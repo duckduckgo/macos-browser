@@ -1,5 +1,5 @@
 //
-//  AppDelegate.swift
+//  ViewController.swift
 //
 //  Copyright © 2020 DuckDuckGo. All rights reserved.
 //
@@ -17,16 +17,33 @@
 //
 
 import Cocoa
+import WebKit
+import os.log
 
-@NSApplicationMain
-class AppDelegate: NSObject, NSApplicationDelegate {
+class WebViewController: NSViewController {
 
-    func applicationDidFinishLaunching(_ aNotification: Notification) {
-        // Insert code here to initialize your application
+    @IBOutlet weak var webView: WKWebView!
+
+    override func viewDidLoad() {
+        super.viewDidLoad()
+
+        webView.navigationDelegate = self
+        webView.uiDelegate = self
     }
 
-    func applicationWillTerminate(_ aNotification: Notification) {
-        // Insert code here to tear down your application
+    func load(url: URL) {
+        os_log("%s: load %s", log: generalLog, type: .debug, self.className, url.absoluteString)
+
+        let request = URLRequest(url: url)
+        webView.load(request)
     }
+
+}
+
+extension WebViewController: WKNavigationDelegate {
+
+}
+
+extension WebViewController: WKUIDelegate {
 
 }

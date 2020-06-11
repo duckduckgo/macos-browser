@@ -8,11 +8,18 @@
 
 /* Begin PBXBuildFile section */
 		AA585D82248FD31100E9A3E2 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA585D81248FD31100E9A3E2 /* AppDelegate.swift */; };
-		AA585D84248FD31100E9A3E2 /* ViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA585D83248FD31100E9A3E2 /* ViewController.swift */; };
+		AA585D84248FD31100E9A3E2 /* WebViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA585D83248FD31100E9A3E2 /* WebViewController.swift */; };
 		AA585D86248FD31400E9A3E2 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = AA585D85248FD31400E9A3E2 /* Assets.xcassets */; };
 		AA585D89248FD31400E9A3E2 /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = AA585D87248FD31400E9A3E2 /* Main.storyboard */; };
 		AA585D95248FD31400E9A3E2 /* DuckDuckGoTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA585D94248FD31400E9A3E2 /* DuckDuckGoTests.swift */; };
 		AA585DA0248FD31500E9A3E2 /* DuckDuckGoUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA585D9F248FD31500E9A3E2 /* DuckDuckGoUITests.swift */; };
+		AA585DAF2490E6E600E9A3E2 /* MainViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA585DAE2490E6E600E9A3E2 /* MainViewController.swift */; };
+		AA68C3D32490ED62001B8783 /* NavigationBarViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA68C3D22490ED62001B8783 /* NavigationBarViewController.swift */; };
+		AA68C3D72490F821001B8783 /* README.md in Resources */ = {isa = PBXBuildFile; fileRef = AA68C3D62490F821001B8783 /* README.md */; };
+		AA8EDF212491FCEB0071C2E8 /* URLViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA8EDF202491FCEB0071C2E8 /* URLViewModel.swift */; };
+		AA8EDF2424923E980071C2E8 /* URL.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA8EDF2324923E980071C2E8 /* URL.swift */; };
+		AA8EDF2724923EC70071C2E8 /* String.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA8EDF2624923EC70071C2E8 /* String.swift */; };
+		AA8EDF2A249268600071C2E8 /* Log.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA8EDF29249268600071C2E8 /* Log.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -35,7 +42,7 @@
 /* Begin PBXFileReference section */
 		AA585D7E248FD31100E9A3E2 /* DuckDuckGo.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = DuckDuckGo.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		AA585D81248FD31100E9A3E2 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
-		AA585D83248FD31100E9A3E2 /* ViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ViewController.swift; sourceTree = "<group>"; };
+		AA585D83248FD31100E9A3E2 /* WebViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = WebViewController.swift; path = ../WebViewController.swift; sourceTree = "<group>"; };
 		AA585D85248FD31400E9A3E2 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		AA585D88248FD31400E9A3E2 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/Main.storyboard; sourceTree = "<group>"; };
 		AA585D8A248FD31400E9A3E2 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
@@ -46,6 +53,13 @@
 		AA585D9B248FD31400E9A3E2 /* DuckDuckGoUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = DuckDuckGoUITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		AA585D9F248FD31500E9A3E2 /* DuckDuckGoUITests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DuckDuckGoUITests.swift; sourceTree = "<group>"; };
 		AA585DA1248FD31500E9A3E2 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		AA585DAE2490E6E600E9A3E2 /* MainViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = MainViewController.swift; path = ../MainViewController.swift; sourceTree = "<group>"; };
+		AA68C3D22490ED62001B8783 /* NavigationBarViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = NavigationBarViewController.swift; path = ../NavigationBarViewController.swift; sourceTree = "<group>"; };
+		AA68C3D62490F821001B8783 /* README.md */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; path = README.md; sourceTree = "<group>"; };
+		AA8EDF202491FCEB0071C2E8 /* URLViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = URLViewModel.swift; sourceTree = "<group>"; };
+		AA8EDF2324923E980071C2E8 /* URL.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = URL.swift; sourceTree = "<group>"; };
+		AA8EDF2624923EC70071C2E8 /* String.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = String.swift; sourceTree = "<group>"; };
+		AA8EDF29249268600071C2E8 /* Log.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Log.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -76,6 +90,7 @@
 		AA585D75248FD31100E9A3E2 = {
 			isa = PBXGroup;
 			children = (
+				AA68C3D62490F821001B8783 /* README.md */,
 				AA585D80248FD31100E9A3E2 /* DuckDuckGo */,
 				AA585D93248FD31400E9A3E2 /* DuckDuckGoTests */,
 				AA585D9E248FD31500E9A3E2 /* DuckDuckGoUITests */,
@@ -97,9 +112,9 @@
 			isa = PBXGroup;
 			children = (
 				AA585D81248FD31100E9A3E2 /* AppDelegate.swift */,
-				AA585D83248FD31100E9A3E2 /* ViewController.swift */,
+				AA585DB02490E6FA00E9A3E2 /* Main */,
+				AA8EDF29249268600071C2E8 /* Log.swift */,
 				AA585D85248FD31400E9A3E2 /* Assets.xcassets */,
-				AA585D87248FD31400E9A3E2 /* Main.storyboard */,
 				AA585D8A248FD31400E9A3E2 /* Info.plist */,
 				AA585D8B248FD31400E9A3E2 /* DuckDuckGo.entitlements */,
 			);
@@ -124,6 +139,36 @@
 			path = DuckDuckGoUITests;
 			sourceTree = "<group>";
 		};
+		AA585DB02490E6FA00E9A3E2 /* Main */ = {
+			isa = PBXGroup;
+			children = (
+				AA68C3D824911D56001B8783 /* View */,
+				AA8EDF1F2491FCC10071C2E8 /* ViewModel */,
+			);
+			path = Main;
+			sourceTree = "<group>";
+		};
+		AA68C3D824911D56001B8783 /* View */ = {
+			isa = PBXGroup;
+			children = (
+				AA585D87248FD31400E9A3E2 /* Main.storyboard */,
+				AA585DAE2490E6E600E9A3E2 /* MainViewController.swift */,
+				AA68C3D22490ED62001B8783 /* NavigationBarViewController.swift */,
+				AA585D83248FD31100E9A3E2 /* WebViewController.swift */,
+			);
+			path = View;
+			sourceTree = "<group>";
+		};
+		AA8EDF1F2491FCC10071C2E8 /* ViewModel */ = {
+			isa = PBXGroup;
+			children = (
+				AA8EDF202491FCEB0071C2E8 /* URLViewModel.swift */,
+				AA8EDF2324923E980071C2E8 /* URL.swift */,
+				AA8EDF2624923EC70071C2E8 /* String.swift */,
+			);
+			path = ViewModel;
+			sourceTree = "<group>";
+		};
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
@@ -132,6 +177,7 @@
 			buildConfigurationList = AA585DA4248FD31500E9A3E2 /* Build configuration list for PBXNativeTarget "DuckDuckGo" */;
 			buildPhases = (
 				AA585D7A248FD31100E9A3E2 /* Sources */,
+				AA8EDF2824925E940071C2E8 /* Swift Lint */,
 				AA585D7B248FD31100E9A3E2 /* Frameworks */,
 				AA585D7C248FD31100E9A3E2 /* Resources */,
 			);
@@ -228,6 +274,7 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				AA68C3D72490F821001B8783 /* README.md in Resources */,
 				AA585D86248FD31400E9A3E2 /* Assets.xcassets in Resources */,
 				AA585D89248FD31400E9A3E2 /* Main.storyboard in Resources */,
 			);
@@ -249,13 +296,40 @@
 		};
 /* End PBXResourcesBuildPhase section */
 
+/* Begin PBXShellScriptBuildPhase section */
+		AA8EDF2824925E940071C2E8 /* Swift Lint */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputFileListPaths = (
+			);
+			inputPaths = (
+			);
+			name = "Swift Lint";
+			outputFileListPaths = (
+			);
+			outputPaths = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "if which swiftlint >/dev/null; then\n   if [ ! -z \"$BITRISE_PROJECT_PATH\" ] || [ \"$CONFIGURATION\" = \"Release\" ]; then\n       swiftlint lint --strict\n       if [ $? -ne 0 ]; then\n           echo \"error: SwiftLint validation failed.\"\n           exit 1\n       fi\n   else\n       swiftlint lint\n   fi\nelse\n   echo \"error: SwiftLint not installed. Install using \\`brew install swiftlint\\`\"\n   exit 1\nfi\n";
+		};
+/* End PBXShellScriptBuildPhase section */
+
 /* Begin PBXSourcesBuildPhase section */
 		AA585D7A248FD31100E9A3E2 /* Sources */ = {
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				AA585D84248FD31100E9A3E2 /* ViewController.swift in Sources */,
+				AA68C3D32490ED62001B8783 /* NavigationBarViewController.swift in Sources */,
+				AA585DAF2490E6E600E9A3E2 /* MainViewController.swift in Sources */,
+				AA8EDF212491FCEB0071C2E8 /* URLViewModel.swift in Sources */,
+				AA585D84248FD31100E9A3E2 /* WebViewController.swift in Sources */,
+				AA8EDF2724923EC70071C2E8 /* String.swift in Sources */,
 				AA585D82248FD31100E9A3E2 /* AppDelegate.swift in Sources */,
+				AA8EDF2A249268600071C2E8 /* Log.swift in Sources */,
+				AA8EDF2424923E980071C2E8 /* URL.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

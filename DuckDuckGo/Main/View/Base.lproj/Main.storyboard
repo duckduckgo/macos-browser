@@ -1,7 +1,9 @@
-<?xml version="1.0" encoding="UTF-8" standalone="no"?>
-<document type="com.apple.InterfaceBuilder3.Cocoa.Storyboard.XIB" version="3.0" toolsVersion="11134" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none" useAutolayout="YES" initialViewController="B8D-0N-5wS">
+<?xml version="1.0" encoding="UTF-8"?>
+<document type="com.apple.InterfaceBuilder3.Cocoa.Storyboard.XIB" version="3.0" toolsVersion="16097" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none" useAutolayout="YES" initialViewController="B8D-0N-5wS">
     <dependencies>
-        <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="11134"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="16097"/>
+        <plugIn identifier="com.apple.WebKit2IBPlugin" version="16097"/>
+        <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
     </dependencies>
     <scenes>
         <!--Application-->
@@ -673,20 +675,20 @@
                         <outlet property="delegate" destination="Voe-Tx-rLC" id="PrD-fu-P6m"/>
                     </connections>
                 </application>
-                <customObject id="Voe-Tx-rLC" customClass="AppDelegate" customModuleProvider="target"/>
+                <customObject id="Voe-Tx-rLC" customClass="AppDelegate" customModule="DuckDuckGo" customModuleProvider="target"/>
                 <customObject id="YLy-65-1bz" customClass="NSFontManager"/>
                 <customObject id="Ady-hI-5gd" userLabel="First Responder" customClass="NSResponder" sceneMemberID="firstResponder"/>
             </objects>
-            <point key="canvasLocation" x="75" y="0.0"/>
+            <point key="canvasLocation" x="-215" y="-265"/>
         </scene>
         <!--Window Controller-->
         <scene sceneID="R2V-B0-nI4">
             <objects>
                 <windowController id="B8D-0N-5wS" sceneMemberID="viewController">
-                    <window key="window" title="Window" allowsToolTipsWhenApplicationIsInactive="NO" autorecalculatesKeyViewLoop="NO" releasedWhenClosed="NO" visibleAtLaunch="NO" animationBehavior="default" id="IQv-IB-iLA">
+                    <window key="window" title="Window" allowsToolTipsWhenApplicationIsInactive="NO" autorecalculatesKeyViewLoop="NO" releasedWhenClosed="NO" visibleAtLaunch="NO" animationBehavior="default" titleVisibility="hidden" id="IQv-IB-iLA">
                         <windowStyleMask key="styleMask" titled="YES" closable="YES" miniaturizable="YES" resizable="YES"/>
                         <windowPositionMask key="initialPositionMask" leftStrut="YES" rightStrut="YES" topStrut="YES" bottomStrut="YES"/>
-                        <rect key="contentRect" x="196" y="240" width="480" height="270"/>
+                        <rect key="contentRect" x="196" y="240" width="1024" height="789"/>
                         <rect key="screenRect" x="0.0" y="0.0" width="1680" height="1027"/>
                         <connections>
                             <outlet property="delegate" destination="B8D-0N-5wS" id="98r-iN-zZc"/>
@@ -700,18 +702,115 @@
             </objects>
             <point key="canvasLocation" x="75" y="250"/>
         </scene>
-        <!--View Controller-->
+        <!--Main View Controller-->
         <scene sceneID="hIz-AP-VOD">
             <objects>
-                <viewController id="XfG-lQ-9wD" customClass="ViewController" customModuleProvider="target" sceneMemberID="viewController">
+                <viewController id="XfG-lQ-9wD" customClass="MainViewController" customModule="DuckDuckGo" customModuleProvider="target" sceneMemberID="viewController">
                     <view key="view" id="m2S-Jp-Qdl">
-                        <rect key="frame" x="0.0" y="0.0" width="480" height="270"/>
+                        <rect key="frame" x="0.0" y="0.0" width="1024" height="789"/>
                         <autoresizingMask key="autoresizingMask"/>
+                        <subviews>
+                            <containerView translatesAutoresizingMaskIntoConstraints="NO" id="wFH-xq-50o">
+                                <rect key="frame" x="0.0" y="750" width="1024" height="39"/>
+                                <constraints>
+                                    <constraint firstAttribute="height" constant="39" id="vZS-tl-wOP"/>
+                                </constraints>
+                                <connections>
+                                    <segue destination="zAi-mT-h2J" kind="embed" destinationCreationSelector="createNavigationBarViewControllerWithCoder:sender:segueIdentifier:" id="Py5-GB-0yS"/>
+                                </connections>
+                            </containerView>
+                            <containerView translatesAutoresizingMaskIntoConstraints="NO" id="SYo-8W-jl3">
+                                <rect key="frame" x="0.0" y="0.0" width="1024" height="750"/>
+                                <connections>
+                                    <segue destination="ELG-jh-7Cj" kind="embed" destinationCreationSelector="createWebViewControllerWithCoder:sender:segueIdentifier:" id="PBj-0f-brI"/>
+                                </connections>
+                            </containerView>
+                        </subviews>
+                        <constraints>
+                            <constraint firstAttribute="trailing" secondItem="wFH-xq-50o" secondAttribute="trailing" id="4Cb-FA-sMo"/>
+                            <constraint firstAttribute="trailing" secondItem="SYo-8W-jl3" secondAttribute="trailing" id="EJ8-cX-El9"/>
+                            <constraint firstItem="wFH-xq-50o" firstAttribute="top" secondItem="m2S-Jp-Qdl" secondAttribute="top" id="PlA-C1-Iyl"/>
+                            <constraint firstItem="SYo-8W-jl3" firstAttribute="top" secondItem="wFH-xq-50o" secondAttribute="bottom" id="SOg-lH-g5P"/>
+                            <constraint firstItem="wFH-xq-50o" firstAttribute="leading" secondItem="m2S-Jp-Qdl" secondAttribute="leading" id="XQv-BZ-2ci"/>
+                            <constraint firstAttribute="bottom" secondItem="SYo-8W-jl3" secondAttribute="bottom" id="tLa-XX-e8i"/>
+                            <constraint firstItem="SYo-8W-jl3" firstAttribute="leading" secondItem="m2S-Jp-Qdl" secondAttribute="leading" id="woj-yk-97j"/>
+                        </constraints>
                     </view>
+                    <connections>
+                        <outlet property="navigationBarContainerView" destination="wFH-xq-50o" id="hbq-xV-McI"/>
+                        <outlet property="webContainerView" destination="SYo-8W-jl3" id="DoZ-Ih-dHA"/>
+                    </connections>
                 </viewController>
                 <customObject id="rPt-NT-nkU" userLabel="First Responder" customClass="NSResponder" sceneMemberID="firstResponder"/>
             </objects>
-            <point key="canvasLocation" x="75" y="655"/>
+            <point key="canvasLocation" x="75" y="1179"/>
+        </scene>
+        <!--Navigation Bar View Controller-->
+        <scene sceneID="Lx2-fj-RhY">
+            <objects>
+                <viewController id="zAi-mT-h2J" customClass="NavigationBarViewController" customModule="DuckDuckGo" customModuleProvider="target" sceneMemberID="viewController">
+                    <view key="view" id="23V-k7-gwK">
+                        <rect key="frame" x="0.0" y="0.0" width="561" height="40"/>
+                        <autoresizingMask key="autoresizingMask"/>
+                        <subviews>
+                            <searchField wantsLayer="YES" verticalHuggingPriority="750" textCompletion="NO" translatesAutoresizingMaskIntoConstraints="NO" id="b1U-yO-v3i">
+                                <rect key="frame" x="31" y="9" width="500" height="22"/>
+                                <constraints>
+                                    <constraint firstAttribute="height" constant="22" id="IOH-UD-0S2"/>
+                                    <constraint firstAttribute="width" priority="250" constant="500" id="Lba-qs-Qej"/>
+                                </constraints>
+                                <searchFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" selectable="YES" editable="YES" borderStyle="bezel" placeholderString="Search or enter address" usesSingleLineMode="YES" bezelStyle="round" id="Ad5-Li-sGN">
+                                    <font key="font" metaFont="system"/>
+                                    <color key="textColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
+                                    <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
+                                </searchFieldCell>
+                            </searchField>
+                        </subviews>
+                        <constraints>
+                            <constraint firstAttribute="trailing" relation="greaterThanOrEqual" secondItem="b1U-yO-v3i" secondAttribute="trailing" constant="20" id="7vl-ky-E8t"/>
+                            <constraint firstItem="b1U-yO-v3i" firstAttribute="leading" relation="greaterThanOrEqual" secondItem="23V-k7-gwK" secondAttribute="leading" constant="20" id="Uvz-dQ-aK4"/>
+                            <constraint firstItem="b1U-yO-v3i" firstAttribute="centerY" secondItem="23V-k7-gwK" secondAttribute="centerY" id="aZJ-7U-mmY"/>
+                            <constraint firstItem="b1U-yO-v3i" firstAttribute="centerX" secondItem="23V-k7-gwK" secondAttribute="centerX" id="t2z-q9-dku"/>
+                        </constraints>
+                    </view>
+                    <connections>
+                        <outlet property="searchField" destination="b1U-yO-v3i" id="KPy-9z-ND7"/>
+                    </connections>
+                </viewController>
+                <customObject id="zdG-Z1-HUh" userLabel="First Responder" customClass="NSResponder" sceneMemberID="firstResponder"/>
+            </objects>
+            <point key="canvasLocation" x="-199" y="1868"/>
+        </scene>
+        <!--Web View Controller-->
+        <scene sceneID="POP-kj-wTB">
+            <objects>
+                <viewController id="ELG-jh-7Cj" customClass="WebViewController" customModule="DuckDuckGo" customModuleProvider="target" sceneMemberID="viewController">
+                    <view key="view" id="9OZ-eN-8Ze">
+                        <rect key="frame" x="0.0" y="0.0" width="512" height="492"/>
+                        <autoresizingMask key="autoresizingMask"/>
+                        <subviews>
+                            <wkWebView wantsLayer="YES" translatesAutoresizingMaskIntoConstraints="NO" id="0pi-OT-jzg">
+                                <rect key="frame" x="0.0" y="0.0" width="512" height="492"/>
+                                <wkWebViewConfiguration key="configuration">
+                                    <audiovisualMediaTypes key="mediaTypesRequiringUserActionForPlayback" none="YES"/>
+                                    <wkPreferences key="preferences"/>
+                                </wkWebViewConfiguration>
+                            </wkWebView>
+                        </subviews>
+                        <constraints>
+                            <constraint firstItem="0pi-OT-jzg" firstAttribute="top" secondItem="9OZ-eN-8Ze" secondAttribute="top" id="GdO-9V-k8G"/>
+                            <constraint firstAttribute="bottom" secondItem="0pi-OT-jzg" secondAttribute="bottom" id="OCn-LW-f5K"/>
+                            <constraint firstAttribute="trailing" secondItem="0pi-OT-jzg" secondAttribute="trailing" id="o51-Tp-9t2"/>
+                            <constraint firstItem="0pi-OT-jzg" firstAttribute="leading" secondItem="9OZ-eN-8Ze" secondAttribute="leading" id="upy-bE-zOl"/>
+                        </constraints>
+                    </view>
+                    <connections>
+                        <outlet property="webView" destination="0pi-OT-jzg" id="VeJ-Qf-md8"/>
+                    </connections>
+                </viewController>
+                <customObject id="mxo-Js-ldQ" userLabel="First Responder" customClass="NSResponder" sceneMemberID="firstResponder"/>
+            </objects>
+            <point key="canvasLocation" x="374" y="2094"/>
         </scene>
     </scenes>
 </document>

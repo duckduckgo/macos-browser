@@ -1,5 +1,5 @@
 //
-//  AppDelegate.swift
+//  URLViewModel.swift
 //
 //  Copyright © 2020 DuckDuckGo. All rights reserved.
 //
@@ -16,17 +16,18 @@
 //  limitations under the License.
 //
 
-import Cocoa
+import Foundation
 
-@NSApplicationMain
-class AppDelegate: NSObject, NSApplicationDelegate {
+class URLViewModel {
 
-    func applicationDidFinishLaunching(_ aNotification: Notification) {
-        // Insert code here to initialize your application
+    let url: URL
+
+    init(url: URL) {
+        self.url = url
     }
 
-    func applicationWillTerminate(_ aNotification: Notification) {
-        // Insert code here to tear down your application
+    var addressBarRepresentation: String {
+        url.searchQuery ?? url.host ?? ""
     }
 
 }
