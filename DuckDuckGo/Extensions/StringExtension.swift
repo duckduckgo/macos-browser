@@ -17,6 +17,7 @@
 //
 
 import Foundation
+import os.log
 
 extension String {
 
@@ -24,8 +25,8 @@ extension String {
 
     var isValidUrl: Bool {
         guard let detector = try? NSDataDetector(types: NSTextCheckingResult.CheckingType.link.rawValue) else {
+            os_log("String extension: Failed to create NSDataDetector", log: generalLog, type: .error)
             return false
-            //todo os og
         }
         let range = NSRange(location: 0, length: self.utf16.count)
 

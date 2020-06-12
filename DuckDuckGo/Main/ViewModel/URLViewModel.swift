@@ -17,6 +17,7 @@
 //
 
 import Foundation
+import os.log
 
 class URLViewModel {
 
@@ -26,8 +27,45 @@ class URLViewModel {
         self.url = url
     }
 
+    convenience init?(addressBarString: String) {
+        guard let url = URL.makeURL(from: addressBarString) else {
+            return nil
+        }
+
+        self.init(url: url)
+    }
+
     var addressBarRepresentation: String {
         url.searchQuery ?? url.host ?? ""
     }
 
+}
+
+extension URL {
+
+    static func makeSearchUrl(from searchQuery: String) -> URL? {
+        let trimmedQuery = searchQuery.trimmingCharacters(in: .whitespacesAndNewlines)
+        do {
+            var searchUrl = Self.duckduckgo
+            try searchUrl.addParameter(name: DuckduckgoParameters.search.rawValue, value: trimmedQuery)
+            return searchUrl
+        } catch let error {
+            os_log("URL extension: %s", log: generalLog, type: .error, error.localizedDescription)
+            return nil
+        }
+    }
+
+    static func makeURL(from addressBarString: String) -> URL? {
+        if let addressBarUrl = addressBarString.url {
+            return addressBarUrl
+        }
+
+        if let searchUrl = URL.makeSearchUrl(from: addressBarString) {
+            return searchUrl
+        }
+
+        os_log("URL extension: Making URL from %s failed", log: generalLog, type: .error, addressBarString)
+        return nil
+    }
+    
 }

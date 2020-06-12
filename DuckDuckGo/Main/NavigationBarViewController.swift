@@ -20,8 +20,7 @@ import Cocoa
 
 protocol NavigationBarViewControllerDelegate: AnyObject {
 
-    func navigationBarViewController(_ navigationBarViewController: NavigationBarViewController, textDidChange text: String)
-    func navigationBarViewControllerDidConfirmInput(_ navigationBarViewController: NavigationBarViewController)
+    func navigationBarViewController(_ navigationBarViewController: NavigationBarViewController, urlDidChange urlViewModel: URLViewModel?)
 
 }
 
@@ -43,8 +42,14 @@ class NavigationBarViewController: NSViewController {
         searchField.delegate = self
     }
 
-    func refreshSearchField() {
+    private func refreshSearchField() {
         searchField.stringValue = urlViewModel?.addressBarRepresentation ?? ""
+    }
+
+    private func refreshUrlViewModel() {
+        urlViewModel = URLViewModel(addressBarString: searchField.stringValue)
+
+        delegate?.navigationBarViewController(self, urlDidChange: urlViewModel)
     }
     
 }
@@ -54,12 +59,12 @@ extension NavigationBarViewController: NSSearchFieldDelegate {
     func controlTextDidEndEditing(_ obj: Notification) {
         let textMovement = obj.userInfo?["NSTextMovement"] as? Int
         if textMovement == NSReturnTextMovement {
-            delegate?.navigationBarViewControllerDidConfirmInput(self)
+            refreshUrlViewModel()
         }
     }
 
     func controlTextDidChange(_ obj: Notification) {
-        delegate?.navigationBarViewController(self, textDidChange: searchField.stringValue)
+
     }
 
 }

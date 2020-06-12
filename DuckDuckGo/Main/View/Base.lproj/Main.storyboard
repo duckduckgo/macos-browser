@@ -781,10 +781,10 @@
             </objects>
             <point key="canvasLocation" x="-199" y="1868"/>
         </scene>
-        <!--Web View Controller-->
+        <!--Browser Tab View Controller-->
         <scene sceneID="POP-kj-wTB">
             <objects>
-                <viewController id="ELG-jh-7Cj" customClass="WebViewController" customModule="DuckDuckGo" customModuleProvider="target" sceneMemberID="viewController">
+                <viewController id="ELG-jh-7Cj" customClass="BrowserTabViewController" customModule="DuckDuckGo" customModuleProvider="target" sceneMemberID="viewController">
                     <view key="view" id="9OZ-eN-8Ze">
                         <rect key="frame" x="0.0" y="0.0" width="512" height="492"/>
                         <autoresizingMask key="autoresizingMask"/>

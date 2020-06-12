@@ -25,13 +25,7 @@ class MainViewController: NSViewController {
     @IBOutlet weak var webContainerView: NSView!
 
     var navigationBarViewController: NavigationBarViewController?
-    var webViewController: WebViewController?
-
-    var urlViewModel: URLViewModel? {
-        didSet {
-            navigationBarViewController?.urlViewModel = urlViewModel
-        }
-    }
+    var browserTabViewController: BrowserTabViewController?
 
     @IBSegueAction
     func createNavigationBarViewController(coder: NSCoder, sender: Any?, segueIdentifier: String?) -> NavigationBarViewController? {
@@ -42,40 +36,18 @@ class MainViewController: NSViewController {
     }
 
     @IBSegueAction
-    func createWebViewController(coder: NSCoder, sender: Any?, segueIdentifier: String?) -> WebViewController? {
-        let webViewController = WebViewController(coder: coder)
-        self.webViewController = webViewController
+    func createWebViewController(coder: NSCoder, sender: Any?, segueIdentifier: String?) -> BrowserTabViewController? {
+        let webViewController = BrowserTabViewController(coder: coder)
+        self.browserTabViewController = webViewController
         return webViewController
-    }
-
-    private func loadURLInWebView() {
-        guard let webViewController = webViewController else {
-            os_log("%s: webViewController is nil", log: generalLog, type: .error, self.className)
-            return
-        }
-
-        guard let url = urlViewModel?.url else {
-            os_log("%s: urlViewModel is nil", log: generalLog, type: .error, self.className)
-            return
-        }
-
-        webViewController.load(url: url)
     }
     
 }
 
 extension MainViewController: NavigationBarViewControllerDelegate {
 
-    func navigationBarViewController(_ navigationBarViewController: NavigationBarViewController, textDidChange text: String) {}
-
-    func navigationBarViewControllerDidConfirmInput(_ navigationBarViewController: NavigationBarViewController) {
-        if let url = URL.makeURL(from: navigationBarViewController.searchField.stringValue) {
-            urlViewModel = URLViewModel(url: url)
-        } else {
-            urlViewModel = nil
-        }
-
-        loadURLInWebView()
+    func navigationBarViewController(_ navigationBarViewController: NavigationBarViewController, urlDidChange urlViewModel: URLViewModel?) {
+        browserTabViewController?.urlViewModel = urlViewModel
     }
 
 }
