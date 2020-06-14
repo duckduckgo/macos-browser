@@ -1,5 +1,5 @@
 //
-//  URL.swift
+//  URLExtension.swift
 //
 //  Copyright © 2020 DuckDuckGo. All rights reserved.
 //

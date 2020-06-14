@@ -1,5 +1,5 @@
 //
-//  ViewController.swift
+//  BrowserTabViewController.swift
 //
 //  Copyright © 2020 DuckDuckGo. All rights reserved.
 //
@@ -20,9 +20,17 @@ import Cocoa
 import WebKit
 import os.log
 
+protocol BrowserTabViewControllerDelegate: AnyObject {
+
+    func browserTabViewController(_ browserTabViewController: BrowserTabViewController, urlDidChange urlViewModel: URLViewModel?)
+
+}
+
 class BrowserTabViewController: NSViewController {
 
     @IBOutlet weak var webView: WKWebView!
+
+    weak var delegate: BrowserTabViewControllerDelegate?
 
     var urlViewModel: URLViewModel? {
         didSet {
@@ -35,6 +43,23 @@ class BrowserTabViewController: NSViewController {
 
         webView.navigationDelegate = self
         webView.uiDelegate = self
+        webView.addObserver(self, forKeyPath: #keyPath(WKWebView.url), options: .new, context: nil)
+    }
+
+    override func observeValue(forKeyPath keyPath: String?,
+                               of object: Any?,
+                               change: [NSKeyValueChangeKey: Any]?,
+                               context: UnsafeMutableRawPointer?) {
+        if keyPath == #keyPath(WKWebView.url) {
+            urlChanged()
+            return
+        }
+
+        super.observeValue(forKeyPath: keyPath, of: object, change: change, context: context)
+    }
+
+    deinit {
+        webView.removeObserver(self, forKeyPath: #keyPath(WKWebView.url))
     }
 
     private func reload() {
@@ -44,6 +69,15 @@ class BrowserTabViewController: NSViewController {
             let request = URLRequest(url: urlViewModel.url)
             webView.load(request)
         }
+    }
+
+    private func urlChanged() {
+        var urlViewModel: URLViewModel?
+        if let url = webView.url {
+            urlViewModel = URLViewModel(url: url)
+        }
+
+        delegate?.browserTabViewController(self, urlDidChange: urlViewModel)
     }
 
 }

@@ -37,9 +37,10 @@ class MainViewController: NSViewController {
 
     @IBSegueAction
     func createWebViewController(coder: NSCoder, sender: Any?, segueIdentifier: String?) -> BrowserTabViewController? {
-        let webViewController = BrowserTabViewController(coder: coder)
-        self.browserTabViewController = webViewController
-        return webViewController
+        let browserTabViewController = BrowserTabViewController(coder: coder)
+        self.browserTabViewController = browserTabViewController
+        browserTabViewController?.delegate = self
+        return browserTabViewController
     }
     
 }
@@ -48,6 +49,14 @@ extension MainViewController: NavigationBarViewControllerDelegate {
 
     func navigationBarViewController(_ navigationBarViewController: NavigationBarViewController, urlDidChange urlViewModel: URLViewModel?) {
         browserTabViewController?.urlViewModel = urlViewModel
+    }
+
+}
+
+extension MainViewController: BrowserTabViewControllerDelegate {
+
+    func browserTabViewController(_ browserTabViewController: BrowserTabViewController, urlDidChange urlViewModel: URLViewModel?) {
+        navigationBarViewController?.urlViewModel = urlViewModel
     }
 
 }

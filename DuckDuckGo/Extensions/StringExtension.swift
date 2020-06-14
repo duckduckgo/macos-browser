@@ -1,5 +1,5 @@
 //
-//  String.swift
+//  StringExtension.swift
 //
 //  Copyright © 2020 DuckDuckGo. All rights reserved.
 //

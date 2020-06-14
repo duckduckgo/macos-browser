@@ -41,7 +41,7 @@ class URLViewModel {
 
 }
 
-extension URL {
+fileprivate extension URL {
 
     static func makeSearchUrl(from searchQuery: String) -> URL? {
         let trimmedQuery = searchQuery.trimmingCharacters(in: .whitespacesAndNewlines)
