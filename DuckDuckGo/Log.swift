@@ -1,5 +1,5 @@
 //
-//  AppDelegate.swift
+//  Log.swift
 //
 //  Copyright © 2020 DuckDuckGo. All rights reserved.
 //
@@ -16,17 +16,7 @@
 //  limitations under the License.
 //
 
-import Cocoa
+import Foundation
+import os.log
 
-@NSApplicationMain
-class AppDelegate: NSObject, NSApplicationDelegate {
-
-    func applicationDidFinishLaunching(_ aNotification: Notification) {
-        // Insert code here to initialize your application
-    }
-
-    func applicationWillTerminate(_ aNotification: Notification) {
-        // Insert code here to tear down your application
-    }
-
-}
+let generalLog: OSLog = OSLog(subsystem: Bundle.main.bundleIdentifier ?? "\(Bundle.main.bundlePath)", category: "DDG General")
