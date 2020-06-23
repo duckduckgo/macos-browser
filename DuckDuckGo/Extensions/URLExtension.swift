@@ -61,7 +61,7 @@ extension URL {
     // MARK: - DuckDuckGo
 
     static var duckduckgo: URL {
-        let duckduckgoUrlString = "https://duckduckgo.com"
+        let duckduckgoUrlString = "https://duckduckgo.com/"
         return URL(string: duckduckgoUrlString)!
     }
 
