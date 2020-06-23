@@ -19,7 +19,7 @@
 		AA8EDF212491FCEB0071C2E8 /* URLViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA8EDF202491FCEB0071C2E8 /* URLViewModel.swift */; };
 		AA8EDF2424923E980071C2E8 /* URLExtension.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA8EDF2324923E980071C2E8 /* URLExtension.swift */; };
 		AA8EDF2724923EC70071C2E8 /* StringExtension.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA8EDF2624923EC70071C2E8 /* StringExtension.swift */; };
-		AA8EDF2A249268600071C2E8 /* Log.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA8EDF29249268600071C2E8 /* Log.swift */; };
+		AA8EDF2A249268600071C2E8 /* OSLogExtension.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA8EDF29249268600071C2E8 /* OSLogExtension.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -59,7 +59,7 @@
 		AA8EDF202491FCEB0071C2E8 /* URLViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = URLViewModel.swift; sourceTree = "<group>"; };
 		AA8EDF2324923E980071C2E8 /* URLExtension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = URLExtension.swift; sourceTree = "<group>"; };
 		AA8EDF2624923EC70071C2E8 /* StringExtension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StringExtension.swift; sourceTree = "<group>"; };
-		AA8EDF29249268600071C2E8 /* Log.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Log.swift; sourceTree = "<group>"; };
+		AA8EDF29249268600071C2E8 /* OSLogExtension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OSLogExtension.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -114,7 +114,6 @@
 				AA585D81248FD31100E9A3E2 /* AppDelegate.swift */,
 				AADC60E92493B305008F8EF7 /* Extensions */,
 				AA585DB02490E6FA00E9A3E2 /* Main */,
-				AA8EDF29249268600071C2E8 /* Log.swift */,
 				AA585D85248FD31400E9A3E2 /* Assets.xcassets */,
 				AA585D8A248FD31400E9A3E2 /* Info.plist */,
 				AA585D8B248FD31400E9A3E2 /* DuckDuckGo.entitlements */,
@@ -171,8 +170,9 @@
 		AADC60E92493B305008F8EF7 /* Extensions */ = {
 			isa = PBXGroup;
 			children = (
-				AA8EDF2324923E980071C2E8 /* URLExtension.swift */,
+				AA8EDF29249268600071C2E8 /* OSLogExtension.swift */,
 				AA8EDF2624923EC70071C2E8 /* StringExtension.swift */,
+				AA8EDF2324923E980071C2E8 /* URLExtension.swift */,
 			);
 			path = Extensions;
 			sourceTree = "<group>";
@@ -336,7 +336,7 @@
 				AA585D84248FD31100E9A3E2 /* BrowserTabViewController.swift in Sources */,
 				AA8EDF2724923EC70071C2E8 /* StringExtension.swift in Sources */,
 				AA585D82248FD31100E9A3E2 /* AppDelegate.swift in Sources */,
-				AA8EDF2A249268600071C2E8 /* Log.swift in Sources */,
+				AA8EDF2A249268600071C2E8 /* OSLogExtension.swift in Sources */,
 				AA8EDF2424923E980071C2E8 /* URLExtension.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;

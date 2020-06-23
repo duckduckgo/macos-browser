@@ -19,4 +19,10 @@
 import Foundation
 import os.log
 
-let generalLog: OSLog = OSLog(subsystem: Bundle.main.bundleIdentifier ?? "\(Bundle.main.bundlePath)", category: "DDG General")
+extension OSLog {
+
+    public struct Category {
+        public static let general: OSLog = OSLog(subsystem: Bundle.main.bundleIdentifier ?? "\(Bundle.main.bundlePath)", category: "DDG General")
+    }
+
+}

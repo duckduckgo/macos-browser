@@ -64,7 +64,7 @@ class BrowserTabViewController: NSViewController {
 
     private func reload() {
         if let urlViewModel = urlViewModel {
-            os_log("%s: load %s", log: generalLog, type: .debug, self.className, urlViewModel.url.absoluteString)
+            os_log("%s: load %s", log: OSLog.Category.general, type: .debug, self.className, urlViewModel.url.absoluteString)
 
             let request = URLRequest(url: urlViewModel.url)
             webView.load(request)

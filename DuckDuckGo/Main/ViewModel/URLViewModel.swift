@@ -36,7 +36,7 @@ class URLViewModel {
     }
 
     var addressBarRepresentation: String {
-        url.searchQuery ?? url.host ?? ""
+        url.searchQuery ?? url.absoluteString
     }
 
 }
@@ -50,7 +50,7 @@ fileprivate extension URL {
             try searchUrl.addParameter(name: DuckduckgoParameters.search.rawValue, value: trimmedQuery)
             return searchUrl
         } catch let error {
-            os_log("URL extension: %s", log: generalLog, type: .error, error.localizedDescription)
+            os_log("URL extension: %s", log: OSLog.Category.general, type: .error, error.localizedDescription)
             return nil
         }
     }
@@ -64,7 +64,7 @@ fileprivate extension URL {
             return searchUrl
         }
 
-        os_log("URL extension: Making URL from %s failed", log: generalLog, type: .error, addressBarString)
+        os_log("URL extension: Making URL from %s failed", log: OSLog.Category.general, type: .error, addressBarString)
         return nil
     }
     
