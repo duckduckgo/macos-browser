@@ -55,6 +55,10 @@ extension String {
         return url
     }
 
+    func encodingWebSpaces() -> String {
+        return replacingOccurrences(of: "+", with: "%20")
+    }
+
     // MARK: - Mutating
 
     @inlinable mutating func prepend(_ string: String) {

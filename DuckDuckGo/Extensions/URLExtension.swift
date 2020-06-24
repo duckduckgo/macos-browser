@@ -25,6 +25,7 @@ extension URL {
 
     enum ParameterError: Error {
         case parsingFailed
+        case encodingFailed
         case creatingFailed
     }
 
@@ -34,13 +35,16 @@ extension URL {
         let newQueryItem = URLQueryItem(name: name, value: value)
         queryItems.append(newQueryItem)
         components.queryItems = queryItems
-        //todo? percent encoding?
+        guard let encodedQuery = components.percentEncodedQuery else { throw ParameterError.encodingFailed }
+        components.percentEncodedQuery = encodedQuery.encodingWebSpaces()
         guard let newUrl = components.url else { throw ParameterError.creatingFailed }
         self = newUrl
     }
 
     func getParameter(name: String) throws -> String? {
-        guard let components = URLComponents(url: self, resolvingAgainstBaseURL: false) else { throw ParameterError.parsingFailed }
+        guard var components = URLComponents(url: self, resolvingAgainstBaseURL: false) else { throw ParameterError.parsingFailed }
+        guard let encodedQuery = components.percentEncodedQuery else { throw ParameterError.encodingFailed }
+        components.percentEncodedQuery = encodedQuery.encodingWebSpaces()
         let queryItem = components.queryItems?.first(where: { (queryItem) -> Bool in
             queryItem.name == name
         })

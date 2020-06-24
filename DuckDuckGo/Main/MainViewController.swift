@@ -27,36 +27,34 @@ class MainViewController: NSViewController {
     var navigationBarViewController: NavigationBarViewController?
     var browserTabViewController: BrowserTabViewController?
 
+    var tabCollectionViewModel = TabCollectionViewModel()
+
+    override func viewDidLoad() {
+        createInitialTab()
+    }
+
     @IBSegueAction
     func createNavigationBarViewController(coder: NSCoder, sender: Any?, segueIdentifier: String?) -> NavigationBarViewController? {
         let navigationBarViewController = NavigationBarViewController(coder: coder)
         self.navigationBarViewController = navigationBarViewController
-        navigationBarViewController?.delegate = self
+        navigationBarViewController?.tabViewModel = tabCollectionViewModel.selectedTabViewModel
         return navigationBarViewController
     }
 
     @IBSegueAction
     func createWebViewController(coder: NSCoder, sender: Any?, segueIdentifier: String?) -> BrowserTabViewController? {
-        let browserTabViewController = BrowserTabViewController(coder: coder)
+        guard let selectedTabViewModel = tabCollectionViewModel.selectedTabViewModel else {
+            os_log("%s: No selected tabViewModel", log: OSLog.Category.general, type: .error, className)
+            return nil
+        }
+        let browserTabViewController = BrowserTabViewController(coder: coder, tabViewModel: selectedTabViewModel)
         self.browserTabViewController = browserTabViewController
-        browserTabViewController?.delegate = self
         return browserTabViewController
     }
+
+    private func createInitialTab() {
+        tabCollectionViewModel.tabCollection.prependNewTab()
+        tabCollectionViewModel.tabCollection.selectionIndex = 0
+    }
     
-}
-
-extension MainViewController: NavigationBarViewControllerDelegate {
-
-    func navigationBarViewController(_ navigationBarViewController: NavigationBarViewController, urlDidChange urlViewModel: URLViewModel?) {
-        browserTabViewController?.urlViewModel = urlViewModel
-    }
-
-}
-
-extension MainViewController: BrowserTabViewControllerDelegate {
-
-    func browserTabViewController(_ browserTabViewController: BrowserTabViewController, urlDidChange urlViewModel: URLViewModel?) {
-        navigationBarViewController?.urlViewModel = urlViewModel
-    }
-
 }

@@ -19,23 +19,24 @@
 import Cocoa
 import WebKit
 import os.log
-
-protocol BrowserTabViewControllerDelegate: AnyObject {
-
-    func browserTabViewController(_ browserTabViewController: BrowserTabViewController, urlDidChange urlViewModel: URLViewModel?)
-
-}
+import Combine
 
 class BrowserTabViewController: NSViewController {
 
     @IBOutlet weak var webView: WKWebView!
 
-    weak var delegate: BrowserTabViewControllerDelegate?
+    let tabViewModel: TabViewModel
+    var webViewTabUpdater: WebViewTabUpdater?
+    var urlCancelable: AnyCancellable?
 
-    var urlViewModel: URLViewModel? {
-        didSet {
-            reload()
-        }
+    required init?(coder: NSCoder) {
+        fatalError("BrowserTabViewController: Bad initializer")
+    }
+
+    init?(coder: NSCoder, tabViewModel: TabViewModel) {
+        self.tabViewModel = tabViewModel
+
+        super.init(coder: coder)
     }
 
     override func viewDidLoad() {
@@ -43,41 +44,25 @@ class BrowserTabViewController: NSViewController {
 
         webView.navigationDelegate = self
         webView.uiDelegate = self
-        webView.addObserver(self, forKeyPath: #keyPath(WKWebView.url), options: .new, context: nil)
+        tabViewModel.tab.actionDelegate = self
+
+        webViewTabUpdater = WebViewTabUpdater(webView: webView, tab: tabViewModel.tab)
+        bindUrl()
     }
 
-    override func observeValue(forKeyPath keyPath: String?,
-                               of object: Any?,
-                               change: [NSKeyValueChangeKey: Any]?,
-                               context: UnsafeMutableRawPointer?) {
-        if keyPath == #keyPath(WKWebView.url) {
-            urlChanged()
-            return
-        }
-
-        super.observeValue(forKeyPath: keyPath, of: object, change: change, context: context)
+    private func bindUrl() {
+        urlCancelable = tabViewModel.tab.$url.sinkAsync { _ in self.reloadWebViewIfNeeded() }
     }
 
-    deinit {
-        webView.removeObserver(self, forKeyPath: #keyPath(WKWebView.url))
-    }
+    private func reloadWebViewIfNeeded() {
+        if webView.url == tabViewModel.tab.url { return }
 
-    private func reload() {
-        if let urlViewModel = urlViewModel {
-            os_log("%s: load %s", log: OSLog.Category.general, type: .debug, self.className, urlViewModel.url.absoluteString)
+        if let url = tabViewModel.tab.url {
+            os_log("%s: load %s", log: OSLog.Category.general, type: .debug, className, url.absoluteString)
 
-            let request = URLRequest(url: urlViewModel.url)
+            let request = URLRequest(url: url)
             webView.load(request)
         }
-    }
-
-    private func urlChanged() {
-        var urlViewModel: URLViewModel?
-        if let url = webView.url {
-            urlViewModel = URLViewModel(url: url)
-        }
-
-        delegate?.browserTabViewController(self, urlDidChange: urlViewModel)
     }
 
 }
@@ -87,5 +72,21 @@ extension BrowserTabViewController: WKNavigationDelegate {
 }
 
 extension BrowserTabViewController: WKUIDelegate {
+
+}
+
+extension BrowserTabViewController: TabActionDelegate {
+
+    func tabForwardAction(_ tab: Tab) {
+        webView.goForward()
+    }
+
+    func tabBackAction(_ tab: Tab) {
+        webView.goBack()
+    }
+
+    func tabReloadAction(_ tab: Tab) {
+        webView.reload()
+    }
 
 }
