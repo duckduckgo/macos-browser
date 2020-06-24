@@ -46,6 +46,7 @@ class BrowserTabViewController: NSViewController {
         webView.addObserver(self, forKeyPath: #keyPath(WKWebView.url), options: .new, context: nil)
     }
 
+    // swiftlint:disable block_based_kvo
     override func observeValue(forKeyPath keyPath: String?,
                                of object: Any?,
                                change: [NSKeyValueChangeKey: Any]?,
@@ -57,7 +58,8 @@ class BrowserTabViewController: NSViewController {
 
         super.observeValue(forKeyPath: keyPath, of: object, change: change, context: context)
     }
-
+    // swiftlint:enable block_based_kvo
+    
     deinit {
         webView.removeObserver(self, forKeyPath: #keyPath(WKWebView.url))
     }
