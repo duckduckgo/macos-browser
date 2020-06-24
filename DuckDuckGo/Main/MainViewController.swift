@@ -43,6 +43,29 @@ class MainViewController: NSViewController {
         return browserTabViewController
     }
     
+    override func viewDidLoad() {
+        super.viewDidLoad()
+        
+        NSAppleEventManager
+            .shared()
+            .setEventHandler(
+                self,
+                andSelector: #selector(handleURL(event:reply:)),
+                forEventClass: AEEventClass(kInternetEventClass),
+                andEventID: AEEventID(kAEGetURL)
+            )
+
+    }
+
+    @objc func handleURL(event: NSAppleEventDescriptor, reply: NSAppleEventDescriptor) {
+        guard let path = event.paramDescriptor(forKeyword: keyDirectObject)?.stringValue?.removingPercentEncoding,
+            let url = URL(string: path) else { return }
+            
+        let model = URLViewModel(url: url)
+        browserTabViewController?.urlViewModel = model
+        navigationBarViewController?.urlViewModel = model
+    }
+
 }
 
 extension MainViewController: NavigationBarViewControllerDelegate {
