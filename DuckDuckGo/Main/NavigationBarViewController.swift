@@ -117,8 +117,8 @@ fileprivate extension URL {
     static func makeSearchUrl(from searchQuery: String) -> URL? {
         let trimmedQuery = searchQuery.trimmingCharacters(in: .whitespacesAndNewlines)
         do {
-            var searchUrl = Self.duckduckgo
-            try searchUrl.addParameter(name: DuckduckgoParameters.search.rawValue, value: trimmedQuery)
+            var searchUrl = Self.duckDuckGo
+            try searchUrl.addParameter(name: DuckDuckGoParameters.search.rawValue, value: trimmedQuery)
             return searchUrl
         } catch let error {
             os_log("URL extension: %s", log: OSLog.Category.general, type: .error, error.localizedDescription)
