@@ -64,9 +64,9 @@ class NavigationBarViewController: NSViewController {
         navigationButtonsCancelables.forEach { $0.cancel() }
         navigationButtonsCancelables.removeAll()
 
-        tabViewModel?.tab.$canGoBack.sinkAsync { _ in self.setNavigationButtons() } .store(in: &navigationButtonsCancelables)
-        tabViewModel?.tab.$canGoForward.sinkAsync { _ in self.setNavigationButtons() } .store(in: &navigationButtonsCancelables)
-        tabViewModel?.tab.$canReload.sinkAsync { _ in self.setNavigationButtons() } .store(in: &navigationButtonsCancelables)
+        tabViewModel?.$canGoBack.sinkAsync { _ in self.setNavigationButtons() } .store(in: &navigationButtonsCancelables)
+        tabViewModel?.$canGoForward.sinkAsync { _ in self.setNavigationButtons() } .store(in: &navigationButtonsCancelables)
+        tabViewModel?.$canReload.sinkAsync { _ in self.setNavigationButtons() } .store(in: &navigationButtonsCancelables)
     }
 
     private func refreshSearchField() {
@@ -78,9 +78,9 @@ class NavigationBarViewController: NSViewController {
     }
 
     private func setNavigationButtons() {
-        goBackButton.isEnabled = tabViewModel?.tab.canGoBack ?? false
-        goForwardButton.isEnabled = tabViewModel?.tab.canGoForward ?? false
-        reloadButton.isEnabled = tabViewModel?.tab.canReload ?? false
+        goBackButton.isEnabled = tabViewModel?.canGoBack ?? false
+        goForwardButton.isEnabled = tabViewModel?.canGoForward ?? false
+        reloadButton.isEnabled = tabViewModel?.canReload ?? false
     }
 
     private func setUrl() {

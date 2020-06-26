@@ -28,15 +28,7 @@ protocol TabActionDelegate: AnyObject {
 
 class Tab {
 
-    @Published var url: URL? {
-        didSet {
-            canReload = url != nil
-        }
-    }
-
-    @Published var canGoForward: Bool = false
-    @Published var canGoBack: Bool = false
-    @Published var canReload: Bool = false
+    @Published var url: URL?
 
     weak var actionDelegate: TabActionDelegate?
 
@@ -50,6 +42,22 @@ class Tab {
 
     func reload() {
         actionDelegate?.tabReloadAction(self)
+    }
+
+}
+
+extension Tab: Equatable {
+
+    static func == (lhs: Tab, rhs: Tab) -> Bool {
+        lhs === rhs
+    }
+
+}
+
+extension Tab: Hashable {
+
+    func hash(into hasher: inout Hasher) {
+        hasher.combine(url)
     }
 
 }

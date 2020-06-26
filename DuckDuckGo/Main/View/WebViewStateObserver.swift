@@ -20,14 +20,14 @@ import Cocoa
 import WebKit
 import os.log
 
-class WebViewTabUpdater: NSObject {
+class WebViewStateObserver: NSObject {
 
     let webView: WKWebView
-    let tab: Tab
+    let tabViewModel: TabViewModel
 
-    init(webView: WKWebView, tab: Tab) {
+    init(webView: WKWebView, tabViewModel: TabViewModel) {
         self.webView = webView
-        self.tab = tab
+        self.tabViewModel = tabViewModel
         super.init()
 
         observeWebview()
@@ -50,9 +50,9 @@ class WebViewTabUpdater: NSObject {
         }
 
         switch keyPath {
-        case #keyPath(WKWebView.url): tab.url = webView.url
-        case #keyPath(WKWebView.canGoBack): tab.canGoBack = webView.canGoBack
-        case #keyPath(WKWebView.canGoForward): tab.canGoForward = webView.canGoForward
+        case #keyPath(WKWebView.url): tabViewModel.tab.url = webView.url
+        case #keyPath(WKWebView.canGoBack): tabViewModel.canGoBack = webView.canGoBack
+        case #keyPath(WKWebView.canGoForward): tabViewModel.canGoForward = webView.canGoForward
         default:
             os_log("%s: keyPath %s not handled", log: OSLog.Category.general, type: .error, className, keyPath)
             super.observeValue(forKeyPath: keyPath, of: object, change: change, context: context)

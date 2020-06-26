@@ -18,10 +18,35 @@
 
 import Foundation
 import os.log
+import Combine
 
 class TabCollectionViewModel {
 
-    var tabCollection: TabCollection
+    private(set) var tabCollection: TabCollection
+    private(set) var tabViewModels = [Tab: TabViewModel]()
+
+    private var cancelables = Set<AnyCancellable>()
+
+    init(tabCollection: TabCollection) {
+        self.tabCollection = tabCollection
+
+        bindTabs()
+    }
+
+    convenience init() {
+        let tabCollection = TabCollection()
+        self.init(tabCollection: tabCollection)
+    }
+
+    private func bindTabs() {
+        tabCollection.$tabs.sinkAsync { _ in self.removeViewModelsIfNeeded() } .store(in: &cancelables)
+    }
+
+    private func removeViewModelsIfNeeded() {
+        tabViewModels = tabViewModels.filter { (item) -> Bool in
+            tabCollection.tabs.contains(item.key)
+        }
+    }
 
     var selectedTabViewModel: TabViewModel? {
         guard let selectionIndex = tabCollection.selectionIndex else {
@@ -30,22 +55,18 @@ class TabCollectionViewModel {
         return tabViewModel(at: selectionIndex)
     }
 
-    init(tabCollection: TabCollection) {
-        self.tabCollection = tabCollection
-    }
-
-    convenience init() {
-        let tabCollection = TabCollection()
-        self.init(tabCollection: tabCollection)
-    }
-
     func tabViewModel(at index: Int) -> TabViewModel? {
         guard tabCollection.tabs.count > index else {
             os_log("Index %lu higher than number of tabs %lu", log: OSLog.Category.general, type: .error, index, tabCollection.tabs.count)
             return nil
         }
+
         let tab = tabCollection.tabs[index]
-        return TabViewModel(tab: tab)
+        if tabViewModels[tab] == nil {
+            tabViewModels[tab] = TabViewModel(tab: tab)
+        }
+
+        return tabViewModels[tab]
     }
 
 }

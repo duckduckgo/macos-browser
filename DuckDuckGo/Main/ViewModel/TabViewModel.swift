@@ -17,13 +17,21 @@
 //
 
 import Foundation
+import Combine
 
 class TabViewModel {
 
     private(set) var tab: Tab
+    private var cancelables = Set<AnyCancellable>()
+
+    @Published var canGoForward: Bool = false
+    @Published var canGoBack: Bool = false
+    @Published var canReload: Bool = false
 
     init(tab: Tab) {
         self.tab = tab
+
+        bindUrl()
     }
 
     var addressBarString: String {
@@ -31,6 +39,14 @@ class TabViewModel {
             return ""
         }
         return url.searchQuery ?? url.absoluteString
+    }
+
+    private func bindUrl() {
+        tab.$url.sinkAsync { _ in self.updateCanReaload() } .store(in: &cancelables)
+    }
+
+    private func updateCanReaload() {
+        self.canReload = self.tab.url != nil
     }
 
 }

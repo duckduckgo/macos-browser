@@ -26,7 +26,7 @@ class BrowserTabViewController: NSViewController {
     @IBOutlet weak var webView: WKWebView!
 
     let tabViewModel: TabViewModel
-    var webViewTabUpdater: WebViewTabUpdater?
+    var webViewStateObserver: WebViewStateObserver?
     var urlCancelable: AnyCancellable?
 
     required init?(coder: NSCoder) {
@@ -46,7 +46,7 @@ class BrowserTabViewController: NSViewController {
         webView.uiDelegate = self
         tabViewModel.tab.actionDelegate = self
 
-        webViewTabUpdater = WebViewTabUpdater(webView: webView, tab: tabViewModel.tab)
+        webViewStateObserver = WebViewStateObserver(webView: webView, tabViewModel: tabViewModel)
         bindUrl()
     }
 
