@@ -17,11 +17,37 @@
 //
 
 import Foundation
+import os.log
 
 class TabCollection {
 
     @Published private(set) var tabs: [Tab] = []
     @Published var selectionIndex: Int?
+
+    init() {
+        listenUrlEvents()
+    }
+
+    private func listenUrlEvents() {
+        NSAppleEventManager.shared().setEventHandler(
+            self,
+            andSelector: #selector(handleUrlEvent(event:reply:)),
+            forEventClass: AEEventClass(kInternetEventClass),
+            andEventID: AEEventID(kAEGetURL)
+        )
+    }
+
+    @objc private func handleUrlEvent(event: NSAppleEventDescriptor, reply: NSAppleEventDescriptor) {
+        guard let path = event.paramDescriptor(forKeyword: keyDirectObject)?.stringValue?.removingPercentEncoding,
+              let url = URL(string: path) else {
+            os_log("TabCollection: URL initialization failed", log: OSLog.Category.general, type: .error)
+            return
+        }
+
+        let newTab = Tab()
+        newTab.url = url
+        prepend(tab: newTab)
+    }
 
     func prependNewTab() {
         prepend(tab: Tab())
