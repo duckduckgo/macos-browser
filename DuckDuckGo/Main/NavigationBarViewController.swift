@@ -30,6 +30,7 @@ class NavigationBarViewController: NSViewController {
     private var urlCancelable: AnyCancellable?
     private var navigationButtonsCancelables = Set<AnyCancellable>()
 
+    private let autocompleteViewModel = AutocompleteViewModel(autocomplete: Autocomplete())
     var tabViewModel: TabViewModel? {
         didSet {
             bindUrl()
@@ -107,7 +108,10 @@ extension NavigationBarViewController: NSSearchFieldDelegate {
     }
 
     func controlTextDidChange(_ obj: Notification) {
-
+        autocompleteViewModel.autocomplete.getSuggestions(for: searchField.stringValue) { (suggestions, _) in
+            self.searchField.recentSearches = suggestions?.map { $0.value } ?? []
+            print("suggestions: \(suggestions ?? [Suggestion]())")
+        }
     }
 
 }
@@ -118,7 +122,7 @@ fileprivate extension URL {
         let trimmedQuery = searchQuery.trimmingCharacters(in: .whitespacesAndNewlines)
         do {
             var searchUrl = Self.duckDuckGo
-            try searchUrl.addParameter(name: DuckDuckGoParameters.search.rawValue, value: trimmedQuery)
+            searchUrl = try searchUrl.addParameter(name: DuckDuckGoParameters.search.rawValue, value: trimmedQuery)
             return searchUrl
         } catch let error {
             os_log("URL extension: %s", log: OSLog.Category.general, type: .error, error.localizedDescription)

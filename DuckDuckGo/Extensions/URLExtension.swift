@@ -29,7 +29,7 @@ extension URL {
         case creatingFailed
     }
 
-    mutating func addParameter(name: String, value: String) throws {
+    func addParameter(name: String, value: String) throws -> URL {
         guard var components = URLComponents(url: self, resolvingAgainstBaseURL: false) else { throw ParameterError.parsingFailed }
         var queryItems = components.queryItems ?? [URLQueryItem]()
         let newQueryItem = URLQueryItem(name: name, value: value)
@@ -38,7 +38,7 @@ extension URL {
         guard let encodedQuery = components.percentEncodedQuery else { throw ParameterError.encodingFailed }
         components.percentEncodedQuery = encodedQuery.encodingWebSpaces()
         guard let newUrl = components.url else { throw ParameterError.creatingFailed }
-        self = newUrl
+        return newUrl
     }
 
     func getParameter(name: String) throws -> String? {
@@ -67,6 +67,10 @@ extension URL {
     static var duckDuckGo: URL {
         let duckDuckGoUrlString = "https://duckduckgo.com/"
         return URL(string: duckDuckGoUrlString)!
+    }
+
+    static var duckDuckGoAutocomplete: URL {
+        duckDuckGo.appendingPathComponent("ac/")
     }
 
     var isDuckDuckGo: Bool {
