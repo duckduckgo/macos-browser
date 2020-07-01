@@ -1,5 +1,5 @@
 //
-//  AutocompleteAPI.swift
+//  SuggestionsAPI.swift
 //
 //  Copyright © 2020 DuckDuckGo. All rights reserved.
 //
@@ -19,13 +19,13 @@
 import Foundation
 import os.log
 
-protocol AutocompleteAPI {
+protocol SuggestionsAPI {
 
     func fetchSuggestions(for query: String, completion: @escaping ([Suggestion]?, Error?) -> Void)
 
 }
 
-class DuckDuckGoAutocompleteAPI: AutocompleteAPI {
+class DuckDuckGoSuggestionsAPI: SuggestionsAPI {
 
     enum FetchSuggestionsError: Error {
         case urlInitFailed
@@ -42,12 +42,13 @@ class DuckDuckGoAutocompleteAPI: AutocompleteAPI {
             }
         }
 
-        task?.cancel()
+        //todo resolve problems with cancel
+//        task?.cancel()
         task = nil
 
         let url = URL.duckDuckGoAutocomplete
         guard let searchUrl = try? url.addParameter(name: URL.DuckDuckGoParameters.search.rawValue, value: query) else {
-            os_log("DuckDuckGoAutocompleteAPI: Failed to add parameter", log: OSLog.Category.general, type: .error)
+            os_log("DuckDuckGoSuggestionsAPI: Failed to add parameter", log: OSLog.Category.general, type: .error)
             mainQueueCompletion(nil, FetchSuggestionsError.urlInitFailed)
             return
         }
@@ -55,7 +56,7 @@ class DuckDuckGoAutocompleteAPI: AutocompleteAPI {
         let request = URLRequest(url: searchUrl)
         task = URLSession.shared.dataTask(with: request, completionHandler: { (data, _, error) in
             guard let data = data else {
-                os_log("DuckDuckGoAutocompleteAPI: Failed to fetch suggestions - %s",
+                os_log("DuckDuckGoSuggestionsAPI: Failed to fetch suggestions - %s",
                        log: OSLog.Category.general,
                        type: .error, error?.localizedDescription ?? "")
                 mainQueueCompletion(nil, error)
@@ -63,17 +64,17 @@ class DuckDuckGoAutocompleteAPI: AutocompleteAPI {
             }
 
             let decoder = JSONDecoder()
-            guard let autocompleteResult = try? decoder.decode(AutocompleteAPIResult.self, from: data) else {
-                os_log("DuckDuckGoAutocompleteAPI: Failed to decode suggestions", log: OSLog.Category.general, type: .error)
+            guard let suggestionsResult = try? decoder.decode(SuggestionsAPIResult.self, from: data) else {
+                os_log("DuckDuckGoSuggestionsAPI: Failed to decode suggestions", log: OSLog.Category.general, type: .error)
                 mainQueueCompletion(nil, FetchSuggestionsError.decodingFailed)
                 return
             }
 
-            mainQueueCompletion(autocompleteResult.suggestions, nil)
+            mainQueueCompletion(suggestionsResult.suggestions, nil)
         })
 
         guard task != nil else {
-            os_log("DuckDuckGoAutocompleteAPI: Failed to init data task", log: OSLog.Category.general, type: .error)
+            os_log("DuckDuckGoSuggestionsAPI: Failed to init data task", log: OSLog.Category.general, type: .error)
             mainQueueCompletion(nil, FetchSuggestionsError.dataTaskInitFailed)
             return
         }

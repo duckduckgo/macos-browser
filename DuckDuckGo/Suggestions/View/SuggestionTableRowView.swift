@@ -1,5 +1,5 @@
 //
-//  Suggestion.swift
+//  SuggestionTableRowView.swift
 //
 //  Copyright © 2020 DuckDuckGo. All rights reserved.
 //
@@ -16,17 +16,17 @@
 //  limitations under the License.
 //
 
-import Foundation
+import Cocoa
 
-struct Suggestion {
+class SuggestionTableRowView: NSTableRowView {
 
-    enum SuggestionType: String {
-        case phase
-        case url
-        case unknown
+    static let identifier = "SuggestionTableRowView"
+
+    // swiftlint:disable unused_setter_value
+    override var isEmphasized: Bool {
+        set {}
+        get { return true }
     }
+    // swiftlint:enable unused_setter_value
 
-    let type: SuggestionType
-    let value: String
-    
 }

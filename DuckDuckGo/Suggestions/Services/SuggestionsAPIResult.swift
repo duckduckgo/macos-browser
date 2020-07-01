@@ -1,5 +1,5 @@
 //
-//  AutocompleteResult.swift
+//  SuggestionsAPIResult.swift
 //
 //  Copyright © 2020 DuckDuckGo. All rights reserved.
 //
@@ -19,7 +19,7 @@
 import Foundation
 import os.log
 
-struct AutocompleteAPIResult: Decodable {
+struct SuggestionsAPIResult: Decodable {
 
     var suggestions: [Suggestion]
 
@@ -32,7 +32,7 @@ struct AutocompleteAPIResult: Decodable {
             for item in items {
                 let type = Suggestion.SuggestionType(rawValue: item.key) ?? Suggestion.SuggestionType.unknown
                 if type == .unknown {
-                    os_log("AutocompleteAPIResult: Unknown suggestion type", log: OSLog.Category.general, type: .debug)
+                    os_log("SuggestionsAPIResult: Unknown suggestion type", log: OSLog.Category.general, type: .debug)
                 }
                 let suggestion = Suggestion(type: type, value: item.value)
                 self.suggestions.append(suggestion)

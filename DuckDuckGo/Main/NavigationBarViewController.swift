@@ -27,10 +27,13 @@ class NavigationBarViewController: NSViewController {
     @IBOutlet weak var goForwardButton: NSButton!
     @IBOutlet weak var reloadButton: NSButton!
 
+    private var suggestionsWindowController: NSWindowController?
+
     private var urlCancelable: AnyCancellable?
+    private var searchSuggestionsCancelable: AnyCancellable?
     private var navigationButtonsCancelables = Set<AnyCancellable>()
 
-    private let autocompleteViewModel = AutocompleteViewModel(autocomplete: Autocomplete())
+    private let suggestionsViewModel = SuggestionsViewModel(suggestions: Suggestions())
     var tabViewModel: TabViewModel? {
         didSet {
             bindUrl()
@@ -42,6 +45,8 @@ class NavigationBarViewController: NSViewController {
         super.viewDidLoad()
 
         searchField.delegate = self
+
+        initSuggestionsWindow()
     }
 
     @IBAction func goBackAction(_ sender: NSButton) {
@@ -95,6 +100,60 @@ class NavigationBarViewController: NSViewController {
         }
         tabViewModel.tab.url = url
     }
+
+    // MARK: - Suggestions window
+
+    private func initSuggestionsWindow() {
+        let storyboard = NSStoryboard(name: "Suggestions", bundle: nil)
+        guard let suggestionsWindowController = storyboard.instantiateController(
+                withIdentifier: "SuggestionsWindowController") as? NSWindowController else {
+            //todo os_log
+            return
+        }
+        self.suggestionsWindowController = suggestionsWindowController
+
+        guard let suggestionsViewController = suggestionsWindowController.contentViewController as? SuggestionsViewController else {
+            //todo os_log
+            return
+        }
+        suggestionsViewController.suggestionsViewModel = suggestionsViewModel
+    }
+
+    private func showSuggestionsWindow() {
+        guard let window = view.window, let suggestionsWindow = suggestionsWindowController?.window else {
+            //todo os_log
+            return
+        }
+
+        if !suggestionsWindow.isVisible {
+            window.addChildWindow(suggestionsWindow, ordered: .above)
+        }
+
+        // Layout the window
+        let padding = CGFloat(3)
+        suggestionsWindow.setFrame(NSRect(x: 0, y: 0, width: searchField.frame.width + 2 * padding, height: 0), display: true)
+
+        var point = searchField.frame.origin
+        point.y -= padding
+        point.x -= padding
+
+        let converted = view.convert(point, to: nil)
+        let screen = window.convertPoint(toScreen: converted)
+        suggestionsWindow.setFrameTopLeftPoint(screen)
+    }
+
+    private func hideSuggestionsWindow() {
+        guard let window = view.window, let suggestionsWindow = suggestionsWindowController?.window else {
+            //todo os_log
+            return
+        }
+
+        if !suggestionsWindow.isVisible { return }
+
+        window.removeChildWindow(suggestionsWindow)
+        suggestionsWindow.parent?.removeChildWindow(suggestionsWindow)
+        suggestionsWindow.orderOut(nil)
+    }
     
 }
 
@@ -108,9 +167,13 @@ extension NavigationBarViewController: NSSearchFieldDelegate {
     }
 
     func controlTextDidChange(_ obj: Notification) {
-        autocompleteViewModel.autocomplete.getSuggestions(for: searchField.stringValue) { (suggestions, _) in
-            self.searchField.recentSearches = suggestions?.map { $0.value } ?? []
-            print("suggestions: \(suggestions ?? [Suggestion]())")
+        print("controlTextDidChange")
+        suggestionsViewModel.suggestions.getSuggestions(for: searchField.stringValue)
+
+        if searchField.stringValue.isEmpty {
+            hideSuggestionsWindow()
+        } else {
+            showSuggestionsWindow()
         }
     }
 

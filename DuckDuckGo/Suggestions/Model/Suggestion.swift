@@ -1,5 +1,5 @@
 //
-//  AutocompleteStore.swift
+//  Suggestion.swift
 //
 //  Copyright © 2020 DuckDuckGo. All rights reserved.
 //
@@ -18,21 +18,15 @@
 
 import Foundation
 
-protocol AutocompleteStore {
+struct Suggestion {
 
-    func loadSuggestions(for query: String, completion: @escaping ([URL]?, Error?) -> Void)
-    func saveSuggestion(url: URL)
-
-}
-
-class LocalAutocompleteStore: AutocompleteStore {
-
-    func loadSuggestions(for query: String, completion: @escaping ([URL]?, Error?) -> Void) {
-        //todo
+    enum SuggestionType: String {
+        case phrase
+        case url
+        case unknown
     }
 
-    func saveSuggestion(url: URL) {
-        //todo
-    }
+    let type: SuggestionType
+    let value: String
     
 }

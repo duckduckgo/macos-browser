@@ -1,5 +1,5 @@
 //
-//  AutocompleteViewModel.swift
+//  SuggestionsSearchField.swift
 //
 //  Copyright © 2020 DuckDuckGo. All rights reserved.
 //
@@ -16,12 +16,10 @@
 //  limitations under the License.
 //
 
-class AutocompleteViewModel {
+import Cocoa
 
-    let autocomplete: Autocomplete
+class AutocompleteSearchField: NSSearchField {
 
-    init(autocomplete: Autocomplete) {
-        self.autocomplete = autocomplete
-    }
-    
+
+
 }
