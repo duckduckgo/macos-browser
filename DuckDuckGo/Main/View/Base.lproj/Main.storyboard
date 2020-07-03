@@ -823,10 +823,10 @@
                         </constraints>
                     </view>
                     <connections>
+                        <outlet property="autocompleteSearchField" destination="b1U-yO-v3i" id="KPy-9z-ND7"/>
                         <outlet property="goBackButton" destination="0fx-y3-Oc0" id="dQl-Dn-Vhw"/>
                         <outlet property="goForwardButton" destination="bnS-8m-XdK" id="kT2-Lj-vFt"/>
                         <outlet property="reloadButton" destination="8IH-kp-rpL" id="U4B-Iy-2Vr"/>
-                        <outlet property="searchField" destination="b1U-yO-v3i" id="KPy-9z-ND7"/>
                     </connections>
                 </viewController>
                 <customObject id="zdG-Z1-HUh" userLabel="First Responder" customClass="NSResponder" sceneMemberID="firstResponder"/>

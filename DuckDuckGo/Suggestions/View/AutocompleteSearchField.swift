@@ -17,21 +17,166 @@
 //
 
 import Cocoa
+import Combine
+import os.log
+
+protocol AutocompleteSearchFieldDelegate: AnyObject {
+
+    func autocompleteSearchField(_ autocompleteSearchField: AutocompleteSearchField, didConfirmStringValue: String)
+
+}
 
 class AutocompleteSearchField: NSSearchField {
+
+    weak var searchFieldDelegate: AutocompleteSearchFieldDelegate?
+
+    private let suggestionsViewModel = SuggestionsViewModel(suggestions: Suggestions())
+    private var selectedSuggestionCancellable: AnyCancellable?
+
+    private var originalStringValue: String?
 
     override func awakeFromNib() {
         super.awakeFromNib()
 
-//        delegate = self
+        super.delegate = self
+        initSuggestionsWindow()
+        bindSelectedSuggestion()
     }
 
-    override func keyUp(with event: NSEvent) {
-        print("keyUp")
+    func viewDidLayout() {
+        layoutSuggestionWindow()
     }
 
-    override func keyDown(with event: NSEvent) {
-        print("keyDown")
+    private func confirmStringValue() {
+        hideSuggestionsWindow()
+        searchFieldDelegate?.autocompleteSearchField(self, didConfirmStringValue: stringValue)
+    }
+
+    private func bindSelectedSuggestion() {
+        selectedSuggestionCancellable = suggestionsViewModel.$selectedSuggestion.sinkAsync { _ in
+            self.displaySelectedSuggestion()
+        }
+    }
+
+    private func displaySelectedSuggestion() {
+        guard let selectedSuggestion = suggestionsViewModel.selectedSuggestion else {
+            if let originalStringValue = originalStringValue {
+                stringValue = originalStringValue
+            }
+            return
+        }
+
+        stringValue = selectedSuggestion.value
+    }
+
+    // MARK: - Suggestions window
+
+    private var suggestionsWindowController: NSWindowController?
+
+    private func initSuggestionsWindow() {
+        let storyboard = NSStoryboard(name: "Suggestions", bundle: nil)
+        let creator: (NSCoder) -> SuggestionsViewController? = { coder in
+            let suggestionsViewController = SuggestionsViewController(coder: coder, suggestionsViewModel: self.suggestionsViewModel)
+            suggestionsViewController?.delegate = self
+            return suggestionsViewController
+        }
+
+        let windowController = storyboard.instantiateController(withIdentifier: "SuggestionsWindowController") as? NSWindowController
+        let suggestionsViewController = storyboard.instantiateController(identifier: "SuggestionsViewController", creator: creator)
+
+        windowController?.contentViewController = suggestionsViewController
+        self.suggestionsWindowController = windowController
+    }
+
+    private func showSuggestionsWindow() {
+        guard let window = window, let suggestionsWindow = suggestionsWindowController?.window else {
+            os_log("AutocompleteSearchField: Window not available", log: OSLog.Category.general, type: .error)
+            return
+        }
+
+        if !suggestionsWindow.isVisible {
+            window.addChildWindow(suggestionsWindow, ordered: .above)
+        }
+
+        layoutSuggestionWindow()
+    }
+
+    private func hideSuggestionsWindow() {
+        guard let window = window, let suggestionsWindow = suggestionsWindowController?.window else {
+            os_log("AutocompleteSearchField: Window not available", log: OSLog.Category.general, type: .error)
+            return
+        }
+
+        if !suggestionsWindow.isVisible { return }
+
+        window.removeChildWindow(suggestionsWindow)
+        suggestionsWindow.parent?.removeChildWindow(suggestionsWindow)
+        suggestionsWindow.orderOut(nil)
+    }
+
+    private func layoutSuggestionWindow() {
+        guard let window = window, let suggestionsWindow = suggestionsWindowController?.window else {
+            os_log("AutocompleteSearchField: Window not available", log: OSLog.Category.general, type: .error)
+            return
+        }
+
+        let padding = CGFloat(3)
+        suggestionsWindow.setFrame(NSRect(x: 0, y: 0, width: frame.width + 2 * padding, height: 0), display: true)
+
+        var point = bounds.origin
+        point.y += frame.height
+        point.y += padding
+        point.x -= padding
+
+        let converted = convert(point, to: nil)
+        let screen = window.convertPoint(toScreen: converted)
+        suggestionsWindow.setFrameTopLeftPoint(screen)
+    }
+}
+
+extension AutocompleteSearchField: NSSearchFieldDelegate {
+
+    func controlTextDidEndEditing(_ obj: Notification) {
+        let textMovement = obj.userInfo?["NSTextMovement"] as? Int
+        if textMovement == NSReturnTextMovement {
+            confirmStringValue()
+        }
+    }
+
+    func controlTextDidChange(_ obj: Notification) {
+        suggestionsViewModel.suggestions.getSuggestions(for: stringValue)
+        originalStringValue = stringValue
+
+        if stringValue.isEmpty {
+            hideSuggestionsWindow()
+        } else {
+            showSuggestionsWindow()
+        }
+    }
+
+    func control(_ control: NSControl, textView: NSTextView, doCommandBy commandSelector: Selector) -> Bool {
+        guard suggestionsWindowController?.window?.isVisible == true else {
+            return false
+        }
+
+        switch commandSelector {
+        case #selector(NSResponder.moveDown(_:)):
+            suggestionsViewModel.selectNextIfPossible(); return true
+        case #selector(NSResponder.moveUp(_:)):
+            suggestionsViewModel.selectPreviousIfPossible(); return true
+        case #selector(NSResponder.deleteBackward(_:)), #selector(NSResponder.deleteForward(_:)):
+            suggestionsViewModel.suggestions.clearSelection(); return false
+        default:
+            return false
+        }
+    }
+
+}
+
+extension AutocompleteSearchField: SuggestionsViewControllerDelegate {
+
+    func suggestionsViewControllerDidConfirmSelection(_ suggestionsViewController: SuggestionsViewController) {
+        confirmStringValue()
     }
 
 }

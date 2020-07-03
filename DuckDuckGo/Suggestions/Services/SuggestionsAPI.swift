@@ -42,8 +42,6 @@ class DuckDuckGoSuggestionsAPI: SuggestionsAPI {
             }
         }
 
-        //todo resolve problems with cancel
-//        task?.cancel()
         task = nil
 
         let url = URL.duckDuckGoAutocomplete

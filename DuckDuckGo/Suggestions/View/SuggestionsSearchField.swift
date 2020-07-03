@@ -20,6 +20,4 @@ import Cocoa
 
 class AutocompleteSearchField: NSSearchField {
 
-
-
 }

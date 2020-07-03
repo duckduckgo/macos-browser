@@ -22,18 +22,15 @@ import os.log
 
 class NavigationBarViewController: NSViewController {
 
-    @IBOutlet weak var searchField: NSSearchField!
+    @IBOutlet weak var autocompleteSearchField: AutocompleteSearchField!
     @IBOutlet weak var goBackButton: NSButton!
     @IBOutlet weak var goForwardButton: NSButton!
     @IBOutlet weak var reloadButton: NSButton!
-
-    private var suggestionsWindowController: NSWindowController?
 
     private var urlCancelable: AnyCancellable?
     private var searchSuggestionsCancelable: AnyCancellable?
     private var navigationButtonsCancelables = Set<AnyCancellable>()
 
-    private let suggestionsViewModel = SuggestionsViewModel(suggestions: Suggestions())
     var tabViewModel: TabViewModel? {
         didSet {
             bindUrl()
@@ -44,9 +41,13 @@ class NavigationBarViewController: NSViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
 
-        searchField.delegate = self
+        autocompleteSearchField.searchFieldDelegate = self
+    }
 
-        initSuggestionsWindow()
+    override func viewDidLayout() {
+        super.viewDidLayout()
+
+        autocompleteSearchField.viewDidLayout()
     }
 
     @IBAction func goBackAction(_ sender: NSButton) {
@@ -80,7 +81,7 @@ class NavigationBarViewController: NSViewController {
             os_log("%s: Property tabViewModel is nil", log: OSLog.Category.general, type: .error, className)
             return
         }
-        searchField.stringValue = tabViewModel.addressBarString
+        autocompleteSearchField.stringValue = tabViewModel.addressBarString
     }
 
     private func setNavigationButtons() {
@@ -94,87 +95,19 @@ class NavigationBarViewController: NSViewController {
             os_log("%s: Property tabViewModel is nil", log: OSLog.Category.general, type: .error, className)
             return
         }
-        guard let url = URL.makeURL(from: searchField.stringValue) else {
+        guard let url = URL.makeURL(from: autocompleteSearchField.stringValue) else {
             os_log("%s: Making url from address bar string failed", log: OSLog.Category.general, type: .error, className)
             return
         }
         tabViewModel.tab.url = url
     }
 
-    // MARK: - Suggestions window
-
-    private func initSuggestionsWindow() {
-        let storyboard = NSStoryboard(name: "Suggestions", bundle: nil)
-        guard let suggestionsWindowController = storyboard.instantiateController(
-                withIdentifier: "SuggestionsWindowController") as? NSWindowController else {
-            //todo os_log
-            return
-        }
-        self.suggestionsWindowController = suggestionsWindowController
-
-        guard let suggestionsViewController = suggestionsWindowController.contentViewController as? SuggestionsViewController else {
-            //todo os_log
-            return
-        }
-        suggestionsViewController.suggestionsViewModel = suggestionsViewModel
-    }
-
-    private func showSuggestionsWindow() {
-        guard let window = view.window, let suggestionsWindow = suggestionsWindowController?.window else {
-            //todo os_log
-            return
-        }
-
-        if !suggestionsWindow.isVisible {
-            window.addChildWindow(suggestionsWindow, ordered: .above)
-        }
-
-        // Layout the window
-        let padding = CGFloat(3)
-        suggestionsWindow.setFrame(NSRect(x: 0, y: 0, width: searchField.frame.width + 2 * padding, height: 0), display: true)
-
-        var point = searchField.frame.origin
-        point.y -= padding
-        point.x -= padding
-
-        let converted = view.convert(point, to: nil)
-        let screen = window.convertPoint(toScreen: converted)
-        suggestionsWindow.setFrameTopLeftPoint(screen)
-    }
-
-    private func hideSuggestionsWindow() {
-        guard let window = view.window, let suggestionsWindow = suggestionsWindowController?.window else {
-            //todo os_log
-            return
-        }
-
-        if !suggestionsWindow.isVisible { return }
-
-        window.removeChildWindow(suggestionsWindow)
-        suggestionsWindow.parent?.removeChildWindow(suggestionsWindow)
-        suggestionsWindow.orderOut(nil)
-    }
-    
 }
 
-extension NavigationBarViewController: NSSearchFieldDelegate {
+extension NavigationBarViewController: AutocompleteSearchFieldDelegate {
 
-    func controlTextDidEndEditing(_ obj: Notification) {
-        let textMovement = obj.userInfo?["NSTextMovement"] as? Int
-        if textMovement == NSReturnTextMovement {
-            setUrl()
-        }
-    }
-
-    func controlTextDidChange(_ obj: Notification) {
-        print("controlTextDidChange")
-        suggestionsViewModel.suggestions.getSuggestions(for: searchField.stringValue)
-
-        if searchField.stringValue.isEmpty {
-            hideSuggestionsWindow()
-        } else {
-            showSuggestionsWindow()
-        }
+    func autocompleteSearchField(_ autocompleteSearchField: AutocompleteSearchField, didConfirmStringValue: String) {
+        setUrl()
     }
 
 }

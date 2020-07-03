@@ -16,12 +16,68 @@
 //  limitations under the License.
 //
 
+import Foundation
+import Combine
+
 class SuggestionsViewModel {
 
     let suggestions: Suggestions
+    @Published private(set) var selectedSuggestion: Suggestion?
+
+    private var selectionIndexCancellable: AnyCancellable?
 
     init(suggestions: Suggestions) {
         self.suggestions = suggestions
+
+        bindSelectionIndex()
+    }
+
+    private func bindSelectionIndex() {
+        selectionIndexCancellable = suggestions.$selectionIndex.sinkAsync { _ in
+            self.setSelectedSuggestion()
+        }
+    }
+
+    private func setSelectedSuggestion() {
+        if let index = suggestions.selectionIndex {
+            selectedSuggestion = suggestions.suggestion(at: index)
+        } else {
+            selectedSuggestion = nil
+        }
+    }
+
+    func selectNextIfPossible() {
+        // When no item is selected, start selection from the top of the list
+        guard let selectionIndex = suggestions.selectionIndex else {
+            suggestions.select(at: 0)
+            return
+        }
+
+        // At the end of the list, cancel the selection
+        if selectionIndex == suggestions.items.count - 1 {
+            suggestions.clearSelection()
+            return
+        }
+
+        let newIndex = min(suggestions.items.count - 1, selectionIndex + 1)
+        suggestions.select(at: newIndex)
+    }
+
+    func selectPreviousIfPossible() {
+        // When no item is selected, start selection from the bottom of the list
+        guard let selectionIndex = suggestions.selectionIndex else {
+            suggestions.select(at: suggestions.items.count - 1)
+            return
+        }
+
+        // If the first item is selected, cancel the selection
+        if selectionIndex == 0 {
+            suggestions.clearSelection()
+            return
+        }
+
+        let newIndex = max(0, selectionIndex - 1)
+        suggestions.select(at: newIndex)
     }
     
 }

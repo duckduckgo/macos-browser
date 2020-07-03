@@ -23,9 +23,6 @@
                             <outlet property="delegate" destination="cvc-K3-VCn" id="KLH-5q-ufi"/>
                         </connections>
                     </window>
-                    <connections>
-                        <segue destination="JbS-WE-3yw" kind="relationship" relationship="window.shadowedContentViewController" id="ge9-oc-cD0"/>
-                    </connections>
                 </windowController>
                 <customObject id="FMk-py-oCo" userLabel="First Responder" customClass="NSResponder" sceneMemberID="firstResponder"/>
             </objects>
@@ -34,12 +31,12 @@
         <!--Suggestions View Controller-->
         <scene sceneID="uJh-kd-sy1">
             <objects>
-                <viewController id="JbS-WE-3yw" customClass="SuggestionsViewController" customModule="DuckDuckGo" customModuleProvider="target" sceneMemberID="viewController">
+                <viewController storyboardIdentifier="SuggestionsViewController" id="JbS-WE-3yw" customClass="SuggestionsViewController" customModule="DuckDuckGo" customModuleProvider="target" sceneMemberID="viewController">
                     <view key="view" id="PAv-y7-vhB">
                         <rect key="frame" x="0.0" y="0.0" width="480" height="206"/>
                         <autoresizingMask key="autoresizingMask"/>
                         <subviews>
-                            <visualEffectView blendingMode="behindWindow" material="appearanceBased" state="active" translatesAutoresizingMaskIntoConstraints="NO" id="O3Y-th-ZhM">
+                            <visualEffectView blendingMode="behindWindow" material="windowBackground" state="active" translatesAutoresizingMaskIntoConstraints="NO" id="O3Y-th-ZhM">
                                 <rect key="frame" x="0.0" y="0.0" width="480" height="206"/>
                             </visualEffectView>
                             <scrollView autohidesScrollers="YES" horizontalLineScroll="25" horizontalPageScroll="10" verticalLineScroll="25" verticalPageScroll="10" usesPredominantAxisScrolling="NO" translatesAutoresizingMaskIntoConstraints="NO" id="cx3-LG-ZUH">
@@ -79,7 +76,7 @@
                                                                     <autoresizingMask key="autoresizingMask" widthSizable="YES" flexibleMinY="YES" flexibleMaxY="YES"/>
                                                                     <textFieldCell key="cell" lineBreakMode="truncatingTail" sendsActionOnEndEditing="YES" title="Table View Cell" id="7bg-HA-vCm">
                                                                         <font key="font" usesAppearanceFont="YES"/>
-                                                                        <color key="textColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
+                                                                        <color key="textColor" name="textColor" catalog="System" colorSpace="catalog"/>
                                                                         <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
                                                                     </textFieldCell>
                                                                 </textField>
@@ -126,7 +123,7 @@
                 </viewController>
                 <customObject id="WHZ-eM-7SZ" userLabel="First Responder" customClass="NSResponder" sceneMemberID="firstResponder"/>
             </objects>
-            <point key="canvasLocation" x="-344" y="555"/>
+            <point key="canvasLocation" x="-344" y="516"/>
         </scene>
     </scenes>
 </document>

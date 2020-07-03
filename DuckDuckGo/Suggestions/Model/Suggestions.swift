@@ -24,7 +24,8 @@ class Suggestions {
     let suggestionsAPI: SuggestionsAPI
     let suggestionsStore: SuggestionsStore
 
-    @Published var items: [Suggestion] = []
+    @Published private(set) var items: [Suggestion] = []
+    @Published private(set) var selectionIndex: Int?
 
     init(suggestionsAPI: SuggestionsAPI, suggestionsStore: SuggestionsStore) {
         self.suggestionsAPI = suggestionsAPI
@@ -38,23 +39,50 @@ class Suggestions {
     func getSuggestions(for query: String) {
         if query == "" {
             items = []
+            selectionIndex = nil
             return
         }
+
         //todo get local
 
         suggestionsAPI.fetchSuggestions(for: query) { (suggestions, error) in
             guard let suggestions = suggestions, error == nil else {
                 self.items = []
+                self.selectionIndex = nil
                 os_log("Suggestions: Failed to fetch suggestions - ", log: OSLog.Category.general, type: .error, error?.localizedDescription ?? "")
                 return
             }
 
             self.items = suggestions
+            self.selectionIndex = nil
         }
     }
 
     func saveSuggestion(url: URL) {
         //todo
+    }
+
+    func select(at index: Int) {
+        guard index >= 0, index < items.count else {
+            os_log("Suggestions: Index out of bounds", log: OSLog.Category.general, type: .error)
+            selectionIndex = nil
+            return
+        }
+
+        selectionIndex = index
+    }
+
+    func clearSelection() {
+        selectionIndex = nil
+    }
+
+    func suggestion(at index: Int) -> Suggestion? {
+        guard index >= 0, index < items.count else {
+            os_log("Suggestions: Index out of bounds", log: OSLog.Category.general, type: .error)
+            return nil
+        }
+
+        return items[index]
     }
 
 }

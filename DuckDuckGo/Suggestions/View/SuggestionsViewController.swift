@@ -18,23 +18,34 @@
 
 import Cocoa
 import Combine
+import os.log
+
+protocol SuggestionsViewControllerDelegate: AnyObject {
+
+    func suggestionsViewControllerDidConfirmSelection(_ suggestionsViewController: SuggestionsViewController)
+
+}
 
 class SuggestionsViewController: NSViewController {
 
+    weak var delegate: SuggestionsViewControllerDelegate?
+
     @IBOutlet weak var tableView: NSTableView!
 
-    var suggestionsViewModel: SuggestionsViewModel? {
-        didSet {
-            guard isViewLoaded else {
-                //todo os_log warning
-                return
-            }
+    let suggestionsViewModel: SuggestionsViewModel
 
-            bindSuggestions()
-        }
+    required init?(coder: NSCoder) {
+        fatalError("SuggestionsViewController: Bad initializer")
+    }
+
+    required init?(coder: NSCoder, suggestionsViewModel: SuggestionsViewModel) {
+        self.suggestionsViewModel = suggestionsViewModel
+
+        super.init(coder: coder)
     }
 
     var suggestionsCancelable: AnyCancellable?
+    var selectionIndexCancelable: AnyCancellable?
 
     var mouseUpEventsMonitor: Any?
     var mouseDownEventsMonitor: Any?
@@ -46,6 +57,8 @@ class SuggestionsViewController: NSViewController {
         tableView.dataSource = self
 
         addTrackingArea()
+        bindSuggestions()
+        bindSelectionIndex()
     }
 
     override func viewWillAppear() {
@@ -82,22 +95,35 @@ class SuggestionsViewController: NSViewController {
     }
 
     private func bindSuggestions() {
-        suggestionsCancelable = suggestionsViewModel?.suggestions.$items.sinkAsync { _ in
-            self.tableView.reloadData()
-            self.selectRow(at: 0)
+        suggestionsCancelable = suggestionsViewModel.suggestions.$items.sinkAsync { _ in
+            self.displayNewSuggestions()
         }
     }
 
-    private func selectRow(at index: Int) {
-        guard index >= 0 else {
+    private func bindSelectionIndex() {
+        selectionIndexCancelable = suggestionsViewModel.suggestions.$selectionIndex.sinkAsync { _ in
+            self.selectRow(at: self.suggestionsViewModel.suggestions.selectionIndex)
+        }
+    }
+
+    private func displayNewSuggestions() {
+        if suggestionsViewModel.suggestions.items.isEmpty {
+            closeWindow()
+        } else {
+            tableView.reloadData()
+        }
+    }
+
+    private func selectRow(at index: Int?) {
+        guard let index = index,
+              index >= 0,
+              !suggestionsViewModel.suggestions.items.isEmpty,
+              suggestionsViewModel.suggestions.items.count > index else {
+            clearSelection()
             return
         }
 
-        if let suggestionsViewModel = suggestionsViewModel,
-           !suggestionsViewModel.suggestions.items.isEmpty,
-           suggestionsViewModel.suggestions.items.count > index {
-            tableView.selectRowIndexes(IndexSet(arrayLiteral: index), byExtendingSelection: false)
-        }
+        tableView.selectRowIndexes(IndexSet(arrayLiteral: index), byExtendingSelection: false)
     }
 
     private func selectRow(at point: NSPoint) {
@@ -118,17 +144,23 @@ class SuggestionsViewController: NSViewController {
         selectRow(at: event.locationInWindow)
     }
 
+    override func mouseExited(with event: NSEvent) {
+        clearSelection()
+    }
+
     func mouseDown(with event: NSEvent) -> NSEvent? {
         if event.window == view.window {
             return nil
         }
 
+        closeWindow()
         return event
     }
 
     func mouseUp(with event: NSEvent) -> NSEvent? {
         if event.window == view.window {
             closeWindow()
+            delegate?.suggestionsViewControllerDidConfirmSelection(self)
             return nil
         }
         return event
@@ -136,7 +168,7 @@ class SuggestionsViewController: NSViewController {
 
     private func closeWindow() {
         guard let window = view.window else {
-            //todo os_log
+            os_log("SuggestionsViewController: Window not available", log: OSLog.Category.general, type: .error)
             return
         }
 
@@ -149,7 +181,7 @@ class SuggestionsViewController: NSViewController {
 extension SuggestionsViewController: NSTableViewDataSource {
 
     func numberOfRows(in tableView: NSTableView) -> Int {
-        return suggestionsViewModel?.suggestions.items.count ?? 0
+        return suggestionsViewModel.suggestions.items.count
     }
 
 }
@@ -160,15 +192,11 @@ extension SuggestionsViewController: NSTableViewDelegate {
         guard let suggestionTableCellView = tableView.makeView(
                 withIdentifier: NSUserInterfaceItemIdentifier(rawValue: SuggestionTableCellView.identifier), owner: self)
                 as? SuggestionTableCellView else {
-            //todo os_log
+            os_log("SuggestionsViewController: Making of table cell view failed", log: OSLog.Category.general, type: .error)
             return nil
         }
 
-        guard let suggestion = suggestionsViewModel?.suggestions.items[row] else {
-            //todo os_log
-            return nil
-        }
-
+        let suggestion = suggestionsViewModel.suggestions.items[row]
         suggestionTableCellView.display(suggestion)
         return suggestionTableCellView
     }
@@ -177,10 +205,18 @@ extension SuggestionsViewController: NSTableViewDelegate {
         guard let suggestionTableRowView = tableView.makeView(
                 withIdentifier: NSUserInterfaceItemIdentifier(rawValue: SuggestionTableRowView.identifier), owner: self)
                 as? SuggestionTableRowView else {
-            //todo os_log
+            os_log("SuggestionsViewController: Making of table row view failed", log: OSLog.Category.general, type: .error)
             return nil
         }
         return suggestionTableRowView
+    }
+
+    func tableViewSelectionDidChange(_ notification: Notification) {
+        if tableView.selectedRow == -1 { return }
+
+        if suggestionsViewModel.suggestions.selectionIndex != tableView.selectedRow {
+            suggestionsViewModel.suggestions.select(at: tableView.selectedRow)
+        }
     }
 
 }
