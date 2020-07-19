@@ -1,5 +1,5 @@
 //
-//  SuggestionsStore.swift
+//  HistoryStore.swift
 //
 //  Copyright © 2020 DuckDuckGo. All rights reserved.
 //
