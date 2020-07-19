@@ -26,6 +26,7 @@ class BrowserTabViewController: NSViewController {
     @IBOutlet weak var webView: WKWebView!
 
     let tabViewModel: TabViewModel
+    let historyViewModel: HistoryViewModel
     var webViewStateObserver: WebViewStateObserver?
     var urlCancelable: AnyCancellable?
 
@@ -33,8 +34,9 @@ class BrowserTabViewController: NSViewController {
         fatalError("BrowserTabViewController: Bad initializer")
     }
 
-    init?(coder: NSCoder, tabViewModel: TabViewModel) {
+    init?(coder: NSCoder, tabViewModel: TabViewModel, historyViewModel: HistoryViewModel) {
         self.tabViewModel = tabViewModel
+        self.historyViewModel = historyViewModel
 
         super.init(coder: coder)
     }
@@ -65,9 +67,19 @@ class BrowserTabViewController: NSViewController {
         }
     }
 
+    private func saveWebsiteVisit() {
+        if let url = webView.url {
+            historyViewModel.history.saveWebsiteVisit(url: url, title: webView.title, date: NSDate.now as Date)
+        }
+    }
+
 }
 
 extension BrowserTabViewController: WKNavigationDelegate {
+
+    func webView(_ webView: WKWebView, didFinish navigation: WKNavigation!) {
+        saveWebsiteVisit()
+    }
 
 }
 

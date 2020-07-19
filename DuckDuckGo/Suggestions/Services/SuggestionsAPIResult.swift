@@ -21,22 +21,14 @@ import os.log
 
 struct SuggestionsAPIResult: Decodable {
 
-    var suggestions: [Suggestion]
+    var items = [[String: String]]()
 
     init(from decoder: Decoder) throws {
         var container = try decoder.unkeyedContainer()
 
-        self.suggestions = [Suggestion]()
         while !container.isAtEnd {
-            let items = try container.decode([String: String].self)
-            for item in items {
-                let type = Suggestion.SuggestionType(rawValue: item.key) ?? Suggestion.SuggestionType.unknown
-                if type == .unknown {
-                    os_log("SuggestionsAPIResult: Unknown suggestion type", log: OSLog.Category.general, type: .debug)
-                }
-                let suggestion = Suggestion(type: type, value: item.value)
-                self.suggestions.append(suggestion)
-            }
+            let item = try container.decode([String: String].self)
+            items.append(item)
         }
     }
     

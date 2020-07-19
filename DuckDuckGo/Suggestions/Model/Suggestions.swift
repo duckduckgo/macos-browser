@@ -21,68 +21,75 @@ import os.log
 
 class Suggestions {
 
+    enum Constants {
+        static let maxNumberInCategory = 5
+    }
+
     let suggestionsAPI: SuggestionsAPI
-    let suggestionsStore: SuggestionsStore
+    let historyStore: HistoryStore
 
-    @Published private(set) var items: [Suggestion] = []
-    @Published private(set) var selectionIndex: Int?
+    @Published private(set) var items: (remote: [Suggestion]?, local: [Suggestion]?) = (nil, nil)
 
-    init(suggestionsAPI: SuggestionsAPI, suggestionsStore: SuggestionsStore) {
+    init(suggestionsAPI: SuggestionsAPI, historyStore: HistoryStore) {
         self.suggestionsAPI = suggestionsAPI
-        self.suggestionsStore = suggestionsStore
+        self.historyStore = historyStore
     }
 
     convenience init () {
-        self.init(suggestionsAPI: DuckDuckGoSuggestionsAPI(), suggestionsStore: LocalSuggestionsStore())
+        self.init(suggestionsAPI: DuckDuckGoSuggestionsAPI(), historyStore: LocalHistoryStore())
     }
 
     func getSuggestions(for query: String) {
         if query == "" {
-            items = []
-            selectionIndex = nil
+            items = (nil, nil)
             return
         }
 
-        //todo get local
+        getRemoteSuggestions(for: query)
+        getLocalSuggestions(for: query)
+    }
 
-        suggestionsAPI.fetchSuggestions(for: query) { (suggestions, error) in
-            guard let suggestions = suggestions, error == nil else {
-                self.items = []
-                self.selectionIndex = nil
-                os_log("Suggestions: Failed to fetch suggestions - ", log: OSLog.Category.general, type: .error, error?.localizedDescription ?? "")
+    private func getRemoteSuggestions(for query: String) {
+        suggestionsAPI.fetchSuggestions(for: query) { (result, error) in
+            guard let result = result, error == nil else {
+                self.items.remote = nil
+                os_log("Suggestions: Failed to fetch remote suggestions - %s",
+                       log: OSLog.Category.general,
+                       type: .error,
+                       error?.localizedDescription ?? "")
                 return
             }
 
-            self.items = suggestions
-            self.selectionIndex = nil
+            var suggestions = [Suggestion]()
+            for resultItem in result.items {
+                for (key, value) in resultItem {
+                    let suggestion = key == "phrase" ? Suggestion.phrase(phrase: value) : Suggestion.phrase(phrase: value)
+                    if key != "phrase" {
+                        os_log("SuggestionsAPIResult: Unknown suggestion type", log: OSLog.Category.general, type: .debug)
+                    }
+                    suggestions.append(suggestion)
+                }
+            }
+
+            let filtered = Array(suggestions.prefix(Constants.maxNumberInCategory))
+            self.items.remote = filtered
         }
     }
 
-    func saveSuggestion(url: URL) {
-        //todo
-    }
-
-    func select(at index: Int) {
-        guard index >= 0, index < items.count else {
-            os_log("Suggestions: Index out of bounds", log: OSLog.Category.general, type: .error)
-            selectionIndex = nil
-            return
+    private func getLocalSuggestions(for query: String) {
+        historyStore.loadWebsiteVisits(query: query, limit: Constants.maxNumberInCategory) { (websiteVisits, error) in
+            guard let websiteVisits = websiteVisits, error == nil else {
+                self.items.local = nil
+                os_log("Suggestions: Failed to fetch local suggestions - %s",
+                       log: OSLog.Category.general,
+                       type: .error,
+                       error?.localizedDescription ?? "")
+                return
+            }
+            let suggestions = websiteVisits.map { Suggestion.website(url: $0.url, title: $0.title) }
+            let filtered = Array(suggestions.prefix(Constants.maxNumberInCategory))
+            self.items.local = filtered
         }
-
-        selectionIndex = index
-    }
-
-    func clearSelection() {
-        selectionIndex = nil
-    }
-
-    func suggestion(at index: Int) -> Suggestion? {
-        guard index >= 0, index < items.count else {
-            os_log("Suggestions: Index out of bounds", log: OSLog.Category.general, type: .error)
-            return nil
-        }
-
-        return items[index]
     }
 
 }

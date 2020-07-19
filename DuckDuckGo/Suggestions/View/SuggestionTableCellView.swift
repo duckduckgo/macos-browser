@@ -21,15 +21,17 @@ import Cocoa
 class SuggestionTableCellView: NSTableCellView {
 
     static let identifier = "SuggestionTableCellView"
+    @IBOutlet weak var iconImageView: NSImageView!
 
     override func awakeFromNib() {
         super.awakeFromNib()
-
-        textField?.textColor = NSColor.textColor
+        
+        iconImageView.contentTintColor = NSColor.textColor
     }
 
-    func display(_ suggestion: Suggestion) {
-        textField?.stringValue = suggestion.value
+    func display(_ suggestionViewModel: SuggestionViewModel) {
+        textField?.attributedStringValue = suggestionViewModel.attributedString
+        iconImageView.image = suggestionViewModel.icon
     }
 
 }

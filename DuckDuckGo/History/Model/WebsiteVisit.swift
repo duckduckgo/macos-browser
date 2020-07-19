@@ -1,5 +1,5 @@
 //
-//  SuggestionsStore.swift
+//  WebsiteVisit.swift
 //
 //  Copyright © 2020 DuckDuckGo. All rights reserved.
 //
@@ -18,21 +18,10 @@
 
 import Foundation
 
-protocol VisitedSitesStore {
+struct WebsiteVisit {
 
-    func loadSuggestions(for query: String, completion: @escaping ([URL]?, Error?) -> Void)
-    func saveSuggestion(url: URL)
+    let url: URL
+    let title: String?
+    let date: Date
 
-}
-
-class LocalSuggestionsStore: VisitedSitesStore {
-
-    func loadSuggestions(for query: String, completion: @escaping ([URL]?, Error?) -> Void) {
-        //todo
-    }
-
-    func saveSuggestion(url: URL) {
-        //todo
-    }
-    
 }

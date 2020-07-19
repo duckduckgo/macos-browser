@@ -31,7 +31,7 @@ class AutocompleteSearchField: NSSearchField {
     weak var searchFieldDelegate: AutocompleteSearchFieldDelegate?
 
     private let suggestionsViewModel = SuggestionsViewModel(suggestions: Suggestions())
-    private var selectedSuggestionCancellable: AnyCancellable?
+    private var selectedSuggestionViewModelCancellable: AnyCancellable?
 
     private var originalStringValue: String?
 
@@ -40,7 +40,7 @@ class AutocompleteSearchField: NSSearchField {
 
         super.delegate = self
         initSuggestionsWindow()
-        bindSelectedSuggestion()
+        bindSelectedSuggestionViewModel()
     }
 
     func viewDidLayout() {
@@ -52,21 +52,28 @@ class AutocompleteSearchField: NSSearchField {
         searchFieldDelegate?.autocompleteSearchField(self, didConfirmStringValue: stringValue)
     }
 
-    private func bindSelectedSuggestion() {
-        selectedSuggestionCancellable = suggestionsViewModel.$selectedSuggestion.sinkAsync { _ in
-            self.displaySelectedSuggestion()
+    private func bindSelectedSuggestionViewModel() {
+        selectedSuggestionViewModelCancellable = suggestionsViewModel.$selectedSuggestionViewModel.sinkAsync { _ in
+            self.displaySelectedSuggestionViewModel()
         }
     }
 
-    private func displaySelectedSuggestion() {
-        guard let selectedSuggestion = suggestionsViewModel.selectedSuggestion else {
+    private func displaySelectedSuggestionViewModel() {
+        guard let selectedSuggestionViewModel = suggestionsViewModel.selectedSuggestionViewModel else {
             if let originalStringValue = originalStringValue {
                 stringValue = originalStringValue
             }
             return
         }
 
-        stringValue = selectedSuggestion.value
+        switch selectedSuggestionViewModel.suggestion {
+        case .phrase(phrase: let phrase):
+            stringValue = phrase
+        case .website(url: let url, title: _):
+            stringValue = url.absoluteString
+        case .unknown(value: let value):
+            stringValue = value
+        }
     }
 
     // MARK: - Suggestions window
@@ -165,7 +172,7 @@ extension AutocompleteSearchField: NSSearchFieldDelegate {
         case #selector(NSResponder.moveUp(_:)):
             suggestionsViewModel.selectPreviousIfPossible(); return true
         case #selector(NSResponder.deleteBackward(_:)), #selector(NSResponder.deleteForward(_:)):
-            suggestionsViewModel.suggestions.clearSelection(); return false
+            suggestionsViewModel.clearSelection(); return false
         default:
             return false
         }

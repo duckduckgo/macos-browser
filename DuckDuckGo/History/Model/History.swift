@@ -1,5 +1,5 @@
 //
-//  SuggestionsStore.swift
+//  History.swift
 //
 //  Copyright © 2020 DuckDuckGo. All rights reserved.
 //
@@ -18,21 +18,21 @@
 
 import Foundation
 
-protocol VisitedSitesStore {
+class History {
 
-    func loadSuggestions(for query: String, completion: @escaping ([URL]?, Error?) -> Void)
-    func saveSuggestion(url: URL)
+    let historyStore: HistoryStore
 
-}
-
-class LocalSuggestionsStore: VisitedSitesStore {
-
-    func loadSuggestions(for query: String, completion: @escaping ([URL]?, Error?) -> Void) {
-        //todo
+    init(historyStore: HistoryStore) {
+        self.historyStore = historyStore
     }
 
-    func saveSuggestion(url: URL) {
-        //todo
+    convenience init () {
+        self.init(historyStore: LocalHistoryStore())
     }
-    
+
+    func saveWebsiteVisit(url: URL, title: String?, date: Date) {
+        let websiteVisit = WebsiteVisit(url: url, title: title, date: date)
+        historyStore.saveWebsiteVisit(websiteVisit)
+    }
+
 }

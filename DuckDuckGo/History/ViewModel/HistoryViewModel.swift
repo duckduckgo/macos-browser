@@ -1,5 +1,5 @@
 //
-//  SuggestionsStore.swift
+//  HistoryViewModel.swift
 //
 //  Copyright © 2020 DuckDuckGo. All rights reserved.
 //
@@ -17,22 +17,19 @@
 //
 
 import Foundation
+import os.log
 
-protocol VisitedSitesStore {
+class HistoryViewModel {
 
-    func loadSuggestions(for query: String, completion: @escaping ([URL]?, Error?) -> Void)
-    func saveSuggestion(url: URL)
+    let history: History
 
-}
-
-class LocalSuggestionsStore: VisitedSitesStore {
-
-    func loadSuggestions(for query: String, completion: @escaping ([URL]?, Error?) -> Void) {
-        //todo
+    init(history: History) {
+        self.history = history
     }
 
-    func saveSuggestion(url: URL) {
-        //todo
+    convenience init() {
+        let history = History()
+        self.init(history: history)
     }
     
 }

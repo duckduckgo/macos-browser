@@ -21,7 +21,7 @@ import os.log
 
 protocol SuggestionsAPI {
 
-    func fetchSuggestions(for query: String, completion: @escaping ([Suggestion]?, Error?) -> Void)
+    func fetchSuggestions(for query: String, completion: @escaping (SuggestionsAPIResult?, Error?) -> Void)
 
 }
 
@@ -35,8 +35,9 @@ class DuckDuckGoSuggestionsAPI: SuggestionsAPI {
 
     private var task: URLSessionDataTask?
 
-    func fetchSuggestions(for query: String, completion: @escaping ([Suggestion]?, Error?) -> Void) {
-        func mainQueueCompletion(_ suggestions: [Suggestion]?, _ error: Error?) {
+    func fetchSuggestions(for query: String, completion: @escaping (SuggestionsAPIResult?, Error?) -> Void) {
+        
+        func mainQueueCompletion(_ suggestions: SuggestionsAPIResult?, _ error: Error?) {
             DispatchQueue.main.async {
                 completion(suggestions, error)
             }
@@ -68,7 +69,7 @@ class DuckDuckGoSuggestionsAPI: SuggestionsAPI {
                 return
             }
 
-            mainQueueCompletion(suggestionsResult.suggestions, nil)
+            mainQueueCompletion(suggestionsResult, nil)
         })
 
         guard task != nil else {

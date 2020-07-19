@@ -47,7 +47,9 @@ class MainViewController: NSViewController {
             os_log("%s: No selected tabViewModel", log: OSLog.Category.general, type: .error, className)
             return nil
         }
-        let browserTabViewController = BrowserTabViewController(coder: coder, tabViewModel: selectedTabViewModel)
+        let browserTabViewController = BrowserTabViewController(coder: coder,
+                                                                tabViewModel: selectedTabViewModel,
+                                                                historyViewModel: HistoryViewModel())
         self.browserTabViewController = browserTabViewController
         return browserTabViewController
     }

@@ -31,6 +31,7 @@ class SuggestionsViewController: NSViewController {
     weak var delegate: SuggestionsViewControllerDelegate?
 
     @IBOutlet weak var tableView: NSTableView!
+    @IBOutlet weak var tableViewHeightConstraint: NSLayoutConstraint!
 
     let suggestionsViewModel: SuggestionsViewModel
 
@@ -101,15 +102,15 @@ class SuggestionsViewController: NSViewController {
     }
 
     private func bindSelectionIndex() {
-        selectionIndexCancelable = suggestionsViewModel.suggestions.$selectionIndex.sinkAsync { _ in
-            self.selectRow(at: self.suggestionsViewModel.suggestions.selectionIndex)
+        selectionIndexCancelable = suggestionsViewModel.$selectionIndex.sinkAsync { _ in
+            self.selectRow(at: self.suggestionsViewModel.selectionIndex)
         }
     }
 
     private func displayNewSuggestions() {
-        if suggestionsViewModel.suggestions.items.isEmpty {
-            closeWindow()
-        } else {
+        // Remove the second reload that causes visual glitch in the beginning of typing
+        if suggestionsViewModel.suggestions.items.remote != nil {
+            setHeight()
             tableView.reloadData()
         }
     }
@@ -117,9 +118,9 @@ class SuggestionsViewController: NSViewController {
     private func selectRow(at index: Int?) {
         guard let index = index,
               index >= 0,
-              !suggestionsViewModel.suggestions.items.isEmpty,
-              suggestionsViewModel.suggestions.items.count > index else {
-            clearSelection()
+              suggestionsViewModel.numberOfSuggestions != 0,
+              index < suggestionsViewModel.numberOfSuggestions else {
+            self.clearSelection()
             return
         }
 
@@ -166,6 +167,12 @@ class SuggestionsViewController: NSViewController {
         return event
     }
 
+    private func setHeight() {
+        let padding: CGFloat = 2 * 3
+        let cellSize: CGFloat = 25
+        tableViewHeightConstraint.constant = CGFloat(max(5, suggestionsViewModel.numberOfSuggestions)) * cellSize + padding
+    }
+
     private func closeWindow() {
         guard let window = view.window else {
             os_log("SuggestionsViewController: Window not available", log: OSLog.Category.general, type: .error)
@@ -181,7 +188,7 @@ class SuggestionsViewController: NSViewController {
 extension SuggestionsViewController: NSTableViewDataSource {
 
     func numberOfRows(in tableView: NSTableView) -> Int {
-        return suggestionsViewModel.suggestions.items.count
+        return suggestionsViewModel.numberOfSuggestions
     }
 
 }
@@ -196,8 +203,12 @@ extension SuggestionsViewController: NSTableViewDelegate {
             return nil
         }
 
-        let suggestion = suggestionsViewModel.suggestions.items[row]
-        suggestionTableCellView.display(suggestion)
+        guard let suggestionViewModel = suggestionsViewModel.suggestionViewModel(at: row) else {
+            os_log("SuggestionsViewController: Failed to get suggestion", log: OSLog.Category.general, type: .error)
+            return nil
+        }
+
+        suggestionTableCellView.display(suggestionViewModel)
         return suggestionTableCellView
     }
 
@@ -212,10 +223,13 @@ extension SuggestionsViewController: NSTableViewDelegate {
     }
 
     func tableViewSelectionDidChange(_ notification: Notification) {
-        if tableView.selectedRow == -1 { return }
+        if tableView.selectedRow == -1 {
+            suggestionsViewModel.clearSelection()
+            return
+        }
 
-        if suggestionsViewModel.suggestions.selectionIndex != tableView.selectedRow {
-            suggestionsViewModel.suggestions.select(at: tableView.selectedRow)
+        if suggestionsViewModel.selectionIndex != tableView.selectedRow {
+            suggestionsViewModel.select(at: tableView.selectedRow)
         }
     }
 

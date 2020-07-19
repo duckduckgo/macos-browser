@@ -1,1 +1,1 @@
-# DuckDuckGo macOS Browser
+# DuckDuckGo Privacy Browser for macOS

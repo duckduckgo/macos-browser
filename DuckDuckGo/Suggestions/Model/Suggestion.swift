@@ -18,15 +18,10 @@
 
 import Foundation
 
-struct Suggestion {
-
-    enum SuggestionType: String {
-        case phrase
-        case url
-        case unknown
-    }
-
-    let type: SuggestionType
-    let value: String
+enum Suggestion {
+    
+    case phrase(phrase: String)
+    case website(url: URL, title: String?)
+    case unknown(value: String)
     
 }
