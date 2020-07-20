@@ -88,4 +88,13 @@ extension URL {
         return try? getParameter(name: DuckDuckGoParameters.search.rawValue)
     }
 
+    // MARK: - Local
+
+    static var applicationSupport: URL {
+        guard let url = FileManager.default.urls(for: .applicationSupportDirectory, in: .userDomainMask).first else {
+            fatalError("Database: Failed to get Application Support file URL")
+        }
+        return url
+    }
+
 }

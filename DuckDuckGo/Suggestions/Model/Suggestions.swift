@@ -77,7 +77,7 @@ class Suggestions {
     }
 
     private func getLocalSuggestions(for query: String) {
-        historyStore.loadWebsiteVisits(query: query, limit: Constants.maxNumberInCategory) { (websiteVisits, error) in
+        historyStore.loadWebsiteVisits(textQuery: query, limit: Constants.maxNumberInCategory) { (websiteVisits, error) in
             guard let websiteVisits = websiteVisits, error == nil else {
                 self.items.local = nil
                 os_log("Suggestions: Failed to fetch local suggestions - %s",

@@ -26,13 +26,17 @@ class History {
         self.historyStore = historyStore
     }
 
-    convenience init () {
+    convenience init() {
         self.init(historyStore: LocalHistoryStore())
     }
 
     func saveWebsiteVisit(url: URL, title: String?, date: Date) {
         let websiteVisit = WebsiteVisit(url: url, title: title, date: date)
         historyStore.saveWebsiteVisit(websiteVisit)
+    }
+
+    func clear() {
+        historyStore.removeAllWebsiteVisits()
     }
 
 }

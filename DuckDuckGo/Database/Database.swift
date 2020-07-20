@@ -24,16 +24,29 @@ class Database {
 
     static let shared = Database()
 
-    private(set) var persistentContainer: NSPersistentContainer = {
+    enum Constants {
+        static let filename = "Database.sqlite"
+    }
+
+    private(set) var persistentContainer: NSPersistentContainer
+
+    init(fileUrl: URL) {
         let container = NSPersistentContainer(name: "DataModel")
+        let description = NSPersistentStoreDescription(url: fileUrl)
+        container.persistentStoreDescriptions = [description]
         container.loadPersistentStores { _, error in
             if let error = error {
                 fatalError("Database: Unable to load persistent stores: \(error)")
             }
         }
 
-        return container
-    }()
+        persistentContainer = container
+    }
+
+    convenience init() {
+        let fileUrl = URL.applicationSupport.appendingPathComponent(Constants.filename)
+        self.init(fileUrl: fileUrl)
+    }
 
     var context: NSManagedObjectContext {
         return persistentContainer.viewContext
