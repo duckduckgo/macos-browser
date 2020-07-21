@@ -90,6 +90,16 @@ extension URL {
         absoluteString.starts(with: Self.duckDuckGo.absoluteString)
     }
 
+    // swiftlint:disable unused_optional_binding
+    var isDuckDuckGoSearch: Bool {
+        if isDuckDuckGo, let _ = try? getParameter(name: DuckDuckGoParameters.search.rawValue) {
+            return true
+        }
+
+        return false
+    }
+    // swiftlint:enable unused_optional_binding
+
     enum DuckDuckGoParameters: String {
         case search = "q"
     }

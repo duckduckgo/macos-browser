@@ -73,9 +73,23 @@ class BrowserTabViewController: NSViewController {
         }
     }
 
+    private func setFirstResponderIfNeeded() {
+        guard let url = webView.url else {
+            return
+        }
+
+        if !url.isDuckDuckGoSearch {
+            view.window?.makeFirstResponder(webView)
+        }
+    }
+
 }
 
 extension BrowserTabViewController: WKNavigationDelegate {
+
+    func webView(_ webView: WKWebView, didStartProvisionalNavigation navigation: WKNavigation!) {
+        setFirstResponderIfNeeded()
+    }
 
     func webView(_ webView: WKWebView, didFinish navigation: WKNavigation!) {
         saveWebsiteVisit()

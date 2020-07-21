@@ -676,7 +676,7 @@
                         <outlet property="delegate" destination="Voe-Tx-rLC" id="PrD-fu-P6m"/>
                     </connections>
                 </application>
-                <customObject id="Voe-Tx-rLC" customClass="AppDelegate" customModule="DuckDuckGo" customModuleProvider="target"/>
+                <customObject id="Voe-Tx-rLC" customClass="AppDelegate" customModule="DuckDuckGo_Privacy_Browser" customModuleProvider="target"/>
                 <customObject id="YLy-65-1bz" customClass="NSFontManager"/>
                 <customObject id="Ady-hI-5gd" userLabel="First Responder" customClass="NSResponder" sceneMemberID="firstResponder"/>
             </objects>
@@ -706,7 +706,7 @@
         <!--Main View Controller-->
         <scene sceneID="hIz-AP-VOD">
             <objects>
-                <viewController id="XfG-lQ-9wD" customClass="MainViewController" customModule="DuckDuckGo" customModuleProvider="target" sceneMemberID="viewController">
+                <viewController id="XfG-lQ-9wD" customClass="MainViewController" customModule="DuckDuckGo_Privacy_Browser" customModuleProvider="target" sceneMemberID="viewController">
                     <view key="view" id="m2S-Jp-Qdl">
                         <rect key="frame" x="0.0" y="0.0" width="1024" height="789"/>
                         <autoresizingMask key="autoresizingMask"/>
@@ -749,12 +749,12 @@
         <!--Navigation Bar View Controller-->
         <scene sceneID="Lx2-fj-RhY">
             <objects>
-                <viewController id="zAi-mT-h2J" customClass="NavigationBarViewController" customModule="DuckDuckGo" customModuleProvider="target" sceneMemberID="viewController">
+                <viewController id="zAi-mT-h2J" customClass="NavigationBarViewController" customModule="DuckDuckGo_Privacy_Browser" customModuleProvider="target" sceneMemberID="viewController">
                     <view key="view" id="23V-k7-gwK">
                         <rect key="frame" x="0.0" y="0.0" width="845" height="40"/>
                         <autoresizingMask key="autoresizingMask"/>
                         <subviews>
-                            <searchField wantsLayer="YES" verticalHuggingPriority="750" textCompletion="NO" translatesAutoresizingMaskIntoConstraints="NO" id="b1U-yO-v3i" customClass="AutocompleteSearchField" customModule="DuckDuckGo" customModuleProvider="target">
+                            <searchField wantsLayer="YES" verticalHuggingPriority="750" textCompletion="NO" translatesAutoresizingMaskIntoConstraints="NO" id="b1U-yO-v3i" customClass="AutocompleteSearchField" customModule="DuckDuckGo_Privacy_Browser" customModuleProvider="target">
                                 <rect key="frame" x="173" y="9" width="500" height="22"/>
                                 <constraints>
                                     <constraint firstAttribute="height" constant="22" id="IOH-UD-0S2"/>
@@ -836,7 +836,7 @@
         <!--Browser Tab View Controller-->
         <scene sceneID="POP-kj-wTB">
             <objects>
-                <viewController id="ELG-jh-7Cj" customClass="BrowserTabViewController" customModule="DuckDuckGo" customModuleProvider="target" sceneMemberID="viewController">
+                <viewController id="ELG-jh-7Cj" customClass="BrowserTabViewController" customModule="DuckDuckGo_Privacy_Browser" customModuleProvider="target" sceneMemberID="viewController">
                     <view key="view" id="9OZ-eN-8Ze">
                         <rect key="frame" x="0.0" y="0.0" width="512" height="492"/>
                         <autoresizingMask key="autoresizingMask"/>
