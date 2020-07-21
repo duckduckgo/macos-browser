@@ -62,6 +62,19 @@ extension URL {
         }
     }
 
+    // MARK: - Validity
+
+    var isValid: Bool {
+        guard let scheme = scheme,
+              URL.Scheme(rawValue: scheme) != nil,
+              let host = host, host.isValidHost,
+              user == nil else {
+            return false
+        }
+
+        return true
+    }
+
     // MARK: - DuckDuckGo
 
     static var duckDuckGo: URL {

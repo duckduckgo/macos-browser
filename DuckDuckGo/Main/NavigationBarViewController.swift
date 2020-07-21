@@ -127,7 +127,7 @@ fileprivate extension URL {
     }
 
     static func makeURL(from addressBarString: String) -> URL? {
-        if let addressBarUrl = addressBarString.url {
+        if let addressBarUrl = addressBarString.url, addressBarUrl.isValid {
             return addressBarUrl
         }
 
