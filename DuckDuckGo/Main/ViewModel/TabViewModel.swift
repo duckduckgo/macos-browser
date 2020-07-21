@@ -27,6 +27,7 @@ class TabViewModel {
     @Published var canGoForward: Bool = false
     @Published var canGoBack: Bool = false
     @Published var canReload: Bool = false
+    @Published var isLoading: Bool = false
 
     init(tab: Tab) {
         self.tab = tab

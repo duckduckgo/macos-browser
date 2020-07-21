@@ -794,7 +794,7 @@
                                     <action selector="goForwardAction:" target="zAi-mT-h2J" id="ZCI-tB-3Zd"/>
                                 </connections>
                             </button>
-                            <button translatesAutoresizingMaskIntoConstraints="NO" id="8IH-kp-rpL">
+                            <button translatesAutoresizingMaskIntoConstraints="NO" id="8IH-kp-rpL" customClass="RotatingButton" customModule="DuckDuckGo_Privacy_Browser" customModuleProvider="target">
                                 <rect key="frame" x="98" y="6" width="29" height="29"/>
                                 <constraints>
                                     <constraint firstAttribute="width" constant="29" id="f1O-Dq-2FO"/>

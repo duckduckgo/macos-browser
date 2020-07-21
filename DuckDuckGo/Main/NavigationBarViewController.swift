@@ -25,16 +25,18 @@ class NavigationBarViewController: NSViewController {
     @IBOutlet weak var autocompleteSearchField: AutocompleteSearchField!
     @IBOutlet weak var goBackButton: NSButton!
     @IBOutlet weak var goForwardButton: NSButton!
-    @IBOutlet weak var reloadButton: NSButton!
+    @IBOutlet weak var reloadButton: RotatingButton!
 
     private var urlCancelable: AnyCancellable?
     private var searchSuggestionsCancelable: AnyCancellable?
     private var navigationButtonsCancelables = Set<AnyCancellable>()
+    private var loadingIndicatorCancelable: AnyCancellable?
 
     var tabViewModel: TabViewModel? {
         didSet {
             bindUrl()
             bindNavigationButtons()
+            bindLoading()
         }
     }
 
@@ -76,6 +78,11 @@ class NavigationBarViewController: NSViewController {
         tabViewModel?.$canReload.sinkAsync { _ in self.setNavigationButtons() } .store(in: &navigationButtonsCancelables)
     }
 
+    private func bindLoading() {
+        loadingIndicatorCancelable?.cancel()
+        loadingIndicatorCancelable = tabViewModel?.$isLoading.sinkAsync { _ in self.setLoadingIndicator() }
+    }
+
     private func refreshSearchField() {
         guard let tabViewModel = tabViewModel else {
             os_log("%s: Property tabViewModel is nil", log: OSLog.Category.general, type: .error, className)
@@ -100,6 +107,14 @@ class NavigationBarViewController: NSViewController {
             return
         }
         tabViewModel.tab.url = url
+    }
+
+    private func setLoadingIndicator() {
+        if tabViewModel?.isLoading ?? false {
+            reloadButton.startRotation()
+        } else {
+            reloadButton.stopRotation()
+        }
     }
 
 }

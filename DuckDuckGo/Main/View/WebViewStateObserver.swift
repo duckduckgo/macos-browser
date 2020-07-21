@@ -37,6 +37,7 @@ class WebViewStateObserver: NSObject {
         webView.addObserver(self, forKeyPath: #keyPath(WKWebView.url), options: .new, context: nil)
         webView.addObserver(self, forKeyPath: #keyPath(WKWebView.canGoBack), options: .new, context: nil)
         webView.addObserver(self, forKeyPath: #keyPath(WKWebView.canGoForward), options: .new, context: nil)
+        webView.addObserver(self, forKeyPath: #keyPath(WKWebView.isLoading), options: .new, context: nil)
     }
 
     // swiftlint:disable block_based_kvo
@@ -53,6 +54,7 @@ class WebViewStateObserver: NSObject {
         case #keyPath(WKWebView.url): tabViewModel.tab.url = webView.url
         case #keyPath(WKWebView.canGoBack): tabViewModel.canGoBack = webView.canGoBack
         case #keyPath(WKWebView.canGoForward): tabViewModel.canGoForward = webView.canGoForward
+        case #keyPath(WKWebView.isLoading): tabViewModel.isLoading = webView.isLoading
         default:
             os_log("%s: keyPath %s not handled", log: OSLog.Category.general, type: .error, className, keyPath)
             super.observeValue(forKeyPath: keyPath, of: object, change: change, context: context)
