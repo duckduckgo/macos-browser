@@ -43,6 +43,19 @@ class AutocompleteSearchField: NSSearchField {
         bindSelectedSuggestionViewModel()
     }
 
+    override func becomeFirstResponder() -> Bool {
+        let isFirstResponder = super.becomeFirstResponder()
+        if isFirstResponder {
+            perform(#selector(selectText(_:)), with: self, afterDelay: 0)
+        }
+
+        return isFirstResponder
+    }
+
+    override func resignFirstResponder() -> Bool {
+        return super.resignFirstResponder()
+    }
+
     func viewDidLayout() {
         layoutSuggestionWindow()
     }
