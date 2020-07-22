@@ -23,41 +23,43 @@ class SuggestionViewModel {
     let suggestion: Suggestion
 
     init(suggestion: Suggestion) {
-        self.suggestion = suggestion
+        if case .phrase(phrase: let phrase) = suggestion, let url = phrase.url, url.isValid {
+            self.suggestion = .website(url: url, title: nil)
+        } else {
+            self.suggestion = suggestion
+        }
     }
 
     var attributedString: NSAttributedString {
-        let firstAttributes = [NSAttributedString.Key.foregroundColor: NSColor.labelColor]
-        let secondAttributes = [NSAttributedString.Key.foregroundColor: NSColor.secondaryLabelColor]
+        let attributes = [NSAttributedString.Key.foregroundColor: NSColor.labelColor]
 
         switch suggestion {
         case .phrase(phrase: let phrase):
-            let firstPart = NSMutableAttributedString(string: phrase, attributes: firstAttributes)
-            let secondPart = NSAttributedString(string: " - DuckDuckGo Search", attributes: secondAttributes)
-            firstPart.append(secondPart)
-            return firstPart
+            return NSMutableAttributedString(string: phrase, attributes: attributes)
         case .website(url: let url, title: let title):
-            if let title = title {
-                let firstPart = NSMutableAttributedString(string: title, attributes: firstAttributes)
-                let secondPart = NSAttributedString(string: " - \(url.absoluteString)", attributes: secondAttributes)
-                firstPart.append(secondPart)
-                return firstPart
+            if let title = title, title.count > 0 {
+                return NSAttributedString(string: "\(title) - \(url.host ?? "")\(url.path)", attributes: attributes)
             } else {
-                return NSAttributedString(string: "\(url.absoluteString)", attributes: firstAttributes)
+                return NSAttributedString(string: "\(url.host ?? "")\(url.path)", attributes: attributes)
             }
         case .unknown(value: let value):
-            return NSAttributedString(string: value, attributes: firstAttributes)
+            return NSAttributedString(string: value, attributes: attributes)
         }
+    }
+
+    private enum SuggestionIconNames: String {
+        case search = "NSTouchBarSearchTemplate"
+        case website = "NSListViewTemplate"
     }
 
     var icon: NSImage? {
         switch suggestion {
         case .phrase(phrase: _):
-            return NSImage(named: "NSTouchBarSearchTemplate")
+            return NSImage(named: SuggestionIconNames.search.rawValue)
         case .website(url: _, title: _):
-            return NSImage(named: "NSListViewTemplate")
+            return NSImage(named: SuggestionIconNames.website.rawValue)
         case .unknown(value: _):
-            return NSImage(named: "NSListViewTemplate")
+            return NSImage(named: SuggestionIconNames.website.rawValue)
         }
     }
 
