@@ -108,8 +108,15 @@ class SuggestionsViewController: NSViewController {
     }
 
     private func displayNewSuggestions() {
+        guard suggestionsViewModel.numberOfSuggestions > 0 else {
+            closeWindow()
+            tableView.reloadData()
+            return
+        }
+
         // Remove the second reload that causes visual glitch in the beginning of typing
-        if suggestionsViewModel.suggestions.items.remote != nil || suggestionsViewModel.numberOfSuggestions == 0 {
+        if suggestionsViewModel.suggestions.items.remote != nil {
+            setHeight()
             tableView.reloadData()
             self.selectRow(at: self.suggestionsViewModel.selectionIndex)
         }
@@ -165,6 +172,17 @@ class SuggestionsViewController: NSViewController {
             return nil
         }
         return event
+    }
+
+    private func setHeight() {
+        guard suggestionsViewModel.numberOfSuggestions > 0 else {
+            tableViewHeightConstraint.constant = 0
+            return
+        }
+
+        let padding: CGFloat = 2 * 3
+        let cellSize: CGFloat = 25
+        tableViewHeightConstraint.constant = CGFloat(suggestionsViewModel.numberOfSuggestions) * cellSize + padding
     }
 
     private func closeWindow() {
