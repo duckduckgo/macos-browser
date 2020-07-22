@@ -10,6 +10,7 @@
 		85AE2FF224A33A2D002D507F /* WebKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 85AE2FF124A33A2D002D507F /* WebKit.framework */; };
 		AA23DA7324B25A74006F262F /* Database.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA23DA7224B25A74006F262F /* Database.swift */; };
 		AA23DA7624B25EC2006F262F /* DataModel.xcdatamodeld in Sources */ = {isa = PBXBuildFile; fileRef = AA23DA7424B25EC2006F262F /* DataModel.xcdatamodeld */; };
+		AA2E423424C8A2270048C0D5 /* BackgroundView.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA2E423324C8A2270048C0D5 /* BackgroundView.swift */; };
 		AA3F895324C18AD500628DDE /* SuggestionViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA3F895224C18AD500628DDE /* SuggestionViewModel.swift */; };
 		AA585D82248FD31100E9A3E2 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA585D81248FD31100E9A3E2 /* AppDelegate.swift */; };
 		AA585D84248FD31100E9A3E2 /* BrowserTabViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA585D83248FD31100E9A3E2 /* BrowserTabViewController.swift */; };
@@ -67,6 +68,7 @@
 		85AE2FF124A33A2D002D507F /* WebKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = WebKit.framework; path = System/Library/Frameworks/WebKit.framework; sourceTree = SDKROOT; };
 		AA23DA7224B25A74006F262F /* Database.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Database.swift; sourceTree = "<group>"; };
 		AA23DA7524B25EC2006F262F /* DataModel.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = DataModel.xcdatamodel; sourceTree = "<group>"; };
+		AA2E423324C8A2270048C0D5 /* BackgroundView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = BackgroundView.swift; sourceTree = "<group>"; };
 		AA3F895224C18AD500628DDE /* SuggestionViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SuggestionViewModel.swift; sourceTree = "<group>"; };
 		AA585D7E248FD31100E9A3E2 /* DuckDuckGo Privacy Browser.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "DuckDuckGo Privacy Browser.app"; sourceTree = BUILT_PRODUCTS_DIR; };
 		AA585D81248FD31100E9A3E2 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
@@ -227,6 +229,7 @@
 				AA68C3D22490ED62001B8783 /* NavigationBarViewController.swift */,
 				AAAC93EE24C76FCD00C23ECC /* RotatingButton.swift */,
 				AA585D83248FD31100E9A3E2 /* BrowserTabViewController.swift */,
+				AA2E423324C8A2270048C0D5 /* BackgroundView.swift */,
 				AA5D6DAB24A340F700C6FBCE /* WebViewStateObserver.swift */,
 			);
 			path = View;
@@ -526,6 +529,7 @@
 				AA9FF96124A21D2F0039E328 /* PublisherExtension.swift in Sources */,
 				AABEE69A24A902A90043105B /* SuggestionsViewModel.swift in Sources */,
 				AABEE69E24A9C5C30043105B /* Suggestion.swift in Sources */,
+				AA2E423424C8A2270048C0D5 /* BackgroundView.swift in Sources */,
 				AAE7CAA124B4A88800CD7F00 /* History.swift in Sources */,
 				AA9FF95F24A1FB690039E328 /* TabCollectionViewModel.swift in Sources */,
 				AA585D84248FD31100E9A3E2 /* BrowserTabViewController.swift in Sources */,

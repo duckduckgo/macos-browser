@@ -772,7 +772,7 @@
                                     <constraint firstAttribute="height" constant="29" id="H1Q-jN-aiv"/>
                                     <constraint firstAttribute="width" constant="29" id="t38-6z-ubW"/>
                                 </constraints>
-                                <buttonCell key="cell" type="square" bezelStyle="shadowlessSquare" image="NSTouchBarGoBackTemplate" imagePosition="overlaps" alignment="center" imageScaling="proportionallyUpOrDown" inset="2" id="oqM-Wt-CCf">
+                                <buttonCell key="cell" type="square" bezelStyle="shadowlessSquare" image="NSTouchBarGoBackTemplate" imagePosition="only" alignment="center" imageScaling="proportionallyUpOrDown" inset="2" id="oqM-Wt-CCf">
                                     <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
                                     <font key="font" metaFont="system"/>
                                 </buttonCell>
@@ -848,15 +848,52 @@
                                     <wkPreferences key="preferences"/>
                                 </wkWebViewConfiguration>
                             </wkWebView>
+                            <customView hidden="YES" translatesAutoresizingMaskIntoConstraints="NO" id="Nvb-Di-hxz" customClass="BackgroundView" customModule="DuckDuckGo_Privacy_Browser" customModuleProvider="target">
+                                <rect key="frame" x="0.0" y="0.0" width="512" height="492"/>
+                                <subviews>
+                                    <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="wDW-73-QgT">
+                                        <rect key="frame" x="140" y="253" width="232" height="17"/>
+                                        <textFieldCell key="cell" lineBreakMode="clipping" title="DuckDuckGo can't load this page." id="L12-N1-wo0">
+                                            <font key="font" metaFont="systemSemibold" size="14"/>
+                                            <color key="textColor" name="labelColor" catalog="System" colorSpace="catalog"/>
+                                            <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
+                                        </textFieldCell>
+                                    </textField>
+                                    <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="BVh-ER-EPP">
+                                        <rect key="frame" x="81" y="228" width="351" height="16"/>
+                                        <textFieldCell key="cell" lineBreakMode="clipping" title="A server with the specified hostname could not be found." id="0xq-R9-UnE">
+                                            <font key="font" metaFont="system"/>
+                                            <color key="textColor" name="labelColor" catalog="System" colorSpace="catalog"/>
+                                            <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
+                                        </textFieldCell>
+                                    </textField>
+                                </subviews>
+                                <constraints>
+                                    <constraint firstItem="wDW-73-QgT" firstAttribute="centerY" secondItem="Nvb-Di-hxz" secondAttribute="centerY" constant="-15" id="NWz-vb-r3E"/>
+                                    <constraint firstItem="BVh-ER-EPP" firstAttribute="centerX" secondItem="Nvb-Di-hxz" secondAttribute="centerX" id="ix8-D4-dzr"/>
+                                    <constraint firstItem="BVh-ER-EPP" firstAttribute="centerY" secondItem="Nvb-Di-hxz" secondAttribute="centerY" constant="10" id="quT-4m-sos"/>
+                                    <constraint firstItem="wDW-73-QgT" firstAttribute="centerX" secondItem="Nvb-Di-hxz" secondAttribute="centerX" id="yGz-gN-3kk"/>
+                                </constraints>
+                                <userDefinedRuntimeAttributes>
+                                    <userDefinedRuntimeAttribute type="color" keyPath="backgroundColor">
+                                        <color key="value" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
+                                    </userDefinedRuntimeAttribute>
+                                </userDefinedRuntimeAttributes>
+                            </customView>
                         </subviews>
                         <constraints>
+                            <constraint firstAttribute="bottom" secondItem="Nvb-Di-hxz" secondAttribute="bottom" id="CGI-tw-BgY"/>
                             <constraint firstItem="0pi-OT-jzg" firstAttribute="top" secondItem="9OZ-eN-8Ze" secondAttribute="top" id="GdO-9V-k8G"/>
                             <constraint firstAttribute="bottom" secondItem="0pi-OT-jzg" secondAttribute="bottom" id="OCn-LW-f5K"/>
+                            <constraint firstItem="Nvb-Di-hxz" firstAttribute="leading" secondItem="9OZ-eN-8Ze" secondAttribute="leading" id="QFP-Vc-ubB"/>
+                            <constraint firstItem="Nvb-Di-hxz" firstAttribute="top" secondItem="9OZ-eN-8Ze" secondAttribute="top" id="myq-jf-wfV"/>
                             <constraint firstAttribute="trailing" secondItem="0pi-OT-jzg" secondAttribute="trailing" id="o51-Tp-9t2"/>
+                            <constraint firstAttribute="trailing" secondItem="Nvb-Di-hxz" secondAttribute="trailing" id="qd4-AK-1kn"/>
                             <constraint firstItem="0pi-OT-jzg" firstAttribute="leading" secondItem="9OZ-eN-8Ze" secondAttribute="leading" id="upy-bE-zOl"/>
                         </constraints>
                     </view>
                     <connections>
+                        <outlet property="errorView" destination="Nvb-Di-hxz" id="zPb-tZ-0fB"/>
                         <outlet property="webView" destination="0pi-OT-jzg" id="VeJ-Qf-md8"/>
                     </connections>
                 </viewController>

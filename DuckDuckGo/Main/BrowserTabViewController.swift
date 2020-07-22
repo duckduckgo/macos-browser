@@ -24,11 +24,12 @@ import Combine
 class BrowserTabViewController: NSViewController {
 
     @IBOutlet weak var webView: WKWebView!
+    @IBOutlet weak var errorView: NSView!
 
-    let tabViewModel: TabViewModel
-    let historyViewModel: HistoryViewModel
-    var webViewStateObserver: WebViewStateObserver?
-    var urlCancelable: AnyCancellable?
+    private let tabViewModel: TabViewModel
+    private let historyViewModel: HistoryViewModel
+    private var webViewStateObserver: WebViewStateObserver?
+    private var urlCancelable: AnyCancellable?
 
     required init?(coder: NSCoder) {
         fatalError("BrowserTabViewController: Bad initializer")
@@ -83,16 +84,33 @@ class BrowserTabViewController: NSViewController {
         }
     }
 
+    private func displayErrorView(_ shown: Bool) {
+        if shown {
+            tabViewModel.tab.url = nil
+        }
+        errorView.isHidden = !shown
+        webView.isHidden = shown
+    }
+
 }
 
 extension BrowserTabViewController: WKNavigationDelegate {
 
     func webView(_ webView: WKWebView, didStartProvisionalNavigation navigation: WKNavigation!) {
         setFirstResponderIfNeeded()
+        displayErrorView(false)
     }
 
     func webView(_ webView: WKWebView, didFinish navigation: WKNavigation!) {
         saveWebsiteVisit()
+    }
+
+    func webView(_ webView: WKWebView, didFail navigation: WKNavigation!, withError error: Error) {
+        displayErrorView(true)
+    }
+
+    func webView(_ webView: WKWebView, didFailProvisionalNavigation navigation: WKNavigation!, withError error: Error) {
+        displayErrorView(true)
     }
 
 }
