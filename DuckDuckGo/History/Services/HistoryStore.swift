@@ -30,6 +30,10 @@ protocol HistoryStore {
 
 class LocalHistoryStore: HistoryStore {
 
+    enum Constants {
+        static let websiteVisitEntity = "WebsiteVisit"
+    }
+
     init(database: Database) {
         self.database = database
     }
@@ -45,7 +49,7 @@ class LocalHistoryStore: HistoryStore {
     }
 
     func loadWebsiteVisits(textQuery: String?, limit: Int, completion: ([WebsiteVisit]?, Error?) -> Void) {
-        let fetchRequest = NSFetchRequest<NSFetchRequestResult>(entityName: "WebsiteVisit")
+        let fetchRequest = NSFetchRequest<NSFetchRequestResult>(entityName: Constants.websiteVisitEntity)
 
         if let textQuery = textQuery {
             let urlPredicate = NSPredicate(format: "%K CONTAINS[c] %@", "url", textQuery)
@@ -57,19 +61,18 @@ class LocalHistoryStore: HistoryStore {
         fetchRequest.fetchLimit = limit
 
         do {
-            guard let managedObjects = try database.context.fetch(fetchRequest) as? [NSManagedObject] else {
+            guard let managedObjects = try database.context.fetch(fetchRequest) as? [WebsiteVisitManagedObject] else {
                 os_log("LocalHistoryStore: Unwrapping fetch request failed", log: OSLog.Category.general, type: .error)
                 completion(nil, LocalHistoryStoreError.loadingFailed)
                 return
             }
             let websiteVisits: [WebsiteVisit] = managedObjects.compactMap {
-                guard let url = $0.value(forKey: "url") as? URL,
-                      let title = $0.value(forKey: "title") as? String,
-                      let date = $0.value(forKey: "date") as? Date else {
+                guard let url = $0.url,
+                      let date = $0.date else {
                     os_log("LocalHistoryStore: Unwrapping fetch request failed", log: OSLog.Category.general, type: .error)
                     return nil
                 }
-                return WebsiteVisit(url: url, title: title, date: date) }
+                return WebsiteVisit(url: url, title: $0.title, date: date) }
 
             completion(websiteVisits, nil)
         } catch let error {
@@ -79,14 +82,14 @@ class LocalHistoryStore: HistoryStore {
     }
 
     func saveWebsiteVisit(_ websiteVisit: WebsiteVisit) {
-        guard let websiteVisitEntity = NSEntityDescription.entity(forEntityName: "WebsiteVisit", in: database.context) else {
+        guard let websiteVisitEntity = NSEntityDescription.entity(forEntityName: Constants.websiteVisitEntity, in: database.context) else {
             os_log("LocalHistoryStore: Failed to get entity", log: OSLog.Category.general, type: .error)
             return
         }
-        let managedObject = NSManagedObject(entity: websiteVisitEntity, insertInto: database.context)
-        managedObject.setValue(websiteVisit.url, forKey: "url")
-        managedObject.setValue(websiteVisit.date, forKey: "date")
-        managedObject.setValue(websiteVisit.title, forKey: "title")
+        let managedObject = WebsiteVisitManagedObject(entity: websiteVisitEntity, insertInto: database.context)
+        managedObject.url = websiteVisit.url
+        managedObject.date = websiteVisit.date
+        managedObject.title = websiteVisit.title
 
         do {
             try database.context.save()
@@ -100,7 +103,7 @@ class LocalHistoryStore: HistoryStore {
     }
 
     func removeAllWebsiteVisits() {
-        let fetchRequest = NSFetchRequest<NSFetchRequestResult>(entityName: "WebsiteVisit")
+        let fetchRequest = NSFetchRequest<NSFetchRequestResult>(entityName: Constants.websiteVisitEntity)
         let deleteRequest = NSBatchDeleteRequest(fetchRequest: fetchRequest)
 
         do {
