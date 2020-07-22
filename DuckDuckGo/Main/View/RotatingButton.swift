@@ -24,7 +24,7 @@ class RotatingButton: NSButton {
     enum Constants {
         static let rotationAnimationKeyPath = "transform.rotation.z"
         static let rotationAnimationKey = rotationAnimationKeyPath
-        static let rotationDuration: Double = 1
+        static let rotationDuration: Double = 3/4
     }
 
     override func awakeFromNib() {
