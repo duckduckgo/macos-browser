@@ -1,5 +1,5 @@
 //
-//  AppDelegate.swift
+//  BackgroundView.swift
 //
 //  Copyright © 2020 DuckDuckGo. All rights reserved.
 //
@@ -18,19 +18,29 @@
 
 import Cocoa
 
-@NSApplicationMain
-class AppDelegate: NSObject, NSApplicationDelegate {
+// View capable of setting background in Interface Builder
+//@objcMembers
+public class BackgroundView: NSView {
 
-    func applicationDidFinishLaunching(_ aNotification: Notification) {
-        // Insert code here to initialize your application
+    required init?(coder: NSCoder) {
+        super.init(coder: coder)
+
+        commonInit()
     }
 
-    func applicationWillTerminate(_ aNotification: Notification) {
-        // Insert code here to tear down your application
+    public override init(frame frameRect: NSRect) {
+        super.init(frame: frameRect)
+
+        commonInit()
     }
 
-    func applicationShouldTerminateAfterLastWindowClosed(_ sender: NSApplication) -> Bool {
-        true
+    @IBInspectable public var backgroundColor: NSColor = NSColor.clear {
+        didSet {
+            layer?.backgroundColor = backgroundColor.cgColor
+        }
     }
-    
+
+    func commonInit() {
+        self.wantsLayer = true
+    }
 }

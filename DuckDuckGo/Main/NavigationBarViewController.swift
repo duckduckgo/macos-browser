@@ -22,25 +22,34 @@ import os.log
 
 class NavigationBarViewController: NSViewController {
 
-    @IBOutlet weak var searchField: NSSearchField!
+    @IBOutlet weak var autocompleteSearchField: AutocompleteSearchField!
     @IBOutlet weak var goBackButton: NSButton!
     @IBOutlet weak var goForwardButton: NSButton!
-    @IBOutlet weak var reloadButton: NSButton!
+    @IBOutlet weak var reloadButton: RotatingButton!
 
     private var urlCancelable: AnyCancellable?
+    private var searchSuggestionsCancelable: AnyCancellable?
     private var navigationButtonsCancelables = Set<AnyCancellable>()
+    private var loadingIndicatorCancelable: AnyCancellable?
 
     var tabViewModel: TabViewModel? {
         didSet {
             bindUrl()
             bindNavigationButtons()
+            bindLoading()
         }
     }
 
     override func viewDidLoad() {
         super.viewDidLoad()
 
-        searchField.delegate = self
+        autocompleteSearchField.searchFieldDelegate = self
+    }
+
+    override func viewDidLayout() {
+        super.viewDidLayout()
+
+        autocompleteSearchField.viewDidLayout()
     }
 
     @IBAction func goBackAction(_ sender: NSButton) {
@@ -69,12 +78,17 @@ class NavigationBarViewController: NSViewController {
         tabViewModel?.$canReload.sinkAsync { _ in self.setNavigationButtons() } .store(in: &navigationButtonsCancelables)
     }
 
+    private func bindLoading() {
+        loadingIndicatorCancelable?.cancel()
+        loadingIndicatorCancelable = tabViewModel?.$isLoading.sinkAsync { _ in self.setLoadingIndicator() }
+    }
+
     private func refreshSearchField() {
         guard let tabViewModel = tabViewModel else {
             os_log("%s: Property tabViewModel is nil", log: OSLog.Category.general, type: .error, className)
             return
         }
-        searchField.stringValue = tabViewModel.addressBarString
+        autocompleteSearchField.stringValue = tabViewModel.addressBarString
     }
 
     private func setNavigationButtons() {
@@ -88,26 +102,27 @@ class NavigationBarViewController: NSViewController {
             os_log("%s: Property tabViewModel is nil", log: OSLog.Category.general, type: .error, className)
             return
         }
-        guard let url = URL.makeURL(from: searchField.stringValue) else {
+        guard let url = URL.makeURL(from: autocompleteSearchField.stringValue) else {
             os_log("%s: Making url from address bar string failed", log: OSLog.Category.general, type: .error, className)
             return
         }
         tabViewModel.tab.url = url
     }
-    
-}
 
-extension NavigationBarViewController: NSSearchFieldDelegate {
-
-    func controlTextDidEndEditing(_ obj: Notification) {
-        let textMovement = obj.userInfo?["NSTextMovement"] as? Int
-        if textMovement == NSReturnTextMovement {
-            setUrl()
+    private func setLoadingIndicator() {
+        if tabViewModel?.isLoading ?? false {
+            reloadButton.startRotation()
+        } else {
+            reloadButton.stopRotation()
         }
     }
 
-    func controlTextDidChange(_ obj: Notification) {
+}
 
+extension NavigationBarViewController: AutocompleteSearchFieldDelegate {
+
+    func autocompleteSearchField(_ autocompleteSearchField: AutocompleteSearchField, didConfirmStringValue: String) {
+        setUrl()
     }
 
 }
@@ -118,7 +133,7 @@ fileprivate extension URL {
         let trimmedQuery = searchQuery.trimmingCharacters(in: .whitespacesAndNewlines)
         do {
             var searchUrl = Self.duckDuckGo
-            try searchUrl.addParameter(name: DuckDuckGoParameters.search.rawValue, value: trimmedQuery)
+            searchUrl = try searchUrl.addParameter(name: DuckDuckGoParameters.search.rawValue, value: trimmedQuery)
             return searchUrl
         } catch let error {
             os_log("URL extension: %s", log: OSLog.Category.general, type: .error, error.localizedDescription)
@@ -127,7 +142,7 @@ fileprivate extension URL {
     }
 
     static func makeURL(from addressBarString: String) -> URL? {
-        if let addressBarUrl = addressBarString.url {
+        if let addressBarUrl = addressBarString.url, addressBarUrl.isValid {
             return addressBarUrl
         }
 

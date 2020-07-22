@@ -1,5 +1,5 @@
 //
-//  AppDelegate.swift
+//  History.swift
 //
 //  Copyright © 2020 DuckDuckGo. All rights reserved.
 //
@@ -16,21 +16,27 @@
 //  limitations under the License.
 //
 
-import Cocoa
+import Foundation
 
-@NSApplicationMain
-class AppDelegate: NSObject, NSApplicationDelegate {
+class History {
 
-    func applicationDidFinishLaunching(_ aNotification: Notification) {
-        // Insert code here to initialize your application
+    let historyStore: HistoryStore
+
+    init(historyStore: HistoryStore) {
+        self.historyStore = historyStore
     }
 
-    func applicationWillTerminate(_ aNotification: Notification) {
-        // Insert code here to tear down your application
+    convenience init() {
+        self.init(historyStore: LocalHistoryStore())
     }
 
-    func applicationShouldTerminateAfterLastWindowClosed(_ sender: NSApplication) -> Bool {
-        true
+    func saveWebsiteVisit(url: URL, title: String?, date: Date) {
+        let websiteVisit = WebsiteVisit(url: url, title: title, date: date)
+        historyStore.saveWebsiteVisit(websiteVisit)
     }
-    
+
+    func clear() {
+        historyStore.removeAllWebsiteVisits()
+    }
+
 }

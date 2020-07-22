@@ -1,5 +1,5 @@
 //
-//  AppDelegate.swift
+//  SuggestionTableRowView.swift
 //
 //  Copyright © 2020 DuckDuckGo. All rights reserved.
 //
@@ -18,19 +18,15 @@
 
 import Cocoa
 
-@NSApplicationMain
-class AppDelegate: NSObject, NSApplicationDelegate {
+class SuggestionTableRowView: NSTableRowView {
 
-    func applicationDidFinishLaunching(_ aNotification: Notification) {
-        // Insert code here to initialize your application
-    }
+    static let identifier = "SuggestionTableRowView"
 
-    func applicationWillTerminate(_ aNotification: Notification) {
-        // Insert code here to tear down your application
+    // swiftlint:disable unused_setter_value
+    override var isEmphasized: Bool {
+        set {}
+        get { return true }
     }
+    // swiftlint:enable unused_setter_value
 
-    func applicationShouldTerminateAfterLastWindowClosed(_ sender: NSApplication) -> Bool {
-        true
-    }
-    
 }

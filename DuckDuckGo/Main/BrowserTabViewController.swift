@@ -24,17 +24,20 @@ import Combine
 class BrowserTabViewController: NSViewController {
 
     @IBOutlet weak var webView: WKWebView!
+    @IBOutlet weak var errorView: NSView!
 
-    let tabViewModel: TabViewModel
-    var webViewStateObserver: WebViewStateObserver?
-    var urlCancelable: AnyCancellable?
+    private let tabViewModel: TabViewModel
+    private let historyViewModel: HistoryViewModel
+    private var webViewStateObserver: WebViewStateObserver?
+    private var urlCancelable: AnyCancellable?
 
     required init?(coder: NSCoder) {
         fatalError("BrowserTabViewController: Bad initializer")
     }
 
-    init?(coder: NSCoder, tabViewModel: TabViewModel) {
+    init?(coder: NSCoder, tabViewModel: TabViewModel, historyViewModel: HistoryViewModel) {
         self.tabViewModel = tabViewModel
+        self.historyViewModel = historyViewModel
 
         super.init(coder: coder)
     }
@@ -58,16 +61,55 @@ class BrowserTabViewController: NSViewController {
         if webView.url == tabViewModel.tab.url { return }
 
         if let url = tabViewModel.tab.url {
-            os_log("%s: load %s", log: OSLog.Category.general, type: .debug, className, url.absoluteString)
-
             let request = URLRequest(url: url)
             webView.load(request)
         }
     }
 
+    private func saveWebsiteVisit() {
+        if let url = webView.url {
+            historyViewModel.history.saveWebsiteVisit(url: url, title: webView.title, date: NSDate.now as Date)
+        }
+    }
+
+    private func setFirstResponderIfNeeded() {
+        guard let url = webView.url else {
+            return
+        }
+
+        if !url.isDuckDuckGoSearch {
+            view.window?.makeFirstResponder(webView)
+        }
+    }
+
+    private func displayErrorView(_ shown: Bool) {
+        if shown {
+            tabViewModel.tab.url = nil
+        }
+        errorView.isHidden = !shown
+        webView.isHidden = shown
+    }
+
 }
 
 extension BrowserTabViewController: WKNavigationDelegate {
+
+    func webView(_ webView: WKWebView, didStartProvisionalNavigation navigation: WKNavigation!) {
+        setFirstResponderIfNeeded()
+        displayErrorView(false)
+    }
+
+    func webView(_ webView: WKWebView, didFinish navigation: WKNavigation!) {
+        saveWebsiteVisit()
+    }
+
+    func webView(_ webView: WKWebView, didFail navigation: WKNavigation!, withError error: Error) {
+        displayErrorView(true)
+    }
+
+    func webView(_ webView: WKWebView, didFailProvisionalNavigation navigation: WKNavigation!, withError error: Error) {
+        displayErrorView(true)
+    }
 
 }
 

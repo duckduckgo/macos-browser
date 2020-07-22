@@ -1,5 +1,5 @@
 //
-//  AppDelegate.swift
+//  HistoryViewModel.swift
 //
 //  Copyright © 2020 DuckDuckGo. All rights reserved.
 //
@@ -16,21 +16,20 @@
 //  limitations under the License.
 //
 
-import Cocoa
+import Foundation
+import os.log
 
-@NSApplicationMain
-class AppDelegate: NSObject, NSApplicationDelegate {
+class HistoryViewModel {
 
-    func applicationDidFinishLaunching(_ aNotification: Notification) {
-        // Insert code here to initialize your application
+    let history: History
+
+    init(history: History) {
+        self.history = history
     }
 
-    func applicationWillTerminate(_ aNotification: Notification) {
-        // Insert code here to tear down your application
-    }
-
-    func applicationShouldTerminateAfterLastWindowClosed(_ sender: NSApplication) -> Bool {
-        true
+    convenience init() {
+        let history = History()
+        self.init(history: history)
     }
     
 }

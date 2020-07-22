@@ -29,7 +29,7 @@ extension URL {
         case creatingFailed
     }
 
-    mutating func addParameter(name: String, value: String) throws {
+    func addParameter(name: String, value: String) throws -> URL {
         guard var components = URLComponents(url: self, resolvingAgainstBaseURL: false) else { throw ParameterError.parsingFailed }
         var queryItems = components.queryItems ?? [URLQueryItem]()
         let newQueryItem = URLQueryItem(name: name, value: value)
@@ -38,7 +38,7 @@ extension URL {
         guard let encodedQuery = components.percentEncodedQuery else { throw ParameterError.encodingFailed }
         components.percentEncodedQuery = encodedQuery.encodingWebSpaces()
         guard let newUrl = components.url else { throw ParameterError.creatingFailed }
-        self = newUrl
+        return newUrl
     }
 
     func getParameter(name: String) throws -> String? {
@@ -62,6 +62,19 @@ extension URL {
         }
     }
 
+    // MARK: - Validity
+
+    var isValid: Bool {
+        guard let scheme = scheme,
+              URL.Scheme(rawValue: scheme) != nil,
+              let host = host, host.isValidHost,
+              user == nil else {
+            return false
+        }
+
+        return true
+    }
+
     // MARK: - DuckDuckGo
 
     static var duckDuckGo: URL {
@@ -69,9 +82,23 @@ extension URL {
         return URL(string: duckDuckGoUrlString)!
     }
 
+    static var duckDuckGoAutocomplete: URL {
+        duckDuckGo.appendingPathComponent("ac/")
+    }
+
     var isDuckDuckGo: Bool {
         absoluteString.starts(with: Self.duckDuckGo.absoluteString)
     }
+
+    // swiftlint:disable unused_optional_binding
+    var isDuckDuckGoSearch: Bool {
+        if isDuckDuckGo, let _ = try? getParameter(name: DuckDuckGoParameters.search.rawValue) {
+            return true
+        }
+
+        return false
+    }
+    // swiftlint:enable unused_optional_binding
 
     enum DuckDuckGoParameters: String {
         case search = "q"
@@ -82,6 +109,15 @@ extension URL {
     var searchQuery: String? {
         guard isDuckDuckGo else { return nil }
         return try? getParameter(name: DuckDuckGoParameters.search.rawValue)
+    }
+
+    // MARK: - Local
+
+    static var applicationSupport: URL {
+        guard let url = FileManager.default.urls(for: .applicationSupportDirectory, in: .userDomainMask).first else {
+            fatalError("Database: Failed to get Application Support file URL")
+        }
+        return url
     }
 
 }

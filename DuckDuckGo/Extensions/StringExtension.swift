@@ -21,38 +21,50 @@ import os.log
 
 extension String {
 
-    // MARK: - URL
+    // MARK: - Regular Expression
 
-    var isValidUrl: Bool {
-        guard let detector = try? NSDataDetector(types: NSTextCheckingResult.CheckingType.link.rawValue) else {
-            os_log("String extension: Failed to create NSDataDetector", log: OSLog.Category.general, type: .error)
+    func matches(pattern: String) -> Bool {
+        guard let regex = try? NSRegularExpression(pattern: pattern, options: .caseInsensitive) else {
             return false
         }
-        let range = NSRange(location: 0, length: self.utf16.count)
-
-        if let match = detector.firstMatch(in: self, options: [], range: range) {
-            return match.range.length == self.utf16.count
-        } else {
-            return false
-        }
+        let matches = regex.matches(in: self, options: .anchored, range: NSRange(location: 0, length: count))
+        return matches.count == 1
     }
 
-    var url: URL? {
-        guard isValidUrl else { return nil }
+    // MARK: - URL
 
+    var url: URL? {
         guard let url = URL(string: self) else { return nil }
 
-        guard let scheme = url.scheme else {
+        guard url.scheme != nil else {
             var string = self
             string.prepend(URL.Scheme.https.separated())
             return string.url
         }
 
-        guard URL.Scheme(rawValue: scheme) != nil else { return nil }
-
-        guard url.host != nil else { return nil }
-
         return url
+    }
+
+    static let localhost = "localhost"
+
+    var isValidHost: Bool {
+        return isValidHostname || isValidIpHost
+    }
+
+    var isValidHostname: Bool {
+        if self == Self.localhost {
+            return true
+        }
+
+        // from https://stackoverflow.com/a/25717506/73479
+        let hostNameRegex = "^(((?!-)[A-Za-z0-9-]{1,63}(?<!-)\\.)+[A-Za-z0-9-]{2,63})$"
+        return matches(pattern: hostNameRegex)
+    }
+
+    var isValidIpHost: Bool {
+        // from https://stackoverflow.com/a/30023010/73479
+        let ipRegex = "^((25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\\.){3}(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)$"
+        return matches(pattern: ipRegex)
     }
 
     func encodingWebSpaces() -> String {

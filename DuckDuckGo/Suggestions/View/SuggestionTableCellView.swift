@@ -1,5 +1,5 @@
 //
-//  AppDelegate.swift
+//  SuggestionTableCellView.swift
 //
 //  Copyright © 2020 DuckDuckGo. All rights reserved.
 //
@@ -18,19 +18,20 @@
 
 import Cocoa
 
-@NSApplicationMain
-class AppDelegate: NSObject, NSApplicationDelegate {
+class SuggestionTableCellView: NSTableCellView {
 
-    func applicationDidFinishLaunching(_ aNotification: Notification) {
-        // Insert code here to initialize your application
+    static let identifier = "SuggestionTableCellView"
+    @IBOutlet weak var iconImageView: NSImageView!
+
+    override func awakeFromNib() {
+        super.awakeFromNib()
+        
+        iconImageView.contentTintColor = NSColor.textColor
     }
 
-    func applicationWillTerminate(_ aNotification: Notification) {
-        // Insert code here to tear down your application
+    func display(_ suggestionViewModel: SuggestionViewModel) {
+        textField?.attributedStringValue = suggestionViewModel.attributedString
+        iconImageView.image = suggestionViewModel.icon
     }
 
-    func applicationShouldTerminateAfterLastWindowClosed(_ sender: NSApplication) -> Bool {
-        true
-    }
-    
 }

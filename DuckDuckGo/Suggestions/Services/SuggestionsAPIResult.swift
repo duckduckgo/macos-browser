@@ -1,5 +1,5 @@
 //
-//  AppDelegate.swift
+//  SuggestionsAPIResult.swift
 //
 //  Copyright © 2020 DuckDuckGo. All rights reserved.
 //
@@ -16,21 +16,20 @@
 //  limitations under the License.
 //
 
-import Cocoa
+import Foundation
+import os.log
 
-@NSApplicationMain
-class AppDelegate: NSObject, NSApplicationDelegate {
+struct SuggestionsAPIResult: Decodable {
 
-    func applicationDidFinishLaunching(_ aNotification: Notification) {
-        // Insert code here to initialize your application
-    }
+    var items = [[String: String]]()
 
-    func applicationWillTerminate(_ aNotification: Notification) {
-        // Insert code here to tear down your application
-    }
+    init(from decoder: Decoder) throws {
+        var container = try decoder.unkeyedContainer()
 
-    func applicationShouldTerminateAfterLastWindowClosed(_ sender: NSApplication) -> Bool {
-        true
+        while !container.isAtEnd {
+            let item = try container.decode([String: String].self)
+            items.append(item)
+        }
     }
     
 }
