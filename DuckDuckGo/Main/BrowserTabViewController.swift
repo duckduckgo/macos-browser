@@ -61,8 +61,6 @@ class BrowserTabViewController: NSViewController {
         if webView.url == tabViewModel.tab.url { return }
 
         if let url = tabViewModel.tab.url {
-            os_log("%s: load %s", log: OSLog.Category.general, type: .debug, className, url.absoluteString)
-
             let request = URLRequest(url: url)
             webView.load(request)
         }

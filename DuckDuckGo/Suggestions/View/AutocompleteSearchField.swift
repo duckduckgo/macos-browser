@@ -75,6 +75,8 @@ class AutocompleteSearchField: NSSearchField {
         guard let selectedSuggestionViewModel = suggestionsViewModel.selectedSuggestionViewModel else {
             if let originalStringValue = originalStringValue {
                 stringValue = originalStringValue
+            } else {
+                stringValue = ""
             }
             return
         }

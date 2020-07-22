@@ -78,11 +78,15 @@ class SuggestionsViewModel {
             return
         }
 
-        selectionIndex = index
+        if selectionIndex != index {
+            selectionIndex = index
+        }
     }
 
     func clearSelection() {
-        selectionIndex = nil
+        if selectionIndex != nil {
+            selectionIndex = nil
+        }
     }
 
     func selectNextIfPossible() {
