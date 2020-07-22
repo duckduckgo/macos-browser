@@ -77,4 +77,10 @@ extension String {
         self = string + self
     }
 
+    // MARK: - Prefix
+
+    func dropPrefix(_ prefix: String) -> String {
+        return hasPrefix(prefix) ? String(dropFirst(prefix.count)) : self
+    }
+
 }

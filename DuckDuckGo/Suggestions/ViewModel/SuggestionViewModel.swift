@@ -38,9 +38,9 @@ class SuggestionViewModel {
             return NSMutableAttributedString(string: phrase, attributes: attributes)
         case .website(url: let url, title: let title):
             if let title = title, title.count > 0 {
-                return NSAttributedString(string: "\(title) - \(url.host ?? "")\(url.path)", attributes: attributes)
+                return NSAttributedString(string: "\(title) - \(url.absoluteStringWithoutScheme)", attributes: attributes)
             } else {
-                return NSAttributedString(string: "\(url.host ?? "")\(url.path)", attributes: attributes)
+                return NSAttributedString(string: "\(url.absoluteStringWithoutScheme)", attributes: attributes)
             }
         case .unknown(value: let value):
             return NSAttributedString(string: value, attributes: attributes)
@@ -60,6 +60,18 @@ class SuggestionViewModel {
             return NSImage(named: SuggestionIconNames.website.rawValue)
         case .unknown(value: _):
             return NSImage(named: SuggestionIconNames.website.rawValue)
+        }
+    }
+
+}
+
+fileprivate extension URL {
+
+    var absoluteStringWithoutScheme: String {
+        if let scheme = scheme {
+            return absoluteString.dropPrefix(scheme + "://")
+        } else {
+            return absoluteString
         }
     }
 
