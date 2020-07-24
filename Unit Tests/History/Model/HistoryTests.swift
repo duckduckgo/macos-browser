@@ -30,6 +30,7 @@ class HistoryTests: XCTestCase {
         let date = NSDate.now as Date
         history.saveWebsiteVisit(url: url, title: title, date: date)
 
+        XCTAssertTrue(historyStoreMock.saveWebsiteVisitCalled)
         XCTAssertEqual(historyStoreMock.savedWebsiteVisit?.url, url)
         XCTAssertEqual(historyStoreMock.savedWebsiteVisit?.title, title)
         XCTAssertEqual(historyStoreMock.savedWebsiteVisit?.date, date)

@@ -20,6 +20,7 @@ import XCTest
 @testable import DuckDuckGo_Privacy_Browser
 
 class HistoryStoreMock: HistoryStore {
+
     var loadWebsiteVisitsCalled = false
     var websiteVisits: [WebsiteVisit]?
     var error: Error?
@@ -42,4 +43,5 @@ class HistoryStoreMock: HistoryStore {
     func removeAllWebsiteVisits() {
         removeAllWebsiteVisitsCalled = true
     }
+    
 }
