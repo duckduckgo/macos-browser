@@ -76,7 +76,7 @@ class SuggestionsViewController: NSViewController {
     }
 
     private func addTrackingArea() {
-        let trackingOptions: NSTrackingArea.Options = [.activeInActiveApp, .mouseEnteredAndExited, .enabledDuringMouseDrag, .mouseMoved]
+        let trackingOptions: NSTrackingArea.Options = [.activeInActiveApp, .mouseEnteredAndExited, .enabledDuringMouseDrag, .mouseMoved, .inVisibleRect]
         let trackingArea = NSTrackingArea(rect: tableView.frame, options: trackingOptions, owner: self, userInfo: nil)
         tableView.addTrackingArea(trackingArea)
     }
@@ -123,6 +123,8 @@ class SuggestionsViewController: NSViewController {
     }
 
     private func selectRow(at index: Int?) {
+        if tableView.selectedRow == index { return }
+
         guard let index = index,
               index >= 0,
               suggestionsViewModel.numberOfSuggestions != 0,
@@ -142,10 +144,6 @@ class SuggestionsViewController: NSViewController {
 
     private func clearSelection() {
         tableView.deselectAll(self)
-    }
-
-    override func mouseEntered(with event: NSEvent) {
-        selectRow(at: event.locationInWindow)
     }
 
     override func mouseMoved(with event: NSEvent) {
