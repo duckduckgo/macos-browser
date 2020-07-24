@@ -21,6 +21,33 @@ import os.log
 
 extension URL {
 
+    // MARK: - Factory
+
+    static func makeSearchUrl(from searchQuery: String) -> URL? {
+        let trimmedQuery = searchQuery.trimmingCharacters(in: .whitespacesAndNewlines)
+        do {
+            var searchUrl = Self.duckDuckGo
+            searchUrl = try searchUrl.addParameter(name: DuckDuckGoParameters.search.rawValue, value: trimmedQuery)
+            return searchUrl
+        } catch let error {
+            os_log("URL extension: %s", log: OSLog.Category.general, type: .error, error.localizedDescription)
+            return nil
+        }
+    }
+
+    static func makeURL(from addressBarString: String) -> URL? {
+        if let addressBarUrl = addressBarString.url, addressBarUrl.isValid {
+            return addressBarUrl
+        }
+
+        if let searchUrl = URL.makeSearchUrl(from: addressBarString) {
+            return searchUrl
+        }
+
+        os_log("URL extension: Making URL from %s failed", log: OSLog.Category.general, type: .error, addressBarString)
+        return nil
+    }
+
     // MARK: - Parameters
 
     enum ParameterError: Error {
