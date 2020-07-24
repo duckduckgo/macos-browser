@@ -22,11 +22,24 @@ import os.log
 class TabCollection {
 
     @Published private(set) var tabs: [Tab] = []
-    @Published var selectionIndex: Int?
 
     init() {
         listenUrlEvents()
     }
+
+    func prependNewTab() {
+        prepend(tab: Tab())
+    }
+
+    func prepend(tab: Tab) {
+        tabs.insert(tab, at: 0)
+    }
+
+}
+
+// MARK: - URL Event
+
+extension TabCollection {
 
     private func listenUrlEvents() {
         NSAppleEventManager.shared().setEventHandler(
@@ -47,14 +60,6 @@ class TabCollection {
         let newTab = Tab()
         newTab.url = url
         prepend(tab: newTab)
-    }
-
-    func prependNewTab() {
-        prepend(tab: Tab())
-    }
-
-    func prepend(tab: Tab) {
-        tabs.insert(tab, at: 0)
     }
 
 }

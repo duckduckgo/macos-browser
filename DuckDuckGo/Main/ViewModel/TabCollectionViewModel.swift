@@ -25,6 +25,8 @@ class TabCollectionViewModel {
     private(set) var tabCollection: TabCollection
     private(set) var tabViewModels = [Tab: TabViewModel]()
 
+    @Published var selectionIndex: Int?
+
     private var cancelables = Set<AnyCancellable>()
 
     init(tabCollection: TabCollection) {
@@ -49,7 +51,7 @@ class TabCollectionViewModel {
     }
 
     var selectedTabViewModel: TabViewModel? {
-        guard let selectionIndex = tabCollection.selectionIndex else {
+        guard let selectionIndex = selectionIndex else {
             return nil
         }
         return tabViewModel(at: selectionIndex)

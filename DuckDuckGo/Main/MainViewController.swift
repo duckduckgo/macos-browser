@@ -56,7 +56,7 @@ class MainViewController: NSViewController {
 
     private func createInitialTab() {
         tabCollectionViewModel.tabCollection.prependNewTab()
-        tabCollectionViewModel.tabCollection.selectionIndex = 0
+        tabCollectionViewModel.selectionIndex = 0
     }
     
 }
