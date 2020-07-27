@@ -52,7 +52,7 @@ class SuggestionsTests: XCTestCase {
 
 }
 
-fileprivate extension SuggestionsAPIResult {
+extension SuggestionsAPIResult {
 
     static var aSuggestionsAPIResult: SuggestionsAPIResult {
         let phrase1 = "phrase"
@@ -72,7 +72,7 @@ fileprivate extension SuggestionsAPIResult {
 
 }
 
-fileprivate extension WebsiteVisit {
+extension WebsiteVisit {
 
     static var aWebsiteVisits: [WebsiteVisit] {
         return [

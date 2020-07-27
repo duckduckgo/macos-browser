@@ -18,7 +18,7 @@
 
 import Foundation
 
-enum Suggestion {
+enum Suggestion: Equatable {
     
     case phrase(phrase: String)
     case website(url: URL, title: String?)
