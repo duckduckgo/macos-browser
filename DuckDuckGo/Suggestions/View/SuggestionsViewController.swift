@@ -76,7 +76,11 @@ class SuggestionsViewController: NSViewController {
     }
 
     private func addTrackingArea() {
-        let trackingOptions: NSTrackingArea.Options = [.activeInActiveApp, .mouseEnteredAndExited, .enabledDuringMouseDrag, .mouseMoved, .inVisibleRect]
+        let trackingOptions: NSTrackingArea.Options = [ .activeInActiveApp,
+                                                        .mouseEnteredAndExited,
+                                                        .enabledDuringMouseDrag,
+                                                        .mouseMoved,
+                                                        .inVisibleRect ]
         let trackingArea = NSTrackingArea(rect: tableView.frame, options: trackingOptions, owner: self, userInfo: nil)
         tableView.addTrackingArea(trackingArea)
     }
