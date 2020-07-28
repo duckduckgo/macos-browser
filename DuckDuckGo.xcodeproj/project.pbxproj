@@ -929,8 +929,9 @@
 				);
 				PRODUCT_BUNDLE_IDENTIFIER = com.duckduckgo.macos.browser.DuckDuckGoUITests;
 				PRODUCT_NAME = "$(TARGET_NAME)";
+				PROVISIONING_PROFILE = "";
 				SWIFT_VERSION = 5.0;
-				TEST_TARGET_NAME = DuckDuckGo;
+				TEST_TARGET_NAME = "DuckDuckGo Privacy Browser";
 			};
 			name = Debug;
 		};
@@ -950,8 +951,9 @@
 				);
 				PRODUCT_BUNDLE_IDENTIFIER = com.duckduckgo.macos.browser.DuckDuckGoUITests;
 				PRODUCT_NAME = "$(TARGET_NAME)";
+				PROVISIONING_PROFILE = "";
 				SWIFT_VERSION = 5.0;
-				TEST_TARGET_NAME = DuckDuckGo;
+				TEST_TARGET_NAME = "DuckDuckGo Privacy Browser";
 			};
 			name = Release;
 		};
