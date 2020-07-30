@@ -116,10 +116,9 @@ class AutocompleteSearchField: NSSearchField {
             return
         }
 
-        if !suggestionsWindow.isVisible {
-            window.addChildWindow(suggestionsWindow, ordered: .above)
-        }
+        if suggestionsWindow.isVisible { return }
 
+        window.addChildWindow(suggestionsWindow, ordered: .above)
         layoutSuggestionWindow()
     }
 

@@ -39,7 +39,14 @@ class TabViewModel {
         guard let url = tab.url else {
             return ""
         }
-        return url.searchQuery ?? url.absoluteString
+
+        if let searchQuery = url.searchQuery {
+            return searchQuery
+        } else {
+            return url.absoluteString
+                .dropPrefix(URL.Scheme.https.separated())
+                .dropPrefix(URL.Scheme.http.separated())
+        }
     }
 
     private func bindUrl() {

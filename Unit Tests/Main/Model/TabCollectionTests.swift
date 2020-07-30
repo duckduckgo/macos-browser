@@ -1,5 +1,5 @@
 //
-//  Suggestion.swift
+//  TabCollectionTests.swift
 //
 //  Copyright © 2020 DuckDuckGo. All rights reserved.
 //
@@ -16,12 +16,23 @@
 //  limitations under the License.
 //
 
-import Foundation
+import XCTest
+@testable import DuckDuckGo_Privacy_Browser
 
-enum Suggestion: Equatable {
-    
-    case phrase(phrase: String)
-    case website(url: URL, title: String?)
-    case unknown(value: String)
+class TabCollectionTests: XCTestCase {
+
+    func testWhenTabIsPrependThenItsIndexIs0() throws {
+        let tabCollection = TabCollection()
+        let tab1 = Tab()
+        tab1.url = URL.duckDuckGo
+
+        let tab2 = Tab()
+
+        tabCollection.prepend(tab: tab1)
+        XCTAssertEqual(tabCollection.tabs[0], tab1)
+
+        tabCollection.prepend(tab: tab2)
+        XCTAssertEqual(tabCollection.tabs[0], tab2)
+    }
 
 }

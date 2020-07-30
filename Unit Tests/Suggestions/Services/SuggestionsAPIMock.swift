@@ -1,5 +1,5 @@
 //
-//  Suggestion.swift
+//  SuggestionsAPIMock.swift
 //
 //  Copyright © 2020 DuckDuckGo. All rights reserved.
 //
@@ -16,12 +16,17 @@
 //  limitations under the License.
 //
 
-import Foundation
+import XCTest
+@testable import DuckDuckGo_Privacy_Browser
 
-enum Suggestion: Equatable {
-    
-    case phrase(phrase: String)
-    case website(url: URL, title: String?)
-    case unknown(value: String)
+class SuggestionsAPIMock: SuggestionsAPI {
+
+    var fetchSuggestionsCalled = false
+    var suggestionsAPIResult: SuggestionsAPIResult?
+    var error: Error?
+
+    func fetchSuggestions(for query: String, completion: @escaping (SuggestionsAPIResult?, Error?) -> Void) {
+        completion(suggestionsAPIResult, error)
+    }
 
 }

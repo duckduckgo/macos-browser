@@ -63,11 +63,7 @@ class Suggestions {
             var suggestions = [Suggestion]()
             for resultItem in result.items {
                 for (key, value) in resultItem {
-                    let suggestion = key == "phrase" ? Suggestion.phrase(phrase: value) : Suggestion.phrase(phrase: value)
-                    if key != "phrase" {
-                        os_log("SuggestionsAPIResult: Unknown suggestion type", log: OSLog.Category.general, type: .debug)
-                    }
-                    suggestions.append(suggestion)
+                    suggestions.append(Suggestion.makeSuggestion(key: key, value: value))
                 }
             }
 
@@ -90,6 +86,18 @@ class Suggestions {
             let filtered = Array(suggestions.prefix(Constants.maxNumberInCategory))
             self.items.local = filtered
         }
+    }
+
+}
+
+fileprivate extension Suggestion {
+
+    static func makeSuggestion(key: String, value: String) -> Suggestion {
+        let suggestion = key == "phrase" ? Suggestion.phrase(phrase: value) : Suggestion.unknown(value: value)
+        if key != "phrase" {
+            os_log("SuggestionsAPIResult: Unknown suggestion type", log: OSLog.Category.general, type: .debug)
+        }
+        return suggestion
     }
 
 }

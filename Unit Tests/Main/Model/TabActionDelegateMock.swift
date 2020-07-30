@@ -1,5 +1,5 @@
 //
-//  Suggestion.swift
+//  TabActionDelegateMock.swift
 //
 //  Copyright © 2020 DuckDuckGo. All rights reserved.
 //
@@ -16,12 +16,26 @@
 //  limitations under the License.
 //
 
-import Foundation
+@testable import DuckDuckGo_Privacy_Browser
 
-enum Suggestion: Equatable {
-    
-    case phrase(phrase: String)
-    case website(url: URL, title: String?)
-    case unknown(value: String)
+class TabActionDelegateMock: TabActionDelegate {
+
+    var tabForwardActionCalled = false
+
+    func tabForwardAction(_ tab: Tab) {
+        tabForwardActionCalled = true
+    }
+
+    var tabBackActionCalled = false
+
+    func tabBackAction(_ tab: Tab) {
+        tabBackActionCalled = true
+    }
+
+    var tabReloadActionCalled = false
+
+    func tabReloadAction(_ tab: Tab) {
+        tabReloadActionCalled = true
+    }
 
 }

@@ -25,6 +25,8 @@ class TabCollectionViewModel {
     private(set) var tabCollection: TabCollection
     private(set) var tabViewModels = [Tab: TabViewModel]()
 
+    @Published var selectionIndex: Int?
+
     private var cancelables = Set<AnyCancellable>()
 
     init(tabCollection: TabCollection) {
@@ -38,18 +40,8 @@ class TabCollectionViewModel {
         self.init(tabCollection: tabCollection)
     }
 
-    private func bindTabs() {
-        tabCollection.$tabs.sinkAsync { _ in self.removeViewModelsIfNeeded() } .store(in: &cancelables)
-    }
-
-    private func removeViewModelsIfNeeded() {
-        tabViewModels = tabViewModels.filter { (item) -> Bool in
-            tabCollection.tabs.contains(item.key)
-        }
-    }
-
     var selectedTabViewModel: TabViewModel? {
-        guard let selectionIndex = tabCollection.selectionIndex else {
+        guard let selectionIndex = selectionIndex else {
             return nil
         }
         return tabViewModel(at: selectionIndex)
@@ -67,6 +59,16 @@ class TabCollectionViewModel {
         }
 
         return tabViewModels[tab]
+    }
+
+    private func bindTabs() {
+        tabCollection.$tabs.sinkAsync { _ in self.removeViewModelsIfNeeded() } .store(in: &cancelables)
+    }
+
+    private func removeViewModelsIfNeeded() {
+        tabViewModels = tabViewModels.filter { (item) -> Bool in
+            tabCollection.tabs.contains(item.key)
+        }
     }
 
 }
