@@ -1,5 +1,5 @@
 //
-//  BackgroundColorView.swift
+//  ColorView.swift
 //
 //  Copyright © 2020 DuckDuckGo. All rights reserved.
 //
@@ -18,18 +18,18 @@
 
 import Cocoa
 
-class BackgroundColorView: NSView {
+class ColorView: NSView {
 
     required init?(coder: NSCoder) {
         super.init(coder: coder)
 
-        commonInit()
+        setupView()
     }
 
     public override init(frame frameRect: NSRect) {
         super.init(frame: frameRect)
 
-        commonInit()
+        setupView()
     }
 
     @IBInspectable public var backgroundColor: NSColor? = NSColor.clear {
@@ -38,7 +38,7 @@ class BackgroundColorView: NSView {
         }
     }
 
-    func commonInit() {
+    func setupView() {
         self.wantsLayer = true
     }
 }

@@ -4,6 +4,7 @@
         <deployment identifier="macosx"/>
         <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="17132"/>
         <plugIn identifier="com.apple.WebKit2IBPlugin" version="17132"/>
+        <capability name="Named colors" minToolsVersion="9.0"/>
         <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
     </dependencies>
     <scenes>
@@ -685,11 +686,11 @@
         <!--Window Controller-->
         <scene sceneID="R2V-B0-nI4">
             <objects>
-                <windowController id="B8D-0N-5wS" sceneMemberID="viewController">
-                    <window key="window" title="Window" allowsToolTipsWhenApplicationIsInactive="NO" autorecalculatesKeyViewLoop="NO" releasedWhenClosed="NO" visibleAtLaunch="NO" animationBehavior="default" titlebarAppearsTransparent="YES" titleVisibility="hidden" id="IQv-IB-iLA">
-                        <windowStyleMask key="styleMask" titled="YES" closable="YES" miniaturizable="YES" resizable="YES"/>
+                <windowController id="B8D-0N-5wS" customClass="MainWindowController" customModule="DuckDuckGo_Privacy_Browser" customModuleProvider="target" sceneMemberID="viewController">
+                    <window key="window" allowsToolTipsWhenApplicationIsInactive="NO" autorecalculatesKeyViewLoop="NO" releasedWhenClosed="NO" visibleAtLaunch="NO" animationBehavior="default" titlebarAppearsTransparent="YES" titleVisibility="hidden" id="IQv-IB-iLA" customClass="MainWindow" customModule="DuckDuckGo_Privacy_Browser" customModuleProvider="target">
+                        <windowStyleMask key="styleMask" closable="YES" miniaturizable="YES" resizable="YES" fullSizeContentView="YES"/>
                         <windowPositionMask key="initialPositionMask" leftStrut="YES" rightStrut="YES" topStrut="YES" bottomStrut="YES"/>
-                        <rect key="contentRect" x="196" y="240" width="1024" height="789"/>
+                        <rect key="contentRect" x="196" y="239" width="1024" height="790"/>
                         <rect key="screenRect" x="0.0" y="0.0" width="1680" height="1027"/>
                         <connections>
                             <outlet property="delegate" destination="B8D-0N-5wS" id="98r-iN-zZc"/>
@@ -701,7 +702,7 @@
                 </windowController>
                 <customObject id="Oky-zY-oP4" userLabel="First Responder" customClass="NSResponder" sceneMemberID="firstResponder"/>
             </objects>
-            <point key="canvasLocation" x="75" y="250"/>
+            <point key="canvasLocation" x="75" y="249"/>
         </scene>
         <!--Main View Controller-->
         <scene sceneID="hIz-AP-VOD">
@@ -711,46 +712,85 @@
                         <rect key="frame" x="0.0" y="0.0" width="1024" height="789"/>
                         <autoresizingMask key="autoresizingMask"/>
                         <subviews>
-                            <containerView translatesAutoresizingMaskIntoConstraints="NO" id="wFH-xq-50o">
-                                <rect key="frame" x="0.0" y="750" width="1024" height="39"/>
+                            <containerView translatesAutoresizingMaskIntoConstraints="NO" id="lYg-bX-QrJ">
+                                <rect key="frame" x="0.0" y="751" width="1024" height="38"/>
                                 <constraints>
-                                    <constraint firstAttribute="height" constant="39" id="vZS-tl-wOP"/>
+                                    <constraint firstAttribute="height" constant="38" id="zAs-5I-a2u"/>
+                                </constraints>
+                                <connections>
+                                    <segue destination="7KY-zL-hBj" kind="embed" id="yOn-Dt-TBk"/>
+                                </connections>
+                            </containerView>
+                            <containerView translatesAutoresizingMaskIntoConstraints="NO" id="wFH-xq-50o">
+                                <rect key="frame" x="0.0" y="695" width="1024" height="56"/>
+                                <constraints>
+                                    <constraint firstAttribute="height" constant="56" id="vZS-tl-wOP"/>
                                 </constraints>
                                 <connections>
                                     <segue destination="zAi-mT-h2J" kind="embed" destinationCreationSelector="createNavigationBarViewControllerWithCoder:sender:segueIdentifier:" id="Py5-GB-0yS"/>
                                 </connections>
                             </containerView>
+                            <customView translatesAutoresizingMaskIntoConstraints="NO" id="af1-Eb-VaG" userLabel="Separator" customClass="ColorView" customModule="DuckDuckGo_Privacy_Browser" customModuleProvider="target">
+                                <rect key="frame" x="0.0" y="695" width="1024" height="1"/>
+                                <constraints>
+                                    <constraint firstAttribute="height" constant="1" id="hrt-pu-NuL"/>
+                                </constraints>
+                                <userDefinedRuntimeAttributes>
+                                    <userDefinedRuntimeAttribute type="color" keyPath="backgroundColor">
+                                        <color key="value" name="SeparatorColor"/>
+                                    </userDefinedRuntimeAttribute>
+                                </userDefinedRuntimeAttributes>
+                            </customView>
                             <containerView translatesAutoresizingMaskIntoConstraints="NO" id="SYo-8W-jl3">
-                                <rect key="frame" x="0.0" y="0.0" width="1024" height="750"/>
+                                <rect key="frame" x="0.0" y="0.0" width="1024" height="695"/>
                                 <connections>
                                     <segue destination="ELG-jh-7Cj" kind="embed" destinationCreationSelector="createWebViewControllerWithCoder:sender:segueIdentifier:" id="PBj-0f-brI"/>
+                                </connections>
+                            </containerView>
+                            <containerView translatesAutoresizingMaskIntoConstraints="NO" id="Ho7-y5-8HO">
+                                <rect key="frame" x="12" y="763" width="100" height="14"/>
+                                <constraints>
+                                    <constraint firstAttribute="height" constant="14" id="Jas-CN-K5f"/>
+                                    <constraint firstAttribute="width" constant="100" id="NrO-U7-QDd"/>
+                                </constraints>
+                                <connections>
+                                    <segue destination="q3j-hn-4a0" kind="embed" id="6TM-4c-S3z"/>
                                 </connections>
                             </containerView>
                         </subviews>
                         <constraints>
                             <constraint firstAttribute="trailing" secondItem="wFH-xq-50o" secondAttribute="trailing" id="4Cb-FA-sMo"/>
                             <constraint firstAttribute="trailing" secondItem="SYo-8W-jl3" secondAttribute="trailing" id="EJ8-cX-El9"/>
-                            <constraint firstItem="wFH-xq-50o" firstAttribute="top" secondItem="m2S-Jp-Qdl" secondAttribute="top" id="PlA-C1-Iyl"/>
+                            <constraint firstItem="wFH-xq-50o" firstAttribute="top" secondItem="lYg-bX-QrJ" secondAttribute="bottom" id="EnL-Zp-RcI"/>
+                            <constraint firstAttribute="trailing" secondItem="lYg-bX-QrJ" secondAttribute="trailing" id="HkZ-fV-qYb"/>
+                            <constraint firstItem="lYg-bX-QrJ" firstAttribute="top" secondItem="m2S-Jp-Qdl" secondAttribute="top" id="PNG-fr-pcs"/>
                             <constraint firstItem="SYo-8W-jl3" firstAttribute="top" secondItem="wFH-xq-50o" secondAttribute="bottom" id="SOg-lH-g5P"/>
                             <constraint firstItem="wFH-xq-50o" firstAttribute="leading" secondItem="m2S-Jp-Qdl" secondAttribute="leading" id="XQv-BZ-2ci"/>
+                            <constraint firstItem="SYo-8W-jl3" firstAttribute="top" secondItem="af1-Eb-VaG" secondAttribute="bottom" id="ZLC-J7-HaR"/>
+                            <constraint firstItem="Ho7-y5-8HO" firstAttribute="top" secondItem="m2S-Jp-Qdl" secondAttribute="top" constant="12" id="j7y-ae-Gve"/>
+                            <constraint firstItem="lYg-bX-QrJ" firstAttribute="leading" secondItem="m2S-Jp-Qdl" secondAttribute="leading" id="kVB-Sz-8Sv"/>
+                            <constraint firstItem="af1-Eb-VaG" firstAttribute="leading" secondItem="m2S-Jp-Qdl" secondAttribute="leading" id="oLA-yb-nB8"/>
                             <constraint firstAttribute="bottom" secondItem="SYo-8W-jl3" secondAttribute="bottom" id="tLa-XX-e8i"/>
+                            <constraint firstItem="Ho7-y5-8HO" firstAttribute="leading" secondItem="m2S-Jp-Qdl" secondAttribute="leading" constant="12" id="uac-4O-cZF"/>
                             <constraint firstItem="SYo-8W-jl3" firstAttribute="leading" secondItem="m2S-Jp-Qdl" secondAttribute="leading" id="woj-yk-97j"/>
+                            <constraint firstAttribute="trailing" secondItem="af1-Eb-VaG" secondAttribute="trailing" id="y1o-Rd-sxm"/>
                         </constraints>
                     </view>
                     <connections>
                         <outlet property="navigationBarContainerView" destination="wFH-xq-50o" id="hbq-xV-McI"/>
+                        <outlet property="tabBarContainerView" destination="lYg-bX-QrJ" id="nor-E0-cFP"/>
                         <outlet property="webContainerView" destination="SYo-8W-jl3" id="DoZ-Ih-dHA"/>
                     </connections>
                 </viewController>
                 <customObject id="rPt-NT-nkU" userLabel="First Responder" customClass="NSResponder" sceneMemberID="firstResponder"/>
             </objects>
-            <point key="canvasLocation" x="75" y="1179"/>
+            <point key="canvasLocation" x="75" y="1178.5"/>
         </scene>
         <!--Navigation Bar View Controller-->
         <scene sceneID="Lx2-fj-RhY">
             <objects>
                 <viewController id="zAi-mT-h2J" customClass="NavigationBarViewController" customModule="DuckDuckGo_Privacy_Browser" customModuleProvider="target" sceneMemberID="viewController">
-                    <view key="view" id="23V-k7-gwK">
+                    <view key="view" id="23V-k7-gwK" customClass="ColorView" customModule="DuckDuckGo_Privacy_Browser" customModuleProvider="target">
                         <rect key="frame" x="0.0" y="0.0" width="845" height="40"/>
                         <autoresizingMask key="autoresizingMask"/>
                         <subviews>
@@ -767,12 +807,12 @@
                                 </searchFieldCell>
                             </searchField>
                             <button translatesAutoresizingMaskIntoConstraints="NO" id="0fx-y3-Oc0">
-                                <rect key="frame" x="20" y="6" width="29" height="29"/>
+                                <rect key="frame" x="8" y="6" width="29" height="29"/>
                                 <constraints>
                                     <constraint firstAttribute="height" constant="29" id="H1Q-jN-aiv"/>
                                     <constraint firstAttribute="width" constant="29" id="t38-6z-ubW"/>
                                 </constraints>
-                                <buttonCell key="cell" type="square" bezelStyle="shadowlessSquare" image="NSTouchBarGoBackTemplate" imagePosition="only" alignment="center" imageScaling="proportionallyUpOrDown" inset="2" id="oqM-Wt-CCf">
+                                <buttonCell key="cell" type="square" bezelStyle="shadowlessSquare" image="Back" imagePosition="only" alignment="center" imageScaling="proportionallyDown" inset="2" id="oqM-Wt-CCf">
                                     <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
                                     <font key="font" metaFont="system"/>
                                 </buttonCell>
@@ -781,12 +821,12 @@
                                 </connections>
                             </button>
                             <button translatesAutoresizingMaskIntoConstraints="NO" id="bnS-8m-XdK">
-                                <rect key="frame" x="59" y="6" width="29" height="29"/>
+                                <rect key="frame" x="37" y="6" width="29" height="29"/>
                                 <constraints>
                                     <constraint firstAttribute="width" constant="29" id="HpB-H4-ZDd"/>
                                     <constraint firstAttribute="height" constant="29" id="WTi-e6-msq"/>
                                 </constraints>
-                                <buttonCell key="cell" type="square" bezelStyle="shadowlessSquare" image="NSTouchBarGoForwardTemplate" imagePosition="only" alignment="center" imageScaling="proportionallyUpOrDown" inset="2" id="WE6-5p-2mh">
+                                <buttonCell key="cell" type="square" bezelStyle="shadowlessSquare" image="Forward" imagePosition="only" alignment="center" imageScaling="proportionallyDown" inset="2" id="WE6-5p-2mh">
                                     <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
                                     <font key="font" metaFont="system"/>
                                 </buttonCell>
@@ -795,12 +835,12 @@
                                 </connections>
                             </button>
                             <button translatesAutoresizingMaskIntoConstraints="NO" id="8IH-kp-rpL" customClass="RotatingButton" customModule="DuckDuckGo_Privacy_Browser" customModuleProvider="target">
-                                <rect key="frame" x="98" y="6" width="29" height="29"/>
+                                <rect key="frame" x="681" y="6" width="29" height="29"/>
                                 <constraints>
                                     <constraint firstAttribute="width" constant="29" id="f1O-Dq-2FO"/>
                                     <constraint firstAttribute="height" constant="29" id="ufS-ly-vTD"/>
                                 </constraints>
-                                <buttonCell key="cell" type="square" bezelStyle="shadowlessSquare" image="NSTouchBarRefreshTemplate" imagePosition="only" alignment="center" imageScaling="proportionallyUpOrDown" inset="2" id="wcP-EK-gnM">
+                                <buttonCell key="cell" type="square" bezelStyle="shadowlessSquare" image="Refresh" imagePosition="only" alignment="center" imageScaling="proportionallyDown" inset="2" id="wcP-EK-gnM">
                                     <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
                                     <font key="font" metaFont="system"/>
                                 </buttonCell>
@@ -808,30 +848,54 @@
                                     <action selector="reloadAction:" target="zAi-mT-h2J" id="dc1-7B-MrU"/>
                                 </connections>
                             </button>
+                            <button translatesAutoresizingMaskIntoConstraints="NO" id="RKo-Tk-BBV">
+                                <rect key="frame" x="808" y="6" width="29" height="29"/>
+                                <constraints>
+                                    <constraint firstAttribute="width" constant="29" id="Jg0-JS-9Pb"/>
+                                    <constraint firstAttribute="height" constant="29" id="Y2d-92-PkP"/>
+                                </constraints>
+                                <buttonCell key="cell" type="square" bezelStyle="shadowlessSquare" image="Settings" imagePosition="only" alignment="center" imageScaling="proportionallyDown" inset="2" id="k90-tp-Z21">
+                                    <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
+                                    <font key="font" metaFont="system"/>
+                                </buttonCell>
+                                <connections>
+                                    <action selector="settingsButtonAction:" target="zAi-mT-h2J" id="jqG-yE-eCO"/>
+                                </connections>
+                            </button>
                         </subviews>
                         <constraints>
                             <constraint firstItem="8IH-kp-rpL" firstAttribute="centerY" secondItem="23V-k7-gwK" secondAttribute="centerY" id="2Tw-uY-QSx"/>
                             <constraint firstItem="bnS-8m-XdK" firstAttribute="centerY" secondItem="23V-k7-gwK" secondAttribute="centerY" id="75W-jb-4P3"/>
                             <constraint firstAttribute="trailing" relation="greaterThanOrEqual" secondItem="b1U-yO-v3i" secondAttribute="trailing" constant="20" id="7vl-ky-E8t"/>
-                            <constraint firstItem="8IH-kp-rpL" firstAttribute="leading" secondItem="bnS-8m-XdK" secondAttribute="trailing" constant="10" id="At5-n6-qQM"/>
+                            <constraint firstAttribute="trailing" secondItem="RKo-Tk-BBV" secondAttribute="trailing" constant="8" id="AHB-z1-O79"/>
                             <constraint firstItem="0fx-y3-Oc0" firstAttribute="centerY" secondItem="23V-k7-gwK" secondAttribute="centerY" id="EjX-JW-sDS"/>
-                            <constraint firstItem="bnS-8m-XdK" firstAttribute="leading" secondItem="0fx-y3-Oc0" secondAttribute="trailing" constant="10" id="Sws-Bc-6cW"/>
-                            <constraint firstItem="0fx-y3-Oc0" firstAttribute="leading" secondItem="23V-k7-gwK" secondAttribute="leading" constant="20" id="Trt-ZX-gOw"/>
+                            <constraint firstItem="bnS-8m-XdK" firstAttribute="leading" secondItem="0fx-y3-Oc0" secondAttribute="trailing" id="Sws-Bc-6cW"/>
+                            <constraint firstItem="0fx-y3-Oc0" firstAttribute="leading" secondItem="23V-k7-gwK" secondAttribute="leading" constant="8" id="Trt-ZX-gOw"/>
+                            <constraint firstItem="RKo-Tk-BBV" firstAttribute="centerY" secondItem="23V-k7-gwK" secondAttribute="centerY" id="U86-oa-2qz"/>
+                            <constraint firstAttribute="trailing" relation="greaterThanOrEqual" secondItem="8IH-kp-rpL" secondAttribute="trailing" constant="8" id="Ubh-JM-Pqn"/>
                             <constraint firstItem="b1U-yO-v3i" firstAttribute="leading" relation="greaterThanOrEqual" secondItem="23V-k7-gwK" secondAttribute="leading" constant="20" id="Uvz-dQ-aK4"/>
                             <constraint firstItem="b1U-yO-v3i" firstAttribute="centerY" secondItem="23V-k7-gwK" secondAttribute="centerY" id="aZJ-7U-mmY"/>
+                            <constraint firstItem="b1U-yO-v3i" firstAttribute="leading" relation="greaterThanOrEqual" secondItem="bnS-8m-XdK" secondAttribute="trailing" constant="8" id="lWc-n2-Zem"/>
+                            <constraint firstItem="8IH-kp-rpL" firstAttribute="leading" secondItem="b1U-yO-v3i" secondAttribute="trailing" constant="8" symbolic="YES" id="obe-cZ-Bvd"/>
                             <constraint firstItem="b1U-yO-v3i" firstAttribute="centerX" secondItem="23V-k7-gwK" secondAttribute="centerX" id="t2z-q9-dku"/>
                         </constraints>
+                        <userDefinedRuntimeAttributes>
+                            <userDefinedRuntimeAttribute type="color" keyPath="backgroundColor">
+                                <color key="value" name="InterfaceBackgroundColor"/>
+                            </userDefinedRuntimeAttribute>
+                        </userDefinedRuntimeAttributes>
                     </view>
                     <connections>
                         <outlet property="autocompleteSearchField" destination="b1U-yO-v3i" id="KPy-9z-ND7"/>
                         <outlet property="goBackButton" destination="0fx-y3-Oc0" id="dQl-Dn-Vhw"/>
                         <outlet property="goForwardButton" destination="bnS-8m-XdK" id="kT2-Lj-vFt"/>
                         <outlet property="reloadButton" destination="8IH-kp-rpL" id="U4B-Iy-2Vr"/>
+                        <outlet property="settingsButton" destination="RKo-Tk-BBV" id="1vf-DY-tIZ"/>
                     </connections>
                 </viewController>
                 <customObject id="zdG-Z1-HUh" userLabel="First Responder" customClass="NSResponder" sceneMemberID="firstResponder"/>
             </objects>
-            <point key="canvasLocation" x="-341.5" y="1868"/>
+            <point key="canvasLocation" x="75.5" y="1892"/>
         </scene>
         <!--Browser Tab View Controller-->
         <scene sceneID="POP-kj-wTB">
@@ -848,7 +912,7 @@
                                     <wkPreferences key="preferences"/>
                                 </wkWebViewConfiguration>
                             </wkWebView>
-                            <customView hidden="YES" translatesAutoresizingMaskIntoConstraints="NO" id="Nvb-Di-hxz" customClass="BackgroundView" customModule="DuckDuckGo_Privacy_Browser" customModuleProvider="target">
+                            <customView hidden="YES" translatesAutoresizingMaskIntoConstraints="NO" id="Nvb-Di-hxz" customClass="ColorView" customModule="DuckDuckGo_Privacy_Browser" customModuleProvider="target">
                                 <rect key="frame" x="0.0" y="0.0" width="512" height="492"/>
                                 <subviews>
                                     <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="wDW-73-QgT">
@@ -899,12 +963,143 @@
                 </viewController>
                 <customObject id="mxo-Js-ldQ" userLabel="First Responder" customClass="NSResponder" sceneMemberID="firstResponder"/>
             </objects>
-            <point key="canvasLocation" x="374" y="2094"/>
+            <point key="canvasLocation" x="123" y="2235"/>
+        </scene>
+        <!--Tab Bar View Controller-->
+        <scene sceneID="P68-fv-m1U">
+            <objects>
+                <viewController id="7KY-zL-hBj" customClass="TabBarViewController" customModule="DuckDuckGo_Privacy_Browser" customModuleProvider="target" sceneMemberID="viewController">
+                    <view key="view" id="mmu-yW-bKd">
+                        <rect key="frame" x="0.0" y="0.0" width="845" height="38"/>
+                        <autoresizingMask key="autoresizingMask"/>
+                        <subviews>
+                            <visualEffectView blendingMode="behindWindow" material="mediumLight" state="followsWindowActiveState" translatesAutoresizingMaskIntoConstraints="NO" id="TFd-to-QRw">
+                                <rect key="frame" x="0.0" y="0.0" width="845" height="38"/>
+                                <subviews>
+                                    <button translatesAutoresizingMaskIntoConstraints="NO" id="IdN-te-Ja4">
+                                        <rect key="frame" x="805" y="5" width="32" height="24"/>
+                                        <constraints>
+                                            <constraint firstAttribute="height" constant="24" id="8tx-p6-Cbm"/>
+                                            <constraint firstAttribute="width" constant="32" id="Mmv-gb-Ux0"/>
+                                        </constraints>
+                                        <buttonCell key="cell" type="square" bezelStyle="shadowlessSquare" image="Burn" imagePosition="only" alignment="center" imageScaling="proportionallyDown" inset="2" id="3m2-rv-K2A">
+                                            <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
+                                            <font key="font" metaFont="system"/>
+                                        </buttonCell>
+                                        <color key="contentTintColor" name="ButtonColor"/>
+                                        <connections>
+                                            <action selector="burnButtonAction:" target="7KY-zL-hBj" id="PgC-f5-Rj3"/>
+                                        </connections>
+                                    </button>
+                                </subviews>
+                                <constraints>
+                                    <constraint firstItem="IdN-te-Ja4" firstAttribute="centerY" secondItem="TFd-to-QRw" secondAttribute="centerY" constant="2" id="Vo4-5m-G2u"/>
+                                    <constraint firstAttribute="trailing" secondItem="IdN-te-Ja4" secondAttribute="trailing" constant="8" id="Y2g-KS-WEq"/>
+                                </constraints>
+                            </visualEffectView>
+                            <scrollView wantsLayer="YES" borderType="none" horizontalLineScroll="10" horizontalPageScroll="10" verticalLineScroll="10" verticalPageScroll="10" hasVerticalScroller="NO" verticalScrollElasticity="none" translatesAutoresizingMaskIntoConstraints="NO" id="A4a-rM-ZNc" customClass="TabBarScrollView" customModule="DuckDuckGo_Privacy_Browser" customModuleProvider="target">
+                                <rect key="frame" x="80" y="0.0" width="685" height="32"/>
+                                <clipView key="contentView" drawsBackground="NO" copiesOnScroll="NO" id="ASm-CV-3UE">
+                                    <rect key="frame" x="0.0" y="0.0" width="685" height="32"/>
+                                    <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+                                    <subviews>
+                                        <collectionView selectable="YES" id="woB-U4-Zp2">
+                                            <rect key="frame" x="0.0" y="0.0" width="685" height="32"/>
+                                            <autoresizingMask key="autoresizingMask" heightSizable="YES"/>
+                                            <collectionViewFlowLayout key="collectionViewLayout" scrollDirection="horizontal" id="7xi-kT-4Kf">
+                                                <size key="itemSize" width="120" height="32"/>
+                                            </collectionViewFlowLayout>
+                                            <color key="primaryBackgroundColor" name="ClearColor"/>
+                                            <connections>
+                                                <outlet property="dataSource" destination="7KY-zL-hBj" id="ucY-jn-hPq"/>
+                                                <outlet property="delegate" destination="7KY-zL-hBj" id="VMN-Hy-19q"/>
+                                            </connections>
+                                        </collectionView>
+                                    </subviews>
+                                    <color key="backgroundColor" name="ClearColor"/>
+                                </clipView>
+                                <constraints>
+                                    <constraint firstAttribute="height" constant="32" id="6we-Of-Svn"/>
+                                    <constraint firstAttribute="width" relation="greaterThanOrEqual" constant="120" id="z1D-8j-DKe"/>
+                                </constraints>
+                                <scroller key="horizontalScroller" wantsLayer="YES" verticalHuggingPriority="750" horizontal="YES" id="3yy-2x-vy5">
+                                    <rect key="frame" x="0.0" y="16" width="685" height="16"/>
+                                    <autoresizingMask key="autoresizingMask"/>
+                                </scroller>
+                                <scroller key="verticalScroller" hidden="YES" wantsLayer="YES" verticalHuggingPriority="750" horizontal="NO" id="ajl-Yz-a8a">
+                                    <rect key="frame" x="-100" y="-100" width="16" height="39"/>
+                                    <autoresizingMask key="autoresizingMask"/>
+                                </scroller>
+                            </scrollView>
+                            <button translatesAutoresizingMaskIntoConstraints="NO" id="iDw-zC-day">
+                                <rect key="frame" x="773" y="5" width="32" height="24"/>
+                                <constraints>
+                                    <constraint firstAttribute="width" constant="32" id="UsD-NT-U7K"/>
+                                    <constraint firstAttribute="height" constant="24" id="q0N-i2-cgz"/>
+                                </constraints>
+                                <buttonCell key="cell" type="square" bezelStyle="shadowlessSquare" image="Add" imagePosition="overlaps" alignment="center" imageScaling="proportionallyDown" inset="2" id="3zA-Re-9nt">
+                                    <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
+                                    <font key="font" metaFont="system"/>
+                                </buttonCell>
+                                <color key="contentTintColor" name="ButtonColor"/>
+                                <connections>
+                                    <action selector="addButtonAction:" target="7KY-zL-hBj" id="cuU-Qf-FYD"/>
+                                </connections>
+                            </button>
+                        </subviews>
+                        <constraints>
+                            <constraint firstAttribute="trailing" secondItem="iDw-zC-day" secondAttribute="trailing" constant="40" id="4Mi-YH-Hyu"/>
+                            <constraint firstItem="A4a-rM-ZNc" firstAttribute="leading" secondItem="mmu-yW-bKd" secondAttribute="leading" constant="80" id="5wv-aK-uaR"/>
+                            <constraint firstItem="TFd-to-QRw" firstAttribute="top" secondItem="mmu-yW-bKd" secondAttribute="top" id="Piz-fW-ykc"/>
+                            <constraint firstItem="iDw-zC-day" firstAttribute="centerY" secondItem="mmu-yW-bKd" secondAttribute="centerY" constant="2" id="Qjq-GZ-IHo"/>
+                            <constraint firstAttribute="trailing" secondItem="TFd-to-QRw" secondAttribute="trailing" id="Ryh-Eb-Yeh"/>
+                            <constraint firstAttribute="bottom" secondItem="A4a-rM-ZNc" secondAttribute="bottom" id="Zok-G0-Lan"/>
+                            <constraint firstAttribute="bottom" secondItem="TFd-to-QRw" secondAttribute="bottom" id="gAR-NC-HuT"/>
+                            <constraint firstItem="TFd-to-QRw" firstAttribute="leading" secondItem="mmu-yW-bKd" secondAttribute="leading" id="glh-CI-gPL"/>
+                            <constraint firstItem="A4a-rM-ZNc" firstAttribute="top" secondItem="mmu-yW-bKd" secondAttribute="top" constant="6" id="hEe-2b-LrB"/>
+                            <constraint firstAttribute="trailing" secondItem="A4a-rM-ZNc" secondAttribute="trailing" constant="80" id="iRG-CE-xT7"/>
+                        </constraints>
+                    </view>
+                    <connections>
+                        <outlet property="collectionView" destination="woB-U4-Zp2" id="qna-Jk-fSK"/>
+                    </connections>
+                </viewController>
+                <customObject id="7VK-LF-Cxc" userLabel="First Responder" customClass="NSResponder" sceneMemberID="firstResponder"/>
+            </objects>
+            <point key="canvasLocation" x="29.5" y="1779"/>
+        </scene>
+        <!--Control Buttons View Controller-->
+        <scene sceneID="YTl-il-KY0">
+            <objects>
+                <viewController id="q3j-hn-4a0" customClass="ControlButtonsViewController" customModule="DuckDuckGo_Privacy_Browser" customModuleProvider="target" sceneMemberID="viewController">
+                    <view key="view" id="CF0-Fu-PQ8">
+                        <rect key="frame" x="0.0" y="0.0" width="78" height="38"/>
+                        <autoresizingMask key="autoresizingMask"/>
+                    </view>
+                </viewController>
+                <customObject id="eQq-RL-nKZ" userLabel="First Responder" customClass="NSResponder" sceneMemberID="firstResponder"/>
+            </objects>
+            <point key="canvasLocation" x="-455" y="1779.5"/>
         </scene>
     </scenes>
     <resources>
-        <image name="NSTouchBarGoBackTemplate" width="10" height="30"/>
-        <image name="NSTouchBarGoForwardTemplate" width="10" height="30"/>
-        <image name="NSTouchBarRefreshTemplate" width="19" height="30"/>
+        <image name="Add" width="14" height="14"/>
+        <image name="Back" width="7" height="13"/>
+        <image name="Burn" width="12" height="14"/>
+        <image name="Forward" width="7" height="13"/>
+        <image name="Refresh" width="12" height="15"/>
+        <image name="Settings" width="12" height="3"/>
+        <namedColor name="ButtonColor">
+            <color red="0.28627450980392155" green="0.28627450980392155" blue="0.28627450980392155" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+        </namedColor>
+        <namedColor name="ClearColor">
+            <color red="1" green="1" blue="1" alpha="0.0" colorSpace="custom" customColorSpace="sRGB"/>
+        </namedColor>
+        <namedColor name="InterfaceBackgroundColor">
+            <color red="1" green="1" blue="1" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+        </namedColor>
+        <namedColor name="SeparatorColor">
+            <color red="0.0" green="0.0" blue="0.0" alpha="0.10000000149011612" colorSpace="custom" customColorSpace="sRGB"/>
+        </namedColor>
     </resources>
 </document>

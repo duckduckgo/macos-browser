@@ -1,5 +1,5 @@
 //
-//  BackgroundColorView.swift
+//  TabBarScrollView.swift
 //
 //  Copyright © 2020 DuckDuckGo. All rights reserved.
 //
@@ -18,27 +18,22 @@
 
 import Cocoa
 
-class BackgroundColorView: NSView {
+class TabBarScrollView: NSScrollView {
 
-    required init?(coder: NSCoder) {
-        super.init(coder: coder)
-
-        commonInit()
+    override var mouseDownCanMoveWindow: Bool {
+        false
     }
 
-    public override init(frame frameRect: NSRect) {
-        super.init(frame: frameRect)
-
-        commonInit()
+    // Hiding scrollers in storyboard doesn't work. It's a known bug
+    
+    override var hasHorizontalScroller: Bool {
+        get { return false }
+        set { super.hasHorizontalScroller = newValue }
     }
 
-    @IBInspectable public var backgroundColor: NSColor? = NSColor.clear {
-        didSet {
-            layer?.backgroundColor = backgroundColor?.cgColor
-        }
+    override var horizontalScroller: NSScroller? {
+        get { return nil }
+        set { super.horizontalScroller = newValue }
     }
 
-    func commonInit() {
-        self.wantsLayer = true
-    }
 }

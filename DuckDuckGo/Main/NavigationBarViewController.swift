@@ -26,6 +26,7 @@ class NavigationBarViewController: NSViewController {
     @IBOutlet weak var goBackButton: NSButton!
     @IBOutlet weak var goForwardButton: NSButton!
     @IBOutlet weak var reloadButton: RotatingButton!
+    @IBOutlet weak var settingsButton: NSButton!
 
     private var urlCancelable: AnyCancellable?
     private var searchSuggestionsCancelable: AnyCancellable?
@@ -64,6 +65,9 @@ class NavigationBarViewController: NSViewController {
         tabViewModel?.tab.reload()
     }
 
+    @IBAction func settingsButtonAction(_ sender: NSButton) {
+    }
+    
     private func bindUrl() {
         urlCancelable?.cancel()
         urlCancelable = tabViewModel?.tab.$url.sinkAsync { _ in self.refreshSearchField() }

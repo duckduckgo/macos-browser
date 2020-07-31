@@ -1,5 +1,5 @@
 //
-//  BackgroundColorView.swift
+//  GradientView.swift
 //
 //  Copyright © 2020 DuckDuckGo. All rights reserved.
 //
@@ -18,27 +18,46 @@
 
 import Cocoa
 
-class BackgroundColorView: NSView {
+class GradientView: NSView {
 
     required init?(coder: NSCoder) {
         super.init(coder: coder)
 
-        commonInit()
+        setupView()
     }
 
     public override init(frame frameRect: NSRect) {
         super.init(frame: frameRect)
 
-        commonInit()
+        setupView()
     }
 
-    @IBInspectable public var backgroundColor: NSColor? = NSColor.clear {
+    @IBInspectable public var backgroundColor1: NSColor? = NSColor.clear {
         didSet {
-            layer?.backgroundColor = backgroundColor?.cgColor
+            setupGradient()
         }
     }
 
-    func commonInit() {
+    @IBInspectable public var backgroundColor2: NSColor? = NSColor.clear {
+        didSet {
+            setupGradient()
+        }
+    }
+
+    private func setupView() {
         self.wantsLayer = true
+    }
+
+    private func setupGradient() {
+        guard let backgroundColor1 = backgroundColor1, let backgroundColor2 = backgroundColor2 else {
+            return
+        }
+
+        let gradientLayer = CAGradientLayer()
+        gradientLayer.colors = [backgroundColor1.cgColor, backgroundColor2.cgColor]
+        gradientLayer.startPoint = CGPoint(x: 0.0, y: 0.5)
+        gradientLayer.endPoint = CGPoint(x: 1.0, y: 0.5)
+        gradientLayer.frame = bounds
+        layer = gradientLayer
     }
 }

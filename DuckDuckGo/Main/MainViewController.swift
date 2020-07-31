@@ -21,6 +21,7 @@ import os.log
 
 class MainViewController: NSViewController {
 
+    @IBOutlet weak var tabBarContainerView: NSView!
     @IBOutlet weak var navigationBarContainerView: NSView!
     @IBOutlet weak var webContainerView: NSView!
 

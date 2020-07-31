@@ -1,5 +1,5 @@
 //
-//  BackgroundColorView.swift
+//  MainWindowController.swift
 //
 //  Copyright © 2020 DuckDuckGo. All rights reserved.
 //
@@ -17,28 +17,19 @@
 //
 
 import Cocoa
+import os.log
 
-class BackgroundColorView: NSView {
+class MainWindowController: NSWindowController {
 
-    required init?(coder: NSCoder) {
-        super.init(coder: coder)
+    override func windowDidLoad() {
+        super.windowDidLoad()
 
-        commonInit()
+        setupWindow()
     }
 
-    public override init(frame frameRect: NSRect) {
-        super.init(frame: frameRect)
-
-        commonInit()
+    private func setupWindow() {
+        window?.isMovableByWindowBackground = true
+        window?.hasShadow = true
     }
 
-    @IBInspectable public var backgroundColor: NSColor? = NSColor.clear {
-        didSet {
-            layer?.backgroundColor = backgroundColor?.cgColor
-        }
-    }
-
-    func commonInit() {
-        self.wantsLayer = true
-    }
 }
