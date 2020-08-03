@@ -3,7 +3,6 @@
     <dependencies>
         <deployment identifier="macosx"/>
         <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="17132"/>
-        <plugIn identifier="com.apple.WebKit2IBPlugin" version="17132"/>
         <capability name="Named colors" minToolsVersion="9.0"/>
         <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
     </dependencies>
@@ -718,7 +717,7 @@
                                     <constraint firstAttribute="height" constant="38" id="zAs-5I-a2u"/>
                                 </constraints>
                                 <connections>
-                                    <segue destination="7KY-zL-hBj" kind="embed" id="yOn-Dt-TBk"/>
+                                    <segue destination="Nfk-V8-FAE" kind="embed" id="dL6-gI-9Hl"/>
                                 </connections>
                             </containerView>
                             <containerView translatesAutoresizingMaskIntoConstraints="NO" id="wFH-xq-50o">
@@ -727,7 +726,7 @@
                                     <constraint firstAttribute="height" constant="56" id="vZS-tl-wOP"/>
                                 </constraints>
                                 <connections>
-                                    <segue destination="zAi-mT-h2J" kind="embed" destinationCreationSelector="createNavigationBarViewControllerWithCoder:sender:segueIdentifier:" id="Py5-GB-0yS"/>
+                                    <segue destination="R9l-dg-lKa" kind="embed" destinationCreationSelector="createNavigationBarViewControllerWithCoder:sender:segueIdentifier:" id="Br9-o3-sQ8"/>
                                 </connections>
                             </containerView>
                             <customView translatesAutoresizingMaskIntoConstraints="NO" id="af1-Eb-VaG" userLabel="Separator" customClass="ColorView" customModule="DuckDuckGo_Privacy_Browser" customModuleProvider="target">
@@ -744,7 +743,7 @@
                             <containerView translatesAutoresizingMaskIntoConstraints="NO" id="SYo-8W-jl3">
                                 <rect key="frame" x="0.0" y="0.0" width="1024" height="695"/>
                                 <connections>
-                                    <segue destination="ELG-jh-7Cj" kind="embed" destinationCreationSelector="createWebViewControllerWithCoder:sender:segueIdentifier:" id="PBj-0f-brI"/>
+                                    <segue destination="wo6-dV-Q3Q" kind="embed" destinationCreationSelector="createWebViewControllerWithCoder:sender:segueIdentifier:" id="A2b-sp-a54"/>
                                 </connections>
                             </containerView>
                             <containerView translatesAutoresizingMaskIntoConstraints="NO" id="Ho7-y5-8HO">
@@ -786,287 +785,13 @@
             </objects>
             <point key="canvasLocation" x="75" y="1178.5"/>
         </scene>
-        <!--Navigation Bar View Controller-->
-        <scene sceneID="Lx2-fj-RhY">
+        <!--TabBar-->
+        <scene sceneID="XSA-KE-InJ">
             <objects>
-                <viewController id="zAi-mT-h2J" customClass="NavigationBarViewController" customModule="DuckDuckGo_Privacy_Browser" customModuleProvider="target" sceneMemberID="viewController">
-                    <view key="view" id="23V-k7-gwK" customClass="ColorView" customModule="DuckDuckGo_Privacy_Browser" customModuleProvider="target">
-                        <rect key="frame" x="0.0" y="0.0" width="845" height="40"/>
-                        <autoresizingMask key="autoresizingMask"/>
-                        <subviews>
-                            <searchField wantsLayer="YES" verticalHuggingPriority="750" textCompletion="NO" translatesAutoresizingMaskIntoConstraints="NO" id="b1U-yO-v3i" customClass="AutocompleteSearchField" customModule="DuckDuckGo_Privacy_Browser" customModuleProvider="target">
-                                <rect key="frame" x="173" y="9" width="500" height="22"/>
-                                <constraints>
-                                    <constraint firstAttribute="height" constant="22" id="IOH-UD-0S2"/>
-                                    <constraint firstAttribute="width" priority="250" constant="500" id="Lba-qs-Qej"/>
-                                </constraints>
-                                <searchFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" selectable="YES" editable="YES" borderStyle="bezel" placeholderString="Search or enter address" usesSingleLineMode="YES" bezelStyle="round" id="Ad5-Li-sGN">
-                                    <font key="font" metaFont="system"/>
-                                    <color key="textColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
-                                    <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
-                                </searchFieldCell>
-                            </searchField>
-                            <button translatesAutoresizingMaskIntoConstraints="NO" id="0fx-y3-Oc0">
-                                <rect key="frame" x="8" y="6" width="29" height="29"/>
-                                <constraints>
-                                    <constraint firstAttribute="height" constant="29" id="H1Q-jN-aiv"/>
-                                    <constraint firstAttribute="width" constant="29" id="t38-6z-ubW"/>
-                                </constraints>
-                                <buttonCell key="cell" type="square" bezelStyle="shadowlessSquare" image="Back" imagePosition="only" alignment="center" imageScaling="proportionallyDown" inset="2" id="oqM-Wt-CCf">
-                                    <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
-                                    <font key="font" metaFont="system"/>
-                                </buttonCell>
-                                <connections>
-                                    <action selector="goBackAction:" target="zAi-mT-h2J" id="ZqM-Wu-AK8"/>
-                                </connections>
-                            </button>
-                            <button translatesAutoresizingMaskIntoConstraints="NO" id="bnS-8m-XdK">
-                                <rect key="frame" x="37" y="6" width="29" height="29"/>
-                                <constraints>
-                                    <constraint firstAttribute="width" constant="29" id="HpB-H4-ZDd"/>
-                                    <constraint firstAttribute="height" constant="29" id="WTi-e6-msq"/>
-                                </constraints>
-                                <buttonCell key="cell" type="square" bezelStyle="shadowlessSquare" image="Forward" imagePosition="only" alignment="center" imageScaling="proportionallyDown" inset="2" id="WE6-5p-2mh">
-                                    <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
-                                    <font key="font" metaFont="system"/>
-                                </buttonCell>
-                                <connections>
-                                    <action selector="goForwardAction:" target="zAi-mT-h2J" id="ZCI-tB-3Zd"/>
-                                </connections>
-                            </button>
-                            <button translatesAutoresizingMaskIntoConstraints="NO" id="8IH-kp-rpL" customClass="RotatingButton" customModule="DuckDuckGo_Privacy_Browser" customModuleProvider="target">
-                                <rect key="frame" x="681" y="6" width="29" height="29"/>
-                                <constraints>
-                                    <constraint firstAttribute="width" constant="29" id="f1O-Dq-2FO"/>
-                                    <constraint firstAttribute="height" constant="29" id="ufS-ly-vTD"/>
-                                </constraints>
-                                <buttonCell key="cell" type="square" bezelStyle="shadowlessSquare" image="Refresh" imagePosition="only" alignment="center" imageScaling="proportionallyDown" inset="2" id="wcP-EK-gnM">
-                                    <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
-                                    <font key="font" metaFont="system"/>
-                                </buttonCell>
-                                <connections>
-                                    <action selector="reloadAction:" target="zAi-mT-h2J" id="dc1-7B-MrU"/>
-                                </connections>
-                            </button>
-                            <button translatesAutoresizingMaskIntoConstraints="NO" id="RKo-Tk-BBV">
-                                <rect key="frame" x="808" y="6" width="29" height="29"/>
-                                <constraints>
-                                    <constraint firstAttribute="width" constant="29" id="Jg0-JS-9Pb"/>
-                                    <constraint firstAttribute="height" constant="29" id="Y2d-92-PkP"/>
-                                </constraints>
-                                <buttonCell key="cell" type="square" bezelStyle="shadowlessSquare" image="Settings" imagePosition="only" alignment="center" imageScaling="proportionallyDown" inset="2" id="k90-tp-Z21">
-                                    <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
-                                    <font key="font" metaFont="system"/>
-                                </buttonCell>
-                                <connections>
-                                    <action selector="settingsButtonAction:" target="zAi-mT-h2J" id="jqG-yE-eCO"/>
-                                </connections>
-                            </button>
-                        </subviews>
-                        <constraints>
-                            <constraint firstItem="8IH-kp-rpL" firstAttribute="centerY" secondItem="23V-k7-gwK" secondAttribute="centerY" id="2Tw-uY-QSx"/>
-                            <constraint firstItem="bnS-8m-XdK" firstAttribute="centerY" secondItem="23V-k7-gwK" secondAttribute="centerY" id="75W-jb-4P3"/>
-                            <constraint firstAttribute="trailing" relation="greaterThanOrEqual" secondItem="b1U-yO-v3i" secondAttribute="trailing" constant="20" id="7vl-ky-E8t"/>
-                            <constraint firstAttribute="trailing" secondItem="RKo-Tk-BBV" secondAttribute="trailing" constant="8" id="AHB-z1-O79"/>
-                            <constraint firstItem="0fx-y3-Oc0" firstAttribute="centerY" secondItem="23V-k7-gwK" secondAttribute="centerY" id="EjX-JW-sDS"/>
-                            <constraint firstItem="bnS-8m-XdK" firstAttribute="leading" secondItem="0fx-y3-Oc0" secondAttribute="trailing" id="Sws-Bc-6cW"/>
-                            <constraint firstItem="0fx-y3-Oc0" firstAttribute="leading" secondItem="23V-k7-gwK" secondAttribute="leading" constant="8" id="Trt-ZX-gOw"/>
-                            <constraint firstItem="RKo-Tk-BBV" firstAttribute="centerY" secondItem="23V-k7-gwK" secondAttribute="centerY" id="U86-oa-2qz"/>
-                            <constraint firstAttribute="trailing" relation="greaterThanOrEqual" secondItem="8IH-kp-rpL" secondAttribute="trailing" constant="8" id="Ubh-JM-Pqn"/>
-                            <constraint firstItem="b1U-yO-v3i" firstAttribute="leading" relation="greaterThanOrEqual" secondItem="23V-k7-gwK" secondAttribute="leading" constant="20" id="Uvz-dQ-aK4"/>
-                            <constraint firstItem="b1U-yO-v3i" firstAttribute="centerY" secondItem="23V-k7-gwK" secondAttribute="centerY" id="aZJ-7U-mmY"/>
-                            <constraint firstItem="b1U-yO-v3i" firstAttribute="leading" relation="greaterThanOrEqual" secondItem="bnS-8m-XdK" secondAttribute="trailing" constant="8" id="lWc-n2-Zem"/>
-                            <constraint firstItem="8IH-kp-rpL" firstAttribute="leading" secondItem="b1U-yO-v3i" secondAttribute="trailing" constant="8" symbolic="YES" id="obe-cZ-Bvd"/>
-                            <constraint firstItem="b1U-yO-v3i" firstAttribute="centerX" secondItem="23V-k7-gwK" secondAttribute="centerX" id="t2z-q9-dku"/>
-                        </constraints>
-                        <userDefinedRuntimeAttributes>
-                            <userDefinedRuntimeAttribute type="color" keyPath="backgroundColor">
-                                <color key="value" name="InterfaceBackgroundColor"/>
-                            </userDefinedRuntimeAttribute>
-                        </userDefinedRuntimeAttributes>
-                    </view>
-                    <connections>
-                        <outlet property="autocompleteSearchField" destination="b1U-yO-v3i" id="KPy-9z-ND7"/>
-                        <outlet property="goBackButton" destination="0fx-y3-Oc0" id="dQl-Dn-Vhw"/>
-                        <outlet property="goForwardButton" destination="bnS-8m-XdK" id="kT2-Lj-vFt"/>
-                        <outlet property="reloadButton" destination="8IH-kp-rpL" id="U4B-Iy-2Vr"/>
-                        <outlet property="settingsButton" destination="RKo-Tk-BBV" id="1vf-DY-tIZ"/>
-                    </connections>
-                </viewController>
-                <customObject id="zdG-Z1-HUh" userLabel="First Responder" customClass="NSResponder" sceneMemberID="firstResponder"/>
+                <controllerPlaceholder storyboardName="TabBar" id="Nfk-V8-FAE" sceneMemberID="viewController"/>
+                <customObject id="NXm-I5-OhA" userLabel="First Responder" customClass="NSResponder" sceneMemberID="firstResponder"/>
             </objects>
-            <point key="canvasLocation" x="75.5" y="1892"/>
-        </scene>
-        <!--Browser Tab View Controller-->
-        <scene sceneID="POP-kj-wTB">
-            <objects>
-                <viewController id="ELG-jh-7Cj" customClass="BrowserTabViewController" customModule="DuckDuckGo_Privacy_Browser" customModuleProvider="target" sceneMemberID="viewController">
-                    <view key="view" id="9OZ-eN-8Ze">
-                        <rect key="frame" x="0.0" y="0.0" width="512" height="492"/>
-                        <autoresizingMask key="autoresizingMask"/>
-                        <subviews>
-                            <wkWebView wantsLayer="YES" translatesAutoresizingMaskIntoConstraints="NO" id="0pi-OT-jzg">
-                                <rect key="frame" x="0.0" y="0.0" width="512" height="492"/>
-                                <wkWebViewConfiguration key="configuration">
-                                    <audiovisualMediaTypes key="mediaTypesRequiringUserActionForPlayback" none="YES"/>
-                                    <wkPreferences key="preferences"/>
-                                </wkWebViewConfiguration>
-                            </wkWebView>
-                            <customView hidden="YES" translatesAutoresizingMaskIntoConstraints="NO" id="Nvb-Di-hxz" customClass="ColorView" customModule="DuckDuckGo_Privacy_Browser" customModuleProvider="target">
-                                <rect key="frame" x="0.0" y="0.0" width="512" height="492"/>
-                                <subviews>
-                                    <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="wDW-73-QgT">
-                                        <rect key="frame" x="140" y="253" width="232" height="17"/>
-                                        <textFieldCell key="cell" lineBreakMode="clipping" title="DuckDuckGo can't load this page." id="L12-N1-wo0">
-                                            <font key="font" metaFont="systemSemibold" size="14"/>
-                                            <color key="textColor" name="labelColor" catalog="System" colorSpace="catalog"/>
-                                            <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
-                                        </textFieldCell>
-                                    </textField>
-                                    <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="BVh-ER-EPP">
-                                        <rect key="frame" x="81" y="228" width="351" height="16"/>
-                                        <textFieldCell key="cell" lineBreakMode="clipping" title="A server with the specified hostname could not be found." id="0xq-R9-UnE">
-                                            <font key="font" metaFont="system"/>
-                                            <color key="textColor" name="labelColor" catalog="System" colorSpace="catalog"/>
-                                            <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
-                                        </textFieldCell>
-                                    </textField>
-                                </subviews>
-                                <constraints>
-                                    <constraint firstItem="wDW-73-QgT" firstAttribute="centerY" secondItem="Nvb-Di-hxz" secondAttribute="centerY" constant="-15" id="NWz-vb-r3E"/>
-                                    <constraint firstItem="BVh-ER-EPP" firstAttribute="centerX" secondItem="Nvb-Di-hxz" secondAttribute="centerX" id="ix8-D4-dzr"/>
-                                    <constraint firstItem="BVh-ER-EPP" firstAttribute="centerY" secondItem="Nvb-Di-hxz" secondAttribute="centerY" constant="10" id="quT-4m-sos"/>
-                                    <constraint firstItem="wDW-73-QgT" firstAttribute="centerX" secondItem="Nvb-Di-hxz" secondAttribute="centerX" id="yGz-gN-3kk"/>
-                                </constraints>
-                                <userDefinedRuntimeAttributes>
-                                    <userDefinedRuntimeAttribute type="color" keyPath="backgroundColor">
-                                        <color key="value" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
-                                    </userDefinedRuntimeAttribute>
-                                </userDefinedRuntimeAttributes>
-                            </customView>
-                        </subviews>
-                        <constraints>
-                            <constraint firstAttribute="bottom" secondItem="Nvb-Di-hxz" secondAttribute="bottom" id="CGI-tw-BgY"/>
-                            <constraint firstItem="0pi-OT-jzg" firstAttribute="top" secondItem="9OZ-eN-8Ze" secondAttribute="top" id="GdO-9V-k8G"/>
-                            <constraint firstAttribute="bottom" secondItem="0pi-OT-jzg" secondAttribute="bottom" id="OCn-LW-f5K"/>
-                            <constraint firstItem="Nvb-Di-hxz" firstAttribute="leading" secondItem="9OZ-eN-8Ze" secondAttribute="leading" id="QFP-Vc-ubB"/>
-                            <constraint firstItem="Nvb-Di-hxz" firstAttribute="top" secondItem="9OZ-eN-8Ze" secondAttribute="top" id="myq-jf-wfV"/>
-                            <constraint firstAttribute="trailing" secondItem="0pi-OT-jzg" secondAttribute="trailing" id="o51-Tp-9t2"/>
-                            <constraint firstAttribute="trailing" secondItem="Nvb-Di-hxz" secondAttribute="trailing" id="qd4-AK-1kn"/>
-                            <constraint firstItem="0pi-OT-jzg" firstAttribute="leading" secondItem="9OZ-eN-8Ze" secondAttribute="leading" id="upy-bE-zOl"/>
-                        </constraints>
-                    </view>
-                    <connections>
-                        <outlet property="errorView" destination="Nvb-Di-hxz" id="zPb-tZ-0fB"/>
-                        <outlet property="webView" destination="0pi-OT-jzg" id="VeJ-Qf-md8"/>
-                    </connections>
-                </viewController>
-                <customObject id="mxo-Js-ldQ" userLabel="First Responder" customClass="NSResponder" sceneMemberID="firstResponder"/>
-            </objects>
-            <point key="canvasLocation" x="123" y="2235"/>
-        </scene>
-        <!--Tab Bar View Controller-->
-        <scene sceneID="P68-fv-m1U">
-            <objects>
-                <viewController id="7KY-zL-hBj" customClass="TabBarViewController" customModule="DuckDuckGo_Privacy_Browser" customModuleProvider="target" sceneMemberID="viewController">
-                    <view key="view" id="mmu-yW-bKd">
-                        <rect key="frame" x="0.0" y="0.0" width="845" height="38"/>
-                        <autoresizingMask key="autoresizingMask"/>
-                        <subviews>
-                            <visualEffectView blendingMode="behindWindow" material="mediumLight" state="followsWindowActiveState" translatesAutoresizingMaskIntoConstraints="NO" id="TFd-to-QRw">
-                                <rect key="frame" x="0.0" y="0.0" width="845" height="38"/>
-                                <subviews>
-                                    <button translatesAutoresizingMaskIntoConstraints="NO" id="IdN-te-Ja4">
-                                        <rect key="frame" x="805" y="5" width="32" height="24"/>
-                                        <constraints>
-                                            <constraint firstAttribute="height" constant="24" id="8tx-p6-Cbm"/>
-                                            <constraint firstAttribute="width" constant="32" id="Mmv-gb-Ux0"/>
-                                        </constraints>
-                                        <buttonCell key="cell" type="square" bezelStyle="shadowlessSquare" image="Burn" imagePosition="only" alignment="center" imageScaling="proportionallyDown" inset="2" id="3m2-rv-K2A">
-                                            <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
-                                            <font key="font" metaFont="system"/>
-                                        </buttonCell>
-                                        <color key="contentTintColor" name="ButtonColor"/>
-                                        <connections>
-                                            <action selector="burnButtonAction:" target="7KY-zL-hBj" id="PgC-f5-Rj3"/>
-                                        </connections>
-                                    </button>
-                                </subviews>
-                                <constraints>
-                                    <constraint firstItem="IdN-te-Ja4" firstAttribute="centerY" secondItem="TFd-to-QRw" secondAttribute="centerY" constant="2" id="Vo4-5m-G2u"/>
-                                    <constraint firstAttribute="trailing" secondItem="IdN-te-Ja4" secondAttribute="trailing" constant="8" id="Y2g-KS-WEq"/>
-                                </constraints>
-                            </visualEffectView>
-                            <scrollView wantsLayer="YES" borderType="none" horizontalLineScroll="10" horizontalPageScroll="10" verticalLineScroll="10" verticalPageScroll="10" hasVerticalScroller="NO" verticalScrollElasticity="none" translatesAutoresizingMaskIntoConstraints="NO" id="A4a-rM-ZNc" customClass="TabBarScrollView" customModule="DuckDuckGo_Privacy_Browser" customModuleProvider="target">
-                                <rect key="frame" x="80" y="0.0" width="685" height="32"/>
-                                <clipView key="contentView" drawsBackground="NO" copiesOnScroll="NO" id="ASm-CV-3UE">
-                                    <rect key="frame" x="0.0" y="0.0" width="685" height="32"/>
-                                    <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
-                                    <subviews>
-                                        <collectionView selectable="YES" id="woB-U4-Zp2">
-                                            <rect key="frame" x="0.0" y="0.0" width="685" height="32"/>
-                                            <autoresizingMask key="autoresizingMask" heightSizable="YES"/>
-                                            <collectionViewFlowLayout key="collectionViewLayout" scrollDirection="horizontal" id="7xi-kT-4Kf">
-                                                <size key="itemSize" width="120" height="32"/>
-                                            </collectionViewFlowLayout>
-                                            <color key="primaryBackgroundColor" name="ClearColor"/>
-                                            <connections>
-                                                <outlet property="dataSource" destination="7KY-zL-hBj" id="ucY-jn-hPq"/>
-                                                <outlet property="delegate" destination="7KY-zL-hBj" id="VMN-Hy-19q"/>
-                                            </connections>
-                                        </collectionView>
-                                    </subviews>
-                                    <color key="backgroundColor" name="ClearColor"/>
-                                </clipView>
-                                <constraints>
-                                    <constraint firstAttribute="height" constant="32" id="6we-Of-Svn"/>
-                                    <constraint firstAttribute="width" relation="greaterThanOrEqual" constant="120" id="z1D-8j-DKe"/>
-                                </constraints>
-                                <scroller key="horizontalScroller" wantsLayer="YES" verticalHuggingPriority="750" horizontal="YES" id="3yy-2x-vy5">
-                                    <rect key="frame" x="0.0" y="16" width="685" height="16"/>
-                                    <autoresizingMask key="autoresizingMask"/>
-                                </scroller>
-                                <scroller key="verticalScroller" hidden="YES" wantsLayer="YES" verticalHuggingPriority="750" horizontal="NO" id="ajl-Yz-a8a">
-                                    <rect key="frame" x="-100" y="-100" width="16" height="39"/>
-                                    <autoresizingMask key="autoresizingMask"/>
-                                </scroller>
-                            </scrollView>
-                            <button translatesAutoresizingMaskIntoConstraints="NO" id="iDw-zC-day">
-                                <rect key="frame" x="773" y="5" width="32" height="24"/>
-                                <constraints>
-                                    <constraint firstAttribute="width" constant="32" id="UsD-NT-U7K"/>
-                                    <constraint firstAttribute="height" constant="24" id="q0N-i2-cgz"/>
-                                </constraints>
-                                <buttonCell key="cell" type="square" bezelStyle="shadowlessSquare" image="Add" imagePosition="overlaps" alignment="center" imageScaling="proportionallyDown" inset="2" id="3zA-Re-9nt">
-                                    <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
-                                    <font key="font" metaFont="system"/>
-                                </buttonCell>
-                                <color key="contentTintColor" name="ButtonColor"/>
-                                <connections>
-                                    <action selector="addButtonAction:" target="7KY-zL-hBj" id="cuU-Qf-FYD"/>
-                                </connections>
-                            </button>
-                        </subviews>
-                        <constraints>
-                            <constraint firstAttribute="trailing" secondItem="iDw-zC-day" secondAttribute="trailing" constant="40" id="4Mi-YH-Hyu"/>
-                            <constraint firstItem="A4a-rM-ZNc" firstAttribute="leading" secondItem="mmu-yW-bKd" secondAttribute="leading" constant="80" id="5wv-aK-uaR"/>
-                            <constraint firstItem="TFd-to-QRw" firstAttribute="top" secondItem="mmu-yW-bKd" secondAttribute="top" id="Piz-fW-ykc"/>
-                            <constraint firstItem="iDw-zC-day" firstAttribute="centerY" secondItem="mmu-yW-bKd" secondAttribute="centerY" constant="2" id="Qjq-GZ-IHo"/>
-                            <constraint firstAttribute="trailing" secondItem="TFd-to-QRw" secondAttribute="trailing" id="Ryh-Eb-Yeh"/>
-                            <constraint firstAttribute="bottom" secondItem="A4a-rM-ZNc" secondAttribute="bottom" id="Zok-G0-Lan"/>
-                            <constraint firstAttribute="bottom" secondItem="TFd-to-QRw" secondAttribute="bottom" id="gAR-NC-HuT"/>
-                            <constraint firstItem="TFd-to-QRw" firstAttribute="leading" secondItem="mmu-yW-bKd" secondAttribute="leading" id="glh-CI-gPL"/>
-                            <constraint firstItem="A4a-rM-ZNc" firstAttribute="top" secondItem="mmu-yW-bKd" secondAttribute="top" constant="6" id="hEe-2b-LrB"/>
-                            <constraint firstAttribute="trailing" secondItem="A4a-rM-ZNc" secondAttribute="trailing" constant="80" id="iRG-CE-xT7"/>
-                        </constraints>
-                    </view>
-                    <connections>
-                        <outlet property="collectionView" destination="woB-U4-Zp2" id="qna-Jk-fSK"/>
-                    </connections>
-                </viewController>
-                <customObject id="7VK-LF-Cxc" userLabel="First Responder" customClass="NSResponder" sceneMemberID="firstResponder"/>
-            </objects>
-            <point key="canvasLocation" x="29.5" y="1779"/>
+            <point key="canvasLocation" x="848" y="1012"/>
         </scene>
         <!--Control Buttons View Controller-->
         <scene sceneID="YTl-il-KY0">
@@ -1079,25 +804,26 @@
                 </viewController>
                 <customObject id="eQq-RL-nKZ" userLabel="First Responder" customClass="NSResponder" sceneMemberID="firstResponder"/>
             </objects>
-            <point key="canvasLocation" x="-455" y="1779.5"/>
+            <point key="canvasLocation" x="846" y="810"/>
+        </scene>
+        <!--NavigationBar-->
+        <scene sceneID="Sc0-ir-Na8">
+            <objects>
+                <controllerPlaceholder storyboardName="NavigationBar" id="R9l-dg-lKa" sceneMemberID="viewController"/>
+                <customObject id="Pfq-lf-Cxf" userLabel="First Responder" customClass="NSResponder" sceneMemberID="firstResponder"/>
+            </objects>
+            <point key="canvasLocation" x="869" y="1112"/>
+        </scene>
+        <!--BrowserTab-->
+        <scene sceneID="O3n-py-FOu">
+            <objects>
+                <controllerPlaceholder storyboardName="BrowserTab" id="wo6-dV-Q3Q" sceneMemberID="viewController"/>
+                <customObject id="ECq-3v-dmj" userLabel="First Responder" customClass="NSResponder" sceneMemberID="firstResponder"/>
+            </objects>
+            <point key="canvasLocation" x="863" y="1228"/>
         </scene>
     </scenes>
     <resources>
-        <image name="Add" width="14" height="14"/>
-        <image name="Back" width="7" height="13"/>
-        <image name="Burn" width="12" height="14"/>
-        <image name="Forward" width="7" height="13"/>
-        <image name="Refresh" width="12" height="15"/>
-        <image name="Settings" width="12" height="3"/>
-        <namedColor name="ButtonColor">
-            <color red="0.28627450980392155" green="0.28627450980392155" blue="0.28627450980392155" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
-        </namedColor>
-        <namedColor name="ClearColor">
-            <color red="1" green="1" blue="1" alpha="0.0" colorSpace="custom" customColorSpace="sRGB"/>
-        </namedColor>
-        <namedColor name="InterfaceBackgroundColor">
-            <color red="1" green="1" blue="1" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
-        </namedColor>
         <namedColor name="SeparatorColor">
             <color red="0.0" green="0.0" blue="0.0" alpha="0.10000000149011612" colorSpace="custom" customColorSpace="sRGB"/>
         </namedColor>

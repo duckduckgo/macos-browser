@@ -1,0 +1,124 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<document type="com.apple.InterfaceBuilder3.Cocoa.Storyboard.XIB" version="3.0" toolsVersion="17132" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none" useAutolayout="YES" initialViewController="uSf-9n-QMw">
+    <dependencies>
+        <deployment identifier="macosx"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="17132"/>
+        <capability name="Named colors" minToolsVersion="9.0"/>
+        <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
+    </dependencies>
+    <scenes>
+        <!--Tab Bar View Controller-->
+        <scene sceneID="1uN-YZ-dtj">
+            <objects>
+                <viewController id="uSf-9n-QMw" customClass="TabBarViewController" customModule="DuckDuckGo_Privacy_Browser" customModuleProvider="target" sceneMemberID="viewController">
+                    <view key="view" id="JQD-ov-FCr">
+                        <rect key="frame" x="0.0" y="0.0" width="845" height="38"/>
+                        <autoresizingMask key="autoresizingMask"/>
+                        <subviews>
+                            <visualEffectView blendingMode="behindWindow" material="mediumLight" state="followsWindowActiveState" translatesAutoresizingMaskIntoConstraints="NO" id="8Av-Au-VBq">
+                                <rect key="frame" x="0.0" y="0.0" width="845" height="38"/>
+                                <subviews>
+                                    <button translatesAutoresizingMaskIntoConstraints="NO" id="XV4-Ze-5j7">
+                                        <rect key="frame" x="805" y="5" width="32" height="24"/>
+                                        <constraints>
+                                            <constraint firstAttribute="width" constant="32" id="9Ii-rC-Eca"/>
+                                            <constraint firstAttribute="height" constant="24" id="Dea-ni-6y6"/>
+                                        </constraints>
+                                        <buttonCell key="cell" type="square" bezelStyle="shadowlessSquare" image="Burn" imagePosition="only" alignment="center" imageScaling="proportionallyDown" inset="2" id="JD8-8V-x3K">
+                                            <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
+                                            <font key="font" metaFont="system"/>
+                                        </buttonCell>
+                                        <color key="contentTintColor" name="ButtonColor"/>
+                                        <connections>
+                                            <action selector="burnButtonAction:" target="uSf-9n-QMw" id="ifc-Vj-HVz"/>
+                                        </connections>
+                                    </button>
+                                </subviews>
+                                <constraints>
+                                    <constraint firstAttribute="trailing" secondItem="XV4-Ze-5j7" secondAttribute="trailing" constant="8" id="kCx-t5-ULE"/>
+                                    <constraint firstItem="XV4-Ze-5j7" firstAttribute="centerY" secondItem="8Av-Au-VBq" secondAttribute="centerY" constant="2" id="ziQ-Sz-LH0"/>
+                                </constraints>
+                            </visualEffectView>
+                            <scrollView wantsLayer="YES" borderType="none" horizontalLineScroll="10" horizontalPageScroll="10" verticalLineScroll="10" verticalPageScroll="10" hasVerticalScroller="NO" verticalScrollElasticity="none" translatesAutoresizingMaskIntoConstraints="NO" id="O0X-yp-zLn" customClass="TabBarScrollView" customModule="DuckDuckGo_Privacy_Browser" customModuleProvider="target">
+                                <rect key="frame" x="80" y="0.0" width="685" height="32"/>
+                                <clipView key="contentView" drawsBackground="NO" copiesOnScroll="NO" id="zdf-RD-hTG">
+                                    <rect key="frame" x="0.0" y="0.0" width="685" height="32"/>
+                                    <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+                                    <subviews>
+                                        <collectionView selectable="YES" id="OEu-5P-cRF">
+                                            <rect key="frame" x="0.0" y="0.0" width="685" height="32"/>
+                                            <autoresizingMask key="autoresizingMask" heightSizable="YES"/>
+                                            <collectionViewFlowLayout key="collectionViewLayout" scrollDirection="horizontal" id="oAv-jh-KDw">
+                                                <size key="itemSize" width="120" height="32"/>
+                                            </collectionViewFlowLayout>
+                                            <color key="primaryBackgroundColor" name="ClearColor"/>
+                                            <connections>
+                                                <outlet property="dataSource" destination="uSf-9n-QMw" id="rwc-vK-E21"/>
+                                                <outlet property="delegate" destination="uSf-9n-QMw" id="hVp-Yc-2ds"/>
+                                            </connections>
+                                        </collectionView>
+                                    </subviews>
+                                    <color key="backgroundColor" name="ClearColor"/>
+                                </clipView>
+                                <constraints>
+                                    <constraint firstAttribute="height" constant="32" id="VKd-ux-Wjv"/>
+                                    <constraint firstAttribute="width" relation="greaterThanOrEqual" constant="120" id="zdL-nq-TSG"/>
+                                </constraints>
+                                <scroller key="horizontalScroller" wantsLayer="YES" verticalHuggingPriority="750" horizontal="YES" id="f6A-N1-Ed1">
+                                    <rect key="frame" x="0.0" y="16" width="685" height="16"/>
+                                    <autoresizingMask key="autoresizingMask"/>
+                                </scroller>
+                                <scroller key="verticalScroller" hidden="YES" wantsLayer="YES" verticalHuggingPriority="750" horizontal="NO" id="tXZ-5R-7cy">
+                                    <rect key="frame" x="-100" y="-100" width="16" height="39"/>
+                                    <autoresizingMask key="autoresizingMask"/>
+                                </scroller>
+                            </scrollView>
+                            <button translatesAutoresizingMaskIntoConstraints="NO" id="qXs-b0-tWI">
+                                <rect key="frame" x="773" y="5" width="32" height="24"/>
+                                <constraints>
+                                    <constraint firstAttribute="width" constant="32" id="Lmr-Cv-caT"/>
+                                    <constraint firstAttribute="height" constant="24" id="dy2-Qu-QxL"/>
+                                </constraints>
+                                <buttonCell key="cell" type="square" bezelStyle="shadowlessSquare" image="Add" imagePosition="overlaps" alignment="center" imageScaling="proportionallyDown" inset="2" id="Lrx-0x-DAw">
+                                    <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
+                                    <font key="font" metaFont="system"/>
+                                </buttonCell>
+                                <color key="contentTintColor" name="ButtonColor"/>
+                                <connections>
+                                    <action selector="addButtonAction:" target="uSf-9n-QMw" id="Nx9-xc-NzJ"/>
+                                </connections>
+                            </button>
+                        </subviews>
+                        <constraints>
+                            <constraint firstAttribute="trailing" secondItem="8Av-Au-VBq" secondAttribute="trailing" id="04T-2h-lX4"/>
+                            <constraint firstAttribute="trailing" secondItem="qXs-b0-tWI" secondAttribute="trailing" constant="40" id="Fsr-hL-HYK"/>
+                            <constraint firstAttribute="trailing" secondItem="O0X-yp-zLn" secondAttribute="trailing" constant="80" id="FuJ-6x-Wa5"/>
+                            <constraint firstItem="qXs-b0-tWI" firstAttribute="centerY" secondItem="JQD-ov-FCr" secondAttribute="centerY" constant="2" id="Iib-Si-FQP"/>
+                            <constraint firstAttribute="bottom" secondItem="O0X-yp-zLn" secondAttribute="bottom" id="MIL-fB-QcY"/>
+                            <constraint firstItem="8Av-Au-VBq" firstAttribute="top" secondItem="JQD-ov-FCr" secondAttribute="top" id="UNA-xd-vb7"/>
+                            <constraint firstItem="O0X-yp-zLn" firstAttribute="top" secondItem="JQD-ov-FCr" secondAttribute="top" constant="6" id="ckd-HT-jfP"/>
+                            <constraint firstItem="8Av-Au-VBq" firstAttribute="leading" secondItem="JQD-ov-FCr" secondAttribute="leading" id="djE-ZR-Zcb"/>
+                            <constraint firstItem="O0X-yp-zLn" firstAttribute="leading" secondItem="JQD-ov-FCr" secondAttribute="leading" constant="80" id="fH2-uF-lal"/>
+                            <constraint firstAttribute="bottom" secondItem="8Av-Au-VBq" secondAttribute="bottom" id="pat-VC-dVb"/>
+                        </constraints>
+                    </view>
+                    <connections>
+                        <outlet property="collectionView" destination="OEu-5P-cRF" id="b95-c4-JM0"/>
+                    </connections>
+                </viewController>
+                <customObject id="7J5-0H-rHB" userLabel="First Responder" customClass="NSResponder" sceneMemberID="firstResponder"/>
+            </objects>
+            <point key="canvasLocation" x="29.5" y="1779"/>
+        </scene>
+    </scenes>
+    <resources>
+        <image name="Add" width="14" height="14"/>
+        <image name="Burn" width="12" height="14"/>
+        <namedColor name="ButtonColor">
+            <color red="0.28627450980392155" green="0.28627450980392155" blue="0.28627450980392155" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+        </namedColor>
+        <namedColor name="ClearColor">
+            <color red="1" green="1" blue="1" alpha="0.0" colorSpace="custom" customColorSpace="sRGB"/>
+        </namedColor>
+    </resources>
+</document>

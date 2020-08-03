@@ -1,0 +1,131 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<document type="com.apple.InterfaceBuilder3.Cocoa.Storyboard.XIB" version="3.0" toolsVersion="17132" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none" useAutolayout="YES" initialViewController="o2v-eH-jTI">
+    <dependencies>
+        <deployment identifier="macosx"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="17132"/>
+        <capability name="Named colors" minToolsVersion="9.0"/>
+        <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
+    </dependencies>
+    <scenes>
+        <!--Navigation Bar View Controller-->
+        <scene sceneID="uf3-HR-DIS">
+            <objects>
+                <viewController id="o2v-eH-jTI" customClass="NavigationBarViewController" customModule="DuckDuckGo_Privacy_Browser" customModuleProvider="target" sceneMemberID="viewController">
+                    <view key="view" id="hYV-nu-QIp" customClass="ColorView" customModule="DuckDuckGo_Privacy_Browser" customModuleProvider="target">
+                        <rect key="frame" x="0.0" y="0.0" width="845" height="40"/>
+                        <autoresizingMask key="autoresizingMask"/>
+                        <subviews>
+                            <searchField wantsLayer="YES" verticalHuggingPriority="750" textCompletion="NO" translatesAutoresizingMaskIntoConstraints="NO" id="8tV-Os-eVV" customClass="AutocompleteSearchField" customModule="DuckDuckGo_Privacy_Browser" customModuleProvider="target">
+                                <rect key="frame" x="173" y="9" width="500" height="22"/>
+                                <constraints>
+                                    <constraint firstAttribute="width" priority="250" constant="500" id="XQh-4I-UIR"/>
+                                    <constraint firstAttribute="height" constant="22" id="kJJ-80-EcF"/>
+                                </constraints>
+                                <searchFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" selectable="YES" editable="YES" borderStyle="bezel" placeholderString="Search or enter address" usesSingleLineMode="YES" bezelStyle="round" id="qIh-Ib-Xej">
+                                    <font key="font" metaFont="system"/>
+                                    <color key="textColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
+                                    <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
+                                </searchFieldCell>
+                            </searchField>
+                            <button translatesAutoresizingMaskIntoConstraints="NO" id="kky-0N-Cfd">
+                                <rect key="frame" x="8" y="6" width="29" height="29"/>
+                                <constraints>
+                                    <constraint firstAttribute="height" constant="29" id="0zh-Jn-l2h"/>
+                                    <constraint firstAttribute="width" constant="29" id="8sl-Tr-gSd"/>
+                                </constraints>
+                                <buttonCell key="cell" type="square" bezelStyle="shadowlessSquare" image="Back" imagePosition="only" alignment="center" imageScaling="proportionallyDown" inset="2" id="EhR-jn-0hY">
+                                    <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
+                                    <font key="font" metaFont="system"/>
+                                </buttonCell>
+                                <connections>
+                                    <action selector="goBackAction:" target="o2v-eH-jTI" id="gEk-2Z-80d"/>
+                                </connections>
+                            </button>
+                            <button translatesAutoresizingMaskIntoConstraints="NO" id="mdE-u0-Ei5">
+                                <rect key="frame" x="37" y="6" width="29" height="29"/>
+                                <constraints>
+                                    <constraint firstAttribute="height" constant="29" id="VXS-B2-jFA"/>
+                                    <constraint firstAttribute="width" constant="29" id="jYM-So-c8l"/>
+                                </constraints>
+                                <buttonCell key="cell" type="square" bezelStyle="shadowlessSquare" image="Forward" imagePosition="only" alignment="center" imageScaling="proportionallyDown" inset="2" id="ePU-hF-DNf">
+                                    <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
+                                    <font key="font" metaFont="system"/>
+                                </buttonCell>
+                                <connections>
+                                    <action selector="goForwardAction:" target="o2v-eH-jTI" id="aht-fm-Fhd"/>
+                                </connections>
+                            </button>
+                            <button translatesAutoresizingMaskIntoConstraints="NO" id="WKw-DB-V3R">
+                                <rect key="frame" x="681" y="6" width="29" height="29"/>
+                                <constraints>
+                                    <constraint firstAttribute="width" constant="29" id="0n0-Jg-xha"/>
+                                    <constraint firstAttribute="height" constant="29" id="5aC-wi-5a8"/>
+                                </constraints>
+                                <buttonCell key="cell" type="square" bezelStyle="shadowlessSquare" image="Refresh" imagePosition="only" alignment="center" imageScaling="proportionallyDown" inset="2" id="1tl-29-GQO">
+                                    <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
+                                    <font key="font" metaFont="system"/>
+                                </buttonCell>
+                                <connections>
+                                    <action selector="reloadAction:" target="o2v-eH-jTI" id="dGJ-c6-ARu"/>
+                                </connections>
+                            </button>
+                            <button translatesAutoresizingMaskIntoConstraints="NO" id="iIF-Ky-unr">
+                                <rect key="frame" x="808" y="6" width="29" height="29"/>
+                                <constraints>
+                                    <constraint firstAttribute="width" constant="29" id="2ry-8Q-yfk"/>
+                                    <constraint firstAttribute="height" constant="29" id="s7E-4e-eTj"/>
+                                </constraints>
+                                <buttonCell key="cell" type="square" bezelStyle="shadowlessSquare" image="Settings" imagePosition="only" alignment="center" imageScaling="proportionallyDown" inset="2" id="N7m-mn-k3W">
+                                    <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
+                                    <font key="font" metaFont="system"/>
+                                </buttonCell>
+                                <connections>
+                                    <action selector="settingsButtonAction:" target="o2v-eH-jTI" id="Qb4-p7-ZSD"/>
+                                </connections>
+                            </button>
+                        </subviews>
+                        <constraints>
+                            <constraint firstItem="kky-0N-Cfd" firstAttribute="leading" secondItem="hYV-nu-QIp" secondAttribute="leading" constant="8" id="5xQ-lQ-hZc"/>
+                            <constraint firstItem="iIF-Ky-unr" firstAttribute="centerY" secondItem="hYV-nu-QIp" secondAttribute="centerY" id="6EH-Ax-6p8"/>
+                            <constraint firstItem="WKw-DB-V3R" firstAttribute="centerY" secondItem="hYV-nu-QIp" secondAttribute="centerY" id="8Zc-0x-thk"/>
+                            <constraint firstItem="8tV-Os-eVV" firstAttribute="leading" relation="greaterThanOrEqual" secondItem="hYV-nu-QIp" secondAttribute="leading" constant="20" id="Arg-gk-pw1"/>
+                            <constraint firstAttribute="trailing" relation="greaterThanOrEqual" secondItem="8tV-Os-eVV" secondAttribute="trailing" constant="20" id="EpU-Ow-rPx"/>
+                            <constraint firstItem="WKw-DB-V3R" firstAttribute="leading" secondItem="8tV-Os-eVV" secondAttribute="trailing" constant="8" symbolic="YES" id="L9h-rr-Z0k"/>
+                            <constraint firstAttribute="trailing" relation="greaterThanOrEqual" secondItem="WKw-DB-V3R" secondAttribute="trailing" constant="8" id="Ypj-Qr-1xn"/>
+                            <constraint firstItem="8tV-Os-eVV" firstAttribute="centerY" secondItem="hYV-nu-QIp" secondAttribute="centerY" id="a6I-nY-qiq"/>
+                            <constraint firstItem="mdE-u0-Ei5" firstAttribute="leading" secondItem="kky-0N-Cfd" secondAttribute="trailing" id="dfl-Lh-pZe"/>
+                            <constraint firstItem="8tV-Os-eVV" firstAttribute="leading" relation="greaterThanOrEqual" secondItem="mdE-u0-Ei5" secondAttribute="trailing" constant="8" id="g9W-Y9-GrJ"/>
+                            <constraint firstAttribute="trailing" secondItem="iIF-Ky-unr" secondAttribute="trailing" constant="8" id="gaO-bl-clp"/>
+                            <constraint firstItem="mdE-u0-Ei5" firstAttribute="centerY" secondItem="hYV-nu-QIp" secondAttribute="centerY" id="hpv-rt-wVQ"/>
+                            <constraint firstItem="kky-0N-Cfd" firstAttribute="centerY" secondItem="hYV-nu-QIp" secondAttribute="centerY" id="nim-fw-Zt3"/>
+                            <constraint firstItem="8tV-Os-eVV" firstAttribute="centerX" secondItem="hYV-nu-QIp" secondAttribute="centerX" id="nqx-BQ-EBI"/>
+                        </constraints>
+                        <userDefinedRuntimeAttributes>
+                            <userDefinedRuntimeAttribute type="color" keyPath="backgroundColor">
+                                <color key="value" name="InterfaceBackgroundColor"/>
+                            </userDefinedRuntimeAttribute>
+                        </userDefinedRuntimeAttributes>
+                    </view>
+                    <connections>
+                        <outlet property="autocompleteSearchField" destination="8tV-Os-eVV" id="cJ8-YT-JrW"/>
+                        <outlet property="goBackButton" destination="kky-0N-Cfd" id="RA9-yE-URS"/>
+                        <outlet property="goForwardButton" destination="mdE-u0-Ei5" id="7wT-nX-Avr"/>
+                        <outlet property="reloadButton" destination="WKw-DB-V3R" id="zOP-zS-2EN"/>
+                        <outlet property="settingsButton" destination="iIF-Ky-unr" id="vvZ-mm-idv"/>
+                    </connections>
+                </viewController>
+                <customObject id="wkT-Td-n7D" userLabel="First Responder" customClass="NSResponder" sceneMemberID="firstResponder"/>
+            </objects>
+            <point key="canvasLocation" x="75.5" y="1892"/>
+        </scene>
+    </scenes>
+    <resources>
+        <image name="Back" width="7" height="13"/>
+        <image name="Forward" width="7" height="13"/>
+        <image name="Refresh" width="12" height="15"/>
+        <image name="Settings" width="12" height="3"/>
+        <namedColor name="InterfaceBackgroundColor">
+            <color red="1" green="1" blue="1" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+        </namedColor>
+    </resources>
+</document>

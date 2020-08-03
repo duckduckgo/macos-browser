@@ -36,6 +36,10 @@
 		AA7412BD24D2BEEE00D22FE0 /* MainWindow.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA7412BC24D2BEEE00D22FE0 /* MainWindow.swift */; };
 		AA7412BF24D2E07000D22FE0 /* ControlButtonsViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA7412BE24D2E07000D22FE0 /* ControlButtonsViewController.swift */; };
 		AA86490C24D3494C001BABEE /* GradientView.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA86490B24D3494C001BABEE /* GradientView.swift */; };
+		AA86490E24D49B54001BABEE /* TabLoadingView.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA86490D24D49B54001BABEE /* TabLoadingView.swift */; };
+		AA86491024D83104001BABEE /* TabBar.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = AA86490F24D83104001BABEE /* TabBar.storyboard */; };
+		AA86491824D833E7001BABEE /* NavigationBar.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = AA86491724D833E7001BABEE /* NavigationBar.storyboard */; };
+		AA86492024D83B22001BABEE /* BrowserTab.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = AA86491F24D83B22001BABEE /* BrowserTab.storyboard */; };
 		AA8EDF2424923E980071C2E8 /* URLExtension.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA8EDF2324923E980071C2E8 /* URLExtension.swift */; };
 		AA8EDF2724923EC70071C2E8 /* StringExtension.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA8EDF2624923EC70071C2E8 /* StringExtension.swift */; };
 		AA8EDF2A249268600071C2E8 /* OSLogExtension.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA8EDF29249268600071C2E8 /* OSLogExtension.swift */; };
@@ -45,7 +49,6 @@
 		AA9FF95F24A1FB690039E328 /* TabCollectionViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA9FF95E24A1FB680039E328 /* TabCollectionViewModel.swift */; };
 		AA9FF96124A21D2F0039E328 /* PublisherExtension.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA9FF96024A21D2F0039E328 /* PublisherExtension.swift */; };
 		AAAC93EA24C5BA1700C23ECC /* LocalHistoryStoreTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = AAAC93E924C5BA1700C23ECC /* LocalHistoryStoreTests.swift */; };
-		AAAC93EF24C76FCD00C23ECC /* RotatingButton.swift in Sources */ = {isa = PBXBuildFile; fileRef = AAAC93EE24C76FCD00C23ECC /* RotatingButton.swift */; };
 		AABEE69324A4E2F80043105B /* SuggestionsAPI.swift in Sources */ = {isa = PBXBuildFile; fileRef = AABEE69224A4E2F80043105B /* SuggestionsAPI.swift */; };
 		AABEE69824A5FD930043105B /* SuggestionsAPIResult.swift in Sources */ = {isa = PBXBuildFile; fileRef = AABEE69724A5FD930043105B /* SuggestionsAPIResult.swift */; };
 		AABEE69A24A902A90043105B /* SuggestionsViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = AABEE69924A902A90043105B /* SuggestionsViewModel.swift */; };
@@ -95,7 +98,7 @@
 		AA3F895224C18AD500628DDE /* SuggestionViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SuggestionViewModel.swift; sourceTree = "<group>"; };
 		AA585D7E248FD31100E9A3E2 /* DuckDuckGo Privacy Browser.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "DuckDuckGo Privacy Browser.app"; sourceTree = BUILT_PRODUCTS_DIR; };
 		AA585D81248FD31100E9A3E2 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
-		AA585D83248FD31100E9A3E2 /* BrowserTabViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = BrowserTabViewController.swift; path = ../BrowserTabViewController.swift; sourceTree = "<group>"; };
+		AA585D83248FD31100E9A3E2 /* BrowserTabViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BrowserTabViewController.swift; sourceTree = "<group>"; };
 		AA585D85248FD31400E9A3E2 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		AA585D88248FD31400E9A3E2 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/Main.storyboard; sourceTree = "<group>"; };
 		AA585D8A248FD31400E9A3E2 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
@@ -112,7 +115,7 @@
 		AA63745124C9BBE100AB2AC4 /* SuggestionsAPIMock.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SuggestionsAPIMock.swift; sourceTree = "<group>"; };
 		AA63745324C9BF9A00AB2AC4 /* SuggestionsTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SuggestionsTests.swift; sourceTree = "<group>"; };
 		AA63745524C9EB3C00AB2AC4 /* SuggestionsAPIResultTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SuggestionsAPIResultTests.swift; sourceTree = "<group>"; };
-		AA68C3D22490ED62001B8783 /* NavigationBarViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = NavigationBarViewController.swift; path = ../NavigationBarViewController.swift; sourceTree = "<group>"; };
+		AA68C3D22490ED62001B8783 /* NavigationBarViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NavigationBarViewController.swift; sourceTree = "<group>"; };
 		AA68C3D62490F821001B8783 /* README.md */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; path = README.md; sourceTree = "<group>"; };
 		AA7412B024D0B3AC00D22FE0 /* TabBarViewItem.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TabBarViewItem.swift; sourceTree = "<group>"; };
 		AA7412B124D0B3AC00D22FE0 /* TabBarViewItem.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = TabBarViewItem.xib; sourceTree = "<group>"; };
@@ -121,6 +124,10 @@
 		AA7412BC24D2BEEE00D22FE0 /* MainWindow.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MainWindow.swift; sourceTree = "<group>"; };
 		AA7412BE24D2E07000D22FE0 /* ControlButtonsViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ControlButtonsViewController.swift; sourceTree = "<group>"; };
 		AA86490B24D3494C001BABEE /* GradientView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GradientView.swift; sourceTree = "<group>"; };
+		AA86490D24D49B54001BABEE /* TabLoadingView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TabLoadingView.swift; sourceTree = "<group>"; };
+		AA86490F24D83104001BABEE /* TabBar.storyboard */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; path = TabBar.storyboard; sourceTree = "<group>"; };
+		AA86491724D833E7001BABEE /* NavigationBar.storyboard */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; path = NavigationBar.storyboard; sourceTree = "<group>"; };
+		AA86491F24D83B22001BABEE /* BrowserTab.storyboard */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; path = BrowserTab.storyboard; sourceTree = "<group>"; };
 		AA8EDF2324923E980071C2E8 /* URLExtension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = URLExtension.swift; sourceTree = "<group>"; };
 		AA8EDF2624923EC70071C2E8 /* StringExtension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StringExtension.swift; sourceTree = "<group>"; };
 		AA8EDF29249268600071C2E8 /* OSLogExtension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OSLogExtension.swift; sourceTree = "<group>"; };
@@ -130,7 +137,6 @@
 		AA9FF95E24A1FB680039E328 /* TabCollectionViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TabCollectionViewModel.swift; sourceTree = "<group>"; };
 		AA9FF96024A21D2F0039E328 /* PublisherExtension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PublisherExtension.swift; sourceTree = "<group>"; };
 		AAAC93E924C5BA1700C23ECC /* LocalHistoryStoreTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LocalHistoryStoreTests.swift; sourceTree = "<group>"; };
-		AAAC93EE24C76FCD00C23ECC /* RotatingButton.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RotatingButton.swift; sourceTree = "<group>"; };
 		AABEE69224A4E2F80043105B /* SuggestionsAPI.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SuggestionsAPI.swift; sourceTree = "<group>"; };
 		AABEE69724A5FD930043105B /* SuggestionsAPIResult.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SuggestionsAPIResult.swift; sourceTree = "<group>"; };
 		AABEE69924A902A90043105B /* SuggestionsViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SuggestionsViewModel.swift; sourceTree = "<group>"; };
@@ -230,11 +236,15 @@
 			isa = PBXGroup;
 			children = (
 				AA585D81248FD31100E9A3E2 /* AppDelegate.swift */,
+				AA86491B24D837DE001BABEE /* BrowserTab */,
+				AA86491324D831B9001BABEE /* Common */,
 				AA23DA7124B24532006F262F /* Database */,
 				AADC60E92493B305008F8EF7 /* Extensions */,
 				AAE7CA9D24B4A80200CD7F00 /* History */,
 				AA585DB02490E6FA00E9A3E2 /* Main */,
+				AA86491524D83384001BABEE /* NavigationBar */,
 				AACB8E7224A4C8BC005F2218 /* Suggestions */,
+				AA86491124D8318F001BABEE /* TabBar */,
 				AA585D85248FD31400E9A3E2 /* Assets.xcassets */,
 				AA585D8B248FD31400E9A3E2 /* DuckDuckGo.entitlements */,
 				AA585D8A248FD31400E9A3E2 /* Info.plist */,
@@ -266,8 +276,6 @@
 			isa = PBXGroup;
 			children = (
 				AA68C3D824911D56001B8783 /* View */,
-				AA8EDF1F2491FCC10071C2E8 /* ViewModel */,
-				AA9FF95724A1ECE20039E328 /* Model */,
 			);
 			path = Main;
 			sourceTree = "<group>";
@@ -314,25 +322,107 @@
 				AA7412BC24D2BEEE00D22FE0 /* MainWindow.swift */,
 				AA7412B424D1536B00D22FE0 /* MainWindowController.swift */,
 				AA585DAE2490E6E600E9A3E2 /* MainViewController.swift */,
+				AA7412BE24D2E07000D22FE0 /* ControlButtonsViewController.swift */,
+			);
+			path = View;
+			sourceTree = "<group>";
+		};
+		AA86491124D8318F001BABEE /* TabBar */ = {
+			isa = PBXGroup;
+			children = (
+				AA86491224D831A1001BABEE /* View */,
+				AA8EDF1F2491FCC10071C2E8 /* ViewModel */,
+				AA9FF95724A1ECE20039E328 /* Model */,
+			);
+			path = TabBar;
+			sourceTree = "<group>";
+		};
+		AA86491224D831A1001BABEE /* View */ = {
+			isa = PBXGroup;
+			children = (
+				AA86490F24D83104001BABEE /* TabBar.storyboard */,
 				1430DFF424D0580F00B8978C /* TabBarViewController.swift */,
 				AA7412B624D1687000D22FE0 /* TabBarScrollView.swift */,
 				AA7412B024D0B3AC00D22FE0 /* TabBarViewItem.swift */,
 				AA7412B124D0B3AC00D22FE0 /* TabBarViewItem.xib */,
-				AA7412BE24D2E07000D22FE0 /* ControlButtonsViewController.swift */,
-				AA68C3D22490ED62001B8783 /* NavigationBarViewController.swift */,
-				AAAC93EE24C76FCD00C23ECC /* RotatingButton.swift */,
-				AA585D83248FD31100E9A3E2 /* BrowserTabViewController.swift */,
+				AA86490D24D49B54001BABEE /* TabLoadingView.swift */,
+			);
+			path = View;
+			sourceTree = "<group>";
+		};
+		AA86491324D831B9001BABEE /* Common */ = {
+			isa = PBXGroup;
+			children = (
+				AA86491424D831C4001BABEE /* View */,
+			);
+			path = Common;
+			sourceTree = "<group>";
+		};
+		AA86491424D831C4001BABEE /* View */ = {
+			isa = PBXGroup;
+			children = (
 				AA2E423324C8A2270048C0D5 /* ColorView.swift */,
 				AA86490B24D3494C001BABEE /* GradientView.swift */,
+			);
+			path = View;
+			sourceTree = "<group>";
+		};
+		AA86491524D83384001BABEE /* NavigationBar */ = {
+			isa = PBXGroup;
+			children = (
+				AA86491624D8339A001BABEE /* View */,
+			);
+			path = NavigationBar;
+			sourceTree = "<group>";
+		};
+		AA86491624D8339A001BABEE /* View */ = {
+			isa = PBXGroup;
+			children = (
+				AA86491724D833E7001BABEE /* NavigationBar.storyboard */,
+				AA68C3D22490ED62001B8783 /* NavigationBarViewController.swift */,
+			);
+			path = View;
+			sourceTree = "<group>";
+		};
+		AA86491B24D837DE001BABEE /* BrowserTab */ = {
+			isa = PBXGroup;
+			children = (
+				AA86491C24D83868001BABEE /* View */,
+				AA86491D24D83A59001BABEE /* ViewModel */,
+				AA86491E24D83A66001BABEE /* Model */,
+			);
+			path = BrowserTab;
+			sourceTree = "<group>";
+		};
+		AA86491C24D83868001BABEE /* View */ = {
+			isa = PBXGroup;
+			children = (
+				AA86491F24D83B22001BABEE /* BrowserTab.storyboard */,
+				AA585D83248FD31100E9A3E2 /* BrowserTabViewController.swift */,
 				AA5D6DAB24A340F700C6FBCE /* WebViewStateObserver.swift */,
 			);
 			path = View;
 			sourceTree = "<group>";
 		};
-		AA8EDF1F2491FCC10071C2E8 /* ViewModel */ = {
+		AA86491D24D83A59001BABEE /* ViewModel */ = {
 			isa = PBXGroup;
 			children = (
 				AA9FF95A24A1EFC20039E328 /* TabViewModel.swift */,
+			);
+			path = ViewModel;
+			sourceTree = "<group>";
+		};
+		AA86491E24D83A66001BABEE /* Model */ = {
+			isa = PBXGroup;
+			children = (
+				AA9FF95824A1ECF20039E328 /* Tab.swift */,
+			);
+			path = Model;
+			sourceTree = "<group>";
+		};
+		AA8EDF1F2491FCC10071C2E8 /* ViewModel */ = {
+			isa = PBXGroup;
+			children = (
 				AA9FF95E24A1FB680039E328 /* TabCollectionViewModel.swift */,
 			);
 			path = ViewModel;
@@ -341,7 +431,6 @@
 		AA9FF95724A1ECE20039E328 /* Model */ = {
 			isa = PBXGroup;
 			children = (
-				AA9FF95824A1ECF20039E328 /* Tab.swift */,
 				AA9FF95C24A1FA1C0039E328 /* TabCollection.swift */,
 			);
 			path = Model;
@@ -598,7 +687,10 @@
 				AA68C3D72490F821001B8783 /* README.md in Resources */,
 				AA585D86248FD31400E9A3E2 /* Assets.xcassets in Resources */,
 				AA585D89248FD31400E9A3E2 /* Main.storyboard in Resources */,
+				AA86491024D83104001BABEE /* TabBar.storyboard in Resources */,
 				AA7412B324D0B3AC00D22FE0 /* TabBarViewItem.xib in Resources */,
+				AA86491824D833E7001BABEE /* NavigationBar.storyboard in Resources */,
+				AA86492024D83B22001BABEE /* BrowserTab.storyboard in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -664,9 +756,9 @@
 				AA7412BF24D2E07000D22FE0 /* ControlButtonsViewController.swift in Sources */,
 				AABEE69324A4E2F80043105B /* SuggestionsAPI.swift in Sources */,
 				AABEE6A924AB4B910043105B /* SuggestionTableCellView.swift in Sources */,
-				AAAC93EF24C76FCD00C23ECC /* RotatingButton.swift in Sources */,
 				AAE1428C24C0D9F000AEB729 /* WebsiteVisit.swift in Sources */,
 				AA9FF95D24A1FA1C0039E328 /* TabCollection.swift in Sources */,
+				AA86490E24D49B54001BABEE /* TabLoadingView.swift in Sources */,
 				AA3F895324C18AD500628DDE /* SuggestionViewModel.swift in Sources */,
 				AA9FF95B24A1EFC20039E328 /* TabViewModel.swift in Sources */,
 				AA8EDF2724923EC70071C2E8 /* StringExtension.swift in Sources */,
