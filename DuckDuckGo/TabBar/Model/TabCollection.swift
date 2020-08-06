@@ -43,7 +43,10 @@ class TabCollection {
             tabs.swapAt(index, newIndex)
             return
         }
+
+        var tabs = self.tabs
         tabs.insert(tabs.remove(at: index), at: newIndex)
+        self.tabs = tabs
     }
 
 }

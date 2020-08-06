@@ -148,14 +148,15 @@ class TabBarViewController: NSViewController {
         }
 
         let index = indexPath.item
-        let newIndex = newIndexPath.item
+        let newIndex = min(newIndexPath.item, max(tabCollectionViewModel.tabCollection.tabs.count - 1, 0))
+        let newIndexPath = IndexPath(item: newIndex, section: 0)
 
         guard index != newIndex else {
             return
         }
         lastIndexPath = newIndexPath
 
-        tabCollectionViewModel.tabCollection.moveItem(at: indexPath.item, to: newIndexPath.item)
+        tabCollectionViewModel.tabCollection.moveItem(at: index, to: newIndex)
         collectionView.animator().moveItem(at: indexPath, to: newIndexPath)
         tabCollectionViewModel.select(at: newIndexPath.item)
     }
