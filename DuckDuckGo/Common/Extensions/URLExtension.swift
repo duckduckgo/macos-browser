@@ -49,7 +49,7 @@ extension URL {
     }
 
     static var emptyPage: URL {
-        return URL(string:"about:blank")!
+        return URL(string: "about:blank")!
     }
 
     // MARK: - Parameters

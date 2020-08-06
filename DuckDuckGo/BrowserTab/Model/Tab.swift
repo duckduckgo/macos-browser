@@ -78,7 +78,7 @@ class Tab {
 extension Tab: Equatable {
 
     static func == (lhs: Tab, rhs: Tab) -> Bool {
-        ObjectIdentifier(lhs) == ObjectIdentifier (rhs)
+        ObjectIdentifier(lhs) == ObjectIdentifier(rhs)
     }
 
 }

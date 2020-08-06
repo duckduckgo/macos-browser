@@ -42,12 +42,6 @@ class TabBarViewController: NSViewController {
         super.viewDidLoad()
 
         setupCollectionView()
-        if #available(OSX 10.13, *) {
-            if let contentSize = self.collectionView.collectionViewLayout?.collectionViewContentSize {
-              self.collectionView.setFrameSize(contentSize)
-            }
-          }
-        bindTabs()
         bindSelectionIndex()
     }
 
@@ -55,6 +49,12 @@ class TabBarViewController: NSViewController {
         super.viewWillAppear()
 
         addInitialTab()
+    }
+
+    override func viewDidAppear() {
+        super.viewDidAppear()
+
+        tabCollectionViewModel.tabCollection.delegate = self
     }
 
     @IBAction func burnButtonAction(_ sender: NSButton) {
@@ -72,26 +72,6 @@ class TabBarViewController: NSViewController {
         collectionView.registerForDraggedTypes([NSPasteboard.PasteboardType.string])
         // Enable dragging items within and into our CollectionView.
         collectionView.setDraggingSourceOperationMask(NSDragOperation.move, forLocal: false)
-    }
-
-    private func bindTabs() {
-        tabsCancelable = tabCollectionViewModel.tabCollection.$tabs.sinkAsync { [weak self] newTabs in
-            self?.reloadCollectionViewIfNeeded(newTabs)
-        }
-    }
-
-    private func reloadCollectionViewIfNeeded(_ newTabs: [Tab]) {
-        if tabCollectionViewModel.tabCollection.tabs.count > collectionView.numberOfItems(inSection: 0){
-            let lastTabIndex = self.tabCollectionViewModel.tabCollection.tabs.count - 1
-            let lastTabIndexPath = IndexPath(item: lastTabIndex, section: 0)
-            let lastTabIndexPathSet = Set(arrayLiteral: lastTabIndexPath)
-
-            self.collectionView.animator().insertItems(at: lastTabIndexPathSet)
-
-            //todo scrolling to inserted item
-//            var selectionRect = self.collectionView.frameForItem(at: lastTabIndexPath.item)
-//            let value = self.collectionView.animator().scrollToVisible(selectionRect)
-        }
     }
 
     private func bindSelectionIndex() {
@@ -113,7 +93,7 @@ class TabBarViewController: NSViewController {
         let newSelectionIndexPath = IndexPath(item: selectionIndex, section: 0)
 
         collectionView.deselectItems(at: collectionView.selectionIndexPaths)
-        collectionView.selectItems(at: [newSelectionIndexPath], scrollPosition: .nearestVerticalEdge)
+        collectionView.animator().selectItems(at: [newSelectionIndexPath], scrollPosition: .nearestVerticalEdge)
     }
 
     private func addInitialTab() {
@@ -130,7 +110,6 @@ class TabBarViewController: NSViewController {
 
     private func closeItem(at indexPath: IndexPath) {
         tabCollectionViewModel.remove(at: indexPath.item)
-        collectionView.deleteItems(at: Set(arrayLiteral: indexPath))
 
         if indexPath.item == 0 && tabCollectionViewModel.tabCollection.tabs.count == 0 {
             NSApplication.shared.terminate(self)
@@ -156,11 +135,39 @@ class TabBarViewController: NSViewController {
         }
         lastIndexPath = newIndexPath
 
-        tabCollectionViewModel.tabCollection.moveItem(at: index, to: newIndex)
-        collectionView.animator().moveItem(at: indexPath, to: newIndexPath)
+        tabCollectionViewModel.tabCollection.moveTab(at: index, to: newIndex)
         tabCollectionViewModel.select(at: newIndexPath.item)
     }
     
+}
+
+extension TabBarViewController: TabCollectionDelegate {
+
+    func tabCollection(_ tabCollection: TabCollection, didAppend tab: Tab) {
+        let lastIndex = tabCollectionViewModel.tabCollection.tabs.count - 1
+        let lastIndexPath = IndexPath(item: lastIndex, section: 0)
+        let lastIndexPathSet = Set(arrayLiteral: lastIndexPath)
+        collectionView.animator().insertItems(at: lastIndexPathSet)
+    }
+
+    func tabCollection(_ tabCollection: TabCollection, didInsert tab: Tab, at index: Int) {
+        let indexPath = IndexPath(item: index, section: 0)
+        let indexPathSet = Set(arrayLiteral: indexPath)
+        collectionView.animator().insertItems(at: indexPathSet)
+    }
+
+    func tabCollection(_ tabCollection: TabCollection, didRemoveTabAt index: Int) {
+        let indexPath = IndexPath(item: index, section: 0)
+        let indexPathSet = Set(arrayLiteral: indexPath)
+        collectionView.animator().deleteItems(at: indexPathSet)
+    }
+
+    func tabCollection(_ tabCollection: TabCollection, didMoveTabAt index: Int, to newIndex: Int) {
+        let indexPath = IndexPath(item: index, section: 0)
+        let newIndexPath = IndexPath(item: newIndex, section: 0)
+        collectionView.animator().moveItem(at: indexPath, to: newIndexPath)
+    }
+
 }
 
 extension TabBarViewController: NSCollectionViewDataSource {

@@ -79,6 +79,15 @@ class TabCollectionViewModel {
         select(at: tabCollection.tabs.count - 1)
     }
 
+    func appendAfterSelected() {
+        guard let selectionIndex = selectionIndex else {
+            os_log("TabCollectionViewModel: No tab selected", log: OSLog.Category.general, type: .error)
+            return
+        }
+        tabCollection.insert(tab: Tab(), at: selectionIndex + 1)
+        select(at: selectionIndex + 1)
+    }
+
     func remove(at index: Int) {
         guard index >= 0, index < tabCollection.tabs.count else {
             os_log("TabCollection: Index out of bounds", log: OSLog.Category.general, type: .error)
@@ -91,10 +100,10 @@ class TabCollectionViewModel {
             return
         }
 
-        if selectionIndex >= index {
+        if selectionIndex > index {
             select(at: max(selectionIndex - 1, 0))
         } else {
-            updateSelectedTabViewModel()
+            select(at: max(min(selectionIndex, tabCollection.tabs.count - 1), 0))
         }
     }
 
@@ -107,7 +116,7 @@ class TabCollectionViewModel {
 
     private func removeTabViewModelsIfNeeded(newTabs: [Tab]) {
         tabViewModels = tabViewModels.filter { (item) -> Bool in
-            tabCollection.tabs.contains(item.key)
+            newTabs.contains(item.key)
         }
     }
 

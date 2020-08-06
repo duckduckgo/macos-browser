@@ -24,7 +24,8 @@ import Combine
 class BrowserTabViewController: NSViewController {
 
     @IBOutlet weak var errorView: NSView!
-    var webView: WKWebView?
+    var webView: WebView?
+    var tabViewModel: TabViewModel?
 
     private let tabCollectionViewModel: TabCollectionViewModel
     private let historyViewModel: HistoryViewModel
@@ -50,11 +51,11 @@ class BrowserTabViewController: NSViewController {
 
     private func bindSelectedTabViewModel() {
         selectedTabViewModelCancelable = tabCollectionViewModel.$selectedTabViewModel.sinkAsync { [weak self] _ in
-            self?.changeTab()
+            self?.changeWebView()
         }
     }
 
-    private func changeTab() {
+    private func changeWebView() {
 
         func displayWebView(of tabViewModel: TabViewModel) {
             let newWebView = tabViewModel.webView
@@ -74,14 +75,14 @@ class BrowserTabViewController: NSViewController {
             webView.removeFromSuperview()
         }
         webView = nil
-
-        guard let selectedTabViewModel = tabCollectionViewModel.selectedTabViewModel else {
+        guard let tabViewModel = tabCollectionViewModel.selectedTabViewModel else {
             return
         }
+        self.tabViewModel = tabViewModel
 
-        displayWebView(of: selectedTabViewModel)
-        bindUrl(of: selectedTabViewModel)
-        selectedTabViewModel.tab.actionDelegate = self
+        displayWebView(of: tabViewModel)
+        bindUrl(of: tabViewModel)
+        tabViewModel.tab.actionDelegate = self
     }
 
     private func reloadWebViewIfNeeded() {
@@ -90,14 +91,14 @@ class BrowserTabViewController: NSViewController {
             return
         }
 
-        guard let selectedTabViewModel = tabCollectionViewModel.selectedTabViewModel else {
-            os_log("%s: Selected tab view model is nil", log: OSLog.Category.general, type: .error, className)
+        guard let tabViewModel = tabViewModel else {
+            os_log("%s: Tab view model is nil", log: OSLog.Category.general, type: .error, className)
             return
         }
 
-        if webView.url == selectedTabViewModel.tab.url { return }
+        if webView.url == tabViewModel.tab.url { return }
 
-        if let url = selectedTabViewModel.tab.url {
+        if let url = tabViewModel.tab.url {
             let request = URLRequest(url: url)
             webView.load(request)
         } else {
@@ -133,13 +134,13 @@ class BrowserTabViewController: NSViewController {
             return
         }
         
-        guard let selectedTabViewModel = tabCollectionViewModel.selectedTabViewModel else {
-            os_log("%s: Selected tab view model is nil", log: OSLog.Category.general, type: .error, className)
+        guard let tabViewModel = tabViewModel else {
+            os_log("%s: Tab view model is nil", log: OSLog.Category.general, type: .error, className)
             return
         }
 
         if shown {
-            selectedTabViewModel.tab.url = nil
+            tabViewModel.tab.url = nil
         }
         errorView.isHidden = !shown
         webView.isHidden = shown
@@ -159,11 +160,25 @@ extension BrowserTabViewController: WKNavigationDelegate {
     }
 
     func webView(_ webView: WKWebView, didFail navigation: WKNavigation!, withError error: Error) {
-        displayErrorView(true)
+        //todo: Did problems when going back
+//        displayErrorView(true)
     }
 
     func webView(_ webView: WKWebView, didFailProvisionalNavigation navigation: WKNavigation!, withError error: Error) {
         displayErrorView(true)
+    }
+
+    func webView(_ webView: WKWebView,
+                 createWebViewWith configuration: WKWebViewConfiguration,
+                 for navigationAction: WKNavigationAction,
+                 windowFeatures: WKWindowFeatures) -> WKWebView? {
+        tabCollectionViewModel.appendAfterSelected()
+        guard let selectedViewModel = tabCollectionViewModel.selectedTabViewModel else {
+            os_log("%s: Selected tab view model is nil", log: OSLog.Category.general, type: .error, className)
+            return nil
+        }
+        selectedViewModel.webView.load(navigationAction.request)
+        return nil
     }
 
 }

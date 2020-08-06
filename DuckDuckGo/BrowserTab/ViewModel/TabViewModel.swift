@@ -30,7 +30,12 @@ class TabViewModel {
     private(set) var tab: Tab
     private var cancelables = Set<AnyCancellable>()
 
-    private(set) var webView: WKWebView
+    var webView: WebView {
+        didSet {
+            webViewStateObserver = WebViewStateObserver(webView: webView, tabViewModel: self)
+        }
+    }
+    
     private var webViewStateObserver: WebViewStateObserver?
 
     @Published var canGoForward: Bool = false
@@ -45,7 +50,7 @@ class TabViewModel {
     init(tab: Tab) {
         self.tab = tab
 
-        webView = WKWebView(frame: CGRect.zero, configuration: WKWebViewConfiguration.makeConfiguration())
+        webView = WebView(frame: CGRect.zero, configuration: WKWebViewConfiguration.makeConfiguration())
         webViewStateObserver = WebViewStateObserver(webView: webView, tabViewModel: self)
 
         bindUrl()
@@ -80,6 +85,8 @@ class TabViewModel {
 
         if let searchQuery = url.searchQuery {
             addressBarString = searchQuery
+        } else if url == URL.emptyPage {
+            addressBarString = ""
         } else {
             addressBarString = url.absoluteString
                 .dropPrefix(URL.Scheme.https.separated())
@@ -113,7 +120,7 @@ class TabViewModel {
             favicon = NSImage()
         }
     }
-
+    
 }
 
 fileprivate extension WKWebViewConfiguration {
