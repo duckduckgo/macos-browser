@@ -717,7 +717,7 @@
                                     <constraint firstAttribute="height" constant="38" id="zAs-5I-a2u"/>
                                 </constraints>
                                 <connections>
-                                    <segue destination="Nfk-V8-FAE" kind="embed" id="dL6-gI-9Hl"/>
+                                    <segue destination="Nfk-V8-FAE" kind="embed" destinationCreationSelector="createTabBarViewControllerWithCoder:sender:segueIdentifier:" id="dL6-gI-9Hl"/>
                                 </connections>
                             </containerView>
                             <containerView translatesAutoresizingMaskIntoConstraints="NO" id="wFH-xq-50o">

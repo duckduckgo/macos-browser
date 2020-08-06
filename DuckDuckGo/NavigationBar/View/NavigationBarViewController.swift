@@ -28,21 +28,28 @@ class NavigationBarViewController: NSViewController {
     @IBOutlet weak var reloadButton: NSButton!
     @IBOutlet weak var settingsButton: NSButton!
 
+    private var tabCollectionViewModel: TabCollectionViewModel
+
+    private var selectedTabViewModelCancelable: AnyCancellable?
     private var urlCancelable: AnyCancellable?
     private var searchSuggestionsCancelable: AnyCancellable?
     private var navigationButtonsCancelables = Set<AnyCancellable>()
 
-    var tabViewModel: TabViewModel? {
-        didSet {
-            bindUrl()
-            bindNavigationButtons()
-        }
+    required init?(coder: NSCoder) {
+        fatalError("BrowserTabViewController: Bad initializer")
+    }
+
+    init?(coder: NSCoder, tabCollectionViewModel: TabCollectionViewModel) {
+        self.tabCollectionViewModel = tabCollectionViewModel
+
+        super.init(coder: coder)
     }
 
     override func viewDidLoad() {
         super.viewDidLoad()
 
         autocompleteSearchField.searchFieldDelegate = self
+        bindSelectedTabViewModel()
     }
 
     override func viewDidLayout() {
@@ -52,58 +59,96 @@ class NavigationBarViewController: NSViewController {
     }
 
     @IBAction func goBackAction(_ sender: NSButton) {
-        tabViewModel?.tab.goBack()
+        guard let selectedTabViewModel = tabCollectionViewModel.selectedTabViewModel else {
+            os_log("%s: Selected tab view model is nil", log: OSLog.Category.general, type: .error, className)
+            return
+        }
+
+        selectedTabViewModel.tab.goBack()
     }
 
     @IBAction func goForwardAction(_ sender: NSButton) {
-        tabViewModel?.tab.goForward()
+        guard let selectedTabViewModel = tabCollectionViewModel.selectedTabViewModel else {
+            os_log("%s: Selected tab view model is nil", log: OSLog.Category.general, type: .error, className)
+            return
+        }
+
+        selectedTabViewModel.tab.goForward()
     }
 
     @IBAction func reloadAction(_ sender: NSButton) {
-        tabViewModel?.tab.reload()
+        guard let selectedTabViewModel = tabCollectionViewModel.selectedTabViewModel else {
+            os_log("%s: Selected tab view model is nil", log: OSLog.Category.general, type: .error, className)
+            return
+        }
+
+        selectedTabViewModel.tab.reload()
     }
 
     @IBAction func settingsButtonAction(_ sender: NSButton) {
     }
+
+    private func bindSelectedTabViewModel() {
+        selectedTabViewModelCancelable = tabCollectionViewModel.$selectedTabViewModel.sinkAsync { [weak self] _ in
+            self?.bindUrl()
+            self?.bindNavigationButtons()
+        }
+    }
     
     private func bindUrl() {
         urlCancelable?.cancel()
-        urlCancelable = tabViewModel?.tab.$url.sinkAsync { _ in self.refreshSearchField() }
+
+        guard let selectedTabViewModel = tabCollectionViewModel.selectedTabViewModel else {
+            autocompleteSearchField.stringValue = ""
+            return
+        }
+        urlCancelable = selectedTabViewModel.$addressBarString.sinkAsync { [weak self] _ in self?.refreshSearchField() }
     }
 
     private func bindNavigationButtons() {
         navigationButtonsCancelables.forEach { $0.cancel() }
         navigationButtonsCancelables.removeAll()
 
-        tabViewModel?.$canGoBack.sinkAsync { _ in self.setNavigationButtons() } .store(in: &navigationButtonsCancelables)
-        tabViewModel?.$canGoForward.sinkAsync { _ in self.setNavigationButtons() } .store(in: &navigationButtonsCancelables)
-        tabViewModel?.$canReload.sinkAsync { _ in self.setNavigationButtons() } .store(in: &navigationButtonsCancelables)
+        guard let selectedTabViewModel = tabCollectionViewModel.selectedTabViewModel else {
+            goBackButton.isEnabled = false
+            goForwardButton.isEnabled = false
+            reloadButton.isEnabled = false
+            return
+        }
+        selectedTabViewModel.$canGoBack.sinkAsync { [weak self] _ in self?.setNavigationButtons() } .store(in: &navigationButtonsCancelables)
+        selectedTabViewModel.$canGoForward.sinkAsync { [weak self] _ in self?.setNavigationButtons() } .store(in: &navigationButtonsCancelables)
+        selectedTabViewModel.$canReload.sinkAsync { [weak self] _ in self?.setNavigationButtons() } .store(in: &navigationButtonsCancelables)
     }
 
     private func refreshSearchField() {
-        guard let tabViewModel = tabViewModel else {
-            os_log("%s: Property tabViewModel is nil", log: OSLog.Category.general, type: .error, className)
+        guard let selectedTabViewModel = tabCollectionViewModel.selectedTabViewModel else {
+            os_log("%s: Selected tab view model is nil", log: OSLog.Category.general, type: .error, className)
             return
         }
-        autocompleteSearchField.stringValue = tabViewModel.addressBarString
+        autocompleteSearchField.stringValue = selectedTabViewModel.addressBarString
     }
 
     private func setNavigationButtons() {
-        goBackButton.isEnabled = tabViewModel?.canGoBack ?? false
-        goForwardButton.isEnabled = tabViewModel?.canGoForward ?? false
-        reloadButton.isEnabled = tabViewModel?.canReload ?? false
+        guard let selectedTabViewModel = tabCollectionViewModel.selectedTabViewModel else {
+            os_log("%s: Selected tab view model is nil", log: OSLog.Category.general, type: .error, className)
+            return
+        }
+
+        goBackButton.isEnabled = selectedTabViewModel.canGoBack
+        goForwardButton.isEnabled = selectedTabViewModel.canGoForward
+        reloadButton.isEnabled = selectedTabViewModel.canReload
     }
 
     private func setUrl() {
-        guard let tabViewModel = tabViewModel else {
-            os_log("%s: Property tabViewModel is nil", log: OSLog.Category.general, type: .error, className)
+        guard let selectedTabViewModel = tabCollectionViewModel.selectedTabViewModel else {
+            os_log("%s: Selected tab view model is nil", log: OSLog.Category.general, type: .error, className)
             return
         }
         guard let url = URL.makeURL(from: autocompleteSearchField.stringValue) else {
             os_log("%s: Making url from address bar string failed", log: OSLog.Category.general, type: .error, className)
             return
         }
-        tabViewModel.tab.url = url
+        selectedTabViewModel.tab.url = url
     }
 
 }

@@ -100,14 +100,16 @@ class SuggestionsViewController: NSViewController {
     }
 
     private func bindSuggestions() {
-        suggestionsCancelable = suggestionsViewModel.suggestions.$items.sinkAsync { _ in
-            self.displayNewSuggestions()
+        suggestionsCancelable = suggestionsViewModel.suggestions.$items.sinkAsync { [weak self] _ in
+            self?.displayNewSuggestions()
         }
     }
 
     private func bindSelectionIndex() {
-        selectionIndexCancelable = suggestionsViewModel.$selectionIndex.sinkAsync { _ in
-            self.selectRow(at: self.suggestionsViewModel.selectionIndex)
+        selectionIndexCancelable = suggestionsViewModel.$selectionIndex.sinkAsync { [weak self] _ in
+            if let weakSelf = self {
+                weakSelf.selectRow(at: weakSelf.suggestionsViewModel.selectionIndex)
+            }
         }
     }
 

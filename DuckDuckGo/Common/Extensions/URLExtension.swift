@@ -48,6 +48,10 @@ extension URL {
         return nil
     }
 
+    static var emptyPage: URL {
+        return URL(string:"about:blank")!
+    }
+
     // MARK: - Parameters
 
     enum ParameterError: Error {

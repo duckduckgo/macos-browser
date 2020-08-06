@@ -18,6 +18,13 @@
 
 import Cocoa
 import os.log
+import Combine
+
+protocol TabBarViewItemDelegate: AnyObject {
+
+    func tabBarViewItemDidCloseAction(_ tabBarViewItem: TabBarViewItem)
+
+}
 
 class TabBarViewItem: NSCollectionViewItem {
 
@@ -28,6 +35,11 @@ class TabBarViewItem: NSCollectionViewItem {
     @IBOutlet weak var closeButton: NSButton!
     @IBOutlet weak var rightSeparatorView: ColorView!
     @IBOutlet weak var bottomCornersView: ColorView!
+    @IBOutlet weak var loadingView: TabLoadingView!
+
+    private var cancelables = Set<AnyCancellable>()
+
+    weak var delegate: TabBarViewItemDelegate?
 
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -35,7 +47,8 @@ class TabBarViewItem: NSCollectionViewItem {
         view.wantsLayer = true
         view.layer?.cornerRadius = 7
         view.layer?.masksToBounds = false
-        setViews()
+
+        setViews()        
     }
 
     override var isSelected: Bool {
@@ -52,14 +65,46 @@ class TabBarViewItem: NSCollectionViewItem {
         return super.draggingImageComponents
     }
 
-    var isDragged = false {
-        didSet {
-            setViews()
+    @IBAction func closeButtonAction(_ sender: NSButton) {
+        delegate?.tabBarViewItemDidCloseAction(self)
+    }
+
+    func bind(tabViewModel: TabViewModel) {
+        clearBindings()
+
+        tabViewModel.$title.sink { title in
+            self.titleTextField.stringValue = title
+        }.store(in: &cancelables)
+
+        tabViewModel.$favicon.sink { favicon in
+            self.faviconImageView.image = favicon
+        }.store(in: &cancelables)
+
+        tabViewModel.$isLoading.sink { isLoading in
+            if isLoading {
+                self.loadingView.startAnimation()
+            } else {
+                self.loadingView.stopAnimation()
+            }
+        }.store(in: &cancelables)
+    }
+
+    func clear() {
+        clearBindings()
+        faviconImageView.image = nil
+        titleTextField.stringValue = ""
+    }
+
+    private func clearBindings() {
+        cancelables.forEach { (cancelable) in
+            cancelable.cancel()
         }
     }
 
-    func display(tabViewModel: TabViewModel) {
-        //todo
+    private var isDragged = false {
+        didSet {
+            setViews()
+        }
     }
 
     private func setViews() {

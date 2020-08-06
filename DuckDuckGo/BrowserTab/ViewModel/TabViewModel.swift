@@ -16,45 +16,113 @@
 //  limitations under the License.
 //
 
-import Foundation
+import Cocoa
 import Combine
+import WebKit
 
 class TabViewModel {
 
+    private enum Constants {
+        static let homeTitle = "Home"
+        static let homeFaviconImage = NSImage(named: "NSTouchBarSearchTemplate")!
+    }
+
     private(set) var tab: Tab
     private var cancelables = Set<AnyCancellable>()
+
+    private(set) var webView: WKWebView
+    private var webViewStateObserver: WebViewStateObserver?
 
     @Published var canGoForward: Bool = false
     @Published var canGoBack: Bool = false
     @Published var canReload: Bool = false
     @Published var isLoading: Bool = false
 
+    @Published private(set) var addressBarString: String = ""
+    @Published private(set) var title: String = Constants.homeTitle
+    @Published private(set) var favicon: NSImage = Constants.homeFaviconImage
+
     init(tab: Tab) {
         self.tab = tab
 
+        webView = WKWebView(frame: CGRect.zero, configuration: WKWebViewConfiguration.makeConfiguration())
+        webViewStateObserver = WebViewStateObserver(webView: webView, tabViewModel: self)
+
         bindUrl()
+        bindTitle()
+        bindFavicon()
     }
 
-    var addressBarString: String {
+    private func bindUrl() {
+        tab.$url.sinkAsync { [weak self] _ in
+            self?.updateCanReaload()
+            self?.updateAddressBarString()
+        } .store(in: &cancelables)
+    }
+
+    private func bindTitle() {
+        tab.$title.sinkAsync { [weak self] _ in self?.updateTitle() } .store(in: &cancelables)
+    }
+
+    private func bindFavicon() {
+        tab.$favicon.sinkAsync { [weak self] _ in self?.updateFavicon() } .store(in: &cancelables)
+    }
+
+    private func updateCanReaload() {
+        self.canReload = self.tab.url != nil
+    }
+
+    private func updateAddressBarString() {
         guard let url = tab.url else {
-            return ""
+            addressBarString = ""
+            return
         }
 
         if let searchQuery = url.searchQuery {
-            return searchQuery
+            addressBarString = searchQuery
         } else {
-            return url.absoluteString
+            addressBarString = url.absoluteString
                 .dropPrefix(URL.Scheme.https.separated())
                 .dropPrefix(URL.Scheme.http.separated())
         }
     }
 
-    private func bindUrl() {
-        tab.$url.sinkAsync { _ in self.updateCanReaload() } .store(in: &cancelables)
+    private func updateTitle() {
+        if tab.url == nil {
+            title = Constants.homeTitle
+            return
+        }
+
+        if let title = tab.title {
+            self.title = title
+        } else {
+            title = addressBarString
+        }
     }
 
-    private func updateCanReaload() {
-        self.canReload = self.tab.url != nil
+    private func updateFavicon() {
+        if tab.url == nil {
+            favicon = Constants.homeFaviconImage
+            return
+        }
+
+        if let favicon = tab.favicon {
+            self.favicon = favicon
+        } else {
+            //todo default favicon
+            favicon = NSImage()
+        }
+    }
+
+}
+
+fileprivate extension WKWebViewConfiguration {
+
+    static func makeConfiguration() -> WKWebViewConfiguration {
+        let configuration = WKWebViewConfiguration()
+        configuration.websiteDataStore = WKWebsiteDataStore.default()
+        configuration.allowsAirPlayForMediaPlayback = true
+        return configuration
     }
 
 }

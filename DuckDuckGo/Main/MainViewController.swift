@@ -25,39 +25,45 @@ class MainViewController: NSViewController {
     @IBOutlet weak var navigationBarContainerView: NSView!
     @IBOutlet weak var webContainerView: NSView!
 
+    var tabBarViewController: TabBarViewController?
     var navigationBarViewController: NavigationBarViewController?
     var browserTabViewController: BrowserTabViewController?
 
     var tabCollectionViewModel = TabCollectionViewModel()
 
-    override func viewDidLoad() {
-        createInitialTab()
+    @IBSegueAction
+    func createTabBarViewController(coder: NSCoder, sender: Any?, segueIdentifier: String?) -> TabBarViewController? {
+        guard let tabBarViewController = TabBarViewController(coder: coder, tabCollectionViewModel: tabCollectionViewModel) else {
+            os_log("MainViewController: Failed to init TabBarViewController", log: OSLog.Category.general, type: .error)
+            return nil
+        }
+        
+        self.tabBarViewController = tabBarViewController
+        return tabBarViewController
     }
 
     @IBSegueAction
     func createNavigationBarViewController(coder: NSCoder, sender: Any?, segueIdentifier: String?) -> NavigationBarViewController? {
-        let navigationBarViewController = NavigationBarViewController(coder: coder)
+        guard let navigationBarViewController = NavigationBarViewController(coder: coder, tabCollectionViewModel: tabCollectionViewModel) else {
+            os_log("MainViewController: Failed to init NavigationBarViewController", log: OSLog.Category.general, type: .error)
+            return nil
+        }
+
         self.navigationBarViewController = navigationBarViewController
-        navigationBarViewController?.tabViewModel = tabCollectionViewModel.selectedTabViewModel
         return navigationBarViewController
     }
 
     @IBSegueAction
     func createWebViewController(coder: NSCoder, sender: Any?, segueIdentifier: String?) -> BrowserTabViewController? {
-        guard let selectedTabViewModel = tabCollectionViewModel.selectedTabViewModel else {
-            os_log("%s: No selected tabViewModel", log: OSLog.Category.general, type: .error, className)
+        guard let browserTabViewController = BrowserTabViewController(coder: coder,
+                                                                tabCollectionViewModel: tabCollectionViewModel,
+                                                                historyViewModel: HistoryViewModel()) else {
+            os_log("MainViewController: Failed to init BrowserTabViewController", log: OSLog.Category.general, type: .error)
             return nil
         }
-        let browserTabViewController = BrowserTabViewController(coder: coder,
-                                                                tabViewModel: selectedTabViewModel,
-                                                                historyViewModel: HistoryViewModel())
+
         self.browserTabViewController = browserTabViewController
         return browserTabViewController
-    }
-
-    private func createInitialTab() {
-        tabCollectionViewModel.tabCollection.prependNewTab()
-        tabCollectionViewModel.selectionIndex = 0
     }
     
 }

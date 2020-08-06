@@ -23,24 +23,32 @@ class TabLoadingView: NSView {
     static var images: [NSImage] = {
         var images = [NSImage]()
         for i in 0..<120 {
-            if let image = NSImage(named: "loading-\(i)") {
+            if let image = NSImage(named: "Loading-\(i)") {
                 images.append(image)
             }
         }
         return images
     }()
 
+    override func awakeFromNib() {
+        super.awakeFromNib()
+
+        wantsLayer = true
+    }
+
+    func startAnimation() {
+        layer?.add(animation, forKey: Constants.animationKeyPath)
+    }
+
+    func stopAnimation() {
+        layer?.removeAnimation(forKey: Constants.animationKeyPath)
+    }
+
     private enum Constants {
         static let animationKeyPath = "contents"
     }
 
-    override func awakeFromNib() {
-        super.awakeFromNib()
-
-//        addLayerAnimation()
-    }
-
-    private func addLayerAnimation() {
+    private lazy var animation: CAKeyframeAnimation = {
         let keyFrameAnimation = CAKeyframeAnimation(keyPath: Constants.animationKeyPath)
         keyFrameAnimation.values = Self.images
         keyFrameAnimation.calculationMode = .discrete
@@ -50,9 +58,7 @@ class TabLoadingView: NSView {
         keyFrameAnimation.isRemovedOnCompletion = false
         keyFrameAnimation.beginTime = 0.0
         keyFrameAnimation.duration = 4
-
-        wantsLayer = true
-        layer?.add(keyFrameAnimation, forKey: Constants.animationKeyPath)
-    }
+        return keyFrameAnimation
+    }()
     
 }

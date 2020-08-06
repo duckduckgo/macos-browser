@@ -16,7 +16,7 @@
 //  limitations under the License.
 //
 
-import Foundation
+import Cocoa
 
 protocol TabActionDelegate: AnyObject {
 
@@ -28,7 +28,25 @@ protocol TabActionDelegate: AnyObject {
 
 class Tab {
 
-    @Published var url: URL?
+    init(faviconService: FaviconService) {
+        self.faviconService = faviconService
+    }
+
+    convenience init() {
+        self.init(faviconService: LocalFaviconService())
+    }
+
+    let faviconService: FaviconService
+
+    @Published var url: URL? {
+        willSet {
+            if newValue?.host != url?.host, let newHost = newValue?.host {
+                fetchFavicon(for: newHost)
+            }
+        }
+    }
+    @Published var title: String?
+    @Published var favicon: NSImage?
 
     weak var actionDelegate: TabActionDelegate?
 
@@ -44,12 +62,23 @@ class Tab {
         actionDelegate?.tabReloadAction(self)
     }
 
+    private func fetchFavicon(for host: String) {
+        faviconService.fetchFavicon(for: host) { (image, error) in
+            guard error == nil, let image = image else {
+                self.favicon = nil
+                return
+            }
+
+            self.favicon = image
+        }
+    }
+
 }
 
 extension Tab: Equatable {
 
     static func == (lhs: Tab, rhs: Tab) -> Bool {
-        lhs === rhs
+        ObjectIdentifier(lhs) == ObjectIdentifier (rhs)
     }
 
 }
@@ -57,7 +86,7 @@ extension Tab: Equatable {
 extension Tab: Hashable {
 
     func hash(into hasher: inout Hasher) {
-        hasher.combine(url)
+        hasher.combine(ObjectIdentifier(self))
     }
 
 }

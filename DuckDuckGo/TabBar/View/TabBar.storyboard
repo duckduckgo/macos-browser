@@ -45,7 +45,7 @@
                                     <rect key="frame" x="0.0" y="0.0" width="685" height="32"/>
                                     <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                     <subviews>
-                                        <collectionView selectable="YES" id="OEu-5P-cRF">
+                                        <collectionView selectable="YES" allowsEmptySelection="NO" id="OEu-5P-cRF">
                                             <rect key="frame" x="0.0" y="0.0" width="685" height="32"/>
                                             <autoresizingMask key="autoresizingMask" heightSizable="YES"/>
                                             <collectionViewFlowLayout key="collectionViewLayout" scrollDirection="horizontal" id="oAv-jh-KDw">
@@ -60,10 +60,6 @@
                                     </subviews>
                                     <color key="backgroundColor" name="ClearColor"/>
                                 </clipView>
-                                <constraints>
-                                    <constraint firstAttribute="height" constant="32" id="VKd-ux-Wjv"/>
-                                    <constraint firstAttribute="width" relation="greaterThanOrEqual" constant="120" id="zdL-nq-TSG"/>
-                                </constraints>
                                 <scroller key="horizontalScroller" wantsLayer="YES" verticalHuggingPriority="750" horizontal="YES" id="f6A-N1-Ed1">
                                     <rect key="frame" x="0.0" y="16" width="685" height="16"/>
                                     <autoresizingMask key="autoresizingMask"/>
@@ -115,7 +111,10 @@
         <image name="Add" width="14" height="14"/>
         <image name="Burn" width="12" height="14"/>
         <namedColor name="ButtonColor">
-            <color red="0.28627450980392155" green="0.28627450980392155" blue="0.28627450980392155" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+            <color red="0.28600001335144043" green="0.28600001335144043" blue="0.28600001335144043" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+        </namedColor>
+        <namedColor name="ClearColor">
+            <color red="1" green="1" blue="1" alpha="0.0" colorSpace="custom" customColorSpace="sRGB"/>
         </namedColor>
         <namedColor name="ClearColor">
             <color red="1" green="1" blue="1" alpha="0.0" colorSpace="custom" customColorSpace="sRGB"/>

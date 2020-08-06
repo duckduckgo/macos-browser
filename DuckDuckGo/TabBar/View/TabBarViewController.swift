@@ -18,18 +18,50 @@
 
 import Cocoa
 import os.log
+import Combine
 
 class TabBarViewController: NSViewController {
 
     @IBOutlet weak var collectionView: NSCollectionView!
 
-    //todo remove
-    var items = ["Test 1", "Test 2", "Test 3", "Test 4", "Test 5", "Test 6", "Test 7", "Test 8"]
+    private let tabCollectionViewModel: TabCollectionViewModel
+    private var tabsCancelable: AnyCancellable?
+    private var selectionIndexCancelable: AnyCancellable?
+
+    required init?(coder: NSCoder) {
+        fatalError("TabBarViewController: Bad initializer")
+    }
+
+    init?(coder: NSCoder, tabCollectionViewModel: TabCollectionViewModel) {
+        self.tabCollectionViewModel = tabCollectionViewModel
+
+        super.init(coder: coder)
+    }
 
     override func viewDidLoad() {
         super.viewDidLoad()
 
         setupCollectionView()
+        if #available(OSX 10.13, *) {
+            if let contentSize = self.collectionView.collectionViewLayout?.collectionViewContentSize {
+              self.collectionView.setFrameSize(contentSize)
+            }
+          }
+        bindTabs()
+        bindSelectionIndex()
+    }
+
+    override func viewWillAppear() {
+        super.viewWillAppear()
+
+        addInitialTab()
+    }
+
+    @IBAction func burnButtonAction(_ sender: NSButton) {
+    }
+
+    @IBAction func addButtonAction(_ sender: NSButton) {
+        tabCollectionViewModel.appendNewTab()
     }
 
     private func setupCollectionView() {
@@ -42,17 +74,67 @@ class TabBarViewController: NSViewController {
         collectionView.setDraggingSourceOperationMask(NSDragOperation.move, forLocal: false)
     }
 
-    @IBAction func burnButtonAction(_ sender: NSButton) {
+    private func bindTabs() {
+        tabsCancelable = tabCollectionViewModel.tabCollection.$tabs.sinkAsync { [weak self] newTabs in
+            self?.reloadCollectionViewIfNeeded(newTabs)
+        }
     }
 
-    @IBAction func addButtonAction(_ sender: NSButton) {
+    private func reloadCollectionViewIfNeeded(_ newTabs: [Tab]) {
+        if tabCollectionViewModel.tabCollection.tabs.count > collectionView.numberOfItems(inSection: 0){
+            let lastTabIndex = self.tabCollectionViewModel.tabCollection.tabs.count - 1
+            let lastTabIndexPath = IndexPath(item: lastTabIndex, section: 0)
+            let lastTabIndexPathSet = Set(arrayLiteral: lastTabIndexPath)
+
+            self.collectionView.animator().insertItems(at: lastTabIndexPathSet)
+
+            //todo scrolling to inserted item
+//            var selectionRect = self.collectionView.frameForItem(at: lastTabIndexPath.item)
+//            let value = self.collectionView.animator().scrollToVisible(selectionRect)
+        }
+    }
+
+    private func bindSelectionIndex() {
+        selectionIndexCancelable = tabCollectionViewModel.$selectionIndex.sinkAsync { [weak self] _ in
+            self?.reloadSelection()
+        }
+    }
+
+    private func reloadSelection() {
+        guard collectionView.selectionIndexPaths.first?.item != tabCollectionViewModel.selectionIndex else {
+            return
+        }
+
+        guard let selectionIndex = tabCollectionViewModel.selectionIndex else {
+            os_log("TabBarViewController: Selection index is nil", log: OSLog.Category.general, type: .error)
+            return
+        }
+
+        let newSelectionIndexPath = IndexPath(item: selectionIndex, section: 0)
+
+        collectionView.deselectItems(at: collectionView.selectionIndexPaths)
+        collectionView.selectItems(at: [newSelectionIndexPath], scrollPosition: .nearestVerticalEdge)
+    }
+
+    private func addInitialTab() {
+        tabCollectionViewModel.appendNewTab()
     }
 
     // MARK: - Selection
 
     private func selectItem(at indexPath: IndexPath) {
-        collectionView.deselectAll(self)
-        collectionView.selectItems(at: [indexPath], scrollPosition: .nearestHorizontalEdge)
+        tabCollectionViewModel.select(at: indexPath.item)
+    }
+
+    // MARK: - Closing
+
+    private func closeItem(at indexPath: IndexPath) {
+        tabCollectionViewModel.remove(at: indexPath.item)
+        collectionView.deleteItems(at: Set(arrayLiteral: indexPath))
+
+        if indexPath.item == 0 && tabCollectionViewModel.tabCollection.tabs.count == 0 {
+            NSApplication.shared.terminate(self)
+        }
     }
 
     // MARK: - Drag and Drop
@@ -71,15 +153,11 @@ class TabBarViewController: NSViewController {
         guard index != newIndex else {
             return
         }
-
-        let adjustedNewIndex = index < newIndex ? newIndex - 1 : newIndex
-        let item = items[index]
-
         lastIndexPath = newIndexPath
 
-        items.remove(at: index)
-        items.insert(item, at: adjustedNewIndex)
+        tabCollectionViewModel.tabCollection.moveItem(at: indexPath.item, to: newIndexPath.item)
         collectionView.animator().moveItem(at: indexPath, to: newIndexPath)
+        tabCollectionViewModel.select(at: newIndexPath.item)
     }
     
 }
@@ -91,7 +169,7 @@ extension TabBarViewController: NSCollectionViewDataSource {
     }
     
     func collectionView(_ collectionView: NSCollectionView, numberOfItemsInSection section: Int) -> Int {
-        return items.count
+        return tabCollectionViewModel.tabCollection.tabs.count
     }
 
     func collectionView(_ collectionView: NSCollectionView, itemForRepresentedObjectAt indexPath: IndexPath) -> NSCollectionViewItem {
@@ -100,12 +178,15 @@ extension TabBarViewController: NSCollectionViewDataSource {
             os_log("", log: OSLog.Category.general, type: .error)
             return item
         }
+        
+        guard let tabViewModel = tabCollectionViewModel.tabViewModel(at: indexPath.item) else {
+            tabBarViewItem.clear()
+            return tabBarViewItem
+        }
 
-        tabBarViewItem.titleTextField.stringValue = items[indexPath.item]
-        tabBarViewItem.faviconImageView.image = NSImage(named: "NSTouchBarSearchTemplate")
-        //todo
-//        tabBarViewItem.display()
-        return item
+        tabBarViewItem.delegate = self
+        tabBarViewItem.bind(tabViewModel: tabViewModel)
+        return tabBarViewItem
     }
     
 }
@@ -133,7 +214,11 @@ extension TabBarViewController: NSCollectionViewDelegate {
 
     func collectionView(_ collectionView: NSCollectionView,
                         pasteboardWriterForItemAt indexPath: IndexPath) -> NSPasteboardWriting? {
-        return items[indexPath.item] as NSString
+        if let url = tabCollectionViewModel.tabCollection.tabs[indexPath.item].url {
+            return url.absoluteString as NSString
+        } else {
+            return "" as NSString
+        }
     }
 
     func collectionView(_ collectionView: NSCollectionView,
@@ -192,6 +277,19 @@ extension TabBarViewController: NSCollectionViewDelegate {
         }
 
         return true
+    }
+
+}
+
+extension TabBarViewController: TabBarViewItemDelegate {
+
+    func tabBarViewItemDidCloseAction(_ tabBarViewItem: TabBarViewItem) {
+        guard let indexPath = collectionView.indexPath(for: tabBarViewItem) else {
+            os_log("TabBarViewController: Failed to get indexPath", log: OSLog.Category.general, type: .error)
+            return
+        }
+
+        closeItem(at: indexPath)
     }
 
 }

@@ -22,22 +22,23 @@ import os.log
 
 class WebViewStateObserver: NSObject {
 
-    let webView: WKWebView
-    let tabViewModel: TabViewModel
+    weak var webView: WKWebView?
+    weak var tabViewModel: TabViewModel?
 
     init(webView: WKWebView, tabViewModel: TabViewModel) {
         self.webView = webView
         self.tabViewModel = tabViewModel
         super.init()
 
-        observeWebview()
+        observeWebview(webView)
     }
 
-    private func observeWebview() {
+    private func observeWebview(_ webView: WKWebView) {
         webView.addObserver(self, forKeyPath: #keyPath(WKWebView.url), options: .new, context: nil)
         webView.addObserver(self, forKeyPath: #keyPath(WKWebView.canGoBack), options: .new, context: nil)
         webView.addObserver(self, forKeyPath: #keyPath(WKWebView.canGoForward), options: .new, context: nil)
         webView.addObserver(self, forKeyPath: #keyPath(WKWebView.isLoading), options: .new, context: nil)
+        webView.addObserver(self, forKeyPath: #keyPath(WKWebView.title), options: .new, context: nil)
     }
 
     // swiftlint:disable block_based_kvo
@@ -50,11 +51,22 @@ class WebViewStateObserver: NSObject {
             return
         }
 
+        guard let tabViewModel = tabViewModel else {
+            os_log("%s: TabViewModel was released from memory", log: OSLog.Category.general, type: .error, className)
+            return
+        }
+
+        guard let webView = webView else {
+            os_log("%s: TabViewModel was released from memory", log: OSLog.Category.general, type: .error, className)
+            return
+        }
+
         switch keyPath {
         case #keyPath(WKWebView.url): tabViewModel.tab.url = webView.url
         case #keyPath(WKWebView.canGoBack): tabViewModel.canGoBack = webView.canGoBack
         case #keyPath(WKWebView.canGoForward): tabViewModel.canGoForward = webView.canGoForward
         case #keyPath(WKWebView.isLoading): tabViewModel.isLoading = webView.isLoading
+        case #keyPath(WKWebView.title): tabViewModel.tab.title = webView.title
         default:
             os_log("%s: keyPath %s not handled", log: OSLog.Category.general, type: .error, className, keyPath)
             super.observeValue(forKeyPath: keyPath, of: object, change: change, context: context)

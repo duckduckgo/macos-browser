@@ -23,9 +23,14 @@ import Combine
 class TabCollectionViewModel {
 
     private(set) var tabCollection: TabCollection
+    
     private(set) var tabViewModels = [Tab: TabViewModel]()
-
-    @Published var selectionIndex: Int?
+    @Published private(set) var selectionIndex: Int? {
+        didSet {
+            updateSelectedTabViewModel()
+        }
+    }
+    @Published private(set) var selectedTabViewModel: TabViewModel?
 
     private var cancelables = Set<AnyCancellable>()
 
@@ -40,11 +45,13 @@ class TabCollectionViewModel {
         self.init(tabCollection: tabCollection)
     }
 
-    var selectedTabViewModel: TabViewModel? {
+    func updateSelectedTabViewModel() {
         guard let selectionIndex = selectionIndex else {
-            return nil
+            selectedTabViewModel = nil
+            return
         }
-        return tabViewModel(at: selectionIndex)
+        let selectedTabViewModel = tabViewModel(at: selectionIndex)
+        self.selectedTabViewModel = selectedTabViewModel
     }
 
     func tabViewModel(at index: Int) -> TabViewModel? {
@@ -54,20 +61,61 @@ class TabCollectionViewModel {
         }
 
         let tab = tabCollection.tabs[index]
-        if tabViewModels[tab] == nil {
-            tabViewModels[tab] = TabViewModel(tab: tab)
-        }
-
         return tabViewModels[tab]
     }
 
-    private func bindTabs() {
-        tabCollection.$tabs.sinkAsync { _ in self.removeViewModelsIfNeeded() } .store(in: &cancelables)
+    func select(at index: Int) {
+        guard index >= 0, index < tabCollection.tabs.count else {
+            os_log("TabCollectionViewModel: Index out of bounds", log: OSLog.Category.general, type: .error)
+            selectionIndex = nil
+            return
+        }
+
+        selectionIndex = index
     }
 
-    private func removeViewModelsIfNeeded() {
+    func appendNewTab() {
+        tabCollection.append(tab: Tab())
+        select(at: tabCollection.tabs.count - 1)
+    }
+
+    func remove(at index: Int) {
+        guard index >= 0, index < tabCollection.tabs.count else {
+            os_log("TabCollection: Index out of bounds", log: OSLog.Category.general, type: .error)
+            return
+        }
+
+        tabCollection.remove(at: index)
+        guard let selectionIndex = selectionIndex else {
+            os_log("TabCollection: No tab selected", log: OSLog.Category.general, type: .error)
+            return
+        }
+
+        if selectionIndex >= index {
+            select(at: max(selectionIndex - 1, 0))
+        } else {
+            updateSelectedTabViewModel()
+        }
+    }
+
+    private func bindTabs() {
+        tabCollection.$tabs.sink { newTabs in
+            self.removeTabViewModelsIfNeeded(newTabs: newTabs)
+            self.addTabViewModelsIfNeeded(newTabs: newTabs)
+        } .store(in: &cancelables)
+    }
+
+    private func removeTabViewModelsIfNeeded(newTabs: [Tab]) {
         tabViewModels = tabViewModels.filter { (item) -> Bool in
             tabCollection.tabs.contains(item.key)
+        }
+    }
+
+    private func addTabViewModelsIfNeeded(newTabs: [Tab]) {
+        newTabs.forEach { (tab) in
+            if tabViewModels[tab] == nil {
+                tabViewModels[tab] = TabViewModel(tab: tab)
+            }
         }
     }
 

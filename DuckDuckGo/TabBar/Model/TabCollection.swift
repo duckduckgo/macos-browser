@@ -27,12 +27,23 @@ class TabCollection {
         listenUrlEvents()
     }
 
-    func prependNewTab() {
-        prepend(tab: Tab())
+    func append(tab: Tab) {
+        tabs.append(tab)
     }
 
-    func prepend(tab: Tab) {
-        tabs.insert(tab, at: 0)
+    func remove(at index: Int) {
+        tabs.remove(at: index)
+    }
+
+    func moveItem(at index: Int, to newIndex: Int) {
+        if index == newIndex {
+            return
+        }
+        if abs(index - newIndex) == 1 {
+            tabs.swapAt(index, newIndex)
+            return
+        }
+        tabs.insert(tabs.remove(at: index), at: newIndex)
     }
 
 }
@@ -59,7 +70,7 @@ extension TabCollection {
 
         let newTab = Tab()
         newTab.url = url
-        prepend(tab: newTab)
+        append(tab: newTab)
     }
 
 }

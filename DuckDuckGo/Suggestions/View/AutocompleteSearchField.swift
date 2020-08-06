@@ -66,8 +66,8 @@ class AutocompleteSearchField: NSSearchField {
     }
 
     private func bindSelectedSuggestionViewModel() {
-        selectedSuggestionViewModelCancellable = suggestionsViewModel.$selectedSuggestionViewModel.sinkAsync { _ in
-            self.displaySelectedSuggestionViewModel()
+        selectedSuggestionViewModelCancellable = suggestionsViewModel.$selectedSuggestionViewModel.sinkAsync { [weak self] _ in
+            self?.displaySelectedSuggestionViewModel()
         }
     }
 

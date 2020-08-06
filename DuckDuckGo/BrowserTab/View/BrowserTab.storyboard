@@ -3,7 +3,6 @@
     <dependencies>
         <deployment identifier="macosx"/>
         <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="17132"/>
-        <plugIn identifier="com.apple.WebKit2IBPlugin" version="17132"/>
         <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
     </dependencies>
     <scenes>
@@ -15,13 +14,6 @@
                         <rect key="frame" x="0.0" y="0.0" width="512" height="492"/>
                         <autoresizingMask key="autoresizingMask"/>
                         <subviews>
-                            <wkWebView wantsLayer="YES" translatesAutoresizingMaskIntoConstraints="NO" id="Ibb-fk-h2E">
-                                <rect key="frame" x="0.0" y="0.0" width="512" height="492"/>
-                                <wkWebViewConfiguration key="configuration">
-                                    <audiovisualMediaTypes key="mediaTypesRequiringUserActionForPlayback" none="YES"/>
-                                    <wkPreferences key="preferences"/>
-                                </wkWebViewConfiguration>
-                            </wkWebView>
                             <customView hidden="YES" translatesAutoresizingMaskIntoConstraints="NO" id="bol-qn-wuI" customClass="ColorView" customModule="DuckDuckGo_Privacy_Browser" customModuleProvider="target">
                                 <rect key="frame" x="0.0" y="0.0" width="512" height="492"/>
                                 <subviews>
@@ -56,19 +48,14 @@
                             </customView>
                         </subviews>
                         <constraints>
-                            <constraint firstAttribute="trailing" secondItem="Ibb-fk-h2E" secondAttribute="trailing" id="2Ob-Kf-VRs"/>
                             <constraint firstItem="bol-qn-wuI" firstAttribute="leading" secondItem="aev-t9-Epw" secondAttribute="leading" id="ROr-Er-6IN"/>
-                            <constraint firstAttribute="bottom" secondItem="Ibb-fk-h2E" secondAttribute="bottom" id="WBf-bX-5NZ"/>
                             <constraint firstAttribute="trailing" secondItem="bol-qn-wuI" secondAttribute="trailing" id="ea5-1F-Gwm"/>
                             <constraint firstAttribute="bottom" secondItem="bol-qn-wuI" secondAttribute="bottom" id="ef9-7H-3hy"/>
-                            <constraint firstItem="Ibb-fk-h2E" firstAttribute="top" secondItem="aev-t9-Epw" secondAttribute="top" id="gHC-Hi-Wup"/>
-                            <constraint firstItem="Ibb-fk-h2E" firstAttribute="leading" secondItem="aev-t9-Epw" secondAttribute="leading" id="okm-Eq-6Ac"/>
                             <constraint firstItem="bol-qn-wuI" firstAttribute="top" secondItem="aev-t9-Epw" secondAttribute="top" id="v8E-6v-8Tx"/>
                         </constraints>
                     </view>
                     <connections>
                         <outlet property="errorView" destination="bol-qn-wuI" id="gbL-AN-fxw"/>
-                        <outlet property="webView" destination="Ibb-fk-h2E" id="af9-Oz-tYi"/>
                     </connections>
                 </viewController>
                 <customObject id="xRE-VM-YeG" userLabel="First Responder" customClass="NSResponder" sceneMemberID="firstResponder"/>
