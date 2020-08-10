@@ -57,6 +57,12 @@ class TabBarViewController: NSViewController {
         tabCollectionViewModel.tabCollection.delegate = self
     }
 
+    override func viewDidLayout() {
+        super.viewDidLayout()
+
+        collectionView.collectionViewLayout?.invalidateLayout()
+    }
+
     @IBAction func burnButtonAction(_ sender: NSButton) {
     }
 
