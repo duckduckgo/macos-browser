@@ -99,7 +99,7 @@ class TabBarViewController: NSViewController {
         let newSelectionIndexPath = IndexPath(item: selectionIndex, section: 0)
 
         collectionView.deselectItems(at: collectionView.selectionIndexPaths)
-        collectionView.animator().selectItems(at: [newSelectionIndexPath], scrollPosition: .nearestVerticalEdge)
+        collectionView.animator().selectItems(at: [newSelectionIndexPath], scrollPosition: NSCollectionView.ScrollPosition(rawValue: 0))
     }
 
     private func addInitialTab() {
@@ -169,7 +169,12 @@ extension TabBarViewController: TabCollectionDelegate {
         let lastIndex = tabCollectionViewModel.tabCollection.tabs.count - 1
         let lastIndexPath = IndexPath(item: lastIndex, section: 0)
         let lastIndexPathSet = Set(arrayLiteral: lastIndexPath)
-        collectionView.animator().insertItems(at: lastIndexPathSet)
+
+        collectionView.animator().performBatchUpdates {
+            collectionView.animator().insertItems(at: lastIndexPathSet)
+        } completionHandler: { _ in
+            self.collectionView.animator().scroll(CGPoint(x: self.collectionView.bounds.size.width, y: 0))
+        }
     }
 
     func tabCollection(_ tabCollection: TabCollection, didInsert tab: Tab, at index: Int) {
