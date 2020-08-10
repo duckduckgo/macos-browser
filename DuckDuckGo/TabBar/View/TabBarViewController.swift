@@ -99,7 +99,7 @@ class TabBarViewController: NSViewController {
         let newSelectionIndexPath = IndexPath(item: selectionIndex, section: 0)
 
         collectionView.deselectItems(at: collectionView.selectionIndexPaths)
-        collectionView.animator().selectItems(at: [newSelectionIndexPath], scrollPosition: NSCollectionView.ScrollPosition(rawValue: 0))
+        collectionView.selectItems(at: [newSelectionIndexPath], scrollPosition: NSCollectionView.ScrollPosition(rawValue: 0))
     }
 
     private func addInitialTab() {
