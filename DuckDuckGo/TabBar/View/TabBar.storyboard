@@ -84,18 +84,38 @@
                                     <action selector="addButtonAction:" target="uSf-9n-QMw" id="Nx9-xc-NzJ"/>
                                 </connections>
                             </button>
+                            <imageView horizontalHuggingPriority="251" verticalHuggingPriority="251" translatesAutoresizingMaskIntoConstraints="NO" id="u4N-Qc-LMf">
+                                <rect key="frame" x="760" y="0.0" width="5" height="38"/>
+                                <constraints>
+                                    <constraint firstAttribute="width" constant="5" id="tqI-pU-ZWB"/>
+                                </constraints>
+                                <imageCell key="cell" refusesFirstResponder="YES" alignment="left" imageScaling="axesIndependently" image="TabBarShadowRight" id="qd0-z2-M5R"/>
+                            </imageView>
+                            <imageView horizontalHuggingPriority="251" verticalHuggingPriority="251" translatesAutoresizingMaskIntoConstraints="NO" id="zsA-or-9Xo">
+                                <rect key="frame" x="80" y="0.0" width="5" height="38"/>
+                                <constraints>
+                                    <constraint firstAttribute="width" constant="5" id="Zrh-wT-hvv"/>
+                                </constraints>
+                                <imageCell key="cell" refusesFirstResponder="YES" alignment="left" imageScaling="axesIndependently" image="TabBarShadowLeft" id="crE-9i-66r"/>
+                            </imageView>
                         </subviews>
                         <constraints>
                             <constraint firstAttribute="trailing" secondItem="8Av-Au-VBq" secondAttribute="trailing" id="04T-2h-lX4"/>
+                            <constraint firstItem="zsA-or-9Xo" firstAttribute="top" secondItem="JQD-ov-FCr" secondAttribute="top" id="CKr-JO-cA6"/>
+                            <constraint firstItem="zsA-or-9Xo" firstAttribute="leading" secondItem="JQD-ov-FCr" secondAttribute="leading" constant="80" id="Dua-zM-HOB"/>
+                            <constraint firstAttribute="bottom" secondItem="zsA-or-9Xo" secondAttribute="bottom" id="ErC-gw-bFR"/>
+                            <constraint firstAttribute="bottom" secondItem="u4N-Qc-LMf" secondAttribute="bottom" id="Fc4-Wo-qz3"/>
                             <constraint firstAttribute="trailing" secondItem="qXs-b0-tWI" secondAttribute="trailing" constant="40" id="Fsr-hL-HYK"/>
                             <constraint firstAttribute="trailing" secondItem="O0X-yp-zLn" secondAttribute="trailing" constant="80" id="FuJ-6x-Wa5"/>
                             <constraint firstItem="qXs-b0-tWI" firstAttribute="centerY" secondItem="JQD-ov-FCr" secondAttribute="centerY" constant="2" id="Iib-Si-FQP"/>
                             <constraint firstAttribute="bottom" secondItem="O0X-yp-zLn" secondAttribute="bottom" id="MIL-fB-QcY"/>
+                            <constraint firstAttribute="trailing" secondItem="u4N-Qc-LMf" secondAttribute="trailing" constant="80" id="NwE-Ic-2Vk"/>
                             <constraint firstItem="8Av-Au-VBq" firstAttribute="top" secondItem="JQD-ov-FCr" secondAttribute="top" id="UNA-xd-vb7"/>
                             <constraint firstItem="O0X-yp-zLn" firstAttribute="top" secondItem="JQD-ov-FCr" secondAttribute="top" constant="6" id="ckd-HT-jfP"/>
                             <constraint firstItem="8Av-Au-VBq" firstAttribute="leading" secondItem="JQD-ov-FCr" secondAttribute="leading" id="djE-ZR-Zcb"/>
                             <constraint firstItem="O0X-yp-zLn" firstAttribute="leading" secondItem="JQD-ov-FCr" secondAttribute="leading" constant="80" id="fH2-uF-lal"/>
                             <constraint firstAttribute="bottom" secondItem="8Av-Au-VBq" secondAttribute="bottom" id="pat-VC-dVb"/>
+                            <constraint firstItem="u4N-Qc-LMf" firstAttribute="top" secondItem="JQD-ov-FCr" secondAttribute="top" id="zB8-BE-pJR"/>
                         </constraints>
                     </view>
                     <connections>
@@ -110,6 +130,8 @@
     <resources>
         <image name="Add" width="14" height="14"/>
         <image name="Burn" width="12" height="14"/>
+        <image name="TabBarShadowLeft" width="5" height="34"/>
+        <image name="TabBarShadowRight" width="5" height="34"/>
         <namedColor name="ButtonColor">
             <color red="0.28600001335144043" green="0.28600001335144043" blue="0.28600001335144043" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
         </namedColor>

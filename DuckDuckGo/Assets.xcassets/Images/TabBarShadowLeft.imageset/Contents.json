@@ -1,12 +1,12 @@
 {
   "images" : [
     {
-      "filename" : "Overflow-Shadow-Right.png",
+      "filename" : "Overflow-Shadow-Left.png",
       "idiom" : "universal",
       "scale" : "1x"
     },
     {
-      "filename" : "Overflow-Shadow-Right@2x.png",
+      "filename" : "Overflow-Shadow-Left@2x.png",
       "idiom" : "universal",
       "scale" : "2x"
     },
