@@ -327,7 +327,7 @@ extension TabBarViewController: NSCollectionViewDelegate {
 
 extension TabBarViewController: TabBarViewItemDelegate {
 
-    func tabBarViewItemDidCloseAction(_ tabBarViewItem: TabBarViewItem) {
+    func tabBarViewItemCloseAction(_ tabBarViewItem: TabBarViewItem) {
         guard let indexPath = collectionView.indexPath(for: tabBarViewItem) else {
             os_log("TabBarViewController: Failed to get indexPath", log: OSLog.Category.general, type: .error)
             return

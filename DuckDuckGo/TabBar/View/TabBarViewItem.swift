@@ -22,7 +22,7 @@ import Combine
 
 protocol TabBarViewItemDelegate: AnyObject {
 
-    func tabBarViewItemDidCloseAction(_ tabBarViewItem: TabBarViewItem)
+    func tabBarViewItemCloseAction(_ tabBarViewItem: TabBarViewItem)
 
 }
 
@@ -39,6 +39,13 @@ class TabBarViewItem: NSCollectionViewItem {
 
     static let identifier = NSUserInterfaceItemIdentifier(rawValue: "TabBarViewItem")
 
+    static var menu: NSMenu {
+        let menu = NSMenu()
+        let menuItem = NSMenuItem(title: "Close Tab", action: #selector(closeButtonAction(_:)), keyEquivalent: "")
+        menu.addItem(menuItem)
+        return menu
+    }
+
     @IBOutlet weak var faviconImageView: NSImageView!
     @IBOutlet weak var titleTextField: NSTextField!
     @IBOutlet weak var closeButton: NSButton!
@@ -53,11 +60,9 @@ class TabBarViewItem: NSCollectionViewItem {
     override func viewDidLoad() {
         super.viewDidLoad()
 
-        view.wantsLayer = true
-        view.layer?.cornerRadius = 7
-        view.layer?.masksToBounds = false
-
-        setSubviews()        
+        setView()
+        setSubviews()
+        setMenu()
     }
 
     override func viewDidLayout() {
@@ -81,7 +86,7 @@ class TabBarViewItem: NSCollectionViewItem {
     }
 
     @IBAction func closeButtonAction(_ sender: NSButton) {
-        delegate?.tabBarViewItemDidCloseAction(self)
+        delegate?.tabBarViewItemCloseAction(self)
     }
 
     func bind(tabViewModel: TabViewModel) {
@@ -110,6 +115,12 @@ class TabBarViewItem: NSCollectionViewItem {
         titleTextField.stringValue = ""
     }
 
+    private func setView() {
+        view.wantsLayer = true
+        view.layer?.cornerRadius = 7
+        view.layer?.masksToBounds = false
+    }
+
     private func clearBindings() {
         cancelables.forEach { (cancelable) in
             cancelable.cancel()
@@ -130,6 +141,12 @@ class TabBarViewItem: NSCollectionViewItem {
 
         rightSeparatorView.isHidden = isSelected || isDragged
         closeButton.isHidden = !isSelected && view.bounds.width < Width.large.rawValue
+    }
+
+    private func setMenu() {
+        let menu = Self.menu
+        menu.items.forEach { $0.target = self }
+        view.menu = menu
     }
 
 }
