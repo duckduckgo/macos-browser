@@ -120,12 +120,25 @@ class NavigationBarViewController: NSViewController {
         selectedTabViewModel.$canReload.sinkAsync { [weak self] _ in self?.setNavigationButtons() } .store(in: &navigationButtonsCancelables)
     }
 
+    private func makeSearchFieldFirstResponder() {
+        guard let window = view.window else {
+            os_log("%s: Window not available", log: OSLog.Category.general, type: .error, className)
+            return
+        }
+
+        window.makeFirstResponder(autocompleteSearchField)
+    }
+
     private func refreshSearchField() {
         guard let selectedTabViewModel = tabCollectionViewModel.selectedTabViewModel else {
             os_log("%s: Selected tab view model is nil", log: OSLog.Category.general, type: .error, className)
             return
         }
-        autocompleteSearchField.stringValue = selectedTabViewModel.addressBarString
+        let addressBarString = selectedTabViewModel.addressBarString
+        autocompleteSearchField.stringValue = addressBarString
+        if addressBarString == "" {
+            makeSearchFieldFirstResponder()
+        }
     }
 
     private func setNavigationButtons() {
