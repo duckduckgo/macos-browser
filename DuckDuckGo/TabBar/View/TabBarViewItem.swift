@@ -35,7 +35,6 @@ class TabBarViewItem: NSCollectionViewItem {
     enum Width: CGFloat {
         case large = 240
         case medium = 120
-        case small = 60
     }
 
     static let identifier = NSUserInterfaceItemIdentifier(rawValue: "TabBarViewItem")
@@ -131,7 +130,6 @@ class TabBarViewItem: NSCollectionViewItem {
 
         rightSeparatorView.isHidden = isSelected || isDragged
         closeButton.isHidden = !isSelected && view.bounds.width < Width.large.rawValue
-        titleTextField.isHidden = view.bounds.width <= Width.small.rawValue
     }
 
 }

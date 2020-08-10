@@ -153,10 +153,8 @@ class TabBarViewController: NSViewController {
 
         if numberOfItems * TabBarViewItem.Width.large.rawValue < collectionViewWidth {
             return TabBarViewItem.Width.large.rawValue
-        } else if numberOfItems * TabBarViewItem.Width.medium.rawValue < collectionViewWidth {
-            return TabBarViewItem.Width.medium.rawValue
         } else {
-            return TabBarViewItem.Width.small.rawValue
+            return TabBarViewItem.Width.medium.rawValue
         }
     }
 
