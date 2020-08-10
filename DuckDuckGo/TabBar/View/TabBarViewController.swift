@@ -138,9 +138,25 @@ class TabBarViewController: NSViewController {
         tabCollectionViewModel.tabCollection.moveTab(at: index, to: newIndex)
         tabCollectionViewModel.select(at: newIndexPath.item)
     }
-    
+
+    // MARK: - Variable width
+
+    func currentTabWidth() -> CGFloat {
+        let numberOfItems = CGFloat(collectionView.numberOfItems(inSection: 0))
+        let collectionViewWidth = collectionView.bounds.width
+
+        if numberOfItems * TabBarViewItem.Width.large.rawValue < collectionViewWidth {
+            return TabBarViewItem.Width.large.rawValue
+        } else if numberOfItems * TabBarViewItem.Width.medium.rawValue < collectionViewWidth {
+            return TabBarViewItem.Width.medium.rawValue
+        } else {
+            return TabBarViewItem.Width.small.rawValue
+        }
+    }
+
 }
 
+// swiftlint:disable compiler_protocol_init
 extension TabBarViewController: TabCollectionDelegate {
 
     func tabCollection(_ tabCollection: TabCollection, didAppend tab: Tab) {
@@ -166,6 +182,17 @@ extension TabBarViewController: TabCollectionDelegate {
         let indexPath = IndexPath(item: index, section: 0)
         let newIndexPath = IndexPath(item: newIndex, section: 0)
         collectionView.animator().moveItem(at: indexPath, to: newIndexPath)
+    }
+
+}
+// swiftlint:enable compiler_protocol_init
+
+extension TabBarViewController: NSCollectionViewDelegateFlowLayout {
+
+    func collectionView(_ collectionView: NSCollectionView,
+                        layout collectionViewLayout: NSCollectionViewLayout,
+                        sizeForItemAt indexPath: IndexPath) -> NSSize {
+        return NSSize(width: self.currentTabWidth(), height: TabBarViewItem.Height.standard.rawValue)
     }
 
 }

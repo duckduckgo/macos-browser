@@ -28,6 +28,16 @@ protocol TabBarViewItemDelegate: AnyObject {
 
 class TabBarViewItem: NSCollectionViewItem {
 
+    enum Height: CGFloat {
+        case standard = 32
+    }
+
+    enum Width: CGFloat {
+        case large = 240
+        case medium = 120
+        case small = 60
+    }
+
     static let identifier = NSUserInterfaceItemIdentifier(rawValue: "TabBarViewItem")
 
     @IBOutlet weak var faviconImageView: NSImageView!
@@ -48,7 +58,13 @@ class TabBarViewItem: NSCollectionViewItem {
         view.layer?.cornerRadius = 7
         view.layer?.masksToBounds = false
 
-        setViews()        
+        setSubviews()        
+    }
+
+    override func viewDidLayout() {
+        super.viewDidLayout()
+
+        setSubviews()
     }
 
     override var isSelected: Bool {
@@ -56,7 +72,7 @@ class TabBarViewItem: NSCollectionViewItem {
             if isSelected {
                 isDragged = false
             }
-            setViews()
+            setSubviews()
         }
     }
 
@@ -103,17 +119,19 @@ class TabBarViewItem: NSCollectionViewItem {
 
     private var isDragged = false {
         didSet {
-            setViews()
+            setSubviews()
         }
     }
 
-    private func setViews() {
+    private func setSubviews() {
         let backgroundColor = isSelected || isDragged ? NSColor(named: "InterfaceBackgroundColor") : NSColor.clear
 
         view.layer?.backgroundColor = backgroundColor?.cgColor
         bottomCornersView.backgroundColor = backgroundColor
 
         rightSeparatorView.isHidden = isSelected || isDragged
+        closeButton.isHidden = !isSelected && view.bounds.width < Width.large.rawValue
+        titleTextField.isHidden = view.bounds.width <= Width.small.rawValue
     }
 
 }
