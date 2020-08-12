@@ -65,5 +65,23 @@ class MainViewController: NSViewController {
         self.browserTabViewController = browserTabViewController
         return browserTabViewController
     }
+
+    @IBAction func newTab(_ sender: Any?) {
+        tabCollectionViewModel.appendNewTab()
+    }
+
+    @IBAction func closeTab(_ sender: Any?) {
+        tabCollectionViewModel.removeSelected()
+    }
+
+    @IBAction func newWindow(_ sender: Any?) {
+        let mainStoryboard = NSStoryboard(name: "Main", bundle: nil)
+        guard let mainWindowController = mainStoryboard.instantiateInitialController() as? MainWindowController else {
+            //todo error
+            return
+        }
+
+        mainWindowController.showWindow(self)
+    }
     
 }

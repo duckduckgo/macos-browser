@@ -107,6 +107,15 @@ class TabCollectionViewModel {
         }
     }
 
+    func removeSelected() {
+        guard let selectionIndex = selectionIndex else {
+            os_log("TabCollectionViewModel: No tab selected", log: OSLog.Category.general, type: .error)
+            return
+        }
+
+        remove(at: selectionIndex)
+    }
+
     private func bindTabs() {
         tabCollection.$tabs.sink { newTabs in
             self.removeTabViewModelsIfNeeded(newTabs: newTabs)

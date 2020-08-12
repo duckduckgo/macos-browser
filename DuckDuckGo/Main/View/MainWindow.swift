@@ -27,5 +27,5 @@ class MainWindow: NSWindow {
     override var canBecomeMain: Bool {
         return true
     }
-    
+
 }
