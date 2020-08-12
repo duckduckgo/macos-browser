@@ -140,7 +140,6 @@ class TabBarViewItem: NSCollectionViewItem {
         bottomCornersView.backgroundColor = backgroundColor
 
         rightSeparatorView.isHidden = isSelected || isDragged
-        closeButton.isHidden = !isSelected && view.bounds.width < Width.large.rawValue
     }
 
     private func setMenu() {
