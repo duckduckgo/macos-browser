@@ -33,8 +33,18 @@ class TabBarViewItem: NSCollectionViewItem {
     }
 
     enum Width: CGFloat {
-        case large = 240
-        case medium = 120
+        case minimum = 80
+        case maximum = 240
+    }
+
+    enum EffectViewTrailingSpace: CGFloat {
+        case withCloseButton = 17
+        case withoutCloseButton = 0
+    }
+
+    enum TitleTrailingSpace: CGFloat {
+        case withCloseButton = 20
+        case withoutCloseButton = 3
     }
 
     static let identifier = NSUserInterfaceItemIdentifier(rawValue: "TabBarViewItem")
@@ -48,7 +58,11 @@ class TabBarViewItem: NSCollectionViewItem {
 
     @IBOutlet weak var faviconImageView: NSImageView!
     @IBOutlet weak var titleTextField: NSTextField!
+    @IBOutlet weak var effectViewTrailingConstraint: NSLayoutConstraint!
+    @IBOutlet weak var titleTextFieldTrailingConstraint: NSLayoutConstraint!
     @IBOutlet weak var closeButton: NSButton!
+    @IBOutlet weak var closeButtonFadeImageView: NSImageView!
+    @IBOutlet weak var closeButtonFadeEffectView: NSVisualEffectView!
     @IBOutlet weak var rightSeparatorView: ColorView!
     @IBOutlet weak var bottomCornersView: ColorView!
     @IBOutlet weak var loadingView: TabLoadingView!
@@ -63,6 +77,7 @@ class TabBarViewItem: NSCollectionViewItem {
         setView()
         setSubviews()
         setMenu()
+        setEffectViewMask()
     }
 
     override func viewDidLayout() {
@@ -140,12 +155,27 @@ class TabBarViewItem: NSCollectionViewItem {
         bottomCornersView.backgroundColor = backgroundColor
 
         rightSeparatorView.isHidden = isSelected || isDragged
+
+        closeButton.isHidden = !isSelected && view.bounds.size.width == Width.minimum.rawValue
+        effectViewTrailingConstraint.constant = closeButton.isHidden ?
+            EffectViewTrailingSpace.withoutCloseButton.rawValue :
+            EffectViewTrailingSpace.withCloseButton.rawValue
+        titleTextFieldTrailingConstraint.constant = closeButton.isHidden ?
+            TitleTrailingSpace.withoutCloseButton.rawValue :
+            TitleTrailingSpace.withCloseButton.rawValue
+
+        closeButtonFadeImageView.isHidden = !isSelected && !isDragged
+        closeButtonFadeEffectView.isHidden = isSelected || isDragged
     }
 
     private func setMenu() {
         let menu = Self.menu
         menu.items.forEach { $0.target = self }
         view.menu = menu
+    }
+
+    private func setEffectViewMask() {
+        closeButtonFadeEffectView.maskImage = NSImage(named: "TabCloseButtonFade")
     }
 
 }

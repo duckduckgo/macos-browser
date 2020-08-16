@@ -15,7 +15,7 @@
                         <rect key="frame" x="0.0" y="0.0" width="845" height="38"/>
                         <autoresizingMask key="autoresizingMask"/>
                         <subviews>
-                            <visualEffectView blendingMode="behindWindow" material="mediumLight" state="followsWindowActiveState" translatesAutoresizingMaskIntoConstraints="NO" id="8Av-Au-VBq">
+                            <visualEffectView blendingMode="behindWindow" material="sidebar" state="active" translatesAutoresizingMaskIntoConstraints="NO" id="8Av-Au-VBq">
                                 <rect key="frame" x="0.0" y="0.0" width="845" height="38"/>
                                 <subviews>
                                     <button translatesAutoresizingMaskIntoConstraints="NO" id="XV4-Ze-5j7">
@@ -39,13 +39,13 @@
                                     <constraint firstItem="XV4-Ze-5j7" firstAttribute="centerY" secondItem="8Av-Au-VBq" secondAttribute="centerY" constant="2" id="ziQ-Sz-LH0"/>
                                 </constraints>
                             </visualEffectView>
-                            <scrollView wantsLayer="YES" borderType="none" horizontalLineScroll="10" horizontalPageScroll="10" verticalLineScroll="10" verticalPageScroll="10" hasHorizontalScroller="NO" hasVerticalScroller="NO" verticalScrollElasticity="none" translatesAutoresizingMaskIntoConstraints="NO" id="O0X-yp-zLn" customClass="TabBarScrollView" customModule="DuckDuckGo_Privacy_Browser" customModuleProvider="target">
+                            <scrollView wantsLayer="YES" borderType="none" horizontalLineScroll="10" horizontalPageScroll="10" verticalLineScroll="10" verticalPageScroll="10" hasVerticalScroller="NO" verticalScrollElasticity="none" translatesAutoresizingMaskIntoConstraints="NO" id="O0X-yp-zLn" customClass="TabBarScrollView" customModule="DuckDuckGo_Privacy_Browser" customModuleProvider="target">
                                 <rect key="frame" x="80" y="0.0" width="685" height="32"/>
-                                <clipView key="contentView" drawsBackground="NO" copiesOnScroll="NO" id="zdf-RD-hTG">
+                                <clipView key="contentView" drawsBackground="NO" copiesOnScroll="NO" translatesAutoresizingMaskIntoConstraints="NO" id="zdf-RD-hTG">
                                     <rect key="frame" x="0.0" y="0.0" width="685" height="32"/>
                                     <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                     <subviews>
-                                        <collectionView selectable="YES" allowsEmptySelection="NO" id="OEu-5P-cRF">
+                                        <collectionView selectable="YES" allowsEmptySelection="NO" translatesAutoresizingMaskIntoConstraints="NO" id="OEu-5P-cRF">
                                             <rect key="frame" x="0.0" y="0.0" width="685" height="32"/>
                                             <autoresizingMask key="autoresizingMask" heightSizable="YES"/>
                                             <collectionViewFlowLayout key="collectionViewLayout" scrollDirection="horizontal" id="oAv-jh-KDw">
@@ -62,8 +62,8 @@
                                     <edgeInsets key="contentInsets" left="0.0" right="0.0" top="0.0" bottom="0.0"/>
                                 </clipView>
                                 <edgeInsets key="contentInsets" left="0.0" right="0.0" top="0.0" bottom="0.0"/>
-                                <scroller key="horizontalScroller" hidden="YES" wantsLayer="YES" verticalHuggingPriority="750" horizontal="YES" id="f6A-N1-Ed1">
-                                    <rect key="frame" x="-100" y="-100" width="685" height="16"/>
+                                <scroller key="horizontalScroller" wantsLayer="YES" verticalHuggingPriority="750" horizontal="YES" id="f6A-N1-Ed1">
+                                    <rect key="frame" x="0.0" y="16" width="685" height="16"/>
                                     <autoresizingMask key="autoresizingMask"/>
                                 </scroller>
                                 <scroller key="verticalScroller" hidden="YES" wantsLayer="YES" verticalHuggingPriority="750" horizontal="NO" id="tXZ-5R-7cy">
@@ -86,14 +86,14 @@
                                     <action selector="addButtonAction:" target="uSf-9n-QMw" id="Nx9-xc-NzJ"/>
                                 </connections>
                             </button>
-                            <imageView horizontalHuggingPriority="251" verticalHuggingPriority="251" translatesAutoresizingMaskIntoConstraints="NO" id="u4N-Qc-LMf">
+                            <imageView horizontalHuggingPriority="251" verticalHuggingPriority="251" translatesAutoresizingMaskIntoConstraints="NO" id="u4N-Qc-LMf" userLabel="Right Shadow Image">
                                 <rect key="frame" x="760" y="0.0" width="5" height="38"/>
                                 <constraints>
                                     <constraint firstAttribute="width" constant="5" id="tqI-pU-ZWB"/>
                                 </constraints>
                                 <imageCell key="cell" refusesFirstResponder="YES" alignment="left" imageScaling="axesIndependently" image="TabBarShadowRight" id="qd0-z2-M5R"/>
                             </imageView>
-                            <imageView horizontalHuggingPriority="251" verticalHuggingPriority="251" translatesAutoresizingMaskIntoConstraints="NO" id="zsA-or-9Xo">
+                            <imageView horizontalHuggingPriority="251" verticalHuggingPriority="251" translatesAutoresizingMaskIntoConstraints="NO" id="zsA-or-9Xo" userLabel="Left Shadow Image">
                                 <rect key="frame" x="80" y="0.0" width="5" height="38"/>
                                 <constraints>
                                     <constraint firstAttribute="width" constant="5" id="Zrh-wT-hvv"/>
@@ -103,25 +103,26 @@
                         </subviews>
                         <constraints>
                             <constraint firstAttribute="trailing" secondItem="8Av-Au-VBq" secondAttribute="trailing" id="04T-2h-lX4"/>
+                            <constraint firstAttribute="bottom" secondItem="O0X-yp-zLn" secondAttribute="bottom" id="9nu-uZ-CjI"/>
+                            <constraint firstItem="u4N-Qc-LMf" firstAttribute="trailing" secondItem="O0X-yp-zLn" secondAttribute="trailing" id="Bd1-0P-xDt"/>
                             <constraint firstItem="zsA-or-9Xo" firstAttribute="top" secondItem="JQD-ov-FCr" secondAttribute="top" id="CKr-JO-cA6"/>
-                            <constraint firstItem="zsA-or-9Xo" firstAttribute="leading" secondItem="JQD-ov-FCr" secondAttribute="leading" constant="80" id="Dua-zM-HOB"/>
+                            <constraint firstItem="O0X-yp-zLn" firstAttribute="leading" secondItem="JQD-ov-FCr" secondAttribute="leading" constant="80" id="Cdb-LF-Iz8"/>
                             <constraint firstAttribute="bottom" secondItem="zsA-or-9Xo" secondAttribute="bottom" id="ErC-gw-bFR"/>
                             <constraint firstAttribute="bottom" secondItem="u4N-Qc-LMf" secondAttribute="bottom" id="Fc4-Wo-qz3"/>
                             <constraint firstAttribute="trailing" secondItem="qXs-b0-tWI" secondAttribute="trailing" constant="40" id="Fsr-hL-HYK"/>
-                            <constraint firstAttribute="trailing" secondItem="O0X-yp-zLn" secondAttribute="trailing" constant="80" id="FuJ-6x-Wa5"/>
                             <constraint firstItem="qXs-b0-tWI" firstAttribute="centerY" secondItem="JQD-ov-FCr" secondAttribute="centerY" constant="2" id="Iib-Si-FQP"/>
-                            <constraint firstAttribute="bottom" secondItem="O0X-yp-zLn" secondAttribute="bottom" id="MIL-fB-QcY"/>
-                            <constraint firstAttribute="trailing" secondItem="u4N-Qc-LMf" secondAttribute="trailing" constant="80" id="NwE-Ic-2Vk"/>
+                            <constraint firstItem="O0X-yp-zLn" firstAttribute="top" secondItem="JQD-ov-FCr" secondAttribute="top" constant="6" id="L7c-2V-Cvh"/>
                             <constraint firstItem="8Av-Au-VBq" firstAttribute="top" secondItem="JQD-ov-FCr" secondAttribute="top" id="UNA-xd-vb7"/>
-                            <constraint firstItem="O0X-yp-zLn" firstAttribute="top" secondItem="JQD-ov-FCr" secondAttribute="top" constant="6" id="ckd-HT-jfP"/>
+                            <constraint firstItem="O0X-yp-zLn" firstAttribute="leading" secondItem="zsA-or-9Xo" secondAttribute="leading" id="bIL-4K-ggG"/>
                             <constraint firstItem="8Av-Au-VBq" firstAttribute="leading" secondItem="JQD-ov-FCr" secondAttribute="leading" id="djE-ZR-Zcb"/>
-                            <constraint firstItem="O0X-yp-zLn" firstAttribute="leading" secondItem="JQD-ov-FCr" secondAttribute="leading" constant="80" id="fH2-uF-lal"/>
                             <constraint firstAttribute="bottom" secondItem="8Av-Au-VBq" secondAttribute="bottom" id="pat-VC-dVb"/>
+                            <constraint firstAttribute="trailing" secondItem="O0X-yp-zLn" secondAttribute="trailing" constant="80" id="sUB-ad-rWC"/>
                             <constraint firstItem="u4N-Qc-LMf" firstAttribute="top" secondItem="JQD-ov-FCr" secondAttribute="top" id="zB8-BE-pJR"/>
                         </constraints>
                     </view>
                     <connections>
                         <outlet property="collectionView" destination="OEu-5P-cRF" id="b95-c4-JM0"/>
+                        <outlet property="scrollView" destination="O0X-yp-zLn" id="g9v-fn-qxC"/>
                     </connections>
                 </viewController>
                 <customObject id="7J5-0H-rHB" userLabel="First Responder" customClass="NSResponder" sceneMemberID="firstResponder"/>

@@ -14,7 +14,7 @@
         </customObject>
         <customObject id="-1" userLabel="First Responder" customClass="FirstResponder"/>
         <customObject id="-3" userLabel="Application" customClass="NSObject"/>
-        <customView id="Hz6-mo-xeY">
+        <customView id="Hz6-mo-xeY" userLabel="Tab Bar View Item">
             <rect key="frame" x="0.0" y="0.0" width="301" height="33"/>
             <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
             <subviews>
@@ -24,65 +24,63 @@
                         <constraint firstAttribute="height" constant="10" id="IZs-BC-m2g"/>
                     </constraints>
                 </customView>
-                <stackView distribution="fillProportionally" orientation="horizontal" alignment="centerY" spacing="4" horizontalStackHuggingPriority="249.99998474121094" verticalStackHuggingPriority="249.99998474121094" detachesHiddenViews="YES" translatesAutoresizingMaskIntoConstraints="NO" id="9LM-Gm-2q7">
-                    <rect key="frame" x="8" y="0.0" width="285" height="33"/>
+                <customView translatesAutoresizingMaskIntoConstraints="NO" id="A6g-eG-dOW" customClass="TabLoadingView" customModule="DuckDuckGo_Privacy_Browser" customModuleProvider="target">
+                    <rect key="frame" x="8" y="5" width="24" height="24"/>
                     <subviews>
-                        <customView translatesAutoresizingMaskIntoConstraints="NO" id="A6g-eG-dOW" customClass="TabLoadingView" customModule="DuckDuckGo_Privacy_Browser" customModuleProvider="target">
-                            <rect key="frame" x="0.0" y="5" width="24" height="24"/>
-                            <subviews>
-                                <imageView horizontalHuggingPriority="251" verticalHuggingPriority="251" translatesAutoresizingMaskIntoConstraints="NO" id="Kky-kZ-lU9" userLabel="Favicon Image View">
-                                    <rect key="frame" x="4" y="4" width="16" height="16"/>
-                                    <constraints>
-                                        <constraint firstAttribute="width" constant="16" id="UYc-rf-9hh"/>
-                                        <constraint firstAttribute="height" constant="16" id="ey5-m5-Uxp"/>
-                                    </constraints>
-                                    <imageCell key="cell" refusesFirstResponder="YES" alignment="left" imageScaling="proportionallyDown" id="xPB-Hd-eTl"/>
-                                </imageView>
-                            </subviews>
+                        <imageView horizontalHuggingPriority="251" verticalHuggingPriority="251" translatesAutoresizingMaskIntoConstraints="NO" id="Kky-kZ-lU9" userLabel="Favicon Image View">
+                            <rect key="frame" x="4" y="4" width="16" height="16"/>
                             <constraints>
-                                <constraint firstAttribute="height" constant="24" id="JIG-o6-vrA"/>
-                                <constraint firstAttribute="width" constant="24" id="b6u-P2-tfb"/>
-                                <constraint firstItem="Kky-kZ-lU9" firstAttribute="centerY" secondItem="A6g-eG-dOW" secondAttribute="centerY" id="q7W-XH-qud"/>
-                                <constraint firstItem="Kky-kZ-lU9" firstAttribute="centerX" secondItem="A6g-eG-dOW" secondAttribute="centerX" id="sh1-7s-uE8"/>
+                                <constraint firstAttribute="width" constant="16" id="UYc-rf-9hh"/>
+                                <constraint firstAttribute="height" constant="16" id="ey5-m5-Uxp"/>
                             </constraints>
-                        </customView>
-                        <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="DFD-8r-YGx" userLabel="Title Text Field">
-                            <rect key="frame" x="26" y="9" width="245" height="16"/>
-                            <constraints>
-                                <constraint firstAttribute="height" constant="16" id="vWW-sG-CAf"/>
-                            </constraints>
-                            <textFieldCell key="cell" lineBreakMode="truncatingTail" alignment="left" usesSingleLineMode="YES" id="Mpl-9M-WqR">
-                                <font key="font" metaFont="system"/>
-                                <color key="textColor" name="labelColor" catalog="System" colorSpace="catalog"/>
-                                <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
-                            </textFieldCell>
-                        </textField>
-                        <button translatesAutoresizingMaskIntoConstraints="NO" id="vuD-rY-Vzl" userLabel="Close Button">
-                            <rect key="frame" x="273" y="11" width="12" height="12"/>
-                            <constraints>
-                                <constraint firstAttribute="width" constant="12" id="Jud-dv-fco"/>
-                                <constraint firstAttribute="height" constant="12" id="hNW-Ia-KQk"/>
-                            </constraints>
-                            <buttonCell key="cell" type="square" bezelStyle="shadowlessSquare" image="Close" imagePosition="only" alignment="center" imageScaling="proportionallyDown" inset="2" id="ykX-aF-551">
-                                <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
-                                <font key="font" metaFont="system"/>
-                            </buttonCell>
-                            <connections>
-                                <action selector="closeButtonAction:" target="4MN-w4-aCk" id="ezW-I1-5yy"/>
-                            </connections>
-                        </button>
+                            <imageCell key="cell" refusesFirstResponder="YES" alignment="left" imageScaling="proportionallyDown" id="xPB-Hd-eTl"/>
+                        </imageView>
                     </subviews>
-                    <visibilityPriorities>
-                        <integer value="1000"/>
-                        <integer value="1000"/>
-                        <real value="1000"/>
-                    </visibilityPriorities>
-                    <customSpacing>
-                        <real value="3.4028234663852886e+38"/>
-                        <real value="3.4028234663852886e+38"/>
-                        <real value="3.4028234663852886e+38"/>
-                    </customSpacing>
-                </stackView>
+                    <constraints>
+                        <constraint firstAttribute="height" constant="24" id="JIG-o6-vrA"/>
+                        <constraint firstAttribute="width" constant="24" id="b6u-P2-tfb"/>
+                        <constraint firstItem="Kky-kZ-lU9" firstAttribute="centerY" secondItem="A6g-eG-dOW" secondAttribute="centerY" id="q7W-XH-qud"/>
+                        <constraint firstItem="Kky-kZ-lU9" firstAttribute="centerX" secondItem="A6g-eG-dOW" secondAttribute="centerX" id="sh1-7s-uE8"/>
+                    </constraints>
+                </customView>
+                <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="DFD-8r-YGx" userLabel="Title Text Field">
+                    <rect key="frame" x="30" y="9" width="253" height="16"/>
+                    <constraints>
+                        <constraint firstAttribute="height" constant="16" id="vWW-sG-CAf"/>
+                    </constraints>
+                    <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" refusesFirstResponder="YES" alignment="left" usesSingleLineMode="YES" id="Mpl-9M-WqR">
+                        <font key="font" metaFont="system"/>
+                        <color key="textColor" name="labelColor" catalog="System" colorSpace="catalog"/>
+                        <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
+                    </textFieldCell>
+                </textField>
+                <imageView hidden="YES" horizontalHuggingPriority="251" verticalHuggingPriority="251" translatesAutoresizingMaskIntoConstraints="NO" id="IUO-04-BRp" userLabel="Close Button Fade Image">
+                    <rect key="frame" x="262" y="0.0" width="22" height="33"/>
+                    <constraints>
+                        <constraint firstAttribute="width" constant="22" id="pgI-Nl-ngl"/>
+                    </constraints>
+                    <imageCell key="cell" refusesFirstResponder="YES" alignment="left" image="TabCloseButtonFade" id="mma-LH-6Bx"/>
+                </imageView>
+                <visualEffectView blendingMode="behindWindow" material="sidebar" state="active" translatesAutoresizingMaskIntoConstraints="NO" id="aR1-Kk-sbt" userLabel="Close Button Fade Effect View">
+                    <rect key="frame" x="262" y="0.0" width="22" height="33"/>
+                    <constraints>
+                        <constraint firstAttribute="width" constant="22" id="XAm-tK-OL9"/>
+                    </constraints>
+                </visualEffectView>
+                <button translatesAutoresizingMaskIntoConstraints="NO" id="vuD-rY-Vzl" userLabel="Close Button">
+                    <rect key="frame" x="276" y="11" width="12" height="12"/>
+                    <constraints>
+                        <constraint firstAttribute="width" constant="12" id="Jud-dv-fco"/>
+                        <constraint firstAttribute="height" constant="12" id="hNW-Ia-KQk"/>
+                    </constraints>
+                    <buttonCell key="cell" type="square" bezelStyle="shadowlessSquare" image="Close" imagePosition="only" alignment="center" imageScaling="proportionallyDown" inset="2" id="ykX-aF-551">
+                        <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
+                        <font key="font" metaFont="system"/>
+                    </buttonCell>
+                    <connections>
+                        <action selector="closeButtonAction:" target="4MN-w4-aCk" id="ezW-I1-5yy"/>
+                    </connections>
+                </button>
                 <customView translatesAutoresizingMaskIntoConstraints="NO" id="opQ-Od-dCO" userLabel="Right Separator View" customClass="ColorView" customModule="DuckDuckGo_Privacy_Browser" customModuleProvider="target">
                     <rect key="frame" x="300" y="7" width="1" height="20"/>
                     <constraints>
@@ -97,15 +95,24 @@
                 </customView>
             </subviews>
             <constraints>
+                <constraint firstItem="IUO-04-BRp" firstAttribute="top" secondItem="Hz6-mo-xeY" secondAttribute="top" id="3XA-4q-wbx"/>
+                <constraint firstAttribute="bottom" secondItem="IUO-04-BRp" secondAttribute="bottom" id="4Hh-mB-3wo"/>
                 <constraint firstAttribute="trailing" secondItem="KM2-aD-3Sw" secondAttribute="trailing" id="7Gf-mJ-Mkq"/>
                 <constraint firstItem="KM2-aD-3Sw" firstAttribute="leading" secondItem="Hz6-mo-xeY" secondAttribute="leading" id="DiF-C3-GW2"/>
-                <constraint firstAttribute="trailing" secondItem="9LM-Gm-2q7" secondAttribute="trailing" constant="8" id="E4U-Xz-5fT"/>
-                <constraint firstAttribute="bottom" secondItem="9LM-Gm-2q7" secondAttribute="bottom" id="F9d-YI-gzu"/>
                 <constraint firstAttribute="bottom" secondItem="KM2-aD-3Sw" secondAttribute="bottom" id="GQH-O8-dsY"/>
                 <constraint firstItem="opQ-Od-dCO" firstAttribute="centerY" secondItem="Hz6-mo-xeY" secondAttribute="centerY" id="J32-aM-9m2"/>
+                <constraint firstAttribute="trailing" secondItem="DFD-8r-YGx" secondAttribute="trailing" constant="20" id="L7J-mr-jLh"/>
+                <constraint firstItem="A6g-eG-dOW" firstAttribute="leading" secondItem="Hz6-mo-xeY" secondAttribute="leading" constant="8" id="TSx-41-S2A"/>
+                <constraint firstItem="DFD-8r-YGx" firstAttribute="leading" secondItem="A6g-eG-dOW" secondAttribute="trailing" id="UEl-Wk-yUR"/>
                 <constraint firstAttribute="trailing" secondItem="opQ-Od-dCO" secondAttribute="trailing" id="WPC-fb-K22"/>
-                <constraint firstItem="9LM-Gm-2q7" firstAttribute="leading" secondItem="Hz6-mo-xeY" secondAttribute="leading" constant="8" id="cr1-3w-E7H"/>
-                <constraint firstItem="9LM-Gm-2q7" firstAttribute="top" secondItem="Hz6-mo-xeY" secondAttribute="top" id="wwZ-w0-xLB"/>
+                <constraint firstItem="A6g-eG-dOW" firstAttribute="centerY" secondItem="Hz6-mo-xeY" secondAttribute="centerY" id="aQg-CK-diJ"/>
+                <constraint firstAttribute="bottom" secondItem="aR1-Kk-sbt" secondAttribute="bottom" id="fue-Ia-7Dg"/>
+                <constraint firstItem="DFD-8r-YGx" firstAttribute="centerY" secondItem="Hz6-mo-xeY" secondAttribute="centerY" id="oUc-dt-omj"/>
+                <constraint firstAttribute="trailing" secondItem="IUO-04-BRp" secondAttribute="trailing" constant="17" id="q3C-gZ-OsG"/>
+                <constraint firstAttribute="trailing" secondItem="vuD-rY-Vzl" secondAttribute="trailing" constant="13" id="web-9k-BYT"/>
+                <constraint firstItem="aR1-Kk-sbt" firstAttribute="top" secondItem="Hz6-mo-xeY" secondAttribute="top" id="yJc-fY-6HN"/>
+                <constraint firstItem="vuD-rY-Vzl" firstAttribute="centerY" secondItem="Hz6-mo-xeY" secondAttribute="centerY" id="yci-6f-cbz"/>
+                <constraint firstAttribute="trailing" secondItem="aR1-Kk-sbt" secondAttribute="trailing" constant="17" id="zue-fw-pWg"/>
             </constraints>
             <point key="canvasLocation" x="-60.5" y="120.5"/>
         </customView>
@@ -113,16 +120,21 @@
             <connections>
                 <outlet property="bottomCornersView" destination="KM2-aD-3Sw" id="UmF-yW-zue"/>
                 <outlet property="closeButton" destination="vuD-rY-Vzl" id="JGv-Ac-mRi"/>
+                <outlet property="closeButtonFadeEffectView" destination="aR1-Kk-sbt" id="tUd-ha-Pnn"/>
+                <outlet property="closeButtonFadeImageView" destination="IUO-04-BRp" id="skT-OD-SPh"/>
+                <outlet property="effectViewTrailingConstraint" destination="zue-fw-pWg" id="27h-zT-Dwh"/>
                 <outlet property="faviconImageView" destination="Kky-kZ-lU9" id="96Z-4T-ONB"/>
                 <outlet property="loadingView" destination="A6g-eG-dOW" id="ziS-fe-bqN"/>
                 <outlet property="rightSeparatorView" destination="opQ-Od-dCO" id="k6U-n5-y4S"/>
                 <outlet property="titleTextField" destination="DFD-8r-YGx" id="6mj-b0-Oq3"/>
+                <outlet property="titleTextFieldTrailingConstraint" destination="L7J-mr-jLh" id="ds7-7v-acY"/>
                 <outlet property="view" destination="Hz6-mo-xeY" id="DwG-v1-cn3"/>
             </connections>
         </collectionViewItem>
     </objects>
     <resources>
         <image name="Close" width="8" height="8"/>
+        <image name="TabCloseButtonFade" width="22" height="32"/>
         <namedColor name="SeparatorColor">
             <color red="0.0" green="0.0" blue="0.0" alpha="0.10000000149011612" colorSpace="custom" customColorSpace="sRGB"/>
         </namedColor>

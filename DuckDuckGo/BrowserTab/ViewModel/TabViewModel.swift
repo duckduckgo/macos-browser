@@ -24,7 +24,7 @@ class TabViewModel {
 
     private enum Constants {
         static let homeTitle = "Home"
-        static let homeFaviconImage = NSImage(named: "NSTouchBarSearchTemplate")!
+        static let homeFaviconImage = NSImage(named: "HomeFavicon")!
     }
 
     private(set) var tab: Tab
