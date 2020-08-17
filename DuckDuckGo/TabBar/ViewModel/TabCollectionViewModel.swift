@@ -95,6 +95,8 @@ class TabCollectionViewModel {
         }
 
         tabCollection.remove(at: index)
+
+        guard tabCollection.tabs.count > 0 else { return }
         guard let selectionIndex = selectionIndex else {
             os_log("TabCollection: No tab selected", log: OSLog.Category.general, type: .error)
             return

@@ -108,6 +108,16 @@ class TabBarViewController: NSViewController {
         tabCollectionViewModel.appendNewTab()
     }
 
+    private func closeWindowIfNeeded() {
+        if tabCollectionViewModel.tabCollection.tabs.count == 0 {
+            guard let window = view.window else {
+                os_log("AutocompleteSearchField: Window not available", log: OSLog.Category.general, type: .error)
+                return
+            }
+            window.close()
+        }
+    }
+
     // MARK: - Selection
 
     private func clearCollectionViewSelection() {
@@ -122,10 +132,6 @@ class TabBarViewController: NSViewController {
 
     private func closeItem(at indexPath: IndexPath) {
         tabCollectionViewModel.remove(at: indexPath.item)
-
-        if indexPath.item == 0 && tabCollectionViewModel.tabCollection.tabs.count == 0 {
-            NSApplication.shared.terminate(self)
-        }
     }
 
     // MARK: - Drag and Drop
@@ -245,6 +251,8 @@ extension TabBarViewController: TabCollectionDelegate {
         } completionHandler: { _ in
             self.setTabMode()
         }
+
+        closeWindowIfNeeded()
     }
 
     func tabCollection(_ tabCollection: TabCollection, didMoveTabAt index: Int, to newIndex: Int) {
