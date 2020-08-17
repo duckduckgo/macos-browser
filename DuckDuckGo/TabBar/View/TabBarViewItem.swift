@@ -68,12 +68,12 @@ class TabBarViewItem: NSCollectionViewItem {
     @IBOutlet weak var titleTextField: NSTextField!
     @IBOutlet weak var effectViewTrailingConstraint: NSLayoutConstraint!
     @IBOutlet weak var titleTextFieldTrailingConstraint: NSLayoutConstraint!
-    @IBOutlet weak var closeButton: NSButton!
+    @IBOutlet weak var closeButton: MouseOverButton!
     @IBOutlet weak var closeButtonFadeImageView: NSImageView!
     @IBOutlet weak var closeButtonFadeEffectView: NSVisualEffectView!
     @IBOutlet weak var rightSeparatorView: ColorView!
-    @IBOutlet weak var bottomCornersView: ColorView!
     @IBOutlet weak var loadingView: TabLoadingView!
+    @IBOutlet weak var mouseOverView: MouseOverView!
 
     private var cancelables = Set<AnyCancellable>()
 
@@ -155,7 +155,8 @@ class TabBarViewItem: NSCollectionViewItem {
     private func setView() {
         view.wantsLayer = true
         view.layer?.cornerRadius = 7
-        view.layer?.masksToBounds = false
+        view.layer?.maskedCorners = [.layerMinXMaxYCorner, .layerMaxXMaxYCorner]
+        view.layer?.masksToBounds = true
     }
 
     private func clearBindings() {
@@ -166,13 +167,12 @@ class TabBarViewItem: NSCollectionViewItem {
 
     private func setSubviews() {
         let backgroundColor = isSelected || isDragged ? NSColor(named: "InterfaceBackgroundColor") : NSColor.clear
-
         view.layer?.backgroundColor = backgroundColor?.cgColor
-        bottomCornersView.backgroundColor = backgroundColor
 
         rightSeparatorView.isHidden = isSelected || isDragged
+        mouseOverView.mouseOverColor = isSelected || isDragged ? NSColor.clear : NSColor(named: "TabMouseOverColor")
 
-        closeButton.isHidden = !isSelected && view.bounds.size.width == Width.minimum.rawValue
+        closeButton.isHidden = !isSelected && !isDragged && view.bounds.size.width == Width.minimum.rawValue
         effectViewTrailingConstraint.constant = closeButton.isHidden ?
             EffectViewTrailingSpace.withoutCloseButton.rawValue :
             EffectViewTrailingSpace.withCloseButton.rawValue
