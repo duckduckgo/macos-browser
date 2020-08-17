@@ -23,6 +23,8 @@ import Combine
 protocol TabBarViewItemDelegate: AnyObject {
 
     func tabBarViewItemCloseAction(_ tabBarViewItem: TabBarViewItem)
+    func tabBarViewItemCloseOtherAction(_ tabBarViewItem: TabBarViewItem)
+    func tabBarViewItemDuplicateAction(_ tabBarViewItem: TabBarViewItem)
 
 }
 
@@ -51,8 +53,14 @@ class TabBarViewItem: NSCollectionViewItem {
 
     static var menu: NSMenu {
         let menu = NSMenu()
-        let menuItem = NSMenuItem(title: "Close Tab", action: #selector(closeButtonAction(_:)), keyEquivalent: "")
-        menu.addItem(menuItem)
+
+        let duplicateMenuItem = NSMenuItem(title: "Duplicate Tab", action: #selector(duplicateAction(_:)), keyEquivalent: "")
+        menu.addItem(duplicateMenuItem)
+        menu.addItem(NSMenuItem.separator())
+        let closeMenuItem = NSMenuItem(title: "Close Tab", action: #selector(closeButtonAction(_:)), keyEquivalent: "")
+        menu.addItem(closeMenuItem)
+        let closeOtherMenuItem = NSMenuItem(title: "Close Other Tabs", action: #selector(closeOtherAction(_:)), keyEquivalent: "")
+        menu.addItem(closeOtherMenuItem)
         return menu
     }
 
@@ -100,8 +108,16 @@ class TabBarViewItem: NSCollectionViewItem {
         return super.draggingImageComponents
     }
 
+    @objc func duplicateAction(_ sender: NSButton) {
+        delegate?.tabBarViewItemDuplicateAction(self)
+    }
+
     @IBAction func closeButtonAction(_ sender: NSButton) {
         delegate?.tabBarViewItemCloseAction(self)
+    }
+
+    @objc func closeOtherAction(_ sender: NSButton) {
+        delegate?.tabBarViewItemCloseOtherAction(self)
     }
 
     func bind(tabViewModel: TabViewModel) {

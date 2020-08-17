@@ -116,6 +116,38 @@ class TabCollectionViewModel {
         remove(at: selectionIndex)
     }
 
+    func duplicateTab(at index: Int) {
+        guard index >= 0, index < tabCollection.tabs.count else {
+            os_log("TabCollectionViewModel: Index out of bounds", log: OSLog.Category.general, type: .error)
+            return
+        }
+
+        let tab = tabCollection.tabs[index]
+        let tabCopy = Tab()
+        tabCopy.url = tab.url
+        let newIndex = index + 1
+
+        tabCollection.insert(tab: tabCopy, at: newIndex)
+        select(at: newIndex)
+    }
+
+    func closeOtherTabs(except index: Int) {
+        guard index >= 0, index < tabCollection.tabs.count else {
+            os_log("TabCollectionViewModel: Index out of bounds", log: OSLog.Category.general, type: .error)
+            return
+        }
+        let tab = tabCollection.tabs[index]
+
+        var index = tabCollection.tabs.count - 1
+        tabCollection.tabs.reversed().forEach {
+            if tab != $0 {
+                tabCollection.remove(at: index)
+            }
+            index -= 1
+        }
+        select(at: 0)
+    }
+
     private func bindTabs() {
         tabCollection.$tabs.sink { newTabs in
             self.removeTabViewModelsIfNeeded(newTabs: newTabs)

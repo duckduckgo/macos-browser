@@ -390,6 +390,16 @@ extension TabBarViewController: NSCollectionViewDelegate {
 
 extension TabBarViewController: TabBarViewItemDelegate {
 
+    func tabBarViewItemDuplicateAction(_ tabBarViewItem: TabBarViewItem) {
+        guard let indexPath = collectionView.indexPath(for: tabBarViewItem) else {
+            os_log("TabBarViewController: Failed to get indexPath", log: OSLog.Category.general, type: .error)
+            return
+        }
+
+        clearCollectionViewSelection()
+        tabCollectionViewModel.duplicateTab(at: indexPath.item)
+    }
+
     func tabBarViewItemCloseAction(_ tabBarViewItem: TabBarViewItem) {
         guard let indexPath = collectionView.indexPath(for: tabBarViewItem) else {
             os_log("TabBarViewController: Failed to get indexPath", log: OSLog.Category.general, type: .error)
@@ -397,6 +407,15 @@ extension TabBarViewController: TabBarViewItemDelegate {
         }
 
         closeItem(at: indexPath)
+    }
+
+    func tabBarViewItemCloseOtherAction(_ tabBarViewItem: TabBarViewItem) {
+        guard let indexPath = collectionView.indexPath(for: tabBarViewItem) else {
+            os_log("TabBarViewController: Failed to get indexPath", log: OSLog.Category.general, type: .error)
+            return
+        }
+
+        tabCollectionViewModel.closeOtherTabs(except: indexPath.item)
     }
 
 }
