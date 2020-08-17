@@ -201,7 +201,7 @@ class TabBarViewController: NSViewController {
             collectionView.animator().scroll(CGPoint(x: self.collectionView.bounds.size.width, y: 0))
         }, completionHandler: completionHandler)
     }
-    
+
 }
 
 // swiftlint:disable compiler_protocol_init

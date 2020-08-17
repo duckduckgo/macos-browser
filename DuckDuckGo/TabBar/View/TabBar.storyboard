@@ -18,7 +18,7 @@
                             <visualEffectView blendingMode="behindWindow" material="sidebar" state="active" translatesAutoresizingMaskIntoConstraints="NO" id="8Av-Au-VBq">
                                 <rect key="frame" x="0.0" y="0.0" width="845" height="38"/>
                                 <subviews>
-                                    <button translatesAutoresizingMaskIntoConstraints="NO" id="XV4-Ze-5j7">
+                                    <button translatesAutoresizingMaskIntoConstraints="NO" id="XV4-Ze-5j7" customClass="MouseOverButton" customModule="DuckDuckGo_Privacy_Browser" customModuleProvider="target">
                                         <rect key="frame" x="805" y="5" width="32" height="24"/>
                                         <constraints>
                                             <constraint firstAttribute="width" constant="32" id="9Ii-rC-Eca"/>
@@ -29,6 +29,17 @@
                                             <font key="font" metaFont="system"/>
                                         </buttonCell>
                                         <color key="contentTintColor" name="ButtonColor"/>
+                                        <userDefinedRuntimeAttributes>
+                                            <userDefinedRuntimeAttribute type="color" keyPath="mouseOverColor">
+                                                <color key="value" name="ButtonMouseOverColor"/>
+                                            </userDefinedRuntimeAttribute>
+                                            <userDefinedRuntimeAttribute type="number" keyPath="cornerRadius">
+                                                <real key="value" value="4"/>
+                                            </userDefinedRuntimeAttribute>
+                                            <userDefinedRuntimeAttribute type="color" keyPath="mouseDownColor">
+                                                <color key="value" name="ButtonMouseDownColor"/>
+                                            </userDefinedRuntimeAttribute>
+                                        </userDefinedRuntimeAttributes>
                                         <connections>
                                             <action selector="burnButtonAction:" target="uSf-9n-QMw" id="ifc-Vj-HVz"/>
                                         </connections>
@@ -71,7 +82,7 @@
                                     <autoresizingMask key="autoresizingMask"/>
                                 </scroller>
                             </scrollView>
-                            <button translatesAutoresizingMaskIntoConstraints="NO" id="qXs-b0-tWI">
+                            <button translatesAutoresizingMaskIntoConstraints="NO" id="qXs-b0-tWI" customClass="MouseOverButton" customModule="DuckDuckGo_Privacy_Browser" customModuleProvider="target">
                                 <rect key="frame" x="773" y="5" width="32" height="24"/>
                                 <constraints>
                                     <constraint firstAttribute="width" constant="32" id="Lmr-Cv-caT"/>
@@ -82,6 +93,17 @@
                                     <font key="font" metaFont="system"/>
                                 </buttonCell>
                                 <color key="contentTintColor" name="ButtonColor"/>
+                                <userDefinedRuntimeAttributes>
+                                    <userDefinedRuntimeAttribute type="color" keyPath="mouseOverColor">
+                                        <color key="value" name="ButtonMouseOverColor"/>
+                                    </userDefinedRuntimeAttribute>
+                                    <userDefinedRuntimeAttribute type="number" keyPath="cornerRadius">
+                                        <real key="value" value="4"/>
+                                    </userDefinedRuntimeAttribute>
+                                    <userDefinedRuntimeAttribute type="color" keyPath="mouseDownColor">
+                                        <color key="value" name="ButtonMouseDownColor"/>
+                                    </userDefinedRuntimeAttribute>
+                                </userDefinedRuntimeAttributes>
                                 <connections>
                                     <action selector="addButtonAction:" target="uSf-9n-QMw" id="Nx9-xc-NzJ"/>
                                 </connections>
@@ -137,6 +159,15 @@
         <image name="TabBarShadowRight" width="5" height="34"/>
         <namedColor name="ButtonColor">
             <color red="0.28600001335144043" green="0.28600001335144043" blue="0.28600001335144043" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+        </namedColor>
+        <namedColor name="ButtonMouseDownColor">
+            <color red="0.0" green="0.0" blue="0.0" alpha="0.20000000000000001" colorSpace="custom" customColorSpace="sRGB"/>
+        </namedColor>
+        <namedColor name="ButtonMouseOverColor">
+            <color red="0.0" green="0.0" blue="0.0" alpha="0.10000000000000001" colorSpace="custom" customColorSpace="sRGB"/>
+        </namedColor>
+        <namedColor name="ClearColor">
+            <color red="1" green="1" blue="1" alpha="0.0" colorSpace="custom" customColorSpace="sRGB"/>
         </namedColor>
         <namedColor name="ClearColor">
             <color red="1" green="1" blue="1" alpha="0.0" colorSpace="custom" customColorSpace="sRGB"/>

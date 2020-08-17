@@ -27,58 +27,102 @@
                                     <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
                                 </searchFieldCell>
                             </searchField>
-                            <button translatesAutoresizingMaskIntoConstraints="NO" id="kky-0N-Cfd">
-                                <rect key="frame" x="8" y="6" width="29" height="29"/>
+                            <button translatesAutoresizingMaskIntoConstraints="NO" id="kky-0N-Cfd" customClass="MouseOverButton" customModule="DuckDuckGo_Privacy_Browser" customModuleProvider="target">
+                                <rect key="frame" x="8" y="8" width="32" height="24"/>
                                 <constraints>
-                                    <constraint firstAttribute="height" constant="29" id="0zh-Jn-l2h"/>
-                                    <constraint firstAttribute="width" constant="29" id="8sl-Tr-gSd"/>
+                                    <constraint firstAttribute="height" constant="24" id="0zh-Jn-l2h"/>
+                                    <constraint firstAttribute="width" constant="32" id="8sl-Tr-gSd"/>
                                 </constraints>
                                 <buttonCell key="cell" type="square" bezelStyle="shadowlessSquare" image="Back" imagePosition="only" alignment="center" imageScaling="proportionallyDown" inset="2" id="EhR-jn-0hY">
                                     <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
                                     <font key="font" metaFont="system"/>
                                 </buttonCell>
+                                <userDefinedRuntimeAttributes>
+                                    <userDefinedRuntimeAttribute type="color" keyPath="mouseOverColor">
+                                        <color key="value" name="ButtonMouseOverColor"/>
+                                    </userDefinedRuntimeAttribute>
+                                    <userDefinedRuntimeAttribute type="color" keyPath="mouseDownColor">
+                                        <color key="value" name="ButtonMouseDownColor"/>
+                                    </userDefinedRuntimeAttribute>
+                                    <userDefinedRuntimeAttribute type="number" keyPath="cornerRadius">
+                                        <real key="value" value="4"/>
+                                    </userDefinedRuntimeAttribute>
+                                </userDefinedRuntimeAttributes>
                                 <connections>
                                     <action selector="goBackAction:" target="o2v-eH-jTI" id="gEk-2Z-80d"/>
                                 </connections>
                             </button>
-                            <button translatesAutoresizingMaskIntoConstraints="NO" id="mdE-u0-Ei5">
-                                <rect key="frame" x="37" y="6" width="29" height="29"/>
+                            <button translatesAutoresizingMaskIntoConstraints="NO" id="mdE-u0-Ei5" customClass="MouseOverButton" customModule="DuckDuckGo_Privacy_Browser" customModuleProvider="target">
+                                <rect key="frame" x="40" y="8" width="32" height="24"/>
                                 <constraints>
-                                    <constraint firstAttribute="height" constant="29" id="VXS-B2-jFA"/>
-                                    <constraint firstAttribute="width" constant="29" id="jYM-So-c8l"/>
+                                    <constraint firstAttribute="height" constant="24" id="VXS-B2-jFA"/>
+                                    <constraint firstAttribute="width" constant="32" id="jYM-So-c8l"/>
                                 </constraints>
                                 <buttonCell key="cell" type="square" bezelStyle="shadowlessSquare" image="Forward" imagePosition="only" alignment="center" imageScaling="proportionallyDown" inset="2" id="ePU-hF-DNf">
                                     <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
                                     <font key="font" metaFont="system"/>
                                 </buttonCell>
+                                <userDefinedRuntimeAttributes>
+                                    <userDefinedRuntimeAttribute type="color" keyPath="mouseOverColor">
+                                        <color key="value" name="ButtonMouseOverColor"/>
+                                    </userDefinedRuntimeAttribute>
+                                    <userDefinedRuntimeAttribute type="color" keyPath="mouseDownColor">
+                                        <color key="value" name="ButtonMouseDownColor"/>
+                                    </userDefinedRuntimeAttribute>
+                                    <userDefinedRuntimeAttribute type="number" keyPath="cornerRadius">
+                                        <real key="value" value="4"/>
+                                    </userDefinedRuntimeAttribute>
+                                </userDefinedRuntimeAttributes>
                                 <connections>
                                     <action selector="goForwardAction:" target="o2v-eH-jTI" id="aht-fm-Fhd"/>
                                 </connections>
                             </button>
-                            <button translatesAutoresizingMaskIntoConstraints="NO" id="WKw-DB-V3R">
-                                <rect key="frame" x="681" y="6" width="29" height="29"/>
+                            <button translatesAutoresizingMaskIntoConstraints="NO" id="WKw-DB-V3R" customClass="MouseOverButton" customModule="DuckDuckGo_Privacy_Browser" customModuleProvider="target">
+                                <rect key="frame" x="681" y="8" width="32" height="24"/>
                                 <constraints>
-                                    <constraint firstAttribute="width" constant="29" id="0n0-Jg-xha"/>
-                                    <constraint firstAttribute="height" constant="29" id="5aC-wi-5a8"/>
+                                    <constraint firstAttribute="width" constant="32" id="0n0-Jg-xha"/>
+                                    <constraint firstAttribute="height" constant="24" id="5aC-wi-5a8"/>
                                 </constraints>
                                 <buttonCell key="cell" type="square" bezelStyle="shadowlessSquare" image="Refresh" imagePosition="only" alignment="center" imageScaling="proportionallyDown" inset="2" id="1tl-29-GQO">
                                     <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
                                     <font key="font" metaFont="system"/>
                                 </buttonCell>
+                                <userDefinedRuntimeAttributes>
+                                    <userDefinedRuntimeAttribute type="color" keyPath="mouseOverColor">
+                                        <color key="value" name="ButtonMouseOverColor"/>
+                                    </userDefinedRuntimeAttribute>
+                                    <userDefinedRuntimeAttribute type="color" keyPath="mouseDownColor">
+                                        <color key="value" name="ButtonMouseDownColor"/>
+                                    </userDefinedRuntimeAttribute>
+                                    <userDefinedRuntimeAttribute type="number" keyPath="cornerRadius">
+                                        <real key="value" value="4"/>
+                                    </userDefinedRuntimeAttribute>
+                                </userDefinedRuntimeAttributes>
                                 <connections>
                                     <action selector="reloadAction:" target="o2v-eH-jTI" id="dGJ-c6-ARu"/>
                                 </connections>
                             </button>
-                            <button translatesAutoresizingMaskIntoConstraints="NO" id="iIF-Ky-unr">
-                                <rect key="frame" x="808" y="6" width="29" height="29"/>
+                            <button translatesAutoresizingMaskIntoConstraints="NO" id="iIF-Ky-unr" customClass="MouseOverButton" customModule="DuckDuckGo_Privacy_Browser" customModuleProvider="target">
+                                <rect key="frame" x="805" y="8" width="32" height="24"/>
                                 <constraints>
-                                    <constraint firstAttribute="width" constant="29" id="2ry-8Q-yfk"/>
-                                    <constraint firstAttribute="height" constant="29" id="s7E-4e-eTj"/>
+                                    <constraint firstAttribute="width" constant="32" id="2ry-8Q-yfk"/>
+                                    <constraint firstAttribute="height" constant="24" id="s7E-4e-eTj"/>
                                 </constraints>
                                 <buttonCell key="cell" type="square" bezelStyle="shadowlessSquare" image="Settings" imagePosition="only" alignment="center" imageScaling="proportionallyDown" inset="2" id="N7m-mn-k3W">
                                     <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
                                     <font key="font" metaFont="system"/>
                                 </buttonCell>
+                                <userDefinedRuntimeAttributes>
+                                    <userDefinedRuntimeAttribute type="color" keyPath="mouseOverColor">
+                                        <color key="value" name="ButtonMouseOverColor"/>
+                                    </userDefinedRuntimeAttribute>
+                                    <userDefinedRuntimeAttribute type="color" keyPath="mouseDownColor">
+                                        <color key="value" name="ButtonMouseDownColor"/>
+                                    </userDefinedRuntimeAttribute>
+                                    <userDefinedRuntimeAttribute type="number" keyPath="cornerRadius">
+                                        <real key="value" value="4"/>
+                                    </userDefinedRuntimeAttribute>
+                                </userDefinedRuntimeAttributes>
                                 <connections>
                                     <action selector="settingsButtonAction:" target="o2v-eH-jTI" id="Qb4-p7-ZSD"/>
                                 </connections>
@@ -124,6 +168,12 @@
         <image name="Forward" width="7" height="13"/>
         <image name="Refresh" width="12" height="15"/>
         <image name="Settings" width="12" height="3"/>
+        <namedColor name="ButtonMouseDownColor">
+            <color red="0.0" green="0.0" blue="0.0" alpha="0.20000000000000001" colorSpace="custom" customColorSpace="sRGB"/>
+        </namedColor>
+        <namedColor name="ButtonMouseOverColor">
+            <color red="0.0" green="0.0" blue="0.0" alpha="0.10000000000000001" colorSpace="custom" customColorSpace="sRGB"/>
+        </namedColor>
         <namedColor name="InterfaceBackgroundColor">
             <color red="1" green="1" blue="1" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
         </namedColor>

@@ -67,16 +67,27 @@
                         <constraint firstAttribute="width" constant="22" id="XAm-tK-OL9"/>
                     </constraints>
                 </visualEffectView>
-                <button translatesAutoresizingMaskIntoConstraints="NO" id="vuD-rY-Vzl" userLabel="Close Button">
-                    <rect key="frame" x="276" y="11" width="12" height="12"/>
+                <button translatesAutoresizingMaskIntoConstraints="NO" id="vuD-rY-Vzl" userLabel="Close Button" customClass="MouseOverButton" customModule="DuckDuckGo_Privacy_Browser" customModuleProvider="target">
+                    <rect key="frame" x="276" y="9" width="16" height="16"/>
                     <constraints>
-                        <constraint firstAttribute="width" constant="12" id="Jud-dv-fco"/>
-                        <constraint firstAttribute="height" constant="12" id="hNW-Ia-KQk"/>
+                        <constraint firstAttribute="width" constant="16" id="Jud-dv-fco"/>
+                        <constraint firstAttribute="height" constant="16" id="hNW-Ia-KQk"/>
                     </constraints>
                     <buttonCell key="cell" type="square" bezelStyle="shadowlessSquare" image="Close" imagePosition="only" alignment="center" imageScaling="proportionallyDown" inset="2" id="ykX-aF-551">
                         <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
                         <font key="font" metaFont="system"/>
                     </buttonCell>
+                    <userDefinedRuntimeAttributes>
+                        <userDefinedRuntimeAttribute type="number" keyPath="cornerRadius">
+                            <real key="value" value="2"/>
+                        </userDefinedRuntimeAttribute>
+                        <userDefinedRuntimeAttribute type="color" keyPath="mouseOverColor">
+                            <color key="value" name="ButtonMouseOverColor"/>
+                        </userDefinedRuntimeAttribute>
+                        <userDefinedRuntimeAttribute type="color" keyPath="mouseDownColor">
+                            <color key="value" name="ButtonMouseOverColor"/>
+                        </userDefinedRuntimeAttribute>
+                    </userDefinedRuntimeAttributes>
                     <connections>
                         <action selector="closeButtonAction:" target="4MN-w4-aCk" id="ezW-I1-5yy"/>
                     </connections>
@@ -109,7 +120,7 @@
                 <constraint firstAttribute="bottom" secondItem="aR1-Kk-sbt" secondAttribute="bottom" id="fue-Ia-7Dg"/>
                 <constraint firstItem="DFD-8r-YGx" firstAttribute="centerY" secondItem="Hz6-mo-xeY" secondAttribute="centerY" id="oUc-dt-omj"/>
                 <constraint firstAttribute="trailing" secondItem="IUO-04-BRp" secondAttribute="trailing" constant="17" id="q3C-gZ-OsG"/>
-                <constraint firstAttribute="trailing" secondItem="vuD-rY-Vzl" secondAttribute="trailing" constant="13" id="web-9k-BYT"/>
+                <constraint firstAttribute="trailing" secondItem="vuD-rY-Vzl" secondAttribute="trailing" constant="9" id="web-9k-BYT"/>
                 <constraint firstItem="aR1-Kk-sbt" firstAttribute="top" secondItem="Hz6-mo-xeY" secondAttribute="top" id="yJc-fY-6HN"/>
                 <constraint firstItem="vuD-rY-Vzl" firstAttribute="centerY" secondItem="Hz6-mo-xeY" secondAttribute="centerY" id="yci-6f-cbz"/>
                 <constraint firstAttribute="trailing" secondItem="aR1-Kk-sbt" secondAttribute="trailing" constant="17" id="zue-fw-pWg"/>
@@ -135,6 +146,9 @@
     <resources>
         <image name="Close" width="8" height="8"/>
         <image name="TabCloseButtonFade" width="22" height="32"/>
+        <namedColor name="ButtonMouseOverColor">
+            <color red="0.0" green="0.0" blue="0.0" alpha="0.10000000000000001" colorSpace="custom" customColorSpace="sRGB"/>
+        </namedColor>
         <namedColor name="SeparatorColor">
             <color red="0.0" green="0.0" blue="0.0" alpha="0.10000000149011612" colorSpace="custom" customColorSpace="sRGB"/>
         </namedColor>

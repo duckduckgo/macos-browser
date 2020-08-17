@@ -39,10 +39,10 @@ class GradientView: NSView {
         setGradientView()
     }
 
-    @IBInspectable public var backgroundColor1: NSColor? = NSColor.clear
-    @IBInspectable public var backgroundColor2: NSColor? = NSColor.clear
-    @IBInspectable public var startPoint: CGPoint = CGPoint(x: 0.0, y: 0.5)
-    @IBInspectable public var endPoint: CGPoint = CGPoint(x: 1.0, y: 0.5)
+    @IBInspectable var backgroundColor1: NSColor? = NSColor.clear
+    @IBInspectable var backgroundColor2: NSColor? = NSColor.clear
+    @IBInspectable var startPoint: CGPoint = CGPoint(x: 0.0, y: 0.5)
+    @IBInspectable var endPoint: CGPoint = CGPoint(x: 1.0, y: 0.5)
 
     func setGradientView() {
         guard let backgroundColor1 = backgroundColor1, let backgroundColor2 = backgroundColor2 else {

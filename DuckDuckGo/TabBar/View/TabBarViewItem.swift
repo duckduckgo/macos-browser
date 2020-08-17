@@ -130,6 +130,12 @@ class TabBarViewItem: NSCollectionViewItem {
         titleTextField.stringValue = ""
     }
 
+    private var isDragged = false {
+        didSet {
+            setSubviews()
+        }
+    }
+
     private func setView() {
         view.wantsLayer = true
         view.layer?.cornerRadius = 7
@@ -139,12 +145,6 @@ class TabBarViewItem: NSCollectionViewItem {
     private func clearBindings() {
         cancelables.forEach { (cancelable) in
             cancelable.cancel()
-        }
-    }
-
-    private var isDragged = false {
-        didSet {
-            setSubviews()
         }
     }
 
