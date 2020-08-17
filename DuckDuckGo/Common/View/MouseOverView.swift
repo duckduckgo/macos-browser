@@ -60,7 +60,6 @@ class MouseOverView: NSView {
             layer?.backgroundColor = mouseOverColor.cgColor
         } else {
 //            if layer?.backgroundColor == mouseOverColor.cgColor {
-//                print("layer?.backgroundColor \(layer?.backgroundColor)")
 //                let animation = CABasicAnimation(keyPath: "backgroundColor")
 //                animation.fromValue = layer?.backgroundColor
 //                animation.toValue = NSColor.clear.cgColor
