@@ -147,7 +147,7 @@
         <image name="Close" width="8" height="8"/>
         <image name="TabCloseButtonFade" width="22" height="32"/>
         <namedColor name="ButtonMouseOverColor">
-            <color red="0.0" green="0.0" blue="0.0" alpha="0.10000000000000001" colorSpace="custom" customColorSpace="sRGB"/>
+            <color red="0.0" green="0.0" blue="0.0" alpha="0.10000000149011612" colorSpace="custom" customColorSpace="sRGB"/>
         </namedColor>
         <namedColor name="SeparatorColor">
             <color red="0.0" green="0.0" blue="0.0" alpha="0.10000000149011612" colorSpace="custom" customColorSpace="sRGB"/>

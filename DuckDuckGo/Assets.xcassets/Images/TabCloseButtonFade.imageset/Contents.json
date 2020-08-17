@@ -1,12 +1,12 @@
 {
   "images" : [
     {
-      "filename" : "tab-fade-close.png",
+      "filename" : "tab-fade.png",
       "idiom" : "universal",
       "scale" : "1x"
     },
     {
-      "filename" : "tab-fade-close@2x copy.png",
+      "filename" : "tab-fade@2x.png",
       "idiom" : "universal",
       "scale" : "2x"
     },
