@@ -17,39 +17,109 @@
                         <subviews>
                             <visualEffectView blendingMode="behindWindow" material="sidebar" state="active" translatesAutoresizingMaskIntoConstraints="NO" id="8Av-Au-VBq">
                                 <rect key="frame" x="0.0" y="0.0" width="845" height="38"/>
-                                <subviews>
-                                    <button translatesAutoresizingMaskIntoConstraints="NO" id="XV4-Ze-5j7" customClass="MouseOverButton" customModule="DuckDuckGo_Privacy_Browser" customModuleProvider="target">
-                                        <rect key="frame" x="805" y="5" width="32" height="24"/>
-                                        <constraints>
-                                            <constraint firstAttribute="width" constant="32" id="9Ii-rC-Eca"/>
-                                            <constraint firstAttribute="height" constant="24" id="Dea-ni-6y6"/>
-                                        </constraints>
-                                        <buttonCell key="cell" type="square" bezelStyle="shadowlessSquare" image="Burn" imagePosition="only" alignment="center" imageScaling="proportionallyDown" inset="2" id="JD8-8V-x3K">
-                                            <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
-                                            <font key="font" metaFont="system"/>
-                                        </buttonCell>
-                                        <color key="contentTintColor" name="ButtonColor"/>
-                                        <userDefinedRuntimeAttributes>
-                                            <userDefinedRuntimeAttribute type="color" keyPath="mouseOverColor">
-                                                <color key="value" name="ButtonMouseOverColor"/>
-                                            </userDefinedRuntimeAttribute>
-                                            <userDefinedRuntimeAttribute type="number" keyPath="cornerRadius">
-                                                <real key="value" value="4"/>
-                                            </userDefinedRuntimeAttribute>
-                                            <userDefinedRuntimeAttribute type="color" keyPath="mouseDownColor">
-                                                <color key="value" name="ButtonMouseDownColor"/>
-                                            </userDefinedRuntimeAttribute>
-                                        </userDefinedRuntimeAttributes>
-                                        <connections>
-                                            <action selector="burnButtonAction:" target="uSf-9n-QMw" id="ifc-Vj-HVz"/>
-                                        </connections>
-                                    </button>
-                                </subviews>
-                                <constraints>
-                                    <constraint firstAttribute="trailing" secondItem="XV4-Ze-5j7" secondAttribute="trailing" constant="8" id="kCx-t5-ULE"/>
-                                    <constraint firstItem="XV4-Ze-5j7" firstAttribute="centerY" secondItem="8Av-Au-VBq" secondAttribute="centerY" constant="2" id="ziQ-Sz-LH0"/>
-                                </constraints>
                             </visualEffectView>
+                            <button translatesAutoresizingMaskIntoConstraints="NO" id="XV4-Ze-5j7" userLabel="Burn Button" customClass="MouseOverButton" customModule="DuckDuckGo_Privacy_Browser" customModuleProvider="target">
+                                <rect key="frame" x="805" y="5" width="32" height="24"/>
+                                <constraints>
+                                    <constraint firstAttribute="width" constant="32" id="9Ii-rC-Eca"/>
+                                    <constraint firstAttribute="height" constant="24" id="Dea-ni-6y6"/>
+                                </constraints>
+                                <buttonCell key="cell" type="square" bezelStyle="shadowlessSquare" image="Burn" imagePosition="only" alignment="center" imageScaling="proportionallyDown" inset="2" id="JD8-8V-x3K">
+                                    <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
+                                    <font key="font" metaFont="system"/>
+                                </buttonCell>
+                                <color key="contentTintColor" name="ButtonColor"/>
+                                <userDefinedRuntimeAttributes>
+                                    <userDefinedRuntimeAttribute type="color" keyPath="mouseOverColor">
+                                        <color key="value" name="ButtonMouseOverColor"/>
+                                    </userDefinedRuntimeAttribute>
+                                    <userDefinedRuntimeAttribute type="number" keyPath="cornerRadius">
+                                        <real key="value" value="4"/>
+                                    </userDefinedRuntimeAttribute>
+                                    <userDefinedRuntimeAttribute type="color" keyPath="mouseDownColor">
+                                        <color key="value" name="ButtonMouseDownColor"/>
+                                    </userDefinedRuntimeAttribute>
+                                </userDefinedRuntimeAttributes>
+                                <connections>
+                                    <action selector="burnButtonAction:" target="uSf-9n-QMw" id="ifc-Vj-HVz"/>
+                                </connections>
+                            </button>
+                            <button translatesAutoresizingMaskIntoConstraints="NO" id="qXs-b0-tWI" userLabel="Plus Button" customClass="MouseOverButton" customModule="DuckDuckGo_Privacy_Browser" customModuleProvider="target">
+                                <rect key="frame" x="773" y="5" width="32" height="24"/>
+                                <constraints>
+                                    <constraint firstAttribute="width" constant="32" id="Lmr-Cv-caT"/>
+                                    <constraint firstAttribute="height" constant="24" id="dy2-Qu-QxL"/>
+                                </constraints>
+                                <buttonCell key="cell" type="square" bezelStyle="shadowlessSquare" image="Add" imagePosition="overlaps" alignment="center" imageScaling="proportionallyDown" inset="2" id="Lrx-0x-DAw">
+                                    <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
+                                    <font key="font" metaFont="system"/>
+                                </buttonCell>
+                                <color key="contentTintColor" name="ButtonColor"/>
+                                <userDefinedRuntimeAttributes>
+                                    <userDefinedRuntimeAttribute type="color" keyPath="mouseOverColor">
+                                        <color key="value" name="ButtonMouseOverColor"/>
+                                    </userDefinedRuntimeAttribute>
+                                    <userDefinedRuntimeAttribute type="number" keyPath="cornerRadius">
+                                        <real key="value" value="4"/>
+                                    </userDefinedRuntimeAttribute>
+                                    <userDefinedRuntimeAttribute type="color" keyPath="mouseDownColor">
+                                        <color key="value" name="ButtonMouseDownColor"/>
+                                    </userDefinedRuntimeAttribute>
+                                </userDefinedRuntimeAttributes>
+                                <connections>
+                                    <action selector="addButtonAction:" target="uSf-9n-QMw" id="Nx9-xc-NzJ"/>
+                                </connections>
+                            </button>
+                            <button hidden="YES" translatesAutoresizingMaskIntoConstraints="NO" id="2da-G7-xcP" userLabel="Right Scroll Button" customClass="MouseOverButton" customModule="DuckDuckGo_Privacy_Browser" customModuleProvider="target">
+                                <rect key="frame" x="741" y="5" width="32" height="24"/>
+                                <constraints>
+                                    <constraint firstAttribute="width" constant="32" id="avH-Y7-ipU"/>
+                                    <constraint firstAttribute="height" constant="24" id="loq-Q2-JPM"/>
+                                </constraints>
+                                <buttonCell key="cell" type="square" bezelStyle="shadowlessSquare" image="Forward" imagePosition="only" alignment="center" imageScaling="proportionallyDown" inset="2" id="R1x-TD-SO5">
+                                    <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
+                                    <font key="font" metaFont="system"/>
+                                </buttonCell>
+                                <userDefinedRuntimeAttributes>
+                                    <userDefinedRuntimeAttribute type="color" keyPath="mouseOverColor">
+                                        <color key="value" name="ButtonMouseOverColor"/>
+                                    </userDefinedRuntimeAttribute>
+                                    <userDefinedRuntimeAttribute type="color" keyPath="mouseDownColor">
+                                        <color key="value" name="ButtonMouseDownColor"/>
+                                    </userDefinedRuntimeAttribute>
+                                    <userDefinedRuntimeAttribute type="number" keyPath="cornerRadius">
+                                        <real key="value" value="4"/>
+                                    </userDefinedRuntimeAttribute>
+                                </userDefinedRuntimeAttributes>
+                                <connections>
+                                    <action selector="rightScrollButtonAction:" target="uSf-9n-QMw" id="j7F-Ke-3i3"/>
+                                </connections>
+                            </button>
+                            <button hidden="YES" translatesAutoresizingMaskIntoConstraints="NO" id="7XG-Qm-Ksx" userLabel="Left Scroll Button" customClass="MouseOverButton" customModule="DuckDuckGo_Privacy_Browser" customModuleProvider="target">
+                                <rect key="frame" x="72" y="5" width="32" height="24"/>
+                                <constraints>
+                                    <constraint firstAttribute="height" constant="24" id="bi3-CJ-RZk"/>
+                                    <constraint firstAttribute="width" constant="32" id="hQ5-kp-q6K"/>
+                                </constraints>
+                                <buttonCell key="cell" type="square" bezelStyle="shadowlessSquare" image="Back" imagePosition="only" alignment="center" imageScaling="proportionallyDown" inset="2" id="ZaC-5g-rMK">
+                                    <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
+                                    <font key="font" metaFont="system"/>
+                                </buttonCell>
+                                <userDefinedRuntimeAttributes>
+                                    <userDefinedRuntimeAttribute type="color" keyPath="mouseOverColor">
+                                        <color key="value" name="ButtonMouseOverColor"/>
+                                    </userDefinedRuntimeAttribute>
+                                    <userDefinedRuntimeAttribute type="color" keyPath="mouseDownColor">
+                                        <color key="value" name="ButtonMouseDownColor"/>
+                                    </userDefinedRuntimeAttribute>
+                                    <userDefinedRuntimeAttribute type="number" keyPath="cornerRadius">
+                                        <real key="value" value="4"/>
+                                    </userDefinedRuntimeAttribute>
+                                </userDefinedRuntimeAttributes>
+                                <connections>
+                                    <action selector="leftScrollButtonAction:" target="uSf-9n-QMw" id="hBs-JI-5HW"/>
+                                </connections>
+                            </button>
                             <scrollView wantsLayer="YES" borderType="none" horizontalLineScroll="10" horizontalPageScroll="10" verticalLineScroll="10" verticalPageScroll="10" hasVerticalScroller="NO" verticalScrollElasticity="none" translatesAutoresizingMaskIntoConstraints="NO" id="O0X-yp-zLn" customClass="TabBarScrollView" customModule="DuckDuckGo_Privacy_Browser" customModuleProvider="target">
                                 <rect key="frame" x="80" y="0.0" width="685" height="32"/>
                                 <clipView key="contentView" drawsBackground="NO" copiesOnScroll="NO" translatesAutoresizingMaskIntoConstraints="NO" id="zdf-RD-hTG">
@@ -82,40 +152,14 @@
                                     <autoresizingMask key="autoresizingMask"/>
                                 </scroller>
                             </scrollView>
-                            <button translatesAutoresizingMaskIntoConstraints="NO" id="qXs-b0-tWI" customClass="MouseOverButton" customModule="DuckDuckGo_Privacy_Browser" customModuleProvider="target">
-                                <rect key="frame" x="773" y="5" width="32" height="24"/>
-                                <constraints>
-                                    <constraint firstAttribute="width" constant="32" id="Lmr-Cv-caT"/>
-                                    <constraint firstAttribute="height" constant="24" id="dy2-Qu-QxL"/>
-                                </constraints>
-                                <buttonCell key="cell" type="square" bezelStyle="shadowlessSquare" image="Add" imagePosition="overlaps" alignment="center" imageScaling="proportionallyDown" inset="2" id="Lrx-0x-DAw">
-                                    <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
-                                    <font key="font" metaFont="system"/>
-                                </buttonCell>
-                                <color key="contentTintColor" name="ButtonColor"/>
-                                <userDefinedRuntimeAttributes>
-                                    <userDefinedRuntimeAttribute type="color" keyPath="mouseOverColor">
-                                        <color key="value" name="ButtonMouseOverColor"/>
-                                    </userDefinedRuntimeAttribute>
-                                    <userDefinedRuntimeAttribute type="number" keyPath="cornerRadius">
-                                        <real key="value" value="4"/>
-                                    </userDefinedRuntimeAttribute>
-                                    <userDefinedRuntimeAttribute type="color" keyPath="mouseDownColor">
-                                        <color key="value" name="ButtonMouseDownColor"/>
-                                    </userDefinedRuntimeAttribute>
-                                </userDefinedRuntimeAttributes>
-                                <connections>
-                                    <action selector="addButtonAction:" target="uSf-9n-QMw" id="Nx9-xc-NzJ"/>
-                                </connections>
-                            </button>
-                            <imageView horizontalHuggingPriority="251" verticalHuggingPriority="251" translatesAutoresizingMaskIntoConstraints="NO" id="u4N-Qc-LMf" userLabel="Right Shadow Image">
+                            <imageView hidden="YES" horizontalHuggingPriority="251" verticalHuggingPriority="251" translatesAutoresizingMaskIntoConstraints="NO" id="u4N-Qc-LMf" userLabel="Right Shadow Image">
                                 <rect key="frame" x="760" y="0.0" width="5" height="38"/>
                                 <constraints>
                                     <constraint firstAttribute="width" constant="5" id="tqI-pU-ZWB"/>
                                 </constraints>
                                 <imageCell key="cell" refusesFirstResponder="YES" alignment="left" imageScaling="axesIndependently" image="TabBarShadowRight" id="qd0-z2-M5R"/>
                             </imageView>
-                            <imageView horizontalHuggingPriority="251" verticalHuggingPriority="251" translatesAutoresizingMaskIntoConstraints="NO" id="zsA-or-9Xo" userLabel="Left Shadow Image">
+                            <imageView hidden="YES" horizontalHuggingPriority="251" verticalHuggingPriority="251" translatesAutoresizingMaskIntoConstraints="NO" id="zsA-or-9Xo" userLabel="Left Shadow Image">
                                 <rect key="frame" x="80" y="0.0" width="5" height="38"/>
                                 <constraints>
                                     <constraint firstAttribute="width" constant="5" id="Zrh-wT-hvv"/>
@@ -125,7 +169,10 @@
                         </subviews>
                         <constraints>
                             <constraint firstAttribute="trailing" secondItem="8Av-Au-VBq" secondAttribute="trailing" id="04T-2h-lX4"/>
+                            <constraint firstAttribute="trailing" secondItem="XV4-Ze-5j7" secondAttribute="trailing" constant="8" id="2jP-Xp-ZCD"/>
                             <constraint firstAttribute="bottom" secondItem="O0X-yp-zLn" secondAttribute="bottom" id="9nu-uZ-CjI"/>
+                            <constraint firstItem="7XG-Qm-Ksx" firstAttribute="centerY" secondItem="JQD-ov-FCr" secondAttribute="centerY" constant="2" id="A97-ix-81W"/>
+                            <constraint firstItem="XV4-Ze-5j7" firstAttribute="centerY" secondItem="JQD-ov-FCr" secondAttribute="centerY" constant="2" id="BUV-Em-g9d"/>
                             <constraint firstItem="u4N-Qc-LMf" firstAttribute="trailing" secondItem="O0X-yp-zLn" secondAttribute="trailing" id="Bd1-0P-xDt"/>
                             <constraint firstItem="zsA-or-9Xo" firstAttribute="top" secondItem="JQD-ov-FCr" secondAttribute="top" id="CKr-JO-cA6"/>
                             <constraint firstItem="O0X-yp-zLn" firstAttribute="leading" secondItem="JQD-ov-FCr" secondAttribute="leading" constant="80" id="Cdb-LF-Iz8"/>
@@ -134,17 +181,26 @@
                             <constraint firstAttribute="trailing" secondItem="qXs-b0-tWI" secondAttribute="trailing" constant="40" id="Fsr-hL-HYK"/>
                             <constraint firstItem="qXs-b0-tWI" firstAttribute="centerY" secondItem="JQD-ov-FCr" secondAttribute="centerY" constant="2" id="Iib-Si-FQP"/>
                             <constraint firstItem="O0X-yp-zLn" firstAttribute="top" secondItem="JQD-ov-FCr" secondAttribute="top" constant="6" id="L7c-2V-Cvh"/>
+                            <constraint firstAttribute="trailing" secondItem="2da-G7-xcP" secondAttribute="trailing" constant="72" id="MzW-an-3dV"/>
+                            <constraint firstItem="7XG-Qm-Ksx" firstAttribute="leading" secondItem="JQD-ov-FCr" secondAttribute="leading" constant="72" id="RUQ-ds-h8T"/>
                             <constraint firstItem="8Av-Au-VBq" firstAttribute="top" secondItem="JQD-ov-FCr" secondAttribute="top" id="UNA-xd-vb7"/>
                             <constraint firstItem="O0X-yp-zLn" firstAttribute="leading" secondItem="zsA-or-9Xo" secondAttribute="leading" id="bIL-4K-ggG"/>
                             <constraint firstItem="8Av-Au-VBq" firstAttribute="leading" secondItem="JQD-ov-FCr" secondAttribute="leading" id="djE-ZR-Zcb"/>
                             <constraint firstAttribute="bottom" secondItem="8Av-Au-VBq" secondAttribute="bottom" id="pat-VC-dVb"/>
                             <constraint firstAttribute="trailing" secondItem="O0X-yp-zLn" secondAttribute="trailing" constant="80" id="sUB-ad-rWC"/>
+                            <constraint firstItem="2da-G7-xcP" firstAttribute="centerY" secondItem="JQD-ov-FCr" secondAttribute="centerY" constant="2" id="sYC-z4-pRR"/>
                             <constraint firstItem="u4N-Qc-LMf" firstAttribute="top" secondItem="JQD-ov-FCr" secondAttribute="top" id="zB8-BE-pJR"/>
                         </constraints>
                     </view>
                     <connections>
                         <outlet property="collectionView" destination="OEu-5P-cRF" id="b95-c4-JM0"/>
+                        <outlet property="leftScrollButton" destination="7XG-Qm-Ksx" id="yre-8P-vb9"/>
+                        <outlet property="leftShadowImageView" destination="zsA-or-9Xo" id="wVp-jj-2UD"/>
+                        <outlet property="rightScrollButton" destination="2da-G7-xcP" id="4ka-kI-E1j"/>
+                        <outlet property="rightShadowImageView" destination="u4N-Qc-LMf" id="QX4-lD-gfb"/>
                         <outlet property="scrollView" destination="O0X-yp-zLn" id="g9v-fn-qxC"/>
+                        <outlet property="scrollViewLeadingConstraint" destination="Cdb-LF-Iz8" id="Ruf-vn-t0S"/>
+                        <outlet property="scrollViewTrailingConstraint" destination="sUB-ad-rWC" id="FHK-kx-jY3"/>
                     </connections>
                 </viewController>
                 <customObject id="7J5-0H-rHB" userLabel="First Responder" customClass="NSResponder" sceneMemberID="firstResponder"/>
@@ -154,7 +210,9 @@
     </scenes>
     <resources>
         <image name="Add" width="14" height="14"/>
+        <image name="Back" width="7" height="13"/>
         <image name="Burn" width="12" height="14"/>
+        <image name="Forward" width="7" height="13"/>
         <image name="TabBarShadowLeft" width="5" height="34"/>
         <image name="TabBarShadowRight" width="5" height="34"/>
         <namedColor name="ButtonColor">

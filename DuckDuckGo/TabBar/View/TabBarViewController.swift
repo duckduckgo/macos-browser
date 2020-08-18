@@ -22,8 +22,19 @@ import Combine
 
 class TabBarViewController: NSViewController {
 
+    enum CollectionViewHorizontalSpace: CGFloat {
+        case withScrollButtons = 112
+        case withoutScrollButtons = 80
+    }
+
     @IBOutlet weak var collectionView: NSCollectionView!
     @IBOutlet weak var scrollView: TabBarScrollView!
+    @IBOutlet weak var scrollViewTrailingConstraint: NSLayoutConstraint!
+    @IBOutlet weak var scrollViewLeadingConstraint: NSLayoutConstraint!
+    @IBOutlet weak var rightScrollButton: MouseOverButton!
+    @IBOutlet weak var leftScrollButton: MouseOverButton!
+    @IBOutlet weak var rightShadowImageView: NSImageView!
+    @IBOutlet weak var leftShadowImageView: NSImageView!
 
     private let tabCollectionViewModel: TabCollectionViewModel
     private var tabsCancelable: AnyCancellable?
@@ -60,12 +71,24 @@ class TabBarViewController: NSViewController {
         collectionView.collectionViewLayout?.invalidateLayout()
     }
 
+    deinit {
+        NotificationCenter.default.removeObserver(self)
+    }
+
     @IBAction func burnButtonAction(_ sender: NSButton) {
 
     }
 
     @IBAction func addButtonAction(_ sender: NSButton) {
         tabCollectionViewModel.appendNewTab()
+    }
+
+    @IBAction func rightScrollButtonAction(_ sender: NSButton) {
+        scrollToEnd()
+    }
+
+    @IBAction func leftScrollButtonAction(_ sender: NSButton) {
+        scrollToBeginning()
     }
 
     private func setupCollectionView() {
@@ -78,6 +101,7 @@ class TabBarViewController: NSViewController {
         collectionView.setDraggingSourceOperationMask(NSDragOperation.move, forLocal: false)
 
         setScrollElasticity()
+        receiveScrollNotifications()
     }
 
     private func bindSelectionIndex() {
@@ -168,7 +192,7 @@ class TabBarViewController: NSViewController {
         didSet {
             if oldValue != tabMode {
                 setScrollElasticity()
-                //todo display arrows
+                setScrollButtons()
                 collectionView.collectionViewLayout?.invalidateLayout()
             }
         }
@@ -202,9 +226,44 @@ class TabBarViewController: NSViewController {
 
     // MARK: - Scrolling & Scroll Buttons
 
+    private func receiveScrollNotifications() {
+        scrollView.contentView.postsBoundsChangedNotifications = true
+
+        NotificationCenter.default.addObserver(self,
+                                               selector: #selector(scrollViewBoundsDidChange(_:)),
+                                               name: NSView.boundsDidChangeNotification,
+                                               object: scrollView.contentView)
+    }
+
+    @objc private func scrollViewBoundsDidChange(_ sender: Any) {
+        let clipView = scrollView.contentView
+        rightScrollButton.isEnabled = clipView.bounds.origin.x + clipView.bounds.size.width < collectionView.bounds.size.width
+        leftScrollButton.isEnabled = clipView.bounds.origin.x > 0
+    }
+
+    private func setScrollButtons() {
+        let horizontalSpace = tabMode == .divided ?
+            CollectionViewHorizontalSpace.withoutScrollButtons.rawValue :
+            CollectionViewHorizontalSpace.withScrollButtons.rawValue
+        scrollViewLeadingConstraint.constant = horizontalSpace
+        scrollViewTrailingConstraint.constant = horizontalSpace
+
+        let scrollViewsAreHidden = tabMode == .divided
+        rightScrollButton.isHidden = scrollViewsAreHidden
+        leftScrollButton.isHidden = scrollViewsAreHidden
+        rightShadowImageView.isHidden = scrollViewsAreHidden
+        leftShadowImageView.isHidden = scrollViewsAreHidden
+    }
+
     private func scrollToEnd(completionHandler: ((Bool) -> Void)? = nil) {
         collectionView.animator().performBatchUpdates({
             collectionView.animator().scroll(CGPoint(x: self.collectionView.bounds.size.width, y: 0))
+        }, completionHandler: completionHandler)
+    }
+
+    private func scrollToBeginning(completionHandler: ((Bool) -> Void)? = nil) {
+        collectionView.animator().performBatchUpdates({
+            collectionView.animator().scroll(CGPoint(x: 0, y: 0))
         }, completionHandler: completionHandler)
     }
 
