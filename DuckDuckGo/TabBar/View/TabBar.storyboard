@@ -166,10 +166,14 @@
                                 </constraints>
                                 <imageCell key="cell" refusesFirstResponder="YES" alignment="left" imageScaling="axesIndependently" image="TabBarShadowLeft" id="crE-9i-66r"/>
                             </imageView>
+                            <customView translatesAutoresizingMaskIntoConstraints="NO" id="efe-Pc-ueT" userLabel="Window Dragging View" customClass="WindowDraggingView" customModule="DuckDuckGo_Privacy_Browser" customModuleProvider="target">
+                                <rect key="frame" x="80" y="0.0" width="685" height="38"/>
+                            </customView>
                         </subviews>
                         <constraints>
                             <constraint firstAttribute="trailing" secondItem="8Av-Au-VBq" secondAttribute="trailing" id="04T-2h-lX4"/>
                             <constraint firstAttribute="trailing" secondItem="XV4-Ze-5j7" secondAttribute="trailing" constant="8" id="2jP-Xp-ZCD"/>
+                            <constraint firstItem="efe-Pc-ueT" firstAttribute="leading" secondItem="O0X-yp-zLn" secondAttribute="leading" priority="250" id="5k3-uY-xby"/>
                             <constraint firstAttribute="bottom" secondItem="O0X-yp-zLn" secondAttribute="bottom" id="9nu-uZ-CjI"/>
                             <constraint firstItem="7XG-Qm-Ksx" firstAttribute="centerY" secondItem="JQD-ov-FCr" secondAttribute="centerY" constant="2" id="A97-ix-81W"/>
                             <constraint firstItem="XV4-Ze-5j7" firstAttribute="centerY" secondItem="JQD-ov-FCr" secondAttribute="centerY" constant="2" id="BUV-Em-g9d"/>
@@ -177,15 +181,19 @@
                             <constraint firstItem="zsA-or-9Xo" firstAttribute="top" secondItem="JQD-ov-FCr" secondAttribute="top" id="CKr-JO-cA6"/>
                             <constraint firstItem="O0X-yp-zLn" firstAttribute="leading" secondItem="JQD-ov-FCr" secondAttribute="leading" constant="80" id="Cdb-LF-Iz8"/>
                             <constraint firstAttribute="bottom" secondItem="zsA-or-9Xo" secondAttribute="bottom" id="ErC-gw-bFR"/>
+                            <constraint firstItem="efe-Pc-ueT" firstAttribute="trailing" secondItem="O0X-yp-zLn" secondAttribute="trailing" priority="250" id="FJf-Su-MHu"/>
                             <constraint firstAttribute="bottom" secondItem="u4N-Qc-LMf" secondAttribute="bottom" id="Fc4-Wo-qz3"/>
                             <constraint firstAttribute="trailing" secondItem="qXs-b0-tWI" secondAttribute="trailing" constant="40" id="Fsr-hL-HYK"/>
+                            <constraint firstAttribute="bottom" secondItem="O0X-yp-zLn" secondAttribute="bottom" id="H4i-IA-5l5"/>
                             <constraint firstItem="qXs-b0-tWI" firstAttribute="centerY" secondItem="JQD-ov-FCr" secondAttribute="centerY" constant="2" id="Iib-Si-FQP"/>
                             <constraint firstItem="O0X-yp-zLn" firstAttribute="top" secondItem="JQD-ov-FCr" secondAttribute="top" constant="6" id="L7c-2V-Cvh"/>
                             <constraint firstAttribute="trailing" secondItem="2da-G7-xcP" secondAttribute="trailing" constant="72" id="MzW-an-3dV"/>
                             <constraint firstItem="7XG-Qm-Ksx" firstAttribute="leading" secondItem="JQD-ov-FCr" secondAttribute="leading" constant="72" id="RUQ-ds-h8T"/>
+                            <constraint firstAttribute="bottom" secondItem="efe-Pc-ueT" secondAttribute="bottom" priority="750" id="Si3-u3-31S"/>
                             <constraint firstItem="8Av-Au-VBq" firstAttribute="top" secondItem="JQD-ov-FCr" secondAttribute="top" id="UNA-xd-vb7"/>
                             <constraint firstItem="O0X-yp-zLn" firstAttribute="leading" secondItem="zsA-or-9Xo" secondAttribute="leading" id="bIL-4K-ggG"/>
                             <constraint firstItem="8Av-Au-VBq" firstAttribute="leading" secondItem="JQD-ov-FCr" secondAttribute="leading" id="djE-ZR-Zcb"/>
+                            <constraint firstItem="efe-Pc-ueT" firstAttribute="top" secondItem="JQD-ov-FCr" secondAttribute="top" priority="750" id="kNA-2I-L0U"/>
                             <constraint firstAttribute="bottom" secondItem="8Av-Au-VBq" secondAttribute="bottom" id="pat-VC-dVb"/>
                             <constraint firstAttribute="trailing" secondItem="O0X-yp-zLn" secondAttribute="trailing" constant="80" id="sUB-ad-rWC"/>
                             <constraint firstItem="2da-G7-xcP" firstAttribute="centerY" secondItem="JQD-ov-FCr" secondAttribute="centerY" constant="2" id="sYC-z4-pRR"/>
@@ -201,6 +209,7 @@
                         <outlet property="scrollView" destination="O0X-yp-zLn" id="g9v-fn-qxC"/>
                         <outlet property="scrollViewLeadingConstraint" destination="Cdb-LF-Iz8" id="Ruf-vn-t0S"/>
                         <outlet property="scrollViewTrailingConstraint" destination="sUB-ad-rWC" id="FHK-kx-jY3"/>
+                        <outlet property="windowDraggingViewLeadingConstraint" destination="5k3-uY-xby" id="kVU-yU-9M4"/>
                     </connections>
                 </viewController>
                 <customObject id="7J5-0H-rHB" userLabel="First Responder" customClass="NSResponder" sceneMemberID="firstResponder"/>

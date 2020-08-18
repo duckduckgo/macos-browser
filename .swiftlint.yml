@@ -18,6 +18,9 @@ type_name:
   max_length:
     warning: 80
     error: 100
+file_length:
+  warning: 700
+  error: 1200
 
 # General Config
 excluded:

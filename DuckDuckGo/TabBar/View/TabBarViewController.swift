@@ -35,6 +35,7 @@ class TabBarViewController: NSViewController {
     @IBOutlet weak var leftScrollButton: MouseOverButton!
     @IBOutlet weak var rightShadowImageView: NSImageView!
     @IBOutlet weak var leftShadowImageView: NSImageView!
+    @IBOutlet weak var windowDraggingViewLeadingConstraint: NSLayoutConstraint!
 
     private let tabCollectionViewModel: TabCollectionViewModel
     private var tabsCancelable: AnyCancellable?
@@ -61,6 +62,7 @@ class TabBarViewController: NSViewController {
         super.viewWillAppear()
 
         addInitialTab()
+        setWindowDraggingArea()
         tabCollectionViewModel.tabCollection.delegate = self
     }
 
@@ -68,6 +70,7 @@ class TabBarViewController: NSViewController {
         super.viewDidLayout()
 
         setTabMode(for: collectionView.numberOfItems(inSection: 0))
+        setWindowDraggingArea()
         collectionView.collectionViewLayout?.invalidateLayout()
     }
 
@@ -142,6 +145,14 @@ class TabBarViewController: NSViewController {
         }
     }
 
+    // MARK: - Window Dragging
+
+    private func setWindowDraggingArea() {
+        let leadingSpace = min(CGFloat(collectionView.numberOfItems(inSection: 0)) *
+                                currentTabWidth(), scrollView.frame.size.width)
+        windowDraggingViewLeadingConstraint.constant = leadingSpace
+    }
+
     // MARK: - Selection
 
     private func clearCollectionViewSelection() {
@@ -193,6 +204,7 @@ class TabBarViewController: NSViewController {
             if oldValue != tabMode {
                 setScrollElasticity()
                 setScrollButtons()
+                setWindowDraggingArea()
                 collectionView.collectionViewLayout?.invalidateLayout()
             }
         }
@@ -303,6 +315,7 @@ extension TabBarViewController: TabCollectionDelegate {
                 }
             }
         }
+        setWindowDraggingArea()
     }
 
     func tabCollection(_ tabCollection: TabCollection, didInsert tab: Tab, at index: Int) {
@@ -311,6 +324,7 @@ extension TabBarViewController: TabCollectionDelegate {
         collectionView.animator().insertItems(at: indexPathSet)
 
         setTabMode()
+        setWindowDraggingArea()
     }
 
     func tabCollection(_ tabCollection: TabCollection, didRemoveTabAt index: Int) {
@@ -324,6 +338,7 @@ extension TabBarViewController: TabCollectionDelegate {
         }
 
         closeWindowIfNeeded()
+        setWindowDraggingArea()
     }
 
     func tabCollection(_ tabCollection: TabCollection, didMoveTabAt index: Int, to newIndex: Int) {
