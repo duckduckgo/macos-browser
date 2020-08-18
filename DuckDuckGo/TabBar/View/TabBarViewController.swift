@@ -208,6 +208,18 @@ class TabBarViewController: NSViewController {
         }, completionHandler: completionHandler)
     }
 
+    private func scrollToSelected() {
+        guard collectionView.selectionIndexPaths.count == 1, let indexPath = collectionView.selectionIndexPaths.first else {
+            os_log("TabBarViewController: More than 1 item highlighted", log: OSLog.Category.general, type: .error)
+            return
+        }
+
+        let rect = collectionView.frameForItem(at: indexPath.item)
+        collectionView.animator().performBatchUpdates({
+            collectionView.animator().scrollToVisible(rect)
+        }, completionHandler: nil)
+    }
+
 }
 
 // swiftlint:disable compiler_protocol_init
@@ -318,6 +330,11 @@ extension TabBarViewController: NSCollectionViewDelegate {
         if highlightState == .forSelection {
             clearCollectionViewSelection()
             selectItem(at: indexPath)
+
+            // Poor old NSCollectionView
+            DispatchQueue.main.async {
+                self.scrollToSelected()
+            }
         }
     }
 
