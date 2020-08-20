@@ -89,7 +89,7 @@ class NavigationBarViewController: NSViewController {
     }
 
     private func bindSelectedTabViewModel() {
-        selectedTabViewModelCancelable = tabCollectionViewModel.$selectedTabViewModel.sinkAsync { [weak self] _ in
+        selectedTabViewModelCancelable = tabCollectionViewModel.$selectedTabViewModel.receive(on: DispatchQueue.main).sink { [weak self] _ in
             self?.bindUrl()
             self?.bindNavigationButtons()
         }
@@ -102,7 +102,7 @@ class NavigationBarViewController: NSViewController {
             autocompleteSearchField.stringValue = ""
             return
         }
-        urlCancelable = selectedTabViewModel.$addressBarString.sinkAsync { [weak self] _ in self?.refreshSearchField() }
+        urlCancelable = selectedTabViewModel.$addressBarString.receive(on: DispatchQueue.main).sink { [weak self] _ in self?.refreshSearchField() }
     }
 
     private func bindNavigationButtons() {
@@ -115,9 +115,9 @@ class NavigationBarViewController: NSViewController {
             reloadButton.isEnabled = false
             return
         }
-        selectedTabViewModel.$canGoBack.sinkAsync { [weak self] _ in self?.setNavigationButtons() } .store(in: &navigationButtonsCancelables)
-        selectedTabViewModel.$canGoForward.sinkAsync { [weak self] _ in self?.setNavigationButtons() } .store(in: &navigationButtonsCancelables)
-        selectedTabViewModel.$canReload.sinkAsync { [weak self] _ in self?.setNavigationButtons() } .store(in: &navigationButtonsCancelables)
+        selectedTabViewModel.$canGoBack.receive(on: DispatchQueue.main).sink { [weak self] _ in self?.setNavigationButtons() } .store(in: &navigationButtonsCancelables)
+        selectedTabViewModel.$canGoForward.receive(on: DispatchQueue.main).sink { [weak self] _ in self?.setNavigationButtons() } .store(in: &navigationButtonsCancelables)
+        selectedTabViewModel.$canReload.receive(on: DispatchQueue.main).sink { [weak self] _ in self?.setNavigationButtons() } .store(in: &navigationButtonsCancelables)
     }
 
     private func makeSearchFieldFirstResponder() {

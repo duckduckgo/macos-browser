@@ -107,7 +107,7 @@ class TabBarViewController: NSViewController {
     }
 
     private func bindSelectionIndex() {
-        selectionIndexCancelable = tabCollectionViewModel.$selectionIndex.sinkAsync { [weak self] _ in
+        selectionIndexCancelable = tabCollectionViewModel.$selectionIndex.receive(on: DispatchQueue.main).sink { [weak self] _ in
             self?.reloadSelection()
         }
     }

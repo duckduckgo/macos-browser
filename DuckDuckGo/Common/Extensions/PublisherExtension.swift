@@ -16,18 +16,18 @@
 //  limitations under the License.
 //
 
-import Foundation
-import Combine
-
-@available(OSX 10.15, iOS 13.0, tvOS 13.0, watchOS 6.0, *)
-extension Publisher where Self.Failure == Never {
-
-    public func sinkAsync(receiveValue: @escaping ((Self.Output) -> Void)) -> AnyCancellable {
-        return self.sink { (output) in
-            DispatchQueue.main.async {
-                receiveValue(output)
-            }
-        }
-    }
-
-}
+//import Foundation
+//import Combine
+//
+//@available(OSX 10.15, iOS 13.0, tvOS 13.0, watchOS 6.0, *)
+//extension Publisher where Self.Failure == Never {
+//
+//    public func sinkAsync(receiveValue: @escaping ((Self.Output) -> Void)) -> AnyCancellable {
+//        return self.sink { (output) in
+//            DispatchQueue.main.async {
+//                receiveValue(output)
+//            }
+//        }
+//    }
+//
+//}

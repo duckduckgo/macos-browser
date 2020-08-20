@@ -59,18 +59,18 @@ class TabViewModel {
     }
 
     private func bindUrl() {
-        tab.$url.sinkAsync { [weak self] _ in
+        tab.$url.receive(on: DispatchQueue.main).sink { [weak self] _ in
             self?.updateCanReaload()
             self?.updateAddressBarString()
         } .store(in: &cancelables)
     }
 
     private func bindTitle() {
-        tab.$title.sinkAsync { [weak self] _ in self?.updateTitle() } .store(in: &cancelables)
+        tab.$title.receive(on: DispatchQueue.main).sink { [weak self] _ in self?.updateTitle() } .store(in: &cancelables)
     }
 
     private func bindFavicon() {
-        tab.$favicon.sinkAsync { [weak self] _ in self?.updateFavicon() } .store(in: &cancelables)
+        tab.$favicon.receive(on: DispatchQueue.main).sink { [weak self] _ in self?.updateFavicon() } .store(in: &cancelables)
     }
 
     private func updateCanReaload() {

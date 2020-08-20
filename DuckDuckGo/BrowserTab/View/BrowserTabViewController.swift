@@ -50,7 +50,7 @@ class BrowserTabViewController: NSViewController {
     }
 
     private func bindSelectedTabViewModel() {
-        selectedTabViewModelCancelable = tabCollectionViewModel.$selectedTabViewModel.sinkAsync { [weak self] _ in
+        selectedTabViewModelCancelable = tabCollectionViewModel.$selectedTabViewModel.receive(on: DispatchQueue.main).sink { [weak self] _ in
             self?.changeWebView()
         }
     }
@@ -68,7 +68,7 @@ class BrowserTabViewController: NSViewController {
 
         func bindUrl(of tabViewModel: TabViewModel) {
             urlCancelable?.cancel()
-            urlCancelable = tabViewModel.tab.$url.sinkAsync { [weak self] _ in self?.reloadWebViewIfNeeded() }
+            urlCancelable = tabViewModel.tab.$url.receive(on: DispatchQueue.main).sink { [weak self] _ in self?.reloadWebViewIfNeeded() }
         }
 
         if let webView = webView, view.subviews.contains(webView) {
