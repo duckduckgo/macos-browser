@@ -38,6 +38,7 @@ class TabCollectionViewModel {
         self.tabCollection = tabCollection
 
         bindTabs()
+        appendNewTab()
     }
 
     convenience init() {

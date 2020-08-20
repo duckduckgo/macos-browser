@@ -61,7 +61,6 @@ class TabBarViewController: NSViewController {
     override func viewWillAppear() {
         super.viewWillAppear()
 
-        addInitialTab()
         setWindowDraggingArea()
         tabCollectionViewModel.tabCollection.delegate = self
     }
@@ -129,10 +128,6 @@ class TabBarViewController: NSViewController {
         } else {
             collectionView.selectItems(at: [newSelectionIndexPath], scrollPosition: .centeredHorizontally)
         }
-    }
-
-    private func addInitialTab() {
-        tabCollectionViewModel.appendNewTab()
     }
 
     private func closeWindowIfNeeded() {
