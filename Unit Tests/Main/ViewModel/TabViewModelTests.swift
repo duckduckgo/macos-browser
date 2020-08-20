@@ -36,7 +36,9 @@ class TabViewModelTests: XCTestCase {
         let searchUrl = URL.makeSearchUrl(from: query)
         tab.url = searchUrl
 
-        XCTAssertEqual(tabViewModel.addressBarString, query)
+        DispatchQueue.main.async {
+            XCTAssertEqual(tabViewModel.addressBarString, query)
+        }
     }
 
     func testWhenURLIsRegularSiteThenAddressBarStringIsTheURLWithoutPrefix() {
@@ -46,7 +48,9 @@ class TabViewModelTests: XCTestCase {
         let urlString = "spreadprivacy.com"
         tab.url = URL.makeURL(from: urlString)
 
-        XCTAssertEqual(tabViewModel.addressBarString, urlString)
+        DispatchQueue.main.async {
+            XCTAssertEqual(tabViewModel.addressBarString, urlString)
+        }
     }
 
 }

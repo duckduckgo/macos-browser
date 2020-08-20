@@ -21,11 +21,11 @@ import XCTest
 
 class TabCollectionViewModelTests: XCTestCase {
 
-    func testWhenSelectionIndexIsNilThenSelectedTabViewModelIsNil() {
+    func testWhenTabCollectionViewModelIsInitializedThenSelectedTabViewModelIsFirst() {
         let tabCollection = TabCollection()
         let tabCollectionViewModel = TabCollectionViewModel(tabCollection: tabCollection)
-        
-        XCTAssertNil(tabCollectionViewModel.selectedTabViewModel)
+
+        XCTAssert(tabCollectionViewModel.selectedTabViewModel === tabCollectionViewModel.tabViewModel(at: 0))
     }
     
     func testWhenSelectionIndexIsOutOfBoundsThenSelectedTabViewModelIsNil() {
@@ -40,22 +40,17 @@ class TabCollectionViewModelTests: XCTestCase {
     func testWhenSelectionIndexPointsToTabThenSelectedTabViewModelReturnsTheTab() {
         let tabCollection = TabCollection()
         let tabCollectionViewModel = TabCollectionViewModel(tabCollection: tabCollection)
-        let tab1 = Tab()
-        tabCollection.append(tab: tab1)
-        
-        let tab2 = Tab()
-        tabCollection.append(tab: tab2)
-        
+
+        tabCollectionViewModel.appendNewTab()
+        tabCollectionViewModel.appendNewTab()
         tabCollectionViewModel.select(at: 0)
         
-        XCTAssertEqual(tabCollectionViewModel.selectedTabViewModel?.tab, tab1)
+        XCTAssert(tabCollectionViewModel.selectedTabViewModel === tabCollectionViewModel.tabViewModel(at: 0))
     }
     
     func testWhenTabViewModelIndexIsOutOfBoundsThenTabViewModelReturnsNil() {
         let tabCollection = TabCollection()
         let tabCollectionViewModel = TabCollectionViewModel(tabCollection: tabCollection)
-        let tab = Tab()
-        tabCollection.append(tab: tab)
         
         XCTAssertNil(tabCollectionViewModel.tabViewModel(at: 1))
     }
@@ -63,11 +58,9 @@ class TabCollectionViewModelTests: XCTestCase {
     func testWhenTabViewModelIsCalledWithSameIndexThenTheResultHasSameIdentity() {
         let tabCollection = TabCollection()
         let tabCollectionViewModel = TabCollectionViewModel(tabCollection: tabCollection)
-        let tab = Tab()
-        tabCollection.append(tab: tab)
-        
+
         XCTAssert(tabCollectionViewModel.tabViewModel(at: 0) === tabCollectionViewModel.tabViewModel(at: 0))
-        XCTAssertEqual(tabCollectionViewModel.tabViewModel(at: 0)?.tab, tab)
+        XCTAssertEqual(tabCollectionViewModel.tabViewModel(at: 0)?.tab, tabCollection.tabs[0])
     }
 
 }
