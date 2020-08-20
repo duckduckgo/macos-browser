@@ -77,7 +77,7 @@ class MainViewController: NSViewController {
     @IBAction func newWindow(_ sender: Any?) {
         let mainStoryboard = NSStoryboard(name: "Main", bundle: nil)
         guard let mainWindowController = mainStoryboard.instantiateInitialController() as? MainWindowController else {
-            //todo error
+            os_log("MainViewController: Failed to init MainWindowController", log: OSLog.Category.general, type: .error)
             return
         }
 

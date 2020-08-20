@@ -85,16 +85,7 @@ class MouseOverButton: NSButton {
         } else if isMouseOver {
             layer?.backgroundColor = mouseOverColor?.cgColor ?? NSColor.clear.cgColor
         } else {
-//            if layer?.backgroundColor == mouseDownColor?.cgColor ||
-//                layer?.backgroundColor == mouseOverColor?.cgColor {
-//                let animation = CABasicAnimation(keyPath: "backgroundColor")
-//                animation.fromValue = layer?.backgroundColor
-//                animation.toValue = NSColor.clear.cgColor
-//                animation.duration = 1/5
-
-                layer?.backgroundColor = NSColor.clear.cgColor
-//                layer?.add(animation, forKey: "backgroundColor")
-//            }
+            layer?.backgroundColor = NSColor.clear.cgColor
         }
     }
 
