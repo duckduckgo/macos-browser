@@ -32,7 +32,7 @@ class TabCollectionViewModelTests: XCTestCase {
         let tabCollection = TabCollection()
         let tabCollectionViewModel = TabCollectionViewModel(tabCollection: tabCollection)
         
-        tabCollectionViewModel.selectionIndex = 1
+        tabCollectionViewModel.select(at: 1)
         
         XCTAssertNil(tabCollectionViewModel.selectedTabViewModel)
     }
@@ -41,13 +41,12 @@ class TabCollectionViewModelTests: XCTestCase {
         let tabCollection = TabCollection()
         let tabCollectionViewModel = TabCollectionViewModel(tabCollection: tabCollection)
         let tab1 = Tab()
-        tabCollection.prepend(tab: tab1)
+        tabCollection.append(tab: tab1)
         
         let tab2 = Tab()
-        tabCollection.prepend(tab: tab2)
+        tabCollection.append(tab: tab2)
         
-        let selectionIndex = 1
-        tabCollectionViewModel.selectionIndex = selectionIndex
+        tabCollectionViewModel.select(at: 0)
         
         XCTAssertEqual(tabCollectionViewModel.selectedTabViewModel?.tab, tab1)
     }
@@ -56,7 +55,7 @@ class TabCollectionViewModelTests: XCTestCase {
         let tabCollection = TabCollection()
         let tabCollectionViewModel = TabCollectionViewModel(tabCollection: tabCollection)
         let tab = Tab()
-        tabCollection.prepend(tab: tab)
+        tabCollection.append(tab: tab)
         
         XCTAssertNil(tabCollectionViewModel.tabViewModel(at: 1))
     }
@@ -65,7 +64,7 @@ class TabCollectionViewModelTests: XCTestCase {
         let tabCollection = TabCollection()
         let tabCollectionViewModel = TabCollectionViewModel(tabCollection: tabCollection)
         let tab = Tab()
-        tabCollection.prepend(tab: tab)
+        tabCollection.append(tab: tab)
         
         XCTAssert(tabCollectionViewModel.tabViewModel(at: 0) === tabCollectionViewModel.tabViewModel(at: 0))
         XCTAssertEqual(tabCollectionViewModel.tabViewModel(at: 0)?.tab, tab)

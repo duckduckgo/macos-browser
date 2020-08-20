@@ -21,18 +21,18 @@ import XCTest
 
 class TabCollectionTests: XCTestCase {
 
-    func testWhenTabIsPrependThenItsIndexIs0() throws {
+    func testWhenTabIsAppendedThenItsIndexIsLast() throws {
         let tabCollection = TabCollection()
         let tab1 = Tab()
         tab1.url = URL.duckDuckGo
 
         let tab2 = Tab()
 
-        tabCollection.prepend(tab: tab1)
-        XCTAssertEqual(tabCollection.tabs[0], tab1)
+        tabCollection.append(tab: tab1)
+        XCTAssertEqual(tabCollection.tabs[tabCollection.tabs.count - 1], tab1)
 
-        tabCollection.prepend(tab: tab2)
-        XCTAssertEqual(tabCollection.tabs[0], tab2)
+        tabCollection.append(tab: tab2)
+        XCTAssertEqual(tabCollection.tabs[tabCollection.tabs.count - 1], tab2)
     }
 
 }
