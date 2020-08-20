@@ -74,6 +74,7 @@
 		AAE1428C24C0D9F000AEB729 /* WebsiteVisit.swift in Sources */ = {isa = PBXBuildFile; fileRef = AAE1428B24C0D9F000AEB729 /* WebsiteVisit.swift */; };
 		AAE7CAA124B4A88800CD7F00 /* History.swift in Sources */ = {isa = PBXBuildFile; fileRef = AAE7CAA024B4A88800CD7F00 /* History.swift */; };
 		AAE7CAA424B4A8A700CD7F00 /* HistoryViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = AAE7CAA324B4A8A700CD7F00 /* HistoryViewModel.swift */; };
+		AAECA42024EEA4AC00EFA63A /* IndexPathExtension.swift in Sources */ = {isa = PBXBuildFile; fileRef = AAECA41F24EEA4AC00EFA63A /* IndexPathExtension.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -168,6 +169,7 @@
 		AAE1428B24C0D9F000AEB729 /* WebsiteVisit.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = WebsiteVisit.swift; path = ../Model/WebsiteVisit.swift; sourceTree = "<group>"; };
 		AAE7CAA024B4A88800CD7F00 /* History.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = History.swift; sourceTree = "<group>"; };
 		AAE7CAA324B4A8A700CD7F00 /* HistoryViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HistoryViewModel.swift; sourceTree = "<group>"; };
+		AAECA41F24EEA4AC00EFA63A /* IndexPathExtension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = IndexPathExtension.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -560,6 +562,7 @@
 		AADC60E92493B305008F8EF7 /* Extensions */ = {
 			isa = PBXGroup;
 			children = (
+				AAECA41F24EEA4AC00EFA63A /* IndexPathExtension.swift */,
 				AA6FFB4324DC33320028F4D0 /* NSViewExtension.swift */,
 				AA8EDF29249268600071C2E8 /* OSLogExtension.swift */,
 				AA9FF96024A21D2F0039E328 /* PublisherExtension.swift */,
@@ -777,6 +780,7 @@
 				AABEE69A24A902A90043105B /* SuggestionsViewModel.swift in Sources */,
 				AABEE69E24A9C5C30043105B /* Suggestion.swift in Sources */,
 				AA2E423424C8A2270048C0D5 /* ColorView.swift in Sources */,
+				AAECA42024EEA4AC00EFA63A /* IndexPathExtension.swift in Sources */,
 				AAE7CAA124B4A88800CD7F00 /* History.swift in Sources */,
 				AA9FF95F24A1FB690039E328 /* TabCollectionViewModel.swift in Sources */,
 				AA6FFB4424DC33320028F4D0 /* NSViewExtension.swift in Sources */,

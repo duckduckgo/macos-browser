@@ -1,5 +1,5 @@
 //
-//  NSViewExtension.swift
+//  IndexPathExtension.swift
 //
 //  Copyright © 2020 DuckDuckGo. All rights reserved.
 //
@@ -16,18 +16,12 @@
 //  limitations under the License.
 //
 
-import Cocoa
+import Foundation
 
-extension NSView {
+extension IndexPath {
 
-    func addAndLayout(_ subView: NSView) {
-        subView.translatesAutoresizingMaskIntoConstraints = false
-        addSubview(subView)
-
-        subView.leadingAnchor.constraint(equalTo: leadingAnchor).isActive = true
-        subView.topAnchor.constraint(equalTo: topAnchor).isActive = true
-        subView.bottomAnchor.constraint(equalTo: bottomAnchor).isActive = true
-        subView.widthAnchor.constraint(equalTo: widthAnchor).isActive = true
+    init(item: Int) {
+        self.init(item: item, section: 0)
     }
 
 }

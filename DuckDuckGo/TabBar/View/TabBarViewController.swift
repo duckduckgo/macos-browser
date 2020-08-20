@@ -122,7 +122,7 @@ class TabBarViewController: NSViewController {
             return
         }
 
-        let newSelectionIndexPath = IndexPath(item: selectionIndex, section: 0)
+        let newSelectionIndexPath = IndexPath(item: selectionIndex)
         if tabMode == .divided {
             collectionView.animator().selectItems(at: [newSelectionIndexPath], scrollPosition: .centeredHorizontally)
         } else {
@@ -176,7 +176,7 @@ class TabBarViewController: NSViewController {
 
         let index = indexPath.item
         let newIndex = min(newIndexPath.item, max(tabCollectionViewModel.tabCollection.tabs.count - 1, 0))
-        let newIndexPath = IndexPath(item: newIndex, section: 0)
+        let newIndexPath = IndexPath(item: newIndex)
 
         guard index != newIndex else {
             return
@@ -293,7 +293,7 @@ extension TabBarViewController: TabCollectionDelegate {
 
     func tabCollection(_ tabCollection: TabCollection, didAppend tab: Tab) {
         let lastIndex = max(0, tabCollectionViewModel.tabCollection.tabs.count - 1)
-        let lastIndexPath = IndexPath(item: lastIndex, section: 0)
+        let lastIndexPath = IndexPath(item: lastIndex)
         let lastIndexPathSet = Set(arrayLiteral: lastIndexPath)
 
         setTabMode(for: collectionView.numberOfItems(inSection: 0) + 1)
@@ -314,7 +314,7 @@ extension TabBarViewController: TabCollectionDelegate {
     }
 
     func tabCollection(_ tabCollection: TabCollection, didInsert tab: Tab, at index: Int) {
-        let indexPath = IndexPath(item: index, section: 0)
+        let indexPath = IndexPath(item: index)
         let indexPathSet = Set(arrayLiteral: indexPath)
         collectionView.animator().insertItems(at: indexPathSet)
 
@@ -323,7 +323,7 @@ extension TabBarViewController: TabCollectionDelegate {
     }
 
     func tabCollection(_ tabCollection: TabCollection, didRemoveTabAt index: Int) {
-        let indexPath = IndexPath(item: index, section: 0)
+        let indexPath = IndexPath(item: index)
         let indexPathSet = Set(arrayLiteral: indexPath)
 
         collectionView.animator().performBatchUpdates {
@@ -337,8 +337,8 @@ extension TabBarViewController: TabCollectionDelegate {
     }
 
     func tabCollection(_ tabCollection: TabCollection, didMoveTabAt index: Int, to newIndex: Int) {
-        let indexPath = IndexPath(item: index, section: 0)
-        let newIndexPath = IndexPath(item: newIndex, section: 0)
+        let indexPath = IndexPath(item: index)
+        let newIndexPath = IndexPath(item: newIndex)
         collectionView.animator().moveItem(at: indexPath, to: newIndexPath)
 
         setTabMode()
