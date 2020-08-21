@@ -27,7 +27,7 @@ class TabBarViewController: NSViewController {
         case withoutScrollButtons = 80
     }
 
-    @IBOutlet weak var collectionView: NSCollectionView!
+    @IBOutlet weak var collectionView: TabBarCollectionView!
     @IBOutlet weak var scrollView: TabBarScrollView!
     @IBOutlet weak var scrollViewTrailingConstraint: NSLayoutConstraint!
     @IBOutlet weak var scrollViewLeadingConstraint: NSLayoutConstraint!
@@ -54,7 +54,8 @@ class TabBarViewController: NSViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
 
-        setupCollectionView()
+        setScrollElasticity()
+        receiveScrollNotifications()
         bindSelectionIndex()
     }
 
@@ -86,24 +87,11 @@ class TabBarViewController: NSViewController {
     }
 
     @IBAction func rightScrollButtonAction(_ sender: NSButton) {
-        scrollToEnd()
+        collectionView.scrollToEnd()
     }
 
     @IBAction func leftScrollButtonAction(_ sender: NSButton) {
-        scrollToBeginning()
-    }
-
-    private func setupCollectionView() {
-        let nib = NSNib(nibNamed: "TabBarViewItem", bundle: nil)
-        collectionView.register(nib, forItemWithIdentifier: TabBarViewItem.identifier)
-
-        // Register for the dropped object types we can accept.
-        collectionView.registerForDraggedTypes([NSPasteboard.PasteboardType.string])
-        // Enable dragging items within and into our CollectionView.
-        collectionView.setDraggingSourceOperationMask(NSDragOperation.move, forLocal: false)
-
-        setScrollElasticity()
-        receiveScrollNotifications()
+        collectionView.scrollToBeginning()
     }
 
     private func bindSelectionIndex() {
@@ -120,6 +108,10 @@ class TabBarViewController: NSViewController {
         guard let selectionIndex = tabCollectionViewModel.selectionIndex else {
             os_log("TabBarViewController: Selection index is nil", log: OSLog.Category.general, type: .error)
             return
+        }
+        
+        if collectionView.selectionIndexPaths.count > 0 {
+            collectionView.clearSelection()
         }
 
         let newSelectionIndexPath = IndexPath(item: selectionIndex)
@@ -146,16 +138,6 @@ class TabBarViewController: NSViewController {
         let leadingSpace = min(CGFloat(collectionView.numberOfItems(inSection: 0)) *
                                 currentTabWidth(), scrollView.frame.size.width)
         windowDraggingViewLeadingConstraint.constant = leadingSpace
-    }
-
-    // MARK: - Selection
-
-    private func clearCollectionViewSelection() {
-        collectionView.deselectItems(at: collectionView.selectionIndexPaths)
-    }
-
-    private func selectItem(at indexPath: IndexPath) {
-        tabCollectionViewModel.select(at: indexPath.item)
     }
 
     // MARK: - Closing
@@ -231,7 +213,7 @@ class TabBarViewController: NSViewController {
         scrollView.horizontalScrollElasticity = tabMode == .divided ? .none : .allowed
     }
 
-    // MARK: - Scrolling & Scroll Buttons
+    // MARK: - Scroll Buttons
 
     private func receiveScrollNotifications() {
         scrollView.contentView.postsBoundsChangedNotifications = true
@@ -262,30 +244,6 @@ class TabBarViewController: NSViewController {
         leftShadowImageView.isHidden = scrollViewsAreHidden
     }
 
-    private func scrollToEnd(completionHandler: ((Bool) -> Void)? = nil) {
-        collectionView.animator().performBatchUpdates({
-            collectionView.animator().scroll(CGPoint(x: self.collectionView.bounds.size.width, y: 0))
-        }, completionHandler: completionHandler)
-    }
-
-    private func scrollToBeginning(completionHandler: ((Bool) -> Void)? = nil) {
-        collectionView.animator().performBatchUpdates({
-            collectionView.animator().scroll(CGPoint(x: 0, y: 0))
-        }, completionHandler: completionHandler)
-    }
-
-    private func scrollToSelected() {
-        guard collectionView.selectionIndexPaths.count == 1, let indexPath = collectionView.selectionIndexPaths.first else {
-            os_log("TabBarViewController: More than 1 item highlighted", log: OSLog.Category.general, type: .error)
-            return
-        }
-
-        let rect = collectionView.frameForItem(at: indexPath.item)
-        collectionView.animator().performBatchUpdates({
-            collectionView.animator().scrollToVisible(rect)
-        }, completionHandler: nil)
-    }
-
 }
 
 // swiftlint:disable compiler_protocol_init
@@ -298,15 +256,15 @@ extension TabBarViewController: TabCollectionDelegate {
 
         setTabMode(for: collectionView.numberOfItems(inSection: 0) + 1)
 
-        clearCollectionViewSelection()
+        collectionView.clearSelection()
         if tabMode == .divided {
             collectionView.animator().insertItems(at: lastIndexPathSet)
         } else {
             collectionView.insertItems(at: lastIndexPathSet)
             // Old frameworks are like old people. They need special treatment
-            scrollToEnd { _ in
+            collectionView.scrollToEnd { _ in
                 DispatchQueue.main.asyncAfter(deadline: .now() + 0.15) {
-                    self.scrollToEnd()
+                    self.collectionView.scrollToEnd()
                 }
             }
         }
@@ -397,12 +355,12 @@ extension TabBarViewController: NSCollectionViewDelegate {
         }
 
         if highlightState == .forSelection {
-            clearCollectionViewSelection()
-            selectItem(at: indexPath)
+            self.collectionView.clearSelection()
+            tabCollectionViewModel.select(at: indexPath.item)
 
             // Poor old NSCollectionView
             DispatchQueue.main.async {
-                self.scrollToSelected()
+                self.collectionView.scrollToSelected()
             }
         }
     }
@@ -490,7 +448,7 @@ extension TabBarViewController: TabBarViewItemDelegate {
             return
         }
 
-        clearCollectionViewSelection()
+        collectionView.clearSelection()
         tabCollectionViewModel.duplicateTab(at: indexPath.item)
     }
 
