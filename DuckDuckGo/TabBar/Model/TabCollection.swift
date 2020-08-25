@@ -43,19 +43,34 @@ class TabCollection {
     }
 
     func insert(tab: Tab, at index: Int) {
+        guard index >= 0, index <= tabs.endIndex else {
+            os_log("TabCollection: Index out of bounds", log: OSLog.Category.general, type: .error)
+            return
+        }
+
         tabs.insert(tab, at: index)
         delegate?.tabCollection(self, didInsert: tab, at: index)
     }
 
-    func remove(at index: Int) {
+    func remove(at index: Int) -> Bool {
+        guard index >= 0, index < tabs.count else {
+            os_log("TabCollection: Index out of bounds", log: OSLog.Category.general, type: .error)
+            return false
+        }
+
         tabs.remove(at: index)
         delegate?.tabCollection(self, didRemoveTabAt: index)
+
+        return true
     }
 
     func moveTab(at index: Int, to newIndex: Int) {
-        if index == newIndex {
+        guard index >= 0, index < tabs.count, newIndex >= 0, newIndex < tabs.count else {
+            os_log("TabCollection: Index out of bounds", log: OSLog.Category.general, type: .error)
             return
         }
+
+        if index == newIndex { return }
         if abs(index - newIndex) == 1 {
             tabs.swapAt(index, newIndex)
             delegate?.tabCollection(self, didMoveTabAt: index, to: newIndex)

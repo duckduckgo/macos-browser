@@ -21,6 +21,8 @@ import XCTest
 
 class TabTests: XCTestCase {
 
+    // MARK: - TabActionDelegate
+
     func testWhenGoForwardIsCalledThenDelegateIsNotified() throws {
         let tab = Tab()
         let tabActionDelegateMock = TabActionDelegateMock()
@@ -51,4 +53,22 @@ class TabTests: XCTestCase {
         XCTAssertTrue(tabActionDelegateMock.tabReloadActionCalled)
     }
 
+    // MARK: - Equality
+
+    func testWhenTabsAreIdenticalThenTheyAreEqual() {
+        let tab = Tab()
+        let tab2 = tab
+
+        XCTAssert(tab == tab2)
+    }
+
+    func testWhenTabsArentIdenticalThenTheyArentEqual() {
+        let tab = Tab()
+        tab.url = URL.duckDuckGo
+        let tab2 = Tab()
+        tab2.url = URL.duckDuckGo
+
+        XCTAssert(tab != tab2)
+    }
+    
 }

@@ -19,12 +19,17 @@
 import Cocoa
 import Combine
 import WebKit
+import os.log
 
 class TabViewModel {
 
-    private enum Constants {
-        static let homeTitle = "Home"
-        static let homeFaviconImage = NSImage(named: "HomeFavicon")!
+    enum Title {
+        static let home = "Home"
+    }
+
+    enum Favicon {
+        static let home = NSImage(named: "HomeFavicon")!
+        static let defaultFavicon = NSImage()
     }
 
     private(set) var tab: Tab
@@ -44,14 +49,15 @@ class TabViewModel {
     @Published var isLoading: Bool = false
 
     @Published private(set) var addressBarString: String = ""
-    @Published private(set) var title: String = Constants.homeTitle
-    @Published private(set) var favicon: NSImage = Constants.homeFaviconImage
+    @Published private(set) var title: String = Title.home
+    @Published private(set) var favicon: NSImage = Favicon.home
 
     init(tab: Tab) {
         self.tab = tab
 
         webView = WebView(frame: CGRect.zero, configuration: WKWebViewConfiguration.makeConfiguration())
         webViewStateObserver = WebViewStateObserver(webView: webView, tabViewModel: self)
+        tab.actionDelegate = self
 
         bindUrl()
         bindTitle()
@@ -96,7 +102,7 @@ class TabViewModel {
 
     private func updateTitle() {
         if tab.url == nil {
-            title = Constants.homeTitle
+            title = Title.home
             return
         }
 
@@ -109,18 +115,33 @@ class TabViewModel {
 
     private func updateFavicon() {
         if tab.url == nil {
-            favicon = Constants.homeFaviconImage
+            favicon = Favicon.home
             return
         }
 
         if let favicon = tab.favicon {
             self.favicon = favicon
         } else {
-            //todo default favicon
-            favicon = NSImage()
+            favicon = Favicon.defaultFavicon
         }
     }
     
+}
+
+extension TabViewModel: TabActionDelegate {
+
+    func tabForwardAction(_ tab: Tab) {
+        webView.goForward()
+    }
+
+    func tabBackAction(_ tab: Tab) {
+        webView.goBack()
+    }
+
+    func tabReloadAction(_ tab: Tab) {
+        webView.reload()
+    }
+
 }
 
 fileprivate extension WKWebViewConfiguration {

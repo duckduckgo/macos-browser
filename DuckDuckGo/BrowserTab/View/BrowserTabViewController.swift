@@ -82,7 +82,6 @@ class BrowserTabViewController: NSViewController {
 
         displayWebView(of: tabViewModel)
         bindUrl(of: tabViewModel)
-        tabViewModel.tab.actionDelegate = self
     }
 
     private func reloadWebViewIfNeeded() {
@@ -172,7 +171,7 @@ extension BrowserTabViewController: WKNavigationDelegate {
                  createWebViewWith configuration: WKWebViewConfiguration,
                  for navigationAction: WKNavigationAction,
                  windowFeatures: WKWindowFeatures) -> WKWebView? {
-        tabCollectionViewModel.appendAfterSelected()
+        tabCollectionViewModel.appendNewTabAfterSelected()
         guard let selectedViewModel = tabCollectionViewModel.selectedTabViewModel else {
             os_log("%s: Selected tab view model is nil", log: OSLog.Category.general, type: .error, className)
             return nil
@@ -184,36 +183,5 @@ extension BrowserTabViewController: WKNavigationDelegate {
 }
 
 extension BrowserTabViewController: WKUIDelegate {
-
-}
-
-extension BrowserTabViewController: TabActionDelegate {
-
-    func tabForwardAction(_ tab: Tab) {
-        guard let webView = webView else {
-            os_log("BrowserTabViewController: Web view is nil", log: OSLog.Category.general, type: .error)
-            return
-        }
-
-        webView.goForward()
-    }
-
-    func tabBackAction(_ tab: Tab) {
-        guard let webView = webView else {
-            os_log("BrowserTabViewController: Web view is nil", log: OSLog.Category.general, type: .error)
-            return
-        }
-
-        webView.goBack()
-    }
-
-    func tabReloadAction(_ tab: Tab) {
-        guard let webView = webView else {
-            os_log("BrowserTabViewController: Web view is nil", log: OSLog.Category.general, type: .error)
-            return
-        }
-
-        webView.reload()
-    }
 
 }

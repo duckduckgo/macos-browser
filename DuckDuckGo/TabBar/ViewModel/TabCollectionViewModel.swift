@@ -24,7 +24,7 @@ class TabCollectionViewModel {
 
     private(set) var tabCollection: TabCollection
     
-    private(set) var tabViewModels = [Tab: TabViewModel]()
+    private var tabViewModels = [Tab: TabViewModel]()
     @Published private(set) var selectionIndex: Int? {
         didSet {
             updateSelectedTabViewModel()
@@ -46,18 +46,9 @@ class TabCollectionViewModel {
         self.init(tabCollection: tabCollection)
     }
 
-    func updateSelectedTabViewModel() {
-        guard let selectionIndex = selectionIndex else {
-            selectedTabViewModel = nil
-            return
-        }
-        let selectedTabViewModel = tabViewModel(at: selectionIndex)
-        self.selectedTabViewModel = selectedTabViewModel
-    }
-
     func tabViewModel(at index: Int) -> TabViewModel? {
-        guard tabCollection.tabs.count > index else {
-            os_log("Index %lu higher than number of tabs %lu", log: OSLog.Category.general, type: .error, index, tabCollection.tabs.count)
+        guard index >= 0, tabCollection.tabs.count > index else {
+            os_log("TabCollectionViewModel: Index out of bounds", log: OSLog.Category.general, type: .error)
             return nil
         }
 
@@ -80,7 +71,7 @@ class TabCollectionViewModel {
         select(at: tabCollection.tabs.count - 1)
     }
 
-    func appendAfterSelected() {
+    func appendNewTabAfterSelected() {
         guard let selectionIndex = selectionIndex else {
             os_log("TabCollectionViewModel: No tab selected", log: OSLog.Category.general, type: .error)
             return
@@ -90,12 +81,7 @@ class TabCollectionViewModel {
     }
 
     func remove(at index: Int) {
-        guard index >= 0, index < tabCollection.tabs.count else {
-            os_log("TabCollection: Index out of bounds", log: OSLog.Category.general, type: .error)
-            return
-        }
-
-        tabCollection.remove(at: index)
+        guard tabCollection.remove(at: index) else { return }
 
         guard tabCollection.tabs.count > 0 else { return }
         guard let selectionIndex = selectionIndex else {
@@ -119,6 +105,25 @@ class TabCollectionViewModel {
         remove(at: selectionIndex)
     }
 
+    func removeOtherTabs(except index: Int) {
+        guard index >= 0, index < tabCollection.tabs.count else {
+            os_log("TabCollectionViewModel: Index out of bounds", log: OSLog.Category.general, type: .error)
+            return
+        }
+        let tab = tabCollection.tabs[index]
+
+        var index = tabCollection.tabs.count - 1
+        tabCollection.tabs.reversed().forEach {
+            if tab != $0 {
+                if !tabCollection.remove(at: index) {
+                    os_log("TabCollectionViewModel: Failed to remove item", log: OSLog.Category.general, type: .error)
+                }
+            }
+            index -= 1
+        }
+        select(at: 0)
+    }
+
     func duplicateTab(at index: Int) {
         guard index >= 0, index < tabCollection.tabs.count else {
             os_log("TabCollectionViewModel: Index out of bounds", log: OSLog.Category.general, type: .error)
@@ -132,23 +137,6 @@ class TabCollectionViewModel {
 
         tabCollection.insert(tab: tabCopy, at: newIndex)
         select(at: newIndex)
-    }
-
-    func closeOtherTabs(except index: Int) {
-        guard index >= 0, index < tabCollection.tabs.count else {
-            os_log("TabCollectionViewModel: Index out of bounds", log: OSLog.Category.general, type: .error)
-            return
-        }
-        let tab = tabCollection.tabs[index]
-
-        var index = tabCollection.tabs.count - 1
-        tabCollection.tabs.reversed().forEach {
-            if tab != $0 {
-                tabCollection.remove(at: index)
-            }
-            index -= 1
-        }
-        select(at: 0)
     }
 
     private func bindTabs() {
@@ -170,6 +158,15 @@ class TabCollectionViewModel {
                 tabViewModels[tab] = TabViewModel(tab: tab)
             }
         }
+    }
+
+    private func updateSelectedTabViewModel() {
+        guard let selectionIndex = selectionIndex else {
+            selectedTabViewModel = nil
+            return
+        }
+        let selectedTabViewModel = tabViewModel(at: selectionIndex)
+        self.selectedTabViewModel = selectedTabViewModel
     }
 
 }
