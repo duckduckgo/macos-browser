@@ -171,5 +171,4 @@ class TabCollectionViewModelTests: XCTestCase {
         XCTAssertEqual(firstTabViewModel?.tab.url, tabCollectionViewModel.tabViewModel(at: 1)?.tab.url)
     }
 
-    
 }

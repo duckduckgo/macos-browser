@@ -115,9 +115,17 @@ class NavigationBarViewController: NSViewController {
             reloadButton.isEnabled = false
             return
         }
-        selectedTabViewModel.$canGoBack.receive(on: DispatchQueue.main).sink { [weak self] _ in self?.setNavigationButtons() } .store(in: &navigationButtonsCancelables)
-        selectedTabViewModel.$canGoForward.receive(on: DispatchQueue.main).sink { [weak self] _ in self?.setNavigationButtons() } .store(in: &navigationButtonsCancelables)
-        selectedTabViewModel.$canReload.receive(on: DispatchQueue.main).sink { [weak self] _ in self?.setNavigationButtons() } .store(in: &navigationButtonsCancelables)
+        selectedTabViewModel.$canGoBack.receive(on: DispatchQueue.main).sink { [weak self] _ in
+            self?.setNavigationButtons()
+        } .store(in: &navigationButtonsCancelables)
+
+        selectedTabViewModel.$canGoForward.receive(on: DispatchQueue.main).sink { [weak self] _ in
+            self?.setNavigationButtons()
+        } .store(in: &navigationButtonsCancelables)
+
+        selectedTabViewModel.$canReload.receive(on: DispatchQueue.main).sink { [weak self] _ in
+            self?.setNavigationButtons()
+        } .store(in: &navigationButtonsCancelables)
     }
 
     private func makeSearchFieldFirstResponder() {

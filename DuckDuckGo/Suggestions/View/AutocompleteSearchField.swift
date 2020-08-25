@@ -66,7 +66,8 @@ class AutocompleteSearchField: NSSearchField {
     }
 
     private func bindSelectedSuggestionViewModel() {
-        selectedSuggestionViewModelCancellable = suggestionsViewModel.$selectedSuggestionViewModel.receive(on: DispatchQueue.main).sink { [weak self] _ in
+        selectedSuggestionViewModelCancellable =
+            suggestionsViewModel.$selectedSuggestionViewModel.receive(on: DispatchQueue.main).sink { [weak self] _ in
             self?.displaySelectedSuggestionViewModel()
         }
     }
