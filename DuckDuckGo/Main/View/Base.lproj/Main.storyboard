@@ -679,7 +679,7 @@
             <objects>
                 <windowController id="B8D-0N-5wS" customClass="MainWindowController" customModule="DuckDuckGo_Privacy_Browser" customModuleProvider="target" sceneMemberID="viewController">
                     <window key="window" allowsToolTipsWhenApplicationIsInactive="NO" autorecalculatesKeyViewLoop="NO" releasedWhenClosed="NO" visibleAtLaunch="NO" animationBehavior="default" titlebarAppearsTransparent="YES" titleVisibility="hidden" id="IQv-IB-iLA" customClass="MainWindow" customModule="DuckDuckGo_Privacy_Browser" customModuleProvider="target">
-                        <windowStyleMask key="styleMask" closable="YES" miniaturizable="YES" resizable="YES" fullSizeContentView="YES"/>
+                        <windowStyleMask key="styleMask" titled="YES" closable="YES" miniaturizable="YES" resizable="YES" fullSizeContentView="YES"/>
                         <windowPositionMask key="initialPositionMask" leftStrut="YES" rightStrut="YES" topStrut="YES" bottomStrut="YES"/>
                         <rect key="contentRect" x="196" y="239" width="1024" height="790"/>
                         <rect key="screenRect" x="0.0" y="0.0" width="1536" height="937"/>
@@ -738,16 +738,6 @@
                                     <segue destination="wo6-dV-Q3Q" kind="embed" destinationCreationSelector="createWebViewControllerWithCoder:sender:segueIdentifier:" id="A2b-sp-a54"/>
                                 </connections>
                             </containerView>
-                            <containerView translatesAutoresizingMaskIntoConstraints="NO" id="Ho7-y5-8HO">
-                                <rect key="frame" x="12" y="763" width="100" height="14"/>
-                                <constraints>
-                                    <constraint firstAttribute="height" constant="14" id="Jas-CN-K5f"/>
-                                    <constraint firstAttribute="width" constant="100" id="NrO-U7-QDd"/>
-                                </constraints>
-                                <connections>
-                                    <segue destination="q3j-hn-4a0" kind="embed" id="6TM-4c-S3z"/>
-                                </connections>
-                            </containerView>
                         </subviews>
                         <constraints>
                             <constraint firstAttribute="trailing" secondItem="wFH-xq-50o" secondAttribute="trailing" id="4Cb-FA-sMo"/>
@@ -758,11 +748,9 @@
                             <constraint firstItem="SYo-8W-jl3" firstAttribute="top" secondItem="wFH-xq-50o" secondAttribute="bottom" id="SOg-lH-g5P"/>
                             <constraint firstItem="wFH-xq-50o" firstAttribute="leading" secondItem="m2S-Jp-Qdl" secondAttribute="leading" id="XQv-BZ-2ci"/>
                             <constraint firstItem="SYo-8W-jl3" firstAttribute="top" secondItem="af1-Eb-VaG" secondAttribute="bottom" id="ZLC-J7-HaR"/>
-                            <constraint firstItem="Ho7-y5-8HO" firstAttribute="top" secondItem="m2S-Jp-Qdl" secondAttribute="top" constant="12" id="j7y-ae-Gve"/>
                             <constraint firstItem="lYg-bX-QrJ" firstAttribute="leading" secondItem="m2S-Jp-Qdl" secondAttribute="leading" id="kVB-Sz-8Sv"/>
                             <constraint firstItem="af1-Eb-VaG" firstAttribute="leading" secondItem="m2S-Jp-Qdl" secondAttribute="leading" id="oLA-yb-nB8"/>
                             <constraint firstAttribute="bottom" secondItem="SYo-8W-jl3" secondAttribute="bottom" id="tLa-XX-e8i"/>
-                            <constraint firstItem="Ho7-y5-8HO" firstAttribute="leading" secondItem="m2S-Jp-Qdl" secondAttribute="leading" constant="12" id="uac-4O-cZF"/>
                             <constraint firstItem="SYo-8W-jl3" firstAttribute="leading" secondItem="m2S-Jp-Qdl" secondAttribute="leading" id="woj-yk-97j"/>
                             <constraint firstAttribute="trailing" secondItem="af1-Eb-VaG" secondAttribute="trailing" id="y1o-Rd-sxm"/>
                         </constraints>
@@ -784,19 +772,6 @@
                 <customObject id="NXm-I5-OhA" userLabel="First Responder" customClass="NSResponder" sceneMemberID="firstResponder"/>
             </objects>
             <point key="canvasLocation" x="848" y="1012"/>
-        </scene>
-        <!--Control Buttons View Controller-->
-        <scene sceneID="YTl-il-KY0">
-            <objects>
-                <viewController id="q3j-hn-4a0" customClass="ControlButtonsViewController" customModule="DuckDuckGo_Privacy_Browser" customModuleProvider="target" sceneMemberID="viewController">
-                    <view key="view" id="CF0-Fu-PQ8">
-                        <rect key="frame" x="0.0" y="0.0" width="78" height="38"/>
-                        <autoresizingMask key="autoresizingMask"/>
-                    </view>
-                </viewController>
-                <customObject id="eQq-RL-nKZ" userLabel="First Responder" customClass="NSResponder" sceneMemberID="firstResponder"/>
-            </objects>
-            <point key="canvasLocation" x="846" y="810"/>
         </scene>
         <!--NavigationBar-->
         <scene sceneID="Sc0-ir-Na8">
