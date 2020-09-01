@@ -49,6 +49,7 @@ class TabViewModel {
     @Published var isLoading: Bool = false
 
     @Published private(set) var addressBarString: String = ""
+    @Published private(set) var passiveAddressBarString: String = ""
     @Published private(set) var title: String = Title.home
     @Published private(set) var favicon: NSImage = Favicon.home
 
@@ -67,7 +68,7 @@ class TabViewModel {
     private func bindUrl() {
         tab.$url.receive(on: DispatchQueue.main).sink { [weak self] _ in
             self?.updateCanReaload()
-            self?.updateAddressBarString()
+            self?.updateAddressBarStrings()
         } .store(in: &cancelables)
     }
 
@@ -83,20 +84,24 @@ class TabViewModel {
         self.canReload = self.tab.url != nil
     }
 
-    private func updateAddressBarString() {
-        guard let url = tab.url else {
+    private func updateAddressBarStrings() {
+        guard let url = tab.url, let host = url.host else {
             addressBarString = ""
+            passiveAddressBarString = ""
             return
         }
 
         if let searchQuery = url.searchQuery {
             addressBarString = searchQuery
+            passiveAddressBarString = searchQuery
         } else if url == URL.emptyPage {
             addressBarString = ""
+            passiveAddressBarString = ""
         } else {
             addressBarString = url.absoluteString
                 .dropPrefix(URL.Scheme.https.separated())
                 .dropPrefix(URL.Scheme.http.separated())
+            passiveAddressBarString = host.dropPrefix(URL.HostPrefix.www.separated())
         }
     }
 

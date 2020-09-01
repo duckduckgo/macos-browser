@@ -1,5 +1,5 @@
 //
-//  AutocompleteSearchField.swift
+//  AddressBarTextField.swift
 //
 //  Copyright © 2020 DuckDuckGo. All rights reserved.
 //
@@ -20,20 +20,22 @@ import Cocoa
 import Combine
 import os.log
 
-protocol AutocompleteSearchFieldDelegate: AnyObject {
+class AddressBarTextField: NSTextField {
 
-    func autocompleteSearchField(_ autocompleteSearchField: AutocompleteSearchField, didConfirmStringValue: String)
-
-}
-
-class AutocompleteSearchField: NSSearchField {
-
-    weak var searchFieldDelegate: AutocompleteSearchFieldDelegate?
+    var tabCollectionViewModel: TabCollectionViewModel! {
+        didSet {
+            bindSelectedTabViewModel()
+        }
+    }
 
     private let suggestionsViewModel = SuggestionsViewModel(suggestions: Suggestions())
-    private var selectedSuggestionViewModelCancellable: AnyCancellable?
 
     private var originalStringValue: String?
+
+    private var selectedSuggestionViewModelCancellable: AnyCancellable?
+    private var selectedTabViewModelCancelable: AnyCancellable?
+    private var searchSuggestionsCancelable: AnyCancellable?
+    private var addressBarStringCancelable: AnyCancellable?
 
     override func awakeFromNib() {
         super.awakeFromNib()
@@ -43,32 +45,48 @@ class AutocompleteSearchField: NSSearchField {
         bindSelectedSuggestionViewModel()
     }
 
-    override func becomeFirstResponder() -> Bool {
-        let isFirstResponder = super.becomeFirstResponder()
-        if isFirstResponder {
-            perform(#selector(selectText(_:)), with: self, afterDelay: 0)
-        }
-
-        return isFirstResponder
-    }
-
-    override func resignFirstResponder() -> Bool {
-        return super.resignFirstResponder()
+    override func mouseDown(with event: NSEvent) {
+        super.mouseDown(with: event)
+        currentEditor()?.selectAll(self)
     }
 
     func viewDidLayout() {
         layoutSuggestionWindow()
     }
 
-    private func confirmStringValue() {
-        hideSuggestionsWindow()
-        searchFieldDelegate?.autocompleteSearchField(self, didConfirmStringValue: stringValue)
-    }
-
     private func bindSelectedSuggestionViewModel() {
         selectedSuggestionViewModelCancellable =
             suggestionsViewModel.$selectedSuggestionViewModel.receive(on: DispatchQueue.main).sink { [weak self] _ in
             self?.displaySelectedSuggestionViewModel()
+        }
+    }
+
+    private func bindSelectedTabViewModel() {
+        selectedTabViewModelCancelable = tabCollectionViewModel.$selectedTabViewModel.receive(on: DispatchQueue.main).sink { [weak self] _ in
+            self?.bindAddressBarString()
+        }
+    }
+
+    private func bindAddressBarString() {
+        addressBarStringCancelable?.cancel()
+
+        guard let selectedTabViewModel = tabCollectionViewModel.selectedTabViewModel else {
+            stringValue = ""
+            return
+        }
+        addressBarStringCancelable = selectedTabViewModel.$addressBarString.receive(on: DispatchQueue.main).sink { [weak self] _ in
+            self?.setStringValue()
+        }
+    }
+    private func setStringValue() {
+        guard let selectedTabViewModel = tabCollectionViewModel.selectedTabViewModel else {
+            os_log("%s: Selected tab view model is nil", log: OSLog.Category.general, type: .error, className)
+            return
+        }
+        let addressBarString = selectedTabViewModel.addressBarString
+        stringValue = addressBarString
+        if addressBarString == "" {
+            makeMeFirstResponder()
         }
     }
 
@@ -92,6 +110,23 @@ class AutocompleteSearchField: NSSearchField {
         }
     }
 
+    private func confirmStringValue() {
+        hideSuggestionsWindow()
+        setUrl()
+    }
+
+    private func setUrl() {
+        guard let selectedTabViewModel = tabCollectionViewModel.selectedTabViewModel else {
+            os_log("%s: Selected tab view model is nil", log: OSLog.Category.general, type: .error, className)
+            return
+        }
+        guard let url = URL.makeURL(from: stringValue) else {
+            os_log("%s: Making url from address bar string failed", log: OSLog.Category.general, type: .error, className)
+            return
+        }
+        selectedTabViewModel.tab.url = url
+    }
+
     // MARK: - Suggestions window
 
     private var suggestionsWindowController: NSWindowController?
@@ -113,7 +148,7 @@ class AutocompleteSearchField: NSSearchField {
 
     private func showSuggestionsWindow() {
         guard let window = window, let suggestionsWindow = suggestionsWindowController?.window else {
-            os_log("AutocompleteSearchField: Window not available", log: OSLog.Category.general, type: .error)
+            os_log("AddressBarTextField: Window not available", log: OSLog.Category.general, type: .error)
             return
         }
 
@@ -125,7 +160,7 @@ class AutocompleteSearchField: NSSearchField {
 
     private func hideSuggestionsWindow() {
         guard let window = window, let suggestionsWindow = suggestionsWindowController?.window else {
-            os_log("AutocompleteSearchField: Window not available", log: OSLog.Category.general, type: .error)
+            os_log("AddressBarTextField: Window not available", log: OSLog.Category.general, type: .error)
             return
         }
 
@@ -138,25 +173,27 @@ class AutocompleteSearchField: NSSearchField {
 
     private func layoutSuggestionWindow() {
         guard let window = window, let suggestionsWindow = suggestionsWindowController?.window else {
-            os_log("AutocompleteSearchField: Window not available", log: OSLog.Category.general, type: .error)
+            os_log("AddressBarTextField: Window not available", log: OSLog.Category.general, type: .error)
+            return
+        }
+        guard let superview = superview else {
+            os_log("AddressBarTextField: Superview not available", log: OSLog.Category.general, type: .error)
             return
         }
 
         let padding = CGFloat(3)
-        suggestionsWindow.setFrame(NSRect(x: 0, y: 0, width: frame.width + 2 * padding, height: 0), display: true)
+        suggestionsWindow.setFrame(NSRect(x: 0, y: 0, width: superview.frame.width + 2 * padding, height: 0), display: true)
 
-        var point = bounds.origin
-        point.y += frame.height
-        point.y += padding
+        var point = superview.bounds.origin
         point.x -= padding
 
-        let converted = convert(point, to: nil)
+        let converted = superview.convert(point, to: nil)
         let screen = window.convertPoint(toScreen: converted)
         suggestionsWindow.setFrameTopLeftPoint(screen)
     }
 }
 
-extension AutocompleteSearchField: NSSearchFieldDelegate {
+extension AddressBarTextField: NSSearchFieldDelegate {
 
     func controlTextDidEndEditing(_ obj: Notification) {
         let textMovement = obj.userInfo?["NSTextMovement"] as? Int
@@ -195,7 +232,7 @@ extension AutocompleteSearchField: NSSearchFieldDelegate {
 
 }
 
-extension AutocompleteSearchField: SuggestionsViewControllerDelegate {
+extension AddressBarTextField: SuggestionsViewControllerDelegate {
 
     func suggestionsViewControllerDidConfirmSelection(_ suggestionsViewController: SuggestionsViewController) {
         confirmStringValue()

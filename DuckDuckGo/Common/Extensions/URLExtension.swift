@@ -82,7 +82,7 @@ extension URL {
         return queryItem?.value
     }
 
-    // MARK: - Schemes
+    // MARK: - Components
 
     enum Scheme: String, CaseIterable {
         case http
@@ -90,6 +90,14 @@ extension URL {
 
         func separated() -> String {
             self.rawValue + "://"
+        }
+    }
+
+    enum HostPrefix: String {
+        case www
+
+        func separated() -> String {
+            self.rawValue + "."
         }
     }
 

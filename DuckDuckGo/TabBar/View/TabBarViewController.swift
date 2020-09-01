@@ -121,7 +121,7 @@ class TabBarViewController: NSViewController {
     private func closeWindowIfNeeded() {
         if tabCollectionViewModel.tabCollection.tabs.count == 0 {
             guard let window = view.window else {
-                os_log("AutocompleteSearchField: Window not available", log: OSLog.Category.general, type: .error)
+                os_log("AddressBarTextField: Window not available", log: OSLog.Category.general, type: .error)
                 return
             }
             window.close()

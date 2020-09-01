@@ -17,6 +17,7 @@
 //
 
 import Cocoa
+import os.log
 
 extension NSView {
 
@@ -28,6 +29,15 @@ extension NSView {
         subView.topAnchor.constraint(equalTo: topAnchor).isActive = true
         subView.bottomAnchor.constraint(equalTo: bottomAnchor).isActive = true
         subView.widthAnchor.constraint(equalTo: widthAnchor).isActive = true
+    }
+
+    func makeMeFirstResponder() {
+        guard let window = window else {
+            os_log("%s: Window not available", log: OSLog.Category.general, type: .error, className)
+            return
+        }
+
+        window.makeFirstResponder(self)
     }
 
 }
