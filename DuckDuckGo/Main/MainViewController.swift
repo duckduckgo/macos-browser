@@ -74,4 +74,22 @@ class MainViewController: NSViewController {
         tabCollectionViewModel.removeSelected()
     }
 
+    @IBAction func reloadPage(_ sender: Any?) {
+        guard let browserTabViewController = browserTabViewController else {
+            os_log("MainViewController: Failed to init NavigationBarViewController", log: OSLog.Category.general, type: .error)
+            return
+        }
+
+        browserTabViewController.reloadPage()
+    }
+
+    @IBAction func stopLoading(_ sender: Any?) {
+        guard let browserTabViewController = browserTabViewController else {
+            os_log("MainViewController: Failed to init NavigationBarViewController", log: OSLog.Category.general, type: .error)
+            return
+        }
+
+        browserTabViewController.stopLoading()
+    }
+
 }
