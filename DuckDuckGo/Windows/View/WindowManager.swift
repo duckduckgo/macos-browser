@@ -1,5 +1,5 @@
 //
-//  AppDelegate.swift
+//  WindowManager.swift
 //
 //  Copyright © 2020 DuckDuckGo. All rights reserved.
 //
@@ -17,28 +17,23 @@
 //
 
 import Cocoa
+import os.log
 
-@NSApplicationMain
-class AppDelegate: NSObject, NSApplicationDelegate {
+class WindowManager {
 
-    func applicationDidFinishLaunching(_ aNotification: Notification) {
-        // Insert code here to initialize your application
+    func closeAllWindows() {
+        NSApplication.shared.windows.forEach { (window) in
+            window.close()
+        }
     }
 
-    func applicationWillTerminate(_ aNotification: Notification) {
-        // Insert code here to tear down your application
+    func openNewWindow() {
+        let mainStoryboard = NSStoryboard(name: "Main", bundle: nil)
+        guard let mainWindowController = mainStoryboard.instantiateInitialController() as? MainWindowController else {
+            os_log("MainViewController: Failed to init MainWindowController", log: OSLog.Category.general, type: .error)
+            return
+        }
+
+        mainWindowController.showWindow(self)
     }
-
-    // MARK: - Windows
-
-    let windowManager = WindowManager()
-
-    @IBAction func newWindow(_ sender: Any?) {
-        windowManager.openNewWindow()
-    }
-
-    @IBAction func closeAllWindows(_ sender: Any?) {
-        windowManager.closeAllWindows()
-    }
-
 }
