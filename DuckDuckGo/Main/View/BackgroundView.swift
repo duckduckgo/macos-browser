@@ -1,5 +1,5 @@
 //
-//  BackgroundView.swift
+//  BackgroundColorView.swift
 //
 //  Copyright © 2020 DuckDuckGo. All rights reserved.
 //
@@ -18,9 +18,7 @@
 
 import Cocoa
 
-// View capable of setting background in Interface Builder
-//@objcMembers
-public class BackgroundView: NSView {
+class BackgroundColorView: NSView {
 
     required init?(coder: NSCoder) {
         super.init(coder: coder)
@@ -34,9 +32,9 @@ public class BackgroundView: NSView {
         commonInit()
     }
 
-    @IBInspectable public var backgroundColor: NSColor = NSColor.clear {
+    @IBInspectable public var backgroundColor: NSColor? = NSColor.clear {
         didSet {
-            layer?.backgroundColor = backgroundColor.cgColor
+            layer?.backgroundColor = backgroundColor?.cgColor
         }
     }
 

@@ -24,8 +24,8 @@ class SuggestionTableRowView: NSTableRowView {
 
     // swiftlint:disable unused_setter_value
     override var isEmphasized: Bool {
-        set {}
         get { return true }
+        set {}
     }
     // swiftlint:enable unused_setter_value
 

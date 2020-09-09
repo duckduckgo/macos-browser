@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<document type="com.apple.InterfaceBuilder3.Cocoa.Storyboard.XIB" version="3.0" toolsVersion="17132" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none" useAutolayout="YES" initialViewController="B8D-0N-5wS">
+<document type="com.apple.InterfaceBuilder3.Cocoa.Storyboard.XIB" version="3.0" toolsVersion="17154" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none" useAutolayout="YES" initialViewController="B8D-0N-5wS">
     <dependencies>
         <deployment identifier="macosx"/>
-        <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="17132"/>
-        <plugIn identifier="com.apple.WebKit2IBPlugin" version="17132"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="17154"/>
+        <capability name="Named colors" minToolsVersion="9.0"/>
         <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
     </dependencies>
     <scenes>
@@ -61,33 +61,25 @@
                                 <modifierMask key="keyEquivalentModifierMask"/>
                                 <menu key="submenu" title="File" id="bib-Uj-vzu">
                                     <items>
-                                        <menuItem title="New" keyEquivalent="n" id="Was-JA-tGl">
+                                        <menuItem title="New Window" keyEquivalent="n" id="Was-JA-tGl">
                                             <connections>
-                                                <action selector="newDocument:" target="Ady-hI-5gd" id="4Si-XN-c54"/>
+                                                <action selector="newWindow:" target="Ady-hI-5gd" id="nK2-0w-B4c"/>
                                             </connections>
                                         </menuItem>
-                                        <menuItem title="Open…" keyEquivalent="o" id="IAo-SY-fd9">
+                                        <menuItem title="New Tab" keyEquivalent="t" id="9qI-62-tsd" userLabel="New Tab">
                                             <connections>
-                                                <action selector="openDocument:" target="Ady-hI-5gd" id="bVn-NM-KNZ"/>
+                                                <action selector="newTab:" target="Ady-hI-5gd" id="Gnb-ML-joG"/>
                                             </connections>
-                                        </menuItem>
-                                        <menuItem title="Open Recent" id="tXI-mr-wws">
-                                            <modifierMask key="keyEquivalentModifierMask"/>
-                                            <menu key="submenu" title="Open Recent" systemMenu="recentDocuments" id="oas-Oc-fiZ">
-                                                <items>
-                                                    <menuItem title="Clear Menu" id="vNY-rz-j42">
-                                                        <modifierMask key="keyEquivalentModifierMask"/>
-                                                        <connections>
-                                                            <action selector="clearRecentDocuments:" target="Ady-hI-5gd" id="Daa-9d-B3U"/>
-                                                        </connections>
-                                                    </menuItem>
-                                                </items>
-                                            </menu>
                                         </menuItem>
                                         <menuItem isSeparatorItem="YES" id="m54-Is-iLE"/>
-                                        <menuItem title="Close" keyEquivalent="w" id="DVo-aG-piG">
+                                        <menuItem title="Close Window" keyEquivalent="W" id="CzI-4o-2re">
                                             <connections>
-                                                <action selector="performClose:" target="Ady-hI-5gd" id="HmO-Ls-i7Q"/>
+                                                <action selector="performClose:" target="Ady-hI-5gd" id="7UD-1F-xow"/>
+                                            </connections>
+                                        </menuItem>
+                                        <menuItem title="Close Tab" keyEquivalent="w" id="DVo-aG-piG">
+                                            <connections>
+                                                <action selector="closeTab:" target="Ady-hI-5gd" id="zjx-YQ-d6C"/>
                                             </connections>
                                         </menuItem>
                                         <menuItem title="Save…" keyEquivalent="s" id="pxx-59-PXV">
@@ -685,12 +677,12 @@
         <!--Window Controller-->
         <scene sceneID="R2V-B0-nI4">
             <objects>
-                <windowController id="B8D-0N-5wS" sceneMemberID="viewController">
-                    <window key="window" title="Window" allowsToolTipsWhenApplicationIsInactive="NO" autorecalculatesKeyViewLoop="NO" releasedWhenClosed="NO" visibleAtLaunch="NO" animationBehavior="default" titlebarAppearsTransparent="YES" titleVisibility="hidden" id="IQv-IB-iLA">
-                        <windowStyleMask key="styleMask" titled="YES" closable="YES" miniaturizable="YES" resizable="YES"/>
+                <windowController id="B8D-0N-5wS" customClass="MainWindowController" customModule="DuckDuckGo_Privacy_Browser" customModuleProvider="target" sceneMemberID="viewController">
+                    <window key="window" allowsToolTipsWhenApplicationIsInactive="NO" autorecalculatesKeyViewLoop="NO" releasedWhenClosed="NO" visibleAtLaunch="NO" animationBehavior="default" titlebarAppearsTransparent="YES" titleVisibility="hidden" id="IQv-IB-iLA" customClass="MainWindow" customModule="DuckDuckGo_Privacy_Browser" customModuleProvider="target">
+                        <windowStyleMask key="styleMask" closable="YES" miniaturizable="YES" resizable="YES" fullSizeContentView="YES"/>
                         <windowPositionMask key="initialPositionMask" leftStrut="YES" rightStrut="YES" topStrut="YES" bottomStrut="YES"/>
-                        <rect key="contentRect" x="196" y="240" width="1024" height="789"/>
-                        <rect key="screenRect" x="0.0" y="0.0" width="1680" height="1027"/>
+                        <rect key="contentRect" x="196" y="239" width="1024" height="790"/>
+                        <rect key="screenRect" x="0.0" y="0.0" width="1536" height="937"/>
                         <connections>
                             <outlet property="delegate" destination="B8D-0N-5wS" id="98r-iN-zZc"/>
                         </connections>
@@ -701,7 +693,7 @@
                 </windowController>
                 <customObject id="Oky-zY-oP4" userLabel="First Responder" customClass="NSResponder" sceneMemberID="firstResponder"/>
             </objects>
-            <point key="canvasLocation" x="75" y="250"/>
+            <point key="canvasLocation" x="75" y="249"/>
         </scene>
         <!--Main View Controller-->
         <scene sceneID="hIz-AP-VOD">
@@ -711,200 +703,121 @@
                         <rect key="frame" x="0.0" y="0.0" width="1024" height="789"/>
                         <autoresizingMask key="autoresizingMask"/>
                         <subviews>
-                            <containerView translatesAutoresizingMaskIntoConstraints="NO" id="wFH-xq-50o">
-                                <rect key="frame" x="0.0" y="750" width="1024" height="39"/>
+                            <containerView translatesAutoresizingMaskIntoConstraints="NO" id="lYg-bX-QrJ">
+                                <rect key="frame" x="0.0" y="751" width="1024" height="38"/>
                                 <constraints>
-                                    <constraint firstAttribute="height" constant="39" id="vZS-tl-wOP"/>
+                                    <constraint firstAttribute="height" constant="38" id="zAs-5I-a2u"/>
                                 </constraints>
                                 <connections>
-                                    <segue destination="zAi-mT-h2J" kind="embed" destinationCreationSelector="createNavigationBarViewControllerWithCoder:sender:segueIdentifier:" id="Py5-GB-0yS"/>
+                                    <segue destination="Nfk-V8-FAE" kind="embed" destinationCreationSelector="createTabBarViewControllerWithCoder:sender:segueIdentifier:" id="dL6-gI-9Hl"/>
                                 </connections>
                             </containerView>
-                            <containerView translatesAutoresizingMaskIntoConstraints="NO" id="SYo-8W-jl3">
-                                <rect key="frame" x="0.0" y="0.0" width="1024" height="750"/>
+                            <containerView translatesAutoresizingMaskIntoConstraints="NO" id="wFH-xq-50o">
+                                <rect key="frame" x="0.0" y="695" width="1024" height="56"/>
+                                <constraints>
+                                    <constraint firstAttribute="height" constant="56" id="vZS-tl-wOP"/>
+                                </constraints>
                                 <connections>
-                                    <segue destination="ELG-jh-7Cj" kind="embed" destinationCreationSelector="createWebViewControllerWithCoder:sender:segueIdentifier:" id="PBj-0f-brI"/>
+                                    <segue destination="R9l-dg-lKa" kind="embed" destinationCreationSelector="createNavigationBarViewControllerWithCoder:sender:segueIdentifier:" id="Br9-o3-sQ8"/>
+                                </connections>
+                            </containerView>
+                            <customView translatesAutoresizingMaskIntoConstraints="NO" id="af1-Eb-VaG" userLabel="Separator" customClass="ColorView" customModule="DuckDuckGo_Privacy_Browser" customModuleProvider="target">
+                                <rect key="frame" x="0.0" y="695" width="1024" height="1"/>
+                                <constraints>
+                                    <constraint firstAttribute="height" constant="1" id="hrt-pu-NuL"/>
+                                </constraints>
+                                <userDefinedRuntimeAttributes>
+                                    <userDefinedRuntimeAttribute type="color" keyPath="backgroundColor">
+                                        <color key="value" name="SeparatorColor"/>
+                                    </userDefinedRuntimeAttribute>
+                                </userDefinedRuntimeAttributes>
+                            </customView>
+                            <containerView translatesAutoresizingMaskIntoConstraints="NO" id="SYo-8W-jl3">
+                                <rect key="frame" x="0.0" y="0.0" width="1024" height="695"/>
+                                <connections>
+                                    <segue destination="wo6-dV-Q3Q" kind="embed" destinationCreationSelector="createWebViewControllerWithCoder:sender:segueIdentifier:" id="A2b-sp-a54"/>
+                                </connections>
+                            </containerView>
+                            <containerView translatesAutoresizingMaskIntoConstraints="NO" id="Ho7-y5-8HO">
+                                <rect key="frame" x="12" y="763" width="100" height="14"/>
+                                <constraints>
+                                    <constraint firstAttribute="height" constant="14" id="Jas-CN-K5f"/>
+                                    <constraint firstAttribute="width" constant="100" id="NrO-U7-QDd"/>
+                                </constraints>
+                                <connections>
+                                    <segue destination="q3j-hn-4a0" kind="embed" id="6TM-4c-S3z"/>
                                 </connections>
                             </containerView>
                         </subviews>
                         <constraints>
                             <constraint firstAttribute="trailing" secondItem="wFH-xq-50o" secondAttribute="trailing" id="4Cb-FA-sMo"/>
                             <constraint firstAttribute="trailing" secondItem="SYo-8W-jl3" secondAttribute="trailing" id="EJ8-cX-El9"/>
-                            <constraint firstItem="wFH-xq-50o" firstAttribute="top" secondItem="m2S-Jp-Qdl" secondAttribute="top" id="PlA-C1-Iyl"/>
+                            <constraint firstItem="wFH-xq-50o" firstAttribute="top" secondItem="lYg-bX-QrJ" secondAttribute="bottom" id="EnL-Zp-RcI"/>
+                            <constraint firstAttribute="trailing" secondItem="lYg-bX-QrJ" secondAttribute="trailing" id="HkZ-fV-qYb"/>
+                            <constraint firstItem="lYg-bX-QrJ" firstAttribute="top" secondItem="m2S-Jp-Qdl" secondAttribute="top" id="PNG-fr-pcs"/>
                             <constraint firstItem="SYo-8W-jl3" firstAttribute="top" secondItem="wFH-xq-50o" secondAttribute="bottom" id="SOg-lH-g5P"/>
                             <constraint firstItem="wFH-xq-50o" firstAttribute="leading" secondItem="m2S-Jp-Qdl" secondAttribute="leading" id="XQv-BZ-2ci"/>
+                            <constraint firstItem="SYo-8W-jl3" firstAttribute="top" secondItem="af1-Eb-VaG" secondAttribute="bottom" id="ZLC-J7-HaR"/>
+                            <constraint firstItem="Ho7-y5-8HO" firstAttribute="top" secondItem="m2S-Jp-Qdl" secondAttribute="top" constant="12" id="j7y-ae-Gve"/>
+                            <constraint firstItem="lYg-bX-QrJ" firstAttribute="leading" secondItem="m2S-Jp-Qdl" secondAttribute="leading" id="kVB-Sz-8Sv"/>
+                            <constraint firstItem="af1-Eb-VaG" firstAttribute="leading" secondItem="m2S-Jp-Qdl" secondAttribute="leading" id="oLA-yb-nB8"/>
                             <constraint firstAttribute="bottom" secondItem="SYo-8W-jl3" secondAttribute="bottom" id="tLa-XX-e8i"/>
+                            <constraint firstItem="Ho7-y5-8HO" firstAttribute="leading" secondItem="m2S-Jp-Qdl" secondAttribute="leading" constant="12" id="uac-4O-cZF"/>
                             <constraint firstItem="SYo-8W-jl3" firstAttribute="leading" secondItem="m2S-Jp-Qdl" secondAttribute="leading" id="woj-yk-97j"/>
+                            <constraint firstAttribute="trailing" secondItem="af1-Eb-VaG" secondAttribute="trailing" id="y1o-Rd-sxm"/>
                         </constraints>
                     </view>
                     <connections>
                         <outlet property="navigationBarContainerView" destination="wFH-xq-50o" id="hbq-xV-McI"/>
+                        <outlet property="tabBarContainerView" destination="lYg-bX-QrJ" id="nor-E0-cFP"/>
                         <outlet property="webContainerView" destination="SYo-8W-jl3" id="DoZ-Ih-dHA"/>
                     </connections>
                 </viewController>
                 <customObject id="rPt-NT-nkU" userLabel="First Responder" customClass="NSResponder" sceneMemberID="firstResponder"/>
             </objects>
-            <point key="canvasLocation" x="75" y="1179"/>
+            <point key="canvasLocation" x="75" y="1178.5"/>
         </scene>
-        <!--Navigation Bar View Controller-->
-        <scene sceneID="Lx2-fj-RhY">
+        <!--TabBar-->
+        <scene sceneID="XSA-KE-InJ">
             <objects>
-                <viewController id="zAi-mT-h2J" customClass="NavigationBarViewController" customModule="DuckDuckGo_Privacy_Browser" customModuleProvider="target" sceneMemberID="viewController">
-                    <view key="view" id="23V-k7-gwK">
-                        <rect key="frame" x="0.0" y="0.0" width="845" height="40"/>
-                        <autoresizingMask key="autoresizingMask"/>
-                        <subviews>
-                            <searchField wantsLayer="YES" verticalHuggingPriority="750" textCompletion="NO" translatesAutoresizingMaskIntoConstraints="NO" id="b1U-yO-v3i" customClass="AutocompleteSearchField" customModule="DuckDuckGo_Privacy_Browser" customModuleProvider="target">
-                                <rect key="frame" x="173" y="9" width="500" height="22"/>
-                                <constraints>
-                                    <constraint firstAttribute="height" constant="22" id="IOH-UD-0S2"/>
-                                    <constraint firstAttribute="width" priority="250" constant="500" id="Lba-qs-Qej"/>
-                                </constraints>
-                                <searchFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" selectable="YES" editable="YES" borderStyle="bezel" placeholderString="Search or enter address" usesSingleLineMode="YES" bezelStyle="round" id="Ad5-Li-sGN">
-                                    <font key="font" metaFont="system"/>
-                                    <color key="textColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
-                                    <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
-                                </searchFieldCell>
-                            </searchField>
-                            <button translatesAutoresizingMaskIntoConstraints="NO" id="0fx-y3-Oc0">
-                                <rect key="frame" x="20" y="6" width="29" height="29"/>
-                                <constraints>
-                                    <constraint firstAttribute="height" constant="29" id="H1Q-jN-aiv"/>
-                                    <constraint firstAttribute="width" constant="29" id="t38-6z-ubW"/>
-                                </constraints>
-                                <buttonCell key="cell" type="square" bezelStyle="shadowlessSquare" image="NSTouchBarGoBackTemplate" imagePosition="only" alignment="center" imageScaling="proportionallyUpOrDown" inset="2" id="oqM-Wt-CCf">
-                                    <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
-                                    <font key="font" metaFont="system"/>
-                                </buttonCell>
-                                <connections>
-                                    <action selector="goBackAction:" target="zAi-mT-h2J" id="ZqM-Wu-AK8"/>
-                                </connections>
-                            </button>
-                            <button translatesAutoresizingMaskIntoConstraints="NO" id="bnS-8m-XdK">
-                                <rect key="frame" x="59" y="6" width="29" height="29"/>
-                                <constraints>
-                                    <constraint firstAttribute="width" constant="29" id="HpB-H4-ZDd"/>
-                                    <constraint firstAttribute="height" constant="29" id="WTi-e6-msq"/>
-                                </constraints>
-                                <buttonCell key="cell" type="square" bezelStyle="shadowlessSquare" image="NSTouchBarGoForwardTemplate" imagePosition="only" alignment="center" imageScaling="proportionallyUpOrDown" inset="2" id="WE6-5p-2mh">
-                                    <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
-                                    <font key="font" metaFont="system"/>
-                                </buttonCell>
-                                <connections>
-                                    <action selector="goForwardAction:" target="zAi-mT-h2J" id="ZCI-tB-3Zd"/>
-                                </connections>
-                            </button>
-                            <button translatesAutoresizingMaskIntoConstraints="NO" id="8IH-kp-rpL" customClass="RotatingButton" customModule="DuckDuckGo_Privacy_Browser" customModuleProvider="target">
-                                <rect key="frame" x="98" y="6" width="29" height="29"/>
-                                <constraints>
-                                    <constraint firstAttribute="width" constant="29" id="f1O-Dq-2FO"/>
-                                    <constraint firstAttribute="height" constant="29" id="ufS-ly-vTD"/>
-                                </constraints>
-                                <buttonCell key="cell" type="square" bezelStyle="shadowlessSquare" image="NSTouchBarRefreshTemplate" imagePosition="only" alignment="center" imageScaling="proportionallyUpOrDown" inset="2" id="wcP-EK-gnM">
-                                    <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
-                                    <font key="font" metaFont="system"/>
-                                </buttonCell>
-                                <connections>
-                                    <action selector="reloadAction:" target="zAi-mT-h2J" id="dc1-7B-MrU"/>
-                                </connections>
-                            </button>
-                        </subviews>
-                        <constraints>
-                            <constraint firstItem="8IH-kp-rpL" firstAttribute="centerY" secondItem="23V-k7-gwK" secondAttribute="centerY" id="2Tw-uY-QSx"/>
-                            <constraint firstItem="bnS-8m-XdK" firstAttribute="centerY" secondItem="23V-k7-gwK" secondAttribute="centerY" id="75W-jb-4P3"/>
-                            <constraint firstAttribute="trailing" relation="greaterThanOrEqual" secondItem="b1U-yO-v3i" secondAttribute="trailing" constant="20" id="7vl-ky-E8t"/>
-                            <constraint firstItem="8IH-kp-rpL" firstAttribute="leading" secondItem="bnS-8m-XdK" secondAttribute="trailing" constant="10" id="At5-n6-qQM"/>
-                            <constraint firstItem="0fx-y3-Oc0" firstAttribute="centerY" secondItem="23V-k7-gwK" secondAttribute="centerY" id="EjX-JW-sDS"/>
-                            <constraint firstItem="bnS-8m-XdK" firstAttribute="leading" secondItem="0fx-y3-Oc0" secondAttribute="trailing" constant="10" id="Sws-Bc-6cW"/>
-                            <constraint firstItem="0fx-y3-Oc0" firstAttribute="leading" secondItem="23V-k7-gwK" secondAttribute="leading" constant="20" id="Trt-ZX-gOw"/>
-                            <constraint firstItem="b1U-yO-v3i" firstAttribute="leading" relation="greaterThanOrEqual" secondItem="23V-k7-gwK" secondAttribute="leading" constant="20" id="Uvz-dQ-aK4"/>
-                            <constraint firstItem="b1U-yO-v3i" firstAttribute="centerY" secondItem="23V-k7-gwK" secondAttribute="centerY" id="aZJ-7U-mmY"/>
-                            <constraint firstItem="b1U-yO-v3i" firstAttribute="centerX" secondItem="23V-k7-gwK" secondAttribute="centerX" id="t2z-q9-dku"/>
-                        </constraints>
-                    </view>
-                    <connections>
-                        <outlet property="autocompleteSearchField" destination="b1U-yO-v3i" id="KPy-9z-ND7"/>
-                        <outlet property="goBackButton" destination="0fx-y3-Oc0" id="dQl-Dn-Vhw"/>
-                        <outlet property="goForwardButton" destination="bnS-8m-XdK" id="kT2-Lj-vFt"/>
-                        <outlet property="reloadButton" destination="8IH-kp-rpL" id="U4B-Iy-2Vr"/>
-                    </connections>
-                </viewController>
-                <customObject id="zdG-Z1-HUh" userLabel="First Responder" customClass="NSResponder" sceneMemberID="firstResponder"/>
+                <controllerPlaceholder storyboardName="TabBar" id="Nfk-V8-FAE" sceneMemberID="viewController"/>
+                <customObject id="NXm-I5-OhA" userLabel="First Responder" customClass="NSResponder" sceneMemberID="firstResponder"/>
             </objects>
-            <point key="canvasLocation" x="-341.5" y="1868"/>
+            <point key="canvasLocation" x="848" y="1012"/>
         </scene>
-        <!--Browser Tab View Controller-->
-        <scene sceneID="POP-kj-wTB">
+        <!--Control Buttons View Controller-->
+        <scene sceneID="YTl-il-KY0">
             <objects>
-                <viewController id="ELG-jh-7Cj" customClass="BrowserTabViewController" customModule="DuckDuckGo_Privacy_Browser" customModuleProvider="target" sceneMemberID="viewController">
-                    <view key="view" id="9OZ-eN-8Ze">
-                        <rect key="frame" x="0.0" y="0.0" width="512" height="492"/>
+                <viewController id="q3j-hn-4a0" customClass="ControlButtonsViewController" customModule="DuckDuckGo_Privacy_Browser" customModuleProvider="target" sceneMemberID="viewController">
+                    <view key="view" id="CF0-Fu-PQ8">
+                        <rect key="frame" x="0.0" y="0.0" width="78" height="38"/>
                         <autoresizingMask key="autoresizingMask"/>
-                        <subviews>
-                            <wkWebView wantsLayer="YES" translatesAutoresizingMaskIntoConstraints="NO" id="0pi-OT-jzg">
-                                <rect key="frame" x="0.0" y="0.0" width="512" height="492"/>
-                                <wkWebViewConfiguration key="configuration">
-                                    <audiovisualMediaTypes key="mediaTypesRequiringUserActionForPlayback" none="YES"/>
-                                    <wkPreferences key="preferences"/>
-                                </wkWebViewConfiguration>
-                            </wkWebView>
-                            <customView hidden="YES" translatesAutoresizingMaskIntoConstraints="NO" id="Nvb-Di-hxz" customClass="BackgroundView" customModule="DuckDuckGo_Privacy_Browser" customModuleProvider="target">
-                                <rect key="frame" x="0.0" y="0.0" width="512" height="492"/>
-                                <subviews>
-                                    <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="wDW-73-QgT">
-                                        <rect key="frame" x="140" y="253" width="232" height="17"/>
-                                        <textFieldCell key="cell" lineBreakMode="clipping" title="DuckDuckGo can't load this page." id="L12-N1-wo0">
-                                            <font key="font" metaFont="systemSemibold" size="14"/>
-                                            <color key="textColor" name="labelColor" catalog="System" colorSpace="catalog"/>
-                                            <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
-                                        </textFieldCell>
-                                    </textField>
-                                    <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="BVh-ER-EPP">
-                                        <rect key="frame" x="81" y="228" width="351" height="16"/>
-                                        <textFieldCell key="cell" lineBreakMode="clipping" title="A server with the specified hostname could not be found." id="0xq-R9-UnE">
-                                            <font key="font" metaFont="system"/>
-                                            <color key="textColor" name="labelColor" catalog="System" colorSpace="catalog"/>
-                                            <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
-                                        </textFieldCell>
-                                    </textField>
-                                </subviews>
-                                <constraints>
-                                    <constraint firstItem="wDW-73-QgT" firstAttribute="centerY" secondItem="Nvb-Di-hxz" secondAttribute="centerY" constant="-15" id="NWz-vb-r3E"/>
-                                    <constraint firstItem="BVh-ER-EPP" firstAttribute="centerX" secondItem="Nvb-Di-hxz" secondAttribute="centerX" id="ix8-D4-dzr"/>
-                                    <constraint firstItem="BVh-ER-EPP" firstAttribute="centerY" secondItem="Nvb-Di-hxz" secondAttribute="centerY" constant="10" id="quT-4m-sos"/>
-                                    <constraint firstItem="wDW-73-QgT" firstAttribute="centerX" secondItem="Nvb-Di-hxz" secondAttribute="centerX" id="yGz-gN-3kk"/>
-                                </constraints>
-                                <userDefinedRuntimeAttributes>
-                                    <userDefinedRuntimeAttribute type="color" keyPath="backgroundColor">
-                                        <color key="value" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
-                                    </userDefinedRuntimeAttribute>
-                                </userDefinedRuntimeAttributes>
-                            </customView>
-                        </subviews>
-                        <constraints>
-                            <constraint firstAttribute="bottom" secondItem="Nvb-Di-hxz" secondAttribute="bottom" id="CGI-tw-BgY"/>
-                            <constraint firstItem="0pi-OT-jzg" firstAttribute="top" secondItem="9OZ-eN-8Ze" secondAttribute="top" id="GdO-9V-k8G"/>
-                            <constraint firstAttribute="bottom" secondItem="0pi-OT-jzg" secondAttribute="bottom" id="OCn-LW-f5K"/>
-                            <constraint firstItem="Nvb-Di-hxz" firstAttribute="leading" secondItem="9OZ-eN-8Ze" secondAttribute="leading" id="QFP-Vc-ubB"/>
-                            <constraint firstItem="Nvb-Di-hxz" firstAttribute="top" secondItem="9OZ-eN-8Ze" secondAttribute="top" id="myq-jf-wfV"/>
-                            <constraint firstAttribute="trailing" secondItem="0pi-OT-jzg" secondAttribute="trailing" id="o51-Tp-9t2"/>
-                            <constraint firstAttribute="trailing" secondItem="Nvb-Di-hxz" secondAttribute="trailing" id="qd4-AK-1kn"/>
-                            <constraint firstItem="0pi-OT-jzg" firstAttribute="leading" secondItem="9OZ-eN-8Ze" secondAttribute="leading" id="upy-bE-zOl"/>
-                        </constraints>
                     </view>
-                    <connections>
-                        <outlet property="errorView" destination="Nvb-Di-hxz" id="zPb-tZ-0fB"/>
-                        <outlet property="webView" destination="0pi-OT-jzg" id="VeJ-Qf-md8"/>
-                    </connections>
                 </viewController>
-                <customObject id="mxo-Js-ldQ" userLabel="First Responder" customClass="NSResponder" sceneMemberID="firstResponder"/>
+                <customObject id="eQq-RL-nKZ" userLabel="First Responder" customClass="NSResponder" sceneMemberID="firstResponder"/>
             </objects>
-            <point key="canvasLocation" x="374" y="2094"/>
+            <point key="canvasLocation" x="846" y="810"/>
+        </scene>
+        <!--NavigationBar-->
+        <scene sceneID="Sc0-ir-Na8">
+            <objects>
+                <controllerPlaceholder storyboardName="NavigationBar" id="R9l-dg-lKa" sceneMemberID="viewController"/>
+                <customObject id="Pfq-lf-Cxf" userLabel="First Responder" customClass="NSResponder" sceneMemberID="firstResponder"/>
+            </objects>
+            <point key="canvasLocation" x="869" y="1112"/>
+        </scene>
+        <!--BrowserTab-->
+        <scene sceneID="O3n-py-FOu">
+            <objects>
+                <controllerPlaceholder storyboardName="BrowserTab" id="wo6-dV-Q3Q" sceneMemberID="viewController"/>
+                <customObject id="ECq-3v-dmj" userLabel="First Responder" customClass="NSResponder" sceneMemberID="firstResponder"/>
+            </objects>
+            <point key="canvasLocation" x="863" y="1228"/>
         </scene>
     </scenes>
     <resources>
-        <image name="NSTouchBarGoBackTemplate" width="10" height="30"/>
-        <image name="NSTouchBarGoForwardTemplate" width="10" height="30"/>
-        <image name="NSTouchBarRefreshTemplate" width="19" height="30"/>
+        <namedColor name="SeparatorColor">
+            <color red="0.0" green="0.0" blue="0.0" alpha="0.10000000149011612" colorSpace="custom" customColorSpace="sRGB"/>
+        </namedColor>
     </resources>
 </document>

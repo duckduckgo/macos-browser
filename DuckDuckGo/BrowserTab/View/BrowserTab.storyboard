@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<document type="com.apple.InterfaceBuilder3.Cocoa.Storyboard.XIB" version="3.0" toolsVersion="17132" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none" useAutolayout="YES" initialViewController="D9y-55-iLO">
+    <dependencies>
+        <deployment identifier="macosx"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="17132"/>
+        <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
+    </dependencies>
+    <scenes>
+        <!--Browser Tab View Controller-->
+        <scene sceneID="qRm-AW-AdQ">
+            <objects>
+                <viewController id="D9y-55-iLO" customClass="BrowserTabViewController" customModule="DuckDuckGo_Privacy_Browser" customModuleProvider="target" sceneMemberID="viewController">
+                    <view key="view" id="aev-t9-Epw">
+                        <rect key="frame" x="0.0" y="0.0" width="512" height="492"/>
+                        <autoresizingMask key="autoresizingMask"/>
+                        <subviews>
+                            <customView hidden="YES" translatesAutoresizingMaskIntoConstraints="NO" id="bol-qn-wuI" customClass="ColorView" customModule="DuckDuckGo_Privacy_Browser" customModuleProvider="target">
+                                <rect key="frame" x="0.0" y="0.0" width="512" height="492"/>
+                                <subviews>
+                                    <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="RNn-86-Wkx">
+                                        <rect key="frame" x="140" y="253" width="232" height="17"/>
+                                        <textFieldCell key="cell" lineBreakMode="clipping" title="DuckDuckGo can't load this page." id="W60-yd-bv3">
+                                            <font key="font" metaFont="systemSemibold" size="14"/>
+                                            <color key="textColor" name="labelColor" catalog="System" colorSpace="catalog"/>
+                                            <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
+                                        </textFieldCell>
+                                    </textField>
+                                    <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="iH5-FT-P9e">
+                                        <rect key="frame" x="81" y="228" width="351" height="16"/>
+                                        <textFieldCell key="cell" lineBreakMode="clipping" title="A server with the specified hostname could not be found." id="rLZ-IC-OXf">
+                                            <font key="font" metaFont="system"/>
+                                            <color key="textColor" name="labelColor" catalog="System" colorSpace="catalog"/>
+                                            <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
+                                        </textFieldCell>
+                                    </textField>
+                                </subviews>
+                                <constraints>
+                                    <constraint firstItem="iH5-FT-P9e" firstAttribute="centerY" secondItem="bol-qn-wuI" secondAttribute="centerY" constant="10" id="F05-mw-7Re"/>
+                                    <constraint firstItem="RNn-86-Wkx" firstAttribute="centerY" secondItem="bol-qn-wuI" secondAttribute="centerY" constant="-15" id="m7c-MA-Rcm"/>
+                                    <constraint firstItem="RNn-86-Wkx" firstAttribute="centerX" secondItem="bol-qn-wuI" secondAttribute="centerX" id="nuD-3G-hI8"/>
+                                    <constraint firstItem="iH5-FT-P9e" firstAttribute="centerX" secondItem="bol-qn-wuI" secondAttribute="centerX" id="tff-7d-2X3"/>
+                                </constraints>
+                                <userDefinedRuntimeAttributes>
+                                    <userDefinedRuntimeAttribute type="color" keyPath="backgroundColor">
+                                        <color key="value" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
+                                    </userDefinedRuntimeAttribute>
+                                </userDefinedRuntimeAttributes>
+                            </customView>
+                        </subviews>
+                        <constraints>
+                            <constraint firstItem="bol-qn-wuI" firstAttribute="leading" secondItem="aev-t9-Epw" secondAttribute="leading" id="ROr-Er-6IN"/>
+                            <constraint firstAttribute="trailing" secondItem="bol-qn-wuI" secondAttribute="trailing" id="ea5-1F-Gwm"/>
+                            <constraint firstAttribute="bottom" secondItem="bol-qn-wuI" secondAttribute="bottom" id="ef9-7H-3hy"/>
+                            <constraint firstItem="bol-qn-wuI" firstAttribute="top" secondItem="aev-t9-Epw" secondAttribute="top" id="v8E-6v-8Tx"/>
+                        </constraints>
+                    </view>
+                    <connections>
+                        <outlet property="errorView" destination="bol-qn-wuI" id="gbL-AN-fxw"/>
+                    </connections>
+                </viewController>
+                <customObject id="xRE-VM-YeG" userLabel="First Responder" customClass="NSResponder" sceneMemberID="firstResponder"/>
+            </objects>
+            <point key="canvasLocation" x="123" y="2235"/>
+        </scene>
+    </scenes>
+</document>

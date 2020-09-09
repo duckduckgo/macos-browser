@@ -53,7 +53,7 @@ class DuckDuckGoSuggestionsAPI: SuggestionsAPI {
         }
 
         let request = URLRequest(url: searchUrl)
-        task = URLSession.shared.dataTask(with: request, completionHandler: { (data, _, error) in
+        let task = URLSession.shared.dataTask(with: request, completionHandler: { (data, _, error) in
             guard let data = data else {
                 os_log("DuckDuckGoSuggestionsAPI: Failed to fetch suggestions - %s",
                        log: OSLog.Category.general,
@@ -72,13 +72,8 @@ class DuckDuckGoSuggestionsAPI: SuggestionsAPI {
             mainQueueCompletion(suggestionsResult, nil)
         })
 
-        guard task != nil else {
-            os_log("DuckDuckGoSuggestionsAPI: Failed to init data task", log: OSLog.Category.general, type: .error)
-            mainQueueCompletion(nil, FetchSuggestionsError.dataTaskInitFailed)
-            return
-        }
-
-        task?.resume()
+        self.task = task
+        task.resume()
     }
 
 }
