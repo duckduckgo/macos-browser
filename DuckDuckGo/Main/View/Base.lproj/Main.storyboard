@@ -340,6 +340,34 @@
                                     </items>
                                 </menu>
                             </menuItem>
+                            <menuItem title="History" tag="4" id="sRV-6k-P2o">
+                                <modifierMask key="keyEquivalentModifierMask"/>
+                                <menu key="submenu" title="History" autoenablesItems="NO" id="yLz-zX-NKV">
+                                    <items>
+                                        <menuItem title="Back" tag="40" enabled="NO" keyEquivalent="[" id="VWV-vB-Mtc">
+                                            <connections>
+                                                <action selector="back:" target="Ady-hI-5gd" id="h04-cY-Ixk"/>
+                                            </connections>
+                                        </menuItem>
+                                        <menuItem title="Forward" tag="41" enabled="NO" keyEquivalent="]" id="Gbj-sV-aI3">
+                                            <connections>
+                                                <action selector="forward:" target="Ady-hI-5gd" id="eVr-CZ-DBf"/>
+                                            </connections>
+                                        </menuItem>
+                                        <menuItem title="Home" keyEquivalent="H" id="FPm-eZ-BQ8">
+                                            <connections>
+                                                <action selector="home:" target="Ady-hI-5gd" id="z3t-iv-FBh"/>
+                                            </connections>
+                                        </menuItem>
+                                        <menuItem isSeparatorItem="YES" id="IJK-jz-3WO"/>
+                                        <menuItem title="Reopen Last Closed Tab" tag="43" enabled="NO" keyEquivalent="T" id="c3l-v1-kxk">
+                                            <connections>
+                                                <action selector="reopenLastClosedTab:" target="Ady-hI-5gd" id="jzQ-2q-HGB"/>
+                                            </connections>
+                                        </menuItem>
+                                    </items>
+                                </menu>
+                            </menuItem>
                             <menuItem title="Window" id="aUF-d1-5bR">
                                 <modifierMask key="keyEquivalentModifierMask"/>
                                 <menu key="submenu" title="Window" systemMenu="window" id="Td7-aD-5lo">

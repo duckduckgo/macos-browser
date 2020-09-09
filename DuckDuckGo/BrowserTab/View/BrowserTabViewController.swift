@@ -49,24 +49,6 @@ class BrowserTabViewController: NSViewController {
         bindSelectedTabViewModel()
     }
 
-    func reloadPage() {
-        guard let webView = webView else {
-            os_log("BrowserTabViewController: Web view is nil", log: OSLog.Category.general, type: .error)
-            return
-        }
-
-        webView.reload()
-    }
-
-    func stopLoading() {
-        guard let webView = webView else {
-            os_log("BrowserTabViewController: Web view is nil", log: OSLog.Category.general, type: .error)
-            return
-        }
-
-        webView.stopLoading()
-    }
-
     private func bindSelectedTabViewModel() {
         selectedTabViewModelCancelable = tabCollectionViewModel.$selectedTabViewModel.receive(on: DispatchQueue.main).sink { [weak self] _ in
             self?.changeWebView()
@@ -94,6 +76,7 @@ class BrowserTabViewController: NSViewController {
         }
         webView = nil
         guard let tabViewModel = tabCollectionViewModel.selectedTabViewModel else {
+            self.tabViewModel = nil
             return
         }
         self.tabViewModel = tabViewModel

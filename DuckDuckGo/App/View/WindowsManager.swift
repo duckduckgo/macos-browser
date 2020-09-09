@@ -19,15 +19,15 @@
 import Cocoa
 import os.log
 
-class WindowManager {
+class WindowsManager {
 
-    func closeAllWindows() {
+    class func closeAllWindows() {
         NSApplication.shared.windows.forEach { (window) in
             window.close()
         }
     }
 
-    func openNewWindow() {
+    class func openNewWindow() {
         let mainStoryboard = NSStoryboard(name: "Main", bundle: nil)
         guard let mainWindowController = mainStoryboard.instantiateInitialController() as? MainWindowController else {
             os_log("MainViewController: Failed to init MainWindowController", log: OSLog.Category.general, type: .error)
@@ -36,4 +36,5 @@ class WindowManager {
 
         mainWindowController.showWindow(self)
     }
+
 }

@@ -33,6 +33,8 @@ class TabCollection {
     @Published private(set) var tabs: [Tab] = []
     weak var delegate: TabCollectionDelegate?
 
+    @Published private(set) var lastRemovedTab: (Tab, Int)?
+
     init() {
         listenUrlEvents()
     }
@@ -58,7 +60,8 @@ class TabCollection {
             return false
         }
 
-        tabs.remove(at: index)
+        let removedTab = tabs.remove(at: index)
+        lastRemovedTab = (removedTab, index)
         delegate?.tabCollection(self, didRemoveTabAt: index)
 
         return true
@@ -81,6 +84,16 @@ class TabCollection {
         tabs.insert(tabs.remove(at: index), at: newIndex)
         self.tabs = tabs
         delegate?.tabCollection(self, didMoveTabAt: index, to: newIndex)
+    }
+
+    func insertLastRemovedTab() {
+        guard let lastRemovedTab = lastRemovedTab else {
+            os_log("TabCollection: No tab removed yet", log: OSLog.Category.general, type: .error)
+            return
+        }
+
+        insert(tab: lastRemovedTab.0, at: min(lastRemovedTab.1, tabs.count))
+        self.lastRemovedTab = nil
     }
 
 }

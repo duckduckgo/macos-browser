@@ -106,7 +106,7 @@ class TabViewModel {
     }
 
     private func updateTitle() {
-        if tab.url == nil {
+        if tab.url == nil || tab.url == URL.emptyPage {
             title = Title.home
             return
         }
@@ -119,7 +119,7 @@ class TabViewModel {
     }
 
     private func updateFavicon() {
-        if tab.url == nil {
+        if tab.url == nil || tab.url == URL.emptyPage {
             favicon = Favicon.home
             return
         }
@@ -143,8 +143,16 @@ extension TabViewModel: TabActionDelegate {
         webView.goBack()
     }
 
+    func tabHomeAction(_ tab: Tab) {
+        tab.url = nil
+    }
+
     func tabReloadAction(_ tab: Tab) {
         webView.reload()
+    }
+
+    func tabStopLoadingAction(_ tab: Tab) {
+        webView.stopLoading()
     }
 
 }

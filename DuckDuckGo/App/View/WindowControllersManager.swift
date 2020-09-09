@@ -1,5 +1,5 @@
 //
-//  AppDelegate.swift
+//  WindowControllersManager.swift
 //
 //  Copyright © 2020 DuckDuckGo. All rights reserved.
 //
@@ -16,17 +16,20 @@
 //  limitations under the License.
 //
 
-import Cocoa
+import Foundation
 
-@NSApplicationMain
-class AppDelegate: NSObject, NSApplicationDelegate {
+class WindowControllersManager {
 
-    func applicationDidFinishLaunching(_ aNotification: Notification) {
-        // Insert code here to initialize your application
+    static let shared = WindowControllersManager()
+
+    private var windowControllers = Set<MainWindowController>()
+
+    func register(_ windowController: MainWindowController) {
+        windowControllers.insert(windowController)
     }
 
-    func applicationWillTerminate(_ aNotification: Notification) {
-        // Insert code here to tear down your application
+    func unregister(_ windowController: MainWindowController) {
+        windowControllers.remove(windowController)
     }
 
 }

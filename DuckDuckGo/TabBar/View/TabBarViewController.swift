@@ -463,7 +463,7 @@ extension TabBarViewController: TabBarViewItemDelegate {
             return
         }
 
-        tabCollectionViewModel.removeOtherTabs(except: indexPath.item)
+        tabCollectionViewModel.removeAllTabs(except: indexPath.item)
     }
 
 }

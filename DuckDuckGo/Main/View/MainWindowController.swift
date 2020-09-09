@@ -40,6 +40,7 @@ class MainWindowController: NSWindowController {
     override func windowDidLoad() {
         super.windowDidLoad()
         isLoaded = true
+        WindowControllersManager.shared.register(self)
 
         setupWindow()
         addWindowButtons()
@@ -133,6 +134,30 @@ extension MainWindowController: NSWindowDelegate {
         resizeTitleBar()
         addWindowButtons()
         layoutWindowButtons()
+    }
+
+    func windowDidBecomeMain(_ notification: Notification) {
+        guard let mainViewController = contentViewController as? MainViewController else {
+            os_log("MainWindowController: Failed to get reference to main view controller", log: OSLog.Category.general, type: .error)
+            return
+        }
+
+        mainViewController.windowDidBecomeMain()
+    }
+
+    func windowWillClose(_ notification: Notification) {
+        guard let mainViewController = contentViewController as? MainViewController else {
+            os_log("MainWindowController: Failed to get reference to main view controller", log: OSLog.Category.general, type: .error)
+            return
+        }
+
+        mainViewController.windowWillClose()
+
+        // Unregistering triggers deinitialization of this object.
+        // Because it's also the delegate, deinit within this method caused crash
+        DispatchQueue.main.async {
+            WindowControllersManager.shared.unregister(self)
+        }
     }
 
 }

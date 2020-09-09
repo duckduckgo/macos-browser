@@ -123,19 +123,19 @@ class TabBarViewItem: NSCollectionViewItem {
     func bind(tabViewModel: TabViewModel) {
         clearBindings()
 
-        tabViewModel.$title.sink { title in
-            self.titleTextField.stringValue = title
+        tabViewModel.$title.sink { [weak self] title in
+            self?.titleTextField.stringValue = title
         }.store(in: &cancelables)
 
-        tabViewModel.$favicon.sink { favicon in
-            self.faviconImageView.image = favicon
+        tabViewModel.$favicon.sink { [weak self] favicon in
+            self?.faviconImageView.image = favicon
         }.store(in: &cancelables)
 
-        tabViewModel.$isLoading.sink { isLoading in
+        tabViewModel.$isLoading.sink { [weak self] isLoading in
             if isLoading {
-                self.loadingView.startAnimation()
+                self?.loadingView.startAnimation()
             } else {
-                self.loadingView.stopAnimation()
+                self?.loadingView.stopAnimation()
             }
         }.store(in: &cancelables)
     }

@@ -22,7 +22,9 @@ protocol TabActionDelegate: AnyObject {
 
     func tabForwardAction(_ tab: Tab)
     func tabBackAction(_ tab: Tab)
+    func tabHomeAction(_ tab: Tab)
     func tabReloadAction(_ tab: Tab)
+    func tabStopLoadingAction(_ tab: Tab)
 
 }
 
@@ -40,8 +42,8 @@ class Tab {
 
     @Published var url: URL? {
         willSet {
-            if newValue?.host != url?.host, let newHost = newValue?.host {
-                fetchFavicon(for: newHost)
+            if newValue?.host != url?.host {
+                fetchFavicon(for: newValue?.host)
             }
         }
     }
@@ -58,11 +60,24 @@ class Tab {
         actionDelegate?.tabBackAction(self)
     }
 
+    func goHome() {
+        actionDelegate?.tabHomeAction(self)
+    }
+
     func reload() {
         actionDelegate?.tabReloadAction(self)
     }
 
-    private func fetchFavicon(for host: String) {
+    func stopLoading() {
+        actionDelegate?.tabStopLoadingAction(self)
+    }
+
+    private func fetchFavicon(for host: String?) {
+        guard let host = host else {
+            favicon = nil
+            return
+        }
+
         faviconService.fetchFavicon(for: host) { (image, error) in
             guard error == nil, let image = image else {
                 self.favicon = nil

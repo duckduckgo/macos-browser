@@ -28,10 +28,18 @@ class MainWindow: NSWindow {
         return true
     }
 
+    // MARK: - First Responder Notification
+
     override func makeFirstResponder(_ responder: NSResponder?) -> Bool {
         // The only reliable way to detect NSTextField is the first responder
         NotificationCenter.default.post(name: .firstResponder, object: responder)
         return super.makeFirstResponder(responder)
+    }
+
+    override func becomeMain() {
+        super.becomeMain()
+
+        NotificationCenter.default.post(name: .firstResponder, object: firstResponder)
     }
 
 }
