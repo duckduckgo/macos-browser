@@ -74,10 +74,6 @@ class TabBarViewController: NSViewController {
         collectionView.collectionViewLayout?.invalidateLayout()
     }
 
-    deinit {
-        NotificationCenter.default.removeObserver(self)
-    }
-
     @IBAction func burnButtonAction(_ sender: NSButton) {
 
     }
