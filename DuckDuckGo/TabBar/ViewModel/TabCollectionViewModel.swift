@@ -82,6 +82,13 @@ class TabCollectionViewModel {
         select(at: selectionIndex + 1)
     }
 
+    func append(tabs: [Tab]) {
+        tabs.forEach {
+            tabCollection.append(tab: $0)
+        }
+        select(at: tabCollection.tabs.count - 1)
+    }
+
     func remove(at index: Int) {
         guard tabCollection.remove(at: index) else { return }
 

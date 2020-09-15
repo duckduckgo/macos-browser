@@ -24,12 +24,14 @@ import os.log
 // Extension of MainViewController because actions are sent to objects of responder chain
 extension MainViewController {
 
+    // MARK: - File
+
     @IBAction func newWindow(_ sender: Any?) {
         WindowsManager.openNewWindow()
     }
 
     @IBAction func closeAllWindows(_ sender: Any?) {
-        WindowsManager.closeAllWindows()
+        WindowsManager.closeWindows()
     }
 
     @IBAction func newTab(_ sender: Any?) {
@@ -39,6 +41,8 @@ extension MainViewController {
     @IBAction func closeTab(_ sender: Any?) {
         tabCollectionViewModel.removeSelected()
     }
+
+    // MARK: - View
 
     @IBAction func reloadPage(_ sender: Any?) {
         guard let selectedTabViewModel = tabCollectionViewModel.selectedTabViewModel else {
@@ -57,6 +61,8 @@ extension MainViewController {
 
         selectedTabViewModel.tab.stopLoading()
     }
+
+    // MARK: - History
 
     @IBAction func back(_ sender: Any?) {
         guard let selectedTabViewModel = tabCollectionViewModel.selectedTabViewModel else {
@@ -87,6 +93,28 @@ extension MainViewController {
 
     @IBAction func reopenLastClosedTab(_ sender: Any?) {
         tabCollectionViewModel.insertLastRemovedTab()
+    }
+
+    // MARK: - Window
+
+    @IBAction func moveTabToNewWindow(_ sender: Any?) {
+        guard let selectedTabViewModel = tabCollectionViewModel.selectedTabViewModel else {
+            os_log("MainViewController: No tab view model selected", log: OSLog.Category.general, type: .error)
+            return
+        }
+
+        WindowsManager.openNewWindow(with: selectedTabViewModel.tab.url)
+    }
+
+    @IBAction func mergeAllWindows(_ sender: Any?) {
+        let otherWindowControllers = WindowControllersManager.shared.windowControllers.filter { $0.window != view.window }
+        let otherMainViewControllers = otherWindowControllers.compactMap { $0.mainViewController }
+        let otherTabCollectionViewModels = otherMainViewControllers.map { $0.tabCollectionViewModel }
+        let otherTabs = otherTabCollectionViewModels.flatMap { $0.tabCollection.tabs }
+
+        WindowsManager.closeWindows(except: view.window)
+
+        tabCollectionViewModel.append(tabs: otherTabs)
     }
 
 }

@@ -22,7 +22,7 @@ class WindowControllersManager {
 
     static let shared = WindowControllersManager()
 
-    private var windowControllers = Set<MainWindowController>()
+    private(set) var windowControllers = Set<MainWindowController>()
 
     func register(_ windowController: MainWindowController) {
         windowControllers.insert(windowController)

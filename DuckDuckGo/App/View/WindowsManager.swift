@@ -21,13 +21,15 @@ import os.log
 
 class WindowsManager {
 
-    class func closeAllWindows() {
-        NSApplication.shared.windows.forEach { (window) in
-            window.close()
+    class func closeWindows(except window: NSWindow? = nil) {
+        NSApplication.shared.windows.forEach {
+            if $0 != window {
+                $0.close()
+            }
         }
     }
 
-    class func openNewWindow() {
+    class func openNewWindow(with initialUrl: URL? = nil) {
         let mainStoryboard = NSStoryboard(name: "Main", bundle: nil)
         guard let mainWindowController = mainStoryboard.instantiateInitialController() as? MainWindowController else {
             os_log("MainViewController: Failed to init MainWindowController", log: OSLog.Category.general, type: .error)
@@ -35,6 +37,20 @@ class WindowsManager {
         }
 
         mainWindowController.showWindow(self)
+
+        if let initialUrl = initialUrl {
+            guard let mainViewController = mainWindowController.contentViewController as? MainViewController else {
+                os_log("MainWindowController: Failed to get reference to main view controller", log: OSLog.Category.general, type: .error)
+                return
+            }
+
+            guard let newTab = mainViewController.tabCollectionViewModel.tabCollection.tabs.first else {
+                os_log("MainWindowController: Failed to get initial tab", log: OSLog.Category.general, type: .error)
+                return
+            }
+
+            newTab.url = initialUrl
+        }
     }
 
 }

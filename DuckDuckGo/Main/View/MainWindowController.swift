@@ -37,6 +37,10 @@ class MainWindowController: NSWindowController {
     private var minimizeWidget: NSView?
     private var zoomWidget: NSView?
 
+    var mainViewController: MainViewController? {
+        contentViewController as? MainViewController
+    }
+
     override func windowDidLoad() {
         super.windowDidLoad()
         isLoaded = true
