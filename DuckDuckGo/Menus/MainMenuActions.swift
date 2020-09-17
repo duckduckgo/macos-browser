@@ -107,7 +107,7 @@ extension MainViewController {
     }
 
     @IBAction func mergeAllWindows(_ sender: Any?) {
-        let otherWindowControllers = WindowControllersManager.shared.windowControllers.filter { $0.window != view.window }
+        let otherWindowControllers = WindowControllersManager.shared.mainWindowControllers.filter { $0.window != view.window }
         let otherMainViewControllers = otherWindowControllers.compactMap { $0.mainViewController }
         let otherTabCollectionViewModels = otherMainViewControllers.map { $0.tabCollectionViewModel }
         let otherTabs = otherTabCollectionViewModels.flatMap { $0.tabCollection.tabs }
