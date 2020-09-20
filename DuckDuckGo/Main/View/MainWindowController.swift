@@ -149,6 +149,10 @@ extension MainWindowController: NSWindowDelegate {
         mainViewController.windowDidBecomeMain()
     }
 
+    func windowDidBecomeKey(_ notification: Notification) {
+        WindowControllersManager.shared.lastKeyMainWindowController = self
+    }
+
     func windowWillClose(_ notification: Notification) {
         guard let mainViewController = contentViewController as? MainViewController else {
             os_log("MainWindowController: Failed to get reference to main view controller", log: OSLog.Category.general, type: .error)

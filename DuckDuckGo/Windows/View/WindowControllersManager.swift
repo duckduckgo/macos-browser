@@ -24,6 +24,7 @@ class WindowControllersManager {
     static let shared = WindowControllersManager()
 
     private(set) var mainWindowControllers = [MainWindowController]()
+    var lastKeyMainWindowController: MainWindowController?
 
     func register(_ windowController: MainWindowController) {
         mainWindowControllers.append(windowController)
@@ -60,15 +61,12 @@ extension WindowControllersManager: ApplicationDockMenuDataSource {
     }
 
     func indexOfSelectedWindowMenuItem(in applicationDockMenu: ApplicationDockMenu) -> Int? {
-        let keyMainWindowIndex = mainWindowControllers.firstIndex(where: {
-            guard let window = $0.window else {
-                os_log("WindowControllersManager: Window property is nil", log: OSLog.Category.general, type: .error)
-                return false
-            }
-            return window.isKeyWindow
-        })
+        guard let lastKeyMainWindowController = lastKeyMainWindowController else {
+            os_log("WindowControllersManager: Last key main window controller property is nil", log: OSLog.Category.general, type: .error)
+            return nil
+        }
 
-        return keyMainWindowIndex
+        return mainWindowControllers.firstIndex(of: lastKeyMainWindowController)
     }
 
 }
