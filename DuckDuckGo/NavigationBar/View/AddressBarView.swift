@@ -39,13 +39,13 @@ class AddressBarView: NSView {
         layoutSublayers()
     }
 
-    func setView(firstResponder: Bool, animated: Bool) {
+    func setView(stroke: Bool) {
         CATransaction.begin()
-        CATransaction.setAnimationDuration(animated ? 1/3 : 0)
+        CATransaction.setAnimationDuration(0)
 
-        shadowLayer.opacity = firstResponder ? 0.4 : 0
-        strokeLayer.opacity = firstResponder ? 1.0 : 0
-        backgroundLayer.backgroundColor = firstResponder ?
+        shadowLayer.opacity = stroke ? 0.4 : 0
+        strokeLayer.opacity = stroke ? 1.0 : 0
+        backgroundLayer.backgroundColor = stroke ?
                 NSColor.textBackgroundColor.cgColor : NSColor(named: "AddressBarBackgroundColor")?.cgColor
         
         CATransaction.commit()

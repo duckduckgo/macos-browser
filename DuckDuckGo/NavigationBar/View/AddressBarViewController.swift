@@ -127,7 +127,7 @@ class AddressBarViewController: NSViewController {
     private func setView(firstResponder: Bool, animated: Bool) {
         if animated {
             NSAnimationContext.runAnimationGroup { context in
-                context.duration = 1/3
+                context.duration = 1/4
                 self.textField.animator().alphaValue = firstResponder ? 1 : 0
                 self.passiveTextField.animator().alphaValue = firstResponder ? 0 : 1
             }
@@ -136,7 +136,7 @@ class AddressBarViewController: NSViewController {
             self.passiveTextField.alphaValue = firstResponder ? 0 : 1
         }
 
-        self.addressBarView?.setView(firstResponder: firstResponder, animated: animated)
+        self.addressBarView?.setView(stroke: firstResponder)
     }
     
 }
