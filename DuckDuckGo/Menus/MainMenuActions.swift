@@ -19,10 +19,11 @@
 import Cocoa
 import os.log
 
+// Actions are sent to objects of responder chain
+
 // MARK: - Main Menu Actions
 
-// Extension of MainViewController because actions are sent to objects of responder chain
-extension MainViewController {
+extension AppDelegate {
 
     // MARK: - File
 
@@ -33,6 +34,12 @@ extension MainViewController {
     @IBAction func closeAllWindows(_ sender: Any?) {
         WindowsManager.closeWindows()
     }
+
+}
+
+extension MainViewController {
+
+    // MARK: - File
 
     @IBAction func newTab(_ sender: Any?) {
         tabCollectionViewModel.appendNewTab()
