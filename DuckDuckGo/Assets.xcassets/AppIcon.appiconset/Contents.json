@@ -43,13 +43,13 @@
       "size" : "256x256"
     },
     {
-      "filename" : "DDG_Icon_512pt-1.png",
+      "filename" : "DDG_Icon_512pt.png",
       "idiom" : "mac",
       "scale" : "2x",
       "size" : "256x256"
     },
     {
-      "filename" : "DDG_Icon_512pt.png",
+      "filename" : "DDG_Icon_512pt-2.png",
       "idiom" : "mac",
       "scale" : "1x",
       "size" : "512x512"
