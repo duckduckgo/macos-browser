@@ -17,6 +17,7 @@
 //
 
 import Cocoa
+import os.log
 
 class MouseOverView: NSView {
 
@@ -30,8 +31,13 @@ class MouseOverView: NSView {
         super.awakeFromNib()
 
         wantsLayer = true
-        layerUsesCoreImageFilters = true
-        addTrackingArea()
+        removeAddTrackingArea()
+    }
+
+    override func updateTrackingAreas() {
+        super.updateTrackingAreas()
+
+        removeAddTrackingArea()
     }
 
     override func mouseEntered(with event: NSEvent) {
@@ -63,8 +69,35 @@ class MouseOverView: NSView {
         }
     }
 
-    private func addTrackingArea() {
-        let area = NSTrackingArea(rect: bounds, options: [.mouseEnteredAndExited, .activeInKeyWindow, .inVisibleRect], owner: self, userInfo: nil)
-        addTrackingArea(area)
+    private func removeAddTrackingArea() {
+        trackingAreas.forEach {
+            removeTrackingArea($0)
+        }
+
+        let trackingArea = NSTrackingArea(rect: frame,
+                                          options: [.mouseEnteredAndExited,
+                                                    .activeInKeyWindow,
+                                                    .enabledDuringMouseDrag],
+                                          owner: self,
+                                          userInfo: nil)
+        addTrackingArea(trackingArea)
+        setIsMouseOver()
     }
+
+    //swiftlint:disable legacy_nsgeometry_functions
+    private func setIsMouseOver() {
+        guard let window = window else {
+            os_log("MouseOverView: Window not available", log: OSLog.Category.general, type: .error)
+            return
+        }
+
+        let mouseLocation = window.mouseLocationOutsideOfEventStream
+        if NSPointInRect(mouseLocation, bounds) {
+            isMouseOver = true
+        } else {
+            isMouseOver = false
+        }
+    }
+    //swiftlint:enable legacy_nsgeometry_functions
+
 }
