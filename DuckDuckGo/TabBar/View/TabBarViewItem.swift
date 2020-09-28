@@ -39,14 +39,10 @@ class TabBarViewItem: NSCollectionViewItem {
         case maximum = 240
     }
 
-    enum EffectViewTrailingSpace: CGFloat {
-        case withCloseButton = 17
-        case withoutCloseButton = 0
-    }
-
-    enum TitleTrailingSpace: CGFloat {
-        case withCloseButton = 20
-        case withoutCloseButton = 3
+    enum TextFieldMaskGradientSize: CGFloat {
+        case width = 6
+        case trailingSpace = 0
+        case trailingSpaceWithButton = 20
     }
 
     static let identifier = NSUserInterfaceItemIdentifier(rawValue: "TabBarViewItem")
@@ -66,14 +62,12 @@ class TabBarViewItem: NSCollectionViewItem {
 
     @IBOutlet weak var faviconImageView: NSImageView!
     @IBOutlet weak var titleTextField: NSTextField!
-    @IBOutlet weak var effectViewTrailingConstraint: NSLayoutConstraint!
-    @IBOutlet weak var titleTextFieldTrailingConstraint: NSLayoutConstraint!
     @IBOutlet weak var closeButton: MouseOverButton!
-    @IBOutlet weak var closeButtonFadeImageView: NSImageView!
-    @IBOutlet weak var closeButtonFadeEffectView: NSVisualEffectView!
     @IBOutlet weak var rightSeparatorView: ColorView!
     @IBOutlet weak var loadingView: TabLoadingView!
     @IBOutlet weak var mouseOverView: MouseOverView!
+
+    private let titleTextFieldMaskLayer = CAGradientLayer()
 
     private var cancelables = Set<AnyCancellable>()
 
@@ -85,13 +79,14 @@ class TabBarViewItem: NSCollectionViewItem {
         setView()
         setSubviews()
         setMenu()
-        setEffectViewMask()
+        setTitleTextFieldMask()
     }
 
     override func viewDidLayout() {
         super.viewDidLayout()
 
         setSubviews()
+        setTitleTextFieldMask()
     }
 
     override var isSelected: Bool {
@@ -100,6 +95,7 @@ class TabBarViewItem: NSCollectionViewItem {
                 isDragged = false
             }
             setSubviews()
+            setTitleTextFieldMask()
         }
     }
 
@@ -168,20 +164,10 @@ class TabBarViewItem: NSCollectionViewItem {
     private func setSubviews() {
         let backgroundColor = isSelected || isDragged ? NSColor(named: "InterfaceBackgroundColor") : NSColor.clear
         view.layer?.backgroundColor = backgroundColor?.cgColor
-
-        rightSeparatorView.isHidden = isSelected || isDragged
         mouseOverView.mouseOverColor = isSelected || isDragged ? NSColor.clear : NSColor(named: "TabMouseOverColor")
 
+        rightSeparatorView.isHidden = isSelected || isDragged
         closeButton.isHidden = !isSelected && !isDragged && view.bounds.size.width == Width.minimum.rawValue
-        effectViewTrailingConstraint.constant = closeButton.isHidden ?
-            EffectViewTrailingSpace.withoutCloseButton.rawValue :
-            EffectViewTrailingSpace.withCloseButton.rawValue
-        titleTextFieldTrailingConstraint.constant = closeButton.isHidden ?
-            TitleTrailingSpace.withoutCloseButton.rawValue :
-            TitleTrailingSpace.withCloseButton.rawValue
-
-        closeButtonFadeImageView.isHidden = !isSelected && !isDragged
-        closeButtonFadeEffectView.isHidden = isSelected || isDragged
     }
 
     private func setMenu() {
@@ -190,8 +176,32 @@ class TabBarViewItem: NSCollectionViewItem {
         view.menu = menu
     }
 
-    private func setEffectViewMask() {
-        closeButtonFadeEffectView.maskImage = NSImage(named: "TabCloseButtonFade")
+    private func setTitleTextFieldMask() {
+        guard let titleTextFieldLayer = titleTextField.layer else {
+            os_log("TabBarViewItem: Title text field has no layer", log: OSLog.Category.general, type: .error)
+            return
+        }
+
+        if titleTextFieldLayer.mask == nil {
+            titleTextFieldLayer.mask = titleTextFieldMaskLayer
+            titleTextFieldMaskLayer.colors = [NSColor.white.cgColor, NSColor.clear.cgColor]
+        }
+
+        CATransaction.begin()
+        CATransaction.setAnimationDuration(0)
+
+        titleTextFieldMaskLayer.frame = titleTextFieldLayer.bounds
+
+        let gradientPadding: CGFloat = closeButton.isHidden ?
+            TextFieldMaskGradientSize.trailingSpace.rawValue : TextFieldMaskGradientSize.trailingSpaceWithButton.rawValue
+        let gradientWidth: CGFloat = TextFieldMaskGradientSize.width.rawValue
+        let startPointX = (titleTextFieldMaskLayer.bounds.width - (gradientPadding + gradientWidth)) / titleTextFieldMaskLayer.bounds.width
+        let endPointX = (titleTextFieldMaskLayer.bounds.width - gradientPadding) / titleTextFieldMaskLayer.bounds.width
+
+        titleTextFieldMaskLayer.startPoint = CGPoint(x: startPointX, y: 0.5)
+        titleTextFieldMaskLayer.endPoint = CGPoint(x: endPointX, y: 0.5)
+
+        CATransaction.commit()
     }
 
 }
