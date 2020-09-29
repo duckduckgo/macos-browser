@@ -87,7 +87,6 @@ class MouseOverView: NSView {
     //swiftlint:disable legacy_nsgeometry_functions
     private func setIsMouseOver() {
         guard let window = window else {
-            os_log("MouseOverView: Window not available", log: OSLog.Category.general, type: .error)
             return
         }
 
