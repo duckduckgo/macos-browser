@@ -22,11 +22,22 @@ import Combine
 
 class AddressBarViewController: NSViewController {
 
-    @IBOutlet weak var textField: AddressBarTextField!
+    enum Mode {
+        case searching
+        case browsing
+    }
+
+    @IBOutlet weak var addressBarTextField: AddressBarTextField!
     @IBOutlet weak var passiveTextField: NSTextField!
     @IBOutlet weak var reloadButton: NSButton!
-
+    @IBOutlet weak var imageButton: NSButton!
+    
     private var tabCollectionViewModel: TabCollectionViewModel
+    private var mode: Mode = .searching {
+        didSet {
+            setImageButton()
+        }
+    }
 
     private var selectedTabViewModelCancelable: AnyCancellable?
     private var reloadButtonCancelable: AnyCancellable?
@@ -46,7 +57,7 @@ class AddressBarViewController: NSViewController {
         super.viewDidLoad()
 
         setView(firstResponder: false, animated: false)
-        textField.tabCollectionViewModel = tabCollectionViewModel
+        addressBarTextField.tabCollectionViewModel = tabCollectionViewModel
         bindSelectedTabViewModel()
         NotificationCenter.default.addObserver(self,
                                                selector: #selector(textFieldFirstReponderNotification(_:)),
@@ -57,7 +68,7 @@ class AddressBarViewController: NSViewController {
     override func viewDidLayout() {
         super.viewDidLayout()
 
-        textField.viewDidLayout()
+        addressBarTextField.viewDidLayout()
     }
 
     @IBAction func reloadAction(_ sender: NSButton) {
@@ -98,7 +109,7 @@ class AddressBarViewController: NSViewController {
         passiveAddressBarStringCancelable?.cancel()
 
         guard let selectedTabViewModel = tabCollectionViewModel.selectedTabViewModel else {
-            textField.stringValue = ""
+            addressBarTextField.stringValue = ""
             return
         }
         passiveAddressBarStringCancelable = selectedTabViewModel.$passiveAddressBarString.receive(on: DispatchQueue.main).sink { [weak self] _ in
@@ -127,16 +138,20 @@ class AddressBarViewController: NSViewController {
     private func setView(firstResponder: Bool, animated: Bool) {
         if animated {
             NSAnimationContext.runAnimationGroup { context in
-                context.duration = 1/4
-                self.textField.animator().alphaValue = firstResponder ? 1 : 0
+                context.duration = 1/3
+                self.addressBarTextField.animator().alphaValue = firstResponder ? 1 : 0
                 self.passiveTextField.animator().alphaValue = firstResponder ? 0 : 1
             }
         } else {
-            self.textField.alphaValue = firstResponder ? 1 : 0
+            self.addressBarTextField.alphaValue = firstResponder ? 1 : 0
             self.passiveTextField.alphaValue = firstResponder ? 0 : 1
         }
 
         self.addressBarView?.setView(stroke: firstResponder)
+    }
+
+    private func setImageButton() {
+        imageButton.image = mode == .searching ? NSImage(named: "HomeFavicon") : NSImage(named: "Grade")
     }
     
 }
@@ -145,8 +160,8 @@ extension AddressBarViewController {
 
     @objc func textFieldFirstReponderNotification(_ notification: Notification) {
         // NSTextField passes its first responder status down to a child view of NSTextView class
-        if let textView = notification.object as? NSTextView, textView.superview?.superview === textField {
-            setView(firstResponder: true, animated: true)
+        if let textView = notification.object as? NSTextView, textView.superview?.superview === addressBarTextField {
+            setView(firstResponder: true, animated: false)
         } else {
             if notification.object as? WebView != nil {
                 setView(firstResponder: false, animated: true)
