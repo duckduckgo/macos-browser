@@ -75,7 +75,7 @@ class AddressBarViewController: NSViewController {
 
     private func bindSelectedTabViewModel() {
         selectedTabViewModelCancelable = tabCollectionViewModel.$selectedTabViewModel.receive(on: DispatchQueue.main).sink { [weak self] _ in
-            self?.setView(firstResponder: false, animated: false)
+            self?.view.window?.makeFirstResponder(self?.view.window)
             self?.bindReloadButton()
             self?.bindPassiveAddressBarString()
         }
