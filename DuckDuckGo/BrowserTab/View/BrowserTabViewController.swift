@@ -28,7 +28,6 @@ class BrowserTabViewController: NSViewController {
     var tabViewModel: TabViewModel?
 
     private let tabCollectionViewModel: TabCollectionViewModel
-    private let historyViewModel: HistoryViewModel
     private var urlCancelable: AnyCancellable?
     private var selectedTabViewModelCancelable: AnyCancellable?
 
@@ -36,9 +35,8 @@ class BrowserTabViewController: NSViewController {
         fatalError("BrowserTabViewController: Bad initializer")
     }
 
-    init?(coder: NSCoder, tabCollectionViewModel: TabCollectionViewModel, historyViewModel: HistoryViewModel) {
+    init?(coder: NSCoder, tabCollectionViewModel: TabCollectionViewModel) {
         self.tabCollectionViewModel = tabCollectionViewModel
-        self.historyViewModel = historyViewModel
 
         super.init(coder: coder)
     }
@@ -107,17 +105,6 @@ class BrowserTabViewController: NSViewController {
         }
     }
 
-    private func saveWebsiteVisit() {
-        guard let webView = webView else {
-            os_log("BrowserTabViewController: Web view is nil", log: OSLog.Category.general, type: .error)
-            return
-        }
-        
-        if let url = webView.url {
-            historyViewModel.history.saveWebsiteVisit(url: url, title: webView.title, date: NSDate.now as Date)
-        }
-    }
-
     private func setFirstResponderIfNeeded() {
         guard let url = webView?.url else {
             return
@@ -156,7 +143,6 @@ extension BrowserTabViewController: WKNavigationDelegate {
     }
 
     func webView(_ webView: WKWebView, didFinish navigation: WKNavigation!) {
-        saveWebsiteVisit()
     }
 
     func webView(_ webView: WKWebView, didFail navigation: WKNavigation!, withError error: Error) {

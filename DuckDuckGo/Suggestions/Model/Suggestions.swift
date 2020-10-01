@@ -20,39 +20,27 @@ import Foundation
 import os.log
 
 class Suggestions {
-
-    enum Constants {
-        static let maxNumberInCategory = 5
-    }
-
     let suggestionsAPI: SuggestionsAPI
-    let historyStore: HistoryStore
 
-    @Published private(set) var items: (remote: [Suggestion]?, local: [Suggestion]?) = (nil, nil)
+    @Published private(set) var items: [Suggestion]?
 
-    init(suggestionsAPI: SuggestionsAPI, historyStore: HistoryStore) {
+    init(suggestionsAPI: SuggestionsAPI) {
         self.suggestionsAPI = suggestionsAPI
-        self.historyStore = historyStore
     }
 
     convenience init () {
-        self.init(suggestionsAPI: DuckDuckGoSuggestionsAPI(), historyStore: LocalHistoryStore())
+        self.init(suggestionsAPI: DuckDuckGoSuggestionsAPI())
     }
 
     func getSuggestions(for query: String) {
         if query == "" {
-            items = (nil, nil)
+            items = nil
             return
         }
 
-        getRemoteSuggestions(for: query)
-        getLocalSuggestions(for: query)
-    }
-
-    private func getRemoteSuggestions(for query: String) {
         suggestionsAPI.fetchSuggestions(for: query) { (result, error) in
             guard let result = result, error == nil else {
-                self.items.remote = nil
+                self.items = nil
                 os_log("Suggestions: Failed to fetch remote suggestions - %s",
                        log: OSLog.Category.general,
                        type: .error,
@@ -67,24 +55,7 @@ class Suggestions {
                 }
             }
 
-            let filtered = Array(suggestions.prefix(Constants.maxNumberInCategory))
-            self.items.remote = filtered
-        }
-    }
-
-    private func getLocalSuggestions(for query: String) {
-        historyStore.loadWebsiteVisits(textQuery: query, limit: Constants.maxNumberInCategory) { (websiteVisits, error) in
-            guard let websiteVisits = websiteVisits, error == nil else {
-                self.items.local = nil
-                os_log("Suggestions: Failed to fetch local suggestions - %s",
-                       log: OSLog.Category.general,
-                       type: .error,
-                       error?.localizedDescription ?? "")
-                return
-            }
-            let suggestions = websiteVisits.map { Suggestion.website(url: $0.url, title: $0.title) }
-            let filtered = Array(suggestions.prefix(Constants.maxNumberInCategory))
-            self.items.local = filtered
+            self.items = suggestions
         }
     }
 

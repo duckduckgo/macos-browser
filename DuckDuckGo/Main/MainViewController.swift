@@ -79,8 +79,7 @@ class MainViewController: NSViewController {
     @IBSegueAction
     func createWebViewController(coder: NSCoder, sender: Any?, segueIdentifier: String?) -> BrowserTabViewController? {
         guard let browserTabViewController = BrowserTabViewController(coder: coder,
-                                                                      tabCollectionViewModel: tabCollectionViewModel,
-                                                                      historyViewModel: HistoryViewModel()) else {
+                                                                      tabCollectionViewModel: tabCollectionViewModel) else {
             os_log("MainViewController: Failed to init BrowserTabViewController", log: OSLog.Category.general, type: .error)
             return nil
         }
