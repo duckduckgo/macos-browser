@@ -207,6 +207,8 @@ extension AddressBarTextField: NSSearchFieldDelegate {
         let textMovement = obj.userInfo?["NSTextMovement"] as? Int
         if textMovement == NSReturnTextMovement {
             confirmStringValue()
+        } else {
+            setStringValue()
         }
     }
 

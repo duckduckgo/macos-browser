@@ -173,10 +173,11 @@ class AddressBarViewController: NSViewController {
         }
 
         let isSearchingMode = mode == .searching
+        let isURLNil = selectedTabViewModel.tab.url == nil
         let isTextFieldFirstResponder = view.window?.firstResponder === addressBarTextField
         let isDuckDuckGoUrl = selectedTabViewModel.tab.url?.isDuckDuckGoSearch ?? false
 
-        gradeButton.isHidden = isSearchingMode || isTextFieldFirstResponder || isDuckDuckGoUrl
+        gradeButton.isHidden = isSearchingMode || isTextFieldFirstResponder || isDuckDuckGoUrl || isURLNil
         imageButton.image = isSearchingMode ? Self.homeFaviconImage : selectedTabViewModel.favicon
         actionButton.image = isSearchingMode ? Self.clearImage : Self.refreshImage
     }
@@ -190,6 +191,7 @@ extension AddressBarViewController {
         if let textView = notification.object as? NSTextView, textView.superview?.superview === addressBarTextField {
             setView(firstResponder: true, animated: false)
         } else {
+            self.mode = .browsing
             if notification.object as? WebView != nil {
                 setView(firstResponder: false, animated: true)
             } else {
