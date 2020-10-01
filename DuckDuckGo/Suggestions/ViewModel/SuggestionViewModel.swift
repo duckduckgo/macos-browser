@@ -20,6 +20,9 @@ import Cocoa
 
 class SuggestionViewModel {
 
+    static let webImage = NSImage(named: "Web")
+    static let searchImage = NSImage(named: "Search")
+
     let suggestion: Suggestion
 
     init(suggestion: Suggestion) {
@@ -47,19 +50,14 @@ class SuggestionViewModel {
         }
     }
 
-    private enum SuggestionIconNames: String {
-        case search = "NSTouchBarSearchTemplate"
-        case website = "NSListViewTemplate"
-    }
-
     var icon: NSImage? {
         switch suggestion {
         case .phrase(phrase: _):
-            return NSImage(named: SuggestionIconNames.search.rawValue)
+            return Self.searchImage
         case .website(url: _, title: _):
-            return NSImage(named: SuggestionIconNames.website.rawValue)
+            return Self.webImage
         case .unknown(value: _):
-            return NSImage(named: SuggestionIconNames.website.rawValue)
+            return Self.webImage
         }
     }
 
