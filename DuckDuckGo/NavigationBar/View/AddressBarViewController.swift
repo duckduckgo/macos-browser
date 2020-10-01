@@ -22,26 +22,35 @@ import Combine
 
 class AddressBarViewController: NSViewController {
 
+    static let homeFaviconImage = NSImage(named: "HomeFavicon")
+    static let refreshImage = NSImage(named: "Refresh")
+    static let clearImage = NSImage(named: "Clear")
+
+    @IBOutlet weak var addressBarTextField: AddressBarTextField!
+    @IBOutlet weak var passiveTextField: NSTextField!
+    @IBOutlet weak var actionButton: NSButton!
+    @IBOutlet weak var imageButton: NSButton!
+    @IBOutlet weak var gradeButton: NSButton!
+    
+    private var tabCollectionViewModel: TabCollectionViewModel
+    private let suggestionsViewModel = SuggestionsViewModel(suggestions: Suggestions())
+
     enum Mode {
         case searching
         case browsing
     }
-
-    @IBOutlet weak var addressBarTextField: AddressBarTextField!
-    @IBOutlet weak var passiveTextField: NSTextField!
-    @IBOutlet weak var reloadButton: NSButton!
-    @IBOutlet weak var imageButton: NSButton!
     
-    private var tabCollectionViewModel: TabCollectionViewModel
     private var mode: Mode = .searching {
         didSet {
-            setImageButton()
+            setButtons()
         }
     }
 
     private var selectedTabViewModelCancelable: AnyCancellable?
     private var reloadButtonCancelable: AnyCancellable?
+    private var addressBarStringCancelable: AnyCancellable?
     private var passiveAddressBarStringCancelable: AnyCancellable?
+    private var suggestionsCancelable: AnyCancellable?
 
     required init?(coder: NSCoder) {
         fatalError("AddressBarViewController: Bad initializer")
@@ -58,11 +67,13 @@ class AddressBarViewController: NSViewController {
 
         setView(firstResponder: false, animated: false)
         addressBarTextField.tabCollectionViewModel = tabCollectionViewModel
+        addressBarTextField.suggestionsViewModel = suggestionsViewModel
         bindSelectedTabViewModel()
         NotificationCenter.default.addObserver(self,
                                                selector: #selector(textFieldFirstReponderNotification(_:)),
                                                name: .firstResponder,
                                                object: nil)
+        bindSuggestions()
     }
 
     override func viewDidLayout() {
@@ -71,13 +82,17 @@ class AddressBarViewController: NSViewController {
         addressBarTextField.viewDidLayout()
     }
 
-    @IBAction func reloadAction(_ sender: NSButton) {
+    @IBAction func actionButtonAction(_ sender: NSButton) {
         guard let selectedTabViewModel = tabCollectionViewModel.selectedTabViewModel else {
             os_log("%s: Selected tab view model is nil", log: OSLog.Category.general, type: .error, className)
             return
         }
 
-        selectedTabViewModel.tab.reload()
+        if actionButton.image === Self.refreshImage {
+            selectedTabViewModel.tab.reload()
+        } else {
+            addressBarTextField.stringValue = ""
+        }
     }
 
     private var addressBarView: AddressBarView? {
@@ -87,21 +102,25 @@ class AddressBarViewController: NSViewController {
     private func bindSelectedTabViewModel() {
         selectedTabViewModelCancelable = tabCollectionViewModel.$selectedTabViewModel.receive(on: DispatchQueue.main).sink { [weak self] _ in
             self?.view.window?.makeFirstResponder(self?.view.window)
-            self?.bindReloadButton()
+            self?.bindAddressBarString()
             self?.bindPassiveAddressBarString()
         }
     }
 
-    private func bindReloadButton() {
-        reloadButtonCancelable?.cancel()
+    private func bindAddressBarString() {
+        addressBarStringCancelable?.cancel()
 
         guard let selectedTabViewModel = tabCollectionViewModel.selectedTabViewModel else {
-            reloadButton.isEnabled = false
+            os_log("%s: Selected tab view model is nil", log: OSLog.Category.general, type: .error, className)
             return
         }
 
-        reloadButtonCancelable = selectedTabViewModel.$canReload.receive(on: DispatchQueue.main).sink { [weak self] _ in
-            self?.setReloadButton()
+        addressBarStringCancelable = selectedTabViewModel.$addressBarString.receive(on: DispatchQueue.main).sink { [weak self] addressBarString in
+            if addressBarString.isEmpty {
+                self?.mode = .searching
+            } else {
+                self?.mode = .browsing
+            }
         }
     }
 
@@ -109,7 +128,7 @@ class AddressBarViewController: NSViewController {
         passiveAddressBarStringCancelable?.cancel()
 
         guard let selectedTabViewModel = tabCollectionViewModel.selectedTabViewModel else {
-            addressBarTextField.stringValue = ""
+            passiveTextField.stringValue = ""
             return
         }
         passiveAddressBarStringCancelable = selectedTabViewModel.$passiveAddressBarString.receive(on: DispatchQueue.main).sink { [weak self] _ in
@@ -117,13 +136,10 @@ class AddressBarViewController: NSViewController {
         }
     }
 
-    private func setReloadButton() {
-        guard let selectedTabViewModel = tabCollectionViewModel.selectedTabViewModel else {
-            os_log("%s: Selected tab view model is nil", log: OSLog.Category.general, type: .error, className)
-            return
+    private func bindSuggestions() {
+        suggestionsCancelable = suggestionsViewModel.suggestions.$items.receive(on: DispatchQueue.main).sink { [weak self] _ in
+            self?.mode = .searching
         }
-
-        reloadButton.isEnabled = selectedTabViewModel.canReload
     }
 
     private func setPassiveTextField() {
@@ -143,15 +159,26 @@ class AddressBarViewController: NSViewController {
                 self.passiveTextField.animator().alphaValue = firstResponder ? 0 : 1
             }
         } else {
-            self.addressBarTextField.alphaValue = firstResponder ? 1 : 0
-            self.passiveTextField.alphaValue = firstResponder ? 0 : 1
+            addressBarTextField.alphaValue = firstResponder ? 1 : 0
+            passiveTextField.alphaValue = firstResponder ? 0 : 1
         }
 
-        self.addressBarView?.setView(stroke: firstResponder)
+        addressBarView?.setView(stroke: firstResponder)
     }
 
-    private func setImageButton() {
-        imageButton.image = mode == .searching ? NSImage(named: "HomeFavicon") : NSImage(named: "Grade")
+    private func setButtons() {
+        guard let selectedTabViewModel = tabCollectionViewModel.selectedTabViewModel else {
+            os_log("%s: Selected tab view model is nil", log: OSLog.Category.general, type: .error, className)
+            return
+        }
+
+        let isSearchingMode = mode == .searching
+        let isTextFieldFirstResponder = view.window?.firstResponder === addressBarTextField
+        let isDuckDuckGoUrl = selectedTabViewModel.tab.url?.isDuckDuckGoSearch ?? false
+
+        gradeButton.isHidden = isSearchingMode || isTextFieldFirstResponder || isDuckDuckGoUrl
+        imageButton.image = isSearchingMode ? Self.homeFaviconImage : selectedTabViewModel.favicon
+        actionButton.image = isSearchingMode ? Self.clearImage : Self.refreshImage
     }
     
 }
@@ -169,6 +196,8 @@ extension AddressBarViewController {
                 setView(firstResponder: false, animated: false)
             }
         }
+
+        setButtons()
     }
     
 }

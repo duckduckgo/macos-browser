@@ -28,7 +28,12 @@ class AddressBarTextField: NSTextField {
         }
     }
 
-    private let suggestionsViewModel = SuggestionsViewModel(suggestions: Suggestions())
+    var suggestionsViewModel: SuggestionsViewModel! {
+        didSet {
+            initSuggestionsWindow()
+            bindSelectedSuggestionViewModel()
+        }
+    }
 
     private var originalStringValue: String?
 
@@ -41,8 +46,6 @@ class AddressBarTextField: NSTextField {
         super.awakeFromNib()
 
         super.delegate = self
-        initSuggestionsWindow()
-        bindSelectedSuggestionViewModel()
     }
 
     override func mouseDown(with event: NSEvent) {
@@ -76,8 +79,10 @@ class AddressBarTextField: NSTextField {
         }
         addressBarStringCancelable = selectedTabViewModel.$addressBarString.receive(on: DispatchQueue.main).sink { [weak self] _ in
             self?.setStringValue()
+            self?.makeMeFirstResponderIfNeeded()
         }
     }
+
     private func setStringValue() {
         guard let selectedTabViewModel = tabCollectionViewModel.selectedTabViewModel else {
             os_log("%s: Selected tab view model is nil", log: OSLog.Category.general, type: .error, className)
@@ -85,7 +90,10 @@ class AddressBarTextField: NSTextField {
         }
         let addressBarString = selectedTabViewModel.addressBarString
         stringValue = addressBarString
-        if addressBarString == "" {
+    }
+
+    private func makeMeFirstResponderIfNeeded() {
+        if stringValue == "" {
             makeMeFirstResponder()
         }
     }
