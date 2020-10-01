@@ -143,7 +143,7 @@ class TabCollectionViewModelTests: XCTestCase {
         tabCollectionViewModel.appendNewTab()
         tabCollectionViewModel.appendNewTab()
 
-        tabCollectionViewModel.removeOtherTabs(except: 0)
+        tabCollectionViewModel.removeAllTabs(except: 0)
 
         XCTAssertEqual(firstTab, tabCollectionViewModel.selectedTabViewModel?.tab)
     }

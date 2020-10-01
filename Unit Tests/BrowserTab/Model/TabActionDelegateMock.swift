@@ -38,4 +38,10 @@ class TabActionDelegateMock: TabActionDelegate {
         tabReloadActionCalled = true
     }
 
+    func tabHomeAction(_ tab: Tab) {
+    }
+
+    func tabStopLoadingAction(_ tab: Tab) {
+    }
+
 }
