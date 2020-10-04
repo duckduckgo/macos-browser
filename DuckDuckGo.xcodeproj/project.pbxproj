@@ -48,6 +48,7 @@
 		AA86491024D83104001BABEE /* TabBar.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = AA86490F24D83104001BABEE /* TabBar.storyboard */; };
 		AA86491824D833E7001BABEE /* NavigationBar.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = AA86491724D833E7001BABEE /* NavigationBar.storyboard */; };
 		AA86492024D83B22001BABEE /* BrowserTab.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = AA86491F24D83B22001BABEE /* BrowserTab.storyboard */; };
+		AA88D14B252A557100980B4E /* URLRequestExtension.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA88D14A252A557100980B4E /* URLRequestExtension.swift */; };
 		AA8EDF2424923E980071C2E8 /* URLExtension.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA8EDF2324923E980071C2E8 /* URLExtension.swift */; };
 		AA8EDF2724923EC70071C2E8 /* StringExtension.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA8EDF2624923EC70071C2E8 /* StringExtension.swift */; };
 		AA8EDF2A249268600071C2E8 /* OSLogExtension.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA8EDF29249268600071C2E8 /* OSLogExtension.swift */; };
@@ -145,6 +146,7 @@
 		AA86490F24D83104001BABEE /* TabBar.storyboard */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; path = TabBar.storyboard; sourceTree = "<group>"; };
 		AA86491724D833E7001BABEE /* NavigationBar.storyboard */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; path = NavigationBar.storyboard; sourceTree = "<group>"; };
 		AA86491F24D83B22001BABEE /* BrowserTab.storyboard */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; path = BrowserTab.storyboard; sourceTree = "<group>"; };
+		AA88D14A252A557100980B4E /* URLRequestExtension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = URLRequestExtension.swift; sourceTree = "<group>"; };
 		AA8EDF2324923E980071C2E8 /* URLExtension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = URLExtension.swift; sourceTree = "<group>"; };
 		AA8EDF2624923EC70071C2E8 /* StringExtension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StringExtension.swift; sourceTree = "<group>"; };
 		AA8EDF29249268600071C2E8 /* OSLogExtension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OSLogExtension.swift; sourceTree = "<group>"; };
@@ -617,6 +619,7 @@
 				AA8EDF29249268600071C2E8 /* OSLogExtension.swift */,
 				AA8EDF2624923EC70071C2E8 /* StringExtension.swift */,
 				AA8EDF2324923E980071C2E8 /* URLExtension.swift */,
+				AA88D14A252A557100980B4E /* URLRequestExtension.swift */,
 			);
 			path = Extensions;
 			sourceTree = "<group>";
@@ -792,6 +795,7 @@
 				AA68C3D32490ED62001B8783 /* NavigationBarViewController.swift in Sources */,
 				AA585DAF2490E6E600E9A3E2 /* MainViewController.swift in Sources */,
 				AABEE69A24A902A90043105B /* SuggestionsViewModel.swift in Sources */,
+				AA88D14B252A557100980B4E /* URLRequestExtension.swift in Sources */,
 				AABEE69E24A9C5C30043105B /* Suggestion.swift in Sources */,
 				AA2E423424C8A2270048C0D5 /* ColorView.swift in Sources */,
 				AAECA42024EEA4AC00EFA63A /* IndexPathExtension.swift in Sources */,

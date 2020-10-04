@@ -52,7 +52,7 @@ class DuckDuckGoSuggestionsAPI: SuggestionsAPI {
             return
         }
 
-        let request = URLRequest(url: searchUrl)
+        let request = URLRequest.defaultRequest(with: searchUrl)
         let task = URLSession.shared.dataTask(with: request, completionHandler: { (data, _, error) in
             guard let data = data else {
                 os_log("DuckDuckGoSuggestionsAPI: Failed to fetch suggestions - %s",
