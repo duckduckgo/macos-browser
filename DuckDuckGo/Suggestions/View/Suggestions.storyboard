@@ -88,7 +88,7 @@
                                                             <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                                             <subviews>
                                                                 <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" horizontalCompressionResistancePriority="250" translatesAutoresizingMaskIntoConstraints="NO" id="bOr-Go-gyW">
-                                                                    <rect key="frame" x="32" y="5" width="416" height="16"/>
+                                                                    <rect key="frame" x="39" y="5" width="409" height="16"/>
                                                                     <textFieldCell key="cell" lineBreakMode="truncatingTail" sendsActionOnEndEditing="YES" title="Table View Cell" id="7bg-HA-vCm">
                                                                         <font key="font" usesAppearanceFont="YES"/>
                                                                         <color key="textColor" name="textColor" catalog="System" colorSpace="catalog"/>
@@ -96,7 +96,7 @@
                                                                     </textFieldCell>
                                                                 </textField>
                                                                 <imageView horizontalHuggingPriority="251" verticalHuggingPriority="251" translatesAutoresizingMaskIntoConstraints="NO" id="vli-IP-Nr8">
-                                                                    <rect key="frame" x="12" y="5" width="16" height="16"/>
+                                                                    <rect key="frame" x="19" y="5" width="16" height="16"/>
                                                                     <constraints>
                                                                         <constraint firstAttribute="width" constant="16" id="Q25-Gx-Xzg"/>
                                                                         <constraint firstAttribute="height" constant="16" id="go3-c4-c3W"/>
@@ -109,7 +109,7 @@
                                                                 <constraint firstItem="bOr-Go-gyW" firstAttribute="leading" secondItem="vli-IP-Nr8" secondAttribute="trailing" constant="6" id="JNb-pL-G7y"/>
                                                                 <constraint firstAttribute="trailing" secondItem="bOr-Go-gyW" secondAttribute="trailing" constant="8" id="b4A-tY-oOP"/>
                                                                 <constraint firstItem="bOr-Go-gyW" firstAttribute="centerY" secondItem="kX2-C1-38Y" secondAttribute="centerY" id="oAf-1Z-91H"/>
-                                                                <constraint firstItem="vli-IP-Nr8" firstAttribute="leading" secondItem="kX2-C1-38Y" secondAttribute="leading" constant="12" id="zgq-le-RHJ"/>
+                                                                <constraint firstItem="vli-IP-Nr8" firstAttribute="leading" secondItem="kX2-C1-38Y" secondAttribute="leading" constant="19" id="zgq-le-RHJ"/>
                                                             </constraints>
                                                             <connections>
                                                                 <outlet property="iconImageView" destination="vli-IP-Nr8" id="5lX-7Q-4Cw"/>

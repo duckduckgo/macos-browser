@@ -137,6 +137,10 @@ class AddressBarTextField: NSTextField {
 
     // MARK: - Suggestions window
 
+    enum SuggestionsWindowSizes: CGFloat {
+        case padding = 10
+    }
+
     private var suggestionsWindowController: NSWindowController?
 
     private func initSuggestionsWindow() {
@@ -189,7 +193,7 @@ class AddressBarTextField: NSTextField {
             return
         }
 
-        let padding = CGFloat(3)
+        let padding = SuggestionsWindowSizes.padding.rawValue
         suggestionsWindow.setFrame(NSRect(x: 0, y: 0, width: superview.frame.width + 2 * padding, height: 0), display: true)
 
         var point = superview.bounds.origin
