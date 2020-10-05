@@ -51,6 +51,8 @@ class SuggestionTableRowView: NSTableRowView {
 
     private func setupView() {
         selectionHighlightStyle = .none
+        wantsLayer = true
+        layer?.cornerRadius = 3
     }
 
     private func updateBackgroundColor() {
