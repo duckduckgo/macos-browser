@@ -35,8 +35,6 @@ class AddressBarTextField: NSTextField {
         }
     }
 
-    private var originalStringValue: String?
-
     private var selectedSuggestionViewModelCancellable: AnyCancellable?
     private var selectedTabViewModelCancelable: AnyCancellable?
     private var searchSuggestionsCancelable: AnyCancellable?
@@ -100,7 +98,7 @@ class AddressBarTextField: NSTextField {
 
     private func displaySelectedSuggestionViewModel() {
         guard let selectedSuggestionViewModel = suggestionsViewModel.selectedSuggestionViewModel else {
-            if let originalStringValue = originalStringValue {
+            if let originalStringValue = suggestionsViewModel.userStringValue {
                 stringValue = originalStringValue
             } else {
                 stringValue = ""
@@ -111,7 +109,7 @@ class AddressBarTextField: NSTextField {
         switch selectedSuggestionViewModel.suggestion {
         case .phrase(phrase: let phrase):
             stringValue = phrase
-        case .website(url: let url, title: _):
+        case .website(url: let url):
             stringValue = url.absoluteString
         case .unknown(value: let value):
             stringValue = value
@@ -217,8 +215,7 @@ extension AddressBarTextField: NSSearchFieldDelegate {
     }
 
     func controlTextDidChange(_ obj: Notification) {
-        suggestionsViewModel.suggestions.getSuggestions(for: stringValue)
-        originalStringValue = stringValue
+        suggestionsViewModel.userStringValue = stringValue
 
         if stringValue.isEmpty {
             hideSuggestionsWindow()

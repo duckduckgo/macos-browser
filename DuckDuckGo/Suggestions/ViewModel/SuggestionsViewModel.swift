@@ -38,6 +38,14 @@ class SuggestionsViewModel {
 
     @Published private(set) var selectedSuggestionViewModel: SuggestionViewModel?
 
+    var userStringValue: String? {
+        didSet {
+            if let userStringValue = userStringValue {
+                suggestions.getSuggestions(for: userStringValue)
+            }
+        }
+    }
+
     private func setSelectedSuggestionViewModel() {
         if let selectionIndex = selectionIndex {
             selectedSuggestionViewModel = suggestionViewModel(at: selectionIndex)
@@ -54,7 +62,12 @@ class SuggestionsViewModel {
             return nil
         }
 
-        return SuggestionViewModel(suggestion: items[index])
+        guard let userStringValue = userStringValue else {
+            os_log("SuggestionsViewModel: User string value is nil", log: OSLog.Category.general, type: .error)
+            return nil
+        }
+
+        return SuggestionViewModel(suggestion: items[index], userStringValue: userStringValue)
     }
 
     func select(at index: Int) {

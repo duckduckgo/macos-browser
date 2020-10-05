@@ -20,41 +20,51 @@ import Cocoa
 
 class SuggestionViewModel {
 
-    static let webImage = NSImage(named: "Web")
-    static let searchImage = NSImage(named: "Search")
-
     let suggestion: Suggestion
+    let userStringValue: String
 
-    init(suggestion: Suggestion) {
+    init(suggestion: Suggestion, userStringValue: String) {
         if case .phrase(phrase: let phrase) = suggestion, let url = phrase.url, url.isValid {
-            self.suggestion = .website(url: url, title: nil)
+            self.suggestion = .website(url: url)
         } else {
             self.suggestion = suggestion
         }
+        self.userStringValue = userStringValue
     }
 
-    var attributedString: NSAttributedString {
-        let attributes = [NSAttributedString.Key.foregroundColor: NSColor.labelColor]
+    // MARK: - Attributed Strings
 
+    static let tableRowViewFirstAttributes = [NSAttributedString.Key.font: NSFont.systemFont(ofSize: 13, weight: .light)]
+    static let tableRowViewSecondAttributes = [NSAttributedString.Key.font: NSFont.systemFont(ofSize: 13, weight: .semibold)]
+
+    var tableCellViewAttributedString: NSAttributedString {
+        let firstPart = NSMutableAttributedString(string: userStringValue, attributes: Self.tableRowViewFirstAttributes)
+        let secondPart = NSAttributedString(string: String(string.dropFirst(userStringValue.count)), attributes: Self.tableRowViewSecondAttributes)
+        firstPart.append(secondPart)
+        return firstPart
+    }
+
+    private var string: String {
         switch suggestion {
         case .phrase(phrase: let phrase):
-            return NSMutableAttributedString(string: phrase, attributes: attributes)
-        case .website(url: let url, title: let title):
-            if let title = title, title.count > 0 {
-                return NSAttributedString(string: "\(title) - \(url.absoluteStringWithoutScheme)", attributes: attributes)
-            } else {
-                return NSAttributedString(string: "\(url.absoluteStringWithoutScheme)", attributes: attributes)
-            }
+            return phrase
+        case .website(url: let url):
+            return url.absoluteStringWithoutSchemeAndWWW
         case .unknown(value: let value):
-            return NSAttributedString(string: value, attributes: attributes)
+            return value
         }
     }
+
+    // MARK: - Icon
+
+    static let webImage = NSImage(named: "Web")
+    static let searchImage = NSImage(named: "Search")
 
     var icon: NSImage? {
         switch suggestion {
         case .phrase(phrase: _):
             return Self.searchImage
-        case .website(url: _, title: _):
+        case .website(url: _):
             return Self.webImage
         case .unknown(value: _):
             return Self.webImage
@@ -65,9 +75,9 @@ class SuggestionViewModel {
 
 fileprivate extension URL {
 
-    var absoluteStringWithoutScheme: String {
+    var absoluteStringWithoutSchemeAndWWW: String {
         if let scheme = scheme {
-            return absoluteString.dropPrefix(scheme + "://")
+            return absoluteString.dropPrefix(scheme + "://").dropPrefix("www.")
         } else {
             return absoluteString
         }

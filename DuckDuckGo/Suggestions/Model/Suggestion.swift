@@ -21,7 +21,7 @@ import Foundation
 enum Suggestion: Equatable {
     
     case phrase(phrase: String)
-    case website(url: URL, title: String?)
+    case website(url: URL)
     case unknown(value: String)
 
 }

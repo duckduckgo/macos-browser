@@ -184,9 +184,9 @@ class SuggestionsViewController: NSViewController {
             return
         }
 
-        let padding: CGFloat = 2 * 3
-        let cellSize: CGFloat = 25
-        tableViewHeightConstraint.constant = CGFloat(suggestionsViewModel.numberOfSuggestions) * cellSize + padding
+        let padding: CGFloat = 2 * 10
+        let rowHeight = SuggestionTableRowView.Size.height.rawValue
+        tableViewHeightConstraint.constant = CGFloat(suggestionsViewModel.numberOfSuggestions) * rowHeight + padding
     }
 
     private func closeWindow() {

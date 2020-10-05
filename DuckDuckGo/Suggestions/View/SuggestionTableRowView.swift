@@ -17,10 +17,23 @@
 //
 
 import Cocoa
+import os.log
 
 class SuggestionTableRowView: NSTableRowView {
 
     static let identifier = "SuggestionTableRowView"
+    static let selectionBackroundColor = NSColor(named: "SelectedSuggestionBackgroundColor")!
+
+    enum Size: CGFloat {
+        case height = 22
+    }
+
+    override func awakeFromNib() {
+        super.awakeFromNib()
+
+        setupView()
+        updateBackgroundColor()
+    }
 
     // swiftlint:disable unused_setter_value
     override var isEmphasized: Bool {
@@ -28,5 +41,26 @@ class SuggestionTableRowView: NSTableRowView {
         set {}
     }
     // swiftlint:enable unused_setter_value
+
+    override var isSelected: Bool {
+        didSet {
+            updateCellView()
+            updateBackgroundColor()
+        }
+    }
+
+    private func setupView() {
+        selectionHighlightStyle = .none
+    }
+
+    private func updateBackgroundColor() {
+        backgroundColor = isSelected ? Self.selectionBackroundColor : NSColor.clear
+    }
+
+    private func updateCellView() {
+        if let cellView = subviews.first as? SuggestionTableCellView {
+            cellView.isSelected = isSelected
+        }
+    }
 
 }
