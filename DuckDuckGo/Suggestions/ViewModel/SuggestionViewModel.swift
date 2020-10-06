@@ -38,13 +38,13 @@ class SuggestionViewModel {
     static let tableRowViewSecondAttributes = [NSAttributedString.Key.font: NSFont.systemFont(ofSize: 13, weight: .semibold)]
 
     var tableCellViewAttributedString: NSAttributedString {
-        let firstPart = NSMutableAttributedString(string: userStringValue, attributes: Self.tableRowViewFirstAttributes)
+        let firstPart = NSMutableAttributedString(string: String(string.prefix(userStringValue.count)), attributes: Self.tableRowViewFirstAttributes)
         let secondPart = NSAttributedString(string: String(string.dropFirst(userStringValue.count)), attributes: Self.tableRowViewSecondAttributes)
         firstPart.append(secondPart)
         return firstPart
     }
 
-    private var string: String {
+    var string: String {
         switch suggestion {
         case .phrase(phrase: let phrase):
             return phrase

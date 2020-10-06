@@ -60,8 +60,10 @@ class SuggestionTableRowView: NSTableRowView {
     }
 
     private func updateCellView() {
-        if let cellView = subviews.first as? SuggestionTableCellView {
-            cellView.isSelected = isSelected
+        for subview in subviews {
+            if let cellView = subview as? SuggestionTableCellView {
+                cellView.isSelected = isSelected
+            }
         }
     }
 
