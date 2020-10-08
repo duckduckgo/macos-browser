@@ -73,22 +73,22 @@ class AddressBarTextField: NSTextField {
         addressBarStringCancelable?.cancel()
 
         guard let selectedTabViewModel = tabCollectionViewModel.selectedTabViewModel else {
-            stringValue = ""
+            value = Value.text("")
             return
         }
         addressBarStringCancelable = selectedTabViewModel.$addressBarString.receive(on: DispatchQueue.main).sink { [weak self] _ in
-            self?.updateStringValue()
+            self?.updateValue()
             self?.makeMeFirstResponderIfNeeded()
         }
     }
 
-    private func updateStringValue() {
+    private func updateValue() {
         guard let selectedTabViewModel = tabCollectionViewModel.selectedTabViewModel else {
             os_log("%s: Selected tab view model is nil", log: OSLog.Category.general, type: .error, className)
             return
         }
         let addressBarString = selectedTabViewModel.addressBarString
-        stringValue = addressBarString
+        value = Value(stringValue: addressBarString, userTyped: false)
     }
 
     private func makeMeFirstResponderIfNeeded() {
@@ -100,16 +100,16 @@ class AddressBarTextField: NSTextField {
     private func displaySelectedSuggestionViewModel() {
         guard let selectedSuggestionViewModel = suggestionsViewModel.selectedSuggestionViewModel else {
             if let originalStringValue = suggestionsViewModel.userStringValue {
-                stringValue = originalStringValue
+                value = Value(stringValue: originalStringValue, userTyped: true)
             } else {
-                stringValue = ""
+                value = Value.text("")
             }
 
             updateSuffix()
             return
         }
 
-        stringValue = selectedSuggestionViewModel.string
+        value = Value.suggestion(selectedSuggestionViewModel)
         updateSuffix()
         selectFromCursorToTheEnd()
     }
@@ -129,6 +129,45 @@ class AddressBarTextField: NSTextField {
             return
         }
         selectedTabViewModel.tab.url = url
+    }
+
+    // MARK: - Value
+
+    enum Value {
+        case text(_ text: String)
+        case url(urlString: String, url: URL, userTyped: Bool)
+        case suggestion(_ suggestionViewModel: SuggestionViewModel)
+
+        init(stringValue: String, userTyped: Bool) {
+            if let url = stringValue.url, url.isValid {
+                self = .url(urlString: stringValue, url: url, userTyped: userTyped)
+            } else {
+                self = .text(stringValue)
+            }
+        }
+
+        var string: String {
+            switch self {
+            case .text(let text): return text
+            case .url(urlString: let urlString, url: _, userTyped: _): return urlString
+            case .suggestion(let suggestionViewModel): return suggestionViewModel.string
+            }
+        }
+    }
+
+    @Published private(set) var value: Value = .text("") {
+        didSet {
+            switch value {
+            case .text(let text):
+                if stringValue != text {
+                    stringValue = text
+                }
+            case .url(urlString: let urlString, url: _, userTyped: _):
+                stringValue = urlString
+            case .suggestion(let suggestionViewModel):
+                stringValue = suggestionViewModel.string
+            }
+        }
     }
 
     // MARK: - Suffixes
@@ -155,9 +194,9 @@ class AddressBarTextField: NSTextField {
         var string: String {
             switch self {
             case .search:
-                return " - Search DuckDuckGo"
+                return " — Search DuckDuckGo"
             case .visit(host: let host):
-                return " - Visit \(host)"
+                return " — Visit \(host)"
             }
         }
     }
@@ -167,24 +206,28 @@ class AddressBarTextField: NSTextField {
     private func updateSuffix() {
         let cursorPosition = self.cursorPosition
 
-        let withoutSuffix = self.stringValueWithoutSuffix
-        guard !withoutSuffix.isEmpty else {
+        if case .text("") = value {
             suffix = nil
-            attributedStringValue = NSAttributedString(string: withoutSuffix)
             return
         }
 
-        let resultString = NSMutableAttributedString(string: withoutSuffix, attributes: Self.textAttributes)
-        if let url = stringValueWithoutSuffix.url, url.isValid {
-            let suffix = Suffix.visit(host: url.host?.description ?? "")
-            self.suffix = suffix
-            resultString.append(suffix.attributedString)
-        } else {
-            let suffix = Suffix.search
-            self.suffix = suffix
-            resultString.append(suffix.attributedString)
+        switch value {
+        case .text: suffix = Suffix.search
+        case .url(urlString: _, url: let url, userTyped: let userTyped):
+            suffix = userTyped ? Suffix.visit(host: url.host ?? url.absoluteString) : nil
+        case .suggestion(let suggestionViewModel):
+            switch suggestionViewModel.suggestion {
+            case .phrase(phrase: _): suffix = Suffix.search
+            case .website(url: let url): suffix = Suffix.visit(host: url.host ?? url.absoluteString)
+            case .unknown(value: _): suffix = Suffix.search
+            }
         }
-        attributedStringValue = resultString
+
+        if let suffix = suffix {
+            let attributedString = NSMutableAttributedString(string: value.string, attributes: Self.textAttributes)
+            attributedString.append(suffix.attributedString)
+            attributedStringValue = attributedString
+        }
 
         setCursorPosition(cursorPosition)
     }
@@ -303,14 +346,19 @@ extension AddressBarTextField: NSSearchFieldDelegate {
         if textMovement == NSReturnTextMovement {
             confirmStringValue()
         } else {
-            updateStringValue()
+            updateValue()
         }
     }
 
     func controlTextDidChange(_ obj: Notification) {
-        suggestionsViewModel.userStringValue = stringValueWithoutSuffix
+        self.value = Value(stringValue: stringValueWithoutSuffix, userTyped: true)
+        switch value {
+        case .text(let text): suggestionsViewModel.userStringValue = text
+        case .url(urlString: let urlString, url: _, userTyped: _): suggestionsViewModel.userStringValue = urlString
+        case .suggestion(let suggestionViewModel): suggestionsViewModel.userStringValue = suggestionViewModel.string
+        }
 
-        if stringValue.isEmpty {
+        if stringValue == "" {
             hideSuggestionsWindow()
         } else {
             showSuggestionsWindow()
