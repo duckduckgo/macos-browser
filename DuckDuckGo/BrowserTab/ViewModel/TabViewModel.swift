@@ -59,10 +59,15 @@ class TabViewModel {
         webView = WebView(frame: CGRect.zero, configuration: WKWebViewConfiguration.makeConfiguration())
         webViewStateObserver = WebViewStateObserver(webView: webView, tabViewModel: self)
         tab.actionDelegate = self
+        setupWebView()
 
         bindUrl()
         bindTitle()
         bindFavicon()
+    }
+
+    private func setupWebView() {
+        webView.allowsBackForwardNavigationGestures = true
     }
 
     private func bindUrl() {
