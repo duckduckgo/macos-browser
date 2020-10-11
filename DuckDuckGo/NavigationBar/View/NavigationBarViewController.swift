@@ -28,6 +28,11 @@ class NavigationBarViewController: NSViewController {
 
     private var tabCollectionViewModel: TabCollectionViewModel
 
+    // swiftlint:disable weak_delegate
+    private var goBackButtonMenuDelegate: NavigationButtonMenuDelegate
+    private var goForwardButtonMenuDelegate: NavigationButtonMenuDelegate
+    // swiftlint:enable weak_delegate
+
     private var selectedTabViewModelCancelable: AnyCancellable?
     private var navigationButtonsCancelables = Set<AnyCancellable>()
 
@@ -37,6 +42,8 @@ class NavigationBarViewController: NSViewController {
 
     init?(coder: NSCoder, tabCollectionViewModel: TabCollectionViewModel) {
         self.tabCollectionViewModel = tabCollectionViewModel
+        self.goBackButtonMenuDelegate = NavigationButtonMenuDelegate(buttonType: .back, tabCollectionViewModel: tabCollectionViewModel)
+        self.goForwardButtonMenuDelegate = NavigationButtonMenuDelegate(buttonType: .forward, tabCollectionViewModel: tabCollectionViewModel)
 
         super.init(coder: coder)
     }
@@ -44,6 +51,7 @@ class NavigationBarViewController: NSViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
 
+        setupNavigationButtonMenus()
         bindSelectedTabViewModel()
     }
 
@@ -78,6 +86,15 @@ class NavigationBarViewController: NSViewController {
     @IBAction func settingsButtonAction(_ sender: NSButton) {
     }
 
+    private func setupNavigationButtonMenus() {
+        let backButtonMenu = NSMenu()
+        backButtonMenu.delegate = goBackButtonMenuDelegate
+        goBackButton.menu = backButtonMenu
+        let forwardButtonMenu = NSMenu()
+        forwardButtonMenu.delegate = goForwardButtonMenuDelegate
+        goForwardButton.menu = forwardButtonMenu
+    }
+
     private func bindSelectedTabViewModel() {
         selectedTabViewModelCancelable = tabCollectionViewModel.$selectedTabViewModel.receive(on: DispatchQueue.main).sink { [weak self] _ in
             self?.bindNavigationButtons()
@@ -94,15 +111,15 @@ class NavigationBarViewController: NSViewController {
             return
         }
         selectedTabViewModel.$canGoBack.receive(on: DispatchQueue.main).sink { [weak self] _ in
-            self?.setNavigationButtons()
+            self?.updateNavigationButtons()
         } .store(in: &navigationButtonsCancelables)
 
         selectedTabViewModel.$canGoForward.receive(on: DispatchQueue.main).sink { [weak self] _ in
-            self?.setNavigationButtons()
+            self?.updateNavigationButtons()
         } .store(in: &navigationButtonsCancelables)
     }
 
-    private func setNavigationButtons() {
+    private func updateNavigationButtons() {
         guard let selectedTabViewModel = tabCollectionViewModel.selectedTabViewModel else {
             os_log("%s: Selected tab view model is nil", log: OSLog.Category.general, type: .error, className)
             return

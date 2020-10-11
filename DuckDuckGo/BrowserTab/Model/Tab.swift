@@ -35,7 +35,7 @@ class Tab {
     }
 
     convenience init() {
-        self.init(faviconService: LocalFaviconService())
+        self.init(faviconService: LocalFaviconService.shared)
     }
 
     let faviconService: FaviconService

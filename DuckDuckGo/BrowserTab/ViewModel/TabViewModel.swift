@@ -29,7 +29,7 @@ class TabViewModel {
 
     enum Favicon {
         static let home = NSImage(named: "HomeFavicon")!
-        static let defaultFavicon = NSImage()
+        static let defaultFavicon = NSImage(named: "DefaultFavicon")!
     }
 
     private(set) var tab: Tab

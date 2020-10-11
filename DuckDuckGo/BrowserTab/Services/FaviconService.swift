@@ -21,10 +21,13 @@ import Cocoa
 protocol FaviconService {
 
     func fetchFavicon(for host: String, completion: @escaping (NSImage?, Error?) -> Void)
+    func getCachedFavicon(for host: String) -> NSImage?
 
 }
 
 class LocalFaviconService: FaviconService {
+
+    static let shared = LocalFaviconService()
 
     private enum FaviconName: String {
         case favicon = "favicon.ico"
@@ -55,6 +58,10 @@ class LocalFaviconService: FaviconService {
 
         self.cache[host] = image
         completion(image, nil)
+    }
+
+    func getCachedFavicon(for host: String) -> NSImage? {
+        return cache[host]
     }
 
 }
