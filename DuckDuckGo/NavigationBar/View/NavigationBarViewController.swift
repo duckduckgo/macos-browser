@@ -24,14 +24,15 @@ class NavigationBarViewController: NSViewController {
 
     @IBOutlet weak var goBackButton: NSButton!
     @IBOutlet weak var goForwardButton: NSButton!
-    @IBOutlet weak var settingsButton: NSButton!
+    @IBOutlet weak var optionsButton: NSButton!
 
     private var tabCollectionViewModel: TabCollectionViewModel
 
     // swiftlint:disable weak_delegate
-    private var goBackButtonMenuDelegate: NavigationButtonMenuDelegate
-    private var goForwardButtonMenuDelegate: NavigationButtonMenuDelegate
+    private let goBackButtonMenuDelegate: NavigationButtonMenuDelegate
+    private let goForwardButtonMenuDelegate: NavigationButtonMenuDelegate
     // swiftlint:enable weak_delegate
+    private let optionsMenu: OptionsButtonMenu
 
     private var selectedTabViewModelCancelable: AnyCancellable?
     private var navigationButtonsCancelables = Set<AnyCancellable>()
@@ -42,9 +43,9 @@ class NavigationBarViewController: NSViewController {
 
     init?(coder: NSCoder, tabCollectionViewModel: TabCollectionViewModel) {
         self.tabCollectionViewModel = tabCollectionViewModel
-        self.goBackButtonMenuDelegate = NavigationButtonMenuDelegate(buttonType: .back, tabCollectionViewModel: tabCollectionViewModel)
-        self.goForwardButtonMenuDelegate = NavigationButtonMenuDelegate(buttonType: .forward, tabCollectionViewModel: tabCollectionViewModel)
-
+        goBackButtonMenuDelegate = NavigationButtonMenuDelegate(buttonType: .back, tabCollectionViewModel: tabCollectionViewModel)
+        goForwardButtonMenuDelegate = NavigationButtonMenuDelegate(buttonType: .forward, tabCollectionViewModel: tabCollectionViewModel)
+        optionsMenu = OptionsButtonMenu(tabCollectionViewModel: tabCollectionViewModel)
         super.init(coder: coder)
     }
 
@@ -83,7 +84,10 @@ class NavigationBarViewController: NSViewController {
         selectedTabViewModel.tab.goForward()
     }
 
-    @IBAction func settingsButtonAction(_ sender: NSButton) {
+    @IBAction func optionsButtonAction(_ sender: NSButton) {
+        if let event = NSApplication.shared.currentEvent {
+            NSMenu.popUpContextMenu(optionsMenu, with: event, for: sender)
+        }
     }
 
     private func setupNavigationButtonMenus() {

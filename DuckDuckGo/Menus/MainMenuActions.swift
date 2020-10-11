@@ -110,7 +110,9 @@ extension MainViewController {
             return
         }
 
-        WindowsManager.openNewWindow(with: selectedTabViewModel.tab.url)
+        let url = selectedTabViewModel.tab.url
+        tabCollectionViewModel.removeSelected()
+        WindowsManager.openNewWindow(with: url)
     }
 
     @IBAction func mergeAllWindows(_ sender: Any?) {

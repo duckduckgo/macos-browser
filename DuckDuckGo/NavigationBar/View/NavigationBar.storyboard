@@ -87,7 +87,7 @@
                                     </userDefinedRuntimeAttribute>
                                 </userDefinedRuntimeAttributes>
                                 <connections>
-                                    <action selector="settingsButtonAction:" target="o2v-eH-jTI" id="Qb4-p7-ZSD"/>
+                                    <action selector="optionsButtonAction:" target="o2v-eH-jTI" id="WEA-2O-3h5"/>
                                 </connections>
                             </button>
                             <containerView translatesAutoresizingMaskIntoConstraints="NO" id="Wba-nA-FYj">
@@ -122,7 +122,7 @@
                     <connections>
                         <outlet property="goBackButton" destination="kky-0N-Cfd" id="RA9-yE-URS"/>
                         <outlet property="goForwardButton" destination="mdE-u0-Ei5" id="7wT-nX-Avr"/>
-                        <outlet property="settingsButton" destination="iIF-Ky-unr" id="vvZ-mm-idv"/>
+                        <outlet property="optionsButton" destination="iIF-Ky-unr" id="vvZ-mm-idv"/>
                     </connections>
                 </viewController>
                 <customObject id="wkT-Td-n7D" userLabel="First Responder" customClass="NSResponder" sceneMemberID="firstResponder"/>
