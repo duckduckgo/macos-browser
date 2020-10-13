@@ -98,6 +98,12 @@ class AddressBarTextField: NSTextField {
     }
 
     private func displaySelectedSuggestionViewModel() {
+        guard let suggestionsWindow = suggestionsWindowController?.window else {
+            os_log("AddressBarTextField: Window not available", log: OSLog.Category.general, type: .error)
+            return
+        }
+        guard suggestionsWindow.isVisible else { return }
+
         guard let selectedSuggestionViewModel = suggestionsViewModel.selectedSuggestionViewModel else {
             if let originalStringValue = suggestionsViewModel.userStringValue {
                 value = Value(stringValue: originalStringValue, userTyped: true)
@@ -105,13 +111,11 @@ class AddressBarTextField: NSTextField {
                 value = Value.text("")
             }
 
-            updateSuffix()
             return
         }
 
         value = Value.suggestion(selectedSuggestionViewModel)
-        updateSuffix()
-        selectFromCursorToTheEnd()
+        selectToTheEnd(from: cursorPosition)
     }
 
     private func confirmStringValue() {
@@ -157,15 +161,23 @@ class AddressBarTextField: NSTextField {
 
     @Published private(set) var value: Value = .text("") {
         didSet {
+            var stringValue = ""
             switch value {
             case .text(let text):
-                if stringValue != text {
-                    stringValue = text
-                }
+                stringValue = text
             case .url(urlString: let urlString, url: _, userTyped: _):
                 stringValue = urlString
             case .suggestion(let suggestionViewModel):
                 stringValue = suggestionViewModel.string
+            }
+            suffix = Suffix(value: value)
+
+            if let suffix = suffix {
+                let attributedString = NSMutableAttributedString(string: value.string, attributes: Self.textAttributes)
+                attributedString.append(suffix.attributedString)
+                attributedStringValue = attributedString
+            } else {
+                self.stringValue = stringValue
             }
         }
     }
@@ -176,6 +188,25 @@ class AddressBarTextField: NSTextField {
                                  .foregroundColor: NSColor.textColor]
 
     enum Suffix {
+        init?(value: Value) {
+            if case .text("") = value {
+                return nil
+            }
+
+            switch value {
+            case .text: self = Suffix.search
+            case .url(urlString: _, url: let url, userTyped: let userTyped):
+                if !userTyped { return nil }
+                self = Suffix.visit(host: url.host ?? url.absoluteString)
+            case .suggestion(let suggestionViewModel):
+                switch suggestionViewModel.suggestion {
+                case .phrase(phrase: _): self = Suffix.search
+                case .website(url: let url): self = Suffix.visit(host: url.host ?? url.absoluteString)
+                case .unknown(value: _): self = Suffix.search
+                }
+            }
+        }
+
         case search
         case visit(host: String)
 
@@ -202,34 +233,8 @@ class AddressBarTextField: NSTextField {
     }
 
     private var suffix: Suffix?
-
-    private func updateSuffix() {
-        let cursorPosition = self.cursorPosition
-
-        if case .text("") = value {
-            suffix = nil
-            return
-        }
-
-        switch value {
-        case .text: suffix = Suffix.search
-        case .url(urlString: _, url: let url, userTyped: let userTyped):
-            suffix = userTyped ? Suffix.visit(host: url.host ?? url.absoluteString) : nil
-        case .suggestion(let suggestionViewModel):
-            switch suggestionViewModel.suggestion {
-            case .phrase(phrase: _): suffix = Suffix.search
-            case .website(url: let url): suffix = Suffix.visit(host: url.host ?? url.absoluteString)
-            case .unknown(value: _): suffix = Suffix.search
-            }
-        }
-
-        if let suffix = suffix {
-            let attributedString = NSMutableAttributedString(string: value.string, attributes: Self.textAttributes)
-            attributedString.append(suffix.attributedString)
-            attributedStringValue = attributedString
-        }
-
-        setCursorPosition(cursorPosition)
+    private var suffixLength: Int {
+        suffix?.string.count ?? 0
     }
 
     private var stringValueWithoutSuffix: String {
@@ -251,22 +256,44 @@ class AddressBarTextField: NSTextField {
         return currentEditor.selectedRange.location
     }
 
-    private func setCursorPosition(_ position: Int) {
+    private func selectToTheEnd(from position: Int) {
         guard let currentEditor = currentEditor() else {
             os_log("AddressBarTextField: Current editor not available", log: OSLog.Category.general, type: .error)
             return
         }
 
-        currentEditor.selectedRange = NSRange(location: position, length: 00)
+        currentEditor.selectedRange = NSRange(location: position, length: stringValue.count - position - suffixLength)
     }
 
-    private func selectFromCursorToTheEnd() {
+    private func filterSuffixSelection() {
         guard let currentEditor = currentEditor() else {
             os_log("AddressBarTextField: Current editor not available", log: OSLog.Category.general, type: .error)
             return
         }
 
-        currentEditor.selectedRange = NSRange(location: cursorPosition, length: stringValue.count - cursorPosition - (suffix?.string.count ?? 0))
+        let currentLocation = currentEditor.selectedRange.location
+        let currentLength = currentEditor.selectedRange.length
+        let currentSelectionEnd = currentLocation + currentLength
+        let suffixStart = stringValue.count - suffixLength
+        guard suffixStart >= 0 else { return }
+
+        if currentSelectionEnd > suffixStart {
+            let newLocation = min(currentLocation, suffixStart)
+            let newMaxLength = suffixStart - newLocation
+            let newLength = min(newMaxLength, currentSelectionEnd - newLocation)
+            let newRange = NSRange(location: newLocation, length: newLength)
+            if currentEditor.selectedRange != newRange {
+                currentEditor.selectedRange = newRange
+            }
+        }
+    }
+
+    @objc private func textViewDidChangeSelection(_ notification: Notification) {
+        guard notification.object as? NSObject == self.currentEditor() else {
+            return
+        }
+
+        filterSuffixSelection()
     }
 
     // MARK: - Suggestions window
@@ -339,7 +366,7 @@ class AddressBarTextField: NSTextField {
     }
 }
 
-extension AddressBarTextField: NSSearchFieldDelegate {
+extension AddressBarTextField: NSTextFieldDelegate {
 
     func controlTextDidEndEditing(_ obj: Notification) {
         let textMovement = obj.userInfo?["NSTextMovement"] as? Int
@@ -351,7 +378,9 @@ extension AddressBarTextField: NSSearchFieldDelegate {
     }
 
     func controlTextDidChange(_ obj: Notification) {
-        self.value = Value(stringValue: stringValueWithoutSuffix, userTyped: true)
+        suggestionsViewModel.clearSelection()
+        
+        value = Value(stringValue: stringValueWithoutSuffix, userTyped: true)
         switch value {
         case .text(let text): suggestionsViewModel.userStringValue = text
         case .url(urlString: let urlString, url: _, userTyped: _): suggestionsViewModel.userStringValue = urlString
@@ -363,8 +392,6 @@ extension AddressBarTextField: NSSearchFieldDelegate {
         } else {
             showSuggestionsWindow()
         }
-
-        updateSuffix()
     }
 
     func control(_ control: NSControl, textView: NSTextView, doCommandBy commandSelector: Selector) -> Bool {
