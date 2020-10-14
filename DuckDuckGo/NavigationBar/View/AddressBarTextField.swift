@@ -31,10 +31,12 @@ class AddressBarTextField: NSTextField {
     var suggestionsViewModel: SuggestionsViewModel! {
         didSet {
             initSuggestionsWindow()
+            bindSuggestionItems()
             bindSelectedSuggestionViewModel()
         }
     }
 
+    private var suggestionItemsCancellable: AnyCancellable?
     private var selectedSuggestionViewModelCancellable: AnyCancellable?
     private var selectedTabViewModelCancelable: AnyCancellable?
     private var searchSuggestionsCancelable: AnyCancellable?
@@ -54,6 +56,14 @@ class AddressBarTextField: NSTextField {
 
     func viewDidLayout() {
         layoutSuggestionWindow()
+    }
+
+    private func bindSuggestionItems() {
+        suggestionItemsCancellable = suggestionsViewModel.suggestions.$items.receive(on: DispatchQueue.main).sink { [weak self] _ in
+            if self?.suggestionsViewModel.suggestions.items?.count ?? 0 > 0 {
+                self?.showSuggestionsWindow()
+            }
+        }
     }
 
     private func bindSelectedSuggestionViewModel() {
@@ -389,8 +399,6 @@ extension AddressBarTextField: NSTextFieldDelegate {
 
         if stringValue == "" {
             hideSuggestionsWindow()
-        } else {
-            showSuggestionsWindow()
         }
     }
 
