@@ -20,6 +20,8 @@ import Cocoa
 import Combine
 import os.log
 
+//swiftlint:disable type_body_length
+
 class AddressBarTextField: NSTextField {
 
     var tabCollectionViewModel: TabCollectionViewModel! {
@@ -436,3 +438,5 @@ extension AddressBarTextField: SuggestionsViewControllerDelegate {
     }
 
 }
+
+//swiftlint:enable type_body_length
