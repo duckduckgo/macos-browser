@@ -34,14 +34,21 @@ class SuggestionViewModel {
 
     // MARK: - Attributed Strings
 
-    static let tableRowViewFirstAttributes = [NSAttributedString.Key.font: NSFont.systemFont(ofSize: 13, weight: .light)]
-    static let tableRowViewSecondAttributes = [NSAttributedString.Key.font: NSFont.systemFont(ofSize: 13, weight: .semibold)]
+    static let tableRowViewStandardAttributes = [NSAttributedString.Key.font: NSFont.systemFont(ofSize: 13, weight: .light)]
+    static let tableRowViewBoldAttributes = [NSAttributedString.Key.font: NSFont.systemFont(ofSize: 13, weight: .semibold)]
 
     var tableCellViewAttributedString: NSAttributedString {
-        let firstPart = NSMutableAttributedString(string: String(string.prefix(userStringValue.count)), attributes: Self.tableRowViewFirstAttributes)
-        let secondPart = NSAttributedString(string: String(string.dropFirst(userStringValue.count)), attributes: Self.tableRowViewSecondAttributes)
-        firstPart.append(secondPart)
-        return firstPart
+        var firstPart = ""
+        var boldPart = string
+        if string.hasPrefix(userStringValue) {
+            firstPart = String(string.prefix(userStringValue.count))
+            boldPart = String(string.dropFirst(userStringValue.count))
+        }
+
+        let attributedString = NSMutableAttributedString(string: firstPart, attributes: Self.tableRowViewStandardAttributes)
+        let boldAttributedString = NSAttributedString(string: boldPart, attributes: Self.tableRowViewBoldAttributes)
+        attributedString.append(boldAttributedString)
+        return attributedString
     }
 
     var string: String {
