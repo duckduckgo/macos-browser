@@ -21,33 +21,27 @@ import XCTest
 
 class SuggestionsTests: XCTestCase {
 
-    func testWhenQueryIsEmptyThenAllSuggestionsAreNil() {
+    func testWhenQueryIsEmptyThenSuggestionsAreNil() {
         let suggestionsAPIMock = SuggestionsAPIMock()
-        let historyStoreMock = HistoryStoreMock()
-        let suggestions = Suggestions(suggestionsAPI: suggestionsAPIMock, historyStore: historyStoreMock)
+        let suggestions = Suggestions(suggestionsAPI: suggestionsAPIMock)
 
         let query = ""
         suggestions.getSuggestions(for: query)
 
-        XCTAssertNil(suggestions.items.local)
-        XCTAssertNil(suggestions.items.remote)
+        XCTAssertNil(suggestions.items)
     }
 
-    func testWhenQueryIsNotEmptyThenAPIResultAndWebsiteVisitsAreLoaded() {
+    func testWhenQueryIsNotEmptyThenAPIResultAreLoaded() {
         let suggestionsAPIMock = SuggestionsAPIMock()
-        let historyStoreMock = HistoryStoreMock()
-        let suggestions = Suggestions(suggestionsAPI: suggestionsAPIMock, historyStore: historyStoreMock)
+        let suggestions = Suggestions(suggestionsAPI: suggestionsAPIMock)
 
         let suggestionsAPIResult = SuggestionsAPIResult.aSuggestionsAPIResult
         suggestionsAPIMock.suggestionsAPIResult = suggestionsAPIResult
-        let websiteVisits = WebsiteVisit.aWebsiteVisits
-        historyStoreMock.websiteVisits = websiteVisits
 
         let query = "test"
         suggestions.getSuggestions(for: query)
 
-        XCTAssertTrue(suggestions.items.local?.count == suggestionsAPIResult.items.count)
-        XCTAssertTrue(suggestions.items.remote?.count == websiteVisits.count)
+        XCTAssertTrue(suggestions.items?.count == suggestionsAPIResult.items.count)
     }
 
 }
@@ -68,17 +62,6 @@ extension SuggestionsAPIResult {
         //swiftlint:disable force_try
         return try! JSONDecoder().decode(SuggestionsAPIResult.self, from: data)
         //swiftlint:enable force_try
-    }
-
-}
-
-extension WebsiteVisit {
-
-    static var aWebsiteVisits: [WebsiteVisit] {
-        return [
-            WebsiteVisit(url: URL.duckDuckGo, title: "DuckDuckGo", date: NSDate.now as Date),
-            WebsiteVisit(url: URL.duckDuckGo, title: "DuckDuckGo", date: NSDate.now as Date)
-        ]
     }
 
 }

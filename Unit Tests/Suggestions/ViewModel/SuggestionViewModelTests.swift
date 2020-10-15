@@ -21,33 +21,31 @@ import XCTest
 
 class SuggestionViewModelTests: XCTestCase {
 
-    func testWhenSuggestionIsPhraseThenAttributedStringIsTheSame() {
+    func testWhenSuggestionIsPhraseThenStringIsTheSame() {
         let phrase = "phrase"
         let suggestion = Suggestion.phrase(phrase: phrase)
-        let suggestionViewModel = SuggestionViewModel(suggestion: suggestion)
+        let suggestionViewModel = SuggestionViewModel(suggestion: suggestion, userStringValue: "")
         
-        XCTAssertEqual(phrase, suggestionViewModel.attributedString.string)
+        XCTAssertEqual(phrase, suggestionViewModel.string)
     }
     
-    func testWhenSuggestionIsWebsiteWithoutTitleThenAttributedStringIsURLWithoutScheme() {
+    func testWhenSuggestionIsWebsiteThenStringIsUrlStringWithoutSchemeAndWWW() {
         let urlString = "https://spreadprivacy.com"
         let url = URL(string: urlString)!
-        let suggestion = Suggestion.website(url: url, title: nil)
-        let suggestionViewModel = SuggestionViewModel(suggestion: suggestion)
+        let suggestion = Suggestion.website(url: url)
+        let suggestionViewModel = SuggestionViewModel(suggestion: suggestion, userStringValue: "")
         
-        XCTAssert(suggestionViewModel.attributedString.string.hasSuffix("spreadprivacy.com"))
-        XCTAssert(!suggestionViewModel.attributedString.string.hasPrefix("https://"))
+        XCTAssert(suggestionViewModel.string.hasSuffix("spreadprivacy.com"))
+        XCTAssert(!suggestionViewModel.string.hasPrefix("https://"))
     }
     
-    func testWhenSuggestionIsWebsiteWithTitleThenAttributedStringIsTitleAndURLWithoutScheme() {
+    func testWhenSuggestionIsWebsiteWithTitleThenStringIsTitleAndURLWithoutScheme() {
         let urlString = "https://spreadprivacy.com"
         let url = URL(string: urlString)!
-        let title = "Privacy"
-        let suggestion = Suggestion.website(url: url, title: title)
-        let suggestionViewModel = SuggestionViewModel(suggestion: suggestion)
-        
-        XCTAssert(suggestionViewModel.attributedString.string.hasSuffix("spreadprivacy.com"))
-        XCTAssert(suggestionViewModel.attributedString.string.hasPrefix(title))
+        let suggestion = Suggestion.website(url: url)
+        let suggestionViewModel = SuggestionViewModel(suggestion: suggestion, userStringValue: "")
+
+        XCTAssertEqual(suggestionViewModel.string, "spreadprivacy.com")
     }
 
 }

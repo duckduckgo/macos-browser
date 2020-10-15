@@ -62,12 +62,7 @@ class SuggestionsViewModel {
             return nil
         }
 
-        guard let userStringValue = userStringValue else {
-            os_log("SuggestionsViewModel: User string value is nil", log: OSLog.Category.general, type: .error)
-            return nil
-        }
-
-        return SuggestionViewModel(suggestion: items[index], userStringValue: userStringValue)
+        return SuggestionViewModel(suggestion: items[index], userStringValue: userStringValue ?? "")
     }
 
     func select(at index: Int) {
