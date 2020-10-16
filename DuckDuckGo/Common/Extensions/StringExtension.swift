@@ -71,6 +71,12 @@ extension String {
         return replacingOccurrences(of: "+", with: "%20")
     }
 
+    func dropSubdomain() -> String? {
+        let parts = components(separatedBy: ".")
+        guard parts.count > 1 else { return nil }
+        return parts.dropFirst().joined(separator: ".")
+    }
+
     // MARK: - Mutating
 
     @inlinable mutating func prepend(_ string: String) {
