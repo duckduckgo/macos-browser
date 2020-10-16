@@ -26,6 +26,8 @@ class NavigationBarViewController: NSViewController {
     @IBOutlet weak var goForwardButton: NSButton!
     @IBOutlet weak var optionsButton: NSButton!
 
+    var addressBarViewController: AddressBarViewController?
+
     private var tabCollectionViewModel: TabCollectionViewModel
 
     // swiftlint:disable weak_delegate
@@ -63,6 +65,7 @@ class NavigationBarViewController: NSViewController {
             return nil
         }
 
+        self.addressBarViewController = addressBarViewController
         return addressBarViewController
     }
 

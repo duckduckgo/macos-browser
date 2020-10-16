@@ -71,6 +71,11 @@
                                                 <action selector="newTab:" target="Ady-hI-5gd" id="Gnb-ML-joG"/>
                                             </connections>
                                         </menuItem>
+                                        <menuItem title="Open Location..." keyEquivalent="l" id="xnU-dQ-JR1">
+                                            <connections>
+                                                <action selector="openLocation:" target="Ady-hI-5gd" id="ggi-sX-Mec"/>
+                                            </connections>
+                                        </menuItem>
                                         <menuItem isSeparatorItem="YES" id="m54-Is-iLE"/>
                                         <menuItem title="Close Window" keyEquivalent="W" id="CzI-4o-2re">
                                             <connections>

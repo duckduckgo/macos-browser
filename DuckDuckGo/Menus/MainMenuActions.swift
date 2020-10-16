@@ -31,6 +31,10 @@ extension AppDelegate {
         WindowsManager.openNewWindow()
     }
 
+    @IBAction func openLocation(_ sender: Any?) {
+        WindowsManager.openNewWindow()
+    }
+
     @IBAction func closeAllWindows(_ sender: Any?) {
         WindowsManager.closeWindows()
     }
@@ -43,6 +47,14 @@ extension MainViewController {
 
     @IBAction func newTab(_ sender: Any?) {
         tabCollectionViewModel.appendNewTab()
+    }
+
+    @IBAction func openLocation(_ sender: Any?) {
+        guard let addressBarTextField = navigationBarViewController?.addressBarViewController?.addressBarTextField else {
+            os_log("MainViewController: Cannot reference address bar text field", log: OSLog.Category.general, type: .error)
+            return
+        }
+        view.window?.makeFirstResponder(addressBarTextField)
     }
 
     @IBAction func closeTab(_ sender: Any?) {

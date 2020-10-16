@@ -26,9 +26,9 @@ class MainViewController: NSViewController {
     @IBOutlet weak var navigationBarContainerView: NSView!
     @IBOutlet weak var webContainerView: NSView!
 
-    private var tabBarViewController: TabBarViewController?
-    private var navigationBarViewController: NavigationBarViewController?
-    private var browserTabViewController: BrowserTabViewController?
+    private(set) var tabBarViewController: TabBarViewController?
+    private(set) var navigationBarViewController: NavigationBarViewController?
+    private(set) var browserTabViewController: BrowserTabViewController?
 
     var tabCollectionViewModel = TabCollectionViewModel()
 
