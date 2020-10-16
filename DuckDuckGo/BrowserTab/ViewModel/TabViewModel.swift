@@ -18,7 +18,6 @@
 
 import Cocoa
 import Combine
-import WebKit
 import os.log
 
 class TabViewModel {
@@ -34,12 +33,6 @@ class TabViewModel {
 
     private(set) var tab: Tab
     private var cancelables = Set<AnyCancellable>()
-
-    var webView: WebView {
-        didSet {
-            webViewStateObserver = WebViewStateObserver(webView: webView, tabViewModel: self)
-        }
-    }
     
     private var webViewStateObserver: WebViewStateObserver?
 
@@ -56,18 +49,11 @@ class TabViewModel {
     init(tab: Tab) {
         self.tab = tab
 
-        webView = WebView(frame: CGRect.zero, configuration: WKWebViewConfiguration.makeConfiguration())
-        webViewStateObserver = WebViewStateObserver(webView: webView, tabViewModel: self)
-        tab.actionDelegate = self
-        setupWebView()
+        webViewStateObserver = WebViewStateObserver(webView: tab.webView, tabViewModel: self)
 
         bindUrl()
         bindTitle()
         bindFavicon()
-    }
-
-    private func setupWebView() {
-        webView.allowsBackForwardNavigationGestures = true
     }
 
     private func bindUrl() {
@@ -134,41 +120,6 @@ class TabViewModel {
         } else {
             favicon = Favicon.defaultFavicon
         }
-    }
-    
-}
-
-extension TabViewModel: TabActionDelegate {
-
-    func tabForwardAction(_ tab: Tab) {
-        webView.goForward()
-    }
-
-    func tabBackAction(_ tab: Tab) {
-        webView.goBack()
-    }
-
-    func tabHomeAction(_ tab: Tab) {
-        tab.url = nil
-    }
-
-    func tabReloadAction(_ tab: Tab) {
-        webView.reload()
-    }
-
-    func tabStopLoadingAction(_ tab: Tab) {
-        webView.stopLoading()
-    }
-
-}
-
-fileprivate extension WKWebViewConfiguration {
-
-    static func makeConfiguration() -> WKWebViewConfiguration {
-        let configuration = WKWebViewConfiguration()
-        configuration.websiteDataStore = WKWebsiteDataStore.default()
-        configuration.allowsAirPlayForMediaPlayback = true
-        return configuration
     }
 
 }

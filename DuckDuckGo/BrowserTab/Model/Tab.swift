@@ -17,21 +17,15 @@
 //
 
 import Cocoa
-
-protocol TabActionDelegate: AnyObject {
-
-    func tabForwardAction(_ tab: Tab)
-    func tabBackAction(_ tab: Tab)
-    func tabHomeAction(_ tab: Tab)
-    func tabReloadAction(_ tab: Tab)
-    func tabStopLoadingAction(_ tab: Tab)
-
-}
+import WebKit
 
 class Tab {
 
     init(faviconService: FaviconService) {
         self.faviconService = faviconService
+        webView = WebView(frame: CGRect.zero, configuration: WKWebViewConfiguration.makeConfiguration())
+
+        setupWebView()
     }
 
     convenience init() {
@@ -39,6 +33,7 @@ class Tab {
     }
 
     let faviconService: FaviconService
+    let webView: WebView
 
     @Published var url: URL? {
         willSet {
@@ -50,26 +45,28 @@ class Tab {
     @Published var title: String?
     @Published var favicon: NSImage?
 
-    weak var actionDelegate: TabActionDelegate?
-
     func goForward() {
-        actionDelegate?.tabForwardAction(self)
+        webView.goForward()
     }
 
     func goBack() {
-        actionDelegate?.tabBackAction(self)
+        webView.goBack()
     }
 
     func goHome() {
-        actionDelegate?.tabHomeAction(self)
+        url = nil
     }
 
     func reload() {
-        actionDelegate?.tabReloadAction(self)
+        webView.reload()
     }
 
     func stopLoading() {
-        actionDelegate?.tabStopLoadingAction(self)
+        webView.stopLoading()
+    }
+
+    private func setupWebView() {
+        webView.allowsBackForwardNavigationGestures = true
     }
 
     private func fetchFavicon(for host: String?) {
@@ -102,6 +99,17 @@ extension Tab: Hashable {
 
     func hash(into hasher: inout Hasher) {
         hasher.combine(ObjectIdentifier(self))
+    }
+
+}
+
+fileprivate extension WKWebViewConfiguration {
+
+    static func makeConfiguration() -> WKWebViewConfiguration {
+        let configuration = WKWebViewConfiguration()
+        configuration.websiteDataStore = WKWebsiteDataStore.default()
+        configuration.allowsAirPlayForMediaPlayback = true
+        return configuration
     }
 
 }

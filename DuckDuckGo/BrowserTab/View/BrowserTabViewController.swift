@@ -56,7 +56,7 @@ class BrowserTabViewController: NSViewController {
     private func changeWebView() {
 
         func displayWebView(of tabViewModel: TabViewModel) {
-            let newWebView = tabViewModel.webView
+            let newWebView = tabViewModel.tab.webView
             newWebView.navigationDelegate = self
             newWebView.uiDelegate = self
 
@@ -163,7 +163,7 @@ extension BrowserTabViewController: WKNavigationDelegate {
             os_log("%s: Selected tab view model is nil", log: OSLog.Category.general, type: .error, className)
             return nil
         }
-        selectedViewModel.webView.load(navigationAction.request)
+        selectedViewModel.tab.webView.load(navigationAction.request)
         return nil
     }
 
