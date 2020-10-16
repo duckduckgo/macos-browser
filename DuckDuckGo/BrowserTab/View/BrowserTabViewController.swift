@@ -133,9 +133,30 @@ class BrowserTabViewController: NSViewController {
         webView.isHidden = shown
     }
 
+    private func openNewTab(with url: URL?) {
+        let tab = Tab()
+        tab.url = url
+        tabCollectionViewModel.append(tab: tab)
+    }
+
 }
 
 extension BrowserTabViewController: WKNavigationDelegate {
+
+    func webView(_ webView: WKWebView,
+                 decidePolicyFor navigationAction: WKNavigationAction,
+                 decisionHandler: @escaping (WKNavigationActionPolicy) -> Void) {
+
+        let isCommandPressed = NSApp.currentEvent?.modifierFlags.contains(.command) ?? false
+        let isLinkActivated = navigationAction.navigationType == .linkActivated
+        if isLinkActivated && isCommandPressed {
+            decisionHandler(.cancel)
+            openNewTab(with: navigationAction.request.url)
+            return
+        }
+
+        decisionHandler(.allow)
+    }
 
     func webView(_ webView: WKWebView, didStartProvisionalNavigation navigation: WKNavigation!) {
         setFirstResponderIfNeeded()
@@ -158,6 +179,7 @@ extension BrowserTabViewController: WKNavigationDelegate {
                  createWebViewWith configuration: WKWebViewConfiguration,
                  for navigationAction: WKNavigationAction,
                  windowFeatures: WKWindowFeatures) -> WKWebView? {
+        
         tabCollectionViewModel.appendNewTabAfterSelected()
         guard let selectedViewModel = tabCollectionViewModel.selectedTabViewModel else {
             os_log("%s: Selected tab view model is nil", log: OSLog.Category.general, type: .error, className)
