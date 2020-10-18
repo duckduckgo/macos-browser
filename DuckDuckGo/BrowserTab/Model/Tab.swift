@@ -26,24 +26,23 @@ class Tab {
         webView = WebView(frame: CGRect.zero, configuration: WKWebViewConfiguration.makeConfiguration())
 
         setupWebView()
+        setupUserScripts()
     }
 
     convenience init() {
         self.init(faviconService: LocalFaviconService.shared)
     }
 
-    let faviconService: FaviconService
     let webView: WebView
 
     @Published var url: URL? {
-        willSet {
-            if newValue?.host != url?.host {
-                fetchFavicon(for: newValue?.host)
+        didSet {
+            if oldValue?.host != url?.host {
+                fetchFavicon(nil, for: url?.host)
             }
         }
     }
     @Published var title: String?
-    @Published var favicon: NSImage?
 
     func goForward() {
         webView.goForward()
@@ -69,13 +68,18 @@ class Tab {
         webView.allowsBackForwardNavigationGestures = true
     }
 
-    private func fetchFavicon(for host: String?) {
+    // MARK: - Favicon
+
+    @Published var favicon: NSImage?
+    let faviconService: FaviconService
+
+    private func fetchFavicon(_ faviconURL: URL?, for host: String?) {
         guard let host = host else {
             favicon = nil
             return
         }
 
-        faviconService.fetchFavicon(for: host) { (image, error) in
+        faviconService.fetchFavicon(faviconURL, for: host) { (image, error) in
             guard error == nil, let image = image else {
                 self.favicon = nil
                 return
@@ -83,6 +87,15 @@ class Tab {
 
             self.favicon = image
         }
+    }
+
+    // MARK: - User Scripts
+
+    let faviconScript = FaviconUserScript()
+
+    private func setupUserScripts() {
+        faviconScript.delegate = self
+        webView.configuration.userContentController.addUserScript(userScript: faviconScript)
     }
 
 }
@@ -99,6 +112,24 @@ extension Tab: Hashable {
 
     func hash(into hasher: inout Hasher) {
         hasher.combine(ObjectIdentifier(self))
+    }
+
+}
+
+extension Tab: FaviconUserScriptDelegate {
+
+    func faviconUserScript(_ faviconUserScript: FaviconUserScript, didFindFavicon faviconUrl: URL) {
+        guard let host = url?.host else {
+            return
+        }
+
+        faviconService.fetchFavicon(faviconUrl, for: host) { (image, error) in
+            guard error == nil, let image = image else {
+                return
+            }
+
+            self.favicon = image
+        }
     }
 
 }
