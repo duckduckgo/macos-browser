@@ -34,8 +34,8 @@ class SuggestionViewModel {
 
     // MARK: - Attributed Strings
 
-    static let tableRowViewStandardAttributes = [NSAttributedString.Key.font: NSFont.systemFont(ofSize: 13, weight: .light)]
-    static let tableRowViewBoldAttributes = [NSAttributedString.Key.font: NSFont.systemFont(ofSize: 13, weight: .semibold)]
+    static let tableRowViewStandardAttributes = [NSAttributedString.Key.font: NSFont.systemFont(ofSize: 13, weight: .regular)]
+    static let tableRowViewBoldAttributes = [NSAttributedString.Key.font: NSFont.systemFont(ofSize: 13, weight: .bold)]
 
     var tableCellViewAttributedString: NSAttributedString {
         var firstPart = ""
