@@ -65,7 +65,7 @@ class AddressBarViewController: NSViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
 
-        setView(firstResponder: false, animated: false)
+        setView(firstResponder: false)
         addressBarTextField.tabCollectionViewModel = tabCollectionViewModel
         addressBarTextField.suggestionsViewModel = suggestionsViewModel
         bindSelectedTabViewModel()
@@ -143,17 +143,9 @@ class AddressBarViewController: NSViewController {
         passiveTextField.stringValue = selectedTabViewModel.passiveAddressBarString
     }
 
-    private func setView(firstResponder: Bool, animated: Bool) {
-        if animated {
-            NSAnimationContext.runAnimationGroup { context in
-                context.duration = 1/3
-                self.addressBarTextField.animator().alphaValue = firstResponder ? 1 : 0
-                self.passiveTextField.animator().alphaValue = firstResponder ? 0 : 1
-            }
-        } else {
-            addressBarTextField.alphaValue = firstResponder ? 1 : 0
-            passiveTextField.alphaValue = firstResponder ? 0 : 1
-        }
+    private func setView(firstResponder: Bool) {
+        addressBarTextField.alphaValue = firstResponder ? 1 : 0
+        passiveTextField.alphaValue = firstResponder ? 0 : 1
 
         addressBarView?.setView(stroke: firstResponder)
     }
@@ -188,14 +180,10 @@ extension AddressBarViewController {
     @objc func textFieldFirstReponderNotification(_ notification: Notification) {
         // NSTextField passes its first responder status down to a child view of NSTextView class
         if let textView = notification.object as? NSTextView, textView.superview?.superview === addressBarTextField {
-            setView(firstResponder: true, animated: false)
+            setView(firstResponder: true)
         } else {
             self.mode = .browsing
-            if notification.object as? WebView != nil {
-                setView(firstResponder: false, animated: true)
-            } else {
-                setView(firstResponder: false, animated: false)
-            }
+            setView(firstResponder: false)
         }
 
         setButtons()
