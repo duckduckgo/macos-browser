@@ -91,7 +91,7 @@ class AddressBarViewController: NSViewController {
         if actionButton.image === Self.refreshImage {
             selectedTabViewModel.tab.reload()
         } else {
-            addressBarTextField.stringValue = ""
+            addressBarTextField.clearValue()
         }
     }
 
@@ -120,17 +120,8 @@ class AddressBarViewController: NSViewController {
 
     private func bindAddressBarTextFieldValue() {
         addressBarTextFieldValueCancelable = addressBarTextField.$value.receive(on: DispatchQueue.main).sink { [weak self] _ in
-            switch self?.addressBarTextField.value {
-            case .text: self?.mode = .searching(withUrl: false)
-            case .url(urlString: _, url: _, userTyped: let userTyped): self?.mode = userTyped ? .searching(withUrl: true) : .browsing
-            case .suggestion(let suggestionViewModel):
-                switch suggestionViewModel.suggestion {
-                case .phrase: self?.mode = .searching(withUrl: false)
-                case .website: self?.mode = .searching(withUrl: true)
-                case .unknown: self?.mode = .searching(withUrl: false)
-                }
-            case .none: break
-            }
+            self?.updateMode()
+            self?.setButtons()
         }
     }
 
@@ -162,13 +153,34 @@ class AddressBarViewController: NSViewController {
         let isDuckDuckGoUrl = selectedTabViewModel.tab.url?.isDuckDuckGoSearch ?? false
 
         gradeButton.isHidden = isSearchingMode || isTextFieldFirstResponder || isDuckDuckGoUrl || isURLNil
+
+        actionButton.isHidden = false
+        if case .text(let text) = addressBarTextField.value {
+            if text == "" {
+                actionButton.isHidden = true
+            }
+        }
         actionButton.image = isSearchingMode ? Self.clearImage : Self.refreshImage
+
         imageButton.image = selectedTabViewModel.favicon
         if case .searching(let withUrl) = mode {
             if withUrl {
                 imageButton.image = Self.webImage
             } else {
                 imageButton.image = Self.homeFaviconImage
+            }
+        }
+    }
+
+    private func updateMode() {
+        switch self.addressBarTextField.value {
+        case .text: self.mode = .searching(withUrl: false)
+        case .url(urlString: _, url: _, userTyped: let userTyped): self.mode = userTyped ? .searching(withUrl: true) : .browsing
+        case .suggestion(let suggestionViewModel):
+            switch suggestionViewModel.suggestion {
+            case .phrase: self.mode = .searching(withUrl: false)
+            case .website: self.mode = .searching(withUrl: true)
+            case .unknown: self.mode = .searching(withUrl: false)
             }
         }
     }

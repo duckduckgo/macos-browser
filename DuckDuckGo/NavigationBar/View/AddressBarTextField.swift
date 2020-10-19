@@ -60,6 +60,10 @@ class AddressBarTextField: NSTextField {
         layoutSuggestionWindow()
     }
 
+    func clearValue() {
+        value = .text("")
+    }
+
     private func bindSuggestionItems() {
         suggestionItemsCancellable = suggestionsViewModel.suggestions.$items.receive(on: DispatchQueue.main).sink { [weak self] _ in
             if self?.suggestionsViewModel.suggestions.items?.count ?? 0 > 0 {
@@ -85,7 +89,7 @@ class AddressBarTextField: NSTextField {
         addressBarStringCancelable?.cancel()
 
         guard let selectedTabViewModel = tabCollectionViewModel.selectedTabViewModel else {
-            value = Value.text("")
+            clearValue()
             return
         }
         addressBarStringCancelable = selectedTabViewModel.$addressBarString.receive(on: DispatchQueue.main).sink { [weak self] _ in
@@ -120,7 +124,7 @@ class AddressBarTextField: NSTextField {
             if let originalStringValue = suggestionsViewModel.userStringValue {
                 value = Value(stringValue: originalStringValue, userTyped: true)
             } else {
-                value = Value.text("")
+                clearValue()
             }
 
             return
