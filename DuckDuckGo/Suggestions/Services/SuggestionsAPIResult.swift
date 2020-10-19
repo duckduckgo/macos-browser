@@ -23,6 +23,8 @@ struct SuggestionsAPIResult: Decodable {
 
     var items = [[String: String]]()
 
+    init() {}
+    
     init(from decoder: Decoder) throws {
         var container = try decoder.unkeyedContainer()
 

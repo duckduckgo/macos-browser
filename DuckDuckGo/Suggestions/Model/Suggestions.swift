@@ -59,6 +59,10 @@ class Suggestions {
         }
     }
 
+    func stopFetchingSuggestions() {
+        suggestionsAPI.stopFetchingSuggestions()
+    }
+
 }
 
 fileprivate extension Suggestion {

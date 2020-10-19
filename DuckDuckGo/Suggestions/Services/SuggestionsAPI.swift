@@ -22,6 +22,7 @@ import os.log
 protocol SuggestionsAPI {
 
     func fetchSuggestions(for query: String, completion: @escaping (SuggestionsAPIResult?, Error?) -> Void)
+    func stopFetchingSuggestions()
 
 }
 
@@ -36,9 +37,10 @@ class DuckDuckGoSuggestionsAPI: SuggestionsAPI {
     private var task: URLSessionDataTask?
 
     func fetchSuggestions(for query: String, completion: @escaping (SuggestionsAPIResult?, Error?) -> Void) {
-        
+
         func mainQueueCompletion(_ suggestions: SuggestionsAPIResult?, _ error: Error?) {
             DispatchQueue.main.async {
+                guard self.task != nil else { return }
                 completion(suggestions, error)
             }
         }
@@ -53,7 +55,14 @@ class DuckDuckGoSuggestionsAPI: SuggestionsAPI {
         }
 
         let request = URLRequest.defaultRequest(with: searchUrl)
-        let task = URLSession.shared.dataTask(with: request, completionHandler: { (data, _, error) in
+        let task = URLSession.shared.dataTask(with: request, completionHandler: { [weak self] (data, _, error) in
+            guard self != nil else { return }
+
+            if let error = error as NSError?, error.code == NSURLErrorCancelled {
+                mainQueueCompletion(SuggestionsAPIResult(), nil)
+                return
+            }
+
             guard let data = data else {
                 os_log("DuckDuckGoSuggestionsAPI: Failed to fetch suggestions - %s",
                        log: OSLog.Category.general,
@@ -74,6 +83,13 @@ class DuckDuckGoSuggestionsAPI: SuggestionsAPI {
 
         self.task = task
         task.resume()
+    }
+
+    func stopFetchingSuggestions() {
+        guard task?.state == URLSessionTask.State.running else { return }
+
+        task?.cancel()
+        task = nil
     }
 
 }

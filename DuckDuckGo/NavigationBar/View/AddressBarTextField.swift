@@ -336,8 +336,7 @@ class AddressBarTextField: NSTextField {
             os_log("AddressBarTextField: Window not available", log: OSLog.Category.general, type: .error)
             return
         }
-
-        if suggestionsWindow.isVisible { return }
+        guard !suggestionsWindow.isVisible, window.firstResponder == currentEditor() else { return }
 
         window.addChildWindow(suggestionsWindow, ordered: .above)
         layoutSuggestionWindow()
@@ -381,6 +380,8 @@ class AddressBarTextField: NSTextField {
 extension AddressBarTextField: NSTextFieldDelegate {
 
     func controlTextDidEndEditing(_ obj: Notification) {
+        suggestionsViewModel.suggestions.stopFetchingSuggestions()
+
         let textMovement = obj.userInfo?["NSTextMovement"] as? Int
         if textMovement == NSReturnTextMovement {
             confirmStringValue()
