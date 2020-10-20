@@ -12,7 +12,7 @@
             <objects>
                 <viewController id="o2v-eH-jTI" customClass="NavigationBarViewController" customModule="DuckDuckGo_Privacy_Browser" customModuleProvider="target" sceneMemberID="viewController">
                     <view key="view" id="hYV-nu-QIp" customClass="ColorView" customModule="DuckDuckGo_Privacy_Browser" customModuleProvider="target">
-                        <rect key="frame" x="0.0" y="0.0" width="845" height="56"/>
+                        <rect key="frame" x="0.0" y="0.0" width="847" height="56"/>
                         <autoresizingMask key="autoresizingMask"/>
                         <subviews>
                             <button translatesAutoresizingMaskIntoConstraints="NO" id="kky-0N-Cfd" customClass="MouseOverButton" customModule="DuckDuckGo_Privacy_Browser" customModuleProvider="target">
@@ -68,7 +68,7 @@
                                 </connections>
                             </button>
                             <button translatesAutoresizingMaskIntoConstraints="NO" id="iIF-Ky-unr" customClass="MouseOverButton" customModule="DuckDuckGo_Privacy_Browser" customModuleProvider="target">
-                                <rect key="frame" x="805" y="16" width="32" height="24"/>
+                                <rect key="frame" x="807" y="16" width="32" height="24"/>
                                 <constraints>
                                     <constraint firstAttribute="width" constant="32" id="2ry-8Q-yfk"/>
                                     <constraint firstAttribute="height" constant="24" id="s7E-4e-eTj"/>
@@ -94,10 +94,9 @@
                                 </connections>
                             </button>
                             <containerView translatesAutoresizingMaskIntoConstraints="NO" id="Wba-nA-FYj">
-                                <rect key="frame" x="123" y="11" width="600" height="34"/>
+                                <rect key="frame" x="127" y="11" width="593" height="34"/>
                                 <constraints>
                                     <constraint firstAttribute="height" constant="34" id="fDM-4Y-Nvs"/>
-                                    <constraint firstAttribute="width" priority="250" constant="600" id="hTu-Cd-p3w"/>
                                 </constraints>
                                 <connections>
                                     <segue destination="H4f-bE-T92" kind="embed" destinationCreationSelector="createAddressBarViewController:" id="5BM-Q3-tYH"/>
@@ -105,16 +104,17 @@
                             </containerView>
                         </subviews>
                         <constraints>
-                            <constraint firstItem="Wba-nA-FYj" firstAttribute="leading" relation="greaterThanOrEqual" secondItem="mdE-u0-Ei5" secondAttribute="trailing" constant="8" id="3ru-Lx-9Cl"/>
                             <constraint firstItem="kky-0N-Cfd" firstAttribute="leading" secondItem="hYV-nu-QIp" secondAttribute="leading" constant="8" id="5xQ-lQ-hZc"/>
                             <constraint firstItem="iIF-Ky-unr" firstAttribute="centerY" secondItem="hYV-nu-QIp" secondAttribute="centerY" id="6EH-Ax-6p8"/>
+                            <constraint firstItem="Wba-nA-FYj" firstAttribute="centerX" secondItem="hYV-nu-QIp" secondAttribute="centerX" id="Ofg-Pb-s0m"/>
+                            <constraint firstItem="iIF-Ky-unr" firstAttribute="leading" relation="greaterThanOrEqual" secondItem="Wba-nA-FYj" secondAttribute="trailing" constant="8" id="RR5-n6-acI"/>
                             <constraint firstItem="mdE-u0-Ei5" firstAttribute="leading" secondItem="kky-0N-Cfd" secondAttribute="trailing" id="dfl-Lh-pZe"/>
                             <constraint firstItem="Wba-nA-FYj" firstAttribute="centerY" secondItem="hYV-nu-QIp" secondAttribute="centerY" id="fvH-o3-iHx"/>
                             <constraint firstAttribute="trailing" secondItem="iIF-Ky-unr" secondAttribute="trailing" constant="8" id="gaO-bl-clp"/>
                             <constraint firstItem="mdE-u0-Ei5" firstAttribute="centerY" secondItem="hYV-nu-QIp" secondAttribute="centerY" id="hpv-rt-wVQ"/>
-                            <constraint firstItem="iIF-Ky-unr" firstAttribute="leading" relation="greaterThanOrEqual" secondItem="Wba-nA-FYj" secondAttribute="trailing" constant="8" id="jZA-UA-upR"/>
                             <constraint firstItem="kky-0N-Cfd" firstAttribute="centerY" secondItem="hYV-nu-QIp" secondAttribute="centerY" id="nim-fw-Zt3"/>
-                            <constraint firstItem="Wba-nA-FYj" firstAttribute="centerX" secondItem="hYV-nu-QIp" secondAttribute="centerX" id="uYZ-mI-7KM"/>
+                            <constraint firstItem="Wba-nA-FYj" firstAttribute="leading" relation="greaterThanOrEqual" secondItem="mdE-u0-Ei5" secondAttribute="trailing" constant="8" id="sKj-TU-b0z"/>
+                            <constraint firstItem="Wba-nA-FYj" firstAttribute="width" secondItem="hYV-nu-QIp" secondAttribute="width" multiplier="0.7" priority="750" id="yyv-y0-Is1"/>
                         </constraints>
                         <userDefinedRuntimeAttributes>
                             <userDefinedRuntimeAttribute type="color" keyPath="backgroundColor">
