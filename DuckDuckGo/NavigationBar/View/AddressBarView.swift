@@ -20,6 +20,11 @@ import Cocoa
 
 class AddressBarView: NSView {
 
+    enum Size: CGFloat {
+        case shadow = 2.5
+        case stroke = 0.5
+    }
+
     private let shadowLayer = CALayer()
     private let strokeLayer = CALayer()
     private let backgroundLayer = CALayer()
@@ -73,15 +78,15 @@ class AddressBarView: NSView {
         CATransaction.setAnimationDuration(0)
         shadowLayer.frame = layer.bounds
         shadowLayer.cornerRadius = shadowLayer.frame.height / 2
-        strokeLayer.frame = NSRect(x: layer.bounds.origin.x + 3,
-                                   y: layer.bounds.origin.y + 3,
-                                   width: layer.bounds.size.width - 6,
-                                   height: layer.bounds.size.height - 6)
+        strokeLayer.frame = NSRect(x: layer.bounds.origin.x + Size.shadow.rawValue,
+                                   y: layer.bounds.origin.y + Size.shadow.rawValue,
+                                   width: layer.bounds.size.width - 2 * Size.shadow.rawValue,
+                                   height: layer.bounds.size.height - 2 * Size.shadow.rawValue)
         strokeLayer.cornerRadius = strokeLayer.frame.height / 2
-        backgroundLayer.frame = NSRect(x: layer.bounds.origin.x + 3.5,
-                                       y: layer.bounds.origin.y + 3.5,
-                                       width: layer.bounds.size.width - 7,
-                                       height: layer.bounds.size.height - 7)
+        backgroundLayer.frame = NSRect(x: layer.bounds.origin.x + Size.shadow.rawValue + Size.stroke.rawValue,
+                                       y: layer.bounds.origin.y + Size.shadow.rawValue + Size.stroke.rawValue,
+                                       width: layer.bounds.size.width - 2 * (Size.shadow.rawValue + Size.stroke.rawValue),
+                                       height: layer.bounds.size.height - 2 * (Size.shadow.rawValue + Size.stroke.rawValue))
         backgroundLayer.cornerRadius = backgroundLayer.frame.height / 2
         CATransaction.commit()
     }
