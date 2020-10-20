@@ -23,6 +23,7 @@ class AddressBarView: NSView {
     enum Size: CGFloat {
         case shadow = 2.5
         case stroke = 0.5
+        case backgroundRadius = 8
     }
 
     private let shadowLayer = CALayer()
@@ -77,17 +78,17 @@ class AddressBarView: NSView {
         CATransaction.begin()
         CATransaction.setAnimationDuration(0)
         shadowLayer.frame = layer.bounds
-        shadowLayer.cornerRadius = shadowLayer.frame.height / 2
+        shadowLayer.cornerRadius = Size.backgroundRadius.rawValue + Size.shadow.rawValue + Size.stroke.rawValue
         strokeLayer.frame = NSRect(x: layer.bounds.origin.x + Size.shadow.rawValue,
                                    y: layer.bounds.origin.y + Size.shadow.rawValue,
                                    width: layer.bounds.size.width - 2 * Size.shadow.rawValue,
                                    height: layer.bounds.size.height - 2 * Size.shadow.rawValue)
-        strokeLayer.cornerRadius = strokeLayer.frame.height / 2
+        strokeLayer.cornerRadius = Size.backgroundRadius.rawValue + Size.stroke.rawValue
         backgroundLayer.frame = NSRect(x: layer.bounds.origin.x + Size.shadow.rawValue + Size.stroke.rawValue,
                                        y: layer.bounds.origin.y + Size.shadow.rawValue + Size.stroke.rawValue,
                                        width: layer.bounds.size.width - 2 * (Size.shadow.rawValue + Size.stroke.rawValue),
                                        height: layer.bounds.size.height - 2 * (Size.shadow.rawValue + Size.stroke.rawValue))
-        backgroundLayer.cornerRadius = backgroundLayer.frame.height / 2
+        backgroundLayer.cornerRadius = Size.backgroundRadius.rawValue
         CATransaction.commit()
     }
     
