@@ -370,9 +370,9 @@ extension TabBarViewController: NSCollectionViewDelegate {
     func collectionView(_ collectionView: NSCollectionView,
                         pasteboardWriterForItemAt indexPath: IndexPath) -> NSPasteboardWriting? {
         if let url = tabCollectionViewModel.tabCollection.tabs[indexPath.item].url {
-            return url.absoluteString as NSString
+            return url as NSURL
         } else {
-            return "" as NSString
+            return URL.emptyPage as NSURL
         }
     }
 
