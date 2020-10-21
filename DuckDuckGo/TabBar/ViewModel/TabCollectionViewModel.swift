@@ -140,7 +140,7 @@ class TabCollectionViewModel {
     }
 
     func insertLastRemovedTab() {
-        let lastRemovedTabIndex = tabCollection.lastRemovedTab?.1
+        let lastRemovedTabIndex = tabCollection.lastRemovedTabCache?.index
         tabCollection.insertLastRemovedTab()
 
         if let lastRemovedTabIndex = lastRemovedTabIndex {
@@ -171,7 +171,7 @@ class TabCollectionViewModel {
     }
 
     private func bindLastRemovedTab() {
-        tabCollection.$lastRemovedTab.receive(on: DispatchQueue.main).sink { [weak self] _ in
+        tabCollection.$lastRemovedTabCache.receive(on: DispatchQueue.main).sink { [weak self] _ in
             self?.updateCanInsertLastRemovedTab()
         } .store(in: &cancelables)
     }
@@ -200,7 +200,7 @@ class TabCollectionViewModel {
     }
 
     private func updateCanInsertLastRemovedTab() {
-        canInsertLastRemovedTab = tabCollection.lastRemovedTab != nil
+        canInsertLastRemovedTab = tabCollection.lastRemovedTabCache != nil
     }
 
 }
