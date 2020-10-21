@@ -153,16 +153,22 @@ class AddressBarViewController: NSViewController {
         let isTextFieldEditorFirstResponder = view.window?.firstResponder === addressBarTextField.currentEditor()
         let isDuckDuckGoUrl = selectedTabViewModel.tab.url?.isDuckDuckGoSearch ?? false
 
+        // Grade button
         gradeButton.isHidden = isSearchingMode || isTextFieldFirstResponder || isDuckDuckGoUrl || isURLNil
 
-        actionButton.isHidden = false
+        // Action button
+        var actionButtonHidden = false
         if case .text(let text) = addressBarTextField.value {
             if text == "" {
-                actionButton.isHidden = true
+                actionButtonHidden = true
             }
+        }
+        if actionButton.isHidden != actionButtonHidden {
+            actionButton.isHidden = actionButtonHidden
         }
         actionButton.image = isSearchingMode && isTextFieldEditorFirstResponder ? Self.clearImage : Self.refreshImage
 
+        // Image button
         imageButton.image = selectedTabViewModel.favicon
         if case .searching(let withUrl) = mode {
             if withUrl {
