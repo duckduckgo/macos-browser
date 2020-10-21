@@ -149,10 +149,11 @@ class AddressBarViewController: NSViewController {
 
         let isSearchingMode = mode != .browsing
         let isURLNil = selectedTabViewModel.tab.url == nil
+        let isTextFieldFirstResponder = view.window?.firstResponder === addressBarTextField
         let isTextFieldEditorFirstResponder = view.window?.firstResponder === addressBarTextField.currentEditor()
         let isDuckDuckGoUrl = selectedTabViewModel.tab.url?.isDuckDuckGoSearch ?? false
 
-        gradeButton.isHidden = isSearchingMode || isTextFieldEditorFirstResponder || isDuckDuckGoUrl || isURLNil
+        gradeButton.isHidden = isSearchingMode || isTextFieldFirstResponder || isDuckDuckGoUrl || isURLNil
 
         actionButton.isHidden = false
         if case .text(let text) = addressBarTextField.value {
@@ -194,7 +195,9 @@ extension AddressBarViewController {
         if let textView = notification.object as? NSTextView, textView.superview?.superview === addressBarTextField {
             setView(firstResponder: true)
         } else {
-            self.mode = .browsing
+            if mode != .browsing {
+                self.mode = .browsing
+            }
             setView(firstResponder: false)
         }
 
