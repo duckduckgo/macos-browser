@@ -33,6 +33,10 @@ class Tab {
         self.init(faviconService: LocalFaviconService.shared)
     }
 
+    deinit {
+        webView.stopLoading()
+    }
+
     let webView: WebView
 
     @Published var url: URL? {
