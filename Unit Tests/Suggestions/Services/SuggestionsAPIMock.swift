@@ -29,4 +29,9 @@ class SuggestionsAPIMock: SuggestionsAPI {
         completion(suggestionsAPIResult, error)
     }
 
+    var stopFetchingSuggestionsCalled = false
+    func stopFetchingSuggestions() {
+        stopFetchingSuggestionsCalled = true
+    }
+
 }

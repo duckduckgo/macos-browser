@@ -78,14 +78,14 @@ class Tab {
     let faviconService: FaviconService
 
     private func fetchFavicon(_ faviconURL: URL?, for host: String?) {
+        favicon = nil
+
         guard let host = host else {
-            favicon = nil
             return
         }
 
         faviconService.fetchFavicon(faviconURL, for: host) { (image, error) in
             guard error == nil, let image = image else {
-                self.favicon = nil
                 return
             }
 

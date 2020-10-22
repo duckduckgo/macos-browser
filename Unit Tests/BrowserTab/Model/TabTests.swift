@@ -21,38 +21,6 @@ import XCTest
 
 class TabTests: XCTestCase {
 
-    // MARK: - TabActionDelegate
-
-    func testWhenGoForwardIsCalledThenDelegateIsNotified() throws {
-        let tab = Tab()
-        let tabActionDelegateMock = TabActionDelegateMock()
-        tab.actionDelegate = tabActionDelegateMock
-
-        tab.goForward()
-
-        XCTAssertTrue(tabActionDelegateMock.tabForwardActionCalled)
-    }
-
-    func testWhenGoBackIsCalledThenDelegateIsNotified() throws {
-        let tab = Tab()
-        let tabActionDelegateMock = TabActionDelegateMock()
-        tab.actionDelegate = tabActionDelegateMock
-
-        tab.goBack()
-
-        XCTAssertTrue(tabActionDelegateMock.tabBackActionCalled)
-    }
-
-    func testWhenReloadIsCalledThenDelegateIsNotified() throws {
-        let tab = Tab()
-        let tabActionDelegateMock = TabActionDelegateMock()
-        tab.actionDelegate = tabActionDelegateMock
-
-        tab.reload()
-
-        XCTAssertTrue(tabActionDelegateMock.tabReloadActionCalled)
-    }
-
     // MARK: - Equality
 
     func testWhenTabsAreIdenticalThenTheyAreEqual() {
