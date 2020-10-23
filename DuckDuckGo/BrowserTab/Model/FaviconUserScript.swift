@@ -48,24 +48,20 @@ extension FaviconUserScript {
 
     static let messageNames = ["faviconFound"]
     static let source = """
-
 (function() {
-
     function getFavicon() {
-        var favicons = findFavicons()
-        return favicons[favicons.length - 1];
+        return findFavicons()[0];
     };
 
     function findFavicons() {
-
-         var selectors = {
-            "link[rel~='icon']": 0,
-            "link[rel='apple-touch-icon']": 1,
-            "link[rel='apple-touch-icon-precomposed']": 2
-        };
-
+         var selectors = [
+            "link[rel~='icon']",
+            "link[rel='apple-touch-icon']",
+            "link[rel='apple-touch-icon-precomposed']"
+        ];
         var favicons = [];
-        for (var selector in selectors) {
+        while (selectors.length > 0) {
+            var selector = selectors.pop()
             var icons = document.head.querySelectorAll(selector);
             for (var i = 0; i < icons.length; i++) {
                 var href = icons[i].href;
@@ -74,22 +70,18 @@ extension FaviconUserScript {
                 if (href.indexOf("svg") >= 0 || (icons[i].type && icons[i].type.indexOf("svg") >= 0)) {
                     continue;
                 }
-
                 favicons.push(href)
             }
         }
         return favicons;
     };
-
     try {
         var favicon = getFavicon();
         webkit.messageHandlers.faviconFound.postMessage(favicon);
     } catch(error) {
         // webkit might not be defined
     }
-
 }) ();
-
 """
 
 }
