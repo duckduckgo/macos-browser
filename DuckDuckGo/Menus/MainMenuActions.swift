@@ -107,7 +107,7 @@ extension MainViewController {
             return
         }
 
-        selectedTabViewModel.tab.goHome()
+        selectedTabViewModel.tab.openHomepage()
     }
 
     @IBAction func reopenLastClosedTab(_ sender: Any?) {

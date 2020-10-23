@@ -97,7 +97,7 @@ class TabViewModel {
     }
 
     private func updateTitle() {
-        if tab.url == nil || tab.url == URL.emptyPage {
+        if tab.isHomepageLoaded {
             title = Title.home
             return
         }
@@ -110,7 +110,7 @@ class TabViewModel {
     }
 
     private func updateFavicon() {
-        if tab.url == nil || tab.url == URL.emptyPage {
+        if tab.isHomepageLoaded {
             favicon = Favicon.home
             return
         }

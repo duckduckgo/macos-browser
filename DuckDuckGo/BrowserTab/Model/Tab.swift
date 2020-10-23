@@ -48,6 +48,10 @@ class Tab {
     }
     @Published var title: String?
 
+    var isHomepageLoaded: Bool {
+        url == nil || url == URL.emptyPage
+    }
+
     func goForward() {
         webView.goForward()
     }
@@ -56,7 +60,7 @@ class Tab {
         webView.goBack()
     }
 
-    func goHome() {
+    func openHomepage() {
         url = nil
     }
 
