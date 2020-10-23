@@ -58,7 +58,7 @@ class TabViewModel {
 
     private func bindUrl() {
         tab.$url.receive(on: DispatchQueue.main).sink { [weak self] _ in
-            self?.updateCanReaload()
+            self?.updateCanReload()
             self?.updateAddressBarStrings()
         } .store(in: &cancelables)
     }
@@ -71,8 +71,8 @@ class TabViewModel {
         tab.$favicon.receive(on: DispatchQueue.main).sink { [weak self] _ in self?.updateFavicon() } .store(in: &cancelables)
     }
 
-    private func updateCanReaload() {
-        self.canReload = self.tab.url != nil
+    private func updateCanReload() {
+        canReload = tab.url != nil
     }
 
     private func updateAddressBarStrings() {
