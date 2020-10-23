@@ -17,7 +17,6 @@
 //
 
 import Cocoa
-import os.log
 
 class MouseOverView: NSView {
 
