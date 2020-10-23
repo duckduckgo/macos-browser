@@ -70,9 +70,7 @@ class MouseOverView: NSView {
     }
 
     private func removeAddTrackingArea() {
-        trackingAreas.forEach {
-            removeTrackingArea($0)
-        }
+        trackingAreas.forEach(removeTrackingArea)
 
         let trackingArea = NSTrackingArea(rect: frame,
                                           options: [.mouseEnteredAndExited,
