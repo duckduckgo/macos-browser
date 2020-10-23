@@ -90,9 +90,9 @@ class TabViewModel {
             passiveAddressBarString = ""
         } else {
             addressBarString = url.absoluteString
-                .dropPrefix(URL.Scheme.https.separated())
-                .dropPrefix(URL.Scheme.http.separated())
-            passiveAddressBarString = host.dropPrefix(URL.HostPrefix.www.separated())
+                .drop(prefix: URL.Scheme.https.separated())
+                .drop(prefix: URL.Scheme.http.separated())
+            passiveAddressBarString = host.drop(prefix: URL.HostPrefix.www.separated())
         }
     }
 

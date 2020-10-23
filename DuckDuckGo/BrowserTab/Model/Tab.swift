@@ -99,7 +99,7 @@ class Tab {
 
     private func setupUserScripts() {
         faviconScript.delegate = self
-        webView.configuration.userContentController.addUserScript(userScript: faviconScript)
+        webView.configuration.userContentController.add(userScript: faviconScript)
     }
 
 }

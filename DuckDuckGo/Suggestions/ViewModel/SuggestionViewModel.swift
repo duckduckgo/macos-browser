@@ -84,7 +84,7 @@ fileprivate extension URL {
 
     var absoluteStringWithoutSchemeAndWWW: String {
         if let scheme = scheme {
-            return absoluteString.dropPrefix(scheme + "://").dropPrefix("www.")
+            return absoluteString.drop(prefix: scheme + "://").drop(prefix: "www.")
         } else {
             return absoluteString
         }

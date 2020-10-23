@@ -85,13 +85,13 @@ extension String {
 
     // MARK: - Prefix
 
-    func dropPrefix(_ prefix: String) -> String {
+    func drop(prefix: String) -> String {
         return hasPrefix(prefix) ? String(dropFirst(prefix.count)) : self
     }
 
     // MARK: - Suffix
 
-    func dropSuffix(_ suffix: String) -> String {
+    func drop(suffix: String) -> String {
         return hasSuffix(suffix) ? String(dropLast(suffix.count)) : self
     }
 

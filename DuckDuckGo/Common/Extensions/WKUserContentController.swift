@@ -21,7 +21,7 @@ import WebKit
 
 extension WKUserContentController {
 
-    func addUserScript(userScript: UserScript) {
+    func add(userScript: UserScript) {
         addUserScript(userScript)
         for messageName in userScript.messageNames {
             add(userScript, name: messageName)

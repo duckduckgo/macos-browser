@@ -30,7 +30,7 @@ class WebViewStateObserver: NSObject {
         self.tabViewModel = tabViewModel
         super.init()
 
-        observeWebview(webView)
+        observe(webView: webView)
     }
 
     deinit {
@@ -41,7 +41,7 @@ class WebViewStateObserver: NSObject {
         webView?.removeObserver(self, forKeyPath: #keyPath(WKWebView.title))
     }
 
-    private func observeWebview(_ webView: WKWebView) {
+    private func observe(webView: WKWebView) {
         webView.addObserver(self, forKeyPath: #keyPath(WKWebView.url), options: .new, context: nil)
         webView.addObserver(self, forKeyPath: #keyPath(WKWebView.canGoBack), options: .new, context: nil)
         webView.addObserver(self, forKeyPath: #keyPath(WKWebView.canGoForward), options: .new, context: nil)

@@ -255,7 +255,7 @@ class AddressBarTextField: NSTextField {
 
     private var stringValueWithoutSuffix: String {
         if let suffix = suffix {
-            return stringValue.dropSuffix(suffix.string)
+            return stringValue.drop(suffix: suffix.string)
         } else {
             return stringValue
         }
