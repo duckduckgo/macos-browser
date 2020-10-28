@@ -21,45 +21,60 @@ import Cocoa
 class SuggestionViewModel {
 
     let suggestion: Suggestion
+    let userStringValue: String
 
-    init(suggestion: Suggestion) {
+    init(suggestion: Suggestion, userStringValue: String) {
         if case .phrase(phrase: let phrase) = suggestion, let url = phrase.url, url.isValid {
-            self.suggestion = .website(url: url, title: nil)
+            self.suggestion = .website(url: url)
         } else {
             self.suggestion = suggestion
         }
+        self.userStringValue = userStringValue
     }
 
-    var attributedString: NSAttributedString {
-        let attributes = [NSAttributedString.Key.foregroundColor: NSColor.labelColor]
+    // MARK: - Attributed Strings
 
+    static let tableRowViewStandardAttributes = [NSAttributedString.Key.font: NSFont.systemFont(ofSize: 13, weight: .regular)]
+    static let tableRowViewBoldAttributes = [NSAttributedString.Key.font: NSFont.systemFont(ofSize: 13, weight: .bold)]
+
+    var tableCellViewAttributedString: NSAttributedString {
+        var firstPart = ""
+        var boldPart = string
+        if string.hasPrefix(userStringValue) {
+            firstPart = String(string.prefix(userStringValue.count))
+            boldPart = String(string.dropFirst(userStringValue.count))
+        }
+
+        let attributedString = NSMutableAttributedString(string: firstPart, attributes: Self.tableRowViewStandardAttributes)
+        let boldAttributedString = NSAttributedString(string: boldPart, attributes: Self.tableRowViewBoldAttributes)
+        attributedString.append(boldAttributedString)
+        return attributedString
+    }
+
+    var string: String {
         switch suggestion {
         case .phrase(phrase: let phrase):
-            return NSMutableAttributedString(string: phrase, attributes: attributes)
-        case .website(url: let url, title: let title):
-            if let title = title, title.count > 0 {
-                return NSAttributedString(string: "\(title) - \(url.absoluteStringWithoutScheme)", attributes: attributes)
-            } else {
-                return NSAttributedString(string: "\(url.absoluteStringWithoutScheme)", attributes: attributes)
-            }
+            return phrase
+        case .website(url: let url):
+            return url.absoluteStringWithoutSchemeAndWWW
         case .unknown(value: let value):
-            return NSAttributedString(string: value, attributes: attributes)
+            return value
         }
     }
 
-    private enum SuggestionIconNames: String {
-        case search = "NSTouchBarSearchTemplate"
-        case website = "NSListViewTemplate"
-    }
+    // MARK: - Icon
+
+    static let webImage = NSImage(named: "Web")
+    static let searchImage = NSImage(named: "Search")
 
     var icon: NSImage? {
         switch suggestion {
         case .phrase(phrase: _):
-            return NSImage(named: SuggestionIconNames.search.rawValue)
-        case .website(url: _, title: _):
-            return NSImage(named: SuggestionIconNames.website.rawValue)
+            return Self.searchImage
+        case .website(url: _):
+            return Self.webImage
         case .unknown(value: _):
-            return NSImage(named: SuggestionIconNames.website.rawValue)
+            return Self.webImage
         }
     }
 
@@ -67,9 +82,9 @@ class SuggestionViewModel {
 
 fileprivate extension URL {
 
-    var absoluteStringWithoutScheme: String {
+    var absoluteStringWithoutSchemeAndWWW: String {
         if let scheme = scheme {
-            return absoluteString.dropPrefix(scheme + "://")
+            return absoluteString.drop(prefix: scheme + "://").drop(prefix: "www.")
         } else {
             return absoluteString
         }

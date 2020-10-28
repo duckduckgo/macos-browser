@@ -33,6 +33,8 @@ class TabCollection {
     @Published private(set) var tabs: [Tab] = []
     weak var delegate: TabCollectionDelegate?
 
+    @Published private(set) var lastRemovedTabCache: (url: URL?, index: Int)?
+
     init() {
         listenUrlEvents()
     }
@@ -58,7 +60,9 @@ class TabCollection {
             return false
         }
 
+        saveLastRemovedTab(at: index)
         tabs.remove(at: index)
+
         delegate?.tabCollection(self, didRemoveTabAt: index)
 
         return true
@@ -81,6 +85,28 @@ class TabCollection {
         tabs.insert(tabs.remove(at: index), at: newIndex)
         self.tabs = tabs
         delegate?.tabCollection(self, didMoveTabAt: index, to: newIndex)
+    }
+
+    func saveLastRemovedTab(at index: Int) {
+        guard index >= 0, index < tabs.count else {
+            os_log("TabCollection: Index out of bounds", log: OSLog.Category.general, type: .error)
+            return
+        }
+
+        let tab = tabs[index]
+        lastRemovedTabCache = (tab.url, index)
+    }
+
+    func insertLastRemovedTab() {
+        guard let lastRemovedTabCache = lastRemovedTabCache else {
+            os_log("TabCollection: No tab removed yet", log: OSLog.Category.general, type: .error)
+            return
+        }
+
+        let tab = Tab()
+        tab.url = lastRemovedTabCache.url
+        insert(tab: tab, at: min(lastRemovedTabCache.index, tabs.count))
+        self.lastRemovedTabCache = nil
     }
 
 }

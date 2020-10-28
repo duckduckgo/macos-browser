@@ -29,8 +29,11 @@ class AppDelegate: NSObject, NSApplicationDelegate {
         // Insert code here to tear down your application
     }
 
-    func applicationShouldTerminateAfterLastWindowClosed(_ sender: NSApplication) -> Bool {
-        true
+    func applicationDockMenu(_ sender: NSApplication) -> NSMenu? {
+        let applicationDockMenu = ApplicationDockMenu()
+        applicationDockMenu.dataSource = WindowControllersManager.shared
+        applicationDockMenu.applicationDockMenuDelegate = WindowControllersManager.shared
+        return applicationDockMenu
     }
-    
+
 }

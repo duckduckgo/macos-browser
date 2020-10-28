@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<document type="com.apple.InterfaceBuilder3.Cocoa.Storyboard.XIB" version="3.0" toolsVersion="17154" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none" useAutolayout="YES" initialViewController="o2v-eH-jTI">
+<document type="com.apple.InterfaceBuilder3.Cocoa.Storyboard.XIB" version="3.0" toolsVersion="17156" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none" useAutolayout="YES" initialViewController="o2v-eH-jTI">
     <dependencies>
         <deployment identifier="macosx"/>
-        <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="17154"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="17156"/>
         <capability name="Named colors" minToolsVersion="9.0"/>
         <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
     </dependencies>
@@ -12,23 +12,11 @@
             <objects>
                 <viewController id="o2v-eH-jTI" customClass="NavigationBarViewController" customModule="DuckDuckGo_Privacy_Browser" customModuleProvider="target" sceneMemberID="viewController">
                     <view key="view" id="hYV-nu-QIp" customClass="ColorView" customModule="DuckDuckGo_Privacy_Browser" customModuleProvider="target">
-                        <rect key="frame" x="0.0" y="0.0" width="845" height="40"/>
+                        <rect key="frame" x="0.0" y="0.0" width="847" height="56"/>
                         <autoresizingMask key="autoresizingMask"/>
                         <subviews>
-                            <searchField wantsLayer="YES" verticalHuggingPriority="750" textCompletion="NO" translatesAutoresizingMaskIntoConstraints="NO" id="8tV-Os-eVV" customClass="AutocompleteSearchField" customModule="DuckDuckGo_Privacy_Browser" customModuleProvider="target">
-                                <rect key="frame" x="173" y="9" width="500" height="22"/>
-                                <constraints>
-                                    <constraint firstAttribute="width" priority="250" constant="500" id="XQh-4I-UIR"/>
-                                    <constraint firstAttribute="height" constant="22" id="kJJ-80-EcF"/>
-                                </constraints>
-                                <searchFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" selectable="YES" editable="YES" borderStyle="bezel" placeholderString="Search or enter address" usesSingleLineMode="YES" bezelStyle="round" id="qIh-Ib-Xej">
-                                    <font key="font" metaFont="system"/>
-                                    <color key="textColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
-                                    <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
-                                </searchFieldCell>
-                            </searchField>
                             <button translatesAutoresizingMaskIntoConstraints="NO" id="kky-0N-Cfd" customClass="MouseOverButton" customModule="DuckDuckGo_Privacy_Browser" customModuleProvider="target">
-                                <rect key="frame" x="8" y="8" width="32" height="24"/>
+                                <rect key="frame" x="8" y="16" width="32" height="24"/>
                                 <constraints>
                                     <constraint firstAttribute="height" constant="24" id="0zh-Jn-l2h"/>
                                     <constraint firstAttribute="width" constant="32" id="8sl-Tr-gSd"/>
@@ -37,6 +25,7 @@
                                     <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
                                     <font key="font" metaFont="system"/>
                                 </buttonCell>
+                                <color key="contentTintColor" name="ButtonColor"/>
                                 <userDefinedRuntimeAttributes>
                                     <userDefinedRuntimeAttribute type="color" keyPath="mouseOverColor">
                                         <color key="value" name="ButtonMouseOverColor"/>
@@ -53,7 +42,7 @@
                                 </connections>
                             </button>
                             <button translatesAutoresizingMaskIntoConstraints="NO" id="mdE-u0-Ei5" customClass="MouseOverButton" customModule="DuckDuckGo_Privacy_Browser" customModuleProvider="target">
-                                <rect key="frame" x="40" y="8" width="32" height="24"/>
+                                <rect key="frame" x="40" y="16" width="32" height="24"/>
                                 <constraints>
                                     <constraint firstAttribute="height" constant="24" id="VXS-B2-jFA"/>
                                     <constraint firstAttribute="width" constant="32" id="jYM-So-c8l"/>
@@ -62,6 +51,7 @@
                                     <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
                                     <font key="font" metaFont="system"/>
                                 </buttonCell>
+                                <color key="contentTintColor" name="ButtonColor"/>
                                 <userDefinedRuntimeAttributes>
                                     <userDefinedRuntimeAttribute type="color" keyPath="mouseOverColor">
                                         <color key="value" name="ButtonMouseOverColor"/>
@@ -77,33 +67,8 @@
                                     <action selector="goForwardAction:" target="o2v-eH-jTI" id="aht-fm-Fhd"/>
                                 </connections>
                             </button>
-                            <button translatesAutoresizingMaskIntoConstraints="NO" id="WKw-DB-V3R" customClass="MouseOverButton" customModule="DuckDuckGo_Privacy_Browser" customModuleProvider="target">
-                                <rect key="frame" x="681" y="8" width="32" height="24"/>
-                                <constraints>
-                                    <constraint firstAttribute="width" constant="32" id="0n0-Jg-xha"/>
-                                    <constraint firstAttribute="height" constant="24" id="5aC-wi-5a8"/>
-                                </constraints>
-                                <buttonCell key="cell" type="square" bezelStyle="shadowlessSquare" image="Refresh" imagePosition="only" alignment="center" imageScaling="proportionallyDown" inset="2" id="1tl-29-GQO">
-                                    <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
-                                    <font key="font" metaFont="system"/>
-                                </buttonCell>
-                                <userDefinedRuntimeAttributes>
-                                    <userDefinedRuntimeAttribute type="color" keyPath="mouseOverColor">
-                                        <color key="value" name="ButtonMouseOverColor"/>
-                                    </userDefinedRuntimeAttribute>
-                                    <userDefinedRuntimeAttribute type="color" keyPath="mouseDownColor">
-                                        <color key="value" name="ButtonMouseDownColor"/>
-                                    </userDefinedRuntimeAttribute>
-                                    <userDefinedRuntimeAttribute type="number" keyPath="cornerRadius">
-                                        <real key="value" value="4"/>
-                                    </userDefinedRuntimeAttribute>
-                                </userDefinedRuntimeAttributes>
-                                <connections>
-                                    <action selector="reloadAction:" target="o2v-eH-jTI" id="dGJ-c6-ARu"/>
-                                </connections>
-                            </button>
                             <button translatesAutoresizingMaskIntoConstraints="NO" id="iIF-Ky-unr" customClass="MouseOverButton" customModule="DuckDuckGo_Privacy_Browser" customModuleProvider="target">
-                                <rect key="frame" x="805" y="8" width="32" height="24"/>
+                                <rect key="frame" x="807" y="16" width="32" height="24"/>
                                 <constraints>
                                     <constraint firstAttribute="width" constant="32" id="2ry-8Q-yfk"/>
                                     <constraint firstAttribute="height" constant="24" id="s7E-4e-eTj"/>
@@ -112,6 +77,7 @@
                                     <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
                                     <font key="font" metaFont="system"/>
                                 </buttonCell>
+                                <color key="contentTintColor" name="ButtonColor"/>
                                 <userDefinedRuntimeAttributes>
                                     <userDefinedRuntimeAttribute type="color" keyPath="mouseOverColor">
                                         <color key="value" name="ButtonMouseOverColor"/>
@@ -124,25 +90,31 @@
                                     </userDefinedRuntimeAttribute>
                                 </userDefinedRuntimeAttributes>
                                 <connections>
-                                    <action selector="settingsButtonAction:" target="o2v-eH-jTI" id="Qb4-p7-ZSD"/>
+                                    <action selector="optionsButtonAction:" target="o2v-eH-jTI" id="WEA-2O-3h5"/>
                                 </connections>
                             </button>
+                            <containerView translatesAutoresizingMaskIntoConstraints="NO" id="Wba-nA-FYj">
+                                <rect key="frame" x="127" y="11" width="593" height="34"/>
+                                <constraints>
+                                    <constraint firstAttribute="height" constant="34" id="fDM-4Y-Nvs"/>
+                                </constraints>
+                                <connections>
+                                    <segue destination="H4f-bE-T92" kind="embed" destinationCreationSelector="createAddressBarViewController:" id="5BM-Q3-tYH"/>
+                                </connections>
+                            </containerView>
                         </subviews>
                         <constraints>
                             <constraint firstItem="kky-0N-Cfd" firstAttribute="leading" secondItem="hYV-nu-QIp" secondAttribute="leading" constant="8" id="5xQ-lQ-hZc"/>
                             <constraint firstItem="iIF-Ky-unr" firstAttribute="centerY" secondItem="hYV-nu-QIp" secondAttribute="centerY" id="6EH-Ax-6p8"/>
-                            <constraint firstItem="WKw-DB-V3R" firstAttribute="centerY" secondItem="hYV-nu-QIp" secondAttribute="centerY" id="8Zc-0x-thk"/>
-                            <constraint firstItem="8tV-Os-eVV" firstAttribute="leading" relation="greaterThanOrEqual" secondItem="hYV-nu-QIp" secondAttribute="leading" constant="20" id="Arg-gk-pw1"/>
-                            <constraint firstAttribute="trailing" relation="greaterThanOrEqual" secondItem="8tV-Os-eVV" secondAttribute="trailing" constant="20" id="EpU-Ow-rPx"/>
-                            <constraint firstItem="WKw-DB-V3R" firstAttribute="leading" secondItem="8tV-Os-eVV" secondAttribute="trailing" constant="8" symbolic="YES" id="L9h-rr-Z0k"/>
-                            <constraint firstAttribute="trailing" relation="greaterThanOrEqual" secondItem="WKw-DB-V3R" secondAttribute="trailing" constant="8" id="Ypj-Qr-1xn"/>
-                            <constraint firstItem="8tV-Os-eVV" firstAttribute="centerY" secondItem="hYV-nu-QIp" secondAttribute="centerY" id="a6I-nY-qiq"/>
+                            <constraint firstItem="Wba-nA-FYj" firstAttribute="centerX" secondItem="hYV-nu-QIp" secondAttribute="centerX" id="Ofg-Pb-s0m"/>
+                            <constraint firstItem="iIF-Ky-unr" firstAttribute="leading" relation="greaterThanOrEqual" secondItem="Wba-nA-FYj" secondAttribute="trailing" constant="8" id="RR5-n6-acI"/>
                             <constraint firstItem="mdE-u0-Ei5" firstAttribute="leading" secondItem="kky-0N-Cfd" secondAttribute="trailing" id="dfl-Lh-pZe"/>
-                            <constraint firstItem="8tV-Os-eVV" firstAttribute="leading" relation="greaterThanOrEqual" secondItem="mdE-u0-Ei5" secondAttribute="trailing" constant="8" id="g9W-Y9-GrJ"/>
+                            <constraint firstItem="Wba-nA-FYj" firstAttribute="centerY" secondItem="hYV-nu-QIp" secondAttribute="centerY" id="fvH-o3-iHx"/>
                             <constraint firstAttribute="trailing" secondItem="iIF-Ky-unr" secondAttribute="trailing" constant="8" id="gaO-bl-clp"/>
                             <constraint firstItem="mdE-u0-Ei5" firstAttribute="centerY" secondItem="hYV-nu-QIp" secondAttribute="centerY" id="hpv-rt-wVQ"/>
                             <constraint firstItem="kky-0N-Cfd" firstAttribute="centerY" secondItem="hYV-nu-QIp" secondAttribute="centerY" id="nim-fw-Zt3"/>
-                            <constraint firstItem="8tV-Os-eVV" firstAttribute="centerX" secondItem="hYV-nu-QIp" secondAttribute="centerX" id="nqx-BQ-EBI"/>
+                            <constraint firstItem="Wba-nA-FYj" firstAttribute="leading" relation="greaterThanOrEqual" secondItem="mdE-u0-Ei5" secondAttribute="trailing" constant="8" id="sKj-TU-b0z"/>
+                            <constraint firstItem="Wba-nA-FYj" firstAttribute="width" secondItem="hYV-nu-QIp" secondAttribute="width" multiplier="0.7" priority="750" id="yyv-y0-Is1"/>
                         </constraints>
                         <userDefinedRuntimeAttributes>
                             <userDefinedRuntimeAttribute type="color" keyPath="backgroundColor">
@@ -151,23 +123,116 @@
                         </userDefinedRuntimeAttributes>
                     </view>
                     <connections>
-                        <outlet property="autocompleteSearchField" destination="8tV-Os-eVV" id="cJ8-YT-JrW"/>
                         <outlet property="goBackButton" destination="kky-0N-Cfd" id="RA9-yE-URS"/>
                         <outlet property="goForwardButton" destination="mdE-u0-Ei5" id="7wT-nX-Avr"/>
-                        <outlet property="reloadButton" destination="WKw-DB-V3R" id="zOP-zS-2EN"/>
-                        <outlet property="settingsButton" destination="iIF-Ky-unr" id="vvZ-mm-idv"/>
+                        <outlet property="optionsButton" destination="iIF-Ky-unr" id="vvZ-mm-idv"/>
                     </connections>
                 </viewController>
                 <customObject id="wkT-Td-n7D" userLabel="First Responder" customClass="NSResponder" sceneMemberID="firstResponder"/>
             </objects>
             <point key="canvasLocation" x="75.5" y="1892"/>
         </scene>
+        <!--Address Bar View Controller-->
+        <scene sceneID="gzs-lg-gqU">
+            <objects>
+                <viewController id="H4f-bE-T92" customClass="AddressBarViewController" customModule="DuckDuckGo_Privacy_Browser" customModuleProvider="target" sceneMemberID="viewController">
+                    <view key="view" wantsLayer="YES" id="wj6-L2-5rJ" customClass="AddressBarView" customModule="DuckDuckGo_Privacy_Browser" customModuleProvider="target">
+                        <rect key="frame" x="0.0" y="0.0" width="600" height="34"/>
+                        <autoresizingMask key="autoresizingMask"/>
+                        <subviews>
+                            <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="le0-Hn-ZAC">
+                                <rect key="frame" x="223" y="2" width="154" height="30"/>
+                                <constraints>
+                                    <constraint firstAttribute="height" constant="30" id="BFW-gW-Uru"/>
+                                </constraints>
+                                <textFieldCell key="cell" lineBreakMode="truncatingTail" refusesFirstResponder="YES" alignment="center" placeholderString="Search or enter address" usesSingleLineMode="YES" id="rpt-TE-48N" customClass="VerticallyCenteredTextFieldCell" customModule="DuckDuckGo_Privacy_Browser" customModuleProvider="target">
+                                    <font key="font" metaFont="system"/>
+                                    <color key="textColor" name="labelColor" catalog="System" colorSpace="catalog"/>
+                                    <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
+                                </textFieldCell>
+                            </textField>
+                            <textField focusRingType="none" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="zaX-wZ-E3D" customClass="AddressBarTextField" customModule="DuckDuckGo_Privacy_Browser" customModuleProvider="target">
+                                <rect key="frame" x="29" y="2" width="547" height="30"/>
+                                <constraints>
+                                    <constraint firstAttribute="height" constant="30" id="SFO-5X-1Hf"/>
+                                </constraints>
+                                <textFieldCell key="cell" lineBreakMode="truncatingTail" selectable="YES" editable="YES" sendsActionOnEndEditing="YES" focusRingType="none" tag="5" placeholderString="Search or enter address" usesSingleLineMode="YES" id="1ah-Qg-8lr" customClass="VerticallyCenteredTextFieldCell" customModule="DuckDuckGo_Privacy_Browser" customModuleProvider="target">
+                                    <font key="font" metaFont="system"/>
+                                    <color key="textColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
+                                    <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
+                                </textFieldCell>
+                            </textField>
+                            <button translatesAutoresizingMaskIntoConstraints="NO" id="WKw-DB-V3R">
+                                <rect key="frame" x="568" y="5" width="32" height="24"/>
+                                <constraints>
+                                    <constraint firstAttribute="width" constant="32" id="0n0-Jg-xha"/>
+                                    <constraint firstAttribute="height" constant="24" id="5aC-wi-5a8"/>
+                                </constraints>
+                                <buttonCell key="cell" type="square" bezelStyle="shadowlessSquare" image="Refresh" imagePosition="only" alignment="center" imageScaling="proportionallyDown" inset="2" id="1tl-29-GQO">
+                                    <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
+                                    <font key="font" metaFont="system"/>
+                                </buttonCell>
+                                <connections>
+                                    <action selector="actionButtonAction:" target="H4f-bE-T92" id="6r3-rb-Z3r"/>
+                                </connections>
+                            </button>
+                            <button translatesAutoresizingMaskIntoConstraints="NO" id="XMM-Vd-9H5">
+                                <rect key="frame" x="9" y="9" width="16" height="16"/>
+                                <constraints>
+                                    <constraint firstAttribute="height" constant="16" id="Mx4-BM-s2S"/>
+                                    <constraint firstAttribute="width" constant="16" id="Q3o-tA-aEO"/>
+                                </constraints>
+                                <buttonCell key="cell" type="square" bezelStyle="shadowlessSquare" image="HomeFavicon" imagePosition="only" alignment="center" imageScaling="proportionallyDown" inset="2" id="TU5-Hg-l4v">
+                                    <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
+                                    <font key="font" metaFont="system"/>
+                                </buttonCell>
+                            </button>
+                            <button hidden="YES" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="Wmw-FG-ZMU">
+                                <rect key="frame" x="6" y="6" width="22" height="22"/>
+                                <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+                                <buttonCell key="cell" type="square" bezelStyle="shadowlessSquare" image="Grade" imagePosition="only" alignment="center" imageScaling="proportionallyUpOrDown" inset="2" id="U3T-b0-hqd">
+                                    <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
+                                    <font key="font" metaFont="system"/>
+                                </buttonCell>
+                            </button>
+                        </subviews>
+                        <constraints>
+                            <constraint firstItem="WKw-DB-V3R" firstAttribute="leading" relation="greaterThanOrEqual" secondItem="le0-Hn-ZAC" secondAttribute="trailing" priority="750" constant="8" id="4yS-gj-rnF"/>
+                            <constraint firstItem="le0-Hn-ZAC" firstAttribute="centerX" secondItem="wj6-L2-5rJ" secondAttribute="centerX" id="GIk-xf-3Bn"/>
+                            <constraint firstItem="zaX-wZ-E3D" firstAttribute="centerY" secondItem="wj6-L2-5rJ" secondAttribute="centerY" id="M2U-b3-Z0t"/>
+                            <constraint firstItem="zaX-wZ-E3D" firstAttribute="leading" secondItem="XMM-Vd-9H5" secondAttribute="trailing" constant="6" id="Mjv-ru-efe"/>
+                            <constraint firstItem="XMM-Vd-9H5" firstAttribute="centerY" secondItem="wj6-L2-5rJ" secondAttribute="centerY" id="RmK-Rm-8hq"/>
+                            <constraint firstAttribute="trailing" secondItem="zaX-wZ-E3D" secondAttribute="trailing" constant="26" id="YQW-k5-lHh"/>
+                            <constraint firstItem="XMM-Vd-9H5" firstAttribute="leading" secondItem="wj6-L2-5rJ" secondAttribute="leading" constant="9" id="a8y-2W-3ct"/>
+                            <constraint firstAttribute="trailing" secondItem="WKw-DB-V3R" secondAttribute="trailing" id="hV9-Px-xUw"/>
+                            <constraint firstItem="WKw-DB-V3R" firstAttribute="centerY" secondItem="wj6-L2-5rJ" secondAttribute="centerY" id="vK7-lN-qIE"/>
+                            <constraint firstItem="le0-Hn-ZAC" firstAttribute="centerY" secondItem="wj6-L2-5rJ" secondAttribute="centerY" id="wEn-eS-Lat"/>
+                        </constraints>
+                    </view>
+                    <connections>
+                        <outlet property="actionButton" destination="WKw-DB-V3R" id="S6s-xZ-VTi"/>
+                        <outlet property="addressBarTextField" destination="zaX-wZ-E3D" id="pfO-d4-i46"/>
+                        <outlet property="gradeButton" destination="Wmw-FG-ZMU" id="J8F-44-HJL"/>
+                        <outlet property="imageButton" destination="XMM-Vd-9H5" id="gBC-5k-4hV"/>
+                        <outlet property="passiveTextField" destination="le0-Hn-ZAC" id="npL-R1-gmH"/>
+                        <outlet property="view" destination="wj6-L2-5rJ" id="bsr-e7-gS7"/>
+                    </connections>
+                </viewController>
+                <customObject id="EdY-IL-QwL" userLabel="First Responder" customClass="NSResponder" sceneMemberID="firstResponder"/>
+            </objects>
+            <point key="canvasLocation" x="75" y="2064"/>
+        </scene>
     </scenes>
     <resources>
         <image name="Back" width="7" height="13"/>
         <image name="Forward" width="7" height="13"/>
+        <image name="Grade" width="22" height="22"/>
+        <image name="HomeFavicon" width="16" height="16"/>
         <image name="Refresh" width="12" height="15"/>
         <image name="Settings" width="12" height="3"/>
+        <namedColor name="ButtonColor">
+            <color red="0.28600001335144043" green="0.28600001335144043" blue="0.28600001335144043" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+        </namedColor>
         <namedColor name="ButtonMouseDownColor">
             <color red="0.0" green="0.0" blue="0.0" alpha="0.20000000298023224" colorSpace="custom" customColorSpace="sRGB"/>
         </namedColor>

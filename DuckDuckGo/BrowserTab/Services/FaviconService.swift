@@ -20,41 +20,68 @@ import Cocoa
 
 protocol FaviconService {
 
-    func fetchFavicon(for host: String, completion: @escaping (NSImage?, Error?) -> Void)
+    func fetchFavicon(_ faviconUrl: URL?, for host: String, completion: @escaping (NSImage?, Error?) -> Void)
+    func getCachedFavicon(for host: String) -> NSImage?
 
 }
 
 class LocalFaviconService: FaviconService {
+
+    static let shared = LocalFaviconService()
 
     private enum FaviconName: String {
         case favicon = "favicon.ico"
     }
 
     private var cache = [String: NSImage]()
+    private let queue = DispatchQueue(label: "LocalFaviconService queue", attributes: .concurrent)
 
     enum LocalFaviconServiceError: Error {
         case urlConstructionFailed
         case imageInitFailed
     }
 
-    func fetchFavicon(for host: String, completion: @escaping (NSImage?, Error?) -> Void) {
-        if let cachedImage = cache[host] {
-            completion(cachedImage, nil)
-            return
+    func fetchFavicon(_ faviconUrl: URL?, for host: String, completion: @escaping (NSImage?, Error?) -> Void) {
+
+        func mainQueueCompletion(_ favicon: NSImage?, _ error: Error?) {
+            DispatchQueue.main.async {
+                completion(favicon, error)
+            }
         }
 
-        guard let url = URL(string: "\(URL.Scheme.https.separated())\(host)/\(FaviconName.favicon.rawValue)") else {
-            completion(nil, LocalFaviconServiceError.urlConstructionFailed)
-            return
-        }
+        queue.async {
+            if let cachedFavicon = self.getCachedFavicon(for: host) {
+                mainQueueCompletion(cachedFavicon, nil)
+                return
+            }
 
-        guard let image = NSImage(contentsOf: url), image.isValid else {
-            completion(nil, LocalFaviconServiceError.imageInitFailed)
-            return
-        }
+            guard let url = faviconUrl ?? URL(string: "\(URL.Scheme.https.separated())\(host)/\(FaviconName.favicon.rawValue)") else {
+                mainQueueCompletion(nil, LocalFaviconServiceError.urlConstructionFailed)
+                return
+            }
 
-        self.cache[host] = image
-        completion(image, nil)
+            guard let image = NSImage(contentsOf: url), image.isValid else {
+                if let newHost = host.dropSubdomain(), faviconUrl == nil {
+                    self.fetchFavicon(nil, for: newHost, completion: completion)
+                } else {
+                    mainQueueCompletion(nil, LocalFaviconServiceError.imageInitFailed)
+                }
+                return
+            }
+
+            self.store(favicon: image, for: host)
+            mainQueueCompletion(image, nil)
+        }
+    }
+
+    func store(favicon: NSImage, for host: String) {
+        queue.async(flags: .barrier) {
+            self.cache[host] = favicon
+        }
+    }
+
+    func getCachedFavicon(for host: String) -> NSImage? {
+        return cache[host]
     }
 
 }

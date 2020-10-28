@@ -28,7 +28,6 @@ class BrowserTabViewController: NSViewController {
     var tabViewModel: TabViewModel?
 
     private let tabCollectionViewModel: TabCollectionViewModel
-    private let historyViewModel: HistoryViewModel
     private var urlCancelable: AnyCancellable?
     private var selectedTabViewModelCancelable: AnyCancellable?
 
@@ -36,9 +35,8 @@ class BrowserTabViewController: NSViewController {
         fatalError("BrowserTabViewController: Bad initializer")
     }
 
-    init?(coder: NSCoder, tabCollectionViewModel: TabCollectionViewModel, historyViewModel: HistoryViewModel) {
+    init?(coder: NSCoder, tabCollectionViewModel: TabCollectionViewModel) {
         self.tabCollectionViewModel = tabCollectionViewModel
-        self.historyViewModel = historyViewModel
 
         super.init(coder: coder)
     }
@@ -58,7 +56,7 @@ class BrowserTabViewController: NSViewController {
     private func changeWebView() {
 
         func displayWebView(of tabViewModel: TabViewModel) {
-            let newWebView = tabViewModel.webView
+            let newWebView = tabViewModel.tab.webView
             newWebView.navigationDelegate = self
             newWebView.uiDelegate = self
 
@@ -76,6 +74,7 @@ class BrowserTabViewController: NSViewController {
         }
         webView = nil
         guard let tabViewModel = tabCollectionViewModel.selectedTabViewModel else {
+            self.tabViewModel = nil
             return
         }
         self.tabViewModel = tabViewModel
@@ -103,17 +102,6 @@ class BrowserTabViewController: NSViewController {
         } else {
             let request = URLRequest(url: URL.emptyPage)
             webView.load(request)
-        }
-    }
-
-    private func saveWebsiteVisit() {
-        guard let webView = webView else {
-            os_log("BrowserTabViewController: Web view is nil", log: OSLog.Category.general, type: .error)
-            return
-        }
-        
-        if let url = webView.url {
-            historyViewModel.history.saveWebsiteVisit(url: url, title: webView.title, date: NSDate.now as Date)
         }
     }
 
@@ -145,9 +133,30 @@ class BrowserTabViewController: NSViewController {
         webView.isHidden = shown
     }
 
+    private func openNewTab(with url: URL?) {
+        let tab = Tab()
+        tab.url = url
+        tabCollectionViewModel.append(tab: tab)
+    }
+
 }
 
 extension BrowserTabViewController: WKNavigationDelegate {
+
+    func webView(_ webView: WKWebView,
+                 decidePolicyFor navigationAction: WKNavigationAction,
+                 decisionHandler: @escaping (WKNavigationActionPolicy) -> Void) {
+
+        let isCommandPressed = NSApp.currentEvent?.modifierFlags.contains(.command) ?? false
+        let isLinkActivated = navigationAction.navigationType == .linkActivated
+        if isLinkActivated && isCommandPressed {
+            decisionHandler(.cancel)
+            openNewTab(with: navigationAction.request.url)
+            return
+        }
+
+        decisionHandler(.allow)
+    }
 
     func webView(_ webView: WKWebView, didStartProvisionalNavigation navigation: WKNavigation!) {
         setFirstResponderIfNeeded()
@@ -155,7 +164,6 @@ extension BrowserTabViewController: WKNavigationDelegate {
     }
 
     func webView(_ webView: WKWebView, didFinish navigation: WKNavigation!) {
-        saveWebsiteVisit()
     }
 
     func webView(_ webView: WKWebView, didFail navigation: WKNavigation!, withError error: Error) {
@@ -171,12 +179,13 @@ extension BrowserTabViewController: WKNavigationDelegate {
                  createWebViewWith configuration: WKWebViewConfiguration,
                  for navigationAction: WKNavigationAction,
                  windowFeatures: WKWindowFeatures) -> WKWebView? {
+        
         tabCollectionViewModel.appendNewTabAfterSelected()
         guard let selectedViewModel = tabCollectionViewModel.selectedTabViewModel else {
             os_log("%s: Selected tab view model is nil", log: OSLog.Category.general, type: .error, className)
             return nil
         }
-        selectedViewModel.webView.load(navigationAction.request)
+        selectedViewModel.tab.webView.load(navigationAction.request)
         return nil
     }
 

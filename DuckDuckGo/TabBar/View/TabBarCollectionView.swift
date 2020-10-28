@@ -20,6 +20,10 @@ import Cocoa
 import os.log
 
 class TabBarCollectionView: NSCollectionView {
+
+    override var acceptsFirstResponder: Bool {
+        return false
+    }
     
     override func awakeFromNib() {
         super.awakeFromNib()
@@ -28,9 +32,11 @@ class TabBarCollectionView: NSCollectionView {
         register(nib, forItemWithIdentifier: TabBarViewItem.identifier)
 
         // Register for the dropped object types we can accept.
-        registerForDraggedTypes([NSPasteboard.PasteboardType.string])
+        registerForDraggedTypes([.URL])
+        // Enable dragging items from our CollectionView to other applications.
+        setDraggingSourceOperationMask([.every], forLocal: false)
         // Enable dragging items within and into our CollectionView.
-        setDraggingSourceOperationMask(NSDragOperation.move, forLocal: false)
+        setDraggingSourceOperationMask([.move], forLocal: true)
     }
 
     func clearSelection() {

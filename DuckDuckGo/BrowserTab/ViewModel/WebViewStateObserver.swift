@@ -22,7 +22,7 @@ import os.log
 
 class WebViewStateObserver: NSObject {
 
-    weak var webView: WKWebView?
+    var webView: WKWebView?
     weak var tabViewModel: TabViewModel?
 
     init(webView: WKWebView, tabViewModel: TabViewModel) {
@@ -30,10 +30,18 @@ class WebViewStateObserver: NSObject {
         self.tabViewModel = tabViewModel
         super.init()
 
-        observeWebview(webView)
+        observe(webView: webView)
     }
 
-    private func observeWebview(_ webView: WKWebView) {
+    deinit {
+        webView?.removeObserver(self, forKeyPath: #keyPath(WKWebView.url))
+        webView?.removeObserver(self, forKeyPath: #keyPath(WKWebView.canGoBack))
+        webView?.removeObserver(self, forKeyPath: #keyPath(WKWebView.canGoForward))
+        webView?.removeObserver(self, forKeyPath: #keyPath(WKWebView.isLoading))
+        webView?.removeObserver(self, forKeyPath: #keyPath(WKWebView.title))
+    }
+
+    private func observe(webView: WKWebView) {
         webView.addObserver(self, forKeyPath: #keyPath(WKWebView.url), options: .new, context: nil)
         webView.addObserver(self, forKeyPath: #keyPath(WKWebView.canGoBack), options: .new, context: nil)
         webView.addObserver(self, forKeyPath: #keyPath(WKWebView.canGoForward), options: .new, context: nil)

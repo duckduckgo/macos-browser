@@ -18,7 +18,6 @@
 
 import Cocoa
 import Combine
-import WebKit
 import os.log
 
 class TabViewModel {
@@ -34,12 +33,6 @@ class TabViewModel {
 
     private(set) var tab: Tab
     private var cancelables = Set<AnyCancellable>()
-
-    var webView: WebView {
-        didSet {
-            webViewStateObserver = WebViewStateObserver(webView: webView, tabViewModel: self)
-        }
-    }
     
     private var webViewStateObserver: WebViewStateObserver?
 
@@ -49,15 +42,14 @@ class TabViewModel {
     @Published var isLoading: Bool = false
 
     @Published private(set) var addressBarString: String = ""
+    @Published private(set) var passiveAddressBarString: String = ""
     @Published private(set) var title: String = Title.home
     @Published private(set) var favicon: NSImage = Favicon.home
 
     init(tab: Tab) {
         self.tab = tab
 
-        webView = WebView(frame: CGRect.zero, configuration: WKWebViewConfiguration.makeConfiguration())
-        webViewStateObserver = WebViewStateObserver(webView: webView, tabViewModel: self)
-        tab.actionDelegate = self
+        webViewStateObserver = WebViewStateObserver(webView: tab.webView, tabViewModel: self)
 
         bindUrl()
         bindTitle()
@@ -66,8 +58,8 @@ class TabViewModel {
 
     private func bindUrl() {
         tab.$url.receive(on: DispatchQueue.main).sink { [weak self] _ in
-            self?.updateCanReaload()
-            self?.updateAddressBarString()
+            self?.updateCanReload()
+            self?.updateAddressBarStrings()
         } .store(in: &cancelables)
     }
 
@@ -79,29 +71,33 @@ class TabViewModel {
         tab.$favicon.receive(on: DispatchQueue.main).sink { [weak self] _ in self?.updateFavicon() } .store(in: &cancelables)
     }
 
-    private func updateCanReaload() {
-        self.canReload = self.tab.url != nil
+    private func updateCanReload() {
+        canReload = tab.url != nil
     }
 
-    private func updateAddressBarString() {
-        guard let url = tab.url else {
+    private func updateAddressBarStrings() {
+        guard let url = tab.url, let host = url.host else {
             addressBarString = ""
+            passiveAddressBarString = ""
             return
         }
 
         if let searchQuery = url.searchQuery {
             addressBarString = searchQuery
+            passiveAddressBarString = searchQuery
         } else if url == URL.emptyPage {
             addressBarString = ""
+            passiveAddressBarString = ""
         } else {
             addressBarString = url.absoluteString
-                .dropPrefix(URL.Scheme.https.separated())
-                .dropPrefix(URL.Scheme.http.separated())
+                .drop(prefix: URL.Scheme.https.separated())
+                .drop(prefix: URL.Scheme.http.separated())
+            passiveAddressBarString = host.drop(prefix: URL.HostPrefix.www.separated())
         }
     }
 
     private func updateTitle() {
-        if tab.url == nil {
+        if tab.isHomepageLoaded {
             title = Title.home
             return
         }
@@ -114,7 +110,7 @@ class TabViewModel {
     }
 
     private func updateFavicon() {
-        if tab.url == nil {
+        if tab.isHomepageLoaded {
             favicon = Favicon.home
             return
         }
@@ -124,33 +120,6 @@ class TabViewModel {
         } else {
             favicon = Favicon.defaultFavicon
         }
-    }
-    
-}
-
-extension TabViewModel: TabActionDelegate {
-
-    func tabForwardAction(_ tab: Tab) {
-        webView.goForward()
-    }
-
-    func tabBackAction(_ tab: Tab) {
-        webView.goBack()
-    }
-
-    func tabReloadAction(_ tab: Tab) {
-        webView.reload()
-    }
-
-}
-
-fileprivate extension WKWebViewConfiguration {
-
-    static func makeConfiguration() -> WKWebViewConfiguration {
-        let configuration = WKWebViewConfiguration()
-        configuration.websiteDataStore = WKWebsiteDataStore.default()
-        configuration.allowsAirPlayForMediaPlayback = true
-        return configuration
     }
 
 }

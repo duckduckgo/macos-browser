@@ -17,23 +17,18 @@
 //
 
 import XCTest
+import Combine
 @testable import DuckDuckGo_Privacy_Browser
 
 class SuggestionsViewModelTests: XCTestCase {
+
+    var cancelables = Set<AnyCancellable>()
     
     func testWhenNoSuggestionsThenNumberOfSuggestionsIs0() {
         let suggestions = Suggestions()
         let suggestionsViewModel = SuggestionsViewModel(suggestions: suggestions)
         
         XCTAssertEqual(suggestionsViewModel.numberOfSuggestions, 0)
-    }
-    
-    func testWhenSuggestionsAreFetchedThenNumberOfSuggestionsIsSumOfAll() {
-        let suggestionsViewModel = SuggestionsViewModel.aSuggestionsViewModel
-        
-        XCTAssertEqual(suggestionsViewModel.numberOfSuggestions,
-                       suggestionsViewModel.suggestions.items.local!.count +
-                        suggestionsViewModel.suggestions.items.remote!.count)
     }
     
     func testWhenSelectionIndexIsNilThenSelectedSuggestionViewModelIsNil() {
@@ -46,11 +41,17 @@ class SuggestionsViewModelTests: XCTestCase {
     
     func testWhenSuggestionIsSelectedThenSelectedSuggestionViewModelMatchSuggestions() {
         let suggestionsViewModel = SuggestionsViewModel.aSuggestionsViewModel
-    
+
         let index = 0
         suggestionsViewModel.select(at: index)
-        
-        XCTAssertEqual(suggestionsViewModel.suggestions.items.remote?[index], suggestionsViewModel.selectedSuggestionViewModel?.suggestion)
+
+        let selectedSuggestionViewModelExpectation = expectation(description: "Selected suggestion view model expectation")
+
+        suggestionsViewModel.$selectedSuggestionViewModel.debounce(for: 0.1, scheduler: RunLoop.main).sink { selectedSuggestionViewModel in
+            XCTAssertEqual(suggestionsViewModel.suggestions.items?[index], selectedSuggestionViewModel?.suggestion)
+            selectedSuggestionViewModelExpectation.fulfill()
+        } .store(in: &cancelables)
+        waitForExpectations(timeout: 1, handler: nil)
     }
     
     func testWhenSelectCalledWithIndexOutOfBoundsThenSelectedSuggestionViewModelIsNil() {
@@ -58,23 +59,32 @@ class SuggestionsViewModelTests: XCTestCase {
         let suggestionsViewModel = SuggestionsViewModel(suggestions: suggestions)
         
         suggestionsViewModel.select(at: 0)
-        
-        XCTAssertNil(suggestionsViewModel.selectionIndex)
-        XCTAssertNil(suggestionsViewModel.selectedSuggestionViewModel)
+
+        let selectedSuggestionViewModelExpectation = expectation(description: "Selected suggestion view model expectation")
+
+        suggestionsViewModel.$selectedSuggestionViewModel.debounce(for: 0.1, scheduler: RunLoop.main).sink { selectedSuggestionViewModel in
+            XCTAssertNil(suggestionsViewModel.selectionIndex)
+            XCTAssertNil(selectedSuggestionViewModel)
+            selectedSuggestionViewModelExpectation.fulfill()
+        } .store(in: &cancelables)
+        waitForExpectations(timeout: 1, handler: nil)
     }
     
     func testWhenClearSelectionIsCalledThenNoSuggestonIsSeleted() {
         let suggestionsViewModel = SuggestionsViewModel.aSuggestionsViewModel
-        
+
         suggestionsViewModel.select(at: 0)
-        
-        XCTAssertNotNil(suggestionsViewModel.selectionIndex)
-        XCTAssertNotNil(suggestionsViewModel.selectedSuggestionViewModel)
-        
+
         suggestionsViewModel.clearSelection()
-        
-        XCTAssertNil(suggestionsViewModel.selectionIndex)
-        XCTAssertNil(suggestionsViewModel.selectedSuggestionViewModel)
+
+        let selectedSuggestionViewModelExpectation2 = expectation(description: "Selected suggestion view model expectation")
+
+        suggestionsViewModel.$selectedSuggestionViewModel.debounce(for: 0.1, scheduler: RunLoop.main).sink { selectedSuggestionViewModel in
+            XCTAssertNil(suggestionsViewModel.selectionIndex)
+            XCTAssertNil(suggestionsViewModel.selectedSuggestionViewModel)
+            selectedSuggestionViewModelExpectation2.fulfill()
+        } .store(in: &cancelables)
+        waitForExpectations(timeout: 1, handler: nil)
     }
     
     func testSelectNextIfPossible() {
@@ -117,14 +127,11 @@ extension SuggestionsViewModel {
     
     static var aSuggestionsViewModel: SuggestionsViewModel {
         let suggestionsAPIMock = SuggestionsAPIMock()
-        let historyStoreMock = HistoryStoreMock()
-        let suggestions = Suggestions(suggestionsAPI: suggestionsAPIMock, historyStore: historyStoreMock)
+        let suggestions = Suggestions(suggestionsAPI: suggestionsAPIMock)
         let suggestionsViewModel = SuggestionsViewModel(suggestions: suggestions)
 
         let suggestionsAPIResult = SuggestionsAPIResult.aSuggestionsAPIResult
         suggestionsAPIMock.suggestionsAPIResult = suggestionsAPIResult
-        let websiteVisits = WebsiteVisit.aWebsiteVisits
-        historyStoreMock.websiteVisits = websiteVisits
 
         let query = "query"
         suggestions.getSuggestions(for: query)

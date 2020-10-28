@@ -17,21 +17,49 @@
 //
 
 import Cocoa
+import os.log
 
 class SuggestionTableCellView: NSTableCellView {
 
     static let identifier = "SuggestionTableCellView"
+
+    static let tintColor = NSColor(named: "SuggestionTintColor")!
+    static let selectedTintColor = NSColor(named: "SelectedSuggestionTintColor")!
+    
     @IBOutlet weak var iconImageView: NSImageView!
 
-    override func awakeFromNib() {
-        super.awakeFromNib()
-        
-        iconImageView.contentTintColor = NSColor.textColor
+    var isSelected: Bool = false {
+        didSet {
+            updateIconImageView()
+            updateTextField()
+        }
     }
 
     func display(_ suggestionViewModel: SuggestionViewModel) {
-        textField?.attributedStringValue = suggestionViewModel.attributedString
+        attributedString = suggestionViewModel.tableCellViewAttributedString
         iconImageView.image = suggestionViewModel.icon
+
+        updateTextField()
+    }
+
+    private var attributedString: NSAttributedString?
+
+    private func updateTextField() {
+        guard let attributedString = attributedString else {
+            os_log("SuggestionTableCellView: Attributed strings are nil", log: OSLog.Category.general, type: .error)
+            return
+        }
+        if isSelected {
+            textField?.attributedStringValue = attributedString
+            textField?.textColor = Self.selectedTintColor
+        } else {
+            textField?.attributedStringValue = attributedString
+            textField?.textColor = Self.tintColor
+        }
+    }
+
+    private func updateIconImageView() {
+        iconImageView.contentTintColor = isSelected ? Self.selectedTintColor : Self.tintColor
     }
 
 }

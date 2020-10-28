@@ -17,6 +17,7 @@
 //
 
 import Cocoa
+import Combine
 import os.log
 
 class MainViewController: NSViewController {
@@ -25,11 +26,33 @@ class MainViewController: NSViewController {
     @IBOutlet weak var navigationBarContainerView: NSView!
     @IBOutlet weak var webContainerView: NSView!
 
-    var tabBarViewController: TabBarViewController?
-    var navigationBarViewController: NavigationBarViewController?
-    var browserTabViewController: BrowserTabViewController?
+    private(set) var tabBarViewController: TabBarViewController?
+    private(set) var navigationBarViewController: NavigationBarViewController?
+    private(set) var browserTabViewController: BrowserTabViewController?
 
     var tabCollectionViewModel = TabCollectionViewModel()
+
+    private var selectedTabViewModelCancelable: AnyCancellable?
+    private var canGoForwardCancelable: AnyCancellable?
+    private var canGoBackCancelable: AnyCancellable?
+    private var canInsertLastRemovedTabCancelable: AnyCancellable?
+
+    override func viewDidLoad() {
+        super.viewDidLoad()
+
+        bindSelectedTabViewModel()
+        bindCanInsertLastRemovedTab()
+    }
+
+    func windowDidBecomeMain() {
+        setBackMenuItem()
+        setForwardMenuItem()
+        setReopenLastClosedTabMenuItem()
+    }
+
+    func windowWillClose() {
+        tabCollectionViewModel.removeAllTabs()
+    }
 
     @IBSegueAction
     func createTabBarViewController(coder: NSCoder, sender: Any?, segueIdentifier: String?) -> TabBarViewController? {
@@ -37,7 +60,7 @@ class MainViewController: NSViewController {
             os_log("MainViewController: Failed to init TabBarViewController", log: OSLog.Category.general, type: .error)
             return nil
         }
-        
+
         self.tabBarViewController = tabBarViewController
         return tabBarViewController
     }
@@ -56,8 +79,7 @@ class MainViewController: NSViewController {
     @IBSegueAction
     func createWebViewController(coder: NSCoder, sender: Any?, segueIdentifier: String?) -> BrowserTabViewController? {
         guard let browserTabViewController = BrowserTabViewController(coder: coder,
-                                                                tabCollectionViewModel: tabCollectionViewModel,
-                                                                historyViewModel: HistoryViewModel()) else {
+                                                                      tabCollectionViewModel: tabCollectionViewModel) else {
             os_log("MainViewController: Failed to init BrowserTabViewController", log: OSLog.Category.general, type: .error)
             return nil
         }
@@ -66,22 +88,63 @@ class MainViewController: NSViewController {
         return browserTabViewController
     }
 
-    @IBAction func newTab(_ sender: Any?) {
-        tabCollectionViewModel.appendNewTab()
+    private func bindSelectedTabViewModel() {
+        selectedTabViewModelCancelable = tabCollectionViewModel.$selectedTabViewModel.receive(on: DispatchQueue.main).sink { [weak self] _ in
+            self?.bindCanGoBackForward()
+        }
     }
 
-    @IBAction func closeTab(_ sender: Any?) {
-        tabCollectionViewModel.removeSelected()
+    private func bindCanGoBackForward() {
+        canGoBackCancelable?.cancel()
+        canGoBackCancelable = tabCollectionViewModel.selectedTabViewModel?.$canGoBack.receive(on: DispatchQueue.main).sink { [weak self] _ in
+            self?.setBackMenuItem()
+        }
+        canGoForwardCancelable?.cancel()
+        canGoForwardCancelable = tabCollectionViewModel.selectedTabViewModel?.$canGoForward.receive(on: DispatchQueue.main).sink { [weak self] _ in
+            self?.setForwardMenuItem()
+        }
     }
 
-    @IBAction func newWindow(_ sender: Any?) {
-        let mainStoryboard = NSStoryboard(name: "Main", bundle: nil)
-        guard let mainWindowController = mainStoryboard.instantiateInitialController() as? MainWindowController else {
-            os_log("MainViewController: Failed to init MainWindowController", log: OSLog.Category.general, type: .error)
+    private func bindCanInsertLastRemovedTab() {
+        canInsertLastRemovedTabCancelable?.cancel()
+        canInsertLastRemovedTabCancelable = tabCollectionViewModel.$canInsertLastRemovedTab.receive(on: DispatchQueue.main).sink { [weak self] _ in
+            self?.setReopenLastClosedTabMenuItem()
+        }
+    }
+
+    private func setBackMenuItem() {
+        guard let selectedTabViewModel = tabCollectionViewModel.selectedTabViewModel else {
+            os_log("MainViewController: No tab view model selected", log: OSLog.Category.general, type: .error)
+            return
+        }
+        guard let mainMenu = NSApplication.shared.mainMenu, let backMenuItem = mainMenu.backMenuItem else {
+            os_log("MainViewController: Failed to get reference to back menu item", log: OSLog.Category.general, type: .error)
             return
         }
 
-        mainWindowController.showWindow(self)
+        backMenuItem.isEnabled = selectedTabViewModel.canGoBack
     }
-    
+
+    func setForwardMenuItem() {
+        guard let selectedTabViewModel = tabCollectionViewModel.selectedTabViewModel else {
+            os_log("MainViewController: No tab view model selected", log: OSLog.Category.general, type: .error)
+            return
+        }
+        guard let mainMenu = NSApplication.shared.mainMenu, let forwardMenuItem = mainMenu.forwardMenuItem else {
+            os_log("MainViewController: Failed to get reference to back menu item", log: OSLog.Category.general, type: .error)
+            return
+        }
+
+        forwardMenuItem.isEnabled = selectedTabViewModel.canGoForward
+    }
+
+    func setReopenLastClosedTabMenuItem() {
+        guard let mainMenu = NSApplication.shared.mainMenu, let reopenLastClosedTabMenuItem = mainMenu.reopenLastClosedTabMenuItem else {
+            os_log("MainViewController: Failed to get reference to back menu item", log: OSLog.Category.general, type: .error)
+            return
+        }
+
+        reopenLastClosedTabMenuItem.isEnabled = tabCollectionViewModel.canInsertLastRemovedTab
+    }
+
 }

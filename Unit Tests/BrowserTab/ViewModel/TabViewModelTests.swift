@@ -24,22 +24,40 @@ class TabViewModelTests: XCTestCase {
 
     var cancelables = Set<AnyCancellable>()
 
+    // MARK: - Can reload
+
+    func testWhenURLIsNilThenCanReloadIsFalse() {
+        let tabViewModel = TabViewModel.aTabViewModel
+
+        XCTAssertFalse(tabViewModel.canReload)
+    }
+
+    func testWhenURLIsNotNilThenCanReloadIsTrue() {
+        let tabViewModel = TabViewModel.aTabViewModel
+        tabViewModel.tab.url = URL.duckDuckGo
+
+        let canReloadExpectation = expectation(description: "Can reload")
+        tabViewModel.$canReload.debounce(for: 0.1, scheduler: RunLoop.main).sink { _ in
+            XCTAssert(tabViewModel.canReload)
+            canReloadExpectation.fulfill()
+        } .store(in: &cancelables)
+        waitForExpectations(timeout: 1, handler: nil)
+    }
+
     // MARK: - AddressBarString
 
     func testWhenURLIsNilThenAddressBarStringIsEmpty() {
-        let tab = Tab()
-        let tabViewModel = TabViewModel(tab: tab)
+        let tabViewModel = TabViewModel.aTabViewModel
 
         XCTAssertEqual(tabViewModel.addressBarString, "")
     }
 
     func testWhenURLIsSearchThenAddressBarStringIsTheQuery() {
-        let tab = Tab()
-        let tabViewModel = TabViewModel(tab: tab)
+        let tabViewModel = TabViewModel.aTabViewModel
 
         let query = "query"
         let searchUrl = URL.makeSearchUrl(from: query)
-        tab.url = searchUrl
+        tabViewModel.tab.url = searchUrl
 
         let addressBarStringExpectation = expectation(description: "Address bar string")
 
@@ -51,11 +69,10 @@ class TabViewModelTests: XCTestCase {
     }
 
     func testWhenURLIsRegularSiteThenAddressBarStringIsTheURLWithoutPrefix() {
-        let tab = Tab()
-        let tabViewModel = TabViewModel(tab: tab)
+        let tabViewModel = TabViewModel.aTabViewModel
 
         let urlString = "spreadprivacy.com"
-        tab.url = URL.makeURL(from: urlString)
+        tabViewModel.tab.url = URL.makeURL(from: urlString)
 
         let addressBarStringExpectation = expectation(description: "Address bar string")
 
@@ -69,18 +86,16 @@ class TabViewModelTests: XCTestCase {
     // MARK: - Title
 
     func testWhenURLIsNilThenTitleIsHome() {
-        let tab = Tab()
-        let tabViewModel = TabViewModel(tab: tab)
+        let tabViewModel = TabViewModel.aTabViewModel
 
         XCTAssertEqual(tabViewModel.title, "Home")
     }
 
     func testWhenTabTitleIsNotNilThenTitleReflectsTabTitle() {
-        let tab = Tab()
-        let tabViewModel = TabViewModel(tab: tab)
-        tab.url = URL.duckDuckGo
+        let tabViewModel = TabViewModel.aTabViewModel
+        tabViewModel.tab.url = URL.duckDuckGo
         let testTitle = "Test title"
-        tab.title = testTitle
+        tabViewModel.tab.title = testTitle
 
         let titleExpectation = expectation(description: "Title")
 
@@ -92,9 +107,8 @@ class TabViewModelTests: XCTestCase {
     }
 
     func testWhenTabTitleIsNilThenTitleIsAddressBarString() {
-        let tab = Tab()
-        let tabViewModel = TabViewModel(tab: tab)
-        tab.url = URL.duckDuckGo
+        let tabViewModel = TabViewModel.aTabViewModel
+        tabViewModel.tab.url = URL.duckDuckGo
 
         let titleExpectation = expectation(description: "Title")
 
@@ -108,46 +122,34 @@ class TabViewModelTests: XCTestCase {
     // MARK: - Favicon
 
     func testWhenURLIsNilThenFaviconIsHomeFavicon() {
-        let tab = Tab()
-        let tabViewModel = TabViewModel(tab: tab)
+        let tabViewModel = TabViewModel.aTabViewModel
 
         XCTAssertEqual(tabViewModel.favicon, TabViewModel.Favicon.home)
     }
 
-    func testWhenTabFaviconIsNilThenFaviconIsDefaultFavicon() {
-        let tab = Tab()
-        let tabViewModel = TabViewModel(tab: tab)
-        tab.url = URL.aNoFaviconSiteURL
-
-        let faviconExpectation = expectation(description: "Favicon")
-
-        tabViewModel.$favicon.debounce(for: 0.1, scheduler: RunLoop.main).sink { favicon in
-            XCTAssertEqual(favicon, TabViewModel.Favicon.defaultFavicon)
-            faviconExpectation.fulfill()
-        } .store(in: &cancelables)
-        waitForExpectations(timeout: 1, handler: nil)
-    }
-
-    func testWhenTabFaviconIsNotNilThenFaviconIsNotNil() {
-        let tab = Tab()
-        let tabViewModel = TabViewModel(tab: tab)
-        tab.url = URL.duckDuckGo
+    func testWhenTabDownloadedFaviconThenFaviconIsNotNil() {
+        let tabViewModel = TabViewModel.aTabViewModel
+        tabViewModel.tab.url = URL.duckDuckGo
 
         let faviconExpectation = expectation(description: "Favicon")
 
         tabViewModel.$favicon.debounce(for: 0.1, scheduler: RunLoop.main).sink { favicon in
             XCTAssertNotNil(favicon)
-            XCTAssertNotEqual(favicon, TabViewModel.Favicon.defaultFavicon)
             XCTAssertNotEqual(favicon, TabViewModel.Favicon.home)
-            faviconExpectation.fulfill()
+            if favicon != TabViewModel.Favicon.defaultFavicon {
+                faviconExpectation.fulfill()
+            }
         } .store(in: &cancelables)
         waitForExpectations(timeout: 1, handler: nil)
     }
 
 }
 
-fileprivate extension URL {
+extension TabViewModel {
 
-    static let aNoFaviconSiteURL = URL(string: "https://aktuality.sk")
+    static var aTabViewModel: TabViewModel {
+        let tab = Tab()
+        return TabViewModel(tab: tab)
+    }
 
 }

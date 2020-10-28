@@ -29,7 +29,7 @@ class SuggestionsViewModel {
     }
 
     var numberOfSuggestions: Int {
-        (suggestions.items.remote?.count ?? 0) + (suggestions.items.local?.count ?? 0)
+        suggestions.items?.count ?? 0
     }
 
     @Published private(set) var selectionIndex: Int? {
@@ -37,6 +37,14 @@ class SuggestionsViewModel {
     }
 
     @Published private(set) var selectedSuggestionViewModel: SuggestionViewModel?
+
+    var userStringValue: String? {
+        didSet {
+            if let userStringValue = userStringValue {
+                suggestions.getSuggestions(for: userStringValue)
+            }
+        }
+    }
 
     private func setSelectedSuggestionViewModel() {
         if let selectionIndex = selectionIndex {
@@ -47,28 +55,14 @@ class SuggestionsViewModel {
     }
     
     func suggestionViewModel(at index: Int) -> SuggestionViewModel? {
-        let remote = suggestions.items.remote ?? []
-        let local = suggestions.items.local ?? []
+        let items = suggestions.items ?? []
 
-        guard index < remote.count + local.count else {
+        guard index < items.count else {
             os_log("SuggestionsViewModel: Absolute index is out of bounds", log: OSLog.Category.general, type: .error)
             return nil
         }
 
-        if remote.count == 0 {
-            return SuggestionViewModel(suggestion: local[index])
-        }
-
-        switch index {
-        case 0 ..< remote.count:
-            return SuggestionViewModel(suggestion: remote[index])
-        case remote.count ..< (remote.count + local.count):
-            let index = index - remote.count
-            return SuggestionViewModel(suggestion: local[index])
-        default:
-            os_log("SuggestionsViewModel: absolute index is out of bounds", log: OSLog.Category.general, type: .error)
-            return nil
-        }
+        return SuggestionViewModel(suggestion: items[index], userStringValue: userStringValue ?? "")
     }
 
     func select(at index: Int) {

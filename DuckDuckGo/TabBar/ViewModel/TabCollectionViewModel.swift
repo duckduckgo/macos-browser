@@ -31,6 +31,7 @@ class TabCollectionViewModel {
         }
     }
     @Published private(set) var selectedTabViewModel: TabViewModel?
+    @Published private(set) var canInsertLastRemovedTab: Bool = false
 
     private var cancelables = Set<AnyCancellable>()
 
@@ -38,6 +39,7 @@ class TabCollectionViewModel {
         self.tabCollection = tabCollection
 
         bindTabs()
+        bindLastRemovedTab()
         appendNewTab()
     }
 
@@ -80,10 +82,26 @@ class TabCollectionViewModel {
         select(at: selectionIndex + 1)
     }
 
+    func append(tab: Tab) {
+        tabCollection.append(tab: tab)
+        select(at: tabCollection.tabs.count - 1)
+    }
+
+    func append(tabs: [Tab]) {
+        tabs.forEach {
+            tabCollection.append(tab: $0)
+        }
+        select(at: tabCollection.tabs.count - 1)
+    }
+
     func remove(at index: Int) {
         guard tabCollection.remove(at: index) else { return }
 
-        guard tabCollection.tabs.count > 0 else { return }
+        guard tabCollection.tabs.count > 0 else {
+            selectionIndex = nil
+            return
+        }
+        
         guard let selectionIndex = selectionIndex else {
             os_log("TabCollection: No tab selected", log: OSLog.Category.general, type: .error)
             return
@@ -105,23 +123,29 @@ class TabCollectionViewModel {
         remove(at: selectionIndex)
     }
 
-    func removeOtherTabs(except index: Int) {
-        guard index >= 0, index < tabCollection.tabs.count else {
-            os_log("TabCollectionViewModel: Index out of bounds", log: OSLog.Category.general, type: .error)
-            return
-        }
-        let tab = tabCollection.tabs[index]
-
-        var index = tabCollection.tabs.count - 1
-        tabCollection.tabs.reversed().forEach {
-            if tab != $0 {
-                if !tabCollection.remove(at: index) {
+    func removeAllTabs(except exceptionIndex: Int? = nil) {
+        tabCollection.tabs.enumerated().reversed().forEach {
+            if exceptionIndex != $0.offset {
+                if !tabCollection.remove(at: $0.offset) {
                     os_log("TabCollectionViewModel: Failed to remove item", log: OSLog.Category.general, type: .error)
                 }
             }
-            index -= 1
         }
-        select(at: 0)
+
+        if exceptionIndex != nil {
+            select(at: 0)
+        } else {
+            selectionIndex = nil
+        }
+    }
+
+    func insertLastRemovedTab() {
+        let lastRemovedTabIndex = tabCollection.lastRemovedTabCache?.index
+        tabCollection.insertLastRemovedTab()
+
+        if let lastRemovedTabIndex = lastRemovedTabIndex {
+            select(at: lastRemovedTabIndex)
+        }
     }
 
     func duplicateTab(at index: Int) {
@@ -140,9 +164,15 @@ class TabCollectionViewModel {
     }
 
     private func bindTabs() {
-        tabCollection.$tabs.sink { newTabs in
-            self.removeTabViewModelsIfNeeded(newTabs: newTabs)
-            self.addTabViewModelsIfNeeded(newTabs: newTabs)
+        tabCollection.$tabs.sink { [weak self] newTabs in
+            self?.removeTabViewModelsIfNeeded(newTabs: newTabs)
+            self?.addTabViewModelsIfNeeded(newTabs: newTabs)
+        } .store(in: &cancelables)
+    }
+
+    private func bindLastRemovedTab() {
+        tabCollection.$lastRemovedTabCache.receive(on: DispatchQueue.main).sink { [weak self] _ in
+            self?.updateCanInsertLastRemovedTab()
         } .store(in: &cancelables)
     }
 
@@ -167,6 +197,10 @@ class TabCollectionViewModel {
         }
         let selectedTabViewModel = tabViewModel(at: selectionIndex)
         self.selectedTabViewModel = selectedTabViewModel
+    }
+
+    private func updateCanInsertLastRemovedTab() {
+        canInsertLastRemovedTab = tabCollection.lastRemovedTabCache != nil
     }
 
 }

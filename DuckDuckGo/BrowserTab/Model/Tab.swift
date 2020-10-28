@@ -17,60 +17,93 @@
 //
 
 import Cocoa
-
-protocol TabActionDelegate: AnyObject {
-
-    func tabForwardAction(_ tab: Tab)
-    func tabBackAction(_ tab: Tab)
-    func tabReloadAction(_ tab: Tab)
-
-}
+import WebKit
 
 class Tab {
 
     init(faviconService: FaviconService) {
         self.faviconService = faviconService
+        webView = WebView(frame: CGRect.zero, configuration: WKWebViewConfiguration.makeConfiguration())
+
+        setupWebView()
+        setupUserScripts()
     }
 
     convenience init() {
-        self.init(faviconService: LocalFaviconService())
+        self.init(faviconService: LocalFaviconService.shared)
     }
 
-    let faviconService: FaviconService
+    deinit {
+        webView.stopLoading()
+    }
+
+    let webView: WebView
 
     @Published var url: URL? {
-        willSet {
-            if newValue?.host != url?.host, let newHost = newValue?.host {
-                fetchFavicon(for: newHost)
+        didSet {
+            if oldValue?.host != url?.host {
+                fetchFavicon(nil, for: url?.host)
             }
         }
     }
     @Published var title: String?
-    @Published var favicon: NSImage?
 
-    weak var actionDelegate: TabActionDelegate?
+    var isHomepageLoaded: Bool {
+        url == nil || url == URL.emptyPage
+    }
 
     func goForward() {
-        actionDelegate?.tabForwardAction(self)
+        webView.goForward()
     }
 
     func goBack() {
-        actionDelegate?.tabBackAction(self)
+        webView.goBack()
+    }
+
+    func openHomepage() {
+        url = nil
     }
 
     func reload() {
-        actionDelegate?.tabReloadAction(self)
+        webView.reload()
     }
 
-    private func fetchFavicon(for host: String) {
-        faviconService.fetchFavicon(for: host) { (image, error) in
+    func stopLoading() {
+        webView.stopLoading()
+    }
+
+    private func setupWebView() {
+        webView.allowsBackForwardNavigationGestures = true
+    }
+
+    // MARK: - Favicon
+
+    @Published var favicon: NSImage?
+    let faviconService: FaviconService
+
+    private func fetchFavicon(_ faviconURL: URL?, for host: String?) {
+        favicon = nil
+
+        guard let host = host else {
+            return
+        }
+
+        faviconService.fetchFavicon(faviconURL, for: host) { (image, error) in
             guard error == nil, let image = image else {
-                self.favicon = nil
                 return
             }
 
             self.favicon = image
         }
+    }
+
+    // MARK: - User Scripts
+
+    let faviconScript = FaviconUserScript()
+
+    private func setupUserScripts() {
+        faviconScript.delegate = self
+        webView.configuration.userContentController.add(userScript: faviconScript)
     }
 
 }
@@ -87,6 +120,35 @@ extension Tab: Hashable {
 
     func hash(into hasher: inout Hasher) {
         hasher.combine(ObjectIdentifier(self))
+    }
+
+}
+
+extension Tab: FaviconUserScriptDelegate {
+
+    func faviconUserScript(_ faviconUserScript: FaviconUserScript, didFindFavicon faviconUrl: URL) {
+        guard let host = url?.host else {
+            return
+        }
+
+        faviconService.fetchFavicon(faviconUrl, for: host) { (image, error) in
+            guard error == nil, let image = image else {
+                return
+            }
+
+            self.favicon = image
+        }
+    }
+
+}
+
+fileprivate extension WKWebViewConfiguration {
+
+    static func makeConfiguration() -> WKWebViewConfiguration {
+        let configuration = WKWebViewConfiguration()
+        configuration.websiteDataStore = WKWebsiteDataStore.default()
+        configuration.allowsAirPlayForMediaPlayback = true
+        return configuration
     }
 
 }

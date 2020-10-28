@@ -71,6 +71,12 @@ extension String {
         return replacingOccurrences(of: "+", with: "%20")
     }
 
+    func dropSubdomain() -> String? {
+        let parts = components(separatedBy: ".")
+        guard parts.count > 1 else { return nil }
+        return parts.dropFirst().joined(separator: ".")
+    }
+
     // MARK: - Mutating
 
     @inlinable mutating func prepend(_ string: String) {
@@ -79,8 +85,14 @@ extension String {
 
     // MARK: - Prefix
 
-    func dropPrefix(_ prefix: String) -> String {
+    func drop(prefix: String) -> String {
         return hasPrefix(prefix) ? String(dropFirst(prefix.count)) : self
+    }
+
+    // MARK: - Suffix
+
+    func drop(suffix: String) -> String {
+        return hasSuffix(suffix) ? String(dropLast(suffix.count)) : self
     }
 
 }

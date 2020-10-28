@@ -121,7 +121,7 @@ class TabBarViewController: NSViewController {
     private func closeWindowIfNeeded() {
         if tabCollectionViewModel.tabCollection.tabs.count == 0 {
             guard let window = view.window else {
-                os_log("AutocompleteSearchField: Window not available", log: OSLog.Category.general, type: .error)
+                os_log("AddressBarTextField: Window not available", log: OSLog.Category.general, type: .error)
                 return
             }
             window.close()
@@ -370,9 +370,9 @@ extension TabBarViewController: NSCollectionViewDelegate {
     func collectionView(_ collectionView: NSCollectionView,
                         pasteboardWriterForItemAt indexPath: IndexPath) -> NSPasteboardWriting? {
         if let url = tabCollectionViewModel.tabCollection.tabs[indexPath.item].url {
-            return url.absoluteString as NSString
+            return url as NSURL
         } else {
-            return "" as NSString
+            return URL.emptyPage as NSURL
         }
     }
 
@@ -463,7 +463,7 @@ extension TabBarViewController: TabBarViewItemDelegate {
             return
         }
 
-        tabCollectionViewModel.removeOtherTabs(except: indexPath.item)
+        tabCollectionViewModel.removeAllTabs(except: indexPath.item)
     }
 
 }
