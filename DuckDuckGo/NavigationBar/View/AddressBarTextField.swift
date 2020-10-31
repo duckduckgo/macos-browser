@@ -136,10 +136,10 @@ class AddressBarTextField: NSTextField {
 
     private func confirmStringValue() {
         hideSuggestionsWindow()
-        setUrl()
+        updateTabUrl()
     }
 
-    private func setUrl() {
+    private func updateTabUrl() {
         guard let selectedTabViewModel = tabCollectionViewModel.selectedTabViewModel else {
             os_log("%s: Selected tab view model is nil", log: OSLog.Category.general, type: .error, className)
             return

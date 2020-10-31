@@ -45,9 +45,9 @@ class MainViewController: NSViewController {
     }
 
     func windowDidBecomeMain() {
-        setBackMenuItem()
-        setForwardMenuItem()
-        setReopenLastClosedTabMenuItem()
+        updateBackMenuItem()
+        updateForwardMenuItem()
+        updateReopenLastClosedTabMenuItem()
     }
 
     func windowWillClose() {
@@ -97,22 +97,22 @@ class MainViewController: NSViewController {
     private func bindCanGoBackForward() {
         canGoBackCancelable?.cancel()
         canGoBackCancelable = tabCollectionViewModel.selectedTabViewModel?.$canGoBack.receive(on: DispatchQueue.main).sink { [weak self] _ in
-            self?.setBackMenuItem()
+            self?.updateBackMenuItem()
         }
         canGoForwardCancelable?.cancel()
         canGoForwardCancelable = tabCollectionViewModel.selectedTabViewModel?.$canGoForward.receive(on: DispatchQueue.main).sink { [weak self] _ in
-            self?.setForwardMenuItem()
+            self?.updateForwardMenuItem()
         }
     }
 
     private func bindCanInsertLastRemovedTab() {
         canInsertLastRemovedTabCancelable?.cancel()
         canInsertLastRemovedTabCancelable = tabCollectionViewModel.$canInsertLastRemovedTab.receive(on: DispatchQueue.main).sink { [weak self] _ in
-            self?.setReopenLastClosedTabMenuItem()
+            self?.updateReopenLastClosedTabMenuItem()
         }
     }
 
-    private func setBackMenuItem() {
+    private func updateBackMenuItem() {
         guard let selectedTabViewModel = tabCollectionViewModel.selectedTabViewModel else {
             os_log("MainViewController: No tab view model selected", log: OSLog.Category.general, type: .error)
             return
@@ -125,7 +125,7 @@ class MainViewController: NSViewController {
         backMenuItem.isEnabled = selectedTabViewModel.canGoBack
     }
 
-    func setForwardMenuItem() {
+    func updateForwardMenuItem() {
         guard let selectedTabViewModel = tabCollectionViewModel.selectedTabViewModel else {
             os_log("MainViewController: No tab view model selected", log: OSLog.Category.general, type: .error)
             return
@@ -138,7 +138,7 @@ class MainViewController: NSViewController {
         forwardMenuItem.isEnabled = selectedTabViewModel.canGoForward
     }
 
-    func setReopenLastClosedTabMenuItem() {
+    func updateReopenLastClosedTabMenuItem() {
         guard let mainMenu = NSApplication.shared.mainMenu, let reopenLastClosedTabMenuItem = mainMenu.reopenLastClosedTabMenuItem else {
             os_log("MainViewController: Failed to get reference to back menu item", log: OSLog.Category.general, type: .error)
             return

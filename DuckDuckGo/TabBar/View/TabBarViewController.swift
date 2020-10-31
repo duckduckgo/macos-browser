@@ -54,7 +54,7 @@ class TabBarViewController: NSViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
 
-        setScrollElasticity()
+        updateScrollElasticity()
         receiveScrollNotifications()
         bindSelectionIndex()
     }
@@ -62,15 +62,15 @@ class TabBarViewController: NSViewController {
     override func viewWillAppear() {
         super.viewWillAppear()
 
-        setWindowDraggingArea()
+        updateWindowDraggingArea()
         tabCollectionViewModel.tabCollection.delegate = self
     }
 
     override func viewDidLayout() {
         super.viewDidLayout()
 
-        setTabMode(for: collectionView.numberOfItems(inSection: 0))
-        setWindowDraggingArea()
+        updateTabMode(for: collectionView.numberOfItems(inSection: 0))
+        updateWindowDraggingArea()
         collectionView.collectionViewLayout?.invalidateLayout()
     }
 
@@ -130,7 +130,7 @@ class TabBarViewController: NSViewController {
 
     // MARK: - Window Dragging
 
-    private func setWindowDraggingArea() {
+    private func updateWindowDraggingArea() {
         let leadingSpace = min(CGFloat(collectionView.numberOfItems(inSection: 0)) *
                                 currentTabWidth(), scrollView.frame.size.width)
         windowDraggingViewLeadingConstraint.constant = leadingSpace
@@ -175,15 +175,15 @@ class TabBarViewController: NSViewController {
     private var tabMode = TabMode.divided {
         didSet {
             if oldValue != tabMode {
-                setScrollElasticity()
-                setScrollButtons()
-                setWindowDraggingArea()
+                updateScrollElasticity()
+                updateScrollButtons()
+                updateWindowDraggingArea()
                 collectionView.collectionViewLayout?.invalidateLayout()
             }
         }
     }
 
-    private func setTabMode(for numberOfItems: Int? = nil) {
+    private func updateTabMode(for numberOfItems: Int? = nil) {
         let items = CGFloat(numberOfItems ?? collectionView.numberOfItems(inSection: 0))
         let tabsWidth = scrollView.bounds.width
 
@@ -205,7 +205,7 @@ class TabBarViewController: NSViewController {
         }
     }
 
-    private func setScrollElasticity() {
+    private func updateScrollElasticity() {
         scrollView.horizontalScrollElasticity = tabMode == .divided ? .none : .allowed
     }
 
@@ -226,7 +226,7 @@ class TabBarViewController: NSViewController {
         leftScrollButton.isEnabled = clipView.bounds.origin.x > 0
     }
 
-    private func setScrollButtons() {
+    private func updateScrollButtons() {
         let horizontalSpace = tabMode == .divided ?
             CollectionViewHorizontalSpace.withoutScrollButtons.rawValue :
             CollectionViewHorizontalSpace.withScrollButtons.rawValue
@@ -250,7 +250,7 @@ extension TabBarViewController: TabCollectionDelegate {
         let lastIndexPath = IndexPath(item: lastIndex)
         let lastIndexPathSet = Set(arrayLiteral: lastIndexPath)
 
-        setTabMode(for: collectionView.numberOfItems(inSection: 0) + 1)
+        updateTabMode(for: collectionView.numberOfItems(inSection: 0) + 1)
 
         collectionView.clearSelection()
         if tabMode == .divided {
@@ -264,7 +264,7 @@ extension TabBarViewController: TabCollectionDelegate {
                 }
             }
         }
-        setWindowDraggingArea()
+        updateWindowDraggingArea()
     }
 
     func tabCollection(_ tabCollection: TabCollection, didInsert tab: Tab, at index: Int) {
@@ -272,8 +272,8 @@ extension TabBarViewController: TabCollectionDelegate {
         let indexPathSet = Set(arrayLiteral: indexPath)
         collectionView.animator().insertItems(at: indexPathSet)
 
-        setTabMode()
-        setWindowDraggingArea()
+        updateTabMode()
+        updateWindowDraggingArea()
     }
 
     func tabCollection(_ tabCollection: TabCollection, didRemoveTabAt index: Int) {
@@ -283,11 +283,11 @@ extension TabBarViewController: TabCollectionDelegate {
         collectionView.animator().performBatchUpdates {
             collectionView.animator().deleteItems(at: indexPathSet)
         } completionHandler: { _ in
-            self.setTabMode()
+            self.updateTabMode()
         }
 
         closeWindowIfNeeded()
-        setWindowDraggingArea()
+        updateWindowDraggingArea()
     }
 
     func tabCollection(_ tabCollection: TabCollection, didMoveTabAt index: Int, to newIndex: Int) {
@@ -295,7 +295,7 @@ extension TabBarViewController: TabCollectionDelegate {
         let newIndexPath = IndexPath(item: newIndex)
         collectionView.animator().moveItem(at: indexPath, to: newIndexPath)
 
-        setTabMode()
+        updateTabMode()
     }
 
 }

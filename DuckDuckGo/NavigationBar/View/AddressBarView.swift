@@ -45,7 +45,7 @@ class AddressBarView: NSView {
         layoutSublayers()
     }
 
-    func setView(stroke: Bool) {
+    func updateView(stroke: Bool) {
         CATransaction.begin()
         CATransaction.setAnimationDuration(0)
 

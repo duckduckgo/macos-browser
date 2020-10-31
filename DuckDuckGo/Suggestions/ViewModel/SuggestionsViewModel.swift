@@ -33,7 +33,7 @@ class SuggestionsViewModel {
     }
 
     @Published private(set) var selectionIndex: Int? {
-        didSet { setSelectedSuggestionViewModel() }
+        didSet { updateSelectedSuggestionViewModel() }
     }
 
     @Published private(set) var selectedSuggestionViewModel: SuggestionViewModel?
@@ -46,7 +46,7 @@ class SuggestionsViewModel {
         }
     }
 
-    private func setSelectedSuggestionViewModel() {
+    private func updateSelectedSuggestionViewModel() {
         if let selectionIndex = selectionIndex {
             selectedSuggestionViewModel = suggestionViewModel(at: selectionIndex)
         } else {

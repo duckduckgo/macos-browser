@@ -76,17 +76,17 @@ class TabBarViewItem: NSCollectionViewItem {
     override func viewDidLoad() {
         super.viewDidLoad()
 
-        setView()
-        setSubviews()
-        setMenu()
-        setTitleTextFieldMask()
+        setupView()
+        updateSubviews()
+        setupMenu()
+        updateTitleTextFieldMask()
     }
 
     override func viewDidLayout() {
         super.viewDidLayout()
 
-        setSubviews()
-        setTitleTextFieldMask()
+        updateSubviews()
+        updateTitleTextFieldMask()
     }
 
     override var isSelected: Bool {
@@ -94,8 +94,8 @@ class TabBarViewItem: NSCollectionViewItem {
             if isSelected {
                 isDragged = false
             }
-            setSubviews()
-            setTitleTextFieldMask()
+            updateSubviews()
+            updateTitleTextFieldMask()
         }
     }
 
@@ -144,11 +144,11 @@ class TabBarViewItem: NSCollectionViewItem {
 
     private var isDragged = false {
         didSet {
-            setSubviews()
+            updateSubviews()
         }
     }
 
-    private func setView() {
+    private func setupView() {
         view.wantsLayer = true
         view.layer?.cornerRadius = 7
         view.layer?.maskedCorners = [.layerMinXMaxYCorner, .layerMaxXMaxYCorner]
@@ -161,7 +161,7 @@ class TabBarViewItem: NSCollectionViewItem {
         }
     }
 
-    private func setSubviews() {
+    private func updateSubviews() {
         let backgroundColor = isSelected || isDragged ? NSColor(named: "InterfaceBackgroundColor") : NSColor.clear
         view.layer?.backgroundColor = backgroundColor?.cgColor
         mouseOverView.mouseOverColor = isSelected || isDragged ? NSColor.clear : NSColor(named: "TabMouseOverColor")
@@ -170,13 +170,13 @@ class TabBarViewItem: NSCollectionViewItem {
         closeButton.isHidden = !isSelected && !isDragged && view.bounds.size.width == Width.minimum.rawValue
     }
 
-    private func setMenu() {
+    private func setupMenu() {
         let menu = Self.menu
         menu.items.forEach { $0.target = self }
         view.menu = menu
     }
 
-    private func setTitleTextFieldMask() {
+    private func updateTitleTextFieldMask() {
         guard let titleTextFieldLayer = titleTextField.layer else {
             os_log("TabBarViewItem: Title text field has no layer", log: OSLog.Category.general, type: .error)
             return

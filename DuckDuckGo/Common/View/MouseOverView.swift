@@ -22,7 +22,7 @@ class MouseOverView: NSView {
 
     @IBInspectable var mouseOverColor: NSColor? {
         didSet {
-            setBackgroundColor()
+            updateBackgroundColor()
         }
     }
 
@@ -51,11 +51,11 @@ class MouseOverView: NSView {
 
     private var isMouseOver = false {
         didSet {
-            setBackgroundColor()
+            updateBackgroundColor()
         }
     }
 
-    private func setBackgroundColor() {
+    private func updateBackgroundColor() {
         guard let mouseOverColor = mouseOverColor else {
             layer?.backgroundColor = NSColor.clear.cgColor
             return
@@ -78,11 +78,11 @@ class MouseOverView: NSView {
                                           owner: self,
                                           userInfo: nil)
         addTrackingArea(trackingArea)
-        setIsMouseOver()
+        updateIsMouseOver()
     }
 
     //swiftlint:disable legacy_nsgeometry_functions
-    private func setIsMouseOver() {
+    private func updateIsMouseOver() {
         guard let window = window else {
             return
         }
