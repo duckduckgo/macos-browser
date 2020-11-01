@@ -45,7 +45,7 @@ class TabBarCollectionView: NSCollectionView {
     
     func scrollToSelected() {
         guard selectionIndexPaths.count == 1, let indexPath = selectionIndexPaths.first else {
-            os_log("TabBarCollectionView: More than 1 item highlighted", log: OSLog.Category.general, type: .error)
+            os_log("TabBarCollectionView: More than 1 item highlighted", type: .error)
             return
         }
 

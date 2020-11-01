@@ -33,7 +33,7 @@ extension NSView {
 
     func makeMeFirstResponder() {
         guard let window = window else {
-            os_log("%s: Window not available", log: OSLog.Category.general, type: .error, className)
+            os_log("%s: Window not available", type: .error, className)
             return
         }
 

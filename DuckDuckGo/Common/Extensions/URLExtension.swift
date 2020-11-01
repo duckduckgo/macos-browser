@@ -30,7 +30,7 @@ extension URL {
             searchUrl = try searchUrl.addParameter(name: DuckDuckGoParameters.search.rawValue, value: trimmedQuery)
             return searchUrl
         } catch let error {
-            os_log("URL extension: %s", log: OSLog.Category.general, type: .error, error.localizedDescription)
+            os_log("URL extension: %s", type: .error, error.localizedDescription)
             return nil
         }
     }
@@ -44,7 +44,7 @@ extension URL {
             return searchUrl
         }
 
-        os_log("URL extension: Making URL from %s failed", log: OSLog.Category.general, type: .error, addressBarString)
+        os_log("URL extension: Making URL from %s failed", type: .error, addressBarString)
         return nil
     }
 

@@ -61,7 +61,7 @@ class NavigationBarViewController: NSViewController {
     @IBSegueAction func createAddressBarViewController(_ coder: NSCoder) -> AddressBarViewController? {
         guard let addressBarViewController = AddressBarViewController(coder: coder,
                                                                       tabCollectionViewModel: tabCollectionViewModel) else {
-            os_log("NavigationBarViewController: Failed to init AddressBarViewController", log: OSLog.Category.general, type: .error)
+            os_log("NavigationBarViewController: Failed to init AddressBarViewController", type: .error)
             return nil
         }
 
@@ -71,7 +71,7 @@ class NavigationBarViewController: NSViewController {
 
     @IBAction func goBackAction(_ sender: NSButton) {
         guard let selectedTabViewModel = tabCollectionViewModel.selectedTabViewModel else {
-            os_log("%s: Selected tab view model is nil", log: OSLog.Category.general, type: .error, className)
+            os_log("%s: Selected tab view model is nil", type: .error, className)
             return
         }
 
@@ -80,7 +80,7 @@ class NavigationBarViewController: NSViewController {
 
     @IBAction func goForwardAction(_ sender: NSButton) {
         guard let selectedTabViewModel = tabCollectionViewModel.selectedTabViewModel else {
-            os_log("%s: Selected tab view model is nil", log: OSLog.Category.general, type: .error, className)
+            os_log("%s: Selected tab view model is nil", type: .error, className)
             return
         }
 
@@ -128,7 +128,7 @@ class NavigationBarViewController: NSViewController {
 
     private func updateNavigationButtons() {
         guard let selectedTabViewModel = tabCollectionViewModel.selectedTabViewModel else {
-            os_log("%s: Selected tab view model is nil", log: OSLog.Category.general, type: .error, className)
+            os_log("%s: Selected tab view model is nil", type: .error, className)
             return
         }
 

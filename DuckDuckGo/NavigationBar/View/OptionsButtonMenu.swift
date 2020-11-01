@@ -46,7 +46,7 @@ class OptionsButtonMenu: NSMenu {
 
     @objc func moveTabToNewWindowAction(_ sender: NSMenuItem) {
         guard let selectedTabViewModel = tabCollectionViewModel.selectedTabViewModel else {
-            os_log("MainViewController: No tab view model selected", log: OSLog.Category.general, type: .error)
+            os_log("MainViewController: No tab view model selected", type: .error)
             return
         }
 

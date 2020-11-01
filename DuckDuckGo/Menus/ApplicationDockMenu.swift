@@ -63,11 +63,11 @@ class ApplicationDockMenu: NSMenu {
 
     @objc func menuItemAction(_ sender: Any?) {
         guard let menuItem = sender as? NSMenuItem else {
-            os_log("ApplicationDockMenu: Sender is not instance of NSMenuItem", log: OSLog.Category.general, type: .error)
+            os_log("ApplicationDockMenu: Sender is not instance of NSMenuItem", type: .error)
             return
         }
         guard let index = items.firstIndex(of: menuItem) else {
-            os_log("ApplicationDockMenu: NSMenuItem not part of this menu", log: OSLog.Category.general, type: .error)
+            os_log("ApplicationDockMenu: NSMenuItem not part of this menu", type: .error)
             return
         }
         applicationDockMenuDelegate?.applicationDockMenu(self, selectWindowWith: index)

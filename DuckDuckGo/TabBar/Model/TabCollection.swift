@@ -46,7 +46,7 @@ class TabCollection {
 
     func insert(tab: Tab, at index: Int) {
         guard index >= 0, index <= tabs.endIndex else {
-            os_log("TabCollection: Index out of bounds", log: OSLog.Category.general, type: .error)
+            os_log("TabCollection: Index out of bounds", type: .error)
             return
         }
 
@@ -56,7 +56,7 @@ class TabCollection {
 
     func remove(at index: Int) -> Bool {
         guard index >= 0, index < tabs.count else {
-            os_log("TabCollection: Index out of bounds", log: OSLog.Category.general, type: .error)
+            os_log("TabCollection: Index out of bounds", type: .error)
             return false
         }
 
@@ -70,7 +70,7 @@ class TabCollection {
 
     func moveTab(at index: Int, to newIndex: Int) {
         guard index >= 0, index < tabs.count, newIndex >= 0, newIndex < tabs.count else {
-            os_log("TabCollection: Index out of bounds", log: OSLog.Category.general, type: .error)
+            os_log("TabCollection: Index out of bounds", type: .error)
             return
         }
 
@@ -89,7 +89,7 @@ class TabCollection {
 
     func saveLastRemovedTab(at index: Int) {
         guard index >= 0, index < tabs.count else {
-            os_log("TabCollection: Index out of bounds", log: OSLog.Category.general, type: .error)
+            os_log("TabCollection: Index out of bounds", type: .error)
             return
         }
 
@@ -99,7 +99,7 @@ class TabCollection {
 
     func insertLastRemovedTab() {
         guard let lastRemovedTabCache = lastRemovedTabCache else {
-            os_log("TabCollection: No tab removed yet", log: OSLog.Category.general, type: .error)
+            os_log("TabCollection: No tab removed yet", type: .error)
             return
         }
 
@@ -127,7 +127,7 @@ extension TabCollection {
     @objc private func handleUrlEvent(event: NSAppleEventDescriptor, reply: NSAppleEventDescriptor) {
         guard let path = event.paramDescriptor(forKeyword: keyDirectObject)?.stringValue?.removingPercentEncoding,
               let url = URL(string: path) else {
-            os_log("TabCollection: URL initialization failed", log: OSLog.Category.general, type: .error)
+            os_log("TabCollection: URL initialization failed", type: .error)
             return
         }
 

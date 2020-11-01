@@ -57,7 +57,7 @@ class MainViewController: NSViewController {
     @IBSegueAction
     func createTabBarViewController(coder: NSCoder, sender: Any?, segueIdentifier: String?) -> TabBarViewController? {
         guard let tabBarViewController = TabBarViewController(coder: coder, tabCollectionViewModel: tabCollectionViewModel) else {
-            os_log("MainViewController: Failed to init TabBarViewController", log: OSLog.Category.general, type: .error)
+            os_log("MainViewController: Failed to init TabBarViewController", type: .error)
             return nil
         }
 
@@ -68,7 +68,7 @@ class MainViewController: NSViewController {
     @IBSegueAction
     func createNavigationBarViewController(coder: NSCoder, sender: Any?, segueIdentifier: String?) -> NavigationBarViewController? {
         guard let navigationBarViewController = NavigationBarViewController(coder: coder, tabCollectionViewModel: tabCollectionViewModel) else {
-            os_log("MainViewController: Failed to init NavigationBarViewController", log: OSLog.Category.general, type: .error)
+            os_log("MainViewController: Failed to init NavigationBarViewController", type: .error)
             return nil
         }
 
@@ -80,7 +80,7 @@ class MainViewController: NSViewController {
     func createWebViewController(coder: NSCoder, sender: Any?, segueIdentifier: String?) -> BrowserTabViewController? {
         guard let browserTabViewController = BrowserTabViewController(coder: coder,
                                                                       tabCollectionViewModel: tabCollectionViewModel) else {
-            os_log("MainViewController: Failed to init BrowserTabViewController", log: OSLog.Category.general, type: .error)
+            os_log("MainViewController: Failed to init BrowserTabViewController", type: .error)
             return nil
         }
 
@@ -114,11 +114,11 @@ class MainViewController: NSViewController {
 
     private func updateBackMenuItem() {
         guard let selectedTabViewModel = tabCollectionViewModel.selectedTabViewModel else {
-            os_log("MainViewController: No tab view model selected", log: OSLog.Category.general, type: .error)
+            os_log("MainViewController: No tab view model selected", type: .error)
             return
         }
         guard let mainMenu = NSApplication.shared.mainMenu, let backMenuItem = mainMenu.backMenuItem else {
-            os_log("MainViewController: Failed to get reference to back menu item", log: OSLog.Category.general, type: .error)
+            os_log("MainViewController: Failed to get reference to back menu item", type: .error)
             return
         }
 
@@ -127,11 +127,11 @@ class MainViewController: NSViewController {
 
     func updateForwardMenuItem() {
         guard let selectedTabViewModel = tabCollectionViewModel.selectedTabViewModel else {
-            os_log("MainViewController: No tab view model selected", log: OSLog.Category.general, type: .error)
+            os_log("MainViewController: No tab view model selected", type: .error)
             return
         }
         guard let mainMenu = NSApplication.shared.mainMenu, let forwardMenuItem = mainMenu.forwardMenuItem else {
-            os_log("MainViewController: Failed to get reference to back menu item", log: OSLog.Category.general, type: .error)
+            os_log("MainViewController: Failed to get reference to back menu item", type: .error)
             return
         }
 
@@ -140,7 +140,7 @@ class MainViewController: NSViewController {
 
     func updateReopenLastClosedTabMenuItem() {
         guard let mainMenu = NSApplication.shared.mainMenu, let reopenLastClosedTabMenuItem = mainMenu.reopenLastClosedTabMenuItem else {
-            os_log("MainViewController: Failed to get reference to back menu item", log: OSLog.Category.general, type: .error)
+            os_log("MainViewController: Failed to get reference to back menu item", type: .error)
             return
         }
 

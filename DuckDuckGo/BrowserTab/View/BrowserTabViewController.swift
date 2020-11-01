@@ -85,12 +85,12 @@ class BrowserTabViewController: NSViewController {
 
     private func reloadWebViewIfNeeded() {
         guard let webView = webView else {
-            os_log("BrowserTabViewController: Web view is nil", log: OSLog.Category.general, type: .error)
+            os_log("BrowserTabViewController: Web view is nil", type: .error)
             return
         }
 
         guard let tabViewModel = tabViewModel else {
-            os_log("%s: Tab view model is nil", log: OSLog.Category.general, type: .error, className)
+            os_log("%s: Tab view model is nil", type: .error, className)
             return
         }
 
@@ -117,12 +117,12 @@ class BrowserTabViewController: NSViewController {
 
     private func displayErrorView(_ shown: Bool) {
         guard let webView = webView else {
-            os_log("BrowserTabViewController: Web view is nil", log: OSLog.Category.general, type: .error)
+            os_log("BrowserTabViewController: Web view is nil", type: .error)
             return
         }
         
         guard let tabViewModel = tabViewModel else {
-            os_log("%s: Tab view model is nil", log: OSLog.Category.general, type: .error, className)
+            os_log("%s: Tab view model is nil", type: .error, className)
             return
         }
 
@@ -182,7 +182,7 @@ extension BrowserTabViewController: WKNavigationDelegate {
         
         tabCollectionViewModel.appendNewTabAfterSelected()
         guard let selectedViewModel = tabCollectionViewModel.selectedTabViewModel else {
-            os_log("%s: Selected tab view model is nil", log: OSLog.Category.general, type: .error, className)
+            os_log("%s: Selected tab view model is nil", type: .error, className)
             return nil
         }
         selectedViewModel.tab.webView.load(navigationAction.request)

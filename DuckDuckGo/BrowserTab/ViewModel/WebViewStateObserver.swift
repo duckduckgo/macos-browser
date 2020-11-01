@@ -54,17 +54,17 @@ class WebViewStateObserver: NSObject {
                                change: [NSKeyValueChangeKey: Any]?,
                                context: UnsafeMutableRawPointer?) {
         guard let keyPath = keyPath else {
-            os_log("%s: keyPath not provided", log: OSLog.Category.general, type: .error, className)
+            os_log("%s: keyPath not provided", type: .error, className)
             return
         }
 
         guard let tabViewModel = tabViewModel else {
-            os_log("%s: TabViewModel was released from memory", log: OSLog.Category.general, type: .error, className)
+            os_log("%s: TabViewModel was released from memory", type: .error, className)
             return
         }
 
         guard let webView = webView else {
-            os_log("%s: TabViewModel was released from memory", log: OSLog.Category.general, type: .error, className)
+            os_log("%s: TabViewModel was released from memory", type: .error, className)
             return
         }
 
@@ -75,7 +75,7 @@ class WebViewStateObserver: NSObject {
         case #keyPath(WKWebView.isLoading): tabViewModel.isLoading = webView.isLoading
         case #keyPath(WKWebView.title): tabViewModel.tab.title = webView.title
         default:
-            os_log("%s: keyPath %s not handled", log: OSLog.Category.general, type: .error, className, keyPath)
+            os_log("%s: keyPath %s not handled", type: .error, className, keyPath)
             super.observeValue(forKeyPath: keyPath, of: object, change: change, context: context)
         }
     }

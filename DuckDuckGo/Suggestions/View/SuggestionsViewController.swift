@@ -191,7 +191,7 @@ class SuggestionsViewController: NSViewController {
 
     private func closeWindow() {
         guard let window = view.window else {
-            os_log("SuggestionsViewController: Window not available", log: OSLog.Category.general, type: .error)
+            os_log("SuggestionsViewController: Window not available", type: .error)
             return
         }
 
@@ -215,12 +215,12 @@ extension SuggestionsViewController: NSTableViewDelegate {
         guard let suggestionTableCellView = tableView.makeView(
                 withIdentifier: NSUserInterfaceItemIdentifier(rawValue: SuggestionTableCellView.identifier), owner: self)
                 as? SuggestionTableCellView else {
-            os_log("SuggestionsViewController: Making of table cell view failed", log: OSLog.Category.general, type: .error)
+            os_log("SuggestionsViewController: Making of table cell view failed", type: .error)
             return nil
         }
 
         guard let suggestionViewModel = suggestionsViewModel.suggestionViewModel(at: row) else {
-            os_log("SuggestionsViewController: Failed to get suggestion", log: OSLog.Category.general, type: .error)
+            os_log("SuggestionsViewController: Failed to get suggestion", type: .error)
             return nil
         }
 
@@ -232,7 +232,7 @@ extension SuggestionsViewController: NSTableViewDelegate {
         guard let suggestionTableRowView = tableView.makeView(
                 withIdentifier: NSUserInterfaceItemIdentifier(rawValue: SuggestionTableRowView.identifier), owner: self)
                 as? SuggestionTableRowView else {
-            os_log("SuggestionsViewController: Making of table row view failed", log: OSLog.Category.general, type: .error)
+            os_log("SuggestionsViewController: Making of table row view failed", type: .error)
             return nil
         }
         return suggestionTableRowView

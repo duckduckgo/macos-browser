@@ -79,7 +79,7 @@ class MainWindowController: NSWindowController {
               let closeWidget = titlebarView.subviews.first(where: { $0.className == "_NSThemeCloseWidget" }),
               let minimizeWidget = titlebarView.subviews.first(where: { $0.className == "_NSThemeWidget" }),
               let zoomWidget = titlebarView.subviews.first(where: { $0.className == "_NSThemeZoomWidget" }) else {
-            os_log("MainWindowController: Failed to get references to window buttons", log: OSLog.Category.general, type: .error)
+            os_log("MainWindowController: Failed to get references to window buttons", type: .error)
             return
         }
 
@@ -105,7 +105,7 @@ class MainWindowController: NSWindowController {
               let closeWidget = closeWidget,
               let minimizeWidget = minimizeWidget,
               let zoomWidget = zoomWidget else {
-            os_log("MainWindowController: No references to window buttons", log: OSLog.Category.general, type: .error)
+            os_log("MainWindowController: No references to window buttons", type: .error)
             return
         }
 
@@ -142,7 +142,7 @@ extension MainWindowController: NSWindowDelegate {
 
     func windowDidBecomeMain(_ notification: Notification) {
         guard let mainViewController = contentViewController as? MainViewController else {
-            os_log("MainWindowController: Failed to get reference to main view controller", log: OSLog.Category.general, type: .error)
+            os_log("MainWindowController: Failed to get reference to main view controller", type: .error)
             return
         }
 
@@ -155,7 +155,7 @@ extension MainWindowController: NSWindowDelegate {
 
     func windowWillClose(_ notification: Notification) {
         guard let mainViewController = contentViewController as? MainViewController else {
-            os_log("MainWindowController: Failed to get reference to main view controller", log: OSLog.Category.general, type: .error)
+            os_log("MainWindowController: Failed to get reference to main view controller", type: .error)
             return
         }
 

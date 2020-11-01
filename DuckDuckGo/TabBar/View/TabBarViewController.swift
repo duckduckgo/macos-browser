@@ -102,7 +102,7 @@ class TabBarViewController: NSViewController {
         }
 
         guard let selectionIndex = tabCollectionViewModel.selectionIndex else {
-            os_log("TabBarViewController: Selection index is nil", log: OSLog.Category.general, type: .error)
+            os_log("TabBarViewController: Selection index is nil", type: .error)
             return
         }
         
@@ -121,7 +121,7 @@ class TabBarViewController: NSViewController {
     private func closeWindowIfNeeded() {
         if tabCollectionViewModel.tabCollection.tabs.isEmpty {
             guard let window = view.window else {
-                os_log("AddressBarTextField: Window not available", log: OSLog.Category.general, type: .error)
+                os_log("AddressBarTextField: Window not available", type: .error)
                 return
             }
             window.close()
@@ -324,7 +324,7 @@ extension TabBarViewController: NSCollectionViewDataSource {
     func collectionView(_ collectionView: NSCollectionView, itemForRepresentedObjectAt indexPath: IndexPath) -> NSCollectionViewItem {
         let item = collectionView.makeItem(withIdentifier: TabBarViewItem.identifier, for: indexPath)
         guard let tabBarViewItem = item as? TabBarViewItem else {
-            os_log("", log: OSLog.Category.general, type: .error)
+            os_log("", type: .error)
             return item
         }
         
@@ -346,7 +346,7 @@ extension TabBarViewController: NSCollectionViewDelegate {
                         didChangeItemsAt indexPaths: Set<IndexPath>,
                         to highlightState: NSCollectionViewItem.HighlightState) {
         guard indexPaths.count == 1, let indexPath = indexPaths.first else {
-            os_log("TabBarViewController: More than 1 item highlighted", log: OSLog.Category.general, type: .error)
+            os_log("TabBarViewController: More than 1 item highlighted", type: .error)
             return
         }
 
@@ -397,12 +397,12 @@ extension TabBarViewController: NSCollectionViewDelegate {
                         proposedIndexPath proposedDropIndexPath: AutoreleasingUnsafeMutablePointer<NSIndexPath>,
                         dropOperation proposedDropOperation: UnsafeMutablePointer<NSCollectionView.DropOperation>) -> NSDragOperation {
         guard let draggingIndexPaths = draggingIndexPaths else {
-            os_log("TabBarViewController: Dragging index paths is nil", log: OSLog.Category.general, type: .error)
+            os_log("TabBarViewController: Dragging index paths is nil", type: .error)
             return .copy
         }
 
         guard let indexPath = draggingIndexPaths.first, draggingIndexPaths.count == 1 else {
-            os_log("TabBarViewController: More than 1 dragging index path", log: OSLog.Category.general, type: .error)
+            os_log("TabBarViewController: More than 1 dragging index path", type: .error)
             return .move
         }
 
@@ -422,12 +422,12 @@ extension TabBarViewController: NSCollectionViewDelegate {
                         indexPath: IndexPath,
                         dropOperation: NSCollectionView.DropOperation) -> Bool {
         guard let draggingIndexPaths = draggingIndexPaths else {
-            os_log("TabBarViewController: Dragging index paths is nil", log: OSLog.Category.general, type: .error)
+            os_log("TabBarViewController: Dragging index paths is nil", type: .error)
             return false
         }
 
         guard draggingIndexPaths.count == 1 else {
-            os_log("TabBarViewController: More than 1 item selected", log: OSLog.Category.general, type: .error)
+            os_log("TabBarViewController: More than 1 item selected", type: .error)
             return false
         }
 
@@ -440,7 +440,7 @@ extension TabBarViewController: TabBarViewItemDelegate {
 
     func tabBarViewItemDuplicateAction(_ tabBarViewItem: TabBarViewItem) {
         guard let indexPath = collectionView.indexPath(for: tabBarViewItem) else {
-            os_log("TabBarViewController: Failed to get indexPath", log: OSLog.Category.general, type: .error)
+            os_log("TabBarViewController: Failed to get indexPath", type: .error)
             return
         }
 
@@ -450,7 +450,7 @@ extension TabBarViewController: TabBarViewItemDelegate {
 
     func tabBarViewItemCloseAction(_ tabBarViewItem: TabBarViewItem) {
         guard let indexPath = collectionView.indexPath(for: tabBarViewItem) else {
-            os_log("TabBarViewController: Failed to get indexPath", log: OSLog.Category.general, type: .error)
+            os_log("TabBarViewController: Failed to get indexPath", type: .error)
             return
         }
 
@@ -459,7 +459,7 @@ extension TabBarViewController: TabBarViewItemDelegate {
 
     func tabBarViewItemCloseOtherAction(_ tabBarViewItem: TabBarViewItem) {
         guard let indexPath = collectionView.indexPath(for: tabBarViewItem) else {
-            os_log("TabBarViewController: Failed to get indexPath", log: OSLog.Category.general, type: .error)
+            os_log("TabBarViewController: Failed to get indexPath", type: .error)
             return
         }
 

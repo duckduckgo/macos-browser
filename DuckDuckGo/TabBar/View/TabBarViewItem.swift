@@ -178,7 +178,7 @@ class TabBarViewItem: NSCollectionViewItem {
 
     private func updateTitleTextFieldMask() {
         guard let titleTextFieldLayer = titleTextField.layer else {
-            os_log("TabBarViewItem: Title text field has no layer", log: OSLog.Category.general, type: .error)
+            os_log("TabBarViewItem: Title text field has no layer", type: .error)
             return
         }
 
