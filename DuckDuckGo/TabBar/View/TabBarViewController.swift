@@ -119,7 +119,7 @@ class TabBarViewController: NSViewController {
     }
 
     private func closeWindowIfNeeded() {
-        if tabCollectionViewModel.tabCollection.tabs.count == 0 {
+        if tabCollectionViewModel.tabCollection.tabs.isEmpty {
             guard let window = view.window else {
                 os_log("AddressBarTextField: Window not available", log: OSLog.Category.general, type: .error)
                 return
