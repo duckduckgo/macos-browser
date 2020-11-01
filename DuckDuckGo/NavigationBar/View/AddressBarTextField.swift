@@ -26,15 +26,15 @@ class AddressBarTextField: NSTextField {
 
     var tabCollectionViewModel: TabCollectionViewModel! {
         didSet {
-            bindSelectedTabViewModel()
+            subscribeToSelectedTabViewModel()
         }
     }
 
     var suggestionsViewModel: SuggestionsViewModel! {
         didSet {
             initSuggestionsWindow()
-            bindSuggestionItems()
-            bindSelectedSuggestionViewModel()
+            subscribeToSuggestionItems()
+            subscribeToSelectedSuggestionViewModel()
         }
     }
 
@@ -64,7 +64,7 @@ class AddressBarTextField: NSTextField {
         value = .text("")
     }
 
-    private func bindSuggestionItems() {
+    private func subscribeToSuggestionItems() {
         suggestionItemsCancellable = suggestionsViewModel.suggestions.$items.receive(on: DispatchQueue.main).sink { [weak self] _ in
             if self?.suggestionsViewModel.suggestions.items?.count ?? 0 > 0 {
                 self?.showSuggestionsWindow()
@@ -72,20 +72,20 @@ class AddressBarTextField: NSTextField {
         }
     }
 
-    private func bindSelectedSuggestionViewModel() {
+    private func subscribeToSelectedSuggestionViewModel() {
         selectedSuggestionViewModelCancellable =
             suggestionsViewModel.$selectedSuggestionViewModel.receive(on: DispatchQueue.main).sink { [weak self] _ in
                 self?.displaySelectedSuggestionViewModel()
         }
     }
 
-    private func bindSelectedTabViewModel() {
+    private func subscribeToSelectedTabViewModel() {
         selectedTabViewModelCancelable = tabCollectionViewModel.$selectedTabViewModel.receive(on: DispatchQueue.main).sink { [weak self] _ in
-            self?.bindAddressBarString()
+            self?.subscribeToAddressBarString()
         }
     }
 
-    private func bindAddressBarString() {
+    private func subscribeToAddressBarString() {
         addressBarStringCancelable?.cancel()
 
         guard let selectedTabViewModel = tabCollectionViewModel.selectedTabViewModel else {

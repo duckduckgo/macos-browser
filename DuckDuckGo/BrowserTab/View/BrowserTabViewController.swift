@@ -44,10 +44,10 @@ class BrowserTabViewController: NSViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
 
-        bindSelectedTabViewModel()
+        subscribeToSelectedTabViewModel()
     }
 
-    private func bindSelectedTabViewModel() {
+    private func subscribeToSelectedTabViewModel() {
         selectedTabViewModelCancelable = tabCollectionViewModel.$selectedTabViewModel.receive(on: DispatchQueue.main).sink { [weak self] _ in
             self?.changeWebView()
         }
@@ -64,7 +64,7 @@ class BrowserTabViewController: NSViewController {
             webView = newWebView
         }
 
-        func bindUrl(of tabViewModel: TabViewModel) {
+        func subscribeToUrl(of tabViewModel: TabViewModel) {
             urlCancelable?.cancel()
             urlCancelable = tabViewModel.tab.$url.receive(on: DispatchQueue.main).sink { [weak self] _ in self?.reloadWebViewIfNeeded() }
         }
@@ -80,7 +80,7 @@ class BrowserTabViewController: NSViewController {
         self.tabViewModel = tabViewModel
 
         displayWebView(of: tabViewModel)
-        bindUrl(of: tabViewModel)
+        subscribeToUrl(of: tabViewModel)
     }
 
     private func reloadWebViewIfNeeded() {

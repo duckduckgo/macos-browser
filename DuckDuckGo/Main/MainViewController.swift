@@ -40,8 +40,8 @@ class MainViewController: NSViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
 
-        bindSelectedTabViewModel()
-        bindCanInsertLastRemovedTab()
+        subscribeToSelectedTabViewModel()
+        subscribeToCanInsertLastRemovedTab()
     }
 
     func windowDidBecomeMain() {
@@ -88,13 +88,13 @@ class MainViewController: NSViewController {
         return browserTabViewController
     }
 
-    private func bindSelectedTabViewModel() {
+    private func subscribeToSelectedTabViewModel() {
         selectedTabViewModelCancelable = tabCollectionViewModel.$selectedTabViewModel.receive(on: DispatchQueue.main).sink { [weak self] _ in
-            self?.bindCanGoBackForward()
+            self?.subscribeToCanGoBackForward()
         }
     }
 
-    private func bindCanGoBackForward() {
+    private func subscribeToCanGoBackForward() {
         canGoBackCancelable?.cancel()
         canGoBackCancelable = tabCollectionViewModel.selectedTabViewModel?.$canGoBack.receive(on: DispatchQueue.main).sink { [weak self] _ in
             self?.updateBackMenuItem()
@@ -105,7 +105,7 @@ class MainViewController: NSViewController {
         }
     }
 
-    private func bindCanInsertLastRemovedTab() {
+    private func subscribeToCanInsertLastRemovedTab() {
         canInsertLastRemovedTabCancelable?.cancel()
         canInsertLastRemovedTabCancelable = tabCollectionViewModel.$canInsertLastRemovedTab.receive(on: DispatchQueue.main).sink { [weak self] _ in
             self?.updateReopenLastClosedTabMenuItem()

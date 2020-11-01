@@ -68,8 +68,8 @@ class AddressBarViewController: NSViewController {
         updateView(firstResponder: false)
         addressBarTextField.tabCollectionViewModel = tabCollectionViewModel
         addressBarTextField.suggestionsViewModel = suggestionsViewModel
-        bindSelectedTabViewModel()
-        bindAddressBarTextFieldValue()
+        subscribeToSelectedTabViewModel()
+        subscribeToAddressBarTextFieldValue()
         NotificationCenter.default.addObserver(self,
                                                selector: #selector(textFieldFirstReponderNotification(_:)),
                                                name: .firstResponder,
@@ -99,14 +99,14 @@ class AddressBarViewController: NSViewController {
         return view as? AddressBarView
     }
 
-    private func bindSelectedTabViewModel() {
+    private func subscribeToSelectedTabViewModel() {
         selectedTabViewModelCancelable = tabCollectionViewModel.$selectedTabViewModel.receive(on: DispatchQueue.main).sink { [weak self] _ in
             self?.view.window?.makeFirstResponder(self?.view.window)
-            self?.bindPassiveAddressBarString()
+            self?.subscribeToPassiveAddressBarString()
         }
     }
 
-    private func bindPassiveAddressBarString() {
+    private func subscribeToPassiveAddressBarString() {
         passiveAddressBarStringCancelable?.cancel()
 
         guard let selectedTabViewModel = tabCollectionViewModel.selectedTabViewModel else {
@@ -118,7 +118,7 @@ class AddressBarViewController: NSViewController {
         }
     }
 
-    private func bindAddressBarTextFieldValue() {
+    private func subscribeToAddressBarTextFieldValue() {
         addressBarTextFieldValueCancelable = addressBarTextField.$value.receive(on: DispatchQueue.main).sink { [weak self] _ in
             self?.updateMode()
             self?.updateButtons()

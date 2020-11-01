@@ -116,8 +116,8 @@ class TabBarViewItem: NSCollectionViewItem {
         delegate?.tabBarViewItemCloseOtherAction(self)
     }
 
-    func bind(tabViewModel: TabViewModel) {
-        clearBindings()
+    func subscribe(to tabViewModel: TabViewModel) {
+        clearSubscriptions()
 
         tabViewModel.$title.sink { [weak self] title in
             self?.titleTextField.stringValue = title
@@ -137,7 +137,7 @@ class TabBarViewItem: NSCollectionViewItem {
     }
 
     func clear() {
-        clearBindings()
+        clearSubscriptions()
         faviconImageView.image = nil
         titleTextField.stringValue = ""
     }
@@ -155,7 +155,7 @@ class TabBarViewItem: NSCollectionViewItem {
         view.layer?.masksToBounds = true
     }
 
-    private func clearBindings() {
+    private func clearSubscriptions() {
         cancelables.forEach { (cancelable) in
             cancelable.cancel()
         }

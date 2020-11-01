@@ -58,8 +58,8 @@ class SuggestionsViewController: NSViewController {
         tableView.dataSource = self
 
         addTrackingArea()
-        bindSuggestions()
-        bindSelectionIndex()
+        subscribeToSuggestions()
+        subscribeToSelectionIndex()
     }
 
     override func viewWillAppear() {
@@ -99,13 +99,13 @@ class SuggestionsViewController: NSViewController {
         }
     }
 
-    private func bindSuggestions() {
+    private func subscribeToSuggestions() {
         suggestionsCancelable = suggestionsViewModel.suggestions.$items.receive(on: DispatchQueue.main).sink { [weak self] _ in
             self?.displayNewSuggestions()
         }
     }
 
-    private func bindSelectionIndex() {
+    private func subscribeToSelectionIndex() {
         selectionIndexCancelable = suggestionsViewModel.$selectionIndex.receive(on: DispatchQueue.main).sink { [weak self] _ in
             if let weakSelf = self {
                 weakSelf.selectRow(at: weakSelf.suggestionsViewModel.selectionIndex)

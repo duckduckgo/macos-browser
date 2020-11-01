@@ -56,7 +56,7 @@ class TabBarViewController: NSViewController {
 
         updateScrollElasticity()
         receiveScrollNotifications()
-        bindSelectionIndex()
+        subscribeToSelectionIndex()
     }
 
     override func viewWillAppear() {
@@ -90,7 +90,7 @@ class TabBarViewController: NSViewController {
         collectionView.scrollToBeginning()
     }
 
-    private func bindSelectionIndex() {
+    private func subscribeToSelectionIndex() {
         selectionIndexCancelable = tabCollectionViewModel.$selectionIndex.receive(on: DispatchQueue.main).sink { [weak self] _ in
             self?.reloadSelection()
         }
@@ -334,7 +334,7 @@ extension TabBarViewController: NSCollectionViewDataSource {
         }
 
         tabBarViewItem.delegate = self
-        tabBarViewItem.bind(tabViewModel: tabViewModel)
+        tabBarViewItem.subscribe(to: tabViewModel)
         return tabBarViewItem
     }
     

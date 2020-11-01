@@ -51,23 +51,23 @@ class TabViewModel {
 
         webViewStateObserver = WebViewStateObserver(webView: tab.webView, tabViewModel: self)
 
-        bindUrl()
-        bindTitle()
-        bindFavicon()
+        subscribeToUrl()
+        subscribeToTitle()
+        subscribeToFavicon()
     }
 
-    private func bindUrl() {
+    private func subscribeToUrl() {
         tab.$url.receive(on: DispatchQueue.main).sink { [weak self] _ in
             self?.updateCanReload()
             self?.updateAddressBarStrings()
         } .store(in: &cancelables)
     }
 
-    private func bindTitle() {
+    private func subscribeToTitle() {
         tab.$title.receive(on: DispatchQueue.main).sink { [weak self] _ in self?.updateTitle() } .store(in: &cancelables)
     }
 
-    private func bindFavicon() {
+    private func subscribeToFavicon() {
         tab.$favicon.receive(on: DispatchQueue.main).sink { [weak self] _ in self?.updateFavicon() } .store(in: &cancelables)
     }
 

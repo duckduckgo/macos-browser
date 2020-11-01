@@ -55,7 +55,7 @@ class NavigationBarViewController: NSViewController {
         super.viewDidLoad()
 
         setupNavigationButtonMenus()
-        bindSelectedTabViewModel()
+        subscribeToSelectedTabViewModel()
     }
 
     @IBSegueAction func createAddressBarViewController(_ coder: NSCoder) -> AddressBarViewController? {
@@ -102,13 +102,13 @@ class NavigationBarViewController: NSViewController {
         goForwardButton.menu = forwardButtonMenu
     }
 
-    private func bindSelectedTabViewModel() {
+    private func subscribeToSelectedTabViewModel() {
         selectedTabViewModelCancelable = tabCollectionViewModel.$selectedTabViewModel.receive(on: DispatchQueue.main).sink { [weak self] _ in
-            self?.bindNavigationButtons()
+            self?.subscribeToNavigationActionFlags()
         }
     }
 
-    private func bindNavigationButtons() {
+    private func subscribeToNavigationActionFlags() {
         navigationButtonsCancelables.forEach { $0.cancel() }
         navigationButtonsCancelables.removeAll()
 

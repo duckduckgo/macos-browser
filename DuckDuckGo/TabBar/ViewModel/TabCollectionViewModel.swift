@@ -38,8 +38,8 @@ class TabCollectionViewModel {
     init(tabCollection: TabCollection) {
         self.tabCollection = tabCollection
 
-        bindTabs()
-        bindLastRemovedTab()
+        subscribeToTabs()
+        subscribeToLastRemovedTab()
         appendNewTab()
     }
 
@@ -163,14 +163,14 @@ class TabCollectionViewModel {
         select(at: newIndex)
     }
 
-    private func bindTabs() {
+    private func subscribeToTabs() {
         tabCollection.$tabs.sink { [weak self] newTabs in
             self?.removeTabViewModelsIfNeeded(newTabs: newTabs)
             self?.addTabViewModelsIfNeeded(newTabs: newTabs)
         } .store(in: &cancelables)
     }
 
-    private func bindLastRemovedTab() {
+    private func subscribeToLastRemovedTab() {
         tabCollection.$lastRemovedTabCache.receive(on: DispatchQueue.main).sink { [weak self] _ in
             self?.updateCanInsertLastRemovedTab()
         } .store(in: &cancelables)
