@@ -177,7 +177,7 @@ class AddressBarTextField: NSTextField {
 
     @Published private(set) var value: Value = .text("") {
         didSet {
-            var stringValue = ""
+            let stringValue: String
             switch value {
             case .text(let text):
                 stringValue = text
