@@ -38,6 +38,8 @@ class TabBarViewController: NSViewController {
     @IBOutlet weak var windowDraggingViewLeadingConstraint: NSLayoutConstraint!
 
     private let tabCollectionViewModel: TabCollectionViewModel
+    lazy private var fireViewModel = FireViewModel()
+
     private var tabsCancellable: AnyCancellable?
     private var selectionIndexCancellable: AnyCancellable?
 
@@ -75,7 +77,8 @@ class TabBarViewController: NSViewController {
     }
 
     @IBAction func burnButtonAction(_ sender: NSButton) {
-
+        WindowsManager.closeWindows(except: view.window)
+        fireViewModel.fire.burnAll(tabCollectionViewModel: tabCollectionViewModel)
     }
 
     @IBAction func addButtonAction(_ sender: NSButton) {
