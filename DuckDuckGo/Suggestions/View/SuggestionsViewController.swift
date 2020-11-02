@@ -45,8 +45,8 @@ class SuggestionsViewController: NSViewController {
         super.init(coder: coder)
     }
 
-    var suggestionsCancelable: AnyCancellable?
-    var selectionIndexCancelable: AnyCancellable?
+    var suggestionsCancellable: AnyCancellable?
+    var selectionIndexCancellable: AnyCancellable?
 
     var mouseUpEventsMonitor: Any?
     var mouseDownEventsMonitor: Any?
@@ -100,13 +100,13 @@ class SuggestionsViewController: NSViewController {
     }
 
     private func subscribeToSuggestions() {
-        suggestionsCancelable = suggestionsViewModel.suggestions.$items.receive(on: DispatchQueue.main).sink { [weak self] _ in
+        suggestionsCancellable = suggestionsViewModel.suggestions.$items.receive(on: DispatchQueue.main).sink { [weak self] _ in
             self?.displayNewSuggestions()
         }
     }
 
     private func subscribeToSelectionIndex() {
-        selectionIndexCancelable = suggestionsViewModel.$selectionIndex.receive(on: DispatchQueue.main).sink { [weak self] _ in
+        selectionIndexCancellable = suggestionsViewModel.$selectionIndex.receive(on: DispatchQueue.main).sink { [weak self] _ in
             if let weakSelf = self {
                 weakSelf.selectRow(at: weakSelf.suggestionsViewModel.selectionIndex)
             }

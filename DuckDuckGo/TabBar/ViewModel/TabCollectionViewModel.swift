@@ -33,7 +33,7 @@ class TabCollectionViewModel {
     @Published private(set) var selectedTabViewModel: TabViewModel?
     @Published private(set) var canInsertLastRemovedTab: Bool = false
 
-    private var cancelables = Set<AnyCancellable>()
+    private var cancellables = Set<AnyCancellable>()
 
     init(tabCollection: TabCollection) {
         self.tabCollection = tabCollection
@@ -167,13 +167,13 @@ class TabCollectionViewModel {
         tabCollection.$tabs.sink { [weak self] newTabs in
             self?.removeTabViewModelsIfNeeded(newTabs: newTabs)
             self?.addTabViewModelsIfNeeded(newTabs: newTabs)
-        } .store(in: &cancelables)
+        } .store(in: &cancellables)
     }
 
     private func subscribeToLastRemovedTab() {
         tabCollection.$lastRemovedTabCache.receive(on: DispatchQueue.main).sink { [weak self] _ in
             self?.updateCanInsertLastRemovedTab()
-        } .store(in: &cancelables)
+        } .store(in: &cancellables)
     }
 
     private func removeTabViewModelsIfNeeded(newTabs: [Tab]) {

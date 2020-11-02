@@ -36,8 +36,8 @@ class NavigationBarViewController: NSViewController {
     // swiftlint:enable weak_delegate
     private let optionsMenu: OptionsButtonMenu
 
-    private var selectedTabViewModelCancelable: AnyCancellable?
-    private var navigationButtonsCancelables = Set<AnyCancellable>()
+    private var selectedTabViewModelCancellable: AnyCancellable?
+    private var navigationButtonsCancellables = Set<AnyCancellable>()
 
     required init?(coder: NSCoder) {
         fatalError("NavigationBarViewController: Bad initializer")
@@ -103,14 +103,14 @@ class NavigationBarViewController: NSViewController {
     }
 
     private func subscribeToSelectedTabViewModel() {
-        selectedTabViewModelCancelable = tabCollectionViewModel.$selectedTabViewModel.receive(on: DispatchQueue.main).sink { [weak self] _ in
+        selectedTabViewModelCancellable = tabCollectionViewModel.$selectedTabViewModel.receive(on: DispatchQueue.main).sink { [weak self] _ in
             self?.subscribeToNavigationActionFlags()
         }
     }
 
     private func subscribeToNavigationActionFlags() {
-        navigationButtonsCancelables.forEach { $0.cancel() }
-        navigationButtonsCancelables.removeAll()
+        navigationButtonsCancellables.forEach { $0.cancel() }
+        navigationButtonsCancellables.removeAll()
 
         guard let selectedTabViewModel = tabCollectionViewModel.selectedTabViewModel else {
             goBackButton.isEnabled = false
@@ -119,11 +119,11 @@ class NavigationBarViewController: NSViewController {
         }
         selectedTabViewModel.$canGoBack.receive(on: DispatchQueue.main).sink { [weak self] _ in
             self?.updateNavigationButtons()
-        } .store(in: &navigationButtonsCancelables)
+        } .store(in: &navigationButtonsCancellables)
 
         selectedTabViewModel.$canGoForward.receive(on: DispatchQueue.main).sink { [weak self] _ in
             self?.updateNavigationButtons()
-        } .store(in: &navigationButtonsCancelables)
+        } .store(in: &navigationButtonsCancellables)
     }
 
     private func updateNavigationButtons() {

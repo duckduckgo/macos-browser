@@ -28,8 +28,8 @@ class BrowserTabViewController: NSViewController {
     var tabViewModel: TabViewModel?
 
     private let tabCollectionViewModel: TabCollectionViewModel
-    private var urlCancelable: AnyCancellable?
-    private var selectedTabViewModelCancelable: AnyCancellable?
+    private var urlCancellable: AnyCancellable?
+    private var selectedTabViewModelCancellable: AnyCancellable?
 
     required init?(coder: NSCoder) {
         fatalError("BrowserTabViewController: Bad initializer")
@@ -48,7 +48,7 @@ class BrowserTabViewController: NSViewController {
     }
 
     private func subscribeToSelectedTabViewModel() {
-        selectedTabViewModelCancelable = tabCollectionViewModel.$selectedTabViewModel.receive(on: DispatchQueue.main).sink { [weak self] _ in
+        selectedTabViewModelCancellable = tabCollectionViewModel.$selectedTabViewModel.receive(on: DispatchQueue.main).sink { [weak self] _ in
             self?.changeWebView()
         }
     }
@@ -65,8 +65,8 @@ class BrowserTabViewController: NSViewController {
         }
 
         func subscribeToUrl(of tabViewModel: TabViewModel) {
-            urlCancelable?.cancel()
-            urlCancelable = tabViewModel.tab.$url.receive(on: DispatchQueue.main).sink { [weak self] _ in self?.reloadWebViewIfNeeded() }
+            urlCancellable?.cancel()
+            urlCancellable = tabViewModel.tab.$url.receive(on: DispatchQueue.main).sink { [weak self] _ in self?.reloadWebViewIfNeeded() }
         }
 
         if let webView = webView, view.subviews.contains(webView) {

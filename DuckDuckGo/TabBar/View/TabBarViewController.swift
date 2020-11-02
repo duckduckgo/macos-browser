@@ -38,8 +38,8 @@ class TabBarViewController: NSViewController {
     @IBOutlet weak var windowDraggingViewLeadingConstraint: NSLayoutConstraint!
 
     private let tabCollectionViewModel: TabCollectionViewModel
-    private var tabsCancelable: AnyCancellable?
-    private var selectionIndexCancelable: AnyCancellable?
+    private var tabsCancellable: AnyCancellable?
+    private var selectionIndexCancellable: AnyCancellable?
 
     required init?(coder: NSCoder) {
         fatalError("TabBarViewController: Bad initializer")
@@ -91,7 +91,7 @@ class TabBarViewController: NSViewController {
     }
 
     private func subscribeToSelectionIndex() {
-        selectionIndexCancelable = tabCollectionViewModel.$selectionIndex.receive(on: DispatchQueue.main).sink { [weak self] _ in
+        selectionIndexCancellable = tabCollectionViewModel.$selectionIndex.receive(on: DispatchQueue.main).sink { [weak self] _ in
             self?.reloadSelection()
         }
     }

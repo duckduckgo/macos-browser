@@ -40,9 +40,9 @@ class AddressBarTextField: NSTextField {
 
     private var suggestionItemsCancellable: AnyCancellable?
     private var selectedSuggestionViewModelCancellable: AnyCancellable?
-    private var selectedTabViewModelCancelable: AnyCancellable?
-    private var searchSuggestionsCancelable: AnyCancellable?
-    private var addressBarStringCancelable: AnyCancellable?
+    private var selectedTabViewModelCancellable: AnyCancellable?
+    private var searchSuggestionsCancellable: AnyCancellable?
+    private var addressBarStringCancellable: AnyCancellable?
 
     override func awakeFromNib() {
         super.awakeFromNib()
@@ -80,19 +80,19 @@ class AddressBarTextField: NSTextField {
     }
 
     private func subscribeToSelectedTabViewModel() {
-        selectedTabViewModelCancelable = tabCollectionViewModel.$selectedTabViewModel.receive(on: DispatchQueue.main).sink { [weak self] _ in
+        selectedTabViewModelCancellable = tabCollectionViewModel.$selectedTabViewModel.receive(on: DispatchQueue.main).sink { [weak self] _ in
             self?.subscribeToAddressBarString()
         }
     }
 
     private func subscribeToAddressBarString() {
-        addressBarStringCancelable?.cancel()
+        addressBarStringCancellable?.cancel()
 
         guard let selectedTabViewModel = tabCollectionViewModel.selectedTabViewModel else {
             clearValue()
             return
         }
-        addressBarStringCancelable = selectedTabViewModel.$addressBarString.receive(on: DispatchQueue.main).sink { [weak self] _ in
+        addressBarStringCancellable = selectedTabViewModel.$addressBarString.receive(on: DispatchQueue.main).sink { [weak self] _ in
             self?.updateValue()
             self?.makeMeFirstResponderIfNeeded()
         }

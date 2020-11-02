@@ -32,10 +32,10 @@ class MainViewController: NSViewController {
 
     var tabCollectionViewModel = TabCollectionViewModel()
 
-    private var selectedTabViewModelCancelable: AnyCancellable?
-    private var canGoForwardCancelable: AnyCancellable?
-    private var canGoBackCancelable: AnyCancellable?
-    private var canInsertLastRemovedTabCancelable: AnyCancellable?
+    private var selectedTabViewModelCancellable: AnyCancellable?
+    private var canGoForwardCancellable: AnyCancellable?
+    private var canGoBackCancellable: AnyCancellable?
+    private var canInsertLastRemovedTabCancellable: AnyCancellable?
 
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -89,25 +89,25 @@ class MainViewController: NSViewController {
     }
 
     private func subscribeToSelectedTabViewModel() {
-        selectedTabViewModelCancelable = tabCollectionViewModel.$selectedTabViewModel.receive(on: DispatchQueue.main).sink { [weak self] _ in
+        selectedTabViewModelCancellable = tabCollectionViewModel.$selectedTabViewModel.receive(on: DispatchQueue.main).sink { [weak self] _ in
             self?.subscribeToCanGoBackForward()
         }
     }
 
     private func subscribeToCanGoBackForward() {
-        canGoBackCancelable?.cancel()
-        canGoBackCancelable = tabCollectionViewModel.selectedTabViewModel?.$canGoBack.receive(on: DispatchQueue.main).sink { [weak self] _ in
+        canGoBackCancellable?.cancel()
+        canGoBackCancellable = tabCollectionViewModel.selectedTabViewModel?.$canGoBack.receive(on: DispatchQueue.main).sink { [weak self] _ in
             self?.updateBackMenuItem()
         }
-        canGoForwardCancelable?.cancel()
-        canGoForwardCancelable = tabCollectionViewModel.selectedTabViewModel?.$canGoForward.receive(on: DispatchQueue.main).sink { [weak self] _ in
+        canGoForwardCancellable?.cancel()
+        canGoForwardCancellable = tabCollectionViewModel.selectedTabViewModel?.$canGoForward.receive(on: DispatchQueue.main).sink { [weak self] _ in
             self?.updateForwardMenuItem()
         }
     }
 
     private func subscribeToCanInsertLastRemovedTab() {
-        canInsertLastRemovedTabCancelable?.cancel()
-        canInsertLastRemovedTabCancelable = tabCollectionViewModel.$canInsertLastRemovedTab.receive(on: DispatchQueue.main).sink { [weak self] _ in
+        canInsertLastRemovedTabCancellable?.cancel()
+        canInsertLastRemovedTabCancellable = tabCollectionViewModel.$canInsertLastRemovedTab.receive(on: DispatchQueue.main).sink { [weak self] _ in
             self?.updateReopenLastClosedTabMenuItem()
         }
     }

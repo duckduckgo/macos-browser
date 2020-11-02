@@ -22,7 +22,7 @@ import Combine
 
 class SuggestionsViewModelTests: XCTestCase {
 
-    var cancelables = Set<AnyCancellable>()
+    var cancellables = Set<AnyCancellable>()
     
     func testWhenNoSuggestionsThenNumberOfSuggestionsIs0() {
         let suggestions = Suggestions()
@@ -50,7 +50,7 @@ class SuggestionsViewModelTests: XCTestCase {
         suggestionsViewModel.$selectedSuggestionViewModel.debounce(for: 0.1, scheduler: RunLoop.main).sink { selectedSuggestionViewModel in
             XCTAssertEqual(suggestionsViewModel.suggestions.items?[index], selectedSuggestionViewModel?.suggestion)
             selectedSuggestionViewModelExpectation.fulfill()
-        } .store(in: &cancelables)
+        } .store(in: &cancellables)
         waitForExpectations(timeout: 1, handler: nil)
     }
     
@@ -66,7 +66,7 @@ class SuggestionsViewModelTests: XCTestCase {
             XCTAssertNil(suggestionsViewModel.selectionIndex)
             XCTAssertNil(selectedSuggestionViewModel)
             selectedSuggestionViewModelExpectation.fulfill()
-        } .store(in: &cancelables)
+        } .store(in: &cancellables)
         waitForExpectations(timeout: 1, handler: nil)
     }
     
@@ -83,7 +83,7 @@ class SuggestionsViewModelTests: XCTestCase {
             XCTAssertNil(suggestionsViewModel.selectionIndex)
             XCTAssertNil(suggestionsViewModel.selectedSuggestionViewModel)
             selectedSuggestionViewModelExpectation2.fulfill()
-        } .store(in: &cancelables)
+        } .store(in: &cancellables)
         waitForExpectations(timeout: 1, handler: nil)
     }
     

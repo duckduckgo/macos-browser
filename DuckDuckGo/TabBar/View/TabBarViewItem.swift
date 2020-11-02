@@ -69,7 +69,7 @@ class TabBarViewItem: NSCollectionViewItem {
 
     private let titleTextFieldMaskLayer = CAGradientLayer()
 
-    private var cancelables = Set<AnyCancellable>()
+    private var cancellables = Set<AnyCancellable>()
 
     weak var delegate: TabBarViewItemDelegate?
 
@@ -121,11 +121,11 @@ class TabBarViewItem: NSCollectionViewItem {
 
         tabViewModel.$title.sink { [weak self] title in
             self?.titleTextField.stringValue = title
-        }.store(in: &cancelables)
+        }.store(in: &cancellables)
 
         tabViewModel.$favicon.sink { [weak self] favicon in
             self?.faviconImageView.image = favicon
-        }.store(in: &cancelables)
+        }.store(in: &cancellables)
 
         tabViewModel.$isLoading.sink { [weak self] isLoading in
             if isLoading {
@@ -133,7 +133,7 @@ class TabBarViewItem: NSCollectionViewItem {
             } else {
                 self?.loadingView.stopAnimation()
             }
-        }.store(in: &cancelables)
+        }.store(in: &cancellables)
     }
 
     func clear() {
@@ -156,8 +156,8 @@ class TabBarViewItem: NSCollectionViewItem {
     }
 
     private func clearSubscriptions() {
-        cancelables.forEach { (cancelable) in
-            cancelable.cancel()
+        cancellables.forEach { (cancellable) in
+            cancellable.cancel()
         }
     }
 

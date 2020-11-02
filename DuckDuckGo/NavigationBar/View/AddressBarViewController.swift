@@ -47,10 +47,10 @@ class AddressBarViewController: NSViewController {
         }
     }
 
-    private var selectedTabViewModelCancelable: AnyCancellable?
-    private var reloadButtonCancelable: AnyCancellable?
-    private var addressBarTextFieldValueCancelable: AnyCancellable?
-    private var passiveAddressBarStringCancelable: AnyCancellable?
+    private var selectedTabViewModelCancellable: AnyCancellable?
+    private var reloadButtonCancellable: AnyCancellable?
+    private var addressBarTextFieldValueCancellable: AnyCancellable?
+    private var passiveAddressBarStringCancellable: AnyCancellable?
 
     required init?(coder: NSCoder) {
         fatalError("AddressBarViewController: Bad initializer")
@@ -100,26 +100,26 @@ class AddressBarViewController: NSViewController {
     }
 
     private func subscribeToSelectedTabViewModel() {
-        selectedTabViewModelCancelable = tabCollectionViewModel.$selectedTabViewModel.receive(on: DispatchQueue.main).sink { [weak self] _ in
+        selectedTabViewModelCancellable = tabCollectionViewModel.$selectedTabViewModel.receive(on: DispatchQueue.main).sink { [weak self] _ in
             self?.view.window?.makeFirstResponder(self?.view.window)
             self?.subscribeToPassiveAddressBarString()
         }
     }
 
     private func subscribeToPassiveAddressBarString() {
-        passiveAddressBarStringCancelable?.cancel()
+        passiveAddressBarStringCancellable?.cancel()
 
         guard let selectedTabViewModel = tabCollectionViewModel.selectedTabViewModel else {
             passiveTextField.stringValue = ""
             return
         }
-        passiveAddressBarStringCancelable = selectedTabViewModel.$passiveAddressBarString.receive(on: DispatchQueue.main).sink { [weak self] _ in
+        passiveAddressBarStringCancellable = selectedTabViewModel.$passiveAddressBarString.receive(on: DispatchQueue.main).sink { [weak self] _ in
             self?.updatePassiveTextField()
         }
     }
 
     private func subscribeToAddressBarTextFieldValue() {
-        addressBarTextFieldValueCancelable = addressBarTextField.$value.receive(on: DispatchQueue.main).sink { [weak self] _ in
+        addressBarTextFieldValueCancellable = addressBarTextField.$value.receive(on: DispatchQueue.main).sink { [weak self] _ in
             self?.updateMode()
             self?.updateButtons()
         }
