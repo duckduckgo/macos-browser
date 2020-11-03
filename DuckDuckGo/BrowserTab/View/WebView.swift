@@ -42,7 +42,7 @@ class WebView: WKWebView {
 
     private func editLinkMenu(_ menu: NSMenu) {
         guard let newWindowMenuItem = menu.items.first(where: { $0.identifier?.rawValue == "WKMenuItemIdentifierOpenLinkInNewWindow"}) else {
-            os_log("WebView: WKMenuItemIdentifierOpenLinkInNewWindow menu item not found", log: OSLog.Category.general, type: .error)
+            os_log("WebView: WKMenuItemIdentifierOpenLinkInNewWindow menu item not found", type: .error)
             return
         }
 

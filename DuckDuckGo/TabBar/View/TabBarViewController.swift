@@ -38,8 +38,8 @@ class TabBarViewController: NSViewController {
     @IBOutlet weak var windowDraggingViewLeadingConstraint: NSLayoutConstraint!
 
     private let tabCollectionViewModel: TabCollectionViewModel
-    private var tabsCancelable: AnyCancellable?
-    private var selectionIndexCancelable: AnyCancellable?
+    private var tabsCancellable: AnyCancellable?
+    private var selectionIndexCancellable: AnyCancellable?
 
     required init?(coder: NSCoder) {
         fatalError("TabBarViewController: Bad initializer")
@@ -54,23 +54,23 @@ class TabBarViewController: NSViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
 
-        setScrollElasticity()
+        updateScrollElasticity()
         receiveScrollNotifications()
-        bindSelectionIndex()
+        subscribeToSelectionIndex()
     }
 
     override func viewWillAppear() {
         super.viewWillAppear()
 
-        setWindowDraggingArea()
+        updateWindowDraggingArea()
         tabCollectionViewModel.tabCollection.delegate = self
     }
 
     override func viewDidLayout() {
         super.viewDidLayout()
 
-        setTabMode(for: collectionView.numberOfItems(inSection: 0))
-        setWindowDraggingArea()
+        updateTabMode(for: collectionView.numberOfItems(inSection: 0))
+        updateWindowDraggingArea()
         collectionView.collectionViewLayout?.invalidateLayout()
     }
 
@@ -90,8 +90,8 @@ class TabBarViewController: NSViewController {
         collectionView.scrollToBeginning()
     }
 
-    private func bindSelectionIndex() {
-        selectionIndexCancelable = tabCollectionViewModel.$selectionIndex.receive(on: DispatchQueue.main).sink { [weak self] _ in
+    private func subscribeToSelectionIndex() {
+        selectionIndexCancellable = tabCollectionViewModel.$selectionIndex.receive(on: DispatchQueue.main).sink { [weak self] _ in
             self?.reloadSelection()
         }
     }
@@ -102,7 +102,7 @@ class TabBarViewController: NSViewController {
         }
 
         guard let selectionIndex = tabCollectionViewModel.selectionIndex else {
-            os_log("TabBarViewController: Selection index is nil", log: OSLog.Category.general, type: .error)
+            os_log("TabBarViewController: Selection index is nil", type: .error)
             return
         }
         
@@ -119,9 +119,9 @@ class TabBarViewController: NSViewController {
     }
 
     private func closeWindowIfNeeded() {
-        if tabCollectionViewModel.tabCollection.tabs.count == 0 {
+        if tabCollectionViewModel.tabCollection.tabs.isEmpty {
             guard let window = view.window else {
-                os_log("AddressBarTextField: Window not available", log: OSLog.Category.general, type: .error)
+                os_log("AddressBarTextField: Window not available", type: .error)
                 return
             }
             window.close()
@@ -130,7 +130,7 @@ class TabBarViewController: NSViewController {
 
     // MARK: - Window Dragging
 
-    private func setWindowDraggingArea() {
+    private func updateWindowDraggingArea() {
         let leadingSpace = min(CGFloat(collectionView.numberOfItems(inSection: 0)) *
                                 currentTabWidth(), scrollView.frame.size.width)
         windowDraggingViewLeadingConstraint.constant = leadingSpace
@@ -175,15 +175,15 @@ class TabBarViewController: NSViewController {
     private var tabMode = TabMode.divided {
         didSet {
             if oldValue != tabMode {
-                setScrollElasticity()
-                setScrollButtons()
-                setWindowDraggingArea()
+                updateScrollElasticity()
+                updateScrollButtons()
+                updateWindowDraggingArea()
                 collectionView.collectionViewLayout?.invalidateLayout()
             }
         }
     }
 
-    private func setTabMode(for numberOfItems: Int? = nil) {
+    private func updateTabMode(for numberOfItems: Int? = nil) {
         let items = CGFloat(numberOfItems ?? collectionView.numberOfItems(inSection: 0))
         let tabsWidth = scrollView.bounds.width
 
@@ -205,7 +205,7 @@ class TabBarViewController: NSViewController {
         }
     }
 
-    private func setScrollElasticity() {
+    private func updateScrollElasticity() {
         scrollView.horizontalScrollElasticity = tabMode == .divided ? .none : .allowed
     }
 
@@ -226,7 +226,7 @@ class TabBarViewController: NSViewController {
         leftScrollButton.isEnabled = clipView.bounds.origin.x > 0
     }
 
-    private func setScrollButtons() {
+    private func updateScrollButtons() {
         let horizontalSpace = tabMode == .divided ?
             CollectionViewHorizontalSpace.withoutScrollButtons.rawValue :
             CollectionViewHorizontalSpace.withScrollButtons.rawValue
@@ -250,7 +250,7 @@ extension TabBarViewController: TabCollectionDelegate {
         let lastIndexPath = IndexPath(item: lastIndex)
         let lastIndexPathSet = Set(arrayLiteral: lastIndexPath)
 
-        setTabMode(for: collectionView.numberOfItems(inSection: 0) + 1)
+        updateTabMode(for: collectionView.numberOfItems(inSection: 0) + 1)
 
         collectionView.clearSelection()
         if tabMode == .divided {
@@ -264,7 +264,7 @@ extension TabBarViewController: TabCollectionDelegate {
                 }
             }
         }
-        setWindowDraggingArea()
+        updateWindowDraggingArea()
     }
 
     func tabCollection(_ tabCollection: TabCollection, didInsert tab: Tab, at index: Int) {
@@ -272,8 +272,8 @@ extension TabBarViewController: TabCollectionDelegate {
         let indexPathSet = Set(arrayLiteral: indexPath)
         collectionView.animator().insertItems(at: indexPathSet)
 
-        setTabMode()
-        setWindowDraggingArea()
+        updateTabMode()
+        updateWindowDraggingArea()
     }
 
     func tabCollection(_ tabCollection: TabCollection, didRemoveTabAt index: Int) {
@@ -283,11 +283,11 @@ extension TabBarViewController: TabCollectionDelegate {
         collectionView.animator().performBatchUpdates {
             collectionView.animator().deleteItems(at: indexPathSet)
         } completionHandler: { _ in
-            self.setTabMode()
+            self.updateTabMode()
         }
 
         closeWindowIfNeeded()
-        setWindowDraggingArea()
+        updateWindowDraggingArea()
     }
 
     func tabCollection(_ tabCollection: TabCollection, didMoveTabAt index: Int, to newIndex: Int) {
@@ -295,7 +295,7 @@ extension TabBarViewController: TabCollectionDelegate {
         let newIndexPath = IndexPath(item: newIndex)
         collectionView.animator().moveItem(at: indexPath, to: newIndexPath)
 
-        setTabMode()
+        updateTabMode()
     }
 
 }
@@ -324,7 +324,7 @@ extension TabBarViewController: NSCollectionViewDataSource {
     func collectionView(_ collectionView: NSCollectionView, itemForRepresentedObjectAt indexPath: IndexPath) -> NSCollectionViewItem {
         let item = collectionView.makeItem(withIdentifier: TabBarViewItem.identifier, for: indexPath)
         guard let tabBarViewItem = item as? TabBarViewItem else {
-            os_log("", log: OSLog.Category.general, type: .error)
+            os_log("", type: .error)
             return item
         }
         
@@ -334,7 +334,7 @@ extension TabBarViewController: NSCollectionViewDataSource {
         }
 
         tabBarViewItem.delegate = self
-        tabBarViewItem.bind(tabViewModel: tabViewModel)
+        tabBarViewItem.subscribe(to: tabViewModel)
         return tabBarViewItem
     }
     
@@ -346,7 +346,7 @@ extension TabBarViewController: NSCollectionViewDelegate {
                         didChangeItemsAt indexPaths: Set<IndexPath>,
                         to highlightState: NSCollectionViewItem.HighlightState) {
         guard indexPaths.count == 1, let indexPath = indexPaths.first else {
-            os_log("TabBarViewController: More than 1 item highlighted", log: OSLog.Category.general, type: .error)
+            os_log("TabBarViewController: More than 1 item highlighted", type: .error)
             return
         }
 
@@ -397,12 +397,12 @@ extension TabBarViewController: NSCollectionViewDelegate {
                         proposedIndexPath proposedDropIndexPath: AutoreleasingUnsafeMutablePointer<NSIndexPath>,
                         dropOperation proposedDropOperation: UnsafeMutablePointer<NSCollectionView.DropOperation>) -> NSDragOperation {
         guard let draggingIndexPaths = draggingIndexPaths else {
-            os_log("TabBarViewController: Dragging index paths is nil", log: OSLog.Category.general, type: .error)
+            os_log("TabBarViewController: Dragging index paths is nil", type: .error)
             return .copy
         }
 
         guard let indexPath = draggingIndexPaths.first, draggingIndexPaths.count == 1 else {
-            os_log("TabBarViewController: More than 1 dragging index path", log: OSLog.Category.general, type: .error)
+            os_log("TabBarViewController: More than 1 dragging index path", type: .error)
             return .move
         }
 
@@ -422,12 +422,12 @@ extension TabBarViewController: NSCollectionViewDelegate {
                         indexPath: IndexPath,
                         dropOperation: NSCollectionView.DropOperation) -> Bool {
         guard let draggingIndexPaths = draggingIndexPaths else {
-            os_log("TabBarViewController: Dragging index paths is nil", log: OSLog.Category.general, type: .error)
+            os_log("TabBarViewController: Dragging index paths is nil", type: .error)
             return false
         }
 
         guard draggingIndexPaths.count == 1 else {
-            os_log("TabBarViewController: More than 1 item selected", log: OSLog.Category.general, type: .error)
+            os_log("TabBarViewController: More than 1 item selected", type: .error)
             return false
         }
 
@@ -440,7 +440,7 @@ extension TabBarViewController: TabBarViewItemDelegate {
 
     func tabBarViewItemDuplicateAction(_ tabBarViewItem: TabBarViewItem) {
         guard let indexPath = collectionView.indexPath(for: tabBarViewItem) else {
-            os_log("TabBarViewController: Failed to get indexPath", log: OSLog.Category.general, type: .error)
+            os_log("TabBarViewController: Failed to get indexPath", type: .error)
             return
         }
 
@@ -450,7 +450,7 @@ extension TabBarViewController: TabBarViewItemDelegate {
 
     func tabBarViewItemCloseAction(_ tabBarViewItem: TabBarViewItem) {
         guard let indexPath = collectionView.indexPath(for: tabBarViewItem) else {
-            os_log("TabBarViewController: Failed to get indexPath", log: OSLog.Category.general, type: .error)
+            os_log("TabBarViewController: Failed to get indexPath", type: .error)
             return
         }
 
@@ -459,7 +459,7 @@ extension TabBarViewController: TabBarViewItemDelegate {
 
     func tabBarViewItemCloseOtherAction(_ tabBarViewItem: TabBarViewItem) {
         guard let indexPath = collectionView.indexPath(for: tabBarViewItem) else {
-            os_log("TabBarViewController: Failed to get indexPath", log: OSLog.Category.general, type: .error)
+            os_log("TabBarViewController: Failed to get indexPath", type: .error)
             return
         }
 

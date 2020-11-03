@@ -33,7 +33,7 @@ class SuggestionsViewModel {
     }
 
     @Published private(set) var selectionIndex: Int? {
-        didSet { setSelectedSuggestionViewModel() }
+        didSet { updateSelectedSuggestionViewModel() }
     }
 
     @Published private(set) var selectedSuggestionViewModel: SuggestionViewModel?
@@ -46,7 +46,7 @@ class SuggestionsViewModel {
         }
     }
 
-    private func setSelectedSuggestionViewModel() {
+    private func updateSelectedSuggestionViewModel() {
         if let selectionIndex = selectionIndex {
             selectedSuggestionViewModel = suggestionViewModel(at: selectionIndex)
         } else {
@@ -58,7 +58,7 @@ class SuggestionsViewModel {
         let items = suggestions.items ?? []
 
         guard index < items.count else {
-            os_log("SuggestionsViewModel: Absolute index is out of bounds", log: OSLog.Category.general, type: .error)
+            os_log("SuggestionsViewModel: Absolute index is out of bounds", type: .error)
             return nil
         }
 
@@ -67,7 +67,7 @@ class SuggestionsViewModel {
 
     func select(at index: Int) {
         guard index >= 0, index < numberOfSuggestions else {
-            os_log("SuggestionsViewModel: Index out of bounds", log: OSLog.Category.general, type: .error)
+            os_log("SuggestionsViewModel: Index out of bounds", type: .error)
             selectionIndex = nil
             return
         }

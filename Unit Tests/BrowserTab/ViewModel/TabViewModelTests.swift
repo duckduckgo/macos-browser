@@ -22,7 +22,7 @@ import Combine
 
 class TabViewModelTests: XCTestCase {
 
-    var cancelables = Set<AnyCancellable>()
+    var cancellables = Set<AnyCancellable>()
 
     // MARK: - Can reload
 
@@ -40,7 +40,7 @@ class TabViewModelTests: XCTestCase {
         tabViewModel.$canReload.debounce(for: 0.1, scheduler: RunLoop.main).sink { _ in
             XCTAssert(tabViewModel.canReload)
             canReloadExpectation.fulfill()
-        } .store(in: &cancelables)
+        } .store(in: &cancellables)
         waitForExpectations(timeout: 1, handler: nil)
     }
 
@@ -64,7 +64,7 @@ class TabViewModelTests: XCTestCase {
         tabViewModel.$addressBarString.debounce(for: 0.1, scheduler: RunLoop.main).sink { addressBarString in
             XCTAssertEqual(addressBarString, query)
             addressBarStringExpectation.fulfill()
-        } .store(in: &cancelables)
+        } .store(in: &cancellables)
         waitForExpectations(timeout: 1, handler: nil)
     }
 
@@ -79,7 +79,7 @@ class TabViewModelTests: XCTestCase {
         tabViewModel.$addressBarString.debounce(for: 0.1, scheduler: RunLoop.main).sink { addressBarString in
             XCTAssertEqual(tabViewModel.addressBarString, urlString)
             addressBarStringExpectation.fulfill()
-        } .store(in: &cancelables)
+        } .store(in: &cancellables)
         waitForExpectations(timeout: 1, handler: nil)
     }
 
@@ -102,7 +102,7 @@ class TabViewModelTests: XCTestCase {
         tabViewModel.$title.debounce(for: 0.1, scheduler: RunLoop.main).sink { title in
             XCTAssertEqual(title, testTitle)
             titleExpectation.fulfill()
-        } .store(in: &cancelables)
+        } .store(in: &cancellables)
         waitForExpectations(timeout: 1, handler: nil)
     }
 
@@ -115,7 +115,7 @@ class TabViewModelTests: XCTestCase {
         tabViewModel.$title.debounce(for: 0.1, scheduler: RunLoop.main).sink { title in
             XCTAssertEqual(title, tabViewModel.addressBarString)
             titleExpectation.fulfill()
-        } .store(in: &cancelables)
+        } .store(in: &cancellables)
         waitForExpectations(timeout: 1, handler: nil)
     }
 
@@ -139,7 +139,7 @@ class TabViewModelTests: XCTestCase {
             if favicon != TabViewModel.Favicon.defaultFavicon {
                 faviconExpectation.fulfill()
             }
-        } .store(in: &cancelables)
+        } .store(in: &cancellables)
         waitForExpectations(timeout: 1, handler: nil)
     }
 

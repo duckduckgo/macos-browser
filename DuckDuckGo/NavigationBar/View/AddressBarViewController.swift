@@ -43,14 +43,14 @@ class AddressBarViewController: NSViewController {
     
     private var mode: Mode = .searching(withUrl: false) {
         didSet {
-            setButtons()
+            updateButtons()
         }
     }
 
-    private var selectedTabViewModelCancelable: AnyCancellable?
-    private var reloadButtonCancelable: AnyCancellable?
-    private var addressBarTextFieldValueCancelable: AnyCancellable?
-    private var passiveAddressBarStringCancelable: AnyCancellable?
+    private var selectedTabViewModelCancellable: AnyCancellable?
+    private var reloadButtonCancellable: AnyCancellable?
+    private var addressBarTextFieldValueCancellable: AnyCancellable?
+    private var passiveAddressBarStringCancellable: AnyCancellable?
 
     required init?(coder: NSCoder) {
         fatalError("AddressBarViewController: Bad initializer")
@@ -65,11 +65,11 @@ class AddressBarViewController: NSViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
 
-        setView(firstResponder: false)
+        updateView(firstResponder: false)
         addressBarTextField.tabCollectionViewModel = tabCollectionViewModel
         addressBarTextField.suggestionsViewModel = suggestionsViewModel
-        bindSelectedTabViewModel()
-        bindAddressBarTextFieldValue()
+        subscribeToSelectedTabViewModel()
+        subscribeToAddressBarTextFieldValue()
         NotificationCenter.default.addObserver(self,
                                                selector: #selector(textFieldFirstReponderNotification(_:)),
                                                name: .firstResponder,
@@ -84,7 +84,7 @@ class AddressBarViewController: NSViewController {
 
     @IBAction func actionButtonAction(_ sender: NSButton) {
         guard let selectedTabViewModel = tabCollectionViewModel.selectedTabViewModel else {
-            os_log("%s: Selected tab view model is nil", log: OSLog.Category.general, type: .error, className)
+            os_log("%s: Selected tab view model is nil", type: .error, className)
             return
         }
 
@@ -99,51 +99,51 @@ class AddressBarViewController: NSViewController {
         return view as? AddressBarView
     }
 
-    private func bindSelectedTabViewModel() {
-        selectedTabViewModelCancelable = tabCollectionViewModel.$selectedTabViewModel.receive(on: DispatchQueue.main).sink { [weak self] _ in
+    private func subscribeToSelectedTabViewModel() {
+        selectedTabViewModelCancellable = tabCollectionViewModel.$selectedTabViewModel.receive(on: DispatchQueue.main).sink { [weak self] _ in
             self?.view.window?.makeFirstResponder(self?.view.window)
-            self?.bindPassiveAddressBarString()
+            self?.subscribeToPassiveAddressBarString()
         }
     }
 
-    private func bindPassiveAddressBarString() {
-        passiveAddressBarStringCancelable?.cancel()
+    private func subscribeToPassiveAddressBarString() {
+        passiveAddressBarStringCancellable?.cancel()
 
         guard let selectedTabViewModel = tabCollectionViewModel.selectedTabViewModel else {
             passiveTextField.stringValue = ""
             return
         }
-        passiveAddressBarStringCancelable = selectedTabViewModel.$passiveAddressBarString.receive(on: DispatchQueue.main).sink { [weak self] _ in
-            self?.setPassiveTextField()
+        passiveAddressBarStringCancellable = selectedTabViewModel.$passiveAddressBarString.receive(on: DispatchQueue.main).sink { [weak self] _ in
+            self?.updatePassiveTextField()
         }
     }
 
-    private func bindAddressBarTextFieldValue() {
-        addressBarTextFieldValueCancelable = addressBarTextField.$value.receive(on: DispatchQueue.main).sink { [weak self] _ in
+    private func subscribeToAddressBarTextFieldValue() {
+        addressBarTextFieldValueCancellable = addressBarTextField.$value.receive(on: DispatchQueue.main).sink { [weak self] _ in
             self?.updateMode()
-            self?.setButtons()
+            self?.updateButtons()
         }
     }
 
-    private func setPassiveTextField() {
+    private func updatePassiveTextField() {
         guard let selectedTabViewModel = tabCollectionViewModel.selectedTabViewModel else {
-            os_log("%s: Selected tab view model is nil", log: OSLog.Category.general, type: .error, className)
+            os_log("%s: Selected tab view model is nil", type: .error, className)
             return
         }
 
         passiveTextField.stringValue = selectedTabViewModel.passiveAddressBarString
     }
 
-    private func setView(firstResponder: Bool) {
+    private func updateView(firstResponder: Bool) {
         addressBarTextField.alphaValue = firstResponder ? 1 : 0
         passiveTextField.alphaValue = firstResponder ? 0 : 1
 
-        addressBarView?.setView(stroke: firstResponder)
+        addressBarView?.updateView(stroke: firstResponder)
     }
 
-    private func setButtons() {
+    private func updateButtons() {
         guard let selectedTabViewModel = tabCollectionViewModel.selectedTabViewModel else {
-            os_log("%s: Selected tab view model is nil", log: OSLog.Category.general, type: .error, className)
+            os_log("%s: Selected tab view model is nil", type: .error, className)
             return
         }
 
@@ -199,15 +199,15 @@ extension AddressBarViewController {
     @objc func textFieldFirstReponderNotification(_ notification: Notification) {
         // NSTextField passes its first responder status down to a child view of NSTextView class
         if let textView = notification.object as? NSTextView, textView.superview?.superview === addressBarTextField {
-            setView(firstResponder: true)
+            updateView(firstResponder: true)
         } else {
             if mode != .browsing {
                 self.mode = .browsing
             }
-            setView(firstResponder: false)
+            updateView(firstResponder: false)
         }
 
-        setButtons()
+        updateButtons()
     }
     
 }

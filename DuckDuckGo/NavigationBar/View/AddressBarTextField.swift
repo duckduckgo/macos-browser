@@ -26,23 +26,23 @@ class AddressBarTextField: NSTextField {
 
     var tabCollectionViewModel: TabCollectionViewModel! {
         didSet {
-            bindSelectedTabViewModel()
+            subscribeToSelectedTabViewModel()
         }
     }
 
     var suggestionsViewModel: SuggestionsViewModel! {
         didSet {
             initSuggestionsWindow()
-            bindSuggestionItems()
-            bindSelectedSuggestionViewModel()
+            subscribeToSuggestionItems()
+            subscribeToSelectedSuggestionViewModel()
         }
     }
 
     private var suggestionItemsCancellable: AnyCancellable?
     private var selectedSuggestionViewModelCancellable: AnyCancellable?
-    private var selectedTabViewModelCancelable: AnyCancellable?
-    private var searchSuggestionsCancelable: AnyCancellable?
-    private var addressBarStringCancelable: AnyCancellable?
+    private var selectedTabViewModelCancellable: AnyCancellable?
+    private var searchSuggestionsCancellable: AnyCancellable?
+    private var addressBarStringCancellable: AnyCancellable?
 
     override func awakeFromNib() {
         super.awakeFromNib()
@@ -64,7 +64,7 @@ class AddressBarTextField: NSTextField {
         value = .text("")
     }
 
-    private func bindSuggestionItems() {
+    private func subscribeToSuggestionItems() {
         suggestionItemsCancellable = suggestionsViewModel.suggestions.$items.receive(on: DispatchQueue.main).sink { [weak self] _ in
             if self?.suggestionsViewModel.suggestions.items?.count ?? 0 > 0 {
                 self?.showSuggestionsWindow()
@@ -72,27 +72,27 @@ class AddressBarTextField: NSTextField {
         }
     }
 
-    private func bindSelectedSuggestionViewModel() {
+    private func subscribeToSelectedSuggestionViewModel() {
         selectedSuggestionViewModelCancellable =
             suggestionsViewModel.$selectedSuggestionViewModel.receive(on: DispatchQueue.main).sink { [weak self] _ in
                 self?.displaySelectedSuggestionViewModel()
         }
     }
 
-    private func bindSelectedTabViewModel() {
-        selectedTabViewModelCancelable = tabCollectionViewModel.$selectedTabViewModel.receive(on: DispatchQueue.main).sink { [weak self] _ in
-            self?.bindAddressBarString()
+    private func subscribeToSelectedTabViewModel() {
+        selectedTabViewModelCancellable = tabCollectionViewModel.$selectedTabViewModel.receive(on: DispatchQueue.main).sink { [weak self] _ in
+            self?.subscribeToAddressBarString()
         }
     }
 
-    private func bindAddressBarString() {
-        addressBarStringCancelable?.cancel()
+    private func subscribeToAddressBarString() {
+        addressBarStringCancellable?.cancel()
 
         guard let selectedTabViewModel = tabCollectionViewModel.selectedTabViewModel else {
             clearValue()
             return
         }
-        addressBarStringCancelable = selectedTabViewModel.$addressBarString.receive(on: DispatchQueue.main).sink { [weak self] _ in
+        addressBarStringCancellable = selectedTabViewModel.$addressBarString.receive(on: DispatchQueue.main).sink { [weak self] _ in
             self?.updateValue()
             self?.makeMeFirstResponderIfNeeded()
         }
@@ -100,7 +100,7 @@ class AddressBarTextField: NSTextField {
 
     private func updateValue() {
         guard let selectedTabViewModel = tabCollectionViewModel.selectedTabViewModel else {
-            os_log("%s: Selected tab view model is nil", log: OSLog.Category.general, type: .error, className)
+            os_log("%s: Selected tab view model is nil", type: .error, className)
             return
         }
         let addressBarString = selectedTabViewModel.addressBarString
@@ -115,7 +115,7 @@ class AddressBarTextField: NSTextField {
 
     private func displaySelectedSuggestionViewModel() {
         guard let suggestionsWindow = suggestionsWindowController?.window else {
-            os_log("AddressBarTextField: Window not available", log: OSLog.Category.general, type: .error)
+            os_log("AddressBarTextField: Window not available", type: .error)
             return
         }
         guard suggestionsWindow.isVisible else { return }
@@ -136,16 +136,16 @@ class AddressBarTextField: NSTextField {
 
     private func confirmStringValue() {
         hideSuggestionsWindow()
-        setUrl()
+        updateTabUrl()
     }
 
-    private func setUrl() {
+    private func updateTabUrl() {
         guard let selectedTabViewModel = tabCollectionViewModel.selectedTabViewModel else {
-            os_log("%s: Selected tab view model is nil", log: OSLog.Category.general, type: .error, className)
+            os_log("%s: Selected tab view model is nil", type: .error, className)
             return
         }
         guard let url = URL.makeURL(from: stringValueWithoutSuffix) else {
-            os_log("%s: Making url from address bar string failed", log: OSLog.Category.general, type: .error, className)
+            os_log("%s: Making url from address bar string failed", type: .error, className)
             return
         }
         selectedTabViewModel.tab.url = url
@@ -177,7 +177,7 @@ class AddressBarTextField: NSTextField {
 
     @Published private(set) var value: Value = .text("") {
         didSet {
-            var stringValue = ""
+            let stringValue: String
             switch value {
             case .text(let text):
                 stringValue = text
@@ -265,7 +265,7 @@ class AddressBarTextField: NSTextField {
 
     private var cursorPosition: Int {
         guard let currentEditor = currentEditor() else {
-            os_log("AddressBarTextField: Current editor not available", log: OSLog.Category.general, type: .error)
+            os_log("AddressBarTextField: Current editor not available", type: .error)
             return 0
         }
 
@@ -274,7 +274,7 @@ class AddressBarTextField: NSTextField {
 
     private func selectToTheEnd(from position: Int) {
         guard let currentEditor = currentEditor() else {
-            os_log("AddressBarTextField: Current editor not available", log: OSLog.Category.general, type: .error)
+            os_log("AddressBarTextField: Current editor not available", type: .error)
             return
         }
 
@@ -283,7 +283,7 @@ class AddressBarTextField: NSTextField {
 
     private func filterSuffixSelection() {
         guard let currentEditor = currentEditor() else {
-            os_log("AddressBarTextField: Current editor not available", log: OSLog.Category.general, type: .error)
+            os_log("AddressBarTextField: Current editor not available", type: .error)
             return
         }
 
@@ -337,7 +337,7 @@ class AddressBarTextField: NSTextField {
 
     private func showSuggestionsWindow() {
         guard let window = window, let suggestionsWindow = suggestionsWindowController?.window else {
-            os_log("AddressBarTextField: Window not available", log: OSLog.Category.general, type: .error)
+            os_log("AddressBarTextField: Window not available", type: .error)
             return
         }
         guard !suggestionsWindow.isVisible, window.firstResponder == currentEditor() else { return }
@@ -348,7 +348,7 @@ class AddressBarTextField: NSTextField {
 
     private func hideSuggestionsWindow() {
         guard let window = window, let suggestionsWindow = suggestionsWindowController?.window else {
-            os_log("AddressBarTextField: Window not available", log: OSLog.Category.general, type: .error)
+            os_log("AddressBarTextField: Window not available", type: .error)
             return
         }
 
@@ -361,11 +361,11 @@ class AddressBarTextField: NSTextField {
 
     private func layoutSuggestionWindow() {
         guard let window = window, let suggestionsWindow = suggestionsWindowController?.window else {
-            os_log("AddressBarTextField: Window not available", log: OSLog.Category.general, type: .error)
+            os_log("AddressBarTextField: Window not available", type: .error)
             return
         }
         guard let superview = superview else {
-            os_log("AddressBarTextField: Superview not available", log: OSLog.Category.general, type: .error)
+            os_log("AddressBarTextField: Superview not available", type: .error)
             return
         }
 

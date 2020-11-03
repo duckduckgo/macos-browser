@@ -28,8 +28,8 @@ class BrowserTabViewController: NSViewController {
     var tabViewModel: TabViewModel?
 
     private let tabCollectionViewModel: TabCollectionViewModel
-    private var urlCancelable: AnyCancellable?
-    private var selectedTabViewModelCancelable: AnyCancellable?
+    private var urlCancellable: AnyCancellable?
+    private var selectedTabViewModelCancellable: AnyCancellable?
 
     required init?(coder: NSCoder) {
         fatalError("BrowserTabViewController: Bad initializer")
@@ -44,11 +44,11 @@ class BrowserTabViewController: NSViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
 
-        bindSelectedTabViewModel()
+        subscribeToSelectedTabViewModel()
     }
 
-    private func bindSelectedTabViewModel() {
-        selectedTabViewModelCancelable = tabCollectionViewModel.$selectedTabViewModel.receive(on: DispatchQueue.main).sink { [weak self] _ in
+    private func subscribeToSelectedTabViewModel() {
+        selectedTabViewModelCancellable = tabCollectionViewModel.$selectedTabViewModel.receive(on: DispatchQueue.main).sink { [weak self] _ in
             self?.changeWebView()
         }
     }
@@ -64,9 +64,9 @@ class BrowserTabViewController: NSViewController {
             webView = newWebView
         }
 
-        func bindUrl(of tabViewModel: TabViewModel) {
-            urlCancelable?.cancel()
-            urlCancelable = tabViewModel.tab.$url.receive(on: DispatchQueue.main).sink { [weak self] _ in self?.reloadWebViewIfNeeded() }
+        func subscribeToUrl(of tabViewModel: TabViewModel) {
+            urlCancellable?.cancel()
+            urlCancellable = tabViewModel.tab.$url.receive(on: DispatchQueue.main).sink { [weak self] _ in self?.reloadWebViewIfNeeded() }
         }
 
         if let webView = webView, view.subviews.contains(webView) {
@@ -80,17 +80,17 @@ class BrowserTabViewController: NSViewController {
         self.tabViewModel = tabViewModel
 
         displayWebView(of: tabViewModel)
-        bindUrl(of: tabViewModel)
+        subscribeToUrl(of: tabViewModel)
     }
 
     private func reloadWebViewIfNeeded() {
         guard let webView = webView else {
-            os_log("BrowserTabViewController: Web view is nil", log: OSLog.Category.general, type: .error)
+            os_log("BrowserTabViewController: Web view is nil", type: .error)
             return
         }
 
         guard let tabViewModel = tabViewModel else {
-            os_log("%s: Tab view model is nil", log: OSLog.Category.general, type: .error, className)
+            os_log("%s: Tab view model is nil", type: .error, className)
             return
         }
 
@@ -117,12 +117,12 @@ class BrowserTabViewController: NSViewController {
 
     private func displayErrorView(_ shown: Bool) {
         guard let webView = webView else {
-            os_log("BrowserTabViewController: Web view is nil", log: OSLog.Category.general, type: .error)
+            os_log("BrowserTabViewController: Web view is nil", type: .error)
             return
         }
         
         guard let tabViewModel = tabViewModel else {
-            os_log("%s: Tab view model is nil", log: OSLog.Category.general, type: .error, className)
+            os_log("%s: Tab view model is nil", type: .error, className)
             return
         }
 
@@ -182,7 +182,7 @@ extension BrowserTabViewController: WKNavigationDelegate {
         
         tabCollectionViewModel.appendNewTabAfterSelected()
         guard let selectedViewModel = tabCollectionViewModel.selectedTabViewModel else {
-            os_log("%s: Selected tab view model is nil", log: OSLog.Category.general, type: .error, className)
+            os_log("%s: Selected tab view model is nil", type: .error, className)
             return nil
         }
         selectedViewModel.tab.webView.load(navigationAction.request)

@@ -46,7 +46,7 @@ class SuggestionTableCellView: NSTableCellView {
 
     private func updateTextField() {
         guard let attributedString = attributedString else {
-            os_log("SuggestionTableCellView: Attributed strings are nil", log: OSLog.Category.general, type: .error)
+            os_log("SuggestionTableCellView: Attributed strings are nil", type: .error)
             return
         }
         if isSelected {

@@ -32,7 +32,7 @@ class TabViewModel {
     }
 
     private(set) var tab: Tab
-    private var cancelables = Set<AnyCancellable>()
+    private var cancellables = Set<AnyCancellable>()
     
     private var webViewStateObserver: WebViewStateObserver?
 
@@ -51,24 +51,24 @@ class TabViewModel {
 
         webViewStateObserver = WebViewStateObserver(webView: tab.webView, tabViewModel: self)
 
-        bindUrl()
-        bindTitle()
-        bindFavicon()
+        subscribeToUrl()
+        subscribeToTitle()
+        subscribeToFavicon()
     }
 
-    private func bindUrl() {
+    private func subscribeToUrl() {
         tab.$url.receive(on: DispatchQueue.main).sink { [weak self] _ in
             self?.updateCanReload()
             self?.updateAddressBarStrings()
-        } .store(in: &cancelables)
+        } .store(in: &cancellables)
     }
 
-    private func bindTitle() {
-        tab.$title.receive(on: DispatchQueue.main).sink { [weak self] _ in self?.updateTitle() } .store(in: &cancelables)
+    private func subscribeToTitle() {
+        tab.$title.receive(on: DispatchQueue.main).sink { [weak self] _ in self?.updateTitle() } .store(in: &cancellables)
     }
 
-    private func bindFavicon() {
-        tab.$favicon.receive(on: DispatchQueue.main).sink { [weak self] _ in self?.updateFavicon() } .store(in: &cancelables)
+    private func subscribeToFavicon() {
+        tab.$favicon.receive(on: DispatchQueue.main).sink { [weak self] _ in self?.updateFavicon() } .store(in: &cancellables)
     }
 
     private func updateCanReload() {

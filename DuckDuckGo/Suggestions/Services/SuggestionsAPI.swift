@@ -49,7 +49,7 @@ class DuckDuckGoSuggestionsAPI: SuggestionsAPI {
 
         let url = URL.duckDuckGoAutocomplete
         guard let searchUrl = try? url.addParameter(name: URL.DuckDuckGoParameters.search.rawValue, value: query) else {
-            os_log("DuckDuckGoSuggestionsAPI: Failed to add parameter", log: OSLog.Category.general, type: .error)
+            os_log("DuckDuckGoSuggestionsAPI: Failed to add parameter", type: .error)
             mainQueueCompletion(nil, FetchSuggestionsError.urlInitFailed)
             return
         }
@@ -65,7 +65,6 @@ class DuckDuckGoSuggestionsAPI: SuggestionsAPI {
 
             guard let data = data else {
                 os_log("DuckDuckGoSuggestionsAPI: Failed to fetch suggestions - %s",
-                       log: OSLog.Category.general,
                        type: .error, error?.localizedDescription ?? "")
                 mainQueueCompletion(nil, error)
                 return
@@ -73,7 +72,7 @@ class DuckDuckGoSuggestionsAPI: SuggestionsAPI {
 
             let decoder = JSONDecoder()
             guard let suggestionsResult = try? decoder.decode(SuggestionsAPIResult.self, from: data) else {
-                os_log("DuckDuckGoSuggestionsAPI: Failed to decode suggestions", log: OSLog.Category.general, type: .error)
+                os_log("DuckDuckGoSuggestionsAPI: Failed to decode suggestions", type: .error)
                 mainQueueCompletion(nil, FetchSuggestionsError.decodingFailed)
                 return
             }

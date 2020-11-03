@@ -33,13 +33,13 @@ class TabCollectionViewModel {
     @Published private(set) var selectedTabViewModel: TabViewModel?
     @Published private(set) var canInsertLastRemovedTab: Bool = false
 
-    private var cancelables = Set<AnyCancellable>()
+    private var cancellables = Set<AnyCancellable>()
 
     init(tabCollection: TabCollection) {
         self.tabCollection = tabCollection
 
-        bindTabs()
-        bindLastRemovedTab()
+        subscribeToTabs()
+        subscribeToLastRemovedTab()
         appendNewTab()
     }
 
@@ -50,7 +50,7 @@ class TabCollectionViewModel {
 
     func tabViewModel(at index: Int) -> TabViewModel? {
         guard index >= 0, tabCollection.tabs.count > index else {
-            os_log("TabCollectionViewModel: Index out of bounds", log: OSLog.Category.general, type: .error)
+            os_log("TabCollectionViewModel: Index out of bounds", type: .error)
             return nil
         }
 
@@ -60,7 +60,7 @@ class TabCollectionViewModel {
 
     func select(at index: Int) {
         guard index >= 0, index < tabCollection.tabs.count else {
-            os_log("TabCollectionViewModel: Index out of bounds", log: OSLog.Category.general, type: .error)
+            os_log("TabCollectionViewModel: Index out of bounds", type: .error)
             selectionIndex = nil
             return
         }
@@ -75,7 +75,7 @@ class TabCollectionViewModel {
 
     func appendNewTabAfterSelected() {
         guard let selectionIndex = selectionIndex else {
-            os_log("TabCollectionViewModel: No tab selected", log: OSLog.Category.general, type: .error)
+            os_log("TabCollectionViewModel: No tab selected", type: .error)
             return
         }
         tabCollection.insert(tab: Tab(), at: selectionIndex + 1)
@@ -103,7 +103,7 @@ class TabCollectionViewModel {
         }
         
         guard let selectionIndex = selectionIndex else {
-            os_log("TabCollection: No tab selected", log: OSLog.Category.general, type: .error)
+            os_log("TabCollection: No tab selected", type: .error)
             return
         }
 
@@ -116,7 +116,7 @@ class TabCollectionViewModel {
 
     func removeSelected() {
         guard let selectionIndex = selectionIndex else {
-            os_log("TabCollectionViewModel: No tab selected", log: OSLog.Category.general, type: .error)
+            os_log("TabCollectionViewModel: No tab selected", type: .error)
             return
         }
 
@@ -127,7 +127,7 @@ class TabCollectionViewModel {
         tabCollection.tabs.enumerated().reversed().forEach {
             if exceptionIndex != $0.offset {
                 if !tabCollection.remove(at: $0.offset) {
-                    os_log("TabCollectionViewModel: Failed to remove item", log: OSLog.Category.general, type: .error)
+                    os_log("TabCollectionViewModel: Failed to remove item", type: .error)
                 }
             }
         }
@@ -150,7 +150,7 @@ class TabCollectionViewModel {
 
     func duplicateTab(at index: Int) {
         guard index >= 0, index < tabCollection.tabs.count else {
-            os_log("TabCollectionViewModel: Index out of bounds", log: OSLog.Category.general, type: .error)
+            os_log("TabCollectionViewModel: Index out of bounds", type: .error)
             return
         }
 
@@ -163,17 +163,17 @@ class TabCollectionViewModel {
         select(at: newIndex)
     }
 
-    private func bindTabs() {
+    private func subscribeToTabs() {
         tabCollection.$tabs.sink { [weak self] newTabs in
             self?.removeTabViewModelsIfNeeded(newTabs: newTabs)
             self?.addTabViewModelsIfNeeded(newTabs: newTabs)
-        } .store(in: &cancelables)
+        } .store(in: &cancellables)
     }
 
-    private func bindLastRemovedTab() {
+    private func subscribeToLastRemovedTab() {
         tabCollection.$lastRemovedTabCache.receive(on: DispatchQueue.main).sink { [weak self] _ in
             self?.updateCanInsertLastRemovedTab()
-        } .store(in: &cancelables)
+        } .store(in: &cancellables)
     }
 
     private func removeTabViewModelsIfNeeded(newTabs: [Tab]) {

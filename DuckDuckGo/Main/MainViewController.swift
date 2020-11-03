@@ -32,22 +32,22 @@ class MainViewController: NSViewController {
 
     var tabCollectionViewModel = TabCollectionViewModel()
 
-    private var selectedTabViewModelCancelable: AnyCancellable?
-    private var canGoForwardCancelable: AnyCancellable?
-    private var canGoBackCancelable: AnyCancellable?
-    private var canInsertLastRemovedTabCancelable: AnyCancellable?
+    private var selectedTabViewModelCancellable: AnyCancellable?
+    private var canGoForwardCancellable: AnyCancellable?
+    private var canGoBackCancellable: AnyCancellable?
+    private var canInsertLastRemovedTabCancellable: AnyCancellable?
 
     override func viewDidLoad() {
         super.viewDidLoad()
 
-        bindSelectedTabViewModel()
-        bindCanInsertLastRemovedTab()
+        subscribeToSelectedTabViewModel()
+        subscribeToCanInsertLastRemovedTab()
     }
 
     func windowDidBecomeMain() {
-        setBackMenuItem()
-        setForwardMenuItem()
-        setReopenLastClosedTabMenuItem()
+        updateBackMenuItem()
+        updateForwardMenuItem()
+        updateReopenLastClosedTabMenuItem()
     }
 
     func windowWillClose() {
@@ -57,7 +57,7 @@ class MainViewController: NSViewController {
     @IBSegueAction
     func createTabBarViewController(coder: NSCoder, sender: Any?, segueIdentifier: String?) -> TabBarViewController? {
         guard let tabBarViewController = TabBarViewController(coder: coder, tabCollectionViewModel: tabCollectionViewModel) else {
-            os_log("MainViewController: Failed to init TabBarViewController", log: OSLog.Category.general, type: .error)
+            os_log("MainViewController: Failed to init TabBarViewController", type: .error)
             return nil
         }
 
@@ -68,7 +68,7 @@ class MainViewController: NSViewController {
     @IBSegueAction
     func createNavigationBarViewController(coder: NSCoder, sender: Any?, segueIdentifier: String?) -> NavigationBarViewController? {
         guard let navigationBarViewController = NavigationBarViewController(coder: coder, tabCollectionViewModel: tabCollectionViewModel) else {
-            os_log("MainViewController: Failed to init NavigationBarViewController", log: OSLog.Category.general, type: .error)
+            os_log("MainViewController: Failed to init NavigationBarViewController", type: .error)
             return nil
         }
 
@@ -80,7 +80,7 @@ class MainViewController: NSViewController {
     func createWebViewController(coder: NSCoder, sender: Any?, segueIdentifier: String?) -> BrowserTabViewController? {
         guard let browserTabViewController = BrowserTabViewController(coder: coder,
                                                                       tabCollectionViewModel: tabCollectionViewModel) else {
-            os_log("MainViewController: Failed to init BrowserTabViewController", log: OSLog.Category.general, type: .error)
+            os_log("MainViewController: Failed to init BrowserTabViewController", type: .error)
             return nil
         }
 
@@ -88,59 +88,59 @@ class MainViewController: NSViewController {
         return browserTabViewController
     }
 
-    private func bindSelectedTabViewModel() {
-        selectedTabViewModelCancelable = tabCollectionViewModel.$selectedTabViewModel.receive(on: DispatchQueue.main).sink { [weak self] _ in
-            self?.bindCanGoBackForward()
+    private func subscribeToSelectedTabViewModel() {
+        selectedTabViewModelCancellable = tabCollectionViewModel.$selectedTabViewModel.receive(on: DispatchQueue.main).sink { [weak self] _ in
+            self?.subscribeToCanGoBackForward()
         }
     }
 
-    private func bindCanGoBackForward() {
-        canGoBackCancelable?.cancel()
-        canGoBackCancelable = tabCollectionViewModel.selectedTabViewModel?.$canGoBack.receive(on: DispatchQueue.main).sink { [weak self] _ in
-            self?.setBackMenuItem()
+    private func subscribeToCanGoBackForward() {
+        canGoBackCancellable?.cancel()
+        canGoBackCancellable = tabCollectionViewModel.selectedTabViewModel?.$canGoBack.receive(on: DispatchQueue.main).sink { [weak self] _ in
+            self?.updateBackMenuItem()
         }
-        canGoForwardCancelable?.cancel()
-        canGoForwardCancelable = tabCollectionViewModel.selectedTabViewModel?.$canGoForward.receive(on: DispatchQueue.main).sink { [weak self] _ in
-            self?.setForwardMenuItem()
-        }
-    }
-
-    private func bindCanInsertLastRemovedTab() {
-        canInsertLastRemovedTabCancelable?.cancel()
-        canInsertLastRemovedTabCancelable = tabCollectionViewModel.$canInsertLastRemovedTab.receive(on: DispatchQueue.main).sink { [weak self] _ in
-            self?.setReopenLastClosedTabMenuItem()
+        canGoForwardCancellable?.cancel()
+        canGoForwardCancellable = tabCollectionViewModel.selectedTabViewModel?.$canGoForward.receive(on: DispatchQueue.main).sink { [weak self] _ in
+            self?.updateForwardMenuItem()
         }
     }
 
-    private func setBackMenuItem() {
+    private func subscribeToCanInsertLastRemovedTab() {
+        canInsertLastRemovedTabCancellable?.cancel()
+        canInsertLastRemovedTabCancellable = tabCollectionViewModel.$canInsertLastRemovedTab.receive(on: DispatchQueue.main).sink { [weak self] _ in
+            self?.updateReopenLastClosedTabMenuItem()
+        }
+    }
+
+    private func updateBackMenuItem() {
         guard let selectedTabViewModel = tabCollectionViewModel.selectedTabViewModel else {
-            os_log("MainViewController: No tab view model selected", log: OSLog.Category.general, type: .error)
+            os_log("MainViewController: No tab view model selected", type: .error)
             return
         }
         guard let mainMenu = NSApplication.shared.mainMenu, let backMenuItem = mainMenu.backMenuItem else {
-            os_log("MainViewController: Failed to get reference to back menu item", log: OSLog.Category.general, type: .error)
+            os_log("MainViewController: Failed to get reference to back menu item", type: .error)
             return
         }
 
         backMenuItem.isEnabled = selectedTabViewModel.canGoBack
     }
 
-    func setForwardMenuItem() {
+    func updateForwardMenuItem() {
         guard let selectedTabViewModel = tabCollectionViewModel.selectedTabViewModel else {
-            os_log("MainViewController: No tab view model selected", log: OSLog.Category.general, type: .error)
+            os_log("MainViewController: No tab view model selected", type: .error)
             return
         }
         guard let mainMenu = NSApplication.shared.mainMenu, let forwardMenuItem = mainMenu.forwardMenuItem else {
-            os_log("MainViewController: Failed to get reference to back menu item", log: OSLog.Category.general, type: .error)
+            os_log("MainViewController: Failed to get reference to back menu item", type: .error)
             return
         }
 
         forwardMenuItem.isEnabled = selectedTabViewModel.canGoForward
     }
 
-    func setReopenLastClosedTabMenuItem() {
+    func updateReopenLastClosedTabMenuItem() {
         guard let mainMenu = NSApplication.shared.mainMenu, let reopenLastClosedTabMenuItem = mainMenu.reopenLastClosedTabMenuItem else {
-            os_log("MainViewController: Failed to get reference to back menu item", log: OSLog.Category.general, type: .error)
+            os_log("MainViewController: Failed to get reference to back menu item", type: .error)
             return
         }
 

@@ -51,7 +51,7 @@ extension MainViewController {
 
     @IBAction func openLocation(_ sender: Any?) {
         guard let addressBarTextField = navigationBarViewController?.addressBarViewController?.addressBarTextField else {
-            os_log("MainViewController: Cannot reference address bar text field", log: OSLog.Category.general, type: .error)
+            os_log("MainViewController: Cannot reference address bar text field", type: .error)
             return
         }
         view.window?.makeFirstResponder(addressBarTextField)
@@ -65,7 +65,7 @@ extension MainViewController {
 
     @IBAction func reloadPage(_ sender: Any?) {
         guard let selectedTabViewModel = tabCollectionViewModel.selectedTabViewModel else {
-            os_log("MainViewController: No tab view model selected", log: OSLog.Category.general, type: .error)
+            os_log("MainViewController: No tab view model selected", type: .error)
             return
         }
 
@@ -74,7 +74,7 @@ extension MainViewController {
 
     @IBAction func stopLoading(_ sender: Any?) {
         guard let selectedTabViewModel = tabCollectionViewModel.selectedTabViewModel else {
-            os_log("MainViewController: No tab view model selected", log: OSLog.Category.general, type: .error)
+            os_log("MainViewController: No tab view model selected", type: .error)
             return
         }
 
@@ -85,7 +85,7 @@ extension MainViewController {
 
     @IBAction func back(_ sender: Any?) {
         guard let selectedTabViewModel = tabCollectionViewModel.selectedTabViewModel else {
-            os_log("MainViewController: No tab view model selected", log: OSLog.Category.general, type: .error)
+            os_log("MainViewController: No tab view model selected", type: .error)
             return
         }
 
@@ -94,7 +94,7 @@ extension MainViewController {
 
     @IBAction func forward(_ sender: Any?) {
         guard let selectedTabViewModel = tabCollectionViewModel.selectedTabViewModel else {
-            os_log("MainViewController: No tab view model selected", log: OSLog.Category.general, type: .error)
+            os_log("MainViewController: No tab view model selected", type: .error)
             return
         }
 
@@ -103,7 +103,7 @@ extension MainViewController {
 
     @IBAction func home(_ sender: Any?) {
         guard let selectedTabViewModel = tabCollectionViewModel.selectedTabViewModel else {
-            os_log("MainViewController: No tab view model selected", log: OSLog.Category.general, type: .error)
+            os_log("MainViewController: No tab view model selected", type: .error)
             return
         }
 
@@ -118,7 +118,7 @@ extension MainViewController {
 
     @IBAction func moveTabToNewWindow(_ sender: Any?) {
         guard let selectedTabViewModel = tabCollectionViewModel.selectedTabViewModel else {
-            os_log("MainViewController: No tab view model selected", log: OSLog.Category.general, type: .error)
+            os_log("MainViewController: No tab view model selected", type: .error)
             return
         }
 

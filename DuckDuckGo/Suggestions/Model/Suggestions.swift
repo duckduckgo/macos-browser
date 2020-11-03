@@ -42,7 +42,6 @@ class Suggestions {
             guard let result = result, error == nil else {
                 self.items = nil
                 os_log("Suggestions: Failed to fetch remote suggestions - %s",
-                       log: OSLog.Category.general,
                        type: .error,
                        error?.localizedDescription ?? "")
                 return
@@ -70,7 +69,7 @@ fileprivate extension Suggestion {
     static func makeSuggestion(key: String, value: String) -> Suggestion {
         let suggestion = key == "phrase" ? Suggestion.phrase(phrase: value) : Suggestion.unknown(value: value)
         if key != "phrase" {
-            os_log("SuggestionsAPIResult: Unknown suggestion type", log: OSLog.Category.general, type: .debug)
+            os_log("SuggestionsAPIResult: Unknown suggestion type", type: .debug)
         }
         return suggestion
     }

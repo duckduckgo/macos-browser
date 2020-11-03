@@ -45,8 +45,8 @@ class SuggestionsViewController: NSViewController {
         super.init(coder: coder)
     }
 
-    var suggestionsCancelable: AnyCancellable?
-    var selectionIndexCancelable: AnyCancellable?
+    var suggestionsCancellable: AnyCancellable?
+    var selectionIndexCancellable: AnyCancellable?
 
     var mouseUpEventsMonitor: Any?
     var mouseDownEventsMonitor: Any?
@@ -58,8 +58,8 @@ class SuggestionsViewController: NSViewController {
         tableView.dataSource = self
 
         addTrackingArea()
-        bindSuggestions()
-        bindSelectionIndex()
+        subscribeToSuggestions()
+        subscribeToSelectionIndex()
     }
 
     override func viewWillAppear() {
@@ -99,14 +99,14 @@ class SuggestionsViewController: NSViewController {
         }
     }
 
-    private func bindSuggestions() {
-        suggestionsCancelable = suggestionsViewModel.suggestions.$items.receive(on: DispatchQueue.main).sink { [weak self] _ in
+    private func subscribeToSuggestions() {
+        suggestionsCancellable = suggestionsViewModel.suggestions.$items.receive(on: DispatchQueue.main).sink { [weak self] _ in
             self?.displayNewSuggestions()
         }
     }
 
-    private func bindSelectionIndex() {
-        selectionIndexCancelable = suggestionsViewModel.$selectionIndex.receive(on: DispatchQueue.main).sink { [weak self] _ in
+    private func subscribeToSelectionIndex() {
+        selectionIndexCancellable = suggestionsViewModel.$selectionIndex.receive(on: DispatchQueue.main).sink { [weak self] _ in
             if let weakSelf = self {
                 weakSelf.selectRow(at: weakSelf.suggestionsViewModel.selectionIndex)
             }
@@ -122,7 +122,7 @@ class SuggestionsViewController: NSViewController {
 
         // Remove the second reload that causes visual glitch in the beginning of typing
         if suggestionsViewModel.suggestions.items != nil {
-            setHeight()
+            updateHeight()
             tableView.reloadData()
             self.selectRow(at: self.suggestionsViewModel.selectionIndex)
         }
@@ -178,7 +178,7 @@ class SuggestionsViewController: NSViewController {
         return event
     }
 
-    private func setHeight() {
+    private func updateHeight() {
         guard suggestionsViewModel.numberOfSuggestions > 0 else {
             tableViewHeightConstraint.constant = 0
             return
@@ -191,7 +191,7 @@ class SuggestionsViewController: NSViewController {
 
     private func closeWindow() {
         guard let window = view.window else {
-            os_log("SuggestionsViewController: Window not available", log: OSLog.Category.general, type: .error)
+            os_log("SuggestionsViewController: Window not available", type: .error)
             return
         }
 
@@ -215,12 +215,12 @@ extension SuggestionsViewController: NSTableViewDelegate {
         guard let suggestionTableCellView = tableView.makeView(
                 withIdentifier: NSUserInterfaceItemIdentifier(rawValue: SuggestionTableCellView.identifier), owner: self)
                 as? SuggestionTableCellView else {
-            os_log("SuggestionsViewController: Making of table cell view failed", log: OSLog.Category.general, type: .error)
+            os_log("SuggestionsViewController: Making of table cell view failed", type: .error)
             return nil
         }
 
         guard let suggestionViewModel = suggestionsViewModel.suggestionViewModel(at: row) else {
-            os_log("SuggestionsViewController: Failed to get suggestion", log: OSLog.Category.general, type: .error)
+            os_log("SuggestionsViewController: Failed to get suggestion", type: .error)
             return nil
         }
 
@@ -232,7 +232,7 @@ extension SuggestionsViewController: NSTableViewDelegate {
         guard let suggestionTableRowView = tableView.makeView(
                 withIdentifier: NSUserInterfaceItemIdentifier(rawValue: SuggestionTableRowView.identifier), owner: self)
                 as? SuggestionTableRowView else {
-            os_log("SuggestionsViewController: Making of table row view failed", log: OSLog.Category.general, type: .error)
+            os_log("SuggestionsViewController: Making of table row view failed", type: .error)
             return nil
         }
         return suggestionTableRowView

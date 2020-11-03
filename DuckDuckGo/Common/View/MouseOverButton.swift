@@ -22,17 +22,17 @@ class MouseOverButton: NSButton {
 
     @IBInspectable var mouseOverColor: NSColor? {
         didSet {
-            setBackgroundColor()
+            updateBackgroundColor()
         }
     }
     @IBInspectable var mouseDownColor: NSColor? {
         didSet {
-            setBackgroundColor()
+            updateBackgroundColor()
         }
     }
     @IBInspectable var cornerRadius: CGFloat = 0 {
         didSet {
-            setCornerRadius()
+            updateCornerRadius()
         }
 
     }
@@ -43,7 +43,7 @@ class MouseOverButton: NSButton {
         wantsLayer = true
         layerUsesCoreImageFilters = true
         addTrackingArea()
-        setCornerRadius()
+        updateCornerRadius()
     }
 
     override func mouseEntered(with event: NSEvent) {
@@ -64,17 +64,17 @@ class MouseOverButton: NSButton {
 
     private var isMouseOver = false {
         didSet {
-            setBackgroundColor()
+            updateBackgroundColor()
         }
     }
 
     private var isMouseDown = false {
         didSet {
-            setBackgroundColor()
+            updateBackgroundColor()
         }
     }
 
-    private func setBackgroundColor() {
+    private func updateBackgroundColor() {
         guard isEnabled else {
             layer?.backgroundColor = NSColor.clear.cgColor
             return
@@ -94,7 +94,7 @@ class MouseOverButton: NSButton {
         addTrackingArea(area)
     }
 
-    private func setCornerRadius() {
+    private func updateCornerRadius() {
         layer?.cornerRadius = cornerRadius
         layer?.masksToBounds = cornerRadius > 0
     }

@@ -46,14 +46,14 @@ extension WindowControllersManager: ApplicationDockMenuDataSource {
 
     func applicationDockMenu(_ applicationDockMenu: ApplicationDockMenu, windowTitleFor windowMenuItemIndex: Int) -> String {
         guard windowMenuItemIndex >= 0, windowMenuItemIndex < mainWindowControllers.count else {
-            os_log("WindowControllersManager: Index out of bounds", log: OSLog.Category.general, type: .error)
+            os_log("WindowControllersManager: Index out of bounds", type: .error)
             return "-"
         }
 
         let windowController = mainWindowControllers[windowMenuItemIndex]
         guard let mainViewController = windowController.mainViewController,
               let selectedTabViewModel = mainViewController.tabCollectionViewModel.selectedTabViewModel else {
-            os_log("WindowControllersManager: Cannot get selected tab view model", log: OSLog.Category.general, type: .error)
+            os_log("WindowControllersManager: Cannot get selected tab view model", type: .error)
             return "-"
         }
 
@@ -62,7 +62,7 @@ extension WindowControllersManager: ApplicationDockMenuDataSource {
 
     func indexOfSelectedWindowMenuItem(in applicationDockMenu: ApplicationDockMenu) -> Int? {
         guard let lastKeyMainWindowController = lastKeyMainWindowController else {
-            os_log("WindowControllersManager: Last key main window controller property is nil", log: OSLog.Category.general, type: .error)
+            os_log("WindowControllersManager: Last key main window controller property is nil", type: .error)
             return nil
         }
 
@@ -75,7 +75,7 @@ extension WindowControllersManager: ApplicationDockMenuDelegate {
 
     func applicationDockMenu(_ applicationDockMenu: ApplicationDockMenu, selectWindowWith index: Int) {
         guard index >= 0, index < mainWindowControllers.count else {
-            os_log("WindowControllersManager: Index out of bounds", log: OSLog.Category.general, type: .error)
+            os_log("WindowControllersManager: Index out of bounds", type: .error)
             return
         }
 

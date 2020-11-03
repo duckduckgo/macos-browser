@@ -46,7 +46,7 @@ extension NavigationButtonMenuDelegate: NSMenuDelegate {
     func menu(_ menu: NSMenu, update item: NSMenuItem, at index: Int, shouldCancel: Bool) -> Bool {
         let listItems = self.listItems
         guard index < listItems.count else {
-            os_log("%s: Index out of bounds", log: OSLog.Category.general, type: .error, className)
+            os_log("%s: Index out of bounds", type: .error, className)
             return true
         }
 
@@ -68,13 +68,13 @@ extension NavigationButtonMenuDelegate: NSMenuDelegate {
         let listItems = self.listItems
 
         guard index < listItems.count else {
-            os_log("%s: Index out of bounds", log: OSLog.Category.general, type: .error, className)
+            os_log("%s: Index out of bounds", type: .error, className)
             return
         }
         let listItem = listItems[index]
 
         guard let selectedTabViewModel = tabCollectionViewModel.selectedTabViewModel else {
-            os_log("%s: Selected tab view model is nil", log: OSLog.Category.general, type: .error, className)
+            os_log("%s: Selected tab view model is nil", type: .error, className)
             return
         }
 
@@ -83,7 +83,7 @@ extension NavigationButtonMenuDelegate: NSMenuDelegate {
 
     private var listItems: [WKBackForwardListItem] {
         guard let selectedTabViewModel = tabCollectionViewModel.selectedTabViewModel else {
-            os_log("%s: Selected tab view model is nil", log: OSLog.Category.general, type: .error, className)
+            os_log("%s: Selected tab view model is nil", type: .error, className)
             return []
         }
 
@@ -91,7 +91,7 @@ extension NavigationButtonMenuDelegate: NSMenuDelegate {
         var list = buttonType == .back ? backForwardList.backList.reversed() : backForwardList.forwardList
 
         guard let currentItem = selectedTabViewModel.tab.webView.backForwardList.currentItem else {
-            os_log("%s: Current item is nil", log: OSLog.Category.general, type: .error, className)
+            os_log("%s: Current item is nil", type: .error, className)
             return list
         }
         list.insert(currentItem, at: 0)
@@ -101,7 +101,7 @@ extension NavigationButtonMenuDelegate: NSMenuDelegate {
 
     private var currentListItem: WKBackForwardListItem? {
         guard let selectedTabViewModel = tabCollectionViewModel.selectedTabViewModel else {
-            os_log("%s: Selected tab view model is nil", log: OSLog.Category.general, type: .error, className)
+            os_log("%s: Selected tab view model is nil", type: .error, className)
             return nil
         }
 

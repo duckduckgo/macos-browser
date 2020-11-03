@@ -36,8 +36,8 @@ class NavigationBarViewController: NSViewController {
     // swiftlint:enable weak_delegate
     private let optionsMenu: OptionsButtonMenu
 
-    private var selectedTabViewModelCancelable: AnyCancellable?
-    private var navigationButtonsCancelables = Set<AnyCancellable>()
+    private var selectedTabViewModelCancellable: AnyCancellable?
+    private var navigationButtonsCancellables = Set<AnyCancellable>()
 
     required init?(coder: NSCoder) {
         fatalError("NavigationBarViewController: Bad initializer")
@@ -55,13 +55,13 @@ class NavigationBarViewController: NSViewController {
         super.viewDidLoad()
 
         setupNavigationButtonMenus()
-        bindSelectedTabViewModel()
+        subscribeToSelectedTabViewModel()
     }
 
     @IBSegueAction func createAddressBarViewController(_ coder: NSCoder) -> AddressBarViewController? {
         guard let addressBarViewController = AddressBarViewController(coder: coder,
                                                                       tabCollectionViewModel: tabCollectionViewModel) else {
-            os_log("NavigationBarViewController: Failed to init AddressBarViewController", log: OSLog.Category.general, type: .error)
+            os_log("NavigationBarViewController: Failed to init AddressBarViewController", type: .error)
             return nil
         }
 
@@ -71,7 +71,7 @@ class NavigationBarViewController: NSViewController {
 
     @IBAction func goBackAction(_ sender: NSButton) {
         guard let selectedTabViewModel = tabCollectionViewModel.selectedTabViewModel else {
-            os_log("%s: Selected tab view model is nil", log: OSLog.Category.general, type: .error, className)
+            os_log("%s: Selected tab view model is nil", type: .error, className)
             return
         }
 
@@ -80,7 +80,7 @@ class NavigationBarViewController: NSViewController {
 
     @IBAction func goForwardAction(_ sender: NSButton) {
         guard let selectedTabViewModel = tabCollectionViewModel.selectedTabViewModel else {
-            os_log("%s: Selected tab view model is nil", log: OSLog.Category.general, type: .error, className)
+            os_log("%s: Selected tab view model is nil", type: .error, className)
             return
         }
 
@@ -102,15 +102,15 @@ class NavigationBarViewController: NSViewController {
         goForwardButton.menu = forwardButtonMenu
     }
 
-    private func bindSelectedTabViewModel() {
-        selectedTabViewModelCancelable = tabCollectionViewModel.$selectedTabViewModel.receive(on: DispatchQueue.main).sink { [weak self] _ in
-            self?.bindNavigationButtons()
+    private func subscribeToSelectedTabViewModel() {
+        selectedTabViewModelCancellable = tabCollectionViewModel.$selectedTabViewModel.receive(on: DispatchQueue.main).sink { [weak self] _ in
+            self?.subscribeToNavigationActionFlags()
         }
     }
 
-    private func bindNavigationButtons() {
-        navigationButtonsCancelables.forEach { $0.cancel() }
-        navigationButtonsCancelables.removeAll()
+    private func subscribeToNavigationActionFlags() {
+        navigationButtonsCancellables.forEach { $0.cancel() }
+        navigationButtonsCancellables.removeAll()
 
         guard let selectedTabViewModel = tabCollectionViewModel.selectedTabViewModel else {
             goBackButton.isEnabled = false
@@ -119,16 +119,16 @@ class NavigationBarViewController: NSViewController {
         }
         selectedTabViewModel.$canGoBack.receive(on: DispatchQueue.main).sink { [weak self] _ in
             self?.updateNavigationButtons()
-        } .store(in: &navigationButtonsCancelables)
+        } .store(in: &navigationButtonsCancellables)
 
         selectedTabViewModel.$canGoForward.receive(on: DispatchQueue.main).sink { [weak self] _ in
             self?.updateNavigationButtons()
-        } .store(in: &navigationButtonsCancelables)
+        } .store(in: &navigationButtonsCancellables)
     }
 
     private func updateNavigationButtons() {
         guard let selectedTabViewModel = tabCollectionViewModel.selectedTabViewModel else {
-            os_log("%s: Selected tab view model is nil", log: OSLog.Category.general, type: .error, className)
+            os_log("%s: Selected tab view model is nil", type: .error, className)
             return
         }
 
