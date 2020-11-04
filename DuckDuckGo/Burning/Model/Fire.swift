@@ -32,14 +32,14 @@ class Fire {
     func burnAll(tabCollectionViewModel: TabCollectionViewModel) {
         isBurning = true
 
-        guard let tab = tabCollectionViewModel.tabCollection.tabs.first else {
-            os_log("Fire: No tab available", type: .error)
-            isBurning = false
-            return
-        }
-        tab.openHomepage()
+        tabCollectionViewModel.tabCollection.tabs.forEach { $0.stopLoading() }
 
-        tabCollectionViewModel.removeAllTabs(except: 0)
+        if tabCollectionViewModel.tabCollection.tabs.count > 0 {
+            tabCollectionViewModel.insertNewTab()
+            tabCollectionViewModel.removeAllTabs(except: 0)
+        } else {
+            tabCollectionViewModel.appendNewTab()
+        }
 
         websiteDataStore.removeAllWebsiteData { [weak self] in
             self?.isBurning = false
