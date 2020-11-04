@@ -35,8 +35,7 @@ class Fire {
         tabCollectionViewModel.tabCollection.tabs.forEach { $0.stopLoading() }
 
         if tabCollectionViewModel.tabCollection.tabs.count > 0 {
-            tabCollectionViewModel.insertNewTab()
-            tabCollectionViewModel.removeAllTabs(except: 0)
+            tabCollectionViewModel.removeAllTabsAndAppendNewTab()
         } else {
             tabCollectionViewModel.appendNewTab()
         }

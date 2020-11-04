@@ -144,6 +144,11 @@ class TabCollectionViewModel {
         }
     }
 
+    func removeAllTabsAndAppendNewTab() {
+        tabCollection.removeAllAndAppend(tab: Tab())
+        select(at: 0)
+    }
+
     func insertLastRemovedTab() {
         let lastRemovedTabIndex = tabCollection.lastRemovedTabCache?.index
         tabCollection.insertLastRemovedTab()

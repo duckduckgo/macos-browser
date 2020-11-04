@@ -24,6 +24,7 @@ protocol TabCollectionDelegate: AnyObject {
     func tabCollection(_ tabCollection: TabCollection, didAppend tab: Tab)
     func tabCollection(_ tabCollection: TabCollection, didInsert tab: Tab, at index: Int)
     func tabCollection(_ tabCollection: TabCollection, didRemoveTabAt index: Int)
+    func tabCollection(_ tabCollection: TabCollection, didRemoveAllAndAppend tab: Tab)
     func tabCollection(_ tabCollection: TabCollection, didMoveTabAt index: Int, to newIndex: Int)
 
 }
@@ -66,6 +67,12 @@ class TabCollection {
         delegate?.tabCollection(self, didRemoveTabAt: index)
 
         return true
+    }
+
+    func removeAllAndAppend(tab: Tab) {
+        tabs.removeAll()
+        tabs.insert(tab, at: 0)
+        delegate?.tabCollection(self, didRemoveAllAndAppend: tab)
     }
 
     func moveTab(at index: Int, to newIndex: Int) {

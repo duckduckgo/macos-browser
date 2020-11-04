@@ -288,12 +288,23 @@ extension TabBarViewController: TabCollectionDelegate {
 
         collectionView.animator().performBatchUpdates {
             collectionView.animator().deleteItems(at: indexPathSet)
-        } completionHandler: { _ in
-            self.updateTabMode()
+        } completionHandler: { [weak self] _ in
+            self?.updateTabMode()
         }
 
         closeWindowIfNeeded()
         updateWindowDraggingArea()
+    }
+
+    func tabCollection(_ tabCollection: TabCollection, didRemoveAllAndAppend tab: Tab) {
+        let newIndexPath = IndexPath(arrayLiteral: 0)
+        let newIndexPathSet = Set(arrayLiteral: newIndexPath)
+
+        collectionView.animator().performBatchUpdates {
+            collectionView.animator().reloadItems(at: newIndexPathSet)
+        } completionHandler: { [weak self] _ in
+            self?.updateTabMode()
+        }
     }
 
     func tabCollection(_ tabCollection: TabCollection, didMoveTabAt index: Int, to newIndex: Int) {
