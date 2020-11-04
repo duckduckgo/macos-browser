@@ -492,7 +492,7 @@ fileprivate extension NSAlert {
         alert.messageText = "Are you sure you want to burn everything?"
         alert.informativeText = "This will erase website data and close all tabs."
         alert.alertStyle = .warning
-        alert.addButton(withTitle: "Reset")
+        alert.addButton(withTitle: "Burn")
         alert.addButton(withTitle: "Cancel")
         return alert
     }
