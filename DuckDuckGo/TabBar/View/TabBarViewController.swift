@@ -77,8 +77,11 @@ class TabBarViewController: NSViewController {
     }
 
     @IBAction func burnButtonAction(_ sender: NSButton) {
-        WindowsManager.closeWindows(except: view.window)
-        fireViewModel.fire.burnAll(tabCollectionViewModel: tabCollectionViewModel)
+        let response = NSAlert.burnButtonAlert.runModal()
+        if response == NSApplication.ModalResponse.alertFirstButtonReturn {
+            WindowsManager.closeWindows(except: view.window)
+            fireViewModel.fire.burnAll(tabCollectionViewModel: tabCollectionViewModel)
+        }
     }
 
     @IBAction func addButtonAction(_ sender: NSButton) {
@@ -467,6 +470,20 @@ extension TabBarViewController: TabBarViewItemDelegate {
         }
 
         tabCollectionViewModel.removeAllTabs(except: indexPath.item)
+    }
+
+}
+
+fileprivate extension NSAlert {
+
+    static var burnButtonAlert: NSAlert {
+        let alert = NSAlert()
+        alert.messageText = "Are you sure you want to burn everything?"
+        alert.informativeText = "This will erase website data and close all tabs."
+        alert.alertStyle = .warning
+        alert.addButton(withTitle: "Reset")
+        alert.addButton(withTitle: "Cancel")
+        return alert
     }
 
 }
