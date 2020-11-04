@@ -44,7 +44,16 @@ class BrowserTabViewController: NSViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
 
-        subscribeToSelectedTabViewModel()
+        bindSelectedTabViewModel()
+    }
+
+    private func load(url: URL) {
+        load(urlRequest: URLRequest(url: url))
+    }
+
+    private func load(urlRequest: URLRequest) {
+        webView?.stopLoading()
+        webView?.load(urlRequest)
     }
 
     private func subscribeToSelectedTabViewModel() {
@@ -149,13 +158,36 @@ extension BrowserTabViewController: WKNavigationDelegate {
 
         let isCommandPressed = NSApp.currentEvent?.modifierFlags.contains(.command) ?? false
         let isLinkActivated = navigationAction.navigationType == .linkActivated
+
         if isLinkActivated && isCommandPressed {
             decisionHandler(.cancel)
             openNewTab(with: navigationAction.request.url)
             return
         }
 
-        decisionHandler(.allow)
+        guard let url = navigationAction.request.url else {
+            decisionHandler(.allow)
+            return
+        }
+
+        HTTPSUpgrade.shared.isUpgradeable(url: url) { [weak self] isUpgradable in
+            if isUpgradable, let upgradedUrl = self?.upgradeUrl(url, navigationAction: navigationAction) {
+                os_log("Loading %s", type: .debug, upgradedUrl.absoluteString)
+                self?.load(url: upgradedUrl)
+                decisionHandler(.cancel)
+                return
+            }
+
+            decisionHandler(.allow)
+        }
+    }
+
+    private func upgradeUrl(_ url: URL, navigationAction: WKNavigationAction) -> URL? {
+        if let upgradedUrl: URL = url.toHttps() {
+            return upgradedUrl
+        }
+
+        return nil
     }
 
     func webView(_ webView: WKWebView, didStartProvisionalNavigation navigation: WKNavigation!) {
