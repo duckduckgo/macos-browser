@@ -18,6 +18,7 @@
 		AA2E423424C8A2270048C0D5 /* ColorView.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA2E423324C8A2270048C0D5 /* ColorView.swift */; };
 		AA361A3624EBF0B500EEC649 /* WindowDraggingView.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA361A3524EBF0B500EEC649 /* WindowDraggingView.swift */; };
 		AA3F895324C18AD500628DDE /* SuggestionViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA3F895224C18AD500628DDE /* SuggestionViewModel.swift */; };
+		AA4D700725545EF800C3411E /* UrlEventListener.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA4D700625545EF800C3411E /* UrlEventListener.swift */; };
 		AA512D1424D99D9800230283 /* FaviconService.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA512D1324D99D9800230283 /* FaviconService.swift */; };
 		AA585D82248FD31100E9A3E2 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA585D81248FD31100E9A3E2 /* AppDelegate.swift */; };
 		AA585D84248FD31100E9A3E2 /* BrowserTabViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA585D83248FD31100E9A3E2 /* BrowserTabViewController.swift */; };
@@ -115,6 +116,7 @@
 		AA2E423324C8A2270048C0D5 /* ColorView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ColorView.swift; sourceTree = "<group>"; };
 		AA361A3524EBF0B500EEC649 /* WindowDraggingView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WindowDraggingView.swift; sourceTree = "<group>"; };
 		AA3F895224C18AD500628DDE /* SuggestionViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SuggestionViewModel.swift; sourceTree = "<group>"; };
+		AA4D700625545EF800C3411E /* UrlEventListener.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UrlEventListener.swift; sourceTree = "<group>"; };
 		AA512D1324D99D9800230283 /* FaviconService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FaviconService.swift; sourceTree = "<group>"; };
 		AA585D7E248FD31100E9A3E2 /* DuckDuckGo Privacy Browser.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "DuckDuckGo Privacy Browser.app"; sourceTree = BUILT_PRODUCTS_DIR; };
 		AA585D81248FD31100E9A3E2 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
@@ -233,6 +235,15 @@
 			name = Frameworks;
 			sourceTree = "<group>";
 		};
+		AA4D700525545EDE00C3411E /* AppDelegate */ = {
+			isa = PBXGroup;
+			children = (
+				AA585D81248FD31100E9A3E2 /* AppDelegate.swift */,
+				AA4D700625545EF800C3411E /* UrlEventListener.swift */,
+			);
+			path = AppDelegate;
+			sourceTree = "<group>";
+		};
 		AA512D1224D99D4900230283 /* Services */ = {
 			isa = PBXGroup;
 			children = (
@@ -267,7 +278,7 @@
 		AA585D80248FD31100E9A3E2 /* DuckDuckGo */ = {
 			isa = PBXGroup;
 			children = (
-				AA585D81248FD31100E9A3E2 /* AppDelegate.swift */,
+				AA4D700525545EDE00C3411E /* AppDelegate */,
 				AA86491B24D837DE001BABEE /* BrowserTab */,
 				AA6820E825503A21005ED0D5 /* Burning */,
 				AA86491324D831B9001BABEE /* Common */,
@@ -848,6 +859,7 @@
 				1430DFF524D0580F00B8978C /* TabBarViewController.swift in Sources */,
 				AABEE6A524AA0A7F0043105B /* SuggestionsViewController.swift in Sources */,
 				AAA0CC3C25337FAB0079BC96 /* WKBackForwardListItemViewModel.swift in Sources */,
+				AA4D700725545EF800C3411E /* UrlEventListener.swift in Sources */,
 				AAA0CC33252F181A0079BC96 /* NavigationButtonMenuDelegate.swift in Sources */,
 				AA512D1424D99D9800230283 /* FaviconService.swift in Sources */,
 				AABEE6AB24ACA0F90043105B /* SuggestionTableRowView.swift in Sources */,

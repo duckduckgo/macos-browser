@@ -1,5 +1,5 @@
 //
-//  AppDelegate.swift
+//  UrlEventListener.swift
 //
 //  Copyright © 2020 DuckDuckGo. All rights reserved.
 //
@@ -16,46 +16,12 @@
 //  limitations under the License.
 //
 
-import Cocoa
+import Foundation
 import os.log
 
-@NSApplicationMain
-class AppDelegate: NSObject, NSApplicationDelegate {
+class UrlEventListener {
 
-    func applicationWillFinishLaunching(_ notification: Notification) {
-        listenUrlEvents()
-    }
-
-    func applicationDidFinishLaunching(_ aNotification: Notification) {
-        // Insert code here to initialize your application
-    }
-
-    func applicationWillTerminate(_ aNotification: Notification) {
-        // Insert code here to tear down your application
-    }
-
-    func applicationShouldHandleReopen(_ sender: NSApplication, hasVisibleWindows flag: Bool) -> Bool {
-        if !flag {
-            WindowsManager.openNewWindow()
-            return true
-        }
-        return true
-    }
-
-    func applicationDockMenu(_ sender: NSApplication) -> NSMenu? {
-        let applicationDockMenu = ApplicationDockMenu()
-        applicationDockMenu.dataSource = WindowControllersManager.shared
-        applicationDockMenu.applicationDockMenuDelegate = WindowControllersManager.shared
-        return applicationDockMenu
-    }
-
-}
-
-// MARK: - URL Events
-
-extension AppDelegate {
-
-    private func listenUrlEvents() {
+    func listen() {
         NSAppleEventManager.shared().setEventHandler(
             self,
             andSelector: #selector(handleUrlEvent(event:reply:)),
@@ -71,8 +37,9 @@ extension AppDelegate {
             return
         }
 
-        guard let windowController = WindowControllersManager.shared.lastKeyMainWindowController else {
-            os_log("AppDelegate: No key window controller", type: .error)
+        guard let windowController = WindowControllersManager.shared.lastKeyMainWindowController,
+              windowController.window?.isKeyWindow == true else {
+            WindowsManager.openNewWindow(with: url)
             return
         }
 
