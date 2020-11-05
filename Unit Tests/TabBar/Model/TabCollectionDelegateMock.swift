@@ -39,6 +39,12 @@ class TabCollectionDelegateMock: TabCollectionDelegate {
         didRemoveCalled = true
     }
 
+    var didRemoveAllAndAppendCalled = false
+
+    func tabCollection(_ tabCollection: TabCollection, didRemoveAllAndAppend tab: Tab) {
+        didRemoveAllAndAppendCalled = true
+    }
+
     var didMoveCalled = false
 
     func tabCollection(_ tabCollection: TabCollection, didMoveTabAt index: Int, to newIndex: Int) {
