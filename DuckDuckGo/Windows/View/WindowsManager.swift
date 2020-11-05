@@ -21,6 +21,10 @@ import os.log
 
 class WindowsManager {
 
+    class var windows: [NSWindow] {
+        return NSApplication.shared.windows
+    }
+
     class func closeWindows(except window: NSWindow? = nil) {
         NSApplication.shared.windows.forEach {
             if $0 != window {

@@ -17,9 +17,14 @@
 //
 
 import Cocoa
+import os.log
 
 @NSApplicationMain
 class AppDelegate: NSObject, NSApplicationDelegate {
+
+    func applicationWillFinishLaunching(_ notification: Notification) {
+        listenUrlEvents()
+    }
 
     func applicationDidFinishLaunching(_ aNotification: Notification) {
         // Insert code here to initialize your application
@@ -29,11 +34,65 @@ class AppDelegate: NSObject, NSApplicationDelegate {
         // Insert code here to tear down your application
     }
 
+    func applicationShouldHandleReopen(_ sender: NSApplication, hasVisibleWindows flag: Bool) -> Bool {
+        if !flag {
+            WindowsManager.openNewWindow()
+            return true
+        }
+        return true
+    }
+
     func applicationDockMenu(_ sender: NSApplication) -> NSMenu? {
         let applicationDockMenu = ApplicationDockMenu()
         applicationDockMenu.dataSource = WindowControllersManager.shared
         applicationDockMenu.applicationDockMenuDelegate = WindowControllersManager.shared
         return applicationDockMenu
+    }
+
+}
+
+// MARK: - URL Events
+
+extension AppDelegate {
+
+    private func listenUrlEvents() {
+        NSAppleEventManager.shared().setEventHandler(
+            self,
+            andSelector: #selector(handleUrlEvent(event:reply:)),
+            forEventClass: AEEventClass(kInternetEventClass),
+            andEventID: AEEventID(kAEGetURL)
+        )
+    }
+
+    @objc private func handleUrlEvent(event: NSAppleEventDescriptor, reply: NSAppleEventDescriptor) {
+        guard let path = event.paramDescriptor(forKeyword: keyDirectObject)?.stringValue?.removingPercentEncoding,
+              let url = URL(string: path) else {
+            os_log("AppDelegate: URL initialization failed", type: .error)
+            return
+        }
+
+        guard let windowController = WindowControllersManager.shared.lastKeyMainWindowController else {
+            os_log("AppDelegate: No key window controller", type: .error)
+            return
+        }
+
+        guard let mainViewController = windowController.mainViewController else {
+            os_log("AppDelegate: No main view controller", type: .error)
+            return
+        }
+
+        let tabCollectionViewModel = mainViewController.tabCollectionViewModel
+        let tabCollection = tabCollectionViewModel.tabCollection
+
+        if tabCollection.tabs.count == 1,
+           let firstTab = tabCollection.tabs.first,
+           firstTab.isHomepageLoaded {
+            firstTab.url = url
+        } else {
+            let newTab = Tab()
+            newTab.url = url
+            tabCollectionViewModel.append(tab: newTab)
+        }
     }
 
 }

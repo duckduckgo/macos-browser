@@ -36,10 +36,6 @@ class TabCollection {
 
     @Published private(set) var lastRemovedTabCache: (url: URL?, index: Int)?
 
-    init() {
-        listenUrlEvents()
-    }
-
     func append(tab: Tab) {
         tabs.append(tab)
         delegate?.tabCollection(self, didAppend: tab)
@@ -114,33 +110,6 @@ class TabCollection {
         tab.url = lastRemovedTabCache.url
         insert(tab: tab, at: min(lastRemovedTabCache.index, tabs.count))
         self.lastRemovedTabCache = nil
-    }
-
-}
-
-// MARK: - URL Event
-
-extension TabCollection {
-
-    private func listenUrlEvents() {
-        NSAppleEventManager.shared().setEventHandler(
-            self,
-            andSelector: #selector(handleUrlEvent(event:reply:)),
-            forEventClass: AEEventClass(kInternetEventClass),
-            andEventID: AEEventID(kAEGetURL)
-        )
-    }
-
-    @objc private func handleUrlEvent(event: NSAppleEventDescriptor, reply: NSAppleEventDescriptor) {
-        guard let path = event.paramDescriptor(forKeyword: keyDirectObject)?.stringValue?.removingPercentEncoding,
-              let url = URL(string: path) else {
-            os_log("TabCollection: URL initialization failed", type: .error)
-            return
-        }
-
-        let newTab = Tab()
-        newTab.url = url
-        append(tab: newTab)
     }
 
 }
