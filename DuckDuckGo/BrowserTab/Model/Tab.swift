@@ -52,6 +52,15 @@ class Tab {
         url == nil || url == URL.emptyPage
     }
 
+    func load(url: URL) {
+        load(urlRequest: URLRequest(url: url))
+    }
+
+    private func load(urlRequest: URLRequest) {
+        webView.stopLoading()
+        webView.load(urlRequest)
+    }
+
     func goForward() {
         webView.goForward()
     }

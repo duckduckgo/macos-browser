@@ -47,15 +47,6 @@ class BrowserTabViewController: NSViewController {
         subscribeToSelectedTabViewModel()
     }
 
-    private func load(url: URL) {
-        load(urlRequest: URLRequest(url: url))
-    }
-
-    private func load(urlRequest: URLRequest) {
-        webView?.stopLoading()
-        webView?.load(urlRequest)
-    }
-
     private func subscribeToSelectedTabViewModel() {
         selectedTabViewModelCancellable = tabCollectionViewModel.$selectedTabViewModel.receive(on: DispatchQueue.main).sink { [weak self] _ in
             self?.changeWebView()
@@ -173,7 +164,7 @@ extension BrowserTabViewController: WKNavigationDelegate {
         HTTPSUpgrade.shared.isUpgradeable(url: url) { [weak self] isUpgradable in
             if isUpgradable, let upgradedUrl = self?.upgradeUrl(url, navigationAction: navigationAction) {
                 os_log("Loading %s", type: .debug, upgradedUrl.absoluteString)
-                self?.load(url: upgradedUrl)
+                self?.tabViewModel?.tab.load(url: upgradedUrl)
                 decisionHandler(.cancel)
                 return
             }
