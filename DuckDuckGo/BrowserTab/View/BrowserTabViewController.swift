@@ -56,8 +56,10 @@ class BrowserTabViewController: NSViewController {
     private func changeWebView() {
 
         func displayWebView(of tabViewModel: TabViewModel) {
+            tabViewModel.tab.delegate = self
+
             let newWebView = tabViewModel.tab.webView
-            newWebView.navigationDelegate = self
+            newWebView.navigationDelegate = tabViewModel.tab
             newWebView.uiDelegate = self
 
             view.addAndLayout(newWebView)
@@ -141,68 +143,24 @@ class BrowserTabViewController: NSViewController {
 
 }
 
-extension BrowserTabViewController: WKNavigationDelegate {
-
-    func webView(_ webView: WKWebView,
-                 decidePolicyFor navigationAction: WKNavigationAction,
-                 decisionHandler: @escaping (WKNavigationActionPolicy) -> Void) {
-
-        let isCommandPressed = NSApp.currentEvent?.modifierFlags.contains(.command) ?? false
-        let isLinkActivated = navigationAction.navigationType == .linkActivated
-
-        if isLinkActivated && isCommandPressed {
-            decisionHandler(.cancel)
-            openNewTab(with: navigationAction.request.url)
-            return
-        }
-
-        guard let url = navigationAction.request.url else {
-            decisionHandler(.allow)
-            return
-        }
-
-        HTTPSUpgrade.shared.isUpgradeable(url: url) { [weak self] isUpgradable in
-            if isUpgradable, let upgradedUrl = self?.upgradeUrl(url, navigationAction: navigationAction) {
-                os_log("Loading %s", type: .debug, upgradedUrl.absoluteString)
-                self?.tabViewModel?.tab.load(url: upgradedUrl)
-                decisionHandler(.cancel)
-                return
-            }
-
-            decisionHandler(.allow)
+extension BrowserTabViewController: TabDelegate {
+    func received(event: TabEvent) {
+        switch event {
+        case .didStartNavigation:
+            setFirstResponderIfNeeded()
+        case .requestedNewTab(let url):
+            openNewTab(with: url)
         }
     }
+}
 
-    private func upgradeUrl(_ url: URL, navigationAction: WKNavigationAction) -> URL? {
-        if let upgradedUrl: URL = url.toHttps() {
-            return upgradedUrl
-        }
-
-        return nil
-    }
-
-    func webView(_ webView: WKWebView, didStartProvisionalNavigation navigation: WKNavigation!) {
-        setFirstResponderIfNeeded()
-        displayErrorView(false)
-    }
-
-    func webView(_ webView: WKWebView, didFinish navigation: WKNavigation!) {
-    }
-
-    func webView(_ webView: WKWebView, didFail navigation: WKNavigation!, withError error: Error) {
-        //todo: Did problems when going back
-//        displayErrorView(true)
-    }
-
-    func webView(_ webView: WKWebView, didFailProvisionalNavigation navigation: WKNavigation!, withError error: Error) {
-        displayErrorView(true)
-    }
+extension BrowserTabViewController: WKUIDelegate {
 
     func webView(_ webView: WKWebView,
                  createWebViewWith configuration: WKWebViewConfiguration,
                  for navigationAction: WKNavigationAction,
                  windowFeatures: WKWindowFeatures) -> WKWebView? {
-        
+
         tabCollectionViewModel.appendNewTabAfterSelected()
         guard let selectedViewModel = tabCollectionViewModel.selectedTabViewModel else {
             os_log("%s: Selected tab view model is nil", type: .error, className)
@@ -211,9 +169,5 @@ extension BrowserTabViewController: WKNavigationDelegate {
         selectedViewModel.tab.webView.load(navigationAction.request)
         return nil
     }
-
-}
-
-extension BrowserTabViewController: WKUIDelegate {
 
 }

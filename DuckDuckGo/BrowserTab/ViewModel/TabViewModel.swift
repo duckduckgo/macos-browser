@@ -40,6 +40,7 @@ class TabViewModel {
     @Published var canGoBack: Bool = false
     @Published var canReload: Bool = false
     @Published var isLoading: Bool = false
+    @Published var displayErrorView: Bool = false
 
     @Published private(set) var addressBarString: String = ""
     @Published private(set) var passiveAddressBarString: String = ""
@@ -54,6 +55,7 @@ class TabViewModel {
         subscribeToUrl()
         subscribeToTitle()
         subscribeToFavicon()
+        subscribeToTabError()
     }
 
     private func subscribeToUrl() {
@@ -69,6 +71,10 @@ class TabViewModel {
 
     private func subscribeToFavicon() {
         tab.$favicon.receive(on: DispatchQueue.main).sink { [weak self] _ in self?.updateFavicon() } .store(in: &cancellables)
+    }
+
+    private func subscribeToTabError() {
+        tab.$hasError.receive(on: DispatchQueue.main).assign(to: \.displayErrorView, on: self).store(in: &cancellables)
     }
 
     private func updateCanReload() {
