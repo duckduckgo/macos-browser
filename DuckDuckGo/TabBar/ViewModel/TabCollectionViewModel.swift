@@ -94,6 +94,11 @@ class TabCollectionViewModel {
         select(at: tabCollection.tabs.count - 1)
     }
 
+    func insertNewTab(at index: Int = 0) {
+        tabCollection.insert(tab: Tab(), at: index)
+        select(at: index)
+    }
+
     func remove(at index: Int) {
         guard tabCollection.remove(at: index) else { return }
 
@@ -137,6 +142,11 @@ class TabCollectionViewModel {
         } else {
             selectionIndex = nil
         }
+    }
+
+    func removeAllTabsAndAppendNewTab() {
+        tabCollection.removeAllAndAppend(tab: Tab())
+        select(at: 0)
     }
 
     func insertLastRemovedTab() {

@@ -17,9 +17,16 @@
 //
 
 import Cocoa
+import os.log
 
 @NSApplicationMain
 class AppDelegate: NSObject, NSApplicationDelegate {
+
+    let urlEventListener = UrlEventListener()
+
+    func applicationWillFinishLaunching(_ notification: Notification) {
+        urlEventListener.listen()
+    }
 
     func applicationDidFinishLaunching(_ aNotification: Notification) {
         // Insert code here to initialize your application
@@ -27,6 +34,14 @@ class AppDelegate: NSObject, NSApplicationDelegate {
 
     func applicationWillTerminate(_ aNotification: Notification) {
         // Insert code here to tear down your application
+    }
+
+    func applicationShouldHandleReopen(_ sender: NSApplication, hasVisibleWindows flag: Bool) -> Bool {
+        if !flag {
+            WindowsManager.openNewWindow()
+            return true
+        }
+        return true
     }
 
     func applicationDockMenu(_ sender: NSApplication) -> NSMenu? {

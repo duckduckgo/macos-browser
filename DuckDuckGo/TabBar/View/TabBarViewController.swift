@@ -38,6 +38,8 @@ class TabBarViewController: NSViewController {
     @IBOutlet weak var windowDraggingViewLeadingConstraint: NSLayoutConstraint!
 
     private let tabCollectionViewModel: TabCollectionViewModel
+    lazy private var fireViewModel = FireViewModel()
+
     private var tabsCancellable: AnyCancellable?
     private var selectionIndexCancellable: AnyCancellable?
 
@@ -75,7 +77,11 @@ class TabBarViewController: NSViewController {
     }
 
     @IBAction func burnButtonAction(_ sender: NSButton) {
-
+        let response = NSAlert.burnButtonAlert.runModal()
+        if response == NSApplication.ModalResponse.alertFirstButtonReturn {
+            WindowsManager.closeWindows(except: view.window)
+            fireViewModel.fire.burnAll(tabCollectionViewModel: tabCollectionViewModel)
+        }
     }
 
     @IBAction func addButtonAction(_ sender: NSButton) {
@@ -282,12 +288,23 @@ extension TabBarViewController: TabCollectionDelegate {
 
         collectionView.animator().performBatchUpdates {
             collectionView.animator().deleteItems(at: indexPathSet)
-        } completionHandler: { _ in
-            self.updateTabMode()
+        } completionHandler: { [weak self] _ in
+            self?.updateTabMode()
         }
 
         closeWindowIfNeeded()
         updateWindowDraggingArea()
+    }
+
+    func tabCollection(_ tabCollection: TabCollection, didRemoveAllAndAppend tab: Tab) {
+        let newIndexPath = IndexPath(arrayLiteral: 0)
+        let newIndexPathSet = Set(arrayLiteral: newIndexPath)
+
+        collectionView.animator().performBatchUpdates {
+            collectionView.animator().reloadItems(at: newIndexPathSet)
+        } completionHandler: { [weak self] _ in
+            self?.updateTabMode()
+        }
     }
 
     func tabCollection(_ tabCollection: TabCollection, didMoveTabAt index: Int, to newIndex: Int) {
@@ -464,6 +481,21 @@ extension TabBarViewController: TabBarViewItemDelegate {
         }
 
         tabCollectionViewModel.removeAllTabs(except: indexPath.item)
+    }
+
+}
+
+fileprivate extension NSAlert {
+
+    static var burnButtonAlert: NSAlert {
+        let alert = NSAlert()
+        alert.messageText = "Are you sure you want to burn everything?"
+        alert.informativeText = "This will close all tabs and clear website data."
+        alert.alertStyle = .warning
+        alert.icon = NSImage(named: "BurnAlert")
+        alert.addButton(withTitle: "Burn")
+        alert.addButton(withTitle: "Cancel")
+        return alert
     }
 
 }

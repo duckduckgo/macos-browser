@@ -24,6 +24,7 @@ protocol TabCollectionDelegate: AnyObject {
     func tabCollection(_ tabCollection: TabCollection, didAppend tab: Tab)
     func tabCollection(_ tabCollection: TabCollection, didInsert tab: Tab, at index: Int)
     func tabCollection(_ tabCollection: TabCollection, didRemoveTabAt index: Int)
+    func tabCollection(_ tabCollection: TabCollection, didRemoveAllAndAppend tab: Tab)
     func tabCollection(_ tabCollection: TabCollection, didMoveTabAt index: Int, to newIndex: Int)
 
 }
@@ -34,10 +35,6 @@ class TabCollection {
     weak var delegate: TabCollectionDelegate?
 
     @Published private(set) var lastRemovedTabCache: (url: URL?, index: Int)?
-
-    init() {
-        listenUrlEvents()
-    }
 
     func append(tab: Tab) {
         tabs.append(tab)
@@ -66,6 +63,12 @@ class TabCollection {
         delegate?.tabCollection(self, didRemoveTabAt: index)
 
         return true
+    }
+
+    func removeAllAndAppend(tab: Tab) {
+        tabs.removeAll()
+        tabs.insert(tab, at: 0)
+        delegate?.tabCollection(self, didRemoveAllAndAppend: tab)
     }
 
     func moveTab(at index: Int, to newIndex: Int) {
@@ -107,33 +110,6 @@ class TabCollection {
         tab.url = lastRemovedTabCache.url
         insert(tab: tab, at: min(lastRemovedTabCache.index, tabs.count))
         self.lastRemovedTabCache = nil
-    }
-
-}
-
-// MARK: - URL Event
-
-extension TabCollection {
-
-    private func listenUrlEvents() {
-        NSAppleEventManager.shared().setEventHandler(
-            self,
-            andSelector: #selector(handleUrlEvent(event:reply:)),
-            forEventClass: AEEventClass(kInternetEventClass),
-            andEventID: AEEventID(kAEGetURL)
-        )
-    }
-
-    @objc private func handleUrlEvent(event: NSAppleEventDescriptor, reply: NSAppleEventDescriptor) {
-        guard let path = event.paramDescriptor(forKeyword: keyDirectObject)?.stringValue?.removingPercentEncoding,
-              let url = URL(string: path) else {
-            os_log("TabCollection: URL initialization failed", type: .error)
-            return
-        }
-
-        let newTab = Tab()
-        newTab.url = url
-        append(tab: newTab)
     }
 
 }
