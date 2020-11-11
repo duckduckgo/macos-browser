@@ -492,6 +492,7 @@ fileprivate extension NSAlert {
         alert.messageText = "Are you sure you want to burn everything?"
         alert.informativeText = "This will close all tabs and clear website data."
         alert.alertStyle = .warning
+        alert.icon = NSImage(named: "BurnAlert")
         alert.addButton(withTitle: "Burn")
         alert.addButton(withTitle: "Cancel")
         return alert
