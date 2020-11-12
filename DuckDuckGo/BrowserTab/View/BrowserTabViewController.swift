@@ -44,7 +44,7 @@ class BrowserTabViewController: NSViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
 
-        bindSelectedTabViewModel()
+        subscribeToSelectedTabViewModel()
     }
 
     private func load(url: URL) {
