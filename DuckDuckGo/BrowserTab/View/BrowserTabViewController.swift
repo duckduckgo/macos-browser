@@ -144,13 +144,12 @@ class BrowserTabViewController: NSViewController {
 }
 
 extension BrowserTabViewController: TabDelegate {
-    func received(event: TabEvent) {
-        switch event {
-        case .didStartNavigation:
-            setFirstResponderIfNeeded()
-        case .requestedNewTab(let url):
-            openNewTab(with: url)
-        }
+    func tabDidStartNavigation(_ tab: Tab) {
+        setFirstResponderIfNeeded()
+    }
+
+    func tab(_ tab: Tab, requestedNewTab url: URL?) {
+        openNewTab(with: url)
     }
 }
 

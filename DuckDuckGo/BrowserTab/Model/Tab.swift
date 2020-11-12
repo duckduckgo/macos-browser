@@ -20,13 +20,9 @@ import Cocoa
 import WebKit
 import os
 
-enum TabEvent {
-    case didStartNavigation
-    case requestedNewTab(URL?)
-}
-
 protocol TabDelegate: class {
-    func received(event: TabEvent)
+    func tabDidStartNavigation(_ tab: Tab)
+    func tab(_ tab: Tab, requestedNewTab url: URL?)
 }
 
 class Tab: NSObject {
@@ -158,7 +154,7 @@ extension Tab: WKNavigationDelegate {
 
         if isLinkActivated && isCommandPressed {
             decisionHandler(.cancel)
-            delegate?.received(event: .requestedNewTab(navigationAction.request.url))
+            delegate?.tab(self, requestedNewTab: navigationAction.request.url)
             return
         }
 
@@ -188,7 +184,7 @@ extension Tab: WKNavigationDelegate {
     }
 
     func webView(_ webView: WKWebView, didStartProvisionalNavigation navigation: WKNavigation!) {
-        delegate?.received(event: .didStartNavigation)
+        delegate?.tabDidStartNavigation(self)
         hasError = false
     }
 
