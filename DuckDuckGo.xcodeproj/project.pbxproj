@@ -23,7 +23,6 @@
 		4B677437255DBEB800025BD8 /* HTTPSUpgrade.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B67742C255DBEB800025BD8 /* HTTPSUpgrade.swift */; };
 		4B677438255DBEB800025BD8 /* HTTPSUpgrade.xcdatamodeld in Sources */ = {isa = PBXBuildFile; fileRef = 4B67742E255DBEB800025BD8 /* HTTPSUpgrade.xcdatamodeld */; };
 		4B677439255DBEB800025BD8 /* HTTPSUpgradeStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B677430255DBEB800025BD8 /* HTTPSUpgradeStore.swift */; };
-		4B677441255DBEEA00025BD8 /* DataModel.xcdatamodeld in Sources */ = {isa = PBXBuildFile; fileRef = 4B67743E255DBEEA00025BD8 /* DataModel.xcdatamodeld */; };
 		4B677442255DBEEA00025BD8 /* Database.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B677440255DBEEA00025BD8 /* Database.swift */; };
 		4B67744B255DBF3A00025BD8 /* BloomFilter.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4B677449255DBF3A00025BD8 /* BloomFilter.cpp */; };
 		4B677450255DBFA300025BD8 /* HashExtension.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B67744F255DBFA300025BD8 /* HashExtension.swift */; };
@@ -135,7 +134,6 @@
 		4B67742C255DBEB800025BD8 /* HTTPSUpgrade.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = HTTPSUpgrade.swift; sourceTree = "<group>"; };
 		4B67742F255DBEB800025BD8 /* HTTPSUpgrade 3.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = "HTTPSUpgrade 3.xcdatamodel"; sourceTree = "<group>"; };
 		4B677430255DBEB800025BD8 /* HTTPSUpgradeStore.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = HTTPSUpgradeStore.swift; sourceTree = "<group>"; };
-		4B67743F255DBEEA00025BD8 /* DataModel.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = DataModel.xcdatamodel; sourceTree = "<group>"; };
 		4B677440255DBEEA00025BD8 /* Database.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Database.swift; sourceTree = "<group>"; };
 		4B677449255DBF3A00025BD8 /* BloomFilter.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = BloomFilter.cpp; path = Submodules/bloom_cpp/src/BloomFilter.cpp; sourceTree = SOURCE_ROOT; };
 		4B67744A255DBF3A00025BD8 /* BloomFilter.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = BloomFilter.hpp; path = Submodules/bloom_cpp/src/BloomFilter.hpp; sourceTree = SOURCE_ROOT; };
@@ -300,7 +298,6 @@
 		4B67743D255DBEEA00025BD8 /* Database */ = {
 			isa = PBXGroup;
 			children = (
-				4B67743E255DBEEA00025BD8 /* DataModel.xcdatamodeld */,
 				4B677440255DBEEA00025BD8 /* Database.swift */,
 			);
 			path = Database;
@@ -980,7 +977,6 @@
 				AAECA42024EEA4AC00EFA63A /* IndexPathExtension.swift in Sources */,
 				4B677450255DBFA300025BD8 /* HashExtension.swift in Sources */,
 				AA9FF95F24A1FB690039E328 /* TabCollectionViewModel.swift in Sources */,
-				4B677441255DBEEA00025BD8 /* DataModel.xcdatamodeld in Sources */,
 				AA6EF9B525081B4C004754E6 /* MainMenuActions.swift in Sources */,
 				AA6FFB4424DC33320028F4D0 /* NSViewExtension.swift in Sources */,
 				AA585D84248FD31100E9A3E2 /* BrowserTabViewController.swift in Sources */,
@@ -1382,16 +1378,6 @@
 			);
 			currentVersion = 4B67742F255DBEB800025BD8 /* HTTPSUpgrade 3.xcdatamodel */;
 			path = HTTPSUpgrade.xcdatamodeld;
-			sourceTree = "<group>";
-			versionGroupType = wrapper.xcdatamodel;
-		};
-		4B67743E255DBEEA00025BD8 /* DataModel.xcdatamodeld */ = {
-			isa = XCVersionGroup;
-			children = (
-				4B67743F255DBEEA00025BD8 /* DataModel.xcdatamodel */,
-			);
-			currentVersion = 4B67743F255DBEEA00025BD8 /* DataModel.xcdatamodel */;
-			path = DataModel.xcdatamodeld;
 			sourceTree = "<group>";
 			versionGroupType = wrapper.xcdatamodel;
 		};
