@@ -138,4 +138,16 @@ extension MainViewController {
         tabCollectionViewModel.append(tabs: otherTabs)
     }
 
+    // MARK: - Help
+
+#if FEEDBACK
+
+    @IBAction func openFeedback(_ sender: Any?) {
+        let tab = Tab()
+        tab.url = URL.feedback
+        tabCollectionViewModel.append(tab: tab)
+    }
+
+#endif
+
 }

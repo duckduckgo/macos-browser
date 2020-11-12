@@ -25,6 +25,9 @@ extension NSMenu {
         case back = 40
         case forward = 41
         case reopenLastClosedTab = 43
+        case help = 6
+        case helpSeparator = 61
+        case sendFeedback = 62
     }
 
     var backMenuItem: NSMenuItem? {
@@ -37,6 +40,18 @@ extension NSMenu {
 
     var reopenLastClosedTabMenuItem: NSMenuItem? {
         return item(withTag: MenuItemTag.history.rawValue)?.submenu?.item(withTag: MenuItemTag.reopenLastClosedTab.rawValue)
+    }
+
+    var helpMenuItem: NSMenuItem? {
+        return item(withTag: MenuItemTag.help.rawValue)
+    }
+
+    var helpSeparatorMenuItem: NSMenuItem? {
+        helpMenuItem?.submenu?.item(withTag: MenuItemTag.helpSeparator.rawValue)
+    }
+
+    var sendFeedbackMenuItem: NSMenuItem? {
+        helpMenuItem?.submenu?.item(withTag: MenuItemTag.sendFeedback.rawValue)
     }
 
 }

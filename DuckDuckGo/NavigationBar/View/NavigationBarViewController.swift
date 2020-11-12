@@ -24,6 +24,7 @@ class NavigationBarViewController: NSViewController {
 
     @IBOutlet weak var goBackButton: NSButton!
     @IBOutlet weak var goForwardButton: NSButton!
+    @IBOutlet weak var feedbackButton: NSButton!
     @IBOutlet weak var optionsButton: NSButton!
 
     var addressBarViewController: AddressBarViewController?
@@ -56,6 +57,13 @@ class NavigationBarViewController: NSViewController {
 
         setupNavigationButtonMenus()
         subscribeToSelectedTabViewModel()
+
+#if !FEEDBACK
+
+        removeFeedback()
+
+#endif
+
     }
 
     @IBSegueAction func createAddressBarViewController(_ coder: NSCoder) -> AddressBarViewController? {
@@ -92,6 +100,22 @@ class NavigationBarViewController: NSViewController {
             NSMenu.popUpContextMenu(optionsMenu, with: event, for: sender)
         }
     }
+
+#if FEEDBACK
+
+    @IBAction func feedbackButtonAction(_ sender: NSButton) {
+        let tab = Tab()
+        tab.url = URL.feedback
+        tabCollectionViewModel.append(tab: tab)
+    }
+
+#else
+
+    private func removeFeedback() {
+        feedbackButton.removeFromSuperview()
+    }
+
+#endif
 
     private func setupNavigationButtonMenus() {
         let backButtonMenu = NSMenu()

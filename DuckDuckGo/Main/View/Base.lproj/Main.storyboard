@@ -406,13 +406,20 @@
                                     </items>
                                 </menu>
                             </menuItem>
-                            <menuItem title="Help" id="wpr-3q-Mcd">
+                            <menuItem title="Help" tag="6" id="wpr-3q-Mcd">
                                 <modifierMask key="keyEquivalentModifierMask"/>
                                 <menu key="submenu" title="Help" systemMenu="help" id="F2S-fz-NVQ">
                                     <items>
                                         <menuItem title="DuckDuckGo Help" keyEquivalent="?" id="FKE-Sm-Kum">
                                             <connections>
                                                 <action selector="showHelp:" target="Ady-hI-5gd" id="y7X-2Q-9no"/>
+                                            </connections>
+                                        </menuItem>
+                                        <menuItem isSeparatorItem="YES" tag="61" id="ESk-wA-tC4"/>
+                                        <menuItem title="Send Feedback" tag="62" id="V8t-Ts-q0L">
+                                            <modifierMask key="keyEquivalentModifierMask"/>
+                                            <connections>
+                                                <action selector="openFeedback:" target="Ady-hI-5gd" id="FWM-NE-Ftt"/>
                                             </connections>
                                         </menuItem>
                                     </items>

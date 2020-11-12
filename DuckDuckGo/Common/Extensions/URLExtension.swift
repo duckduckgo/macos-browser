@@ -150,13 +150,14 @@ extension URL {
         return try? getParameter(name: DuckDuckGoParameters.search.rawValue)
     }
 
-    // MARK: - Local
+    // MARK: - Feedback
 
-    static var applicationSupport: URL {
-        guard let url = FileManager.default.urls(for: .applicationSupportDirectory, in: .userDomainMask).first else {
-            fatalError("Database: Failed to get Application Support file URL")
-        }
-        return url
+#if FEEDBACK
+
+    static var feedback: URL {
+        return URL(string: "https://www.surveymonkey.com/")!
     }
+
+#endif
 
 }
