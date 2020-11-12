@@ -161,19 +161,10 @@ extension URL {
 
     // MARK: - HTTPS
 
-    enum URLProtocol: String {
-        case http
-        case https
-
-        public var scheme: String {
-            return "\(rawValue)://"
-        }
-    }
-
     func toHttps() -> URL? {
         guard var components = URLComponents(url: self, resolvingAgainstBaseURL: false) else { return self }
-        guard components.scheme == URLProtocol.http.rawValue else { return self }
-        components.scheme = URLProtocol.https.rawValue
+        guard components.scheme == Scheme.http.rawValue else { return self }
+        components.scheme = Scheme.https.rawValue
         return components.url
     }
 
