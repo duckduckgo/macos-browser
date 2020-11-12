@@ -59,7 +59,6 @@ class BrowserTabViewController: NSViewController {
             tabViewModel.tab.delegate = self
 
             let newWebView = tabViewModel.tab.webView
-            newWebView.navigationDelegate = tabViewModel.tab
             newWebView.uiDelegate = self
 
             view.addAndLayout(newWebView)

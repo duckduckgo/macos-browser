@@ -90,6 +90,7 @@ class Tab: NSObject {
     }
 
     private func setupWebView() {
+        webView.navigationDelegate = self
         webView.allowsBackForwardNavigationGestures = true
     }
 
