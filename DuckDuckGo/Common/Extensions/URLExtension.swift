@@ -160,4 +160,13 @@ extension URL {
 
 #endif
 
+    // MARK: - HTTPS
+
+    func toHttps() -> URL? {
+        guard var components = URLComponents(url: self, resolvingAgainstBaseURL: false) else { return self }
+        guard components.scheme == Scheme.http.rawValue else { return self }
+        components.scheme = Scheme.https.rawValue
+        return components.url
+    }
+
 }

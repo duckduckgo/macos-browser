@@ -56,8 +56,9 @@ class BrowserTabViewController: NSViewController {
     private func changeWebView() {
 
         func displayWebView(of tabViewModel: TabViewModel) {
+            tabViewModel.tab.delegate = self
+
             let newWebView = tabViewModel.tab.webView
-            newWebView.navigationDelegate = self
             newWebView.uiDelegate = self
 
             view.addAndLayout(newWebView)
@@ -141,45 +142,23 @@ class BrowserTabViewController: NSViewController {
 
 }
 
-extension BrowserTabViewController: WKNavigationDelegate {
-
-    func webView(_ webView: WKWebView,
-                 decidePolicyFor navigationAction: WKNavigationAction,
-                 decisionHandler: @escaping (WKNavigationActionPolicy) -> Void) {
-
-        let isCommandPressed = NSApp.currentEvent?.modifierFlags.contains(.command) ?? false
-        let isLinkActivated = navigationAction.navigationType == .linkActivated
-        if isLinkActivated && isCommandPressed {
-            decisionHandler(.cancel)
-            openNewTab(with: navigationAction.request.url)
-            return
-        }
-
-        decisionHandler(.allow)
-    }
-
-    func webView(_ webView: WKWebView, didStartProvisionalNavigation navigation: WKNavigation!) {
+extension BrowserTabViewController: TabDelegate {
+    func tabDidStartNavigation(_ tab: Tab) {
         setFirstResponderIfNeeded()
-        displayErrorView(false)
     }
 
-    func webView(_ webView: WKWebView, didFinish navigation: WKNavigation!) {
+    func tab(_ tab: Tab, requestedNewTab url: URL?) {
+        openNewTab(with: url)
     }
+}
 
-    func webView(_ webView: WKWebView, didFail navigation: WKNavigation!, withError error: Error) {
-        //todo: Did problems when going back
-//        displayErrorView(true)
-    }
-
-    func webView(_ webView: WKWebView, didFailProvisionalNavigation navigation: WKNavigation!, withError error: Error) {
-        displayErrorView(true)
-    }
+extension BrowserTabViewController: WKUIDelegate {
 
     func webView(_ webView: WKWebView,
                  createWebViewWith configuration: WKWebViewConfiguration,
                  for navigationAction: WKNavigationAction,
                  windowFeatures: WKWindowFeatures) -> WKWebView? {
-        
+
         tabCollectionViewModel.appendNewTabAfterSelected()
         guard let selectedViewModel = tabCollectionViewModel.selectedTabViewModel else {
             os_log("%s: Selected tab view model is nil", type: .error, className)
@@ -188,9 +167,5 @@ extension BrowserTabViewController: WKNavigationDelegate {
         selectedViewModel.tab.webView.load(navigationAction.request)
         return nil
     }
-
-}
-
-extension BrowserTabViewController: WKUIDelegate {
 
 }

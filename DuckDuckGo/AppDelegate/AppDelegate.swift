@@ -31,6 +31,9 @@ class AppDelegate: NSObject, NSApplicationDelegate {
 
     func applicationDidFinishLaunching(_ aNotification: Notification) {
         // Insert code here to initialize your application
+
+        Database.shared.loadStore()
+        HTTPSUpgrade.shared.loadDataAsync()
     }
 
     func applicationWillTerminate(_ aNotification: Notification) {

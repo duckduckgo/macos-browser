@@ -18,19 +18,25 @@
 
 import Cocoa
 import WebKit
+import os
 
-class Tab {
+protocol TabDelegate: class {
+    func tabDidStartNavigation(_ tab: Tab)
+    func tab(_ tab: Tab, requestedNewTab url: URL?)
+}
 
-    init(faviconService: FaviconService) {
+class Tab: NSObject {
+
+    weak var delegate: TabDelegate?
+
+    init(faviconService: FaviconService = LocalFaviconService.shared) {
         self.faviconService = faviconService
         webView = WebView(frame: CGRect.zero, configuration: WKWebViewConfiguration.makeConfiguration())
 
+        super.init()
+
         setupWebView()
         setupUserScripts()
-    }
-
-    convenience init() {
-        self.init(faviconService: LocalFaviconService.shared)
     }
 
     deinit {
@@ -46,10 +52,21 @@ class Tab {
             }
         }
     }
+
     @Published var title: String?
+    @Published var hasError: Bool = false
 
     var isHomepageLoaded: Bool {
         url == nil || url == URL.emptyPage
+    }
+
+    func load(url: URL) {
+        load(urlRequest: URLRequest(url: url))
+    }
+
+    private func load(urlRequest: URLRequest) {
+        webView.stopLoading()
+        webView.load(urlRequest)
     }
 
     func goForward() {
@@ -73,6 +90,7 @@ class Tab {
     }
 
     private func setupWebView() {
+        webView.navigationDelegate = self
         webView.allowsBackForwardNavigationGestures = true
     }
 
@@ -108,22 +126,6 @@ class Tab {
 
 }
 
-extension Tab: Equatable {
-
-    static func == (lhs: Tab, rhs: Tab) -> Bool {
-        ObjectIdentifier(lhs) == ObjectIdentifier(rhs)
-    }
-
-}
-
-extension Tab: Hashable {
-
-    func hash(into hasher: inout Hasher) {
-        hasher.combine(ObjectIdentifier(self))
-    }
-
-}
-
 extension Tab: FaviconUserScriptDelegate {
 
     func faviconUserScript(_ faviconUserScript: FaviconUserScript, didFindFavicon faviconUrl: URL) {
@@ -138,6 +140,65 @@ extension Tab: FaviconUserScriptDelegate {
 
             self.favicon = image
         }
+    }
+
+}
+
+extension Tab: WKNavigationDelegate {
+
+    func webView(_ webView: WKWebView,
+                 decidePolicyFor navigationAction: WKNavigationAction,
+                 decisionHandler: @escaping (WKNavigationActionPolicy) -> Void) {
+
+        let isCommandPressed = NSApp.currentEvent?.modifierFlags.contains(.command) ?? false
+        let isLinkActivated = navigationAction.navigationType == .linkActivated
+
+        if isLinkActivated && isCommandPressed {
+            decisionHandler(.cancel)
+            delegate?.tab(self, requestedNewTab: navigationAction.request.url)
+            return
+        }
+
+        guard let url = navigationAction.request.url else {
+            decisionHandler(.allow)
+            return
+        }
+
+        HTTPSUpgrade.shared.isUpgradeable(url: url) { [weak self] isUpgradable in
+            if isUpgradable, let upgradedUrl = self?.upgradeUrl(url, navigationAction: navigationAction) {
+                os_log("Loading %s", type: .debug, upgradedUrl.absoluteString)
+                self?.load(url: upgradedUrl)
+                decisionHandler(.cancel)
+                return
+            }
+
+            decisionHandler(.allow)
+        }
+    }
+
+    private func upgradeUrl(_ url: URL, navigationAction: WKNavigationAction) -> URL? {
+        if let upgradedUrl: URL = url.toHttps() {
+            return upgradedUrl
+        }
+
+        return nil
+    }
+
+    func webView(_ webView: WKWebView, didStartProvisionalNavigation navigation: WKNavigation!) {
+        delegate?.tabDidStartNavigation(self)
+        hasError = false
+    }
+
+    func webView(_ webView: WKWebView, didFinish navigation: WKNavigation!) {
+    }
+
+    func webView(_ webView: WKWebView, didFail navigation: WKNavigation!, withError error: Error) {
+        // TODO: Problems when going back
+        hasError = true
+    }
+
+    func webView(_ webView: WKWebView, didFailProvisionalNavigation navigation: WKNavigation!, withError error: Error) {
+        hasError = true
     }
 
 }
