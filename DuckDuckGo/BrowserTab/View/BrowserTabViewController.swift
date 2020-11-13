@@ -168,4 +168,27 @@ extension BrowserTabViewController: WKUIDelegate {
         return nil
     }
 
+    func webView(_ webView: WKWebView,
+                 runOpenPanelWith parameters: WKOpenPanelParameters,
+                 initiatedByFrame frame: WKFrameInfo,
+                 completionHandler: @escaping ([URL]?) -> Void) {
+
+        guard let window = view.window else {
+            os_log("%s: Window is nil", type: .error, className)
+            completionHandler(nil)
+            return
+        }
+
+        let openPanel = NSOpenPanel()
+        openPanel.allowsMultipleSelection = parameters.allowsMultipleSelection
+
+        openPanel.beginSheetModal(for: window) { response in
+            if response == NSApplication.ModalResponse.OK {
+                completionHandler(openPanel.urls)
+            } else {
+                completionHandler(nil)
+            }
+        }
+    }
+
 }
