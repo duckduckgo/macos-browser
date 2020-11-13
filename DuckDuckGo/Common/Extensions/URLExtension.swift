@@ -155,7 +155,7 @@ extension URL {
 #if FEEDBACK
 
     static var feedback: URL {
-        return URL(string: "https://www.surveymonkey.com/")!
+        return URL(string: "https://www.surveymonkey.com/r/KZDGCZ9")!
     }
 
 #endif
