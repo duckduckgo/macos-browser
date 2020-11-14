@@ -69,7 +69,7 @@ fileprivate extension Suggestion {
     static func makeSuggestion(key: String, value: String) -> Suggestion {
         let suggestion = key == "phrase" ? Suggestion.phrase(phrase: value) : Suggestion.unknown(value: value)
         if key != "phrase" {
-            os_log("SuggestionsAPIResult: Unknown suggestion type", type: .debug)
+            os_log("SuggestionsAPIResult: Unknown suggestion type", type: .error)
         }
         return suggestion
     }

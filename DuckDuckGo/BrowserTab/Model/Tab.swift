@@ -167,7 +167,6 @@ extension Tab: WKNavigationDelegate {
 
         HTTPSUpgrade.shared.isUpgradeable(url: url) { [weak self] isUpgradable in
             if isUpgradable, let upgradedUrl = self?.upgradeUrl(url, navigationAction: navigationAction) {
-                os_log("Loading %s", type: .debug, upgradedUrl.absoluteString)
                 self?.load(url: upgradedUrl)
                 decisionHandler(.cancel)
                 return
@@ -187,14 +186,13 @@ extension Tab: WKNavigationDelegate {
 
     func webView(_ webView: WKWebView, didStartProvisionalNavigation navigation: WKNavigation!) {
         delegate?.tabDidStartNavigation(self)
-        hasError = false
+        if hasError { hasError = false }
     }
 
     func webView(_ webView: WKWebView, didFinish navigation: WKNavigation!) {
     }
 
     func webView(_ webView: WKWebView, didFail navigation: WKNavigation!, withError error: Error) {
-        // TODO: Problems when going back
         hasError = true
     }
 
