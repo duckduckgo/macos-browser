@@ -42,6 +42,18 @@ class OptionsButtonMenu: NSMenu {
         moveTabMenuItem.target = self
         moveTabMenuItem.image = NSImage(named: "MoveTabToNewWindow")
         addItem(moveTabMenuItem)
+
+#if FEEDBACK
+
+        let openFeedbackMenuItem = NSMenuItem(title: "Send Feedback",
+                                         action: #selector(openFeedbackAction(_:)),
+                                         keyEquivalent: "")
+        openFeedbackMenuItem.target = self
+        openFeedbackMenuItem.image = NSImage(named: "Feedback")
+        addItem(openFeedbackMenuItem)
+
+#endif
+
     }
 
     @objc func moveTabToNewWindowAction(_ sender: NSMenuItem) {
@@ -54,4 +66,15 @@ class OptionsButtonMenu: NSMenu {
         tabCollectionViewModel.removeSelected()
         WindowsManager.openNewWindow(with: url)
     }
+
+#if FEEDBACK
+
+    @objc func openFeedbackAction(_ sender: NSMenuItem) {
+        let tab = Tab()
+        tab.url = URL.feedback
+        tabCollectionViewModel.append(tab: tab)
+    }
+
+#endif
+
 }

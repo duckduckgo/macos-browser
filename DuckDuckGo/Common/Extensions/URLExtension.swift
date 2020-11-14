@@ -150,14 +150,15 @@ extension URL {
         return try? getParameter(name: DuckDuckGoParameters.search.rawValue)
     }
 
-    // MARK: - Local
+    // MARK: - Feedback
 
-    static var applicationSupport: URL {
-        guard let url = FileManager.default.urls(for: .applicationSupportDirectory, in: .userDomainMask).first else {
-            fatalError("Database: Failed to get Application Support file URL")
-        }
-        return url
+#if FEEDBACK
+
+    static var feedback: URL {
+        return URL(string: "https://form.asana.com/?k=HzdxNoIgDZUBf4w0_cafIQ&d=137249556945")!
     }
+
+#endif
 
     // MARK: - HTTPS
 

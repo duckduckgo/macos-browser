@@ -220,7 +220,7 @@
     <resources>
         <image name="Add" width="14" height="14"/>
         <image name="Back" width="7" height="13"/>
-        <image name="Burn" width="12" height="14"/>
+        <image name="Burn" width="16" height="16"/>
         <image name="Forward" width="7" height="13"/>
         <image name="TabBarShadowLeft" width="5" height="34"/>
         <image name="TabBarShadowRight" width="5" height="34"/>
