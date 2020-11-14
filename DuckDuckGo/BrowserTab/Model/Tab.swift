@@ -160,9 +160,18 @@ extension Tab: WKNavigationDelegate {
             return
         }
 
-        guard let url = navigationAction.request.url else {
+        guard let url = navigationAction.request.url, let urlScheme = url.scheme else {
             decisionHandler(.allow)
             return
+        }
+
+        #warning("Temporary implementation copied from the prototype. Only for internal release!")
+        if !["https", "http", "about", "data"].contains(urlScheme) {
+            let openResult = NSWorkspace.shared.open(url)
+            if openResult {
+                decisionHandler(.cancel)
+                return
+            }
         }
 
         HTTPSUpgrade.shared.isUpgradeable(url: url) { [weak self] isUpgradable in
