@@ -40,7 +40,13 @@ class TabViewModel {
     @Published var canGoBack: Bool = false
     @Published var canReload: Bool = false
     @Published var isLoading: Bool = false
-    @Published var displayErrorView: Bool = false
+    @Published var isErrorViewVisible: Bool = false {
+        didSet {
+            updateAddressBarStrings()
+            updateTitle()
+            updateFavicon()
+        }
+    }
 
     @Published private(set) var addressBarString: String = ""
     @Published private(set) var passiveAddressBarString: String = ""
@@ -74,7 +80,7 @@ class TabViewModel {
     }
 
     private func subscribeToTabError() {
-        tab.$hasError.receive(on: DispatchQueue.main).assign(to: \.displayErrorView, on: self).store(in: &cancellables)
+        tab.$hasError.receive(on: DispatchQueue.main).assign(to: \.isErrorViewVisible, on: self).store(in: &cancellables)
     }
 
     private func updateCanReload() {
@@ -82,7 +88,7 @@ class TabViewModel {
     }
 
     private func updateAddressBarStrings() {
-        guard let url = tab.url, let host = url.host else {
+        guard let url = tab.url, let host = url.host, !isErrorViewVisible else {
             addressBarString = ""
             passiveAddressBarString = ""
             return
@@ -101,6 +107,11 @@ class TabViewModel {
     }
 
     private func updateTitle() {
+        guard !isErrorViewVisible else {
+            title = ""
+            return
+        }
+
         if tab.isHomepageLoaded {
             title = Title.home
             return
@@ -114,6 +125,11 @@ class TabViewModel {
     }
 
     private func updateFavicon() {
+        guard !isErrorViewVisible else {
+            favicon = Favicon.defaultFavicon
+            return
+        }
+
         if tab.isHomepageLoaded {
             favicon = Favicon.home
             return
