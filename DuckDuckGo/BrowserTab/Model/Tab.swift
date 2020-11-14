@@ -92,6 +92,7 @@ class Tab: NSObject {
     private func setupWebView() {
         webView.navigationDelegate = self
         webView.allowsBackForwardNavigationGestures = true
+        webView.customUserAgent = UserAgent.safari
     }
 
     // MARK: - Favicon
