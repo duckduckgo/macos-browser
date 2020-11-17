@@ -108,7 +108,7 @@ class TabViewModel {
 
     private func updateTitle() {
         guard !isErrorViewVisible else {
-            title = ""
+            title = "Oops!"
             return
         }
 
