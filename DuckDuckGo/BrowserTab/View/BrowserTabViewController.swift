@@ -138,12 +138,13 @@ class BrowserTabViewController: NSViewController {
     private func openNewTab(with url: URL?) {
         let tab = Tab()
         tab.url = url
-        tabCollectionViewModel.append(tab: tab)
+        tabCollectionViewModel.appendWithoutSelection(tab: tab)
     }
 
 }
 
 extension BrowserTabViewController: TabDelegate {
+
     func tabDidStartNavigation(_ tab: Tab) {
         setFirstResponderIfNeeded()
     }
@@ -151,6 +152,7 @@ extension BrowserTabViewController: TabDelegate {
     func tab(_ tab: Tab, requestedNewTab url: URL?) {
         openNewTab(with: url)
     }
+
 }
 
 extension BrowserTabViewController: WKUIDelegate {
