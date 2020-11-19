@@ -57,6 +57,7 @@ class SuggestionsViewController: NSViewController {
         tableView.delegate = self
         tableView.dataSource = self
 
+        setupTableView()
         addTrackingArea()
         subscribeToSuggestions()
         subscribeToSelectionIndex()
@@ -73,6 +74,12 @@ class SuggestionsViewController: NSViewController {
 
         removeMouseEventsMonitor()
         clearSelection()
+    }
+
+    private func setupTableView() {
+        if #available(OSX 11.0, *) {
+            tableView.style = .plain
+        }
     }
 
     private func addTrackingArea() {
