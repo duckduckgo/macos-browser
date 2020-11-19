@@ -24,14 +24,14 @@ class UserScript: WKUserScript {
     let messageNames: [String]
 
     init(source: String, messageNames: [String], injectionTime: WKUserScriptInjectionTime = .atDocumentStart, forMainFrameOnly: Bool = true) {
-            self.messageNames = messageNames
+        self.messageNames = messageNames
 
-            if #available(OSX 11.0, *) {
-                super.init(source: source, injectionTime: injectionTime, forMainFrameOnly: forMainFrameOnly, in: .page)
-            } else {
-                super.init(source: source, injectionTime: injectionTime, forMainFrameOnly: forMainFrameOnly)
-            }
+        if #available(OSX 11.0, *) {
+            super.init(source: source, injectionTime: injectionTime, forMainFrameOnly: forMainFrameOnly, in: .page)
+        } else {
+            super.init(source: source, injectionTime: injectionTime, forMainFrameOnly: forMainFrameOnly)
         }
+    }
 
 }
 
