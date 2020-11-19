@@ -87,6 +87,15 @@ class TabCollectionViewModel {
         select(at: tabCollection.tabs.count - 1)
     }
 
+    func appendWithoutSelection(tab: Tab) {
+        guard let selectionIndex = self.selectionIndex else {
+            os_log("TabCollectionViewModel: No tab selected", type: .error)
+            return
+        }
+        tabCollection.append(tab: tab)
+        select(at: selectionIndex)
+    }
+
     func append(tabs: [Tab]) {
         tabs.forEach {
             tabCollection.append(tab: $0)

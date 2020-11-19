@@ -51,7 +51,6 @@ public class HTTPSUpgrade {
         
         waitForAnyReloadsToComplete()
         let isUpgradable = isInUpgradeList(host: host)
-        os_log("%s %s upgradable", type: .debug, host, isUpgradable ? "is" : "is not")
         completion(isUpgradable)
            
     }

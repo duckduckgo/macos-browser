@@ -92,6 +92,7 @@ class Tab: NSObject {
     private func setupWebView() {
         webView.navigationDelegate = self
         webView.allowsBackForwardNavigationGestures = true
+        webView.customUserAgent = UserAgent.safari
     }
 
     // MARK: - Favicon
@@ -159,14 +160,22 @@ extension Tab: WKNavigationDelegate {
             return
         }
 
-        guard let url = navigationAction.request.url else {
+        guard let url = navigationAction.request.url, let urlScheme = url.scheme else {
             decisionHandler(.allow)
             return
         }
 
+        #warning("Temporary implementation copied from the prototype. Only for internal release!")
+        if !["https", "http", "about", "data"].contains(urlScheme) {
+            let openResult = NSWorkspace.shared.open(url)
+            if openResult {
+                decisionHandler(.cancel)
+                return
+            }
+        }
+
         HTTPSUpgrade.shared.isUpgradeable(url: url) { [weak self] isUpgradable in
             if isUpgradable, let upgradedUrl = self?.upgradeUrl(url, navigationAction: navigationAction) {
-                os_log("Loading %s", type: .debug, upgradedUrl.absoluteString)
                 self?.load(url: upgradedUrl)
                 decisionHandler(.cancel)
                 return
@@ -186,15 +195,16 @@ extension Tab: WKNavigationDelegate {
 
     func webView(_ webView: WKWebView, didStartProvisionalNavigation navigation: WKNavigation!) {
         delegate?.tabDidStartNavigation(self)
-        hasError = false
+        if hasError { hasError = false }
     }
 
     func webView(_ webView: WKWebView, didFinish navigation: WKNavigation!) {
+
     }
 
     func webView(_ webView: WKWebView, didFail navigation: WKNavigation!, withError error: Error) {
-        // TODO: Problems when going back
-        hasError = true
+        #warning("Failing not captured. Seems the method is called after calling the webview's method goBack()")
+//        hasError = true
     }
 
     func webView(_ webView: WKWebView, didFailProvisionalNavigation navigation: WKNavigation!, withError error: Error) {

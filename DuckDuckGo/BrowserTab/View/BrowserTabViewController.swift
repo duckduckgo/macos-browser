@@ -30,6 +30,7 @@ class BrowserTabViewController: NSViewController {
     private let tabCollectionViewModel: TabCollectionViewModel
     private var urlCancellable: AnyCancellable?
     private var selectedTabViewModelCancellable: AnyCancellable?
+    private var isErrorViewVisibleCancellable: AnyCancellable?
 
     required init?(coder: NSCoder) {
         fatalError("BrowserTabViewController: Bad initializer")
@@ -45,11 +46,13 @@ class BrowserTabViewController: NSViewController {
         super.viewDidLoad()
 
         subscribeToSelectedTabViewModel()
+        subscribeToIsErrorViewVisible()
     }
 
     private func subscribeToSelectedTabViewModel() {
         selectedTabViewModelCancellable = tabCollectionViewModel.$selectedTabViewModel.receive(on: DispatchQueue.main).sink { [weak self] _ in
             self?.changeWebView()
+            self?.subscribeToIsErrorViewVisible()
         }
     }
 
@@ -82,6 +85,12 @@ class BrowserTabViewController: NSViewController {
 
         displayWebView(of: tabViewModel)
         subscribeToUrl(of: tabViewModel)
+    }
+
+    private func subscribeToIsErrorViewVisible() {
+        isErrorViewVisibleCancellable = tabViewModel?.$isErrorViewVisible.receive(on: DispatchQueue.main).sink { [weak self] _ in
+            self?.displayErrorView(self?.tabViewModel?.isErrorViewVisible ?? false)
+        }
     }
 
     private func reloadWebViewIfNeeded() {
@@ -121,15 +130,7 @@ class BrowserTabViewController: NSViewController {
             os_log("BrowserTabViewController: Web view is nil", type: .error)
             return
         }
-        
-        guard let tabViewModel = tabViewModel else {
-            os_log("%s: Tab view model is nil", type: .error, className)
-            return
-        }
 
-        if shown {
-            tabViewModel.tab.url = nil
-        }
         errorView.isHidden = !shown
         webView.isHidden = shown
     }
@@ -137,12 +138,13 @@ class BrowserTabViewController: NSViewController {
     private func openNewTab(with url: URL?) {
         let tab = Tab()
         tab.url = url
-        tabCollectionViewModel.append(tab: tab)
+        tabCollectionViewModel.appendWithoutSelection(tab: tab)
     }
 
 }
 
 extension BrowserTabViewController: TabDelegate {
+
     func tabDidStartNavigation(_ tab: Tab) {
         setFirstResponderIfNeeded()
     }
@@ -150,6 +152,7 @@ extension BrowserTabViewController: TabDelegate {
     func tab(_ tab: Tab, requestedNewTab url: URL?) {
         openNewTab(with: url)
     }
+
 }
 
 extension BrowserTabViewController: WKUIDelegate {
