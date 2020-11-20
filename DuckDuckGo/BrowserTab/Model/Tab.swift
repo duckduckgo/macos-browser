@@ -21,22 +21,26 @@ import WebKit
 import os
 
 protocol TabDelegate: class {
+
     func tabDidStartNavigation(_ tab: Tab)
     func tab(_ tab: Tab, requestedNewTab url: URL?)
+
 }
 
 class Tab: NSObject {
 
     weak var delegate: TabDelegate?
 
-    init(faviconService: FaviconService = LocalFaviconService.shared) {
+    init(faviconService: FaviconService = LocalFaviconService.shared, webViewConfiguration: WebViewConfiguration? = nil) {
         self.faviconService = faviconService
-        webView = WebView(frame: CGRect.zero, configuration: WKWebViewConfiguration.makeConfiguration())
+        webView = WebView(frame: CGRect.zero, configuration: webViewConfiguration ?? WKWebViewConfiguration.makeConfiguration())
 
         super.init()
 
         setupWebView()
-        setupUserScripts()
+        if webViewConfiguration == nil {
+            setupUserScripts()
+        }
     }
 
     deinit {
@@ -175,7 +179,7 @@ extension Tab: WKNavigationDelegate {
         }
 
         HTTPSUpgrade.shared.isUpgradeable(url: url) { [weak self] isUpgradable in
-            if isUpgradable, let upgradedUrl = self?.upgradeUrl(url, navigationAction: navigationAction) {
+            if isUpgradable, let upgradedUrl = url.toHttps() {
                 self?.load(url: upgradedUrl)
                 decisionHandler(.cancel)
                 return
@@ -185,16 +189,10 @@ extension Tab: WKNavigationDelegate {
         }
     }
 
-    private func upgradeUrl(_ url: URL, navigationAction: WKNavigationAction) -> URL? {
-        if let upgradedUrl: URL = url.toHttps() {
-            return upgradedUrl
-        }
-
-        return nil
-    }
-
     func webView(_ webView: WKWebView, didStartProvisionalNavigation navigation: WKNavigation!) {
         delegate?.tabDidStartNavigation(self)
+
+        // Unnecessary assignment triggers publishing
         if hasError { hasError = false }
     }
 
