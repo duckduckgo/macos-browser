@@ -73,12 +73,18 @@ class TabCollectionViewModel {
         select(at: tabCollection.tabs.count - 1)
     }
 
-    func appendNewTabAfterSelected() {
+    func appendNewTabAfterSelected(with webViewConfiguration: WebViewConfiguration? = nil) {
         guard let selectionIndex = selectionIndex else {
             os_log("TabCollectionViewModel: No tab selected", type: .error)
             return
         }
-        tabCollection.insert(tab: Tab(), at: selectionIndex + 1)
+        let tab: Tab
+        if let webViewConfiguration = webViewConfiguration {
+            tab = Tab(webViewConfiguration: webViewConfiguration)
+        } else {
+            tab = Tab()
+        }
+        tabCollection.insert(tab: tab, at: selectionIndex + 1)
         select(at: selectionIndex + 1)
     }
 

@@ -99,6 +99,7 @@
 		AAC9C01E24CB6BEB00AD1325 /* TabCollectionViewModelTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = AAC9C01D24CB6BEB00AD1325 /* TabCollectionViewModelTests.swift */; };
 		AAE39D1B24F44885008EF28B /* TabCollectionDelegateMock.swift in Sources */ = {isa = PBXBuildFile; fileRef = AAE39D1A24F44885008EF28B /* TabCollectionDelegateMock.swift */; };
 		AAECA42024EEA4AC00EFA63A /* IndexPathExtension.swift in Sources */ = {isa = PBXBuildFile; fileRef = AAECA41F24EEA4AC00EFA63A /* IndexPathExtension.swift */; };
+		AAF7D3862567CED500998667 /* WebViewConfiguration.swift in Sources */ = {isa = PBXBuildFile; fileRef = AAF7D3852567CED500998667 /* WebViewConfiguration.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -221,6 +222,7 @@
 		AAC9C01D24CB6BEB00AD1325 /* TabCollectionViewModelTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TabCollectionViewModelTests.swift; sourceTree = "<group>"; };
 		AAE39D1A24F44885008EF28B /* TabCollectionDelegateMock.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TabCollectionDelegateMock.swift; sourceTree = "<group>"; };
 		AAECA41F24EEA4AC00EFA63A /* IndexPathExtension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = IndexPathExtension.swift; sourceTree = "<group>"; };
+		AAF7D3852567CED500998667 /* WebViewConfiguration.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WebViewConfiguration.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -611,6 +613,7 @@
 				14505A07256084EF00272CC6 /* UserAgent.swift */,
 				AAA0CC512539D5B80079BC96 /* UserScript.swift */,
 				AAA0CC562539EBC90079BC96 /* FaviconUserScript.swift */,
+				AAF7D3852567CED500998667 /* WebViewConfiguration.swift */,
 			);
 			path = Model;
 			sourceTree = "<group>";
@@ -1024,6 +1027,7 @@
 				AA8EDF2424923E980071C2E8 /* URLExtension.swift in Sources */,
 				4B67744B255DBF3A00025BD8 /* BloomFilter.cpp in Sources */,
 				4B677442255DBEEA00025BD8 /* Database.swift in Sources */,
+				AAF7D3862567CED500998667 /* WebViewConfiguration.swift in Sources */,
 				AABEE69824A5FD930043105B /* SuggestionsAPIResult.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
