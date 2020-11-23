@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<document type="com.apple.InterfaceBuilder3.Cocoa.Storyboard.XIB" version="3.0" toolsVersion="17156" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none" useAutolayout="YES" initialViewController="cvc-K3-VCn">
+<document type="com.apple.InterfaceBuilder3.Cocoa.Storyboard.XIB" version="3.0" toolsVersion="17506" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none" useAutolayout="YES" initialViewController="cvc-K3-VCn">
     <dependencies>
         <deployment identifier="macosx"/>
-        <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="17156"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="17506"/>
         <capability name="Named colors" minToolsVersion="9.0"/>
         <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
     </dependencies>
@@ -50,14 +50,14 @@
             <objects>
                 <viewController storyboardIdentifier="SuggestionsViewController" id="JbS-WE-3yw" customClass="SuggestionsViewController" customModule="DuckDuckGo_Privacy_Browser" customModuleProvider="target" sceneMemberID="viewController">
                     <view key="view" id="PAv-y7-vhB">
-                        <rect key="frame" x="0.0" y="0.0" width="512" height="218"/>
+                        <rect key="frame" x="0.0" y="0.0" width="500" height="218"/>
                         <autoresizingMask key="autoresizingMask"/>
                         <subviews>
                             <visualEffectView blendingMode="behindWindow" material="sheet" state="active" translatesAutoresizingMaskIntoConstraints="NO" id="O3Y-th-ZhM">
-                                <rect key="frame" x="0.0" y="0.0" width="512" height="218"/>
+                                <rect key="frame" x="0.0" y="0.0" width="500" height="218"/>
                             </visualEffectView>
                             <customView translatesAutoresizingMaskIntoConstraints="NO" id="GOF-7f-X82" customClass="ColorView" customModule="DuckDuckGo_Privacy_Browser" customModuleProvider="target">
-                                <rect key="frame" x="0.0" y="0.0" width="512" height="218"/>
+                                <rect key="frame" x="0.0" y="0.0" width="500" height="218"/>
                                 <userDefinedRuntimeAttributes>
                                     <userDefinedRuntimeAttribute type="color" keyPath="backgroundColor">
                                         <color key="value" name="SuggestionsBackgroundColor"/>
@@ -65,13 +65,13 @@
                                 </userDefinedRuntimeAttributes>
                             </customView>
                             <scrollView borderType="none" autohidesScrollers="YES" horizontalLineScroll="22" horizontalPageScroll="10" verticalLineScroll="22" verticalPageScroll="10" usesPredominantAxisScrolling="NO" translatesAutoresizingMaskIntoConstraints="NO" id="cx3-LG-ZUH">
-                                <rect key="frame" x="6" y="0.0" width="500" height="218"/>
+                                <rect key="frame" x="6" y="0.0" width="488" height="218"/>
                                 <clipView key="contentView" drawsBackground="NO" copiesOnScroll="NO" id="pb8-sX-fSc">
-                                    <rect key="frame" x="0.0" y="0.0" width="500" height="218"/>
+                                    <rect key="frame" x="0.0" y="0.0" width="488" height="218"/>
                                     <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                     <subviews>
                                         <tableView verticalHuggingPriority="750" allowsExpansionToolTips="YES" columnAutoresizingStyle="lastColumnOnly" selectionHighlightStyle="none" columnSelection="YES" multipleSelection="NO" autosaveColumns="NO" rowHeight="22" viewBased="YES" id="4Z2-d8-NA2">
-                                            <rect key="frame" x="0.0" y="0.0" width="500" height="198"/>
+                                            <rect key="frame" x="0.0" y="0.0" width="488" height="198"/>
                                             <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                             <color key="backgroundColor" name="ClearColor"/>
                                             <color key="gridColor" name="gridColor" catalog="System" colorSpace="catalog"/>
@@ -89,15 +89,15 @@
                                                     <tableColumnResizingMask key="resizingMask" resizeWithTable="YES" userResizable="YES"/>
                                                     <prototypeCellViews>
                                                         <customView identifier="SuggestionTableRowView" id="9zN-fn-Ri0" customClass="SuggestionTableRowView" customModule="DuckDuckGo_Privacy_Browser" customModuleProvider="target">
-                                                            <rect key="frame" x="0.0" y="0.0" width="454" height="22"/>
+                                                            <rect key="frame" x="10" y="0.0" width="466" height="22"/>
                                                             <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                                         </customView>
                                                         <tableCellView identifier="SuggestionTableCellView" id="kX2-C1-38Y" customClass="SuggestionTableCellView" customModule="DuckDuckGo_Privacy_Browser" customModuleProvider="target">
-                                                            <rect key="frame" x="0.0" y="22" width="454" height="22"/>
+                                                            <rect key="frame" x="10" y="22" width="466" height="22"/>
                                                             <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                                             <subviews>
                                                                 <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" horizontalCompressionResistancePriority="250" translatesAutoresizingMaskIntoConstraints="NO" id="bOr-Go-gyW">
-                                                                    <rect key="frame" x="33" y="3" width="415" height="16"/>
+                                                                    <rect key="frame" x="33" y="3" width="427" height="16"/>
                                                                     <textFieldCell key="cell" lineBreakMode="truncatingTail" sendsActionOnEndEditing="YES" title="Table View Cell" id="7bg-HA-vCm">
                                                                         <font key="font" usesAppearanceFont="YES"/>
                                                                         <color key="textColor" name="textColor" catalog="System" colorSpace="catalog"/>
@@ -176,7 +176,7 @@
             <color red="1" green="1" blue="1" alpha="0.0" colorSpace="custom" customColorSpace="sRGB"/>
         </namedColor>
         <namedColor name="SuggestionsBackgroundColor">
-            <color red="1" green="1" blue="1" alpha="0.69999999999999996" colorSpace="custom" customColorSpace="sRGB"/>
+            <color red="1" green="1" blue="1" alpha="0.69999998807907104" colorSpace="custom" customColorSpace="sRGB"/>
         </namedColor>
     </resources>
 </document>
