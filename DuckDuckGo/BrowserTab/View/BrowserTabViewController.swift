@@ -280,6 +280,7 @@ fileprivate extension NSAlert {
         let textField = NSTextField(frame: NSRect(x: 0, y: 0, width: 200, height: 24))
         textField.placeholderString = defaultText
         alert.accessoryView = textField
+        alert.window.initialFirstResponder = textField
         return alert
     }
 
