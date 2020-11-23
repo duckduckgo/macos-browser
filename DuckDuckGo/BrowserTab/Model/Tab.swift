@@ -55,10 +55,15 @@ class Tab: NSObject {
 
     @Published var title: String?
     @Published var hasError: Bool = false
+    @Published var download: FileDownload?
 
     var isHomepageLoaded: Bool {
         url == nil || url == URL.emptyPage
     }
+
+    // Used as the request context for HTML 5 downloads
+    private var lastMainFrameRequest: URLRequest?
+    private var mainFrameNavigations = [WKNavigation]()
 
     func load(url: URL) {
         load(urlRequest: URLRequest(url: url))
@@ -123,8 +128,21 @@ class Tab: NSObject {
 
     private func setupUserScripts() {
         faviconScript.delegate = self
+        html5downloadScript.delegate = self
+
         webView.configuration.userContentController.add(userScript: faviconScript)
         webView.configuration.userContentController.add(userScript: html5downloadScript)
+    }
+
+}
+
+extension Tab: HTML5DownloadDelegate {
+
+    func startDownload(_ userScript: HTML5DownloadUserScript, from url: URL, withSuggestedName name: String) {
+        guard let lastRequest = lastMainFrameRequest else { return }
+        var request = lastRequest
+        request.url = url
+        download = FileDownload(request: request, suggestedName: name)
     }
 
 }
@@ -153,6 +171,11 @@ extension Tab: WKNavigationDelegate {
                  decidePolicyFor navigationAction: WKNavigationAction,
                  decisionHandler: @escaping (WKNavigationActionPolicy) -> Void) {
 
+        if navigationAction.isTargetingMainFrame() {
+            lastMainFrameRequest = navigationAction.request
+            download = nil
+        }
+
         let isCommandPressed = NSApp.currentEvent?.modifierFlags.contains(.command) ?? false
         let isLinkActivated = navigationAction.navigationType == .linkActivated
 
@@ -177,7 +200,7 @@ extension Tab: WKNavigationDelegate {
         }
 
         HTTPSUpgrade.shared.isUpgradeable(url: url) { [weak self] isUpgradable in
-            if isUpgradable, let upgradedUrl = self?.upgradeUrl(url, navigationAction: navigationAction) {
+            if isUpgradable, let upgradedUrl = self?.upgradeUrl(url) {
                 self?.load(url: upgradedUrl)
                 decisionHandler(.cancel)
                 return
@@ -187,12 +210,35 @@ extension Tab: WKNavigationDelegate {
         }
     }
 
-    private func upgradeUrl(_ url: URL, navigationAction: WKNavigationAction) -> URL? {
+    private func upgradeUrl(_ url: URL) -> URL? {
         if let upgradedUrl: URL = url.toHttps() {
             return upgradedUrl
         }
 
         return nil
+    }
+
+    func webView(_ webView: WKWebView,
+                 decidePolicyFor navigationResponse: WKNavigationResponse,
+                 decisionHandler: @escaping (WKNavigationResponsePolicy) -> Void) {
+
+        let policy = navigationResponsePolicyForDownloads(navigationResponse)
+        decisionHandler(policy)
+
+    }
+
+    private func navigationResponsePolicyForDownloads(_ navigationResponse: WKNavigationResponse) -> WKNavigationResponsePolicy {
+        guard navigationResponse.isForMainFrame else {
+            return .allow
+        }
+
+        if (!navigationResponse.canShowMIMEType || navigationResponse.shouldDownload),
+           let request = lastMainFrameRequest {
+            download = FileDownload(request: request, suggestedName: navigationResponse.response.suggestedFilename)
+            return .cancel
+        }
+
+        return .allow
     }
 
     func webView(_ webView: WKWebView, didStartProvisionalNavigation navigation: WKNavigation!) {
@@ -201,7 +247,6 @@ extension Tab: WKNavigationDelegate {
     }
 
     func webView(_ webView: WKWebView, didFinish navigation: WKNavigation!) {
-
     }
 
     func webView(_ webView: WKWebView, didFail navigation: WKNavigation!, withError error: Error) {
@@ -210,7 +255,9 @@ extension Tab: WKNavigationDelegate {
     }
 
     func webView(_ webView: WKWebView, didFailProvisionalNavigation navigation: WKNavigation!, withError error: Error) {
-        hasError = true
+        if download == nil {
+            hasError = true
+        }
     }
 
 }
@@ -224,4 +271,17 @@ fileprivate extension WKWebViewConfiguration {
         return configuration
     }
 
+}
+
+fileprivate extension WKNavigationResponse {
+    var shouldDownload: Bool {
+        let contentDisposition = (response as? HTTPURLResponse)?.allHeaderFields["Content-Disposition"] as? String
+        return contentDisposition?.hasPrefix("attachment") ?? false
+    }
+}
+
+fileprivate extension WKNavigationAction {
+    func isTargetingMainFrame() -> Bool {
+        return targetFrame?.isMainFrame ?? false
+    }
 }

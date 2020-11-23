@@ -57,7 +57,7 @@ extension HTML5DownloadUserScript {
         if (e.srcElement.tagName !== "A" || !e.srcElement.hasAttribute("download")) return;
         webkit.messageHandlers.downloadFile.postMessage({
             "href": e.srcElement.href,
-            "name": e.srcElement.download
+            "download": e.srcElement.download
         });
         event.preventDefault();
     });
