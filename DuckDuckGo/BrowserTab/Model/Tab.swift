@@ -119,10 +119,12 @@ class Tab: NSObject {
     // MARK: - User Scripts
 
     let faviconScript = FaviconUserScript()
+    let html5downloadScript = HTML5DownloadUserScript()
 
     private func setupUserScripts() {
         faviconScript.delegate = self
         webView.configuration.userContentController.add(userScript: faviconScript)
+        webView.configuration.userContentController.add(userScript: html5downloadScript)
     }
 
 }
