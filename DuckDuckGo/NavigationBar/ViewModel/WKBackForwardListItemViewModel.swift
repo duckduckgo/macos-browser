@@ -31,7 +31,7 @@ class WKBackForwardListItemViewModel {
 
     var title: String {
         if backForwardListItem.url == URL.emptyPage {
-            return "Home"
+            return UserText.tabHomeTitle
         }
 
         return backForwardListItem.title ??

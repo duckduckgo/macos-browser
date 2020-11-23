@@ -34,7 +34,7 @@ public class HTTPSUpgrade {
 
     public func isUpgradeable(url: URL, completion: @escaping UpgradeCheckCompletion) {
         
-        guard url.scheme == "http" else {
+        guard url.scheme == URL.Scheme.http.rawValue else {
             completion(false)
             return
         }
