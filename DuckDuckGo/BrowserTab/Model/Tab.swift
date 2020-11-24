@@ -23,6 +23,7 @@ import os
 protocol TabDelegate: class {
     func tabDidStartNavigation(_ tab: Tab)
     func tab(_ tab: Tab, requestedNewTab url: URL?)
+    func tab(_ tab: Tab, requestedFileDownload download: FileDownload)
 }
 
 class Tab: NSObject {
@@ -55,7 +56,9 @@ class Tab: NSObject {
 
     @Published var title: String?
     @Published var hasError: Bool = false
-    @Published var download: FileDownload?
+
+    // Used to track if an error was caused by a download navigation.
+    var download: FileDownload?
 
     var isHomepageLoaded: Bool {
         url == nil || url == URL.emptyPage
@@ -139,10 +142,9 @@ class Tab: NSObject {
 extension Tab: HTML5DownloadDelegate {
 
     func startDownload(_ userScript: HTML5DownloadUserScript, from url: URL, withSuggestedName name: String) {
-        guard let lastRequest = lastMainFrameRequest else { return }
-        var request = lastRequest
+        var request = lastMainFrameRequest ?? URLRequest(url: url)
         request.url = url
-        download = FileDownload(request: request, suggestedName: name)
+        delegate?.tab(self, requestedFileDownload: FileDownload(request: request, suggestedName: name))
     }
 
 }
@@ -166,6 +168,10 @@ extension Tab: FaviconUserScriptDelegate {
 }
 
 extension Tab: WKNavigationDelegate {
+
+    struct ErrorCodes {
+        static let frameLoadInterrupted = 102
+    }
 
     func webView(_ webView: WKWebView,
                  decidePolicyFor navigationAction: WKNavigationAction,
@@ -234,7 +240,10 @@ extension Tab: WKNavigationDelegate {
 
         if (!navigationResponse.canShowMIMEType || navigationResponse.shouldDownload),
            let request = lastMainFrameRequest {
-            download = FileDownload(request: request, suggestedName: navigationResponse.response.suggestedFilename)
+            let download = FileDownload(request: request, suggestedName: navigationResponse.response.suggestedFilename)
+            delegate?.tab(self, requestedFileDownload: download)
+            // Flag this here, because interrupting the frame load will cause an error and we need to know
+            self.download = download
             return .cancel
         }
 
@@ -255,9 +264,12 @@ extension Tab: WKNavigationDelegate {
     }
 
     func webView(_ webView: WKWebView, didFailProvisionalNavigation navigation: WKNavigation!, withError error: Error) {
-        if download == nil {
-            hasError = true
+        if download != nil && (error as NSError).code == ErrorCodes.frameLoadInterrupted {
+            // This error was most likely due to a download.
+            return
         }
+
+        hasError = true
     }
 
 }

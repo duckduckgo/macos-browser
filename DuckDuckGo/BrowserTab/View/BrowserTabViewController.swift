@@ -32,6 +32,9 @@ class BrowserTabViewController: NSViewController {
     private var selectedTabViewModelCancellable: AnyCancellable?
     private var isErrorViewVisibleCancellable: AnyCancellable?
 
+    private var downloads = [FileDownloadState]()
+    private var downloadCancellables = Set<AnyCancellable>()
+
     required init?(coder: NSCoder) {
         fatalError("BrowserTabViewController: Bad initializer")
     }
@@ -47,6 +50,11 @@ class BrowserTabViewController: NSViewController {
 
         subscribeToSelectedTabViewModel()
         subscribeToIsErrorViewVisible()
+        subscribeToDownloads()
+    }
+
+    private func subscribeToDownloads() {
+        
     }
 
     private func subscribeToSelectedTabViewModel() {
@@ -151,6 +159,24 @@ extension BrowserTabViewController: TabDelegate {
 
     func tab(_ tab: Tab, requestedNewTab url: URL?) {
         openNewTab(with: url)
+    }
+
+    func tab(_ tab: Tab, requestedFileDownload download: FileDownload) {
+        let downloadState = FileDownloadState(download: download)
+        downloads.append(downloadState)
+
+        // Later: listen to bytes downloaded and update the UI
+        // Later: inject target folder, for now use ~/Downloads
+
+        downloadState.$filePath.receive(on: DispatchQueue.main).compactMap { $0 }.sink { _ in
+            // Show message to say download is complete
+        }.store(in: &downloadCancellables)
+
+        downloadState.$error.receive(on: DispatchQueue.main).compactMap { $0 }.sink { _ in
+            // Show message to say download failed
+        }.store(in: &downloadCancellables)
+
+        downloadState.start()
     }
 
 }
