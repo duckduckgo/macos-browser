@@ -188,13 +188,14 @@ extension BrowserTabViewController: WKUIDelegate {
                  for navigationAction: WKNavigationAction,
                  windowFeatures: WKWindowFeatures) -> WKWebView? {
 
-        tabCollectionViewModel.appendNewTabAfterSelected()
+        // Returned web view must be created with the specified configuration.
+        tabCollectionViewModel.appendNewTabAfterSelected(with: configuration)
         guard let selectedViewModel = tabCollectionViewModel.selectedTabViewModel else {
             os_log("%s: Selected tab view model is nil", type: .error, className)
             return nil
         }
-        selectedViewModel.tab.webView.load(navigationAction.request)
-        return nil
+        // WebKit loads the request in the returned web view.
+        return selectedViewModel.tab.webView
     }
 
     func webView(_ webView: WKWebView,
@@ -218,6 +219,95 @@ extension BrowserTabViewController: WKUIDelegate {
                 completionHandler(nil)
             }
         }
+    }
+
+    func webView(_ webView: WKWebView,
+                 runJavaScriptAlertPanelWithMessage message: String,
+                 initiatedByFrame frame: WKFrameInfo,
+                 completionHandler: @escaping () -> Void) {
+
+        guard let window = view.window else {
+            os_log("%s: Window is nil", type: .error, className)
+            completionHandler()
+            return
+        }
+
+        let alert = NSAlert.javascriptAlert(with: message)
+        alert.beginSheetModal(for: window) { _ in
+            completionHandler()
+        }
+    }
+
+    func webView(_ webView: WKWebView,
+                 runJavaScriptConfirmPanelWithMessage message: String,
+                 initiatedByFrame frame: WKFrameInfo,
+                 completionHandler: @escaping (Bool) -> Void) {
+
+        guard let window = view.window else {
+            os_log("%s: Window is nil", type: .error, className)
+            completionHandler(false)
+            return
+        }
+
+        let alert = NSAlert.javascriptConfirmation(with: message)
+        alert.beginSheetModal(for: window) { response in
+            completionHandler(response == .alertFirstButtonReturn)
+        }
+    }
+
+    func webView(_ webView: WKWebView,
+                 runJavaScriptTextInputPanelWithPrompt prompt: String,
+                 defaultText: String?,
+                 initiatedByFrame frame: WKFrameInfo,
+                 completionHandler: @escaping (String?) -> Void) {
+
+        guard let window = view.window else {
+            os_log("%s: Window is nil", type: .error, className)
+            completionHandler(nil)
+            return
+        }
+
+        let alert = NSAlert.javascriptTextInput(prompt: prompt, defaultText: defaultText)
+        alert.beginSheetModal(for: window) { response in
+            guard let textField = alert.accessoryView as? NSTextField else {
+                os_log("BrowserTabViewController: Textfield not found in alert", type: .error)
+                completionHandler(nil)
+                return
+            }
+            let answer = response == .alertFirstButtonReturn ? textField.stringValue : nil
+            completionHandler(answer)
+        }
+    }
+
+}
+
+fileprivate extension NSAlert {
+
+    static func javascriptAlert(with message: String) -> NSAlert {
+        let alert = NSAlert()
+        alert.messageText = message
+        alert.addButton(withTitle: "OK")
+        return alert
+    }
+
+    static func javascriptConfirmation(with message: String) -> NSAlert {
+        let alert = NSAlert()
+        alert.messageText = message
+        alert.addButton(withTitle: "OK")
+        alert.addButton(withTitle: "Cancel")
+        return alert
+    }
+
+    static func javascriptTextInput(prompt: String, defaultText: String?) -> NSAlert {
+        let alert = NSAlert()
+        alert.messageText = prompt
+        alert.addButton(withTitle: "OK")
+        alert.addButton(withTitle: "Cancel")
+        let textField = NSTextField(frame: NSRect(x: 0, y: 0, width: 200, height: 24))
+        textField.placeholderString = defaultText
+        alert.accessoryView = textField
+        alert.window.initialFirstResponder = textField
+        return alert
     }
 
 }
