@@ -253,6 +253,15 @@ extension BrowserTabViewController: WKUIDelegate {
         }
     }
 
+    func webViewDidClose(_ webView: WKWebView) {
+        guard let webView = webView as? WebView else {
+            os_log("BrowserTabViewController: Unknown instance of WKWebView", type: .error)
+            return
+        }
+
+        tabCollectionViewModel.remove(ownerOf: webView)
+    }
+
 }
 
 fileprivate extension NSAlert {
