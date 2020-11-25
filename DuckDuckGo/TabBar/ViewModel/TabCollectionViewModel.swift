@@ -134,6 +134,15 @@ class TabCollectionViewModel {
         }
     }
 
+    func remove(ownerOf webView: WebView) {
+        let webViews = tabCollection.tabs.map { $0.webView }
+        guard let index = webViews.firstIndex(of: webView) else {
+            os_log("TabCollection: Failed to get index of the tab", type: .error)
+            return
+        }
+        remove(at: index)
+    }
+
     func removeSelected() {
         guard let selectionIndex = selectionIndex else {
             os_log("TabCollectionViewModel: No tab selected", type: .error)
