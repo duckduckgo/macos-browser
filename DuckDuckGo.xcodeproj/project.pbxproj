@@ -30,7 +30,10 @@
 		4B677450255DBFA300025BD8 /* HashExtension.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B67744F255DBFA300025BD8 /* HashExtension.swift */; };
 		8556A602256BDDD30092FA9D /* HTML5DownloadUserScript.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8556A601256BDDD30092FA9D /* HTML5DownloadUserScript.swift */; };
 		8556A60E256C15DD0092FA9D /* FileDownload.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8556A60D256C15DD0092FA9D /* FileDownload.swift */; };
+		856C98A6256EB59600A22F1F /* NSMenuItem+ContextMenuItems.swift in Sources */ = {isa = PBXBuildFile; fileRef = 856C98A5256EB59600A22F1F /* NSMenuItem+ContextMenuItems.swift */; };
 		85AE2FF224A33A2D002D507F /* WebKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 85AE2FF124A33A2D002D507F /* WebKit.framework */; };
+		85D438B6256E7C9E00F3BAF8 /* ContextMenuUserScript.swift in Sources */ = {isa = PBXBuildFile; fileRef = 85D438B5256E7C9E00F3BAF8 /* ContextMenuUserScript.swift */; };
+		85D438BE256E8E6400F3BAF8 /* ContextMenuElement.swift in Sources */ = {isa = PBXBuildFile; fileRef = 85D438BD256E8E6400F3BAF8 /* ContextMenuElement.swift */; };
 		AA2E423424C8A2270048C0D5 /* ColorView.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA2E423324C8A2270048C0D5 /* ColorView.swift */; };
 		AA361A3624EBF0B500EEC649 /* WindowDraggingView.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA361A3524EBF0B500EEC649 /* WindowDraggingView.swift */; };
 		AA3F895324C18AD500628DDE /* SuggestionViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA3F895224C18AD500628DDE /* SuggestionViewModel.swift */; };
@@ -148,7 +151,10 @@
 		4B677454255DC18000025BD8 /* Bridging.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Bridging.h; sourceTree = "<group>"; };
 		8556A601256BDDD30092FA9D /* HTML5DownloadUserScript.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HTML5DownloadUserScript.swift; sourceTree = "<group>"; };
 		8556A60D256C15DD0092FA9D /* FileDownload.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FileDownload.swift; sourceTree = "<group>"; };
+		856C98A5256EB59600A22F1F /* NSMenuItem+ContextMenuItems.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "NSMenuItem+ContextMenuItems.swift"; sourceTree = "<group>"; };
 		85AE2FF124A33A2D002D507F /* WebKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = WebKit.framework; path = System/Library/Frameworks/WebKit.framework; sourceTree = SDKROOT; };
+		85D438B5256E7C9E00F3BAF8 /* ContextMenuUserScript.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContextMenuUserScript.swift; sourceTree = "<group>"; };
+		85D438BD256E8E6400F3BAF8 /* ContextMenuElement.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContextMenuElement.swift; sourceTree = "<group>"; };
 		AA2E423324C8A2270048C0D5 /* ColorView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ColorView.swift; sourceTree = "<group>"; };
 		AA361A3524EBF0B500EEC649 /* WindowDraggingView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WindowDraggingView.swift; sourceTree = "<group>"; };
 		AA3F895224C18AD500628DDE /* SuggestionViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SuggestionViewModel.swift; sourceTree = "<group>"; };
@@ -613,6 +619,7 @@
 			children = (
 				AA86491F24D83B22001BABEE /* BrowserTab.storyboard */,
 				AA585D83248FD31100E9A3E2 /* BrowserTabViewController.swift */,
+				856C98A5256EB59600A22F1F /* NSMenuItem+ContextMenuItems.swift */,
 				AA6FFB4524DC3B5A0028F4D0 /* WebView.swift */,
 			);
 			path = View;
@@ -630,11 +637,13 @@
 		AA86491E24D83A66001BABEE /* Model */ = {
 			isa = PBXGroup;
 			children = (
+				85D438BD256E8E6400F3BAF8 /* ContextMenuElement.swift */,
+				85D438B5256E7C9E00F3BAF8 /* ContextMenuUserScript.swift */,
+				AAA0CC562539EBC90079BC96 /* FaviconUserScript.swift */,
+				8556A601256BDDD30092FA9D /* HTML5DownloadUserScript.swift */,
 				AA9FF95824A1ECF20039E328 /* Tab.swift */,
 				14505A07256084EF00272CC6 /* UserAgent.swift */,
 				AAA0CC512539D5B80079BC96 /* UserScript.swift */,
-				AAA0CC562539EBC90079BC96 /* FaviconUserScript.swift */,
-				8556A601256BDDD30092FA9D /* HTML5DownloadUserScript.swift */,
 				AAF7D3852567CED500998667 /* WebViewConfiguration.swift */,
 			);
 			path = Model;
@@ -995,6 +1004,7 @@
 				AAA0CC3C25337FAB0079BC96 /* WKBackForwardListItemViewModel.swift in Sources */,
 				8556A602256BDDD30092FA9D /* HTML5DownloadUserScript.swift in Sources */,
 				AA4D700725545EF800C3411E /* UrlEventListener.swift in Sources */,
+				856C98A6256EB59600A22F1F /* NSMenuItem+ContextMenuItems.swift in Sources */,
 				AAA0CC33252F181A0079BC96 /* NavigationButtonMenuDelegate.swift in Sources */,
 				AA512D1424D99D9800230283 /* FaviconService.swift in Sources */,
 				AABEE6AB24ACA0F90043105B /* SuggestionTableRowView.swift in Sources */,
@@ -1004,6 +1014,8 @@
 				AA585DAF2490E6E600E9A3E2 /* MainViewController.swift in Sources */,
 				AABEE69A24A902A90043105B /* SuggestionsViewModel.swift in Sources */,
 				AA6820E425502F19005ED0D5 /* WebsiteDataStore.swift in Sources */,
+				85D438B6256E7C9E00F3BAF8 /* ContextMenuUserScript.swift in Sources */,
+				85D438BE256E8E6400F3BAF8 /* ContextMenuElement.swift in Sources */,
 				14A609C4255D65B20080DA6D /* MainMenuManager.swift in Sources */,
 				AA88D14B252A557100980B4E /* URLRequestExtension.swift in Sources */,
 				AABEE69E24A9C5C30043105B /* Suggestion.swift in Sources */,

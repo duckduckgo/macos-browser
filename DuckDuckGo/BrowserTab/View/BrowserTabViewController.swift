@@ -34,6 +34,8 @@ class BrowserTabViewController: NSViewController {
 
     private var downloads = [FileDownloadState]()
     private var downloadCancellables = Set<AnyCancellable>()
+    private var lastContextMenuLinkUrl: URL?
+    private var lastContextMenuImageUrl: URL?
 
     required init?(coder: NSCoder) {
         fatalError("BrowserTabViewController: Bad initializer")
@@ -50,11 +52,6 @@ class BrowserTabViewController: NSViewController {
 
         subscribeToSelectedTabViewModel()
         subscribeToIsErrorViewVisible()
-        subscribeToDownloads()
-    }
-
-    private func subscribeToDownloads() {
-        
     }
 
     private func subscribeToSelectedTabViewModel() {
@@ -162,6 +159,8 @@ extension BrowserTabViewController: TabDelegate {
     }
 
     func tab(_ tab: Tab, requestedFileDownload download: FileDownload) {
+        print(#function, download)
+
         let downloadState = FileDownloadState(download: download)
         downloads.append(downloadState)
 
@@ -177,6 +176,69 @@ extension BrowserTabViewController: TabDelegate {
         }.store(in: &downloadCancellables)
 
         downloadState.start()
+    }
+
+    func tab(_ tab: Tab, requestedContextMenuAt position: NSPoint, forElements elements: [ContextMenuElement]) {
+
+        print(#function, position, elements)
+
+        lastContextMenuImageUrl = nil
+        lastContextMenuLinkUrl = nil
+
+        var menuItems = [NSMenuItem]()
+
+        if elements.isEmpty {
+            menuItems.append(.contextMenuBack)
+            menuItems.append(.contextMenuForward)
+            menuItems.append(.contextMenuReload)
+        } else {
+
+            // images are first in the list, but we want them at the end of the menu
+            elements.reversed().forEach {
+                if !menuItems.isEmpty {
+                    menuItems.append(.separator())
+                }
+
+                switch $0 {
+
+                case .link(let url):
+                    lastContextMenuLinkUrl = url
+                    menuItems.append(.contextMenuOpenLinkInNewTab)
+                    menuItems.append(.contextMenuOpenLinkInNewWindow)
+                    menuItems.append(.separator())
+                    menuItems.append(.contextMenuDownloadLinkedFile)
+                    menuItems.append(.separator())
+                    menuItems.append(.contextMenuCopyLink)
+
+                case .image(let url):
+                    lastContextMenuImageUrl = url
+                    menuItems.append(.contextMenuOpenImageInNewTab)
+                    menuItems.append(.contextMenuOpenImageInNewWindow)
+                    menuItems.append(.separator())
+                    menuItems.append(.contextMenuSaveImageToDownloads)
+
+                }
+            }
+        }
+
+        let menu = NSMenu()
+        menu.delegate = self
+        menuItems.forEach { menu.addItem($0) }
+        view.window?.makeKey()
+        view.window?.makeFirstResponder(self) // we want this controller to handle actions first, before the parent controller
+        menu.popUp(positioning: nil, at: view.convert(position, from: webView), in: view)
+
+    }
+
+}
+
+extension BrowserTabViewController: NSMenuDelegate {
+
+    func menuWillOpen(_ menu: NSMenu) {
+        print(#function)
+        NSMenuItem.contextMenuBack.isHidden = !(tabViewModel?.canGoBack ?? false)
+        NSMenuItem.contextMenuForward.isHidden = !(tabViewModel?.canGoForward ?? false)
+        NSMenuItem.contextMenuReload.isHidden = !(tabViewModel?.canReload ?? false)
     }
 
 }
@@ -197,7 +259,7 @@ extension BrowserTabViewController: WKUIDelegate {
         // WebKit loads the request in the returned web view.
         return selectedViewModel.tab.webView
     }
-
+    
     func webView(_ webView: WKWebView,
                  runOpenPanelWith parameters: WKOpenPanelParameters,
                  initiatedByFrame frame: WKFrameInfo,

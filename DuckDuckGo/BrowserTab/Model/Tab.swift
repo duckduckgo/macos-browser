@@ -25,6 +25,8 @@ protocol TabDelegate: class {
     func tabDidStartNavigation(_ tab: Tab)
     func tab(_ tab: Tab, requestedNewTab url: URL?)
     func tab(_ tab: Tab, requestedFileDownload download: FileDownload)
+    func tab(_ tab: Tab, requestedContextMenuAt position: NSPoint, forElements elements: [ContextMenuElement])
+
 }
 
 class Tab: NSObject {
@@ -131,13 +133,30 @@ class Tab: NSObject {
 
     let faviconScript = FaviconUserScript()
     let html5downloadScript = HTML5DownloadUserScript()
+    let contextMenuScript = ContextMenuUserScript()
+
+    lazy var userScripts = [
+        self.faviconScript,
+        self.html5downloadScript,
+        self.contextMenuScript
+    ]
 
     private func setupUserScripts() {
         faviconScript.delegate = self
         html5downloadScript.delegate = self
+        contextMenuScript.delegate = self
 
-        webView.configuration.userContentController.add(userScript: faviconScript)
-        webView.configuration.userContentController.add(userScript: html5downloadScript)
+        userScripts.forEach {
+            webView.configuration.userContentController.add(userScript: $0)
+        }
+    }
+
+}
+
+extension Tab: ContextMenuDelegate {
+
+    func contextMenuUserScript(_ script: ContextMenuUserScript, showContextMenuAt position: NSPoint, forElements elements: [ContextMenuElement]) {
+        delegate?.tab(self, requestedContextMenuAt: position, forElements: elements)
     }
 
 }

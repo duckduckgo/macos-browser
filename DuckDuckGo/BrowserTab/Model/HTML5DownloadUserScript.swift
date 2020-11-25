@@ -59,7 +59,7 @@ extension HTML5DownloadUserScript {
             "href": e.srcElement.href,
             "download": e.srcElement.download
         });
-        event.preventDefault();
+        e.preventDefault();
     });
 
 }) ();
