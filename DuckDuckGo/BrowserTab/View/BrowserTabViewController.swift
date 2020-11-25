@@ -34,8 +34,6 @@ class BrowserTabViewController: NSViewController {
 
     private var downloads = [FileDownloadState]()
     private var downloadCancellables = Set<AnyCancellable>()
-    private var lastContextMenuLinkUrl: URL?
-    private var lastContextMenuImageUrl: URL?
 
     required init?(coder: NSCoder) {
         fatalError("BrowserTabViewController: Bad initializer")
@@ -182,9 +180,6 @@ extension BrowserTabViewController: TabDelegate {
 
         print(#function, position, elements)
 
-        lastContextMenuImageUrl = nil
-        lastContextMenuLinkUrl = nil
-
         var menuItems = [NSMenuItem]()
 
         if elements.isEmpty {
@@ -202,20 +197,18 @@ extension BrowserTabViewController: TabDelegate {
                 switch $0 {
 
                 case .link(let url):
-                    lastContextMenuLinkUrl = url
-                    menuItems.append(.contextMenuOpenLinkInNewTab)
-                    menuItems.append(.contextMenuOpenLinkInNewWindow)
+                    menuItems.append(NSMenuItem.contextMenuOpenLinkInNewTab.apply(url))
+                    menuItems.append(NSMenuItem.contextMenuOpenLinkInNewWindow.apply(url))
                     menuItems.append(.separator())
-                    menuItems.append(.contextMenuDownloadLinkedFile)
+                    menuItems.append(NSMenuItem.contextMenuDownloadLinkedFile.apply(url))
                     menuItems.append(.separator())
-                    menuItems.append(.contextMenuCopyLink)
+                    menuItems.append(NSMenuItem.contextMenuCopyLink.apply(url))
 
                 case .image(let url):
-                    lastContextMenuImageUrl = url
-                    menuItems.append(.contextMenuOpenImageInNewTab)
-                    menuItems.append(.contextMenuOpenImageInNewWindow)
+                    menuItems.append(NSMenuItem.contextMenuOpenImageInNewTab.apply(url))
+                    menuItems.append(NSMenuItem.contextMenuOpenImageInNewWindow.apply(url))
                     menuItems.append(.separator())
-                    menuItems.append(.contextMenuSaveImageToDownloads)
+                    menuItems.append(NSMenuItem.contextMenuSaveImageToDownloads.apply(url))
 
                 }
             }

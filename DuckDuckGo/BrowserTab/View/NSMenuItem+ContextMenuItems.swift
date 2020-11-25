@@ -18,6 +18,28 @@
 
 import Cocoa
 
+class ImageContextMenuItem: NSMenuItem {
+
+    var url: URL?
+
+    func apply(_ url: URL) -> Self {
+        self.url = url
+        return self
+    }
+
+}
+
+class LinkContextMenuItem: NSMenuItem {
+
+    var url: URL?
+
+    func apply(_ url: URL) -> Self {
+        self.url = url
+        return self
+    }
+
+}
+
 // swiftlint:disable line_length
 extension NSMenuItem {
 
@@ -25,14 +47,14 @@ extension NSMenuItem {
     static let contextMenuForward = NSMenuItem(title: "Forward", action: #selector(NavigationMenuItemSelectors.forward(_:)), keyEquivalent: "")
     static let contextMenuReload = NSMenuItem(title: "Reload Page", action: #selector(NavigationMenuItemSelectors.reloadPage(_:)), keyEquivalent: "")
 
-    static let contextMenuOpenLinkInNewTab = NSMenuItem(title: "Open Link In New Tab", action: #selector(LinkMenuItemSelectors.openLinkInNewTab(_:)), keyEquivalent: "")
-    static let contextMenuOpenLinkInNewWindow = NSMenuItem(title: "Open Link In New Window", action: #selector(LinkMenuItemSelectors.openLinkInNewWindow(_:)), keyEquivalent: "")
-    static let contextMenuDownloadLinkedFile = NSMenuItem(title: "Download Linked File", action: #selector(LinkMenuItemSelectors.downloadLinkedFile(_:)), keyEquivalent: "")
-    static let contextMenuCopyLink = NSMenuItem(title: "Copy Link", action: #selector(LinkMenuItemSelectors.copyLink(_:)), keyEquivalent: "")
+    static let contextMenuOpenLinkInNewTab = LinkContextMenuItem(title: "Open Link In New Tab", action: #selector(LinkMenuItemSelectors.openLinkInNewTab(_:)), keyEquivalent: "")
+    static let contextMenuOpenLinkInNewWindow = LinkContextMenuItem(title: "Open Link In New Window", action: #selector(LinkMenuItemSelectors.openLinkInNewWindow(_:)), keyEquivalent: "")
+    static let contextMenuDownloadLinkedFile = LinkContextMenuItem(title: "Download Linked File", action: #selector(LinkMenuItemSelectors.downloadLinkedFile(_:)), keyEquivalent: "")
+    static let contextMenuCopyLink = LinkContextMenuItem(title: "Copy Link", action: #selector(LinkMenuItemSelectors.copyLink(_:)), keyEquivalent: "")
 
-    static let contextMenuOpenImageInNewTab = NSMenuItem(title: "Open Image in New Tab", action: #selector(ImageMenuItemSelectors.openImageInNewTab(_:)), keyEquivalent: "")
-    static let contextMenuOpenImageInNewWindow = NSMenuItem(title: "Open Image in New Window", action: #selector(ImageMenuItemSelectors.openImageInNewWindow(_:)), keyEquivalent: "")
-    static let contextMenuSaveImageToDownloads = NSMenuItem(title: "Save Image to \"Downloads\"", action: #selector(ImageMenuItemSelectors.saveImageToDownloads(_:)), keyEquivalent: "")
+    static let contextMenuOpenImageInNewTab = ImageContextMenuItem(title: "Open Image in New Tab", action: #selector(ImageMenuItemSelectors.openImageInNewTab(_:)), keyEquivalent: "")
+    static let contextMenuOpenImageInNewWindow = ImageContextMenuItem(title: "Open Image in New Window", action: #selector(ImageMenuItemSelectors.openImageInNewWindow(_:)), keyEquivalent: "")
+    static let contextMenuSaveImageToDownloads = ImageContextMenuItem(title: "Save Image to \"Downloads\"", action: #selector(ImageMenuItemSelectors.saveImageToDownloads(_:)), keyEquivalent: "")
 
 }
 // swiftlint:enable line_length
