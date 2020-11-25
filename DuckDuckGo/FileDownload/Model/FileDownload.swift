@@ -30,56 +30,104 @@ struct FileDownload {
 
 }
 
-class FileDownloadState {
+class FileDownloadState: NSObject {
 
     enum FileDownloadError: Error {
 
         case restartResumeNotSupported
         case failedToCreateTemporaryFile
+        case failedToCreateTemporaryDir
+        case failedToGetDownloadsFolder
+        case failedToMoveFileToDownloads
+        case failedToCreateTargetFileName
 
     }
 
     let download: FileDownload
-    @Published var bytesDownloaded = 0
+
+    @Published var bytesDownloaded: Int64 = 0
     @Published var filePath: String?
     @Published var error: Error?
 
-    var fresh = true
+    var session: URLSession?
 
     init(download: FileDownload) {
         self.download = download
     }
 
     func start() {
-        if !fresh {
+        if session != nil {
             error = FileDownloadError.restartResumeNotSupported
             return
         }
-        fresh = false
-
-        let fm = FileManager.default
-
-        // download to temp file
-        let name = UUID().uuidString
-        let tempPath = fm.temporaryDirectory.appendingPathComponent(name).absoluteString
-        print(#function, tempPath)
-
-        if !fm.createFile(atPath: tempPath, contents: nil) {
-            error = FileDownloadError.failedToCreateTemporaryFile
-            return
-        }
-
-        // move temp file to downloads
-        self.filePath = moveToTargetFolder()
+        session = URLSession(configuration: .default, delegate: self, delegateQueue: .main)
+        session?.downloadTask(with: download.request).resume()
     }
 
     private func createName() -> String {
         return "temp"
     }
 
-    private func moveToTargetFolder() -> String {
-        // Return a path in ~/Downloads
-        return download.suggestedName ?? createName()
+    private func moveToTargetFolder(from: URL) -> String? {
+        let fm = FileManager.default
+        let fileName = download.suggestedName ?? createName()
+
+        let documentFolders = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask)
+        guard let documentsUrl = documentFolders.first else {
+            error = FileDownloadError.failedToGetDownloadsFolder
+            return nil
+        }
+
+        var copy = 0
+        while copy < 10 {
+
+            let fileInDownloads = availableFile(in: documentsUrl, named: fileName, copy: copy)
+            do {
+                try fm.moveItem(at: from, to: fileInDownloads)
+                print(#function, fileInDownloads.path)
+                return fileInDownloads.path
+            } catch {
+                self.error = FileDownloadError.failedToMoveFileToDownloads
+            }
+            copy += 1
+        }
+
+        error = FileDownloadError.failedToCreateTargetFileName
+        return nil
+    }
+
+    private func availableFile(in folder: URL, named name: String, copy: Int) -> URL {
+        let path = copy == 0 ? name : "\(copy)_\(name)"
+        let file = folder.appendingPathComponent(path)
+        return file
+    }
+
+}
+
+extension FileDownloadState: URLSessionDownloadDelegate {
+
+    func urlSession(_ session: URLSession, downloadTask: URLSessionDownloadTask, didFinishDownloadingTo location: URL) {
+        print(#function, location)
+
+        // Don't reassign nil and trigger an event
+        if let filePath = moveToTargetFolder(from: location) {
+            self.filePath = filePath
+        }
+    }
+
+    func urlSession(_ session: URLSession, downloadTask: URLSessionDownloadTask,
+                    didWriteData bytesWritten: Int64,
+                    totalBytesWritten: Int64,
+                    totalBytesExpectedToWrite: Int64) {
+        bytesDownloaded = totalBytesWritten
+    }
+
+}
+
+extension URL {
+
+    var fileExists: Bool {
+        return (try? checkResourceIsReachable()) ?? false
     }
 
 }

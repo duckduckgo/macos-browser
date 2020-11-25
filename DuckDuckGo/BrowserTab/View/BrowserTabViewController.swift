@@ -32,6 +32,7 @@ class BrowserTabViewController: NSViewController {
     private var selectedTabViewModelCancellable: AnyCancellable?
     private var isErrorViewVisibleCancellable: AnyCancellable?
 
+    // TODO Move to Singleton
     private var downloads = [FileDownloadState]()
     private var downloadCancellables = Set<AnyCancellable>()
 
@@ -165,11 +166,15 @@ extension BrowserTabViewController: TabDelegate {
         // Later: listen to bytes downloaded and update the UI
         // Later: inject target folder, for now use ~/Downloads
 
-        downloadState.$filePath.receive(on: DispatchQueue.main).compactMap { $0 }.sink { _ in
-            // Show message to say download is complete
+        downloadState.$filePath.receive(on: DispatchQueue.main).compactMap { $0 }.sink { [weak self] filePath in
+
+            let file = URL(fileURLWithPath: filePath).deletingLastPathComponent()
+            print(#function, file)
+            NSWorkspace.shared.openFile(file.path)
+
         }.store(in: &downloadCancellables)
 
-        downloadState.$error.receive(on: DispatchQueue.main).compactMap { $0 }.sink { _ in
+        downloadState.$error.receive(on: DispatchQueue.main).compactMap { $0 }.sink { [weak self] _ in
             // Show message to say download failed
         }.store(in: &downloadCancellables)
 
