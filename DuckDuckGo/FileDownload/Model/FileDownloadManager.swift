@@ -1,5 +1,5 @@
 //
-//  FileDownload.swift
+//  FileDownloadManager.swift
 //
 //  Copyright © 2020 DuckDuckGo. All rights reserved.
 //
@@ -18,14 +18,14 @@
 
 import Foundation
 
-struct FileDownload {
+class FileDownloadManager {
 
-    var request: URLRequest
-    var suggestedName: String?
+    static let shared = FileDownloadManager()
 
-    // Derived from headers
-    var contentLength: Int? {
-        return nil
+    private init() { }
+
+    func addDownload(_ download: FileDownload) -> FileDownloadState {
+        return FileDownloadState(download: download)
     }
 
 }

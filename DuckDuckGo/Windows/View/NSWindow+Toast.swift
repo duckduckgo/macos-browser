@@ -1,5 +1,5 @@
 //
-//  FileDownload.swift
+//  NSWindow+Toast.swift
 //
 //  Copyright © 2020 DuckDuckGo. All rights reserved.
 //
@@ -16,16 +16,18 @@
 //  limitations under the License.
 //
 
-import Foundation
+import Cocoa
 
-struct FileDownload {
+extension NSWindow {
 
-    var request: URLRequest
-    var suggestedName: String?
-
-    // Derived from headers
-    var contentLength: Int? {
-        return nil
+    @available(macOS, deprecated: 10.14, message: "Temporary solution while waiting for better design.")
+    func toast(_ message: String) {
+        let text = NSTextField(labelWithString: message)
+        text.frame.origin = CGPoint(x: 5, y: 3)
+        contentView?.addSubview(text)
+        DispatchQueue.main.asyncAfter(deadline: .now() + 3.0) {
+            text.removeFromSuperview()
+        }
     }
 
 }

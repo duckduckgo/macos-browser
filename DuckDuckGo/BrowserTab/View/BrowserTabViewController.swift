@@ -32,8 +32,6 @@ class BrowserTabViewController: NSViewController {
     private var selectedTabViewModelCancellable: AnyCancellable?
     private var isErrorViewVisibleCancellable: AnyCancellable?
 
-    // TODO Move to Singleton
-    private var downloads = [FileDownloadState]()
     private var downloadCancellables = Set<AnyCancellable>()
 
     required init?(coder: NSCoder) {
@@ -160,22 +158,23 @@ extension BrowserTabViewController: TabDelegate {
     func tab(_ tab: Tab, requestedFileDownload download: FileDownload) {
         print(#function, download)
 
-        let downloadState = FileDownloadState(download: download)
-        downloads.append(downloadState)
+        let downloadState = FileDownloadManager.shared.addDownload(download)
 
-        // Later: listen to bytes downloaded and update the UI
-        // Later: inject target folder, for now use ~/Downloads
+        // TODO update this once we have proper UI for the downloads
+        view.window?.toast("Downloading " + (download.request.url?.absoluteString ?? ""))
 
-        downloadState.$filePath.receive(on: DispatchQueue.main).compactMap { $0 }.sink { [weak self] filePath in
+        downloadState.$filePath.receive(on: DispatchQueue.main).compactMap { $0 }.sink { filePath in
 
-            let file = URL(fileURLWithPath: filePath).deletingLastPathComponent()
-            print(#function, file)
-            NSWorkspace.shared.openFile(file.path)
+            print(#function, filePath)
+            let file = URL(fileURLWithPath: filePath)
+            NSWorkspace.shared.activateFileViewerSelecting([file])
 
         }.store(in: &downloadCancellables)
 
         downloadState.$error.receive(on: DispatchQueue.main).compactMap { $0 }.sink { [weak self] _ in
             // Show message to say download failed
+            self?.view.window?.toast("Failed to download " + (download.request.url?.absoluteString ?? ""))
+
         }.store(in: &downloadCancellables)
 
         downloadState.start()

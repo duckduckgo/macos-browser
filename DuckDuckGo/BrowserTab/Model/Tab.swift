@@ -282,6 +282,7 @@ extension Tab: WKNavigationDelegate {
     func webView(_ webView: WKWebView, didFailProvisionalNavigation navigation: WKNavigation!, withError error: Error) {
         if download != nil && (error as NSError).code == ErrorCodes.frameLoadInterrupted {
             // This error was most likely due to a download.
+            download = nil
             return
         }
 
