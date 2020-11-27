@@ -51,39 +51,7 @@ class FileDownloadState: NSObject {
         session = URLSession(configuration: .default, delegate: self, delegateQueue: .main)
         session?.downloadTask(with: download.request).resume()
     }
-
-    private func createFileName(fileType: String?) -> String {
-        let suffix: String
-        if let fileType = fileType {
-            suffix = "." + fileType
-        } else {
-            suffix = ""
-        }
-
-        let prefix: String
-        if let host = download.request.url?.host?.drop(prefix: "www.") {
-            prefix = host + "_"
-        } else {
-            prefix = ""
-        }
-
-        return prefix + UUID().uuidString + suffix
-    }
-
-    /// Tries to use the file name part of the URL, if available, adjusting for content type, if available.
-    private func fileNameFromURL(fileType: String?) -> String? {
-        guard let url = download.request.url, !url.pathExtension.isEmpty else { return nil }
-        let suffix: String
-        if let fileType = fileType,
-           !url.lastPathComponent.hasSuffix("." + fileType) {
-            suffix = "." + fileType
-        } else {
-            suffix = ""
-        }
-
-        return url.lastPathComponent + suffix
-    }
-
+    
     private func moveToTargetFolder(from url: URL, withFileName fileName: String) -> String? {
 
         let fm = FileManager.default
@@ -94,7 +62,7 @@ class FileDownloadState: NSObject {
         }
 
         var copy = 0
-        while copy < 10 {
+        while copy < 1000 { // If it gets to 1000 of these then chances are something else is wrong
 
             let fileInDownloads = incrementFileName(in: folderUrl, named: fileName, copy: copy)
             do {
@@ -125,14 +93,8 @@ extension FileDownloadState: URLSessionDownloadDelegate {
     func urlSession(_ session: URLSession, downloadTask: URLSessionDownloadTask, didFinishDownloadingTo location: URL) {
         print(#function, location)
 
-        let contentType = downloadTask.response?.contentType
-
-        // e.g. text/html; charset=UTF-8 -> html
-        let fileType = contentType?.components(separatedBy: "/").last?.components(separatedBy: ";").first
-
-        let fileName = download.suggestedName ??
-            fileNameFromURL(fileType: fileType) ??
-            createFileName(fileType: fileType)
+        let fileType = downloadTask.response?.fileType
+        let fileName = download.bestFileName(fileType: fileType)
 
         print(#function, "fileName", fileName)
 
@@ -146,12 +108,18 @@ extension FileDownloadState: URLSessionDownloadDelegate {
                     didWriteData bytesWritten: Int64,
                     totalBytesWritten: Int64,
                     totalBytesExpectedToWrite: Int64) {
+        print(#function, totalBytesWritten)
         bytesDownloaded = totalBytesWritten
     }
 
 }
 
 extension URLResponse {
+
+    /// Derived from Content-Type if available: e.g. `text/html; charset=UTF-8` becomes `html`
+    var fileType: String? {
+        return contentType?.components(separatedBy: "/").last?.components(separatedBy: ";").first
+    }
 
     var contentType: String? {
         return (self as? HTTPURLResponse)?.allHeaderFields["Content-Type"] as? String

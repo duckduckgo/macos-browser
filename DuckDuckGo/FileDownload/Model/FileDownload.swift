@@ -29,4 +29,42 @@ struct FileDownload {
         return Int(contentLength)
     }
 
+    func bestFileName(fileType: String?) -> String {
+        return suggestedName ??
+            fileNameFromURL(fileType: fileType) ??
+            createUniqueFileName(fileType: fileType)
+    }
+
+    func createUniqueFileName(fileType: String?) -> String {
+        let suffix: String
+        if let fileType = fileType {
+            suffix = "." + fileType
+        } else {
+            suffix = ""
+        }
+
+        let prefix: String
+        if let host = request.url?.host?.drop(prefix: "www.") {
+            prefix = host + "_"
+        } else {
+            prefix = ""
+        }
+
+        return prefix + UUID().uuidString + suffix
+    }
+
+    /// Tries to use the file name part of the URL, if available, adjusting for content type, if available.
+    func fileNameFromURL(fileType: String?) -> String? {
+        guard let url = request.url, !url.pathExtension.isEmpty else { return nil }
+        let suffix: String
+        if let fileType = fileType,
+           !url.lastPathComponent.hasSuffix("." + fileType) {
+            suffix = "." + fileType
+        } else {
+            suffix = ""
+        }
+
+        return url.lastPathComponent + suffix
+    }
+
 }

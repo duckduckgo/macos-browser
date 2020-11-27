@@ -157,12 +157,9 @@ extension BrowserTabViewController: TabDelegate {
         print(#function, download)
         FileDownloadManager.shared.startDownload(download)
 
-        // Safari does this - we may not want to.  Also, right now, if the user opens a tab and pastes a URL that is to be downloaded, we'll
-        //  close the tab which also might not be desirable.
-        if !(tabViewModel?.canGoBack ?? false) {
-            tabCollectionViewModel.removeSelected()
-        }
-
+        // Note this can result in tabs being left open, e.g. download button on this page:
+        // https://en.wikipedia.org/wiki/Guitar#/media/File:GuitareClassique5.png
+        //  Safari closes new tabs that were opened and then create a download instantly.  Should we do the same?
     }
 
     func tab(_ tab: Tab, requestedContextMenuAt position: NSPoint, forElements elements: [ContextMenuElement]) {
