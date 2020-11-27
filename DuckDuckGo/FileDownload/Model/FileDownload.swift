@@ -23,9 +23,10 @@ struct FileDownload {
     var request: URLRequest
     var suggestedName: String?
 
-    // Derived from headers
+    /// Based on Content-Length header, if avialable.
     var contentLength: Int? {
-        return nil
+        guard let contentLength = request.allHTTPHeaderFields?["Content-Length"] else { return nil }
+        return Int(contentLength)
     }
 
 }

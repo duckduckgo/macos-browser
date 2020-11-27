@@ -32,8 +32,6 @@ class BrowserTabViewController: NSViewController {
     private var selectedTabViewModelCancellable: AnyCancellable?
     private var isErrorViewVisibleCancellable: AnyCancellable?
 
-    private var downloadCancellables = Set<AnyCancellable>()
-
     required init?(coder: NSCoder) {
         fatalError("BrowserTabViewController: Bad initializer")
     }
@@ -157,27 +155,14 @@ extension BrowserTabViewController: TabDelegate {
 
     func tab(_ tab: Tab, requestedFileDownload download: FileDownload) {
         print(#function, download)
+        FileDownloadManager.shared.startDownload(download)
 
-        let downloadState = FileDownloadManager.shared.addDownload(download)
+        // Safari does this - we may not want to.  Also, right now, if the user opens a tab and pastes a URL that is to be downloaded, we'll
+        //  close the tab which also might not be desirable.
+        if !(tabViewModel?.canGoBack ?? false) {
+            tabCollectionViewModel.removeSelected()
+        }
 
-        // TODO update this once we have proper UI for the downloads
-        view.window?.toast("Downloading " + (download.request.url?.absoluteString ?? ""))
-
-        downloadState.$filePath.receive(on: DispatchQueue.main).compactMap { $0 }.sink { filePath in
-
-            print(#function, filePath)
-            let file = URL(fileURLWithPath: filePath)
-            NSWorkspace.shared.activateFileViewerSelecting([file])
-
-        }.store(in: &downloadCancellables)
-
-        downloadState.$error.receive(on: DispatchQueue.main).compactMap { $0 }.sink { [weak self] _ in
-            // Show message to say download failed
-            self?.view.window?.toast("Failed to download " + (download.request.url?.absoluteString ?? ""))
-
-        }.store(in: &downloadCancellables)
-
-        downloadState.start()
     }
 
     func tab(_ tab: Tab, requestedContextMenuAt position: NSPoint, forElements elements: [ContextMenuElement]) {
@@ -201,18 +186,16 @@ extension BrowserTabViewController: TabDelegate {
                 switch $0 {
 
                 case .link(let url):
-                    menuItems.append(NSMenuItem.contextMenuOpenLinkInNewTab.apply(url))
-                    menuItems.append(NSMenuItem.contextMenuOpenLinkInNewWindow.apply(url))
-                    menuItems.append(.separator())
-                    menuItems.append(NSMenuItem.contextMenuDownloadLinkedFile.apply(url))
-                    menuItems.append(.separator())
-                    menuItems.append(NSMenuItem.contextMenuCopyLink.apply(url))
+                    NSMenuItem.linkContextMenuItems.forEach {
+                        ($0 as? URLContextMenuItem)?.url = url
+                        menuItems.append($0)
+                    }
 
                 case .image(let url):
-                    menuItems.append(NSMenuItem.contextMenuOpenImageInNewTab.apply(url))
-                    menuItems.append(NSMenuItem.contextMenuOpenImageInNewWindow.apply(url))
-                    menuItems.append(.separator())
-                    menuItems.append(NSMenuItem.contextMenuSaveImageToDownloads.apply(url))
+                    NSMenuItem.imageContextMenuItems.forEach {
+                        ($0 as? URLContextMenuItem)?.url = url
+                        menuItems.append($0)
+                    }
 
                 }
             }
@@ -236,6 +219,70 @@ extension BrowserTabViewController: NSMenuDelegate {
         NSMenuItem.contextMenuBack.isHidden = !(tabViewModel?.canGoBack ?? false)
         NSMenuItem.contextMenuForward.isHidden = !(tabViewModel?.canGoForward ?? false)
         NSMenuItem.contextMenuReload.isHidden = !(tabViewModel?.canReload ?? false)
+    }
+
+}
+
+extension BrowserTabViewController: LinkMenuItemSelectors {
+
+    func openLinkInNewTab(_ sender: URLContextMenuItem) {
+        print(#function, sender.url as Any)
+        openNewTab(with: sender.url)
+    }
+
+    func openLinkInNewWindow(_ sender: URLContextMenuItem) {
+        print(#function, sender.url as Any)
+        WindowsManager.openNewWindow(with: sender.url)
+    }
+
+    func downloadLinkedFile(_ sender: URLContextMenuItem) {
+        print(#function, sender.url as Any)
+
+        guard let tab = tabCollectionViewModel.selectedTabViewModel?.tab,
+              let url = sender.url else { return }
+
+        self.tab(tab, requestedFileDownload: FileDownload(request: URLRequest(url: url), suggestedName: nil))
+    }
+
+    func copyLink(_ sender: URLContextMenuItem) {
+        print(#function, sender.url as Any)
+
+        guard let url = sender.url?.absoluteString else { return }
+        NSPasteboard.general.clearContents()
+        NSPasteboard.general.setString(url, forType: .URL)
+
+    }
+
+}
+
+extension BrowserTabViewController: ImageMenuItemSelectors {
+
+    func openImageInNewTab(_ sender: URLContextMenuItem) {
+        print(#function, sender.url as Any)
+        openNewTab(with: sender.url)
+    }
+
+    func openImageInNewWindow(_ sender: URLContextMenuItem) {
+        print(#function, sender.url as Any)
+        WindowsManager.openNewWindow(with: sender.url)
+    }
+
+    func saveImageToDownloads(_ sender: URLContextMenuItem) {
+        print(#function, sender.url as Any)
+        
+        guard let tab = tabCollectionViewModel.selectedTabViewModel?.tab,
+              let url = sender.url else { return }
+
+        self.tab(tab, requestedFileDownload: FileDownload(request: URLRequest(url: url), suggestedName: nil))
+    }
+
+    func copyImageAddress(_ sender: URLContextMenuItem) {
+        print(#function, sender.url as Any)
+
+        guard let url = sender.url?.absoluteString else { return }
+        NSPasteboard.general.clearContents()
+        NSPasteboard.general.setString(url, forType: .URL)
+
     }
 
 }

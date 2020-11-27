@@ -16,16 +16,34 @@
 //  limitations under the License.
 //
 
-import Foundation
+import Cocoa
+import Combine
 
+// TODO when there's a UI flesh this out
 class FileDownloadManager {
 
     static let shared = FileDownloadManager()
 
     private init() { }
 
-    func addDownload(_ download: FileDownload) -> FileDownloadState {
-        return FileDownloadState(download: download)
+    private var subscriptions = Set<AnyCancellable>()
+    private (set) var downloads = Set<FileDownloadState>()
+
+    @discardableResult
+    func startDownload(_ download: FileDownload) -> FileDownloadState {
+        let state = FileDownloadState(download: download)
+
+        state.$filePath.receive(on: DispatchQueue.main).compactMap { $0 }.sink { filePath in
+
+            print(#function, filePath)
+            let file = URL(fileURLWithPath: filePath)
+            NSWorkspace.shared.activateFileViewerSelecting([file])
+
+        }.store(in: &subscriptions)
+
+        state.start()
+
+        return state
     }
 
 }

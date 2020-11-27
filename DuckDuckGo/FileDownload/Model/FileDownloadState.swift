@@ -16,7 +16,7 @@
 //  limitations under the License.
 //
 
-import Foundation
+import Combine
 
 class FileDownloadState: NSObject {
 
@@ -52,26 +52,42 @@ class FileDownloadState: NSObject {
         session?.downloadTask(with: download.request).resume()
     }
 
-    private func createName() -> String {
-        guard let url = download.request.url else { return UUID().uuidString } // Should never happen.
-
-        // There's an extension, like .avi then we can use the last part of the path as the file name
-        if !url.pathExtension.isEmpty {
-            return url.lastPathComponent
+    private func createFileName(fileType: String?) -> String {
+        let suffix: String
+        if let fileType = fileType {
+            suffix = "." + fileType
+        } else {
+            suffix = ""
         }
 
-        if let contentType = download.request.allHTTPHeaderFields?["Content-Type"] {
-
+        let prefix: String
+        if let host = download.request.url?.host?.drop(prefix: "www.") {
+            prefix = host + "_"
+        } else {
+            prefix = ""
         }
 
-        return UUID().uuidString
+        return prefix + UUID().uuidString + suffix
     }
 
-    private func moveToTargetFolder(from: URL) -> String? {
-        let fm = FileManager.default
-        let fileName = download.suggestedName ?? createName()
+    /// Tries to use the file name part of the URL, if available, adjusting for content type, if available.
+    private func fileNameFromURL(fileType: String?) -> String? {
+        guard let url = download.request.url, !url.pathExtension.isEmpty else { return nil }
+        let suffix: String
+        if let fileType = fileType,
+           !url.lastPathComponent.hasSuffix("." + fileType) {
+            suffix = "." + fileType
+        } else {
+            suffix = ""
+        }
 
-        let folders = FileManager.default.urls(for: .downloadsDirectory, in: .userDomainMask)
+        return url.lastPathComponent + suffix
+    }
+
+    private func moveToTargetFolder(from url: URL, withFileName fileName: String) -> String? {
+
+        let fm = FileManager.default
+        let folders = fm.urls(for: .downloadsDirectory, in: .userDomainMask)
         guard let folderUrl = folders.first else {
             error = FileDownloadError.failedToGetDownloadsFolder
             return nil
@@ -82,7 +98,7 @@ class FileDownloadState: NSObject {
 
             let fileInDownloads = incrementFileName(in: folderUrl, named: fileName, copy: copy)
             do {
-                try fm.moveItem(at: from, to: fileInDownloads)
+                try fm.moveItem(at: url, to: fileInDownloads)
                 print(#function, fileInDownloads.path)
                 return fileInDownloads.path
             } catch {
@@ -109,8 +125,19 @@ extension FileDownloadState: URLSessionDownloadDelegate {
     func urlSession(_ session: URLSession, downloadTask: URLSessionDownloadTask, didFinishDownloadingTo location: URL) {
         print(#function, location)
 
+        let contentType = downloadTask.response?.contentType
+
+        // e.g. text/html; charset=UTF-8 -> html
+        let fileType = contentType?.components(separatedBy: "/").last?.components(separatedBy: ";").first
+
+        let fileName = download.suggestedName ??
+            fileNameFromURL(fileType: fileType) ??
+            createFileName(fileType: fileType)
+
+        print(#function, "fileName", fileName)
+
         // Don't reassign nil and trigger an event
-        if let filePath = moveToTargetFolder(from: location) {
+        if let filePath = moveToTargetFolder(from: location, withFileName: fileName) {
             self.filePath = filePath
         }
     }
@@ -120,6 +147,14 @@ extension FileDownloadState: URLSessionDownloadDelegate {
                     totalBytesWritten: Int64,
                     totalBytesExpectedToWrite: Int64) {
         bytesDownloaded = totalBytesWritten
+    }
+
+}
+
+extension URLResponse {
+
+    var contentType: String? {
+        return (self as? HTTPURLResponse)?.allHeaderFields["Content-Type"] as? String
     }
 
 }
