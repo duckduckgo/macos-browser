@@ -100,7 +100,14 @@ extension ContextMenuUserScript {
     }
 
     document.addEventListener("contextmenu", function(e) {
-        e.preventDefault(); // Never show the default context menu to avoid user confusion, even if something goes wrong after this.
+
+        // Allow context menu for PDFs
+        if (document.contentType.endsWith("/pdf") && document.plugins.length > 0) {
+            return;
+        }
+
+        // Otherwise, never show the default context menu to avoid user confusion, even if something goes wrong after this.
+        e.preventDefault();
 
         var context = {
             "position": {

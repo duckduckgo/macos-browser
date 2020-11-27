@@ -24,29 +24,11 @@ class WebView: WKWebView {
 
     // MARK: - Menu
 
-    private enum Constants {
-        static let openLinkInNewTab = "Open Link in New Tab"
-    }
-
     override func willOpenMenu(_ menu: NSMenu, with event: NSEvent) {
         super.willOpenMenu(menu, with: event)
-        if let firstMenuItem = menu.items.first {
-            switch firstMenuItem.identifier?.rawValue {
-            case "WKMenuItemIdentifierOpenLink":
-                editLinkMenu(menu)
-            default:
-                return
-            }
-        }
+
+        // Supress WebKit provided menu items, we provide the context menu elsewhere.
+        menu.items.filter { $0.identifier != nil }.forEach { $0.isHidden = true }
+
     }
-
-    private func editLinkMenu(_ menu: NSMenu) {
-        guard let newWindowMenuItem = menu.items.first(where: { $0.identifier?.rawValue == "WKMenuItemIdentifierOpenLinkInNewWindow"}) else {
-            os_log("WebView: WKMenuItemIdentifierOpenLinkInNewWindow menu item not found", type: .error)
-            return
-        }
-
-        newWindowMenuItem.title = Constants.openLinkInNewTab
-    }
-
 }
