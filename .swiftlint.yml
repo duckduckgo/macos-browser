@@ -24,6 +24,5 @@ file_length:
 
 # General Config
 excluded:
-  - Carthage
-  - DuckDuckGo/UserText.swift
+  - DuckDuckGo/Common/Localizables/UserText.swift
 
