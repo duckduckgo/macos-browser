@@ -19,7 +19,6 @@
 import Cocoa
 import Combine
 
-// TODO when there's a UI flesh this out
 class FileDownloadManager {
 
     static let shared = FileDownloadManager()
