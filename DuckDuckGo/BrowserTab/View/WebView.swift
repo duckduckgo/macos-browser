@@ -29,7 +29,5 @@ class WebView: WKWebView {
 
         // Supress WebKit provided menu items, we provide the context menu elsewhere.
         menu.items.filter { $0.identifier != nil }.forEach { $0.isHidden = true }
-
-        newWindowMenuItem.title = UserText.webViewOpenLinkInNewTab
     }
 }
