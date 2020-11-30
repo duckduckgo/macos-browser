@@ -63,15 +63,14 @@ class Tab: NSObject {
     @Published var hasError: Bool = false
 
     // Used to track if an error was caused by a download navigation.
-    var download: FileDownload?
-
-    var isHomepageLoaded: Bool {
-        url == nil || url == URL.emptyPage
-    }
+    private var download: FileDownload?
 
     // Used as the request context for HTML 5 downloads
     private var lastMainFrameRequest: URLRequest?
-    private var mainFrameNavigations = [WKNavigation]()
+    
+    var isHomepageLoaded: Bool {
+        url == nil || url == URL.emptyPage
+    }
 
     func load(url: URL) {
         load(urlRequest: URLRequest(url: url))
