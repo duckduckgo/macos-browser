@@ -25,7 +25,7 @@ struct UserText {
     static let webViewOpenLinkInNewTab = NSLocalizedString("webView-open-link-in-new-tab",
                                                            value: "Open Link in New Tab",
                                                            comment: "Menu item")
-    static let duplicateTab = NSLocalizedString("duplicate-tab", value: "Duplicate Tab", comment: "Menu item")
+    static let duplicateTab = NSLocalizedString("duplicate-tab", value: "Duplicate Tab", comment: "Menu item. Duplicate as a verb")
     static let closeTab = NSLocalizedString("close-tab", value: "Close Tab", comment: "Menu item")
     static let closeOtherTabs = NSLocalizedString("close-other-tabs", value: "Close Other Tabs", comment: "Menu item")
 
@@ -38,10 +38,10 @@ struct UserText {
 
     static let addressBarSearchSuffix = NSLocalizedString("address-bar-search-suffix",
                                                           value: "Search DuckDuckGo",
-                                                          comment: "Suffix of searched terms in address bar")
+                                                          comment: "Suffix of searched terms in address bar. Example: best watching machine - Search DuckDuckGo")
     static let addressBarVisitSuffix = NSLocalizedString("address-bar-visit-suffix",
                                                           value: "Visit",
-                                                          comment: "Address bar suffix of possibly visited website")
+                                                          comment: "Address bar suffix of possibly visited website. Example: spreadprivacy.com - Visit spreadprivacy.com")
 
     static let burnAlertMessageText = NSLocalizedString("burn-alert-message-text",
                                                         value: "Are you sure you want to burn everything?",
