@@ -41,8 +41,6 @@ class ContextMenuUserScript: UserScript {
               let point = point(from: dict)
               else { return }
 
-        print(#function, dict)
-
         delegate?.contextMenuUserScript(self, showContextMenuAt: point, forElements: elements(from: dict))
 
     }

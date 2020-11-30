@@ -41,7 +41,6 @@ class HTML5DownloadUserScript: UserScript {
               let url = URL(string: href),
               let name = dict["download"]
             else { return }
-        print(#function, "href", href, "name", name)
         delegate?.startDownload(self, from: url, withSuggestedName: name)
     }
 

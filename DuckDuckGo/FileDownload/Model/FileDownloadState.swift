@@ -67,7 +67,6 @@ class FileDownloadState: NSObject {
             let fileInDownloads = incrementFileName(in: folderUrl, named: fileName, copy: copy)
             do {
                 try fm.moveItem(at: url, to: fileInDownloads)
-                print(#function, fileInDownloads.path)
                 return fileInDownloads.path
             } catch {
                 self.error = FileDownloadError.failedToMoveFileToDownloads
@@ -91,12 +90,9 @@ class FileDownloadState: NSObject {
 extension FileDownloadState: URLSessionDownloadDelegate {
 
     func urlSession(_ session: URLSession, downloadTask: URLSessionDownloadTask, didFinishDownloadingTo location: URL) {
-        print(#function, location)
 
         let fileType = downloadTask.response?.fileType
         let fileName = download.bestFileName(fileType: fileType)
-
-        print(#function, "fileName", fileName)
 
         // Don't reassign nil and trigger an event
         if let filePath = moveToTargetFolder(from: location, withFileName: fileName) {
@@ -108,7 +104,6 @@ extension FileDownloadState: URLSessionDownloadDelegate {
                     didWriteData bytesWritten: Int64,
                     totalBytesWritten: Int64,
                     totalBytesExpectedToWrite: Int64) {
-        print(#function, totalBytesWritten)
         bytesDownloaded = totalBytesWritten
     }
 

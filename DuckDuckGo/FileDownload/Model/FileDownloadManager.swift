@@ -34,8 +34,9 @@ class FileDownloadManager {
 
         state.$filePath.receive(on: DispatchQueue.main).compactMap { $0 }.sink { filePath in
 
-            print(#function, filePath)
             let file = URL(fileURLWithPath: filePath)
+
+            // For now, show the file in Finder
             NSWorkspace.shared.activateFileViewerSelecting([file])
 
         }.store(in: &subscriptions)

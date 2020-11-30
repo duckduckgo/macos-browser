@@ -154,7 +154,6 @@ extension BrowserTabViewController: TabDelegate {
     }
 
     func tab(_ tab: Tab, requestedFileDownload download: FileDownload) {
-        print(#function, download)
         FileDownloadManager.shared.startDownload(download)
 
         // Note this can result in tabs being left open, e.g. download button on this page:
@@ -163,9 +162,6 @@ extension BrowserTabViewController: TabDelegate {
     }
 
     func tab(_ tab: Tab, requestedContextMenuAt position: NSPoint, forElements elements: [ContextMenuElement]) {
-
-        print(#function, position, elements)
-
         var menuItems = [NSMenuItem]()
 
         if elements.isEmpty {
@@ -212,7 +208,6 @@ extension BrowserTabViewController: TabDelegate {
 extension BrowserTabViewController: NSMenuDelegate {
 
     func menuWillOpen(_ menu: NSMenu) {
-        print(#function)
         NSMenuItem.contextMenuBack.isHidden = !(tabViewModel?.canGoBack ?? false)
         NSMenuItem.contextMenuForward.isHidden = !(tabViewModel?.canGoForward ?? false)
         NSMenuItem.contextMenuReload.isHidden = !(tabViewModel?.canReload ?? false)
@@ -223,18 +218,14 @@ extension BrowserTabViewController: NSMenuDelegate {
 extension BrowserTabViewController: LinkMenuItemSelectors {
 
     func openLinkInNewTab(_ sender: URLContextMenuItem) {
-        print(#function, sender.url as Any)
         openNewTab(with: sender.url)
     }
 
     func openLinkInNewWindow(_ sender: URLContextMenuItem) {
-        print(#function, sender.url as Any)
         WindowsManager.openNewWindow(with: sender.url)
     }
 
     func downloadLinkedFile(_ sender: URLContextMenuItem) {
-        print(#function, sender.url as Any)
-
         guard let tab = tabCollectionViewModel.selectedTabViewModel?.tab,
               let url = sender.url else { return }
 
@@ -242,12 +233,9 @@ extension BrowserTabViewController: LinkMenuItemSelectors {
     }
 
     func copyLink(_ sender: URLContextMenuItem) {
-        print(#function, sender.url as Any)
-
         guard let url = sender.url?.absoluteString else { return }
         NSPasteboard.general.clearContents()
         NSPasteboard.general.setString(url, forType: .URL)
-
     }
 
 }
@@ -255,18 +243,14 @@ extension BrowserTabViewController: LinkMenuItemSelectors {
 extension BrowserTabViewController: ImageMenuItemSelectors {
 
     func openImageInNewTab(_ sender: URLContextMenuItem) {
-        print(#function, sender.url as Any)
         openNewTab(with: sender.url)
     }
 
     func openImageInNewWindow(_ sender: URLContextMenuItem) {
-        print(#function, sender.url as Any)
         WindowsManager.openNewWindow(with: sender.url)
     }
 
     func saveImageToDownloads(_ sender: URLContextMenuItem) {
-        print(#function, sender.url as Any)
-        
         guard let tab = tabCollectionViewModel.selectedTabViewModel?.tab,
               let url = sender.url else { return }
 
@@ -274,8 +258,6 @@ extension BrowserTabViewController: ImageMenuItemSelectors {
     }
 
     func copyImageAddress(_ sender: URLContextMenuItem) {
-        print(#function, sender.url as Any)
-
         guard let url = sender.url?.absoluteString else { return }
         NSPasteboard.general.clearContents()
         NSPasteboard.general.setString(url, forType: .URL)
