@@ -44,7 +44,7 @@ struct FileDownload {
         }
 
         let prefix: String
-        if let host = request.url?.host?.drop(prefix: "www.") {
+        if let host = request.url?.host?.drop(prefix: "www.").replacingOccurrences(of: ".", with: "_") {
             prefix = host + "_"
         } else {
             prefix = ""

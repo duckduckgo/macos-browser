@@ -76,8 +76,8 @@ class TabViewModelTests: XCTestCase {
 
         let addressBarStringExpectation = expectation(description: "Address bar string")
 
-        tabViewModel.$addressBarString.debounce(for: 0.1, scheduler: RunLoop.main).sink { addressBarString in
-            XCTAssertEqual(tabViewModel.addressBarString, urlString)
+        tabViewModel.$addressBarString.debounce(for: 0.1, scheduler: RunLoop.main).sink { _ in
+            XCTAssertEqual(tabViewModel.passiveAddressBarString, urlString)
             addressBarStringExpectation.fulfill()
         } .store(in: &cancellables)
         waitForExpectations(timeout: 1, handler: nil)
@@ -140,7 +140,7 @@ class TabViewModelTests: XCTestCase {
                 faviconExpectation.fulfill()
             }
         } .store(in: &cancellables)
-        waitForExpectations(timeout: 1, handler: nil)
+        waitForExpectations(timeout: 5, handler: nil)
     }
 
 }

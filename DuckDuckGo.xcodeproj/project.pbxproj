@@ -28,6 +28,7 @@
 		4B677442255DBEEA00025BD8 /* Database.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B677440255DBEEA00025BD8 /* Database.swift */; };
 		4B67744B255DBF3A00025BD8 /* BloomFilter.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4B677449255DBF3A00025BD8 /* BloomFilter.cpp */; };
 		4B677450255DBFA300025BD8 /* HashExtension.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B67744F255DBFA300025BD8 /* HashExtension.swift */; };
+		8553FF52257523760029327F /* FileDownloadTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8553FF51257523760029327F /* FileDownloadTests.swift */; };
 		8556A602256BDDD30092FA9D /* HTML5DownloadUserScript.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8556A601256BDDD30092FA9D /* HTML5DownloadUserScript.swift */; };
 		8556A60E256C15DD0092FA9D /* FileDownload.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8556A60D256C15DD0092FA9D /* FileDownload.swift */; };
 		856C98A6256EB59600A22F1F /* NSMenuItem+ContextMenuItems.swift in Sources */ = {isa = PBXBuildFile; fileRef = 856C98A5256EB59600A22F1F /* NSMenuItem+ContextMenuItems.swift */; };
@@ -152,6 +153,7 @@
 		4B67744A255DBF3A00025BD8 /* BloomFilter.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = BloomFilter.hpp; path = Submodules/bloom_cpp/src/BloomFilter.hpp; sourceTree = SOURCE_ROOT; };
 		4B67744F255DBFA300025BD8 /* HashExtension.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = HashExtension.swift; sourceTree = "<group>"; };
 		4B677454255DC18000025BD8 /* Bridging.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Bridging.h; sourceTree = "<group>"; };
+		8553FF51257523760029327F /* FileDownloadTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FileDownloadTests.swift; sourceTree = "<group>"; };
 		8556A601256BDDD30092FA9D /* HTML5DownloadUserScript.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HTML5DownloadUserScript.swift; sourceTree = "<group>"; };
 		8556A60D256C15DD0092FA9D /* FileDownload.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FileDownload.swift; sourceTree = "<group>"; };
 		856C98A5256EB59600A22F1F /* NSMenuItem+ContextMenuItems.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "NSMenuItem+ContextMenuItems.swift"; sourceTree = "<group>"; };
@@ -342,6 +344,14 @@
 			name = bloom_cpp;
 			sourceTree = "<group>";
 		};
+		8553FF50257523630029327F /* FileDownload */ = {
+			isa = PBXGroup;
+			children = (
+				8553FF51257523760029327F /* FileDownloadTests.swift */,
+			);
+			path = FileDownload;
+			sourceTree = "<group>";
+		};
 		8556A60C256C15C60092FA9D /* FileDownload */ = {
 			isa = PBXGroup;
 			children = (
@@ -435,6 +445,7 @@
 		AA585D93248FD31400E9A3E2 /* Unit Tests */ = {
 			isa = PBXGroup;
 			children = (
+				8553FF50257523630029327F /* FileDownload */,
 				AA92ACAE24EFE1F5005F41C9 /* BrowserTab */,
 				AA9C361D25518AAB004B1BA3 /* Burning */,
 				AA63744E24C9BB4A00AB2AC4 /* Suggestions */,
@@ -705,7 +716,6 @@
 		AA9C361D25518AAB004B1BA3 /* Burning */ = {
 			isa = PBXGroup;
 			children = (
-				AA9C362225518B39004B1BA3 /* ViewModel */,
 				AA9C362125518B34004B1BA3 /* Model */,
 			);
 			path = Burning;
@@ -717,13 +727,6 @@
 				AA9C362F25518CA9004B1BA3 /* FireTests.swift */,
 			);
 			path = Model;
-			sourceTree = "<group>";
-		};
-		AA9C362225518B39004B1BA3 /* ViewModel */ = {
-			isa = PBXGroup;
-			children = (
-			);
-			path = ViewModel;
 			sourceTree = "<group>";
 		};
 		AA9C362625518B61004B1BA3 /* Services */ = {
@@ -1095,6 +1098,7 @@
 				AA63745424C9BF9A00AB2AC4 /* SuggestionsTests.swift in Sources */,
 				AAC9C01524CAFBCE00AD1325 /* TabTests.swift in Sources */,
 				AA63745624C9EB3C00AB2AC4 /* SuggestionsAPIResultTests.swift in Sources */,
+				8553FF52257523760029327F /* FileDownloadTests.swift in Sources */,
 				AA9C362825518C44004B1BA3 /* WebsiteDataStoreMock.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
