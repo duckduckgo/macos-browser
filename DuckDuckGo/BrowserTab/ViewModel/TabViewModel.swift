@@ -80,7 +80,10 @@ class TabViewModel {
     }
 
     private func subscribeToTabError() {
-        tab.$hasError.receive(on: DispatchQueue.main).assign(to: \.isErrorViewVisible, on: self).store(in: &cancellables)
+        tab.$hasError.receive(on: DispatchQueue.main).sink { [weak self] _ in
+            guard let self = self else { return }
+            self.isErrorViewVisible = self.tab.hasError
+        } .store(in: &cancellables)
     }
 
     private func updateCanReload() {
