@@ -50,12 +50,12 @@ class TabBarViewItem: NSCollectionViewItem {
     static var menu: NSMenu {
         let menu = NSMenu()
 
-        let duplicateMenuItem = NSMenuItem(title: "Duplicate Tab", action: #selector(duplicateAction(_:)), keyEquivalent: "")
+        let duplicateMenuItem = NSMenuItem(title: UserText.duplicateTab, action: #selector(duplicateAction(_:)), keyEquivalent: "")
         menu.addItem(duplicateMenuItem)
         menu.addItem(NSMenuItem.separator())
-        let closeMenuItem = NSMenuItem(title: "Close Tab", action: #selector(closeButtonAction(_:)), keyEquivalent: "")
+        let closeMenuItem = NSMenuItem(title: UserText.closeTab, action: #selector(closeButtonAction(_:)), keyEquivalent: "")
         menu.addItem(closeMenuItem)
-        let closeOtherMenuItem = NSMenuItem(title: "Close Other Tabs", action: #selector(closeOtherAction(_:)), keyEquivalent: "")
+        let closeOtherMenuItem = NSMenuItem(title: UserText.closeOtherTabs, action: #selector(closeOtherAction(_:)), keyEquivalent: "")
         menu.addItem(closeOtherMenuItem)
         return menu
     }

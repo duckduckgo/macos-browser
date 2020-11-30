@@ -364,6 +364,15 @@ extension BrowserTabViewController: WKUIDelegate {
         }
     }
 
+    func webViewDidClose(_ webView: WKWebView) {
+        guard let webView = webView as? WebView else {
+            os_log("BrowserTabViewController: Unknown instance of WKWebView", type: .error)
+            return
+        }
+
+        tabCollectionViewModel.remove(ownerOf: webView)
+    }
+
 }
 
 fileprivate extension NSAlert {
@@ -371,23 +380,23 @@ fileprivate extension NSAlert {
     static func javascriptAlert(with message: String) -> NSAlert {
         let alert = NSAlert()
         alert.messageText = message
-        alert.addButton(withTitle: "OK")
+        alert.addButton(withTitle: UserText.ok)
         return alert
     }
 
     static func javascriptConfirmation(with message: String) -> NSAlert {
         let alert = NSAlert()
         alert.messageText = message
-        alert.addButton(withTitle: "OK")
-        alert.addButton(withTitle: "Cancel")
+        alert.addButton(withTitle: UserText.ok)
+        alert.addButton(withTitle: UserText.cancel)
         return alert
     }
 
     static func javascriptTextInput(prompt: String, defaultText: String?) -> NSAlert {
         let alert = NSAlert()
         alert.messageText = prompt
-        alert.addButton(withTitle: "OK")
-        alert.addButton(withTitle: "Cancel")
+        alert.addButton(withTitle: UserText.ok)
+        alert.addButton(withTitle: UserText.cancel)
         let textField = NSTextField(frame: NSRect(x: 0, y: 0, width: 200, height: 24))
         textField.placeholderString = defaultText
         alert.accessoryView = textField

@@ -22,10 +22,6 @@ import os.log
 
 class TabViewModel {
 
-    enum Title {
-        static let home = "Home"
-    }
-
     enum Favicon {
         static let home = NSImage(named: "HomeFavicon")!
         static let defaultFavicon = NSImage()
@@ -50,7 +46,7 @@ class TabViewModel {
 
     @Published private(set) var addressBarString: String = ""
     @Published private(set) var passiveAddressBarString: String = ""
-    @Published private(set) var title: String = Title.home
+    @Published private(set) var title: String = UserText.tabHomeTitle
     @Published private(set) var favicon: NSImage = Favicon.home
 
     init(tab: Tab) {
@@ -80,7 +76,10 @@ class TabViewModel {
     }
 
     private func subscribeToTabError() {
-        tab.$hasError.receive(on: DispatchQueue.main).assign(to: \.isErrorViewVisible, on: self).store(in: &cancellables)
+        tab.$hasError.receive(on: DispatchQueue.main).sink { [weak self] _ in
+            guard let self = self else { return }
+            self.isErrorViewVisible = self.tab.hasError
+        } .store(in: &cancellables)
     }
 
     private func updateCanReload() {
@@ -108,12 +107,12 @@ class TabViewModel {
 
     private func updateTitle() {
         guard !isErrorViewVisible else {
-            title = "Oops!"
+            title = UserText.tabErrorTitle
             return
         }
 
         if tab.isHomepageLoaded {
-            title = Title.home
+            title = UserText.tabHomeTitle
             return
         }
 

@@ -20,6 +20,7 @@ import Foundation
 import os.log
 
 class Suggestions {
+
     let suggestionsAPI: SuggestionsAPI
 
     @Published private(set) var items: [Suggestion]?
@@ -66,9 +67,11 @@ class Suggestions {
 
 fileprivate extension Suggestion {
 
+    static let phraseKey = "phrase"
+
     static func makeSuggestion(key: String, value: String) -> Suggestion {
-        let suggestion = key == "phrase" ? Suggestion.phrase(phrase: value) : Suggestion.unknown(value: value)
-        if key != "phrase" {
+        let suggestion = key == Self.phraseKey ? Suggestion.phrase(phrase: value) : Suggestion.unknown(value: value)
+        if key != Self.phraseKey {
             os_log("SuggestionsAPIResult: Unknown suggestion type", type: .error)
         }
         return suggestion

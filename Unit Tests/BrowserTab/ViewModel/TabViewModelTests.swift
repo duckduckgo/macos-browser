@@ -71,7 +71,7 @@ class TabViewModelTests: XCTestCase {
     func testWhenURLIsRegularSiteThenAddressBarStringIsTheURLWithoutPrefix() {
         let tabViewModel = TabViewModel.aTabViewModel
 
-        let urlString = "spreadprivacy.com"
+        let urlString = "https://spreadprivacy.com"
         tabViewModel.tab.url = URL.makeURL(from: urlString)
 
         let addressBarStringExpectation = expectation(description: "Address bar string")
