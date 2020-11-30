@@ -238,12 +238,15 @@ class AddressBarTextField: NSTextField {
             }
         }
 
+        static let searchSuffix = " — \(UserText.addressBarSearchSuffix)"
+        static let visitSuffix = " — \(UserText.addressBarVisitSuffix)"
+
         var string: String {
             switch self {
             case .search:
-                return " — Search DuckDuckGo"
+                return "\(Self.searchSuffix)"
             case .visit(host: let host):
-                return " — Visit \(host)"
+                return "\(Self.visitSuffix) \(host)"
             }
         }
     }

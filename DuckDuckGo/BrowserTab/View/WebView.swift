@@ -24,10 +24,6 @@ class WebView: WKWebView {
 
     // MARK: - Menu
 
-    private enum Constants {
-        static let openLinkInNewTab = "Open Link in New Tab"
-    }
-
     override func willOpenMenu(_ menu: NSMenu, with event: NSEvent) {
         super.willOpenMenu(menu, with: event)
         if let firstMenuItem = menu.items.first {
@@ -46,7 +42,7 @@ class WebView: WKWebView {
             return
         }
 
-        newWindowMenuItem.title = Constants.openLinkInNewTab
+        newWindowMenuItem.title = UserText.webViewOpenLinkInNewTab
     }
 
 }
