@@ -27,7 +27,6 @@ class FileDownloadState: NSObject {
         case failedToCreateTemporaryDir
         case failedToGetDownloadsFolder
         case failedToMoveFileToDownloads
-        case failedToCreateTargetFileName
 
     }
 
@@ -69,12 +68,12 @@ class FileDownloadState: NSObject {
                 try fm.moveItem(at: url, to: fileInDownloads)
                 return fileInDownloads.path
             } catch {
-                self.error = FileDownloadError.failedToMoveFileToDownloads
+                // This is expected, as moveItem throws an error if the file already exists
             }
             copy += 1
         }
 
-        error = FileDownloadError.failedToCreateTargetFileName
+        error = FileDownloadError.failedToMoveFileToDownloads
         return nil
     }
 
