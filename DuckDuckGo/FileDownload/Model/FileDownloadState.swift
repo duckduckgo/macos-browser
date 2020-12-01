@@ -90,8 +90,7 @@ extension FileDownloadState: URLSessionDownloadDelegate {
 
     func urlSession(_ session: URLSession, downloadTask: URLSessionDownloadTask, didFinishDownloadingTo location: URL) {
 
-        let fileType = downloadTask.response?.fileType
-        let fileName = download.bestFileName(fileType: fileType)
+        let fileName = download.bestFileName(mimeType: downloadTask.response?.mimeType)
 
         // Don't reassign nil and trigger an event
         if let filePath = moveToTargetFolder(from: location, withFileName: fileName) {
@@ -104,19 +103,6 @@ extension FileDownloadState: URLSessionDownloadDelegate {
                     totalBytesWritten: Int64,
                     totalBytesExpectedToWrite: Int64) {
         bytesDownloaded = totalBytesWritten
-    }
-
-}
-
-extension URLResponse {
-
-    /// Derived from Content-Type if available: e.g. `text/html; charset=UTF-8` becomes `html`
-    var fileType: String? {
-        return contentType?.components(separatedBy: "/").last?.components(separatedBy: ";").first
-    }
-
-    var contentType: String? {
-        return (self as? HTTPURLResponse)?.allHeaderFields["Content-Type"] as? String
     }
 
 }

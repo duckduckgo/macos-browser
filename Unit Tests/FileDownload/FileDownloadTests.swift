@@ -28,34 +28,34 @@ class FileDownloadTests: XCTestCase {
 
     func testWhenFileNameUnknownThenUniqueNameAssignedWithExtension() {
         let download = FileDownload(request: requestWithPath, suggestedName: nil)
-        XCTAssertTrue(download.bestFileName(fileType: "pdf").hasPrefix("example_com_"))
-        XCTAssertTrue(download.bestFileName(fileType: "pdf").hasSuffix(".pdf"))
+        XCTAssertTrue(download.bestFileName(mimeType: "application/pdf").hasPrefix("example_com_"))
+        XCTAssertTrue(download.bestFileName(mimeType: "application/pdf").hasSuffix(".pdf"))
     }
 
     func testWhenFileNameAndFileTypeUnknownThenUniqueNameAssigned() {
         let download = FileDownload(request: requestWithPath, suggestedName: nil)
-        XCTAssertTrue(download.bestFileName(fileType: nil).hasPrefix("example_com_"))
+        XCTAssertTrue(download.bestFileName(mimeType: nil).hasPrefix("example_com_"))
     }
 
     func testWhenFileTypeMatchesThenNoExtensionDuplicationOccurs() {
         let download = FileDownload(request: requestWithFileName, suggestedName: nil)
-        XCTAssertEqual("file.html", download.bestFileName(fileType: "html"))
+        XCTAssertEqual("file.html", download.bestFileName(mimeType: "text/html"))
     }
 
     func testWhenFileTypeDoesNotMatchURLFileThenFileTypeUsedForExtension() {
         let download = FileDownload(request: requestWithFileName, suggestedName: nil)
-        XCTAssertEqual("file.html.pdf", download.bestFileName(fileType: "pdf"))
+        XCTAssertEqual("file.html.pdf", download.bestFileName(mimeType: "application/pdf"))
     }
 
     func testWhenSuggestedNameNotPresentAndURLHasFileNameThenFileNameIsBest() {
         let download = FileDownload(request: requestWithFileName, suggestedName: nil)
-        XCTAssertEqual("file.html", download.bestFileName(fileType: nil))
+        XCTAssertEqual("file.html", download.bestFileName(mimeType: nil))
     }
 
     func testWhenSuggestedNamePresentThenSuggestedIsBest() {
         let download = FileDownload(request: requestWithFileName, suggestedName: "suggested.ext")
-        XCTAssertEqual("suggested.ext", download.bestFileName(fileType: nil))
-        XCTAssertEqual("suggested.ext", download.bestFileName(fileType: "pdf"))
+        XCTAssertEqual("suggested.ext", download.bestFileName(mimeType: nil))
+        XCTAssertEqual("suggested.ext", download.bestFileName(mimeType: "application/pdf"))
     }
 
 }
