@@ -55,7 +55,9 @@ class FileDownloadState: NSObject {
 
         let fm = FileManager.default
         let folders = fm.urls(for: .downloadsDirectory, in: .userDomainMask)
-        guard let folderUrl = folders.first else {
+        guard let folderUrl = folders.first,
+              let resolvedFolderUrl = try? URL(resolvingAliasFileAt: folderUrl),
+              fm.isWritableFile(atPath: resolvedFolderUrl.path) else {
             error = FileDownloadError.failedToGetDownloadsFolder
             return nil
         }
