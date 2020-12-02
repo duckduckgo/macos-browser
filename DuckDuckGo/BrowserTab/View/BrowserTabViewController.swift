@@ -162,45 +162,12 @@ extension BrowserTabViewController: TabDelegate {
     }
 
     func tab(_ tab: Tab, requestedContextMenuAt position: NSPoint, forElements elements: [ContextMenuElement]) {
-        var menuItems = [NSMenuItem]()
-
-        if elements.isEmpty {
-            menuItems.append(.contextMenuBack)
-            menuItems.append(.contextMenuForward)
-            menuItems.append(.contextMenuReload)
-        } else {
-
-            // images are first in the list, but we want them at the end of the menu
-            elements.reversed().forEach {
-                if !menuItems.isEmpty {
-                    menuItems.append(.separator())
-                }
-
-                switch $0 {
-
-                case .link(let url):
-                    NSMenuItem.linkContextMenuItems.forEach {
-                        ($0 as? URLContextMenuItem)?.url = url
-                        menuItems.append($0)
-                    }
-
-                case .image(let url):
-                    NSMenuItem.imageContextMenuItems.forEach {
-                        ($0 as? URLContextMenuItem)?.url = url
-                        menuItems.append($0)
-                    }
-
-                }
-            }
-        }
-
-        let menu = NSMenu()
-        menu.delegate = self
-        menuItems.forEach { menu.addItem($0) }
         view.window?.makeKey()
         view.window?.makeFirstResponder(self) // we want this controller to handle actions first, before the parent controller
-        menu.popUp(positioning: nil, at: view.convert(position, from: webView), in: view)
 
+        let menu = NSMenu.contextMenu(forElements: elements)
+        menu.delegate = self
+        menu.popUp(positioning: nil, at: view.convert(position, from: webView), in: view)
     }
 
 }

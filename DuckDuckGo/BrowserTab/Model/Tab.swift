@@ -67,7 +67,7 @@ class Tab: NSObject {
 
     // Used as the request context for HTML 5 downloads
     private var lastMainFrameRequest: URLRequest?
-    
+
     var isHomepageLoaded: Bool {
         url == nil || url == URL.emptyPage
     }
