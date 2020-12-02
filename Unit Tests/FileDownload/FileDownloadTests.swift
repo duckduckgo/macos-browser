@@ -25,16 +25,24 @@ class FileDownloadTests: XCTestCase {
 
     let requestWithFileName = URLRequest(url: URL(string: "https://www.example.com/file.html")!)
     let requestWithPath = URLRequest(url: URL(string: "https://www.example.com/")!)
+    let requestWithLongerPath = URLRequest(url: URL(string: "https://www.example.com/Guitar")!)
+
+    func testWhenPathAvailableThenCombineWithMimeTypeForBestName() {
+        let download = FileDownload(request: requestWithLongerPath, suggestedName: nil)
+        XCTAssertEqual("Guitar.html", download.bestFileName(mimeType: "text/html"))
+    }
 
     func testWhenFileNameUnknownThenUniqueNameAssignedWithExtension() {
         let download = FileDownload(request: requestWithPath, suggestedName: nil)
-        XCTAssertTrue(download.bestFileName(mimeType: "application/pdf").hasPrefix("example_com_"))
-        XCTAssertTrue(download.bestFileName(mimeType: "application/pdf").hasSuffix(".pdf"))
+        let fileName = download.bestFileName(mimeType: "application/pdf")
+        XCTAssertTrue(fileName.hasPrefix("example_com_"))
+        XCTAssertTrue(fileName.hasSuffix(".pdf"))
     }
 
     func testWhenFileNameAndFileTypeUnknownThenUniqueNameAssigned() {
         let download = FileDownload(request: requestWithPath, suggestedName: nil)
-        XCTAssertTrue(download.bestFileName(mimeType: nil).hasPrefix("example_com_"))
+        let fileName = download.bestFileName(mimeType: nil)
+        XCTAssertTrue(fileName.hasPrefix("example_com_"))
     }
 
     func testWhenFileTypeMatchesThenNoExtensionDuplicationOccurs() {

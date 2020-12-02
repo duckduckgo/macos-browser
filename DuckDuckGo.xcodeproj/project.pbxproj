@@ -34,7 +34,7 @@
 		8556A60E256C15DD0092FA9D /* FileDownload.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8556A60D256C15DD0092FA9D /* FileDownload.swift */; };
 		856C98A6256EB59600A22F1F /* NSMenuItem+ContextMenuItems.swift in Sources */ = {isa = PBXBuildFile; fileRef = 856C98A5256EB59600A22F1F /* NSMenuItem+ContextMenuItems.swift */; };
 		856C98D52570116900A22F1F /* NSWindow+Toast.swift in Sources */ = {isa = PBXBuildFile; fileRef = 856C98D42570116900A22F1F /* NSWindow+Toast.swift */; };
-		856C98DA2570149800A22F1F /* FileDownloadState.swift in Sources */ = {isa = PBXBuildFile; fileRef = 856C98D92570149800A22F1F /* FileDownloadState.swift */; };
+		856C98DA2570149800A22F1F /* FileDownloadTask.swift in Sources */ = {isa = PBXBuildFile; fileRef = 856C98D92570149800A22F1F /* FileDownloadTask.swift */; };
 		856C98DF257014BD00A22F1F /* FileDownloadManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 856C98DE257014BD00A22F1F /* FileDownloadManager.swift */; };
 		85AE2FF224A33A2D002D507F /* WebKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 85AE2FF124A33A2D002D507F /* WebKit.framework */; };
 		85D438B6256E7C9E00F3BAF8 /* ContextMenuUserScript.swift in Sources */ = {isa = PBXBuildFile; fileRef = 85D438B5256E7C9E00F3BAF8 /* ContextMenuUserScript.swift */; };
@@ -163,7 +163,7 @@
 		8556A60D256C15DD0092FA9D /* FileDownload.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FileDownload.swift; sourceTree = "<group>"; };
 		856C98A5256EB59600A22F1F /* NSMenuItem+ContextMenuItems.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "NSMenuItem+ContextMenuItems.swift"; sourceTree = "<group>"; };
 		856C98D42570116900A22F1F /* NSWindow+Toast.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "NSWindow+Toast.swift"; sourceTree = "<group>"; };
-		856C98D92570149800A22F1F /* FileDownloadState.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FileDownloadState.swift; sourceTree = "<group>"; };
+		856C98D92570149800A22F1F /* FileDownloadTask.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FileDownloadTask.swift; sourceTree = "<group>"; };
 		856C98DE257014BD00A22F1F /* FileDownloadManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FileDownloadManager.swift; sourceTree = "<group>"; };
 		85AE2FF124A33A2D002D507F /* WebKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = WebKit.framework; path = System/Library/Frameworks/WebKit.framework; sourceTree = SDKROOT; };
 		85D438B5256E7C9E00F3BAF8 /* ContextMenuUserScript.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContextMenuUserScript.swift; sourceTree = "<group>"; };
@@ -372,7 +372,7 @@
 			isa = PBXGroup;
 			children = (
 				8556A60D256C15DD0092FA9D /* FileDownload.swift */,
-				856C98D92570149800A22F1F /* FileDownloadState.swift */,
+				856C98D92570149800A22F1F /* FileDownloadTask.swift */,
 				856C98DE257014BD00A22F1F /* FileDownloadManager.swift */,
 			);
 			path = Model;
@@ -1043,7 +1043,7 @@
 				AAA0CC33252F181A0079BC96 /* NavigationButtonMenuDelegate.swift in Sources */,
 				AA512D1424D99D9800230283 /* FaviconService.swift in Sources */,
 				AABEE6AB24ACA0F90043105B /* SuggestionTableRowView.swift in Sources */,
-				856C98DA2570149800A22F1F /* FileDownloadState.swift in Sources */,
+				856C98DA2570149800A22F1F /* FileDownloadTask.swift in Sources */,
 				AA5D6DAC24A340F700C6FBCE /* WebViewStateObserver.swift in Sources */,
 				AABEE6AF24AD22B90043105B /* AddressBarTextField.swift in Sources */,
 				855303282577C0BF0029327F /* NSMenu+ContextMenu.swift in Sources */,

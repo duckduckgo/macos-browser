@@ -56,7 +56,9 @@ struct FileDownload {
 
     /// Tries to use the file name part of the URL, if available, adjusting for content type, if available.
     func fileNameFromURL(mimeType: String?) -> String? {
-        guard let url = request.url, !url.pathExtension.isEmpty else { return nil }
+        guard let url = request.url,
+              !url.pathComponents.isEmpty,
+              url.pathComponents != [ "/" ] else { return nil }
 
         if let mimeType = mimeType,
            hasMatchingMimeType(mimeType, extension: url.pathExtension) {

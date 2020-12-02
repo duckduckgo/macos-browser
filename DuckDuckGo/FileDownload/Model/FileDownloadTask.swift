@@ -1,5 +1,5 @@
 //
-//  FileDownloadState.swift
+//  FileDownloadTask.swift
 //
 //  Copyright © 2020 DuckDuckGo. All rights reserved.
 //
@@ -17,8 +17,9 @@
 //
 
 import Combine
+import os
 
-class FileDownloadState: NSObject {
+class FileDownloadTask: NSObject {
 
     enum FileDownloadError: Error {
 
@@ -27,6 +28,7 @@ class FileDownloadState: NSObject {
         case failedToCreateTemporaryDir
         case failedToGetDownloadsFolder
         case failedToMoveFileToDownloads
+        case failedToCompleteDownloadTask
 
     }
 
@@ -88,7 +90,12 @@ class FileDownloadState: NSObject {
 
 }
 
-extension FileDownloadState: URLSessionDownloadDelegate {
+extension FileDownloadTask: URLSessionDownloadDelegate {
+
+    func urlSession(_ session: URLSession, task: URLSessionTask, didCompleteWithError error: Error?) {
+        os_log("download task failed %s", type: .error, error?.localizedDescription ?? "")
+        self.error = FileDownloadError.failedToCompleteDownloadTask
+    }
 
     func urlSession(_ session: URLSession, downloadTask: URLSessionDownloadTask, didFinishDownloadingTo location: URL) {
 

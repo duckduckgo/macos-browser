@@ -63,7 +63,7 @@ class Tab: NSObject {
     @Published var hasError: Bool = false
 
     // Used to track if an error was caused by a download navigation.
-    private var download: FileDownload?
+    private var currentDownload: FileDownload?
 
     // Used as the request context for HTML 5 downloads
     private var lastMainFrameRequest: URLRequest?
@@ -200,7 +200,7 @@ extension Tab: WKNavigationDelegate {
 
         if navigationAction.isTargetingMainFrame() {
             lastMainFrameRequest = navigationAction.request
-            download = nil
+            currentDownload = nil
         }
 
         let isCommandPressed = NSApp.currentEvent?.modifierFlags.contains(.command) ?? false
@@ -256,7 +256,7 @@ extension Tab: WKNavigationDelegate {
             let download = FileDownload(request: request, suggestedName: navigationResponse.response.suggestedFilename)
             delegate?.tab(self, requestedFileDownload: download)
             // Flag this here, because interrupting the frame load will cause an error and we need to know
-            self.download = download
+            self.currentDownload = download
             return .cancel
         }
 
@@ -279,9 +279,9 @@ extension Tab: WKNavigationDelegate {
     }
 
     func webView(_ webView: WKWebView, didFailProvisionalNavigation navigation: WKNavigation!, withError error: Error) {
-        if download != nil && (error as NSError).code == ErrorCodes.frameLoadInterrupted {
-            // This error was most likely due to a download.
-            download = nil
+        if currentDownload != nil && (error as NSError).code == ErrorCodes.frameLoadInterrupted {
+            currentDownload = nil
+            os_log("didFailProvisionalNavigation due to download %s", type: .debug, currentDownload?.request.url?.absoluteString ?? "")
             return
         }
 

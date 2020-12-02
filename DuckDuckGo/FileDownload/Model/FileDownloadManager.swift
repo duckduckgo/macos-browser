@@ -26,11 +26,11 @@ class FileDownloadManager {
     private init() { }
 
     private var subscriptions = Set<AnyCancellable>()
-    private (set) var downloads = Set<FileDownloadState>()
+    private (set) var downloads = Set<FileDownloadTask>()
 
     @discardableResult
-    func startDownload(_ download: FileDownload) -> FileDownloadState {
-        let state = FileDownloadState(download: download)
+    func startDownload(_ download: FileDownload) -> FileDownloadTask {
+        let state = FileDownloadTask(download: download)
 
         state.$filePath.receive(on: DispatchQueue.main).compactMap { $0 }.sink { filePath in
 
