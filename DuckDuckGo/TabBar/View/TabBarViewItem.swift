@@ -35,8 +35,27 @@ class TabBarViewItem: NSCollectionViewItem {
     }
 
     enum Width: CGFloat {
-        case minimum = 80
+        case minimum = 50
+        case minimumSelected = 120
         case maximum = 240
+    }
+
+    enum WidthStage {
+        case full
+        case withoutCloseButton
+        case withoutTitle
+
+        init(width: CGFloat) {
+            switch width {
+            case 0..<61: self = .withoutTitle
+            case 61..<120: self = .withoutCloseButton
+            default: self = .full
+            }
+        }
+
+        var isTitleHidden: Bool { self == .withoutTitle }
+        var isCloseButtonHidden: Bool { self != .full }
+        var isFaviconCentered: Bool { !isTitleHidden }
     }
 
     enum TextFieldMaskGradientSize: CGFloat {
@@ -66,6 +85,8 @@ class TabBarViewItem: NSCollectionViewItem {
     @IBOutlet weak var rightSeparatorView: ColorView!
     @IBOutlet weak var loadingView: TabLoadingView!
     @IBOutlet weak var mouseOverView: MouseOverView!
+    @IBOutlet weak var tabLoadingViewCenterConstraint: NSLayoutConstraint!
+    @IBOutlet weak var tabLoadingViewLeadingConstraint: NSLayoutConstraint!
 
     private let titleTextFieldMaskLayer = CAGradientLayer()
 
@@ -162,12 +183,23 @@ class TabBarViewItem: NSCollectionViewItem {
     }
 
     private func updateSubviews() {
+        let widthStage: WidthStage
+        if isSelected || isDragged {
+            widthStage = .full
+        } else {
+            widthStage = WidthStage(width: view.bounds.size.width)
+        }
+
         let backgroundColor = isSelected || isDragged ? NSColor(named: "InterfaceBackgroundColor") : NSColor.clear
         view.layer?.backgroundColor = backgroundColor?.cgColor
         mouseOverView.mouseOverColor = isSelected || isDragged ? NSColor.clear : NSColor(named: "TabMouseOverColor")
 
         rightSeparatorView.isHidden = isSelected || isDragged
-        closeButton.isHidden = !isSelected && !isDragged && view.bounds.size.width == Width.minimum.rawValue
+        closeButton.isHidden = !isSelected && !isDragged && widthStage.isCloseButtonHidden
+        titleTextField.isHidden = widthStage.isTitleHidden
+
+        tabLoadingViewCenterConstraint.priority = widthStage.isTitleHidden && widthStage.isCloseButtonHidden ? .defaultHigh : .defaultLow
+        tabLoadingViewLeadingConstraint.priority = widthStage.isTitleHidden && widthStage.isCloseButtonHidden ? .defaultLow : .defaultHigh
     }
 
     private func setupMenu() {
