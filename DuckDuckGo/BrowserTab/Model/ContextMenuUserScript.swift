@@ -20,13 +20,16 @@ import WebKit
 
 protocol ContextMenuDelegate: AnyObject {
 
-    func contextMenuUserScript(_ script: ContextMenuUserScript, showContextMenuAt position: NSPoint, forElements elements: [ContextMenuElement])
+    func contextMenu(forUserScript script: ContextMenuUserScript, willShowAt position: NSPoint, image: URL?, link: URL?)
 
 }
 
 class ContextMenuUserScript: UserScript {
 
     weak var delegate: ContextMenuDelegate?
+
+    var lastAnchor: URL?
+    var lastImage: URL?
 
     init() {
         super.init(source: Self.source,
@@ -38,11 +41,29 @@ class ContextMenuUserScript: UserScript {
     override func userContentController(_ userContentController: WKUserContentController, didReceive message: WKScriptMessage) {
 
         guard let dict = message.body as? [String: Any],
-              let point = point(from: dict)
-              else { return }
+              let point = point(from: dict) else { return }
 
-        delegate?.contextMenuUserScript(self, showContextMenuAt: point, forElements: elements(from: dict))
+        var image: URL?
+        var link: URL?
 
+        guard let elements = dict["elements"] as? [[String: String]] else { return }
+        elements.forEach { dict in
+
+            guard let url = dict["url"] else { return }
+
+            switch dict["tagName"] {
+            case "A":
+                link = URL(string: url)
+
+            case "IMG":
+                image = URL(string: url)
+
+            default: break
+            }
+        }
+
+        print("***", #function, lastAnchor as Any, lastImage as Any)
+        delegate?.contextMenu(forUserScript: self, willShowAt: point, image: image, link: link)
     }
 
     private func point(from dict: [String: Any]) -> NSPoint? {
@@ -50,25 +71,6 @@ class ContextMenuUserScript: UserScript {
               let x = position["x"],
               let y = position["y"] else { return nil }
         return NSPoint(x: x, y: y)
-    }
-
-    private func elements(from dict: [String: Any]) -> [ContextMenuElement] {
-        guard let elements = dict["elements"] as? [[String: String]] else { return [] }
-        return elements.compactMap { dict -> ContextMenuElement? in
-            guard let urlString = dict["url"],
-                  let url = URL(string: urlString) else { return nil }
-
-            switch dict["tagName"] {
-            case "A":
-                return .link(url: url)
-
-            case "IMG":
-                return .image(url: url)
-
-            default:
-                return nil
-            }
-        }
     }
 
 }
@@ -98,14 +100,6 @@ extension ContextMenuUserScript {
     }
 
     document.addEventListener("contextmenu", function(e) {
-
-        // Allow context menu for PDFs
-        if (document.contentType.endsWith("/pdf") && document.plugins.length > 0) {
-            return;
-        }
-
-        // Otherwise, never show the default context menu to avoid user confusion, even if something goes wrong after this.
-        e.preventDefault();
 
         var context = {
             "position": {

@@ -46,4 +46,17 @@ class FileDownloadManager {
         return state
     }
 
+    func saveDataToFile(_ data: Data, withSuggestedFileName suggestedFile: String, mimeType: String) {
+
+        let fm = FileManager.default
+        let temp = fm.temporaryDirectory.appendingPathComponent(UUID().uuidString)
+        guard fm.createFile(atPath: temp.path, contents: data, attributes: nil) else { return }
+
+        if let path = temp.moveToDownloadsFolder(withFileName: suggestedFile) {
+            let file = URL(fileURLWithPath: path)
+            NSWorkspace.shared.activateFileViewerSelecting([file])
+        }
+
+    }
+
 }

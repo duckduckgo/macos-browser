@@ -26,7 +26,6 @@ class FileDownloadTask: NSObject {
         case restartResumeNotSupported
         case failedToCreateTemporaryFile
         case failedToCreateTemporaryDir
-        case failedToGetDownloadsFolder
         case failedToMoveFileToDownloads
         case failedToCompleteDownloadTask
 
@@ -52,41 +51,6 @@ class FileDownloadTask: NSObject {
         session = URLSession(configuration: .default, delegate: self, delegateQueue: .main)
         session?.downloadTask(with: download.request).resume()
     }
-    
-    private func moveToTargetFolder(from url: URL, withFileName fileName: String) -> String? {
-
-        let fm = FileManager.default
-        let folders = fm.urls(for: .downloadsDirectory, in: .userDomainMask)
-        guard let folderUrl = folders.first,
-              let resolvedFolderUrl = try? URL(resolvingAliasFileAt: folderUrl),
-              fm.isWritableFile(atPath: resolvedFolderUrl.path) else {
-            error = FileDownloadError.failedToGetDownloadsFolder
-            return nil
-        }
-
-        var copy = 0
-        while copy < 1000 { // If it gets to 1000 of these then chances are something else is wrong
-
-            let fileInDownloads = incrementFileName(in: folderUrl, named: fileName, copy: copy)
-            do {
-                try fm.moveItem(at: url, to: fileInDownloads)
-                return fileInDownloads.path
-            } catch {
-                // This is expected, as moveItem throws an error if the file already exists
-            }
-            copy += 1
-        }
-
-        error = FileDownloadError.failedToMoveFileToDownloads
-        return nil
-    }
-
-    private func incrementFileName(in folder: URL, named name: String, copy: Int) -> URL {
-        // Zero means we haven't tried anything yet, so use the suggested name.  Otherwise, simply prefix the file name with the copy number.
-        let path = copy == 0 ? name : "\(copy)_\(name)"
-        let file = folder.appendingPathComponent(path)
-        return file
-    }
 
 }
 
@@ -102,9 +66,12 @@ extension FileDownloadTask: URLSessionDownloadDelegate {
         let fileName = download.bestFileName(mimeType: downloadTask.response?.mimeType)
 
         // Don't reassign nil and trigger an event
-        if let filePath = moveToTargetFolder(from: location, withFileName: fileName) {
+        if let filePath = location.moveToDownloadsFolder(withFileName: fileName) {
             self.filePath = filePath
+        } else {
+            error = FileDownloadError.failedToMoveFileToDownloads
         }
+
     }
 
     func urlSession(_ session: URLSession, downloadTask: URLSessionDownloadTask,

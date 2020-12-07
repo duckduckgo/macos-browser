@@ -31,6 +31,8 @@ class BrowserTabViewController: NSViewController {
     private var urlCancellable: AnyCancellable?
     private var selectedTabViewModelCancellable: AnyCancellable?
     private var isErrorViewVisibleCancellable: AnyCancellable?
+    private var contextMenuLink: URL?
+    private var contextMenuImage: URL?
 
     required init?(coder: NSCoder) {
         fatalError("BrowserTabViewController: Bad initializer")
@@ -161,79 +163,68 @@ extension BrowserTabViewController: TabDelegate {
         //  Safari closes new tabs that were opened and then create a download instantly.  Should we do the same?
     }
 
-    func tab(_ tab: Tab, requestedContextMenuAt position: NSPoint, forElements elements: [ContextMenuElement]) {
-        view.window?.makeKey()
-        view.window?.makeFirstResponder(self) // we want this controller to handle actions first, before the parent controller
-
-        let menu = NSMenu.contextMenu(forElements: elements)
-        menu.delegate = self
-        menu.popUp(positioning: nil, at: view.convert(position, from: webView), in: view)
-    }
-
-}
-
-extension BrowserTabViewController: NSMenuDelegate {
-
-    func menuWillOpen(_ menu: NSMenu) {
-        NSMenuItem.contextMenuBack.isHidden = !(tabViewModel?.canGoBack ?? false)
-        NSMenuItem.contextMenuForward.isHidden = !(tabViewModel?.canGoForward ?? false)
-        NSMenuItem.contextMenuReload.isHidden = !(tabViewModel?.canReload ?? false)
+    func tab(_ tab: Tab, willShowContextMenuAt position: NSPoint, image: URL?, link: URL?) {
+        contextMenuImage = image
+        contextMenuLink = link
     }
 
 }
 
 extension BrowserTabViewController: LinkMenuItemSelectors {
 
-    func openLinkInNewTab(_ sender: URLContextMenuItem) {
-        openNewTab(with: sender.url)
+    func openLinkInNewTab(_ sender: NSMenuItem) {
+        guard let url = contextMenuLink else { return }
+        openNewTab(with: url)
     }
 
-    func openLinkInNewWindow(_ sender: URLContextMenuItem) {
-        WindowsManager.openNewWindow(with: sender.url)
+    func openLinkInNewWindow(_ sender: NSMenuItem) {
+        guard let url = contextMenuLink else { return }
+        WindowsManager.openNewWindow(with: url)
     }
 
-    func downloadLinkedFile(_ sender: URLContextMenuItem) {
+    func downloadLinkedFile(_ sender: NSMenuItem) {
         guard let tab = tabCollectionViewModel.selectedTabViewModel?.tab,
-              let url = sender.url else { return }
+              let url = contextMenuLink else { return }
 
         self.tab(tab, requestedFileDownload: FileDownload(request: URLRequest(url: url), suggestedName: nil))
-    }
-
-    func copyLink(_ sender: URLContextMenuItem) {
-        guard let url = sender.url?.absoluteString else { return }
-        NSPasteboard.general.clearContents()
-        NSPasteboard.general.setString(url, forType: .URL)
     }
 
 }
 
 extension BrowserTabViewController: ImageMenuItemSelectors {
 
-    func openImageInNewTab(_ sender: URLContextMenuItem) {
-        openNewTab(with: sender.url)
+    func openImageInNewTab(_ sender: NSMenuItem) {
+        guard let url = contextMenuImage else { return }
+        openNewTab(with: url)
     }
 
-    func openImageInNewWindow(_ sender: URLContextMenuItem) {
-        WindowsManager.openNewWindow(with: sender.url)
+    func openImageInNewWindow(_ sender: NSMenuItem) {
+        guard let url = contextMenuImage else { return }
+        WindowsManager.openNewWindow(with: url)
     }
 
-    func saveImageToDownloads(_ sender: URLContextMenuItem) {
+    func saveImageToDownloads(_ sender: NSMenuItem) {
         guard let tab = tabCollectionViewModel.selectedTabViewModel?.tab,
-              let url = sender.url else { return }
+              let url = contextMenuImage else { return }
 
         self.tab(tab, requestedFileDownload: FileDownload(request: URLRequest(url: url), suggestedName: nil))
     }
 
-    func copyImageAddress(_ sender: URLContextMenuItem) {
-        guard let url = sender.url?.absoluteString else { return }
+    func copyImageAddress(_ sender: NSMenuItem) {
+        guard let url = contextMenuImage else { return }
         NSPasteboard.general.clearContents()
-        NSPasteboard.general.setString(url, forType: .URL)
-
+        NSPasteboard.general.setString(url.absoluteString, forType: .URL)
     }
 
 }
 
 extension BrowserTabViewController: WKUIDelegate {
+
+    // swiftlint:disable identifier_name
+    @objc func _webView(_ webView: WKWebView, saveDataToFile data: NSData, suggestedFilename: NSString, mimeType: NSString, originatingURL: NSURL) {
+        FileDownloadManager.shared.saveDataToFile(data as Data, withSuggestedFileName: suggestedFilename as String, mimeType: mimeType as String)
+    }
+    // swiftlint:enable identifier_name
 
     func webView(_ webView: WKWebView,
                  createWebViewWith configuration: WKWebViewConfiguration,

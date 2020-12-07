@@ -25,7 +25,7 @@ protocol TabDelegate: class {
     func tabDidStartNavigation(_ tab: Tab)
     func tab(_ tab: Tab, requestedNewTab url: URL?)
     func tab(_ tab: Tab, requestedFileDownload download: FileDownload)
-    func tab(_ tab: Tab, requestedContextMenuAt position: NSPoint, forElements elements: [ContextMenuElement])
+    func tab(_ tab: Tab, willShowContextMenuAt position: NSPoint, image: URL?, link: URL?)
 
 }
 
@@ -154,8 +154,8 @@ class Tab: NSObject {
 
 extension Tab: ContextMenuDelegate {
 
-    func contextMenuUserScript(_ script: ContextMenuUserScript, showContextMenuAt position: NSPoint, forElements elements: [ContextMenuElement]) {
-        delegate?.tab(self, requestedContextMenuAt: position, forElements: elements)
+    func contextMenu(forUserScript script: ContextMenuUserScript, willShowAt position: NSPoint, image: URL?, link: URL?) {
+        delegate?.tab(self, willShowContextMenuAt: position, image: image, link: link)
     }
 
 }
