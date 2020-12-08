@@ -24,6 +24,8 @@ protocol TabDelegate: class {
 
     func tabDidStartNavigation(_ tab: Tab)
     func tab(_ tab: Tab, requestedNewTab url: URL?)
+    func tab(_ tab: Tab, requestedFileDownload download: FileDownload)
+    func tab(_ tab: Tab, willShowContextMenuAt position: NSPoint, image: URL?, link: URL?)
 
 }
 
@@ -59,6 +61,12 @@ class Tab: NSObject {
 
     @Published var title: String?
     @Published var hasError: Bool = false
+
+    // Used to track if an error was caused by a download navigation.
+    private var currentDownload: FileDownload?
+
+    // Used as the request context for HTML 5 downloads
+    private var lastMainFrameRequest: URLRequest?
 
     var isHomepageLoaded: Bool {
         url == nil || url == URL.emptyPage
@@ -123,10 +131,41 @@ class Tab: NSObject {
     // MARK: - User Scripts
 
     let faviconScript = FaviconUserScript()
+    let html5downloadScript = HTML5DownloadUserScript()
+    let contextMenuScript = ContextMenuUserScript()
+
+    lazy var userScripts = [
+        self.faviconScript,
+        self.html5downloadScript,
+        self.contextMenuScript
+    ]
 
     private func setupUserScripts() {
         faviconScript.delegate = self
-        webView.configuration.userContentController.add(userScript: faviconScript)
+        html5downloadScript.delegate = self
+        contextMenuScript.delegate = self
+
+        userScripts.forEach {
+            webView.configuration.userContentController.add(userScript: $0)
+        }
+    }
+
+}
+
+extension Tab: ContextMenuDelegate {
+
+    func contextMenu(forUserScript script: ContextMenuUserScript, willShowAt position: NSPoint, image: URL?, link: URL?) {
+        delegate?.tab(self, willShowContextMenuAt: position, image: image, link: link)
+    }
+
+}
+
+extension Tab: HTML5DownloadDelegate {
+
+    func startDownload(_ userScript: HTML5DownloadUserScript, from url: URL, withSuggestedName name: String) {
+        var request = lastMainFrameRequest ?? URLRequest(url: url)
+        request.url = url
+        delegate?.tab(self, requestedFileDownload: FileDownload(request: request, suggestedName: name))
     }
 
 }
@@ -151,9 +190,18 @@ extension Tab: FaviconUserScriptDelegate {
 
 extension Tab: WKNavigationDelegate {
 
+    struct ErrorCodes {
+        static let frameLoadInterrupted = 102
+    }
+
     func webView(_ webView: WKWebView,
                  decidePolicyFor navigationAction: WKNavigationAction,
                  decisionHandler: @escaping (WKNavigationActionPolicy) -> Void) {
+
+        if navigationAction.isTargetingMainFrame() {
+            lastMainFrameRequest = navigationAction.request
+            currentDownload = nil
+        }
 
         let isCommandPressed = NSApp.currentEvent?.modifierFlags.contains(.command) ?? false
         let isLinkActivated = navigationAction.navigationType == .linkActivated
@@ -189,6 +237,32 @@ extension Tab: WKNavigationDelegate {
         }
     }
 
+    func webView(_ webView: WKWebView,
+                 decidePolicyFor navigationResponse: WKNavigationResponse,
+                 decisionHandler: @escaping (WKNavigationResponsePolicy) -> Void) {
+
+        let policy = navigationResponsePolicyForDownloads(navigationResponse)
+        decisionHandler(policy)
+
+    }
+
+    private func navigationResponsePolicyForDownloads(_ navigationResponse: WKNavigationResponse) -> WKNavigationResponsePolicy {
+        guard navigationResponse.isForMainFrame else {
+            return .allow
+        }
+
+        if (!navigationResponse.canShowMIMEType || navigationResponse.shouldDownload),
+           let request = lastMainFrameRequest {
+            let download = FileDownload(request: request, suggestedName: navigationResponse.response.suggestedFilename)
+            delegate?.tab(self, requestedFileDownload: download)
+            // Flag this here, because interrupting the frame load will cause an error and we need to know
+            self.currentDownload = download
+            return .cancel
+        }
+
+        return .allow
+    }
+
     func webView(_ webView: WKWebView, didStartProvisionalNavigation navigation: WKNavigation!) {
         delegate?.tabDidStartNavigation(self)
 
@@ -197,7 +271,6 @@ extension Tab: WKNavigationDelegate {
     }
 
     func webView(_ webView: WKWebView, didFinish navigation: WKNavigation!) {
-
     }
 
     func webView(_ webView: WKWebView, didFail navigation: WKNavigation!, withError error: Error) {
@@ -206,6 +279,12 @@ extension Tab: WKNavigationDelegate {
     }
 
     func webView(_ webView: WKWebView, didFailProvisionalNavigation navigation: WKNavigation!, withError error: Error) {
+        if currentDownload != nil && (error as NSError).code == ErrorCodes.frameLoadInterrupted {
+            currentDownload = nil
+            os_log("didFailProvisionalNavigation due to download %s", type: .debug, currentDownload?.request.url?.absoluteString ?? "")
+            return
+        }
+
         hasError = true
     }
 
@@ -220,4 +299,17 @@ fileprivate extension WKWebViewConfiguration {
         return configuration
     }
 
+}
+
+fileprivate extension WKNavigationResponse {
+    var shouldDownload: Bool {
+        let contentDisposition = (response as? HTTPURLResponse)?.allHeaderFields["Content-Disposition"] as? String
+        return contentDisposition?.hasPrefix("attachment") ?? false
+    }
+}
+
+fileprivate extension WKNavigationAction {
+    func isTargetingMainFrame() -> Bool {
+        return targetFrame?.isMainFrame ?? false
+    }
 }

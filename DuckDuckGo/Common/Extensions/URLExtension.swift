@@ -169,4 +169,41 @@ extension URL {
         return components.url
     }
 
+    // MARK: - File Downloads
+
+    func moveToDownloadsFolder(withFileName fileName: String) -> String? {
+
+        func incrementFileName(in folder: URL, named name: String, copy: Int) -> URL {
+            // Zero means we haven't tried anything yet, so use the suggested name.  Otherwise, simply prefix the file name with the copy number.
+            let path = copy == 0 ? name : "\(copy)_\(name)"
+            let file = folder.appendingPathComponent(path)
+            return file
+        }
+
+        let fm = FileManager.default
+        let folders = fm.urls(for: .downloadsDirectory, in: .userDomainMask)
+        guard let folderUrl = folders.first,
+              let resolvedFolderUrl = try? URL(resolvingAliasFileAt: folderUrl),
+              fm.isWritableFile(atPath: resolvedFolderUrl.path) else {
+            os_log("Failed to access Downloads folder")
+            return nil
+        }
+
+        var copy = 0
+        while copy < 1000 { // If it gets to 1000 of these then chances are something else is wrong
+
+            let fileInDownloads = incrementFileName(in: folderUrl, named: fileName, copy: copy)
+            do {
+                try fm.moveItem(at: self, to: fileInDownloads)
+                return fileInDownloads.path
+            } catch {
+                // This is expected, as moveItem throws an error if the file already exists
+            }
+            copy += 1
+        }
+
+        os_log("Failed to move file to Downloads folder, attempt %d", type: .error, copy)
+        return nil
+    }
+
 }

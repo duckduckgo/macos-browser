@@ -31,6 +31,8 @@ class BrowserTabViewController: NSViewController {
     private var urlCancellable: AnyCancellable?
     private var selectedTabViewModelCancellable: AnyCancellable?
     private var isErrorViewVisibleCancellable: AnyCancellable?
+    private var contextMenuLink: URL?
+    private var contextMenuImage: URL?
 
     required init?(coder: NSCoder) {
         fatalError("BrowserTabViewController: Bad initializer")
@@ -153,9 +155,76 @@ extension BrowserTabViewController: TabDelegate {
         openNewTab(with: url)
     }
 
+    func tab(_ tab: Tab, requestedFileDownload download: FileDownload) {
+        FileDownloadManager.shared.startDownload(download)
+
+        // Note this can result in tabs being left open, e.g. download button on this page:
+        // https://en.wikipedia.org/wiki/Guitar#/media/File:GuitareClassique5.png
+        //  Safari closes new tabs that were opened and then create a download instantly.  Should we do the same?
+    }
+
+    func tab(_ tab: Tab, willShowContextMenuAt position: NSPoint, image: URL?, link: URL?) {
+        contextMenuImage = image
+        contextMenuLink = link
+    }
+
+}
+
+extension BrowserTabViewController: LinkMenuItemSelectors {
+
+    func openLinkInNewTab(_ sender: NSMenuItem) {
+        guard let url = contextMenuLink else { return }
+        openNewTab(with: url)
+    }
+
+    func openLinkInNewWindow(_ sender: NSMenuItem) {
+        guard let url = contextMenuLink else { return }
+        WindowsManager.openNewWindow(with: url)
+    }
+
+    func downloadLinkedFile(_ sender: NSMenuItem) {
+        guard let tab = tabCollectionViewModel.selectedTabViewModel?.tab,
+              let url = contextMenuLink else { return }
+
+        self.tab(tab, requestedFileDownload: FileDownload(request: URLRequest(url: url), suggestedName: nil))
+    }
+
+}
+
+extension BrowserTabViewController: ImageMenuItemSelectors {
+
+    func openImageInNewTab(_ sender: NSMenuItem) {
+        guard let url = contextMenuImage else { return }
+        openNewTab(with: url)
+    }
+
+    func openImageInNewWindow(_ sender: NSMenuItem) {
+        guard let url = contextMenuImage else { return }
+        WindowsManager.openNewWindow(with: url)
+    }
+
+    func saveImageToDownloads(_ sender: NSMenuItem) {
+        guard let tab = tabCollectionViewModel.selectedTabViewModel?.tab,
+              let url = contextMenuImage else { return }
+
+        self.tab(tab, requestedFileDownload: FileDownload(request: URLRequest(url: url), suggestedName: nil))
+    }
+
+    func copyImageAddress(_ sender: NSMenuItem) {
+        guard let url = contextMenuImage else { return }
+        NSPasteboard.general.clearContents()
+        NSPasteboard.general.setString(url.absoluteString, forType: .URL)
+    }
+
 }
 
 extension BrowserTabViewController: WKUIDelegate {
+
+    // swiftlint:disable identifier_name
+    @objc func _webView(_ webView: WKWebView, saveDataToFile data: NSData, suggestedFilename: NSString, mimeType: NSString, originatingURL: NSURL) {
+        FileDownloadManager.shared.saveDataToFile(data as Data, withSuggestedFileName: suggestedFilename as String, mimeType: mimeType as String)
+    }
+    // swiftlint:enable identifier_name
 
     func webView(_ webView: WKWebView,
                  createWebViewWith configuration: WKWebViewConfiguration,
@@ -171,7 +240,7 @@ extension BrowserTabViewController: WKUIDelegate {
         // WebKit loads the request in the returned web view.
         return selectedViewModel.tab.webView
     }
-
+    
     func webView(_ webView: WKWebView,
                  runOpenPanelWith parameters: WKOpenPanelParameters,
                  initiatedByFrame frame: WKFrameInfo,

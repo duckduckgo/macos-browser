@@ -1,5 +1,5 @@
 //
-//  WKUserContentController.swift
+//  NSWindow+Toast.swift
 //
 //  Copyright © 2020 DuckDuckGo. All rights reserved.
 //
@@ -17,18 +17,16 @@
 //
 
 import Cocoa
-import WebKit
 
-extension WKUserContentController {
+extension NSWindow {
 
-    func add(userScript: UserScript) {
-        addUserScript(userScript)
-        for messageName in userScript.messageNames {
-            if #available(OSX 11.0, *) {
-                add(userScript, contentWorld: .defaultClient, name: messageName)
-            } else {
-                add(userScript, name: messageName)
-            }
+    @available(macOS, deprecated: 10.14, message: "Temporary solution while waiting for better design.")
+    func toast(_ message: String) {
+        let text = NSTextField(labelWithString: message)
+        text.frame.origin = CGPoint(x: 5, y: 3)
+        contentView?.addSubview(text)
+        DispatchQueue.main.asyncAfter(deadline: .now() + 3.0) {
+            text.removeFromSuperview()
         }
     }
 

@@ -54,4 +54,25 @@ extension NSMenu {
         helpMenuItem?.submenu?.item(withTag: MenuItemTag.sendFeedback.rawValue)
     }
 
+    func indexOfItem(withIdentifier id: String) -> Int? {
+        guard let item = items.first(where: { $0.identifier?.rawValue == id }) else { return nil }
+        return index(of: item)
+    }
+
+    func insertItemBeforeItemWithIdentifier(_ id: String, title: String, target: AnyObject?, selector: Selector) {
+        guard let index = indexOfItem(withIdentifier: id) else { return }
+
+        let newItem = NSMenuItem()
+        newItem.title = title
+        newItem.action = selector
+        newItem.target = target
+
+        insertItem(newItem, at: index)
+    }
+
+    func insertSeparatorBeforeItemWithIdentifier(_ id: String) {
+        guard let index = indexOfItem(withIdentifier: id) else { return }
+        insertItem(.separator(), at: index)
+    }
+
 }

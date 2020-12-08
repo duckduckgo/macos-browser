@@ -1,5 +1,5 @@
 //
-//  WKUserContentController.swift
+//  ContextMenuElement.swift
 //
 //  Copyright © 2020 DuckDuckGo. All rights reserved.
 //
@@ -16,20 +16,11 @@
 //  limitations under the License.
 //
 
-import Cocoa
-import WebKit
+import Foundation
 
-extension WKUserContentController {
+enum ContextMenuElement {
 
-    func add(userScript: UserScript) {
-        addUserScript(userScript)
-        for messageName in userScript.messageNames {
-            if #available(OSX 11.0, *) {
-                add(userScript, contentWorld: .defaultClient, name: messageName)
-            } else {
-                add(userScript, name: messageName)
-            }
-        }
-    }
-
+    case link(url: URL)
+    case image(url: URL)
+    
 }

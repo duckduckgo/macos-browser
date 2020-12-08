@@ -1,5 +1,5 @@
 //
-//  WKUserContentController.swift
+//  MenuItemSelectors.swift
 //
 //  Copyright © 2020 DuckDuckGo. All rights reserved.
 //
@@ -17,19 +17,20 @@
 //
 
 import Cocoa
-import WebKit
 
-extension WKUserContentController {
+@objc protocol LinkMenuItemSelectors {
 
-    func add(userScript: UserScript) {
-        addUserScript(userScript)
-        for messageName in userScript.messageNames {
-            if #available(OSX 11.0, *) {
-                add(userScript, contentWorld: .defaultClient, name: messageName)
-            } else {
-                add(userScript, name: messageName)
-            }
-        }
-    }
+    func openLinkInNewTab(_ sender: NSMenuItem)
+    func openLinkInNewWindow(_ sender: NSMenuItem)
+    func downloadLinkedFile(_ sender: NSMenuItem)
+
+}
+
+@objc protocol ImageMenuItemSelectors {
+
+    func openImageInNewTab(_ sender: NSMenuItem)
+    func openImageInNewWindow(_ sender: NSMenuItem)
+    func saveImageToDownloads(_ sender: NSMenuItem)
+    func copyImageAddress(_ sender: NSMenuItem)
 
 }

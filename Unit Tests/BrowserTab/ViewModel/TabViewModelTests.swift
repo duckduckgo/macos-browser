@@ -68,15 +68,15 @@ class TabViewModelTests: XCTestCase {
         waitForExpectations(timeout: 1, handler: nil)
     }
 
-    func testWhenURLIsRegularSiteThenAddressBarStringIsTheURLWithoutPrefix() {
+    func testWhenURLIsSetThenAddressBarIsUpdated() {
         let tabViewModel = TabViewModel.aTabViewModel
 
-        let urlString = "https://spreadprivacy.com"
+        let urlString = "http://spreadprivacy.com"
         tabViewModel.tab.url = URL.makeURL(from: urlString)
 
         let addressBarStringExpectation = expectation(description: "Address bar string")
 
-        tabViewModel.$addressBarString.debounce(for: 0.1, scheduler: RunLoop.main).sink { addressBarString in
+        tabViewModel.$addressBarString.debounce(for: 0.1, scheduler: RunLoop.main).sink { _ in
             XCTAssertEqual(tabViewModel.addressBarString, urlString)
             addressBarStringExpectation.fulfill()
         } .store(in: &cancellables)
@@ -140,7 +140,7 @@ class TabViewModelTests: XCTestCase {
                 faviconExpectation.fulfill()
             }
         } .store(in: &cancellables)
-        waitForExpectations(timeout: 1, handler: nil)
+        waitForExpectations(timeout: 5, handler: nil)
     }
 
 }

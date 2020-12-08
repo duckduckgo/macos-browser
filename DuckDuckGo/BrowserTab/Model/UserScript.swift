@@ -27,7 +27,7 @@ class UserScript: WKUserScript {
         self.messageNames = messageNames
 
         if #available(OSX 11.0, *) {
-            super.init(source: source, injectionTime: injectionTime, forMainFrameOnly: forMainFrameOnly, in: .page)
+            super.init(source: source, injectionTime: injectionTime, forMainFrameOnly: forMainFrameOnly, in: .defaultClient)
         } else {
             super.init(source: source, injectionTime: injectionTime, forMainFrameOnly: forMainFrameOnly)
         }

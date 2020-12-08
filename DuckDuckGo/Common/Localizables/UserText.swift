@@ -22,33 +22,39 @@ struct UserText {
 
     static let ok = NSLocalizedString("ok", value: "OK", comment: "OK button")
     static let cancel = NSLocalizedString("cancel", value: "Cancel", comment: "Cancel button")
-    static let webViewOpenLinkInNewTab = NSLocalizedString("webView-open-link-in-new-tab",
-                                                           value: "Open Link in New Tab",
-                                                           comment: "Menu item")
-    static let duplicateTab = NSLocalizedString("duplicate-tab", value: "Duplicate Tab", comment: "Menu item. Duplicate as a verb")
-    static let closeTab = NSLocalizedString("close-tab", value: "Close Tab", comment: "Menu item")
-    static let closeOtherTabs = NSLocalizedString("close-other-tabs", value: "Close Other Tabs", comment: "Menu item")
 
-    static let tabHomeTitle = NSLocalizedString("tab-home-title", value: "Home", comment: "Tab home title")
-    static let tabErrorTitle = NSLocalizedString("tab-error-title", value: "Oops!", comment: "Tab error title")
+    static let duplicateTab = NSLocalizedString("duplicate.tab", value: "Duplicate Tab", comment: "Menu item. Duplicate as a verb")
+    static let closeTab = NSLocalizedString("close.tab", value: "Close Tab", comment: "Menu item")
+    static let closeOtherTabs = NSLocalizedString("close.other.tabs", value: "Close Other Tabs", comment: "Menu item")
 
-    static let optionsMenuMoveTabToNewWindow = NSLocalizedString("options-menu-move-tab-to-new-window",
+    static let tabHomeTitle = NSLocalizedString("tab.home.title", value: "Home", comment: "Tab home title")
+    static let tabErrorTitle = NSLocalizedString("tab.error.title", value: "Oops!", comment: "Tab error title")
+
+    static let optionsMenuMoveTabToNewWindow = NSLocalizedString("options.menu.move.tab.to.new.window",
                                                                  value: "Move Tab to New Window",
                                                                  comment: "Context menu item")
 
-    static let addressBarSearchSuffix = NSLocalizedString("address-bar-search-suffix",
+    static let addressBarSearchSuffix = NSLocalizedString("address.bar.search.suffix",
                                                           value: "Search DuckDuckGo",
-                                                          comment: "Suffix of searched terms in address bar. Example: best watching machine - Search DuckDuckGo")
-    static let addressBarVisitSuffix = NSLocalizedString("address-bar-visit-suffix",
+                                                          comment: "Suffix of searched terms in address bar. Example: best watching machine . Search DuckDuckGo")
+    static let addressBarVisitSuffix = NSLocalizedString("address.bar.visit.suffix",
                                                           value: "Visit",
-                                                          comment: "Address bar suffix of possibly visited website. Example: spreadprivacy.com - Visit spreadprivacy.com")
+                                                          comment: "Address bar suffix of possibly visited website. Example: spreadprivacy.com . Visit spreadprivacy.com")
 
-    static let burnAlertMessageText = NSLocalizedString("burn-alert-message-text",
+    static let burnAlertMessageText = NSLocalizedString("burn.alert.message.text",
                                                         value: "Are you sure you want to burn everything?",
                                                         comment: "")
-    static let burtAlertInformativeText = NSLocalizedString("burn-alert-informative-text",
+    static let burtAlertInformativeText = NSLocalizedString("burn.alert.informative.text",
                                                             value: "This will close all tabs and clear website data.",
                                                             comment: "")
     static let burn = NSLocalizedString("burn", value: "Burn", comment: "Burn button")
+
+    static let navigateBack = NSLocalizedString("navigate.back", value: "Back", comment: "Context menu item")
+    static let navigateForward = NSLocalizedString("navigate.forward", value: "Forward", comment: "Context menu item")
+    static let reloadPage = NSLocalizedString("reload.page", value: "Reload Page", comment: "Context menu item")
+
+    static let openLinkInNewTab = NSLocalizedString("open.link.in.new.tab", value: "Open Link in New Tab", comment: "Context menu item")
+    static let openImageInNewTab = NSLocalizedString("open.image.in.new.tab", value: "Open Image in New Tab", comment: "Context menu item")
+    static let copyImageAddress = NSLocalizedString("copy.image.address", value: "Copy Image Address", comment: "Context menu item")
 
 }
