@@ -62,7 +62,6 @@ class ContextMenuUserScript: UserScript {
             }
         }
 
-        print("***", #function, lastAnchor as Any, lastImage as Any)
         delegate?.contextMenu(forUserScript: self, willShowAt: point, image: image, link: link)
     }
 
