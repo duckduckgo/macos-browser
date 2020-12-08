@@ -30,7 +30,8 @@ struct FileDownload {
     }
 
     func bestFileName(mimeType: String?) -> String {
-        return suggestedName ??
+        let startName = suggestedName?.isEmpty ?? false ? nil : suggestedName
+        return startName ??
             fileNameFromURL(mimeType: mimeType) ??
             createUniqueFileName(mimeType: mimeType)
     }
