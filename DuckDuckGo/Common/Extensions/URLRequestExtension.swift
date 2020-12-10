@@ -31,6 +31,7 @@ extension URLRequest {
         var request = URLRequest(url: url)
         request.setValue("gzip;q=1.0, compress;q=0.5",
                          forHTTPHeaderField: HeaderKey.acceptEncoding.rawValue)
+        #warning("Create a new user agent for both desktop browsers and support it on the backend system")
         request.setValue("ddg_ios/7.54.0.0 (com.duckduckgo.mobile.ios; iOS 14.0)",
                          forHTTPHeaderField: HeaderKey.userAgent.rawValue)
         request.setValue("en;q=1.0",
