@@ -76,6 +76,10 @@ class AddressBarViewController: NSViewController {
                                                object: nil)
     }
 
+    deinit {
+        NotificationCenter.default.removeObserver(self)
+    }
+
     override func viewDidLayout() {
         super.viewDidLayout()
 

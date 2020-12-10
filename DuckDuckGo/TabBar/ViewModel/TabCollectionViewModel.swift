@@ -28,7 +28,7 @@ protocol TabCollectionViewModelDelegate: AnyObject {
     func tabCollectionViewModel(_ tabCollectionViewModel: TabCollectionViewModel, didInsertAndSelectAt index: Int)
     func tabCollectionViewModel(_ tabCollectionViewModel: TabCollectionViewModel,
                                 didRemoveTabAt removalIndex: Int,
-                                andSelectTabAt selectionIndex: Int)
+                                andSelectTabAt selectionIndex: Int?)
     func tabCollectionViewModel(_ tabCollectionViewModel: TabCollectionViewModel,
                                 didRemoveAllExcept exceptionIndex: Int?,
                                 andSelectAt selectionIndex: Int?)
@@ -154,6 +154,7 @@ class TabCollectionViewModel {
 
         guard tabCollection.tabs.count > 0 else {
             selectionIndex = nil
+            delegate?.tabCollectionViewModel(self, didRemoveTabAt: index, andSelectTabAt: nil)
             return
         }
         
@@ -174,6 +175,8 @@ class TabCollectionViewModel {
     }
 
     func removeAllTabs(except exceptionIndex: Int? = nil) {
+        if tabCollection.tabs.isEmpty { return }
+
         tabCollection.tabs.enumerated().reversed().forEach {
             if exceptionIndex != $0.offset {
                 if !tabCollection.remove(at: $0.offset) {
