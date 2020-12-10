@@ -20,7 +20,26 @@ import Foundation
 import os.log
 import Combine
 
+protocol TabCollectionViewModelDelegate: AnyObject {
+
+    func tabCollectionViewModelDidAppend(_ tabCollectionViewModel: TabCollectionViewModel)
+    func tabCollectionViewModelDidAppendAndSelect(_ tabCollectionViewModel: TabCollectionViewModel)
+    func tabCollectionViewModel(_ tabCollectionViewModel: TabCollectionViewModel, didAppendAtMultipleAndSelectAt index: Int)
+    func tabCollectionViewModel(_ tabCollectionViewModel: TabCollectionViewModel, didInsertAndSelectAt index: Int)
+    func tabCollectionViewModel(_ tabCollectionViewModel: TabCollectionViewModel,
+                                didRemoveTabAt removalIndex: Int,
+                                andSelectTabAt selectionIndex: Int)
+    func tabCollectionViewModel(_ tabCollectionViewModel: TabCollectionViewModel,
+                                didRemoveAllExcept exceptionIndex: Int?,
+                                andSelectAt selectionIndex: Int?)
+    func tabCollectionViewModelDidRemoveAllAndAppend(_ tabCollectionViewModel: TabCollectionViewModel)
+    func tabCollectionViewModel(_ tabCollectionViewModel: TabCollectionViewModel, didMoveTabAt index: Int, to newIndex: Int)
+
+}
+
 class TabCollectionViewModel {
+
+    weak var delegate: TabCollectionViewModelDelegate?
 
     private(set) var tabCollection: TabCollection
     
@@ -58,19 +77,22 @@ class TabCollectionViewModel {
         return tabViewModels[tab]
     }
 
-    func select(at index: Int) {
+    @discardableResult func select(at index: Int) -> Bool {
         guard index >= 0, index < tabCollection.tabs.count else {
             os_log("TabCollectionViewModel: Index out of bounds", type: .error)
             selectionIndex = nil
-            return
+            return false
         }
 
         selectionIndex = index
+        return true
     }
 
     func appendNewTab() {
         tabCollection.append(tab: Tab())
         select(at: tabCollection.tabs.count - 1)
+
+        delegate?.tabCollectionViewModelDidAppendAndSelect(self)
     }
 
     func appendNewTabAfterSelected(with webViewConfiguration: WebViewConfiguration? = nil) {
@@ -84,13 +106,19 @@ class TabCollectionViewModel {
         } else {
             tab = Tab()
         }
-        tabCollection.insert(tab: tab, at: selectionIndex + 1)
-        select(at: selectionIndex + 1)
+
+        let newIndex = selectionIndex + 1
+        tabCollection.insert(tab: tab, at: newIndex)
+        select(at: newIndex)
+
+        delegate?.tabCollectionViewModel(self, didInsertAndSelectAt: newIndex)
     }
 
     func append(tab: Tab) {
         tabCollection.append(tab: tab)
         select(at: tabCollection.tabs.count - 1)
+
+        delegate?.tabCollectionViewModelDidAppendAndSelect(self)
     }
 
     func appendWithoutSelection(tab: Tab) {
@@ -100,18 +128,25 @@ class TabCollectionViewModel {
         }
         tabCollection.append(tab: tab)
         select(at: selectionIndex)
+
+        delegate?.tabCollectionViewModelDidAppend(self)
     }
 
     func append(tabs: [Tab]) {
         tabs.forEach {
             tabCollection.append(tab: $0)
         }
-        select(at: tabCollection.tabs.count - 1)
+        let newSelectionIndex = tabCollection.tabs.count - 1
+        select(at: newSelectionIndex)
+
+        delegate?.tabCollectionViewModel(self, didAppendAtMultipleAndSelectAt: newSelectionIndex)
     }
 
     func insertNewTab(at index: Int = 0) {
         tabCollection.insert(tab: Tab(), at: index)
         select(at: index)
+
+        delegate?.tabCollectionViewModel(self, didInsertAndSelectAt: index)
     }
 
     func remove(at index: Int) {
@@ -127,29 +162,15 @@ class TabCollectionViewModel {
             return
         }
 
+        let newSelectionIndex: Int
         if selectionIndex > index {
-            select(at: max(selectionIndex - 1, 0))
+            newSelectionIndex = max(selectionIndex - 1, 0)
         } else {
-            select(at: max(min(selectionIndex, tabCollection.tabs.count - 1), 0))
+            newSelectionIndex = max(min(selectionIndex, tabCollection.tabs.count - 1), 0)
         }
-    }
+        select(at: newSelectionIndex)
 
-    func remove(ownerOf webView: WebView) {
-        let webViews = tabCollection.tabs.map { $0.webView }
-        guard let index = webViews.firstIndex(of: webView) else {
-            os_log("TabCollection: Failed to get index of the tab", type: .error)
-            return
-        }
-        remove(at: index)
-    }
-
-    func removeSelected() {
-        guard let selectionIndex = selectionIndex else {
-            os_log("TabCollectionViewModel: No tab selected", type: .error)
-            return
-        }
-
-        remove(at: selectionIndex)
+        delegate?.tabCollectionViewModel(self, didRemoveTabAt: index, andSelectTabAt: newSelectionIndex)
     }
 
     func removeAllTabs(except exceptionIndex: Int? = nil) {
@@ -163,14 +184,37 @@ class TabCollectionViewModel {
 
         if exceptionIndex != nil {
             select(at: 0)
+            delegate?.tabCollectionViewModel(self, didRemoveAllExcept: exceptionIndex, andSelectAt: 0)
         } else {
             selectionIndex = nil
+            delegate?.tabCollectionViewModel(self, didRemoveAllExcept: exceptionIndex, andSelectAt: nil)
         }
     }
 
     func removeAllTabsAndAppendNewTab() {
         tabCollection.removeAllAndAppend(tab: Tab())
         select(at: 0)
+
+        delegate?.tabCollectionViewModelDidRemoveAllAndAppend(self)
+    }
+
+    func remove(ownerOf webView: WebView) {
+        let webViews = tabCollection.tabs.map { $0.webView }
+        guard let index = webViews.firstIndex(of: webView) else {
+            os_log("TabCollection: Failed to get index of the tab", type: .error)
+            return
+        }
+
+        self.remove(at: index)
+    }
+
+    func removeSelected() {
+        guard let selectionIndex = selectionIndex else {
+            os_log("TabCollectionViewModel: No tab selected", type: .error)
+            return
+        }
+
+        self.remove(at: selectionIndex)
     }
 
     func insertLastRemovedTab() {
@@ -179,6 +223,8 @@ class TabCollectionViewModel {
 
         if let lastRemovedTabIndex = lastRemovedTabIndex {
             select(at: lastRemovedTabIndex)
+
+            delegate?.tabCollectionViewModel(self, didInsertAndSelectAt: lastRemovedTabIndex)
         }
     }
 
@@ -195,6 +241,15 @@ class TabCollectionViewModel {
 
         tabCollection.insert(tab: tabCopy, at: newIndex)
         select(at: newIndex)
+
+        delegate?.tabCollectionViewModel(self, didInsertAndSelectAt: newIndex)
+    }
+
+    func moveTab(at index: Int, to newIndex: Int) {
+        tabCollection.moveTab(at: index, to: newIndex)
+        select(at: newIndex)
+
+        delegate?.tabCollectionViewModel(self, didMoveTabAt: index, to: newIndex)
     }
 
     private func subscribeToTabs() {

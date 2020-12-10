@@ -45,7 +45,7 @@ class TabBarCollectionView: NSCollectionView {
     
     func scrollToSelected() {
         guard selectionIndexPaths.count == 1, let indexPath = selectionIndexPaths.first else {
-            os_log("TabBarCollectionView: More than 1 item highlighted", type: .error)
+            os_log("TabBarCollectionView: More than 1 item or no item highlighted", type: .error)
             return
         }
 
@@ -65,5 +65,10 @@ class TabBarCollectionView: NSCollectionView {
         animator().performBatchUpdates({
             animator().scroll(CGPoint(x: 0, y: 0))
         }, completionHandler: completionHandler)
+    }
+
+    func invalidateLayout() {
+        NSAnimationContext.current.duration = 1/3
+        collectionViewLayout?.invalidateLayout()
     }
 }
