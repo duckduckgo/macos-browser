@@ -19,26 +19,13 @@
 import Foundation
 import os.log
 
-protocol TabCollectionDelegate: AnyObject {
-
-    func tabCollection(_ tabCollection: TabCollection, didAppend tab: Tab)
-    func tabCollection(_ tabCollection: TabCollection, didInsert tab: Tab, at index: Int)
-    func tabCollection(_ tabCollection: TabCollection, didRemoveTabAt index: Int)
-    func tabCollection(_ tabCollection: TabCollection, didRemoveAllAndAppend tab: Tab)
-    func tabCollection(_ tabCollection: TabCollection, didMoveTabAt index: Int, to newIndex: Int)
-
-}
-
 class TabCollection {
 
     @Published private(set) var tabs: [Tab] = []
-    weak var delegate: TabCollectionDelegate?
-
     @Published private(set) var lastRemovedTabCache: (url: URL?, index: Int)?
 
     func append(tab: Tab) {
         tabs.append(tab)
-        delegate?.tabCollection(self, didAppend: tab)
     }
 
     func insert(tab: Tab, at index: Int) {
@@ -48,7 +35,6 @@ class TabCollection {
         }
 
         tabs.insert(tab, at: index)
-        delegate?.tabCollection(self, didInsert: tab, at: index)
     }
 
     func remove(at index: Int) -> Bool {
@@ -60,15 +46,12 @@ class TabCollection {
         saveLastRemovedTab(at: index)
         tabs.remove(at: index)
 
-        delegate?.tabCollection(self, didRemoveTabAt: index)
-
         return true
     }
 
     func removeAllAndAppend(tab: Tab) {
         tabs.removeAll()
         tabs.insert(tab, at: 0)
-        delegate?.tabCollection(self, didRemoveAllAndAppend: tab)
     }
 
     func moveTab(at index: Int, to newIndex: Int) {
@@ -80,14 +63,12 @@ class TabCollection {
         if index == newIndex { return }
         if abs(index - newIndex) == 1 {
             tabs.swapAt(index, newIndex)
-            delegate?.tabCollection(self, didMoveTabAt: index, to: newIndex)
             return
         }
 
         var tabs = self.tabs
         tabs.insert(tabs.remove(at: index), at: newIndex)
         self.tabs = tabs
-        delegate?.tabCollection(self, didMoveTabAt: index, to: newIndex)
     }
 
     func saveLastRemovedTab(at index: Int) {

@@ -65,7 +65,9 @@ class TabBarViewController: NSViewController {
         super.viewWillAppear()
 
         updateWindowDraggingArea()
-        tabCollectionViewModel.tabCollection.delegate = self
+        tabCollectionViewModel.delegate = self
+
+        reloadSelection()
     }
 
     override func viewDidLayout() {
@@ -73,7 +75,7 @@ class TabBarViewController: NSViewController {
 
         updateTabMode(for: collectionView.numberOfItems(inSection: 0))
         updateWindowDraggingArea()
-        collectionView.collectionViewLayout?.invalidateLayout()
+        collectionView.invalidateLayout()
     }
 
     @IBAction func burnButtonAction(_ sender: NSButton) {
@@ -137,8 +139,10 @@ class TabBarViewController: NSViewController {
     // MARK: - Window Dragging
 
     private func updateWindowDraggingArea() {
-        let leadingSpace = min(CGFloat(collectionView.numberOfItems(inSection: 0)) *
-                                currentTabWidth(), scrollView.frame.size.width)
+        let selectedWidth = currentTabWidth(selected: true)
+        let restOfTabsWidth = CGFloat(max(collectionView.numberOfItems(inSection: 0) - 1, 0)) * currentTabWidth()
+        let totalWidth = selectedWidth + restOfTabsWidth
+        let leadingSpace = min(totalWidth, scrollView.frame.size.width)
         windowDraggingViewLeadingConstraint.constant = leadingSpace
     }
 
@@ -151,24 +155,19 @@ class TabBarViewController: NSViewController {
     // MARK: - Drag and Drop
 
     private var draggingIndexPaths: Set<IndexPath>?
-    private var lastIndexPath: IndexPath?
+    private var draggingOverIndexPath: IndexPath?
 
     private func moveItemIfNeeded(at indexPath: IndexPath, to newIndexPath: IndexPath) {
-        guard newIndexPath != lastIndexPath else {
-            return
-        }
+        guard newIndexPath != draggingOverIndexPath else { return }
 
         let index = indexPath.item
         let newIndex = min(newIndexPath.item, max(tabCollectionViewModel.tabCollection.tabs.count - 1, 0))
         let newIndexPath = IndexPath(item: newIndex)
 
-        guard index != newIndex else {
-            return
-        }
-        lastIndexPath = newIndexPath
+        guard index != newIndex else { return }
+        draggingOverIndexPath = newIndexPath
 
-        tabCollectionViewModel.tabCollection.moveTab(at: index, to: newIndex)
-        tabCollectionViewModel.select(at: newIndexPath.item)
+        tabCollectionViewModel.moveTab(at: index, to: newIndex)
     }
 
     // MARK: - Tab Width
@@ -184,7 +183,7 @@ class TabBarViewController: NSViewController {
                 updateScrollElasticity()
                 updateScrollButtons()
                 updateWindowDraggingArea()
-                collectionView.collectionViewLayout?.invalidateLayout()
+                collectionView.invalidateLayout()
             }
         }
     }
@@ -193,21 +192,27 @@ class TabBarViewController: NSViewController {
         let items = CGFloat(numberOfItems ?? collectionView.numberOfItems(inSection: 0))
         let tabsWidth = scrollView.bounds.width
 
-        if items * TabBarViewItem.Width.minimum.rawValue < tabsWidth {
+        if max(0, (items - 1)) * TabBarViewItem.Width.minimum.rawValue + TabBarViewItem.Width.minimumSelected.rawValue < tabsWidth {
             tabMode = .divided
         } else {
             tabMode = .overflow
         }
     }
 
-    private func currentTabWidth() -> CGFloat {
+    private func currentTabWidth(selected: Bool = false) -> CGFloat {
         let numberOfItems = CGFloat(collectionView.numberOfItems(inSection: 0))
         let tabsWidth = scrollView.bounds.width
+        let minimumWidth = selected ? TabBarViewItem.Width.minimumSelected.rawValue : TabBarViewItem.Width.minimum.rawValue
 
         if tabMode == .divided {
-            return min(TabBarViewItem.Width.maximum.rawValue, tabsWidth / numberOfItems)
+            var dividedWidth = tabsWidth / numberOfItems
+            // If tabs are shorter than minimumSelected, then the selected tab takes more space
+            if dividedWidth < TabBarViewItem.Width.minimumSelected.rawValue {
+                dividedWidth = (tabsWidth - TabBarViewItem.Width.minimumSelected.rawValue) / (numberOfItems - 1)
+            }
+            return min(TabBarViewItem.Width.maximum.rawValue, max(minimumWidth, dividedWidth))
         } else {
-            return TabBarViewItem.Width.minimum.rawValue
+            return minimumWidth
         }
     }
 
@@ -248,22 +253,83 @@ class TabBarViewController: NSViewController {
 
 }
 
-// swiftlint:disable compiler_protocol_init
-extension TabBarViewController: TabCollectionDelegate {
+extension TabBarViewController: TabCollectionViewModelDelegate {
 
-    func tabCollection(_ tabCollection: TabCollection, didAppend tab: Tab) {
+    func tabCollectionViewModelDidAppend(_ tabCollectionViewModel: TabCollectionViewModel) {
+        appendToCollectionView(selected: false)
+    }
+
+    func tabCollectionViewModelDidAppendAndSelect(_ tabCollectionViewModel: TabCollectionViewModel) {
+        appendToCollectionView(selected: true)
+    }
+
+    func tabCollectionViewModel(_ tabCollectionViewModel: TabCollectionViewModel, didAppendAtMultipleAndSelectAt index: Int) {
+        reloadCollectionView(selectionIndex: index)
+    }
+
+    func tabCollectionViewModel(_ tabCollectionViewModel: TabCollectionViewModel, didInsertAndSelectAt index: Int) {
+        let indexPath = IndexPath(item: index)
+        let indexPathSet = Set(arrayLiteral: indexPath)
+        collectionView.animator().insertItems(at: indexPathSet)
+        collectionView.selectItems(at: indexPathSet, scrollPosition: .centeredHorizontally)
+
+        updateTabMode()
+        updateWindowDraggingArea()
+    }
+
+    func tabCollectionViewModel(_ tabCollectionViewModel: TabCollectionViewModel,
+                                didRemoveTabAt removedIndex: Int,
+                                andSelectTabAt selectionIndex: Int) {
+        let removedIndexPath = IndexPath(item: removedIndex)
+        let removedIndexPathSet = Set(arrayLiteral: removedIndexPath)
+        let selectionIndexPath = IndexPath(item: selectionIndex)
+        let selectionIndexPathSet = Set(arrayLiteral: selectionIndexPath)
+
+        collectionView.animator().performBatchUpdates {
+            collectionView.animator().deleteItems(at: removedIndexPathSet)
+            collectionView.animator().selectItems(at: selectionIndexPathSet, scrollPosition: .centeredHorizontally)
+        } completionHandler: { [weak self] _ in
+            self?.updateTabMode()
+            self?.updateWindowDraggingArea()
+        }
+    }
+
+    func tabCollectionViewModel(_ tabCollectionViewModel: TabCollectionViewModel,
+                                didRemoveAllExcept exceptionIndex: Int?,
+                                andSelectAt selectionIndex: Int?) {
+        reloadCollectionView(selectionIndex: selectionIndex)
+    }
+
+    func tabCollectionViewModelDidRemoveAllAndAppend(_ tabCollectionViewModel: TabCollectionViewModel) {
+        reloadCollectionView(selectionIndex: 0)
+    }
+
+    func tabCollectionViewModel(_ tabCollectionViewModel: TabCollectionViewModel, didMoveTabAt index: Int, to newIndex: Int) {
+        let indexPath = IndexPath(item: index)
+        let newIndexPath = IndexPath(item: newIndex)
+        collectionView.animator().moveItem(at: indexPath, to: newIndexPath)
+
+        updateTabMode()
+    }
+
+    private func appendToCollectionView(selected: Bool) {
         let lastIndex = max(0, tabCollectionViewModel.tabCollection.tabs.count - 1)
-        let lastIndexPath = IndexPath(item: lastIndex)
-        let lastIndexPathSet = Set(arrayLiteral: lastIndexPath)
+        let lastIndexPathSet = Set(arrayLiteral: IndexPath(item: lastIndex))
 
         updateTabMode(for: collectionView.numberOfItems(inSection: 0) + 1)
 
         collectionView.clearSelection()
         if tabMode == .divided {
             collectionView.animator().insertItems(at: lastIndexPathSet)
+            if selected {
+                collectionView.selectItems(at: lastIndexPathSet, scrollPosition: .centeredHorizontally)
+            }
         } else {
             collectionView.insertItems(at: lastIndexPathSet)
-            // Old frameworks are like old people. They need special treatment
+            if selected {
+                collectionView.selectItems(at: lastIndexPathSet, scrollPosition: .centeredHorizontally)
+            }
+            // Old frameworks are like old people. They need a special treatment
             collectionView.scrollToEnd { _ in
                 DispatchQueue.main.asyncAfter(deadline: .now() + 0.15) {
                     self.collectionView.scrollToEnd()
@@ -273,57 +339,34 @@ extension TabBarViewController: TabCollectionDelegate {
         updateWindowDraggingArea()
     }
 
-    func tabCollection(_ tabCollection: TabCollection, didInsert tab: Tab, at index: Int) {
-        let indexPath = IndexPath(item: index)
-        let indexPathSet = Set(arrayLiteral: indexPath)
-        collectionView.animator().insertItems(at: indexPathSet)
-
-        updateTabMode()
-        updateWindowDraggingArea()
-    }
-
-    func tabCollection(_ tabCollection: TabCollection, didRemoveTabAt index: Int) {
-        let indexPath = IndexPath(item: index)
-        let indexPathSet = Set(arrayLiteral: indexPath)
-
+    private func reloadCollectionView(selectionIndex: Int? = nil) {
         collectionView.animator().performBatchUpdates {
-            collectionView.animator().deleteItems(at: indexPathSet)
+            collectionView.animator().reloadData()
         } completionHandler: { [weak self] _ in
             self?.updateTabMode()
         }
 
-        closeWindowIfNeeded()
-        updateWindowDraggingArea()
-    }
-
-    func tabCollection(_ tabCollection: TabCollection, didRemoveAllAndAppend tab: Tab) {
-        let newIndexPath = IndexPath(arrayLiteral: 0)
-        let newIndexPathSet = Set(arrayLiteral: newIndexPath)
-
-        collectionView.animator().performBatchUpdates {
-            collectionView.animator().reloadItems(at: newIndexPathSet)
-        } completionHandler: { [weak self] _ in
-            self?.updateTabMode()
+        if let selectionIndex = selectionIndex {
+            let selectionIndexPath = IndexPath(arrayLiteral: selectionIndex)
+            let selectionIndexPathSet = Set(arrayLiteral: selectionIndexPath)
+            collectionView.selectItems(at: selectionIndexPathSet, scrollPosition: .centeredHorizontally)
         }
     }
-
-    func tabCollection(_ tabCollection: TabCollection, didMoveTabAt index: Int, to newIndex: Int) {
-        let indexPath = IndexPath(item: index)
-        let newIndexPath = IndexPath(item: newIndex)
-        collectionView.animator().moveItem(at: indexPath, to: newIndexPath)
-
-        updateTabMode()
-    }
-
 }
-// swiftlint:enable compiler_protocol_init
 
 extension TabBarViewController: NSCollectionViewDelegateFlowLayout {
 
     func collectionView(_ collectionView: NSCollectionView,
                         layout collectionViewLayout: NSCollectionViewLayout,
                         sizeForItemAt indexPath: IndexPath) -> NSSize {
-        return NSSize(width: self.currentTabWidth(), height: TabBarViewItem.Height.standard.rawValue)
+        var isItemSelected = tabCollectionViewModel.selectionIndex == indexPath.item
+
+        if let draggingOverIndexPath = draggingOverIndexPath {
+            // Drag&drop in progress - the empty space is equal to the selected tab width
+            isItemSelected = draggingOverIndexPath == indexPath
+        }
+
+        return NSSize(width: self.currentTabWidth(selected: isItemSelected), height: TabBarViewItem.Height.standard.rawValue)
     }
 
 }
@@ -341,7 +384,7 @@ extension TabBarViewController: NSCollectionViewDataSource {
     func collectionView(_ collectionView: NSCollectionView, itemForRepresentedObjectAt indexPath: IndexPath) -> NSCollectionViewItem {
         let item = collectionView.makeItem(withIdentifier: TabBarViewItem.identifier, for: indexPath)
         guard let tabBarViewItem = item as? TabBarViewItem else {
-            os_log("", type: .error)
+            os_log("TabBarViewController: Failed to get reusable TabBarViewItem instance", type: .error)
             return item
         }
         
@@ -406,7 +449,7 @@ extension TabBarViewController: NSCollectionViewDelegate {
                         endedAt screenPoint: NSPoint,
                         dragOperation operation: NSDragOperation) {
         draggingIndexPaths = nil
-        lastIndexPath = nil
+        draggingOverIndexPath = nil
     }
 
     func collectionView(_ collectionView: NSCollectionView,
@@ -424,8 +467,8 @@ extension TabBarViewController: NSCollectionViewDelegate {
         }
 
         let newIndexPath = proposedDropIndexPath.pointee as IndexPath
-        if let lastIndexPath = lastIndexPath {
-            moveItemIfNeeded(at: lastIndexPath, to: newIndexPath)
+        if let draggingOverIndexPath = draggingOverIndexPath {
+            moveItemIfNeeded(at: draggingOverIndexPath, to: newIndexPath)
         } else {
             moveItemIfNeeded(at: indexPath, to: newIndexPath)
         }

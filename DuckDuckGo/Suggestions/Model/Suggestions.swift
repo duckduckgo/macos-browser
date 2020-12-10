@@ -38,7 +38,6 @@ class Suggestions {
             items = nil
             return
         }
-
         suggestionsAPI.fetchSuggestions(for: query) { (result, error) in
             guard let result = result, error == nil else {
                 self.items = nil
