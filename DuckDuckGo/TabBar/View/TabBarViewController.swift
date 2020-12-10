@@ -78,6 +78,10 @@ class TabBarViewController: NSViewController {
         collectionView.invalidateLayout()
     }
 
+    deinit {
+        NotificationCenter.default.removeObserver(self)
+    }
+
     @IBAction func burnButtonAction(_ sender: NSButton) {
         let response = NSAlert.burnButtonAlert.runModal()
         if response == NSApplication.ModalResponse.alertFirstButtonReturn {
@@ -279,9 +283,14 @@ extension TabBarViewController: TabCollectionViewModelDelegate {
 
     func tabCollectionViewModel(_ tabCollectionViewModel: TabCollectionViewModel,
                                 didRemoveTabAt removedIndex: Int,
-                                andSelectTabAt selectionIndex: Int) {
+                                andSelectTabAt selectionIndex: Int?) {
         let removedIndexPath = IndexPath(item: removedIndex)
         let removedIndexPathSet = Set(arrayLiteral: removedIndexPath)
+        guard let selectionIndex = selectionIndex else {
+            collectionView.animator().deleteItems(at: removedIndexPathSet)
+            closeWindowIfNeeded()
+            return
+        }
         let selectionIndexPath = IndexPath(item: selectionIndex)
         let selectionIndexPathSet = Set(arrayLiteral: selectionIndexPath)
 
@@ -351,6 +360,8 @@ extension TabBarViewController: TabCollectionViewModelDelegate {
             let selectionIndexPathSet = Set(arrayLiteral: selectionIndexPath)
             collectionView.selectItems(at: selectionIndexPathSet, scrollPosition: .centeredHorizontally)
         }
+
+        closeWindowIfNeeded()
     }
 }
 
