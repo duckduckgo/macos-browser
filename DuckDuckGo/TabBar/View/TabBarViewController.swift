@@ -314,7 +314,7 @@ extension TabBarViewController: TabCollectionViewModelDelegate {
     func tabCollectionViewModel(_ tabCollectionViewModel: TabCollectionViewModel,
                                 didRemoveAllExcept exceptionIndex: Int?,
                                 andSelectAt selectionIndex: Int?) {
-        reloadCollectionView(selectionIndex: selectionIndex)
+        reloadCollectionView(selectionIndex: selectionIndex, animated: exceptionIndex != nil)
     }
 
     func tabCollectionViewModelDidRemoveAllAndAppend(_ tabCollectionViewModel: TabCollectionViewModel) {
@@ -356,12 +356,18 @@ extension TabBarViewController: TabCollectionViewModelDelegate {
         updateWindowDraggingArea()
     }
 
-    private func reloadCollectionView(selectionIndex: Int? = nil) {
-        collectionView.animator().performBatchUpdates {
+    private func reloadCollectionView(selectionIndex: Int? = nil, animated: Bool = true) {
+        if animated {
+            collectionView.animator().performBatchUpdates {
+                collectionView.animator().reloadData()
+            } completionHandler: { [weak self] _ in
+                self?.updateTabMode()
+                self?.enableScrollButtons()
+            }
+        } else {
             collectionView.animator().reloadData()
-        } completionHandler: { [weak self] _ in
-            self?.updateTabMode()
-            self?.enableScrollButtons()
+            updateTabMode()
+            enableScrollButtons()
         }
 
         if let selectionIndex = selectionIndex {
