@@ -72,3 +72,29 @@ class TabBarCollectionView: NSCollectionView {
         collectionViewLayout?.invalidateLayout()
     }
 }
+
+extension NSCollectionView {
+
+    var clipView: NSClipView? {
+        return enclosingScrollView?.contentView
+    }
+
+    var isAtEndScrollPosition: Bool {
+        guard let clipView = clipView else {
+            os_log("TabBarCollectionView: Clip view is nil", type: .error)
+            return false
+        }
+
+        return clipView.bounds.origin.x + clipView.bounds.size.width >= bounds.size.width
+    }
+
+    var isAtStartScrollPosition: Bool {
+        guard let clipView = clipView else {
+            os_log("TabBarCollectionView: Clip view is nil", type: .error)
+            return false
+        }
+
+        return clipView.bounds.origin.x <= 0
+    }
+
+}

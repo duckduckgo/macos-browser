@@ -236,9 +236,12 @@ class TabBarViewController: NSViewController {
     }
 
     @objc private func scrollViewBoundsDidChange(_ sender: Any) {
-        let clipView = scrollView.contentView
-        rightScrollButton.isEnabled = clipView.bounds.origin.x + clipView.bounds.size.width < collectionView.bounds.size.width
-        leftScrollButton.isEnabled = clipView.bounds.origin.x > 0
+        enableScrollButtons()
+    }
+
+    private func enableScrollButtons() {
+        rightScrollButton.isEnabled = !collectionView.isAtEndScrollPosition
+        leftScrollButton.isEnabled = !collectionView.isAtStartScrollPosition
     }
 
     private func updateScrollButtons() {
@@ -294,12 +297,17 @@ extension TabBarViewController: TabCollectionViewModelDelegate {
         let selectionIndexPath = IndexPath(item: selectionIndex)
         let selectionIndexPathSet = Set(arrayLiteral: selectionIndexPath)
 
+        let shouldScroll = collectionView.isAtEndScrollPosition
         collectionView.animator().performBatchUpdates {
+            if shouldScroll {
+                collectionView.animator().scroll(CGPoint(x: scrollView.contentView.bounds.origin.x - currentTabWidth(), y: 0))
+            }
             collectionView.animator().deleteItems(at: removedIndexPathSet)
             collectionView.animator().selectItems(at: selectionIndexPathSet, scrollPosition: .centeredHorizontally)
         } completionHandler: { [weak self] _ in
             self?.updateTabMode()
             self?.updateWindowDraggingArea()
+            self?.enableScrollButtons()
         }
     }
 
@@ -353,6 +361,7 @@ extension TabBarViewController: TabCollectionViewModelDelegate {
             collectionView.animator().reloadData()
         } completionHandler: { [weak self] _ in
             self?.updateTabMode()
+            self?.enableScrollButtons()
         }
 
         if let selectionIndex = selectionIndex {
