@@ -22,9 +22,11 @@ import Combine
 
 class TabBarViewController: NSViewController {
 
-    enum CollectionViewHorizontalSpace: CGFloat {
-        case withScrollButtons = 112
-        case withoutScrollButtons = 80
+    enum HorizontalSpace: CGFloat {
+        case scrollViewPaddingWithButtons = 112
+        case scrollViewPaddingWithoutButtons = 80
+        case button = 32
+        case buttonPadding = 8
     }
 
     @IBOutlet weak var collectionView: TabBarCollectionView!
@@ -35,6 +37,7 @@ class TabBarViewController: NSViewController {
     @IBOutlet weak var leftScrollButton: MouseOverButton!
     @IBOutlet weak var rightShadowImageView: NSImageView!
     @IBOutlet weak var leftShadowImageView: NSImageView!
+    @IBOutlet weak var plusButton: MouseOverButton!
     @IBOutlet weak var windowDraggingViewLeadingConstraint: NSLayoutConstraint!
 
     private let tabCollectionViewModel: TabCollectionViewModel
@@ -64,7 +67,7 @@ class TabBarViewController: NSViewController {
     override func viewWillAppear() {
         super.viewWillAppear()
 
-        updateWindowDraggingArea()
+        updateEmptyTabArea()
         tabCollectionViewModel.delegate = self
 
         reloadSelection()
@@ -74,7 +77,7 @@ class TabBarViewController: NSViewController {
         super.viewDidLayout()
 
         updateTabMode(for: collectionView.numberOfItems(inSection: 0))
-        updateWindowDraggingArea()
+        updateEmptyTabArea()
         collectionView.invalidateLayout()
     }
 
@@ -140,15 +143,33 @@ class TabBarViewController: NSViewController {
         }
     }
 
-    // MARK: - Window Dragging
+    // MARK: - Window Dragging, Floating Add Button
 
-    private func updateWindowDraggingArea() {
+    private var totalTabWidth: CGFloat {
         let selectedWidth = currentTabWidth(selected: true)
         let restOfTabsWidth = CGFloat(max(collectionView.numberOfItems(inSection: 0) - 1, 0)) * currentTabWidth()
-        let totalWidth = selectedWidth + restOfTabsWidth
-        let leadingSpace = min(totalWidth, scrollView.frame.size.width)
-        windowDraggingViewLeadingConstraint.constant = leadingSpace
+        return selectedWidth + restOfTabsWidth
     }
+
+    private func updateEmptyTabArea() {
+        let totalTabWidth = self.totalTabWidth
+        let emptySpace = scrollView.frame.size.width - totalTabWidth
+        let plusButtonWidth = HorizontalSpace.buttonPadding.rawValue + HorizontalSpace.button.rawValue
+
+        // Window dragging
+        let leadingSpace = min(totalTabWidth + plusButtonWidth, scrollView.frame.size.width)
+        windowDraggingViewLeadingConstraint.constant = leadingSpace
+
+        // Add button
+        if emptySpace > plusButton.frame.size.width {
+            isAddButtonFloating = true
+        } else {
+            isAddButtonFloating = false
+        }
+        plusButton.isHidden = isAddButtonFloating
+    }
+
+    private var isAddButtonFloating = false
 
     // MARK: - Closing
 
@@ -186,7 +207,7 @@ class TabBarViewController: NSViewController {
             if oldValue != tabMode {
                 updateScrollElasticity()
                 updateScrollButtons()
-                updateWindowDraggingArea()
+                updateEmptyTabArea()
                 collectionView.invalidateLayout()
             }
         }
@@ -246,8 +267,8 @@ class TabBarViewController: NSViewController {
 
     private func updateScrollButtons() {
         let horizontalSpace = tabMode == .divided ?
-            CollectionViewHorizontalSpace.withoutScrollButtons.rawValue :
-            CollectionViewHorizontalSpace.withScrollButtons.rawValue
+            HorizontalSpace.scrollViewPaddingWithoutButtons.rawValue :
+            HorizontalSpace.scrollViewPaddingWithButtons.rawValue
         scrollViewLeadingConstraint.constant = horizontalSpace
         scrollViewTrailingConstraint.constant = horizontalSpace
 
@@ -281,7 +302,7 @@ extension TabBarViewController: TabCollectionViewModelDelegate {
         collectionView.selectItems(at: indexPathSet, scrollPosition: .centeredHorizontally)
 
         updateTabMode()
-        updateWindowDraggingArea()
+        updateEmptyTabArea()
     }
 
     func tabCollectionViewModel(_ tabCollectionViewModel: TabCollectionViewModel,
@@ -306,7 +327,7 @@ extension TabBarViewController: TabCollectionViewModelDelegate {
             collectionView.animator().selectItems(at: selectionIndexPathSet, scrollPosition: .centeredHorizontally)
         } completionHandler: { [weak self] _ in
             self?.updateTabMode()
-            self?.updateWindowDraggingArea()
+            self?.updateEmptyTabArea()
             self?.enableScrollButtons()
         }
     }
@@ -353,7 +374,7 @@ extension TabBarViewController: TabCollectionViewModelDelegate {
                 }
             }
         }
-        updateWindowDraggingArea()
+        updateEmptyTabArea()
     }
 
     private func reloadCollectionView(selectionIndex: Int? = nil, animated: Bool = true) {
@@ -423,7 +444,19 @@ extension TabBarViewController: NSCollectionViewDataSource {
         tabBarViewItem.subscribe(to: tabViewModel)
         return tabBarViewItem
     }
-    
+
+    func collectionView(_ collectionView: NSCollectionView,
+                        viewForSupplementaryElementOfKind kind: NSCollectionView.SupplementaryElementKind,
+                        at indexPath: IndexPath) -> NSView {
+
+        let view = collectionView.makeSupplementaryView(ofKind: kind,
+                                                        withIdentifier: TabBarFooter.identifier, for: indexPath)
+        if let footer = view as? TabBarFooter {
+            footer.addButton?.target = self
+            footer.addButton?.action = #selector(addButtonAction(_:))
+        }
+        return view
+    }
 }
 
 extension TabBarViewController: NSCollectionViewDelegate {
@@ -518,6 +551,13 @@ extension TabBarViewController: NSCollectionViewDelegate {
         }
 
         return true
+    }
+
+    func collectionView(_ collectionView: NSCollectionView,
+                        layout collectionViewLayout: NSCollectionViewLayout,
+                        referenceSizeForFooterInSection section: Int) -> NSSize {
+        let width = isAddButtonFloating ? HorizontalSpace.button.rawValue + HorizontalSpace.buttonPadding.rawValue : 0
+        return NSSize(width: width, height: collectionView.frame.size.height)
     }
 
 }
