@@ -44,7 +44,7 @@
                                     <action selector="burnButtonAction:" target="uSf-9n-QMw" id="ifc-Vj-HVz"/>
                                 </connections>
                             </button>
-                            <button translatesAutoresizingMaskIntoConstraints="NO" id="qXs-b0-tWI" userLabel="Plus Button" customClass="MouseOverButton" customModule="DuckDuckGo_Privacy_Browser" customModuleProvider="target">
+                            <button translatesAutoresizingMaskIntoConstraints="NO" id="qXs-b0-tWI" userLabel="Add Button" customClass="MouseOverButton" customModule="DuckDuckGo_Privacy_Browser" customModuleProvider="target">
                                 <rect key="frame" x="773" y="5" width="32" height="24"/>
                                 <constraints>
                                     <constraint firstAttribute="width" constant="32" id="Lmr-Cv-caT"/>
@@ -204,6 +204,7 @@
                         <outlet property="collectionView" destination="OEu-5P-cRF" id="b95-c4-JM0"/>
                         <outlet property="leftScrollButton" destination="7XG-Qm-Ksx" id="yre-8P-vb9"/>
                         <outlet property="leftShadowImageView" destination="zsA-or-9Xo" id="wVp-jj-2UD"/>
+                        <outlet property="plusButton" destination="qXs-b0-tWI" id="cI1-G5-Plf"/>
                         <outlet property="rightScrollButton" destination="2da-G7-xcP" id="4ka-kI-E1j"/>
                         <outlet property="rightShadowImageView" destination="u4N-Qc-LMf" id="QX4-lD-gfb"/>
                         <outlet property="scrollView" destination="O0X-yp-zLn" id="g9v-fn-qxC"/>
