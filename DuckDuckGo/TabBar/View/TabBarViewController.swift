@@ -323,8 +323,12 @@ extension TabBarViewController: TabCollectionViewModelDelegate {
             if shouldScroll {
                 collectionView.animator().scroll(CGPoint(x: scrollView.contentView.bounds.origin.x - currentTabWidth(), y: 0))
             }
+
+            if collectionView.selectionIndexPaths != selectionIndexPathSet {
+                collectionView.clearSelection()
+                collectionView.animator().selectItems(at: selectionIndexPathSet, scrollPosition: .centeredHorizontally)
+            }
             collectionView.animator().deleteItems(at: removedIndexPathSet)
-            collectionView.animator().selectItems(at: selectionIndexPathSet, scrollPosition: .centeredHorizontally)
         } completionHandler: { [weak self] _ in
             self?.updateTabMode()
             self?.updateEmptyTabArea()
