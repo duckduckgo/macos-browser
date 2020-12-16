@@ -296,6 +296,7 @@ fileprivate extension WKWebViewConfiguration {
         let configuration = WKWebViewConfiguration()
         configuration.websiteDataStore = WKWebsiteDataStore.default()
         configuration.allowsAirPlayForMediaPlayback = true
+        configuration.preferences.setValue(true, forKey: "fullScreenEnabled")
         return configuration
     }
 
