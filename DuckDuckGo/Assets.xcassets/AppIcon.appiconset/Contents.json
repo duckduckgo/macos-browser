@@ -1,61 +1,61 @@
 {
   "images" : [
     {
-      "filename" : "DDG_Icon_16pt.png",
+      "filename" : "Icon-16.png",
       "idiom" : "mac",
       "scale" : "1x",
       "size" : "16x16"
     },
     {
-      "filename" : "DDG_Icon_16pt@2x.png",
+      "filename" : "Icon-33.png",
       "idiom" : "mac",
       "scale" : "2x",
       "size" : "16x16"
     },
     {
-      "filename" : "DDG_Icon_32pt.png",
+      "filename" : "Icon-32.png",
       "idiom" : "mac",
       "scale" : "1x",
       "size" : "32x32"
     },
     {
-      "filename" : "DDG_Icon_32pt@2x.png",
+      "filename" : "Icon-64.png",
       "idiom" : "mac",
       "scale" : "2x",
       "size" : "32x32"
     },
     {
-      "filename" : "DDG_Icon_128pt.png",
+      "filename" : "Icon-128.png",
       "idiom" : "mac",
       "scale" : "1x",
       "size" : "128x128"
     },
     {
-      "filename" : "DDG_Icon_128pt@2x-1.png",
+      "filename" : "Icon-257.png",
       "idiom" : "mac",
       "scale" : "2x",
       "size" : "128x128"
     },
     {
-      "filename" : "DDG_Icon_128pt@2x.png",
+      "filename" : "Icon-256.png",
       "idiom" : "mac",
       "scale" : "1x",
       "size" : "256x256"
     },
     {
-      "filename" : "DDG_Icon_512pt.png",
+      "filename" : "Icon-513.png",
       "idiom" : "mac",
       "scale" : "2x",
       "size" : "256x256"
     },
     {
-      "filename" : "DDG_Icon_512pt-2.png",
+      "filename" : "Icon-512.png",
       "idiom" : "mac",
       "scale" : "1x",
       "size" : "512x512"
     },
     {
-      "filename" : "DDG_Icon_512pt@2x.png",
+      "filename" : "Icon-1024.png",
       "idiom" : "mac",
       "scale" : "2x",
       "size" : "512x512"
