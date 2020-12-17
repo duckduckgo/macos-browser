@@ -29,6 +29,10 @@ class TabBarViewController: NSViewController {
         case buttonPadding = 8
     }
 
+    enum VerticalSpace: CGFloat {
+        case tooltipPadding = 2
+    }
+
     @IBOutlet weak var collectionView: TabBarCollectionView!
     @IBOutlet weak var scrollView: TabBarScrollView!
     @IBOutlet weak var scrollViewTrailingConstraint: NSLayoutConstraint!
@@ -258,6 +262,7 @@ class TabBarViewController: NSViewController {
 
     @objc private func scrollViewBoundsDidChange(_ sender: Any) {
         enableScrollButtons()
+        hideTooltip()
     }
 
     private func enableScrollButtons() {
@@ -277,6 +282,40 @@ class TabBarViewController: NSViewController {
         leftScrollButton.isHidden = scrollViewsAreHidden
         rightShadowImageView.isHidden = scrollViewsAreHidden
         leftShadowImageView.isHidden = scrollViewsAreHidden
+    }
+
+    // MARK: - Tooltip
+
+    // swiftlint:disable force_cast
+    private var tooltipWindowController: TooltipWindowController = {
+        let storyboard = NSStoryboard(name: "Tooltip", bundle: nil)
+        return storyboard.instantiateController(withIdentifier: "TooltipWindowController") as! TooltipWindowController
+    }()
+    // swiftlint:enable force_cast
+
+    func showTooltip(for tabBarViewItem: TabBarViewItem) {
+        guard let indexPath = collectionView.indexPath(for: tabBarViewItem),
+              let tabViewModel = tabCollectionViewModel.tabViewModel(at: indexPath.item) else {
+            os_log("TabBarViewController: Failed to get tab view model", type: .error)
+            return
+        }
+
+        tooltipWindowController.tooltipViewController.display(tabViewModel: tabViewModel)
+
+        guard let window = view.window, let clipView = collectionView.clipView else {
+            os_log("TabBarViewController: Showing of tooltip window failed", type: .error)
+            return
+        }
+
+        var point = view.bounds.origin
+        point.y -= VerticalSpace.tooltipPadding.rawValue
+        point.x += scrollViewLeadingConstraint.constant + tabBarViewItem.view.frame.origin.x - clipView.bounds.origin.x
+        let converted = window.convertPoint(toScreen: view.convert(point, to: nil))
+        tooltipWindowController.scheduleShowing(parentWindow: window, topLeftPoint: converted)
+    }
+
+    func hideTooltip() {
+        tooltipWindowController.hide()
     }
 
 }
@@ -303,6 +342,7 @@ extension TabBarViewController: TabCollectionViewModelDelegate {
 
         updateTabMode()
         updateEmptyTabArea()
+        hideTooltip()
     }
 
     func tabCollectionViewModel(_ tabCollectionViewModel: TabCollectionViewModel,
@@ -333,6 +373,7 @@ extension TabBarViewController: TabCollectionViewModelDelegate {
             self?.updateTabMode()
             self?.updateEmptyTabArea()
             self?.enableScrollButtons()
+            self?.hideTooltip()
         }
     }
 
@@ -352,6 +393,7 @@ extension TabBarViewController: TabCollectionViewModelDelegate {
         collectionView.animator().moveItem(at: indexPath, to: newIndexPath)
 
         updateTabMode()
+        hideTooltip()
     }
 
     private func appendToCollectionView(selected: Bool) {
@@ -379,6 +421,7 @@ extension TabBarViewController: TabCollectionViewModelDelegate {
             }
         }
         updateEmptyTabArea()
+        hideTooltip()
     }
 
     private func reloadCollectionView(selectionIndex: Int? = nil, animated: Bool = true) {
@@ -388,11 +431,13 @@ extension TabBarViewController: TabCollectionViewModelDelegate {
             } completionHandler: { [weak self] _ in
                 self?.updateTabMode()
                 self?.enableScrollButtons()
+                self?.hideTooltip()
             }
         } else {
             collectionView.animator().reloadData()
             updateTabMode()
             enableScrollButtons()
+            hideTooltip()
         }
 
         if let selectionIndex = selectionIndex {
@@ -482,6 +527,8 @@ extension TabBarViewController: NSCollectionViewDelegate {
                 self.collectionView.scrollToSelected()
             }
         }
+
+        hideTooltip()
     }
 
     func collectionView(_ collectionView: NSCollectionView,
@@ -568,9 +615,20 @@ extension TabBarViewController: NSCollectionViewDelegate {
 
 extension TabBarViewController: TabBarViewItemDelegate {
 
+    func tabBarViewItem(_ tabBarViewItem: TabBarViewItem, isMouseOver: Bool) {
+        if isMouseOver {
+            // Show tooltip for visible tab bar items
+            if collectionView.visibleRect.intersects(tabBarViewItem.view.frame) {
+                showTooltip(for: tabBarViewItem)
+            }
+        } else {
+            tooltipWindowController.scheduleHiding()
+        }
+    }
+
     func tabBarViewItemDuplicateAction(_ tabBarViewItem: TabBarViewItem) {
         guard let indexPath = collectionView.indexPath(for: tabBarViewItem) else {
-            os_log("TabBarViewController: Failed to get indexPath", type: .error)
+            os_log("TabBarViewController: Failed to get index path of tab bar view item", type: .error)
             return
         }
 
@@ -580,7 +638,7 @@ extension TabBarViewController: TabBarViewItemDelegate {
 
     func tabBarViewItemCloseAction(_ tabBarViewItem: TabBarViewItem) {
         guard let indexPath = collectionView.indexPath(for: tabBarViewItem) else {
-            os_log("TabBarViewController: Failed to get indexPath", type: .error)
+            os_log("TabBarViewController: Failed to get index path of tab bar view item", type: .error)
             return
         }
 
@@ -589,7 +647,7 @@ extension TabBarViewController: TabBarViewItemDelegate {
 
     func tabBarViewItemCloseOtherAction(_ tabBarViewItem: TabBarViewItem) {
         guard let indexPath = collectionView.indexPath(for: tabBarViewItem) else {
-            os_log("TabBarViewController: Failed to get indexPath", type: .error)
+            os_log("TabBarViewController: Failed to get index path of tab bar view item", type: .error)
             return
         }
 

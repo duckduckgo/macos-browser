@@ -22,6 +22,8 @@ import Combine
 
 protocol TabBarViewItemDelegate: AnyObject {
 
+    func tabBarViewItem(_ tabBarViewItem: TabBarViewItem, isMouseOver: Bool)
+
     func tabBarViewItemCloseAction(_ tabBarViewItem: TabBarViewItem)
     func tabBarViewItemCloseOtherAction(_ tabBarViewItem: TabBarViewItem)
     func tabBarViewItemDuplicateAction(_ tabBarViewItem: TabBarViewItem)
@@ -170,6 +172,8 @@ class TabBarViewItem: NSCollectionViewItem {
     }
 
     private func setupView() {
+        mouseOverView.delegate = self
+
         view.wantsLayer = true
         view.layer?.cornerRadius = 7
         view.layer?.maskedCorners = [.layerMinXMaxYCorner, .layerMaxXMaxYCorner]
@@ -234,6 +238,14 @@ class TabBarViewItem: NSCollectionViewItem {
         titleTextFieldMaskLayer.endPoint = CGPoint(x: endPointX, y: 0.5)
 
         CATransaction.commit()
+    }
+
+}
+
+extension TabBarViewItem: MouseOverViewDelegate {
+
+    func mouseOverView(_ mouseOverView: MouseOverView, isMouseOver: Bool) {
+        delegate?.tabBarViewItem(self, isMouseOver: isMouseOver)
     }
 
 }

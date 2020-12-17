@@ -332,6 +332,7 @@ class AddressBarTextField: NSTextField {
         }
 
         let windowController = storyboard.instantiateController(withIdentifier: "SuggestionsWindowController") as? NSWindowController
+        windowController?.window?.animationBehavior = .utilityWindow
         let suggestionsViewController = storyboard.instantiateController(identifier: "SuggestionsViewController", creator: creator)
 
         windowController?.contentViewController = suggestionsViewController
