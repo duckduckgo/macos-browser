@@ -29,10 +29,19 @@ class EncryptionKeyStore: EncryptionKeyStoring {
     
     enum Constants {
         static let encryptionKeyAccount = "com.duckduckgo.macos.browser"
+        static let encryptionKeyService = "DuckDuckGo Privacy Browser Data Encryption Key"
     }
 
     private let generator: EncryptionKeyGenerating
     private let account: String
+
+    private var defaultKeychainQueryAttributes: [String: Any] {
+        return [
+            kSecClass: kSecClassGenericPassword,
+            kSecAttrAccount: account,
+            kSecUseDataProtectionKeychain: true
+        ] as [String: Any]
+    }
 
     init(generator: EncryptionKeyGenerating = EncryptionKeyGenerator(), account: String = Constants.encryptionKeyAccount) {
         self.generator = generator
@@ -42,14 +51,10 @@ class EncryptionKeyStore: EncryptionKeyStoring {
     // MARK: - Keychain
 
     func store(key: SymmetricKey) throws {
-        let query = [
-            kSecClass: kSecClassGenericPassword,
-            kSecAttrService: "DuckDuckGo Privacy Browser Data Encryption Key",
-            kSecAttrAccount: account,
-            kSecAttrAccessible: kSecAttrAccessibleWhenUnlocked,
-            kSecUseDataProtectionKeychain: true,
-            kSecValueData: key.dataRepresentation
-        ] as [String: Any]
+        var query = defaultKeychainQueryAttributes
+        query[kSecAttrService as String] = Constants.encryptionKeyService
+        query[kSecAttrAccessible as String] = kSecAttrAccessibleWhenUnlocked
+        query[kSecValueData as String] = key.dataRepresentation
 
         let status = SecItemAdd(query as CFDictionary, nil)
 
@@ -70,13 +75,7 @@ class EncryptionKeyStore: EncryptionKeyStoring {
     }
 
     func deleteKey() throws {
-        let query = [
-            kSecClass: kSecClassGenericPassword,
-            kSecUseDataProtectionKeychain: true,
-            kSecAttrAccount: account
-        ] as [String: Any]
-
-        switch SecItemDelete(query as CFDictionary) {
+        switch SecItemDelete(defaultKeychainQueryAttributes as CFDictionary) {
         case errSecItemNotFound, errSecSuccess: break
         default:
             throw EncryptionKeyStoreError.deletionFailed
@@ -86,12 +85,8 @@ class EncryptionKeyStore: EncryptionKeyStoring {
     // MARK: - Private
 
     private func readKeyFromKeychain(account: String) throws -> SymmetricKey? {
-        let query = [
-            kSecClass: kSecClassGenericPassword,
-            kSecAttrAccount: account,
-            kSecUseDataProtectionKeychain: true,
-            kSecReturnData: true
-        ] as [String: Any]
+        var query = defaultKeychainQueryAttributes
+        query[kSecReturnData as String] = true
 
         var item: CFTypeRef?
 

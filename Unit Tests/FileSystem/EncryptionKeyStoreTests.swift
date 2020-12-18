@@ -41,6 +41,20 @@ class EncryptionKeyStoreTests: XCTestCase {
         XCTAssertNoThrow(try store.store(key: key))
     }
 
+    func testDeletingKeys() {
+        let store = EncryptionKeyStore(generator: generator, account: account)
+        let key = generator.randomKey()
+
+        XCTAssertNoThrow(try store.store(key: key))
+        XCTAssertNoThrow(try store.deleteKey())
+    }
+
+    func testAttemptingToDeleteKeyWhichDoesNotExist() {
+        // It's fine to try and delete a key which doesn't exist, so no error should throw.
+        let store = EncryptionKeyStore(generator: generator, account: account)
+        XCTAssertNoThrow(try store.deleteKey())
+    }
+
     func testReadingKeysWithNoneInTheKeychainGeneratesNewKey() {
         let mockGenerator = MockEncryptionKeyGenerator()
         let store = EncryptionKeyStore(generator: mockGenerator, account: account)
