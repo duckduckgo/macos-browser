@@ -57,6 +57,8 @@ class EncryptedValueTransformer<T: NSCoding & NSObject>: ValueTransformer {
         return try? NSKeyedUnarchiver.unarchivedObject(ofClass: T.self, from: decryptedData as Data)
     }
 
+    // The transformer name is calculated based on the generic class parameter.
+    // For instance, EncryptedValueTransformer<String> would be named "StringTransformer", and should be specified as such in Core Data attributes.
     public static var transformerName: NSValueTransformerName {
         let className = String(describing: T.self)
         return NSValueTransformerName("\(className)Transformer")
