@@ -36,6 +36,7 @@ class DataEncryption {
             return try ChaChaPoly.open(sealedBox, using: key)
         } catch {
             switch error {
+            // This error is thrown when the sealed box cannot be created, i.e. the data has changed for some reason and can no longer be decrypted.
             case CryptoKitError.incorrectParameterSize:
                 throw DataEncryptionError.invalidData
             default:
