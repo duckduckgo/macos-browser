@@ -36,7 +36,7 @@ class OptionsButtonMenu: NSMenu {
     }
 
     private func setupMenuItems() {
-        let moveTabMenuItem = NSMenuItem(title: UserText.optionsMenuMoveTabToNewWindow,
+        let moveTabMenuItem = NSMenuItem(title: UserText.moveTabToNewWindow,
                                          action: #selector(moveTabToNewWindowAction(_:)),
                                          keyEquivalent: "")
         moveTabMenuItem.target = self

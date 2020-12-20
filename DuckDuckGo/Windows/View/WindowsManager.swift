@@ -40,6 +40,7 @@ class WindowsManager {
             return
         }
 
+        mainWindowController.window?.animationBehavior = .documentWindow
         mainWindowController.showWindow(self)
 
         if let initialUrl = initialUrl {

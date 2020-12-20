@@ -30,7 +30,7 @@ struct UserText {
     static let tabHomeTitle = NSLocalizedString("tab.home.title", value: "Home", comment: "Tab home title")
     static let tabErrorTitle = NSLocalizedString("tab.error.title", value: "Oops!", comment: "Tab error title")
 
-    static let optionsMenuMoveTabToNewWindow = NSLocalizedString("options.menu.move.tab.to.new.window",
+    static let moveTabToNewWindow = NSLocalizedString("options.menu.move.tab.to.new.window",
                                                                  value: "Move Tab to New Window",
                                                                  comment: "Context menu item")
 

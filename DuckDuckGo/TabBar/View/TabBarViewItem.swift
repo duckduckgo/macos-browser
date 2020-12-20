@@ -27,6 +27,7 @@ protocol TabBarViewItemDelegate: AnyObject {
     func tabBarViewItemCloseAction(_ tabBarViewItem: TabBarViewItem)
     func tabBarViewItemCloseOtherAction(_ tabBarViewItem: TabBarViewItem)
     func tabBarViewItemDuplicateAction(_ tabBarViewItem: TabBarViewItem)
+    func tabBarViewItemMoveToNewWindowAction(_ tabBarViewItem: TabBarViewItem)
 
 }
 
@@ -78,6 +79,8 @@ class TabBarViewItem: NSCollectionViewItem {
         menu.addItem(closeMenuItem)
         let closeOtherMenuItem = NSMenuItem(title: UserText.closeOtherTabs, action: #selector(closeOtherAction(_:)), keyEquivalent: "")
         menu.addItem(closeOtherMenuItem)
+        let moveToNewWindowMenuItem = NSMenuItem(title: UserText.moveTabToNewWindow, action: #selector(moveToNewWindowAction(_:)), keyEquivalent: "")
+        menu.addItem(moveToNewWindowMenuItem)
         return menu
     }
 
@@ -137,6 +140,10 @@ class TabBarViewItem: NSCollectionViewItem {
 
     @objc func closeOtherAction(_ sender: NSButton) {
         delegate?.tabBarViewItemCloseOtherAction(self)
+    }
+
+    @objc func moveToNewWindowAction(_ sender: NSButton) {
+        delegate?.tabBarViewItemMoveToNewWindowAction(self)
     }
 
     func subscribe(to tabViewModel: TabViewModel) {

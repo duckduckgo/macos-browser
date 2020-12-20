@@ -655,6 +655,18 @@ extension TabBarViewController: TabBarViewItemDelegate {
         tabCollectionViewModel.removeAllTabs(except: indexPath.item)
     }
 
+    func tabBarViewItemMoveToNewWindowAction(_ tabBarViewItem: TabBarViewItem) {
+        guard let indexPath = collectionView.indexPath(for: tabBarViewItem),
+              let tabViewModel = tabCollectionViewModel.tabViewModel(at: indexPath.item) else {
+            os_log("TabBarViewController: Failed to get tab view model", type: .error)
+            return
+        }
+
+        let url = tabViewModel.tab.url
+        tabCollectionViewModel.remove(at: indexPath.item)
+        WindowsManager.openNewWindow(with: url)
+    }
+
 }
 
 fileprivate extension NSAlert {
