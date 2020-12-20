@@ -213,31 +213,10 @@ class TabBarViewItem: NSCollectionViewItem {
     }
 
     private func updateTitleTextFieldMask() {
-        guard let titleTextFieldLayer = titleTextField.layer else {
-            os_log("TabBarViewItem: Title text field has no layer", type: .error)
-            return
-        }
-
-        if titleTextFieldLayer.mask == nil {
-            titleTextFieldLayer.mask = titleTextFieldMaskLayer
-            titleTextFieldMaskLayer.colors = [NSColor.white.cgColor, NSColor.clear.cgColor]
-        }
-
-        CATransaction.begin()
-        CATransaction.setAnimationDuration(0)
-
-        titleTextFieldMaskLayer.frame = titleTextFieldLayer.bounds
-
         let gradientPadding: CGFloat = closeButton.isHidden ?
             TextFieldMaskGradientSize.trailingSpace.rawValue : TextFieldMaskGradientSize.trailingSpaceWithButton.rawValue
-        let gradientWidth: CGFloat = TextFieldMaskGradientSize.width.rawValue
-        let startPointX = (titleTextFieldMaskLayer.bounds.width - (gradientPadding + gradientWidth)) / titleTextFieldMaskLayer.bounds.width
-        let endPointX = (titleTextFieldMaskLayer.bounds.width - gradientPadding) / titleTextFieldMaskLayer.bounds.width
-
-        titleTextFieldMaskLayer.startPoint = CGPoint(x: startPointX, y: 0.5)
-        titleTextFieldMaskLayer.endPoint = CGPoint(x: endPointX, y: 0.5)
-
-        CATransaction.commit()
+        titleTextField.gradient(width: TextFieldMaskGradientSize.width.rawValue,
+                                trailingPadding: gradientPadding)
     }
 
 }

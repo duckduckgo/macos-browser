@@ -53,6 +53,9 @@
                             </customView>
                             <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="lWf-Z2-vYW">
                                 <rect key="frame" x="14" y="31" width="260" height="17"/>
+                                <constraints>
+                                    <constraint firstAttribute="width" constant="256" id="tMT-xB-AW4"/>
+                                </constraints>
                                 <textFieldCell key="cell" lineBreakMode="clipping" title="Label" id="cca-xA-oAB">
                                     <font key="font" metaFont="system" size="14"/>
                                     <color key="textColor" name="TooltipTintColor"/>

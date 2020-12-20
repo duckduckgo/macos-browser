@@ -51,6 +51,7 @@
 		AA585D89248FD31400E9A3E2 /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = AA585D87248FD31400E9A3E2 /* Main.storyboard */; };
 		AA585DA0248FD31500E9A3E2 /* DuckDuckGoUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA585D9F248FD31500E9A3E2 /* DuckDuckGoUITests.swift */; };
 		AA585DAF2490E6E600E9A3E2 /* MainViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA585DAE2490E6E600E9A3E2 /* MainViewController.swift */; };
+		AA5C8F59258FE21F00748EB7 /* NSTextFieldExtension.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA5C8F58258FE21F00748EB7 /* NSTextFieldExtension.swift */; };
 		AA5D6DAC24A340F700C6FBCE /* WebViewStateObserver.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA5D6DAB24A340F700C6FBCE /* WebViewStateObserver.swift */; };
 		AA63745224C9BBE100AB2AC4 /* SuggestionsAPIMock.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA63745124C9BBE100AB2AC4 /* SuggestionsAPIMock.swift */; };
 		AA63745424C9BF9A00AB2AC4 /* SuggestionsTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA63745324C9BF9A00AB2AC4 /* SuggestionsTests.swift */; };
@@ -191,6 +192,7 @@
 		AA585D9F248FD31500E9A3E2 /* DuckDuckGoUITests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DuckDuckGoUITests.swift; sourceTree = "<group>"; };
 		AA585DA1248FD31500E9A3E2 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		AA585DAE2490E6E600E9A3E2 /* MainViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = MainViewController.swift; path = ../MainViewController.swift; sourceTree = "<group>"; };
+		AA5C8F58258FE21F00748EB7 /* NSTextFieldExtension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NSTextFieldExtension.swift; sourceTree = "<group>"; };
 		AA5D6DAB24A340F700C6FBCE /* WebViewStateObserver.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WebViewStateObserver.swift; sourceTree = "<group>"; };
 		AA63745124C9BBE100AB2AC4 /* SuggestionsAPIMock.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SuggestionsAPIMock.swift; sourceTree = "<group>"; };
 		AA63745324C9BF9A00AB2AC4 /* SuggestionsTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SuggestionsTests.swift; sourceTree = "<group>"; };
@@ -687,13 +689,13 @@
 		AA86491E24D83A66001BABEE /* Model */ = {
 			isa = PBXGroup;
 			children = (
+				AA9FF95824A1ECF20039E328 /* Tab.swift */,
+				14505A07256084EF00272CC6 /* UserAgent.swift */,
+				AAA0CC512539D5B80079BC96 /* UserScript.swift */,
 				85D438BD256E8E6400F3BAF8 /* ContextMenuElement.swift */,
 				85D438B5256E7C9E00F3BAF8 /* ContextMenuUserScript.swift */,
 				AAA0CC562539EBC90079BC96 /* FaviconUserScript.swift */,
 				8556A601256BDDD30092FA9D /* HTML5DownloadUserScript.swift */,
-				AA9FF95824A1ECF20039E328 /* Tab.swift */,
-				14505A07256084EF00272CC6 /* UserAgent.swift */,
-				AAA0CC512539D5B80079BC96 /* UserScript.swift */,
 				AAF7D3852567CED500998667 /* WebViewConfiguration.swift */,
 			);
 			path = Model;
@@ -864,6 +866,7 @@
 				4B67744F255DBFA300025BD8 /* HashExtension.swift */,
 				AAECA41F24EEA4AC00EFA63A /* IndexPathExtension.swift */,
 				AA6EF9B2250785D5004754E6 /* NSMenuExtension.swift */,
+				AA5C8F58258FE21F00748EB7 /* NSTextFieldExtension.swift */,
 				AA6FFB4324DC33320028F4D0 /* NSViewExtension.swift */,
 				AA8EDF2624923EC70071C2E8 /* StringExtension.swift */,
 				AA8EDF2324923E980071C2E8 /* URLExtension.swift */,
@@ -1090,6 +1093,7 @@
 				AAECA42024EEA4AC00EFA63A /* IndexPathExtension.swift in Sources */,
 				4B677450255DBFA300025BD8 /* HashExtension.swift in Sources */,
 				AA9FF95F24A1FB690039E328 /* TabCollectionViewModel.swift in Sources */,
+				AA5C8F59258FE21F00748EB7 /* NSTextFieldExtension.swift in Sources */,
 				AA6EF9B525081B4C004754E6 /* MainMenuActions.swift in Sources */,
 				AA6FFB4424DC33320028F4D0 /* NSViewExtension.swift in Sources */,
 				AA585D84248FD31100E9A3E2 /* BrowserTabViewController.swift in Sources */,

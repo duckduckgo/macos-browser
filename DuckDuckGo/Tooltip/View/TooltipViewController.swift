@@ -28,10 +28,30 @@ class TooltipViewController: NSViewController {
 
 extension TooltipViewController {
 
+    enum TextFieldMaskGradientSize: CGFloat {
+        case width = 6
+        case trailingSpace = 12
+    }
+
+    override func viewDidLoad() {
+        super.viewDidLoad()
+
+        setupGradients()
+    }
+
     func display(tabViewModel: TabViewModel) {
         titleTextField.stringValue = tabViewModel.title
         urlTextField.stringValue = tabViewModel.addressBarString
         faviconImageView.image = tabViewModel.favicon
+    }
+
+    private func setupGradients() {
+        titleTextField.wantsLayer = true
+        titleTextField.gradient(width: TextFieldMaskGradientSize.width.rawValue,
+                                trailingPadding: TextFieldMaskGradientSize.trailingSpace.rawValue)
+        urlTextField.wantsLayer = true
+        urlTextField.gradient(width: TextFieldMaskGradientSize.width.rawValue,
+                              trailingPadding: TextFieldMaskGradientSize.trailingSpace.rawValue)
     }
 
 }
