@@ -39,8 +39,12 @@ class TabBarCollectionView: NSCollectionView {
         setDraggingSourceOperationMask([.move], forLocal: true)
     }
 
-    func clearSelection() {
-        deselectItems(at: selectionIndexPaths)
+    func clearSelection(animated: Bool = false) {
+        if animated {
+            animator().deselectItems(at: selectionIndexPaths)
+        } else {
+            deselectItems(at: selectionIndexPaths)
+        }
     }
     
     func scrollToSelected() {

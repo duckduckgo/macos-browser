@@ -337,6 +337,7 @@ extension TabBarViewController: TabCollectionViewModelDelegate {
     func tabCollectionViewModel(_ tabCollectionViewModel: TabCollectionViewModel, didInsertAndSelectAt index: Int) {
         let indexPath = IndexPath(item: index)
         let indexPathSet = Set(arrayLiteral: indexPath)
+        collectionView.clearSelection(animated: true)
         collectionView.animator().insertItems(at: indexPathSet)
         collectionView.selectItems(at: indexPathSet, scrollPosition: .centeredHorizontally)
 
