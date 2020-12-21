@@ -36,7 +36,7 @@ class CoreDataEncryptionTests: XCTestCase {
         super.setUp()
 
         mockValueTransformer.numberOfTransformations = 0
-        EncryptedValueTransformer<NSString>.registerTransformer()
+        try? EncryptedValueTransformer<NSString>.registerTransformer()
     }
 
     func testSavingEncryptedValues() {

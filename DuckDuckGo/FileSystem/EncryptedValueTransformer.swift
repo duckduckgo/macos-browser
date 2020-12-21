@@ -21,10 +21,10 @@ import CryptoKit
 
 class EncryptedValueTransformer<T: NSCoding & NSObject>: ValueTransformer {
 
-    private let keyStore: EncryptionKeyStoring
+    private let encryptionKey: SymmetricKey
 
-    init(keyStore: EncryptionKeyStoring = EncryptionKeyStore()) {
-        self.keyStore = keyStore
+    init(encryptionKey: SymmetricKey) {
+        self.encryptionKey = encryptionKey
     }
 
     override class func transformedValueClass() -> AnyClass {
@@ -36,23 +36,15 @@ class EncryptedValueTransformer<T: NSCoding & NSObject>: ValueTransformer {
     }
 
     override func transformedValue(_ value: Any?) -> Any? {
-        let generator = EncryptionKeyGenerator()
-        let keyStore = EncryptionKeyStore(generator: generator)
+        guard let castValue = value as? T,
+              let archivedData = try? NSKeyedArchiver.archivedData(withRootObject: castValue, requiringSecureCoding: true) else { return nil }
 
-        guard let value = value as? T,
-              let key = try? keyStore.readKey(),
-              let archivedData = try? NSKeyedArchiver.archivedData(withRootObject: value, requiringSecureCoding: true) else { return nil }
-
-        return try? DataEncryption.encrypt(data: archivedData, key: key)
+        return try? DataEncryption.encrypt(data: archivedData, key: encryptionKey)
     }
 
     override func reverseTransformedValue(_ value: Any?) -> Any? {
-        let generator = EncryptionKeyGenerator()
-        let keyStore = EncryptionKeyStore(generator: generator)
-
         guard let data = value as? Data,
-              let key = try? keyStore.readKey(),
-              let decryptedData = try? DataEncryption.decrypt(data: data, key: key) else { return nil }
+              let decryptedData = try? DataEncryption.decrypt(data: data, key: encryptionKey) else { return nil }
 
         return try? NSKeyedUnarchiver.unarchivedObject(ofClass: T.self, from: decryptedData as Data)
     }
@@ -64,8 +56,12 @@ class EncryptedValueTransformer<T: NSCoding & NSObject>: ValueTransformer {
         return NSValueTransformerName("\(className)Transformer")
     }
 
-    static func registerTransformer() {
-        let transformer = EncryptedValueTransformer<T>()
+    static func registerTransformer() throws {
+        let generator = EncryptionKeyGenerator()
+        let keyStore = EncryptionKeyStore(generator: generator)
+        let key = try keyStore.readKey()
+        let transformer = EncryptedValueTransformer<T>(encryptionKey: key)
+
         ValueTransformer.setValueTransformer(transformer, forName: transformerName)
     }
 

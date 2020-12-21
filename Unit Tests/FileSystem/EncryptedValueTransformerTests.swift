@@ -25,7 +25,8 @@ class EncryptedValueTransformerTests: XCTestCase {
     func testTransformingValues() {
         let value = "Hello, World"
         let store = MockEncryptionKeyStore(generator: MockEncryptionKeyGenerator(), account: "mock-account")
-        let transformer = EncryptedValueTransformer<NSString>(keyStore: store)
+        let key = try? store.readKey()
+        let transformer = EncryptedValueTransformer<NSString>(encryptionKey: key!)
         let transformedValue = transformer.transformedValue(value)
 
         XCTAssertTrue(transformedValue is Data)
@@ -35,7 +36,8 @@ class EncryptedValueTransformerTests: XCTestCase {
     func testReverseTransformingValues() {
         let value = "Hello, World"
         let store = MockEncryptionKeyStore(generator: MockEncryptionKeyGenerator(), account: "mock-account")
-        let transformer = EncryptedValueTransformer<NSString>(keyStore: store)
+        let key = try? store.readKey()
+        let transformer = EncryptedValueTransformer<NSString>(encryptionKey: key!)
         let transformedValue = transformer.transformedValue(value)
         let reverseTransformedValue = transformer.reverseTransformedValue(transformedValue)
 
