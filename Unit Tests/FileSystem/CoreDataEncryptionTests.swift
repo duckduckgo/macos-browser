@@ -23,8 +23,19 @@ import CryptoKit
 @testable import DuckDuckGo_Privacy_Browser
 
 class CoreDataEncryptionTests: XCTestCase {
+
+    private lazy var mockValueTransformer: MockValueTransformer = {
+        let name = NSValueTransformerName("MockValueTransformer")
+        let transformer = MockValueTransformer()
+        ValueTransformer.setValueTransformer(transformer, forName: name)
+
+        return transformer
+    }()
+
     override func setUp() {
         super.setUp()
+
+        mockValueTransformer.numberOfTransformations = 0
         EncryptedValueTransformer<NSString>.registerTransformer()
     }
 
@@ -91,6 +102,35 @@ class CoreDataEncryptionTests: XCTestCase {
         XCTAssertNotNil(result)
         XCTAssertEqual(result?.date, timestamp)
         XCTAssertEqual(result?.encryptedString, "Hello, World" as NSString)
+    }
+
+    func testValueTransformers() {
+        let transformer = self.mockValueTransformer
+        let container = createInMemoryPersistentContainer()
+        let context = container.viewContext
+
+        context.performAndWait {
+            let entity = MockEntity(context: context)
+            entity.mockString = "Test String" as NSString
+
+            do {
+                try context.save()
+            } catch {
+                XCTFail("Failed with Core Data error: \(error)")
+            }
+        }
+
+        XCTAssertEqual(transformer.numberOfTransformations, 1)
+
+        let request = NSFetchRequest<NSManagedObject>(entityName: "MockEntity")
+
+        do {
+            let results = try context.fetch(request)
+            let result = results[0] as? MockEntity
+            XCTAssertEqual(result?.mockString, "Transformed: Test String" as NSString)
+        } catch let error as NSError {
+            XCTFail("Could not fetch encrypted entity: \(error), \(error.userInfo)")
+        }
     }
 
     private func firstPartiallyEncryptedEntity(context: NSManagedObjectContext) -> PartiallyEncryptedEntity? {

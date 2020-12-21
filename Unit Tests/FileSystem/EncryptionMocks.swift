@@ -62,3 +62,35 @@ class MockEncryptionKeyStore: EncryptionKeyStoring {
     }
 
 }
+
+// Value transformers are created by Core Data when required, and as such it's tricky to unit test them.
+class MockValueTransformer: ValueTransformer {
+    var numberOfTransformations = 0
+    private let prefix = "Transformed: "
+
+    override class func transformedValueClass() -> AnyClass {
+        NSString.self
+    }
+
+    override class func allowsReverseTransformation() -> Bool {
+        true
+    }
+
+    override func transformedValue(_ value: Any?) -> Any? {
+        numberOfTransformations += 1
+
+        guard let value = value as? NSString else { return nil }
+
+        let transformedValue = "\(prefix)\(value)" as NSString
+        return try? NSKeyedArchiver.archivedData(withRootObject: transformedValue, requiringSecureCoding: true)
+    }
+
+    override func reverseTransformedValue(_ value: Any?) -> Any? {
+        guard let data = value as? Data else {
+            return nil
+        }
+
+        return try? NSKeyedUnarchiver.unarchivedObject(ofClass: NSString.self, from: data)
+    }
+
+}

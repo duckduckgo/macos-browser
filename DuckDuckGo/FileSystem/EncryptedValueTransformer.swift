@@ -27,15 +27,15 @@ class EncryptedValueTransformer<T: NSCoding & NSObject>: ValueTransformer {
         self.keyStore = keyStore
     }
 
-    public override class func transformedValueClass() -> AnyClass {
+    override class func transformedValueClass() -> AnyClass {
         T.self
     }
 
-    public override class func allowsReverseTransformation() -> Bool {
+    override class func allowsReverseTransformation() -> Bool {
         true
     }
 
-    public override func transformedValue(_ value: Any?) -> Any? {
+    override func transformedValue(_ value: Any?) -> Any? {
         let generator = EncryptionKeyGenerator()
         let keyStore = EncryptionKeyStore(generator: generator)
 
@@ -46,7 +46,7 @@ class EncryptedValueTransformer<T: NSCoding & NSObject>: ValueTransformer {
         return try? DataEncryption.encrypt(data: archivedData, key: key)
     }
 
-    public override func reverseTransformedValue(_ value: Any?) -> Any? {
+    override func reverseTransformedValue(_ value: Any?) -> Any? {
         let generator = EncryptionKeyGenerator()
         let keyStore = EncryptionKeyStore(generator: generator)
 
@@ -59,12 +59,12 @@ class EncryptedValueTransformer<T: NSCoding & NSObject>: ValueTransformer {
 
     // The transformer name is calculated based on the generic class parameter.
     // For instance, EncryptedValueTransformer<String> would be named "StringTransformer", and should be specified as such in Core Data attributes.
-    public static var transformerName: NSValueTransformerName {
+    static var transformerName: NSValueTransformerName {
         let className = String(describing: T.self)
         return NSValueTransformerName("\(className)Transformer")
     }
 
-    public static func registerTransformer() {
+    static func registerTransformer() {
         let transformer = EncryptedValueTransformer<T>()
         ValueTransformer.setValueTransformer(transformer, forName: transformerName)
     }
