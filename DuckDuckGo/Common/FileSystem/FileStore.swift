@@ -17,6 +17,7 @@
 //
 
 import Foundation
+import CryptoKit
 
 protocol FileStoring {
     func persist(_ data: Data, fileName: String) -> Bool
@@ -26,18 +27,17 @@ protocol FileStoring {
 
 public class FileStore: FileStoring {
 
-    private let encryptionKeyStore: EncryptionKeyStoring?
+    private let encryptionKey: SymmetricKey?
 
-    init(encryptionKeyStore: EncryptionKeyStoring? = nil) {
-        self.encryptionKeyStore = encryptionKeyStore
+    init(encryptionKey: SymmetricKey? = nil) {
+        self.encryptionKey = encryptionKey
     }
 
     func persist(_ data: Data, fileName: String) -> Bool {
         do {
             let dataToWrite: Data
 
-            if let keyStore = self.encryptionKeyStore {
-                let key = try keyStore.readKey()
+            if let key = self.encryptionKey {
                 dataToWrite = try DataEncryption.encrypt(data: data, key: key)
             } else {
                 dataToWrite = data
@@ -56,7 +56,7 @@ public class FileStore: FileStoring {
             return nil
         }
 
-        if let keyStore = self.encryptionKeyStore, let key = try? keyStore.readKey() {
+        if let key = self.encryptionKey {
             return try? DataEncryption.decrypt(data: data, key: key)
         } else {
             return data

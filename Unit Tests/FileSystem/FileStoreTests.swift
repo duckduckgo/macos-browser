@@ -59,7 +59,8 @@ class FileStoreTests: XCTestCase {
 
     func testStoringAndRetrievingEncryptedData() {
         let keyStore = MockEncryptionKeyStore(generator: EncryptionKeyGenerator(), account: "mock-account")
-        let encryptedStore = FileStore(encryptionKeyStore: keyStore)
+        let key = try? keyStore.readKey()
+        let encryptedStore = FileStore(encryptionKey: key!)
 
         XCTAssertTrue(encryptedStore.persist(testData, fileName: testFileName))
 
@@ -76,7 +77,8 @@ class FileStoreTests: XCTestCase {
 
     func testOverwritingStoredFiles() {
         let keyStore = MockEncryptionKeyStore(generator: EncryptionKeyGenerator(), account: "mock-account")
-        let encryptedStore = FileStore(encryptionKeyStore: keyStore)
+        let key = try? keyStore.readKey()
+        let encryptedStore = FileStore(encryptionKey: key!)
 
         XCTAssertTrue(encryptedStore.persist("First Write".data(using: .utf8)!, fileName: testFileName))
         XCTAssertTrue(encryptedStore.persist("Second Write".data(using: .utf8)!, fileName: testFileName))
