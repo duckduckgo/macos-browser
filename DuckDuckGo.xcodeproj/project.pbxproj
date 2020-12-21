@@ -16,6 +16,8 @@
 		14D9B8FB24F7E089000D4D13 /* AddressBarViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 14D9B8F924F7E089000D4D13 /* AddressBarViewController.swift */; };
 		14D9B90024F90230000D4D13 /* VerticallyCenteredTextFieldCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 14D9B8FF24F90230000D4D13 /* VerticallyCenteredTextFieldCell.swift */; };
 		14D9B90224F91316000D4D13 /* AddressBarView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 14D9B90124F91316000D4D13 /* AddressBarView.swift */; };
+		4B11060525903E570039B979 /* CoreDataEncryptionTesting.xcdatamodeld in Sources */ = {isa = PBXBuildFile; fileRef = 4B11060325903E570039B979 /* CoreDataEncryptionTesting.xcdatamodeld */; };
+		4B11060A25903EAC0039B979 /* CoreDataEncryptionTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B11060925903EAC0039B979 /* CoreDataEncryptionTests.swift */; };
 		4B677431255DBEB800025BD8 /* BloomFilterWrapper.mm in Sources */ = {isa = PBXBuildFile; fileRef = 4B677424255DBEB800025BD8 /* BloomFilterWrapper.mm */; };
 		4B677432255DBEB800025BD8 /* httpsMobileV2BloomSpec.json in Resources */ = {isa = PBXBuildFile; fileRef = 4B677427255DBEB800025BD8 /* httpsMobileV2BloomSpec.json */; };
 		4B677433255DBEB800025BD8 /* httpsMobileV2Bloom.bin in Resources */ = {isa = PBXBuildFile; fileRef = 4B677428255DBEB800025BD8 /* httpsMobileV2Bloom.bin */; };
@@ -154,6 +156,8 @@
 		14D9B8F924F7E089000D4D13 /* AddressBarViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AddressBarViewController.swift; sourceTree = "<group>"; };
 		14D9B8FF24F90230000D4D13 /* VerticallyCenteredTextFieldCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VerticallyCenteredTextFieldCell.swift; sourceTree = "<group>"; };
 		14D9B90124F91316000D4D13 /* AddressBarView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AddressBarView.swift; sourceTree = "<group>"; };
+		4B11060425903E570039B979 /* CoreDataEncryptionTesting.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = CoreDataEncryptionTesting.xcdatamodel; sourceTree = "<group>"; };
+		4B11060925903EAC0039B979 /* CoreDataEncryptionTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CoreDataEncryptionTests.swift; sourceTree = "<group>"; };
 		4B677424255DBEB800025BD8 /* BloomFilterWrapper.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = BloomFilterWrapper.mm; sourceTree = "<group>"; };
 		4B677425255DBEB800025BD8 /* BloomFilterWrapper.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = BloomFilterWrapper.h; sourceTree = "<group>"; };
 		4B677427255DBEB800025BD8 /* httpsMobileV2BloomSpec.json */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.json; path = httpsMobileV2BloomSpec.json; sourceTree = "<group>"; };
@@ -406,6 +410,8 @@
 				4BA1A6EA258C288C00F6F690 /* EncryptionKeyStoreTests.swift */,
 				4BA1A6F5258C4F9600F6F690 /* EncryptionMocks.swift */,
 				4BA1A6DD258C100A00F6F690 /* FileStoreTests.swift */,
+				4B11060925903EAC0039B979 /* CoreDataEncryptionTests.swift */,
+				4B11060325903E570039B979 /* CoreDataEncryptionTesting.xcdatamodeld */,
 			);
 			path = FileSystem;
 			sourceTree = "<group>";
@@ -1183,6 +1189,7 @@
 				AAC9C01724CAFBDC00AD1325 /* TabCollectionTests.swift in Sources */,
 				4BA1A6DE258C100A00F6F690 /* FileStoreTests.swift in Sources */,
 				AAC9C01C24CB594C00AD1325 /* TabViewModelTests.swift in Sources */,
+				4B11060525903E570039B979 /* CoreDataEncryptionTesting.xcdatamodeld in Sources */,
 				AA63745224C9BBE100AB2AC4 /* SuggestionsAPIMock.swift in Sources */,
 				142879DC24CE1185005419BB /* SuggestionsViewModelTests.swift in Sources */,
 				AAE39D1B24F44885008EF28B /* TabCollectionDelegateMock.swift in Sources */,
@@ -1192,6 +1199,7 @@
 				4BA1A6D9258C0CB300F6F690 /* DataEncryptionTests.swift in Sources */,
 				4BA1A6FE258C5C1300F6F690 /* EncryptedValueTransformerTests.swift in Sources */,
 				AA63745624C9EB3C00AB2AC4 /* SuggestionsAPIResultTests.swift in Sources */,
+				4B11060A25903EAC0039B979 /* CoreDataEncryptionTests.swift in Sources */,
 				8553FF52257523760029327F /* FileDownloadTests.swift in Sources */,
 				4BA1A6E6258C270800F6F690 /* EncryptionKeyGeneratorTests.swift in Sources */,
 				4BA1A6F6258C4F9600F6F690 /* EncryptionMocks.swift in Sources */,
@@ -1585,6 +1593,16 @@
 /* End XCConfigurationList section */
 
 /* Begin XCVersionGroup section */
+		4B11060325903E570039B979 /* CoreDataEncryptionTesting.xcdatamodeld */ = {
+			isa = XCVersionGroup;
+			children = (
+				4B11060425903E570039B979 /* CoreDataEncryptionTesting.xcdatamodel */,
+			);
+			currentVersion = 4B11060425903E570039B979 /* CoreDataEncryptionTesting.xcdatamodel */;
+			path = CoreDataEncryptionTesting.xcdatamodeld;
+			sourceTree = "<group>";
+			versionGroupType = wrapper.xcdatamodel;
+		};
 		4B67742E255DBEB800025BD8 /* HTTPSUpgrade.xcdatamodeld */ = {
 			isa = XCVersionGroup;
 			children = (
