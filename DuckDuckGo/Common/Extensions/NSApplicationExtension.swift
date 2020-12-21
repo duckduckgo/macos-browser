@@ -24,6 +24,10 @@ extension NSApplication {
         currentEvent?.modifierFlags.contains(.command) ?? false
     }
 
+    var isShiftPressed: Bool {
+        currentEvent?.modifierFlags.contains(.shift) ?? false
+    }
+
     var isReturnOrEnterPressed: Bool {
         currentEvent?.keyCode == 36 || currentEvent?.keyCode == 76
     }

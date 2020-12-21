@@ -137,10 +137,10 @@ class BrowserTabViewController: NSViewController {
         webView.isHidden = shown
     }
 
-    private func openNewTab(with url: URL?) {
+    private func openNewTab(with url: URL?, selected: Bool = false) {
         let tab = Tab()
         tab.url = url
-        tabCollectionViewModel.appendWithoutSelection(tab: tab)
+        tabCollectionViewModel.append(tab: tab, selected: selected)
     }
 
 }
@@ -151,8 +151,8 @@ extension BrowserTabViewController: TabDelegate {
         setFirstResponderIfNeeded()
     }
 
-    func tab(_ tab: Tab, requestedNewTab url: URL?) {
-        openNewTab(with: url)
+    func tab(_ tab: Tab, requestedNewTab url: URL?, selected: Bool) {
+        openNewTab(with: url, selected: selected)
     }
 
     func tab(_ tab: Tab, requestedFileDownload download: FileDownload) {

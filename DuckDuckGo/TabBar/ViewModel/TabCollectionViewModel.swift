@@ -114,22 +114,20 @@ class TabCollectionViewModel {
         delegate?.tabCollectionViewModel(self, didInsertAndSelectAt: newIndex)
     }
 
-    func append(tab: Tab) {
-        tabCollection.append(tab: tab)
-        select(at: tabCollection.tabs.count - 1)
-
-        delegate?.tabCollectionViewModelDidAppendAndSelect(self)
-    }
-
-    func appendWithoutSelection(tab: Tab) {
+    func append(tab: Tab, selected: Bool = true) {
         guard let selectionIndex = self.selectionIndex else {
             os_log("TabCollectionViewModel: No tab selected", type: .error)
             return
         }
-        tabCollection.append(tab: tab)
-        select(at: selectionIndex)
 
-        delegate?.tabCollectionViewModelDidAppend(self)
+        tabCollection.append(tab: tab)
+        if selected {
+            select(at: tabCollection.tabs.count - 1)
+            delegate?.tabCollectionViewModelDidAppendAndSelect(self)
+        } else {
+            select(at: selectionIndex)
+            delegate?.tabCollectionViewModelDidAppend(self)
+        }
     }
 
     func append(tabs: [Tab]) {

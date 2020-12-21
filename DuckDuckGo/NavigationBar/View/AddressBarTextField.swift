@@ -151,8 +151,7 @@ class AddressBarTextField: NSTextField {
         selectedTabViewModel.tab.url = url
     }
 
-
-    private func appendNewTab() {
+    private func openNewTab(selected: Bool) {
         guard let url = URL.makeURL(from: stringValueWithoutSuffix) else {
             os_log("%s: Making url from address bar string failed", type: .error, className)
             return
@@ -160,7 +159,7 @@ class AddressBarTextField: NSTextField {
 
         let tab = Tab()
         tab.url = url
-        tabCollectionViewModel.appendWithoutSelection(tab: tab)
+        tabCollectionViewModel.append(tab: tab, selected: selected)
     }
 
     // MARK: - Value
@@ -401,6 +400,7 @@ extension AddressBarTextField: NSTextFieldDelegate {
 
     func controlTextDidEndEditing(_ obj: Notification) {
         suggestionsViewModel.suggestions.stopFetchingSuggestions()
+        hideSuggestionsWindow()
 
         let textMovement = obj.userInfo?["NSTextMovement"] as? Int
         if textMovement == NSReturnTextMovement {
@@ -447,7 +447,7 @@ extension AddressBarTextField: NSTextFieldDelegate {
             suggestionsViewModel.clearSelection(); return false
         default:
             if NSApp.isCommandPressed && NSApp.isReturnOrEnterPressed {
-                appendNewTab()
+                openNewTab(selected: NSApp.isShiftPressed)
                 return true
             }
             return false
@@ -460,7 +460,7 @@ extension AddressBarTextField: SuggestionsViewControllerDelegate {
 
     func suggestionsViewControllerDidConfirmSelection(_ suggestionsViewController: SuggestionsViewController) {
         if NSApp.isCommandPressed {
-            appendNewTab()
+            openNewTab(selected: NSApp.isShiftPressed)
             return
         }
         navigate()
