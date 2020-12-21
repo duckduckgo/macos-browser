@@ -53,6 +53,7 @@
 		AA585DAF2490E6E600E9A3E2 /* MainViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA585DAE2490E6E600E9A3E2 /* MainViewController.swift */; };
 		AA5C8F59258FE21F00748EB7 /* NSTextFieldExtension.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA5C8F58258FE21F00748EB7 /* NSTextFieldExtension.swift */; };
 		AA5C8F5E2590EEE800748EB7 /* NSPointExtension.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA5C8F5D2590EEE800748EB7 /* NSPointExtension.swift */; };
+		AA5C8F632591021700748EB7 /* NSApplicationExtension.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA5C8F622591021700748EB7 /* NSApplicationExtension.swift */; };
 		AA5D6DAC24A340F700C6FBCE /* WebViewStateObserver.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA5D6DAB24A340F700C6FBCE /* WebViewStateObserver.swift */; };
 		AA63745224C9BBE100AB2AC4 /* SuggestionsAPIMock.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA63745124C9BBE100AB2AC4 /* SuggestionsAPIMock.swift */; };
 		AA63745424C9BF9A00AB2AC4 /* SuggestionsTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA63745324C9BF9A00AB2AC4 /* SuggestionsTests.swift */; };
@@ -195,6 +196,7 @@
 		AA585DAE2490E6E600E9A3E2 /* MainViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = MainViewController.swift; path = ../MainViewController.swift; sourceTree = "<group>"; };
 		AA5C8F58258FE21F00748EB7 /* NSTextFieldExtension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NSTextFieldExtension.swift; sourceTree = "<group>"; };
 		AA5C8F5D2590EEE800748EB7 /* NSPointExtension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NSPointExtension.swift; sourceTree = "<group>"; };
+		AA5C8F622591021700748EB7 /* NSApplicationExtension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NSApplicationExtension.swift; sourceTree = "<group>"; };
 		AA5D6DAB24A340F700C6FBCE /* WebViewStateObserver.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WebViewStateObserver.swift; sourceTree = "<group>"; };
 		AA63745124C9BBE100AB2AC4 /* SuggestionsAPIMock.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SuggestionsAPIMock.swift; sourceTree = "<group>"; };
 		AA63745324C9BF9A00AB2AC4 /* SuggestionsTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SuggestionsTests.swift; sourceTree = "<group>"; };
@@ -867,6 +869,7 @@
 			children = (
 				4B67744F255DBFA300025BD8 /* HashExtension.swift */,
 				AAECA41F24EEA4AC00EFA63A /* IndexPathExtension.swift */,
+				AA5C8F622591021700748EB7 /* NSApplicationExtension.swift */,
 				AA6EF9B2250785D5004754E6 /* NSMenuExtension.swift */,
 				AA5C8F5D2590EEE800748EB7 /* NSPointExtension.swift */,
 				AA5C8F58258FE21F00748EB7 /* NSTextFieldExtension.swift */,
@@ -1095,6 +1098,7 @@
 				AABEE69E24A9C5C30043105B /* Suggestion.swift in Sources */,
 				AA2E423424C8A2270048C0D5 /* ColorView.swift in Sources */,
 				AAECA42024EEA4AC00EFA63A /* IndexPathExtension.swift in Sources */,
+				AA5C8F632591021700748EB7 /* NSApplicationExtension.swift in Sources */,
 				4B677450255DBFA300025BD8 /* HashExtension.swift in Sources */,
 				AA9FF95F24A1FB690039E328 /* TabCollectionViewModel.swift in Sources */,
 				AA5C8F59258FE21F00748EB7 /* NSTextFieldExtension.swift in Sources */,

@@ -203,10 +203,8 @@ extension Tab: WKNavigationDelegate {
             currentDownload = nil
         }
 
-        let isCommandPressed = NSApp.currentEvent?.modifierFlags.contains(.command) ?? false
         let isLinkActivated = navigationAction.navigationType == .linkActivated
-
-        if isLinkActivated && isCommandPressed {
+        if isLinkActivated && NSApp.isCommandPressed {
             decisionHandler(.cancel)
             delegate?.tab(self, requestedNewTab: navigationAction.request.url)
             return
