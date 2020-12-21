@@ -36,7 +36,7 @@ class TabBarCollectionView: NSCollectionView {
         // Enable dragging items from our CollectionView to other applications.
         setDraggingSourceOperationMask([.every], forLocal: false)
         // Enable dragging items within and into our CollectionView.
-        setDraggingSourceOperationMask([.move], forLocal: true)
+        setDraggingSourceOperationMask([.move, .delete, .link], forLocal: true)
     }
 
     func clearSelection(animated: Bool = false) {

@@ -183,20 +183,32 @@ class TabBarViewController: NSViewController {
 
     // MARK: - Drag and Drop
 
-    private var draggingIndexPaths: Set<IndexPath>?
-    private var draggingOverIndexPath: IndexPath?
+    private var initialDraggingIndexPaths: Set<IndexPath>?
+    private var currentDraggingIndexPath: IndexPath?
 
     private func moveItemIfNeeded(at indexPath: IndexPath, to newIndexPath: IndexPath) {
-        guard newIndexPath != draggingOverIndexPath else { return }
+        guard newIndexPath != currentDraggingIndexPath else { return }
 
         let index = indexPath.item
         let newIndex = min(newIndexPath.item, max(tabCollectionViewModel.tabCollection.tabs.count - 1, 0))
         let newIndexPath = IndexPath(item: newIndex)
 
         guard index != newIndex else { return }
-        draggingOverIndexPath = newIndexPath
+        currentDraggingIndexPath = newIndexPath
 
         tabCollectionViewModel.moveTab(at: index, to: newIndex)
+    }
+
+    private func moveToNewWindow(indexPath: IndexPath) {
+        guard tabCollectionViewModel.tabCollection.tabs.count > 1 else { return }
+        guard let tabViewModel = tabCollectionViewModel.tabViewModel(at: indexPath.item) else {
+            os_log("TabBarViewController: Failed to get tab view model", type: .error)
+            return
+        }
+
+        let url = tabViewModel.tab.url
+        tabCollectionViewModel.remove(at: indexPath.item)
+        WindowsManager.openNewWindow(with: url)
     }
 
     // MARK: - Tab Width
@@ -458,7 +470,7 @@ extension TabBarViewController: NSCollectionViewDelegateFlowLayout {
                         sizeForItemAt indexPath: IndexPath) -> NSSize {
         var isItemSelected = tabCollectionViewModel.selectionIndex == indexPath.item
 
-        if let draggingOverIndexPath = draggingOverIndexPath {
+        if let draggingOverIndexPath = currentDraggingIndexPath {
             // Drag&drop in progress - the empty space is equal to the selected tab width
             isItemSelected = draggingOverIndexPath == indexPath
         }
@@ -552,37 +564,51 @@ extension TabBarViewController: NSCollectionViewDelegate {
                         willBeginAt screenPoint: NSPoint,
                         forItemsAt indexPaths: Set<IndexPath>) {
         session.animatesToStartingPositionsOnCancelOrFail = false
-        draggingIndexPaths = indexPaths
+        initialDraggingIndexPaths = indexPaths
+
+        guard let indexPath = indexPaths.first, indexPaths.count == 1 else {
+            os_log("TabBarViewController: More than 1 dragging index path", type: .error)
+            return
+        }
+        currentDraggingIndexPath = indexPath
     }
+
+    static let dropToOpenDistance: CGFloat = 100
 
     func collectionView(_ collectionView: NSCollectionView,
                         draggingSession session: NSDraggingSession,
                         endedAt screenPoint: NSPoint,
                         dragOperation operation: NSDragOperation) {
-        draggingIndexPaths = nil
-        draggingOverIndexPath = nil
+        let draggingIndexPath = self.currentDraggingIndexPath
+        self.initialDraggingIndexPaths = nil
+        currentDraggingIndexPath = nil
+
+        // Create a new window if the drop is too distant from tab bar
+        let frameRelativeToWindow = view.convert(view.bounds, to: nil)
+        guard let frameRelativeToScreen = view.window?.convertToScreen(frameRelativeToWindow) else {
+            os_log("TabBarViewController: Conversion to the screen coordinate system failed", type: .error)
+            return
+        }
+        if !screenPoint.isNearRect(frameRelativeToScreen, allowedDistance: Self.dropToOpenDistance) {
+            guard let draggingIndexPath = draggingIndexPath else {
+                os_log("TabBarViewController: No current dragging index path", type: .error)
+                return
+            }
+            moveToNewWindow(indexPath: draggingIndexPath)
+        }
     }
 
     func collectionView(_ collectionView: NSCollectionView,
                         validateDrop draggingInfo: NSDraggingInfo,
                         proposedIndexPath proposedDropIndexPath: AutoreleasingUnsafeMutablePointer<NSIndexPath>,
                         dropOperation proposedDropOperation: UnsafeMutablePointer<NSCollectionView.DropOperation>) -> NSDragOperation {
-        guard let draggingIndexPaths = draggingIndexPaths else {
-            os_log("TabBarViewController: Dragging index paths is nil", type: .error)
+        guard let currentDraggingIndexPath = currentDraggingIndexPath else {
+            os_log("TabBarViewController: Current dragging index path is nil", type: .error)
             return .copy
         }
 
-        guard let indexPath = draggingIndexPaths.first, draggingIndexPaths.count == 1 else {
-            os_log("TabBarViewController: More than 1 dragging index path", type: .error)
-            return .move
-        }
-
         let newIndexPath = proposedDropIndexPath.pointee as IndexPath
-        if let draggingOverIndexPath = draggingOverIndexPath {
-            moveItemIfNeeded(at: draggingOverIndexPath, to: newIndexPath)
-        } else {
-            moveItemIfNeeded(at: indexPath, to: newIndexPath)
-        }
+        moveItemIfNeeded(at: currentDraggingIndexPath, to: newIndexPath)
 
         proposedDropOperation.pointee = .before
         return .move
@@ -592,7 +618,7 @@ extension TabBarViewController: NSCollectionViewDelegate {
                         acceptDrop draggingInfo: NSDraggingInfo,
                         indexPath: IndexPath,
                         dropOperation: NSCollectionView.DropOperation) -> Bool {
-        guard let draggingIndexPaths = draggingIndexPaths else {
+        guard let draggingIndexPaths = initialDraggingIndexPaths else {
             os_log("TabBarViewController: Dragging index paths is nil", type: .error)
             return false
         }
@@ -656,15 +682,12 @@ extension TabBarViewController: TabBarViewItemDelegate {
     }
 
     func tabBarViewItemMoveToNewWindowAction(_ tabBarViewItem: TabBarViewItem) {
-        guard let indexPath = collectionView.indexPath(for: tabBarViewItem),
-              let tabViewModel = tabCollectionViewModel.tabViewModel(at: indexPath.item) else {
-            os_log("TabBarViewController: Failed to get tab view model", type: .error)
+        guard let indexPath = collectionView.indexPath(for: tabBarViewItem) else {
+            os_log("TabBarViewController: Failed to get index path of tab bar view item", type: .error)
             return
         }
 
-        let url = tabViewModel.tab.url
-        tabCollectionViewModel.remove(at: indexPath.item)
-        WindowsManager.openNewWindow(with: url)
+        moveToNewWindow(indexPath: indexPath)
     }
 
 }
