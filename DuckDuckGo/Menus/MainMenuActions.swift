@@ -124,6 +124,18 @@ extension MainViewController {
         tabCollectionViewModel.selectNext()
     }
 
+    @IBAction func showTab(_ sender: Any?) {
+        guard let sender = sender as? NSMenuItem else {
+            os_log("MainViewController: Casting to NSMenuItem failed", type: .error)
+            return
+        }
+        guard let keyEquivalent = Int(sender.keyEquivalent), keyEquivalent >= 0 && keyEquivalent <= 9 else {
+            os_log("MainViewController: Key equivalent is not correct for tab selection", type: .error)
+            return
+        }
+        tabCollectionViewModel.select(at: keyEquivalent - 1)
+    }
+
     @IBAction func moveTabToNewWindow(_ sender: Any?) {
         guard let selectedTabViewModel = tabCollectionViewModel.selectedTabViewModel else {
             os_log("MainViewController: No tab view model selected", type: .error)

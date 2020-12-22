@@ -413,6 +413,51 @@ CQ
                                                 <action selector="showNextTab:" target="Ady-hI-5gd" id="wOR-ar-KT6"/>
                                             </connections>
                                         </menuItem>
+                                        <menuItem title="Show First Tab (Hidden)" hidden="YES" keyEquivalent="1" allowsKeyEquivalentWhenHidden="YES" id="jjn-9W-TQZ">
+                                            <connections>
+                                                <action selector="showTab:" target="Ady-hI-5gd" id="0OJ-vu-U3E"/>
+                                            </connections>
+                                        </menuItem>
+                                        <menuItem title="Show Second Tab (Hidden)" hidden="YES" keyEquivalent="2" allowsKeyEquivalentWhenHidden="YES" id="R8W-JK-YGI">
+                                            <connections>
+                                                <action selector="showTab:" target="Ady-hI-5gd" id="fS3-s0-B79"/>
+                                            </connections>
+                                        </menuItem>
+                                        <menuItem title="Show Third Tab (Hidden)" hidden="YES" keyEquivalent="3" allowsKeyEquivalentWhenHidden="YES" id="vka-5z-cmK">
+                                            <connections>
+                                                <action selector="showTab:" target="Ady-hI-5gd" id="luV-Cr-e6S"/>
+                                            </connections>
+                                        </menuItem>
+                                        <menuItem title="Show Fourth Tab (Hidden)" hidden="YES" keyEquivalent="4" allowsKeyEquivalentWhenHidden="YES" id="vBg-BX-Ndx">
+                                            <connections>
+                                                <action selector="showTab:" target="Ady-hI-5gd" id="ik0-9K-CxQ"/>
+                                            </connections>
+                                        </menuItem>
+                                        <menuItem title="Show Fifth Tab (Hidden)" hidden="YES" keyEquivalent="5" allowsKeyEquivalentWhenHidden="YES" id="E0Y-Ob-M6P">
+                                            <connections>
+                                                <action selector="showTab:" target="Ady-hI-5gd" id="Lb8-eA-Kmv"/>
+                                            </connections>
+                                        </menuItem>
+                                        <menuItem title="Show Sixth Tab (Hidden)" hidden="YES" keyEquivalent="6" allowsKeyEquivalentWhenHidden="YES" id="mrr-fE-5cw">
+                                            <connections>
+                                                <action selector="showTab:" target="Ady-hI-5gd" id="s4U-jb-a7h"/>
+                                            </connections>
+                                        </menuItem>
+                                        <menuItem title="Show Seventh Tab (Hidden)" hidden="YES" keyEquivalent="7" allowsKeyEquivalentWhenHidden="YES" id="nqZ-gT-MTl">
+                                            <connections>
+                                                <action selector="showTab:" target="Ady-hI-5gd" id="ENK-46-hZW"/>
+                                            </connections>
+                                        </menuItem>
+                                        <menuItem title="Show Eighth Tab (Hidden)" hidden="YES" keyEquivalent="8" allowsKeyEquivalentWhenHidden="YES" id="tfY-rc-h3N">
+                                            <connections>
+                                                <action selector="showTab:" target="Ady-hI-5gd" id="inZ-7I-1yc"/>
+                                            </connections>
+                                        </menuItem>
+                                        <menuItem title="Show Ninth Tab (Hidden)" hidden="YES" keyEquivalent="9" allowsKeyEquivalentWhenHidden="YES" id="Tht-D3-312">
+                                            <connections>
+                                                <action selector="showTab:" target="Ady-hI-5gd" id="JqA-RD-GZA"/>
+                                            </connections>
+                                        </menuItem>
                                         <menuItem title="Move Tab to New Window" id="8LN-7f-htp">
                                             <modifierMask key="keyEquivalentModifierMask"/>
                                             <connections>
