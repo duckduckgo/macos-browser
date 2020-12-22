@@ -308,7 +308,6 @@ class TabBarViewController: NSViewController {
     func showTooltip(for tabBarViewItem: TabBarViewItem) {
         guard let indexPath = collectionView.indexPath(for: tabBarViewItem),
               let tabViewModel = tabCollectionViewModel.tabViewModel(at: indexPath.item) else {
-            os_log("TabBarViewController: Failed to get tab view model", type: .error)
             return
         }
 
