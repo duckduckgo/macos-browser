@@ -116,6 +116,14 @@ extension MainViewController {
 
     // MARK: - Window
 
+    @IBAction func showPreviousTab(_ sender: Any?) {
+        tabCollectionViewModel.selectPrevious()
+    }
+
+    @IBAction func showNextTab(_ sender: Any?) {
+        tabCollectionViewModel.selectNext()
+    }
+
     @IBAction func moveTabToNewWindow(_ sender: Any?) {
         guard let selectedTabViewModel = tabCollectionViewModel.selectedTabViewModel else {
             os_log("MainViewController: No tab view model selected", type: .error)

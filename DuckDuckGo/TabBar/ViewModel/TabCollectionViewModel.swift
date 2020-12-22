@@ -34,6 +34,8 @@ protocol TabCollectionViewModelDelegate: AnyObject {
                                 andSelectAt selectionIndex: Int?)
     func tabCollectionViewModelDidRemoveAllAndAppend(_ tabCollectionViewModel: TabCollectionViewModel)
     func tabCollectionViewModel(_ tabCollectionViewModel: TabCollectionViewModel, didMoveTabAt index: Int, to newIndex: Int)
+    func tabCollectionViewModel(_ tabCollectionViewModel: TabCollectionViewModel, didSelectNextAt selectionIndex: Int?)
+    func tabCollectionViewModel(_ tabCollectionViewModel: TabCollectionViewModel, didSelectPreviousAt selectionIndex: Int?)
 
 }
 
@@ -86,6 +88,38 @@ class TabCollectionViewModel {
 
         selectionIndex = index
         return true
+    }
+
+    func selectNext() {
+        guard tabCollection.tabs.count > 0 else {
+            os_log("TabCollectionViewModel: No tabs for selection", type: .error)
+            return
+        }
+
+        if let selectionIndex = selectionIndex {
+            let newSelectionIndex = (selectionIndex + 1) % tabCollection.tabs.count
+            select(at: newSelectionIndex)
+            delegate?.tabCollectionViewModel(self, didSelectNextAt: newSelectionIndex)
+        } else {
+            select(at: 0)
+            delegate?.tabCollectionViewModel(self, didSelectNextAt: 0)
+        }
+    }
+
+    func selectPrevious() {
+        guard tabCollection.tabs.count > 0 else {
+            os_log("TabCollectionViewModel: No tabs for selection", type: .error)
+            return
+        }
+
+        if let selectionIndex = selectionIndex {
+            let newSelectionIndex = selectionIndex - 1 >= 0 ? selectionIndex - 1 : tabCollection.tabs.count - 1
+            select(at: newSelectionIndex)
+            delegate?.tabCollectionViewModel(self, didSelectPreviousAt: newSelectionIndex)
+        } else {
+            select(at: tabCollection.tabs.count - 1)
+            delegate?.tabCollectionViewModel(self, didSelectPreviousAt: tabCollection.tabs.count - 1)
+        }
     }
 
     func appendNewTab() {

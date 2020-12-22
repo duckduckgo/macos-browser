@@ -409,6 +409,14 @@ extension TabBarViewController: TabCollectionViewModelDelegate {
         hideTooltip()
     }
 
+    func tabCollectionViewModel(_ tabCollectionViewModel: TabCollectionViewModel, didSelectNextAt selectionIndex: Int?) {
+        didSelect(at: selectionIndex)
+    }
+
+    func tabCollectionViewModel(_ tabCollectionViewModel: TabCollectionViewModel, didSelectPreviousAt selectionIndex: Int?) {
+        didSelect(at: selectionIndex)
+    }
+
     private func appendToCollectionView(selected: Bool) {
         let lastIndex = max(0, tabCollectionViewModel.tabCollection.tabs.count - 1)
         let lastIndexPathSet = Set(arrayLiteral: IndexPath(item: lastIndex))
@@ -460,6 +468,18 @@ extension TabBarViewController: TabCollectionViewModelDelegate {
         }
 
         closeWindowIfNeeded()
+    }
+
+    private func didSelect(at selectionIndex: Int?) {
+        if let selectionIndex = selectionIndex {
+            let selectionIndexPath = IndexPath(item: selectionIndex)
+            let selectionIndexPathSet = Set(arrayLiteral: selectionIndexPath)
+            collectionView.clearSelection(animated: true)
+            collectionView.animator().selectItems(at: selectionIndexPathSet, scrollPosition: .centeredHorizontally)
+            collectionView.scrollToSelected()
+        } else {
+            collectionView.clearSelection(animated: true)
+        }
     }
 }
 
