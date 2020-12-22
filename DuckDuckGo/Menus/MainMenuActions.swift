@@ -133,7 +133,10 @@ extension MainViewController {
             os_log("MainViewController: Key equivalent is not correct for tab selection", type: .error)
             return
         }
-        tabCollectionViewModel.select(at: keyEquivalent - 1)
+        let index = keyEquivalent - 1
+        if index >= 0 && index < tabCollectionViewModel.tabCollection.tabs.count {
+            tabCollectionViewModel.select(at: index)
+        }
     }
 
     @IBAction func moveTabToNewWindow(_ sender: Any?) {
