@@ -75,18 +75,24 @@ class BrowserTabViewController: NSViewController {
             urlCancellable = tabViewModel.tab.$url.receive(on: DispatchQueue.main).sink { [weak self] _ in self?.reloadWebViewIfNeeded() }
         }
 
-        if let webView = webView, view.subviews.contains(webView) {
-            webView.removeFromSuperview()
+        func removeOldWebView(_ oldWebView: WebView?) {
+            if let oldWebView = oldWebView, view.subviews.contains(oldWebView) {
+                oldWebView.removeFromSuperview()
+            }
         }
-        webView = nil
+
         guard let tabViewModel = tabCollectionViewModel.selectedTabViewModel else {
             self.tabViewModel = nil
+            removeOldWebView(webView)
             return
         }
-        self.tabViewModel = tabViewModel
+        guard self.tabViewModel !== tabViewModel else { return }
 
+        let oldWebView = webView
         displayWebView(of: tabViewModel)
         subscribeToUrl(of: tabViewModel)
+        self.tabViewModel = tabViewModel
+        removeOldWebView(oldWebView)
     }
 
     private func subscribeToIsErrorViewVisible() {
