@@ -342,7 +342,7 @@ extension TabBarViewController: TabCollectionViewModelDelegate {
     }
 
     func tabCollectionViewModel(_ tabCollectionViewModel: TabCollectionViewModel, didAppendAtMultipleAndSelectAt index: Int) {
-        reloadCollectionView(selectionIndex: index)
+        reloadCollectionView()
     }
 
     func tabCollectionViewModel(_ tabCollectionViewModel: TabCollectionViewModel, didInsertAndSelectAt index: Int) {
@@ -392,11 +392,11 @@ extension TabBarViewController: TabCollectionViewModelDelegate {
     func tabCollectionViewModel(_ tabCollectionViewModel: TabCollectionViewModel,
                                 didRemoveAllExcept exceptionIndex: Int?,
                                 andSelectAt selectionIndex: Int?) {
-        reloadCollectionView(selectionIndex: selectionIndex, animated: exceptionIndex != nil)
+        reloadCollectionView()
     }
 
     func tabCollectionViewModelDidRemoveAllAndAppend(_ tabCollectionViewModel: TabCollectionViewModel) {
-        reloadCollectionView(selectionIndex: 0)
+        reloadCollectionView()
     }
 
     func tabCollectionViewModel(_ tabCollectionViewModel: TabCollectionViewModel, didMoveTabAt index: Int, to newIndex: Int) {
@@ -444,29 +444,16 @@ extension TabBarViewController: TabCollectionViewModelDelegate {
         hideTooltip()
     }
 
-    private func reloadCollectionView(selectionIndex: Int? = nil, animated: Bool = true) {
-        if animated {
-            collectionView.animator().performBatchUpdates {
-                collectionView.animator().reloadData()
-            } completionHandler: { [weak self] _ in
-                self?.updateTabMode()
-                self?.enableScrollButtons()
-                self?.hideTooltip()
-            }
-        } else {
-            collectionView.animator().reloadData()
-            updateTabMode()
-            enableScrollButtons()
-            hideTooltip()
-        }
-
-        if let selectionIndex = selectionIndex {
-            let selectionIndexPath = IndexPath(arrayLiteral: selectionIndex)
-            let selectionIndexPathSet = Set(arrayLiteral: selectionIndexPath)
-            collectionView.selectItems(at: selectionIndexPathSet, scrollPosition: .centeredHorizontally)
-        }
-
+    private func reloadCollectionView() {
         closeWindowIfNeeded()
+
+        collectionView.reloadData()
+        reloadSelection()
+
+        updateTabMode()
+        enableScrollButtons()
+        hideTooltip()
+        updateEmptyTabArea()
     }
 
     private func didSelect(at selectionIndex: Int?) {
