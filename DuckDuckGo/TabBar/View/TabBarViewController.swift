@@ -29,10 +29,6 @@ class TabBarViewController: NSViewController {
         case buttonPadding = 8
     }
 
-    enum VerticalSpace: CGFloat {
-        case tooltipPadding = 2
-    }
-
     @IBOutlet weak var collectionView: TabBarCollectionView!
     @IBOutlet weak var scrollView: TabBarScrollView!
     @IBOutlet weak var scrollViewTrailingConstraint: NSLayoutConstraint!
@@ -63,8 +59,8 @@ class TabBarViewController: NSViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
 
-        updateScrollElasticity()
-        receiveScrollNotifications()
+        scrollView.updateScrollElasticity(with: tabMode)
+        observeToScrollNotifications()
         subscribeToSelectionIndex()
     }
 
@@ -73,7 +69,6 @@ class TabBarViewController: NSViewController {
 
         updateEmptyTabArea()
         tabCollectionViewModel.delegate = self
-
         reloadSelection()
     }
 
@@ -175,12 +170,6 @@ class TabBarViewController: NSViewController {
 
     private var isAddButtonFloating = false
 
-    // MARK: - Closing
-
-    private func closeItem(at indexPath: IndexPath) {
-        tabCollectionViewModel.remove(at: indexPath.item)
-    }
-
     // MARK: - Drag and Drop
 
     private var initialDraggingIndexPaths: Set<IndexPath>?
@@ -213,7 +202,7 @@ class TabBarViewController: NSViewController {
 
     // MARK: - Tab Width
 
-    private enum TabMode {
+    enum TabMode {
         case divided
         case overflow
     }
@@ -221,8 +210,8 @@ class TabBarViewController: NSViewController {
     private var tabMode = TabMode.divided {
         didSet {
             if oldValue != tabMode {
-                updateScrollElasticity()
-                updateScrollButtons()
+                scrollView.updateScrollElasticity(with: tabMode)
+                displayScrollButtons()
                 updateEmptyTabArea()
                 collectionView.invalidateLayout()
             }
@@ -257,13 +246,9 @@ class TabBarViewController: NSViewController {
         }
     }
 
-    private func updateScrollElasticity() {
-        scrollView.horizontalScrollElasticity = tabMode == .divided ? .none : .allowed
-    }
-
     // MARK: - Scroll Buttons
 
-    private func receiveScrollNotifications() {
+    private func observeToScrollNotifications() {
         scrollView.contentView.postsBoundsChangedNotifications = true
 
         NotificationCenter.default.addObserver(self,
@@ -282,7 +267,7 @@ class TabBarViewController: NSViewController {
         leftScrollButton.isEnabled = !collectionView.isAtStartScrollPosition
     }
 
-    private func updateScrollButtons() {
+    private func displayScrollButtons() {
         let horizontalSpace = tabMode == .divided ?
             HorizontalSpace.scrollViewPaddingWithoutButtons.rawValue :
             HorizontalSpace.scrollViewPaddingWithButtons.rawValue
@@ -319,7 +304,7 @@ class TabBarViewController: NSViewController {
         }
 
         var point = view.bounds.origin
-        point.y -= VerticalSpace.tooltipPadding.rawValue
+        point.y -= TooltipWindowController.VerticalSpace.tooltipPadding.rawValue
         point.x += scrollViewLeadingConstraint.constant + tabBarViewItem.view.frame.origin.x - clipView.bounds.origin.x
         let converted = window.convertPoint(toScreen: view.convert(point, to: nil))
         tooltipWindowController.scheduleShowing(parentWindow: window, topLeftPoint: converted)
@@ -346,8 +331,7 @@ extension TabBarViewController: TabCollectionViewModelDelegate {
     }
 
     func tabCollectionViewModel(_ tabCollectionViewModel: TabCollectionViewModel, didInsertAndSelectAt index: Int) {
-        let indexPath = IndexPath(item: index)
-        let indexPathSet = Set(arrayLiteral: indexPath)
+        let indexPathSet = Set(arrayLiteral: IndexPath(item: index))
         collectionView.clearSelection(animated: true)
         collectionView.animator().insertItems(at: indexPathSet)
         collectionView.selectItems(at: indexPathSet, scrollPosition: .centeredHorizontally)
@@ -360,15 +344,13 @@ extension TabBarViewController: TabCollectionViewModelDelegate {
     func tabCollectionViewModel(_ tabCollectionViewModel: TabCollectionViewModel,
                                 didRemoveTabAt removedIndex: Int,
                                 andSelectTabAt selectionIndex: Int?) {
-        let removedIndexPath = IndexPath(item: removedIndex)
-        let removedIndexPathSet = Set(arrayLiteral: removedIndexPath)
+        let removedIndexPathSet = Set(arrayLiteral: IndexPath(item: removedIndex))
         guard let selectionIndex = selectionIndex else {
             collectionView.animator().deleteItems(at: removedIndexPathSet)
             closeWindowIfNeeded()
             return
         }
-        let selectionIndexPath = IndexPath(item: selectionIndex)
-        let selectionIndexPathSet = Set(arrayLiteral: selectionIndexPath)
+        let selectionIndexPathSet = Set(arrayLiteral: IndexPath(item: selectionIndex))
 
         let shouldScroll = collectionView.isAtEndScrollPosition
         collectionView.animator().performBatchUpdates {
@@ -458,8 +440,7 @@ extension TabBarViewController: TabCollectionViewModelDelegate {
 
     private func didSelect(at selectionIndex: Int?) {
         if let selectionIndex = selectionIndex {
-            let selectionIndexPath = IndexPath(item: selectionIndex)
-            let selectionIndexPathSet = Set(arrayLiteral: selectionIndexPath)
+            let selectionIndexPathSet = Set(arrayLiteral: IndexPath(item: selectionIndex))
             collectionView.clearSelection(animated: true)
             collectionView.animator().selectItems(at: selectionIndexPathSet, scrollPosition: .centeredHorizontally)
             collectionView.scrollToSelected()
@@ -675,7 +656,7 @@ extension TabBarViewController: TabBarViewItemDelegate {
             return
         }
 
-        closeItem(at: indexPath)
+        tabCollectionViewModel.remove(at: indexPath.item)
     }
 
     func tabBarViewItemCloseOtherAction(_ tabBarViewItem: TabBarViewItem) {

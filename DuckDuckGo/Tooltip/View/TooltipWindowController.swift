@@ -21,6 +21,10 @@ import os.log
 
 class TooltipWindowController: NSWindowController {
 
+    enum VerticalSpace: CGFloat {
+        case tooltipPadding = 2
+    }
+
     private var showingTimer: Timer?
     private var hidingTimer: Timer?
 
