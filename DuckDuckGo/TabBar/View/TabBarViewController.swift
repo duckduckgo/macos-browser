@@ -318,16 +318,8 @@ class TabBarViewController: NSViewController {
 
 extension TabBarViewController: TabCollectionViewModelDelegate {
 
-    func tabCollectionViewModelDidAppend(_ tabCollectionViewModel: TabCollectionViewModel) {
-        appendToCollectionView(selected: false)
-    }
-
-    func tabCollectionViewModelDidAppendAndSelect(_ tabCollectionViewModel: TabCollectionViewModel) {
-        appendToCollectionView(selected: true)
-    }
-
-    func tabCollectionViewModel(_ tabCollectionViewModel: TabCollectionViewModel, didAppendAtMultipleAndSelectAt index: Int) {
-        reloadCollectionView()
+    func tabCollectionViewModelDidAppend(_ tabCollectionViewModel: TabCollectionViewModel, selected: Bool) {
+        appendToCollectionView(selected: selected)
     }
 
     func tabCollectionViewModel(_ tabCollectionViewModel: TabCollectionViewModel, didInsertAndSelectAt index: Int) {
@@ -371,16 +363,6 @@ extension TabBarViewController: TabCollectionViewModelDelegate {
         }
     }
 
-    func tabCollectionViewModel(_ tabCollectionViewModel: TabCollectionViewModel,
-                                didRemoveAllExcept exceptionIndex: Int?,
-                                andSelectAt selectionIndex: Int?) {
-        reloadCollectionView()
-    }
-
-    func tabCollectionViewModelDidRemoveAllAndAppend(_ tabCollectionViewModel: TabCollectionViewModel) {
-        reloadCollectionView()
-    }
-
     func tabCollectionViewModel(_ tabCollectionViewModel: TabCollectionViewModel, didMoveTabAt index: Int, to newIndex: Int) {
         let indexPath = IndexPath(item: index)
         let newIndexPath = IndexPath(item: newIndex)
@@ -390,12 +372,27 @@ extension TabBarViewController: TabCollectionViewModelDelegate {
         hideTooltip()
     }
 
-    func tabCollectionViewModel(_ tabCollectionViewModel: TabCollectionViewModel, didSelectNextAt selectionIndex: Int?) {
-        didSelect(at: selectionIndex)
+    func tabCollectionViewModel(_ tabCollectionViewModel: TabCollectionViewModel, didSelectAt selectionIndex: Int?) {
+        if let selectionIndex = selectionIndex {
+            let selectionIndexPathSet = Set(arrayLiteral: IndexPath(item: selectionIndex))
+            collectionView.clearSelection(animated: true)
+            collectionView.animator().selectItems(at: selectionIndexPathSet, scrollPosition: .centeredHorizontally)
+            collectionView.scrollToSelected()
+        } else {
+            collectionView.clearSelection(animated: true)
+        }
     }
 
-    func tabCollectionViewModel(_ tabCollectionViewModel: TabCollectionViewModel, didSelectPreviousAt selectionIndex: Int?) {
-        didSelect(at: selectionIndex)
+    func tabCollectionViewModelDidMultipleChanges(_ tabCollectionViewModel: TabCollectionViewModel) {
+        closeWindowIfNeeded()
+
+        collectionView.reloadData()
+        reloadSelection()
+
+        updateTabMode()
+        enableScrollButtons()
+        hideTooltip()
+        updateEmptyTabArea()
     }
 
     private func appendToCollectionView(selected: Bool) {
@@ -426,28 +423,6 @@ extension TabBarViewController: TabCollectionViewModelDelegate {
         hideTooltip()
     }
 
-    private func reloadCollectionView() {
-        closeWindowIfNeeded()
-
-        collectionView.reloadData()
-        reloadSelection()
-
-        updateTabMode()
-        enableScrollButtons()
-        hideTooltip()
-        updateEmptyTabArea()
-    }
-
-    private func didSelect(at selectionIndex: Int?) {
-        if let selectionIndex = selectionIndex {
-            let selectionIndexPathSet = Set(arrayLiteral: IndexPath(item: selectionIndex))
-            collectionView.clearSelection(animated: true)
-            collectionView.animator().selectItems(at: selectionIndexPathSet, scrollPosition: .centeredHorizontally)
-            collectionView.scrollToSelected()
-        } else {
-            collectionView.clearSelection(animated: true)
-        }
-    }
 }
 
 extension TabBarViewController: NSCollectionViewDelegateFlowLayout {
