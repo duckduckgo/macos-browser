@@ -111,7 +111,7 @@ extension MainViewController {
     }
 
     @IBAction func reopenLastClosedTab(_ sender: Any?) {
-        tabCollectionViewModel.insertLastRemovedTab()
+        tabCollectionViewModel.putBackLastRemovedTab()
     }
 
     // MARK: - Window

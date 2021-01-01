@@ -245,9 +245,9 @@ class TabCollectionViewModel {
         self.remove(at: selectionIndex)
     }
 
-    func insertLastRemovedTab() {
+    func putBackLastRemovedTab() {
         let lastRemovedTabIndex = tabCollection.lastRemovedTabCache?.index
-        tabCollection.insertLastRemovedTab()
+        tabCollection.putBackLastRemovedTab()
 
         if let lastRemovedTabIndex = lastRemovedTabIndex {
             select(at: lastRemovedTabIndex)

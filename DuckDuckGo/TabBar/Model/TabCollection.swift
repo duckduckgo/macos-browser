@@ -71,7 +71,7 @@ class TabCollection {
         self.tabs = tabs
     }
 
-    func saveLastRemovedTab(at index: Int) {
+    private func saveLastRemovedTab(at index: Int) {
         guard index >= 0, index < tabs.count else {
             os_log("TabCollection: Index out of bounds", type: .error)
             return
@@ -81,7 +81,7 @@ class TabCollection {
         lastRemovedTabCache = (tab.url, index)
     }
 
-    func insertLastRemovedTab() {
+    func putBackLastRemovedTab() {
         guard let lastRemovedTabCache = lastRemovedTabCache else {
             os_log("TabCollection: No tab removed yet", type: .error)
             return

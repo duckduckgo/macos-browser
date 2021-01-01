@@ -24,22 +24,20 @@ class TabCollectionViewModelTests: XCTestCase {
     // MARK: - TabViewModel
 
     func testWhenTabViewModelIsCalledWithIndexOutOfBoundsThenNilIsReturned() {
-        let tabCollection = TabCollection()
-        let tabCollectionViewModel = TabCollectionViewModel(tabCollection: tabCollection)
+        let tabCollectionViewModel = TabCollectionViewModel.aTabCollectionViewModel()
 
         XCTAssertNil(tabCollectionViewModel.tabViewModel(at: 1))
     }
 
     func testWhenTabViewModelIsCalledThenAppropriateTabViewModelIsReturned() {
-        let tabCollection = TabCollection()
-        let tabCollectionViewModel = TabCollectionViewModel(tabCollection: tabCollection)
+        let tabCollectionViewModel = TabCollectionViewModel.aTabCollectionViewModel()
 
-        XCTAssertEqual(tabCollectionViewModel.tabViewModel(at: 0)?.tab, tabCollection.tabs[0])
+        XCTAssertEqual(tabCollectionViewModel.tabViewModel(at: 0)?.tab,
+                       tabCollectionViewModel.tabCollection.tabs[0])
     }
 
     func testWhenTabViewModelIsCalledWithSameIndexThenTheResultHasSameIdentity() {
-        let tabCollection = TabCollection()
-        let tabCollectionViewModel = TabCollectionViewModel(tabCollection: tabCollection)
+        let tabCollectionViewModel = TabCollectionViewModel.aTabCollectionViewModel()
 
         XCTAssert(tabCollectionViewModel.tabViewModel(at: 0) === tabCollectionViewModel.tabViewModel(at: 0))
     }
@@ -47,15 +45,13 @@ class TabCollectionViewModelTests: XCTestCase {
     // MARK: - Select
 
     func testWhenTabCollectionViewModelIsInitializedThenSelectedTabViewModelIsFirst() {
-        let tabCollection = TabCollection()
-        let tabCollectionViewModel = TabCollectionViewModel(tabCollection: tabCollection)
+        let tabCollectionViewModel = TabCollectionViewModel.aTabCollectionViewModel()
 
         XCTAssert(tabCollectionViewModel.selectedTabViewModel === tabCollectionViewModel.tabViewModel(at: 0))
     }
     
     func testWhenSelectionIndexIsOutOfBoundsThenSelectedTabViewModelIsNil() {
-        let tabCollection = TabCollection()
-        let tabCollectionViewModel = TabCollectionViewModel(tabCollection: tabCollection)
+        let tabCollectionViewModel = TabCollectionViewModel.aTabCollectionViewModel()
         
         tabCollectionViewModel.select(at: 1)
         
@@ -63,8 +59,7 @@ class TabCollectionViewModelTests: XCTestCase {
     }
     
     func testWhenSelectionIndexPointsToTabThenSelectedTabViewModelReturnsTheTab() {
-        let tabCollection = TabCollection()
-        let tabCollectionViewModel = TabCollectionViewModel(tabCollection: tabCollection)
+        let tabCollectionViewModel = TabCollectionViewModel.aTabCollectionViewModel()
 
         tabCollectionViewModel.appendNewTab()
         tabCollectionViewModel.appendNewTab()
@@ -73,11 +68,50 @@ class TabCollectionViewModelTests: XCTestCase {
         XCTAssert(tabCollectionViewModel.selectedTabViewModel === tabCollectionViewModel.tabViewModel(at: 0))
     }
 
+    func testWhenSelectNextIsCalledThenNextTabIsSelected() {
+        let tabCollectionViewModel = TabCollectionViewModel.aTabCollectionViewModel()
+
+        tabCollectionViewModel.appendNewTab()
+        tabCollectionViewModel.appendNewTab()
+        tabCollectionViewModel.select(at: 0)
+        tabCollectionViewModel.selectNext()
+
+        XCTAssert(tabCollectionViewModel.selectedTabViewModel === tabCollectionViewModel.tabViewModel(at: 1))
+    }
+
+    func testWhenLastTabIsSelectedThenSelectNextChangesSelectionToFirstOne() {
+        let tabCollectionViewModel = TabCollectionViewModel.aTabCollectionViewModel()
+
+        tabCollectionViewModel.appendNewTab()
+        tabCollectionViewModel.appendNewTab()
+        tabCollectionViewModel.selectNext()
+
+        XCTAssert(tabCollectionViewModel.selectedTabViewModel === tabCollectionViewModel.tabViewModel(at: 0))
+    }
+
+    func testWhenSelectPreviousIsCalledThenPreviousTabIsSelected() {
+        let tabCollectionViewModel = TabCollectionViewModel.aTabCollectionViewModel()
+
+        tabCollectionViewModel.appendNewTab()
+        tabCollectionViewModel.selectPrevious()
+
+        XCTAssert(tabCollectionViewModel.selectedTabViewModel === tabCollectionViewModel.tabViewModel(at: 0))
+    }
+
+    func testWhenFirstTabIsSelectedThenSelectPreviousChangesSelectionToLastOne() {
+        let tabCollectionViewModel = TabCollectionViewModel.aTabCollectionViewModel()
+
+        tabCollectionViewModel.appendNewTab()
+        tabCollectionViewModel.select(at: 0)
+        tabCollectionViewModel.selectPrevious()
+
+        XCTAssert(tabCollectionViewModel.selectedTabViewModel === tabCollectionViewModel.tabViewModel(at: 1))
+    }
+
     // MARK: - Append
 
     func testWhenAppendNewTabIsCalledThenNewTabIsAlsoSelected() {
-        let tabCollection = TabCollection()
-        let tabCollectionViewModel = TabCollectionViewModel(tabCollection: tabCollection)
+        let tabCollectionViewModel = TabCollectionViewModel.aTabCollectionViewModel()
 
         let index = tabCollectionViewModel.tabCollection.tabs.count
         tabCollectionViewModel.appendNewTab()
@@ -85,13 +119,12 @@ class TabCollectionViewModelTests: XCTestCase {
     }
 
     func testAppendAfterSelected() {
-        let tabCollection = TabCollection()
-        let tabCollectionViewModel = TabCollectionViewModel(tabCollection: tabCollection)
+        let tabCollectionViewModel = TabCollectionViewModel.aTabCollectionViewModel()
 
         tabCollectionViewModel.appendNewTab()
 
-        let tab1 = tabCollection.tabs[0]
-        let tab2 = tabCollection.tabs[1]
+        let tab1 = tabCollectionViewModel.tabCollection.tabs[0]
+        let tab2 = tabCollectionViewModel.tabCollection.tabs[1]
 
         let index = tabCollectionViewModel.tabCollection.tabs.count
         tabCollectionViewModel.appendNewTabAfterSelected()
@@ -101,11 +134,49 @@ class TabCollectionViewModelTests: XCTestCase {
         XCTAssertNotEqual(tabCollectionViewModel.selectedTabViewModel?.tab, tab2)
     }
 
+    func testWhenTabIsAppendedWithSelectedAsFalseThenSelectionIsPreserved() {
+        let tabCollectionViewModel = TabCollectionViewModel.aTabCollectionViewModel()
+        let selectedTabViewModel = tabCollectionViewModel.selectedTabViewModel
+
+        tabCollectionViewModel.append(tab: Tab(), selected: false)
+
+        XCTAssert(tabCollectionViewModel.selectedTabViewModel === selectedTabViewModel)
+    }
+
+    func testWhenTabIsAppendedWithSelectedAsTrueThenNewTabIsSelected() {
+        let tabCollectionViewModel = TabCollectionViewModel.aTabCollectionViewModel()
+
+        tabCollectionViewModel.append(tab: Tab(), selected: true)
+        let lastTabViewModel = tabCollectionViewModel.tabViewModel(at: tabCollectionViewModel.tabCollection.tabs.count - 1)
+
+        XCTAssert(tabCollectionViewModel.selectedTabViewModel === lastTabViewModel)
+    }
+
+    func testWhenMultipleTabsAreAppendedThenTheLastOneIsSelected() {
+        let tabCollectionViewModel = TabCollectionViewModel.aTabCollectionViewModel()
+
+        let lastTab = Tab()
+        tabCollectionViewModel.append(tabs: [Tab(), lastTab])
+
+        XCTAssert(tabCollectionViewModel.selectedTabViewModel?.tab === lastTab)
+    }
+
+    // MARK: - Insert
+
+    func testInsertTab() {
+        let tabCollectionViewModel = TabCollectionViewModel.aTabCollectionViewModel()
+
+        let originalFirstTabViewModel = tabCollectionViewModel.tabViewModel(at: 0)
+        tabCollectionViewModel.insertNewTab(at: 0)
+
+        XCTAssert(originalFirstTabViewModel !== tabCollectionViewModel.tabViewModel(at: 0))
+        XCTAssert(tabCollectionViewModel.tabCollection.tabs.count == 2)
+    }
+
     // MARK: - Remove
 
     func testWhenRemoveIsCalledWithIndexOutOfBoundsThenNoTabIsRemoved() {
-        let tabCollection = TabCollection()
-        let tabCollectionViewModel = TabCollectionViewModel(tabCollection: tabCollection)
+        let tabCollectionViewModel = TabCollectionViewModel.aTabCollectionViewModel()
 
         tabCollectionViewModel.remove(at: 1)
 
@@ -113,8 +184,7 @@ class TabCollectionViewModelTests: XCTestCase {
     }
 
     func testWhenTabIsRemovedAndSelectedTabHasHigherIndexThenSelectionIsPreserved() {
-        let tabCollection = TabCollection()
-        let tabCollectionViewModel = TabCollectionViewModel(tabCollection: tabCollection)
+        let tabCollectionViewModel = TabCollectionViewModel.aTabCollectionViewModel()
 
         tabCollectionViewModel.appendNewTab()
         let selectedTab = tabCollectionViewModel.selectedTabViewModel?.tab
@@ -125,8 +195,7 @@ class TabCollectionViewModelTests: XCTestCase {
     }
 
     func testWhenSelectedTabIsRemovedThenNextItemWithLowerIndexIsSelected() {
-        let tabCollection = TabCollection()
-        let tabCollectionViewModel = TabCollectionViewModel(tabCollection: tabCollection)
+        let tabCollectionViewModel = TabCollectionViewModel.aTabCollectionViewModel()
         let firstTab = tabCollectionViewModel.tabCollection.tabs[0]
 
         tabCollectionViewModel.appendNewTab()
@@ -136,8 +205,7 @@ class TabCollectionViewModelTests: XCTestCase {
     }
 
     func testWhenAllOtherTabsAreRemovedThenRemainedIsAlsoSelected() {
-        let tabCollection = TabCollection()
-        let tabCollectionViewModel = TabCollectionViewModel(tabCollection: tabCollection)
+        let tabCollectionViewModel = TabCollectionViewModel.aTabCollectionViewModel()
         let firstTab = tabCollectionViewModel.tabCollection.tabs[0]
 
         tabCollectionViewModel.appendNewTab()
@@ -148,11 +216,45 @@ class TabCollectionViewModelTests: XCTestCase {
         XCTAssertEqual(firstTab, tabCollectionViewModel.selectedTabViewModel?.tab)
     }
 
+    func testWhenOwnerOfWebviewIsRemovedThenAllOtherTabsRemained() {
+        let tabCollectionViewModel = TabCollectionViewModel.aTabCollectionViewModel()
+
+        tabCollectionViewModel.appendNewTab()
+        tabCollectionViewModel.appendNewTab()
+        let lastTabViewModel = tabCollectionViewModel.tabViewModel(at: tabCollectionViewModel.tabCollection.tabs.count - 1)!
+
+        tabCollectionViewModel.remove(ownerOf: lastTabViewModel.tab.webView)
+
+        XCTAssertFalse(tabCollectionViewModel.tabCollection.tabs.contains(lastTabViewModel.tab))
+        XCTAssert(tabCollectionViewModel.tabCollection.tabs.count == 2)
+    }
+
+    func testWhenOwnerOfWebviewIsNotInTabCollectionThenNoTabIsRemoved() {
+        let tabCollectionViewModel = TabCollectionViewModel.aTabCollectionViewModel()
+        let originalCount = tabCollectionViewModel.tabCollection.tabs.count
+        let tab = Tab()
+
+        tabCollectionViewModel.remove(ownerOf: tab.webView)
+
+        XCTAssertEqual(tabCollectionViewModel.tabCollection.tabs.count, originalCount)
+    }
+
+    func testRemoveSelected() {
+        let tabCollectionViewModel = TabCollectionViewModel.aTabCollectionViewModel()
+
+        tabCollectionViewModel.appendNewTab()
+        tabCollectionViewModel.appendNewTab()
+        let selectedTab = tabCollectionViewModel.selectedTabViewModel?.tab
+
+        tabCollectionViewModel.removeSelected()
+
+        XCTAssertFalse(tabCollectionViewModel.tabCollection.tabs.contains(selectedTab!))
+    }
+
     // MARK: - Duplicate
 
     func testWhenTabIsDuplicatedThenItsCopyHasHigherIndexByOne() {
-        let tabCollection = TabCollection()
-        let tabCollectionViewModel = TabCollectionViewModel(tabCollection: tabCollection)
+        let tabCollectionViewModel = TabCollectionViewModel.aTabCollectionViewModel()
         let firstTabViewModel = tabCollectionViewModel.tabViewModel(at: 0)
 
         tabCollectionViewModel.duplicateTab(at: 0)
@@ -161,14 +263,22 @@ class TabCollectionViewModelTests: XCTestCase {
     }
 
     func testWhenTabIsDuplicatedThenItsCopyHasTheSameUrl() {
-        let tabCollection = TabCollection()
-        let tabCollectionViewModel = TabCollectionViewModel(tabCollection: tabCollection)
+        let tabCollectionViewModel = TabCollectionViewModel.aTabCollectionViewModel()
         let firstTabViewModel = tabCollectionViewModel.tabViewModel(at: 0)
         firstTabViewModel?.tab.url = URL.duckDuckGo
 
         tabCollectionViewModel.duplicateTab(at: 0)
 
         XCTAssertEqual(firstTabViewModel?.tab.url, tabCollectionViewModel.tabViewModel(at: 1)?.tab.url)
+    }
+
+}
+
+fileprivate extension TabCollectionViewModel {
+
+    static func aTabCollectionViewModel() -> TabCollectionViewModel {
+        let tabCollection = TabCollection()
+        return TabCollectionViewModel(tabCollection: tabCollection)
     }
 
 }
