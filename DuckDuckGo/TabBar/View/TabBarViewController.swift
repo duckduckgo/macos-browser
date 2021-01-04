@@ -195,9 +195,9 @@ class TabBarViewController: NSViewController {
             return
         }
 
-        let url = tabViewModel.tab.url
+        let tab = tabViewModel.tab
         tabCollectionViewModel.remove(at: indexPath.item)
-        WindowsManager.openNewWindow(with: url)
+        WindowsManager.openNewWindow(with: tab)
     }
 
     // MARK: - Tab Width

@@ -62,9 +62,9 @@ class OptionsButtonMenu: NSMenu {
             return
         }
 
-        let url = selectedTabViewModel.tab.url
+        let tab = selectedTabViewModel.tab
         tabCollectionViewModel.removeSelected()
-        WindowsManager.openNewWindow(with: url)
+        WindowsManager.openNewWindow(with: tab)
     }
 
 #if FEEDBACK

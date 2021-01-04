@@ -30,6 +30,7 @@ class WebViewStateObserver: NSObject {
         self.tabViewModel = tabViewModel
         super.init()
 
+        matchFlagValues()
         observe(webView: webView)
     }
 
@@ -39,6 +40,22 @@ class WebViewStateObserver: NSObject {
         webView?.removeObserver(self, forKeyPath: #keyPath(WKWebView.canGoForward))
         webView?.removeObserver(self, forKeyPath: #keyPath(WKWebView.isLoading))
         webView?.removeObserver(self, forKeyPath: #keyPath(WKWebView.title))
+    }
+
+    private func matchFlagValues() {
+        guard let tabViewModel = tabViewModel else {
+            os_log("%s: TabViewModel was released from memory", type: .error, className)
+            return
+        }
+
+        guard let webView = webView else {
+            os_log("%s: TabViewModel was released from memory", type: .error, className)
+            return
+        }
+
+        tabViewModel.canGoBack = webView.canGoBack
+        tabViewModel.canGoForward = webView.canGoForward
+        tabViewModel.isLoading = webView.isLoading
     }
 
     private func observe(webView: WKWebView) {
