@@ -33,7 +33,7 @@ class WindowsManager {
         }
     }
 
-    class func openNewWindow(with initialTab: Tab? = nil) {
+    class func openNewWindow(with initialTab: Tab? = nil, droppingPoint: NSPoint? = nil) {
         guard let mainWindowController = makeNewWindow() else {
             return
         }
@@ -45,6 +45,10 @@ class WindowsManager {
 
             mainViewController.tabCollectionViewModel.append(tab: initialTab)
             mainViewController.tabCollectionViewModel.remove(at: 0)
+        }
+
+        if let droppingPoint = droppingPoint {
+            mainWindowController.window?.setFrameOrigin(droppingPoint: droppingPoint)
         }
         mainWindowController.showWindow(self)
     }

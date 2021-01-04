@@ -188,7 +188,7 @@ class TabBarViewController: NSViewController {
         tabCollectionViewModel.moveTab(at: index, to: newIndex)
     }
 
-    private func moveToNewWindow(indexPath: IndexPath) {
+    private func moveToNewWindow(indexPath: IndexPath, droppingPoint: NSPoint? = nil) {
         guard tabCollectionViewModel.tabCollection.tabs.count > 1 else { return }
         guard let tabViewModel = tabCollectionViewModel.tabViewModel(at: indexPath.item) else {
             os_log("TabBarViewController: Failed to get tab view model", type: .error)
@@ -197,7 +197,7 @@ class TabBarViewController: NSViewController {
 
         let tab = tabViewModel.tab
         tabCollectionViewModel.remove(at: indexPath.item)
-        WindowsManager.openNewWindow(with: tab)
+        WindowsManager.openNewWindow(with: tab, droppingPoint: droppingPoint)
     }
 
     // MARK: - Tab Width
@@ -557,7 +557,7 @@ extension TabBarViewController: NSCollectionViewDelegate {
                 os_log("TabBarViewController: No current dragging index path", type: .error)
                 return
             }
-            moveToNewWindow(indexPath: draggingIndexPath)
+            moveToNewWindow(indexPath: draggingIndexPath, droppingPoint: screenPoint)
         }
     }
 
@@ -574,7 +574,7 @@ extension TabBarViewController: NSCollectionViewDelegate {
         moveItemIfNeeded(at: currentDraggingIndexPath, to: newIndexPath)
 
         proposedDropOperation.pointee = .before
-        return .move
+        return .private
     }
 
     func collectionView(_ collectionView: NSCollectionView,
