@@ -25,6 +25,11 @@ class TooltipWindowController: NSWindowController {
         case tooltipPadding = 2
     }
 
+    enum TimerInterval: TimeInterval {
+        case short = 0.66
+        case long = 1.5
+    }
+
     private var showingTimer: Timer?
     private var hidingTimer: Timer?
 
@@ -42,7 +47,7 @@ class TooltipWindowController: NSWindowController {
         window?.animationBehavior = .utilityWindow
     }
 
-    func scheduleShowing(parentWindow: NSWindow, topLeftPoint: NSPoint) {
+    func scheduleShowing(parentWindow: NSWindow, timerInterval: TimerInterval, topLeftPoint: NSPoint) {
         if isHiding { return }
 
         guard let childWindows = parentWindow.childWindows,
@@ -59,7 +64,7 @@ class TooltipWindowController: NSWindowController {
         }
 
         showingTimer?.invalidate()
-        showingTimer = Timer.scheduledTimer(withTimeInterval: 1.0, repeats: false, block: { [weak self] _ in
+        showingTimer = Timer.scheduledTimer(withTimeInterval: timerInterval.rawValue, repeats: false, block: { [weak self] _ in
             parentWindow.addChildWindow(tooltipWindow, ordered: .above)
             self?.layout(topLeftPoint: topLeftPoint)
         })
@@ -108,6 +113,14 @@ class TooltipWindowController: NSWindowController {
 
         window.setFrame(NSRect(x: 0, y: 0, width: 250, height: 58), display: true)
         window.setFrameTopLeftPoint(topLeftPoint)
+    }
+
+}
+
+extension TooltipWindowController.TimerInterval {
+
+    init(from tabWidthStage: TabBarViewItem.WidthStage) {
+        self = tabWidthStage == .full ? .long : .short
     }
 
 }

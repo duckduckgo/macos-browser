@@ -61,6 +61,14 @@ class TabBarViewItem: NSCollectionViewItem {
         var isFaviconCentered: Bool { !isTitleHidden }
     }
 
+    var widthStage: WidthStage {
+        if isSelected || isDragged {
+            return .full
+        } else {
+            return WidthStage(width: view.bounds.size.width)
+        }
+    }
+
     enum TextFieldMaskGradientSize: CGFloat {
         case width = 6
         case trailingSpace = 0
@@ -194,13 +202,6 @@ class TabBarViewItem: NSCollectionViewItem {
     }
 
     private func updateSubviews() {
-        let widthStage: WidthStage
-        if isSelected || isDragged {
-            widthStage = .full
-        } else {
-            widthStage = WidthStage(width: view.bounds.size.width)
-        }
-
         let backgroundColor = isSelected || isDragged ? NSColor(named: "InterfaceBackgroundColor") : NSColor.clear
         view.layer?.backgroundColor = backgroundColor?.cgColor
         mouseOverView.mouseOverColor = isSelected || isDragged ? NSColor.clear : NSColor(named: "TabMouseOverColor")

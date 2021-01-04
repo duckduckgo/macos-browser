@@ -307,7 +307,8 @@ class TabBarViewController: NSViewController {
         point.y -= TooltipWindowController.VerticalSpace.tooltipPadding.rawValue
         point.x += scrollViewLeadingConstraint.constant + tabBarViewItem.view.frame.origin.x - clipView.bounds.origin.x
         let converted = window.convertPoint(toScreen: view.convert(point, to: nil))
-        tooltipWindowController.scheduleShowing(parentWindow: window, topLeftPoint: converted)
+        let timerInterval = TooltipWindowController.TimerInterval(from: tabBarViewItem.widthStage)
+        tooltipWindowController.scheduleShowing(parentWindow: window, timerInterval: timerInterval, topLeftPoint: converted)
     }
 
     func hideTooltip() {
