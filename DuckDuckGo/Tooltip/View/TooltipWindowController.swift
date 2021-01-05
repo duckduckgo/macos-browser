@@ -45,6 +45,14 @@ class TooltipWindowController: NSWindowController {
         super.windowDidLoad()
     
         window?.animationBehavior = .utilityWindow
+        NotificationCenter.default.addObserver(self,
+                                               selector: #selector(suggestionWindowOpenNotification(_:)),
+                                               name: .suggestionWindowOpen,
+                                               object: nil)
+    }
+
+    deinit {
+        NotificationCenter.default.removeObserver(self)
     }
 
     func scheduleShowing(parentWindow: NSWindow, timerInterval: TimerInterval, topLeftPoint: NSPoint) {
@@ -113,6 +121,14 @@ class TooltipWindowController: NSWindowController {
 
         window.setFrame(NSRect(x: 0, y: 0, width: 250, height: 58), display: true)
         window.setFrameTopLeftPoint(topLeftPoint)
+    }
+
+}
+
+extension TooltipWindowController {
+
+    @objc func suggestionWindowOpenNotification(_ notification: Notification) {
+        hide()
     }
 
 }

@@ -359,6 +359,11 @@ class AddressBarTextField: NSTextField {
 
         window.addChildWindow(suggestionsWindow, ordered: .above)
         layoutSuggestionWindow()
+        postSuggestionWindowOpenNotification()
+    }
+
+    private func postSuggestionWindowOpenNotification() {
+        NotificationCenter.default.post(name: .suggestionWindowOpen, object: nil)
     }
 
     private func hideSuggestionsWindow() {
@@ -394,6 +399,12 @@ class AddressBarTextField: NSTextField {
         let screen = window.convertPoint(toScreen: converted)
         suggestionsWindow.setFrameTopLeftPoint(screen)
     }
+}
+
+extension Notification.Name {
+
+    static let suggestionWindowOpen = Notification.Name("suggestionWindowOpen")
+
 }
 
 extension AddressBarTextField: NSTextFieldDelegate {
