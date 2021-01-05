@@ -168,11 +168,15 @@ class TabCollectionViewModel {
         delegate?.tabCollectionViewModelDidMultipleChanges(self)
     }
 
-    func insertNewTab(at index: Int = 0) {
-        tabCollection.insert(tab: Tab(), at: index)
+    func insert(tab: Tab, at index: Int = 0) {
+        tabCollection.insert(tab: tab, at: index)
         select(at: index)
 
         delegate?.tabCollectionViewModel(self, didInsertAndSelectAt: index)
+    }
+
+    func insertNewTab(at index: Int = 0) {
+        insert(tab: Tab(), at: index)
     }
 
     func remove(at index: Int) {

@@ -186,6 +186,7 @@ class TabBarViewController: NSViewController {
         currentDraggingIndexPath = newIndexPath
 
         tabCollectionViewModel.moveTab(at: index, to: newIndex)
+        TabDragAndDropManager.shared.setSource(tabCollectionViewModel: tabCollectionViewModel, indexPath: newIndexPath)
     }
 
     private func moveToNewWindow(indexPath: IndexPath, droppingPoint: NSPoint? = nil) {
@@ -534,6 +535,7 @@ extension TabBarViewController: NSCollectionViewDelegate {
             return
         }
         currentDraggingIndexPath = indexPath
+        TabDragAndDropManager.shared.setSource(tabCollectionViewModel: tabCollectionViewModel, indexPath: indexPath)
     }
 
     static let dropToOpenDistance: CGFloat = 100
@@ -546,7 +548,10 @@ extension TabBarViewController: NSCollectionViewDelegate {
         self.initialDraggingIndexPaths = nil
         currentDraggingIndexPath = nil
 
-        // Create a new window if the drop is too distant from tab bar
+        // Perform the drag and drop between multiple windows
+        if TabDragAndDropManager.shared.performDragAndDropIfNeeded() { return }
+
+        // Create a new window if the drop is too distant
         let frameRelativeToWindow = view.convert(view.bounds, to: nil)
         guard let frameRelativeToScreen = view.window?.convertToScreen(frameRelativeToWindow) else {
             os_log("TabBarViewController: Conversion to the screen coordinate system failed", type: .error)
@@ -566,8 +571,11 @@ extension TabBarViewController: NSCollectionViewDelegate {
                         proposedIndexPath proposedDropIndexPath: AutoreleasingUnsafeMutablePointer<NSIndexPath>,
                         dropOperation proposedDropOperation: UnsafeMutablePointer<NSCollectionView.DropOperation>) -> NSDragOperation {
         guard let currentDraggingIndexPath = currentDraggingIndexPath else {
-            os_log("TabBarViewController: Current dragging index path is nil", type: .error)
-            return .copy
+            TabDragAndDropManager.shared.setDestination(tabCollectionViewModel: tabCollectionViewModel,
+                                                        indexPath: proposedDropIndexPath.pointee as IndexPath)
+
+            proposedDropOperation.pointee = .on
+            return .private
         }
 
         let newIndexPath = proposedDropIndexPath.pointee as IndexPath
@@ -582,8 +590,8 @@ extension TabBarViewController: NSCollectionViewDelegate {
                         indexPath: IndexPath,
                         dropOperation: NSCollectionView.DropOperation) -> Bool {
         guard let draggingIndexPaths = initialDraggingIndexPaths else {
-            os_log("TabBarViewController: Dragging index paths is nil", type: .error)
-            return false
+            // Droping from another TabBarViewController
+            return true
         }
 
         guard draggingIndexPaths.count == 1 else {
