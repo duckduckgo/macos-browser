@@ -21,14 +21,8 @@ import Foundation
 extension NSPoint {
 
     func isNearRect(_ rect: NSRect, allowedDistance: CGFloat) -> Bool {
-        if x < rect.origin.x - allowedDistance ||
-            x > rect.origin.x + rect.size.width + allowedDistance ||
-            y < rect.origin.y - allowedDistance ||
-            y > rect.origin.y + rect.size.height + allowedDistance {
-            return false
-        } else {
-            return true
-        }
+        let expandedRect = rect.insetBy(dx: -allowedDistance, dy: -allowedDistance)
+        return expandedRect.contains(self)
     }
 
 }
