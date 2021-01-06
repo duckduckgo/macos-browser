@@ -59,9 +59,9 @@ extension SuggestionsAPIResult {
         """
         let data = json.data(using: .utf8)!
 
-        //swiftlint:disable force_try
+        // swiftlint:disable force_try
         return try! JSONDecoder().decode(SuggestionsAPIResult.self, from: data)
-        //swiftlint:enable force_try
+        // swiftlint:enable force_try
     }
 
 }

@@ -81,7 +81,7 @@ class MouseOverView: NSView {
         updateIsMouseOver()
     }
 
-    //swiftlint:disable legacy_nsgeometry_functions
+    // swiftlint:disable legacy_nsgeometry_functions
     private func updateIsMouseOver() {
         guard let window = window else {
             return
@@ -94,6 +94,6 @@ class MouseOverView: NSView {
             isMouseOver = false
         }
     }
-    //swiftlint:enable legacy_nsgeometry_functions
+    // swiftlint:enable legacy_nsgeometry_functions
 
 }

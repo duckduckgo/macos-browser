@@ -26,7 +26,7 @@ extension URLRequest {
         case userAgent = "User-Agent"
     }
 
-    //Note: Change the user agent to macOS version before the release
+    // Note: Change the user agent to macOS version before the release
     static func defaultRequest(with url: URL) -> URLRequest {
         var request = URLRequest(url: url)
         request.setValue("gzip;q=1.0, compress;q=0.5",
