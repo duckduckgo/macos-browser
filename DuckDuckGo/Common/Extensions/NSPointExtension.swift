@@ -1,5 +1,5 @@
 //
-//  UserAgent.swift
+//  NSPointExtension.swift
 //
 //  Copyright © 2020 DuckDuckGo. All rights reserved.
 //
@@ -18,10 +18,11 @@
 
 import Foundation
 
-class UserAgent {
+extension NSPoint {
 
-    static var safari: String {
-        "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_6) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/14.0.2 Safari/605.1.15"
+    func isNearRect(_ rect: NSRect, allowedDistance: CGFloat) -> Bool {
+        let expandedRect = rect.insetBy(dx: -allowedDistance, dy: -allowedDistance)
+        return expandedRect.contains(self)
     }
 
 }

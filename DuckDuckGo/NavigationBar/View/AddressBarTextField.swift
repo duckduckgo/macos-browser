@@ -134,7 +134,7 @@ class AddressBarTextField: NSTextField {
         selectToTheEnd(from: cursorPosition)
     }
 
-    private func confirmStringValue() {
+    private func navigate() {
         hideSuggestionsWindow()
         updateTabUrl()
     }
@@ -149,6 +149,17 @@ class AddressBarTextField: NSTextField {
             return
         }
         selectedTabViewModel.tab.url = url
+    }
+
+    private func openNewTab(selected: Bool) {
+        guard let url = URL.makeURL(from: stringValueWithoutSuffix) else {
+            os_log("%s: Making url from address bar string failed", type: .error, className)
+            return
+        }
+
+        let tab = Tab()
+        tab.url = url
+        tabCollectionViewModel.append(tab: tab, selected: selected)
     }
 
     // MARK: - Value
@@ -332,6 +343,7 @@ class AddressBarTextField: NSTextField {
         }
 
         let windowController = storyboard.instantiateController(withIdentifier: "SuggestionsWindowController") as? NSWindowController
+        windowController?.window?.animationBehavior = .utilityWindow
         let suggestionsViewController = storyboard.instantiateController(identifier: "SuggestionsViewController", creator: creator)
 
         windowController?.contentViewController = suggestionsViewController
@@ -347,6 +359,11 @@ class AddressBarTextField: NSTextField {
 
         window.addChildWindow(suggestionsWindow, ordered: .above)
         layoutSuggestionWindow()
+        postSuggestionWindowOpenNotification()
+    }
+
+    private func postSuggestionWindowOpenNotification() {
+        NotificationCenter.default.post(name: .suggestionWindowOpen, object: nil)
     }
 
     private func hideSuggestionsWindow() {
@@ -384,14 +401,21 @@ class AddressBarTextField: NSTextField {
     }
 }
 
+extension Notification.Name {
+
+    static let suggestionWindowOpen = Notification.Name("suggestionWindowOpen")
+
+}
+
 extension AddressBarTextField: NSTextFieldDelegate {
 
     func controlTextDidEndEditing(_ obj: Notification) {
         suggestionsViewModel.suggestions.stopFetchingSuggestions()
+        hideSuggestionsWindow()
 
         let textMovement = obj.userInfo?["NSTextMovement"] as? Int
         if textMovement == NSReturnTextMovement {
-            confirmStringValue()
+            navigate()
         } else {
             updateValue()
         }
@@ -433,6 +457,10 @@ extension AddressBarTextField: NSTextFieldDelegate {
              #selector(NSResponder.deleteBackwardByDecomposingPreviousCharacter(_:)):
             suggestionsViewModel.clearSelection(); return false
         default:
+            if NSApp.isCommandPressed && NSApp.isReturnOrEnterPressed {
+                openNewTab(selected: NSApp.isShiftPressed)
+                return true
+            }
             return false
         }
     }
@@ -442,7 +470,11 @@ extension AddressBarTextField: NSTextFieldDelegate {
 extension AddressBarTextField: SuggestionsViewControllerDelegate {
 
     func suggestionsViewControllerDidConfirmSelection(_ suggestionsViewController: SuggestionsViewController) {
-        confirmStringValue()
+        if NSApp.isCommandPressed {
+            openNewTab(selected: NSApp.isShiftPressed)
+            return
+        }
+        navigate()
     }
 
 }

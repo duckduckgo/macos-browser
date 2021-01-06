@@ -37,3 +37,11 @@ class TabBarScrollView: NSScrollView {
     }
 
 }
+
+extension TabBarScrollView {
+
+    func updateScrollElasticity(with tabMode: TabBarViewController.TabMode) {
+        horizontalScrollElasticity = tabMode == .divided ? .none : .allowed
+    }
+
+}

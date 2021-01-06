@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<document type="com.apple.InterfaceBuilder3.Cocoa.Storyboard.XIB" version="3.0" toolsVersion="17506" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none" useAutolayout="YES" initialViewController="o2v-eH-jTI">
+<document type="com.apple.InterfaceBuilder3.Cocoa.Storyboard.XIB" version="3.0" toolsVersion="17701" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none" useAutolayout="YES" initialViewController="o2v-eH-jTI">
     <dependencies>
         <deployment identifier="macosx"/>
-        <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="17506"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="17701"/>
         <capability name="Named colors" minToolsVersion="9.0"/>
         <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
     </dependencies>
@@ -217,12 +217,13 @@
                                 </buttonCell>
                             </button>
                             <button hidden="YES" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="Wmw-FG-ZMU">
-                                <rect key="frame" x="6" y="6" width="22" height="22"/>
+                                <rect key="frame" x="10" y="10" width="14" height="14"/>
                                 <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
-                                <buttonCell key="cell" type="square" bezelStyle="shadowlessSquare" image="Grade" imagePosition="only" alignment="center" imageScaling="proportionallyUpOrDown" inset="2" id="U3T-b0-hqd">
+                                <buttonCell key="cell" type="square" bezelStyle="shadowlessSquare" image="PrivacyEntryPoint" imagePosition="only" alignment="center" imageScaling="proportionallyUpOrDown" inset="2" id="U3T-b0-hqd">
                                     <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
                                     <font key="font" metaFont="system"/>
                                 </buttonCell>
+                                <color key="contentTintColor" name="ButtonColor"/>
                             </button>
                         </subviews>
                         <constraints>
@@ -241,9 +242,9 @@
                     <connections>
                         <outlet property="actionButton" destination="WKw-DB-V3R" id="S6s-xZ-VTi"/>
                         <outlet property="addressBarTextField" destination="zaX-wZ-E3D" id="pfO-d4-i46"/>
-                        <outlet property="gradeButton" destination="Wmw-FG-ZMU" id="J8F-44-HJL"/>
                         <outlet property="imageButton" destination="XMM-Vd-9H5" id="gBC-5k-4hV"/>
                         <outlet property="passiveTextField" destination="le0-Hn-ZAC" id="npL-R1-gmH"/>
+                        <outlet property="privacyEntryPointButton" destination="Wmw-FG-ZMU" id="J8F-44-HJL"/>
                         <outlet property="view" destination="wj6-L2-5rJ" id="bsr-e7-gS7"/>
                     </connections>
                 </viewController>
@@ -256,8 +257,8 @@
         <image name="Back" width="7" height="13"/>
         <image name="Feedback" width="16" height="16"/>
         <image name="Forward" width="7" height="13"/>
-        <image name="Grade" width="22" height="22"/>
         <image name="HomeFavicon" width="16" height="16"/>
+        <image name="PrivacyEntryPoint" width="15" height="15"/>
         <image name="Refresh" width="12" height="15"/>
         <image name="Settings" width="12" height="3"/>
         <namedColor name="ButtonColor">

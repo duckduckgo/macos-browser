@@ -111,10 +111,33 @@ extension MainViewController {
     }
 
     @IBAction func reopenLastClosedTab(_ sender: Any?) {
-        tabCollectionViewModel.insertLastRemovedTab()
+        tabCollectionViewModel.putBackLastRemovedTab()
     }
 
     // MARK: - Window
+
+    @IBAction func showPreviousTab(_ sender: Any?) {
+        tabCollectionViewModel.selectPrevious()
+    }
+
+    @IBAction func showNextTab(_ sender: Any?) {
+        tabCollectionViewModel.selectNext()
+    }
+
+    @IBAction func showTab(_ sender: Any?) {
+        guard let sender = sender as? NSMenuItem else {
+            os_log("MainViewController: Casting to NSMenuItem failed", type: .error)
+            return
+        }
+        guard let keyEquivalent = Int(sender.keyEquivalent), keyEquivalent >= 0 && keyEquivalent <= 9 else {
+            os_log("MainViewController: Key equivalent is not correct for tab selection", type: .error)
+            return
+        }
+        let index = keyEquivalent - 1
+        if index >= 0 && index < tabCollectionViewModel.tabCollection.tabs.count {
+            tabCollectionViewModel.select(at: index)
+        }
+    }
 
     @IBAction func moveTabToNewWindow(_ sender: Any?) {
         guard let selectedTabViewModel = tabCollectionViewModel.selectedTabViewModel else {
@@ -122,9 +145,9 @@ extension MainViewController {
             return
         }
 
-        let url = selectedTabViewModel.tab.url
+        let tab = selectedTabViewModel.tab
         tabCollectionViewModel.removeSelected()
-        WindowsManager.openNewWindow(with: url)
+        WindowsManager.openNewWindow(with: tab)
     }
 
     @IBAction func mergeAllWindows(_ sender: Any?) {

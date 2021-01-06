@@ -23,7 +23,7 @@ import os
 protocol TabDelegate: class {
 
     func tabDidStartNavigation(_ tab: Tab)
-    func tab(_ tab: Tab, requestedNewTab url: URL?)
+    func tab(_ tab: Tab, requestedNewTab url: URL?, selected: Bool)
     func tab(_ tab: Tab, requestedFileDownload download: FileDownload)
     func tab(_ tab: Tab, willShowContextMenuAt position: NSPoint, image: URL?, link: URL?)
 
@@ -203,12 +203,10 @@ extension Tab: WKNavigationDelegate {
             currentDownload = nil
         }
 
-        let isCommandPressed = NSApp.currentEvent?.modifierFlags.contains(.command) ?? false
         let isLinkActivated = navigationAction.navigationType == .linkActivated
-
-        if isLinkActivated && isCommandPressed {
+        if isLinkActivated && NSApp.isCommandPressed {
             decisionHandler(.cancel)
-            delegate?.tab(self, requestedNewTab: navigationAction.request.url)
+            delegate?.tab(self, requestedNewTab: navigationAction.request.url, selected: NSApp.isShiftPressed)
             return
         }
 

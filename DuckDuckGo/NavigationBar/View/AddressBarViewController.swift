@@ -31,7 +31,7 @@ class AddressBarViewController: NSViewController {
     @IBOutlet weak var passiveTextField: NSTextField!
     @IBOutlet weak var actionButton: NSButton!
     @IBOutlet weak var imageButton: NSButton!
-    @IBOutlet weak var gradeButton: NSButton!
+    @IBOutlet weak var privacyEntryPointButton: NSButton!
     
     private var tabCollectionViewModel: TabCollectionViewModel
     private let suggestionsViewModel = SuggestionsViewModel(suggestions: Suggestions())
@@ -74,6 +74,10 @@ class AddressBarViewController: NSViewController {
                                                selector: #selector(textFieldFirstReponderNotification(_:)),
                                                name: .firstResponder,
                                                object: nil)
+    }
+
+    deinit {
+        NotificationCenter.default.removeObserver(self)
     }
 
     override func viewDidLayout() {
@@ -153,8 +157,9 @@ class AddressBarViewController: NSViewController {
         let isTextFieldEditorFirstResponder = view.window?.firstResponder === addressBarTextField.currentEditor()
         let isDuckDuckGoUrl = selectedTabViewModel.tab.url?.isDuckDuckGoSearch ?? false
 
-        // Grade button
-        gradeButton.isHidden = isSearchingMode || isTextFieldFirstResponder || isDuckDuckGoUrl || isURLNil
+        // Privacy entry point button
+        privacyEntryPointButton.isHidden = isSearchingMode || isTextFieldFirstResponder || isDuckDuckGoUrl || isURLNil
+        imageButton.isHidden = !privacyEntryPointButton.isHidden
 
         // Action button
         var actionButtonHidden = false

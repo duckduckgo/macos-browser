@@ -75,18 +75,24 @@ class BrowserTabViewController: NSViewController {
             urlCancellable = tabViewModel.tab.$url.receive(on: DispatchQueue.main).sink { [weak self] _ in self?.reloadWebViewIfNeeded() }
         }
 
-        if let webView = webView, view.subviews.contains(webView) {
-            webView.removeFromSuperview()
+        func removeOldWebView(_ oldWebView: WebView?) {
+            if let oldWebView = oldWebView, view.subviews.contains(oldWebView) {
+                oldWebView.removeFromSuperview()
+            }
         }
-        webView = nil
+
         guard let tabViewModel = tabCollectionViewModel.selectedTabViewModel else {
             self.tabViewModel = nil
+            removeOldWebView(webView)
             return
         }
-        self.tabViewModel = tabViewModel
+        guard self.tabViewModel !== tabViewModel else { return }
 
+        let oldWebView = webView
         displayWebView(of: tabViewModel)
         subscribeToUrl(of: tabViewModel)
+        self.tabViewModel = tabViewModel
+        removeOldWebView(oldWebView)
     }
 
     private func subscribeToIsErrorViewVisible() {
@@ -137,10 +143,10 @@ class BrowserTabViewController: NSViewController {
         webView.isHidden = shown
     }
 
-    private func openNewTab(with url: URL?) {
+    private func openNewTab(with url: URL?, selected: Bool = false) {
         let tab = Tab()
         tab.url = url
-        tabCollectionViewModel.appendWithoutSelection(tab: tab)
+        tabCollectionViewModel.append(tab: tab, selected: selected)
     }
 
 }
@@ -151,8 +157,8 @@ extension BrowserTabViewController: TabDelegate {
         setFirstResponderIfNeeded()
     }
 
-    func tab(_ tab: Tab, requestedNewTab url: URL?) {
-        openNewTab(with: url)
+    func tab(_ tab: Tab, requestedNewTab url: URL?, selected: Bool) {
+        openNewTab(with: url, selected: selected)
     }
 
     func tab(_ tab: Tab, requestedFileDownload download: FileDownload) {

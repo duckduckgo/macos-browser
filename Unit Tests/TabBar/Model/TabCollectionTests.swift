@@ -21,58 +21,6 @@ import XCTest
 
 class TabCollectionTests: XCTestCase {
 
-    // MARK: - TabCollectionDelegate
-
-    func testWhenTabIsAppendedThenDelegateIsNotified() {
-        let tabCollection = TabCollection()
-        let tabCollectionDelegateMock = TabCollectionDelegateMock()
-        tabCollection.delegate = tabCollectionDelegateMock
-
-        let tab = Tab()
-        tabCollection.append(tab: tab)
-
-        XCTAssert(tabCollectionDelegateMock.didAppendCalled)
-    }
-
-    func testWhenTabIsInsertedThenDelegateIsNotified() {
-        let tabCollection = TabCollection()
-        let tabCollectionDelegateMock = TabCollectionDelegateMock()
-        tabCollection.delegate = tabCollectionDelegateMock
-
-        let tab = Tab()
-        tabCollection.insert(tab: tab, at: 0)
-
-        XCTAssert(tabCollectionDelegateMock.didInsertCalled)
-    }
-
-    func testWhenTabIsRemovedThenDelegateIsNotified() {
-        let tabCollection = TabCollection()
-        let tabCollectionDelegateMock = TabCollectionDelegateMock()
-        tabCollection.delegate = tabCollectionDelegateMock
-
-        let tab = Tab()
-        tabCollection.append(tab: tab)
-        XCTAssert(tabCollection.remove(at: 0))
-
-        XCTAssert(tabCollectionDelegateMock.didRemoveCalled)
-    }
-
-    func testWhenTabsAreMovedThenDelegateIsNotified() {
-        let tabCollection = TabCollection()
-        let tabCollectionDelegateMock = TabCollectionDelegateMock()
-        tabCollection.delegate = tabCollectionDelegateMock
-
-        let tab1 = Tab()
-        tabCollection.append(tab: tab1)
-
-        let tab2 = Tab()
-        tabCollection.append(tab: tab2)
-
-        tabCollection.moveTab(at: 0, to: 1)
-
-        XCTAssert(tabCollectionDelegateMock.didMoveCalled)
-    }
-
     // MARK: - Append
 
     func testWhenTabIsAppendedThenItsIndexIsLast() {
@@ -165,6 +113,20 @@ class TabCollectionTests: XCTestCase {
         XCTAssertEqual(tabCollection.tabs[1], tab2)
     }
 
+    func testWhenMoveIsCalledWithSameIndexesThenNoItemIsMoved() {
+        let tabCollection = TabCollection()
+
+        let tab1 = Tab()
+        tabCollection.append(tab: tab1)
+        let tab2 = Tab()
+        tabCollection.append(tab: tab2)
+
+        tabCollection.moveTab(at: 0, to: 0)
+        tabCollection.moveTab(at: 1, to: 1)
+        XCTAssertEqual(tabCollection.tabs[0], tab1)
+        XCTAssertEqual(tabCollection.tabs[1], tab2)
+    }
+
     func testWhenTabIsMovedThenOtherItemsAreReorganizedProperly() {
         let tabCollection = TabCollection()
 
@@ -175,15 +137,47 @@ class TabCollectionTests: XCTestCase {
         let tab3 = Tab()
         tabCollection.append(tab: tab3)
 
-        tabCollection.moveTab(at: 0, to: 2)
+        tabCollection.moveTab(at: 0, to: 1)
         XCTAssertEqual(tabCollection.tabs[0], tab2)
-        XCTAssertEqual(tabCollection.tabs[1], tab3)
-        XCTAssertEqual(tabCollection.tabs[2], tab1)
+        XCTAssertEqual(tabCollection.tabs[1], tab1)
+        XCTAssertEqual(tabCollection.tabs[2], tab3)
 
         tabCollection.moveTab(at: 0, to: 2)
-        XCTAssertEqual(tabCollection.tabs[0], tab3)
-        XCTAssertEqual(tabCollection.tabs[1], tab1)
+        XCTAssertEqual(tabCollection.tabs[0], tab1)
+        XCTAssertEqual(tabCollection.tabs[1], tab3)
         XCTAssertEqual(tabCollection.tabs[2], tab2)
+    }
+
+    // MARK: - Last Removed Tab
+
+    func testWhenNoTabWasRemovedThenPutBackLastRemovedTabDoesNothing() {
+        let tabCollection = TabCollection()
+        let tabsCount = tabCollection.tabs.count
+
+        tabCollection.putBackLastRemovedTab()
+
+        XCTAssertNil(tabCollection.lastRemovedTabCache)
+        XCTAssertEqual(tabsCount, tabCollection.tabs.count)
+    }
+
+    func testPutBackLastRemovedTab() {
+        let tabCollection = TabCollection()
+
+        let tab1 = Tab()
+        tabCollection.append(tab: tab1)
+        let tab2 = Tab()
+        tab2.url = URL.duckDuckGo
+        tabCollection.append(tab: tab2)
+        let tab3 = Tab()
+        tabCollection.append(tab: tab3)
+
+        XCTAssert(tabCollection.remove(at: 1))
+        tabCollection.putBackLastRemovedTab()
+
+        XCTAssertEqual(tabCollection.tabs[0], tab1)
+        XCTAssertEqual(tabCollection.tabs[1].url, tab2.url)
+        XCTAssertEqual(tabCollection.tabs[2], tab3)
+        XCTAssertNil(tabCollection.lastRemovedTabCache)
     }
 
 }

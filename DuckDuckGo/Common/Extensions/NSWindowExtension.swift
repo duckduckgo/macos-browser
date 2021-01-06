@@ -1,7 +1,7 @@
 //
-//  UserAgent.swift
+//  NSWindowExtension.swift
 //
-//  Copyright © 2020 DuckDuckGo. All rights reserved.
+//  Copyright © 2021 DuckDuckGo. All rights reserved.
 //
 //  Licensed under the Apache License, Version 2.0 (the "License");
 //  you may not use this file except in compliance with the License.
@@ -16,12 +16,13 @@
 //  limitations under the License.
 //
 
-import Foundation
+import Cocoa
 
-class UserAgent {
+extension NSWindow {
 
-    static var safari: String {
-        "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_6) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/14.0.2 Safari/605.1.15"
+    func setFrameOrigin(droppingPoint: NSPoint) {
+        let frameOrigin = NSPoint(x: droppingPoint.x - frame.size.width/2, y: droppingPoint.y - frame.size.height)
+        setFrameOrigin(frameOrigin)
     }
 
 }

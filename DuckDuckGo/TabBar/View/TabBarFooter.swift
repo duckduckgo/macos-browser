@@ -1,5 +1,5 @@
 //
-//  UserAgent.swift
+//  TabBarFooter.swift
 //
 //  Copyright © 2020 DuckDuckGo. All rights reserved.
 //
@@ -16,12 +16,12 @@
 //  limitations under the License.
 //
 
-import Foundation
+import Cocoa
 
-class UserAgent {
+class TabBarFooter: NSView {
 
-    static var safari: String {
-        "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_6) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/14.0.2 Safari/605.1.15"
-    }
+    static let identifier = NSUserInterfaceItemIdentifier(rawValue: "TabBarFooter")
+
+    @IBOutlet weak var addButton: MouseOverButton!
 
 }

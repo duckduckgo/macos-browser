@@ -18,7 +18,15 @@
 
 import Cocoa
 
+protocol MouseOverViewDelegate: AnyObject {
+
+    func mouseOverView(_ mouseOverView: MouseOverView, isMouseOver: Bool)
+
+}
+
 class MouseOverView: NSView {
+
+    weak var delegate: MouseOverViewDelegate?
 
     @IBInspectable var mouseOverColor: NSColor? {
         didSet {
@@ -52,6 +60,10 @@ class MouseOverView: NSView {
     private var isMouseOver = false {
         didSet {
             updateBackgroundColor()
+
+            if oldValue != isMouseOver {
+                delegate?.mouseOverView(self, isMouseOver: isMouseOver)
+            }
         }
     }
 

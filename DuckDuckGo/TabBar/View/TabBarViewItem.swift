@@ -22,9 +22,12 @@ import Combine
 
 protocol TabBarViewItemDelegate: AnyObject {
 
+    func tabBarViewItem(_ tabBarViewItem: TabBarViewItem, isMouseOver: Bool)
+
     func tabBarViewItemCloseAction(_ tabBarViewItem: TabBarViewItem)
     func tabBarViewItemCloseOtherAction(_ tabBarViewItem: TabBarViewItem)
     func tabBarViewItemDuplicateAction(_ tabBarViewItem: TabBarViewItem)
+    func tabBarViewItemMoveToNewWindowAction(_ tabBarViewItem: TabBarViewItem)
 
 }
 
@@ -35,8 +38,35 @@ class TabBarViewItem: NSCollectionViewItem {
     }
 
     enum Width: CGFloat {
-        case minimum = 80
+        case minimum = 50
+        case minimumSelected = 120
         case maximum = 240
+    }
+
+    enum WidthStage {
+        case full
+        case withoutCloseButton
+        case withoutTitle
+
+        init(width: CGFloat) {
+            switch width {
+            case 0..<61: self = .withoutTitle
+            case 61..<120: self = .withoutCloseButton
+            default: self = .full
+            }
+        }
+
+        var isTitleHidden: Bool { self == .withoutTitle }
+        var isCloseButtonHidden: Bool { self != .full }
+        var isFaviconCentered: Bool { !isTitleHidden }
+    }
+
+    var widthStage: WidthStage {
+        if isSelected || isDragged {
+            return .full
+        } else {
+            return WidthStage(width: view.bounds.size.width)
+        }
     }
 
     enum TextFieldMaskGradientSize: CGFloat {
@@ -57,6 +87,8 @@ class TabBarViewItem: NSCollectionViewItem {
         menu.addItem(closeMenuItem)
         let closeOtherMenuItem = NSMenuItem(title: UserText.closeOtherTabs, action: #selector(closeOtherAction(_:)), keyEquivalent: "")
         menu.addItem(closeOtherMenuItem)
+        let moveToNewWindowMenuItem = NSMenuItem(title: UserText.moveTabToNewWindow, action: #selector(moveToNewWindowAction(_:)), keyEquivalent: "")
+        menu.addItem(moveToNewWindowMenuItem)
         return menu
     }
 
@@ -66,6 +98,8 @@ class TabBarViewItem: NSCollectionViewItem {
     @IBOutlet weak var rightSeparatorView: ColorView!
     @IBOutlet weak var loadingView: TabLoadingView!
     @IBOutlet weak var mouseOverView: MouseOverView!
+    @IBOutlet weak var tabLoadingViewCenterConstraint: NSLayoutConstraint!
+    @IBOutlet weak var tabLoadingViewLeadingConstraint: NSLayoutConstraint!
 
     private let titleTextFieldMaskLayer = CAGradientLayer()
 
@@ -116,6 +150,10 @@ class TabBarViewItem: NSCollectionViewItem {
         delegate?.tabBarViewItemCloseOtherAction(self)
     }
 
+    @objc func moveToNewWindowAction(_ sender: NSButton) {
+        delegate?.tabBarViewItemMoveToNewWindowAction(self)
+    }
+
     func subscribe(to tabViewModel: TabViewModel) {
         clearSubscriptions()
 
@@ -149,6 +187,8 @@ class TabBarViewItem: NSCollectionViewItem {
     }
 
     private func setupView() {
+        mouseOverView.delegate = self
+
         view.wantsLayer = true
         view.layer?.cornerRadius = 7
         view.layer?.maskedCorners = [.layerMinXMaxYCorner, .layerMaxXMaxYCorner]
@@ -167,7 +207,11 @@ class TabBarViewItem: NSCollectionViewItem {
         mouseOverView.mouseOverColor = isSelected || isDragged ? NSColor.clear : NSColor(named: "TabMouseOverColor")
 
         rightSeparatorView.isHidden = isSelected || isDragged
-        closeButton.isHidden = !isSelected && !isDragged && view.bounds.size.width == Width.minimum.rawValue
+        closeButton.isHidden = !isSelected && !isDragged && widthStage.isCloseButtonHidden
+        titleTextField.isHidden = widthStage.isTitleHidden
+
+        tabLoadingViewCenterConstraint.priority = widthStage.isTitleHidden && widthStage.isCloseButtonHidden ? .defaultHigh : .defaultLow
+        tabLoadingViewLeadingConstraint.priority = widthStage.isTitleHidden && widthStage.isCloseButtonHidden ? .defaultLow : .defaultHigh
     }
 
     private func setupMenu() {
@@ -177,31 +221,18 @@ class TabBarViewItem: NSCollectionViewItem {
     }
 
     private func updateTitleTextFieldMask() {
-        guard let titleTextFieldLayer = titleTextField.layer else {
-            os_log("TabBarViewItem: Title text field has no layer", type: .error)
-            return
-        }
-
-        if titleTextFieldLayer.mask == nil {
-            titleTextFieldLayer.mask = titleTextFieldMaskLayer
-            titleTextFieldMaskLayer.colors = [NSColor.white.cgColor, NSColor.clear.cgColor]
-        }
-
-        CATransaction.begin()
-        CATransaction.setAnimationDuration(0)
-
-        titleTextFieldMaskLayer.frame = titleTextFieldLayer.bounds
-
         let gradientPadding: CGFloat = closeButton.isHidden ?
             TextFieldMaskGradientSize.trailingSpace.rawValue : TextFieldMaskGradientSize.trailingSpaceWithButton.rawValue
-        let gradientWidth: CGFloat = TextFieldMaskGradientSize.width.rawValue
-        let startPointX = (titleTextFieldMaskLayer.bounds.width - (gradientPadding + gradientWidth)) / titleTextFieldMaskLayer.bounds.width
-        let endPointX = (titleTextFieldMaskLayer.bounds.width - gradientPadding) / titleTextFieldMaskLayer.bounds.width
+        titleTextField.gradient(width: TextFieldMaskGradientSize.width.rawValue,
+                                trailingPadding: gradientPadding)
+    }
 
-        titleTextFieldMaskLayer.startPoint = CGPoint(x: startPointX, y: 0.5)
-        titleTextFieldMaskLayer.endPoint = CGPoint(x: endPointX, y: 0.5)
+}
 
-        CATransaction.commit()
+extension TabBarViewItem: MouseOverViewDelegate {
+
+    func mouseOverView(_ mouseOverView: MouseOverView, isMouseOver: Bool) {
+        delegate?.tabBarViewItem(self, isMouseOver: isMouseOver)
     }
 
 }

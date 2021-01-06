@@ -34,18 +34,22 @@ class TabBarCollectionView: NSCollectionView {
         // Register for the dropped object types we can accept.
         registerForDraggedTypes([.URL])
         // Enable dragging items from our CollectionView to other applications.
-        setDraggingSourceOperationMask([.every], forLocal: false)
+        setDraggingSourceOperationMask([.link], forLocal: false)
         // Enable dragging items within and into our CollectionView.
-        setDraggingSourceOperationMask([.move], forLocal: true)
+        setDraggingSourceOperationMask([.move, .private], forLocal: true)
     }
 
-    func clearSelection() {
-        deselectItems(at: selectionIndexPaths)
+    func clearSelection(animated: Bool = false) {
+        if animated {
+            animator().deselectItems(at: selectionIndexPaths)
+        } else {
+            deselectItems(at: selectionIndexPaths)
+        }
     }
     
     func scrollToSelected() {
         guard selectionIndexPaths.count == 1, let indexPath = selectionIndexPaths.first else {
-            os_log("TabBarCollectionView: More than 1 item highlighted", type: .error)
+            os_log("TabBarCollectionView: More than 1 item or no item highlighted", type: .error)
             return
         }
 
@@ -66,4 +70,35 @@ class TabBarCollectionView: NSCollectionView {
             animator().scroll(CGPoint(x: 0, y: 0))
         }, completionHandler: completionHandler)
     }
+
+    func invalidateLayout() {
+        NSAnimationContext.current.duration = 1/3
+        collectionViewLayout?.invalidateLayout()
+    }
+}
+
+extension NSCollectionView {
+
+    var clipView: NSClipView? {
+        return enclosingScrollView?.contentView
+    }
+
+    var isAtEndScrollPosition: Bool {
+        guard let clipView = clipView else {
+            os_log("TabBarCollectionView: Clip view is nil", type: .error)
+            return false
+        }
+
+        return clipView.bounds.origin.x + clipView.bounds.size.width >= bounds.size.width
+    }
+
+    var isAtStartScrollPosition: Bool {
+        guard let clipView = clipView else {
+            os_log("TabBarCollectionView: Clip view is nil", type: .error)
+            return false
+        }
+
+        return clipView.bounds.origin.x <= 0
+    }
+
 }

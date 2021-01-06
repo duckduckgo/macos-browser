@@ -1,5 +1,5 @@
 //
-//  UserAgent.swift
+//  NSAppExtension.swift
 //
 //  Copyright © 2020 DuckDuckGo. All rights reserved.
 //
@@ -16,12 +16,20 @@
 //  limitations under the License.
 //
 
-import Foundation
+import Cocoa
 
-class UserAgent {
+extension NSApplication {
 
-    static var safari: String {
-        "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_6) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/14.0.2 Safari/605.1.15"
+    var isCommandPressed: Bool {
+        currentEvent?.modifierFlags.contains(.command) ?? false
+    }
+
+    var isShiftPressed: Bool {
+        currentEvent?.modifierFlags.contains(.shift) ?? false
+    }
+
+    var isReturnOrEnterPressed: Bool {
+        currentEvent?.keyCode == 36 || currentEvent?.keyCode == 76
     }
 
 }
