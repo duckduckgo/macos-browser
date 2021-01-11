@@ -23,7 +23,7 @@ extension String {
 
     // MARK: - General
 
-    var trimmed: String {
+    func trimmingWhitespaces() -> String {
         trimmingCharacters(in: .whitespacesAndNewlines)
     }
 
@@ -40,7 +40,7 @@ extension String {
     // MARK: - URL
 
     var url: URL? {
-        var trimmed = self.trimmed
+        var trimmed = trimmingWhitespaces()
         guard let url = URL(string: trimmed) else { return nil }
 
         guard url.scheme != nil else {
@@ -73,8 +73,16 @@ extension String {
         return matches(pattern: ipRegex)
     }
 
-    func encodingWebSpaces() -> String {
+    // Replaces plus symbols in a string with the space character encoding
+    // Space UTF-8 encoding is 0x20
+    func encodingPlusesAsSpaces() -> String {
         return replacingOccurrences(of: "+", with: "%20")
+    }
+
+    // Encodes plus symbols in a string so they are not treated as spaces on the web
+    // Plus sign UTF-8 encoding is 0x2B
+    func encodingPluses() -> String {
+        replacingOccurrences(of: "+", with: "%2B")
     }
 
     func dropSubdomain() -> String? {
