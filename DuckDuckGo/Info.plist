@@ -51,5 +51,28 @@
 	<true/>
 	<key>NSSupportsSuddenTermination</key>
 	<true/>
+	<key>CFBundleDocumentTypes</key>
+	<array>
+		<dict>
+			<key>CFBundleTypeExtensions</key>
+			<array>
+				<string>html</string>
+				<string>htm</string>
+				<string>shtml</string>
+				<string>xht</string>
+				<string>xhtml</string>
+			</array>
+			<key>CFBundleTypeIconFile</key>
+			<string>document.icns</string>
+			<key>CFBundleTypeName</key>
+			<string>HTML Document</string>
+			<key>CFBundleTypeOSTypes</key>
+			<array>
+				<string>HTML</string>
+			</array>
+			<key>CFBundleTypeRole</key>
+			<string>Viewer</string>
+		</dict>
+	</array>
 </dict>
 </plist>
