@@ -60,7 +60,7 @@ class Tab: NSObject {
     }
 
     @Published var title: String?
-    @Published var hasError: Bool = false
+    @Published var error: Error?
 
     // Used to track if an error was caused by a download navigation.
     private var currentDownload: FileDownload?
@@ -265,7 +265,7 @@ extension Tab: WKNavigationDelegate {
         delegate?.tabDidStartNavigation(self)
 
         // Unnecessary assignment triggers publishing
-        if hasError { hasError = false }
+        if error != nil { error = nil }
     }
 
     func webView(_ webView: WKWebView, didFinish navigation: WKNavigation!) {
@@ -283,7 +283,7 @@ extension Tab: WKNavigationDelegate {
             return
         }
 
-        hasError = true
+        self.error = error
     }
 
 }
