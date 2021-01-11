@@ -21,6 +21,12 @@ import os.log
 
 extension String {
 
+    // MARK: - General
+
+    var trimmed: String {
+        trimmingCharacters(in: .whitespacesAndNewlines)
+    }
+
     // MARK: - Regular Expression
 
     func matches(pattern: String) -> Bool {
@@ -34,12 +40,12 @@ extension String {
     // MARK: - URL
 
     var url: URL? {
-        guard let url = URL(string: self) else { return nil }
+        var trimmed = self.trimmed
+        guard let url = URL(string: trimmed) else { return nil }
 
         guard url.scheme != nil else {
-            var string = self
-            string.prepend(URL.Scheme.https.separated())
-            return string.url
+            trimmed.prepend(URL.Scheme.https.separated())
+            return trimmed.url
         }
 
         return url
