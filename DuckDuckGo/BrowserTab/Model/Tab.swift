@@ -72,15 +72,6 @@ class Tab: NSObject {
         url == nil || url == URL.emptyPage
     }
 
-    func load(url: URL) {
-        load(urlRequest: URLRequest(url: url))
-    }
-
-    private func load(urlRequest: URLRequest) {
-        webView.stopLoading()
-        webView.load(urlRequest)
-    }
-
     func goForward() {
         webView.goForward()
     }
@@ -231,7 +222,7 @@ extension Tab: WKNavigationDelegate {
 
         HTTPSUpgrade.shared.isUpgradeable(url: url) { [weak self] isUpgradable in
             if isUpgradable, let upgradedUrl = url.toHttps() {
-                self?.load(url: upgradedUrl)
+                self?.webView.load(upgradedUrl)
                 decisionHandler(.cancel)
                 return
             }
