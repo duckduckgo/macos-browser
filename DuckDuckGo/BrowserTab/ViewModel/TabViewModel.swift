@@ -76,9 +76,9 @@ class TabViewModel {
     }
 
     private func subscribeToTabError() {
-        tab.$hasError.receive(on: DispatchQueue.main).sink { [weak self] _ in
+        tab.$error.receive(on: DispatchQueue.main).sink { [weak self] _ in
             guard let self = self else { return }
-            self.isErrorViewVisible = self.tab.hasError
+            self.isErrorViewVisible = self.tab.error != nil
         } .store(in: &cancellables)
     }
 
@@ -87,7 +87,14 @@ class TabViewModel {
     }
 
     private func updateAddressBarStrings() {
-        guard let url = tab.url, let host = url.host, !isErrorViewVisible else {
+        guard !isErrorViewVisible else {
+            let failingUrl = tab.error?.failingUrl
+            addressBarString = failingUrl?.absoluteString ?? ""
+            passiveAddressBarString = failingUrl?.host?.drop(prefix: URL.HostPrefix.www.separated()) ?? ""
+            return
+        }
+
+        guard let url = tab.url, let host = url.host else {
             addressBarString = ""
             passiveAddressBarString = ""
             return

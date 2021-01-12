@@ -21,6 +21,12 @@ import os.log
 
 extension String {
 
+    // MARK: - General
+
+    func trimmingWhitespaces() -> String {
+        trimmingCharacters(in: .whitespacesAndNewlines)
+    }
+
     // MARK: - Regular Expression
 
     func matches(pattern: String) -> Bool {
@@ -34,12 +40,12 @@ extension String {
     // MARK: - URL
 
     var url: URL? {
-        guard let url = URL(string: self) else { return nil }
+        var trimmed = trimmingWhitespaces()
+        guard let url = URL(string: trimmed) else { return nil }
 
         guard url.scheme != nil else {
-            var string = self
-            string.prepend(URL.Scheme.https.separated())
-            return string.url
+            trimmed.prepend(URL.Scheme.https.separated())
+            return trimmed.url
         }
 
         return url
@@ -67,8 +73,16 @@ extension String {
         return matches(pattern: ipRegex)
     }
 
-    func encodingWebSpaces() -> String {
+    // Replaces plus symbols in a string with the space character encoding
+    // Space UTF-8 encoding is 0x20
+    func encodingPlusesAsSpaces() -> String {
         return replacingOccurrences(of: "+", with: "%20")
+    }
+
+    // Encodes plus symbols in a string so they are not treated as spaces on the web
+    // Plus sign UTF-8 encoding is 0x2B
+    func encodingPluses() -> String {
+        replacingOccurrences(of: "+", with: "%2B")
     }
 
     func dropSubdomain() -> String? {

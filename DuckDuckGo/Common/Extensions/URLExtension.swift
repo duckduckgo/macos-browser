@@ -67,7 +67,7 @@ extension URL {
         queryItems.append(newQueryItem)
         components.queryItems = queryItems
         guard let encodedQuery = components.percentEncodedQuery else { throw ParameterError.encodingFailed }
-        components.percentEncodedQuery = encodedQuery.encodingWebSpaces()
+        components.percentEncodedQuery = encodedQuery.encodingPluses()
         guard let newUrl = components.url else { throw ParameterError.creatingFailed }
         return newUrl
     }
@@ -75,7 +75,7 @@ extension URL {
     func getParameter(name: String) throws -> String? {
         guard var components = URLComponents(url: self, resolvingAgainstBaseURL: false) else { throw ParameterError.parsingFailed }
         guard let encodedQuery = components.percentEncodedQuery else { throw ParameterError.encodingFailed }
-        components.percentEncodedQuery = encodedQuery.encodingWebSpaces()
+        components.percentEncodedQuery = encodedQuery.encodingPlusesAsSpaces()
         let queryItem = components.queryItems?.first(where: { (queryItem) -> Bool in
             queryItem.name == name
         })

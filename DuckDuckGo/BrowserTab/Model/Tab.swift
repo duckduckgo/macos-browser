@@ -60,7 +60,7 @@ class Tab: NSObject {
     }
 
     @Published var title: String?
-    @Published var hasError: Bool = false
+    @Published var error: Error?
 
     // Used to track if an error was caused by a download navigation.
     private var currentDownload: FileDownload?
@@ -70,15 +70,6 @@ class Tab: NSObject {
 
     var isHomepageLoaded: Bool {
         url == nil || url == URL.emptyPage
-    }
-
-    func load(url: URL) {
-        load(urlRequest: URLRequest(url: url))
-    }
-
-    private func load(urlRequest: URLRequest) {
-        webView.stopLoading()
-        webView.load(urlRequest)
     }
 
     func goForward() {
@@ -94,6 +85,11 @@ class Tab: NSObject {
     }
 
     func reload() {
+        if let error = error, let failingUrl = error.failingUrl {
+            webView.load(failingUrl)
+            return
+        }
+
         webView.reload()
     }
 
@@ -226,7 +222,7 @@ extension Tab: WKNavigationDelegate {
 
         HTTPSUpgrade.shared.isUpgradeable(url: url) { [weak self] isUpgradable in
             if isUpgradable, let upgradedUrl = url.toHttps() {
-                self?.load(url: upgradedUrl)
+                self?.webView.load(upgradedUrl)
                 decisionHandler(.cancel)
                 return
             }
@@ -265,7 +261,7 @@ extension Tab: WKNavigationDelegate {
         delegate?.tabDidStartNavigation(self)
 
         // Unnecessary assignment triggers publishing
-        if hasError { hasError = false }
+        if error != nil { error = nil }
     }
 
     func webView(_ webView: WKWebView, didFinish navigation: WKNavigation!) {
@@ -283,7 +279,7 @@ extension Tab: WKNavigationDelegate {
             return
         }
 
-        hasError = true
+        self.error = error
     }
 
 }

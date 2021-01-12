@@ -115,11 +115,9 @@ class BrowserTabViewController: NSViewController {
         if webView.url == tabViewModel.tab.url { return }
 
         if let url = tabViewModel.tab.url {
-            let request = URLRequest(url: url)
-            webView.load(request)
+            webView.load(url)
         } else {
-            let request = URLRequest(url: URL.emptyPage)
-            webView.load(request)
+            webView.load(URL.emptyPage)
         }
     }
 
