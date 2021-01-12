@@ -51,6 +51,7 @@ class MainWindowController: NSWindowController {
     }
 
     private func setupWindow() {
+        window?.setFrameAutosaveName("MainWindow")
         window?.isMovableByWindowBackground = true
         window?.hasShadow = true
     }
