@@ -198,7 +198,6 @@ class SuggestionsViewController: NSViewController {
 
     private func closeWindow() {
         guard let window = view.window else {
-            os_log("SuggestionsViewController: Window not available", type: .error)
             return
         }
 

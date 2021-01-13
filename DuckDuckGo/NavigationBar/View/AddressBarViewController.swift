@@ -70,13 +70,16 @@ class AddressBarViewController: NSViewController {
         addressBarTextField.suggestionsViewModel = suggestionsViewModel
         subscribeToSelectedTabViewModel()
         subscribeToAddressBarTextFieldValue()
+    }
+
+    override func viewWillAppear() {
         NotificationCenter.default.addObserver(self,
                                                selector: #selector(textFieldFirstReponderNotification(_:)),
                                                name: .firstResponder,
                                                object: nil)
     }
 
-    deinit {
+    override func viewWillDisappear() {
         NotificationCenter.default.removeObserver(self)
     }
 

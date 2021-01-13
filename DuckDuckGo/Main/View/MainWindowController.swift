@@ -72,6 +72,8 @@ class MainWindowController: NSWindowController {
                                              height: 0)
     }
 
+    private var windowButtonsReferenced = false
+
     private func referenceWindowButtons() {
         guard let window = window,
               let contentView = window.contentView,
@@ -88,6 +90,7 @@ class MainWindowController: NSWindowController {
         self.closeWidget = closeWidget
         self.minimizeWidget = minimizeWidget
         self.zoomWidget = zoomWidget
+        windowButtonsReferenced = true
     }
 
     private func addWindowButtonsAsSubViewsIfNeeded() {
@@ -155,7 +158,9 @@ extension MainWindowController: NSWindowDelegate {
 
     func windowDidResize(_ notification: Notification) {
         resizeTitleBar()
-        layoutWindowButtons()
+        if windowButtonsReferenced {
+            layoutWindowButtons()
+        }
     }
 
     func windowDidExitFullScreen(_ notification: Notification) {
