@@ -68,6 +68,7 @@ class BrowserTabViewController: NSViewController {
 
             view.addAndLayout(newWebView)
             webView = newWebView
+            setFirstResponderIfNeeded()
         }
 
         func subscribeToUrl(of tabViewModel: TabViewModel) {
@@ -127,7 +128,9 @@ class BrowserTabViewController: NSViewController {
         }
 
         if !url.isDuckDuckGoSearch {
-            view.window?.makeFirstResponder(webView)
+            DispatchQueue.main.async { [weak self] in
+                self?.webView?.makeMeFirstResponder()
+            }
         }
     }
 

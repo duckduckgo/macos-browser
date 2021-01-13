@@ -100,9 +100,9 @@ class AddressBarTextField: NSTextField {
 
     private func updateValue() {
         guard let selectedTabViewModel = tabCollectionViewModel.selectedTabViewModel else {
-            os_log("%s: Selected tab view model is nil", type: .error, className)
             return
         }
+
         let addressBarString = selectedTabViewModel.addressBarString
         value = Value(stringValue: addressBarString, userTyped: false)
     }
