@@ -79,9 +79,11 @@ class AddressBarViewController: NSViewController {
                                                object: nil)
     }
 
+    // swiftlint:disable notification_center_detachment
     override func viewWillDisappear() {
         NotificationCenter.default.removeObserver(self)
     }
+    // swiftlint:enable notification_center_detachment
 
     override func viewDidLayout() {
         super.viewDidLayout()
