@@ -161,6 +161,12 @@ extension MainViewController {
         tabCollectionViewModel.append(tabs: otherTabs)
     }
 
+    // MARK: - Edit
+
+    @IBAction func findInPage(_ sender: Any?) {
+        self.browserTabViewController?.findInPage()
+    }
+
     // MARK: - Help
 
 #if FEEDBACK

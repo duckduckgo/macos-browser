@@ -34,6 +34,13 @@ class BrowserTabViewController: NSViewController {
     private var contextMenuLink: URL?
     private var contextMenuImage: URL?
 
+    // swiftlint:disable force_cast
+    private lazy var findInPageWindowController: FindInPageWindowController = {
+        let storyboard = NSStoryboard(name: "FindInPage", bundle: nil)
+        return storyboard.instantiateController(withIdentifier: "FindInPageWindowController") as! FindInPageWindowController
+    }()
+    // swiftlint:enable force_cast
+
     required init?(coder: NSCoder) {
         fatalError("BrowserTabViewController: Bad initializer")
     }
@@ -145,6 +152,21 @@ class BrowserTabViewController: NSViewController {
         let tab = Tab()
         tab.url = url
         tabCollectionViewModel.append(tab: tab, selected: selected)
+    }
+
+}
+
+extension BrowserTabViewController {
+
+    func findInPage() {
+        print("***", #function)
+        guard let window = self.view.window,
+              let frame = webView?.frame,
+              let converted = webView?.convert(frame.origin, to: nil) else { return }
+        let origin = window.convertPoint(toScreen: converted)
+        let centeredX = origin.x + (frame.size.width / 2) - 200
+        let topLeft = NSPoint(x: centeredX, y: origin.y)
+        findInPageWindowController.show(parentWindow: window, topLeft: topLeft)
     }
 
 }
