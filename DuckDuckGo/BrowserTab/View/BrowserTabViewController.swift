@@ -128,7 +128,9 @@ class BrowserTabViewController: NSViewController {
         }
 
         if !url.isDuckDuckGoSearch {
-            webView?.makeMeFirstResponder()
+            DispatchQueue.main.async { [weak self] in
+                self?.webView?.makeMeFirstResponder()
+            }
         }
     }
 
