@@ -3,7 +3,7 @@
 	archiveVersion = 1;
 	classes = {
 	};
-	objectVersion = 50;
+	objectVersion = 52;
 	objects = {
 
 /* Begin PBXBuildFile section */
@@ -17,6 +17,7 @@
 		14D9B90224F91316000D4D13 /* FocusRingView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 14D9B90124F91316000D4D13 /* FocusRingView.swift */; };
 		4B11060525903E570039B979 /* CoreDataEncryptionTesting.xcdatamodeld in Sources */ = {isa = PBXBuildFile; fileRef = 4B11060325903E570039B979 /* CoreDataEncryptionTesting.xcdatamodeld */; };
 		4B11060A25903EAC0039B979 /* CoreDataEncryptionTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B11060925903EAC0039B979 /* CoreDataEncryptionTests.swift */; };
+		4B6160BB25B10015007DE5B2 /* TrackerRadarKit in Frameworks */ = {isa = PBXBuildFile; productRef = 4B6160BA25B10015007DE5B2 /* TrackerRadarKit */; };
 		4B677431255DBEB800025BD8 /* BloomFilterWrapper.mm in Sources */ = {isa = PBXBuildFile; fileRef = 4B677424255DBEB800025BD8 /* BloomFilterWrapper.mm */; };
 		4B677432255DBEB800025BD8 /* httpsMobileV2BloomSpec.json in Resources */ = {isa = PBXBuildFile; fileRef = 4B677427255DBEB800025BD8 /* httpsMobileV2BloomSpec.json */; };
 		4B677433255DBEB800025BD8 /* httpsMobileV2Bloom.bin in Resources */ = {isa = PBXBuildFile; fileRef = 4B677428255DBEB800025BD8 /* httpsMobileV2Bloom.bin */; };
@@ -317,6 +318,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				85AE2FF224A33A2D002D507F /* WebKit.framework in Frameworks */,
+				4B6160BB25B10015007DE5B2 /* TrackerRadarKit in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -1026,6 +1028,9 @@
 			dependencies = (
 			);
 			name = "DuckDuckGo Privacy Browser";
+			packageProductDependencies = (
+				4B6160BA25B10015007DE5B2 /* TrackerRadarKit */,
+			);
 			productName = DuckDuckGo;
 			productReference = AA585D7E248FD31100E9A3E2 /* DuckDuckGo Privacy Browser.app */;
 			productType = "com.apple.product-type.application";
@@ -1098,6 +1103,9 @@
 				Base,
 			);
 			mainGroup = AA585D75248FD31100E9A3E2;
+			packageReferences = (
+				4B6160B925B10015007DE5B2 /* XCRemoteSwiftPackageReference "TrackerRadarKit" */,
+			);
 			productRefGroup = AA585D7F248FD31100E9A3E2 /* Products */;
 			projectDirPath = "";
 			projectRoot = "";
@@ -1687,6 +1695,25 @@
 			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
+
+/* Begin XCRemoteSwiftPackageReference section */
+		4B6160B925B10015007DE5B2 /* XCRemoteSwiftPackageReference "TrackerRadarKit" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "git@github.com:samsymons/TrackerRadarKit.git";
+			requirement = {
+				branch = main;
+				kind = branch;
+			};
+		};
+/* End XCRemoteSwiftPackageReference section */
+
+/* Begin XCSwiftPackageProductDependency section */
+		4B6160BA25B10015007DE5B2 /* TrackerRadarKit */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 4B6160B925B10015007DE5B2 /* XCRemoteSwiftPackageReference "TrackerRadarKit" */;
+			productName = TrackerRadarKit;
+		};
+/* End XCSwiftPackageProductDependency section */
 
 /* Begin XCVersionGroup section */
 		4B11060325903E570039B979 /* CoreDataEncryptionTesting.xcdatamodeld */ = {
