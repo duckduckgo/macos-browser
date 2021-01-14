@@ -58,11 +58,9 @@ class AddressBarView: NSView {
     }
 
     private func addSublayers() {
-        shadowLayer.backgroundColor = NSColor.controlAccentColor.cgColor
         shadowLayer.opacity = 0
         layer?.addSublayer(shadowLayer)
 
-        strokeLayer.backgroundColor = NSColor.controlAccentColor.cgColor
         strokeLayer.opacity = 0
         layer?.addSublayer(strokeLayer)
 
@@ -77,6 +75,11 @@ class AddressBarView: NSView {
 
         CATransaction.begin()
         CATransaction.setAnimationDuration(0)
+
+        // If the user changes the accent color this will get called and we need to refresh the color.
+        shadowLayer.backgroundColor = NSColor.controlAccentColor.cgColor
+        strokeLayer.backgroundColor = NSColor.controlAccentColor.cgColor
+
         shadowLayer.frame = layer.bounds
         shadowLayer.cornerRadius = Size.backgroundRadius.rawValue + Size.shadow.rawValue + Size.stroke.rawValue
         strokeLayer.frame = NSRect(x: layer.bounds.origin.x + Size.shadow.rawValue,
