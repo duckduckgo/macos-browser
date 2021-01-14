@@ -25,10 +25,12 @@ class MainViewController: NSViewController {
     @IBOutlet weak var tabBarContainerView: NSView!
     @IBOutlet weak var navigationBarContainerView: NSView!
     @IBOutlet weak var webContainerView: NSView!
+    @IBOutlet weak var findInPageContainerView: NSView!
 
     private(set) var tabBarViewController: TabBarViewController?
     private(set) var navigationBarViewController: NavigationBarViewController?
     private(set) var browserTabViewController: BrowserTabViewController?
+    private(set) var findInPageViewController: FindInPageViewController?
 
     var tabCollectionViewModel = TabCollectionViewModel()
 
@@ -36,12 +38,14 @@ class MainViewController: NSViewController {
     private var canGoForwardCancellable: AnyCancellable?
     private var canGoBackCancellable: AnyCancellable?
     private var canInsertLastRemovedTabCancellable: AnyCancellable?
+    private var findInPageCancellable: AnyCancellable?
 
     override func viewDidLoad() {
         super.viewDidLoad()
 
         subscribeToSelectedTabViewModel()
         subscribeToCanInsertLastRemovedTab()
+        findInPageContainerView.applyDropShadow()
     }
 
     func windowDidBecomeMain() {
@@ -88,9 +92,23 @@ class MainViewController: NSViewController {
         return browserTabViewController
     }
 
+    @IBSegueAction
+    func createFindInPageViewController(coder: NSCoder, sender: Any?, segueIdentifier: String?) -> FindInPageViewController? {
+        self.findInPageViewController = FindInPageViewController(coder: coder)
+        return findInPageViewController
+    }
+
     private func subscribeToSelectedTabViewModel() {
         selectedTabViewModelCancellable = tabCollectionViewModel.$selectedTabViewModel.receive(on: DispatchQueue.main).sink { [weak self] _ in
             self?.subscribeToCanGoBackForward()
+            self?.subscribeToFindInPage()
+        }
+    }
+
+    private func subscribeToFindInPage() {
+        findInPageCancellable?.cancel()
+        findInPageCancellable = tabCollectionViewModel.selectedTabViewModel?.$findInPage.receive(on: DispatchQueue.main).sink { [weak self] model in
+            self?.updateFindInPage(model)
         }
     }
 
@@ -109,6 +127,15 @@ class MainViewController: NSViewController {
         canInsertLastRemovedTabCancellable?.cancel()
         canInsertLastRemovedTabCancellable = tabCollectionViewModel.$canInsertLastRemovedTab.receive(on: DispatchQueue.main).sink { [weak self] _ in
             self?.updateReopenLastClosedTabMenuItem()
+        }
+    }
+
+    private func updateFindInPage(_ model: FindInPageModel?) {
+        findInPageContainerView.isHidden = model == nil
+        findInPageViewController?.model = model
+        findInPageViewController?.makeMeFirstResponder()
+        findInPageViewController?.onClose = { [weak self] in
+            self?.tabCollectionViewModel.selectedTabViewModel?.closeFindInPage()
         }
     }
 

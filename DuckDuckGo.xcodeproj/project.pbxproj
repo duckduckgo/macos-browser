@@ -50,9 +50,9 @@
 		856C98D52570116900A22F1F /* NSWindow+Toast.swift in Sources */ = {isa = PBXBuildFile; fileRef = 856C98D42570116900A22F1F /* NSWindow+Toast.swift */; };
 		856C98DA2570149800A22F1F /* FileDownloadTask.swift in Sources */ = {isa = PBXBuildFile; fileRef = 856C98D92570149800A22F1F /* FileDownloadTask.swift */; };
 		856C98DF257014BD00A22F1F /* FileDownloadManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 856C98DE257014BD00A22F1F /* FileDownloadManager.swift */; };
-		85A0116425AF1D7E00FA6A0C /* FindInPageWindowController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 85A0116325AF1D7E00FA6A0C /* FindInPageWindowController.swift */; };
 		85A0116925AF1D8900FA6A0C /* FindInPageViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 85A0116825AF1D8900FA6A0C /* FindInPageViewController.swift */; };
 		85A0117425AF2EDF00FA6A0C /* FindInPage.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 85A0117325AF2EDF00FA6A0C /* FindInPage.storyboard */; };
+		85A0118225AF60E700FA6A0C /* FindInPageModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 85A0118125AF60E700FA6A0C /* FindInPageModel.swift */; };
 		85AE2FF224A33A2D002D507F /* WebKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 85AE2FF124A33A2D002D507F /* WebKit.framework */; };
 		85D438B6256E7C9E00F3BAF8 /* ContextMenuUserScript.swift in Sources */ = {isa = PBXBuildFile; fileRef = 85D438B5256E7C9E00F3BAF8 /* ContextMenuUserScript.swift */; };
 		85D438BE256E8E6400F3BAF8 /* ContextMenuElement.swift in Sources */ = {isa = PBXBuildFile; fileRef = 85D438BD256E8E6400F3BAF8 /* ContextMenuElement.swift */; };
@@ -208,9 +208,9 @@
 		856C98D42570116900A22F1F /* NSWindow+Toast.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "NSWindow+Toast.swift"; sourceTree = "<group>"; };
 		856C98D92570149800A22F1F /* FileDownloadTask.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FileDownloadTask.swift; sourceTree = "<group>"; };
 		856C98DE257014BD00A22F1F /* FileDownloadManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FileDownloadManager.swift; sourceTree = "<group>"; };
-		85A0116325AF1D7E00FA6A0C /* FindInPageWindowController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FindInPageWindowController.swift; sourceTree = "<group>"; };
 		85A0116825AF1D8900FA6A0C /* FindInPageViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FindInPageViewController.swift; sourceTree = "<group>"; };
 		85A0117325AF2EDF00FA6A0C /* FindInPage.storyboard */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; path = FindInPage.storyboard; sourceTree = "<group>"; };
+		85A0118125AF60E700FA6A0C /* FindInPageModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FindInPageModel.swift; sourceTree = "<group>"; };
 		85AE2FF124A33A2D002D507F /* WebKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = WebKit.framework; path = System/Library/Frameworks/WebKit.framework; sourceTree = SDKROOT; };
 		85D438B5256E7C9E00F3BAF8 /* ContextMenuUserScript.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContextMenuUserScript.swift; sourceTree = "<group>"; };
 		85D438BD256E8E6400F3BAF8 /* ContextMenuElement.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContextMenuElement.swift; sourceTree = "<group>"; };
@@ -476,7 +476,7 @@
 			isa = PBXGroup;
 			children = (
 				85A0117325AF2EDF00FA6A0C /* FindInPage.storyboard */,
-				85A0116325AF1D7E00FA6A0C /* FindInPageWindowController.swift */,
+				85A0118125AF60E700FA6A0C /* FindInPageModel.swift */,
 				85A0116825AF1D8900FA6A0C /* FindInPageViewController.swift */,
 			);
 			path = FindInPage;
@@ -1194,7 +1194,6 @@
 				AA6820E425502F19005ED0D5 /* WebsiteDataStore.swift in Sources */,
 				85D438B6256E7C9E00F3BAF8 /* ContextMenuUserScript.swift in Sources */,
 				85D438BE256E8E6400F3BAF8 /* ContextMenuElement.swift in Sources */,
-				85A0116425AF1D7E00FA6A0C /* FindInPageWindowController.swift in Sources */,
 				4BA1A6BD258B082300F6F690 /* EncryptionKeyStore.swift in Sources */,
 				14A609C4255D65B20080DA6D /* MainMenuManager.swift in Sources */,
 				AA88D14B252A557100980B4E /* URLRequestExtension.swift in Sources */,
@@ -1219,6 +1218,7 @@
 				AA6820F125503DA9005ED0D5 /* FireViewModel.swift in Sources */,
 				AAA0CC6A253CC43C0079BC96 /* WKUserContentControllerExtension.swift in Sources */,
 				AA9FF95D24A1FA1C0039E328 /* TabCollection.swift in Sources */,
+				85A0118225AF60E700FA6A0C /* FindInPageModel.swift in Sources */,
 				AA86490E24D49B54001BABEE /* TabLoadingView.swift in Sources */,
 				AA2CB1352587C29500AA6FBE /* TabBarFooter.swift in Sources */,
 				14D9B90224F91316000D4D13 /* AddressBarView.swift in Sources */,

@@ -40,4 +40,11 @@ extension NSView {
         window.makeFirstResponder(self)
     }
 
+    func applyDropShadow() {
+        wantsLayer = true
+        layer?.shadowColor = NSColor.controlShadowColor.cgColor
+        layer?.shadowOpacity = 1.0
+        layer?.masksToBounds = false
+    }
+
 }

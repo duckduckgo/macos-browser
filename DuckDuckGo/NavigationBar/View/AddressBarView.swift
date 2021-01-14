@@ -58,11 +58,11 @@ class AddressBarView: NSView {
     }
 
     private func addSublayers() {
-        shadowLayer.backgroundColor = NSColor(named: "AddressBarAccentColor")?.cgColor
+        shadowLayer.backgroundColor = NSColor.controlAccentColor.cgColor
         shadowLayer.opacity = 0
         layer?.addSublayer(shadowLayer)
 
-        strokeLayer.backgroundColor = NSColor(named: "AddressBarAccentColor")?.cgColor
+        strokeLayer.backgroundColor = NSColor.controlAccentColor.cgColor
         strokeLayer.opacity = 0
         layer?.addSublayer(strokeLayer)
 

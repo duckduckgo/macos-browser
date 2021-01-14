@@ -164,7 +164,20 @@ extension MainViewController {
     // MARK: - Edit
 
     @IBAction func findInPage(_ sender: Any?) {
-        self.browserTabViewController?.findInPage()
+        tabCollectionViewModel.selectedTabViewModel?.startFindInPage()
+        findInPageContainerView.isHidden = false
+        findInPageContainerView.makeMeFirstResponder()
+        findInPageViewController?.onClose = {
+            self.findInPageContainerView.isHidden = true
+        }
+    }
+
+    /// Declines handling findInPage action if there's no page loaded currently.
+    override func responds(to aSelector: Selector!) -> Bool {
+        if aSelector == #selector(findInPage(_:)) && tabCollectionViewModel.selectedTabViewModel?.tab.url == nil {
+            return false
+        }
+        return super.responds(to: aSelector)
     }
 
     // MARK: - Help
