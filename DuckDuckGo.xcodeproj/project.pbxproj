@@ -15,7 +15,7 @@
 		14A609C4255D65B20080DA6D /* MainMenuManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 14A609C3255D65B20080DA6D /* MainMenuManager.swift */; };
 		14D9B8FB24F7E089000D4D13 /* AddressBarViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 14D9B8F924F7E089000D4D13 /* AddressBarViewController.swift */; };
 		14D9B90024F90230000D4D13 /* VerticallyCenteredTextFieldCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 14D9B8FF24F90230000D4D13 /* VerticallyCenteredTextFieldCell.swift */; };
-		14D9B90224F91316000D4D13 /* AddressBarView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 14D9B90124F91316000D4D13 /* AddressBarView.swift */; };
+		14D9B90224F91316000D4D13 /* FocusRingView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 14D9B90124F91316000D4D13 /* FocusRingView.swift */; };
 		4B11060525903E570039B979 /* CoreDataEncryptionTesting.xcdatamodeld in Sources */ = {isa = PBXBuildFile; fileRef = 4B11060325903E570039B979 /* CoreDataEncryptionTesting.xcdatamodeld */; };
 		4B11060A25903EAC0039B979 /* CoreDataEncryptionTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B11060925903EAC0039B979 /* CoreDataEncryptionTests.swift */; };
 		4B677431255DBEB800025BD8 /* BloomFilterWrapper.mm in Sources */ = {isa = PBXBuildFile; fileRef = 4B677424255DBEB800025BD8 /* BloomFilterWrapper.mm */; };
@@ -170,7 +170,7 @@
 		14A609C3255D65B20080DA6D /* MainMenuManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MainMenuManager.swift; sourceTree = "<group>"; };
 		14D9B8F924F7E089000D4D13 /* AddressBarViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AddressBarViewController.swift; sourceTree = "<group>"; };
 		14D9B8FF24F90230000D4D13 /* VerticallyCenteredTextFieldCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VerticallyCenteredTextFieldCell.swift; sourceTree = "<group>"; };
-		14D9B90124F91316000D4D13 /* AddressBarView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AddressBarView.swift; sourceTree = "<group>"; };
+		14D9B90124F91316000D4D13 /* FocusRingView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FocusRingView.swift; sourceTree = "<group>"; };
 		4B11060425903E570039B979 /* CoreDataEncryptionTesting.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = CoreDataEncryptionTesting.xcdatamodel; sourceTree = "<group>"; };
 		4B11060925903EAC0039B979 /* CoreDataEncryptionTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CoreDataEncryptionTests.swift; sourceTree = "<group>"; };
 		4B677424255DBEB800025BD8 /* BloomFilterWrapper.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = BloomFilterWrapper.mm; sourceTree = "<group>"; };
@@ -721,6 +721,7 @@
 			isa = PBXGroup;
 			children = (
 				AA2E423324C8A2270048C0D5 /* ColorView.swift */,
+				14D9B90124F91316000D4D13 /* FocusRingView.swift */,
 				AA86490B24D3494C001BABEE /* GradientView.swift */,
 				AAA8E8BE24EA8A0A0055E685 /* MouseOverButton.swift */,
 				AAA8E8C024EACA700055E685 /* MouseOverView.swift */,
@@ -745,7 +746,6 @@
 				AA80EC6F256C469C007083E7 /* NavigationBar.storyboard */,
 				AA68C3D22490ED62001B8783 /* NavigationBarViewController.swift */,
 				14D9B8F924F7E089000D4D13 /* AddressBarViewController.swift */,
-				14D9B90124F91316000D4D13 /* AddressBarView.swift */,
 				AABEE6AE24AD22B90043105B /* AddressBarTextField.swift */,
 				AAA0CC32252F181A0079BC96 /* NavigationButtonMenuDelegate.swift */,
 				AAA0CC462533833C0079BC96 /* OptionsButtonMenu.swift */,
@@ -1221,7 +1221,7 @@
 				85A0118225AF60E700FA6A0C /* FindInPageModel.swift in Sources */,
 				AA86490E24D49B54001BABEE /* TabLoadingView.swift in Sources */,
 				AA2CB1352587C29500AA6FBE /* TabBarFooter.swift in Sources */,
-				14D9B90224F91316000D4D13 /* AddressBarView.swift in Sources */,
+				14D9B90224F91316000D4D13 /* FocusRingView.swift in Sources */,
 				AA92126F25ACCB1100600CD4 /* ErrorExtension.swift in Sources */,
 				AAA8E8C124EACA700055E685 /* MouseOverView.swift in Sources */,
 				AAE8B110258A456C00E81239 /* TooltipViewController.swift in Sources */,

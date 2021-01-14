@@ -18,6 +18,7 @@
 
 import Cocoa
 
+#warning("FindInPage: Need to handle escape being pressed.")
 class FindInPageViewController: NSViewController {
 
     var onClose: (() -> Void)?
@@ -29,7 +30,7 @@ class FindInPageViewController: NSViewController {
     }
 
     @IBOutlet weak var textField: NSTextField!
-    @IBOutlet weak var addressBarView: AddressBarView!
+    @IBOutlet weak var focusRingView: FocusRingView!
 
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -59,7 +60,7 @@ class FindInPageViewController: NSViewController {
 
     private func updateView(firstResponder: Bool) {
         print("***", #function)
-        addressBarView.updateView(stroke: firstResponder)
+        focusRingView.updateView(stroke: firstResponder)
     }
 
     private func listenForTextFieldResponderNotifications() {

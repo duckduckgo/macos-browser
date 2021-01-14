@@ -93,7 +93,7 @@
                                     <action selector="findInPageNext:" target="9LP-fh-BRf" id="DY9-NK-RcV"/>
                                 </connections>
                             </button>
-                            <customView translatesAutoresizingMaskIntoConstraints="NO" id="eF3-lr-LQv" customClass="AddressBarView" customModule="DuckDuckGo_Privacy_Browser" customModuleProvider="target">
+                            <customView translatesAutoresizingMaskIntoConstraints="NO" id="eF3-lr-LQv" customClass="FocusRingView" customModule="DuckDuckGo_Privacy_Browser" customModuleProvider="target">
                                 <rect key="frame" x="40" y="3" width="280" height="34"/>
                                 <subviews>
                                     <textField focusRingType="none" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="oQw-Lh-sP0">
@@ -158,7 +158,7 @@
                         </userDefinedRuntimeAttributes>
                     </view>
                     <connections>
-                        <outlet property="addressBarView" destination="eF3-lr-LQv" id="IGx-cg-yWh"/>
+                        <outlet property="focusRingView" destination="eF3-lr-LQv" id="64I-mq-2Xf"/>
                         <outlet property="textField" destination="oQw-Lh-sP0" id="woI-aY-Ilk"/>
                     </connections>
                 </viewController>

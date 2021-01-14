@@ -165,7 +165,7 @@
         <scene sceneID="gzs-lg-gqU">
             <objects>
                 <viewController id="H4f-bE-T92" customClass="AddressBarViewController" customModule="DuckDuckGo_Privacy_Browser" customModuleProvider="target" sceneMemberID="viewController">
-                    <view key="view" wantsLayer="YES" id="wj6-L2-5rJ" customClass="AddressBarView" customModule="DuckDuckGo_Privacy_Browser" customModuleProvider="target">
+                    <view key="view" wantsLayer="YES" id="wj6-L2-5rJ" customClass="FocusRingView" customModule="DuckDuckGo_Privacy_Browser" customModuleProvider="target">
                         <rect key="frame" x="0.0" y="0.0" width="600" height="34"/>
                         <autoresizingMask key="autoresizingMask"/>
                         <subviews>

@@ -99,8 +99,8 @@ class AddressBarViewController: NSViewController {
         }
     }
 
-    private var addressBarView: AddressBarView? {
-        return view as? AddressBarView
+    private var focusRingView: FocusRingView? {
+        return view as? FocusRingView
     }
 
     private func subscribeToSelectedTabViewModel() {
@@ -142,7 +142,7 @@ class AddressBarViewController: NSViewController {
         addressBarTextField.alphaValue = firstResponder ? 1 : 0
         passiveTextField.alphaValue = firstResponder ? 0 : 1
 
-        addressBarView?.updateView(stroke: firstResponder)
+        focusRingView?.updateView(stroke: firstResponder)
     }
 
     private func updateButtons() {
