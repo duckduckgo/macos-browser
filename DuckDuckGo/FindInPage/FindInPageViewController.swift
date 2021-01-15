@@ -61,6 +61,19 @@ class FindInPageViewController: NSViewController {
         onClose?()
     }
 
+    override func responds(to aSelector: Selector!) -> Bool {
+
+        switch aSelector {
+        case #selector(findInPageNext(_:)),
+             #selector(findInPagePrevious(_:)):
+            return model?.matchesFound ?? 0 > 0
+
+        default:
+            return super.responds(to: aSelector)
+        }
+
+    }
+
     func makeMeFirstResponder() {
         textField.makeMeFirstResponder()
     }
