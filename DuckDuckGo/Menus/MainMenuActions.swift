@@ -166,9 +166,9 @@ extension MainViewController {
     @IBAction func findInPage(_ sender: Any?) {
         tabCollectionViewModel.selectedTabViewModel?.startFindInPage()
         findInPageContainerView.isHidden = false
-        findInPageContainerView.makeMeFirstResponder()
+        findInPageViewController?.makeMeFirstResponder()
         findInPageViewController?.onClose = {
-            self.findInPageContainerView.isHidden = true
+            self.tabCollectionViewModel.selectedTabViewModel?.closeFindInPage()
         }
     }
 

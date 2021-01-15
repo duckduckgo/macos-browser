@@ -16,10 +16,10 @@
                         <autoresizingMask key="autoresizingMask"/>
                         <subviews>
                             <button translatesAutoresizingMaskIntoConstraints="NO" id="Iy0-Pd-g9N" userLabel="Close Button" customClass="MouseOverButton" customModule="DuckDuckGo_Privacy_Browser" customModuleProvider="target">
-                                <rect key="frame" x="0.0" y="0.0" width="40" height="40"/>
+                                <rect key="frame" x="4" y="8" width="32" height="24"/>
                                 <constraints>
-                                    <constraint firstAttribute="width" constant="40" id="YEe-St-HMj"/>
-                                    <constraint firstAttribute="height" constant="40" id="k0z-Fd-kbt"/>
+                                    <constraint firstAttribute="width" constant="32" id="YEe-St-HMj"/>
+                                    <constraint firstAttribute="height" constant="24" id="k0z-Fd-kbt"/>
                                 </constraints>
                                 <buttonCell key="cell" type="square" bezelStyle="shadowlessSquare" image="Close-Large" imagePosition="only" alignment="center" imageScaling="proportionallyDown" inset="2" id="Gs5-tF-RjC">
                                     <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
@@ -42,10 +42,10 @@
                                 </connections>
                             </button>
                             <button translatesAutoresizingMaskIntoConstraints="NO" id="hWE-T9-Lya" userLabel="Previous Button" customClass="MouseOverButton" customModule="DuckDuckGo_Privacy_Browser" customModuleProvider="target">
-                                <rect key="frame" x="320" y="0.0" width="40" height="40"/>
+                                <rect key="frame" x="328" y="8" width="32" height="24"/>
                                 <constraints>
-                                    <constraint firstAttribute="width" constant="40" id="6Ze-Oq-voa"/>
-                                    <constraint firstAttribute="height" constant="40" id="VBe-gx-zVv"/>
+                                    <constraint firstAttribute="width" constant="32" id="6Ze-Oq-voa"/>
+                                    <constraint firstAttribute="height" constant="24" id="VBe-gx-zVv"/>
                                 </constraints>
                                 <buttonCell key="cell" type="square" bezelStyle="shadowlessSquare" image="Find-Previous" imagePosition="only" alignment="center" imageScaling="proportionallyDown" inset="2" id="AOy-SC-evd">
                                     <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
@@ -68,10 +68,10 @@
                                 </connections>
                             </button>
                             <button translatesAutoresizingMaskIntoConstraints="NO" id="jPH-qk-BNq" userLabel="Next Button" customClass="MouseOverButton" customModule="DuckDuckGo_Privacy_Browser" customModuleProvider="target">
-                                <rect key="frame" x="360" y="0.0" width="40" height="40"/>
+                                <rect key="frame" x="364" y="8" width="32" height="24"/>
                                 <constraints>
-                                    <constraint firstAttribute="height" constant="40" id="U1y-O1-eRL"/>
-                                    <constraint firstAttribute="width" constant="40" id="nmQ-ju-a8J"/>
+                                    <constraint firstAttribute="height" constant="24" id="U1y-O1-eRL"/>
+                                    <constraint firstAttribute="width" constant="32" id="nmQ-ju-a8J"/>
                                 </constraints>
                                 <buttonCell key="cell" type="square" bezelStyle="shadowlessSquare" image="Find-Next" imagePosition="only" alignment="center" imageScaling="proportionallyDown" inset="2" id="Adc-BN-gUM">
                                     <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
@@ -94,11 +94,11 @@
                                 </connections>
                             </button>
                             <customView translatesAutoresizingMaskIntoConstraints="NO" id="eF3-lr-LQv" customClass="FocusRingView" customModule="DuckDuckGo_Privacy_Browser" customModuleProvider="target">
-                                <rect key="frame" x="40" y="3" width="280" height="34"/>
+                                <rect key="frame" x="40" y="3" width="284" height="34"/>
                                 <subviews>
                                     <textField focusRingType="none" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="oQw-Lh-sP0">
-                                        <rect key="frame" x="34" y="0.0" width="190" height="34"/>
-                                        <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" selectable="YES" editable="YES" sendsActionOnEndEditing="YES" focusRingType="none" placeholderString="Find in page" drawsBackground="YES" id="QFu-vZ-FS1" customClass="VerticallyCenteredTextFieldCell" customModule="DuckDuckGo_Privacy_Browser" customModuleProvider="target">
+                                        <rect key="frame" x="34" y="9" width="194" height="16"/>
+                                        <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" selectable="YES" editable="YES" sendsActionOnEndEditing="YES" focusRingType="none" placeholderString="Find in page" drawsBackground="YES" id="QFu-vZ-FS1">
                                             <font key="font" metaFont="system"/>
                                             <color key="textColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
                                             <color key="backgroundColor" name="ClearColor"/>
@@ -116,7 +116,7 @@
                                         </buttonCell>
                                     </button>
                                     <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="gfp-ph-eKn" userLabel="Status Label">
-                                        <rect key="frame" x="230" y="9" width="40" height="16"/>
+                                        <rect key="frame" x="234" y="9" width="40" height="16"/>
                                         <textFieldCell key="cell" lineBreakMode="clipping" title="0 of 0" id="Pst-71-jYN">
                                             <font key="font" metaFont="system"/>
                                             <color key="textColor" name="labelColor" catalog="System" colorSpace="catalog"/>
@@ -126,12 +126,11 @@
                                 </subviews>
                                 <constraints>
                                     <constraint firstItem="oQw-Lh-sP0" firstAttribute="leading" secondItem="jgj-T1-zyO" secondAttribute="trailing" constant="8" symbolic="YES" id="0ec-dh-Z2r"/>
-                                    <constraint firstItem="oQw-Lh-sP0" firstAttribute="top" secondItem="eF3-lr-LQv" secondAttribute="top" id="1MP-7w-xR4"/>
                                     <constraint firstItem="jgj-T1-zyO" firstAttribute="centerY" secondItem="eF3-lr-LQv" secondAttribute="centerY" id="GkN-9R-dPw"/>
+                                    <constraint firstItem="oQw-Lh-sP0" firstAttribute="centerY" secondItem="eF3-lr-LQv" secondAttribute="centerY" id="T68-XF-xRy"/>
                                     <constraint firstItem="gfp-ph-eKn" firstAttribute="leading" secondItem="oQw-Lh-sP0" secondAttribute="trailing" constant="8" symbolic="YES" id="Y7b-h4-qrz"/>
                                     <constraint firstAttribute="height" constant="34" id="dOz-re-sAM"/>
                                     <constraint firstItem="jgj-T1-zyO" firstAttribute="leading" secondItem="eF3-lr-LQv" secondAttribute="leading" constant="12" id="jtO-xw-N5s"/>
-                                    <constraint firstAttribute="bottom" secondItem="oQw-Lh-sP0" secondAttribute="bottom" id="nym-HY-euo"/>
                                     <constraint firstItem="gfp-ph-eKn" firstAttribute="centerY" secondItem="eF3-lr-LQv" secondAttribute="centerY" id="s01-G8-bAW"/>
                                     <constraint firstAttribute="trailing" secondItem="gfp-ph-eKn" secondAttribute="trailing" constant="12" id="wZ1-A9-Ibi"/>
                                 </constraints>
@@ -140,13 +139,13 @@
                         <constraints>
                             <constraint firstItem="eF3-lr-LQv" firstAttribute="centerY" secondItem="lqG-TU-Rhn" secondAttribute="centerY" id="7rc-1x-vhA"/>
                             <constraint firstItem="jPH-qk-BNq" firstAttribute="centerY" secondItem="lqG-TU-Rhn" secondAttribute="centerY" id="Anc-dh-arV"/>
-                            <constraint firstItem="eF3-lr-LQv" firstAttribute="leading" secondItem="Iy0-Pd-g9N" secondAttribute="trailing" id="LmF-F2-TEB"/>
-                            <constraint firstAttribute="trailing" secondItem="jPH-qk-BNq" secondAttribute="trailing" id="aSX-th-b9h"/>
+                            <constraint firstItem="eF3-lr-LQv" firstAttribute="leading" secondItem="Iy0-Pd-g9N" secondAttribute="trailing" constant="4" id="LmF-F2-TEB"/>
+                            <constraint firstAttribute="trailing" secondItem="jPH-qk-BNq" secondAttribute="trailing" constant="4" id="aSX-th-b9h"/>
                             <constraint firstItem="Iy0-Pd-g9N" firstAttribute="centerY" secondItem="lqG-TU-Rhn" secondAttribute="centerY" id="bK4-QJ-VvG"/>
-                            <constraint firstItem="hWE-T9-Lya" firstAttribute="leading" secondItem="eF3-lr-LQv" secondAttribute="trailing" id="iwa-bu-Qzl"/>
+                            <constraint firstItem="hWE-T9-Lya" firstAttribute="leading" secondItem="eF3-lr-LQv" secondAttribute="trailing" constant="4" id="iwa-bu-Qzl"/>
                             <constraint firstItem="hWE-T9-Lya" firstAttribute="centerY" secondItem="lqG-TU-Rhn" secondAttribute="centerY" id="mqd-0Y-PIs"/>
-                            <constraint firstItem="jPH-qk-BNq" firstAttribute="leading" secondItem="hWE-T9-Lya" secondAttribute="trailing" id="pD7-4c-exi"/>
-                            <constraint firstItem="Iy0-Pd-g9N" firstAttribute="leading" secondItem="lqG-TU-Rhn" secondAttribute="leading" id="vXf-5g-b8c"/>
+                            <constraint firstItem="jPH-qk-BNq" firstAttribute="leading" secondItem="hWE-T9-Lya" secondAttribute="trailing" constant="4" id="pD7-4c-exi"/>
+                            <constraint firstItem="Iy0-Pd-g9N" firstAttribute="leading" secondItem="lqG-TU-Rhn" secondAttribute="leading" constant="4" id="vXf-5g-b8c"/>
                         </constraints>
                         <userDefinedRuntimeAttributes>
                             <userDefinedRuntimeAttribute type="color" keyPath="backgroundColor">
@@ -159,6 +158,7 @@
                     </view>
                     <connections>
                         <outlet property="focusRingView" destination="eF3-lr-LQv" id="64I-mq-2Xf"/>
+                        <outlet property="statusField" destination="gfp-ph-eKn" id="bPp-WQ-w62"/>
                         <outlet property="textField" destination="oQw-Lh-sP0" id="woI-aY-Ilk"/>
                     </connections>
                 </viewController>

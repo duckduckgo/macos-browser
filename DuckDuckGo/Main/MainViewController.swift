@@ -18,6 +18,7 @@
 
 import Cocoa
 import Combine
+import Carbon.HIToolbox
 import os.log
 
 class MainViewController: NSViewController {
@@ -133,9 +134,10 @@ class MainViewController: NSViewController {
     private func updateFindInPage(_ model: FindInPageModel?) {
         findInPageContainerView.isHidden = model == nil
         findInPageViewController?.model = model
-        findInPageViewController?.makeMeFirstResponder()
-        findInPageViewController?.onClose = { [weak self] in
-            self?.tabCollectionViewModel.selectedTabViewModel?.closeFindInPage()
+        if model == nil {
+            self.view.makeMeFirstResponder()
+        } else {
+            findInPageViewController?.makeMeFirstResponder()
         }
     }
 

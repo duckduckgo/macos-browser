@@ -21,15 +21,15 @@ import Foundation
 class FindInPageModel {
 
     @Published private(set) var text: String = ""
-    @Published private(set) var currentSelection: Int = 0
+    @Published private(set) var currentSelection: Int = 1
     @Published private(set) var matchesFound: Int = 0
 
     let id = UUID.init().uuidString
 
     func next() {
         let nextSelection = currentSelection + 1
-        if nextSelection >= matchesFound {
-            currentSelection = 0
+        if nextSelection > matchesFound {
+            currentSelection = 1
         } else {
             currentSelection = nextSelection
         }
@@ -37,8 +37,8 @@ class FindInPageModel {
 
     func previous() {
         let nextSelection = currentSelection - 1
-        if nextSelection < 0 {
-            currentSelection = matchesFound - 1
+        if nextSelection < 1 {
+            currentSelection = matchesFound
         } else {
             currentSelection = nextSelection
         }
@@ -47,7 +47,7 @@ class FindInPageModel {
     func update(text: String, matchesFound: Int) {
         self.text = text
         self.matchesFound = matchesFound
-        self.currentSelection = 0
+        self.currentSelection = 1
     }
 
 }

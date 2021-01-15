@@ -163,6 +163,12 @@
                                                             <action selector="findInPagePrevious:" target="Ady-hI-5gd" id="Seu-2E-Cds"/>
                                                         </connections>
                                                     </menuItem>
+                                                    <menuItem isSeparatorItem="YES" id="L2T-zv-9Po"/>
+                                                    <menuItem title="Hide Find" keyEquivalent="F" id="NVw-yL-2Hn">
+                                                        <connections>
+                                                            <action selector="findInPageDone:" target="Ady-hI-5gd" id="kZJ-vx-uyS"/>
+                                                        </connections>
+                                                    </menuItem>
                                                 </items>
                                             </menu>
                                         </menuItem>

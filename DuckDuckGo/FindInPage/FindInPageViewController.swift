@@ -17,13 +17,14 @@
 //
 
 import Cocoa
+import Combine
 
 #warning("FindInPage: Need to handle escape being pressed.")
 class FindInPageViewController: NSViewController {
 
     var onClose: (() -> Void)?
 
-    var model: FindInPageModel? {
+    @Published var model: FindInPageModel? {
         didSet {
             print("***", #function, model?.id as Any)
         }
@@ -31,33 +32,65 @@ class FindInPageViewController: NSViewController {
 
     @IBOutlet weak var textField: NSTextField!
     @IBOutlet weak var focusRingView: FocusRingView!
+    @IBOutlet weak var statusField: NSTextField!
+
+    private var modelCancellables = Set<AnyCancellable>()
 
     override func viewDidLoad() {
         super.viewDidLoad()
         textField.delegate = self
         listenForTextFieldResponderNotifications()
+        subscribeToModelChanges()
     }
 
     @IBAction func findInPageNext(_ sender: Any?) {
         print("***", #function)
+        model?.next()
     }
 
     @IBAction func findInPagePrevious(_ sender: Any?) {
         print("***", #function)
+        model?.previous()
     }
 
     @IBAction func findInPageDone(_ sender: Any?) {
         onClose?()
     }
 
-    @IBAction func findInPage(_ sender: Any?) {
-        textField.makeMeFirstResponder()
-    }
-
     func makeMeFirstResponder() {
         textField.makeMeFirstResponder()
     }
 
+    private func subscribeToModelChanges() {
+        modelCancellables.forEach { $0.cancel() }
+        modelCancellables.removeAll()
+        $model.receive(on: DispatchQueue.main).sink { [weak self] _ in
+            print("***", #function, "received", self?.model as Any)
+
+            guard let self = self,
+                  let model = self.model else { return }
+
+            model.$text.receive(on: DispatchQueue.main).sink { [weak self] text in
+                self?.textField.stringValue = text
+            }.store(in: &self.modelCancellables)
+
+            model.$matchesFound.receive(on: DispatchQueue.main).sink { [weak self] _ in
+                self?.rebuildStatus()
+            }.store(in: &self.modelCancellables)
+
+            model.$currentSelection.receive(on: DispatchQueue.main).sink { [weak self] _ in
+                self?.rebuildStatus()
+            }.store(in: &self.modelCancellables)
+
+        }.store(in: &modelCancellables)
+    }
+
+    private func rebuildStatus() {
+        guard let model = model else { return }
+        #warning("needs localisation")
+        statusField.stringValue = "\(model.currentSelection) of \(model.matchesFound)"
+    }
+    
     private func updateView(firstResponder: Bool) {
         print("***", #function)
         focusRingView.updateView(stroke: firstResponder)
