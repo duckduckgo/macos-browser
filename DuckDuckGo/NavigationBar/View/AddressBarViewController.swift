@@ -70,6 +70,7 @@ class AddressBarViewController: NSViewController {
         addressBarTextField.suggestionsViewModel = suggestionsViewModel
         subscribeToSelectedTabViewModel()
         subscribeToAddressBarTextFieldValue()
+        registerForMouseEnteredAndExitedEvents()
         NotificationCenter.default.addObserver(self,
                                                selector: #selector(textFieldFirstReponderNotification(_:)),
                                                name: .firstResponder,
@@ -215,4 +216,33 @@ extension AddressBarViewController {
         updateButtons()
     }
     
+}
+
+// MARK: - Mouse states
+
+extension AddressBarViewController {
+
+    func registerForMouseEnteredAndExitedEvents() {
+        let trackingArea = NSTrackingArea(rect: self.view.bounds, options: [.activeAlways, .mouseEnteredAndExited], owner: self, userInfo: nil)
+        self.view.addTrackingArea(trackingArea)
+    }
+
+    override func mouseEntered(with event: NSEvent) {
+        print("***", #function)
+        NSCursor.iBeam.set()
+        super.mouseEntered(with: event)
+    }
+
+    override func mouseExited(with event: NSEvent) {
+        print("***", #function)
+        NSCursor.arrow.set()
+        super.mouseExited(with: event)
+    }
+
+    override func mouseDown(with event: NSEvent) {
+        print("***", #function)
+        super.mouseDown(with: event)
+        addressBarTextField.makeMeFirstResponder()
+    }
+
 }
