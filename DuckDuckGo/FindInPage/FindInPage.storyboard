@@ -11,7 +11,7 @@
         <scene sceneID="M7q-cp-Vdi">
             <objects>
                 <viewController id="9LP-fh-BRf" customClass="FindInPageViewController" customModule="DuckDuckGo_Privacy_Browser" customModuleProvider="target" sceneMemberID="viewController">
-                    <view key="view" id="lqG-TU-Rhn" customClass="ColorView" customModule="DuckDuckGo_Privacy_Browser" customModuleProvider="target">
+                    <view key="view" id="lqG-TU-Rhn">
                         <rect key="frame" x="0.0" y="0.0" width="400" height="40"/>
                         <autoresizingMask key="autoresizingMask"/>
                         <subviews>
@@ -158,6 +158,8 @@
                     </view>
                     <connections>
                         <outlet property="focusRingView" destination="eF3-lr-LQv" id="64I-mq-2Xf"/>
+                        <outlet property="nextButton" destination="jPH-qk-BNq" id="Ywa-3x-FBx"/>
+                        <outlet property="previousButton" destination="hWE-T9-Lya" id="mOj-iU-mGV"/>
                         <outlet property="statusField" destination="gfp-ph-eKn" id="bPp-WQ-w62"/>
                         <outlet property="textField" destination="oQw-Lh-sP0" id="woI-aY-Ilk"/>
                     </connections>

@@ -19,7 +19,8 @@
 import Cocoa
 import Combine
 
-#warning("FindInPage: Need to handle escape being pressed.")
+#warning("BRINDY: need to handle escape being pressed")
+#warning("BRINDY: fix address to handle responder and show caret")
 class FindInPageViewController: NSViewController {
 
     var onClose: (() -> Void)?
@@ -33,6 +34,8 @@ class FindInPageViewController: NSViewController {
     @IBOutlet weak var textField: NSTextField!
     @IBOutlet weak var focusRingView: FocusRingView!
     @IBOutlet weak var statusField: NSTextField!
+    @IBOutlet weak var nextButton: NSButton!
+    @IBOutlet weak var previousButton: NSButton!
 
     private var modelCancellables = Set<AnyCancellable>()
 
@@ -41,6 +44,7 @@ class FindInPageViewController: NSViewController {
         textField.delegate = self
         listenForTextFieldResponderNotifications()
         subscribeToModelChanges()
+        updateFieldStates()
     }
 
     @IBAction func findInPageNext(_ sender: Any?) {
@@ -67,6 +71,8 @@ class FindInPageViewController: NSViewController {
         $model.receive(on: DispatchQueue.main).sink { [weak self] _ in
             print("***", #function, "received", self?.model as Any)
 
+            self?.updateFieldStates()
+
             guard let self = self,
                   let model = self.model else { return }
 
@@ -76,6 +82,7 @@ class FindInPageViewController: NSViewController {
 
             model.$matchesFound.receive(on: DispatchQueue.main).sink { [weak self] _ in
                 self?.rebuildStatus()
+                self?.updateFieldStates()
             }.store(in: &self.modelCancellables)
 
             model.$currentSelection.receive(on: DispatchQueue.main).sink { [weak self] _ in
@@ -87,13 +94,19 @@ class FindInPageViewController: NSViewController {
 
     private func rebuildStatus() {
         guard let model = model else { return }
-        #warning("needs localisation")
+        #warning("BRINDY: needs localisation")
         statusField.stringValue = "\(model.currentSelection) of \(model.matchesFound)"
     }
     
     private func updateView(firstResponder: Bool) {
         print("***", #function)
         focusRingView.updateView(stroke: firstResponder)
+    }
+
+    private func updateFieldStates() {
+        statusField.isHidden = model?.matchesFound ?? 0 == 0
+        nextButton.isEnabled = model?.matchesFound ?? 0 > 0
+        previousButton.isEnabled = model?.matchesFound ?? 0 > 0
     }
 
     private func listenForTextFieldResponderNotifications() {

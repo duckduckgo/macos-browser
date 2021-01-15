@@ -17,8 +17,8 @@
 //
 
 import Cocoa
-import Combine
 import Carbon.HIToolbox
+import Combine
 import os.log
 
 class MainViewController: NSViewController {
@@ -44,6 +44,7 @@ class MainViewController: NSViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
 
+        listenToKeyDownEvents()
         subscribeToSelectedTabViewModel()
         subscribeToCanInsertLastRemovedTab()
         findInPageContainerView.applyDropShadow()
@@ -174,6 +175,32 @@ class MainViewController: NSViewController {
         }
 
         reopenLastClosedTabMenuItem.isEnabled = tabCollectionViewModel.canInsertLastRemovedTab
+    }
+
+}
+
+// MARK: - Escape key
+
+// This needs to be handled here or else there will be a "beep" even if handled in a different view controller. This now
+//  matches Safari behaviour.
+extension MainViewController {
+
+    func listenToKeyDownEvents() {
+        NSEvent.addLocalMonitorForEvents(matching: .keyDown) { event in
+            return self.customKeyDown(with: event) ? nil : event
+        }
+    }
+
+    func customKeyDown(with event: NSEvent) -> Bool {
+       guard let locWindow = self.view.window,
+          NSApplication.shared.keyWindow === locWindow else { return false }
+
+        if Int(event.keyCode) == kVK_Escape {
+            findInPageViewController?.findInPageDone(self)
+            return true
+        }
+
+        return false
     }
 
 }
