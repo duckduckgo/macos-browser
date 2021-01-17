@@ -71,15 +71,20 @@ class AddressBarViewController: NSViewController {
         subscribeToSelectedTabViewModel()
         subscribeToAddressBarTextFieldValue()
         registerForMouseEnteredAndExitedEvents()
+    }
+
+    override func viewWillAppear() {
         NotificationCenter.default.addObserver(self,
                                                selector: #selector(textFieldFirstReponderNotification(_:)),
                                                name: .firstResponder,
                                                object: nil)
     }
 
-    deinit {
+    // swiftlint:disable notification_center_detachment
+    override func viewWillDisappear() {
         NotificationCenter.default.removeObserver(self)
     }
+    // swiftlint:enable notification_center_detachment
 
     override func viewDidLayout() {
         super.viewDidLayout()

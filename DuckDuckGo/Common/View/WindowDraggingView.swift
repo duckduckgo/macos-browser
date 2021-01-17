@@ -29,6 +29,18 @@ class WindowDraggingView: NSView {
     }
 
     override func mouseDown(with event: NSEvent) {
+        if event.clickCount == 2 {
+            zoom()
+        } else {
+            drag(with: event)
+        }
+    }
+
+    private func zoom() {
+        window?.zoom(self)
+    }
+
+    private func drag(with event: NSEvent) {
         window?.performDrag(with: event)
     }
     

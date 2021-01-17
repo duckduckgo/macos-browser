@@ -47,10 +47,12 @@ class MainWindowController: NSWindowController {
         WindowControllersManager.shared.register(self)
 
         setupWindow()
-        addWindowButtons()
+        referenceWindowButtons()
+        addWindowButtonsAsSubViewsIfNeeded()
     }
 
     private func setupWindow() {
+        window?.setFrameAutosaveName("MainWindow")
         window?.isMovableByWindowBackground = true
         window?.hasShadow = true
     }
@@ -70,7 +72,9 @@ class MainWindowController: NSWindowController {
                                              height: 0)
     }
 
-    private func addWindowButtons() {
+    private var windowButtonsReferenced = false
+
+    private func referenceWindowButtons() {
         guard let window = window,
               let contentView = window.contentView,
               let themeFrame = contentView.superview,
@@ -83,17 +87,40 @@ class MainWindowController: NSWindowController {
             return
         }
 
+        self.closeWidget = closeWidget
+        self.minimizeWidget = minimizeWidget
+        self.zoomWidget = zoomWidget
+        windowButtonsReferenced = true
+    }
+
+    private func addWindowButtonsAsSubViewsIfNeeded() {
+        guard let window = window, let contentView = window.contentView else {
+            os_log("MainWindowController: Window not available", type: .error)
+            return
+        }
+
+        guard let closeWidget = closeWidget,
+              let minimizeWidget = minimizeWidget,
+              let zoomWidget = zoomWidget else {
+            os_log("MainWindowController: Failed to get references to window buttons", type: .error)
+            return
+        }
+
+        guard closeWidget.superview != window.contentView,
+              minimizeWidget.superview != window.contentView,
+              zoomWidget.superview != window.contentView else {
+            layoutWindowButtons()
+            return
+        }
+
         closeWidget.removeFromSuperview()
         contentView.addSubview(closeWidget)
-        self.closeWidget = closeWidget
 
         minimizeWidget.removeFromSuperview()
         contentView.addSubview(minimizeWidget)
-        self.minimizeWidget = minimizeWidget
 
         zoomWidget.removeFromSuperview()
         contentView.addSubview(zoomWidget)
-        self.zoomWidget = zoomWidget
 
         layoutWindowButtons()
     }
@@ -131,13 +158,22 @@ extension MainWindowController: NSWindowDelegate {
 
     func windowDidResize(_ notification: Notification) {
         resizeTitleBar()
-        layoutWindowButtons()
+        if windowButtonsReferenced {
+            layoutWindowButtons()
+        }
     }
 
     func windowDidExitFullScreen(_ notification: Notification) {
         resizeTitleBar()
-        addWindowButtons()
-        layoutWindowButtons()
+        addWindowButtonsAsSubViewsIfNeeded()
+    }
+
+    func windowDidDeminiaturize(_ notification: Notification) {
+        addWindowButtonsAsSubViewsIfNeeded()
+    }
+
+    func windowDidMove(_ notification: Notification) {
+        addWindowButtonsAsSubViewsIfNeeded()
     }
 
     func windowDidBecomeMain(_ notification: Notification) {
@@ -151,6 +187,8 @@ extension MainWindowController: NSWindowDelegate {
 
     func windowDidBecomeKey(_ notification: Notification) {
         WindowControllersManager.shared.lastKeyMainWindowController = self
+
+        addWindowButtonsAsSubViewsIfNeeded()
     }
 
     func windowWillClose(_ notification: Notification) {
