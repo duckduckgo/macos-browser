@@ -536,6 +536,7 @@ extension TabBarViewController: NSCollectionViewDelegate {
         }
         currentDraggingIndexPath = indexPath
         TabDragAndDropManager.shared.setSource(tabCollectionViewModel: tabCollectionViewModel, indexPath: indexPath)
+        hideTooltip()
     }
 
     static let dropToOpenDistance: CGFloat = 100
