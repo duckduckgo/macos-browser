@@ -26,28 +26,13 @@ class FindInPageModel {
 
     let id = UUID.init().uuidString
 
-    func next() {
-        let nextSelection = currentSelection + 1
-        if nextSelection > matchesFound {
-            currentSelection = 1
-        } else {
-            currentSelection = nextSelection
-        }
-    }
-
-    func previous() {
-        let nextSelection = currentSelection - 1
-        if nextSelection < 1 {
-            currentSelection = matchesFound
-        } else {
-            currentSelection = nextSelection
-        }
-    }
-
-    func update(text: String, matchesFound: Int) {
+    func update(text: String) {
         self.text = text
-        self.matchesFound = matchesFound
-        self.currentSelection = 1
+    }
+
+    func update(currentSelection: Int?, matchesFound: Int?) {
+        self.currentSelection = currentSelection ?? self.currentSelection
+        self.matchesFound = matchesFound ?? self.matchesFound
     }
 
 }

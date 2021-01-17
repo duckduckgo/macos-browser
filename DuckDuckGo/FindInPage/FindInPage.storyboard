@@ -64,7 +64,7 @@
                                     </userDefinedRuntimeAttribute>
                                 </userDefinedRuntimeAttributes>
                                 <connections>
-                                    <action selector="findInPagePrevious:" target="9LP-fh-BRf" id="26q-hV-W1D"/>
+                                    <action selector="findInPagePrevious:" target="IxF-RD-3w4" id="i7F-cA-9uj"/>
                                 </connections>
                             </button>
                             <button translatesAutoresizingMaskIntoConstraints="NO" id="jPH-qk-BNq" userLabel="Next Button" customClass="MouseOverButton" customModule="DuckDuckGo_Privacy_Browser" customModuleProvider="target">
@@ -90,7 +90,7 @@
                                     </userDefinedRuntimeAttribute>
                                 </userDefinedRuntimeAttributes>
                                 <connections>
-                                    <action selector="findInPageNext:" target="9LP-fh-BRf" id="DY9-NK-RcV"/>
+                                    <action selector="findInPageNext:" target="IxF-RD-3w4" id="nd7-uS-PPc"/>
                                 </connections>
                             </button>
                             <customView translatesAutoresizingMaskIntoConstraints="NO" id="eF3-lr-LQv" customClass="FocusRingView" customModule="DuckDuckGo_Privacy_Browser" customModuleProvider="target">

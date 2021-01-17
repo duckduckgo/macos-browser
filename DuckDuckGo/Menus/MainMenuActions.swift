@@ -167,9 +167,7 @@ extension MainViewController {
         tabCollectionViewModel.selectedTabViewModel?.startFindInPage()
         findInPageContainerView.isHidden = false
         findInPageViewController?.makeMeFirstResponder()
-        findInPageViewController?.onClose = {
-            self.tabCollectionViewModel.selectedTabViewModel?.closeFindInPage()
-        }
+        findInPageViewController?.delegate = self
     }
 
     /// Declines handling findInPage action if there's no page loaded currently.
@@ -191,5 +189,21 @@ extension MainViewController {
     }
 
 #endif
+
+}
+
+extension MainViewController: FindInPageDelegate {
+
+    func findInPageNext(_ controller: FindInPageViewController) {
+        self.tabCollectionViewModel.selectedTabViewModel?.findInPageNext()
+    }
+
+    func findInPagePrevious(_ controller: FindInPageViewController) {
+        self.tabCollectionViewModel.selectedTabViewModel?.findInPagePrevious()
+    }
+
+    func findInPageDone(_ controller: FindInPageViewController) {
+        self.tabCollectionViewModel.selectedTabViewModel?.closeFindInPage()
+    }
 
 }

@@ -153,6 +153,7 @@ extension BrowserTabViewController: TabDelegate {
 
     func tabDidStartNavigation(_ tab: Tab) {
         setFirstResponderIfNeeded()
+        tabViewModel?.closeFindInPage()
     }
 
     func tab(_ tab: Tab, requestedNewTab url: URL?, selected: Bool) {

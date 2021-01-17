@@ -17,13 +17,20 @@
 //
 
 import Cocoa
+import Carbon.HIToolbox
 import Combine
 
-#warning("BRINDY: need to handle escape being pressed")
-#warning("BRINDY: fix address to handle responder and show caret")
+protocol FindInPageDelegate: AnyObject {
+
+    func findInPageNext(_ controller: FindInPageViewController)
+    func findInPagePrevious(_ controller: FindInPageViewController)
+    func findInPageDone(_ controller: FindInPageViewController)
+
+}
+
 class FindInPageViewController: NSViewController {
 
-    var onClose: (() -> Void)?
+    weak var delegate: FindInPageDelegate?
 
     @Published var model: FindInPageModel? {
         didSet {
@@ -49,19 +56,29 @@ class FindInPageViewController: NSViewController {
 
     @IBAction func findInPageNext(_ sender: Any?) {
         print("***", #function)
-        model?.next()
+        delegate?.findInPageNext(self)
     }
 
     @IBAction func findInPagePrevious(_ sender: Any?) {
         print("***", #function)
-        model?.previous()
+        delegate?.findInPagePrevious(self)
     }
 
     @IBAction func findInPageDone(_ sender: Any?) {
-        onClose?()
+        print("***", #function)
+        delegate?.findInPageDone(self)
+    }
+
+    func control(_ control: NSControl, textView: NSTextView, doCommandBy commandSelector: Selector) -> Bool {
+        if commandSelector == #selector(insertNewline(_:)) {
+            findInPageNext(self)
+            return true
+        }
+        return false
     }
 
     override func responds(to aSelector: Selector!) -> Bool {
+        print("***", #function, aSelector)
 
         switch aSelector {
         case #selector(findInPageNext(_:)),
@@ -146,14 +163,10 @@ extension FindInPageViewController {
 }
 
 extension FindInPageViewController: NSTextFieldDelegate {
-    
-    func controlTextDidEndEditing(_ obj: Notification) {
-        print("***", #function)
-
-    }
 
     func controlTextDidChange(_ obj: Notification) {
-        print("***", #function)
+        print("***", #function, textField.stringValue)
+        model?.update(text: textField.stringValue)
     }
 
 }

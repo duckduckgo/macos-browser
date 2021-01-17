@@ -52,6 +52,8 @@
 		85A0116925AF1D8900FA6A0C /* FindInPageViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 85A0116825AF1D8900FA6A0C /* FindInPageViewController.swift */; };
 		85A0117425AF2EDF00FA6A0C /* FindInPage.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 85A0117325AF2EDF00FA6A0C /* FindInPage.storyboard */; };
 		85A0118225AF60E700FA6A0C /* FindInPageModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 85A0118125AF60E700FA6A0C /* FindInPageModel.swift */; };
+		85A011E525B4D49400FA6A0C /* findinpage.js in Resources */ = {isa = PBXBuildFile; fileRef = 85A011E425B4D49400FA6A0C /* findinpage.js */; };
+		85A011EA25B4D4CA00FA6A0C /* FindInPageUserScript.swift in Sources */ = {isa = PBXBuildFile; fileRef = 85A011E925B4D4CA00FA6A0C /* FindInPageUserScript.swift */; };
 		85AE2FF224A33A2D002D507F /* WebKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 85AE2FF124A33A2D002D507F /* WebKit.framework */; };
 		85D438B6256E7C9E00F3BAF8 /* ContextMenuUserScript.swift in Sources */ = {isa = PBXBuildFile; fileRef = 85D438B5256E7C9E00F3BAF8 /* ContextMenuUserScript.swift */; };
 		85D438BE256E8E6400F3BAF8 /* ContextMenuElement.swift in Sources */ = {isa = PBXBuildFile; fileRef = 85D438BD256E8E6400F3BAF8 /* ContextMenuElement.swift */; };
@@ -209,6 +211,8 @@
 		85A0116825AF1D8900FA6A0C /* FindInPageViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FindInPageViewController.swift; sourceTree = "<group>"; };
 		85A0117325AF2EDF00FA6A0C /* FindInPage.storyboard */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; path = FindInPage.storyboard; sourceTree = "<group>"; };
 		85A0118125AF60E700FA6A0C /* FindInPageModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FindInPageModel.swift; sourceTree = "<group>"; };
+		85A011E425B4D49400FA6A0C /* findinpage.js */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.javascript; name = findinpage.js; path = Submodules/ios_js_support/src/findinpage.js; sourceTree = SOURCE_ROOT; };
+		85A011E925B4D4CA00FA6A0C /* FindInPageUserScript.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FindInPageUserScript.swift; sourceTree = "<group>"; };
 		85AE2FF124A33A2D002D507F /* WebKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = WebKit.framework; path = System/Library/Frameworks/WebKit.framework; sourceTree = SDKROOT; };
 		85D438B5256E7C9E00F3BAF8 /* ContextMenuUserScript.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContextMenuUserScript.swift; sourceTree = "<group>"; };
 		85D438BD256E8E6400F3BAF8 /* ContextMenuElement.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContextMenuElement.swift; sourceTree = "<group>"; };
@@ -394,6 +398,7 @@
 		4B677447255DBF1400025BD8 /* Submodules */ = {
 			isa = PBXGroup;
 			children = (
+				85A011DB25B4D44800FA6A0C /* ios-js-support */,
 				4B677448255DBF2300025BD8 /* bloom_cpp */,
 			);
 			name = Submodules;
@@ -475,9 +480,18 @@
 			children = (
 				85A0117325AF2EDF00FA6A0C /* FindInPage.storyboard */,
 				85A0118125AF60E700FA6A0C /* FindInPageModel.swift */,
+				85A011E925B4D4CA00FA6A0C /* FindInPageUserScript.swift */,
 				85A0116825AF1D8900FA6A0C /* FindInPageViewController.swift */,
 			);
 			path = FindInPage;
+			sourceTree = "<group>";
+		};
+		85A011DB25B4D44800FA6A0C /* ios-js-support */ = {
+			isa = PBXGroup;
+			children = (
+				85A011E425B4D49400FA6A0C /* findinpage.js */,
+			);
+			name = "ios-js-support";
 			sourceTree = "<group>";
 		};
 		85AE2FF024A33A2D002D507F /* Frameworks */ = {
@@ -1105,6 +1119,7 @@
 				AA80EC89256C49B8007083E7 /* Localizable.strings in Resources */,
 				AAE8B102258A41C000E81239 /* Tooltip.storyboard in Resources */,
 				AA68C3D72490F821001B8783 /* README.md in Resources */,
+				85A011E525B4D49400FA6A0C /* findinpage.js in Resources */,
 				AA585D86248FD31400E9A3E2 /* Assets.xcassets in Resources */,
 				AA585D89248FD31400E9A3E2 /* Main.storyboard in Resources */,
 				AA80EC79256C46AA007083E7 /* TabBar.storyboard in Resources */,
@@ -1223,6 +1238,7 @@
 				AAE8B110258A456C00E81239 /* TooltipViewController.swift in Sources */,
 				AA3F895324C18AD500628DDE /* SuggestionViewModel.swift in Sources */,
 				4B677431255DBEB800025BD8 /* BloomFilterWrapper.mm in Sources */,
+				85A011EA25B4D4CA00FA6A0C /* FindInPageUserScript.swift in Sources */,
 				AA9FF95B24A1EFC20039E328 /* TabViewModel.swift in Sources */,
 				AA9E9A5E25A4867200D1959D /* TabDragAndDropManager.swift in Sources */,
 				AA8EDF2724923EC70071C2E8 /* StringExtension.swift in Sources */,

@@ -61,15 +61,6 @@ class TabViewModel {
         subscribeToTabError()
     }
 
-    public func startFindInPage() {
-        guard findInPage == nil else { return }
-        findInPage = FindInPageModel()
-    }
-
-    public func closeFindInPage() {
-        findInPage = nil
-    }
-
     private func subscribeToUrl() {
         tab.$url.receive(on: DispatchQueue.main).sink { [weak self] _ in
             self?.updateCanReload()
@@ -156,6 +147,29 @@ class TabViewModel {
         } else {
             favicon = Favicon.defaultFavicon
         }
+    }
+
+}
+
+extension TabViewModel {
+
+    func startFindInPage() {
+        guard findInPage == nil else { return }
+        findInPage = FindInPageModel()
+        tab.findInPage = findInPage
+    }
+
+    func closeFindInPage() {
+        tab.findDone()
+        findInPage = nil
+    }
+
+    func findInPageNext() {
+        tab.findNext()
+    }
+
+    func findInPagePrevious() {
+        tab.findPrevious()
     }
 
 }
