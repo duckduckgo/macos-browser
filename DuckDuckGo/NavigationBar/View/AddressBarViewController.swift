@@ -233,19 +233,16 @@ extension AddressBarViewController {
     }
 
     override func mouseEntered(with event: NSEvent) {
-        print("***", #function)
         NSCursor.iBeam.set()
         super.mouseEntered(with: event)
     }
 
     override func mouseExited(with event: NSEvent) {
-        print("***", #function)
         NSCursor.arrow.set()
         super.mouseExited(with: event)
     }
 
     override func mouseDown(with event: NSEvent) {
-        print("***", #function)
         super.mouseDown(with: event)
         addressBarTextField.makeMeFirstResponder()
     }

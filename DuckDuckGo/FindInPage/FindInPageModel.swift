@@ -24,8 +24,6 @@ class FindInPageModel {
     @Published private(set) var currentSelection: Int = 1
     @Published private(set) var matchesFound: Int = 0
 
-    let id = UUID.init().uuidString
-
     func update(text: String) {
         self.text = text
     }

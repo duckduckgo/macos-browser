@@ -32,11 +32,7 @@ class FindInPageViewController: NSViewController {
 
     weak var delegate: FindInPageDelegate?
 
-    @Published var model: FindInPageModel? {
-        didSet {
-            print("***", #function, model?.id as Any)
-        }
-    }
+    @Published var model: FindInPageModel? 
 
     @IBOutlet weak var textField: NSTextField!
     @IBOutlet weak var focusRingView: FocusRingView!
@@ -55,21 +51,19 @@ class FindInPageViewController: NSViewController {
     }
 
     @IBAction func findInPageNext(_ sender: Any?) {
-        print("***", #function)
         delegate?.findInPageNext(self)
     }
 
     @IBAction func findInPagePrevious(_ sender: Any?) {
-        print("***", #function)
         delegate?.findInPagePrevious(self)
     }
 
     @IBAction func findInPageDone(_ sender: Any?) {
-        print("***", #function)
         delegate?.findInPageDone(self)
     }
 
     func control(_ control: NSControl, textView: NSTextView, doCommandBy commandSelector: Selector) -> Bool {
+        // Handle pressing enter here rather than didEndEditing otherwise it moving to the next match doesn't work.
         if commandSelector == #selector(insertNewline(_:)) {
             findInPageNext(self)
             return true
@@ -78,11 +72,12 @@ class FindInPageViewController: NSViewController {
     }
 
     override func responds(to aSelector: Selector!) -> Bool {
-        print("***", #function, aSelector)
 
         switch aSelector {
         case #selector(findInPageNext(_:)),
              #selector(findInPagePrevious(_:)):
+
+            // Disables the menu items if there are no matches.
             return model?.matchesFound ?? 0 > 0
 
         default:
@@ -99,7 +94,6 @@ class FindInPageViewController: NSViewController {
         modelCancellables.forEach { $0.cancel() }
         modelCancellables.removeAll()
         $model.receive(on: DispatchQueue.main).sink { [weak self] _ in
-            print("***", #function, "received", self?.model as Any)
 
             self?.updateFieldStates()
 
@@ -124,12 +118,10 @@ class FindInPageViewController: NSViewController {
 
     private func rebuildStatus() {
         guard let model = model else { return }
-        #warning("BRINDY: needs localisation")
-        statusField.stringValue = "\(model.currentSelection) of \(model.matchesFound)"
+        statusField.stringValue = String(format: UserText.findInPage, model.currentSelection, model.matchesFound)
     }
     
     private func updateView(firstResponder: Bool) {
-        print("***", #function)
         focusRingView.updateView(stroke: firstResponder)
     }
 
@@ -151,7 +143,6 @@ class FindInPageViewController: NSViewController {
 extension FindInPageViewController {
 
     @objc func textFieldFirstReponderNotification(_ notification: Notification) {
-        print("***", #function)
         // NSTextField passes its first responder status down to a child view of NSTextView class
         if let textView = notification.object as? NSTextView, textView.superview?.superview === textField {
             updateView(firstResponder: true)
@@ -165,7 +156,6 @@ extension FindInPageViewController {
 extension FindInPageViewController: NSTextFieldDelegate {
 
     func controlTextDidChange(_ obj: Notification) {
-        print("***", #function, textField.stringValue)
         model?.update(text: textField.stringValue)
     }
 
