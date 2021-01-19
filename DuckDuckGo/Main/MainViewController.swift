@@ -109,8 +109,9 @@ class MainViewController: NSViewController {
 
     private func subscribeToFindInPage() {
         findInPageCancellable?.cancel()
-        findInPageCancellable = tabCollectionViewModel.selectedTabViewModel?.$findInPage.receive(on: DispatchQueue.main).sink { [weak self] model in
-            self?.updateFindInPage(model)
+        let model = tabCollectionViewModel.selectedTabViewModel?.findInPage
+        findInPageCancellable = model?.$visible.receive(on: DispatchQueue.main).sink { [weak self] _ in
+            self?.updateFindInPage()
         }
     }
 
@@ -132,10 +133,15 @@ class MainViewController: NSViewController {
         }
     }
 
-    private func updateFindInPage(_ model: FindInPageModel?) {
-        findInPageContainerView.isHidden = model == nil
+    private func updateFindInPage() {
+        guard let model = tabCollectionViewModel.selectedTabViewModel?.findInPage else {
+            findInPageViewController?.makeMeFirstResponder()
+            os_log("MainViewController: Failed to get find in page model", type: .error)
+            return
+        }
+        findInPageContainerView.isHidden = !model.visible
         findInPageViewController?.model = model
-        if model == nil {
+        if !model.visible {
             self.view.makeMeFirstResponder()
         } else {
             findInPageViewController?.makeMeFirstResponder()

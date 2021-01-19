@@ -71,21 +71,6 @@ class FindInPageViewController: NSViewController {
         return false
     }
 
-    override func responds(to aSelector: Selector!) -> Bool {
-
-        switch aSelector {
-        case #selector(findInPageNext(_:)),
-             #selector(findInPagePrevious(_:)):
-
-            // Disables the menu items if there are no matches.
-            return model?.matchesFound ?? 0 > 0
-
-        default:
-            return super.responds(to: aSelector)
-        }
-
-    }
-
     func makeMeFirstResponder() {
         textField.makeMeFirstResponder()
     }

@@ -23,6 +23,7 @@ class FindInPageModel {
     @Published private(set) var text: String = ""
     @Published private(set) var currentSelection: Int = 1
     @Published private(set) var matchesFound: Int = 0
+    @Published private(set) var visible: Bool = false
 
     func update(text: String) {
         self.text = text
@@ -31,6 +32,14 @@ class FindInPageModel {
     func update(currentSelection: Int?, matchesFound: Int?) {
         self.currentSelection = currentSelection ?? self.currentSelection
         self.matchesFound = matchesFound ?? self.matchesFound
+    }
+
+    func show() {
+        visible = true
+    }
+
+    func hide() {
+        visible = false
     }
 
 }

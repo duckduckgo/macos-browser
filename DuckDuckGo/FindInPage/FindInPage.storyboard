@@ -41,7 +41,7 @@
                                     <action selector="findInPageDone:" target="9LP-fh-BRf" id="oa9-ca-SvK"/>
                                 </connections>
                             </button>
-                            <button translatesAutoresizingMaskIntoConstraints="NO" id="hWE-T9-Lya" userLabel="Previous Button" customClass="MouseOverButton" customModule="DuckDuckGo_Privacy_Browser" customModuleProvider="target">
+                            <button tag="1" translatesAutoresizingMaskIntoConstraints="NO" id="hWE-T9-Lya" userLabel="Previous Button" customClass="MouseOverButton" customModule="DuckDuckGo_Privacy_Browser" customModuleProvider="target">
                                 <rect key="frame" x="328" y="8" width="32" height="24"/>
                                 <constraints>
                                     <constraint firstAttribute="width" constant="32" id="6Ze-Oq-voa"/>
@@ -64,10 +64,10 @@
                                     </userDefinedRuntimeAttribute>
                                 </userDefinedRuntimeAttributes>
                                 <connections>
-                                    <action selector="findInPagePrevious:" target="IxF-RD-3w4" id="i7F-cA-9uj"/>
+                                    <action selector="findInPagePrevious:" target="9LP-fh-BRf" id="1Jw-xE-qrX"/>
                                 </connections>
                             </button>
-                            <button translatesAutoresizingMaskIntoConstraints="NO" id="jPH-qk-BNq" userLabel="Next Button" customClass="MouseOverButton" customModule="DuckDuckGo_Privacy_Browser" customModuleProvider="target">
+                            <button tag="2" translatesAutoresizingMaskIntoConstraints="NO" id="jPH-qk-BNq" userLabel="Next Button" customClass="MouseOverButton" customModule="DuckDuckGo_Privacy_Browser" customModuleProvider="target">
                                 <rect key="frame" x="364" y="8" width="32" height="24"/>
                                 <constraints>
                                     <constraint firstAttribute="height" constant="24" id="U1y-O1-eRL"/>
@@ -90,7 +90,7 @@
                                     </userDefinedRuntimeAttribute>
                                 </userDefinedRuntimeAttributes>
                                 <connections>
-                                    <action selector="findInPageNext:" target="IxF-RD-3w4" id="nd7-uS-PPc"/>
+                                    <action selector="findInPageNext:" target="9LP-fh-BRf" id="oiA-qa-2Pz"/>
                                 </connections>
                             </button>
                             <customView translatesAutoresizingMaskIntoConstraints="NO" id="eF3-lr-LQv" customClass="FocusRingView" customModule="DuckDuckGo_Privacy_Browser" customModuleProvider="target">
