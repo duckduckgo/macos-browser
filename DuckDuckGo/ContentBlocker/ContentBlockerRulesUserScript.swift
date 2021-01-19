@@ -73,7 +73,7 @@ extension ContentBlockerRulesUserScript {
 
     static let messageNames = ["processRule"]
     static let source: String = {
-        // Fireproofing and temporary unprotected domains are not yet implemented.
+        // Unprotected domains are not yet implemented.
         return loadJS("contentblockerrules", withReplacements: [
             "${unprotectedDomains}": ""
         ])
