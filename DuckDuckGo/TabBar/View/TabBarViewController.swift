@@ -536,6 +536,7 @@ extension TabBarViewController: NSCollectionViewDelegate {
         }
         currentDraggingIndexPath = indexPath
         TabDragAndDropManager.shared.setSource(tabCollectionViewModel: tabCollectionViewModel, indexPath: indexPath)
+        hideTooltip()
     }
 
     static let dropToOpenDistance: CGFloat = 100
@@ -550,6 +551,9 @@ extension TabBarViewController: NSCollectionViewDelegate {
 
         // Perform the drag and drop between multiple windows
         if TabDragAndDropManager.shared.performDragAndDropIfNeeded() { return }
+
+        // Check whether the tab wasn't dropped to other app
+        guard operation != .link && operation != .copy else { return }
 
         // Create a new window if the drop is too distant
         let frameRelativeToWindow = view.convert(view.bounds, to: nil)
