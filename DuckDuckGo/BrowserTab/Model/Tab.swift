@@ -211,16 +211,18 @@ extension Tab: FaviconUserScriptDelegate {
 }
 
 extension Tab: ContentBlockerUserScriptDelegate {
+
     func contentBlockerUserScriptShouldProcessTrackers(_ script: UserScript) -> Bool {
+        // Not used until site rating support is implemented.
         return true
     }
 
     func contentBlockerUserScript(_ script: ContentBlockerUserScript, detectedTracker tracker: DetectedTracker, withSurrogate host: String) {
-
+        // Not used until site rating support is implemented.
     }
 
     func contentBlockerUserScript(_ script: UserScript, detectedTracker tracker: DetectedTracker) {
-        
+        // Not used until site rating support is implemented.
     }
 
 }
