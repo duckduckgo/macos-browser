@@ -111,7 +111,6 @@ class AddressBarViewController: NSViewController {
 
     private func subscribeToSelectedTabViewModel() {
         selectedTabViewModelCancellable = tabCollectionViewModel.$selectedTabViewModel.receive(on: DispatchQueue.main).sink { [weak self] _ in
-            self?.view.window?.makeFirstResponder(self?.view.window)
             self?.subscribeToPassiveAddressBarString()
         }
     }

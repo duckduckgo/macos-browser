@@ -27,7 +27,8 @@ class TooltipWindowController: NSWindowController {
 
     enum TimerInterval: TimeInterval {
         case short = 0.66
-        case long = 1.5
+        case middle = 1
+        case long = 3
     }
 
     private var showingTimer: Timer?
@@ -136,7 +137,11 @@ extension TooltipWindowController {
 extension TooltipWindowController.TimerInterval {
 
     init(from tabWidthStage: TabBarViewItem.WidthStage) {
-        self = tabWidthStage == .full ? .long : .short
+        switch tabWidthStage {
+        case .full: self = .long
+        case .withoutCloseButton: self = .middle
+        case .withoutTitle: self = .short
+        }
     }
 
 }
