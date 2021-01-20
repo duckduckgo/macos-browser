@@ -165,9 +165,6 @@ extension MainViewController {
 
     @IBAction func findInPage(_ sender: Any?) {
         tabCollectionViewModel.selectedTabViewModel?.startFindInPage()
-        findInPageContainerView.isHidden = false
-        findInPageViewController?.makeMeFirstResponder()
-        findInPageViewController?.delegate = self
     }
 
     /// Declines handling findInPage action if there's no page loaded currently.

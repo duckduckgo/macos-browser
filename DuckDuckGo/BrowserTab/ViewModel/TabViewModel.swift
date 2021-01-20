@@ -159,6 +159,7 @@ extension TabViewModel {
     }
 
     func closeFindInPage() {
+        guard findInPage.visible else { return }
         tab.findDone()
         findInPage.hide()
     }

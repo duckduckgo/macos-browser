@@ -97,6 +97,7 @@ class MainViewController: NSViewController {
     @IBSegueAction
     func createFindInPageViewController(coder: NSCoder, sender: Any?, segueIdentifier: String?) -> FindInPageViewController? {
         self.findInPageViewController = FindInPageViewController(coder: coder)
+        findInPageViewController?.delegate = self
         return findInPageViewController
     }
 
