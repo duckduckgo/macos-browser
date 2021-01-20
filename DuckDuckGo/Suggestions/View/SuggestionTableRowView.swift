@@ -19,9 +19,9 @@
 import Cocoa
 import os.log
 
-class SuggestionTableRowView: NSTableRowView {
+final class SuggestionTableRowView: NSTableRowView {
 
-    static let identifier = "SuggestionTableRowView"
+    static let identifier = NSUserInterfaceItemIdentifier(rawValue: "SuggestionTableRowView")
     static let selectionBackroundColor = NSColor(named: "SelectedSuggestionBackgroundColor")!
 
     enum Size: CGFloat {

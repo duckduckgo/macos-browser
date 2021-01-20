@@ -28,10 +28,10 @@ class MainViewController: NSViewController {
     @IBOutlet weak var webContainerView: NSView!
     @IBOutlet weak var findInPageContainerView: NSView!
 
-    private(set) var tabBarViewController: TabBarViewController?
-    private(set) var navigationBarViewController: NavigationBarViewController?
-    private(set) var browserTabViewController: BrowserTabViewController?
-    private(set) var findInPageViewController: FindInPageViewController?
+    private var tabBarViewController: TabBarViewController!
+    private(set) var navigationBarViewController: NavigationBarViewController!
+    private var browserTabViewController: BrowserTabViewController!
+    private var findInPageViewController: FindInPageViewController!
 
     var tabCollectionViewModel = TabCollectionViewModel()
 
@@ -61,36 +61,20 @@ class MainViewController: NSViewController {
     }
 
     @IBSegueAction
-    func createTabBarViewController(coder: NSCoder, sender: Any?, segueIdentifier: String?) -> TabBarViewController? {
-        guard let tabBarViewController = TabBarViewController(coder: coder, tabCollectionViewModel: tabCollectionViewModel) else {
-            os_log("MainViewController: Failed to init TabBarViewController", type: .error)
-            return nil
-        }
-
-        self.tabBarViewController = tabBarViewController
+    func createTabBarViewController(coder: NSCoder, sender: Any?, segueIdentifier: String?) -> TabBarViewController {
+        self.tabBarViewController = TabBarViewController(coder: coder, tabCollectionViewModel: tabCollectionViewModel)!
         return tabBarViewController
     }
 
     @IBSegueAction
-    func createNavigationBarViewController(coder: NSCoder, sender: Any?, segueIdentifier: String?) -> NavigationBarViewController? {
-        guard let navigationBarViewController = NavigationBarViewController(coder: coder, tabCollectionViewModel: tabCollectionViewModel) else {
-            os_log("MainViewController: Failed to init NavigationBarViewController", type: .error)
-            return nil
-        }
-
-        self.navigationBarViewController = navigationBarViewController
+    func createNavigationBarViewController(coder: NSCoder, sender: Any?, segueIdentifier: String?) -> NavigationBarViewController {
+        self.navigationBarViewController = NavigationBarViewController(coder: coder, tabCollectionViewModel: tabCollectionViewModel)!
         return navigationBarViewController
     }
 
     @IBSegueAction
-    func createWebViewController(coder: NSCoder, sender: Any?, segueIdentifier: String?) -> BrowserTabViewController? {
-        guard let browserTabViewController = BrowserTabViewController(coder: coder,
-                                                                      tabCollectionViewModel: tabCollectionViewModel) else {
-            os_log("MainViewController: Failed to init BrowserTabViewController", type: .error)
-            return nil
-        }
-
-        self.browserTabViewController = browserTabViewController
+    func createWebViewController(coder: NSCoder, sender: Any?, segueIdentifier: String?) -> BrowserTabViewController {
+        self.browserTabViewController = BrowserTabViewController(coder: coder, tabCollectionViewModel: tabCollectionViewModel)!
         return browserTabViewController
     }
 

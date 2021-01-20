@@ -19,9 +19,9 @@
 import Cocoa
 import os.log
 
-class SuggestionTableCellView: NSTableCellView {
+final class SuggestionTableCellView: NSTableCellView {
 
-    static let identifier = "SuggestionTableCellView"
+    static let identifier = NSUserInterfaceItemIdentifier(rawValue: "SuggestionTableCellView")
 
     static let tintColor = NSColor(named: "SuggestionTintColor")!
     static let selectedTintColor = NSColor(named: "SelectedSuggestionTintColor")!
