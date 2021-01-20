@@ -20,23 +20,21 @@ import Cocoa
 import WebKit
 import os.log
 
-class WebView: WKWebView {
+final class WebView: WKWebView {
 
-    static let itemSelectors: [String: Selector] = [
+    static let itemSelectors: [NSUserInterfaceItemIdentifier: Selector] = [
         // Links
-        "WKMenuItemIdentifierOpenLink": #selector(LinkMenuItemSelectors.openLinkInNewTab(_:)),
-        "WKMenuItemIdentifierOpenLinkInNewWindow": #selector(LinkMenuItemSelectors.openLinkInNewWindow(_:)),
-        "WKMenuItemIdentifierDownloadLinkedFile": #selector(LinkMenuItemSelectors.downloadLinkedFile(_:)),
+        .openLink: #selector(LinkMenuItemSelectors.openLinkInNewTab(_:)),
+        .openLinkInNewWindow: #selector(LinkMenuItemSelectors.openLinkInNewWindow(_:)),
+        .downloadLinkedFile: #selector(LinkMenuItemSelectors.downloadLinkedFile(_:)),
 
         // Images
-        "WKMenuItemIdentifierOpenImageInNewWindow": #selector(ImageMenuItemSelectors.openImageInNewWindow(_:)),
-        "WKMenuItemIdentifierDownloadImage": #selector(ImageMenuItemSelectors.saveImageToDownloads(_:))
+        .openImageInNewWindow: #selector(ImageMenuItemSelectors.openImageInNewWindow(_:)),
+        .downloadImage: #selector(ImageMenuItemSelectors.saveImageToDownloads(_:))
     ]
 
-    static let itemTitles: [String: String] = [
-
-        "WKMenuItemIdentifierOpenLink": UserText.openLinkInNewTab
-
+    static let itemTitles: [NSUserInterfaceItemIdentifier: String] = [
+        .openLink: UserText.openLinkInNewTab
     ]
 
     // MARK: - Menu
@@ -46,14 +44,14 @@ class WebView: WKWebView {
 
         updateActionsAndTitles(menu.items)
 
-        menu.insertItemBeforeItemWithIdentifier("WKMenuItemIdentifierOpenImageInNewWindow",
+        menu.insertItemBeforeItemWithIdentifier(.openImageInNewWindow,
                                                 title: UserText.openImageInNewTab,
                                                 target: uiDelegate,
                                                 selector: #selector(ImageMenuItemSelectors.openImageInNewTab(_:)))
 
-        menu.insertSeparatorBeforeItemWithIdentifier("WKMenuItemIdentifierCopyImage")
+        menu.insertSeparatorBeforeItemWithIdentifier(.copyImage)
 
-        menu.insertItemBeforeItemWithIdentifier("WKMenuItemIdentifierCopyImage",
+        menu.insertItemBeforeItemWithIdentifier(.copyImage,
                                                 title: UserText.copyImageAddress,
                                                 target: uiDelegate,
                                                 selector: #selector(ImageMenuItemSelectors.copyImageAddress(_:)))
@@ -62,7 +60,7 @@ class WebView: WKWebView {
 
     private func updateActionsAndTitles(_ items: [NSMenuItem]) {
         items.forEach {
-            guard let id = $0.identifier?.rawValue else { return }
+            guard let id = $0.identifier else { return }
 
             if let selector = Self.itemSelectors[id] {
                 $0.target = uiDelegate
@@ -75,4 +73,13 @@ class WebView: WKWebView {
         }
     }
 
+}
+
+fileprivate extension NSUserInterfaceItemIdentifier {
+    static let openImageInNewWindow = NSUserInterfaceItemIdentifier(rawValue: "WKMenuItemIdentifierOpenImageInNewWindow")
+    static let copyImage = NSUserInterfaceItemIdentifier(rawValue: "WKMenuItemIdentifierCopyImage")
+    static let downloadImage = NSUserInterfaceItemIdentifier(rawValue: "WKMenuItemIdentifierDownloadImage")
+    static let openLink = NSUserInterfaceItemIdentifier(rawValue: "WKMenuItemIdentifierOpenLink")
+    static let openLinkInNewWindow = NSUserInterfaceItemIdentifier(rawValue: "WKMenuItemIdentifierOpenLinkInNewWindow")
+    static let downloadLinkedFile = NSUserInterfaceItemIdentifier(rawValue: "WKMenuItemIdentifierDownloadLinkedFile")
 }

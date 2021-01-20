@@ -54,12 +54,12 @@ extension NSMenu {
         helpMenuItem?.submenu?.item(withTag: MenuItemTag.sendFeedback.rawValue)
     }
 
-    func indexOfItem(withIdentifier id: String) -> Int? {
-        guard let item = items.first(where: { $0.identifier?.rawValue == id }) else { return nil }
+    func indexOfItem(withIdentifier id: NSUserInterfaceItemIdentifier) -> Int? {
+        guard let item = items.first(where: { $0.identifier == id }) else { return nil }
         return index(of: item)
     }
 
-    func insertItemBeforeItemWithIdentifier(_ id: String, title: String, target: AnyObject?, selector: Selector) {
+    func insertItemBeforeItemWithIdentifier(_ id: NSUserInterfaceItemIdentifier, title: String, target: AnyObject?, selector: Selector) {
         guard let index = indexOfItem(withIdentifier: id) else { return }
 
         let newItem = NSMenuItem()
@@ -70,7 +70,7 @@ extension NSMenu {
         insertItem(newItem, at: index)
     }
 
-    func insertSeparatorBeforeItemWithIdentifier(_ id: String) {
+    func insertSeparatorBeforeItemWithIdentifier(_ id: NSUserInterfaceItemIdentifier) {
         guard let index = indexOfItem(withIdentifier: id) else { return }
         insertItem(.separator(), at: index)
     }
