@@ -38,13 +38,16 @@ class Tab: NSObject {
          webViewConfiguration: WebViewConfiguration? = nil,
          url: URL? = nil,
          title: String? = nil,
-         error: Error? = nil) {
+         error: Error? = nil,
+         sessionStateData: Data? = nil) {
+
         self.faviconService = faviconService
         webView = WebView(frame: CGRect.zero, configuration: webViewConfiguration ?? WKWebViewConfiguration.makeConfiguration())
 
         self.url = url
         self.title = title
         self.error = error
+        self.sessionStateData = sessionStateData
 
         super.init()
 
@@ -52,6 +55,14 @@ class Tab: NSObject {
         if webViewConfiguration == nil {
             setupUserScripts()
         }
+    }
+
+    override func copy() -> Any {
+        Tab(faviconService: faviconService,
+            webViewConfiguration: webView.configuration,
+            url: url,
+            title: title,
+            sessionStateData: try? webView.sessionStateData())
     }
 
     deinit {
@@ -77,6 +88,8 @@ class Tab: NSObject {
             subscribeToFindInPageTextChange()
         }
     }
+
+    var sessionStateData: Data?
 
     // Used to track if an error was caused by a download navigation.
     private var currentDownload: FileDownload?
@@ -324,14 +337,19 @@ extension Tab: WKNavigationDelegate {
 
         // Unnecessary assignment triggers publishing
         if error != nil { error = nil }
+
+        self.sessionStateData = try? (webView as? WebView)?.sessionStateData()
     }
 
     func webView(_ webView: WKWebView, didFinish navigation: WKNavigation!) {
+        self.sessionStateData = try? (webView as? WebView)?.sessionStateData()
     }
 
     func webView(_ webView: WKWebView, didFail navigation: WKNavigation!, withError error: Error) {
         #warning("Failing not captured. Seems the method is called after calling the webview's method goBack()")
 //        hasError = true
+
+        self.sessionStateData = try? (webView as? WebView)?.sessionStateData()
     }
 
     func webView(_ webView: WKWebView, didFailProvisionalNavigation navigation: WKNavigation!, withError error: Error) {

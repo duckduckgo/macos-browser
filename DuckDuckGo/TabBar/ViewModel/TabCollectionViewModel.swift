@@ -272,11 +272,12 @@ final class TabCollectionViewModel: NSObject {
         }
 
         let tab = tabCollection.tabs[index]
-        let tabCopy = Tab()
-        tabCopy.url = tab.url
+        // swiftlint:disable force_cast
+        let copy = tab.copy() as! Tab
+        // swiftlint:enable force_cast
         let newIndex = index + 1
 
-        tabCollection.insert(tab: tabCopy, at: newIndex)
+        tabCollection.insert(tab: copy, at: newIndex)
         select(at: newIndex)
 
         delegate?.tabCollectionViewModel(self, didInsertAndSelectAt: newIndex)
