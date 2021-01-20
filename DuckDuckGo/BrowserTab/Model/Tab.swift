@@ -131,6 +131,15 @@ final class Tab: NSObject, NSSecureCoding {
     private func setupWebView() {
         webView.navigationDelegate = self
         webView.allowsBackForwardNavigationGestures = true
+        webView.customUserAgent = UserAgent.safari
+
+        if let sessionStateData = sessionStateData {
+            do {
+                try webView.restoreSessionState(from: sessionStateData)
+            } catch {
+                os_log("Tab:setupWebView could not restore session state %s", "\(error)")
+            }
+        }
     }
 
     // MARK: - Favicon
