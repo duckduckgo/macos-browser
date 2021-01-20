@@ -58,6 +58,10 @@ final class MainWindowController: NSWindowController {
         super.init(window: window)
         window.delegate = self
 
+        if contentSize == nil || position == .auto {
+            // adjust using last saved frame
+            window.setFrameUsingName(Self.windowFrameSaveName)
+        }
         if let contentSize = contentSize {
             window.setContentSize(contentSize)
         }
@@ -68,8 +72,14 @@ final class MainWindowController: NSWindowController {
         case .origin(let origin):
             window.setFrameOrigin(origin)
         case .auto:
-            break
+            // cascade windows from the last saved frame
+            var origin = window.frame.origin
+            origin.y += window.frame.size.height
+            origin = window.cascadeTopLeft(from: origin)
+            origin.y -= window.frame.size.height
+            window.setFrameOrigin(origin)
         }
+        window.saveFrame(usingName: Self.windowFrameSaveName)
     }
 
     override func showWindow(_ sender: Any?) {
@@ -81,6 +91,14 @@ final class MainWindowController: NSWindowController {
 }
 
 extension MainWindowController: NSWindowDelegate {
+
+    func windowDidResize(_ notification: Notification) {
+        window!.saveFrame(usingName: Self.windowFrameSaveName)
+    }
+
+    func windowDidMove(_ notification: Notification) {
+        window!.saveFrame(usingName: Self.windowFrameSaveName)
+    }
 
     func windowDidBecomeMain(_ notification: Notification) {
         mainViewController.windowDidBecomeMain()
