@@ -547,14 +547,11 @@
 			children = (
 				AA4D700525545EDE00C3411E /* AppDelegate */,
 				AA585D85248FD31400E9A3E2 /* Assets.xcassets */,
-				4B677454255DC18000025BD8 /* Bridging.h */,
 				AA86491B24D837DE001BABEE /* BrowserTab */,
 				AA6820E825503A21005ED0D5 /* Burning */,
 				AA86491324D831B9001BABEE /* Common */,
-				AA585D8B248FD31400E9A3E2 /* DuckDuckGo.entitlements */,
 				8556A60C256C15C60092FA9D /* FileDownload */,
 				85A0115D25AF1C4700FA6A0C /* FindInPage */,
-				AA585D8A248FD31400E9A3E2 /* Info.plist */,
 				AA585DB02490E6FA00E9A3E2 /* Main */,
 				AA97BF4425135CB60014931A /* Menus */,
 				AA86491524D83384001BABEE /* NavigationBar */,
@@ -564,6 +561,9 @@
 				AA86491124D8318F001BABEE /* TabBar */,
 				AAE8B0FD258A416F00E81239 /* Tooltip */,
 				AA6EF9AE25066F99004754E6 /* Windows */,
+				4B677454255DC18000025BD8 /* Bridging.h */,
+				AA585D8B248FD31400E9A3E2 /* DuckDuckGo.entitlements */,
+				AA585D8A248FD31400E9A3E2 /* Info.plist */,
 			);
 			path = DuckDuckGo;
 			sourceTree = "<group>";
