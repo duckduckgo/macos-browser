@@ -60,10 +60,7 @@ class WindowsManager {
 
         mainWindowController.showWindow(self)
 
-        guard let mainViewController = mainWindowController.contentViewController as? MainViewController else {
-            os_log("MainWindowController: Failed to get reference to main view controller", type: .error)
-            return
-        }
+        let mainViewController = mainWindowController.mainViewController
         guard let newTab = mainViewController.tabCollectionViewModel.tabCollection.tabs.first else {
             os_log("MainWindowController: Failed to get initial tab", type: .error)
             return
@@ -73,14 +70,12 @@ class WindowsManager {
     }
 
     private class func makeNewWindow(tabCollectionViewModel: TabCollectionViewModel? = nil) -> MainWindowController? {
-        let mainStoryboard = NSStoryboard(name: "Main", bundle: nil)
-        guard let mainWindowController = mainStoryboard
-                .instantiateController(withIdentifier: .mainWindowController) as? MainWindowController else {
-            os_log("MainViewController: Failed to init MainWindowController", type: .error)
-            return nil
-        }
-        
-        let mainViewController = mainStoryboard
+        let storyboard = NSStoryboard(name: "Main", bundle: nil)
+        // swiftlint:disable force_cast
+        let mainWindowController = storyboard.instantiateController(withIdentifier: .mainWindowController) as! MainWindowController
+        // swiftlint:enable force_cast
+
+        let mainViewController = storyboard
             .instantiateController(identifier: .mainViewController) { coder -> MainViewController? in
                 if let tabCollectionViewModel = tabCollectionViewModel {
                     return MainViewController(coder: coder, tabCollectionViewModel: tabCollectionViewModel)

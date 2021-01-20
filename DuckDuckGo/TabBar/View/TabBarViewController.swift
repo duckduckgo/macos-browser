@@ -467,12 +467,10 @@ extension TabBarViewController: NSCollectionViewDataSource {
     }
 
     func collectionView(_ collectionView: NSCollectionView, itemForRepresentedObjectAt indexPath: IndexPath) -> NSCollectionViewItem {
-        let item = collectionView.makeItem(withIdentifier: TabBarViewItem.identifier, for: indexPath)
-        guard let tabBarViewItem = item as? TabBarViewItem else {
-            os_log("TabBarViewController: Failed to get reusable TabBarViewItem instance", type: .error)
-            return item
-        }
-        
+        // swiftlint:disable force_cast
+        let tabBarViewItem = collectionView.makeItem(withIdentifier: TabBarViewItem.identifier, for: indexPath) as! TabBarViewItem
+        // swiftlint:enable force_cast
+
         guard let tabViewModel = tabCollectionViewModel.tabViewModel(at: indexPath.item) else {
             tabBarViewItem.clear()
             return tabBarViewItem
@@ -480,6 +478,7 @@ extension TabBarViewController: NSCollectionViewDataSource {
 
         tabBarViewItem.delegate = self
         tabBarViewItem.subscribe(to: tabViewModel)
+
         return tabBarViewItem
     }
 
@@ -487,13 +486,16 @@ extension TabBarViewController: NSCollectionViewDataSource {
                         viewForSupplementaryElementOfKind kind: NSCollectionView.SupplementaryElementKind,
                         at indexPath: IndexPath) -> NSView {
 
-        let view = collectionView.makeSupplementaryView(ofKind: kind,
-                                                        withIdentifier: TabBarFooter.identifier, for: indexPath)
-        if let footer = view as? TabBarFooter {
-            footer.addButton?.target = self
-            footer.addButton?.action = #selector(addButtonAction(_:))
-        }
-        return view
+        // swiftlint:disable force_cast
+        let footer = collectionView.makeSupplementaryView(ofKind: kind,
+                                                          withIdentifier: TabBarFooter.identifier,
+                                                          for: indexPath) as! TabBarFooter
+        // swiftlint:enable force_cast
+
+        footer.addButton?.target = self
+        footer.addButton?.action = #selector(addButtonAction(_:))
+
+        return footer
     }
 }
 

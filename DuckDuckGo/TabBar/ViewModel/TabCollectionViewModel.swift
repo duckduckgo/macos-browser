@@ -71,7 +71,7 @@ final class TabCollectionViewModel: NSObject {
     }
 
     func tabViewModel(at index: Int) -> TabViewModel? {
-        guard index >= 0, tabCollection.tabs.count > index else {
+        guard tabCollection.tabs.indices.contains(index) else {
             os_log("TabCollectionViewModel: Index out of bounds", type: .error)
             return nil
         }
@@ -81,7 +81,7 @@ final class TabCollectionViewModel: NSObject {
     }
 
     @discardableResult func select(at index: Int) -> Bool {
-        guard index >= 0, index < tabCollection.tabs.count else {
+        guard tabCollection.tabs.indices.contains(index) else {
             os_log("TabCollectionViewModel: Index out of bounds", type: .error)
             selectionIndex = nil
             return false
@@ -260,7 +260,7 @@ final class TabCollectionViewModel: NSObject {
     }
 
     func duplicateTab(at index: Int) {
-        guard index >= 0, index < tabCollection.tabs.count else {
+        guard tabCollection.tabs.indices.contains(index) else {
             os_log("TabCollectionViewModel: Index out of bounds", type: .error)
             return
         }

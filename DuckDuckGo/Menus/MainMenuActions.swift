@@ -50,10 +50,7 @@ extension AppDelegate {
             return
         }
 
-        guard let mainViewController = windowController.mainViewController else {
-            os_log("AppDelegate: No main view controller", type: .error)
-            return
-        }
+        let mainViewController = windowController.mainViewController
 
         DefaultConfigurationStorage.shared.log()
         ConfigurationManager.shared.log()
@@ -201,7 +198,7 @@ extension MainViewController {
             return
         }
         let index = keyEquivalent - 1
-        if index >= 0 && index < tabCollectionViewModel.tabCollection.tabs.count {
+        if tabCollectionViewModel.tabCollection.tabs.indices.contains(index) {
             tabCollectionViewModel.select(at: index)
         }
     }
