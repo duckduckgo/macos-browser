@@ -19,7 +19,7 @@
 import Foundation
 import os.log
 
-final class TabCollection: NSObject {
+final class TabCollection: NSObject, NSSecureCoding {
 
     @Published private(set) var tabs: [Tab]
     @Published private(set) var lastRemovedTabCache: (url: URL?, index: Int)?
@@ -99,6 +99,19 @@ final class TabCollection: NSObject {
         tab.url = lastRemovedTabCache.url
         insert(tab: tab, at: min(lastRemovedTabCache.index, tabs.count))
         self.lastRemovedTabCache = nil
+    }
+
+    // MARK: - Coding
+
+    static var supportsSecureCoding: Bool { true }
+
+    init?(coder decoder: NSCoder) {
+        self.tabs = decoder.decodeObject(of: [NSArray.self, Tab.self], forKey: NSKeyedArchiveRootObjectKey) as? [Tab] ?? []
+        super.init()
+    }
+
+    func encode(with coder: NSCoder) {
+        coder.encode(tabs, forKey: NSKeyedArchiveRootObjectKey)
     }
 
 }

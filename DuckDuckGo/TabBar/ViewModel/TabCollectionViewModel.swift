@@ -33,7 +33,7 @@ protocol TabCollectionViewModelDelegate: AnyObject {
 
 }
 
-final class TabCollectionViewModel: NSObject {
+final class TabCollectionViewModel: NSObject, NSSecureCoding {
 
     weak var delegate: TabCollectionViewModelDelegate?
 
@@ -328,6 +328,30 @@ final class TabCollectionViewModel: NSObject {
 
     private func updateCanInsertLastRemovedTab() {
         canInsertLastRemovedTab = tabCollection.lastRemovedTabCache != nil
+    }
+
+    // MARK: - Coding
+
+    private enum NSCodingKeys {
+        static let tabCollection = "tabs"
+        static let selectionIndex = "idx"
+    }
+
+    static var supportsSecureCoding: Bool { true }
+
+    required convenience init?(coder: NSCoder) {
+        let tabCollection = coder.decodeObject(of: TabCollection.self, forKey: NSCodingKeys.tabCollection)
+        let selectionIndex = coder.containsValue(forKey: NSCodingKeys.selectionIndex)
+            ? coder.decodeInteger(forKey: NSCodingKeys.selectionIndex)
+            : nil
+        self.init(tabCollection: tabCollection, selectionIndex: selectionIndex)
+    }
+
+    func encode(with coder: NSCoder) {
+        if let selectionIndex = selectionIndex {
+            coder.encode(selectionIndex, forKey: NSCodingKeys.selectionIndex)
+        }
+        coder.encode(tabCollection, forKey: NSCodingKeys.tabCollection)
     }
 
 }
