@@ -111,7 +111,7 @@ class FindInPageViewController: NSViewController {
     }
 
     private func updateFieldStates() {
-        statusField.isHidden = model?.matchesFound ?? 0 == 0
+        statusField.isHidden = model?.text.isEmpty ?? true
         nextButton.isEnabled = model?.matchesFound ?? 0 > 0
         previousButton.isEnabled = model?.matchesFound ?? 0 > 0
     }
