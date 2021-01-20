@@ -47,20 +47,20 @@ public class TabInstrumentation {
 
     public func willLoad(url: URL) {
         currentURL = url.absoluteString
-        if #available(iOSApplicationExtension 12.0, *) {
-            let id = OSSignpostID(log: type(of: self).tabsLog)
-            siteLoadingSPID = id
-            os_signpost(.begin,
-                        log: type(of: self).tabsLog,
-                        name: "Load Page",
-                        signpostID: id,
-                        "Loading URL: %@ in %llu", url.absoluteString, currentTabIdentifier)
-        }
+
+        let id = OSSignpostID(log: type(of: self).tabsLog)
+        siteLoadingSPID = id
+        os_signpost(.begin,
+                    log: type(of: self).tabsLog,
+                    name: "Load Page",
+                    signpostID: id,
+                    "Loading URL: %@ in %llu", url.absoluteString, currentTabIdentifier)
+
     }
 
     public func didLoadURL() {
-        if #available(iOSApplicationExtension 12.0, *),
-            let id = siteLoadingSPID as? OSSignpostID {
+
+        if let id = siteLoadingSPID as? OSSignpostID {
             os_signpost(.end,
                         log: type(of: self).tabsLog,
                         name: "Load Page",
@@ -84,30 +84,27 @@ public class TabInstrumentation {
     }
 
     private func request(url: String, isTracker: Bool, blocked: Bool, reason: String = "", in timeInMs: Double) {
-        if #available(iOSApplicationExtension 12.0, *) {
-            let currentURL = self.currentURL ?? "unknown"
-            let requestType = isTracker ? "Tracker" : "Regular"
-            let status = blocked ? "Blocked" : "Allowed"
+        let currentURL = self.currentURL ?? "unknown"
+        let requestType = isTracker ? "Tracker" : "Regular"
+        let status = blocked ? "Blocked" : "Allowed"
 
-            // 0 is treated as 1ms
-            let timeInNS: UInt64 = timeInMs.asNanos
+        // 0 is treated as 1ms
+        let timeInNS: UInt64 = timeInMs.asNanos
 
-            os_log(.debug,
-                   log: type(of: self).tabsLog,
-                   "[%@] Request: %@ - %@ - %@ (%@) in %llu", currentURL, url, requestType, status, reason, timeInNS)
-        }
+        os_log(.debug,
+               log: type(of: self).tabsLog,
+               "[%@] Request: %@ - %@ - %@ (%@) in %llu", currentURL, url, requestType, status, reason, timeInNS)
     }
 
     public func jsEvent(name: String, executedIn timeInMs: Double) {
-        if #available(iOSApplicationExtension 12.0, *) {
-            let currentURL = self.currentURL ?? "unknown"
-            // 0 is treated as 1ms
-            let timeInNS: UInt64 = timeInMs.asNanos
 
-            os_log(.debug,
-                   log: type(of: self).tabsLog,
-                   "[%@] JSEvent: %@ executedIn: %llu", currentURL, name, timeInNS)
-        }
+        let currentURL = self.currentURL ?? "unknown"
+        // 0 is treated as 1ms
+        let timeInNS: UInt64 = timeInMs.asNanos
+
+        os_log(.debug,
+               log: type(of: self).tabsLog,
+               "[%@] JSEvent: %@ executedIn: %llu", currentURL, name, timeInNS)
     }
 }
 
