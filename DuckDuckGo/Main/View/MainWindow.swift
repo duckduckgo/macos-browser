@@ -18,7 +18,7 @@
 
 import Cocoa
 
-class MainWindow: NSWindow {
+final class MainWindow: NSWindow {
 
     override var canBecomeKey: Bool {
         return true
@@ -26,6 +26,30 @@ class MainWindow: NSWindow {
 
     override var canBecomeMain: Bool {
         return true
+    }
+
+    init() {
+        super.init(contentRect: NSRect(x: 0, y: 0, width: 1024, height: 790),
+                   styleMask: [.titled, .closable, .miniaturizable, .resizable, .fullSizeContentView],
+                   backing: .buffered,
+                   defer: true)
+
+        setupWindow()
+    }
+
+    private func setupWindow() {
+        allowsToolTipsWhenApplicationIsInactive = false
+        autorecalculatesKeyViewLoop = false
+        isReleasedWhenClosed = false
+        animationBehavior = .documentWindow
+        hasShadow = true
+        // traffic lights aligned by an empty unvisible toolbar
+        toolbar = NSToolbar()
+        toolbar!.showsBaselineSeparator = false
+        titleVisibility = .hidden
+        titlebarAppearsTransparent = true
+        // the window will be draggable using custom drag areas defined by WindowDraggingView
+        isMovable = false
     }
 
     // MARK: - First Responder Notification

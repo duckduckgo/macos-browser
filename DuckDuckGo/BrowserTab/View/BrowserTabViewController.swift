@@ -21,7 +21,7 @@ import WebKit
 import os.log
 import Combine
 
-class BrowserTabViewController: NSViewController {
+final class BrowserTabViewController: NSViewController {
 
     @IBOutlet weak var errorView: NSView!
     var webView: WebView?
@@ -196,7 +196,7 @@ extension BrowserTabViewController: LinkMenuItemSelectors {
 
     func openLinkInNewWindow(_ sender: NSMenuItem) {
         guard let url = contextMenuLink else { return }
-        WindowsManager.openNewWindow(with: url)
+        WindowsManager.shared.openNewWindow(with: url)
     }
 
     func downloadLinkedFile(_ sender: NSMenuItem) {
@@ -217,7 +217,7 @@ extension BrowserTabViewController: ImageMenuItemSelectors {
 
     func openImageInNewWindow(_ sender: NSMenuItem) {
         guard let url = contextMenuImage else { return }
-        WindowsManager.openNewWindow(with: url)
+        WindowsManager.shared.openNewWindow(with: url)
     }
 
     func saveImageToDownloads(_ sender: NSMenuItem) {

@@ -19,10 +19,18 @@
 import Foundation
 import os.log
 
-class TabCollection {
+final class TabCollection: NSObject {
 
-    @Published private(set) var tabs: [Tab] = []
+    @Published private(set) var tabs: [Tab]
     @Published private(set) var lastRemovedTabCache: (url: URL?, index: Int)?
+
+    override init() {
+        self.tabs = []
+    }
+
+    init(tabs: [Tab]) {
+        self.tabs = tabs
+    }
 
     func append(tab: Tab) {
         tabs.append(tab)

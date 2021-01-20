@@ -20,7 +20,7 @@ import Cocoa
 import os.log
 
 @NSApplicationMain
-class AppDelegate: NSObject, NSApplicationDelegate {
+final class AppDelegate: NSObject, NSApplicationDelegate {
 
     let urlEventListener = UrlEventListener()
 
@@ -42,7 +42,7 @@ class AppDelegate: NSObject, NSApplicationDelegate {
 
     func applicationShouldHandleReopen(_ sender: NSApplication, hasVisibleWindows flag: Bool) -> Bool {
         if !flag {
-            WindowsManager.openNewWindow()
+            WindowsManager.shared.openNewWindow()
             return true
         }
         return true

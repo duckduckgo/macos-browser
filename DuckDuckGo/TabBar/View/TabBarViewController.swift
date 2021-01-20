@@ -87,7 +87,7 @@ final class TabBarViewController: NSViewController {
     @IBAction func burnButtonAction(_ sender: NSButton) {
         let response = NSAlert.burnButtonAlert.runModal()
         if response == NSApplication.ModalResponse.alertFirstButtonReturn {
-            WindowsManager.closeWindows(except: view.window)
+            WindowsManager.shared.closeWindows(except: view.window)
             fireViewModel.fire.burnAll(tabCollectionViewModel: tabCollectionViewModel)
         }
     }
@@ -133,13 +133,10 @@ final class TabBarViewController: NSViewController {
     }
 
     private func closeWindowIfNeeded() {
-        if tabCollectionViewModel.tabCollection.tabs.isEmpty {
-            guard let window = view.window else {
-                os_log("AddressBarTextField: Window not available", type: .error)
-                return
-            }
-            window.close()
-        }
+        guard tabCollectionViewModel.tabCollection.tabs.isEmpty,
+              let window = view.window
+            else { return }
+        window.close()
     }
 
     // MARK: - Window Dragging, Floating Add Button
@@ -198,7 +195,7 @@ final class TabBarViewController: NSViewController {
 
         let tab = tabViewModel.tab
         tabCollectionViewModel.remove(at: indexPath.item)
-        WindowsManager.openNewWindow(with: tab, droppingPoint: droppingPoint)
+        WindowsManager.shared.openNewWindow(with: tab, at: droppingPoint)
     }
 
     // MARK: - Tab Width
@@ -386,7 +383,7 @@ extension TabBarViewController: TabCollectionViewModelDelegate {
     }
 
     func tabCollectionViewModelDidMultipleChanges(_ tabCollectionViewModel: TabCollectionViewModel) {
-        closeWindowIfNeeded()
+        // don't close window here as we're either already closing the window or having at least one tab
 
         collectionView.reloadData()
         reloadSelection()

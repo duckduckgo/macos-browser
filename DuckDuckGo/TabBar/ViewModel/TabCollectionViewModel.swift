@@ -33,7 +33,7 @@ protocol TabCollectionViewModelDelegate: AnyObject {
 
 }
 
-class TabCollectionViewModel {
+final class TabCollectionViewModel: NSObject {
 
     weak var delegate: TabCollectionViewModelDelegate?
 
@@ -50,17 +50,22 @@ class TabCollectionViewModel {
 
     private var cancellables = Set<AnyCancellable>()
 
-    init(tabCollection: TabCollection) {
-        self.tabCollection = tabCollection
+    init(tabCollection: TabCollection? = nil, selectionIndex: Int? = nil) {
+        self.tabCollection = tabCollection ?? TabCollection()
+        super.init()
 
         subscribeToTabs()
         subscribeToLastRemovedTab()
-        appendNewTab()
+        if tabCollection == nil {
+            appendNewTab()
+        }
+        if let selectionIndex = selectionIndex {
+            self.selectionIndex = selectionIndex
+        }
     }
 
-    convenience init() {
-        let tabCollection = TabCollection()
-        self.init(tabCollection: tabCollection)
+    convenience init(tab: Tab) {
+        self.init(tabCollection: TabCollection(tabs: [tab]), selectionIndex: 0)
     }
 
     func tabViewModel(at index: Int) -> TabViewModel? {

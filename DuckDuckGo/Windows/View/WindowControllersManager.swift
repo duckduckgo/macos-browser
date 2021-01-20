@@ -19,19 +19,23 @@
 import Cocoa
 import os.log
 
-class WindowControllersManager {
+final class WindowControllersManager {
 
     static let shared = WindowControllersManager()
 
     private(set) var mainWindowControllers = [MainWindowController]()
-    var lastKeyMainWindowController: MainWindowController?
+    weak var lastKeyMainWindowController: MainWindowController?
 
     func register(_ windowController: MainWindowController) {
         mainWindowControllers.append(windowController)
     }
 
     func unregister(_ windowController: MainWindowController) {
-        mainWindowControllers.removeAll(where: { $0 === windowController })
+        guard let idx = mainWindowControllers.firstIndex(of: windowController) else {
+            os_log("WindowControllersManager: Window Controller not registered", type: .error)
+            return
+        }
+        mainWindowControllers.remove(at: idx)
     }
 
 }
@@ -51,8 +55,7 @@ extension WindowControllersManager: ApplicationDockMenuDataSource {
         }
 
         let windowController = mainWindowControllers[windowMenuItemIndex]
-        guard let mainViewController = windowController.mainViewController,
-              let selectedTabViewModel = mainViewController.tabCollectionViewModel.selectedTabViewModel else {
+        guard let selectedTabViewModel = windowController.mainViewController.tabCollectionViewModel.selectedTabViewModel else {
             os_log("WindowControllersManager: Cannot get selected tab view model", type: .error)
             return "-"
         }

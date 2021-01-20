@@ -20,9 +20,8 @@ import Cocoa
 
 extension NSWindow {
 
-    func setFrameOrigin(droppingPoint: NSPoint) {
-        let frameOrigin = NSPoint(x: droppingPoint.x - frame.size.width/2, y: droppingPoint.y - frame.size.height)
-        setFrameOrigin(frameOrigin)
+    func frameOrigin(fromDroppingPoint droppingPoint: NSPoint) -> NSPoint {
+        NSPoint(x: droppingPoint.x - frame.size.width/2, y: droppingPoint.y - frame.size.height)
     }
 
 }

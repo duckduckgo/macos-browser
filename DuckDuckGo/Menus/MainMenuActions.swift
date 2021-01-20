@@ -28,15 +28,15 @@ extension AppDelegate {
     // MARK: - File
 
     @IBAction func newWindow(_ sender: Any?) {
-        WindowsManager.openNewWindow()
+        WindowsManager.shared.openNewWindow()
     }
 
     @IBAction func openLocation(_ sender: Any?) {
-        WindowsManager.openNewWindow()
+        WindowsManager.shared.openNewWindow()
     }
 
     @IBAction func closeAllWindows(_ sender: Any?) {
-        WindowsManager.closeWindows()
+        WindowsManager.shared.closeWindows()
     }
 
 }
@@ -147,16 +147,16 @@ extension MainViewController {
 
         let tab = selectedTabViewModel.tab
         tabCollectionViewModel.removeSelected()
-        WindowsManager.openNewWindow(with: tab)
+        WindowsManager.shared.openNewWindow(with: tab)
     }
 
     @IBAction func mergeAllWindows(_ sender: Any?) {
-        let otherWindowControllers = WindowControllersManager.shared.mainWindowControllers.filter { $0.window != view.window }
-        let otherMainViewControllers = otherWindowControllers.compactMap { $0.mainViewController }
-        let otherTabCollectionViewModels = otherMainViewControllers.map { $0.tabCollectionViewModel }
-        let otherTabs = otherTabCollectionViewModels.flatMap { $0.tabCollection.tabs }
+        let otherTabs = WindowControllersManager.shared.mainWindowControllers
+            .filter { $0.window !== view.window }
+            .map { $0.tabCollectionViewModel }
+            .flatMap { $0.tabCollection.tabs }
 
-        WindowsManager.closeWindows(except: view.window)
+        WindowsManager.shared.closeWindows(except: view.window)
 
         tabCollectionViewModel.append(tabs: otherTabs)
     }

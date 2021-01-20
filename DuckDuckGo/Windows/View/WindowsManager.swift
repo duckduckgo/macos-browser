@@ -1,5 +1,5 @@
 //
-//  WindowManager.swift
+//  WindowsManager.swift
 //
 //  Copyright © 2020 DuckDuckGo. All rights reserved.
 //
@@ -19,67 +19,47 @@
 import Cocoa
 import os.log
 
-class WindowsManager {
+extension NSStoryboard {
+    static let main = NSStoryboard(name: "Main", bundle: .main)
+}
 
-    class var windows: [NSWindow] {
+final class WindowsManager {
+    static public let shared = WindowsManager()
+
+    var windows: [NSWindow] {
         return NSApplication.shared.windows
     }
 
-    class func closeWindows(except window: NSWindow? = nil) {
-        NSApplication.shared.windows.forEach {
-            if $0 != window {
-                $0.close()
-            }
+    func closeWindows(except activeWindow: NSWindow? = nil) {
+        for controller in WindowControllersManager.shared.mainWindowControllers
+            where controller.window !== activeWindow {
+
+            controller.window!.close()
         }
     }
 
-    class func openNewWindow(with initialTab: Tab? = nil, droppingPoint: NSPoint? = nil) {
-        guard let mainWindowController = makeNewWindow() else {
-            return
-        }
-
-        if let initialTab = initialTab {
-            guard let mainViewController = mainWindowController.contentViewController as? MainViewController else {
-                return
-            }
-
-            mainViewController.tabCollectionViewModel.append(tab: initialTab)
-            mainViewController.tabCollectionViewModel.remove(at: 0)
-        }
-
-        if let droppingPoint = droppingPoint {
-            mainWindowController.window?.setFrameOrigin(droppingPoint: droppingPoint)
-        }
-        mainWindowController.showWindow(self)
-    }
-
-    class func openNewWindow(with initialUrl: URL) {
-        guard let mainWindowController = makeNewWindow() else {
-            return
-        }
+    @discardableResult
+    func openNewWindow(with tabCollectionViewModel: TabCollectionViewModel,
+                       at position: WindowPosition = .auto,
+                       with contentSize: NSSize? = nil) -> NSWindow? {
+        let mainWindowController = MainWindowController(tabCollectionViewModel: tabCollectionViewModel,
+                                                        position: position,
+                                                        contentSize: contentSize)
 
         mainWindowController.showWindow(self)
-
-        guard let mainViewController = mainWindowController.contentViewController as? MainViewController else {
-            os_log("MainWindowController: Failed to get reference to main view controller", type: .error)
-            return
-        }
-        guard let newTab = mainViewController.tabCollectionViewModel.tabCollection.tabs.first else {
-            os_log("MainWindowController: Failed to get initial tab", type: .error)
-            return
-        }
-
-        newTab.url = initialUrl
+        
+        return mainWindowController.window!
     }
 
-    private class func makeNewWindow() -> MainWindowController? {
-        let mainStoryboard = NSStoryboard(name: "Main", bundle: nil)
-        guard let mainWindowController = mainStoryboard.instantiateInitialController() as? MainWindowController else {
-            os_log("MainViewController: Failed to init MainWindowController", type: .error)
-            return nil
-        }
-
-        mainWindowController.window?.animationBehavior = .documentWindow
-        return mainWindowController
+    @discardableResult
+    func openNewWindow(with tab: Tab? = nil, at droppingPoint: NSPoint? = nil) -> NSWindow? {
+        openNewWindow(with: tab.map(TabCollectionViewModel.init(tab:)) ?? .init(),
+                      at: droppingPoint.map(WindowPosition.droppingPoint) ?? .auto)
     }
+
+    @discardableResult
+    func openNewWindow(with url: URL) -> NSWindow? {
+        openNewWindow(with: Tab(url: url))
+    }
+
 }

@@ -19,7 +19,7 @@
 import Foundation
 import os.log
 
-class UrlEventListener {
+final class UrlEventListener {
 
     func listen() {
         NSAppleEventManager.shared().setEventHandler(
@@ -39,16 +39,11 @@ class UrlEventListener {
 
         guard let windowController = WindowControllersManager.shared.lastKeyMainWindowController,
               windowController.window?.isKeyWindow == true else {
-            WindowsManager.openNewWindow(with: url)
+            WindowsManager.shared.openNewWindow(with: url)
             return
         }
 
-        guard let mainViewController = windowController.mainViewController else {
-            os_log("AppDelegate: No main view controller", type: .error)
-            return
-        }
-
-        let tabCollectionViewModel = mainViewController.tabCollectionViewModel
+        let tabCollectionViewModel = windowController.tabCollectionViewModel
         let tabCollection = tabCollectionViewModel.tabCollection
 
         if tabCollection.tabs.count == 1,

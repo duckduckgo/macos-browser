@@ -21,7 +21,7 @@ import Carbon.HIToolbox
 import Combine
 import os.log
 
-class MainViewController: NSViewController {
+final class MainViewController: NSViewController {
 
     @IBOutlet weak var tabBarContainerView: NSView!
     @IBOutlet weak var navigationBarContainerView: NSView!
@@ -33,13 +33,22 @@ class MainViewController: NSViewController {
     private var browserTabViewController: BrowserTabViewController!
     private var findInPageViewController: FindInPageViewController!
 
-    var tabCollectionViewModel = TabCollectionViewModel()
+    let tabCollectionViewModel: TabCollectionViewModel
 
     private var selectedTabViewModelCancellable: AnyCancellable?
     private var canGoForwardCancellable: AnyCancellable?
     private var canGoBackCancellable: AnyCancellable?
     private var canInsertLastRemovedTabCancellable: AnyCancellable?
     private var findInPageCancellable: AnyCancellable?
+
+    required init?(coder: NSCoder) {
+        fatalError("MainViewController: Bad initializer")
+    }
+
+    init?(coder: NSCoder, tabCollectionViewModel: TabCollectionViewModel) {
+        self.tabCollectionViewModel = tabCollectionViewModel
+        super.init(coder: coder)
+    }
 
     override func viewDidLoad() {
         super.viewDidLoad()

@@ -34,9 +34,17 @@ class Tab: NSObject {
 
     weak var delegate: TabDelegate?
 
-    init(faviconService: FaviconService = LocalFaviconService.shared, webViewConfiguration: WebViewConfiguration? = nil) {
+    init(faviconService: FaviconService = LocalFaviconService.shared,
+         webViewConfiguration: WebViewConfiguration? = nil,
+         url: URL? = nil,
+         title: String? = nil,
+         error: Error? = nil) {
         self.faviconService = faviconService
         webView = WebView(frame: CGRect.zero, configuration: webViewConfiguration ?? WKWebViewConfiguration.makeConfiguration())
+
+        self.url = url
+        self.title = title
+        self.error = error
 
         super.init()
 
