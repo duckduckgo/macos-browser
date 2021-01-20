@@ -76,6 +76,8 @@ class Tab: NSObject {
     // Used as the request context for HTML 5 downloads
     private var lastMainFrameRequest: URLRequest?
 
+    private let instrumentation = TabInstrumentation()
+
     var isHomepageLoaded: Bool {
         url == nil || url == URL.emptyPage
     }
@@ -140,8 +142,10 @@ class Tab: NSObject {
     let findInPageScript = FindInPageUserScript()
     let contentBlockerScript = ContentBlockerUserScript()
     let contentBlockerRulesScript = ContentBlockerRulesUserScript()
+    let debugScript = DebugUserScript()
 
     lazy var userScripts = [
+        self.debugScript,
         self.faviconScript,
         self.html5downloadScript,
         self.contextMenuScript,
@@ -151,6 +155,7 @@ class Tab: NSObject {
     ]
 
     private func setupUserScripts() {
+        debugScript.instrumentation = instrumentation
         faviconScript.delegate = self
         html5downloadScript.delegate = self
         contextMenuScript.delegate = self
