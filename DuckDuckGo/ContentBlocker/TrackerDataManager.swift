@@ -51,7 +51,7 @@ public class TrackerDataManager {
     }
 
     init() {
-        // reload(etag: UserDefaultsETagStorage().etag(for: .trackerDataSet))
+        reload(etag: nil)
     }
 
     @discardableResult

@@ -138,18 +138,24 @@ class Tab: NSObject {
     let html5downloadScript = HTML5DownloadUserScript()
     let contextMenuScript = ContextMenuUserScript()
     let findInPageScript = FindInPageUserScript()
+    let contentBlockerScript = ContentBlockerUserScript()
+    let contentBlockerRulesScript = ContentBlockerRulesUserScript()
 
     lazy var userScripts = [
         self.faviconScript,
         self.html5downloadScript,
         self.contextMenuScript,
         self.findInPageScript
+        self.contentBlockerScript,
+        self.contentBlockerRulesScript
     ]
 
     private func setupUserScripts() {
         faviconScript.delegate = self
         html5downloadScript.delegate = self
         contextMenuScript.delegate = self
+        contentBlockerScript.delegate = self
+        contentBlockerRulesScript.delegate = self
 
         userScripts.forEach {
             webView.configuration.userContentController.add(userScript: $0)
@@ -200,6 +206,21 @@ extension Tab: FaviconUserScriptDelegate {
 
             self.favicon = image
         }
+    }
+
+}
+
+extension Tab: ContentBlockerUserScriptDelegate {
+    func contentBlockerUserScriptShouldProcessTrackers(_ script: UserScript) -> Bool {
+        return true
+    }
+
+    func contentBlockerUserScript(_ script: ContentBlockerUserScript, detectedTracker tracker: DetectedTracker, withSurrogate host: String) {
+
+    }
+
+    func contentBlockerUserScript(_ script: UserScript, detectedTracker tracker: DetectedTracker) {
+        
     }
 
 }
@@ -331,7 +352,24 @@ fileprivate extension WKWebViewConfiguration {
         configuration.websiteDataStore = WKWebsiteDataStore.default()
         configuration.allowsAirPlayForMediaPlayback = true
         configuration.preferences.setValue(true, forKey: "fullScreenEnabled")
+        configuration.installContentBlockingRules()
         return configuration
+    }
+
+    private func installContentBlockingRules() {
+        func addRulesToController(rules: WKContentRuleList) {
+            self.userContentController.add(rules)
+        }
+
+        if let rulesList = ContentBlockerRulesManager.shared.blockingRules {
+            addRulesToController(rules: rulesList)
+        } else {
+            ContentBlockerRulesManager.shared.compileRules { rulesList in
+                if let rulesList = rulesList {
+                    addRulesToController(rules: rulesList)
+                }
+            }
+        }
     }
 
 }
