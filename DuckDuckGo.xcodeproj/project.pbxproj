@@ -17,7 +17,6 @@
 		14D9B90224F91316000D4D13 /* FocusRingView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 14D9B90124F91316000D4D13 /* FocusRingView.swift */; };
 		4B11060525903E570039B979 /* CoreDataEncryptionTesting.xcdatamodeld in Sources */ = {isa = PBXBuildFile; fileRef = 4B11060325903E570039B979 /* CoreDataEncryptionTesting.xcdatamodeld */; };
 		4B11060A25903EAC0039B979 /* CoreDataEncryptionTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B11060925903EAC0039B979 /* CoreDataEncryptionTests.swift */; };
-		4B6160BB25B10015007DE5B2 /* TrackerRadarKit in Frameworks */ = {isa = PBXBuildFile; productRef = 4B6160BA25B10015007DE5B2 /* TrackerRadarKit */; };
 		4B6160D325B14E6E007DE5B2 /* TrackerDataManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B6160D225B14E6E007DE5B2 /* TrackerDataManager.swift */; };
 		4B6160D825B150E4007DE5B2 /* trackerData.json in Resources */ = {isa = PBXBuildFile; fileRef = 4B6160D725B150E4007DE5B2 /* trackerData.json */; };
 		4B6160DD25B152C5007DE5B2 /* ContentBlockerRulesUserScript.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B6160DC25B152C5007DE5B2 /* ContentBlockerRulesUserScript.swift */; };
@@ -38,6 +37,7 @@
 		4B677442255DBEEA00025BD8 /* Database.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B677440255DBEEA00025BD8 /* Database.swift */; };
 		4B67744B255DBF3A00025BD8 /* BloomFilter.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4B677449255DBF3A00025BD8 /* BloomFilter.cpp */; };
 		4B677450255DBFA300025BD8 /* HashExtension.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B67744F255DBFA300025BD8 /* HashExtension.swift */; };
+		4B82E9B325B69E3E00656FE7 /* TrackerRadarKit in Frameworks */ = {isa = PBXBuildFile; productRef = 4B82E9B225B69E3E00656FE7 /* TrackerRadarKit */; };
 		4BA1A69B258B076900F6F690 /* FileStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4BA1A69A258B076900F6F690 /* FileStore.swift */; };
 		4BA1A6A0258B079600F6F690 /* DataEncryption.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4BA1A69F258B079600F6F690 /* DataEncryption.swift */; };
 		4BA1A6A5258B07DF00F6F690 /* EncryptedValueTransformer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4BA1A6A4258B07DF00F6F690 /* EncryptedValueTransformer.swift */; };
@@ -334,7 +334,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				85AE2FF224A33A2D002D507F /* WebKit.framework in Frameworks */,
-				4B6160BB25B10015007DE5B2 /* TrackerRadarKit in Frameworks */,
+				4B82E9B325B69E3E00656FE7 /* TrackerRadarKit in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -1061,7 +1061,7 @@
 			);
 			name = "DuckDuckGo Privacy Browser";
 			packageProductDependencies = (
-				4B6160BA25B10015007DE5B2 /* TrackerRadarKit */,
+				4B82E9B225B69E3E00656FE7 /* TrackerRadarKit */,
 			);
 			productName = DuckDuckGo;
 			productReference = AA585D7E248FD31100E9A3E2 /* DuckDuckGo Privacy Browser.app */;
@@ -1136,7 +1136,7 @@
 			);
 			mainGroup = AA585D75248FD31100E9A3E2;
 			packageReferences = (
-				4B6160B925B10015007DE5B2 /* XCRemoteSwiftPackageReference "TrackerRadarKit" */,
+				4B82E9B125B69E3E00656FE7 /* XCRemoteSwiftPackageReference "TrackerRadarKit" */,
 			);
 			productRefGroup = AA585D7F248FD31100E9A3E2 /* Products */;
 			projectDirPath = "";
@@ -1737,20 +1737,20 @@
 /* End XCConfigurationList section */
 
 /* Begin XCRemoteSwiftPackageReference section */
-		4B6160B925B10015007DE5B2 /* XCRemoteSwiftPackageReference "TrackerRadarKit" */ = {
+		4B82E9B125B69E3E00656FE7 /* XCRemoteSwiftPackageReference "TrackerRadarKit" */ = {
 			isa = XCRemoteSwiftPackageReference;
-			repositoryURL = "git@github.com:samsymons/TrackerRadarKit.git";
+			repositoryURL = "https://github.com/duckduckgo/TrackerRadarKit.git";
 			requirement = {
-				branch = main;
+				branch = "feature/sam/initial-implementation";
 				kind = branch;
 			};
 		};
 /* End XCRemoteSwiftPackageReference section */
 
 /* Begin XCSwiftPackageProductDependency section */
-		4B6160BA25B10015007DE5B2 /* TrackerRadarKit */ = {
+		4B82E9B225B69E3E00656FE7 /* TrackerRadarKit */ = {
 			isa = XCSwiftPackageProductDependency;
-			package = 4B6160B925B10015007DE5B2 /* XCRemoteSwiftPackageReference "TrackerRadarKit" */;
+			package = 4B82E9B125B69E3E00656FE7 /* XCRemoteSwiftPackageReference "TrackerRadarKit" */;
 			productName = TrackerRadarKit;
 		};
 /* End XCSwiftPackageProductDependency section */
