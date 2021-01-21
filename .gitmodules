@@ -1,3 +1,6 @@
 [submodule "Submodules/bloom_cpp"]
 	path = Submodules/bloom_cpp
 	url = git@github.com:duckduckgo/bloom_cpp.git
+[submodule "Submodules/ios_js_support"]
+	path = Submodules/ios_js_support
+	url = git@github.com:duckduckgo/ios-js-support.git

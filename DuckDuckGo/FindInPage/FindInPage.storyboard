@@ -1,0 +1,193 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<document type="com.apple.InterfaceBuilder3.Cocoa.Storyboard.XIB" version="3.0" toolsVersion="17701" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none" useAutolayout="YES" initialViewController="9LP-fh-BRf">
+    <dependencies>
+        <deployment identifier="macosx"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="17701"/>
+        <capability name="Named colors" minToolsVersion="9.0"/>
+        <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
+    </dependencies>
+    <scenes>
+        <!--Find In Page View Controller-->
+        <scene sceneID="M7q-cp-Vdi">
+            <objects>
+                <viewController id="9LP-fh-BRf" customClass="FindInPageViewController" customModule="DuckDuckGo_Privacy_Browser" customModuleProvider="target" sceneMemberID="viewController">
+                    <view key="view" id="lqG-TU-Rhn">
+                        <rect key="frame" x="0.0" y="0.0" width="400" height="40"/>
+                        <autoresizingMask key="autoresizingMask"/>
+                        <subviews>
+                            <button translatesAutoresizingMaskIntoConstraints="NO" id="Iy0-Pd-g9N" userLabel="Close Button" customClass="MouseOverButton" customModule="DuckDuckGo_Privacy_Browser" customModuleProvider="target">
+                                <rect key="frame" x="4" y="8" width="32" height="24"/>
+                                <constraints>
+                                    <constraint firstAttribute="width" constant="32" id="YEe-St-HMj"/>
+                                    <constraint firstAttribute="height" constant="24" id="k0z-Fd-kbt"/>
+                                </constraints>
+                                <buttonCell key="cell" type="square" bezelStyle="shadowlessSquare" image="Close-Large" imagePosition="only" alignment="center" imageScaling="proportionallyDown" inset="2" id="Gs5-tF-RjC">
+                                    <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
+                                    <font key="font" metaFont="system"/>
+                                </buttonCell>
+                                <color key="contentTintColor" name="ButtonColor"/>
+                                <userDefinedRuntimeAttributes>
+                                    <userDefinedRuntimeAttribute type="color" keyPath="mouseOverColor">
+                                        <color key="value" name="ButtonMouseOverColor"/>
+                                    </userDefinedRuntimeAttribute>
+                                    <userDefinedRuntimeAttribute type="number" keyPath="cornerRadius">
+                                        <real key="value" value="4"/>
+                                    </userDefinedRuntimeAttribute>
+                                    <userDefinedRuntimeAttribute type="color" keyPath="mouseDownColor">
+                                        <color key="value" name="ButtonMouseDownColor"/>
+                                    </userDefinedRuntimeAttribute>
+                                </userDefinedRuntimeAttributes>
+                                <connections>
+                                    <action selector="findInPageDone:" target="9LP-fh-BRf" id="oa9-ca-SvK"/>
+                                </connections>
+                            </button>
+                            <button tag="1" translatesAutoresizingMaskIntoConstraints="NO" id="hWE-T9-Lya" userLabel="Previous Button" customClass="MouseOverButton" customModule="DuckDuckGo_Privacy_Browser" customModuleProvider="target">
+                                <rect key="frame" x="328" y="8" width="32" height="24"/>
+                                <constraints>
+                                    <constraint firstAttribute="width" constant="32" id="6Ze-Oq-voa"/>
+                                    <constraint firstAttribute="height" constant="24" id="VBe-gx-zVv"/>
+                                </constraints>
+                                <buttonCell key="cell" type="square" bezelStyle="shadowlessSquare" image="Find-Previous" imagePosition="only" alignment="center" imageScaling="proportionallyDown" inset="2" id="AOy-SC-evd">
+                                    <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
+                                    <font key="font" metaFont="system"/>
+                                </buttonCell>
+                                <color key="contentTintColor" name="ButtonColor"/>
+                                <userDefinedRuntimeAttributes>
+                                    <userDefinedRuntimeAttribute type="color" keyPath="mouseOverColor">
+                                        <color key="value" name="ButtonMouseOverColor"/>
+                                    </userDefinedRuntimeAttribute>
+                                    <userDefinedRuntimeAttribute type="number" keyPath="cornerRadius">
+                                        <real key="value" value="4"/>
+                                    </userDefinedRuntimeAttribute>
+                                    <userDefinedRuntimeAttribute type="color" keyPath="mouseDownColor">
+                                        <color key="value" name="ButtonMouseDownColor"/>
+                                    </userDefinedRuntimeAttribute>
+                                </userDefinedRuntimeAttributes>
+                                <connections>
+                                    <action selector="findInPagePrevious:" target="9LP-fh-BRf" id="1Jw-xE-qrX"/>
+                                </connections>
+                            </button>
+                            <button tag="2" translatesAutoresizingMaskIntoConstraints="NO" id="jPH-qk-BNq" userLabel="Next Button" customClass="MouseOverButton" customModule="DuckDuckGo_Privacy_Browser" customModuleProvider="target">
+                                <rect key="frame" x="364" y="8" width="32" height="24"/>
+                                <constraints>
+                                    <constraint firstAttribute="height" constant="24" id="U1y-O1-eRL"/>
+                                    <constraint firstAttribute="width" constant="32" id="nmQ-ju-a8J"/>
+                                </constraints>
+                                <buttonCell key="cell" type="square" bezelStyle="shadowlessSquare" image="Find-Next" imagePosition="only" alignment="center" imageScaling="proportionallyDown" inset="2" id="Adc-BN-gUM">
+                                    <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
+                                    <font key="font" metaFont="system"/>
+                                </buttonCell>
+                                <color key="contentTintColor" name="ButtonColor"/>
+                                <userDefinedRuntimeAttributes>
+                                    <userDefinedRuntimeAttribute type="color" keyPath="mouseOverColor">
+                                        <color key="value" name="ButtonMouseOverColor"/>
+                                    </userDefinedRuntimeAttribute>
+                                    <userDefinedRuntimeAttribute type="number" keyPath="cornerRadius">
+                                        <real key="value" value="4"/>
+                                    </userDefinedRuntimeAttribute>
+                                    <userDefinedRuntimeAttribute type="color" keyPath="mouseDownColor">
+                                        <color key="value" name="ButtonMouseDownColor"/>
+                                    </userDefinedRuntimeAttribute>
+                                </userDefinedRuntimeAttributes>
+                                <connections>
+                                    <action selector="findInPageNext:" target="9LP-fh-BRf" id="oiA-qa-2Pz"/>
+                                </connections>
+                            </button>
+                            <customView translatesAutoresizingMaskIntoConstraints="NO" id="eF3-lr-LQv" customClass="FocusRingView" customModule="DuckDuckGo_Privacy_Browser" customModuleProvider="target">
+                                <rect key="frame" x="40" y="3" width="284" height="34"/>
+                                <subviews>
+                                    <textField focusRingType="none" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="oQw-Lh-sP0">
+                                        <rect key="frame" x="34" y="9" width="194" height="16"/>
+                                        <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" selectable="YES" editable="YES" sendsActionOnEndEditing="YES" focusRingType="none" placeholderString="Find in page" drawsBackground="YES" id="QFu-vZ-FS1">
+                                            <font key="font" metaFont="system"/>
+                                            <color key="textColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
+                                            <color key="backgroundColor" name="ClearColor"/>
+                                        </textFieldCell>
+                                    </textField>
+                                    <button translatesAutoresizingMaskIntoConstraints="NO" id="jgj-T1-zyO" userLabel="Search Image">
+                                        <rect key="frame" x="12" y="10" width="14" height="14"/>
+                                        <constraints>
+                                            <constraint firstAttribute="height" constant="14" id="KXB-7a-62O"/>
+                                            <constraint firstAttribute="width" constant="14" id="LpJ-Ae-T4i"/>
+                                        </constraints>
+                                        <buttonCell key="cell" type="square" bezelStyle="shadowlessSquare" image="Find-Search" imagePosition="only" alignment="center" imageScaling="proportionallyUpOrDown" inset="2" id="vwK-jg-8Gw">
+                                            <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
+                                            <font key="font" metaFont="system"/>
+                                        </buttonCell>
+                                    </button>
+                                    <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="gfp-ph-eKn" userLabel="Status Label">
+                                        <rect key="frame" x="234" y="9" width="40" height="16"/>
+                                        <textFieldCell key="cell" lineBreakMode="clipping" title="0 of 0" id="Pst-71-jYN">
+                                            <font key="font" metaFont="system"/>
+                                            <color key="textColor" name="labelColor" catalog="System" colorSpace="catalog"/>
+                                            <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
+                                        </textFieldCell>
+                                    </textField>
+                                </subviews>
+                                <constraints>
+                                    <constraint firstItem="oQw-Lh-sP0" firstAttribute="leading" secondItem="jgj-T1-zyO" secondAttribute="trailing" constant="8" symbolic="YES" id="0ec-dh-Z2r"/>
+                                    <constraint firstItem="jgj-T1-zyO" firstAttribute="centerY" secondItem="eF3-lr-LQv" secondAttribute="centerY" id="GkN-9R-dPw"/>
+                                    <constraint firstItem="oQw-Lh-sP0" firstAttribute="centerY" secondItem="eF3-lr-LQv" secondAttribute="centerY" id="T68-XF-xRy"/>
+                                    <constraint firstItem="gfp-ph-eKn" firstAttribute="leading" secondItem="oQw-Lh-sP0" secondAttribute="trailing" constant="8" symbolic="YES" id="Y7b-h4-qrz"/>
+                                    <constraint firstAttribute="height" constant="34" id="dOz-re-sAM"/>
+                                    <constraint firstItem="jgj-T1-zyO" firstAttribute="leading" secondItem="eF3-lr-LQv" secondAttribute="leading" constant="12" id="jtO-xw-N5s"/>
+                                    <constraint firstItem="gfp-ph-eKn" firstAttribute="centerY" secondItem="eF3-lr-LQv" secondAttribute="centerY" id="s01-G8-bAW"/>
+                                    <constraint firstAttribute="trailing" secondItem="gfp-ph-eKn" secondAttribute="trailing" constant="12" id="wZ1-A9-Ibi"/>
+                                </constraints>
+                            </customView>
+                        </subviews>
+                        <constraints>
+                            <constraint firstItem="eF3-lr-LQv" firstAttribute="centerY" secondItem="lqG-TU-Rhn" secondAttribute="centerY" id="7rc-1x-vhA"/>
+                            <constraint firstItem="jPH-qk-BNq" firstAttribute="centerY" secondItem="lqG-TU-Rhn" secondAttribute="centerY" id="Anc-dh-arV"/>
+                            <constraint firstItem="eF3-lr-LQv" firstAttribute="leading" secondItem="Iy0-Pd-g9N" secondAttribute="trailing" constant="4" id="LmF-F2-TEB"/>
+                            <constraint firstAttribute="trailing" secondItem="jPH-qk-BNq" secondAttribute="trailing" constant="4" id="aSX-th-b9h"/>
+                            <constraint firstItem="Iy0-Pd-g9N" firstAttribute="centerY" secondItem="lqG-TU-Rhn" secondAttribute="centerY" id="bK4-QJ-VvG"/>
+                            <constraint firstItem="hWE-T9-Lya" firstAttribute="leading" secondItem="eF3-lr-LQv" secondAttribute="trailing" constant="4" id="iwa-bu-Qzl"/>
+                            <constraint firstItem="hWE-T9-Lya" firstAttribute="centerY" secondItem="lqG-TU-Rhn" secondAttribute="centerY" id="mqd-0Y-PIs"/>
+                            <constraint firstItem="jPH-qk-BNq" firstAttribute="leading" secondItem="hWE-T9-Lya" secondAttribute="trailing" constant="4" id="pD7-4c-exi"/>
+                            <constraint firstItem="Iy0-Pd-g9N" firstAttribute="leading" secondItem="lqG-TU-Rhn" secondAttribute="leading" constant="4" id="vXf-5g-b8c"/>
+                        </constraints>
+                        <userDefinedRuntimeAttributes>
+                            <userDefinedRuntimeAttribute type="color" keyPath="backgroundColor">
+                                <color key="value" name="FindInPageBackgroundColor"/>
+                            </userDefinedRuntimeAttribute>
+                            <userDefinedRuntimeAttribute type="number" keyPath="cornerRadius">
+                                <integer key="value" value="10"/>
+                            </userDefinedRuntimeAttribute>
+                        </userDefinedRuntimeAttributes>
+                    </view>
+                    <connections>
+                        <outlet property="focusRingView" destination="eF3-lr-LQv" id="64I-mq-2Xf"/>
+                        <outlet property="nextButton" destination="jPH-qk-BNq" id="Ywa-3x-FBx"/>
+                        <outlet property="previousButton" destination="hWE-T9-Lya" id="mOj-iU-mGV"/>
+                        <outlet property="statusField" destination="gfp-ph-eKn" id="bPp-WQ-w62"/>
+                        <outlet property="textField" destination="oQw-Lh-sP0" id="woI-aY-Ilk"/>
+                    </connections>
+                </viewController>
+                <customObject id="IxF-RD-3w4" userLabel="First Responder" customClass="NSResponder" sceneMemberID="firstResponder"/>
+            </objects>
+            <point key="canvasLocation" x="-86" y="89"/>
+        </scene>
+    </scenes>
+    <resources>
+        <image name="Close-Large" width="16" height="16"/>
+        <image name="Find-Next" width="16" height="16"/>
+        <image name="Find-Previous" width="16" height="16"/>
+        <image name="Find-Search" width="16" height="16"/>
+        <namedColor name="ButtonColor">
+            <color red="0.28627450980392155" green="0.28627450980392155" blue="0.28627450980392155" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+        </namedColor>
+        <namedColor name="ButtonMouseDownColor">
+            <color red="0.0" green="0.0" blue="0.0" alpha="0.20000000298023224" colorSpace="custom" customColorSpace="sRGB"/>
+        </namedColor>
+        <namedColor name="ButtonMouseOverColor">
+            <color red="0.0" green="0.0" blue="0.0" alpha="0.10000000149011612" colorSpace="custom" customColorSpace="sRGB"/>
+        </namedColor>
+        <namedColor name="ClearColor">
+            <color red="1" green="1" blue="1" alpha="0.0" colorSpace="custom" customColorSpace="sRGB"/>
+        </namedColor>
+        <namedColor name="FindInPageBackgroundColor">
+            <color red="1" green="1" blue="1" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+        </namedColor>
+    </resources>
+</document>

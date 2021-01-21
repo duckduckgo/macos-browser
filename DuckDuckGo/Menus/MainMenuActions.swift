@@ -161,6 +161,20 @@ extension MainViewController {
         tabCollectionViewModel.append(tabs: otherTabs)
     }
 
+    // MARK: - Edit
+
+    @IBAction func findInPage(_ sender: Any?) {
+        tabCollectionViewModel.selectedTabViewModel?.startFindInPage()
+    }
+
+    /// Declines handling findInPage action if there's no page loaded currently.
+    override func responds(to aSelector: Selector!) -> Bool {
+        if aSelector == #selector(findInPage(_:)) && tabCollectionViewModel.selectedTabViewModel?.tab.url == nil {
+            return false
+        }
+        return super.responds(to: aSelector)
+    }
+
     // MARK: - Help
 
 #if FEEDBACK
@@ -172,5 +186,21 @@ extension MainViewController {
     }
 
 #endif
+
+}
+
+extension MainViewController: FindInPageDelegate {
+
+    func findInPageNext(_ controller: FindInPageViewController) {
+        self.tabCollectionViewModel.selectedTabViewModel?.findInPageNext()
+    }
+
+    func findInPagePrevious(_ controller: FindInPageViewController) {
+        self.tabCollectionViewModel.selectedTabViewModel?.findInPagePrevious()
+    }
+
+    func findInPageDone(_ controller: FindInPageViewController) {
+        self.tabCollectionViewModel.selectedTabViewModel?.closeFindInPage()
+    }
 
 }

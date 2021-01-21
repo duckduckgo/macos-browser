@@ -150,33 +150,23 @@
                                                 <items>
                                                     <menuItem title="Find…" tag="1" keyEquivalent="f" id="Xz5-n4-O0W">
                                                         <connections>
-                                                            <action selector="performFindPanelAction:" target="Ady-hI-5gd" id="cD7-Qs-BN4"/>
-                                                        </connections>
-                                                    </menuItem>
-                                                    <menuItem title="Find and Replace…" tag="12" keyEquivalent="f" id="YEy-JH-Tfz">
-                                                        <modifierMask key="keyEquivalentModifierMask" option="YES" command="YES"/>
-                                                        <connections>
-                                                            <action selector="performFindPanelAction:" target="Ady-hI-5gd" id="WD3-Gg-5AJ"/>
+                                                            <action selector="findInPage:" target="Ady-hI-5gd" id="XOi-sW-sOR"/>
                                                         </connections>
                                                     </menuItem>
                                                     <menuItem title="Find Next" tag="2" keyEquivalent="g" id="q09-fT-Sye">
                                                         <connections>
-                                                            <action selector="performFindPanelAction:" target="Ady-hI-5gd" id="NDo-RZ-v9R"/>
+                                                            <action selector="findInPageNext:" target="Ady-hI-5gd" id="fYZ-yR-xkS"/>
                                                         </connections>
                                                     </menuItem>
                                                     <menuItem title="Find Previous" tag="3" keyEquivalent="G" id="OwM-mh-QMV">
                                                         <connections>
-                                                            <action selector="performFindPanelAction:" target="Ady-hI-5gd" id="HOh-sY-3ay"/>
+                                                            <action selector="findInPagePrevious:" target="Ady-hI-5gd" id="Seu-2E-Cds"/>
                                                         </connections>
                                                     </menuItem>
-                                                    <menuItem title="Use Selection for Find" tag="7" keyEquivalent="e" id="buJ-ug-pKt">
+                                                    <menuItem isSeparatorItem="YES" id="L2T-zv-9Po"/>
+                                                    <menuItem title="Hide Find" keyEquivalent="F" id="NVw-yL-2Hn">
                                                         <connections>
-                                                            <action selector="performFindPanelAction:" target="Ady-hI-5gd" id="U76-nv-p5D"/>
-                                                        </connections>
-                                                    </menuItem>
-                                                    <menuItem title="Jump to Selection" keyEquivalent="j" id="S0p-oC-mLd">
-                                                        <connections>
-                                                            <action selector="centerSelectionInVisibleArea:" target="Ady-hI-5gd" id="IOG-6D-g5B"/>
+                                                            <action selector="findInPageDone:" target="Ady-hI-5gd" id="kZJ-vx-uyS"/>
                                                         </connections>
                                                     </menuItem>
                                                 </items>
@@ -520,7 +510,7 @@ CQ
                         <windowStyleMask key="styleMask" titled="YES" closable="YES" miniaturizable="YES" resizable="YES" fullSizeContentView="YES"/>
                         <windowPositionMask key="initialPositionMask" leftStrut="YES" rightStrut="YES" topStrut="YES" bottomStrut="YES"/>
                         <rect key="contentRect" x="196" y="239" width="1024" height="790"/>
-                        <rect key="screenRect" x="0.0" y="0.0" width="1536" height="937"/>
+                        <rect key="screenRect" x="0.0" y="0.0" width="2560" height="1415"/>
                         <connections>
                             <outlet property="delegate" destination="B8D-0N-5wS" id="98r-iN-zZc"/>
                         </connections>
@@ -576,6 +566,16 @@ CQ
                                     <segue destination="wo6-dV-Q3Q" kind="embed" destinationCreationSelector="createWebViewControllerWithCoder:sender:segueIdentifier:" id="A2b-sp-a54"/>
                                 </connections>
                             </containerView>
+                            <containerView hidden="YES" translatesAutoresizingMaskIntoConstraints="NO" id="Jbn-9T-FNt" userLabel="Find in Page Container View">
+                                <rect key="frame" x="312" y="675" width="400" height="40"/>
+                                <constraints>
+                                    <constraint firstAttribute="height" constant="40" id="Hzq-Qn-wpU"/>
+                                    <constraint firstAttribute="width" constant="400" id="Ndt-bt-exS"/>
+                                </constraints>
+                                <connections>
+                                    <segue destination="0cy-cn-sdp" kind="embed" destinationCreationSelector="createFindInPageViewControllerWithCoder:sender:segueIdentifier:" id="DxV-ID-C83"/>
+                                </connections>
+                            </containerView>
                         </subviews>
                         <constraints>
                             <constraint firstAttribute="trailing" secondItem="wFH-xq-50o" secondAttribute="trailing" id="4Cb-FA-sMo"/>
@@ -583,6 +583,7 @@ CQ
                             <constraint firstItem="wFH-xq-50o" firstAttribute="top" secondItem="lYg-bX-QrJ" secondAttribute="bottom" id="EnL-Zp-RcI"/>
                             <constraint firstAttribute="trailing" secondItem="lYg-bX-QrJ" secondAttribute="trailing" id="HkZ-fV-qYb"/>
                             <constraint firstItem="lYg-bX-QrJ" firstAttribute="top" secondItem="m2S-Jp-Qdl" secondAttribute="top" id="PNG-fr-pcs"/>
+                            <constraint firstItem="Jbn-9T-FNt" firstAttribute="centerX" secondItem="wFH-xq-50o" secondAttribute="centerX" id="PQa-4m-EpD"/>
                             <constraint firstItem="SYo-8W-jl3" firstAttribute="top" secondItem="wFH-xq-50o" secondAttribute="bottom" id="SOg-lH-g5P"/>
                             <constraint firstItem="wFH-xq-50o" firstAttribute="leading" secondItem="m2S-Jp-Qdl" secondAttribute="leading" id="XQv-BZ-2ci"/>
                             <constraint firstItem="SYo-8W-jl3" firstAttribute="top" secondItem="af1-Eb-VaG" secondAttribute="bottom" id="ZLC-J7-HaR"/>
@@ -590,10 +591,12 @@ CQ
                             <constraint firstItem="af1-Eb-VaG" firstAttribute="leading" secondItem="m2S-Jp-Qdl" secondAttribute="leading" id="oLA-yb-nB8"/>
                             <constraint firstAttribute="bottom" secondItem="SYo-8W-jl3" secondAttribute="bottom" id="tLa-XX-e8i"/>
                             <constraint firstItem="SYo-8W-jl3" firstAttribute="leading" secondItem="m2S-Jp-Qdl" secondAttribute="leading" id="woj-yk-97j"/>
+                            <constraint firstItem="Jbn-9T-FNt" firstAttribute="top" secondItem="wFH-xq-50o" secondAttribute="bottom" constant="-4" id="xdc-Pw-CDZ"/>
                             <constraint firstAttribute="trailing" secondItem="af1-Eb-VaG" secondAttribute="trailing" id="y1o-Rd-sxm"/>
                         </constraints>
                     </view>
                     <connections>
+                        <outlet property="findInPageContainerView" destination="Jbn-9T-FNt" id="5Sl-UV-Fa9"/>
                         <outlet property="navigationBarContainerView" destination="wFH-xq-50o" id="hbq-xV-McI"/>
                         <outlet property="tabBarContainerView" destination="lYg-bX-QrJ" id="nor-E0-cFP"/>
                         <outlet property="webContainerView" destination="SYo-8W-jl3" id="DoZ-Ih-dHA"/>
@@ -609,7 +612,7 @@ CQ
                 <controllerPlaceholder storyboardName="TabBar" id="Nfk-V8-FAE" sceneMemberID="viewController"/>
                 <customObject id="NXm-I5-OhA" userLabel="First Responder" customClass="NSResponder" sceneMemberID="firstResponder"/>
             </objects>
-            <point key="canvasLocation" x="848" y="1012"/>
+            <point key="canvasLocation" x="849" y="1066"/>
         </scene>
         <!--NavigationBar-->
         <scene sceneID="Sc0-ir-Na8">
@@ -619,13 +622,21 @@ CQ
             </objects>
             <point key="canvasLocation" x="869" y="1112"/>
         </scene>
+        <!--FindInPage-->
+        <scene sceneID="PQx-g7-OSP">
+            <objects>
+                <controllerPlaceholder storyboardName="FindInPage" id="0cy-cn-sdp" sceneMemberID="viewController"/>
+                <customObject id="AN6-a3-PL9" userLabel="First Responder" customClass="NSResponder" sceneMemberID="firstResponder"/>
+            </objects>
+            <point key="canvasLocation" x="860" y="1170"/>
+        </scene>
         <!--BrowserTab-->
         <scene sceneID="O3n-py-FOu">
             <objects>
                 <controllerPlaceholder storyboardName="BrowserTab" id="wo6-dV-Q3Q" sceneMemberID="viewController"/>
                 <customObject id="ECq-3v-dmj" userLabel="First Responder" customClass="NSResponder" sceneMemberID="firstResponder"/>
             </objects>
-            <point key="canvasLocation" x="862" y="1228"/>
+            <point key="canvasLocation" x="860" y="1224"/>
         </scene>
     </scenes>
     <resources>

@@ -19,6 +19,7 @@
 import Cocoa
 import WebKit
 import os
+import Combine
 
 protocol TabDelegate: class {
 
@@ -61,6 +62,13 @@ class Tab: NSObject {
 
     @Published var title: String?
     @Published var error: Error?
+
+    weak var findInPage: FindInPageModel? {
+        didSet {
+            findInPageScript.model = findInPage
+            subscribeToFindInPageTextChange()
+        }
+    }
 
     // Used to track if an error was caused by a download navigation.
     private var currentDownload: FileDownload?
@@ -129,11 +137,13 @@ class Tab: NSObject {
     let faviconScript = FaviconUserScript()
     let html5downloadScript = HTML5DownloadUserScript()
     let contextMenuScript = ContextMenuUserScript()
+    let findInPageScript = FindInPageUserScript()
 
     lazy var userScripts = [
         self.faviconScript,
         self.html5downloadScript,
-        self.contextMenuScript
+        self.contextMenuScript,
+        self.findInPageScript
     ]
 
     private func setupUserScripts() {
@@ -143,6 +153,16 @@ class Tab: NSObject {
 
         userScripts.forEach {
             webView.configuration.userContentController.add(userScript: $0)
+        }
+    }
+
+    var findInPageCancellable: AnyCancellable?
+    private func subscribeToFindInPageTextChange() {
+        findInPageCancellable?.cancel()
+        if let findInPage = findInPage {
+            findInPageCancellable = findInPage.$text.receive(on: DispatchQueue.main).sink { text in
+                self.find(text: text)
+            }
         }
     }
 
@@ -280,6 +300,26 @@ extension Tab: WKNavigationDelegate {
         }
 
         self.error = error
+    }
+
+}
+
+extension Tab {
+
+    private func find(text: String) {
+        findInPageScript.find(text: text, inWebView: webView)
+    }
+
+    func findDone() {
+        findInPageScript.done(withWebView: webView)
+    }
+
+    func findNext() {
+        findInPageScript.next(withWebView: webView)
+    }
+
+    func findPrevious() {
+        findInPageScript.previous(withWebView: webView)
     }
 
 }

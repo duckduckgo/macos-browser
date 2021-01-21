@@ -48,6 +48,7 @@ class TabViewModel {
     @Published private(set) var passiveAddressBarString: String = ""
     @Published private(set) var title: String = UserText.tabHomeTitle
     @Published private(set) var favicon: NSImage = Favicon.home
+    @Published private(set) var findInPage: FindInPageModel = FindInPageModel()
 
     init(tab: Tab) {
         self.tab = tab
@@ -146,6 +147,29 @@ class TabViewModel {
         } else {
             favicon = Favicon.defaultFavicon
         }
+    }
+
+}
+
+extension TabViewModel {
+
+    func startFindInPage() {
+        tab.findInPage = findInPage
+        findInPage.show()
+    }
+
+    func closeFindInPage() {
+        guard findInPage.visible else { return }
+        tab.findDone()
+        findInPage.hide()
+    }
+
+    func findInPageNext() {
+        tab.findNext()
+    }
+
+    func findInPagePrevious() {
+        tab.findPrevious()
     }
 
 }

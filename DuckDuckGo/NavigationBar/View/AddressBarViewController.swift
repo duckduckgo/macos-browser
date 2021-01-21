@@ -70,6 +70,7 @@ class AddressBarViewController: NSViewController {
         addressBarTextField.suggestionsViewModel = suggestionsViewModel
         subscribeToSelectedTabViewModel()
         subscribeToAddressBarTextFieldValue()
+        registerForMouseEnteredAndExitedEvents()
     }
 
     override func viewWillAppear() {
@@ -104,8 +105,8 @@ class AddressBarViewController: NSViewController {
         }
     }
 
-    private var addressBarView: AddressBarView? {
-        return view as? AddressBarView
+    private var focusRingView: FocusRingView? {
+        return view as? FocusRingView
     }
 
     private func subscribeToSelectedTabViewModel() {
@@ -146,7 +147,7 @@ class AddressBarViewController: NSViewController {
         addressBarTextField.alphaValue = firstResponder ? 1 : 0
         passiveTextField.alphaValue = firstResponder ? 0 : 1
 
-        addressBarView?.updateView(stroke: firstResponder)
+        focusRingView?.updateView(stroke: firstResponder)
     }
 
     private func updateButtons() {
@@ -219,4 +220,30 @@ extension AddressBarViewController {
         updateButtons()
     }
     
+}
+
+// MARK: - Mouse states
+
+extension AddressBarViewController {
+
+    func registerForMouseEnteredAndExitedEvents() {
+        let trackingArea = NSTrackingArea(rect: self.view.bounds, options: [.activeAlways, .mouseEnteredAndExited], owner: self, userInfo: nil)
+        self.view.addTrackingArea(trackingArea)
+    }
+
+    override func mouseEntered(with event: NSEvent) {
+        NSCursor.iBeam.set()
+        super.mouseEntered(with: event)
+    }
+
+    override func mouseExited(with event: NSEvent) {
+        NSCursor.arrow.set()
+        super.mouseExited(with: event)
+    }
+
+    override func mouseDown(with event: NSEvent) {
+        super.mouseDown(with: event)
+        addressBarTextField.makeMeFirstResponder()
+    }
+
 }

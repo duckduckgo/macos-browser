@@ -17,6 +17,7 @@
 //
 
 import Cocoa
+import Carbon.HIToolbox
 import Combine
 import os.log
 
@@ -25,10 +26,12 @@ class MainViewController: NSViewController {
     @IBOutlet weak var tabBarContainerView: NSView!
     @IBOutlet weak var navigationBarContainerView: NSView!
     @IBOutlet weak var webContainerView: NSView!
+    @IBOutlet weak var findInPageContainerView: NSView!
 
     private(set) var tabBarViewController: TabBarViewController?
     private(set) var navigationBarViewController: NavigationBarViewController?
     private(set) var browserTabViewController: BrowserTabViewController?
+    private(set) var findInPageViewController: FindInPageViewController?
 
     var tabCollectionViewModel = TabCollectionViewModel()
 
@@ -36,12 +39,15 @@ class MainViewController: NSViewController {
     private var canGoForwardCancellable: AnyCancellable?
     private var canGoBackCancellable: AnyCancellable?
     private var canInsertLastRemovedTabCancellable: AnyCancellable?
+    private var findInPageCancellable: AnyCancellable?
 
     override func viewDidLoad() {
         super.viewDidLoad()
 
+        listenToKeyDownEvents()
         subscribeToSelectedTabViewModel()
         subscribeToCanInsertLastRemovedTab()
+        findInPageContainerView.applyDropShadow()
     }
 
     func windowDidBecomeMain() {
@@ -88,9 +94,25 @@ class MainViewController: NSViewController {
         return browserTabViewController
     }
 
+    @IBSegueAction
+    func createFindInPageViewController(coder: NSCoder, sender: Any?, segueIdentifier: String?) -> FindInPageViewController? {
+        self.findInPageViewController = FindInPageViewController(coder: coder)
+        findInPageViewController?.delegate = self
+        return findInPageViewController
+    }
+
     private func subscribeToSelectedTabViewModel() {
         selectedTabViewModelCancellable = tabCollectionViewModel.$selectedTabViewModel.receive(on: DispatchQueue.main).sink { [weak self] _ in
             self?.subscribeToCanGoBackForward()
+            self?.subscribeToFindInPage()
+        }
+    }
+
+    private func subscribeToFindInPage() {
+        findInPageCancellable?.cancel()
+        let model = tabCollectionViewModel.selectedTabViewModel?.findInPage
+        findInPageCancellable = model?.$visible.receive(on: DispatchQueue.main).sink { [weak self] _ in
+            self?.updateFindInPage()
         }
     }
 
@@ -110,6 +132,25 @@ class MainViewController: NSViewController {
         canInsertLastRemovedTabCancellable = tabCollectionViewModel.$canInsertLastRemovedTab.receive(on: DispatchQueue.main).sink { [weak self] _ in
             self?.updateReopenLastClosedTabMenuItem()
         }
+    }
+
+    private func updateFindInPage() {
+
+        guard let model = tabCollectionViewModel.selectedTabViewModel?.findInPage else {
+            findInPageViewController?.makeMeFirstResponder()
+            os_log("MainViewController: Failed to get find in page model", type: .error)
+            return
+        }
+
+        findInPageContainerView.isHidden = !model.visible
+        findInPageViewController?.model = model
+        if model.visible {
+            findInPageViewController?.makeMeFirstResponder()
+        } else if !(tabCollectionViewModel.selectedTabViewModel?.addressBarString.isEmpty ?? false) {
+            // If there's an address bar string, this isn't a new tab, so make the webview the first responder
+            tabCollectionViewModel.selectedTabViewModel?.tab.webView.makeMeFirstResponder()
+        }
+        
     }
 
     private func updateBackMenuItem() {
@@ -145,6 +186,32 @@ class MainViewController: NSViewController {
         }
 
         reopenLastClosedTabMenuItem.isEnabled = tabCollectionViewModel.canInsertLastRemovedTab
+    }
+
+}
+
+// MARK: - Escape key
+
+// This needs to be handled here or else there will be a "beep" even if handled in a different view controller. This now
+//  matches Safari behaviour.
+extension MainViewController {
+
+    func listenToKeyDownEvents() {
+        NSEvent.addLocalMonitorForEvents(matching: .keyDown) { event in
+            return self.customKeyDown(with: event) ? nil : event
+        }
+    }
+
+    func customKeyDown(with event: NSEvent) -> Bool {
+       guard let locWindow = self.view.window,
+          NSApplication.shared.keyWindow === locWindow else { return false }
+
+        if Int(event.keyCode) == kVK_Escape {
+            findInPageViewController?.findInPageDone(self)
+            return true
+        }
+
+        return false
     }
 
 }

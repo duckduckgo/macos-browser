@@ -1,5 +1,5 @@
 //
-//  AddressBarView.swift
+//  FocusRingView.swift
 //
 //  Copyright © 2020 DuckDuckGo. All rights reserved.
 //
@@ -18,7 +18,7 @@
 
 import Cocoa
 
-class AddressBarView: NSView {
+class FocusRingView: NSView {
 
     enum Size: CGFloat {
         case shadow = 2.5
@@ -26,9 +26,14 @@ class AddressBarView: NSView {
         case backgroundRadius = 8
     }
 
+    var strokedBackgroundColor = NSColor.textBackgroundColor
+    var unstrokedBackgroundColor = NSColor(named: "AddressBarBackgroundColor")!
+
     private let shadowLayer = CALayer()
     private let strokeLayer = CALayer()
     private let backgroundLayer = CALayer()
+
+    private var stroke = false
 
     override func awakeFromNib() {
         super.awakeFromNib()
@@ -46,27 +51,17 @@ class AddressBarView: NSView {
     }
 
     func updateView(stroke: Bool) {
-        CATransaction.begin()
-        CATransaction.setAnimationDuration(0)
-
-        shadowLayer.opacity = stroke ? 0.4 : 0
-        strokeLayer.opacity = stroke ? 1.0 : 0
-        backgroundLayer.backgroundColor = stroke ?
-                NSColor.textBackgroundColor.cgColor : NSColor(named: "AddressBarBackgroundColor")?.cgColor
-        
-        CATransaction.commit()
+        self.stroke = stroke
+        self.needsLayout = true
     }
 
     private func addSublayers() {
-        shadowLayer.backgroundColor = NSColor(named: "AddressBarAccentColor")?.cgColor
         shadowLayer.opacity = 0
         layer?.addSublayer(shadowLayer)
 
-        strokeLayer.backgroundColor = NSColor(named: "AddressBarAccentColor")?.cgColor
         strokeLayer.opacity = 0
         layer?.addSublayer(strokeLayer)
 
-        backgroundLayer.backgroundColor = NSColor(named: "AddressBarBackgroundColor")?.cgColor
         layer?.addSublayer(backgroundLayer)
     }
 
@@ -77,6 +72,16 @@ class AddressBarView: NSView {
 
         CATransaction.begin()
         CATransaction.setAnimationDuration(0)
+
+        shadowLayer.opacity = stroke ? 0.4 : 0
+        strokeLayer.opacity = stroke ? 1.0 : 0
+
+        backgroundLayer.backgroundColor = stroke ?
+            strokedBackgroundColor.cgColor : unstrokedBackgroundColor.cgColor
+
+        shadowLayer.backgroundColor = NSColor.controlAccentColor.cgColor
+        strokeLayer.backgroundColor = NSColor.controlAccentColor.cgColor
+
         shadowLayer.frame = layer.bounds
         shadowLayer.cornerRadius = Size.backgroundRadius.rawValue + Size.shadow.rawValue + Size.stroke.rawValue
         strokeLayer.frame = NSRect(x: layer.bounds.origin.x + Size.shadow.rawValue,
@@ -89,6 +94,7 @@ class AddressBarView: NSView {
                                        width: layer.bounds.size.width - 2 * (Size.shadow.rawValue + Size.stroke.rawValue),
                                        height: layer.bounds.size.height - 2 * (Size.shadow.rawValue + Size.stroke.rawValue))
         backgroundLayer.cornerRadius = Size.backgroundRadius.rawValue
+
         CATransaction.commit()
     }
     
