@@ -135,18 +135,23 @@ class MainViewController: NSViewController {
     }
 
     private func updateFindInPage() {
+        print("***", #function)
+
         guard let model = tabCollectionViewModel.selectedTabViewModel?.findInPage else {
             findInPageViewController?.makeMeFirstResponder()
             os_log("MainViewController: Failed to get find in page model", type: .error)
             return
         }
+
         findInPageContainerView.isHidden = !model.visible
         findInPageViewController?.model = model
-        if !model.visible {
-            self.view.makeMeFirstResponder()
-        } else {
+        if model.visible {
             findInPageViewController?.makeMeFirstResponder()
+        } else if !(tabCollectionViewModel.selectedTabViewModel?.addressBarString.isEmpty ?? false) {
+            // If there's an address bar string, this isn't a new tab, so make the webview the first responder
+            tabCollectionViewModel.selectedTabViewModel?.tab.webView.makeMeFirstResponder()
         }
+        
     }
 
     private func updateBackMenuItem() {
