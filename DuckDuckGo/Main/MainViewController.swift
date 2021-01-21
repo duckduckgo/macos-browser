@@ -135,7 +135,6 @@ class MainViewController: NSViewController {
     }
 
     private func updateFindInPage() {
-        print("***", #function)
 
         guard let model = tabCollectionViewModel.selectedTabViewModel?.findInPage else {
             findInPageViewController?.makeMeFirstResponder()
