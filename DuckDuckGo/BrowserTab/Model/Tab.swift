@@ -149,7 +149,7 @@ class Tab: NSObject {
         self.faviconScript,
         self.html5downloadScript,
         self.contextMenuScript,
-        self.findInPageScript
+        self.findInPageScript,
         self.contentBlockerScript,
         self.contentBlockerRulesScript
     ]

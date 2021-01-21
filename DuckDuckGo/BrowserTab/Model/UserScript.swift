@@ -58,22 +58,3 @@ extension UserScript: WKScriptMessageHandler {
     }
 
 }
-
-extension UserScript {
-
-    static func loadJS(_ jsFile: String, withReplacements replacements: [String: String] = [:]) -> String {
-
-        let path = Bundle.main.path(forResource: jsFile, ofType: "js")!
-
-        guard var js = try? String(contentsOfFile: path) else {
-            fatalError("Failed to load JavaScript \(jsFile) from \(path)")
-        }
-
-        for (key, value) in replacements {
-            js = js.replacingOccurrences(of: key, with: value, options: .literal)
-        }
-
-        return js
-    }
-
-}
