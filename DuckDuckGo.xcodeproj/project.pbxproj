@@ -578,7 +578,6 @@
 		AA585D80248FD31100E9A3E2 /* DuckDuckGo */ = {
 			isa = PBXGroup;
 			children = (
-				4B6160D125B14E5E007DE5B2 /* ContentBlocker */,
 				AA4D700525545EDE00C3411E /* AppDelegate */,
 				AA585D85248FD31400E9A3E2 /* Assets.xcassets */,
 				AA86491B24D837DE001BABEE /* BrowserTab */,
@@ -591,6 +590,7 @@
 				AA86491524D83384001BABEE /* NavigationBar */,
 				4B677422255DBEB800025BD8 /* Smarter Encryption */,
 				4B677447255DBF1400025BD8 /* Submodules */,
+				4B6160D125B14E5E007DE5B2 /* ContentBlocker */,
 				AACB8E7224A4C8BC005F2218 /* Suggestions */,
 				AA86491124D8318F001BABEE /* TabBar */,
 				AAE8B0FD258A416F00E81239 /* Tooltip */,
