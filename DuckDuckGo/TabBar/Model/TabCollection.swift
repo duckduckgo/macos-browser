@@ -20,7 +20,6 @@ import Foundation
 import os.log
 
 final class TabCollection: NSObject, NSSecureCoding {
-
     @Published private(set) var tabs: [Tab]
     @Published private(set) var lastRemovedTabCache: (url: URL?, index: Int)?
 
@@ -58,8 +57,7 @@ final class TabCollection: NSObject, NSSecureCoding {
     }
 
     func removeAllAndAppend(tab: Tab) {
-        tabs.removeAll()
-        tabs.insert(tab, at: 0)
+        tabs = [tab]
     }
 
     func moveTab(at index: Int, to newIndex: Int) {

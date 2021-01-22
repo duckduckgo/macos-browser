@@ -383,8 +383,6 @@ extension TabBarViewController: TabCollectionViewModelDelegate {
     }
 
     func tabCollectionViewModelDidMultipleChanges(_ tabCollectionViewModel: TabCollectionViewModel) {
-        // don't close window here as we're either already closing the window or having at least one tab
-
         collectionView.reloadData()
         reloadSelection()
 

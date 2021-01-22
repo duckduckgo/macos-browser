@@ -18,16 +18,43 @@
 
 import Cocoa
 import os.log
+import Combine
 
 final class WindowControllersManager {
 
-    static let shared = WindowControllersManager()
+    static var shared = WindowControllersManager()
 
     private(set) var mainWindowControllers = [MainWindowController]()
-    weak var lastKeyMainWindowController: MainWindowController?
+    weak var lastKeyMainWindowController: MainWindowController? {
+        didSet {
+            stateChangedSubject.send( () )
+        }
+    }
 
+    var lastKeyWindowControllerIndex: Int? {
+        lastKeyMainWindowController.flatMap { mainWindowControllers.firstIndex(of: $0) }
+    }
+
+    private let stateChangedSubject = PassthroughSubject<Void, Never>()
+    var stateChanged: AnyPublisher<Void, Never> { stateChangedSubject.eraseToAnyPublisher() }
+
+    var observers = [[Any]]()
     func register(_ windowController: MainWindowController) {
         mainWindowControllers.append(windowController)
+
+        addWindowObserversAndNotifyStateChange(for: windowController)
+    }
+
+    private func addWindowObserversAndNotifyStateChange(for windowController: MainWindowController) {
+        let frameObserver = windowController.window!.observe(\.frame) { [stateChangedSubject] _, _ in
+            stateChangedSubject.send( () )
+        }
+        let stateCancellable = windowController.tabCollectionViewModel.stateChanged.sink { [stateChangedSubject] _ in
+            stateChangedSubject.send( () )
+        }
+        self.observers.append([frameObserver, stateCancellable])
+
+        stateChangedSubject.send( () )
     }
 
     func unregister(_ windowController: MainWindowController) {
@@ -35,7 +62,10 @@ final class WindowControllersManager {
             os_log("WindowControllersManager: Window Controller not registered", type: .error)
             return
         }
+        observers.remove(at: idx)
         mainWindowControllers.remove(at: idx)
+
+        stateChangedSubject.send( () )
     }
 
 }

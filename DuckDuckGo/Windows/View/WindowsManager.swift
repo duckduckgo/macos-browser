@@ -24,7 +24,7 @@ extension NSStoryboard {
 }
 
 final class WindowsManager {
-    static public let shared = WindowsManager()
+    static public var shared = WindowsManager()
 
     var windows: [NSWindow] {
         return NSApplication.shared.windows

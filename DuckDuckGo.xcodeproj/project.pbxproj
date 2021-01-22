@@ -163,6 +163,7 @@
 		B6A5A28825B9629200AA7ADA /* UserDefaultsExtension.swift in Sources */ = {isa = PBXBuildFile; fileRef = B6A5A28725B9629200AA7ADA /* UserDefaultsExtension.swift */; };
 		B6A5A28E25B962D200AA7ADA /* AppUserDefaultsTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = B6A5A28D25B962D200AA7ADA /* AppUserDefaultsTests.swift */; };
 		B6A5A29625B964D000AA7ADA /* SystemPreferences.swift in Sources */ = {isa = PBXBuildFile; fileRef = B6A5A29525B964D000AA7ADA /* SystemPreferences.swift */; };
+		B6A5A2A025B96E8300AA7ADA /* AppStateChangePublisherTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = B6A5A29F25B96E8300AA7ADA /* AppStateChangePublisherTests.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -348,6 +349,7 @@
 		B6A5A28725B9629200AA7ADA /* UserDefaultsExtension.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = UserDefaultsExtension.swift; sourceTree = "<group>"; };
 		B6A5A28D25B962D200AA7ADA /* AppUserDefaultsTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AppUserDefaultsTests.swift; sourceTree = "<group>"; };
 		B6A5A29525B964D000AA7ADA /* SystemPreferences.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SystemPreferences.swift; sourceTree = "<group>"; };
+		B6A5A29F25B96E8300AA7ADA /* AppStateChangePublisherTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppStateChangePublisherTests.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -1096,6 +1098,7 @@
 			isa = PBXGroup;
 			children = (
 				B6A5A28D25B962D200AA7ADA /* AppUserDefaultsTests.swift */,
+				B6A5A29F25B96E8300AA7ADA /* AppStateChangePublisherTests.swift */,
 			);
 			path = App;
 			sourceTree = "<group>";
@@ -1401,6 +1404,7 @@
 				4B11060525903E570039B979 /* CoreDataEncryptionTesting.xcdatamodeld in Sources */,
 				8546DE6225C03056000CA5E1 /* UserAgentTests.swift in Sources */,
 				4B82E9C125B6A1CD00656FE7 /* TrackerDataManagerTests.swift in Sources */,
+				B6A5A2A025B96E8300AA7ADA /* AppStateChangePublisherTests.swift in Sources */,
 				AA63745224C9BBE100AB2AC4 /* SuggestionsAPIMock.swift in Sources */,
 				142879DC24CE1185005419BB /* SuggestionsViewModelTests.swift in Sources */,
 				AAE39D1B24F44885008EF28B /* TabCollectionViewModelDelegateMock.swift in Sources */,

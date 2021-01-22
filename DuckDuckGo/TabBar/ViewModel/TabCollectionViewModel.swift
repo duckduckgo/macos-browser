@@ -37,7 +37,7 @@ final class TabCollectionViewModel: NSObject, NSSecureCoding {
 
     weak var delegate: TabCollectionViewModelDelegate?
 
-    private(set) var tabCollection: TabCollection
+    let tabCollection: TabCollection
     
     private var tabViewModels = [Tab: TabViewModel]()
     @Published private(set) var selectionIndex: Int? {
@@ -47,8 +47,11 @@ final class TabCollectionViewModel: NSObject, NSSecureCoding {
     }
     @Published private(set) var selectedTabViewModel: TabViewModel?
     @Published private(set) var canInsertLastRemovedTab: Bool = false
+    private let stateChangedSubject = PassthroughSubject<Void, Never>()
+    public var stateChanged: AnyPublisher<Void, Never> { stateChangedSubject.eraseToAnyPublisher() }
 
     private var cancellables = Set<AnyCancellable>()
+    private var tabStateChangedCancellables = [Tab: Cancellable]()
 
     init(tabCollection: TabCollection? = nil, selectionIndex: Int? = nil) {
         self.tabCollection = tabCollection ?? TabCollection()
@@ -78,7 +81,13 @@ final class TabCollectionViewModel: NSObject, NSSecureCoding {
         return tabViewModels[tab]
     }
 
-    @discardableResult func select(at index: Int) -> Bool {
+    @discardableResult
+    func select(at index: Int) -> Bool {
+        select(at: index, notify: true)
+    }
+
+    @discardableResult 
+    private func select(at index: Int, notify: Bool) -> Bool {
         guard index >= 0, index < tabCollection.tabs.count else {
             os_log("TabCollectionViewModel: Index out of bounds", type: .error)
             selectionIndex = nil
@@ -86,6 +95,11 @@ final class TabCollectionViewModel: NSObject, NSSecureCoding {
         }
 
         selectionIndex = index
+
+        if notify {
+            stateChangedSubject.send( () )
+        }
+
         return true
     }
 
@@ -97,10 +111,10 @@ final class TabCollectionViewModel: NSObject, NSSecureCoding {
 
         if let selectionIndex = selectionIndex {
             let newSelectionIndex = (selectionIndex + 1) % tabCollection.tabs.count
-            select(at: newSelectionIndex)
+            select(at: newSelectionIndex, notify: true)
             delegate?.tabCollectionViewModel(self, didSelectAt: newSelectionIndex)
         } else {
-            select(at: 0)
+            select(at: 0, notify: true)
             delegate?.tabCollectionViewModel(self, didSelectAt: 0)
         }
     }
@@ -113,17 +127,19 @@ final class TabCollectionViewModel: NSObject, NSSecureCoding {
 
         if let selectionIndex = selectionIndex {
             let newSelectionIndex = selectionIndex - 1 >= 0 ? selectionIndex - 1 : tabCollection.tabs.count - 1
-            select(at: newSelectionIndex)
+            select(at: newSelectionIndex, notify: true)
             delegate?.tabCollectionViewModel(self, didSelectAt: newSelectionIndex)
         } else {
-            select(at: tabCollection.tabs.count - 1)
+            select(at: tabCollection.tabs.count - 1, notify: true)
             delegate?.tabCollectionViewModel(self, didSelectAt: tabCollection.tabs.count - 1)
         }
     }
 
-    func appendNewTab() {
+    func appendNewTab(inBackground: Bool = false) {
         tabCollection.append(tab: Tab())
-        select(at: tabCollection.tabs.count - 1)
+        if !inBackground {
+            select(at: tabCollection.tabs.count - 1, notify: false)
+        }
 
         delegate?.tabCollectionViewModelDidAppend(self, selected: true)
     }
@@ -142,7 +158,7 @@ final class TabCollectionViewModel: NSObject, NSSecureCoding {
 
         let newIndex = selectionIndex + 1
         tabCollection.insert(tab: tab, at: newIndex)
-        select(at: newIndex)
+        select(at: newIndex, notify: false)
 
         delegate?.tabCollectionViewModel(self, didInsertAndSelectAt: newIndex)
     }
@@ -155,10 +171,10 @@ final class TabCollectionViewModel: NSObject, NSSecureCoding {
 
         tabCollection.append(tab: tab)
         if selected {
-            select(at: tabCollection.tabs.count - 1)
+            select(at: tabCollection.tabs.count - 1, notify: false)
             delegate?.tabCollectionViewModelDidAppend(self, selected: true)
         } else {
-            select(at: selectionIndex)
+            select(at: selectionIndex, notify: false)
             delegate?.tabCollectionViewModelDidAppend(self, selected: false)
         }
     }
@@ -168,14 +184,14 @@ final class TabCollectionViewModel: NSObject, NSSecureCoding {
             tabCollection.append(tab: $0)
         }
         let newSelectionIndex = tabCollection.tabs.count - 1
-        select(at: newSelectionIndex)
+        select(at: newSelectionIndex, notify: false)
 
         delegate?.tabCollectionViewModelDidMultipleChanges(self)
     }
 
     func insert(tab: Tab, at index: Int = 0) {
         tabCollection.insert(tab: tab, at: index)
-        select(at: index)
+        select(at: index, notify: false)
 
         delegate?.tabCollectionViewModel(self, didInsertAndSelectAt: index)
     }
@@ -204,33 +220,23 @@ final class TabCollectionViewModel: NSObject, NSSecureCoding {
         } else {
             newSelectionIndex = max(min(selectionIndex, tabCollection.tabs.count - 1), 0)
         }
-        select(at: newSelectionIndex)
+        select(at: newSelectionIndex, notify: false)
 
         delegate?.tabCollectionViewModel(self, didRemoveTabAt: index, andSelectTabAt: newSelectionIndex)
     }
 
-    func removeAllTabs(except exceptionIndex: Int? = nil) {
-        if tabCollection.tabs.isEmpty { return }
+    func removeAllTabs(except exceptionIndex: Int) {
+        assert(tabCollection.tabs.indices.contains(exceptionIndex))
 
-        tabCollection.tabs.enumerated().reversed().forEach {
-            if exceptionIndex != $0.offset {
-                if !tabCollection.remove(at: $0.offset) {
-                    os_log("TabCollectionViewModel: Failed to remove item", type: .error)
-                }
-            }
-        }
-
-        if exceptionIndex != nil {
-            select(at: 0)
-        } else {
-            selectionIndex = nil
-        }
+        tabCollection.removeAllAndAppend(tab: tabCollection.tabs[exceptionIndex])
+        
+        select(at: 0, notify: false)
         delegate?.tabCollectionViewModelDidMultipleChanges(self)
     }
 
     func removeAllTabsAndAppendNewTab() {
         tabCollection.removeAllAndAppend(tab: Tab())
-        select(at: 0)
+        select(at: 0, notify: false)
 
         delegate?.tabCollectionViewModelDidMultipleChanges(self)
     }
@@ -259,7 +265,7 @@ final class TabCollectionViewModel: NSObject, NSSecureCoding {
         tabCollection.putBackLastRemovedTab()
 
         if let lastRemovedTabIndex = lastRemovedTabIndex {
-            select(at: lastRemovedTabIndex)
+            select(at: lastRemovedTabIndex, notify: false)
 
             delegate?.tabCollectionViewModel(self, didInsertAndSelectAt: lastRemovedTabIndex)
         }
@@ -278,22 +284,31 @@ final class TabCollectionViewModel: NSObject, NSSecureCoding {
         let newIndex = index + 1
 
         tabCollection.insert(tab: copy, at: newIndex)
-        select(at: newIndex)
+        select(at: newIndex, notify: false)
 
         delegate?.tabCollectionViewModel(self, didInsertAndSelectAt: newIndex)
     }
 
     func moveTab(at index: Int, to newIndex: Int) {
         tabCollection.moveTab(at: index, to: newIndex)
-        select(at: newIndex)
+        select(at: newIndex, notify: false)
 
         delegate?.tabCollectionViewModel(self, didMoveTabAt: index, to: newIndex)
     }
 
     private func subscribeToTabs() {
         tabCollection.$tabs.sink { [weak self] newTabs in
-            self?.removeTabViewModelsIfNeeded(newTabs: newTabs)
-            self?.addTabViewModelsIfNeeded(newTabs: newTabs)
+            guard let self = self else { return }
+
+            let new = Set(newTabs)
+            let old = Set(self.tabViewModels.keys)
+
+            self.removeTabViewModels(old.subtracting(new))
+            self.addTabViewModels(new.subtracting(old))
+
+            if !(new.isEmpty && old.isEmpty) {
+                self.stateChangedSubject.send( () )
+            }
         } .store(in: &cancellables)
     }
 
@@ -303,16 +318,18 @@ final class TabCollectionViewModel: NSObject, NSSecureCoding {
         } .store(in: &cancellables)
     }
 
-    private func removeTabViewModelsIfNeeded(newTabs: [Tab]) {
-        tabViewModels = tabViewModels.filter { (item) -> Bool in
-            newTabs.contains(item.key)
+    private func removeTabViewModels(_ removed: Set<Tab>) {
+        for tab in removed {
+            tabViewModels[tab] = nil
+            tabStateChangedCancellables[tab] = nil
         }
     }
 
-    private func addTabViewModelsIfNeeded(newTabs: [Tab]) {
-        newTabs.forEach { (tab) in
-            if tabViewModels[tab] == nil {
-                tabViewModels[tab] = TabViewModel(tab: tab)
+    private func addTabViewModels(_ added: Set<Tab>) {
+        for tab in added {
+            tabViewModels[tab] = TabViewModel(tab: tab)
+            tabStateChangedCancellables[tab] = tab.$url.dropFirst().sink { [stateChangedSubject] _ in
+                stateChangedSubject.send( () )
             }
         }
     }
