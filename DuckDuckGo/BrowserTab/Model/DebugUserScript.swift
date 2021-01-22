@@ -53,7 +53,8 @@ class DebugUserScript: UserScript {
     }
 
     private func handleLog(message: WKScriptMessage) {
-        os_log("%s", type: .debug, String(describing: message.body))
+        // Used to log JS debug events. This is noisy every time a new tab is opened, so it's commented out unless needed.
+        // os_log("%s", type: .debug, String(describing: message.body))
     }
 
     private func handleSignpost(message: WKScriptMessage) {
