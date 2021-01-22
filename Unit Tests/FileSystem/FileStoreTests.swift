@@ -36,23 +36,26 @@ class FileStoreTests: XCTestCase {
 
     func testStoringDataWithoutEncryption() {
         let store = FileStore()
-        let success = store.persist(testData, fileName: testFileName)
-
-        XCTAssertTrue(success)
+        XCTAssertNoThrow(try store.persist(testData, fileName: testFileName))
     }
 
     func testReadingNonExistentData() {
         let store = FileStore()
-        let data = store.loadData(named: testFileName)
-
+        var data: Data?
+        XCTAssertThrowsError(data = try store.loadData(named: testFileName), NSCocoaErrorDomain) {
+            guard ($0 as? CocoaError)?.code == .fileReadNoSuchFile else {
+                return XCTFail("Unexpected \($0), expected \(CocoaError(.fileReadNoSuchFile))")
+            }
+        }
         XCTAssertNil(data)
     }
 
     func testReadingDataWithoutEncryption() {
         let store = FileStore()
 
-        _ = store.persist(testData, fileName: testFileName)
-        let readData = store.loadData(named: testFileName)
+        XCTAssertNoThrow(try store.persist(testData, fileName: testFileName))
+        var readData: Data!
+        XCTAssertNoThrow(readData = try store.loadData(named: testFileName))
 
         XCTAssertEqual(testData, readData)
     }
@@ -62,7 +65,7 @@ class FileStoreTests: XCTestCase {
         let key = try? keyStore.readKey()
         let encryptedStore = FileStore(encryptionKey: key!)
 
-        XCTAssertTrue(encryptedStore.persist(testData, fileName: testFileName))
+        XCTAssertNoThrow(try encryptedStore.persist(testData, fileName: testFileName))
 
         // A new key should have been generated in the key store.
         XCTAssertEqual(keyStore.storedKeys.count, 1)
@@ -71,7 +74,8 @@ class FileStoreTests: XCTestCase {
         XCTAssertTrue(encryptedStore.hasData(for: testFileName))
 
         // Data should come back decrypted, so it should be equal to the original test data.
-        let data = encryptedStore.loadData(named: testFileName)
+        var data: Data!
+        XCTAssertNoThrow(try data = encryptedStore.loadData(named: testFileName))
         XCTAssertEqual(data, testData)
     }
 
@@ -80,19 +84,48 @@ class FileStoreTests: XCTestCase {
         let key = try? keyStore.readKey()
         let encryptedStore = FileStore(encryptionKey: key!)
 
-        XCTAssertTrue(encryptedStore.persist("First Write".data(using: .utf8)!, fileName: testFileName))
-        XCTAssertTrue(encryptedStore.persist("Second Write".data(using: .utf8)!, fileName: testFileName))
-        XCTAssertTrue(encryptedStore.persist("Third Write".data(using: .utf8)!, fileName: testFileName))
+        XCTAssertNoThrow(try encryptedStore.persist("First Write".data(using: .utf8)!, fileName: testFileName))
+        XCTAssertNoThrow(try encryptedStore.persist("Second Write".data(using: .utf8)!, fileName: testFileName))
+        XCTAssertNoThrow(try encryptedStore.persist("Third Write".data(using: .utf8)!, fileName: testFileName))
 
-        let data = encryptedStore.loadData(named: testFileName)
+        var data: Data!
+        XCTAssertNoThrow(data = try encryptedStore.loadData(named: testFileName))
         XCTAssertEqual("Third Write".data(using: .utf8), data)
+    }
+
+    func testRemovingStoredFiles() {
+        let keyStore = MockEncryptionKeyStore(generator: EncryptionKeyGenerator(), account: "mock-account")
+        let key = try? keyStore.readKey()
+        let encryptedStore = FileStore(encryptionKey: key!)
+
+        XCTAssertNoThrow(try encryptedStore.persist("First Write".data(using: .utf8)!, fileName: testFileName))
+        XCTAssertNoThrow(try encryptedStore.persist("Second Write".data(using: .utf8)!, fileName: testFileName + "2"))
+        XCTAssertNoThrow(try encryptedStore.persist("Third Write".data(using: .utf8)!, fileName: testFileName + "3"))
+
+        encryptedStore.remove(testFileName + "2")
+
+        XCTAssertNoThrow(try encryptedStore.loadData(named: testFileName))
+        XCTAssertThrowsError(try encryptedStore.loadData(named: testFileName + "2"), NSCocoaErrorDomain) {
+            guard ($0 as? CocoaError)?.code == .fileReadNoSuchFile else {
+                return XCTFail("Unexpected \($0), expected \(CocoaError(.fileReadNoSuchFile))")
+            }
+        }
+        XCTAssertNoThrow(try encryptedStore.loadData(named: testFileName + "3"))
+    }
+
+    func testRemovingNonExistentFile() {
+        let store = FileStore()
+
+        XCTAssertFalse(store.hasData(for: testFileName))
+        XCTAssertNoThrow(store.remove(testFileName))
     }
 
     func testCheckingFilePresence() {
         let store = FileStore()
 
         let data = "Hello, World".data(using: .utf8)!
-        XCTAssertTrue(store.persist(data, fileName: testFileName))
+        XCTAssertFalse(store.hasData(for: testFileName))
+        XCTAssertNoThrow(try store.persist(data, fileName: testFileName))
         XCTAssertTrue(store.hasData(for: testFileName))
     }
 

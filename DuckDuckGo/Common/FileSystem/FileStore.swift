@@ -19,58 +19,58 @@
 import Foundation
 import CryptoKit
 
-protocol FileStoring {
-    func persist(_ data: Data, fileName: String) -> Bool
-    func loadData(named fileName: String) -> Data?
+public protocol FileStoring {
+    func persist(_ data: Data, fileName: String) throws
+    func loadData(named fileName: String) throws -> Data
     func hasData(for fileName: String) -> Bool
+    func remove(_ fileName: String)
 }
 
 public class FileStore: FileStoring {
-
     private let encryptionKey: SymmetricKey?
 
     init(encryptionKey: SymmetricKey? = nil) {
         self.encryptionKey = encryptionKey
     }
 
-    func persist(_ data: Data, fileName: String) -> Bool {
-        do {
-            let dataToWrite: Data
-
-            if let key = self.encryptionKey {
-                dataToWrite = try DataEncryption.encrypt(data: data, key: key)
-            } else {
-                dataToWrite = data
-            }
-
-            try dataToWrite.write(to: persistenceLocation(for: fileName))
-
-            return true
-        } catch {
-            return false
-        }
-    }
-
-    func loadData(named fileName: String) -> Data? {
-        guard let data = try? Data(contentsOf: persistenceLocation(for: fileName)) else {
-            return nil
-        }
+    public func persist(_ data: Data, fileName: String) throws {
+        let dataToWrite: Data
 
         if let key = self.encryptionKey {
-            return try? DataEncryption.decrypt(data: data, key: key)
+            dataToWrite = try DataEncryption.encrypt(data: data, key: key)
         } else {
-            return data
+            dataToWrite = data
         }
+
+        try dataToWrite.write(to: persistenceLocation(for: fileName))
     }
 
-    func hasData(for fileName: String) -> Bool {
+    public func loadData(named fileName: String) throws -> Data {
+        let data = try Data(contentsOf: persistenceLocation(for: fileName))
+
+        guard let key = self.encryptionKey else {
+            return data
+        }
+
+        return try DataEncryption.decrypt(data: data, key: key)
+    }
+
+    public func hasData(for fileName: String) -> Bool {
         let path = persistenceLocation(for: fileName).path
-        return FileManager.default.fileExists(atPath: path)
+        var isDir: ObjCBool = false
+        return FileManager().fileExists(atPath: path, isDirectory: &isDir) && !isDir.boolValue
+    }
+
+    public func remove(_ fileName: String) {
+        let url = persistenceLocation(for: fileName)
+        var isDir: ObjCBool = false
+        guard FileManager().fileExists(atPath: url.path, isDirectory: &isDir) && !isDir.boolValue else { return }
+        try? FileManager().removeItem(at: url)
     }
 
     func persistenceLocation(for fileName: String) -> URL {
-        let applicationSupportPath = FileManager.default.urls(for: .applicationSupportDirectory, in: .userDomainMask).first
-        return applicationSupportPath!.appendingPathComponent(fileName)
+        let applicationSupportPath = FileManager.default.urls(for: .applicationSupportDirectory, in: .userDomainMask)[0]
+        return applicationSupportPath.appendingPathComponent(fileName)
     }
 
 }
