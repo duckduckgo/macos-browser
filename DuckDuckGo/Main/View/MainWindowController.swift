@@ -83,8 +83,7 @@ final class MainWindowController: NSWindowController {
     }
 
     override func showWindow(_ sender: Any?) {
-        super.showWindow(sender)
-
+        window!.makeKeyAndOrderFront(sender)
         WindowControllersManager.shared.register(self)
     }
 

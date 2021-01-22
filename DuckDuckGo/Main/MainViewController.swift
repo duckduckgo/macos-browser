@@ -66,7 +66,7 @@ final class MainViewController: NSViewController {
     }
 
     func windowWillClose() {
-        tabCollectionViewModel.removeAllTabs()
+        tabBarViewController.hideTooltip()
     }
 
     @IBSegueAction

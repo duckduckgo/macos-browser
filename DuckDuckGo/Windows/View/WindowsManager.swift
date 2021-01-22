@@ -89,7 +89,7 @@ extension WindowControllersManager {
 }
 
 @objc(WMState)
-private final class WindowManagerStateRestoration: NSObject, NSSecureCoding {
+final class WindowManagerStateRestoration: NSObject, NSSecureCoding {
     private enum NSCodingKeys {
         static let controllers = "ctrls"
         static let keyWindowIndex = "key_idx"
@@ -97,8 +97,8 @@ private final class WindowManagerStateRestoration: NSObject, NSSecureCoding {
 
     static var supportsSecureCoding: Bool { true }
 
-    private let windows: [WindowRestorationItem]
-    private let keyWindowIndex: Int?
+    let windows: [WindowRestorationItem]
+    let keyWindowIndex: Int?
 
     init?(coder: NSCoder) {
         guard let restorationArray = coder.decodeObject(of: [NSArray.self, WindowRestorationItem.self],
@@ -123,14 +123,13 @@ private final class WindowManagerStateRestoration: NSObject, NSSecureCoding {
                 keyWindow = window
             }
         }
-        keyWindow?.makeKey()
+        keyWindow?.makeKeyAndOrderFront(self)
     }
 
     init(windowControllersManager: WindowControllersManager) {
         self.windows = windowControllersManager.mainWindowControllers
             .map(WindowRestorationItem.init(windowController:))
-        self.keyWindowIndex = windowControllersManager.mainWindowControllers
-            .firstIndex(where: { $0.window!.isKeyWindow })
+        self.keyWindowIndex = windowControllersManager.lastKeyWindowControllerIndex
     }
 
     func encode(with coder: NSCoder) {
