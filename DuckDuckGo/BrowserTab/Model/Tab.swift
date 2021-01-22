@@ -434,7 +434,7 @@ extension Tab {
 
 }
 
-fileprivate extension WKWebViewConfiguration {
+extension WKWebViewConfiguration {
 
     static func makeConfiguration() -> WKWebViewConfiguration {
         let configuration = WKWebViewConfiguration()
