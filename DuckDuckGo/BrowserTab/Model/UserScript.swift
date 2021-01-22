@@ -33,9 +33,9 @@ class UserScript: WKUserScript {
         }
     }
 
-    func leakAvoider() -> LeakAvoider {
+    lazy var leakAvoider: LeakAvoider = {
         LeakAvoider(delegate: self)
-    }
+    }()
 
     static func loadJS(_ jsFile: String, withReplacements replacements: [String: String] = [:]) -> String {
 
