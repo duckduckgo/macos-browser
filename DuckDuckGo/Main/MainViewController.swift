@@ -208,10 +208,24 @@ extension MainViewController {
 
         if Int(event.keyCode) == kVK_Escape {
             findInPageViewController?.findInPageDone(self)
+            checkForEndAddressBarEditing()
             return true
         }
 
         return false
+    }
+
+    private func checkForEndAddressBarEditing() {
+        let addressBarTextField = navigationBarViewController?.addressBarViewController?.addressBarTextField
+        guard view.window?.firstResponder == addressBarTextField?.currentEditor() else { return }
+
+        // If the webview doesn't have content it doesn't handle becoming the first responder properly
+        if tabCollectionViewModel.selectedTabViewModel?.tab.webView.url != nil {
+            tabCollectionViewModel.selectedTabViewModel?.tab.webView.makeMeFirstResponder()
+        } else {
+            navigationBarContainerView.makeMeFirstResponder()
+        }
+
     }
 
 }

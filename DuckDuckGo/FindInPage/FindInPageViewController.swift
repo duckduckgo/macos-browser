@@ -128,8 +128,7 @@ class FindInPageViewController: NSViewController {
 extension FindInPageViewController {
 
     @objc func textFieldFirstReponderNotification(_ notification: Notification) {
-        // NSTextField passes its first responder status down to a child view of NSTextView class
-        if let textView = notification.object as? NSTextView, textView.superview?.superview === textField {
+        if view.window?.firstResponder == textField.currentEditor() {
             updateView(firstResponder: true)
         } else {
             updateView(firstResponder: false)

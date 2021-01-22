@@ -54,7 +54,7 @@ extension MainViewController {
             os_log("MainViewController: Cannot reference address bar text field", type: .error)
             return
         }
-        view.window?.makeFirstResponder(addressBarTextField)
+        addressBarTextField.makeMeFirstResponder()
     }
 
     @IBAction func closeTab(_ sender: Any?) {
