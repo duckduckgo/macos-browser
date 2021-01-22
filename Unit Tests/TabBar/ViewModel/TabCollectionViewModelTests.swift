@@ -277,8 +277,8 @@ class TabCollectionViewModelTests: XCTestCase {
 fileprivate extension TabCollectionViewModel {
 
     static func aTabCollectionViewModel() -> TabCollectionViewModel {
-        let tabCollection = TabCollection()
-        return TabCollectionViewModel(tabCollection: tabCollection)
+        let tabCollection = TabCollection(tabs: [Tab()])
+        return TabCollectionViewModel(tabCollection: tabCollection, selectionIndex: 0)
     }
 
 }
