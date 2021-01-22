@@ -159,6 +159,9 @@
 		AAE8B110258A456C00E81239 /* TooltipViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = AAE8B10F258A456C00E81239 /* TooltipViewController.swift */; };
 		AAECA42024EEA4AC00EFA63A /* IndexPathExtension.swift in Sources */ = {isa = PBXBuildFile; fileRef = AAECA41F24EEA4AC00EFA63A /* IndexPathExtension.swift */; };
 		AAF7D3862567CED500998667 /* WebViewConfiguration.swift in Sources */ = {isa = PBXBuildFile; fileRef = AAF7D3852567CED500998667 /* WebViewConfiguration.swift */; };
+		B6A5A27125B9377300AA7ADA /* StateRestorationManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = B6A5A27025B9377300AA7ADA /* StateRestorationManager.swift */; };
+		B6A5A27925B93FFF00AA7ADA /* StateRestorationManagerTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = B6A5A27825B93FFE00AA7ADA /* StateRestorationManagerTests.swift */; };
+		B6A5A27E25B9403E00AA7ADA /* FileStoreMock.swift in Sources */ = {isa = PBXBuildFile; fileRef = B6A5A27D25B9403E00AA7ADA /* FileStoreMock.swift */; };
 		B6A5A28325B9615000AA7ADA /* AppUserDefaults.swift in Sources */ = {isa = PBXBuildFile; fileRef = B6A5A28225B9615000AA7ADA /* AppUserDefaults.swift */; };
 		B6A5A28825B9629200AA7ADA /* UserDefaultsExtension.swift in Sources */ = {isa = PBXBuildFile; fileRef = B6A5A28725B9629200AA7ADA /* UserDefaultsExtension.swift */; };
 		B6A5A28E25B962D200AA7ADA /* AppUserDefaultsTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = B6A5A28D25B962D200AA7ADA /* AppUserDefaultsTests.swift */; };
@@ -345,6 +348,9 @@
 		AAE8B10F258A456C00E81239 /* TooltipViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TooltipViewController.swift; sourceTree = "<group>"; };
 		AAECA41F24EEA4AC00EFA63A /* IndexPathExtension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = IndexPathExtension.swift; sourceTree = "<group>"; };
 		AAF7D3852567CED500998667 /* WebViewConfiguration.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WebViewConfiguration.swift; sourceTree = "<group>"; };
+		B6A5A27025B9377300AA7ADA /* StateRestorationManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StateRestorationManager.swift; sourceTree = "<group>"; };
+		B6A5A27825B93FFE00AA7ADA /* StateRestorationManagerTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StateRestorationManagerTests.swift; sourceTree = "<group>"; };
+		B6A5A27D25B9403E00AA7ADA /* FileStoreMock.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FileStoreMock.swift; sourceTree = "<group>"; };
 		B6A5A28225B9615000AA7ADA /* AppUserDefaults.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppUserDefaults.swift; sourceTree = "<group>"; };
 		B6A5A28725B9629200AA7ADA /* UserDefaultsExtension.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = UserDefaultsExtension.swift; sourceTree = "<group>"; };
 		B6A5A28D25B962D200AA7ADA /* AppUserDefaultsTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AppUserDefaultsTests.swift; sourceTree = "<group>"; };
@@ -486,6 +492,7 @@
 				4BA1A69F258B079600F6F690 /* DataEncryption.swift */,
 				4BA1A6A4258B07DF00F6F690 /* EncryptedValueTransformer.swift */,
 				4BA1A6A9258B07F400F6F690 /* EncryptionKeys */,
+				B6A5A27025B9377300AA7ADA /* StateRestorationManager.swift */,
 			);
 			path = FileSystem;
 			sourceTree = "<group>";
@@ -511,6 +518,8 @@
 				4BA1A6DD258C100A00F6F690 /* FileStoreTests.swift */,
 				4B11060925903EAC0039B979 /* CoreDataEncryptionTests.swift */,
 				4B11060325903E570039B979 /* CoreDataEncryptionTesting.xcdatamodeld */,
+				B6A5A27825B93FFE00AA7ADA /* StateRestorationManagerTests.swift */,
+				B6A5A27D25B9403E00AA7ADA /* FileStoreMock.swift */,
 			);
 			path = FileSystem;
 			sourceTree = "<group>";
@@ -1331,6 +1340,7 @@
 				85A0116925AF1D8900FA6A0C /* FindInPageViewController.swift in Sources */,
 				AA6FFB4424DC33320028F4D0 /* NSViewExtension.swift in Sources */,
 				AA585D84248FD31100E9A3E2 /* BrowserTabViewController.swift in Sources */,
+				B6A5A27125B9377300AA7ADA /* StateRestorationManager.swift in Sources */,
 				AABEE69324A4E2F80043105B /* SuggestionsAPI.swift in Sources */,
 				4BB88B5B25B7BA50006F6B06 /* Instruments.swift in Sources */,
 				4BA1A6B8258B081600F6F690 /* EncryptionKeyStoring.swift in Sources */,
@@ -1396,6 +1406,7 @@
 			files = (
 				142879DA24CE1179005419BB /* SuggestionViewModelTests.swift in Sources */,
 				4BA1A6EB258C288C00F6F690 /* EncryptionKeyStoreTests.swift in Sources */,
+				B6A5A27925B93FFF00AA7ADA /* StateRestorationManagerTests.swift in Sources */,
 				AAC9C01E24CB6BEB00AD1325 /* TabCollectionViewModelTests.swift in Sources */,
 				AAC9C01724CAFBDC00AD1325 /* TabCollectionTests.swift in Sources */,
 				4B82E9B925B6A05800656FE7 /* DetectedTrackerTests.swift in Sources */,
@@ -1412,6 +1423,7 @@
 				AA63745424C9BF9A00AB2AC4 /* SuggestionsTests.swift in Sources */,
 				AAC9C01524CAFBCE00AD1325 /* TabTests.swift in Sources */,
 				4BA1A6D9258C0CB300F6F690 /* DataEncryptionTests.swift in Sources */,
+				B6A5A27E25B9403E00AA7ADA /* FileStoreMock.swift in Sources */,
 				B6A5A28E25B962D200AA7ADA /* AppUserDefaultsTests.swift in Sources */,
 				4BA1A6FE258C5C1300F6F690 /* EncryptedValueTransformerTests.swift in Sources */,
 				AA63745624C9EB3C00AB2AC4 /* SuggestionsAPIResultTests.swift in Sources */,
