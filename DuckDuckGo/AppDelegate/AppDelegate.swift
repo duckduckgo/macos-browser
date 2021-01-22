@@ -17,27 +17,94 @@
 //
 
 import Cocoa
+import Combine
 import os.log
 
 @NSApplicationMain
 final class AppDelegate: NSObject, NSApplicationDelegate {
 
-    let urlEventListener = UrlEventListener()
+    let isRunningTests = ProcessInfo.processInfo.environment["XCTestConfigurationFilePath"] != nil
+
+    private let keyStore = EncryptionKeyStore()
+    private var fileStore: FileStore!
+    private let urlEventListener = UrlEventListener()
+    private var stateRestorationManager: StateRestorationManager!
+    private var stateChangedObserver: AnyCancellable!
 
     func applicationWillFinishLaunching(_ notification: Notification) {
+        do {
+            let encryptionKey = isRunningTests ? nil : try keyStore.readKey()
+            fileStore = FileStore(encryptionKey: encryptionKey)
+        } catch {
+            os_log("App Encryption Key could not be read: %s", "\(error)")
+            fileStore = FileStore()
+        }
+
         urlEventListener.listen()
         MainMenuManager.setupMainMenu()
     }
 
     func applicationDidFinishLaunching(_ aNotification: Notification) {
-        // Insert code here to initialize your application
-
         Database.shared.loadStore()
         HTTPSUpgrade.shared.loadDataAsync()
+        setupStateRestoration()
+
+        if WindowsManager.shared.windows.isEmpty {
+            WindowsManager.shared.openNewWindow()
+        }
     }
 
-    func applicationWillTerminate(_ aNotification: Notification) {
-        // Insert code here to tear down your application
+    func setupStateRestoration() {
+        guard !isRunningTests else { return }
+
+        // state restoration
+        stateRestorationManager = StateRestorationManager(fileStore: fileStore, fileName: "persistentState")
+        stateChangedObserver = WindowControllersManager.shared.stateChanged
+            .debounce(for: .seconds(1), scheduler: RunLoop.main)
+            .sink { [unowned self] _ in
+                self.stateDidChange()
+            }
+
+        if shouldPersistStateOrClear() {
+            do {
+                try stateRestorationManager.restoreState(using: WindowsManager.shared.restoreState(from:))
+            } catch CocoaError.fileReadNoSuchFile {
+                // ignore
+            } catch {
+                os_log("App state could not be decoded: %s", "\(error)")
+            }
+        }
+    }
+
+    func shouldPersistStateOrClear() -> Bool {
+        var shouldPersist: Bool {
+            switch AppUserDefaults.shared.restoreSessionAtLaunch {
+            case .systemDefined:
+                return SystemPreferences.shared.systemRestoresWindowsWhenReopeningApps
+            case .never:
+                return false
+            case .always:
+                return true
+            }
+        }
+        if !shouldPersist {
+            stateRestorationManager.clearState()
+        }
+        return shouldPersist
+    }
+
+    func stateDidChange() {
+        guard shouldPersistStateOrClear() else { return }
+        stateRestorationManager.persistState(using: WindowControllersManager.shared.encodeState(with:))
+    }
+
+    func applicationShouldTerminate(_ sender: NSApplication) -> NSApplication.TerminateReply {
+        if shouldPersistStateOrClear() {
+            stateChangedObserver.cancel()
+            stateRestorationManager.persistState(using: WindowControllersManager.shared.encodeState(with:), sync: true)
+        }
+        
+        return .terminateNow
     }
 
     func applicationShouldHandleReopen(_ sender: NSApplication, hasVisibleWindows flag: Bool) -> Bool {

@@ -59,6 +59,10 @@ final class MainViewController: NSViewController {
         findInPageContainerView.applyDropShadow()
     }
 
+    override func encodeRestorableState(with coder: NSCoder) {
+        fatalError("Default AppKit State Restoration should not be used")
+    }
+
     func windowDidBecomeMain() {
         updateBackMenuItem()
         updateForwardMenuItem()
