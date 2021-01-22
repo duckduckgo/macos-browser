@@ -23,11 +23,12 @@ extension WKUserContentController {
 
     func add(userScript: UserScript) {
         addUserScript(userScript)
+
         for messageName in userScript.messageNames {
             if #available(OSX 11.0, *) {
-                add(userScript, contentWorld: .defaultClient, name: messageName)
+                add(userScript.leakAvoider(), contentWorld: .defaultClient, name: messageName)
             } else {
-                add(userScript, name: messageName)
+                add(userScript.leakAvoider(), name: messageName)
             }
         }
     }

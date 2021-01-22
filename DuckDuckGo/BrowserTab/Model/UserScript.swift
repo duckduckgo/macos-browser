@@ -33,6 +33,10 @@ class UserScript: WKUserScript {
         }
     }
 
+    func leakAvoider() -> LeakAvoider {
+        LeakAvoider(delegate: self)
+    }
+
     static func loadJS(_ jsFile: String, withReplacements replacements: [String: String] = [:]) -> String {
 
         let bundle = Bundle.main
@@ -55,6 +59,21 @@ extension UserScript: WKScriptMessageHandler {
 
     func userContentController(_ userContentController: WKUserContentController, didReceive message: WKScriptMessage) {
         
+    }
+
+}
+
+class LeakAvoider: NSObject, WKScriptMessageHandler {
+
+    weak var delegate: WKScriptMessageHandler?
+
+    init(delegate: WKScriptMessageHandler) {
+        self.delegate = delegate
+        super.init()
+    }
+
+    func userContentController(_ userContentController: WKUserContentController, didReceive message: WKScriptMessage) {
+        self.delegate?.userContentController(userContentController, didReceive: message)
     }
 
 }
