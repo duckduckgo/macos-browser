@@ -73,7 +73,6 @@ class BrowserTabViewController: NSViewController {
             // view.addAndLayout(newWebView)
 
             newWebView.frame = view.bounds
-            newWebView.translatesAutoresizingMaskIntoConstraints = true
             newWebView.autoresizingMask = [.width, .height]
             view.addSubview(newWebView)
 
