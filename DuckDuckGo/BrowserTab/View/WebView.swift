@@ -83,26 +83,3 @@ fileprivate extension NSUserInterfaceItemIdentifier {
     static let openLinkInNewWindow = NSUserInterfaceItemIdentifier(rawValue: "WKMenuItemIdentifierOpenLinkInNewWindow")
     static let downloadLinkedFile = NSUserInterfaceItemIdentifier(rawValue: "WKMenuItemIdentifierDownloadLinkedFile")
 }
-
-// MARK: - SessionState
-extension WebView {
-
-    private static let _restoreFromS = "_restoreFromS"
-    private static let _s = "_s"
-    private static let essionStateData = "essionStateData"
-
-    struct DoesNotSupportRestoreFromSessionData: Error {}
-
-    func sessionStateData() throws -> Data? {
-        let sel = NSSelectorFromString(Self._s + Self.essionStateData)
-        guard self.responds(to: sel) else { throw DoesNotSupportRestoreFromSessionData() }
-        return self.perform(sel)?.takeUnretainedValue() as? Data
-    }
-
-    func restoreSessionState(from data: Data) throws {
-        let sel = NSSelectorFromString(Self._restoreFromS + Self.essionStateData + ":")
-        guard self.responds(to: sel) else { throw DoesNotSupportRestoreFromSessionData() }
-        self.perform(sel, with: data as NSData)
-    }
-
-}
