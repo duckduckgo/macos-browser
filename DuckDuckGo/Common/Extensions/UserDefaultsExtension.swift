@@ -20,6 +20,26 @@
 import Foundation
 
 extension UserDefaults {
+    private enum Keys {
+        static let restoreSessionAtLaunchKey = "com.duckduckgo.app.restoreSessionAtLaunch"
+
+    }
+
+    var restoreSessionAtLaunch: SessionRestorationMode {
+        get {
+            SessionRestorationMode(rawValue: object(forKey: Keys.restoreSessionAtLaunchKey) as? Bool)
+        }
+        set {
+            if let boolValue = newValue.rawValue {
+                setValue(boolValue, forKey: Keys.restoreSessionAtLaunchKey)
+            } else {
+                removeObject(forKey: Keys.restoreSessionAtLaunchKey)
+            }
+        }
+    }
+}
+
+extension UserDefaults {
     func bool(forKey key: String, defaultValue: Bool) -> Bool {
         return object(forKey: key) as? Bool ?? defaultValue
     }

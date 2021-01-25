@@ -28,7 +28,7 @@ class AppUserDefaultsTests: XCTestCase {
     }
 
     func testWhenRestoreSessionAtLaunchIsSetThenItIsPersisted() {
-        let appUserDefaults = AppUserDefaults(suiteName: testSuiteName)
+        let appUserDefaults = UserDefaults(suiteName: testSuiteName)!
 
         appUserDefaults.restoreSessionAtLaunch = .never
         XCTAssertEqual(appUserDefaults.restoreSessionAtLaunch, .never)
@@ -42,7 +42,7 @@ class AppUserDefaultsTests: XCTestCase {
 
     func testWhenSettingsIsNewThenDefaultForRestoreSessionAtLaunchIsSystemDefined() {
 
-        let appUserDefaults = AppUserDefaults(suiteName: testSuiteName)
+        let appUserDefaults = UserDefaults(suiteName: testSuiteName)!
         XCTAssertEqual(appUserDefaults.restoreSessionAtLaunch, .systemDefined)
 
     }

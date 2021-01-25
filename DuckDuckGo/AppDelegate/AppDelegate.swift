@@ -78,7 +78,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
 
     func shouldPersistStateOrClear() -> Bool {
         var shouldPersist: Bool {
-            switch AppUserDefaults.shared.restoreSessionAtLaunch {
+            switch UserDefaults.standard.restoreSessionAtLaunch {
             case .systemDefined:
                 return SystemPreferences.shared.systemRestoresWindowsWhenReopeningApps
             case .never:

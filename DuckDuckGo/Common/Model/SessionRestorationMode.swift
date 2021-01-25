@@ -1,5 +1,5 @@
 //
-//  AppUserDefaults.swift
+//  SessionRestorationMode.swift
 //
 //  Copyright © 2021 DuckDuckGo. All rights reserved.
 //
@@ -17,6 +17,7 @@
 //
 
 import Foundation
+import AppKit
 
 enum SessionRestorationMode: RawRepresentable {
     typealias RawValue = Bool?
@@ -49,39 +50,3 @@ enum SessionRestorationMode: RawRepresentable {
 
 }
 
-protocol AppSettings: AnyObject {
-    var restoreSessionAtLaunch: SessionRestorationMode { get set }
-}
-
-final class AppUserDefaults: AppSettings {
-    static let shared = AppUserDefaults()
-
-    private enum Keys {
-        static let restoreSessionAtLaunchKey = "com.duckduckgo.app.restoreSessionAtLaunch"
-
-    }
-
-    private let suiteName: String?
-
-    private var userDefaults: UserDefaults {
-        suiteName.flatMap(UserDefaults.init(suiteName:)) ?? .standard
-    }
-
-    init(suiteName: String? = nil) {
-        self.suiteName = suiteName
-    }
-
-    var restoreSessionAtLaunch: SessionRestorationMode {
-        get {
-            SessionRestorationMode(rawValue: userDefaults.object(forKey: Keys.restoreSessionAtLaunchKey) as? Bool)
-        }
-        set {
-            if let boolValue = newValue.rawValue {
-                userDefaults.setValue(boolValue, forKey: Keys.restoreSessionAtLaunchKey)
-            } else {
-                userDefaults.removeObject(forKey: Keys.restoreSessionAtLaunchKey)
-            }
-        }
-    }
-    
-}
