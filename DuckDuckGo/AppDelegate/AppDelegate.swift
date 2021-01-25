@@ -123,3 +123,18 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
     }
 
 }
+
+extension AppDelegate: NSMenuItemValidation {
+
+    func validateMenuItem(_ menuItem: NSMenuItem) -> Bool {
+        if menuItem.action == #selector(toggleSessionRestorationMode(_:)) {
+            menuItem.state = UserDefaults.standard.restoreSessionAtLaunch.controlStateValue
+        }
+        return true
+    }
+
+    @IBAction func toggleSessionRestorationMode(_ sender: NSMenuItem) {
+        UserDefaults.standard.restoreSessionAtLaunch.toggle()
+    }
+    
+}

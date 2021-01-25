@@ -50,3 +50,28 @@ enum SessionRestorationMode: RawRepresentable {
 
 }
 
+extension SessionRestorationMode {
+
+    var controlStateValue: NSControl.StateValue {
+        switch self {
+        case .always:
+            return NSControl.StateValue.on
+        case .never:
+            return NSControl.StateValue.off
+        case .systemDefined:
+            return NSControl.StateValue.mixed
+        }
+    }
+
+    mutating func toggle() {
+        switch self {
+        case .systemDefined:
+            self = .always
+        case .always:
+            self = .never
+        case .never:
+            self = .systemDefined
+        }
+    }
+
+}

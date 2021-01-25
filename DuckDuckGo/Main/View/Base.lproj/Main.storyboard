@@ -93,6 +93,13 @@
                                                 <action selector="closeTab:" target="Ady-hI-5gd" id="zjx-YQ-d6C"/>
                                             </connections>
                                         </menuItem>
+                                        <menuItem isSeparatorItem="YES" id="J7z-U7-QpC"/>
+                                        <menuItem title="Restore windows on launch" offStateImage="Close-Large" id="c45-eB-Rmh">
+                                            <modifierMask key="keyEquivalentModifierMask"/>
+                                            <connections>
+                                                <action selector="toggleSessionRestorationMode:" target="Ady-hI-5gd" id="N7d-Kg-BqH"/>
+                                            </connections>
+                                        </menuItem>
                                     </items>
                                 </menu>
                             </menuItem>
@@ -619,6 +626,7 @@ CQ
         </scene>
     </scenes>
     <resources>
+        <image name="Close-Large" width="16" height="16"/>
         <namedColor name="SeparatorColor">
             <color red="0.0" green="0.0" blue="0.0" alpha="0.10000000149011612" colorSpace="custom" customColorSpace="sRGB"/>
         </namedColor>
