@@ -19,21 +19,21 @@
 import Foundation
 import CryptoKit
 
-public protocol FileStoring {
+protocol FileStoring {
     func persist(_ data: Data, fileName: String) throws
     func loadData(named fileName: String) throws -> Data
     func hasData(for fileName: String) -> Bool
     func remove(_ fileName: String)
 }
 
-public class FileStore: FileStoring {
+class FileStore: FileStoring {
     private let encryptionKey: SymmetricKey?
 
     init(encryptionKey: SymmetricKey? = nil) {
         self.encryptionKey = encryptionKey
     }
 
-    public func persist(_ data: Data, fileName: String) throws {
+    func persist(_ data: Data, fileName: String) throws {
         let dataToWrite: Data
 
         if let key = self.encryptionKey {
@@ -45,7 +45,7 @@ public class FileStore: FileStoring {
         try dataToWrite.write(to: persistenceLocation(for: fileName))
     }
 
-    public func loadData(named fileName: String) throws -> Data {
+    func loadData(named fileName: String) throws -> Data {
         let data = try Data(contentsOf: persistenceLocation(for: fileName))
 
         guard let key = self.encryptionKey else {
@@ -55,13 +55,13 @@ public class FileStore: FileStoring {
         return try DataEncryption.decrypt(data: data, key: key)
     }
 
-    public func hasData(for fileName: String) -> Bool {
+    func hasData(for fileName: String) -> Bool {
         let path = persistenceLocation(for: fileName).path
         var isDir: ObjCBool = false
         return FileManager().fileExists(atPath: path, isDirectory: &isDir) && !isDir.boolValue
     }
 
-    public func remove(_ fileName: String) {
+    func remove(_ fileName: String) {
         let url = persistenceLocation(for: fileName)
         var isDir: ObjCBool = false
         guard FileManager().fileExists(atPath: url.path, isDirectory: &isDir) && !isDir.boolValue else { return }

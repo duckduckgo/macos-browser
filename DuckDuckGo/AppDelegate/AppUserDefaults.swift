@@ -18,14 +18,14 @@
 
 import Foundation
 
-public enum SessionRestorationMode: RawRepresentable {
-    public typealias RawValue = Bool?
+enum SessionRestorationMode: RawRepresentable {
+    typealias RawValue = Bool?
 
     case systemDefined
     case always
     case never
 
-    public init(rawValue: Bool?) {
+    init(rawValue: Bool?) {
         switch rawValue {
         case .none:
             self = .systemDefined
@@ -36,7 +36,7 @@ public enum SessionRestorationMode: RawRepresentable {
         }
     }
 
-    public var rawValue: Bool? {
+    var rawValue: Bool? {
         switch self {
         case .systemDefined:
             return nil
@@ -53,7 +53,7 @@ protocol AppSettings: AnyObject {
     var restoreSessionAtLaunch: SessionRestorationMode { get set }
 }
 
-public final class AppUserDefaults: AppSettings {
+final class AppUserDefaults: AppSettings {
     static let shared = AppUserDefaults()
 
     private enum Keys {
@@ -67,11 +67,11 @@ public final class AppUserDefaults: AppSettings {
         suiteName.flatMap(UserDefaults.init(suiteName:)) ?? .standard
     }
 
-    public init(suiteName: String? = nil) {
+    init(suiteName: String? = nil) {
         self.suiteName = suiteName
     }
 
-    public var restoreSessionAtLaunch: SessionRestorationMode {
+    var restoreSessionAtLaunch: SessionRestorationMode {
         get {
             SessionRestorationMode(rawValue: userDefaults.object(forKey: Keys.restoreSessionAtLaunchKey) as? Bool)
         }

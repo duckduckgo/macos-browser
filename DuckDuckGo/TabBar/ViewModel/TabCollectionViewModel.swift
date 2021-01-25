@@ -48,7 +48,7 @@ final class TabCollectionViewModel: NSObject, NSSecureCoding {
     @Published private(set) var selectedTabViewModel: TabViewModel?
     @Published private(set) var canInsertLastRemovedTab: Bool = false
     private let stateChangedSubject = PassthroughSubject<Void, Never>()
-    public var stateChanged: AnyPublisher<Void, Never> { stateChangedSubject.eraseToAnyPublisher() }
+    var stateChanged: AnyPublisher<Void, Never> { stateChangedSubject.eraseToAnyPublisher() }
 
     private var cancellables = Set<AnyCancellable>()
     private var tabStateChangedCancellables = [Tab: Cancellable]()

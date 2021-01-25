@@ -17,7 +17,7 @@
 //
 
 import Foundation
-import DuckDuckGo_Privacy_Browser
+@testable import DuckDuckGo_Privacy_Browser
 
 class FileStoreMock: NSObject, FileStoring {
 

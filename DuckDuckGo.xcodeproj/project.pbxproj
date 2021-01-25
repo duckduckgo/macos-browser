@@ -169,6 +169,8 @@
 		B6A5A29625B964D000AA7ADA /* SystemPreferences.swift in Sources */ = {isa = PBXBuildFile; fileRef = B6A5A29525B964D000AA7ADA /* SystemPreferences.swift */; };
 		B6A5A2A025B96E8300AA7ADA /* AppStateChangePublisherTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = B6A5A29F25B96E8300AA7ADA /* AppStateChangePublisherTests.swift */; };
 		B6A5A2A825BAA35500AA7ADA /* WindowManagerStateRestorationTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = B6A5A2A725BAA35500AA7ADA /* WindowManagerStateRestorationTests.swift */; };
+		B6BBD33F25BE605800BFDD08 /* WKWebViewConfigurationExtension.swift in Sources */ = {isa = PBXBuildFile; fileRef = B6BBD33E25BE605800BFDD08 /* WKWebViewConfigurationExtension.swift */; };
+		B6BBD34725BE61B100BFDD08 /* NSStoryboardExtensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = B6BBD34625BE61B100BFDD08 /* NSStoryboardExtensions.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -360,6 +362,8 @@
 		B6A5A29525B964D000AA7ADA /* SystemPreferences.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SystemPreferences.swift; sourceTree = "<group>"; };
 		B6A5A29F25B96E8300AA7ADA /* AppStateChangePublisherTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppStateChangePublisherTests.swift; sourceTree = "<group>"; };
 		B6A5A2A725BAA35500AA7ADA /* WindowManagerStateRestorationTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WindowManagerStateRestorationTests.swift; sourceTree = "<group>"; };
+		B6BBD33E25BE605800BFDD08 /* WKWebViewConfigurationExtension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WKWebViewConfigurationExtension.swift; sourceTree = "<group>"; };
+		B6BBD34625BE61B100BFDD08 /* NSStoryboardExtensions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NSStoryboardExtensions.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -1084,8 +1088,10 @@
 				AA88D14A252A557100980B4E /* URLRequestExtension.swift */,
 				AAA0CC69253CC43C0079BC96 /* WKUserContentControllerExtension.swift */,
 				AA92127625ADA07900600CD4 /* WKWebViewExtension.swift */,
+				B6BBD33E25BE605800BFDD08 /* WKWebViewConfigurationExtension.swift */,
 				4BB88B4925B7B690006F6B06 /* SequenceExtensions.swift */,
 				B6A5A28725B9629200AA7ADA /* UserDefaultsExtension.swift */,
+				B6BBD34625BE61B100BFDD08 /* NSStoryboardExtensions.swift */,
 			);
 			path = Extensions;
 			sourceTree = "<group>";
@@ -1372,6 +1378,7 @@
 				AAA0CC472533833C0079BC96 /* OptionsButtonMenu.swift in Sources */,
 				4B677438255DBEB800025BD8 /* HTTPSUpgrade.xcdatamodeld in Sources */,
 				4B677434255DBEB800025BD8 /* HTTPSBloomFilterSpecification.swift in Sources */,
+				B6BBD33F25BE605800BFDD08 /* WKWebViewConfigurationExtension.swift in Sources */,
 				B6A5A29625B964D000AA7ADA /* SystemPreferences.swift in Sources */,
 				AA97BF4625135DD30014931A /* ApplicationDockMenu.swift in Sources */,
 				4BA1A69B258B076900F6F690 /* FileStore.swift in Sources */,
@@ -1385,6 +1392,7 @@
 				AA6820EB25503D6A005ED0D5 /* Fire.swift in Sources */,
 				8556A60E256C15DD0092FA9D /* FileDownload.swift in Sources */,
 				AA585D82248FD31100E9A3E2 /* AppDelegate.swift in Sources */,
+				B6BBD34725BE61B100BFDD08 /* NSStoryboardExtensions.swift in Sources */,
 				1456D6E124EFCBC300775049 /* TabBarCollectionView.swift in Sources */,
 				B6A5A28825B9629200AA7ADA /* UserDefaultsExtension.swift in Sources */,
 				AABEE69C24A902BB0043105B /* Suggestions.swift in Sources */,

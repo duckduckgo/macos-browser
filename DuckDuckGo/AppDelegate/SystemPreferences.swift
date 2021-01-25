@@ -18,15 +18,15 @@
 
 import Foundation
 
-public final class SystemPreferences {
-    public static let shared = SystemPreferences()
+final class SystemPreferences {
+    static let shared = SystemPreferences()
 
     private enum Keys {
         static let systemRestoresWindowsAtLaunchKey = "NSQuitAlwaysKeepsWindows"
 
     }
 
-    public var systemRestoresWindowsWhenReopeningApps: Bool {
+    var systemRestoresWindowsWhenReopeningApps: Bool {
         guard let val = CFPreferencesCopyValue(Keys.systemRestoresWindowsAtLaunchKey as CFString,
                                                kCFPreferencesAnyApplication,
                                                kCFPreferencesCurrentUser,

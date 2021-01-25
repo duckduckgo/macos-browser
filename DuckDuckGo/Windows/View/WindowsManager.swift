@@ -19,12 +19,8 @@
 import Cocoa
 import os.log
 
-extension NSStoryboard {
-    static let main = NSStoryboard(name: "Main", bundle: .main)
-}
-
 final class WindowsManager {
-    static public var shared = WindowsManager()
+    static var shared = WindowsManager()
 
     var windows: [NSWindow] {
         return NSApplication.shared.windows

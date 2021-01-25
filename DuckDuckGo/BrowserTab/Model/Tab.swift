@@ -434,36 +434,6 @@ extension Tab {
 
 }
 
-extension WKWebViewConfiguration {
-
-    static func makeConfiguration() -> WKWebViewConfiguration {
-        let configuration = WKWebViewConfiguration()
-        configuration.websiteDataStore = WKWebsiteDataStore.default()
-        configuration.allowsAirPlayForMediaPlayback = true
-        configuration.preferences.setValue(true, forKey: "fullScreenEnabled")
-        configuration.preferences.setValue(true, forKey: "developerExtrasEnabled")
-        configuration.installContentBlockingRules()
-        return configuration
-    }
-
-    private func installContentBlockingRules() {
-        func addRulesToController(rules: WKContentRuleList) {
-            self.userContentController.add(rules)
-        }
-
-        if let rulesList = ContentBlockerRulesManager.shared.blockingRules {
-            addRulesToController(rules: rulesList)
-        } else {
-            ContentBlockerRulesManager.shared.compileRules { rulesList in
-                if let rulesList = rulesList {
-                    addRulesToController(rules: rulesList)
-                }
-            }
-        }
-    }
-
-}
-
 fileprivate extension WKNavigationResponse {
     var shouldDownload: Bool {
         let contentDisposition = (response as? HTTPURLResponse)?.allHeaderFields["Content-Disposition"] as? String
