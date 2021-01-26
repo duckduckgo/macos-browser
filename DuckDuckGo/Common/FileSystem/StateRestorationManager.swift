@@ -20,16 +20,6 @@ import Foundation
 import Combine
 import os.log
 
-extension DispatchQueue {
-    func dispatch(_ workItem: DispatchWorkItem, sync: Bool) {
-        if sync {
-            self.sync(execute: workItem)
-        } else {
-            self.async(execute: workItem)
-        }
-    }
-}
-
 final class StateRestorationManager {
     private let fileStore: FileStoring
     private let fileName: String
