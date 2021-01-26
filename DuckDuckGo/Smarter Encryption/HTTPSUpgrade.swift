@@ -19,10 +19,10 @@
 import Foundation
 import os.log
 
-public class HTTPSUpgrade {
+class HTTPSUpgrade {
 
-    public typealias UpgradeCheckCompletion = (Bool) -> Void
-    public static let shared = HTTPSUpgrade()
+    typealias UpgradeCheckCompletion = (Bool) -> Void
+    static let shared = HTTPSUpgrade()
     
     private let dataReloadLock = NSLock()
     private let store: HTTPSUpgradeStore
@@ -32,7 +32,7 @@ public class HTTPSUpgrade {
         self.store = store
     }
 
-    public func isUpgradeable(url: URL, completion: @escaping UpgradeCheckCompletion) {
+    func isUpgradeable(url: URL, completion: @escaping UpgradeCheckCompletion) {
         
         guard url.scheme == URL.Scheme.http.rawValue else {
             completion(false)
@@ -66,13 +66,13 @@ public class HTTPSUpgrade {
         dataReloadLock.unlock()
     }
     
-    public func loadDataAsync() {
+    func loadDataAsync() {
         DispatchQueue.global(qos: .background).async {
             self.loadData()
         }
     }
     
-    public func loadData() {
+    func loadData() {
         if !dataReloadLock.try() {
             os_log("Reload already in progress", type: .debug)
             return

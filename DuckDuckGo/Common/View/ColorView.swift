@@ -26,13 +26,13 @@ class ColorView: NSView {
         setupView()
     }
 
-    public override init(frame frameRect: NSRect) {
+    override init(frame frameRect: NSRect) {
         super.init(frame: frameRect)
 
         setupView()
     }
 
-    @IBInspectable public var backgroundColor: NSColor? = NSColor.clear {
+    @IBInspectable var backgroundColor: NSColor? = NSColor.clear {
         didSet {
             layer?.backgroundColor = backgroundColor?.cgColor
         }

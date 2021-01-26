@@ -18,13 +18,13 @@
 
 import Foundation
 
-public struct HTTPSBloomFilterSpecification: Equatable, Decodable {
+struct HTTPSBloomFilterSpecification: Equatable, Decodable {
     let bitCount: Int
     let errorRate: Double
     let totalEntries: Int
     let sha256: String
     
-    static public func == (lhs: HTTPSBloomFilterSpecification, rhs: HTTPSBloomFilterSpecification) -> Bool {
+    static func == (lhs: HTTPSBloomFilterSpecification, rhs: HTTPSBloomFilterSpecification) -> Bool {
         return lhs.bitCount == rhs.bitCount && lhs.errorRate == rhs.errorRate && lhs.totalEntries == rhs.totalEntries && lhs.sha256 == rhs.sha256
     }
     

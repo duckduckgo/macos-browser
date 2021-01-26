@@ -26,7 +26,7 @@ class GradientView: NSView {
         setupView()
     }
 
-    public override init(frame frameRect: NSRect) {
+    override init(frame frameRect: NSRect) {
         super.init(frame: frameRect)
 
         setupView()

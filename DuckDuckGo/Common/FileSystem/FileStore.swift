@@ -25,7 +25,7 @@ protocol FileStoring {
     func hasData(for fileName: String) -> Bool
 }
 
-public class FileStore: FileStoring {
+class FileStore: FileStoring {
 
     private let encryptionKey: SymmetricKey?
 

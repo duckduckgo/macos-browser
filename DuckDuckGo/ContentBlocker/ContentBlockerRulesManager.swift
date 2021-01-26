@@ -21,15 +21,15 @@ import WebKit
 import os.log
 import TrackerRadarKit
 
-public class ContentBlockerRulesManager {
+class ContentBlockerRulesManager {
 
-    public static let shared = ContentBlockerRulesManager()
+    static let shared = ContentBlockerRulesManager()
 
-    public var blockingRules: WKContentRuleList?
+    var blockingRules: WKContentRuleList?
 
     private init() {}
 
-    public func compileRules(completion: ((WKContentRuleList?) -> Void)?) {
+    func compileRules(completion: ((WKContentRuleList?) -> Void)?) {
         guard let trackerData = TrackerDataManager.shared.trackerData else {
             completion?(nil)
             return

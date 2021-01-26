@@ -19,7 +19,7 @@
 import Foundation
 import os.signpost
 
-public class TabInstrumentation {
+class TabInstrumentation {
 
     static let tabsLog = OSLog(subsystem: "com.duckduckgo.instrumentation",
                                category: "TabInstrumentation")
@@ -30,22 +30,22 @@ public class TabInstrumentation {
     private var currentURL: String?
     private var currentTabIdentifier: UInt64
 
-    public init() {
+    init() {
         type(of: self).tabMaxIdentifier += 1
         currentTabIdentifier = type(of: self).tabMaxIdentifier
     }
 
     private var tabInitSPID: Any?
 
-    public func willPrepareWebView() {
+    func willPrepareWebView() {
         tabInitSPID = Instruments.shared.startTimedEvent(.tabInitialisation, info: "Tab-\(currentTabIdentifier)")
     }
 
-    public func didPrepareWebView() {
+    func didPrepareWebView() {
         Instruments.shared.endTimedEvent(for: tabInitSPID)
     }
 
-    public func willLoad(url: URL) {
+    func willLoad(url: URL) {
         currentURL = url.absoluteString
 
         let id = OSSignpostID(log: type(of: self).tabsLog)
@@ -58,7 +58,7 @@ public class TabInstrumentation {
 
     }
 
-    public func didLoadURL() {
+    func didLoadURL() {
 
         if let id = siteLoadingSPID as? OSSignpostID {
             os_signpost(.end,
@@ -71,15 +71,15 @@ public class TabInstrumentation {
 
     // MARK: - JS events
 
-    public func request(url: String, allowedIn timeInMs: Double) {
+    func request(url: String, allowedIn timeInMs: Double) {
         request(url: url, isTracker: false, blocked: false, in: timeInMs)
     }
 
-    public func tracker(url: String, allowedIn timeInMs: Double, reason: String?) {
+    func tracker(url: String, allowedIn timeInMs: Double, reason: String?) {
         request(url: url, isTracker: true, blocked: false, reason: reason ?? "?", in: timeInMs)
     }
 
-    public func tracker(url: String, blockedIn timeInMs: Double) {
+    func tracker(url: String, blockedIn timeInMs: Double) {
         request(url: url, isTracker: true, blocked: true, in: timeInMs)
     }
 
@@ -96,7 +96,7 @@ public class TabInstrumentation {
                "[%@] Request: %@ - %@ - %@ (%@) in %llu", currentURL, url, requestType, status, reason, timeInNS)
     }
 
-    public func jsEvent(name: String, executedIn timeInMs: Double) {
+    func jsEvent(name: String, executedIn timeInMs: Double) {
 
         let currentURL = self.currentURL ?? "unknown"
         // 0 is treated as 1ms

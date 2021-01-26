@@ -20,25 +20,25 @@ import Foundation
 import TrackerRadarKit
 
 // Populated with relevant info at the point of detection.
-public struct DetectedTracker {
+struct DetectedTracker {
 
-    public let url: String
-    public let knownTracker: KnownTracker?
-    public let entity: Entity?
-    public let blocked: Bool
+    let url: String
+    let knownTracker: KnownTracker?
+    let entity: Entity?
+    let blocked: Bool
 
-    public init(url: String, knownTracker: KnownTracker?, entity: Entity?, blocked: Bool) {
+    init(url: String, knownTracker: KnownTracker?, entity: Entity?, blocked: Bool) {
         self.url = url
         self.knownTracker = knownTracker
         self.entity = entity
         self.blocked = blocked
     }
 
-    public var domain: String? {
+    var domain: String? {
         return URL(string: url)?.host
     }
 
-    public var networkNameForDisplay: String {
+    var networkNameForDisplay: String {
         return entity?.displayName ?? domain ?? url
     }
 
@@ -46,12 +46,12 @@ public struct DetectedTracker {
 
 extension DetectedTracker: Hashable, Equatable {
 
-    public static func == (lhs: DetectedTracker, rhs: DetectedTracker) -> Bool {
+    static func == (lhs: DetectedTracker, rhs: DetectedTracker) -> Bool {
         return ((lhs.entity != nil || rhs.entity != nil) && lhs.entity?.displayName == rhs.entity?.displayName)
             && lhs.domain ?? "" == rhs.domain ?? ""
     }
 
-    public func hash(into hasher: inout Hasher) {
+    func hash(into hasher: inout Hasher) {
         hasher.combine(self.entity?.displayName)
         hasher.combine(self.domain)
     }
