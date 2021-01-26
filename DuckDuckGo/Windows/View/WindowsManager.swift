@@ -36,7 +36,7 @@ final class WindowsManager {
 
     @discardableResult
     func openNewWindow(with tabCollectionViewModel: TabCollectionViewModel,
-                       at position: WindowPosition = .auto,
+                       at position: MainWindowController.WindowPosition = .auto,
                        with contentSize: NSSize? = nil) -> NSWindow? {
         let mainWindowController = MainWindowController(tabCollectionViewModel: tabCollectionViewModel,
                                                         position: position,
@@ -50,7 +50,7 @@ final class WindowsManager {
     @discardableResult
     func openNewWindow(with tab: Tab? = nil, at droppingPoint: NSPoint? = nil) -> NSWindow? {
         openNewWindow(with: tab.map(TabCollectionViewModel.init(tab:)) ?? .init(),
-                      at: droppingPoint.map(WindowPosition.droppingPoint) ?? .auto)
+                      at: droppingPoint.map(MainWindowController.WindowPosition.droppingPoint) ?? .auto)
     }
 
     @discardableResult
@@ -132,9 +132,7 @@ final class WindowManagerStateRestoration: NSObject, NSSecureCoding {
         #warning("Skip Private Windows coding")
 
         coder.encode(windows as NSArray, forKey: NSCodingKeys.controllers)
-        if let keyWindowIndex = keyWindowIndex {
-            coder.encode(keyWindowIndex, forKey: NSCodingKeys.keyWindowIndex)
-        }
+        keyWindowIndex.map(coder.encode(forKey: NSCodingKeys.keyWindowIndex))
     }
 }
 

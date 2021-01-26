@@ -19,7 +19,7 @@
 import Foundation
 import os.log
 
-extension NSRegularExpression {
+fileprivate extension NSRegularExpression {
     // swiftlint:disable force_try
 
     // from https://stackoverflow.com/a/25717506/73479

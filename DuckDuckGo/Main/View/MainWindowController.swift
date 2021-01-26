@@ -19,14 +19,6 @@
 import Cocoa
 import os.log
 
-fileprivate extension NSStoryboard.SceneIdentifier {
-    static let mainViewController = NSStoryboard.SceneIdentifier("mainViewController")
-}
-enum WindowPosition: Equatable {
-    case auto
-    case origin(NSPoint)
-    case droppingPoint(NSPoint)
-}
 final class MainWindowController: NSWindowController {
     static let windowFrameSaveName = "MainWindow"
 
@@ -44,6 +36,12 @@ final class MainWindowController: NSWindowController {
         fatalError("MainWindowController: Bad initializer")
     }
 
+    enum WindowPosition: Equatable {
+        case auto
+        case origin(NSPoint)
+        case droppingPoint(NSPoint)
+    }
+
     init(tabCollectionViewModel: TabCollectionViewModel,
          position: WindowPosition,
          contentSize: NSSize?) {
@@ -56,30 +54,37 @@ final class MainWindowController: NSWindowController {
         window.contentViewController = mainViewController
 
         super.init(window: window)
-        window.delegate = self
+
+        setupWindow(position: position, contentSize: contentSize)
+    }
+
+    private func setupWindow(position: WindowPosition, contentSize: NSSize?) {
+        window!.delegate = self
 
         if contentSize == nil || position == .auto {
             // adjust using last saved frame
-            window.setFrameUsingName(Self.windowFrameSaveName)
+            window!.setFrameUsingName(Self.windowFrameSaveName)
         }
         if let contentSize = contentSize {
-            window.setContentSize(contentSize)
+            window!.setContentSize(contentSize)
         }
+
         switch position {
         case .droppingPoint(let point):
-            let origin = window.frameOrigin(fromDroppingPoint: point)
-            window.setFrameOrigin(origin)
+            let origin = window!.frameOrigin(fromDroppingPoint: point)
+            window!.setFrameOrigin(origin)
         case .origin(let origin):
-            window.setFrameOrigin(origin)
+            window!.setFrameOrigin(origin)
         case .auto:
             // cascade windows from the last saved frame
-            var origin = window.frame.origin
-            origin.y += window.frame.size.height
-            origin = window.cascadeTopLeft(from: origin)
-            origin.y -= window.frame.size.height
-            window.setFrameOrigin(origin)
+            var origin = window!.frame.origin
+            origin.y += window!.frame.size.height
+            origin = window!.cascadeTopLeft(from: origin)
+            origin.y -= window!.frame.size.height
+            window!.setFrameOrigin(origin)
         }
-        window.saveFrame(usingName: Self.windowFrameSaveName)
+
+        window!.saveFrame(usingName: Self.windowFrameSaveName)
     }
 
     override func showWindow(_ sender: Any?) {
@@ -112,4 +117,8 @@ extension MainWindowController: NSWindowDelegate {
         WindowControllersManager.shared.unregister(self)
     }
 
+}
+
+fileprivate extension NSStoryboard.SceneIdentifier {
+    static let mainViewController = NSStoryboard.SceneIdentifier("mainViewController")
 }
