@@ -162,7 +162,7 @@ class MainViewController: NSViewController {
             findInPageViewController?.makeMeFirstResponder()
         } else if !(tabCollectionViewModel.selectedTabViewModel?.addressBarString.isEmpty ?? false) {
             // If there's an address bar string, this isn't a new tab, so make the webview the first responder
-            tabCollectionViewModel.selectedTabViewModel?.tab.webView.makeMeFirstResponder()
+            tabCollectionViewModel.selectedTabViewModel?.webView.makeMeFirstResponder()
         }
         
     }
@@ -234,8 +234,8 @@ extension MainViewController {
         guard view.window?.firstResponder == addressBarTextField?.currentEditor() else { return }
 
         // If the webview doesn't have content it doesn't handle becoming the first responder properly
-        if tabCollectionViewModel.selectedTabViewModel?.tab.webView.url != nil {
-            tabCollectionViewModel.selectedTabViewModel?.tab.webView.makeMeFirstResponder()
+        if tabCollectionViewModel.selectedTabViewModel?.webView.url != nil {
+            tabCollectionViewModel.selectedTabViewModel?.webView.makeMeFirstResponder()
         } else {
             navigationBarContainerView.makeMeFirstResponder()
         }

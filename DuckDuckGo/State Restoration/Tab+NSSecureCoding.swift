@@ -40,12 +40,12 @@ extension Tab: NSSecureCoding {
     }
 
     public func encode(with coder: NSCoder) {
-        let configuration = webView.configuration
-        guard configuration.websiteDataStore.isPersistent == true else { return }
+        let configuration = maybeWebView?.configuration ?? self.configuration
+        guard configuration?.websiteDataStore.isPersistent != false else { return }
 
         url.map(coder.encode(forKey: NSCodingKeys.url))
         title.map(coder.encode(forKey: NSCodingKeys.title))
-        coder.encode(configuration, forKey: NSCodingKeys.configuration)
+        configuration.map(coder.encode(forKey: NSCodingKeys.configuration))
         favicon.map(coder.encode(forKey: NSCodingKeys.favicon))
         getActualSessionStateData().map(coder.encode(forKey: NSCodingKeys.sessionStateData))
     }

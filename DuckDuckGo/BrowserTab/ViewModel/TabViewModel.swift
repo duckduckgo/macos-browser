@@ -50,10 +50,18 @@ class TabViewModel {
     @Published private(set) var favicon: NSImage = Favicon.home
     @Published private(set) var findInPage: FindInPageModel = FindInPageModel()
 
+    var webView: WebView {
+        tab.getWebView { webView in
+            webViewStateObserver = WebViewStateObserver(webView: webView, tabViewModel: self)
+        }
+    }
+
     init(tab: Tab) {
         self.tab = tab
 
-        webViewStateObserver = WebViewStateObserver(webView: tab.webView, tabViewModel: self)
+        if let webView = tab.maybeWebView {
+            webViewStateObserver = WebViewStateObserver(webView: webView, tabViewModel: self)
+        }
 
         subscribeToUrl()
         subscribeToTitle()

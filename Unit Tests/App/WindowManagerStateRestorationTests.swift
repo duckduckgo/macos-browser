@@ -32,7 +32,7 @@ class WindowManagerStateRestorationTests: XCTestCase {
         a.url == b.url
             && a.title == b.title
             && a.sessionStateData == b.sessionStateData
-            && a.webView.configuration.websiteDataStore.isPersistent == b.webView.configuration.websiteDataStore.isPersistent
+            && a.maybeWebView?.configuration.websiteDataStore.isPersistent == b.maybeWebView?.configuration.websiteDataStore.isPersistent
     }
     func areTabsEqual(_ a: [Tab], _ b: [Tab]) -> Bool {
         a.count == b.count &&

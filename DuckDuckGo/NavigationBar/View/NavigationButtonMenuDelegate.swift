@@ -78,7 +78,7 @@ extension NavigationButtonMenuDelegate: NSMenuDelegate {
             return
         }
 
-        selectedTabViewModel.tab.webView.go(to: listItem)
+        selectedTabViewModel.webView.go(to: listItem)
     }
 
     private var listItems: [WKBackForwardListItem] {
@@ -87,10 +87,10 @@ extension NavigationButtonMenuDelegate: NSMenuDelegate {
             return []
         }
 
-        let backForwardList = selectedTabViewModel.tab.webView.backForwardList
+        let backForwardList = selectedTabViewModel.webView.backForwardList
         var list = buttonType == .back ? backForwardList.backList.reversed() : backForwardList.forwardList
 
-        guard let currentItem = selectedTabViewModel.tab.webView.backForwardList.currentItem else {
+        guard let currentItem = selectedTabViewModel.webView.backForwardList.currentItem else {
             os_log("%s: Current item is nil", type: .error, className)
             return list
         }
@@ -105,7 +105,7 @@ extension NavigationButtonMenuDelegate: NSMenuDelegate {
             return nil
         }
 
-        return selectedTabViewModel.tab.webView.backForwardList.currentItem
+        return selectedTabViewModel.webView.backForwardList.currentItem
     }
 
 }

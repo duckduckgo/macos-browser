@@ -48,16 +48,10 @@ final class Tab: NSObject {
         self.title = title
         self.error = error
         self.favicon = favicon
+        self.configuration = webViewConfiguration
         self.sessionStateData = sessionStateData
 
-        webView = WebView(frame: CGRect.zero, configuration: webViewConfiguration ?? WKWebViewConfiguration.makeConfiguration())
-
         super.init()
-
-        setupWebView()
-        if webView.configuration.userContentController.userScripts.isEmpty {
-            setupUserScripts()
-        }
 
         if let favicon = favicon,
            let host = url?.host {
@@ -66,10 +60,18 @@ final class Tab: NSObject {
     }
 
     deinit {
-        webView.stopLoading()
+        webView?.stopLoading()
     }
 
-    let webView: WebView
+    private var webView: WebView?
+    var maybeWebView: WebView? { webView }
+
+    func getWebView(setupCallback: (WebView) -> Void) -> WebView {
+        if webView == nil {
+            setupCallback(setupWebView())
+        }
+        return webView!
+    }
 
     @Published var url: URL? {
         didSet {
@@ -89,6 +91,8 @@ final class Tab: NSObject {
         }
     }
 
+    let configuration: WebViewConfiguration?
+
     var sessionStateData: Data?
 
     func invalidateSessionStateData() {
@@ -100,7 +104,7 @@ final class Tab: NSObject {
             return sessionStateData
         }
         // collect and cache actual SessionStateData on demand and store until invalidated
-        self.sessionStateData = (try? webView.sessionStateData())
+        self.sessionStateData = (try? webView?.sessionStateData())
         return self.sessionStateData
     }
 
@@ -117,11 +121,11 @@ final class Tab: NSObject {
     }
 
     func goForward() {
-        webView.goForward()
+        webView?.goForward()
     }
 
     func goBack() {
-        webView.goBack()
+        webView?.goBack()
     }
 
     func openHomepage() {
@@ -130,18 +134,20 @@ final class Tab: NSObject {
 
     func reload() {
         if let error = error, let failingUrl = error.failingUrl {
-            webView.load(failingUrl)
+            webView?.load(failingUrl)
             return
         }
 
-        webView.reload()
+        webView?.reload()
     }
 
     func stopLoading() {
-        webView.stopLoading()
+        webView?.stopLoading()
     }
 
-    private func setupWebView() {
+    private func setupWebView() -> WebView {
+        let webView = WebView(frame: CGRect.zero, configuration: configuration ?? .makeConfiguration())
+
         webView.navigationDelegate = self
         webView.allowsBackForwardNavigationGestures = true
 
@@ -152,6 +158,14 @@ final class Tab: NSObject {
                 os_log("Tab:setupWebView could not restore session state %s", "\(error)")
             }
         }
+
+        if webView.configuration.userContentController.userScripts.isEmpty {
+            setupUserScripts(webView: webView)
+        }
+
+        self.webView = webView
+
+        return webView
     }
 
     // MARK: - Favicon
@@ -195,7 +209,7 @@ final class Tab: NSObject {
         self.contentBlockerRulesScript
     ]
 
-    private func setupUserScripts() {
+    private func setupUserScripts(webView: WebView) {
         debugScript.instrumentation = instrumentation
         faviconScript.delegate = self
         html5downloadScript.delegate = self
@@ -313,7 +327,7 @@ extension Tab: WKNavigationDelegate {
 
         HTTPSUpgrade.shared.isUpgradeable(url: url) { [weak self] isUpgradable in
             if isUpgradable, let upgradedUrl = url.toHttps() {
-                self?.webView.load(upgradedUrl)
+                self?.webView?.load(upgradedUrl)
                 decisionHandler(.cancel)
                 return
             }
@@ -333,7 +347,7 @@ extension Tab: WKNavigationDelegate {
 
     private func updateUserAgentForDomain(_ host: String?) {
         let domain = host ?? ""
-        webView.customUserAgent = UserAgent.forDomain(domain)
+        webView!.customUserAgent = UserAgent.forDomain(domain)
     }
 
     private func navigationResponsePolicyForDownloads(_ navigationResponse: WKNavigationResponse) -> WKNavigationResponsePolicy {
@@ -388,19 +402,19 @@ extension Tab: WKNavigationDelegate {
 extension Tab {
 
     private func find(text: String) {
-        findInPageScript.find(text: text, inWebView: webView)
+        findInPageScript.find(text: text, inWebView: webView!)
     }
 
     func findDone() {
-        findInPageScript.done(withWebView: webView)
+        findInPageScript.done(withWebView: webView!)
     }
 
     func findNext() {
-        findInPageScript.next(withWebView: webView)
+        findInPageScript.next(withWebView: webView!)
     }
 
     func findPrevious() {
-        findInPageScript.previous(withWebView: webView)
+        findInPageScript.previous(withWebView: webView!)
     }
 
 }

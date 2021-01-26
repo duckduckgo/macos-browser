@@ -63,7 +63,7 @@ class BrowserTabViewController: NSViewController {
         func displayWebView(of tabViewModel: TabViewModel) {
             tabViewModel.tab.delegate = self
 
-            let newWebView = tabViewModel.tab.webView
+            let newWebView = tabViewModel.webView
             newWebView.uiDelegate = self
 
             // This code should ideally use Auto Layout, but in order to enable the web inspector, it needs to use springs & structs.
@@ -155,6 +155,8 @@ class BrowserTabViewController: NSViewController {
 
     private func openNewTab(with url: URL?, selected: Bool = false) {
         let tab = Tab()
+        // start loading new tab instantly
+        _=tab.getWebView(setupCallback: { _ in })
         tab.url = url
         tabCollectionViewModel.append(tab: tab, selected: selected)
     }
@@ -255,7 +257,7 @@ extension BrowserTabViewController: WKUIDelegate {
             return nil
         }
         // WebKit loads the request in the returned web view.
-        return selectedViewModel.tab.webView
+        return selectedViewModel.webView
     }
     
     func webView(_ webView: WKWebView,
