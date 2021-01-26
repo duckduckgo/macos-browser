@@ -145,7 +145,7 @@ final class MainViewController: NSViewController {
             findInPageViewController?.makeMeFirstResponder()
         } else if !(tabCollectionViewModel.selectedTabViewModel?.addressBarString.isEmpty ?? false) {
             // If there's an address bar string, this isn't a new tab, so make the webview the first responder
-            tabCollectionViewModel.selectedTabViewModel?.tab.webView.makeMeFirstResponder()
+            tabCollectionViewModel.selectedTabViewModel?.webView.makeMeFirstResponder()
         }
         
     }

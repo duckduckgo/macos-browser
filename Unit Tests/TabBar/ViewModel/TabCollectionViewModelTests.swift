@@ -222,8 +222,9 @@ class TabCollectionViewModelTests: XCTestCase {
         tabCollectionViewModel.appendNewTab()
         tabCollectionViewModel.appendNewTab()
         let lastTabViewModel = tabCollectionViewModel.tabViewModel(at: tabCollectionViewModel.tabCollection.tabs.count - 1)!
+        _=lastTabViewModel.tab.setupWebView()
 
-        tabCollectionViewModel.remove(ownerOf: lastTabViewModel.tab.webView)
+        tabCollectionViewModel.remove(ownerOf: lastTabViewModel.tab.webView!)
 
         XCTAssertFalse(tabCollectionViewModel.tabCollection.tabs.contains(lastTabViewModel.tab))
         XCTAssert(tabCollectionViewModel.tabCollection.tabs.count == 2)
@@ -233,8 +234,9 @@ class TabCollectionViewModelTests: XCTestCase {
         let tabCollectionViewModel = TabCollectionViewModel.aTabCollectionViewModel()
         let originalCount = tabCollectionViewModel.tabCollection.tabs.count
         let tab = Tab()
+        _=tab.setupWebView()
 
-        tabCollectionViewModel.remove(ownerOf: tab.webView)
+        tabCollectionViewModel.remove(ownerOf: tab.webView!)
 
         XCTAssertEqual(tabCollectionViewModel.tabCollection.tabs.count, originalCount)
     }

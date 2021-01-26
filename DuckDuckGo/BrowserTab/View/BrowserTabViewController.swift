@@ -63,7 +63,7 @@ final class BrowserTabViewController: NSViewController {
         func displayWebView(of tabViewModel: TabViewModel) {
             tabViewModel.tab.delegate = self
 
-            let newWebView = tabViewModel.tab.webView
+            let newWebView = tabViewModel.webView
             newWebView.uiDelegate = self
 
             // This code should ideally use Auto Layout, but in order to enable the web inspector, it needs to use springs & structs.

@@ -48,7 +48,7 @@ class AppStateChangePublisherTests: XCTestCase {
             e.fulfill()
         }
         withExtendedLifetime(timer) {
-            waitForExpectations(timeout: 1.0, handler: nil)
+            waitForExpectations(timeout: 10.0, handler: nil)
         }
     }
 

@@ -39,37 +39,40 @@ final class Tab: NSObject, NSSecureCoding {
          url: URL? = nil,
          title: String? = nil,
          error: Error? = nil,
+         favicon: NSImage? = nil,
          sessionStateData: Data? = nil) {
 
         self.faviconService = faviconService
-        webView = WebView(frame: CGRect.zero, configuration: webViewConfiguration ?? WKWebViewConfiguration.makeConfiguration())
 
         self.url = url
         self.title = title
         self.error = error
+        self.favicon = favicon
+        self.configuration = webViewConfiguration
         self.sessionStateData = sessionStateData
 
         super.init()
 
-        setupWebView()
-        if webViewConfiguration == nil {
-            setupUserScripts()
+        if let favicon = favicon,
+           let host = url?.host {
+            faviconService.store(favicon: favicon, for: host)
         }
     }
 
     override func copy() -> Any {
         Tab(faviconService: faviconService,
-            webViewConfiguration: webView.configuration,
+            webViewConfiguration: webView?.configuration ?? configuration,
             url: url,
             title: title,
-            sessionStateData: try? webView.sessionStateData())
+            favicon: favicon,
+            sessionStateData: sessionStateData)
     }
 
     deinit {
-        webView.stopLoading()
+        webView?.stopLoading()
     }
 
-    let webView: WebView
+    private(set) var webView: WebView?
 
     @Published var url: URL? {
         didSet {
@@ -89,7 +92,19 @@ final class Tab: NSObject, NSSecureCoding {
         }
     }
 
+    private let configuration: WebViewConfiguration?
     var sessionStateData: Data?
+    private func invalidateSessionStateData() {
+        sessionStateData = nil
+    }
+    private func getActualSessionStateData() -> Data? {
+        if let sessionStateData = sessionStateData {
+            return sessionStateData
+        }
+        // collect and cache actual SessionStateData on demand and store until invalidated
+        self.sessionStateData = (try? webView?.sessionStateData())
+        return self.sessionStateData
+    }
 
     // Used to track if an error was caused by a download navigation.
     private var currentDownload: FileDownload?
@@ -104,11 +119,11 @@ final class Tab: NSObject, NSSecureCoding {
     }
 
     func goForward() {
-        webView.goForward()
+        webView?.goForward()
     }
 
     func goBack() {
-        webView.goBack()
+        webView?.goBack()
     }
 
     func openHomepage() {
@@ -117,18 +132,20 @@ final class Tab: NSObject, NSSecureCoding {
 
     func reload() {
         if let error = error, let failingUrl = error.failingUrl {
-            webView.load(failingUrl)
+            webView?.load(failingUrl)
             return
         }
 
-        webView.reload()
+        webView?.reload()
     }
 
     func stopLoading() {
-        webView.stopLoading()
+        webView?.stopLoading()
     }
 
-    private func setupWebView() {
+    func setupWebView() -> WebView {
+        let webView = WebView(frame: CGRect.zero, configuration: configuration ?? .makeConfiguration())
+
         webView.navigationDelegate = self
         webView.allowsBackForwardNavigationGestures = true
         webView.customUserAgent = UserAgent.safari
@@ -140,6 +157,14 @@ final class Tab: NSObject, NSSecureCoding {
                 os_log("Tab:setupWebView could not restore session state %s", "\(error)")
             }
         }
+
+        if configuration == nil {
+            setupUserScripts(webView: webView)
+        }
+
+        self.webView = webView
+
+        return webView
     }
 
     // MARK: - Favicon
@@ -181,7 +206,7 @@ final class Tab: NSObject, NSSecureCoding {
         self.contentBlockerRulesScript
     ]
 
-    private func setupUserScripts() {
+    private func setupUserScripts(webView: WebView) {
         debugScript.instrumentation = instrumentation
         faviconScript.delegate = self
         html5downloadScript.delegate = self
@@ -211,6 +236,7 @@ final class Tab: NSObject, NSSecureCoding {
         static let title = "title"
         static let configuration = "configuration"
         static let sessionStateData = "ssdata"
+        static let favicon = "icon"
     }
 
     static var supportsSecureCoding: Bool { true }
@@ -219,20 +245,19 @@ final class Tab: NSObject, NSSecureCoding {
         self.init(webViewConfiguration: decoder.decodeIfPresent(at: NSCodingKeys.configuration),
                   url: decoder.decodeIfPresent(at: NSCodingKeys.url),
                   title: decoder.decodeIfPresent(at: NSCodingKeys.title),
+                  favicon: decoder.decodeIfPresent(at: NSCodingKeys.favicon),
                   sessionStateData: decoder.decodeIfPresent(at: NSCodingKeys.sessionStateData))
     }
 
     public func encode(with coder: NSCoder) {
-        let configuration = webView.configuration
-        guard configuration.websiteDataStore.isPersistent else { return }
+        let configuration = webView?.configuration ?? self.configuration
+        guard configuration?.websiteDataStore.isPersistent == true else { return }
 
         url.map(coder.encode(forKey: NSCodingKeys.url))
         title.map(coder.encode(forKey: NSCodingKeys.title))
-        coder.encode(configuration, forKey: NSCodingKeys.configuration)
-
-        if let sessionStateData = try? webView.sessionStateData() {
-            coder.encode(sessionStateData, forKey: NSCodingKeys.sessionStateData)
-        }
+        configuration.map(coder.encode(forKey: NSCodingKeys.configuration))
+        favicon.map(coder.encode(forKey: NSCodingKeys.favicon))
+        getActualSessionStateData().map(coder.encode(forKey: NSCodingKeys.sessionStateData))
     }
 
 }
@@ -328,7 +353,7 @@ extension Tab: WKNavigationDelegate {
 
         HTTPSUpgrade.shared.isUpgradeable(url: url) { [weak self] isUpgradable in
             if isUpgradable, let upgradedUrl = url.toHttps() {
-                self?.webView.load(upgradedUrl)
+                self?.webView?.load(upgradedUrl)
                 decisionHandler(.cancel)
                 return
             }
@@ -374,18 +399,18 @@ extension Tab: WKNavigationDelegate {
         // Unnecessary assignment triggers publishing
         if error != nil { error = nil }
 
-        self.sessionStateData = try? (webView as? WebView)?.sessionStateData()
+        self.invalidateSessionStateData()
     }
 
     func webView(_ webView: WKWebView, didFinish navigation: WKNavigation!) {
-        self.sessionStateData = try? (webView as? WebView)?.sessionStateData()
+        self.invalidateSessionStateData()
     }
 
     func webView(_ webView: WKWebView, didFail navigation: WKNavigation!, withError error: Error) {
         #warning("Failing not captured. Seems the method is called after calling the webview's method goBack()")
 //        hasError = true
 
-        self.sessionStateData = try? (webView as? WebView)?.sessionStateData()
+        self.invalidateSessionStateData()
     }
 
     func webView(_ webView: WKWebView, didFailProvisionalNavigation navigation: WKNavigation!, withError error: Error) {
@@ -403,19 +428,19 @@ extension Tab: WKNavigationDelegate {
 extension Tab {
 
     private func find(text: String) {
-        findInPageScript.find(text: text, inWebView: webView)
+        findInPageScript.find(text: text, inWebView: webView!)
     }
 
     func findDone() {
-        findInPageScript.done(withWebView: webView)
+        findInPageScript.done(withWebView: webView!)
     }
 
     func findNext() {
-        findInPageScript.next(withWebView: webView)
+        findInPageScript.next(withWebView: webView!)
     }
 
     func findPrevious() {
-        findInPageScript.previous(withWebView: webView)
+        findInPageScript.previous(withWebView: webView!)
     }
 
 }
