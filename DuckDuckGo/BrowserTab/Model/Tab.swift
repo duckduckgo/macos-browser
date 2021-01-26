@@ -218,28 +218,18 @@ final class Tab: NSObject, NSSecureCoding {
     static var supportsSecureCoding: Bool { true }
 
     convenience init?(coder decoder: NSCoder) {
-        let url = decoder.containsValue(forKey: NSCodingKeys.url)
-            ? decoder.decodeObject(of: NSURL.self, forKey: NSCodingKeys.url) as URL?
-            : nil
-        let title = decoder.containsValue(forKey: NSCodingKeys.title)
-            ? decoder.decodeObject(of: NSString.self, forKey: NSCodingKeys.title) as String?
-            : nil
-        let sessionStateData = decoder.containsValue(forKey: NSCodingKeys.sessionStateData)
-            ? decoder.decodeObject(of: NSData.self, forKey: NSCodingKeys.sessionStateData) as Data?
-            : nil
-        let configuration = decoder.containsValue(forKey: NSCodingKeys.configuration)
-            ? decoder.decodeObject(of: WebViewConfiguration.self, forKey: NSCodingKeys.configuration)
-            : nil
-
-        self.init(webViewConfiguration: configuration, url: url, title: title, sessionStateData: sessionStateData)
+        self.init(webViewConfiguration: decoder.decodeIfPresent(at: NSCodingKeys.configuration),
+                  url: decoder.decodeIfPresent(at: NSCodingKeys.url),
+                  title: decoder.decodeIfPresent(at: NSCodingKeys.title),
+                  sessionStateData: decoder.decodeIfPresent(at: NSCodingKeys.sessionStateData))
     }
 
     public func encode(with coder: NSCoder) {
         let configuration = webView.configuration
         guard configuration.websiteDataStore.isPersistent else { return }
 
-        coder.encode(url, forKey: NSCodingKeys.url)
-        coder.encode(title, forKey: NSCodingKeys.title)
+        url.map(coder.encode(forKey: NSCodingKeys.url))
+        title.map(coder.encode(forKey: NSCodingKeys.title))
         coder.encode(configuration, forKey: NSCodingKeys.configuration)
 
         if let sessionStateData = try? webView.sessionStateData() {

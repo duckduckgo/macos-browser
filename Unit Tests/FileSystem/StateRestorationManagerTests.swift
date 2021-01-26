@@ -163,18 +163,12 @@ private class SavedStateMock: NSObject {
     }
 
     func encode(with coder: NSCoder) {
-        coder.encode(val1, forKey: NSCodingKeys.key1)
-        if let val2 = val2 {
-            coder.encode(val2, forKey: NSCodingKeys.key2)
-        }
+        val1.map(coder.encode(forKey: NSCodingKeys.key1))
+        val2.map(coder.encode(forKey: NSCodingKeys.key2))
     }
 
     func restoreState(from coder: NSCoder) throws {
-        val1 = coder.containsValue(forKey: NSCodingKeys.key1)
-            ? coder.decodeObject(of: NSString.self, forKey: NSCodingKeys.key1) as String?
-            : nil
-        val2 = coder.containsValue(forKey: NSCodingKeys.key2)
-            ? coder.decodeInteger(forKey: NSCodingKeys.key2)
-            : nil
+        val1 = coder.decodeIfPresent(at: NSCodingKeys.key1)
+        val2 = coder.decodeIfPresent(at: NSCodingKeys.key2)
     }
 }

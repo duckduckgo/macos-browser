@@ -359,16 +359,12 @@ extension TabCollectionViewModel: NSSecureCoding {
 
     convenience init?(coder: NSCoder) {
         let tabCollection = coder.decodeObject(of: TabCollection.self, forKey: NSCodingKeys.tabCollection)
-        let selectionIndex = coder.containsValue(forKey: NSCodingKeys.selectionIndex)
-            ? coder.decodeInteger(forKey: NSCodingKeys.selectionIndex)
-            : nil
+        let selectionIndex = coder.decodeIfPresent(at: NSCodingKeys.selectionIndex)
         self.init(tabCollection: tabCollection, selectionIndex: selectionIndex)
     }
 
     func encode(with coder: NSCoder) {
-        if let selectionIndex = selectionIndex {
-            coder.encode(selectionIndex, forKey: NSCodingKeys.selectionIndex)
-        }
+        selectionIndex.map(coder.encode(forKey: NSCodingKeys.selectionIndex))
         coder.encode(tabCollection, forKey: NSCodingKeys.tabCollection)
     }
 
