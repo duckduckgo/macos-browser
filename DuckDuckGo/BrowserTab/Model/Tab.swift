@@ -154,10 +154,8 @@ final class Tab: NSObject, NSSecureCoding {
             return
         }
 
-        faviconService.fetchFavicon(faviconURL, for: host) { (image, error) in
-            guard error == nil, let image = image else {
-                return
-            }
+        faviconService.fetchFavicon(faviconURL, for: host) { result in
+            guard case .success(let image) = result else { return }
 
             self.favicon = image
         }
@@ -264,10 +262,8 @@ extension Tab: FaviconUserScriptDelegate {
             return
         }
 
-        faviconService.fetchFavicon(faviconUrl, for: host) { (image, error) in
-            guard error == nil, let image = image else {
-                return
-            }
+        faviconService.fetchFavicon(faviconUrl, for: host) { result in
+            guard case .success(let image) = result else { return }
 
             self.favicon = image
         }
