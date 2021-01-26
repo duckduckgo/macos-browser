@@ -207,8 +207,7 @@ class AddressBarViewController: NSViewController {
 extension AddressBarViewController {
 
     @objc func textFieldFirstReponderNotification(_ notification: Notification) {
-        // NSTextField passes its first responder status down to a child view of NSTextView class
-        if let textView = notification.object as? NSTextView, textView.superview?.superview === addressBarTextField {
+        if view.window?.firstResponder == addressBarTextField.currentEditor() {
             updateView(firstResponder: true)
         } else {
             if mode != .browsing {
