@@ -26,7 +26,7 @@ class FocusRingView: NSView {
         case backgroundRadius = 8
     }
 
-    var strokedBackgroundColor = NSColor.textBackgroundColor
+    var strokedBackgroundColor = NSColor(named: "AddressBarFocusedBackgroundColor")!
     var unstrokedBackgroundColor = NSColor(named: "AddressBarBackgroundColor")!
 
     private let shadowLayer = CALayer()
