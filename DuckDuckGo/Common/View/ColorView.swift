@@ -41,4 +41,9 @@ class ColorView: NSView {
     func setupView() {
         self.wantsLayer = true
     }
+    
+    override func updateLayer() {
+        super.updateLayer()
+        layer?.backgroundColor = backgroundColor?.cgColor
+    }
 }
