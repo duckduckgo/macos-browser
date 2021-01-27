@@ -65,6 +65,9 @@ class BrowserTabViewController: NSViewController {
 
             let newWebView = tabViewModel.tab.webView
             newWebView.uiDelegate = self
+            
+            // Without this, in certain situations in dark mode the page will be white
+            newWebView.setValue(false, forKey: "drawsBackground")
 
             view.addAndLayout(newWebView)
             webView = newWebView
