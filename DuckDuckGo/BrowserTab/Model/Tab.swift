@@ -374,7 +374,7 @@ extension Tab: WKNavigationDelegate {
 
     private func updateUserAgentForDomain(_ host: String?) {
         let domain = host ?? ""
-        webView.customUserAgent = UserAgent.forDomain(domain)
+        webView?.customUserAgent = UserAgent.forDomain(domain)
     }
 
     private func navigationResponsePolicyForDownloads(_ navigationResponse: WKNavigationResponse) -> WKNavigationResponsePolicy {
