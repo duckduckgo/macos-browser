@@ -217,8 +217,8 @@ extension MainViewController {
         guard view.window?.firstResponder == addressBarTextField?.currentEditor() else { return }
 
         // If the webview doesn't have content it doesn't handle becoming the first responder properly
-        if tabCollectionViewModel.selectedTabViewModel?.tab.webView.url != nil {
-            tabCollectionViewModel.selectedTabViewModel?.tab.webView.makeMeFirstResponder()
+        if tabCollectionViewModel.selectedTabViewModel?.webView.url != nil {
+            tabCollectionViewModel.selectedTabViewModel?.webView.makeMeFirstResponder()
         } else {
             navigationBarContainerView.makeMeFirstResponder()
         }
