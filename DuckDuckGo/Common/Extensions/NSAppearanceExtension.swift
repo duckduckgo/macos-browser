@@ -22,9 +22,7 @@ extension NSAppearance {
     static func withAppAppearance(_ closure: () -> Void) {
         let previousAppearance = NSAppearance.current
         NSAppearance.current = NSApp.effectiveAppearance
-        defer {
-            NSAppearance.current = previousAppearance
-        }
-        return closure()
+        closure()
+        NSAppearance.current = previousAppearance
     }
 }
