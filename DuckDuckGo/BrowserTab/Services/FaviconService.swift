@@ -17,13 +17,19 @@
 //
 
 import Cocoa
+import Combine
 
 protocol FaviconService {
 
-    func fetchFavicon(_ faviconUrl: URL?, for host: String, completion: @escaping LocalFaviconService.Callback)
+    func fetchFavicon(at faviconUrl: URL?, for host: String, completion: @escaping LocalFaviconService.Callback)
     func getCachedFavicon(for host: String) -> NSImage?
     func store(favicon: NSImage, for host: String)
 
+}
+extension FaviconService {
+    func fetchFavicon(for host: String, completion: @escaping LocalFaviconService.Callback) {
+        fetchFavicon(at: nil, for: host, completion: completion)
+    }
 }
 
 class LocalFaviconService: FaviconService {
@@ -40,56 +46,85 @@ class LocalFaviconService: FaviconService {
         case favicon = "favicon.ico"
     }
 
-    private var requests = [String: Promise<NSImage, Error>]()
-    private var cache = [String: NSImage]()
+    private var requests = [String: Future<NSImage, Error>]()
+    private var subscriptions = [NSValue: AnyCancellable]()
+    private let cache = NSCache<NSString, NSImage>()
     private let queue = DispatchQueue(label: "LocalFaviconService queue", attributes: .concurrent)
 
-    func fetchFavicon(_ faviconUrl: URL?, for host: String, completion: @escaping Callback) {
+    private func fetchFaviconSync(url: URL, host: String, retryDroppingSubdomain: Bool, callback: @escaping Callback) {
+        dispatchPrecondition(condition: .onQueue(queue))
+
+        guard let image = NSImage(contentsOf: url), image.isValid else {
+            if retryDroppingSubdomain,
+               let newHost = host.dropSubdomain() {
+
+                DispatchQueue.main.async {
+                    self.fetchFavicon(at: nil, for: newHost, completion: callback)
+                }
+            } else {
+                callback(.failure(.imageInitFailed))
+            }
+            return
+        }
+
+        callback(.success(image))
+    }
+
+    func fetchFavicon(at faviconUrl: URL?, for host: String, completion callback: @escaping Callback) {
         dispatchPrecondition(condition: .onQueue(.main))
 
         if let cachedFavicon = self.getCachedFavicon(for: host) {
-            return completion(.success(cachedFavicon))
-        }
-        if let promise = requests[host] {
-            return promise.append(completion)
+            callback(.success(cachedFavicon))
+            return
         }
 
-        requests[host] = Promise(queue, callback: { result in
-            if case .success(let image) = result {
-                self.store(favicon: image, for: host)
-            }
+        guard let url = faviconUrl ?? URL(string: "\(URL.Scheme.https.separated())\(host)/\(FaviconName.favicon.rawValue)")
+        else {
+            callback(.failure(.urlConstructionFailed))
+            return
+        }
 
-            self.requests[host] = nil
-            completion(result)
-
-        }) { resolve in
-            guard let url = faviconUrl ?? URL(string: "\(URL.Scheme.https.separated())\(host)/\(FaviconName.favicon.rawValue)") else {
-                return resolve(.failure(.urlConstructionFailed))
-            }
-
-            guard let image = NSImage(contentsOf: url), image.isValid else {
-                if let newHost = host.dropSubdomain(), faviconUrl == nil {
-                    DispatchQueue.main.async {
-                        self.fetchFavicon(nil, for: newHost, completion: resolve)
-                    }
-                } else {
-                    resolve(.failure(.imageInitFailed))
+        func newFuture() -> Future<NSImage, Error> {
+            let future = Future<NSImage, Error> { [unowned self] promise in
+                self.queue.async { [unowned self] in
+                    self.fetchFaviconSync(url: url,
+                                          host: host,
+                                          retryDroppingSubdomain: faviconUrl == nil,
+                                          callback: promise)
                 }
-                return
+            }
+            self.requests[host] = future
+            
+            return future
+        }
+
+        let future = requests[host] ?? newFuture()
+        let subscriptionKey = NSValue(nonretainedObject: callback)
+        subscriptions[subscriptionKey] = future.receive(on: DispatchQueue.main).sink { [unowned self] in
+            self.requests[host] = nil
+            self.subscriptions[subscriptionKey] = nil
+
+            switch $0 {
+            case .failure(let error):
+                callback(.failure(error))
+            case .finished:
+                break
             }
 
-            resolve(.success(image))
+        } receiveValue: { [unowned self] image in
+            self.store(favicon: image, for: host)
+            callback(.success(image))
         }
     }
 
     func store(favicon: NSImage, for host: String) {
         dispatchPrecondition(condition: .onQueue(.main))
-        cache[host] = favicon
+        cache.setObject(favicon, forKey: host as NSString)
     }
 
     func getCachedFavicon(for host: String) -> NSImage? {
         dispatchPrecondition(condition: .onQueue(.main))
-        return cache[host]
+        return cache.object(forKey: host as NSString)
     }
 
 }

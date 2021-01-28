@@ -77,7 +77,7 @@ final class Tab: NSObject, NSSecureCoding {
     @Published var url: URL? {
         didSet {
             if oldValue?.host != url?.host {
-                fetchFavicon(nil, for: url?.host)
+                fetchFavicon(for: url?.host)
             }
         }
     }
@@ -172,14 +172,15 @@ final class Tab: NSObject, NSSecureCoding {
     @Published var favicon: NSImage?
     let faviconService: FaviconService
 
-    private func fetchFavicon(_ faviconURL: URL?, for host: String?) {
+    #warning("racing favicon request when continuosly setting URL")
+    private func fetchFavicon(for host: String?) {
         favicon = nil
 
         guard let host = host else {
             return
         }
 
-        faviconService.fetchFavicon(faviconURL, for: host) { result in
+        faviconService.fetchFavicon(for: host) { result in
             guard case .success(let image) = result else { return }
 
             self.favicon = image
@@ -287,7 +288,7 @@ extension Tab: FaviconUserScriptDelegate {
             return
         }
 
-        faviconService.fetchFavicon(faviconUrl, for: host) { result in
+        faviconService.fetchFavicon(at: faviconUrl, for: host) { result in
             guard case .success(let image) = result else { return }
 
             self.favicon = image
