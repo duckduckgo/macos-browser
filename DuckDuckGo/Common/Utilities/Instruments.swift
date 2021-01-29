@@ -19,9 +19,9 @@
 import Foundation
 import os.signpost
 
-public class Instruments {
+class Instruments {
 
-    public enum TimedEvent: String {
+    enum TimedEvent: String {
         case fetchingContentBlockerData
 
         case loadingDisconnectMeStore
@@ -34,11 +34,11 @@ public class Instruments {
         case injectScripts
     }
 
-    static public let shared = Instruments()
+    static let shared = Instruments()
 
     static var eventsLog = OSLog(subsystem: "com.duckduckgo.instrumentation", category: "Events")
 
-    public func startTimedEvent(_ event: TimedEvent, info: String? = nil) -> Any? {
+    func startTimedEvent(_ event: TimedEvent, info: String? = nil) -> Any? {
         let id = OSSignpostID(log: Instruments.eventsLog)
 
         os_signpost(.begin,
@@ -49,7 +49,7 @@ public class Instruments {
         return id
     }
 
-    public func endTimedEvent(for spid: Any?, result: String? = nil) {
+    func endTimedEvent(for spid: Any?, result: String? = nil) {
         if let id = spid as? OSSignpostID {
             os_signpost(.end,
                         log: Instruments.eventsLog,

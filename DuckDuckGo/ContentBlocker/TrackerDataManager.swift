@@ -19,11 +19,11 @@
 import Foundation
 import TrackerRadarKit
 
-public class TrackerDataManager {
+class TrackerDataManager {
 
     struct Constants {
-        public static let embeddedDataSetETag = "7c0a71eb049748b86e8590353141a90f"
-        public static let embeddedDataSetSHA = "rIBc/qpKYsUxT6+oceMEnF/IUgBCz0tcWMOQWW/waac="
+        static let embeddedDataSetETag = "7c0a71eb049748b86e8590353141a90f"
+        static let embeddedDataSetSHA = "rIBc/qpKYsUxT6+oceMEnF/IUgBCz0tcWMOQWW/waac="
     }
 
     enum DataSet {
@@ -36,15 +36,15 @@ public class TrackerDataManager {
 
     static let shared = TrackerDataManager()
 
-    private(set) public var trackerData: TrackerData! {
+    private(set) var trackerData: TrackerData! {
         didSet {
             let encodedData = try? JSONEncoder().encode(trackerData)
             encodedTrackerData = String(data: encodedData!, encoding: .utf8)!
         }
     }
 
-    private(set) public var encodedTrackerData: String!
-    private(set) public var etag: String?
+    private(set) var encodedTrackerData: String!
+    private(set) var etag: String?
 
     init(trackerData: TrackerData) {
         self.trackerData = trackerData

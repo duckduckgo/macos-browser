@@ -20,7 +20,7 @@ import Foundation
 import CoreData
 import os.log
 
-public protocol HTTPSUpgradeStore {
+protocol HTTPSUpgradeStore {
     
     func bloomFilter() -> BloomFilterWrapper?
     
@@ -33,7 +33,7 @@ public protocol HTTPSUpgradeStore {
     @discardableResult func persistExcludedDomains(_ domains: [String]) -> Bool
 }
 
-public class HTTPSUpgradePersistence: HTTPSUpgradeStore {
+class HTTPSUpgradePersistence: HTTPSUpgradeStore {
     
     private struct Resource {
         static var bloomFilter: URL {
@@ -60,7 +60,7 @@ public class HTTPSUpgradePersistence: HTTPSUpgradeStore {
         return (try? Resource.bloomFilter.checkResourceIsReachable()) ?? false
     }
     
-    public func bloomFilter() -> BloomFilterWrapper? {
+    func bloomFilter() -> BloomFilterWrapper? {
         let storedSpecification = hasBloomFilterData ? bloomFilterSpecification() : loadEmbeddedData()?.specification
         guard let specification = storedSpecification else { return nil }
         return BloomFilterWrapper(fromPath: Resource.bloomFilter.path,
@@ -68,7 +68,7 @@ public class HTTPSUpgradePersistence: HTTPSUpgradeStore {
                                   andTotalItems: Int32(specification.totalEntries))
     }
     
-    public func bloomFilterSpecification() -> HTTPSBloomFilterSpecification? {
+    func bloomFilterSpecification() -> HTTPSBloomFilterSpecification? {
         var specification: HTTPSBloomFilterSpecification?
         context.performAndWait {
             let request: NSFetchRequest<HTTPSStoredBloomFilterSpecification> = HTTPSStoredBloomFilterSpecification.fetchRequest()
@@ -95,7 +95,7 @@ public class HTTPSUpgradePersistence: HTTPSUpgradeStore {
         return EmbeddedBloomData(specification: specification, bloomFilter: bloomData, excludedDomains: excludedDomains.data)
     }
     
-    @discardableResult public func persistBloomFilter(specification: HTTPSBloomFilterSpecification, data: Data) -> Bool {
+    @discardableResult func persistBloomFilter(specification: HTTPSBloomFilterSpecification, data: Data) -> Bool {
         guard data.sha256 == specification.sha256 else { return false }
         guard persistBloomFilter(data: data) else { return false }
         persistBloomFilterSpecification(specification)
@@ -146,7 +146,7 @@ public class HTTPSUpgradePersistence: HTTPSUpgradeStore {
         }
     }
     
-    public func shouldExcludeDomain(_ domain: String) -> Bool {
+    func shouldExcludeDomain(_ domain: String) -> Bool {
         var result = false
         context.performAndWait {
             let request: NSFetchRequest<HTTPSExcludedDomain> = HTTPSExcludedDomain.fetchRequest()
@@ -157,7 +157,7 @@ public class HTTPSUpgradePersistence: HTTPSUpgradeStore {
         return result
     }
     
-    @discardableResult public func persistExcludedDomains(_ domains: [String]) -> Bool {
+    @discardableResult func persistExcludedDomains(_ domains: [String]) -> Bool {
         var result = true
         context.performAndWait {
             deleteExcludedDomains()

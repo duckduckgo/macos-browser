@@ -19,18 +19,18 @@
 import Foundation
 import CoreData
 
-public class Database {
+class Database {
     
     fileprivate struct Constants {
         static let databaseName = "Database"
     }
     
-    public static let shared = Database()
+    static let shared = Database()
 
     private let semaphore = DispatchSemaphore(value: 0)
     private let container: NSPersistentContainer
     
-    public var model: NSManagedObjectModel {
+    var model: NSManagedObjectModel {
         return container.managedObjectModel
     }
     
@@ -46,7 +46,7 @@ public class Database {
         container = DDGPersistentContainer(name: name, managedObjectModel: model)
     }
     
-    public func loadStore(migrationHandler: @escaping (NSManagedObjectContext) -> Void = { _ in }) {
+    func loadStore(migrationHandler: @escaping (NSManagedObjectContext) -> Void = { _ in }) {
         container.loadPersistentStores { _, error in
             if let error = error {
                 fatalError("Could not load DB: \(error.localizedDescription)")
@@ -62,7 +62,7 @@ public class Database {
         }
     }
     
-    public func makeContext(concurrencyType: NSManagedObjectContextConcurrencyType, name: String? = nil) -> NSManagedObjectContext {
+    func makeContext(concurrencyType: NSManagedObjectContextConcurrencyType, name: String? = nil) -> NSManagedObjectContext {
         semaphore.wait()
         let context = NSManagedObjectContext(concurrencyType: concurrencyType)
         context.persistentStoreCoordinator = container.persistentStoreCoordinator
@@ -75,19 +75,19 @@ public class Database {
 
 extension NSManagedObjectContext {
     
-    public func deleteAll(entities: [NSManagedObject] = []) {
+    func deleteAll(entities: [NSManagedObject] = []) {
         for entity in entities {
             delete(entity)
         }
     }
     
-    public func deleteAll<T: NSManagedObject>(matching request: NSFetchRequest<T>) {
+    func deleteAll<T: NSManagedObject>(matching request: NSFetchRequest<T>) {
             if let result = try? fetch(request) {
                 deleteAll(entities: result)
             }
     }
     
-    public func deleteAll(entityDescriptions: [NSEntityDescription] = []) {
+    func deleteAll(entityDescriptions: [NSEntityDescription] = []) {
         for entityDescription in entityDescriptions {
             let request = NSFetchRequest<NSManagedObject>()
             request.entity = entityDescription
@@ -99,7 +99,7 @@ extension NSManagedObjectContext {
 
 private class DDGPersistentContainer: NSPersistentContainer {
 
-    override public class func defaultDirectoryURL() -> URL {
+    override class func defaultDirectoryURL() -> URL {
         return FileManager.default.urls(for: .applicationSupportDirectory, in: .userDomainMask).first!
     } 
 }
