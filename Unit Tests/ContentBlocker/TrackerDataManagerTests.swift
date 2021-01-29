@@ -18,7 +18,7 @@
 
 import XCTest
 import CommonCrypto
-@testable import TrackerRadarKit
+import TrackerRadarKit
 @testable import DuckDuckGo_Privacy_Browser
 
 class TrackerDataManagerTests: XCTestCase {
