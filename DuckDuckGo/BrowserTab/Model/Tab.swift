@@ -72,7 +72,16 @@ final class Tab: NSObject, NSSecureCoding {
         webView?.stopLoading()
     }
 
-    private(set) var webView: WebView?
+    private var webView: WebView?
+
+    var maybeWebView: WebView? { webView }
+
+    func getWebView(setupCallback: (WebView) -> Void) -> WebView {
+        if webView == nil {
+            setupCallback(setupWebView())
+        }
+        return webView!
+    }
 
     @Published var url: URL? {
         didSet {
@@ -143,7 +152,7 @@ final class Tab: NSObject, NSSecureCoding {
         webView?.stopLoading()
     }
 
-    func setupWebView() -> WebView {
+    private func setupWebView() -> WebView {
         let webView = WebView(frame: CGRect.zero, configuration: configuration ?? .makeConfiguration())
 
         webView.navigationDelegate = self

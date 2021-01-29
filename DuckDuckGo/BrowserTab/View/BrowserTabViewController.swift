@@ -255,7 +255,7 @@ extension BrowserTabViewController: WKUIDelegate {
             return nil
         }
         // WebKit loads the request in the returned web view.
-        return selectedViewModel.tab.webView
+        return selectedViewModel.webView
     }
     
     func webView(_ webView: WKWebView,

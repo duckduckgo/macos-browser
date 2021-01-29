@@ -51,14 +51,9 @@ class TabViewModel {
     @Published private(set) var findInPage: FindInPageModel = FindInPageModel()
 
     var webView: WebView {
-        let webView: WebView
-        if let some = tab.webView {
-            webView = some
-        } else {
-            webView = tab.setupWebView()
+        tab.getWebView { webView in
             webViewStateObserver = WebViewStateObserver(webView: webView, tabViewModel: self)
         }
-        return webView
     }
 
     init(tab: Tab) {

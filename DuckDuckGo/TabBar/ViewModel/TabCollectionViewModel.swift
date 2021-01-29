@@ -242,7 +242,7 @@ final class TabCollectionViewModel: NSObject {
     }
 
     func remove(ownerOf webView: WebView) {
-        let webViews = tabCollection.tabs.map { $0.webView }
+        let webViews = tabCollection.tabs.map(\.maybeWebView)
         guard let index = webViews.firstIndex(of: webView) else {
             os_log("TabCollection: Failed to get index of the tab", type: .error)
             return
