@@ -167,7 +167,7 @@ final class Tab: NSObject, NSSecureCoding {
             }
         }
 
-        if configuration == nil {
+        if webView.configuration.userContentController.userScripts.isEmpty {
             setupUserScripts(webView: webView)
         }
 
