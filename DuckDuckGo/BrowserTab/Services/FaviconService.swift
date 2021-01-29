@@ -45,6 +45,14 @@ class LocalFaviconService: FaviconService {
         case urlConstructionFailed
         case imageInitFailed
     }
+    
+    init() {
+        DistributedNotificationCenter.default.addObserver(
+            self,
+            selector: #selector(themeChanged),
+            name: NSNotification.Name(rawValue: "AppleInterfaceThemeChangedNotification"),
+            object: nil)
+    }
 
     func fetchFavicon(_ faviconUrl: URL?, for host: String, isFromUserScript: Bool, completion: @escaping (NSImage?, Error?) -> Void) {
 
@@ -96,6 +104,14 @@ class LocalFaviconService: FaviconService {
             return nil
         }
         return entry.image
+    }
+    
+    @objc func themeChanged() {
+        invalidateCache()
+    }
+    
+    private func invalidateCache() {
+        cache = [String: CacheEntry]()
     }
 
 }
