@@ -110,7 +110,6 @@ class Tab: NSObject {
     private func setupWebView() {
         webView.navigationDelegate = self
         webView.allowsBackForwardNavigationGestures = true
-        webView.customUserAgent = UserAgent.safari
     }
 
     // MARK: - Favicon
@@ -242,6 +241,8 @@ extension Tab: WKNavigationDelegate {
                  decidePolicyFor navigationAction: WKNavigationAction,
                  decisionHandler: @escaping (WKNavigationActionPolicy) -> Void) {
 
+        updateUserAgentForDomain(navigationAction.request.url?.host)
+
         if navigationAction.isTargetingMainFrame() {
             lastMainFrameRequest = navigationAction.request
             currentDownload = nil
@@ -286,6 +287,11 @@ extension Tab: WKNavigationDelegate {
         let policy = navigationResponsePolicyForDownloads(navigationResponse)
         decisionHandler(policy)
 
+    }
+
+    private func updateUserAgentForDomain(_ host: String?) {
+        let domain = host ?? ""
+        webView.customUserAgent = UserAgent.forDomain(domain)
     }
 
     private func navigationResponsePolicyForDownloads(_ navigationResponse: WKNavigationResponse) -> WKNavigationResponsePolicy {
@@ -359,6 +365,7 @@ fileprivate extension WKWebViewConfiguration {
         configuration.websiteDataStore = WKWebsiteDataStore.default()
         configuration.allowsAirPlayForMediaPlayback = true
         configuration.preferences.setValue(true, forKey: "fullScreenEnabled")
+        configuration.preferences.setValue(true, forKey: "developerExtrasEnabled")
         configuration.installContentBlockingRules()
         return configuration
     }

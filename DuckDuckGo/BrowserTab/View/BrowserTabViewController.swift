@@ -66,7 +66,16 @@ class BrowserTabViewController: NSViewController {
             let newWebView = tabViewModel.tab.webView
             newWebView.uiDelegate = self
 
-            view.addAndLayout(newWebView)
+            // This code should ideally use Auto Layout, but in order to enable the web inspector, it needs to use springs & structs.
+            // The line at the bottom of this comment is the "correct" method of doing this, but breaks the inspector.
+            // Context: https://stackoverflow.com/questions/60727065/wkwebview-web-inspector-in-macos-app-fails-to-render-and-flickers-flashes
+            //
+            // view.addAndLayout(newWebView)
+
+            newWebView.frame = view.bounds
+            newWebView.autoresizingMask = [.width, .height]
+            view.addSubview(newWebView)
+
             webView = newWebView
             setFirstResponderIfNeeded()
         }
