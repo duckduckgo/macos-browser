@@ -20,40 +20,6 @@ import Cocoa
 
 extension NSMenu {
 
-    enum MenuItemTag: Int {
-        case history = 4
-        case back = 40
-        case forward = 41
-        case reopenLastClosedTab = 43
-        case help = 6
-        case helpSeparator = 61
-        case sendFeedback = 62
-    }
-
-    var backMenuItem: NSMenuItem? {
-        return item(withTag: MenuItemTag.history.rawValue)?.submenu?.item(withTag: MenuItemTag.back.rawValue)
-    }
-
-    var forwardMenuItem: NSMenuItem? {
-        return item(withTag: MenuItemTag.history.rawValue)?.submenu?.item(withTag: MenuItemTag.forward.rawValue)
-    }
-
-    var reopenLastClosedTabMenuItem: NSMenuItem? {
-        return item(withTag: MenuItemTag.history.rawValue)?.submenu?.item(withTag: MenuItemTag.reopenLastClosedTab.rawValue)
-    }
-
-    var helpMenuItem: NSMenuItem? {
-        return item(withTag: MenuItemTag.help.rawValue)
-    }
-
-    var helpSeparatorMenuItem: NSMenuItem? {
-        helpMenuItem?.submenu?.item(withTag: MenuItemTag.helpSeparator.rawValue)
-    }
-
-    var sendFeedbackMenuItem: NSMenuItem? {
-        helpMenuItem?.submenu?.item(withTag: MenuItemTag.sendFeedback.rawValue)
-    }
-
     func indexOfItem(withIdentifier id: String) -> Int? {
         guard let item = items.first(where: { $0.identifier?.rawValue == id }) else { return nil }
         return index(of: item)

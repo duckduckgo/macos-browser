@@ -20,6 +20,10 @@ import Cocoa
 
 extension NSApplication {
 
+    var mainMenuTyped: MainMenu? {
+        return mainMenu as? MainMenu
+    }
+
     var isCommandPressed: Bool {
         currentEvent?.modifierFlags.contains(.command) ?? false
     }
