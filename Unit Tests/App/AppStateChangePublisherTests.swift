@@ -50,7 +50,8 @@ class AppStateChangePublisherTests: XCTestCase {
             e.fulfill()
         }
         withExtendedLifetime(timer) {
-            waitForExpectations(timeout: 10.0, handler: nil)
+            // wtf: content blocking rules are taking forever to compile
+            waitForExpectations(timeout: 60.0, handler: nil)
         }
     }
 
