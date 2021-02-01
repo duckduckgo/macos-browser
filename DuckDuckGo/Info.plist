@@ -71,8 +71,8 @@
 	<key>NSRequiresAquaSystemAppearance</key>
 	<string>YES</string>
 	<key>NSSupportsAutomaticTermination</key>
-	<true/>
+	<false/>
 	<key>NSSupportsSuddenTermination</key>
-	<true/>
+	<false/>
 </dict>
 </plist>

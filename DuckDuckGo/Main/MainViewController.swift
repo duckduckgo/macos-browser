@@ -33,13 +33,23 @@ class MainViewController: NSViewController {
     private(set) var browserTabViewController: BrowserTabViewController?
     private(set) var findInPageViewController: FindInPageViewController?
 
-    var tabCollectionViewModel = TabCollectionViewModel()
+    let tabCollectionViewModel: TabCollectionViewModel
 
     private var selectedTabViewModelCancellable: AnyCancellable?
     private var canGoForwardCancellable: AnyCancellable?
     private var canGoBackCancellable: AnyCancellable?
     private var canInsertLastRemovedTabCancellable: AnyCancellable?
     private var findInPageCancellable: AnyCancellable?
+
+    required init?(coder: NSCoder) {
+        self.tabCollectionViewModel = TabCollectionViewModel()
+        super.init(coder: coder)
+    }
+
+    init?(coder: NSCoder, tabCollectionViewModel: TabCollectionViewModel) {
+        self.tabCollectionViewModel = tabCollectionViewModel
+        super.init(coder: coder)
+    }
 
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -50,6 +60,10 @@ class MainViewController: NSViewController {
         findInPageContainerView.applyDropShadow()
     }
 
+    override func encodeRestorableState(with coder: NSCoder) {
+        fatalError("Default AppKit State Restoration should not be used")
+    }
+
     func windowDidBecomeMain() {
         updateBackMenuItem()
         updateForwardMenuItem()
@@ -57,7 +71,7 @@ class MainViewController: NSViewController {
     }
 
     func windowWillClose() {
-        tabCollectionViewModel.removeAllTabs()
+        tabBarViewController?.hideTooltip()
     }
 
     @IBSegueAction

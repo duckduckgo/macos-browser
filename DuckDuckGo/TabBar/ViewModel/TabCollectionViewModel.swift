@@ -33,12 +33,12 @@ protocol TabCollectionViewModelDelegate: AnyObject {
 
 }
 
-class TabCollectionViewModel {
+final class TabCollectionViewModel: NSObject {
 
     weak var delegate: TabCollectionViewModelDelegate?
 
     private(set) var tabCollection: TabCollection
-    
+
     private var tabViewModels = [Tab: TabViewModel]()
     @Published private(set) var selectionIndex: Int? {
         didSet {
@@ -48,17 +48,28 @@ class TabCollectionViewModel {
     @Published private(set) var selectedTabViewModel: TabViewModel?
     @Published private(set) var canInsertLastRemovedTab: Bool = false
 
-    private var cancellables = Set<AnyCancellable>()
+    private let stateChangedSubject = PassthroughSubject<Void, Never>()
+    var stateChanged: AnyPublisher<Void, Never> { stateChangedSubject.eraseToAnyPublisher() }
 
-    init(tabCollection: TabCollection) {
+    private var cancellables = Set<AnyCancellable>()
+    private var tabStateChangedCancellables = [Tab: Cancellable]()
+
+    init(tabCollection: TabCollection, selectionIndex: Int = 0) {
         self.tabCollection = tabCollection
+        super.init()
 
         subscribeToTabs()
         subscribeToLastRemovedTab()
-        appendNewTab()
+
+        if tabCollection.tabs.isEmpty {
+            appendNewTab()
+        }
+        if self.selectionIndex != selectionIndex {
+            self.selectionIndex = selectionIndex
+        }
     }
 
-    convenience init() {
+    convenience override init() {
         let tabCollection = TabCollection()
         self.init(tabCollection: tabCollection)
     }
@@ -98,6 +109,7 @@ class TabCollectionViewModel {
             select(at: 0)
             delegate?.tabCollectionViewModel(self, didSelectAt: 0)
         }
+        stateChangedSubject.send( () )
     }
 
     func selectPrevious() {
@@ -114,6 +126,7 @@ class TabCollectionViewModel {
             select(at: tabCollection.tabs.count - 1)
             delegate?.tabCollectionViewModel(self, didSelectAt: tabCollection.tabs.count - 1)
         }
+        stateChangedSubject.send( () )
     }
 
     func appendNewTab() {
@@ -205,15 +218,7 @@ class TabCollectionViewModel {
     }
 
     func removeAllTabs(except exceptionIndex: Int? = nil) {
-        if tabCollection.tabs.isEmpty { return }
-
-        tabCollection.tabs.enumerated().reversed().forEach {
-            if exceptionIndex != $0.offset {
-                if !tabCollection.remove(at: $0.offset) {
-                    os_log("TabCollectionViewModel: Failed to remove item", type: .error)
-                }
-            }
-        }
+        tabCollection.removeAll(andAppend: exceptionIndex.map { tabCollection.tabs[$0] })
 
         if exceptionIndex != nil {
             select(at: 0)
@@ -224,7 +229,7 @@ class TabCollectionViewModel {
     }
 
     func removeAllTabsAndAppendNewTab() {
-        tabCollection.removeAllAndAppend(tab: Tab())
+        tabCollection.removeAll(andAppend: Tab())
         select(at: 0)
 
         delegate?.tabCollectionViewModelDidMultipleChanges(self)
@@ -286,8 +291,17 @@ class TabCollectionViewModel {
 
     private func subscribeToTabs() {
         tabCollection.$tabs.sink { [weak self] newTabs in
-            self?.removeTabViewModelsIfNeeded(newTabs: newTabs)
-            self?.addTabViewModelsIfNeeded(newTabs: newTabs)
+            guard let self = self else { return }
+
+            let new = Set(newTabs)
+            let old = Set(self.tabViewModels.keys)
+
+            self.removeTabViewModels(old.subtracting(new))
+            self.addTabViewModels(new.subtracting(old))
+
+            if !(new.isEmpty && old.isEmpty) {
+                self.stateChangedSubject.send( () )
+            }
         } .store(in: &cancellables)
     }
 
@@ -297,16 +311,18 @@ class TabCollectionViewModel {
         } .store(in: &cancellables)
     }
 
-    private func removeTabViewModelsIfNeeded(newTabs: [Tab]) {
-        tabViewModels = tabViewModels.filter { (item) -> Bool in
-            newTabs.contains(item.key)
+    private func removeTabViewModels(_ removed: Set<Tab>) {
+        for tab in removed {
+            tabViewModels[tab] = nil
+            tabStateChangedCancellables[tab] = nil
         }
     }
 
-    private func addTabViewModelsIfNeeded(newTabs: [Tab]) {
-        newTabs.forEach { (tab) in
-            if tabViewModels[tab] == nil {
-                tabViewModels[tab] = TabViewModel(tab: tab)
+    private func addTabViewModels(_ added: Set<Tab>) {
+        for tab in added {
+            tabViewModels[tab] = TabViewModel(tab: tab)
+            tabStateChangedCancellables[tab] = tab.$url.dropFirst().sink { [stateChangedSubject] _ in
+                stateChangedSubject.send( () )
             }
         }
     }
