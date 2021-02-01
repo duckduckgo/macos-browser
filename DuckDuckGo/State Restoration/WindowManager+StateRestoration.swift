@@ -33,7 +33,7 @@ extension WindowsManager {
     private class func restoreWindows(from state: WindowManagerStateRestoration) {
         var keyWindow: NSWindow?
         for (idx, item) in state.windows.enumerated() {
-            guard let window = self.openNewWindow(with: item.model) else { continue }
+            let window = self.openNewWindow(with: item.model)
             window.setContentSize(item.frame.size)
             window.setFrameOrigin(item.frame.origin)
 

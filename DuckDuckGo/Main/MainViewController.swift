@@ -42,12 +42,11 @@ class MainViewController: NSViewController {
     private var findInPageCancellable: AnyCancellable?
 
     required init?(coder: NSCoder) {
-        self.tabCollectionViewModel = TabCollectionViewModel()
-        super.init(coder: coder)
+        fatalError("MainViewController: Bad initializer")
     }
 
-    init?(coder: NSCoder, tabCollectionViewModel: TabCollectionViewModel) {
-        self.tabCollectionViewModel = tabCollectionViewModel
+    init?(coder: NSCoder, tabCollectionViewModel: TabCollectionViewModel?) {
+        self.tabCollectionViewModel = tabCollectionViewModel ?? TabCollectionViewModel()
         super.init(coder: coder)
     }
 

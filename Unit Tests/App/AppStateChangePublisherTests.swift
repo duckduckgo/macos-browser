@@ -97,7 +97,7 @@ class AppStateChangePublisherTests: XCTestCase {
                 e.fulfill()
             }.store(in: &cancellables)
 
-        window!.close()
+        window.close()
         waitForExpectations(timeout: 0.3, handler: nil)
     }
 
@@ -111,7 +111,7 @@ class AppStateChangePublisherTests: XCTestCase {
                 e.fulfill()
             }.store(in: &cancellables)
 
-        window?.setFrameOrigin(.init(x: .random(in: 0...1000), y: .random(in: 0...1000)))
+        window.setFrameOrigin(.init(x: .random(in: 0...1000), y: .random(in: 0...1000)))
 
         waitForExpectations(timeout: 0.3, handler: nil)
     }
@@ -126,7 +126,7 @@ class AppStateChangePublisherTests: XCTestCase {
                 e.fulfill()
             }.store(in: &cancellables)
 
-        window?.setContentSize(.init(width: .random(in: 100...1000), height: .random(in: 100...1000)))
+        window.setContentSize(.init(width: .random(in: 100...1000), height: .random(in: 100...1000)))
 
         waitForExpectations(timeout: 0.3, handler: nil)
     }
