@@ -26,7 +26,7 @@ protocol SuggestionsViewControllerDelegate: AnyObject {
 
 }
 
-class SuggestionsViewController: NSViewController {
+final class SuggestionsViewController: NSViewController {
 
     weak var delegate: SuggestionsViewControllerDelegate?
 

@@ -20,7 +20,7 @@ import XCTest
 import CryptoKit
 @testable import DuckDuckGo_Privacy_Browser
 
-class EncryptionKeyStoreTests: XCTestCase {
+final class EncryptionKeyStoreTests: XCTestCase {
     private let account = "com.duckduckgo.macos.browser.unit-test-encryption-key"
     private let generator = EncryptionKeyGenerator()
 

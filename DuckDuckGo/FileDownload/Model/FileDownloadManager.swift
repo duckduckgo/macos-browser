@@ -19,7 +19,7 @@
 import Cocoa
 import Combine
 
-class FileDownloadManager {
+final class FileDownloadManager {
 
     static let shared = FileDownloadManager()
 

@@ -21,7 +21,7 @@ import CommonCrypto
 import TrackerRadarKit
 @testable import DuckDuckGo_Privacy_Browser
 
-class TrackerDataManagerTests: XCTestCase {
+final class TrackerDataManagerTests: XCTestCase {
 
     override func setUp() {
         super.setUp()

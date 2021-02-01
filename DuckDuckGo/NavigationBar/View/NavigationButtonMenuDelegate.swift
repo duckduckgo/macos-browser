@@ -20,7 +20,7 @@ import Cocoa
 import os.log
 import WebKit
 
-class NavigationButtonMenuDelegate: NSObject {
+final class NavigationButtonMenuDelegate: NSObject {
 
     enum ButtonType: Equatable {
         case back

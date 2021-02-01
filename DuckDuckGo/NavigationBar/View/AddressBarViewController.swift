@@ -20,7 +20,7 @@ import Cocoa
 import os.log
 import Combine
 
-class AddressBarViewController: NSViewController {
+final class AddressBarViewController: NSViewController {
 
     static let homeFaviconImage = NSImage(named: "HomeFavicon")
     static let webImage = NSImage(named: "Web")

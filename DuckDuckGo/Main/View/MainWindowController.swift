@@ -19,7 +19,7 @@
 import Cocoa
 import os.log
 
-class MainWindowController: NSWindowController {
+final class MainWindowController: NSWindowController {
 
     private enum WindowButtonTrailingSpace {
         static let close: CGFloat = 12

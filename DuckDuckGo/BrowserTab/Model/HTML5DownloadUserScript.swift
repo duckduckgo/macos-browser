@@ -24,7 +24,7 @@ protocol HTML5DownloadDelegate: AnyObject {
 
 }
 
-class HTML5DownloadUserScript: UserScript {
+final class HTML5DownloadUserScript: UserScript {
 
     weak var delegate: HTML5DownloadDelegate?
 

@@ -31,7 +31,7 @@ protocol TabBarViewItemDelegate: AnyObject {
 
 }
 
-class TabBarViewItem: NSCollectionViewItem {
+final class TabBarViewItem: NSCollectionViewItem {
 
     enum Height: CGFloat {
         case standard = 32

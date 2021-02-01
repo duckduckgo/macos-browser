@@ -18,7 +18,7 @@
 
 import WebKit
 
-class FindInPageUserScript: UserScript {
+final class FindInPageUserScript: UserScript {
 
     var model: FindInPageModel?
 

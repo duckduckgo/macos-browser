@@ -21,7 +21,7 @@ import Foundation
 import XCTest
 @testable import DuckDuckGo_Privacy_Browser
 
-class WebsiteDataStoreMock: WebsiteDataStore {
+final class WebsiteDataStoreMock: WebsiteDataStore {
 
     var removeAllWebsiteDataCalled = false
     func removeAllWebsiteData(_ completionHandler: @escaping () -> Void) {

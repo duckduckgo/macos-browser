@@ -19,7 +19,7 @@
 import Cocoa
 import os.log
 
-class TabBarCollectionView: NSCollectionView {
+final class TabBarCollectionView: NSCollectionView {
 
     override var acceptsFirstResponder: Bool {
         return false

@@ -19,7 +19,7 @@
 import Cocoa
 import os.log
 
-class SuggestionTableCellView: NSTableCellView {
+final class SuggestionTableCellView: NSTableCellView {
 
     static let identifier = "SuggestionTableCellView"
 

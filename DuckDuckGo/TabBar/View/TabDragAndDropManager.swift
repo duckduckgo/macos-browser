@@ -20,7 +20,7 @@ import Foundation
 import os.log
 
 /// Responsible for handling drag and drop of tabs between windows
-class TabDragAndDropManager {
+final class TabDragAndDropManager {
 
     static let shared = TabDragAndDropManager()
 

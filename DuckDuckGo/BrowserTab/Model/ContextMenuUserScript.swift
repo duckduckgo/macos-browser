@@ -24,7 +24,7 @@ protocol ContextMenuDelegate: AnyObject {
 
 }
 
-class ContextMenuUserScript: UserScript {
+final class ContextMenuUserScript: UserScript {
 
     weak var delegate: ContextMenuDelegate?
 

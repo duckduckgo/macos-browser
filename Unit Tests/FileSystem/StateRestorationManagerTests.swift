@@ -20,7 +20,7 @@ import XCTest
 import Combine
 @testable import DuckDuckGo_Privacy_Browser
 
-class StateRestorationManagerTests: XCTestCase {
+final class StateRestorationManagerTests: XCTestCase {
     private var fileStore: FileStoreMock!
     private let testFileName = "TestFile"
     private var state: SavedStateMock!

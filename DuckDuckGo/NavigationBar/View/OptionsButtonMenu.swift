@@ -20,7 +20,7 @@ import Cocoa
 import os.log
 import WebKit
 
-class OptionsButtonMenu: NSMenu {
+final class OptionsButtonMenu: NSMenu {
 
     private let tabCollectionViewModel: TabCollectionViewModel
 

@@ -19,7 +19,7 @@
 import WebKit
 import os
 
-class DebugUserScript: UserScript {
+final class DebugUserScript: UserScript {
 
     enum MessageNames: String, CaseIterable {
 

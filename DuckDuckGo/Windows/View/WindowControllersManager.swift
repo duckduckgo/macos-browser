@@ -20,7 +20,7 @@ import Cocoa
 import os.log
 import Combine
 
-class WindowControllersManager {
+final class WindowControllersManager {
 
     static let shared = WindowControllersManager()
 

@@ -19,7 +19,7 @@
 import Foundation
 import os.log
 
-class UrlEventListener {
+final class UrlEventListener {
 
     func listen() {
         NSAppleEventManager.shared().setEventHandler(

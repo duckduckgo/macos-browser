@@ -20,7 +20,7 @@ import XCTest
 import TrackerRadarKit
 @testable import DuckDuckGo_Privacy_Browser
 
-class DetectedTrackerTests: XCTestCase {
+final class DetectedTrackerTests: XCTestCase {
 
     private struct Constants {
         static let aUrl = "www.example.com"

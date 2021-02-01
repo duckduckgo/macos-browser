@@ -22,7 +22,7 @@ import XCTest
 import CryptoKit
 @testable import DuckDuckGo_Privacy_Browser
 
-class CoreDataEncryptionTests: XCTestCase {
+final class CoreDataEncryptionTests: XCTestCase {
 
     private lazy var mockValueTransformer: MockValueTransformer = {
         let name = NSValueTransformerName("MockValueTransformer")

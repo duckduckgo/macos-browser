@@ -20,7 +20,7 @@ import Cocoa
 import WebKit
 import os.log
 
-class WebViewStateObserver: NSObject {
+final class WebViewStateObserver: NSObject {
 
     var webView: WKWebView?
     weak var tabViewModel: TabViewModel?

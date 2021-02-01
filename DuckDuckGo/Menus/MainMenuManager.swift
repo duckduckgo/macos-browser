@@ -19,7 +19,7 @@
 import Cocoa
 import os.log
 
-class MainMenuManager {
+final class MainMenuManager {
 
     class func setupMainMenu() {
 

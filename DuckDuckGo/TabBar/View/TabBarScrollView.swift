@@ -18,7 +18,7 @@
 
 import Cocoa
 
-class TabBarScrollView: NSScrollView {
+final class TabBarScrollView: NSScrollView {
 
     override var mouseDownCanMoveWindow: Bool {
         false

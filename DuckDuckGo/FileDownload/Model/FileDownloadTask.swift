@@ -19,7 +19,7 @@
 import Combine
 import os
 
-class FileDownloadTask: NSObject {
+final class FileDownloadTask: NSObject {
 
     enum FileDownloadError: Error {
 

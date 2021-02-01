@@ -22,7 +22,7 @@ import os.log
 
 // swiftlint:disable type_body_length
 
-class AddressBarTextField: NSTextField {
+final class AddressBarTextField: NSTextField {
 
     var tabCollectionViewModel: TabCollectionViewModel! {
         didSet {

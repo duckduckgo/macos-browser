@@ -19,7 +19,7 @@
 import Cocoa
 import os.log
 
-class TooltipWindowController: NSWindowController {
+final class TooltipWindowController: NSWindowController {
 
     enum VerticalSpace: CGFloat {
         case tooltipPadding = 2

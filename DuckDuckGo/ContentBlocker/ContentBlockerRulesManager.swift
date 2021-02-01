@@ -21,7 +21,7 @@ import WebKit
 import os.log
 import TrackerRadarKit
 
-class ContentBlockerRulesManager {
+final class ContentBlockerRulesManager {
 
     static let shared = ContentBlockerRulesManager()
 

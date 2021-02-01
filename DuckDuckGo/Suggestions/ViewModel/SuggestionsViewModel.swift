@@ -20,7 +20,7 @@ import Foundation
 import Combine
 import os.log
 
-class SuggestionsViewModel {
+final class SuggestionsViewModel {
 
     let suggestions: Suggestions
 

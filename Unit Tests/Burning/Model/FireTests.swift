@@ -22,7 +22,7 @@ import XCTest
 import Combine
 @testable import DuckDuckGo_Privacy_Browser
 
-class FireTests: XCTestCase {
+final class FireTests: XCTestCase {
 
     var cancellables = Set<AnyCancellable>()
 

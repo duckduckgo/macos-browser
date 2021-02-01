@@ -20,7 +20,7 @@ import XCTest
 import CryptoKit
 @testable import DuckDuckGo_Privacy_Browser
 
-class FileStoreTests: XCTestCase {
+final class FileStoreTests: XCTestCase {
     private let testFileName = "TestFile"
     private let testData = "Hello, World".data(using: .utf8)!
 

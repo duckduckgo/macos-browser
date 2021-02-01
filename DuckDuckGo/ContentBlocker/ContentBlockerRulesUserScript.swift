@@ -18,7 +18,7 @@
 
 import WebKit
 
-class ContentBlockerRulesUserScript: UserScript {
+final class ContentBlockerRulesUserScript: UserScript {
 
     struct ContentBlockerKey {
         static let url = "url"

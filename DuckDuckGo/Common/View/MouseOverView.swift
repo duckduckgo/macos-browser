@@ -24,7 +24,7 @@ protocol MouseOverViewDelegate: AnyObject {
 
 }
 
-class MouseOverView: NSView {
+final class MouseOverView: NSView {
 
     weak var delegate: MouseOverViewDelegate?
 

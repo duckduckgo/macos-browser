@@ -26,7 +26,7 @@ protocol SuggestionsAPI {
 
 }
 
-class DuckDuckGoSuggestionsAPI: SuggestionsAPI {
+final class DuckDuckGoSuggestionsAPI: SuggestionsAPI {
 
     enum FetchSuggestionsError: Error {
         case urlInitFailed

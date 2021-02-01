@@ -18,7 +18,7 @@
 
 import Cocoa
 
-class MouseOverButton: NSButton {
+final class MouseOverButton: NSButton {
 
     @IBInspectable var mouseOverColor: NSColor? {
         didSet {

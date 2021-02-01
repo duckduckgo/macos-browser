@@ -18,7 +18,7 @@
 
 import Cocoa
 
-class WindowDraggingView: NSView {
+final class WindowDraggingView: NSView {
 
     override func acceptsFirstMouse(for event: NSEvent?) -> Bool {
         return true

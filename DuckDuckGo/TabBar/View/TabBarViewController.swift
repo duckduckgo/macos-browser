@@ -20,7 +20,7 @@ import Cocoa
 import os.log
 import Combine
 
-class TabBarViewController: NSViewController {
+final class TabBarViewController: NSViewController {
 
     enum HorizontalSpace: CGFloat {
         case scrollViewPaddingWithButtons = 112

@@ -25,7 +25,7 @@ protocol FaviconUserScriptDelegate: AnyObject {
 
 }
 
-class FaviconUserScript: UserScript {
+final class FaviconUserScript: UserScript {
 
     weak var delegate: FaviconUserScriptDelegate?
 
