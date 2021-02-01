@@ -33,6 +33,10 @@ class UserScript: WKUserScript {
         }
     }
 
+    lazy var leakAvoider: LeakAvoider = {
+        LeakAvoider(delegate: self)
+    }()
+
     static func loadJS(_ jsFile: String, withReplacements replacements: [String: String] = [:]) -> String {
 
         let bundle = Bundle.main
@@ -55,6 +59,24 @@ extension UserScript: WKScriptMessageHandler {
 
     func userContentController(_ userContentController: WKUserContentController, didReceive message: WKScriptMessage) {
         
+    }
+
+}
+
+/// Reference: https://stackoverflow.com/questions/26383031/wkwebview-causes-my-view-controller-to-leak/26383032#26383032
+///
+/// This is only a mitigation of the problem. Instead of scripts themselves leaking, which are far larger in size, the LeakAvoider will be leaked. It can save others from leaking, but not itself.
+class LeakAvoider: NSObject, WKScriptMessageHandler {
+
+    weak var delegate: WKScriptMessageHandler?
+
+    init(delegate: WKScriptMessageHandler) {
+        self.delegate = delegate
+        super.init()
+    }
+
+    func userContentController(_ userContentController: WKUserContentController, didReceive message: WKScriptMessage) {
+        self.delegate?.userContentController(userContentController, didReceive: message)
     }
 
 }

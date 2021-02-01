@@ -39,6 +39,10 @@ class WebView: WKWebView {
 
     ]
 
+    deinit {
+        self.configuration.userContentController.removeAllUserScripts()
+    }
+
     // MARK: - Menu
 
     override func willOpenMenu(_ menu: NSMenu, with event: NSEvent) {
