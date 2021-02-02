@@ -160,7 +160,9 @@ final class Tab: NSObject {
     let faviconService: FaviconService
 
     private func fetchFavicon(_ faviconURL: URL?, for host: String?) {
-        favicon = nil
+        if favicon != nil {
+            favicon = nil
+        }
 
         guard let host = host else {
             return

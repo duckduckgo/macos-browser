@@ -1,5 +1,5 @@
 //
-//  StateRestorationManager.swift
+//  StatePersistenceService.swift
 //
 //  Copyright © 2021 DuckDuckGo. All rights reserved.
 //
@@ -20,7 +20,7 @@ import Foundation
 import Combine
 import os.log
 
-final class StateRestorationManager {
+final class StatePersistenceService {
     private let fileStore: FileStoring
     private let fileName: String
     private let queue = DispatchQueue(label: "StateRestorationManager.queue", qos: .background)

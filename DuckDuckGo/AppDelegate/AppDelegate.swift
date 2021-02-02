@@ -31,8 +31,7 @@ class AppDelegate: NSObject, NSApplicationDelegate {
 
     private let keyStore = EncryptionKeyStore()
     private var fileStore: FileStore!
-    private var stateRestorationManager: StateRestorationManager!
-    private var stateChangedObserver: AnyCancellable!
+    private var stateRestorationManager: AppStateRestorationManager!
 
     func applicationWillFinishLaunching(_ notification: Notification) {
         do {
@@ -42,6 +41,7 @@ class AppDelegate: NSObject, NSApplicationDelegate {
             os_log("App Encryption Key could not be read: %s", "\(error)")
             fileStore = FileStore()
         }
+        stateRestorationManager = AppStateRestorationManager(fileStore: fileStore)
 
         urlEventListener.listen()
         MainMenuManager.setupMainMenu()
@@ -52,7 +52,7 @@ class AppDelegate: NSObject, NSApplicationDelegate {
         HTTPSUpgrade.shared.loadDataAsync()
 
         if !isRunningTests {
-            setupStateRestoration()
+            stateRestorationManager.applicationDidFinishLaunching()
 
             if WindowsManager.windows.isEmpty {
                 WindowsManager.openNewWindow()
@@ -61,8 +61,7 @@ class AppDelegate: NSObject, NSApplicationDelegate {
     }
 
     func applicationShouldTerminate(_ sender: NSApplication) -> NSApplication.TerminateReply {
-        stateChangedObserver.cancel()
-        stateRestorationManager.persistState(using: WindowControllersManager.shared.encodeState(with:), sync: true)
+        stateRestorationManager.applicationWillTerminate()
 
         return .terminateNow
     }
@@ -80,32 +79,6 @@ class AppDelegate: NSObject, NSApplicationDelegate {
         applicationDockMenu.dataSource = WindowControllersManager.shared
         applicationDockMenu.applicationDockMenuDelegate = WindowControllersManager.shared
         return applicationDockMenu
-    }
-
-    // MARK: - State Restoration
-
-    func setupStateRestoration() {
-        guard !isRunningTests else { return }
-
-        // state restoration
-        stateRestorationManager = StateRestorationManager(fileStore: fileStore, fileName: "persistentState")
-        stateChangedObserver = WindowControllersManager.shared.stateChanged
-            .debounce(for: .seconds(1), scheduler: RunLoop.main)
-            .sink { [unowned self] _ in
-                self.stateDidChange()
-            }
-
-        do {
-            try stateRestorationManager.restoreState(using: WindowsManager.restoreState(from:))
-        } catch CocoaError.fileReadNoSuchFile {
-            // ignore
-        } catch {
-            os_log("App state could not be decoded: %s", "\(error)")
-        }
-    }
-
-    func stateDidChange() {
-        stateRestorationManager.persistState(using: WindowControllersManager.shared.encodeState(with:))
     }
 
 }

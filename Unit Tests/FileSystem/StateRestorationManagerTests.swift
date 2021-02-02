@@ -24,12 +24,12 @@ class StateRestorationManagerTests: XCTestCase {
     private var fileStore: FileStoreMock!
     private let testFileName = "TestFile"
     private var state: SavedStateMock!
-    private var srm: StateRestorationManager!
+    private var srm: StatePersistenceService!
 
     override func setUp() {
         fileStore = FileStoreMock()
         state = SavedStateMock()
-        srm = StateRestorationManager(fileStore: fileStore, fileName: testFileName)
+        srm = StatePersistenceService(fileStore: fileStore, fileName: testFileName)
     }
 
     override func tearDown() {

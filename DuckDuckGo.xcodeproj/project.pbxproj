@@ -168,7 +168,11 @@
 		B68458C025C7E9E000DC17B6 /* TabCollectionViewModel+NSSecureCoding.swift in Sources */ = {isa = PBXBuildFile; fileRef = B68458BF25C7E9E000DC17B6 /* TabCollectionViewModel+NSSecureCoding.swift */; };
 		B68458C525C7EA0C00DC17B6 /* TabCollection+NSSecureCoding.swift in Sources */ = {isa = PBXBuildFile; fileRef = B68458C425C7EA0C00DC17B6 /* TabCollection+NSSecureCoding.swift */; };
 		B68458CD25C7EB9000DC17B6 /* WKWebViewConfigurationExtensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = B68458CC25C7EB9000DC17B6 /* WKWebViewConfigurationExtensions.swift */; };
-		B6A5A27125B9377300AA7ADA /* StateRestorationManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = B6A5A27025B9377300AA7ADA /* StateRestorationManager.swift */; };
+		B684590825C9027900DC17B6 /* AppStateChangedPublisher.swift in Sources */ = {isa = PBXBuildFile; fileRef = B684590725C9027900DC17B6 /* AppStateChangedPublisher.swift */; };
+		B684592225C93BE000DC17B6 /* Publisher.asVoid.swift in Sources */ = {isa = PBXBuildFile; fileRef = B684592125C93BE000DC17B6 /* Publisher.asVoid.swift */; };
+		B684592725C93C0500DC17B6 /* Publishers.NestedObjectChanges.swift in Sources */ = {isa = PBXBuildFile; fileRef = B684592625C93C0500DC17B6 /* Publishers.NestedObjectChanges.swift */; };
+		B684592F25C93FBF00DC17B6 /* AppStateRestorationManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = B684592E25C93FBF00DC17B6 /* AppStateRestorationManager.swift */; };
+		B6A5A27125B9377300AA7ADA /* StatePersistenceService.swift in Sources */ = {isa = PBXBuildFile; fileRef = B6A5A27025B9377300AA7ADA /* StatePersistenceService.swift */; };
 		B6A5A27925B93FFF00AA7ADA /* StateRestorationManagerTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = B6A5A27825B93FFE00AA7ADA /* StateRestorationManagerTests.swift */; };
 		B6A5A27E25B9403E00AA7ADA /* FileStoreMock.swift in Sources */ = {isa = PBXBuildFile; fileRef = B6A5A27D25B9403E00AA7ADA /* FileStoreMock.swift */; };
 		B6A5A2A025B96E8300AA7ADA /* AppStateChangePublisherTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = B6A5A29F25B96E8300AA7ADA /* AppStateChangePublisherTests.swift */; };
@@ -364,7 +368,11 @@
 		B68458BF25C7E9E000DC17B6 /* TabCollectionViewModel+NSSecureCoding.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "TabCollectionViewModel+NSSecureCoding.swift"; sourceTree = "<group>"; };
 		B68458C425C7EA0C00DC17B6 /* TabCollection+NSSecureCoding.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "TabCollection+NSSecureCoding.swift"; sourceTree = "<group>"; };
 		B68458CC25C7EB9000DC17B6 /* WKWebViewConfigurationExtensions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WKWebViewConfigurationExtensions.swift; sourceTree = "<group>"; };
-		B6A5A27025B9377300AA7ADA /* StateRestorationManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StateRestorationManager.swift; sourceTree = "<group>"; };
+		B684590725C9027900DC17B6 /* AppStateChangedPublisher.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppStateChangedPublisher.swift; sourceTree = "<group>"; };
+		B684592125C93BE000DC17B6 /* Publisher.asVoid.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Publisher.asVoid.swift; sourceTree = "<group>"; };
+		B684592625C93C0500DC17B6 /* Publishers.NestedObjectChanges.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Publishers.NestedObjectChanges.swift; sourceTree = "<group>"; };
+		B684592E25C93FBF00DC17B6 /* AppStateRestorationManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppStateRestorationManager.swift; sourceTree = "<group>"; };
+		B6A5A27025B9377300AA7ADA /* StatePersistenceService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StatePersistenceService.swift; sourceTree = "<group>"; };
 		B6A5A27825B93FFE00AA7ADA /* StateRestorationManagerTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StateRestorationManagerTests.swift; sourceTree = "<group>"; };
 		B6A5A27D25B9403E00AA7ADA /* FileStoreMock.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FileStoreMock.swift; sourceTree = "<group>"; };
 		B6A5A29F25B96E8300AA7ADA /* AppStateChangePublisherTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppStateChangePublisherTests.swift; sourceTree = "<group>"; };
@@ -505,7 +513,6 @@
 				4BA1A69F258B079600F6F690 /* DataEncryption.swift */,
 				4BA1A6A4258B07DF00F6F690 /* EncryptedValueTransformer.swift */,
 				4BA1A6A9258B07F400F6F690 /* EncryptionKeys */,
-				B6A5A27025B9377300AA7ADA /* StateRestorationManager.swift */,
 			);
 			path = FileSystem;
 			sourceTree = "<group>";
@@ -823,7 +830,6 @@
 			children = (
 				AA86491424D831C4001BABEE /* View */,
 				4B67743D255DBEEA00025BD8 /* Database */,
-				B63D466325BE760B00874977 /* Model */,
 				4BA1A691258B06F600F6F690 /* FileSystem */,
 				AA80EC52256BE33A007083E7 /* Localizables */,
 				AADC60E92493B305008F8EF7 /* Extensions */,
@@ -1099,6 +1105,8 @@
 				B68458CC25C7EB9000DC17B6 /* WKWebViewConfigurationExtensions.swift */,
 				B63D467925BFC3E100874977 /* NSCoderExtensions.swift */,
 				B63D467025BFA6C100874977 /* DispatchQueueExtensions.swift */,
+				B684592125C93BE000DC17B6 /* Publisher.asVoid.swift */,
+				B684592625C93C0500DC17B6 /* Publishers.NestedObjectChanges.swift */,
 			);
 			path = Extensions;
 			sourceTree = "<group>";
@@ -1121,20 +1129,16 @@
 			path = View;
 			sourceTree = "<group>";
 		};
-		B63D466325BE760B00874977 /* Model */ = {
-			isa = PBXGroup;
-			children = (
-			);
-			path = Model;
-			sourceTree = "<group>";
-		};
 		B68458AE25C7E75100DC17B6 /* State Restoration */ = {
 			isa = PBXGroup;
 			children = (
+				B6A5A27025B9377300AA7ADA /* StatePersistenceService.swift */,
 				B68458AF25C7E76A00DC17B6 /* WindowManager+StateRestoration.swift */,
 				B68458B725C7E8B200DC17B6 /* Tab+NSSecureCoding.swift */,
 				B68458C425C7EA0C00DC17B6 /* TabCollection+NSSecureCoding.swift */,
 				B68458BF25C7E9E000DC17B6 /* TabCollectionViewModel+NSSecureCoding.swift */,
+				B684590725C9027900DC17B6 /* AppStateChangedPublisher.swift */,
+				B684592E25C93FBF00DC17B6 /* AppStateRestorationManager.swift */,
 			);
 			path = "State Restoration";
 			sourceTree = "<group>";
@@ -1326,6 +1330,7 @@
 			files = (
 				AAA0CC572539EBC90079BC96 /* FaviconUserScript.swift in Sources */,
 				AA86490C24D3494C001BABEE /* GradientView.swift in Sources */,
+				B684590825C9027900DC17B6 /* AppStateChangedPublisher.swift in Sources */,
 				AA80EC54256BE3BC007083E7 /* UserText.swift in Sources */,
 				14505A08256084EF00272CC6 /* UserAgent.swift in Sources */,
 				AA7412BD24D2BEEE00D22FE0 /* MainWindow.swift in Sources */,
@@ -1346,6 +1351,7 @@
 				AA4D700725545EF800C3411E /* UrlEventListener.swift in Sources */,
 				AA92127725ADA07900600CD4 /* WKWebViewExtension.swift in Sources */,
 				856C98A6256EB59600A22F1F /* MenuItemSelectors.swift in Sources */,
+				B684592225C93BE000DC17B6 /* Publisher.asVoid.swift in Sources */,
 				AAA0CC33252F181A0079BC96 /* NavigationButtonMenuDelegate.swift in Sources */,
 				AA512D1424D99D9800230283 /* FaviconService.swift in Sources */,
 				AABEE6AB24ACA0F90043105B /* SuggestionTableRowView.swift in Sources */,
@@ -1379,12 +1385,13 @@
 				AA6FFB4424DC33320028F4D0 /* NSViewExtension.swift in Sources */,
 				AA585D84248FD31100E9A3E2 /* BrowserTabViewController.swift in Sources */,
 				B63D467A25BFC3E100874977 /* NSCoderExtensions.swift in Sources */,
-				B6A5A27125B9377300AA7ADA /* StateRestorationManager.swift in Sources */,
+				B6A5A27125B9377300AA7ADA /* StatePersistenceService.swift in Sources */,
 				AABEE69324A4E2F80043105B /* SuggestionsAPI.swift in Sources */,
 				B68458B025C7E76A00DC17B6 /* WindowManager+StateRestoration.swift in Sources */,
 				B68458C525C7EA0C00DC17B6 /* TabCollection+NSSecureCoding.swift in Sources */,
 				4BB88B5B25B7BA50006F6B06 /* Instruments.swift in Sources */,
 				4BA1A6B8258B081600F6F690 /* EncryptionKeyStoring.swift in Sources */,
+				B684592F25C93FBF00DC17B6 /* AppStateRestorationManager.swift in Sources */,
 				AAA892EA250A4CEF005B37B2 /* WindowControllersManager.swift in Sources */,
 				AABEE6A924AB4B910043105B /* SuggestionTableCellView.swift in Sources */,
 				AA6820F125503DA9005ED0D5 /* FireViewModel.swift in Sources */,
@@ -1399,6 +1406,7 @@
 				AAE8B110258A456C00E81239 /* TooltipViewController.swift in Sources */,
 				AA3F895324C18AD500628DDE /* SuggestionViewModel.swift in Sources */,
 				4B677431255DBEB800025BD8 /* BloomFilterWrapper.mm in Sources */,
+				B684592725C93C0500DC17B6 /* Publishers.NestedObjectChanges.swift in Sources */,
 				85A011EA25B4D4CA00FA6A0C /* FindInPageUserScript.swift in Sources */,
 				AA9FF95B24A1EFC20039E328 /* TabViewModel.swift in Sources */,
 				AA9E9A5E25A4867200D1959D /* TabDragAndDropManager.swift in Sources */,

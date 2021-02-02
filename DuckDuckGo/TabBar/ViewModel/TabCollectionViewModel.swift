@@ -48,11 +48,7 @@ final class TabCollectionViewModel: NSObject {
     @Published private(set) var selectedTabViewModel: TabViewModel?
     @Published private(set) var canInsertLastRemovedTab: Bool = false
 
-    private let stateChangedSubject = PassthroughSubject<Void, Never>()
-    var stateChanged: AnyPublisher<Void, Never> { stateChangedSubject.eraseToAnyPublisher() }
-
     private var cancellables = Set<AnyCancellable>()
-    private var tabStateChangedCancellables = [Tab: Cancellable]()
 
     init(tabCollection: TabCollection, selectionIndex: Int = 0) {
         self.tabCollection = tabCollection
@@ -109,7 +105,6 @@ final class TabCollectionViewModel: NSObject {
             select(at: 0)
             delegate?.tabCollectionViewModel(self, didSelectAt: 0)
         }
-        stateChangedSubject.send( () )
     }
 
     func selectPrevious() {
@@ -126,7 +121,6 @@ final class TabCollectionViewModel: NSObject {
             select(at: tabCollection.tabs.count - 1)
             delegate?.tabCollectionViewModel(self, didSelectAt: tabCollection.tabs.count - 1)
         }
-        stateChangedSubject.send( () )
     }
 
     func appendNewTab() {
@@ -298,10 +292,6 @@ final class TabCollectionViewModel: NSObject {
 
             self.removeTabViewModels(old.subtracting(new))
             self.addTabViewModels(new.subtracting(old))
-
-            if !(new.isEmpty && old.isEmpty) {
-                self.stateChangedSubject.send( () )
-            }
         } .store(in: &cancellables)
     }
 
@@ -314,16 +304,12 @@ final class TabCollectionViewModel: NSObject {
     private func removeTabViewModels(_ removed: Set<Tab>) {
         for tab in removed {
             tabViewModels[tab] = nil
-            tabStateChangedCancellables[tab] = nil
         }
     }
 
     private func addTabViewModels(_ added: Set<Tab>) {
         for tab in added {
             tabViewModels[tab] = TabViewModel(tab: tab)
-            tabStateChangedCancellables[tab] = tab.$url.dropFirst().sink { [stateChangedSubject] _ in
-                stateChangedSubject.send( () )
-            }
         }
     }
 

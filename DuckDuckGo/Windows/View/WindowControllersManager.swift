@@ -24,32 +24,11 @@ class WindowControllersManager {
 
     static let shared = WindowControllersManager()
 
-    private(set) var mainWindowControllers = [MainWindowController]()
+    @Published private(set) var mainWindowControllers = [MainWindowController]()
     var lastKeyMainWindowController: MainWindowController?
-
-    private let stateChangedSubject = PassthroughSubject<Void, Never>()
-    var stateChanged: AnyPublisher<Void, Never> { stateChangedSubject.eraseToAnyPublisher() }
-
-    private var observers = [[AnyCancellable]]()
 
     func register(_ windowController: MainWindowController) {
         mainWindowControllers.append(windowController)
-
-        addWindowObserversAndNotifyStateChange(for: windowController)
-    }
-
-    private func addWindowObserversAndNotifyStateChange(for windowController: MainWindowController) {
-        let stateCancellable = windowController.mainViewController!
-            .tabCollectionViewModel
-            .stateChanged
-            .sink { [stateChangedSubject] _ in
-                stateChangedSubject.send( () )
-        }
-        // publishes initial value so we don't need to publishh extra State Changed event here
-        let frameObserver = windowController.window!.publisher(for: \.frame).sink { [stateChangedSubject] _ in
-            stateChangedSubject.send( () )
-        }
-        self.observers.append([frameObserver, stateCancellable])
     }
 
     func unregister(_ windowController: MainWindowController) {
@@ -57,10 +36,7 @@ class WindowControllersManager {
             os_log("WindowControllersManager: Window Controller not registered", type: .error)
             return
         }
-        observers.remove(at: idx)
         mainWindowControllers.remove(at: idx)
-
-        stateChangedSubject.send( () )
     }
 
 }
