@@ -26,7 +26,6 @@ class AppDelegate: NSObject, NSApplicationDelegate {
 
     func applicationWillFinishLaunching(_ notification: Notification) {
         urlEventListener.listen()
-        MainMenuManager.setupMainMenu()
     }
 
     func applicationDidFinishLaunching(_ aNotification: Notification) {
