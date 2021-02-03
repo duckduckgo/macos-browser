@@ -238,7 +238,7 @@ class AddressBarTextField: NSTextField {
         case visit(host: String)
 
         static let suffixAttributes = [NSAttributedString.Key.font: NSFont.systemFont(ofSize: 12, weight: .light),
-                                       .foregroundColor: NSColor(named: "AddressBarSuffixColor")!]
+                                       .foregroundColor: NSColor.addressBarSuffixColor]
 
         var attributedString: NSAttributedString {
             switch self {

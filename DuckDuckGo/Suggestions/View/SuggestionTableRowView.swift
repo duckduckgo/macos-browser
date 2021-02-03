@@ -22,7 +22,7 @@ import os.log
 class SuggestionTableRowView: NSTableRowView {
 
     static let identifier = "SuggestionTableRowView"
-    static let selectionBackroundColor = NSColor(named: "SelectedSuggestionBackgroundColor")!
+    static let selectionBackroundColor = NSColor.selectedSuggestionBackgroundColor
 
     enum Size: CGFloat {
         case height = 22

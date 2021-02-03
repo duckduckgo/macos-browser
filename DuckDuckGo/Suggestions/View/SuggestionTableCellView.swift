@@ -23,9 +23,9 @@ class SuggestionTableCellView: NSTableCellView {
 
     static let identifier = "SuggestionTableCellView"
 
-    static let textColor = NSColor(named: "SuggestionTextColor")!
-    static let iconColor = NSColor(named: "SuggestionIconColor")!
-    static let selectedTintColor = NSColor(named: "SelectedSuggestionTintColor")!
+    static let textColor = NSColor.suggestionTextColor
+    static let iconColor = NSColor.suggestionIconColor
+    static let selectedTintColor = NSColor.selectedSuggestionTintColor
     
     @IBOutlet weak var iconImageView: NSImageView!
 
