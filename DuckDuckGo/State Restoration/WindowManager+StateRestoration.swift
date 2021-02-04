@@ -42,6 +42,10 @@ extension WindowsManager {
             }
         }
         keyWindow?.makeKeyAndOrderFront(self)
+
+        if !state.windows.isEmpty {
+            NSApp.activate(ignoringOtherApps: true)
+        }
     }
 
 }
