@@ -40,6 +40,7 @@ class MainViewController: NSViewController {
     private var canGoBackCancellable: AnyCancellable?
     private var canInsertLastRemovedTabCancellable: AnyCancellable?
     private var findInPageCancellable: AnyCancellable?
+    private var keyDownMonitor: Any?
 
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -57,6 +58,11 @@ class MainViewController: NSViewController {
     }
 
     func windowWillClose() {
+        if let monitor = keyDownMonitor {
+            NSEvent.removeMonitor(monitor)
+            keyDownMonitor = nil
+        }
+
         tabCollectionViewModel.removeAllTabs()
     }
 
@@ -197,7 +203,7 @@ class MainViewController: NSViewController {
 extension MainViewController {
 
     func listenToKeyDownEvents() {
-        NSEvent.addLocalMonitorForEvents(matching: .keyDown) { event in
+        self.keyDownMonitor = NSEvent.addLocalMonitorForEvents(matching: .keyDown) { event in
             return self.customKeyDown(with: event) ? nil : event
         }
     }
