@@ -203,6 +203,11 @@ class MainViewController: NSViewController {
 extension MainViewController {
 
     func listenToKeyDownEvents() {
+        if let monitor = keyDownMonitor {
+            NSEvent.removeMonitor(monitor)
+            keyDownMonitor = nil
+        }
+
         self.keyDownMonitor = NSEvent.addLocalMonitorForEvents(matching: .keyDown) { event in
             return self.customKeyDown(with: event) ? nil : event
         }
