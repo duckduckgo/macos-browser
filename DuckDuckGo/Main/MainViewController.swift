@@ -208,7 +208,8 @@ extension MainViewController {
             keyDownMonitor = nil
         }
 
-        self.keyDownMonitor = NSEvent.addLocalMonitorForEvents(matching: .keyDown) { event in
+        self.keyDownMonitor = NSEvent.addLocalMonitorForEvents(matching: .keyDown) { [weak self] event in
+            guard let self = self else { return nil }
             return self.customKeyDown(with: event) ? nil : event
         }
     }
