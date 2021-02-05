@@ -24,7 +24,7 @@ class WindowControllersManager {
     static let shared = WindowControllersManager()
 
     private(set) var mainWindowControllers = [MainWindowController]()
-    var lastKeyMainWindowController: MainWindowController?
+    weak var lastKeyMainWindowController: MainWindowController?
 
     func register(_ windowController: MainWindowController) {
         mainWindowControllers.append(windowController)

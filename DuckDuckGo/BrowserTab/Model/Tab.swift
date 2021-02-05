@@ -47,7 +47,15 @@ class Tab: NSObject {
     }
 
     deinit {
-        webView.stopLoading()
+        userScripts.forEach {
+            $0.messageNames.forEach {
+                if #available(OSX 11.0, *) {
+                    webView.configuration.userContentController.removeScriptMessageHandler(forName: $0, contentWorld: .defaultClient)
+                } else {
+                    webView.configuration.userContentController.removeScriptMessageHandler(forName: $0)
+                }
+            }
+        }
     }
 
     let webView: WebView
