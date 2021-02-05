@@ -28,10 +28,10 @@ class MainViewController: NSViewController {
     @IBOutlet weak var webContainerView: NSView!
     @IBOutlet weak var findInPageContainerView: NSView!
 
-    private(set) var tabBarViewController: TabBarViewController?
-    private(set) var navigationBarViewController: NavigationBarViewController?
-    private(set) var browserTabViewController: BrowserTabViewController?
-    private(set) var findInPageViewController: FindInPageViewController?
+    private(set) weak var tabBarViewController: TabBarViewController?
+    private(set) weak var navigationBarViewController: NavigationBarViewController?
+    private(set) weak var browserTabViewController: BrowserTabViewController?
+    private(set) weak var findInPageViewController: FindInPageViewController?
 
     var tabCollectionViewModel = TabCollectionViewModel()
 
@@ -102,8 +102,9 @@ class MainViewController: NSViewController {
 
     @IBSegueAction
     func createFindInPageViewController(coder: NSCoder, sender: Any?, segueIdentifier: String?) -> FindInPageViewController? {
-        self.findInPageViewController = FindInPageViewController(coder: coder)
+        let findInPageViewController = FindInPageViewController(coder: coder)
         findInPageViewController?.delegate = self
+        self.findInPageViewController = findInPageViewController
         return findInPageViewController
     }
 
