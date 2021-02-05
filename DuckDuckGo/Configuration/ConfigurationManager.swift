@@ -19,82 +19,45 @@
 import Foundation
 import Combine
 
-// https://theswiftdev.com/how-to-download-files-with-urlsession-using-combine-publishers-and-subscribers/
 class ConfigurationManager {
 
-    enum ConfigLocations: String {
+    enum Error: Swift.Error {
 
-        case bloomFilterSpec = "https://staticcdn.duckduckgo.com/https/https-mobile-v2-bloom-spec.json"
-        case trackerRadar = "https://staticcdn.duckduckgo.com/trackerblocking/v2.1/tds.json"
-        case temporaryUnprotectedSites = "https://duckduckgo.com/contentblocking/trackers-whitelist-temporary.txt"
-
-        // TODO https://github.com/duckduckgo/duckduckgo-privacy-extension/blob/develop/shared/data/surrogates.txt
-        case surrogates = "https://duckduckgo.com/contentblocking.js?l=surrogates"
+        case unknown
 
     }
 
-    static let embeddedEtags: [ConfigLocations: String] = [
+    static let queue = DispatchQueue(label: "Configuration Manager")
 
-        .bloomFilterSpec: "",
-        .trackerRadar: "",
-        .temporaryUnprotectedSites: ""
-
-    ]
-
-    static let downloadTimeout = 60.0
-
-    let queue = DispatchQueue(label: "Configuration Manager")
+    static let downloadTimeout = 60.0 * 5
+    var cancellable: AnyCancellable?
 
     func checkForDownloads() {
-        queue.async {
-            guard self.timeToCheck() else { return }
+        Self.queue.async {
+            guard self.isReadyToUpdate() else { return }
 
-            Publishers.Zip3(self.beginDownload(.bloomFilterSpec), self.beginDownload(.trackerRadar), self.beginDownload(.temporaryUnprotectedSites)).sink(receiveValue: <#T##(((Download, Download, Download)) -> Void)##(((Download, Download, Download)) -> Void)##((Download, Download, Download)) -> Void#>)
+            // This is a serial queue but some of the calls below are async, so we want to wait for everything to finish before allowing
+            //  these API calls again.
+            let group = DispatchGroup()
+            group.enter()
 
-            self.beginDownload(.bloomFilterSpec).sink { download in
-                self.handleBloomFilterSpec(download)
-            }
-
-            self.beginDownload(.trackerRadar).sink { download in
-                self.handleTrackerRadar(download)
-            }
-
-            self.beginDownload(.temporaryUnprotectedSites).sink { download in
-                self.handleTemporaryUnprotectedSites(download)
-            }
-
+            self.cancellable = BloomFilterDownloader().createConfigurationUpdateJob()
+                .merge(with: TrackerRadarDownloader().createConfigurationUpdateJob())
+                .merge(with: TemporaryUnprotectedSitesDownloader().createConfigurationUpdateJob())
+                .merge(with: SurrogatesDownloader().createConfigurationUpdateJob())
+                .collect()
+                .sink { _ in
+                    self.updateCompleted()
+                    group.leave()
+                }
         }
     }
 
-    private func timeToCheck() -> Bool {
-        return false
+    private func isReadyToUpdate() -> Bool {
+        return true
     }
 
-    private func beginDownload(_ location: ConfigLocations) -> Just<Download> {
-        return Just(Download(etag: "", data: Data()))
+    private func updateCompleted() {
     }
-
-    private func handleBloomFilterSpec(_ download: Download) {
-    }
-
-    private func handleTrackerRadar(_ download: Download) {
-    }
-
-    private func handleTemporaryUnprotectedSites(_ download: Download) {
-    }
-
-    struct Download {
-
-        let etag: String
-        let data: Data
-
-    }
-
-}
-
-class BloomFilterFetcher {
-
-    static let bloomFilterBinary = "https://staticcdn.duckduckgo.com/https/https-mobile-v2-bloom.bin"
-    static let bloomFilterExcludedDomains = "https://staticcdn.duckduckgo.com/https/https-mobile-v2-false-positives.json"
 
 }

@@ -46,10 +46,6 @@ class TrackerDataManager {
     private(set) var encodedTrackerData: String!
     private(set) var etag: String?
 
-    init(trackerData: TrackerData) {
-        self.trackerData = trackerData
-    }
-
     init() {
         reload(etag: nil)
     }

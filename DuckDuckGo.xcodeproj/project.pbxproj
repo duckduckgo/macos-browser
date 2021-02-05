@@ -71,7 +71,13 @@
 		85A011E525B4D49400FA6A0C /* findinpage.js in Resources */ = {isa = PBXBuildFile; fileRef = 85A011E425B4D49400FA6A0C /* findinpage.js */; };
 		85A011EA25B4D4CA00FA6A0C /* FindInPageUserScript.swift in Sources */ = {isa = PBXBuildFile; fileRef = 85A011E925B4D4CA00FA6A0C /* FindInPageUserScript.swift */; };
 		85AE2FF224A33A2D002D507F /* WebKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 85AE2FF124A33A2D002D507F /* WebKit.framework */; };
+		85C6A29625CC1FFD00EEB5F1 /* UserDefaultsWrapper.swift in Sources */ = {isa = PBXBuildFile; fileRef = 85C6A29525CC1FFD00EEB5F1 /* UserDefaultsWrapper.swift */; };
 		85D33F1225C82EB3002B91A6 /* ConfigurationManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 85D33F1125C82EB3002B91A6 /* ConfigurationManager.swift */; };
+		85D3400E25CB1869002B91A6 /* ConfigurationDownloading.swift in Sources */ = {isa = PBXBuildFile; fileRef = 85D3400D25CB1869002B91A6 /* ConfigurationDownloading.swift */; };
+		85D3401325CB18E0002B91A6 /* BloomFilterDownloader.swift in Sources */ = {isa = PBXBuildFile; fileRef = 85D3401225CB18E0002B91A6 /* BloomFilterDownloader.swift */; };
+		85D3401E25CB1B02002B91A6 /* TrackerRadarDownloader.swift in Sources */ = {isa = PBXBuildFile; fileRef = 85D3401D25CB1B02002B91A6 /* TrackerRadarDownloader.swift */; };
+		85D3402325CB1B12002B91A6 /* TemporaryUnprotectedSitesDownloader.swift in Sources */ = {isa = PBXBuildFile; fileRef = 85D3402225CB1B12002B91A6 /* TemporaryUnprotectedSitesDownloader.swift */; };
+		85D3402825CB1B4B002B91A6 /* SurrogatesDownloader.swift in Sources */ = {isa = PBXBuildFile; fileRef = 85D3402725CB1B4B002B91A6 /* SurrogatesDownloader.swift */; };
 		85D438B6256E7C9E00F3BAF8 /* ContextMenuUserScript.swift in Sources */ = {isa = PBXBuildFile; fileRef = 85D438B5256E7C9E00F3BAF8 /* ContextMenuUserScript.swift */; };
 		85D438BE256E8E6400F3BAF8 /* ContextMenuElement.swift in Sources */ = {isa = PBXBuildFile; fileRef = 85D438BD256E8E6400F3BAF8 /* ContextMenuElement.swift */; };
 		AA2CB12D2587BB5600AA6FBE /* TabBarFooter.xib in Resources */ = {isa = PBXBuildFile; fileRef = AA2CB12C2587BB5600AA6FBE /* TabBarFooter.xib */; };
@@ -246,7 +252,13 @@
 		85A011E425B4D49400FA6A0C /* findinpage.js */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.javascript; name = findinpage.js; path = Submodules/ios_js_support/src/findinpage.js; sourceTree = SOURCE_ROOT; };
 		85A011E925B4D4CA00FA6A0C /* FindInPageUserScript.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FindInPageUserScript.swift; sourceTree = "<group>"; };
 		85AE2FF124A33A2D002D507F /* WebKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = WebKit.framework; path = System/Library/Frameworks/WebKit.framework; sourceTree = SDKROOT; };
+		85C6A29525CC1FFD00EEB5F1 /* UserDefaultsWrapper.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UserDefaultsWrapper.swift; sourceTree = "<group>"; };
 		85D33F1125C82EB3002B91A6 /* ConfigurationManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ConfigurationManager.swift; sourceTree = "<group>"; };
+		85D3400D25CB1869002B91A6 /* ConfigurationDownloading.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ConfigurationDownloading.swift; sourceTree = "<group>"; };
+		85D3401225CB18E0002B91A6 /* BloomFilterDownloader.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BloomFilterDownloader.swift; sourceTree = "<group>"; };
+		85D3401D25CB1B02002B91A6 /* TrackerRadarDownloader.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TrackerRadarDownloader.swift; sourceTree = "<group>"; };
+		85D3402225CB1B12002B91A6 /* TemporaryUnprotectedSitesDownloader.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TemporaryUnprotectedSitesDownloader.swift; sourceTree = "<group>"; };
+		85D3402725CB1B4B002B91A6 /* SurrogatesDownloader.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SurrogatesDownloader.swift; sourceTree = "<group>"; };
 		85D438B5256E7C9E00F3BAF8 /* ContextMenuUserScript.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContextMenuUserScript.swift; sourceTree = "<group>"; };
 		85D438BD256E8E6400F3BAF8 /* ContextMenuElement.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContextMenuElement.swift; sourceTree = "<group>"; };
 		AA2CB12C2587BB5600AA6FBE /* TabBarFooter.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = TabBarFooter.xib; sourceTree = "<group>"; };
@@ -512,6 +524,7 @@
 			children = (
 				4BB88B5A25B7BA50006F6B06 /* Instruments.swift */,
 				4BB88B4F25B7BA2B006F6B06 /* TabInstrumentation.swift */,
+				85C6A29525CC1FFD00EEB5F1 /* UserDefaultsWrapper.swift */,
 			);
 			path = Utilities;
 			sourceTree = "<group>";
@@ -572,7 +585,12 @@
 		85D33F1025C82E93002B91A6 /* Configuration */ = {
 			isa = PBXGroup;
 			children = (
+				85D3401225CB18E0002B91A6 /* BloomFilterDownloader.swift */,
+				85D3400D25CB1869002B91A6 /* ConfigurationDownloading.swift */,
 				85D33F1125C82EB3002B91A6 /* ConfigurationManager.swift */,
+				85D3402725CB1B4B002B91A6 /* SurrogatesDownloader.swift */,
+				85D3402225CB1B12002B91A6 /* TemporaryUnprotectedSitesDownloader.swift */,
+				85D3401D25CB1B02002B91A6 /* TrackerRadarDownloader.swift */,
 			);
 			path = Configuration;
 			sourceTree = "<group>";
@@ -1285,6 +1303,7 @@
 				4BB88B4A25B7B690006F6B06 /* SequenceExtensions.swift in Sources */,
 				AAA0CC3C25337FAB0079BC96 /* WKBackForwardListItemViewModel.swift in Sources */,
 				4BB88B4525B7B55C006F6B06 /* DebugUserScript.swift in Sources */,
+				85D3402825CB1B4B002B91A6 /* SurrogatesDownloader.swift in Sources */,
 				8556A602256BDDD30092FA9D /* HTML5DownloadUserScript.swift in Sources */,
 				AA4D700725545EF800C3411E /* UrlEventListener.swift in Sources */,
 				AA92127725ADA07900600CD4 /* WKWebViewExtension.swift in Sources */,
@@ -1294,6 +1313,7 @@
 				AABEE6AB24ACA0F90043105B /* SuggestionTableRowView.swift in Sources */,
 				856C98DA2570149800A22F1F /* FileDownloadTask.swift in Sources */,
 				AA5D6DAC24A340F700C6FBCE /* WebViewStateObserver.swift in Sources */,
+				85C6A29625CC1FFD00EEB5F1 /* UserDefaultsWrapper.swift in Sources */,
 				4BA1A6A0258B079600F6F690 /* DataEncryption.swift in Sources */,
 				AABEE6AF24AD22B90043105B /* AddressBarTextField.swift in Sources */,
 				AA68C3D32490ED62001B8783 /* NavigationBarViewController.swift in Sources */,
@@ -1345,6 +1365,7 @@
 				AAA0CC472533833C0079BC96 /* OptionsButtonMenu.swift in Sources */,
 				4B677438255DBEB800025BD8 /* HTTPSUpgrade.xcdatamodeld in Sources */,
 				4B677434255DBEB800025BD8 /* HTTPSBloomFilterSpecification.swift in Sources */,
+				85D3400E25CB1869002B91A6 /* ConfigurationDownloading.swift in Sources */,
 				AA97BF4625135DD30014931A /* ApplicationDockMenu.swift in Sources */,
 				4BA1A69B258B076900F6F690 /* FileStore.swift in Sources */,
 				4B677436255DBEB800025BD8 /* HTTPSExcludedDomains.swift in Sources */,
@@ -1362,6 +1383,7 @@
 				4B677439255DBEB800025BD8 /* HTTPSUpgradeStore.swift in Sources */,
 				AA6EF9B3250785D5004754E6 /* NSMenuExtension.swift in Sources */,
 				AA7412B524D1536B00D22FE0 /* MainWindowController.swift in Sources */,
+				85D3401E25CB1B02002B91A6 /* TrackerRadarDownloader.swift in Sources */,
 				AA9FF95924A1ECF20039E328 /* Tab.swift in Sources */,
 				AA6FFB4624DC3B5A0028F4D0 /* WebView.swift in Sources */,
 				AA7412B224D0B3AC00D22FE0 /* TabBarViewItem.swift in Sources */,
@@ -1371,6 +1393,8 @@
 				4B677442255DBEEA00025BD8 /* Database.swift in Sources */,
 				AAF7D3862567CED500998667 /* WebViewConfiguration.swift in Sources */,
 				AABEE69824A5FD930043105B /* SuggestionsAPIResult.swift in Sources */,
+				85D3401325CB18E0002B91A6 /* BloomFilterDownloader.swift in Sources */,
+				85D3402325CB1B12002B91A6 /* TemporaryUnprotectedSitesDownloader.swift in Sources */,
 				4B6160ED25B15417007DE5B2 /* DetectedTracker.swift in Sources */,
 				4BA1A6C2258B0A1300F6F690 /* ContiguousBytesExtension.swift in Sources */,
 			);
