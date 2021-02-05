@@ -22,7 +22,7 @@ import os.log
 
 class WebViewStateObserver: NSObject {
 
-    var webView: WKWebView?
+    weak var webView: WKWebView?
     weak var tabViewModel: TabViewModel?
 
     init(webView: WKWebView, tabViewModel: TabViewModel) {

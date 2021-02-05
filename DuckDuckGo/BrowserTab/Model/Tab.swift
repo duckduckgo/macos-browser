@@ -170,8 +170,8 @@ class Tab: NSObject {
     private func subscribeToFindInPageTextChange() {
         findInPageCancellable?.cancel()
         if let findInPage = findInPage {
-            findInPageCancellable = findInPage.$text.receive(on: DispatchQueue.main).sink { text in
-                self.find(text: text)
+            findInPageCancellable = findInPage.$text.receive(on: DispatchQueue.main).sink { [weak self] text in
+                self?.find(text: text)
             }
         }
     }
