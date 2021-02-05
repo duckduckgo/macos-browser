@@ -55,7 +55,7 @@ class Tab: NSObject {
     @Published var url: URL? {
         didSet {
             if oldValue?.host != url?.host {
-                fetchFavicon(nil, for: url?.host)
+                fetchFavicon(nil, for: url?.host, isFromUserScript: false)
             }
         }
     }
@@ -117,14 +117,14 @@ class Tab: NSObject {
     @Published var favicon: NSImage?
     let faviconService: FaviconService
 
-    private func fetchFavicon(_ faviconURL: URL?, for host: String?) {
+    private func fetchFavicon(_ faviconURL: URL?, for host: String?, isFromUserScript: Bool) {
         favicon = nil
 
         guard let host = host else {
             return
         }
 
-        faviconService.fetchFavicon(faviconURL, for: host) { (image, error) in
+        faviconService.fetchFavicon(faviconURL, for: host, isFromUserScript: isFromUserScript) { (image, error) in
             guard error == nil, let image = image else {
                 return
             }
@@ -203,7 +203,7 @@ extension Tab: FaviconUserScriptDelegate {
             return
         }
 
-        faviconService.fetchFavicon(faviconUrl, for: host) { (image, error) in
+        faviconService.fetchFavicon(faviconUrl, for: host, isFromUserScript: true) { (image, error) in
             guard error == nil, let image = image else {
                 return
             }

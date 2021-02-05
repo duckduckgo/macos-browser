@@ -49,6 +49,10 @@ class MainViewController: NSViewController {
         subscribeToCanInsertLastRemovedTab()
         findInPageContainerView.applyDropShadow()
     }
+    
+    override func viewDidLayout() {
+        findInPageContainerView.applyDropShadow()
+    }
 
     func windowDidBecomeMain() {
         updateBackMenuItem()
