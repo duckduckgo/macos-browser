@@ -1,7 +1,7 @@
 //
-//  NSAppExtension.swift
+//  NSAppearanceExtension.swift
 //
-//  Copyright © 2020 DuckDuckGo. All rights reserved.
+//  Copyright © 2021 DuckDuckGo. All rights reserved.
 //
 //  Licensed under the Apache License, Version 2.0 (the "License");
 //  you may not use this file except in compliance with the License.
@@ -18,22 +18,11 @@
 
 import Cocoa
 
-extension NSApplication {
-
-    var mainMenuTyped: MainMenu? {
-        return mainMenu as? MainMenu
+extension NSAppearance {
+    static func withAppAppearance(_ closure: () -> Void) {
+        let previousAppearance = NSAppearance.current
+        NSAppearance.current = NSApp.effectiveAppearance
+        closure()
+        NSAppearance.current = previousAppearance
     }
-
-    var isCommandPressed: Bool {
-        currentEvent?.modifierFlags.contains(.command) ?? false
-    }
-
-    var isShiftPressed: Bool {
-        currentEvent?.modifierFlags.contains(.shift) ?? false
-    }
-
-    var isReturnOrEnterPressed: Bool {
-        currentEvent?.keyCode == 36 || currentEvent?.keyCode == 76
-    }
-
 }
