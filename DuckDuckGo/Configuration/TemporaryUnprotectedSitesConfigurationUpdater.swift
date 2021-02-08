@@ -1,5 +1,5 @@
 //
-//  TemporaryUnprotectedSitesDownloader.swift
+//  TemporaryUnprotectedSitesConfigurationUpdater.swift
 //
 //  Copyright © 2021 DuckDuckGo. All rights reserved.
 //
@@ -18,15 +18,13 @@
 
 import Combine
 
-class TemporaryUnprotectedSitesDownloader: ConfigurationDownloading {
+struct TemporaryUnprotectedSitesConfigurationUpdater: ConfiguationUpdating {
 
-    static let temporaryUnprotectedSites = "https://duckduckgo.com/contentblocking/trackers-whitelist-temporary.txt"
+    let downloader: ConfigurationDownloader
 
-    func createConfigurationUpdateJob() -> Future<Void, Never> {
+    func future() -> Future<Void, Never> {
         return Future { promise in
-
             
-
         }
     }
 

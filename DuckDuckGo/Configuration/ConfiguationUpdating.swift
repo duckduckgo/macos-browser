@@ -1,5 +1,5 @@
 //
-//  Surrogate0sDownloader.swift
+//  ConfiguationUpdating.swift
 //
 //  Copyright © 2021 DuckDuckGo. All rights reserved.
 //
@@ -18,13 +18,8 @@
 
 import Combine
 
-class SurrogatesDownloader: ConfigurationDownloading {
+protocol ConfiguationUpdating {
 
-    static let surrogates = "https://duckduckgo.com/contentblocking.js?l=surrogates"
-
-    func createConfigurationUpdateJob() -> Future<Void, Never> {
-        return Future { promise in
-        }
-    }
+    func future() -> Future<Void, Never>
 
 }

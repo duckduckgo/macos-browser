@@ -30,26 +30,35 @@ class ConfigurationManager {
     static let queue = DispatchQueue(label: "Configuration Manager")
 
     static let downloadTimeout = 60.0 * 5
+
     var cancellable: AnyCancellable?
 
     func checkForDownloads() {
         Self.queue.async {
             guard self.isReadyToUpdate() else { return }
 
+            let configDownloader: ConfigurationDownloader = DefaultConfigurationDownloader()
+
             // This is a serial queue but some of the calls below are async, so we want to wait for everything to finish before allowing
             //  these API calls again.
             let group = DispatchGroup()
             group.enter()
 
-            self.cancellable = BloomFilterDownloader().createConfigurationUpdateJob()
-                .merge(with: TrackerRadarDownloader().createConfigurationUpdateJob())
-                .merge(with: TemporaryUnprotectedSitesDownloader().createConfigurationUpdateJob())
-                .merge(with: SurrogatesDownloader().createConfigurationUpdateJob())
+            self.cancellable = BloomFilterConfigurationUpdater(downloader: configDownloader).future()
+                .merge(with: TrackerRadarConfigurationUpdater(downloader: configDownloader).future())
+                .merge(with: TemporaryUnprotectedSitesConfigurationUpdater(downloader: configDownloader).future())
+                .merge(with: SurrogatesConfigurationUpdater(downloader: configDownloader).future())
                 .collect()
                 .sink { _ in
                     self.updateCompleted()
                     group.leave()
                 }
+
+            if group.wait(timeout: .now() + Self.downloadTimeout) == .timedOut {
+                // TODO log it
+            }
+
+            configDownloader.cancelAll()
         }
     }
 
@@ -58,6 +67,7 @@ class ConfigurationManager {
     }
 
     private func updateCompleted() {
+
     }
 
 }

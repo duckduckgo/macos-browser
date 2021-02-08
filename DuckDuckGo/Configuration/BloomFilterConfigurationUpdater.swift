@@ -1,5 +1,5 @@
 //
-//  TrackerRadarDownloader.swift
+//  BloomFilterConfigurationUpdater.swift
 //
 //  Copyright © 2021 DuckDuckGo. All rights reserved.
 //
@@ -18,14 +18,12 @@
 
 import Combine
 
-class TrackerRadarDownloader: ConfigurationDownloading {
+struct BloomFilterConfigurationUpdater: ConfiguationUpdating {
 
-    static let trackerRadarLocation = URL(string: "https://staticcdn.duckduckgo.com/trackerblocking/v2.1/tds.json")!
+    let downloader: ConfigurationDownloader
 
-    func createConfigurationUpdateJob() -> Future<Void, Never> {
+    func future() -> Future<Void, Never> {
         return Future { promise in
-
-            
 
         }
     }

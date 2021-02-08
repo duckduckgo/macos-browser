@@ -1,5 +1,5 @@
 //
-//  BloomFilterDownloader.swift
+//  SurrogatesConfigurationUpdater.swift
 //
 //  Copyright © 2021 DuckDuckGo. All rights reserved.
 //
@@ -18,19 +18,12 @@
 
 import Combine
 
-class BloomFilterDownloader: ConfigurationDownloading {
+struct SurrogatesConfigurationUpdater: ConfiguationUpdating {
 
-    struct Locations {
-        static let bloomFilterSpec = "https://staticcdn.duckduckgo.com/https/https-mobile-v2-bloom-spec.json"
-        static let bloomFilterBinary = "https://staticcdn.duckduckgo.com/https/https-mobile-v2-bloom.bin"
-        static let bloomFilterExcludedDomains = "https://staticcdn.duckduckgo.com/https/https-mobile-v2-false-positives.json"
-    }
-    
-    func createConfigurationUpdateJob() -> Future<Void, Never> {
+    let downloader: ConfigurationDownloader
+
+    func future() -> Future<Void, Never> {
         return Future { promise in
-
-            
-
         }
     }
 
