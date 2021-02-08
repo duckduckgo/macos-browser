@@ -3,6 +3,7 @@
     <dependencies>
         <deployment identifier="macosx"/>
         <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="17506"/>
+        <capability name="Named colors" minToolsVersion="9.0"/>
         <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
     </dependencies>
     <scenes>
@@ -10,7 +11,7 @@
         <scene sceneID="qRm-AW-AdQ">
             <objects>
                 <viewController id="D9y-55-iLO" customClass="BrowserTabViewController" customModule="DuckDuckGo_Privacy_Browser" customModuleProvider="target" sceneMemberID="viewController">
-                    <view key="view" id="aev-t9-Epw">
+                    <view key="view" id="aev-t9-Epw" customClass="ColorView" customModule="DuckDuckGo_Privacy_Browser" customModuleProvider="target">
                         <rect key="frame" x="0.0" y="0.0" width="512" height="492"/>
                         <autoresizingMask key="autoresizingMask"/>
                         <subviews>
@@ -18,7 +19,7 @@
                                 <rect key="frame" x="0.0" y="0.0" width="512" height="492"/>
                                 <subviews>
                                     <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="RNn-86-Wkx">
-                                        <rect key="frame" x="140" y="253" width="233" height="17"/>
+                                        <rect key="frame" x="140" y="253" width="232" height="17"/>
                                         <textFieldCell key="cell" lineBreakMode="clipping" title="DuckDuckGo can't load this page." id="W60-yd-bv3">
                                             <font key="font" metaFont="systemSemibold" size="14"/>
                                             <color key="textColor" name="labelColor" catalog="System" colorSpace="catalog"/>
@@ -53,6 +54,11 @@
                             <constraint firstAttribute="bottom" secondItem="bol-qn-wuI" secondAttribute="bottom" id="ef9-7H-3hy"/>
                             <constraint firstItem="bol-qn-wuI" firstAttribute="top" secondItem="aev-t9-Epw" secondAttribute="top" id="v8E-6v-8Tx"/>
                         </constraints>
+                        <userDefinedRuntimeAttributes>
+                            <userDefinedRuntimeAttribute type="color" keyPath="backgroundColor">
+                                <color key="value" name="BroswerTabBackgroundColor"/>
+                            </userDefinedRuntimeAttribute>
+                        </userDefinedRuntimeAttributes>
                     </view>
                     <connections>
                         <outlet property="errorView" destination="bol-qn-wuI" id="gbL-AN-fxw"/>
@@ -63,4 +69,9 @@
             <point key="canvasLocation" x="123" y="2235"/>
         </scene>
     </scenes>
+    <resources>
+        <namedColor name="BroswerTabBackgroundColor">
+            <color red="1" green="1" blue="1" alpha="0.0" colorSpace="custom" customColorSpace="sRGB"/>
+        </namedColor>
+    </resources>
 </document>

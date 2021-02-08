@@ -44,6 +44,7 @@ class FindInPageViewController: NSViewController {
 
     override func viewDidLoad() {
         super.viewDidLoad()
+        focusRingView.strokedBackgroundColor = NSColor.findInPageFocusedBackgroundColor
         textField.delegate = self
         listenForTextFieldResponderNotifications()
         subscribeToModelChanges()

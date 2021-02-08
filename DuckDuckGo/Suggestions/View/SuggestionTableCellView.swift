@@ -23,8 +23,9 @@ class SuggestionTableCellView: NSTableCellView {
 
     static let identifier = "SuggestionTableCellView"
 
-    static let tintColor = NSColor(named: "SuggestionTintColor")!
-    static let selectedTintColor = NSColor(named: "SelectedSuggestionTintColor")!
+    static let textColor = NSColor.suggestionTextColor
+    static let iconColor = NSColor.suggestionIconColor
+    static let selectedTintColor = NSColor.selectedSuggestionTintColor
     
     @IBOutlet weak var iconImageView: NSImageView!
 
@@ -54,12 +55,12 @@ class SuggestionTableCellView: NSTableCellView {
             textField?.textColor = Self.selectedTintColor
         } else {
             textField?.attributedStringValue = attributedString
-            textField?.textColor = Self.tintColor
+            textField?.textColor = Self.textColor
         }
     }
 
     private func updateIconImageView() {
-        iconImageView.contentTintColor = isSelected ? Self.selectedTintColor : Self.tintColor
+        iconImageView.contentTintColor = isSelected ? Self.selectedTintColor : Self.iconColor
     }
 
 }

@@ -80,12 +80,14 @@ class MouseOverButton: NSButton {
             return
         }
 
-        if isMouseDown {
-            layer?.backgroundColor = mouseDownColor?.cgColor ?? NSColor.clear.cgColor
-        } else if isMouseOver {
-            layer?.backgroundColor = mouseOverColor?.cgColor ?? NSColor.clear.cgColor
-        } else {
-            layer?.backgroundColor = NSColor.clear.cgColor
+        NSAppearance.withAppAppearance {
+            if isMouseDown {
+                layer?.backgroundColor = mouseDownColor?.cgColor ?? NSColor.clear.cgColor
+            } else if isMouseOver {
+                layer?.backgroundColor = mouseOverColor?.cgColor ?? NSColor.clear.cgColor
+            } else {
+                layer?.backgroundColor = NSColor.clear.cgColor
+            }
         }
     }
 

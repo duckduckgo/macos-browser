@@ -44,7 +44,6 @@ class AppDelegate: NSObject, NSApplicationDelegate {
         stateRestorationManager = AppStateRestorationManager(fileStore: fileStore)
 
         urlEventListener.listen()
-        MainMenuManager.setupMainMenu()
     }
 
     func applicationDidFinishLaunching(_ aNotification: Notification) {

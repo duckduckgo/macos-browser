@@ -59,6 +59,10 @@ class MainViewController: NSViewController {
         subscribeToCanInsertLastRemovedTab()
         findInPageContainerView.applyDropShadow()
     }
+    
+    override func viewDidLayout() {
+        findInPageContainerView.applyDropShadow()
+    }
 
     override func encodeRestorableState(with coder: NSCoder) {
         fatalError("Default AppKit State Restoration should not be used")
@@ -172,7 +176,7 @@ class MainViewController: NSViewController {
             os_log("MainViewController: No tab view model selected", type: .error)
             return
         }
-        guard let mainMenu = NSApplication.shared.mainMenu, let backMenuItem = mainMenu.backMenuItem else {
+        guard let backMenuItem = NSApplication.shared.mainMenuTyped?.backMenuItem else {
             os_log("MainViewController: Failed to get reference to back menu item", type: .error)
             return
         }
@@ -185,7 +189,7 @@ class MainViewController: NSViewController {
             os_log("MainViewController: No tab view model selected", type: .error)
             return
         }
-        guard let mainMenu = NSApplication.shared.mainMenu, let forwardMenuItem = mainMenu.forwardMenuItem else {
+        guard let forwardMenuItem = NSApplication.shared.mainMenuTyped?.forwardMenuItem else {
             os_log("MainViewController: Failed to get reference to back menu item", type: .error)
             return
         }
@@ -194,7 +198,7 @@ class MainViewController: NSViewController {
     }
 
     func updateReopenLastClosedTabMenuItem() {
-        guard let mainMenu = NSApplication.shared.mainMenu, let reopenLastClosedTabMenuItem = mainMenu.reopenLastClosedTabMenuItem else {
+        guard let reopenLastClosedTabMenuItem = NSApplication.shared.mainMenuTyped?.reopenLastClosedTabMenuItem else {
             os_log("MainViewController: Failed to get reference to back menu item", type: .error)
             return
         }
