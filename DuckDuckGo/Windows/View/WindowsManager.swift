@@ -33,24 +33,24 @@ class WindowsManager {
         }
     }
 
-    class func openNewWindow(with initialTab: Tab? = nil, droppingPoint: NSPoint? = nil) {
-        guard let mainWindowController = makeNewWindow() else {
-            return
-        }
-
-        if let initialTab = initialTab {
-            guard let mainViewController = mainWindowController.contentViewController as? MainViewController else {
-                return
-            }
-
-            mainViewController.tabCollectionViewModel.append(tab: initialTab)
-            mainViewController.tabCollectionViewModel.remove(at: 0)
+    @discardableResult
+    class func openNewWindow(with tabCollectionViewModel: TabCollectionViewModel? = nil, droppingPoint: NSPoint? = nil) -> NSWindow? {
+        guard let mainWindowController = makeNewWindow(tabCollectionViewModel: tabCollectionViewModel) else {
+            return nil
         }
 
         if let droppingPoint = droppingPoint {
             mainWindowController.window?.setFrameOrigin(droppingPoint: droppingPoint)
         }
         mainWindowController.showWindow(self)
+
+        return mainWindowController.window
+    }
+
+    class func openNewWindow(with tab: Tab, droppingPoint: NSPoint? = nil) {
+        let tabCollection = TabCollection()
+        tabCollection.append(tab: tab)
+        openNewWindow(with: TabCollectionViewModel(tabCollection: tabCollection))
     }
 
     class func openNewWindow(with initialUrl: URL) {
@@ -72,14 +72,31 @@ class WindowsManager {
         newTab.url = initialUrl
     }
 
-    private class func makeNewWindow() -> MainWindowController? {
+    private class func makeNewWindow(tabCollectionViewModel: TabCollectionViewModel? = nil) -> MainWindowController? {
         let mainStoryboard = NSStoryboard(name: "Main", bundle: nil)
-        guard let mainWindowController = mainStoryboard.instantiateInitialController() as? MainWindowController else {
+        guard let mainWindowController = mainStoryboard
+                .instantiateController(withIdentifier: .mainWindowController) as? MainWindowController else {
             os_log("MainViewController: Failed to init MainWindowController", type: .error)
             return nil
         }
+        
+        let mainViewController = mainStoryboard
+            .instantiateController(identifier: .mainViewController) { coder -> MainViewController? in
+                if let tabCollectionViewModel = tabCollectionViewModel {
+                    return MainViewController(coder: coder, tabCollectionViewModel: tabCollectionViewModel)
+                } else {
+                    return MainViewController(coder: coder)
+                }
+            }
+        mainWindowController.contentViewController = mainViewController
 
         mainWindowController.window?.animationBehavior = .documentWindow
         return mainWindowController
     }
+
+}
+
+fileprivate extension NSStoryboard.SceneIdentifier {
+    static let mainWindowController = NSStoryboard.SceneIdentifier("mainWindowController")
+    static let mainViewController = NSStoryboard.SceneIdentifier("mainViewController")
 }

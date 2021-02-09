@@ -23,6 +23,7 @@ protocol FileStoring {
     func persist(_ data: Data, fileName: String) -> Bool
     func loadData(named fileName: String) -> Data?
     func hasData(for fileName: String) -> Bool
+    func remove(_ fileName: String)
 }
 
 class FileStore: FileStoring {
@@ -66,6 +67,14 @@ class FileStore: FileStoring {
     func hasData(for fileName: String) -> Bool {
         let path = persistenceLocation(for: fileName).path
         return FileManager.default.fileExists(atPath: path)
+    }
+
+    func remove(_ fileName: String) {
+        let url = persistenceLocation(for: fileName)
+        var isDir: ObjCBool = false
+        let fileManager = FileManager()
+        guard fileManager.fileExists(atPath: url.path, isDirectory: &isDir) && !isDir.boolValue else { return }
+        try? fileManager.removeItem(at: url)
     }
 
     func persistenceLocation(for fileName: String) -> URL {
