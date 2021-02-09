@@ -24,14 +24,13 @@ class AddressBarViewController: NSViewController {
 
     static let homeFaviconImage = NSImage(named: "HomeFavicon")
     static let webImage = NSImage(named: "Web")
-    static let refreshImage = NSImage(named: "Refresh")
-    static let clearImage = NSImage(named: "Clear")
 
     @IBOutlet weak var addressBarTextField: AddressBarTextField!
     @IBOutlet weak var passiveTextField: NSTextField!
-    @IBOutlet weak var actionButton: NSButton!
+    @IBOutlet weak var clearButton: NSButton!
     @IBOutlet weak var imageButton: NSButton!
     @IBOutlet weak var privacyEntryPointButton: NSButton!
+    @IBOutlet var inactiveBackgroundView: NSView!
     
     private var tabCollectionViewModel: TabCollectionViewModel
     private let suggestionsViewModel = SuggestionsViewModel(suggestions: Suggestions())
@@ -48,7 +47,6 @@ class AddressBarViewController: NSViewController {
     }
 
     private var selectedTabViewModelCancellable: AnyCancellable?
-    private var reloadButtonCancellable: AnyCancellable?
     private var addressBarTextFieldValueCancellable: AnyCancellable?
     private var passiveAddressBarStringCancellable: AnyCancellable?
 
@@ -92,19 +90,10 @@ class AddressBarViewController: NSViewController {
         addressBarTextField.viewDidLayout()
     }
 
-    @IBAction func actionButtonAction(_ sender: NSButton) {
-        guard let selectedTabViewModel = tabCollectionViewModel.selectedTabViewModel else {
-            os_log("%s: Selected tab view model is nil", type: .error, className)
-            return
-        }
-
-        if actionButton.image === Self.refreshImage {
-            selectedTabViewModel.tab.reload()
-        } else {
-            addressBarTextField.clearValue()
-        }
+    @IBAction func clearButtonAction(_ sender: NSButton) {
+        addressBarTextField.clearValue()
     }
-
+    
     private var focusRingView: FocusRingView? {
         return view as? FocusRingView
     }
@@ -148,6 +137,7 @@ class AddressBarViewController: NSViewController {
         passiveTextField.alphaValue = firstResponder ? 0 : 1
 
         focusRingView?.updateView(stroke: firstResponder)
+        inactiveBackgroundView.alphaValue = firstResponder ? 0 : 1
     }
 
     private func updateButtons() {
@@ -166,17 +156,7 @@ class AddressBarViewController: NSViewController {
         privacyEntryPointButton.isHidden = isSearchingMode || isTextFieldFirstResponder || isDuckDuckGoUrl || isURLNil
         imageButton.isHidden = !privacyEntryPointButton.isHidden
 
-        // Action button
-        var actionButtonHidden = false
-        if case .text(let text) = addressBarTextField.value {
-            if text == "" {
-                actionButtonHidden = true
-            }
-        }
-        if actionButton.isHidden != actionButtonHidden {
-            actionButton.isHidden = actionButtonHidden
-        }
-        actionButton.image = isSearchingMode && isTextFieldEditorFirstResponder ? Self.clearImage : Self.refreshImage
+        clearButton.isHidden = !(isTextFieldEditorFirstResponder && !addressBarTextField.value.isEmpty)
 
         // Image button
         imageButton.image = selectedTabViewModel.favicon

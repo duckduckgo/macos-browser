@@ -24,6 +24,7 @@ class NavigationBarViewController: NSViewController {
 
     @IBOutlet weak var goBackButton: NSButton!
     @IBOutlet weak var goForwardButton: NSButton!
+    @IBOutlet weak var refreshButton: NSButton!
     @IBOutlet weak var feedbackButton: NSButton!
     @IBOutlet weak var optionsButton: NSButton!
 
@@ -95,6 +96,15 @@ class NavigationBarViewController: NSViewController {
         selectedTabViewModel.tab.goForward()
     }
 
+    @IBAction func refreshAction(_ sender: NSButton) {
+        guard let selectedTabViewModel = tabCollectionViewModel.selectedTabViewModel else {
+            os_log("%s: Selected tab view model is nil", type: .error, className)
+            return
+        }
+
+        selectedTabViewModel.tab.reload()
+    }
+
     @IBAction func optionsButtonAction(_ sender: NSButton) {
         if let event = NSApplication.shared.currentEvent {
             NSMenu.popUpContextMenu(optionsMenu, with: event, for: sender)
@@ -148,6 +158,10 @@ class NavigationBarViewController: NSViewController {
         selectedTabViewModel.$canGoForward.receive(on: DispatchQueue.main).sink { [weak self] _ in
             self?.updateNavigationButtons()
         } .store(in: &navigationButtonsCancellables)
+
+        selectedTabViewModel.$canReload.receive(on: DispatchQueue.main).sink { [weak self] _ in
+            self?.updateNavigationButtons()
+        } .store(in: &navigationButtonsCancellables)
     }
 
     private func updateNavigationButtons() {
@@ -158,6 +172,7 @@ class NavigationBarViewController: NSViewController {
 
         goBackButton.isEnabled = selectedTabViewModel.canGoBack
         goForwardButton.isEnabled = selectedTabViewModel.canGoForward
+        refreshButton.isEnabled = selectedTabViewModel.canReload
     }
 
 }

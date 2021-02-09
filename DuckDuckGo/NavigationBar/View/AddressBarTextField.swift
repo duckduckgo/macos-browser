@@ -184,6 +184,17 @@ class AddressBarTextField: NSTextField {
             case .suggestion(let suggestionViewModel): return suggestionViewModel.string
             }
         }
+
+        var isEmpty: Bool {
+            switch self {
+            case .text(let text):
+                return text.isEmpty
+            case .url(urlString: let urlString, url: _, userTyped: _):
+                return urlString.isEmpty
+            case .suggestion(let suggestion):
+                return suggestion.string.isEmpty
+            }
+        }
     }
 
     @Published private(set) var value: Value = .text("") {
