@@ -31,6 +31,8 @@ class AddressBarViewController: NSViewController {
     @IBOutlet weak var imageButton: NSButton!
     @IBOutlet weak var privacyEntryPointButton: NSButton!
     @IBOutlet var inactiveBackgroundView: NSView!
+    @IBOutlet var activeBackgroundView: NSView!
+    @IBOutlet var activeBackgroundViewOverHeight: NSLayoutConstraint!
     
     private var tabCollectionViewModel: TabCollectionViewModel
     private let suggestionsViewModel = SuggestionsViewModel(suggestions: Suggestions())
@@ -49,6 +51,8 @@ class AddressBarViewController: NSViewController {
     private var selectedTabViewModelCancellable: AnyCancellable?
     private var addressBarTextFieldValueCancellable: AnyCancellable?
     private var passiveAddressBarStringCancellable: AnyCancellable?
+    private var isSuggestionsVisibleCancellable: AnyCancellable?
+    private var frameCancellable: AnyCancellable?
 
     required init?(coder: NSCoder) {
         fatalError("AddressBarViewController: Bad initializer")
@@ -94,9 +98,7 @@ class AddressBarViewController: NSViewController {
         addressBarTextField.clearValue()
     }
     
-    private var focusRingView: FocusRingView? {
-        return view as? FocusRingView
-    }
+    @IBOutlet var focusRingView: ShadowView!
 
     private func subscribeToSelectedTabViewModel() {
         selectedTabViewModelCancellable = tabCollectionViewModel.$selectedTabViewModel.receive(on: DispatchQueue.main).sink { [weak self] _ in
@@ -136,8 +138,37 @@ class AddressBarViewController: NSViewController {
         addressBarTextField.alphaValue = firstResponder ? 1 : 0
         passiveTextField.alphaValue = firstResponder ? 0 : 1
 
-        focusRingView?.updateView(stroke: firstResponder)
+        updateFocusRingView(firstResponder: firstResponder)
         inactiveBackgroundView.alphaValue = firstResponder ? 0 : 1
+        activeBackgroundView.alphaValue = firstResponder ? 1 : 0
+    }
+
+    private func updateFocusRingView(firstResponder: Bool) {
+        guard firstResponder else {
+            isSuggestionsVisibleCancellable = nil
+            focusRingView.removeFromSuperview()
+            return
+        }
+
+        isSuggestionsVisibleCancellable = addressBarTextField.isSuggestionsWindowVisible
+            .sink { [weak self] visible in
+                self?.focusRingView.shadowSides = visible
+                    ? [.left, .top, .right]
+                    : .all
+                self?.activeBackgroundViewOverHeight.isActive = visible
+        }
+        frameCancellable = self.view.superview?.publisher(for: \.frame).sink { [weak self] _ in
+            self?.layoutFocusRingView()
+        }
+        view.window?.contentView?.addSubview(focusRingView)
+    }
+
+    private func layoutFocusRingView() {
+        guard let superview = focusRingView.superview else { return }
+
+        let winFrame = self.view.convert(self.view.bounds, to: nil)
+        let frame = superview.convert(winFrame, from: nil)
+        focusRingView.frame = frame
     }
 
     private func updateButtons() {

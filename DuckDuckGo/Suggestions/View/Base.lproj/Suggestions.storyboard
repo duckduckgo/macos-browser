@@ -11,8 +11,8 @@
         <scene sceneID="kK0-bi-Mi6">
             <objects>
                 <windowController storyboardIdentifier="SuggestionsWindowController" id="cvc-K3-VCn" sceneMemberID="viewController">
-                    <window key="window" allowsToolTipsWhenApplicationIsInactive="NO" autorecalculatesKeyViewLoop="NO" releasedWhenClosed="NO" visibleAtLaunch="NO" frameAutosaveName="" animationBehavior="default" titlebarAppearsTransparent="YES" titleVisibility="hidden" id="k4G-BH-yNc">
-                        <windowStyleMask key="styleMask" titled="YES" fullSizeContentView="YES"/>
+                    <window key="window" allowsToolTipsWhenApplicationIsInactive="NO" autorecalculatesKeyViewLoop="NO" restorable="NO" hasShadow="NO" releasedWhenClosed="NO" visibleAtLaunch="NO" frameAutosaveName="" animationBehavior="default" titlebarAppearsTransparent="YES" titleVisibility="hidden" id="k4G-BH-yNc">
+                        <windowStyleMask key="styleMask" fullSizeContentView="YES"/>
                         <windowPositionMask key="initialPositionMask" leftStrut="YES" rightStrut="YES" topStrut="YES" bottomStrut="YES"/>
                         <rect key="contentRect" x="294" y="313" width="480" height="218"/>
                         <rect key="screenRect" x="0.0" y="0.0" width="1536" height="935"/>
@@ -49,134 +49,208 @@
         <scene sceneID="uJh-kd-sy1">
             <objects>
                 <viewController storyboardIdentifier="SuggestionsViewController" id="JbS-WE-3yw" customClass="SuggestionsViewController" customModule="DuckDuckGo_Privacy_Browser" customModuleProvider="target" sceneMemberID="viewController">
-                    <view key="view" id="PAv-y7-vhB">
-                        <rect key="frame" x="0.0" y="0.0" width="500" height="218"/>
+                    <view key="view" misplaced="YES" id="PAv-y7-vhB">
+                        <rect key="frame" x="0.0" y="0.0" width="550" height="170"/>
                         <autoresizingMask key="autoresizingMask"/>
                         <subviews>
-                            <visualEffectView blendingMode="behindWindow" material="sheet" state="active" translatesAutoresizingMaskIntoConstraints="NO" id="O3Y-th-ZhM">
-                                <rect key="frame" x="0.0" y="0.0" width="500" height="218"/>
-                            </visualEffectView>
-                            <customView translatesAutoresizingMaskIntoConstraints="NO" id="GOF-7f-X82" customClass="ColorView" customModule="DuckDuckGo_Privacy_Browser" customModuleProvider="target">
-                                <rect key="frame" x="0.0" y="0.0" width="500" height="218"/>
-                                <userDefinedRuntimeAttributes>
-                                    <userDefinedRuntimeAttribute type="color" keyPath="backgroundColor">
-                                        <color key="value" name="SuggestionsBackgroundColor"/>
-                                    </userDefinedRuntimeAttribute>
-                                </userDefinedRuntimeAttributes>
-                            </customView>
-                            <scrollView borderType="none" autohidesScrollers="YES" horizontalLineScroll="22" horizontalPageScroll="10" verticalLineScroll="22" verticalPageScroll="10" usesPredominantAxisScrolling="NO" translatesAutoresizingMaskIntoConstraints="NO" id="cx3-LG-ZUH">
-                                <rect key="frame" x="6" y="0.0" width="488" height="218"/>
-                                <clipView key="contentView" drawsBackground="NO" copiesOnScroll="NO" id="pb8-sX-fSc">
-                                    <rect key="frame" x="0.0" y="0.0" width="488" height="218"/>
-                                    <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
-                                    <subviews>
-                                        <tableView verticalHuggingPriority="750" allowsExpansionToolTips="YES" columnAutoresizingStyle="lastColumnOnly" selectionHighlightStyle="none" columnSelection="YES" multipleSelection="NO" autosaveColumns="NO" rowHeight="22" viewBased="YES" id="4Z2-d8-NA2">
-                                            <rect key="frame" x="0.0" y="0.0" width="488" height="198"/>
-                                            <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
-                                            <color key="backgroundColor" name="ClearColor"/>
-                                            <color key="gridColor" name="gridColor" catalog="System" colorSpace="catalog"/>
-                                            <tableColumns>
-                                                <tableColumn width="454" minWidth="40" maxWidth="1000" id="0zj-Uc-AlR">
-                                                    <tableHeaderCell key="headerCell" lineBreakMode="truncatingTail" borderStyle="border">
-                                                        <color key="textColor" name="headerTextColor" catalog="System" colorSpace="catalog"/>
-                                                        <color key="backgroundColor" name="headerColor" catalog="System" colorSpace="catalog"/>
-                                                    </tableHeaderCell>
-                                                    <textFieldCell key="dataCell" lineBreakMode="truncatingTail" selectable="YES" editable="YES" title="Text Cell" id="ZgG-he-8hk">
-                                                        <font key="font" metaFont="system"/>
-                                                        <color key="textColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
-                                                        <color key="backgroundColor" name="controlBackgroundColor" catalog="System" colorSpace="catalog"/>
-                                                    </textFieldCell>
-                                                    <tableColumnResizingMask key="resizingMask" resizeWithTable="YES" userResizable="YES"/>
-                                                    <prototypeCellViews>
-                                                        <customView identifier="SuggestionTableRowView" id="9zN-fn-Ri0" customClass="SuggestionTableRowView" customModule="DuckDuckGo_Privacy_Browser" customModuleProvider="target">
-                                                            <rect key="frame" x="10" y="0.0" width="466" height="22"/>
-                                                            <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
-                                                        </customView>
-                                                        <tableCellView identifier="SuggestionTableCellView" id="kX2-C1-38Y" customClass="SuggestionTableCellView" customModule="DuckDuckGo_Privacy_Browser" customModuleProvider="target">
-                                                            <rect key="frame" x="10" y="22" width="466" height="22"/>
-                                                            <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
-                                                            <subviews>
-                                                                <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" horizontalCompressionResistancePriority="250" translatesAutoresizingMaskIntoConstraints="NO" id="bOr-Go-gyW">
-                                                                    <rect key="frame" x="33" y="3" width="427" height="16"/>
-                                                                    <textFieldCell key="cell" lineBreakMode="truncatingTail" sendsActionOnEndEditing="YES" title="Table View Cell" id="7bg-HA-vCm">
-                                                                        <font key="font" usesAppearanceFont="YES"/>
-                                                                        <color key="textColor" name="textColor" catalog="System" colorSpace="catalog"/>
-                                                                        <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
-                                                                    </textFieldCell>
-                                                                </textField>
-                                                                <imageView horizontalHuggingPriority="251" verticalHuggingPriority="251" translatesAutoresizingMaskIntoConstraints="NO" id="vli-IP-Nr8">
-                                                                    <rect key="frame" x="13" y="3" width="16" height="16"/>
-                                                                    <constraints>
-                                                                        <constraint firstAttribute="width" constant="16" id="Q25-Gx-Xzg"/>
-                                                                        <constraint firstAttribute="height" constant="16" id="go3-c4-c3W"/>
-                                                                    </constraints>
-                                                                    <imageCell key="cell" refusesFirstResponder="YES" alignment="left" imageScaling="proportionallyDown" id="zsh-dc-Umh"/>
-                                                                </imageView>
-                                                            </subviews>
-                                                            <constraints>
-                                                                <constraint firstItem="vli-IP-Nr8" firstAttribute="centerY" secondItem="kX2-C1-38Y" secondAttribute="centerY" id="ICn-31-LAg"/>
-                                                                <constraint firstItem="bOr-Go-gyW" firstAttribute="leading" secondItem="vli-IP-Nr8" secondAttribute="trailing" constant="6" id="JNb-pL-G7y"/>
-                                                                <constraint firstAttribute="trailing" secondItem="bOr-Go-gyW" secondAttribute="trailing" constant="8" id="b4A-tY-oOP"/>
-                                                                <constraint firstItem="bOr-Go-gyW" firstAttribute="centerY" secondItem="kX2-C1-38Y" secondAttribute="centerY" id="oAf-1Z-91H"/>
-                                                                <constraint firstItem="vli-IP-Nr8" firstAttribute="leading" secondItem="kX2-C1-38Y" secondAttribute="leading" constant="13" id="zgq-le-RHJ"/>
-                                                            </constraints>
-                                                            <connections>
-                                                                <outlet property="iconImageView" destination="vli-IP-Nr8" id="5lX-7Q-4Cw"/>
-                                                                <outlet property="textField" destination="bOr-Go-gyW" id="wxi-1N-Bc4"/>
-                                                            </connections>
-                                                        </tableCellView>
-                                                    </prototypeCellViews>
-                                                </tableColumn>
-                                            </tableColumns>
-                                        </tableView>
-                                    </subviews>
-                                    <color key="backgroundColor" name="ClearColor"/>
-                                </clipView>
+                            <customView translatesAutoresizingMaskIntoConstraints="NO" id="KKJ-SW-5gR" userLabel="Shadow Clip View">
+                                <rect key="frame" x="0.0" y="0.0" width="550" height="101"/>
+                                <subviews>
+                                    <customView translatesAutoresizingMaskIntoConstraints="NO" id="cHT-Cf-UOB" customClass="ShadowView" customModule="DuckDuckGo_Privacy_Browser" customModuleProvider="target">
+                                        <rect key="frame" x="20" y="20" width="510" height="101"/>
+                                        <userDefinedRuntimeAttributes>
+                                            <userDefinedRuntimeAttribute type="color" keyPath="shadowColor">
+                                                <color key="value" name="AddressBarShadowColor"/>
+                                            </userDefinedRuntimeAttribute>
+                                            <userDefinedRuntimeAttribute type="size" keyPath="shadowOffset">
+                                                <size key="value" width="0.0" height="-4"/>
+                                            </userDefinedRuntimeAttribute>
+                                            <userDefinedRuntimeAttribute type="number" keyPath="shadowRadius">
+                                                <real key="value" value="4"/>
+                                            </userDefinedRuntimeAttribute>
+                                            <userDefinedRuntimeAttribute type="number" keyPath="cornerRadius">
+                                                <real key="value" value="14"/>
+                                            </userDefinedRuntimeAttribute>
+                                            <userDefinedRuntimeAttribute type="number" keyPath="shadowOpacity">
+                                                <real key="value" value="1"/>
+                                            </userDefinedRuntimeAttribute>
+                                        </userDefinedRuntimeAttributes>
+                                    </customView>
+                                </subviews>
                                 <constraints>
-                                    <constraint firstAttribute="height" constant="218" id="6a1-59-ehY"/>
+                                    <constraint firstAttribute="bottom" secondItem="cHT-Cf-UOB" secondAttribute="bottom" constant="20" id="8AL-RN-SoQ"/>
+                                    <constraint firstItem="cHT-Cf-UOB" firstAttribute="leading" secondItem="KKJ-SW-5gR" secondAttribute="leading" constant="20" id="E9b-KN-Xdh"/>
+                                    <constraint firstItem="cHT-Cf-UOB" firstAttribute="top" secondItem="KKJ-SW-5gR" secondAttribute="top" constant="-20" id="r2a-5g-qnG"/>
+                                    <constraint firstAttribute="trailing" secondItem="cHT-Cf-UOB" secondAttribute="trailing" constant="20" id="xH1-iA-ulc"/>
                                 </constraints>
-                                <edgeInsets key="contentInsets" left="0.0" right="0.0" top="10" bottom="10"/>
-                                <scroller key="horizontalScroller" hidden="YES" wantsLayer="YES" verticalHuggingPriority="750" horizontal="YES" id="uOv-xx-TFd">
-                                    <rect key="frame" x="1" y="237" width="486" height="16"/>
-                                    <autoresizingMask key="autoresizingMask"/>
-                                </scroller>
-                                <scroller key="verticalScroller" hidden="YES" wantsLayer="YES" verticalHuggingPriority="750" horizontal="NO" id="jx0-BH-84H">
-                                    <rect key="frame" x="224" y="17" width="15" height="102"/>
-                                    <autoresizingMask key="autoresizingMask"/>
-                                </scroller>
-                            </scrollView>
+                            </customView>
+                            <customView translatesAutoresizingMaskIntoConstraints="NO" id="Svf-wj-SjJ" userLabel="Clip View">
+                                <rect key="frame" x="20" y="20" width="510" height="82"/>
+                                <subviews>
+                                    <customView translatesAutoresizingMaskIntoConstraints="NO" id="j2X-bv-VAU" customClass="ColorView" customModule="DuckDuckGo_Privacy_Browser" customModuleProvider="target">
+                                        <rect key="frame" x="0.0" y="0.0" width="510" height="102"/>
+                                        <subviews>
+                                            <scrollView borderType="none" horizontalLineScroll="28" horizontalPageScroll="10" verticalLineScroll="28" verticalPageScroll="10" hasHorizontalScroller="NO" hasVerticalScroller="NO" usesPredominantAxisScrolling="NO" translatesAutoresizingMaskIntoConstraints="NO" id="cx3-LG-ZUH">
+                                                <rect key="frame" x="5" y="0.0" width="500" height="64"/>
+                                                <clipView key="contentView" drawsBackground="NO" copiesOnScroll="NO" id="pb8-sX-fSc">
+                                                    <rect key="frame" x="0.0" y="0.0" width="500" height="64"/>
+                                                    <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+                                                    <subviews>
+                                                        <tableView verticalHuggingPriority="750" allowsExpansionToolTips="YES" columnAutoresizingStyle="lastColumnOnly" selectionHighlightStyle="none" columnSelection="YES" multipleSelection="NO" autosaveColumns="NO" rowHeight="28" viewBased="YES" id="4Z2-d8-NA2">
+                                                            <rect key="frame" x="0.0" y="0.0" width="500" height="47"/>
+                                                            <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+                                                            <color key="backgroundColor" name="ClearColor"/>
+                                                            <color key="gridColor" name="gridColor" catalog="System" colorSpace="catalog"/>
+                                                            <tableColumns>
+                                                                <tableColumn width="454" minWidth="40" maxWidth="1000" id="0zj-Uc-AlR">
+                                                                    <tableHeaderCell key="headerCell" lineBreakMode="truncatingTail" borderStyle="border">
+                                                                        <color key="textColor" name="headerTextColor" catalog="System" colorSpace="catalog"/>
+                                                                        <color key="backgroundColor" name="headerColor" catalog="System" colorSpace="catalog"/>
+                                                                    </tableHeaderCell>
+                                                                    <textFieldCell key="dataCell" lineBreakMode="truncatingTail" selectable="YES" editable="YES" title="Text Cell" id="ZgG-he-8hk">
+                                                                        <font key="font" metaFont="system"/>
+                                                                        <color key="textColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
+                                                                        <color key="backgroundColor" name="controlBackgroundColor" catalog="System" colorSpace="catalog"/>
+                                                                    </textFieldCell>
+                                                                    <tableColumnResizingMask key="resizingMask" resizeWithTable="YES" userResizable="YES"/>
+                                                                    <prototypeCellViews>
+                                                                        <customView identifier="SuggestionTableRowView" id="9zN-fn-Ri0" customClass="SuggestionTableRowView" customModule="DuckDuckGo_Privacy_Browser" customModuleProvider="target">
+                                                                            <rect key="frame" x="0.0" y="0.0" width="454" height="22"/>
+                                                                            <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+                                                                        </customView>
+                                                                        <tableCellView identifier="SuggestionTableCellView" id="kX2-C1-38Y" customClass="SuggestionTableCellView" customModule="DuckDuckGo_Privacy_Browser" customModuleProvider="target">
+                                                                            <rect key="frame" x="0.0" y="22" width="454" height="0.0"/>
+                                                                            <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+                                                                            <subviews>
+                                                                                <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" horizontalCompressionResistancePriority="250" translatesAutoresizingMaskIntoConstraints="NO" id="bOr-Go-gyW">
+                                                                                    <rect key="frame" x="34" y="-7" width="414" height="16"/>
+                                                                                    <textFieldCell key="cell" lineBreakMode="truncatingTail" sendsActionOnEndEditing="YES" title="Table View Cell" id="7bg-HA-vCm">
+                                                                                        <font key="font" usesAppearanceFont="YES"/>
+                                                                                        <color key="textColor" name="textColor" catalog="System" colorSpace="catalog"/>
+                                                                                        <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
+                                                                                    </textFieldCell>
+                                                                                </textField>
+                                                                                <imageView horizontalHuggingPriority="251" verticalHuggingPriority="251" translatesAutoresizingMaskIntoConstraints="NO" id="vli-IP-Nr8">
+                                                                                    <rect key="frame" x="8" y="-8" width="16" height="16"/>
+                                                                                    <constraints>
+                                                                                        <constraint firstAttribute="width" constant="16" id="Q25-Gx-Xzg"/>
+                                                                                        <constraint firstAttribute="height" constant="16" id="go3-c4-c3W"/>
+                                                                                    </constraints>
+                                                                                    <imageCell key="cell" refusesFirstResponder="YES" alignment="left" imageScaling="proportionallyDown" id="zsh-dc-Umh"/>
+                                                                                </imageView>
+                                                                            </subviews>
+                                                                            <constraints>
+                                                                                <constraint firstItem="vli-IP-Nr8" firstAttribute="centerY" secondItem="kX2-C1-38Y" secondAttribute="centerY" id="ICn-31-LAg"/>
+                                                                                <constraint firstItem="bOr-Go-gyW" firstAttribute="leading" secondItem="vli-IP-Nr8" secondAttribute="trailing" constant="12" id="JNb-pL-G7y"/>
+                                                                                <constraint firstAttribute="trailing" secondItem="bOr-Go-gyW" secondAttribute="trailing" constant="8" id="b4A-tY-oOP"/>
+                                                                                <constraint firstItem="bOr-Go-gyW" firstAttribute="centerY" secondItem="kX2-C1-38Y" secondAttribute="centerY" constant="-1" id="oAf-1Z-91H"/>
+                                                                                <constraint firstItem="vli-IP-Nr8" firstAttribute="leading" secondItem="kX2-C1-38Y" secondAttribute="leading" constant="8" id="zgq-le-RHJ"/>
+                                                                            </constraints>
+                                                                            <connections>
+                                                                                <outlet property="iconImageView" destination="vli-IP-Nr8" id="5lX-7Q-4Cw"/>
+                                                                                <outlet property="textField" destination="bOr-Go-gyW" id="wxi-1N-Bc4"/>
+                                                                            </connections>
+                                                                        </tableCellView>
+                                                                    </prototypeCellViews>
+                                                                </tableColumn>
+                                                            </tableColumns>
+                                                        </tableView>
+                                                    </subviews>
+                                                    <color key="backgroundColor" name="ClearColor"/>
+                                                </clipView>
+                                                <edgeInsets key="contentInsets" left="0.0" right="0.0" top="8" bottom="9"/>
+                                                <scroller key="horizontalScroller" hidden="YES" wantsLayer="YES" verticalHuggingPriority="750" horizontal="YES" id="uOv-xx-TFd">
+                                                    <rect key="frame" x="-100" y="-100" width="486" height="16"/>
+                                                    <autoresizingMask key="autoresizingMask"/>
+                                                </scroller>
+                                                <scroller key="verticalScroller" hidden="YES" wantsLayer="YES" verticalHuggingPriority="750" horizontal="NO" id="jx0-BH-84H">
+                                                    <rect key="frame" x="-100" y="-100" width="15" height="24"/>
+                                                    <autoresizingMask key="autoresizingMask"/>
+                                                </scroller>
+                                            </scrollView>
+                                        </subviews>
+                                        <constraints>
+                                            <constraint firstItem="cx3-LG-ZUH" firstAttribute="top" secondItem="j2X-bv-VAU" secondAttribute="top" constant="21" id="4Fa-J7-BMm"/>
+                                            <constraint firstItem="cx3-LG-ZUH" firstAttribute="leading" secondItem="j2X-bv-VAU" secondAttribute="leading" constant="5" id="XIc-AY-AdT"/>
+                                            <constraint firstAttribute="trailing" secondItem="cx3-LG-ZUH" secondAttribute="trailing" constant="5" id="XKo-K6-XDq"/>
+                                            <constraint firstAttribute="bottom" secondItem="cx3-LG-ZUH" secondAttribute="bottom" id="gus-g0-iwG"/>
+                                        </constraints>
+                                        <userDefinedRuntimeAttributes>
+                                            <userDefinedRuntimeAttribute type="color" keyPath="backgroundColor">
+                                                <color key="value" name="SuggestionsBackgroundColor"/>
+                                            </userDefinedRuntimeAttribute>
+                                            <userDefinedRuntimeAttribute type="number" keyPath="cornerRadius">
+                                                <real key="value" value="14"/>
+                                            </userDefinedRuntimeAttribute>
+                                            <userDefinedRuntimeAttribute type="color" keyPath="borderColor">
+                                                <color key="value" name="AddressBarBorderColor"/>
+                                            </userDefinedRuntimeAttribute>
+                                            <userDefinedRuntimeAttribute type="number" keyPath="borderWidth">
+                                                <real key="value" value="1"/>
+                                            </userDefinedRuntimeAttribute>
+                                        </userDefinedRuntimeAttributes>
+                                    </customView>
+                                    <customView translatesAutoresizingMaskIntoConstraints="NO" id="ATb-xt-XAg" userLabel="Separator" customClass="ColorView" customModule="DuckDuckGo_Privacy_Browser" customModuleProvider="target">
+                                        <rect key="frame" x="1" y="81" width="508" height="1"/>
+                                        <constraints>
+                                            <constraint firstAttribute="height" constant="1" id="G3c-nz-oCJ"/>
+                                        </constraints>
+                                        <userDefinedRuntimeAttributes>
+                                            <userDefinedRuntimeAttribute type="color" keyPath="backgroundColor">
+                                                <color key="value" name="AddressBarSeparatorColor"/>
+                                            </userDefinedRuntimeAttribute>
+                                        </userDefinedRuntimeAttributes>
+                                    </customView>
+                                </subviews>
+                                <constraints>
+                                    <constraint firstItem="ATb-xt-XAg" firstAttribute="top" secondItem="Svf-wj-SjJ" secondAttribute="top" id="FoQ-BR-ASj"/>
+                                    <constraint firstItem="j2X-bv-VAU" firstAttribute="leading" secondItem="Svf-wj-SjJ" secondAttribute="leading" id="Izj-JF-mOk"/>
+                                    <constraint firstItem="ATb-xt-XAg" firstAttribute="leading" secondItem="Svf-wj-SjJ" secondAttribute="leading" constant="1" id="PIu-nj-NP2"/>
+                                    <constraint firstAttribute="height" priority="950" constant="200" id="aJH-FU-o7W"/>
+                                    <constraint firstAttribute="bottom" secondItem="j2X-bv-VAU" secondAttribute="bottom" id="aeB-Jm-z2x"/>
+                                    <constraint firstAttribute="trailing" secondItem="j2X-bv-VAU" secondAttribute="trailing" id="ct6-Vy-WYG"/>
+                                    <constraint firstAttribute="height" relation="greaterThanOrEqual" constant="28" id="g17-AI-L6x"/>
+                                    <constraint firstAttribute="trailing" secondItem="ATb-xt-XAg" secondAttribute="trailing" constant="1" id="rIw-Jg-tIG"/>
+                                    <constraint firstItem="j2X-bv-VAU" firstAttribute="top" secondItem="Svf-wj-SjJ" secondAttribute="top" constant="-20" id="sSl-Lo-qub"/>
+                                </constraints>
+                            </customView>
                         </subviews>
                         <constraints>
-                            <constraint firstItem="O3Y-th-ZhM" firstAttribute="leading" secondItem="PAv-y7-vhB" secondAttribute="leading" id="Cia-5F-bUR"/>
-                            <constraint firstItem="O3Y-th-ZhM" firstAttribute="top" secondItem="PAv-y7-vhB" secondAttribute="top" id="Fpt-3W-4Ed"/>
-                            <constraint firstItem="GOF-7f-X82" firstAttribute="leading" secondItem="PAv-y7-vhB" secondAttribute="leading" id="GDY-Jd-EPG"/>
-                            <constraint firstItem="cx3-LG-ZUH" firstAttribute="leading" secondItem="PAv-y7-vhB" secondAttribute="leading" constant="6" id="Mlk-uo-isz"/>
-                            <constraint firstItem="GOF-7f-X82" firstAttribute="top" secondItem="PAv-y7-vhB" secondAttribute="top" id="NVd-gB-T0N"/>
-                            <constraint firstAttribute="trailing" secondItem="GOF-7f-X82" secondAttribute="trailing" id="XpN-cI-C6L"/>
-                            <constraint firstAttribute="bottom" secondItem="O3Y-th-ZhM" secondAttribute="bottom" id="dL7-l3-pIk"/>
-                            <constraint firstItem="cx3-LG-ZUH" firstAttribute="top" secondItem="PAv-y7-vhB" secondAttribute="top" id="ewt-ZA-1Pw"/>
-                            <constraint firstAttribute="bottom" secondItem="cx3-LG-ZUH" secondAttribute="bottom" id="nXt-ew-XI4"/>
-                            <constraint firstAttribute="bottom" secondItem="GOF-7f-X82" secondAttribute="bottom" id="rYe-Wi-rt8"/>
-                            <constraint firstAttribute="trailing" secondItem="cx3-LG-ZUH" secondAttribute="trailing" constant="6" id="ryD-Vv-EEg"/>
-                            <constraint firstAttribute="trailing" secondItem="O3Y-th-ZhM" secondAttribute="trailing" id="tKs-i7-tPP"/>
+                            <constraint firstAttribute="bottom" secondItem="KKJ-SW-5gR" secondAttribute="bottom" id="7yF-HS-DO0"/>
+                            <constraint firstAttribute="trailing" secondItem="Svf-wj-SjJ" secondAttribute="trailing" constant="20" id="HrK-ep-lPj"/>
+                            <constraint firstAttribute="trailing" secondItem="KKJ-SW-5gR" secondAttribute="trailing" id="bqZ-Ey-K0f"/>
+                            <constraint firstAttribute="bottom" secondItem="Svf-wj-SjJ" secondAttribute="bottom" constant="20" id="hKx-cK-8ne"/>
+                            <constraint firstItem="Svf-wj-SjJ" firstAttribute="top" secondItem="PAv-y7-vhB" secondAttribute="top" id="okn-cT-4Og"/>
+                            <constraint firstItem="KKJ-SW-5gR" firstAttribute="top" secondItem="PAv-y7-vhB" secondAttribute="top" constant="1" id="yGs-FD-REU"/>
+                            <constraint firstItem="KKJ-SW-5gR" firstAttribute="leading" secondItem="PAv-y7-vhB" secondAttribute="leading" id="zhP-8b-sDs"/>
+                            <constraint firstItem="Svf-wj-SjJ" firstAttribute="leading" secondItem="PAv-y7-vhB" secondAttribute="leading" constant="20" id="zx5-8j-hQS"/>
                         </constraints>
                     </view>
                     <connections>
                         <outlet property="tableView" destination="4Z2-d8-NA2" id="xll-Sx-bit"/>
-                        <outlet property="tableViewHeightConstraint" destination="6a1-59-ehY" id="FTG-h7-cTG"/>
+                        <outlet property="tableViewHeightConstraint" destination="aJH-FU-o7W" id="QpI-Vm-xUG"/>
                     </connections>
                 </viewController>
                 <customObject id="WHZ-eM-7SZ" userLabel="First Responder" customClass="NSResponder" sceneMemberID="firstResponder"/>
             </objects>
-            <point key="canvasLocation" x="250" y="600"/>
+            <point key="canvasLocation" x="250" y="599.5"/>
         </scene>
     </scenes>
     <resources>
+        <namedColor name="AddressBarBorderColor">
+            <color red="0.83137254901960789" green="0.83137254901960789" blue="0.83137254901960789" alpha="0.69999998807907104" colorSpace="custom" customColorSpace="displayP3"/>
+        </namedColor>
+        <namedColor name="AddressBarSeparatorColor">
+            <color red="0.0" green="0.0" blue="0.0" alpha="0.11999999731779099" colorSpace="custom" customColorSpace="displayP3"/>
+        </namedColor>
+        <namedColor name="AddressBarShadowColor">
+            <color red="0.0" green="0.0" blue="0.0" alpha="0.15000000596046448" colorSpace="custom" customColorSpace="displayP3"/>
+        </namedColor>
         <namedColor name="ClearColor">
             <color red="1" green="1" blue="1" alpha="0.0" colorSpace="custom" customColorSpace="sRGB"/>
         </namedColor>
         <namedColor name="SuggestionsBackgroundColor">
-            <color red="1" green="1" blue="1" alpha="0.69999998807907104" colorSpace="custom" customColorSpace="sRGB"/>
+            <color red="1" green="1" blue="1" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
         </namedColor>
     </resources>
 </document>

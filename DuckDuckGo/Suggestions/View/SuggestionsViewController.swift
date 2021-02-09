@@ -66,6 +66,9 @@ class SuggestionsViewController: NSViewController {
     override func viewWillAppear() {
         super.viewWillAppear()
 
+        self.view.window!.isOpaque = false
+        self.view.window!.backgroundColor = .clear
+        
         addMouseEventsMonitors()
     }
 
@@ -191,9 +194,11 @@ class SuggestionsViewController: NSViewController {
             return
         }
 
-        let padding: CGFloat = 2 * 10
-        let rowHeight = SuggestionTableRowView.Size.height.rawValue
-        tableViewHeightConstraint.constant = CGFloat(suggestionsViewModel.numberOfSuggestions) * rowHeight + padding
+        let rowHeight = tableView.rowHeight
+
+        tableViewHeightConstraint.constant = CGFloat(suggestionsViewModel.numberOfSuggestions) * rowHeight
+            + (tableView.enclosingScrollView?.contentInsets.top ?? 0)
+            + (tableView.enclosingScrollView?.contentInsets.bottom ?? 0)
     }
 
     private func closeWindow() {

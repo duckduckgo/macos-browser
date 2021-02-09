@@ -40,7 +40,11 @@ class ShadowView: NSView {
     @IBInspectable var shadowOffset: CGSize = .zero
     @IBInspectable var shadowOpacity: CGFloat = 0
     @IBInspectable var cornerRadius: CGFloat = 0
-    var shadowSides: ShadowSide = .all
+    var shadowSides: ShadowSide = .all {
+        didSet {
+            self.needsLayout = true
+        }
+    }
 
     lazy private var mask: CAShapeLayer = {
         let mask = CAShapeLayer()

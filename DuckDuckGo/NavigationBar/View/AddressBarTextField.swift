@@ -38,6 +38,12 @@ class AddressBarTextField: NSTextField {
         }
     }
 
+    var isSuggestionsWindowVisible: AnyPublisher<Bool, Never> {
+        self.publisher(for: \.suggestionsWindowController?.window?.isVisible)
+            .map { $0 ?? false }
+            .eraseToAnyPublisher()
+    }
+
     private var suggestionItemsCancellable: AnyCancellable?
     private var selectedSuggestionViewModelCancellable: AnyCancellable?
     private var selectedTabViewModelCancellable: AnyCancellable?
@@ -339,11 +345,11 @@ class AddressBarTextField: NSTextField {
 
     // MARK: - Suggestions window
 
-    enum SuggestionsWindowSizes: CGFloat {
-        case padding = 10
+    enum SuggestionsWindowSizes {
+        static let padding: CGFloat = 20
     }
 
-    private var suggestionsWindowController: NSWindowController?
+    @objc dynamic private var suggestionsWindowController: NSWindowController?
 
     private func initSuggestionsWindow() {
         let storyboard = NSStoryboard(name: "Suggestions", bundle: nil)
@@ -399,11 +405,12 @@ class AddressBarTextField: NSTextField {
             return
         }
 
-        let padding = SuggestionsWindowSizes.padding.rawValue
+        let padding = SuggestionsWindowSizes.padding
         suggestionsWindow.setFrame(NSRect(x: 0, y: 0, width: superview.frame.width + 2 * padding, height: 0), display: true)
 
         var point = superview.bounds.origin
         point.x -= padding
+        point.y += 1
 
         let converted = superview.convert(point, to: nil)
         let screen = window.convertPoint(toScreen: converted)
