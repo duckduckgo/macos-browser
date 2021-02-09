@@ -18,56 +18,84 @@
 
 import Foundation
 import Combine
+import os
 
 class ConfigurationManager {
 
     enum Error: Swift.Error {
-
-        case unknown
-
+        case timeout
     }
 
-    static let queue = DispatchQueue(label: "Configuration Manager")
+    struct Constants {
+        static let downloadTimeoutSeconds = 10.0
+        static let refreshPeriodSeconds = 60.0 * 60 * 12
+        static let retryDelaySeconds = 60.0 * 60
+    }
 
-    static let downloadTimeout = 60.0 * 5
+    static let shared = ConfigurationManager()
+
+    let queue: DispatchQueue = DispatchQueue(label: "Configuration Manager")
+
+    @UserDefaultsWrapper(key: .configurationLastUpdated, defaultValue: Date())
+    var lastUpdateTime: Date
 
     var cancellable: AnyCancellable?
 
+    private init() { }
+
     func checkForDownloads() {
-        Self.queue.async {
+        // Quickly exit if it's not time
+        guard self.isReadyToUpdate() else { return }
+
+        queue.async {
+            print(#function)
+
+            // Check again, in case a previous operation completed since this one started
             guard self.isReadyToUpdate() else { return }
 
             let configDownloader: ConfigurationDownloader = DefaultConfigurationDownloader()
 
-            // This is a serial queue but some of the calls below are async, so we want to wait for everything to finish before allowing
-            //  these API calls again.
-            let group = DispatchGroup()
-            group.enter()
-
-            self.cancellable = BloomFilterConfigurationUpdater(downloader: configDownloader).future()
-                .merge(with: TrackerRadarConfigurationUpdater(downloader: configDownloader).future())
-                .merge(with: TemporaryUnprotectedSitesConfigurationUpdater(downloader: configDownloader).future())
-                .merge(with: SurrogatesConfigurationUpdater(downloader: configDownloader).future())
+            var cancellable: AnyCancellable?
+            cancellable =
+                TrackerRadarConfigurationUpdater(downloader: configDownloader).update()
+                .merge(with: TemporaryUnprotectedSitesConfigurationUpdater(downloader: configDownloader).update())
+                .merge(with: SurrogatesConfigurationUpdater(downloader: configDownloader).update())
+                .merge(with: BloomFilterConfigurationUpdater(downloader: configDownloader).update())
                 .collect()
-                .sink { _ in
-                    self.updateCompleted()
-                    group.leave()
+                .timeout(.seconds(Constants.downloadTimeoutSeconds), scheduler: self.queue, options: nil, customError: { Error.timeout })
+                .sink { completion in
+                    print(#function, "sink completion")
+
+                    if case .failure(let error) = completion {
+                        os_log("Failed to complete configuration update %s", type: .error, error.localizedDescription)
+                        self.tryAgainSoon()
+                    } else {
+                        self.tryAgainLater()
+                    }
+
+                    withExtendedLifetime(cancellable, {})
+                    cancellable = nil
+                    configDownloader.cancelAll()
+
+                } receiveValue: { _ in
+                    print(#function, "sink received value")
+                    // no-op
                 }
-
-            if group.wait(timeout: .now() + Self.downloadTimeout) == .timedOut {
-                // TODO log it
-            }
-
-            configDownloader.cancelAll()
         }
+
     }
 
     private func isReadyToUpdate() -> Bool {
-        return true
+        return Date().timeIntervalSince(lastUpdateTime) > Constants.refreshPeriodSeconds
     }
 
-    private func updateCompleted() {
+    private func tryAgainLater() {
+        lastUpdateTime = Date()
+    }
 
+    private func tryAgainSoon() {
+        // Set the last update time to in the past so it triggers again sooner
+        lastUpdateTime = Date(timeIntervalSinceNow: Constants.refreshPeriodSeconds - Constants.retryDelaySeconds)
     }
 
 }

@@ -20,6 +20,6 @@ import Combine
 
 protocol ConfiguationUpdating {
 
-    func future() -> Future<Void, Never>
+    func update() -> AnyPublisher<Void, Error>
 
 }

@@ -23,7 +23,7 @@ public struct UserDefaultsWrapper<T> {
 
     public enum Key: String, CaseIterable {
 
-        case dummy
+        case configurationLastUpdated
 
     }
 

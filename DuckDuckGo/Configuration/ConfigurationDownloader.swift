@@ -20,7 +20,7 @@ import Combine
 
 protocol ConfigurationDownloader {
 
-    func download(_ config: ConfigurationLocation) -> Future<(etag: String, data: Data)?, Error>
+    func download(_ config: ConfigurationLocation, embeddedEtag: String?) -> AnyPublisher<(etag: String, data: Data)?, Error>
     func cancelAll()
 
 }
@@ -54,7 +54,7 @@ enum ConfigurationLocation: String {
     case bloomFilterExcludedDomains = "https://staticcdn.duckduckgo.com/https/https-mobile-v2-false-positives.json"
     case surrogates = "https://duckduckgo.com/contentblocking.js?l=surrogates"
     case temporaryUnprotectedSites = "https://duckduckgo.com/contentblocking/trackers-whitelist-temporary.txt"
-    case trackerRadarLocation = "https://staticcdn.duckduckgo.com/trackerblocking/v2.1/tds.json"
+    case trackerRadar = "https://staticcdn.duckduckgo.com/trackerblocking/v2.1/tds.json"
 
 }
 
@@ -64,6 +64,7 @@ class DefaultConfigurationDownloader: ConfigurationDownloader {
         static let userAgent = "macos_ddg_dev"
         static let userAgentField = "User-Agent"
         static let ifNoneMatchField = "If-None-Match"
+        static let etagField = "Etag"
         static let notModifiedResponseCode = 304
         static let successResponseCode = 200
     }
@@ -84,7 +85,7 @@ class DefaultConfigurationDownloader: ConfigurationDownloader {
             throw ConfigurationDownloadError.noResponse
         }
 
-        guard let etag = response.value(forHTTPHeaderField: Constants.ifNoneMatchField) else {
+        guard let etag = response.value(forHTTPHeaderField: Constants.etagField) else {
             throw ConfigurationDownloadError.noEtagInResponse
         }
 
@@ -116,10 +117,10 @@ class DefaultConfigurationDownloader: ConfigurationDownloader {
 
     }
 
-    func download(_ config: ConfigurationLocation) -> Future<(etag: String, data: Data)?, Error> {
+    func download(_ config: ConfigurationLocation, embeddedEtag: String?) -> AnyPublisher<(etag: String, data: Data)?, Error> {
 
         let url = URL(string: config.rawValue)!
-        let currentEtag = storage.loadEtag(for: config)
+        let currentEtag = storage.loadEtag(for: config) ?? embeddedEtag
 
         return Future { promise in
             var request = URLRequest(url: url)
@@ -153,7 +154,7 @@ class DefaultConfigurationDownloader: ConfigurationDownloader {
 
             }.store(in: &self.cancellables)
 
-        }
+        }.eraseToAnyPublisher()
     }
 
     func cancelAll() {

@@ -597,10 +597,10 @@
 				85D3400D25CB1869002B91A6 /* ConfiguationUpdating.swift */,
 				85480FBA25D181CB009424E3 /* ConfigurationDownloader.swift */,
 				85D33F1125C82EB3002B91A6 /* ConfigurationManager.swift */,
+				85480FCE25D1AA22009424E3 /* ConfigurationStoring.swift */,
 				85D3402725CB1B4B002B91A6 /* SurrogatesConfigurationUpdater.swift */,
 				85D3402225CB1B12002B91A6 /* TemporaryUnprotectedSitesConfigurationUpdater.swift */,
 				85D3401D25CB1B02002B91A6 /* TrackerRadarConfigurationUpdater.swift */,
-				85480FCE25D1AA22009424E3 /* ConfigurationStoring.swift */,
 			);
 			path = Configuration;
 			sourceTree = "<group>";

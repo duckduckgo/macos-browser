@@ -22,10 +22,10 @@ struct TemporaryUnprotectedSitesConfigurationUpdater: ConfiguationUpdating {
 
     let downloader: ConfigurationDownloader
 
-    func future() -> Future<Void, Never> {
+    func update() -> AnyPublisher<Void, Error> {
         return Future { promise in
-            
-        }
+
+        }.eraseToAnyPublisher()
     }
 
 }

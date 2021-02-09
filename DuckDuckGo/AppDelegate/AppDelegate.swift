@@ -26,6 +26,10 @@ class AppDelegate: NSObject, NSApplicationDelegate {
 
     func applicationWillFinishLaunching(_ notification: Notification) {
         urlEventListener.listen()
+
+        // TODO only call this once a navigation finishes
+        ConfigurationManager.shared.lastUpdateTime = .distantPast
+        ConfigurationManager.shared.checkForDownloads()
     }
 
     func applicationDidFinishLaunching(_ aNotification: Notification) {

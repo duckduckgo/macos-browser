@@ -17,14 +17,37 @@
 //
 
 import Combine
+import os
 
 struct TrackerRadarConfigurationUpdater: ConfiguationUpdating {
 
     let downloader: ConfigurationDownloader
 
-    func future() -> Future<Void, Never> {
+    func update() -> AnyPublisher<Void, Error> {
         return Future { promise in
-        }
+
+            var cancellable: AnyCancellable?
+
+            cancellable = downloader.download(.trackerRadar, embeddedEtag: TrackerDataManager.Constants.embeddedDataSetETag)
+                .mapError { error -> Error in
+                    os_log("Failed to retrieve TrackerRadar data %s", type: .error, error.localizedDescription)
+                    return error
+                }
+                .compactMap { $0 }
+                .map { $0.etag }
+                .sink { _ in
+
+                    withExtendedLifetime(cancellable) { _ in }
+                    promise(.success(()))
+                    cancellable = nil
+
+                } receiveValue: { value in
+
+                    TrackerDataManager.shared.reload(etag: value)
+
+                }
+
+        }.eraseToAnyPublisher()
     }
 
 }
