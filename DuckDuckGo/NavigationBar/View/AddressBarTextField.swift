@@ -68,6 +68,10 @@ class AddressBarTextField: NSTextField {
 
     func clearValue() {
         value = .text("")
+        suggestionsViewModel.clearSelection()
+        suggestionsViewModel.suggestions.stopFetchingSuggestions()
+        suggestionsViewModel.userStringValue = nil
+        hideSuggestionsWindow()
     }
 
     private func subscribeToSuggestionItems() {
@@ -228,8 +232,11 @@ class AddressBarTextField: NSTextField {
 
     // MARK: - Suffixes
 
-    static let textAttributes = [NSAttributedString.Key.font: NSFont.systemFont(ofSize: 13, weight: .regular),
-                                 .foregroundColor: NSColor.textColor]
+    static let textAttributes: [NSAttributedString.Key: Any] = [
+        .font: NSFont.systemFont(ofSize: 13, weight: .regular),
+        .foregroundColor: NSColor.textColor,
+        .kern: -0.16
+    ]
 
     enum Suffix {
         init?(value: Value) {
@@ -254,7 +261,7 @@ class AddressBarTextField: NSTextField {
         case search
         case visit(host: String)
 
-        static let suffixAttributes = [NSAttributedString.Key.font: NSFont.systemFont(ofSize: 12, weight: .light),
+        static let suffixAttributes = [NSAttributedString.Key.font: NSFont.systemFont(ofSize: 13, weight: .light),
                                        .foregroundColor: NSColor.addressBarSuffixColor]
 
         var attributedString: NSAttributedString {
@@ -266,8 +273,8 @@ class AddressBarTextField: NSTextField {
             }
         }
 
-        static let searchSuffix = " — \(UserText.addressBarSearchSuffix)"
-        static let visitSuffix = " — \(UserText.addressBarVisitSuffix)"
+        static let searchSuffix = " – \(UserText.addressBarSearchSuffix)"
+        static let visitSuffix = " – \(UserText.addressBarVisitSuffix)"
 
         var string: String {
             switch self {
@@ -494,6 +501,17 @@ extension AddressBarTextField: SuggestionsViewControllerDelegate {
         navigate()
     }
 
+    func shouldCloseSuggestionsWindow(forMouseEvent event: NSEvent) -> Bool {
+        // don't hide suggestions if clicking somewhere inside the Address Bar view
+        if let screenPoint = event.window?.convertPoint(toScreen: event.locationInWindow),
+           let point = self.window?.convertPoint(fromScreen: screenPoint),
+           superview!.bounds.contains(superview!.convert(point, from: nil)) {
+
+            return false
+        }
+
+        return true
+    }
 }
 
 // swiftlint:enable type_body_length
