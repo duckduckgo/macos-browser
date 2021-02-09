@@ -357,17 +357,18 @@ class AddressBarTextField: NSTextField {
     }
 
     @objc dynamic private var suggestionsWindowController: NSWindowController?
-
-    private func initSuggestionsWindow() {
-        let storyboard = NSStoryboard(name: "Suggestions", bundle: nil)
-        let creator: (NSCoder) -> SuggestionsViewController? = { coder in
-            let suggestionsViewController = SuggestionsViewController(coder: coder, suggestionsViewModel: self.suggestionsViewModel)
+    private lazy var suggestionsViewController: SuggestionsViewController = {
+        NSStoryboard.suggestions.instantiateController(identifier: "SuggestionsViewController") { coder in
+            let suggestionsViewController = SuggestionsViewController(coder: coder,
+                                                                      suggestionsViewModel: self.suggestionsViewModel)
             suggestionsViewController?.delegate = self
             return suggestionsViewController
         }
+    }()
 
-        let windowController = storyboard.instantiateController(withIdentifier: "SuggestionsWindowController") as? NSWindowController
-        let suggestionsViewController = storyboard.instantiateController(identifier: "SuggestionsViewController", creator: creator)
+    private func initSuggestionsWindow() {
+        let windowController = NSStoryboard.suggestions
+            .instantiateController(withIdentifier: "SuggestionsWindowController") as? NSWindowController
 
         windowController?.contentViewController = suggestionsViewController
         self.suggestionsWindowController = windowController
@@ -420,9 +421,15 @@ class AddressBarTextField: NSTextField {
         point.y += 1
 
         let converted = superview.convert(point, to: nil)
-        let screen = window.convertPoint(toScreen: converted)
+        let rounded = CGPoint(x: Int(converted.x), y: Int(converted.y))
+
+        let screen = window.convertPoint(toScreen: rounded)
         suggestionsWindow.setFrameTopLeftPoint(screen)
+
+        // pixel-perfect window adjustment for fractional points
+        suggestionsViewController.pixelPerfectConstratint.constant = converted.x - rounded.x
     }
+
 }
 
 extension Notification.Name {
@@ -515,3 +522,7 @@ extension AddressBarTextField: SuggestionsViewControllerDelegate {
 }
 
 // swiftlint:enable type_body_length
+
+fileprivate extension NSStoryboard {
+    static let suggestions = NSStoryboard(name: "Suggestions", bundle: .main)
+}

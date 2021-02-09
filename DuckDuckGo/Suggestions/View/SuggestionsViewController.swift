@@ -33,6 +33,7 @@ class SuggestionsViewController: NSViewController {
 
     @IBOutlet weak var tableView: NSTableView!
     @IBOutlet weak var tableViewHeightConstraint: NSLayoutConstraint!
+    @IBOutlet weak var pixelPerfectConstratint: NSLayoutConstraint!
 
     let suggestionsViewModel: SuggestionsViewModel
 
