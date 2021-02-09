@@ -33,12 +33,12 @@ protocol TabCollectionViewModelDelegate: AnyObject {
 
 }
 
-class TabCollectionViewModel {
+final class TabCollectionViewModel: NSObject {
 
     weak var delegate: TabCollectionViewModelDelegate?
 
     private(set) var tabCollection: TabCollection
-    
+
     private var tabViewModels = [Tab: TabViewModel]()
     @Published private(set) var selectionIndex: Int? {
         didSet {
@@ -50,15 +50,22 @@ class TabCollectionViewModel {
 
     private var cancellables = Set<AnyCancellable>()
 
-    init(tabCollection: TabCollection) {
+    init(tabCollection: TabCollection, selectionIndex: Int = 0) {
         self.tabCollection = tabCollection
+        super.init()
 
         subscribeToTabs()
         subscribeToLastRemovedTab()
-        appendNewTab()
+
+        if tabCollection.tabs.isEmpty {
+            appendNewTab()
+        }
+        if self.selectionIndex != selectionIndex {
+            self.selectionIndex = selectionIndex
+        }
     }
 
-    convenience init() {
+    convenience override init() {
         let tabCollection = TabCollection()
         self.init(tabCollection: tabCollection)
     }
@@ -205,15 +212,7 @@ class TabCollectionViewModel {
     }
 
     func removeAllTabs(except exceptionIndex: Int? = nil) {
-        if tabCollection.tabs.isEmpty { return }
-
-        tabCollection.tabs.enumerated().reversed().forEach {
-            if exceptionIndex != $0.offset {
-                if !tabCollection.remove(at: $0.offset) {
-                    os_log("TabCollectionViewModel: Failed to remove item", type: .error)
-                }
-            }
-        }
+        tabCollection.removeAll(andAppend: exceptionIndex.map { tabCollection.tabs[$0] })
 
         if exceptionIndex != nil {
             select(at: 0)
@@ -224,7 +223,7 @@ class TabCollectionViewModel {
     }
 
     func removeAllTabsAndAppendNewTab() {
-        tabCollection.removeAllAndAppend(tab: Tab())
+        tabCollection.removeAll(andAppend: Tab())
         select(at: 0)
 
         delegate?.tabCollectionViewModelDidMultipleChanges(self)
@@ -286,8 +285,13 @@ class TabCollectionViewModel {
 
     private func subscribeToTabs() {
         tabCollection.$tabs.sink { [weak self] newTabs in
-            self?.removeTabViewModelsIfNeeded(newTabs: newTabs)
-            self?.addTabViewModelsIfNeeded(newTabs: newTabs)
+            guard let self = self else { return }
+
+            let new = Set(newTabs)
+            let old = Set(self.tabViewModels.keys)
+
+            self.removeTabViewModels(old.subtracting(new))
+            self.addTabViewModels(new.subtracting(old))
         } .store(in: &cancellables)
     }
 
@@ -297,17 +301,15 @@ class TabCollectionViewModel {
         } .store(in: &cancellables)
     }
 
-    private func removeTabViewModelsIfNeeded(newTabs: [Tab]) {
-        tabViewModels = tabViewModels.filter { (item) -> Bool in
-            newTabs.contains(item.key)
+    private func removeTabViewModels(_ removed: Set<Tab>) {
+        for tab in removed {
+            tabViewModels[tab] = nil
         }
     }
 
-    private func addTabViewModelsIfNeeded(newTabs: [Tab]) {
-        newTabs.forEach { (tab) in
-            if tabViewModels[tab] == nil {
-                tabViewModels[tab] = TabViewModel(tab: tab)
-            }
+    private func addTabViewModels(_ added: Set<Tab>) {
+        for tab in added {
+            tabViewModels[tab] = TabViewModel(tab: tab)
         }
     }
 

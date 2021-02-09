@@ -17,26 +17,52 @@
 //
 
 import Cocoa
+import Combine
 import os.log
 
 @NSApplicationMain
 class AppDelegate: NSObject, NSApplicationDelegate {
 
+    private var isRunningTests: Bool {
+        ProcessInfo.processInfo.environment["XCTestConfigurationFilePath"] != nil
+    }
+
     let urlEventListener = UrlEventListener()
 
+    private let keyStore = EncryptionKeyStore()
+    private var fileStore: FileStore!
+    private var stateRestorationManager: AppStateRestorationManager!
+
     func applicationWillFinishLaunching(_ notification: Notification) {
+        do {
+            let encryptionKey = isRunningTests ? nil : try keyStore.readKey()
+            fileStore = FileStore(encryptionKey: encryptionKey)
+        } catch {
+            os_log("App Encryption Key could not be read: %s", "\(error)")
+            fileStore = FileStore()
+        }
+        stateRestorationManager = AppStateRestorationManager(fileStore: fileStore)
+
         urlEventListener.listen()
     }
 
     func applicationDidFinishLaunching(_ aNotification: Notification) {
-        // Insert code here to initialize your application
-
         Database.shared.loadStore()
         HTTPSUpgrade.shared.loadDataAsync()
+
+        if !isRunningTests {
+            stateRestorationManager.applicationDidFinishLaunching()
+
+            if WindowsManager.windows.isEmpty {
+                WindowsManager.openNewWindow()
+            }
+        }
     }
 
-    func applicationWillTerminate(_ aNotification: Notification) {
-        // Insert code here to tear down your application
+    func applicationShouldTerminate(_ sender: NSApplication) -> NSApplication.TerminateReply {
+        stateRestorationManager.applicationWillTerminate()
+
+        return .terminateNow
     }
 
     func applicationShouldHandleReopen(_ sender: NSApplication, hasVisibleWindows flag: Bool) -> Bool {
