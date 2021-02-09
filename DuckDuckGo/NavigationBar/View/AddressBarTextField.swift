@@ -431,7 +431,7 @@ class AddressBarTextField: NSTextField {
         suggestionsWindow.setFrameTopLeftPoint(screen)
 
         // pixel-perfect window adjustment for fractional points
-        suggestionsViewController.pixelPerfectConstratint.constant = converted.x - rounded.x
+        suggestionsViewController.pixelPerfectConstraint.constant = converted.x - rounded.x
     }
 
 }
