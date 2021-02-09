@@ -158,7 +158,11 @@ class AddressBarTextField: NSTextField {
             os_log("%s: Making url from address bar string failed", type: .error, className)
             return
         }
-        selectedTabViewModel.tab.url = url
+        if selectedTabViewModel.tab.url == url {
+            selectedTabViewModel.tab.reload()
+        } else {
+            selectedTabViewModel.tab.url = url
+        }
     }
 
     private func openNewTab(selected: Bool) {
