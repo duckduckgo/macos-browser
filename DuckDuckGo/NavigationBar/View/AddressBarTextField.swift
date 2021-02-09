@@ -463,6 +463,7 @@ extension AddressBarTextField: NSTextFieldDelegate {
         }
 
         if stringValue == "" {
+            suggestionsViewModel.suggestions.stopFetchingSuggestions()
             hideSuggestionsWindow()
         }
     }
