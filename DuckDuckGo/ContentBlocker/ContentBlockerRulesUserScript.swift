@@ -48,7 +48,7 @@ class ContentBlockerRulesUserScript: UserScript {
         if let tracker = trackerFromUrl(urlString, blocked: blocked) {
             guard let pageUrl = URL(string: pageUrlStr),
                let pageHost = pageUrl.host,
-               let pageEntity = TrackerDataManager.shared.findEntity(forHost: pageHost) else {
+               let pageEntity = TrackerRadarManager.shared.findEntity(forHost: pageHost) else {
                 delegate.contentBlockerUserScript(self, detectedTracker: tracker)
                 return
             }
@@ -60,8 +60,8 @@ class ContentBlockerRulesUserScript: UserScript {
     }
 
     private func trackerFromUrl(_ urlString: String, blocked: Bool) -> DetectedTracker? {
-        let knownTracker = TrackerDataManager.shared.findTracker(forUrl: urlString)
-        if let entity = TrackerDataManager.shared.findEntity(byName: knownTracker?.owner?.name ?? "") {
+        let knownTracker = TrackerRadarManager.shared.findTracker(forUrl: urlString)
+        if let entity = TrackerRadarManager.shared.findEntity(byName: knownTracker?.owner?.name ?? "") {
             return DetectedTracker(url: urlString, knownTracker: knownTracker, entity: entity, blocked: blocked)
         }
 

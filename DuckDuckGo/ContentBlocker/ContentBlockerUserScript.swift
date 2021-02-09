@@ -64,8 +64,8 @@ class ContentBlockerUserScript: UserScript {
     }
 
     private func trackerFromUrl(_ urlString: String, _ blocked: Bool) -> DetectedTracker {
-        let knownTracker = TrackerDataManager.shared.findTracker(forUrl: urlString)
-        let entity = TrackerDataManager.shared.findEntity(byName: knownTracker?.owner?.name ?? "")
+        let knownTracker = TrackerRadarManager.shared.findTracker(forUrl: urlString)
+        let entity = TrackerRadarManager.shared.findEntity(byName: knownTracker?.owner?.name ?? "")
         return DetectedTracker(url: urlString, knownTracker: knownTracker, entity: entity, blocked: blocked)
     }
 }
@@ -75,7 +75,7 @@ extension ContentBlockerUserScript {
     static let messageNames = ["trackerDetectedMessage"]
 
     static let source: String = {
-        let trackerData = TrackerDataManager.shared.encodedTrackerData!
+        let trackerData = TrackerRadarManager.shared.encodedTrackerData!
 
         return loadJS("contentblocker", withReplacements: [
             "${unprotectedDomains}": "",

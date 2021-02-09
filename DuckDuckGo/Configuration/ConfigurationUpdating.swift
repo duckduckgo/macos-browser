@@ -1,5 +1,5 @@
 //
-//  ConfiguationUpdating.swift
+//  ConfigurationUpdating.swift
 //
 //  Copyright © 2021 DuckDuckGo. All rights reserved.
 //
@@ -18,7 +18,7 @@
 
 import Combine
 
-protocol ConfiguationUpdating {
+protocol ConfigurationUpdating {
 
     func update() -> AnyPublisher<Void, Error>
 

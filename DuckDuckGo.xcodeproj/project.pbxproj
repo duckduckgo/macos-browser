@@ -16,7 +16,7 @@
 		14D9B90224F91316000D4D13 /* FocusRingView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 14D9B90124F91316000D4D13 /* FocusRingView.swift */; };
 		4B11060525903E570039B979 /* CoreDataEncryptionTesting.xcdatamodeld in Sources */ = {isa = PBXBuildFile; fileRef = 4B11060325903E570039B979 /* CoreDataEncryptionTesting.xcdatamodeld */; };
 		4B11060A25903EAC0039B979 /* CoreDataEncryptionTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B11060925903EAC0039B979 /* CoreDataEncryptionTests.swift */; };
-		4B6160D325B14E6E007DE5B2 /* TrackerDataManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B6160D225B14E6E007DE5B2 /* TrackerDataManager.swift */; };
+		4B6160D325B14E6E007DE5B2 /* TrackerRadarManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B6160D225B14E6E007DE5B2 /* TrackerRadarManager.swift */; };
 		4B6160D825B150E4007DE5B2 /* trackerData.json in Resources */ = {isa = PBXBuildFile; fileRef = 4B6160D725B150E4007DE5B2 /* trackerData.json */; };
 		4B6160DD25B152C5007DE5B2 /* ContentBlockerRulesUserScript.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B6160DC25B152C5007DE5B2 /* ContentBlockerRulesUserScript.swift */; };
 		4B6160E525B152FA007DE5B2 /* ContentBlockerUserScript.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B6160E425B152FA007DE5B2 /* ContentBlockerUserScript.swift */; };
@@ -38,7 +38,7 @@
 		4B677450255DBFA300025BD8 /* HashExtension.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B67744F255DBFA300025BD8 /* HashExtension.swift */; };
 		4B82E9B325B69E3E00656FE7 /* TrackerRadarKit in Frameworks */ = {isa = PBXBuildFile; productRef = 4B82E9B225B69E3E00656FE7 /* TrackerRadarKit */; };
 		4B82E9B925B6A05800656FE7 /* DetectedTrackerTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B82E9B825B6A05800656FE7 /* DetectedTrackerTests.swift */; };
-		4B82E9C125B6A1CD00656FE7 /* TrackerDataManagerTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B82E9C025B6A1CD00656FE7 /* TrackerDataManagerTests.swift */; };
+		4B82E9C125B6A1CD00656FE7 /* TrackerRadarManagerTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B82E9C025B6A1CD00656FE7 /* TrackerRadarManagerTests.swift */; };
 		4BA1A69B258B076900F6F690 /* FileStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4BA1A69A258B076900F6F690 /* FileStore.swift */; };
 		4BA1A6A0258B079600F6F690 /* DataEncryption.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4BA1A69F258B079600F6F690 /* DataEncryption.swift */; };
 		4BA1A6A5258B07DF00F6F690 /* EncryptedValueTransformer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4BA1A6A4258B07DF00F6F690 /* EncryptedValueTransformer.swift */; };
@@ -74,7 +74,7 @@
 		85AE2FF224A33A2D002D507F /* WebKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 85AE2FF124A33A2D002D507F /* WebKit.framework */; };
 		85C6A29625CC1FFD00EEB5F1 /* UserDefaultsWrapper.swift in Sources */ = {isa = PBXBuildFile; fileRef = 85C6A29525CC1FFD00EEB5F1 /* UserDefaultsWrapper.swift */; };
 		85D33F1225C82EB3002B91A6 /* ConfigurationManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 85D33F1125C82EB3002B91A6 /* ConfigurationManager.swift */; };
-		85D3400E25CB1869002B91A6 /* ConfiguationUpdating.swift in Sources */ = {isa = PBXBuildFile; fileRef = 85D3400D25CB1869002B91A6 /* ConfiguationUpdating.swift */; };
+		85D3400E25CB1869002B91A6 /* ConfigurationUpdating.swift in Sources */ = {isa = PBXBuildFile; fileRef = 85D3400D25CB1869002B91A6 /* ConfigurationUpdating.swift */; };
 		85D3401325CB18E0002B91A6 /* BloomFilterConfigurationUpdater.swift in Sources */ = {isa = PBXBuildFile; fileRef = 85D3401225CB18E0002B91A6 /* BloomFilterConfigurationUpdater.swift */; };
 		85D3401E25CB1B02002B91A6 /* TrackerRadarConfigurationUpdater.swift in Sources */ = {isa = PBXBuildFile; fileRef = 85D3401D25CB1B02002B91A6 /* TrackerRadarConfigurationUpdater.swift */; };
 		85D3402325CB1B12002B91A6 /* TemporaryUnprotectedSitesConfigurationUpdater.swift in Sources */ = {isa = PBXBuildFile; fileRef = 85D3402225CB1B12002B91A6 /* TemporaryUnprotectedSitesConfigurationUpdater.swift */; };
@@ -199,7 +199,7 @@
 		14D9B90124F91316000D4D13 /* FocusRingView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FocusRingView.swift; sourceTree = "<group>"; };
 		4B11060425903E570039B979 /* CoreDataEncryptionTesting.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = CoreDataEncryptionTesting.xcdatamodel; sourceTree = "<group>"; };
 		4B11060925903EAC0039B979 /* CoreDataEncryptionTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CoreDataEncryptionTests.swift; sourceTree = "<group>"; };
-		4B6160D225B14E6E007DE5B2 /* TrackerDataManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TrackerDataManager.swift; sourceTree = "<group>"; };
+		4B6160D225B14E6E007DE5B2 /* TrackerRadarManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TrackerRadarManager.swift; sourceTree = "<group>"; };
 		4B6160D725B150E4007DE5B2 /* trackerData.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; path = trackerData.json; sourceTree = "<group>"; };
 		4B6160DC25B152C5007DE5B2 /* ContentBlockerRulesUserScript.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentBlockerRulesUserScript.swift; sourceTree = "<group>"; };
 		4B6160E425B152FA007DE5B2 /* ContentBlockerUserScript.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentBlockerUserScript.swift; sourceTree = "<group>"; };
@@ -223,7 +223,7 @@
 		4B67744F255DBFA300025BD8 /* HashExtension.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = HashExtension.swift; sourceTree = "<group>"; };
 		4B677454255DC18000025BD8 /* Bridging.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Bridging.h; sourceTree = "<group>"; };
 		4B82E9B825B6A05800656FE7 /* DetectedTrackerTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DetectedTrackerTests.swift; sourceTree = "<group>"; };
-		4B82E9C025B6A1CD00656FE7 /* TrackerDataManagerTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TrackerDataManagerTests.swift; sourceTree = "<group>"; };
+		4B82E9C025B6A1CD00656FE7 /* TrackerRadarManagerTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TrackerRadarManagerTests.swift; sourceTree = "<group>"; };
 		4BA1A69A258B076900F6F690 /* FileStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FileStore.swift; sourceTree = "<group>"; };
 		4BA1A69F258B079600F6F690 /* DataEncryption.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DataEncryption.swift; sourceTree = "<group>"; };
 		4BA1A6A4258B07DF00F6F690 /* EncryptedValueTransformer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EncryptedValueTransformer.swift; sourceTree = "<group>"; };
@@ -259,7 +259,7 @@
 		85AE2FF124A33A2D002D507F /* WebKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = WebKit.framework; path = System/Library/Frameworks/WebKit.framework; sourceTree = SDKROOT; };
 		85C6A29525CC1FFD00EEB5F1 /* UserDefaultsWrapper.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UserDefaultsWrapper.swift; sourceTree = "<group>"; };
 		85D33F1125C82EB3002B91A6 /* ConfigurationManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ConfigurationManager.swift; sourceTree = "<group>"; };
-		85D3400D25CB1869002B91A6 /* ConfiguationUpdating.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ConfiguationUpdating.swift; sourceTree = "<group>"; };
+		85D3400D25CB1869002B91A6 /* ConfigurationUpdating.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ConfigurationUpdating.swift; sourceTree = "<group>"; };
 		85D3401225CB18E0002B91A6 /* BloomFilterConfigurationUpdater.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BloomFilterConfigurationUpdater.swift; sourceTree = "<group>"; };
 		85D3401D25CB1B02002B91A6 /* TrackerRadarConfigurationUpdater.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TrackerRadarConfigurationUpdater.swift; sourceTree = "<group>"; };
 		85D3402225CB1B12002B91A6 /* TemporaryUnprotectedSitesConfigurationUpdater.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TemporaryUnprotectedSitesConfigurationUpdater.swift; sourceTree = "<group>"; };
@@ -406,7 +406,7 @@
 				4B6160FE25B15BB1007DE5B2 /* ContentBlockerRulesManager.swift */,
 				4B6160DC25B152C5007DE5B2 /* ContentBlockerRulesUserScript.swift */,
 				4B6160E425B152FA007DE5B2 /* ContentBlockerUserScript.swift */,
-				4B6160D225B14E6E007DE5B2 /* TrackerDataManager.swift */,
+				4B6160D225B14E6E007DE5B2 /* TrackerRadarManager.swift */,
 				4B6160EC25B15417007DE5B2 /* DetectedTracker.swift */,
 				4B6160F125B15792007DE5B2 /* contentblockerrules.js */,
 				4B6160F625B157BB007DE5B2 /* contentblocker.js */,
@@ -486,7 +486,7 @@
 			isa = PBXGroup;
 			children = (
 				4B82E9B825B6A05800656FE7 /* DetectedTrackerTests.swift */,
-				4B82E9C025B6A1CD00656FE7 /* TrackerDataManagerTests.swift */,
+				4B82E9C025B6A1CD00656FE7 /* TrackerRadarManagerTests.swift */,
 			);
 			path = ContentBlocker;
 			sourceTree = "<group>";
@@ -594,7 +594,7 @@
 			isa = PBXGroup;
 			children = (
 				85D3401225CB18E0002B91A6 /* BloomFilterConfigurationUpdater.swift */,
-				85D3400D25CB1869002B91A6 /* ConfiguationUpdating.swift */,
+				85D3400D25CB1869002B91A6 /* ConfigurationUpdating.swift */,
 				85480FBA25D181CB009424E3 /* ConfigurationDownloader.swift */,
 				85D33F1125C82EB3002B91A6 /* ConfigurationManager.swift */,
 				85480FCE25D1AA22009424E3 /* ConfigurationStoring.swift */,
@@ -1336,7 +1336,7 @@
 				85D438B6256E7C9E00F3BAF8 /* ContextMenuUserScript.swift in Sources */,
 				85D438BE256E8E6400F3BAF8 /* ContextMenuElement.swift in Sources */,
 				4BA1A6BD258B082300F6F690 /* EncryptionKeyStore.swift in Sources */,
-				4B6160D325B14E6E007DE5B2 /* TrackerDataManager.swift in Sources */,
+				4B6160D325B14E6E007DE5B2 /* TrackerRadarManager.swift in Sources */,
 				AA88D14B252A557100980B4E /* URLRequestExtension.swift in Sources */,
 				856C98DF257014BD00A22F1F /* FileDownloadManager.swift in Sources */,
 				AABEE69E24A9C5C30043105B /* Suggestion.swift in Sources */,
@@ -1380,7 +1380,7 @@
 				AAA0CC472533833C0079BC96 /* OptionsButtonMenu.swift in Sources */,
 				4B677438255DBEB800025BD8 /* HTTPSUpgrade.xcdatamodeld in Sources */,
 				4B677434255DBEB800025BD8 /* HTTPSBloomFilterSpecification.swift in Sources */,
-				85D3400E25CB1869002B91A6 /* ConfiguationUpdating.swift in Sources */,
+				85D3400E25CB1869002B91A6 /* ConfigurationUpdating.swift in Sources */,
 				AA97BF4625135DD30014931A /* ApplicationDockMenu.swift in Sources */,
 				4BA1A69B258B076900F6F690 /* FileStore.swift in Sources */,
 				4B677436255DBEB800025BD8 /* HTTPSExcludedDomains.swift in Sources */,
@@ -1429,7 +1429,7 @@
 				AAC9C01C24CB594C00AD1325 /* TabViewModelTests.swift in Sources */,
 				4B11060525903E570039B979 /* CoreDataEncryptionTesting.xcdatamodeld in Sources */,
 				8546DE6225C03056000CA5E1 /* UserAgentTests.swift in Sources */,
-				4B82E9C125B6A1CD00656FE7 /* TrackerDataManagerTests.swift in Sources */,
+				4B82E9C125B6A1CD00656FE7 /* TrackerRadarManagerTests.swift in Sources */,
 				AA63745224C9BBE100AB2AC4 /* SuggestionsAPIMock.swift in Sources */,
 				142879DC24CE1185005419BB /* SuggestionsViewModelTests.swift in Sources */,
 				AAE39D1B24F44885008EF28B /* TabCollectionViewModelDelegateMock.swift in Sources */,

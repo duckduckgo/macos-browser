@@ -19,7 +19,7 @@
 import Combine
 import os
 
-struct TrackerRadarConfigurationUpdater: ConfiguationUpdating {
+struct TrackerRadarConfigurationUpdater: ConfigurationUpdating {
 
     let downloader: ConfigurationDownloader
 
@@ -28,22 +28,21 @@ struct TrackerRadarConfigurationUpdater: ConfiguationUpdating {
 
             var cancellable: AnyCancellable?
 
-            cancellable = downloader.download(.trackerRadar, embeddedEtag: TrackerDataManager.Constants.embeddedDataSetETag)
+            cancellable = downloader.download(.trackerRadar, embeddedEtag: TrackerRadarManager.Constants.embeddedDataSetETag)
                 .mapError { error -> Error in
                     os_log("Failed to retrieve TrackerRadar data %s", type: .error, error.localizedDescription)
                     return error
                 }
                 .compactMap { $0 }
-                .map { $0.etag }
                 .sink { _ in
 
                     withExtendedLifetime(cancellable) { _ in }
                     promise(.success(()))
                     cancellable = nil
 
-                } receiveValue: { value in
+                } receiveValue: { _ in
 
-                    TrackerDataManager.shared.reload(etag: value)
+                    TrackerRadarManager.shared.reload()
 
                 }
 

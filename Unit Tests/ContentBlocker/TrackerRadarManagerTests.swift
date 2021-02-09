@@ -21,7 +21,7 @@ import CommonCrypto
 import TrackerRadarKit
 @testable import DuckDuckGo_Privacy_Browser
 
-class TrackerDataManagerTests: XCTestCase {
+class TrackerRadarManagerTests: XCTestCase {
 
     override func setUp() {
         super.setUp()
@@ -29,23 +29,23 @@ class TrackerDataManagerTests: XCTestCase {
     }
 
     func testWhenReloadCalledInitiallyThenDataSetIsEmbedded() {
-        XCTAssertEqual(TrackerDataManager.shared.reload(etag: nil), .embedded)
+        XCTAssertEqual(TrackerRadarManager.shared.reload(etag: nil), .embedded)
     }
 
     func testFindTrackerByUrl() {
-        let tracker = TrackerDataManager.shared.findTracker(forUrl: "http://googletagmanager.com")
+        let tracker = TrackerRadarManager.shared.findTracker(forUrl: "http://googletagmanager.com")
         XCTAssertNotNil(tracker)
         XCTAssertEqual("Google", tracker?.owner?.displayName)
     }
 
     func testFindEntityByName() {
-        let entity = TrackerDataManager.shared.findEntity(byName: "Google LLC")
+        let entity = TrackerRadarManager.shared.findEntity(byName: "Google LLC")
         XCTAssertNotNil(entity)
         XCTAssertEqual("Google", entity?.displayName)
     }
 
     func testFindEntityForHost() {
-        let entity = TrackerDataManager.shared.findEntity(forHost: "www.google.com")
+        let entity = TrackerRadarManager.shared.findEntity(forHost: "www.google.com")
         XCTAssertNotNil(entity)
         XCTAssertEqual("Google", entity?.displayName)
     }

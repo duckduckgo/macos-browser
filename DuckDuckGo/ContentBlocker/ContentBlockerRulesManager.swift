@@ -30,7 +30,7 @@ class ContentBlockerRulesManager {
     private init() {}
 
     func compileRules(completion: ((WKContentRuleList?) -> Void)?) {
-        guard let trackerData = TrackerDataManager.shared.trackerData else {
+        guard let trackerData = TrackerRadarManager.shared.trackerData else {
             completion?(nil)
             return
         }

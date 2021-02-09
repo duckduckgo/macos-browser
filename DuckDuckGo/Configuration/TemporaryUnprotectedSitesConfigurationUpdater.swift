@@ -18,7 +18,7 @@
 
 import Combine
 
-struct TemporaryUnprotectedSitesConfigurationUpdater: ConfiguationUpdating {
+struct TemporaryUnprotectedSitesConfigurationUpdater: ConfigurationUpdating {
 
     let downloader: ConfigurationDownloader
 

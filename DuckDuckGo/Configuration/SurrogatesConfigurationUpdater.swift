@@ -18,7 +18,7 @@
 
 import Combine
 
-struct SurrogatesConfigurationUpdater: ConfiguationUpdating {
+struct SurrogatesConfigurationUpdater: ConfigurationUpdating {
 
     let downloader: ConfigurationDownloader
 

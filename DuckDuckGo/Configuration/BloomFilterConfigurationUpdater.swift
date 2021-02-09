@@ -18,7 +18,7 @@
 
 import Combine
 
-struct BloomFilterConfigurationUpdater: ConfiguationUpdating {
+struct BloomFilterConfigurationUpdater: ConfigurationUpdating {
 
     let downloader: ConfigurationDownloader
 
