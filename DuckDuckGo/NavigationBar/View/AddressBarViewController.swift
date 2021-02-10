@@ -163,6 +163,12 @@ class AddressBarViewController: NSViewController {
                 self?.focusRingView.shadowSides = visible
                     ? [.left, .top, .right]
                     : .all
+                self?.focusRingView.shadowColor = visible
+                    ? .suggestionsShadowColor
+                    : .addressBarShadowColor
+                self?.focusRingView.shadowRadius = visible
+                    ? 8.0
+                    : 4.0
                 self?.activeBackgroundViewOverHeight.isActive = visible
         }
         frameCancellable = self.view.superview?.publisher(for: \.frame).sink { [weak self] _ in

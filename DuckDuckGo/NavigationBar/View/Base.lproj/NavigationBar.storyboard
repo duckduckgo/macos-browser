@@ -222,8 +222,28 @@
                             </customView>
                             <customView translatesAutoresizingMaskIntoConstraints="NO" id="e0p-7S-Gan" customClass="ColorView" customModule="DuckDuckGo_Privacy_Browser" customModuleProvider="target">
                                 <rect key="frame" x="0.0" y="-22" width="600" height="60"/>
+                                <subviews>
+                                    <customView translatesAutoresizingMaskIntoConstraints="NO" id="okL-f2-MVs" userLabel="Inner Border View" customClass="ColorView" customModule="DuckDuckGo_Privacy_Browser" customModuleProvider="target">
+                                        <rect key="frame" x="1" y="1" width="598" height="58"/>
+                                        <userDefinedRuntimeAttributes>
+                                            <userDefinedRuntimeAttribute type="color" keyPath="borderColor">
+                                                <color key="value" name="AddressBarInnerBorderColor"/>
+                                            </userDefinedRuntimeAttribute>
+                                            <userDefinedRuntimeAttribute type="number" keyPath="borderWidth">
+                                                <real key="value" value="1"/>
+                                            </userDefinedRuntimeAttribute>
+                                            <userDefinedRuntimeAttribute type="number" keyPath="cornerRadius">
+                                                <real key="value" value="14"/>
+                                            </userDefinedRuntimeAttribute>
+                                        </userDefinedRuntimeAttributes>
+                                    </customView>
+                                </subviews>
                                 <constraints>
+                                    <constraint firstAttribute="trailing" secondItem="okL-f2-MVs" secondAttribute="trailing" constant="1" id="2om-qd-Lmk"/>
+                                    <constraint firstAttribute="bottom" secondItem="okL-f2-MVs" secondAttribute="bottom" constant="1" id="Mew-1J-SIB"/>
                                     <constraint firstAttribute="height" constant="60" id="WCn-tU-JoP"/>
+                                    <constraint firstItem="okL-f2-MVs" firstAttribute="top" secondItem="e0p-7S-Gan" secondAttribute="top" constant="1" id="fT5-Th-J4n"/>
+                                    <constraint firstItem="okL-f2-MVs" firstAttribute="leading" secondItem="e0p-7S-Gan" secondAttribute="leading" constant="1" id="klT-Ox-vJw"/>
                                 </constraints>
                                 <userDefinedRuntimeAttributes>
                                     <userDefinedRuntimeAttribute type="color" keyPath="backgroundColor">
@@ -266,7 +286,7 @@
                                     <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
                                     <font key="font" metaFont="system"/>
                                 </buttonCell>
-                                <color key="contentTintColor" name="ButtonColor"/>
+                                <color key="contentTintColor" name="ClearButtonColor"/>
                                 <userDefinedRuntimeAttributes>
                                     <userDefinedRuntimeAttribute type="color" keyPath="mouseOverColor">
                                         <color key="value" name="ButtonMouseOverColor"/>
@@ -378,6 +398,9 @@
         <namedColor name="AddressBarBorderColor">
             <color red="0.83137254901960789" green="0.83137254901960789" blue="0.83137254901960789" alpha="0.69999998807907104" colorSpace="custom" customColorSpace="displayP3"/>
         </namedColor>
+        <namedColor name="AddressBarInnerBorderColor">
+            <color red="1" green="1" blue="1" alpha="0.0" colorSpace="custom" customColorSpace="displayP3"/>
+        </namedColor>
         <namedColor name="AddressBarShadowColor">
             <color red="0.0" green="0.0" blue="0.0" alpha="0.15000000596046448" colorSpace="custom" customColorSpace="displayP3"/>
         </namedColor>
@@ -389,6 +412,9 @@
         </namedColor>
         <namedColor name="ButtonMouseOverColor">
             <color red="0.0" green="0.0" blue="0.0" alpha="0.10000000149011612" colorSpace="custom" customColorSpace="sRGB"/>
+        </namedColor>
+        <namedColor name="ClearButtonColor">
+            <color red="0.28627450980392155" green="0.28627450980392155" blue="0.28627450980392155" alpha="1" colorSpace="custom" customColorSpace="displayP3"/>
         </namedColor>
         <namedColor name="InactiveSearchBarBackground">
             <color red="0.91764705882352937" green="0.91764705882352937" blue="0.91764705882352937" alpha="1" colorSpace="custom" customColorSpace="displayP3"/>

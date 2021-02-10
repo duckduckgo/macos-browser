@@ -27,6 +27,14 @@ extension NSColor {
     static var addressBarBackgroundColor: NSColor {
         NSColor(named: "AddressBarBackgroundColor")!
     }
+
+    static var addressBarShadowColor: NSColor {
+        NSColor(named: "AddressBarShadowColor")!
+    }
+
+    static var suggestionsShadowColor: NSColor {
+        NSColor(named: "SuggestionsShadowColor")!
+    }
     
     static var addressBarSuffixColor: NSColor {
         NSColor(named: "AddressBarSuffixColor")!

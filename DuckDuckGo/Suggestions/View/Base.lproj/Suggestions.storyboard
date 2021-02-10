@@ -54,22 +54,22 @@
                         <autoresizingMask key="autoresizingMask"/>
                         <subviews>
                             <customView translatesAutoresizingMaskIntoConstraints="NO" id="bEL-6C-4Mq" userLabel="Layout View">
-                                <rect key="frame" x="0.0" y="0.0" width="550" height="169"/>
+                                <rect key="frame" x="0.0" y="0.0" width="550" height="203"/>
                                 <subviews>
                                     <customView translatesAutoresizingMaskIntoConstraints="NO" id="KKJ-SW-5gR" userLabel="Shadow Clip View">
-                                        <rect key="frame" x="0.0" y="0.0" width="550" height="168"/>
+                                        <rect key="frame" x="0.0" y="0.0" width="550" height="202"/>
                                         <subviews>
                                             <customView translatesAutoresizingMaskIntoConstraints="NO" id="cHT-Cf-UOB" customClass="ShadowView" customModule="DuckDuckGo_Privacy_Browser" customModuleProvider="target">
-                                                <rect key="frame" x="20" y="20" width="510" height="168"/>
+                                                <rect key="frame" x="20" y="20" width="510" height="202"/>
                                                 <userDefinedRuntimeAttributes>
                                                     <userDefinedRuntimeAttribute type="color" keyPath="shadowColor">
-                                                        <color key="value" name="AddressBarShadowColor"/>
+                                                        <color key="value" name="SuggestionsShadowColor"/>
                                                     </userDefinedRuntimeAttribute>
                                                     <userDefinedRuntimeAttribute type="size" keyPath="shadowOffset">
                                                         <size key="value" width="0.0" height="-4"/>
                                                     </userDefinedRuntimeAttribute>
                                                     <userDefinedRuntimeAttribute type="number" keyPath="shadowRadius">
-                                                        <real key="value" value="4"/>
+                                                        <real key="value" value="8"/>
                                                     </userDefinedRuntimeAttribute>
                                                     <userDefinedRuntimeAttribute type="number" keyPath="cornerRadius">
                                                         <real key="value" value="14"/>
@@ -88,19 +88,33 @@
                                         </constraints>
                                     </customView>
                                     <customView translatesAutoresizingMaskIntoConstraints="NO" id="Svf-wj-SjJ" userLabel="Clip View">
-                                        <rect key="frame" x="20" y="20" width="510" height="149"/>
+                                        <rect key="frame" x="20" y="20" width="510" height="183"/>
                                         <subviews>
-                                            <customView translatesAutoresizingMaskIntoConstraints="NO" id="j2X-bv-VAU" customClass="ColorView" customModule="DuckDuckGo_Privacy_Browser" customModuleProvider="target">
-                                                <rect key="frame" x="0.0" y="0.0" width="510" height="169"/>
+                                            <customView translatesAutoresizingMaskIntoConstraints="NO" id="j2X-bv-VAU" userLabel="Background View" customClass="ColorView" customModule="DuckDuckGo_Privacy_Browser" customModuleProvider="target">
+                                                <rect key="frame" x="0.0" y="0.0" width="510" height="203"/>
                                                 <subviews>
+                                                    <customView translatesAutoresizingMaskIntoConstraints="NO" id="MtO-b9-tF8" userLabel="Inner Border View" customClass="ColorView" customModule="DuckDuckGo_Privacy_Browser" customModuleProvider="target">
+                                                        <rect key="frame" x="1" y="1" width="508" height="184"/>
+                                                        <userDefinedRuntimeAttributes>
+                                                            <userDefinedRuntimeAttribute type="color" keyPath="borderColor">
+                                                                <color key="value" name="AddressBarInnerBorderColor"/>
+                                                            </userDefinedRuntimeAttribute>
+                                                            <userDefinedRuntimeAttribute type="number" keyPath="borderWidth">
+                                                                <real key="value" value="1"/>
+                                                            </userDefinedRuntimeAttribute>
+                                                            <userDefinedRuntimeAttribute type="number" keyPath="cornerRadius">
+                                                                <real key="value" value="14"/>
+                                                            </userDefinedRuntimeAttribute>
+                                                        </userDefinedRuntimeAttributes>
+                                                    </customView>
                                                     <scrollView borderType="none" horizontalLineScroll="28" horizontalPageScroll="10" verticalLineScroll="28" verticalPageScroll="10" hasHorizontalScroller="NO" hasVerticalScroller="NO" usesPredominantAxisScrolling="NO" translatesAutoresizingMaskIntoConstraints="NO" id="cx3-LG-ZUH">
-                                                        <rect key="frame" x="5" y="0.0" width="500" height="131"/>
+                                                        <rect key="frame" x="5" y="0.0" width="500" height="165"/>
                                                         <clipView key="contentView" drawsBackground="NO" copiesOnScroll="NO" id="pb8-sX-fSc">
-                                                            <rect key="frame" x="0.0" y="0.0" width="500" height="131"/>
+                                                            <rect key="frame" x="0.0" y="0.0" width="500" height="165"/>
                                                             <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                                             <subviews>
                                                                 <tableView verticalHuggingPriority="750" allowsExpansionToolTips="YES" columnAutoresizingStyle="lastColumnOnly" selectionHighlightStyle="none" columnSelection="YES" multipleSelection="NO" autosaveColumns="NO" rowHeight="28" viewBased="YES" id="4Z2-d8-NA2">
-                                                                    <rect key="frame" x="0.0" y="0.0" width="500" height="114"/>
+                                                                    <rect key="frame" x="0.0" y="0.0" width="500" height="148"/>
                                                                     <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                                                     <color key="backgroundColor" name="ClearColor"/>
                                                                     <color key="gridColor" name="gridColor" catalog="System" colorSpace="catalog"/>
@@ -176,11 +190,15 @@
                                                     <constraint firstItem="cx3-LG-ZUH" firstAttribute="top" secondItem="j2X-bv-VAU" secondAttribute="top" constant="21" id="4Fa-J7-BMm"/>
                                                     <constraint firstItem="cx3-LG-ZUH" firstAttribute="leading" secondItem="j2X-bv-VAU" secondAttribute="leading" constant="5" id="XIc-AY-AdT"/>
                                                     <constraint firstAttribute="trailing" secondItem="cx3-LG-ZUH" secondAttribute="trailing" constant="5" id="XKo-K6-XDq"/>
+                                                    <constraint firstItem="MtO-b9-tF8" firstAttribute="top" secondItem="j2X-bv-VAU" secondAttribute="top" constant="1" id="btM-7K-jHw"/>
                                                     <constraint firstAttribute="bottom" secondItem="cx3-LG-ZUH" secondAttribute="bottom" id="gus-g0-iwG"/>
+                                                    <constraint firstAttribute="bottom" secondItem="MtO-b9-tF8" secondAttribute="bottom" constant="1" id="jy6-YQ-i7d"/>
+                                                    <constraint firstAttribute="trailing" secondItem="MtO-b9-tF8" secondAttribute="trailing" constant="1" id="nOj-Ls-Ft4"/>
+                                                    <constraint firstItem="MtO-b9-tF8" firstAttribute="leading" secondItem="j2X-bv-VAU" secondAttribute="leading" constant="1" id="xur-aP-SHI"/>
                                                 </constraints>
                                                 <userDefinedRuntimeAttributes>
                                                     <userDefinedRuntimeAttribute type="color" keyPath="backgroundColor">
-                                                        <color key="value" name="SuggestionsBackgroundColor"/>
+                                                        <color key="value" name="AddressBarBackgroundColor"/>
                                                     </userDefinedRuntimeAttribute>
                                                     <userDefinedRuntimeAttribute type="number" keyPath="cornerRadius">
                                                         <real key="value" value="14"/>
@@ -194,7 +212,7 @@
                                                 </userDefinedRuntimeAttributes>
                                             </customView>
                                             <customView translatesAutoresizingMaskIntoConstraints="NO" id="ATb-xt-XAg" userLabel="Separator" customClass="ColorView" customModule="DuckDuckGo_Privacy_Browser" customModuleProvider="target">
-                                                <rect key="frame" x="1" y="148" width="508" height="1"/>
+                                                <rect key="frame" x="2" y="182" width="506" height="1"/>
                                                 <constraints>
                                                     <constraint firstAttribute="height" constant="1" id="G3c-nz-oCJ"/>
                                                 </constraints>
@@ -208,12 +226,12 @@
                                         <constraints>
                                             <constraint firstItem="ATb-xt-XAg" firstAttribute="top" secondItem="Svf-wj-SjJ" secondAttribute="top" id="FoQ-BR-ASj"/>
                                             <constraint firstItem="j2X-bv-VAU" firstAttribute="leading" secondItem="Svf-wj-SjJ" secondAttribute="leading" id="Izj-JF-mOk"/>
-                                            <constraint firstItem="ATb-xt-XAg" firstAttribute="leading" secondItem="Svf-wj-SjJ" secondAttribute="leading" constant="1" id="PIu-nj-NP2"/>
+                                            <constraint firstItem="ATb-xt-XAg" firstAttribute="leading" secondItem="Svf-wj-SjJ" secondAttribute="leading" constant="2" id="PIu-nj-NP2"/>
                                             <constraint firstAttribute="height" priority="950" constant="200" id="aJH-FU-o7W"/>
                                             <constraint firstAttribute="bottom" secondItem="j2X-bv-VAU" secondAttribute="bottom" id="aeB-Jm-z2x"/>
                                             <constraint firstAttribute="trailing" secondItem="j2X-bv-VAU" secondAttribute="trailing" id="ct6-Vy-WYG"/>
                                             <constraint firstAttribute="height" relation="greaterThanOrEqual" constant="28" id="g17-AI-L6x"/>
-                                            <constraint firstAttribute="trailing" secondItem="ATb-xt-XAg" secondAttribute="trailing" constant="1" id="rIw-Jg-tIG"/>
+                                            <constraint firstAttribute="trailing" secondItem="ATb-xt-XAg" secondAttribute="trailing" constant="2" id="rIw-Jg-tIG"/>
                                             <constraint firstItem="j2X-bv-VAU" firstAttribute="top" secondItem="Svf-wj-SjJ" secondAttribute="top" constant="-20" id="sSl-Lo-qub"/>
                                         </constraints>
                                     </customView>
@@ -249,20 +267,23 @@
         </scene>
     </scenes>
     <resources>
+        <namedColor name="AddressBarBackgroundColor">
+            <color red="1" green="1" blue="1" alpha="1" colorSpace="custom" customColorSpace="displayP3"/>
+        </namedColor>
         <namedColor name="AddressBarBorderColor">
             <color red="0.83137254901960789" green="0.83137254901960789" blue="0.83137254901960789" alpha="0.69999998807907104" colorSpace="custom" customColorSpace="displayP3"/>
+        </namedColor>
+        <namedColor name="AddressBarInnerBorderColor">
+            <color red="1" green="1" blue="1" alpha="0.0" colorSpace="custom" customColorSpace="displayP3"/>
         </namedColor>
         <namedColor name="AddressBarSeparatorColor">
             <color red="0.0" green="0.0" blue="0.0" alpha="0.11999999731779099" colorSpace="custom" customColorSpace="displayP3"/>
         </namedColor>
-        <namedColor name="AddressBarShadowColor">
-            <color red="0.0" green="0.0" blue="0.0" alpha="0.15000000596046448" colorSpace="custom" customColorSpace="displayP3"/>
-        </namedColor>
         <namedColor name="ClearColor">
             <color red="1" green="1" blue="1" alpha="0.0" colorSpace="custom" customColorSpace="sRGB"/>
         </namedColor>
-        <namedColor name="SuggestionsBackgroundColor">
-            <color red="1" green="1" blue="1" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+        <namedColor name="SuggestionsShadowColor">
+            <color red="0.0" green="0.0" blue="0.0" alpha="0.25" colorSpace="custom" customColorSpace="displayP3"/>
         </namedColor>
     </resources>
 </document>
