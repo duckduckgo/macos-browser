@@ -42,17 +42,19 @@ class ContentBlockerRulesManager {
             return
         }
 
-        if let store = WKContentRuleListStore.default() {
-            let ruleList = String(data: data, encoding: .utf8)!
-            store.compileContentRuleList(forIdentifier: "tds", encodedContentRuleList: ruleList) { [weak self] ruleList, error in
-                self?.blockingRules = ruleList
-                completion?(ruleList)
-                if let error = error {
-                    os_log("Failed to compile rules %{public}s", type: .error, error.localizedDescription)
+        DispatchQueue.global(qos: .background).async {
+            if let store = WKContentRuleListStore.default() {
+                let ruleList = String(data: data, encoding: .utf8)!
+                store.compileContentRuleList(forIdentifier: "tds", encodedContentRuleList: ruleList) { [weak self] ruleList, error in
+                    self?.blockingRules = ruleList
+                    completion?(ruleList)
+                    if let error = error {
+                        os_log("Failed to compile rules %{public}s", type: .error, error.localizedDescription)
+                    }
                 }
+            } else {
+                os_log("Failed to access the default WKContentRuleListStore for rules compiliation checking", type: .error)
             }
-        } else {
-            os_log("Failed to access the default WKContentRuleListStore for rules compiliation checking", type: .error)
         }
     }
 

@@ -46,7 +46,7 @@ class TrackerRadarManager {
     private(set) var encodedTrackerData: String!
     private var configDataStore: ConfigurationStoring
 
-    init(configDataStore: ConfigurationStoring = DefaultConfigurationStorage()) {
+    init(configDataStore: ConfigurationStoring = DefaultConfigurationStorage.shared) {
         self.configDataStore = configDataStore
         reload()
     }

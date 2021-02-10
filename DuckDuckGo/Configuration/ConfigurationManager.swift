@@ -24,64 +24,84 @@ class ConfigurationManager {
 
     enum Error: Swift.Error {
         case timeout
+        case bloomFilterSpecNotFound
     }
 
     struct Constants {
-        static let downloadTimeoutSeconds = 10.0
+        static let downloadTimeoutSeconds = 60.0 * 5
         static let refreshPeriodSeconds = 60.0 * 60 * 12
         static let retryDelaySeconds = 60.0 * 60
     }
 
     static let shared = ConfigurationManager()
 
-    let queue: DispatchQueue = DispatchQueue(label: "Configuration Manager")
+    private let queue: DispatchQueue = DispatchQueue(label: "Configuration Manager")
 
-    @UserDefaultsWrapper(key: .configurationLastUpdated, defaultValue: Date())
+    @UserDefaultsWrapper(key: .configLastUpdated, defaultValue: Date())
     var lastUpdateTime: Date
 
-    var cancellable: AnyCancellable?
+    private var cancellable: AnyCancellable?
 
     private init() { }
 
-    func checkForDownloads() {
-        // Quickly exit if it's not time
-        guard self.isReadyToUpdate() else { return }
+    func updateConfigIfReady() {
+        guard self.isReadyToUpdate(), cancellable == nil else { return }
 
-        queue.async {
-            print(#function)
+        let configDownloader: ConfigurationDownloader = DefaultConfigurationDownloader()
 
-            // Check again, in case a previous operation completed since this one started
-            guard self.isReadyToUpdate() else { return }
+        cancellable =
+            Publishers.MergeMany(
 
-            let configDownloader: ConfigurationDownloader = DefaultConfigurationDownloader()
-
-            var cancellable: AnyCancellable?
-            cancellable =
-                TrackerRadarConfigurationUpdater(downloader: configDownloader).update()
-                .merge(with: TemporaryUnprotectedSitesConfigurationUpdater(downloader: configDownloader).update())
-                .merge(with: SurrogatesConfigurationUpdater(downloader: configDownloader).update())
-                .merge(with: BloomFilterConfigurationUpdater(downloader: configDownloader).update())
+                // Tracker blocker related data
+                Publishers.MergeMany(
+                    configDownloader.download(.trackerRadar, embeddedEtag: nil),
+                    configDownloader.download(.surrogates, embeddedEtag: nil),
+                    configDownloader.download(.temporaryUnprotectedSites, embeddedEtag: nil)
+                )
+                .receive(on: self.queue)
                 .collect()
-                .timeout(.seconds(Constants.downloadTimeoutSeconds), scheduler: self.queue, options: nil, customError: { Error.timeout })
-                .sink { completion in
-                    print(#function, "sink completion")
-
-                    if case .failure(let error) = completion {
-                        os_log("Failed to complete configuration update %s", type: .error, error.localizedDescription)
-                        self.tryAgainSoon()
-                    } else {
-                        self.tryAgainLater()
+                .tryMap { result -> [(String, Data)?] in
+                    if !result.compactMap({$0}).isEmpty {
+                        try self.updateTrackerBlockingDependencies()
                     }
+                    return result
+                },
 
-                    withExtendedLifetime(cancellable, {})
-                    cancellable = nil
-                    configDownloader.cancelAll()
-
-                } receiveValue: { _ in
-                    print(#function, "sink received value")
-                    // no-op
+                // Bloom filter related data
+                Publishers.MergeMany(
+                    configDownloader.download(.bloomFilterSpec, embeddedEtag: nil),
+                    configDownloader.download(.bloomFilterBinary, embeddedEtag: nil),
+                    configDownloader.download(.bloomFilterExcludedDomains, embeddedEtag: nil)
+                )
+                .receive(on: self.queue)
+                .collect()
+                .tryMap { result -> [(String, Data)?] in
+                    if !result.compactMap({$0}).isEmpty {
+                        try self.updateBloomFilterDependencies()
+                    }
+                    return result
                 }
-        }
+
+            )
+            .collect()
+            .timeout(.seconds(Constants.downloadTimeoutSeconds), scheduler: self.queue, options: nil, customError: { Error.timeout })
+            .sink { completion in
+
+                print("*** sink receive completion")
+
+                if case .failure(let error) = completion {
+                    os_log("Failed to complete configuration update %s", type: .error, error.localizedDescription)
+                    self.tryAgainSoon()
+                } else {
+                    self.tryAgainLater()
+                }
+
+                self.cancellable = nil
+                configDownloader.cancelAll()
+
+            } receiveValue: { _ in
+                // no-op - if you want to do something more globally if any of the files were downloaded, this is the place
+            }
 
     }
 
@@ -96,6 +116,44 @@ class ConfigurationManager {
     private func tryAgainSoon() {
         // Set the last update time to in the past so it triggers again sooner
         lastUpdateTime = Date(timeIntervalSinceNow: Constants.refreshPeriodSeconds - Constants.retryDelaySeconds)
+    }
+
+    private func updateTrackerBlockingDependencies() throws {
+        print("***", #function)
+        TrackerRadarManager.shared.reload()
+        // TODO recompile the blocker rules
+        // TODO tell the open tabs to reconfigure their webviews
+    }
+
+    private func updateBloomFilterDependencies() throws {
+        print("***", #function)
+
+        let configStore = DefaultConfigurationStorage.shared
+        guard let specData = configStore.loadData(for: .bloomFilterSpec) else {
+            throw Error.bloomFilterSpecNotFound
+        }
+
+        guard let bloomFilterData = configStore.loadData(for: .bloomFilterBinary) else {
+            throw Error.bloomFilterSpecNotFound // TODO
+        }
+
+        guard let bloomFilterExclusions = configStore.loadData(for: .bloomFilterExcludedDomains) else {
+            throw Error.bloomFilterSpecNotFound // TODO
+        }
+
+        let spec = try JSONDecoder().decode(HTTPSBloomFilterSpecification.self, from: specData)
+        let excludedDomains = try JSONDecoder().decode(HTTPSExcludedDomains.self, from: bloomFilterExclusions).data
+
+        let httpsStore = HTTPSUpgradePersistence()
+        guard httpsStore.persistBloomFilter(specification: spec, data: bloomFilterData) else {
+            throw Error.bloomFilterSpecNotFound // TODO
+        }
+
+        guard httpsStore.persistExcludedDomains(excludedDomains) else {
+            throw Error.bloomFilterSpecNotFound // TODO
+        }
+
+        HTTPSUpgrade.shared.loadData()
     }
 
 }

@@ -23,7 +23,13 @@ public struct UserDefaultsWrapper<T> {
 
     public enum Key: String, CaseIterable {
 
-        case configurationLastUpdated
+        case configLastUpdated = "config.last.updated"
+        case configStorageTrackerRadarEtag = "config.storage.trackerradar.etag"
+        case configStorageBloomFilterSpecEtag = "config.storage.bloomfilter.spec.etag"
+        case configStorageBloomFilterBinaryEtag = "config.storage.bloomfilter.binary.etag"
+        case configStorageBloomFilterExclusionsEtag = "config.storage.bloomfilter.exclusions.etag"
+        case configStorageSurrogatesEtag = "config.storage.surrogates.etag"
+        case configStorageTempUnprotectedSitesEtag = "config.storage.temporaryunprotectedsites.etag"
 
     }
 

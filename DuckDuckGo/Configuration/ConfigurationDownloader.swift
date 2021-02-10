@@ -35,25 +35,20 @@ struct ConfigurationDownloadMeta {
 enum ConfigurationDownloadError: Error {
 
     case urlSessionError(error: Error)
-    case noResponse
     case noEtagInResponse
-    case etagMismatch
-    case cachedDataMissing
-    case unexpectedStatusCode(statusCode: Int)
-    case noDataOnSuccess
+    case invalidResponse
     case savingData
     case savingEtag
 
 }
 
-// If you change any of these, add a migration to move or delete the old data
 enum ConfigurationLocation: String {
 
     case bloomFilterSpec = "https://staticcdn.duckduckgo.com/https/https-mobile-v2-bloom-spec.json"
     case bloomFilterBinary = "https://staticcdn.duckduckgo.com/https/https-mobile-v2-bloom.bin"
     case bloomFilterExcludedDomains = "https://staticcdn.duckduckgo.com/https/https-mobile-v2-false-positives.json"
     case surrogates = "https://duckduckgo.com/contentblocking.js?l=surrogates"
-    case temporaryUnprotectedSites = "https://duckduckgo.com/contentblocking/trackers-whitelist-temporary.txt"
+    case temporaryUnprotectedSites = "https://duckduckgo.com/contentblocking/trackers-unprotected-temporary.txt"
     case trackerRadar = "https://staticcdn.duckduckgo.com/trackerblocking/v2.1/tds.json"
 
 }
@@ -73,88 +68,67 @@ class DefaultConfigurationDownloader: ConfigurationDownloader {
 
     private var cancellables = Set<AnyCancellable>()
 
-    init(storage: ConfigurationStoring = DefaultConfigurationStorage()) {
+    init(storage: ConfigurationStoring = DefaultConfigurationStorage.shared) {
         self.storage = storage
-    }
-
-    /// Returns new data from the given data and response object, nil if there's nothing new, or throws an error if something is wrong
-    private func newDataFrom(_ value: (data: Data, response: URLResponse), currentEtag: String?, cachedData: Data?)
-            throws -> (etag: String, data: Data)? {
-
-        guard let response = value.response as? HTTPURLResponse else {
-            throw ConfigurationDownloadError.noResponse
-        }
-
-        guard let etag = response.value(forHTTPHeaderField: Constants.etagField) else {
-            throw ConfigurationDownloadError.noEtagInResponse
-        }
-
-        switch response.statusCode {
-        case Constants.notModifiedResponseCode:
-
-            guard etag == currentEtag else {
-                throw ConfigurationDownloadError.etagMismatch
-            }
-
-            if cachedData == nil {
-                throw ConfigurationDownloadError.cachedDataMissing
-            }
-
-            return nil
-
-        case Constants.successResponseCode:
-
-            guard !value.data.isEmpty else {
-                throw ConfigurationDownloadError.noDataOnSuccess
-            }
-
-            return (etag: etag, data: value.data)
-
-        default:
-            throw ConfigurationDownloadError.unexpectedStatusCode(statusCode: response.statusCode)
-
-        }
-
     }
 
     func download(_ config: ConfigurationLocation, embeddedEtag: String?) -> AnyPublisher<(etag: String, data: Data)?, Error> {
 
         let url = URL(string: config.rawValue)!
-        let currentEtag = storage.loadEtag(for: config) ?? embeddedEtag
 
         return Future { promise in
             var request = URLRequest(url: url)
             request.addValue(Constants.userAgent, forHTTPHeaderField: Constants.userAgentField)
+            request.cachePolicy = .reloadIgnoringLocalAndRemoteCacheData
 
-            let cachedData = self.storage.loadData(for: config)
-            if let etag = currentEtag, cachedData != nil {
+            if self.storage.loadData(for: config) != nil,
+               let etag = self.storage.loadEtag(for: config) ?? embeddedEtag {
+
+                print("*** sending etag", etag, "for", config.rawValue)
                 request.addValue(etag, forHTTPHeaderField: Constants.ifNoneMatchField)
             }
 
-            URLSession.shared.dataTaskPublisher(for: request).sink { completion in
-
-                if case .failure(let error) = completion {
-                    promise(.failure(ConfigurationDownloadError.urlSessionError(error: error)))
-                }
-
-            } receiveValue: { value in
-
-                do {
-                    if let meta = try self.newDataFrom(value, currentEtag: currentEtag, cachedData: cachedData) {
-                        try self.storage.saveData(meta.data, for: config)
-                        try self.storage.saveEtag(meta.etag, for: config)
-                        promise(.success(meta))
-                    } else {
-                        promise(.success(nil))
+            // Uses protocol based caching.
+            //  Our server disables absolute caching but returns an etag which URL session always checks against
+            URLSession.shared.dataTaskPublisher(for: request)
+                .tryMap { result -> (etag: String, data: Data)? in
+                    guard let response = result.response as? HTTPURLResponse else {
+                        throw ConfigurationDownloadError.invalidResponse
                     }
 
-                } catch {
-                    promise(.failure(error))
-                }
+                    print("***", config.rawValue, response.statusCode)
+                    if response.statusCode == Constants.notModifiedResponseCode {
+                        print("***", config.rawValue, "[NOT MODIFIED]")
+                        return nil
+                    }
 
-            }.store(in: &self.cancellables)
+                    guard let etag = response.value(forHTTPHeaderField: Constants.etagField) else {
+                        throw ConfigurationDownloadError.noEtagInResponse
+                    }
+
+                    try self.storage.saveData(result.data, for: config)
+                    try self.storage.saveEtag(etag, for: config)
+
+                    return (etag: etag, data: result.data)
+                }
+                .print()
+                .sink(receiveCompletion: { completion in
+
+                    print("download", config, "completion received", completion)
+
+                    if case .failure(let error) = completion {
+                        promise(.failure(error))
+                    }
+
+                }) { value in
+
+                    print("download", config, "value received", value == nil ? "value is nil" : "new data!")
+                    promise(.success((value)))
+
+                }.store(in: &self.cancellables)
 
         }.eraseToAnyPublisher()
+
     }
 
     func cancelAll() {

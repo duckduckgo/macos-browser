@@ -27,9 +27,11 @@ class AppDelegate: NSObject, NSApplicationDelegate {
     func applicationWillFinishLaunching(_ notification: Notification) {
         urlEventListener.listen()
 
-        // TODO only call this once a navigation finishes
+        // If this affects performance, then we should remove it, but
+        //  shouldn't happen very often after the first update.
+        // DefaultConfigurationStorage.shared.removeAll()
         ConfigurationManager.shared.lastUpdateTime = .distantPast
-        ConfigurationManager.shared.checkForDownloads()
+        ConfigurationManager.shared.updateConfigIfReady()
     }
 
     func applicationDidFinishLaunching(_ aNotification: Notification) {
