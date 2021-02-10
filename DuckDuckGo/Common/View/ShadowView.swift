@@ -35,11 +35,34 @@ class ShadowView: NSView {
         }
     }
 
-    @IBInspectable var shadowColor: NSColor? = NSColor.clear
-    @IBInspectable var shadowRadius: CGFloat = 0
-    @IBInspectable var shadowOffset: CGSize = .zero
-    @IBInspectable var shadowOpacity: CGFloat = 0
-    @IBInspectable var cornerRadius: CGFloat = 0
+    @IBInspectable var shadowColor: NSColor? {
+        didSet {
+            self.needsDisplay = true
+        }
+    }
+    @IBInspectable var shadowRadius: CGFloat = 0 {
+        didSet {
+            self.needsDisplay = true
+            self.needsLayout = true
+        }
+    }
+    @IBInspectable var shadowOffset: CGSize = .zero {
+        didSet {
+            self.needsDisplay = true
+            self.needsLayout = true
+        }
+    }
+    @IBInspectable var shadowOpacity: CGFloat = 0 {
+        didSet {
+            self.needsDisplay = true
+        }
+    }
+    @IBInspectable var cornerRadius: CGFloat = 0 {
+        didSet {
+            self.needsDisplay = true
+            self.needsLayout = true
+        }
+    }
     var shadowSides: ShadowSide = .all {
         didSet {
             self.needsLayout = true
@@ -150,7 +173,6 @@ class ShadowView: NSView {
         layer!.masksToBounds = false
         layer!.backgroundColor = NSColor.clear.cgColor
         layer!.cornerRadius = cornerRadius
-        layer!.shadowColor = shadowColor?.cgColor
         layer!.shadowColor = shadowColor?.cgColor
         layer!.shadowRadius = shadowRadius
         layer!.shadowOffset = shadowOffset
