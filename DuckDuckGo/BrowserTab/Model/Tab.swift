@@ -34,8 +34,6 @@ final class Tab: NSObject {
 
     weak var delegate: TabDelegate?
 
-    private var webViewReconfigurationCancellable: AnyCancellable?
-
     init(faviconService: FaviconService = LocalFaviconService.shared,
          webViewConfiguration: WebViewConfiguration? = nil,
          url: URL? = nil,
@@ -66,19 +64,11 @@ final class Tab: NSObject {
             faviconService.storeIfNeeded(favicon: favicon, for: host, isFromUserScript: false)
         }
 
-        subscribeToWebViewReconfigurationEvents()
+        subscribeToTrackerBlockerConfigUpdatedEvents()
     }
 
     deinit {
-        userScripts.forEach {
-            $0.messageNames.forEach {
-                if #available(OSX 11.0, *) {
-                    webView.configuration.userContentController.removeScriptMessageHandler(forName: $0, contentWorld: .defaultClient)
-                } else {
-                    webView.configuration.userContentController.removeScriptMessageHandler(forName: $0)
-                }
-            }
-        }
+        userScripts.remove(from: webView)
     }
 
     let webView: WebView
@@ -96,8 +86,7 @@ final class Tab: NSObject {
 
     weak var findInPage: FindInPageModel? {
         didSet {
-            findInPageScript.model = findInPage
-            subscribeToFindInPageTextChange()
+            attachFindInPage()
         }
     }
 
@@ -168,18 +157,21 @@ final class Tab: NSObject {
 
     // MARK: - WebView Reconfiguration
 
-    private func subscribeToWebViewReconfigurationEvents() {
-        webViewReconfigurationCancellable = ConfigurationManager.trackerBlockerDataUpdatedPublisher()
+    private var trackerBlockerConfigUpdatedCancellable: AnyCancellable?
+
+    private func subscribeToTrackerBlockerConfigUpdatedEvents() {
+        trackerBlockerConfigUpdatedCancellable = ConfigurationManager.trackerBlockerDataUpdatedPublisher()
             .receive(on: DispatchQueue.main)
-            .sink { _ in
-            self.reconfigureWebView()
+            .sink { [weak self] _ in
+            self?.reconfigureWebView()
         }
     }
 
     private func reconfigureWebView() {
         print("***", #function)
         webView.configuration.reinstallContentBlocker()
-        webView.configuration.userContentController.removeAllUserScripts()
+        userScripts.remove(from: webView)
+        userScripts = UserScripts()
         installUserScripts()
     }
 
@@ -208,36 +200,22 @@ final class Tab: NSObject {
 
     // MARK: - User Scripts
 
-    let faviconScript = FaviconUserScript()
-    let html5downloadScript = HTML5DownloadUserScript()
-    let contextMenuScript = ContextMenuUserScript()
-    let findInPageScript = FindInPageUserScript()
-    let contentBlockerScript = ContentBlockerUserScript()
-    let contentBlockerRulesScript = ContentBlockerRulesUserScript()
-    let debugScript = DebugUserScript()
-
-    lazy var userScripts = [
-        self.debugScript,
-        self.faviconScript,
-        self.html5downloadScript,
-        self.contextMenuScript,
-        self.findInPageScript,
-        self.contentBlockerScript,
-        self.contentBlockerRulesScript
-    ]
+    var userScripts = UserScripts()
 
     private func installUserScripts() {
-        debugScript.instrumentation = instrumentation
-        faviconScript.delegate = self
-        html5downloadScript.delegate = self
-        contextMenuScript.delegate = self
-        contentBlockerScript.delegate = self
-        contentBlockerRulesScript.delegate = self
+        userScripts.debugScript.instrumentation = instrumentation
+        userScripts.faviconScript.delegate = self
+        userScripts.html5downloadScript.delegate = self
+        userScripts.contextMenuScript.delegate = self
+        userScripts.contentBlockerScript.delegate = self
+        userScripts.contentBlockerRulesScript.delegate = self
 
-        userScripts.forEach {
-            webView.configuration.userContentController.add(userScript: $0)
-        }
+        attachFindInPage()
+
+        userScripts.install(into: webView)
     }
+
+    // MARK: Find in Page
 
     var findInPageCancellable: AnyCancellable?
     private func subscribeToFindInPageTextChange() {
@@ -247,6 +225,11 @@ final class Tab: NSObject {
                 self?.find(text: text)
             }
         }
+    }
+
+    private func attachFindInPage() {
+        userScripts.findInPageScript.model = findInPage
+        subscribeToFindInPageTextChange()
     }
 
 }
@@ -419,19 +402,19 @@ extension Tab: WKNavigationDelegate {
 extension Tab {
 
     private func find(text: String) {
-        findInPageScript.find(text: text, inWebView: webView)
+        userScripts.findInPageScript.find(text: text, inWebView: webView)
     }
 
     func findDone() {
-        findInPageScript.done(withWebView: webView)
+        userScripts.findInPageScript.done(withWebView: webView)
     }
 
     func findNext() {
-        findInPageScript.next(withWebView: webView)
+        userScripts.findInPageScript.next(withWebView: webView)
     }
 
     func findPrevious() {
-        findInPageScript.previous(withWebView: webView)
+        userScripts.findInPageScript.previous(withWebView: webView)
     }
 
 }

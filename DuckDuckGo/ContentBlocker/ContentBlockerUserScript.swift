@@ -37,8 +37,20 @@ class ContentBlockerUserScript: UserScript {
         static let isSurrogate = "isSurrogate"
     }
 
-    init() {
-        super.init(source: Self.source,
+    init(configStorage: ConfigurationStoring = DefaultConfigurationStorage.shared) {
+
+        // Use sensible defaults in case the upstream data is unparsable
+        let trackerData = TrackerRadarManager.shared.encodedTrackerData ?? "{}"
+        let surrogates = configStorage.loadData(for: .surrogates)?.utf8String() ?? ""
+        let unprotectedSites = configStorage.loadData(for: .temporaryUnprotectedSites)?.utf8String() ?? ""
+
+        let source = Self.loadJS("contentblocker", withReplacements: [
+            "${unprotectedDomains}": unprotectedSites,
+            "${trackerData}": trackerData,
+            "${surrogates}": surrogates
+        ])
+
+        super.init(source: source,
                    messageNames: Self.messageNames,
                    injectionTime: .atDocumentStart,
                    forMainFrameOnly: false)
@@ -73,18 +85,5 @@ class ContentBlockerUserScript: UserScript {
 extension ContentBlockerUserScript {
 
     static let messageNames = ["trackerDetectedMessage"]
-
-    static let source: String = {
-        // Use sensible defaults in case the upstream data is unparsable
-        let trackerData = TrackerRadarManager.shared.encodedTrackerData ?? "{}"
-        let surrogates = DefaultConfigurationStorage.shared.loadData(for: .surrogates) ?? Data()
-        let unprotectedSites = DefaultConfigurationStorage.shared.loadData(for: .temporaryUnprotectedSites) ?? Data()
-
-        return loadJS("contentblocker", withReplacements: [
-            "${unprotectedDomains}": String(data: unprotectedSites, encoding: .utf8) ?? "",
-            "${trackerData}": trackerData,
-            "${surrogates}": String(data: surrogates, encoding: .utf8) ?? ""
-        ])
-    }()
 
 }

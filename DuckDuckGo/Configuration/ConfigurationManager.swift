@@ -130,7 +130,9 @@ class ConfigurationManager {
     private func updateTrackerBlockingDependencies() throws {
         print("***", #function)
         TrackerRadarManager.shared.reload()
-        trackerBlockerDataUpdatedSubject.send(())
+        ContentBlockerRulesManager.shared.compileRules { _ in
+            self.trackerBlockerDataUpdatedSubject.send(())
+        }
     }
 
     private func updateBloomFilter() throws {

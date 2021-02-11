@@ -99,8 +99,11 @@ class DefaultConfigurationStorage: ConfigurationStoring {
     }
 
     func loadData(for config: ConfigurationLocation) -> Data? {
+        print("***", #function, config.rawValue)
         let file = FileManager.default.fileUrl(for: config)
-        return try? Data(contentsOf: file)
+        let data = try? Data(contentsOf: file)
+        print("***", #function, config.rawValue, data?.count ?? -1)
+        return data
     }
 
     func saveData(_ data: Data, for config: ConfigurationLocation) throws {

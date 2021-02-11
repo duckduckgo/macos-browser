@@ -27,8 +27,15 @@ class ContentBlockerRulesUserScript: UserScript {
         static let pageUrl = "pageUrl"
     }
 
-    init() {
-        super.init(source: Self.source,
+    init(configStorage: ConfigurationStoring = DefaultConfigurationStorage.shared) {
+
+        let unprotectedDomains = configStorage.loadData(for: .temporaryUnprotectedSites)?.utf8String() ?? ""
+
+        let source = Self.loadJS("contentblockerrules", withReplacements: [
+            "${unprotectedDomains}": unprotectedDomains
+        ])
+
+        super.init(source: source,
                    messageNames: Self.messageNames,
                    injectionTime: .atDocumentStart,
                    forMainFrameOnly: false)
@@ -72,11 +79,5 @@ class ContentBlockerRulesUserScript: UserScript {
 extension ContentBlockerRulesUserScript {
 
     static let messageNames = ["processRule"]
-    static let source: String = {
-        // Unprotected domains are not yet implemented.
-        return loadJS("contentblockerrules", withReplacements: [
-            "${unprotectedDomains}": ""
-        ])
-    }()
 
 }
