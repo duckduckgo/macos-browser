@@ -22,6 +22,7 @@ protocol FaviconService {
 
     func fetchFavicon(_ faviconUrl: URL?, for host: String, isFromUserScript: Bool, completion: @escaping (NSImage?, Error?) -> Void)
     func getCachedFavicon(for host: String, mustBeFromUserScript: Bool) -> NSImage?
+    func storeIfNeeded(favicon: NSImage, for host: String, isFromUserScript: Bool)
 
 }
 

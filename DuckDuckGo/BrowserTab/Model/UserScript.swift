@@ -65,7 +65,8 @@ extension UserScript: WKScriptMessageHandler {
 
 /// Reference: https://stackoverflow.com/questions/26383031/wkwebview-causes-my-view-controller-to-leak/26383032#26383032
 ///
-/// This is only a mitigation of the problem. Instead of scripts themselves leaking, which are far larger in size, the LeakAvoider will be leaked. It can save others from leaking, but not itself.
+/// This is only a mitigation of the problem. Instead of scripts themselves leaking, which are far larger in size, the LeakAvoider will be leaked.
+/// It can save others from leaking, but not itself.
 class LeakAvoider: NSObject, WKScriptMessageHandler {
 
     weak var delegate: WKScriptMessageHandler?

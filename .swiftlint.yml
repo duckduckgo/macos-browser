@@ -21,6 +21,8 @@ type_name:
 file_length:
   warning: 700
   error: 1200
+nesting:
+  type_level: 2
 
 # General Config
 excluded:

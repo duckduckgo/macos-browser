@@ -30,19 +30,38 @@ protocol TabDelegate: class {
 
 }
 
-class Tab: NSObject {
+final class Tab: NSObject {
 
     weak var delegate: TabDelegate?
 
-    init(faviconService: FaviconService = LocalFaviconService.shared, webViewConfiguration: WebViewConfiguration? = nil) {
+    init(faviconService: FaviconService = LocalFaviconService.shared,
+         webViewConfiguration: WebViewConfiguration? = nil,
+         url: URL? = nil,
+         title: String? = nil,
+         error: Error? = nil,
+         favicon: NSImage? = nil,
+         sessionStateData: Data? = nil) {
+
         self.faviconService = faviconService
+
+        self.url = url
+        self.title = title
+        self.error = error
+        self.favicon = favicon
+        self.sessionStateData = sessionStateData
+
         webView = WebView(frame: CGRect.zero, configuration: webViewConfiguration ?? WKWebViewConfiguration.makeConfiguration())
 
         super.init()
 
         setupWebView()
-        if webViewConfiguration == nil {
+        if webView.configuration.userContentController.userScripts.isEmpty {
             setupUserScripts()
+        }
+
+        if let favicon = favicon,
+           let host = url?.host {
+            faviconService.storeIfNeeded(favicon: favicon, for: host, isFromUserScript: false)
         }
     }
 
@@ -68,6 +87,21 @@ class Tab: NSObject {
             findInPageScript.model = findInPage
             subscribeToFindInPageTextChange()
         }
+    }
+
+    var sessionStateData: Data?
+
+    func invalidateSessionStateData() {
+        sessionStateData = nil
+    }
+
+    func getActualSessionStateData() -> Data? {
+        if let sessionStateData = sessionStateData {
+            return sessionStateData
+        }
+        // collect and cache actual SessionStateData on demand and store until invalidated
+        self.sessionStateData = (try? webView.sessionStateData())
+        return self.sessionStateData
     }
 
     // Used to track if an error was caused by a download navigation.
@@ -110,6 +144,14 @@ class Tab: NSObject {
     private func setupWebView() {
         webView.navigationDelegate = self
         webView.allowsBackForwardNavigationGestures = true
+
+        if let sessionStateData = sessionStateData {
+            do {
+                try webView.restoreSessionState(from: sessionStateData)
+            } catch {
+                os_log("Tab:setupWebView could not restore session state %s", "\(error)")
+            }
+        }
     }
 
     // MARK: - Favicon
@@ -118,7 +160,9 @@ class Tab: NSObject {
     let faviconService: FaviconService
 
     private func fetchFavicon(_ faviconURL: URL?, for host: String?, isFromUserScript: Bool) {
-        favicon = nil
+        if favicon != nil {
+            favicon = nil
+        }
 
         guard let host = host else {
             return
@@ -316,15 +360,19 @@ extension Tab: WKNavigationDelegate {
 
         // Unnecessary assignment triggers publishing
         if error != nil { error = nil }
+
+        self.invalidateSessionStateData()
     }
 
     func webView(_ webView: WKWebView, didFinish navigation: WKNavigation!) {
-        ConfigurationManager.shared.updateConfigIfReady()
+        self.invalidateSessionStateData()
     }
 
     func webView(_ webView: WKWebView, didFail navigation: WKNavigation!, withError error: Error) {
         #warning("Failing not captured. Seems the method is called after calling the webview's method goBack()")
 //        hasError = true
+
+        self.invalidateSessionStateData()
     }
 
     func webView(_ webView: WKWebView, didFailProvisionalNavigation navigation: WKNavigation!, withError error: Error) {
@@ -355,36 +403,6 @@ extension Tab {
 
     func findPrevious() {
         findInPageScript.previous(withWebView: webView)
-    }
-
-}
-
-fileprivate extension WKWebViewConfiguration {
-
-    static func makeConfiguration() -> WKWebViewConfiguration {
-        let configuration = WKWebViewConfiguration()
-        configuration.websiteDataStore = WKWebsiteDataStore.default()
-        configuration.allowsAirPlayForMediaPlayback = true
-        configuration.preferences.setValue(true, forKey: "fullScreenEnabled")
-        configuration.preferences.setValue(true, forKey: "developerExtrasEnabled")
-        configuration.installContentBlockingRules()
-        return configuration
-    }
-
-    private func installContentBlockingRules() {
-        func addRulesToController(rules: WKContentRuleList) {
-            self.userContentController.add(rules)
-        }
-
-        if let rulesList = ContentBlockerRulesManager.shared.blockingRules {
-            addRulesToController(rules: rulesList)
-        } else {
-            ContentBlockerRulesManager.shared.compileRules { rulesList in
-                if let rulesList = rulesList {
-                    addRulesToController(rules: rulesList)
-                }
-            }
-        }
     }
 
 }
