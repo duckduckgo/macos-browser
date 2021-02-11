@@ -25,6 +25,10 @@ class ConfigurationManager {
     enum Error: Swift.Error {
         case timeout
         case bloomFilterSpecNotFound
+        case bloomFilterBinaryNotFound
+        case bloomFilterPersistenceFailed
+        case bloomFilterExclusionsNotFound
+        case bloomFilterExclusionsPersistenceFailed
     }
 
     struct Constants {
@@ -47,40 +51,26 @@ class ConfigurationManager {
     func updateConfigIfReady() {
         guard self.isReadyToUpdate(), cancellable == nil else { return }
 
-        let configDownloader: ConfigurationDownloader = DefaultConfigurationDownloader()
+        let configDownloader: ConfigurationDownloader = DefaultConfigurationDownloader(deliveryQueue: self.queue)
 
         cancellable =
+
             Publishers.MergeMany(
 
-                // Tracker blocker related data
-                Publishers.MergeMany(
-                    configDownloader.download(.trackerRadar, embeddedEtag: nil),
-                    configDownloader.download(.surrogates, embeddedEtag: nil),
-                    configDownloader.download(.temporaryUnprotectedSites, embeddedEtag: nil)
-                )
-                .receive(on: self.queue)
-                .collect()
-                .tryMap { result -> [(String, Data)?] in
-                    if !result.compactMap({$0}).isEmpty {
-                        try self.updateTrackerBlockingDependencies()
-                    }
-                    return result
-                },
+                configDownloader.refreshDataThenUpdate(for: [
+                    .trackerRadar,
+                    .surrogates,
+                    .temporaryUnprotectedSites
+                ], self.updateTrackerBlockingDependencies),
 
-                // Bloom filter related data
-                Publishers.MergeMany(
-                    configDownloader.download(.bloomFilterSpec, embeddedEtag: nil),
-                    configDownloader.download(.bloomFilterBinary, embeddedEtag: nil),
-                    configDownloader.download(.bloomFilterExcludedDomains, embeddedEtag: nil)
-                )
-                .receive(on: self.queue)
-                .collect()
-                .tryMap { result -> [(String, Data)?] in
-                    if !result.compactMap({$0}).isEmpty {
-                        try self.updateBloomFilterDependencies()
-                    }
-                    return result
-                }
+                configDownloader.refreshDataThenUpdate(for: [
+                    .bloomFilterBinary,
+                    .bloomFilterSpec
+                ], self.updateBloomFilter),
+
+                configDownloader.refreshDataThenUpdate(for: [
+                    .bloomFilterExcludedDomains
+                ], self.updateBloomFilterExclusions)
 
             )
             .collect()
@@ -104,7 +94,6 @@ class ConfigurationManager {
             }
 
     }
-
     private func isReadyToUpdate() -> Bool {
         return Date().timeIntervalSince(lastUpdateTime) > Constants.refreshPeriodSeconds
     }
@@ -125,7 +114,7 @@ class ConfigurationManager {
         // TODO tell the open tabs to reconfigure their webviews
     }
 
-    private func updateBloomFilterDependencies() throws {
+    private func updateBloomFilter() throws {
         print("***", #function)
 
         let configStore = DefaultConfigurationStorage.shared
@@ -134,23 +123,32 @@ class ConfigurationManager {
         }
 
         guard let bloomFilterData = configStore.loadData(for: .bloomFilterBinary) else {
-            throw Error.bloomFilterSpecNotFound // TODO
-        }
-
-        guard let bloomFilterExclusions = configStore.loadData(for: .bloomFilterExcludedDomains) else {
-            throw Error.bloomFilterSpecNotFound // TODO
+            throw Error.bloomFilterBinaryNotFound
         }
 
         let spec = try JSONDecoder().decode(HTTPSBloomFilterSpecification.self, from: specData)
-        let excludedDomains = try JSONDecoder().decode(HTTPSExcludedDomains.self, from: bloomFilterExclusions).data
 
         let httpsStore = HTTPSUpgradePersistence()
         guard httpsStore.persistBloomFilter(specification: spec, data: bloomFilterData) else {
-            throw Error.bloomFilterSpecNotFound // TODO
+            throw Error.bloomFilterPersistenceFailed
         }
 
+        HTTPSUpgrade.shared.loadData()
+    }
+
+    private func updateBloomFilterExclusions() throws {
+        print("***", #function)
+
+        let configStore = DefaultConfigurationStorage.shared
+        guard let bloomFilterExclusions = configStore.loadData(for: .bloomFilterExcludedDomains) else {
+            throw Error.bloomFilterExclusionsNotFound
+        }
+
+        let excludedDomains = try JSONDecoder().decode(HTTPSExcludedDomains.self, from: bloomFilterExclusions).data
+
+        let httpsStore = HTTPSUpgradePersistence()
         guard httpsStore.persistExcludedDomains(excludedDomains) else {
-            throw Error.bloomFilterSpecNotFound // TODO
+            throw Error.bloomFilterExclusionsPersistenceFailed
         }
 
         HTTPSUpgrade.shared.loadData()

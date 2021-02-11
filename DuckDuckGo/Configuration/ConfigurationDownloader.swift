@@ -20,7 +20,8 @@ import Combine
 
 protocol ConfigurationDownloader {
 
-    func download(_ config: ConfigurationLocation, embeddedEtag: String?) -> AnyPublisher<(etag: String, data: Data)?, Error>
+    func refreshDataThenUpdate(for locations: [ConfigurationLocation], _ updater: @escaping () throws -> Void)
+            -> AnyPublisher<[ConfigurationDownloadMeta?], Swift.Error>
     func cancelAll()
 
 }
@@ -29,16 +30,6 @@ struct ConfigurationDownloadMeta {
 
     var etag: String
     var data: Data
-
-}
-
-enum ConfigurationDownloadError: Error {
-
-    case urlSessionError(error: Error)
-    case noEtagInResponse
-    case invalidResponse
-    case savingData
-    case savingEtag
 
 }
 
@@ -55,6 +46,16 @@ enum ConfigurationLocation: String {
 
 class DefaultConfigurationDownloader: ConfigurationDownloader {
 
+    enum Error: Swift.Error {
+
+        case urlSessionError(error: Swift.Error)
+        case noEtagInResponse
+        case invalidResponse
+        case savingData
+        case savingEtag
+
+    }
+
     struct Constants {
         static let userAgent = "macos_ddg_dev"
         static let userAgentField = "User-Agent"
@@ -67,12 +68,14 @@ class DefaultConfigurationDownloader: ConfigurationDownloader {
     let storage: ConfigurationStoring
 
     private var cancellables = Set<AnyCancellable>()
+    private let deliveryQueue: DispatchQueue
 
-    init(storage: ConfigurationStoring = DefaultConfigurationStorage.shared) {
+    init(storage: ConfigurationStoring = DefaultConfigurationStorage.shared, deliveryQueue: DispatchQueue) {
         self.storage = storage
+        self.deliveryQueue = deliveryQueue
     }
 
-    func download(_ config: ConfigurationLocation, embeddedEtag: String?) -> AnyPublisher<(etag: String, data: Data)?, Error> {
+    func download(_ config: ConfigurationLocation, embeddedEtag: String?) -> AnyPublisher<ConfigurationDownloadMeta?, Swift.Error> {
 
         let url = URL(string: config.rawValue)!
 
@@ -91,9 +94,9 @@ class DefaultConfigurationDownloader: ConfigurationDownloader {
             // Uses protocol based caching.
             //  Our server disables absolute caching but returns an etag which URL session always checks against
             URLSession.shared.dataTaskPublisher(for: request)
-                .tryMap { result -> (etag: String, data: Data)? in
+                .tryMap { result -> ConfigurationDownloadMeta? in
                     guard let response = result.response as? HTTPURLResponse else {
-                        throw ConfigurationDownloadError.invalidResponse
+                        throw Error.invalidResponse
                     }
 
                     print("***", config.rawValue, response.statusCode)
@@ -103,13 +106,13 @@ class DefaultConfigurationDownloader: ConfigurationDownloader {
                     }
 
                     guard let etag = response.value(forHTTPHeaderField: Constants.etagField) else {
-                        throw ConfigurationDownloadError.noEtagInResponse
+                        throw Error.noEtagInResponse
                     }
 
                     try self.storage.saveData(result.data, for: config)
                     try self.storage.saveEtag(etag, for: config)
 
-                    return (etag: etag, data: result.data)
+                    return ConfigurationDownloadMeta(etag: etag, data: result.data)
                 }
                 .print()
                 .sink(receiveCompletion: { completion in
@@ -136,6 +139,32 @@ class DefaultConfigurationDownloader: ConfigurationDownloader {
         let cancellables = self.cancellables
         self.cancellables.removeAll()
         cancellables.forEach { $0.cancel() }
+
+    }
+
+    func embeddedEtag(for config: ConfigurationLocation) -> String? {
+        switch config {
+        case .trackerRadar: return TrackerRadarManager.Constants.embeddedDataSetETag
+        default: return nil
+        }
+    }
+
+    func refreshDataThenUpdate(for locations: [ConfigurationLocation], _ updater: @escaping () throws -> Void)
+            -> AnyPublisher<[ConfigurationDownloadMeta?], Swift.Error> {
+
+        Publishers.MergeMany(
+            locations.map {
+                download($0, embeddedEtag: embeddedEtag(for: $0))
+            }
+        )
+        .receive(on: self.deliveryQueue)
+        .collect()
+        .tryMap { result -> [ConfigurationDownloadMeta?] in
+            if !result.compactMap({$0}).isEmpty {
+                try updater()
+            }
+            return result
+        }.eraseToAnyPublisher()
 
     }
 
