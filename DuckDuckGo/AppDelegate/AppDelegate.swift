@@ -57,8 +57,6 @@ class AppDelegate: NSObject, NSApplicationDelegate {
                 WindowsManager.openNewWindow()
             }
         }
-      
-        newWindow(self) // TODO: Still needed after session restoration?
     }
 
     func applicationShouldTerminate(_ sender: NSApplication) -> NSApplication.TerminateReply {
