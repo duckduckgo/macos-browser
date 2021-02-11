@@ -34,6 +34,8 @@ final class Tab: NSObject {
 
     weak var delegate: TabDelegate?
 
+    private var webViewReconfigurationCancellable: AnyCancellable?
+
     init(faviconService: FaviconService = LocalFaviconService.shared,
          webViewConfiguration: WebViewConfiguration? = nil,
          url: URL? = nil,
@@ -56,13 +58,15 @@ final class Tab: NSObject {
 
         setupWebView()
         if webView.configuration.userContentController.userScripts.isEmpty {
-            setupUserScripts()
+            installUserScripts()
         }
 
         if let favicon = favicon,
            let host = url?.host {
             faviconService.storeIfNeeded(favicon: favicon, for: host, isFromUserScript: false)
         }
+
+        subscribeToWebViewReconfigurationEvents()
     }
 
     deinit {
@@ -154,6 +158,23 @@ final class Tab: NSObject {
         }
     }
 
+    // MARK: - WebView Reconfiguration
+
+    private func subscribeToWebViewReconfigurationEvents() {
+        webViewReconfigurationCancellable = ConfigurationManager.webViewReconfigurationPublisher()
+            .subscribe(on: DispatchQueue.main)
+            .sink { _ in
+            self.reconfigureWebView()
+        }
+    }
+
+    private func reconfigureWebView() {
+        print("***", #function)
+        webView.configuration.reinstallContentBlocker()
+        webView.configuration.userContentController.removeAllUserScripts()
+        installUserScripts()
+    }
+
     // MARK: - Favicon
 
     @Published var favicon: NSImage?
@@ -197,7 +218,7 @@ final class Tab: NSObject {
         self.contentBlockerRulesScript
     ]
 
-    private func setupUserScripts() {
+    private func installUserScripts() {
         debugScript.instrumentation = instrumentation
         faviconScript.delegate = self
         html5downloadScript.delegate = self

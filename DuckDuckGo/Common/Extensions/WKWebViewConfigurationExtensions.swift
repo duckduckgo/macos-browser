@@ -46,4 +46,9 @@ extension WKWebViewConfiguration {
         }
     }
 
+    func reinstallContentBlocker() {
+        userContentController.removeAllContentRuleLists()
+        installContentBlockingRules()
+    }
+
 }

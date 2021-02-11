@@ -35,6 +35,7 @@ class ConfigurationManager {
         static let downloadTimeoutSeconds = 60.0 * 5
         static let refreshPeriodSeconds = 60.0 * 60 * 12
         static let retryDelaySeconds = 60.0 * 60
+        static let refreshCheckIntervalSeconds = 60.0
     }
 
     static let shared = ConfigurationManager()
@@ -44,16 +45,29 @@ class ConfigurationManager {
     @UserDefaultsWrapper(key: .configLastUpdated, defaultValue: Date())
     var lastUpdateTime: Date
 
-    private var cancellable: AnyCancellable?
+    private var webViewNeedsReconfiguredSubject = PassthroughSubject<Void, Never>()
 
-    private init() { }
+    private var timerCancellable: AnyCancellable?
+    private var refreshCancellable: AnyCancellable?
 
-    func updateConfigIfReady() {
-        guard self.isReadyToUpdate(), cancellable == nil else { return }
+    private init() {
+        timerCancellable = Timer.publish(every: 1, on: .main, in: .default)
+            .autoconnect()
+            .receive(on: self.queue)
+            .sink(receiveValue: { _ in
+                self.refreshIfNeeded()
+            })
+    }
+
+    public static func webViewReconfigurationPublisher() -> AnyPublisher<Void, Never> {
+        return Self.shared.webViewNeedsReconfiguredSubject.share().eraseToAnyPublisher()
+    }
+
+    private func refreshNow() {
 
         let configDownloader: ConfigurationDownloader = DefaultConfigurationDownloader(deliveryQueue: self.queue)
 
-        cancellable =
+        refreshCancellable =
 
             Publishers.MergeMany(
 
@@ -86,7 +100,7 @@ class ConfigurationManager {
                     self.tryAgainLater()
                 }
 
-                self.cancellable = nil
+                self.refreshCancellable = nil
                 configDownloader.cancelAll()
 
             } receiveValue: { _ in
@@ -94,7 +108,13 @@ class ConfigurationManager {
             }
 
     }
-    private func isReadyToUpdate() -> Bool {
+
+    private func refreshIfNeeded() {
+        guard self.isReadyToRefresh(), refreshCancellable == nil else { return }
+        refreshNow()
+    }
+
+    private func isReadyToRefresh() -> Bool {
         return Date().timeIntervalSince(lastUpdateTime) > Constants.refreshPeriodSeconds
     }
 
@@ -110,9 +130,7 @@ class ConfigurationManager {
     private func updateTrackerBlockingDependencies() throws {
         print("***", #function)
         TrackerRadarManager.shared.reload()
-
-        // TODO recompile the blocker rules
-        // TODO tell the open tabs to reconfigure their webviews
+        webViewNeedsReconfiguredSubject.send(())
     }
 
     private func updateBloomFilter() throws {

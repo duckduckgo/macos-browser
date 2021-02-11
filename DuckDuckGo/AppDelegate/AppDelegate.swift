@@ -45,11 +45,9 @@ class AppDelegate: NSObject, NSApplicationDelegate {
 
         urlEventListener.listen()
 
-        // If this affects performance, then we should remove it, but
-        //  shouldn't happen very often after the first update.
-        // DefaultConfigurationStorage.shared.removeAll()
-        ConfigurationManager.shared.lastUpdateTime = .distantPast
-        ConfigurationManager.shared.updateConfigIfReady()
+        DispatchQueue.main.asyncAfter(deadline: .now() + 60) {
+            ConfigurationManager.shared.lastUpdateTime = .distantPast
+        }
     }
 
     func applicationDidFinishLaunching(_ aNotification: Notification) {
