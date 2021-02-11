@@ -45,13 +45,13 @@ class ConfigurationManager {
     @UserDefaultsWrapper(key: .configLastUpdated, defaultValue: Date())
     var lastUpdateTime: Date
 
-    private var webViewNeedsReconfiguredSubject = PassthroughSubject<Void, Never>()
+    private var trackerBlockerDataUpdatedSubject = PassthroughSubject<Void, Never>()
 
     private var timerCancellable: AnyCancellable?
     private var refreshCancellable: AnyCancellable?
 
     private init() {
-        timerCancellable = Timer.publish(every: 1, on: .main, in: .default)
+        timerCancellable = Timer.publish(every: Constants.refreshCheckIntervalSeconds, on: .main, in: .default)
             .autoconnect()
             .receive(on: self.queue)
             .sink(receiveValue: { _ in
@@ -59,8 +59,8 @@ class ConfigurationManager {
             })
     }
 
-    public static func webViewReconfigurationPublisher() -> AnyPublisher<Void, Never> {
-        return Self.shared.webViewNeedsReconfiguredSubject.share().eraseToAnyPublisher()
+    public static func trackerBlockerDataUpdatedPublisher() -> AnyPublisher<Void, Never> {
+        return Self.shared.trackerBlockerDataUpdatedSubject.share().eraseToAnyPublisher()
     }
 
     private func refreshNow() {
@@ -130,7 +130,7 @@ class ConfigurationManager {
     private func updateTrackerBlockingDependencies() throws {
         print("***", #function)
         TrackerRadarManager.shared.reload()
-        webViewNeedsReconfiguredSubject.send(())
+        trackerBlockerDataUpdatedSubject.send(())
     }
 
     private func updateBloomFilter() throws {

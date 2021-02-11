@@ -161,8 +161,8 @@ final class Tab: NSObject {
     // MARK: - WebView Reconfiguration
 
     private func subscribeToWebViewReconfigurationEvents() {
-        webViewReconfigurationCancellable = ConfigurationManager.webViewReconfigurationPublisher()
-            .subscribe(on: DispatchQueue.main)
+        webViewReconfigurationCancellable = ConfigurationManager.trackerBlockerDataUpdatedPublisher()
+            .receive(on: DispatchQueue.main)
             .sink { _ in
             self.reconfigureWebView()
         }
