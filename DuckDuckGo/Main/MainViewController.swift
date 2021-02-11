@@ -33,7 +33,7 @@ class MainViewController: NSViewController {
     private(set) weak var browserTabViewController: BrowserTabViewController?
     private(set) weak var findInPageViewController: FindInPageViewController?
 
-    var tabCollectionViewModel = TabCollectionViewModel()
+    let tabCollectionViewModel: TabCollectionViewModel
 
     private var selectedTabViewModelCancellable: AnyCancellable?
     private var canGoForwardCancellable: AnyCancellable?
@@ -42,6 +42,16 @@ class MainViewController: NSViewController {
     private var findInPageCancellable: AnyCancellable?
     private var keyDownMonitor: Any?
 
+    required init?(coder: NSCoder) {
+        self.tabCollectionViewModel = TabCollectionViewModel()
+        super.init(coder: coder)
+    }
+
+    init?(coder: NSCoder, tabCollectionViewModel: TabCollectionViewModel) {
+        self.tabCollectionViewModel = tabCollectionViewModel
+        super.init(coder: coder)
+    }
+
     override func viewDidLoad() {
         super.viewDidLoad()
 
@@ -49,6 +59,14 @@ class MainViewController: NSViewController {
         subscribeToSelectedTabViewModel()
         subscribeToCanInsertLastRemovedTab()
         findInPageContainerView.applyDropShadow()
+    }
+    
+    override func viewDidLayout() {
+        findInPageContainerView.applyDropShadow()
+    }
+
+    override func encodeRestorableState(with coder: NSCoder) {
+        fatalError("Default AppKit State Restoration should not be used")
     }
 
     func windowDidBecomeMain() {
@@ -63,7 +81,7 @@ class MainViewController: NSViewController {
             keyDownMonitor = nil
         }
 
-        tabCollectionViewModel.removeAllTabs()
+        tabBarViewController?.hideTooltip()
     }
 
     @IBSegueAction

@@ -44,7 +44,7 @@ class WKBackForwardListItemViewModel {
             return NSImage(named: "HomeFavicon")
         }
 
-        if let host = backForwardListItem.url.host, let favicon = faviconService.getCachedFavicon(for: host) {
+        if let host = backForwardListItem.url.host, let favicon = faviconService.getCachedFavicon(for: host, mustBeFromUserScript: false) {
             favicon.size = NSSize(width: 16, height: 16)
             return favicon
         }

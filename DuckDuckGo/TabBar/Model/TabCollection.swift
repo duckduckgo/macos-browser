@@ -19,10 +19,14 @@
 import Foundation
 import os.log
 
-class TabCollection {
+final class TabCollection: NSObject {
 
-    @Published private(set) var tabs: [Tab] = []
+    @Published private(set) var tabs: [Tab]
     @Published private(set) var lastRemovedTabCache: (url: URL?, index: Int)?
+
+    init(tabs: [Tab] = []) {
+        self.tabs = tabs
+    }
 
     func append(tab: Tab) {
         tabs.append(tab)
@@ -49,9 +53,8 @@ class TabCollection {
         return true
     }
 
-    func removeAllAndAppend(tab: Tab) {
-        tabs.removeAll()
-        tabs.insert(tab, at: 0)
+    func removeAll(andAppend tab: Tab? = nil) {
+        tabs = tab.map { [$0] } ?? []
     }
 
     func moveTab(at index: Int, to newIndex: Int) {

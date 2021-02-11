@@ -38,7 +38,32 @@ class ColorView: NSView {
         }
     }
 
+    @IBInspectable var cornerRadius: CGFloat = 0 {
+        didSet {
+            layer!.cornerRadius = cornerRadius
+            layer!.masksToBounds = true
+        }
+    }
+
+    @IBInspectable var borderColor: NSColor? = nil {
+        didSet {
+            layer!.borderColor = borderColor?.cgColor
+        }
+    }
+
+    @IBInspectable var borderWidth: CGFloat = 0 {
+        didSet {
+            layer?.borderWidth = borderWidth
+        }
+    }
+
     func setupView() {
         self.wantsLayer = true
+    }
+    
+    override func updateLayer() {
+        super.updateLayer()
+        layer?.backgroundColor = backgroundColor?.cgColor
+        layer?.borderColor = borderColor?.cgColor
     }
 }

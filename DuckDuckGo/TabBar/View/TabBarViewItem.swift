@@ -202,9 +202,11 @@ class TabBarViewItem: NSCollectionViewItem {
     }
 
     private func updateSubviews() {
-        let backgroundColor = isSelected || isDragged ? NSColor(named: "InterfaceBackgroundColor") : NSColor.clear
-        view.layer?.backgroundColor = backgroundColor?.cgColor
-        mouseOverView.mouseOverColor = isSelected || isDragged ? NSColor.clear : NSColor(named: "TabMouseOverColor")
+        NSAppearance.withAppAppearance {
+            let backgroundColor = isSelected || isDragged ? NSColor.interfaceBackgroundColor : NSColor.clear
+            view.layer?.backgroundColor = backgroundColor.cgColor
+            mouseOverView.mouseOverColor = isSelected || isDragged ? NSColor.clear : NSColor.tabMouseOverColor
+        }
 
         rightSeparatorView.isHidden = isSelected || isDragged
         closeButton.isHidden = !isSelected && !isDragged && widthStage.isCloseButtonHidden

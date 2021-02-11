@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<document type="com.apple.InterfaceBuilder3.Cocoa.Storyboard.XIB" version="3.0" toolsVersion="17701" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none" useAutolayout="YES" initialViewController="B8D-0N-5wS">
+<document type="com.apple.InterfaceBuilder3.Cocoa.Storyboard.XIB" version="3.0" toolsVersion="17701" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none" useAutolayout="YES">
     <dependencies>
         <deployment identifier="macosx"/>
         <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="17701"/>
@@ -10,7 +10,7 @@
         <!--Window Controller-->
         <scene sceneID="R2V-B0-nI4">
             <objects>
-                <windowController id="B8D-0N-5wS" customClass="MainWindowController" customModule="DuckDuckGo_Privacy_Browser" customModuleProvider="target" sceneMemberID="viewController">
+                <windowController storyboardIdentifier="mainWindowController" id="B8D-0N-5wS" customClass="MainWindowController" customModule="DuckDuckGo_Privacy_Browser" customModuleProvider="target" sceneMemberID="viewController">
                     <window key="window" allowsToolTipsWhenApplicationIsInactive="NO" autorecalculatesKeyViewLoop="NO" releasedWhenClosed="NO" visibleAtLaunch="NO" animationBehavior="documentWindow" frameAutosaveName="" titlebarAppearsTransparent="YES" titleVisibility="hidden" id="IQv-IB-iLA" customClass="MainWindow" customModule="DuckDuckGo_Privacy_Browser" customModuleProvider="target">
                         <windowStyleMask key="styleMask" titled="YES" closable="YES" miniaturizable="YES" resizable="YES" fullSizeContentView="YES"/>
                         <windowPositionMask key="initialPositionMask" leftStrut="YES" rightStrut="YES" topStrut="YES" bottomStrut="YES"/>
@@ -20,9 +20,6 @@
                             <outlet property="delegate" destination="B8D-0N-5wS" id="98r-iN-zZc"/>
                         </connections>
                     </window>
-                    <connections>
-                        <segue destination="XfG-lQ-9wD" kind="relationship" relationship="window.shadowedContentViewController" id="cq2-FE-JQM"/>
-                    </connections>
                 </windowController>
                 <customObject id="Oky-zY-oP4" userLabel="First Responder" customClass="NSResponder" sceneMemberID="firstResponder"/>
             </objects>
@@ -31,7 +28,7 @@
         <!--Main View Controller-->
         <scene sceneID="hIz-AP-VOD">
             <objects>
-                <viewController id="XfG-lQ-9wD" customClass="MainViewController" customModule="DuckDuckGo_Privacy_Browser" customModuleProvider="target" sceneMemberID="viewController">
+                <viewController storyboardIdentifier="mainViewController" id="XfG-lQ-9wD" customClass="MainViewController" customModule="DuckDuckGo_Privacy_Browser" customModuleProvider="target" sceneMemberID="viewController">
                     <view key="view" id="m2S-Jp-Qdl">
                         <rect key="frame" x="0.0" y="0.0" width="1024" height="789"/>
                         <autoresizingMask key="autoresizingMask"/>
@@ -54,8 +51,14 @@
                                     <segue destination="R9l-dg-lKa" kind="embed" destinationCreationSelector="createNavigationBarViewControllerWithCoder:sender:segueIdentifier:" id="Br9-o3-sQ8"/>
                                 </connections>
                             </containerView>
+                            <containerView translatesAutoresizingMaskIntoConstraints="NO" id="SYo-8W-jl3">
+                                <rect key="frame" x="0.0" y="0.0" width="1024" height="711"/>
+                                <connections>
+                                    <segue destination="wo6-dV-Q3Q" kind="embed" destinationCreationSelector="createWebViewControllerWithCoder:sender:segueIdentifier:" id="A2b-sp-a54"/>
+                                </connections>
+                            </containerView>
                             <customView translatesAutoresizingMaskIntoConstraints="NO" id="af1-Eb-VaG" userLabel="Separator" customClass="ColorView" customModule="DuckDuckGo_Privacy_Browser" customModuleProvider="target">
-                                <rect key="frame" x="0.0" y="711" width="1024" height="1"/>
+                                <rect key="frame" x="0.0" y="710" width="1024" height="1"/>
                                 <constraints>
                                     <constraint firstAttribute="height" constant="1" id="hrt-pu-NuL"/>
                                 </constraints>
@@ -65,12 +68,6 @@
                                     </userDefinedRuntimeAttribute>
                                 </userDefinedRuntimeAttributes>
                             </customView>
-                            <containerView translatesAutoresizingMaskIntoConstraints="NO" id="SYo-8W-jl3">
-                                <rect key="frame" x="0.0" y="0.0" width="1024" height="711"/>
-                                <connections>
-                                    <segue destination="wo6-dV-Q3Q" kind="embed" destinationCreationSelector="createWebViewControllerWithCoder:sender:segueIdentifier:" id="A2b-sp-a54"/>
-                                </connections>
-                            </containerView>
                             <containerView hidden="YES" translatesAutoresizingMaskIntoConstraints="NO" id="Jbn-9T-FNt" userLabel="Find in Page Container View">
                                 <rect key="frame" x="312" y="675" width="400" height="40"/>
                                 <constraints>
@@ -91,7 +88,7 @@
                             <constraint firstItem="Jbn-9T-FNt" firstAttribute="centerX" secondItem="wFH-xq-50o" secondAttribute="centerX" id="PQa-4m-EpD"/>
                             <constraint firstItem="SYo-8W-jl3" firstAttribute="top" secondItem="wFH-xq-50o" secondAttribute="bottom" id="SOg-lH-g5P"/>
                             <constraint firstItem="wFH-xq-50o" firstAttribute="leading" secondItem="m2S-Jp-Qdl" secondAttribute="leading" id="XQv-BZ-2ci"/>
-                            <constraint firstItem="SYo-8W-jl3" firstAttribute="top" secondItem="af1-Eb-VaG" secondAttribute="bottom" id="ZLC-J7-HaR"/>
+                            <constraint firstItem="af1-Eb-VaG" firstAttribute="top" secondItem="wFH-xq-50o" secondAttribute="bottom" id="ajK-M4-7Qf"/>
                             <constraint firstItem="lYg-bX-QrJ" firstAttribute="leading" secondItem="m2S-Jp-Qdl" secondAttribute="leading" id="kVB-Sz-8Sv"/>
                             <constraint firstItem="af1-Eb-VaG" firstAttribute="leading" secondItem="m2S-Jp-Qdl" secondAttribute="leading" id="oLA-yb-nB8"/>
                             <constraint firstAttribute="bottom" secondItem="SYo-8W-jl3" secondAttribute="bottom" id="tLa-XX-e8i"/>

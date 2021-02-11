@@ -74,7 +74,9 @@ class MouseOverView: NSView {
         }
 
         if isMouseOver {
-            layer?.backgroundColor = mouseOverColor.cgColor
+            NSAppearance.withAppAppearance {
+                layer?.backgroundColor = mouseOverColor.cgColor
+            }
         } else {
             layer?.backgroundColor = NSColor.clear.cgColor
         }

@@ -38,6 +38,12 @@ class AddressBarTextField: NSTextField {
         }
     }
 
+    var isSuggestionsWindowVisible: AnyPublisher<Bool, Never> {
+        self.publisher(for: \.suggestionsWindowController?.window?.isVisible)
+            .map { $0 ?? false }
+            .eraseToAnyPublisher()
+    }
+
     private var suggestionItemsCancellable: AnyCancellable?
     private var selectedSuggestionViewModelCancellable: AnyCancellable?
     private var selectedTabViewModelCancellable: AnyCancellable?
@@ -62,6 +68,10 @@ class AddressBarTextField: NSTextField {
 
     func clearValue() {
         value = .text("")
+        suggestionsViewModel.clearSelection()
+        suggestionsViewModel.suggestions.stopFetchingSuggestions()
+        suggestionsViewModel.userStringValue = nil
+        hideSuggestionsWindow()
     }
 
     private func subscribeToSuggestionItems() {
@@ -148,7 +158,11 @@ class AddressBarTextField: NSTextField {
             os_log("%s: Making url from address bar string failed", type: .error, className)
             return
         }
-        selectedTabViewModel.tab.url = url
+        if selectedTabViewModel.tab.url == url {
+            selectedTabViewModel.tab.reload()
+        } else {
+            selectedTabViewModel.tab.url = url
+        }
     }
 
     private func openNewTab(selected: Bool) {
@@ -184,6 +198,17 @@ class AddressBarTextField: NSTextField {
             case .suggestion(let suggestionViewModel): return suggestionViewModel.string
             }
         }
+
+        var isEmpty: Bool {
+            switch self {
+            case .text(let text):
+                return text.isEmpty
+            case .url(urlString: let urlString, url: _, userTyped: _):
+                return urlString.isEmpty
+            case .suggestion(let suggestion):
+                return suggestion.string.isEmpty
+            }
+        }
     }
 
     @Published private(set) var value: Value = .text("") {
@@ -211,8 +236,11 @@ class AddressBarTextField: NSTextField {
 
     // MARK: - Suffixes
 
-    static let textAttributes = [NSAttributedString.Key.font: NSFont.systemFont(ofSize: 13, weight: .regular),
-                                 .foregroundColor: NSColor.textColor]
+    static let textAttributes: [NSAttributedString.Key: Any] = [
+        .font: NSFont.systemFont(ofSize: 13, weight: .regular),
+        .foregroundColor: NSColor.textColor,
+        .kern: -0.16
+    ]
 
     enum Suffix {
         init?(value: Value) {
@@ -237,8 +265,8 @@ class AddressBarTextField: NSTextField {
         case search
         case visit(host: String)
 
-        static let suffixAttributes = [NSAttributedString.Key.font: NSFont.systemFont(ofSize: 12, weight: .light),
-                                       .foregroundColor: NSColor(named: "AddressBarSuffixColor")!]
+        static let suffixAttributes = [NSAttributedString.Key.font: NSFont.systemFont(ofSize: 13, weight: .light),
+                                       .foregroundColor: NSColor.addressBarSuffixColor]
 
         var attributedString: NSAttributedString {
             switch self {
@@ -249,8 +277,8 @@ class AddressBarTextField: NSTextField {
             }
         }
 
-        static let searchSuffix = " — \(UserText.addressBarSearchSuffix)"
-        static let visitSuffix = " — \(UserText.addressBarVisitSuffix)"
+        static let searchSuffix = " – \(UserText.addressBarSearchSuffix)"
+        static let visitSuffix = " – \(UserText.addressBarVisitSuffix)"
 
         var string: String {
             switch self {
@@ -328,22 +356,23 @@ class AddressBarTextField: NSTextField {
 
     // MARK: - Suggestions window
 
-    enum SuggestionsWindowSizes: CGFloat {
-        case padding = 10
+    enum SuggestionsWindowSizes {
+        static let padding = CGPoint(x: -20, y: 1)
     }
 
-    private var suggestionsWindowController: NSWindowController?
-
-    private func initSuggestionsWindow() {
-        let storyboard = NSStoryboard(name: "Suggestions", bundle: nil)
-        let creator: (NSCoder) -> SuggestionsViewController? = { coder in
-            let suggestionsViewController = SuggestionsViewController(coder: coder, suggestionsViewModel: self.suggestionsViewModel)
+    @objc dynamic private var suggestionsWindowController: NSWindowController?
+    private lazy var suggestionsViewController: SuggestionsViewController = {
+        NSStoryboard.suggestions.instantiateController(identifier: "SuggestionsViewController") { coder in
+            let suggestionsViewController = SuggestionsViewController(coder: coder,
+                                                                      suggestionsViewModel: self.suggestionsViewModel)
             suggestionsViewController?.delegate = self
             return suggestionsViewController
         }
+    }()
 
-        let windowController = storyboard.instantiateController(withIdentifier: "SuggestionsWindowController") as? NSWindowController
-        let suggestionsViewController = storyboard.instantiateController(identifier: "SuggestionsViewController", creator: creator)
+    private func initSuggestionsWindow() {
+        let windowController = NSStoryboard.suggestions
+            .instantiateController(withIdentifier: "SuggestionsWindowController") as? NSWindowController
 
         windowController?.contentViewController = suggestionsViewController
         self.suggestionsWindowController = windowController
@@ -388,16 +417,23 @@ class AddressBarTextField: NSTextField {
             return
         }
 
-        let padding = SuggestionsWindowSizes.padding.rawValue
-        suggestionsWindow.setFrame(NSRect(x: 0, y: 0, width: superview.frame.width + 2 * padding, height: 0), display: true)
+        let padding = SuggestionsWindowSizes.padding
+        suggestionsWindow.setFrame(NSRect(x: 0, y: 0, width: superview.frame.width - 2 * padding.x, height: 0), display: true)
 
         var point = superview.bounds.origin
-        point.x -= padding
+        point.x += padding.x
+        point.y += padding.y
 
         let converted = superview.convert(point, to: nil)
-        let screen = window.convertPoint(toScreen: converted)
+        let rounded = CGPoint(x: Int(converted.x), y: Int(converted.y))
+
+        let screen = window.convertPoint(toScreen: rounded)
         suggestionsWindow.setFrameTopLeftPoint(screen)
+
+        // pixel-perfect window adjustment for fractional points
+        suggestionsViewController.pixelPerfectConstraint.constant = converted.x - rounded.x
     }
+
 }
 
 extension Notification.Name {
@@ -431,6 +467,7 @@ extension AddressBarTextField: NSTextFieldDelegate {
         }
 
         if stringValue == "" {
+            suggestionsViewModel.suggestions.stopFetchingSuggestions()
             hideSuggestionsWindow()
         }
     }
@@ -476,6 +513,21 @@ extension AddressBarTextField: SuggestionsViewControllerDelegate {
         navigate()
     }
 
+    func shouldCloseSuggestionsWindow(forMouseEvent event: NSEvent) -> Bool {
+        // don't hide suggestions if clicking somewhere inside the Address Bar view
+        if let screenPoint = event.window?.convertPoint(toScreen: event.locationInWindow),
+           let point = self.window?.convertPoint(fromScreen: screenPoint),
+           superview!.bounds.contains(superview!.convert(point, from: nil)) {
+
+            return false
+        }
+
+        return true
+    }
 }
 
 // swiftlint:enable type_body_length
+
+fileprivate extension NSStoryboard {
+    static let suggestions = NSStoryboard(name: "Suggestions", bundle: .main)
+}

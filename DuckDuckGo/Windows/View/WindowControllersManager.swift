@@ -18,12 +18,13 @@
 
 import Cocoa
 import os.log
+import Combine
 
 class WindowControllersManager {
 
     static let shared = WindowControllersManager()
 
-    private(set) var mainWindowControllers = [MainWindowController]()
+    @Published private(set) var mainWindowControllers = [MainWindowController]()
     weak var lastKeyMainWindowController: MainWindowController?
 
     func register(_ windowController: MainWindowController) {
@@ -31,7 +32,11 @@ class WindowControllersManager {
     }
 
     func unregister(_ windowController: MainWindowController) {
-        mainWindowControllers.removeAll(where: { $0 === windowController })
+        guard let idx = mainWindowControllers.firstIndex(of: windowController) else {
+            os_log("WindowControllersManager: Window Controller not registered", type: .error)
+            return
+        }
+        mainWindowControllers.remove(at: idx)
     }
 
 }

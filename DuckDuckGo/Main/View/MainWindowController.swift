@@ -44,7 +44,6 @@ class MainWindowController: NSWindowController {
     override func windowDidLoad() {
         super.windowDidLoad()
         isLoaded = true
-        WindowControllersManager.shared.register(self)
 
         setupWindow()
         referenceWindowButtons()
@@ -150,6 +149,11 @@ class MainWindowController: NSWindowController {
                                   y: contentView.frame.size.height - WindowButtonTopSpace.common,
                                   width: zoomWidget.frame.size.width,
                                   height: zoomWidget.frame.size.height)
+    }
+
+    override func showWindow(_ sender: Any?) {
+        window!.makeKeyAndOrderFront(sender)
+        WindowControllersManager.shared.register(self)
     }
 
 }

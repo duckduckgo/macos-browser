@@ -20,8 +20,9 @@ import Cocoa
 
 protocol FaviconService {
 
-    func fetchFavicon(_ faviconUrl: URL?, for host: String, completion: @escaping (NSImage?, Error?) -> Void)
-    func getCachedFavicon(for host: String) -> NSImage?
+    func fetchFavicon(_ faviconUrl: URL?, for host: String, isFromUserScript: Bool, completion: @escaping (NSImage?, Error?) -> Void)
+    func getCachedFavicon(for host: String, mustBeFromUserScript: Bool) -> NSImage?
+    func storeIfNeeded(favicon: NSImage, for host: String, isFromUserScript: Bool)
 
 }
 
@@ -32,16 +33,29 @@ class LocalFaviconService: FaviconService {
     private enum FaviconName: String {
         case favicon = "favicon.ico"
     }
-
-    private var cache = [String: NSImage]()
+    
+    private struct CacheEntry {
+        let image: NSImage
+        let isFromUserScript: Bool
+    }
+    
+    private var cache = [String: CacheEntry]()
     private let queue = DispatchQueue(label: "LocalFaviconService queue", attributes: .concurrent)
 
     enum LocalFaviconServiceError: Error {
         case urlConstructionFailed
         case imageInitFailed
     }
+    
+    init() {
+        DistributedNotificationCenter.default.addObserver(
+            self,
+            selector: #selector(themeChanged),
+            name: NSNotification.Name(rawValue: "AppleInterfaceThemeChangedNotification"),
+            object: nil)
+    }
 
-    func fetchFavicon(_ faviconUrl: URL?, for host: String, completion: @escaping (NSImage?, Error?) -> Void) {
+    func fetchFavicon(_ faviconUrl: URL?, for host: String, isFromUserScript: Bool, completion: @escaping (NSImage?, Error?) -> Void) {
 
         func mainQueueCompletion(_ favicon: NSImage?, _ error: Error?) {
             DispatchQueue.main.async {
@@ -50,7 +64,7 @@ class LocalFaviconService: FaviconService {
         }
 
         queue.async {
-            if let cachedFavicon = self.getCachedFavicon(for: host) {
+            if let cachedFavicon = self.getCachedFavicon(for: host, mustBeFromUserScript: isFromUserScript) {
                 mainQueueCompletion(cachedFavicon, nil)
                 return
             }
@@ -62,26 +76,43 @@ class LocalFaviconService: FaviconService {
 
             guard let image = NSImage(contentsOf: url), image.isValid else {
                 if let newHost = host.dropSubdomain(), faviconUrl == nil {
-                    self.fetchFavicon(nil, for: newHost, completion: completion)
+                    self.fetchFavicon(nil, for: newHost, isFromUserScript: isFromUserScript, completion: completion)
                 } else {
                     mainQueueCompletion(nil, LocalFaviconServiceError.imageInitFailed)
                 }
                 return
             }
 
-            self.store(favicon: image, for: host)
+            self.storeIfNeeded(favicon: image, for: host, isFromUserScript: isFromUserScript)
             mainQueueCompletion(image, nil)
         }
     }
 
-    func store(favicon: NSImage, for host: String) {
+    func storeIfNeeded(favicon: NSImage, for host: String, isFromUserScript: Bool) {
         queue.async(flags: .barrier) {
-            self.cache[host] = favicon
+            // Don't replace a favicon from the UserScript with one that isn't from the UserScript
+            if let entry = self.cache[host],
+               entry.isFromUserScript && !isFromUserScript {
+                return
+            }
+            self.cache[host] = CacheEntry(image: favicon, isFromUserScript: isFromUserScript)
         }
     }
 
-    func getCachedFavicon(for host: String) -> NSImage? {
-        return cache[host]
+    func getCachedFavicon(for host: String, mustBeFromUserScript: Bool) -> NSImage? {
+        guard let entry = cache[host] else { return nil }
+        if mustBeFromUserScript && !entry.isFromUserScript {
+            return nil
+        }
+        return entry.image
+    }
+    
+    @objc func themeChanged() {
+        invalidateCache()
+    }
+    
+    private func invalidateCache() {
+        cache = [String: CacheEntry]()
     }
 
 }

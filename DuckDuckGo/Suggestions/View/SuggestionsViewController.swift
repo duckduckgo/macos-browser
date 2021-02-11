@@ -22,6 +22,7 @@ import os.log
 
 protocol SuggestionsViewControllerDelegate: AnyObject {
 
+    func shouldCloseSuggestionsWindow(forMouseEvent event: NSEvent) -> Bool
     func suggestionsViewControllerDidConfirmSelection(_ suggestionsViewController: SuggestionsViewController)
 
 }
@@ -32,6 +33,7 @@ class SuggestionsViewController: NSViewController {
 
     @IBOutlet weak var tableView: NSTableView!
     @IBOutlet weak var tableViewHeightConstraint: NSLayoutConstraint!
+    @IBOutlet weak var pixelPerfectConstraint: NSLayoutConstraint!
 
     let suggestionsViewModel: SuggestionsViewModel
 
@@ -48,8 +50,9 @@ class SuggestionsViewController: NSViewController {
     var suggestionsCancellable: AnyCancellable?
     var selectionIndexCancellable: AnyCancellable?
 
-    var mouseUpEventsMonitor: Any?
-    var mouseDownEventsMonitor: Any?
+    private var mouseUpEventsMonitor: Any?
+    private var mouseDownEventsMonitor: Any?
+    private var appObserver: Any?
 
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -66,7 +69,10 @@ class SuggestionsViewController: NSViewController {
     override func viewWillAppear() {
         super.viewWillAppear()
 
-        addMouseEventsMonitors()
+        self.view.window!.isOpaque = false
+        self.view.window!.backgroundColor = .clear
+        
+        addMonitors()
     }
 
     override func viewWillDisappear() {
@@ -92,12 +98,22 @@ class SuggestionsViewController: NSViewController {
         tableView.addTrackingArea(trackingArea)
     }
 
-    private func addMouseEventsMonitors() {
+    private func addMonitors() {
         let upEventTypes: NSEvent.EventTypeMask = [.leftMouseUp, .rightMouseUp]
-        mouseUpEventsMonitor = NSEvent.addLocalMonitorForEvents(matching: upEventTypes, handler: mouseUp)
+        mouseUpEventsMonitor = NSEvent.addLocalMonitorForEvents(matching: upEventTypes) { [weak self] event in
+            self?.mouseUp(with: event)
+        }
 
         let downEventTypes: NSEvent.EventTypeMask = [.leftMouseDown, .rightMouseDown]
-        mouseDownEventsMonitor = NSEvent.addLocalMonitorForEvents(matching: downEventTypes, handler: mouseDown)
+        mouseDownEventsMonitor = NSEvent.addLocalMonitorForEvents(matching: downEventTypes) { [weak self] event in
+            self?.mouseDown(with: event)
+        }
+
+        appObserver = NotificationCenter.default.addObserver(forName: NSApplication.didResignActiveNotification,
+                                                             object: nil,
+                                                             queue: nil) { [weak self] _ in
+            self?.closeWindow()
+        }
     }
 
     private func removeMouseEventsMonitor() {
@@ -174,16 +190,20 @@ class SuggestionsViewController: NSViewController {
     }
 
     func mouseDown(with event: NSEvent) -> NSEvent? {
-        if event.window == view.window {
+        if event.window === view.window {
             return nil
         }
-
-        closeWindow()
+        if delegate?.shouldCloseSuggestionsWindow(forMouseEvent: event) ?? true {
+            closeWindow()
+        }
+        
         return event
     }
 
     func mouseUp(with event: NSEvent) -> NSEvent? {
-        if event.window == view.window {
+        if event.window === view.window,
+           tableView.bounds.contains(tableView.convert(event.locationInWindow, from: nil)) {
+
             closeWindow()
             delegate?.suggestionsViewControllerDidConfirmSelection(self)
             return nil
@@ -197,9 +217,11 @@ class SuggestionsViewController: NSViewController {
             return
         }
 
-        let padding: CGFloat = 2 * 10
-        let rowHeight = SuggestionTableRowView.Size.height.rawValue
-        tableViewHeightConstraint.constant = CGFloat(suggestionsViewModel.numberOfSuggestions) * rowHeight + padding
+        let rowHeight = tableView.rowHeight
+
+        tableViewHeightConstraint.constant = CGFloat(suggestionsViewModel.numberOfSuggestions) * rowHeight
+            + (tableView.enclosingScrollView?.contentInsets.top ?? 0)
+            + (tableView.enclosingScrollView?.contentInsets.bottom ?? 0)
     }
 
     private func closeWindow() {
