@@ -117,8 +117,14 @@ class SuggestionsViewController: NSViewController {
     }
 
     private func removeMouseEventsMonitor() {
-        if let monitor = mouseUpEventsMonitor {
-            NSEvent.removeMonitor(monitor)
+        if let upEventMonitor = mouseUpEventsMonitor {
+            NSEvent.removeMonitor(upEventMonitor)
+            mouseUpEventsMonitor = nil
+        }
+
+        if let downEventMonitor = mouseDownEventsMonitor {
+            NSEvent.removeMonitor(downEventMonitor)
+            mouseDownEventsMonitor = nil
         }
     }
 

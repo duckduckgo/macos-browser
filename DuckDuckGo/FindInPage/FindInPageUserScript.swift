@@ -20,7 +20,7 @@ import WebKit
 
 class FindInPageUserScript: UserScript {
 
-    var model: FindInPageModel?
+    weak var model: FindInPageModel?
 
     init() {
         super.init(source: Self.source,

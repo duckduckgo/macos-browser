@@ -24,7 +24,7 @@ import Combine
 class BrowserTabViewController: NSViewController {
 
     @IBOutlet weak var errorView: NSView!
-    var webView: WebView?
+    weak var webView: WebView?
     var tabViewModel: TabViewModel?
 
     private let tabCollectionViewModel: TabCollectionViewModel

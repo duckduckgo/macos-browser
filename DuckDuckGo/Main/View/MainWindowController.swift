@@ -203,6 +203,9 @@ extension MainWindowController: NSWindowDelegate {
 
         mainViewController.windowWillClose()
 
+        window?.resignKey()
+        window?.resignMain()
+
         // Unregistering triggers deinitialization of this object.
         // Because it's also the delegate, deinit within this method caused crash
         DispatchQueue.main.async {

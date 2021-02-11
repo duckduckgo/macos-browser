@@ -65,7 +65,7 @@
 	<key>NSHumanReadableCopyright</key>
 	<string>Copyright © 2020 DuckDuckGo. All rights reserved.</string>
 	<key>NSMainStoryboardFile</key>
-	<string>Main</string>
+	<string>Launch</string>
 	<key>NSPrincipalClass</key>
 	<string>NSApplication</string>
 	<key>NSSupportsAutomaticTermination</key>

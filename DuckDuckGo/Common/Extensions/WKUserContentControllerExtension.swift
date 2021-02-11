@@ -26,9 +26,9 @@ extension WKUserContentController {
 
         for messageName in userScript.messageNames {
             if #available(OSX 11.0, *) {
-                add(userScript.leakAvoider, contentWorld: .defaultClient, name: messageName)
+                add(userScript, contentWorld: .defaultClient, name: messageName)
             } else {
-                add(userScript.leakAvoider, name: messageName)
+                add(userScript, name: messageName)
             }
         }
     }
