@@ -110,6 +110,7 @@ class ConfigurationManager {
     private func updateTrackerBlockingDependencies() throws {
         print("***", #function)
         TrackerRadarManager.shared.reload()
+
         // TODO recompile the blocker rules
         // TODO tell the open tabs to reconfigure their webviews
     }

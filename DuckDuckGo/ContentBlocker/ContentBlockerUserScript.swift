@@ -75,12 +75,15 @@ extension ContentBlockerUserScript {
     static let messageNames = ["trackerDetectedMessage"]
 
     static let source: String = {
-        let trackerData = TrackerRadarManager.shared.encodedTrackerData!
+        // Use sensible defaults in case the upstream data is unparsable
+        let trackerData = TrackerRadarManager.shared.encodedTrackerData ?? "{}"
+        let surrogates = DefaultConfigurationStorage.shared.loadData(for: .surrogates) ?? Data()
+        let unprotectedSites = DefaultConfigurationStorage.shared.loadData(for: .temporaryUnprotectedSites) ?? Data()
 
         return loadJS("contentblocker", withReplacements: [
-            "${unprotectedDomains}": "",
+            "${unprotectedDomains}": String(data: unprotectedSites, encoding: .utf8) ?? "",
             "${trackerData}": trackerData,
-            "${surrogates}": ""
+            "${surrogates}": String(data: surrogates, encoding: .utf8) ?? ""
         ])
     }()
 
