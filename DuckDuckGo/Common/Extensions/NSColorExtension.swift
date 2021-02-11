@@ -51,15 +51,11 @@ extension NSColor {
     static var suggestionIconColor: NSColor {
         NSColor(named: "SuggestionIconColor")!
     }
-    
+
     static var selectedSuggestionTintColor: NSColor {
         NSColor(named: "SelectedSuggestionTintColor")!
     }
-    
-    static var selectedSuggestionBackgroundColor: NSColor {
-        NSColor(named: "SelectedSuggestionBackgroundColor")!
-    }
-    
+
     static var interfaceBackgroundColor: NSColor {
         NSColor(named: "InterfaceBackgroundColor")!
     }

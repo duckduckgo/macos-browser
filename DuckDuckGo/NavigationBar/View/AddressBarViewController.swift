@@ -104,7 +104,7 @@ class AddressBarViewController: NSViewController {
         addressBarTextField.clearValue()
     }
     
-    @IBOutlet var focusRingView: ShadowView!
+    @IBOutlet var shadowView: ShadowView!
 
     private func subscribeToSelectedTabViewModel() {
         selectedTabViewModelCancellable = tabCollectionViewModel.$selectedTabViewModel.receive(on: DispatchQueue.main).sink { [weak self] _ in
@@ -146,43 +146,37 @@ class AddressBarViewController: NSViewController {
         addressBarTextField.alphaValue = firstResponder ? 1 : 0
         passiveTextField.alphaValue = firstResponder ? 0 : 1
 
-        updateFocusRingView(firstResponder: firstResponder)
+        updateShadowView(firstResponder: firstResponder)
         inactiveBackgroundView.alphaValue = firstResponder ? 0 : 1
         activeBackgroundView.alphaValue = firstResponder ? 1 : 0
     }
 
-    private func updateFocusRingView(firstResponder: Bool) {
+    private func updateShadowView(firstResponder: Bool) {
         guard firstResponder else {
             isSuggestionsVisibleCancellable = nil
-            focusRingView.removeFromSuperview()
+            frameCancellable = nil
+            shadowView.removeFromSuperview()
             return
         }
 
-        isSuggestionsVisibleCancellable = addressBarTextField.isSuggestionsWindowVisible
-            .sink { [weak self] visible in
-                self?.focusRingView.shadowSides = visible
-                    ? [.left, .top, .right]
-                    : .all
-                self?.focusRingView.shadowColor = visible
-                    ? .suggestionsShadowColor
-                    : .addressBarShadowColor
-                self?.focusRingView.shadowRadius = visible
-                    ? 8.0
-                    : 4.0
-                self?.activeBackgroundViewOverHeight.isActive = visible
+        isSuggestionsVisibleCancellable = addressBarTextField.isSuggestionsWindowVisible.sink { [weak self] visible in
+            self?.shadowView.shadowSides = visible ? [.left, .top, .right] : .all
+            self?.shadowView.shadowColor = visible ? .suggestionsShadowColor : .addressBarShadowColor
+            self?.shadowView.shadowRadius = visible ? 8.0 : 4.0
+            self?.activeBackgroundViewOverHeight.isActive = visible
         }
         frameCancellable = self.view.superview?.publisher(for: \.frame).sink { [weak self] _ in
-            self?.layoutFocusRingView()
+            self?.layoutShadowView()
         }
-        view.window?.contentView?.addSubview(focusRingView)
+        view.window?.contentView?.addSubview(shadowView)
     }
 
-    private func layoutFocusRingView() {
-        guard let superview = focusRingView.superview else { return }
+    private func layoutShadowView() {
+        guard let superview = shadowView.superview else { return }
 
         let winFrame = self.view.convert(self.view.bounds, to: nil)
         let frame = superview.convert(winFrame, from: nil)
-        focusRingView.frame = frame
+        shadowView.frame = frame
     }
 
     private func updateButtons() {

@@ -370,11 +370,11 @@
                         <outlet property="activeBackgroundViewOverHeight" destination="WCn-tU-JoP" id="8FS-jG-1qv"/>
                         <outlet property="addressBarTextField" destination="zaX-wZ-E3D" id="pfO-d4-i46"/>
                         <outlet property="clearButton" destination="WKw-DB-V3R" id="dW7-iS-PYV"/>
-                        <outlet property="focusRingView" destination="ktI-g4-Uk6" id="v81-tf-DGJ"/>
                         <outlet property="imageButton" destination="XMM-Vd-9H5" id="gBC-5k-4hV"/>
                         <outlet property="inactiveBackgroundView" destination="ENV-0H-Fcc" id="OV5-2s-Ggq"/>
                         <outlet property="passiveTextField" destination="le0-Hn-ZAC" id="npL-R1-gmH"/>
                         <outlet property="privacyEntryPointButton" destination="Wmw-FG-ZMU" id="J8F-44-HJL"/>
+                        <outlet property="shadowView" destination="ktI-g4-Uk6" id="v81-tf-DGJ"/>
                         <outlet property="view" destination="wj6-L2-5rJ" id="bsr-e7-gS7"/>
                     </connections>
                 </viewController>

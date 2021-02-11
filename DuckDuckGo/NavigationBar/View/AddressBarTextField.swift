@@ -357,7 +357,7 @@ class AddressBarTextField: NSTextField {
     // MARK: - Suggestions window
 
     enum SuggestionsWindowSizes {
-        static let padding: CGFloat = 20
+        static let padding = CGPoint(x: -20, y: 1)
     }
 
     @objc dynamic private var suggestionsWindowController: NSWindowController?
@@ -418,11 +418,11 @@ class AddressBarTextField: NSTextField {
         }
 
         let padding = SuggestionsWindowSizes.padding
-        suggestionsWindow.setFrame(NSRect(x: 0, y: 0, width: superview.frame.width + 2 * padding, height: 0), display: true)
+        suggestionsWindow.setFrame(NSRect(x: 0, y: 0, width: superview.frame.width - 2 * padding.x, height: 0), display: true)
 
         var point = superview.bounds.origin
-        point.x -= padding
-        point.y += 1
+        point.x += padding.x
+        point.y += padding.y
 
         let converted = superview.convert(point, to: nil)
         let rounded = CGPoint(x: Int(converted.x), y: Int(converted.y))
