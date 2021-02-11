@@ -22,11 +22,6 @@ import os.log
 class SuggestionTableRowView: NSTableRowView {
 
     static let identifier = "SuggestionTableRowView"
-    static let selectionBackroundColor = NSColor.selectedSuggestionBackgroundColor
-
-    enum Size: CGFloat {
-        case height = 22
-    }
 
     override func awakeFromNib() {
         super.awakeFromNib()
@@ -56,7 +51,7 @@ class SuggestionTableRowView: NSTableRowView {
     }
 
     private func updateBackgroundColor() {
-        backgroundColor = isSelected ? Self.selectionBackroundColor : NSColor.clear
+        backgroundColor = isSelected ? .controlAccentColor : .clear
     }
 
     private func updateCellView() {

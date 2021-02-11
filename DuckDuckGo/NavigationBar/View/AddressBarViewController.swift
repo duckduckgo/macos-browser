@@ -24,14 +24,15 @@ class AddressBarViewController: NSViewController {
 
     static let homeFaviconImage = NSImage(named: "HomeFavicon")
     static let webImage = NSImage(named: "Web")
-    static let refreshImage = NSImage(named: "Refresh")
-    static let clearImage = NSImage(named: "Clear")
 
     @IBOutlet weak var addressBarTextField: AddressBarTextField!
     @IBOutlet weak var passiveTextField: NSTextField!
-    @IBOutlet weak var actionButton: NSButton!
+    @IBOutlet weak var clearButton: NSButton!
     @IBOutlet weak var imageButton: NSButton!
     @IBOutlet weak var privacyEntryPointButton: NSButton!
+    @IBOutlet var inactiveBackgroundView: NSView!
+    @IBOutlet var activeBackgroundView: NSView!
+    @IBOutlet var activeBackgroundViewOverHeight: NSLayoutConstraint!
     
     private var tabCollectionViewModel: TabCollectionViewModel
     private let suggestionsViewModel = SuggestionsViewModel(suggestions: Suggestions())
@@ -48,9 +49,14 @@ class AddressBarViewController: NSViewController {
     }
 
     private var selectedTabViewModelCancellable: AnyCancellable?
-    private var reloadButtonCancellable: AnyCancellable?
     private var addressBarTextFieldValueCancellable: AnyCancellable?
     private var passiveAddressBarStringCancellable: AnyCancellable?
+    private var isSuggestionsVisibleCancellable: AnyCancellable?
+    private var frameCancellable: AnyCancellable?
+
+    private var clickPoint: NSPoint?
+    private var mouseDownMonitor: Any?
+    private var mouseUpMonitor: Any?
 
     required init?(coder: NSCoder) {
         fatalError("AddressBarViewController: Bad initializer")
@@ -78,11 +84,13 @@ class AddressBarViewController: NSViewController {
                                                selector: #selector(textFieldFirstReponderNotification(_:)),
                                                name: .firstResponder,
                                                object: nil)
+        addMouseMonitors()
     }
 
     // swiftlint:disable notification_center_detachment
     override func viewWillDisappear() {
         NotificationCenter.default.removeObserver(self)
+        removeMouseMonitors()
     }
     // swiftlint:enable notification_center_detachment
 
@@ -92,26 +100,17 @@ class AddressBarViewController: NSViewController {
         addressBarTextField.viewDidLayout()
     }
 
-    @IBAction func actionButtonAction(_ sender: NSButton) {
-        guard let selectedTabViewModel = tabCollectionViewModel.selectedTabViewModel else {
-            os_log("%s: Selected tab view model is nil", type: .error, className)
-            return
-        }
-
-        if actionButton.image === Self.refreshImage {
-            selectedTabViewModel.tab.reload()
-        } else {
-            addressBarTextField.clearValue()
-        }
+    @IBAction func clearButtonAction(_ sender: NSButton) {
+        addressBarTextField.clearValue()
     }
-
-    private var focusRingView: FocusRingView? {
-        return view as? FocusRingView
-    }
+    
+    @IBOutlet var shadowView: ShadowView!
 
     private func subscribeToSelectedTabViewModel() {
         selectedTabViewModelCancellable = tabCollectionViewModel.$selectedTabViewModel.receive(on: DispatchQueue.main).sink { [weak self] _ in
             self?.subscribeToPassiveAddressBarString()
+            // don't resign first responder on tab switching
+            self?.clickPoint = nil
         }
     }
 
@@ -147,7 +146,37 @@ class AddressBarViewController: NSViewController {
         addressBarTextField.alphaValue = firstResponder ? 1 : 0
         passiveTextField.alphaValue = firstResponder ? 0 : 1
 
-        focusRingView?.updateView(stroke: firstResponder)
+        updateShadowView(firstResponder: firstResponder)
+        inactiveBackgroundView.alphaValue = firstResponder ? 0 : 1
+        activeBackgroundView.alphaValue = firstResponder ? 1 : 0
+    }
+
+    private func updateShadowView(firstResponder: Bool) {
+        guard firstResponder else {
+            isSuggestionsVisibleCancellable = nil
+            frameCancellable = nil
+            shadowView.removeFromSuperview()
+            return
+        }
+
+        isSuggestionsVisibleCancellable = addressBarTextField.isSuggestionsWindowVisible.sink { [weak self] visible in
+            self?.shadowView.shadowSides = visible ? [.left, .top, .right] : .all
+            self?.shadowView.shadowColor = visible ? .suggestionsShadowColor : .addressBarShadowColor
+            self?.shadowView.shadowRadius = visible ? 8.0 : 4.0
+            self?.activeBackgroundViewOverHeight.isActive = visible
+        }
+        frameCancellable = self.view.superview?.publisher(for: \.frame).sink { [weak self] _ in
+            self?.layoutShadowView()
+        }
+        view.window?.contentView?.addSubview(shadowView)
+    }
+
+    private func layoutShadowView() {
+        guard let superview = shadowView.superview else { return }
+
+        let winFrame = self.view.convert(self.view.bounds, to: nil)
+        let frame = superview.convert(winFrame, from: nil)
+        shadowView.frame = frame
     }
 
     private func updateButtons() {
@@ -158,34 +187,23 @@ class AddressBarViewController: NSViewController {
 
         let isSearchingMode = mode != .browsing
         let isURLNil = selectedTabViewModel.tab.url == nil
-        let isTextFieldFirstResponder = view.window?.firstResponder === addressBarTextField
         let isTextFieldEditorFirstResponder = view.window?.firstResponder === addressBarTextField.currentEditor()
         let isDuckDuckGoUrl = selectedTabViewModel.tab.url?.isDuckDuckGoSearch ?? false
 
         // Privacy entry point button
-        privacyEntryPointButton.isHidden = isSearchingMode || isTextFieldFirstResponder || isDuckDuckGoUrl || isURLNil
+        privacyEntryPointButton.isHidden = isSearchingMode || isTextFieldEditorFirstResponder || isDuckDuckGoUrl || isURLNil
         imageButton.isHidden = !privacyEntryPointButton.isHidden
 
-        // Action button
-        var actionButtonHidden = false
-        if case .text(let text) = addressBarTextField.value {
-            if text == "" {
-                actionButtonHidden = true
-            }
-        }
-        if actionButton.isHidden != actionButtonHidden {
-            actionButton.isHidden = actionButtonHidden
-        }
-        actionButton.image = isSearchingMode && isTextFieldEditorFirstResponder ? Self.clearImage : Self.refreshImage
+        clearButton.isHidden = !(isTextFieldEditorFirstResponder && !addressBarTextField.value.isEmpty)
 
         // Image button
-        imageButton.image = selectedTabViewModel.favicon
-        if case .searching(let withUrl) = mode {
-            if withUrl {
-                imageButton.image = Self.webImage
-            } else {
-                imageButton.image = Self.homeFaviconImage
-            }
+        switch mode {
+        case .browsing:
+            imageButton.image = selectedTabViewModel.favicon
+        case .searching(withUrl: true):
+            imageButton.image = Self.webImage
+        case .searching(withUrl: false):
+            imageButton.image = Self.homeFaviconImage
         }
     }
 
@@ -226,7 +244,10 @@ extension AddressBarViewController {
 extension AddressBarViewController {
 
     func registerForMouseEnteredAndExitedEvents() {
-        let trackingArea = NSTrackingArea(rect: self.view.bounds, options: [.activeAlways, .mouseEnteredAndExited], owner: self, userInfo: nil)
+        let trackingArea = NSTrackingArea(rect: self.view.bounds,
+                                          options: [.activeAlways, .mouseEnteredAndExited, .mouseMoved],
+                                          owner: self,
+                                          userInfo: nil)
         self.view.addTrackingArea(trackingArea)
     }
 
@@ -235,14 +256,85 @@ extension AddressBarViewController {
         super.mouseEntered(with: event)
     }
 
+    override func mouseMoved(with event: NSEvent) {
+        guard event.window === self.view.window else { return }
+
+        let point = self.view.convert(event.locationInWindow, from: nil)
+        let view = self.view.hitTest(point)
+
+        if view is NSButton {
+            NSCursor.arrow.set()
+        } else {
+            NSCursor.iBeam.set()
+        }
+
+        super.mouseMoved(with: event)
+    }
+
     override func mouseExited(with event: NSEvent) {
         NSCursor.arrow.set()
         super.mouseExited(with: event)
     }
 
-    override func mouseDown(with event: NSEvent) {
-        super.mouseDown(with: event)
-        addressBarTextField.makeMeFirstResponder()
+    func addMouseMonitors() {
+        guard mouseDownMonitor == nil, mouseUpMonitor == nil else { return }
+
+        self.mouseDownMonitor = NSEvent.addLocalMonitorForEvents(matching: .leftMouseDown) { [weak self] event in
+            self?.mouseDown(with: event)
+        }
+        self.mouseUpMonitor = NSEvent.addLocalMonitorForEvents(matching: .leftMouseUp) { [weak self] event in
+            self?.mouseUp(with: event)
+        }
+    }
+
+    func removeMouseMonitors() {
+        if let monitor = mouseDownMonitor {
+            NSEvent.removeMonitor(monitor)
+        }
+        if let monitor = mouseUpMonitor {
+            NSEvent.removeMonitor(monitor)
+        }
+        self.mouseUpMonitor = nil
+        self.mouseDownMonitor = nil
+    }
+
+    func mouseDown(with event: NSEvent) -> NSEvent? {
+        self.clickPoint = nil
+        guard event.window === self.view.window else { return event }
+
+        let point = self.view.convert(event.locationInWindow, from: nil)
+        if self.view.bounds.contains(point) {
+            guard self.view.window?.firstResponder !== addressBarTextField.currentEditor(),
+                !(self.view.hitTest(point) is NSButton)
+            else { return event }
+
+            // first activate app and window if needed, then make it first responder
+            if self.view.window?.isMainWindow == true {
+                self.addressBarTextField.makeMeFirstResponder()
+
+                return nil
+            } else {
+                DispatchQueue.main.async {
+                    self.addressBarTextField.makeMeFirstResponder()
+                }
+            }
+
+        } else if self.view.window?.isMainWindow == true {
+            self.clickPoint = event.locationInWindow
+        }
+        return event
+    }
+
+    func mouseUp(with event: NSEvent) -> NSEvent? {
+        // click (same position down+up) outside of the field: resign first responder
+        guard event.window === self.view.window,
+              self.view.window?.firstResponder === addressBarTextField.currentEditor(),
+              self.clickPoint == event.locationInWindow
+        else { return event }
+
+        self.view.window?.makeFirstResponder(nil)
+
+        return event
     }
 
 }

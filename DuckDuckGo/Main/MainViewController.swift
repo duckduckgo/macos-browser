@@ -28,10 +28,10 @@ class MainViewController: NSViewController {
     @IBOutlet weak var webContainerView: NSView!
     @IBOutlet weak var findInPageContainerView: NSView!
 
-    private(set) var tabBarViewController: TabBarViewController?
-    private(set) var navigationBarViewController: NavigationBarViewController?
-    private(set) var browserTabViewController: BrowserTabViewController?
-    private(set) var findInPageViewController: FindInPageViewController?
+    private(set) weak var tabBarViewController: TabBarViewController?
+    private(set) weak var navigationBarViewController: NavigationBarViewController?
+    private(set) weak var browserTabViewController: BrowserTabViewController?
+    private(set) weak var findInPageViewController: FindInPageViewController?
 
     let tabCollectionViewModel: TabCollectionViewModel
 
@@ -40,6 +40,7 @@ class MainViewController: NSViewController {
     private var canGoBackCancellable: AnyCancellable?
     private var canInsertLastRemovedTabCancellable: AnyCancellable?
     private var findInPageCancellable: AnyCancellable?
+    private var keyDownMonitor: Any?
 
     required init?(coder: NSCoder) {
         self.tabCollectionViewModel = TabCollectionViewModel()
@@ -75,6 +76,11 @@ class MainViewController: NSViewController {
     }
 
     func windowWillClose() {
+        if let monitor = keyDownMonitor {
+            NSEvent.removeMonitor(monitor)
+            keyDownMonitor = nil
+        }
+
         tabBarViewController?.hideTooltip()
     }
 
@@ -114,8 +120,9 @@ class MainViewController: NSViewController {
 
     @IBSegueAction
     func createFindInPageViewController(coder: NSCoder, sender: Any?, segueIdentifier: String?) -> FindInPageViewController? {
-        self.findInPageViewController = FindInPageViewController(coder: coder)
+        let findInPageViewController = FindInPageViewController(coder: coder)
         findInPageViewController?.delegate = self
+        self.findInPageViewController = findInPageViewController
         return findInPageViewController
     }
 
@@ -215,7 +222,13 @@ class MainViewController: NSViewController {
 extension MainViewController {
 
     func listenToKeyDownEvents() {
-        NSEvent.addLocalMonitorForEvents(matching: .keyDown) { event in
+        if let monitor = keyDownMonitor {
+            NSEvent.removeMonitor(monitor)
+            keyDownMonitor = nil
+        }
+
+        self.keyDownMonitor = NSEvent.addLocalMonitorForEvents(matching: .keyDown) { [weak self] event in
+            guard let self = self else { return nil }
             return self.customKeyDown(with: event) ? nil : event
         }
     }

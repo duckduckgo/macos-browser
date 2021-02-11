@@ -70,7 +70,15 @@ final class Tab: NSObject {
     }
 
     deinit {
-        webView.stopLoading()
+        userScripts.forEach {
+            $0.messageNames.forEach {
+                if #available(OSX 11.0, *) {
+                    webView.configuration.userContentController.removeScriptMessageHandler(forName: $0, contentWorld: .defaultClient)
+                } else {
+                    webView.configuration.userContentController.removeScriptMessageHandler(forName: $0)
+                }
+            }
+        }
     }
 
     let webView: WebView
@@ -235,8 +243,8 @@ final class Tab: NSObject {
     private func subscribeToFindInPageTextChange() {
         findInPageCancellable?.cancel()
         if let findInPage = findInPage {
-            findInPageCancellable = findInPage.$text.receive(on: DispatchQueue.main).sink { text in
-                self.find(text: text)
+            findInPageCancellable = findInPage.$text.receive(on: DispatchQueue.main).sink { [weak self] text in
+                self?.find(text: text)
             }
         }
     }

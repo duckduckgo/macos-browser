@@ -27,11 +27,17 @@ extension NSColor {
     static var addressBarBackgroundColor: NSColor {
         NSColor(named: "AddressBarBackgroundColor")!
     }
-    
-    static var addressBarSuffixColor: NSColor {
-        NSColor(named: "AddressBarSuffixColor")!
+
+    static var addressBarShadowColor: NSColor {
+        NSColor(named: "AddressBarShadowColor")!
+    }
+
+    static var suggestionsShadowColor: NSColor {
+        NSColor(named: "SuggestionsShadowColor")!
     }
     
+    static let addressBarSuffixColor = NSColor(catalogName: "System", colorName: "detailAccentColor") ?? .controlAccentColor
+
     static var findInPageFocusedBackgroundColor: NSColor {
         NSColor(named: "FindInPageFocusedBackgroundColor")!
     }
@@ -43,15 +49,11 @@ extension NSColor {
     static var suggestionIconColor: NSColor {
         NSColor(named: "SuggestionIconColor")!
     }
-    
+
     static var selectedSuggestionTintColor: NSColor {
         NSColor(named: "SelectedSuggestionTintColor")!
     }
-    
-    static var selectedSuggestionBackgroundColor: NSColor {
-        NSColor(named: "SelectedSuggestionBackgroundColor")!
-    }
-    
+
     static var interfaceBackgroundColor: NSColor {
         NSColor(named: "InterfaceBackgroundColor")!
     }
