@@ -36,10 +36,8 @@ extension NSColor {
         NSColor(named: "SuggestionsShadowColor")!
     }
     
-    static var addressBarSuffixColor: NSColor {
-        NSColor(named: "AddressBarSuffixColor")!
-    }
-    
+    static let addressBarSuffixColor = NSColor(catalogName: "System", colorName: "detailAccentColor") ?? .controlAccentColor
+
     static var findInPageFocusedBackgroundColor: NSColor {
         NSColor(named: "FindInPageFocusedBackgroundColor")!
     }
