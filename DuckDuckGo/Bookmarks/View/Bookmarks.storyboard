@@ -1,0 +1,118 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<document type="com.apple.InterfaceBuilder3.Cocoa.Storyboard.XIB" version="3.0" toolsVersion="17701" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none" useAutolayout="YES">
+    <dependencies>
+        <deployment identifier="macosx"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="17701"/>
+        <capability name="Named colors" minToolsVersion="9.0"/>
+        <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
+    </dependencies>
+    <scenes>
+        <!--Bookmark Popover View Controller-->
+        <scene sceneID="3pH-Ju-wLu">
+            <objects>
+                <viewController storyboardIdentifier="BookmarkPopoverViewController" id="vCQ-b9-yaB" customClass="BookmarkPopoverViewController" customModule="DuckDuckGo_Privacy_Browser" customModuleProvider="target" sceneMemberID="viewController">
+                    <view key="view" id="2fn-ed-4g2">
+                        <rect key="frame" x="0.0" y="0.0" width="300" height="200"/>
+                        <autoresizingMask key="autoresizingMask"/>
+                        <subviews>
+                            <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="b7R-iD-UcK">
+                                <rect key="frame" x="22" y="158" width="256" height="16"/>
+                                <textFieldCell key="cell" lineBreakMode="clipping" title="Bookmark added" id="zKL-Gb-RmD">
+                                    <font key="font" metaFont="systemBold"/>
+                                    <color key="textColor" name="labelColor" catalog="System" colorSpace="catalog"/>
+                                    <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
+                                </textFieldCell>
+                            </textField>
+                            <textField verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="Ich-82-cIb">
+                                <rect key="frame" x="24" y="113" width="252" height="21"/>
+                                <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" selectable="YES" editable="YES" sendsActionOnEndEditing="YES" borderStyle="bezel" drawsBackground="YES" id="mXp-oh-9G8">
+                                    <font key="font" metaFont="system"/>
+                                    <color key="textColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
+                                    <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
+                                </textFieldCell>
+                            </textField>
+                            <customView translatesAutoresizingMaskIntoConstraints="NO" id="PHK-0Q-PGv" userLabel="Separator View" customClass="ColorView" customModule="DuckDuckGo_Privacy_Browser" customModuleProvider="target">
+                                <rect key="frame" x="0.0" y="54" width="300" height="1"/>
+                                <constraints>
+                                    <constraint firstAttribute="height" constant="1" id="pce-i3-i0O"/>
+                                </constraints>
+                                <userDefinedRuntimeAttributes>
+                                    <userDefinedRuntimeAttribute type="color" keyPath="backgroundColor">
+                                        <color key="value" name="SeparatorColor"/>
+                                    </userDefinedRuntimeAttribute>
+                                </userDefinedRuntimeAttributes>
+                            </customView>
+                            <button verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="3zg-6l-JsQ">
+                                <rect key="frame" x="222" y="10" width="64" height="40"/>
+                                <buttonCell key="cell" type="push" title="Done" bezelStyle="rounded" alignment="center" controlSize="large" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="XYa-Xm-B8n">
+                                    <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
+                                    <font key="font" metaFont="system"/>
+                                    <string key="keyEquivalent" base64-UTF8="YES">
+DQ
+</string>
+                                </buttonCell>
+                                <connections>
+                                    <action selector="doneButtonAction:" target="vCQ-b9-yaB" id="zDN-yP-TrH"/>
+                                </connections>
+                            </button>
+                            <button verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="0eB-pX-cZ5">
+                                <rect key="frame" x="141" y="10" width="81" height="40"/>
+                                <buttonCell key="cell" type="push" title="Remove" bezelStyle="rounded" alignment="center" controlSize="large" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="IZ6-xl-fw6">
+                                    <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
+                                    <font key="font" metaFont="system"/>
+                                </buttonCell>
+                                <connections>
+                                    <action selector="removeButtonAction:" target="vCQ-b9-yaB" id="gID-s8-sUP"/>
+                                </connections>
+                            </button>
+                            <button translatesAutoresizingMaskIntoConstraints="NO" id="fju-6w-rFQ">
+                                <rect key="frame" x="24" y="83" width="252" height="16"/>
+                                <buttonCell key="cell" type="square" title="Add to Favorites" bezelStyle="shadowlessSquare" image="Favorite" imagePosition="left" alignment="left" imageScaling="proportionallyUpOrDown" inset="2" id="Oi3-rg-1fd">
+                                    <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
+                                    <font key="font" metaFont="system"/>
+                                </buttonCell>
+                                <color key="contentTintColor" name="ButtonColor"/>
+                                <connections>
+                                    <action selector="favoritesButtonAction:" target="vCQ-b9-yaB" id="5Ku-TZ-qPS"/>
+                                </connections>
+                            </button>
+                        </subviews>
+                        <constraints>
+                            <constraint firstItem="fju-6w-rFQ" firstAttribute="trailing" secondItem="b7R-iD-UcK" secondAttribute="trailing" id="0HH-Ow-gFH"/>
+                            <constraint firstAttribute="bottom" secondItem="0eB-pX-cZ5" secondAttribute="bottom" constant="16" id="0P5-Ls-6WB"/>
+                            <constraint firstItem="fju-6w-rFQ" firstAttribute="top" secondItem="Ich-82-cIb" secondAttribute="bottom" constant="14" id="2Iv-Mc-iUE"/>
+                            <constraint firstAttribute="trailing" secondItem="3zg-6l-JsQ" secondAttribute="trailing" constant="20" symbolic="YES" id="4Im-c8-shf"/>
+                            <constraint firstAttribute="bottom" secondItem="3zg-6l-JsQ" secondAttribute="bottom" constant="16" id="4VU-Sj-j46"/>
+                            <constraint firstItem="fju-6w-rFQ" firstAttribute="leading" secondItem="b7R-iD-UcK" secondAttribute="leading" id="IUH-Gl-qq9"/>
+                            <constraint firstAttribute="trailing" secondItem="b7R-iD-UcK" secondAttribute="trailing" constant="24" id="S67-Qw-Hrf"/>
+                            <constraint firstItem="PHK-0Q-PGv" firstAttribute="leading" secondItem="2fn-ed-4g2" secondAttribute="leading" id="Wa1-06-TF0"/>
+                            <constraint firstAttribute="bottom" secondItem="PHK-0Q-PGv" secondAttribute="bottom" constant="54" id="XeY-DJ-34H"/>
+                            <constraint firstItem="Ich-82-cIb" firstAttribute="top" secondItem="b7R-iD-UcK" secondAttribute="bottom" constant="24" id="Xlg-4G-fmw"/>
+                            <constraint firstItem="3zg-6l-JsQ" firstAttribute="leading" secondItem="0eB-pX-cZ5" secondAttribute="trailing" constant="12" symbolic="YES" id="eW9-QH-hDN"/>
+                            <constraint firstItem="b7R-iD-UcK" firstAttribute="top" secondItem="2fn-ed-4g2" secondAttribute="top" constant="26" id="iBs-wS-tC7"/>
+                            <constraint firstAttribute="trailing" secondItem="PHK-0Q-PGv" secondAttribute="trailing" id="rIN-GP-eD1"/>
+                            <constraint firstItem="Ich-82-cIb" firstAttribute="trailing" secondItem="b7R-iD-UcK" secondAttribute="trailing" id="wRZ-Zo-CRe"/>
+                            <constraint firstItem="Ich-82-cIb" firstAttribute="leading" secondItem="b7R-iD-UcK" secondAttribute="leading" id="xPm-3O-k0Q"/>
+                            <constraint firstItem="b7R-iD-UcK" firstAttribute="leading" secondItem="2fn-ed-4g2" secondAttribute="leading" constant="24" id="yLT-8L-lrN"/>
+                        </constraints>
+                    </view>
+                    <connections>
+                        <outlet property="favoriteButton" destination="fju-6w-rFQ" id="4Ya-ca-ym6"/>
+                        <outlet property="textField" destination="Ich-82-cIb" id="VaB-Bb-pHa"/>
+                    </connections>
+                </viewController>
+                <customObject id="AD4-gD-7Lp" userLabel="First Responder" customClass="NSResponder" sceneMemberID="firstResponder"/>
+            </objects>
+            <point key="canvasLocation" x="-260" y="385"/>
+        </scene>
+    </scenes>
+    <resources>
+        <image name="Favorite" width="15" height="15"/>
+        <namedColor name="ButtonColor">
+            <color red="0.28627450980392155" green="0.28627450980392155" blue="0.28627450980392155" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+        </namedColor>
+        <namedColor name="SeparatorColor">
+            <color red="0.0" green="0.0" blue="0.0" alpha="0.10000000149011612" colorSpace="custom" customColorSpace="sRGB"/>
+        </namedColor>
+    </resources>
+</document>

@@ -114,6 +114,34 @@ extension MainViewController {
         tabCollectionViewModel.putBackLastRemovedTab()
     }
 
+    // MARK: - Bookmarks
+    @IBAction func bookmarkThisPage(_ sender: Any?) {
+        navigationBarViewController?
+            .addressBarViewController?
+            .addressBarButtonsViewController?
+            .openBookmarkPopover(setFavorite: false)
+    }
+    
+    @IBAction func favoriteThisPage(_ sender: Any?) {
+        navigationBarViewController?
+            .addressBarViewController?
+            .addressBarButtonsViewController?
+            .openBookmarkPopover(setFavorite: true)
+    }
+    
+    @IBAction func navigateToBookmark(_ sender: Any?) {
+        guard let menuItem = sender as? NSMenuItem else {
+            os_log("MainViewController: Casting to menu item failed", type: .error)
+            return
+        }
+        guard let selectedTabViewModel = tabCollectionViewModel.selectedTabViewModel else {
+            os_log("MainViewController: No tab view model selected", type: .error)
+            return
+        }
+        
+        selectedTabViewModel.tab.url = menuItem.representedObject as? URL
+    }
+
     // MARK: - Window
 
     @IBAction func showPreviousTab(_ sender: Any?) {

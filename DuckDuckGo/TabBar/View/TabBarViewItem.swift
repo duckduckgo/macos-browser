@@ -27,6 +27,7 @@ protocol TabBarViewItemDelegate: AnyObject {
     func tabBarViewItemCloseAction(_ tabBarViewItem: TabBarViewItem)
     func tabBarViewItemCloseOtherAction(_ tabBarViewItem: TabBarViewItem)
     func tabBarViewItemDuplicateAction(_ tabBarViewItem: TabBarViewItem)
+    func tabBarViewItemBookmarkThisPageAction(_ tabBarViewItem: TabBarViewItem)
     func tabBarViewItemMoveToNewWindowAction(_ tabBarViewItem: TabBarViewItem)
 
 }
@@ -83,6 +84,9 @@ class TabBarViewItem: NSCollectionViewItem {
         let duplicateMenuItem = NSMenuItem(title: UserText.duplicateTab, action: #selector(duplicateAction(_:)), keyEquivalent: "")
         menu.addItem(duplicateMenuItem)
         menu.addItem(NSMenuItem.separator())
+        let bookmarkMenuItem = NSMenuItem(title: UserText.bookmarkThisPage, action: #selector(bookmarkThisPageAction(_:)), keyEquivalent: "")
+                menu.addItem(bookmarkMenuItem)
+                menu.addItem(NSMenuItem.separator())
         let closeMenuItem = NSMenuItem(title: UserText.closeTab, action: #selector(closeButtonAction(_:)), keyEquivalent: "")
         menu.addItem(closeMenuItem)
         let closeOtherMenuItem = NSMenuItem(title: UserText.closeOtherTabs, action: #selector(closeOtherAction(_:)), keyEquivalent: "")
@@ -140,6 +144,10 @@ class TabBarViewItem: NSCollectionViewItem {
 
     @objc func duplicateAction(_ sender: NSButton) {
         delegate?.tabBarViewItemDuplicateAction(self)
+    }
+
+    @objc func bookmarkThisPageAction(_ sender: NSButton) {
+        delegate?.tabBarViewItemBookmarkThisPageAction(self)
     }
 
     @IBAction func closeButtonAction(_ sender: NSButton) {

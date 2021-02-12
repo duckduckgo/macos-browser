@@ -43,6 +43,14 @@ class Database {
     }
     
     init(name: String, model: NSManagedObjectModel) {
+        do {
+            try EncryptedValueTransformer<NSImage>.registerTransformer()
+            try EncryptedValueTransformer<NSString>.registerTransformer()
+            try EncryptedValueTransformer<NSURL>.registerTransformer()
+        } catch {
+            fatalError("Failed to register encryption value transformers")
+        }
+
         container = DDGPersistentContainer(name: name, managedObjectModel: model)
     }
     
