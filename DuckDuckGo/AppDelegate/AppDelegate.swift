@@ -44,10 +44,6 @@ class AppDelegate: NSObject, NSApplicationDelegate {
         stateRestorationManager = AppStateRestorationManager(fileStore: fileStore)
 
         urlEventListener.listen()
-
-        DispatchQueue.main.asyncAfter(deadline: .now() + 60) {
-            ConfigurationManager.shared.lastUpdateTime = .distantPast
-        }
     }
 
     func applicationDidFinishLaunching(_ aNotification: Notification) {

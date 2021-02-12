@@ -42,7 +42,7 @@ class ConfigurationManager {
 
     private let queue: DispatchQueue = DispatchQueue(label: "Configuration Manager")
 
-    @UserDefaultsWrapper(key: .configLastUpdated, defaultValue: Date())
+    @UserDefaultsWrapper(key: .configLastUpdated, defaultValue: .distantPast)
     var lastUpdateTime: Date
 
     private var trackerBlockerDataUpdatedSubject = PassthroughSubject<Void, Never>()
@@ -54,6 +54,8 @@ class ConfigurationManager {
 
     private init(scriptSource: ScriptSourceProviding = DefaultScriptSourceProvider.shared) {
         self.scriptSource = scriptSource
+
+        os_log("Starting configuration refresh timer", type: .debug)
         timerCancellable = Timer.publish(every: Constants.refreshCheckIntervalSeconds, on: .main, in: .default)
             .autoconnect()
             .receive(on: self.queue)
@@ -120,7 +122,10 @@ class ConfigurationManager {
     }
 
     private func refreshIfNeeded() {
-        guard self.isReadyToRefresh(), refreshCancellable == nil else { return }
+        guard self.isReadyToRefresh(), refreshCancellable == nil else {
+            os_log("Configuration refresh is not needed at this time", type: .debug)
+            return
+        }
         refreshNow()
     }
 
