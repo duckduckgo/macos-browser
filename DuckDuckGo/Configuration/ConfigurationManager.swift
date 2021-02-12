@@ -50,7 +50,10 @@ class ConfigurationManager {
     private var timerCancellable: AnyCancellable?
     private var refreshCancellable: AnyCancellable?
 
-    private init() {
+    private let scriptSource: ScriptSourceProviding
+
+    private init(scriptSource: ScriptSourceProviding = DefaultScriptSourceProvider.shared) {
+        self.scriptSource = scriptSource
         timerCancellable = Timer.publish(every: Constants.refreshCheckIntervalSeconds, on: .main, in: .default)
             .autoconnect()
             .receive(on: self.queue)
@@ -129,10 +132,13 @@ class ConfigurationManager {
 
     private func updateTrackerBlockingDependencies() throws {
         print("***", #function)
+
         TrackerRadarManager.shared.reload()
+        scriptSource.reload()
         ContentBlockerRulesManager.shared.compileRules { _ in
             self.trackerBlockerDataUpdatedSubject.send(())
         }
+
     }
 
     private func updateBloomFilter() throws {

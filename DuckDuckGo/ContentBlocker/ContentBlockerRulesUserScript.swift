@@ -27,15 +27,9 @@ class ContentBlockerRulesUserScript: UserScript {
         static let pageUrl = "pageUrl"
     }
 
-    init(configStorage: ConfigurationStoring = DefaultConfigurationStorage.shared) {
+    init(scriptSource: ScriptSourceProviding = DefaultScriptSourceProvider.shared) {
 
-        let unprotectedDomains = configStorage.loadData(for: .temporaryUnprotectedSites)?.utf8String() ?? ""
-
-        let source = Self.loadJS("contentblockerrules", withReplacements: [
-            "${unprotectedDomains}": unprotectedDomains
-        ])
-
-        super.init(source: source,
+        super.init(source: scriptSource.contentBlockerRulesSource,
                    messageNames: Self.messageNames,
                    injectionTime: .atDocumentStart,
                    forMainFrameOnly: false)

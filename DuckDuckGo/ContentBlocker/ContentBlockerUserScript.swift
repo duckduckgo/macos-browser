@@ -37,20 +37,8 @@ class ContentBlockerUserScript: UserScript {
         static let isSurrogate = "isSurrogate"
     }
 
-    init(configStorage: ConfigurationStoring = DefaultConfigurationStorage.shared) {
-
-        // Use sensible defaults in case the upstream data is unparsable
-        let trackerData = TrackerRadarManager.shared.encodedTrackerData ?? "{}"
-        let surrogates = configStorage.loadData(for: .surrogates)?.utf8String() ?? ""
-        let unprotectedSites = configStorage.loadData(for: .temporaryUnprotectedSites)?.utf8String() ?? ""
-
-        let source = Self.loadJS("contentblocker", withReplacements: [
-            "${unprotectedDomains}": unprotectedSites,
-            "${trackerData}": trackerData,
-            "${surrogates}": surrogates
-        ])
-
-        super.init(source: source,
+    init(scriptSource: ScriptSourceProviding = DefaultScriptSourceProvider.shared) {
+        super.init(source: scriptSource.contentBlockerSource,
                    messageNames: Self.messageNames,
                    injectionTime: .atDocumentStart,
                    forMainFrameOnly: false)
