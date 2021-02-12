@@ -98,19 +98,20 @@ class ConfigurationManager {
             )
             .collect()
             .timeout(.seconds(Constants.downloadTimeoutSeconds), scheduler: self.queue, options: nil, customError: { Error.timeout })
-            .sink { completion in
-
-                print("*** sink receive completion")
+            .sink { [self] completion in
 
                 if case .failure(let error) = completion {
                     os_log("Failed to complete configuration update %s", type: .error, error.localizedDescription)
-                    self.tryAgainSoon()
+                    tryAgainSoon()
                 } else {
-                    self.tryAgainLater()
+                    tryAgainLater()
                 }
 
-                self.refreshCancellable = nil
+                refreshCancellable = nil
                 configDownloader.cancelAll()
+
+                DefaultConfigurationStorage.shared.log()
+                log()
 
             } receiveValue: { _ in
                 // no-op - if you want to do something more globally if any of the files were downloaded, this is the place
@@ -137,7 +138,6 @@ class ConfigurationManager {
     }
 
     private func updateTrackerBlockingDependencies() throws {
-        print("***", #function)
 
         TrackerRadarManager.shared.reload()
         scriptSource.reload()
@@ -148,7 +148,6 @@ class ConfigurationManager {
     }
 
     private func updateBloomFilter() throws {
-        print("***", #function)
 
         let configStore = DefaultConfigurationStorage.shared
         guard let specData = configStore.loadData(for: .bloomFilterSpec) else {
@@ -170,7 +169,6 @@ class ConfigurationManager {
     }
 
     private func updateBloomFilterExclusions() throws {
-        print("***", #function)
 
         let configStore = DefaultConfigurationStorage.shared
         guard let bloomFilterExclusions = configStore.loadData(for: .bloomFilterExcludedDomains) else {

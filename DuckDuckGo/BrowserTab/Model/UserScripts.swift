@@ -40,7 +40,6 @@ class UserScripts {
 
     func install(into webView: WebView) {
         userScripts.forEach {
-            print("***", #function, $0.self)
             webView.configuration.userContentController.add(userScript: $0)
         }
     }

@@ -86,22 +86,16 @@ class DefaultConfigurationDownloader: ConfigurationDownloader {
 
             if self.storage.loadData(for: config) != nil,
                let etag = self.storage.loadEtag(for: config) ?? embeddedEtag {
-
-                print("*** sending etag", etag, "for", config.rawValue)
                 request.addValue(etag, forHTTPHeaderField: Constants.ifNoneMatchField)
             }
 
-            // Uses protocol based caching.
-            //  Our server disables absolute caching but returns an etag which URL session always checks against
             URLSession.shared.dataTaskPublisher(for: request)
                 .tryMap { result -> ConfigurationDownloadMeta? in
                     guard let response = result.response as? HTTPURLResponse else {
                         throw Error.invalidResponse
                     }
 
-                    print("***", config.rawValue, response.statusCode)
                     if response.statusCode == Constants.notModifiedResponseCode {
-                        print("***", config.rawValue, "[NOT MODIFIED]")
                         return nil
                     }
 
@@ -114,18 +108,14 @@ class DefaultConfigurationDownloader: ConfigurationDownloader {
 
                     return ConfigurationDownloadMeta(etag: etag, data: result.data)
                 }
-                .print()
                 .sink(receiveCompletion: { completion in
-
-                    print("download", config, "completion received", completion)
 
                     if case .failure(let error) = completion {
                         promise(.failure(error))
                     }
 
                 }) { value in
-
-                    print("download", config, "value received", value == nil ? "value is nil" : "new data!")
+                    
                     promise(.success((value)))
 
                 }.store(in: &self.cancellables)

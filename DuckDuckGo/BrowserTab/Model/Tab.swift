@@ -168,7 +168,6 @@ final class Tab: NSObject {
     }
 
     private func reconfigureWebView() {
-        print("***", #function)
         webView.configuration.reinstallContentBlocker()
         userScripts.remove(from: webView)
         userScripts = UserScripts()
