@@ -17,16 +17,15 @@
 //
 
 import Foundation
+import os
 
 protocol ConfigurationStoring {
 
     func loadData(for: ConfigurationLocation) -> Data?
-
     func loadEtag(for: ConfigurationLocation) -> String?
-
     func saveData(_ data: Data, for: ConfigurationLocation) throws
-
     func saveEtag(_ etag: String, for: ConfigurationLocation) throws
+    func log()
 
 }
 
@@ -109,6 +108,15 @@ class DefaultConfigurationStorage: ConfigurationStoring {
     func saveData(_ data: Data, for config: ConfigurationLocation) throws {
         let file = FileManager.default.fileUrl(for: config)
         try data.write(to: file, options: .atomic)
+    }
+
+    func log() {
+        os_log("bloomFilterBinaryEtag %{public}s", type: .default, bloomFilterBinaryEtag ?? "")
+        os_log("bloomFilterSpecEtag %{public}s", type: .default, bloomFilterSpecEtag ?? "")
+        os_log("bloomFilterExcludedDomainsEtag %{public}s", type: .default, bloomFilterExcludedDomainsEtag ?? "")
+        os_log("surrogatesEtag %{public}s", type: .default, surrogatesEtag ?? "")
+        os_log("temporaryUnprotectedSitesEtag %{public}s", type: .default, temporaryUnprotectedSitesEtag ?? "")
+        os_log("trackerRadarEtag %{public}s", type: .default, trackerRadarEtag ?? "")
     }
 
 }

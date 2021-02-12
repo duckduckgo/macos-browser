@@ -114,6 +114,9 @@ class NavigationBarViewController: NSViewController {
 #if FEEDBACK
 
     @IBAction func feedbackButtonAction(_ sender: NSButton) {
+        DefaultConfigurationStorage.shared.log()
+        ConfigurationManager.shared.log()
+
         let tab = Tab()
         tab.url = URL.feedback
         tabCollectionViewModel.append(tab: tab)

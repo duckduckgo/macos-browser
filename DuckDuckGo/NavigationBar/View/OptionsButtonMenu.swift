@@ -70,6 +70,9 @@ class OptionsButtonMenu: NSMenu {
 #if FEEDBACK
 
     @objc func openFeedbackAction(_ sender: NSMenuItem) {
+        DefaultConfigurationStorage.shared.log()
+        ConfigurationManager.shared.log()
+
         let tab = Tab()
         tab.url = URL.feedback
         tabCollectionViewModel.append(tab: tab)

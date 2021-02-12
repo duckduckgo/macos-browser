@@ -180,6 +180,9 @@ extension MainViewController {
 #if FEEDBACK
 
     @IBAction func openFeedback(_ sender: Any?) {
+        DefaultConfigurationStorage.shared.log()
+        ConfigurationManager.shared.log()
+        
         let tab = Tab()
         tab.url = URL.feedback
         tabCollectionViewModel.append(tab: tab)

@@ -46,9 +46,9 @@ class ConfigurationManager {
     var lastUpdateTime: Date
 
     private var trackerBlockerDataUpdatedSubject = PassthroughSubject<Void, Never>()
-
     private var timerCancellable: AnyCancellable?
     private var refreshCancellable: AnyCancellable?
+    private var lastRefreshCheckTime: Date = Date()
 
     private let scriptSource: ScriptSourceProviding
 
@@ -58,12 +58,18 @@ class ConfigurationManager {
             .autoconnect()
             .receive(on: self.queue)
             .sink(receiveValue: { _ in
+                self.lastRefreshCheckTime = Date()
                 self.refreshIfNeeded()
             })
     }
 
     public static func trackerBlockerDataUpdatedPublisher() -> AnyPublisher<Void, Never> {
         return Self.shared.trackerBlockerDataUpdatedSubject.share().eraseToAnyPublisher()
+    }
+
+    func log() {
+        os_log("last update %{public}s", type: .default, String(describing: lastUpdateTime))
+        os_log("last refresh check %{public}s", type: .default, String(describing: lastRefreshCheckTime))
     }
 
     private func refreshNow() {
