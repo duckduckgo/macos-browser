@@ -42,7 +42,7 @@ extension URL {
         "linkedin.com": [regex("oauth/v\\d.*/authorization")],
         "github.com": [regex("login/oauth/authorize")],
         "api.twitter.com": [regex("oauth/authenticate"), regex("oauth/authorize")],
-        "api.duosecurity.com": [regex("oauth/v\\d.*/authorize")]
+        "duosecurity.com": [regex("oauth/v\\d.*/authorize")]
     ]
 
     private static func regex(_ pattern: String) -> NSRegularExpression {

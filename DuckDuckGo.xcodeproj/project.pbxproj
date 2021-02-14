@@ -53,6 +53,7 @@
 		4BA1A6F6258C4F9600F6F690 /* EncryptionMocks.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4BA1A6F5258C4F9600F6F690 /* EncryptionMocks.swift */; };
 		4BA1A6FE258C5C1300F6F690 /* EncryptedValueTransformerTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4BA1A6FD258C5C1300F6F690 /* EncryptedValueTransformerTests.swift */; };
 		4BB5471625D9A3BF0082F1E9 /* FireproofingURLExtensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4BB5471525D9A3BF0082F1E9 /* FireproofingURLExtensions.swift */; };
+		4BB5471F25D9A4C60082F1E9 /* FireproofingURLExtensionsTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4BB5471E25D9A4C60082F1E9 /* FireproofingURLExtensionsTests.swift */; };
 		4BB88B4525B7B55C006F6B06 /* DebugUserScript.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4BB88B4425B7B55C006F6B06 /* DebugUserScript.swift */; };
 		4BB88B4A25B7B690006F6B06 /* SequenceExtensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4BB88B4925B7B690006F6B06 /* SequenceExtensions.swift */; };
 		4BB88B5025B7BA2B006F6B06 /* TabInstrumentation.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4BB88B4F25B7BA2B006F6B06 /* TabInstrumentation.swift */; };
@@ -250,6 +251,7 @@
 		4BA1A6F5258C4F9600F6F690 /* EncryptionMocks.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EncryptionMocks.swift; sourceTree = "<group>"; };
 		4BA1A6FD258C5C1300F6F690 /* EncryptedValueTransformerTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EncryptedValueTransformerTests.swift; sourceTree = "<group>"; };
 		4BB5471525D9A3BF0082F1E9 /* FireproofingURLExtensions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FireproofingURLExtensions.swift; sourceTree = "<group>"; };
+		4BB5471E25D9A4C60082F1E9 /* FireproofingURLExtensionsTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FireproofingURLExtensionsTests.swift; sourceTree = "<group>"; };
 		4BB88B4425B7B55C006F6B06 /* DebugUserScript.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DebugUserScript.swift; sourceTree = "<group>"; };
 		4BB88B4925B7B690006F6B06 /* SequenceExtensions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SequenceExtensions.swift; sourceTree = "<group>"; };
 		4BB88B4F25B7BA2B006F6B06 /* TabInstrumentation.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TabInstrumentation.swift; sourceTree = "<group>"; };
@@ -570,6 +572,14 @@
 			path = Extensions;
 			sourceTree = "<group>";
 		};
+		4BB5471D25D9A4AD0082F1E9 /* Fireproofing */ = {
+			isa = PBXGroup;
+			children = (
+				4BB5471E25D9A4C60082F1E9 /* FireproofingURLExtensionsTests.swift */,
+			);
+			path = Fireproofing;
+			sourceTree = "<group>";
+		};
 		4BB88B4E25B7BA20006F6B06 /* Utilities */ = {
 			isa = PBXGroup;
 			children = (
@@ -708,6 +718,7 @@
 				AA92ACAE24EFE1F5005F41C9 /* BrowserTab */,
 				AA9C361D25518AAB004B1BA3 /* Burning */,
 				8553FF50257523630029327F /* FileDownload */,
+				4BB5471D25D9A4AD0082F1E9 /* Fireproofing */,
 				AA63744E24C9BB4A00AB2AC4 /* Suggestions */,
 				AAC9C01224CAFBB700AD1325 /* TabBar */,
 				4BA1A6CE258BF58C00F6F690 /* FileSystem */,
@@ -1518,6 +1529,7 @@
 				4BA1A6E6258C270800F6F690 /* EncryptionKeyGeneratorTests.swift in Sources */,
 				4BA1A6F6258C4F9600F6F690 /* EncryptionMocks.swift in Sources */,
 				AA9C362825518C44004B1BA3 /* WebsiteDataStoreMock.swift in Sources */,
+				4BB5471F25D9A4C60082F1E9 /* FireproofingURLExtensionsTests.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
