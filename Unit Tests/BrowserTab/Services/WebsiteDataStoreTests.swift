@@ -180,7 +180,7 @@ class WebCacheManagerTests: XCTestCase {
 
     }
 
-    class MockPreservedLogins: PreserveLogins {
+    class MockPreservedLogins: FireproofDomains {
 
         let domains: [String]
 

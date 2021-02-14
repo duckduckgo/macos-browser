@@ -90,7 +90,7 @@ class TabBarViewItem: NSCollectionViewItem {
         if let url = currentURL {
             let menuItem: NSMenuItem
 
-            if PreserveLogins.shared.isAllowed(fireproofDomain: url.baseHost ?? "") {
+            if FireproofDomains.shared.isAllowed(fireproofDomain: url.baseHost ?? "") {
                 menuItem = NSMenuItem(title: UserText.removeFireproofing, action: #selector(removeFireproofingAction(_:)), keyEquivalent: "")
             } else {
                 menuItem = NSMenuItem(title: UserText.fireproofSite, action: #selector(fireproofSiteAction(_:)), keyEquivalent: "")
@@ -138,7 +138,7 @@ class TabBarViewItem: NSCollectionViewItem {
 
         NotificationCenter.default.addObserver(self,
                                                selector: #selector(setupMenu),
-                                               name: PreserveLogins.Constants.allowedDomainsChangedNotification,
+                                               name: FireproofDomains.Constants.allowedDomainsChangedNotification,
                                                object: nil)
     }
 

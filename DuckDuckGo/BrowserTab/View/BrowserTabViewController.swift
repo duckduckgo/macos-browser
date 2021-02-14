@@ -194,11 +194,11 @@ extension BrowserTabViewController: TabDelegate {
             return
         }
 
-        if PreserveLogins.shared.isAllowed(fireproofDomain: host) {
-            PreserveLogins.shared.remove(domain: host)
+        if FireproofDomains.shared.isAllowed(fireproofDomain: host) {
+            FireproofDomains.shared.remove(domain: host)
         } else {
             // TODO: Figure out if this login should live here.
-            PreserveLogins.shared.addToAllowed(domain: host)
+            FireproofDomains.shared.addToAllowed(domain: host)
         }
     }
 

@@ -94,12 +94,12 @@ class AddressBarViewController: NSViewController {
 
         NotificationCenter.default.addObserver(self,
                                                selector: #selector(refreshAddressBarAppearance(_:)),
-                                               name: PreserveLogins.Constants.allowedDomainsChangedNotification,
+                                               name: FireproofDomains.Constants.allowedDomainsChangedNotification,
                                                object: nil)
 
         NotificationCenter.default.addObserver(self,
                                                selector: #selector(showUndoFireproofingPopover(_:)),
-                                               name: PreserveLogins.Constants.newFireproofedDomainNotification,
+                                               name: FireproofDomains.Constants.newFireproofedDomainNotification,
                                                object: nil)
     }
 
@@ -237,8 +237,8 @@ class AddressBarViewController: NSViewController {
                 context.duration = 0.3
                 context.allowsImplicitAnimation = true
 
-                fireproofedButtonDivider.isHidden = !PreserveLogins.shared.isAllowed(fireproofDomain: url.baseHost ?? "")
-                fireproofedButton.isHidden = !PreserveLogins.shared.isAllowed(fireproofDomain: url.baseHost ?? "")
+                fireproofedButtonDivider.isHidden = !FireproofDomains.shared.isAllowed(fireproofDomain: url.baseHost ?? "")
+                fireproofedButton.isHidden = !FireproofDomains.shared.isAllowed(fireproofDomain: url.baseHost ?? "")
 
             }, completionHandler: nil)
         } else {
@@ -276,7 +276,7 @@ class AddressBarViewController: NSViewController {
             return
         }
 
-        if let host = selectedTabViewModel.tab.url?.baseHost, PreserveLogins.shared.isAllowed(fireproofDomain: host) {
+        if let host = selectedTabViewModel.tab.url?.baseHost, FireproofDomains.shared.isAllowed(fireproofDomain: host) {
             let viewController = FireproofInfoViewController.create(for: host)
             present(viewController, asPopoverRelativeTo: button.frame, of: button.superview!, preferredEdge: .minY, behavior: .transient)
         }
@@ -416,7 +416,7 @@ extension AddressBarViewController {
 extension AddressBarViewController: UndoFireproofingViewControllerDelegate {
 
     func undoFireproofingViewController(_ viewController: UndoFireproofingViewController, requestedUndoFor domain: String) {
-        PreserveLogins.shared.remove(domain: domain)
+        FireproofDomains.shared.remove(domain: domain)
     }
 
 }

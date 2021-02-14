@@ -18,14 +18,14 @@
 
 import Foundation
 
-class PreserveLogins {
+class FireproofDomains {
 
     enum Constants {
         static let allowedDomainsChangedNotification = Notification.Name("AllowedDomainsChangedNotification")
         static let newFireproofedDomainNotification = Notification.Name("newFireproofedDomainNotification")
     }
 
-    static let shared = PreserveLogins()
+    static let shared = FireproofDomains()
 
     @UserDefaultsWrapper(key: .preserveLoginsAllowedDomains, defaultValue: [])
     private(set) var allowedDomains: [String] {

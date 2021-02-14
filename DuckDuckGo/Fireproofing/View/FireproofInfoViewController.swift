@@ -63,7 +63,7 @@ class FireproofInfoViewController: NSViewController {
     }
 
     @IBAction func removeFireproofing(_ sender: AnyObject) {
-        PreserveLogins.shared.remove(domain: domain)
+        FireproofDomains.shared.remove(domain: domain)
         presentingViewController?.dismiss(self)
     }
 

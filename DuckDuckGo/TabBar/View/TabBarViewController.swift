@@ -667,7 +667,7 @@ extension TabBarViewController: TabBarViewItemDelegate {
 
     func tabBarViewItemFireproofSite(_ tabBarViewItem: TabBarViewItem) {
         if let url = tabCollectionViewModel.selectedTabViewModel?.tab.url?.baseHost {
-            PreserveLogins.shared.addToAllowed(domain: url)
+            FireproofDomains.shared.addToAllowed(domain: url)
         }
 
         tabBarViewItem.setupMenu()
@@ -675,7 +675,7 @@ extension TabBarViewController: TabBarViewItemDelegate {
 
     func tabBarViewItemRemoveFireproofing(_ tabBarViewItem: TabBarViewItem) {
         if let url = tabCollectionViewModel.selectedTabViewModel?.tab.url?.baseHost {
-            PreserveLogins.shared.remove(domain: url)
+            FireproofDomains.shared.remove(domain: url)
         }
 
         tabBarViewItem.setupMenu()

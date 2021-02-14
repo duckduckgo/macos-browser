@@ -119,7 +119,7 @@ class WebCacheManager {
 
     func clear(dataStore: WebsiteDataStore = WKWebsiteDataStore.default(),
                appCookieStorage: CookieStorage = CookieStorage(),
-               logins: PreserveLogins = PreserveLogins.shared,
+               logins: FireproofDomains = FireproofDomains.shared,
                completion: @escaping () -> Void) {
         extractAllowedCookies(from: dataStore.cookieStore, cookieStorage: appCookieStorage, logins: logins) {
             self.clearAllData(dataStore: dataStore, completion: completion)
@@ -140,7 +140,7 @@ class WebCacheManager {
 
     private func extractAllowedCookies(from cookieStore: WebsiteCookieStore?,
                                        cookieStorage: CookieStorage,
-                                       logins: PreserveLogins,
+                                       logins: FireproofDomains,
                                        completion: @escaping () -> Void) {
 
         guard let cookieStore = cookieStore else {
