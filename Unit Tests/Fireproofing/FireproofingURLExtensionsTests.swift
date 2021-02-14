@@ -33,16 +33,25 @@ class FireproofingURLExtensionsTests: XCTestCase {
         XCTAssert(URL(string: "https://github.com/login/oauth/authorize")!.isOAuthURL)
         XCTAssert(URL(string: "https://api.twitter.com/oauth/authorize?oauth_token")!.isOAuthURL)
         XCTAssert(URL(string: "https://api.duosecurity.com/oauth/v1/authorize?response_type=code&client_id")!.isOAuthURL)
+
+        XCTAssertFalse(URL(string: "https://duckduckgo.com")!.isOAuthURL)
+        XCTAssertFalse(URL(string: "example.com")!.isOAuthURL)
     }
 
     func testTwoFactorPatterns() {
         XCTAssert(URL(string: "https://accounts.google.com/signin/v2/challenge/az?client_id")!.isTwoFactorURL)
         XCTAssert(URL(string: "https://sso.duckduckgo.com/module.php/duosecurity/getduo.php")!.isTwoFactorURL)
         XCTAssert(URL(string: "https://www.amazon.com/ap/cvf/approval")!.isTwoFactorURL)
+
+        XCTAssertFalse(URL(string: "https://duckduckgo.com")!.isTwoFactorURL)
+        XCTAssertFalse(URL(string: "example.com")!.isTwoFactorURL)
     }
 
     func testSSOPatterns() {
         XCTAssert(URL(string: "https://sso.host.com/saml2/idp/SSOService.php")!.isSingleSignOnURL)
+
+        XCTAssertFalse(URL(string: "https://duckduckgo.com")!.isSingleSignOnURL)
+        XCTAssertFalse(URL(string: "example.com")!.isSingleSignOnURL)
     }
 
 }
