@@ -59,7 +59,7 @@ class FireproofInfoViewController: NSViewController {
 
     override func viewDidLoad() {
         super.viewDidLoad()
-        updateTitleLabel(with: domain)
+        self.titleLabel.stringValue = UserText.domainIsFireproof(domain: domain)
     }
 
     @IBAction func removeFireproofing(_ sender: AnyObject) {
@@ -70,10 +70,6 @@ class FireproofInfoViewController: NSViewController {
 
     @IBAction func dismiss(_ sender: AnyObject) {
         presentingViewController?.dismiss(self)
-    }
-
-    private func updateTitleLabel(with domain: String) {
-        self.titleLabel.stringValue = "\(domain) is Fireproof"
     }
 
 }
