@@ -46,7 +46,7 @@ class OptionsButtonMenu: NSMenu {
 #if FEEDBACK
 
         let openFeedbackMenuItem = NSMenuItem(title: "Send Feedback",
-                                         action: #selector(openFeedbackAction(_:)),
+                                              action: #selector(AppDelegate.openFeedback(_:)),
                                          keyEquivalent: "")
         openFeedbackMenuItem.target = self
         openFeedbackMenuItem.image = NSImage(named: "Feedback")
@@ -66,18 +66,5 @@ class OptionsButtonMenu: NSMenu {
         tabCollectionViewModel.removeSelected()
         WindowsManager.openNewWindow(with: tab)
     }
-
-#if FEEDBACK
-
-    @objc func openFeedbackAction(_ sender: NSMenuItem) {
-        DefaultConfigurationStorage.shared.log()
-        ConfigurationManager.shared.log()
-
-        let tab = Tab()
-        tab.url = URL.feedback
-        tabCollectionViewModel.append(tab: tab)
-    }
-
-#endif
 
 }

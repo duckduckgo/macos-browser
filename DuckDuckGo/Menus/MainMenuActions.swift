@@ -39,6 +39,34 @@ extension AppDelegate {
         WindowsManager.closeWindows()
     }
 
+    // MARK: - Help
+
+#if FEEDBACK
+
+    @IBAction func openFeedback(_ sender: Any?) {
+        guard let windowController = WindowControllersManager.shared.lastKeyMainWindowController,
+              windowController.window?.isKeyWindow == true else {
+            WindowsManager.openNewWindow(with: URL.feedback)
+            return
+        }
+
+        guard let mainViewController = windowController.mainViewController else {
+            os_log("AppDelegate: No main view controller", type: .error)
+            return
+        }
+
+        DefaultConfigurationStorage.shared.log()
+        ConfigurationManager.shared.log()
+
+        let tab = Tab()
+        tab.url = URL.feedback
+
+        let tabCollectionViewModel = mainViewController.tabCollectionViewModel
+        tabCollectionViewModel.append(tab: tab)
+    }
+
+#endif
+
 }
 
 extension MainViewController {
@@ -174,21 +202,6 @@ extension MainViewController {
         }
         return super.responds(to: aSelector)
     }
-
-    // MARK: - Help
-
-#if FEEDBACK
-
-    @IBAction func openFeedback(_ sender: Any?) {
-        DefaultConfigurationStorage.shared.log()
-        ConfigurationManager.shared.log()
-        
-        let tab = Tab()
-        tab.url = URL.feedback
-        tabCollectionViewModel.append(tab: tab)
-    }
-
-#endif
 
 }
 
