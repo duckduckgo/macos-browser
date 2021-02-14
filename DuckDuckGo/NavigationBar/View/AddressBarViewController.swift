@@ -99,7 +99,7 @@ class AddressBarViewController: NSViewController {
 
         NotificationCenter.default.addObserver(self,
                                                selector: #selector(showUndoFireproofingPopover(_:)),
-                                               name: FireproofDomains.Constants.newFireproofedDomainNotification,
+                                               name: FireproofDomains.Constants.newFireproofDomainNotification,
                                                object: nil)
     }
 
@@ -283,14 +283,18 @@ class AddressBarViewController: NSViewController {
     }
 
     @objc private func showUndoFireproofingPopover(_ sender: Notification) {
-        guard let domain = sender.userInfo?["domain"] as? String else { return }
+        guard let domain = sender.userInfo?[FireproofDomains.Constants.newFireproofDomainKey] as? String else { return }
 
         DispatchQueue.main.async {
             let viewController = UndoFireproofingViewController.create(for: domain)
             viewController.delegate = self
             let frame = self.fireproofedButton.frame.insetBy(dx: -10, dy: -10)
 
-            self.present(viewController, asPopoverRelativeTo: frame, of: self.fireproofedButton.superview!, preferredEdge: .minY, behavior: .transient)
+            self.present(viewController,
+                         asPopoverRelativeTo: frame,
+                         of: self.fireproofedButton.superview!,
+                         preferredEdge: .minY,
+                         behavior: .transient)
         }
     }
     

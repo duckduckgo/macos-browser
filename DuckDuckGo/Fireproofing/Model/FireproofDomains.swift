@@ -22,7 +22,8 @@ class FireproofDomains {
 
     enum Constants {
         static let allowedDomainsChangedNotification = Notification.Name("AllowedDomainsChangedNotification")
-        static let newFireproofedDomainNotification = Notification.Name("newFireproofedDomainNotification")
+        static let newFireproofDomainNotification = Notification.Name("newFireproofedDomainNotification")
+        static let newFireproofDomainKey = "newFireproofDomainKey"
     }
 
     static let shared = FireproofDomains()
@@ -37,8 +38,8 @@ class FireproofDomains {
     func addToAllowed(domain: String) {
         allowedDomains += [domain]
 
-        NotificationCenter.default.post(name: Constants.newFireproofedDomainNotification, object: self, userInfo: [
-            "domain": domain
+        NotificationCenter.default.post(name: Constants.newFireproofDomainNotification, object: self, userInfo: [
+            Constants.newFireproofDomainKey: domain
         ])
     }
 
