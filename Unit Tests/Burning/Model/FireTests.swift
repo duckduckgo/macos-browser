@@ -27,8 +27,7 @@ class FireTests: XCTestCase {
     var cancellables = Set<AnyCancellable>()
 
     func testWhenBurnAllThenTabsAreClosedAndNewEmptyTabIsOpen() {
-        let websiteDataStoreMock = WebsiteDataStoreMock()
-        let fire = Fire(websiteDataStore: websiteDataStoreMock)
+        let fire = Fire()
         let tabCollectionViewModel = TabCollectionViewModel.aTabCollectionViewModel
 
         fire.burnAll(tabCollectionViewModel: tabCollectionViewModel)
@@ -38,18 +37,17 @@ class FireTests: XCTestCase {
     }
 
     func testWhenBurnAllThenAllWebsiteDataAreRemoved() {
-        let websiteDataStoreMock = WebsiteDataStoreMock()
-        let fire = Fire(websiteDataStore: websiteDataStoreMock)
+        let manager = WebCacheManagerMock()
+        let fire = Fire(cacheManager: manager)
         let tabCollectionViewModel = TabCollectionViewModel.aTabCollectionViewModel
 
         fire.burnAll(tabCollectionViewModel: tabCollectionViewModel)
 
-        XCTAssert(websiteDataStoreMock.removeAllWebsiteDataCalled)
+        XCTAssert(manager.removeAllWebsiteDataCalled)
     }
 
     func testWhenBurnAllThenBurningFlagToggles() {
-        let websiteDataStoreMock = WebsiteDataStoreMock()
-        let fire = Fire(websiteDataStore: websiteDataStoreMock)
+        let fire = Fire()
         let tabCollectionViewModel = TabCollectionViewModel.aTabCollectionViewModel
 
         let isBurningExpectation = expectation(description: "Burning")

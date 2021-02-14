@@ -32,7 +32,7 @@ protocol WebsiteDataStore {
 
     var cookieStore: WebsiteCookieStore? { get }
 
-    func removeAllData(_ completionHandler: @escaping () -> Void)
+    func removeAllData(completionHandler: @escaping () -> Void)
 
 }
 
@@ -135,7 +135,7 @@ class WebCacheManager {
     }
 
     private func clearAllData(dataStore: WebsiteDataStore, completion: @escaping () -> Void) {
-        dataStore.removeAllData(completion)
+        dataStore.removeAllData(completionHandler: completion)
     }
 
     private func extractAllowedCookies(from cookieStore: WebsiteCookieStore?,
@@ -169,7 +169,7 @@ extension WKWebsiteDataStore: WebsiteDataStore {
         return self.httpCookieStore
     }
 
-    func removeAllData(_ completionHandler: @escaping () -> Void) {
+    func removeAllData(completionHandler: @escaping () -> Void) {
         removeData(ofTypes: WKWebsiteDataStore.allWebsiteDataTypes(),
                    modifiedSince: Date.distantPast,
                    completionHandler: completionHandler)

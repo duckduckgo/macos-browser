@@ -21,12 +21,40 @@ import Foundation
 import XCTest
 @testable import DuckDuckGo_Privacy_Browser
 
-class WebsiteDataStoreMock: WebsiteDataStore {
+class WebCacheManagerMock: WebCacheManager {
 
     var removeAllWebsiteDataCalled = false
-    func removeAllWebsiteData(_ completionHandler: @escaping () -> Void) {
+
+    override func clear(dataStore: WebsiteDataStore = WKWebsiteDataStore.default(),
+                        appCookieStorage: CookieStorage = CookieStorage(),
+                        logins: PreserveLogins = PreserveLogins.shared,
+                        completion: @escaping () -> Void) {
         removeAllWebsiteDataCalled = true
-        completionHandler()
+        completion()
+    }
+
+}
+
+extension HTTPCookie {
+
+    static func make(name: String = "name",
+                     value: String = "value",
+                     domain: String = "example.com",
+                     path: String = "/",
+                     policy: HTTPCookieStringPolicy? = nil) -> HTTPCookie {
+
+        var properties: [HTTPCookiePropertyKey: Any] = [
+            .name: name,
+            .value: value,
+            .domain: domain,
+            .path: path
+        ]
+
+        if #available(iOS 13, *), policy != nil {
+            properties[HTTPCookiePropertyKey.sameSitePolicy] = policy
+        }
+
+        return HTTPCookie(properties: properties)!
     }
 
 }
