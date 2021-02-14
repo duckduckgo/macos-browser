@@ -56,6 +56,9 @@
 		4BB5471F25D9A4C60082F1E9 /* FireproofingURLExtensionsTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4BB5471E25D9A4C60082F1E9 /* FireproofingURLExtensionsTests.swift */; };
 		4BB5472A25D9A7990082F1E9 /* LoginDetectionUserScript.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4BB5472925D9A7990082F1E9 /* LoginDetectionUserScript.swift */; };
 		4BB5473025D9A7E30082F1E9 /* login-detection.js in Resources */ = {isa = PBXBuildFile; fileRef = 4BB5472F25D9A7E30082F1E9 /* login-detection.js */; };
+		4BB5473825D9A8600082F1E9 /* FireproofInfoViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4BB5473525D9A8600082F1E9 /* FireproofInfoViewController.swift */; };
+		4BB5473925D9A8600082F1E9 /* UndoFireproofingViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4BB5473625D9A8600082F1E9 /* UndoFireproofingViewController.swift */; };
+		4BB5473A25D9A8600082F1E9 /* Fireproofing.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 4BB5473725D9A8600082F1E9 /* Fireproofing.storyboard */; };
 		4BB88B4525B7B55C006F6B06 /* DebugUserScript.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4BB88B4425B7B55C006F6B06 /* DebugUserScript.swift */; };
 		4BB88B4A25B7B690006F6B06 /* SequenceExtensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4BB88B4925B7B690006F6B06 /* SequenceExtensions.swift */; };
 		4BB88B5025B7BA2B006F6B06 /* TabInstrumentation.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4BB88B4F25B7BA2B006F6B06 /* TabInstrumentation.swift */; };
@@ -256,6 +259,9 @@
 		4BB5471E25D9A4C60082F1E9 /* FireproofingURLExtensionsTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FireproofingURLExtensionsTests.swift; sourceTree = "<group>"; };
 		4BB5472925D9A7990082F1E9 /* LoginDetectionUserScript.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LoginDetectionUserScript.swift; sourceTree = "<group>"; };
 		4BB5472F25D9A7E30082F1E9 /* login-detection.js */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.javascript; path = "login-detection.js"; sourceTree = "<group>"; };
+		4BB5473525D9A8600082F1E9 /* FireproofInfoViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = FireproofInfoViewController.swift; sourceTree = "<group>"; };
+		4BB5473625D9A8600082F1E9 /* UndoFireproofingViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = UndoFireproofingViewController.swift; sourceTree = "<group>"; };
+		4BB5473725D9A8600082F1E9 /* Fireproofing.storyboard */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.storyboard; path = Fireproofing.storyboard; sourceTree = "<group>"; };
 		4BB88B4425B7B55C006F6B06 /* DebugUserScript.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DebugUserScript.swift; sourceTree = "<group>"; };
 		4BB88B4925B7B690006F6B06 /* SequenceExtensions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SequenceExtensions.swift; sourceTree = "<group>"; };
 		4BB88B4F25B7BA2B006F6B06 /* TabInstrumentation.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TabInstrumentation.swift; sourceTree = "<group>"; };
@@ -565,6 +571,7 @@
 			children = (
 				4BB5471425D9A3A50082F1E9 /* Extensions */,
 				4BB5472E25D9A7C50082F1E9 /* Resources */,
+				4BB5473425D9A8460082F1E9 /* View */,
 			);
 			path = Fireproofing;
 			sourceTree = "<group>";
@@ -591,6 +598,16 @@
 				4BB5472F25D9A7E30082F1E9 /* login-detection.js */,
 			);
 			path = Resources;
+			sourceTree = "<group>";
+		};
+		4BB5473425D9A8460082F1E9 /* View */ = {
+			isa = PBXGroup;
+			children = (
+				4BB5473725D9A8600082F1E9 /* Fireproofing.storyboard */,
+				4BB5473525D9A8600082F1E9 /* FireproofInfoViewController.swift */,
+				4BB5473625D9A8600082F1E9 /* UndoFireproofingViewController.swift */,
+			);
+			path = View;
 			sourceTree = "<group>";
 		};
 		4BB88B4E25B7BA20006F6B06 /* Utilities */ = {
@@ -1337,6 +1354,7 @@
 				AA80EC6D256C469C007083E7 /* NavigationBar.storyboard in Resources */,
 				4B677433255DBEB800025BD8 /* httpsMobileV2Bloom.bin in Resources */,
 				4B677432255DBEB800025BD8 /* httpsMobileV2BloomSpec.json in Resources */,
+				4BB5473A25D9A8600082F1E9 /* Fireproofing.storyboard in Resources */,
 				AA2CB12D2587BB5600AA6FBE /* TabBarFooter.xib in Resources */,
 				4B6160D825B150E4007DE5B2 /* trackerData.json in Resources */,
 				AA80EC67256C4691007083E7 /* BrowserTab.storyboard in Resources */,
@@ -1451,6 +1469,7 @@
 				B68458B025C7E76A00DC17B6 /* WindowManager+StateRestoration.swift in Sources */,
 				B68458C525C7EA0C00DC17B6 /* TabCollection+NSSecureCoding.swift in Sources */,
 				4BB88B5B25B7BA50006F6B06 /* Instruments.swift in Sources */,
+				4BB5473825D9A8600082F1E9 /* FireproofInfoViewController.swift in Sources */,
 				F44C130225C2DA0400426E3E /* NSAppearanceExtension.swift in Sources */,
 				4BA1A6B8258B081600F6F690 /* EncryptionKeyStoring.swift in Sources */,
 				B684592F25C93FBF00DC17B6 /* AppStateRestorationManager.swift in Sources */,
@@ -1493,6 +1512,7 @@
 				AA585D82248FD31100E9A3E2 /* AppDelegate.swift in Sources */,
 				1456D6E124EFCBC300775049 /* TabBarCollectionView.swift in Sources */,
 				AABEE69C24A902BB0043105B /* Suggestions.swift in Sources */,
+				4BB5473925D9A8600082F1E9 /* UndoFireproofingViewController.swift in Sources */,
 				4B677439255DBEB800025BD8 /* HTTPSUpgradeStore.swift in Sources */,
 				F41D174125CB131900472416 /* NSColorExtension.swift in Sources */,
 				AA6EF9B3250785D5004754E6 /* NSMenuExtension.swift in Sources */,
