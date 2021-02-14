@@ -62,7 +62,7 @@ class UndoFireproofingViewController: NSViewController {
 
     override func viewDidLoad() {
         super.viewDidLoad()
-        updateTitleLabel(with: domain)
+        self.titleLabel.stringValue = UserText.domainIsFireproof(domain: domain)
 
         if let mouseOverView = self.view as? MouseOverView {
             mouseOverView.delegate = self
@@ -90,10 +90,6 @@ class UndoFireproofingViewController: NSViewController {
             guard let self = self else { return }
             self.presentingViewController?.dismiss(self)
         }
-    }
-
-    private func updateTitleLabel(with domain: String) {
-        self.titleLabel.stringValue = "\(domain) is Fireproof"
     }
 
 }
