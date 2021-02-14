@@ -36,6 +36,7 @@ final class Tab: NSObject {
     weak var delegate: TabDelegate?
 
     init(faviconService: FaviconService = LocalFaviconService.shared,
+         webCacheManager: WebCacheManager = .shared,
          webViewConfiguration: WebViewConfiguration? = nil,
          url: URL? = nil,
          title: String? = nil,
@@ -63,6 +64,12 @@ final class Tab: NSObject {
         if let favicon = favicon,
            let host = url?.host {
             faviconService.storeIfNeeded(favicon: favicon, for: host, isFromUserScript: false)
+        }
+
+        webView.configuration.websiteDataStore.fetchDataRecords(ofTypes: WKWebsiteDataStore.allWebsiteDataTypes()) { _ in
+            webCacheManager.consumeCookies {
+                // Nothing to see here yet
+            }
         }
     }
 
