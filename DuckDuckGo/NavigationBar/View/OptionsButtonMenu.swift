@@ -35,22 +35,35 @@ class OptionsButtonMenu: NSMenu {
         setupMenuItems()
     }
 
+    private func addMenuItem(title: String, action: Selector, imageName: String) {
+        let item = NSMenuItem(title: title, action: action, keyEquivalent: "")
+        item.target = self
+        item.image = NSImage(named: imageName)
+        addItem(item)
+    }
+
     private func setupMenuItems() {
-        let moveTabMenuItem = NSMenuItem(title: UserText.moveTabToNewWindow,
-                                         action: #selector(moveTabToNewWindowAction(_:)),
-                                         keyEquivalent: "")
-        moveTabMenuItem.target = self
-        moveTabMenuItem.image = NSImage(named: "MoveTabToNewWindow")
-        addItem(moveTabMenuItem)
+        addMenuItem(title: UserText.moveTabToNewWindow,
+                    action: #selector(moveTabToNewWindowAction(_:)),
+                    imageName: "MoveTabToNewWindow")
+
+        addItem(NSMenuItem.separator())
+
+        if let host = tabCollectionViewModel.selectedTabViewModel?.tab.url?.baseHost {
+            if PreserveLogins.shared.isAllowed(fireproofDomain: host) {
+                addMenuItem(title: UserText.removeFireproofing, action: #selector(toggleFireproofing(_:)), imageName: "BurnProof")
+            } else {
+                addMenuItem(title: UserText.fireproofSite, action: #selector(toggleFireproofing(_:)), imageName: "BurnProof")
+            }
+
+            addItem(NSMenuItem.separator())
+        }
 
 #if FEEDBACK
 
-        let openFeedbackMenuItem = NSMenuItem(title: "Send Feedback",
-                                         action: #selector(openFeedbackAction(_:)),
-                                         keyEquivalent: "")
-        openFeedbackMenuItem.target = self
-        openFeedbackMenuItem.image = NSImage(named: "Feedback")
-        addItem(openFeedbackMenuItem)
+        addMenuItem(title: "Send Feedback",
+                    action: #selector(openFeedbackAction(_:)),
+                    imageName: "Feedback")
 
 #endif
 
@@ -67,7 +80,16 @@ class OptionsButtonMenu: NSMenu {
         WindowsManager.openNewWindow(with: tab)
     }
 
-#if FEEDBACK
+    @objc func toggleFireproofing(_ sender: NSMenuItem) {
+        guard let selectedTabViewModel = tabCollectionViewModel.selectedTabViewModel else {
+            os_log("MainViewController: No tab view model selected", type: .error)
+            return
+        }
+
+        selectedTabViewModel.tab.requestFireproofToggle()
+    }
+
+    #if FEEDBACK
 
     @objc func openFeedbackAction(_ sender: NSMenuItem) {
         let tab = Tab()
@@ -75,6 +97,6 @@ class OptionsButtonMenu: NSMenu {
         tabCollectionViewModel.append(tab: tab)
     }
 
-#endif
+    #endif
 
 }

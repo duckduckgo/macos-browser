@@ -189,6 +189,19 @@ extension BrowserTabViewController: TabDelegate {
         contextMenuLink = link
     }
 
+    func tab(_ tab: Tab, requestedFireproofToggle url: URL?) {
+        guard let host = url?.baseHost else {
+            return
+        }
+
+        if PreserveLogins.shared.isAllowed(fireproofDomain: host) {
+            PreserveLogins.shared.remove(domain: host)
+        } else {
+            // TODO: Figure out if this login should live here.
+            PreserveLogins.shared.addToAllowed(domain: host)
+        }
+    }
+
 }
 
 extension BrowserTabViewController: LinkMenuItemSelectors {

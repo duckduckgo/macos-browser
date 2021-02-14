@@ -27,6 +27,7 @@ protocol TabDelegate: class {
     func tab(_ tab: Tab, requestedNewTab url: URL?, selected: Bool)
     func tab(_ tab: Tab, requestedFileDownload download: FileDownload)
     func tab(_ tab: Tab, willShowContextMenuAt position: NSPoint, image: URL?, link: URL?)
+    func tab(_ tab: Tab, requestedFireproofToggle url: URL?)
 
 }
 
@@ -147,6 +148,10 @@ final class Tab: NSObject {
 
     func stopLoading() {
         webView.stopLoading()
+    }
+
+    func requestFireproofToggle() {
+        self.delegate?.tab(self, requestedFireproofToggle: url)
     }
 
     private func setupWebView() {
