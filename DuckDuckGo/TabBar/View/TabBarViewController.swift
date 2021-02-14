@@ -665,6 +665,22 @@ extension TabBarViewController: TabBarViewItemDelegate {
         moveToNewWindow(indexPath: indexPath)
     }
 
+    func tabBarViewItemFireproofSite(_ tabBarViewItem: TabBarViewItem) {
+        if let url = tabCollectionViewModel.selectedTabViewModel?.tab.url?.baseHost {
+            PreserveLogins.shared.addToAllowed(domain: url)
+        }
+
+        tabBarViewItem.setupMenu()
+    }
+
+    func tabBarViewItemRemoveFireproofing(_ tabBarViewItem: TabBarViewItem) {
+        if let url = tabCollectionViewModel.selectedTabViewModel?.tab.url?.baseHost {
+            PreserveLogins.shared.remove(domain: url)
+        }
+
+        tabBarViewItem.setupMenu()
+    }
+
 }
 
 fileprivate extension NSAlert {

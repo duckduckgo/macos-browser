@@ -28,6 +28,8 @@ protocol TabBarViewItemDelegate: AnyObject {
     func tabBarViewItemCloseOtherAction(_ tabBarViewItem: TabBarViewItem)
     func tabBarViewItemDuplicateAction(_ tabBarViewItem: TabBarViewItem)
     func tabBarViewItemMoveToNewWindowAction(_ tabBarViewItem: TabBarViewItem)
+    func tabBarViewItemFireproofSite(_ tabBarViewItem: TabBarViewItem)
+    func tabBarViewItemRemoveFireproofing(_ tabBarViewItem: TabBarViewItem)
 
 }
 
@@ -77,18 +79,36 @@ class TabBarViewItem: NSCollectionViewItem {
 
     static let identifier = NSUserInterfaceItemIdentifier(rawValue: "TabBarViewItem")
 
-    static var menu: NSMenu {
+    var tabBarViewItemMenu: NSMenu {
         let menu = NSMenu()
 
         let duplicateMenuItem = NSMenuItem(title: UserText.duplicateTab, action: #selector(duplicateAction(_:)), keyEquivalent: "")
         menu.addItem(duplicateMenuItem)
+
         menu.addItem(NSMenuItem.separator())
+
+        if let url = currentURL {
+            let menuItem: NSMenuItem
+
+            if PreserveLogins.shared.isAllowed(fireproofDomain: url.baseHost ?? "") {
+                menuItem = NSMenuItem(title: UserText.removeFireproofing, action: #selector(removeFireproofingAction(_:)), keyEquivalent: "")
+            } else {
+                menuItem = NSMenuItem(title: UserText.fireproofSite, action: #selector(fireproofSiteAction(_:)), keyEquivalent: "")
+            }
+
+            menu.addItem(menuItem)
+            menu.addItem(NSMenuItem.separator())
+        }
+
         let closeMenuItem = NSMenuItem(title: UserText.closeTab, action: #selector(closeButtonAction(_:)), keyEquivalent: "")
         menu.addItem(closeMenuItem)
+
         let closeOtherMenuItem = NSMenuItem(title: UserText.closeOtherTabs, action: #selector(closeOtherAction(_:)), keyEquivalent: "")
         menu.addItem(closeOtherMenuItem)
+
         let moveToNewWindowMenuItem = NSMenuItem(title: UserText.moveTabToNewWindow, action: #selector(moveToNewWindowAction(_:)), keyEquivalent: "")
         menu.addItem(moveToNewWindowMenuItem)
+
         return menu
     }
 
@@ -103,6 +123,7 @@ class TabBarViewItem: NSCollectionViewItem {
 
     private let titleTextFieldMaskLayer = CAGradientLayer()
 
+    private var currentURL: URL?
     private var cancellables = Set<AnyCancellable>()
 
     weak var delegate: TabBarViewItemDelegate?
@@ -142,6 +163,14 @@ class TabBarViewItem: NSCollectionViewItem {
         delegate?.tabBarViewItemDuplicateAction(self)
     }
 
+    @objc func fireproofSiteAction(_ sender: NSButton) {
+        delegate?.tabBarViewItemFireproofSite(self)
+    }
+
+    @objc func removeFireproofingAction(_ sender: NSButton) {
+        delegate?.tabBarViewItemRemoveFireproofing(self)
+    }
+
     @IBAction func closeButtonAction(_ sender: NSButton) {
         delegate?.tabBarViewItemCloseAction(self)
     }
@@ -163,6 +192,11 @@ class TabBarViewItem: NSCollectionViewItem {
 
         tabViewModel.$favicon.sink { [weak self] favicon in
             self?.faviconImageView.image = favicon
+        }.store(in: &cancellables)
+
+        tabViewModel.tab.$url.sink { [weak self] url in
+            self?.currentURL = url
+            self?.setupMenu()
         }.store(in: &cancellables)
 
         tabViewModel.$isLoading.sink { [weak self] isLoading in
@@ -216,8 +250,8 @@ class TabBarViewItem: NSCollectionViewItem {
         tabLoadingViewLeadingConstraint.priority = widthStage.isTitleHidden && widthStage.isCloseButtonHidden ? .defaultLow : .defaultHigh
     }
 
-    private func setupMenu() {
-        let menu = Self.menu
+    func setupMenu() {
+        let menu = self.tabBarViewItemMenu
         menu.items.forEach { $0.target = self }
         view.menu = menu
     }
