@@ -54,6 +54,8 @@
 		4BA1A6FE258C5C1300F6F690 /* EncryptedValueTransformerTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4BA1A6FD258C5C1300F6F690 /* EncryptedValueTransformerTests.swift */; };
 		4BB5471625D9A3BF0082F1E9 /* FireproofingURLExtensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4BB5471525D9A3BF0082F1E9 /* FireproofingURLExtensions.swift */; };
 		4BB5471F25D9A4C60082F1E9 /* FireproofingURLExtensionsTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4BB5471E25D9A4C60082F1E9 /* FireproofingURLExtensionsTests.swift */; };
+		4BB5472A25D9A7990082F1E9 /* LoginDetectionUserScript.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4BB5472925D9A7990082F1E9 /* LoginDetectionUserScript.swift */; };
+		4BB5473025D9A7E30082F1E9 /* login-detection.js in Resources */ = {isa = PBXBuildFile; fileRef = 4BB5472F25D9A7E30082F1E9 /* login-detection.js */; };
 		4BB88B4525B7B55C006F6B06 /* DebugUserScript.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4BB88B4425B7B55C006F6B06 /* DebugUserScript.swift */; };
 		4BB88B4A25B7B690006F6B06 /* SequenceExtensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4BB88B4925B7B690006F6B06 /* SequenceExtensions.swift */; };
 		4BB88B5025B7BA2B006F6B06 /* TabInstrumentation.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4BB88B4F25B7BA2B006F6B06 /* TabInstrumentation.swift */; };
@@ -252,6 +254,8 @@
 		4BA1A6FD258C5C1300F6F690 /* EncryptedValueTransformerTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EncryptedValueTransformerTests.swift; sourceTree = "<group>"; };
 		4BB5471525D9A3BF0082F1E9 /* FireproofingURLExtensions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FireproofingURLExtensions.swift; sourceTree = "<group>"; };
 		4BB5471E25D9A4C60082F1E9 /* FireproofingURLExtensionsTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FireproofingURLExtensionsTests.swift; sourceTree = "<group>"; };
+		4BB5472925D9A7990082F1E9 /* LoginDetectionUserScript.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LoginDetectionUserScript.swift; sourceTree = "<group>"; };
+		4BB5472F25D9A7E30082F1E9 /* login-detection.js */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.javascript; path = "login-detection.js"; sourceTree = "<group>"; };
 		4BB88B4425B7B55C006F6B06 /* DebugUserScript.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DebugUserScript.swift; sourceTree = "<group>"; };
 		4BB88B4925B7B690006F6B06 /* SequenceExtensions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SequenceExtensions.swift; sourceTree = "<group>"; };
 		4BB88B4F25B7BA2B006F6B06 /* TabInstrumentation.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TabInstrumentation.swift; sourceTree = "<group>"; };
@@ -560,6 +564,7 @@
 			isa = PBXGroup;
 			children = (
 				4BB5471425D9A3A50082F1E9 /* Extensions */,
+				4BB5472E25D9A7C50082F1E9 /* Resources */,
 			);
 			path = Fireproofing;
 			sourceTree = "<group>";
@@ -578,6 +583,14 @@
 				4BB5471E25D9A4C60082F1E9 /* FireproofingURLExtensionsTests.swift */,
 			);
 			path = Fireproofing;
+			sourceTree = "<group>";
+		};
+		4BB5472E25D9A7C50082F1E9 /* Resources */ = {
+			isa = PBXGroup;
+			children = (
+				4BB5472F25D9A7E30082F1E9 /* login-detection.js */,
+			);
+			path = Resources;
 			sourceTree = "<group>";
 		};
 		4BB88B4E25B7BA20006F6B06 /* Utilities */ = {
@@ -956,6 +969,7 @@
 				4BB88B4425B7B55C006F6B06 /* DebugUserScript.swift */,
 				8556A601256BDDD30092FA9D /* HTML5DownloadUserScript.swift */,
 				AAF7D3852567CED500998667 /* WebViewConfiguration.swift */,
+				4BB5472925D9A7990082F1E9 /* LoginDetectionUserScript.swift */,
 			);
 			path = Model;
 			sourceTree = "<group>";
@@ -1319,6 +1333,7 @@
 				85480F8A25CDC360009424E3 /* Launch.storyboard in Resources */,
 				4B677435255DBEB800025BD8 /* httpsMobileV2FalsePositives.json in Resources */,
 				AA80EC8F256C49BC007083E7 /* Localizable.stringsdict in Resources */,
+				4BB5473025D9A7E30082F1E9 /* login-detection.js in Resources */,
 				AA80EC6D256C469C007083E7 /* NavigationBar.storyboard in Resources */,
 				4B677433255DBEB800025BD8 /* httpsMobileV2Bloom.bin in Resources */,
 				4B677432255DBEB800025BD8 /* httpsMobileV2BloomSpec.json in Resources */,
@@ -1419,6 +1434,7 @@
 				AAECA42024EEA4AC00EFA63A /* IndexPathExtension.swift in Sources */,
 				AA5C8F632591021700748EB7 /* NSApplicationExtension.swift in Sources */,
 				AA9E9A5625A3AE8400D1959D /* NSWindowExtension.swift in Sources */,
+				4BB5472A25D9A7990082F1E9 /* LoginDetectionUserScript.swift in Sources */,
 				4B677450255DBFA300025BD8 /* HashExtension.swift in Sources */,
 				AA9FF95F24A1FB690039E328 /* TabCollectionViewModel.swift in Sources */,
 				AA5C8F59258FE21F00748EB7 /* NSTextFieldExtension.swift in Sources */,
