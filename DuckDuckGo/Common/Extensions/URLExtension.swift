@@ -101,6 +101,10 @@ extension URL {
         }
     }
 
+    var baseHost: String? {
+        host?.drop(prefix: HostPrefix.www.separated())
+    }
+
     // MARK: - Validity
 
     var isValid: Bool {
