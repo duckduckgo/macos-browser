@@ -21,12 +21,12 @@ import os.log
 
 class Fire {
 
-    let websiteDataStore: WebsiteDataStore
+    let webCacheManager: WebCacheManager
 
     @Published private(set) var isBurning = false
 
-    init(websiteDataStore: WebsiteDataStore) {
-        self.websiteDataStore = websiteDataStore
+    init(cacheManager: WebCacheManager = .shared) {
+        self.webCacheManager = cacheManager
     }
 
     func burnAll(tabCollectionViewModel: TabCollectionViewModel) {
@@ -40,7 +40,7 @@ class Fire {
             tabCollectionViewModel.appendNewTab()
         }
 
-        websiteDataStore.removeAllWebsiteData { [weak self] in
+        webCacheManager.clear { [weak self] in
             self?.isBurning = false
         }
     }
