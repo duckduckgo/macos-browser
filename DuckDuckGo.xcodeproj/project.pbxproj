@@ -59,6 +59,7 @@
 		4BB5473825D9A8600082F1E9 /* FireproofInfoViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4BB5473525D9A8600082F1E9 /* FireproofInfoViewController.swift */; };
 		4BB5473925D9A8600082F1E9 /* UndoFireproofingViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4BB5473625D9A8600082F1E9 /* UndoFireproofingViewController.swift */; };
 		4BB5473A25D9A8600082F1E9 /* Fireproofing.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 4BB5473725D9A8600082F1E9 /* Fireproofing.storyboard */; };
+		4BB5474225D9B3C90082F1E9 /* CookieStorage.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4BB5474125D9B3C90082F1E9 /* CookieStorage.swift */; };
 		4BB88B4525B7B55C006F6B06 /* DebugUserScript.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4BB88B4425B7B55C006F6B06 /* DebugUserScript.swift */; };
 		4BB88B4A25B7B690006F6B06 /* SequenceExtensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4BB88B4925B7B690006F6B06 /* SequenceExtensions.swift */; };
 		4BB88B5025B7BA2B006F6B06 /* TabInstrumentation.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4BB88B4F25B7BA2B006F6B06 /* TabInstrumentation.swift */; };
@@ -262,6 +263,7 @@
 		4BB5473525D9A8600082F1E9 /* FireproofInfoViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = FireproofInfoViewController.swift; sourceTree = "<group>"; };
 		4BB5473625D9A8600082F1E9 /* UndoFireproofingViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = UndoFireproofingViewController.swift; sourceTree = "<group>"; };
 		4BB5473725D9A8600082F1E9 /* Fireproofing.storyboard */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.storyboard; path = Fireproofing.storyboard; sourceTree = "<group>"; };
+		4BB5474125D9B3C90082F1E9 /* CookieStorage.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CookieStorage.swift; sourceTree = "<group>"; };
 		4BB88B4425B7B55C006F6B06 /* DebugUserScript.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DebugUserScript.swift; sourceTree = "<group>"; };
 		4BB88B4925B7B690006F6B06 /* SequenceExtensions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SequenceExtensions.swift; sourceTree = "<group>"; };
 		4BB88B4F25B7BA2B006F6B06 /* TabInstrumentation.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TabInstrumentation.swift; sourceTree = "<group>"; };
@@ -686,6 +688,7 @@
 			children = (
 				AA512D1324D99D9800230283 /* FaviconService.swift */,
 				AA6820E325502F19005ED0D5 /* WebsiteDataStore.swift */,
+				4BB5474125D9B3C90082F1E9 /* CookieStorage.swift */,
 			);
 			path = Services;
 			sourceTree = "<group>";
@@ -1437,6 +1440,7 @@
 				4BA1A6A0258B079600F6F690 /* DataEncryption.swift in Sources */,
 				AABEE6AF24AD22B90043105B /* AddressBarTextField.swift in Sources */,
 				AA68C3D32490ED62001B8783 /* NavigationBarViewController.swift in Sources */,
+				4BB5474225D9B3C90082F1E9 /* CookieStorage.swift in Sources */,
 				AA585DAF2490E6E600E9A3E2 /* MainViewController.swift in Sources */,
 				AABEE69A24A902A90043105B /* SuggestionsViewModel.swift in Sources */,
 				AA6820E425502F19005ED0D5 /* WebsiteDataStore.swift in Sources */,
