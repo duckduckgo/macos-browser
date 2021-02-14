@@ -19,7 +19,7 @@
 import Foundation
 import os.log
 
-public class CookieStorage {
+class CookieStorage {
 
     struct Constants {
         static let key = "com.duckduckgo.allowedCookies"
@@ -47,7 +47,7 @@ public class CookieStorage {
         return storedCookies
     }
 
-    public init(userDefaults: UserDefaults = UserDefaults.standard) {
+    init(userDefaults: UserDefaults = UserDefaults.standard) {
         self.userDefaults = userDefaults
     }
 
