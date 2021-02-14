@@ -268,6 +268,25 @@
                                     <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
                                 </textFieldCell>
                             </textField>
+                            <button translatesAutoresizingMaskIntoConstraints="NO" id="XMM-Vd-9H5">
+                                <rect key="frame" x="13" y="11" width="16" height="16"/>
+                                <constraints>
+                                    <constraint firstAttribute="height" constant="16" id="Mx4-BM-s2S"/>
+                                    <constraint firstAttribute="width" constant="16" id="Q3o-tA-aEO"/>
+                                </constraints>
+                                <buttonCell key="cell" type="square" bezelStyle="shadowlessSquare" image="HomeFavicon" imagePosition="only" alignment="center" imageScaling="proportionallyDown" inset="2" id="TU5-Hg-l4v">
+                                    <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
+                                    <font key="font" metaFont="system"/>
+                                </buttonCell>
+                            </button>
+                            <button hidden="YES" translatesAutoresizingMaskIntoConstraints="NO" id="Wmw-FG-ZMU">
+                                <rect key="frame" x="13" y="12" width="15" height="15"/>
+                                <buttonCell key="cell" type="square" bezelStyle="shadowlessSquare" image="PrivacyEntryPoint" imagePosition="only" alignment="center" imageScaling="proportionallyUpOrDown" inset="2" id="U3T-b0-hqd">
+                                    <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
+                                    <font key="font" metaFont="system"/>
+                                </buttonCell>
+                                <color key="contentTintColor" name="ButtonColor"/>
+                            </button>
                             <textField focusRingType="none" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="zaX-wZ-E3D" customClass="AddressBarTextField" customModule="DuckDuckGo_Privacy_Browser" customModuleProvider="target">
                                 <rect key="frame" x="35" y="11" width="522" height="16"/>
                                 <textFieldCell key="cell" lineBreakMode="truncatingTail" selectable="YES" editable="YES" sendsActionOnEndEditing="YES" focusRingType="none" tag="5" placeholderString="Search or enter address" usesSingleLineMode="YES" id="1ah-Qg-8lr">
@@ -301,25 +320,6 @@
                                 <connections>
                                     <action selector="clearButtonAction:" target="H4f-bE-T92" id="ORB-Cf-gHh"/>
                                 </connections>
-                            </button>
-                            <button translatesAutoresizingMaskIntoConstraints="NO" id="XMM-Vd-9H5">
-                                <rect key="frame" x="13" y="11" width="16" height="16"/>
-                                <constraints>
-                                    <constraint firstAttribute="height" constant="16" id="Mx4-BM-s2S"/>
-                                    <constraint firstAttribute="width" constant="16" id="Q3o-tA-aEO"/>
-                                </constraints>
-                                <buttonCell key="cell" type="square" bezelStyle="shadowlessSquare" image="HomeFavicon" imagePosition="only" alignment="center" imageScaling="proportionallyDown" inset="2" id="TU5-Hg-l4v">
-                                    <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
-                                    <font key="font" metaFont="system"/>
-                                </buttonCell>
-                            </button>
-                            <button hidden="YES" translatesAutoresizingMaskIntoConstraints="NO" id="Wmw-FG-ZMU">
-                                <rect key="frame" x="13" y="12" width="15" height="15"/>
-                                <buttonCell key="cell" type="square" bezelStyle="shadowlessSquare" image="PrivacyEntryPoint" imagePosition="only" alignment="center" imageScaling="proportionallyUpOrDown" inset="2" id="U3T-b0-hqd">
-                                    <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
-                                    <font key="font" metaFont="system"/>
-                                </buttonCell>
-                                <color key="contentTintColor" name="ButtonColor"/>
                             </button>
                             <customView id="ktI-g4-Uk6" customClass="ShadowView" customModule="DuckDuckGo_Privacy_Browser" customModuleProvider="target">
                                 <rect key="frame" x="410" y="5" width="135" height="32"/>
