@@ -28,14 +28,15 @@ public class CookieStorage {
     private var userDefaults: UserDefaults
 
     var cookies: [HTTPCookie] {
-
         var storedCookies = [HTTPCookie]()
+
         if let cookies = userDefaults.object(forKey: Constants.key) as? [[String: Any?]] {
             for cookieData in cookies {
                 var properties = [HTTPCookiePropertyKey: Any]()
-                cookieData.forEach({
+
+                cookieData.forEach {
                     properties[HTTPCookiePropertyKey(rawValue: $0.key)] = $0.value
-                })
+                }
 
                 if let cookie = HTTPCookie(properties: properties) {
                     storedCookies.append(cookie)
