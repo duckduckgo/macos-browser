@@ -33,6 +33,20 @@ class AddressBarViewController: NSViewController {
     @IBOutlet var inactiveBackgroundView: NSView!
     @IBOutlet var activeBackgroundView: NSView!
     @IBOutlet var activeBackgroundViewOverHeight: NSLayoutConstraint!
+
+    @IBOutlet weak var fireproofedButtonDivider: NSBox! {
+        didSet {
+            fireproofedButtonDivider.isHidden = true
+        }
+    }
+
+    @IBOutlet weak var fireproofedButton: NSButton! {
+        didSet {
+            fireproofedButton.isHidden = true
+            fireproofedButton.target = self
+            fireproofedButton.action = #selector(fireproofedButtonAction)
+        }
+    }
     
     private var tabCollectionViewModel: TabCollectionViewModel
     private let suggestionsViewModel = SuggestionsViewModel(suggestions: Suggestions())
@@ -77,6 +91,16 @@ class AddressBarViewController: NSViewController {
         subscribeToSelectedTabViewModel()
         subscribeToAddressBarTextFieldValue()
         registerForMouseEnteredAndExitedEvents()
+
+        NotificationCenter.default.addObserver(self,
+                                               selector: #selector(refreshAddressBarAppearance(_:)),
+                                               name: PreserveLogins.Constants.allowedDomainsChangedNotification,
+                                               object: nil)
+
+        NotificationCenter.default.addObserver(self,
+                                               selector: #selector(showUndoFireproofingPopover(_:)),
+                                               name: PreserveLogins.Constants.newFireproofedDomainNotification,
+                                               object: nil)
     }
 
     override func viewWillAppear() {
@@ -205,6 +229,28 @@ class AddressBarViewController: NSViewController {
         case .searching(withUrl: false):
             imageButton.image = Self.homeFaviconImage
         }
+
+        // Fireproof button
+        // TODO: Put the duckduckgo.com check elsewhere
+        if let url = selectedTabViewModel.tab.url, url.baseHost != "duckduckgo.com" {
+            NSAnimationContext.runAnimationGroup({ context in
+                context.duration = 0.3
+                context.allowsImplicitAnimation = true
+
+                fireproofedButtonDivider.isHidden = !PreserveLogins.shared.isAllowed(fireproofDomain: url.baseHost ?? "")
+                fireproofedButton.isHidden = !PreserveLogins.shared.isAllowed(fireproofDomain: url.baseHost ?? "")
+
+            }, completionHandler: nil)
+        } else {
+            NSAnimationContext.runAnimationGroup({ context in
+                context.duration = 0.3
+                context.allowsImplicitAnimation = true
+
+                fireproofedButtonDivider.isHidden = true
+                fireproofedButton.isHidden = true
+
+            }, completionHandler: nil)
+        }
     }
 
     private func updateMode() {
@@ -217,6 +263,34 @@ class AddressBarViewController: NSViewController {
             case .website: self.mode = .searching(withUrl: true)
             case .unknown: self.mode = .searching(withUrl: false)
             }
+        }
+    }
+
+    @objc private func refreshAddressBarAppearance(_ sender: Any) {
+        self.updateMode()
+        self.updateButtons()
+    }
+
+    @objc func fireproofedButtonAction(_ sender: Any) {
+        guard let selectedTabViewModel = tabCollectionViewModel.selectedTabViewModel, let button = sender as? NSButton else {
+            return
+        }
+
+        if let host = selectedTabViewModel.tab.url?.baseHost, PreserveLogins.shared.isAllowed(fireproofDomain: host) {
+            let viewController = FireproofInfoViewController.create(for: host)
+            present(viewController, asPopoverRelativeTo: button.frame, of: button.superview!, preferredEdge: .minY, behavior: .transient)
+        }
+    }
+
+    @objc private func showUndoFireproofingPopover(_ sender: Notification) {
+        guard let domain = sender.userInfo?["domain"] as? String else { return }
+
+        DispatchQueue.main.async {
+            let viewController = UndoFireproofingViewController.create(for: domain)
+            viewController.delegate = self
+            let frame = self.fireproofedButton.frame.insetBy(dx: -10, dy: -10)
+
+            self.present(viewController, asPopoverRelativeTo: frame, of: self.fireproofedButton.superview!, preferredEdge: .minY, behavior: .transient)
         }
     }
     
@@ -335,6 +409,14 @@ extension AddressBarViewController {
         self.view.window?.makeFirstResponder(nil)
 
         return event
+    }
+
+}
+
+extension AddressBarViewController: UndoFireproofingViewControllerDelegate {
+
+    func undoFireproofingViewController(_ viewController: UndoFireproofingViewController, requestedUndoFor domain: String) {
+        PreserveLogins.shared.remove(domain: domain)
     }
 
 }

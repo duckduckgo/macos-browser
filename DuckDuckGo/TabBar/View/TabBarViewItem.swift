@@ -135,6 +135,11 @@ class TabBarViewItem: NSCollectionViewItem {
         updateSubviews()
         setupMenu()
         updateTitleTextFieldMask()
+
+        NotificationCenter.default.addObserver(self,
+                                               selector: #selector(setupMenu),
+                                               name: PreserveLogins.Constants.allowedDomainsChangedNotification,
+                                               object: nil)
     }
 
     override func viewDidLayout() {
@@ -250,7 +255,7 @@ class TabBarViewItem: NSCollectionViewItem {
         tabLoadingViewLeadingConstraint.priority = widthStage.isTitleHidden && widthStage.isCloseButtonHidden ? .defaultLow : .defaultHigh
     }
 
-    func setupMenu() {
+    @objc func setupMenu() {
         let menu = self.tabBarViewItemMenu
         menu.items.forEach { $0.target = self }
         view.menu = menu
