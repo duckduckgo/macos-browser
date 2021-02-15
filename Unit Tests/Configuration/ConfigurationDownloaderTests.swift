@@ -196,6 +196,34 @@ class ConfigurationDownloaderTests: XCTestCase {
         XCTAssertNil(networkingMock.request?.value(forHTTPHeaderField: HTTPURLResponse.ifNoneMatchHeader))
     }
 
+    func test_when_embedded_etag_and_external_etag_provided_then_external_included_in_request() {
+        let embeddedEtag = UUID().uuidString
+        let externalEtag = UUID().uuidString
+
+        let response = HTTPURLResponse.success
+        let storageMock = MockStorage()
+        storageMock.data = Data()
+        storageMock.etag = externalEtag
+
+        let networkingMock = MockNetworking(result: (Self.resultData, response))
+        let downloader = DefaultConfigurationDownloader(storage: storageMock, dataTaskProvider: networkingMock, deliveryQueue: DispatchQueue.main)
+        _ = downloader.download(.bloomFilterSpec, embeddedEtag: embeddedEtag)
+
+        XCTAssertEqual(externalEtag, networkingMock.request?.value(forHTTPHeaderField: HTTPURLResponse.ifNoneMatchHeader))
+    }
+
+    func test_when_embedded_etag_provided_then_is_included_in_request() {
+        let embeddedEtag = UUID().uuidString
+
+        let response = HTTPURLResponse.success
+        let storageMock = MockStorage()
+        let networkingMock = MockNetworking(result: (Self.resultData, response))
+        let downloader = DefaultConfigurationDownloader(storage: storageMock, dataTaskProvider: networkingMock, deliveryQueue: DispatchQueue.main)
+        _ = downloader.download(.bloomFilterSpec, embeddedEtag: embeddedEtag)
+
+        XCTAssertEqual(embeddedEtag, networkingMock.request?.value(forHTTPHeaderField: HTTPURLResponse.ifNoneMatchHeader))
+    }
+
     func test_when_response_is_success_and_valid_etag_then_meta_returned_and_data_stored() {
 
         for config in ConfigurationLocation.allCases {

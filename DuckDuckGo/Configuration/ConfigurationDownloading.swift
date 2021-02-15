@@ -85,8 +85,11 @@ class DefaultConfigurationDownloader: ConfigurationDownloading {
             var request = URLRequest.defaultRequest(with: url)
             request.cachePolicy = .reloadIgnoringLocalAndRemoteCacheData
 
-            if self.storage.loadData(for: config) != nil,
-               let etag = self.storage.loadEtag(for: config) ?? embeddedEtag {
+            let storedEtag = self.storage.loadEtag(for: config)
+
+            if let embeddedEtag = embeddedEtag, storedEtag == nil {
+                request.addValue(embeddedEtag, forHTTPHeaderField: Constants.ifNoneMatchField)
+            } else if self.storage.loadData(for: config) != nil, let etag = storedEtag {
                 request.addValue(etag, forHTTPHeaderField: Constants.ifNoneMatchField)
             }
 
