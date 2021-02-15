@@ -33,9 +33,14 @@ class ConfigurationManager {
 
     struct Constants {
         static let downloadTimeoutSeconds = 60.0 * 5
-        static let refreshPeriodSeconds = 60.0 * 60 * 12
-        static let retryDelaySeconds = 60.0 * 60
-        static let refreshCheckIntervalSeconds = 60.0
+#if DEBUG
+        static let refreshPeriodSeconds = 60.0 * 2 // 2 minutes when in debug mode
+        static let refreshCheckIntervalSeconds = 10.0 // Check if we need a refresh every 10 seconds
+#else
+        static let refreshPeriodSeconds = 60.0 * 60 * 12 // 12 hours
+        static let refreshCheckIntervalSeconds = 60.0 // Check if we need a refresh every minute
+#endif
+        static let retryDelaySeconds = 60.0 * 60 * 1 // 1 hour delay before checking again if something went wrong last time
     }
 
     static let shared = ConfigurationManager()
