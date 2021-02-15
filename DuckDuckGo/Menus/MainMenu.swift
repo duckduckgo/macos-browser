@@ -123,7 +123,15 @@ class MainMenu: NSMenu {
         func favoriteMenuItems(from bookmarkViewModels: [BookmarkViewModel]) -> [NSMenuItem] {
             bookmarkViewModels
                 .filter { $0.bookmark.isFavorite }
-                .map { NSMenuItem(bookmarkViewModel: $0) }
+                .enumerated()
+                .map { index, bookmarkViewModel in
+                    let item = NSMenuItem(bookmarkViewModel: bookmarkViewModel)
+                    if index < 9 {
+                        item.keyEquivalentModifierMask = [.option, .command]
+                        item.keyEquivalent = String(index + 1)
+                    }
+                    return item
+                }
         }
 
         guard let bookmarksMenu = bookmarksMenuItem?.submenu,
