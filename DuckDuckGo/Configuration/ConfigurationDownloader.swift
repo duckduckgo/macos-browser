@@ -33,7 +33,7 @@ struct ConfigurationDownloadMeta {
 
 }
 
-enum ConfigurationLocation: String {
+enum ConfigurationLocation: String, CaseIterable {
 
     case bloomFilterSpec = "https://staticcdn.duckduckgo.com/https/https-mobile-v2-bloom-spec.json"
     case bloomFilterBinary = "https://staticcdn.duckduckgo.com/https/https-mobile-v2-bloom.bin"
@@ -57,8 +57,6 @@ class DefaultConfigurationDownloader: ConfigurationDownloader {
     }
 
     struct Constants {
-        static let userAgent = "macos_ddg_dev"
-        static let userAgentField = "User-Agent"
         static let ifNoneMatchField = "If-None-Match"
         static let etagField = "Etag"
         static let notModifiedResponseCode = 304
@@ -66,12 +64,16 @@ class DefaultConfigurationDownloader: ConfigurationDownloader {
     }
 
     let storage: ConfigurationStoring
+    let dataTaskProvider: DataTaskProviding
 
     private var cancellables = Set<AnyCancellable>()
     private let deliveryQueue: DispatchQueue
 
-    init(storage: ConfigurationStoring = DefaultConfigurationStorage.shared, deliveryQueue: DispatchQueue) {
+    init(storage: ConfigurationStoring = DefaultConfigurationStorage.shared,
+         dataTaskProvider: DataTaskProviding = SharedURLSessionDataTaskProvider(),
+         deliveryQueue: DispatchQueue) {
         self.storage = storage
+        self.dataTaskProvider = dataTaskProvider
         self.deliveryQueue = deliveryQueue
     }
 
@@ -80,8 +82,7 @@ class DefaultConfigurationDownloader: ConfigurationDownloader {
         let url = URL(string: config.rawValue)!
 
         return Future { promise in
-            var request = URLRequest(url: url)
-            request.addValue(Constants.userAgent, forHTTPHeaderField: Constants.userAgentField)
+            var request = URLRequest.defaultRequest(with: url)
             request.cachePolicy = .reloadIgnoringLocalAndRemoteCacheData
 
             if self.storage.loadData(for: config) != nil,
@@ -89,7 +90,7 @@ class DefaultConfigurationDownloader: ConfigurationDownloader {
                 request.addValue(etag, forHTTPHeaderField: Constants.ifNoneMatchField)
             }
 
-            URLSession.shared.dataTaskPublisher(for: request)
+            self.dataTaskProvider.dataTaskPublisher(for: request)
                 .tryMap { result -> ConfigurationDownloadMeta? in
                     guard let response = result.response as? HTTPURLResponse else {
                         throw Error.invalidResponse

@@ -25,11 +25,11 @@ class TrackerRadarManagerTests: XCTestCase {
 
     override func setUp() {
         super.setUp()
-        // try? FileManager.default.removeItem(at: FileStore().persistenceLocation(forConfiguration: .trackerDataSet))
+        try? FileManager.default.removeItem(at: DefaultConfigurationStorage.shared.fileUrl(for: .trackerRadar))
     }
 
     func testWhenReloadCalledInitiallyThenDataSetIsEmbedded() {
-        XCTAssertEqual(TrackerRadarManager.shared.reload(etag: nil), .embedded)
+        XCTAssertEqual(TrackerRadarManager.shared.reload(), .embedded)
     }
 
     func testFindTrackerByUrl() {

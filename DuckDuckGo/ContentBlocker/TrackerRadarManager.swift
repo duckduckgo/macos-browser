@@ -52,11 +52,30 @@ class TrackerRadarManager {
     }
 
     @discardableResult
-    func reload() -> DataSet {
-        let data = configDataStore.loadData(for: .trackerRadar) ?? Self.loadEmbeddedAsData()
-        let trackerData = try? JSONDecoder().decode(TrackerData.self, from: data)
-        self.trackerData = trackerData!
-        return .embedded
+    public func reload() -> DataSet {
+
+        let dataSet: DataSet
+        let data: Data
+
+        if let loadedData = DefaultConfigurationStorage.shared.loadData(for: .trackerRadar) {
+            data = loadedData
+            dataSet = .downloaded
+        } else {
+            data = Self.loadEmbeddedAsData()
+            dataSet = .embedded
+        }
+
+        do {
+            // This might fail if the downloaded data is corrupt or format has changed unexpectedly
+            trackerData = try JSONDecoder().decode(TrackerData.self, from: data)
+        } catch {
+            // This should NEVER fail
+            let trackerData = try? JSONDecoder().decode(TrackerData.self, from: Self.loadEmbeddedAsData())
+            self.trackerData = trackerData!
+            return .embeddedFallback
+        }
+
+        return dataSet
     }
 
     func findTracker(forUrl url: String) -> KnownTracker? {

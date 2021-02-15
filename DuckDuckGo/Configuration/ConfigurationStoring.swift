@@ -31,6 +31,15 @@ protocol ConfigurationStoring {
 
 class DefaultConfigurationStorage: ConfigurationStoring {
 
+    private static let fileLocations: [ConfigurationLocation: String] = [
+        .bloomFilterBinary: "smarterEncryption.bin",
+        .bloomFilterExcludedDomains: "smarterEncryptionExclusions.bin",
+        .bloomFilterSpec: "smarterEncryption.spec",
+        .surrogates: "surrogates.txt",
+        .temporaryUnprotectedSites: "temp-unprotected-sites.txt",
+        .trackerRadar: "tracker-radar.json"
+    ]
+
     static let shared = DefaultConfigurationStorage()
 
     @UserDefaultsWrapper(key: .configStorageTrackerRadarEtag, defaultValue: nil)
@@ -98,12 +107,12 @@ class DefaultConfigurationStorage: ConfigurationStoring {
     }
 
     func loadData(for config: ConfigurationLocation) -> Data? {
-        let file = FileManager.default.fileUrl(for: config)
+        let file = fileUrl(for: config)
         return try? Data(contentsOf: file)
     }
 
     func saveData(_ data: Data, for config: ConfigurationLocation) throws {
-        let file = FileManager.default.fileUrl(for: config)
+        let file = fileUrl(for: config)
         try data.write(to: file, options: .atomic)
     }
 
@@ -116,21 +125,8 @@ class DefaultConfigurationStorage: ConfigurationStoring {
         os_log("trackerRadarEtag %{public}s", type: .default, trackerRadarEtag ?? "")
     }
 
-}
-
-fileprivate extension FileManager {
-
-    private static let fileLocations: [ConfigurationLocation: String] = [
-        .bloomFilterBinary: "smarterEncryption.bin",
-        .bloomFilterExcludedDomains: "smarterEncryptionExclusions.bin",
-        .bloomFilterSpec: "smarterEncryption.spec",
-        .surrogates: "surrogates.txt",
-        .temporaryUnprotectedSites: "temp-unprotected-sites.txt",
-        .trackerRadar: "tracker-radar.json"
-    ]
-
     func fileUrl(for config: ConfigurationLocation) -> URL {
-        guard let dir = urls(for: .applicationSupportDirectory, in: .userDomainMask).first else {
+        guard let dir = FileManager.default.urls(for: .applicationSupportDirectory, in: .userDomainMask).first else {
             fatalError("Could  not find application support directory")
         }
         return dir.appendingPathComponent(Self.fileLocations[config]!)

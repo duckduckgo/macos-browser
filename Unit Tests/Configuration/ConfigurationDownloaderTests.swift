@@ -16,15 +16,263 @@
 //  limitations under the License.
 //
 
-@testable import DuckDuckGo
-import XCTestCase
+import XCTest
+import Combine
+@testable import DuckDuckGo_Privacy_Browser
 
 class ConfigurationDownloaderTests: XCTestCase {
 
-    func test() {
+    static let resultData = "test".data(using: .utf8)!
 
-        
+    var cancellables = Set<AnyCancellable>()
+
+    func test_when_store_etag_fails_then_failure_returned_and_no_etag_stored() {
+        let response = HTTPURLResponse.success
+        let storageMock = MockStorage()
+        storageMock.errorOnStoreEtag = true
+
+        let networkingMock = MockNetworking(result: (Self.resultData, response))
+        let downloader = DefaultConfigurationDownloader(storage: storageMock, dataTaskProvider: networkingMock, deliveryQueue: DispatchQueue.main)
+
+        var completionResult: Subscribers.Completion<Error>?
+        downloader.download(.bloomFilterBinary, embeddedEtag: nil).sink { completion in
+            completionResult = completion
+        } receiveValue: { _ in
+            XCTFail("expected value")
+        }.store(in: &cancellables)
+
+        XCTAssertNotNil(completionResult)
+        if case .failure = completionResult! {
+            // we good
+        } else {
+            XCTFail("completion was not expected failure")
+        }
+
+        // Data may have been stored by this point, nothing we can do about that
+        XCTAssertNil(storageMock.etag)
+        XCTAssertNil(storageMock.etagConfig)
+    }
+
+    func test_when_store_data_fails_then_failure_returned_and_no_data_or_etag_stored() {
+        let response = HTTPURLResponse.success
+        let storageMock = MockStorage()
+        storageMock.errorOnStoreData = true
+
+        let networkingMock = MockNetworking(result: (Self.resultData, response))
+        let downloader = DefaultConfigurationDownloader(storage: storageMock, dataTaskProvider: networkingMock, deliveryQueue: DispatchQueue.main)
+
+        var completionResult: Subscribers.Completion<Error>?
+        downloader.download(.bloomFilterBinary, embeddedEtag: nil).sink { completion in
+            completionResult = completion
+        } receiveValue: { _ in
+            XCTFail("expected value")
+        }.store(in: &cancellables)
+
+        XCTAssertNotNil(completionResult)
+        if case .failure = completionResult! {
+            // we good
+        } else {
+            XCTFail("completion was not expected failure")
+        }
+
+        XCTAssertNil(storageMock.data)
+        XCTAssertNil(storageMock.etag)
+        XCTAssertNil(storageMock.dataConfig)
+        XCTAssertNil(storageMock.etagConfig)
+    }
+
+    func test_when_response_is_success_and_no_etag_then_error_returned() {
+        let response = HTTPURLResponse.successNoEtag
+        let storageMock = MockStorage()
+        let networkingMock = MockNetworking(result: (Self.resultData, response))
+        let downloader = DefaultConfigurationDownloader(storage: storageMock, dataTaskProvider: networkingMock, deliveryQueue: DispatchQueue.main)
+
+        var completionResult: Subscribers.Completion<Error>?
+        downloader.download(.bloomFilterBinary, embeddedEtag: nil).sink { completion in
+            completionResult = completion
+        } receiveValue: { _ in
+            XCTFail("expected value")
+        }.store(in: &cancellables)
+
+        XCTAssertNotNil(completionResult)
+        if case .failure = completionResult! {
+            // we good
+        } else {
+            XCTFail("completion was not expected failure")
+        }
+
+        XCTAssertNil(storageMock.data)
+        XCTAssertNil(storageMock.etag)
+        XCTAssertNil(storageMock.dataConfig)
+        XCTAssertNil(storageMock.etagConfig)
+    }
+
+    func test_when_response_is_failure_then_error_returned() {
+        let response = HTTPURLResponse.internalServerError
+        let storageMock = MockStorage()
+        let networkingMock = MockNetworking(result: (Self.resultData, response))
+        let downloader = DefaultConfigurationDownloader(storage: storageMock, dataTaskProvider: networkingMock, deliveryQueue: DispatchQueue.main)
+
+        var completionResult: Subscribers.Completion<Error>?
+        downloader.download(.bloomFilterBinary, embeddedEtag: nil).sink { completion in
+            completionResult = completion
+        } receiveValue: { _ in
+            XCTFail("expected value")
+        }.store(in: &cancellables)
+
+        XCTAssertNotNil(completionResult)
+        if case .failure = completionResult! {
+            // we good
+        } else {
+            XCTFail("completion was not expected failure")
+        }
+
+        XCTAssertNil(storageMock.data)
+        XCTAssertNil(storageMock.etag)
+        XCTAssertNil(storageMock.dataConfig)
+        XCTAssertNil(storageMock.etagConfig)
+    }
+
+    func test_when_response_is_not_modified_and_valid_etag_then_nil_meta_returned_no_data_stored() {
+        let response = HTTPURLResponse.notModified
+        let storageMock = MockStorage()
+        let networkingMock = MockNetworking(result: (Self.resultData, response))
+        let downloader = DefaultConfigurationDownloader(storage: storageMock, dataTaskProvider: networkingMock, deliveryQueue: DispatchQueue.main)
+        var meta: ConfigurationDownloadMeta?
+        downloader.download(.bloomFilterBinary, embeddedEtag: nil).sink { completion in
+            if case .failure = completion {
+                XCTFail("unexpected failure")
+            }
+        } receiveValue: { value in
+            meta = value
+        }.store(in: &cancellables)
+
+        XCTAssertNil(meta)
+        XCTAssertNil(storageMock.data)
+        XCTAssertNil(storageMock.etag)
+        XCTAssertNil(storageMock.dataConfig)
+        XCTAssertNil(storageMock.etagConfig)
+    }
+
+    func test_when_response_is_success_and_valid_etag_then_meta_returned_and_data_stored() {
+
+        for config in ConfigurationLocation.allCases {
+
+            let response = HTTPURLResponse.success
+            let storageMock = MockStorage()
+            let networkingMock = MockNetworking(result: (Self.resultData, response))
+            let downloader = DefaultConfigurationDownloader(storage: storageMock, dataTaskProvider: networkingMock, deliveryQueue: DispatchQueue.main)
+            var meta: ConfigurationDownloadMeta?
+            downloader.download(config, embeddedEtag: nil).sink { completion in
+                if case .failure = completion {
+                    XCTFail("unexpected failure for \(config.rawValue)")
+                }
+            } receiveValue: { value in
+                meta = value
+            }.store(in: &cancellables)
+
+            XCTAssertEqual(meta?.etag, HTTPURLResponse.etagValue)
+            XCTAssertEqual(meta?.data, Self.resultData)
+            XCTAssertNotNil(storageMock.data)
+            XCTAssertNotNil(storageMock.etag)
+            XCTAssertEqual(storageMock.dataConfig, config)
+            XCTAssertNotNil(storageMock.etagConfig, HTTPURLResponse.etagValue)
+
+        }
 
     }
+
+    class MockNetworking: DataTaskProviding {
+
+        let result: (Data, URLResponse)
+        var publisher: CurrentValueSubject<(data: Data, response: URLResponse), URLError>?
+
+        init(result: (Data, URLResponse)) {
+            self.result = result
+        }
+
+        func send(_ data: Data, _ response: URLResponse) {
+            publisher?.send((data: data, response: response))
+        }
+
+        func dataTaskPublisher(for: URLRequest) -> AnyPublisher<(data: Data, response: URLResponse), URLError> {
+            let publisher = CurrentValueSubject<(data: Data, response: URLResponse), URLError>(result)
+            self.publisher = publisher
+            return publisher.eraseToAnyPublisher()
+        }
+
+    }
+
+    class MockStorage: ConfigurationStoring {
+
+        enum Error: Swift.Error {
+            case mockError
+        }
+
+        var errorOnStoreData = false
+        var errorOnStoreEtag = false
+
+        var data: Data?
+        var dataConfig: ConfigurationLocation?
+
+        var etag: String?
+        var etagConfig: ConfigurationLocation?
+
+        func loadData(for: ConfigurationLocation) -> Data? {
+            return data
+        }
+
+        func loadEtag(for: ConfigurationLocation) -> String? {
+            return etag
+        }
+
+        func saveData(_ data: Data, for config: ConfigurationLocation) throws {
+            if errorOnStoreData {
+                throw Error.mockError
+            }
+
+            self.data = data
+            self.dataConfig = config
+        }
+
+        func saveEtag(_ etag: String, for config: ConfigurationLocation) throws {
+            if errorOnStoreEtag {
+                throw Error.mockError
+            }
+
+            self.etag = etag
+            self.etagConfig = config
+        }
+
+        func log() { }
+
+    }
+
+}
+
+fileprivate extension HTTPURLResponse {
+
+    static let etagHeader = "Etag"
+    static let etagValue = "test-etag"
+
+    static let success = HTTPURLResponse(url: URL.emptyPage,
+                                         statusCode: 200,
+                                         httpVersion: nil,
+                                         headerFields: [HTTPURLResponse.etagHeader: HTTPURLResponse.etagValue])!
+
+    static let notModified = HTTPURLResponse(url: URL.emptyPage,
+                                             statusCode: 304,
+                                             httpVersion: nil,
+                                             headerFields: [HTTPURLResponse.etagHeader: HTTPURLResponse.etagValue])!
+
+    static let internalServerError = HTTPURLResponse(url: URL.emptyPage,
+                                                     statusCode: 500,
+                                                     httpVersion: nil,
+                                                     headerFields: [:])!
+
+    static let successNoEtag = HTTPURLResponse(url: URL.emptyPage,
+                                               statusCode: 200,
+                                               httpVersion: nil,
+                                               headerFields: [:])!
 
 }
