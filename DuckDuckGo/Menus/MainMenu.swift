@@ -105,60 +105,55 @@ class MainMenu: NSMenu {
 
     var bookmarkListCancellable: AnyCancellable?
     private func subscribeToBookmarkList() {
-        bookmarkListCancellable = LocalBookmarksManager.shared.$list.receive(on: DispatchQueue.main).sink { [weak self] _ in
-            self?.updateBookmarks()
+        bookmarkListCancellable = LocalBookmarksManager.shared.$list
+            .map({ $0.bookmarks().map({ BookmarkViewModel(bookmark: $0) }) })
+            .receive(on: DispatchQueue.main).sink { [weak self] bookmarkViewModels in
+                self?.updateBookmarksMenu(bookmarkViewModels: bookmarkViewModels)
         }
     }
 
-    func updateBookmarks() {
-        let bookmarkList = LocalBookmarksManager.shared.list
+    func updateBookmarksMenu(bookmarkViewModels: [BookmarkViewModel]) {
+
+        func bookmarkMenuItems(from bookmarkViewModels: [BookmarkViewModel]) -> [NSMenuItem] {
+            bookmarkViewModels
+                .filter { !$0.bookmark.isFavorite }
+                .map { NSMenuItem(bookmarkViewModel: $0) }
+        }
+
+        func favoriteMenuItems(from bookmarkViewModels: [BookmarkViewModel]) -> [NSMenuItem] {
+            bookmarkViewModels
+                .filter { $0.bookmark.isFavorite }
+                .map { NSMenuItem(bookmarkViewModel: $0) }
+        }
+
         guard let bookmarksMenu = bookmarksMenuItem?.submenu,
               let favoritesSeparatorIndex = bookmarksMenu.items.lastIndex(where: { $0.isSeparatorItem }),
               let favoritesMenuItem = favoritesMenuItem,
               let favoritesMenu = favoritesMenuItem.submenu,
-              let favoriteThisPageSeparatorIndex = favoritesMenu.items.lastIndex(where: { $0.isSeparatorItem })
-        else {
+              let favoriteThisPageSeparatorIndex = favoritesMenu.items.lastIndex(where: { $0.isSeparatorItem }) else {
             os_log("MainMenuManager: Failed to reference bookmarks menu items", type: .error)
             return
         }
 
         let cleanedBookmarkItems = bookmarksMenu.items.dropLast(bookmarksMenu.items.count - (favoritesSeparatorIndex + 1))
-        let bookmarkItems = bookmarkList.makeMenuItems()
+        let bookmarkItems = bookmarkMenuItems(from: bookmarkViewModels)
         bookmarksMenu.items = Array(cleanedBookmarkItems) + bookmarkItems
 
         let cleanedFavoriteItems = favoritesMenu.items.dropLast(favoritesMenu.items.count - (favoriteThisPageSeparatorIndex + 1))
-        let favoriteItems = bookmarkList.makeFavoriteMenuItems()
+        let favoriteItems = favoriteMenuItems(from: bookmarkViewModels)
         favoritesMenu.items = Array(cleanedFavoriteItems) + favoriteItems
     }
 
 }
 
-fileprivate extension BookmarkList {
-    
-    func makeMenuItems() -> [NSMenuItem] {
-        return bookmarks().map { bookmark in
-            return NSMenuItem(bookmark: bookmark)
-        }
-    }
-    
-    func makeFavoriteMenuItems() -> [NSMenuItem] {
-        return bookmarks().filter {
-            $0.isFavorite
-        } .map { bookmark in
-            return NSMenuItem(bookmark: bookmark)
-        }
-    }
-    
-}
-
 fileprivate extension NSMenuItem {
     
-    convenience init(bookmark: Bookmark) {
+    convenience init(bookmarkViewModel: BookmarkViewModel) {
         self.init()
         
-        title = bookmark.title
-        image = bookmark.isFavorite ? bookmark.favicon?.makeFavoriteOverlay() : bookmark.favicon
-        representedObject = bookmark.url
+        title = bookmarkViewModel.menuTitle
+        image = bookmarkViewModel.menuFavicon
+        representedObject = bookmarkViewModel.bookmark.url
         action = #selector(MainViewController.navigateToBookmark(_:))
     }
     

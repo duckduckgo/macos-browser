@@ -1,5 +1,5 @@
 //
-//  NSImageExtension.swift
+//  BookmarkViewModel.swift
 //
 //  Copyright © 2021 DuckDuckGo. All rights reserved.
 //
@@ -16,9 +16,32 @@
 //  limitations under the License.
 //
 
-import Cocoa
+import Foundation
 
-extension NSImage {
+struct BookmarkViewModel {
+
+    let bookmark: Bookmark
+
+    static let maxMenuTitleLength = 55
+    var menuTitle: String {
+        if bookmark.title.count <= Self.maxMenuTitleLength {
+            return bookmark.title
+        } else {
+            let suffix = "..."
+            return String(bookmark.title.prefix(Self.maxMenuTitleLength - suffix.count)) + suffix
+        }
+
+    }
+
+    var menuFavicon: NSImage? {
+        // Once we have bookmark folders
+        // bookmark.isFavorite ? bookmark.favicon?.makeFavoriteOverlay() : bookmark.favicon
+        bookmark.favicon
+    }
+
+}
+
+fileprivate extension NSImage {
 
     static let favoriteFaviconImage = NSImage(named: "FavoriteFavicon")!
 
