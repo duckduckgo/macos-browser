@@ -203,7 +203,7 @@ extension BrowserTabViewController: TabDelegate {
     }
 
     func tab(_ tab: Tab, detectedLogin host: String) {
-        guard let window = view.window else {
+        guard let window = view.window, !FireproofDomains.shared.isAllowed(fireproofDomain: host) else {
             os_log("%s: Window is nil", type: .error, className)
             return
         }
