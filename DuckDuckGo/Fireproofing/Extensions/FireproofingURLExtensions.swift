@@ -22,6 +22,8 @@ private typealias URLPatterns = [String: [NSRegularExpression]]
 
 extension URL {
 
+    static let cookieDomain = "duckduckgo.com"
+
     private static let twoFactorAuthPatterns: URLPatterns = [
         "accounts.google.com": [regex("signin/v\\d.*/challenge")],
         "sso": [regex("duosecurity/getduo")],
@@ -61,6 +63,16 @@ extension URL {
 
     var isOAuthURL: Bool {
         matches(any: Self.oAuthUrlPatterns)
+    }
+
+    var canFireproof: Bool {
+        guard let baseHost = self.baseHost else { return false }
+        return (baseHost != Self.cookieDomain)
+    }
+
+    var showFireproofStatus: Bool {
+        guard let baseHost = self.baseHost else { return false }
+        return canFireproof && FireproofDomains.shared.isAllowed(fireproofDomain: baseHost)
     }
 
     private func matches(any patterns: URLPatterns) -> Bool {

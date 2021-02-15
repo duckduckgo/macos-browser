@@ -38,10 +38,6 @@ protocol WebsiteDataStore {
 
 class WebCacheManager {
 
-    private struct Constants {
-        static let cookieDomain = "duckduckgo.com"
-    }
-
     static var shared = WebCacheManager()
 
     init() { }
@@ -150,7 +146,7 @@ class WebCacheManager {
 
         cookieStore.getAllCookies { cookies in
             for cookie in cookies {
-                if cookie.domain == Constants.cookieDomain || logins.isAllowed(cookieDomain: cookie.domain) {
+                if cookie.domain == URL.cookieDomain || logins.isAllowed(cookieDomain: cookie.domain) {
                     cookieStorage.setCookie(cookie)
                 }
             }

@@ -87,7 +87,7 @@ class TabBarViewItem: NSCollectionViewItem {
 
         menu.addItem(NSMenuItem.separator())
 
-        if let url = currentURL {
+        if let url = currentURL, url.canFireproof {
             let menuItem: NSMenuItem
 
             if FireproofDomains.shared.isAllowed(fireproofDomain: url.baseHost ?? "") {

@@ -231,25 +231,12 @@ class AddressBarViewController: NSViewController {
         }
 
         // Fireproof button
-        // TODO: Put the duckduckgo.com check elsewhere
-        if let url = selectedTabViewModel.tab.url, url.baseHost != "duckduckgo.com" {
-            NSAnimationContext.runAnimationGroup({ context in
-                context.duration = 0.3
-                context.allowsImplicitAnimation = true
-
-                fireproofedButtonDivider.isHidden = !FireproofDomains.shared.isAllowed(fireproofDomain: url.baseHost ?? "")
-                fireproofedButton.isHidden = !FireproofDomains.shared.isAllowed(fireproofDomain: url.baseHost ?? "")
-
-            }, completionHandler: nil)
+        if let url = selectedTabViewModel.tab.url, url.showFireproofStatus {
+            fireproofedButtonDivider.isHidden = !FireproofDomains.shared.isAllowed(fireproofDomain: url.baseHost ?? "")
+            fireproofedButton.isHidden = !FireproofDomains.shared.isAllowed(fireproofDomain: url.baseHost ?? "")
         } else {
-            NSAnimationContext.runAnimationGroup({ context in
-                context.duration = 0.3
-                context.allowsImplicitAnimation = true
-
-                fireproofedButtonDivider.isHidden = true
-                fireproofedButton.isHidden = true
-
-            }, completionHandler: nil)
+            fireproofedButtonDivider.isHidden = true
+            fireproofedButton.isHidden = true
         }
     }
 

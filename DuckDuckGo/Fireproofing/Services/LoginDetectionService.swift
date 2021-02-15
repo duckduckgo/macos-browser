@@ -61,7 +61,13 @@ class LoginDetectionService {
             discardLoginAttempt()
 
         case .pageBeganLoading(let url):
-            print("Began")
+            guard let host = url.baseHost else { return }
+
+            print("Page began loading \(url)")
+            if !authDetectedHosts.contains(host) {
+                print("Clearing auth hosts \(authDetectedHosts)")
+                authDetectedHosts = []
+            }
 
         case .pageFinishedLoading:
             if delayAfterFinishingPageLoad {
@@ -70,7 +76,7 @@ class LoginDetectionService {
                     self?.handleLoginDetection()
                 }
 
-                DispatchQueue.main.asyncAfter(deadline: DispatchTime.now() + 0.5, execute: loginDetectionWorkItem!)
+                DispatchQueue.main.asyncAfter(deadline: DispatchTime.now() + 0.25, execute: loginDetectionWorkItem!)
             } else {
                 handleLoginDetection()
             }
@@ -109,6 +115,7 @@ class LoginDetectionService {
             guard !FireproofDomains.shared.isAllowed(fireproofDomain: forwardedToDomain) else { return }
 
             loginDetectionHandler(forwardedToDomain)
+            authDetectedHosts = []
             detectedLoginURL = nil
         }
     }
@@ -158,6 +165,7 @@ class LoginDetectionService {
         return currentURL.host != detectedURL.host || currentURL.path != detectedURL.path
     }
 
+    // TODO: Move to the tab, or whatever should be presenting the alert
     private func promptToFireproof(_ domain: String) {
         guard let window = NSApplication.shared.keyWindow, !AppDelegate.isRunningTests else { return }
 
@@ -172,6 +180,7 @@ class LoginDetectionService {
 
 }
 
+// TODO: Move to the tab, or whatever should be presenting the alert
 fileprivate extension NSAlert {
 
     static func fireproofAlert(with domain: String) -> NSAlert {

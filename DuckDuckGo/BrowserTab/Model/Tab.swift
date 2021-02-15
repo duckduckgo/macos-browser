@@ -51,6 +51,9 @@ final class Tab: NSObject {
         self.error = error
         self.favicon = favicon
         self.sessionStateData = sessionStateData
+        self.loginDetectionService = LoginDetectionService { host in
+            print("LOGIN DETECTED \(host)")
+        }
 
         webView = WebView(frame: CGRect.zero, configuration: webViewConfiguration ?? WKWebViewConfiguration.makeConfiguration())
 
@@ -126,6 +129,7 @@ final class Tab: NSObject {
     // Used as the request context for HTML 5 downloads
     private var lastMainFrameRequest: URLRequest?
 
+    private let loginDetectionService: LoginDetectionService
     private let instrumentation = TabInstrumentation()
 
     var isHomepageLoaded: Bool {
@@ -302,8 +306,7 @@ extension Tab: LoginFormDetectionDelegate {
 
     func loginFormDetectionUserScriptDetectedLoginForm(_ script: LoginFormDetectionUserScript) {
         guard let url = webView.url else { return }
-        // TODO: Pass this through to the login detection class when available.
-        print("Detected login for \(url)")
+        loginDetectionService.handle(navigationEvent: .detectedLogin(url: url))
     }
 
 }
@@ -395,10 +398,15 @@ extension Tab: WKNavigationDelegate {
         if error != nil { error = nil }
 
         self.invalidateSessionStateData()
+
+        if let url = webView.url {
+            loginDetectionService.handle(navigationEvent: .pageBeganLoading(url: url))
+        }
     }
 
     func webView(_ webView: WKWebView, didFinish navigation: WKNavigation!) {
         self.invalidateSessionStateData()
+        loginDetectionService.handle(navigationEvent: .pageFinishedLoading)
     }
 
     func webView(_ webView: WKWebView, didFail navigation: WKNavigation!, withError error: Error) {
@@ -416,6 +424,11 @@ extension Tab: WKNavigationDelegate {
         }
 
         self.error = error
+    }
+
+    func webView(_ webView: WKWebView, didReceiveServerRedirectForProvisionalNavigation navigation: WKNavigation!) {
+        guard let url = webView.url else { return }
+        loginDetectionService.handle(navigationEvent: .redirect(url: url))
     }
 
 }
