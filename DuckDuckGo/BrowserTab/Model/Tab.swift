@@ -138,10 +138,12 @@ final class Tab: NSObject {
 
     func goForward() {
         webView.goForward()
+        loginDetectionService.handle(navigationEvent: .userAction)
     }
 
     func goBack() {
         webView.goBack()
+        loginDetectionService.handle(navigationEvent: .userAction)
     }
 
     func openHomepage() {
@@ -155,6 +157,7 @@ final class Tab: NSObject {
         }
 
         webView.reload()
+        loginDetectionService.handle(navigationEvent: .userAction)
     }
 
     func stopLoading() {

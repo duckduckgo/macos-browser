@@ -63,10 +63,15 @@ class LoginDetectionService {
         case .pageBeganLoading(let url):
             guard let host = url.baseHost else { return }
 
-            print("Page began loading \(url)")
             if !authDetectedHosts.contains(host) {
-                print("Clearing auth hosts \(authDetectedHosts)")
                 authDetectedHosts = []
+            }
+
+            // If a login attempt is taking place, consider the new URL to be the one that should be fireproofed.
+            // The login detection work item should be canceled as it'll be restarted when the page finishes loading.
+            loginDetectionWorkItem?.cancel()
+            if detectedLoginURL != nil {
+                self.postLoginURL = url
             }
 
         case .pageFinishedLoading:
@@ -78,6 +83,7 @@ class LoginDetectionService {
 
                 DispatchQueue.main.asyncAfter(deadline: DispatchTime.now() + 0.25, execute: loginDetectionWorkItem!)
             } else {
+                loginDetectionWorkItem?.cancel()
                 handleLoginDetection()
             }
 
@@ -108,15 +114,11 @@ class LoginDetectionService {
         case .authFlow(authLoginDomain: let authLoginDomain):
             print("DETECT LOGIN: Got auth flow: \(authLoginDomain)")
 
-        case .twoFactorAuthFlow(authLoginDomain: let authLoginDomain):
-            print("DETECT LOGIN: Got 2FA flow: \(authLoginDomain)")
-
         case .loginDetected(authLoginDomain: _, forwardedToDomain: let forwardedToDomain):
-            guard !FireproofDomains.shared.isAllowed(fireproofDomain: forwardedToDomain) else { return }
-
             loginDetectionHandler(forwardedToDomain)
             authDetectedHosts = []
             detectedLoginURL = nil
+        default: break
         }
     }
 
