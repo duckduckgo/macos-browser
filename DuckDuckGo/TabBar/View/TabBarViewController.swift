@@ -41,7 +41,7 @@ class TabBarViewController: NSViewController {
     @IBOutlet weak var windowDraggingViewLeadingConstraint: NSLayoutConstraint!
 
     private let tabCollectionViewModel: TabCollectionViewModel
-    private let bookmarksManager: BookmarksManager = LocalBookmarksManager.shared
+    private let bookmarkManager: BookmarkManager = LocalBookmarkManager.shared
     lazy private var fireViewModel = FireViewModel()
 
     private var tabsCancellable: AnyCancellable?
@@ -647,8 +647,8 @@ extension TabBarViewController: TabBarViewItemDelegate {
             return
         }
 
-        if !bookmarksManager.isUrlBookmarked(url: url) {
-            bookmarksManager.makeBookmark(for: url, title: tabViewModel.title, favicon: tabViewModel.favicon)
+        if !bookmarkManager.isUrlBookmarked(url: url) {
+            bookmarkManager.makeBookmark(for: url, title: tabViewModel.title, favicon: tabViewModel.favicon)
         }
     }
 

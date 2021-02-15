@@ -34,7 +34,7 @@ class BookmarkPopoverViewController: NSViewController {
     @IBOutlet weak var textField: NSTextField!
     @IBOutlet weak var favoriteButton: NSButton!
 
-    let bookmarksManager: BookmarksManager = LocalBookmarksManager.shared
+    let bookmarkManager: BookmarkManager = LocalBookmarkManager.shared
     var bookmark: Bookmark? {
         didSet {
             if isViewLoaded {
@@ -57,7 +57,7 @@ class BookmarkPopoverViewController: NSViewController {
 
     @IBAction func removeButtonAction(_ sender: NSButton) {
         guard let bookmark = bookmark else { return }
-        bookmarksManager.remove(bookmark: bookmark)
+        bookmarkManager.remove(bookmark: bookmark)
         
         delegate?.popoverShouldClose(self)
     }
@@ -71,7 +71,7 @@ class BookmarkPopoverViewController: NSViewController {
         bookmark.isFavorite = !bookmark.isFavorite
         self.bookmark = bookmark
 
-        bookmarksManager.update(bookmark: bookmark)
+        bookmarkManager.update(bookmark: bookmark)
     }
 
     func updateSubviews() {
@@ -97,7 +97,7 @@ extension BookmarkPopoverViewController: NSTextFieldDelegate {
         bookmark.title = textField.stringValue
         self.bookmark = bookmark
 
-        bookmarksManager.update(bookmark: bookmark)
+        bookmarkManager.update(bookmark: bookmark)
     }
 
 }

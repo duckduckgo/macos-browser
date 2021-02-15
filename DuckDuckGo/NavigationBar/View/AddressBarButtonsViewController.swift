@@ -43,7 +43,7 @@ class AddressBarButtonsViewController: NSViewController {
     @IBOutlet weak var clearButton: NSButton!
 
     private var tabCollectionViewModel: TabCollectionViewModel
-    private var bookmarksManager: BookmarksManager = LocalBookmarksManager.shared
+    private var bookmarkManager: BookmarkManager = LocalBookmarkManager.shared
 
     private var selectedTabViewModelCancellable: AnyCancellable?
     private var urlCancellable: AnyCancellable?
@@ -88,7 +88,7 @@ class AddressBarButtonsViewController: NSViewController {
 
         if setFavorite {
             bookmark.isFavorite = true
-            bookmarksManager.update(bookmark: bookmark)
+            bookmarkManager.update(bookmark: bookmark)
         }
 
         if !bookmarkPopover.isShown {
@@ -153,14 +153,14 @@ class AddressBarButtonsViewController: NSViewController {
     }
 
     private func subscribeToBookmarkList() {
-        bookmarkListCancellable = bookmarksManager.listPublisher.receive(on: DispatchQueue.main).sink { [weak self] _ in
+        bookmarkListCancellable = bookmarkManager.listPublisher.receive(on: DispatchQueue.main).sink { [weak self] _ in
             self?.updateBookmarkButtonImage()
         }
     }
 
     private func updateBookmarkButtonImage(isUrlBookmarked: Bool = false) {
         if let url = tabCollectionViewModel.selectedTabViewModel?.tab.url,
-           isUrlBookmarked || bookmarksManager.isUrlBookmarked(url: url) {
+           isUrlBookmarked || bookmarkManager.isUrlBookmarked(url: url) {
             bookmarkButton.image = Self.bookmarkFilledImage
         } else {
             bookmarkButton.image = Self.bookmarkImage
@@ -174,9 +174,9 @@ class AddressBarButtonsViewController: NSViewController {
             return nil
         }
 
-        var bookmark = bookmarksManager.getBookmark(for: url)
+        var bookmark = bookmarkManager.getBookmark(for: url)
         if bookmark == nil {
-            bookmark = bookmarksManager.makeBookmark(for: url, title: selectedTabViewModel.title, favicon: selectedTabViewModel.favicon)
+            bookmark = bookmarkManager.makeBookmark(for: url, title: selectedTabViewModel.title, favicon: selectedTabViewModel.favicon)
             updateBookmarkButtonImage(isUrlBookmarked: bookmark != nil)
         }
         return bookmark

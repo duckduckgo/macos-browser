@@ -1,5 +1,5 @@
 //
-//  BookmarksManager.swift
+//  BookmarkManager.swift
 //
 //  Copyright © 2021 DuckDuckGo. All rights reserved.
 //
@@ -18,7 +18,7 @@
 
 import Cocoa
 
-protocol BookmarksManager: AnyObject {
+protocol BookmarkManager: AnyObject {
 
     func isUrlBookmarked(url: URL) -> Bool
     func getBookmark(for url: URL) -> Bookmark?
@@ -31,9 +31,9 @@ protocol BookmarksManager: AnyObject {
 
 }
 
-class LocalBookmarksManager: BookmarksManager {
+class LocalBookmarkManager: BookmarkManager {
 
-    static let shared = LocalBookmarksManager()
+    static let shared = LocalBookmarkManager()
 
     private init() {}
 
@@ -45,7 +45,7 @@ class LocalBookmarksManager: BookmarksManager {
     func loadBookmarks() {
         bookmarkStore.loadAll { [weak self] (bookmarks, error) in
             guard error == nil, let bookmarks = bookmarks else {
-                assertionFailure("LocalBookmarksManager: Failed to fetch bookmarks.")
+                assertionFailure("LocalBookmarkManager: Failed to fetch bookmarks.")
                 return
             }
 
@@ -63,7 +63,7 @@ class LocalBookmarksManager: BookmarksManager {
 
     @discardableResult func makeBookmark(for url: URL, title: String, favicon: NSImage?) -> Bookmark? {
         guard !isUrlBookmarked(url: url) else {
-            assertionFailure("LocalBookmarksManager: Url is already bookmarked")
+            assertionFailure("LocalBookmarkManager: Url is already bookmarked")
             return nil
         }
         favicon?.size = NSSize.faviconSize
@@ -84,7 +84,7 @@ class LocalBookmarksManager: BookmarksManager {
 
     func remove(bookmark: Bookmark) {
         guard let latestBookmark = getBookmark(for: bookmark.url) else {
-            assertionFailure("LocalBookmarksManager: Attempt to remove already removed bookmark")
+            assertionFailure("LocalBookmarkManager: Attempt to remove already removed bookmark")
             return
         }
 
@@ -98,7 +98,7 @@ class LocalBookmarksManager: BookmarksManager {
 
     func update(bookmark: Bookmark) {
         guard let latestBookmark = getBookmark(for: bookmark.url) else {
-            assertionFailure("LocalBookmarksManager: Failed to update bookmark - not in the list.")
+            assertionFailure("LocalBookmarkManager: Failed to update bookmark - not in the list.")
             return
         }
 
