@@ -35,6 +35,16 @@ class LoginFormDetectionUserScript: UserScript {
                    forMainFrameOnly: false)
     }
 
+    /// Some cases require scanning for login forms direction. For instance, forms that directly call `form.submit()` will not trigger the submit event that this script typically uses to detect logins.
+    /// Instead, the web view will do some additional monitoring for POST requests that look to be hitting a login URL, and will trigger password field scanning that way.
+    func scanForLoginForm(in webView: WKWebView) {
+        if #available(OSX 11.0, *) {
+            webView.evaluateJavaScript("window.__ddg__.scanForPasswordField()", in: nil, in: .defaultClient)
+        } else {
+            webView.evaluateJavaScript("window.__ddg__.scanForPasswordField()")
+        }
+    }
+
     override func userContentController(_ userContentController: WKUserContentController, didReceive message: WKScriptMessage) {
         delegate?.loginFormDetectionUserScriptDetectedLoginForm(self)
     }
