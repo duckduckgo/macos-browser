@@ -64,6 +64,8 @@
 		4BB5474D25D9B63C0082F1E9 /* UserDefaultsWrapper.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4BB5474C25D9B63C0082F1E9 /* UserDefaultsWrapper.swift */; };
 		4BB5475525D9CBE20082F1E9 /* WebsiteDataStoreTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4BB5475425D9CBE20082F1E9 /* WebsiteDataStoreTests.swift */; };
 		4BB5475D25D9DAA20082F1E9 /* FireproofDomainsTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4BB5475C25D9DAA20082F1E9 /* FireproofDomainsTests.swift */; };
+		4BB5476325D9DD380082F1E9 /* LoginDetectionService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4BB5476225D9DD380082F1E9 /* LoginDetectionService.swift */; };
+		4BB5476825D9DEF70082F1E9 /* LoginDetectionServiceTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4BB5476725D9DEF70082F1E9 /* LoginDetectionServiceTests.swift */; };
 		4BB88B4525B7B55C006F6B06 /* DebugUserScript.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4BB88B4425B7B55C006F6B06 /* DebugUserScript.swift */; };
 		4BB88B4A25B7B690006F6B06 /* SequenceExtensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4BB88B4925B7B690006F6B06 /* SequenceExtensions.swift */; };
 		4BB88B5025B7BA2B006F6B06 /* TabInstrumentation.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4BB88B4F25B7BA2B006F6B06 /* TabInstrumentation.swift */; };
@@ -272,6 +274,8 @@
 		4BB5474C25D9B63C0082F1E9 /* UserDefaultsWrapper.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = UserDefaultsWrapper.swift; sourceTree = "<group>"; };
 		4BB5475425D9CBE20082F1E9 /* WebsiteDataStoreTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WebsiteDataStoreTests.swift; sourceTree = "<group>"; };
 		4BB5475C25D9DAA20082F1E9 /* FireproofDomainsTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FireproofDomainsTests.swift; sourceTree = "<group>"; };
+		4BB5476225D9DD380082F1E9 /* LoginDetectionService.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = LoginDetectionService.swift; sourceTree = "<group>"; };
+		4BB5476725D9DEF70082F1E9 /* LoginDetectionServiceTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LoginDetectionServiceTests.swift; sourceTree = "<group>"; };
 		4BB88B4425B7B55C006F6B06 /* DebugUserScript.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DebugUserScript.swift; sourceTree = "<group>"; };
 		4BB88B4925B7B690006F6B06 /* SequenceExtensions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SequenceExtensions.swift; sourceTree = "<group>"; };
 		4BB88B4F25B7BA2B006F6B06 /* TabInstrumentation.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TabInstrumentation.swift; sourceTree = "<group>"; };
@@ -579,9 +583,10 @@
 		4BB5471325D9A38E0082F1E9 /* Fireproofing */ = {
 			isa = PBXGroup;
 			children = (
-				4BB5474625D9B5F80082F1E9 /* Model */,
 				4BB5471425D9A3A50082F1E9 /* Extensions */,
+				4BB5474625D9B5F80082F1E9 /* Model */,
 				4BB5472E25D9A7C50082F1E9 /* Resources */,
+				4BB5476125D9DD200082F1E9 /* Services */,
 				4BB5473425D9A8460082F1E9 /* View */,
 			);
 			path = Fireproofing;
@@ -600,6 +605,7 @@
 			children = (
 				4BB5471E25D9A4C60082F1E9 /* FireproofingURLExtensionsTests.swift */,
 				4BB5475C25D9DAA20082F1E9 /* FireproofDomainsTests.swift */,
+				4BB5476725D9DEF70082F1E9 /* LoginDetectionServiceTests.swift */,
 			);
 			path = Fireproofing;
 			sourceTree = "<group>";
@@ -628,6 +634,14 @@
 				4BB5474725D9B6040082F1E9 /* FireproofDomains.swift */,
 			);
 			path = Model;
+			sourceTree = "<group>";
+		};
+		4BB5476125D9DD200082F1E9 /* Services */ = {
+			isa = PBXGroup;
+			children = (
+				4BB5476225D9DD380082F1E9 /* LoginDetectionService.swift */,
+			);
+			path = Services;
 			sourceTree = "<group>";
 		};
 		4BB88B4E25B7BA20006F6B06 /* Utilities */ = {
@@ -1444,6 +1458,7 @@
 				4B6160DD25B152C5007DE5B2 /* ContentBlockerRulesUserScript.swift in Sources */,
 				4BA1A6B3258B080A00F6F690 /* EncryptionKeyGeneration.swift in Sources */,
 				AABEE6A524AA0A7F0043105B /* SuggestionsViewController.swift in Sources */,
+				4BB5476325D9DD380082F1E9 /* LoginDetectionService.swift in Sources */,
 				4BB88B4A25B7B690006F6B06 /* SequenceExtensions.swift in Sources */,
 				AAA0CC3C25337FAB0079BC96 /* WKBackForwardListItemViewModel.swift in Sources */,
 				4BB88B4525B7B55C006F6B06 /* DebugUserScript.swift in Sources */,
@@ -1585,6 +1600,7 @@
 				AAC9C01524CAFBCE00AD1325 /* TabTests.swift in Sources */,
 				4BA1A6D9258C0CB300F6F690 /* DataEncryptionTests.swift in Sources */,
 				B6A5A27E25B9403E00AA7ADA /* FileStoreMock.swift in Sources */,
+				4BB5476825D9DEF70082F1E9 /* LoginDetectionServiceTests.swift in Sources */,
 				4BA1A6FE258C5C1300F6F690 /* EncryptedValueTransformerTests.swift in Sources */,
 				AA63745624C9EB3C00AB2AC4 /* SuggestionsAPIResultTests.swift in Sources */,
 				B6A5A2A825BAA35500AA7ADA /* WindowManagerStateRestorationTests.swift in Sources */,
