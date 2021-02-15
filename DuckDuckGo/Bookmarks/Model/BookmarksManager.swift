@@ -17,7 +17,6 @@
 //
 
 import Cocoa
-import os.log
 
 protocol BookmarksManager: AnyObject {
 
@@ -46,7 +45,7 @@ class LocalBookmarksManager: BookmarksManager {
     func loadBookmarks() {
         bookmarkStore.loadAll { [weak self] (bookmarks, error) in
             guard error == nil, let bookmarks = bookmarks else {
-                os_log("LocalBookmarksManager: Failed to fetch bookmarks.", type: .error)
+                assertionFailure("LocalBookmarksManager: Failed to fetch bookmarks.")
                 return
             }
 

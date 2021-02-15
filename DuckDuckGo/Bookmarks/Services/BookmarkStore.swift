@@ -19,7 +19,6 @@
 import Foundation
 import CoreData
 import Cocoa
-import os.log
 
 protocol BookmarkStore {
 
@@ -53,7 +52,7 @@ class LocalBookmarkStore: BookmarkStore {
         fetchRequest.returnsObjectsAsFaults = false
         let asyncRequest = NSAsynchronousFetchRequest(fetchRequest: fetchRequest) { result in
             guard let bookmarkManagedObjects = result.finalResult else {
-                os_log("LocalBookmarkStore: Async fetch failed", type: .error)
+                assertionFailure("LocalBookmarkStore: Async fetch failed")
                 mainQeueCompletion(bookmarks: nil, error: result.operationError)
                 return
             }
@@ -78,7 +77,7 @@ class LocalBookmarkStore: BookmarkStore {
 
             let managedObject = NSEntityDescription.insertNewObject(forEntityName: BookmarkManagedObject.className(), into: self.context)
             guard let bookmarkMO = managedObject as? BookmarkManagedObject else {
-                os_log("LocalBookmarkStore: Failed to init BookmarkManagedObject", type: .error)
+                assertionFailure("LocalBookmarkStore: Failed to init BookmarkManagedObject")
                 DispatchQueue.main.async { completion(false, nil, BookmarkStoreError.insertFailed) }
                 return
             }
@@ -92,7 +91,7 @@ class LocalBookmarkStore: BookmarkStore {
             do {
                 try self.context.save()
             } catch {
-                os_log("LocalBookmarkStore: Saving of context failed", type: .error)
+                assertionFailure("LocalBookmarkStore: Saving of context failed")
                 DispatchQueue.main.async { completion(false, nil, error) }
             }
 
@@ -118,7 +117,7 @@ class LocalBookmarkStore: BookmarkStore {
             do {
                 try self.context.save()
             } catch {
-                os_log("LocalBookmarkStore: Saving of context failed", type: .error)
+                assertionFailure("LocalBookmarkStore: Saving of context failed")
                 DispatchQueue.main.async { completion(false, error) }
             }
             DispatchQueue.main.async { completion(true, nil) }
@@ -136,7 +135,7 @@ class LocalBookmarkStore: BookmarkStore {
             }
 
             guard let bookmarkMO = self.context.object(with: objectId) as? BookmarkManagedObject else {
-                os_log("LocalBookmarkStore: Failed to get BookmarkManagedObject from the context", type: .error)
+                assertionFailure("LocalBookmarkStore: Failed to get BookmarkManagedObject from the context")
                 return
             }
 
@@ -145,7 +144,7 @@ class LocalBookmarkStore: BookmarkStore {
             do {
                 try self.context.save()
             } catch {
-                os_log("LocalBookmarkStore: Saving of context failed", type: .error)
+                assertionFailure("LocalBookmarkStore: Saving of context failed")
             }
         }
     }
@@ -157,7 +156,7 @@ fileprivate extension Bookmark {
     init?(bookmarkMO: BookmarkManagedObject) {
         guard let url = bookmarkMO.urlEncrypted as? URL,
               let title = bookmarkMO.titleEncrypted as? String else {
-            os_log("Bookmark: Failed to init Bookmark from BookmarkManagedObject", type: .error)
+            assertionFailure("Bookmark: Failed to init Bookmark from BookmarkManagedObject")
             return nil
         }
         let favicon = bookmarkMO.faviconEncrypted as? NSImage
@@ -173,7 +172,7 @@ fileprivate extension BookmarkManagedObject {
 
     func update(with bookmark: Bookmark) {
         guard objectID == bookmark.managedObjectId, urlEncrypted as? URL == bookmark.url else {
-            os_log("BookmarkManagedObject: Incorrect bookmark struct for the update", type: .error)
+            assertionFailure("BookmarkManagedObject: Incorrect bookmark struct for the update")
             return
         }
 
