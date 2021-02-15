@@ -104,19 +104,11 @@
                                     <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
                                 </textFieldCell>
                             </textField>
-                            <button verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="AXr-3d-GGi">
-                                <rect key="frame" x="17" y="20" width="25" height="25"/>
-                                <buttonCell key="cell" type="help" bezelStyle="helpButton" alignment="center" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="X2M-vd-NSH">
-                                    <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
-                                    <font key="font" metaFont="system"/>
-                                </buttonCell>
-                            </button>
                         </subviews>
                         <constraints>
                             <constraint firstItem="m1Z-dg-G6t" firstAttribute="top" secondItem="ueg-qL-Rvw" secondAttribute="bottom" constant="8" symbolic="YES" id="3KG-2h-lLp"/>
                             <constraint firstAttribute="trailing" secondItem="8qv-q0-b9t" secondAttribute="trailing" constant="20" symbolic="YES" id="6gi-ah-hnH"/>
                             <constraint firstItem="8qv-q0-b9t" firstAttribute="leading" secondItem="j0P-C2-eOh" secondAttribute="trailing" constant="12" symbolic="YES" id="6jo-2k-QFO"/>
-                            <constraint firstItem="AXr-3d-GGi" firstAttribute="centerY" secondItem="j0P-C2-eOh" secondAttribute="centerY" id="El7-HW-to9"/>
                             <constraint firstItem="ueg-qL-Rvw" firstAttribute="leading" secondItem="prW-AZ-vsO" secondAttribute="leading" constant="20" symbolic="YES" id="I2h-GW-Pig"/>
                             <constraint firstAttribute="trailing" secondItem="ueg-qL-Rvw" secondAttribute="trailing" constant="20" symbolic="YES" id="LdY-WZ-m2F"/>
                             <constraint firstItem="vuA-8C-6AZ" firstAttribute="leading" secondItem="prW-AZ-vsO" secondAttribute="leading" id="Tf3-sJ-p6y"/>
@@ -128,7 +120,6 @@
                             <constraint firstItem="ueg-qL-Rvw" firstAttribute="top" secondItem="prW-AZ-vsO" secondAttribute="top" constant="20" symbolic="YES" id="dsn-aW-XBc"/>
                             <constraint firstAttribute="trailing" secondItem="vuA-8C-6AZ" secondAttribute="trailing" id="eTm-8D-ib5"/>
                             <constraint firstItem="vuA-8C-6AZ" firstAttribute="top" secondItem="m1Z-dg-G6t" secondAttribute="bottom" constant="16" id="gCG-E2-ck5"/>
-                            <constraint firstItem="AXr-3d-GGi" firstAttribute="leading" secondItem="prW-AZ-vsO" secondAttribute="leading" constant="20" symbolic="YES" id="hs6-t3-9n9"/>
                             <constraint firstItem="j0P-C2-eOh" firstAttribute="top" secondItem="vuA-8C-6AZ" secondAttribute="bottom" constant="20" symbolic="YES" id="txu-MN-PPe"/>
                         </constraints>
                     </view>
