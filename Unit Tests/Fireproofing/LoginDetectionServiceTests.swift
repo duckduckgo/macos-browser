@@ -153,6 +153,24 @@ class LoginDetectionServiceTests: XCTestCase {
         XCTAssertEqual(receivedLogins, [])
     }
 
+    func testWhenLoginAttemptedAndUserNavigatesBackThenNewPageDoesNotDetectLogin() {
+        let receivedLoginsExpectation = expectation(description: "Login detection expectation")
+        receivedLoginsExpectation.isInverted = true
+        var receivedLogins = [String]()
+
+        let service = LoginDetectionService {
+            receivedLogins.append($0)
+            receivedLoginsExpectation.fulfill()
+        }
+
+        service.handle(navigationEvent: .detectedLogin(url: URL(string: "http://example.com/login")!))
+        service.handle(navigationEvent: .userAction) // Simulate the Navigate Back action, all user actions are treated the same
+        load(service, url: "http://another.example.com/")
+
+        waitForExpectations(timeout: 1, handler: nil)
+        XCTAssertEqual(receivedLogins, [])
+    }
+
     /// Simulates the process of loading a web page.
     private func load(_ service: LoginDetectionService, url: String, wait: Bool = false) {
         service.handle(navigationEvent: .pageBeganLoading(url: URL(string: url)!), delayAfterFinishingPageLoad: false)

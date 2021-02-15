@@ -28,6 +28,7 @@ protocol TabDelegate: class {
     func tab(_ tab: Tab, requestedFileDownload download: FileDownload)
     func tab(_ tab: Tab, willShowContextMenuAt position: NSPoint, image: URL?, link: URL?)
     func tab(_ tab: Tab, requestedFireproofToggle url: URL?)
+    func tab(_ tab: Tab, detectedLogin host: String)
 
 }
 
@@ -51,13 +52,15 @@ final class Tab: NSObject {
         self.error = error
         self.favicon = favicon
         self.sessionStateData = sessionStateData
-        self.loginDetectionService = LoginDetectionService { host in
-            print("LOGIN DETECTED \(host)")
-        }
 
         webView = WebView(frame: CGRect.zero, configuration: webViewConfiguration ?? WKWebViewConfiguration.makeConfiguration())
 
         super.init()
+
+        self.loginDetectionService = LoginDetectionService { [weak self] host in
+            guard let self = self else { return }
+            self.delegate?.tab(self, detectedLogin: host)
+        }
 
         setupWebView()
         if webView.configuration.userContentController.userScripts.isEmpty {
@@ -129,7 +132,7 @@ final class Tab: NSObject {
     // Used as the request context for HTML 5 downloads
     private var lastMainFrameRequest: URLRequest?
 
-    private let loginDetectionService: LoginDetectionService
+    private var loginDetectionService: LoginDetectionService?
     private let instrumentation = TabInstrumentation()
 
     var isHomepageLoaded: Bool {
@@ -138,12 +141,12 @@ final class Tab: NSObject {
 
     func goForward() {
         webView.goForward()
-        loginDetectionService.handle(navigationEvent: .userAction)
+        loginDetectionService?.handle(navigationEvent: .userAction)
     }
 
     func goBack() {
         webView.goBack()
-        loginDetectionService.handle(navigationEvent: .userAction)
+        loginDetectionService?.handle(navigationEvent: .userAction)
     }
 
     func openHomepage() {
@@ -157,7 +160,7 @@ final class Tab: NSObject {
         }
 
         webView.reload()
-        loginDetectionService.handle(navigationEvent: .userAction)
+        loginDetectionService?.handle(navigationEvent: .userAction)
     }
 
     func stopLoading() {
@@ -309,7 +312,7 @@ extension Tab: LoginFormDetectionDelegate {
 
     func loginFormDetectionUserScriptDetectedLoginForm(_ script: LoginFormDetectionUserScript) {
         guard let url = webView.url else { return }
-        loginDetectionService.handle(navigationEvent: .detectedLogin(url: url))
+        loginDetectionService?.handle(navigationEvent: .detectedLogin(url: url))
     }
 
 }
@@ -403,13 +406,13 @@ extension Tab: WKNavigationDelegate {
         self.invalidateSessionStateData()
 
         if let url = webView.url {
-            loginDetectionService.handle(navigationEvent: .pageBeganLoading(url: url))
+            loginDetectionService?.handle(navigationEvent: .pageBeganLoading(url: url))
         }
     }
 
     func webView(_ webView: WKWebView, didFinish navigation: WKNavigation!) {
         self.invalidateSessionStateData()
-        loginDetectionService.handle(navigationEvent: .pageFinishedLoading)
+        loginDetectionService?.handle(navigationEvent: .pageFinishedLoading)
     }
 
     func webView(_ webView: WKWebView, didFail navigation: WKNavigation!, withError error: Error) {
@@ -431,7 +434,7 @@ extension Tab: WKNavigationDelegate {
 
     func webView(_ webView: WKWebView, didReceiveServerRedirectForProvisionalNavigation navigation: WKNavigation!) {
         guard let url = webView.url else { return }
-        loginDetectionService.handle(navigationEvent: .redirect(url: url))
+        loginDetectionService?.handle(navigationEvent: .redirect(url: url))
     }
 
 }

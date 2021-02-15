@@ -96,6 +96,8 @@ class LoginDetectionService {
     }
 
     private func discardLoginAttempt() {
+        loginDetectionWorkItem?.cancel()
+        loginDetectionWorkItem = nil
         self.postLoginURL = nil
         self.detectedLoginURL = nil
     }
@@ -158,42 +160,13 @@ class LoginDetectionService {
         }
 
         if detectedLoginURL != nil {
-            print("REDIRECTION: Have detected login URL, adding URL to check \(url)")
+            print("REDIRECTION: Got existing login URL, adding URL to check \(url)")
             self.postLoginURL = url
         }
     }
 
     private func domainOrPathDidChange(_ detectedURL: URL, _ currentURL: URL) -> Bool {
         return currentURL.host != detectedURL.host || currentURL.path != detectedURL.path
-    }
-
-    // TODO: Move to the tab, or whatever should be presenting the alert
-    private func promptToFireproof(_ domain: String) {
-        guard let window = NSApplication.shared.keyWindow, !AppDelegate.isRunningTests else { return }
-
-        let alert = NSAlert.fireproofAlert(with: domain)
-        alert.beginSheetModal(for: window) { response in
-            if response == NSApplication.ModalResponse.alertFirstButtonReturn {
-                FireproofDomains.shared.addToAllowed(domain: domain)
-                // TODO: Load favicon?
-            }
-        }
-    }
-
-}
-
-// TODO: Move to the tab, or whatever should be presenting the alert
-fileprivate extension NSAlert {
-
-    static func fireproofAlert(with domain: String) -> NSAlert {
-        let alert = NSAlert()
-        alert.messageText = UserText.fireproofConfirmationTitle(domain: domain)
-        alert.informativeText = UserText.fireproofConfirmationMessage
-        alert.alertStyle = .warning
-        alert.icon = NSImage(named: "BurnAlert")
-        alert.addButton(withTitle: UserText.fireproof)
-        alert.addButton(withTitle: UserText.notNow)
-        return alert
     }
 
 }

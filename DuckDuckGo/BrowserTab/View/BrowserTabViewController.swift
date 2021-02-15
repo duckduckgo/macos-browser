@@ -202,6 +202,21 @@ extension BrowserTabViewController: TabDelegate {
         }
     }
 
+    func tab(_ tab: Tab, detectedLogin host: String) {
+        guard let window = view.window else {
+            os_log("%s: Window is nil", type: .error, className)
+            return
+        }
+
+        let alert = NSAlert.fireproofAlert(with: host)
+        alert.beginSheetModal(for: window) { response in
+            if response == NSApplication.ModalResponse.alertFirstButtonReturn {
+                FireproofDomains.shared.addToAllowed(domain: host)
+                // TODO: Load favicon?
+            }
+        }
+    }
+
 }
 
 extension BrowserTabViewController: LinkMenuItemSelectors {
@@ -393,6 +408,17 @@ fileprivate extension NSAlert {
         textField.placeholderString = defaultText
         alert.accessoryView = textField
         alert.window.initialFirstResponder = textField
+        return alert
+    }
+
+    static func fireproofAlert(with domain: String) -> NSAlert {
+        let alert = NSAlert()
+        alert.messageText = UserText.fireproofConfirmationTitle(domain: domain)
+        alert.informativeText = UserText.fireproofConfirmationMessage
+        alert.alertStyle = .warning
+        alert.icon = NSImage(named: "BurnAlert")
+        alert.addButton(withTitle: UserText.fireproof)
+        alert.addButton(withTitle: UserText.notNow)
         return alert
     }
 
