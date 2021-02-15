@@ -19,7 +19,7 @@
 import Foundation
 import Combine
 
-/// A testable abstraction of a data task publisher, whcih you can usually get from URLSession.dataTaskPublisher(for: )
+/// A testable abstraction of a data task publisher, which you can usually get from URLSession.dataTaskPublisher(for: )
 protocol DataTaskProviding {
 
     func dataTaskPublisher(for: URLRequest) -> AnyPublisher<(data: Data, response: URLResponse), URLError>
