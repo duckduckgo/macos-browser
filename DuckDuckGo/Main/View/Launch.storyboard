@@ -370,9 +370,9 @@
                                         <menuItem isSeparatorItem="YES" id="aPG-H0-BrG"/>
                                         <menuItem title="Favorites" image="Favorite" tag="52" id="Y9I-ZC-gGg">
                                             <modifierMask key="keyEquivalentModifierMask"/>
-                                            <menu key="submenu" id="Nxf-cs-uVD">
+                                            <menu key="submenu" autoenablesItems="NO" id="Nxf-cs-uVD">
                                                 <items>
-                                                    <menuItem title="Favorite This Page..." image="Favorite" tag="520" id="cHZ-Fb-aKU">
+                                                    <menuItem title="Favorite This Page..." image="Favorite" tag="520" enabled="NO" id="cHZ-Fb-aKU">
                                                         <modifierMask key="keyEquivalentModifierMask"/>
                                                         <connections>
                                                             <action selector="favoriteThisPage:" target="Ady-hI-5gd" id="wPO-TZ-mVB"/>
