@@ -24,6 +24,8 @@ extension URL {
 
     static let cookieDomain = "duckduckgo.com"
 
+    private static let loginPattern = regex("login|sign-in|signin|session")
+
     private static let twoFactorAuthPatterns: URLPatterns = [
         "accounts.google.com": [regex("signin/v\\d.*/challenge")],
         "sso": [regex("duosecurity/getduo")],
@@ -51,6 +53,16 @@ extension URL {
         // swiftlint:disable force_try
         try! NSRegularExpression(pattern: pattern)
         // swiftlint:enable force_try
+    }
+
+    var isLoginURL: Bool {
+        if isOAuthURL {
+            return true
+        }
+
+        let range = NSRange(location: 0, length: absoluteString.count)
+        let matches = Self.loginPattern.matches(in: self.absoluteString, options: [], range: range)
+        return matches.count > 0
     }
 
     var isTwoFactorURL: Bool {

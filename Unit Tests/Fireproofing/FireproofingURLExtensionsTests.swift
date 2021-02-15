@@ -54,4 +54,15 @@ class FireproofingURLExtensionsTests: XCTestCase {
         XCTAssertFalse(URL(string: "example.com")!.isSingleSignOnURL)
     }
 
+    func testLoginPatterns() {
+        XCTAssert(URL(string: "https://sso.host.com/module.php/core/loginuserpass.php")!.isLoginURL)
+        XCTAssert(URL(string: "https://example.com/login")!.isLoginURL)
+        XCTAssert(URL(string: "https://example.com/sign-in")!.isLoginURL)
+        XCTAssert(URL(string: "https://example.com/signin")!.isLoginURL)
+        XCTAssert(URL(string: "https://example.com/session")!.isLoginURL)
+
+        XCTAssertFalse(URL(string: "https://duckduckgo.com")!.isLoginURL)
+        XCTAssertFalse(URL(string: "example.com")!.isLoginURL)
+    }
+
 }
