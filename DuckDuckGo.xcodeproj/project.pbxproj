@@ -58,7 +58,7 @@
 		4BB88B5B25B7BA50006F6B06 /* Instruments.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4BB88B5A25B7BA50006F6B06 /* Instruments.swift */; };
 		8546DE6225C03056000CA5E1 /* UserAgentTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8546DE6125C03056000CA5E1 /* UserAgentTests.swift */; };
 		85480F8A25CDC360009424E3 /* Launch.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 85480F8925CDC360009424E3 /* Launch.storyboard */; };
-		85480FBB25D181CB009424E3 /* ConfigurationDownloader.swift in Sources */ = {isa = PBXBuildFile; fileRef = 85480FBA25D181CB009424E3 /* ConfigurationDownloader.swift */; };
+		85480FBB25D181CB009424E3 /* ConfigurationDownloading.swift in Sources */ = {isa = PBXBuildFile; fileRef = 85480FBA25D181CB009424E3 /* ConfigurationDownloading.swift */; };
 		85480FCF25D1AA22009424E3 /* ConfigurationStoring.swift in Sources */ = {isa = PBXBuildFile; fileRef = 85480FCE25D1AA22009424E3 /* ConfigurationStoring.swift */; };
 		8553FF52257523760029327F /* FileDownloadTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8553FF51257523760029327F /* FileDownloadTests.swift */; };
 		8556A602256BDDD30092FA9D /* HTML5DownloadUserScript.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8556A601256BDDD30092FA9D /* HTML5DownloadUserScript.swift */; };
@@ -77,6 +77,7 @@
 		85AC3B0525D6B1D800C7D2AA /* ScriptSourceProviding.swift in Sources */ = {isa = PBXBuildFile; fileRef = 85AC3B0425D6B1D800C7D2AA /* ScriptSourceProviding.swift */; };
 		85AC3B1725D9BC1A00C7D2AA /* ConfigurationDownloaderTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 85AC3B1625D9BC1A00C7D2AA /* ConfigurationDownloaderTests.swift */; };
 		85AC3B3525DA82A600C7D2AA /* DataTaskProviding.swift in Sources */ = {isa = PBXBuildFile; fileRef = 85AC3B3425DA82A600C7D2AA /* DataTaskProviding.swift */; };
+		85AC3B4925DAC9BD00C7D2AA /* ConfigurationStorageTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 85AC3B4825DAC9BD00C7D2AA /* ConfigurationStorageTests.swift */; };
 		85AE2FF224A33A2D002D507F /* WebKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 85AE2FF124A33A2D002D507F /* WebKit.framework */; };
 		85C6A29625CC1FFD00EEB5F1 /* UserDefaultsWrapper.swift in Sources */ = {isa = PBXBuildFile; fileRef = 85C6A29525CC1FFD00EEB5F1 /* UserDefaultsWrapper.swift */; };
 		85D33F1225C82EB3002B91A6 /* ConfigurationManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 85D33F1125C82EB3002B91A6 /* ConfigurationManager.swift */; };
@@ -263,7 +264,7 @@
 		4BB88B5A25B7BA50006F6B06 /* Instruments.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Instruments.swift; sourceTree = "<group>"; };
 		8546DE6125C03056000CA5E1 /* UserAgentTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UserAgentTests.swift; sourceTree = "<group>"; };
 		85480F8925CDC360009424E3 /* Launch.storyboard */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; path = Launch.storyboard; sourceTree = "<group>"; };
-		85480FBA25D181CB009424E3 /* ConfigurationDownloader.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ConfigurationDownloader.swift; sourceTree = "<group>"; };
+		85480FBA25D181CB009424E3 /* ConfigurationDownloading.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ConfigurationDownloading.swift; sourceTree = "<group>"; };
 		85480FCE25D1AA22009424E3 /* ConfigurationStoring.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ConfigurationStoring.swift; sourceTree = "<group>"; };
 		8553FF51257523760029327F /* FileDownloadTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FileDownloadTests.swift; sourceTree = "<group>"; };
 		8556A601256BDDD30092FA9D /* HTML5DownloadUserScript.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HTML5DownloadUserScript.swift; sourceTree = "<group>"; };
@@ -282,6 +283,7 @@
 		85AC3B0425D6B1D800C7D2AA /* ScriptSourceProviding.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ScriptSourceProviding.swift; sourceTree = "<group>"; };
 		85AC3B1625D9BC1A00C7D2AA /* ConfigurationDownloaderTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ConfigurationDownloaderTests.swift; sourceTree = "<group>"; };
 		85AC3B3425DA82A600C7D2AA /* DataTaskProviding.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DataTaskProviding.swift; sourceTree = "<group>"; };
+		85AC3B4825DAC9BD00C7D2AA /* ConfigurationStorageTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ConfigurationStorageTests.swift; sourceTree = "<group>"; };
 		85AE2FF124A33A2D002D507F /* WebKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = WebKit.framework; path = System/Library/Frameworks/WebKit.framework; sourceTree = SDKROOT; };
 		85C6A29525CC1FFD00EEB5F1 /* UserDefaultsWrapper.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UserDefaultsWrapper.swift; sourceTree = "<group>"; };
 		85D33F1125C82EB3002B91A6 /* ConfigurationManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ConfigurationManager.swift; sourceTree = "<group>"; };
@@ -630,6 +632,7 @@
 			isa = PBXGroup;
 			children = (
 				85AC3B1625D9BC1A00C7D2AA /* ConfigurationDownloaderTests.swift */,
+				85AC3B4825DAC9BD00C7D2AA /* ConfigurationStorageTests.swift */,
 			);
 			path = Configuration;
 			sourceTree = "<group>";
@@ -653,7 +656,7 @@
 		85D33F1025C82E93002B91A6 /* Configuration */ = {
 			isa = PBXGroup;
 			children = (
-				85480FBA25D181CB009424E3 /* ConfigurationDownloader.swift */,
+				85480FBA25D181CB009424E3 /* ConfigurationDownloading.swift */,
 				85D33F1125C82EB3002B91A6 /* ConfigurationManager.swift */,
 				85480FCE25D1AA22009424E3 /* ConfigurationStoring.swift */,
 			);
@@ -1440,7 +1443,7 @@
 				AA88D14B252A557100980B4E /* URLRequestExtension.swift in Sources */,
 				856C98DF257014BD00A22F1F /* FileDownloadManager.swift in Sources */,
 				AABEE69E24A9C5C30043105B /* Suggestion.swift in Sources */,
-				85480FBB25D181CB009424E3 /* ConfigurationDownloader.swift in Sources */,
+				85480FBB25D181CB009424E3 /* ConfigurationDownloading.swift in Sources */,
 				AA2E423424C8A2270048C0D5 /* ColorView.swift in Sources */,
 				AAECA42024EEA4AC00EFA63A /* IndexPathExtension.swift in Sources */,
 				AA5C8F632591021700748EB7 /* NSApplicationExtension.swift in Sources */,
@@ -1539,6 +1542,7 @@
 				4B11060525903E570039B979 /* CoreDataEncryptionTesting.xcdatamodeld in Sources */,
 				8546DE6225C03056000CA5E1 /* UserAgentTests.swift in Sources */,
 				4B82E9C125B6A1CD00656FE7 /* TrackerRadarManagerTests.swift in Sources */,
+				85AC3B4925DAC9BD00C7D2AA /* ConfigurationStorageTests.swift in Sources */,
 				B62EB47C25BAD3BB005745C6 /* WKWebViewSessionDataTests.swift in Sources */,
 				B6A5A2A025B96E8300AA7ADA /* AppStateChangePublisherTests.swift in Sources */,
 				AA63745224C9BBE100AB2AC4 /* SuggestionsAPIMock.swift in Sources */,

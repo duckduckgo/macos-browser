@@ -107,7 +107,7 @@ class ConfigurationDownloaderTests: XCTestCase {
         XCTAssertNil(storageMock.etagConfig)
     }
 
-    func test_when_response_is_failure_then_error_returned() {
+    func test_when_response_is_error_then_error_returned() {
         let response = HTTPURLResponse.internalServerError
         let storageMock = MockStorage()
         let networkingMock = MockNetworking(result: (Self.resultData, response))
@@ -133,7 +133,7 @@ class ConfigurationDownloaderTests: XCTestCase {
         XCTAssertNil(storageMock.etagConfig)
     }
 
-    func test_when_response_is_not_modified_and_valid_etag_then_nil_meta_returned_no_data_stored() {
+    func test_when_response_is_not_modified_and_valid_etag_then_nil_meta_returned_and_no_data_stored() {
         let response = HTTPURLResponse.notModified
         let storageMock = MockStorage()
         let networkingMock = MockNetworking(result: (Self.resultData, response))
@@ -152,6 +152,48 @@ class ConfigurationDownloaderTests: XCTestCase {
         XCTAssertNil(storageMock.etag)
         XCTAssertNil(storageMock.dataConfig)
         XCTAssertNil(storageMock.etagConfig)
+    }
+
+    func test_when_etag_and_data_stored_then_etag_added_to_request() {
+
+        let requestedEtag = UUID().uuidString
+
+        let response = HTTPURLResponse.success
+        let storageMock = MockStorage()
+        storageMock.data = Data()
+        storageMock.etag = requestedEtag
+
+        let networkingMock = MockNetworking(result: (Self.resultData, response))
+        let downloader = DefaultConfigurationDownloader(storage: storageMock, dataTaskProvider: networkingMock, deliveryQueue: DispatchQueue.main)
+        _ = downloader.download(.bloomFilterSpec, embeddedEtag: nil)
+
+        XCTAssertEqual(requestedEtag, networkingMock.request?.value(forHTTPHeaderField: HTTPURLResponse.ifNoneMatchHeader))
+    }
+
+    func test_when_no_etag_stored_then_no_etag_added_to_request() {
+
+        let response = HTTPURLResponse.success
+        let storageMock = MockStorage()
+        storageMock.data = Data()
+
+        let networkingMock = MockNetworking(result: (Self.resultData, response))
+        let downloader = DefaultConfigurationDownloader(storage: storageMock, dataTaskProvider: networkingMock, deliveryQueue: DispatchQueue.main)
+        _ = downloader.download(.bloomFilterSpec, embeddedEtag: nil)
+
+        XCTAssertNil(networkingMock.request?.value(forHTTPHeaderField: HTTPURLResponse.ifNoneMatchHeader))
+    }
+
+    func test_when_no_data_stored_then_no_etag_added_to_request() {
+
+        let response = HTTPURLResponse.success
+        let storageMock = MockStorage()
+        storageMock.etag = ""
+
+        let networkingMock = MockNetworking(result: (Self.resultData, response))
+        let downloader = DefaultConfigurationDownloader(storage: storageMock, dataTaskProvider: networkingMock, deliveryQueue: DispatchQueue.main)
+        _ = downloader.download(.bloomFilterSpec, embeddedEtag: nil)
+
+        XCTAssertNil(networkingMock.request?.value(forHTTPHeaderField: HTTPURLResponse.ifNoneMatchHeader))
     }
 
     func test_when_response_is_success_and_valid_etag_then_meta_returned_and_data_stored() {
@@ -186,6 +228,7 @@ class ConfigurationDownloaderTests: XCTestCase {
 
         let result: (Data, URLResponse)
         var publisher: CurrentValueSubject<(data: Data, response: URLResponse), URLError>?
+        var request: URLRequest?
 
         init(result: (Data, URLResponse)) {
             self.result = result
@@ -195,7 +238,8 @@ class ConfigurationDownloaderTests: XCTestCase {
             publisher?.send((data: data, response: response))
         }
 
-        func dataTaskPublisher(for: URLRequest) -> AnyPublisher<(data: Data, response: URLResponse), URLError> {
+        func dataTaskPublisher(for request: URLRequest) -> AnyPublisher<(data: Data, response: URLResponse), URLError> {
+            self.request = request
             let publisher = CurrentValueSubject<(data: Data, response: URLResponse), URLError>(result)
             self.publisher = publisher
             return publisher.eraseToAnyPublisher()
@@ -253,6 +297,7 @@ class ConfigurationDownloaderTests: XCTestCase {
 fileprivate extension HTTPURLResponse {
 
     static let etagHeader = "Etag"
+    static let ifNoneMatchHeader = "If-None-Match"
     static let etagValue = "test-etag"
 
     static let success = HTTPURLResponse(url: URL.emptyPage,

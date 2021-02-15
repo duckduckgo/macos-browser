@@ -160,7 +160,7 @@ final class Tab: NSObject {
     private var trackerBlockerConfigUpdatedCancellable: AnyCancellable?
 
     private func subscribeToTrackerBlockerConfigUpdatedEvents() {
-        trackerBlockerConfigUpdatedCancellable = ConfigurationManager.trackerBlockerDataUpdatedPublisher()
+        trackerBlockerConfigUpdatedCancellable = ConfigurationManager.shared.trackerBlockerDataUpdatedPublisher()
             .receive(on: DispatchQueue.main)
             .sink { [weak self] _ in
             self?.reconfigureWebView()

@@ -40,7 +40,7 @@ class ConfigurationManager {
 
     static let shared = ConfigurationManager()
 
-    private let queue: DispatchQueue = DispatchQueue(label: "Configuration Manager")
+    static let queue: DispatchQueue = DispatchQueue(label: "Configuration Manager")
 
     @UserDefaultsWrapper(key: .configLastUpdated, defaultValue: .distantPast)
     var lastUpdateTime: Date
@@ -51,22 +51,27 @@ class ConfigurationManager {
     private var lastRefreshCheckTime: Date = Date()
 
     private let scriptSource: ScriptSourceProviding
+    private let configDownloader: ConfigurationDownloading
 
-    private init(scriptSource: ScriptSourceProviding = DefaultScriptSourceProvider.shared) {
+    /// Use the shared instance if subscribing to events.  Only use the constructor for testing.
+    init(scriptSource: ScriptSourceProviding = DefaultScriptSourceProvider.shared,
+         configDownloader: ConfigurationDownloading = DefaultConfigurationDownloader(deliveryQueue: ConfigurationManager.queue)) {
+
         self.scriptSource = scriptSource
+        self.configDownloader = configDownloader
 
         os_log("Starting configuration refresh timer", type: .debug)
         timerCancellable = Timer.publish(every: Constants.refreshCheckIntervalSeconds, on: .main, in: .default)
             .autoconnect()
-            .receive(on: self.queue)
+            .receive(on: Self.queue)
             .sink(receiveValue: { _ in
                 self.lastRefreshCheckTime = Date()
                 self.refreshIfNeeded()
             })
     }
 
-    public static func trackerBlockerDataUpdatedPublisher() -> AnyPublisher<Void, Never> {
-        return Self.shared.trackerBlockerDataUpdatedSubject.share().eraseToAnyPublisher()
+    public func trackerBlockerDataUpdatedPublisher() -> AnyPublisher<Void, Never> {
+        return trackerBlockerDataUpdatedSubject.share().eraseToAnyPublisher()
     }
 
     func log() {
@@ -75,8 +80,6 @@ class ConfigurationManager {
     }
 
     private func refreshNow() {
-
-        let configDownloader: ConfigurationDownloader = DefaultConfigurationDownloader(deliveryQueue: self.queue)
 
         refreshCancellable =
 
@@ -99,7 +102,7 @@ class ConfigurationManager {
 
             )
             .collect()
-            .timeout(.seconds(Constants.downloadTimeoutSeconds), scheduler: self.queue, options: nil, customError: { Error.timeout })
+            .timeout(.seconds(Constants.downloadTimeoutSeconds), scheduler: Self.queue, options: nil, customError: { Error.timeout })
             .sink { [self] completion in
 
                 if case .failure(let error) = completion {

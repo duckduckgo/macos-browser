@@ -1,5 +1,5 @@
 //
-//  ConfigurationDownloader.swift
+//  ConfigurationDownloading.swift
 //
 //  Copyright © 2021 DuckDuckGo. All rights reserved.
 //
@@ -18,7 +18,7 @@
 
 import Combine
 
-protocol ConfigurationDownloader {
+protocol ConfigurationDownloading {
 
     func refreshDataThenUpdate(for locations: [ConfigurationLocation], _ updater: @escaping () throws -> Void)
             -> AnyPublisher<[ConfigurationDownloadMeta?], Swift.Error>
@@ -44,7 +44,7 @@ enum ConfigurationLocation: String, CaseIterable {
 
 }
 
-class DefaultConfigurationDownloader: ConfigurationDownloader {
+class DefaultConfigurationDownloader: ConfigurationDownloading {
 
     enum Error: Swift.Error {
 

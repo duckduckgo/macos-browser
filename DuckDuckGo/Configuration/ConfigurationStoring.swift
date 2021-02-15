@@ -33,8 +33,8 @@ class DefaultConfigurationStorage: ConfigurationStoring {
 
     private static let fileLocations: [ConfigurationLocation: String] = [
         .bloomFilterBinary: "smarterEncryption.bin",
-        .bloomFilterExcludedDomains: "smarterEncryptionExclusions.bin",
-        .bloomFilterSpec: "smarterEncryption.spec",
+        .bloomFilterExcludedDomains: "smarterEncryptionExclusions.json",
+        .bloomFilterSpec: "smarterEncryptionSpec.json",
         .surrogates: "surrogates.txt",
         .temporaryUnprotectedSites: "temp-unprotected-sites.txt",
         .trackerRadar: "tracker-radar.json"
@@ -126,10 +126,28 @@ class DefaultConfigurationStorage: ConfigurationStoring {
     }
 
     func fileUrl(for config: ConfigurationLocation) -> URL {
-        guard let dir = FileManager.default.urls(for: .applicationSupportDirectory, in: .userDomainMask).first else {
+        let fm = FileManager.default
+
+        guard let dir = fm.urls(for: .applicationSupportDirectory, in: .userDomainMask).first else {
             fatalError("Could  not find application support directory")
         }
-        return dir.appendingPathComponent(Self.fileLocations[config]!)
+        let subDir = dir.appendingPathComponent("Configuration")
+
+        var isDir: ObjCBool = false
+        if !fm.fileExists(atPath: subDir.path, isDirectory: &isDir) {
+            do {
+                try fm.createDirectory(at: subDir, withIntermediateDirectories: true, attributes: nil)
+                isDir = true
+            } catch {
+                fatalError("Failed to create directory at \(subDir.path)")
+            }
+        }
+
+        if !isDir.boolValue {
+            fatalError("Configuration folder at \(subDir.path) is not a directory")
+        }
+
+        return subDir.appendingPathComponent(Self.fileLocations[config]!)
     }
 
 }
