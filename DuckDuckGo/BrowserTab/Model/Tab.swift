@@ -53,6 +53,8 @@ final class Tab: NSObject {
         self.favicon = favicon
         self.sessionStateData = sessionStateData
 
+        // Apply required configuration changes after state restoration.
+        webViewConfiguration?.applyStandardConfiguration()
         webView = WebView(frame: CGRect.zero, configuration: webViewConfiguration ?? WKWebViewConfiguration.makeConfiguration())
 
         super.init()
@@ -328,6 +330,11 @@ extension Tab: WKNavigationDelegate {
                  decisionHandler: @escaping (WKNavigationActionPolicy) -> Void) {
 
         updateUserAgentForDomain(navigationAction.request.url?.host)
+
+        // Check if a POST request is being made, and if it matches the appearance of a login request.
+        if let method = navigationAction.request.httpMethod, method == "POST", navigationAction.request.url?.isLoginURL ?? false {
+            loginDetectionUserScript.scanForLoginForm(in: webView)
+        }
 
         if navigationAction.isTargetingMainFrame() {
             lastMainFrameRequest = navigationAction.request
