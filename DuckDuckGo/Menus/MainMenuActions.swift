@@ -39,6 +39,17 @@ extension AppDelegate {
         WindowsManager.closeWindows()
     }
 
+    @IBAction func navigateToBookmark(_ sender: Any?) {
+        guard let menuItem = sender as? NSMenuItem else {
+            os_log("AppDelegate: Casting to menu item failed", type: .error)
+            return
+        }
+
+        let tab = Tab()
+        tab.url = menuItem.representedObject as? URL
+        WindowsManager.openNewWindow(with: tab)
+    }
+
 }
 
 extension MainViewController {
