@@ -20,12 +20,6 @@ import Foundation
 import AppKit
 import Combine
 
-enum LoginResult: Equatable {
-    case authFlow(authLoginDomain: String)
-    case twoFactorAuthFlow(authLoginDomain: String)
-    case loginDetected(authLoginDomain: String, forwardedToDomain: String)
-}
-
 enum NavigationEvent {
     case userAction
     case pageBeganLoading(url: URL)
@@ -35,6 +29,12 @@ enum NavigationEvent {
 }
 
 class LoginDetectionService {
+
+    private enum LoginResult: Equatable {
+        case authenticationFlow(authenticationDomain: String)
+        case twoFactorAuthFlow(authenticationDomain: String)
+        case loginDetected(authenticationDomain: String, forwardedDomain: String)
+    }
 
     /// The detected login result, provided as a string representing the host name. This can be used to present a Fireproofing prompt.
     private var loginDetectionHandler: (String) -> Void
@@ -113,13 +113,14 @@ class LoginDetectionService {
         }
 
         switch result {
-        case .authFlow(authLoginDomain: let authLoginDomain):
-            print("DETECT LOGIN: Got auth flow: \(authLoginDomain)")
+        case .authenticationFlow(let authLoginDomain):
+            authDetectedHosts.append(authLoginDomain)
 
-        case .loginDetected(authLoginDomain: _, forwardedToDomain: let forwardedToDomain):
+        case .loginDetected(_, let forwardedToDomain):
             loginDetectionHandler(forwardedToDomain)
             authDetectedHosts = []
             detectedLoginURL = nil
+
         default: break
         }
     }
@@ -128,22 +129,19 @@ class LoginDetectionService {
         guard let validLoginAttempt = detectedLoginURL, let host = url.baseHost else { return nil }
 
         if authDetectedHosts.contains(host) {
-            print("DETECT LOGIN: Got auth detected host")
-            return LoginResult.authFlow(authLoginDomain: host)
+            return LoginResult.authenticationFlow(authenticationDomain: host)
         }
 
         if url.isOAuthURL || url.isSingleSignOnURL {
-            print("DETECT LOGIN: Got SSO URL")
-            return LoginResult.authFlow(authLoginDomain: host)
+            return LoginResult.authenticationFlow(authenticationDomain: host)
         }
 
         if url.isTwoFactorURL {
-            print("DETECT LOGIN: Got 2FA URL")
-            return LoginResult.twoFactorAuthFlow(authLoginDomain: host)
+            return LoginResult.twoFactorAuthFlow(authenticationDomain: host)
         }
 
         if domainOrPathDidChange(validLoginAttempt, url) {
-            return LoginResult.loginDetected(authLoginDomain: validLoginAttempt.baseHost!, forwardedToDomain: host)
+            return LoginResult.loginDetected(authenticationDomain: validLoginAttempt.baseHost!, forwardedDomain: host)
         }
 
         return nil
@@ -152,15 +150,11 @@ class LoginDetectionService {
     private func handleRedirection(url: URL) {
         guard let host = url.baseHost else { return }
 
-        print("REDIRECTION: Redirected to \(url)")
-
         if url.isOAuthURL || url.isSingleSignOnURL || authDetectedHosts.contains(host) {
             authDetectedHosts.append(host)
-            print("REDIRECTION: Got OAuth/SSO URL, added auth host: \(host)")
         }
 
         if detectedLoginURL != nil {
-            print("REDIRECTION: Got existing login URL, adding URL to check \(url)")
             self.postLoginURL = url
         }
     }
