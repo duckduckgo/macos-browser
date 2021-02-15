@@ -344,13 +344,13 @@
                                                 <action selector="forward:" target="Ady-hI-5gd" id="eVr-CZ-DBf"/>
                                             </connections>
                                         </menuItem>
-                                        <menuItem title="Home" keyEquivalent="H" id="FPm-eZ-BQ8">
+                                        <menuItem title="Home" tag="42" keyEquivalent="H" id="FPm-eZ-BQ8">
                                             <connections>
                                                 <action selector="home:" target="Ady-hI-5gd" id="z3t-iv-FBh"/>
                                             </connections>
                                         </menuItem>
                                         <menuItem isSeparatorItem="YES" id="IJK-jz-3WO"/>
-                                        <menuItem title="Reopen Last Closed Tab" tag="43" enabled="NO" keyEquivalent="T" id="c3l-v1-kxk">
+                                        <menuItem title="Reopen Last Closed Tab" tag="44" enabled="NO" keyEquivalent="T" id="c3l-v1-kxk">
                                             <connections>
                                                 <action selector="reopenLastClosedTab:" target="Ady-hI-5gd" id="jzQ-2q-HGB"/>
                                             </connections>

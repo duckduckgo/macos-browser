@@ -32,7 +32,8 @@ class MainMenu: NSMenu {
         case history = 4
         case back = 40
         case forward = 41
-        case reopenLastClosedTab = 43
+        case home = 42
+        case reopenLastClosedTab = 44
         case bookmarks = 5
         case bookmarkThisPage = 50
         case favorites = 52
@@ -48,6 +49,10 @@ class MainMenu: NSMenu {
 
     var forwardMenuItem: NSMenuItem? {
         return item(withTag: Tag.history.rawValue)?.submenu?.item(withTag: Tag.forward.rawValue)
+    }
+
+    var homeMenuItem: NSMenuItem? {
+        return item(withTag: Tag.history.rawValue)?.submenu?.item(withTag: Tag.home.rawValue)
     }
 
     var reopenLastClosedTabMenuItem: NSMenuItem? {
@@ -80,6 +85,15 @@ class MainMenu: NSMenu {
 
     var sendFeedbackMenuItem: NSMenuItem? {
         helpMenuItem?.submenu?.item(withTag: Tag.sendFeedback.rawValue)
+    }
+
+    func setWindowRelatedMenuItems(enabled: Bool) {
+        backMenuItem?.isEnabled = enabled
+        forwardMenuItem?.isEnabled = enabled
+        homeMenuItem?.isEnabled = enabled
+        reopenLastClosedTabMenuItem?.isEnabled = enabled
+        bookmarkThisPageMenuItem?.isEnabled = enabled
+        favoriteThisPageMenuItem?.isEnabled = enabled
     }
 
     private func setup() {

@@ -71,9 +71,15 @@ class MainViewController: NSViewController {
     }
 
     func windowDidBecomeMain() {
+        NSApplication.shared.mainMenuTyped?.setWindowRelatedMenuItems(enabled: true)
+
         updateBackMenuItem()
         updateForwardMenuItem()
         updateReopenLastClosedTabMenuItem()
+    }
+
+    func windowDidResignMain() {
+        NSApplication.shared.mainMenuTyped?.setWindowRelatedMenuItems(enabled: false)
     }
 
     func windowWillClose() {
