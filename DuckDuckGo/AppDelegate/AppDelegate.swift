@@ -23,7 +23,7 @@ import os.log
 @NSApplicationMain
 class AppDelegate: NSObject, NSApplicationDelegate {
 
-    static var isRunningTests: Bool {
+    private var isRunningTests: Bool {
         ProcessInfo.processInfo.environment["XCTestConfigurationFilePath"] != nil
     }
 
@@ -35,7 +35,7 @@ class AppDelegate: NSObject, NSApplicationDelegate {
 
     func applicationWillFinishLaunching(_ notification: Notification) {
         do {
-            let encryptionKey = Self.isRunningTests ? nil : try keyStore.readKey()
+            let encryptionKey = isRunningTests ? nil : try keyStore.readKey()
             fileStore = FileStore(encryptionKey: encryptionKey)
         } catch {
             os_log("App Encryption Key could not be read: %s", "\(error)")
@@ -50,7 +50,7 @@ class AppDelegate: NSObject, NSApplicationDelegate {
         Database.shared.loadStore()
         HTTPSUpgrade.shared.loadDataAsync()
 
-        if !Self.isRunningTests {
+        if !isRunningTests {
             stateRestorationManager.applicationDidFinishLaunching()
 
             if WindowsManager.windows.isEmpty {
