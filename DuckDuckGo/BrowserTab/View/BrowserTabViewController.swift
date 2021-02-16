@@ -51,6 +51,32 @@ class BrowserTabViewController: NSViewController {
         subscribeToIsErrorViewVisible()
     }
 
+    override func responds(to aSelector: Selector!) -> Bool {
+        if aSelector == #selector(printWebView(_:)) && webView?.url == nil {
+            return false
+        }
+        return super.responds(to: aSelector)
+    }
+
+    var printOperation: NSPrintOperation?
+
+    @IBAction func printWebView(_ sender: Any?) {
+        guard let webView = webView, let window = self.view.window else { return }
+
+//        let printOperation = NSPrintOperation(view: webView, printInfo: NSPrintInfo.shared)
+//        printOperation.runModal(for: window, delegate: window, didRun: nil, contextInfo: nil)
+
+        if #available(OSX 11.0, *) {
+            // Wasn't sure if I need to retain the instance, so am doing anyway (I don't think it's actually required)
+            printOperation = webView.printOperation(with: NSPrintInfo.shared)
+            printOperation?.run()
+                    //.run() // Crashes
+                    //.runModal(for: window, delegate: nil, didRun: nil, contextInfo: nil) // Crashes
+
+        }
+
+    }
+
     private func subscribeToSelectedTabViewModel() {
         selectedTabViewModelCancellable = tabCollectionViewModel.$selectedTabViewModel.receive(on: DispatchQueue.main).sink { [weak self] _ in
             self?.changeWebView()
