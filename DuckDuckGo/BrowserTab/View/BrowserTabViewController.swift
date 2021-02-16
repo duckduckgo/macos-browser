@@ -52,29 +52,20 @@ class BrowserTabViewController: NSViewController {
     }
 
     override func responds(to aSelector: Selector!) -> Bool {
-        if aSelector == #selector(printWebView(_:)) && webView?.url == nil {
+        if aSelector == #selector(printWebView(_:)) {
+            if #available(iOS 11, *) {
+                return webView?.url != nil
+            }
             return false
         }
         return super.responds(to: aSelector)
     }
 
-    var printOperation: NSPrintOperation?
-
     @IBAction func printWebView(_ sender: Any?) {
-        guard let webView = webView, let window = self.view.window else { return }
-
-//        let printOperation = NSPrintOperation(view: webView, printInfo: NSPrintInfo.shared)
-//        printOperation.runModal(for: window, delegate: window, didRun: nil, contextInfo: nil)
-
+        guard let webView = webView else { return }
         if #available(OSX 11.0, *) {
-            // Wasn't sure if I need to retain the instance, so am doing anyway (I don't think it's actually required)
-            printOperation = webView.printOperation(with: NSPrintInfo.shared)
-            printOperation?.run()
-                    //.run() // Crashes
-                    //.runModal(for: window, delegate: nil, didRun: nil, contextInfo: nil) // Crashes
-
+            webView.printOperation(with: NSPrintInfo.shared).run()
         }
-
     }
 
     private func subscribeToSelectedTabViewModel() {
