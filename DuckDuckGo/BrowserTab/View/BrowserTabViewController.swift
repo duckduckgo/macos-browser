@@ -64,6 +64,8 @@ class BrowserTabViewController: NSViewController {
     @IBAction func printWebView(_ sender: Any?) {
         guard let webView = webView else { return }
         if #available(OSX 11.0, *) {
+            // This might crash when running from Xcode, hit resume and it should be fine.
+            // Release builds work fine.
             webView.printOperation(with: NSPrintInfo.shared).run()
         }
     }
