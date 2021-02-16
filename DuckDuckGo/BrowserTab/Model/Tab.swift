@@ -50,6 +50,8 @@ final class Tab: NSObject {
         self.favicon = favicon
         self.sessionStateData = sessionStateData
 
+        // Apply required configuration changes after state restoration.
+        webViewConfiguration?.applyStandardConfiguration()
         webView = WebView(frame: CGRect.zero, configuration: webViewConfiguration ?? WKWebViewConfiguration.makeConfiguration())
 
         super.init()
