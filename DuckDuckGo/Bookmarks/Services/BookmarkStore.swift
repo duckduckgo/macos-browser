@@ -111,7 +111,11 @@ class LocalBookmarkStore: BookmarkStore {
                 return
             }
 
-            let bookmarkMO = self.context.object(with: objectId)
+            guard let bookmarkMO = try? self.context.existingObject(with: objectId) else {
+                assertionFailure("LocalBookmarkStore: No existing object with \(objectId)")
+                DispatchQueue.main.async { completion(false, BookmarkStoreError.badObjectId) }
+                return
+            }
             self.context.delete(bookmarkMO)
 
             do {
@@ -134,7 +138,7 @@ class LocalBookmarkStore: BookmarkStore {
                 return
             }
 
-            guard let bookmarkMO = self.context.object(with: objectId) as? BookmarkManagedObject else {
+            guard let bookmarkMO = try? self.context.existingObject(with: objectId) as? BookmarkManagedObject else {
                 assertionFailure("LocalBookmarkStore: Failed to get BookmarkManagedObject from the context")
                 return
             }
