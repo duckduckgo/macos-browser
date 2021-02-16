@@ -75,6 +75,10 @@ class LoginDetectionService {
             }
 
         case .pageFinishedLoading:
+
+            // By default the login detection logic will wait a bit before checking whether to display the Fireproof prompt.
+            // This gives the browser a chance to stop being redirected by auth providers, but it can be bypassed by providing false for
+            // `delayAfterFinishingPageLoad`, which is useful during unit tests.
             if delayAfterFinishingPageLoad {
                 loginDetectionWorkItem?.cancel()
                 loginDetectionWorkItem = DispatchWorkItem { [weak self] in
