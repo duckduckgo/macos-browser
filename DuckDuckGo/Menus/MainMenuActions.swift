@@ -172,7 +172,24 @@ extension MainViewController {
         if aSelector == #selector(findInPage(_:)) && tabCollectionViewModel.selectedTabViewModel?.tab.url == nil {
             return false
         }
+
+        if aSelector == #selector(printWebView(_:)) {
+            if #available(iOS 11, *) {
+                return tabCollectionViewModel.selectedTabViewModel?.tab.webView.url != nil
+            }
+            return false
+        }
+
         return super.responds(to: aSelector)
+    }
+
+    // MARK: - Printing
+
+    @IBAction func printWebView(_ sender: Any?) {
+        guard let webView = tabCollectionViewModel.selectedTabViewModel?.tab.webView else { return }
+        if #available(OSX 11.0, *) {
+            webView.printOperation(with: NSPrintInfo.shared).run()
+        }
     }
 
     // MARK: - Help

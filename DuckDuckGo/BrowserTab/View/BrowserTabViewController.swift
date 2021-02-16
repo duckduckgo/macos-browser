@@ -51,23 +51,6 @@ class BrowserTabViewController: NSViewController {
         subscribeToIsErrorViewVisible()
     }
 
-    override func responds(to aSelector: Selector!) -> Bool {
-        if aSelector == #selector(printWebView(_:)) {
-            if #available(iOS 11, *) {
-                return webView?.url != nil
-            }
-            return false
-        }
-        return super.responds(to: aSelector)
-    }
-
-    @IBAction func printWebView(_ sender: Any?) {
-        guard let webView = webView else { return }
-        if #available(OSX 11.0, *) {
-            webView.printOperation(with: NSPrintInfo.shared).run()
-        }
-    }
-
     private func subscribeToSelectedTabViewModel() {
         selectedTabViewModelCancellable = tabCollectionViewModel.$selectedTabViewModel.receive(on: DispatchQueue.main).sink { [weak self] _ in
             self?.changeWebView()
