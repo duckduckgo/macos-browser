@@ -173,10 +173,7 @@ extension MainViewController {
             return false
         }
 
-        if aSelector == #selector(printWebView(_:)) {
-            if #available(iOS 11, *) {
-                return tabCollectionViewModel.selectedTabViewModel?.tab.webView.url != nil
-            }
+        if aSelector == #selector(printWebView(_:)) && tabCollectionViewModel.selectedTabViewModel?.tab.webView.url == nil {
             return false
         }
 

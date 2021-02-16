@@ -21,6 +21,9 @@ import os.log
 
 class MainMenu: NSMenu {
 
+    @IBOutlet weak var printSeparatorItem: NSMenuItem?
+    @IBOutlet weak var printMenuItem: NSMenuItem?
+
     required init(coder: NSCoder) {
         super.init(coder: coder)
 
@@ -77,6 +80,26 @@ class MainMenu: NSMenu {
 
 #endif
 
+    }
+
+    override func update() {
+        super.update()
+
+        if #available(macOS 11, *) {
+            // no-op
+        } else {
+            printMenuItem?.removeFromParent()
+            printSeparatorItem?.removeFromParent()
+        }
+
+    }
+
+}
+
+extension NSMenuItem {
+
+    func removeFromParent() {
+        parent?.submenu?.removeItem(self)
     }
 
 }

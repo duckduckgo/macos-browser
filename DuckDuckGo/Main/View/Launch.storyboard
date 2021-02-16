@@ -498,6 +498,10 @@ CQ
                                 </menu>
                             </menuItem>
                         </items>
+                        <connections>
+                            <outlet property="printMenuItem" destination="uFk-FD-FTB" id="mOP-Xp-myS"/>
+                            <outlet property="printSeparatorItem" destination="anH-0y-7dE" id="E6b-rl-clQ"/>
+                        </connections>
                     </menu>
                     <connections>
                         <outlet property="delegate" destination="Voe-Tx-rLC" id="PrD-fu-P6m"/>
