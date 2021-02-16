@@ -150,7 +150,7 @@ class LoginDetectionService {
     private func handleRedirection(url: URL) {
         guard let host = url.baseHost else { return }
 
-        if url.isOAuthURL || url.isSingleSignOnURL || authDetectedHosts.contains(host) {
+        if url.isOAuthURL || url.isSingleSignOnURL {
             authDetectedHosts.append(host)
         }
 
