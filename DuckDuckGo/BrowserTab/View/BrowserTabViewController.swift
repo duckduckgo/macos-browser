@@ -189,19 +189,6 @@ extension BrowserTabViewController: TabDelegate {
         contextMenuLink = link
     }
 
-    func tab(_ tab: Tab, requestedFireproofToggle url: URL?) {
-        guard let host = url?.baseHost else {
-            return
-        }
-
-        if FireproofDomains.shared.isAllowed(fireproofDomain: host) {
-            FireproofDomains.shared.remove(domain: host)
-        } else {
-            // TODO: Figure out if this login should live here.
-            FireproofDomains.shared.addToAllowed(domain: host)
-        }
-    }
-
     func tab(_ tab: Tab, detectedLogin host: String) {
         guard let window = view.window, !FireproofDomains.shared.isAllowed(fireproofDomain: host) else {
             os_log("%s: Window is nil", type: .error, className)

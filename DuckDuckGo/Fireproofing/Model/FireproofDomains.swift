@@ -35,6 +35,14 @@ class FireproofDomains {
         }
     }
 
+    func toggle(domain: String) {
+        if isAllowed(fireproofDomain: domain) {
+            remove(domain: domain)
+        } else {
+            addToAllowed(domain: domain)
+        }
+    }
+
     func addToAllowed(domain: String) {
         allowedDomains += [domain]
 

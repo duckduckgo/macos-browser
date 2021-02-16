@@ -27,7 +27,6 @@ protocol TabDelegate: class {
     func tab(_ tab: Tab, requestedNewTab url: URL?, selected: Bool)
     func tab(_ tab: Tab, requestedFileDownload download: FileDownload)
     func tab(_ tab: Tab, willShowContextMenuAt position: NSPoint, image: URL?, link: URL?)
-    func tab(_ tab: Tab, requestedFireproofToggle url: URL?)
     func tab(_ tab: Tab, detectedLogin host: String)
 
 }
@@ -75,9 +74,7 @@ final class Tab: NSObject {
         }
 
         webView.configuration.websiteDataStore.fetchDataRecords(ofTypes: WKWebsiteDataStore.allWebsiteDataTypes()) { _ in
-            webCacheManager.consumeCookies {
-                // Nothing to see here yet
-            }
+            webCacheManager.consumeCookies {}
         }
     }
 
@@ -170,7 +167,8 @@ final class Tab: NSObject {
     }
 
     func requestFireproofToggle() {
-        self.delegate?.tab(self, requestedFireproofToggle: url)
+        guard let host = url?.baseHost else { return }
+        FireproofDomains.shared.toggle(domain: host)
     }
 
     private func setupWebView() {
