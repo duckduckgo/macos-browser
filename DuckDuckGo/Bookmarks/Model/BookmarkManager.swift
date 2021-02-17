@@ -17,6 +17,7 @@
 //
 
 import Cocoa
+import os.log
 
 protocol BookmarkManager: AnyObject {
 
@@ -37,6 +38,10 @@ class LocalBookmarkManager: BookmarkManager {
 
     private init() {}
 
+    init(bookmarkStore: BookmarkStore) {
+        self.bookmarkStore = bookmarkStore
+    }
+
     @Published private(set) var list = BookmarkList()
     var listPublisher: Published<BookmarkList>.Publisher { $list }
 
@@ -45,7 +50,7 @@ class LocalBookmarkManager: BookmarkManager {
     func loadBookmarks() {
         bookmarkStore.loadAll { [weak self] (bookmarks, error) in
             guard error == nil, let bookmarks = bookmarks else {
-                assertionFailure("LocalBookmarkManager: Failed to fetch bookmarks.")
+                os_log("LocalBookmarkManager: Failed to fetch bookmarks.", type: .error)
                 return
             }
 
@@ -63,7 +68,7 @@ class LocalBookmarkManager: BookmarkManager {
 
     @discardableResult func makeBookmark(for url: URL, title: String, favicon: NSImage?) -> Bookmark? {
         guard !isUrlBookmarked(url: url) else {
-            assertionFailure("LocalBookmarkManager: Url is already bookmarked")
+            os_log("LocalBookmarkManager: Url is already bookmarked", type: .error)
             return nil
         }
         favicon?.size = NSSize.faviconSize
@@ -84,7 +89,7 @@ class LocalBookmarkManager: BookmarkManager {
 
     func remove(bookmark: Bookmark) {
         guard let latestBookmark = getBookmark(for: bookmark.url) else {
-            assertionFailure("LocalBookmarkManager: Attempt to remove already removed bookmark")
+            os_log("LocalBookmarkManager: Attempt to remove already removed bookmark", type: .error)
             return
         }
 
@@ -98,7 +103,7 @@ class LocalBookmarkManager: BookmarkManager {
 
     func update(bookmark: Bookmark) {
         guard let latestBookmark = getBookmark(for: bookmark.url) else {
-            assertionFailure("LocalBookmarkManager: Failed to update bookmark - not in the list.")
+            os_log("LocalBookmarkManager: Failed to update bookmark - not in the list.", type: .error)
             return
         }
 

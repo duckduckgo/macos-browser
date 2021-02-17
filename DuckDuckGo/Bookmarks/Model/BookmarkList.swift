@@ -17,6 +17,7 @@
 //
 
 import Foundation
+import os.log
 
 struct BookmarkList {
 
@@ -25,7 +26,7 @@ struct BookmarkList {
 
     mutating func insert(_ bookmark: Bookmark) {
         guard itemsDict[bookmark.url] == nil else {
-            assertionFailure("BookmarkList: Adding failed, the item already is in the bookmark list")
+            os_log("BookmarkList: Adding failed, the item already is in the bookmark list", type: .error)
             return
         }
 
@@ -54,7 +55,7 @@ struct BookmarkList {
 
     mutating func update(with bookmark: Bookmark) {
         guard itemsDict[bookmark.url] != nil else {
-            assertionFailure("BookmarkList: Update failed, no such item in bookmark list")
+            os_log("BookmarkList: Update failed, no such item in bookmark list")
             return
         }
 

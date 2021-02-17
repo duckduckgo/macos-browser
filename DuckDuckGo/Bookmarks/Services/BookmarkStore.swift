@@ -31,6 +31,12 @@ protocol BookmarkStore {
 
 class LocalBookmarkStore: BookmarkStore {
 
+    init() {}
+
+    init(context: NSManagedObjectContext) {
+        self.context = context
+    }
+
     enum BookmarkStoreError: Error {
         case storeDeallocated
         case insertFailed
