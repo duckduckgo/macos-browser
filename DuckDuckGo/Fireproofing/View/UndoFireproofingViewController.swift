@@ -23,7 +23,7 @@ class UndoFireproofingViewController: NSViewController {
     enum Constants {
         static let storyboardName = "Fireproofing"
         static let identifier = "UndoFireproofingViewController"
-        static let autoDismissDuration: TimeInterval = 1.8
+        static let autoDismissDuration: TimeInterval = 1.75
     }
 
     static func create(for domain: String) -> UndoFireproofingViewController {
