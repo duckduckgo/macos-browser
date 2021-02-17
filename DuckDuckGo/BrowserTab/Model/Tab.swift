@@ -115,6 +115,13 @@ final class Tab: NSObject {
 
     var sessionStateData: Data?
 
+    func update(url: URL?) {
+        self.url = url
+
+        // This function is called when the user has manually typed in a new address, which should reset the login detection flow.
+        loginDetectionService?.handle(navigationEvent: .userAction)
+    }
+
     func invalidateSessionStateData() {
         sessionStateData = nil
     }
