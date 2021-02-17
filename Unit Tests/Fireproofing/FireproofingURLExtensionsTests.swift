@@ -33,6 +33,7 @@ class FireproofingURLExtensionsTests: XCTestCase {
         XCTAssert(URL(string: "https://github.com/login/oauth/authorize")!.isOAuthURL)
         XCTAssert(URL(string: "https://api.twitter.com/oauth/authorize?oauth_token")!.isOAuthURL)
         XCTAssert(URL(string: "https://api.duosecurity.com/oauth/v1/authorize?response_type=code&client_id")!.isOAuthURL)
+        XCTAssert(URL(string: "https://api-f6f4ecbe.duosecurity.com/frame/prompt?sid=frameless")!.isOAuthURL)
 
         XCTAssertFalse(URL(string: "https://duckduckgo.com")!.isOAuthURL)
         XCTAssertFalse(URL(string: "example.com")!.isOAuthURL)
@@ -56,6 +57,7 @@ class FireproofingURLExtensionsTests: XCTestCase {
 
     func testLoginPatterns() {
         XCTAssert(URL(string: "https://sso.host.com/module.php/core/loginuserpass.php")!.isLoginURL)
+        XCTAssert(URL(string: "https://login.microsoftonline.com/")!.isLoginURL)
         XCTAssert(URL(string: "https://example.com/login")!.isLoginURL)
         XCTAssert(URL(string: "https://example.com/sign-in")!.isLoginURL)
         XCTAssert(URL(string: "https://example.com/signin")!.isLoginURL)

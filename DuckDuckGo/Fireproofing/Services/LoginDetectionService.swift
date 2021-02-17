@@ -61,11 +61,6 @@ class LoginDetectionService {
             discardLoginAttempt()
 
         case .pageBeganLoading(let url):
-            guard let host = url.baseHost else { return }
-
-            if !authDetectedHosts.contains(host) {
-                authDetectedHosts = []
-            }
 
             // If a login attempt is taking place, consider the new URL to be the one that should be fireproofed.
             // The login detection work item should be canceled as it'll be restarted when the page finishes loading.
@@ -102,8 +97,9 @@ class LoginDetectionService {
     private func discardLoginAttempt() {
         loginDetectionWorkItem?.cancel()
         loginDetectionWorkItem = nil
-        self.postLoginURL = nil
-        self.detectedLoginURL = nil
+        postLoginURL = nil
+        detectedLoginURL = nil
+        authDetectedHosts = []
     }
 
     private func handleLoginDetection() {

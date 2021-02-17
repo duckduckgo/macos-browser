@@ -199,7 +199,6 @@ extension BrowserTabViewController: TabDelegate {
         alert.beginSheetModal(for: window) { response in
             if response == NSApplication.ModalResponse.alertFirstButtonReturn {
                 FireproofDomains.shared.addToAllowed(domain: host)
-                // TODO: Load favicon?
             }
         }
     }
