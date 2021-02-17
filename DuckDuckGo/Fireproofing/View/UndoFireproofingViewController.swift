@@ -18,18 +18,12 @@
 
 import AppKit
 
-protocol UndoFireproofingViewControllerDelegate: class {
-
-    func undoFireproofingViewController(_ viewController: UndoFireproofingViewController, requestedUndoFor domain: String)
-
-}
-
 class UndoFireproofingViewController: NSViewController {
 
     enum Constants {
         static let storyboardName = "Fireproofing"
         static let identifier = "UndoFireproofingViewController"
-        static let autoDismissDuration: TimeInterval = 3.0
+        static let autoDismissDuration: TimeInterval = 1.8
     }
 
     static func create(for domain: String) -> UndoFireproofingViewController {
@@ -41,8 +35,6 @@ class UndoFireproofingViewController: NSViewController {
     }
 
     @IBOutlet weak var titleLabel: NSTextField!
-
-    weak var delegate: UndoFireproofingViewControllerDelegate?
 
     private var timer: Timer?
     private var domain: String
@@ -72,11 +64,6 @@ class UndoFireproofingViewController: NSViewController {
     override func viewDidAppear() {
         super.viewDidAppear()
         scheduleAutoDismissTimer()
-    }
-
-    @IBAction func undoAction(_ sender: Any) {
-        delegate?.undoFireproofingViewController(self, requestedUndoFor: domain)
-        self.presentingViewController?.dismiss(self)
     }
 
     private func cancelAutoDismissTimer() {

@@ -274,7 +274,6 @@ class AddressBarViewController: NSViewController {
 
         DispatchQueue.main.async {
             let viewController = UndoFireproofingViewController.create(for: domain)
-            viewController.delegate = self
             let frame = self.fireproofedButton.frame.insetBy(dx: -10, dy: -10)
 
             self.present(viewController,
@@ -400,14 +399,6 @@ extension AddressBarViewController {
         self.view.window?.makeFirstResponder(nil)
 
         return event
-    }
-
-}
-
-extension AddressBarViewController: UndoFireproofingViewControllerDelegate {
-
-    func undoFireproofingViewController(_ viewController: UndoFireproofingViewController, requestedUndoFor domain: String) {
-        FireproofDomains.shared.remove(domain: domain)
     }
 
 }

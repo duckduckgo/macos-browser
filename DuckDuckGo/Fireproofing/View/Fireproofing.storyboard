@@ -11,35 +11,23 @@
             <objects>
                 <viewController storyboardIdentifier="UndoFireproofingViewController" id="8n5-nj-K2s" customClass="UndoFireproofingViewController" customModule="DuckDuckGo_Privacy_Browser" customModuleProvider="target" sceneMemberID="viewController">
                     <view key="view" id="XFa-KF-3ZJ" customClass="MouseOverView" customModule="DuckDuckGo_Privacy_Browser" customModuleProvider="target">
-                        <rect key="frame" x="0.0" y="0.0" width="300" height="63"/>
+                        <rect key="frame" x="0.0" y="0.0" width="209" height="63"/>
                         <autoresizingMask key="autoresizingMask"/>
                         <subviews>
                             <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="gfh-pc-7ts">
-                                <rect key="frame" x="24" y="24" width="186" height="15"/>
+                                <rect key="frame" x="24" y="24" width="161" height="15"/>
                                 <textFieldCell key="cell" lineBreakMode="clipping" title="This Website is Fireproof" id="qLZ-BC-Rkv">
                                     <font key="font" size="13" name="SFPro-Semibold"/>
                                     <color key="textColor" name="labelColor" catalog="System" colorSpace="catalog"/>
                                     <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
                                 </textFieldCell>
                             </textField>
-                            <button horizontalHuggingPriority="1000" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="VKQ-Sr-8Fb">
-                                <rect key="frame" x="215" y="12" width="65" height="40"/>
-                                <buttonCell key="cell" type="push" title="Undo" bezelStyle="rounded" alignment="center" controlSize="large" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="eoT-QM-3On">
-                                    <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
-                                    <font key="font" metaFont="system"/>
-                                </buttonCell>
-                                <connections>
-                                    <action selector="undoAction:" target="8n5-nj-K2s" id="hf8-bK-TaL"/>
-                                </connections>
-                            </button>
                         </subviews>
                         <constraints>
                             <constraint firstItem="gfh-pc-7ts" firstAttribute="leading" secondItem="XFa-KF-3ZJ" secondAttribute="leading" constant="26" id="Hqm-Yh-8Dc"/>
                             <constraint firstItem="gfh-pc-7ts" firstAttribute="top" secondItem="XFa-KF-3ZJ" secondAttribute="top" constant="24" id="Lnk-9F-Oab"/>
-                            <constraint firstAttribute="trailing" secondItem="VKQ-Sr-8Fb" secondAttribute="trailing" constant="26" id="P17-pk-62X"/>
-                            <constraint firstItem="VKQ-Sr-8Fb" firstAttribute="centerY" secondItem="XFa-KF-3ZJ" secondAttribute="centerY" id="gmq-qS-HV0"/>
+                            <constraint firstAttribute="trailing" secondItem="gfh-pc-7ts" secondAttribute="trailing" constant="26" id="Rna-l0-xHQ"/>
                             <constraint firstAttribute="bottom" secondItem="gfh-pc-7ts" secondAttribute="bottom" constant="24" id="xkI-s1-AQU"/>
-                            <constraint firstItem="VKQ-Sr-8Fb" firstAttribute="leading" secondItem="gfh-pc-7ts" secondAttribute="trailing" constant="13" id="zQo-CP-Iec"/>
                         </constraints>
                     </view>
                     <connections>
@@ -48,7 +36,7 @@
                 </viewController>
                 <customObject id="SpA-Xn-cHW" userLabel="First Responder" customClass="NSResponder" sceneMemberID="firstResponder"/>
             </objects>
-            <point key="canvasLocation" x="86" y="-4.5"/>
+            <point key="canvasLocation" x="41" y="-8"/>
         </scene>
         <!--Fireproof Info View Controller-->
         <scene sceneID="xNW-sm-DvA">
