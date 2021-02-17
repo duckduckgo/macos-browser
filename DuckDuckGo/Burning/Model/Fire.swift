@@ -40,7 +40,9 @@ class Fire {
             tabCollectionViewModel.appendNewTab()
         }
 
+        os_log("Fire.swift beginning cookie deletion", log: Logging.fireButton, type: .debug)
         webCacheManager.clear { [weak self] in
+            os_log("Fire.swift completed cookie deletion", log: Logging.fireButton, type: .debug)
             self?.isBurning = false
         }
     }

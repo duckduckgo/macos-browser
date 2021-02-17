@@ -19,6 +19,7 @@
 import Foundation
 import AppKit
 import Combine
+import os
 
 enum NavigationEvent {
     case userAction
@@ -56,8 +57,11 @@ class LoginDetectionService {
     }
 
     func handle(navigationEvent: NavigationEvent, delayAfterFinishingPageLoad: Bool = true) {
+        os_log("Login detection received event: %s", log: Logging.fireButton, type: .debug, String(describing: navigationEvent))
+
         switch navigationEvent {
         case .userAction:
+            os_log("Received user action, discard login attempt", log: Logging.fireButton, type: .debug)
             discardLoginAttempt()
 
         case .pageBeganLoading(let url):
@@ -80,6 +84,7 @@ class LoginDetectionService {
                     self?.handleLoginDetection()
                 }
 
+                os_log("Queueing login detection job", log: Logging.fireButton, type: .debug)
                 DispatchQueue.main.asyncAfter(deadline: DispatchTime.now() + 0.25, execute: loginDetectionWorkItem!)
             } else {
                 loginDetectionWorkItem?.cancel()
@@ -87,6 +92,7 @@ class LoginDetectionService {
             }
 
         case .detectedLogin(let url):
+            os_log("Setting detected login URL: %s", log: Logging.fireButton, type: .debug, url.absoluteString)
             self.detectedLoginURL = url
 
         case .redirect(let url):
@@ -100,9 +106,13 @@ class LoginDetectionService {
         postLoginURL = nil
         detectedLoginURL = nil
         authDetectedHosts = []
+
+        os_log("Discarded login attempt", log: Logging.fireButton, type: .debug)
     }
 
     private func handleLoginDetection() {
+        os_log("Login detection work item fired", log: Logging.fireButton, type: .debug)
+
         guard let urlToCheck = postLoginURL else {
             return
         }
@@ -141,6 +151,7 @@ class LoginDetectionService {
         }
 
         if domainOrPathDidChange(validLoginAttempt, url) {
+            os_log("Detected login to %{public}s (auth domain %{public}s)", log: Logging.fireButton, type: .debug, host, validLoginAttempt.baseHost!)
             return LoginResult.loginDetected(authenticationDomain: validLoginAttempt.baseHost!, forwardedDomain: host)
         }
 
@@ -151,6 +162,7 @@ class LoginDetectionService {
         guard let host = url.baseHost else { return }
 
         if url.isOAuthURL || url.isSingleSignOnURL {
+            os_log("Redirection added authentication host %{public}s", log: Logging.fireButton, type: .debug, host)
             authDetectedHosts.append(host)
         }
 
