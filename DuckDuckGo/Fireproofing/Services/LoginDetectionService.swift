@@ -49,6 +49,8 @@ class LoginDetectionService {
     /// Tracks the authentication hosts throughout the login process.
     private var authDetectedHosts = [String]()
 
+    private var previouslyHandledURL: URL?
+
     /// Processes login detection after a short delay, to ensure that no more page redirects are coming.
     private var loginDetectionWorkItem: DispatchWorkItem?
 
@@ -57,8 +59,6 @@ class LoginDetectionService {
     }
 
     func handle(navigationEvent: NavigationEvent, delayAfterFinishingPageLoad: Bool = true) {
-        os_log("Login detection received event: %s", log: Logging.fireButton, type: .debug, String(describing: navigationEvent))
-
         switch navigationEvent {
         case .userAction:
             os_log("Received user action, discard login attempt", log: Logging.fireButton, type: .debug)
@@ -72,6 +72,8 @@ class LoginDetectionService {
             if detectedLoginURL != nil {
                 self.postLoginURL = url
             }
+
+            self.previouslyHandledURL = url
 
         case .pageFinishedLoading:
 
@@ -93,10 +95,12 @@ class LoginDetectionService {
 
         case .detectedLogin(let url):
             os_log("Setting detected login URL: %s", log: Logging.fireButton, type: .debug, url.absoluteString)
+            self.currentlyInAuthRedirectionFlow = false
             self.detectedLoginURL = url
 
         case .redirect(let url):
             handleRedirection(url: url)
+            self.previouslyHandledURL = url
         }
     }
 
@@ -105,6 +109,8 @@ class LoginDetectionService {
         loginDetectionWorkItem = nil
         postLoginURL = nil
         detectedLoginURL = nil
+        urlWhenRedirectedToAuthenticationFlow = nil
+        currentlyInAuthRedirectionFlow = false
         authDetectedHosts = []
 
         os_log("Discarded login attempt", log: Logging.fireButton, type: .debug)
@@ -113,11 +119,30 @@ class LoginDetectionService {
     private func handleLoginDetection() {
         os_log("Login detection work item fired", log: Logging.fireButton, type: .debug)
 
+        // This flag is set when redirected to an OAuth provider, and is reset when any event other than a redirection happens.
+        // We track the original domain when this flag is set, and if we make it to the login detection check with it still set and can see that
+        // the original host matches the current host, then it's very likely that the user was sent through an OAuth provider that they were already
+        // authenticated with. As a result, we prompt them to Fireproof the domain.
+        if currentlyInAuthRedirectionFlow,
+           let originalHost = urlWhenRedirectedToAuthenticationFlow?.baseHost,
+           let currentHost = previouslyHandledURL?.baseHost {
+
+            if originalHost == currentHost {
+                os_log("Login detection prompting to Fireproof due to auth redirect flow", log: Logging.fireButton, type: .debug)
+
+                loginDetectionHandler(originalHost)
+                discardLoginAttempt()
+                return
+            }
+        }
+
         guard let urlToCheck = postLoginURL else {
+            os_log("Login detection work item has no URL to check", log: Logging.fireButton, type: .debug)
             return
         }
 
         guard let result = detectLogin(url: urlToCheck) else {
+            os_log("Login detection couldn't detect login, discarding attempt", log: Logging.fireButton, type: .debug)
             discardLoginAttempt()
             return
         }
@@ -136,27 +161,38 @@ class LoginDetectionService {
     }
 
     private func detectLogin(url: URL) -> LoginResult? {
-        guard let validLoginAttempt = detectedLoginURL, let host = url.baseHost else { return nil }
+        guard let validLoginAttempt = detectedLoginURL, let host = url.baseHost else {
+            os_log("Login detection hit guard statement", log: Logging.fireButton, type: .debug)
+            return nil
+        }
 
         if authDetectedHosts.contains(host) {
+            os_log("Login detection returning auth flow", log: Logging.fireButton, type: .debug)
             return LoginResult.authenticationFlow(authenticationDomain: host)
         }
 
         if url.isOAuthURL || url.isSingleSignOnURL {
+            os_log("Login detection returning OAuth/SSO auth flow", log: Logging.fireButton, type: .debug)
             return LoginResult.authenticationFlow(authenticationDomain: host)
         }
 
         if url.isTwoFactorURL {
+            os_log("Login detection returning 2FA flow", log: Logging.fireButton, type: .debug)
             return LoginResult.twoFactorAuthFlow(authenticationDomain: host)
         }
 
         if domainOrPathDidChange(validLoginAttempt, url) {
             os_log("Detected login to %{public}s (auth domain %{public}s)", log: Logging.fireButton, type: .debug, host, validLoginAttempt.baseHost!)
             return LoginResult.loginDetected(authenticationDomain: validLoginAttempt.baseHost!, forwardedDomain: host)
+        } else {
+            os_log("DID NOT detect login to %{public}s (auth domain %{public}s)", log: Logging.fireButton, type: .debug, host, validLoginAttempt.baseHost!)
         }
 
         return nil
     }
+
+    private var urlWhenRedirectedToAuthenticationFlow: URL?
+    private var currentlyInAuthRedirectionFlow: Bool = false
 
     private func handleRedirection(url: URL) {
         guard let host = url.baseHost else { return }
@@ -164,6 +200,11 @@ class LoginDetectionService {
         if url.isOAuthURL || url.isSingleSignOnURL {
             os_log("Redirection added authentication host %{public}s", log: Logging.fireButton, type: .debug, host)
             authDetectedHosts.append(host)
+
+            if urlWhenRedirectedToAuthenticationFlow == nil {
+                self.urlWhenRedirectedToAuthenticationFlow = previouslyHandledURL
+                self.currentlyInAuthRedirectionFlow = true
+            }
         }
 
         if detectedLoginURL != nil {
