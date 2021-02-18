@@ -171,24 +171,6 @@ class LoginDetectionServiceTests: XCTestCase {
         XCTAssertEqual(receivedLogins, [])
     }
 
-    func testWhenRedirectedThroughAuthProvidersBackToOriginalSiteThenLoginDetected() {
-        let receivedLoginsExpectation = expectation(description: "Login detection expectation")
-        var receivedLogins = [String]()
-
-        let service = LoginDetectionService {
-            receivedLogins.append($0)
-            receivedLoginsExpectation.fulfill()
-        }
-
-        redirect(service, to: "https://www.example.com/login", wait: true)
-        redirect(service, to: "https://github.com/login/oauth/authorize", wait: true)
-        redirect(service, to: "https://www.example.com/github-auth?redirect=https://www.example.com&code=someauthtoken", wait: true)
-        redirect(service, to: "https://example.com/")
-
-        waitForExpectations(timeout: 1, handler: nil)
-        XCTAssertEqual(receivedLogins, ["example.com"])
-    }
-
     /// Simulates the process of loading a web page.
     private func load(_ service: LoginDetectionService, url: String, wait: Bool = false) {
         service.handle(navigationEvent: .pageBeganLoading(url: URL(string: url)!), delayAfterFinishingPageLoad: false)
