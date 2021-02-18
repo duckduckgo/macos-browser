@@ -21,7 +21,7 @@ import XCTest
 
 class WebCacheManagerTests: XCTestCase {
 
-    func testWhenCookiesHaveSubDomainsOnSubDomainsAndWidlcardsThenOnlyMatchingCookiesRetained() {
+    func testWhenCookiesHaveSubDomainsOnSubDomainsAndWildcardsThenOnlyMatchingCookiesRetained() {
         let logins = MockPreservedLogins(domains: [
             "mobile.twitter.com"
         ])
