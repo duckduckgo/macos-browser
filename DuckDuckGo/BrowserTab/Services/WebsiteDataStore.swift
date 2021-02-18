@@ -22,9 +22,7 @@ import os
 protocol WebsiteCookieStore {
 
     func getAllCookies(_ completionHandler: @escaping ([HTTPCookie]) -> Void)
-
     func setCookie(_ cookie: HTTPCookie, completionHandler: (() -> Void)?)
-
     func delete(_ cookie: HTTPCookie, completionHandler: (() -> Void)?)
 
 }
@@ -98,7 +96,6 @@ class WebCacheManager {
                             group.leave()
                         }
 
-                        // don't try to delete the cookie twice as it doesn't always work (esecially on the simulator)
                         return
                     }
                 }
