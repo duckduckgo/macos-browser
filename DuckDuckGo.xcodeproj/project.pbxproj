@@ -186,7 +186,6 @@
 		F41D17C225DC4AFB00472416 /* EmailUserScript.swift in Sources */ = {isa = PBXBuildFile; fileRef = F41D17BD25DC4AFB00472416 /* EmailUserScript.swift */; };
 		F41D17C325DC4AFB00472416 /* EmailKeychainManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = F41D17BE25DC4AFB00472416 /* EmailKeychainManager.swift */; };
 		F41D17D225DD652400472416 /* email-autofill.css in Resources */ = {isa = PBXBuildFile; fileRef = F41D17D125DD652400472416 /* email-autofill.css */; };
-		F41D17D725DD664100472416 /* EmailAutofillSchemeHandler.swift in Sources */ = {isa = PBXBuildFile; fileRef = F41D17D625DD664100472416 /* EmailAutofillSchemeHandler.swift */; };
 		F44C130225C2DA0400426E3E /* NSAppearanceExtension.swift in Sources */ = {isa = PBXBuildFile; fileRef = F44C130125C2DA0400426E3E /* NSAppearanceExtension.swift */; };
 /* End PBXBuildFile section */
 
@@ -397,7 +396,6 @@
 		F41D17BD25DC4AFB00472416 /* EmailUserScript.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = EmailUserScript.swift; sourceTree = "<group>"; };
 		F41D17BE25DC4AFB00472416 /* EmailKeychainManager.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = EmailKeychainManager.swift; sourceTree = "<group>"; };
 		F41D17D125DD652400472416 /* email-autofill.css */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.css; path = "email-autofill.css"; sourceTree = "<group>"; };
-		F41D17D625DD664100472416 /* EmailAutofillSchemeHandler.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EmailAutofillSchemeHandler.swift; sourceTree = "<group>"; };
 		F44C130125C2DA0400426E3E /* NSAppearanceExtension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NSAppearanceExtension.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
@@ -1188,7 +1186,6 @@
 				F41D17BB25DC4AFB00472416 /* EmailManager.swift */,
 				F41D17BD25DC4AFB00472416 /* EmailUserScript.swift */,
 				F41D17BA25DC4AFB00472416 /* UserScript2.swift */,
-				F41D17D625DD664100472416 /* EmailAutofillSchemeHandler.swift */,
 			);
 			path = Email;
 			sourceTree = "<group>";
@@ -1404,7 +1401,6 @@
 				AABEE6AB24ACA0F90043105B /* SuggestionTableRowView.swift in Sources */,
 				856C98DA2570149800A22F1F /* FileDownloadTask.swift in Sources */,
 				AA5D6DAC24A340F700C6FBCE /* WebViewStateObserver.swift in Sources */,
-				F41D17D725DD664100472416 /* EmailAutofillSchemeHandler.swift in Sources */,
 				4BA1A6A0258B079600F6F690 /* DataEncryption.swift in Sources */,
 				AABEE6AF24AD22B90043105B /* AddressBarTextField.swift in Sources */,
 				AA68C3D32490ED62001B8783 /* NavigationBarViewController.swift in Sources */,

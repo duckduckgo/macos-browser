@@ -50,11 +50,7 @@ final class Tab: NSObject {
         self.favicon = favicon
         self.sessionStateData = sessionStateData
 
-        let config = webViewConfiguration ?? WKWebViewConfiguration.makeConfiguration()
-        config.setURLSchemeHandler(EmailAutofillSchemeHandler(), forURLScheme: EmailAutofillSchemeHandler.schemeName)
-        config.preferences.setValue(true, forKey: "allowFileAccessFromFileURLs")
-
-        webView = WebView(frame: CGRect.zero, configuration: config)
+        webView = WebView(frame: CGRect.zero, configuration: webViewConfiguration ?? WKWebViewConfiguration.makeConfiguration())
 
         super.init()
 

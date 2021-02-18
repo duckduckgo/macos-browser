@@ -47,6 +47,11 @@ public protocol EmailManagerRequestDelegate: class {
                       completion: @escaping (Data?, Error?) -> Void)
 }
 
+public extension Notification.Name {
+    static let emailDidSignIn = Notification.Name("com.duckduckgo.browserServicesKit.EmailDidSignIn")
+    static let emailDidSignOut = Notification.Name("com.duckduckgo.browserServicesKit.EmailDidSignOut")
+}
+
 public enum AliasRequestError: Error {
     case noDataError
     case signedOut
@@ -114,6 +119,7 @@ public class EmailManager {
     
     public func signOut() {
         storage.deleteAll()
+        NotificationCenter.default.post(name: .emailDidSignOut, object: self)
         //TODO Pixel.fire(pixel: .emailUserSignedOut)
     }
     
@@ -167,6 +173,7 @@ extension EmailManager: EmailUserScriptDelegate {
     public func emailUserScript(_ emailUserScript: EmailUserScript, didRequestStoreToken token: String, username: String) {
         //TODO Pixel.fire(pixel: .emailUserSignedIn)
         storeToken(token, username: username)
+        NotificationCenter.default.post(name: .emailDidSignIn, object: self)
     }
 }
 

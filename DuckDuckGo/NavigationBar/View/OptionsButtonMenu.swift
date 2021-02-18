@@ -23,16 +23,29 @@ import WebKit
 class OptionsButtonMenu: NSMenu {
 
     private let tabCollectionViewModel: TabCollectionViewModel
+    private let emailManager: EmailManager
+    
+    private var emailMenuItem: NSMenuItem?
 
     required init(coder: NSCoder) {
         fatalError("OptionsButtonMenu: Bad initializer")
     }
 
-    init(tabCollectionViewModel: TabCollectionViewModel) {
+    init(tabCollectionViewModel: TabCollectionViewModel, emailManager: EmailManager = EmailManager()) {
         self.tabCollectionViewModel = tabCollectionViewModel
+        self.emailManager = emailManager
         super.init(title: "")
 
         setupMenuItems()
+        
+        NotificationCenter.default.addObserver(self,
+                                               selector: #selector(emailDidSignInNotification(_:)),
+                                               name: .emailDidSignIn,
+                                               object: nil)
+        NotificationCenter.default.addObserver(self,
+                                               selector: #selector(emailDidSignOutNotification(_:)),
+                                               name: .emailDidSignOut,
+                                               object: nil)
     }
 
     private func setupMenuItems() {
@@ -53,7 +66,25 @@ class OptionsButtonMenu: NSMenu {
         addItem(openFeedbackMenuItem)
 
 #endif
-
+        
+        let emailItem = NSMenuItem(title: "",
+                                   action: nil,
+                                   keyEquivalent: "")
+        emailItem.target = self
+        emailItem.image = NSImage(named: "Feedback")
+        addItem(emailItem)
+        emailMenuItem = emailItem
+        updateEmailMenuItem()
+    }
+    
+    private func updateEmailMenuItem() {
+        if emailManager.isSignedIn {
+            emailMenuItem?.title = "Turn off Email Protection"
+            emailMenuItem?.action = #selector(turnOffEmailAction(_:))
+        } else {
+            emailMenuItem?.title = "Turn on Email Protection"
+            emailMenuItem?.action = #selector(turnOnEmailAction(_:))
+        }
     }
 
     @objc func moveTabToNewWindowAction(_ sender: NSMenuItem) {
@@ -76,5 +107,21 @@ class OptionsButtonMenu: NSMenu {
     }
 
 #endif
+    
+    @objc func turnOffEmailAction(_ sender: NSMenuItem) {
+        emailManager.signOut()
+    }
+    
+    @objc func turnOnEmailAction(_ sender: NSMenuItem) {
+        //TODO open quack.duckduckgo.com/email-protection
+    }
 
+    @objc func emailDidSignInNotification(_ notification: Notification) {
+        updateEmailMenuItem()
+    }
+    
+    @objc func emailDidSignOutNotification(_ notification: Notification) {
+        updateEmailMenuItem()
+    }
+    
 }
