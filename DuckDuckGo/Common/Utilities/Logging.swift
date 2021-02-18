@@ -29,7 +29,7 @@ extension OSLog {
 
 struct Logging {
 
-    fileprivate static let fireButtonLoggingEnabled = true
-    fileprivate static let fireButtonLog: OSLog = OSLog(subsystem: Bundle.main.bundleIdentifier ?? "DuckDuckGo", category: "Fire Button/Login Detection")
+    fileprivate static let fireButtonLoggingEnabled = false
+    fileprivate static let fireButtonLog = OSLog(subsystem: Bundle.main.bundleIdentifier ?? "DuckDuckGo", category: "Fire Button/Login Detection")
 
 }
