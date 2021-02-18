@@ -82,7 +82,7 @@ class LocalBookmarkManagerTests: XCTestCase {
 
         let objectId = NSManagedObjectID()
         bookmarkStoreMock.managedObjectId = objectId
-        let _ = bookmarkManager.makeBookmark(for: URL.duckDuckGo, title: "Title", favicon: nil)!
+        _ = bookmarkManager.makeBookmark(for: URL.duckDuckGo, title: "Title", favicon: nil)!
 
         XCTAssertNil(bookmarkManager.makeBookmark(for: URL.duckDuckGo, title: "Title", favicon: nil))
     }
