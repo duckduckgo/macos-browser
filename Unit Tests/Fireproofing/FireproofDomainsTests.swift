@@ -34,7 +34,7 @@ class FireproofDomainsTests: XCTestCase {
 
     func testWhenNewThenAllowedDomainsIsEmpty() {
         let logins = FireproofDomains()
-        XCTAssertTrue(logins.allowedDomains.isEmpty)
+        XCTAssertTrue(logins.fireproofDomains.isEmpty)
     }
 
     func testWhenRemovingDomainThenOtherDomainsAreNotRemoved() {
@@ -47,7 +47,7 @@ class FireproofDomainsTests: XCTestCase {
         logins.remove(domain: "secondexample.com")
         XCTAssertTrue(logins.isAllowed(fireproofDomain: "example.com"))
         XCTAssertFalse(logins.isAllowed(fireproofDomain: "secondexample.com"))
-        XCTAssertFalse(logins.allowedDomains.isEmpty)
+        XCTAssertFalse(logins.fireproofDomains.isEmpty)
     }
 
     func testWhenClearAllIsCalledThenAllDomainsAreRemoved() {
@@ -57,7 +57,7 @@ class FireproofDomainsTests: XCTestCase {
 
         logins.clearAll()
         XCTAssertFalse(logins.isAllowed(fireproofDomain: "example.com"))
-        XCTAssertTrue(logins.allowedDomains.isEmpty)
+        XCTAssertTrue(logins.fireproofDomains.isEmpty)
     }
 
 }

@@ -23,7 +23,8 @@ struct UserDefaultsWrapper<T> {
 
     enum Key: String, CaseIterable {
 
-        case preserveLoginsAllowedDomains = "com.duckduckgo.ios.PreserveLogins.userDecision.allowedDomains"
+        case allowedCookies = "com.duckduckgo.fireproofingallowedCookies"
+        case fireproofDomains = "com.duckduckgo.fireproofing.allowedDomains"
 
     }
 

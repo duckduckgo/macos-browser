@@ -28,8 +28,8 @@ class FireproofDomains {
 
     static let shared = FireproofDomains()
 
-    @UserDefaultsWrapper(key: .preserveLoginsAllowedDomains, defaultValue: [])
-    private(set) var allowedDomains: [String] {
+    @UserDefaultsWrapper(key: .fireproofDomains, defaultValue: [])
+    private(set) var fireproofDomains: [String] {
         didSet {
             NotificationCenter.default.post(name: Constants.allowedDomainsChangedNotification, object: self)
         }
@@ -44,7 +44,7 @@ class FireproofDomains {
     }
 
     func addToAllowed(domain: String) {
-        allowedDomains += [domain]
+        fireproofDomains += [domain]
 
         NotificationCenter.default.post(name: Constants.newFireproofDomainNotification, object: self, userInfo: [
             Constants.newFireproofDomainKey: domain
@@ -53,22 +53,22 @@ class FireproofDomains {
 
     func isAllowed(cookieDomain: String) -> Bool {
 
-        return allowedDomains.contains(where: { $0 == cookieDomain
+        return fireproofDomains.contains(where: { $0 == cookieDomain
                                         || ".\($0)" == cookieDomain
                                         || (cookieDomain.hasPrefix(".") && $0.hasSuffix(cookieDomain)) })
 
     }
 
     func remove(domain: String) {
-        allowedDomains = allowedDomains.filter { $0 != domain }
+        fireproofDomains = fireproofDomains.filter { $0 != domain }
     }
 
     func clearAll() {
-        allowedDomains = []
+        fireproofDomains = []
     }
 
     func isAllowed(fireproofDomain domain: String) -> Bool {
-        return allowedDomains.contains(domain)
+        return fireproofDomains.contains(domain)
     }
 
 }

@@ -184,7 +184,7 @@ class WebCacheManagerTests: XCTestCase {
 
         let domains: [String]
 
-        override var allowedDomains: [String] {
+        override var fireproofDomains: [String] {
             return domains
         }
 
@@ -221,10 +221,18 @@ class WebCacheManagerTests: XCTestCase {
 
     class MockCookieStorage: CookieStorage {
 
-        convenience init() {
-            let userDefaults = UserDefaults(suiteName: "test")!
-            userDefaults.removePersistentDomain(forName: "test")
-            self.init(userDefaults: userDefaults)
+        private var mockCookies: [HTTPCookie] = []
+
+        override var cookies: [HTTPCookie] {
+            mockCookies
+        }
+
+        override func clear() {
+            mockCookies = []
+        }
+
+        override func setCookie(_ cookie: HTTPCookie) {
+            mockCookies.append(cookie)
         }
 
     }
