@@ -180,6 +180,13 @@
 		B6A5A2A825BAA35500AA7ADA /* WindowManagerStateRestorationTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = B6A5A2A725BAA35500AA7ADA /* WindowManagerStateRestorationTests.swift */; };
 		B6D7A2EE25D2418B002B2AE1 /* ShadowView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B6D7A2ED25D2418B002B2AE1 /* ShadowView.swift */; };
 		F41D174125CB131900472416 /* NSColorExtension.swift in Sources */ = {isa = PBXBuildFile; fileRef = F41D174025CB131900472416 /* NSColorExtension.swift */; };
+		F41D17BF25DC4AFB00472416 /* UserScript2.swift in Sources */ = {isa = PBXBuildFile; fileRef = F41D17BA25DC4AFB00472416 /* UserScript2.swift */; };
+		F41D17C025DC4AFB00472416 /* EmailManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = F41D17BB25DC4AFB00472416 /* EmailManager.swift */; };
+		F41D17C125DC4AFB00472416 /* email-autofill.js in Resources */ = {isa = PBXBuildFile; fileRef = F41D17BC25DC4AFB00472416 /* email-autofill.js */; };
+		F41D17C225DC4AFB00472416 /* EmailUserScript.swift in Sources */ = {isa = PBXBuildFile; fileRef = F41D17BD25DC4AFB00472416 /* EmailUserScript.swift */; };
+		F41D17C325DC4AFB00472416 /* EmailKeychainManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = F41D17BE25DC4AFB00472416 /* EmailKeychainManager.swift */; };
+		F41D17D225DD652400472416 /* email-autofill.css in Resources */ = {isa = PBXBuildFile; fileRef = F41D17D125DD652400472416 /* email-autofill.css */; };
+		F41D17D725DD664100472416 /* EmailAutofillSchemeHandler.swift in Sources */ = {isa = PBXBuildFile; fileRef = F41D17D625DD664100472416 /* EmailAutofillSchemeHandler.swift */; };
 		F44C130225C2DA0400426E3E /* NSAppearanceExtension.swift in Sources */ = {isa = PBXBuildFile; fileRef = F44C130125C2DA0400426E3E /* NSAppearanceExtension.swift */; };
 /* End PBXBuildFile section */
 
@@ -384,6 +391,13 @@
 		B6A5A2A725BAA35500AA7ADA /* WindowManagerStateRestorationTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WindowManagerStateRestorationTests.swift; sourceTree = "<group>"; };
 		B6D7A2ED25D2418B002B2AE1 /* ShadowView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ShadowView.swift; sourceTree = "<group>"; };
 		F41D174025CB131900472416 /* NSColorExtension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NSColorExtension.swift; sourceTree = "<group>"; };
+		F41D17BA25DC4AFB00472416 /* UserScript2.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = UserScript2.swift; sourceTree = "<group>"; };
+		F41D17BB25DC4AFB00472416 /* EmailManager.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = EmailManager.swift; sourceTree = "<group>"; };
+		F41D17BC25DC4AFB00472416 /* email-autofill.js */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.javascript; path = "email-autofill.js"; sourceTree = "<group>"; };
+		F41D17BD25DC4AFB00472416 /* EmailUserScript.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = EmailUserScript.swift; sourceTree = "<group>"; };
+		F41D17BE25DC4AFB00472416 /* EmailKeychainManager.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = EmailKeychainManager.swift; sourceTree = "<group>"; };
+		F41D17D125DD652400472416 /* email-autofill.css */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.css; path = "email-autofill.css"; sourceTree = "<group>"; };
+		F41D17D625DD664100472416 /* EmailAutofillSchemeHandler.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EmailAutofillSchemeHandler.swift; sourceTree = "<group>"; };
 		F44C130125C2DA0400426E3E /* NSAppearanceExtension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NSAppearanceExtension.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
@@ -657,6 +671,7 @@
 		AA585D80248FD31100E9A3E2 /* DuckDuckGo */ = {
 			isa = PBXGroup;
 			children = (
+				F41D17A325DC444C00472416 /* Email */,
 				AA4D700525545EDE00C3411E /* AppDelegate */,
 				AA86491B24D837DE001BABEE /* BrowserTab */,
 				AA6820E825503A21005ED0D5 /* Burning */,
@@ -1164,6 +1179,20 @@
 			path = App;
 			sourceTree = "<group>";
 		};
+		F41D17A325DC444C00472416 /* Email */ = {
+			isa = PBXGroup;
+			children = (
+				F41D17BC25DC4AFB00472416 /* email-autofill.js */,
+				F41D17D125DD652400472416 /* email-autofill.css */,
+				F41D17BE25DC4AFB00472416 /* EmailKeychainManager.swift */,
+				F41D17BB25DC4AFB00472416 /* EmailManager.swift */,
+				F41D17BD25DC4AFB00472416 /* EmailUserScript.swift */,
+				F41D17BA25DC4AFB00472416 /* UserScript2.swift */,
+				F41D17D625DD664100472416 /* EmailAutofillSchemeHandler.swift */,
+			);
+			path = Email;
+			sourceTree = "<group>";
+		};
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
@@ -1278,6 +1307,7 @@
 				AA80EC73256C46A2007083E7 /* Suggestions.storyboard in Resources */,
 				85A0117425AF2EDF00FA6A0C /* FindInPage.storyboard in Resources */,
 				AA80EC89256C49B8007083E7 /* Localizable.strings in Resources */,
+				F41D17D225DD652400472416 /* email-autofill.css in Resources */,
 				AAE8B102258A41C000E81239 /* Tooltip.storyboard in Resources */,
 				AA68C3D72490F821001B8783 /* README.md in Resources */,
 				85A011E525B4D49400FA6A0C /* findinpage.js in Resources */,
@@ -1294,6 +1324,7 @@
 				4B677432255DBEB800025BD8 /* httpsMobileV2BloomSpec.json in Resources */,
 				AA2CB12D2587BB5600AA6FBE /* TabBarFooter.xib in Resources */,
 				4B6160D825B150E4007DE5B2 /* trackerData.json in Resources */,
+				F41D17C125DC4AFB00472416 /* email-autofill.js in Resources */,
 				AA80EC67256C4691007083E7 /* BrowserTab.storyboard in Resources */,
 				4B6160F725B157BB007DE5B2 /* contentblocker.js in Resources */,
 			);
@@ -1347,6 +1378,7 @@
 				AA80EC54256BE3BC007083E7 /* UserText.swift in Sources */,
 				14505A08256084EF00272CC6 /* UserAgent.swift in Sources */,
 				AA7412BD24D2BEEE00D22FE0 /* MainWindow.swift in Sources */,
+				F41D17BF25DC4AFB00472416 /* UserScript2.swift in Sources */,
 				4B6160FF25B15BB1007DE5B2 /* ContentBlockerRulesManager.swift in Sources */,
 				AA5C8F5E2590EEE800748EB7 /* NSPointExtension.swift in Sources */,
 				AA6EF9AD25066F42004754E6 /* WindowsManager.swift in Sources */,
@@ -1355,11 +1387,13 @@
 				4B677437255DBEB800025BD8 /* HTTPSUpgrade.swift in Sources */,
 				1430DFF524D0580F00B8978C /* TabBarViewController.swift in Sources */,
 				4B6160DD25B152C5007DE5B2 /* ContentBlockerRulesUserScript.swift in Sources */,
+				F41D17C325DC4AFB00472416 /* EmailKeychainManager.swift in Sources */,
 				4BA1A6B3258B080A00F6F690 /* EncryptionKeyGeneration.swift in Sources */,
 				AABEE6A524AA0A7F0043105B /* SuggestionsViewController.swift in Sources */,
 				4BB88B4A25B7B690006F6B06 /* SequenceExtensions.swift in Sources */,
 				AAA0CC3C25337FAB0079BC96 /* WKBackForwardListItemViewModel.swift in Sources */,
 				4BB88B4525B7B55C006F6B06 /* DebugUserScript.swift in Sources */,
+				F41D17C225DC4AFB00472416 /* EmailUserScript.swift in Sources */,
 				8556A602256BDDD30092FA9D /* HTML5DownloadUserScript.swift in Sources */,
 				AA4D700725545EF800C3411E /* UrlEventListener.swift in Sources */,
 				AA92127725ADA07900600CD4 /* WKWebViewExtension.swift in Sources */,
@@ -1370,6 +1404,7 @@
 				AABEE6AB24ACA0F90043105B /* SuggestionTableRowView.swift in Sources */,
 				856C98DA2570149800A22F1F /* FileDownloadTask.swift in Sources */,
 				AA5D6DAC24A340F700C6FBCE /* WebViewStateObserver.swift in Sources */,
+				F41D17D725DD664100472416 /* EmailAutofillSchemeHandler.swift in Sources */,
 				4BA1A6A0258B079600F6F690 /* DataEncryption.swift in Sources */,
 				AABEE6AF24AD22B90043105B /* AddressBarTextField.swift in Sources */,
 				AA68C3D32490ED62001B8783 /* NavigationBarViewController.swift in Sources */,
@@ -1386,6 +1421,7 @@
 				AABEE69E24A9C5C30043105B /* Suggestion.swift in Sources */,
 				AA2E423424C8A2270048C0D5 /* ColorView.swift in Sources */,
 				AAECA42024EEA4AC00EFA63A /* IndexPathExtension.swift in Sources */,
+				F41D17C025DC4AFB00472416 /* EmailManager.swift in Sources */,
 				AA5C8F632591021700748EB7 /* NSApplicationExtension.swift in Sources */,
 				AA9E9A5625A3AE8400D1959D /* NSWindowExtension.swift in Sources */,
 				4B677450255DBFA300025BD8 /* HashExtension.swift in Sources */,

@@ -50,7 +50,11 @@ final class Tab: NSObject {
         self.favicon = favicon
         self.sessionStateData = sessionStateData
 
-        webView = WebView(frame: CGRect.zero, configuration: webViewConfiguration ?? WKWebViewConfiguration.makeConfiguration())
+        let config = webViewConfiguration ?? WKWebViewConfiguration.makeConfiguration()
+        config.setURLSchemeHandler(EmailAutofillSchemeHandler(), forURLScheme: EmailAutofillSchemeHandler.schemeName)
+        config.preferences.setValue(true, forKey: "allowFileAccessFromFileURLs")
+
+        webView = WebView(frame: CGRect.zero, configuration: config)
 
         super.init()
 
@@ -194,6 +198,7 @@ final class Tab: NSObject {
     let contentBlockerScript = ContentBlockerUserScript()
     let contentBlockerRulesScript = ContentBlockerRulesUserScript()
     let debugScript = DebugUserScript()
+    let emailScript = EmailUserScript()
 
     lazy var userScripts = [
         self.debugScript,
@@ -204,6 +209,19 @@ final class Tab: NSObject {
         self.contentBlockerScript,
         self.contentBlockerRulesScript
     ]
+    
+    lazy var emailManager: EmailManager = {
+        let emailManager = EmailManager()
+        //emailManager.delegate = self
+        //we don't actually need the delegate
+        //TODO should probs rename the delegate
+        emailManager.requestDelegate = self
+        return emailManager
+    }()
+    
+    lazy var userScripts2 = [
+        self.emailScript
+    ]
 
     private func setupUserScripts() {
         debugScript.instrumentation = instrumentation
@@ -212,9 +230,19 @@ final class Tab: NSObject {
         contextMenuScript.delegate = self
         contentBlockerScript.delegate = self
         contentBlockerRulesScript.delegate = self
+        
+        emailScript.webView = webView
+        emailScript.delegate = emailManager
 
         userScripts.forEach {
             webView.configuration.userContentController.add(userScript: $0)
+        }
+        webView.configuration.userContentController.addUserScript(WKUserScript(source: emailScript.source,
+                                                                               injectionTime: emailScript.injectionTime,
+                                                                               forMainFrameOnly: emailScript.forMainFrameOnly))
+        
+        emailScript.messageNames.forEach { messageName in
+            webView.configuration.userContentController.add(emailScript, name: messageName)
         }
     }
 
@@ -281,6 +309,25 @@ extension Tab: ContentBlockerUserScriptDelegate {
         // Not used until site rating support is implemented.
     }
 
+}
+
+extension Tab: EmailManagerRequestDelegate {
+    
+    func emailManager(_ emailManager: EmailManager,
+                      didRequestAliasWithURL url: URL,
+                      method: String,
+                      headers: [String: String],
+                      timeoutInterval: TimeInterval,
+                      completion: @escaping (Data?, Error?) -> Void) {
+        
+        var request = URLRequest(url: url, timeoutInterval: timeoutInterval)
+        request.allHTTPHeaderFields = headers
+        request.httpMethod = method
+        URLSession.shared.dataTask(with: request) { (data, _, error) in
+            completion(data, error)
+        }.resume()
+    }
+    
 }
 
 extension Tab: WKNavigationDelegate {
