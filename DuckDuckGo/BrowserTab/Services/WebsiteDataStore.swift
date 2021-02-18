@@ -120,7 +120,7 @@ class WebCacheManager {
                completion: @escaping () -> Void) {
 
         extractAllowedCookies(from: dataStore.cookieStore, cookieStorage: appCookieStorage, logins: logins) {
-            os_log("WebsiteDataStore completed extracting allowed cookies", log: Logging.fireButton, type: .debug)
+            os_log("WebsiteDataStore completed extracting allowed cookies", log: .fire, type: .debug)
             self.clearAllData(dataStore: dataStore, completion: completion)
         }
     }
@@ -134,7 +134,7 @@ class WebCacheManager {
     }
 
     private func clearAllData(dataStore: WebsiteDataStore, completion: @escaping () -> Void) {
-        os_log("WebsiteDataStore removing all cookie data store data", log: Logging.fireButton, type: .debug)
+        os_log("WebsiteDataStore removing all cookie data store data", log: .fire, type: .debug)
         dataStore.removeAllData(completionHandler: completion)
     }
 
@@ -143,7 +143,7 @@ class WebCacheManager {
                                        logins: FireproofDomains,
                                        completion: @escaping () -> Void) {
 
-        os_log("WebsiteDataStore extracting allowed cookies", log: Logging.fireButton, type: .debug)
+        os_log("WebsiteDataStore extracting allowed cookies", log: .fire, type: .debug)
 
         guard let cookieStore = cookieStore else {
             completion()
@@ -154,7 +154,7 @@ class WebCacheManager {
             for cookie in cookies {
                 if cookie.domain == URL.cookieDomain || logins.isAllowed(cookieDomain: cookie.domain) {
                     cookieStorage.setCookie(cookie)
-                    os_log("Saved cookie for %s with name %s", log: Logging.fireButton, type: .debug, cookie.domain, cookie.name)
+                    os_log("Saved cookie for %s with name %s", log: .fire, type: .debug, cookie.domain, cookie.name)
                 }
             }
             completion()

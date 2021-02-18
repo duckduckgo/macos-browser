@@ -19,17 +19,17 @@
 import Foundation
 import os
 
-struct Logging {
+extension OSLog {
 
-    static var fireButton: OSLog {
-        fireButtonLoggingEnabled ? fireButtonLog : .disabled
+    static var fire: OSLog {
+        Logging.fireButtonLoggingEnabled ? Logging.fireButtonLog : .disabled
     }
 
-    // MARK: - Logging Status
+}
 
-    private static let fireButtonLoggingEnabled = true
+struct Logging {
 
-    // MARK: - Loggers
+    fileprivate static let fireButtonLoggingEnabled = true
+    fileprivate static let fireButtonLog: OSLog = OSLog(subsystem: Bundle.main.bundleIdentifier ?? "DuckDuckGo", category: "Fire Button/Login Detection")
 
-    private static let fireButtonLog: OSLog = OSLog(subsystem: Bundle.main.bundleIdentifier ?? "DuckDuckGo", category: "Fire Button/Login Detection")
 }
