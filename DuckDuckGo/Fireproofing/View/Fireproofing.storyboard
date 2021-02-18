@@ -11,13 +11,13 @@
             <objects>
                 <viewController storyboardIdentifier="UndoFireproofingViewController" id="8n5-nj-K2s" customClass="UndoFireproofingViewController" customModule="DuckDuckGo_Privacy_Browser" customModuleProvider="target" sceneMemberID="viewController">
                     <view key="view" id="XFa-KF-3ZJ" customClass="MouseOverView" customModule="DuckDuckGo_Privacy_Browser" customModuleProvider="target">
-                        <rect key="frame" x="0.0" y="0.0" width="209" height="63"/>
+                        <rect key="frame" x="0.0" y="0.0" width="213" height="64"/>
                         <autoresizingMask key="autoresizingMask"/>
                         <subviews>
                             <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="gfh-pc-7ts">
-                                <rect key="frame" x="24" y="24" width="161" height="15"/>
+                                <rect key="frame" x="24" y="24" width="165" height="16"/>
                                 <textFieldCell key="cell" lineBreakMode="clipping" title="This Website is Fireproof" id="qLZ-BC-Rkv">
-                                    <font key="font" size="13" name="SFPro-Semibold"/>
+                                    <font key="font" textStyle="headline" name=".SFNS-Bold"/>
                                     <color key="textColor" name="labelColor" catalog="System" colorSpace="catalog"/>
                                     <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
                                 </textFieldCell>
@@ -43,7 +43,7 @@
             <objects>
                 <viewController storyboardIdentifier="FireproofInfoViewController" id="jqq-GQ-sK6" customClass="FireproofInfoViewController" customModule="DuckDuckGo_Privacy_Browser" customModuleProvider="target" sceneMemberID="viewController">
                     <view key="view" id="prW-AZ-vsO">
-                        <rect key="frame" x="0.0" y="0.0" width="340" height="208"/>
+                        <rect key="frame" x="0.0" y="0.0" width="340" height="209"/>
                         <autoresizingMask key="autoresizingMask"/>
                         <subviews>
                             <customView translatesAutoresizingMaskIntoConstraints="NO" id="vuA-8C-6AZ" userLabel="Separator">
@@ -76,9 +76,9 @@ DQ
                                 </connections>
                             </button>
                             <textField horizontalHuggingPriority="251" verticalHuggingPriority="1000" translatesAutoresizingMaskIntoConstraints="NO" id="ueg-qL-Rvw">
-                                <rect key="frame" x="18" y="173" width="304" height="15"/>
+                                <rect key="frame" x="18" y="173" width="304" height="16"/>
                                 <textFieldCell key="cell" lineBreakMode="clipping" title="This Website is Fireproof" id="A96-Lb-yAP">
-                                    <font key="font" size="13" name="SFPro-Semibold"/>
+                                    <font key="font" textStyle="headline" name=".SFNS-Bold"/>
                                     <color key="textColor" name="labelColor" catalog="System" colorSpace="catalog"/>
                                     <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
                                 </textFieldCell>
@@ -89,7 +89,7 @@ DQ
                                     <constraint firstAttribute="width" constant="300" id="ket-cH-6Xl"/>
                                 </constraints>
                                 <textFieldCell key="cell" alignment="left" id="KzY-j5-09Y">
-                                    <font key="font" metaFont="system"/>
+                                    <font key="font" textStyle="body" name=".SFNS-Regular"/>
                                     <string key="title">Websites rely on cookies to keep you signed in. When you fireproof a site, cookies won’t be erased, and you’ll stay signed in, even after using the Fire button. We still block third-party trackers found on Fireproof websites.</string>
                                     <color key="textColor" name="labelColor" catalog="System" colorSpace="catalog"/>
                                     <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
