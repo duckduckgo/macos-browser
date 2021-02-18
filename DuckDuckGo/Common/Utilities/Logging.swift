@@ -22,7 +22,7 @@ import os
 struct Logging {
 
     static var fireButton: OSLog {
-        fireButtonLoggingEnabled ? fireButtonLog : OSLog.disabled
+        fireButtonLoggingEnabled ? fireButtonLog : .disabled
     }
 
     // MARK: - Logging Status
