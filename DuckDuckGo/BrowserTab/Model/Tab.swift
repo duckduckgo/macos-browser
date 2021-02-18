@@ -331,6 +331,15 @@ extension Tab: WKNavigationDelegate {
     struct ErrorCodes {
         static let frameLoadInterrupted = 102
     }
+    
+    func webView(_ webView: WKWebView,
+                 didReceive challenge: URLAuthenticationChallenge,
+                 completionHandler: @escaping (URLSession.AuthChallengeDisposition, URLCredential?) -> Void) {
+        if let url = webView.url, EmailUrls().shouldAuthenticateWithEmailCredentials(url: url) {
+            completionHandler(.useCredential, URLCredential(user: "dax", password: "qu4ckqu4ck!", persistence: .none))
+        }
+        completionHandler(.performDefaultHandling, nil)
+    }
 
     func webView(_ webView: WKWebView,
                  decidePolicyFor navigationAction: WKNavigationAction,
