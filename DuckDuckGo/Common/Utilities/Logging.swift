@@ -31,5 +31,5 @@ struct Logging {
 
     // MARK: - Loggers
 
-    private static let fireButtonLog: OSLog = OSLog(subsystem: Bundle.main.bundleIdentifier ?? "DuckDuckGo", category: "Login Detection")
+    private static let fireButtonLog: OSLog = OSLog(subsystem: Bundle.main.bundleIdentifier ?? "DuckDuckGo", category: "Fire Button/Login Detection")
 }
