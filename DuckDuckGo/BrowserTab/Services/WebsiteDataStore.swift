@@ -155,8 +155,6 @@ class WebCacheManager {
                 if cookie.domain == URL.cookieDomain || logins.isAllowed(cookieDomain: cookie.domain) {
                     cookieStorage.setCookie(cookie)
                     os_log("Saved cookie for %s with name %s", log: Logging.fireButton, type: .debug, cookie.domain, cookie.name)
-                } else {
-                    os_log("Ignored cookie for %s with name %s", log: Logging.fireButton, type: .debug, cookie.domain, cookie.name)
                 }
             }
             completion()
