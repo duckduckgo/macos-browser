@@ -18,11 +18,23 @@
 
 import Cocoa
 import WebKit
+import BrowserServicesKit
 
 extension WKUserContentController {
 
     func add(userScript: UserScript) {
-        addUserScript(userScript)
+        let script: WKUserScript
+        if #available(OSX 11.0, *) {
+            script = WKUserScript(source: userScript.source,
+                         injectionTime: userScript.injectionTime,
+                         forMainFrameOnly: userScript.forMainFrameOnly,
+                         in: .defaultClient)
+        } else {
+            script = WKUserScript(source: userScript.source,
+                         injectionTime: userScript.injectionTime,
+                         forMainFrameOnly: userScript.forMainFrameOnly)
+        }
+        addUserScript(script)
 
         for messageName in userScript.messageNames {
             if #available(OSX 11.0, *) {

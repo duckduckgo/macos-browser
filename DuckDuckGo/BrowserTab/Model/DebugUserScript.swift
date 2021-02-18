@@ -18,8 +18,9 @@
 
 import WebKit
 import os
+import BrowserServicesKit
 
-class DebugUserScript: UserScript {
+class DebugUserScript: NSObject, UserScript {
 
     enum MessageNames: String, CaseIterable {
 
@@ -27,17 +28,21 @@ class DebugUserScript: UserScript {
         case log
 
     }
-
-    init() {
-        super.init(source: Self.source,
-                   messageNames: Self.messageNames,
-                   injectionTime: .atDocumentStart,
-                   forMainFrameOnly: false)
-    }
+    
+    var injectionTime: WKUserScriptInjectionTime = .atDocumentStart
+    var forMainFrameOnly = false
+    let messageNames = MessageNames.allCases.map(\.rawValue)
+    let source: String = {
+        #if DEBUG
+            return DebugUserScript.debugMessagingEnabledSource
+        #else
+            return DebugUserScript.debugMessagingDisabledSource
+        #endif
+    }()
 
     weak var instrumentation: TabInstrumentation?
 
-    override func userContentController(_ userContentController: WKUserContentController, didReceive message: WKScriptMessage) {
+    func userContentController(_ userContentController: WKUserContentController, didReceive message: WKScriptMessage) {
         let messageType = MessageNames(rawValue: message.name)
 
         switch messageType {
@@ -87,15 +92,6 @@ class DebugUserScript: UserScript {
 }
 
 extension DebugUserScript {
-
-    static let messageNames = MessageNames.allCases.map(\.rawValue)
-    static let source: String = {
-        #if DEBUG
-            return debugMessagingEnabledSource
-        #else
-            return debugMessagingDisabledSource
-        #endif
-    }()
 
     static let debugMessagingEnabledSource = """
 var duckduckgoDebugMessaging = function() {

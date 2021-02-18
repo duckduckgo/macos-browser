@@ -18,6 +18,7 @@
 
 import Foundation
 import WebKit
+import BrowserServicesKit
 
 protocol FaviconUserScriptDelegate: AnyObject {
 
@@ -25,29 +26,21 @@ protocol FaviconUserScriptDelegate: AnyObject {
 
 }
 
-class FaviconUserScript: UserScript {
+class FaviconUserScript: NSObject, UserScript {
 
+    var injectionTime: WKUserScriptInjectionTime = .atDocumentEnd
+    var forMainFrameOnly = true
+    
     weak var delegate: FaviconUserScriptDelegate?
 
-    init() {
-        super.init(source: Self.source,
-                   messageNames: Self.messageNames,
-                   injectionTime: .atDocumentEnd,
-                   forMainFrameOnly: true)
-    }
-
-    override func userContentController(_ userContentController: WKUserContentController, didReceive message: WKScriptMessage) {
+    func userContentController(_ userContentController: WKUserContentController, didReceive message: WKScriptMessage) {
         if let urlString = message.body as? String, let url = URL(string: urlString) {
             delegate?.faviconUserScript(self, didFindFavicon: url)
         }
     }
     
-}
-
-extension FaviconUserScript {
-
-    static let messageNames = ["faviconFound"]
-    static let source = """
+    let messageNames = ["faviconFound"]
+    let source = """
 (function() {
     function getFavicon() {
         return findFavicons()[0];
@@ -83,5 +76,5 @@ extension FaviconUserScript {
     }
 }) ();
 """
-
+    
 }

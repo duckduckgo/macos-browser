@@ -18,6 +18,7 @@
 
 import WebKit
 import os
+import BrowserServicesKit
 
 protocol ContentBlockerUserScriptDelegate: NSObjectProtocol {
 
@@ -27,7 +28,7 @@ protocol ContentBlockerUserScriptDelegate: NSObjectProtocol {
 
 }
 
-class ContentBlockerUserScript: UserScript {
+class ContentBlockerUserScript: NSObject, UserScript {
 
     struct TrackerDetectedKey {
         static let protectionId = "protectionId"
@@ -36,17 +37,23 @@ class ContentBlockerUserScript: UserScript {
         static let url = "url"
         static let isSurrogate = "isSurrogate"
     }
+    
+    var injectionTime: WKUserScriptInjectionTime = .atDocumentStart
+    var forMainFrameOnly = false
+    let messageNames = ["trackerDetectedMessage"]
+    lazy var source: String = {
+        let trackerData = TrackerDataManager.shared.encodedTrackerData!
 
-    init() {
-        super.init(source: Self.source,
-                   messageNames: Self.messageNames,
-                   injectionTime: .atDocumentStart,
-                   forMainFrameOnly: false)
-    }
+        return loadJS("contentblocker", fromBundle: Bundle.main, withReplacements: [
+            "${unprotectedDomains}": "",
+            "${trackerData}": trackerData,
+            "${surrogates}": ""
+        ])
+    }()
 
     weak var delegate: ContentBlockerUserScriptDelegate?
 
-    override func userContentController(_ userContentController: WKUserContentController, didReceive message: WKScriptMessage) {
+    func userContentController(_ userContentController: WKUserContentController, didReceive message: WKScriptMessage) {
         guard let delegate = delegate else { return }
         guard delegate.contentBlockerUserScriptShouldProcessTrackers(self) else { return }
 
@@ -70,18 +77,3 @@ class ContentBlockerUserScript: UserScript {
     }
 }
 
-extension ContentBlockerUserScript {
-
-    static let messageNames = ["trackerDetectedMessage"]
-
-    static let source: String = {
-        let trackerData = TrackerDataManager.shared.encodedTrackerData!
-
-        return loadJS("contentblocker", withReplacements: [
-            "${unprotectedDomains}": "",
-            "${trackerData}": trackerData,
-            "${surrogates}": ""
-        ])
-    }()
-
-}

@@ -17,6 +17,7 @@
 //
 
 import WebKit
+import BrowserServicesKit
 
 protocol ContextMenuDelegate: AnyObject {
 
@@ -24,21 +25,17 @@ protocol ContextMenuDelegate: AnyObject {
 
 }
 
-class ContextMenuUserScript: UserScript {
+class ContextMenuUserScript: NSObject, UserScript {
+    
+    var injectionTime: WKUserScriptInjectionTime = .atDocumentEnd
+    var forMainFrameOnly = true
 
     weak var delegate: ContextMenuDelegate?
 
     var lastAnchor: URL?
     var lastImage: URL?
 
-    init() {
-        super.init(source: Self.source,
-                   messageNames: Self.messageNames,
-                   injectionTime: .atDocumentEnd,
-                   forMainFrameOnly: true)
-    }
-
-    override func userContentController(_ userContentController: WKUserContentController, didReceive message: WKScriptMessage) {
+    func userContentController(_ userContentController: WKUserContentController, didReceive message: WKScriptMessage) {
 
         guard let dict = message.body as? [String: Any],
               let point = point(from: dict) else { return }
@@ -72,12 +69,8 @@ class ContextMenuUserScript: UserScript {
         return NSPoint(x: x, y: y)
     }
 
-}
-
-extension ContextMenuUserScript {
-
-    static let messageNames = ["contextMenu"]
-    static let source = """
+    let messageNames = ["contextMenu"]
+    let source = """
 (function() {
 
     function linkFrom(element) {
@@ -130,5 +123,5 @@ extension ContextMenuUserScript {
 
 }) ();
 """
-
+    
 }

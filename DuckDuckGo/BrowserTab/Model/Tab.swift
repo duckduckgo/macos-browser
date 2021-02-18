@@ -20,6 +20,7 @@ import Cocoa
 import WebKit
 import os
 import Combine
+import BrowserServicesKit
 
 protocol TabDelegate: class {
 
@@ -196,14 +197,15 @@ final class Tab: NSObject {
     let debugScript = DebugUserScript()
     let emailScript = EmailUserScript()
 
-    lazy var userScripts = [
+    lazy var userScripts: [UserScript] = [
         self.debugScript,
         self.faviconScript,
         self.html5downloadScript,
         self.contextMenuScript,
         self.findInPageScript,
         self.contentBlockerScript,
-        self.contentBlockerRulesScript
+        self.contentBlockerRulesScript,
+        self.emailScript
     ]
     
     lazy var emailManager: EmailManager = {
@@ -214,10 +216,6 @@ final class Tab: NSObject {
         emailManager.requestDelegate = self
         return emailManager
     }()
-    
-    lazy var userScripts2 = [
-        self.emailScript
-    ]
 
     private func setupUserScripts() {
         debugScript.instrumentation = instrumentation

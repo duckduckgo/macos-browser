@@ -17,8 +17,9 @@
 //
 
 import WebKit
+import BrowserServicesKit
 
-class ContentBlockerRulesUserScript: UserScript {
+class ContentBlockerRulesUserScript: NSObject, UserScript {
 
     struct ContentBlockerKey {
         static let url = "url"
@@ -26,17 +27,20 @@ class ContentBlockerRulesUserScript: UserScript {
         static let blocked = "blocked"
         static let pageUrl = "pageUrl"
     }
-
-    init() {
-        super.init(source: Self.source,
-                   messageNames: Self.messageNames,
-                   injectionTime: .atDocumentStart,
-                   forMainFrameOnly: false)
-    }
+    
+    var injectionTime: WKUserScriptInjectionTime = .atDocumentStart
+    var forMainFrameOnly = false
+    let messageNames = ["processRule"]
+    lazy var source: String = {
+        // Unprotected domains are not yet implemented.
+        return loadJS("contentblockerrules", fromBundle: Bundle.main,  withReplacements: [
+            "${unprotectedDomains}": ""
+        ])
+    }()
 
     weak var delegate: ContentBlockerUserScriptDelegate?
 
-    override func userContentController(_ userContentController: WKUserContentController, didReceive message: WKScriptMessage) {
+    func userContentController(_ userContentController: WKUserContentController, didReceive message: WKScriptMessage) {
         guard let delegate = delegate else { return }
         guard delegate.contentBlockerUserScriptShouldProcessTrackers(self) else { return }
 
@@ -67,16 +71,4 @@ class ContentBlockerRulesUserScript: UserScript {
 
         return nil
     }
-}
-
-extension ContentBlockerRulesUserScript {
-
-    static let messageNames = ["processRule"]
-    static let source: String = {
-        // Unprotected domains are not yet implemented.
-        return loadJS("contentblockerrules", withReplacements: [
-            "${unprotectedDomains}": ""
-        ])
-    }()
-
 }
