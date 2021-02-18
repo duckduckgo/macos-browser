@@ -32,7 +32,7 @@
                                 </textFieldCell>
                             </textField>
                             <customView translatesAutoresizingMaskIntoConstraints="NO" id="PHK-0Q-PGv" userLabel="Separator View" customClass="ColorView" customModule="DuckDuckGo_Privacy_Browser" customModuleProvider="target">
-                                <rect key="frame" x="0.0" y="54" width="300" height="1"/>
+                                <rect key="frame" x="0.0" y="60" width="300" height="1"/>
                                 <constraints>
                                     <constraint firstAttribute="height" constant="1" id="pce-i3-i0O"/>
                                 </constraints>
@@ -86,7 +86,7 @@ DQ
                             <constraint firstItem="fju-6w-rFQ" firstAttribute="leading" secondItem="b7R-iD-UcK" secondAttribute="leading" id="IUH-Gl-qq9"/>
                             <constraint firstAttribute="trailing" secondItem="b7R-iD-UcK" secondAttribute="trailing" constant="24" id="S67-Qw-Hrf"/>
                             <constraint firstItem="PHK-0Q-PGv" firstAttribute="leading" secondItem="2fn-ed-4g2" secondAttribute="leading" id="Wa1-06-TF0"/>
-                            <constraint firstAttribute="bottom" secondItem="PHK-0Q-PGv" secondAttribute="bottom" constant="54" id="XeY-DJ-34H"/>
+                            <constraint firstAttribute="bottom" secondItem="PHK-0Q-PGv" secondAttribute="bottom" constant="60" id="XeY-DJ-34H"/>
                             <constraint firstItem="Ich-82-cIb" firstAttribute="top" secondItem="b7R-iD-UcK" secondAttribute="bottom" constant="24" id="Xlg-4G-fmw"/>
                             <constraint firstItem="3zg-6l-JsQ" firstAttribute="leading" secondItem="0eB-pX-cZ5" secondAttribute="trailing" constant="12" symbolic="YES" id="eW9-QH-hDN"/>
                             <constraint firstItem="b7R-iD-UcK" firstAttribute="top" secondItem="2fn-ed-4g2" secondAttribute="top" constant="26" id="iBs-wS-tC7"/>
