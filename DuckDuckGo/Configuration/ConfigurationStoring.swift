@@ -117,12 +117,12 @@ class DefaultConfigurationStorage: ConfigurationStoring {
     }
 
     func log() {
-        os_log("bloomFilterBinaryEtag %{public}s", type: .default, bloomFilterBinaryEtag ?? "")
-        os_log("bloomFilterSpecEtag %{public}s", type: .default, bloomFilterSpecEtag ?? "")
-        os_log("bloomFilterExcludedDomainsEtag %{public}s", type: .default, bloomFilterExcludedDomainsEtag ?? "")
-        os_log("surrogatesEtag %{public}s", type: .default, surrogatesEtag ?? "")
-        os_log("temporaryUnprotectedSitesEtag %{public}s", type: .default, temporaryUnprotectedSitesEtag ?? "")
-        os_log("trackerRadarEtag %{public}s", type: .default, trackerRadarEtag ?? "")
+        os_log("bloomFilterBinaryEtag %{public}s", log: .config, type: .default, bloomFilterBinaryEtag ?? "")
+        os_log("bloomFilterSpecEtag %{public}s", log: .config, type: .default, bloomFilterSpecEtag ?? "")
+        os_log("bloomFilterExcludedDomainsEtag %{public}s", log: .config, type: .default, bloomFilterExcludedDomainsEtag ?? "")
+        os_log("surrogatesEtag %{public}s", log: .config, type: .default, surrogatesEtag ?? "")
+        os_log("temporaryUnprotectedSitesEtag %{public}s", log: .config, type: .default, temporaryUnprotectedSitesEtag ?? "")
+        os_log("trackerRadarEtag %{public}s", log: .config, type: .default, trackerRadarEtag ?? "")
     }
 
     func fileUrl(for config: ConfigurationLocation) -> URL {

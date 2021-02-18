@@ -64,7 +64,7 @@ class ConfigurationManager {
         self.scriptSource = scriptSource
         self.configDownloader = configDownloader
 
-        os_log("Starting configuration refresh timer", type: .debug)
+        os_log("Starting configuration refresh timer", log: .config, type: .debug)
         timerCancellable = Timer.publish(every: Constants.refreshCheckIntervalSeconds, on: .main, in: .default)
             .autoconnect()
             .receive(on: Self.queue)
@@ -79,8 +79,8 @@ class ConfigurationManager {
     }
 
     func log() {
-        os_log("last update %{public}s", type: .default, String(describing: lastUpdateTime))
-        os_log("last refresh check %{public}s", type: .default, String(describing: lastRefreshCheckTime))
+        os_log("last update %{public}s", log: .config, type: .default, String(describing: lastUpdateTime))
+        os_log("last refresh check %{public}s", log: .config, type: .default, String(describing: lastRefreshCheckTime))
     }
 
     private func refreshNow() {
@@ -110,7 +110,7 @@ class ConfigurationManager {
             .sink { [self] completion in
 
                 if case .failure(let error) = completion {
-                    os_log("Failed to complete configuration update %s", type: .error, error.localizedDescription)
+                    os_log("Failed to complete configuration update %s", log: .config, type: .error, error.localizedDescription)
                     tryAgainSoon()
                 } else {
                     tryAgainLater()
@@ -130,7 +130,7 @@ class ConfigurationManager {
 
     private func refreshIfNeeded() {
         guard self.isReadyToRefresh(), refreshCancellable == nil else {
-            os_log("Configuration refresh is not needed at this time", type: .debug)
+            os_log("Configuration refresh is not needed at this time", log: .config, type: .debug)
             return
         }
         refreshNow()
