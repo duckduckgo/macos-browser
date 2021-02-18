@@ -149,7 +149,7 @@
     try {
         const observer = new PerformanceObserver((list, observer) => {
             const entries = list.getEntries().filter((entry) => {
-                var found = (entry.initiatorType == "xmlhttprequest" || entry.initiatorType == "fetch") && entry.name.split("?")[0].match(/login|sign-in|signin|session/);
+                var found = entry.initiatorType == "xmlhttprequest" && entry.name.split("?")[0].match(/login|sign-in|signin|session/);
                 if (found) {
                     logger.log("XHR: observed login - " + entry.name.split("?")[0]);
                 }
