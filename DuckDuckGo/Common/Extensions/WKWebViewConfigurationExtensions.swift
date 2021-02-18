@@ -22,12 +22,16 @@ extension WKWebViewConfiguration {
 
     static func makeConfiguration() -> WKWebViewConfiguration {
         let configuration = WKWebViewConfiguration()
-        configuration.websiteDataStore = WKWebsiteDataStore.default()
-        configuration.allowsAirPlayForMediaPlayback = true
-        configuration.preferences.setValue(true, forKey: "fullScreenEnabled")
-        configuration.preferences.setValue(true, forKey: "developerExtrasEnabled")
-        configuration.installContentBlockingRules()
+        configuration.applyStandardConfiguration()
         return configuration
+    }
+
+    func applyStandardConfiguration() {
+        websiteDataStore = WKWebsiteDataStore.default()
+        allowsAirPlayForMediaPlayback = true
+        preferences.setValue(true, forKey: "fullScreenEnabled")
+        preferences.setValue(true, forKey: "developerExtrasEnabled")
+        installContentBlockingRules()
     }
 
     private func installContentBlockingRules() {

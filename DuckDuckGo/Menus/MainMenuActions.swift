@@ -211,7 +211,23 @@ extension MainViewController {
         if aSelector == #selector(findInPage(_:)) && tabCollectionViewModel.selectedTabViewModel?.tab.url == nil {
             return false
         }
+
+        if aSelector == #selector(printWebView(_:)) && tabCollectionViewModel.selectedTabViewModel?.tab.webView.url == nil {
+            return false
+        }
+
         return super.responds(to: aSelector)
+    }
+
+    // MARK: - Printing
+
+    @IBAction func printWebView(_ sender: Any?) {
+        guard let webView = tabCollectionViewModel.selectedTabViewModel?.tab.webView else { return }
+        if #available(OSX 11.0, *) {
+            // This might crash when running from Xcode, hit resume and it should be fine.
+            // Release builds work fine.
+            webView.printOperation(with: NSPrintInfo.shared).run()
+        }
     }
 
     // MARK: - Help
