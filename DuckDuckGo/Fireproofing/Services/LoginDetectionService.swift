@@ -91,7 +91,6 @@ class LoginDetectionService {
 
         case .detectedLogin(let url):
             os_log("Setting detected login URL: %s", log: .fire, type: .debug, url.absoluteString)
-//            self.currentlyInAuthRedirectionFlow = false
             self.detectedLoginURL = url
 
         case .redirect(let url):
@@ -104,8 +103,6 @@ class LoginDetectionService {
         loginDetectionWorkItem = nil
         postLoginURL = nil
         detectedLoginURL = nil
-//        urlWhenRedirectedToAuthenticationFlow = nil
-//        currentlyInAuthRedirectionFlow = false
         authDetectedHosts = []
 
         os_log("Discarded login attempt", log: .fire, type: .debug)
@@ -168,9 +165,6 @@ class LoginDetectionService {
 
         return nil
     }
-
-//    private var urlWhenRedirectedToAuthenticationFlow: URL?
-//    private var currentlyInAuthRedirectionFlow: Bool = false
 
     private func handleRedirection(url: URL) {
         guard let host = url.baseHost else { return }
