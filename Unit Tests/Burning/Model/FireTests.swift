@@ -46,7 +46,6 @@ class FireTests: XCTestCase {
         XCTAssert(manager.removeAllWebsiteDataCalled)
     }
 
-    // TODO: Fails after running the browser locally, probably some local state that needs to be cleared in `setUp`.
     func testWhenBurnAllThenBurningFlagToggles() {
         let fire = Fire()
         let tabCollectionViewModel = TabCollectionViewModel.aTabCollectionViewModel
