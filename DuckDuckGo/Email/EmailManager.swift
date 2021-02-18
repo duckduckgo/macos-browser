@@ -60,18 +60,18 @@ public enum AliasRequestError: Error {
     case permissionDelegateNil
 }
 
-private struct EmailUrls {
+public struct EmailUrls {
     private struct Url {
         static let emailAlias = "https://quack.duckduckgo.com/api/email/addresses"
         static let emailLandingPage = "https://quack.duckduckgo.com/email-protection"
         static let emailAuthenticationHosts = ["quack.duckduckgo.com", "quackdev.duckduckgo.com"]
     }
     
-    var emailLandingPage: URL {
+    public var emailLandingPage: URL {
         return URL(string: Url.emailLandingPage)!
     }
     
-    func shouldAuthenticateWithEmailCredentials(url: URL) -> Bool {
+    public func shouldAuthenticateWithEmailCredentials(url: URL) -> Bool {
         guard let host = url.host else { return false }
         return Url.emailAuthenticationHosts.contains(host)
     }

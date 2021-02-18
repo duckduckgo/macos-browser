@@ -113,7 +113,9 @@ class OptionsButtonMenu: NSMenu {
     }
     
     @objc func turnOnEmailAction(_ sender: NSMenuItem) {
-        //TODO open quack.duckduckgo.com/email-protection
+        let tab = Tab()
+        tab.url = EmailUrls().emailLandingPage
+        tabCollectionViewModel.append(tab: tab)
     }
 
     @objc func emailDidSignInNotification(_ notification: Notification) {
