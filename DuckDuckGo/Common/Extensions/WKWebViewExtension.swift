@@ -20,9 +20,14 @@ import WebKit
 
 extension WKWebView {
 
-    @discardableResult func load(_ url: URL) -> WKNavigation? {
-        let request = URLRequest(url: url)
-        return load(request)
+    func load(_ url: URL) {
+        // Occasionally, the web view will try to load this URL but will find itself with no cookies, even if they've been restored.
+        // The consumeCookies call is finishing before this line executes, but if you're fast enough it seems that WKWebView still hasn't processed
+        // the cookies that have been set. Pushing the load to the next iteration of the run loops seems to fix this 100% of the time.
+        DispatchQueue.main.async {
+            let request = URLRequest(url: url)
+            self.load(request)
+        }
     }
 
 }
