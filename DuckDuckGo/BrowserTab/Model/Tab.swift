@@ -74,9 +74,13 @@ final class Tab: NSObject {
         }
 
         webView.configuration.websiteDataStore.fetchDataRecords(ofTypes: WKWebsiteDataStore.allWebsiteDataTypes()) { _ in
-            os_log("Tab.swift beginning consumeCookies", log: .fire)
+            os_log("Tab began restoring cookies", log: .fire, type: .default)
             webCacheManager.consumeCookies {
-                os_log("Tab.swift completed consumeCookies", log: .fire)
+                os_log("Tab completed restoring cookies", log: .fire, type: .default)
+
+                self.webView.configuration.websiteDataStore.cookieStore?.getAllCookies { cookies in
+                    os_log("Tab cookie count: %d", log: .fire, type: .default, cookies.count)
+                }
             }
         }
     }

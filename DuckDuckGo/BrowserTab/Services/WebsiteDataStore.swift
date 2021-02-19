@@ -53,6 +53,7 @@ class WebCacheManager {
         let cookies = cookieStorage.cookies
 
         guard !cookies.isEmpty else {
+            os_log("Cookie store is empty", log: .fire, type: .default)
             completion()
             return
         }
@@ -61,6 +62,7 @@ class WebCacheManager {
 
         for cookie in cookies {
             group.enter()
+            os_log("Restored cookie for %s with name %s", log: .fire, type: .default, cookie.domain, cookie.name)
             httpCookieStore.setCookie(cookie) {
                 group.leave()
             }
@@ -117,7 +119,6 @@ class WebCacheManager {
                completion: @escaping () -> Void) {
 
         extractAllowedCookies(from: dataStore.cookieStore, cookieStorage: appCookieStorage, logins: logins) {
-            os_log("WebsiteDataStore completed extracting allowed cookies", log: .fire, type: .debug)
             self.clearAllData(dataStore: dataStore, completion: completion)
         }
     }
@@ -131,7 +132,7 @@ class WebCacheManager {
     }
 
     private func clearAllData(dataStore: WebsiteDataStore, completion: @escaping () -> Void) {
-        os_log("WebsiteDataStore removing all cookie data store data", log: .fire, type: .debug)
+        os_log("WebsiteDataStore removing all cookie data store data", log: .fire, type: .default)
         dataStore.removeAllData(completionHandler: completion)
     }
 
@@ -140,7 +141,7 @@ class WebCacheManager {
                                        logins: FireproofDomains,
                                        completion: @escaping () -> Void) {
 
-        os_log("WebsiteDataStore extracting allowed cookies", log: .fire, type: .debug)
+        os_log("WebsiteDataStore extracting allowed cookies", log: .fire, type: .default)
 
         guard let cookieStore = cookieStore else {
             completion()
@@ -151,7 +152,9 @@ class WebCacheManager {
             for cookie in cookies {
                 if cookie.domain == URL.cookieDomain || logins.isAllowed(cookieDomain: cookie.domain) {
                     cookieStorage.setCookie(cookie)
-                    os_log("Saved cookie for %s with name %s", log: .fire, type: .debug, cookie.domain, cookie.name)
+                    os_log("Saved cookie for %s named %s", log: .fire, type: .default, cookie.domain, cookie.name)
+                } else {
+                    os_log("Did NOT save cookie for %s named %s", log: .fire, type: .default, cookie.domain, cookie.name)
                 }
             }
             completion()
