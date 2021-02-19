@@ -105,7 +105,7 @@ class AddressBarButtonsViewController: NSViewController {
             return
         }
 
-        if let host = selectedTabViewModel.tab.url?.baseHost, FireproofDomains.shared.isAllowed(fireproofDomain: host) {
+        if let host = selectedTabViewModel.tab.url?.host, FireproofDomains.shared.isAllowed(fireproofDomain: host) {
             let viewController = FireproofInfoViewController.create(for: host)
             present(viewController, asPopoverRelativeTo: button.frame, of: button.superview!, preferredEdge: .minY, behavior: .transient)
         }
@@ -161,8 +161,8 @@ class AddressBarButtonsViewController: NSViewController {
 
         // Fireproof button
         if let url = selectedTabViewModel.tab.url, url.showFireproofStatus, !privacyEntryPointButton.isHidden {
-            fireproofedButtonDivider.isHidden = !FireproofDomains.shared.isAllowed(fireproofDomain: url.baseHost ?? "")
-            fireproofedButton.isHidden = !FireproofDomains.shared.isAllowed(fireproofDomain: url.baseHost ?? "")
+            fireproofedButtonDivider.isHidden = !FireproofDomains.shared.isAllowed(fireproofDomain: url.host ?? "")
+            fireproofedButton.isHidden = !FireproofDomains.shared.isAllowed(fireproofDomain: url.host ?? "")
         } else {
             fireproofedButtonDivider.isHidden = true
             fireproofedButton.isHidden = true

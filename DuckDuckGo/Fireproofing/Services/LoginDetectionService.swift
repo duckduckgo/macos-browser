@@ -136,7 +136,7 @@ class LoginDetectionService {
     }
 
     private func detectLogin(url: URL) -> LoginResult? {
-        guard let validLoginAttempt = detectedLoginURL, let host = url.baseHost else {
+        guard let validLoginAttempt = detectedLoginURL, let host = url.host else {
             os_log("Login detection hit guard statement", log: .fire)
             return nil
         }
@@ -157,17 +157,17 @@ class LoginDetectionService {
         }
 
         if domainOrPathDidChange(validLoginAttempt, url) {
-            os_log("Detected login to %{public}s (auth domain %{public}s)", log: .fire, host, validLoginAttempt.baseHost!)
-            return LoginResult.loginDetected(authenticationDomain: validLoginAttempt.baseHost!, forwardedDomain: host)
+            os_log("Detected login to %{public}s (auth domain %{public}s)", log: .fire, host, validLoginAttempt.host!)
+            return LoginResult.loginDetected(authenticationDomain: validLoginAttempt.host!, forwardedDomain: host)
         } else {
-            os_log("DID NOT detect login to %{public}s (auth domain %{public}s)", log: .fire, host, validLoginAttempt.baseHost!)
+            os_log("DID NOT detect login to %{public}s (auth domain %{public}s)", log: .fire, host, validLoginAttempt.host!)
         }
 
         return nil
     }
 
     private func handleRedirection(url: URL) {
-        guard let host = url.baseHost else { return }
+        guard let host = url.host else { return }
 
         if url.isOAuthURL || url.isSingleSignOnURL {
             os_log("Redirection added authentication host %{public}s", log: .fire, host)

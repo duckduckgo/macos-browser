@@ -680,7 +680,7 @@ extension TabBarViewController: TabBarViewItemDelegate {
     }
 
     func tabBarViewItemFireproofSite(_ tabBarViewItem: TabBarViewItem) {
-        if let url = tabCollectionViewModel.selectedTabViewModel?.tab.url?.baseHost {
+        if let url = tabCollectionViewModel.selectedTabViewModel?.tab.url?.host {
             FireproofDomains.shared.addToAllowed(domain: url)
         }
 
@@ -688,7 +688,7 @@ extension TabBarViewController: TabBarViewItemDelegate {
     }
 
     func tabBarViewItemRemoveFireproofing(_ tabBarViewItem: TabBarViewItem) {
-        if let url = tabCollectionViewModel.selectedTabViewModel?.tab.url?.baseHost {
+        if let url = tabCollectionViewModel.selectedTabViewModel?.tab.url?.host {
             FireproofDomains.shared.remove(domain: url)
         }
 

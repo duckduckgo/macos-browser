@@ -94,7 +94,7 @@ class TabBarViewItem: NSCollectionViewItem {
         if let url = currentURL, url.canFireproof {
             let menuItem: NSMenuItem
 
-            if FireproofDomains.shared.isAllowed(fireproofDomain: url.baseHost ?? "") {
+            if FireproofDomains.shared.isAllowed(fireproofDomain: url.host ?? "") {
                 menuItem = NSMenuItem(title: UserText.removeFireproofing, action: #selector(removeFireproofingAction(_:)), keyEquivalent: "")
             } else {
                 menuItem = NSMenuItem(title: UserText.fireproofSite, action: #selector(fireproofSiteAction(_:)), keyEquivalent: "")

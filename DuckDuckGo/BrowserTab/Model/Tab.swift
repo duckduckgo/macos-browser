@@ -171,7 +171,7 @@ final class Tab: NSObject {
     }
 
     func requestFireproofToggle() {
-        guard let host = url?.baseHost else { return }
+        guard let host = url?.host else { return }
         FireproofDomains.shared.toggle(domain: host)
     }
 

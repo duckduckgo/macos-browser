@@ -51,12 +51,12 @@ class FireproofDomains {
         ])
     }
 
-    /// Record domains should be allowed if they match or are a superset of a fireproof domain.
-    ///
-    /// For example, subdomain.example.com allows records from subdomain.example.com and example.com.
-    /// It does **not** allow records from another.subdomain.example.com.
-    func isAllowed(recordDomain: String) -> Bool {
-        fireproofDomains.contains { $0 == recordDomain || $0.hasSuffix(".\(recordDomain)") }
+    public func isAllowed(cookieDomain: String) -> Bool {
+        fireproofDomains.contains {
+            $0 == cookieDomain
+                || ".\($0)" == cookieDomain
+                || (cookieDomain.hasPrefix(".") && $0.hasSuffix(cookieDomain))
+        }
     }
 
     func remove(domain: String) {

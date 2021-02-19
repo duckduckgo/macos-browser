@@ -78,17 +78,17 @@ extension URL {
     }
 
     var canFireproof: Bool {
-        guard let baseHost = self.baseHost else { return false }
-        return (baseHost != Self.cookieDomain)
+        guard let host = self.host else { return false }
+        return (host != Self.cookieDomain)
     }
 
     var showFireproofStatus: Bool {
-        guard let baseHost = self.baseHost else { return false }
-        return canFireproof && FireproofDomains.shared.isAllowed(fireproofDomain: baseHost)
+        guard let host = self.host else { return false }
+        return canFireproof && FireproofDomains.shared.isAllowed(fireproofDomain: host)
     }
 
     private func matches(any patterns: URLPatterns) -> Bool {
-        guard let host = self.baseHost,
+        guard let host = self.host?.dropWWW(),
               let matchingKey = patterns.keys.first(where: { host.contains($0) }),
               let pattern = patterns[matchingKey] else { return false }
 

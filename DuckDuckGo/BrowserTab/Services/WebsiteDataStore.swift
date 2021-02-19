@@ -19,7 +19,19 @@
 import WebKit
 import os
 
+public protocol WebCacheManagerCookieStore {
+
+    func getAllCookies(_ completionHandler: @escaping ([HTTPCookie]) -> Void)
+
+    func setCookie(_ cookie: HTTPCookie, completionHandler: (() -> Void)?)
+
+    func delete(_ cookie: HTTPCookie, completionHandler: (() -> Void)?)
+
+}
+
 protocol WebsiteDataStore {
+
+    var cookieStore: WebCacheManagerCookieStore? { get }
 
     func fetchDataRecords(ofTypes dataTypes: Set<String>, completionHandler: @escaping ([WKWebsiteDataRecord]) -> Void)
 
@@ -42,25 +54,45 @@ class WebCacheManager {
 
         dataStore.fetchDataRecords(ofTypes: all) { records in
 
-            let grouped = Dictionary(grouping: records) { logins.isAllowed(recordDomain: $0.displayName) || $0.displayName == URL.cookieDomain }
-            let recordsToKeep = grouped[true] ?? []
-            let recordsToRemove = grouped[false] ?? []
+            // Remove all data except cookies for all domains, and then filter cookies to preserve those allowed by Fireproofing.
+            dataStore.removeData(ofTypes: allExceptCookies, for: records) {
+                guard let cookieStore = dataStore.cookieStore else {
+                    completion()
+                    return
+                }
 
-            for record in recordsToKeep {
-                os_log("WebCacheManager keeping record for %s", log: .fire, record.displayName)
-            }
+                let group = DispatchGroup()
 
-            for record in recordsToRemove {
-                os_log("WebCacheManager removing record for %s", log: .fire, record.displayName)
-            }
+                cookieStore.getAllCookies { cookies in
+                    let cookiesToRemove = cookies.filter { !logins.isAllowed(cookieDomain: $0.domain) && $0.domain != URL.cookieDomain }
 
-            // Remove all records for non-fireproof domains, and remove all records except cookies for fireproof domains.
-            dataStore.removeData(ofTypes: allExceptCookies, for: recordsToKeep) {
-                dataStore.removeData(ofTypes: all, for: recordsToRemove, completionHandler: completion)
+                    for cookie in cookiesToRemove {
+                        group.enter()
+                        os_log("Deleting cookie for %s named %s", log: .fire, cookie.domain, cookie.name)
+                        cookieStore.delete(cookie) {
+                            group.leave()
+                        }
+                    }
+                }
+
+                DispatchQueue.global(qos: .background).async {
+                    _ = group.wait(timeout: .now() + 5)
+                    DispatchQueue.main.async {
+                        completion()
+                    }
+                }
             }
         }
     }
 
 }
 
-extension WKWebsiteDataStore: WebsiteDataStore {}
+extension WKHTTPCookieStore: WebCacheManagerCookieStore {}
+
+extension WKWebsiteDataStore: WebsiteDataStore {
+
+    var cookieStore: WebCacheManagerCookieStore? {
+        httpCookieStore
+    }
+
+}

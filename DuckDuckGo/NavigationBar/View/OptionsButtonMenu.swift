@@ -62,7 +62,7 @@ class OptionsButtonMenu: NSMenu {
 
         addItem(NSMenuItem.separator())
 
-        if let url = tabCollectionViewModel.selectedTabViewModel?.tab.url, url.canFireproof, let host = url.baseHost {
+        if let url = tabCollectionViewModel.selectedTabViewModel?.tab.url, url.canFireproof, let host = url.host {
             if FireproofDomains.shared.isAllowed(fireproofDomain: host) {
                 addMenuItem(title: UserText.removeFireproofing, action: #selector(toggleFireproofing(_:)), imageName: "BurnProof")
             } else {
