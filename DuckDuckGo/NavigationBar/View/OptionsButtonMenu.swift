@@ -35,6 +35,14 @@ class OptionsButtonMenu: NSMenu {
         setupMenuItems()
     }
 
+    let bookmarksMenuItem = NSMenuItem(title: UserText.bookmarks, action: nil, keyEquivalent: "")
+
+    override func update() {
+        updateBookmarks()
+
+        super.update()
+    }
+
     private func setupMenuItems() {
         let moveTabMenuItem = NSMenuItem(title: UserText.moveTabToNewWindow,
                                          action: #selector(moveTabToNewWindowAction(_:)),
@@ -53,7 +61,17 @@ class OptionsButtonMenu: NSMenu {
         addItem(openFeedbackMenuItem)
 
 #endif
-
+        
+        addItem(NSMenuItem.separator())
+        
+        bookmarksMenuItem.image = NSImage(named: "Bookmark")
+        addItem(bookmarksMenuItem)
+    }
+    
+    private func updateBookmarks() {
+        // The bookmarks section is the same with the main menu
+        bookmarksMenuItem.submenu = NSApplication.shared.mainMenuTyped?.bookmarksMenuItem?.submenu?.copy() as? NSMenu
+        
     }
 
     @objc func moveTabToNewWindowAction(_ sender: NSMenuItem) {

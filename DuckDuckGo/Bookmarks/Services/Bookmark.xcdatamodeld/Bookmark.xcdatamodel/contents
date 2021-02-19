@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<model type="com.apple.IDECoreDataModeler.DataModel" documentVersion="1.0" lastSavedToolsVersion="17709" systemVersion="20C69" minimumToolsVersion="Automatic" sourceLanguage="Swift" userDefinedModelVersionIdentifier="">
+    <entity name="BookmarkManagedObject" representedClassName="BookmarkManagedObject" syncable="YES" codeGenerationType="class">
+        <attribute name="dateAdded" attributeType="Date" usesScalarValueType="NO"/>
+        <attribute name="faviconEncrypted" optional="YES" attributeType="Transformable" valueTransformerName="NSImageTransformer"/>
+        <attribute name="isFavorite" attributeType="Boolean" usesScalarValueType="YES"/>
+        <attribute name="titleEncrypted" attributeType="Transformable" valueTransformerName="NSStringTransformer"/>
+        <attribute name="urlEncrypted" attributeType="Transformable" valueTransformerName="NSURLTransformer"/>
+        <fetchIndex name="byDateAdded">
+            <fetchIndexElement property="dateAdded" type="Binary" order="descending"/>
+        </fetchIndex>
+    </entity>
+    <elements>
+        <element name="BookmarkManagedObject" positionX="-54" positionY="-54" width="128" height="104"/>
+    </elements>
+</model>

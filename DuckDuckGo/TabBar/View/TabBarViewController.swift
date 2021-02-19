@@ -41,6 +41,7 @@ class TabBarViewController: NSViewController {
     @IBOutlet weak var windowDraggingViewLeadingConstraint: NSLayoutConstraint!
 
     private let tabCollectionViewModel: TabCollectionViewModel
+    private let bookmarkManager: BookmarkManager = LocalBookmarkManager.shared
     lazy private var fireViewModel = FireViewModel()
 
     private var tabsCancellable: AnyCancellable?
@@ -636,6 +637,19 @@ extension TabBarViewController: TabBarViewItemDelegate {
 
         collectionView.clearSelection()
         tabCollectionViewModel.duplicateTab(at: indexPath.item)
+    }
+
+    func tabBarViewItemBookmarkThisPageAction(_ tabBarViewItem: TabBarViewItem) {
+        guard let indexPath = collectionView.indexPath(for: tabBarViewItem),
+              let tabViewModel = tabCollectionViewModel.tabViewModel(at: indexPath.item),
+              let url = tabViewModel.tab.url else {
+            os_log("TabBarViewController: Failed to get index path of tab bar view item", type: .error)
+            return
+        }
+
+        if !bookmarkManager.isUrlBookmarked(url: url) {
+            bookmarkManager.makeBookmark(for: url, title: tabViewModel.title, favicon: tabViewModel.favicon)
+        }
     }
 
     func tabBarViewItemCloseAction(_ tabBarViewItem: TabBarViewItem) {

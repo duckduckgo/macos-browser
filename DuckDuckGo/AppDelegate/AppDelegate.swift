@@ -49,6 +49,7 @@ class AppDelegate: NSObject, NSApplicationDelegate {
     func applicationDidFinishLaunching(_ aNotification: Notification) {
         Database.shared.loadStore()
         HTTPSUpgrade.shared.loadDataAsync()
+        LocalBookmarkManager.shared.loadBookmarks()
 
         if !isRunningTests {
             stateRestorationManager.applicationDidFinishLaunching()

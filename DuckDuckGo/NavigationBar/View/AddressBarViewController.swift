@@ -22,17 +22,13 @@ import Combine
 
 class AddressBarViewController: NSViewController {
 
-    static let homeFaviconImage = NSImage(named: "HomeFavicon")
-    static let webImage = NSImage(named: "Web")
-
     @IBOutlet weak var addressBarTextField: AddressBarTextField!
     @IBOutlet weak var passiveTextField: NSTextField!
-    @IBOutlet weak var clearButton: NSButton!
-    @IBOutlet weak var imageButton: NSButton!
-    @IBOutlet weak var privacyEntryPointButton: NSButton!
     @IBOutlet var inactiveBackgroundView: NSView!
     @IBOutlet var activeBackgroundView: NSView!
     @IBOutlet var activeBackgroundViewOverHeight: NSLayoutConstraint!
+
+    private(set) var addressBarButtonsViewController: AddressBarButtonsViewController?
     
     private var tabCollectionViewModel: TabCollectionViewModel
     private let suggestionsViewModel = SuggestionsViewModel(suggestions: Suggestions())
@@ -100,8 +96,12 @@ class AddressBarViewController: NSViewController {
         addressBarTextField.viewDidLayout()
     }
 
-    @IBAction func clearButtonAction(_ sender: NSButton) {
-        addressBarTextField.clearValue()
+    @IBSegueAction func createAddressBarButtonsViewController(_ coder: NSCoder) -> AddressBarButtonsViewController? {
+        let controller = AddressBarButtonsViewController(coder: coder, tabCollectionViewModel: tabCollectionViewModel)
+
+        self.addressBarButtonsViewController = controller
+        controller?.delegate = self
+        return addressBarButtonsViewController
     }
     
     @IBOutlet var shadowView: ShadowView!
@@ -128,8 +128,9 @@ class AddressBarViewController: NSViewController {
 
     private func subscribeToAddressBarTextFieldValue() {
         addressBarTextFieldValueCancellable = addressBarTextField.$value.receive(on: DispatchQueue.main).sink { [weak self] _ in
-            self?.updateMode()
-            self?.updateButtons()
+            guard let self = self else { return }
+            self.updateMode()
+            self.updateButtons()
         }
     }
 
@@ -179,34 +180,6 @@ class AddressBarViewController: NSViewController {
         shadowView.frame = frame
     }
 
-    private func updateButtons() {
-        guard let selectedTabViewModel = tabCollectionViewModel.selectedTabViewModel else {
-            os_log("%s: Selected tab view model is nil", type: .error, className)
-            return
-        }
-
-        let isSearchingMode = mode != .browsing
-        let isURLNil = selectedTabViewModel.tab.url == nil
-        let isTextFieldEditorFirstResponder = view.window?.firstResponder === addressBarTextField.currentEditor()
-        let isDuckDuckGoUrl = selectedTabViewModel.tab.url?.isDuckDuckGoSearch ?? false
-
-        // Privacy entry point button
-        privacyEntryPointButton.isHidden = isSearchingMode || isTextFieldEditorFirstResponder || isDuckDuckGoUrl || isURLNil
-        imageButton.isHidden = !privacyEntryPointButton.isHidden
-
-        clearButton.isHidden = !(isTextFieldEditorFirstResponder && !addressBarTextField.value.isEmpty)
-
-        // Image button
-        switch mode {
-        case .browsing:
-            imageButton.image = selectedTabViewModel.favicon
-        case .searching(withUrl: true):
-            imageButton.image = Self.webImage
-        case .searching(withUrl: false):
-            imageButton.image = Self.homeFaviconImage
-        }
-    }
-
     private func updateMode() {
         switch self.addressBarTextField.value {
         case .text: self.mode = .searching(withUrl: false)
@@ -218,6 +191,14 @@ class AddressBarViewController: NSViewController {
             case .unknown: self.mode = .searching(withUrl: false)
             }
         }
+    }
+
+    private func updateButtons() {
+        let isTextFieldEditorFirstResponder = view.window?.firstResponder === addressBarTextField.currentEditor()
+
+        self.addressBarButtonsViewController?.updateButtons(mode: mode,
+                                                            isTextFieldEditorFirstResponder: isTextFieldEditorFirstResponder,
+                                                            textFieldValue: addressBarTextField.value)
     }
     
 }
@@ -335,6 +316,14 @@ extension AddressBarViewController {
         self.view.window?.makeFirstResponder(nil)
 
         return event
+    }
+
+}
+
+extension AddressBarViewController: AddressBarButtonsViewControllerDelegate {
+
+    func addressBarButtonsViewControllerClearButtonClicked(_ addressBarButtonsViewController: AddressBarButtonsViewController) {
+        addressBarTextField.clearValue()
     }
 
 }
