@@ -34,9 +34,9 @@ class Fire {
 
         tabCollectionViewModel.tabCollection.tabs.forEach { $0.stopLoading() }
 
-        os_log("WebsiteDataStore began cookie deletion", log: .fire, type: .default)
+        os_log("WebsiteDataStore began cookie deletion", log: .fire)
         webCacheManager.clear { [weak self] in
-            os_log("WebsiteDataStore completed cookie deletion", log: .fire, type: .default)
+            os_log("WebsiteDataStore completed cookie deletion", log: .fire)
             self?.isBurning = false
 
             DispatchQueue.main.async {

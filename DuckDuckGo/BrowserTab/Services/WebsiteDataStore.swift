@@ -47,11 +47,11 @@ class WebCacheManager {
             let recordsToRemove = grouped[false] ?? []
 
             for record in recordsToKeep {
-                os_log("WebCacheManager keeping record for %s", log: .fire, type: .default, record.displayName)
+                os_log("WebCacheManager keeping record for %s", log: .fire, record.displayName)
             }
 
             for record in recordsToRemove {
-                os_log("WebCacheManager removing record for %s", log: .fire, type: .default, record.displayName)
+                os_log("WebCacheManager removing record for %s", log: .fire, record.displayName)
             }
 
             // Remove all records for non-fireproof domains, and remove all records except cookies for fireproof domains.
