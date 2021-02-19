@@ -53,7 +53,7 @@ class WebCacheManager {
         let cookies = cookieStorage.cookies
 
         guard !cookies.isEmpty else {
-            os_log("Cookie store is empty", log: .fire, type: .default)
+            os_log("Cookie store is empty, likely cookies have already been restored", log: .fire, type: .default)
             completion()
             return
         }
