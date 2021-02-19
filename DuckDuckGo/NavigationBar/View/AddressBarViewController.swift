@@ -198,7 +198,6 @@ class AddressBarViewController: NSViewController {
         }
     }
 
-
     @objc private func refreshAddressBarAppearance(_ sender: Any) {
         self.updateMode()
         self.updateButtons()
