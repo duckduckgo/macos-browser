@@ -78,41 +78,6 @@ class WebCacheManager {
         }
     }
 
-    func removeCookies(forDomains domains: [String],
-                       dataStore: WebsiteDataStore = WKWebsiteDataStore.default(),
-                       completion: @escaping () -> Void) {
-
-        guard let cookieStore = dataStore.cookieStore else {
-            completion()
-            return
-        }
-
-        cookieStore.getAllCookies { cookies in
-            let group = DispatchGroup()
-            cookies.forEach { cookie in
-                domains.forEach { domain in
-
-                    if self.isDuckDuckGoOrAllowedDomain(cookie: cookie, domain: domain) {
-                        group.enter()
-                        cookieStore.delete(cookie) {
-                            group.leave()
-                        }
-
-                        return
-                    }
-                }
-            }
-
-            DispatchQueue.global(qos: .background).async {
-                _ = group.wait(timeout: .now() + 5)
-                DispatchQueue.main.async {
-                    completion()
-                }
-            }
-        }
-
-    }
-
     func clear(dataStore: WebsiteDataStore = WKWebsiteDataStore.default(),
                appCookieStorage: CookieStorage = CookieStorage(),
                logins: FireproofDomains = FireproofDomains.shared,

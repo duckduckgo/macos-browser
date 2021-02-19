@@ -48,23 +48,6 @@ class WebCacheManagerTests: XCTestCase {
         XCTAssertEqual(cookieStorage.cookies[1].domain, "mobile.twitter.com")
     }
 
-    func testWhenRemovingCookieForDomainThenItIsRemovedFromCookieStorage() {
-
-        let dataStore = MockDataStore()
-        let cookieStore = MockHTTPCookieStore(cookies: [
-            .make(domain: "www.example.com"),
-            .make(domain: ".example.com")
-        ])
-        dataStore.cookieStore = cookieStore
-        let expect = expectation(description: #function)
-        WebCacheManager.shared.removeCookies(forDomains: ["www.example.com"], dataStore: dataStore) {
-            expect.fulfill()
-        }
-        wait(for: [expect], timeout: 5.0)
-
-        XCTAssertEqual(cookieStore.deletedCookies.count, 2)
-    }
-
     func testWhenClearedThenCookiesWithParentDomainsAreRetained() {
 
         let logins = MockPreservedLogins(domains: [
