@@ -19,7 +19,7 @@
 import WebKit
 import os
 
-public protocol WebCacheManagerCookieStore {
+public protocol HTTPCookieStore {
 
     func getAllCookies(_ completionHandler: @escaping ([HTTPCookie]) -> Void)
 
@@ -31,7 +31,7 @@ public protocol WebCacheManagerCookieStore {
 
 protocol WebsiteDataStore {
 
-    var cookieStore: WebCacheManagerCookieStore? { get }
+    var cookieStore: HTTPCookieStore? { get }
 
     func fetchDataRecords(ofTypes dataTypes: Set<String>, completionHandler: @escaping ([WKWebsiteDataRecord]) -> Void)
 
@@ -87,11 +87,11 @@ class WebCacheManager {
 
 }
 
-extension WKHTTPCookieStore: WebCacheManagerCookieStore {}
+extension WKHTTPCookieStore: HTTPCookieStore {}
 
 extension WKWebsiteDataStore: WebsiteDataStore {
 
-    var cookieStore: WebCacheManagerCookieStore? {
+    var cookieStore: HTTPCookieStore? {
         httpCookieStore
     }
 
