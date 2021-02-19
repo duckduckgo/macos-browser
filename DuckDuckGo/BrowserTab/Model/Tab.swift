@@ -58,25 +58,19 @@ final class Tab: NSObject {
 
         setupWebView()
         if webView.configuration.userContentController.userScripts.isEmpty {
-            setupUserScripts()
+            installUserScripts()
         }
 
         if let favicon = favicon,
            let host = url?.host {
             faviconService.storeIfNeeded(favicon: favicon, for: host, isFromUserScript: false)
         }
+
+        subscribeToTrackerBlockerConfigUpdatedEvents()
     }
 
     deinit {
-        userScripts.forEach {
-            $0.messageNames.forEach {
-                if #available(OSX 11.0, *) {
-                    webView.configuration.userContentController.removeScriptMessageHandler(forName: $0, contentWorld: .defaultClient)
-                } else {
-                    webView.configuration.userContentController.removeScriptMessageHandler(forName: $0)
-                }
-            }
-        }
+        userScripts.remove(from: webView)
     }
 
     let webView: WebView
@@ -94,8 +88,7 @@ final class Tab: NSObject {
 
     weak var findInPage: FindInPageModel? {
         didSet {
-            findInPageScript.model = findInPage
-            subscribeToFindInPageTextChange()
+            attachFindInPage()
         }
     }
 
@@ -164,6 +157,25 @@ final class Tab: NSObject {
         }
     }
 
+    // MARK: - WebView Reconfiguration
+
+    private var trackerBlockerConfigUpdatedCancellable: AnyCancellable?
+
+    private func subscribeToTrackerBlockerConfigUpdatedEvents() {
+        trackerBlockerConfigUpdatedCancellable = ConfigurationManager.shared.trackerBlockerDataUpdatedPublisher()
+            .receive(on: DispatchQueue.main)
+            .sink { [weak self] _ in
+            self?.reconfigureWebView()
+        }
+    }
+
+    private func reconfigureWebView() {
+        webView.configuration.reinstallContentBlocker()
+        userScripts.remove(from: webView)
+        userScripts = UserScripts()
+        installUserScripts()
+    }
+
     // MARK: - Favicon
 
     @Published var favicon: NSImage?
@@ -189,36 +201,22 @@ final class Tab: NSObject {
 
     // MARK: - User Scripts
 
-    let faviconScript = FaviconUserScript()
-    let html5downloadScript = HTML5DownloadUserScript()
-    let contextMenuScript = ContextMenuUserScript()
-    let findInPageScript = FindInPageUserScript()
-    let contentBlockerScript = ContentBlockerUserScript()
-    let contentBlockerRulesScript = ContentBlockerRulesUserScript()
-    let debugScript = DebugUserScript()
+    var userScripts = UserScripts()
 
-    lazy var userScripts = [
-        self.debugScript,
-        self.faviconScript,
-        self.html5downloadScript,
-        self.contextMenuScript,
-        self.findInPageScript,
-        self.contentBlockerScript,
-        self.contentBlockerRulesScript
-    ]
+    private func installUserScripts() {
+        userScripts.debugScript.instrumentation = instrumentation
+        userScripts.faviconScript.delegate = self
+        userScripts.html5downloadScript.delegate = self
+        userScripts.contextMenuScript.delegate = self
+        userScripts.contentBlockerScript.delegate = self
+        userScripts.contentBlockerRulesScript.delegate = self
 
-    private func setupUserScripts() {
-        debugScript.instrumentation = instrumentation
-        faviconScript.delegate = self
-        html5downloadScript.delegate = self
-        contextMenuScript.delegate = self
-        contentBlockerScript.delegate = self
-        contentBlockerRulesScript.delegate = self
+        attachFindInPage()
 
-        userScripts.forEach {
-            webView.configuration.userContentController.add(userScript: $0)
-        }
+        userScripts.install(into: webView)
     }
+
+    // MARK: Find in Page
 
     var findInPageCancellable: AnyCancellable?
     private func subscribeToFindInPageTextChange() {
@@ -228,6 +226,11 @@ final class Tab: NSObject {
                 self?.find(text: text)
             }
         }
+    }
+
+    private func attachFindInPage() {
+        userScripts.findInPageScript.model = findInPage
+        subscribeToFindInPageTextChange()
     }
 
 }
@@ -400,19 +403,19 @@ extension Tab: WKNavigationDelegate {
 extension Tab {
 
     private func find(text: String) {
-        findInPageScript.find(text: text, inWebView: webView)
+        userScripts.findInPageScript.find(text: text, inWebView: webView)
     }
 
     func findDone() {
-        findInPageScript.done(withWebView: webView)
+        userScripts.findInPageScript.done(withWebView: webView)
     }
 
     func findNext() {
-        findInPageScript.next(withWebView: webView)
+        userScripts.findInPageScript.next(withWebView: webView)
     }
 
     func findPrevious() {
-        findInPageScript.previous(withWebView: webView)
+        userScripts.findInPageScript.previous(withWebView: webView)
     }
 
 }

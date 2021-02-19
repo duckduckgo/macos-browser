@@ -39,6 +39,34 @@ extension AppDelegate {
         WindowsManager.closeWindows()
     }
 
+    // MARK: - Help
+
+#if FEEDBACK
+
+    @IBAction func openFeedback(_ sender: Any?) {
+        guard let windowController = WindowControllersManager.shared.lastKeyMainWindowController,
+              windowController.window?.isKeyWindow == true else {
+            WindowsManager.openNewWindow(with: URL.feedback)
+            return
+        }
+
+        guard let mainViewController = windowController.mainViewController else {
+            os_log("AppDelegate: No main view controller", type: .error)
+            return
+        }
+
+        DefaultConfigurationStorage.shared.log()
+        ConfigurationManager.shared.log()
+
+        let tab = Tab()
+        tab.url = URL.feedback
+
+        let tabCollectionViewModel = mainViewController.tabCollectionViewModel
+        tabCollectionViewModel.append(tab: tab)
+    }
+
+#endif
+
     @IBAction func navigateToBookmark(_ sender: Any?) {
         guard let menuItem = sender as? NSMenuItem else {
             os_log("AppDelegate: Casting to menu item failed", type: .error)
@@ -229,18 +257,6 @@ extension MainViewController {
             webView.printOperation(with: NSPrintInfo.shared).run()
         }
     }
-
-    // MARK: - Help
-
-#if FEEDBACK
-
-    @IBAction func openFeedback(_ sender: Any?) {
-        let tab = Tab()
-        tab.url = URL.feedback
-        tabCollectionViewModel.append(tab: tab)
-    }
-
-#endif
 
 }
 

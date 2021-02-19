@@ -27,8 +27,9 @@ class ContentBlockerRulesUserScript: UserScript {
         static let pageUrl = "pageUrl"
     }
 
-    init() {
-        super.init(source: Self.source,
+    init(scriptSource: ScriptSourceProviding = DefaultScriptSourceProvider.shared) {
+
+        super.init(source: scriptSource.contentBlockerRulesSource,
                    messageNames: Self.messageNames,
                    injectionTime: .atDocumentStart,
                    forMainFrameOnly: false)
@@ -48,7 +49,7 @@ class ContentBlockerRulesUserScript: UserScript {
         if let tracker = trackerFromUrl(urlString, blocked: blocked) {
             guard let pageUrl = URL(string: pageUrlStr),
                let pageHost = pageUrl.host,
-               let pageEntity = TrackerDataManager.shared.findEntity(forHost: pageHost) else {
+               let pageEntity = TrackerRadarManager.shared.findEntity(forHost: pageHost) else {
                 delegate.contentBlockerUserScript(self, detectedTracker: tracker)
                 return
             }
@@ -60,8 +61,8 @@ class ContentBlockerRulesUserScript: UserScript {
     }
 
     private func trackerFromUrl(_ urlString: String, blocked: Bool) -> DetectedTracker? {
-        let knownTracker = TrackerDataManager.shared.findTracker(forUrl: urlString)
-        if let entity = TrackerDataManager.shared.findEntity(byName: knownTracker?.owner?.name ?? "") {
+        let knownTracker = TrackerRadarManager.shared.findTracker(forUrl: urlString)
+        if let entity = TrackerRadarManager.shared.findEntity(byName: knownTracker?.owner?.name ?? "") {
             return DetectedTracker(url: urlString, knownTracker: knownTracker, entity: entity, blocked: blocked)
         }
 
@@ -72,11 +73,5 @@ class ContentBlockerRulesUserScript: UserScript {
 extension ContentBlockerRulesUserScript {
 
     static let messageNames = ["processRule"]
-    static let source: String = {
-        // Unprotected domains are not yet implemented.
-        return loadJS("contentblockerrules", withReplacements: [
-            "${unprotectedDomains}": ""
-        ])
-    }()
 
 }

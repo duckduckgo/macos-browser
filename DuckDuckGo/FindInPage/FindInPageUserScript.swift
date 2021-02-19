@@ -65,6 +65,6 @@ class FindInPageUserScript: UserScript {
 extension FindInPageUserScript {
 
     static let messageNames = ["findInPageHandler"]
-    static let source = UserScript.loadJS("findinpage")
+    static let source = DefaultScriptSourceProvider.loadJS("findinpage")
 
 }

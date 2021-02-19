@@ -121,9 +121,7 @@ class NavigationBarViewController: NSViewController {
 #if FEEDBACK
 
     @IBAction func feedbackButtonAction(_ sender: NSButton) {
-        let tab = Tab()
-        tab.url = URL.feedback
-        tabCollectionViewModel.append(tab: tab)
+        (NSApp.delegate as? AppDelegate)?.openFeedback(sender)
     }
 
 #else
