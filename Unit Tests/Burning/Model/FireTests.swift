@@ -30,7 +30,12 @@ class FireTests: XCTestCase {
         let fire = Fire()
         let tabCollectionViewModel = TabCollectionViewModel.aTabCollectionViewModel
 
-        fire.burnAll(tabCollectionViewModel: tabCollectionViewModel)
+        let burningExpectation = expectation(description: "Burning")
+        fire.burnAll(tabCollectionViewModel: tabCollectionViewModel) {
+            burningExpectation.fulfill()
+        }
+
+        waitForExpectations(timeout: 1, handler: nil)
 
         XCTAssertEqual(tabCollectionViewModel.tabCollection.tabs.count, 1)
         XCTAssert(tabCollectionViewModel.tabCollection.tabs.first?.isHomepageLoaded ?? false)

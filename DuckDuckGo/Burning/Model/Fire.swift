@@ -29,7 +29,7 @@ class Fire {
         self.webCacheManager = cacheManager
     }
 
-    func burnAll(tabCollectionViewModel: TabCollectionViewModel) {
+    func burnAll(tabCollectionViewModel: TabCollectionViewModel, completion: (() -> Void)? = nil) {
         isBurning = true
 
         tabCollectionViewModel.tabCollection.tabs.forEach { $0.stopLoading() }
@@ -45,6 +45,8 @@ class Fire {
                 } else {
                     tabCollectionViewModel.appendNewTab()
                 }
+
+                completion?()
             }
         }
     }
