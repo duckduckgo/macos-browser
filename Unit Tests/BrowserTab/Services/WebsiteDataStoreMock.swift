@@ -26,7 +26,6 @@ class WebCacheManagerMock: WebCacheManager {
     var removeAllWebsiteDataCalled = false
 
     override func clear(dataStore: WebsiteDataStore = WKWebsiteDataStore.default(),
-                        appCookieStorage: CookieStorage = CookieStorage(),
                         logins: FireproofDomains = FireproofDomains.shared,
                         completion: @escaping () -> Void) {
         removeAllWebsiteDataCalled = true

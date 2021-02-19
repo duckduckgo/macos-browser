@@ -60,4 +60,20 @@ class FireproofDomainsTests: XCTestCase {
         XCTAssertTrue(logins.fireproofDomains.isEmpty)
     }
 
+    func testWhenRecordsHaveSubdomainsThenRecordsWithTheBaseDomainAreAllowed() {
+        let logins = FireproofDomains()
+        logins.addToAllowed(domain: "app.example.com")
+        XCTAssertTrue(logins.isAllowed(recordDomain: "example.com"))
+    }
+
+    func testWhenRecordsHaveSubdomainsOfSubdomainsThenRecordsWithTheBaseDomainAndEarlierSubdomainsAreAllowed() {
+        let logins = FireproofDomains()
+        logins.addToAllowed(domain: "subdomain.example.com")
+        logins.addToAllowed(domain: "allowed.subdomain.example.com")
+        XCTAssertTrue(!logins.isAllowed(recordDomain: "notallowed.subdomain.example.com"))
+        XCTAssertTrue(logins.isAllowed(recordDomain: "allowed.subdomain.example.com"))
+        XCTAssertTrue(logins.isAllowed(recordDomain: "subdomain.example.com"))
+        XCTAssertTrue(logins.isAllowed(recordDomain: "example.com"))
+    }
+
 }

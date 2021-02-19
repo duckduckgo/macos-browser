@@ -27,25 +27,21 @@ class WebCacheManagerTests: XCTestCase {
         ])
 
         let dataStore = MockDataStore()
-        dataStore.cookieStore = MockHTTPCookieStore(cookies: [
-            .make(domain: "twitter.com"),
-            .make(domain: ".twitter.com"),
-            .make(domain: "mobile.twitter.com"),
-            .make(domain: "fake.mobile.twitter.com"),
-            .make(domain: ".fake.mobile.twitter.com")
-        ])
-
-        let cookieStorage = MockCookieStorage()
+        dataStore.records = [
+            MockDataRecord(recordName: "twitter.com"),
+            MockDataRecord(recordName: "mobile.twitter.com"),
+            MockDataRecord(recordName: "fake.mobile.twitter.com")
+        ]
 
         let expect = expectation(description: #function)
-        WebCacheManager.shared.clear(dataStore: dataStore, appCookieStorage: cookieStorage, logins: logins) {
+        WebCacheManager.shared.clear(dataStore: dataStore, logins: logins) {
             expect.fulfill()
         }
         wait(for: [expect], timeout: 5.0)
 
-        XCTAssertEqual(cookieStorage.cookies.count, 2)
-        XCTAssertEqual(cookieStorage.cookies[0].domain, ".twitter.com")
-        XCTAssertEqual(cookieStorage.cookies[1].domain, "mobile.twitter.com")
+        XCTAssertEqual(dataStore.records.count, 2)
+        XCTAssertEqual(dataStore.records[0].displayName, "twitter.com")
+        XCTAssertEqual(dataStore.records[1].displayName, "mobile.twitter.com")
     }
 
     func testWhenClearedThenCookiesWithParentDomainsAreRetained() {
@@ -55,21 +51,19 @@ class WebCacheManagerTests: XCTestCase {
         ])
 
         let dataStore = MockDataStore()
-        dataStore.cookieStore = MockHTTPCookieStore(cookies: [
-            .make(domain: ".example.com"),
-            .make(domain: "facebook.com")
-        ])
-
-        let cookieStorage = MockCookieStorage()
+        dataStore.records = [
+            MockDataRecord(recordName: "example.com"),
+            MockDataRecord(recordName: "facebook.com")
+        ]
 
         let expect = expectation(description: #function)
-        WebCacheManager.shared.clear(dataStore: dataStore, appCookieStorage: cookieStorage, logins: logins) {
+        WebCacheManager.shared.clear(dataStore: dataStore, logins: logins) {
             expect.fulfill()
         }
         wait(for: [expect], timeout: 5.0)
 
-        XCTAssertEqual(cookieStorage.cookies.count, 1)
-        XCTAssertEqual(cookieStorage.cookies[0].domain, ".example.com")
+        XCTAssertEqual(dataStore.records.count, 1)
+        XCTAssertEqual(dataStore.records[0].displayName, "example.com")
 
     }
 
@@ -79,20 +73,18 @@ class WebCacheManagerTests: XCTestCase {
         ])
 
         let dataStore = MockDataStore()
-        dataStore.cookieStore = MockHTTPCookieStore(cookies: [
-            .make(domain: "duckduckgo.com")
-        ])
-
-        let cookieStorage = MockCookieStorage()
+        dataStore.records = [
+            MockDataRecord(recordName: "duckduckgo.com")
+        ]
 
         let expect = expectation(description: #function)
-        WebCacheManager.shared.clear(dataStore: dataStore, appCookieStorage: cookieStorage, logins: logins) {
+        WebCacheManager.shared.clear(dataStore: dataStore, logins: logins) {
             expect.fulfill()
         }
         wait(for: [expect], timeout: 5.0)
 
-        XCTAssertEqual(cookieStorage.cookies.count, 1)
-        XCTAssertEqual(cookieStorage.cookies[0].domain, "duckduckgo.com")
+        XCTAssertEqual(dataStore.records.count, 1)
+        XCTAssertEqual(dataStore.records[0].displayName, "duckduckgo.com")
     }
 
     func testWhenClearedThenCookiesForLoginsAreRetained() {
@@ -101,38 +93,20 @@ class WebCacheManagerTests: XCTestCase {
         ])
 
         let dataStore = MockDataStore()
-        dataStore.cookieStore = MockHTTPCookieStore(cookies: [
-            .make(domain: "www.example.com"),
-            .make(domain: "facebook.com")
-        ])
-
-        let cookieStorage = MockCookieStorage()
+        dataStore.records = [
+            MockDataRecord(recordName: "www.example.com"),
+            MockDataRecord(recordName: "facebook.com")
+        ]
 
         let expect = expectation(description: #function)
-        WebCacheManager.shared.clear(dataStore: dataStore, appCookieStorage: cookieStorage, logins: logins) {
+        WebCacheManager.shared.clear(dataStore: dataStore, logins: logins) {
             expect.fulfill()
         }
         wait(for: [expect], timeout: 5.0)
 
-        XCTAssertEqual(cookieStorage.cookies.count, 1)
-        XCTAssertEqual(cookieStorage.cookies[0].domain, "www.example.com")
+        XCTAssertEqual(dataStore.records.count, 1)
+        XCTAssertEqual(dataStore.records[0].displayName, "www.example.com")
 
-    }
-
-    func testWhenConsumeIsCalledThenCompletionIsCalled() {
-        let cookieStorage = MockCookieStorage()
-        cookieStorage.setCookie(HTTPCookie.make())
-
-        let httpCookieStore = MockHTTPCookieStore()
-
-        let expect = expectation(description: #function)
-        WebCacheManager.shared.consumeCookies(cookieStorage: cookieStorage, httpCookieStore: httpCookieStore) {
-            expect.fulfill()
-        }
-        wait(for: [expect], timeout: 5.0)
-
-        XCTAssertTrue(cookieStorage.cookies.isEmpty)
-        XCTAssertEqual(httpCookieStore.cookies.count, 1)
     }
 
     func testWhenClearIsCalledThenCompletionIsCalled() {
@@ -152,13 +126,17 @@ class WebCacheManagerTests: XCTestCase {
 
     class MockDataStore: WebsiteDataStore {
 
+        var records = [WKWebsiteDataRecord]()
         var removeAllDataCalledCount = 0
 
-        var cookieStore: WebsiteCookieStore?
+        func fetchDataRecords(ofTypes dataTypes: Set<String>, completionHandler: @escaping ([WKWebsiteDataRecord]) -> Void) {
+            completionHandler(records)
+        }
 
-        func removeAllData(completionHandler completion: @escaping () -> Void) {
+        func removeData(ofTypes dataTypes: Set<String>, for dataRecords: [WKWebsiteDataRecord], completionHandler: @escaping () -> Void) {
             removeAllDataCalledCount += 1
-            completion()
+            self.records = records.filter { !dataRecords.contains($0) }
+            completionHandler()
         }
 
     }
@@ -177,45 +155,16 @@ class WebCacheManagerTests: XCTestCase {
 
     }
 
-    class MockHTTPCookieStore: WebsiteCookieStore {
+    class MockDataRecord: WKWebsiteDataRecord {
 
-        var deletedCookies = [HTTPCookie]()
-        var cookies: [HTTPCookie]
+        let recordName: String
 
-        init(cookies: [HTTPCookie] = []) {
-            self.cookies = cookies
+        init(recordName: String) {
+            self.recordName = recordName
         }
 
-        func getAllCookies(_ completionHandler: @escaping ([HTTPCookie]) -> Void) {
-            completionHandler(cookies)
-        }
-
-        func setCookie(_ cookie: HTTPCookie, completionHandler: (() -> Void)?) {
-            cookies.append(cookie)
-            completionHandler?()
-        }
-
-        func delete(_ cookie: HTTPCookie, completionHandler: (() -> Void)?) {
-            deletedCookies.append(cookie)
-            completionHandler?()
-        }
-
-    }
-
-    class MockCookieStorage: CookieStorage {
-
-        private var mockCookies: [HTTPCookie] = []
-
-        override var cookies: [HTTPCookie] {
-            mockCookies
-        }
-
-        override func clear() {
-            mockCookies = []
-        }
-
-        override func setCookie(_ cookie: HTTPCookie) {
-            mockCookies.append(cookie)
+        override var displayName: String {
+            recordName
         }
 
     }

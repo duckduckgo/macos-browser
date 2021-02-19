@@ -59,7 +59,6 @@
 		4BB5473825D9A8600082F1E9 /* FireproofInfoViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4BB5473525D9A8600082F1E9 /* FireproofInfoViewController.swift */; };
 		4BB5473925D9A8600082F1E9 /* UndoFireproofingViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4BB5473625D9A8600082F1E9 /* UndoFireproofingViewController.swift */; };
 		4BB5473A25D9A8600082F1E9 /* Fireproofing.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 4BB5473725D9A8600082F1E9 /* Fireproofing.storyboard */; };
-		4BB5474225D9B3C90082F1E9 /* CookieStorage.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4BB5474125D9B3C90082F1E9 /* CookieStorage.swift */; };
 		4BB5474825D9B6040082F1E9 /* FireproofDomains.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4BB5474725D9B6040082F1E9 /* FireproofDomains.swift */; };
 		4BB5474D25D9B63C0082F1E9 /* UserDefaultsWrapper.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4BB5474C25D9B63C0082F1E9 /* UserDefaultsWrapper.swift */; };
 		4BB5475525D9CBE20082F1E9 /* WebsiteDataStoreTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4BB5475425D9CBE20082F1E9 /* WebsiteDataStoreTests.swift */; };
@@ -270,7 +269,6 @@
 		4BB5473525D9A8600082F1E9 /* FireproofInfoViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = FireproofInfoViewController.swift; sourceTree = "<group>"; };
 		4BB5473625D9A8600082F1E9 /* UndoFireproofingViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = UndoFireproofingViewController.swift; sourceTree = "<group>"; };
 		4BB5473725D9A8600082F1E9 /* Fireproofing.storyboard */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.storyboard; path = Fireproofing.storyboard; sourceTree = "<group>"; };
-		4BB5474125D9B3C90082F1E9 /* CookieStorage.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CookieStorage.swift; sourceTree = "<group>"; };
 		4BB5474725D9B6040082F1E9 /* FireproofDomains.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = FireproofDomains.swift; sourceTree = "<group>"; };
 		4BB5474C25D9B63C0082F1E9 /* UserDefaultsWrapper.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = UserDefaultsWrapper.swift; sourceTree = "<group>"; };
 		4BB5475425D9CBE20082F1E9 /* WebsiteDataStoreTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WebsiteDataStoreTests.swift; sourceTree = "<group>"; };
@@ -724,7 +722,6 @@
 			children = (
 				AA512D1324D99D9800230283 /* FaviconService.swift */,
 				AA6820E325502F19005ED0D5 /* WebsiteDataStore.swift */,
-				4BB5474125D9B3C90082F1E9 /* CookieStorage.swift */,
 			);
 			path = Services;
 			sourceTree = "<group>";
@@ -1479,7 +1476,6 @@
 				4BA1A6A0258B079600F6F690 /* DataEncryption.swift in Sources */,
 				AABEE6AF24AD22B90043105B /* AddressBarTextField.swift in Sources */,
 				AA68C3D32490ED62001B8783 /* NavigationBarViewController.swift in Sources */,
-				4BB5474225D9B3C90082F1E9 /* CookieStorage.swift in Sources */,
 				AA585DAF2490E6E600E9A3E2 /* MainViewController.swift in Sources */,
 				AABEE69A24A902A90043105B /* SuggestionsViewModel.swift in Sources */,
 				AA6820E425502F19005ED0D5 /* WebsiteDataStore.swift in Sources */,
@@ -1832,7 +1828,7 @@
 					"$(inherited)",
 					"@executable_path/../Frameworks",
 				);
-				MARKETING_VERSION = 0.6.8;
+				MARKETING_VERSION = 0.6.8.fireproofing.6;
 				PRODUCT_BUNDLE_IDENTIFIER = com.duckduckgo.macos.browser;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_ACTIVE_COMPILATION_CONDITIONS = "DEBUG FEEDBACK";
@@ -1858,7 +1854,7 @@
 					"$(inherited)",
 					"@executable_path/../Frameworks",
 				);
-				MARKETING_VERSION = 0.6.8;
+				MARKETING_VERSION = 0.6.8.fireproofing.6;
 				PRODUCT_BUNDLE_IDENTIFIER = com.duckduckgo.macos.browser;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_ACTIVE_COMPILATION_CONDITIONS = FEEDBACK;

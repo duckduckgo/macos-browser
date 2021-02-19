@@ -23,7 +23,6 @@ struct UserDefaultsWrapper<T> {
 
     enum Key: String, CaseIterable {
 
-        case allowedCookies = "com.duckduckgo.fireproofingallowedCookies"
         case fireproofDomains = "com.duckduckgo.fireproofing.allowedDomains"
 
     }
