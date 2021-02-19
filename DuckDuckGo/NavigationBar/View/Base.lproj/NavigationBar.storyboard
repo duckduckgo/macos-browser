@@ -482,12 +482,11 @@
                         </subviews>
                         <constraints>
                             <constraint firstAttribute="trailing" secondItem="taC-vG-1fV" secondAttribute="trailing" constant="1" id="26X-xU-JjT"/>
+                            <constraint firstItem="HEu-ro-RSA" firstAttribute="centerY" secondItem="Bhg-sv-n5J" secondAttribute="centerY" id="BRs-q1-MOh"/>
                             <constraint firstItem="taC-vG-1fV" firstAttribute="top" secondItem="Bhg-sv-n5J" secondAttribute="top" id="DZu-Mp-6eA"/>
                             <constraint firstItem="HEu-ro-RSA" firstAttribute="leading" secondItem="Bhg-sv-n5J" secondAttribute="leading" constant="1" id="JJu-Ej-iFq"/>
                             <constraint firstAttribute="bottom" secondItem="kRc-0m-oqe" secondAttribute="bottom" constant="1" id="Trl-Jy-VjP"/>
                             <constraint firstAttribute="trailing" secondItem="kRc-0m-oqe" secondAttribute="trailing" constant="1" id="WeU-Fb-omO"/>
-                            <constraint firstItem="HEu-ro-RSA" firstAttribute="top" secondItem="Bhg-sv-n5J" secondAttribute="top" id="fag-YI-Lom"/>
-                            <constraint firstAttribute="bottom" secondItem="HEu-ro-RSA" secondAttribute="bottom" id="tvj-VL-KeS"/>
                             <constraint firstAttribute="bottom" secondItem="taC-vG-1fV" secondAttribute="bottom" id="u8B-3l-kXC"/>
                         </constraints>
                     </view>
