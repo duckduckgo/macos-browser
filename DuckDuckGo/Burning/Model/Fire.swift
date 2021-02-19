@@ -34,16 +34,18 @@ class Fire {
 
         tabCollectionViewModel.tabCollection.tabs.forEach { $0.stopLoading() }
 
-        if tabCollectionViewModel.tabCollection.tabs.count > 0 {
-            tabCollectionViewModel.removeAllTabsAndAppendNewTab()
-        } else {
-            tabCollectionViewModel.appendNewTab()
-        }
-
-        os_log("Fire.swift beginning cookie deletion", log: .fire, type: .debug)
+        os_log("WebsiteDataStore began cookie deletion", log: .fire, type: .default)
         webCacheManager.clear { [weak self] in
-            os_log("Fire.swift completed cookie deletion", log: .fire, type: .debug)
+            os_log("WebsiteDataStore completed cookie deletion", log: .fire, type: .default)
             self?.isBurning = false
+
+            DispatchQueue.main.async {
+                if tabCollectionViewModel.tabCollection.tabs.count > 0 {
+                    tabCollectionViewModel.removeAllTabsAndAppendNewTab()
+                } else {
+                    tabCollectionViewModel.appendNewTab()
+                }
+            }
         }
     }
 }
