@@ -38,18 +38,26 @@ class WebCacheManager {
                completion: @escaping () -> Void) {
 
         let all = WKWebsiteDataStore.allWebsiteDataTypes()
+        let allExceptCookies = all.filter { $0 != "WKWebsiteDataTypeCookies" }
 
         dataStore.fetchDataRecords(ofTypes: all) { records in
-            let recordsToRemove = records.filter {
-                print("CHECKING \($0.displayName)")
-                return !logins.isAllowed(recordDomain: $0.displayName) && $0.displayName != URL.cookieDomain
+
+            let grouped = Dictionary(grouping: records) { logins.isAllowed(recordDomain: $0.displayName) || $0.displayName == URL.cookieDomain }
+            let recordsToKeep = grouped[true] ?? []
+            let recordsToRemove = grouped[false] ?? []
+
+            for record in recordsToKeep {
+                os_log("WebCacheManager keeping record for %s", log: .fire, type: .default, record.displayName)
             }
 
             for record in recordsToRemove {
                 os_log("WebCacheManager removing record for %s", log: .fire, type: .default, record.displayName)
             }
 
-            dataStore.removeData(ofTypes: all, for: recordsToRemove, completionHandler: completion)
+            // Remove all undesired records, and remove all records except cookies for fireproof domains.
+            dataStore.removeData(ofTypes: allExceptCookies, for: recordsToKeep) {
+                dataStore.removeData(ofTypes: all, for: recordsToRemove, completionHandler: completion)
+            }
         }
     }
 
