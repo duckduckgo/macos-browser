@@ -24,6 +24,8 @@ class OptionsButtonMenu: NSMenu {
 
     private let tabCollectionViewModel: TabCollectionViewModel
 
+    private let bookmarksMenuItem = NSMenuItem(title: UserText.bookmarks, action: nil, keyEquivalent: "")
+
     required init(coder: NSCoder) {
         fatalError("OptionsButtonMenu: Bad initializer")
     }
@@ -42,10 +44,21 @@ class OptionsButtonMenu: NSMenu {
         addItem(item)
     }
 
+    override func update() {
+        updateBookmarks()
+
+        super.update()
+    }
+
     private func setupMenuItems() {
         addMenuItem(title: UserText.moveTabToNewWindow,
                     action: #selector(moveTabToNewWindowAction(_:)),
                     imageName: "MoveTabToNewWindow")
+
+        addItem(NSMenuItem.separator())
+
+        bookmarksMenuItem.image = NSImage(named: "Bookmark")
+        addItem(bookmarksMenuItem)
 
         addItem(NSMenuItem.separator())
 
@@ -67,6 +80,12 @@ class OptionsButtonMenu: NSMenu {
 
 #endif
 
+    }
+    
+    private func updateBookmarks() {
+        // The bookmarks section is the same with the main menu
+        bookmarksMenuItem.submenu = NSApplication.shared.mainMenuTyped?.bookmarksMenuItem?.submenu?.copy() as? NSMenu
+        
     }
 
     @objc func moveTabToNewWindowAction(_ sender: NSMenuItem) {

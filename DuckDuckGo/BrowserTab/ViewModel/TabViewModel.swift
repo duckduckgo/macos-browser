@@ -35,6 +35,7 @@ class TabViewModel {
     @Published var canGoForward: Bool = false
     @Published var canGoBack: Bool = false
     @Published var canReload: Bool = false
+    @Published var canBeBookmarked: Bool = false
     @Published var isLoading: Bool = false
     @Published var isErrorViewVisible: Bool = false {
         didSet {
@@ -65,6 +66,7 @@ class TabViewModel {
         tab.$url.receive(on: DispatchQueue.main).sink { [weak self] _ in
             self?.updateCanReload()
             self?.updateAddressBarStrings()
+            self?.updateCanBeBookmarked()
         } .store(in: &cancellables)
     }
 
@@ -85,6 +87,10 @@ class TabViewModel {
 
     private func updateCanReload() {
         canReload = tab.url != nil
+    }
+
+    private func updateCanBeBookmarked() {
+        canBeBookmarked = tab.url != nil
     }
 
     private func updateAddressBarStrings() {

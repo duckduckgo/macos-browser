@@ -22,31 +22,13 @@ import Combine
 
 class AddressBarViewController: NSViewController {
 
-    static let homeFaviconImage = NSImage(named: "HomeFavicon")
-    static let webImage = NSImage(named: "Web")
-
     @IBOutlet weak var addressBarTextField: AddressBarTextField!
     @IBOutlet weak var passiveTextField: NSTextField!
-    @IBOutlet weak var clearButton: NSButton!
-    @IBOutlet weak var imageButton: NSButton!
-    @IBOutlet weak var privacyEntryPointButton: NSButton!
     @IBOutlet var inactiveBackgroundView: NSView!
     @IBOutlet var activeBackgroundView: NSView!
     @IBOutlet var activeBackgroundViewOverHeight: NSLayoutConstraint!
 
-    @IBOutlet weak var fireproofedButtonDivider: NSBox! {
-        didSet {
-            fireproofedButtonDivider.isHidden = true
-        }
-    }
-
-    @IBOutlet weak var fireproofedButton: NSButton! {
-        didSet {
-            fireproofedButton.isHidden = true
-            fireproofedButton.target = self
-            fireproofedButton.action = #selector(fireproofedButtonAction)
-        }
-    }
+    private(set) var addressBarButtonsViewController: AddressBarButtonsViewController?
     
     private var tabCollectionViewModel: TabCollectionViewModel
     private let suggestionsViewModel = SuggestionsViewModel(suggestions: Suggestions())
@@ -96,11 +78,6 @@ class AddressBarViewController: NSViewController {
                                                selector: #selector(refreshAddressBarAppearance(_:)),
                                                name: FireproofDomains.Constants.allowedDomainsChangedNotification,
                                                object: nil)
-
-        NotificationCenter.default.addObserver(self,
-                                               selector: #selector(showUndoFireproofingPopover(_:)),
-                                               name: FireproofDomains.Constants.newFireproofDomainNotification,
-                                               object: nil)
     }
 
     override func viewWillAppear() {
@@ -124,8 +101,12 @@ class AddressBarViewController: NSViewController {
         addressBarTextField.viewDidLayout()
     }
 
-    @IBAction func clearButtonAction(_ sender: NSButton) {
-        addressBarTextField.clearValue()
+    @IBSegueAction func createAddressBarButtonsViewController(_ coder: NSCoder) -> AddressBarButtonsViewController? {
+        let controller = AddressBarButtonsViewController(coder: coder, tabCollectionViewModel: tabCollectionViewModel)
+
+        self.addressBarButtonsViewController = controller
+        controller?.delegate = self
+        return addressBarButtonsViewController
     }
     
     @IBOutlet var shadowView: ShadowView!
@@ -152,8 +133,9 @@ class AddressBarViewController: NSViewController {
 
     private func subscribeToAddressBarTextFieldValue() {
         addressBarTextFieldValueCancellable = addressBarTextField.$value.receive(on: DispatchQueue.main).sink { [weak self] _ in
-            self?.updateMode()
-            self?.updateButtons()
+            guard let self = self else { return }
+            self.updateMode()
+            self.updateButtons()
         }
     }
 
@@ -203,43 +185,6 @@ class AddressBarViewController: NSViewController {
         shadowView.frame = frame
     }
 
-    private func updateButtons() {
-        guard let selectedTabViewModel = tabCollectionViewModel.selectedTabViewModel else {
-            os_log("%s: Selected tab view model is nil", type: .error, className)
-            return
-        }
-
-        let isSearchingMode = mode != .browsing
-        let isURLNil = selectedTabViewModel.tab.url == nil
-        let isTextFieldEditorFirstResponder = view.window?.firstResponder === addressBarTextField.currentEditor()
-        let isDuckDuckGoUrl = selectedTabViewModel.tab.url?.isDuckDuckGoSearch ?? false
-
-        // Privacy entry point button
-        privacyEntryPointButton.isHidden = isSearchingMode || isTextFieldEditorFirstResponder || isDuckDuckGoUrl || isURLNil
-        imageButton.isHidden = !privacyEntryPointButton.isHidden
-
-        clearButton.isHidden = !(isTextFieldEditorFirstResponder && !addressBarTextField.value.isEmpty)
-
-        // Image button
-        switch mode {
-        case .browsing:
-            imageButton.image = selectedTabViewModel.favicon
-        case .searching(withUrl: true):
-            imageButton.image = Self.webImage
-        case .searching(withUrl: false):
-            imageButton.image = Self.homeFaviconImage
-        }
-
-        // Fireproof button
-        if let url = selectedTabViewModel.tab.url, url.showFireproofStatus {
-            fireproofedButtonDivider.isHidden = !FireproofDomains.shared.isAllowed(fireproofDomain: url.baseHost ?? "")
-            fireproofedButton.isHidden = !FireproofDomains.shared.isAllowed(fireproofDomain: url.baseHost ?? "")
-        } else {
-            fireproofedButtonDivider.isHidden = true
-            fireproofedButton.isHidden = true
-        }
-    }
-
     private func updateMode() {
         switch self.addressBarTextField.value {
         case .text: self.mode = .searching(withUrl: false)
@@ -253,35 +198,18 @@ class AddressBarViewController: NSViewController {
         }
     }
 
+
     @objc private func refreshAddressBarAppearance(_ sender: Any) {
         self.updateMode()
         self.updateButtons()
     }
 
-    @objc func fireproofedButtonAction(_ sender: Any) {
-        guard let selectedTabViewModel = tabCollectionViewModel.selectedTabViewModel, let button = sender as? NSButton else {
-            return
-        }
+    private func updateButtons() {
+        let isTextFieldEditorFirstResponder = view.window?.firstResponder === addressBarTextField.currentEditor()
 
-        if let host = selectedTabViewModel.tab.url?.baseHost, FireproofDomains.shared.isAllowed(fireproofDomain: host) {
-            let viewController = FireproofInfoViewController.create(for: host)
-            present(viewController, asPopoverRelativeTo: button.frame, of: button.superview!, preferredEdge: .minY, behavior: .transient)
-        }
-    }
-
-    @objc private func showUndoFireproofingPopover(_ sender: Notification) {
-        guard let domain = sender.userInfo?[FireproofDomains.Constants.newFireproofDomainKey] as? String else { return }
-
-        DispatchQueue.main.async {
-            let viewController = UndoFireproofingViewController.create(for: domain)
-            let frame = self.fireproofedButton.frame.insetBy(dx: -10, dy: -10)
-
-            self.present(viewController,
-                         asPopoverRelativeTo: frame,
-                         of: self.fireproofedButton.superview!,
-                         preferredEdge: .minY,
-                         behavior: .transient)
-        }
+        self.addressBarButtonsViewController?.updateButtons(mode: mode,
+                                                            isTextFieldEditorFirstResponder: isTextFieldEditorFirstResponder,
+                                                            textFieldValue: addressBarTextField.value)
     }
     
 }
@@ -399,6 +327,14 @@ extension AddressBarViewController {
         self.view.window?.makeFirstResponder(nil)
 
         return event
+    }
+
+}
+
+extension AddressBarViewController: AddressBarButtonsViewControllerDelegate {
+
+    func addressBarButtonsViewControllerClearButtonClicked(_ addressBarButtonsViewController: AddressBarButtonsViewController) {
+        addressBarTextField.clearValue()
     }
 
 }

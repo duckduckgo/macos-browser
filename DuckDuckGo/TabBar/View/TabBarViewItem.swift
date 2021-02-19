@@ -27,6 +27,7 @@ protocol TabBarViewItemDelegate: AnyObject {
     func tabBarViewItemCloseAction(_ tabBarViewItem: TabBarViewItem)
     func tabBarViewItemCloseOtherAction(_ tabBarViewItem: TabBarViewItem)
     func tabBarViewItemDuplicateAction(_ tabBarViewItem: TabBarViewItem)
+    func tabBarViewItemBookmarkThisPageAction(_ tabBarViewItem: TabBarViewItem)
     func tabBarViewItemMoveToNewWindowAction(_ tabBarViewItem: TabBarViewItem)
     func tabBarViewItemFireproofSite(_ tabBarViewItem: TabBarViewItem)
     func tabBarViewItemRemoveFireproofing(_ tabBarViewItem: TabBarViewItem)
@@ -86,6 +87,9 @@ class TabBarViewItem: NSCollectionViewItem {
         menu.addItem(duplicateMenuItem)
 
         menu.addItem(NSMenuItem.separator())
+
+        let bookmarkMenuItem = NSMenuItem(title: UserText.bookmarkThisPage, action: #selector(bookmarkThisPageAction(_:)), keyEquivalent: "")
+        menu.addItem(bookmarkMenuItem)
 
         if let url = currentURL, url.canFireproof {
             let menuItem: NSMenuItem
@@ -174,6 +178,10 @@ class TabBarViewItem: NSCollectionViewItem {
 
     @objc func removeFireproofingAction(_ sender: NSButton) {
         delegate?.tabBarViewItemRemoveFireproofing(self)
+    }
+
+    @objc func bookmarkThisPageAction(_ sender: NSButton) {
+        delegate?.tabBarViewItemBookmarkThisPageAction(self)
     }
 
     @IBAction func closeButtonAction(_ sender: NSButton) {
