@@ -74,7 +74,7 @@ class MouseOverButton: NSButton {
         }
     }
 
-    private func updateBackgroundColor() {
+    func updateBackgroundColor() {
         guard isEnabled else {
             layer?.backgroundColor = NSColor.clear.cgColor
             return

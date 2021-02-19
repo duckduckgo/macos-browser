@@ -350,17 +350,48 @@
                                                 <action selector="forward:" target="Ady-hI-5gd" id="eVr-CZ-DBf"/>
                                             </connections>
                                         </menuItem>
-                                        <menuItem title="Home" keyEquivalent="H" id="FPm-eZ-BQ8">
+                                        <menuItem title="Home" tag="42" keyEquivalent="H" id="FPm-eZ-BQ8">
                                             <connections>
                                                 <action selector="home:" target="Ady-hI-5gd" id="z3t-iv-FBh"/>
                                             </connections>
                                         </menuItem>
                                         <menuItem isSeparatorItem="YES" id="IJK-jz-3WO"/>
-                                        <menuItem title="Reopen Last Closed Tab" tag="43" enabled="NO" keyEquivalent="T" id="c3l-v1-kxk">
+                                        <menuItem title="Reopen Last Closed Tab" tag="44" enabled="NO" keyEquivalent="T" id="c3l-v1-kxk">
                                             <connections>
                                                 <action selector="reopenLastClosedTab:" target="Ady-hI-5gd" id="jzQ-2q-HGB"/>
                                             </connections>
                                         </menuItem>
+                                    </items>
+                                </menu>
+                            </menuItem>
+                            <menuItem title="Bookmarks" tag="5" id="xf8-PW-TOA">
+                                <modifierMask key="keyEquivalentModifierMask"/>
+                                <menu key="submenu" title="Bookmarks" autoenablesItems="NO" id="AGQ-XC-31O">
+                                    <items>
+                                        <menuItem title="Bookmark this page..." tag="50" enabled="NO" keyEquivalent="d" id="Nkm-zy-JXD">
+                                            <connections>
+                                                <action selector="bookmarkThisPage:" target="Ady-hI-5gd" id="Mah-44-bE1"/>
+                                            </connections>
+                                        </menuItem>
+                                        <menuItem isSeparatorItem="YES" id="aPG-H0-BrG"/>
+                                        <menuItem title="Favorites" image="Favorite" tag="52" id="Y9I-ZC-gGg">
+                                            <modifierMask key="keyEquivalentModifierMask"/>
+                                            <menu key="submenu" autoenablesItems="NO" id="Nxf-cs-uVD">
+                                                <items>
+                                                    <menuItem title="Favorite This Page..." image="Favorite" tag="520" enabled="NO" id="cHZ-Fb-aKU">
+                                                        <modifierMask key="keyEquivalentModifierMask"/>
+                                                        <connections>
+                                                            <action selector="favoriteThisPage:" target="Ady-hI-5gd" id="wPO-TZ-mVB"/>
+                                                        </connections>
+                                                    </menuItem>
+                                                    <menuItem isSeparatorItem="YES" tag="521" id="eL9-aR-XDR"/>
+                                                </items>
+                                            </menu>
+                                            <connections>
+                                                <action selector="forward:" target="Ady-hI-5gd" id="cu9-Pd-5QV"/>
+                                            </connections>
+                                        </menuItem>
+                                        <menuItem isSeparatorItem="YES" tag="53" id="s02-vH-KA3"/>
                                     </items>
                                 </menu>
                             </menuItem>
@@ -478,7 +509,7 @@ CQ
                                     </items>
                                 </menu>
                             </menuItem>
-                            <menuItem title="Help" tag="6" id="wpr-3q-Mcd">
+                            <menuItem title="Help" tag="7" id="wpr-3q-Mcd">
                                 <modifierMask key="keyEquivalentModifierMask"/>
                                 <menu key="submenu" title="Help" systemMenu="help" id="F2S-fz-NVQ">
                                     <items>
@@ -487,8 +518,8 @@ CQ
                                                 <action selector="showHelp:" target="Ady-hI-5gd" id="y7X-2Q-9no"/>
                                             </connections>
                                         </menuItem>
-                                        <menuItem isSeparatorItem="YES" tag="61" id="ESk-wA-tC4"/>
-                                        <menuItem title="Send Feedback" tag="62" id="V8t-Ts-q0L">
+                                        <menuItem isSeparatorItem="YES" tag="71" id="ESk-wA-tC4"/>
+                                        <menuItem title="Send Feedback" tag="72" id="V8t-Ts-q0L">
                                             <modifierMask key="keyEquivalentModifierMask"/>
                                             <connections>
                                                 <action selector="openFeedback:" target="Ady-hI-5gd" id="FWM-NE-Ftt"/>
@@ -511,4 +542,7 @@ CQ
             <point key="canvasLocation" x="-215" y="-265"/>
         </scene>
     </scenes>
+    <resources>
+        <image name="Favorite" width="15" height="15"/>
+    </resources>
 </document>
