@@ -1,5 +1,5 @@
 //
-//  Logging.swift
+//  DataExtension.swift
 //
 //  Copyright © 2021 DuckDuckGo. All rights reserved.
 //
@@ -15,20 +15,13 @@
 //  See the License for the specific language governing permissions and
 //  limitations under the License.
 //
+
 import Foundation
-import os
 
-extension OSLog {
+extension Data {
 
-    static var config: OSLog {
-        Logging.configLoggingEnabled ? Logging.configLog : .disabled
+    func utf8String() -> String? {
+        return String(data: self, encoding: .utf8)
     }
-
-}
-
-struct Logging {
-
-    fileprivate static let configLoggingEnabled = false
-    fileprivate static let configLog: OSLog = OSLog(subsystem: Bundle.main.bundleIdentifier ?? "DuckDuckGo", category: "Configuration Downloading")
 
 }

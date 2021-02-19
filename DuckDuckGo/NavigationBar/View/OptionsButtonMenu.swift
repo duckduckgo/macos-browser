@@ -24,8 +24,6 @@ class OptionsButtonMenu: NSMenu {
 
     private let tabCollectionViewModel: TabCollectionViewModel
 
-    private let bookmarksMenuItem = NSMenuItem(title: UserText.bookmarks, action: nil, keyEquivalent: "")
-
     required init(coder: NSCoder) {
         fatalError("OptionsButtonMenu: Bad initializer")
     }
@@ -37,12 +35,7 @@ class OptionsButtonMenu: NSMenu {
         setupMenuItems()
     }
 
-    private func addMenuItem(title: String, action: Selector, imageName: String) {
-        let item = NSMenuItem(title: title, action: action, keyEquivalent: "")
-        item.target = self
-        item.image = NSImage(named: imageName)
-        addItem(item)
-    }
+    let bookmarksMenuItem = NSMenuItem(title: UserText.bookmarks, action: nil, keyEquivalent: "")
 
     override func update() {
         updateBookmarks()
@@ -51,35 +44,28 @@ class OptionsButtonMenu: NSMenu {
     }
 
     private func setupMenuItems() {
-        addMenuItem(title: UserText.moveTabToNewWindow,
-                    action: #selector(moveTabToNewWindowAction(_:)),
-                    imageName: "MoveTabToNewWindow")
-
-        addItem(NSMenuItem.separator())
-
-        bookmarksMenuItem.image = NSImage(named: "Bookmark")
-        addItem(bookmarksMenuItem)
-
-        addItem(NSMenuItem.separator())
-
-        if let url = tabCollectionViewModel.selectedTabViewModel?.tab.url, url.canFireproof, let host = url.host {
-            if FireproofDomains.shared.isAllowed(fireproofDomain: host) {
-                addMenuItem(title: UserText.removeFireproofing, action: #selector(toggleFireproofing(_:)), imageName: "BurnProof")
-            } else {
-                addMenuItem(title: UserText.fireproofSite, action: #selector(toggleFireproofing(_:)), imageName: "BurnProof")
-            }
-
-            addItem(NSMenuItem.separator())
-        }
+        let moveTabMenuItem = NSMenuItem(title: UserText.moveTabToNewWindow,
+                                         action: #selector(moveTabToNewWindowAction(_:)),
+                                         keyEquivalent: "")
+        moveTabMenuItem.target = self
+        moveTabMenuItem.image = NSImage(named: "MoveTabToNewWindow")
+        addItem(moveTabMenuItem)
 
 #if FEEDBACK
 
-        addMenuItem(title: "Send Feedback",
-                    action: #selector(openFeedbackAction(_:)),
-                    imageName: "Feedback")
+        let openFeedbackMenuItem = NSMenuItem(title: "Send Feedback",
+                                              action: #selector(AppDelegate.openFeedback(_:)),
+                                         keyEquivalent: "")
+        openFeedbackMenuItem.target = self
+        openFeedbackMenuItem.image = NSImage(named: "Feedback")
+        addItem(openFeedbackMenuItem)
 
 #endif
-
+        
+        addItem(NSMenuItem.separator())
+        
+        bookmarksMenuItem.image = NSImage(named: "Bookmark")
+        addItem(bookmarksMenuItem)
     }
     
     private func updateBookmarks() {
@@ -98,24 +84,5 @@ class OptionsButtonMenu: NSMenu {
         tabCollectionViewModel.removeSelected()
         WindowsManager.openNewWindow(with: tab)
     }
-
-    @objc func toggleFireproofing(_ sender: NSMenuItem) {
-        guard let selectedTabViewModel = tabCollectionViewModel.selectedTabViewModel else {
-            os_log("MainViewController: No tab view model selected", type: .error)
-            return
-        }
-
-        selectedTabViewModel.tab.requestFireproofToggle()
-    }
-
-    #if FEEDBACK
-
-    @objc func openFeedbackAction(_ sender: NSMenuItem) {
-        let tab = Tab()
-        tab.url = URL.feedback
-        tabCollectionViewModel.append(tab: tab)
-    }
-
-    #endif
 
 }

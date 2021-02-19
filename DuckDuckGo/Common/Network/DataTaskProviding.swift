@@ -1,5 +1,5 @@
 //
-//  Logging.swift
+//  DataTaskProviding.swift
 //
 //  Copyright © 2021 DuckDuckGo. All rights reserved.
 //
@@ -15,20 +15,23 @@
 //  See the License for the specific language governing permissions and
 //  limitations under the License.
 //
+
 import Foundation
-import os
+import Combine
 
-extension OSLog {
+/// A testable abstraction of a data task publisher, which you can usually get from URLSession.dataTaskPublisher(for: )
+protocol DataTaskProviding {
 
-    static var config: OSLog {
-        Logging.configLoggingEnabled ? Logging.configLog : .disabled
-    }
+    func dataTaskPublisher(for: URLRequest) -> AnyPublisher<(data: Data, response: URLResponse), URLError>
 
 }
 
-struct Logging {
+/// Default implementation which just delegates to URLSession.shared
+struct SharedURLSessionDataTaskProvider: DataTaskProviding {
 
-    fileprivate static let configLoggingEnabled = false
-    fileprivate static let configLog: OSLog = OSLog(subsystem: Bundle.main.bundleIdentifier ?? "DuckDuckGo", category: "Configuration Downloading")
+    func dataTaskPublisher(for request: URLRequest) -> AnyPublisher<(data: Data, response: URLResponse), URLError> {
+        return URLSession.shared.dataTaskPublisher(for: request)
+            .eraseToAnyPublisher()
+    }
 
 }

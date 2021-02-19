@@ -19,11 +19,17 @@
 import Foundation
 
 @propertyWrapper
-struct UserDefaultsWrapper<T> {
+public struct UserDefaultsWrapper<T> {
 
-    enum Key: String, CaseIterable {
+    public enum Key: String, CaseIterable {
 
-        case fireproofDomains = "com.duckduckgo.fireproofing.allowedDomains"
+        case configLastUpdated = "config.last.updated"
+        case configStorageTrackerRadarEtag = "config.storage.trackerradar.etag"
+        case configStorageBloomFilterSpecEtag = "config.storage.bloomfilter.spec.etag"
+        case configStorageBloomFilterBinaryEtag = "config.storage.bloomfilter.binary.etag"
+        case configStorageBloomFilterExclusionsEtag = "config.storage.bloomfilter.exclusions.etag"
+        case configStorageSurrogatesEtag = "config.storage.surrogates.etag"
+        case configStorageTempUnprotectedSitesEtag = "config.storage.temporaryunprotectedsites.etag"
 
     }
 
@@ -31,13 +37,13 @@ struct UserDefaultsWrapper<T> {
     private let defaultValue: T
     private let setIfEmpty: Bool
 
-    init(key: Key, defaultValue: T, setIfEmpty: Bool = false) {
+    public init(key: Key, defaultValue: T, setIfEmpty: Bool = false) {
         self.key = key
         self.defaultValue = defaultValue
         self.setIfEmpty = setIfEmpty
     }
 
-    var wrappedValue: T {
+    public var wrappedValue: T {
         get {
             if let storedValue = UserDefaults.standard.object(forKey: key.rawValue) as? T {
                 return storedValue
@@ -51,12 +57,6 @@ struct UserDefaultsWrapper<T> {
         }
         set {
             UserDefaults.standard.set(newValue, forKey: key.rawValue)
-        }
-    }
-
-    static func clearAll() {
-        Key.allCases.forEach { key in
-            UserDefaults.standard.removeObject(forKey: key.rawValue)
         }
     }
 }

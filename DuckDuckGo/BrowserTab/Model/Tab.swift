@@ -27,7 +27,6 @@ protocol TabDelegate: class {
     func tab(_ tab: Tab, requestedNewTab url: URL?, selected: Bool)
     func tab(_ tab: Tab, requestedFileDownload download: FileDownload)
     func tab(_ tab: Tab, willShowContextMenuAt position: NSPoint, image: URL?, link: URL?)
-    func tab(_ tab: Tab, detectedLogin host: String)
 
 }
 
@@ -36,7 +35,6 @@ final class Tab: NSObject {
     weak var delegate: TabDelegate?
 
     init(faviconService: FaviconService = LocalFaviconService.shared,
-         webCacheManager: WebCacheManager = .shared,
          webViewConfiguration: WebViewConfiguration? = nil,
          url: URL? = nil,
          title: String? = nil,
@@ -58,14 +56,9 @@ final class Tab: NSObject {
 
         super.init()
 
-        self.loginDetectionService = LoginDetectionService { [weak self] host in
-            guard let self = self else { return }
-            self.delegate?.tab(self, detectedLogin: host)
-        }
-
         setupWebView()
         if webView.configuration.userContentController.userScripts.isEmpty {
-            setupUserScripts()
+            installUserScripts()
         }
 
         if let favicon = favicon,
@@ -73,18 +66,11 @@ final class Tab: NSObject {
             faviconService.storeIfNeeded(favicon: favicon, for: host, isFromUserScript: false)
         }
 
+        subscribeToTrackerBlockerConfigUpdatedEvents()
     }
 
     deinit {
-        userScripts.forEach {
-            $0.messageNames.forEach {
-                if #available(OSX 11.0, *) {
-                    webView.configuration.userContentController.removeScriptMessageHandler(forName: $0, contentWorld: .defaultClient)
-                } else {
-                    webView.configuration.userContentController.removeScriptMessageHandler(forName: $0)
-                }
-            }
-        }
+        userScripts.remove(from: webView)
     }
 
     let webView: WebView
@@ -102,19 +88,11 @@ final class Tab: NSObject {
 
     weak var findInPage: FindInPageModel? {
         didSet {
-            findInPageScript.model = findInPage
-            subscribeToFindInPageTextChange()
+            attachFindInPage()
         }
     }
 
     var sessionStateData: Data?
-
-    func update(url: URL?) {
-        self.url = url
-
-        // This function is called when the user has manually typed in a new address, which should reset the login detection flow.
-        loginDetectionService?.handle(navigationEvent: .userAction)
-    }
 
     func invalidateSessionStateData() {
         sessionStateData = nil
@@ -135,7 +113,6 @@ final class Tab: NSObject {
     // Used as the request context for HTML 5 downloads
     private var lastMainFrameRequest: URLRequest?
 
-    private var loginDetectionService: LoginDetectionService?
     private let instrumentation = TabInstrumentation()
 
     var isHomepageLoaded: Bool {
@@ -144,12 +121,10 @@ final class Tab: NSObject {
 
     func goForward() {
         webView.goForward()
-        loginDetectionService?.handle(navigationEvent: .userAction)
     }
 
     func goBack() {
         webView.goBack()
-        loginDetectionService?.handle(navigationEvent: .userAction)
     }
 
     func openHomepage() {
@@ -163,16 +138,10 @@ final class Tab: NSObject {
         }
 
         webView.reload()
-        loginDetectionService?.handle(navigationEvent: .userAction)
     }
 
     func stopLoading() {
         webView.stopLoading()
-    }
-
-    func requestFireproofToggle() {
-        guard let host = url?.host else { return }
-        FireproofDomains.shared.toggle(domain: host)
     }
 
     private func setupWebView() {
@@ -186,6 +155,25 @@ final class Tab: NSObject {
                 os_log("Tab:setupWebView could not restore session state %s", "\(error)")
             }
         }
+    }
+
+    // MARK: - WebView Reconfiguration
+
+    private var trackerBlockerConfigUpdatedCancellable: AnyCancellable?
+
+    private func subscribeToTrackerBlockerConfigUpdatedEvents() {
+        trackerBlockerConfigUpdatedCancellable = ConfigurationManager.shared.trackerBlockerDataUpdatedPublisher()
+            .receive(on: DispatchQueue.main)
+            .sink { [weak self] _ in
+            self?.reconfigureWebView()
+        }
+    }
+
+    private func reconfigureWebView() {
+        webView.configuration.reinstallContentBlocker()
+        userScripts.remove(from: webView)
+        userScripts = UserScripts()
+        installUserScripts()
     }
 
     // MARK: - Favicon
@@ -213,39 +201,22 @@ final class Tab: NSObject {
 
     // MARK: - User Scripts
 
-    let faviconScript = FaviconUserScript()
-    let html5downloadScript = HTML5DownloadUserScript()
-    let contextMenuScript = ContextMenuUserScript()
-    let findInPageScript = FindInPageUserScript()
-    let loginDetectionUserScript = LoginFormDetectionUserScript()
-    let contentBlockerScript = ContentBlockerUserScript()
-    let contentBlockerRulesScript = ContentBlockerRulesUserScript()
-    let debugScript = DebugUserScript()
+    var userScripts = UserScripts()
 
-    lazy var userScripts = [
-        self.debugScript,
-        self.faviconScript,
-        self.html5downloadScript,
-        self.contextMenuScript,
-        self.findInPageScript,
-        self.loginDetectionUserScript,
-        self.contentBlockerScript,
-        self.contentBlockerRulesScript
-    ]
+    private func installUserScripts() {
+        userScripts.debugScript.instrumentation = instrumentation
+        userScripts.faviconScript.delegate = self
+        userScripts.html5downloadScript.delegate = self
+        userScripts.contextMenuScript.delegate = self
+        userScripts.contentBlockerScript.delegate = self
+        userScripts.contentBlockerRulesScript.delegate = self
 
-    private func setupUserScripts() {
-        debugScript.instrumentation = instrumentation
-        faviconScript.delegate = self
-        html5downloadScript.delegate = self
-        contextMenuScript.delegate = self
-        loginDetectionUserScript.delegate = self
-        contentBlockerScript.delegate = self
-        contentBlockerRulesScript.delegate = self
+        attachFindInPage()
 
-        userScripts.forEach {
-            webView.configuration.userContentController.add(userScript: $0)
-        }
+        userScripts.install(into: webView)
     }
+
+    // MARK: Find in Page
 
     var findInPageCancellable: AnyCancellable?
     private func subscribeToFindInPageTextChange() {
@@ -255,6 +226,11 @@ final class Tab: NSObject {
                 self?.find(text: text)
             }
         }
+    }
+
+    private func attachFindInPage() {
+        userScripts.findInPageScript.model = findInPage
+        subscribeToFindInPageTextChange()
     }
 
 }
@@ -312,15 +288,6 @@ extension Tab: ContentBlockerUserScriptDelegate {
 
 }
 
-extension Tab: LoginFormDetectionDelegate {
-
-    func loginFormDetectionUserScriptDetectedLoginForm(_ script: LoginFormDetectionUserScript) {
-        guard let url = webView.url else { return }
-        loginDetectionService?.handle(navigationEvent: .detectedLogin(url: url))
-    }
-
-}
-
 extension Tab: WKNavigationDelegate {
 
     struct ErrorCodes {
@@ -332,11 +299,6 @@ extension Tab: WKNavigationDelegate {
                  decisionHandler: @escaping (WKNavigationActionPolicy) -> Void) {
 
         updateUserAgentForDomain(navigationAction.request.url?.host)
-
-        // Check if a POST request is being made, and if it matches the appearance of a login request.
-        if let method = navigationAction.request.httpMethod, method == "POST", navigationAction.request.url?.isLoginURL ?? false {
-            loginDetectionUserScript.scanForLoginForm(in: webView)
-        }
 
         if navigationAction.isTargetingMainFrame() {
             lastMainFrameRequest = navigationAction.request
@@ -413,15 +375,10 @@ extension Tab: WKNavigationDelegate {
         if error != nil { error = nil }
 
         self.invalidateSessionStateData()
-
-        if let url = webView.url {
-            loginDetectionService?.handle(navigationEvent: .pageBeganLoading(url: url))
-        }
     }
 
     func webView(_ webView: WKWebView, didFinish navigation: WKNavigation!) {
         self.invalidateSessionStateData()
-        loginDetectionService?.handle(navigationEvent: .pageFinishedLoading)
     }
 
     func webView(_ webView: WKWebView, didFail navigation: WKNavigation!, withError error: Error) {
@@ -441,29 +398,24 @@ extension Tab: WKNavigationDelegate {
         self.error = error
     }
 
-    func webView(_ webView: WKWebView, didReceiveServerRedirectForProvisionalNavigation navigation: WKNavigation!) {
-        guard let url = webView.url else { return }
-        loginDetectionService?.handle(navigationEvent: .redirect(url: url))
-    }
-
 }
 
 extension Tab {
 
     private func find(text: String) {
-        findInPageScript.find(text: text, inWebView: webView)
+        userScripts.findInPageScript.find(text: text, inWebView: webView)
     }
 
     func findDone() {
-        findInPageScript.done(withWebView: webView)
+        userScripts.findInPageScript.done(withWebView: webView)
     }
 
     func findNext() {
-        findInPageScript.next(withWebView: webView)
+        userScripts.findInPageScript.next(withWebView: webView)
     }
 
     func findPrevious() {
-        findInPageScript.previous(withWebView: webView)
+        userScripts.findInPageScript.previous(withWebView: webView)
     }
 
 }
