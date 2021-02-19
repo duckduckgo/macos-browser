@@ -28,7 +28,7 @@ extension OSLog {
 
 struct Logging {
 
-    fileprivate static let configLoggingEnabled = true
+    fileprivate static let configLoggingEnabled = false
     fileprivate static let configLog: OSLog = OSLog(subsystem: Bundle.main.bundleIdentifier ?? "DuckDuckGo", category: "Configuration Downloading")
 
 }
