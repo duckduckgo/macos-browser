@@ -53,6 +53,6 @@ class LoginFormDetectionUserScript: UserScript {
 extension LoginFormDetectionUserScript {
 
     static let messageNames = ["loginFormDetected"]
-    static let source = UserScript.loadJS("login-detection")
+    static let source = DefaultScriptSourceProvider.loadJS("login-detection")
 
 }

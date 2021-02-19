@@ -31,6 +31,8 @@ public struct UserDefaultsWrapper<T> {
         case configStorageSurrogatesEtag = "config.storage.surrogates.etag"
         case configStorageTempUnprotectedSitesEtag = "config.storage.temporaryunprotectedsites.etag"
 
+        case fireproofDomains = "com.duckduckgo.fireproofing.allowedDomains"
+
     }
 
     private let key: Key
@@ -59,4 +61,10 @@ public struct UserDefaultsWrapper<T> {
             UserDefaults.standard.set(newValue, forKey: key.rawValue)
         }
     }
+
+    static func clearAll() {
+         Key.allCases.forEach { key in
+             UserDefaults.standard.removeObject(forKey: key.rawValue)
+         }
+     }
 }

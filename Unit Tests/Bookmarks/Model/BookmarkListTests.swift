@@ -88,7 +88,7 @@ class BookmarkListTests: XCTestCase {
     func testWhenUpdateIsCalledWithUnknownBookmark_ThenTheListRemainsUnchanged() {
         var bookmarkList = BookmarkList()
 
-        var bookmark = Bookmark.aBookmark
+        let bookmark = Bookmark.aBookmark
         bookmarkList.insert(bookmark)
 
         let unknownBookmark = Bookmark(url: URL.duckDuckGoAutocomplete, title: "Unknown title", favicon: nil, isFavorite: true, managedObjectId: nil)
