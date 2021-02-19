@@ -133,7 +133,7 @@
                                 </connections>
                             </containerView>
                             <button translatesAutoresizingMaskIntoConstraints="NO" id="DqX-mW-o7G" customClass="MouseOverButton" customModule="DuckDuckGo_Privacy_Browser" customModuleProvider="target">
-                                <rect key="frame" x="731" y="8" width="32" height="24"/>
+                                <rect key="frame" x="699" y="8" width="32" height="24"/>
                                 <constraints>
                                     <constraint firstAttribute="width" constant="32" id="VYL-F0-tet"/>
                                     <constraint firstAttribute="height" constant="24" id="fPk-l3-pz2"/>
@@ -158,6 +158,32 @@
                                     <action selector="feedbackButtonAction:" target="o2v-eH-jTI" id="MY7-rh-qCW"/>
                                 </connections>
                             </button>
+                            <button translatesAutoresizingMaskIntoConstraints="NO" id="XBe-xO-dXj" userLabel="Share Button" customClass="MouseOverButton" customModule="DuckDuckGo_Privacy_Browser" customModuleProvider="target">
+                                <rect key="frame" x="731" y="5" width="32.5" height="32"/>
+                                <constraints>
+                                    <constraint firstAttribute="height" constant="24" id="Ile-vS-DrC"/>
+                                    <constraint firstAttribute="width" constant="32" id="dww-gU-g9Y"/>
+                                </constraints>
+                                <buttonCell key="cell" type="square" bezelStyle="shadowlessSquare" image="NSShareTemplate" imagePosition="only" alignment="center" imageScaling="proportionallyDown" inset="2" id="vbU-I9-uH4">
+                                    <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
+                                    <font key="font" metaFont="system"/>
+                                </buttonCell>
+                                <color key="contentTintColor" name="ButtonColor"/>
+                                <userDefinedRuntimeAttributes>
+                                    <userDefinedRuntimeAttribute type="color" keyPath="mouseOverColor">
+                                        <color key="value" name="ButtonMouseOverColor"/>
+                                    </userDefinedRuntimeAttribute>
+                                    <userDefinedRuntimeAttribute type="color" keyPath="mouseDownColor">
+                                        <color key="value" name="ButtonMouseDownColor"/>
+                                    </userDefinedRuntimeAttribute>
+                                    <userDefinedRuntimeAttribute type="number" keyPath="cornerRadius">
+                                        <real key="value" value="4"/>
+                                    </userDefinedRuntimeAttribute>
+                                </userDefinedRuntimeAttributes>
+                                <connections>
+                                    <action selector="shareButtonAction:" target="o2v-eH-jTI" id="VBL-Ae-zB0"/>
+                                </connections>
+                            </button>
                         </subviews>
                         <constraints>
                             <constraint firstAttribute="bottom" secondItem="EQw-GG-GMA" secondAttribute="bottom" id="4ye-CO-dDp"/>
@@ -167,13 +193,15 @@
                             <constraint firstAttribute="trailing" relation="greaterThanOrEqual" secondItem="Wba-nA-FYj" secondAttribute="trailing" constant="80" id="RR5-n6-acI"/>
                             <constraint firstItem="DqX-mW-o7G" firstAttribute="centerY" secondItem="hYV-nu-QIp" secondAttribute="centerY" id="VzY-vk-wmA"/>
                             <constraint firstItem="Wba-nA-FYj" firstAttribute="top" secondItem="hYV-nu-QIp" secondAttribute="top" constant="1" id="Whl-qs-kgy"/>
+                            <constraint firstItem="iIF-Ky-unr" firstAttribute="leading" secondItem="XBe-xO-dXj" secondAttribute="trailing" id="XeF-9Z-4fx"/>
                             <constraint firstItem="B2U-XM-Vo0" firstAttribute="leading" secondItem="mdE-u0-Ei5" secondAttribute="trailing" id="aG0-IE-Xpr"/>
+                            <constraint firstItem="XBe-xO-dXj" firstAttribute="centerY" secondItem="hYV-nu-QIp" secondAttribute="centerY" id="aq3-cG-JsH"/>
                             <constraint firstItem="EQw-GG-GMA" firstAttribute="top" secondItem="hYV-nu-QIp" secondAttribute="top" id="ctd-w7-EMF"/>
                             <constraint firstItem="mdE-u0-Ei5" firstAttribute="leading" secondItem="kky-0N-Cfd" secondAttribute="trailing" id="dfl-Lh-pZe"/>
                             <constraint firstAttribute="trailing" secondItem="iIF-Ky-unr" secondAttribute="trailing" constant="8" id="gaO-bl-clp"/>
                             <constraint firstItem="EQw-GG-GMA" firstAttribute="leading" secondItem="hYV-nu-QIp" secondAttribute="leading" id="hpe-5Y-XTJ"/>
                             <constraint firstItem="mdE-u0-Ei5" firstAttribute="centerY" secondItem="hYV-nu-QIp" secondAttribute="centerY" id="hpv-rt-wVQ"/>
-                            <constraint firstItem="iIF-Ky-unr" firstAttribute="leading" secondItem="DqX-mW-o7G" secondAttribute="trailing" id="jwc-uv-Z8J"/>
+                            <constraint firstItem="XBe-xO-dXj" firstAttribute="leading" secondItem="DqX-mW-o7G" secondAttribute="trailing" id="jwc-uv-Z8J"/>
                             <constraint firstItem="kky-0N-Cfd" firstAttribute="centerY" secondItem="hYV-nu-QIp" secondAttribute="centerY" id="nim-fw-Zt3"/>
                             <constraint firstAttribute="trailing" secondItem="EQw-GG-GMA" secondAttribute="trailing" id="oYK-XH-0iN"/>
                             <constraint firstItem="Wba-nA-FYj" firstAttribute="leading" relation="greaterThanOrEqual" secondItem="hYV-nu-QIp" secondAttribute="leading" constant="112" id="sKj-TU-b0z"/>
@@ -192,6 +220,7 @@
                         <outlet property="goForwardButton" destination="mdE-u0-Ei5" id="7wT-nX-Avr"/>
                         <outlet property="optionsButton" destination="iIF-Ky-unr" id="vvZ-mm-idv"/>
                         <outlet property="refreshButton" destination="B2U-XM-Vo0" id="BUY-sH-cf0"/>
+                        <outlet property="shareButton" destination="XBe-xO-dXj" id="Q8z-cf-QG5"/>
                     </connections>
                 </viewController>
                 <customObject id="wkT-Td-n7D" userLabel="First Responder" customClass="NSResponder" sceneMemberID="firstResponder"/>
@@ -466,6 +495,7 @@
         <image name="Feedback" width="16" height="16"/>
         <image name="Forward" width="7" height="13"/>
         <image name="HomeFavicon" width="16" height="16"/>
+        <image name="NSShareTemplate" width="15" height="17"/>
         <image name="PrivacyEntryPoint" width="15" height="15"/>
         <image name="Refresh" width="12" height="15"/>
         <image name="Settings" width="12" height="3"/>

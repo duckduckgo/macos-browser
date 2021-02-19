@@ -27,6 +27,7 @@ class NavigationBarViewController: NSViewController {
     @IBOutlet weak var refreshButton: NSButton!
     @IBOutlet weak var feedbackButton: NSButton!
     @IBOutlet weak var optionsButton: NSButton!
+    @IBOutlet weak var shareButton: NSButton!
 
     var addressBarViewController: AddressBarViewController?
 
@@ -111,6 +112,12 @@ class NavigationBarViewController: NSViewController {
         }
     }
 
+    @IBAction func shareButtonAction(_ sender: NSButton) {
+        guard let url = tabCollectionViewModel.selectedTabViewModel?.tab.url else { return }
+        let sharing = NSSharingServicePicker(items: [url])
+        sharing.show(relativeTo: .zero, of: sender, preferredEdge: .minY)
+    }
+
 #if FEEDBACK
 
     @IBAction func feedbackButtonAction(_ sender: NSButton) {
@@ -171,6 +178,8 @@ class NavigationBarViewController: NSViewController {
         goBackButton.isEnabled = selectedTabViewModel.canGoBack
         goForwardButton.isEnabled = selectedTabViewModel.canGoForward
         refreshButton.isEnabled = selectedTabViewModel.canReload
+        shareButton.isEnabled = selectedTabViewModel.canReload
+        shareButton.isEnabled = selectedTabViewModel.tab.url != nil
     }
 
 }
