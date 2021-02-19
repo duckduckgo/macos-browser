@@ -54,7 +54,7 @@ class WebCacheManager {
                 os_log("WebCacheManager removing record for %s", log: .fire, type: .default, record.displayName)
             }
 
-            // Remove all undesired records, and remove all records except cookies for fireproof domains.
+            // Remove all records for non-fireproof domains, and remove all records except cookies for fireproof domains.
             dataStore.removeData(ofTypes: allExceptCookies, for: recordsToKeep) {
                 dataStore.removeData(ofTypes: all, for: recordsToRemove, completionHandler: completion)
             }
