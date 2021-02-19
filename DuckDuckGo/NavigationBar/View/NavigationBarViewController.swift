@@ -181,6 +181,7 @@ class NavigationBarViewController: NSViewController {
         goForwardButton.isEnabled = selectedTabViewModel.canGoForward
         refreshButton.isEnabled = selectedTabViewModel.canReload
         shareButton.isEnabled = selectedTabViewModel.canReload
+        shareButton.isEnabled = selectedTabViewModel.tab.url != nil
     }
 
 }
