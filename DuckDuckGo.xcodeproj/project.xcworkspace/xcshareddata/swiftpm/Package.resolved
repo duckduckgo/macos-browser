@@ -5,9 +5,9 @@
         "package": "BrowserServicesKit",
         "repositoryURL": "https://dub.duckduckgo.com/duckduckgo/BrowserServicesKit",
         "state": {
-          "branch": "feature/elle/initial",
-          "revision": "7e5018fc7571495de26ef4d864633a8988507d59",
-          "version": null
+          "branch": null,
+          "revision": "76b61d7c37b5d9ffeb5cf7ef87466359ba2c26f4",
+          "version": "0.1.0"
         }
       },
       {
