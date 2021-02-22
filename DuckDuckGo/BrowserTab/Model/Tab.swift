@@ -228,13 +228,6 @@ final class Tab: NSObject {
         userScripts.forEach {
             webView.configuration.userContentController.add(userScript: $0)
         }
-        webView.configuration.userContentController.addUserScript(WKUserScript(source: emailScript.source,
-                                                                               injectionTime: emailScript.injectionTime,
-                                                                               forMainFrameOnly: emailScript.forMainFrameOnly))
-        
-        emailScript.messageNames.forEach { messageName in
-            webView.configuration.userContentController.add(emailScript, name: messageName)
-        }
     }
 
     var findInPageCancellable: AnyCancellable?
