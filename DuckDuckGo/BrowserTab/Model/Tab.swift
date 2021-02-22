@@ -210,9 +210,6 @@ final class Tab: NSObject {
     
     lazy var emailManager: EmailManager = {
         let emailManager = EmailManager()
-        //emailManager.delegate = self
-        //we don't actually need the delegate
-        //TODO should probs rename the delegate
         emailManager.requestDelegate = self
         return emailManager
     }()
