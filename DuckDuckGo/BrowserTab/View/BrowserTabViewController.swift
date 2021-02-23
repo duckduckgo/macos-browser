@@ -370,8 +370,11 @@ extension BrowserTabViewController: WKUIDelegate {
 
 fileprivate extension NSAlert {
 
+    static var cautionImage = NSImage(named: "NSCaution")
+
     static func javascriptAlert(with message: String) -> NSAlert {
         let alert = NSAlert()
+        alert.icon = Self.cautionImage
         alert.messageText = message
         alert.addButton(withTitle: UserText.ok)
         return alert
@@ -379,6 +382,7 @@ fileprivate extension NSAlert {
 
     static func javascriptConfirmation(with message: String) -> NSAlert {
         let alert = NSAlert()
+        alert.icon = Self.cautionImage
         alert.messageText = message
         alert.addButton(withTitle: UserText.ok)
         alert.addButton(withTitle: UserText.cancel)
@@ -387,6 +391,7 @@ fileprivate extension NSAlert {
 
     static func javascriptTextInput(prompt: String, defaultText: String?) -> NSAlert {
         let alert = NSAlert()
+        alert.icon = Self.cautionImage
         alert.messageText = prompt
         alert.addButton(withTitle: UserText.ok)
         alert.addButton(withTitle: UserText.cancel)
