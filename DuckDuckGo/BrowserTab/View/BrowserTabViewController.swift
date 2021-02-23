@@ -52,10 +52,26 @@ class BrowserTabViewController: NSViewController {
     }
 
     private func subscribeToSelectedTabViewModel() {
-        selectedTabViewModelCancellable = tabCollectionViewModel.$selectedTabViewModel.receive(on: DispatchQueue.main).sink { [weak self] _ in
-            self?.changeWebView()
+        selectedTabViewModelCancellable = tabCollectionViewModel.$selectedTabViewModel.receive(on: DispatchQueue.main).sink { [weak self] model in
+            self?.updateInterface(url: model?.tab.url)
             self?.subscribeToIsErrorViewVisible()
         }
+    }
+
+    /// Takes a URL and decided what to do with the UI. There are three states:
+    ///
+    /// 1. No URL is provided, so the webview should be hidden in favor of showing the default UI elements.
+    /// 2. A URL is provided for the first time, so the webview should be added as a subview and the URL should be loaded.
+    /// 3. A URL is provided after already adding the webview, so the webview should be reloaded.
+    private func updateInterface(url: URL?) {
+        guard let url = url else {
+            webView?.removeFromSuperview()
+            print("WEBVIEW: HIDING WEB VIEW")
+            return
+        }
+
+        changeWebView()
+        reloadWebViewIfNeeded()
     }
 
     private func changeWebView() {
@@ -82,7 +98,7 @@ class BrowserTabViewController: NSViewController {
 
         func subscribeToUrl(of tabViewModel: TabViewModel) {
             urlCancellable?.cancel()
-            urlCancellable = tabViewModel.tab.$url.receive(on: DispatchQueue.main).sink { [weak self] _ in self?.reloadWebViewIfNeeded() }
+            urlCancellable = tabViewModel.tab.$url.receive(on: DispatchQueue.main).sink { [weak self] url in self?.updateInterface(url: url) }
         }
 
         func removeOldWebView(_ oldWebView: WebView?) {
