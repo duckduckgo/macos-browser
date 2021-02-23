@@ -39,6 +39,7 @@ class TabBarViewController: NSViewController {
     @IBOutlet weak var rightShadowImageView: NSImageView!
     @IBOutlet weak var leftShadowImageView: NSImageView!
     @IBOutlet weak var plusButton: MouseOverButton!
+    @IBOutlet weak var burnButton: BurnButton!
     @IBOutlet weak var windowDraggingViewLeadingConstraint: NSLayoutConstraint!
 
     private let tabCollectionViewModel: TabCollectionViewModel
@@ -47,6 +48,7 @@ class TabBarViewController: NSViewController {
 
     private var tabsCancellable: AnyCancellable?
     private var selectionIndexCancellable: AnyCancellable?
+    private var cancellables = Set<AnyCancellable>()
 
     required init?(coder: NSCoder) {
         fatalError("TabBarViewController: Bad initializer")
@@ -64,6 +66,7 @@ class TabBarViewController: NSViewController {
         scrollView.updateScrollElasticity(with: tabMode)
         observeToScrollNotifications()
         subscribeToSelectionIndex()
+        subscribeToIsBurning()
     }
 
     override func viewWillAppear() {
@@ -110,6 +113,13 @@ class TabBarViewController: NSViewController {
         selectionIndexCancellable = tabCollectionViewModel.$selectionIndex.receive(on: DispatchQueue.main).sink { [weak self] _ in
             self?.reloadSelection()
         }
+    }
+
+    private func subscribeToIsBurning() {
+        fireViewModel.fire.$isBurning
+            .receive(on: DispatchQueue.main)
+            .weakAssign(to: \.isBurning, on: burnButton)
+            .store(in: &cancellables)
     }
 
     private func reloadSelection() {
