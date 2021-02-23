@@ -73,6 +73,11 @@ class AddressBarViewController: NSViewController {
         subscribeToSelectedTabViewModel()
         subscribeToAddressBarTextFieldValue()
         registerForMouseEnteredAndExitedEvents()
+
+        NotificationCenter.default.addObserver(self,
+                                               selector: #selector(refreshAddressBarAppearance(_:)),
+                                               name: FireproofDomains.Constants.allowedDomainsChangedNotification,
+                                               object: nil)
     }
 
     override func viewWillAppear() {
@@ -191,6 +196,11 @@ class AddressBarViewController: NSViewController {
             case .unknown: self.mode = .searching(withUrl: false)
             }
         }
+    }
+
+    @objc private func refreshAddressBarAppearance(_ sender: Any) {
+        self.updateMode()
+        self.updateButtons()
     }
 
     private func updateButtons() {

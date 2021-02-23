@@ -37,7 +37,6 @@ class NavigationBarViewController: NSViewController {
     private let goBackButtonMenuDelegate: NavigationButtonMenuDelegate
     private let goForwardButtonMenuDelegate: NavigationButtonMenuDelegate
     // swiftlint:enable weak_delegate
-    private let optionsMenu: OptionsButtonMenu
 
     private var selectedTabViewModelCancellable: AnyCancellable?
     private var navigationButtonsCancellables = Set<AnyCancellable>()
@@ -50,7 +49,6 @@ class NavigationBarViewController: NSViewController {
         self.tabCollectionViewModel = tabCollectionViewModel
         goBackButtonMenuDelegate = NavigationButtonMenuDelegate(buttonType: .back, tabCollectionViewModel: tabCollectionViewModel)
         goForwardButtonMenuDelegate = NavigationButtonMenuDelegate(buttonType: .forward, tabCollectionViewModel: tabCollectionViewModel)
-        optionsMenu = OptionsButtonMenu(tabCollectionViewModel: tabCollectionViewModel)
         super.init(coder: coder)
     }
 
@@ -108,7 +106,8 @@ class NavigationBarViewController: NSViewController {
 
     @IBAction func optionsButtonAction(_ sender: NSButton) {
         if let event = NSApplication.shared.currentEvent {
-            NSMenu.popUpContextMenu(optionsMenu, with: event, for: sender)
+            let menu = OptionsButtonMenu(tabCollectionViewModel: tabCollectionViewModel)
+            NSMenu.popUpContextMenu(menu, with: event, for: sender)
         }
     }
 

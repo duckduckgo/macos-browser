@@ -39,7 +39,7 @@ extension Tab: NSSecureCoding {
                   sessionStateData: decoder.decodeIfPresent(at: NSCodingKeys.sessionStateData))
     }
 
-    public func encode(with coder: NSCoder) {
+    func encode(with coder: NSCoder) {
         let configuration = webView.configuration
         guard configuration.websiteDataStore.isPersistent == true else { return }
 

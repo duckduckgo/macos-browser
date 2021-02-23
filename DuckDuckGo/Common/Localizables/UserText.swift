@@ -22,6 +22,7 @@ struct UserText {
 
     static let ok = NSLocalizedString("ok", value: "OK", comment: "OK button")
     static let cancel = NSLocalizedString("cancel", value: "Cancel", comment: "Cancel button")
+    static let notNow = NSLocalizedString("notnow", value: "Not Now", comment: "Not Now button")
 
     static let duplicateTab = NSLocalizedString("duplicate.tab", value: "Duplicate Tab", comment: "Menu item. Duplicate as a verb")
     static let closeTab = NSLocalizedString("close.tab", value: "Close Tab", comment: "Menu item")
@@ -31,15 +32,15 @@ struct UserText {
     static let tabErrorTitle = NSLocalizedString("tab.error.title", value: "Oops!", comment: "Tab error title")
 
     static let moveTabToNewWindow = NSLocalizedString("options.menu.move.tab.to.new.window",
-                                                                 value: "Move Tab to New Window",
-                                                                 comment: "Context menu item")
+                                                      value: "Move Tab to New Window",
+                                                      comment: "Context menu item")
 
     static let addressBarSearchSuffix = NSLocalizedString("address.bar.search.suffix",
                                                           value: "Search DuckDuckGo",
                                                           comment: "Suffix of searched terms in address bar. Example: best watching machine . Search DuckDuckGo")
     static let addressBarVisitSuffix = NSLocalizedString("address.bar.visit.suffix",
-                                                          value: "Visit",
-                                                          comment: "Address bar suffix of possibly visited website. Example: spreadprivacy.com . Visit spreadprivacy.com")
+                                                         value: "Visit",
+                                                         comment: "Address bar suffix of possibly visited website. Example: spreadprivacy.com . Visit spreadprivacy.com")
 
     static let burnAlertMessageText = NSLocalizedString("burn.alert.message.text",
                                                         value: "Are you sure you want to burn everything?",
@@ -58,6 +59,26 @@ struct UserText {
     static let copyImageAddress = NSLocalizedString("copy.image.address", value: "Copy Image Address", comment: "Context menu item")
 
     static let findInPage = NSLocalizedString("find.in.page", value: "%1$d of %2$d", comment: "Find in page status (e.g. 1 of 99)")
+
+    static let fireproofSite = NSLocalizedString("options.menu.fireproof-site", value: "Fireproof Site", comment: "Context menu item")
+    static let removeFireproofing = NSLocalizedString("options.menu.remove-fireproofing", value: "Remove Fireproofing", comment: "Context menu item")
+    static let fireproof = NSLocalizedString("fireproof", value: "Fireproof", comment: "Fireproof button")
+
+    static func domainIsFireproof(domain: String) -> String {
+        let localized = NSLocalizedString("fireproof", value: "%@ is Fireproof", comment: "Domain fireproof status")
+        return String(format: localized, domain)
+    }
+
+    static func fireproofConfirmationTitle(domain: String) -> String {
+        let localized = NSLocalizedString("fireproof.confirmation.title",
+                                          value: "Would you like to Fireproof %@?",
+                                          comment: "Fireproof confirmation title")
+        return String(format: localized, domain)
+    }
+
+    static let fireproofConfirmationMessage = NSLocalizedString("fireproof.confirmation.message",
+                                                                value: "Fireproofing this site will keep you signed in after using the Fire Button.",
+                                                                comment: "Fireproof confirmation message")
 
     static let bookmarks = NSLocalizedString("bookmarks", value: "Bookmarks", comment: "Button for bookmarks")
     static let addToFavorites = NSLocalizedString("add.to.favorites", value: "Add to Favorites", comment: "Button for adding bookmarks to favorites")

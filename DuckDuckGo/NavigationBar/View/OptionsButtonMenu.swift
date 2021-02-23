@@ -66,6 +66,30 @@ class OptionsButtonMenu: NSMenu {
         
         bookmarksMenuItem.image = NSImage(named: "Bookmark")
         addItem(bookmarksMenuItem)
+
+        if let url = tabCollectionViewModel.selectedTabViewModel?.tab.url, url.canFireproof, let host = url.host {
+             if FireproofDomains.shared.isAllowed(fireproofDomain: host) {
+
+                let removeFireproofingItem = NSMenuItem(title: UserText.removeFireproofing,
+                                                 action: #selector(toggleFireproofing(_:)),
+                                                 keyEquivalent: "")
+                removeFireproofingItem.target = self
+                removeFireproofingItem.image = NSImage(named: "BurnProof")
+                addItem(removeFireproofingItem)
+
+             } else {
+
+                let fireproofSiteItem = NSMenuItem(title: UserText.fireproofSite,
+                                                 action: #selector(toggleFireproofing(_:)),
+                                                 keyEquivalent: "")
+                fireproofSiteItem.target = self
+                fireproofSiteItem.image = NSImage(named: "BurnProof")
+                addItem(fireproofSiteItem)
+
+             }
+
+             addItem(NSMenuItem.separator())
+         }
     }
     
     private func updateBookmarks() {
@@ -84,5 +108,14 @@ class OptionsButtonMenu: NSMenu {
         tabCollectionViewModel.removeSelected()
         WindowsManager.openNewWindow(with: tab)
     }
+
+    @objc func toggleFireproofing(_ sender: NSMenuItem) {
+         guard let selectedTabViewModel = tabCollectionViewModel.selectedTabViewModel else {
+             os_log("MainViewController: No tab view model selected", type: .error)
+             return
+         }
+
+         selectedTabViewModel.tab.requestFireproofToggle()
+     }
 
 }

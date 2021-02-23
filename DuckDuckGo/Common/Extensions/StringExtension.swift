@@ -91,6 +91,10 @@ extension String {
         return parts.dropFirst().joined(separator: ".")
     }
 
+    func dropWWW() -> String {
+        self.drop(prefix: "www.")
+    }
+
     // MARK: - Mutating
 
     @inlinable mutating func prepend(_ string: String) {

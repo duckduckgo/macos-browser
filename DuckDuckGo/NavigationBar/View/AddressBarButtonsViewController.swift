@@ -39,8 +39,23 @@ class AddressBarButtonsViewController: NSViewController {
 
     @IBOutlet weak var privacyEntryPointButton: AddressBarButton!
     @IBOutlet weak var bookmarkButton: AddressBarButton!
+    @IBOutlet weak var imageButtonWrapper: NSView!
     @IBOutlet weak var imageButton: NSButton!
     @IBOutlet weak var clearButton: NSButton!
+
+    @IBOutlet weak var fireproofedButtonDivider: NSBox! {
+        didSet {
+            fireproofedButtonDivider.isHidden = true
+        }
+    }
+
+    @IBOutlet weak var fireproofedButton: NSButton! {
+        didSet {
+            fireproofedButton.isHidden = true
+            fireproofedButton.target = self
+            fireproofedButton.action = #selector(fireproofedButtonAction)
+        }
+    }
 
     private var tabCollectionViewModel: TabCollectionViewModel
     private var bookmarkManager: BookmarkManager = LocalBookmarkManager.shared
@@ -66,6 +81,11 @@ class AddressBarButtonsViewController: NSViewController {
         setupButtons()
         subscribeToSelectedTabViewModel()
         subscribeToBookmarkList()
+
+        NotificationCenter.default.addObserver(self,
+                                               selector: #selector(showUndoFireproofingPopover(_:)),
+                                               name: FireproofDomains.Constants.newFireproofDomainNotification,
+                                               object: nil)
     }
 
     @IBAction func bookmarkButtonAction(_ sender: Any) {
@@ -78,6 +98,17 @@ class AddressBarButtonsViewController: NSViewController {
     
     @IBAction func privacyEntryPointButtonAction(_ sender: Any) {
         privacyEntryPointButton.state = .off
+    }
+
+    @objc func fireproofedButtonAction(_ sender: Any) {
+        guard let selectedTabViewModel = tabCollectionViewModel.selectedTabViewModel, let button = sender as? NSButton else {
+            return
+        }
+
+        if let host = selectedTabViewModel.tab.url?.host, FireproofDomains.shared.isAllowed(fireproofDomain: host) {
+            let viewController = FireproofInfoViewController.create(for: host)
+            present(viewController, asPopoverRelativeTo: button.frame, of: button.superview!, preferredEdge: .minY, behavior: .transient)
+        }
     }
 
     func openBookmarkPopover(setFavorite: Bool) {
@@ -113,7 +144,7 @@ class AddressBarButtonsViewController: NSViewController {
 
         // Privacy entry point button
         privacyEntryPointButton.isHidden = isSearchingMode || isTextFieldEditorFirstResponder || isDuckDuckGoUrl || isURLNil
-        imageButton.isHidden = !privacyEntryPointButton.isHidden
+        imageButtonWrapper.isHidden = !privacyEntryPointButton.isHidden
 
         clearButton.isHidden = !(isTextFieldEditorFirstResponder && !textFieldValue.isEmpty)
         bookmarkButton.isHidden = !clearButton.isHidden || textFieldValue.isEmpty
@@ -126,6 +157,15 @@ class AddressBarButtonsViewController: NSViewController {
             imageButton.image = Self.webImage
         case .searching(withUrl: false):
             imageButton.image = Self.homeFaviconImage
+        }
+
+        // Fireproof button
+        if let url = selectedTabViewModel.tab.url, url.showFireproofStatus, !privacyEntryPointButton.isHidden {
+            fireproofedButtonDivider.isHidden = !FireproofDomains.shared.isAllowed(fireproofDomain: url.host ?? "")
+            fireproofedButton.isHidden = !FireproofDomains.shared.isAllowed(fireproofDomain: url.host ?? "")
+        } else {
+            fireproofedButtonDivider.isHidden = true
+            fireproofedButton.isHidden = true
         }
     }
 
@@ -180,6 +220,21 @@ class AddressBarButtonsViewController: NSViewController {
             updateBookmarkButtonImage(isUrlBookmarked: bookmark != nil)
         }
         return bookmark
+    }
+
+    @objc private func showUndoFireproofingPopover(_ sender: Notification) {
+        guard let domain = sender.userInfo?[FireproofDomains.Constants.newFireproofDomainKey] as? String else { return }
+
+        DispatchQueue.main.async {
+            let viewController = UndoFireproofingViewController.create(for: domain)
+            let frame = self.fireproofedButton.frame.insetBy(dx: -10, dy: -10)
+
+            self.present(viewController,
+                         asPopoverRelativeTo: frame,
+                         of: self.fireproofedButton.superview!,
+                         preferredEdge: .minY,
+                         behavior: .transient)
+        }
     }
 
 }

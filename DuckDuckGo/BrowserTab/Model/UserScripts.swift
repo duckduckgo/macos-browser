@@ -24,6 +24,7 @@ class UserScripts {
     let html5downloadScript = HTML5DownloadUserScript()
     let contextMenuScript = ContextMenuUserScript()
     let findInPageScript = FindInPageUserScript()
+    let loginDetectionUserScript = LoginFormDetectionUserScript()
     let contentBlockerScript = ContentBlockerUserScript()
     let contentBlockerRulesScript = ContentBlockerRulesUserScript()
     let debugScript = DebugUserScript()
@@ -34,6 +35,7 @@ class UserScripts {
         self.html5downloadScript,
         self.contextMenuScript,
         self.findInPageScript,
+        self.loginDetectionUserScript,
         self.contentBlockerScript,
         self.contentBlockerRulesScript
     ]

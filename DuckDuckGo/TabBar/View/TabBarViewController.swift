@@ -20,6 +20,7 @@ import Cocoa
 import os.log
 import Combine
 
+// swiftlint:disable file_length
 class TabBarViewController: NSViewController {
 
     enum HorizontalSpace: CGFloat {
@@ -679,6 +680,22 @@ extension TabBarViewController: TabBarViewItemDelegate {
         moveToNewWindow(indexPath: indexPath)
     }
 
+    func tabBarViewItemFireproofSite(_ tabBarViewItem: TabBarViewItem) {
+        if let url = tabCollectionViewModel.selectedTabViewModel?.tab.url?.host {
+            FireproofDomains.shared.addToAllowed(domain: url)
+        }
+
+        tabBarViewItem.setupMenu()
+    }
+
+    func tabBarViewItemRemoveFireproofing(_ tabBarViewItem: TabBarViewItem) {
+        if let url = tabCollectionViewModel.selectedTabViewModel?.tab.url?.host {
+            FireproofDomains.shared.remove(domain: url)
+        }
+
+        tabBarViewItem.setupMenu()
+    }
+
 }
 
 fileprivate extension NSAlert {
@@ -695,3 +712,4 @@ fileprivate extension NSAlert {
     }
 
 }
+// swiftlint:enable file_length
