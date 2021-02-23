@@ -34,9 +34,9 @@ class TabBarCollectionView: NSCollectionView {
         // Register for the dropped object types we can accept.
         registerForDraggedTypes([.URL])
         // Enable dragging items from our CollectionView to other applications.
-        setDraggingSourceOperationMask([.every], forLocal: false)
+        setDraggingSourceOperationMask([.private], forLocal: false)
         // Enable dragging items within and into our CollectionView.
-        setDraggingSourceOperationMask([.move, .private], forLocal: true)
+        setDraggingSourceOperationMask([.private], forLocal: true)
     }
 
     func clearSelection(animated: Bool = false) {
