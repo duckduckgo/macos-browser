@@ -20,6 +20,7 @@ import Cocoa
 import os.log
 import Combine
 
+// swiftlint:disable file_length
 class TabBarViewController: NSViewController {
 
     enum HorizontalSpace: CGFloat {
@@ -711,3 +712,4 @@ fileprivate extension NSAlert {
     }
 
 }
+// swiftlint:enable file_length

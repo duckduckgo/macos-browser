@@ -60,7 +60,9 @@ class FireproofDomains {
     }
 
     func remove(domain: String) {
-        fireproofDomains = fireproofDomains.filter { $0 != domain }
+        fireproofDomains.removeAll {
+            $0 == domain || $0 == "www.\(domain)"
+        }
     }
 
     func clearAll() {

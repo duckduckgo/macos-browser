@@ -195,7 +195,7 @@ extension BrowserTabViewController: TabDelegate {
             return
         }
 
-        let alert = NSAlert.fireproofAlert(with: host)
+        let alert = NSAlert.fireproofAlert(with: host.dropWWW())
         alert.beginSheetModal(for: window) { response in
             if response == NSApplication.ModalResponse.alertFirstButtonReturn {
                 FireproofDomains.shared.addToAllowed(domain: host)
