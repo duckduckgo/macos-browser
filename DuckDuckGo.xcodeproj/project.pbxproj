@@ -76,6 +76,7 @@
 		4BB88B5B25B7BA50006F6B06 /* Instruments.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4BB88B5A25B7BA50006F6B06 /* Instruments.swift */; };
 		8511E18425F82B34002F516B /* 01_Fire_really_small.json in Resources */ = {isa = PBXBuildFile; fileRef = 8511E18325F82B34002F516B /* 01_Fire_really_small.json */; };
 		8524389725FA49B900DE9B83 /* BrowserServicesKit in Frameworks */ = {isa = PBXBuildFile; productRef = 8524389625FA49B900DE9B83 /* BrowserServicesKit */; };
+		853014D625E671A000FB8205 /* PageObserverUserScript.swift in Sources */ = {isa = PBXBuildFile; fileRef = 853014D525E671A000FB8205 /* PageObserverUserScript.swift */; };
 		8546DE6225C03056000CA5E1 /* UserAgentTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8546DE6125C03056000CA5E1 /* UserAgentTests.swift */; };
 		85480F8A25CDC360009424E3 /* Launch.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 85480F8925CDC360009424E3 /* Launch.storyboard */; };
 		85480FBB25D181CB009424E3 /* ConfigurationDownloading.swift in Sources */ = {isa = PBXBuildFile; fileRef = 85480FBA25D181CB009424E3 /* ConfigurationDownloading.swift */; };
@@ -334,6 +335,7 @@
 		4BB88B4F25B7BA2B006F6B06 /* TabInstrumentation.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TabInstrumentation.swift; sourceTree = "<group>"; };
 		4BB88B5A25B7BA50006F6B06 /* Instruments.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Instruments.swift; sourceTree = "<group>"; };
 		8511E18325F82B34002F516B /* 01_Fire_really_small.json */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.json; path = 01_Fire_really_small.json; sourceTree = "<group>"; };
+		853014D525E671A000FB8205 /* PageObserverUserScript.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PageObserverUserScript.swift; sourceTree = "<group>"; };
 		8546DE6125C03056000CA5E1 /* UserAgentTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UserAgentTests.swift; sourceTree = "<group>"; };
 		85480F8925CDC360009424E3 /* Launch.storyboard */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; path = Launch.storyboard; sourceTree = "<group>"; };
 		85480FBA25D181CB009424E3 /* ConfigurationDownloading.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ConfigurationDownloading.swift; sourceTree = "<group>"; };
@@ -760,6 +762,14 @@
 			path = Utilities;
 			sourceTree = "<group>";
 		};
+		853014D425E6709500FB8205 /* Support */ = {
+			isa = PBXGroup;
+			children = (
+				853014D525E671A000FB8205 /* PageObserverUserScript.swift */,
+			);
+			path = Support;
+			sourceTree = "<group>";
+		};
 		8553FF50257523630029327F /* FileDownload */ = {
 			isa = PBXGroup;
 			children = (
@@ -1140,6 +1150,7 @@
 		AA86491524D83384001BABEE /* NavigationBar */ = {
 			isa = PBXGroup;
 			children = (
+				853014D425E6709500FB8205 /* Support */,
 				AA86491624D8339A001BABEE /* View */,
 				AAA0CC3A25337F990079BC96 /* ViewModel */,
 			);
@@ -1863,6 +1874,7 @@
 				F41D174125CB131900472416 /* NSColorExtension.swift in Sources */,
 				4B02198D25E05FAC00ED7DEA /* UndoFireproofingViewController.swift in Sources */,
 				AAC5E4F625D6BF2C007F5990 /* AddressBarButtonsViewController.swift in Sources */,
+				853014D625E671A000FB8205 /* PageObserverUserScript.swift in Sources */,
 				AA6EF9B3250785D5004754E6 /* NSMenuExtension.swift in Sources */,
 				AA7412B524D1536B00D22FE0 /* MainWindowController.swift in Sources */,
 				AA9FF95924A1ECF20039E328 /* Tab.swift in Sources */,

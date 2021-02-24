@@ -242,7 +242,12 @@ extension BrowserTabViewController: TabDelegate {
 				searchForExternalUrl()
 			}
         }
+    }
 
+    func tabPageDOMLoaded(_ tab: Tab) {
+        if tabViewModel?.tab == tab {
+            tabViewModel?.isLoading = false
+        }
     }
 
     func tabDidStartNavigation(_ tab: Tab) {

@@ -508,7 +508,7 @@
                                     <real value="3.4028234663852886e+38"/>
                                 </customSpacing>
                             </stackView>
-                            <progressIndicator maxValue="100" doubleValue="100" displayedWhenStopped="NO" indeterminate="YES" style="bar" translatesAutoresizingMaskIntoConstraints="NO" id="P7j-v9-GLy">
+                            <progressIndicator maxValue="100" doubleValue="100" style="bar" translatesAutoresizingMaskIntoConstraints="NO" id="P7j-v9-GLy">
                                 <rect key="frame" x="0.0" y="-11" width="578" height="20"/>
                             </progressIndicator>
                         </subviews>

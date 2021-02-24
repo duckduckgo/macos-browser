@@ -81,6 +81,8 @@ class AddressBarButtonsViewController: NSViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
 
+        progressIndicator.addObserver(self, forKeyPath: "doubleValue", options: [.new], context: nil)
+
         setupButtons()
         subscribeToSelectedTabViewModel()
         subscribeToBookmarkList()
@@ -91,6 +93,13 @@ class AddressBarButtonsViewController: NSViewController {
                                                selector: #selector(showUndoFireproofingPopover(_:)),
                                                name: FireproofDomains.Constants.newFireproofDomainNotification,
                                                object: nil)
+    }
+
+    override func observeValue(forKeyPath keyPath: String?,
+                               of object: Any?,
+                               change: [NSKeyValueChangeKey: Any]?,
+                               context: UnsafeMutableRawPointer?) {
+        print("***", #function, progressIndicator.doubleValue)
     }
 
     @IBAction func bookmarkButtonAction(_ sender: Any) {
@@ -203,21 +212,29 @@ class AddressBarButtonsViewController: NSViewController {
         }
 
         progressCancellable = selectedTabViewModel.$progress.receive(on: DispatchQueue.main).sink { [weak self] value in
-            let target = max(0.1, value) * 125.0 // cut off at 80%
-            print("progress", target, value)
-//            self?.progressIndicator.doubleValue = target
-//            if target >= 100 {
-//                self?.progressIndicator.isHidden = true
-//            }
+            let target = max(0.1, value) * 100
+            // print("***", #function, target, value)
+
+            if selectedTabViewModel.isLoading {
+                print("*** updating progress to", target)
+                self?.progressIndicator.doubleValue = target
+            }
         }
 
         loadingCancellable = selectedTabViewModel.$isLoading.receive(on: DispatchQueue.main).sink { [weak self] value in
-            self?.progressIndicator.isHidden = !value
+            // print("***", #function, value)
 
             if value {
-                self?.progressIndicator.startAnimation(self)
-            } else {
-                self?.progressIndicator.stopAnimation(self)
+                print("*** showing indicator")
+                self?.progressIndicator.isHidden = false
+                self?.progressIndicator.doubleValue = 10
+            } else if self?.progressIndicator.doubleValue ?? 0 < 100 {
+                print("*** setting indicator to 100%")
+                self?.progressIndicator.doubleValue = 100
+                DispatchQueue.main.asyncAfter(deadline: .now() + 1.0) {
+                    print("*** hiding indicator")
+                    self?.progressIndicator.isHidden = true
+                }
             }
 
         }

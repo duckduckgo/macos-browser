@@ -21,6 +21,7 @@ import BrowserServicesKit
 
 class UserScripts {
 
+    let pageObserverScript = PageObserverUserScript()
     let faviconScript = FaviconUserScript()
     let html5downloadScript = HTML5DownloadUserScript()
     let contextMenuScript = ContextMenuUserScript()
@@ -48,7 +49,8 @@ class UserScripts {
         self.loginDetectionUserScript,
         self.contentBlockerScript,
         self.contentBlockerRulesScript,
-        self.emailScript
+        self.emailScript,
+        self.pageObserverScript
     ]
 
     lazy var scripts = userScripts.map { $0.makeWKUserScript() }

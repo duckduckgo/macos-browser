@@ -31,6 +31,8 @@ protocol TabDelegate: class {
     func tab(_ tab: Tab, detectedLogin host: String)
 	func tab(_ tab: Tab, requestedOpenExternalURL url: URL, forUserEnteredURL: Bool)
 
+    func tabPageDOMLoaded(_ tab: Tab)
+
 }
 
 final class Tab: NSObject {
@@ -280,6 +282,7 @@ final class Tab: NSObject {
             userScripts.contentBlockerRulesScript.delegate = self
             userScripts.emailScript.webView = webView
             userScripts.emailScript.delegate = emailManager
+            userScripts.pageObserverScript.delegate = self
 
             attachFindInPage()
 
@@ -309,6 +312,14 @@ final class Tab: NSObject {
     private func attachFindInPage() {
         userScripts.findInPageScript.model = findInPage
         subscribeToFindInPageTextChange()
+    }
+
+}
+
+extension Tab: PageObserverUserScriptDelegate {
+
+    func pageDOMLoaded() {
+        self.delegate?.tabPageDOMLoaded(self)
     }
 
 }
