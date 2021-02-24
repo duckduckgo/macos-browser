@@ -30,8 +30,12 @@ class LocalFaviconService: FaviconService {
 
     static let shared = LocalFaviconService()
 
-    private enum FaviconName: String {
-        case favicon = "favicon.ico"
+    private enum FaviconName {
+        static let favicon = "favicon.ico"
+    }
+
+    private enum Favicon {
+        static let duckDuckGo = NSImage(named: "HomeFavicon")!
     }
     
     private struct CacheEntry {
@@ -48,11 +52,21 @@ class LocalFaviconService: FaviconService {
     }
     
     init() {
+        initCache()
+
         DistributedNotificationCenter.default.addObserver(
             self,
             selector: #selector(themeChanged),
             name: NSNotification.Name(rawValue: "AppleInterfaceThemeChangedNotification"),
             object: nil)
+    }
+
+    private func initCache() {
+        queue.async(flags: .barrier) {
+            if let duckduckgoHost = URL.duckDuckGo.host {
+                self.cache[duckduckgoHost] = CacheEntry(image: Favicon.duckDuckGo, isFromUserScript: true)
+            }
+        }
     }
 
     func fetchFavicon(_ faviconUrl: URL?, for host: String, isFromUserScript: Bool, completion: @escaping (NSImage?, Error?) -> Void) {
@@ -69,7 +83,7 @@ class LocalFaviconService: FaviconService {
                 return
             }
 
-            guard let url = faviconUrl ?? URL(string: "\(URL.Scheme.https.separated())\(host)/\(FaviconName.favicon.rawValue)") else {
+            guard let url = faviconUrl ?? URL(string: "\(URL.Scheme.https.separated())\(host)/\(FaviconName.favicon)") else {
                 mainQueueCompletion(nil, LocalFaviconServiceError.urlConstructionFailed)
                 return
             }
