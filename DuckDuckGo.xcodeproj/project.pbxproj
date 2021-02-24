@@ -37,7 +37,8 @@
 		4B6160FF25B15BB1007DE5B2 /* ContentBlockerRulesManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B6160FE25B15BB1007DE5B2 /* ContentBlockerRulesManager.swift */; };
 		4B65027525E5F2A70054432E /* DefaultBrowserPromptView.xib in Resources */ = {isa = PBXBuildFile; fileRef = 4B65027425E5F2A70054432E /* DefaultBrowserPromptView.xib */; };
 		4B65027A25E5F2B10054432E /* DefaultBrowserPromptView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B65027925E5F2B10054432E /* DefaultBrowserPromptView.swift */; };
-		4B65027F25E5FEBE0054432E /* DefaultBrowser.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B65027E25E5FEBE0054432E /* DefaultBrowser.swift */; };
+		4B65027F25E5FEBE0054432E /* Browser.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B65027E25E5FEBE0054432E /* Browser.swift */; };
+		4B65028A25E6CBF40054432E /* NibLoadable.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B65028925E6CBF40054432E /* NibLoadable.swift */; };
 		4B677431255DBEB800025BD8 /* BloomFilterWrapper.mm in Sources */ = {isa = PBXBuildFile; fileRef = 4B677424255DBEB800025BD8 /* BloomFilterWrapper.mm */; };
 		4B677432255DBEB800025BD8 /* httpsMobileV2BloomSpec.json in Resources */ = {isa = PBXBuildFile; fileRef = 4B677427255DBEB800025BD8 /* httpsMobileV2BloomSpec.json */; };
 		4B677433255DBEB800025BD8 /* httpsMobileV2Bloom.bin in Resources */ = {isa = PBXBuildFile; fileRef = 4B677428255DBEB800025BD8 /* httpsMobileV2Bloom.bin */; };
@@ -278,7 +279,8 @@
 		4B6160FE25B15BB1007DE5B2 /* ContentBlockerRulesManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentBlockerRulesManager.swift; sourceTree = "<group>"; };
 		4B65027425E5F2A70054432E /* DefaultBrowserPromptView.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = DefaultBrowserPromptView.xib; sourceTree = "<group>"; };
 		4B65027925E5F2B10054432E /* DefaultBrowserPromptView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DefaultBrowserPromptView.swift; sourceTree = "<group>"; };
-		4B65027E25E5FEBE0054432E /* DefaultBrowser.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DefaultBrowser.swift; sourceTree = "<group>"; };
+		4B65027E25E5FEBE0054432E /* Browser.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Browser.swift; sourceTree = "<group>"; };
+		4B65028925E6CBF40054432E /* NibLoadable.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NibLoadable.swift; sourceTree = "<group>"; };
 		4B677424255DBEB800025BD8 /* BloomFilterWrapper.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = BloomFilterWrapper.mm; sourceTree = "<group>"; };
 		4B677425255DBEB800025BD8 /* BloomFilterWrapper.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = BloomFilterWrapper.h; sourceTree = "<group>"; };
 		4B677427255DBEB800025BD8 /* httpsMobileV2BloomSpec.json */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.json; path = httpsMobileV2BloomSpec.json; sourceTree = "<group>"; };
@@ -715,7 +717,7 @@
 				85799C1725DEBB3F0007EC87 /* Logging.swift */,
 				4BB88B4F25B7BA2B006F6B06 /* TabInstrumentation.swift */,
 				85C6A29525CC1FFD00EEB5F1 /* UserDefaultsWrapper.swift */,
-				4B65027E25E5FEBE0054432E /* DefaultBrowser.swift */,
+				4B65027E25E5FEBE0054432E /* Browser.swift */,
 			);
 			path = Utilities;
 			sourceTree = "<group>";
@@ -1079,6 +1081,7 @@
 				AAC5E4E825D6BB4F007F5990 /* Popover.swift */,
 				AA361A3524EBF0B500EEC649 /* WindowDraggingView.swift */,
 				B6D7A2ED25D2418B002B2AE1 /* ShadowView.swift */,
+				4B65028925E6CBF40054432E /* NibLoadable.swift */,
 			);
 			path = View;
 			sourceTree = "<group>";
@@ -1708,7 +1711,7 @@
 				B6A5A27125B9377300AA7ADA /* StatePersistenceService.swift in Sources */,
 				AABEE69324A4E2F80043105B /* SuggestionsAPI.swift in Sources */,
 				B68458B025C7E76A00DC17B6 /* WindowManager+StateRestoration.swift in Sources */,
-				4B65027F25E5FEBE0054432E /* DefaultBrowser.swift in Sources */,
+				4B65027F25E5FEBE0054432E /* Browser.swift in Sources */,
 				B68458C525C7EA0C00DC17B6 /* TabCollection+NSSecureCoding.swift in Sources */,
 				4BB88B5B25B7BA50006F6B06 /* Instruments.swift in Sources */,
 				F44C130225C2DA0400426E3E /* NSAppearanceExtension.swift in Sources */,
@@ -1740,6 +1743,7 @@
 				AA8EDF2724923EC70071C2E8 /* StringExtension.swift in Sources */,
 				AA361A3624EBF0B500EEC649 /* WindowDraggingView.swift in Sources */,
 				B68458B825C7E8B200DC17B6 /* Tab+NSSecureCoding.swift in Sources */,
+				4B65028A25E6CBF40054432E /* NibLoadable.swift in Sources */,
 				AAA0CC472533833C0079BC96 /* OptionsButtonMenu.swift in Sources */,
 				4B677438255DBEB800025BD8 /* HTTPSUpgrade.xcdatamodeld in Sources */,
 				4B677434255DBEB800025BD8 /* HTTPSBloomFilterSpecification.swift in Sources */,

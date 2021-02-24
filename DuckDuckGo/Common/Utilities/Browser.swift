@@ -1,5 +1,5 @@
 //
-//  DefaultBrowser.swift
+//  Browser.swift
 //
 //  Copyright © 2021 DuckDuckGo. All rights reserved.
 //
@@ -18,11 +18,20 @@
 
 import Foundation
 
-struct DefaultBrowser {
+struct Browser {
 
-    static var isDefaultBrowser: Bool {
+    static var isDefault: Bool {
         let bundleID = Bundle.main.object(forInfoDictionaryKey: "CFBundleIdentifier") as? String
         return defaultBrowserBundleID == bundleID
+    }
+
+    static func becomeDefault() -> Bool {
+        guard let bundleID = Bundle.main.object(forInfoDictionaryKey: "CFBundleIdentifier") as? String else {
+            return false
+        }
+
+        let httpResult = LSSetDefaultHandlerForURLScheme("http" as CFString, bundleID as CFString)
+        return httpResult == 0
     }
 
     private static var defaultBrowserBundleID: String? {

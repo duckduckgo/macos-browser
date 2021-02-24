@@ -64,14 +64,29 @@ class BrowserTabViewController: NSViewController {
     /// 2. A URL is provided for the first time, so the webview should be added as a subview and the URL should be loaded.
     /// 3. A URL is provided after already adding the webview, so the webview should be reloaded.
     private func updateInterface(url: URL?) {
-        guard let url = url else {
+        guard url != nil else {
+            changeWebView()
             webView?.removeFromSuperview()
-            print("WEBVIEW: HIDING WEB VIEW")
+
+            if !Browser.isDefault {
+                addDefaultBrowserPrompt()
+            }
+
             return
         }
 
         changeWebView()
         reloadWebViewIfNeeded()
+    }
+
+    private func addDefaultBrowserPrompt() {
+        let defaultBrowserPromptView = DefaultBrowserPromptView.createFromNib()
+        defaultBrowserPromptView.translatesAutoresizingMaskIntoConstraints = false
+        self.view.addSubview(defaultBrowserPromptView)
+
+        defaultBrowserPromptView.topAnchor.constraint(equalTo: self.view.topAnchor).isActive = true
+        defaultBrowserPromptView.leadingAnchor.constraint(equalTo: self.view.leadingAnchor).isActive = true
+        defaultBrowserPromptView.trailingAnchor.constraint(equalTo: self.view.trailingAnchor).isActive = true
     }
 
     private func changeWebView() {

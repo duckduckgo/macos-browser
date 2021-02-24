@@ -32,35 +32,13 @@ class DefaultBrowserPromptView: NSView, NibLoadable {
     }
 
     @IBAction func setDefaultButtonClicked(_ sender: Any) {
-        print("Set default clicked")
+        if Browser.becomeDefault() {
+            // self.removeFromSuperview()
+        }
     }
 
     @IBAction func dismissPromptButtonClicked(_ sender: Any) {
         self.removeFromSuperview()
     }
 
-}
-
-protocol NibLoadable {
-
-    static var nibName: String { get }
-    static func createFromNib(in bundle: Bundle) -> Self
-
-}
-
-extension NibLoadable where Self: NSView {
-
-    static var nibName: String {
-        return String(describing: Self.self)
-    }
-
-    static func createFromNib(in bundle: Bundle = Bundle.main) -> Self {
-        var topLevelArray: NSArray?
-        bundle.loadNibNamed(NSNib.Name(nibName), owner: self, topLevelObjects: &topLevelArray)
-        let views = [Any](topLevelArray!).filter { $0 is Self }
-
-        // swiftlint:disable force_cast
-        return views.last as! Self
-        // swiftlint:enable force_cast
-    }
 }
