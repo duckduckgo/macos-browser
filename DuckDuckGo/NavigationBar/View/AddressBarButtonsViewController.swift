@@ -42,6 +42,7 @@ class AddressBarButtonsViewController: NSViewController {
     @IBOutlet weak var imageButtonWrapper: NSView!
     @IBOutlet weak var imageButton: NSButton!
     @IBOutlet weak var clearButton: NSButton!
+    @IBOutlet var progressIndicator: NSProgressIndicator!
 
     @IBOutlet weak var fireproofedButtonDivider: NSBox! {
         didSet {
@@ -63,6 +64,8 @@ class AddressBarButtonsViewController: NSViewController {
     private var selectedTabViewModelCancellable: AnyCancellable?
     private var urlCancellable: AnyCancellable?
     private var bookmarkListCancellable: AnyCancellable?
+    private var progressCancellable: AnyCancellable?
+    private var loadingCancellable: AnyCancellable?
 
     required init?(coder: NSCoder) {
         fatalError("AddressBarButtonsViewController: Bad initializer")
@@ -181,14 +184,34 @@ class AddressBarButtonsViewController: NSViewController {
     }
 
     private func subscribeToUrl() {
+
         urlCancellable?.cancel()
+        progressCancellable?.cancel()
+        loadingCancellable?.cancel()
 
         guard let selectedTabViewModel = tabCollectionViewModel.selectedTabViewModel else {
             updateBookmarkButtonImage()
             return
         }
+
+        progressIndicator?.isHidden = !selectedTabViewModel.isLoading
+
         urlCancellable = selectedTabViewModel.tab.$url.receive(on: DispatchQueue.main).sink { [weak self] _ in
             self?.updateBookmarkButtonImage()
+        }
+
+        progressCancellable = selectedTabViewModel.$progress.receive(on: DispatchQueue.main).sink { [weak self] value in
+            let target = max(0.1, value) * 125.0 // cut off at 80%
+            print("progress", target, value)
+            self?.progressIndicator.doubleValue = target
+            if target >= 100 {
+                self?.progressIndicator.isHidden = true
+            }
+        }
+
+        loadingCancellable = selectedTabViewModel.$isLoading.receive(on: DispatchQueue.main).sink { [weak self] value in
+            print("progress", self?.progressIndicator.doubleValue ?? 0, "isLoading", value)
+            self?.progressIndicator.isHidden = !value
         }
     }
 

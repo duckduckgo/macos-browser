@@ -213,13 +213,13 @@ class TabBarViewItem: NSCollectionViewItem {
             self?.setupMenu()
         }.store(in: &cancellables)
 
-        tabViewModel.$isLoading.sink { [weak self] isLoading in
-            if isLoading {
-                self?.loadingView.startAnimation()
-            } else {
-                self?.loadingView.stopAnimation()
-            }
-        }.store(in: &cancellables)
+//        tabViewModel.$isLoading.sink { [weak self] isLoading in
+//            if isLoading {
+//                self?.loadingView.startAnimation()
+//            } else {
+//                self?.loadingView.stopAnimation()
+//            }
+//        }.store(in: &cancellables)
     }
 
     func clear() {

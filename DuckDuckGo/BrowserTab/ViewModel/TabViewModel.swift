@@ -37,6 +37,7 @@ class TabViewModel {
     @Published var canReload: Bool = false
     @Published var canBeBookmarked: Bool = false
     @Published var isLoading: Bool = false
+    @Published var progress: Double = 0.0
     @Published var isErrorViewVisible: Bool = false {
         didSet {
             updateAddressBarStrings()
