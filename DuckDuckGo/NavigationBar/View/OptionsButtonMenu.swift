@@ -19,7 +19,7 @@
 import Cocoa
 import os.log
 import WebKit
-import BrowserServicesKit
+
 
 class OptionsButtonMenu: NSMenu {
 

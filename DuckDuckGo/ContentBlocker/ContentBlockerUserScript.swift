@@ -18,7 +18,7 @@
 
 import WebKit
 import os
-import BrowserServicesKit
+
 
 protocol ContentBlockerUserScriptDelegate: NSObjectProtocol {
 

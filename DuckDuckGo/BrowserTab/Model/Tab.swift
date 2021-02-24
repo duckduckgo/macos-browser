@@ -20,7 +20,7 @@ import Cocoa
 import WebKit
 import os
 import Combine
-import BrowserServicesKit
+
 
 protocol TabDelegate: class {
 
