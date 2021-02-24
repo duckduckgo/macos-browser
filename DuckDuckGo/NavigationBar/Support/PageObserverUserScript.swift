@@ -48,7 +48,6 @@ class PageObserverUserScript: NSObject, StaticUserScript {
 
     func userContentController(_ userContentController: WKUserContentController, didReceive message: WKScriptMessage) {
         if message.frameInfo.isMainFrame {
-            print("***", #function)
             delegate?.pageDOMLoaded()
         }
     }
