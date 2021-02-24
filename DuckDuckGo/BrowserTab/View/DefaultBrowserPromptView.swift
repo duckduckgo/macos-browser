@@ -32,9 +32,7 @@ class DefaultBrowserPromptView: NSView, NibLoadable {
     }
 
     @IBAction func setDefaultButtonClicked(_ sender: Any) {
-        if Browser.becomeDefault() {
-            // self.removeFromSuperview()
-        }
+        Browser.becomeDefault()
     }
 
     @IBAction func dismissPromptButtonClicked(_ sender: Any) {

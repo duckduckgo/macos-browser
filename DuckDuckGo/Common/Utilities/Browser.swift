@@ -25,13 +25,25 @@ struct Browser {
         return defaultBrowserBundleID == bundleID
     }
 
-    static func becomeDefault() -> Bool {
+    static func becomeDefault() {
+        if !presentDefaultBrowserPromptIfPossible() {
+            openSystemPreferences()
+        }
+    }
+
+    private static func presentDefaultBrowserPromptIfPossible() -> Bool {
         guard let bundleID = Bundle.main.object(forInfoDictionaryKey: "CFBundleIdentifier") as? String else {
             return false
         }
 
-        let httpResult = LSSetDefaultHandlerForURLScheme("http" as CFString, bundleID as CFString)
-        return httpResult == 0
+         let httpResult = LSSetDefaultHandlerForURLScheme("http" as CFString, bundleID as CFString)
+         return httpResult == 0
+    }
+
+    private static func openSystemPreferences() {
+        // Apple provides a more general URL for opening System Preferences in the form of "x-apple.systempreferences:com.apple.preference" but it
+        // doesn't support opening the General prefpane directly.
+        NSWorkspace.shared.open(URL(fileURLWithPath: "/System/Library/PreferencePanes/Appearance.prefPane"))
     }
 
     private static var defaultBrowserBundleID: String? {
