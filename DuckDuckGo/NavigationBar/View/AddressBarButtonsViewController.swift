@@ -212,10 +212,10 @@ class AddressBarButtonsViewController: NSViewController {
         loadingCancellable = selectedTabViewModel.$isLoading.receive(on: DispatchQueue.main).sink { [weak self] value in
             if value {
                 self?.progressIndicator.isHidden = false
-                self?.progressIndicator.doubleValue = 10
+                self?.progressIndicator.doubleValue = 20
             } else if self?.progressIndicator.doubleValue ?? 0 < 100 {
                 self?.progressIndicator.doubleValue = 100
-                DispatchQueue.main.asyncAfter(deadline: .now() + 1.0) {
+                DispatchQueue.main.asyncAfter(deadline: .now() + 0.7) {
                     self?.progressIndicator.isHidden = true
                 }
             }
