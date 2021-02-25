@@ -168,7 +168,7 @@ class BrowserTabViewController: NSViewController {
 extension BrowserTabViewController: TabDelegate {
 
     func tab(_ tab: Tab, requestedOpenExternalURL url: URL) {
-        print("***", #function, url)
+        // TODO show the prompt
     }
 
     func tabDidStartNavigation(_ tab: Tab) {
