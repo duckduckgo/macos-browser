@@ -50,6 +50,7 @@ class AppDelegate: NSObject, NSApplicationDelegate {
         Database.shared.loadStore()
         HTTPSUpgrade.shared.loadDataAsync()
         LocalBookmarkManager.shared.loadBookmarks()
+        _=ConfigurationManager.shared
 
         if !isRunningTests {
             stateRestorationManager.applicationDidFinishLaunching()
