@@ -139,6 +139,7 @@ extension EmailManager: EmailUserScriptDelegate {
     
     public func emailUserScript(_ emailUserScript: EmailUserScript,
                                 didRequestAliasAndRequiresUserPermission requiresUserPermission: Bool,
+                                shouldConsumeAliasIfProvided: Bool,
                                 completionHandler: @escaping AliasCompletion) {
             
         getAliasEmailIfNeeded { [weak self] newAlias, error in
@@ -157,14 +158,18 @@ extension EmailManager: EmailUserScriptDelegate {
                 delegate.emailManager(self, didRequestPermissionToProvideAlias: newAlias) { [weak self] permissionsGranted in
                     if permissionsGranted {
                         completionHandler(newAlias, nil)
-                        self?.consumeAliasAndReplace()
+                        if shouldConsumeAliasIfProvided {
+                            self?.consumeAliasAndReplace()
+                        }
                     } else {
                         completionHandler(nil, .userRefused)
                     }
                 }
             } else {
                 completionHandler(newAlias, nil)
-                self.consumeAliasAndReplace()
+                if shouldConsumeAliasIfProvided {
+                    self.consumeAliasAndReplace()
+                }
             }
         }
     }

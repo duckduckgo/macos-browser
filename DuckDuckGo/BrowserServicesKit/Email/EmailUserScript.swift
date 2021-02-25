@@ -23,6 +23,7 @@ public protocol EmailUserScriptDelegate: class {
     func emailUserScriptDidRequestSignedInStatus(emailUserScript: EmailUserScript) -> Bool
     func emailUserScript(_ emailUserScript: EmailUserScript,
                          didRequestAliasAndRequiresUserPermission requiresUserPermission: Bool,
+                         shouldConsumeAliasIfProvided: Bool,
                          completionHandler: @escaping AliasCompletion)
     func emailUserScriptDidRequestRefreshAlias(emailUserScript: EmailUserScript)
     func emailUserScript(_ emailUserScript: EmailUserScript, didRequestStoreToken token: String, username: String)
@@ -78,9 +79,10 @@ public class EmailUserScript: NSObject, UserScript {
             
         case .getAlias:
             guard let dict = message.body as? [String: Any],
-                  let requiresUserPermission = dict["requiresUserPermission"] as? Bool else { return }
+                  let requiresUserPermission = dict["requiresUserPermission"] as? Bool,
+                  let shouldConsumeAliasIfProvided = dict["shouldConsumeAliasIfProvided"] as? Bool else { return }
 
-            delegate?.emailUserScript(self, didRequestAliasAndRequiresUserPermission: requiresUserPermission) { alias, _ in
+            delegate?.emailUserScript(self, didRequestAliasAndRequiresUserPermission: requiresUserPermission, shouldConsumeAliasIfProvided: shouldConsumeAliasIfProvided) { alias, _ in
                 guard let alias = alias else {
                     return
                 }
