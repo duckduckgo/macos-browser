@@ -344,7 +344,8 @@ extension Tab: WKNavigationDelegate {
         }
 
         let isLinkActivated = navigationAction.navigationType == .linkActivated
-        if isLinkActivated && NSApp.isCommandPressed {
+        let isMiddleClicked = navigationAction.buttonNumber >= 2
+        if isLinkActivated && NSApp.isCommandPressed || isMiddleClicked {
             decisionHandler(.cancel)
             delegate?.tab(self, requestedNewTab: navigationAction.request.url, selected: NSApp.isShiftPressed)
             return
