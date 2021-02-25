@@ -222,6 +222,7 @@
 		B6D7A2EE25D2418B002B2AE1 /* ShadowView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B6D7A2ED25D2418B002B2AE1 /* ShadowView.swift */; };
 		F41D174125CB131900472416 /* NSColorExtension.swift in Sources */ = {isa = PBXBuildFile; fileRef = F41D174025CB131900472416 /* NSColorExtension.swift */; };
 		F44C130225C2DA0400426E3E /* NSAppearanceExtension.swift in Sources */ = {isa = PBXBuildFile; fileRef = F44C130125C2DA0400426E3E /* NSAppearanceExtension.swift */; };
+		F498DCBB25E7D508008197FE /* BrowserServicesKit in Frameworks */ = {isa = PBXBuildFile; productRef = F498DCBA25E7D508008197FE /* BrowserServicesKit */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -473,6 +474,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				F498DCBB25E7D508008197FE /* BrowserServicesKit in Frameworks */,
 				85AE2FF224A33A2D002D507F /* WebKit.framework in Frameworks */,
 				4B82E9B325B69E3E00656FE7 /* TrackerRadarKit in Frameworks */,
 			);
@@ -1448,6 +1450,7 @@
 			name = "DuckDuckGo Privacy Browser";
 			packageProductDependencies = (
 				4B82E9B225B69E3E00656FE7 /* TrackerRadarKit */,
+				F498DCBA25E7D508008197FE /* BrowserServicesKit */,
 			);
 			productName = DuckDuckGo;
 			productReference = AA585D7E248FD31100E9A3E2 /* DuckDuckGo Privacy Browser.app */;
@@ -1523,6 +1526,7 @@
 			mainGroup = AA585D75248FD31100E9A3E2;
 			packageReferences = (
 				4B82E9B125B69E3E00656FE7 /* XCRemoteSwiftPackageReference "TrackerRadarKit" */,
+				F498DCB925E7D508008197FE /* XCRemoteSwiftPackageReference "BrowserServicesKit" */,
 			);
 			productRefGroup = AA585D7F248FD31100E9A3E2 /* Products */;
 			projectDirPath = "";
@@ -2201,6 +2205,14 @@
 				minimumVersion = 1.0.2;
 			};
 		};
+		F498DCB925E7D508008197FE /* XCRemoteSwiftPackageReference "BrowserServicesKit" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://dub.duckduckgo.com/duckduckgo/BrowserServicesKit";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 0.1.0;
+			};
+		};
 /* End XCRemoteSwiftPackageReference section */
 
 /* Begin XCSwiftPackageProductDependency section */
@@ -2208,6 +2220,11 @@
 			isa = XCSwiftPackageProductDependency;
 			package = 4B82E9B125B69E3E00656FE7 /* XCRemoteSwiftPackageReference "TrackerRadarKit" */;
 			productName = TrackerRadarKit;
+		};
+		F498DCBA25E7D508008197FE /* BrowserServicesKit */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = F498DCB925E7D508008197FE /* XCRemoteSwiftPackageReference "BrowserServicesKit" */;
+			productName = BrowserServicesKit;
 		};
 /* End XCSwiftPackageProductDependency section */
 

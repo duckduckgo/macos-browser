@@ -2,6 +2,15 @@
   "object": {
     "pins": [
       {
+        "package": "BrowserServicesKit",
+        "repositoryURL": "https://dub.duckduckgo.com/duckduckgo/BrowserServicesKit",
+        "state": {
+          "branch": null,
+          "revision": "76b61d7c37b5d9ffeb5cf7ef87466359ba2c26f4",
+          "version": "0.1.0"
+        }
+      },
+      {
         "package": "TrackerRadarKit",
         "repositoryURL": "https://github.com/duckduckgo/TrackerRadarKit.git",
         "state": {
