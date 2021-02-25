@@ -18,6 +18,7 @@
 
 import WebKit
 import os
+import BrowserServicesKit
 
 protocol ContentBlockerUserScriptDelegate: NSObjectProtocol {
 
@@ -27,7 +28,7 @@ protocol ContentBlockerUserScriptDelegate: NSObjectProtocol {
 
 }
 
-class ContentBlockerUserScript: UserScript {
+class ContentBlockerUserScript: NSObject, UserScript {
 
     struct TrackerDetectedKey {
         static let protectionId = "protectionId"
@@ -36,17 +37,19 @@ class ContentBlockerUserScript: UserScript {
         static let url = "url"
         static let isSurrogate = "isSurrogate"
     }
-
+    
+    var injectionTime: WKUserScriptInjectionTime = .atDocumentStart
+    var forMainFrameOnly = false
+    let messageNames = ["trackerDetectedMessage"]
+    var source: String
+        
     init(scriptSource: ScriptSourceProviding = DefaultScriptSourceProvider.shared) {
-        super.init(source: scriptSource.contentBlockerSource,
-                   messageNames: Self.messageNames,
-                   injectionTime: .atDocumentStart,
-                   forMainFrameOnly: false)
+        source = scriptSource.contentBlockerSource
     }
 
     weak var delegate: ContentBlockerUserScriptDelegate?
 
-    override func userContentController(_ userContentController: WKUserContentController, didReceive message: WKScriptMessage) {
+    func userContentController(_ userContentController: WKUserContentController, didReceive message: WKScriptMessage) {
         guard let delegate = delegate else { return }
         guard delegate.contentBlockerUserScriptShouldProcessTrackers(self) else { return }
 
@@ -68,10 +71,4 @@ class ContentBlockerUserScript: UserScript {
         let entity = TrackerRadarManager.shared.findEntity(byName: knownTracker?.owner?.name ?? "")
         return DetectedTracker(url: urlString, knownTracker: knownTracker, entity: entity, blocked: blocked)
     }
-}
-
-extension ContentBlockerUserScript {
-
-    static let messageNames = ["trackerDetectedMessage"]
-
 }
