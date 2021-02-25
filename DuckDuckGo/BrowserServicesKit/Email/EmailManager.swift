@@ -169,6 +169,10 @@ extension EmailManager: EmailUserScriptDelegate {
         }
     }
     
+    public func emailUserScriptDidRequestRefreshAlias(emailUserScript: EmailUserScript) {
+        self.consumeAliasAndReplace()
+    }
+    
     public func emailUserScript(_ emailUserScript: EmailUserScript, didRequestStoreToken token: String, username: String) {
         storeToken(token, username: username)
         NotificationCenter.default.post(name: .emailDidSignIn, object: self)

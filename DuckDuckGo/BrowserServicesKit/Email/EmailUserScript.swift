@@ -24,6 +24,7 @@ public protocol EmailUserScriptDelegate: class {
     func emailUserScript(_ emailUserScript: EmailUserScript,
                          didRequestAliasAndRequiresUserPermission requiresUserPermission: Bool,
                          completionHandler: @escaping AliasCompletion)
+    func emailUserScriptDidRequestRefreshAlias(emailUserScript: EmailUserScript)
     func emailUserScript(_ emailUserScript: EmailUserScript, didRequestStoreToken token: String, username: String)
 }
 
@@ -34,6 +35,7 @@ public class EmailUserScript: NSObject, UserScript {
         case checkSignedInStatus = "emailHandlerCheckAppSignedInStatus"
         case checkCanInjectAutofill = "emailHandlerCheckCanInjectAutoFill"
         case getAlias = "emailHandlerGetAlias"
+        case refreshAlias = "emailHandlerRefreshAlias"
     }
     
     public weak var delegate: EmailUserScriptDelegate?
@@ -85,6 +87,8 @@ public class EmailUserScript: NSObject, UserScript {
                 let jsString = EmailUserScript.postMessageJSString(withPropertyString: "type: 'getAliasResponse', alias: \"\(alias)\"")
                 self.webView?.evaluateJavaScript(jsString)
             }
+        case .refreshAlias:
+            delegate?.emailUserScriptDidRequestRefreshAlias(emailUserScript: self)
         }
     }
     
