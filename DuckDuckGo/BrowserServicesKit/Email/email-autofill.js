@@ -1306,7 +1306,8 @@ var AppleDeviceInterface = function AppleDeviceInterface() {
   this.getAlias = function () {
     return sendAndWaitForAnswer(function () {
       return window.webkit.messageHandlers['emailHandlerGetAlias'].postMessage({
-        requiresUserPermission: !isMacOSApp
+        requiresUserPermission: !isMacOSApp,
+        shouldConsumeAliasIfProvided: !isMacOSApp
       });
     }, 'getAliasResponse').then(function (_ref2) {
       var alias = _ref2.alias;
