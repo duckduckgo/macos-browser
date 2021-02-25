@@ -17,6 +17,7 @@
 //
 
 import Foundation
+import Combine
 
 protocol ScriptSourceProviding {
 
@@ -24,14 +25,24 @@ protocol ScriptSourceProviding {
     var contentBlockerRulesSource: String { get }
     var contentBlockerSource: String { get }
 
+    var sourceUpdatedPublisher: AnyPublisher<Void, Never> { get }
+
 }
 
 class DefaultScriptSourceProvider: ScriptSourceProviding {
 
     static var shared: ScriptSourceProviding = DefaultScriptSourceProvider()
 
+    @Published
     private(set) var contentBlockerRulesSource: String = ""
+    @Published
     private(set) var contentBlockerSource: String = ""
+
+    private let sourceUpdatedSubject = PassthroughSubject<Void, Never>()
+
+    var sourceUpdatedPublisher: AnyPublisher<Void, Never> {
+        sourceUpdatedSubject.eraseToAnyPublisher()
+    }
 
     let configStorage: ConfigurationStoring
 
@@ -43,6 +54,7 @@ class DefaultScriptSourceProvider: ScriptSourceProviding {
     func reload() {
         contentBlockerRulesSource = buildContentBlockerRulesSource()
         contentBlockerSource = buildContentBlockerSource()
+        sourceUpdatedSubject.send( () )
     }
 
     private func buildContentBlockerRulesSource() -> String {
@@ -55,7 +67,7 @@ class DefaultScriptSourceProvider: ScriptSourceProviding {
     private func buildContentBlockerSource() -> String {
 
         // Use sensible defaults in case the upstream data is unparsable
-        let trackerData = TrackerRadarManager.shared.encodedTrackerData ?? "{}"
+        let trackerData = TrackerRadarManager.shared.encodedTrackerData
         let surrogates = configStorage.loadData(for: .surrogates)?.utf8String() ?? ""
         let unprotectedSites = configStorage.loadData(for: .temporaryUnprotectedSites)?.utf8String() ?? ""
 

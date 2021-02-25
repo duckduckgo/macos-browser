@@ -18,7 +18,7 @@
 
 import WebKit
 
-class ContentBlockerRulesUserScript: UserScript {
+final class ContentBlockerRulesUserScript: NSObject, UserScript {
 
     struct ContentBlockerKey {
         static let url = "url"
@@ -28,16 +28,19 @@ class ContentBlockerRulesUserScript: UserScript {
     }
 
     init(scriptSource: ScriptSourceProviding = DefaultScriptSourceProvider.shared) {
-
-        super.init(source: scriptSource.contentBlockerRulesSource,
-                   messageNames: Self.messageNames,
-                   injectionTime: .atDocumentStart,
-                   forMainFrameOnly: false)
+        self.script = WKUserScript(from: scriptSource.contentBlockerRulesSource,
+                                   injectionTime: .atDocumentStart,
+                                   forMainFrameOnly: false)
     }
 
+    private init(script: WKUserScript) {
+        self.script = script
+    }
+
+    let script: WKUserScript
     weak var delegate: ContentBlockerUserScriptDelegate?
 
-    override func userContentController(_ userContentController: WKUserContentController, didReceive message: WKScriptMessage) {
+    func userContentController(_ userContentController: WKUserContentController, didReceive message: WKScriptMessage) {
         guard let delegate = delegate else { return }
         guard delegate.contentBlockerUserScriptShouldProcessTrackers(self) else { return }
 
@@ -73,5 +76,13 @@ class ContentBlockerRulesUserScript: UserScript {
 extension ContentBlockerRulesUserScript {
 
     static let messageNames = ["processRule"]
+
+}
+
+extension ContentBlockerRulesUserScript: NSCopying {
+
+    func copy(with zone: NSZone? = nil) -> Any {
+        return Self.init(script: self.script)
+    }
 
 }

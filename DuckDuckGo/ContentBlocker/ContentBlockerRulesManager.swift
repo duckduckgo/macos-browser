@@ -20,40 +20,47 @@ import Foundation
 import WebKit
 import os.log
 import TrackerRadarKit
+import Combine
 
 class ContentBlockerRulesManager {
 
     static let shared = ContentBlockerRulesManager()
 
-    var blockingRules: WKContentRuleList?
+    private let blockingRulesSubject = CurrentValueSubject<WKContentRuleList?, Never>(nil)
+    var blockingRules: AnyPublisher<WKContentRuleList?, Never> {
+        blockingRulesSubject.eraseToAnyPublisher()
+    }
 
-    private init() {}
+    private init() {
+        compileRules()
+    }
 
-    func compileRules(completion: ((WKContentRuleList?) -> Void)?) {
-        guard let trackerData = TrackerRadarManager.shared.trackerData else {
-            completion?(nil)
-            return
+    func compileRules(completion: ((WKContentRuleList?) -> Void)? = nil) {
+        let trackerData = TrackerRadarManager.shared.trackerData
+
+        DispatchQueue.global(qos: .background).async { [unowned self] in
+            self.compileRules(with: trackerData, completion: completion)
         }
+    }
 
+    private func compileRules(with trackerData: TrackerData, completion: ((WKContentRuleList?) -> Void)?) {
         let rules = ContentBlockerRulesBuilder(trackerData: trackerData).buildRules(withExceptions: [],
                                                                                     andTemporaryUnprotectedDomains: [])
+        guard let data = try? JSONEncoder().encode(rules) else { return }
 
-        guard let data = try? JSONEncoder().encode(rules) else {
-            return
-        }
-
-        DispatchQueue.global(qos: .background).async {
-            if let store = WKContentRuleListStore.default() {
-                let ruleList = String(data: data, encoding: .utf8)!
-                store.compileContentRuleList(forIdentifier: "tds", encodedContentRuleList: ruleList) { [weak self] ruleList, error in
-                    self?.blockingRules = ruleList
-                    completion?(ruleList)
-                    if let error = error {
-                        os_log("Failed to compile rules %{public}s", type: .error, error.localizedDescription)
-                    }
+        if let store = WKContentRuleListStore.default() {
+            let ruleList = String(data: data, encoding: .utf8)!
+            store.compileContentRuleList(forIdentifier: "tds", encodedContentRuleList: ruleList) { [unowned self] ruleList, error in
+                self.blockingRulesSubject.send(ruleList)
+                completion?(ruleList)
+                if let error = error {
+                    os_log("Failed to compile rules %{public}s", type: .error, error.localizedDescription)
                 }
-            } else {
-                os_log("Failed to access the default WKContentRuleListStore for rules compiliation checking", type: .error)
+            }
+        } else {
+            os_log("Failed to access the default WKContentRuleListStore for rules compiliation checking", type: .error)
+            DispatchQueue.main.async {
+                completion?(nil)
             }
         }
     }

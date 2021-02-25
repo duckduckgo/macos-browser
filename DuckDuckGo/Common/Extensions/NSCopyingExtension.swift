@@ -1,7 +1,7 @@
 //
-//  UserScript.swift
+//  NSCopyingExtension.swift
 //
-//  Copyright © 2020 DuckDuckGo. All rights reserved.
+//  Copyright © 2021 DuckDuckGo. All rights reserved.
 //
 //  Licensed under the Apache License, Version 2.0 (the "License");
 //  you may not use this file except in compliance with the License.
@@ -17,16 +17,13 @@
 //
 
 import Foundation
-import WebKit
-import Combine
 
-protocol UserScript: WKScriptMessageHandler {
+extension NSCopying {
 
-    static var messageNames: [String] { get }
-    var script: WKUserScript { get }
-
-}
-
-extension UserScript {
-    var messageNames: [String] { Self.messageNames }
+    func makeCopy() -> Self {
+        // swiftlint:disable force_cast
+        self.copy() as! Self
+        // swiftlint:enable force_cast
+    }
+    
 }

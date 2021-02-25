@@ -22,7 +22,7 @@ import WebKit
 extension WKUserContentController {
 
     func add(userScript: UserScript) {
-        addUserScript(userScript)
+        addUserScript(userScript.script)
 
         for messageName in userScript.messageNames {
             if #available(OSX 11.0, *) {
@@ -33,4 +33,14 @@ extension WKUserContentController {
         }
     }
 
+    func removeScriptMessageHandlers(forNames messageNames: [String]) {
+        messageNames.forEach {
+            if #available(OSX 11.0, *) {
+                removeScriptMessageHandler(forName: $0, contentWorld: .defaultClient)
+            } else {
+                removeScriptMessageHandler(forName: $0)
+            }
+        }
+    }
+    
 }

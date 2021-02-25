@@ -1,7 +1,7 @@
 //
-//  UserScript.swift
+//  NSObject+lifetimeDisposeBag.swift
 //
-//  Copyright © 2020 DuckDuckGo. All rights reserved.
+//  Copyright © 2021 DuckDuckGo. All rights reserved.
 //
 //  Licensed under the Apache License, Version 2.0 (the "License");
 //  you may not use this file except in compliance with the License.
@@ -17,16 +17,19 @@
 //
 
 import Foundation
-import WebKit
 import Combine
 
-protocol UserScript: WKScriptMessageHandler {
+extension NSObject {
 
-    static var messageNames: [String] { get }
-    var script: WKUserScript { get }
+    private static let lifetimeDisposeBagKey = UnsafeRawPointer(bitPattern: "lifetimeDisposeBagKey".hashValue)!
 
-}
+    var lifetimeDisposeBag: Set<AnyCancellable> {
+        get {
+            objc_getAssociatedObject(self, Self.lifetimeDisposeBagKey) as? Set<AnyCancellable> ?? []
+        }
+        set {
+            objc_setAssociatedObject(self, Self.lifetimeDisposeBagKey, newValue, .OBJC_ASSOCIATION_RETAIN)
+        }
+    }
 
-extension UserScript {
-    var messageNames: [String] { Self.messageNames }
 }

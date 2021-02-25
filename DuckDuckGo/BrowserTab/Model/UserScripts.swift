@@ -18,18 +18,48 @@
 
 import Foundation
 
-class UserScripts {
+final class UserScripts {
 
-    let faviconScript = FaviconUserScript()
-    let html5downloadScript = HTML5DownloadUserScript()
-    let contextMenuScript = ContextMenuUserScript()
-    let findInPageScript = FindInPageUserScript()
-    let loginDetectionUserScript = LoginFormDetectionUserScript()
-    let contentBlockerScript = ContentBlockerUserScript()
-    let contentBlockerRulesScript = ContentBlockerRulesUserScript()
-    let debugScript = DebugUserScript()
+    let faviconScript: FaviconUserScript
+    let html5downloadScript: HTML5DownloadUserScript
+    let contextMenuScript: ContextMenuUserScript
+    let findInPageScript: FindInPageUserScript
+    let loginDetectionUserScript: LoginFormDetectionUserScript
+    let contentBlockerScript: ContentBlockerUserScript
+    let contentBlockerRulesScript: ContentBlockerRulesUserScript
+    let debugScript: DebugUserScript
 
-    lazy var userScripts = [
+    convenience init() {
+        self.init(faviconScript: FaviconUserScript(),
+                  html5downloadScript: HTML5DownloadUserScript(),
+                  contextMenuScript: ContextMenuUserScript(),
+                  findInPageScript: FindInPageUserScript(),
+                  loginDetectionUserScript: LoginFormDetectionUserScript(),
+                  contentBlockerScript: ContentBlockerUserScript(),
+                  contentBlockerRulesScript: ContentBlockerRulesUserScript(),
+                  debugScript: DebugUserScript())
+    }
+
+    private init(faviconScript: FaviconUserScript,
+                 html5downloadScript: HTML5DownloadUserScript,
+                 contextMenuScript: ContextMenuUserScript,
+                 findInPageScript: FindInPageUserScript,
+                 loginDetectionUserScript: LoginFormDetectionUserScript,
+                 contentBlockerScript: ContentBlockerUserScript,
+                 contentBlockerRulesScript: ContentBlockerRulesUserScript,
+                 debugScript: DebugUserScript) {
+
+        self.faviconScript = faviconScript
+        self.html5downloadScript = html5downloadScript
+        self.contextMenuScript = contextMenuScript
+        self.findInPageScript = findInPageScript
+        self.loginDetectionUserScript = loginDetectionUserScript
+        self.contentBlockerScript = contentBlockerScript
+        self.contentBlockerRulesScript = contentBlockerRulesScript
+        self.debugScript = debugScript
+    }
+
+    lazy var userScripts: [UserScript] = [
         self.debugScript,
         self.faviconScript,
         self.html5downloadScript,
@@ -50,14 +80,23 @@ class UserScripts {
         webView.configuration.userContentController.removeAllUserScripts()
         
         userScripts.forEach {
-            $0.messageNames.forEach {
-                if #available(OSX 11.0, *) {
-                    webView.configuration.userContentController.removeScriptMessageHandler(forName: $0, contentWorld: .defaultClient)
-                } else {
-                    webView.configuration.userContentController.removeScriptMessageHandler(forName: $0)
-                }
-            }
+            webView.configuration.userContentController.removeScriptMessageHandlers(forNames: $0.messageNames)
         }
+    }
+
+}
+
+extension UserScripts: NSCopying {
+
+    func copy(with zone: NSZone? = nil) -> Any {
+        return UserScripts(faviconScript: faviconScript.makeCopy(),
+                           html5downloadScript: html5downloadScript.makeCopy(),
+                           contextMenuScript: contextMenuScript.makeCopy(),
+                           findInPageScript: findInPageScript.makeCopy(),
+                           loginDetectionUserScript: loginDetectionUserScript.makeCopy(),
+                           contentBlockerScript: contentBlockerScript.makeCopy(),
+                           contentBlockerRulesScript: contentBlockerRulesScript.makeCopy(),
+                           debugScript: debugScript.makeCopy())
     }
 
 }

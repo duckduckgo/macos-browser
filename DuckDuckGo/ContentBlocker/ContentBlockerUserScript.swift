@@ -27,7 +27,7 @@ protocol ContentBlockerUserScriptDelegate: NSObjectProtocol {
 
 }
 
-class ContentBlockerUserScript: UserScript {
+final class ContentBlockerUserScript: NSObject, UserScript {
 
     struct TrackerDetectedKey {
         static let protectionId = "protectionId"
@@ -38,15 +38,19 @@ class ContentBlockerUserScript: UserScript {
     }
 
     init(scriptSource: ScriptSourceProviding = DefaultScriptSourceProvider.shared) {
-        super.init(source: scriptSource.contentBlockerSource,
-                   messageNames: Self.messageNames,
-                   injectionTime: .atDocumentStart,
-                   forMainFrameOnly: false)
+        self.script = WKUserScript(from: scriptSource.contentBlockerSource,
+                                   injectionTime: .atDocumentStart,
+                                   forMainFrameOnly: false)
     }
 
+    private init(script: WKUserScript) {
+        self.script = script
+    }
+
+    let script: WKUserScript
     weak var delegate: ContentBlockerUserScriptDelegate?
 
-    override func userContentController(_ userContentController: WKUserContentController, didReceive message: WKScriptMessage) {
+    func userContentController(_ userContentController: WKUserContentController, didReceive message: WKScriptMessage) {
         guard let delegate = delegate else { return }
         guard delegate.contentBlockerUserScriptShouldProcessTrackers(self) else { return }
 
@@ -73,5 +77,13 @@ class ContentBlockerUserScript: UserScript {
 extension ContentBlockerUserScript {
 
     static let messageNames = ["trackerDetectedMessage"]
+
+}
+
+extension ContentBlockerUserScript: NSCopying {
+
+    func copy(with zone: NSZone? = nil) -> Any {
+        return Self.init(script: self.script)
+    }
 
 }

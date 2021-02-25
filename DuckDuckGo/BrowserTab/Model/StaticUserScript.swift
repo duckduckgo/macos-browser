@@ -1,7 +1,7 @@
 //
-//  UserScript.swift
+//  StaticUserScript.swift
 //
-//  Copyright © 2020 DuckDuckGo. All rights reserved.
+//  Copyright © 2021 DuckDuckGo. All rights reserved.
 //
 //  Licensed under the Apache License, Version 2.0 (the "License");
 //  you may not use this file except in compliance with the License.
@@ -18,15 +18,21 @@
 
 import Foundation
 import WebKit
-import Combine
 
-protocol UserScript: WKScriptMessageHandler {
+protocol StaticUserScript: UserScript {
 
-    static var messageNames: [String] { get }
-    var script: WKUserScript { get }
+    static var script: WKUserScript { get }
+
+    init()
 
 }
 
-extension UserScript {
-    var messageNames: [String] { Self.messageNames }
+extension StaticUserScript {
+
+    var script: WKUserScript { Self.script }
+
+    func makeCopy() -> Self {
+        return Self.init()
+    }
+
 }

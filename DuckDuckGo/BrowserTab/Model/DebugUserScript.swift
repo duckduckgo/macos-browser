@@ -19,7 +19,7 @@
 import WebKit
 import os
 
-class DebugUserScript: UserScript {
+final class DebugUserScript: NSObject, StaticUserScript {
 
     enum MessageNames: String, CaseIterable {
 
@@ -28,16 +28,10 @@ class DebugUserScript: UserScript {
 
     }
 
-    init() {
-        super.init(source: Self.source,
-                   messageNames: Self.messageNames,
-                   injectionTime: .atDocumentStart,
-                   forMainFrameOnly: false)
-    }
-
+    static let script = WKUserScript(from: source, injectionTime: .atDocumentStart, forMainFrameOnly: false)
     weak var instrumentation: TabInstrumentation?
 
-    override func userContentController(_ userContentController: WKUserContentController, didReceive message: WKScriptMessage) {
+    func userContentController(_ userContentController: WKUserContentController, didReceive message: WKScriptMessage) {
         let messageType = MessageNames(rawValue: message.name)
 
         switch messageType {

@@ -18,6 +18,7 @@
 
 import Foundation
 import TrackerRadarKit
+import Combine
 
 class TrackerRadarManager {
 
@@ -36,33 +37,25 @@ class TrackerRadarManager {
 
     static let shared = TrackerRadarManager()
 
-    private(set) var trackerData: TrackerData! {
-        didSet {
-            let encodedData = try? JSONEncoder().encode(trackerData)
-            encodedTrackerData = String(data: encodedData!, encoding: .utf8)!
-        }
-    }
+    private(set) var trackerData: TrackerData
+    private(set) var encodedTrackerData: String
 
-    private(set) var encodedTrackerData: String!
     private var configDataStore: ConfigurationStoring
 
     init(configDataStore: ConfigurationStoring = DefaultConfigurationStorage.shared) {
         self.configDataStore = configDataStore
-        reload()
+        (self.trackerData, self.encodedTrackerData) = Self.loadData()
     }
 
-    @discardableResult
-    public func reload() -> DataSet {
+    private class func loadData() -> (trackerData: TrackerData, text: String) {
 
-        let dataSet: DataSet
-        let data: Data
+        let trackerData: TrackerData
+        var data: Data
 
         if let loadedData = DefaultConfigurationStorage.shared.loadData(for: .trackerRadar) {
             data = loadedData
-            dataSet = .downloaded
         } else {
-            data = Self.loadEmbeddedAsData()
-            dataSet = .embedded
+            data = loadEmbeddedAsData()
         }
 
         do {
@@ -70,12 +63,15 @@ class TrackerRadarManager {
             trackerData = try JSONDecoder().decode(TrackerData.self, from: data)
         } catch {
             // This should NEVER fail
-            let trackerData = try? JSONDecoder().decode(TrackerData.self, from: Self.loadEmbeddedAsData())
-            self.trackerData = trackerData!
-            return .embeddedFallback
+            data = loadEmbeddedAsData()
+            trackerData = (try? JSONDecoder().decode(TrackerData.self, from: data))!
         }
 
-        return dataSet
+        return (trackerData, data.utf8String()!)
+    }
+
+    public func reload() {
+        (self.trackerData, self.encodedTrackerData) = Self.loadData()
     }
 
     func findTracker(forUrl url: String) -> KnownTracker? {

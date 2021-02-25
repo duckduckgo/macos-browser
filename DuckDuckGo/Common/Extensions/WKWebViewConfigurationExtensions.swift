@@ -17,6 +17,7 @@
 //
 
 import WebKit
+import Combine
 
 extension WKWebViewConfiguration {
 
@@ -35,24 +36,25 @@ extension WKWebViewConfiguration {
      }
 
     private func installContentBlockingRules() {
-        func addRulesToController(rules: WKContentRuleList) {
-            self.userContentController.add(rules)
-        }
-
-        if let rulesList = ContentBlockerRulesManager.shared.blockingRules {
-            addRulesToController(rules: rulesList)
-        } else {
-            ContentBlockerRulesManager.shared.compileRules { rulesList in
-                if let rulesList = rulesList {
-                    addRulesToController(rules: rulesList)
-                }
-            }
-        }
+        userContentController.installContentBlockingRules()
     }
 
-    func reinstallContentBlocker() {
-        userContentController.removeAllContentRuleLists()
-        installContentBlockingRules()
+}
+
+extension WKUserContentController {
+
+    func installContentBlockingRules() {
+        ContentBlockerRulesManager.shared.blockingRules.sink { [weak self] rules in
+            dispatchPrecondition(condition: .onQueue(.main))
+
+            guard let self = self,
+                  let rules = rules
+            else { return }
+
+            self.removeAllContentRuleLists()
+            self.add(rules)
+
+        }.store(in: &self.lifetimeDisposeBag)
     }
 
 }

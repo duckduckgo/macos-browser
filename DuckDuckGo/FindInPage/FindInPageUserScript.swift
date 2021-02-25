@@ -18,18 +18,12 @@
 
 import WebKit
 
-class FindInPageUserScript: UserScript {
+final class FindInPageUserScript: NSObject, StaticUserScript {
 
+    static let script = WKUserScript(from: source, injectionTime: .atDocumentEnd, forMainFrameOnly: false)
     weak var model: FindInPageModel?
 
-    init() {
-        super.init(source: Self.source,
-                   messageNames: Self.messageNames,
-                   injectionTime: .atDocumentEnd,
-                   forMainFrameOnly: false)
-    }
-
-    override func userContentController(_ userContentController: WKUserContentController, didReceive message: WKScriptMessage) {
+    func userContentController(_ userContentController: WKUserContentController, didReceive message: WKScriptMessage) {
         guard let dict = message.body as? [String: Any] else { return }
         let currentResult = dict["currentResult"] as? Int
         let totalResults = dict["totalResults"] as? Int

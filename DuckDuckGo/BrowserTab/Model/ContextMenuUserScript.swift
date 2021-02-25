@@ -24,21 +24,15 @@ protocol ContextMenuDelegate: AnyObject {
 
 }
 
-class ContextMenuUserScript: UserScript {
+final class ContextMenuUserScript: NSObject, StaticUserScript {
 
+    static let script = WKUserScript(from: source, injectionTime: .atDocumentEnd, forMainFrameOnly: true)
     weak var delegate: ContextMenuDelegate?
 
     var lastAnchor: URL?
     var lastImage: URL?
 
-    init() {
-        super.init(source: Self.source,
-                   messageNames: Self.messageNames,
-                   injectionTime: .atDocumentEnd,
-                   forMainFrameOnly: true)
-    }
-
-    override func userContentController(_ userContentController: WKUserContentController, didReceive message: WKScriptMessage) {
+    func userContentController(_ userContentController: WKUserContentController, didReceive message: WKScriptMessage) {
 
         guard let dict = message.body as? [String: Any],
               let point = point(from: dict) else { return }

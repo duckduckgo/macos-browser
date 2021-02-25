@@ -1,7 +1,7 @@
 //
-//  UserScript.swift
+//  WKUserScriptExtension.swift
 //
-//  Copyright © 2020 DuckDuckGo. All rights reserved.
+//  Copyright © 2021 DuckDuckGo. All rights reserved.
 //
 //  Licensed under the Apache License, Version 2.0 (the "License");
 //  you may not use this file except in compliance with the License.
@@ -16,17 +16,16 @@
 //  limitations under the License.
 //
 
-import Foundation
 import WebKit
-import Combine
 
-protocol UserScript: WKScriptMessageHandler {
+extension WKUserScript {
 
-    static var messageNames: [String] { get }
-    var script: WKUserScript { get }
+    convenience init(from source: String, injectionTime: WKUserScriptInjectionTime, forMainFrameOnly: Bool) {
+        if #available(OSX 11.0, *) {
+            self.init(source: source, injectionTime: injectionTime, forMainFrameOnly: forMainFrameOnly, in: .defaultClient)
+        } else {
+            self.init(source: source, injectionTime: injectionTime, forMainFrameOnly: forMainFrameOnly)
+        }
+    }
 
-}
-
-extension UserScript {
-    var messageNames: [String] { Self.messageNames }
 }

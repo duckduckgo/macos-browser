@@ -24,18 +24,12 @@ protocol HTML5DownloadDelegate: AnyObject {
 
 }
 
-class HTML5DownloadUserScript: UserScript {
+final class HTML5DownloadUserScript: NSObject, StaticUserScript {
 
+    static let script = WKUserScript(from: source, injectionTime: .atDocumentEnd, forMainFrameOnly: true)
     weak var delegate: HTML5DownloadDelegate?
 
-    init() {
-        super.init(source: Self.source,
-                   messageNames: Self.messageNames,
-                   injectionTime: .atDocumentEnd,
-                   forMainFrameOnly: true)
-    }
-
-    override func userContentController(_ userContentController: WKUserContentController, didReceive message: WKScriptMessage) {
+    func userContentController(_ userContentController: WKUserContentController, didReceive message: WKScriptMessage) {
         guard let dict = message.body as? [String: String],
               let href = dict["href"],
               let url = URL(string: href),

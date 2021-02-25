@@ -1,7 +1,7 @@
 //
-//  UserScript.swift
+//  UserScriptsManager.swift
 //
-//  Copyright © 2020 DuckDuckGo. All rights reserved.
+//  Copyright © 2021 DuckDuckGo. All rights reserved.
 //
 //  Licensed under the Apache License, Version 2.0 (the "License");
 //  you may not use this file except in compliance with the License.
@@ -17,16 +17,19 @@
 //
 
 import Foundation
-import WebKit
 import Combine
 
-protocol UserScript: WKScriptMessageHandler {
+final class UserScriptsManager {
+    static let shared = UserScriptsManager()
 
-    static var messageNames: [String] { get }
-    var script: WKUserScript { get }
+    @Published
+    private(set) var userScripts = UserScripts()
+    private var sourceUpdatedCancellable: AnyCancellable!
 
-}
+    init(scriptSource: ScriptSourceProviding = DefaultScriptSourceProvider.shared) {
+        sourceUpdatedCancellable = scriptSource.sourceUpdatedPublisher
+            .map(UserScripts.init)
+            .weakAssign(to: \.userScripts, on: self)
+    }
 
-extension UserScript {
-    var messageNames: [String] { Self.messageNames }
 }

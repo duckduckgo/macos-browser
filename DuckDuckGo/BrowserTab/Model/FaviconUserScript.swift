@@ -25,23 +25,17 @@ protocol FaviconUserScriptDelegate: AnyObject {
 
 }
 
-class FaviconUserScript: UserScript {
+final class FaviconUserScript: NSObject, StaticUserScript {
 
     weak var delegate: FaviconUserScriptDelegate?
+    static let script = WKUserScript(from: source, injectionTime: .atDocumentEnd, forMainFrameOnly: true)
 
-    init() {
-        super.init(source: Self.source,
-                   messageNames: Self.messageNames,
-                   injectionTime: .atDocumentEnd,
-                   forMainFrameOnly: true)
-    }
-
-    override func userContentController(_ userContentController: WKUserContentController, didReceive message: WKScriptMessage) {
+    func userContentController(_ userContentController: WKUserContentController, didReceive message: WKScriptMessage) {
         if let urlString = message.body as? String, let url = URL(string: urlString) {
             delegate?.faviconUserScript(self, didFindFavicon: url)
         }
     }
-    
+
 }
 
 extension FaviconUserScript {
