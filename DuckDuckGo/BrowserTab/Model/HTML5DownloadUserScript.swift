@@ -17,25 +17,22 @@
 //
 
 import WebKit
+import BrowserServicesKit
 
-protocol HTML5DownloadDelegate: AnyObject {
+protocol HTML5DownloadDelegate: NSObject, AnyObject {
 
     func startDownload(_ userScript: HTML5DownloadUserScript, from: URL, withSuggestedName: String)
 
 }
 
-class HTML5DownloadUserScript: UserScript {
+class HTML5DownloadUserScript: NSObject, UserScript {
 
+    var injectionTime: WKUserScriptInjectionTime = .atDocumentEnd
+    var forMainFrameOnly = true
+    
     weak var delegate: HTML5DownloadDelegate?
 
-    init() {
-        super.init(source: Self.source,
-                   messageNames: Self.messageNames,
-                   injectionTime: .atDocumentEnd,
-                   forMainFrameOnly: true)
-    }
-
-    override func userContentController(_ userContentController: WKUserContentController, didReceive message: WKScriptMessage) {
+    func userContentController(_ userContentController: WKUserContentController, didReceive message: WKScriptMessage) {
         guard let dict = message.body as? [String: String],
               let href = dict["href"],
               let url = URL(string: href),
@@ -43,13 +40,9 @@ class HTML5DownloadUserScript: UserScript {
             else { return }
         delegate?.startDownload(self, from: url, withSuggestedName: name)
     }
-
-}
-
-extension HTML5DownloadUserScript {
-
-    static let messageNames = ["downloadFile"]
-    static let source = """
+    
+    let messageNames = ["downloadFile"]
+    let source = """
 (function() {
 
     document.addEventListener("click", function(e) {
