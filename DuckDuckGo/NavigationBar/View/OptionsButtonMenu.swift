@@ -81,9 +81,11 @@ class OptionsButtonMenu: NSMenu {
     private func updateEmailMenuItem() {
         if emailManager.isSignedIn {
             emailMenuItem?.title = "Turn off Email Protection"
+            emailMenuItem?.image = NSImage(named: "OptionsButtonMenuEmailDisabled")
             emailMenuItem?.action = #selector(turnOffEmailAction(_:))
         } else {
             emailMenuItem?.title = "Turn on Email Protection"
+            emailMenuItem?.image = NSImage(named: "OptionsButtonMenuEmail")
             emailMenuItem?.action = #selector(turnOnEmailAction(_:))
         }
     }
