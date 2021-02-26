@@ -18,6 +18,7 @@
 
 import WebKit
 import os
+import BrowserServicesKit
 
 protocol ContentBlockerUserScriptDelegate: NSObjectProtocol {
 
@@ -27,7 +28,7 @@ protocol ContentBlockerUserScriptDelegate: NSObjectProtocol {
 
 }
 
-final class ContentBlockerUserScript: NSObject, UserScript {
+class ContentBlockerUserScript: NSObject, UserScript {
 
     struct TrackerDetectedKey {
         static let protectionId = "protectionId"
@@ -37,17 +38,15 @@ final class ContentBlockerUserScript: NSObject, UserScript {
         static let isSurrogate = "isSurrogate"
     }
 
+    var injectionTime: WKUserScriptInjectionTime = .atDocumentStart
+    var forMainFrameOnly = false
+    let messageNames = ["trackerDetectedMessage"]
+    var source: String
+
     init(scriptSource: ScriptSourceProviding = DefaultScriptSourceProvider.shared) {
-        self.script = WKUserScript(from: scriptSource.contentBlockerSource,
-                                   injectionTime: .atDocumentStart,
-                                   forMainFrameOnly: false)
+        source = scriptSource.contentBlockerSource
     }
 
-    private init(script: WKUserScript) {
-        self.script = script
-    }
-
-    let script: WKUserScript
     weak var delegate: ContentBlockerUserScriptDelegate?
 
     func userContentController(_ userContentController: WKUserContentController, didReceive message: WKScriptMessage) {
@@ -72,18 +71,4 @@ final class ContentBlockerUserScript: NSObject, UserScript {
         let entity = TrackerRadarManager.shared.findEntity(byName: knownTracker?.owner?.name ?? "")
         return DetectedTracker(url: urlString, knownTracker: knownTracker, entity: entity, blocked: blocked)
     }
-}
-
-extension ContentBlockerUserScript {
-
-    static let messageNames = ["trackerDetectedMessage"]
-
-}
-
-extension ContentBlockerUserScript: NSCopying {
-
-    func copy(with zone: NSZone? = nil) -> Any {
-        return Self.init(script: self.script)
-    }
-
 }

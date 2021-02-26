@@ -18,12 +18,11 @@
 
 import Cocoa
 import WebKit
+import BrowserServicesKit
 
 extension WKUserContentController {
 
-    func add(userScript: UserScript) {
-        addUserScript(userScript.script)
-
+    func addHandler(_ userScript: UserScript) {
         for messageName in userScript.messageNames {
             if #available(OSX 11.0, *) {
                 add(userScript, contentWorld: .defaultClient, name: messageName)
@@ -33,8 +32,8 @@ extension WKUserContentController {
         }
     }
 
-    func removeScriptMessageHandlers(forNames messageNames: [String]) {
-        messageNames.forEach {
+    func removeHandler(_ userScript: UserScript) {
+        userScript.messageNames.forEach {
             if #available(OSX 11.0, *) {
                 removeScriptMessageHandler(forName: $0, contentWorld: .defaultClient)
             } else {

@@ -120,7 +120,7 @@ class NavigationBarViewController: NSViewController {
 #if FEEDBACK
 
     @IBAction func feedbackButtonAction(_ sender: NSButton) {
-        (NSApp.delegate as? AppDelegate)?.openFeedback(sender)
+        AppDelegate.shared.openFeedback(sender)
     }
 
 #else

@@ -20,6 +20,7 @@ import Cocoa
 import WebKit
 import os
 import Combine
+import BrowserServicesKit
 
 protocol TabDelegate: class {
 
@@ -270,7 +271,7 @@ final class Tab: NSObject {
     private func subscribeToUserScripts() {
         userScriptsUpdatedCancellable = UserScriptsManager.shared
             .$userScripts
-            .map { $0.copy() as? UserScripts }
+            .map(UserScripts.init(copy:))
             .weakAssign(to: \.userScripts, on: self)
     }
 

@@ -18,8 +18,10 @@
 
 import WebKit
 import os
+import BrowserServicesKit
 
-final class DebugUserScript: NSObject, StaticUserScript {
+class DebugUserScript: NSObject, StaticUserScript {
+    static var script: WKUserScript?
 
     enum MessageNames: String, CaseIterable {
 
@@ -28,7 +30,17 @@ final class DebugUserScript: NSObject, StaticUserScript {
 
     }
 
-    static let script = WKUserScript(from: source, injectionTime: .atDocumentStart, forMainFrameOnly: false)
+    var injectionTime: WKUserScriptInjectionTime = .atDocumentStart
+    var forMainFrameOnly = false
+    let messageNames = MessageNames.allCases.map(\.rawValue)
+    let source: String = {
+        #if DEBUG
+            return DebugUserScript.debugMessagingEnabledSource
+        #else
+            return DebugUserScript.debugMessagingDisabledSource
+        #endif
+    }()
+
     weak var instrumentation: TabInstrumentation?
 
     func userContentController(_ userContentController: WKUserContentController, didReceive message: WKScriptMessage) {
@@ -81,15 +93,6 @@ final class DebugUserScript: NSObject, StaticUserScript {
 }
 
 extension DebugUserScript {
-
-    static let messageNames = MessageNames.allCases.map(\.rawValue)
-    static let source: String = {
-        #if DEBUG
-            return debugMessagingEnabledSource
-        #else
-            return debugMessagingDisabledSource
-        #endif
-    }()
 
     static let debugMessagingEnabledSource = """
 var duckduckgoDebugMessaging = function() {

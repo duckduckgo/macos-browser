@@ -72,5 +72,7 @@
 	<false/>
 	<key>NSSupportsSuddenTermination</key>
 	<false/>
+	<key>ViewBridgeService</key>
+	<false/>
 </dict>
 </plist>

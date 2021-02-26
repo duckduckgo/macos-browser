@@ -17,16 +17,20 @@
 //
 
 import WebKit
+import BrowserServicesKit
 
-protocol HTML5DownloadDelegate: AnyObject {
+protocol HTML5DownloadDelegate: class {
 
     func startDownload(_ userScript: HTML5DownloadUserScript, from: URL, withSuggestedName: String)
 
 }
 
-final class HTML5DownloadUserScript: NSObject, StaticUserScript {
+class HTML5DownloadUserScript: NSObject, StaticUserScript {
+    static var script: WKUserScript?
 
-    static let script = WKUserScript(from: source, injectionTime: .atDocumentEnd, forMainFrameOnly: true)
+    var injectionTime: WKUserScriptInjectionTime = .atDocumentEnd
+    var forMainFrameOnly = true
+
     weak var delegate: HTML5DownloadDelegate?
 
     func userContentController(_ userContentController: WKUserContentController, didReceive message: WKScriptMessage) {
@@ -38,12 +42,8 @@ final class HTML5DownloadUserScript: NSObject, StaticUserScript {
         delegate?.startDownload(self, from: url, withSuggestedName: name)
     }
 
-}
-
-extension HTML5DownloadUserScript {
-
-    static let messageNames = ["downloadFile"]
-    static let source = """
+    let messageNames = ["downloadFile"]
+    let source = """
 (function() {
 
     document.addEventListener("click", function(e) {

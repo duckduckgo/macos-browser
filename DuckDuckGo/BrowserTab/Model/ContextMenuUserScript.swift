@@ -17,6 +17,7 @@
 //
 
 import WebKit
+import BrowserServicesKit
 
 protocol ContextMenuDelegate: AnyObject {
 
@@ -24,9 +25,12 @@ protocol ContextMenuDelegate: AnyObject {
 
 }
 
-final class ContextMenuUserScript: NSObject, StaticUserScript {
+class ContextMenuUserScript: NSObject, StaticUserScript {
+    static var script: WKUserScript?
 
-    static let script = WKUserScript(from: source, injectionTime: .atDocumentEnd, forMainFrameOnly: true)
+    var injectionTime: WKUserScriptInjectionTime = .atDocumentEnd
+    var forMainFrameOnly = true
+
     weak var delegate: ContextMenuDelegate?
 
     var lastAnchor: URL?
@@ -66,12 +70,8 @@ final class ContextMenuUserScript: NSObject, StaticUserScript {
         return NSPoint(x: x, y: y)
     }
 
-}
-
-extension ContextMenuUserScript {
-
-    static let messageNames = ["contextMenu"]
-    static let source = """
+    let messageNames = ["contextMenu"]
+    let source = """
 (function() {
 
     function linkFrom(element) {

@@ -18,6 +18,7 @@
 
 import Foundation
 import WebKit
+import BrowserServicesKit
 
 protocol FaviconUserScriptDelegate: AnyObject {
 
@@ -25,10 +26,13 @@ protocol FaviconUserScriptDelegate: AnyObject {
 
 }
 
-final class FaviconUserScript: NSObject, StaticUserScript {
+class FaviconUserScript: NSObject, StaticUserScript {
+    static var script: WKUserScript?
+
+    var injectionTime: WKUserScriptInjectionTime = .atDocumentEnd
+    var forMainFrameOnly = true
 
     weak var delegate: FaviconUserScriptDelegate?
-    static let script = WKUserScript(from: source, injectionTime: .atDocumentEnd, forMainFrameOnly: true)
 
     func userContentController(_ userContentController: WKUserContentController, didReceive message: WKScriptMessage) {
         if let urlString = message.body as? String, let url = URL(string: urlString) {
@@ -36,12 +40,8 @@ final class FaviconUserScript: NSObject, StaticUserScript {
         }
     }
 
-}
-
-extension FaviconUserScript {
-
-    static let messageNames = ["faviconFound"]
-    static let source = """
+    let messageNames = ["faviconFound"]
+    let source = """
 (function() {
     function getFavicon() {
         return findFavicons()[0];

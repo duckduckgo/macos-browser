@@ -17,46 +17,25 @@
 //
 
 import Foundation
+import BrowserServicesKit
 
-final class UserScripts {
+class UserScripts {
 
-    let faviconScript: FaviconUserScript
-    let html5downloadScript: HTML5DownloadUserScript
-    let contextMenuScript: ContextMenuUserScript
-    let findInPageScript: FindInPageUserScript
-    let loginDetectionUserScript: LoginFormDetectionUserScript
-    let contentBlockerScript: ContentBlockerUserScript
-    let contentBlockerRulesScript: ContentBlockerRulesUserScript
-    let debugScript: DebugUserScript
+    let faviconScript = FaviconUserScript()
+    let html5downloadScript = HTML5DownloadUserScript()
+    let contextMenuScript = ContextMenuUserScript()
+    let findInPageScript = FindInPageUserScript()
+    let loginDetectionUserScript = LoginFormDetectionUserScript()
+    let contentBlockerScript = ContentBlockerUserScript()
+    let contentBlockerRulesScript = ContentBlockerRulesUserScript()
+    let debugScript = DebugUserScript()
 
-    convenience init() {
-        self.init(faviconScript: FaviconUserScript(),
-                  html5downloadScript: HTML5DownloadUserScript(),
-                  contextMenuScript: ContextMenuUserScript(),
-                  findInPageScript: FindInPageUserScript(),
-                  loginDetectionUserScript: LoginFormDetectionUserScript(),
-                  contentBlockerScript: ContentBlockerUserScript(),
-                  contentBlockerRulesScript: ContentBlockerRulesUserScript(),
-                  debugScript: DebugUserScript())
+    init() {
     }
 
-    private init(faviconScript: FaviconUserScript,
-                 html5downloadScript: HTML5DownloadUserScript,
-                 contextMenuScript: ContextMenuUserScript,
-                 findInPageScript: FindInPageUserScript,
-                 loginDetectionUserScript: LoginFormDetectionUserScript,
-                 contentBlockerScript: ContentBlockerUserScript,
-                 contentBlockerRulesScript: ContentBlockerRulesUserScript,
-                 debugScript: DebugUserScript) {
-
-        self.faviconScript = faviconScript
-        self.html5downloadScript = html5downloadScript
-        self.contextMenuScript = contextMenuScript
-        self.findInPageScript = findInPageScript
-        self.loginDetectionUserScript = loginDetectionUserScript
-        self.contentBlockerScript = contentBlockerScript
-        self.contentBlockerRulesScript = contentBlockerRulesScript
-        self.debugScript = debugScript
+    init(copy other: UserScripts) {
+        // copy compiled scripts to avoid repeated loading from disk
+        self.scripts = other.scripts
     }
 
     lazy var userScripts: [UserScript] = [
@@ -70,33 +49,16 @@ final class UserScripts {
         self.contentBlockerRulesScript
     ]
 
+    private lazy var scripts = userScripts.map(WKUserScript.makeWKUserScript(from:))
+
     func install(into webView: WebView) {
-        userScripts.forEach {
-            webView.configuration.userContentController.add(userScript: $0)
-        }
+        scripts.forEach(webView.configuration.userContentController.addUserScript)
+        userScripts.forEach(webView.configuration.userContentController.addHandler)
     }
 
     func remove(from webView: WebView) {
         webView.configuration.userContentController.removeAllUserScripts()
-        
-        userScripts.forEach {
-            webView.configuration.userContentController.removeScriptMessageHandlers(forNames: $0.messageNames)
-        }
-    }
-
-}
-
-extension UserScripts: NSCopying {
-
-    func copy(with zone: NSZone? = nil) -> Any {
-        return UserScripts(faviconScript: faviconScript.makeCopy(),
-                           html5downloadScript: html5downloadScript.makeCopy(),
-                           contextMenuScript: contextMenuScript.makeCopy(),
-                           findInPageScript: findInPageScript.makeCopy(),
-                           loginDetectionUserScript: loginDetectionUserScript.makeCopy(),
-                           contentBlockerScript: contentBlockerScript.makeCopy(),
-                           contentBlockerRulesScript: contentBlockerRulesScript.makeCopy(),
-                           debugScript: debugScript.makeCopy())
+        userScripts.forEach(webView.configuration.userContentController.removeHandler)
     }
 
 }

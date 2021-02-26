@@ -18,21 +18,21 @@
 
 import Foundation
 import WebKit
+import BrowserServicesKit
 
 protocol StaticUserScript: UserScript {
 
-    static var script: WKUserScript { get }
-
-    init()
+    static var script: WKUserScript? { get set }
 
 }
 
 extension StaticUserScript {
 
-    var script: WKUserScript { Self.script }
-
-    func makeCopy() -> Self {
-        return Self.init()
+    func makeWKUserScript() -> WKUserScript {
+        if Self.script == nil {
+            Self.script = WKUserScript(userScript: self)
+        }
+        return Self.script!
     }
 
 }

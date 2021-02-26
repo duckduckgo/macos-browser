@@ -17,15 +17,26 @@
 //
 
 import WebKit
+import BrowserServicesKit
 
 extension WKUserScript {
 
-    convenience init(from source: String, injectionTime: WKUserScriptInjectionTime, forMainFrameOnly: Bool) {
+    convenience init(userScript: UserScript) {
         if #available(OSX 11.0, *) {
-            self.init(source: source, injectionTime: injectionTime, forMainFrameOnly: forMainFrameOnly, in: .defaultClient)
+            self.init(source: userScript.source,
+                      injectionTime: userScript.injectionTime,
+                      forMainFrameOnly: userScript.forMainFrameOnly,
+                      in: .defaultClient)
         } else {
-            self.init(source: source, injectionTime: injectionTime, forMainFrameOnly: forMainFrameOnly)
+            self.init(source: userScript.source,
+                      injectionTime: userScript.injectionTime,
+                      forMainFrameOnly: userScript.forMainFrameOnly)
         }
+    }
+
+    static func makeWKUserScript(from userScript: UserScript) -> WKUserScript {
+        (userScript as? StaticUserScript)?.makeWKUserScript()
+            ?? WKUserScript(userScript: userScript)
     }
 
 }

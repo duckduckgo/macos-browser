@@ -17,6 +17,7 @@
 //
 
 import WebKit
+import BrowserServicesKit
 
 protocol LoginFormDetectionDelegate: NSObjectProtocol {
 
@@ -24,10 +25,17 @@ protocol LoginFormDetectionDelegate: NSObjectProtocol {
 
 }
 
-final class LoginFormDetectionUserScript: NSObject, StaticUserScript {
+class LoginFormDetectionUserScript: NSObject, StaticUserScript {
+    static var script: WKUserScript?
 
-    static let script = WKUserScript(from: source, injectionTime: .atDocumentStart, forMainFrameOnly: false)
     weak var delegate: LoginFormDetectionDelegate?
+
+    var injectionTime: WKUserScriptInjectionTime = .atDocumentStart
+    var forMainFrameOnly = false
+    let messageNames = ["loginFormDetected"]
+    lazy var source: String = {
+        return Self.loadJS("login-detection", fromBundle: Bundle.main)
+    }()
 
     /// Some cases require scanning for login forms direction. For instance, forms that directly call `form.submit()` will not trigger the submit event that this script typically uses to detect logins.
     /// Instead, the web view will do some additional monitoring for POST requests that look to be hitting a login URL, and will trigger password field scanning that way.
@@ -42,11 +50,4 @@ final class LoginFormDetectionUserScript: NSObject, StaticUserScript {
     func userContentController(_ userContentController: WKUserContentController, didReceive message: WKScriptMessage) {
         delegate?.loginFormDetectionUserScriptDetectedLoginForm(self)
     }
-}
-
-extension LoginFormDetectionUserScript {
-
-    static let messageNames = ["loginFormDetected"]
-    static let source = DefaultScriptSourceProvider.loadJS("login-detection")
-
 }

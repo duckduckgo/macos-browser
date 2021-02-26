@@ -59,7 +59,7 @@ class DefaultScriptSourceProvider: ScriptSourceProviding {
 
     private func buildContentBlockerRulesSource() -> String {
         let unprotectedDomains = configStorage.loadData(for: .temporaryUnprotectedSites)?.utf8String() ?? ""
-        return Self.loadJS("contentblockerrules", withReplacements: [
+        return ContentBlockerRulesUserScript.loadJS("contentblockerrules", fromBundle: .main, withReplacements: [
             "${unprotectedDomains}": unprotectedDomains
         ])
     }
@@ -71,27 +71,11 @@ class DefaultScriptSourceProvider: ScriptSourceProviding {
         let surrogates = configStorage.loadData(for: .surrogates)?.utf8String() ?? ""
         let unprotectedSites = configStorage.loadData(for: .temporaryUnprotectedSites)?.utf8String() ?? ""
 
-        return Self.loadJS("contentblocker", withReplacements: [
+        return ContentBlockerUserScript.loadJS("contentblocker", fromBundle: .main, withReplacements: [
             "${unprotectedDomains}": unprotectedSites,
             "${trackerData}": trackerData,
             "${surrogates}": surrogates
         ])
-    }
-
-    static func loadJS(_ jsFile: String, withReplacements replacements: [String: String] = [:]) -> String {
-
-        let bundle = Bundle.main
-        let path = bundle.path(forResource: jsFile, ofType: "js")!
-
-        guard var js = try? String(contentsOfFile: path) else {
-            fatalError("Failed to load JavaScript \(jsFile) from \(path)")
-        }
-
-        for (key, value) in replacements {
-            js = js.replacingOccurrences(of: key, with: value, options: .literal)
-        }
-
-        return js
     }
 
 }
