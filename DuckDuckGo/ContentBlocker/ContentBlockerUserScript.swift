@@ -41,15 +41,11 @@ class ContentBlockerUserScript: NSObject, UserScript {
     var injectionTime: WKUserScriptInjectionTime = .atDocumentStart
     var forMainFrameOnly = false
     let messageNames = ["trackerDetectedMessage"]
-    lazy var source: String = {
-        let trackerData = TrackerDataManager.shared.encodedTrackerData!
-
-        return loadJS("contentblocker", fromBundle: Bundle.main, withReplacements: [
-            "${unprotectedDomains}": "",
-            "${trackerData}": trackerData,
-            "${surrogates}": ""
-        ])
-    }()
+    var source: String
+        
+    init(scriptSource: ScriptSourceProviding = DefaultScriptSourceProvider.shared) {
+        source = scriptSource.contentBlockerSource
+    }
 
     weak var delegate: ContentBlockerUserScriptDelegate?
 
@@ -71,9 +67,8 @@ class ContentBlockerUserScript: NSObject, UserScript {
     }
 
     private func trackerFromUrl(_ urlString: String, _ blocked: Bool) -> DetectedTracker {
-        let knownTracker = TrackerDataManager.shared.findTracker(forUrl: urlString)
-        let entity = TrackerDataManager.shared.findEntity(byName: knownTracker?.owner?.name ?? "")
+        let knownTracker = TrackerRadarManager.shared.findTracker(forUrl: urlString)
+        let entity = TrackerRadarManager.shared.findEntity(byName: knownTracker?.owner?.name ?? "")
         return DetectedTracker(url: urlString, knownTracker: knownTracker, entity: entity, blocked: blocked)
     }
 }
-

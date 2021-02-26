@@ -21,31 +21,31 @@ import CommonCrypto
 import TrackerRadarKit
 @testable import DuckDuckGo_Privacy_Browser
 
-class TrackerDataManagerTests: XCTestCase {
+class TrackerRadarManagerTests: XCTestCase {
 
     override func setUp() {
         super.setUp()
-        // try? FileManager.default.removeItem(at: FileStore().persistenceLocation(forConfiguration: .trackerDataSet))
+        try? FileManager.default.removeItem(at: DefaultConfigurationStorage.shared.fileUrl(for: .trackerRadar))
     }
 
     func testWhenReloadCalledInitiallyThenDataSetIsEmbedded() {
-        XCTAssertEqual(TrackerDataManager.shared.reload(etag: nil), .embedded)
+        XCTAssertEqual(TrackerRadarManager.shared.reload(), .embedded)
     }
 
     func testFindTrackerByUrl() {
-        let tracker = TrackerDataManager.shared.findTracker(forUrl: "http://googletagmanager.com")
+        let tracker = TrackerRadarManager.shared.findTracker(forUrl: "http://googletagmanager.com")
         XCTAssertNotNil(tracker)
         XCTAssertEqual("Google", tracker?.owner?.displayName)
     }
 
     func testFindEntityByName() {
-        let entity = TrackerDataManager.shared.findEntity(byName: "Google LLC")
+        let entity = TrackerRadarManager.shared.findEntity(byName: "Google LLC")
         XCTAssertNotNil(entity)
         XCTAssertEqual("Google", entity?.displayName)
     }
 
     func testFindEntityForHost() {
-        let entity = TrackerDataManager.shared.findEntity(forHost: "www.google.com")
+        let entity = TrackerRadarManager.shared.findEntity(forHost: "www.google.com")
         XCTAssertNotNil(entity)
         XCTAssertEqual("Google", entity?.displayName)
     }

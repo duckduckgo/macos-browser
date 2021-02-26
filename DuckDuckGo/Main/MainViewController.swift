@@ -38,6 +38,7 @@ class MainViewController: NSViewController {
     private var selectedTabViewModelCancellable: AnyCancellable?
     private var canGoForwardCancellable: AnyCancellable?
     private var canGoBackCancellable: AnyCancellable?
+    private var canBookmarkCancellable: AnyCancellable?
     private var canInsertLastRemovedTabCancellable: AnyCancellable?
     private var findInPageCancellable: AnyCancellable?
     private var keyDownMonitor: Any?
@@ -70,9 +71,15 @@ class MainViewController: NSViewController {
     }
 
     func windowDidBecomeMain() {
+        NSApplication.shared.mainMenuTyped?.setWindowRelatedMenuItems(enabled: true)
+
         updateBackMenuItem()
         updateForwardMenuItem()
         updateReopenLastClosedTabMenuItem()
+    }
+
+    func windowDidResignMain() {
+        NSApplication.shared.mainMenuTyped?.setWindowRelatedMenuItems(enabled: false)
     }
 
     func windowWillClose() {
@@ -130,6 +137,7 @@ class MainViewController: NSViewController {
         selectedTabViewModelCancellable = tabCollectionViewModel.$selectedTabViewModel.receive(on: DispatchQueue.main).sink { [weak self] _ in
             self?.subscribeToCanGoBackForward()
             self?.subscribeToFindInPage()
+            self?.subscribeToCanBookmark()
         }
     }
 
@@ -149,6 +157,13 @@ class MainViewController: NSViewController {
         canGoForwardCancellable?.cancel()
         canGoForwardCancellable = tabCollectionViewModel.selectedTabViewModel?.$canGoForward.receive(on: DispatchQueue.main).sink { [weak self] _ in
             self?.updateForwardMenuItem()
+        }
+    }
+
+    private func subscribeToCanBookmark() {
+        canBookmarkCancellable?.cancel()
+        canBookmarkCancellable = tabCollectionViewModel.selectedTabViewModel?.$canBeBookmarked.receive(on: DispatchQueue.main).sink { [weak self] _ in
+            self?.updateBookmarksMenu()
         }
     }
 
@@ -202,6 +217,22 @@ class MainViewController: NSViewController {
         }
 
         forwardMenuItem.isEnabled = selectedTabViewModel.canGoForward
+    }
+
+    private func updateBookmarksMenu() {
+        guard let selectedTabViewModel = tabCollectionViewModel.selectedTabViewModel else {
+            os_log("MainViewController: No tab view model selected", type: .error)
+            return
+        }
+        guard let mainMenu = NSApplication.shared.mainMenuTyped,
+              let bookmarkThisPageMenuItem = mainMenu.bookmarkThisPageMenuItem,
+              let favoriteThisPageMenuItem = mainMenu.favoriteThisPageMenuItem else {
+            os_log("MainViewController: Failed to get reference to bookmarks menu items", type: .error)
+            return
+        }
+
+        bookmarkThisPageMenuItem.isEnabled = selectedTabViewModel.canBeBookmarked
+        favoriteThisPageMenuItem.isEnabled = selectedTabViewModel.canBeBookmarked
     }
 
     func updateReopenLastClosedTabMenuItem() {

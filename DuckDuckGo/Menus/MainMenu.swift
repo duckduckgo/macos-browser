@@ -18,8 +18,12 @@
 
 import Cocoa
 import os.log
+import Combine
 
 class MainMenu: NSMenu {
+
+    @IBOutlet weak var printSeparatorItem: NSMenuItem?
+    @IBOutlet weak var printMenuItem: NSMenuItem?
 
     required init(coder: NSCoder) {
         super.init(coder: coder)
@@ -31,10 +35,15 @@ class MainMenu: NSMenu {
         case history = 4
         case back = 40
         case forward = 41
-        case reopenLastClosedTab = 43
-        case help = 6
-        case helpSeparator = 61
-        case sendFeedback = 62
+        case home = 42
+        case reopenLastClosedTab = 44
+        case bookmarks = 5
+        case bookmarkThisPage = 50
+        case favorites = 52
+        case favoriteThisPage = 520
+        case help = 7
+        case helpSeparator = 71
+        case sendFeedback = 72
     }
 
     var backMenuItem: NSMenuItem? {
@@ -45,8 +54,28 @@ class MainMenu: NSMenu {
         return item(withTag: Tag.history.rawValue)?.submenu?.item(withTag: Tag.forward.rawValue)
     }
 
+    var homeMenuItem: NSMenuItem? {
+        return item(withTag: Tag.history.rawValue)?.submenu?.item(withTag: Tag.home.rawValue)
+    }
+
     var reopenLastClosedTabMenuItem: NSMenuItem? {
         return item(withTag: Tag.history.rawValue)?.submenu?.item(withTag: Tag.reopenLastClosedTab.rawValue)
+    }
+
+    var bookmarksMenuItem: NSMenuItem? {
+        item(withTag: Tag.bookmarks.rawValue)
+    }
+
+    var bookmarkThisPageMenuItem: NSMenuItem? {
+        bookmarksMenuItem?.submenu?.item(withTag: Tag.bookmarkThisPage.rawValue)
+    }
+
+    var favoritesMenuItem: NSMenuItem? {
+        bookmarksMenuItem?.submenu?.item(withTag: Tag.favorites.rawValue)
+    }
+
+    var favoriteThisPageMenuItem: NSMenuItem? {
+        favoritesMenuItem?.submenu?.item(withTag: Tag.favoriteThisPage.rawValue)
     }
 
     var helpMenuItem: NSMenuItem? {
@@ -60,23 +89,112 @@ class MainMenu: NSMenu {
     var sendFeedbackMenuItem: NSMenuItem? {
         helpMenuItem?.submenu?.item(withTag: Tag.sendFeedback.rawValue)
     }
+  
+    override func update() {
+        super.update()
+
+        if #available(macOS 11, *) {
+            // no-op
+        } else {
+            printMenuItem?.removeFromParent()
+            printSeparatorItem?.removeFromParent()
+        }
+    }
+
+    func setWindowRelatedMenuItems(enabled: Bool) {
+        backMenuItem?.isEnabled = enabled
+        forwardMenuItem?.isEnabled = enabled
+        homeMenuItem?.isEnabled = enabled
+        reopenLastClosedTabMenuItem?.isEnabled = enabled
+        bookmarkThisPageMenuItem?.isEnabled = enabled
+        favoriteThisPageMenuItem?.isEnabled = enabled
+    }
 
     private func setup() {
 
 #if !FEEDBACK
 
-    guard let helpMenuItemSubmenu = helpMenuItem?.submenu,
-          let helpSeparatorMenuItem = helpSeparatorMenuItem,
-          let sendFeedbackMenuItem = sendFeedbackMenuItem else {
-        os_log("MainMenuManager: Failed to setup main menu", type: .error)
-        return
-    }
+        guard let helpMenuItemSubmenu = helpMenuItem?.submenu,
+              let helpSeparatorMenuItem = helpSeparatorMenuItem,
+              let sendFeedbackMenuItem = sendFeedbackMenuItem else {
+            os_log("MainMenuManager: Failed to setup main menu", type: .error)
+            return
+        }
 
-    helpMenuItemSubmenu.removeItem(helpSeparatorMenuItem)
-    helpMenuItemSubmenu.removeItem(sendFeedbackMenuItem)
+        helpMenuItemSubmenu.removeItem(helpSeparatorMenuItem)
+        helpMenuItemSubmenu.removeItem(sendFeedbackMenuItem)
 
 #endif
 
+        subscribeToBookmarkList()
+    }
+
+    // MARK: - Bookmarks
+
+    var bookmarkListCancellable: AnyCancellable?
+    private func subscribeToBookmarkList() {
+        bookmarkListCancellable = LocalBookmarkManager.shared.$list
+            .map({ $0.bookmarks().map({ BookmarkViewModel(bookmark: $0) }) })
+            .receive(on: DispatchQueue.main).sink { [weak self] bookmarkViewModels in
+                self?.updateBookmarksMenu(bookmarkViewModels: bookmarkViewModels)
+        }
+    }
+
+    func updateBookmarksMenu(bookmarkViewModels: [BookmarkViewModel]) {
+
+        func bookmarkMenuItems(from bookmarkViewModels: [BookmarkViewModel]) -> [NSMenuItem] {
+            bookmarkViewModels
+                .filter { !$0.bookmark.isFavorite }
+                .map { NSMenuItem(bookmarkViewModel: $0) }
+        }
+
+        func favoriteMenuItems(from bookmarkViewModels: [BookmarkViewModel]) -> [NSMenuItem] {
+            bookmarkViewModels
+                .filter { $0.bookmark.isFavorite }
+                .enumerated()
+                .map { index, bookmarkViewModel in
+                    let item = NSMenuItem(bookmarkViewModel: bookmarkViewModel)
+                    if index < 9 {
+                        item.keyEquivalentModifierMask = [.option, .command]
+                        item.keyEquivalent = String(index + 1)
+                    }
+                    return item
+                }
+        }
+
+        guard let bookmarksMenu = bookmarksMenuItem?.submenu,
+              let favoritesSeparatorIndex = bookmarksMenu.items.lastIndex(where: { $0.isSeparatorItem }),
+              let favoritesMenuItem = favoritesMenuItem,
+              let favoritesMenu = favoritesMenuItem.submenu,
+              let favoriteThisPageSeparatorIndex = favoritesMenu.items.lastIndex(where: { $0.isSeparatorItem }) else {
+            os_log("MainMenuManager: Failed to reference bookmarks menu items", type: .error)
+            return
+        }
+
+        let cleanedBookmarkItems = bookmarksMenu.items.dropLast(bookmarksMenu.items.count - (favoritesSeparatorIndex + 1))
+        let bookmarkItems = bookmarkMenuItems(from: bookmarkViewModels)
+        bookmarksMenu.items = Array(cleanedBookmarkItems) + bookmarkItems
+
+        let cleanedFavoriteItems = favoritesMenu.items.dropLast(favoritesMenu.items.count - (favoriteThisPageSeparatorIndex + 1))
+        let favoriteItems = favoriteMenuItems(from: bookmarkViewModels)
+        favoritesMenu.items = Array(cleanedFavoriteItems) + favoriteItems
+    }
+
+}
+
+fileprivate extension NSMenuItem {
+    
+    convenience init(bookmarkViewModel: BookmarkViewModel) {
+        self.init()
+        
+        title = bookmarkViewModel.menuTitle
+        image = bookmarkViewModel.menuFavicon
+        representedObject = bookmarkViewModel.bookmark.url
+        action = #selector(MainViewController.navigateToBookmark(_:))
+    }
+
+    func removeFromParent() {
+        parent?.submenu?.removeItem(self)
     }
 
 }

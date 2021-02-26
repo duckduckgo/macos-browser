@@ -31,12 +31,11 @@ class ContentBlockerRulesUserScript: NSObject, UserScript {
     var injectionTime: WKUserScriptInjectionTime = .atDocumentStart
     var forMainFrameOnly = false
     let messageNames = ["processRule"]
-    lazy var source: String = {
-        // Unprotected domains are not yet implemented.
-        return loadJS("contentblockerrules", fromBundle: Bundle.main,  withReplacements: [
-            "${unprotectedDomains}": ""
-        ])
-    }()
+    var source: String
+
+    init(scriptSource: ScriptSourceProviding = DefaultScriptSourceProvider.shared) {
+        source = scriptSource.contentBlockerRulesSource
+    }
 
     weak var delegate: ContentBlockerUserScriptDelegate?
 
@@ -52,7 +51,7 @@ class ContentBlockerRulesUserScript: NSObject, UserScript {
         if let tracker = trackerFromUrl(urlString, blocked: blocked) {
             guard let pageUrl = URL(string: pageUrlStr),
                let pageHost = pageUrl.host,
-               let pageEntity = TrackerDataManager.shared.findEntity(forHost: pageHost) else {
+               let pageEntity = TrackerRadarManager.shared.findEntity(forHost: pageHost) else {
                 delegate.contentBlockerUserScript(self, detectedTracker: tracker)
                 return
             }
@@ -64,8 +63,8 @@ class ContentBlockerRulesUserScript: NSObject, UserScript {
     }
 
     private func trackerFromUrl(_ urlString: String, blocked: Bool) -> DetectedTracker? {
-        let knownTracker = TrackerDataManager.shared.findTracker(forUrl: urlString)
-        if let entity = TrackerDataManager.shared.findEntity(byName: knownTracker?.owner?.name ?? "") {
+        let knownTracker = TrackerRadarManager.shared.findTracker(forUrl: urlString)
+        if let entity = TrackerRadarManager.shared.findEntity(byName: knownTracker?.owner?.name ?? "") {
             return DetectedTracker(url: urlString, knownTracker: knownTracker, entity: entity, blocked: blocked)
         }
 

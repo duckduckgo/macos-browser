@@ -1,5 +1,5 @@
 //
-//  TrackerDataManager.swift
+//  TrackerRadarManager.swift
 //
 //  Copyright © 2021 DuckDuckGo. All rights reserved.
 //
@@ -19,7 +19,7 @@
 import Foundation
 import TrackerRadarKit
 
-class TrackerDataManager {
+class TrackerRadarManager {
 
     struct Constants {
         static let embeddedDataSetETag = "7c0a71eb049748b86e8590353141a90f"
@@ -34,7 +34,7 @@ class TrackerDataManager {
 
     }
 
-    static let shared = TrackerDataManager()
+    static let shared = TrackerRadarManager()
 
     private(set) var trackerData: TrackerData! {
         didSet {
@@ -44,22 +44,38 @@ class TrackerDataManager {
     }
 
     private(set) var encodedTrackerData: String!
-    private(set) var etag: String?
+    private var configDataStore: ConfigurationStoring
 
-    init(trackerData: TrackerData) {
-        self.trackerData = trackerData
-    }
-
-    init() {
-        reload(etag: nil)
+    init(configDataStore: ConfigurationStoring = DefaultConfigurationStorage.shared) {
+        self.configDataStore = configDataStore
+        reload()
     }
 
     @discardableResult
-    func reload(etag: String?) -> DataSet {
-        let trackerData = try? JSONDecoder().decode(TrackerData.self, from: Self.loadEmbeddedAsData())
-        self.trackerData = trackerData!
-        self.etag = Constants.embeddedDataSetETag
-        return .embedded
+    public func reload() -> DataSet {
+
+        let dataSet: DataSet
+        let data: Data
+
+        if let loadedData = DefaultConfigurationStorage.shared.loadData(for: .trackerRadar) {
+            data = loadedData
+            dataSet = .downloaded
+        } else {
+            data = Self.loadEmbeddedAsData()
+            dataSet = .embedded
+        }
+
+        do {
+            // This might fail if the downloaded data is corrupt or format has changed unexpectedly
+            trackerData = try JSONDecoder().decode(TrackerData.self, from: data)
+        } catch {
+            // This should NEVER fail
+            let trackerData = try? JSONDecoder().decode(TrackerData.self, from: Self.loadEmbeddedAsData())
+            self.trackerData = trackerData!
+            return .embeddedFallback
+        }
+
+        return dataSet
     }
 
     func findTracker(forUrl url: String) -> KnownTracker? {

@@ -27,6 +27,7 @@ class NavigationBarViewController: NSViewController {
     @IBOutlet weak var refreshButton: NSButton!
     @IBOutlet weak var feedbackButton: NSButton!
     @IBOutlet weak var optionsButton: NSButton!
+    @IBOutlet weak var shareButton: NSButton!
 
     var addressBarViewController: AddressBarViewController?
 
@@ -36,7 +37,6 @@ class NavigationBarViewController: NSViewController {
     private let goBackButtonMenuDelegate: NavigationButtonMenuDelegate
     private let goForwardButtonMenuDelegate: NavigationButtonMenuDelegate
     // swiftlint:enable weak_delegate
-    private let optionsMenu: OptionsButtonMenu
 
     private var selectedTabViewModelCancellable: AnyCancellable?
     private var navigationButtonsCancellables = Set<AnyCancellable>()
@@ -49,7 +49,6 @@ class NavigationBarViewController: NSViewController {
         self.tabCollectionViewModel = tabCollectionViewModel
         goBackButtonMenuDelegate = NavigationButtonMenuDelegate(buttonType: .back, tabCollectionViewModel: tabCollectionViewModel)
         goForwardButtonMenuDelegate = NavigationButtonMenuDelegate(buttonType: .forward, tabCollectionViewModel: tabCollectionViewModel)
-        optionsMenu = OptionsButtonMenu(tabCollectionViewModel: tabCollectionViewModel)
         super.init(coder: coder)
     }
 
@@ -107,16 +106,21 @@ class NavigationBarViewController: NSViewController {
 
     @IBAction func optionsButtonAction(_ sender: NSButton) {
         if let event = NSApplication.shared.currentEvent {
-            NSMenu.popUpContextMenu(optionsMenu, with: event, for: sender)
+            let menu = OptionsButtonMenu(tabCollectionViewModel: tabCollectionViewModel)
+            NSMenu.popUpContextMenu(menu, with: event, for: sender)
         }
+    }
+
+    @IBAction func shareButtonAction(_ sender: NSButton) {
+        guard let url = tabCollectionViewModel.selectedTabViewModel?.tab.url else { return }
+        let sharing = NSSharingServicePicker(items: [url])
+        sharing.show(relativeTo: .zero, of: sender, preferredEdge: .minY)
     }
 
 #if FEEDBACK
 
     @IBAction func feedbackButtonAction(_ sender: NSButton) {
-        let tab = Tab()
-        tab.url = URL.feedback
-        tabCollectionViewModel.append(tab: tab)
+        AppDelegate.shared.openFeedback(sender)
     }
 
 #else
@@ -173,6 +177,8 @@ class NavigationBarViewController: NSViewController {
         goBackButton.isEnabled = selectedTabViewModel.canGoBack
         goForwardButton.isEnabled = selectedTabViewModel.canGoForward
         refreshButton.isEnabled = selectedTabViewModel.canReload
+        shareButton.isEnabled = selectedTabViewModel.canReload
+        shareButton.isEnabled = selectedTabViewModel.tab.url != nil
     }
 
 }

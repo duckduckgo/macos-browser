@@ -39,6 +39,45 @@ extension AppDelegate {
         WindowsManager.closeWindows()
     }
 
+    // MARK: - Help
+
+#if FEEDBACK
+
+    @IBAction func openFeedback(_ sender: Any?) {
+        guard let windowController = WindowControllersManager.shared.lastKeyMainWindowController,
+              windowController.window?.isKeyWindow == true else {
+            WindowsManager.openNewWindow(with: URL.feedback)
+            return
+        }
+
+        guard let mainViewController = windowController.mainViewController else {
+            os_log("AppDelegate: No main view controller", type: .error)
+            return
+        }
+
+        DefaultConfigurationStorage.shared.log()
+        ConfigurationManager.shared.log()
+
+        let tab = Tab()
+        tab.url = URL.feedback
+
+        let tabCollectionViewModel = mainViewController.tabCollectionViewModel
+        tabCollectionViewModel.append(tab: tab)
+    }
+
+#endif
+
+    @IBAction func navigateToBookmark(_ sender: Any?) {
+        guard let menuItem = sender as? NSMenuItem else {
+            os_log("AppDelegate: Casting to menu item failed", type: .error)
+            return
+        }
+
+        let tab = Tab()
+        tab.url = menuItem.representedObject as? URL
+        WindowsManager.openNewWindow(with: tab)
+    }
+
 }
 
 extension MainViewController {
@@ -114,6 +153,34 @@ extension MainViewController {
         tabCollectionViewModel.putBackLastRemovedTab()
     }
 
+    // MARK: - Bookmarks
+    @IBAction func bookmarkThisPage(_ sender: Any?) {
+        navigationBarViewController?
+            .addressBarViewController?
+            .addressBarButtonsViewController?
+            .openBookmarkPopover(setFavorite: false)
+    }
+    
+    @IBAction func favoriteThisPage(_ sender: Any?) {
+        navigationBarViewController?
+            .addressBarViewController?
+            .addressBarButtonsViewController?
+            .openBookmarkPopover(setFavorite: true)
+    }
+    
+    @IBAction func navigateToBookmark(_ sender: Any?) {
+        guard let menuItem = sender as? NSMenuItem else {
+            os_log("MainViewController: Casting to menu item failed", type: .error)
+            return
+        }
+        guard let selectedTabViewModel = tabCollectionViewModel.selectedTabViewModel else {
+            os_log("MainViewController: No tab view model selected", type: .error)
+            return
+        }
+        
+        selectedTabViewModel.tab.url = menuItem.representedObject as? URL
+    }
+
     // MARK: - Window
 
     @IBAction func showPreviousTab(_ sender: Any?) {
@@ -172,20 +239,24 @@ extension MainViewController {
         if aSelector == #selector(findInPage(_:)) && tabCollectionViewModel.selectedTabViewModel?.tab.url == nil {
             return false
         }
+
+        if aSelector == #selector(printWebView(_:)) && tabCollectionViewModel.selectedTabViewModel?.tab.webView.url == nil {
+            return false
+        }
+
         return super.responds(to: aSelector)
     }
 
-    // MARK: - Help
+    // MARK: - Printing
 
-#if FEEDBACK
-
-    @IBAction func openFeedback(_ sender: Any?) {
-        let tab = Tab()
-        tab.url = URL.feedback
-        tabCollectionViewModel.append(tab: tab)
+    @IBAction func printWebView(_ sender: Any?) {
+        guard let webView = tabCollectionViewModel.selectedTabViewModel?.tab.webView else { return }
+        if #available(OSX 11.0, *) {
+            // This might crash when running from Xcode, hit resume and it should be fine.
+            // Release builds work fine.
+            webView.printOperation(with: NSPrintInfo.shared).run()
+        }
     }
-
-#endif
 
 }
 

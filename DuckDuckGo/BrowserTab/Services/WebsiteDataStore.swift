@@ -17,17 +17,82 @@
 //
 
 import WebKit
+import os
 
-protocol WebsiteDataStore {
+public protocol HTTPCookieStore {
 
-    func removeAllWebsiteData(_ completionHandler: @escaping () -> Void)
+    func getAllCookies(_ completionHandler: @escaping ([HTTPCookie]) -> Void)
+
+    func setCookie(_ cookie: HTTPCookie, completionHandler: (() -> Void)?)
+
+    func delete(_ cookie: HTTPCookie, completionHandler: (() -> Void)?)
 
 }
 
+protocol WebsiteDataStore {
+
+    var cookieStore: HTTPCookieStore? { get }
+
+    func fetchDataRecords(ofTypes dataTypes: Set<String>, completionHandler: @escaping ([WKWebsiteDataRecord]) -> Void)
+
+    func removeData(ofTypes dataTypes: Set<String>, for dataRecords: [WKWebsiteDataRecord], completionHandler: @escaping () -> Void)
+
+}
+
+class WebCacheManager {
+
+    static var shared = WebCacheManager()
+
+    init() { }
+
+    func clear(dataStore: WebsiteDataStore = WKWebsiteDataStore.default(),
+               logins: FireproofDomains = FireproofDomains.shared,
+               completion: @escaping () -> Void) {
+
+        let all = WKWebsiteDataStore.allWebsiteDataTypes()
+        let allExceptCookies = all.filter { $0 != "WKWebsiteDataTypeCookies" }
+
+        dataStore.fetchDataRecords(ofTypes: all) { records in
+
+            // Remove all data except cookies for all domains, and then filter cookies to preserve those allowed by Fireproofing.
+            dataStore.removeData(ofTypes: allExceptCookies, for: records) {
+                guard let cookieStore = dataStore.cookieStore else {
+                    completion()
+                    return
+                }
+
+                let group = DispatchGroup()
+
+                cookieStore.getAllCookies { cookies in
+                    let cookiesToRemove = cookies.filter { !logins.isAllowed(cookieDomain: $0.domain) && $0.domain != URL.cookieDomain }
+
+                    for cookie in cookiesToRemove {
+                        group.enter()
+                        os_log("Deleting cookie for %s named %s", log: .fire, cookie.domain, cookie.name)
+                        cookieStore.delete(cookie) {
+                            group.leave()
+                        }
+                    }
+                }
+
+                DispatchQueue.global(qos: .background).async {
+                    _ = group.wait(timeout: .now() + 5)
+                    DispatchQueue.main.async {
+                        completion()
+                    }
+                }
+            }
+        }
+    }
+
+}
+
+extension WKHTTPCookieStore: HTTPCookieStore {}
+
 extension WKWebsiteDataStore: WebsiteDataStore {
 
-    func removeAllWebsiteData(_ completionHandler: @escaping () -> Void) {
-        removeData(ofTypes: WKWebsiteDataStore.allWebsiteDataTypes(), modifiedSince: Date.distantPast, completionHandler: completionHandler)
+    var cookieStore: HTTPCookieStore? {
+        httpCookieStore
     }
 
 }

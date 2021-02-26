@@ -20,6 +20,7 @@ import Cocoa
 import os.log
 import Combine
 
+// swiftlint:disable file_length
 class TabBarViewController: NSViewController {
 
     enum HorizontalSpace: CGFloat {
@@ -38,13 +39,16 @@ class TabBarViewController: NSViewController {
     @IBOutlet weak var rightShadowImageView: NSImageView!
     @IBOutlet weak var leftShadowImageView: NSImageView!
     @IBOutlet weak var plusButton: MouseOverButton!
+    @IBOutlet weak var burnButton: BurnButton!
     @IBOutlet weak var windowDraggingViewLeadingConstraint: NSLayoutConstraint!
 
     private let tabCollectionViewModel: TabCollectionViewModel
+    private let bookmarkManager: BookmarkManager = LocalBookmarkManager.shared
     lazy private var fireViewModel = FireViewModel()
 
     private var tabsCancellable: AnyCancellable?
     private var selectionIndexCancellable: AnyCancellable?
+    private var cancellables = Set<AnyCancellable>()
 
     required init?(coder: NSCoder) {
         fatalError("TabBarViewController: Bad initializer")
@@ -62,6 +66,7 @@ class TabBarViewController: NSViewController {
         scrollView.updateScrollElasticity(with: tabMode)
         observeToScrollNotifications()
         subscribeToSelectionIndex()
+        subscribeToIsBurning()
     }
 
     override func viewWillAppear() {
@@ -108,6 +113,13 @@ class TabBarViewController: NSViewController {
         selectionIndexCancellable = tabCollectionViewModel.$selectionIndex.receive(on: DispatchQueue.main).sink { [weak self] _ in
             self?.reloadSelection()
         }
+    }
+
+    private func subscribeToIsBurning() {
+        fireViewModel.fire.$isBurning
+            .receive(on: DispatchQueue.main)
+            .weakAssign(to: \.isBurning, on: burnButton)
+            .store(in: &cancellables)
     }
 
     private func reloadSelection() {
@@ -638,6 +650,19 @@ extension TabBarViewController: TabBarViewItemDelegate {
         tabCollectionViewModel.duplicateTab(at: indexPath.item)
     }
 
+    func tabBarViewItemBookmarkThisPageAction(_ tabBarViewItem: TabBarViewItem) {
+        guard let indexPath = collectionView.indexPath(for: tabBarViewItem),
+              let tabViewModel = tabCollectionViewModel.tabViewModel(at: indexPath.item),
+              let url = tabViewModel.tab.url else {
+            os_log("TabBarViewController: Failed to get index path of tab bar view item", type: .error)
+            return
+        }
+
+        if !bookmarkManager.isUrlBookmarked(url: url) {
+            bookmarkManager.makeBookmark(for: url, title: tabViewModel.title, favicon: tabViewModel.favicon)
+        }
+    }
+
     func tabBarViewItemCloseAction(_ tabBarViewItem: TabBarViewItem) {
         guard let indexPath = collectionView.indexPath(for: tabBarViewItem) else {
             os_log("TabBarViewController: Failed to get index path of tab bar view item", type: .error)
@@ -665,6 +690,22 @@ extension TabBarViewController: TabBarViewItemDelegate {
         moveToNewWindow(indexPath: indexPath)
     }
 
+    func tabBarViewItemFireproofSite(_ tabBarViewItem: TabBarViewItem) {
+        if let url = tabCollectionViewModel.selectedTabViewModel?.tab.url?.host {
+            FireproofDomains.shared.addToAllowed(domain: url)
+        }
+
+        tabBarViewItem.setupMenu()
+    }
+
+    func tabBarViewItemRemoveFireproofing(_ tabBarViewItem: TabBarViewItem) {
+        if let url = tabCollectionViewModel.selectedTabViewModel?.tab.url?.host {
+            FireproofDomains.shared.remove(domain: url)
+        }
+
+        tabBarViewItem.setupMenu()
+    }
+
 }
 
 fileprivate extension NSAlert {
@@ -681,3 +722,4 @@ fileprivate extension NSAlert {
     }
 
 }
+// swiftlint:enable file_length

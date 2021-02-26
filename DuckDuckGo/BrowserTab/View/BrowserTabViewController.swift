@@ -189,6 +189,20 @@ extension BrowserTabViewController: TabDelegate {
         contextMenuLink = link
     }
 
+    func tab(_ tab: Tab, detectedLogin host: String) {
+        guard let window = view.window, !FireproofDomains.shared.isAllowed(fireproofDomain: host) else {
+            os_log("%s: Window is nil", type: .error, className)
+            return
+        }
+
+        let alert = NSAlert.fireproofAlert(with: host.dropWWW())
+        alert.beginSheetModal(for: window) { response in
+            if response == NSApplication.ModalResponse.alertFirstButtonReturn {
+                FireproofDomains.shared.addToAllowed(domain: host)
+            }
+        }
+    }
+
 }
 
 extension BrowserTabViewController: LinkMenuItemSelectors {
@@ -356,8 +370,11 @@ extension BrowserTabViewController: WKUIDelegate {
 
 fileprivate extension NSAlert {
 
+    static var cautionImage = NSImage(named: "NSCaution")
+
     static func javascriptAlert(with message: String) -> NSAlert {
         let alert = NSAlert()
+        alert.icon = Self.cautionImage
         alert.messageText = message
         alert.addButton(withTitle: UserText.ok)
         return alert
@@ -365,6 +382,7 @@ fileprivate extension NSAlert {
 
     static func javascriptConfirmation(with message: String) -> NSAlert {
         let alert = NSAlert()
+        alert.icon = Self.cautionImage
         alert.messageText = message
         alert.addButton(withTitle: UserText.ok)
         alert.addButton(withTitle: UserText.cancel)
@@ -373,6 +391,7 @@ fileprivate extension NSAlert {
 
     static func javascriptTextInput(prompt: String, defaultText: String?) -> NSAlert {
         let alert = NSAlert()
+        alert.icon = Self.cautionImage
         alert.messageText = prompt
         alert.addButton(withTitle: UserText.ok)
         alert.addButton(withTitle: UserText.cancel)
@@ -380,6 +399,17 @@ fileprivate extension NSAlert {
         textField.placeholderString = defaultText
         alert.accessoryView = textField
         alert.window.initialFirstResponder = textField
+        return alert
+    }
+
+    static func fireproofAlert(with domain: String) -> NSAlert {
+        let alert = NSAlert()
+        alert.messageText = UserText.fireproofConfirmationTitle(domain: domain)
+        alert.informativeText = UserText.fireproofConfirmationMessage
+        alert.alertStyle = .warning
+        alert.icon = #imageLiteral(resourceName: "Fireproof")
+        alert.addButton(withTitle: UserText.fireproof)
+        alert.addButton(withTitle: UserText.notNow)
         return alert
     }
 

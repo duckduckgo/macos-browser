@@ -27,7 +27,7 @@ class FireViewModel {
     }
 
     init() {
-        fire = Fire(websiteDataStore: WKWebsiteDataStore.default())
+        fire = Fire()
     }
 
 }

@@ -49,6 +49,14 @@ class OptionsButtonMenu: NSMenu {
                                                object: nil)
     }
 
+    let bookmarksMenuItem = NSMenuItem(title: UserText.bookmarks, action: nil, keyEquivalent: "")
+
+    override func update() {
+        updateBookmarks()
+
+        super.update()
+    }
+
     private func setupMenuItems() {
         let moveTabMenuItem = NSMenuItem(title: UserText.moveTabToNewWindow,
                                          action: #selector(moveTabToNewWindowAction(_:)),
@@ -60,9 +68,9 @@ class OptionsButtonMenu: NSMenu {
 #if FEEDBACK
 
         let openFeedbackMenuItem = NSMenuItem(title: "Send Feedback",
-                                         action: #selector(openFeedbackAction(_:)),
+                                              action: #selector(AppDelegate.openFeedback(_:)),
                                          keyEquivalent: "")
-        openFeedbackMenuItem.target = self
+        openFeedbackMenuItem.target = AppDelegate.shared
         openFeedbackMenuItem.image = NSImage(named: "Feedback")
         addItem(openFeedbackMenuItem)
 
@@ -76,6 +84,35 @@ class OptionsButtonMenu: NSMenu {
         addItem(emailItem)
         emailMenuItem = emailItem
         updateEmailMenuItem()
+    
+        addItem(NSMenuItem.separator())
+        
+        bookmarksMenuItem.image = NSImage(named: "Bookmark")
+        addItem(bookmarksMenuItem)
+
+        if let url = tabCollectionViewModel.selectedTabViewModel?.tab.url, url.canFireproof, let host = url.host {
+             if FireproofDomains.shared.isAllowed(fireproofDomain: host) {
+
+                let removeFireproofingItem = NSMenuItem(title: UserText.removeFireproofing,
+                                                 action: #selector(toggleFireproofing(_:)),
+                                                 keyEquivalent: "")
+                removeFireproofingItem.target = self
+                removeFireproofingItem.image = NSImage(named: "BurnProof")
+                addItem(removeFireproofingItem)
+
+             } else {
+
+                let fireproofSiteItem = NSMenuItem(title: UserText.fireproofSite,
+                                                 action: #selector(toggleFireproofing(_:)),
+                                                 keyEquivalent: "")
+                fireproofSiteItem.target = self
+                fireproofSiteItem.image = NSImage(named: "BurnProof")
+                addItem(fireproofSiteItem)
+
+             }
+
+             addItem(NSMenuItem.separator())
+         }
     }
     
     private func updateEmailMenuItem() {
@@ -89,6 +126,11 @@ class OptionsButtonMenu: NSMenu {
             emailMenuItem?.action = #selector(turnOnEmailAction(_:))
         }
     }
+    
+    private func updateBookmarks() {
+        // The bookmarks section is the same with the main menu
+        bookmarksMenuItem.submenu = NSApplication.shared.mainMenuTyped?.bookmarksMenuItem?.submenu?.copy() as? NSMenu
+    }
 
     @objc func moveTabToNewWindowAction(_ sender: NSMenuItem) {
         guard let selectedTabViewModel = tabCollectionViewModel.selectedTabViewModel else {
@@ -101,15 +143,14 @@ class OptionsButtonMenu: NSMenu {
         WindowsManager.openNewWindow(with: tab)
     }
 
-#if FEEDBACK
-
-    @objc func openFeedbackAction(_ sender: NSMenuItem) {
-        let tab = Tab()
-        tab.url = URL.feedback
-        tabCollectionViewModel.append(tab: tab)
+    @objc func toggleFireproofing(_ sender: NSMenuItem) {
+        guard let selectedTabViewModel = tabCollectionViewModel.selectedTabViewModel else {
+            os_log("MainViewController: No tab view model selected", type: .error)
+            return
+        }
+        
+        selectedTabViewModel.tab.requestFireproofToggle()
     }
-
-#endif
     
     @objc func turnOffEmailAction(_ sender: NSMenuItem) {
         emailManager.signOut()

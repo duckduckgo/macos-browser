@@ -21,27 +21,33 @@ import os.log
 
 class Fire {
 
-    let websiteDataStore: WebsiteDataStore
+    let webCacheManager: WebCacheManager
 
     @Published private(set) var isBurning = false
 
-    init(websiteDataStore: WebsiteDataStore) {
-        self.websiteDataStore = websiteDataStore
+    init(cacheManager: WebCacheManager = .shared) {
+        self.webCacheManager = cacheManager
     }
 
-    func burnAll(tabCollectionViewModel: TabCollectionViewModel) {
+    func burnAll(tabCollectionViewModel: TabCollectionViewModel, completion: (() -> Void)? = nil) {
         isBurning = true
 
         tabCollectionViewModel.tabCollection.tabs.forEach { $0.stopLoading() }
 
-        if tabCollectionViewModel.tabCollection.tabs.count > 0 {
-            tabCollectionViewModel.removeAllTabsAndAppendNewTab()
-        } else {
-            tabCollectionViewModel.appendNewTab()
-        }
-
-        websiteDataStore.removeAllWebsiteData { [weak self] in
+        os_log("WebsiteDataStore began cookie deletion", log: .fire)
+        webCacheManager.clear { [weak self] in
+            os_log("WebsiteDataStore completed cookie deletion", log: .fire)
             self?.isBurning = false
+
+            DispatchQueue.main.async {
+                if tabCollectionViewModel.tabCollection.tabs.count > 0 {
+                    tabCollectionViewModel.removeAllTabsAndAppendNewTab()
+                } else {
+                    tabCollectionViewModel.appendNewTab()
+                }
+
+                completion?()
+            }
         }
     }
 }

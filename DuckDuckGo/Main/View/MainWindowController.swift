@@ -195,6 +195,10 @@ extension MainWindowController: NSWindowDelegate {
         addWindowButtonsAsSubViewsIfNeeded()
     }
 
+    func windowDidResignMain(_ notification: Notification) {
+        mainViewController?.windowDidResignMain()
+    }
+
     func windowWillClose(_ notification: Notification) {
         guard let mainViewController = contentViewController as? MainViewController else {
             os_log("MainWindowController: Failed to get reference to main view controller", type: .error)
