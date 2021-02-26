@@ -33,7 +33,7 @@ class LoginFormDetectionUserScript: NSObject, UserScript {
     var forMainFrameOnly = false
     let messageNames = ["loginFormDetected"]
     lazy var source: String = {
-        return loadJS("login-detection", fromBundle: Bundle.main)
+        return LoginFormDetectionUserScript.loadJS("login-detection", fromBundle: Bundle.main)
     }()
 
     /// Some cases require scanning for login forms direction. For instance, forms that directly call `form.submit()` will not trigger the submit event that this script typically uses to detect logins.

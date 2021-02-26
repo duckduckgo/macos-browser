@@ -28,6 +28,7 @@ class UserScripts {
     let loginDetectionUserScript = LoginFormDetectionUserScript()
     let contentBlockerScript = ContentBlockerUserScript()
     let contentBlockerRulesScript = ContentBlockerRulesUserScript()
+    let emailScript = EmailUserScript()
     let debugScript = DebugUserScript()
 
     lazy var userScripts: [UserScript] = [
@@ -38,7 +39,8 @@ class UserScripts {
         self.findInPageScript,
         self.loginDetectionUserScript,
         self.contentBlockerScript,
-        self.contentBlockerRulesScript
+        self.contentBlockerRulesScript,
+        self.emailScript
     ]
 
     func install(into webView: WebView) {

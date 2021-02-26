@@ -224,6 +224,12 @@ final class Tab: NSObject {
     }
 
     // MARK: - User Scripts
+    
+    lazy var emailManager: EmailManager = {
+        let emailManager = EmailManager()
+        emailManager.requestDelegate = self
+        return emailManager
+    }()
 
     var userScripts = UserScripts()
 
@@ -235,6 +241,8 @@ final class Tab: NSObject {
         userScripts.loginDetectionUserScript.delegate = self
         userScripts.contentBlockerScript.delegate = self
         userScripts.contentBlockerRulesScript.delegate = self
+        userScripts.emailScript.webView = webView
+        userScripts.emailScript.delegate = emailManager
 
         attachFindInPage()
 
