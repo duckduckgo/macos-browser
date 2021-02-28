@@ -224,6 +224,14 @@ extension BrowserTabViewController: LinkMenuItemSelectors {
         self.tab(tab, requestedFileDownload: FileDownload(request: URLRequest(url: url), suggestedName: nil))
     }
 
+    func copyLink(_ sender: NSMenuItem) {
+        guard let url = contextMenuLink as NSURL? else { return }
+
+        let pasteboard = NSPasteboard.general
+        pasteboard.declareTypes([.URL], owner: nil)
+        url.write(to: pasteboard)
+    }
+
 }
 
 extension BrowserTabViewController: ImageMenuItemSelectors {
