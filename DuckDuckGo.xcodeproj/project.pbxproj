@@ -202,6 +202,8 @@
 		AAF7D3862567CED500998667 /* WebViewConfiguration.swift in Sources */ = {isa = PBXBuildFile; fileRef = AAF7D3852567CED500998667 /* WebViewConfiguration.swift */; };
 		AAFCB37A25E5403A00859DD4 /* BurnButton.swift in Sources */ = {isa = PBXBuildFile; fileRef = AAFCB37925E5403A00859DD4 /* BurnButton.swift */; };
 		AAFCB37F25E545D400859DD4 /* PublisherExtension.swift in Sources */ = {isa = PBXBuildFile; fileRef = AAFCB37E25E545D400859DD4 /* PublisherExtension.swift */; };
+		B61F012325ECBAE400ABB5A3 /* UserScriptsTest.swift in Sources */ = {isa = PBXBuildFile; fileRef = B61F012225ECBAE400ABB5A3 /* UserScriptsTest.swift */; };
+		B61F012B25ECBB1700ABB5A3 /* UserScriptsManagerTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = B61F012A25ECBB1700ABB5A3 /* UserScriptsManagerTests.swift */; };
 		B62EB47C25BAD3BB005745C6 /* WKWebViewSessionDataTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = B62EB47B25BAD3BB005745C6 /* WKWebViewSessionDataTests.swift */; };
 		B633C86D25E797D800E4B352 /* UserScriptsManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = B633C86C25E797D800E4B352 /* UserScriptsManager.swift */; };
 		B633C88725E7BC5600E4B352 /* NSObject+lifetimeDisposeBag.swift in Sources */ = {isa = PBXBuildFile; fileRef = B633C88625E7BC5600E4B352 /* NSObject+lifetimeDisposeBag.swift */; };
@@ -449,6 +451,8 @@
 		AAF7D3852567CED500998667 /* WebViewConfiguration.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WebViewConfiguration.swift; sourceTree = "<group>"; };
 		AAFCB37925E5403A00859DD4 /* BurnButton.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BurnButton.swift; sourceTree = "<group>"; };
 		AAFCB37E25E545D400859DD4 /* PublisherExtension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PublisherExtension.swift; sourceTree = "<group>"; };
+		B61F012225ECBAE400ABB5A3 /* UserScriptsTest.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UserScriptsTest.swift; sourceTree = "<group>"; };
+		B61F012A25ECBB1700ABB5A3 /* UserScriptsManagerTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UserScriptsManagerTests.swift; sourceTree = "<group>"; };
 		B62EB47B25BAD3BB005745C6 /* WKWebViewSessionDataTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = WKWebViewSessionDataTests.swift; sourceTree = "<group>"; };
 		B633C86C25E797D800E4B352 /* UserScriptsManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UserScriptsManager.swift; sourceTree = "<group>"; };
 		B633C88625E7BC5600E4B352 /* NSObject+lifetimeDisposeBag.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "NSObject+lifetimeDisposeBag.swift"; sourceTree = "<group>"; };
@@ -883,6 +887,7 @@
 				4B02199725E063DE00ED7DEA /* Fireproofing */,
 				AA63744E24C9BB4A00AB2AC4 /* Suggestions */,
 				AAC9C01224CAFBB700AD1325 /* TabBar */,
+				B61F012125ECBACE00ABB5A3 /* UserScripts */,
 				AA585D96248FD31400E9A3E2 /* Info.plist */,
 			);
 			path = "Unit Tests";
@@ -1426,6 +1431,15 @@
 			path = View;
 			sourceTree = "<group>";
 		};
+		B61F012125ECBACE00ABB5A3 /* UserScripts */ = {
+			isa = PBXGroup;
+			children = (
+				B61F012A25ECBB1700ABB5A3 /* UserScriptsManagerTests.swift */,
+				B61F012225ECBAE400ABB5A3 /* UserScriptsTest.swift */,
+			);
+			path = UserScripts;
+			sourceTree = "<group>";
+		};
 		B633C89425E85C5700E4B352 /* Recovered References */ = {
 			isa = PBXGroup;
 			children = (
@@ -1827,9 +1841,11 @@
 				AA63745624C9EB3C00AB2AC4 /* SuggestionsAPIResultTests.swift in Sources */,
 				AA652CCE25DD9071009059CC /* BookmarkListTests.swift in Sources */,
 				B6A5A2A825BAA35500AA7ADA /* WindowManagerStateRestorationTests.swift in Sources */,
+				B61F012325ECBAE400ABB5A3 /* UserScriptsTest.swift in Sources */,
 				4B11060A25903EAC0039B979 /* CoreDataEncryptionTests.swift in Sources */,
 				8553FF52257523760029327F /* FileDownloadTests.swift in Sources */,
 				4BA1A6E6258C270800F6F690 /* EncryptionKeyGeneratorTests.swift in Sources */,
+				B61F012B25ECBB1700ABB5A3 /* UserScriptsManagerTests.swift in Sources */,
 				85AC3B1725D9BC1A00C7D2AA /* ConfigurationDownloaderTests.swift in Sources */,
 				4BA1A6F6258C4F9600F6F690 /* EncryptionMocks.swift in Sources */,
 				4B02199D25E063DE00ED7DEA /* FireproofingURLExtensionsTests.swift in Sources */,

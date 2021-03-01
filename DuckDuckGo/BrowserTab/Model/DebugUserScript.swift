@@ -20,6 +20,13 @@ import WebKit
 import os
 import BrowserServicesKit
 
+protocol TabInstrumentationProtocol: class {
+    func request(url: String, allowedIn timeInMs: Double)
+    func tracker(url: String, allowedIn timeInMs: Double, reason: String?)
+    func tracker(url: String, blockedIn timeInMs: Double)
+    func jsEvent(name: String, executedIn timeInMs: Double)
+}
+
 class DebugUserScript: NSObject, StaticUserScript {
 
     enum MessageNames: String, CaseIterable {
@@ -41,7 +48,7 @@ class DebugUserScript: NSObject, StaticUserScript {
     }()
     static var script: WKUserScript = DebugUserScript.makeWKUserScript()
 
-    weak var instrumentation: TabInstrumentation?
+    weak var instrumentation: TabInstrumentationProtocol?
 
     func userContentController(_ userContentController: WKUserContentController, didReceive message: WKScriptMessage) {
         let messageType = MessageNames(rawValue: message.name)

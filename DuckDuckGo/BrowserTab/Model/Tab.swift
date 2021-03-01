@@ -82,7 +82,7 @@ final class Tab: NSObject {
     }
 
     deinit {
-        userScripts?.remove(from: webView)
+        userScripts?.remove(from: webView.configuration.userContentController)
     }
 
     let webView: WebView
@@ -250,7 +250,7 @@ final class Tab: NSObject {
     private var userScripts: UserScripts! {
         willSet {
             if let userScripts = userScripts {
-                userScripts.remove(from: webView)
+                userScripts.remove(from: webView.configuration.userContentController)
             }
         }
         didSet {
@@ -264,7 +264,9 @@ final class Tab: NSObject {
 
             attachFindInPage()
 
-            userScripts.install(into: webView)
+            if webView.configuration.userContentController.userScripts.isEmpty {
+            userScripts.install(into: webView.configuration.userContentController)
+            }
         }
     }
 

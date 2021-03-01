@@ -19,7 +19,7 @@
 import Foundation
 import os.signpost
 
-class TabInstrumentation {
+class TabInstrumentation: TabInstrumentationProtocol {
 
     static let tabsLog = OSLog(subsystem: "com.duckduckgo.instrumentation",
                                category: "TabInstrumentation")

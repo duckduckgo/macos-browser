@@ -51,14 +51,4 @@ class UserScripts {
 
     lazy var scripts = userScripts.map { $0.makeWKUserScript() }
 
-    func install(into webView: WebView) {
-        scripts.forEach(webView.configuration.userContentController.addUserScript)
-        userScripts.forEach(webView.configuration.userContentController.addHandler)
-    }
-
-    func remove(from webView: WebView) {
-        webView.configuration.userContentController.removeAllUserScripts()
-        userScripts.forEach(webView.configuration.userContentController.removeHandler)
-    }
-
 }

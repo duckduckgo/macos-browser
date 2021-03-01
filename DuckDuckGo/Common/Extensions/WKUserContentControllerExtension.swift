@@ -20,7 +20,20 @@ import Cocoa
 import WebKit
 import BrowserServicesKit
 
-extension WKUserContentController {
+protocol UserScripting {
+    func addUserScript(_ userScript: WKUserScript)
+    func removeAllUserScripts()
+
+    @available(macOS 11.0, *)
+    func add(_ scriptMessageHandler: WKScriptMessageHandler, contentWorld world: WKContentWorld, name: String)
+    func add(_ scriptMessageHandler: WKScriptMessageHandler, name: String)
+    @available(macOS 11.0, *)
+    func removeScriptMessageHandler(forName name: String, contentWorld: WKContentWorld)
+    func removeScriptMessageHandler(forName name: String)
+
+}
+
+extension UserScripting {
 
     func addHandler(_ userScript: UserScript) {
         for messageName in userScript.messageNames {
@@ -42,4 +55,21 @@ extension WKUserContentController {
         }
     }
     
+}
+
+extension WKUserContentController: UserScripting {
+}
+
+extension UserScripts {
+
+    func install(into userScripting: UserScripting) {
+        scripts.forEach(userScripting.addUserScript)
+        userScripts.forEach(userScripting.addHandler)
+    }
+
+    func remove(from userScripting: UserScripting) {
+        userScripting.removeAllUserScripts()
+        userScripts.forEach(userScripting.removeHandler)
+    }
+
 }
