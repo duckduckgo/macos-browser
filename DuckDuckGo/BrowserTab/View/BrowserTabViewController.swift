@@ -169,7 +169,7 @@ extension BrowserTabViewController: TabDelegate {
 
     func tab(_ tab: Tab, requestedOpenExternalURL url: URL) {
         guard let window = self.view.window else {
-            // LOG
+            os_log("%s: Window is nil", type: .error, className)
             return
         }
 
