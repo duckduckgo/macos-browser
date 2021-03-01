@@ -25,7 +25,7 @@ class FindInPageUserScript: NSObject, UserScript {
     var forMainFrameOnly = false
     let messageNames = ["findInPageHandler"]
     lazy var source: String = {
-        return FindInPageUserScript.loadJS("findinpage", fromBundle: Bundle.main)
+        return FindInPageUserScript.loadJS("findinpage", from: Bundle.main)
     }()
     
     weak var model: FindInPageModel?
