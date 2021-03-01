@@ -2221,8 +2221,8 @@
 			isa = XCRemoteSwiftPackageReference;
 			repositoryURL = "https://dub.duckduckgo.com/duckduckgo/BrowserServicesKit";
 			requirement = {
-				branch = "feature/elle/update-email";
-				kind = branch;
+				kind = upToNextMinorVersion;
+				minimumVersion = 0.3.0;
 			};
 		};
 /* End XCRemoteSwiftPackageReference section */
