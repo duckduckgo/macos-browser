@@ -323,6 +323,7 @@ extension Tab: ContentBlockerUserScriptDelegate {
 
 extension Tab: EmailManagerRequestDelegate {
     
+    // swiftlint:disable function_parameter_count
     func emailManager(_ emailManager: EmailManager,
                       didRequestAliasWithURL url: URL,
                       method: String,
@@ -337,6 +338,7 @@ extension Tab: EmailManagerRequestDelegate {
             completion(data, error)
         }.resume()
     }
+    // swiftlint:enable function_parameter_count
     
 }
 
