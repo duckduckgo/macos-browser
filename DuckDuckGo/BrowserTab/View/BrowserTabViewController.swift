@@ -173,7 +173,10 @@ extension BrowserTabViewController: TabDelegate {
             return
         }
 
-        guard let appUrl = NSWorkspace.shared.urlForApplication(toOpen: url) else { return }
+        guard let appUrl = NSWorkspace.shared.urlForApplication(toOpen: url) else {
+            NSAlert.unableToOpenExernalURLAlert().beginSheetModal(for: window)
+            return
+        }
         let externalAppName = Bundle(url: appUrl)?.infoDictionary?["CFBundleName"] as? String
 
         NSAlert.openExternalURLAlert(with: externalAppName).beginSheetModal(for: window) { response in
@@ -450,9 +453,16 @@ fileprivate extension NSAlert {
         }
 
         alert.alertStyle = .warning
-        alert.addButton(withTitle: UserText.openExternalURLOpenAction)
-        alert.addButton(withTitle: UserText.openExternalURLCancelAction)
+        alert.addButton(withTitle: UserText.open)
+        alert.addButton(withTitle: UserText.cancel)
+        return alert
+    }
 
+    static func unableToOpenExernalURLAlert() -> NSAlert {
+        let alert = NSAlert()
+        alert.messageText = UserText.failedToOpenExternally
+        alert.alertStyle = .warning
+        alert.addButton(withTitle: UserText.ok)
         return alert
     }
 

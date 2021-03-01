@@ -23,6 +23,7 @@ struct UserText {
     static let ok = NSLocalizedString("ok", value: "OK", comment: "OK button")
     static let cancel = NSLocalizedString("cancel", value: "Cancel", comment: "Cancel button")
     static let notNow = NSLocalizedString("notnow", value: "Not Now", comment: "Not Now button")
+    static let open = NSLocalizedString("open", value: "Open", comment: "Open button")
 
     static let duplicateTab = NSLocalizedString("duplicate.tab", value: "Duplicate Tab", comment: "Menu item. Duplicate as a verb")
     static let closeTab = NSLocalizedString("close.tab", value: "Close Tab", comment: "Menu item")
@@ -101,8 +102,6 @@ struct UserText {
 
     static let openExternalURLTitleUnknownApp = NSLocalizedString("open.external.url.title.unknown.app", value: "Open in Another App?", comment: "Open URL in another app dialog title for unknown app")
     static let openExternalURLMessageUnknownApp = NSLocalizedString("open.external.url.message.unknown.app", value: "Do you want to view this content in another app?", comment: "Open URL in another app dialog message for unknown app")
-
-    static let openExternalURLOpenAction = NSLocalizedString("open.external.url.open.action", value: "Open", comment: "Text for the open button")
-    static let openExternalURLCancelAction = NSLocalizedString("open.external.url.cancel.action", value: "Cancel", comment: "Text for the cance button")
+    static let failedToOpenExternally = NSLocalizedString("open.externally.failed", value: "The app required to open that link can’t be found", comment: "’Link’ is link on a website")
 
 }
