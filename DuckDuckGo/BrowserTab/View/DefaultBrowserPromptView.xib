@@ -44,7 +44,11 @@
                             <imageCell key="cell" refusesFirstResponder="YES" alignment="left" imageScaling="proportionallyDown" image="Logo" id="Y7f-UL-UBE"/>
                         </imageView>
                         <button verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="8eV-Qb-jVn">
-                            <rect key="frame" x="20" y="29" width="8" height="8"/>
+                            <rect key="frame" x="20" y="18" width="30" height="30"/>
+                            <constraints>
+                                <constraint firstAttribute="width" constant="30" id="CpQ-bM-0AT"/>
+                                <constraint firstAttribute="height" constant="30" id="F6W-5F-sSp"/>
+                            </constraints>
                             <buttonCell key="cell" type="square" bezelStyle="shadowlessSquare" image="Close" imagePosition="only" alignment="center" imageScaling="proportionallyDown" inset="2" id="vk7-eB-IwF">
                                 <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
                                 <font key="font" metaFont="system"/>
