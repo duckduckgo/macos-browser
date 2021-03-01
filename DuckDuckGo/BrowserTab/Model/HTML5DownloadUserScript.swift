@@ -26,10 +26,11 @@ protocol HTML5DownloadDelegate: class {
 }
 
 class HTML5DownloadUserScript: NSObject, StaticUserScript {
-    static var script: WKUserScript?
 
-    var injectionTime: WKUserScriptInjectionTime = .atDocumentEnd
-    var forMainFrameOnly = true
+    static var injectionTime: WKUserScriptInjectionTime { .atDocumentEnd }
+    static var forMainFrameOnly: Bool { true }
+    static var script: WKUserScript = HTML5DownloadUserScript.makeWKUserScript()
+    var messageNames: [String] { ["downloadFile"] }
 
     weak var delegate: HTML5DownloadDelegate?
 
@@ -42,8 +43,7 @@ class HTML5DownloadUserScript: NSObject, StaticUserScript {
         delegate?.startDownload(self, from: url, withSuggestedName: name)
     }
 
-    let messageNames = ["downloadFile"]
-    let source = """
+    static let source = """
 (function() {
 
     document.addEventListener("click", function(e) {

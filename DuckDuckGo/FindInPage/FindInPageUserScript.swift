@@ -20,14 +20,12 @@ import WebKit
 import BrowserServicesKit
 
 class FindInPageUserScript: NSObject, StaticUserScript {
-    static var script: WKUserScript?
 
-    var injectionTime: WKUserScriptInjectionTime = .atDocumentEnd
-    var forMainFrameOnly = false
-    let messageNames = ["findInPageHandler"]
-    lazy var source: String = {
-        return Self.loadJS("findinpage", fromBundle: Bundle.main)
-    }()
+    static var injectionTime: WKUserScriptInjectionTime { .atDocumentEnd }
+    static var forMainFrameOnly: Bool { false }
+    static var source: String = FindInPageUserScript.loadJS("findinpage", from: .main)
+    static var script: WKUserScript = FindInPageUserScript.makeWKUserScript()
+    var messageNames: [String] { ["findInPageHandler"] }
 
     weak var model: FindInPageModel?
 

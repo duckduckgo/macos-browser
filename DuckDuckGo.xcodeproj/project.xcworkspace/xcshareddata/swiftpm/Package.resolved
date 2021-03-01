@@ -5,8 +5,8 @@
         "package": "BrowserServicesKit",
         "repositoryURL": "https://dub.duckduckgo.com/duckduckgo/BrowserServicesKit",
         "state": {
-          "branch": "main",
-          "revision": "256c1434300728fbcb5c44b8687fcb7abb3ff816",
+          "branch": "feature/alex/staticUserScript",
+          "revision": "b2b517637131c3827a3545eaab5058c6f8ab4693",
           "version": null
         }
       },

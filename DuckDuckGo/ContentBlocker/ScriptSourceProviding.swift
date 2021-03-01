@@ -59,7 +59,7 @@ class DefaultScriptSourceProvider: ScriptSourceProviding {
 
     private func buildContentBlockerRulesSource() -> String {
         let unprotectedDomains = configStorage.loadData(for: .temporaryUnprotectedSites)?.utf8String() ?? ""
-        return ContentBlockerRulesUserScript.loadJS("contentblockerrules", fromBundle: .main, withReplacements: [
+        return ContentBlockerRulesUserScript.loadJS("contentblockerrules", from: .main, withReplacements: [
             "${unprotectedDomains}": unprotectedDomains
         ])
     }
@@ -71,7 +71,7 @@ class DefaultScriptSourceProvider: ScriptSourceProviding {
         let surrogates = configStorage.loadData(for: .surrogates)?.utf8String() ?? ""
         let unprotectedSites = configStorage.loadData(for: .temporaryUnprotectedSites)?.utf8String() ?? ""
 
-        return ContentBlockerUserScript.loadJS("contentblocker", fromBundle: .main, withReplacements: [
+        return ContentBlockerUserScript.loadJS("contentblocker", from: .main, withReplacements: [
             "${unprotectedDomains}": unprotectedSites,
             "${trackerData}": trackerData,
             "${surrogates}": surrogates

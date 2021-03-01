@@ -21,7 +21,6 @@ import os
 import BrowserServicesKit
 
 class DebugUserScript: NSObject, StaticUserScript {
-    static var script: WKUserScript?
 
     enum MessageNames: String, CaseIterable {
 
@@ -30,16 +29,17 @@ class DebugUserScript: NSObject, StaticUserScript {
 
     }
 
-    var injectionTime: WKUserScriptInjectionTime = .atDocumentStart
-    var forMainFrameOnly = false
-    let messageNames = MessageNames.allCases.map(\.rawValue)
-    let source: String = {
+    static var injectionTime: WKUserScriptInjectionTime { .atDocumentStart }
+    static var forMainFrameOnly: Bool { false }
+    var messageNames: [String] { MessageNames.allCases.map(\.rawValue) }
+    static let source: String = {
         #if DEBUG
             return DebugUserScript.debugMessagingEnabledSource
         #else
             return DebugUserScript.debugMessagingDisabledSource
         #endif
     }()
+    static var script: WKUserScript = DebugUserScript.makeWKUserScript()
 
     weak var instrumentation: TabInstrumentation?
 

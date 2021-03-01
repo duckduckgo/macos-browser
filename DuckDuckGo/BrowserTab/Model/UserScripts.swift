@@ -49,7 +49,7 @@ class UserScripts {
         self.contentBlockerRulesScript
     ]
 
-    private lazy var scripts = userScripts.map(WKUserScript.makeWKUserScript(from:))
+    lazy var scripts = userScripts.map { $0.makeWKUserScript() }
 
     func install(into webView: WebView) {
         scripts.forEach(webView.configuration.userContentController.addUserScript)

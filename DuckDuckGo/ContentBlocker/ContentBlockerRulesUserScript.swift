@@ -28,10 +28,10 @@ class ContentBlockerRulesUserScript: NSObject, UserScript {
         static let pageUrl = "pageUrl"
     }
 
-    var injectionTime: WKUserScriptInjectionTime = .atDocumentStart
-    var forMainFrameOnly = false
-    let messageNames = ["processRule"]
-    var source: String
+    var injectionTime: WKUserScriptInjectionTime { .atDocumentStart }
+    var forMainFrameOnly: Bool { false }
+    var messageNames: [String] { ["processRule"] }
+    let source: String
 
     init(scriptSource: ScriptSourceProviding = DefaultScriptSourceProvider.shared) {
         source = scriptSource.contentBlockerRulesSource
@@ -70,4 +70,5 @@ class ContentBlockerRulesUserScript: NSObject, UserScript {
 
         return nil
     }
+
 }
