@@ -29,6 +29,7 @@ protocol TabDelegate: class {
     func tab(_ tab: Tab, requestedFileDownload download: FileDownload)
     func tab(_ tab: Tab, willShowContextMenuAt position: NSPoint, image: URL?, link: URL?)
     func tab(_ tab: Tab, detectedLogin host: String)
+    func tab(_ tab: Tab, requestedOpenExternalURL url: URL)
 
 }
 
@@ -75,6 +76,7 @@ final class Tab: NSObject {
         }
 
         subscribeToTrackerBlockerConfigUpdatedEvents()
+        subscribeToOpenExternalUrlEvents()
     }
 
     deinit {
@@ -178,6 +180,17 @@ final class Tab: NSObject {
             } catch {
                 os_log("Tab:setupWebView could not restore session state %s", "\(error)")
             }
+        }
+    }
+
+    // MARK: - Open External URL
+
+    let externalUrlHandler = ExternalURLHandler()
+    var openExternalUrlEventsCancellable: AnyCancellable?
+
+    private func subscribeToOpenExternalUrlEvents() {
+        openExternalUrlEventsCancellable = externalUrlHandler.openExternalUrlPublisher.sink {
+            self.delegate?.tab(self, requestedOpenExternalURL: $0)
         }
     }
 
@@ -356,13 +369,13 @@ extension Tab: WKNavigationDelegate {
             return
         }
 
-        #warning("Temporary implementation copied from the prototype. Only for internal release!")
-        if !["https", "http", "about", "data"].contains(urlScheme) {
-            let openResult = NSWorkspace.shared.open(url)
-            if openResult {
-                decisionHandler(.cancel)
-                return
-            }
+        if externalUrlHandler.isExternal(scheme: urlScheme) {
+            externalUrlHandler.handle(url: url,
+                                      onPage: webView.url,
+                                      fromFrame: !navigationAction.sourceFrame.isMainFrame, // ignore <iframe src="custom://url">
+                                      triggeredByUser: navigationAction.navigationType == .linkActivated)
+            decisionHandler(.cancel)
+            return
         }
 
         HTTPSUpgrade.shared.isUpgradeable(url: url) { [weak self] isUpgradable in

@@ -167,6 +167,10 @@ class BrowserTabViewController: NSViewController {
 
 extension BrowserTabViewController: TabDelegate {
 
+    func tab(_ tab: Tab, requestedOpenExternalURL url: URL) {
+        print("***", #function, url)
+    }
+
     func tabDidStartNavigation(_ tab: Tab) {
         setFirstResponderIfNeeded()
         tabViewModel?.closeFindInPage()
