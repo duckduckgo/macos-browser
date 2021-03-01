@@ -173,28 +173,10 @@ extension BrowserTabViewController: TabDelegate {
             return
         }
 
-        guard let appUrl = NSWorkspace.shared.urlForApplication(toOpen: url) else {
-            print("***", #function, "no app for url")
-            return
-        }
+        guard let appUrl = NSWorkspace.shared.urlForApplication(toOpen: url) else { return }
+        let externalAppName = Bundle(url: appUrl)?.infoDictionary?["CFBundleName"] as? String
 
-        print("***", appUrl)
-
-        let targetBundleName = Bundle(url: appUrl)?.infoDictionary?["CFBundleName"]
-        let appName = targetBundleName ?? "in Another App"
-        let informativeText = targetBundleName == nil
-            ? "Would you like to leave DuckDuckGo to view this content?"
-            : "Would you like to open \"\(url.absoluteString)\" in \(appName)?"
-            // : "Would you like to open \(appName) to view this content?"
-
-        let alert = NSAlert()
-        alert.messageText = "Open \(appName)?"
-        alert.informativeText = informativeText
-        alert.alertStyle = .warning
-        alert.addButton(withTitle: "Open")
-        alert.addButton(withTitle: "Cancel")
-
-        alert.beginSheetModal(for: window) { response in
+        NSAlert.openExternalURLAlert(with: externalAppName).beginSheetModal(for: window) { response in
             if response == NSApplication.ModalResponse.alertFirstButtonReturn {
                 NSWorkspace.shared.open(url)
             }
@@ -453,6 +435,24 @@ fileprivate extension NSAlert {
         alert.icon = #imageLiteral(resourceName: "Fireproof")
         alert.addButton(withTitle: UserText.fireproof)
         alert.addButton(withTitle: UserText.notNow)
+        return alert
+    }
+
+    static func openExternalURLAlert(with appName: String?) -> NSAlert {
+        let alert = NSAlert()
+
+        if let appName = appName {
+            alert.messageText = UserText.openExternalURLTitle(forAppName: appName)
+            alert.informativeText = UserText.openExternalURLMessage(forAppName: appName)
+        } else {
+            alert.messageText = UserText.openExternalURLTitleUnknownApp
+            alert.informativeText = UserText.openExternalURLMessageUnknownApp
+        }
+
+        alert.alertStyle = .warning
+        alert.addButton(withTitle: UserText.openExternalURLOpenAction)
+        alert.addButton(withTitle: UserText.openExternalURLCancelAction)
+
         return alert
     }
 
