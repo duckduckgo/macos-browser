@@ -264,9 +264,7 @@ final class Tab: NSObject {
 
             attachFindInPage()
 
-            if webView.configuration.userContentController.userScripts.isEmpty {
             userScripts.install(into: webView.configuration.userContentController)
-            }
         }
     }
 
