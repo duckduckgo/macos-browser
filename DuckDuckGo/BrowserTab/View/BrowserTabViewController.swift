@@ -168,7 +168,38 @@ class BrowserTabViewController: NSViewController {
 extension BrowserTabViewController: TabDelegate {
 
     func tab(_ tab: Tab, requestedOpenExternalURL url: URL) {
-        // TODO show the prompt
+        guard let window = self.view.window else {
+            // LOG
+            return
+        }
+
+        guard let appUrl = NSWorkspace.shared.urlForApplication(toOpen: url) else {
+            print("***", #function, "no app for url")
+            return
+        }
+
+        print("***", appUrl)
+
+        let targetBundleName = Bundle(url: appUrl)?.infoDictionary?["CFBundleName"]
+        let appName = targetBundleName ?? "in Another App"
+        let informativeText = targetBundleName == nil
+            ? "Would you like to leave DuckDuckGo to view this content?"
+            : "Would you like to open \"\(url.absoluteString)\" in \(appName)?"
+            // : "Would you like to open \(appName) to view this content?"
+
+        let alert = NSAlert()
+        alert.messageText = "Open \(appName)?"
+        alert.informativeText = informativeText
+        alert.alertStyle = .warning
+        alert.addButton(withTitle: "Open")
+        alert.addButton(withTitle: "Cancel")
+
+        alert.beginSheetModal(for: window) { response in
+            if response == NSApplication.ModalResponse.alertFirstButtonReturn {
+                NSWorkspace.shared.open(url)
+            }
+        }
+
     }
 
     func tabDidStartNavigation(_ tab: Tab) {
