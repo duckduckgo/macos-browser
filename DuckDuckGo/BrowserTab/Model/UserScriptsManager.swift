@@ -28,6 +28,7 @@ final class UserScriptsManager {
 
     init(scriptSource: ScriptSourceProviding = DefaultScriptSourceProvider.shared) {
         sourceUpdatedCancellable = scriptSource.sourceUpdatedPublisher
+            .receive(on: DispatchQueue.main)
             .map(UserScripts.init)
             .weakAssign(to: \.userScripts, on: self)
     }
