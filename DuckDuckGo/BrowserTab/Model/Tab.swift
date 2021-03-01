@@ -372,7 +372,7 @@ extension Tab: WKNavigationDelegate {
         if externalUrlHandler.isExternal(scheme: urlScheme) {
             externalUrlHandler.handle(url: url,
                                       onPage: webView.url,
-                                      fromFrame: false, // !navigationAction.sourceFrame.isMainFrame, // ignore <iframe src="custom://url">
+                                      fromFrame: !navigationAction.sourceFrame.isMainFrame, // ignore <iframe src="custom://url">
                                       triggeredByUser: navigationAction.navigationType == .linkActivated)
             decisionHandler(.cancel)
             return
