@@ -19,16 +19,29 @@
 import Foundation
 import Combine
 
+final private class AnyCancellableStorage: NSObject {
+    var set = Set<AnyCancellable>()
+}
+
 extension NSObject {
 
     private static let lifetimeDisposeBagKey = UnsafeRawPointer(bitPattern: "lifetimeDisposeBagKey".hashValue)!
 
     var lifetimeDisposeBag: Set<AnyCancellable> {
         get {
-            objc_getAssociatedObject(self, Self.lifetimeDisposeBagKey) as? Set<AnyCancellable> ?? []
+            guard let storage = objc_getAssociatedObject(self, Self.lifetimeDisposeBagKey) as? AnyCancellableStorage
+            else {
+                return []
+            }
+            return storage.set
         }
         set {
-            objc_setAssociatedObject(self, Self.lifetimeDisposeBagKey, newValue, .OBJC_ASSOCIATION_RETAIN)
+            var storage = objc_getAssociatedObject(self, Self.lifetimeDisposeBagKey) as? AnyCancellableStorage
+            if storage == nil {
+                storage = AnyCancellableStorage()
+                objc_setAssociatedObject(self, Self.lifetimeDisposeBagKey, storage!, .OBJC_ASSOCIATION_RETAIN)
+            }
+            storage!.set = newValue
         }
     }
 
