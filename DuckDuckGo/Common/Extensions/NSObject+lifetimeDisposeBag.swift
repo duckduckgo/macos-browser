@@ -25,21 +25,21 @@ final private class AnyCancellableStorage: NSObject {
 
 extension NSObject {
 
-    private static let lifetimeDisposeBagKey = UnsafeRawPointer(bitPattern: "lifetimeDisposeBagKey".hashValue)!
+    private static let lifetimeCancellableStorageKey = UnsafeRawPointer(bitPattern: "lifetimeCancellableStorageKey".hashValue)!
 
-    var lifetimeDisposeBag: Set<AnyCancellable> {
+    var lifetimeCancellableStorage: Set<AnyCancellable> {
         get {
-            guard let storage = objc_getAssociatedObject(self, Self.lifetimeDisposeBagKey) as? AnyCancellableStorage
+            guard let storage = objc_getAssociatedObject(self, Self.lifetimeCancellableStorageKey) as? AnyCancellableStorage
             else {
                 return []
             }
             return storage.set
         }
         set {
-            var storage = objc_getAssociatedObject(self, Self.lifetimeDisposeBagKey) as? AnyCancellableStorage
+            var storage = objc_getAssociatedObject(self, Self.lifetimeCancellableStorageKey) as? AnyCancellableStorage
             if storage == nil {
                 storage = AnyCancellableStorage()
-                objc_setAssociatedObject(self, Self.lifetimeDisposeBagKey, storage!, .OBJC_ASSOCIATION_RETAIN)
+                objc_setAssociatedObject(self, Self.lifetimeCancellableStorageKey, storage!, .OBJC_ASSOCIATION_RETAIN)
             }
             storage!.set = newValue
         }

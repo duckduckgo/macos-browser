@@ -21,12 +21,6 @@ import Combine
 
 extension WKWebViewConfiguration {
 
-    static func makeConfiguration() -> WKWebViewConfiguration {
-        let configuration = WKWebViewConfiguration()
-        configuration.applyStandardConfiguration()
-        return configuration
-    }
-
     func applyStandardConfiguration(persistent: Bool = true) {
         if !self.userContentController.userScripts.isEmpty {
             self.userContentController = WKUserContentController()
@@ -57,7 +51,7 @@ extension WKUserContentController {
             self.removeAllContentRuleLists()
             self.add(rules)
 
-        }.store(in: &self.lifetimeDisposeBag)
+        }.store(in: &self.lifetimeCancellableStorage)
     }
 
 }
