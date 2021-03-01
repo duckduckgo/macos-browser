@@ -173,12 +173,17 @@ extension BrowserTabViewController: TabDelegate {
             return
         }
 
+        guard tabCollectionViewModel.selectedTabViewModel?.tab == tab else {
+            // Only allow the selected tab to open external apps
+            return
+        }
+
         guard let appUrl = NSWorkspace.shared.urlForApplication(toOpen: url) else {
             NSAlert.unableToOpenExernalURLAlert().beginSheetModal(for: window)
             return
         }
-        let externalAppName = Bundle(url: appUrl)?.infoDictionary?["CFBundleName"] as? String
 
+        let externalAppName = Bundle(url: appUrl)?.infoDictionary?["CFBundleName"] as? String
         NSAlert.openExternalURLAlert(with: externalAppName).beginSheetModal(for: window) { response in
             if response == NSApplication.ModalResponse.alertFirstButtonReturn {
                 NSWorkspace.shared.open(url)
