@@ -24,13 +24,13 @@ import WebKit
 class WKWebViewSessionStateAvailabilityTests: XCTestCase {
 
     func testWebViewRespondsTo_sessionStateData() {
-        let webView = WebView.init(frame: CGRect(), configuration: WKWebViewConfiguration.makeConfiguration())
+        let webView = WebView.init(frame: CGRect(), configuration: .init())
 
         XCTAssertNoThrow(try XCTAssertNotNil(webView.sessionStateData()))
     }
 
     func testWebViewRespondsTo_restoreFromSessionStateData() {
-        let webView = WebView(frame: CGRect(), configuration: WKWebViewConfiguration.makeConfiguration())
+        let webView = WebView(frame: CGRect(), configuration: .init())
         XCTAssertNoThrow(try webView.restoreSessionState(from: Data()))
     }
 }

@@ -97,8 +97,8 @@ class UserScriptsTests: XCTestCase {
     }
 
     func testWhenUserScriptsRemovedInOneWebViewThenScriptsStayInOtherWebView() {
-        let webView1 = WebView(frame: .zero, configuration: .makeConfiguration())
-        let webView2 = WebView(frame: .zero, configuration: .makeConfiguration())
+        let webView1 = WebView(frame: .zero, configuration: .init())
+        let webView2 = WebView(frame: .zero, configuration: .init())
 
         let userScripts1 = UserScripts()
         let userScripts2 = UserScripts(copy: userScripts1)
@@ -113,7 +113,7 @@ class UserScriptsTests: XCTestCase {
     }
 
     func testWhenUserScriptsRemovedCanBeReinstalled() {
-        let webView = WebView(frame: .zero, configuration: .makeConfiguration())
+        let webView = WebView(frame: .zero, configuration: .init())
         let userScripts1 = UserScripts()
         userScripts1.install(into: webView.configuration.userContentController)
         userScripts1.remove(from: webView.configuration.userContentController)

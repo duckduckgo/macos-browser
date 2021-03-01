@@ -79,6 +79,12 @@ class UserScriptsManagerTests: XCTestCase {
 
         let userScripts3 = manager.userScripts
 
+        // swiftlint:disable force_cast
+        let set1 = Set(userScripts1.userScripts as! [NSObject])
+        let set2 = Set(userScripts2.userScripts as! [NSObject])
+        // swiftlint:enable force_cast
+
+        XCTAssertNotEqual(set1, set2)
         XCTAssertFalse(userScripts1.userScripts.isEmpty)
         XCTAssertFalse(userScripts2.userScripts.isEmpty)
         XCTAssertTrue(userScripts1 !== userScripts2)
