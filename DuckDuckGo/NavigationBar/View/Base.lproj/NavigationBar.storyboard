@@ -155,7 +155,7 @@
                                     </userDefinedRuntimeAttribute>
                                 </userDefinedRuntimeAttributes>
                                 <connections>
-                                    <action selector="feedbackButtonAction:" target="o2v-eH-jTI" id="MY7-rh-qCW"/>
+                                    <action selector="openFeedback:" target="wkT-Td-n7D" id="1IP-IF-SD9"/>
                                 </connections>
                             </button>
                             <button translatesAutoresizingMaskIntoConstraints="NO" id="XBe-xO-dXj" userLabel="Share Button" customClass="MouseOverButton" customModule="DuckDuckGo_Privacy_Browser" customModuleProvider="target">
