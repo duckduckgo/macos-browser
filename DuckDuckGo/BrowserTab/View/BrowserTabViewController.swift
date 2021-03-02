@@ -167,6 +167,41 @@ class BrowserTabViewController: NSViewController {
 
 extension BrowserTabViewController: TabDelegate {
 
+	func tab(_ tab: Tab, requestedOpenExternalURL url: URL, forUserEnteredURL userEntered: Bool) {
+        guard let window = self.view.window else {
+            os_log("%s: Window is nil", type: .error, className)
+            return
+        }
+
+        guard tabCollectionViewModel.selectedTabViewModel?.tab == tab else {
+            // Only allow the selected tab to open external apps
+            return
+        }
+
+		func searchForExternalUrl() {
+			tab.update(url: URL.makeSearchUrl(from: url.absoluteString), userEntered: false)
+		}
+
+        guard let appUrl = NSWorkspace.shared.urlForApplication(toOpen: url) else {
+			if userEntered {
+				searchForExternalUrl()
+			} else {
+				NSAlert.unableToOpenExernalURLAlert().beginSheetModal(for: window)
+			}
+            return
+        }
+
+        let externalAppName = Bundle(url: appUrl)?.infoDictionary?["CFBundleName"] as? String
+        NSAlert.openExternalURLAlert(with: externalAppName).beginSheetModal(for: window) { response in
+            if response == NSApplication.ModalResponse.alertFirstButtonReturn {
+                NSWorkspace.shared.open(url)
+			} else if userEntered {
+				searchForExternalUrl()
+			}
+        }
+
+    }
+
     func tabDidStartNavigation(_ tab: Tab) {
         setFirstResponderIfNeeded()
         tabViewModel?.closeFindInPage()
@@ -418,6 +453,31 @@ fileprivate extension NSAlert {
         alert.icon = #imageLiteral(resourceName: "Fireproof")
         alert.addButton(withTitle: UserText.fireproof)
         alert.addButton(withTitle: UserText.notNow)
+        return alert
+    }
+
+    static func openExternalURLAlert(with appName: String?) -> NSAlert {
+        let alert = NSAlert()
+
+        if let appName = appName {
+            alert.messageText = UserText.openExternalURLTitle(forAppName: appName)
+            alert.informativeText = UserText.openExternalURLMessage(forAppName: appName)
+        } else {
+            alert.messageText = UserText.openExternalURLTitleUnknownApp
+            alert.informativeText = UserText.openExternalURLMessageUnknownApp
+        }
+
+        alert.alertStyle = .warning
+        alert.addButton(withTitle: UserText.open)
+        alert.addButton(withTitle: UserText.cancel)
+        return alert
+    }
+
+    static func unableToOpenExernalURLAlert() -> NSAlert {
+        let alert = NSAlert()
+        alert.messageText = UserText.failedToOpenExternally
+        alert.alertStyle = .warning
+        alert.addButton(withTitle: UserText.ok)
         return alert
     }
 

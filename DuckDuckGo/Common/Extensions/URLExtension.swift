@@ -84,7 +84,7 @@ extension URL {
 
     // MARK: - Components
 
-    enum Scheme: String, CaseIterable {
+    enum NavigationalScheme: String, CaseIterable {
         case http
         case https
 
@@ -104,13 +104,13 @@ extension URL {
     // MARK: - Validity
 
     var isValid: Bool {
-        guard let scheme = scheme,
-              URL.Scheme(rawValue: scheme) != nil,
-              let host = host, host.isValidHost,
-              user == nil else {
-            return false
-        }
+        guard let scheme = scheme else { return false }
 
+        if URL.NavigationalScheme(rawValue: scheme) != nil,
+           let host = host, host.isValidHost,
+           user == nil { return true }
+
+        // This effectively allows external URLs
         return true
     }
 
@@ -164,8 +164,8 @@ extension URL {
 
     func toHttps() -> URL? {
         guard var components = URLComponents(url: self, resolvingAgainstBaseURL: false) else { return self }
-        guard components.scheme == Scheme.http.rawValue else { return self }
-        components.scheme = Scheme.https.rawValue
+        guard components.scheme == NavigationalScheme.http.rawValue else { return self }
+        components.scheme = NavigationalScheme.https.rawValue
         return components.url
     }
 

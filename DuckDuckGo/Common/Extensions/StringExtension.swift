@@ -44,7 +44,7 @@ extension String {
         guard let url = URL(string: trimmed) else { return nil }
 
         guard url.scheme != nil else {
-            trimmed.prepend(URL.Scheme.http.separated())
+            trimmed.prepend(URL.NavigationalScheme.http.separated())
             return trimmed.url
         }
 

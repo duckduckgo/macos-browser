@@ -96,6 +96,9 @@
 		85D33F1225C82EB3002B91A6 /* ConfigurationManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 85D33F1125C82EB3002B91A6 /* ConfigurationManager.swift */; };
 		85D438B6256E7C9E00F3BAF8 /* ContextMenuUserScript.swift in Sources */ = {isa = PBXBuildFile; fileRef = 85D438B5256E7C9E00F3BAF8 /* ContextMenuUserScript.swift */; };
 		85D438BE256E8E6400F3BAF8 /* ContextMenuElement.swift in Sources */ = {isa = PBXBuildFile; fileRef = 85D438BD256E8E6400F3BAF8 /* ContextMenuElement.swift */; };
+		85E11C2F25E7DC7E00974CAF /* ExternalURLHandler.swift in Sources */ = {isa = PBXBuildFile; fileRef = 85E11C2E25E7DC7E00974CAF /* ExternalURLHandler.swift */; };
+		85E11C3725E7F1E100974CAF /* ExternalURLHandlerTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 85E11C3625E7F1E100974CAF /* ExternalURLHandlerTests.swift */; };
+		85F69B3C25EDE81F00978E59 /* URLExtensionTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 85F69B3B25EDE81F00978E59 /* URLExtensionTests.swift */; };
 		AA2CB12D2587BB5600AA6FBE /* TabBarFooter.xib in Resources */ = {isa = PBXBuildFile; fileRef = AA2CB12C2587BB5600AA6FBE /* TabBarFooter.xib */; };
 		AA2CB1352587C29500AA6FBE /* TabBarFooter.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA2CB1342587C29500AA6FBE /* TabBarFooter.swift */; };
 		AA2E423424C8A2270048C0D5 /* ColorView.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA2E423324C8A2270048C0D5 /* ColorView.swift */; };
@@ -335,6 +338,9 @@
 		85D33F1125C82EB3002B91A6 /* ConfigurationManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ConfigurationManager.swift; sourceTree = "<group>"; };
 		85D438B5256E7C9E00F3BAF8 /* ContextMenuUserScript.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContextMenuUserScript.swift; sourceTree = "<group>"; };
 		85D438BD256E8E6400F3BAF8 /* ContextMenuElement.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContextMenuElement.swift; sourceTree = "<group>"; };
+		85E11C2E25E7DC7E00974CAF /* ExternalURLHandler.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ExternalURLHandler.swift; sourceTree = "<group>"; };
+		85E11C3625E7F1E100974CAF /* ExternalURLHandlerTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ExternalURLHandlerTests.swift; sourceTree = "<group>"; };
+		85F69B3B25EDE81F00978E59 /* URLExtensionTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = URLExtensionTests.swift; sourceTree = "<group>"; };
 		AA2CB12C2587BB5600AA6FBE /* TabBarFooter.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = TabBarFooter.xib; sourceTree = "<group>"; };
 		AA2CB1342587C29500AA6FBE /* TabBarFooter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TabBarFooter.swift; sourceTree = "<group>"; };
 		AA2E423324C8A2270048C0D5 /* ColorView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ColorView.swift; sourceTree = "<group>"; };
@@ -793,6 +799,14 @@
 			path = Configuration;
 			sourceTree = "<group>";
 		};
+		85F69B3A25EDE7F800978E59 /* Common */ = {
+			isa = PBXGroup;
+			children = (
+				85F69B3B25EDE81F00978E59 /* URLExtensionTests.swift */,
+			);
+			path = Common;
+			sourceTree = "<group>";
+		};
 		AA4D700525545EDE00C3411E /* AppDelegate */ = {
 			isa = PBXGroup;
 			children = (
@@ -871,6 +885,7 @@
 				AA652CAB25DD820D009059CC /* Bookmarks */,
 				AA92ACAE24EFE1F5005F41C9 /* BrowserTab */,
 				AA9C361D25518AAB004B1BA3 /* Burning */,
+				85F69B3A25EDE7F800978E59 /* Common */,
 				85AC3B1525D9BBFA00C7D2AA /* Configuration */,
 				4B82E9B725B6A04B00656FE7 /* ContentBlocker */,
 				8553FF50257523630029327F /* FileDownload */,
@@ -1134,12 +1149,13 @@
 		AA86491E24D83A66001BABEE /* Model */ = {
 			isa = PBXGroup;
 			children = (
-				4B02199225E060C600ED7DEA /* LoginDetectionUserScript.swift */,
 				85D438BD256E8E6400F3BAF8 /* ContextMenuElement.swift */,
 				85D438B5256E7C9E00F3BAF8 /* ContextMenuUserScript.swift */,
 				4BB88B4425B7B55C006F6B06 /* DebugUserScript.swift */,
+				85E11C2E25E7DC7E00974CAF /* ExternalURLHandler.swift */,
 				AAA0CC562539EBC90079BC96 /* FaviconUserScript.swift */,
 				8556A601256BDDD30092FA9D /* HTML5DownloadUserScript.swift */,
+				4B02199225E060C600ED7DEA /* LoginDetectionUserScript.swift */,
 				AA9FF95824A1ECF20039E328 /* Tab.swift */,
 				14505A07256084EF00272CC6 /* UserAgent.swift */,
 				85AC3AEE25D5CE9800C7D2AA /* UserScripts.swift */,
@@ -1180,6 +1196,7 @@
 			children = (
 				AAC9C01424CAFBCE00AD1325 /* TabTests.swift */,
 				8546DE6125C03056000CA5E1 /* UserAgentTests.swift */,
+				85E11C3625E7F1E100974CAF /* ExternalURLHandlerTests.swift */,
 			);
 			path = Model;
 			sourceTree = "<group>";
@@ -1689,6 +1706,7 @@
 				4BA1A6A5258B07DF00F6F690 /* EncryptedValueTransformer.swift in Sources */,
 				AA6EF9B525081B4C004754E6 /* MainMenuActions.swift in Sources */,
 				B63D466925BEB6C200874977 /* WKWebView+SessionState.swift in Sources */,
+				85E11C2F25E7DC7E00974CAF /* ExternalURLHandler.swift in Sources */,
 				85A0116925AF1D8900FA6A0C /* FindInPageViewController.swift in Sources */,
 				AA6FFB4424DC33320028F4D0 /* NSViewExtension.swift in Sources */,
 				AA4BBA3B25C58FA200C4FB0F /* MainMenu.swift in Sources */,
@@ -1785,6 +1803,7 @@
 				B6A5A27925B93FFF00AA7ADA /* StateRestorationManagerTests.swift in Sources */,
 				4B0219A825E0646500ED7DEA /* WebsiteDataStoreTests.swift in Sources */,
 				AAC9C01E24CB6BEB00AD1325 /* TabCollectionViewModelTests.swift in Sources */,
+				85E11C3725E7F1E100974CAF /* ExternalURLHandlerTests.swift in Sources */,
 				4B02199B25E063DE00ED7DEA /* LoginDetectionServiceTests.swift in Sources */,
 				AAC9C01724CAFBDC00AD1325 /* TabCollectionTests.swift in Sources */,
 				4B82E9B925B6A05800656FE7 /* DetectedTrackerTests.swift in Sources */,
@@ -1808,6 +1827,7 @@
 				4BA1A6D9258C0CB300F6F690 /* DataEncryptionTests.swift in Sources */,
 				B6A5A27E25B9403E00AA7ADA /* FileStoreMock.swift in Sources */,
 				4BA1A6FE258C5C1300F6F690 /* EncryptedValueTransformerTests.swift in Sources */,
+				85F69B3C25EDE81F00978E59 /* URLExtensionTests.swift in Sources */,
 				AA63745624C9EB3C00AB2AC4 /* SuggestionsAPIResultTests.swift in Sources */,
 				AA652CCE25DD9071009059CC /* BookmarkListTests.swift in Sources */,
 				B6A5A2A825BAA35500AA7ADA /* WindowManagerStateRestorationTests.swift in Sources */,

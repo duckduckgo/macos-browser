@@ -23,6 +23,7 @@ struct UserText {
     static let ok = NSLocalizedString("ok", value: "OK", comment: "OK button")
     static let cancel = NSLocalizedString("cancel", value: "Cancel", comment: "Cancel button")
     static let notNow = NSLocalizedString("notnow", value: "Not Now", comment: "Not Now button")
+    static let open = NSLocalizedString("open", value: "Open", comment: "Open button")
 
     static let duplicateTab = NSLocalizedString("duplicate.tab", value: "Duplicate Tab", comment: "Menu item. Duplicate as a verb")
     static let closeTab = NSLocalizedString("close.tab", value: "Close Tab", comment: "Menu item")
@@ -84,5 +85,23 @@ struct UserText {
     static let addToFavorites = NSLocalizedString("add.to.favorites", value: "Add to Favorites", comment: "Button for adding bookmarks to favorites")
     static let removeFromFavorites = NSLocalizedString("remove.from.favorites", value: "Remove from Favorites", comment: "Button for removing bookmarks from favorites")
     static let bookmarkThisPage = NSLocalizedString("bookmark.this.page", value: "Bookmark This Page...", comment: "Menu item for bookmarking current page")
+
+    static func openExternalURLTitle(forAppName appName: String) -> String {
+        let localized = NSLocalizedString("open.external.url.title",
+                                          value: "Open in %@?",
+                                          comment: "Open URL in another app dialog title with app name")
+        return String(format: localized, appName)
+    }
+
+    static func openExternalURLMessage(forAppName appName: String) -> String {
+        let localized = NSLocalizedString("open.external.url.message",
+                                          value: "Do you want to view this content in the %@ app?",
+                                          comment: "Open URL in another app dialog message with app name")
+        return String(format: localized, appName)
+    }
+
+    static let openExternalURLTitleUnknownApp = NSLocalizedString("open.external.url.title.unknown.app", value: "Open in Another App?", comment: "Open URL in another app dialog title for unknown app")
+    static let openExternalURLMessageUnknownApp = NSLocalizedString("open.external.url.message.unknown.app", value: "Do you want to view this content in another app?", comment: "Open URL in another app dialog message for unknown app")
+    static let failedToOpenExternally = NSLocalizedString("open.externally.failed", value: "The app required to open that link can’t be found", comment: "’Link’ is link on a website")
 
 }
