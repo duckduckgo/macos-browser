@@ -111,8 +111,8 @@ extension URL {
            user == nil { return true }
 
         // This effectively allows external URLs to be entered by the user.
-		// Without this check single word entries get treated like domains.
-		return URL.NavigationalScheme(rawValue: scheme) == nil
+        // Without this check single word entries get treated like domains.
+        return URL.NavigationalScheme(rawValue: scheme) == nil
     }
 
     // MARK: - DuckDuckGo
