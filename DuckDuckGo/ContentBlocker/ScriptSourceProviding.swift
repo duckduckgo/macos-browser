@@ -17,6 +17,7 @@
 //
 
 import Foundation
+import Combine
 
 protocol ScriptSourceProviding {
 
@@ -24,14 +25,24 @@ protocol ScriptSourceProviding {
     var contentBlockerRulesSource: String { get }
     var contentBlockerSource: String { get }
 
+    var sourceUpdatedPublisher: AnyPublisher<Void, Never> { get }
+
 }
 
 class DefaultScriptSourceProvider: ScriptSourceProviding {
 
     static var shared: ScriptSourceProviding = DefaultScriptSourceProvider()
 
+    @Published
     private(set) var contentBlockerRulesSource: String = ""
+    @Published
     private(set) var contentBlockerSource: String = ""
+
+    private let sourceUpdatedSubject = PassthroughSubject<Void, Never>()
+
+    var sourceUpdatedPublisher: AnyPublisher<Void, Never> {
+        sourceUpdatedSubject.eraseToAnyPublisher()
+    }
 
     let configStorage: ConfigurationStoring
 
@@ -43,11 +54,12 @@ class DefaultScriptSourceProvider: ScriptSourceProviding {
     func reload() {
         contentBlockerRulesSource = buildContentBlockerRulesSource()
         contentBlockerSource = buildContentBlockerSource()
+        sourceUpdatedSubject.send( () )
     }
 
     private func buildContentBlockerRulesSource() -> String {
         let unprotectedDomains = configStorage.loadData(for: .temporaryUnprotectedSites)?.utf8String() ?? ""
-        return Self.loadJS("contentblockerrules", withReplacements: [
+        return ContentBlockerRulesUserScript.loadJS("contentblockerrules", from: .main, withReplacements: [
             "${unprotectedDomains}": unprotectedDomains
         ])
     }
@@ -55,31 +67,15 @@ class DefaultScriptSourceProvider: ScriptSourceProviding {
     private func buildContentBlockerSource() -> String {
 
         // Use sensible defaults in case the upstream data is unparsable
-        let trackerData = TrackerRadarManager.shared.encodedTrackerData ?? "{}"
+        let trackerData = TrackerRadarManager.shared.encodedTrackerData
         let surrogates = configStorage.loadData(for: .surrogates)?.utf8String() ?? ""
         let unprotectedSites = configStorage.loadData(for: .temporaryUnprotectedSites)?.utf8String() ?? ""
 
-        return Self.loadJS("contentblocker", withReplacements: [
+        return ContentBlockerUserScript.loadJS("contentblocker", from: .main, withReplacements: [
             "${unprotectedDomains}": unprotectedSites,
             "${trackerData}": trackerData,
             "${surrogates}": surrogates
         ])
-    }
-
-    static func loadJS(_ jsFile: String, withReplacements replacements: [String: String] = [:]) -> String {
-
-        let bundle = Bundle.main
-        let path = bundle.path(forResource: jsFile, ofType: "js")!
-
-        guard var js = try? String(contentsOfFile: path) else {
-            fatalError("Failed to load JavaScript \(jsFile) from \(path)")
-        }
-
-        for (key, value) in replacements {
-            js = js.replacingOccurrences(of: key, with: value, options: .literal)
-        }
-
-        return js
     }
 
 }

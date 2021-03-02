@@ -44,7 +44,8 @@ final class Tab: NSObject {
          title: String? = nil,
          error: Error? = nil,
          favicon: NSImage? = nil,
-         sessionStateData: Data? = nil) {
+         sessionStateData: Data? = nil,
+         shouldLoadInBackground: Bool = false) {
 
         self.faviconService = faviconService
 
@@ -54,9 +55,10 @@ final class Tab: NSObject {
         self.favicon = favicon
         self.sessionStateData = sessionStateData
 
-        // Apply required configuration changes after state restoration.
-        webViewConfiguration?.applyStandardConfiguration()
-        webView = WebView(frame: CGRect.zero, configuration: webViewConfiguration ?? WKWebViewConfiguration.makeConfiguration())
+        let configuration = webViewConfiguration ?? WKWebViewConfiguration()
+        configuration.applyStandardConfiguration()
+
+        webView = WebView(frame: CGRect.zero, configuration: configuration)
 
         super.init()
 
@@ -65,22 +67,18 @@ final class Tab: NSObject {
              self.delegate?.tab(self, detectedLogin: host)
          }
 
-        setupWebView()
-        if webView.configuration.userContentController.userScripts.isEmpty {
-            installUserScripts()
-        }
+        setupWebView(shouldLoadInBackground: shouldLoadInBackground)
 
+        // cache session-restored favicon if present
         if let favicon = favicon,
            let host = url?.host {
             faviconService.storeIfNeeded(favicon: favicon, for: host, isFromUserScript: false)
         }
 
-        subscribeToTrackerBlockerConfigUpdatedEvents()
-        subscribeToOpenExternalUrlEvents()
     }
 
     deinit {
-        userScripts.remove(from: webView)
+        userScripts?.remove(from: webView.configuration.userContentController)
     }
 
     let webView: WebView
@@ -91,6 +89,8 @@ final class Tab: NSObject {
             if oldValue?.host != url?.host {
                 fetchFavicon(nil, for: url?.host, isFromUserScript: false)
             }
+            invalidateSessionStateData()
+            reloadIfNeeded()
         }
     }
 
@@ -113,6 +113,7 @@ final class Tab: NSObject {
         if let sessionStateData = sessionStateData {
             return sessionStateData
         }
+        guard webView.url != nil else { return nil }
         // collect and cache actual SessionStateData on demand and store until invalidated
         self.sessionStateData = (try? webView.sessionStateData())
         return self.sessionStateData
@@ -159,8 +160,33 @@ final class Tab: NSObject {
             return
         }
 
-        webView.reload()
+        if webView.url == nil,
+           let url = self.url {
+            webView.load(url)
+        } else {
+            webView.reload()
+        }
         loginDetectionService?.handle(navigationEvent: .userAction)
+    }
+
+    private func reloadIfNeeded(shouldLoadInBackground: Bool = false) {
+        guard webView.superview != nil || shouldLoadInBackground,
+            webView.url != self.url
+        else { return }
+
+        if let sessionStateData = self.sessionStateData {
+            do {
+                try webView.restoreSessionState(from: sessionStateData)
+                return
+            } catch {
+                os_log("Tab:setupWebView could not restore session state %s", "\(error)")
+            }
+        }
+        if let url = self.url {
+            webView.load(url)
+        } else {
+            webView.load(URL.emptyPage)
+        }
     }
 
     func stopLoading() {
@@ -172,17 +198,24 @@ final class Tab: NSObject {
          FireproofDomains.shared.toggle(domain: host)
      }
 
-    private func setupWebView() {
+    private var superviewObserver: NSKeyValueObservation?
+
+    private func setupWebView(shouldLoadInBackground: Bool) {
         webView.navigationDelegate = self
         webView.allowsBackForwardNavigationGestures = true
 
-        if let sessionStateData = sessionStateData {
-            do {
-                try webView.restoreSessionState(from: sessionStateData)
-            } catch {
-                os_log("Tab:setupWebView could not restore session state %s", "\(error)")
+        subscribeToUserScripts()
+        subscribeToOpenExternalUrlEvents()
+
+        superviewObserver = webView.observe(\.superview, options: .old) { [weak self] _, change in
+            // if the webView is being added to superview - reload if needed
+            if case .some(.none) = change.oldValue {
+                self?.reloadIfNeeded()
             }
         }
+
+        // background tab loading should start immediately
+        reloadIfNeeded(shouldLoadInBackground: shouldLoadInBackground)
     }
 
     // MARK: - Open External URL
@@ -192,27 +225,8 @@ final class Tab: NSObject {
 
     private func subscribeToOpenExternalUrlEvents() {
         openExternalUrlEventsCancellable = externalUrlHandler.openExternalUrlPublisher.sink {
-			self.delegate?.tab(self, requestedOpenExternalURL: $0, forUserEnteredURL: self.userEnteredUrl)
+            self.delegate?.tab(self, requestedOpenExternalURL: $0, forUserEnteredURL: self.userEnteredUrl)
         }
-    }
-
-    // MARK: - WebView Reconfiguration
-
-    private var trackerBlockerConfigUpdatedCancellable: AnyCancellable?
-
-    private func subscribeToTrackerBlockerConfigUpdatedEvents() {
-        trackerBlockerConfigUpdatedCancellable = ConfigurationManager.shared.trackerBlockerDataUpdatedPublisher()
-            .receive(on: DispatchQueue.main)
-            .sink { [weak self] _ in
-            self?.reconfigureWebView()
-        }
-    }
-
-    private func reconfigureWebView() {
-        webView.configuration.reinstallContentBlocker()
-        userScripts.remove(from: webView)
-        userScripts = UserScripts()
-        installUserScripts()
     }
 
     // MARK: - Favicon
@@ -240,20 +254,34 @@ final class Tab: NSObject {
 
     // MARK: - User Scripts
 
-    var userScripts = UserScripts()
+    private var userScriptsUpdatedCancellable: AnyCancellable?
 
-    private func installUserScripts() {
-        userScripts.debugScript.instrumentation = instrumentation
-        userScripts.faviconScript.delegate = self
-        userScripts.html5downloadScript.delegate = self
-        userScripts.contextMenuScript.delegate = self
-        userScripts.loginDetectionUserScript.delegate = self
-        userScripts.contentBlockerScript.delegate = self
-        userScripts.contentBlockerRulesScript.delegate = self
+    private var userScripts: UserScripts! {
+        willSet {
+            if let userScripts = userScripts {
+                userScripts.remove(from: webView.configuration.userContentController)
+            }
+        }
+        didSet {
+            userScripts.debugScript.instrumentation = instrumentation
+            userScripts.faviconScript.delegate = self
+            userScripts.html5downloadScript.delegate = self
+            userScripts.contextMenuScript.delegate = self
+            userScripts.loginDetectionUserScript.delegate = self
+            userScripts.contentBlockerScript.delegate = self
+            userScripts.contentBlockerRulesScript.delegate = self
 
-        attachFindInPage()
+            attachFindInPage()
 
-        userScripts.install(into: webView)
+            userScripts.install(into: webView.configuration.userContentController)
+        }
+    }
+
+    private func subscribeToUserScripts() {
+        userScriptsUpdatedCancellable = UserScriptsManager.shared
+            .$userScripts
+            .map(UserScripts.init(copy:))
+            .weakAssign(to: \.userScripts, on: self)
     }
 
     // MARK: Find in Page

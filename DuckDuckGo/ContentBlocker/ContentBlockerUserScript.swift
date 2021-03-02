@@ -37,12 +37,12 @@ class ContentBlockerUserScript: NSObject, UserScript {
         static let url = "url"
         static let isSurrogate = "isSurrogate"
     }
-    
-    var injectionTime: WKUserScriptInjectionTime = .atDocumentStart
-    var forMainFrameOnly = false
-    let messageNames = ["trackerDetectedMessage"]
-    var source: String
-        
+
+    var injectionTime: WKUserScriptInjectionTime { .atDocumentStart }
+    var forMainFrameOnly: Bool { false }
+    var messageNames: [String] { ["trackerDetectedMessage"] }
+    let source: String
+
     init(scriptSource: ScriptSourceProviding = DefaultScriptSourceProvider.shared) {
         source = scriptSource.contentBlockerSource
     }
@@ -71,4 +71,5 @@ class ContentBlockerUserScript: NSObject, UserScript {
         let entity = TrackerRadarManager.shared.findEntity(byName: knownTracker?.owner?.name ?? "")
         return DetectedTracker(url: urlString, knownTracker: knownTracker, entity: entity, blocked: blocked)
     }
+
 }

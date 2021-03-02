@@ -28,7 +28,6 @@ class BrowserTabViewController: NSViewController {
     var tabViewModel: TabViewModel?
 
     private let tabCollectionViewModel: TabCollectionViewModel
-    private var urlCancellable: AnyCancellable?
     private var selectedTabViewModelCancellable: AnyCancellable?
     private var isErrorViewVisibleCancellable: AnyCancellable?
     private var contextMenuLink: URL?
@@ -80,11 +79,6 @@ class BrowserTabViewController: NSViewController {
             setFirstResponderIfNeeded()
         }
 
-        func subscribeToUrl(of tabViewModel: TabViewModel) {
-            urlCancellable?.cancel()
-            urlCancellable = tabViewModel.tab.$url.receive(on: DispatchQueue.main).sink { [weak self] _ in self?.reloadWebViewIfNeeded() }
-        }
-
         func removeOldWebView(_ oldWebView: WebView?) {
             if let oldWebView = oldWebView, view.subviews.contains(oldWebView) {
                 oldWebView.removeFromSuperview()
@@ -100,7 +94,6 @@ class BrowserTabViewController: NSViewController {
 
         let oldWebView = webView
         displayWebView(of: tabViewModel)
-        subscribeToUrl(of: tabViewModel)
         self.tabViewModel = tabViewModel
         removeOldWebView(oldWebView)
     }
@@ -108,26 +101,6 @@ class BrowserTabViewController: NSViewController {
     private func subscribeToIsErrorViewVisible() {
         isErrorViewVisibleCancellable = tabViewModel?.$isErrorViewVisible.receive(on: DispatchQueue.main).sink { [weak self] _ in
             self?.displayErrorView(self?.tabViewModel?.isErrorViewVisible ?? false)
-        }
-    }
-
-    private func reloadWebViewIfNeeded() {
-        guard let webView = webView else {
-            os_log("BrowserTabViewController: Web view is nil", type: .error)
-            return
-        }
-
-        guard let tabViewModel = tabViewModel else {
-            os_log("%s: Tab view model is nil", type: .error, className)
-            return
-        }
-
-        if webView.url == tabViewModel.tab.url { return }
-
-        if let url = tabViewModel.tab.url {
-            webView.load(url)
-        } else {
-            webView.load(URL.emptyPage)
         }
     }
 
@@ -158,8 +131,7 @@ class BrowserTabViewController: NSViewController {
     }
 
     private func openNewTab(with url: URL?, selected: Bool = false) {
-        let tab = Tab()
-        tab.url = url
+        let tab = Tab(url: url, shouldLoadInBackground: true)
         tabCollectionViewModel.append(tab: tab, selected: selected)
     }
 
