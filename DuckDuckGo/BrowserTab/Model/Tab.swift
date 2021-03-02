@@ -327,6 +327,10 @@ extension Tab: WKNavigationDelegate {
         static let frameLoadInterrupted = 102
     }
 
+    struct Constants {
+        static let webkitMiddleClick = 4
+    }
+
     func webView(_ webView: WKWebView,
                  decidePolicyFor navigationAction: WKNavigationAction,
                  decisionHandler: @escaping (WKNavigationActionPolicy) -> Void) {
@@ -344,7 +348,7 @@ extension Tab: WKNavigationDelegate {
         }
 
         let isLinkActivated = navigationAction.navigationType == .linkActivated
-        let isMiddleClicked = navigationAction.buttonNumber >= 2
+        let isMiddleClicked = navigationAction.buttonNumber == Constants.webkitMiddleClick
         if isLinkActivated && NSApp.isCommandPressed || isMiddleClicked {
             decisionHandler(.cancel)
             delegate?.tab(self, requestedNewTab: navigationAction.request.url, selected: NSApp.isShiftPressed)
