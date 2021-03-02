@@ -1,5 +1,5 @@
 //
-//  WKWebViewConfigurationExtensions.swift
+//  URLExtensionTests.swift
 //
 //  Copyright © 2021 DuckDuckGo. All rights reserved.
 //
@@ -16,18 +16,22 @@
 //  limitations under the License.
 //
 
-import WebKit
+import XCTest
 import Combine
+@testable import DuckDuckGo_Privacy_Browser
 
-extension WKWebViewConfiguration {
+class URLExtensionTests: XCTestCase {
 
-    func applyStandardConfiguration() {
-        allowsAirPlayForMediaPlayback = true
-        preferences.setValue(true, forKey: "fullScreenEnabled")
-        preferences.setValue(true, forKey: "developerExtrasEnabled")
-        preferences.javaScriptCanOpenWindowsAutomatically = false
+    func test_external_urls_are_valid() {
+        XCTAssertTrue("mailto://user@host.tld".url!.isValid)
+        XCTAssertTrue("sms://+44776424232323".url!.isValid)
+    }
 
-        self.userContentController = UserContentController()
-     }
+    func test_navigational_urls_are_valid() {
+        XCTAssertTrue("http://example.com".url!.isValid)
+        XCTAssertTrue("https://example.com".url!.isValid)
+        XCTAssertTrue("ftp://example.com".url!.isValid)
+        XCTAssertTrue("http://localdomain".url!.isValid)
+    }
 
 }
