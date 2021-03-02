@@ -178,8 +178,16 @@ extension BrowserTabViewController: TabDelegate {
             return
         }
 
+		func searchForExternalUrl() {
+			tab.update(url: URL.makeSearchUrl(from: url.absoluteString), userEntered: false)
+		}
+
         guard let appUrl = NSWorkspace.shared.urlForApplication(toOpen: url) else {
-            NSAlert.unableToOpenExernalURLAlert().beginSheetModal(for: window)
+			if userEntered {
+				searchForExternalUrl()
+			} else {
+				NSAlert.unableToOpenExernalURLAlert().beginSheetModal(for: window)
+			}
             return
         }
 
@@ -188,7 +196,7 @@ extension BrowserTabViewController: TabDelegate {
             if response == NSApplication.ModalResponse.alertFirstButtonReturn {
                 NSWorkspace.shared.open(url)
 			} else if userEntered {
-				tab.update(url: URL.makeSearchUrl(from: url.absoluteString), userEntered: false)
+				searchForExternalUrl()
 			}
         }
 
