@@ -43,9 +43,8 @@ class ExternalURLHandler {
     }
 
     func handle(url: URL, onPage page: URL?, fromFrame: Bool, triggeredByUser: Bool) {
-        guard let page = page,
-              // just cancel frame based external urls
-              !fromFrame else { return }
+        // just cancel frame based external urls
+        guard !fromFrame else { return }
 
         if triggeredByUser {
             urlPublisher.send(url)

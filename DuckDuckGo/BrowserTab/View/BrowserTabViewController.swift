@@ -167,7 +167,7 @@ class BrowserTabViewController: NSViewController {
 
 extension BrowserTabViewController: TabDelegate {
 
-    func tab(_ tab: Tab, requestedOpenExternalURL url: URL) {
+	func tab(_ tab: Tab, requestedOpenExternalURL url: URL, forUserEnteredURL userEntered: Bool) {
         guard let window = self.view.window else {
             os_log("%s: Window is nil", type: .error, className)
             return
@@ -187,7 +187,9 @@ extension BrowserTabViewController: TabDelegate {
         NSAlert.openExternalURLAlert(with: externalAppName).beginSheetModal(for: window) { response in
             if response == NSApplication.ModalResponse.alertFirstButtonReturn {
                 NSWorkspace.shared.open(url)
-            }
+			} else if userEntered {
+				tab.update(url: URL.makeSearchUrl(from: url.absoluteString), userEntered: false)
+			}
         }
 
     }
