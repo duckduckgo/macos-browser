@@ -2221,7 +2221,7 @@
 			isa = XCRemoteSwiftPackageReference;
 			repositoryURL = "https://dub.duckduckgo.com/duckduckgo/BrowserServicesKit";
 			requirement = {
-				kind = upToNextMajorVersion;
+				kind = upToNextMinorVersion;
 				minimumVersion = 0.1.0;
 			};
 		};

@@ -23,12 +23,6 @@ import os.log
 @NSApplicationMain
 class AppDelegate: NSObject, NSApplicationDelegate {
 
-    static var shared: AppDelegate {
-        // swiftlint:disable force_cast
-        return (NSApp.delegate as! AppDelegate)
-        // swiftlint:enable force_cast
-    }
-
     private var isRunningTests: Bool {
         ProcessInfo.processInfo.environment["XCTestConfigurationFilePath"] != nil
     }
