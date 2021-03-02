@@ -19,9 +19,21 @@
 import Foundation
 import XCTest
 import Combine
+import BrowserServicesKit
 @testable import DuckDuckGo_Privacy_Browser
 
 class UserScriptsTests: XCTestCase {
+
+    func testUserScriptsTranslatesVarsIntoArray() {
+        let userScripts = UserScripts()
+
+        // swiftlint:disable force_cast
+        let expected = Mirror(reflecting: userScripts).children.compactMap { $0.value as? UserScript } as! [NSObject]
+        let actual = Set(userScripts.userScripts as! [NSObject])
+        // swiftlint:enable force_cast
+
+        XCTAssertEqual(actual, Set(expected))
+    }
 
     func testUserScriptsScriptsAreInitializedOnce() {
         let userScripts = UserScripts()
