@@ -21,37 +21,12 @@ import Combine
 
 extension WKWebViewConfiguration {
 
-    func applyStandardConfiguration(persistent: Bool = true) {
-        if !self.userContentController.userScripts.isEmpty {
-            self.userContentController = WKUserContentController()
-        }
-        websiteDataStore = WKWebsiteDataStore.default()
+    func applyStandardConfiguration() {
         allowsAirPlayForMediaPlayback = true
         preferences.setValue(true, forKey: "fullScreenEnabled")
         preferences.setValue(true, forKey: "developerExtrasEnabled")
-        installContentBlockingRules()
+
+        self.userContentController = UserContentController()
      }
-
-    private func installContentBlockingRules() {
-        userContentController.installContentBlockingRules()
-    }
-
-}
-
-extension WKUserContentController {
-
-    func installContentBlockingRules() {
-        ContentBlockerRulesManager.shared.blockingRules.sink { [weak self] rules in
-            dispatchPrecondition(condition: .onQueue(.main))
-
-            guard let self = self,
-                  let rules = rules
-            else { return }
-
-            self.removeAllContentRuleLists()
-            self.add(rules)
-
-        }.store(in: &self.lifetimeCancellableStorage)
-    }
 
 }

@@ -147,32 +147,35 @@ extension UserScriptsTests {
         }
     }
 
-    final class UserContentControllerMock: UserScripting {
-        var userScripts = [WKUserScript]()
+    final class UserContentControllerMock: WKUserContentController {
+        // swiftlint:disable identifier_name
+        var _userScripts = [WKUserScript]()
+        // swiftlint:enable identifier_name
+        override var userScripts: [WKUserScript] { _userScripts }
         var handlers = [String: WKScriptMessageHandler]()
 
-        func addUserScript(_ userScript: WKUserScript) {
-            userScripts.append(userScript)
+        override func addUserScript(_ userScript: WKUserScript) {
+            _userScripts.append(userScript)
         }
 
-        func removeAllUserScripts() {
-            userScripts = []
+        override func removeAllUserScripts() {
+            _userScripts = []
         }
 
-        func add(_ scriptMessageHandler: WKScriptMessageHandler, name: String) {
+        override func add(_ scriptMessageHandler: WKScriptMessageHandler, name: String) {
             assert(handlers[name] == nil)
             handlers[name] = scriptMessageHandler
         }
         @available(OSX 11.0, *)
-        func add(_ scriptMessageHandler: WKScriptMessageHandler, contentWorld world: WKContentWorld, name: String) {
+        override func add(_ scriptMessageHandler: WKScriptMessageHandler, contentWorld world: WKContentWorld, name: String) {
             add(scriptMessageHandler, name: name)
         }
 
-        func removeScriptMessageHandler(forName name: String) {
+        override func removeScriptMessageHandler(forName name: String) {
             handlers[name] = nil
         }
         @available(OSX 11.0, *)
-        func removeScriptMessageHandler(forName name: String, contentWorld: WKContentWorld) {
+        override func removeScriptMessageHandler(forName name: String, contentWorld: WKContentWorld) {
             removeScriptMessageHandler(forName: name)
         }
     }

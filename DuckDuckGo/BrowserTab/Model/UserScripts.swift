@@ -52,3 +52,17 @@ class UserScripts {
     lazy var scripts = userScripts.map { $0.makeWKUserScript() }
 
 }
+
+extension UserScripts {
+
+    func install(into controller: WKUserContentController) {
+        scripts.forEach(controller.addUserScript)
+        userScripts.forEach(controller.addHandler)
+    }
+
+    func remove(from controller: WKUserContentController) {
+        controller.removeAllUserScripts()
+        userScripts.forEach(controller.removeHandler)
+    }
+
+}
