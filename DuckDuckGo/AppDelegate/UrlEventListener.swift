@@ -37,29 +37,7 @@ class UrlEventListener {
             return
         }
 
-        guard let windowController = WindowControllersManager.shared.lastKeyMainWindowController,
-              windowController.window?.isKeyWindow == true else {
-            WindowsManager.openNewWindow(with: url)
-            return
-        }
-
-        guard let mainViewController = windowController.mainViewController else {
-            os_log("AppDelegate: No main view controller", type: .error)
-            return
-        }
-
-        let tabCollectionViewModel = mainViewController.tabCollectionViewModel
-        let tabCollection = tabCollectionViewModel.tabCollection
-
-        if tabCollection.tabs.count == 1,
-           let firstTab = tabCollection.tabs.first,
-           firstTab.isHomepageLoaded {
-            firstTab.url = url
-        } else {
-            let newTab = Tab()
-            newTab.url = url
-            tabCollectionViewModel.append(tab: newTab)
-        }
+        WindowControllersManager.shared.show(url: url)
     }
 
 }

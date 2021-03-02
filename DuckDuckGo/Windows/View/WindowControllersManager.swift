@@ -41,6 +41,64 @@ class WindowControllersManager {
 
 }
 
+// MARK: - Opening a url from the external event
+
+extension WindowControllersManager {
+
+    func show(url: URL) {
+
+        func show(url: URL, in windowController: MainWindowController) {
+            guard let viewController = windowController.mainViewController else {
+                assertionFailure("WindowControllersManager: Failed to reference registered")
+                return
+            }
+
+            windowController.window?.makeKeyAndOrderFront(self)
+
+            let tabCollectionViewModel = viewController.tabCollectionViewModel
+            let tabCollection = tabCollectionViewModel.tabCollection
+
+            if tabCollection.tabs.count == 1,
+               let firstTab = tabCollection.tabs.first,
+               firstTab.isHomepageLoaded {
+                firstTab.url = url
+            } else {
+                let newTab = Tab()
+                newTab.url = url
+                tabCollectionViewModel.append(tab: newTab)
+            }
+        }
+
+        // If there is a main window, open the URL in it
+        if let windowController = mainWindowControllers.first(where: { $0.window?.isMainWindow ?? false }) {
+            show(url: url, in: windowController)
+            return
+        }
+
+        // If a last key window is available, open the URL in it
+        if let windowController = lastKeyMainWindowController {
+            show(url: url, in: windowController)
+            return
+        }
+
+        // If there is any open window on the current screen, open the URL in it
+        if let windowController = mainWindowControllers.first(where: { $0.window?.screen == NSScreen.main }) {
+            show(url: url, in: windowController)
+            return
+        }
+
+        // If there is any window available, open the URL in it
+        if let windowController = mainWindowControllers.first(where: { $0.window?.screen == NSScreen.main }) {
+            show(url: url, in: windowController)
+            return
+        }
+
+        // Open a new window
+        WindowsManager.openNewWindow(with: url)
+    }
+
+}
+
 // MARK: - ApplicationDockMenu
 
 extension WindowControllersManager: ApplicationDockMenuDataSource {
