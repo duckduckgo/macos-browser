@@ -19,7 +19,7 @@
 import WebKit
 import BrowserServicesKit
 
-protocol HTML5DownloadDelegate: AnyObject {
+protocol HTML5DownloadDelegate: class {
 
     func startDownload(_ userScript: HTML5DownloadUserScript, from: URL, withSuggestedName: String)
 
