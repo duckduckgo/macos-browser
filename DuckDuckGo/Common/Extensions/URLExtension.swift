@@ -87,7 +87,6 @@ extension URL {
     enum NavigationalScheme: String, CaseIterable {
         case http
         case https
-        case ftp
 
         func separated() -> String {
             self.rawValue + "://"
