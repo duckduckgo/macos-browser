@@ -17,6 +17,7 @@
 //
 
 import Foundation
+import BrowserServicesKit
 
 class UserScripts {
 
@@ -29,7 +30,7 @@ class UserScripts {
     let contentBlockerRulesScript = ContentBlockerRulesUserScript()
     let debugScript = DebugUserScript()
 
-    lazy var userScripts = [
+    lazy var userScripts: [UserScript] = [
         self.debugScript,
         self.faviconScript,
         self.html5downloadScript,

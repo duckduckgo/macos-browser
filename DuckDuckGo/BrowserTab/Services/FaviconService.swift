@@ -83,7 +83,7 @@ class LocalFaviconService: FaviconService {
                 return
             }
 
-            guard let url = faviconUrl ?? URL(string: "\(URL.Scheme.https.separated())\(host)/\(FaviconName.favicon)") else {
+            guard let url = faviconUrl ?? URL(string: "\(URL.NavigationalScheme.https.separated())\(host)/\(FaviconName.favicon.rawValue)") else {
                 mainQueueCompletion(nil, LocalFaviconServiceError.urlConstructionFailed)
                 return
             }

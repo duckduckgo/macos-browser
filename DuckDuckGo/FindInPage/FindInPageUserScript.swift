@@ -17,19 +17,20 @@
 //
 
 import WebKit
+import BrowserServicesKit
 
-class FindInPageUserScript: UserScript {
+class FindInPageUserScript: NSObject, UserScript {
 
+    var injectionTime: WKUserScriptInjectionTime = .atDocumentEnd
+    var forMainFrameOnly = false
+    let messageNames = ["findInPageHandler"]
+    lazy var source: String = {
+        return loadJS("findinpage", fromBundle: Bundle.main)
+    }()
+    
     weak var model: FindInPageModel?
 
-    init() {
-        super.init(source: Self.source,
-                   messageNames: Self.messageNames,
-                   injectionTime: .atDocumentEnd,
-                   forMainFrameOnly: false)
-    }
-
-    override func userContentController(_ userContentController: WKUserContentController, didReceive message: WKScriptMessage) {
+    func userContentController(_ userContentController: WKUserContentController, didReceive message: WKScriptMessage) {
         guard let dict = message.body as? [String: Any] else { return }
         let currentResult = dict["currentResult"] as? Int
         let totalResults = dict["totalResults"] as? Int
@@ -59,12 +60,5 @@ class FindInPageUserScript: UserScript {
             webView.evaluateJavaScript(js)
         }
     }
-
-}
-
-extension FindInPageUserScript {
-
-    static let messageNames = ["findInPageHandler"]
-    static let source = DefaultScriptSourceProvider.loadJS("findinpage")
 
 }

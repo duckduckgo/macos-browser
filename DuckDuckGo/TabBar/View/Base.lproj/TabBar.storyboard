@@ -34,7 +34,7 @@
                                     <constraint firstItem="T1A-KU-P4c" firstAttribute="top" secondItem="8Av-Au-VBq" secondAttribute="top" id="vLF-of-F3h"/>
                                 </constraints>
                             </visualEffectView>
-                            <button translatesAutoresizingMaskIntoConstraints="NO" id="XV4-Ze-5j7" userLabel="Burn Button" customClass="MouseOverButton" customModule="DuckDuckGo_Privacy_Browser" customModuleProvider="target">
+                            <button translatesAutoresizingMaskIntoConstraints="NO" id="XV4-Ze-5j7" userLabel="Burn Button" customClass="BurnButton" customModule="DuckDuckGo_Privacy_Browser" customModuleProvider="target">
                                 <rect key="frame" x="805" y="5" width="32" height="24"/>
                                 <constraints>
                                     <constraint firstAttribute="width" constant="32" id="9Ii-rC-Eca"/>
@@ -217,6 +217,7 @@
                         </constraints>
                     </view>
                     <connections>
+                        <outlet property="burnButton" destination="XV4-Ze-5j7" id="ZCC-wX-7hC"/>
                         <outlet property="collectionView" destination="OEu-5P-cRF" id="b95-c4-JM0"/>
                         <outlet property="leftScrollButton" destination="7XG-Qm-Ksx" id="yre-8P-vb9"/>
                         <outlet property="leftShadowImageView" destination="zsA-or-9Xo" id="wVp-jj-2UD"/>

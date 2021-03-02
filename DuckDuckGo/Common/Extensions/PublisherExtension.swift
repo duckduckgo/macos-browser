@@ -1,7 +1,7 @@
 //
-//  MenuItemSelectors.swift
+//  PublisherExtension.swift
 //
-//  Copyright © 2020 DuckDuckGo. All rights reserved.
+//  Copyright © 2021 DuckDuckGo. All rights reserved.
 //
 //  Licensed under the Apache License, Version 2.0 (the "License");
 //  you may not use this file except in compliance with the License.
@@ -16,22 +16,15 @@
 //  limitations under the License.
 //
 
-import Cocoa
+import Foundation
+import Combine
 
-@objc protocol LinkMenuItemSelectors {
+extension Publisher where Failure == Never {
 
-    func openLinkInNewTab(_ sender: NSMenuItem)
-    func openLinkInNewWindow(_ sender: NSMenuItem)
-    func downloadLinkedFile(_ sender: NSMenuItem)
-    func copyLink(_ sender: NSMenuItem)
-
-}
-
-@objc protocol ImageMenuItemSelectors {
-
-    func openImageInNewTab(_ sender: NSMenuItem)
-    func openImageInNewWindow(_ sender: NSMenuItem)
-    func saveImageToDownloads(_ sender: NSMenuItem)
-    func copyImageAddress(_ sender: NSMenuItem)
+    func weakAssign<T: AnyObject>(to keyPath: ReferenceWritableKeyPath<T, Output>, on object: T) -> AnyCancellable {
+        sink { [weak object] value in
+            object?[keyPath: keyPath] = value
+        }
+    }
 
 }

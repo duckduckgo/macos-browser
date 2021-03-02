@@ -20,6 +20,7 @@ import Cocoa
 import WebKit
 import os
 import Combine
+import BrowserServicesKit
 
 protocol TabDelegate: class {
 
@@ -28,6 +29,7 @@ protocol TabDelegate: class {
     func tab(_ tab: Tab, requestedFileDownload download: FileDownload)
     func tab(_ tab: Tab, willShowContextMenuAt position: NSPoint, image: URL?, link: URL?)
     func tab(_ tab: Tab, detectedLogin host: String)
+	func tab(_ tab: Tab, requestedOpenExternalURL url: URL, forUserEnteredURL: Bool)
 
 }
 
@@ -74,6 +76,7 @@ final class Tab: NSObject {
         }
 
         subscribeToTrackerBlockerConfigUpdatedEvents()
+        subscribeToOpenExternalUrlEvents()
     }
 
     deinit {
@@ -81,6 +84,7 @@ final class Tab: NSObject {
     }
 
     let webView: WebView
+	var userEnteredUrl = true
 
     @Published var url: URL? {
         didSet {
@@ -114,11 +118,12 @@ final class Tab: NSObject {
         return self.sessionStateData
     }
 
-    func update(url: URL?) {
-         self.url = url
+	func update(url: URL?, userEntered: Bool = true) {
+        self.url = url
 
-         // This function is called when the user has manually typed in a new address, which should reset the login detection flow.
-         loginDetectionService?.handle(navigationEvent: .userAction)
+        // This function is called when the user has manually typed in a new address, which should reset the login detection flow.
+		userEnteredUrl = userEntered
+		loginDetectionService?.handle(navigationEvent: .userAction)
      }
 
     // Used to track if an error was caused by a download navigation.
@@ -177,6 +182,17 @@ final class Tab: NSObject {
             } catch {
                 os_log("Tab:setupWebView could not restore session state %s", "\(error)")
             }
+        }
+    }
+
+    // MARK: - Open External URL
+
+    let externalUrlHandler = ExternalURLHandler()
+    var openExternalUrlEventsCancellable: AnyCancellable?
+
+    private func subscribeToOpenExternalUrlEvents() {
+        openExternalUrlEventsCancellable = externalUrlHandler.openExternalUrlPublisher.sink {
+			self.delegate?.tab(self, requestedOpenExternalURL: $0, forUserEnteredURL: self.userEnteredUrl)
         }
     }
 
@@ -360,13 +376,17 @@ extension Tab: WKNavigationDelegate {
             return
         }
 
-        #warning("Temporary implementation copied from the prototype. Only for internal release!")
-        if !["https", "http", "about", "data"].contains(urlScheme) {
-            let openResult = NSWorkspace.shared.open(url)
-            if openResult {
-                decisionHandler(.cancel)
-                return
-            }
+        if externalUrlHandler.isExternal(scheme: urlScheme) {
+            // ignore <iframe src="custom://url"> but allow via address bar
+            let fromFrame = !(navigationAction.sourceFrame.isMainFrame || self.userEnteredUrl)
+
+            externalUrlHandler.handle(url: url,
+                                      onPage: webView.url,
+                                      fromFrame: fromFrame,
+                                      triggeredByUser: navigationAction.navigationType == .linkActivated)
+
+            decisionHandler(.cancel)
+            return
         }
 
         HTTPSUpgrade.shared.isUpgradeable(url: url) { [weak self] isUpgradable in
@@ -383,7 +403,7 @@ extension Tab: WKNavigationDelegate {
     func webView(_ webView: WKWebView,
                  decidePolicyFor navigationResponse: WKNavigationResponse,
                  decisionHandler: @escaping (WKNavigationResponsePolicy) -> Void) {
-
+		userEnteredUrl = false // subsequent requests will be navigations
         let policy = navigationResponsePolicyForDownloads(navigationResponse)
         decisionHandler(policy)
 

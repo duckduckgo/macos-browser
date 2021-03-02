@@ -32,6 +32,7 @@ extension WKWebViewConfiguration {
         preferences.setValue(true, forKey: "fullScreenEnabled")
         preferences.setValue(true, forKey: "allowsPictureInPictureMediaPlayback")
         preferences.setValue(true, forKey: "developerExtrasEnabled")
+        preferences.javaScriptCanOpenWindowsAutomatically = false
         installContentBlockingRules()
     }
 
