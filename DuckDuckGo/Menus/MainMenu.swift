@@ -95,10 +95,6 @@ class MainMenu: NSMenu {
     var debugMenuItem: NSMenuItem? {
         item(withTag: Tag.debug.rawValue)
     }
-
-    var resetDefaultBrowserPromptMenuItem: NSMenuItem? {
-        debugMenuItem?.submenu?.item(withTag: Tag.debugResetDefaultBrowserPrompt.rawValue)
-    }
   
     override func update() {
         super.update()
