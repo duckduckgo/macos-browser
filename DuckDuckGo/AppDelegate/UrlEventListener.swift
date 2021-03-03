@@ -21,6 +21,14 @@ import os.log
 
 class UrlEventListener {
 
+    private let handler: ((URL) -> Void)
+
+    init(handler: @escaping ((URL) -> Void) = { url in
+        WindowControllersManager.shared.show(url: url)
+    }) {
+        self.handler = handler
+    }
+
     func listen() {
         NSAppleEventManager.shared().setEventHandler(
             self,
@@ -30,14 +38,18 @@ class UrlEventListener {
         )
     }
 
-    @objc private func handleUrlEvent(event: NSAppleEventDescriptor, reply: NSAppleEventDescriptor) {
-        guard let path = event.paramDescriptor(forKeyword: keyDirectObject)?.stringValue?.removingPercentEncoding,
-              let url = URL(string: path) else {
-            os_log("AppDelegate: URL initialization failed", type: .error)
+    @objc func handleUrlEvent(event: NSAppleEventDescriptor, reply: NSAppleEventDescriptor) {
+        guard let path = event.paramDescriptor(forKeyword: keyDirectObject)?.stringValue?.removingPercentEncoding else {
+            os_log("UrlEventListener: unable to determine path", type: .error)
             return
         }
 
-        WindowControllersManager.shared.show(url: url)
+        guard let url = URL(string: path) ?? URL(string: path.replacingOccurrences(of: " ", with: "%20")) else {
+            os_log("UrlEventListener: failed to construct URL from path %s", type: .error, path)
+            return
+        }
+
+        handler(url)
     }
 
 }
