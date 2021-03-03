@@ -68,5 +68,9 @@ public struct UserDefaultsWrapper<T> {
          Key.allCases.forEach { key in
              UserDefaults.standard.removeObject(forKey: key.rawValue)
          }
-     }
+    }
+
+    static func clear(_ key: Key) {
+        UserDefaults.standard.removeObject(forKey: key.rawValue)
+    }
 }
