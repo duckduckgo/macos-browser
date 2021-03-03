@@ -21,7 +21,7 @@ import WebKit
 import os.log
 import Combine
 
-class BrowserTabViewController: NSViewController {
+class BrowserTabViewController: NSViewController, LinkPreviewViewControllerDelegate {
 
     @IBOutlet weak var errorView: NSView!
     weak var webView: WebView?
@@ -275,12 +275,17 @@ extension BrowserTabViewController: ImageMenuItemSelectors {
 
         let converted = NSPoint(x: position.x, y: self.view.bounds.height - position.y)
         let controller = LinkPreviewViewController.create(for: link)
+        controller.delegate = self
 
         self.present(controller,
                      asPopoverRelativeTo: CGRect(x: converted.x, y: converted.y, width: 1, height: 1),
                      of: view, // Hack Days!
                      preferredEdge: .minY,
                      behavior: .semitransient)
+    }
+
+    func linkPreviewViewController(_ controller: LinkPreviewViewController, requestedNewTab url: URL?) {
+        openNewTab(with: url)
     }
 
 }

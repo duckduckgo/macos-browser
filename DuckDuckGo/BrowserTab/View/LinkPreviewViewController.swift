@@ -19,6 +19,12 @@
 import Cocoa
 import WebKit
 
+protocol LinkPreviewViewControllerDelegate: class {
+
+    func linkPreviewViewController(_ controller: LinkPreviewViewController, requestedNewTab url: URL?)
+
+}
+
 class LinkPreviewViewController: NSViewController, NSPopoverDelegate {
 
     static func create(for initialURL: URL, compact: Bool = false) -> LinkPreviewViewController {
@@ -28,6 +34,8 @@ class LinkPreviewViewController: NSViewController, NSPopoverDelegate {
             return LinkPreviewViewController(coder: coder, initialURL: initialURL, compact: compact)
         }
     }
+
+    weak var delegate: LinkPreviewViewControllerDelegate?
 
     @IBOutlet weak var titleLabel: NSTextField!
     @IBOutlet weak var webView: WKWebView!
@@ -84,6 +92,7 @@ class LinkPreviewViewController: NSViewController, NSPopoverDelegate {
     }
 
     @IBAction func openInNewTab(_ sender: NSButton) {
+        delegate?.linkPreviewViewController(self, requestedNewTab: webView.url)
         dismiss(self)
     }
 
