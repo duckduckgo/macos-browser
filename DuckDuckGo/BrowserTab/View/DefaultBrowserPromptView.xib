@@ -27,7 +27,7 @@
                                 <action selector="setDefaultButtonClicked:" target="c22-O7-iKe" id="Nqd-CO-fSH"/>
                             </connections>
                         </button>
-                        <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="w6Q-JE-EdY" userLabel="CTA Label">
+                        <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" verticalCompressionResistancePriority="250" translatesAutoresizingMaskIntoConstraints="NO" id="w6Q-JE-EdY" userLabel="CTA Label">
                             <rect key="frame" x="233" y="25" width="253" height="16"/>
                             <textFieldCell key="cell" lineBreakMode="clipping" title="Set DuckDuckGo as your default browser" id="i7L-JG-R47">
                                 <font key="font" textStyle="body" name=".SFNS-Regular"/>
@@ -64,9 +64,11 @@
                     </subviews>
                     <constraints>
                         <constraint firstItem="w6Q-JE-EdY" firstAttribute="centerX" secondItem="rLP-iM-LU7" secondAttribute="centerX" id="7F7-F8-YHw"/>
+                        <constraint firstAttribute="trailing" relation="greaterThanOrEqual" secondItem="UqG-2t-H4B" secondAttribute="trailing" constant="20" id="7fj-q1-Ji6"/>
                         <constraint firstItem="8eV-Qb-jVn" firstAttribute="centerY" secondItem="rLP-iM-LU7" secondAttribute="centerY" id="CuD-Ym-9cc"/>
                         <constraint firstAttribute="bottom" secondItem="Eyo-Wi-WoT" secondAttribute="bottom" id="T5H-aK-XvD"/>
                         <constraint firstAttribute="bottom" secondItem="w6Q-JE-EdY" secondAttribute="bottom" constant="25" id="YzH-uQ-CZr"/>
+                        <constraint firstItem="7MQ-6U-8P8" firstAttribute="leading" relation="greaterThanOrEqual" secondItem="8eV-Qb-jVn" secondAttribute="trailing" constant="10" id="cLN-oK-Yoi"/>
                         <constraint firstItem="8eV-Qb-jVn" firstAttribute="leading" secondItem="rLP-iM-LU7" secondAttribute="leading" constant="20" id="ei0-sr-ARf"/>
                         <constraint firstItem="UqG-2t-H4B" firstAttribute="leading" secondItem="w6Q-JE-EdY" secondAttribute="trailing" constant="12" id="iWG-gl-3W9"/>
                         <constraint firstItem="7MQ-6U-8P8" firstAttribute="centerY" secondItem="w6Q-JE-EdY" secondAttribute="centerY" id="oiA-bH-GfZ"/>

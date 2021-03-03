@@ -24,17 +24,8 @@ import Combine
 class BrowserTabViewController: NSViewController {
 
     @IBOutlet weak var errorView: NSView!
-    weak var webView: WebView? {
-        didSet {
-            print("SET NEW WEBVIEW \(webView)")
-        }
-    }
-
-    var tabViewModel: TabViewModel? {
-        didSet {
-            print("SET NEW TAB VIEW MODEL \(tabViewModel)")
-        }
-    }
+    weak var webView: WebView?
+    var tabViewModel: TabViewModel?
 
     private let tabCollectionViewModel: TabCollectionViewModel
     private var urlCancellable: AnyCancellable?
@@ -147,7 +138,6 @@ class BrowserTabViewController: NSViewController {
             return
         }
 
-        print("Trying to change webview to use \(tabViewModel)")
         guard self.tabViewModel !== tabViewModel else { return }
 
         let oldWebView = webView
