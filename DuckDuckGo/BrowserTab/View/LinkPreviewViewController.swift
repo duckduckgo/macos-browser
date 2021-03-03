@@ -48,6 +48,7 @@ class LinkPreviewViewController: NSViewController, NSPopoverDelegate {
 
     lazy var detachedWindowController: LinkPreviewWindowController = {
         let detachedWindowController = LinkPreviewWindowController()
+        detachedWindowController.window?.level = NSWindow.Level(rawValue: 1000) // Keep the window in the foreground at all times
         detachedWindowController.contentViewController = LinkPreviewViewController.create(for: self.initialURL, compact: true)
 
         return detachedWindowController
