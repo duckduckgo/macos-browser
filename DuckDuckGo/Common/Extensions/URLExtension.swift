@@ -23,6 +23,19 @@ extension URL {
 
     // MARK: - Factory
 
+    static func makeHTMLSearchURL(from searchQuery: String) -> URL? {
+
+        let trimmedQuery = searchQuery.trimmingCharacters(in: .whitespacesAndNewlines)
+        do {
+            var searchUrl = Self.duckDuckGo.appendingPathComponent("html")
+            searchUrl = try searchUrl.addParameter(name: DuckDuckGoParameters.search.rawValue, value: trimmedQuery)
+            return searchUrl
+        } catch let error {
+            os_log("URL extension: %s", type: .error, error.localizedDescription)
+            return nil
+        }
+    }
+
     static func makeSearchUrl(from searchQuery: String) -> URL? {
         let trimmedQuery = searchQuery.trimmingCharacters(in: .whitespacesAndNewlines)
         do {

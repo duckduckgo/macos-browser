@@ -213,6 +213,8 @@
 		B61F01B825EF668F00ABB5A3 /* CommandPaletteViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = B61F01B725EF668F00ABB5A3 /* CommandPaletteViewController.swift */; };
 		B61F01BD25EF6C5E00ABB5A3 /* TabTableCellView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B61F01BC25EF6C5E00ABB5A3 /* TabTableCellView.swift */; };
 		B61F01C225EF6F0D00ABB5A3 /* CommandPaletteViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = B61F01C125EF6F0D00ABB5A3 /* CommandPaletteViewModel.swift */; };
+		B61F01CC25EFBC9F00ABB5A3 /* SwiftSoup in Frameworks */ = {isa = PBXBuildFile; productRef = B61F01CB25EFBC9F00ABB5A3 /* SwiftSoup */; };
+		B61F01D525EFBCB900ABB5A3 /* SearchResultsProvider.swift in Sources */ = {isa = PBXBuildFile; fileRef = B61F01D425EFBCB900ABB5A3 /* SearchResultsProvider.swift */; };
 		B62EB47C25BAD3BB005745C6 /* WKWebViewSessionDataTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = B62EB47B25BAD3BB005745C6 /* WKWebViewSessionDataTests.swift */; };
 		B633C86D25E797D800E4B352 /* UserScriptsManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = B633C86C25E797D800E4B352 /* UserScriptsManager.swift */; };
 		B63D466925BEB6C200874977 /* WKWebView+SessionState.swift in Sources */ = {isa = PBXBuildFile; fileRef = B63D466825BEB6C200874977 /* WKWebView+SessionState.swift */; };
@@ -470,6 +472,7 @@
 		B61F01B725EF668F00ABB5A3 /* CommandPaletteViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CommandPaletteViewController.swift; sourceTree = "<group>"; };
 		B61F01BC25EF6C5E00ABB5A3 /* TabTableCellView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TabTableCellView.swift; sourceTree = "<group>"; };
 		B61F01C125EF6F0D00ABB5A3 /* CommandPaletteViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CommandPaletteViewModel.swift; sourceTree = "<group>"; };
+		B61F01D425EFBCB900ABB5A3 /* SearchResultsProvider.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SearchResultsProvider.swift; sourceTree = "<group>"; };
 		B62EB47B25BAD3BB005745C6 /* WKWebViewSessionDataTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = WKWebViewSessionDataTests.swift; sourceTree = "<group>"; };
 		B633C86C25E797D800E4B352 /* UserScriptsManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UserScriptsManager.swift; sourceTree = "<group>"; };
 		B63D466725BEB6C200874977 /* WKWebView+SessionState.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "WKWebView+SessionState.h"; sourceTree = "<group>"; };
@@ -501,6 +504,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				F498DCBB25E7D508008197FE /* BrowserServicesKit in Frameworks */,
+				B61F01CC25EFBC9F00ABB5A3 /* SwiftSoup in Frameworks */,
 				85AE2FF224A33A2D002D507F /* WebKit.framework in Frameworks */,
 				4B82E9B325B69E3E00656FE7 /* TrackerRadarKit in Frameworks */,
 			);
@@ -891,6 +895,7 @@
 				B68458AE25C7E75100DC17B6 /* State Restoration */,
 				B61F019E25EF5E9D00ABB5A3 /* Command Palette */,
 				AA585D8B248FD31400E9A3E2 /* DuckDuckGo.entitlements */,
+				B61F01D025EFBCA700ABB5A3 /* SearchResultsProvider */,
 				4B677454255DC18000025BD8 /* Bridging.h */,
 				AA585D8A248FD31400E9A3E2 /* Info.plist */,
 				AA585D85248FD31400E9A3E2 /* Assets.xcassets */,
@@ -1480,6 +1485,14 @@
 			path = "Command Palette";
 			sourceTree = "<group>";
 		};
+		B61F01D025EFBCA700ABB5A3 /* SearchResultsProvider */ = {
+			isa = PBXGroup;
+			children = (
+				B61F01D425EFBCB900ABB5A3 /* SearchResultsProvider.swift */,
+			);
+			path = SearchResultsProvider;
+			sourceTree = "<group>";
+		};
 		B633C89425E85C5700E4B352 /* Recovered References */ = {
 			isa = PBXGroup;
 			children = (
@@ -1530,6 +1543,7 @@
 			packageProductDependencies = (
 				4B82E9B225B69E3E00656FE7 /* TrackerRadarKit */,
 				F498DCBA25E7D508008197FE /* BrowserServicesKit */,
+				B61F01CB25EFBC9F00ABB5A3 /* SwiftSoup */,
 			);
 			productName = DuckDuckGo;
 			productReference = AA585D7E248FD31100E9A3E2 /* DuckDuckGo Privacy Browser.app */;
@@ -1606,6 +1620,7 @@
 			packageReferences = (
 				4B82E9B125B69E3E00656FE7 /* XCRemoteSwiftPackageReference "TrackerRadarKit" */,
 				F498DCB925E7D508008197FE /* XCRemoteSwiftPackageReference "BrowserServicesKit" */,
+				B61F01CA25EFBC9F00ABB5A3 /* XCRemoteSwiftPackageReference "SwiftSoup" */,
 			);
 			productRefGroup = AA585D7F248FD31100E9A3E2 /* Products */;
 			projectDirPath = "";
@@ -1833,6 +1848,7 @@
 				AA7412B524D1536B00D22FE0 /* MainWindowController.swift in Sources */,
 				AA9FF95924A1ECF20039E328 /* Tab.swift in Sources */,
 				B63D467125BFA6C100874977 /* DispatchQueueExtensions.swift in Sources */,
+				B61F01D525EFBCB900ABB5A3 /* SearchResultsProvider.swift in Sources */,
 				AA6FFB4624DC3B5A0028F4D0 /* WebView.swift in Sources */,
 				AA7412B224D0B3AC00D22FE0 /* TabBarViewItem.swift in Sources */,
 				856C98D52570116900A22F1F /* NSWindow+Toast.swift in Sources */,
@@ -2297,6 +2313,14 @@
 				minimumVersion = 1.0.2;
 			};
 		};
+		B61F01CA25EFBC9F00ABB5A3 /* XCRemoteSwiftPackageReference "SwiftSoup" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/scinfu/SwiftSoup.git";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 2.3.2;
+			};
+		};
 		F498DCB925E7D508008197FE /* XCRemoteSwiftPackageReference "BrowserServicesKit" */ = {
 			isa = XCRemoteSwiftPackageReference;
 			repositoryURL = "https://dub.duckduckgo.com/duckduckgo/BrowserServicesKit";
@@ -2312,6 +2336,11 @@
 			isa = XCSwiftPackageProductDependency;
 			package = 4B82E9B125B69E3E00656FE7 /* XCRemoteSwiftPackageReference "TrackerRadarKit" */;
 			productName = TrackerRadarKit;
+		};
+		B61F01CB25EFBC9F00ABB5A3 /* SwiftSoup */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = B61F01CA25EFBC9F00ABB5A3 /* XCRemoteSwiftPackageReference "SwiftSoup" */;
+			productName = SwiftSoup;
 		};
 		F498DCBA25E7D508008197FE /* BrowserServicesKit */ = {
 			isa = XCSwiftPackageProductDependency;
