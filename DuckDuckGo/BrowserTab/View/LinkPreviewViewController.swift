@@ -47,9 +47,11 @@ class LinkPreviewViewController: NSViewController, NSPopoverDelegate {
     private let compact: Bool
 
     lazy var detachedWindowController: LinkPreviewWindowController = {
+        let viewController = LinkPreviewViewController.create(for: self.initialURL, compact: true)
         let detachedWindowController = LinkPreviewWindowController()
+        detachedWindowController.delegate = viewController
         detachedWindowController.window?.level = NSWindow.Level(rawValue: 1000) // Keep the window in the foreground at all times
-        detachedWindowController.contentViewController = LinkPreviewViewController.create(for: self.initialURL, compact: true)
+        detachedWindowController.contentViewController = viewController
 
         return detachedWindowController
     }()
@@ -122,13 +124,17 @@ class LinkPreviewViewController: NSViewController, NSPopoverDelegate {
             return
         }
 
+        let viewWindowController = self.view.window?.windowController as? LinkPreviewWindowController
+
         switch keyPath {
         case #keyPath(WKWebView.url), #keyPath(WKWebView.title):
             updateTitle()
+            viewWindowController?.updateInterface(title: webView.title ?? "", canGoBack: webView.canGoBack, canGoForward: webView.canGoForward)
 
         case #keyPath(WKWebView.canGoBack):
-            detachedWindowController.backItem.isEnabled = webView.canGoBack
-        case #keyPath(WKWebView.canGoForward): break
+            viewWindowController?.updateInterface(title: webView.title ?? "", canGoBack: webView.canGoBack, canGoForward: webView.canGoForward)
+        case #keyPath(WKWebView.canGoForward):
+            viewWindowController?.updateInterface(title: webView.title ?? "", canGoBack: webView.canGoBack, canGoForward: webView.canGoForward)
         default:
             super.observeValue(forKeyPath: keyPath, of: object, change: change, context: context)
         }
@@ -142,4 +148,20 @@ class LinkPreviewViewController: NSViewController, NSPopoverDelegate {
 
         titleLabel.stringValue = webView.title ?? ""
     }
+}
+
+extension LinkPreviewViewController: LinkPreviewWindowControllerDelegate {
+
+    func linkPreviewWindowControllerRequestedPageRefresh(_ sender: LinkPreviewWindowController) {
+        webView.reload()
+    }
+
+    func linkPreviewWindowControllerRequestedBack(_ sender: LinkPreviewWindowController) {
+        webView.goBack()
+    }
+
+    func linkPreviewWindowControllerRequestedForward(_ sender: LinkPreviewWindowController) {
+        webView.goForward()
+    }
+
 }

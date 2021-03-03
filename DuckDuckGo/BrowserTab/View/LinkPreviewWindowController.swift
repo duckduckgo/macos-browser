@@ -18,7 +18,17 @@
 
 import Foundation
 
+protocol LinkPreviewWindowControllerDelegate: class {
+
+    func linkPreviewWindowControllerRequestedPageRefresh(_ sender: LinkPreviewWindowController)
+    func linkPreviewWindowControllerRequestedBack(_ sender: LinkPreviewWindowController)
+    func linkPreviewWindowControllerRequestedForward(_ sender: LinkPreviewWindowController)
+
+}
+
 class LinkPreviewWindowController: NSWindowController, NSToolbarDelegate, NSToolbarItemValidation {
+
+    weak var delegate: LinkPreviewWindowControllerDelegate?
 
     private let backButtonIdentifier = NSToolbarItem.Identifier("Back")
     private let forwardButtonIdentifier = NSToolbarItem.Identifier("Forward")
@@ -67,22 +77,24 @@ class LinkPreviewWindowController: NSWindowController, NSToolbarDelegate, NSTool
 
     private lazy var titleItem: NSToolbarItem = {
         let item = NSToolbarItem(itemIdentifier: titleIdentifier)
-        item.title = "Web View Title Goes Here Web View Title Goes Here Web View Title Goes Here Web View Title Goes Here"
+        item.title = ""
         item.target = self
         return item
     }()
 
+    private var canGoBack: Bool = false
+    private var canGoForward: Bool = false
+
     init() {
         super.init(window: nil)
 
-        /* Load window from xib file */
         Bundle.main.loadNibNamed("LinkPreviewWindowController", owner: self, topLevelObjects: nil)
-
-        print("Loaded with window: \(self.window)")
 
         window?.titlebarAppearsTransparent = true
         window?.titleVisibility = .hidden
         window?.toolbar = self.toolbar
+
+        window?.standardWindowButton(.zoomButton)?.isEnabled = false
     }
 
     required init?(coder: NSCoder) {
@@ -90,21 +102,22 @@ class LinkPreviewWindowController: NSWindowController, NSToolbarDelegate, NSTool
     }
 
     @objc func back(_ sender: NSToolbarItem) {
-        print("Back")
+        delegate?.linkPreviewWindowControllerRequestedBack(self)
     }
 
     @objc func forward(_ sender: NSToolbarItem) {
-        print("Forward")
+        delegate?.linkPreviewWindowControllerRequestedForward(self)
     }
 
     @objc func refresh(_ sender: NSToolbarItem) {
-        print("Refresh")
+        delegate?.linkPreviewWindowControllerRequestedPageRefresh(self)
     }
 
     func updateInterface(title: String, canGoBack: Bool, canGoForward: Bool) {
-        self.titleItem.label = title
-        // self.backItem.isEnabled = canGoBack
-        // self.forwardItem.isEnabled = canGoForward
+        print("Updated with title \(title)")
+        self.titleItem.title = title
+        self.canGoBack = canGoBack
+        self.canGoForward = canGoForward
     }
 
     func toolbar(_ toolbar: NSToolbar,
@@ -163,9 +176,9 @@ class LinkPreviewWindowController: NSWindowController, NSToolbarDelegate, NSTool
 
     func validateToolbarItem(_ item: NSToolbarItem) -> Bool {
         if item == backItem {
-            return true
+            return canGoBack
         } else if item == forwardItem {
-            return false
+            return canGoForward
         } else {
             return true
         }
