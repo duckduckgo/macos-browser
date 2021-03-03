@@ -18,7 +18,7 @@
 
 import Foundation
 
-class LinkPreviewWindowController: NSWindowController, NSToolbarDelegate {
+class LinkPreviewWindowController: NSWindowController, NSToolbarDelegate, NSToolbarItemValidation {
 
     private let backButtonIdentifier = NSToolbarItem.Identifier("Back")
     private let forwardButtonIdentifier = NSToolbarItem.Identifier("Forward")
@@ -36,21 +36,23 @@ class LinkPreviewWindowController: NSWindowController, NSToolbarDelegate {
         return customToolbar
     }()
 
-    private lazy var backItem: NSToolbarItem = {
+    lazy var backItem: NSToolbarItem = {
         let item = NSToolbarItem(itemIdentifier: backButtonIdentifier)
         item.image = NSImage(named: "Back")
         item.target = self
         item.action = #selector(back(_:))
         item.maxSize = NSSize(width: 16, height: 16)
+        item.isEnabled = false
         return item
     }()
 
-    private lazy var forwardItem: NSToolbarItem = {
+    lazy var forwardItem: NSToolbarItem = {
         let item = NSToolbarItem(itemIdentifier: forwardButtonIdentifier)
         item.image = NSImage(named: "Forward")
         item.target = self
         item.action = #selector(forward(_:))
         item.maxSize = NSSize(width: 16, height: 16)
+        item.isEnabled = false
         return item
     }()
 
@@ -97,6 +99,12 @@ class LinkPreviewWindowController: NSWindowController, NSToolbarDelegate {
 
     @objc func refresh(_ sender: NSToolbarItem) {
         print("Refresh")
+    }
+
+    func updateInterface(title: String, canGoBack: Bool, canGoForward: Bool) {
+        self.titleItem.label = title
+        // self.backItem.isEnabled = canGoBack
+        // self.forwardItem.isEnabled = canGoForward
     }
 
     func toolbar(_ toolbar: NSToolbar,
@@ -153,12 +161,14 @@ class LinkPreviewWindowController: NSWindowController, NSToolbarDelegate {
         []
     }
 
-    func toolbarWillAddItem(_ notification: Notification) {
-
-    }
-
-    func toolbarDidRemoveItem(_ notification: Notification) {
-
+    func validateToolbarItem(_ item: NSToolbarItem) -> Bool {
+        if item == backItem {
+            return true
+        } else if item == forwardItem {
+            return false
+        } else {
+            return true
+        }
     }
 
 }

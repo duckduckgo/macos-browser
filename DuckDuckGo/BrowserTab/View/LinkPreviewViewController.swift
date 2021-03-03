@@ -60,7 +60,6 @@ class LinkPreviewViewController: NSViewController, NSPopoverDelegate {
         webView?.removeObserver(self, forKeyPath: #keyPath(WKWebView.url))
         webView?.removeObserver(self, forKeyPath: #keyPath(WKWebView.canGoBack))
         webView?.removeObserver(self, forKeyPath: #keyPath(WKWebView.canGoForward))
-        webView?.removeObserver(self, forKeyPath: #keyPath(WKWebView.isLoading))
         webView?.removeObserver(self, forKeyPath: #keyPath(WKWebView.title))
     }
 
@@ -77,6 +76,10 @@ class LinkPreviewViewController: NSViewController, NSPopoverDelegate {
     }
 
     @IBAction func pinToScreen(_ sender: NSButton) {
+        guard let popoverWindowFrame = self.view.window?.frame else { return }
+        detachedWindowController.window?.setFrame(popoverWindowFrame, display: false)
+        detachedWindowController.showWindow(self)
+
         dismiss(self)
     }
 
@@ -98,7 +101,6 @@ class LinkPreviewViewController: NSViewController, NSPopoverDelegate {
         webView.addObserver(self, forKeyPath: #keyPath(WKWebView.url), options: .new, context: nil)
         webView.addObserver(self, forKeyPath: #keyPath(WKWebView.canGoBack), options: .new, context: nil)
         webView.addObserver(self, forKeyPath: #keyPath(WKWebView.canGoForward), options: .new, context: nil)
-        webView.addObserver(self, forKeyPath: #keyPath(WKWebView.isLoading), options: .new, context: nil)
         webView.addObserver(self, forKeyPath: #keyPath(WKWebView.title), options: .new, context: nil)
     }
 
@@ -111,13 +113,12 @@ class LinkPreviewViewController: NSViewController, NSPopoverDelegate {
         }
 
         switch keyPath {
-        case #keyPath(WKWebView.url):
+        case #keyPath(WKWebView.url), #keyPath(WKWebView.title):
             updateTitle()
 
-        case #keyPath(WKWebView.canGoBack): break
+        case #keyPath(WKWebView.canGoBack):
+            detachedWindowController.backItem.isEnabled = webView.canGoBack
         case #keyPath(WKWebView.canGoForward): break
-        case #keyPath(WKWebView.isLoading): break
-        case #keyPath(WKWebView.title): updateTitle()
         default:
             super.observeValue(forKeyPath: keyPath, of: object, change: change, context: context)
         }
@@ -129,7 +130,6 @@ class LinkPreviewViewController: NSViewController, NSPopoverDelegate {
             return
         }
 
-        // self.view.window?.toolbar?
         titleLabel.stringValue = webView.title ?? ""
     }
 }
