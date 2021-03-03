@@ -91,6 +91,13 @@ class MainViewController: NSViewController {
         tabBarViewController?.hideTooltip()
     }
 
+    lazy var commandPalette: NSWindowController = {
+        // swiftlint:disable force_cast
+        NSStoryboard(name: "CommandPalette", bundle: .main)
+            .instantiateInitialController() as! NSWindowController
+        // swiftlint:enable force_cast
+    }()
+
     @IBSegueAction
     func createTabBarViewController(coder: NSCoder, sender: Any?, segueIdentifier: String?) -> TabBarViewController? {
         guard let tabBarViewController = TabBarViewController(coder: coder, tabCollectionViewModel: tabCollectionViewModel) else {
@@ -131,6 +138,24 @@ class MainViewController: NSViewController {
         findInPageViewController?.delegate = self
         self.findInPageViewController = findInPageViewController
         return findInPageViewController
+    }
+
+    @IBAction func findTabAction(_ sender: Any?) {
+
+        commandPalette.window!.isOpaque = false
+        commandPalette.window!.backgroundColor = .clear
+        
+        self.view.window!.addChildWindow(commandPalette.window!, ordered: .above)
+
+        let bounds = self.view.window!.frame
+        let size = commandPalette.window!.frame.size
+        let frame = CGRect(x: bounds.minX + (bounds.width - size.width) * 0.5,
+                           y: bounds.minY + (bounds.height - size.height) * 0.5,
+                           width: size.width,
+                           height: size.height)
+
+        commandPalette.window!.setFrame(frame, display: true)
+        commandPalette.window!.makeKey()
     }
 
     private func subscribeToSelectedTabViewModel() {

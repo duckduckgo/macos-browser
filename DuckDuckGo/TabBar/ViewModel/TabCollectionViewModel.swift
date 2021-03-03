@@ -80,6 +80,10 @@ final class TabCollectionViewModel: NSObject {
         return tabViewModels[tab]
     }
 
+    func tabViewModel(for tab: Tab) -> TabViewModel? {
+        return tabViewModels[tab]
+    }
+
     @discardableResult func select(at index: Int) -> Bool {
         guard index >= 0, index < tabCollection.tabs.count else {
             os_log("TabCollectionViewModel: Index out of bounds", type: .error)

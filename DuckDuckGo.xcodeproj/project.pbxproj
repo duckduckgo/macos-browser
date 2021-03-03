@@ -209,6 +209,10 @@
 		B61F012325ECBAE400ABB5A3 /* UserScriptsTest.swift in Sources */ = {isa = PBXBuildFile; fileRef = B61F012225ECBAE400ABB5A3 /* UserScriptsTest.swift */; };
 		B61F012B25ECBB1700ABB5A3 /* UserScriptsManagerTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = B61F012A25ECBB1700ABB5A3 /* UserScriptsManagerTests.swift */; };
 		B61F015525EDD5A700ABB5A3 /* UserContentController.swift in Sources */ = {isa = PBXBuildFile; fileRef = B61F015425EDD5A700ABB5A3 /* UserContentController.swift */; };
+		B61F01AB25EF620800ABB5A3 /* CommandPalette.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = B61F01AA25EF620800ABB5A3 /* CommandPalette.storyboard */; };
+		B61F01B825EF668F00ABB5A3 /* CommandPaletteViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = B61F01B725EF668F00ABB5A3 /* CommandPaletteViewController.swift */; };
+		B61F01BD25EF6C5E00ABB5A3 /* TabTableCellView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B61F01BC25EF6C5E00ABB5A3 /* TabTableCellView.swift */; };
+		B61F01C225EF6F0D00ABB5A3 /* CommandPaletteViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = B61F01C125EF6F0D00ABB5A3 /* CommandPaletteViewModel.swift */; };
 		B62EB47C25BAD3BB005745C6 /* WKWebViewSessionDataTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = B62EB47B25BAD3BB005745C6 /* WKWebViewSessionDataTests.swift */; };
 		B633C86D25E797D800E4B352 /* UserScriptsManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = B633C86C25E797D800E4B352 /* UserScriptsManager.swift */; };
 		B63D466925BEB6C200874977 /* WKWebView+SessionState.swift in Sources */ = {isa = PBXBuildFile; fileRef = B63D466825BEB6C200874977 /* WKWebView+SessionState.swift */; };
@@ -462,6 +466,10 @@
 		B61F012225ECBAE400ABB5A3 /* UserScriptsTest.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UserScriptsTest.swift; sourceTree = "<group>"; };
 		B61F012A25ECBB1700ABB5A3 /* UserScriptsManagerTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UserScriptsManagerTests.swift; sourceTree = "<group>"; };
 		B61F015425EDD5A700ABB5A3 /* UserContentController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UserContentController.swift; sourceTree = "<group>"; };
+		B61F01AA25EF620800ABB5A3 /* CommandPalette.storyboard */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; path = CommandPalette.storyboard; sourceTree = "<group>"; };
+		B61F01B725EF668F00ABB5A3 /* CommandPaletteViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CommandPaletteViewController.swift; sourceTree = "<group>"; };
+		B61F01BC25EF6C5E00ABB5A3 /* TabTableCellView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TabTableCellView.swift; sourceTree = "<group>"; };
+		B61F01C125EF6F0D00ABB5A3 /* CommandPaletteViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CommandPaletteViewModel.swift; sourceTree = "<group>"; };
 		B62EB47B25BAD3BB005745C6 /* WKWebViewSessionDataTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = WKWebViewSessionDataTests.swift; sourceTree = "<group>"; };
 		B633C86C25E797D800E4B352 /* UserScriptsManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UserScriptsManager.swift; sourceTree = "<group>"; };
 		B63D466725BEB6C200874977 /* WKWebView+SessionState.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "WKWebView+SessionState.h"; sourceTree = "<group>"; };
@@ -881,6 +889,7 @@
 				AAE8B0FD258A416F00E81239 /* Tooltip */,
 				AA6EF9AE25066F99004754E6 /* Windows */,
 				B68458AE25C7E75100DC17B6 /* State Restoration */,
+				B61F019E25EF5E9D00ABB5A3 /* Command Palette */,
 				AA585D8B248FD31400E9A3E2 /* DuckDuckGo.entitlements */,
 				4B677454255DC18000025BD8 /* Bridging.h */,
 				AA585D8A248FD31400E9A3E2 /* Info.plist */,
@@ -1460,6 +1469,17 @@
 			path = UserScripts;
 			sourceTree = "<group>";
 		};
+		B61F019E25EF5E9D00ABB5A3 /* Command Palette */ = {
+			isa = PBXGroup;
+			children = (
+				B61F01AA25EF620800ABB5A3 /* CommandPalette.storyboard */,
+				B61F01B725EF668F00ABB5A3 /* CommandPaletteViewController.swift */,
+				B61F01BC25EF6C5E00ABB5A3 /* TabTableCellView.swift */,
+				B61F01C125EF6F0D00ABB5A3 /* CommandPaletteViewModel.swift */,
+			);
+			path = "Command Palette";
+			sourceTree = "<group>";
+		};
 		B633C89425E85C5700E4B352 /* Recovered References */ = {
 			isa = PBXGroup;
 			children = (
@@ -1611,6 +1631,7 @@
 				AA68C3D72490F821001B8783 /* README.md in Resources */,
 				85A011E525B4D49400FA6A0C /* findinpage.js in Resources */,
 				AA585D86248FD31400E9A3E2 /* Assets.xcassets in Resources */,
+				B61F01AB25EF620800ABB5A3 /* CommandPalette.storyboard in Resources */,
 				AA585D89248FD31400E9A3E2 /* Main.storyboard in Resources */,
 				4B6160F225B15792007DE5B2 /* contentblockerrules.js in Resources */,
 				AA80EC79256C46AA007083E7 /* TabBar.storyboard in Resources */,
@@ -1770,6 +1791,7 @@
 				4B02198E25E05FAC00ED7DEA /* LoginDetectionService.swift in Sources */,
 				AA3F895324C18AD500628DDE /* SuggestionViewModel.swift in Sources */,
 				4B677431255DBEB800025BD8 /* BloomFilterWrapper.mm in Sources */,
+				B61F01B825EF668F00ABB5A3 /* CommandPaletteViewController.swift in Sources */,
 				B684592725C93C0500DC17B6 /* Publishers.NestedObjectChanges.swift in Sources */,
 				85A011EA25B4D4CA00FA6A0C /* FindInPageUserScript.swift in Sources */,
 				AA9FF95B24A1EFC20039E328 /* TabViewModel.swift in Sources */,
@@ -1784,6 +1806,7 @@
 				AA97BF4625135DD30014931A /* ApplicationDockMenu.swift in Sources */,
 				4BA1A69B258B076900F6F690 /* FileStore.swift in Sources */,
 				AAFCB37A25E5403A00859DD4 /* BurnButton.swift in Sources */,
+				B61F01BD25EF6C5E00ABB5A3 /* TabTableCellView.swift in Sources */,
 				4B677436255DBEB800025BD8 /* HTTPSExcludedDomains.swift in Sources */,
 				AAC5E4DA25D6A711007F5990 /* Bookmark.xcdatamodeld in Sources */,
 				AAC5E4D225D6A709007F5990 /* BookmarkList.swift in Sources */,
@@ -1800,6 +1823,7 @@
 				AABEE69C24A902BB0043105B /* Suggestions.swift in Sources */,
 				85AC3AEF25D5CE9800C7D2AA /* UserScripts.swift in Sources */,
 				4B677439255DBEB800025BD8 /* HTTPSUpgradeStore.swift in Sources */,
+				B61F01C225EF6F0D00ABB5A3 /* CommandPaletteViewModel.swift in Sources */,
 				4B02199325E060C600ED7DEA /* LoginDetectionUserScript.swift in Sources */,
 				AAB549DF25DAB8F80058460B /* BookmarkViewModel.swift in Sources */,
 				F41D174125CB131900472416 /* NSColorExtension.swift in Sources */,

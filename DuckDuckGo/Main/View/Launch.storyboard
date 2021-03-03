@@ -171,7 +171,11 @@
                                                         </connections>
                                                     </menuItem>
                                                     <menuItem isSeparatorItem="YES" id="L2T-zv-9Po"/>
-                                                    <menuItem title="Hide Find" keyEquivalent="F" id="NVw-yL-2Hn">
+                                                    <menuItem title="Hide Find" id="NVw-yL-2Hn">
+                                                        <string key="keyEquivalent" base64-UTF8="YES">
+Gw
+</string>
+                                                        <modifierMask key="keyEquivalentModifierMask"/>
                                                         <connections>
                                                             <action selector="findInPageDone:" target="Ady-hI-5gd" id="kZJ-vx-uyS"/>
                                                         </connections>
@@ -499,6 +503,12 @@ CQ
                                             </connections>
                                         </menuItem>
                                         <menuItem isSeparatorItem="YES" id="pC4-EZ-Df8"/>
+                                        <menuItem title="Find Tab" keyEquivalent="F" id="gDh-ne-Tz3" userLabel="New Tab">
+                                            <connections>
+                                                <action selector="findTabAction:" target="Ady-hI-5gd" id="hZm-80-4nv"/>
+                                            </connections>
+                                        </menuItem>
+                                        <menuItem isSeparatorItem="YES" id="eIo-fC-enI"/>
                                         <menuItem title="Bring All to Front" id="LE2-aR-0XJ">
                                             <modifierMask key="keyEquivalentModifierMask"/>
                                             <connections>
