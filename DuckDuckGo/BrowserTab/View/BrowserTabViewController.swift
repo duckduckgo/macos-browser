@@ -24,14 +24,25 @@ import Combine
 class BrowserTabViewController: NSViewController {
 
     @IBOutlet weak var errorView: NSView!
-    weak var webView: WebView?
-    var tabViewModel: TabViewModel?
+    weak var webView: WebView? {
+        didSet {
+            print("SET NEW WEBVIEW \(webView)")
+        }
+    }
+
+    var tabViewModel: TabViewModel? {
+        didSet {
+            print("SET NEW TAB VIEW MODEL \(tabViewModel)")
+        }
+    }
 
     private let tabCollectionViewModel: TabCollectionViewModel
+    private var urlCancellable: AnyCancellable?
     private var selectedTabViewModelCancellable: AnyCancellable?
     private var isErrorViewVisibleCancellable: AnyCancellable?
     private var contextMenuLink: URL?
     private var contextMenuImage: URL?
+    private var defaultBrowserPromptView: DefaultBrowserPromptView?
 
     required init?(coder: NSCoder) {
         fatalError("BrowserTabViewController: Bad initializer")
@@ -51,8 +62,8 @@ class BrowserTabViewController: NSViewController {
     }
 
     private func subscribeToSelectedTabViewModel() {
-        selectedTabViewModelCancellable = tabCollectionViewModel.$selectedTabViewModel.receive(on: DispatchQueue.main).sink { [weak self] model in
-            self?.updateInterface(url: model?.tab.url)
+        selectedTabViewModelCancellable = tabCollectionViewModel.$selectedTabViewModel.receive(on: DispatchQueue.main).sink { [weak self] viewModel in
+            self?.updateInterface(url: viewModel?.tab.url)
             self?.subscribeToIsErrorViewVisible()
         }
     }
@@ -63,29 +74,43 @@ class BrowserTabViewController: NSViewController {
     /// 2. A URL is provided for the first time, so the webview should be added as a subview and the URL should be loaded.
     /// 3. A URL is provided after already adding the webview, so the webview should be reloaded.
     private func updateInterface(url: URL?) {
-        guard url != nil else {
-            changeWebView()
-            webView?.removeFromSuperview()
-
-            if !Browser.isDefault {
-                addDefaultBrowserPrompt()
-            }
-
-            return
-        }
-
         changeWebView()
-        reloadWebViewIfNeeded()
+
+        if url != nil {
+            showWebView()
+        } else {
+            showDefaultTabInterface()
+        }
+    }
+
+    private func showWebView() {
+        self.webView?.isHidden = false
+
+        defaultBrowserPromptView?.removeFromSuperview()
+        defaultBrowserPromptView = nil
+    }
+
+    private func showDefaultTabInterface() {
+        self.webView?.isHidden = true
+
+        if !Browser.isDefault {
+            addDefaultBrowserPrompt()
+        }
     }
 
     private func addDefaultBrowserPrompt() {
-        let defaultBrowserPromptView = DefaultBrowserPromptView.createFromNib()
-        defaultBrowserPromptView.translatesAutoresizingMaskIntoConstraints = false
-        self.view.addSubview(defaultBrowserPromptView)
+        guard self.defaultBrowserPromptView == nil else { return }
 
-        defaultBrowserPromptView.topAnchor.constraint(equalTo: self.view.topAnchor).isActive = true
-        defaultBrowserPromptView.leadingAnchor.constraint(equalTo: self.view.leadingAnchor).isActive = true
-        defaultBrowserPromptView.trailingAnchor.constraint(equalTo: self.view.trailingAnchor).isActive = true
+        let view = DefaultBrowserPromptView.createFromNib()
+        view.delegate = self
+        view.translatesAutoresizingMaskIntoConstraints = false
+        self.view.addSubview(view)
+
+        view.topAnchor.constraint(equalTo: self.view.topAnchor).isActive = true
+        view.leadingAnchor.constraint(equalTo: self.view.leadingAnchor).isActive = true
+        view.trailingAnchor.constraint(equalTo: self.view.trailingAnchor).isActive = true
+
+        self.defaultBrowserPromptView = view
     }
 
     private func changeWebView() {
@@ -121,12 +146,22 @@ class BrowserTabViewController: NSViewController {
             removeOldWebView(webView)
             return
         }
+
+        print("Trying to change webview to use \(tabViewModel)")
         guard self.tabViewModel !== tabViewModel else { return }
 
         let oldWebView = webView
         displayWebView(of: tabViewModel)
+        subscribeToUrl(of: tabViewModel)
         self.tabViewModel = tabViewModel
         removeOldWebView(oldWebView)
+    }
+
+    func subscribeToUrl(of tabViewModel: TabViewModel) {
+         urlCancellable?.cancel()
+         urlCancellable = tabViewModel.tab.$url.receive(on: DispatchQueue.main).sink { [weak self] url in
+            self?.updateInterface(url: url)
+         }
     }
 
     private func subscribeToIsErrorViewVisible() {
@@ -482,6 +517,19 @@ fileprivate extension NSAlert {
         alert.alertStyle = .warning
         alert.addButton(withTitle: UserText.ok)
         return alert
+    }
+
+}
+
+extension BrowserTabViewController: DefaultBrowserPromptViewDelegate {
+
+    func defaultBrowserPromptViewDismissed(_ view: DefaultBrowserPromptView) {
+        defaultBrowserPromptView?.removeFromSuperview()
+        defaultBrowserPromptView = nil
+    }
+
+    func defaultBrowserPromptViewRequestedDefaultBrowserPrompt(_ view: DefaultBrowserPromptView) {
+        Browser.becomeDefault()
     }
 
 }

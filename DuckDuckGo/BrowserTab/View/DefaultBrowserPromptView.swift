@@ -18,6 +18,11 @@
 
 import AppKit
 
+protocol DefaultBrowserPromptViewDelegate: class {
+    func defaultBrowserPromptViewDismissed(_ view: DefaultBrowserPromptView)
+    func defaultBrowserPromptViewRequestedDefaultBrowserPrompt(_ view: DefaultBrowserPromptView)
+}
+
 class DefaultBrowserPromptView: NSView, NibLoadable {
 
     @IBOutlet var logoImageView: NSImageView! {
@@ -31,12 +36,14 @@ class DefaultBrowserPromptView: NSView, NibLoadable {
         }
     }
 
+    weak var delegate: DefaultBrowserPromptViewDelegate?
+
     @IBAction func setDefaultButtonClicked(_ sender: Any) {
-        Browser.becomeDefault()
+        delegate?.defaultBrowserPromptViewRequestedDefaultBrowserPrompt(self)
     }
 
     @IBAction func dismissPromptButtonClicked(_ sender: Any) {
-        self.removeFromSuperview()
+        delegate?.defaultBrowserPromptViewDismissed(self)
     }
 
 }
