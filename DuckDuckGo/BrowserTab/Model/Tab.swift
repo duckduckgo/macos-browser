@@ -224,8 +224,10 @@ final class Tab: NSObject {
     var openExternalUrlEventsCancellable: AnyCancellable?
 
     private func subscribeToOpenExternalUrlEvents() {
-        openExternalUrlEventsCancellable = externalUrlHandler.openExternalUrlPublisher.sink {
-            self.delegate?.tab(self, requestedOpenExternalURL: $0, forUserEnteredURL: self.userEnteredUrl)
+        openExternalUrlEventsCancellable = externalUrlHandler.openExternalUrlPublisher.sink { [weak self] in
+            if let self = self {
+                self.delegate?.tab(self, requestedOpenExternalURL: $0, forUserEnteredURL: self.userEnteredUrl)
+            }
         }
     }
 
