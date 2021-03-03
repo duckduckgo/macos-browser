@@ -32,6 +32,7 @@ class BrowserTabViewController: NSViewController {
     private var isErrorViewVisibleCancellable: AnyCancellable?
     private var contextMenuLink: URL?
     private var contextMenuImage: URL?
+    private var contextMenuOrigin: NSPoint?
 
     required init?(coder: NSCoder) {
         fatalError("BrowserTabViewController: Bad initializer")
@@ -194,6 +195,7 @@ extension BrowserTabViewController: TabDelegate {
     func tab(_ tab: Tab, willShowContextMenuAt position: NSPoint, image: URL?, link: URL?) {
         contextMenuImage = image
         contextMenuLink = link
+        contextMenuOrigin = position
     }
 
     func tab(_ tab: Tab, detectedLogin host: String) {
@@ -264,6 +266,21 @@ extension BrowserTabViewController: ImageMenuItemSelectors {
         guard let url = contextMenuImage else { return }
         NSPasteboard.general.clearContents()
         NSPasteboard.general.setString(url.absoluteString, forType: .URL)
+    }
+
+    func previewLink(_ sender: NSMenuItem) {
+        guard let view = NSApp.mainWindow?.contentView else { return }
+
+        guard let position = contextMenuOrigin, let link = contextMenuLink else { return }
+
+        let converted = NSPoint(x: position.x, y: self.view.bounds.height - position.y)
+        let controller = LinkPreviewViewController.create(for: link)
+
+        self.present(controller,
+                     asPopoverRelativeTo: CGRect(x: converted.x, y: converted.y, width: 1, height: 1),
+                     of: view, // Hack Days!
+                     preferredEdge: .minY,
+                     behavior: .semitransient)
     }
 
 }

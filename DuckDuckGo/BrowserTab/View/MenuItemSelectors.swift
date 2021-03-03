@@ -33,5 +33,6 @@ import Cocoa
     func openImageInNewWindow(_ sender: NSMenuItem)
     func saveImageToDownloads(_ sender: NSMenuItem)
     func copyImageAddress(_ sender: NSMenuItem)
+    func previewLink(_ sender: NSMenuItem)
 
 }

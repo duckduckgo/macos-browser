@@ -1,8 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<document type="com.apple.InterfaceBuilder3.Cocoa.Storyboard.XIB" version="3.0" toolsVersion="17506" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none" useAutolayout="YES" initialViewController="D9y-55-iLO">
+<document type="com.apple.InterfaceBuilder3.Cocoa.Storyboard.XIB" version="3.0" toolsVersion="17701" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none" useAutolayout="YES" initialViewController="D9y-55-iLO">
     <dependencies>
         <deployment identifier="macosx"/>
-        <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="17506"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="17701"/>
+        <plugIn identifier="com.apple.WebKit2IBPlugin" version="17701"/>
         <capability name="Named colors" minToolsVersion="9.0"/>
         <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
     </dependencies>
@@ -68,10 +69,85 @@
             </objects>
             <point key="canvasLocation" x="123" y="2235"/>
         </scene>
+        <!--Link Preview View Controller-->
+        <scene sceneID="CJ2-2H-mPy">
+            <objects>
+                <viewController storyboardIdentifier="LinkPreviewViewController" id="r9i-PN-Mjb" customClass="LinkPreviewViewController" customModule="DuckDuckGo_Privacy_Browser" customModuleProvider="target" sceneMemberID="viewController">
+                    <view key="view" id="bmw-KY-QiL">
+                        <rect key="frame" x="0.0" y="0.0" width="450" height="498"/>
+                        <autoresizingMask key="autoresizingMask"/>
+                        <subviews>
+                            <button verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="G6s-wj-MI8">
+                                <rect key="frame" x="299" y="13" width="138" height="32"/>
+                                <buttonCell key="cell" type="push" title="Open In New Tab" bezelStyle="rounded" alignment="center" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="y6J-FS-k24">
+                                    <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
+                                    <font key="font" metaFont="system"/>
+                                    <string key="keyEquivalent" base64-UTF8="YES">
+DQ
+</string>
+                                </buttonCell>
+                                <connections>
+                                    <action selector="openInNewTab:" target="r9i-PN-Mjb" id="xkG-2J-VmW"/>
+                                </connections>
+                            </button>
+                            <button verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="sxK-NV-U1B">
+                                <rect key="frame" x="186" y="13" width="115" height="32"/>
+                                <buttonCell key="cell" type="push" title="Pin to Screen" bezelStyle="rounded" alignment="center" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="VPP-5A-aQq">
+                                    <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
+                                    <font key="font" metaFont="system"/>
+                                </buttonCell>
+                                <connections>
+                                    <action selector="pinToScreen:" target="r9i-PN-Mjb" id="4EZ-7n-vM0"/>
+                                </connections>
+                            </button>
+                            <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="8Yv-Ue-Vdl">
+                                <rect key="frame" x="18" y="471" width="414" height="16"/>
+                                <textFieldCell key="cell" lineBreakMode="clipping" alignment="center" title="Page Title" id="Qvg-68-1pn">
+                                    <font key="font" metaFont="system"/>
+                                    <color key="textColor" name="labelColor" catalog="System" colorSpace="catalog"/>
+                                    <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
+                                </textFieldCell>
+                            </textField>
+                            <wkWebView wantsLayer="YES" translatesAutoresizingMaskIntoConstraints="NO" id="U82-fb-R5O" customClass="WebView" customModule="DuckDuckGo_Privacy_Browser" customModuleProvider="target">
+                                <rect key="frame" x="0.0" y="60" width="450" height="400"/>
+                                <wkWebViewConfiguration key="configuration">
+                                    <audiovisualMediaTypes key="mediaTypesRequiringUserActionForPlayback" none="YES"/>
+                                    <wkPreferences key="preferences"/>
+                                </wkWebViewConfiguration>
+                            </wkWebView>
+                        </subviews>
+                        <constraints>
+                            <constraint firstItem="sxK-NV-U1B" firstAttribute="leading" relation="greaterThanOrEqual" secondItem="bmw-KY-QiL" secondAttribute="leading" constant="20" symbolic="YES" id="7mY-AN-qET"/>
+                            <constraint firstItem="U82-fb-R5O" firstAttribute="leading" secondItem="bmw-KY-QiL" secondAttribute="leading" id="KmV-tc-CKh"/>
+                            <constraint firstItem="8Yv-Ue-Vdl" firstAttribute="leading" secondItem="bmw-KY-QiL" secondAttribute="leading" constant="20" symbolic="YES" id="KqJ-xY-C3H"/>
+                            <constraint firstItem="sxK-NV-U1B" firstAttribute="centerY" secondItem="G6s-wj-MI8" secondAttribute="centerY" id="TmT-Lb-uVc"/>
+                            <constraint firstAttribute="bottom" secondItem="G6s-wj-MI8" secondAttribute="bottom" constant="20" symbolic="YES" id="UFb-ZN-PNe"/>
+                            <constraint firstItem="U82-fb-R5O" firstAttribute="top" secondItem="bmw-KY-QiL" secondAttribute="top" priority="250" id="XKS-36-QPQ" userLabel="Web View Top Constraint"/>
+                            <constraint firstItem="8Yv-Ue-Vdl" firstAttribute="top" secondItem="bmw-KY-QiL" secondAttribute="top" priority="750" constant="11" id="bSp-Oa-gP3"/>
+                            <constraint firstAttribute="bottom" secondItem="U82-fb-R5O" secondAttribute="bottom" priority="250" id="c4s-pz-UN4" userLabel="Web View Bottom Constraint"/>
+                            <constraint firstItem="U82-fb-R5O" firstAttribute="top" secondItem="8Yv-Ue-Vdl" secondAttribute="bottom" priority="750" constant="11" id="cNi-TF-lxf"/>
+                            <constraint firstItem="G6s-wj-MI8" firstAttribute="top" secondItem="U82-fb-R5O" secondAttribute="bottom" priority="750" constant="20" symbolic="YES" id="cnb-Yj-kSA"/>
+                            <constraint firstItem="G6s-wj-MI8" firstAttribute="leading" secondItem="sxK-NV-U1B" secondAttribute="trailing" constant="12" symbolic="YES" id="qSp-cN-vIw"/>
+                            <constraint firstAttribute="trailing" secondItem="G6s-wj-MI8" secondAttribute="trailing" constant="20" symbolic="YES" id="sEQ-NO-n8v"/>
+                            <constraint firstAttribute="trailing" secondItem="8Yv-Ue-Vdl" secondAttribute="trailing" constant="20" symbolic="YES" id="wYl-TG-vUN"/>
+                            <constraint firstAttribute="trailing" secondItem="U82-fb-R5O" secondAttribute="trailing" id="yKV-z2-9eo"/>
+                        </constraints>
+                    </view>
+                    <connections>
+                        <outlet property="bottomConstraint" destination="c4s-pz-UN4" id="XEq-e5-bUs"/>
+                        <outlet property="titleLabel" destination="8Yv-Ue-Vdl" id="orD-L3-FqR"/>
+                        <outlet property="topConstraint" destination="XKS-36-QPQ" id="caq-4d-H7E"/>
+                        <outlet property="webView" destination="U82-fb-R5O" id="cck-fQ-8FI"/>
+                    </connections>
+                </viewController>
+                <customObject id="SMn-kf-CIV" userLabel="First Responder" customClass="NSResponder" sceneMemberID="firstResponder"/>
+            </objects>
+            <point key="canvasLocation" x="92" y="2813"/>
+        </scene>
     </scenes>
     <resources>
         <namedColor name="BroswerTabBackgroundColor">
-            <color red="1" green="1" blue="1" alpha="0.0" colorSpace="custom" customColorSpace="sRGB"/>
+            <color red="1" green="1" blue="1" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
         </namedColor>
     </resources>
 </document>

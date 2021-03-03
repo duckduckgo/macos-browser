@@ -47,6 +47,9 @@
 		4B677442255DBEEA00025BD8 /* Database.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B677440255DBEEA00025BD8 /* Database.swift */; };
 		4B67744B255DBF3A00025BD8 /* BloomFilter.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4B677449255DBF3A00025BD8 /* BloomFilter.cpp */; };
 		4B677450255DBFA300025BD8 /* HashExtension.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B67744F255DBFA300025BD8 /* HashExtension.swift */; };
+		4B71362E25EFF30B00ACD43F /* LinkPreviewViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B71362D25EFF30B00ACD43F /* LinkPreviewViewController.swift */; };
+		4B71363425F0037F00ACD43F /* LinkPreviewWindowController.xib in Resources */ = {isa = PBXBuildFile; fileRef = 4B71363325F0037F00ACD43F /* LinkPreviewWindowController.xib */; };
+		4B71363925F003A300ACD43F /* LinkPreviewWindowController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B71363825F003A300ACD43F /* LinkPreviewWindowController.swift */; };
 		4B82E9B325B69E3E00656FE7 /* TrackerRadarKit in Frameworks */ = {isa = PBXBuildFile; productRef = 4B82E9B225B69E3E00656FE7 /* TrackerRadarKit */; };
 		4B82E9B925B6A05800656FE7 /* DetectedTrackerTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B82E9B825B6A05800656FE7 /* DetectedTrackerTests.swift */; };
 		4B82E9C125B6A1CD00656FE7 /* TrackerRadarManagerTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B82E9C025B6A1CD00656FE7 /* TrackerRadarManagerTests.swift */; };
@@ -296,6 +299,9 @@
 		4B67744A255DBF3A00025BD8 /* BloomFilter.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = BloomFilter.hpp; path = Submodules/bloom_cpp/src/BloomFilter.hpp; sourceTree = SOURCE_ROOT; };
 		4B67744F255DBFA300025BD8 /* HashExtension.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = HashExtension.swift; sourceTree = "<group>"; };
 		4B677454255DC18000025BD8 /* Bridging.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Bridging.h; sourceTree = "<group>"; };
+		4B71362D25EFF30B00ACD43F /* LinkPreviewViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LinkPreviewViewController.swift; sourceTree = "<group>"; };
+		4B71363325F0037F00ACD43F /* LinkPreviewWindowController.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = LinkPreviewWindowController.xib; sourceTree = "<group>"; };
+		4B71363825F003A300ACD43F /* LinkPreviewWindowController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LinkPreviewWindowController.swift; sourceTree = "<group>"; };
 		4B82E9B825B6A05800656FE7 /* DetectedTrackerTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DetectedTrackerTests.swift; sourceTree = "<group>"; };
 		4B82E9C025B6A1CD00656FE7 /* TrackerRadarManagerTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TrackerRadarManagerTests.swift; sourceTree = "<group>"; };
 		4BA1A69A258B076900F6F690 /* FileStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FileStore.swift; sourceTree = "<group>"; };
@@ -1146,6 +1152,9 @@
 				AA585D83248FD31100E9A3E2 /* BrowserTabViewController.swift */,
 				856C98A5256EB59600A22F1F /* MenuItemSelectors.swift */,
 				AA6FFB4524DC3B5A0028F4D0 /* WebView.swift */,
+				4B71362D25EFF30B00ACD43F /* LinkPreviewViewController.swift */,
+				4B71363825F003A300ACD43F /* LinkPreviewWindowController.swift */,
+				4B71363325F0037F00ACD43F /* LinkPreviewWindowController.xib */,
 			);
 			path = View;
 			sourceTree = "<group>";
@@ -1604,6 +1613,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				4B02198C25E05FAC00ED7DEA /* Fireproofing.storyboard in Resources */,
+				4B71363425F0037F00ACD43F /* LinkPreviewWindowController.xib in Resources */,
 				AA80EC73256C46A2007083E7 /* Suggestions.storyboard in Resources */,
 				85A0117425AF2EDF00FA6A0C /* FindInPage.storyboard in Resources */,
 				AA80EC89256C49B8007083E7 /* Localizable.strings in Resources */,
@@ -1697,6 +1707,7 @@
 				4BB88B4A25B7B690006F6B06 /* SequenceExtensions.swift in Sources */,
 				AAA0CC3C25337FAB0079BC96 /* WKBackForwardListItemViewModel.swift in Sources */,
 				4BB88B4525B7B55C006F6B06 /* DebugUserScript.swift in Sources */,
+				4B71362E25EFF30B00ACD43F /* LinkPreviewViewController.swift in Sources */,
 				8556A602256BDDD30092FA9D /* HTML5DownloadUserScript.swift in Sources */,
 				AA4D700725545EF800C3411E /* UrlEventListener.swift in Sources */,
 				AA92127725ADA07900600CD4 /* WKWebViewExtension.swift in Sources */,
@@ -1713,6 +1724,7 @@
 				4BA1A6A0258B079600F6F690 /* DataEncryption.swift in Sources */,
 				AABEE6AF24AD22B90043105B /* AddressBarTextField.swift in Sources */,
 				AA68C3D32490ED62001B8783 /* NavigationBarViewController.swift in Sources */,
+				4B71363925F003A300ACD43F /* LinkPreviewWindowController.swift in Sources */,
 				AA585DAF2490E6E600E9A3E2 /* MainViewController.swift in Sources */,
 				AABEE69A24A902A90043105B /* SuggestionsViewModel.swift in Sources */,
 				AA6820E425502F19005ED0D5 /* WebsiteDataStore.swift in Sources */,
