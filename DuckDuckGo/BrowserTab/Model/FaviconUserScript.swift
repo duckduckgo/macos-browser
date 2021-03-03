@@ -26,11 +26,13 @@ protocol FaviconUserScriptDelegate: AnyObject {
 
 }
 
-class FaviconUserScript: NSObject, UserScript {
+class FaviconUserScript: NSObject, StaticUserScript {
 
-    var injectionTime: WKUserScriptInjectionTime = .atDocumentEnd
-    var forMainFrameOnly = true
-    
+    static var injectionTime: WKUserScriptInjectionTime { .atDocumentEnd }
+    static var forMainFrameOnly: Bool { true }
+    static var script: WKUserScript = FaviconUserScript.makeWKUserScript()
+    var messageNames: [String] { ["faviconFound"] }
+
     weak var delegate: FaviconUserScriptDelegate?
 
     func userContentController(_ userContentController: WKUserContentController, didReceive message: WKScriptMessage) {
@@ -38,9 +40,8 @@ class FaviconUserScript: NSObject, UserScript {
             delegate?.faviconUserScript(self, didFindFavicon: url)
         }
     }
-    
-    let messageNames = ["faviconFound"]
-    let source = """
+
+    static let source = """
 (function() {
     function getFavicon() {
         return findFavicons()[0];
@@ -76,5 +77,5 @@ class FaviconUserScript: NSObject, UserScript {
     }
 }) ();
 """
-    
+
 }

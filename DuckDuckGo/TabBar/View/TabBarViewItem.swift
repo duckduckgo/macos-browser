@@ -122,6 +122,7 @@ class TabBarViewItem: NSCollectionViewItem {
     @IBOutlet weak var rightSeparatorView: ColorView!
     @IBOutlet weak var loadingView: TabLoadingView!
     @IBOutlet weak var mouseOverView: MouseOverView!
+    @IBOutlet weak var mouseClickView: MouseClickView!
     @IBOutlet weak var tabLoadingViewCenterConstraint: NSLayoutConstraint!
     @IBOutlet weak var tabLoadingViewLeadingConstraint: NSLayoutConstraint!
 
@@ -235,6 +236,7 @@ class TabBarViewItem: NSCollectionViewItem {
 
     private func setupView() {
         mouseOverView.delegate = self
+        mouseClickView.delegate = self
 
         view.wantsLayer = true
         view.layer?.cornerRadius = 7
@@ -282,6 +284,16 @@ extension TabBarViewItem: MouseOverViewDelegate {
 
     func mouseOverView(_ mouseOverView: MouseOverView, isMouseOver: Bool) {
         delegate?.tabBarViewItem(self, isMouseOver: isMouseOver)
+    }
+
+}
+
+extension TabBarViewItem: MouseClickViewDelegate {
+
+    func mouseClickView(_ mouseClickView: MouseClickView, otherMouseDownEvent: NSEvent) {
+        if otherMouseDownEvent.buttonNumber == 2 {
+            delegate?.tabBarViewItemCloseAction(self)
+        }
     }
 
 }

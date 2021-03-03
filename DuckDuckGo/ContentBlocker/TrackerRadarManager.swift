@@ -18,6 +18,7 @@
 
 import Foundation
 import TrackerRadarKit
+import Combine
 
 class TrackerRadarManager {
 
@@ -36,32 +37,28 @@ class TrackerRadarManager {
 
     static let shared = TrackerRadarManager()
 
-    private(set) var trackerData: TrackerData! {
-        didSet {
-            let encodedData = try? JSONEncoder().encode(trackerData)
-            encodedTrackerData = String(data: encodedData!, encoding: .utf8)!
-        }
-    }
+    private(set) var trackerData: TrackerData
+    private(set) var encodedTrackerData: String
 
-    private(set) var encodedTrackerData: String!
     private var configDataStore: ConfigurationStoring
 
     init(configDataStore: ConfigurationStoring = DefaultConfigurationStorage.shared) {
         self.configDataStore = configDataStore
-        reload()
+        (self.trackerData, self.encodedTrackerData, _) = Self.loadData()
     }
 
-    @discardableResult
-    public func reload() -> DataSet {
+    private typealias LoadDataResult = (TrackerData, String, DataSet)
+    private class func loadData() -> LoadDataResult {
 
-        let dataSet: DataSet
-        let data: Data
+        var dataSet: DataSet
+        let trackerData: TrackerData
+        var data: Data
 
         if let loadedData = DefaultConfigurationStorage.shared.loadData(for: .trackerRadar) {
             data = loadedData
             dataSet = .downloaded
         } else {
-            data = Self.loadEmbeddedAsData()
+            data = loadEmbeddedAsData()
             dataSet = .embedded
         }
 
@@ -70,11 +67,18 @@ class TrackerRadarManager {
             trackerData = try JSONDecoder().decode(TrackerData.self, from: data)
         } catch {
             // This should NEVER fail
-            let trackerData = try? JSONDecoder().decode(TrackerData.self, from: Self.loadEmbeddedAsData())
-            self.trackerData = trackerData!
-            return .embeddedFallback
+            data = loadEmbeddedAsData()
+            trackerData = (try? JSONDecoder().decode(TrackerData.self, from: data))!
+            dataSet = .embeddedFallback
         }
 
+        return (trackerData, data.utf8String()!, dataSet)
+    }
+
+    @discardableResult
+    public func reload() -> DataSet {
+        let dataSet: DataSet
+        (self.trackerData, self.encodedTrackerData, dataSet) = Self.loadData()
         return dataSet
     }
 

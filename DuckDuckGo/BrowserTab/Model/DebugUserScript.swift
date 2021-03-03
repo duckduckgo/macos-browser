@@ -20,7 +20,14 @@ import WebKit
 import os
 import BrowserServicesKit
 
-class DebugUserScript: NSObject, UserScript {
+protocol TabInstrumentationProtocol: class {
+    func request(url: String, allowedIn timeInMs: Double)
+    func tracker(url: String, allowedIn timeInMs: Double, reason: String?)
+    func tracker(url: String, blockedIn timeInMs: Double)
+    func jsEvent(name: String, executedIn timeInMs: Double)
+}
+
+class DebugUserScript: NSObject, StaticUserScript {
 
     enum MessageNames: String, CaseIterable {
 
@@ -28,19 +35,20 @@ class DebugUserScript: NSObject, UserScript {
         case log
 
     }
-    
-    var injectionTime: WKUserScriptInjectionTime = .atDocumentStart
-    var forMainFrameOnly = false
-    let messageNames = MessageNames.allCases.map(\.rawValue)
-    let source: String = {
+
+    static var injectionTime: WKUserScriptInjectionTime { .atDocumentStart }
+    static var forMainFrameOnly: Bool { false }
+    var messageNames: [String] { MessageNames.allCases.map(\.rawValue) }
+    static let source: String = {
         #if DEBUG
             return DebugUserScript.debugMessagingEnabledSource
         #else
             return DebugUserScript.debugMessagingDisabledSource
         #endif
     }()
+    static var script: WKUserScript = DebugUserScript.makeWKUserScript()
 
-    weak var instrumentation: TabInstrumentation?
+    weak var instrumentation: TabInstrumentationProtocol?
 
     func userContentController(_ userContentController: WKUserContentController, didReceive message: WKScriptMessage) {
         let messageType = MessageNames(rawValue: message.name)

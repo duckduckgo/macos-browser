@@ -117,13 +117,7 @@ class NavigationBarViewController: NSViewController {
         sharing.show(relativeTo: .zero, of: sender, preferredEdge: .minY)
     }
 
-#if FEEDBACK
-
-    @IBAction func feedbackButtonAction(_ sender: NSButton) {
-        AppDelegate.shared.openFeedback(sender)
-    }
-
-#else
+#if !FEEDBACK
 
     private func removeFeedback() {
         feedbackButton.removeFromSuperview()
