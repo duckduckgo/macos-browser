@@ -33,6 +33,8 @@ public struct UserDefaultsWrapper<T> {
 
         case fireproofDomains = "com.duckduckgo.fireproofing.allowedDomains"
 
+        case defaultBrowserDismissed = "browser.default.dismissed"
+
     }
 
     private let key: Key

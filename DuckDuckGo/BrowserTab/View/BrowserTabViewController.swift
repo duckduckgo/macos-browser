@@ -35,6 +35,9 @@ class BrowserTabViewController: NSViewController {
     private var contextMenuImage: URL?
     private var defaultBrowserPromptView: DefaultBrowserPromptView?
 
+    @UserDefaultsWrapper(key: .defaultBrowserDismissed, defaultValue: false)
+    var defaultBrowserPromptDismissed: Bool
+
     required init?(coder: NSCoder) {
         fatalError("BrowserTabViewController: Bad initializer")
     }
@@ -47,6 +50,11 @@ class BrowserTabViewController: NSViewController {
 
     override func viewDidLoad() {
         super.viewDidLoad()
+
+        NotificationCenter.default.addObserver(self,
+                                               selector: #selector(displayDefaultBrowserPromptIfNeeded),
+                                               name: NSApplication.didBecomeActiveNotification,
+                                               object: nil)
 
         subscribeToSelectedTabViewModel()
         subscribeToIsErrorViewVisible()
@@ -83,25 +91,28 @@ class BrowserTabViewController: NSViewController {
 
     private func showDefaultTabInterface() {
         self.webView?.isHidden = true
-
-        if !Browser.isDefault {
-            addDefaultBrowserPrompt()
-        }
+        displayDefaultBrowserPromptIfNeeded()
     }
 
-    private func addDefaultBrowserPrompt() {
-        guard self.defaultBrowserPromptView == nil else { return }
+    @objc
+    private func displayDefaultBrowserPromptIfNeeded() {
+        if Browser.isDefault || defaultBrowserPromptDismissed {
+            defaultBrowserPromptView?.removeFromSuperview()
+            defaultBrowserPromptView = nil
+        } else {
+            guard self.defaultBrowserPromptView == nil else { return }
 
-        let view = DefaultBrowserPromptView.createFromNib()
-        view.delegate = self
-        view.translatesAutoresizingMaskIntoConstraints = false
-        self.view.addSubview(view)
+            let view = DefaultBrowserPromptView.createFromNib()
+            view.delegate = self
+            view.translatesAutoresizingMaskIntoConstraints = false
+            self.view.addSubview(view)
 
-        view.topAnchor.constraint(equalTo: self.view.topAnchor).isActive = true
-        view.leadingAnchor.constraint(equalTo: self.view.leadingAnchor).isActive = true
-        view.trailingAnchor.constraint(equalTo: self.view.trailingAnchor).isActive = true
+            view.topAnchor.constraint(equalTo: self.view.topAnchor).isActive = true
+            view.leadingAnchor.constraint(equalTo: self.view.leadingAnchor).isActive = true
+            view.trailingAnchor.constraint(equalTo: self.view.trailingAnchor).isActive = true
 
-        self.defaultBrowserPromptView = view
+            self.defaultBrowserPromptView = view
+        }
     }
 
     private func changeWebView() {
@@ -514,12 +525,13 @@ fileprivate extension NSAlert {
 extension BrowserTabViewController: DefaultBrowserPromptViewDelegate {
 
     func defaultBrowserPromptViewDismissed(_ view: DefaultBrowserPromptView) {
-        defaultBrowserPromptView?.removeFromSuperview()
-        defaultBrowserPromptView = nil
+        defaultBrowserPromptDismissed = true
+        displayDefaultBrowserPromptIfNeeded()
     }
 
     func defaultBrowserPromptViewRequestedDefaultBrowserPrompt(_ view: DefaultBrowserPromptView) {
         Browser.becomeDefault()
+        displayDefaultBrowserPromptIfNeeded()
     }
 
 }
