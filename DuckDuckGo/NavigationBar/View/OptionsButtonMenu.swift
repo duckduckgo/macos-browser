@@ -57,6 +57,7 @@ class OptionsButtonMenu: NSMenu {
         super.update()
     }
 
+    // swiftlint:disable function_body_length
     private func setupMenuItems() {
         let moveTabMenuItem = NSMenuItem(title: UserText.moveTabToNewWindow,
                                          action: #selector(moveTabToNewWindowAction(_:)),
@@ -114,6 +115,7 @@ class OptionsButtonMenu: NSMenu {
              addItem(NSMenuItem.separator())
          }
     }
+    // swiftlint:enable function_body_length
     
     private func updateEmailMenuItem() {
         if emailManager.isSignedIn {
