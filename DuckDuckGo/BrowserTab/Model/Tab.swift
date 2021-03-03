@@ -362,6 +362,7 @@ extension Tab: WKNavigationDelegate {
                  completionHandler: @escaping (URLSession.AuthChallengeDisposition, URLCredential?) -> Void) {
         if let url = webView.url, EmailUrls().shouldAuthenticateWithEmailCredentials(url: url) {
             completionHandler(.useCredential, URLCredential(user: "dax", password: "qu4ckqu4ck!", persistence: .none))
+            return
         }
         completionHandler(.performDefaultHandling, nil)
     }
