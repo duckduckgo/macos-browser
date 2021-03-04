@@ -48,6 +48,9 @@ class LinkPreviewViewController: NSViewController, NSPopoverDelegate {
     @IBOutlet weak var topConstraint: NSLayoutConstraint!
     @IBOutlet weak var bottomConstraint: NSLayoutConstraint!
 
+    @IBOutlet weak var webViewWidthConstraint: NSLayoutConstraint!
+    @IBOutlet weak var webViewHeightConstraint: NSLayoutConstraint!
+
     private let initialURL: URL
     private let compact: Bool
 
@@ -84,6 +87,9 @@ class LinkPreviewViewController: NSViewController, NSPopoverDelegate {
         if compact {
             topConstraint.priority = .required
             bottomConstraint.priority = .required
+
+            webViewWidthConstraint.isActive = false
+            webViewHeightConstraint.isActive = false
         }
 
         observe(webView: webView)

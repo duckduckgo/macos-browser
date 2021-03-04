@@ -110,6 +110,10 @@ DQ
                             </textField>
                             <wkWebView wantsLayer="YES" translatesAutoresizingMaskIntoConstraints="NO" id="U82-fb-R5O" customClass="WebView" customModule="DuckDuckGo_Privacy_Browser" customModuleProvider="target">
                                 <rect key="frame" x="0.0" y="60" width="375" height="552"/>
+                                <constraints>
+                                    <constraint firstAttribute="height" constant="552" id="IsO-m7-A1L"/>
+                                    <constraint firstAttribute="width" constant="375" id="uft-ma-W2X"/>
+                                </constraints>
                                 <wkWebViewConfiguration key="configuration">
                                     <audiovisualMediaTypes key="mediaTypesRequiringUserActionForPlayback" none="YES"/>
                                     <wkPreferences key="preferences"/>
@@ -138,6 +142,8 @@ DQ
                         <outlet property="titleLabel" destination="8Yv-Ue-Vdl" id="orD-L3-FqR"/>
                         <outlet property="topConstraint" destination="XKS-36-QPQ" id="caq-4d-H7E"/>
                         <outlet property="webView" destination="U82-fb-R5O" id="cck-fQ-8FI"/>
+                        <outlet property="webViewHeightConstraint" destination="IsO-m7-A1L" id="NQe-Vb-pq1"/>
+                        <outlet property="webViewWidthConstraint" destination="uft-ma-W2X" id="DsT-xr-ykd"/>
                     </connections>
                 </viewController>
                 <customObject id="SMn-kf-CIV" userLabel="First Responder" customClass="NSResponder" sceneMemberID="firstResponder"/>
