@@ -21,8 +21,8 @@ import BrowserServicesKit
 
 protocol LinkHoverUserScriptDelegate: NSObjectProtocol {
 
-    func mouseDidEnter(_: LinkHoverUserScript, link: String)
-    func mouseDidExit(_: LinkHoverUserScript, link: String)
+    func mouseDidEnter(_ linkHoverUserScript: LinkHoverUserScript, link: String)
+    func mouseDidExit(_ linkHoverUserScript: LinkHoverUserScript, link: String)
 
 }
 
