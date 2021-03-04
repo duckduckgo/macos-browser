@@ -26,7 +26,7 @@ protocol LinkPreviewWindowControllerDelegate: class {
 
 }
 
-class LinkPreviewWindowController: NSWindowController, NSToolbarDelegate, NSToolbarItemValidation {
+class LinkPreviewWindowController: NSWindowController, NSToolbarDelegate, NSToolbarItemValidation, NSWindowDelegate {
 
     weak var delegate: LinkPreviewWindowControllerDelegate?
 
@@ -183,13 +183,42 @@ class LinkPreviewWindowController: NSWindowController, NSToolbarDelegate, NSTool
         }
     }
 
+    override func showWindow(_ sender: Any?) {
+        window!.makeKeyAndOrderFront(sender)
+        LinkPreviewWindowControllerManager.shared.register(self)
+    }
+
     func windowWillClose(_ notification: Notification) {
-        guard let mainViewController = contentViewController as? LinkPreviewViewController else {
+        guard contentViewController is LinkPreviewViewController else {
             return
         }
 
         window?.resignKey()
         window?.resignMain()
+
+        DispatchQueue.main.async {
+            LinkPreviewWindowControllerManager.shared.unregister(self)
+        }
+    }
+
+}
+
+class LinkPreviewWindowControllerManager {
+
+    static let shared = LinkPreviewWindowControllerManager()
+
+    private(set) var windowControllers = [LinkPreviewWindowController]()
+
+    func register(_ windowController: LinkPreviewWindowController) {
+        windowControllers.append(windowController)
+    }
+
+    func unregister(_ windowController: LinkPreviewWindowController) {
+        guard let index = windowControllers.firstIndex(of: windowController) else {
+            return
+        }
+
+        windowControllers.remove(at: index)
     }
 
 }

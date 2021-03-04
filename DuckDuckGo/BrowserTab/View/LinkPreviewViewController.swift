@@ -90,7 +90,7 @@ class LinkPreviewViewController: NSViewController, NSPopoverDelegate {
 
         let controller = createDetachedWindowController()
         controller.window?.setFrame(popoverWindowFrame, display: false)
-        controller.showWindow(nil)
+        controller.showWindow(self)
 
         presentingViewController?.dismiss(self)
     }
@@ -102,6 +102,7 @@ class LinkPreviewViewController: NSViewController, NSPopoverDelegate {
 
     func detachableWindow(for popover: NSPopover) -> NSWindow? {
         let controller = createDetachedWindowController()
+        LinkPreviewWindowControllerManager.shared.register(controller)
         return controller.window
     }
 
