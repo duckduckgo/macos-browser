@@ -66,21 +66,11 @@ class LinkPreviewViewController: NSViewController, NSPopoverDelegate {
         fatalError("You must create this view controller with a domain.")
     }
 
-    override func viewDidDisappear() {
-        super.viewDidDisappear()
-        cleanUpWebView()
-    }
-
     deinit {
-        cleanUpWebView()
-    }
-
-    func cleanUpWebView() {
         webView?.removeObserver(self, forKeyPath: #keyPath(WKWebView.url))
         webView?.removeObserver(self, forKeyPath: #keyPath(WKWebView.canGoBack))
         webView?.removeObserver(self, forKeyPath: #keyPath(WKWebView.canGoForward))
         webView?.removeObserver(self, forKeyPath: #keyPath(WKWebView.title))
-        webView = nil
     }
 
     override func viewDidLoad() {
@@ -102,17 +92,12 @@ class LinkPreviewViewController: NSViewController, NSPopoverDelegate {
         controller.window?.setFrame(popoverWindowFrame, display: false)
         controller.showWindow(nil)
 
-        // dismiss(self)
         presentingViewController?.dismiss(self)
-        cleanUpWebView()
     }
 
     @IBAction func openInNewTab(_ sender: NSButton) {
         delegate?.linkPreviewViewController(self, requestedNewTab: webView.url)
-        // dismiss(self)
         presentingViewController?.dismiss(self)
-
-        cleanUpWebView()
     }
 
     func detachableWindow(for popover: NSPopover) -> NSWindow? {
@@ -122,10 +107,6 @@ class LinkPreviewViewController: NSViewController, NSPopoverDelegate {
 
     func popoverShouldDetach(_ popover: NSPopover) -> Bool {
         return true
-    }
-
-    func popoverDidClose(_ notification: Notification) {
-        cleanUpWebView()
     }
 
     func popoverShouldClose(_ popover: NSPopover) -> Bool {
