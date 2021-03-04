@@ -69,6 +69,7 @@ final class Tab: NSObject, LinkHoverUserScriptDelegate {
         configuration.applyStandardConfiguration()
 
         webView = WebView(frame: CGRect.zero, configuration: configuration)
+        webView.allowsLinkPreview = false
 
         super.init()
 
