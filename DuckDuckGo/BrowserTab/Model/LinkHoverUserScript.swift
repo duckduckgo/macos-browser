@@ -28,17 +28,17 @@ protocol LinkHoverUserScriptDelegate: NSObjectProtocol {
 
 class LinkHoverUserScript: NSObject, StaticUserScript {
 
-    private struct MessageName {
-        static let mouseDidEnter = "mouseDidEnter"
-        static let mouseDidExit = "mouseDidExit"
+    private enum MessageNames: String, CaseIterable {
+        case mouseDidEnter
+        case mouseDidExit
     }
 
     weak var delegate: LinkHoverUserScriptDelegate?
 
     static var injectionTime: WKUserScriptInjectionTime { .atDocumentStart }
     static var forMainFrameOnly: Bool { false }
+    static var script: WKUserScript = LinkHoverUserScript.makeWKUserScript()
     static let source = """
-
     (function() {
 
             window.onmouseover = function(event) {
@@ -57,16 +57,14 @@ class LinkHoverUserScript: NSObject, StaticUserScript {
     }) ();
     """
 
-    static var script: WKUserScript = LinkHoverUserScript.makeWKUserScript()
-
     var messageNames: [String] {
-        [MessageName.mouseDidEnter, MessageName.mouseDidExit]
+        return MessageNames.allCases.map { $0.rawValue }
     }
 
     func userContentController(_ userContentController: WKUserContentController, didReceive message: WKScriptMessage) {
-        if message.name == MessageName.mouseDidEnter, let link = message.body as? String {
+        if message.name == MessageNames.mouseDidEnter.rawValue, let link = message.body as? String {
             delegate?.mouseDidEnter(self, link: link)
-        } else if message.name == MessageName.mouseDidExit, let link = message.body as? String {
+        } else if message.name == MessageNames.mouseDidExit.rawValue, let link = message.body as? String {
             delegate?.mouseDidExit(self, link: link)
         }
     }
