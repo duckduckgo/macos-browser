@@ -30,27 +30,47 @@ final class CommandPaletteWindow: NSPanel {
 
 enum CommandPaletteSuggestion {
     case tab(model: TabViewModel, activate: () -> Void)
+    case searchResult(model: SearchResult, activate: () -> Void)
 
     func activate() {
         switch self {
         case .tab(model: _, activate: let activate):
             activate()
+        case .searchResult(model: _, activate: let activate):
+            activate()
         }
     }
 }
+
 struct CommandPaletteSection {
-    let title: String
+    enum Section: String {
+        case currentWindowTabs = "Active Window"
+        case otherWindowsTabs = "All Tabs"
+        case searchResults = "DuckDuckGo Search Results"
+    }
+
+    let section: Section
     let suggestions: [CommandPaletteSuggestion]
 }
 protocol CommandPaletteViewModelProtocol {
     var userInput: PassthroughSubject<String, Never> { get }
     var suggestionsPublisher: AnyPublisher<[CommandPaletteSection], Never> { get }
+    var isLoadingPublisher: AnyPublisher<Bool, Never> { get }
 }
 
 final class CommandPaletteViewController: NSViewController {
     @IBOutlet var backgroundView: NSVisualEffectView!
     @IBOutlet var textField: NSTextField!
     @IBOutlet var tableView: NSTableView!
+    @IBOutlet var viewHeightConstraint: NSLayoutConstraint!
+    
+    @objc dynamic var textFieldIsEmpty: Bool = true
+
+    private lazy var tempSnippetCellView: NSTableCellView = {
+        // swiftlint:disable force_cast
+        tableView.makeView(withIdentifier: .snippetCell, owner: nil) as! NSTableCellView
+        // swiftlint:enable force_cast
+    }()
 
     override var representedObject: Any? {
         didSet {
@@ -69,6 +89,7 @@ final class CommandPaletteViewController: NSViewController {
     enum Object {
         case title(String)
         case suggestion(CommandPaletteSuggestion)
+        case loading
 
         var isSuggestion: Bool {
             if case .suggestion = self {
@@ -82,26 +103,35 @@ final class CommandPaletteViewController: NSViewController {
                 return title
             case .suggestion(.tab(model: let model, activate: _)):
                 return model
+            case .suggestion(.searchResult(model: let model, activate: _)):
+                return model
+            case .loading:
+                return ""
             }
         }
     }
     private var objects: [Object]? {
         didSet {
             tableView.reloadData()
+            updateHeight()
             DispatchQueue.main.async { [weak self] in
                 self?.selectNextIfPossible(after: -1)
+                self?.tableView.enclosingScrollView?.flashScrollers()
             }
         }
     }
 
     override func viewDidLoad() {
         backgroundView.wantsLayer = true
-        backgroundView.layer!.cornerRadius = 20.0
+        backgroundView.layer!.cornerRadius = 8.0
         backgroundView.layer!.masksToBounds = true
+        backgroundView.layer!.borderWidth = 1.0
+        backgroundView.layer!.borderColor = NSColor.separatorColor.cgColor
     }
 
     override func viewWillAppear() {
         textField.stringValue = ""
+        textFieldIsEmpty = true
         representedObject = CommandPaletteViewModel()
     }
 
@@ -120,12 +150,24 @@ final class CommandPaletteViewController: NSViewController {
             return
         }
 
-        model.suggestionsPublisher.map {
-            $0.reduce(into: [Object]()) {
-                $0.append(contentsOf: [Object.title($1.title)] + $1.suggestions.map(Object.suggestion))
-            }
+        model.suggestionsPublisher.combineLatest(model.isLoadingPublisher).map {
+            $0.0.reduce(into: [Object]()) {
+                $0.append(contentsOf: [Object.title($1.section.rawValue)] + $1.suggestions.map(Object.suggestion))
+            } + ($0.1 /* isLoading */ ? [Object.loading] : [])
         }.weakAssign(to: \.objects, on: self)
         .store(in: &cancellables)
+
+        model.userInput.map(\.isEmpty)
+            .assign(to: \.textFieldIsEmpty, on: self)
+        .store(in: &cancellables)
+
+        NSEvent.localEvents(for: .leftMouseDown)
+            .sink { [weak self] in self?.mouseDown($0) }
+            .store(in: &cancellables)
+
+        NSEvent.localEvents(for: .leftMouseUp)
+            .sink { [weak self] in self?.mouseUp($0) }
+            .store(in: &cancellables)
     }
 
     func hide() {
@@ -134,8 +176,48 @@ final class CommandPaletteViewController: NSViewController {
         self.representedObject = nil
     }
 
+    private func updateHeight() {
+        guard let window = self.view.window,
+              let parentWindow = window.parent
+        else { return }
+
+        let tableHeight: CGFloat
+        if (objects?.count ?? 0) > 0 {
+            tableHeight = tableView.frame.height
+                + (tableView.enclosingScrollView?.contentInsets.top ?? 0)
+                + (tableView.enclosingScrollView?.contentInsets.bottom ?? 0)
+        } else {
+            tableHeight = 0
+        }
+
+        viewHeightConstraint.constant = min(tableHeight + 42,
+                                            max(window.frame.maxY - parentWindow.frame.minY, 80))
+    }
+
+    func mouseDown(_ output: NSEvent.LocalEvents.Output) {
+        guard output.event.window !== view.window else {
+            output.handled()
+            return
+        }
+
+        hide()
+    }
+
+    func mouseUp(_ output: NSEvent.LocalEvents.Output) {
+        guard output.event.window === view.window,
+              tableView.bounds.contains(tableView.convert(output.event.locationInWindow, from: nil))
+        else {
+            return
+        }
+
+        hide()
+        confirmSelection()
+        output.handled()
+    }
+
     func select(at index: Int) {
         tableView.selectRowIndexes(IndexSet(arrayLiteral: index), byExtendingSelection: false)
+        tableView.scrollRowToVisible(index)
     }
 
     func selectNextIfPossible(after: Int? = nil) {
@@ -143,10 +225,17 @@ final class CommandPaletteViewController: NSViewController {
               !objects.isEmpty
         else { return }
 
-        var index = after ?? tableView.selectedRow
+        let after = after ?? tableView.selectedRow
+        var index = after
         repeat {
-            index = (index + 1) % objects.count
-        } while !objects[index].isSuggestion && index != tableView.selectedRow
+            index += 1
+            if index >= objects.count {
+                if after < 0 {
+                    break
+                }
+                index = 0
+            }
+        } while !objects[index].isSuggestion && index != after
 
         select(at: index)
     }
@@ -159,6 +248,9 @@ final class CommandPaletteViewController: NSViewController {
         var index = tableView.selectedRow
         repeat {
             index -= 1
+            if tableView.selectedRow == -1 && index == -1 {
+                break
+            }
             if index < 0 {
                 index = tableView.numberOfRows - 1
             }
@@ -181,6 +273,10 @@ final class CommandPaletteViewController: NSViewController {
         default:
             return
         }
+    }
+
+    @IBAction func clearValue(_ sender: Any) {
+        textField.stringValue = ""
     }
 
 }
@@ -206,29 +302,41 @@ extension CommandPaletteViewController: NSTableViewDelegate {
             identifier = .section
         case .suggestion(.tab):
             identifier = .tab
+        case .suggestion(.searchResult):
+            identifier = .snippetCell
+        case .loading:
+            identifier = .loadingCell
         }
         return tableView.makeView(withIdentifier: identifier, owner: self)!
     }
 
     func tableView(_ tableView: NSTableView, rowViewForRow row: Int) -> NSTableRowView? {
-        guard case .suggestion = objects![row] else { return nil }
+        let identifier: NSUserInterfaceItemIdentifier
+        switch objects![row] {
+        case .title:
+            identifier = .sectionRow
+        case .suggestion:
+            identifier = .suggestionRow
+        default:
+            return nil
+        }
         // swiftlint:disable force_cast
-        return (tableView.makeView(withIdentifier: .suggestionRow, owner: self) as! NSTableRowView)
+        return (tableView.makeView(withIdentifier: identifier, owner: self) as! NSTableRowView)
         // swiftlint:enable force_cast
     }
 
     func tableView(_ tableView: NSTableView, heightOfRow row: Int) -> CGFloat {
         switch objects![row] {
         case .title:
-            return 17
+            return 25
         case .suggestion(.tab):
-            return 58
-        }
-    }
-
-    func tableViewSelectionDidChange(_ notification: Notification) {
-        if case .leftMouseUp = NSApp.currentEvent?.type {
-            confirmSelection()
+            return 45
+        case .loading:
+            return 24
+        case .suggestion(.searchResult(model: let model, activate: _)):
+            tempSnippetCellView.objectValue = model
+            tempSnippetCellView.layoutSubtreeIfNeeded()
+            return tempSnippetCellView.frame.height
         }
     }
 
@@ -265,6 +373,9 @@ extension CommandPaletteViewController: NSTextFieldDelegate {
 
 private extension NSUserInterfaceItemIdentifier {
     static let tab = NSUserInterfaceItemIdentifier(rawValue: "TabTableCellView")
+    static let snippetCell = NSUserInterfaceItemIdentifier(rawValue: "SnippetTableCellView")
     static let section = NSUserInterfaceItemIdentifier(rawValue: "SectionTitle")
     static let suggestionRow = NSUserInterfaceItemIdentifier(rawValue: SuggestionTableRowView.identifier)
+    static let sectionRow = NSUserInterfaceItemIdentifier(rawValue: "SectionRow")
+    static let loadingCell = NSUserInterfaceItemIdentifier(rawValue: "Loading")
 }

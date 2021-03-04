@@ -32,6 +32,10 @@ extension NSColor {
         NSColor(named: "AddressBarShadowColor")!
     }
 
+    static var separatorColor: NSColor {
+        NSColor(named: "SeparatorColor")!
+    }
+
     static var suggestionsShadowColor: NSColor {
         NSColor(named: "SuggestionsShadowColor")!
     }

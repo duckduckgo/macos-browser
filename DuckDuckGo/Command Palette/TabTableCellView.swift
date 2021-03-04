@@ -27,14 +27,14 @@ final class TabTableCellView: NSTableCellView {
         didSet {
             guard let some = objectValue else { return }
             guard let tabViewModel = some as? TabViewModel else { fatalError("Unexpected object value") }
-            display(tabViewModel: tabViewModel)
+            display(tabViewModel)
         }
     }
 
-    func display(tabViewModel: TabViewModel) {
-        titleTextField.stringValue = tabViewModel.title
-        urlTextField.stringValue = tabViewModel.addressBarString
-        faviconImageView.image = tabViewModel.favicon
+    func display(_ model: TabViewModel) {
+        titleTextField.stringValue = model.title
+        urlTextField.stringValue = model.addressBarString
+        faviconImageView.image = model.favicon
     }
 
 }

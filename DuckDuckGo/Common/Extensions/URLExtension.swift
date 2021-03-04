@@ -138,8 +138,16 @@ extension URL {
         duckDuckGo.appendingPathComponent("ac/")
     }
 
+    static var duckDuckGoLink: URL {
+        duckDuckGo.appendingPathComponent("l/")
+    }
+
     var isDuckDuckGo: Bool {
         absoluteString.starts(with: Self.duckDuckGo.absoluteString)
+    }
+
+    var isDuckDuckGoLink: Bool {
+        absoluteString.starts(with: Self.duckDuckGoLink.absoluteString)
     }
 
     // swiftlint:disable unused_optional_binding
@@ -154,6 +162,7 @@ extension URL {
 
     enum DuckDuckGoParameters: String {
         case search = "q"
+        case uddg = "uddg"
     }
 
     // MARK: - Search
@@ -161,6 +170,11 @@ extension URL {
     var searchQuery: String? {
         guard isDuckDuckGo else { return nil }
         return try? getParameter(name: DuckDuckGoParameters.search.rawValue)
+    }
+
+    var redirectLink: String? {
+        guard isDuckDuckGoLink else { return nil }
+        return try? getParameter(name: DuckDuckGoParameters.uddg.rawValue)
     }
 
     // MARK: - Feedback

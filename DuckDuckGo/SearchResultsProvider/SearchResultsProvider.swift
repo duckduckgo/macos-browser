@@ -20,10 +20,11 @@ import Foundation
 import Combine
 import SwiftSoup
 
-struct SearchResult {
+struct SearchResult: Equatable {
     let title: String
     let snippet: String?
     let url: URL
+    let faviconURL: URL?
 }
 enum SearchError: Error {
     case urlError(URLError)
@@ -48,13 +49,19 @@ final class SearchResultsProvider {
 
             }.tryMap { doc in
                 try doc.select("div.links_main").array().map {
-                    let link = try $0.select("a").first()
-                    let href = try link?.attr("href")
-                    let title = try link?.text()
-                    let snippet = try $0.select(".result__snippet").first()?.text()
+                    let link = try? $0.select("a").first()
+                    let href = try? link?.attr("href")
+                    let url = href.flatMap { URL(string: $0, relativeTo: .duckDuckGo) }
+                    let img = try? $0.select("img").first()
+                    let faviconSrc = try? img?.attr("src")
+                    let faviconURL = faviconSrc.flatMap { URL(string: $0, relativeTo: .duckDuckGo) }
+                    let title = try? link?.text()
+                    let snippet = try? $0.select(".result__snippet").first()?.text()
+                    
                     return SearchResult(title: title!,
                                         snippet: snippet,
-                                        url: URL(string: href!, relativeTo: .duckDuckGo)!)
+                                        url: url!,
+                                        faviconURL: faviconURL)
                 }
 
             }.mapError {
@@ -66,6 +73,7 @@ final class SearchResultsProvider {
                 default:
                     return SearchError.other($0)
                 }
+
             }.eraseToAnyPublisher()
 
     }

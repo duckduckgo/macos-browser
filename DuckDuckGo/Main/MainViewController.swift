@@ -150,7 +150,7 @@ class MainViewController: NSViewController {
         let bounds = self.view.window!.frame
         let size = commandPalette.window!.frame.size
         let frame = CGRect(x: bounds.minX + (bounds.width - size.width) * 0.5,
-                           y: bounds.minY + (bounds.height - size.height) * 0.5,
+                           y: bounds.minY + bounds.height - 150,
                            width: size.width,
                            height: size.height)
 
