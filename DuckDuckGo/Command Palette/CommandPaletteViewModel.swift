@@ -75,22 +75,44 @@ final class CommandPaletteViewModel: CommandPaletteViewModelProtocol {
     typealias PublishedSection = (section: CommandPaletteSection.Section, publisher: SectionPublisher)
 
     private func userInputUpdated(_ predicate: String) {
+        var predicate = predicate.trimmingWhitespaces()
         guard !predicate.isEmpty else {
             c = nil
             isLoadingAndSuggestions = (false, [])
             return
         }
 
+        let commands: [String: CommandPaletteSection.Section] = [
+            "h": .help,
+            "help": .help
+        ]
+        let hiddenCommands: Set<CommandPaletteSection.Section> = [
+            .help
+        ]
+
+        var filteredSections = Set(CommandPaletteSection.Section.allCases).subtracting(hiddenCommands)
+
+        if predicate.hasPrefix(":") {
+            let endIdx = predicate.firstIndex(of: " ") ?? predicate.endIndex
+            let cmd = String(predicate[predicate.index(after: predicate.startIndex)..<endIdx])
+            if !cmd.isEmpty, let section = commands[cmd] {
+                filteredSections = [section]
+            }
+        }
+        func shouldInclude(_ item: PublishedSection) -> Bool {
+            filteredSections.contains(item.section)
+        }
         let publishers: [PublishedSection] = [
+            (.help, helpSection()),
             (.currentWindowTabs, activeWindowTabs(matching: predicate)),
             (.otherWindowsTabs, tabs(matching: predicate)),
             (.bookmarks, bookmarks(for: predicate)),
             (.searchResults, searchResults(for: predicate)),
-            (.instantAnswers, instantAnswers(for: predicate)),
-        ]
+            (.instantAnswers, instantAnswers(for: predicate))
+        ].filter(shouldInclude)
 
-        c = publishers.enumerated()
-            .map(\.element.publisher)
+        c = publishers
+            .map(\.publisher)
             .combineLatest()
             .map {
                 (isLoading: $0.contains(where: { $0.isLoading }),
@@ -157,6 +179,17 @@ final class CommandPaletteViewModel: CommandPaletteViewModelProtocol {
         return Just(tabs)
             .map(Loadable.loaded)
             .eraseToAnyPublisher()
+    }
+
+    func helpSection() -> SectionPublisher {
+        let model = SearchResult(title: "Show Commands Help",
+                                 snippet: nil,
+                                 url: Bundle.main.url(forResource: "command_help", withExtension: "html")!,
+                                 favicon: nil,
+                                 faviconURL: URL(string: "https://external-content.duckduckgo.com/ip3/duckduckgo.com.ico")!)
+        return Just(.loaded([CommandPaletteSuggestion.searchResult(model: model, activate: {
+            WindowsManager.openNewWindow(with: model.url)
+        })])).eraseToAnyPublisher()
     }
 
     func searchResults(for query: String) -> SectionPublisher {

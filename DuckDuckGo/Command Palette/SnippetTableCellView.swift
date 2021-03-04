@@ -52,9 +52,9 @@ final class SnippetTableCellView: NSTableCellView {
 
         if let image = model.favicon {
             self.faviconImageView.image = image
-        } else {
+        } else if url.host != nil || model.faviconURL?.host != nil {
             LocalFaviconService.shared.fetchFavicon(model.faviconURL,
-                                                    for: url.host!,
+                                                    for: url.host ?? model.faviconURL!.host!,
                                                     isFromUserScript: false) { [weak self] (image, _) in
                 dispatchPrecondition(condition: .onQueue(.main))
                 guard let self = self,

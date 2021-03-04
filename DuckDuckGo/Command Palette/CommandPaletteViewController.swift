@@ -43,7 +43,8 @@ enum CommandPaletteSuggestion {
 }
 
 struct CommandPaletteSection {
-    enum Section: String {
+    enum Section: String, CaseIterable {
+        case help = "Help"
         case currentWindowTabs = "Active Window"
         case otherWindowsTabs = "All Tabs"
         case searchResults = "DuckDuckGo Search Results"

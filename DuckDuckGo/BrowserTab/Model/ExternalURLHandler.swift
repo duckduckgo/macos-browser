@@ -41,6 +41,9 @@ class ExternalURLHandler {
     func isExternal(scheme: String) -> Bool {
         return !["https", "http", "about", "data"].contains(scheme)
     }
+    func isFile(scheme: String) -> Bool {
+        return scheme == "file"
+    }
 
     func handle(url: URL, onPage page: URL?, fromFrame: Bool, triggeredByUser: Bool) {
         // just cancel frame based external urls

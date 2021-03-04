@@ -404,7 +404,10 @@ extension Tab: WKNavigationDelegate {
             return
         }
 
-        if externalUrlHandler.isExternal(scheme: urlScheme) {
+        if externalUrlHandler.isFile(scheme: urlScheme) {
+            decisionHandler(.allow)
+            return
+        } else if externalUrlHandler.isExternal(scheme: urlScheme) {
             // ignore <iframe src="custom://url"> but allow via address bar
             let fromFrame = !(navigationAction.sourceFrame.isMainFrame || self.userEnteredUrl)
 
