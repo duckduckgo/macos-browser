@@ -74,11 +74,11 @@
             <objects>
                 <viewController storyboardIdentifier="LinkPreviewViewController" id="r9i-PN-Mjb" customClass="LinkPreviewViewController" customModule="DuckDuckGo_Privacy_Browser" customModuleProvider="target" sceneMemberID="viewController">
                     <view key="view" id="bmw-KY-QiL">
-                        <rect key="frame" x="0.0" y="0.0" width="704" height="460"/>
+                        <rect key="frame" x="0.0" y="0.0" width="375" height="650"/>
                         <autoresizingMask key="autoresizingMask"/>
                         <subviews>
                             <button verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="G6s-wj-MI8">
-                                <rect key="frame" x="553" y="13" width="138" height="32"/>
+                                <rect key="frame" x="224" y="13" width="138" height="32"/>
                                 <buttonCell key="cell" type="push" title="Open In New Tab" bezelStyle="rounded" alignment="center" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="y6J-FS-k24">
                                     <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
                                     <font key="font" metaFont="system"/>
@@ -91,7 +91,7 @@ DQ
                                 </connections>
                             </button>
                             <button verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="sxK-NV-U1B">
-                                <rect key="frame" x="440" y="13" width="115" height="32"/>
+                                <rect key="frame" x="111" y="13" width="115" height="32"/>
                                 <buttonCell key="cell" type="push" title="Pin to Screen" bezelStyle="rounded" alignment="center" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="VPP-5A-aQq">
                                     <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
                                     <font key="font" metaFont="system"/>
@@ -101,7 +101,7 @@ DQ
                                 </connections>
                             </button>
                             <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="8Yv-Ue-Vdl">
-                                <rect key="frame" x="18" y="433" width="668" height="16"/>
+                                <rect key="frame" x="18" y="623" width="339" height="16"/>
                                 <textFieldCell key="cell" lineBreakMode="clipping" alignment="center" title="Page Title" id="Qvg-68-1pn">
                                     <font key="font" metaFont="system"/>
                                     <color key="textColor" name="labelColor" catalog="System" colorSpace="catalog"/>
@@ -109,7 +109,7 @@ DQ
                                 </textFieldCell>
                             </textField>
                             <wkWebView wantsLayer="YES" translatesAutoresizingMaskIntoConstraints="NO" id="U82-fb-R5O" customClass="WebView" customModule="DuckDuckGo_Privacy_Browser" customModuleProvider="target">
-                                <rect key="frame" x="0.0" y="60" width="704" height="362"/>
+                                <rect key="frame" x="0.0" y="60" width="375" height="552"/>
                                 <wkWebViewConfiguration key="configuration">
                                     <audiovisualMediaTypes key="mediaTypesRequiringUserActionForPlayback" none="YES"/>
                                     <wkPreferences key="preferences"/>
@@ -142,7 +142,7 @@ DQ
                 </viewController>
                 <customObject id="SMn-kf-CIV" userLabel="First Responder" customClass="NSResponder" sceneMemberID="firstResponder"/>
             </objects>
-            <point key="canvasLocation" x="219" y="2794"/>
+            <point key="canvasLocation" x="55" y="2869"/>
         </scene>
     </scenes>
     <resources>

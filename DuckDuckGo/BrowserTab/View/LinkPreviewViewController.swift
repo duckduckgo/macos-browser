@@ -38,7 +38,12 @@ class LinkPreviewViewController: NSViewController, NSPopoverDelegate {
     weak var delegate: LinkPreviewViewControllerDelegate?
 
     @IBOutlet weak var titleLabel: NSTextField!
-    @IBOutlet weak var webView: WKWebView!
+    @IBOutlet weak var webView: WKWebView! {
+        didSet {
+            webView.configuration.applyStandardConfiguration()
+            webView.configuration.defaultWebpagePreferences.preferredContentMode = .mobile
+        }
+    }
 
     @IBOutlet weak var topConstraint: NSLayoutConstraint!
     @IBOutlet weak var bottomConstraint: NSLayoutConstraint!
