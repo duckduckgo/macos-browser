@@ -49,6 +49,20 @@ class BrowserTabViewController: NSViewController, LinkPreviewViewControllerDeleg
 
         subscribeToSelectedTabViewModel()
         subscribeToIsErrorViewVisible()
+
+        let longPressGesture = NSPressGestureRecognizer(target: self, action: #selector(longClick(_:)))
+        longPressGesture.minimumPressDuration = 0.75
+        view.addGestureRecognizer(longPressGesture)
+    }
+
+    var mouseLocation: NSPoint? { self.view.window?.mouseLocationOutsideOfEventStream }
+
+    @objc
+    private func longClick(_ recognizer: NSGestureRecognizer) {
+        // Only intercept the first time this event is fired, we only need to display the preview once.
+        if recognizer.state == .began, let location = mouseLocation, let link = self.tabViewModel?.tab.currentHoveredLink {
+            displayLinkPreview(for: URL(string: link)!, at: location)
+        }
     }
 
     private func subscribeToSelectedTabViewModel() {
@@ -272,13 +286,19 @@ extension BrowserTabViewController: ImageMenuItemSelectors {
         guard let view = NSApp.mainWindow?.contentView else { return }
 
         guard let position = contextMenuOrigin, let link = contextMenuLink else { return }
-
         let converted = NSPoint(x: position.x, y: self.view.bounds.height - position.y)
+
+        displayLinkPreview(for: link, at: converted)
+    }
+
+    private func displayLinkPreview(for link: URL, at point: NSPoint) {
+        guard self.presentedViewControllers?.isEmpty ?? true else { return }
+
         let controller = LinkPreviewViewController.create(for: link)
         controller.delegate = self
 
         self.present(controller,
-                     asPopoverRelativeTo: CGRect(x: converted.x, y: converted.y, width: 1, height: 1),
+                     asPopoverRelativeTo: CGRect(x: point.x, y: point.y, width: 1, height: 1),
                      of: view,
                      preferredEdge: .minY,
                      behavior: .transient)

@@ -33,7 +33,17 @@ protocol TabDelegate: class {
 
 }
 
-final class Tab: NSObject {
+final class Tab: NSObject, LinkHoverUserScriptDelegate {
+
+    func mouseDidEnter(_: LinkHoverUserScript, link: String) {
+        self.currentHoveredLink = link
+    }
+
+    func mouseDidExit(_: LinkHoverUserScript, link: String) {
+        self.currentHoveredLink = nil
+    }
+
+    var currentHoveredLink: String?
 
     weak var delegate: TabDelegate?
 
@@ -272,6 +282,7 @@ final class Tab: NSObject {
             userScripts.loginDetectionUserScript.delegate = self
             userScripts.contentBlockerScript.delegate = self
             userScripts.contentBlockerRulesScript.delegate = self
+            userScripts.linkHoverUserScript.delegate = self
 
             attachFindInPage()
 

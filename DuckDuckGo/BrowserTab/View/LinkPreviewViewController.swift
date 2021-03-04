@@ -42,6 +42,7 @@ class LinkPreviewViewController: NSViewController, NSPopoverDelegate {
         didSet {
             webView.configuration.applyStandardConfiguration()
             webView.configuration.defaultWebpagePreferences.preferredContentMode = .mobile
+            webView.allowsLinkPreview = false
         }
     }
 
@@ -91,7 +92,7 @@ class LinkPreviewViewController: NSViewController, NSPopoverDelegate {
             titleLabel.isHidden = true
             bottomConstraint.priority = .required
 
-            webViewWidthConstraint.isActive = false
+            webViewWidthConstraint.priority = .defaultLow
             webViewHeightConstraint.isActive = false
         }
 
