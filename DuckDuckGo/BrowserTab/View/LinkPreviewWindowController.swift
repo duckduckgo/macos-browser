@@ -114,7 +114,6 @@ class LinkPreviewWindowController: NSWindowController, NSToolbarDelegate, NSTool
     }
 
     func updateInterface(title: String, canGoBack: Bool, canGoForward: Bool) {
-        print("Updated with title \(title)")
         self.titleItem.title = title
         self.canGoBack = canGoBack
         self.canGoForward = canGoForward
@@ -184,8 +183,13 @@ class LinkPreviewWindowController: NSWindowController, NSToolbarDelegate, NSTool
         }
     }
 
-}
+    func windowWillClose(_ notification: Notification) {
+        guard let mainViewController = contentViewController as? LinkPreviewViewController else {
+            return
+        }
 
-class LinkPreviewWindow: NSWindow {
+        window?.resignKey()
+        window?.resignMain()
+    }
 
 }

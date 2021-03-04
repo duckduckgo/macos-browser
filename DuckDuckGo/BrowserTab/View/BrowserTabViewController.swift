@@ -279,9 +279,9 @@ extension BrowserTabViewController: ImageMenuItemSelectors {
 
         self.present(controller,
                      asPopoverRelativeTo: CGRect(x: converted.x, y: converted.y, width: 1, height: 1),
-                     of: view, // Hack Days!
+                     of: view,
                      preferredEdge: .minY,
-                     behavior: .semitransient)
+                     behavior: .transient)
     }
 
     func linkPreviewViewController(_ controller: LinkPreviewViewController, requestedNewTab url: URL?) {

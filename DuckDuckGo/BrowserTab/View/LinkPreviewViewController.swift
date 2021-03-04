@@ -46,15 +46,14 @@ class LinkPreviewViewController: NSViewController, NSPopoverDelegate {
     private let initialURL: URL
     private let compact: Bool
 
-    lazy var detachedWindowController: LinkPreviewWindowController = {
+    private func createDetachedWindowController() -> LinkPreviewWindowController {
         let viewController = LinkPreviewViewController.create(for: self.initialURL, compact: true)
         let detachedWindowController = LinkPreviewWindowController()
         detachedWindowController.delegate = viewController
-        detachedWindowController.window?.level = NSWindow.Level(rawValue: 1000) // Keep the window in the foreground at all times
         detachedWindowController.contentViewController = viewController
 
         return detachedWindowController
-    }()
+    }
 
     init?(coder: NSCoder, initialURL: URL, compact: Bool = false) {
         self.initialURL = initialURL
@@ -67,11 +66,21 @@ class LinkPreviewViewController: NSViewController, NSPopoverDelegate {
         fatalError("You must create this view controller with a domain.")
     }
 
+    override func viewDidDisappear() {
+        super.viewDidDisappear()
+        cleanUpWebView()
+    }
+
     deinit {
+        cleanUpWebView()
+    }
+
+    func cleanUpWebView() {
         webView?.removeObserver(self, forKeyPath: #keyPath(WKWebView.url))
         webView?.removeObserver(self, forKeyPath: #keyPath(WKWebView.canGoBack))
         webView?.removeObserver(self, forKeyPath: #keyPath(WKWebView.canGoForward))
         webView?.removeObserver(self, forKeyPath: #keyPath(WKWebView.title))
+        webView = nil
     }
 
     override func viewDidLoad() {
@@ -88,22 +97,38 @@ class LinkPreviewViewController: NSViewController, NSPopoverDelegate {
 
     @IBAction func pinToScreen(_ sender: NSButton) {
         guard let popoverWindowFrame = self.view.window?.frame else { return }
-        detachedWindowController.window?.setFrame(popoverWindowFrame, display: false)
-        detachedWindowController.showWindow(self)
 
-        dismiss(self)
+        let controller = createDetachedWindowController()
+        controller.window?.setFrame(popoverWindowFrame, display: false)
+        controller.showWindow(nil)
+
+        // dismiss(self)
+        presentingViewController?.dismiss(self)
+        cleanUpWebView()
     }
 
     @IBAction func openInNewTab(_ sender: NSButton) {
         delegate?.linkPreviewViewController(self, requestedNewTab: webView.url)
-        dismiss(self)
+        // dismiss(self)
+        presentingViewController?.dismiss(self)
+
+        cleanUpWebView()
     }
 
     func detachableWindow(for popover: NSPopover) -> NSWindow? {
-        return detachedWindowController.window
+        let controller = createDetachedWindowController()
+        return controller.window
     }
 
     func popoverShouldDetach(_ popover: NSPopover) -> Bool {
+        return true
+    }
+
+    func popoverDidClose(_ notification: Notification) {
+        cleanUpWebView()
+    }
+
+    func popoverShouldClose(_ popover: NSPopover) -> Bool {
         return true
     }
 
@@ -127,13 +152,8 @@ class LinkPreviewViewController: NSViewController, NSPopoverDelegate {
         let viewWindowController = self.view.window?.windowController as? LinkPreviewWindowController
 
         switch keyPath {
-        case #keyPath(WKWebView.url), #keyPath(WKWebView.title):
+        case #keyPath(WKWebView.url), #keyPath(WKWebView.title), #keyPath(WKWebView.canGoBack), #keyPath(WKWebView.canGoForward):
             updateTitle()
-            viewWindowController?.updateInterface(title: webView.title ?? "", canGoBack: webView.canGoBack, canGoForward: webView.canGoForward)
-
-        case #keyPath(WKWebView.canGoBack):
-            viewWindowController?.updateInterface(title: webView.title ?? "", canGoBack: webView.canGoBack, canGoForward: webView.canGoForward)
-        case #keyPath(WKWebView.canGoForward):
             viewWindowController?.updateInterface(title: webView.title ?? "", canGoBack: webView.canGoBack, canGoForward: webView.canGoForward)
         default:
             super.observeValue(forKeyPath: keyPath, of: object, change: change, context: context)
