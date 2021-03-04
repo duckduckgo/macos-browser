@@ -159,10 +159,12 @@ final class CommandPaletteViewModel: CommandPaletteViewModelProtocol {
     func searchResults(for query: String) -> SectionPublisher {
         SearchResultsProvider().querySearchResults(for: query)
             .map {
-                $0 + [SearchResult(title: "More results from DuckDuckGo...",
-                                   snippet: nil,
-                                   url: .makeHTMLSearchURL(from: query)!,
-                                   faviconURL: URL(string: "https://external-content.duckduckgo.com/ip3/duckduckgo.com.ico")!)]
+                $0.first(5) + [
+                    SearchResult(title: "More results from DuckDuckGo...",
+                                 snippet: nil,
+                                 url: .makeHTMLSearchURL(from: query)!,
+                                 faviconURL: URL(string: "https://external-content.duckduckgo.com/ip3/duckduckgo.com.ico")!)
+                ]
             }
             .replaceError(with: [])
             .map {
