@@ -74,11 +74,86 @@
             <objects>
                 <viewController storyboardIdentifier="LinkPreviewViewController" id="r9i-PN-Mjb" customClass="LinkPreviewViewController" customModule="DuckDuckGo_Privacy_Browser" customModuleProvider="target" sceneMemberID="viewController">
                     <view key="view" id="bmw-KY-QiL">
-                        <rect key="frame" x="0.0" y="0.0" width="375" height="650"/>
+                        <rect key="frame" x="0.0" y="0.0" width="430" height="710"/>
                         <autoresizingMask key="autoresizingMask"/>
                         <subviews>
+                            <box boxType="custom" borderType="none" cornerRadius="4" titlePosition="noTitle" translatesAutoresizingMaskIntoConstraints="NO" id="jZd-Cb-dHL" userLabel="Fake Toolbar Container">
+                                <rect key="frame" x="0.0" y="660" width="430" height="50"/>
+                                <view key="contentView" id="zZY-qC-UIE">
+                                    <rect key="frame" x="0.0" y="0.0" width="430" height="50"/>
+                                    <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+                                    <subviews>
+                                        <button translatesAutoresizingMaskIntoConstraints="NO" id="rVZ-TB-0GK" userLabel="Close Button">
+                                            <rect key="frame" x="20" y="18" width="14" height="14"/>
+                                            <constraints>
+                                                <constraint firstAttribute="width" constant="14" id="1wX-Xx-HnT"/>
+                                                <constraint firstAttribute="height" constant="14" id="Ch3-E1-bBm"/>
+                                            </constraints>
+                                            <buttonCell key="cell" type="square" bezelStyle="shadowlessSquare" image="CloseBackground" imagePosition="only" alignment="center" imageScaling="proportionallyUpOrDown" inset="2" id="rQG-o7-pdh">
+                                                <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
+                                                <font key="font" metaFont="system"/>
+                                            </buttonCell>
+                                            <color key="contentTintColor" name="ButtonColor"/>
+                                            <connections>
+                                                <action selector="closeButtonClicked:" target="r9i-PN-Mjb" id="ABt-Y2-cpN"/>
+                                            </connections>
+                                        </button>
+                                        <button translatesAutoresizingMaskIntoConstraints="NO" id="fp8-MS-tYi" userLabel="Back Button">
+                                            <rect key="frame" x="54" y="19" width="7" height="13"/>
+                                            <buttonCell key="cell" type="square" bezelStyle="shadowlessSquare" image="Back" imagePosition="only" alignment="center" enabled="NO" imageScaling="proportionallyUpOrDown" inset="2" id="DWy-F7-i3M">
+                                                <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
+                                                <font key="font" metaFont="system"/>
+                                            </buttonCell>
+                                            <connections>
+                                                <action selector="backButtonClicked:" target="r9i-PN-Mjb" id="Twv-aR-xcO"/>
+                                            </connections>
+                                        </button>
+                                        <button translatesAutoresizingMaskIntoConstraints="NO" id="cA5-O0-Flt" userLabel="Forward Button">
+                                            <rect key="frame" x="81" y="19" width="7" height="13"/>
+                                            <buttonCell key="cell" type="square" bezelStyle="shadowlessSquare" image="Forward" imagePosition="only" alignment="center" enabled="NO" imageScaling="proportionallyUpOrDown" inset="2" id="fSr-pX-1uT">
+                                                <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
+                                                <font key="font" metaFont="system"/>
+                                            </buttonCell>
+                                            <connections>
+                                                <action selector="forwardButtonClicked:" target="r9i-PN-Mjb" id="yew-nU-Q0C"/>
+                                            </connections>
+                                        </button>
+                                        <button translatesAutoresizingMaskIntoConstraints="NO" id="Loh-yb-xXc" userLabel="Refresh Button">
+                                            <rect key="frame" x="108" y="18" width="12" height="15"/>
+                                            <buttonCell key="cell" type="square" bezelStyle="shadowlessSquare" image="Refresh" imagePosition="only" alignment="center" imageScaling="proportionallyUpOrDown" inset="2" id="Msp-mo-O30">
+                                                <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
+                                                <font key="font" metaFont="system"/>
+                                            </buttonCell>
+                                            <connections>
+                                                <action selector="refreshButtonClicked:" target="r9i-PN-Mjb" id="c04-uw-cPF"/>
+                                            </connections>
+                                        </button>
+                                        <textField horizontalHuggingPriority="249" verticalHuggingPriority="750" horizontalCompressionResistancePriority="250" translatesAutoresizingMaskIntoConstraints="NO" id="1Cq-eY-R6n">
+                                            <rect key="frame" x="138" y="17" width="274" height="16"/>
+                                            <textFieldCell key="cell" lineBreakMode="truncatingTail" alignment="center" id="s5l-Yp-Plb">
+                                                <font key="font" metaFont="system"/>
+                                                <color key="textColor" name="labelColor" catalog="System" colorSpace="catalog"/>
+                                                <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
+                                            </textFieldCell>
+                                        </textField>
+                                    </subviews>
+                                    <constraints>
+                                        <constraint firstItem="rVZ-TB-0GK" firstAttribute="centerY" secondItem="zZY-qC-UIE" secondAttribute="centerY" id="4Ot-C7-a3a"/>
+                                        <constraint firstItem="Loh-yb-xXc" firstAttribute="leading" secondItem="cA5-O0-Flt" secondAttribute="trailing" constant="20" id="5ko-CQ-lGm"/>
+                                        <constraint firstItem="cA5-O0-Flt" firstAttribute="centerY" secondItem="zZY-qC-UIE" secondAttribute="centerY" id="86x-rV-VDe"/>
+                                        <constraint firstItem="cA5-O0-Flt" firstAttribute="leading" secondItem="fp8-MS-tYi" secondAttribute="trailing" constant="20" id="8C8-ga-pq0"/>
+                                        <constraint firstItem="fp8-MS-tYi" firstAttribute="leading" secondItem="rVZ-TB-0GK" secondAttribute="trailing" constant="20" id="AnR-dY-ZjL"/>
+                                        <constraint firstAttribute="trailing" secondItem="1Cq-eY-R6n" secondAttribute="trailing" constant="20" id="OgS-th-C6R"/>
+                                        <constraint firstItem="Loh-yb-xXc" firstAttribute="centerY" secondItem="zZY-qC-UIE" secondAttribute="centerY" id="OxF-vJ-Shr"/>
+                                        <constraint firstItem="1Cq-eY-R6n" firstAttribute="centerY" secondItem="zZY-qC-UIE" secondAttribute="centerY" id="d8E-1d-QFv"/>
+                                        <constraint firstItem="1Cq-eY-R6n" firstAttribute="leading" secondItem="Loh-yb-xXc" secondAttribute="trailing" constant="20" id="efz-vy-Y3A"/>
+                                        <constraint firstItem="fp8-MS-tYi" firstAttribute="centerY" secondItem="zZY-qC-UIE" secondAttribute="centerY" id="fu1-Dd-1h9"/>
+                                        <constraint firstItem="rVZ-TB-0GK" firstAttribute="leading" secondItem="zZY-qC-UIE" secondAttribute="leading" constant="20" id="pqC-Fy-hJ0"/>
+                                    </constraints>
+                                </view>
+                            </box>
                             <button verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="G6s-wj-MI8">
-                                <rect key="frame" x="224" y="13" width="138" height="32"/>
+                                <rect key="frame" x="279" y="13" width="138" height="32"/>
                                 <buttonCell key="cell" type="push" title="Open In New Tab" bezelStyle="rounded" alignment="center" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="y6J-FS-k24">
                                     <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
                                     <font key="font" metaFont="system"/>
@@ -91,7 +166,7 @@ DQ
                                 </connections>
                             </button>
                             <button verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="sxK-NV-U1B">
-                                <rect key="frame" x="111" y="13" width="115" height="32"/>
+                                <rect key="frame" x="166" y="13" width="115" height="32"/>
                                 <buttonCell key="cell" type="push" title="Pin to Screen" bezelStyle="rounded" alignment="center" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="VPP-5A-aQq">
                                     <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
                                     <font key="font" metaFont="system"/>
@@ -101,7 +176,7 @@ DQ
                                 </connections>
                             </button>
                             <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="8Yv-Ue-Vdl">
-                                <rect key="frame" x="18" y="623" width="339" height="16"/>
+                                <rect key="frame" x="18" y="677" width="394" height="16"/>
                                 <textFieldCell key="cell" lineBreakMode="clipping" alignment="center" title="Page Title" id="Qvg-68-1pn">
                                     <font key="font" metaFont="system"/>
                                     <color key="textColor" name="labelColor" catalog="System" colorSpace="catalog"/>
@@ -109,10 +184,10 @@ DQ
                                 </textFieldCell>
                             </textField>
                             <wkWebView wantsLayer="YES" translatesAutoresizingMaskIntoConstraints="NO" id="U82-fb-R5O" customClass="WebView" customModule="DuckDuckGo_Privacy_Browser" customModuleProvider="target">
-                                <rect key="frame" x="0.0" y="60" width="375" height="552"/>
+                                <rect key="frame" x="0.0" y="60" width="430" height="600"/>
                                 <constraints>
-                                    <constraint firstAttribute="height" constant="552" id="IsO-m7-A1L"/>
-                                    <constraint firstAttribute="width" constant="375" id="uft-ma-W2X"/>
+                                    <constraint firstAttribute="height" constant="600" id="IsO-m7-A1L"/>
+                                    <constraint firstAttribute="width" constant="430" id="uft-ma-W2X"/>
                                 </constraints>
                                 <wkWebViewConfiguration key="configuration">
                                     <audiovisualMediaTypes key="mediaTypesRequiringUserActionForPlayback" none="YES"/>
@@ -122,25 +197,32 @@ DQ
                         </subviews>
                         <constraints>
                             <constraint firstItem="sxK-NV-U1B" firstAttribute="leading" relation="greaterThanOrEqual" secondItem="bmw-KY-QiL" secondAttribute="leading" constant="20" symbolic="YES" id="7mY-AN-qET"/>
+                            <constraint firstItem="jZd-Cb-dHL" firstAttribute="top" secondItem="bmw-KY-QiL" secondAttribute="top" id="HbZ-Fg-1Dy"/>
+                            <constraint firstItem="U82-fb-R5O" firstAttribute="top" secondItem="jZd-Cb-dHL" secondAttribute="bottom" id="Keg-p9-SDa"/>
                             <constraint firstItem="U82-fb-R5O" firstAttribute="leading" secondItem="bmw-KY-QiL" secondAttribute="leading" id="KmV-tc-CKh"/>
                             <constraint firstItem="8Yv-Ue-Vdl" firstAttribute="leading" secondItem="bmw-KY-QiL" secondAttribute="leading" constant="20" symbolic="YES" id="KqJ-xY-C3H"/>
                             <constraint firstItem="sxK-NV-U1B" firstAttribute="centerY" secondItem="G6s-wj-MI8" secondAttribute="centerY" id="TmT-Lb-uVc"/>
                             <constraint firstAttribute="bottom" secondItem="G6s-wj-MI8" secondAttribute="bottom" constant="20" symbolic="YES" id="UFb-ZN-PNe"/>
                             <constraint firstItem="U82-fb-R5O" firstAttribute="top" secondItem="bmw-KY-QiL" secondAttribute="top" priority="250" id="XKS-36-QPQ" userLabel="Web View Top Constraint"/>
-                            <constraint firstItem="8Yv-Ue-Vdl" firstAttribute="top" secondItem="bmw-KY-QiL" secondAttribute="top" priority="750" constant="11" id="bSp-Oa-gP3"/>
+                            <constraint firstItem="8Yv-Ue-Vdl" firstAttribute="top" secondItem="bmw-KY-QiL" secondAttribute="top" priority="750" constant="17" id="bSp-Oa-gP3"/>
                             <constraint firstAttribute="bottom" secondItem="U82-fb-R5O" secondAttribute="bottom" priority="250" id="c4s-pz-UN4" userLabel="Web View Bottom Constraint"/>
-                            <constraint firstItem="U82-fb-R5O" firstAttribute="top" secondItem="8Yv-Ue-Vdl" secondAttribute="bottom" priority="750" constant="11" id="cNi-TF-lxf"/>
+                            <constraint firstItem="U82-fb-R5O" firstAttribute="top" secondItem="8Yv-Ue-Vdl" secondAttribute="bottom" priority="750" constant="17" id="cNi-TF-lxf"/>
                             <constraint firstItem="G6s-wj-MI8" firstAttribute="top" secondItem="U82-fb-R5O" secondAttribute="bottom" priority="750" constant="20" symbolic="YES" id="cnb-Yj-kSA"/>
+                            <constraint firstAttribute="trailing" secondItem="jZd-Cb-dHL" secondAttribute="trailing" id="mxC-KH-nhS"/>
                             <constraint firstItem="G6s-wj-MI8" firstAttribute="leading" secondItem="sxK-NV-U1B" secondAttribute="trailing" constant="12" symbolic="YES" id="qSp-cN-vIw"/>
+                            <constraint firstItem="jZd-Cb-dHL" firstAttribute="leading" secondItem="bmw-KY-QiL" secondAttribute="leading" id="qWS-f2-lfW"/>
                             <constraint firstAttribute="trailing" secondItem="G6s-wj-MI8" secondAttribute="trailing" constant="20" symbolic="YES" id="sEQ-NO-n8v"/>
                             <constraint firstAttribute="trailing" secondItem="8Yv-Ue-Vdl" secondAttribute="trailing" constant="20" symbolic="YES" id="wYl-TG-vUN"/>
                             <constraint firstAttribute="trailing" secondItem="U82-fb-R5O" secondAttribute="trailing" id="yKV-z2-9eo"/>
                         </constraints>
                     </view>
                     <connections>
+                        <outlet property="backButton" destination="fp8-MS-tYi" id="M6A-EE-ojq"/>
                         <outlet property="bottomConstraint" destination="c4s-pz-UN4" id="XEq-e5-bUs"/>
+                        <outlet property="forwardButton" destination="cA5-O0-Flt" id="vhx-e0-WYG"/>
                         <outlet property="titleLabel" destination="8Yv-Ue-Vdl" id="orD-L3-FqR"/>
-                        <outlet property="topConstraint" destination="XKS-36-QPQ" id="caq-4d-H7E"/>
+                        <outlet property="toolbarContainer" destination="jZd-Cb-dHL" id="tDk-JA-9ov"/>
+                        <outlet property="toolbarTitleLabel" destination="1Cq-eY-R6n" id="U0g-vn-v1C"/>
                         <outlet property="webView" destination="U82-fb-R5O" id="cck-fQ-8FI"/>
                         <outlet property="webViewHeightConstraint" destination="IsO-m7-A1L" id="NQe-Vb-pq1"/>
                         <outlet property="webViewWidthConstraint" destination="uft-ma-W2X" id="DsT-xr-ykd"/>
@@ -148,12 +230,19 @@ DQ
                 </viewController>
                 <customObject id="SMn-kf-CIV" userLabel="First Responder" customClass="NSResponder" sceneMemberID="firstResponder"/>
             </objects>
-            <point key="canvasLocation" x="55" y="2869"/>
+            <point key="canvasLocation" x="82" y="2911"/>
         </scene>
     </scenes>
     <resources>
+        <image name="Back" width="7" height="13"/>
+        <image name="CloseBackground" width="16" height="16"/>
+        <image name="Forward" width="7" height="13"/>
+        <image name="Refresh" width="12" height="15"/>
         <namedColor name="BroswerTabBackgroundColor">
             <color red="1" green="1" blue="1" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+        </namedColor>
+        <namedColor name="ButtonColor">
+            <color red="0.28627450980392155" green="0.28627450980392155" blue="0.28627450980392155" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
         </namedColor>
     </resources>
 </document>
