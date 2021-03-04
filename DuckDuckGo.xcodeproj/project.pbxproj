@@ -219,6 +219,7 @@
 		B61F01E225F0BE0600ABB5A3 /* SnippetTableCellView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B61F01E125F0BE0500ABB5A3 /* SnippetTableCellView.swift */; };
 		B61F01E825F0C9EA00ABB5A3 /* CombineExt in Frameworks */ = {isa = PBXBuildFile; productRef = B61F01E725F0C9EA00ABB5A3 /* CombineExt */; };
 		B61F01ED25F0E55C00ABB5A3 /* ArrayExtension.swift in Sources */ = {isa = PBXBuildFile; fileRef = B61F01EC25F0E55C00ABB5A3 /* ArrayExtension.swift */; };
+		B61F01F525F0E5A500ABB5A3 /* InstantAnswersProvider.swift in Sources */ = {isa = PBXBuildFile; fileRef = B61F01F425F0E5A500ABB5A3 /* InstantAnswersProvider.swift */; };
 		B62EB47C25BAD3BB005745C6 /* WKWebViewSessionDataTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = B62EB47B25BAD3BB005745C6 /* WKWebViewSessionDataTests.swift */; };
 		B633C86D25E797D800E4B352 /* UserScriptsManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = B633C86C25E797D800E4B352 /* UserScriptsManager.swift */; };
 		B63D466925BEB6C200874977 /* WKWebView+SessionState.swift in Sources */ = {isa = PBXBuildFile; fileRef = B63D466825BEB6C200874977 /* WKWebView+SessionState.swift */; };
@@ -480,6 +481,7 @@
 		B61F01DC25F0727600ABB5A3 /* NSEvent+Publisher.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "NSEvent+Publisher.swift"; sourceTree = "<group>"; };
 		B61F01E125F0BE0500ABB5A3 /* SnippetTableCellView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SnippetTableCellView.swift; sourceTree = "<group>"; };
 		B61F01EC25F0E55C00ABB5A3 /* ArrayExtension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ArrayExtension.swift; sourceTree = "<group>"; };
+		B61F01F425F0E5A500ABB5A3 /* InstantAnswersProvider.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InstantAnswersProvider.swift; sourceTree = "<group>"; };
 		B62EB47B25BAD3BB005745C6 /* WKWebViewSessionDataTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = WKWebViewSessionDataTests.swift; sourceTree = "<group>"; };
 		B633C86C25E797D800E4B352 /* UserScriptsManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UserScriptsManager.swift; sourceTree = "<group>"; };
 		B63D466725BEB6C200874977 /* WKWebView+SessionState.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "WKWebView+SessionState.h"; sourceTree = "<group>"; };
@@ -1500,6 +1502,7 @@
 			isa = PBXGroup;
 			children = (
 				B61F01D425EFBCB900ABB5A3 /* SearchResultsProvider.swift */,
+				B61F01F425F0E5A500ABB5A3 /* InstantAnswersProvider.swift */,
 			);
 			path = SearchResultsProvider;
 			sourceTree = "<group>";
@@ -1821,6 +1824,7 @@
 				4B02198E25E05FAC00ED7DEA /* LoginDetectionService.swift in Sources */,
 				AA3F895324C18AD500628DDE /* SuggestionViewModel.swift in Sources */,
 				4B677431255DBEB800025BD8 /* BloomFilterWrapper.mm in Sources */,
+				B61F01F525F0E5A500ABB5A3 /* InstantAnswersProvider.swift in Sources */,
 				B61F01B825EF668F00ABB5A3 /* CommandPaletteViewController.swift in Sources */,
 				B684592725C93C0500DC17B6 /* Publishers.NestedObjectChanges.swift in Sources */,
 				85A011EA25B4D4CA00FA6A0C /* FindInPageUserScript.swift in Sources */,

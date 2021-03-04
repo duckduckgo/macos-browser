@@ -36,6 +36,18 @@ extension URL {
         }
     }
 
+    static func makeInstantAnswersURL(from searchQuery: String) -> URL? {
+        let trimmedQuery = searchQuery.trimmingCharacters(in: .whitespacesAndNewlines)
+        do {
+            return try Self.duckDuckGoAPI
+                .addParameter(name: DuckDuckGoParameters.search.rawValue, value: trimmedQuery)
+                .addParameter(name: DuckDuckGoParameters.format.rawValue, value: "json")
+        } catch let error {
+            os_log("URL extension: %s", type: .error, error.localizedDescription)
+            return nil
+        }
+    }
+
     static func makeSearchUrl(from searchQuery: String) -> URL? {
         let trimmedQuery = searchQuery.trimmingCharacters(in: .whitespacesAndNewlines)
         do {
@@ -138,6 +150,8 @@ extension URL {
         duckDuckGo.appendingPathComponent("ac/")
     }
 
+    static var duckDuckGoAPI = URL(string: "https://api.duckduckgo.com/")!
+
     static var duckDuckGoLink: URL {
         duckDuckGo.appendingPathComponent("l/")
     }
@@ -163,6 +177,7 @@ extension URL {
     enum DuckDuckGoParameters: String {
         case search = "q"
         case uddg = "uddg"
+        case format = "format"
     }
 
     // MARK: - Search

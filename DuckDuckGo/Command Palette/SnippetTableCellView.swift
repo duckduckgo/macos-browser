@@ -33,7 +33,12 @@ final class SnippetTableCellView: NSTableCellView {
     }
 
     func display(_ model: SearchResult) {
-        titleTextField.stringValue = model.title
+        if !model.title.isEmpty {
+            titleTextField.stringValue = model.title
+            titleTextField.isHidden = false
+        } else {
+            titleTextField.isHidden = true
+        }
         if let snippet = model.snippet,
            !snippet.isEmpty {
             snippetTextField.stringValue = snippet
@@ -45,15 +50,19 @@ final class SnippetTableCellView: NSTableCellView {
         let url = model.url.redirectLink.flatMap(URL.init(string:)) ?? model.url
         urlTextField.stringValue = url.absoluteString
 
-        LocalFaviconService.shared.fetchFavicon(model.faviconURL,
-                                                for: url.host!,
-                                                isFromUserScript: false) { [weak self] (image, _) in
-            dispatchPrecondition(condition: .onQueue(.main))
-            guard let self = self,
-                  self.objectValue as? SearchResult == model
-            else { return }
-
+        if let image = model.favicon {
             self.faviconImageView.image = image
+        } else {
+            LocalFaviconService.shared.fetchFavicon(model.faviconURL,
+                                                    for: url.host!,
+                                                    isFromUserScript: false) { [weak self] (image, _) in
+                dispatchPrecondition(condition: .onQueue(.main))
+                guard let self = self,
+                      self.objectValue as? SearchResult == model
+                else { return }
+
+                self.faviconImageView.image = image
+            }
         }
     }
 

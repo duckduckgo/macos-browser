@@ -19,6 +19,7 @@
 import Foundation
 import Combine
 import CombineExt
+import SwiftSoup
 
 public enum Loadable<T> {
     case loading
@@ -83,7 +84,9 @@ final class CommandPaletteViewModel: CommandPaletteViewModelProtocol {
         let publishers: [PublishedSection] = [
             (.currentWindowTabs, activeWindowTabs(matching: predicate)),
             (.otherWindowsTabs, tabs(matching: predicate)),
+            (.bookmarks, bookmarks(for: predicate)),
             (.searchResults, searchResults(for: predicate)),
+            (.instantAnswers, instantAnswers(for: predicate)),
         ]
 
         c = publishers.enumerated()
@@ -157,12 +160,13 @@ final class CommandPaletteViewModel: CommandPaletteViewModelProtocol {
     }
 
     func searchResults(for query: String) -> SectionPublisher {
-        SearchResultsProvider().querySearchResults(for: query)
+        SearchResultsProvider.shared.querySearchResults(for: query)
             .map {
                 $0.first(5) + [
                     SearchResult(title: "More results from DuckDuckGo...",
                                  snippet: nil,
                                  url: .makeHTMLSearchURL(from: query)!,
+                                 favicon: nil,
                                  faviconURL: URL(string: "https://external-content.duckduckgo.com/ip3/duckduckgo.com.ico")!)
                 ]
             }
@@ -176,6 +180,48 @@ final class CommandPaletteViewModel: CommandPaletteViewModelProtocol {
             }
             .multicast(subject: CurrentValueSubject(.loading))
             .autoconnect()
+            .receive(on: DispatchQueue.main)
+            .eraseToAnyPublisher()
+    }
+
+    func instantAnswers(for query: String) -> SectionPublisher {
+        InstantAnswersProvider.shared.queryInstantAnswers(for: query)
+            .replaceError(with: [])
+            .map {
+                .loaded($0.map { model in
+                    let title = (try? SwiftSoup.parse(model.result).select("a").first()?.text()) ?? ""
+                    let snippet = model.text
+                    let iconURL = model.icon.url.isEmpty ? nil : URL(string: model.icon.url, relativeTo: .duckDuckGoAPI)
+                    let searchResult = SearchResult(title: title,
+                                                    snippet: snippet,
+                                                    url: model.url,
+                                                    favicon: nil,
+                                                    faviconURL: iconURL)
+                    return CommandPaletteSuggestion.searchResult(model: searchResult, activate: {
+                        WindowsManager.openNewWindow(with: model.url)
+                    })
+                }.first(5))
+            }
+            .multicast(subject: CurrentValueSubject(.loading))
+            .autoconnect()
+            .receive(on: DispatchQueue.main)
+            .eraseToAnyPublisher()
+    }
+
+    func bookmarks(for query: String) -> SectionPublisher {
+        LocalBookmarkManager.shared.findBookmarks(with: query)
+            .map {
+                .loaded($0.map { bookmark in
+                    let searchResult = SearchResult(title: bookmark.title,
+                                                    snippet: nil,
+                                                    url: bookmark.url,
+                                                    favicon: bookmark.favicon,
+                                                    faviconURL: nil)
+                    return CommandPaletteSuggestion.searchResult(model: searchResult, activate: {
+                        WindowsManager.openNewWindow(with: bookmark.url)
+                    })
+                })
+            }
             .receive(on: DispatchQueue.main)
             .eraseToAnyPublisher()
     }

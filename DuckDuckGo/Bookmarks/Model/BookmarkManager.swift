@@ -18,6 +18,7 @@
 
 import Cocoa
 import os.log
+import Combine
 
 protocol BookmarkManager: AnyObject {
 
@@ -64,6 +65,20 @@ class LocalBookmarkManager: BookmarkManager {
 
     func getBookmark(for url: URL) -> Bookmark? {
         return list[url]
+    }
+
+    func findBookmarks(with predicate: String) -> Future<[Bookmark], Never> {
+        Future { [bookmarks=list.bookmarks()] promise in
+            DispatchQueue.global().async {
+                let filtered = bookmarks.filter {
+                    let options: String.CompareOptions = [.caseInsensitive, .diacriticInsensitive]
+
+                    return $0.title.range(of: predicate, options: options, locale: .current) != nil
+                        || $0.url.absoluteString.range(of: predicate, options: options, locale: .current) != nil
+                }
+                promise(.success(filtered))
+            }
+        }
     }
 
     @discardableResult func makeBookmark(for url: URL, title: String, favicon: NSImage?) -> Bookmark? {

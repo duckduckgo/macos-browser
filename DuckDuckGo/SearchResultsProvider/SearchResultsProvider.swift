@@ -24,6 +24,7 @@ struct SearchResult: Equatable {
     let title: String
     let snippet: String?
     let url: URL
+    let favicon: NSImage?
     let faviconURL: URL?
 }
 enum SearchError: Error {
@@ -61,6 +62,7 @@ final class SearchResultsProvider {
                     return SearchResult(title: title!,
                                         snippet: snippet,
                                         url: url!,
+                                        favicon: nil,
                                         faviconURL: faviconURL)
                 }
 

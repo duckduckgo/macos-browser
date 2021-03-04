@@ -115,7 +115,7 @@
                                                             <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                                             <subviews>
                                                                 <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="e0X-Sn-u3A">
-                                                                    <rect key="frame" x="8" y="0.0" width="38" height="16"/>
+                                                                    <rect key="frame" x="8" y="4" width="38" height="16"/>
                                                                     <textFieldCell key="cell" lineBreakMode="clipping" title="Label" id="P5B-93-CkU">
                                                                         <font key="font" metaFont="systemMedium" size="13"/>
                                                                         <color key="textColor" name="labelColor" catalog="System" colorSpace="catalog"/>
@@ -129,7 +129,7 @@
                                                             <constraints>
                                                                 <constraint firstItem="e0X-Sn-u3A" firstAttribute="leading" secondItem="nGS-t5-BzT" secondAttribute="leading" constant="10" id="jWB-pd-twE"/>
                                                                 <constraint firstAttribute="trailing" relation="greaterThanOrEqual" secondItem="e0X-Sn-u3A" secondAttribute="trailing" constant="8" id="swo-O2-42a"/>
-                                                                <constraint firstItem="e0X-Sn-u3A" firstAttribute="top" secondItem="nGS-t5-BzT" secondAttribute="top" constant="8" id="wsN-EN-zir"/>
+                                                                <constraint firstItem="e0X-Sn-u3A" firstAttribute="centerY" secondItem="nGS-t5-BzT" secondAttribute="centerY" id="yDy-lW-ecz"/>
                                                             </constraints>
                                                         </tableCellView>
                                                         <tableCellView identifier="SectionRow" id="KFn-mT-YIS" userLabel="Section Row" customClass="NSTableRowView">
@@ -273,7 +273,7 @@
                                                             <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                                             <subviews>
                                                                 <progressIndicator wantsLayer="YES" maxValue="100" indeterminate="YES" controlSize="small" style="spinning" translatesAutoresizingMaskIntoConstraints="NO" id="ahm-Jp-a74">
-                                                                    <rect key="frame" x="16" y="0.0" width="16" height="16"/>
+                                                                    <rect key="frame" x="219" y="0.0" width="16" height="16"/>
                                                                     <connections>
                                                                         <binding destination="JJZ-Vd-NUH" name="animate" keyPath="self" id="aHX-1V-FZz">
                                                                             <dictionary key="options">
@@ -285,7 +285,7 @@
                                                             </subviews>
                                                             <constraints>
                                                                 <constraint firstAttribute="bottom" secondItem="ahm-Jp-a74" secondAttribute="bottom" id="2pE-b4-ZWY"/>
-                                                                <constraint firstItem="ahm-Jp-a74" firstAttribute="leading" secondItem="JJZ-Vd-NUH" secondAttribute="leading" constant="16" id="rEZ-6L-71t"/>
+                                                                <constraint firstItem="ahm-Jp-a74" firstAttribute="centerX" secondItem="JJZ-Vd-NUH" secondAttribute="centerX" id="Ob6-iN-ZXT"/>
                                                             </constraints>
                                                         </tableCellView>
                                                     </prototypeCellViews>

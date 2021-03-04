@@ -47,6 +47,8 @@ struct CommandPaletteSection {
         case currentWindowTabs = "Active Window"
         case otherWindowsTabs = "All Tabs"
         case searchResults = "DuckDuckGo Search Results"
+        case instantAnswers = "Instant Answers"
+        case bookmarks = "Bookmarks"
     }
 
     let section: Section
@@ -145,10 +147,8 @@ final class CommandPaletteViewController: NSViewController {
     }
 
     private func bind() {
-        guard let model = model else {
-            cancellables = []
-            return
-        }
+        cancellables = []
+        guard let model = model else { return }
 
         model.suggestionsPublisher.combineLatest(model.isLoadingPublisher).map {
             $0.0.reduce(into: [Object]()) {
