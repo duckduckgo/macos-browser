@@ -29,6 +29,7 @@ class UserScripts {
     let contentBlockerScript = ContentBlockerUserScript()
     let contentBlockerRulesScript = ContentBlockerRulesUserScript()
     let debugScript = DebugUserScript()
+    let linkHoverUserScript = LinkHoverUserScript()
 
     init() {
     }
@@ -46,7 +47,8 @@ class UserScripts {
         self.findInPageScript,
         self.loginDetectionUserScript,
         self.contentBlockerScript,
-        self.contentBlockerRulesScript
+        self.contentBlockerRulesScript,
+        self.linkHoverUserScript
     ]
 
     lazy var scripts = userScripts.map { $0.makeWKUserScript() }

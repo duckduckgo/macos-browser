@@ -51,6 +51,13 @@ class WebView: WKWebView {
 
         updateActionsAndTitles(menu.items)
 
+        menu.insertItemBeforeItemWithIdentifier("WKMenuItemIdentifierOpenLink",
+                        title: "Preview Link",
+                        target: uiDelegate,
+                        selector: #selector(ImageMenuItemSelectors.previewLink(_:)))
+
+        menu.insertSeparatorBeforeItemWithIdentifier("WKMenuItemIdentifierOpenLink")
+
         menu.insertItemBeforeItemWithIdentifier("WKMenuItemIdentifierOpenImageInNewWindow",
                                                 title: UserText.openImageInNewTab,
                                                 target: uiDelegate,

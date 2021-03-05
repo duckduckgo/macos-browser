@@ -33,7 +33,17 @@ protocol TabDelegate: class {
 
 }
 
-final class Tab: NSObject {
+final class Tab: NSObject, LinkHoverUserScriptDelegate {
+
+    func mouseDidEnter(_: LinkHoverUserScript, link: String) {
+        self.currentHoveredLink = link
+    }
+
+    func mouseDidExit(_: LinkHoverUserScript, link: String) {
+        self.currentHoveredLink = nil
+    }
+
+    var currentHoveredLink: String?
 
     weak var delegate: TabDelegate?
 
@@ -59,6 +69,7 @@ final class Tab: NSObject {
         configuration.applyStandardConfiguration()
 
         webView = WebView(frame: CGRect.zero, configuration: configuration)
+        webView.allowsLinkPreview = false
 
         super.init()
 
@@ -225,10 +236,10 @@ final class Tab: NSObject {
 
     private func subscribeToOpenExternalUrlEvents() {
         openExternalUrlEventsCancellable = externalUrlHandler.openExternalUrlPublisher.sink { [weak self] in
-            if let self = self {
-                self.delegate?.tab(self, requestedOpenExternalURL: $0, forUserEnteredURL: self.userEnteredUrl)
-            }
-        }
+             if let self = self {
+                 self.delegate?.tab(self, requestedOpenExternalURL: $0, forUserEnteredURL: self.userEnteredUrl)
+             }
+         }
     }
 
     // MARK: - Favicon
@@ -272,6 +283,7 @@ final class Tab: NSObject {
             userScripts.loginDetectionUserScript.delegate = self
             userScripts.contentBlockerScript.delegate = self
             userScripts.contentBlockerRulesScript.delegate = self
+            userScripts.linkHoverUserScript.delegate = self
 
             attachFindInPage()
 
