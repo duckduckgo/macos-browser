@@ -28,7 +28,7 @@ final class CommandPaletteWindow: NSPanel {
     }
 }
 
-enum CommandPaletteSuggestion {
+enum CommandPaletteSuggestion: Equatable {
     case tab(model: TabViewModel, activate: () -> Void)
     case searchResult(model: SearchResult, activate: () -> Void)
 
@@ -38,6 +38,17 @@ enum CommandPaletteSuggestion {
             activate()
         case .searchResult(model: _, activate: let activate):
             activate()
+        }
+    }
+
+    static func == (lhs: CommandPaletteSuggestion, rhs: CommandPaletteSuggestion) -> Bool {
+        switch (lhs, rhs) {
+        case (.tab(model: let model1, activate: _), .tab(let model2, _)):
+            return model1.tab == model2.tab
+        case (.searchResult(model: let model1, activate: _), .searchResult(model: let model2, activate: _)):
+            return model1 == model2
+        case (.tab, _), (.searchResult, _):
+            return false
         }
     }
 }
@@ -61,6 +72,7 @@ struct CommandPaletteSection {
 protocol CommandPaletteViewModelProtocol {
     var userInput: PassthroughSubject<String, Never> { get }
     var suggestionsPublisher: AnyPublisher<[CommandPaletteSection], Never> { get }
+    var isLoading: Bool { get }
     var isLoadingPublisher: AnyPublisher<Bool, Never> { get }
 }
 
@@ -145,9 +157,25 @@ final class CommandPaletteViewController: NSViewController {
     override func viewDidAppear() {
         textField.makeMeFirstResponder()
         NotificationCenter.default
-            .publisher(for: NSWindow.didResignKeyNotification, object: self.view.window!)
-            .sink { [weak self] _ in
-                self?.hide()
+            .publisher(for: NSWindow.didBecomeKeyNotification)
+            .sink { [weak self] notification in
+                guard let self = self,
+                      let window = notification.object as? NSWindow,
+                      window !== self.view.window
+                else { return }
+
+                if window.nextResponder is LinkPreviewWindowController,
+                   self.linkPreviewViewController != nil {
+
+                    // Link Preview Controller detached
+                    self.linkPreviewViewController = nil
+                    // bring focus back
+                    self.view.window?.makeKeyAndOrderFront(nil)
+
+                } else if self.linkPreviewViewController == nil {
+                    self.hide()
+                }
+
             }.store(in: &self.cancellables)
     }
 
@@ -186,6 +214,9 @@ final class CommandPaletteViewController: NSViewController {
     }
 
     func hide() {
+        self.linkPreviewViewController?.dismiss(nil)
+        self.tooltipWindowController?.tooltipViewController.dismiss(nil)
+
         self.view.window?.parent?.removeChildWindow(self.view.window!)
         self.view.window?.orderOut(nil)
         self.representedObject = nil
@@ -212,10 +243,16 @@ final class CommandPaletteViewController: NSViewController {
     override func mouseMoved(with event: NSEvent) {
         selectRow(at: event.locationInWindow)
     }
-    
+
+    override func mouseExited(with event: NSEvent) {
+
+    }
+
     func mouseDown(_ output: NSEvent.LocalEvents.Output) {
-        guard output.event.window !== view.window else {
+        if output.event.window === view.window {
             output.handled()
+            return
+        } else if output.event.window?.contentViewController is LinkPreviewViewController {
             return
         }
 
@@ -234,9 +271,96 @@ final class CommandPaletteViewController: NSViewController {
         output.handled()
     }
 
+    var linkPreviewViewController: LinkPreviewViewController?
+    private func displayLinkPreview(for url: URL, from rect: CGRect) {
+        guard model?.isLoading == false,
+              let parent = self.view.window?.parent?.contentViewController
+        else { return }
+
+        linkPreviewViewController?.dismiss(nil)
+        tooltipWindowController?.tooltipViewController.dismiss(nil)
+
+        let controller = LinkPreviewViewController.create(for: url)
+        controller.delegate = self
+        self.linkPreviewViewController = controller
+
+        let flipped = view.convert(rect, from: tableView)
+        let converted = view.convert(flipped, to: nil)
+        let screen = view.window!.convertToScreen(converted)
+        let windowRect = parent.view.window!.convertFromScreen(screen)
+        let targetRect = parent.view.convert(windowRect, from: nil)
+
+        parent.present(controller, asPopoverRelativeTo: targetRect, of: parent.view, preferredEdge: .maxX, behavior: .transient)
+
+        previewMatchesSelection = true
+    }
+
+    private var tooltipWindowController: TooltipWindowController?
+
+    func showTooltip(for tabViewModel: TabViewModel, from rect: CGRect) {
+//        if tooltipWindowController == nil {
+//            tooltipWindowController = { () -> TooltipWindowController in
+//                // swiftlint:disable force_cast
+//                let storyboard = NSStoryboard(name: "Tooltip", bundle: nil)
+//                return storyboard.instantiateController(withIdentifier: "TooltipWindowController") as! TooltipWindowController
+//                // swiftlint:enable force_cast
+//            }()
+//        }
+//        linkPreviewViewController?.dismiss(nil)
+//        tooltipWindowController!.tooltipViewController.dismiss(nil)
+//
+//        tooltipWindowController!.tooltipViewController.display(tabViewModel: tabViewModel)
+//
+//        self.present(tooltipWindowController!.tooltipViewController, asPopoverRelativeTo: rect, of: tableView, preferredEdge: .maxX, behavior: .transient)
+    }
+
+    var previewMatchesSelection = false
+    func displayPreviewAfterDelay(forItemAt index: Int) {
+        previewMatchesSelection = false
+        guard objects?.indices.contains(index) == true,
+            case .suggestion(let suggestion) = objects![index]
+        else { return }
+
+        DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) { [weak self] in
+            guard let self = self,
+                  self.tableView.selectedRow == index,
+                  case .suggestion(suggestion) = self.objects![index]
+            else { return }
+
+            let rect = self.tableView.rect(ofRow: index)
+            switch suggestion {
+            case .searchResult(model: let searchResult, activate: _):
+                guard let url = searchResult.url else { break }
+
+                self.displayLinkPreview(for: url, from: rect)
+
+            case .tab(model: let model, activate: _):
+                self.showTooltip(for: model, from: rect)
+            }
+        }
+    }
+
+    var selectedSuggestion: CommandPaletteSuggestion?
     func select(at index: Int) {
+        guard objects?.indices.contains(index) == true,
+              case .suggestion(let suggestion) = objects![index]
+        else {
+            linkPreviewViewController?.dismiss(nil)
+            tooltipWindowController?.tooltipViewController.dismiss(nil)
+            tableView.deselectAll(nil)
+            selectedSuggestion = nil
+            return
+        }
+        if case .suggestion(selectedSuggestion) = objects![index],
+           tableView.selectedRow == index {
+            return
+        }
+
+        self.selectedSuggestion = suggestion
         tableView.selectRowIndexes(IndexSet(arrayLiteral: index), byExtendingSelection: false)
         tableView.scrollRowToVisible(index)
+
+        displayPreviewAfterDelay(forItemAt: index)
     }
 
     private func selectRow(at point: NSPoint) {
@@ -248,7 +372,10 @@ final class CommandPaletteViewController: NSViewController {
     func selectNextIfPossible(after: Int? = nil) {
         guard let objects = objects,
               !objects.isEmpty
-        else { return }
+        else {
+            select(at: -1)
+            return
+        }
 
         let after = after ?? tableView.selectedRow
         var index = after
@@ -297,6 +424,16 @@ final class CommandPaletteViewController: NSViewController {
         defer {
             hide()
         }
+
+        if previewMatchesSelection,
+           let previewController = self.linkPreviewViewController,
+           previewController.presentingViewController != nil {
+
+            previewController.pinToScreen(nil)
+
+            return
+        }
+
         guard let objects = objects,
               objects.indices.contains(tableView.selectedRow)
             else { return }
@@ -409,6 +546,30 @@ extension CommandPaletteViewController: NSTextFieldDelegate {
         }
     }
 
+}
+
+extension CommandPaletteViewController: LinkPreviewViewControllerDelegate {
+    func linkPreviewViewController(_ controller: LinkPreviewViewController, requestedNewTab url: URL?) {
+        WindowControllersManager.shared.lastKeyMainWindowController?.mainViewController!.browserTabViewController?
+            .openNewTab(with: url, selected: true)
+            ?? {
+                if let url = url {
+                    WindowsManager.openNewWindow(with: url)
+                } else {
+                    WindowsManager.openNewWindow()
+                }
+            }()
+    }
+    func linkPreviewViewController(_ controller: LinkPreviewViewController, willDetachWindow window: NSWindow) {
+//        var observer: NSKeyValueObservation?
+//        observer = window.observe(\.isKeyWindow) { window, _ in
+//            if window.isKeyWindow, let _ = observer {
+//                self.view.window?.makeKeyAndOrderFront(nil)
+//                observer = nil
+//            }
+//        }
+//        self.linkPreviewViewController = nil
+    }
 }
 
 private extension NSUserInterfaceItemIdentifier {

@@ -40,8 +40,12 @@ extension Loadable {
 
 final class CommandPaletteViewModel: CommandPaletteViewModelProtocol {
 
-    @Published private var isLoading: Bool = false
+    @Published var isLoading: Bool = false
     @Published private var suggestions = [CommandPaletteSection]()
+    
+    var isLoadingPublisher: AnyPublisher<Bool, Never> {
+        $isLoading.eraseToAnyPublisher()
+    }
 
     private var isLoadingAndSuggestions: (Bool, [CommandPaletteSection]) {
         get {
@@ -55,9 +59,6 @@ final class CommandPaletteViewModel: CommandPaletteViewModelProtocol {
 
     var suggestionsPublisher: AnyPublisher<[CommandPaletteSection], Never> {
         $suggestions.eraseToAnyPublisher()
-    }
-    var isLoadingPublisher: AnyPublisher<Bool, Never> {
-        $isLoading.eraseToAnyPublisher()
     }
     var userInput: PassthroughSubject<String, Never> = .init()
 

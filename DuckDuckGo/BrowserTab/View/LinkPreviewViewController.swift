@@ -108,7 +108,7 @@ class LinkPreviewViewController: NSViewController, NSPopoverDelegate {
         webView.load(initialURL)
     }
 
-    @IBAction func pinToScreen(_ sender: NSButton) {
+    @IBAction func pinToScreen(_ sender: NSButton?) {
         guard let popoverWindowFrame = self.view.window?.frame else { return }
 
         let controller = createDetachedWindowController()

@@ -145,7 +145,7 @@ class BrowserTabViewController: NSViewController, LinkPreviewViewControllerDeleg
         webView.isHidden = shown
     }
 
-    private func openNewTab(with url: URL?, selected: Bool = false) {
+    func openNewTab(with url: URL?, selected: Bool = false) {
         let tab = Tab(url: url, shouldLoadInBackground: true)
         tabCollectionViewModel.append(tab: tab, selected: selected)
     }

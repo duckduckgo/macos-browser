@@ -18,6 +18,18 @@
 
 import Foundation
 
+class LinkPreviewWindow: NSPanel {
+    override func awakeFromNib() {
+        super.awakeFromNib()
+
+        self.becomesKeyOnlyIfNeeded = true
+    }
+
+    override var canBecomeKey: Bool {
+        true
+    }
+}
+
 class LinkPreviewWindowController: NSWindowController, NSWindowDelegate {
 
     private var canGoBack: Bool = false
