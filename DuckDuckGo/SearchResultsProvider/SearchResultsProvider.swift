@@ -23,7 +23,7 @@ import SwiftSoup
 struct SearchResult: Equatable {
     let title: String
     let snippet: String?
-    let url: URL
+    let url: URL?
     let favicon: NSImage?
     let faviconURL: URL?
 }

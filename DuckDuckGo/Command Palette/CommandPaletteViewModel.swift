@@ -74,6 +74,49 @@ final class CommandPaletteViewModel: CommandPaletteViewModelProtocol {
     typealias SectionPublisher = AnyPublisher<Loadable<[CommandPaletteSuggestion]>, Never>
     typealias PublishedSection = (section: CommandPaletteSection.Section, publisher: SectionPublisher)
 
+    private let commands: [String: [CommandPaletteSection.Section]] = [
+        "d": [.searchResults],
+        "b": [.bookmarks],
+        "c": [.currentWindowTabs],
+        "o": [.otherWindowsTabs],
+        "f": [.currentWindowTabs, .otherWindowsTabs],
+        "q": [.instantAnswers],
+
+        "h": [.help],
+        "help": [.help],
+
+        "dev": [.inspector],
+        "ins": [.inspector],
+
+        "gg": [.copyURL]
+    ]
+
+    private let hiddenCommands: Set<CommandPaletteSection.Section> = [
+        .help,
+        .inspector
+    ]
+
+    private func publisher(for section: CommandPaletteSection.Section, matching predicate: String) -> SectionPublisher {
+        switch section {
+        case .help:
+            return helpSection()
+        case .currentWindowTabs:
+            return activeWindowTabs(matching: predicate)
+        case .otherWindowsTabs:
+            return tabs(matching: predicate)
+        case .bookmarks:
+            return bookmarks(for: predicate)
+        case .searchResults:
+            return searchResults(for: predicate)
+        case .instantAnswers:
+            return instantAnswers(for: predicate)
+        case .inspector:
+            return inspector()
+        case .copyURL:
+            return copyPageAddress()
+        }
+    }
+
     private func userInputUpdated(_ predicate: String) {
         var predicate = predicate.trimmingWhitespaces()
         guard !predicate.isEmpty else {
@@ -82,34 +125,20 @@ final class CommandPaletteViewModel: CommandPaletteViewModelProtocol {
             return
         }
 
-        let commands: [String: CommandPaletteSection.Section] = [
-            "h": .help,
-            "help": .help
-        ]
-        let hiddenCommands: Set<CommandPaletteSection.Section> = [
-            .help
-        ]
-
-        var filteredSections = Set(CommandPaletteSection.Section.allCases).subtracting(hiddenCommands)
+        var filteredSections = CommandPaletteSection.Section.allCases.filter { !hiddenCommands.contains($0) }
 
         if predicate.hasPrefix(":") {
             let endIdx = predicate.firstIndex(of: " ") ?? predicate.endIndex
             let cmd = String(predicate[predicate.index(after: predicate.startIndex)..<endIdx])
-            if !cmd.isEmpty, let section = commands[cmd] {
-                filteredSections = [section]
+            if !cmd.isEmpty, let sections = commands[cmd] {
+                filteredSections = sections
+                predicate = endIdx < predicate.endIndex ? String(predicate[endIdx...]).trimmingWhitespaces() : ""
             }
         }
-        func shouldInclude(_ item: PublishedSection) -> Bool {
-            filteredSections.contains(item.section)
+
+        let publishers: [PublishedSection] = filteredSections.map {
+            ($0, publisher(for: $0, matching: predicate))
         }
-        let publishers: [PublishedSection] = [
-            (.help, helpSection()),
-            (.currentWindowTabs, activeWindowTabs(matching: predicate)),
-            (.otherWindowsTabs, tabs(matching: predicate)),
-            (.bookmarks, bookmarks(for: predicate)),
-            (.searchResults, searchResults(for: predicate)),
-            (.instantAnswers, instantAnswers(for: predicate))
-        ].filter(shouldInclude)
 
         c = publishers
             .map(\.publisher)
@@ -124,8 +153,11 @@ final class CommandPaletteViewModel: CommandPaletteViewModelProtocol {
             }
             .weakAssign(to: \.isLoadingAndSuggestions, on: self)
     }
+}
 
-    private func filterTabs(matching predicate: String) -> (MainWindowController) -> [CommandPaletteSuggestion] {
+private extension CommandPaletteViewModel {
+    
+    func filterTabs(matching predicate: String) -> (MainWindowController) -> [CommandPaletteSuggestion] {
         { windowController in
 
             let model = windowController.mainViewController!.tabCollectionViewModel
@@ -184,11 +216,52 @@ final class CommandPaletteViewModel: CommandPaletteViewModelProtocol {
     func helpSection() -> SectionPublisher {
         let model = SearchResult(title: "Show Commands Help",
                                  snippet: nil,
-                                 url: Bundle.main.url(forResource: "command_help", withExtension: "html")!,
+                                 url: nil,
                                  favicon: nil,
                                  faviconURL: URL(string: "https://external-content.duckduckgo.com/ip3/duckduckgo.com.ico")!)
         return Just(.loaded([CommandPaletteSuggestion.searchResult(model: model, activate: {
-            WindowsManager.openNewWindow(with: model.url)
+            WindowsManager.openNewWindow(with: Bundle.main.url(forResource: "command_help", withExtension: "html")!)
+        })])).eraseToAnyPublisher()
+    }
+
+    func inspector() -> SectionPublisher {
+        let model = SearchResult(title: "Show Page Inspector",
+                                 snippet: nil,
+                                 url: nil,
+                                 favicon: nil,
+                                 faviconURL: nil)
+        return Just(.loaded([CommandPaletteSuggestion.searchResult(model: model, activate: {
+            guard let inspector = WindowControllersManager.shared.lastKeyMainWindowController?.mainViewController?
+                .tabCollectionViewModel
+                .selectedTabViewModel?
+                .tab
+                .webView
+                .value(forKey: "inspector") as? NSObject
+            else { return }
+
+            inspector.perform(Selector(("show")))
+        })])).eraseToAnyPublisher()
+    }
+
+    func copyPageAddress() -> SectionPublisher {
+        guard let url = WindowControllersManager.shared.lastKeyMainWindowController?.mainViewController?
+            .tabCollectionViewModel
+            .selectedTabViewModel?
+            .tab
+            .url
+        else { return Just(.loaded([])).eraseToAnyPublisher() }
+
+        let model = SearchResult(title: "Copy Page Address",
+                                 snippet: nil,
+                                 url: url,
+                                 favicon: nil,
+                                 faviconURL: nil)
+        return Just(.loaded([CommandPaletteSuggestion.searchResult(model: model, activate: {
+
+            let pasteboard = NSPasteboard.general
+            pasteboard.declareTypes([.URL], owner: nil)
+            (url as NSURL).write(to: pasteboard)
+
         })])).eraseToAnyPublisher()
     }
 
@@ -207,7 +280,7 @@ final class CommandPaletteViewModel: CommandPaletteViewModelProtocol {
             .map {
                 .loaded($0.map { model in
                     CommandPaletteSuggestion.searchResult(model: model, activate: {
-                        WindowsManager.openNewWindow(with: model.url)
+                        WindowsManager.openNewWindow(with: model.url!)
                     })
                 })
             }

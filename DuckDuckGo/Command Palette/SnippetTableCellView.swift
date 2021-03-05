@@ -47,14 +47,19 @@ final class SnippetTableCellView: NSTableCellView {
             snippetTextField.isHidden = true
         }
 
-        let url = model.url.redirectLink.flatMap(URL.init(string:)) ?? model.url
-        urlTextField.stringValue = url.absoluteString
+        let url = model.url?.redirectLink.flatMap(URL.init(string:)) ?? model.url
+        if let url = url {
+            urlTextField.stringValue = url.absoluteString
+            urlTextField.isHidden = false
+        } else {
+            urlTextField.isHidden = true
+        }
 
         if let image = model.favicon {
             self.faviconImageView.image = image
-        } else if url.host != nil || model.faviconURL?.host != nil {
+        } else if url?.host != nil || model.faviconURL?.host != nil {
             LocalFaviconService.shared.fetchFavicon(model.faviconURL,
-                                                    for: url.host ?? model.faviconURL!.host!,
+                                                    for: url?.host ?? model.faviconURL!.host!,
                                                     isFromUserScript: false) { [weak self] (image, _) in
                 dispatchPrecondition(condition: .onQueue(.main))
                 guard let self = self,

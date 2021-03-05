@@ -47,9 +47,12 @@ struct CommandPaletteSection {
         case help = "Help"
         case currentWindowTabs = "Active Window"
         case otherWindowsTabs = "All Tabs"
+        case bookmarks = "Bookmarks"
         case searchResults = "DuckDuckGo Search Results"
         case instantAnswers = "Instant Answers"
-        case bookmarks = "Bookmarks"
+
+        case inspector = "Developer Tools"
+        case copyURL = "Copy URL"
     }
 
     let section: Section
