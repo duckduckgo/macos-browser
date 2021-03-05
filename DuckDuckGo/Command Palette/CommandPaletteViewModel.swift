@@ -168,7 +168,20 @@ final class CommandPaletteViewModel: CommandPaletteViewModelProtocol {
 }
 
 private extension CommandPaletteViewModel {
-    
+
+    func open(_ url: URL) {
+        if NSApp.currentEvent?.modifierFlags.contains(.command) == true {
+            if !NSApp.currentEvent!.modifierFlags.contains(.shift),
+               let controller = WindowControllersManager.shared.lastKeyMainWindowController?.mainViewController?.browserTabViewController {
+                controller.openNewTab(with: url, selected: true)
+            } else {
+                WindowsManager.openNewWindow(with: url)
+            }
+        } else {
+            LinkPreviewViewController.create(for: url).pinToScreen(nil)
+        }
+    }
+
     func filterTabs(matching predicate: String) -> (MainWindowController) -> [CommandPaletteSuggestion] {
         { windowController in
 
@@ -226,13 +239,14 @@ private extension CommandPaletteViewModel {
     }
 
     func helpSection() -> SectionPublisher {
+        let url = Bundle.main.url(forResource: "command_help", withExtension: "html")!
         let model = SearchResult(title: "Show Commands Help",
                                  snippet: nil,
-                                 url: nil,
+                                 url: url,
                                  favicon: nil,
                                  faviconURL: URL(string: "https://external-content.duckduckgo.com/ip3/duckduckgo.com.ico")!)
         return Just(.loaded([CommandPaletteSuggestion.searchResult(model: model, activate: {
-            WindowsManager.openNewWindow(with: Bundle.main.url(forResource: "command_help", withExtension: "html")!)
+            LinkPreviewViewController.create(for: url).pinToScreen(nil)
         })])).eraseToAnyPublisher()
     }
 
@@ -291,9 +305,7 @@ private extension CommandPaletteViewModel {
             .replaceError(with: [])
             .map {
                 .loaded($0.map { model in
-                    CommandPaletteSuggestion.searchResult(model: model, activate: {
-                        WindowsManager.openNewWindow(with: model.url!)
-                    })
+                    CommandPaletteSuggestion.searchResult(model: model, activate: { self.open(model.url!) })
                 })
             }
             .multicast(subject: CurrentValueSubject(.loading))
@@ -315,9 +327,7 @@ private extension CommandPaletteViewModel {
                                                     url: model.url,
                                                     favicon: nil,
                                                     faviconURL: iconURL)
-                    return CommandPaletteSuggestion.searchResult(model: searchResult, activate: {
-                        WindowsManager.openNewWindow(with: model.url)
-                    })
+                    return CommandPaletteSuggestion.searchResult(model: searchResult, activate: { self.open(model.url) })
                 }.first(5))
             }
             .multicast(subject: CurrentValueSubject(.loading))
@@ -335,9 +345,7 @@ private extension CommandPaletteViewModel {
                                                     url: bookmark.url,
                                                     favicon: bookmark.favicon,
                                                     faviconURL: nil)
-                    return CommandPaletteSuggestion.searchResult(model: searchResult, activate: {
-                        WindowsManager.openNewWindow(with: bookmark.url)
-                    })
+                    return CommandPaletteSuggestion.searchResult(model: searchResult, activate: { self.open(bookmark.url) })
                 })
             }
             .receive(on: DispatchQueue.main)

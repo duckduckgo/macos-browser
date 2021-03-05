@@ -109,10 +109,10 @@ class LinkPreviewViewController: NSViewController, NSPopoverDelegate {
     }
 
     @IBAction func pinToScreen(_ sender: NSButton?) {
-        guard let popoverWindowFrame = self.view.window?.frame else { return }
-
         let controller = createDetachedWindowController()
-        controller.window?.setFrame(popoverWindowFrame, display: false)
+        self.view.window.map { popoverWindow in
+            controller.window?.setFrame(popoverWindow.frame, display: false)
+        }
         controller.showWindow(self)
 
         presentingViewController?.dismiss(self)

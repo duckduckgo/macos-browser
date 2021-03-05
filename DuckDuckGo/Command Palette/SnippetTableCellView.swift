@@ -48,7 +48,7 @@ final class SnippetTableCellView: NSTableCellView {
         }
 
         let url = model.url?.redirectLink.flatMap(URL.init(string:)) ?? model.url
-        if let url = url {
+        if let url = url, url.scheme != "file" {
             urlTextField.stringValue = url.absoluteString
             urlTextField.isHidden = false
         } else {

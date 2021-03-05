@@ -366,6 +366,9 @@ final class CommandPaletteViewController: NSViewController {
     private func selectRow(at point: NSPoint) {
         let flippedPoint = view.convert(point, to: tableView)
         let row = tableView.row(at: flippedPoint)
+        guard objects?.indices.contains(row) == true,
+              case .suggestion = objects![row]
+        else { return }
         select(at: row)
     }
 
