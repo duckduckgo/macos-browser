@@ -27,9 +27,8 @@ extension URL {
 
         let trimmedQuery = searchQuery.trimmingCharacters(in: .whitespacesAndNewlines)
         do {
-            var searchUrl = Self.duckDuckGo.appendingPathComponent("html")
-            searchUrl = try searchUrl.addParameter(name: DuckDuckGoParameters.search.rawValue, value: trimmedQuery)
-            return searchUrl
+            return try Self.htmlDuckDuckGo
+                .addParameter(name: DuckDuckGoParameters.search.rawValue, value: trimmedQuery)
         } catch let error {
             os_log("URL extension: %s", type: .error, error.localizedDescription)
             return nil
@@ -145,6 +144,9 @@ extension URL {
     static var duckDuckGo: URL {
         let duckDuckGoUrlString = "https://duckduckgo.com/"
         return URL(string: duckDuckGoUrlString)!
+    }
+    static var htmlDuckDuckGo: URL {
+        URL(string: "https://html.duckduckgo.com/html")!
     }
 
     static var duckDuckGoAutocomplete: URL {

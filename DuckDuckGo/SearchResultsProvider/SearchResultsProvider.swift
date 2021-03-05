@@ -39,7 +39,9 @@ final class SearchResultsProvider {
 
     func querySearchResults(for searchQuery: String) -> AnyPublisher<[SearchResult], SearchError> {
         let url = URL.makeHTMLSearchURL(from: searchQuery)!
-        let request = URLRequest(url: url)
+        var request = URLRequest.defaultRequest(with: url)
+        request.setValue("Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_6) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/14.0.3 Safari/605.1.15",
+                         forHTTPHeaderField: URLRequest.HeaderKey.userAgent.rawValue)
         return SharedURLSessionDataTaskProvider()
             .dataTaskPublisher(for: request)
             .tryMap { result -> Document in
