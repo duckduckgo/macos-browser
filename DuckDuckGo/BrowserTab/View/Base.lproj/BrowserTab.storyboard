@@ -83,6 +83,9 @@
                                     <rect key="frame" x="0.0" y="0.0" width="430" height="50"/>
                                     <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                     <subviews>
+                                        <visualEffectView blendingMode="behindWindow" material="titlebar" state="followsWindowActiveState" translatesAutoresizingMaskIntoConstraints="NO" id="QiW-G6-OKQ">
+                                            <rect key="frame" x="0.0" y="0.0" width="430" height="50"/>
+                                        </visualEffectView>
                                         <button translatesAutoresizingMaskIntoConstraints="NO" id="rVZ-TB-0GK" userLabel="Close Button">
                                             <rect key="frame" x="20" y="18" width="14" height="14"/>
                                             <constraints>
@@ -143,11 +146,15 @@
                                         <constraint firstItem="cA5-O0-Flt" firstAttribute="centerY" secondItem="zZY-qC-UIE" secondAttribute="centerY" id="86x-rV-VDe"/>
                                         <constraint firstItem="cA5-O0-Flt" firstAttribute="leading" secondItem="fp8-MS-tYi" secondAttribute="trailing" constant="20" id="8C8-ga-pq0"/>
                                         <constraint firstItem="fp8-MS-tYi" firstAttribute="leading" secondItem="rVZ-TB-0GK" secondAttribute="trailing" constant="20" id="AnR-dY-ZjL"/>
+                                        <constraint firstAttribute="trailing" secondItem="QiW-G6-OKQ" secondAttribute="trailing" id="EkB-2m-0E7"/>
+                                        <constraint firstAttribute="bottom" secondItem="QiW-G6-OKQ" secondAttribute="bottom" id="HbF-ZP-qt8"/>
                                         <constraint firstAttribute="trailing" secondItem="1Cq-eY-R6n" secondAttribute="trailing" constant="20" id="OgS-th-C6R"/>
                                         <constraint firstItem="Loh-yb-xXc" firstAttribute="centerY" secondItem="zZY-qC-UIE" secondAttribute="centerY" id="OxF-vJ-Shr"/>
                                         <constraint firstItem="1Cq-eY-R6n" firstAttribute="centerY" secondItem="zZY-qC-UIE" secondAttribute="centerY" id="d8E-1d-QFv"/>
+                                        <constraint firstItem="QiW-G6-OKQ" firstAttribute="leading" secondItem="zZY-qC-UIE" secondAttribute="leading" id="dj4-6p-Fs9"/>
                                         <constraint firstItem="1Cq-eY-R6n" firstAttribute="leading" secondItem="Loh-yb-xXc" secondAttribute="trailing" constant="20" id="efz-vy-Y3A"/>
                                         <constraint firstItem="fp8-MS-tYi" firstAttribute="centerY" secondItem="zZY-qC-UIE" secondAttribute="centerY" id="fu1-Dd-1h9"/>
+                                        <constraint firstItem="QiW-G6-OKQ" firstAttribute="top" secondItem="zZY-qC-UIE" secondAttribute="top" id="hkJ-ua-Shi"/>
                                         <constraint firstItem="rVZ-TB-0GK" firstAttribute="leading" secondItem="zZY-qC-UIE" secondAttribute="leading" constant="20" id="pqC-Fy-hJ0"/>
                                     </constraints>
                                 </view>

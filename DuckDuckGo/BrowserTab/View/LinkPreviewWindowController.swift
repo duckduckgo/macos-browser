@@ -31,7 +31,7 @@ class LinkPreviewWindowController: NSWindowController, NSWindowDelegate {
         window?.titlebarAppearsTransparent = true
         window?.titleVisibility = .hidden
         window?.isMovableByWindowBackground = true
-        // window?.backgroundColor = .lightGray
+        // window?.backgroundColor = .clear
         window?.isOpaque = false
         window?.styleMask = [.resizable, .titled, .fullSizeContentView]
         window?.titlebarAppearsTransparent = true
