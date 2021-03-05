@@ -304,6 +304,8 @@ final class CommandPaletteViewController: NSViewController {
     private var tooltipWindowController: TooltipWindowController?
 
     func showTooltip(for tabViewModel: TabViewModel, from rect: CGRect) {
+        linkPreviewViewController?.dismiss(nil)
+        tooltipWindowController?.tooltipViewController.dismiss(nil)
 //        if tooltipWindowController == nil {
 //            tooltipWindowController = { () -> TooltipWindowController in
 //                // swiftlint:disable force_cast
@@ -312,8 +314,6 @@ final class CommandPaletteViewController: NSViewController {
 //                // swiftlint:enable force_cast
 //            }()
 //        }
-//        linkPreviewViewController?.dismiss(nil)
-//        tooltipWindowController!.tooltipViewController.dismiss(nil)
 //
 //        tooltipWindowController!.tooltipViewController.display(tabViewModel: tabViewModel)
 //

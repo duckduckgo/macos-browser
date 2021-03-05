@@ -28,7 +28,7 @@
                                         </textFieldCell>
                                     </textField>
                                     <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="iH5-FT-P9e">
-                                        <rect key="frame" x="81" y="228" width="350" height="16"/>
+                                        <rect key="frame" x="81" y="228" width="351" height="16"/>
                                         <textFieldCell key="cell" lineBreakMode="clipping" title="A server with the specified hostname could not be found." id="rLZ-IC-OXf">
                                             <font key="font" metaFont="system"/>
                                             <color key="textColor" name="labelColor" catalog="System" colorSpace="catalog"/>
@@ -73,18 +73,18 @@
         <scene sceneID="CJ2-2H-mPy">
             <objects>
                 <viewController storyboardIdentifier="LinkPreviewViewController" id="r9i-PN-Mjb" customClass="LinkPreviewViewController" customModule="DuckDuckGo_Privacy_Browser" customModuleProvider="target" sceneMemberID="viewController">
-                    <view key="view" id="bmw-KY-QiL">
-                        <rect key="frame" x="0.0" y="0.0" width="430" height="710"/>
+                    <view key="view" misplaced="YES" id="bmw-KY-QiL">
+                        <rect key="frame" x="0.0" y="0.0" width="320" height="711"/>
                         <autoresizingMask key="autoresizingMask"/>
                         <subviews>
                             <box boxType="custom" borderType="none" cornerRadius="4" titlePosition="noTitle" translatesAutoresizingMaskIntoConstraints="NO" id="jZd-Cb-dHL" userLabel="Fake Toolbar Container">
-                                <rect key="frame" x="0.0" y="660" width="430" height="50"/>
+                                <rect key="frame" x="0.0" y="661" width="388" height="50"/>
                                 <view key="contentView" id="zZY-qC-UIE">
-                                    <rect key="frame" x="0.0" y="0.0" width="430" height="50"/>
+                                    <rect key="frame" x="0.0" y="0.0" width="388" height="50"/>
                                     <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                     <subviews>
                                         <visualEffectView blendingMode="behindWindow" material="titlebar" state="followsWindowActiveState" translatesAutoresizingMaskIntoConstraints="NO" id="QiW-G6-OKQ">
-                                            <rect key="frame" x="0.0" y="0.0" width="430" height="50"/>
+                                            <rect key="frame" x="0.0" y="0.0" width="388" height="50"/>
                                         </visualEffectView>
                                         <button translatesAutoresizingMaskIntoConstraints="NO" id="rVZ-TB-0GK" userLabel="Close Button">
                                             <rect key="frame" x="20" y="18" width="14" height="14"/>
@@ -132,7 +132,7 @@
                                             </connections>
                                         </button>
                                         <textField horizontalHuggingPriority="249" verticalHuggingPriority="750" horizontalCompressionResistancePriority="250" translatesAutoresizingMaskIntoConstraints="NO" id="1Cq-eY-R6n">
-                                            <rect key="frame" x="138" y="17" width="274" height="16"/>
+                                            <rect key="frame" x="138" y="17" width="232" height="16"/>
                                             <textFieldCell key="cell" lineBreakMode="truncatingTail" alignment="center" id="s5l-Yp-Plb">
                                                 <font key="font" metaFont="system"/>
                                                 <color key="textColor" name="labelColor" catalog="System" colorSpace="catalog"/>
@@ -160,7 +160,7 @@
                                 </view>
                             </box>
                             <button verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="G6s-wj-MI8">
-                                <rect key="frame" x="279" y="13" width="138" height="32"/>
+                                <rect key="frame" x="230" y="13" width="144" height="32"/>
                                 <buttonCell key="cell" type="push" title="Open In New Tab" bezelStyle="rounded" alignment="center" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="y6J-FS-k24">
                                     <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
                                     <font key="font" metaFont="system"/>
@@ -173,7 +173,7 @@ DQ
                                 </connections>
                             </button>
                             <button verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="sxK-NV-U1B">
-                                <rect key="frame" x="166" y="13" width="115" height="32"/>
+                                <rect key="frame" x="109" y="13" width="121" height="32"/>
                                 <buttonCell key="cell" type="push" title="Pin to Screen" bezelStyle="rounded" alignment="center" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="VPP-5A-aQq">
                                     <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
                                     <font key="font" metaFont="system"/>
@@ -183,7 +183,7 @@ DQ
                                 </connections>
                             </button>
                             <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="8Yv-Ue-Vdl">
-                                <rect key="frame" x="18" y="677" width="394" height="16"/>
+                                <rect key="frame" x="18" y="678" width="352" height="16"/>
                                 <textFieldCell key="cell" lineBreakMode="clipping" alignment="center" title="Page Title" id="Qvg-68-1pn">
                                     <font key="font" metaFont="system"/>
                                     <color key="textColor" name="labelColor" catalog="System" colorSpace="catalog"/>
@@ -191,10 +191,10 @@ DQ
                                 </textFieldCell>
                             </textField>
                             <wkWebView wantsLayer="YES" translatesAutoresizingMaskIntoConstraints="NO" id="U82-fb-R5O" customClass="WebView" customModule="DuckDuckGo_Privacy_Browser" customModuleProvider="target">
-                                <rect key="frame" x="0.0" y="60" width="430" height="600"/>
+                                <rect key="frame" x="0.0" y="61" width="388" height="600"/>
                                 <constraints>
                                     <constraint firstAttribute="height" constant="600" id="IsO-m7-A1L"/>
-                                    <constraint firstAttribute="width" constant="430" id="uft-ma-W2X"/>
+                                    <constraint firstAttribute="width" constant="388" id="uft-ma-W2X"/>
                                 </constraints>
                                 <wkWebViewConfiguration key="configuration">
                                     <audiovisualMediaTypes key="mediaTypesRequiringUserActionForPlayback" none="YES"/>
