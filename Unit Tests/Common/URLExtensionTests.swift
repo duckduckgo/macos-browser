@@ -25,13 +25,13 @@ class URLExtensionTests: XCTestCase {
     func test_external_urls_are_valid() {
         XCTAssertTrue("mailto://user@host.tld".url!.isValid)
         XCTAssertTrue("sms://+44776424232323".url!.isValid)
+        XCTAssertTrue("ftp://example.com".url!.isValid)
     }
 
     func test_navigational_urls_are_valid() {
         XCTAssertTrue("http://example.com".url!.isValid)
         XCTAssertTrue("https://example.com".url!.isValid)
-        XCTAssertTrue("ftp://example.com".url!.isValid)
-        XCTAssertTrue("http://localdomain".url!.isValid)
+        // XCTAssertTrue("http://localdomain".url!.isValid) // local domain URLs are not supported at this time
     }
 
 }
