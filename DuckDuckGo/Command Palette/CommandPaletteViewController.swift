@@ -133,6 +133,7 @@ final class CommandPaletteViewController: NSViewController {
         backgroundView.layer!.masksToBounds = true
         backgroundView.layer!.borderWidth = 1.0
         backgroundView.layer!.borderColor = NSColor.separatorColor.cgColor
+        addTrackingArea()
     }
 
     override func viewWillAppear() {
@@ -174,6 +175,16 @@ final class CommandPaletteViewController: NSViewController {
             .store(in: &cancellables)
     }
 
+    private func addTrackingArea() {
+        let trackingOptions: NSTrackingArea.Options = [ .activeInActiveApp,
+                                                        .mouseEnteredAndExited,
+                                                        .enabledDuringMouseDrag,
+                                                        .mouseMoved,
+                                                        .inVisibleRect ]
+        let trackingArea = NSTrackingArea(rect: tableView.frame, options: trackingOptions, owner: self, userInfo: nil)
+        tableView.addTrackingArea(trackingArea)
+    }
+
     func hide() {
         self.view.window?.parent?.removeChildWindow(self.view.window!)
         self.view.window?.orderOut(nil)
@@ -198,6 +209,10 @@ final class CommandPaletteViewController: NSViewController {
                                             max(window.frame.maxY - parentWindow.frame.minY, 80))
     }
 
+    override func mouseMoved(with event: NSEvent) {
+        selectRow(at: event.locationInWindow)
+    }
+    
     func mouseDown(_ output: NSEvent.LocalEvents.Output) {
         guard output.event.window !== view.window else {
             output.handled()
@@ -224,6 +239,12 @@ final class CommandPaletteViewController: NSViewController {
         tableView.scrollRowToVisible(index)
     }
 
+    private func selectRow(at point: NSPoint) {
+        let flippedPoint = view.convert(point, to: tableView)
+        let row = tableView.row(at: flippedPoint)
+        select(at: row)
+    }
+
     func selectNextIfPossible(after: Int? = nil) {
         guard let objects = objects,
               !objects.isEmpty
@@ -244,23 +265,32 @@ final class CommandPaletteViewController: NSViewController {
         select(at: index)
     }
 
-    func selectPreviousIfPossible() {
+    func selectFirst() {
+        selectNextIfPossible(after: -1)
+    }
+
+    func selectPreviousIfPossible(before: Int? = nil) {
         guard let objects = objects,
               !objects.isEmpty
         else { return }
 
-        var index = tableView.selectedRow
+        let before = before ?? tableView.selectedRow
+        var index = before
         repeat {
             index -= 1
-            if tableView.selectedRow == -1 && index == -1 {
+            if before < 0 && index == -1 {
                 break
             }
             if index < 0 {
                 index = tableView.numberOfRows - 1
             }
-        } while !objects[index].isSuggestion && index != tableView.selectedRow
+        } while !objects[index].isSuggestion && index != before
 
         select(at: index)
+    }
+
+    func selectLast() {
+        selectPreviousIfPossible(before: -1)
     }
 
     func confirmSelection() {
@@ -360,8 +390,14 @@ extension CommandPaletteViewController: NSTextFieldDelegate {
         case #selector(NSResponder.moveDown(_:)):
             self.selectNextIfPossible()
             return true
+        case #selector(NSResponder.moveToEndOfDocument(_:)):
+            self.selectLast()
+            return true
         case #selector(NSResponder.moveUp(_:)):
             self.selectPreviousIfPossible()
+            return true
+        case #selector(NSResponder.moveToBeginningOfDocument(_:)):
+            self.selectFirst()
             return true
 
         case #selector(NSResponder.insertNewline(_:)):
