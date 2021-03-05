@@ -43,6 +43,10 @@ class LinkPreviewViewController: NSViewController, NSPopoverDelegate {
             webView.configuration.applyStandardConfiguration()
             webView.configuration.defaultWebpagePreferences.preferredContentMode = .mobile
             webView.allowsLinkPreview = false
+
+            if !compact {
+                webView.customUserAgent = "Mozilla/5.0 (iPhone; CPU iPhone OS 14_0 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/12.0 Mobile/16A366 DuckDuckGo/7 Safari/605.1.15"
+            }
         }
     }
 
