@@ -95,6 +95,8 @@ final class Tab: NSObject, LinkHoverUserScriptDelegate {
     let webView: WebView
 	var userEnteredUrl = true
 
+    var id: TabId { webView.id }
+
     @Published var url: URL? {
         didSet {
             if oldValue?.host != url?.host {
@@ -107,6 +109,11 @@ final class Tab: NSObject, LinkHoverUserScriptDelegate {
 
     @Published var title: String?
     @Published var error: Error?
+
+    private let navigationEventsSubject = PassthroughSubject<NavigationEvent, Never>()
+    var navigationEvents: AnyPublisher<NavigationEvent, Never> {
+        navigationEventsSubject.eraseToAnyPublisher()
+    }
 
     weak var findInPage: FindInPageModel? {
         didSet {
@@ -135,7 +142,7 @@ final class Tab: NSObject, LinkHoverUserScriptDelegate {
 
         // This function is called when the user has manually typed in a new address, which should reset the login detection flow.
 		userEnteredUrl = userEntered
-		loginDetectionService?.handle(navigationEvent: .userAction)
+        navigationEventsSubject.send(.userAction)
      }
 
     // Used to track if an error was caused by a download navigation.
@@ -144,7 +151,16 @@ final class Tab: NSObject, LinkHoverUserScriptDelegate {
     // Used as the request context for HTML 5 downloads
     private var lastMainFrameRequest: URLRequest?
 
-    private var loginDetectionService: LoginDetectionService?
+    private var loginDetectionCancellable: AnyCancellable?
+    private var loginDetectionService: LoginDetectionService? {
+        didSet {
+            guard let loginDetectionService = loginDetectionService else {
+                loginDetectionCancellable = nil
+                return
+            }
+            loginDetectionCancellable = navigationEvents.sink(receiveValue: loginDetectionService.handle(navigationEvent:))
+        }
+    }
     private let instrumentation = TabInstrumentation()
 
     var isHomepageLoaded: Bool {
@@ -153,12 +169,12 @@ final class Tab: NSObject, LinkHoverUserScriptDelegate {
 
     func goForward() {
         webView.goForward()
-        loginDetectionService?.handle(navigationEvent: .userAction)
+        navigationEventsSubject.send(.userAction)
     }
 
     func goBack() {
         webView.goBack()
-        loginDetectionService?.handle(navigationEvent: .userAction)
+        navigationEventsSubject.send(.userAction)
     }
 
     func openHomepage() {
@@ -177,7 +193,7 @@ final class Tab: NSObject, LinkHoverUserScriptDelegate {
         } else {
             webView.reload()
         }
-        loginDetectionService?.handle(navigationEvent: .userAction)
+        navigationEventsSubject.send(.userAction)
     }
 
     private func reloadIfNeeded(shouldLoadInBackground: Bool = false) {
@@ -372,10 +388,10 @@ extension Tab: ContentBlockerUserScriptDelegate {
 
 extension Tab: LoginFormDetectionDelegate {
 
-     func loginFormDetectionUserScriptDetectedLoginForm(_ script: LoginFormDetectionUserScript) {
-         guard let url = webView.url else { return }
-         loginDetectionService?.handle(navigationEvent: .detectedLogin(url: url))
-     }
+    func loginFormDetectionUserScriptDetectedLoginForm(_ script: LoginFormDetectionUserScript) {
+        guard let url = webView.url else { return }
+        navigationEventsSubject.send(.detectedLogin(url: url))
+    }
 
  }
 
@@ -485,13 +501,21 @@ extension Tab: WKNavigationDelegate {
         self.invalidateSessionStateData()
 
         if let url = webView.url {
-             loginDetectionService?.handle(navigationEvent: .pageBeganLoading(url: url))
+            navigationEventsSubject.send(.pageBeganLoading(url: url))
          }
     }
 
     func webView(_ webView: WKWebView, didFinish navigation: WKNavigation!) {
         self.invalidateSessionStateData()
-        loginDetectionService?.handle(navigationEvent: .pageFinishedLoading)
+        navigationEventsSubject.send(.pageFinishedLoading)
+
+//        webView.evaluateJavaScript("document.body.innerText") { result, error in
+//            guard let result = result as? String else {
+//                print(error)
+//                return
+//            }
+//            print(result)
+//        }
     }
 
     func webView(_ webView: WKWebView, didFail navigation: WKNavigation!, withError error: Error) {
@@ -512,9 +536,9 @@ extension Tab: WKNavigationDelegate {
     }
 
     func webView(_ webView: WKWebView, didReceiveServerRedirectForProvisionalNavigation navigation: WKNavigation!) {
-         guard let url = webView.url else { return }
-         loginDetectionService?.handle(navigationEvent: .redirect(url: url))
-     }
+        guard let url = webView.url else { return }
+        navigationEventsSubject.send(.redirect(url: url))
+    }
 
 }
 

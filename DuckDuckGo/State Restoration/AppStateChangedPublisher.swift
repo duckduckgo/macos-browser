@@ -30,6 +30,7 @@ extension Tab {
 extension TabCollectionViewModel {
     var stateChanged: AnyPublisher<Void, Never> {
         tabCollection.$tabs.nestedObjectChanges(\.stateChanged)
+            .asVoid()
             .merge(with: $selectionIndex.asVoid())
             .eraseToAnyPublisher()
     }
@@ -46,6 +47,7 @@ extension MainWindowController {
 extension WindowControllersManager {
     var stateChanged: AnyPublisher<Void, Never> {
         $mainWindowControllers.nestedObjectChanges(\.stateChanged)
+            .asVoid()
             .eraseToAnyPublisher()
     }
 }

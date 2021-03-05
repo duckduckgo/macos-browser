@@ -56,7 +56,7 @@ class LoginDetectionService {
         self.loginDetectionHandler = loginDetectionHandler
     }
 
-    func handle(navigationEvent: NavigationEvent, delayAfterFinishingPageLoad: Bool = true) {
+    func handle(navigationEvent: NavigationEvent, delayAfterFinishingPageLoad: Bool) {
         switch navigationEvent {
         case .userAction:
             os_log("Received user action, discard login attempt", log: .fire)
@@ -183,4 +183,10 @@ class LoginDetectionService {
         return currentURL.host != detectedURL.host || currentURL.path != detectedURL.path
     }
 
+}
+
+extension LoginDetectionService {
+    func handle(navigationEvent: NavigationEvent) {
+        handle(navigationEvent: navigationEvent, delayAfterFinishingPageLoad: true)
+    }
 }

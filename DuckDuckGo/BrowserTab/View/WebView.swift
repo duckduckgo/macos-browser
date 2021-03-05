@@ -20,6 +20,24 @@ import Cocoa
 import WebKit
 import os.log
 
+struct TabId: RawRepresentable, Hashable {
+    var rawValue: Int
+
+    typealias RawValue = Int
+    private static var counter = 0
+
+    init(rawValue: Int) {
+        self.rawValue = rawValue
+    }
+
+    init() {
+        dispatchPrecondition(condition: .onQueue(.main))
+
+        self.init(rawValue: Self.counter)
+        Self.counter += 1
+    }
+}
+
 class WebView: WKWebView {
 
     static let itemSelectors: [String: Selector] = [
@@ -35,10 +53,10 @@ class WebView: WKWebView {
     ]
 
     static let itemTitles: [String: String] = [
-
         "WKMenuItemIdentifierOpenLink": UserText.openLinkInNewTab
-
     ]
+
+    let id = TabId()
 
     deinit {
         self.configuration.userContentController.removeAllUserScripts()

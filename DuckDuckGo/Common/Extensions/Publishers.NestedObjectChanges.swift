@@ -39,8 +39,13 @@ extension Publishers {
           Upstream.Failure == Never,
           NestedPublisher.Failure == Never {
 
-        typealias Output = Void
+        typealias Output = Change
         typealias Failure = Never
+
+        enum Change {
+            case composition(added: Set<Upstream.Output.Element>, removed: Set<Upstream.Output.Element>)
+            case value(owner: Upstream.Output.Element, value: NestedPublisher.Output)
+        }
 
         private let upstream: Upstream
         private let transform: (Upstream.Output.Element) -> NestedPublisher
@@ -62,7 +67,7 @@ extension Publishers {
 
 extension Publishers.NestedObjectChanges {
 
-    private final class Inner<S: Subscriber>: Subscription where S.Input == Void, S.Failure == Never {
+    private final class Inner<S: Subscriber>: Subscription where S.Input == Change, S.Failure == Never {
 
         typealias Parent = Publishers.NestedObjectChanges<NestedPublisher, Upstream>
         typealias Element = Upstream.Output.Element
@@ -108,18 +113,18 @@ extension Publishers.NestedObjectChanges {
 
             // skip initial sink
             if case .some = self.cancellable {
-                _=subscriber.receive( () )
+                _=subscriber.receive( .composition(added: added, removed: removed) )
             }
         }
 
         private func subscribe(to added: Set<Element>) {
             for item in added {
-                self.nested[item] = parent.transform(item).sink { [weak self] _ in
+                self.nested[item] = parent.transform(item).sink { [weak self] value in
                     dispatchPrecondition(condition: .onQueue(.main))
                     // skip initial sink
                     guard case .some = self?.nested[item] else { return }
 
-                    _=self?.subscriber.receive( () )
+                    _=self?.subscriber.receive( .value(owner: item, value: value) )
                 }
             }
         }

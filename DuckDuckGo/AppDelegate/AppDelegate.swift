@@ -51,6 +51,7 @@ class AppDelegate: NSObject, NSApplicationDelegate {
         HTTPSUpgrade.shared.loadDataAsync()
         LocalBookmarkManager.shared.loadBookmarks()
         _=ConfigurationManager.shared
+        _=TabsSearchService.shared
 
         if !isRunningTests {
             stateRestorationManager.applicationDidFinishLaunching()
