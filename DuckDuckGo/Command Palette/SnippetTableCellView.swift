@@ -27,8 +27,18 @@ final class SnippetTableCellView: NSTableCellView {
     override var objectValue: Any? {
         didSet {
             guard let some = objectValue else { return }
-            guard let model = some as? SearchResult else { fatalError("Unexpected object value") }
-            display(model)
+            display(some)
+        }
+    }
+
+    func display(_ model: Any) {
+        switch model {
+        case let model as SearchResult:
+            self.display(model)
+        case let model as FullTextTabSearchResult:
+            self.display(model)
+        default:
+            fatalError()
         }
     }
 
@@ -68,6 +78,36 @@ final class SnippetTableCellView: NSTableCellView {
 
                 self.faviconImageView.image = image
             }
+        }
+    }
+
+    func display(_ model: FullTextTabSearchResult) {
+        if let title = model.tabViewModel.tab.title,
+           !title.isEmpty {
+            titleTextField.stringValue = title
+            titleTextField.isHidden = false
+        } else {
+            titleTextField.isHidden = true
+        }
+        if let snippet = model.snippet,
+           snippet.length > 0 {
+            snippetTextField.attributedStringValue = snippet
+            snippetTextField.isHidden = false
+        } else {
+            snippetTextField.isHidden = true
+        }
+
+        if let url = model.tabViewModel.tab.url {
+            urlTextField.stringValue = url.absoluteString
+            urlTextField.isHidden = false
+        } else {
+            urlTextField.isHidden = true
+        }
+
+        if let image = model.tabViewModel.tab.favicon {
+            self.faviconImageView.image = image
+        } else {
+            self.faviconImageView.image = nil
         }
     }
 

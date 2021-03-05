@@ -88,6 +88,8 @@ final class CommandPaletteViewModel: CommandPaletteViewModelProtocol {
         "f": [.currentWindowTabs, .otherWindowsTabs],
         "t": [.currentWindowTabs, .otherWindowsTabs],
 
+        "x": [.fulltextSearch],
+
         "q": [.instantAnswers],
         "a": [.instantAnswers],
 
@@ -99,7 +101,7 @@ final class CommandPaletteViewModel: CommandPaletteViewModelProtocol {
         "src": [.inspector],
 
         "gg": [.copyURL],
-        "cp": [.copyURL],
+        "cp": [.copyURL]
     ]
 
     private let hiddenCommands: Set<CommandPaletteSection.Section> = [
@@ -116,6 +118,8 @@ final class CommandPaletteViewModel: CommandPaletteViewModelProtocol {
             return activeWindowTabs(matching: predicate)
         case .otherWindowsTabs:
             return tabs(matching: predicate)
+        case .fulltextSearch:
+            return fulltextSearch(predicate)
         case .bookmarks:
             return bookmarks(for: predicate)
         case .searchResults:
@@ -289,6 +293,30 @@ private extension CommandPaletteViewModel {
             (url as NSURL).write(to: pasteboard)
 
         })])).eraseToAnyPublisher()
+    }
+
+    func fulltextSearch(_ predicate: String) -> SectionPublisher {
+        TabsSearchService.shared.search(predicate)
+            .replaceError(with: [])
+            .receive(on: DispatchQueue.main)
+            .map {
+                .loaded($0.filter {
+                    !($0.controller.window!.isMainWindow
+                        && $0.controller.mainViewController!.tabCollectionViewModel.selectedTabViewModel === $0.tabViewModel)
+                }.map { result in
+                    CommandPaletteSuggestion.fulltextSearchResult(model: result, activate: {
+                        let model = result.controller.mainViewController!.tabCollectionViewModel
+                        guard let idx = model.tabCollection.tabs.firstIndex(of: result.tabViewModel.tab) else { return }
+                        model.select(at: idx)
+                        if !result.controller.window!.isMainWindow {
+                            result.controller.window!.makeKeyAndOrderFront(nil)
+                        }
+                    })
+                })
+            }
+            .multicast(subject: CurrentValueSubject(.loading))
+            .autoconnect()
+            .eraseToAnyPublisher()
     }
 
     func searchResults(for query: String) -> SectionPublisher {

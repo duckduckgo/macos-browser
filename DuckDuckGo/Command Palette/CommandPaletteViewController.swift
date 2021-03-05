@@ -31,12 +31,13 @@ final class CommandPaletteWindow: NSPanel {
 enum CommandPaletteSuggestion: Equatable {
     case tab(model: TabViewModel, activate: () -> Void)
     case searchResult(model: SearchResult, activate: () -> Void)
+    case fulltextSearchResult(model: FullTextTabSearchResult, activate: () -> Void)
 
     func activate() {
         switch self {
-        case .tab(model: _, activate: let activate):
-            activate()
-        case .searchResult(model: _, activate: let activate):
+        case .tab(model: _, activate: let activate),
+             .searchResult(model: _, activate: let activate),
+             .fulltextSearchResult(model: _, activate: let activate):
             activate()
         }
     }
@@ -47,7 +48,9 @@ enum CommandPaletteSuggestion: Equatable {
             return model1.tab == model2.tab
         case (.searchResult(model: let model1, activate: _), .searchResult(model: let model2, activate: _)):
             return model1 == model2
-        case (.tab, _), (.searchResult, _):
+        case (.fulltextSearchResult(model: let model1, activate: _), .fulltextSearchResult(model: let model2, activate: _)):
+            return model1.tabViewModel.tab == model2.tabViewModel.tab
+        case (.tab, _), (.searchResult, _), (.fulltextSearchResult, _):
             return false
         }
     }
@@ -58,6 +61,7 @@ struct CommandPaletteSection {
         case help = "Help"
         case currentWindowTabs = "Active Window"
         case otherWindowsTabs = "All Tabs"
+        case fulltextSearch = "Fulltext Search"
         case bookmarks = "Bookmarks"
         case searchResults = "DuckDuckGo Search Results"
         case instantAnswers = "Instant Answers"
@@ -122,6 +126,8 @@ final class CommandPaletteViewController: NSViewController {
             case .suggestion(.tab(model: let model, activate: _)):
                 return model
             case .suggestion(.searchResult(model: let model, activate: _)):
+                return model
+            case .suggestion(.fulltextSearchResult(model: let model, activate: _)):
                 return model
             case .loading:
                 return ""
@@ -336,6 +342,9 @@ final class CommandPaletteViewController: NSViewController {
 
             case .tab(model: let model, activate: _):
                 self.showTooltip(for: model, from: rect)
+
+            case .fulltextSearchResult(model: let model, activate: _):
+                self.showTooltip(for: model.tabViewModel, from: rect)
             }
         }
     }
@@ -478,6 +487,8 @@ extension CommandPaletteViewController: NSTableViewDelegate {
             identifier = .tab
         case .suggestion(.searchResult):
             identifier = .snippetCell
+        case .suggestion(.fulltextSearchResult):
+            identifier = .snippetCell
         case .loading:
             identifier = .loadingCell
         }
@@ -508,6 +519,10 @@ extension CommandPaletteViewController: NSTableViewDelegate {
         case .loading:
             return 24
         case .suggestion(.searchResult(model: let model, activate: _)):
+            tempSnippetCellView.objectValue = model
+            tempSnippetCellView.layoutSubtreeIfNeeded()
+            return tempSnippetCellView.frame.height
+        case .suggestion(.fulltextSearchResult(model: let model, activate: _)):
             tempSnippetCellView.objectValue = model
             tempSnippetCellView.layoutSubtreeIfNeeded()
             return tempSnippetCellView.frame.height

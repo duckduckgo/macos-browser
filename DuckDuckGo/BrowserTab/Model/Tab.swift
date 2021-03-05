@@ -508,14 +508,6 @@ extension Tab: WKNavigationDelegate {
     func webView(_ webView: WKWebView, didFinish navigation: WKNavigation!) {
         self.invalidateSessionStateData()
         navigationEventsSubject.send(.pageFinishedLoading)
-
-//        webView.evaluateJavaScript("document.body.innerText") { result, error in
-//            guard let result = result as? String else {
-//                print(error)
-//                return
-//            }
-//            print(result)
-//        }
     }
 
     func webView(_ webView: WKWebView, didFail navigation: WKNavigation!, withError error: Error) {

@@ -229,6 +229,7 @@
 		B62EB47C25BAD3BB005745C6 /* WKWebViewSessionDataTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = B62EB47B25BAD3BB005745C6 /* WKWebViewSessionDataTests.swift */; };
 		B633C86D25E797D800E4B352 /* UserScriptsManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = B633C86C25E797D800E4B352 /* UserScriptsManager.swift */; };
 		B63B339425F1CE030051D2F8 /* TabsSearchService.swift in Sources */ = {isa = PBXBuildFile; fileRef = B63B339325F1CE030051D2F8 /* TabsSearchService.swift */; };
+		B63B33A625F21B520051D2F8 /* GRDB in Frameworks */ = {isa = PBXBuildFile; productRef = B63B33A525F21B520051D2F8 /* GRDB */; };
 		B63D466925BEB6C200874977 /* WKWebView+SessionState.swift in Sources */ = {isa = PBXBuildFile; fileRef = B63D466825BEB6C200874977 /* WKWebView+SessionState.swift */; };
 		B63D467125BFA6C100874977 /* DispatchQueueExtensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = B63D467025BFA6C100874977 /* DispatchQueueExtensions.swift */; };
 		B63D467A25BFC3E100874977 /* NSCoderExtensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = B63D467925BFC3E100874977 /* NSCoderExtensions.swift */; };
@@ -529,6 +530,7 @@
 				F498DCBB25E7D508008197FE /* BrowserServicesKit in Frameworks */,
 				B61F01CC25EFBC9F00ABB5A3 /* SwiftSoup in Frameworks */,
 				85AE2FF224A33A2D002D507F /* WebKit.framework in Frameworks */,
+				B63B33A625F21B520051D2F8 /* GRDB in Frameworks */,
 				B61F01E825F0C9EA00ABB5A3 /* CombineExt in Frameworks */,
 				4B82E9B325B69E3E00656FE7 /* TrackerRadarKit in Frameworks */,
 			);
@@ -1596,6 +1598,7 @@
 				F498DCBA25E7D508008197FE /* BrowserServicesKit */,
 				B61F01CB25EFBC9F00ABB5A3 /* SwiftSoup */,
 				B61F01E725F0C9EA00ABB5A3 /* CombineExt */,
+				B63B33A525F21B520051D2F8 /* GRDB */,
 			);
 			productName = DuckDuckGo;
 			productReference = AA585D7E248FD31100E9A3E2 /* DuckDuckGo Privacy Browser.app */;
@@ -1674,6 +1677,7 @@
 				F498DCB925E7D508008197FE /* XCRemoteSwiftPackageReference "BrowserServicesKit" */,
 				B61F01CA25EFBC9F00ABB5A3 /* XCRemoteSwiftPackageReference "SwiftSoup" */,
 				B61F01E625F0C9EA00ABB5A3 /* XCRemoteSwiftPackageReference "CombineExt" */,
+				B63B33A425F21B520051D2F8 /* XCRemoteSwiftPackageReference "GRDB.swift" */,
 			);
 			productRefGroup = AA585D7F248FD31100E9A3E2 /* Products */;
 			projectDirPath = "";
@@ -2393,6 +2397,14 @@
 				minimumVersion = 1.2.0;
 			};
 		};
+		B63B33A425F21B520051D2F8 /* XCRemoteSwiftPackageReference "GRDB.swift" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/groue/GRDB.swift.git";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 5.5.0;
+			};
+		};
 		F498DCB925E7D508008197FE /* XCRemoteSwiftPackageReference "BrowserServicesKit" */ = {
 			isa = XCRemoteSwiftPackageReference;
 			repositoryURL = "https://dub.duckduckgo.com/duckduckgo/BrowserServicesKit";
@@ -2418,6 +2430,11 @@
 			isa = XCSwiftPackageProductDependency;
 			package = B61F01E625F0C9EA00ABB5A3 /* XCRemoteSwiftPackageReference "CombineExt" */;
 			productName = CombineExt;
+		};
+		B63B33A525F21B520051D2F8 /* GRDB */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = B63B33A425F21B520051D2F8 /* XCRemoteSwiftPackageReference "GRDB.swift" */;
+			productName = GRDB;
 		};
 		F498DCBA25E7D508008197FE /* BrowserServicesKit */ = {
 			isa = XCSwiftPackageProductDependency;
