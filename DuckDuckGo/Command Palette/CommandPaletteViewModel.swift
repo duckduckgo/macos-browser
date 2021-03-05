@@ -76,24 +76,35 @@ final class CommandPaletteViewModel: CommandPaletteViewModelProtocol {
 
     private let commands: [String: [CommandPaletteSection.Section]] = [
         "d": [.searchResults],
+        "s": [.searchResults],
+        "g": [.searchResults],
+
         "b": [.bookmarks],
+
         "c": [.currentWindowTabs],
         "o": [.otherWindowsTabs],
+
         "f": [.currentWindowTabs, .otherWindowsTabs],
+        "t": [.currentWindowTabs, .otherWindowsTabs],
+
         "q": [.instantAnswers],
+        "a": [.instantAnswers],
 
         "h": [.help],
         "help": [.help],
 
         "dev": [.inspector],
         "ins": [.inspector],
+        "src": [.inspector],
 
-        "gg": [.copyURL]
+        "gg": [.copyURL],
+        "cp": [.copyURL],
     ]
 
     private let hiddenCommands: Set<CommandPaletteSection.Section> = [
         .help,
-        .inspector
+        .inspector,
+        .copyURL
     ]
 
     private func publisher(for section: CommandPaletteSection.Section, matching predicate: String) -> SectionPublisher {
