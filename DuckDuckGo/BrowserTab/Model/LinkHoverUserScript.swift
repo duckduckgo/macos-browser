@@ -19,7 +19,7 @@
 import Foundation
 import BrowserServicesKit
 
-protocol LinkHoverUserScriptDelegate: NSObjectProtocol {
+protocol LinkHoverUserScriptDelegate: class {
 
     func mouseDidEnter(_ linkHoverUserScript: LinkHoverUserScript, link: String)
     func mouseDidExit(_ linkHoverUserScript: LinkHoverUserScript, link: String)
