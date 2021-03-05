@@ -45,7 +45,9 @@ class LinkPreviewViewController: NSViewController, NSPopoverDelegate {
             webView.allowsLinkPreview = false
 
             if !compact {
+                // swiftlint:disable line_length
                 webView.customUserAgent = "Mozilla/5.0 (iPhone; CPU iPhone OS 14_0 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/12.0 Mobile/16A366 DuckDuckGo/7 Safari/605.1.15"
+                // swiftlint:enable line_length
             }
         }
     }
@@ -151,8 +153,6 @@ class LinkPreviewViewController: NSViewController, NSPopoverDelegate {
         guard let keyPath = keyPath else {
             return
         }
-
-        let viewWindowController = self.view.window?.windowController as? LinkPreviewWindowController
 
         switch keyPath {
         case #keyPath(WKWebView.url), #keyPath(WKWebView.title), #keyPath(WKWebView.canGoBack), #keyPath(WKWebView.canGoForward):
