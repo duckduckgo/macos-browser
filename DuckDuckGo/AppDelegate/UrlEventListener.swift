@@ -21,6 +21,14 @@ import os.log
 
 class UrlEventListener {
 
+    private let handler: ((URL) -> Void)
+
+    init(handler: @escaping ((URL) -> Void) = { url in
+        WindowControllersManager.shared.show(url: url)
+    }) {
+        self.handler = handler
+    }
+
     func listen() {
         NSAppleEventManager.shared().setEventHandler(
             self,
@@ -30,36 +38,18 @@ class UrlEventListener {
         )
     }
 
-    @objc private func handleUrlEvent(event: NSAppleEventDescriptor, reply: NSAppleEventDescriptor) {
-        guard let path = event.paramDescriptor(forKeyword: keyDirectObject)?.stringValue?.removingPercentEncoding,
-              let url = URL(string: path) else {
-            os_log("AppDelegate: URL initialization failed", type: .error)
+    @objc func handleUrlEvent(event: NSAppleEventDescriptor, reply: NSAppleEventDescriptor) {
+        guard let path = event.paramDescriptor(forKeyword: keyDirectObject)?.stringValue?.removingPercentEncoding else {
+            os_log("UrlEventListener: unable to determine path", type: .error)
             return
         }
 
-        guard let windowController = WindowControllersManager.shared.lastKeyMainWindowController,
-              windowController.window?.isKeyWindow == true else {
-            WindowsManager.openNewWindow(with: url)
+        guard let url = URL(string: path) ?? URL(string: path.replacingOccurrences(of: " ", with: "%20")) else {
+            os_log("UrlEventListener: failed to construct URL from path %s", type: .error, path)
             return
         }
 
-        guard let mainViewController = windowController.mainViewController else {
-            os_log("AppDelegate: No main view controller", type: .error)
-            return
-        }
-
-        let tabCollectionViewModel = mainViewController.tabCollectionViewModel
-        let tabCollection = tabCollectionViewModel.tabCollection
-
-        if tabCollection.tabs.count == 1,
-           let firstTab = tabCollection.tabs.first,
-           firstTab.isHomepageLoaded {
-            firstTab.url = url
-        } else {
-            let newTab = Tab()
-            newTab.url = url
-            tabCollectionViewModel.append(tab: newTab)
-        }
+        handler(url)
     }
 
 }

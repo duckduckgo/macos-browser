@@ -25,10 +25,12 @@ protocol ContextMenuDelegate: AnyObject {
 
 }
 
-class ContextMenuUserScript: NSObject, UserScript {
-    
-    var injectionTime: WKUserScriptInjectionTime = .atDocumentEnd
-    var forMainFrameOnly = true
+class ContextMenuUserScript: NSObject, StaticUserScript {
+
+    static var injectionTime: WKUserScriptInjectionTime { .atDocumentEnd }
+    static var forMainFrameOnly: Bool { true }
+    static var script: WKUserScript = ContextMenuUserScript.makeWKUserScript()
+    var messageNames: [String] { ["contextMenu"] }
 
     weak var delegate: ContextMenuDelegate?
 
@@ -69,8 +71,7 @@ class ContextMenuUserScript: NSObject, UserScript {
         return NSPoint(x: x, y: y)
     }
 
-    let messageNames = ["contextMenu"]
-    let source = """
+    static let source = """
 (function() {
 
     function linkFrom(element) {
@@ -123,5 +124,5 @@ class ContextMenuUserScript: NSObject, UserScript {
 
 }) ();
 """
-    
+
 }

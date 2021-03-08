@@ -1,6 +1,5 @@
 //
-//  WKWebViewSessionDataTests.swift
-//  DuckDuckGo
+//  UserScriptsManager.swift
 //
 //  Copyright © 2021 DuckDuckGo. All rights reserved.
 //
@@ -17,20 +16,21 @@
 //  limitations under the License.
 //
 
-import XCTest
-import WebKit
-@testable import DuckDuckGo_Privacy_Browser
+import Foundation
+import Combine
 
-class WKWebViewSessionStateAvailabilityTests: XCTestCase {
+final class UserScriptsManager {
+    static let shared = UserScriptsManager()
 
-    func testWebViewRespondsTo_sessionStateData() {
-        let webView = WebView.init(frame: CGRect(), configuration: .init())
+    @Published
+    private(set) var userScripts = UserScripts()
+    private var sourceUpdatedCancellable: AnyCancellable!
 
-        XCTAssertNoThrow(try XCTAssertNotNil(webView.sessionStateData()))
+    init(scriptSource: ScriptSourceProviding = DefaultScriptSourceProvider.shared) {
+        sourceUpdatedCancellable = scriptSource.sourceUpdatedPublisher
+            .receive(on: DispatchQueue.main)
+            .map(UserScripts.init)
+            .weakAssign(to: \.userScripts, on: self)
     }
 
-    func testWebViewRespondsTo_restoreFromSessionStateData() {
-        let webView = WebView(frame: CGRect(), configuration: .init())
-        XCTAssertNoThrow(try webView.restoreSessionState(from: Data()))
-    }
 }

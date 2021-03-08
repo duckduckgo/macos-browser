@@ -1,6 +1,5 @@
 //
-//  WKWebViewSessionDataTests.swift
-//  DuckDuckGo
+//  URLExtensionTests.swift
 //
 //  Copyright © 2021 DuckDuckGo. All rights reserved.
 //
@@ -18,19 +17,21 @@
 //
 
 import XCTest
-import WebKit
+import Combine
 @testable import DuckDuckGo_Privacy_Browser
 
-class WKWebViewSessionStateAvailabilityTests: XCTestCase {
+class URLExtensionTests: XCTestCase {
 
-    func testWebViewRespondsTo_sessionStateData() {
-        let webView = WebView.init(frame: CGRect(), configuration: .init())
-
-        XCTAssertNoThrow(try XCTAssertNotNil(webView.sessionStateData()))
+    func test_external_urls_are_valid() {
+        XCTAssertTrue("mailto://user@host.tld".url!.isValid)
+        XCTAssertTrue("sms://+44776424232323".url!.isValid)
+        XCTAssertTrue("ftp://example.com".url!.isValid)
     }
 
-    func testWebViewRespondsTo_restoreFromSessionStateData() {
-        let webView = WebView(frame: CGRect(), configuration: .init())
-        XCTAssertNoThrow(try webView.restoreSessionState(from: Data()))
+    func test_navigational_urls_are_valid() {
+        XCTAssertTrue("http://example.com".url!.isValid)
+        XCTAssertTrue("https://example.com".url!.isValid)
+        // XCTAssertTrue("http://localdomain".url!.isValid) // local domain URLs are not supported at this time
     }
+
 }
