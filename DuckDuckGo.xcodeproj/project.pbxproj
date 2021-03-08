@@ -2222,7 +2222,7 @@
 			repositoryURL = "https://dub.duckduckgo.com/duckduckgo/BrowserServicesKit";
 			requirement = {
 				kind = upToNextMinorVersion;
-				minimumVersion = 0.3.0;
+				minimumVersion = 0.4.0;
 			};
 		};
 /* End XCRemoteSwiftPackageReference section */
