@@ -20,16 +20,20 @@ import Cocoa
 import WebKit
 import os.log
 import Combine
+import SwiftUI
 
 class BrowserTabViewController: NSViewController {
 
     @IBOutlet weak var errorView: NSView!
+    lazy var homepageView: NSHostingView<HomepageView> = NSHostingView(rootView: HomepageView())
     weak var webView: WebView?
+
     var tabViewModel: TabViewModel?
 
     private let tabCollectionViewModel: TabCollectionViewModel
     private var selectedTabViewModelCancellable: AnyCancellable?
     private var isErrorViewVisibleCancellable: AnyCancellable?
+    private var urlCancellable: AnyCancellable?
     private var contextMenuLink: URL?
     private var contextMenuImage: URL?
 
@@ -46,14 +50,20 @@ class BrowserTabViewController: NSViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
 
+        addHomepageView()
         subscribeToSelectedTabViewModel()
         subscribeToIsErrorViewVisible()
+    }
+
+    private func addHomepageView() {
+        view.addAndLayout(homepageView)
     }
 
     private func subscribeToSelectedTabViewModel() {
         selectedTabViewModelCancellable = tabCollectionViewModel.$selectedTabViewModel.receive(on: DispatchQueue.main).sink { [weak self] _ in
             self?.changeWebView()
             self?.subscribeToIsErrorViewVisible()
+            self?.subscribeToUrl()
         }
     }
 
@@ -101,6 +111,13 @@ class BrowserTabViewController: NSViewController {
     private func subscribeToIsErrorViewVisible() {
         isErrorViewVisibleCancellable = tabViewModel?.$isErrorViewVisible.receive(on: DispatchQueue.main).sink { [weak self] _ in
             self?.displayErrorView(self?.tabViewModel?.isErrorViewVisible ?? false)
+        }
+    }
+
+    private func subscribeToUrl() {
+        urlCancellable?.cancel()
+        urlCancellable = tabViewModel?.tab.$url.receive(on: DispatchQueue.main).sink { [weak self] _ in
+            self?.homepageView.isHidden = !(self?.tabViewModel?.tab.isHomepageShown ?? false)
         }
     }
 

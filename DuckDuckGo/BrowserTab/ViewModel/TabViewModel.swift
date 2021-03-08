@@ -125,7 +125,7 @@ class TabViewModel {
             return
         }
 
-        if tab.isHomepageLoaded {
+        if tab.isHomepageShown {
             title = UserText.tabHomeTitle
             return
         }
@@ -143,7 +143,7 @@ class TabViewModel {
             return
         }
 
-        if tab.isHomepageLoaded {
+        if tab.isHomepageShown {
             favicon = Favicon.home
             return
         }

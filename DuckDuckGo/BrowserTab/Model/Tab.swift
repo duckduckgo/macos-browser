@@ -136,7 +136,7 @@ final class Tab: NSObject {
     private var loginDetectionService: LoginDetectionService?
     private let instrumentation = TabInstrumentation()
 
-    var isHomepageLoaded: Bool {
+    var isHomepageShown: Bool {
         url == nil || url == URL.emptyPage
     }
 
