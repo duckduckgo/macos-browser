@@ -173,12 +173,8 @@ class BrowserTabViewController: NSViewController {
 
     private func setFirstResponderIfNeeded() {
         guard let url = webView?.url else {
-            // Without this, in certain situations in dark mode the page will be white when there's no url
-            webView?.setValue(false, forKey: "drawsBackground")
             return
         }
-        
-        webView?.setValue(true, forKey: "drawsBackground")
 
         if !url.isDuckDuckGoSearch {
             DispatchQueue.main.async { [weak self] in
