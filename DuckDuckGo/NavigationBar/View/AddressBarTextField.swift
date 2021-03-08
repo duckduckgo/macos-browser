@@ -130,9 +130,11 @@ class AddressBarTextField: NSTextField {
         }
         guard suggestionsWindow.isVisible else { return }
 
+        let originalStringValue = suggestionsViewModel.userStringValue
         guard let selectedSuggestionViewModel = suggestionsViewModel.selectedSuggestionViewModel else {
-            if let originalStringValue = suggestionsViewModel.userStringValue {
+            if let originalStringValue = originalStringValue {
                 value = Value(stringValue: originalStringValue, userTyped: true)
+                selectToTheEnd(from: originalStringValue.endIndex)
             } else {
                 clearValue()
             }
@@ -141,7 +143,14 @@ class AddressBarTextField: NSTextField {
         }
 
         value = Value.suggestion(selectedSuggestionViewModel)
-        selectToTheEnd(from: cursorPosition)
+        if let originalStringValue = originalStringValue,
+           value.string.hasPrefix(originalStringValue) {
+
+            selectToTheEnd(from: originalStringValue.endIndex)
+        } else {
+            // if suggestion doesn't start with the user input select whole string
+            currentEditor()?.selectAll(nil)
+        }
     }
 
     private func navigate() {
@@ -305,22 +314,21 @@ class AddressBarTextField: NSTextField {
 
     // MARK: - Cursor & Selection
 
-    private var cursorPosition: Int {
-        guard let currentEditor = currentEditor() else {
-            os_log("AddressBarTextField: Current editor not available", type: .error)
-            return 0
-        }
-
-        return currentEditor.selectedRange.location
-    }
-
-    private func selectToTheEnd(from position: Int) {
+    private func selectToTheEnd(from index: String.Index) {
         guard let currentEditor = currentEditor() else {
             os_log("AddressBarTextField: Current editor not available", type: .error)
             return
         }
+        let string = currentEditor.string
+        guard string.indices.contains(index) else {
+            os_log("AddressBarTextField: Current editor does not contain selection start index", type: .error)
+            currentEditor.selectAll(nil)
+            return
+        }
 
-        currentEditor.selectedRange = NSRange(location: position, length: stringValue.count - position - suffixLength)
+        let endIndex = string.index(string.endIndex, offsetBy: -suffixLength)
+
+        currentEditor.selectedRange = string.nsRange(from: index..<endIndex)
     }
 
     private func filterSuffixSelection() {
@@ -332,7 +340,7 @@ class AddressBarTextField: NSTextField {
         let currentLocation = currentEditor.selectedRange.location
         let currentLength = currentEditor.selectedRange.length
         let currentSelectionEnd = currentLocation + currentLength
-        let suffixStart = stringValue.count - suffixLength
+        let suffixStart = stringValue.utf16.count - suffixLength
         guard suffixStart >= 0 else { return }
 
         if currentSelectionEnd > suffixStart {
