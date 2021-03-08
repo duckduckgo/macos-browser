@@ -26,8 +26,6 @@ class OptionsButtonMenu: NSMenu {
     private let tabCollectionViewModel: TabCollectionViewModel
     private let emailManager: EmailManager
     
-    private var emailMenuItem: NSMenuItem?
-
     required init(coder: NSCoder) {
         fatalError("OptionsButtonMenu: Bad initializer")
     }
@@ -38,15 +36,6 @@ class OptionsButtonMenu: NSMenu {
         super.init(title: "")
 
         setupMenuItems()
-        
-        NotificationCenter.default.addObserver(self,
-                                               selector: #selector(emailDidSignInNotification(_:)),
-                                               name: .emailDidSignIn,
-                                               object: nil)
-        NotificationCenter.default.addObserver(self,
-                                               selector: #selector(emailDidSignOutNotification(_:)),
-                                               name: .emailDidSignOut,
-                                               object: nil)
     }
 
     let bookmarksMenuItem = NSMenuItem(title: UserText.bookmarks, action: nil, keyEquivalent: "")
@@ -57,7 +46,6 @@ class OptionsButtonMenu: NSMenu {
         super.update()
     }
 
-    // swiftlint:disable function_body_length
     private func setupMenuItems() {
         let moveTabMenuItem = NSMenuItem(title: UserText.moveTabToNewWindow,
                                          action: #selector(moveTabToNewWindowAction(_:)),
@@ -77,14 +65,12 @@ class OptionsButtonMenu: NSMenu {
 
 #endif
         
-        let emailItem = NSMenuItem(title: "",
+        let emailItem = NSMenuItem(title: UserText.emailOptionsMenuItem,
                                    action: nil,
                                    keyEquivalent: "")
-        emailItem.target = self
-        emailItem.image = NSImage(named: "Feedback")
+        emailItem.image = NSImage(named: "OptionsButtonMenuEmail")
+        emailItem.submenu = EmailOptionsButtonSubMenu(tabCollectionViewModel: tabCollectionViewModel, emailManager: emailManager)
         addItem(emailItem)
-        emailMenuItem = emailItem
-        updateEmailMenuItem()
     
         addItem(NSMenuItem.separator())
         
@@ -115,19 +101,6 @@ class OptionsButtonMenu: NSMenu {
              addItem(NSMenuItem.separator())
          }
     }
-    // swiftlint:enable function_body_length
-    
-    private func updateEmailMenuItem() {
-        if emailManager.isSignedIn {
-            emailMenuItem?.title = "Turn off Email Protection"
-            emailMenuItem?.image = NSImage(named: "OptionsButtonMenuEmailDisabled")
-            emailMenuItem?.action = #selector(turnOffEmailAction(_:))
-        } else {
-            emailMenuItem?.title = "Turn on Email Protection"
-            emailMenuItem?.image = NSImage(named: "OptionsButtonMenuEmail")
-            emailMenuItem?.action = #selector(turnOnEmailAction(_:))
-        }
-    }
     
     private func updateBookmarks() {
         // The bookmarks section is the same with the main menu
@@ -154,6 +127,83 @@ class OptionsButtonMenu: NSMenu {
         selectedTabViewModel.tab.requestFireproofToggle()
     }
     
+}
+
+class EmailOptionsButtonSubMenu: NSMenu {
+    
+    private let tabCollectionViewModel: TabCollectionViewModel
+    private let emailManager: EmailManager
+        
+    init(tabCollectionViewModel: TabCollectionViewModel, emailManager: EmailManager) {
+        self.tabCollectionViewModel = tabCollectionViewModel
+        self.emailManager = emailManager
+        super.init(title: UserText.emailOptionsMenuItem)
+
+        updateMenuItems()
+        
+        NotificationCenter.default.addObserver(self,
+                                               selector: #selector(emailDidSignInNotification(_:)),
+                                               name: .emailDidSignIn,
+                                               object: nil)
+        NotificationCenter.default.addObserver(self,
+                                               selector: #selector(emailDidSignOutNotification(_:)),
+                                               name: .emailDidSignOut,
+                                               object: nil)
+    }
+    
+    required init(coder: NSCoder) {
+        fatalError("init(coder:) has not been implemented")
+    }
+    
+    private func updateMenuItems() {
+        removeAllItems()
+        if emailManager.isSignedIn {
+            let createAddressItem = NSMenuItem(title: UserText.emailOptionsMenuCreateAddressSubItem,
+                                           action: #selector(createAddressAction(_:)),
+                                           keyEquivalent: "")
+            createAddressItem.target = self
+            createAddressItem.image = NSImage(named: "OptionsButtonMenuEmailGenerateAddress")
+            addItem(createAddressItem)
+            
+            let viewDashboardItem = NSMenuItem(title: UserText.emailOptionsMenuViewDashboardSubItem,
+                                           action: #selector(viewDashboardAction(_:)),
+                                           keyEquivalent: "")
+            viewDashboardItem.target = self
+            viewDashboardItem.image = NSImage(named: "OptionsButtonMenuEmailDashboard")
+            addItem(viewDashboardItem)
+            
+            let turnOnOffItem = NSMenuItem(title: UserText.emailOptionsMenuTurnOffSubItem,
+                                           action: #selector(turnOffEmailAction(_:)),
+                                           keyEquivalent: "")
+            turnOnOffItem.target = self
+            turnOnOffItem.image = NSImage(named: "OptionsButtonMenuEmailDisabled")
+            addItem(turnOnOffItem)
+        } else {
+            let turnOnOffItem = NSMenuItem(title: UserText.emailOptionsMenuTurnOnSubItem,
+                                           action: #selector(turnOnEmailAction(_:)),
+                                           keyEquivalent: "")
+            turnOnOffItem.target = self
+            turnOnOffItem.image = NSImage(named: "OptionsButtonMenuEmail")
+            addItem(turnOnOffItem)
+        }
+    }
+    
+    @objc func createAddressAction(_ sender: NSMenuItem) {
+        guard let url = emailManager.generateTokenPageURL else {
+            assertionFailure("Could not get token page URL, token not available")
+            return
+        }
+        let tab = Tab()
+        tab.url = url
+        tabCollectionViewModel.append(tab: tab)
+    }
+    
+    @objc func viewDashboardAction(_ sender: NSMenuItem) {
+        let tab = Tab()
+        tab.url = EmailUrls().emailDashboardPage
+        tabCollectionViewModel.append(tab: tab)
+    }
+    
     @objc func turnOffEmailAction(_ sender: NSMenuItem) {
         emailManager.signOut()
     }
@@ -165,11 +215,10 @@ class OptionsButtonMenu: NSMenu {
     }
 
     @objc func emailDidSignInNotification(_ notification: Notification) {
-        updateEmailMenuItem()
+        updateMenuItems()
     }
     
     @objc func emailDidSignOutNotification(_ notification: Notification) {
-        updateEmailMenuItem()
+        updateMenuItems()
     }
-    
 }
