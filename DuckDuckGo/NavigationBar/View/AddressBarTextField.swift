@@ -153,6 +153,17 @@ class AddressBarTextField: NSTextField {
         }
     }
 
+    private func addressBarEnterPressed() {
+        suggestionsViewModel.suggestions.stopFetchingSuggestions()
+        hideSuggestionsWindow()
+
+        if NSApp.isCommandPressed {
+            openNewTab(selected: NSApp.isShiftPressed)
+        } else {
+            navigate()
+        }
+    }
+
     private func navigate() {
         hideSuggestionsWindow()
         updateTabUrl()
@@ -424,16 +435,7 @@ extension AddressBarTextField: NSTextFieldDelegate {
     func controlTextDidEndEditing(_ obj: Notification) {
         suggestionsViewModel.suggestions.stopFetchingSuggestions()
         hideSuggestionsWindow()
-
-        if NSApp.isReturnOrEnterPressed {
-            if NSApp.isCommandPressed {
-                openNewTab(selected: NSApp.isShiftPressed)
-            } else {
-                navigate()
-            }
-        } else {
-            updateValue()
-        }
+        updateValue()
     }
 
     func controlTextDidChange(_ obj: Notification) {
@@ -454,7 +456,7 @@ extension AddressBarTextField: NSTextFieldDelegate {
 
     func control(_ control: NSControl, textView: NSTextView, doCommandBy commandSelector: Selector) -> Bool {
         if NSApp.isReturnOrEnterPressed {
-            self.controlTextDidEndEditing(Notification(name: .init(rawValue: "")))
+            self.addressBarEnterPressed()
             return true
         }
 
