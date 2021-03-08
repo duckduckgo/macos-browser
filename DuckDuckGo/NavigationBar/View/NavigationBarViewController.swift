@@ -28,6 +28,7 @@ class NavigationBarViewController: NSViewController {
     @IBOutlet weak var feedbackButton: NSButton!
     @IBOutlet weak var optionsButton: NSButton!
     @IBOutlet weak var shareButton: NSButton!
+    @IBOutlet weak var extensionsStackView: NSStackView!
 
     var addressBarViewController: AddressBarViewController?
 
@@ -40,6 +41,7 @@ class NavigationBarViewController: NSViewController {
 
     private var selectedTabViewModelCancellable: AnyCancellable?
     private var navigationButtonsCancellables = Set<AnyCancellable>()
+    private var webExtensionsCancellable: AnyCancellable?
 
     required init?(coder: NSCoder) {
         fatalError("NavigationBarViewController: Bad initializer")
@@ -57,6 +59,7 @@ class NavigationBarViewController: NSViewController {
 
         setupNavigationButtonMenus()
         subscribeToSelectedTabViewModel()
+        subscribeToWebExtensions()
 
 #if !FEEDBACK
 
@@ -160,6 +163,23 @@ class NavigationBarViewController: NSViewController {
         selectedTabViewModel.$canReload.receive(on: DispatchQueue.main).sink { [weak self] _ in
             self?.updateNavigationButtons()
         } .store(in: &navigationButtonsCancellables)
+    }
+
+    private func subscribeToWebExtensions() {
+        webExtensionsCancellable = WebExtensionsManager.shared.$activeExtensions
+            .receive(on: DispatchQueue.main)
+            .sink { [weak self] activeExtensions in
+                let imageViews = activeExtensions.map { webExtension -> NSImageView in
+                    if let icon = webExtension.icon { return NSImageView(image: icon) } else { return NSImageView() }
+                }
+                self?.extensionsStackView.arrangedSubviews.forEach { $0.removeFromSuperview() }
+                imageViews.forEach {
+                    let widthConstraint = $0.widthAnchor.constraint(equalToConstant: 20)
+                    let heightConstraint = $0.heightAnchor.constraint(equalToConstant: 20)
+                    $0.addConstraints([widthConstraint, heightConstraint])
+                    self?.extensionsStackView.addArrangedSubview($0)
+                }
+            }
     }
 
     private func updateNavigationButtons() {

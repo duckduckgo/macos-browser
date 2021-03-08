@@ -1,0 +1,79 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<document type="com.apple.InterfaceBuilder3.Cocoa.XIB" version="3.0" toolsVersion="17701" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none" useAutolayout="YES" customObjectInstantitationMethod="direct">
+    <dependencies>
+        <deployment identifier="macosx"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="17701"/>
+        <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
+    </dependencies>
+    <objects>
+        <customObject id="-2" userLabel="File's Owner" customClass="WebExtensionCollectionViewItem" customModule="DuckDuckGo_Privacy_Browser" customModuleProvider="target">
+            <connections>
+                <outlet property="view" destination="Hz6-mo-xeY" id="0bl-1N-x8E"/>
+            </connections>
+        </customObject>
+        <customObject id="-1" userLabel="First Responder" customClass="FirstResponder"/>
+        <customObject id="-3" userLabel="Application" customClass="NSObject"/>
+        <customView id="Hz6-mo-xeY" userLabel="Web Extension Collection View Item">
+            <rect key="frame" x="0.0" y="0.0" width="724" height="72"/>
+            <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+            <subviews>
+                <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="rP3-oC-QYL">
+                    <rect key="frame" x="73" y="39" width="545" height="16"/>
+                    <textFieldCell key="cell" lineBreakMode="clipping" placeholderString="name" id="udW-7j-wwi">
+                        <font key="font" textStyle="headline" name=".SFNS-Bold"/>
+                        <color key="textColor" name="labelColor" catalog="System" colorSpace="catalog"/>
+                        <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
+                    </textFieldCell>
+                </textField>
+                <imageView horizontalHuggingPriority="251" verticalHuggingPriority="251" translatesAutoresizingMaskIntoConstraints="NO" id="Amu-Cg-a3G">
+                    <rect key="frame" x="20" y="20" width="35" height="35"/>
+                    <constraints>
+                        <constraint firstAttribute="height" constant="35" id="KMd-jt-Xxj"/>
+                        <constraint firstAttribute="width" constant="35" id="gWE-VU-Mx3"/>
+                    </constraints>
+                    <imageCell key="cell" refusesFirstResponder="YES" alignment="left" imageScaling="proportionallyDown" id="Jpa-eZ-UmJ"/>
+                </imageView>
+                <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="3B9-my-EGI">
+                    <rect key="frame" x="75" y="22" width="543" height="13"/>
+                    <textFieldCell key="cell" lineBreakMode="truncatingTail" title="Label" id="bvt-2q-YgU">
+                        <font key="font" textStyle="footnote" name=".SFNS-Regular"/>
+                        <color key="textColor" name="labelColor" catalog="System" colorSpace="catalog"/>
+                        <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
+                    </textFieldCell>
+                </textField>
+                <button verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="rp6-76-YXv">
+                    <rect key="frame" x="617" y="19" width="94" height="32"/>
+                    <constraints>
+                        <constraint firstAttribute="width" constant="80" id="f74-qV-fxe"/>
+                    </constraints>
+                    <buttonCell key="cell" type="push" title="Install" bezelStyle="rounded" alignment="center" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="U8U-6w-Smk">
+                        <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
+                        <font key="font" metaFont="system"/>
+                    </buttonCell>
+                </button>
+            </subviews>
+            <constraints>
+                <constraint firstItem="rp6-76-YXv" firstAttribute="leading" secondItem="3B9-my-EGI" secondAttribute="trailing" constant="8" symbolic="YES" id="0SQ-TL-7UZ"/>
+                <constraint firstItem="rp6-76-YXv" firstAttribute="centerY" secondItem="Hz6-mo-xeY" secondAttribute="centerY" id="106-Gq-orm"/>
+                <constraint firstItem="Amu-Cg-a3G" firstAttribute="top" secondItem="Hz6-mo-xeY" secondAttribute="top" constant="17" id="DFF-N5-SYV"/>
+                <constraint firstItem="rP3-oC-QYL" firstAttribute="top" secondItem="Hz6-mo-xeY" secondAttribute="top" constant="17" id="F7S-Fw-e0B"/>
+                <constraint firstItem="rp6-76-YXv" firstAttribute="leading" secondItem="rP3-oC-QYL" secondAttribute="trailing" constant="8" symbolic="YES" id="Jac-Uh-xlw"/>
+                <constraint firstAttribute="trailing" secondItem="rp6-76-YXv" secondAttribute="trailing" constant="20" id="Q2L-2O-WG3"/>
+                <constraint firstItem="Amu-Cg-a3G" firstAttribute="leading" secondItem="Hz6-mo-xeY" secondAttribute="leading" constant="20" symbolic="YES" id="S5f-mg-zWP"/>
+                <constraint firstItem="3B9-my-EGI" firstAttribute="leading" secondItem="Amu-Cg-a3G" secondAttribute="trailing" constant="22" id="YtA-1W-3hd"/>
+                <constraint firstItem="rP3-oC-QYL" firstAttribute="leading" secondItem="Amu-Cg-a3G" secondAttribute="trailing" constant="20" id="uuZ-z1-icl"/>
+                <constraint firstItem="3B9-my-EGI" firstAttribute="top" secondItem="rP3-oC-QYL" secondAttribute="bottom" constant="4" id="yra-Ol-0i0"/>
+            </constraints>
+            <point key="canvasLocation" x="274" y="9"/>
+        </customView>
+        <collectionViewItem id="uBS-U9-OIV" customClass="WebExtensionCollectionViewItem" customModule="DuckDuckGo_Privacy_Browser" customModuleProvider="target">
+            <connections>
+                <outlet property="descriptionTextField" destination="3B9-my-EGI" id="Y4K-Ga-eKL"/>
+                <outlet property="iconImageView" destination="Amu-Cg-a3G" id="j1r-Pn-TeT"/>
+                <outlet property="installButton" destination="rp6-76-YXv" id="htK-XO-HCV"/>
+                <outlet property="nameTextField" destination="rP3-oC-QYL" id="ohN-fa-7pZ"/>
+                <outlet property="view" destination="Hz6-mo-xeY" id="rjV-kf-QHL"/>
+            </connections>
+        </collectionViewItem>
+    </objects>
+</document>

@@ -17,16 +17,20 @@
 //
 
 import Foundation
+import Combine
 
 class WebExtensionsManager {
 
     static let shared = WebExtensionsManager()
 
     private init() {
-//        _ = webExtensions
+        // Temporary
+        activeExtensions = [] //webExtensions.filter({$0.manifest.name == "Borderify" || $0.manifest.name == "Emoji Substitution"})
     }
 
-    private var webExtensions: [WebExtension] = {
+    @Published var activeExtensions: [WebExtension]
+
+    var webExtensions: [WebExtension] = {
         let url = Bundle.main.bundleURL.appendingPathComponent("Contents/PlugIns/WebExtensions")
         //        print("\(url)")
         let contents = try? FileManager.default.contentsOfDirectory(at: url, includingPropertiesForKeys: nil, options: [])

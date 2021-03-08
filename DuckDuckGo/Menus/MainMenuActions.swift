@@ -78,6 +78,12 @@ extension AppDelegate {
         WindowsManager.openNewWindow(with: tab)
     }
 
+    @IBAction func openWebExtensions(_ sender: Any?) {
+        let storyboard = NSStoryboard(name: "WebExtensions", bundle: nil)
+        let controller = storyboard.instantiateController(withIdentifier: "WebExtensionsWindow") as? NSWindowController
+        controller?.showWindow(self)
+    }
+
 }
 
 extension MainViewController {

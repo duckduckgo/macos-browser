@@ -25,12 +25,19 @@ final class UserScriptsManager {
     @Published
     private(set) var userScripts = UserScripts()
     private var sourceUpdatedCancellable: AnyCancellable!
+    private var activeWebExtensionsCancellable: AnyCancellable!
 
     init(scriptSource: ScriptSourceProviding = DefaultScriptSourceProvider.shared) {
         sourceUpdatedCancellable = scriptSource.sourceUpdatedPublisher
             .receive(on: DispatchQueue.main)
             .map(UserScripts.init)
             .weakAssign(to: \.userScripts, on: self)
+
+        activeWebExtensionsCancellable = WebExtensionsManager.shared.$activeExtensions
+            .receive(on: DispatchQueue.main)
+            .sink { [weak self] _ in
+                self?.userScripts = UserScripts()
+            }
     }
 
 }

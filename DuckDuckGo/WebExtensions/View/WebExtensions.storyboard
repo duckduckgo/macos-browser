@@ -1,0 +1,95 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<document type="com.apple.InterfaceBuilder3.Cocoa.Storyboard.XIB" version="3.0" toolsVersion="17701" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none" useAutolayout="YES" initialViewController="ilf-Kd-8Pe">
+    <dependencies>
+        <deployment identifier="macosx"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="17701"/>
+        <capability name="Named colors" minToolsVersion="9.0"/>
+        <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
+    </dependencies>
+    <scenes>
+        <!--Window Controller-->
+        <scene sceneID="EqL-KJ-QfL">
+            <objects>
+                <windowController storyboardIdentifier="WebExtensionsWindow" id="ilf-Kd-8Pe" sceneMemberID="viewController">
+                    <window key="window" title="Extensions" allowsToolTipsWhenApplicationIsInactive="NO" autorecalculatesKeyViewLoop="NO" releasedWhenClosed="NO" visibleAtLaunch="NO" frameAutosaveName="" animationBehavior="default" id="MJ1-Nf-D8O">
+                        <windowStyleMask key="styleMask" titled="YES" closable="YES" miniaturizable="YES" resizable="YES"/>
+                        <windowPositionMask key="initialPositionMask" leftStrut="YES" rightStrut="YES" topStrut="YES" bottomStrut="YES"/>
+                        <rect key="contentRect" x="294" y="207" width="705" height="376"/>
+                        <rect key="screenRect" x="0.0" y="0.0" width="1920" height="1055"/>
+                        <view key="contentView" id="3pA-so-e2o">
+                            <rect key="frame" x="0.0" y="0.0" width="705" height="376"/>
+                            <autoresizingMask key="autoresizingMask"/>
+                        </view>
+                        <connections>
+                            <outlet property="delegate" destination="ilf-Kd-8Pe" id="WWg-Te-Iwm"/>
+                        </connections>
+                    </window>
+                    <connections>
+                        <segue destination="mcJ-WJ-y5S" kind="relationship" relationship="window.shadowedContentViewController" id="Rmw-nM-vQF"/>
+                    </connections>
+                </windowController>
+                <customObject id="EDJ-JO-LnP" userLabel="First Responder" customClass="NSResponder" sceneMemberID="firstResponder"/>
+            </objects>
+            <point key="canvasLocation" x="-261.5" y="110"/>
+        </scene>
+        <!--Web Extensions View Controller-->
+        <scene sceneID="6V2-zQ-d7V">
+            <objects>
+                <viewController id="mcJ-WJ-y5S" customClass="WebExtensionsViewController" customModule="DuckDuckGo_Privacy_Browser" customModuleProvider="target" sceneMemberID="viewController">
+                    <view key="view" id="j0I-cn-b46">
+                        <rect key="frame" x="0.0" y="0.0" width="705" height="362"/>
+                        <autoresizingMask key="autoresizingMask"/>
+                        <subviews>
+                            <scrollView wantsLayer="YES" autohidesScrollers="YES" horizontalLineScroll="10" horizontalPageScroll="10" verticalLineScroll="10" verticalPageScroll="10" usesPredominantAxisScrolling="NO" translatesAutoresizingMaskIntoConstraints="NO" id="pSF-tN-u75">
+                                <rect key="frame" x="0.0" y="0.0" width="705" height="362"/>
+                                <clipView key="contentView" drawsBackground="NO" id="mqt-ei-tcu">
+                                    <rect key="frame" x="1" y="1" width="703" height="360"/>
+                                    <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+                                    <subviews>
+                                        <collectionView selectable="YES" allowsMultipleSelection="YES" id="wC9-kn-ZZd">
+                                            <rect key="frame" x="0.0" y="0.0" width="703" height="158"/>
+                                            <autoresizingMask key="autoresizingMask" widthSizable="YES"/>
+                                            <collectionViewFlowLayout key="collectionViewLayout" minimumInteritemSpacing="1" minimumLineSpacing="1" id="V7K-ps-avE">
+                                                <size key="itemSize" width="150" height="150"/>
+                                                <edgeInsets key="sectionInset" left="10" right="10" top="0.0" bottom="0.0"/>
+                                            </collectionViewFlowLayout>
+                                            <color key="primaryBackgroundColor" name="TooltipBackgroundColor"/>
+                                            <connections>
+                                                <outlet property="dataSource" destination="mcJ-WJ-y5S" id="ONV-LT-gii"/>
+                                                <outlet property="delegate" destination="mcJ-WJ-y5S" id="N4b-94-cTy"/>
+                                            </connections>
+                                        </collectionView>
+                                    </subviews>
+                                </clipView>
+                                <scroller key="horizontalScroller" hidden="YES" wantsLayer="YES" verticalHuggingPriority="750" horizontal="YES" id="N9a-2g-RoO">
+                                    <rect key="frame" x="1" y="144" width="233" height="15"/>
+                                    <autoresizingMask key="autoresizingMask"/>
+                                </scroller>
+                                <scroller key="verticalScroller" hidden="YES" wantsLayer="YES" verticalHuggingPriority="750" doubleValue="1" horizontal="NO" id="13l-IU-8it">
+                                    <rect key="frame" x="234" y="1" width="15" height="143"/>
+                                    <autoresizingMask key="autoresizingMask"/>
+                                </scroller>
+                            </scrollView>
+                        </subviews>
+                        <constraints>
+                            <constraint firstAttribute="trailing" secondItem="pSF-tN-u75" secondAttribute="trailing" id="92f-z7-gRk"/>
+                            <constraint firstItem="pSF-tN-u75" firstAttribute="top" secondItem="j0I-cn-b46" secondAttribute="top" id="NPO-rL-6rq"/>
+                            <constraint firstItem="pSF-tN-u75" firstAttribute="leading" secondItem="j0I-cn-b46" secondAttribute="leading" id="ZIF-cH-j1x"/>
+                            <constraint firstAttribute="bottom" secondItem="pSF-tN-u75" secondAttribute="bottom" id="rk0-eg-hWb"/>
+                        </constraints>
+                    </view>
+                    <connections>
+                        <outlet property="collectionView" destination="wC9-kn-ZZd" id="8ky-Vr-eEz"/>
+                    </connections>
+                </viewController>
+                <customObject id="2Z7-iY-XPG" userLabel="First Responder" customClass="NSResponder" sceneMemberID="firstResponder"/>
+            </objects>
+            <point key="canvasLocation" x="-261.5" y="625"/>
+        </scene>
+    </scenes>
+    <resources>
+        <namedColor name="TooltipBackgroundColor">
+            <color red="0.97254901960784312" green="0.97254901960784312" blue="0.97254901960784312" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+        </namedColor>
+    </resources>
+</document>

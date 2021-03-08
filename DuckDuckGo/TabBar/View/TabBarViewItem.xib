@@ -118,7 +118,7 @@
                 <constraint firstItem="DFD-8r-YGx" firstAttribute="leading" secondItem="Hz6-mo-xeY" secondAttribute="leading" constant="32" id="wsl-bP-pgm"/>
                 <constraint firstItem="vuD-rY-Vzl" firstAttribute="centerY" secondItem="Hz6-mo-xeY" secondAttribute="centerY" id="yci-6f-cbz"/>
             </constraints>
-            <point key="canvasLocation" x="-60.5" y="120.5"/>
+            <point key="canvasLocation" x="-61" y="120.5"/>
         </customView>
         <collectionViewItem id="4MN-w4-aCk" customClass="TabBarViewItem" customModule="DuckDuckGo_Privacy_Browser" customModuleProvider="target">
             <connections>

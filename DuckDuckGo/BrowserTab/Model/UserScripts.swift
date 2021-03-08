@@ -49,7 +49,11 @@ class UserScripts {
         self.contentBlockerRulesScript
     ]
 
-    lazy var scripts = userScripts.map { $0.makeWKUserScript() }
+    var webExtensionScripts: [UserScript] = {
+        WebExtensionsManager.shared.activeExtensions.map({ WebExtensionUserScript(webExtension: $0) })
+    }()
+
+    lazy var scripts = (userScripts + webExtensionScripts).map { $0.makeWKUserScript() }
 
 }
 

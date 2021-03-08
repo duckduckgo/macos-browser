@@ -12,12 +12,18 @@
             <objects>
                 <viewController id="o2v-eH-jTI" customClass="NavigationBarViewController" customModule="DuckDuckGo_Privacy_Browser" customModuleProvider="target" sceneMemberID="viewController">
                     <view key="view" id="hYV-nu-QIp" customClass="ColorView" customModule="DuckDuckGo_Privacy_Browser" customModuleProvider="target">
-                        <rect key="frame" x="0.0" y="0.0" width="803" height="40"/>
+                        <rect key="frame" x="0.0" y="0.0" width="899" height="40"/>
                         <autoresizingMask key="autoresizingMask"/>
                         <subviews>
                             <customView translatesAutoresizingMaskIntoConstraints="NO" id="EQw-GG-GMA" customClass="WindowDraggingView" customModule="DuckDuckGo_Privacy_Browser" customModuleProvider="target">
-                                <rect key="frame" x="0.0" y="0.0" width="803" height="40"/>
+                                <rect key="frame" x="0.0" y="0.0" width="899" height="40"/>
                             </customView>
+                            <stackView distribution="equalSpacing" orientation="horizontal" alignment="centerY" spacing="10" horizontalStackHuggingPriority="249.99998474121094" verticalStackHuggingPriority="249.99998474121094" detachesHiddenViews="YES" translatesAutoresizingMaskIntoConstraints="NO" id="n8A-f7-w6x">
+                                <rect key="frame" x="787" y="10" width="0.0" height="21"/>
+                                <constraints>
+                                    <constraint firstAttribute="height" constant="21" id="BwV-iD-SVd"/>
+                                </constraints>
+                            </stackView>
                             <button translatesAutoresizingMaskIntoConstraints="NO" id="kky-0N-Cfd" customClass="MouseOverButton" customModule="DuckDuckGo_Privacy_Browser" customModuleProvider="target">
                                 <rect key="frame" x="8" y="8" width="32" height="24"/>
                                 <constraints>
@@ -97,7 +103,7 @@
                                 </connections>
                             </button>
                             <button translatesAutoresizingMaskIntoConstraints="NO" id="iIF-Ky-unr" customClass="MouseOverButton" customModule="DuckDuckGo_Privacy_Browser" customModuleProvider="target">
-                                <rect key="frame" x="763" y="8" width="32" height="24"/>
+                                <rect key="frame" x="859" y="8" width="32" height="24"/>
                                 <constraints>
                                     <constraint firstAttribute="width" constant="32" id="2ry-8Q-yfk"/>
                                     <constraint firstAttribute="height" constant="24" id="s7E-4e-eTj"/>
@@ -123,7 +129,7 @@
                                 </connections>
                             </button>
                             <containerView translatesAutoresizingMaskIntoConstraints="NO" id="Wba-nA-FYj">
-                                <rect key="frame" x="130" y="1" width="560" height="38"/>
+                                <rect key="frame" x="178" y="1" width="560" height="38"/>
                                 <constraints>
                                     <constraint firstAttribute="width" relation="greaterThanOrEqual" priority="301" constant="560" id="UmE-2a-hW4"/>
                                     <constraint firstAttribute="height" constant="38" id="fDM-4Y-Nvs"/>
@@ -133,7 +139,7 @@
                                 </connections>
                             </containerView>
                             <button translatesAutoresizingMaskIntoConstraints="NO" id="DqX-mW-o7G" customClass="MouseOverButton" customModule="DuckDuckGo_Privacy_Browser" customModuleProvider="target">
-                                <rect key="frame" x="699" y="8" width="32" height="24"/>
+                                <rect key="frame" x="795" y="8" width="32" height="24"/>
                                 <constraints>
                                     <constraint firstAttribute="width" constant="32" id="VYL-F0-tet"/>
                                     <constraint firstAttribute="height" constant="24" id="fPk-l3-pz2"/>
@@ -159,7 +165,7 @@
                                 </connections>
                             </button>
                             <button translatesAutoresizingMaskIntoConstraints="NO" id="XBe-xO-dXj" userLabel="Share Button" customClass="MouseOverButton" customModule="DuckDuckGo_Privacy_Browser" customModuleProvider="target">
-                                <rect key="frame" x="731" y="5" width="32.5" height="32"/>
+                                <rect key="frame" x="827" y="5" width="32.5" height="32"/>
                                 <constraints>
                                     <constraint firstAttribute="height" constant="24" id="Ile-vS-DrC"/>
                                     <constraint firstAttribute="width" constant="32" id="dww-gU-g9Y"/>
@@ -195,6 +201,7 @@
                             <constraint firstItem="Wba-nA-FYj" firstAttribute="top" secondItem="hYV-nu-QIp" secondAttribute="top" constant="1" id="Whl-qs-kgy"/>
                             <constraint firstItem="iIF-Ky-unr" firstAttribute="leading" secondItem="XBe-xO-dXj" secondAttribute="trailing" id="XeF-9Z-4fx"/>
                             <constraint firstItem="B2U-XM-Vo0" firstAttribute="leading" secondItem="mdE-u0-Ei5" secondAttribute="trailing" id="aG0-IE-Xpr"/>
+                            <constraint firstItem="n8A-f7-w6x" firstAttribute="centerY" secondItem="hYV-nu-QIp" secondAttribute="centerY" id="aaL-uR-ozW"/>
                             <constraint firstItem="XBe-xO-dXj" firstAttribute="centerY" secondItem="hYV-nu-QIp" secondAttribute="centerY" id="aq3-cG-JsH"/>
                             <constraint firstItem="EQw-GG-GMA" firstAttribute="top" secondItem="hYV-nu-QIp" secondAttribute="top" id="ctd-w7-EMF"/>
                             <constraint firstItem="mdE-u0-Ei5" firstAttribute="leading" secondItem="kky-0N-Cfd" secondAttribute="trailing" id="dfl-Lh-pZe"/>
@@ -202,6 +209,7 @@
                             <constraint firstItem="EQw-GG-GMA" firstAttribute="leading" secondItem="hYV-nu-QIp" secondAttribute="leading" id="hpe-5Y-XTJ"/>
                             <constraint firstItem="mdE-u0-Ei5" firstAttribute="centerY" secondItem="hYV-nu-QIp" secondAttribute="centerY" id="hpv-rt-wVQ"/>
                             <constraint firstItem="XBe-xO-dXj" firstAttribute="leading" secondItem="DqX-mW-o7G" secondAttribute="trailing" id="jwc-uv-Z8J"/>
+                            <constraint firstItem="DqX-mW-o7G" firstAttribute="leading" secondItem="n8A-f7-w6x" secondAttribute="trailing" constant="8" id="kvl-TA-bye"/>
                             <constraint firstItem="kky-0N-Cfd" firstAttribute="centerY" secondItem="hYV-nu-QIp" secondAttribute="centerY" id="nim-fw-Zt3"/>
                             <constraint firstAttribute="trailing" secondItem="EQw-GG-GMA" secondAttribute="trailing" id="oYK-XH-0iN"/>
                             <constraint firstItem="Wba-nA-FYj" firstAttribute="leading" relation="greaterThanOrEqual" secondItem="hYV-nu-QIp" secondAttribute="leading" constant="112" id="sKj-TU-b0z"/>
@@ -215,6 +223,7 @@
                         </userDefinedRuntimeAttributes>
                     </view>
                     <connections>
+                        <outlet property="extensionsStackView" destination="n8A-f7-w6x" id="uGk-Tf-tZo"/>
                         <outlet property="feedbackButton" destination="DqX-mW-o7G" id="cwM-B1-ntW"/>
                         <outlet property="goBackButton" destination="kky-0N-Cfd" id="RA9-yE-URS"/>
                         <outlet property="goForwardButton" destination="mdE-u0-Ei5" id="7wT-nX-Avr"/>
@@ -225,7 +234,7 @@
                 </viewController>
                 <customObject id="wkT-Td-n7D" userLabel="First Responder" customClass="NSResponder" sceneMemberID="firstResponder"/>
             </objects>
-            <point key="canvasLocation" x="75.5" y="1892"/>
+            <point key="canvasLocation" x="123.5" y="1892"/>
         </scene>
         <!--Address Bar View Controller-->
         <scene sceneID="gzs-lg-gqU">
