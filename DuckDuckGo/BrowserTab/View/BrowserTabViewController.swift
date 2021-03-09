@@ -34,6 +34,9 @@ class BrowserTabViewController: NSViewController {
     private var contextMenuLink: URL?
     private var contextMenuImage: URL?
     private var defaultBrowserPromptView: DefaultBrowserPromptView?
+    private var canShowEmptyTabInterface: Bool {
+        return tabViewModel?.tab.url == nil
+    }
 
     @UserDefaultsWrapper(key: .defaultBrowserDismissed, defaultValue: false)
     var defaultBrowserPromptDismissed: Bool
@@ -83,14 +86,16 @@ class BrowserTabViewController: NSViewController {
     }
 
     private func showWebView() {
-        self.webView?.isHidden = false
-
         defaultBrowserPromptView?.removeFromSuperview()
         defaultBrowserPromptView = nil
+
+        if let webView = self.webView {
+            addWebViewToViewHierarchy(webView)
+        }
     }
 
     private func showDefaultTabInterface() {
-        self.webView?.isHidden = true
+        self.webView?.removeFromSuperview()
         displayDefaultBrowserPromptIfNeeded()
     }
 
@@ -100,7 +105,7 @@ class BrowserTabViewController: NSViewController {
             defaultBrowserPromptView?.removeFromSuperview()
             defaultBrowserPromptView = nil
         } else {
-            guard self.defaultBrowserPromptView == nil else { return }
+            guard self.defaultBrowserPromptView == nil, canShowEmptyTabInterface else { return }
 
             let view = DefaultBrowserPromptView.createFromNib()
             view.delegate = self
@@ -115,6 +120,19 @@ class BrowserTabViewController: NSViewController {
         }
     }
 
+    private func addWebViewToViewHierarchy(_ webView: WebView) {
+        // This code should ideally use Auto Layout, but in order to enable the web inspector, it needs to use springs & structs.
+        // The line at the bottom of this comment is the "correct" method of doing this, but breaks the inspector.
+        // Context: https://stackoverflow.com/questions/60727065/wkwebview-web-inspector-in-macos-app-fails-to-render-and-flickers-flashes
+        //
+        // view.addAndLayout(newWebView)
+
+        webView.frame = view.bounds
+        webView.autoresizingMask = [.width, .height]
+        view.addSubview(webView)
+        setFirstResponderIfNeeded()
+    }
+
     private func changeWebView() {
 
         func displayWebView(of tabViewModel: TabViewModel) {
@@ -122,19 +140,9 @@ class BrowserTabViewController: NSViewController {
 
             let newWebView = tabViewModel.tab.webView
             newWebView.uiDelegate = self
-
-            // This code should ideally use Auto Layout, but in order to enable the web inspector, it needs to use springs & structs.
-            // The line at the bottom of this comment is the "correct" method of doing this, but breaks the inspector.
-            // Context: https://stackoverflow.com/questions/60727065/wkwebview-web-inspector-in-macos-app-fails-to-render-and-flickers-flashes
-            //
-            // view.addAndLayout(newWebView)
-
-            newWebView.frame = view.bounds
-            newWebView.autoresizingMask = [.width, .height]
-            view.addSubview(newWebView)
-
             webView = newWebView
-            setFirstResponderIfNeeded()
+
+            addWebViewToViewHierarchy(newWebView)
         }
 
         func removeOldWebView(_ oldWebView: WebView?) {
