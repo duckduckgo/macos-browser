@@ -27,13 +27,18 @@ extension String {
         trimmingCharacters(in: .whitespacesAndNewlines)
     }
 
+    func nsRange(from range: Range<String.Index>) -> NSRange {
+        return NSRange(location: self[..<range.lowerBound].utf16.count,
+                       length: self[range].utf16.count)
+    }
+
     // MARK: - Regular Expression
 
     func matches(pattern: String) -> Bool {
         guard let regex = try? NSRegularExpression(pattern: pattern, options: .caseInsensitive) else {
             return false
         }
-        let matches = regex.matches(in: self, options: .anchored, range: NSRange(location: 0, length: count))
+        let matches = regex.matches(in: self, options: .anchored, range: NSRange(location: 0, length: self.utf16.count))
         return matches.count == 1
     }
 
