@@ -1,0 +1,82 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<document type="com.apple.InterfaceBuilder3.Cocoa.Storyboard.XIB" version="3.0" toolsVersion="17701" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none" useAutolayout="YES" initialViewController="NgM-AV-NvE">
+    <dependencies>
+        <deployment identifier="macosx"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="17701"/>
+        <capability name="Named colors" minToolsVersion="9.0"/>
+        <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
+    </dependencies>
+    <scenes>
+        <!--Homepage View Controller-->
+        <scene sceneID="lhD-K8-q8j">
+            <objects>
+                <viewController id="NgM-AV-NvE" customClass="HomepageViewController" customModule="DuckDuckGo_Privacy_Browser" customModuleProvider="target" sceneMemberID="viewController">
+                    <view key="view" id="Veh-DK-43v" customClass="ColorView" customModule="DuckDuckGo_Privacy_Browser" customModuleProvider="target">
+                        <rect key="frame" x="0.0" y="0.0" width="939" height="530"/>
+                        <autoresizingMask key="autoresizingMask"/>
+                        <subviews>
+                            <scrollView wantsLayer="YES" borderType="none" autohidesScrollers="YES" horizontalLineScroll="10" horizontalPageScroll="10" verticalLineScroll="10" verticalPageScroll="10" hasHorizontalScroller="NO" hasVerticalScroller="NO" usesPredominantAxisScrolling="NO" translatesAutoresizingMaskIntoConstraints="NO" id="yHP-1u-VXv">
+                                <rect key="frame" x="194" y="161" width="552" height="208"/>
+                                <clipView key="contentView" drawsBackground="NO" id="w2D-bw-AI3">
+                                    <rect key="frame" x="0.0" y="0.0" width="552" height="208"/>
+                                    <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+                                    <subviews>
+                                        <collectionView id="MU6-iJ-Oba">
+                                            <rect key="frame" x="0.0" y="0.0" width="552" height="158"/>
+                                            <autoresizingMask key="autoresizingMask" widthSizable="YES"/>
+                                            <collectionViewFlowLayout key="collectionViewLayout" minimumInteritemSpacing="48" minimumLineSpacing="32" id="DoO-9t-4cf">
+                                                <size key="itemSize" width="50" height="50"/>
+                                            </collectionViewFlowLayout>
+                                            <color key="primaryBackgroundColor" name="ClearColor"/>
+                                            <connections>
+                                                <outlet property="dataSource" destination="NgM-AV-NvE" id="XHQ-vx-Fxp"/>
+                                                <outlet property="delegate" destination="NgM-AV-NvE" id="PpO-2c-xUZ"/>
+                                            </connections>
+                                        </collectionView>
+                                    </subviews>
+                                    <color key="backgroundColor" name="ClearColor"/>
+                                </clipView>
+                                <constraints>
+                                    <constraint firstAttribute="width" priority="250" constant="552" id="KJY-Xv-KbH"/>
+                                    <constraint firstAttribute="height" priority="250" constant="208" id="u4x-RV-S2R"/>
+                                </constraints>
+                                <scroller key="horizontalScroller" hidden="YES" wantsLayer="YES" verticalHuggingPriority="750" horizontal="YES" id="Jii-b1-70r">
+                                    <rect key="frame" x="-100" y="-100" width="233" height="15"/>
+                                    <autoresizingMask key="autoresizingMask"/>
+                                </scroller>
+                                <scroller key="verticalScroller" hidden="YES" wantsLayer="YES" verticalHuggingPriority="750" doubleValue="1" horizontal="NO" id="M0e-YE-E1d">
+                                    <rect key="frame" x="-100" y="-100" width="15" height="143"/>
+                                    <autoresizingMask key="autoresizingMask"/>
+                                </scroller>
+                            </scrollView>
+                        </subviews>
+                        <constraints>
+                            <constraint firstItem="yHP-1u-VXv" firstAttribute="centerX" secondItem="Veh-DK-43v" secondAttribute="centerX" id="Ee0-wc-Wwv"/>
+                            <constraint firstAttribute="trailing" relation="greaterThanOrEqual" secondItem="yHP-1u-VXv" secondAttribute="trailing" constant="20" id="Loo-dG-uq6"/>
+                            <constraint firstItem="yHP-1u-VXv" firstAttribute="centerY" secondItem="Veh-DK-43v" secondAttribute="centerY" id="WaZ-dB-23C"/>
+                            <constraint firstItem="yHP-1u-VXv" firstAttribute="leading" relation="greaterThanOrEqual" secondItem="Veh-DK-43v" secondAttribute="leading" constant="20" id="pUh-al-NUM"/>
+                        </constraints>
+                        <userDefinedRuntimeAttributes>
+                            <userDefinedRuntimeAttribute type="color" keyPath="backgroundColor">
+                                <color key="value" name="HomepageBackgroundColor"/>
+                            </userDefinedRuntimeAttribute>
+                        </userDefinedRuntimeAttributes>
+                    </view>
+                    <connections>
+                        <outlet property="collectionView" destination="MU6-iJ-Oba" id="dUx-ve-GKd"/>
+                    </connections>
+                </viewController>
+                <customObject id="0P8-8S-i0z" userLabel="First Responder" customClass="NSResponder" sceneMemberID="firstResponder"/>
+            </objects>
+            <point key="canvasLocation" x="-69.5" y="209"/>
+        </scene>
+    </scenes>
+    <resources>
+        <namedColor name="ClearColor">
+            <color red="1" green="1" blue="1" alpha="0.0" colorSpace="custom" customColorSpace="sRGB"/>
+        </namedColor>
+        <namedColor name="HomepageBackgroundColor">
+            <color red="0.97647058823529409" green="0.98039215686274506" blue="0.98039215686274506" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+        </namedColor>
+    </resources>
+</document>

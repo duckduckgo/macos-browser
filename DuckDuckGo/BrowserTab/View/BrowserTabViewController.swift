@@ -25,7 +25,7 @@ import SwiftUI
 class BrowserTabViewController: NSViewController {
 
     @IBOutlet weak var errorView: NSView!
-    lazy var homepageView: NSHostingView<HomepageView> = NSHostingView(rootView: HomepageView())
+    @IBOutlet weak var homepageView: NSView!
     weak var webView: WebView?
 
     var tabViewModel: TabViewModel?

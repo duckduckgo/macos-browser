@@ -1,5 +1,5 @@
 //
-//  HomepageFavoritesView.swift
+//  HomepageCollectionViewItem.swift
 //
 //  Copyright © 2021 DuckDuckGo. All rights reserved.
 //
@@ -16,16 +16,28 @@
 //  limitations under the License.
 //
 
-import SwiftUI
+import Cocoa
 
-struct HomepageFavoritesView: View {
-    var body: some View {
-        Text(/*@START_MENU_TOKEN@*/"Hello, World!"/*@END_MENU_TOKEN@*/)
-    }
-}
+class HomepageCollectionViewItem: NSCollectionViewItem {
 
-struct HomepageFavoritesView_Previews: PreviewProvider {
-    static var previews: some View {
-        HomepageFavoritesView()
+    static let identifier = NSUserInterfaceItemIdentifier(rawValue: "HomepageCollectionViewItem")
+
+    enum Size {
+        static let width = 64
+        static let height = 88
     }
+
+    @IBOutlet weak var faviconImageView: NSImageView!
+    @IBOutlet weak var titleTextField: NSTextField!
+
+    override func viewDidLoad() {
+        super.viewDidLoad()
+        // Do view setup here.
+    }
+
+    func set(bookmark: Bookmark) {
+        faviconImageView.image = bookmark.favicon
+        titleTextField.stringValue = bookmark.title
+    }
+
 }
