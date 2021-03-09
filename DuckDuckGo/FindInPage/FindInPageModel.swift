@@ -18,7 +18,7 @@
 
 import Foundation
 
-class FindInPageModel {
+final class FindInPageModel {
 
     @Published private(set) var text: String = ""
     @Published private(set) var currentSelection: Int = 1

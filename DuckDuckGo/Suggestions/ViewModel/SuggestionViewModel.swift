@@ -18,7 +18,7 @@
 
 import Cocoa
 
-class SuggestionViewModel {
+final class SuggestionViewModel {
 
     let suggestion: Suggestion
     let userStringValue: String

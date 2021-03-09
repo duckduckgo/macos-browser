@@ -19,7 +19,7 @@
 import Cocoa
 import WebKit
 
-class WKBackForwardListItemViewModel {
+final class WKBackForwardListItemViewModel {
 
     private let backForwardListItem: WKBackForwardListItem
     private let faviconService: FaviconService

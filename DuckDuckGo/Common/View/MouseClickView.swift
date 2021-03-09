@@ -34,7 +34,7 @@ extension MouseClickViewDelegate {
 
 }
 
-class MouseClickView: NSView {
+final class MouseClickView: NSView {
 
     weak var delegate: MouseClickViewDelegate?
 

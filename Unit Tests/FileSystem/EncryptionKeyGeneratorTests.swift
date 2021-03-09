@@ -20,7 +20,7 @@ import XCTest
 import CryptoKit
 @testable import DuckDuckGo_Privacy_Browser
 
-class EncryptionKeyGeneratorTests: XCTestCase {
+final class EncryptionKeyGeneratorTests: XCTestCase {
 
     func testRandomKeysAre256Bits() {
         let key = EncryptionKeyGenerator().randomKey()

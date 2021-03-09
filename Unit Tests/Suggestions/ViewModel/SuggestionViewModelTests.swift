@@ -19,7 +19,7 @@
 import XCTest
 @testable import DuckDuckGo_Privacy_Browser
 
-class SuggestionViewModelTests: XCTestCase {
+final class SuggestionViewModelTests: XCTestCase {
 
     func testWhenSuggestionIsPhraseThenStringIsTheSame() {
         let phrase = "phrase"

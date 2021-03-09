@@ -20,7 +20,7 @@ import Cocoa
 import WebKit
 import os.log
 
-class WebView: WKWebView {
+final class WebView: WKWebView {
 
     static let itemSelectors: [String: Selector] = [
         // Links

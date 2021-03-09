@@ -19,7 +19,7 @@
 import XCTest
 @testable import DuckDuckGo_Privacy_Browser
 
-class WebCacheManagerTests: XCTestCase {
+final class WebCacheManagerTests: XCTestCase {
 
     func testWhenCookiesHaveSubDomainsOnSubDomainsAndWildcardsThenOnlyMatchingCookiesRetained() {
         let logins = MockPreservedLogins(domains: [

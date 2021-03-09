@@ -20,7 +20,7 @@ import XCTest
 import Combine
 @testable import DuckDuckGo_Privacy_Browser
 
-class AppStateChangePublisherTests: XCTestCase {
+final class AppStateChangePublisherTests: XCTestCase {
     var cancellables = Set<AnyCancellable>()
 
     override func setUp() {

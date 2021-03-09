@@ -21,7 +21,7 @@ import XCTest
 import WebKit
 @testable import DuckDuckGo_Privacy_Browser
 
-class WKWebViewSessionStateAvailabilityTests: XCTestCase {
+final class WKWebViewSessionStateAvailabilityTests: XCTestCase {
 
     func testWebViewRespondsTo_sessionStateData() {
         let webView = WebView.init(frame: CGRect(), configuration: .init())

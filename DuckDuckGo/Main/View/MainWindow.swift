@@ -18,7 +18,7 @@
 
 import Cocoa
 
-class MainWindow: NSWindow {
+final class MainWindow: NSWindow {
 
     override var canBecomeKey: Bool {
         return true

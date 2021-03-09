@@ -29,7 +29,7 @@ protocol ScriptSourceProviding {
 
 }
 
-class DefaultScriptSourceProvider: ScriptSourceProviding {
+final class DefaultScriptSourceProvider: ScriptSourceProviding {
 
     static var shared: ScriptSourceProviding = DefaultScriptSourceProvider()
 

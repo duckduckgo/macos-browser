@@ -19,7 +19,7 @@
 import Foundation
 import os.log
 
-class UrlEventListener {
+final class UrlEventListener {
 
     private let handler: ((URL) -> Void)
 

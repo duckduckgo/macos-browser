@@ -18,7 +18,7 @@
 
 import Cocoa
 
-class GradientView: NSView {
+final class GradientView: NSView {
 
     required init?(coder: NSCoder) {
         super.init(coder: coder)

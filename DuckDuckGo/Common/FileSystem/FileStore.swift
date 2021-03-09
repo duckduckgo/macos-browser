@@ -26,7 +26,7 @@ protocol FileStoring {
     func remove(_ fileName: String)
 }
 
-class FileStore: FileStoring {
+final class FileStore: FileStoring {
 
     private let encryptionKey: SymmetricKey?
 

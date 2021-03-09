@@ -19,7 +19,7 @@
 import Foundation
 import CryptoKit
 
-class EncryptedValueTransformer<T: NSCoding & NSObject>: ValueTransformer {
+final class EncryptedValueTransformer<T: NSCoding & NSObject>: ValueTransformer {
 
     private let encryptionKey: SymmetricKey
 

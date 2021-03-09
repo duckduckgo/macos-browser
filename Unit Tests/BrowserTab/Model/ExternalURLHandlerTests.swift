@@ -20,7 +20,7 @@ import XCTest
 import Combine
 @testable import DuckDuckGo_Privacy_Browser
 
-class ExternalURLHandlerTests: XCTestCase {
+final class ExternalURLHandlerTests: XCTestCase {
 
     static let smsUrl = URL(string: "sms://123123123123")!
     static let facetimeUrl = URL(string: "facetime://123123123123")!

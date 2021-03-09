@@ -20,7 +20,7 @@ import XCTest
 import Combine
 @testable import DuckDuckGo_Privacy_Browser
 
-class ConfigurationStorageTests: XCTestCase {
+final class ConfigurationStorageTests: XCTestCase {
 
     override func tearDown() {
         super.tearDown()

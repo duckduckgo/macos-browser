@@ -20,7 +20,7 @@ import Cocoa
 import os.log
 import Combine
 
-class MainMenu: NSMenu {
+final class MainMenu: NSMenu {
 
     @IBOutlet weak var printSeparatorItem: NSMenuItem?
     @IBOutlet weak var printMenuItem: NSMenuItem?

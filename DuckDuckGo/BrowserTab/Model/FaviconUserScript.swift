@@ -26,7 +26,7 @@ protocol FaviconUserScriptDelegate: AnyObject {
 
 }
 
-class FaviconUserScript: NSObject, StaticUserScript {
+final class FaviconUserScript: NSObject, StaticUserScript {
 
     static var injectionTime: WKUserScriptInjectionTime { .atDocumentEnd }
     static var forMainFrameOnly: Bool { true }
