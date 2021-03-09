@@ -21,8 +21,11 @@ import Foundation
 struct Browser {
 
     static var isDefault: Bool {
-        let bundleID = Bundle.main.object(forInfoDictionaryKey: "CFBundleIdentifier") as? String
-        return defaultBrowserBundleID == bundleID
+        guard let defaultBrowserURL = NSWorkspace.shared.urlForApplication(toOpen: URL(string: "http://")!) else {
+            return false
+        }
+
+        return Bundle.main.bundleURL == defaultBrowserURL
     }
 
     static func becomeDefault() {
@@ -44,16 +47,6 @@ struct Browser {
         // Apple provides a more general URL for opening System Preferences in the form of "x-apple.systempreferences:com.apple.preference" but it
         // doesn't support opening the General prefpane directly.
         NSWorkspace.shared.open(URL(fileURLWithPath: "/System/Library/PreferencePanes/Appearance.prefPane"))
-    }
-
-    private static var defaultBrowserBundleID: String? {
-        NSWorkspace.shared.urlForApplication(toOpen: URL(string: "http://")!)
-            .flatMap(Bundle.init(url:))
-            .flatMap {
-                $0.object(forInfoDictionaryKey: "CFBundleIdentifier")
-            }.flatMap {
-                $0 as? String
-            }
     }
 
 }
