@@ -51,7 +51,7 @@ class MainWindowController: NSWindowController {
     private func setupToolbar() {
         // Empty toolbar ensures that window buttons are centered vertically
         window?.toolbar = NSToolbar()
-        window?.toolbar?.showsBaselineSeparator = false
+        window?.toolbar?.showsBaselineSeparator = true
 
         let tabBarViewController = mainViewController!.tabBarViewController!
         guard let titlebarView = window?.standardWindowButton(.closeButton)?.superview else { return }
