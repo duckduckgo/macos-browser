@@ -33,7 +33,10 @@ extension NSApplication {
     }
 
     var isReturnOrEnterPressed: Bool {
-        currentEvent?.keyCode == 36 || currentEvent?.keyCode == 76
+        guard let event = currentEvent,
+              case .keyDown = event.type
+        else { return false }
+        return event.keyCode == 36 || event.keyCode == 76
     }
 
 }

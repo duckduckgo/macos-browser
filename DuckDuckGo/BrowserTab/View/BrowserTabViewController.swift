@@ -28,7 +28,6 @@ class BrowserTabViewController: NSViewController {
     var tabViewModel: TabViewModel?
 
     private let tabCollectionViewModel: TabCollectionViewModel
-    private var urlCancellable: AnyCancellable?
     private var selectedTabViewModelCancellable: AnyCancellable?
     private var isErrorViewVisibleCancellable: AnyCancellable?
     private var contextMenuLink: URL?
@@ -80,11 +79,6 @@ class BrowserTabViewController: NSViewController {
             setFirstResponderIfNeeded()
         }
 
-        func subscribeToUrl(of tabViewModel: TabViewModel) {
-            urlCancellable?.cancel()
-            urlCancellable = tabViewModel.tab.$url.receive(on: DispatchQueue.main).sink { [weak self] _ in self?.reloadWebViewIfNeeded() }
-        }
-
         func removeOldWebView(_ oldWebView: WebView?) {
             if let oldWebView = oldWebView, view.subviews.contains(oldWebView) {
                 oldWebView.removeFromSuperview()
@@ -100,7 +94,6 @@ class BrowserTabViewController: NSViewController {
 
         let oldWebView = webView
         displayWebView(of: tabViewModel)
-        subscribeToUrl(of: tabViewModel)
         self.tabViewModel = tabViewModel
         removeOldWebView(oldWebView)
     }
@@ -108,26 +101,6 @@ class BrowserTabViewController: NSViewController {
     private func subscribeToIsErrorViewVisible() {
         isErrorViewVisibleCancellable = tabViewModel?.$isErrorViewVisible.receive(on: DispatchQueue.main).sink { [weak self] _ in
             self?.displayErrorView(self?.tabViewModel?.isErrorViewVisible ?? false)
-        }
-    }
-
-    private func reloadWebViewIfNeeded() {
-        guard let webView = webView else {
-            os_log("BrowserTabViewController: Web view is nil", type: .error)
-            return
-        }
-
-        guard let tabViewModel = tabViewModel else {
-            os_log("%s: Tab view model is nil", type: .error, className)
-            return
-        }
-
-        if webView.url == tabViewModel.tab.url { return }
-
-        if let url = tabViewModel.tab.url {
-            webView.load(url)
-        } else {
-            webView.load(URL.emptyPage)
         }
     }
 
@@ -158,14 +131,48 @@ class BrowserTabViewController: NSViewController {
     }
 
     private func openNewTab(with url: URL?, selected: Bool = false) {
-        let tab = Tab()
-        tab.url = url
+        let tab = Tab(url: url, shouldLoadInBackground: true)
         tabCollectionViewModel.append(tab: tab, selected: selected)
     }
 
 }
 
 extension BrowserTabViewController: TabDelegate {
+
+	func tab(_ tab: Tab, requestedOpenExternalURL url: URL, forUserEnteredURL userEntered: Bool) {
+        guard let window = self.view.window else {
+            os_log("%s: Window is nil", type: .error, className)
+            return
+        }
+
+        guard tabCollectionViewModel.selectedTabViewModel?.tab == tab else {
+            // Only allow the selected tab to open external apps
+            return
+        }
+
+		func searchForExternalUrl() {
+			tab.update(url: URL.makeSearchUrl(from: url.absoluteString), userEntered: false)
+		}
+
+        guard let appUrl = NSWorkspace.shared.urlForApplication(toOpen: url) else {
+			if userEntered {
+				searchForExternalUrl()
+			} else {
+				NSAlert.unableToOpenExernalURLAlert().beginSheetModal(for: window)
+			}
+            return
+        }
+
+        let externalAppName = Bundle(url: appUrl)?.infoDictionary?["CFBundleName"] as? String
+        NSAlert.openExternalURLAlert(with: externalAppName).beginSheetModal(for: window) { response in
+            if response == NSApplication.ModalResponse.alertFirstButtonReturn {
+                NSWorkspace.shared.open(url)
+			} else if userEntered {
+				searchForExternalUrl()
+			}
+        }
+
+    }
 
     func tabDidStartNavigation(_ tab: Tab) {
         setFirstResponderIfNeeded()
@@ -222,6 +229,14 @@ extension BrowserTabViewController: LinkMenuItemSelectors {
               let url = contextMenuLink else { return }
 
         self.tab(tab, requestedFileDownload: FileDownload(request: URLRequest(url: url), suggestedName: nil))
+    }
+
+    func copyLink(_ sender: NSMenuItem) {
+        guard let url = contextMenuLink as NSURL? else { return }
+
+        let pasteboard = NSPasteboard.general
+        pasteboard.declareTypes([.URL], owner: nil)
+        url.write(to: pasteboard)
     }
 
 }
@@ -410,6 +425,31 @@ fileprivate extension NSAlert {
         alert.icon = #imageLiteral(resourceName: "Fireproof")
         alert.addButton(withTitle: UserText.fireproof)
         alert.addButton(withTitle: UserText.notNow)
+        return alert
+    }
+
+    static func openExternalURLAlert(with appName: String?) -> NSAlert {
+        let alert = NSAlert()
+
+        if let appName = appName {
+            alert.messageText = UserText.openExternalURLTitle(forAppName: appName)
+            alert.informativeText = UserText.openExternalURLMessage(forAppName: appName)
+        } else {
+            alert.messageText = UserText.openExternalURLTitleUnknownApp
+            alert.informativeText = UserText.openExternalURLMessageUnknownApp
+        }
+
+        alert.alertStyle = .warning
+        alert.addButton(withTitle: UserText.open)
+        alert.addButton(withTitle: UserText.cancel)
+        return alert
+    }
+
+    static func unableToOpenExernalURLAlert() -> NSAlert {
+        let alert = NSAlert()
+        alert.messageText = UserText.failedToOpenExternally
+        alert.alertStyle = .warning
+        alert.addButton(withTitle: UserText.ok)
         return alert
     }
 

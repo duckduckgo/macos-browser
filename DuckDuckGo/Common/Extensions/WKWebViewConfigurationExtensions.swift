@@ -17,42 +17,17 @@
 //
 
 import WebKit
+import Combine
 
 extension WKWebViewConfiguration {
 
-    static func makeConfiguration() -> WKWebViewConfiguration {
-        let configuration = WKWebViewConfiguration()
-        configuration.applyStandardConfiguration()
-        return configuration
-    }
-
     func applyStandardConfiguration() {
-         websiteDataStore = WKWebsiteDataStore.default()
-         allowsAirPlayForMediaPlayback = true
-         preferences.setValue(true, forKey: "fullScreenEnabled")
-         preferences.setValue(true, forKey: "developerExtrasEnabled")
-         installContentBlockingRules()
+        allowsAirPlayForMediaPlayback = true
+        preferences.setValue(true, forKey: "fullScreenEnabled")
+        preferences.setValue(true, forKey: "allowsPictureInPictureMediaPlayback")
+        preferences.setValue(true, forKey: "developerExtrasEnabled")
+        preferences.javaScriptCanOpenWindowsAutomatically = false
+        self.userContentController = UserContentController()
      }
-
-    private func installContentBlockingRules() {
-        func addRulesToController(rules: WKContentRuleList) {
-            self.userContentController.add(rules)
-        }
-
-        if let rulesList = ContentBlockerRulesManager.shared.blockingRules {
-            addRulesToController(rules: rulesList)
-        } else {
-            ContentBlockerRulesManager.shared.compileRules { rulesList in
-                if let rulesList = rulesList {
-                    addRulesToController(rules: rulesList)
-                }
-            }
-        }
-    }
-
-    func reinstallContentBlocker() {
-        userContentController.removeAllContentRuleLists()
-        installContentBlockingRules()
-    }
 
 }

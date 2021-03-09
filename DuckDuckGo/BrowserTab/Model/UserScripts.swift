@@ -31,6 +31,14 @@ class UserScripts {
     let emailScript = EmailUserScript()
     let debugScript = DebugUserScript()
 
+    init() {
+    }
+
+    init(copy other: UserScripts) {
+        // copy compiled scripts to avoid repeated loading from disk
+        self.scripts = other.scripts
+    }
+
     lazy var userScripts: [UserScript] = [
         self.debugScript,
         self.faviconScript,
@@ -43,24 +51,20 @@ class UserScripts {
         self.emailScript
     ]
 
-    func install(into webView: WebView) {
-        userScripts.forEach {
-            webView.configuration.userContentController.add(userScript: $0)
-        }
+    lazy var scripts = userScripts.map { $0.makeWKUserScript() }
+
+}
+
+extension UserScripts {
+
+    func install(into controller: WKUserContentController) {
+        scripts.forEach(controller.addUserScript)
+        userScripts.forEach(controller.addHandler)
     }
 
-    func remove(from webView: WebView) {
-        webView.configuration.userContentController.removeAllUserScripts()
-        
-        userScripts.forEach {
-            $0.messageNames.forEach {
-                if #available(OSX 11.0, *) {
-                    webView.configuration.userContentController.removeScriptMessageHandler(forName: $0, contentWorld: .defaultClient)
-                } else {
-                    webView.configuration.userContentController.removeScriptMessageHandler(forName: $0)
-                }
-            }
-        }
+    func remove(from controller: WKUserContentController) {
+        controller.removeAllUserScripts()
+        userScripts.forEach(controller.removeHandler)
     }
 
 }

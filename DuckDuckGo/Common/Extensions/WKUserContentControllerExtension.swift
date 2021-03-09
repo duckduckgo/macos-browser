@@ -1,5 +1,5 @@
 //
-//  WKUserContentController.swift
+//  WKUserContentControllerExtension.swift
 //
 //  Copyright © 2020 DuckDuckGo. All rights reserved.
 //
@@ -22,25 +22,22 @@ import BrowserServicesKit
 
 extension WKUserContentController {
 
-    func add(userScript: UserScript) {
-        let script: WKUserScript
-        if #available(OSX 11.0, *) {
-            script = WKUserScript(source: userScript.source,
-                         injectionTime: userScript.injectionTime,
-                         forMainFrameOnly: userScript.forMainFrameOnly,
-                         in: .defaultClient)
-        } else {
-            script = WKUserScript(source: userScript.source,
-                         injectionTime: userScript.injectionTime,
-                         forMainFrameOnly: userScript.forMainFrameOnly)
-        }
-        addUserScript(script)
-
+    func addHandler(_ userScript: UserScript) {
         for messageName in userScript.messageNames {
             if #available(OSX 11.0, *) {
                 add(userScript, contentWorld: .defaultClient, name: messageName)
             } else {
                 add(userScript, name: messageName)
+            }
+        }
+    }
+
+    func removeHandler(_ userScript: UserScript) {
+        userScript.messageNames.forEach {
+            if #available(OSX 11.0, *) {
+                removeScriptMessageHandler(forName: $0, contentWorld: .defaultClient)
+            } else {
+                removeScriptMessageHandler(forName: $0)
             }
         }
     }

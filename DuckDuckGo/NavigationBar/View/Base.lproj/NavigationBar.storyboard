@@ -155,11 +155,11 @@
                                     </userDefinedRuntimeAttribute>
                                 </userDefinedRuntimeAttributes>
                                 <connections>
-                                    <action selector="feedbackButtonAction:" target="o2v-eH-jTI" id="MY7-rh-qCW"/>
+                                    <action selector="openFeedback:" target="wkT-Td-n7D" id="1IP-IF-SD9"/>
                                 </connections>
                             </button>
                             <button translatesAutoresizingMaskIntoConstraints="NO" id="XBe-xO-dXj" userLabel="Share Button" customClass="MouseOverButton" customModule="DuckDuckGo_Privacy_Browser" customModuleProvider="target">
-                                <rect key="frame" x="731" y="5" width="32.5" height="32"/>
+                                <rect key="frame" x="731" y="8" width="32" height="24"/>
                                 <constraints>
                                     <constraint firstAttribute="height" constant="24" id="Ile-vS-DrC"/>
                                     <constraint firstAttribute="width" constant="32" id="dww-gU-g9Y"/>
@@ -299,7 +299,7 @@
                             </textField>
                             <textField focusRingType="none" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="zaX-wZ-E3D" customClass="AddressBarTextField" customModule="DuckDuckGo_Privacy_Browser" customModuleProvider="target">
                                 <rect key="frame" x="35" y="11" width="522" height="16"/>
-                                <textFieldCell key="cell" lineBreakMode="truncatingTail" selectable="YES" editable="YES" sendsActionOnEndEditing="YES" focusRingType="none" tag="5" placeholderString="Search or enter address" usesSingleLineMode="YES" id="1ah-Qg-8lr">
+                                <textFieldCell key="cell" lineBreakMode="truncatingTail" selectable="YES" editable="YES" sendsActionOnEndEditing="YES" focusRingType="none" tag="5" placeholderString="Search or enter address" usesSingleLineMode="YES" id="1ah-Qg-8lr" customClass="AddressBarTextFieldCell" customModule="DuckDuckGo_Privacy_Browser" customModuleProvider="target">
                                     <font key="font" metaFont="system"/>
                                     <color key="textColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
                                     <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
@@ -542,7 +542,7 @@
         <image name="Feedback" width="16" height="16"/>
         <image name="Forward" width="7" height="13"/>
         <image name="HomeFavicon" width="16" height="16"/>
-        <image name="NSShareTemplate" width="15" height="17"/>
+        <image name="NSShareTemplate" width="11" height="16"/>
         <image name="PrivacyEntryPoint" width="15" height="15"/>
         <image name="Refresh" width="12" height="15"/>
         <image name="Settings" width="12" height="3"/>

@@ -59,7 +59,6 @@ class OptionsButtonMenu: NSMenu {
         let openFeedbackMenuItem = NSMenuItem(title: "Send Feedback",
                                               action: #selector(AppDelegate.openFeedback(_:)),
                                          keyEquivalent: "")
-        openFeedbackMenuItem.target = AppDelegate.shared
         openFeedbackMenuItem.image = NSImage(named: "Feedback")
         addItem(openFeedbackMenuItem)
 
