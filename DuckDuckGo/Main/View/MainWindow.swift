@@ -46,6 +46,16 @@ class MainWindow: NSWindow {
         postFirstResponderNotification(with: firstResponder)
     }
 
+    override func endEditing(for object: Any?) {
+        if case .leftMouseUp = NSApp.currentEvent?.type,
+           object is AddressBarTextEditor {
+            // prevent deactivation of Address Bar on Toolbar click
+            return
+        }
+
+        super.endEditing(for: object)
+    }
+
     private func postFirstResponderNotification(with firstResponder: NSResponder?) {
         NotificationCenter.default.post(name: .firstResponder, object: firstResponder)
     }
