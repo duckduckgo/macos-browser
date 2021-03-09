@@ -18,6 +18,7 @@
 
 import Cocoa
 import os.log
+import Combine
 
 class MainWindowController: NSWindowController {
     private static let windowFrameSaveName = "MainWindow"
@@ -43,18 +44,37 @@ class MainWindowController: NSWindowController {
         window!.delegate = self
         window!.setFrameAutosaveName(Self.windowFrameSaveName)
 
-        setupEmptyToolbar()
+        setupToolbar()
     }
 
-    private func setupEmptyToolbar() {
+    var trafficLightsAlphaCancellable: AnyCancellable?
+    private func setupToolbar() {
         // Empty toolbar ensures that window buttons are centered vertically
         window?.toolbar = NSToolbar()
         window?.toolbar?.showsBaselineSeparator = false
-    }
 
-    private func clearEmptyToolbar() {
-        // Empty toolbar makes problems in full screen mode
-        window?.toolbar = nil
+        let tabBarViewController = mainViewController!.tabBarViewController!
+        guard let titlebarView = window?.standardWindowButton(.closeButton)?.superview else { return }
+
+        tabBarViewController.view.removeFromSuperview()
+        titlebarView.addSubview(tabBarViewController.view)
+
+        tabBarViewController.view.frame = titlebarView.bounds
+        tabBarViewController.view.translatesAutoresizingMaskIntoConstraints = false
+        let constraints = tabBarViewController.view.addConstraints(to: titlebarView, [
+            .leading: .leading(),
+            .trailing: .trailing(),
+            .top: .top(),
+            .height: .const(38.0)
+        ])
+        NSLayoutConstraint.activate(constraints)
+
+        // slide tabs to the left in full screen
+        trafficLightsAlphaCancellable = window?.standardWindowButton(.closeButton)?
+            .publisher(for: \.alphaValue)
+            .map { alphaValue in 80.0 * alphaValue }
+            .assign(to: \.constant, on: tabBarViewController.scrollViewLeadingConstraint)
+
     }
 
     override func showWindow(_ sender: Any?) {
@@ -66,12 +86,9 @@ class MainWindowController: NSWindowController {
 
 extension MainWindowController: NSWindowDelegate {
 
-    func windowWillEnterFullScreen(_ notification: Notification) {
-        clearEmptyToolbar()
-    }
-
-    func windowDidExitFullScreen(_ notification: Notification) {
-        setupEmptyToolbar()
+    func window(_ window: NSWindow,
+                willUseFullScreenPresentationOptions: NSApplication.PresentationOptions) -> NSApplication.PresentationOptions {
+        return [.fullScreen, .autoHideMenuBar]
     }
 
     func windowDidBecomeMain(_ notification: Notification) {
