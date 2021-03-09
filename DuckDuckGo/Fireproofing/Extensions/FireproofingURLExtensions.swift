@@ -60,7 +60,7 @@ extension URL {
             return true
         }
 
-        let range = NSRange(location: 0, length: absoluteString.count)
+        let range = NSRange(location: 0, length: absoluteString.utf16.count)
         let matches = Self.loginPattern.matches(in: self.absoluteString, options: [], range: range)
         return matches.count > 0
     }
@@ -92,7 +92,7 @@ extension URL {
               let matchingKey = patterns.keys.first(where: { host.contains($0) }),
               let pattern = patterns[matchingKey] else { return false }
 
-        let range = NSRange(location: 0, length: absoluteString.count)
+        let range = NSRange(location: 0, length: absoluteString.utf16.count)
 
         return pattern.contains { regex in
             let matches = regex.matches(in: self.absoluteString, options: [], range: range)
