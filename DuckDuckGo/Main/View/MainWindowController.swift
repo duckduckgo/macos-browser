@@ -20,23 +20,28 @@ import Cocoa
 import os.log
 
 class MainWindowController: NSWindowController {
+    private static let windowFrameSaveName = "MainWindow"
 
     var mainViewController: MainViewController? {
         contentViewController as? MainViewController
     }
 
-    override func windowDidLoad() {
-        super.windowDidLoad()
+    init(mainViewController: MainViewController) {
+        let window = MainWindow(frame: NSRect(x: 0, y: 0, width: 1024, height: 790))
+        window.contentViewController = mainViewController
+
+        super.init(window: window)
 
         setupWindow()
     }
 
+    required init?(coder: NSCoder) {
+        fatalError("init(coder:) has not been implemented")
+    }
+
     private func setupWindow() {
-        window?.setFrameAutosaveName("MainWindow")
-        window?.hasShadow = true
-        window?.titleVisibility = .hidden
-        window?.titlebarAppearsTransparent = true
-        window?.isMovable = false
+        window!.delegate = self
+        window!.setFrameAutosaveName(Self.windowFrameSaveName)
 
         setupEmptyToolbar()
     }
