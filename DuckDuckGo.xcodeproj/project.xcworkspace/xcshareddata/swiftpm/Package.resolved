@@ -1,0 +1,34 @@
+{
+  "object": {
+    "pins": [
+      {
+        "package": "BrowserServicesKit",
+        "repositoryURL": "https://dub.duckduckgo.com/duckduckgo/BrowserServicesKit",
+        "state": {
+          "branch": null,
+          "revision": "afb2fbf3fddee1876c786ff20d0abc9c0c6cb16e",
+          "version": "0.4.0"
+        }
+      },
+      {
+        "package": "Lottie",
+        "repositoryURL": "https://github.com/airbnb/lottie-ios",
+        "state": {
+          "branch": "lottie/macos-spm",
+          "revision": "f4d701070f9743b9ef7b9ac42d386d1ef98b842f",
+          "version": null
+        }
+      },
+      {
+        "package": "TrackerRadarKit",
+        "repositoryURL": "https://github.com/duckduckgo/TrackerRadarKit.git",
+        "state": {
+          "branch": null,
+          "revision": "a11e97e591273845519b6b06ddbb6ba88eab2195",
+          "version": "1.0.2"
+        }
+      }
+    ]
+  },
+  "version": 1
+}

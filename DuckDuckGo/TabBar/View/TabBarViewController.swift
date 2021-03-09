@@ -19,6 +19,7 @@
 import Cocoa
 import os.log
 import Combine
+import Lottie
 
 // swiftlint:disable file_length
 class TabBarViewController: NSViewController {
@@ -67,6 +68,8 @@ class TabBarViewController: NSViewController {
         observeToScrollNotifications()
         subscribeToSelectionIndex()
         subscribeToIsBurning()
+
+        warmupFireAnimation()
     }
 
     override func viewWillAppear() {
@@ -92,8 +95,8 @@ class TabBarViewController: NSViewController {
     @IBAction func burnButtonAction(_ sender: NSButton) {
         let response = NSAlert.burnButtonAlert.runModal()
         if response == NSApplication.ModalResponse.alertFirstButtonReturn {
-            WindowsManager.closeWindows(except: view.window)
-            fireViewModel.fire.burnAll(tabCollectionViewModel: tabCollectionViewModel)
+            WindowsManager.closeWindows(except: self.view.window)
+            playFireAnimation()
         }
     }
 
@@ -704,6 +707,42 @@ extension TabBarViewController: TabBarViewItemDelegate {
         }
 
         tabBarViewItem.setupMenu()
+    }
+
+}
+
+extension TabBarViewController {
+
+    static let fireAnimation: AnimationView = {
+        let view = AnimationView(name: "01_Fire_really_small")
+        view.forceDisplayUpdate()
+        return view
+    }()
+
+    func playFireAnimation() {
+
+        Self.fireAnimation.contentMode = .scaleToFill
+        Self.fireAnimation.frame = .init(x: 0,
+                                y: 0,
+                                width: view.window?.frame.width ?? 0,
+                                height: view.window?.frame.height ?? 0)
+
+        view.window?.contentView?.addSubview(Self.fireAnimation)
+        Self.fireAnimation.play { _ in
+            Self.fireAnimation.removeFromSuperview()
+        }
+
+        DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
+            self.fireViewModel.fire.burnAll(tabCollectionViewModel: self.tabCollectionViewModel)
+        }
+
+    }
+
+    func warmupFireAnimation() {
+        view.addSubview(Self.fireAnimation)
+        DispatchQueue.main.async {
+            Self.fireAnimation.removeFromSuperview()
+        }
     }
 
 }
