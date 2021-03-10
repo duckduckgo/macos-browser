@@ -130,9 +130,11 @@ class AddressBarTextField: NSTextField {
         }
         guard suggestionsWindow.isVisible else { return }
 
+        let originalStringValue = suggestionsViewModel.userStringValue
         guard let selectedSuggestionViewModel = suggestionsViewModel.selectedSuggestionViewModel else {
-            if let originalStringValue = suggestionsViewModel.userStringValue {
+            if let originalStringValue = originalStringValue {
                 value = Value(stringValue: originalStringValue, userTyped: true)
+                selectToTheEnd(from: originalStringValue.endIndex)
             } else {
                 clearValue()
             }
@@ -141,12 +143,31 @@ class AddressBarTextField: NSTextField {
         }
 
         value = Value.suggestion(selectedSuggestionViewModel)
-        selectToTheEnd(from: cursorPosition)
+        if let originalStringValue = originalStringValue,
+           value.string.hasPrefix(originalStringValue) {
+
+            selectToTheEnd(from: originalStringValue.endIndex)
+        } else {
+            // if suggestion doesn't start with the user input select whole string
+            currentEditor()?.selectAll(nil)
+        }
+    }
+
+    private func addressBarEnterPressed() {
+        suggestionsViewModel.suggestions.stopFetchingSuggestions()
+        hideSuggestionsWindow()
+
+        if NSApp.isCommandPressed {
+            openNewTab(selected: NSApp.isShiftPressed)
+        } else {
+            navigate()
+        }
     }
 
     private func navigate() {
         hideSuggestionsWindow()
         updateTabUrl()
+        currentEditor()?.selectAll(self)
     }
 
     private func updateTabUrl() {
@@ -163,6 +184,9 @@ class AddressBarTextField: NSTextField {
         } else {
             selectedTabViewModel.tab.update(url: url)
         }
+        if !url.isDuckDuckGoSearch {
+            self.window?.makeFirstResponder(nil)
+        }
     }
 
     private func openNewTab(selected: Bool) {
@@ -171,8 +195,7 @@ class AddressBarTextField: NSTextField {
             return
         }
 
-        let tab = Tab()
-        tab.url = url
+        let tab = Tab(url: url, shouldLoadInBackground: true)
         tabCollectionViewModel.append(tab: tab, selected: selected)
     }
 
@@ -213,15 +236,6 @@ class AddressBarTextField: NSTextField {
 
     @Published private(set) var value: Value = .text("") {
         didSet {
-            let stringValue: String
-            switch value {
-            case .text(let text):
-                stringValue = text
-            case .url(urlString: let urlString, url: _, userTyped: _):
-                stringValue = urlString
-            case .suggestion(let suggestionViewModel):
-                stringValue = suggestionViewModel.string
-            }
             suffix = Suffix(value: value)
 
             if let suffix = suffix {
@@ -229,7 +243,7 @@ class AddressBarTextField: NSTextField {
                 attributedString.append(suffix.attributedString)
                 attributedStringValue = attributedString
             } else {
-                self.stringValue = stringValue
+                self.stringValue = value.string
             }
         }
     }
@@ -291,9 +305,6 @@ class AddressBarTextField: NSTextField {
     }
 
     private var suffix: Suffix?
-    private var suffixLength: Int {
-        suffix?.string.count ?? 0
-    }
 
     private var stringValueWithoutSuffix: String {
         if let suffix = suffix {
@@ -305,53 +316,30 @@ class AddressBarTextField: NSTextField {
 
     // MARK: - Cursor & Selection
 
-    private var cursorPosition: Int {
-        guard let currentEditor = currentEditor() else {
-            os_log("AddressBarTextField: Current editor not available", type: .error)
-            return 0
-        }
-
-        return currentEditor.selectedRange.location
-    }
-
-    private func selectToTheEnd(from position: Int) {
+    private func selectToTheEnd(from index: String.Index) {
         guard let currentEditor = currentEditor() else {
             os_log("AddressBarTextField: Current editor not available", type: .error)
             return
         }
+        let string = currentEditor.string
+        let startIndex = string.indices.contains(index) ? index : string.startIndex
+        let endIndex = string.index(string.endIndex, offsetBy: -(suffix?.string.count ?? 0))
 
-        currentEditor.selectedRange = NSRange(location: position, length: stringValue.count - position - suffixLength)
+        currentEditor.selectedRange = string.nsRange(from: startIndex..<endIndex)
     }
 
-    private func filterSuffixSelection() {
-        guard let currentEditor = currentEditor() else {
-            os_log("AddressBarTextField: Current editor not available", type: .error)
-            return
-        }
+    func filterSuffix(fromSelectionRange range: NSRange, for stringValue: String) -> NSRange {
+        let suffixStart = stringValue.utf16.count - (suffix?.string.utf16.count ?? 0)
+        let currentSelectionEnd = range.location + range.length
+        guard suffixStart >= 0,
+              currentSelectionEnd > suffixStart
+        else { return range }
 
-        let currentLocation = currentEditor.selectedRange.location
-        let currentLength = currentEditor.selectedRange.length
-        let currentSelectionEnd = currentLocation + currentLength
-        let suffixStart = stringValue.count - suffixLength
-        guard suffixStart >= 0 else { return }
+        let newLocation = min(range.location, suffixStart)
+        let newMaxLength = suffixStart - newLocation
+        let newLength = min(newMaxLength, currentSelectionEnd - newLocation)
 
-        if currentSelectionEnd > suffixStart {
-            let newLocation = min(currentLocation, suffixStart)
-            let newMaxLength = suffixStart - newLocation
-            let newLength = min(newMaxLength, currentSelectionEnd - newLocation)
-            let newRange = NSRange(location: newLocation, length: newLength)
-            if currentEditor.selectedRange != newRange {
-                currentEditor.selectedRange = newRange
-            }
-        }
-    }
-
-    @objc private func textViewDidChangeSelection(_ notification: Notification) {
-        guard notification.object as? NSObject == self.currentEditor() else {
-            return
-        }
-
-        filterSuffixSelection()
+        return NSRange(location: newLocation, length: newLength)
     }
 
     // MARK: - Suggestions window
@@ -447,13 +435,7 @@ extension AddressBarTextField: NSTextFieldDelegate {
     func controlTextDidEndEditing(_ obj: Notification) {
         suggestionsViewModel.suggestions.stopFetchingSuggestions()
         hideSuggestionsWindow()
-
-        let textMovement = obj.userInfo?["NSTextMovement"] as? Int
-        if textMovement == NSReturnTextMovement {
-            navigate()
-        } else {
-            updateValue()
-        }
+        updateValue()
     }
 
     func controlTextDidChange(_ obj: Notification) {
@@ -473,6 +455,11 @@ extension AddressBarTextField: NSTextFieldDelegate {
     }
 
     func control(_ control: NSControl, textView: NSTextView, doCommandBy commandSelector: Selector) -> Bool {
+        if NSApp.isReturnOrEnterPressed {
+            self.addressBarEnterPressed()
+            return true
+        }
+
         guard suggestionsWindowController?.window?.isVisible == true else {
             return false
         }
@@ -493,10 +480,6 @@ extension AddressBarTextField: NSTextFieldDelegate {
              #selector(NSResponder.deleteBackwardByDecomposingPreviousCharacter(_:)):
             suggestionsViewModel.clearSelection(); return false
         default:
-            if NSApp.isCommandPressed && NSApp.isReturnOrEnterPressed {
-                openNewTab(selected: NSApp.isShiftPressed)
-                return true
-            }
             return false
         }
     }
@@ -523,6 +506,62 @@ extension AddressBarTextField: SuggestionsViewControllerDelegate {
         }
 
         return true
+    }
+}
+
+extension AddressBarTextField: NSTextViewDelegate {
+    func textView(_ textView: NSTextView, willChangeSelectionFromCharacterRange _: NSRange, toCharacterRange range: NSRange) -> NSRange {
+        return self.filterSuffix(fromSelectionRange: range, for: textView.string)
+    }
+}
+
+class AddressBarTextEditor: NSTextView {
+
+    override func selectionRange(forProposedRange proposedCharRange: NSRange, granularity: NSSelectionGranularity) -> NSRange {
+        guard let delegate = delegate as? AddressBarTextField else {
+            os_log("AddressBarTextEditor: unexpected kind of delegate")
+            return super.selectionRange(forProposedRange: proposedCharRange, granularity: granularity)
+        }
+
+        let string = self.string
+        var range: NSRange
+        switch granularity {
+        case .selectByParagraph:
+            // select all and then adjust by removing suffix
+            range = self.string.nsRange(from: string.startIndex..<string.endIndex)
+
+        case .selectByWord:
+            range = delegate.filterSuffix(fromSelectionRange: proposedCharRange, for: self.string)
+            // if selection for word included suffix, move one character before adjusted to select last word w/o suffix
+            if range != proposedCharRange,
+               range.location > 0 {
+                range.location -= 1
+            }
+            // select word and then adjust by removing suffix
+            range = super.selectionRange(forProposedRange: range, granularity: granularity)
+
+        case .selectByCharacter: fallthrough
+        @unknown default:
+            // adjust caret location only
+            range = proposedCharRange
+        }
+        return delegate.filterSuffix(fromSelectionRange: range, for: self.string)
+    }
+
+    override func characterIndexForInsertion(at point: NSPoint) -> Int {
+        let index = super.characterIndexForInsertion(at: point)
+        let adjustedRange = selectionRange(forProposedRange: NSRange(location: index, length: 0),
+                                           granularity: .selectByCharacter)
+        return adjustedRange.location
+    }
+
+}
+
+class AddressBarTextFieldCell: NSTextFieldCell {
+    lazy var customEditor = AddressBarTextEditor()
+
+    override func fieldEditor(for controlView: NSView) -> NSTextView? {
+        return customEditor
     }
 }
 

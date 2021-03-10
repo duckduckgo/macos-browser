@@ -47,4 +47,49 @@ extension NSView {
         layer?.masksToBounds = false
     }
 
+    struct NSLayoutConstraintToAttribute {
+        let attribute: NSLayoutConstraint.Attribute
+        let multiplier: CGFloat
+        let constant: CGFloat
+
+        static func top(multiplier: CGFloat = 1.0, const: CGFloat = 0.0) -> NSLayoutConstraintToAttribute {
+            NSLayoutConstraintToAttribute(attribute: .top, multiplier: multiplier, constant: const)
+        }
+        static func bottom(multiplier: CGFloat = 1.0, const: CGFloat = 0.0) -> NSLayoutConstraintToAttribute {
+            NSLayoutConstraintToAttribute(attribute: .bottom, multiplier: multiplier, constant: const)
+        }
+        static func leading(multiplier: CGFloat = 1.0, const: CGFloat = 0.0) -> NSLayoutConstraintToAttribute {
+            NSLayoutConstraintToAttribute(attribute: .leading, multiplier: multiplier, constant: const)
+        }
+        static func trailing(multiplier: CGFloat = 1.0, const: CGFloat = 0.0) -> NSLayoutConstraintToAttribute {
+            NSLayoutConstraintToAttribute(attribute: .trailing, multiplier: multiplier, constant: const)
+        }
+        static func width(multiplier: CGFloat = 1.0, const: CGFloat = 0.0) -> NSLayoutConstraintToAttribute {
+            NSLayoutConstraintToAttribute(attribute: .width, multiplier: multiplier, constant: const)
+        }
+        static func height(multiplier: CGFloat = 1.0, const: CGFloat = 0.0) -> NSLayoutConstraintToAttribute {
+            NSLayoutConstraintToAttribute(attribute: .width, multiplier: multiplier, constant: const)
+        }
+
+        static func const(multiplier: CGFloat = 1.0, _ const: CGFloat) -> NSLayoutConstraintToAttribute {
+            NSLayoutConstraintToAttribute(attribute: .notAnAttribute, multiplier: multiplier, constant: const)
+        }
+    }
+
+    func addConstraints(to view: NSView?,
+                        _ attributes: KeyValuePairs<NSLayoutConstraint.Attribute, NSLayoutConstraintToAttribute>)
+    -> [NSLayoutConstraint] {
+        attributes.map { fromAttr, toAttr in
+            NSLayoutConstraint(
+                item: self,
+                attribute: fromAttr,
+                relatedBy: .equal,
+                toItem: toAttr.attribute == .notAnAttribute ? nil : view,
+                attribute: toAttr.attribute,
+                multiplier: toAttr.multiplier,
+                constant: toAttr.constant
+            )
+        }
+    }
+
 }
