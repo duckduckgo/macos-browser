@@ -43,17 +43,28 @@
                             </constraints>
                             <imageCell key="cell" refusesFirstResponder="YES" alignment="left" imageScaling="proportionallyDown" image="Logo" id="Y7f-UL-UBE"/>
                         </imageView>
-                        <button verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="8eV-Qb-jVn">
-                            <rect key="frame" x="20" y="18" width="30" height="30"/>
+                        <button verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="8eV-Qb-jVn" customClass="MouseOverButton" customModule="DuckDuckGo_Privacy_Browser" customModuleProvider="target">
+                            <rect key="frame" x="20" y="21" width="32" height="24"/>
                             <constraints>
-                                <constraint firstAttribute="width" constant="30" id="CpQ-bM-0AT"/>
-                                <constraint firstAttribute="height" constant="30" id="F6W-5F-sSp"/>
+                                <constraint firstAttribute="width" constant="32" id="CpQ-bM-0AT"/>
+                                <constraint firstAttribute="height" constant="24" id="F6W-5F-sSp"/>
                             </constraints>
                             <buttonCell key="cell" type="square" bezelStyle="shadowlessSquare" image="Close" imagePosition="only" alignment="center" imageScaling="proportionallyDown" inset="2" id="vk7-eB-IwF">
                                 <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
                                 <font key="font" metaFont="system"/>
                             </buttonCell>
                             <color key="contentTintColor" name="ClearButtonColor"/>
+                            <userDefinedRuntimeAttributes>
+                                <userDefinedRuntimeAttribute type="color" keyPath="mouseOverColor">
+                                    <color key="value" name="ButtonMouseOverColor"/>
+                                </userDefinedRuntimeAttribute>
+                                <userDefinedRuntimeAttribute type="color" keyPath="mouseDownColor">
+                                    <color key="value" name="ButtonMouseDownColor"/>
+                                </userDefinedRuntimeAttribute>
+                                <userDefinedRuntimeAttribute type="number" keyPath="cornerRadius">
+                                    <real key="value" value="4"/>
+                                </userDefinedRuntimeAttribute>
+                            </userDefinedRuntimeAttributes>
                             <connections>
                                 <action selector="dismissPromptButtonClicked:" target="c22-O7-iKe" id="28x-U0-dhV"/>
                             </connections>
@@ -102,6 +113,12 @@
         <image name="Logo" width="128" height="128"/>
         <namedColor name="BrowserTabBackgroundColor">
             <color red="0.98039215686274506" green="0.98039215686274506" blue="0.98039215686274506" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+        </namedColor>
+        <namedColor name="ButtonMouseDownColor">
+            <color red="1" green="1" blue="1" alpha="0.20000000298023224" colorSpace="custom" customColorSpace="sRGB"/>
+        </namedColor>
+        <namedColor name="ButtonMouseOverColor">
+            <color red="0.0" green="0.0" blue="0.0" alpha="0.10000000149011612" colorSpace="custom" customColorSpace="sRGB"/>
         </namedColor>
         <namedColor name="ClearButtonColor">
             <color red="0.28627450980392155" green="0.28627450980392155" blue="0.28627450980392155" alpha="1" colorSpace="custom" customColorSpace="displayP3"/>
