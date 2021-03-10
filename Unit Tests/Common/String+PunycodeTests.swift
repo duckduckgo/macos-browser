@@ -18,6 +18,7 @@
 //
 
 import XCTest
+@testable import DuckDuckGo_Privacy_Browser
 
 class StringPunycodeTests: XCTestCase {
 
@@ -30,9 +31,9 @@ class StringPunycodeTests: XCTestCase {
     }
     
     func testWhenPunycodeUrlIsCalledWithValidUrlsThenUrlIsReturned() {
-        XCTAssertEqual("xn--ls8h.la", "💩.la".punycodedUrl?.absoluteString)
-        XCTAssertEqual("xn--ls8h.la/", "💩.la/".punycodedUrl?.absoluteString)
-        XCTAssertEqual("82.xn--b1aew.xn--p1ai", "82.мвд.рф".punycodedUrl?.absoluteString)
+        XCTAssertEqual("http://xn--ls8h.la", "💩.la".punycodedUrl?.absoluteString)
+        XCTAssertEqual("http://xn--ls8h.la/", "💩.la/".punycodedUrl?.absoluteString)
+        XCTAssertEqual("http://82.xn--b1aew.xn--p1ai", "82.мвд.рф".punycodedUrl?.absoluteString)
         XCTAssertEqual("http://xn--ls8h.la:8080", "http://💩.la:8080".punycodedUrl?.absoluteString)
         XCTAssertEqual("http://xn--ls8h.la", "http://💩.la".punycodedUrl?.absoluteString)
         XCTAssertEqual("https://xn--ls8h.la", "https://💩.la".punycodedUrl?.absoluteString)

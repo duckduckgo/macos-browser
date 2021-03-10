@@ -207,7 +207,11 @@ class AddressBarTextField: NSTextField {
         case suggestion(_ suggestionViewModel: SuggestionViewModel)
 
         init(stringValue: String, userTyped: Bool) {
-            if let url = stringValue.url, url.isValid {
+            if let url = stringValue.punycodedUrl, url.isValid {
+                var stringValue = stringValue
+                if let punycodeDecoded = url.punycodeDecodedString {
+                    stringValue = punycodeDecoded
+                }
                 self = .url(urlString: stringValue, url: url, userTyped: userTyped)
             } else {
                 self = .text(stringValue)

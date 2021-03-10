@@ -36,11 +36,13 @@ extension URL {
     }
 
     static func makeURL(from addressBarString: String) -> URL? {
-        if let addressBarUrl = addressBarString.url, addressBarUrl.isValid {
+        let trimmed = addressBarString.trimmingWhitespaces()
+
+        if let addressBarUrl = trimmed.punycodedUrl, addressBarUrl.isValid {
             return addressBarUrl
         }
 
-        if let searchUrl = URL.makeSearchUrl(from: addressBarString) {
+        if let searchUrl = URL.makeSearchUrl(from: trimmed) {
             return searchUrl
         }
 

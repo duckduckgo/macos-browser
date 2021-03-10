@@ -23,7 +23,7 @@ extension String {
 
     /// URL and URLComponents can't cope with emojis and international characters so this routine does some manual processing while trying to
     ///  retain the input as much as possible.
-    public var punycodedUrl: URL? {
+    var punycodedUrl: URL? {
         if let url = URL(string: self) {
             return url
         }
@@ -32,18 +32,19 @@ extension String {
             return nil
         }
 
-        var originalScheme = ""
+        let scheme: String
         var s = self
 
         if hasPrefix(URL.NavigationalScheme.http.separated()) {
-            originalScheme = URL.NavigationalScheme.http.separated()
+            scheme = URL.NavigationalScheme.http.separated()
         } else if hasPrefix(URL.NavigationalScheme.https.separated()) {
-            originalScheme = URL.NavigationalScheme.https.separated()
+            scheme = URL.NavigationalScheme.https.separated()
         } else if !contains(".") {
             // could be a local domain but user needs to use the protocol to specify that
             return nil
         } else {
-            s = URL.NavigationalScheme.https.separated() + s
+            scheme = URL.NavigationalScheme.http.separated()
+            s = scheme + s
         }
 
         let urlAndQuery = s.split(separator: "?")
@@ -52,7 +53,7 @@ extension String {
         }
 
         let query = urlAndQuery.count > 1 ? "?" + urlAndQuery[1] : ""
-        let componentsWithoutQuery = [String](urlAndQuery[0].split(separator: "/").map { String($0) }.dropFirst())
+        let componentsWithoutQuery = [String](urlAndQuery[0].split(separator: "/").map(String.init).dropFirst())
         guard componentsWithoutQuery.count > 0 else {
             return nil
         }
@@ -64,7 +65,7 @@ extension String {
             .joined(separator: "/")
 
         let hostPathSeparator = !encodedPath.isEmpty || hasSuffix("/") ? "/" : ""
-        let url = originalScheme + host + hostPathSeparator + encodedPath + query
+        let url = scheme + host + hostPathSeparator + encodedPath + query
         return URL(string: url)
     }
 
@@ -75,4 +76,22 @@ extension String {
             .joined(separator: ".")
     }
     
+}
+
+extension URL {
+
+    var punycodeDecodedString: String? {
+        guard let components = URLComponents(url: self, resolvingAgainstBaseURL: true),
+              let host = components.host,
+              let decodedHost = host.idnaDecoded,
+              host != decodedHost,
+              let hostRange = components.rangeOfHost,
+              var string = components.string
+        else { return nil }
+
+        string.replaceSubrange(hostRange, with: decodedHost)
+
+        return string
+    }
+
 }

@@ -93,15 +93,21 @@ class TabViewModel {
         canBeBookmarked = tab.url != nil
     }
 
+    private func displayHost(for url: URL) -> String {
+        guard let host = url.host else { return url.absoluteString }
+
+        return (host.idnaDecoded ?? host).drop(prefix: URL.HostPrefix.www.separated())
+    }
+
     private func updateAddressBarStrings() {
         guard !isErrorViewVisible else {
             let failingUrl = tab.error?.failingUrl
             addressBarString = failingUrl?.absoluteString ?? ""
-            passiveAddressBarString = failingUrl?.host?.drop(prefix: URL.HostPrefix.www.separated()) ?? ""
+            passiveAddressBarString = failingUrl.map(self.displayHost(for:)) ?? ""
             return
         }
 
-        guard let url = tab.url, let host = url.host else {
+        guard let url = tab.url, url.host != nil else {
             addressBarString = ""
             passiveAddressBarString = ""
             return
@@ -115,7 +121,7 @@ class TabViewModel {
             passiveAddressBarString = ""
         } else {
             addressBarString = url.absoluteString
-            passiveAddressBarString = host.drop(prefix: URL.HostPrefix.www.separated())
+            passiveAddressBarString = self.displayHost(for: url)
         }
     }
 
