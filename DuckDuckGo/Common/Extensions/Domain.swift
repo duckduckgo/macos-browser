@@ -21,12 +21,8 @@ import Foundation
 struct Domain: Hashable {
     let hostName: String
 
-    var droppingWWW: String {
-        hostName.dropWWW()
-    }
-
     var displayName: String {
-        let host = self.droppingWWW
+        let host = self.hostName.dropWWW()
         // decode punycode
         return host.idnaDecoded ?? host
     }
