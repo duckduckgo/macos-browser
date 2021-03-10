@@ -134,7 +134,7 @@ class AddressBarTextField: NSTextField {
         guard let selectedSuggestionViewModel = suggestionsViewModel.selectedSuggestionViewModel else {
             if let originalStringValue = originalStringValue {
                 value = Value(stringValue: originalStringValue, userTyped: true)
-                selectToTheEnd(from: originalStringValue.endIndex)
+                selectToTheEnd(from: originalStringValue.count)
             } else {
                 clearValue()
             }
@@ -146,7 +146,7 @@ class AddressBarTextField: NSTextField {
         if let originalStringValue = originalStringValue,
            value.string.hasPrefix(originalStringValue) {
 
-            selectToTheEnd(from: originalStringValue.endIndex)
+            selectToTheEnd(from: originalStringValue.count)
         } else {
             // if suggestion doesn't start with the user input select whole string
             currentEditor()?.selectAll(nil)
@@ -316,13 +316,13 @@ class AddressBarTextField: NSTextField {
 
     // MARK: - Cursor & Selection
 
-    private func selectToTheEnd(from index: String.Index) {
+    private func selectToTheEnd(from offset: Int) {
         guard let currentEditor = currentEditor() else {
             os_log("AddressBarTextField: Current editor not available", type: .error)
             return
         }
         let string = currentEditor.string
-        let startIndex = string.indices.contains(index) ? index : string.startIndex
+        let startIndex = string.index(string.startIndex, offsetBy: string.count >= offset ? offset : 0)
         let endIndex = string.index(string.endIndex, offsetBy: -(suffix?.string.count ?? 0))
 
         currentEditor.selectedRange = string.nsRange(from: startIndex..<endIndex)
