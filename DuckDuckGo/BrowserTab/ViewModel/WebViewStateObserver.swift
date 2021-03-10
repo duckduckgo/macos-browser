@@ -102,7 +102,7 @@ class WebViewStateObserver: NSObject {
 
     private func updateTitle() {
         if webView?.title?.trimmingWhitespaces().isEmpty ?? true {
-            tabViewModel?.tab.title = webView?.url?.host?.drop(prefix: "www.")
+            tabViewModel?.tab.title = webView?.url?.displayHost
             return
         }
 

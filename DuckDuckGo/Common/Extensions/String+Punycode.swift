@@ -94,4 +94,10 @@ extension URL {
         return string
     }
 
+    var displayHost: String {
+        guard let host = self.host else { return self.absoluteString }
+
+        return (host.idnaDecoded ?? host).drop(prefix: URL.HostPrefix.www.separated())
+    }
+
 }
