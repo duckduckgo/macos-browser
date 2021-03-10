@@ -103,6 +103,10 @@ extension URL {
         }
     }
 
+    var domain: Domain? {
+        Domain(url: self)
+    }
+
     // MARK: - Validity
 
     var isValid: Bool {
@@ -207,6 +211,22 @@ extension URL {
 
         os_log("Failed to move file to Downloads folder, attempt %d", type: .error, copy)
         return nil
+    }
+
+    // MARK: - Punycode
+
+    var punycodeDecodedString: String? {
+        guard let components = URLComponents(url: self, resolvingAgainstBaseURL: true),
+              let host = components.host,
+              let decodedHost = host.idnaDecoded,
+              host != decodedHost,
+              let hostRange = components.rangeOfHost,
+              var string = components.string
+        else { return nil }
+
+        string.replaceSubrange(hostRange, with: decodedHost)
+
+        return string
     }
 
 }

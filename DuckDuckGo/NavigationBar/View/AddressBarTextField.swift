@@ -209,7 +209,9 @@ class AddressBarTextField: NSTextField {
         init(stringValue: String, userTyped: Bool) {
             if let url = stringValue.punycodedUrl, url.isValid {
                 var stringValue = stringValue
-                if let punycodeDecoded = url.punycodeDecodedString {
+                if let punycodeDecoded = url.punycodeDecodedString,
+                   // stringValue should be in encoded form otherwise leave it as it is
+                   stringValue.range(of: punycodeDecoded) == nil {
                     stringValue = punycodeDecoded
                 }
                 self = .url(urlString: stringValue, url: url, userTyped: userTyped)
@@ -270,11 +272,11 @@ class AddressBarTextField: NSTextField {
             case .text: self = Suffix.search
             case .url(urlString: _, url: let url, userTyped: let userTyped):
                 if !userTyped { return nil }
-                self = Suffix.visit(host: url.host ?? url.absoluteString)
+                self = Suffix.visit(host: url.domain?.displayName ?? url.absoluteString)
             case .suggestion(let suggestionViewModel):
                 switch suggestionViewModel.suggestion {
                 case .phrase(phrase: _): self = Suffix.search
-                case .website(url: let url): self = Suffix.visit(host: url.host ?? url.absoluteString)
+                case .website(url: let url): self = Suffix.visit(host: url.domain?.displayName ?? url.absoluteString)
                 case .unknown(value: _): self = Suffix.search
                 }
             }

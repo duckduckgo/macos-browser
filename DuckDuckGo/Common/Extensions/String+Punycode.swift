@@ -77,27 +77,3 @@ extension String {
     }
     
 }
-
-extension URL {
-
-    var punycodeDecodedString: String? {
-        guard let components = URLComponents(url: self, resolvingAgainstBaseURL: true),
-              let host = components.host,
-              let decodedHost = host.idnaDecoded,
-              host != decodedHost,
-              let hostRange = components.rangeOfHost,
-              var string = components.string
-        else { return nil }
-
-        string.replaceSubrange(hostRange, with: decodedHost)
-
-        return string
-    }
-
-    var displayHost: String {
-        guard let host = self.host else { return self.absoluteString }
-
-        return (host.idnaDecoded ?? host).drop(prefix: URL.HostPrefix.www.separated())
-    }
-
-}

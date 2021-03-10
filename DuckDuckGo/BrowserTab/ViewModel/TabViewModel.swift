@@ -97,7 +97,7 @@ class TabViewModel {
         guard !isErrorViewVisible else {
             let failingUrl = tab.error?.failingUrl
             addressBarString = failingUrl?.absoluteString ?? ""
-            passiveAddressBarString = failingUrl?.displayHost ?? ""
+            passiveAddressBarString = failingUrl?.domain?.displayName ?? ""
             return
         }
 
@@ -115,7 +115,7 @@ class TabViewModel {
             passiveAddressBarString = ""
         } else {
             addressBarString = url.absoluteString
-            passiveAddressBarString = url.displayHost
+            passiveAddressBarString = url.domain?.displayName ?? addressBarString
         }
     }
 
