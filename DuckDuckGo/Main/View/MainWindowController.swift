@@ -41,8 +41,8 @@ class MainWindowController: NSWindowController {
     }
 
     private func setupWindow() {
-        window!.delegate = self
-        window!.setFrameAutosaveName(Self.windowFrameSaveName)
+        window?.delegate = self
+        window?.setFrameAutosaveName(Self.windowFrameSaveName)
 
         setupToolbar()
     }
@@ -53,7 +53,11 @@ class MainWindowController: NSWindowController {
         window?.toolbar = NSToolbar()
         window?.toolbar?.showsBaselineSeparator = true
 
-        let tabBarViewController = mainViewController!.tabBarViewController!
+        guard let tabBarViewController = mainViewController?.tabBarViewController else {
+            assertionFailure("MainWindowController: tabBarViewController is nil" )
+            return
+        }
+
         guard let titlebarView = window?.standardWindowButton(.closeButton)?.superview else { return }
 
         tabBarViewController.view.removeFromSuperview()
@@ -73,7 +77,7 @@ class MainWindowController: NSWindowController {
         trafficLightsAlphaCancellable = window?.standardWindowButton(.closeButton)?
             .publisher(for: \.alphaValue)
             .map { alphaValue in 80.0 * alphaValue }
-            .assign(to: \.constant, on: tabBarViewController.scrollViewLeadingConstraint)
+            .weakAssign(to: \.constant, on: tabBarViewController.scrollViewLeadingConstraint)
 
     }
 
