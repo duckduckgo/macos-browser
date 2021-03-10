@@ -34,6 +34,9 @@
                                     <constraint firstItem="T1A-KU-P4c" firstAttribute="top" secondItem="8Av-Au-VBq" secondAttribute="top" id="vLF-of-F3h"/>
                                 </constraints>
                             </visualEffectView>
+                            <customView translatesAutoresizingMaskIntoConstraints="NO" id="efe-Pc-ueP" userLabel="Window Dragging View" customClass="WindowDraggingView" customModule="DuckDuckGo_Privacy_Browser" customModuleProvider="target">
+                                <rect key="frame" x="0.0" y="0.0" width="845" height="38"/>
+                            </customView>
                             <button translatesAutoresizingMaskIntoConstraints="NO" id="XV4-Ze-5j7" userLabel="Burn Button" customClass="BurnButton" customModule="DuckDuckGo_Privacy_Browser" customModuleProvider="target">
                                 <rect key="frame" x="805" y="5" width="32" height="24"/>
                                 <constraints>
@@ -201,14 +204,18 @@
                             <constraint firstAttribute="bottom" secondItem="u4N-Qc-LMf" secondAttribute="bottom" id="Fc4-Wo-qz3"/>
                             <constraint firstAttribute="trailing" secondItem="qXs-b0-tWI" secondAttribute="trailing" constant="40" id="Fsr-hL-HYK"/>
                             <constraint firstAttribute="bottom" secondItem="O0X-yp-zLn" secondAttribute="bottom" id="H4i-IA-5l5"/>
+                            <constraint firstItem="efe-Pc-ueP" firstAttribute="top" secondItem="JQD-ov-FCr" secondAttribute="top" id="IfJ-U1-mpT"/>
                             <constraint firstItem="qXs-b0-tWI" firstAttribute="centerY" secondItem="JQD-ov-FCr" secondAttribute="centerY" constant="2" id="Iib-Si-FQP"/>
                             <constraint firstItem="O0X-yp-zLn" firstAttribute="top" secondItem="JQD-ov-FCr" secondAttribute="top" constant="6" id="L7c-2V-Cvh"/>
                             <constraint firstAttribute="trailing" secondItem="2da-G7-xcP" secondAttribute="trailing" constant="72" id="MzW-an-3dV"/>
                             <constraint firstItem="7XG-Qm-Ksx" firstAttribute="leading" secondItem="JQD-ov-FCr" secondAttribute="leading" constant="72" id="RUQ-ds-h8T"/>
                             <constraint firstAttribute="bottom" secondItem="efe-Pc-ueT" secondAttribute="bottom" priority="750" id="Si3-u3-31S"/>
+                            <constraint firstItem="efe-Pc-ueP" firstAttribute="leading" secondItem="JQD-ov-FCr" secondAttribute="leading" id="UBO-rv-mb4"/>
                             <constraint firstItem="8Av-Au-VBq" firstAttribute="top" secondItem="JQD-ov-FCr" secondAttribute="top" id="UNA-xd-vb7"/>
                             <constraint firstItem="O0X-yp-zLn" firstAttribute="leading" secondItem="zsA-or-9Xo" secondAttribute="leading" id="bIL-4K-ggG"/>
                             <constraint firstItem="8Av-Au-VBq" firstAttribute="leading" secondItem="JQD-ov-FCr" secondAttribute="leading" id="djE-ZR-Zcb"/>
+                            <constraint firstAttribute="trailing" secondItem="efe-Pc-ueP" secondAttribute="trailing" id="etm-VT-0k2"/>
+                            <constraint firstAttribute="bottom" secondItem="efe-Pc-ueP" secondAttribute="bottom" id="iYT-Di-UlL"/>
                             <constraint firstItem="efe-Pc-ueT" firstAttribute="top" secondItem="JQD-ov-FCr" secondAttribute="top" priority="750" id="kNA-2I-L0U"/>
                             <constraint firstAttribute="bottom" secondItem="8Av-Au-VBq" secondAttribute="bottom" id="pat-VC-dVb"/>
                             <constraint firstAttribute="trailing" secondItem="O0X-yp-zLn" secondAttribute="trailing" constant="80" id="sUB-ad-rWC"/>
