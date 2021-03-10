@@ -59,23 +59,6 @@ final class AppStateChangePublisherTests: XCTestCase {
 
     // MARK: -
 
-    func testWhenPublisherInitiatedNoStateChangeEventsPublished() {
-        WindowsManager.openNewWindow()
-
-        WindowControllersManager.shared.stateChanged
-            .sink { _ in
-                XCTFail("Should not receive initial State Change")
-            }.store(in: &cancellables)
-
-        let e = expectation(description: "Wait 0.1sec")
-        let timer = Timer.scheduledTimer(withTimeInterval: 0.1, repeats: false) { _ in
-            e.fulfill()
-        }
-        withExtendedLifetime(timer) {
-            waitForExpectations(timeout: 10.0, handler: nil)
-        }
-    }
-
     func testWhenWindowIsOpenedThenStateChangePublished() {
         let e = expectation(description: "Window Opened fires State change")
 

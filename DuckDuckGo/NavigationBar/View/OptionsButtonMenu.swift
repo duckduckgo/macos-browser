@@ -19,17 +19,20 @@
 import Cocoa
 import os.log
 import WebKit
+import BrowserServicesKit
 
 final class OptionsButtonMenu: NSMenu {
 
     private let tabCollectionViewModel: TabCollectionViewModel
-
+    private let emailManager: EmailManager
+    
     required init(coder: NSCoder) {
         fatalError("OptionsButtonMenu: Bad initializer")
     }
 
-    init(tabCollectionViewModel: TabCollectionViewModel) {
+    init(tabCollectionViewModel: TabCollectionViewModel, emailManager: EmailManager = EmailManager()) {
         self.tabCollectionViewModel = tabCollectionViewModel
+        self.emailManager = emailManager
         super.init(title: "")
 
         setupMenuItems()
@@ -61,6 +64,13 @@ final class OptionsButtonMenu: NSMenu {
 
 #endif
         
+        let emailItem = NSMenuItem(title: UserText.emailOptionsMenuItem,
+                                   action: nil,
+                                   keyEquivalent: "")
+        emailItem.image = NSImage(named: "OptionsButtonMenuEmail")
+        emailItem.submenu = EmailOptionsButtonSubMenu(tabCollectionViewModel: tabCollectionViewModel, emailManager: emailManager)
+        addItem(emailItem)
+    
         addItem(NSMenuItem.separator())
         
         bookmarksMenuItem.image = NSImage(named: "Bookmark")
@@ -94,7 +104,6 @@ final class OptionsButtonMenu: NSMenu {
     private func updateBookmarks() {
         // The bookmarks section is the same with the main menu
         bookmarksMenuItem.submenu = NSApplication.shared.mainMenuTyped?.bookmarksMenuItem?.submenu?.copy() as? NSMenu
-        
     }
 
     @objc func moveTabToNewWindowAction(_ sender: NSMenuItem) {
@@ -109,12 +118,106 @@ final class OptionsButtonMenu: NSMenu {
     }
 
     @objc func toggleFireproofing(_ sender: NSMenuItem) {
-         guard let selectedTabViewModel = tabCollectionViewModel.selectedTabViewModel else {
-             os_log("MainViewController: No tab view model selected", type: .error)
-             return
-         }
+        guard let selectedTabViewModel = tabCollectionViewModel.selectedTabViewModel else {
+            os_log("MainViewController: No tab view model selected", type: .error)
+            return
+        }
+        
+        selectedTabViewModel.tab.requestFireproofToggle()
+    }
+    
+}
 
-         selectedTabViewModel.tab.requestFireproofToggle()
-     }
+final class EmailOptionsButtonSubMenu: NSMenu {
+    
+    private let tabCollectionViewModel: TabCollectionViewModel
+    private let emailManager: EmailManager
+        
+    init(tabCollectionViewModel: TabCollectionViewModel, emailManager: EmailManager) {
+        self.tabCollectionViewModel = tabCollectionViewModel
+        self.emailManager = emailManager
+        super.init(title: UserText.emailOptionsMenuItem)
 
+        updateMenuItems()
+        
+        NotificationCenter.default.addObserver(self,
+                                               selector: #selector(emailDidSignInNotification(_:)),
+                                               name: .emailDidSignIn,
+                                               object: nil)
+        NotificationCenter.default.addObserver(self,
+                                               selector: #selector(emailDidSignOutNotification(_:)),
+                                               name: .emailDidSignOut,
+                                               object: nil)
+    }
+    
+    required init(coder: NSCoder) {
+        fatalError("init(coder:) has not been implemented")
+    }
+    
+    private func updateMenuItems() {
+        removeAllItems()
+        if emailManager.isSignedIn {
+            let createAddressItem = NSMenuItem(title: UserText.emailOptionsMenuCreateAddressSubItem,
+                                           action: #selector(createAddressAction(_:)),
+                                           keyEquivalent: "")
+            createAddressItem.target = self
+            createAddressItem.image = NSImage(named: "OptionsButtonMenuEmailGenerateAddress")
+            addItem(createAddressItem)
+            
+            let viewDashboardItem = NSMenuItem(title: UserText.emailOptionsMenuViewDashboardSubItem,
+                                           action: #selector(viewDashboardAction(_:)),
+                                           keyEquivalent: "")
+            viewDashboardItem.target = self
+            viewDashboardItem.image = NSImage(named: "OptionsButtonMenuEmailDashboard")
+            addItem(viewDashboardItem)
+            
+            let turnOnOffItem = NSMenuItem(title: UserText.emailOptionsMenuTurnOffSubItem,
+                                           action: #selector(turnOffEmailAction(_:)),
+                                           keyEquivalent: "")
+            turnOnOffItem.target = self
+            turnOnOffItem.image = NSImage(named: "OptionsButtonMenuEmailDisabled")
+            addItem(turnOnOffItem)
+        } else {
+            let turnOnOffItem = NSMenuItem(title: UserText.emailOptionsMenuTurnOnSubItem,
+                                           action: #selector(turnOnEmailAction(_:)),
+                                           keyEquivalent: "")
+            turnOnOffItem.target = self
+            turnOnOffItem.image = NSImage(named: "OptionsButtonMenuEmail")
+            addItem(turnOnOffItem)
+        }
+    }
+    
+    @objc func createAddressAction(_ sender: NSMenuItem) {
+        guard let url = emailManager.generateTokenPageURL else {
+            assertionFailure("Could not get token page URL, token not available")
+            return
+        }
+        let tab = Tab()
+        tab.url = url
+        tabCollectionViewModel.append(tab: tab)
+    }
+    
+    @objc func viewDashboardAction(_ sender: NSMenuItem) {
+        let tab = Tab()
+        tab.url = EmailUrls().emailDashboardPage
+        tabCollectionViewModel.append(tab: tab)
+    }
+    
+    @objc func turnOffEmailAction(_ sender: NSMenuItem) {
+        emailManager.signOut()
+    }
+    
+    @objc func turnOnEmailAction(_ sender: NSMenuItem) {
+        let tab = Tab()
+        tab.url = EmailUrls().emailLandingPage
+        tabCollectionViewModel.append(tab: tab)
+    }
+
+    @objc func emailDidSignInNotification(_ notification: Notification) {
+        updateMenuItems()
+    }
+    
+    @objc func emailDidSignOutNotification(_ notification: Notification) {
+        updateMenuItems()
+    }
 }

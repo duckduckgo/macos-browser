@@ -28,6 +28,7 @@ final class UserScripts {
     let loginDetectionUserScript = LoginFormDetectionUserScript()
     let contentBlockerScript = ContentBlockerUserScript()
     let contentBlockerRulesScript = ContentBlockerRulesUserScript()
+    let emailScript = EmailUserScript()
     let debugScript = DebugUserScript()
 
     init() {
@@ -46,7 +47,8 @@ final class UserScripts {
         self.findInPageScript,
         self.loginDetectionUserScript,
         self.contentBlockerScript,
-        self.contentBlockerRulesScript
+        self.contentBlockerRulesScript,
+        self.emailScript
     ]
 
     lazy var scripts = userScripts.map { $0.makeWKUserScript() }

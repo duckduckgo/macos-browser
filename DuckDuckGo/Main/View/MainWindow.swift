@@ -28,6 +28,27 @@ final class MainWindow: NSWindow {
         return true
     }
 
+    init(frame: NSRect) {
+        super.init(contentRect: frame,
+                   styleMask: [.titled, .closable, .miniaturizable, .resizable, .fullSizeContentView],
+                   backing: .buffered,
+                   defer: true)
+
+        setupWindow()
+    }
+
+    private func setupWindow() {
+        allowsToolTipsWhenApplicationIsInactive = false
+        autorecalculatesKeyViewLoop = false
+        isReleasedWhenClosed = false
+        animationBehavior = .documentWindow
+        hasShadow = true
+        titleVisibility = .hidden
+        titlebarAppearsTransparent = true
+        // the window will be draggable using custom drag areas defined by WindowDraggingView
+        isMovable = false
+    }
+
     // MARK: - First Responder Notification
 
     override func makeFirstResponder(_ responder: NSResponder?) -> Bool {
@@ -44,6 +65,16 @@ final class MainWindow: NSWindow {
         super.becomeMain()
 
         postFirstResponderNotification(with: firstResponder)
+    }
+
+    override func endEditing(for object: Any?) {
+        if case .leftMouseUp = NSApp.currentEvent?.type,
+           object is AddressBarTextEditor {
+            // prevent deactivation of Address Bar on Toolbar click
+            return
+        }
+
+        super.endEditing(for: object)
     }
 
     private func postFirstResponderNotification(with firstResponder: NSResponder?) {

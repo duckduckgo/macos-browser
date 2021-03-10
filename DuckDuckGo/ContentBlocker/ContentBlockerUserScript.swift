@@ -20,7 +20,7 @@ import WebKit
 import os
 import BrowserServicesKit
 
-protocol ContentBlockerUserScriptDelegate: NSObjectProtocol {
+protocol ContentBlockerUserScriptDelegate: class {
 
     func contentBlockerUserScriptShouldProcessTrackers(_ script: UserScript) -> Bool
     func contentBlockerUserScript(_ script: ContentBlockerUserScript, detectedTracker tracker: DetectedTracker, withSurrogate host: String)

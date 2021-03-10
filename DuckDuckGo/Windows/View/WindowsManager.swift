@@ -73,14 +73,7 @@ final class WindowsManager {
     }
 
     private class func makeNewWindow(tabCollectionViewModel: TabCollectionViewModel? = nil) -> MainWindowController? {
-        let mainStoryboard = NSStoryboard(name: "Main", bundle: nil)
-        guard let mainWindowController = mainStoryboard
-                .instantiateController(withIdentifier: .mainWindowController) as? MainWindowController else {
-            os_log("MainViewController: Failed to init MainWindowController", type: .error)
-            return nil
-        }
-        
-        let mainViewController = mainStoryboard
+        let mainViewController = NSStoryboard(name: "Main", bundle: nil)
             .instantiateController(identifier: .mainViewController) { coder -> MainViewController? in
                 if let tabCollectionViewModel = tabCollectionViewModel {
                     return MainViewController(coder: coder, tabCollectionViewModel: tabCollectionViewModel)
@@ -88,15 +81,12 @@ final class WindowsManager {
                     return MainViewController(coder: coder)
                 }
             }
-        mainWindowController.contentViewController = mainViewController
 
-        mainWindowController.window?.animationBehavior = .documentWindow
-        return mainWindowController
+        return MainWindowController(mainViewController: mainViewController)
     }
 
 }
 
 fileprivate extension NSStoryboard.SceneIdentifier {
-    static let mainWindowController = NSStoryboard.SceneIdentifier("mainWindowController")
     static let mainViewController = NSStoryboard.SceneIdentifier("mainViewController")
 }
