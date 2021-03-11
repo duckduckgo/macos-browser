@@ -57,7 +57,7 @@ class SuggestionsViewModel {
     func suggestionViewModel(at index: Int) -> SuggestionViewModel? {
         let items = suggestions.items ?? []
 
-        guard items.indices.contains(index) else {
+        guard index < items.count else {
             os_log("SuggestionsViewModel: Absolute index is out of bounds", type: .error)
             return nil
         }
@@ -66,7 +66,7 @@ class SuggestionsViewModel {
     }
 
     func select(at index: Int) {
-        guard suggestions.items?.indices.contains(index) == true else {
+        guard index >= 0, index < numberOfSuggestions else {
             os_log("SuggestionsViewModel: Index out of bounds", type: .error)
             selectionIndex = nil
             return

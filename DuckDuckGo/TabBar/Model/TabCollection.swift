@@ -42,7 +42,7 @@ final class TabCollection: NSObject {
     }
 
     func remove(at index: Int) -> Bool {
-        guard tabs.indices.contains(index) else {
+        guard index >= 0, index < tabs.count else {
             os_log("TabCollection: Index out of bounds", type: .error)
             return false
         }
@@ -58,7 +58,7 @@ final class TabCollection: NSObject {
     }
 
     func moveTab(at index: Int, to newIndex: Int) {
-        guard tabs.indices.contains(index), tabs.indices.contains(newIndex) else {
+        guard index >= 0, index < tabs.count, newIndex >= 0, newIndex < tabs.count else {
             os_log("TabCollection: Index out of bounds", type: .error)
             return
         }
@@ -75,7 +75,7 @@ final class TabCollection: NSObject {
     }
 
     private func saveLastRemovedTab(at index: Int) {
-        guard tabs.indices.contains(index) else {
+        guard index >= 0, index < tabs.count else {
             os_log("TabCollection: Index out of bounds", type: .error)
             return
         }

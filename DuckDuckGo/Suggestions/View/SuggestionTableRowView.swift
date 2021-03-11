@@ -21,7 +21,7 @@ import os.log
 
 class SuggestionTableRowView: NSTableRowView {
 
-    static let identifier = NSUserInterfaceItemIdentifier(rawValue: "SuggestionTableRowView")
+    static let identifier = "SuggestionTableRowView"
 
     override func awakeFromNib() {
         super.awakeFromNib()

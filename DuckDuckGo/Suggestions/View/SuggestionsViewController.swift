@@ -27,7 +27,7 @@ protocol SuggestionsViewControllerDelegate: AnyObject {
 
 }
 
-final class SuggestionsViewController: NSViewController {
+class SuggestionsViewController: NSViewController {
 
     weak var delegate: SuggestionsViewControllerDelegate?
 
@@ -161,8 +161,9 @@ final class SuggestionsViewController: NSViewController {
         if tableView.selectedRow == index { return }
 
         guard let index = index,
-              (0..<suggestionsViewModel.numberOfSuggestions).contains(index)
-        else {
+              index >= 0,
+              suggestionsViewModel.numberOfSuggestions != 0,
+              index < suggestionsViewModel.numberOfSuggestions else {
             self.clearSelection()
             return
         }
@@ -245,13 +246,15 @@ extension SuggestionsViewController: NSTableViewDataSource {
 extension SuggestionsViewController: NSTableViewDelegate {
 
     func tableView(_ tableView: NSTableView, viewFor tableColumn: NSTableColumn?, row: Int) -> NSView? {
-        // swiftlint:disable force_cast
-        let suggestionTableCellView = tableView.makeView(withIdentifier: SuggestionTableCellView.identifier,
-                                                         owner: self) as! SuggestionTableCellView
-        // swiftlint:enable force_cast
+        guard let suggestionTableCellView = tableView.makeView(
+                withIdentifier: NSUserInterfaceItemIdentifier(rawValue: SuggestionTableCellView.identifier), owner: self)
+                as? SuggestionTableCellView else {
+            assertionFailure("SuggestionsViewController: Making of table cell view failed")
+            return nil
+        }
 
         guard let suggestionViewModel = suggestionsViewModel.suggestionViewModel(at: row) else {
-            os_log("SuggestionsViewController: Failed to get suggestion", type: .error)
+            assertionFailure("SuggestionsViewController: Failed to get suggestion")
             return nil
         }
 
@@ -260,9 +263,13 @@ extension SuggestionsViewController: NSTableViewDelegate {
     }
 
     func tableView(_ tableView: NSTableView, rowViewForRow row: Int) -> NSTableRowView? {
-        // swiftlint:disable force_cast
-        tableView.makeView(withIdentifier: SuggestionTableRowView.identifier, owner: self) as! SuggestionTableRowView
-        // swiftlint:enable force_cast
+        guard let suggestionTableRowView = tableView.makeView(
+                withIdentifier: NSUserInterfaceItemIdentifier(rawValue: SuggestionTableRowView.identifier), owner: self)
+                as? SuggestionTableRowView else {
+            assertionFailure("SuggestionsViewController: Making of table row view failed")
+            return nil
+        }
+        return suggestionTableRowView
     }
 
     func tableViewSelectionDidChange(_ notification: Notification) {

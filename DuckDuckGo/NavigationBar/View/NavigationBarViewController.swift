@@ -20,7 +20,7 @@ import Cocoa
 import Combine
 import os.log
 
-final class NavigationBarViewController: NSViewController {
+class NavigationBarViewController: NSViewController {
 
     @IBOutlet weak var goBackButton: NSButton!
     @IBOutlet weak var goForwardButton: NSButton!
@@ -29,7 +29,7 @@ final class NavigationBarViewController: NSViewController {
     @IBOutlet weak var optionsButton: NSButton!
     @IBOutlet weak var shareButton: NSButton!
 
-    var addressBarViewController: AddressBarViewController!
+    var addressBarViewController: AddressBarViewController?
 
     private var tabCollectionViewModel: TabCollectionViewModel
 
@@ -66,9 +66,14 @@ final class NavigationBarViewController: NSViewController {
 
     }
 
-    @IBSegueAction func createAddressBarViewController(_ coder: NSCoder) -> AddressBarViewController {
-        self.addressBarViewController = AddressBarViewController(coder: coder,
-                                                                 tabCollectionViewModel: tabCollectionViewModel)!
+    @IBSegueAction func createAddressBarViewController(_ coder: NSCoder) -> AddressBarViewController? {
+        guard let addressBarViewController = AddressBarViewController(coder: coder,
+                                                                      tabCollectionViewModel: tabCollectionViewModel) else {
+            assertionFailure("NavigationBarViewController: Failed to init AddressBarViewController")
+            return nil
+        }
+
+        self.addressBarViewController = addressBarViewController
         return addressBarViewController
     }
 

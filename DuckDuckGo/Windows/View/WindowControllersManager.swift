@@ -104,7 +104,7 @@ extension WindowControllersManager: ApplicationDockMenuDataSource {
     }
 
     func applicationDockMenu(_ applicationDockMenu: ApplicationDockMenu, windowTitleFor windowMenuItemIndex: Int) -> String {
-        guard mainWindowControllers.indices.contains(windowMenuItemIndex) else {
+        guard windowMenuItemIndex >= 0, windowMenuItemIndex < mainWindowControllers.count else {
             os_log("WindowControllersManager: Index out of bounds", type: .error)
             return "-"
         }
@@ -133,7 +133,7 @@ extension WindowControllersManager: ApplicationDockMenuDataSource {
 extension WindowControllersManager: ApplicationDockMenuDelegate {
 
     func applicationDockMenu(_ applicationDockMenu: ApplicationDockMenu, selectWindowWith index: Int) {
-        guard mainWindowControllers.indices.contains(index) else {
+        guard index >= 0, index < mainWindowControllers.count else {
             os_log("WindowControllersManager: Index out of bounds", type: .error)
             return
         }

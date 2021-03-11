@@ -198,7 +198,7 @@ extension MainViewController {
             return
         }
         let index = keyEquivalent - 1
-        if tabCollectionViewModel.tabCollection.tabs.indices.contains(index) {
+        if index >= 0 && index < tabCollectionViewModel.tabCollection.tabs.count {
             tabCollectionViewModel.select(at: index)
         }
     }

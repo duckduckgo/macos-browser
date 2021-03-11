@@ -45,7 +45,7 @@ extension NavigationButtonMenuDelegate: NSMenuDelegate {
 
     func menu(_ menu: NSMenu, update item: NSMenuItem, at index: Int, shouldCancel: Bool) -> Bool {
         let listItems = self.listItems
-        guard listItems.indices.contains(index) else {
+        guard index < listItems.count else {
             os_log("%s: Index out of bounds", type: .error, className)
             return true
         }
@@ -67,7 +67,7 @@ extension NavigationButtonMenuDelegate: NSMenuDelegate {
         let index = sender.tag
         let listItems = self.listItems
 
-        guard listItems.indices.contains(index) else {
+        guard index < listItems.count else {
             os_log("%s: Index out of bounds", type: .error, className)
             return
         }

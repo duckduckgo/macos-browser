@@ -467,9 +467,11 @@ extension TabBarViewController: NSCollectionViewDataSource {
     }
 
     func collectionView(_ collectionView: NSCollectionView, itemForRepresentedObjectAt indexPath: IndexPath) -> NSCollectionViewItem {
-        // swiftlint:disable force_cast
-        let tabBarViewItem = collectionView.makeItem(withIdentifier: TabBarViewItem.identifier, for: indexPath) as! TabBarViewItem
-        // swiftlint:enable force_cast
+        let item = collectionView.makeItem(withIdentifier: TabBarViewItem.identifier, for: indexPath)
+        guard let tabBarViewItem = item as? TabBarViewItem else {
+            assertionFailure("TabBarViewController: Failed to get reusable TabBarViewItem instance")
+            return item
+        }
 
         guard let tabViewModel = tabCollectionViewModel.tabViewModel(at: indexPath.item) else {
             tabBarViewItem.clear()
@@ -486,16 +488,13 @@ extension TabBarViewController: NSCollectionViewDataSource {
                         viewForSupplementaryElementOfKind kind: NSCollectionView.SupplementaryElementKind,
                         at indexPath: IndexPath) -> NSView {
 
-        // swiftlint:disable force_cast
-        let footer = collectionView.makeSupplementaryView(ofKind: kind,
-                                                          withIdentifier: TabBarFooter.identifier,
-                                                          for: indexPath) as! TabBarFooter
-        // swiftlint:enable force_cast
-
-        footer.addButton?.target = self
-        footer.addButton?.action = #selector(addButtonAction(_:))
-
-        return footer
+        let view = collectionView.makeSupplementaryView(ofKind: kind,
+                                                        withIdentifier: TabBarFooter.identifier, for: indexPath)
+        if let footer = view as? TabBarFooter {
+            footer.addButton?.target = self
+            footer.addButton?.action = #selector(addButtonAction(_:))
+        }
+        return view
     }
 }
 
