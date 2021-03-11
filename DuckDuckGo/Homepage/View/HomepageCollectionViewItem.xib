@@ -22,7 +22,7 @@
                     <rect key="frame" x="0.0" y="0.0" width="80" height="92"/>
                     <subviews>
                         <customView translatesAutoresizingMaskIntoConstraints="NO" id="Hsz-i9-i2N" userLabel="Wide Border View" customClass="ColorView" customModule="DuckDuckGo_Privacy_Browser" customModuleProvider="target">
-                            <rect key="frame" x="4" y="20" width="72" height="72"/>
+                            <rect key="frame" x="5" y="21" width="70" height="70"/>
                             <userDefinedRuntimeAttributes>
                                 <userDefinedRuntimeAttribute type="number" keyPath="cornerRadius">
                                     <real key="value" value="12"/>
@@ -78,7 +78,7 @@
                         <constraint firstItem="5V1-qQ-gBR" firstAttribute="leading" secondItem="Rdo-h5-kmQ" secondAttribute="leading" id="5FL-6Q-GOf"/>
                         <constraint firstItem="azc-ma-J3L" firstAttribute="leading" relation="greaterThanOrEqual" secondItem="Rdo-h5-kmQ" secondAttribute="leading" constant="2" id="DoC-N7-1ia"/>
                         <constraint firstItem="5V1-qQ-gBR" firstAttribute="top" secondItem="Rdo-h5-kmQ" secondAttribute="top" id="IBe-na-KX3"/>
-                        <constraint firstItem="1Vd-Cw-5GJ" firstAttribute="trailing" secondItem="Hsz-i9-i2N" secondAttribute="trailing" constant="-4" id="Pyk-Rx-lFH"/>
+                        <constraint firstItem="1Vd-Cw-5GJ" firstAttribute="trailing" secondItem="Hsz-i9-i2N" secondAttribute="trailing" constant="-3" id="Pyk-Rx-lFH"/>
                         <constraint firstAttribute="trailing" relation="greaterThanOrEqual" secondItem="azc-ma-J3L" secondAttribute="trailing" constant="2" id="SIe-ag-62s"/>
                         <constraint firstAttribute="bottom" secondItem="azc-ma-J3L" secondAttribute="bottom" id="Scb-l9-p1P"/>
                         <constraint firstItem="1Vd-Cw-5GJ" firstAttribute="top" secondItem="Rdo-h5-kmQ" secondAttribute="top" constant="4" id="SmU-Y4-VHO"/>
@@ -86,10 +86,10 @@
                         <constraint firstItem="C8O-oQ-mZN" firstAttribute="leading" secondItem="1Vd-Cw-5GJ" secondAttribute="leading" constant="-1" id="Y4W-kP-TQd"/>
                         <constraint firstItem="C8O-oQ-mZN" firstAttribute="bottom" secondItem="1Vd-Cw-5GJ" secondAttribute="bottom" constant="1" id="YG6-bM-t4f"/>
                         <constraint firstItem="1Vd-Cw-5GJ" firstAttribute="centerX" secondItem="Rdo-h5-kmQ" secondAttribute="centerX" id="hBN-AL-PdD"/>
-                        <constraint firstItem="1Vd-Cw-5GJ" firstAttribute="top" secondItem="Hsz-i9-i2N" secondAttribute="top" constant="4" id="hcv-J2-mrP"/>
+                        <constraint firstItem="1Vd-Cw-5GJ" firstAttribute="top" secondItem="Hsz-i9-i2N" secondAttribute="top" constant="3" id="hcv-J2-mrP"/>
                         <constraint firstItem="azc-ma-J3L" firstAttribute="centerX" secondItem="Rdo-h5-kmQ" secondAttribute="centerX" id="iSR-rh-iEF"/>
-                        <constraint firstItem="1Vd-Cw-5GJ" firstAttribute="leading" secondItem="Hsz-i9-i2N" secondAttribute="leading" constant="4" id="ixH-62-g5M"/>
-                        <constraint firstItem="1Vd-Cw-5GJ" firstAttribute="bottom" secondItem="Hsz-i9-i2N" secondAttribute="bottom" constant="-4" id="n7J-9I-nOt"/>
+                        <constraint firstItem="1Vd-Cw-5GJ" firstAttribute="leading" secondItem="Hsz-i9-i2N" secondAttribute="leading" constant="3" id="ixH-62-g5M"/>
+                        <constraint firstItem="1Vd-Cw-5GJ" firstAttribute="bottom" secondItem="Hsz-i9-i2N" secondAttribute="bottom" constant="-3" id="n7J-9I-nOt"/>
                         <constraint firstItem="C8O-oQ-mZN" firstAttribute="top" secondItem="1Vd-Cw-5GJ" secondAttribute="top" constant="-1" id="qjg-P8-QIp"/>
                         <constraint firstAttribute="bottom" secondItem="5V1-qQ-gBR" secondAttribute="bottom" id="xp5-2v-AdK"/>
                         <constraint firstItem="C8O-oQ-mZN" firstAttribute="trailing" secondItem="1Vd-Cw-5GJ" secondAttribute="trailing" constant="1" id="zr6-A2-tlq"/>

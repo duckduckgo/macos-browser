@@ -54,6 +54,15 @@ class BrowserTabViewController: NSViewController {
         super.init(coder: coder)
     }
 
+    @IBSegueAction func createHomepageViewController(_ coder: NSCoder) -> NSViewController? {
+        guard let controller = HomepageViewController(coder: coder,
+                                                      tabCollectionViewModel: tabCollectionViewModel,
+                                                      bookmarkManager: LocalBookmarkManager.shared) else {
+            fatalError("BrowserTabViewController: Failed to init HomepageViewController")
+        }
+        return controller
+    }
+
     override func viewDidLoad() {
         super.viewDidLoad()
 

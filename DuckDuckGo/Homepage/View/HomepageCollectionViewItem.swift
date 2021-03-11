@@ -45,12 +45,12 @@ class HomepageCollectionViewItem: NSCollectionViewItem {
         state = .normal
     }
 
-    override var isSelected: Bool {
+    override var highlightState: NSCollectionViewItem.HighlightState {
         didSet {
             switch state {
-            case .normal: if isSelected { state = .active }
-            case .hover: if isSelected { state = .active }
-            case .active: if !isSelected { state = isMouseOver ? .hover : .normal }
+            case .normal: if highlightState == .forSelection { state = .active }
+            case .hover: if highlightState == .forSelection { state = .active }
+            case .active: if highlightState != .forSelection { state = isMouseOver ? .hover : .normal }
             }
         }
     }

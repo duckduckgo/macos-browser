@@ -18,7 +18,7 @@
                             <containerView translatesAutoresizingMaskIntoConstraints="NO" id="aUo-25-0iW">
                                 <rect key="frame" x="0.0" y="0.0" width="512" height="492"/>
                                 <connections>
-                                    <segue destination="fQy-ie-1zy" kind="embed" id="XdA-0x-M1n"/>
+                                    <segue destination="fQy-ie-1zy" kind="embed" destinationCreationSelector="createHomepageViewController:" id="XdA-0x-M1n"/>
                                 </connections>
                             </containerView>
                             <customView hidden="YES" translatesAutoresizingMaskIntoConstraints="NO" id="bol-qn-wuI" customClass="ColorView" customModule="DuckDuckGo_Privacy_Browser" customModuleProvider="target">

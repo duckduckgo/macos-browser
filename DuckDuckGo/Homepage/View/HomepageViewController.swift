@@ -27,7 +27,8 @@ class HomepageViewController: NSViewController {
 
     @IBOutlet weak var collectionView: NSCollectionView!
 
-    private var bookmarkManager: BookmarkManager = LocalBookmarkManager.shared
+    private let tabCollectionViewModel: TabCollectionViewModel
+    private var bookmarkManager: BookmarkManager
     private var topFavorites: [Bookmark]? {
         didSet {
             collectionView.reloadData()
@@ -35,6 +36,17 @@ class HomepageViewController: NSViewController {
     }
 
     private var bookmarkListCancellable: AnyCancellable?
+
+    required init?(coder: NSCoder) {
+        fatalError("HomepageViewController: Bad initializer")
+    }
+
+    init?(coder: NSCoder, tabCollectionViewModel: TabCollectionViewModel, bookmarkManager: BookmarkManager) {
+        self.tabCollectionViewModel = tabCollectionViewModel
+        self.bookmarkManager = bookmarkManager
+
+        super.init(coder: coder)
+    }
 
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -96,11 +108,22 @@ extension HomepageViewController: NSCollectionViewDataSource, NSCollectionViewDe
     }
 
     func collectionView(_ collectionView: NSCollectionView, didSelectItemsAt indexPaths: Set<IndexPath>) {
-        //todo navigate
-    }
+        guard let topFavorites = topFavorites else {
+            assertionFailure("No favorites to display")
+            return
+        }
 
-    func collectionView(_ collectionView: NSCollectionView, shouldChangeItemsAt indexPaths: Set<IndexPath>, to highlightState: NSCollectionViewItem.HighlightState) -> Set<IndexPath> {
-        return Set()
+        guard let index = indexPaths.first?.item else {
+            return
+        }
+
+        guard index < topFavorites.count else {
+            //todo add favourite
+            return
+        }
+
+        let favorite = topFavorites[index]
+        tabCollectionViewModel.selectedTabViewModel?.tab.update(url: favorite.url, userEntered: false)
     }
 
  }
