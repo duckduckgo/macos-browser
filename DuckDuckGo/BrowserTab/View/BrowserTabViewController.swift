@@ -75,7 +75,6 @@ class BrowserTabViewController: NSViewController {
         selectedTabViewModelCancellable = tabCollectionViewModel.$selectedTabViewModel.receive(on: DispatchQueue.main).sink { [weak self] viewModel in
             self?.updateInterface(url: viewModel?.tab.url)
             self?.subscribeToIsErrorViewVisible()
-            self?.subscribeToUrl()
         }
     }
 
@@ -87,7 +86,7 @@ class BrowserTabViewController: NSViewController {
     private func updateInterface(url: URL?) {
         changeWebView()
 
-        if url != nil {
+        if url != nil && url != URL.emptyPage {
             showWebView()
         } else {
             showDefaultTabInterface()
@@ -97,6 +96,7 @@ class BrowserTabViewController: NSViewController {
     private func showWebView() {
         defaultBrowserPromptView?.removeFromSuperview()
         defaultBrowserPromptView = nil
+        self.homepageView.isHidden = true
 
         if let webView = self.webView {
             addWebViewToViewHierarchy(webView)
@@ -106,6 +106,7 @@ class BrowserTabViewController: NSViewController {
     private func showDefaultTabInterface() {
         self.webView?.removeFromSuperview()
         displayDefaultBrowserPromptIfNeeded()
+        self.homepageView.isHidden = false
     }
 
     @objc
@@ -185,13 +186,6 @@ class BrowserTabViewController: NSViewController {
     private func subscribeToIsErrorViewVisible() {
         isErrorViewVisibleCancellable = tabViewModel?.$isErrorViewVisible.receive(on: DispatchQueue.main).sink { [weak self] _ in
             self?.displayErrorView(self?.tabViewModel?.isErrorViewVisible ?? false)
-        }
-    }
-
-    private func subscribeToUrl() {
-        urlCancellable?.cancel()
-        urlCancellable = tabViewModel?.tab.$url.receive(on: DispatchQueue.main).sink { [weak self] _ in
-            self?.homepageView.isHidden = !(self?.tabViewModel?.tab.isHomepageShown ?? false)
         }
     }
 
