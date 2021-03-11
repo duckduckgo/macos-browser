@@ -63,16 +63,23 @@ class WindowsManager {
 
         newTab.url = initialUrl
     }
-
+    
     private class func makeNewWindow(tabCollectionViewModel: TabCollectionViewModel? = nil) -> MainWindowController {
-        let mainViewController = NSStoryboard.init(name: "Main", bundle: nil)
-            .instantiateController(identifier: .mainViewController) { coder -> MainViewController? in
-                if let tabCollectionViewModel = tabCollectionViewModel {
-                    return MainViewController(coder: coder, tabCollectionViewModel: tabCollectionViewModel)
-                } else {
-                    return MainViewController(coder: coder)
-                }
+        let mainViewController: MainViewController
+        do {
+            mainViewController = try NSException.catch {
+                NSStoryboard(name: "Main", bundle: .main)
+                    .instantiateController(identifier: .mainViewController) { coder -> MainViewController? in
+                        if let tabCollectionViewModel = tabCollectionViewModel {
+                            return MainViewController(coder: coder, tabCollectionViewModel: tabCollectionViewModel)
+                        } else {
+                            return MainViewController(coder: coder)
+                        }
+                    }
             }
+        } catch {
+            fatalError("WindowsManager.makeNewWindow caught an unexpected exception: \(error.localizedDescription)")
+        }
 
         return MainWindowController(mainViewController: mainViewController)
     }
