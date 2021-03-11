@@ -63,7 +63,7 @@ class WindowsManager {
 
         newTab.url = initialUrl
     }
-    
+
     private class func makeNewWindow(tabCollectionViewModel: TabCollectionViewModel? = nil) -> MainWindowController {
         let mainViewController: MainViewController
         do {
@@ -78,7 +78,11 @@ class WindowsManager {
                     }
             }
         } catch {
-            fatalError("WindowsManager.makeNewWindow caught an unexpected exception: \(error.localizedDescription)")
+#if DEBUG
+            fatalError("WindowsManager.makeNewWindow: \(error)")
+#else
+            fatalError("WindowsManager.makeNewWindow: the App Bundle seems to be removed")
+#endif
         }
 
         return MainWindowController(mainViewController: mainViewController)
