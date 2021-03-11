@@ -87,7 +87,7 @@ extension HomepageViewController: NSCollectionViewDataSource, NSCollectionViewDe
         }
 
         guard indexPath.item < topFavorites.count else {
-            //todo add button
+            item.setAddFavourite()
             return item
         }
 
@@ -96,7 +96,11 @@ extension HomepageViewController: NSCollectionViewDataSource, NSCollectionViewDe
     }
 
     func collectionView(_ collectionView: NSCollectionView, didSelectItemsAt indexPaths: Set<IndexPath>) {
+        //todo navigate
+    }
 
+    func collectionView(_ collectionView: NSCollectionView, shouldChangeItemsAt indexPaths: Set<IndexPath>, to highlightState: NSCollectionViewItem.HighlightState) -> Set<IndexPath> {
+        return Set()
     }
 
  }
@@ -110,4 +114,3 @@ extension HomepageViewController: NSCollectionViewDataSource, NSCollectionViewDe
      }
 
  }
-

@@ -15,16 +15,16 @@
                         <rect key="frame" x="0.0" y="0.0" width="939" height="530"/>
                         <autoresizingMask key="autoresizingMask"/>
                         <subviews>
-                            <scrollView wantsLayer="YES" borderType="none" autohidesScrollers="YES" horizontalLineScroll="10" horizontalPageScroll="10" verticalLineScroll="10" verticalPageScroll="10" hasHorizontalScroller="NO" hasVerticalScroller="NO" usesPredominantAxisScrolling="NO" translatesAutoresizingMaskIntoConstraints="NO" id="yHP-1u-VXv">
-                                <rect key="frame" x="194" y="161" width="552" height="208"/>
+                            <scrollView wantsLayer="YES" borderType="none" autohidesScrollers="YES" horizontalLineScroll="10" horizontalPageScroll="10" verticalLineScroll="10" verticalPageScroll="10" hasHorizontalScroller="NO" usesPredominantAxisScrolling="NO" translatesAutoresizingMaskIntoConstraints="NO" id="yHP-1u-VXv">
+                                <rect key="frame" x="189" y="157" width="562" height="216"/>
                                 <clipView key="contentView" drawsBackground="NO" id="w2D-bw-AI3">
-                                    <rect key="frame" x="0.0" y="0.0" width="552" height="208"/>
+                                    <rect key="frame" x="0.0" y="0.0" width="562" height="216"/>
                                     <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                     <subviews>
-                                        <collectionView id="MU6-iJ-Oba">
-                                            <rect key="frame" x="0.0" y="0.0" width="552" height="158"/>
+                                        <collectionView selectable="YES" id="MU6-iJ-Oba">
+                                            <rect key="frame" x="0.0" y="0.0" width="562" height="216"/>
                                             <autoresizingMask key="autoresizingMask" widthSizable="YES"/>
-                                            <collectionViewFlowLayout key="collectionViewLayout" minimumInteritemSpacing="48" minimumLineSpacing="32" id="DoO-9t-4cf">
+                                            <collectionViewFlowLayout key="collectionViewLayout" minimumInteritemSpacing="40" minimumLineSpacing="32" id="DoO-9t-4cf">
                                                 <size key="itemSize" width="50" height="50"/>
                                             </collectionViewFlowLayout>
                                             <color key="primaryBackgroundColor" name="ClearColor"/>
@@ -37,8 +37,8 @@
                                     <color key="backgroundColor" name="ClearColor"/>
                                 </clipView>
                                 <constraints>
-                                    <constraint firstAttribute="width" priority="250" constant="552" id="KJY-Xv-KbH"/>
-                                    <constraint firstAttribute="height" priority="250" constant="208" id="u4x-RV-S2R"/>
+                                    <constraint firstAttribute="width" priority="250" constant="562" id="KJY-Xv-KbH"/>
+                                    <constraint firstAttribute="height" priority="250" constant="216" id="u4x-RV-S2R"/>
                                 </constraints>
                                 <scroller key="horizontalScroller" hidden="YES" wantsLayer="YES" verticalHuggingPriority="750" horizontal="YES" id="Jii-b1-70r">
                                     <rect key="frame" x="-100" y="-100" width="233" height="15"/>

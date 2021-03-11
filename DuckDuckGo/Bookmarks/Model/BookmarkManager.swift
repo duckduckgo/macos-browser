@@ -71,7 +71,7 @@ class LocalBookmarkManager: BookmarkManager {
             os_log("LocalBookmarkManager: Url is already bookmarked", type: .error)
             return nil
         }
-        favicon?.size = NSSize.faviconSize
+//        favicon?.size = NSSize.faviconSize
         let bookmark = Bookmark(url: url, title: title, favicon: favicon, isFavorite: false)
 
         list.insert(bookmark)

@@ -23,21 +23,115 @@ class HomepageCollectionViewItem: NSCollectionViewItem {
     static let identifier = NSUserInterfaceItemIdentifier(rawValue: "HomepageCollectionViewItem")
 
     enum Size {
-        static let width = 64
-        static let height = 88
+        static let width = 80
+        static let height = 92
     }
 
-    @IBOutlet weak var faviconImageView: NSImageView!
-    @IBOutlet weak var titleTextField: NSTextField!
+    private enum Constants {
+        static let textFieldCornerRadius: CGFloat = 4
+    }
 
-    override func viewDidLoad() {
-        super.viewDidLoad()
-        // Do view setup here.
+    @IBOutlet weak var wideBorderView: ColorView!
+    @IBOutlet weak var narrowBorderView: ColorView!
+    @IBOutlet weak var croppingView: ColorView!
+    @IBOutlet weak var faviconImageView: BorderImageView!
+    @IBOutlet weak var titleTextField: NSTextField!
+    @IBOutlet weak var mouseOverView: MouseOverView!
+
+    override func awakeFromNib() {
+        super.awakeFromNib()
+
+        setupView()
+        state = .normal
+    }
+
+    override var isSelected: Bool {
+        didSet {
+            switch state {
+            case .normal: if isSelected { state = .active }
+            case .hover: if isSelected { state = .active }
+            case .active: if !isSelected { state = isMouseOver ? .hover : .normal }
+            }
+        }
     }
 
     func set(bookmark: Bookmark) {
-        faviconImageView.image = bookmark.favicon
+        if let size = bookmark.favicon?.size,
+           size.width >= CGFloat(Size.width),
+           size.height >= CGFloat(Size.width) {
+            faviconImageView.image = bookmark.favicon
+        } else {
+            faviconImageView.image = nil
+        }
+
         titleTextField.stringValue = bookmark.title
     }
+
+    func setAddFavourite() {
+        faviconImageView.image = NSImage(named: "Add")
+        titleTextField.stringValue = UserText.addFavorite
+    }
+
+    private func setupView() {
+        mouseOverView.delegate = self
+        titleTextField.wantsLayer = true
+        titleTextField.layer?.cornerRadius = Constants.textFieldCornerRadius
+    }
+
+    private var isMouseOver: Bool = false
+
+    // MARK: - State
+
+    private enum State {
+        case normal
+        case hover
+        case active
+    }
+
+    private var state: State = .normal {
+        didSet {
+            let wideBorderColor: NSColor, narrowBorderColor: NSColor, foregroundColor: NSColor
+            switch state {
+            case .normal:
+                wideBorderColor = NSColor.clear
+                narrowBorderColor = NSColor.homepageFaviconBorderColor
+                foregroundColor = NSColor.clear
+            case .hover:
+                wideBorderColor = NSColor.homepageFaviconHoverColor
+                narrowBorderColor = NSColor.clear
+                foregroundColor = NSColor.clear
+            case .active:
+                wideBorderColor = NSColor.homepageFaviconActiveColor
+                narrowBorderColor = NSColor.clear
+                foregroundColor =  NSColor.homepageFaviconActiveColor
+            }
+
+            wideBorderView.backgroundColor = wideBorderColor
+            narrowBorderView.backgroundColor = narrowBorderColor
+            titleTextField.layer?.backgroundColor = wideBorderColor.cgColor
+            //todo foreground
+        }
+    }
+
+}
+
+extension HomepageCollectionViewItem: MouseOverViewDelegate {
+
+    func mouseOverView(_ mouseOverView: MouseOverView, isMouseOver: Bool) {
+        self.isMouseOver = isMouseOver
+        switch state {
+        case .normal: if isMouseOver { state = .hover }
+        case .hover: if !isMouseOver { state = .normal }
+        case .active: break
+        }
+    }
+
+}
+
+fileprivate extension NSColor {
+
+    static let homepageFaviconBorderColor = NSColor(named: "HomepageFaviconBorderColor")!
+    static let homepageFaviconHoverColor = NSColor(named: "HomepageFaviconHoverColor")!
+    static let homepageFaviconActiveColor = NSColor(named: "HomepageFaviconActiveColor")!
 
 }

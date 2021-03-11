@@ -36,7 +36,10 @@ struct BookmarkViewModel {
     var menuFavicon: NSImage? {
         // Once we have bookmark folders
         // bookmark.isFavorite ? bookmark.favicon?.makeFavoriteOverlay() : bookmark.favicon
-        bookmark.favicon
+
+        let favicon = bookmark.favicon?.copy() as? NSImage
+        favicon?.size = NSSize.faviconSize
+        return favicon
     }
 
 }

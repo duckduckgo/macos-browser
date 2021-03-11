@@ -1,5 +1,5 @@
 //
-//  CornerRadiusImageView.swift
+//  BorderImageView.swift
 //
 //  Copyright © 2021 DuckDuckGo. All rights reserved.
 //
@@ -18,7 +18,7 @@
 
 import Cocoa
 
-class CornerRadiusImageView: NSImageView {
+class BorderImageView: NSImageView {
 
     required init?(coder: NSCoder) {
         super.init(coder: coder)

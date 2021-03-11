@@ -207,7 +207,7 @@
 		AAE71E3125F7855400D74437 /* HomepageViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = AAE71E3025F7855400D74437 /* HomepageViewController.swift */; };
 		AAE71E3725F7869300D74437 /* HomepageCollectionViewItem.swift in Sources */ = {isa = PBXBuildFile; fileRef = AAE71E3525F7869300D74437 /* HomepageCollectionViewItem.swift */; };
 		AAE71E3825F7869300D74437 /* HomepageCollectionViewItem.xib in Resources */ = {isa = PBXBuildFile; fileRef = AAE71E3625F7869300D74437 /* HomepageCollectionViewItem.xib */; };
-		AAE71E3D25F7B9A600D74437 /* CornerRadiusImageView.swift in Sources */ = {isa = PBXBuildFile; fileRef = AAE71E3C25F7B9A600D74437 /* CornerRadiusImageView.swift */; };
+		AAE71E3D25F7B9A600D74437 /* BorderImageView.swift in Sources */ = {isa = PBXBuildFile; fileRef = AAE71E3C25F7B9A600D74437 /* BorderImageView.swift */; };
 		AAE8B102258A41C000E81239 /* Tooltip.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = AAE8B101258A41C000E81239 /* Tooltip.storyboard */; };
 		AAE8B110258A456C00E81239 /* TooltipViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = AAE8B10F258A456C00E81239 /* TooltipViewController.swift */; };
 		AAECA42024EEA4AC00EFA63A /* IndexPathExtension.swift in Sources */ = {isa = PBXBuildFile; fileRef = AAECA41F24EEA4AC00EFA63A /* IndexPathExtension.swift */; };
@@ -467,7 +467,7 @@
 		AAE71E3025F7855400D74437 /* HomepageViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HomepageViewController.swift; sourceTree = "<group>"; };
 		AAE71E3525F7869300D74437 /* HomepageCollectionViewItem.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HomepageCollectionViewItem.swift; sourceTree = "<group>"; };
 		AAE71E3625F7869300D74437 /* HomepageCollectionViewItem.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = HomepageCollectionViewItem.xib; sourceTree = "<group>"; };
-		AAE71E3C25F7B9A600D74437 /* CornerRadiusImageView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CornerRadiusImageView.swift; sourceTree = "<group>"; };
+		AAE71E3C25F7B9A600D74437 /* BorderImageView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BorderImageView.swift; sourceTree = "<group>"; };
 		AAE8B101258A41C000E81239 /* Tooltip.storyboard */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; path = Tooltip.storyboard; sourceTree = "<group>"; };
 		AAE8B10F258A456C00E81239 /* TooltipViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TooltipViewController.swift; sourceTree = "<group>"; };
 		AAECA41F24EEA4AC00EFA63A /* IndexPathExtension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = IndexPathExtension.swift; sourceTree = "<group>"; };
@@ -1119,7 +1119,6 @@
 			isa = PBXGroup;
 			children = (
 				AA2E423324C8A2270048C0D5 /* ColorView.swift */,
-				AAE71E3C25F7B9A600D74437 /* CornerRadiusImageView.swift */,
 				14D9B90124F91316000D4D13 /* FocusRingView.swift */,
 				AA86490B24D3494C001BABEE /* GradientView.swift */,
 				AAA8E8BE24EA8A0A0055E685 /* MouseOverButton.swift */,
@@ -1128,6 +1127,7 @@
 				AAC5E4E825D6BB4F007F5990 /* Popover.swift */,
 				AA361A3524EBF0B500EEC649 /* WindowDraggingView.swift */,
 				B6D7A2ED25D2418B002B2AE1 /* ShadowView.swift */,
+				AAE71E3C25F7B9A600D74437 /* BorderImageView.swift */,
 			);
 			path = View;
 			sourceTree = "<group>";
@@ -1789,7 +1789,7 @@
 				AA5C8F59258FE21F00748EB7 /* NSTextFieldExtension.swift in Sources */,
 				4B02198925E05FAC00ED7DEA /* FireproofingURLExtensions.swift in Sources */,
 				4BA1A6A5258B07DF00F6F690 /* EncryptedValueTransformer.swift in Sources */,
-				AAE71E3D25F7B9A600D74437 /* CornerRadiusImageView.swift in Sources */,
+				AAE71E3D25F7B9A600D74437 /* BorderImageView.swift in Sources */,
 				AA6EF9B525081B4C004754E6 /* MainMenuActions.swift in Sources */,
 				B63D466925BEB6C200874977 /* WKWebView+SessionState.swift in Sources */,
 				85E11C2F25E7DC7E00974CAF /* ExternalURLHandler.swift in Sources */,
