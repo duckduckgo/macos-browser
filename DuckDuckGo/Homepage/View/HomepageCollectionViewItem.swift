@@ -23,7 +23,7 @@ class HomepageCollectionViewItem: NSCollectionViewItem {
     static let identifier = NSUserInterfaceItemIdentifier(rawValue: "HomepageCollectionViewItem")
 
     enum Size {
-        static let width = 80
+        static let width = 92
         static let height = 92
     }
 

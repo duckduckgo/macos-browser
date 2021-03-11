@@ -24,7 +24,7 @@
                                         <collectionView selectable="YES" id="MU6-iJ-Oba">
                                             <rect key="frame" x="0.0" y="0.0" width="562" height="216"/>
                                             <autoresizingMask key="autoresizingMask" widthSizable="YES"/>
-                                            <collectionViewFlowLayout key="collectionViewLayout" minimumInteritemSpacing="40" minimumLineSpacing="32" id="DoO-9t-4cf">
+                                            <collectionViewFlowLayout key="collectionViewLayout" minimumInteritemSpacing="24" minimumLineSpacing="32" id="DoO-9t-4cf">
                                                 <size key="itemSize" width="50" height="50"/>
                                             </collectionViewFlowLayout>
                                             <color key="primaryBackgroundColor" name="ClearColor"/>
