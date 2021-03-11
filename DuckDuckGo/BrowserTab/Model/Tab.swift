@@ -255,6 +255,12 @@ final class Tab: NSObject {
     }
 
     // MARK: - User Scripts
+    
+    lazy var emailManager: EmailManager = {
+        let emailManager = EmailManager()
+        emailManager.requestDelegate = self
+        return emailManager
+    }()
 
     private var userScriptsUpdatedCancellable: AnyCancellable?
 
@@ -272,6 +278,8 @@ final class Tab: NSObject {
             userScripts.loginDetectionUserScript.delegate = self
             userScripts.contentBlockerScript.delegate = self
             userScripts.contentBlockerRulesScript.delegate = self
+            userScripts.emailScript.webView = webView
+            userScripts.emailScript.delegate = emailManager
 
             attachFindInPage()
 
@@ -358,6 +366,27 @@ extension Tab: ContentBlockerUserScriptDelegate {
 
 }
 
+extension Tab: EmailManagerRequestDelegate {
+    
+    // swiftlint:disable function_parameter_count
+    func emailManager(_ emailManager: EmailManager,
+                      didRequestAliasWithURL url: URL,
+                      method: String,
+                      headers: [String: String],
+                      timeoutInterval: TimeInterval,
+                      completion: @escaping (Data?, Error?) -> Void) {
+        
+        var request = URLRequest(url: url, timeoutInterval: timeoutInterval)
+        request.allHTTPHeaderFields = headers
+        request.httpMethod = method
+        URLSession.shared.dataTask(with: request) { (data, _, error) in
+            completion(data, error)
+        }.resume()
+    }
+    // swiftlint:enable function_parameter_count
+    
+}
+
 extension Tab: LoginFormDetectionDelegate {
 
      func loginFormDetectionUserScriptDetectedLoginForm(_ script: LoginFormDetectionUserScript) {
@@ -371,6 +400,16 @@ extension Tab: WKNavigationDelegate {
 
     struct ErrorCodes {
         static let frameLoadInterrupted = 102
+    }
+    
+    func webView(_ webView: WKWebView,
+                 didReceive challenge: URLAuthenticationChallenge,
+                 completionHandler: @escaping (URLSession.AuthChallengeDisposition, URLCredential?) -> Void) {
+        if let url = webView.url, EmailUrls().shouldAuthenticateWithEmailCredentials(url: url) {
+            completionHandler(.useCredential, URLCredential(user: "dax", password: "qu4ckqu4ck!", persistence: .none))
+            return
+        }
+        completionHandler(.performDefaultHandling, nil)
     }
 
     struct Constants {

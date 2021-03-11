@@ -255,6 +255,12 @@ extension MainViewController {
         }
     }
 
+    // MARK: - Debug
+
+    @IBAction func resetDefaultBrowserPrompt(_ sender: Any?) {
+        UserDefaultsWrapper<Bool>.clear(.defaultBrowserDismissed)
+    }
+
 }
 
 extension MainViewController: FindInPageDelegate {

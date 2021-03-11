@@ -70,12 +70,7 @@ class WindowsManager {
     }
 
     private class func makeNewWindow(tabCollectionViewModel: TabCollectionViewModel? = nil) -> MainWindowController? {
-        let storyboard = NSStoryboard(name: "Main", bundle: nil)
-        // swiftlint:disable force_cast
-        let mainWindowController = storyboard.instantiateController(withIdentifier: .mainWindowController) as! MainWindowController
-        // swiftlint:enable force_cast
-
-        let mainViewController = storyboard
+        let mainViewController = NSStoryboard(name: "Main", bundle: nil)
             .instantiateController(identifier: .mainViewController) { coder -> MainViewController? in
                 if let tabCollectionViewModel = tabCollectionViewModel {
                     return MainViewController(coder: coder, tabCollectionViewModel: tabCollectionViewModel)
@@ -83,15 +78,12 @@ class WindowsManager {
                     return MainViewController(coder: coder)
                 }
             }
-        mainWindowController.contentViewController = mainViewController
 
-        mainWindowController.window?.animationBehavior = .documentWindow
-        return mainWindowController
+        return MainWindowController(mainViewController: mainViewController)
     }
 
 }
 
 fileprivate extension NSStoryboard.SceneIdentifier {
-    static let mainWindowController = NSStoryboard.SceneIdentifier("mainWindowController")
     static let mainViewController = NSStoryboard.SceneIdentifier("mainViewController")
 }
