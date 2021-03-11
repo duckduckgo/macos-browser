@@ -44,12 +44,24 @@
                                     <rect key="frame" x="-1" y="-1" width="66" height="66"/>
                                     <imageCell key="cell" refusesFirstResponder="YES" alignment="left" imageScaling="proportionallyDown" id="gRc-Dj-q4y"/>
                                 </imageView>
+                                <customView translatesAutoresizingMaskIntoConstraints="NO" id="ROO-5P-Meg" userLabel="Overlay View" customClass="ColorView" customModule="DuckDuckGo_Privacy_Browser" customModuleProvider="target">
+                                    <rect key="frame" x="-1" y="-1" width="66" height="66"/>
+                                    <userDefinedRuntimeAttributes>
+                                        <userDefinedRuntimeAttribute type="color" keyPath="backgroundColor">
+                                            <color key="value" name="HomepageFaviconHoverColor"/>
+                                        </userDefinedRuntimeAttribute>
+                                    </userDefinedRuntimeAttributes>
+                                </customView>
                             </subviews>
                             <constraints>
+                                <constraint firstAttribute="bottom" secondItem="ROO-5P-Meg" secondAttribute="bottom" constant="-1" id="Ccq-xf-kf1"/>
                                 <constraint firstItem="nhR-fJ-WxK" firstAttribute="leading" secondItem="1Vd-Cw-5GJ" secondAttribute="leading" constant="-1" id="JbX-y3-6Px"/>
+                                <constraint firstItem="ROO-5P-Meg" firstAttribute="leading" secondItem="1Vd-Cw-5GJ" secondAttribute="leading" constant="-1" id="QWQ-v4-2kk"/>
                                 <constraint firstItem="nhR-fJ-WxK" firstAttribute="top" secondItem="1Vd-Cw-5GJ" secondAttribute="top" constant="-1" id="UgW-XW-hIi"/>
                                 <constraint firstAttribute="bottom" secondItem="nhR-fJ-WxK" secondAttribute="bottom" constant="-1" id="V39-BK-ZvU"/>
+                                <constraint firstItem="ROO-5P-Meg" firstAttribute="top" secondItem="1Vd-Cw-5GJ" secondAttribute="top" constant="-1" id="VCK-EA-CxR"/>
                                 <constraint firstAttribute="trailing" secondItem="nhR-fJ-WxK" secondAttribute="trailing" constant="-1" id="duI-8n-PSQ"/>
+                                <constraint firstAttribute="trailing" secondItem="ROO-5P-Meg" secondAttribute="trailing" constant="-1" id="mdi-oK-Mdg"/>
                                 <constraint firstAttribute="height" constant="64" id="y93-yy-2Y9"/>
                                 <constraint firstAttribute="width" constant="64" id="z23-Kb-g0Z"/>
                             </constraints>
@@ -110,6 +122,7 @@
                 <outlet property="faviconImageView" destination="nhR-fJ-WxK" id="5hc-tV-NYQ"/>
                 <outlet property="mouseOverView" destination="5V1-qQ-gBR" id="S2b-sq-siR"/>
                 <outlet property="narrowBorderView" destination="C8O-oQ-mZN" id="bso-zR-alb"/>
+                <outlet property="overlayView" destination="ROO-5P-Meg" id="UIa-A3-7Ej"/>
                 <outlet property="titleTextField" destination="azc-ma-J3L" id="MID-zE-yiS"/>
                 <outlet property="view" destination="Hz6-mo-xeY" id="AZi-l2-DK9"/>
                 <outlet property="wideBorderView" destination="Hsz-i9-i2N" id="ycc-Xo-ToT"/>
@@ -119,6 +132,9 @@
     <resources>
         <namedColor name="HomepageBackgroundColor">
             <color red="0.97647058823529409" green="0.98039215686274506" blue="0.98039215686274506" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+        </namedColor>
+        <namedColor name="HomepageFaviconHoverColor">
+            <color red="0.050999999046325684" green="0.082000002264976501" blue="0.14900000393390656" alpha="0.079999998211860657" colorSpace="custom" customColorSpace="sRGB"/>
         </namedColor>
     </resources>
 </document>
