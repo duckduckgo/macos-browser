@@ -35,9 +35,7 @@ class WindowsManager {
 
     @discardableResult
     class func openNewWindow(with tabCollectionViewModel: TabCollectionViewModel? = nil, droppingPoint: NSPoint? = nil) -> NSWindow? {
-        guard let mainWindowController = makeNewWindow(tabCollectionViewModel: tabCollectionViewModel) else {
-            return nil
-        }
+        let mainWindowController = makeNewWindow(tabCollectionViewModel: tabCollectionViewModel)
 
         if let droppingPoint = droppingPoint {
             mainWindowController.window?.setFrameOrigin(droppingPoint: droppingPoint)
@@ -54,10 +52,7 @@ class WindowsManager {
     }
 
     class func openNewWindow(with initialUrl: URL) {
-        guard let mainWindowController = makeNewWindow() else {
-            return
-        }
-
+        let mainWindowController = makeNewWindow()
         mainWindowController.showWindow(self)
 
         let mainViewController = mainWindowController.mainViewController
@@ -69,8 +64,8 @@ class WindowsManager {
         newTab.url = initialUrl
     }
 
-    private class func makeNewWindow(tabCollectionViewModel: TabCollectionViewModel? = nil) -> MainWindowController? {
-        let mainViewController = NSStoryboard(name: "Main", bundle: nil)
+    private class func makeNewWindow(tabCollectionViewModel: TabCollectionViewModel? = nil) -> MainWindowController {
+        let mainViewController = NSStoryboard.init(name: "Main", bundle: nil)
             .instantiateController(identifier: .mainViewController) { coder -> MainViewController? in
                 if let tabCollectionViewModel = tabCollectionViewModel {
                     return MainViewController(coder: coder, tabCollectionViewModel: tabCollectionViewModel)
