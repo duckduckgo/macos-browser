@@ -23,8 +23,10 @@ import Combine
 class MainWindowController: NSWindowController {
     private static let windowFrameSaveName = "MainWindow"
 
-    var mainViewController: MainViewController? {
-        contentViewController as? MainViewController
+    var mainViewController: MainViewController {
+        // swiftlint:disable force_cast
+        contentViewController as! MainViewController
+        // swiftlint:enable force_cast
     }
 
     init(mainViewController: MainViewController) {
@@ -53,7 +55,7 @@ class MainWindowController: NSWindowController {
         window?.toolbar = NSToolbar()
         window?.toolbar?.showsBaselineSeparator = true
 
-        guard let tabBarViewController = mainViewController?.tabBarViewController else {
+        guard let tabBarViewController = mainViewController.tabBarViewController else {
             assertionFailure("MainWindowController: tabBarViewController is nil" )
             return
         }
@@ -96,11 +98,6 @@ extension MainWindowController: NSWindowDelegate {
     }
 
     func windowDidBecomeMain(_ notification: Notification) {
-        guard let mainViewController = contentViewController as? MainViewController else {
-            os_log("MainWindowController: Failed to get reference to main view controller", type: .error)
-            return
-        }
-
         mainViewController.windowDidBecomeMain()
     }
 
@@ -109,15 +106,10 @@ extension MainWindowController: NSWindowDelegate {
     }
 
     func windowDidResignMain(_ notification: Notification) {
-        mainViewController?.windowDidResignMain()
+        mainViewController.windowDidResignMain()
     }
 
     func windowWillClose(_ notification: Notification) {
-        guard let mainViewController = contentViewController as? MainViewController else {
-            os_log("MainWindowController: Failed to get reference to main view controller", type: .error)
-            return
-        }
-
         mainViewController.windowWillClose()
 
         window?.resignKey()
