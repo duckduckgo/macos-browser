@@ -56,30 +56,6 @@ class CoreDataEncryptionTests: XCTestCase {
         }
     }
 
-    func testSavingIncorrectValueTypes() {
-        let container = createInMemoryPersistentContainer()
-        let context = container.viewContext
-
-        context.performAndWait {
-            let entity = PartiallyEncryptedEntity(context: context)
-            entity.date = Date()
-            entity.encryptedString = 42 as NSNumber // This should not get saved, as value transformers check their types.
-
-            do {
-                try context.save()
-            } catch {
-                XCTFail("Failed with Core Data error: \(error)")
-            }
-        }
-
-        let result = firstPartiallyEncryptedEntity(context: context)
-
-        // It would be better if Core Data would fail to save in cases where the value can't be transformed. Right now it will instead have a nil
-        // value for that attribute.
-        XCTAssertNotNil(result)
-        XCTAssertNil(result?.encryptedString)
-    }
-
     func testFetchingEncryptedValues() {
         let container = createInMemoryPersistentContainer()
         let context = container.viewContext
