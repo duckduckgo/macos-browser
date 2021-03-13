@@ -121,7 +121,6 @@
 		AA585D84248FD31100E9A3E2 /* BrowserTabViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA585D83248FD31100E9A3E2 /* BrowserTabViewController.swift */; };
 		AA585D86248FD31400E9A3E2 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = AA585D85248FD31400E9A3E2 /* Assets.xcassets */; };
 		AA585D89248FD31400E9A3E2 /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = AA585D87248FD31400E9A3E2 /* Main.storyboard */; };
-		AA585DA0248FD31500E9A3E2 /* DuckDuckGoUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA585D9F248FD31500E9A3E2 /* DuckDuckGoUITests.swift */; };
 		AA585DAF2490E6E600E9A3E2 /* MainViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA585DAE2490E6E600E9A3E2 /* MainViewController.swift */; };
 		AA5C8F59258FE21F00748EB7 /* NSTextFieldExtension.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA5C8F58258FE21F00748EB7 /* NSTextFieldExtension.swift */; };
 		AA5C8F5E2590EEE800748EB7 /* NSPointExtension.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA5C8F5D2590EEE800748EB7 /* NSPointExtension.swift */; };
@@ -257,13 +256,6 @@
 			remoteGlobalIDString = AA585D7D248FD31100E9A3E2;
 			remoteInfo = DuckDuckGo;
 		};
-		AA585D9C248FD31400E9A3E2 /* PBXContainerItemProxy */ = {
-			isa = PBXContainerItemProxy;
-			containerPortal = AA585D76248FD31100E9A3E2 /* Project object */;
-			proxyType = 1;
-			remoteGlobalIDString = AA585D7D248FD31100E9A3E2;
-			remoteInfo = DuckDuckGo;
-		};
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
@@ -387,9 +379,6 @@
 		AA585D8B248FD31400E9A3E2 /* DuckDuckGo.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = DuckDuckGo.entitlements; sourceTree = "<group>"; };
 		AA585D90248FD31400E9A3E2 /* Unit Tests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = "Unit Tests.xctest"; sourceTree = BUILT_PRODUCTS_DIR; };
 		AA585D96248FD31400E9A3E2 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
-		AA585D9B248FD31400E9A3E2 /* UI Tests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = "UI Tests.xctest"; sourceTree = BUILT_PRODUCTS_DIR; };
-		AA585D9F248FD31500E9A3E2 /* DuckDuckGoUITests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DuckDuckGoUITests.swift; sourceTree = "<group>"; };
-		AA585DA1248FD31500E9A3E2 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		AA585DAE2490E6E600E9A3E2 /* MainViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = MainViewController.swift; path = ../MainViewController.swift; sourceTree = "<group>"; };
 		AA5C8F58258FE21F00748EB7 /* NSTextFieldExtension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NSTextFieldExtension.swift; sourceTree = "<group>"; };
 		AA5C8F5D2590EEE800748EB7 /* NSPointExtension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NSPointExtension.swift; sourceTree = "<group>"; };
@@ -530,13 +519,6 @@
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 		AA585D8D248FD31400E9A3E2 /* Frameworks */ = {
-			isa = PBXFrameworksBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-		};
-		AA585D98248FD31400E9A3E2 /* Frameworks */ = {
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
@@ -889,7 +871,6 @@
 				AA68C3D62490F821001B8783 /* README.md */,
 				AA585D80248FD31100E9A3E2 /* DuckDuckGo */,
 				AA585D93248FD31400E9A3E2 /* Unit Tests */,
-				AA585D9E248FD31500E9A3E2 /* DuckDuckGoUITests */,
 				4B1AD89E25FC27E200261379 /* Integration Tests */,
 				AA585D7F248FD31100E9A3E2 /* Products */,
 				85AE2FF024A33A2D002D507F /* Frameworks */,
@@ -902,7 +883,6 @@
 			children = (
 				AA585D7E248FD31100E9A3E2 /* DuckDuckGo Privacy Browser.app */,
 				AA585D90248FD31400E9A3E2 /* Unit Tests.xctest */,
-				AA585D9B248FD31400E9A3E2 /* UI Tests.xctest */,
 				4B1AD89D25FC27E200261379 /* Integration Tests.xctest */,
 			);
 			name = Products;
@@ -959,15 +939,6 @@
 				AA585D96248FD31400E9A3E2 /* Info.plist */,
 			);
 			path = "Unit Tests";
-			sourceTree = "<group>";
-		};
-		AA585D9E248FD31500E9A3E2 /* DuckDuckGoUITests */ = {
-			isa = PBXGroup;
-			children = (
-				AA585D9F248FD31500E9A3E2 /* DuckDuckGoUITests.swift */,
-				AA585DA1248FD31500E9A3E2 /* Info.plist */,
-			);
-			path = DuckDuckGoUITests;
 			sourceTree = "<group>";
 		};
 		AA585DB02490E6FA00E9A3E2 /* Main */ = {
@@ -1607,24 +1578,6 @@
 			productReference = AA585D90248FD31400E9A3E2 /* Unit Tests.xctest */;
 			productType = "com.apple.product-type.bundle.unit-test";
 		};
-		AA585D9A248FD31400E9A3E2 /* UI Tests */ = {
-			isa = PBXNativeTarget;
-			buildConfigurationList = AA585DAA248FD31500E9A3E2 /* Build configuration list for PBXNativeTarget "UI Tests" */;
-			buildPhases = (
-				AA585D97248FD31400E9A3E2 /* Sources */,
-				AA585D98248FD31400E9A3E2 /* Frameworks */,
-				AA585D99248FD31400E9A3E2 /* Resources */,
-			);
-			buildRules = (
-			);
-			dependencies = (
-				AA585D9D248FD31400E9A3E2 /* PBXTargetDependency */,
-			);
-			name = "UI Tests";
-			productName = DuckDuckGoUITests;
-			productReference = AA585D9B248FD31400E9A3E2 /* UI Tests.xctest */;
-			productType = "com.apple.product-type.bundle.ui-testing";
-		};
 /* End PBXNativeTarget section */
 
 /* Begin PBXProject section */
@@ -1643,10 +1596,6 @@
 						CreatedOnToolsVersion = 11.5;
 					};
 					AA585D8F248FD31400E9A3E2 = {
-						CreatedOnToolsVersion = 11.5;
-						TestTargetID = AA585D7D248FD31100E9A3E2;
-					};
-					AA585D9A248FD31400E9A3E2 = {
 						CreatedOnToolsVersion = 11.5;
 						TestTargetID = AA585D7D248FD31100E9A3E2;
 					};
@@ -1673,7 +1622,6 @@
 				AA585D7D248FD31100E9A3E2 /* DuckDuckGo Privacy Browser */,
 				AA585D8F248FD31400E9A3E2 /* Unit Tests */,
 				4B1AD89C25FC27E200261379 /* Integration Tests */,
-				AA585D9A248FD31400E9A3E2 /* UI Tests */,
 			);
 		};
 /* End PBXProject section */
@@ -1720,13 +1668,6 @@
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 		AA585D8E248FD31400E9A3E2 /* Resources */ = {
-			isa = PBXResourcesBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-		};
-		AA585D99248FD31400E9A3E2 /* Resources */ = {
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
@@ -1980,14 +1921,6 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
-		AA585D97248FD31400E9A3E2 /* Sources */ = {
-			isa = PBXSourcesBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-				AA585DA0248FD31500E9A3E2 /* DuckDuckGoUITests.swift in Sources */,
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-		};
 /* End PBXSourcesBuildPhase section */
 
 /* Begin PBXTargetDependency section */
@@ -2000,11 +1933,6 @@
 			isa = PBXTargetDependency;
 			target = AA585D7D248FD31100E9A3E2 /* DuckDuckGo Privacy Browser */;
 			targetProxy = AA585D91248FD31400E9A3E2 /* PBXContainerItemProxy */;
-		};
-		AA585D9D248FD31400E9A3E2 /* PBXTargetDependency */ = {
-			isa = PBXTargetDependency;
-			target = AA585D7D248FD31100E9A3E2 /* DuckDuckGo Privacy Browser */;
-			targetProxy = AA585D9C248FD31400E9A3E2 /* PBXContainerItemProxy */;
 		};
 /* End PBXTargetDependency section */
 
@@ -2243,29 +2171,6 @@
 			};
 			name = CI;
 		};
-		4B1AD8B425FC322600261379 /* CI */ = {
-			isa = XCBuildConfiguration;
-			buildSettings = {
-				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
-				CODE_SIGN_IDENTITY = "Apple Development";
-				CODE_SIGN_STYLE = Automatic;
-				COMBINE_HIDPI_IMAGES = YES;
-				DEVELOPMENT_TEAM = HKE973VLUW;
-				INFOPLIST_FILE = DuckDuckGoUITests/Info.plist;
-				LD_RUNPATH_SEARCH_PATHS = (
-					"$(inherited)",
-					"@executable_path/../Frameworks",
-					"@loader_path/../Frameworks",
-				);
-				PRODUCT_BUNDLE_IDENTIFIER = com.duckduckgo.macos.browser.DuckDuckGoUITests;
-				PRODUCT_NAME = "$(TARGET_NAME)";
-				PROVISIONING_PROFILE = "";
-				PROVISIONING_PROFILE_SPECIFIER = "";
-				SWIFT_VERSION = 5.0;
-				TEST_TARGET_NAME = "DuckDuckGo Privacy Browser";
-			};
-			name = CI;
-		};
 		AA585DA2248FD31500E9A3E2 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
@@ -2481,52 +2386,6 @@
 			};
 			name = Release;
 		};
-		AA585DAB248FD31500E9A3E2 /* Debug */ = {
-			isa = XCBuildConfiguration;
-			buildSettings = {
-				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
-				CODE_SIGN_IDENTITY = "Apple Development";
-				CODE_SIGN_STYLE = Automatic;
-				COMBINE_HIDPI_IMAGES = YES;
-				DEVELOPMENT_TEAM = HKE973VLUW;
-				INFOPLIST_FILE = DuckDuckGoUITests/Info.plist;
-				LD_RUNPATH_SEARCH_PATHS = (
-					"$(inherited)",
-					"@executable_path/../Frameworks",
-					"@loader_path/../Frameworks",
-				);
-				PRODUCT_BUNDLE_IDENTIFIER = com.duckduckgo.macos.browser.DuckDuckGoUITests;
-				PRODUCT_NAME = "$(TARGET_NAME)";
-				PROVISIONING_PROFILE = "";
-				PROVISIONING_PROFILE_SPECIFIER = "";
-				SWIFT_VERSION = 5.0;
-				TEST_TARGET_NAME = "DuckDuckGo Privacy Browser";
-			};
-			name = Debug;
-		};
-		AA585DAC248FD31500E9A3E2 /* Release */ = {
-			isa = XCBuildConfiguration;
-			buildSettings = {
-				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
-				CODE_SIGN_IDENTITY = "Apple Development";
-				CODE_SIGN_STYLE = Automatic;
-				COMBINE_HIDPI_IMAGES = YES;
-				DEVELOPMENT_TEAM = HKE973VLUW;
-				INFOPLIST_FILE = DuckDuckGoUITests/Info.plist;
-				LD_RUNPATH_SEARCH_PATHS = (
-					"$(inherited)",
-					"@executable_path/../Frameworks",
-					"@loader_path/../Frameworks",
-				);
-				PRODUCT_BUNDLE_IDENTIFIER = com.duckduckgo.macos.browser.DuckDuckGoUITests;
-				PRODUCT_NAME = "$(TARGET_NAME)";
-				PROVISIONING_PROFILE = "";
-				PROVISIONING_PROFILE_SPECIFIER = "";
-				SWIFT_VERSION = 5.0;
-				TEST_TARGET_NAME = "DuckDuckGo Privacy Browser";
-			};
-			name = Release;
-		};
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
@@ -2566,16 +2425,6 @@
 				AA585DA8248FD31500E9A3E2 /* Debug */,
 				4B1AD8B225FC322600261379 /* CI */,
 				AA585DA9248FD31500E9A3E2 /* Release */,
-			);
-			defaultConfigurationIsVisible = 0;
-			defaultConfigurationName = Release;
-		};
-		AA585DAA248FD31500E9A3E2 /* Build configuration list for PBXNativeTarget "UI Tests" */ = {
-			isa = XCConfigurationList;
-			buildConfigurations = (
-				AA585DAB248FD31500E9A3E2 /* Debug */,
-				4B1AD8B425FC322600261379 /* CI */,
-				AA585DAC248FD31500E9A3E2 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;

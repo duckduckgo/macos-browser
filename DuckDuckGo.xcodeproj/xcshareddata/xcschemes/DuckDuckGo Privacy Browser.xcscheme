@@ -20,6 +20,20 @@
                ReferencedContainer = "container:DuckDuckGo.xcodeproj">
             </BuildableReference>
          </BuildActionEntry>
+         <BuildActionEntry
+            buildForTesting = "NO"
+            buildForRunning = "NO"
+            buildForProfiling = "NO"
+            buildForArchiving = "NO"
+            buildForAnalyzing = "NO">
+            <BuildableReference
+               BuildableIdentifier = "primary"
+               BlueprintIdentifier = "4B1AD89C25FC27E200261379"
+               BuildableName = "Integration Tests.xctest"
+               BlueprintName = "Integration Tests"
+               ReferencedContainer = "container:DuckDuckGo.xcodeproj">
+            </BuildableReference>
+         </BuildActionEntry>
       </BuildActionEntries>
    </BuildAction>
    <TestAction
@@ -38,6 +52,11 @@
                BlueprintName = "Unit Tests"
                ReferencedContainer = "container:DuckDuckGo.xcodeproj">
             </BuildableReference>
+            <SkippedTests>
+               <Test
+                  Identifier = "EncryptionKeyStoreTests">
+               </Test>
+            </SkippedTests>
          </TestableReference>
          <TestableReference
             skipped = "YES">
@@ -46,16 +65,6 @@
                BlueprintIdentifier = "AA585D9A248FD31400E9A3E2"
                BuildableName = "UI Tests.xctest"
                BlueprintName = "UI Tests"
-               ReferencedContainer = "container:DuckDuckGo.xcodeproj">
-            </BuildableReference>
-         </TestableReference>
-         <TestableReference
-            skipped = "NO">
-            <BuildableReference
-               BuildableIdentifier = "primary"
-               BlueprintIdentifier = "4B1AD89C25FC27E200261379"
-               BuildableName = "Integration Tests.xctest"
-               BlueprintName = "Integration Tests"
                ReferencedContainer = "container:DuckDuckGo.xcodeproj">
             </BuildableReference>
          </TestableReference>
