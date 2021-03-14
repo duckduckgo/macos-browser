@@ -72,6 +72,33 @@ class HomepageViewController: NSViewController {
             .prefix(Constants.maxNumberOfFavorites))
     }
 
+    // MARK: - Add/Edit Favorite Popover
+
+    private func showAddFavourite() {
+        // swiftlint:disable force_cast
+        let windowController = NSStoryboard.homepage.instantiateController(withIdentifier: "AddEditFavoriteWindowController") as! NSWindowController
+        // swiftlint:enable force_cast
+
+        guard let window = windowController.window else {
+            assertionFailure("Failed to present AddEditFavoriteWindowController")
+            return
+        }
+
+        guard let screen = window.screen else {
+            assertionFailure("No screen")
+            return
+        }
+
+        let windowFrame = NSRect(x: screen.frame.size.width / 2.0 - AddEditFavoriteWindow.Size.width / 2.0,
+                                 y: screen.frame.size.height / 2.0 - AddEditFavoriteWindow.Size.height / 2.0,
+                                 width: AddEditFavoriteWindow.Size.width,
+                                 height: AddEditFavoriteWindow.Size.height)
+
+        view.window?.addChildWindow(window, ordered: .above)
+        window.setFrame(windowFrame, display: true)
+        window.makeKey()
+    }
+
 }
 
 extension HomepageViewController: NSCollectionViewDataSource, NSCollectionViewDelegate {
@@ -118,7 +145,7 @@ extension HomepageViewController: NSCollectionViewDataSource, NSCollectionViewDe
         }
 
         guard index < topFavorites.count else {
-            //todo add favourite
+            showAddFavourite()
             return
         }
 
@@ -137,3 +164,9 @@ extension HomepageViewController: NSCollectionViewDataSource, NSCollectionViewDe
      }
 
  }
+
+fileprivate extension NSStoryboard {
+
+    static let homepage = NSStoryboard(name: "Homepage", bundle: .main)
+
+}
