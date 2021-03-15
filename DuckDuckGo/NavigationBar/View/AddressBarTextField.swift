@@ -209,9 +209,9 @@ class AddressBarTextField: NSTextField {
         init(stringValue: String, userTyped: Bool) {
             if let url = stringValue.punycodedUrl, url.isValid {
                 var stringValue = stringValue
-                if let punycodeDecoded = url.punycodeDecodedString,
-                   // stringValue should be in encoded form otherwise leave it as it is
-                   stringValue.range(of: punycodeDecoded) == nil {
+                // display punycoded url in readable form when editing
+                if !userTyped,
+                   let punycodeDecoded = url.punycodeDecodedString {
                     stringValue = punycodeDecoded
                 }
                 self = .url(urlString: stringValue, url: url, userTyped: userTyped)
@@ -271,19 +271,25 @@ class AddressBarTextField: NSTextField {
             switch value {
             case .text: self = Suffix.search
             case .url(urlString: _, url: let url, userTyped: let userTyped):
-                if !userTyped { return nil }
-                self = Suffix.visit(host: url.domain?.displayName ?? url.absoluteString)
+                guard userTyped,
+                      let domain = url.domain
+                else { return nil }
+                self = Suffix.visit(domain: domain)
             case .suggestion(let suggestionViewModel):
                 switch suggestionViewModel.suggestion {
-                case .phrase(phrase: _): self = Suffix.search
-                case .website(url: let url): self = Suffix.visit(host: url.domain?.displayName ?? url.absoluteString)
-                case .unknown(value: _): self = Suffix.search
+                case .phrase(phrase: _):
+                    self = Suffix.search
+                case .website(url: let url):
+                    guard let domain = url.domain else { return nil }
+                    self = Suffix.visit(domain: domain)
+                case .unknown(value: _):
+                    self = Suffix.search
                 }
             }
         }
 
         case search
-        case visit(host: String)
+        case visit(domain: Domain)
 
         static let suffixAttributes = [NSAttributedString.Key.font: NSFont.systemFont(ofSize: 13, weight: .light),
                                        .foregroundColor: NSColor.addressBarSuffixColor]
@@ -292,7 +298,7 @@ class AddressBarTextField: NSTextField {
             switch self {
             case .search:
                 return NSAttributedString(string: string, attributes: Self.suffixAttributes)
-            case .visit(host: _):
+            case .visit(domain: _):
                 return NSAttributedString(string: string, attributes: Self.suffixAttributes)
             }
         }
@@ -304,8 +310,8 @@ class AddressBarTextField: NSTextField {
             switch self {
             case .search:
                 return "\(Self.searchSuffix)"
-            case .visit(host: let host):
-                return "\(Self.visitSuffix) \(host)"
+            case .visit(domain: let domain):
+                return "\(Self.visitSuffix) \(domain.displayName)"
             }
         }
     }

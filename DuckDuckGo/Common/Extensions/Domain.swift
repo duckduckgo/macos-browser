@@ -18,13 +18,16 @@
 
 import Foundation
 
-struct Domain: Hashable {
+struct Domain: Hashable, CustomStringConvertible {
+
     let hostName: String
+
+    var description: String { hostName }
 
     var displayName: String {
         let host = self.hostName.dropWWW()
-        // decode punycode
-        return host.idnaDecoded ?? host
+        #warning("Display decoded Punycode if valid when SpoofChecker is ready")
+        return host // SpoofChecker.shared.isSafe(host) ? (host.idnaDecoded ?? host) : host
     }
 
     init?(url: URL) {

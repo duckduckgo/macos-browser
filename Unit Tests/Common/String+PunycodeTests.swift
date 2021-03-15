@@ -22,15 +22,42 @@ import XCTest
 
 class StringPunycodeTests: XCTestCase {
 
+    func testWhenPunycodeUrlIsCalledOnEmptyStringThenUrlIsNotReturned() {
+        XCTAssertNil("".punycodedUrl?.absoluteString)
+    }
+
     func testWhenPunycodeUrlIsCalledOnQueryThenUrlIsNotReturned() {
         XCTAssertNil(" ".punycodedUrl?.absoluteString)
+    }
+
+    func testWhenPunycodeUrlIsCalledOnQueryWithSpaceThenUrlIsNotReturned() {
+        XCTAssertNil("https://www.duckduckgo .com/html?q=search".punycodedUrl?.absoluteString)
     }
 
     func testWhenPunycodeUrlIsCalledOnLocalHostnameThenUrlIsNotReturned() {
         XCTAssertNil("💩".punycodedUrl?.absoluteString)
     }
-    
-    func testWhenPunycodeUrlIsCalledWithValidUrlsThenUrlIsReturned() {
+
+    func testWhenPunycodeUrlIsCalledWithSimpleUrlsThenUrlIsReturned() {
+        let addresses = [
+            "https://",
+            "http://duckduckgo.com",
+            "https://duckduckgo.com",
+            "https://duckduckgo.com/",
+            "duckduckgo.com",
+            "www.duckduckgo.com",
+            "https://www.duckduckgo.com/html?q=search",
+            "https://www.duckduckgo.com/html/?q=search",
+            "ftp://www.duckduckgo.com",
+            "file:///users/user/Documents/afile"
+        ]
+
+        for address in addresses {
+            XCTAssertEqual(address, address.punycodedUrl?.absoluteString)
+        }
+    }
+
+    func testWhenPunycodeUrlIsCalledWithEncodedUrlsThenUrlIsReturned() {
         XCTAssertEqual("http://xn--ls8h.la", "💩.la".punycodedUrl?.absoluteString)
         XCTAssertEqual("http://xn--ls8h.la/", "💩.la/".punycodedUrl?.absoluteString)
         XCTAssertEqual("http://82.xn--b1aew.xn--p1ai", "82.мвд.рф".punycodedUrl?.absoluteString)
