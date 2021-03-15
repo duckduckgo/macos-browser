@@ -18,137 +18,69 @@
 
 import Cocoa
 import os.log
+import Combine
 
 class MainWindowController: NSWindowController {
+    private static let windowFrameSaveName = "MainWindow"
 
-    private enum WindowButtonTrailingSpace {
-        static let close: CGFloat = 12
-        static let minimize: CGFloat = 32
-        static let zoom: CGFloat = 52
+    var mainViewController: MainViewController {
+        // swiftlint:disable force_cast
+        contentViewController as! MainViewController
+        // swiftlint:enable force_cast
     }
 
-    private enum WindowButtonTopSpace {
-        static let common: CGFloat = 27
-    }
+    init(mainViewController: MainViewController) {
+        let window = MainWindow(frame: NSRect(x: 0, y: 0, width: 1024, height: 790))
+        window.contentViewController = mainViewController
 
-    private var isLoaded = false
-
-    private var closeWidget: NSView?
-    private var minimizeWidget: NSView?
-    private var zoomWidget: NSView?
-
-    var mainViewController: MainViewController? {
-        contentViewController as? MainViewController
-    }
-
-    override func windowDidLoad() {
-        super.windowDidLoad()
-        isLoaded = true
+        super.init(window: window)
 
         setupWindow()
-        referenceWindowButtons()
-        addWindowButtonsAsSubViewsIfNeeded()
+    }
+
+    required init?(coder: NSCoder) {
+        fatalError("init(coder:) has not been implemented")
     }
 
     private func setupWindow() {
-        window?.setFrameAutosaveName("MainWindow")
-        window?.isMovableByWindowBackground = true
-        window?.hasShadow = true
+        window?.delegate = self
+        window?.setFrameAutosaveName(Self.windowFrameSaveName)
+
+        setupToolbar()
     }
 
-    private func resizeTitleBar() {
-        guard let themeFrame = window?.contentView?.superview else {
+    var trafficLightsAlphaCancellable: AnyCancellable?
+    private func setupToolbar() {
+        // Empty toolbar ensures that window buttons are centered vertically
+        window?.toolbar = NSToolbar()
+        window?.toolbar?.showsBaselineSeparator = true
+
+        guard let tabBarViewController = mainViewController.tabBarViewController else {
+            assertionFailure("MainWindowController: tabBarViewController is nil" )
             return
         }
 
-        guard let titlebarContainerView = themeFrame.subviews.first(where: { $0.className == "NSTitlebarContainerView" }) else {
-            return
-        }
+        guard let titlebarView = window?.standardWindowButton(.closeButton)?.superview else { return }
 
-        titlebarContainerView.frame = NSRect(x: titlebarContainerView.frame.origin.x,
-                                             y: titlebarContainerView.frame.origin.y,
-                                             width: titlebarContainerView.frame.size.width,
-                                             height: 0)
-    }
+        tabBarViewController.view.removeFromSuperview()
+        titlebarView.addSubview(tabBarViewController.view)
 
-    private var windowButtonsReferenced = false
+        tabBarViewController.view.frame = titlebarView.bounds
+        tabBarViewController.view.translatesAutoresizingMaskIntoConstraints = false
+        let constraints = tabBarViewController.view.addConstraints(to: titlebarView, [
+            .leading: .leading(),
+            .trailing: .trailing(),
+            .top: .top(),
+            .height: .const(38.0)
+        ])
+        NSLayoutConstraint.activate(constraints)
 
-    private func referenceWindowButtons() {
-        guard let window = window,
-              let contentView = window.contentView,
-              let themeFrame = contentView.superview,
-              let titlebarContainerView = themeFrame.subviews.first(where: { $0.className == "NSTitlebarContainerView" }),
-              let titlebarView = titlebarContainerView.subviews.first(where: { $0.className == "NSTitlebarView" }),
-              let closeWidget = titlebarView.subviews.first(where: { $0.className == "_NSThemeCloseWidget" }),
-              let minimizeWidget = titlebarView.subviews.first(where: { $0.className == "_NSThemeWidget" }),
-              let zoomWidget = titlebarView.subviews.first(where: { $0.className == "_NSThemeZoomWidget" }) else {
-            os_log("MainWindowController: Failed to get references to window buttons", type: .error)
-            return
-        }
+        // slide tabs to the left in full screen
+        trafficLightsAlphaCancellable = window?.standardWindowButton(.closeButton)?
+            .publisher(for: \.alphaValue)
+            .map { alphaValue in 80.0 * alphaValue }
+            .weakAssign(to: \.constant, on: tabBarViewController.scrollViewLeadingConstraint)
 
-        self.closeWidget = closeWidget
-        self.minimizeWidget = minimizeWidget
-        self.zoomWidget = zoomWidget
-        windowButtonsReferenced = true
-    }
-
-    private func addWindowButtonsAsSubViewsIfNeeded() {
-        guard let window = window, let contentView = window.contentView else {
-            os_log("MainWindowController: Window not available", type: .error)
-            return
-        }
-
-        guard let closeWidget = closeWidget,
-              let minimizeWidget = minimizeWidget,
-              let zoomWidget = zoomWidget else {
-            os_log("MainWindowController: Failed to get references to window buttons", type: .error)
-            return
-        }
-
-        guard closeWidget.superview != window.contentView,
-              minimizeWidget.superview != window.contentView,
-              zoomWidget.superview != window.contentView else {
-            layoutWindowButtons()
-            return
-        }
-
-        closeWidget.removeFromSuperview()
-        contentView.addSubview(closeWidget)
-
-        minimizeWidget.removeFromSuperview()
-        contentView.addSubview(minimizeWidget)
-
-        zoomWidget.removeFromSuperview()
-        contentView.addSubview(zoomWidget)
-
-        layoutWindowButtons()
-    }
-
-    private func layoutWindowButtons() {
-        guard isLoaded else { return }
-
-        guard let contentView = window?.contentView,
-              let closeWidget = closeWidget,
-              let minimizeWidget = minimizeWidget,
-              let zoomWidget = zoomWidget else {
-            os_log("MainWindowController: No references to window buttons", type: .error)
-            return
-        }
-
-        closeWidget.frame = NSRect(x: WindowButtonTrailingSpace.close,
-                                   y: contentView.frame.size.height - WindowButtonTopSpace.common,
-                                   width: closeWidget.frame.size.width,
-                                   height: closeWidget.frame.size.height)
-
-        minimizeWidget.frame = NSRect(x: WindowButtonTrailingSpace.minimize,
-                                      y: contentView.frame.size.height - WindowButtonTopSpace.common,
-                                      width: minimizeWidget.frame.size.width,
-                                      height: minimizeWidget.frame.size.height)
-
-        zoomWidget.frame = NSRect(x: WindowButtonTrailingSpace.zoom,
-                                  y: contentView.frame.size.height - WindowButtonTopSpace.common,
-                                  width: zoomWidget.frame.size.width,
-                                  height: zoomWidget.frame.size.height)
     }
 
     override func showWindow(_ sender: Any?) {
@@ -160,51 +92,24 @@ class MainWindowController: NSWindowController {
 
 extension MainWindowController: NSWindowDelegate {
 
-    func windowDidResize(_ notification: Notification) {
-        resizeTitleBar()
-        if windowButtonsReferenced {
-            layoutWindowButtons()
-        }
-    }
-
-    func windowDidExitFullScreen(_ notification: Notification) {
-        resizeTitleBar()
-        addWindowButtonsAsSubViewsIfNeeded()
-    }
-
-    func windowDidDeminiaturize(_ notification: Notification) {
-        addWindowButtonsAsSubViewsIfNeeded()
-    }
-
-    func windowDidMove(_ notification: Notification) {
-        addWindowButtonsAsSubViewsIfNeeded()
+    func window(_ window: NSWindow,
+                willUseFullScreenPresentationOptions: NSApplication.PresentationOptions) -> NSApplication.PresentationOptions {
+        return [.fullScreen, .autoHideMenuBar]
     }
 
     func windowDidBecomeMain(_ notification: Notification) {
-        guard let mainViewController = contentViewController as? MainViewController else {
-            os_log("MainWindowController: Failed to get reference to main view controller", type: .error)
-            return
-        }
-
         mainViewController.windowDidBecomeMain()
     }
 
     func windowDidBecomeKey(_ notification: Notification) {
         WindowControllersManager.shared.lastKeyMainWindowController = self
-
-        addWindowButtonsAsSubViewsIfNeeded()
     }
 
     func windowDidResignMain(_ notification: Notification) {
-        mainViewController?.windowDidResignMain()
+        mainViewController.windowDidResignMain()
     }
 
     func windowWillClose(_ notification: Notification) {
-        guard let mainViewController = contentViewController as? MainViewController else {
-            os_log("MainWindowController: Failed to get reference to main view controller", type: .error)
-            return
-        }
-
         mainViewController.windowWillClose()
 
         window?.resignKey()

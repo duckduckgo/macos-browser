@@ -59,23 +59,6 @@ class AppStateChangePublisherTests: XCTestCase {
 
     // MARK: -
 
-    func testWhenPublisherInitiatedNoStateChangeEventsPublished() {
-        WindowsManager.openNewWindow()
-
-        WindowControllersManager.shared.stateChanged
-            .sink { _ in
-                XCTFail("Should not receive initial State Change")
-            }.store(in: &cancellables)
-
-        let e = expectation(description: "Wait 0.1sec")
-        let timer = Timer.scheduledTimer(withTimeInterval: 0.1, repeats: false) { _ in
-            e.fulfill()
-        }
-        withExtendedLifetime(timer) {
-            waitForExpectations(timeout: 10.0, handler: nil)
-        }
-    }
-
     func testWhenWindowIsOpenedThenStateChangePublished() {
         let e = expectation(description: "Window Opened fires State change")
 
@@ -152,7 +135,7 @@ class AppStateChangePublisherTests: XCTestCase {
 
     func testWhenNewTabIsOpenedThenStateChangePublished() {
         WindowsManager.openNewWindow()
-        WindowControllersManager.shared.mainWindowControllers[0].mainViewController!.tabCollectionViewModel
+        WindowControllersManager.shared.mainWindowControllers[0].mainViewController.tabCollectionViewModel
             .appendNewTab()
 
         // 2 events should be fired (one for tab appending, one for selectionIndex change)
@@ -162,7 +145,7 @@ class AppStateChangePublisherTests: XCTestCase {
                 e.fulfill()
             }.store(in: &cancellables)
 
-        WindowControllersManager.shared.mainWindowControllers[0].mainViewController!.tabCollectionViewModel
+        WindowControllersManager.shared.mainWindowControllers[0].mainViewController.tabCollectionViewModel
             .appendNewTab()
 
         waitForExpectations(timeout: 0.3, handler: nil)
@@ -171,9 +154,9 @@ class AppStateChangePublisherTests: XCTestCase {
     func testWhenTabIsClosedThenStateChangePublished() {
         WindowsManager.openNewWindow()
         WindowsManager.openNewWindow()
-        WindowControllersManager.shared.mainWindowControllers[0].mainViewController!.tabCollectionViewModel
+        WindowControllersManager.shared.mainWindowControllers[0].mainViewController.tabCollectionViewModel
             .appendNewTab()
-        WindowControllersManager.shared.mainWindowControllers[1].mainViewController!.tabCollectionViewModel
+        WindowControllersManager.shared.mainWindowControllers[1].mainViewController.tabCollectionViewModel
             .appendNewTab()
 
         // 4 events should be fired (2 for tabs removal, 2 for selectionIndex change)
@@ -183,9 +166,9 @@ class AppStateChangePublisherTests: XCTestCase {
                 e.fulfill()
             }.store(in: &cancellables)
 
-        WindowControllersManager.shared.mainWindowControllers[0].mainViewController!.tabCollectionViewModel
+        WindowControllersManager.shared.mainWindowControllers[0].mainViewController.tabCollectionViewModel
             .remove(at: 0)
-        WindowControllersManager.shared.mainWindowControllers[1].mainViewController!.tabCollectionViewModel
+        WindowControllersManager.shared.mainWindowControllers[1].mainViewController.tabCollectionViewModel
             .remove(at: 1)
 
         waitForExpectations(timeout: 0.3, handler: nil)
@@ -193,11 +176,11 @@ class AppStateChangePublisherTests: XCTestCase {
 
     func testWhenAllTabsExceptOneClosedThenStateChangePublished() {
         WindowsManager.openNewWindow()
-        WindowControllersManager.shared.mainWindowControllers[0].mainViewController!.tabCollectionViewModel
+        WindowControllersManager.shared.mainWindowControllers[0].mainViewController.tabCollectionViewModel
             .appendNewTab()
-        WindowControllersManager.shared.mainWindowControllers[0].mainViewController!.tabCollectionViewModel
+        WindowControllersManager.shared.mainWindowControllers[0].mainViewController.tabCollectionViewModel
             .appendNewTab()
-        WindowControllersManager.shared.mainWindowControllers[0].mainViewController!.tabCollectionViewModel
+        WindowControllersManager.shared.mainWindowControllers[0].mainViewController.tabCollectionViewModel
             .appendNewTab()
 
         // 2 events should be fired (one for tab removal, one for selectionIndex change)
@@ -207,7 +190,7 @@ class AppStateChangePublisherTests: XCTestCase {
                 e.fulfill()
             }.store(in: &cancellables)
 
-        WindowControllersManager.shared.mainWindowControllers[0].mainViewController!.tabCollectionViewModel
+        WindowControllersManager.shared.mainWindowControllers[0].mainViewController.tabCollectionViewModel
             .removeAllTabs(except: 1)
 
         waitForExpectations(timeout: 0.3, handler: nil)
@@ -215,11 +198,11 @@ class AppStateChangePublisherTests: XCTestCase {
 
     func testWhenTabsReorderedThenStateChangePublished() {
         WindowsManager.openNewWindow()
-        WindowControllersManager.shared.mainWindowControllers[0].mainViewController!.tabCollectionViewModel
+        WindowControllersManager.shared.mainWindowControllers[0].mainViewController.tabCollectionViewModel
             .appendNewTab()
-        WindowControllersManager.shared.mainWindowControllers[0].mainViewController!.tabCollectionViewModel
+        WindowControllersManager.shared.mainWindowControllers[0].mainViewController.tabCollectionViewModel
             .appendNewTab()
-        WindowControllersManager.shared.mainWindowControllers[0].mainViewController!.tabCollectionViewModel
+        WindowControllersManager.shared.mainWindowControllers[0].mainViewController.tabCollectionViewModel
             .appendNewTab()
 
         // 2 events should be fired: 1 for tabs reordering, 1 for selectionIndex change
@@ -229,7 +212,7 @@ class AppStateChangePublisherTests: XCTestCase {
                 e.fulfill()
             }.store(in: &cancellables)
 
-        WindowControllersManager.shared.mainWindowControllers[0].mainViewController!.tabCollectionViewModel
+        WindowControllersManager.shared.mainWindowControllers[0].mainViewController.tabCollectionViewModel
             .moveTab(at: 2, to: 0)
 
         waitForExpectations(timeout: 0.3, handler: nil)
@@ -244,7 +227,7 @@ class AppStateChangePublisherTests: XCTestCase {
                 e.fulfill()
             }.store(in: &cancellables)
 
-        WindowControllersManager.shared.mainWindowControllers[0].mainViewController!.tabCollectionViewModel
+        WindowControllersManager.shared.mainWindowControllers[0].mainViewController.tabCollectionViewModel
             .tabViewModel(at: 0)!.tab.url = URL(string: "https://duckduckgo.com")
 
         waitForExpectations(timeout: 0.3, handler: nil)
@@ -259,7 +242,7 @@ class AppStateChangePublisherTests: XCTestCase {
                 e.fulfill()
             }.store(in: &cancellables)
 
-        WindowControllersManager.shared.mainWindowControllers[0].mainViewController!.tabCollectionViewModel
+        WindowControllersManager.shared.mainWindowControllers[0].mainViewController.tabCollectionViewModel
             .tabViewModel(at: 0)!.tab.favicon = NSImage()
 
         waitForExpectations(timeout: 0.3, handler: nil)
