@@ -17,14 +17,80 @@
 //
 
 import Cocoa
+import Combine
 
 class AddEditFavoriteViewController: NSViewController {
+
+    @IBOutlet weak var headerTextField: NSTextField!
+    @IBOutlet weak var titleInputTextField: NSTextField!
+    @IBOutlet weak var urlInputTextField: NSTextField!
+    @IBOutlet weak var confirmButton: NSButton!
+
+    private var bookmarkManager: BookmarkManager = LocalBookmarkManager.shared
+    private var originalBookmark: Bookmark?
+
+    private var cancellables = Set<AnyCancellable>()
+
+    override func viewDidLoad() {
+        super.viewDidLoad()
+
+        updateConfirmButton()
+        subscribeToInputTextFields()
+    }
 
     @IBAction func cancelAction(_ sender: NSButton) {
         view.window?.close()
     }
 
     @IBAction func saveAction(_ sender: NSButton) {
+        guard isInputValid, let url = urlInputTextField.stringValue.url else {
+            assertionFailure("Not valid input")
+            return
+        }
+
+        let title = titleInputTextField.stringValue
+        if let bookmark = originalBookmark {
+            // TODO: 
+        } else {
+            if var bookmark = bookmarkManager.getBookmark(for: url) {
+                bookmark.isFavorite = true
+                bookmark.title = title
+                bookmarkManager.update(bookmark: bookmark)
+            } else {
+                bookmarkManager.makeBookmark(for: url, title: title, favicon: nil, isFavorite: true)
+            }
+        }
         view.window?.close()
     }
+
+    func edit(bookmark: Bookmark) {
+        originalBookmark = bookmark
+        titleInputTextField.stringValue = bookmark.title
+        urlInputTextField.stringValue = bookmark.url.absoluteString
+
+        headerTextField.stringValue = UserText.editFavorite
+        confirmButton.stringValue = UserText.save
+    }
+
+    private func subscribeToInputTextFields() {
+        NotificationCenter.default
+            .publisher(for: NSControl.textDidChangeNotification, object: titleInputTextField)
+            .sink { [weak self] _ in self?.updateConfirmButton() }
+            .store(in: &cancellables)
+        NotificationCenter.default
+            .publisher(for: NSControl.textDidChangeNotification, object: urlInputTextField)
+            .sink { [weak self] _ in self?.updateConfirmButton() }
+            .store(in: &cancellables)
+    }
+
+    private var isInputValid: Bool {
+        let url = urlInputTextField.stringValue.url
+        return !titleInputTextField.stringValue.isEmpty &&
+            url?.isValid ?? false
+    }
+
+    private func updateConfirmButton() {
+        confirmButton.isEnabled = isInputValid
+    }
+
 }

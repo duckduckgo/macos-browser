@@ -135,6 +135,8 @@ extension HomepageViewController: NSCollectionViewDataSource, NSCollectionViewDe
     }
 
     func collectionView(_ collectionView: NSCollectionView, didSelectItemsAt indexPaths: Set<IndexPath>) {
+        collectionView.deselectAll(self)
+
         guard let topFavorites = topFavorites else {
             assertionFailure("No favorites to display")
             return

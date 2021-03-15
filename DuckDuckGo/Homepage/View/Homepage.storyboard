@@ -104,8 +104,8 @@
                         <autoresizingMask key="autoresizingMask"/>
                         <subviews>
                             <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="sgc-bW-ErE">
-                                <rect key="frame" x="18" y="139" width="40" height="16"/>
-                                <textFieldCell key="cell" lineBreakMode="clipping" title="Label" id="TYR-zX-uGa">
+                                <rect key="frame" x="18" y="139" width="86" height="16"/>
+                                <textFieldCell key="cell" lineBreakMode="clipping" title="Add Favorite" id="TYR-zX-uGa">
                                     <font key="font" metaFont="systemBold"/>
                                     <color key="textColor" name="labelColor" catalog="System" colorSpace="catalog"/>
                                     <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
@@ -165,8 +165,8 @@
                                 </gridCells>
                             </gridView>
                             <button verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="pot-HE-SGY">
-                                <rect key="frame" x="373" y="13" width="64" height="32"/>
-                                <buttonCell key="cell" type="push" title="Save" bezelStyle="rounded" alignment="center" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="A8N-QU-TZk">
+                                <rect key="frame" x="378" y="13" width="59" height="32"/>
+                                <buttonCell key="cell" type="push" title="Add" bezelStyle="rounded" alignment="center" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="A8N-QU-TZk">
                                     <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
                                     <font key="font" metaFont="system"/>
                                     <string key="keyEquivalent" base64-UTF8="YES">
@@ -178,7 +178,7 @@ DQ
                                 </connections>
                             </button>
                             <button verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="Jmd-dj-8KN">
-                                <rect key="frame" x="299" y="13" width="76" height="32"/>
+                                <rect key="frame" x="304" y="13" width="76" height="32"/>
                                 <buttonCell key="cell" type="push" title="Cancel" bezelStyle="rounded" alignment="center" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="viu-3X-dwN">
                                     <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
                                     <font key="font" metaFont="system"/>
@@ -203,6 +203,12 @@ Gw
                             <constraint firstAttribute="bottom" secondItem="pot-HE-SGY" secondAttribute="bottom" constant="20" id="z5o-vt-dzd"/>
                         </constraints>
                     </view>
+                    <connections>
+                        <outlet property="confirmButton" destination="pot-HE-SGY" id="OT1-EH-07g"/>
+                        <outlet property="headerTextField" destination="sgc-bW-ErE" id="7yD-uZ-wMw"/>
+                        <outlet property="titleInputTextField" destination="bLd-Hj-ttQ" id="6bD-u5-flf"/>
+                        <outlet property="urlInputTextField" destination="bB4-9W-QHG" id="q9T-fr-w7i"/>
+                    </connections>
                 </viewController>
                 <customObject id="AAz-cS-fuW" userLabel="First Responder" customClass="NSResponder" sceneMemberID="firstResponder"/>
             </objects>

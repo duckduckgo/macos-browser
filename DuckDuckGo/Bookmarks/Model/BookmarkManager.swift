@@ -23,7 +23,7 @@ protocol BookmarkManager: AnyObject {
 
     func isUrlBookmarked(url: URL) -> Bool
     func getBookmark(for url: URL) -> Bookmark?
-    @discardableResult func makeBookmark(for url: URL, title: String, favicon: NSImage?) -> Bookmark?
+    @discardableResult func makeBookmark(for url: URL, title: String, favicon: NSImage?, isFavorite: Bool) -> Bookmark?
     func remove(bookmark: Bookmark)
     func update(bookmark: Bookmark)
 
@@ -66,13 +66,13 @@ class LocalBookmarkManager: BookmarkManager {
         return list[url]
     }
 
-    @discardableResult func makeBookmark(for url: URL, title: String, favicon: NSImage?) -> Bookmark? {
+    @discardableResult func makeBookmark(for url: URL, title: String, favicon: NSImage?, isFavorite: Bool) -> Bookmark? {
         guard !isUrlBookmarked(url: url) else {
             os_log("LocalBookmarkManager: Url is already bookmarked", type: .error)
             return nil
         }
-//        favicon?.size = NSSize.faviconSize
-        let bookmark = Bookmark(url: url, title: title, favicon: favicon, isFavorite: false)
+
+        let bookmark = Bookmark(url: url, title: title, favicon: favicon, isFavorite: isFavorite)
 
         list.insert(bookmark)
         bookmarkStore.save(bookmark: bookmark) { [weak self] success, objectId, _  in
