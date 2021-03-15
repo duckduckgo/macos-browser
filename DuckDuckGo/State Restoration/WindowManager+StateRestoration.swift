@@ -115,7 +115,7 @@ final class WindowRestorationItem: NSObject, NSSecureCoding {
 
     init(windowController: MainWindowController) {
         self.frame = windowController.window!.frame
-        self.model = windowController.mainViewController!.tabCollectionViewModel
+        self.model = windowController.mainViewController.tabCollectionViewModel
     }
 
     static var supportsSecureCoding: Bool { true }
