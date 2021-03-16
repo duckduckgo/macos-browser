@@ -41,4 +41,25 @@ class URLExtensionTests: XCTestCase {
         XCTAssertEqual("localhost".url!.absoluteString, "http://localhost")
     }
 
+    func test_makeURL_from_addressBarString() {
+        #warning("fix spaces in search query")
+//            ("https://duckduckgo.com/?q=search string with spaces", "https://duckduckgo.com/?q=search%20string%20with%20spaces")
+        let data: [(string: String, expected: String)] = [
+            ("   http://example.com\n", "http://example.com"),
+            (" duckduckgo.com", "http://duckduckgo.com"),
+            (" duckduckgo.c ", "https://duckduckgo.com/?q=duckduckgo.c"),
+            ("localhost ", "http://localhost"),
+            ("local ", "https://duckduckgo.com/?q=local"),
+            ("test string with spaces", "https://duckduckgo.com/?q=test%20string%20with%20spaces"),
+            ("http://💩.la:8080 ", "http://xn--ls8h.la:8080"),
+            ("http:// 💩.la:8080 ", "https://duckduckgo.com/?q=http://%20%F0%9F%92%A9.la:8080"),
+            ("https://xn--ls8h.la/path/to/resource", "https://xn--ls8h.la/path/to/resource")
+        ]
+
+        for (string, expected) in data {
+            let url = URL.makeURL(from: string)!
+            XCTAssertEqual(expected, url.absoluteString)
+        }
+    }
+
 }
