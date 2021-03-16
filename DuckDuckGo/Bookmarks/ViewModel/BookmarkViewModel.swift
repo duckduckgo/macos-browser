@@ -42,6 +42,30 @@ struct BookmarkViewModel {
         return favicon
     }
 
+    // MARK: - Representing Color and Character
+
+    static var representingColors: [NSColor] = {
+        return [
+            NSColor.red,
+            NSColor.blue,
+            NSColor.orange
+        ].map { (color) -> NSColor in
+            color.withAlphaComponent(0.1)
+        }
+    }()
+
+    // Representing color is a color shown as a background of homepage item when
+    // the bookmark has no favicon
+    var representingColor: NSColor {
+        let index = bookmark.url.absoluteString.count % Self.representingColors.count
+        return Self.representingColors[index]
+    }
+
+    // Representing character is on top of representing color
+    var representingCharacter: String {
+        return bookmark.url.host?.dropWWW().first?.uppercased() ?? "-"
+    }
+
 }
 
 fileprivate extension NSImage {

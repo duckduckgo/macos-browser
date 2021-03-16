@@ -47,6 +47,7 @@ class HomepageCollectionViewItem: NSCollectionViewItem {
     @IBOutlet weak var croppingView: ColorView!
     @IBOutlet weak var overlayView: ColorView!
     @IBOutlet weak var faviconImageView: BorderImageView!
+    @IBOutlet weak var representingCharacterTextField: NSTextField!
     @IBOutlet weak var titleTextField: NSTextField!
     @IBOutlet weak var mouseOverView: MouseOverView!
 
@@ -58,32 +59,27 @@ class HomepageCollectionViewItem: NSCollectionViewItem {
         state = .normal
     }
 
-    override var highlightState: NSCollectionViewItem.HighlightState {
-        didSet {
-            switch state {
-            case .normal: if highlightState == .forSelection { state = .active }
-            case .hover: if highlightState == .forSelection { state = .active }
-            case .active: if highlightState != .forSelection { state = isMouseOver ? .hover : .normal }
-            }
-        }
-    }
-
-    func set(bookmark: Bookmark) {
-        if let size = bookmark.favicon?.size,
+    func set(bookmarkViewModel: BookmarkViewModel) {
+        if let size = bookmarkViewModel.bookmark.favicon?.size,
            size.width >= CGFloat(Size.width),
            size.height >= CGFloat(Size.width) {
-            faviconImageView.image = bookmark.favicon
+            faviconImageView.image = bookmarkViewModel.bookmark.favicon
+            faviconImageView.layer?.backgroundColor = NSColor.clear.cgColor
+            representingCharacterTextField.isHidden = true
         } else {
             faviconImageView.image = nil
+            faviconImageView.layer?.backgroundColor = bookmarkViewModel.representingColor.cgColor
+            representingCharacterTextField.isHidden = false
+            representingCharacterTextField.stringValue = bookmarkViewModel.representingCharacter
         }
 
-        faviconImageView.layer?.backgroundColor = NSColor.clear.cgColor
-        titleTextField.stringValue = bookmark.title
+        titleTextField.stringValue = bookmarkViewModel.bookmark.title
     }
 
     func setAddFavourite() {
         faviconImageView.image = NSImage(named: "Add")
         faviconImageView.layer?.backgroundColor = NSColor.homepageAddItemFillColor.cgColor
+        representingCharacterTextField.isHidden = true
         titleTextField.stringValue = UserText.addFavorite
     }
 
@@ -123,6 +119,16 @@ class HomepageCollectionViewItem: NSCollectionViewItem {
             narrowBorderView.backgroundColor = narrowBorderColor
             titleTextField.layer?.backgroundColor = wideBorderColor.cgColor
             overlayView.isHidden = state != .active
+        }
+    }
+
+    override var highlightState: NSCollectionViewItem.HighlightState {
+        didSet {
+            switch state {
+            case .normal: if highlightState == .forSelection { state = .active }
+            case .hover: if highlightState == .forSelection { state = .active }
+            case .active: if highlightState != .forSelection { state = isMouseOver ? .hover : .normal }
+            }
         }
     }
 

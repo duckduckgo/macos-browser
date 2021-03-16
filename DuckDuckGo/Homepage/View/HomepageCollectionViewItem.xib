@@ -52,15 +52,25 @@
                                         </userDefinedRuntimeAttribute>
                                     </userDefinedRuntimeAttributes>
                                 </customView>
+                                <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="jXM-Ai-XYD" userLabel="Representing Character Text Field">
+                                    <rect key="frame" x="14" y="7" width="37" height="53"/>
+                                    <textFieldCell key="cell" lineBreakMode="clipping" alignment="center" title="A" id="eL5-QY-GRi">
+                                        <font key="font" metaFont="system" size="45"/>
+                                        <color key="textColor" name="alternateSelectedControlTextColor" catalog="System" colorSpace="catalog"/>
+                                        <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
+                                    </textFieldCell>
+                                </textField>
                             </subviews>
                             <constraints>
                                 <constraint firstAttribute="bottom" secondItem="ROO-5P-Meg" secondAttribute="bottom" constant="-1" id="Ccq-xf-kf1"/>
                                 <constraint firstItem="nhR-fJ-WxK" firstAttribute="leading" secondItem="1Vd-Cw-5GJ" secondAttribute="leading" constant="-1" id="JbX-y3-6Px"/>
+                                <constraint firstItem="jXM-Ai-XYD" firstAttribute="centerY" secondItem="1Vd-Cw-5GJ" secondAttribute="centerY" constant="-1.5" id="Kql-RW-dRz"/>
                                 <constraint firstItem="ROO-5P-Meg" firstAttribute="leading" secondItem="1Vd-Cw-5GJ" secondAttribute="leading" constant="-1" id="QWQ-v4-2kk"/>
                                 <constraint firstItem="nhR-fJ-WxK" firstAttribute="top" secondItem="1Vd-Cw-5GJ" secondAttribute="top" constant="-1" id="UgW-XW-hIi"/>
                                 <constraint firstAttribute="bottom" secondItem="nhR-fJ-WxK" secondAttribute="bottom" constant="-1" id="V39-BK-ZvU"/>
                                 <constraint firstItem="ROO-5P-Meg" firstAttribute="top" secondItem="1Vd-Cw-5GJ" secondAttribute="top" constant="-1" id="VCK-EA-CxR"/>
                                 <constraint firstAttribute="trailing" secondItem="nhR-fJ-WxK" secondAttribute="trailing" constant="-1" id="duI-8n-PSQ"/>
+                                <constraint firstItem="jXM-Ai-XYD" firstAttribute="centerX" secondItem="1Vd-Cw-5GJ" secondAttribute="centerX" id="kxO-yQ-nmN"/>
                                 <constraint firstAttribute="trailing" secondItem="ROO-5P-Meg" secondAttribute="trailing" constant="-1" id="mdi-oK-Mdg"/>
                                 <constraint firstAttribute="height" constant="64" id="y93-yy-2Y9"/>
                                 <constraint firstAttribute="width" constant="64" id="z23-Kb-g0Z"/>
@@ -74,7 +84,7 @@
                                 </userDefinedRuntimeAttribute>
                             </userDefinedRuntimeAttributes>
                         </customView>
-                        <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="azc-ma-J3L">
+                        <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="azc-ma-J3L" userLabel="Title Text Field">
                             <rect key="frame" x="28" y="0.0" width="37" height="14"/>
                             <textFieldCell key="cell" lineBreakMode="truncatingTail" alignment="center" title="Label" id="o1u-RK-q5i">
                                 <font key="font" metaFont="smallSystem"/>
@@ -123,6 +133,7 @@
                 <outlet property="mouseOverView" destination="5V1-qQ-gBR" id="S2b-sq-siR"/>
                 <outlet property="narrowBorderView" destination="C8O-oQ-mZN" id="bso-zR-alb"/>
                 <outlet property="overlayView" destination="ROO-5P-Meg" id="UIa-A3-7Ej"/>
+                <outlet property="representingCharacterTextField" destination="jXM-Ai-XYD" id="Nel-qt-qvc"/>
                 <outlet property="titleTextField" destination="azc-ma-J3L" id="MID-zE-yiS"/>
                 <outlet property="view" destination="Hz6-mo-xeY" id="AZi-l2-DK9"/>
                 <outlet property="wideBorderView" destination="Hsz-i9-i2N" id="ycc-Xo-ToT"/>
@@ -134,7 +145,7 @@
             <color red="0.97647058823529409" green="0.98039215686274506" blue="0.98039215686274506" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
         </namedColor>
         <namedColor name="HomepageFaviconHoverColor">
-            <color red="0.050999999046325684" green="0.082000002264976501" blue="0.14900000393390656" alpha="0.079999998211860657" colorSpace="custom" customColorSpace="sRGB"/>
+            <color red="0.050980392156862744" green="0.078431372549019607" blue="0.14509803921568629" alpha="0.079999998211860657" colorSpace="custom" customColorSpace="sRGB"/>
         </namedColor>
     </resources>
 </document>

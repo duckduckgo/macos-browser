@@ -134,7 +134,7 @@ extension HomepageViewController: NSCollectionViewDataSource, NSCollectionViewDe
             return item
         }
 
-        item.set(bookmark: topFavorites[indexPath.item])
+        item.set(bookmarkViewModel: BookmarkViewModel(bookmark: topFavorites[indexPath.item]))
         item.delegate = self
         return item
     }
