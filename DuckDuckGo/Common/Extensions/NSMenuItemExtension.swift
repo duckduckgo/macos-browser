@@ -1,5 +1,5 @@
 //
-//  Bookmark.swift
+//  NSMenuItemExtension.swift
 //
 //  Copyright © 2021 DuckDuckGo. All rights reserved.
 //
@@ -18,29 +18,11 @@
 
 import Cocoa
 
-struct Bookmark {
+extension NSMenuItem {
 
-    let url: URL
-    var title: String
-    var favicon: NSImage?
-    var isFavorite: Bool
-
-    var managedObjectId: NSManagedObjectID?
-
-}
-
-extension Bookmark: Equatable {
-
-    static func == (lhs: Self, rhs: Self) -> Bool {
-        lhs.url == rhs.url
-    }
-
-    init(from bookmark: Bookmark, with newUrl: URL) {
-        self.init(url: newUrl,
-                  title: bookmark.title,
-                  favicon: bookmark.favicon,
-                  isFavorite: bookmark.isFavorite,
-                  managedObjectId: bookmark.managedObjectId)
+    convenience init(title string: String, action selector: Selector?, target: AnyObject?, keyEquivalent charCode: String) {
+        self.init(title: string, action: selector, keyEquivalent: charCode)
+        self.target = target
     }
 
 }

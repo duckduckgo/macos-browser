@@ -43,21 +43,38 @@ class AddEditFavoriteViewController: NSViewController {
     }
 
     @IBAction func saveAction(_ sender: NSButton) {
-        guard isInputValid, let url = urlInputTextField.stringValue.url else {
+
+        func update(bookmark: Bookmark, newTitle: String, newUrl: URL? = nil) {
+            var bookmark = bookmark
+            bookmark.isFavorite = true
+            bookmark.title = newTitle
+            bookmarkManager.update(bookmark: bookmark)
+
+            if let newUrl = newUrl, newUrl != bookmark.url {
+                bookmarkManager.updateUrl(of: bookmark, to: newUrl)
+            }
+        }
+
+        // Updating a URL means
+        func update(bookmark: Bookmark, url: String, title: String) {
+
+        }
+
+        guard isInputValid, let newUrl = urlInputTextField.stringValue.url else {
             assertionFailure("Not valid input")
             return
         }
 
-        let title = titleInputTextField.stringValue
+        let newTitle = titleInputTextField.stringValue
         if let bookmark = originalBookmark {
-            // TODO: 
+            // Editing
+            update(bookmark: bookmark, newTitle: newTitle, newUrl: newUrl)
         } else {
-            if var bookmark = bookmarkManager.getBookmark(for: url) {
-                bookmark.isFavorite = true
-                bookmark.title = title
-                bookmarkManager.update(bookmark: bookmark)
+            // Saving
+            if let bookmark = bookmarkManager.getBookmark(for: newUrl) {
+                update(bookmark: bookmark, newTitle: newTitle)
             } else {
-                bookmarkManager.makeBookmark(for: url, title: title, favicon: nil, isFavorite: true)
+                bookmarkManager.makeBookmark(for: newUrl, title: newTitle, favicon: nil, isFavorite: true)
             }
         }
         view.window?.close()
@@ -69,7 +86,9 @@ class AddEditFavoriteViewController: NSViewController {
         urlInputTextField.stringValue = bookmark.url.absoluteString
 
         headerTextField.stringValue = UserText.editFavorite
-        confirmButton.stringValue = UserText.save
+        confirmButton.title = UserText.save
+
+        updateConfirmButton()
     }
 
     private func subscribeToInputTextFields() {

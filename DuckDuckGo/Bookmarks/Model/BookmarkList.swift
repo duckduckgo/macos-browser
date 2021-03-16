@@ -62,6 +62,21 @@ struct BookmarkList {
         itemsDict[bookmark.url] = bookmark
     }
 
+    mutating func updateUrl(of bookmark: Bookmark, to newUrl: URL) -> Bookmark? {
+        guard itemsDict[bookmark.url] != nil, let index = keysOrdered.firstIndex(of: bookmark.url) else {
+            os_log("BookmarkList: Update failed, no such item in bookmark list")
+            return nil
+        }
+
+        keysOrdered.remove(at: index)
+        keysOrdered.insert(newUrl, at: index)
+
+        itemsDict[bookmark.url] = nil
+        let newBookmark = Bookmark(from: bookmark, with: newUrl)
+        itemsDict[newUrl] = newBookmark
+        return newBookmark
+    }
+
     func bookmarks() -> [Bookmark] {
         keysOrdered
             .map { itemsDict[$0] }

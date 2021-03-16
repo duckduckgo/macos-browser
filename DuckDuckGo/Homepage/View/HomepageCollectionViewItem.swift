@@ -18,6 +18,15 @@
 
 import Cocoa
 
+protocol HomepageCollectionViewItemDelegate: AnyObject {
+
+    func homepageCollectionViewItemOpenInNewTabAction(_ homepageCollectionViewItem: HomepageCollectionViewItem)
+    func homepageCollectionViewItemOpenInNewWindowAction(_ homepageCollectionViewItem: HomepageCollectionViewItem)
+    func homepageCollectionViewItemEditAction(_ homepageCollectionViewItem: HomepageCollectionViewItem)
+    func homepageCollectionViewItemRemoveAction(_ homepageCollectionViewItem: HomepageCollectionViewItem)
+
+}
+
 class HomepageCollectionViewItem: NSCollectionViewItem {
 
     static let identifier = NSUserInterfaceItemIdentifier(rawValue: "HomepageCollectionViewItem")
@@ -31,6 +40,8 @@ class HomepageCollectionViewItem: NSCollectionViewItem {
         static let textFieldCornerRadius: CGFloat = 4
     }
 
+    weak var delegate: HomepageCollectionViewItemDelegate?
+
     @IBOutlet weak var wideBorderView: ColorView!
     @IBOutlet weak var narrowBorderView: ColorView!
     @IBOutlet weak var croppingView: ColorView!
@@ -43,6 +54,7 @@ class HomepageCollectionViewItem: NSCollectionViewItem {
         super.awakeFromNib()
 
         setupView()
+        setupMenu()
         state = .normal
     }
 
@@ -114,6 +126,48 @@ class HomepageCollectionViewItem: NSCollectionViewItem {
         }
     }
 
+    // MARK: - Menu
+
+    private func setupMenu() {
+        let menu = NSMenu()
+
+        menu.addItem(NSMenuItem(title: UserText.openInNewTab,
+                                action: #selector(openInNewTab(_:)),
+                                target: self,
+                                keyEquivalent: ""))
+        menu.addItem(NSMenuItem(title: UserText.openInNewWindow,
+                                action: #selector(openInNewWindow(_:)),
+                                target: self,
+                                keyEquivalent: ""))
+        menu.addItem(NSMenuItem.separator())
+        menu.addItem(NSMenuItem(title: UserText.edit,
+                                action: #selector(edit(_:)),
+                                target: self,
+                                keyEquivalent: ""))
+        menu.addItem(NSMenuItem(title: UserText.remove,
+                                action: #selector(remove(_:)),
+                                target: self,
+                                keyEquivalent: ""))
+        menu.delegate = self
+        view.menu = menu
+    }
+
+    @objc func openInNewTab(_ sender: NSButton) {
+        delegate?.homepageCollectionViewItemOpenInNewTabAction(self)
+    }
+
+    @objc func openInNewWindow(_ sender: NSButton) {
+        delegate?.homepageCollectionViewItemOpenInNewWindowAction(self)
+    }
+
+    @objc func edit(_ sender: NSButton) {
+        delegate?.homepageCollectionViewItemEditAction(self)
+    }
+
+    @objc func remove(_ sender: NSButton) {
+        delegate?.homepageCollectionViewItemRemoveAction(self)
+    }
+
 }
 
 extension HomepageCollectionViewItem: MouseOverViewDelegate {
@@ -127,6 +181,13 @@ extension HomepageCollectionViewItem: MouseOverViewDelegate {
         }
     }
 
+}
+
+extension HomepageCollectionViewItem: NSMenuDelegate {
+
+    func menuDidClose(_ menu: NSMenu) {
+        state = .normal
+    }
 }
 
 fileprivate extension NSColor {

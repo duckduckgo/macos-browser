@@ -27,4 +27,10 @@ class AddEditFavoriteWindow: NSWindow {
 
     override var canBecomeMain: Bool { false }
 
+    // swiftlint:disable force_cast
+    var addEditFavoriteViewController: AddEditFavoriteViewController {
+        contentViewController as! AddEditFavoriteViewController
+    }
+    // swiftlint:enable force_cast
+
 }

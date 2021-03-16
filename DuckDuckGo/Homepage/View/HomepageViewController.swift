@@ -74,19 +74,23 @@ class HomepageViewController: NSViewController {
 
     // MARK: - Add/Edit Favorite Popover
 
-    private func showAddFavourite() {
+    private func showAddEditController(for bookmark: Bookmark? = nil) {
         // swiftlint:disable force_cast
         let windowController = NSStoryboard.homepage.instantiateController(withIdentifier: "AddEditFavoriteWindowController") as! NSWindowController
         // swiftlint:enable force_cast
 
-        guard let window = windowController.window else {
-            assertionFailure("Failed to present AddEditFavoriteWindowController")
+        guard let window = windowController.window as? AddEditFavoriteWindow else {
+            assertionFailure("HomepageViewController: Failed to present AddEditFavoriteWindowController")
             return
         }
 
         guard let screen = window.screen else {
-            assertionFailure("No screen")
+            assertionFailure("HomepageViewController: No screen")
             return
+        }
+
+        if let bookmark = bookmark {
+            window.addEditFavoriteViewController.edit(bookmark: bookmark)
         }
 
         let windowFrame = NSRect(x: screen.frame.size.width / 2.0 - AddEditFavoriteWindow.Size.width / 2.0,
@@ -121,7 +125,7 @@ extension HomepageViewController: NSCollectionViewDataSource, NSCollectionViewDe
         // swiftlint:enable force_cast
 
         guard let topFavorites = topFavorites else {
-            assertionFailure("No favorites to display")
+            assertionFailure("HomepageViewController: No favorites to display")
             return item
         }
 
@@ -131,6 +135,7 @@ extension HomepageViewController: NSCollectionViewDataSource, NSCollectionViewDe
         }
 
         item.set(bookmark: topFavorites[indexPath.item])
+        item.delegate = self
         return item
     }
 
@@ -138,7 +143,7 @@ extension HomepageViewController: NSCollectionViewDataSource, NSCollectionViewDe
         collectionView.deselectAll(self)
 
         guard let topFavorites = topFavorites else {
-            assertionFailure("No favorites to display")
+            assertionFailure("HomepageViewController: No favorites to display")
             return
         }
 
@@ -147,7 +152,7 @@ extension HomepageViewController: NSCollectionViewDataSource, NSCollectionViewDe
         }
 
         guard index < topFavorites.count else {
-            showAddFavourite()
+            showAddEditController()
             return
         }
 
@@ -166,6 +171,39 @@ extension HomepageViewController: NSCollectionViewDataSource, NSCollectionViewDe
      }
 
  }
+
+extension HomepageViewController: HomepageCollectionViewItemDelegate {
+
+    func homepageCollectionViewItemOpenInNewTabAction(_ homepageCollectionViewItem: HomepageCollectionViewItem) {
+        if let indexPath = collectionView.indexPath(for: homepageCollectionViewItem),
+           let favorite = topFavorites?[indexPath.item] {
+            let tab = Tab(url: favorite.url, shouldLoadInBackground: true)
+            tabCollectionViewModel.append(tab: tab, selected: false)
+        }
+    }
+
+    func homepageCollectionViewItemOpenInNewWindowAction(_ homepageCollectionViewItem: HomepageCollectionViewItem) {
+        if let indexPath = collectionView.indexPath(for: homepageCollectionViewItem),
+           let favorite = topFavorites?[indexPath.item] {
+            WindowsManager.openNewWindow(with: favorite.url)
+        }
+    }
+
+    func homepageCollectionViewItemEditAction(_ homepageCollectionViewItem: HomepageCollectionViewItem) {
+        if let indexPath = collectionView.indexPath(for: homepageCollectionViewItem),
+           let favorite = topFavorites?[indexPath.item] {
+            showAddEditController(for: favorite)
+        }
+    }
+
+    func homepageCollectionViewItemRemoveAction(_ homepageCollectionViewItem: HomepageCollectionViewItem) {
+        if let indexPath = collectionView.indexPath(for: homepageCollectionViewItem),
+           let favorite = topFavorites?[indexPath.item] {
+            bookmarkManager.remove(bookmark: favorite)
+        }
+    }
+
+}
 
 fileprivate extension NSStoryboard {
 

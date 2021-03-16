@@ -26,6 +26,7 @@ protocol BookmarkManager: AnyObject {
     @discardableResult func makeBookmark(for url: URL, title: String, favicon: NSImage?, isFavorite: Bool) -> Bookmark?
     func remove(bookmark: Bookmark)
     func update(bookmark: Bookmark)
+    @discardableResult func updateUrl(of bookmark: Bookmark, to newUrl: URL) -> Bookmark?
 
     // Wrapper definition in a protocol is not supported yet
     var listPublisher: Published<BookmarkList>.Publisher { get }
@@ -112,6 +113,23 @@ class LocalBookmarkManager: BookmarkManager {
 
         list.update(with: bookmark)
         bookmarkStore.update(bookmark: bookmark)
+    }
+
+    func updateUrl(of bookmark: Bookmark, to newUrl: URL) -> Bookmark? {
+        guard let latestBookmark = getBookmark(for: bookmark.url) else {
+            os_log("LocalBookmarkManager: Failed to update bookmark - not in the list.", type: .error)
+            return nil
+        }
+
+        let managedObjectId = latestBookmark.managedObjectId
+
+        guard var newBookmark = list.updateUrl(of: bookmark, to: newUrl) else {
+            os_log("LocalBookmarkManager: Failed to update URL of bookmark.", type: .error)
+            return nil
+        }
+        newBookmark.managedObjectId = managedObjectId
+        bookmarkStore.update(bookmark: newBookmark)
+        return newBookmark
     }
 
     private func set(objectId: NSManagedObjectID, for bookmark: Bookmark) {
