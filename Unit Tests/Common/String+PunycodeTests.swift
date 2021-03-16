@@ -45,6 +45,7 @@ class StringPunycodeTests: XCTestCase {
             "https://duckduckgo.com",
             "https://duckduckgo.com/",
             "duckduckgo.com",
+            "duckduckgo.com/html?q=search",
             "www.duckduckgo.com",
             "https://www.duckduckgo.com/html?q=search",
             "https://www.duckduckgo.com/html/?q=search",
@@ -52,8 +53,16 @@ class StringPunycodeTests: XCTestCase {
             "file:///users/user/Documents/afile"
         ]
 
-        for address in addresses {
-            XCTAssertEqual(address, address.punycodedUrl?.absoluteString)
+        for var address in addresses {
+            let url = address.punycodedUrl
+            let expectedScheme = address.split(separator: "/").first.flatMap {
+                $0.hasSuffix(":") ? String($0).drop(suffix: ":") : nil
+            } ?? "http"
+            if !address.hasPrefix(expectedScheme) {
+                address = expectedScheme + "://" + address
+            }
+            XCTAssertEqual(url?.scheme, expectedScheme)
+            XCTAssertEqual(url?.absoluteString, address)
         }
     }
 

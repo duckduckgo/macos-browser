@@ -31,7 +31,14 @@ class URLExtensionTests: XCTestCase {
     func test_navigational_urls_are_valid() {
         XCTAssertTrue("http://example.com".url!.isValid)
         XCTAssertTrue("https://example.com".url!.isValid)
+        XCTAssertTrue("http://localhost".url!.isValid)
         // XCTAssertTrue("http://localdomain".url!.isValid) // local domain URLs are not supported at this time
+    }
+
+    func test_when_no_scheme_in_string_url_has_scheme() {
+        XCTAssertEqual("duckduckgo.com".url!.absoluteString, "http://duckduckgo.com")
+        XCTAssertEqual("example.com".url!.absoluteString, "http://example.com")
+        XCTAssertEqual("localhost".url!.absoluteString, "http://localhost")
     }
 
 }

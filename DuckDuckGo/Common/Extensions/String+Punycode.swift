@@ -25,6 +25,10 @@ extension String {
     ///  retain the input as much as possible.
     var punycodedUrl: URL? {
         if let url = URL(string: self) {
+            guard url.scheme != nil else {
+                return (URL.NavigationalScheme.http.separated() + self).punycodedUrl
+            }
+
             return url
         }
 
