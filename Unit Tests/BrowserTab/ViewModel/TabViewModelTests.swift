@@ -129,14 +129,13 @@ class TabViewModelTests: XCTestCase {
 
     func testWhenTabDownloadedFaviconThenFaviconIsNotNil() {
         let tabViewModel = TabViewModel.aTabViewModel
-        tabViewModel.tab.url = URL.duckDuckGo
+        tabViewModel.tab.url = URL(string: "http://apple.com")
 
         let faviconExpectation = expectation(description: "Favicon")
 
         tabViewModel.$favicon.debounce(for: 0.1, scheduler: RunLoop.main).sink { favicon in
             XCTAssertNotNil(favicon)
-            // This assertion is failing.
-            // XCTAssertNotEqual(favicon, TabViewModel.Favicon.home)
+            XCTAssertNotEqual(favicon, TabViewModel.Favicon.home)
             if favicon != TabViewModel.Favicon.defaultFavicon {
                 faviconExpectation.fulfill()
             }
