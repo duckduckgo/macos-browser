@@ -58,7 +58,7 @@ class LocalBookmarkManagerTests: XCTestCase {
 
         let objectId = NSManagedObjectID()
         bookmarkStoreMock.managedObjectId = objectId
-        let bookmark = bookmarkManager.makeBookmark(for: URL.duckDuckGo, title: "Title", favicon: nil)!
+        let bookmark = bookmarkManager.makeBookmark(for: URL.duckDuckGo, title: "Title", favicon: nil, isFavorite: false)!
 
         XCTAssert(bookmarkManager.isUrlBookmarked(url: bookmark.url))
         XCTAssert(bookmarkManager.getBookmark(for: bookmark.url)?.managedObjectId == objectId)
@@ -70,7 +70,7 @@ class LocalBookmarkManagerTests: XCTestCase {
         let bookmarkManager = LocalBookmarkManager(bookmarkStore: bookmarkStoreMock)
 
         bookmarkStoreMock.saveSuccess = false
-        let bookmark = bookmarkManager.makeBookmark(for: URL.duckDuckGo, title: "Title", favicon: nil)!
+        let bookmark = bookmarkManager.makeBookmark(for: URL.duckDuckGo, title: "Title", favicon: nil, isFavorite: false)!
 
         XCTAssertFalse(bookmarkManager.isUrlBookmarked(url: bookmark.url))
         XCTAssert(bookmarkStoreMock.saveCalled)
@@ -82,9 +82,9 @@ class LocalBookmarkManagerTests: XCTestCase {
 
         let objectId = NSManagedObjectID()
         bookmarkStoreMock.managedObjectId = objectId
-        _ = bookmarkManager.makeBookmark(for: URL.duckDuckGo, title: "Title", favicon: nil)!
+        _ = bookmarkManager.makeBookmark(for: URL.duckDuckGo, title: "Title", favicon: nil, isFavorite: false)!
 
-        XCTAssertNil(bookmarkManager.makeBookmark(for: URL.duckDuckGo, title: "Title", favicon: nil))
+        XCTAssertNil(bookmarkManager.makeBookmark(for: URL.duckDuckGo, title: "Title", favicon: nil, isFavorite: false))
     }
 
     func testWhenBookmarkIsRemoved_ThenManagerRemovesItFromStore() {
@@ -93,7 +93,7 @@ class LocalBookmarkManagerTests: XCTestCase {
 
         let objectId = NSManagedObjectID()
         bookmarkStoreMock.managedObjectId = objectId
-        let bookmark = bookmarkManager.makeBookmark(for: URL.duckDuckGo, title: "Title", favicon: nil)!
+        let bookmark = bookmarkManager.makeBookmark(for: URL.duckDuckGo, title: "Title", favicon: nil, isFavorite: false)!
 
         bookmarkManager.remove(bookmark: bookmark)
 
@@ -108,7 +108,7 @@ class LocalBookmarkManagerTests: XCTestCase {
 
         let objectId = NSManagedObjectID()
         bookmarkStoreMock.managedObjectId = objectId
-        let bookmark = bookmarkManager.makeBookmark(for: URL.duckDuckGo, title: "Title", favicon: nil)!
+        let bookmark = bookmarkManager.makeBookmark(for: URL.duckDuckGo, title: "Title", favicon: nil, isFavorite: false)!
 
         bookmarkStoreMock.removeSuccess = false
         bookmarkStoreMock.removeError = BookmarkManagerError.somethingReallyBad
@@ -145,7 +145,7 @@ class LocalBookmarkManagerTests: XCTestCase {
 
         let objectId = NSManagedObjectID()
         bookmarkStoreMock.managedObjectId = objectId
-        var bookmark = bookmarkManager.makeBookmark(for: URL.duckDuckGo, title: "Title", favicon: nil)!
+        var bookmark = bookmarkManager.makeBookmark(for: URL.duckDuckGo, title: "Title", favicon: nil, isFavorite: false)!
 
         bookmark.isFavorite = !bookmark.isFavorite
         bookmarkManager.update(bookmark: bookmark)
