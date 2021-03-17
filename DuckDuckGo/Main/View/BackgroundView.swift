@@ -18,7 +18,7 @@
 
 import Cocoa
 
-class BackgroundColorView: NSView {
+internal class BackgroundColorView: NSView {
 
     required init?(coder: NSCoder) {
         super.init(coder: coder)
