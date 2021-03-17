@@ -23,11 +23,16 @@ class HomepageViewController: NSViewController {
 
     enum Constants {
         static let maxNumberOfFavorites = 10
+        static let defaltPromptViewHeight: CGFloat = 66
         static let collectionViewMinimumHeight: CGFloat = 216
     }
 
+    private var defaultBrowserPromptView = DefaultBrowserPromptView.createFromNib()
     @IBOutlet weak var collectionView: NSCollectionView!
     @IBOutlet weak var collectionViewHeight: NSLayoutConstraint!
+
+    @UserDefaultsWrapper(key: .defaultBrowserDismissed, defaultValue: false)
+    var defaultBrowserPromptDismissed: Bool
 
     private let tabCollectionViewModel: TabCollectionViewModel
     private var bookmarkManager: BookmarkManager
@@ -53,8 +58,14 @@ class HomepageViewController: NSViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
 
+        layoutDefaultBrowserPromptView()
         let nib = NSNib(nibNamed: "HomepageCollectionViewItem", bundle: nil)
         collectionView.register(nib, forItemWithIdentifier: HomepageCollectionViewItem.identifier)
+
+        NotificationCenter.default.addObserver(self,
+                                               selector: #selector(displayDefaultBrowserPromptIfNeeded),
+                                               name: NSApplication.didBecomeActiveNotification,
+                                               object: nil)
 
         subscribeToBookmarkList()
     }
@@ -63,6 +74,29 @@ class HomepageViewController: NSViewController {
         super.viewDidLayout()
 
         adjustCollectionViewHeight()
+    }
+
+    override func viewWillAppear() {
+        super.viewWillAppear()
+
+        displayDefaultBrowserPromptIfNeeded()
+    }
+
+    func layoutDefaultBrowserPromptView() {
+        defaultBrowserPromptView.delegate = self
+        defaultBrowserPromptView.translatesAutoresizingMaskIntoConstraints = false
+        self.view.addSubview(defaultBrowserPromptView)
+
+        defaultBrowserPromptView.heightAnchor.constraint(equalToConstant: Constants.defaltPromptViewHeight).isActive = true
+        defaultBrowserPromptView.topAnchor.constraint(equalTo: self.view.topAnchor).isActive = true
+        defaultBrowserPromptView.leadingAnchor.constraint(equalTo: self.view.leadingAnchor).isActive = true
+        defaultBrowserPromptView.trailingAnchor.constraint(equalTo: self.view.trailingAnchor).isActive = true
+        defaultBrowserPromptView.bottomAnchor.constraint(lessThanOrEqualTo: collectionView.topAnchor).isActive = true
+    }
+
+    @objc
+    private func displayDefaultBrowserPromptIfNeeded() {
+        defaultBrowserPromptView.isHidden = Browser.isDefault || defaultBrowserPromptDismissed
     }
 
     private func subscribeToBookmarkList() {
@@ -116,6 +150,20 @@ class HomepageViewController: NSViewController {
         view.window?.addChildWindow(window, ordered: .above)
         window.setFrame(windowFrame, display: true)
         window.makeKey()
+    }
+
+}
+
+extension HomepageViewController: DefaultBrowserPromptViewDelegate {
+
+    func defaultBrowserPromptViewDismissed(_ view: DefaultBrowserPromptView) {
+        defaultBrowserPromptDismissed = true
+        displayDefaultBrowserPromptIfNeeded()
+    }
+
+    func defaultBrowserPromptViewRequestedDefaultBrowserPrompt(_ view: DefaultBrowserPromptView) {
+        Browser.becomeDefault()
+        displayDefaultBrowserPromptIfNeeded()
     }
 
 }

@@ -37,7 +37,7 @@
                                     <color key="backgroundColor" name="ClearColor"/>
                                 </clipView>
                                 <constraints>
-                                    <constraint firstAttribute="height" priority="250" constant="216" id="B9J-V4-PQV"/>
+                                    <constraint firstAttribute="height" constant="216" id="B9J-V4-PQV"/>
                                     <constraint firstAttribute="width" priority="250" constant="562" id="KJY-Xv-KbH"/>
                                 </constraints>
                                 <scroller key="horizontalScroller" hidden="YES" wantsLayer="YES" verticalHuggingPriority="750" horizontal="YES" id="Jii-b1-70r">

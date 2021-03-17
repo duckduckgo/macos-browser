@@ -1190,8 +1190,6 @@
 				AA585D83248FD31100E9A3E2 /* BrowserTabViewController.swift */,
 				856C98A5256EB59600A22F1F /* MenuItemSelectors.swift */,
 				AA6FFB4524DC3B5A0028F4D0 /* WebView.swift */,
-				4B65027925E5F2B10054432E /* DefaultBrowserPromptView.swift */,
-				4B65027425E5F2A70054432E /* DefaultBrowserPromptView.xib */,
 			);
 			path = View;
 			sourceTree = "<group>";
@@ -1485,6 +1483,8 @@
 			children = (
 				AAE71E2B25F781EA00D74437 /* Homepage.storyboard */,
 				AAE71E3025F7855400D74437 /* HomepageViewController.swift */,
+				4B65027925E5F2B10054432E /* DefaultBrowserPromptView.swift */,
+				4B65027425E5F2A70054432E /* DefaultBrowserPromptView.xib */,
 				AAE71E3525F7869300D74437 /* HomepageCollectionViewItem.swift */,
 				AAE71E3625F7869300D74437 /* HomepageCollectionViewItem.xib */,
 				AA72D5E225FE977F00C77619 /* AddEditFavoriteViewController.swift */,
