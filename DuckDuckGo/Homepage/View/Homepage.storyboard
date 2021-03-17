@@ -37,24 +37,26 @@
                                     <color key="backgroundColor" name="ClearColor"/>
                                 </clipView>
                                 <constraints>
+                                    <constraint firstAttribute="height" priority="250" constant="216" id="B9J-V4-PQV"/>
                                     <constraint firstAttribute="width" priority="250" constant="562" id="KJY-Xv-KbH"/>
-                                    <constraint firstAttribute="height" priority="250" constant="216" id="u4x-RV-S2R"/>
                                 </constraints>
                                 <scroller key="horizontalScroller" hidden="YES" wantsLayer="YES" verticalHuggingPriority="750" horizontal="YES" id="Jii-b1-70r">
                                     <rect key="frame" x="-100" y="-100" width="233" height="15"/>
                                     <autoresizingMask key="autoresizingMask"/>
                                 </scroller>
                                 <scroller key="verticalScroller" hidden="YES" wantsLayer="YES" verticalHuggingPriority="750" doubleValue="1" horizontal="NO" id="M0e-YE-E1d">
-                                    <rect key="frame" x="-100" y="-100" width="15" height="143"/>
+                                    <rect key="frame" x="546" y="0.0" width="16" height="215"/>
                                     <autoresizingMask key="autoresizingMask"/>
                                 </scroller>
                             </scrollView>
                         </subviews>
                         <constraints>
-                            <constraint firstItem="yHP-1u-VXv" firstAttribute="centerX" secondItem="Veh-DK-43v" secondAttribute="centerX" id="Ee0-wc-Wwv"/>
+                            <constraint firstAttribute="bottom" relation="greaterThanOrEqual" secondItem="yHP-1u-VXv" secondAttribute="bottom" constant="20" id="88q-UH-Ss9"/>
+                            <constraint firstItem="yHP-1u-VXv" firstAttribute="centerY" secondItem="Veh-DK-43v" secondAttribute="centerY" id="Cc3-wS-Y0b"/>
                             <constraint firstAttribute="trailing" relation="greaterThanOrEqual" secondItem="yHP-1u-VXv" secondAttribute="trailing" constant="20" id="Loo-dG-uq6"/>
-                            <constraint firstItem="yHP-1u-VXv" firstAttribute="centerY" secondItem="Veh-DK-43v" secondAttribute="centerY" id="WaZ-dB-23C"/>
+                            <constraint firstItem="yHP-1u-VXv" firstAttribute="top" relation="greaterThanOrEqual" secondItem="Veh-DK-43v" secondAttribute="top" constant="20" id="gXZ-9j-16Z"/>
                             <constraint firstItem="yHP-1u-VXv" firstAttribute="leading" relation="greaterThanOrEqual" secondItem="Veh-DK-43v" secondAttribute="leading" constant="20" id="pUh-al-NUM"/>
+                            <constraint firstItem="yHP-1u-VXv" firstAttribute="centerX" secondItem="Veh-DK-43v" secondAttribute="centerX" id="rYE-l9-Pkw"/>
                         </constraints>
                         <userDefinedRuntimeAttributes>
                             <userDefinedRuntimeAttribute type="color" keyPath="backgroundColor">
@@ -64,6 +66,7 @@
                     </view>
                     <connections>
                         <outlet property="collectionView" destination="MU6-iJ-Oba" id="dUx-ve-GKd"/>
+                        <outlet property="collectionViewHeight" destination="B9J-V4-PQV" id="vtf-ez-uP2"/>
                     </connections>
                 </viewController>
                 <customObject id="0P8-8S-i0z" userLabel="First Responder" customClass="NSResponder" sceneMemberID="firstResponder"/>

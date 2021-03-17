@@ -23,9 +23,11 @@ class HomepageViewController: NSViewController {
 
     enum Constants {
         static let maxNumberOfFavorites = 10
+        static let collectionViewMinimumHeight: CGFloat = 216
     }
 
     @IBOutlet weak var collectionView: NSCollectionView!
+    @IBOutlet weak var collectionViewHeight: NSLayoutConstraint!
 
     private let tabCollectionViewModel: TabCollectionViewModel
     private var bookmarkManager: BookmarkManager
@@ -57,6 +59,12 @@ class HomepageViewController: NSViewController {
         subscribeToBookmarkList()
     }
 
+    override func viewDidLayout() {
+        super.viewDidLayout()
+
+        adjustCollectionViewHeight()
+    }
+
     private func subscribeToBookmarkList() {
         bookmarkListCancellable = bookmarkManager.listPublisher
             .receive(on: DispatchQueue.main)
@@ -70,6 +78,13 @@ class HomepageViewController: NSViewController {
         topFavorites = Array(bookmarkList.bookmarks()
             .filter { $0.isFavorite }
             .prefix(Constants.maxNumberOfFavorites))
+            .reversed()
+    }
+
+    private func adjustCollectionViewHeight() {
+        if let layout = collectionView.collectionViewLayout {
+            collectionViewHeight.constant = max(layout.collectionViewContentSize.height, Constants.collectionViewMinimumHeight)
+        }
     }
 
     // MARK: - Add/Edit Favorite Popover
