@@ -32,9 +32,12 @@ extension NibLoadable where Self: NSView {
     }
 
     static func createFromNib(in bundle: Bundle = Bundle.main) -> Self {
-        var objects: NSArray?
+        var objects: NSArray!
         bundle.loadNibNamed(NSNib.Name(nibName), owner: self, topLevelObjects: &objects)
-        let views = (objects!).filter { $0 is Self }
+        guard objects != nil else {
+            fatalError("NibLoadable: Could not load nib")
+        }
+        let views = objects.filter { $0 is Self }
 
         // swiftlint:disable force_cast
         return views.last as! Self

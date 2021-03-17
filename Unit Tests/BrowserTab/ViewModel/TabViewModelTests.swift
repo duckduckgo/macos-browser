@@ -129,7 +129,7 @@ class TabViewModelTests: XCTestCase {
 
     func testWhenTabDownloadedFaviconThenFaviconIsNotNil() {
         let tabViewModel = TabViewModel.aTabViewModel
-        tabViewModel.tab.url = URL.duckDuckGo
+        tabViewModel.tab.url = URL(string: "http://apple.com")
 
         let faviconExpectation = expectation(description: "Favicon")
 
