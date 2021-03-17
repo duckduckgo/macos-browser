@@ -41,7 +41,7 @@ class ExternalURLHandlerTests: XCTestCase {
         handler.handle(url: Self.smsUrl, onPage: Self.pageUrl, fromFrame: false, triggeredByUser: false)
         handler.handle(url: Self.smsUrl, onPage: Self.pageUrl, fromFrame: false, triggeredByUser: false)
 
-        waitForExpectations(timeout: 1.0)
+        waitForExpectations(timeout: 3.0)
 
         // when the page changes we should get the next external url
         e = expectation(description: "Handler should be fired again")
