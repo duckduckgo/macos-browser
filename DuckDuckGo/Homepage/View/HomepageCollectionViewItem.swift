@@ -46,7 +46,7 @@ class HomepageCollectionViewItem: NSCollectionViewItem {
     @IBOutlet weak var narrowBorderView: ColorView!
     @IBOutlet weak var croppingView: ColorView!
     @IBOutlet weak var overlayView: ColorView!
-    @IBOutlet weak var faviconImageView: BorderImageView!
+    @IBOutlet weak var faviconImageView: NSImageView!
     @IBOutlet weak var representingCharacterTextField: NSTextField!
     @IBOutlet weak var titleTextField: NSTextField!
     @IBOutlet weak var mouseOverView: MouseOverView!
