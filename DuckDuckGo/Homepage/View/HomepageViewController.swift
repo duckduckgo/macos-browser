@@ -102,7 +102,6 @@ class HomepageViewController: NSViewController {
     private func subscribeToBookmarkList() {
         bookmarkListCancellable = bookmarkManager.listPublisher
             .receive(on: DispatchQueue.main)
-            .dropFirst()
             .sink { [weak self] bookmarkList in
                 self?.updateFavourites(from: bookmarkList)
             }
