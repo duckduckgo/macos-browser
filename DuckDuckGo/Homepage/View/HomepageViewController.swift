@@ -21,6 +21,26 @@ import Combine
 
 class HomepageViewController: NSViewController {
 
+    // Temporary placeholders that are displayed when user has no favorites
+    // Should be removed when the search element of the homepage is implemented
+    static let favoritePlaceholders: [Bookmark] = [
+        Bookmark(url: URL.duckDuckGo,
+                 title: "Search",
+                 favicon: NSImage(named: "Logo"),
+                 isFavorite: true,
+                 managedObjectId: nil),
+        Bookmark(url: URL(string: "https://spreadprivacy.com/")!,
+                 title: "Spread Privacy",
+                 favicon: NSImage(named: "Logo"),
+                 isFavorite: true,
+                 managedObjectId: nil),
+        Bookmark(url: URL(string: "https://duckduckgo.com/app")!,
+                 title: "Apps",
+                 favicon: NSImage(named: "Logo"),
+                 isFavorite: true,
+                 managedObjectId: nil)
+    ]
+
     enum Constants {
         static let maxNumberOfFavorites = 10
         static let defaltPromptViewHeight: CGFloat = 66
@@ -108,10 +128,17 @@ class HomepageViewController: NSViewController {
     }
 
     private func updateFavourites(from bookmarkList: BookmarkList) {
-        topFavorites = Array(bookmarkList.bookmarks()
-            .filter { $0.isFavorite }
-            .prefix(Constants.maxNumberOfFavorites))
-            .reversed()
+        guard let favorites = bookmarkList.bookmarks()?.filter({ $0.isFavorite }) else {
+            return
+        }
+
+        if favorites.isEmpty {
+            topFavorites = Self.favoritePlaceholders
+        } else {
+            topFavorites = Array(favorites
+                                    .prefix(Constants.maxNumberOfFavorites)
+                                    .reversed())
+        }
     }
 
     private func adjustCollectionViewHeight() {

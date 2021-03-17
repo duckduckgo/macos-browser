@@ -34,7 +34,11 @@ struct BookmarkList {
         itemsDict[bookmark.url] = bookmark
     }
 
+    var reinitialised = false
+
     mutating func reinit(with bookmarks: [Bookmark]) {
+        reinitialised = true
+
         let keysOrdered = bookmarks.map { $0.url }
 
         var itemsDict = [URL: Bookmark]()
@@ -77,8 +81,10 @@ struct BookmarkList {
         return newBookmark
     }
 
-    func bookmarks() -> [Bookmark] {
-        keysOrdered
+    func bookmarks() -> [Bookmark]? {
+        guard reinitialised else { return nil }
+
+        return keysOrdered
             .map { itemsDict[$0] }
             .compactMap { $0 }
     }
