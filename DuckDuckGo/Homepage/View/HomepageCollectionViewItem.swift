@@ -60,10 +60,8 @@ class HomepageCollectionViewItem: NSCollectionViewItem {
     }
 
     func set(bookmarkViewModel: BookmarkViewModel) {
-        if let size = bookmarkViewModel.bookmark.favicon?.size,
-           size.width >= CGFloat(Size.width),
-           size.height >= CGFloat(Size.width) {
-            faviconImageView.image = bookmarkViewModel.bookmark.favicon
+        if let favicon = bookmarkViewModel.bookmark.favicon {
+            faviconImageView.image = favicon
             faviconImageView.layer?.backgroundColor = NSColor.clear.cgColor
             representingCharacterTextField.isHidden = true
         } else {
