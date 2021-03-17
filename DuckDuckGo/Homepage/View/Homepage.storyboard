@@ -15,8 +15,8 @@
                         <rect key="frame" x="0.0" y="0.0" width="628" height="381"/>
                         <autoresizingMask key="autoresizingMask"/>
                         <subviews>
-                            <scrollView wantsLayer="YES" borderType="none" autohidesScrollers="YES" horizontalLineScroll="10" horizontalPageScroll="10" verticalLineScroll="10" verticalPageScroll="10" hasHorizontalScroller="NO" usesPredominantAxisScrolling="NO" translatesAutoresizingMaskIntoConstraints="NO" id="yHP-1u-VXv">
-                                <rect key="frame" x="33" y="83" width="562" height="216"/>
+                            <scrollView wantsLayer="YES" borderType="none" autohidesScrollers="YES" horizontalLineScroll="10" horizontalPageScroll="10" verticalLineScroll="10" verticalPageScroll="10" hasHorizontalScroller="NO" usesPredominantAxisScrolling="NO" horizontalScrollElasticity="none" verticalScrollElasticity="none" translatesAutoresizingMaskIntoConstraints="NO" id="yHP-1u-VXv">
+                                <rect key="frame" x="33" y="93" width="562" height="216"/>
                                 <clipView key="contentView" drawsBackground="NO" id="w2D-bw-AI3">
                                     <rect key="frame" x="0.0" y="0.0" width="562" height="216"/>
                                     <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
@@ -52,7 +52,7 @@
                         </subviews>
                         <constraints>
                             <constraint firstAttribute="bottom" relation="greaterThanOrEqual" secondItem="yHP-1u-VXv" secondAttribute="bottom" constant="20" id="88q-UH-Ss9"/>
-                            <constraint firstItem="yHP-1u-VXv" firstAttribute="centerY" secondItem="Veh-DK-43v" secondAttribute="centerY" id="Cc3-wS-Y0b"/>
+                            <constraint firstItem="yHP-1u-VXv" firstAttribute="centerY" secondItem="Veh-DK-43v" secondAttribute="centerY" constant="-10" id="Cc3-wS-Y0b"/>
                             <constraint firstAttribute="trailing" relation="greaterThanOrEqual" secondItem="yHP-1u-VXv" secondAttribute="trailing" constant="20" id="Loo-dG-uq6"/>
                             <constraint firstItem="yHP-1u-VXv" firstAttribute="top" relation="greaterThanOrEqual" secondItem="Veh-DK-43v" secondAttribute="top" constant="20" id="gXZ-9j-16Z"/>
                             <constraint firstItem="yHP-1u-VXv" firstAttribute="leading" relation="greaterThanOrEqual" secondItem="Veh-DK-43v" secondAttribute="leading" constant="20" id="pUh-al-NUM"/>
