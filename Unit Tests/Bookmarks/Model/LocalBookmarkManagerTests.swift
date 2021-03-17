@@ -134,9 +134,11 @@ class LocalBookmarkManagerTests: XCTestCase {
         let bookmarkManager = LocalBookmarkManager(bookmarkStore: bookmarkStoreMock)
 
         bookmarkManager.update(bookmark: Bookmark.aBookmark)
+        let updateUrlResult = bookmarkManager.updateUrl(of: Bookmark.aBookmark, to: URL.duckDuckGoAutocomplete)
 
         XCTAssertFalse(bookmarkManager.isUrlBookmarked(url: Bookmark.aBookmark.url))
         XCTAssertFalse(bookmarkStoreMock.updateCalled)
+        XCTAssertNil(updateUrlResult)
     }
 
     func testWhenBookmarkIsUpdated_ThenManagerUpdatesItInStore() {
@@ -151,6 +153,25 @@ class LocalBookmarkManagerTests: XCTestCase {
         bookmarkManager.update(bookmark: bookmark)
 
         XCTAssert(bookmarkManager.isUrlBookmarked(url: bookmark.url))
+        XCTAssert(bookmarkStoreMock.updateCalled)
+    }
+
+    func testWhenBookmarkUrlIsUpdated_ThenManagerUpdatesItAlsoInStore() {
+        let bookmarkStoreMock = BookmarkStoreMock()
+        let bookmarkManager = LocalBookmarkManager(bookmarkStore: bookmarkStoreMock)
+
+        let objectId = NSManagedObjectID()
+        bookmarkStoreMock.managedObjectId = objectId
+        var bookmark = bookmarkManager.makeBookmark(for: URL.duckDuckGo, title: "Title", favicon: nil, isFavorite: false)!
+
+        bookmark.isFavorite = !bookmark.isFavorite
+
+        let newURL = URL.duckDuckGoAutocomplete
+        let newBookmark = bookmarkManager.updateUrl(of: bookmark, to: newURL)
+
+        XCTAssertFalse(bookmarkManager.isUrlBookmarked(url: bookmark.url))
+        XCTAssert(bookmarkManager.isUrlBookmarked(url: newBookmark!.url))
+        XCTAssert(bookmarkManager.isUrlBookmarked(url: newURL))
         XCTAssert(bookmarkStoreMock.updateCalled)
     }
 
