@@ -472,10 +472,10 @@ extension TabBarViewController: NSCollectionViewDataSource {
     func collectionView(_ collectionView: NSCollectionView, itemForRepresentedObjectAt indexPath: IndexPath) -> NSCollectionViewItem {
         let item = collectionView.makeItem(withIdentifier: TabBarViewItem.identifier, for: indexPath)
         guard let tabBarViewItem = item as? TabBarViewItem else {
-            os_log("TabBarViewController: Failed to get reusable TabBarViewItem instance", type: .error)
+            assertionFailure("TabBarViewController: Failed to get reusable TabBarViewItem instance")
             return item
         }
-        
+
         guard let tabViewModel = tabCollectionViewModel.tabViewModel(at: indexPath.item) else {
             tabBarViewItem.clear()
             return tabBarViewItem
@@ -483,6 +483,7 @@ extension TabBarViewController: NSCollectionViewDataSource {
 
         tabBarViewItem.delegate = self
         tabBarViewItem.subscribe(to: tabViewModel)
+
         return tabBarViewItem
     }
 

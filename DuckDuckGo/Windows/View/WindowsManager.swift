@@ -35,9 +35,7 @@ final class WindowsManager {
 
     @discardableResult
     class func openNewWindow(with tabCollectionViewModel: TabCollectionViewModel? = nil, droppingPoint: NSPoint? = nil) -> NSWindow? {
-        guard let mainWindowController = makeNewWindow(tabCollectionViewModel: tabCollectionViewModel) else {
-            return nil
-        }
+        let mainWindowController = makeNewWindow(tabCollectionViewModel: tabCollectionViewModel)
 
         if let droppingPoint = droppingPoint {
             mainWindowController.window?.setFrameOrigin(droppingPoint: droppingPoint)
@@ -54,16 +52,10 @@ final class WindowsManager {
     }
 
     class func openNewWindow(with initialUrl: URL) {
-        guard let mainWindowController = makeNewWindow() else {
-            return
-        }
-
+        let mainWindowController = makeNewWindow()
         mainWindowController.showWindow(self)
 
-        guard let mainViewController = mainWindowController.contentViewController as? MainViewController else {
-            os_log("MainWindowController: Failed to get reference to main view controller", type: .error)
-            return
-        }
+        let mainViewController = mainWindowController.mainViewController
         guard let newTab = mainViewController.tabCollectionViewModel.tabCollection.tabs.first else {
             os_log("MainWindowController: Failed to get initial tab", type: .error)
             return
@@ -72,15 +64,26 @@ final class WindowsManager {
         newTab.url = initialUrl
     }
 
-    private class func makeNewWindow(tabCollectionViewModel: TabCollectionViewModel? = nil) -> MainWindowController? {
-        let mainViewController = NSStoryboard(name: "Main", bundle: nil)
-            .instantiateController(identifier: .mainViewController) { coder -> MainViewController? in
-                if let tabCollectionViewModel = tabCollectionViewModel {
-                    return MainViewController(coder: coder, tabCollectionViewModel: tabCollectionViewModel)
-                } else {
-                    return MainViewController(coder: coder)
-                }
+    private class func makeNewWindow(tabCollectionViewModel: TabCollectionViewModel? = nil) -> MainWindowController {
+        let mainViewController: MainViewController
+        do {
+            mainViewController = try NSException.catch {
+                NSStoryboard(name: "Main", bundle: .main)
+                    .instantiateController(identifier: .mainViewController) { coder -> MainViewController? in
+                        if let tabCollectionViewModel = tabCollectionViewModel {
+                            return MainViewController(coder: coder, tabCollectionViewModel: tabCollectionViewModel)
+                        } else {
+                            return MainViewController(coder: coder)
+                        }
+                    }
             }
+        } catch {
+#if DEBUG
+            fatalError("WindowsManager.makeNewWindow: \(error)")
+#else
+            fatalError("WindowsManager.makeNewWindow: the App Bundle seems to be removed")
+#endif
+        }
 
         return MainWindowController(mainViewController: mainViewController)
     }

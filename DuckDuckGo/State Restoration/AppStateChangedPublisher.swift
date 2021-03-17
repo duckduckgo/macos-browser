@@ -37,7 +37,7 @@ extension TabCollectionViewModel {
 
 extension MainWindowController {
     var stateChanged: AnyPublisher<Void, Never> {
-        mainViewController!.tabCollectionViewModel.stateChanged
+        mainViewController.tabCollectionViewModel.stateChanged
             .merge(with: window!.publisher(for: \.frame).asVoid())
             .eraseToAnyPublisher()
     }

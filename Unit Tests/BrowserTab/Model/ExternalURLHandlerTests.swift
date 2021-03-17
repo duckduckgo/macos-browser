@@ -32,22 +32,21 @@ final class ExternalURLHandlerTests: XCTestCase {
         let handler = ExternalURLHandler(collectionTimeMillis: 300)
         var cancellable: AnyCancellable?
 
-        var count = 0
+        var e = expectation(description: "One sms handler fired")
         cancellable = handler.openExternalUrlPublisher.sink { _ in
-            count += 1
+            e.fulfill()
         }
 
         handler.handle(url: Self.smsUrl, onPage: Self.pageUrl, fromFrame: false, triggeredByUser: false)
         handler.handle(url: Self.smsUrl, onPage: Self.pageUrl, fromFrame: false, triggeredByUser: false)
         handler.handle(url: Self.smsUrl, onPage: Self.pageUrl, fromFrame: false, triggeredByUser: false)
 
-        RunLoop.current.run(until: Date().addingTimeInterval(0.5)) // allow the debounce to happen
-        XCTAssertEqual(1, count)
+        waitForExpectations(timeout: 3.0)
 
         // when the page changes we should get the next external url
+        e = expectation(description: "Handler should be fired again")
         handler.handle(url: Self.facetimeUrl, onPage: Self.nextPageUrl, fromFrame: false, triggeredByUser: false)
-        RunLoop.current.run(until: Date().addingTimeInterval(0.5)) // allow the debounce to happen
-        XCTAssertEqual(2, count)
+        waitForExpectations(timeout: 1.0)
 
         cancellable?.cancel()
     }

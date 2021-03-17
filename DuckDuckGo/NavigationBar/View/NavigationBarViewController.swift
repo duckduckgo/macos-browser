@@ -69,8 +69,7 @@ final class NavigationBarViewController: NSViewController {
     @IBSegueAction func createAddressBarViewController(_ coder: NSCoder) -> AddressBarViewController? {
         guard let addressBarViewController = AddressBarViewController(coder: coder,
                                                                       tabCollectionViewModel: tabCollectionViewModel) else {
-            os_log("NavigationBarViewController: Failed to init AddressBarViewController", type: .error)
-            return nil
+            fatalError("NavigationBarViewController: Failed to init AddressBarViewController")
         }
 
         self.addressBarViewController = addressBarViewController

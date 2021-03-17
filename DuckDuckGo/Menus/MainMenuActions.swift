@@ -50,10 +50,7 @@ extension AppDelegate {
             return
         }
 
-        guard let mainViewController = windowController.mainViewController else {
-            os_log("AppDelegate: No main view controller", type: .error)
-            return
-        }
+        let mainViewController = windowController.mainViewController
 
         DefaultConfigurationStorage.shared.log()
         ConfigurationManager.shared.log()
@@ -256,6 +253,12 @@ extension MainViewController {
             // Release builds work fine.
             webView.printOperation(with: NSPrintInfo.shared).run()
         }
+    }
+
+    // MARK: - Debug
+
+    @IBAction func resetDefaultBrowserPrompt(_ sender: Any?) {
+        UserDefaultsWrapper<Bool>.clear(.defaultBrowserDismissed)
     }
 
 }

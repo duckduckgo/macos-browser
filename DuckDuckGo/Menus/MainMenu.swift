@@ -44,6 +44,8 @@ final class MainMenu: NSMenu {
         case help = 7
         case helpSeparator = 71
         case sendFeedback = 72
+        case debug = 8
+        case debugResetDefaultBrowserPrompt = 80
     }
 
     var backMenuItem: NSMenuItem? {
@@ -89,6 +91,10 @@ final class MainMenu: NSMenu {
     var sendFeedbackMenuItem: NSMenuItem? {
         helpMenuItem?.submenu?.item(withTag: Tag.sendFeedback.rawValue)
     }
+
+    var debugMenuItem: NSMenuItem? {
+        item(withTag: Tag.debug.rawValue)
+    }
   
     override func update() {
         super.update()
@@ -123,6 +129,14 @@ final class MainMenu: NSMenu {
 
         helpMenuItemSubmenu.removeItem(helpSeparatorMenuItem)
         helpMenuItemSubmenu.removeItem(sendFeedbackMenuItem)
+
+#endif
+
+#if !DEBUG
+
+        if let item = debugMenuItem {
+            removeItem(item)
+        }
 
 #endif
 

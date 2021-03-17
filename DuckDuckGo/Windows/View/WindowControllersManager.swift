@@ -48,11 +48,7 @@ extension WindowControllersManager {
     func show(url: URL) {
 
         func show(url: URL, in windowController: MainWindowController) {
-            guard let viewController = windowController.mainViewController else {
-                assertionFailure("WindowControllersManager: Failed to reference registered")
-                return
-            }
-
+            let viewController = windowController.mainViewController
             windowController.window?.makeKeyAndOrderFront(self)
 
             let tabCollectionViewModel = viewController.tabCollectionViewModel
@@ -114,8 +110,8 @@ extension WindowControllersManager: ApplicationDockMenuDataSource {
         }
 
         let windowController = mainWindowControllers[windowMenuItemIndex]
-        guard let mainViewController = windowController.mainViewController,
-              let selectedTabViewModel = mainViewController.tabCollectionViewModel.selectedTabViewModel else {
+        let mainViewController = windowController.mainViewController
+        guard let selectedTabViewModel = mainViewController.tabCollectionViewModel.selectedTabViewModel else {
             os_log("WindowControllersManager: Cannot get selected tab view model", type: .error)
             return "-"
         }

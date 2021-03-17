@@ -28,10 +28,18 @@ final class BrowserTabViewController: NSViewController {
     var tabViewModel: TabViewModel?
 
     private let tabCollectionViewModel: TabCollectionViewModel
+    private var urlCancellable: AnyCancellable?
     private var selectedTabViewModelCancellable: AnyCancellable?
     private var isErrorViewVisibleCancellable: AnyCancellable?
     private var contextMenuLink: URL?
     private var contextMenuImage: URL?
+    private var defaultBrowserPromptView: DefaultBrowserPromptView?
+    private var canShowEmptyTabInterface: Bool {
+        return tabViewModel?.tab.url == nil
+    }
+
+    @UserDefaultsWrapper(key: .defaultBrowserDismissed, defaultValue: false)
+    var defaultBrowserPromptDismissed: Bool
 
     required init?(coder: NSCoder) {
         fatalError("BrowserTabViewController: Bad initializer")
@@ -46,15 +54,83 @@ final class BrowserTabViewController: NSViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
 
+        NotificationCenter.default.addObserver(self,
+                                               selector: #selector(displayDefaultBrowserPromptIfNeeded),
+                                               name: NSApplication.didBecomeActiveNotification,
+                                               object: nil)
+
         subscribeToSelectedTabViewModel()
         subscribeToIsErrorViewVisible()
     }
 
     private func subscribeToSelectedTabViewModel() {
-        selectedTabViewModelCancellable = tabCollectionViewModel.$selectedTabViewModel.receive(on: DispatchQueue.main).sink { [weak self] _ in
-            self?.changeWebView()
+        selectedTabViewModelCancellable = tabCollectionViewModel.$selectedTabViewModel.receive(on: DispatchQueue.main).sink { [weak self] viewModel in
+            self?.updateInterface(url: viewModel?.tab.url)
             self?.subscribeToIsErrorViewVisible()
         }
+    }
+
+    /// Takes a URL and decided what to do with the UI. There are three states:
+    ///
+    /// 1. No URL is provided, so the webview should be hidden in favor of showing the default UI elements.
+    /// 2. A URL is provided for the first time, so the webview should be added as a subview and the URL should be loaded.
+    /// 3. A URL is provided after already adding the webview, so the webview should be reloaded.
+    private func updateInterface(url: URL?) {
+        changeWebView()
+
+        if url != nil {
+            showWebView()
+        } else {
+            showDefaultTabInterface()
+        }
+    }
+
+    private func showWebView() {
+        defaultBrowserPromptView?.removeFromSuperview()
+        defaultBrowserPromptView = nil
+
+        if let webView = self.webView {
+            addWebViewToViewHierarchy(webView)
+        }
+    }
+
+    private func showDefaultTabInterface() {
+        self.webView?.removeFromSuperview()
+        displayDefaultBrowserPromptIfNeeded()
+    }
+
+    @objc
+    private func displayDefaultBrowserPromptIfNeeded() {
+        if Browser.isDefault || defaultBrowserPromptDismissed {
+            defaultBrowserPromptView?.removeFromSuperview()
+            defaultBrowserPromptView = nil
+        } else {
+            guard self.defaultBrowserPromptView == nil, canShowEmptyTabInterface else { return }
+
+            let view = DefaultBrowserPromptView.createFromNib()
+            view.delegate = self
+            view.translatesAutoresizingMaskIntoConstraints = false
+            self.view.addSubview(view)
+
+            view.topAnchor.constraint(equalTo: self.view.topAnchor).isActive = true
+            view.leadingAnchor.constraint(equalTo: self.view.leadingAnchor).isActive = true
+            view.trailingAnchor.constraint(equalTo: self.view.trailingAnchor).isActive = true
+
+            self.defaultBrowserPromptView = view
+        }
+    }
+
+    private func addWebViewToViewHierarchy(_ webView: WebView) {
+        // This code should ideally use Auto Layout, but in order to enable the web inspector, it needs to use springs & structs.
+        // The line at the bottom of this comment is the "correct" method of doing this, but breaks the inspector.
+        // Context: https://stackoverflow.com/questions/60727065/wkwebview-web-inspector-in-macos-app-fails-to-render-and-flickers-flashes
+        //
+        // view.addAndLayout(newWebView)
+
+        webView.frame = view.bounds
+        webView.autoresizingMask = [.width, .height]
+        view.addSubview(webView)
+        setFirstResponderIfNeeded()
     }
 
     private func changeWebView() {
@@ -64,19 +140,9 @@ final class BrowserTabViewController: NSViewController {
 
             let newWebView = tabViewModel.tab.webView
             newWebView.uiDelegate = self
-
-            // This code should ideally use Auto Layout, but in order to enable the web inspector, it needs to use springs & structs.
-            // The line at the bottom of this comment is the "correct" method of doing this, but breaks the inspector.
-            // Context: https://stackoverflow.com/questions/60727065/wkwebview-web-inspector-in-macos-app-fails-to-render-and-flickers-flashes
-            //
-            // view.addAndLayout(newWebView)
-
-            newWebView.frame = view.bounds
-            newWebView.autoresizingMask = [.width, .height]
-            view.addSubview(newWebView)
-
             webView = newWebView
-            setFirstResponderIfNeeded()
+
+            addWebViewToViewHierarchy(newWebView)
         }
 
         func removeOldWebView(_ oldWebView: WebView?) {
@@ -90,12 +156,21 @@ final class BrowserTabViewController: NSViewController {
             removeOldWebView(webView)
             return
         }
+
         guard self.tabViewModel !== tabViewModel else { return }
 
         let oldWebView = webView
         displayWebView(of: tabViewModel)
+        subscribeToUrl(of: tabViewModel)
         self.tabViewModel = tabViewModel
         removeOldWebView(oldWebView)
+    }
+
+    func subscribeToUrl(of tabViewModel: TabViewModel) {
+         urlCancellable?.cancel()
+         urlCancellable = tabViewModel.tab.$url.receive(on: DispatchQueue.main).sink { [weak self] url in
+            self?.updateInterface(url: url)
+         }
     }
 
     private func subscribeToIsErrorViewVisible() {
@@ -106,12 +181,8 @@ final class BrowserTabViewController: NSViewController {
 
     private func setFirstResponderIfNeeded() {
         guard let url = webView?.url else {
-            // Without this, in certain situations in dark mode the page will be white when there's no url
-            webView?.setValue(false, forKey: "drawsBackground")
             return
         }
-        
-        webView?.setValue(true, forKey: "drawsBackground")
 
         if !url.isDuckDuckGoSearch {
             DispatchQueue.main.async { [weak self] in
@@ -451,6 +522,20 @@ fileprivate extension NSAlert {
         alert.alertStyle = .warning
         alert.addButton(withTitle: UserText.ok)
         return alert
+    }
+
+}
+
+extension BrowserTabViewController: DefaultBrowserPromptViewDelegate {
+
+    func defaultBrowserPromptViewDismissed(_ view: DefaultBrowserPromptView) {
+        defaultBrowserPromptDismissed = true
+        displayDefaultBrowserPromptIfNeeded()
+    }
+
+    func defaultBrowserPromptViewRequestedDefaultBrowserPrompt(_ view: DefaultBrowserPromptView) {
+        Browser.becomeDefault()
+        displayDefaultBrowserPromptIfNeeded()
     }
 
 }

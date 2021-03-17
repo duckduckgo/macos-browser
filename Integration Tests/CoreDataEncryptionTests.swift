@@ -22,7 +22,7 @@ import XCTest
 import CryptoKit
 @testable import DuckDuckGo_Privacy_Browser
 
-final class CoreDataEncryptionTests: XCTestCase {
+class CoreDataEncryptionTests: XCTestCase {
 
     private lazy var mockValueTransformer: MockValueTransformer = {
         let name = NSValueTransformerName("MockValueTransformer")
@@ -39,32 +39,14 @@ final class CoreDataEncryptionTests: XCTestCase {
         try? EncryptedValueTransformer<NSString>.registerTransformer()
     }
 
-    func testSavingEncryptedValues() {
+    func testSavingIncorrectValueTypes() {
         let container = createInMemoryPersistentContainer()
         let context = container.viewContext
 
         context.performAndWait {
             let entity = PartiallyEncryptedEntity(context: context)
             entity.date = Date()
-            entity.encryptedString = "Hello, World" as NSString
-
-            do {
-                try context.save()
-            } catch {
-                XCTFail("Failed with Core Data error: \(error)")
-            }
-        }
-    }
-
-    func testFetchingEncryptedValues() {
-        let container = createInMemoryPersistentContainer()
-        let context = container.viewContext
-        let timestamp = Date()
-
-        context.performAndWait {
-            let entity = PartiallyEncryptedEntity(context: context)
-            entity.date = timestamp
-            entity.encryptedString = "Hello, World" as NSString
+            entity.encryptedString = 42 as NSNumber // This should not get saved, as value transformers check their types.
 
             do {
                 try context.save()
@@ -75,38 +57,10 @@ final class CoreDataEncryptionTests: XCTestCase {
 
         let result = firstPartiallyEncryptedEntity(context: context)
 
+        // It would be better if Core Data would fail to save in cases where the value can't be transformed. Right now it will instead have a nil
+        // value for that attribute.
         XCTAssertNotNil(result)
-        XCTAssertEqual(result?.date, timestamp)
-        XCTAssertEqual(result?.encryptedString, "Hello, World" as NSString)
-    }
-
-    func testValueTransformers() {
-        let transformer = self.mockValueTransformer
-        let container = createInMemoryPersistentContainer()
-        let context = container.viewContext
-
-        context.performAndWait {
-            let entity = MockEntity(context: context)
-            entity.mockString = "Test String" as NSString
-
-            do {
-                try context.save()
-            } catch {
-                XCTFail("Failed with Core Data error: \(error)")
-            }
-        }
-
-        XCTAssertEqual(transformer.numberOfTransformations, 1)
-
-        let request = NSFetchRequest<NSManagedObject>(entityName: "MockEntity")
-
-        do {
-            let results = try context.fetch(request)
-            let result = results[0] as? MockEntity
-            XCTAssertEqual(result?.mockString, "Transformed: Test String" as NSString)
-        } catch let error as NSError {
-            XCTFail("Could not fetch encrypted entity: \(error), \(error.userInfo)")
-        }
+        XCTAssertNil(result?.encryptedString)
     }
 
     private func firstPartiallyEncryptedEntity(context: NSManagedObjectContext) -> PartiallyEncryptedEntity? {

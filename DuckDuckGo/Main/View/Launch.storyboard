@@ -509,6 +509,19 @@ CQ
                                     </items>
                                 </menu>
                             </menuItem>
+                            <menuItem title="Debug" tag="8" id="ilv-5f-YpZ" userLabel="Debug">
+                                <modifierMask key="keyEquivalentModifierMask"/>
+                                <menu key="submenu" title="Debug" systemMenu="help" autoenablesItems="NO" id="y0w-AM-Bho">
+                                    <items>
+                                        <menuItem title="Reset Default Browser Prompt" tag="80" id="3Ve-bg-l5b" userLabel="Reset Default Browser Prompt">
+                                            <modifierMask key="keyEquivalentModifierMask"/>
+                                            <connections>
+                                                <action selector="resetDefaultBrowserPrompt:" target="Ady-hI-5gd" id="Esm-iy-0kW"/>
+                                            </connections>
+                                        </menuItem>
+                                    </items>
+                                </menu>
+                            </menuItem>
                             <menuItem title="Help" tag="7" id="wpr-3q-Mcd">
                                 <modifierMask key="keyEquivalentModifierMask"/>
                                 <menu key="submenu" title="Help" systemMenu="help" id="F2S-fz-NVQ">
