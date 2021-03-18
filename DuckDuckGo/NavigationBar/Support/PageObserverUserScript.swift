@@ -25,7 +25,7 @@ protocol PageObserverUserScriptDelegate: AnyObject {
 
 }
 
-class PageObserverUserScript: NSObject, StaticUserScript {
+final class PageObserverUserScript: NSObject, StaticUserScript {
 
     weak var delegate: PageObserverUserScriptDelegate?
 

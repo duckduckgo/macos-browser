@@ -252,7 +252,13 @@ extension BrowserTabViewController: TabDelegate {
 
     func tabDidStartNavigation(_ tab: Tab) {
         setFirstResponderIfNeeded()
-        tabViewModel?.closeFindInPage()
+        guard let tabViewModel = tabViewModel else { return }
+
+        tabViewModel.closeFindInPage()
+        if !tabViewModel.isLoading,
+           tabViewModel.tab.webView.isLoading {
+            tabViewModel.isLoading = true
+        }
     }
 
     func tab(_ tab: Tab, requestedNewTab url: URL?, selected: Bool) {

@@ -86,7 +86,7 @@ final class Tab: NSObject {
     let webView: WebView
 	var userEnteredUrl = true
 
-    @Published var url: URL? {
+    @PublishedAfter var url: URL? {
         didSet {
             if oldValue?.host != url?.host {
                 fetchFavicon(nil, for: url?.host, isFromUserScript: false)
@@ -96,8 +96,8 @@ final class Tab: NSObject {
         }
     }
 
-    @Published var title: String?
-    @Published var error: Error?
+    @PublishedAfter var title: String?
+    @PublishedAfter var error: Error?
 
     weak var findInPage: FindInPageModel? {
         didSet {

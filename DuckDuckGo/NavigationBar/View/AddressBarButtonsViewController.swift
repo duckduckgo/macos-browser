@@ -42,7 +42,7 @@ final class AddressBarButtonsViewController: NSViewController {
     @IBOutlet weak var imageButtonWrapper: NSView!
     @IBOutlet weak var imageButton: NSButton!
     @IBOutlet weak var clearButton: NSButton!
-    @IBOutlet var progressIndicator: NSProgressIndicator!
+    @IBOutlet var progressIndicator: AnimatedProgressIndicator!
 
     @IBOutlet weak var fireproofedButtonDivider: NSBox! {
         didSet {
@@ -81,11 +81,9 @@ final class AddressBarButtonsViewController: NSViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
 
-        setupButtons()
+        setupUI()
         subscribeToSelectedTabViewModel()
         subscribeToBookmarkList()
-
-        // progressIndicator.startAnimation(self)
 
         NotificationCenter.default.addObserver(self,
                                                selector: #selector(showUndoFireproofingPopover(_:)),
@@ -174,15 +172,30 @@ final class AddressBarButtonsViewController: NSViewController {
         }
     }
 
-    private func setupButtons() {
+    private func setupUI() {
         bookmarkButton.position = .right
         privacyEntryPointButton.position = .left
+
+        progressIndicator.minValue = 0.0
+        progressIndicator.maxValue = 1.0
+        progressIndicator.doubleValue = 1.0
+        progressIndicator.usesThreadedAnimation = false
+        progressIndicator.isHidden = true
     }
 
     private func subscribeToSelectedTabViewModel() {
         selectedTabViewModelCancellable = tabCollectionViewModel.$selectedTabViewModel.receive(on: DispatchQueue.main).sink { [weak self] _ in
             self?.subscribeToUrl()
         }
+    }
+
+    private enum ProgressConstants {
+        static let initialValue = 0.15
+        static let max = 1.0
+        static let animationDuration = 0.2
+        static let fakeDelta = 0.1
+        static let fakeLimit = 0.8
+        static let fakeDuration: TimeInterval = 2.5
     }
 
     private func subscribeToUrl() {
@@ -196,30 +209,56 @@ final class AddressBarButtonsViewController: NSViewController {
             return
         }
 
-        progressIndicator?.isHidden = !selectedTabViewModel.isLoading
+        progressIndicator.isHidden = !selectedTabViewModel.isLoading
 
         urlCancellable = selectedTabViewModel.tab.$url.receive(on: DispatchQueue.main).sink { [weak self] _ in
             self?.updateBookmarkButtonImage()
         }
 
-        progressCancellable = selectedTabViewModel.$progress.receive(on: DispatchQueue.main).sink { [weak self] value in
-            let target = max(0.1, value) * 100
-            if selectedTabViewModel.isLoading {
-                self?.progressIndicator.doubleValue = target
+        progressCancellable = selectedTabViewModel.$progress.sink { [weak self] value in
+            guard selectedTabViewModel.isLoading,
+                  let progressIndicator = self?.progressIndicator
+            else { return }
+
+            let value = ProgressConstants.initialValue + (value * (ProgressConstants.max - ProgressConstants.initialValue))
+
+            let completion = {
+                // when reached current value continue progress for some extended time
+                let nextValue = max(progressIndicator.doubleValue,
+                                    min(progressIndicator.doubleValue + ProgressConstants.fakeDelta,
+                                        ProgressConstants.fakeLimit))
+                progressIndicator.setValue(nextValue, animationDuration: ProgressConstants.fakeDuration)
+            }
+
+            if progressIndicator.doubleValue < value {
+                progressIndicator.setValue(value,
+                                           animationDuration: ProgressConstants.animationDuration,
+                                           completion: completion)
+            } else {
+                progressIndicator.doubleValue = value
+                completion()
             }
         }
 
-        loadingCancellable = selectedTabViewModel.$isLoading.receive(on: DispatchQueue.main).sink { [weak self] value in
-            if value {
-                self?.progressIndicator.isHidden = false
-                self?.progressIndicator.doubleValue = 20
-            } else if self?.progressIndicator.doubleValue ?? 0 < 100 {
-                self?.progressIndicator.doubleValue = 100
-                DispatchQueue.main.asyncAfter(deadline: .now() + 0.7) {
-                    self?.progressIndicator.isHidden = true
-                }
-            }
+        loadingCancellable = selectedTabViewModel.$isLoading
+            .sink { [weak self] isLoading in
+                guard let progressIndicator = self?.progressIndicator else { return }
 
+                if isLoading {
+                    progressIndicator.isHidden = false
+                    progressIndicator.doubleValue = max(selectedTabViewModel.progress, ProgressConstants.initialValue)
+                    progressIndicator.setValue(progressIndicator.doubleValue + ProgressConstants.fakeDelta,
+                                               animationDuration: ProgressConstants.fakeDuration)
+
+                } else if !progressIndicator.isHidden {
+                    guard progressIndicator.doubleValue < ProgressConstants.max else {
+                        progressIndicator.isHidden = true
+                        return
+                    }
+                    progressIndicator.setValue(ProgressConstants.max, animationDuration: ProgressConstants.animationDuration) {
+                        progressIndicator.isHidden = true
+                    }
+                }
         }
     }
 

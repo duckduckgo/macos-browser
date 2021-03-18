@@ -26,7 +26,7 @@ final class AddressBarViewController: NSViewController {
     @IBOutlet weak var passiveTextField: NSTextField!
     @IBOutlet var inactiveBackgroundView: NSView!
     @IBOutlet var activeBackgroundView: NSView!
-    @IBOutlet var activeBackgroundViewOverHeight: NSLayoutConstraint!
+    @IBOutlet var activeBackgroundViewWithSuggestions: NSView!
 
     private(set) var addressBarButtonsViewController: AddressBarButtonsViewController?
     
@@ -126,7 +126,7 @@ final class AddressBarViewController: NSViewController {
             passiveTextField.stringValue = ""
             return
         }
-        passiveAddressBarStringCancellable = selectedTabViewModel.$passiveAddressBarString.receive(on: DispatchQueue.main).sink { [weak self] _ in
+        passiveAddressBarStringCancellable = selectedTabViewModel.$passiveAddressBarString.sink { [weak self] _ in
             self?.updatePassiveTextField()
         }
     }
@@ -169,7 +169,9 @@ final class AddressBarViewController: NSViewController {
             self?.shadowView.shadowSides = visible ? [.left, .top, .right] : .all
             self?.shadowView.shadowColor = visible ? .suggestionsShadowColor : .addressBarShadowColor
             self?.shadowView.shadowRadius = visible ? 8.0 : 4.0
-            self?.activeBackgroundViewOverHeight.isActive = visible
+
+            self?.activeBackgroundView.isHidden = visible
+            self?.activeBackgroundViewWithSuggestions.isHidden = !visible
         }
         frameCancellable = self.view.superview?.publisher(for: \.frame).sink { [weak self] _ in
             self?.layoutShadowView()

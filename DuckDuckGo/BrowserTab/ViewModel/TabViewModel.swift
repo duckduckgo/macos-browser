@@ -47,7 +47,7 @@ final class TabViewModel {
     }
 
     @Published private(set) var addressBarString: String = ""
-    @Published private(set) var passiveAddressBarString: String = ""
+    @PublishedAfter private(set) var passiveAddressBarString: String = ""
     @Published private(set) var title: String = UserText.tabHomeTitle
     @Published private(set) var favicon: NSImage = Favicon.home
     @Published private(set) var findInPage: FindInPageModel = FindInPageModel()
@@ -64,7 +64,7 @@ final class TabViewModel {
     }
 
     private func subscribeToUrl() {
-        tab.$url.receive(on: DispatchQueue.main).sink { [weak self] _ in
+        tab.$url.sink { [weak self] _ in
             self?.updateCanReload()
             self?.updateAddressBarStrings()
             self?.updateCanBeBookmarked()
@@ -72,7 +72,7 @@ final class TabViewModel {
     }
 
     private func subscribeToTitle() {
-        tab.$title.receive(on: DispatchQueue.main).sink { [weak self] _ in self?.updateTitle() } .store(in: &cancellables)
+        tab.$title.sink { [weak self] _ in self?.updateTitle() } .store(in: &cancellables)
     }
 
     private func subscribeToFavicon() {
