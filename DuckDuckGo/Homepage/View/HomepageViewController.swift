@@ -19,7 +19,7 @@
 import Cocoa
 import Combine
 
-class HomepageViewController: NSViewController {
+final class HomepageViewController: NSViewController {
 
     // Temporary placeholders that are displayed when user has no favorites
     // Should be removed when the search element of the homepage is implemented

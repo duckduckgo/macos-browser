@@ -19,7 +19,7 @@
 import Cocoa
 import Combine
 
-class AddEditFavoriteViewController: NSViewController {
+final class AddEditFavoriteViewController: NSViewController {
 
     @IBOutlet weak var headerTextField: NSTextField!
     @IBOutlet weak var titleInputTextField: NSTextField!

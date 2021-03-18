@@ -18,7 +18,7 @@
 
 import Cocoa
 
-class AddEditFavoriteWindow: NSWindow {
+final class AddEditFavoriteWindow: NSWindow {
 
     enum Size {
         static let width: CGFloat = 450

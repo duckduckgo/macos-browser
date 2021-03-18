@@ -27,7 +27,7 @@ protocol HomepageCollectionViewItemDelegate: AnyObject {
 
 }
 
-class HomepageCollectionViewItem: NSCollectionViewItem {
+final class HomepageCollectionViewItem: NSCollectionViewItem {
 
     static let identifier = NSUserInterfaceItemIdentifier(rawValue: "HomepageCollectionViewItem")
 
