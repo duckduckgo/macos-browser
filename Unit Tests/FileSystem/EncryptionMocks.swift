@@ -20,7 +20,7 @@ import XCTest
 import CryptoKit
 @testable import DuckDuckGo_Privacy_Browser
 
-class MockEncryptionKeyGenerator: EncryptionKeyGenerating {
+final class MockEncryptionKeyGenerator: EncryptionKeyGenerating {
 
     var numberOfKeysGenerated: Int = 0
 
@@ -31,7 +31,7 @@ class MockEncryptionKeyGenerator: EncryptionKeyGenerating {
 
 }
 
-class MockEncryptionKeyStore: EncryptionKeyStoring {
+final class MockEncryptionKeyStore: EncryptionKeyStoring {
 
     private(set) var storedKeys: [String: SymmetricKey] = [:]
     private let generator: EncryptionKeyGenerating
@@ -64,7 +64,7 @@ class MockEncryptionKeyStore: EncryptionKeyStoring {
 }
 
 // Value transformers are created by Core Data when required, and as such it's tricky to unit test them.
-class MockValueTransformer: ValueTransformer {
+final class MockValueTransformer: ValueTransformer {
     var numberOfTransformations = 0
     private let prefix = "Transformed: "
 

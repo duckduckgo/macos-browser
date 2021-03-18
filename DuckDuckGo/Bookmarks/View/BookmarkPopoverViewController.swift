@@ -24,7 +24,7 @@ protocol BookmarkPopoverViewControllerDelegate: AnyObject {
 
 }
 
-class BookmarkPopoverViewController: NSViewController {
+final class BookmarkPopoverViewController: NSViewController {
 
     static let favoriteImage = NSImage(named: "Favorite")
     static let favoriteFilledImage = NSImage(named: "FavoriteFilled")

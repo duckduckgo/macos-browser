@@ -18,7 +18,7 @@
 
 import Cocoa
 
-class TabBarFooter: NSView {
+final class TabBarFooter: NSView {
 
     static let identifier = NSUserInterfaceItemIdentifier(rawValue: "TabBarFooter")
 

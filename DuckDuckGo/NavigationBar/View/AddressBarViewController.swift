@@ -20,7 +20,7 @@ import Cocoa
 import os.log
 import Combine
 
-class AddressBarViewController: NSViewController {
+final class AddressBarViewController: NSViewController {
 
     @IBOutlet weak var addressBarTextField: AddressBarTextField!
     @IBOutlet weak var passiveTextField: NSTextField!

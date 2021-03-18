@@ -18,7 +18,7 @@
 
 import AppKit
 
-class UndoFireproofingViewController: NSViewController {
+final class UndoFireproofingViewController: NSViewController {
 
     enum Constants {
         static let storyboardName = "Fireproofing"

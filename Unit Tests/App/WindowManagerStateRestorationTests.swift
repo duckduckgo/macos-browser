@@ -19,7 +19,7 @@
 import XCTest
 @testable import DuckDuckGo_Privacy_Browser
 
-class WindowManagerStateRestorationTests: XCTestCase {
+final class WindowManagerStateRestorationTests: XCTestCase {
 
     override func setUp() {
     }

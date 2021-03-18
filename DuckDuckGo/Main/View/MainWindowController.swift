@@ -20,7 +20,7 @@ import Cocoa
 import os.log
 import Combine
 
-class MainWindowController: NSWindowController {
+final class MainWindowController: NSWindowController {
     private static let windowFrameSaveName = "MainWindow"
 
     var mainViewController: MainViewController {

@@ -33,7 +33,7 @@ protocol BookmarkManager: AnyObject {
 
 }
 
-class LocalBookmarkManager: BookmarkManager {
+final class LocalBookmarkManager: BookmarkManager {
 
     static let shared = LocalBookmarkManager()
 

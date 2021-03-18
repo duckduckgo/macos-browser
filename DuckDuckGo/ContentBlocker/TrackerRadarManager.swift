@@ -20,7 +20,7 @@ import Foundation
 import TrackerRadarKit
 import Combine
 
-class TrackerRadarManager {
+final class TrackerRadarManager {
 
     struct Constants {
         static let embeddedDataSetETag = "7c0a71eb049748b86e8590353141a90f"

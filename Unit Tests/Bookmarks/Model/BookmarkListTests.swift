@@ -21,7 +21,7 @@ import Foundation
 import XCTest
 @testable import DuckDuckGo_Privacy_Browser
 
-class BookmarkListTests: XCTestCase {
+final class BookmarkListTests: XCTestCase {
 
     func testWhenBookmarkIsInserted_ThenItIsPartOfTheList() {
         var bookmarkList = BookmarkList()

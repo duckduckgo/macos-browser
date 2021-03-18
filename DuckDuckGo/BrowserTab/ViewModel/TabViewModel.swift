@@ -20,7 +20,7 @@ import Cocoa
 import Combine
 import os.log
 
-class TabViewModel {
+final class TabViewModel {
 
     enum Favicon {
         static let home = NSImage(named: "HomeFavicon")!

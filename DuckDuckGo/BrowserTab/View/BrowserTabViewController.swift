@@ -22,7 +22,7 @@ import os.log
 import Combine
 import SwiftUI
 
-class BrowserTabViewController: NSViewController {
+final class BrowserTabViewController: NSViewController {
 
     @IBOutlet weak var errorView: NSView!
     @IBOutlet weak var homepageView: NSView!

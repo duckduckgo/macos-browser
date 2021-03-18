@@ -19,7 +19,7 @@
 import XCTest
 @testable import DuckDuckGo_Privacy_Browser
 
-class LoginDetectionServiceTests: XCTestCase {
+final class LoginDetectionServiceTests: XCTestCase {
 
     override class func setUp() {
         super.setUp()

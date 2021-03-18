@@ -29,7 +29,7 @@ protocol BookmarkStore {
 
 }
 
-class LocalBookmarkStore: BookmarkStore {
+final class LocalBookmarkStore: BookmarkStore {
 
     init() {}
 

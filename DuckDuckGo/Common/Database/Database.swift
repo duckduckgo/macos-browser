@@ -19,7 +19,7 @@
 import Foundation
 import CoreData
 
-class Database {
+final class Database {
     
     fileprivate struct Constants {
         static let databaseName = "Database"

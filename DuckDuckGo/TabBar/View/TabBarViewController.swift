@@ -22,7 +22,7 @@ import Combine
 import Lottie
 
 // swiftlint:disable file_length
-class TabBarViewController: NSViewController {
+final class TabBarViewController: NSViewController {
 
     enum HorizontalSpace: CGFloat {
         case scrollViewPaddingWithButtons = 112

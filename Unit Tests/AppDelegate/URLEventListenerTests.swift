@@ -21,7 +21,7 @@ import Foundation
 import XCTest
 @testable import DuckDuckGo_Privacy_Browser
 
-class URLEventListenerTests: XCTestCase {
+final class URLEventListenerTests: XCTestCase {
 
     func test() {
         assertUrlHandled("https://www.example.com")

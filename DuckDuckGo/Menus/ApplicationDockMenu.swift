@@ -33,7 +33,7 @@ protocol ApplicationDockMenuDelegate: AnyObject {
 
 }
 
-class ApplicationDockMenu: NSMenu {
+final class ApplicationDockMenu: NSMenu {
 
     weak var dataSource: ApplicationDockMenuDataSource? {
         didSet {

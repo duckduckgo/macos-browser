@@ -19,7 +19,7 @@
 import XCTest
 @testable import DuckDuckGo_Privacy_Browser
 
-class SuggestionsTests: XCTestCase {
+final class SuggestionsTests: XCTestCase {
 
     func testWhenQueryIsEmptyThenSuggestionsAreNil() {
         let suggestionsAPIMock = SuggestionsAPIMock()

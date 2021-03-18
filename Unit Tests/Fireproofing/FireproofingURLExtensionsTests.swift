@@ -19,7 +19,7 @@
 import XCTest
 @testable import DuckDuckGo_Privacy_Browser
 
-class FireproofingURLExtensionsTests: XCTestCase {
+final class FireproofingURLExtensionsTests: XCTestCase {
 
     func testOAuthPatterns() {
         XCTAssert(URL(string: "https://accounts.google.com/o/oauth2/v2/auth?client_id=123456&scope=openid")!.isOAuthURL)

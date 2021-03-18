@@ -25,7 +25,7 @@ protocol HTML5DownloadDelegate: class {
 
 }
 
-class HTML5DownloadUserScript: NSObject, StaticUserScript {
+final class HTML5DownloadUserScript: NSObject, StaticUserScript {
 
     static var injectionTime: WKUserScriptInjectionTime { .atDocumentEnd }
     static var forMainFrameOnly: Bool { true }
