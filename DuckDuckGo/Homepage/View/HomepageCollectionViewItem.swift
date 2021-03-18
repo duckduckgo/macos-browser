@@ -75,10 +75,12 @@ class HomepageCollectionViewItem: NSCollectionViewItem {
     }
 
     func setAddFavourite() {
-        faviconImageView.image = NSImage(named: "Add")
-        faviconImageView.layer?.backgroundColor = NSColor.homepageAddItemFillColor.cgColor
-        representingCharacterTextField.isHidden = true
-        titleTextField.stringValue = UserText.addFavorite
+        NSAppearance.withAppAppearance {
+            faviconImageView.image = NSImage(named: "Add")
+            faviconImageView.layer?.backgroundColor = NSColor.homepageAddItemFillColor.cgColor
+            representingCharacterTextField.isHidden = true
+            titleTextField.stringValue = UserText.addFavorite
+        }
     }
 
     private func setupView() {
@@ -100,23 +102,25 @@ class HomepageCollectionViewItem: NSCollectionViewItem {
 
     private var state: State = .normal {
         didSet {
-            let wideBorderColor: NSColor, narrowBorderColor: NSColor
-            switch state {
-            case .normal:
-                wideBorderColor = NSColor.clear
-                narrowBorderColor = NSColor.homepageFaviconBorderColor
-            case .hover:
-                wideBorderColor = NSColor.homepageFaviconHoverColor
-                narrowBorderColor = NSColor.clear
-            case .active:
-                wideBorderColor = NSColor.homepageFaviconActiveColor
-                narrowBorderColor = NSColor.clear
-            }
+            NSAppearance.withAppAppearance {
+                let wideBorderColor: NSColor, narrowBorderColor: NSColor
+                switch state {
+                case .normal:
+                    wideBorderColor = NSColor.clear
+                    narrowBorderColor = NSColor.homepageFaviconBorderColor
+                case .hover:
+                    wideBorderColor = NSColor.homepageFaviconHoverColor
+                    narrowBorderColor = NSColor.clear
+                case .active:
+                    wideBorderColor = NSColor.homepageFaviconActiveColor
+                    narrowBorderColor = NSColor.clear
+                }
 
-            wideBorderView.backgroundColor = wideBorderColor
-            narrowBorderView.backgroundColor = narrowBorderColor
-            titleTextField.layer?.backgroundColor = wideBorderColor.cgColor
-            overlayView.isHidden = state != .active
+                wideBorderView.backgroundColor = wideBorderColor
+                narrowBorderView.backgroundColor = narrowBorderColor
+                titleTextField.layer?.backgroundColor = wideBorderColor.cgColor
+                overlayView.isHidden = state != .active
+            }
         }
     }
 
