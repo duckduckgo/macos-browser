@@ -26,7 +26,7 @@ protocol AddressBarButtonsViewControllerDelegate: AnyObject {
 
 }
 
-class AddressBarButtonsViewController: NSViewController {
+final class AddressBarButtonsViewController: NSViewController {
 
     static let homeFaviconImage = NSImage(named: "HomeFavicon")
     static let webImage = NSImage(named: "Web")

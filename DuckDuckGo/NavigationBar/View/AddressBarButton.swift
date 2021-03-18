@@ -18,7 +18,7 @@
 
 import Cocoa
 
-class AddressBarButton: MouseOverButton {
+final class AddressBarButton: MouseOverButton {
 
     override func awakeFromNib() {
         super.awakeFromNib()

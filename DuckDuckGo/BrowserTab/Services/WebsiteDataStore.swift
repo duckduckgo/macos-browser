@@ -39,7 +39,7 @@ protocol WebsiteDataStore {
 
 }
 
-class WebCacheManager {
+internal class WebCacheManager {
 
     static var shared = WebCacheManager()
 

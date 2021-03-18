@@ -19,7 +19,7 @@
 import Foundation
 import BrowserServicesKit
 
-class UserScripts {
+final class UserScripts {
 
     let pageObserverScript = PageObserverUserScript()
     let faviconScript = FaviconUserScript()

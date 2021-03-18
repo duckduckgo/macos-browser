@@ -19,7 +19,7 @@
 import WebKit
 import BrowserServicesKit
 
-class ContentBlockerRulesUserScript: NSObject, UserScript {
+final class ContentBlockerRulesUserScript: NSObject, UserScript {
 
     struct ContentBlockerKey {
         static let url = "url"

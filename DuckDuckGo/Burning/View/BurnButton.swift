@@ -18,7 +18,7 @@
 
 import Cocoa
 
-class BurnButton: MouseOverButton {
+final class BurnButton: MouseOverButton {
 
     enum Constants {
         static let color = NSColor(named: "ButtonColor")

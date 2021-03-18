@@ -19,14 +19,18 @@
 import XCTest
 @testable import DuckDuckGo_Privacy_Browser
 
-class UserAgentTests: XCTestCase {
+final class UserAgentTests: XCTestCase {
 
     func test_default_user_agent_is_safari() {
+        XCTAssertEqual(UserAgent.safari, UserAgent.forDomain("localhost"))
         XCTAssertEqual(UserAgent.safari, UserAgent.forDomain("example.com"))
     }
 
     func test_when_domain_is_google_docs_then_user_agent_is_chrome() {
+        XCTAssertEqual(UserAgent.chrome, UserAgent.forDomain("google.com"))
         XCTAssertEqual(UserAgent.chrome, UserAgent.forDomain("docs.google.com"))
+        XCTAssertEqual(UserAgent.chrome, UserAgent.forDomain("spreadsheets.google.com"))
+        XCTAssertEqual(UserAgent.chrome, UserAgent.forDomain("a.docs.google.com"))
     }
-    
+
 }

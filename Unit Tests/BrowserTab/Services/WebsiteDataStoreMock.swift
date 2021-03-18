@@ -21,7 +21,7 @@ import Foundation
 import XCTest
 @testable import DuckDuckGo_Privacy_Browser
 
-class WebCacheManagerMock: WebCacheManager {
+final class WebCacheManagerMock: WebCacheManager {
 
     var removeAllWebsiteDataCalled = false
 

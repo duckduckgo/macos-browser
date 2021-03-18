@@ -28,7 +28,7 @@ protocol ContentBlockerUserScriptDelegate: class {
 
 }
 
-class ContentBlockerUserScript: NSObject, UserScript {
+final class ContentBlockerUserScript: NSObject, UserScript {
 
     struct TrackerDetectedKey {
         static let protectionId = "protectionId"

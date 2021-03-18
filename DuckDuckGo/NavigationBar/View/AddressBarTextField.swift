@@ -22,7 +22,7 @@ import os.log
 
 // swiftlint:disable type_body_length
 
-class AddressBarTextField: NSTextField {
+final class AddressBarTextField: NSTextField {
 
     var tabCollectionViewModel: TabCollectionViewModel! {
         didSet {
@@ -515,7 +515,7 @@ extension AddressBarTextField: NSTextViewDelegate {
     }
 }
 
-class AddressBarTextEditor: NSTextView {
+final class AddressBarTextEditor: NSTextView {
 
     override func selectionRange(forProposedRange proposedCharRange: NSRange, granularity: NSSelectionGranularity) -> NSRange {
         guard let delegate = delegate as? AddressBarTextField else {
@@ -557,7 +557,7 @@ class AddressBarTextEditor: NSTextView {
 
 }
 
-class AddressBarTextFieldCell: NSTextFieldCell {
+final class AddressBarTextFieldCell: NSTextFieldCell {
     lazy var customEditor = AddressBarTextEditor()
 
     override func fieldEditor(for controlView: NSView) -> NSTextView? {

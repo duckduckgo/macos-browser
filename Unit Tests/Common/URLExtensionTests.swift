@@ -20,7 +20,7 @@ import XCTest
 import Combine
 @testable import DuckDuckGo_Privacy_Browser
 
-class URLExtensionTests: XCTestCase {
+final class URLExtensionTests: XCTestCase {
 
     func test_external_urls_are_valid() {
         XCTAssertTrue("mailto://user@host.tld".url!.isValid)

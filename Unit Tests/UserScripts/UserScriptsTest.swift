@@ -22,7 +22,7 @@ import Combine
 import BrowserServicesKit
 @testable import DuckDuckGo_Privacy_Browser
 
-class UserScriptsTests: XCTestCase {
+final class UserScriptsTests: XCTestCase {
 
     func testUserScriptsTranslatesVarsIntoArray() {
         let userScripts = UserScripts()

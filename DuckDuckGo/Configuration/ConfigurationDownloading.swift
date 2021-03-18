@@ -44,7 +44,7 @@ enum ConfigurationLocation: String, CaseIterable {
 
 }
 
-class DefaultConfigurationDownloader: ConfigurationDownloading {
+final class DefaultConfigurationDownloader: ConfigurationDownloading {
 
     enum Error: Swift.Error {
 

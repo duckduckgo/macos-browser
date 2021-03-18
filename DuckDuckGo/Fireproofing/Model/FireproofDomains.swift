@@ -18,7 +18,7 @@
 
 import Foundation
 
-class FireproofDomains {
+internal class FireproofDomains {
 
     enum Constants {
         static let allowedDomainsChangedNotification = Notification.Name("allowedDomainsChangedNotification")

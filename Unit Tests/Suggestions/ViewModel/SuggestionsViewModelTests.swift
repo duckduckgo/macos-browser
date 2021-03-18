@@ -20,7 +20,7 @@ import XCTest
 import Combine
 @testable import DuckDuckGo_Privacy_Browser
 
-class SuggestionsViewModelTests: XCTestCase {
+final class SuggestionsViewModelTests: XCTestCase {
 
     var cancellables = Set<AnyCancellable>()
     

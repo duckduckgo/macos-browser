@@ -21,7 +21,7 @@ import Foundation
 import XCTest
 @testable import DuckDuckGo_Privacy_Browser
 
-class SuggestionsAPIResultTests: XCTestCase {
+final class SuggestionsAPIResultTests: XCTestCase {
 
     func testWhenInitializedFromEmptyThenNoItemsAreInTheResult() {
         let json = """

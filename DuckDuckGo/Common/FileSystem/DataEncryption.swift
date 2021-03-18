@@ -24,7 +24,7 @@ enum DataEncryptionError: Error {
     case decryptionFailed
 }
 
-class DataEncryption {
+final class DataEncryption {
 
     static func encrypt(data: Data, key: SymmetricKey) throws -> Data {
         try ChaChaPoly.seal(data, using: key).combined

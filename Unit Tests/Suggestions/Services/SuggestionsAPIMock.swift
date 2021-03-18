@@ -19,7 +19,7 @@
 import XCTest
 @testable import DuckDuckGo_Privacy_Browser
 
-class SuggestionsAPIMock: SuggestionsAPI {
+final class SuggestionsAPIMock: SuggestionsAPI {
 
     var fetchSuggestionsCalled = false
     var suggestionsAPIResult: SuggestionsAPIResult?

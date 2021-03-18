@@ -21,7 +21,7 @@ import Foundation
 import XCTest
 @testable import DuckDuckGo_Privacy_Browser
 
-class BookmarkStoreMock: BookmarkStore {
+final class BookmarkStoreMock: BookmarkStore {
 
     var loadAllCalled = false
     var bookmarks: [Bookmark]?

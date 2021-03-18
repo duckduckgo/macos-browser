@@ -21,7 +21,7 @@ import XCTest
 import Combine
 @testable import DuckDuckGo_Privacy_Browser
 
-class UserScriptsManagerTests: XCTestCase {
+final class UserScriptsManagerTests: XCTestCase {
 
     final class ScriptSourceProvidingSourceUpdater: ScriptSourceProviding {
         var sourceUpdatedSubject = PassthroughSubject<Void, Never>()

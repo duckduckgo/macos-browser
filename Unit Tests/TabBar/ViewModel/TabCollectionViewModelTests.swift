@@ -19,7 +19,7 @@
 import XCTest
 @testable import DuckDuckGo_Privacy_Browser
 
-class TabCollectionViewModelTests: XCTestCase {
+final class TabCollectionViewModelTests: XCTestCase {
 
     // MARK: - TabViewModel
 
