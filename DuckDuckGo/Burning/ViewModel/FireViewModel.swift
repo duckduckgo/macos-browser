@@ -18,7 +18,7 @@
 
 import WebKit
 
-class FireViewModel {
+final class FireViewModel {
 
     let fire: Fire
 

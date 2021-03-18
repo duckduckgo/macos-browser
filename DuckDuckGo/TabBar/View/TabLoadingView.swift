@@ -18,7 +18,7 @@
 
 import Cocoa
 
-class TabLoadingView: NSView {
+final class TabLoadingView: NSView {
 
     static var images: [NSImage] = {
         var images = [NSImage]()

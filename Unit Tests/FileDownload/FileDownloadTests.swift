@@ -21,7 +21,7 @@ import XCTest
 import Combine
 @testable import DuckDuckGo_Privacy_Browser
 
-class FileDownloadTests: XCTestCase {
+final class FileDownloadTests: XCTestCase {
 
     let requestWithFileName = URLRequest(url: URL(string: "https://www.example.com/file.html")!)
     let requestWithPath = URLRequest(url: URL(string: "https://www.example.com/")!)

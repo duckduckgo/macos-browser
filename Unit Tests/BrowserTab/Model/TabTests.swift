@@ -19,7 +19,7 @@
 import XCTest
 @testable import DuckDuckGo_Privacy_Browser
 
-class TabTests: XCTestCase {
+final class TabTests: XCTestCase {
 
     // MARK: - Equality
 

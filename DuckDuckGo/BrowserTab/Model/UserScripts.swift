@@ -19,7 +19,7 @@
 import Foundation
 import BrowserServicesKit
 
-class UserScripts {
+final class UserScripts {
 
     let faviconScript = FaviconUserScript()
     let html5downloadScript = HTML5DownloadUserScript()

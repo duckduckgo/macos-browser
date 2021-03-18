@@ -18,7 +18,7 @@
 
 import Cocoa
 
-class Popover: NSPopover {
+internal class Popover: NSPopover {
 
     weak private var associatedButton: NSButton?
 

@@ -19,7 +19,7 @@
 import Foundation
 @testable import DuckDuckGo_Privacy_Browser
 
-class TabCollectionViewModelDelegateMock: TabCollectionViewModelDelegate {
+final class TabCollectionViewModelDelegateMock: TabCollectionViewModelDelegate {
 
     var didAppendCalled = false
 

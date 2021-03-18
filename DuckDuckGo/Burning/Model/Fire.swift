@@ -19,7 +19,7 @@
 import Foundation
 import os.log
 
-class Fire {
+final class Fire {
 
     let webCacheManager: WebCacheManager
 

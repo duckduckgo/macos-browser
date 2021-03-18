@@ -29,7 +29,7 @@ protocol ConfigurationStoring {
 
 }
 
-class DefaultConfigurationStorage: ConfigurationStoring {
+final class DefaultConfigurationStorage: ConfigurationStoring {
 
     private static let fileLocations: [ConfigurationLocation: String] = [
         .bloomFilterBinary: "smarterEncryption.bin",

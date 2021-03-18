@@ -19,7 +19,7 @@
 import WebKit
 import BrowserServicesKit
 
-class FindInPageUserScript: NSObject, StaticUserScript {
+final class FindInPageUserScript: NSObject, StaticUserScript {
 
     static var injectionTime: WKUserScriptInjectionTime { .atDocumentEnd }
     static var forMainFrameOnly: Bool { false }

@@ -33,7 +33,7 @@ protocol HTTPSUpgradeStore {
     @discardableResult func persistExcludedDomains(_ domains: [String]) -> Bool
 }
 
-class HTTPSUpgradePersistence: HTTPSUpgradeStore {
+final class HTTPSUpgradePersistence: HTTPSUpgradeStore {
     
     private struct Resource {
         static var bloomFilter: URL {

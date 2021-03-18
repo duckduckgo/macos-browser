@@ -26,7 +26,7 @@ protocol FaviconService {
 
 }
 
-class LocalFaviconService: FaviconService {
+final class LocalFaviconService: FaviconService {
 
     static let shared = LocalFaviconService()
 

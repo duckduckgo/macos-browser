@@ -25,7 +25,7 @@ protocol ContextMenuDelegate: AnyObject {
 
 }
 
-class ContextMenuUserScript: NSObject, StaticUserScript {
+final class ContextMenuUserScript: NSObject, StaticUserScript {
 
     static var injectionTime: WKUserScriptInjectionTime { .atDocumentEnd }
     static var forMainFrameOnly: Bool { true }

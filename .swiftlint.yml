@@ -6,6 +6,18 @@ disabled_rules:
   - block_based_kvo
   - compiler_protocol_init
 
+custom_rules:
+  explicit_non_final_class:
+    included: ".*\\.swift"
+    excluded: ".*Tests\\.swift"
+    name: "Implicitly non-final class"
+    regex: "^\\s*(class) (?!func|var)"
+    capture_group: 0
+    match_kinds:
+      - keyword
+    message: "Classes should be `final` by default, use explicit `internal` or `public` for non-final classes."
+    severity: error
+
 # Rule Config
 line_length:
   warning: 150

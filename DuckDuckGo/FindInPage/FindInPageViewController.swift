@@ -28,7 +28,7 @@ protocol FindInPageDelegate: AnyObject {
 
 }
 
-class FindInPageViewController: NSViewController {
+final class FindInPageViewController: NSViewController {
 
     weak var delegate: FindInPageDelegate?
 

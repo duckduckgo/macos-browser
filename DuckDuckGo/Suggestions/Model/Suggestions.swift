@@ -19,7 +19,7 @@
 import Foundation
 import os.log
 
-class Suggestions {
+final class Suggestions {
 
     let suggestionsAPI: SuggestionsAPI
 

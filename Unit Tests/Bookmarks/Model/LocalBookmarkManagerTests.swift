@@ -21,7 +21,7 @@ import Foundation
 import XCTest
 @testable import DuckDuckGo_Privacy_Browser
 
-class LocalBookmarkManagerTests: XCTestCase {
+final class LocalBookmarkManagerTests: XCTestCase {
 
     enum BookmarkManagerError: Error {
         case somethingReallyBad

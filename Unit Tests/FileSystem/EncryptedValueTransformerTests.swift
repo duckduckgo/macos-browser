@@ -20,7 +20,7 @@ import XCTest
 import CryptoKit
 @testable import DuckDuckGo_Privacy_Browser
 
-class EncryptedValueTransformerTests: XCTestCase {
+final class EncryptedValueTransformerTests: XCTestCase {
 
     func testTransformingValues() {
         let value = "Hello, World"

@@ -22,7 +22,7 @@ import os.log
 import TrackerRadarKit
 import Combine
 
-class ContentBlockerRulesManager {
+final class ContentBlockerRulesManager {
 
     static let shared = ContentBlockerRulesManager()
 

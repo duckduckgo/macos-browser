@@ -20,7 +20,7 @@ import Foundation
 import Combine
 import os
 
-class ConfigurationManager {
+final class ConfigurationManager {
 
     enum Error: Swift.Error {
         case timeout

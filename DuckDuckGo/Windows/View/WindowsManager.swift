@@ -19,7 +19,7 @@
 import Cocoa
 import os.log
 
-class WindowsManager {
+final class WindowsManager {
 
     class var windows: [NSWindow] {
         return NSApplication.shared.windows

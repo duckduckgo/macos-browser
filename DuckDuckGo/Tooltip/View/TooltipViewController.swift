@@ -18,7 +18,7 @@
 
 import Cocoa
 
-class TooltipViewController: NSViewController {
+final class TooltipViewController: NSViewController {
 
     @IBOutlet weak var titleTextField: NSTextField!
     @IBOutlet weak var urlTextField: NSTextField!

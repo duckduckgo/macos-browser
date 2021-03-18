@@ -19,7 +19,7 @@
 import Foundation
 import os.log
 
-class HTTPSUpgrade {
+final class HTTPSUpgrade {
 
     typealias UpgradeCheckCompletion = (Bool) -> Void
     static let shared = HTTPSUpgrade()

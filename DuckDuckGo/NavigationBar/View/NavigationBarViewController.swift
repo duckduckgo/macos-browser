@@ -20,7 +20,7 @@ import Cocoa
 import Combine
 import os.log
 
-class NavigationBarViewController: NSViewController {
+final class NavigationBarViewController: NSViewController {
 
     @IBOutlet weak var goBackButton: NSButton!
     @IBOutlet weak var goForwardButton: NSButton!

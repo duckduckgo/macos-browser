@@ -23,7 +23,7 @@ protocol EncryptionKeyGenerating {
     func randomKey() -> SymmetricKey
 }
 
-class EncryptionKeyGenerator: EncryptionKeyGenerating {
+final class EncryptionKeyGenerator: EncryptionKeyGenerating {
 
     func randomKey() -> SymmetricKey {
         SymmetricKey(size: .bits256)

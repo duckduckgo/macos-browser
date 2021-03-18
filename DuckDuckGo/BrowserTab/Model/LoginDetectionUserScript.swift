@@ -25,7 +25,7 @@ protocol LoginFormDetectionDelegate: NSObjectProtocol {
 
 }
 
-class LoginFormDetectionUserScript: NSObject, StaticUserScript {
+final class LoginFormDetectionUserScript: NSObject, StaticUserScript {
     weak var delegate: LoginFormDetectionDelegate?
 
     static var injectionTime: WKUserScriptInjectionTime { .atDocumentStart }

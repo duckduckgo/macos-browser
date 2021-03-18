@@ -20,7 +20,7 @@ import XCTest
 import CryptoKit
 @testable import DuckDuckGo_Privacy_Browser
 
-class DataEncryptionTests: XCTestCase {
+final class DataEncryptionTests: XCTestCase {
 
     func testSuccessfulEncryption() {
         let key = SymmetricKey(size: .bits256)
