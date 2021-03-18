@@ -178,6 +178,7 @@ class BrowserTabViewController: NSViewController {
 
         errorView.isHidden = !shown
         webView.isHidden = shown
+        homepageView.isHidden = shown
     }
 
     private func openNewTab(with url: URL?, selected: Bool = false) {
