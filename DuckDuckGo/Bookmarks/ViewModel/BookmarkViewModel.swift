@@ -44,15 +44,13 @@ struct BookmarkViewModel {
 
     // MARK: - Representing Color and Character
 
-    static var representingColors: [NSColor] = {
-        return [
-            NSColor.red,
-            NSColor.blue,
-            NSColor.orange
-        ].map { (color) -> NSColor in
-            color.withAlphaComponent(0.1)
-        }
-    }()
+    static var representingColors = [
+        NSColor(named: "BookmarkRepresentingColor1")!,
+        NSColor(named: "BookmarkRepresentingColor2")!,
+        NSColor(named: "BookmarkRepresentingColor3")!,
+        NSColor(named: "BookmarkRepresentingColor4")!,
+        NSColor(named: "BookmarkRepresentingColor5")!
+    ]
 
     // Representing color is a color shown as a background of homepage item when
     // the bookmark has no favicon
