@@ -21,7 +21,7 @@ import WebKit
 import os.log
 import Combine
 
-class BrowserTabViewController: NSViewController {
+final class BrowserTabViewController: NSViewController {
 
     @IBOutlet weak var errorView: NSView!
     weak var webView: WebView?

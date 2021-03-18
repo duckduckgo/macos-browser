@@ -20,7 +20,7 @@ import XCTest
 import Combine
 @testable import DuckDuckGo_Privacy_Browser
 
-class ConfigurationDownloaderTests: XCTestCase {
+final class ConfigurationDownloaderTests: XCTestCase {
 
     static let resultData = "test".data(using: .utf8)!
 

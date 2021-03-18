@@ -18,7 +18,7 @@
 
 import AppKit
 
-class FireproofInfoViewController: NSViewController {
+final class FireproofInfoViewController: NSViewController {
 
     enum Constants {
         static let storyboardName = "Fireproofing"

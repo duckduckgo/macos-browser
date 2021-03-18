@@ -25,7 +25,7 @@ enum EncryptionKeyStoreError: Error {
     case deletionFailed
 }
 
-class EncryptionKeyStore: EncryptionKeyStoring {
+final class EncryptionKeyStore: EncryptionKeyStoring {
     
     enum Constants {
         static let encryptionKeyAccount = "com.duckduckgo.macos.browser"

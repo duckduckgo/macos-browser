@@ -20,7 +20,7 @@ import XCTest
 import Combine
 @testable import DuckDuckGo_Privacy_Browser
 
-class TabViewModelTests: XCTestCase {
+final class TabViewModelTests: XCTestCase {
 
     var cancellables = Set<AnyCancellable>()
 
@@ -129,7 +129,7 @@ class TabViewModelTests: XCTestCase {
 
     func testWhenTabDownloadedFaviconThenFaviconIsNotNil() {
         let tabViewModel = TabViewModel.aTabViewModel
-        tabViewModel.tab.url = URL.duckDuckGo
+        tabViewModel.tab.url = URL(string: "http://apple.com")
 
         let faviconExpectation = expectation(description: "Favicon")
 

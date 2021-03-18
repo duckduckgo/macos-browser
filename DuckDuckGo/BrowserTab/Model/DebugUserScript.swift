@@ -27,7 +27,7 @@ protocol TabInstrumentationProtocol: class {
     func jsEvent(name: String, executedIn timeInMs: Double)
 }
 
-class DebugUserScript: NSObject, StaticUserScript {
+final class DebugUserScript: NSObject, StaticUserScript {
 
     enum MessageNames: String, CaseIterable {
 

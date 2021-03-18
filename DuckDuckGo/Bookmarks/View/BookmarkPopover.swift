@@ -18,7 +18,7 @@
 
 import Cocoa
 
-class BookmarkPopover: Popover {
+final class BookmarkPopover: Popover {
 
     override init() {
         super.init()

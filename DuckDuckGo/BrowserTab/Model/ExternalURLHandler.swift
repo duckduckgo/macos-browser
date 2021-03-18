@@ -18,7 +18,7 @@
 
 import Combine
 
-class ExternalURLHandler {
+final class ExternalURLHandler {
 
     var openExternalUrlPublisher: AnyPublisher<URL, Never> {
         urlPublisher.eraseToAnyPublisher()

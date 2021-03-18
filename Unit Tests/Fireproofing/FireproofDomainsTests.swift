@@ -19,7 +19,7 @@
 import XCTest
 @testable import DuckDuckGo_Privacy_Browser
 
-class FireproofDomainsTests: XCTestCase {
+final class FireproofDomainsTests: XCTestCase {
 
     override func setUp() {
         UserDefaultsWrapper<Any>.clearAll()

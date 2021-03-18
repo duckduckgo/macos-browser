@@ -21,7 +21,7 @@ import Foundation
 import XCTest
 @testable import DuckDuckGo_Privacy_Browser
 
-class LocalBookmarkStoreTests: XCTestCase {
+final class LocalBookmarkStoreTests: XCTestCase {
 
     func testWhenBookmarkIsSaved_ThenItMustBeLoadedFromStore() {
         let container = createInMemoryPersistentContainer()

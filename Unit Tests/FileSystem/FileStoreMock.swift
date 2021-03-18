@@ -19,7 +19,7 @@
 import Foundation
 @testable import DuckDuckGo_Privacy_Browser
 
-class FileStoreMock: NSObject, FileStoring {
+final class FileStoreMock: NSObject, FileStoring {
 
     private var _storage = [String: Data]()
     private let lock = NSLock()

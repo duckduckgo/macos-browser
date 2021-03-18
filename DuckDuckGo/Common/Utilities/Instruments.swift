@@ -19,7 +19,7 @@
 import Foundation
 import os.signpost
 
-class Instruments {
+final class Instruments {
 
     enum TimedEvent: String {
         case fetchingContentBlockerData

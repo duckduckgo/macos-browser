@@ -18,7 +18,7 @@
 
 import Cocoa
 
-class ShadowView: NSView {
+final class ShadowView: NSView {
 
     struct ShadowSide: OptionSet {
         let rawValue: UInt8

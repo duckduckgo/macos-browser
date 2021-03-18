@@ -18,7 +18,7 @@
 
 import Cocoa
 
-class FocusRingView: NSView {
+final class FocusRingView: NSView {
 
     enum Size: CGFloat {
         case shadow = 2.5

@@ -23,7 +23,7 @@ protocol DefaultBrowserPromptViewDelegate: class {
     func defaultBrowserPromptViewRequestedDefaultBrowserPrompt(_ view: DefaultBrowserPromptView)
 }
 
-class DefaultBrowserPromptView: NSView, NibLoadable {
+final class DefaultBrowserPromptView: NSView, NibLoadable {
 
     @IBOutlet var logoImageView: NSImageView! {
         didSet {

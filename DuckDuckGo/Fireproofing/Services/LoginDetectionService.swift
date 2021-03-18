@@ -29,7 +29,7 @@ enum NavigationEvent {
     case detectedLogin(url: URL)
 }
 
-class LoginDetectionService {
+final class LoginDetectionService {
 
     private enum LoginResult: Equatable {
         case authenticationFlow(authenticationDomain: String)

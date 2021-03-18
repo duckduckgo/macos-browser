@@ -21,7 +21,7 @@ import os.log
 import WebKit
 import BrowserServicesKit
 
-class OptionsButtonMenu: NSMenu {
+final class OptionsButtonMenu: NSMenu {
 
     private let tabCollectionViewModel: TabCollectionViewModel
     private let emailManager: EmailManager
@@ -128,7 +128,7 @@ class OptionsButtonMenu: NSMenu {
     
 }
 
-class EmailOptionsButtonSubMenu: NSMenu {
+final class EmailOptionsButtonSubMenu: NSMenu {
     
     private let tabCollectionViewModel: TabCollectionViewModel
     private let emailManager: EmailManager
