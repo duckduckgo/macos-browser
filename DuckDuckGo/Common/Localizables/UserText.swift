@@ -65,16 +65,16 @@ struct UserText {
     static let removeFireproofing = NSLocalizedString("options.menu.remove-fireproofing", value: "Remove Fireproofing", comment: "Context menu item")
     static let fireproof = NSLocalizedString("fireproof", value: "Fireproof", comment: "Fireproof button")
 
-    static func domainIsFireproof(domain: Domain) -> String {
+    static func domainIsFireproof(domain: String) -> String {
         let localized = NSLocalizedString("fireproof", value: "%@ is Fireproof", comment: "Domain fireproof status")
-        return String(format: localized, domain.displayName)
+        return String(format: localized, domain)
     }
 
-    static func fireproofConfirmationTitle(domain: Domain) -> String {
+    static func fireproofConfirmationTitle(domain: String) -> String {
         let localized = NSLocalizedString("fireproof.confirmation.title",
                                           value: "Would you like to Fireproof %@?",
                                           comment: "Fireproof confirmation title")
-        return String(format: localized, domain.displayName)
+        return String(format: localized, domain)
     }
 
     static let fireproofConfirmationMessage = NSLocalizedString("fireproof.confirmation.message",

@@ -105,8 +105,8 @@ class AddressBarButtonsViewController: NSViewController {
             return
         }
 
-        if let domain = selectedTabViewModel.tab.url?.domain, FireproofDomains.shared.isAllowed(fireproofDomain: domain.hostName) {
-            let viewController = FireproofInfoViewController.create(for: domain)
+        if let host = selectedTabViewModel.tab.url?.host, FireproofDomains.shared.isAllowed(fireproofDomain: host) {
+            let viewController = FireproofInfoViewController.create(for: host)
             present(viewController, asPopoverRelativeTo: button.frame, of: button.superview!, preferredEdge: .minY, behavior: .transient)
         }
     }
@@ -226,7 +226,7 @@ class AddressBarButtonsViewController: NSViewController {
         guard let domain = sender.userInfo?[FireproofDomains.Constants.newFireproofDomainKey] as? String else { return }
 
         DispatchQueue.main.async {
-            let viewController = UndoFireproofingViewController.create(for: Domain(host: domain))
+            let viewController = UndoFireproofingViewController.create(for: domain)
             let frame = self.fireproofedButton.frame.insetBy(dx: -10, dy: -10)
 
             self.present(viewController,

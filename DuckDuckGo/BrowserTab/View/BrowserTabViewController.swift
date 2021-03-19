@@ -273,7 +273,7 @@ extension BrowserTabViewController: TabDelegate {
             return
         }
 
-        let alert = NSAlert.fireproofAlert(with: Domain(host: host))
+        let alert = NSAlert.fireproofAlert(with: host.dropWWW())
         alert.beginSheetModal(for: window) { response in
             if response == NSApplication.ModalResponse.alertFirstButtonReturn {
                 FireproofDomains.shared.addToAllowed(domain: host)
@@ -488,7 +488,7 @@ fileprivate extension NSAlert {
         return alert
     }
 
-    static func fireproofAlert(with domain: Domain) -> NSAlert {
+    static func fireproofAlert(with domain: String) -> NSAlert {
         let alert = NSAlert()
         alert.messageText = UserText.fireproofConfirmationTitle(domain: domain)
         alert.informativeText = UserText.fireproofConfirmationMessage

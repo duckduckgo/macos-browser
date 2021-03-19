@@ -224,11 +224,9 @@
 		B63D466925BEB6C200874977 /* WKWebView+SessionState.swift in Sources */ = {isa = PBXBuildFile; fileRef = B63D466825BEB6C200874977 /* WKWebView+SessionState.swift */; };
 		B63D467125BFA6C100874977 /* DispatchQueueExtensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = B63D467025BFA6C100874977 /* DispatchQueueExtensions.swift */; };
 		B63D467A25BFC3E100874977 /* NSCoderExtensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = B63D467925BFC3E100874977 /* NSCoderExtensions.swift */; };
-		B640281B25FF12FC0049A51D /* DomainTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = B640281A25FF12FC0049A51D /* DomainTests.swift */; };
 		B65783E725F8AAFB00D8DB33 /* String+Punycode.swift in Sources */ = {isa = PBXBuildFile; fileRef = B65783E625F8AAFB00D8DB33 /* String+Punycode.swift */; };
 		B65783EC25F8AB9300D8DB33 /* String+PunycodeTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = B65783EB25F8AB9200D8DB33 /* String+PunycodeTests.swift */; };
 		B65783F525F8ACA400D8DB33 /* Punnycode in Frameworks */ = {isa = PBXBuildFile; productRef = B65783F425F8ACA400D8DB33 /* Punnycode */; };
-		B65783FA25F8C6F900D8DB33 /* Domain.swift in Sources */ = {isa = PBXBuildFile; fileRef = B65783F925F8C6F900D8DB33 /* Domain.swift */; };
 		B657841A25FA484B00D8DB33 /* NSException+Catch.m in Sources */ = {isa = PBXBuildFile; fileRef = B657841925FA484B00D8DB33 /* NSException+Catch.m */; };
 		B657841F25FA497600D8DB33 /* NSException+Catch.swift in Sources */ = {isa = PBXBuildFile; fileRef = B657841E25FA497600D8DB33 /* NSException+Catch.swift */; };
 		B68458B025C7E76A00DC17B6 /* WindowManager+StateRestoration.swift in Sources */ = {isa = PBXBuildFile; fileRef = B68458AF25C7E76A00DC17B6 /* WindowManager+StateRestoration.swift */; };
@@ -490,10 +488,8 @@
 		B63D466825BEB6C200874977 /* WKWebView+SessionState.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "WKWebView+SessionState.swift"; sourceTree = "<group>"; };
 		B63D467025BFA6C100874977 /* DispatchQueueExtensions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DispatchQueueExtensions.swift; sourceTree = "<group>"; };
 		B63D467925BFC3E100874977 /* NSCoderExtensions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NSCoderExtensions.swift; sourceTree = "<group>"; };
-		B640281A25FF12FC0049A51D /* DomainTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DomainTests.swift; sourceTree = "<group>"; };
 		B65783E625F8AAFB00D8DB33 /* String+Punycode.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "String+Punycode.swift"; sourceTree = "<group>"; };
 		B65783EB25F8AB9200D8DB33 /* String+PunycodeTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "String+PunycodeTests.swift"; sourceTree = "<group>"; };
-		B65783F925F8C6F900D8DB33 /* Domain.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Domain.swift; sourceTree = "<group>"; };
 		B657841825FA484B00D8DB33 /* NSException+Catch.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "NSException+Catch.h"; sourceTree = "<group>"; };
 		B657841925FA484B00D8DB33 /* NSException+Catch.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = "NSException+Catch.m"; sourceTree = "<group>"; };
 		B657841E25FA497600D8DB33 /* NSException+Catch.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "NSException+Catch.swift"; sourceTree = "<group>"; };
@@ -863,7 +859,6 @@
 			children = (
 				B65783EB25F8AB9200D8DB33 /* String+PunycodeTests.swift */,
 				85F69B3B25EDE81F00978E59 /* URLExtensionTests.swift */,
-				B640281A25FF12FC0049A51D /* DomainTests.swift */,
 			);
 			path = Common;
 			sourceTree = "<group>";
@@ -1462,7 +1457,6 @@
 				AA8EDF2624923EC70071C2E8 /* StringExtension.swift */,
 				B65783E625F8AAFB00D8DB33 /* String+Punycode.swift */,
 				AA8EDF2324923E980071C2E8 /* URLExtension.swift */,
-				B65783F925F8C6F900D8DB33 /* Domain.swift */,
 				AA88D14A252A557100980B4E /* URLRequestExtension.swift */,
 				B63D466725BEB6C200874977 /* WKWebView+SessionState.h */,
 				B63D466825BEB6C200874977 /* WKWebView+SessionState.swift */,
@@ -1887,7 +1881,6 @@
 				AA6FFB4624DC3B5A0028F4D0 /* WebView.swift in Sources */,
 				AA7412B224D0B3AC00D22FE0 /* TabBarViewItem.swift in Sources */,
 				856C98D52570116900A22F1F /* NSWindow+Toast.swift in Sources */,
-				B65783FA25F8C6F900D8DB33 /* Domain.swift in Sources */,
 				4B02198B25E05FAC00ED7DEA /* FireproofInfoViewController.swift in Sources */,
 				AA8EDF2424923E980071C2E8 /* URLExtension.swift in Sources */,
 				4B67744B255DBF3A00025BD8 /* BloomFilter.cpp in Sources */,
@@ -1953,7 +1946,6 @@
 				AA9C362825518C44004B1BA3 /* WebsiteDataStoreMock.swift in Sources */,
 				AA652CB125DD825B009059CC /* LocalBookmarkStoreTests.swift in Sources */,
 				AA652CC925DD8981009059CC /* Bookmark.xcdatamodeld in Sources */,
-				B640281B25FF12FC0049A51D /* DomainTests.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -2485,20 +2477,20 @@
 				minimumVersion = 0.5.0;
 			};
 		};
-		B65783F325F8ACA400D8DB33 /* XCRemoteSwiftPackageReference "PunycodeSwift" */ = {
-			isa = XCRemoteSwiftPackageReference;
-			repositoryURL = "https://github.com/gumob/PunycodeSwift.git";
-			requirement = {
-				kind = upToNextMajorVersion;
-				minimumVersion = 2.1.0;
-			};
-		};
 		85FF55C625F82E4F00E2AB99 /* XCRemoteSwiftPackageReference "lottie-ios" */ = {
 			isa = XCRemoteSwiftPackageReference;
 			repositoryURL = "https://github.com/airbnb/lottie-ios";
 			requirement = {
 				branch = "lottie/macos-spm";
 				kind = branch;
+			};
+		};
+		B65783F325F8ACA400D8DB33 /* XCRemoteSwiftPackageReference "PunycodeSwift" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/gumob/PunycodeSwift.git";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 2.1.0;
 			};
 		};
 /* End XCRemoteSwiftPackageReference section */
@@ -2523,11 +2515,6 @@
 			isa = XCSwiftPackageProductDependency;
 			package = B65783F325F8ACA400D8DB33 /* XCRemoteSwiftPackageReference "PunycodeSwift" */;
 			productName = Punnycode;
-		};
-		F498DCBA25E7D508008197FE /* BrowserServicesKit */ = {
-			isa = XCSwiftPackageProductDependency;
-			package = F498DCB925E7D508008197FE /* XCRemoteSwiftPackageReference "BrowserServicesKit" */;
-			productName = BrowserServicesKit;
 		};
 /* End XCSwiftPackageProductDependency section */
 

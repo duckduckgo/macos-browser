@@ -272,16 +272,16 @@ class AddressBarTextField: NSTextField {
             case .text: self = Suffix.search
             case .url(urlString: _, url: let url, userTyped: let userTyped):
                 guard userTyped,
-                      let domain = url.domain
+                      let host = url.host
                 else { return nil }
-                self = Suffix.visit(domain: domain)
+                self = Suffix.visit(host: host)
             case .suggestion(let suggestionViewModel):
                 switch suggestionViewModel.suggestion {
                 case .phrase(phrase: _):
                     self = Suffix.search
                 case .website(url: let url):
-                    guard let domain = url.domain else { return nil }
-                    self = Suffix.visit(domain: domain)
+                    guard let host = url.host else { return nil }
+                    self = Suffix.visit(host: host)
                 case .unknown(value: _):
                     self = Suffix.search
                 }
@@ -289,7 +289,7 @@ class AddressBarTextField: NSTextField {
         }
 
         case search
-        case visit(domain: Domain)
+        case visit(host: String)
 
         static let suffixAttributes = [NSAttributedString.Key.font: NSFont.systemFont(ofSize: 13, weight: .light),
                                        .foregroundColor: NSColor.addressBarSuffixColor]
@@ -298,7 +298,7 @@ class AddressBarTextField: NSTextField {
             switch self {
             case .search:
                 return NSAttributedString(string: string, attributes: Self.suffixAttributes)
-            case .visit(domain: _):
+            case .visit(host: _):
                 return NSAttributedString(string: string, attributes: Self.suffixAttributes)
             }
         }
@@ -310,8 +310,8 @@ class AddressBarTextField: NSTextField {
             switch self {
             case .search:
                 return "\(Self.searchSuffix)"
-            case .visit(domain: let domain):
-                return "\(Self.visitSuffix) \(domain.displayName)"
+            case .visit(host: let host):
+                return "\(Self.visitSuffix) \(host)"
             }
         }
     }

@@ -25,11 +25,11 @@ class FireproofInfoViewController: NSViewController {
         static let identifier = "FireproofInfoViewController"
     }
 
-    static func create(for domain: Domain) -> FireproofInfoViewController {
+    static func create(for domain: String) -> FireproofInfoViewController {
         let storyboard = NSStoryboard(name: Constants.storyboardName, bundle: nil)
 
         return storyboard.instantiateController(identifier: Constants.identifier) { coder in
-            return FireproofInfoViewController(coder: coder, domain: domain)
+            return FireproofInfoViewController(coder: coder, domain: domain.dropWWW())
         }
     }
 
@@ -46,9 +46,9 @@ class FireproofInfoViewController: NSViewController {
         }
     }
 
-    private var domain: Domain
+    private var domain: String
 
-    init?(coder: NSCoder, domain: Domain) {
+    init?(coder: NSCoder, domain: String) {
         self.domain = domain
         super.init(coder: coder)
     }
@@ -63,7 +63,7 @@ class FireproofInfoViewController: NSViewController {
     }
 
     @IBAction func removeFireproofing(_ sender: AnyObject) {
-        FireproofDomains.shared.remove(domain: domain.hostName.dropWWW())
+        FireproofDomains.shared.remove(domain: domain)
         presentingViewController?.dismiss(self)
     }
 

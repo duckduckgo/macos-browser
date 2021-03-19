@@ -103,10 +103,6 @@ extension URL {
         }
     }
 
-    var domain: Domain? {
-        Domain(url: self)
-    }
-
     // MARK: - Validity
 
     var isValid: Bool {

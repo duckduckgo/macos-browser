@@ -26,20 +26,20 @@ class UndoFireproofingViewController: NSViewController {
         static let autoDismissDuration: TimeInterval = 1.75
     }
 
-    static func create(for domain: Domain) -> UndoFireproofingViewController {
+    static func create(for domain: String) -> UndoFireproofingViewController {
         let storyboard = NSStoryboard(name: Constants.storyboardName, bundle: nil)
 
         return storyboard.instantiateController(identifier: Constants.identifier) { coder in
-            return UndoFireproofingViewController(coder: coder, domain: domain)
+            return UndoFireproofingViewController(coder: coder, domain: domain.dropWWW())
         }
     }
 
     @IBOutlet weak var titleLabel: NSTextField!
 
     private var timer: Timer?
-    private var domain: Domain
+    private var domain: String
 
-    init?(coder: NSCoder, domain: Domain) {
+    init?(coder: NSCoder, domain: String) {
         self.domain = domain
         super.init(coder: coder)
     }
