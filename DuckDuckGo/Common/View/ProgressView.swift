@@ -86,6 +86,12 @@ final class ProgressView: NSView, CAAnimationDelegate {
         progressLayer.startPoint = CGPoint(x: 0, y: 0.5)
         progressLayer.endPoint = CGPoint(x: 1, y: 0.5)
 
+        layer!.insertSublayer(progressLayer, at: 0)
+    }
+
+    override func updateLayer() {
+        super.updateLayer()
+
         var colors = [CGColor]()
         for _ in 0...6 {
             colors.append(NSColor.progressBarGradientDarkColor.cgColor)
@@ -93,8 +99,6 @@ final class ProgressView: NSView, CAAnimationDelegate {
         }
 
         progressLayer.colors = colors
-
-        layer!.insertSublayer(progressLayer, at: 0)
     }
 
     func show(progress: Double? = nil, startTime: CFTimeInterval? = nil) {
@@ -239,6 +243,7 @@ final class ProgressView: NSView, CAAnimationDelegate {
     }
 
     override func layout() {
+
         super.layout()
 
         progressLayer.frame = bounds
