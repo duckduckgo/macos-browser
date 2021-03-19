@@ -45,15 +45,7 @@ extension String {
     // MARK: - URL
 
     var url: URL? {
-        var trimmed = trimmingWhitespaces()
-        guard let url = URL(string: trimmed) else { return nil }
-
-        guard url.scheme != nil else {
-            trimmed.prepend(URL.NavigationalScheme.http.separated())
-            return trimmed.url
-        }
-
-        return url
+        return punycodedUrl
     }
 
     static let localhost = "localhost"

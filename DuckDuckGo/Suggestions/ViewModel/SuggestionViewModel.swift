@@ -24,7 +24,7 @@ final class SuggestionViewModel {
     let userStringValue: String
 
     init(suggestion: Suggestion, userStringValue: String) {
-        if case .phrase(phrase: let phrase) = suggestion, let url = phrase.url, url.isValid {
+        if case .phrase(phrase: let phrase) = suggestion, let url = phrase.punycodedUrl, url.isValid {
             self.suggestion = .website(url: url)
         } else {
             self.suggestion = suggestion
@@ -83,6 +83,7 @@ final class SuggestionViewModel {
 fileprivate extension URL {
 
     var absoluteStringWithoutSchemeAndWWW: String {
+        let absoluteString = self.punycodeDecodedString ?? self.absoluteString
         if let scheme = scheme {
             return absoluteString.drop(prefix: scheme + "://").drop(prefix: "www.")
         } else {

@@ -41,7 +41,12 @@ extension TooltipViewController {
 
     func display(tabViewModel: TabViewModel) {
         titleTextField.stringValue = tabViewModel.title
-        urlTextField.stringValue = tabViewModel.addressBarString
+        if let url = tabViewModel.addressBarString.punycodedUrl,
+           let punycodeDecoded = url.punycodeDecodedString {
+            urlTextField.stringValue = punycodeDecoded
+        } else {
+            urlTextField.stringValue = tabViewModel.addressBarString
+        }
         faviconImageView.image = tabViewModel.favicon
     }
 

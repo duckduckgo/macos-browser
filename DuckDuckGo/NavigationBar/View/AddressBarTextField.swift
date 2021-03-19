@@ -134,7 +134,7 @@ final class AddressBarTextField: NSTextField {
         guard let selectedSuggestionViewModel = suggestionsViewModel.selectedSuggestionViewModel else {
             if let originalStringValue = originalStringValue {
                 value = Value(stringValue: originalStringValue, userTyped: true)
-                selectToTheEnd(from: originalStringValue.endIndex)
+                selectToTheEnd(from: originalStringValue.count)
             } else {
                 clearValue()
             }
@@ -146,7 +146,7 @@ final class AddressBarTextField: NSTextField {
         if let originalStringValue = originalStringValue,
            value.string.hasPrefix(originalStringValue) {
 
-            selectToTheEnd(from: originalStringValue.endIndex)
+            selectToTheEnd(from: originalStringValue.count)
         } else {
             // if suggestion doesn't start with the user input select whole string
             currentEditor()?.selectAll(nil)
@@ -207,7 +207,13 @@ final class AddressBarTextField: NSTextField {
         case suggestion(_ suggestionViewModel: SuggestionViewModel)
 
         init(stringValue: String, userTyped: Bool) {
-            if let url = stringValue.url, url.isValid {
+            if let url = stringValue.punycodedUrl, url.isValid {
+                var stringValue = stringValue
+                // display punycoded url in readable form when editing
+                if !userTyped,
+                   let punycodeDecoded = url.punycodeDecodedString {
+                    stringValue = punycodeDecoded
+                }
                 self = .url(urlString: stringValue, url: url, userTyped: userTyped)
             } else {
                 self = .text(stringValue)
@@ -265,13 +271,19 @@ final class AddressBarTextField: NSTextField {
             switch value {
             case .text: self = Suffix.search
             case .url(urlString: _, url: let url, userTyped: let userTyped):
-                if !userTyped { return nil }
-                self = Suffix.visit(host: url.host ?? url.absoluteString)
+                guard userTyped,
+                      let host = url.host
+                else { return nil }
+                self = Suffix.visit(host: host)
             case .suggestion(let suggestionViewModel):
                 switch suggestionViewModel.suggestion {
-                case .phrase(phrase: _): self = Suffix.search
-                case .website(url: let url): self = Suffix.visit(host: url.host ?? url.absoluteString)
-                case .unknown(value: _): self = Suffix.search
+                case .phrase(phrase: _):
+                    self = Suffix.search
+                case .website(url: let url):
+                    guard let host = url.host else { return nil }
+                    self = Suffix.visit(host: host)
+                case .unknown(value: _):
+                    self = Suffix.search
                 }
             }
         }
@@ -316,13 +328,13 @@ final class AddressBarTextField: NSTextField {
 
     // MARK: - Cursor & Selection
 
-    private func selectToTheEnd(from index: String.Index) {
+    private func selectToTheEnd(from offset: Int) {
         guard let currentEditor = currentEditor() else {
             os_log("AddressBarTextField: Current editor not available", type: .error)
             return
         }
         let string = currentEditor.string
-        let startIndex = string.indices.contains(index) ? index : string.startIndex
+        let startIndex = string.index(string.startIndex, offsetBy: string.count >= offset ? offset : 0)
         let endIndex = string.index(string.endIndex, offsetBy: -(suffix?.string.count ?? 0))
 
         currentEditor.selectedRange = string.nsRange(from: startIndex..<endIndex)
