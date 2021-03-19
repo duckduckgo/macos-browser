@@ -37,8 +37,8 @@ final class TabViewModel {
     @Published var canReload: Bool = false
     @Published var canBeBookmarked: Bool = false
     @Published var isLoading: Bool = false {
-        didSet {
-            if isLoading {
+        willSet {
+            if newValue {
                 loadingStartTime = CACurrentMediaTime()
             }
         }

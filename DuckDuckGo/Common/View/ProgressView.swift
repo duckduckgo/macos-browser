@@ -174,7 +174,7 @@ final class ProgressView: NSView, CAAnimationDelegate {
         self.targetTime = CACurrentMediaTime() + (animationDuration ?? 0)
 
         let progressFrame = calculateProgressMaskRect(for: progressValue)
-        if let animationDuration = animationDuration, animationDuration > 0 {
+        if let animationDuration = animationDuration, animationDuration > 0.05 {
             let animation = CABasicAnimation(keyPath: "bounds")
             animation.duration = animationDuration
             animation.fromValue = calculateProgressMaskRect(for: actualProgress)
@@ -217,9 +217,9 @@ final class ProgressView: NSView, CAAnimationDelegate {
                 break
             }
         }
-        let multiplier = estimatedElapsedTime > 0 ? min(2.0, max(0.1, actualElapsedTime / estimatedElapsedTime)) : 1.0
+        let multiplier = estimatedElapsedTime > 0 ? min(10.0, max(0.1, actualElapsedTime / estimatedElapsedTime)) : 1.0
 
-        return (nextStep, multiplier * nextEstimate)
+        return (nextStep, max(multiplier * nextEstimate, Constants.animationDuration))
     }
 
     func animationDidStop(_ animation: CAAnimation, finished: Bool) {
