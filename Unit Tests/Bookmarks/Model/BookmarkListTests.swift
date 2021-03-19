@@ -29,8 +29,8 @@ final class BookmarkListTests: XCTestCase {
         let bookmark = Bookmark.aBookmark
         bookmarkList.insert(bookmark)
 
-        XCTAssert(bookmarkList.bookmarks().count == 1)
-        XCTAssert(bookmarkList.bookmarks().first == bookmark)
+        XCTAssert(bookmarkList.bookmarks()?.count == 1)
+        XCTAssert(bookmarkList.bookmarks()?.first == bookmark)
         XCTAssertNotNil(bookmarkList[bookmark.url])
     }
 
@@ -41,8 +41,8 @@ final class BookmarkListTests: XCTestCase {
         bookmarkList.insert(bookmark)
         bookmarkList.insert(bookmark)
 
-        XCTAssert(bookmarkList.bookmarks().count == 1)
-        XCTAssert(bookmarkList.bookmarks().first == bookmark)
+        XCTAssert(bookmarkList.bookmarks()?.count == 1)
+        XCTAssert(bookmarkList.bookmarks()?.first == bookmark)
     }
 
     func testWhenBookmarkListIsReinitialized_ThenItCannotContainOriginalBookmarks() {
@@ -56,7 +56,7 @@ final class BookmarkListTests: XCTestCase {
         ]
         bookmarkList.reinit(with: newBookmarks)
 
-        XCTAssertFalse(bookmarkList.bookmarks().contains(bookmark))
+        XCTAssertFalse(bookmarkList.bookmarks()!.contains(bookmark))
         XCTAssertNil(bookmarkList[bookmark.url])
     }
 
@@ -68,7 +68,7 @@ final class BookmarkListTests: XCTestCase {
 
         bookmarkList.remove(bookmark)
 
-        XCTAssertFalse(bookmarkList.bookmarks().contains(bookmark))
+        XCTAssertFalse(bookmarkList.bookmarks()!.contains(bookmark))
         XCTAssertNil(bookmarkList[bookmark.url])
     }
 
@@ -98,8 +98,8 @@ final class BookmarkListTests: XCTestCase {
 
         XCTAssert(bookmarkList[bookmark.url]?.isFavorite == bookmark.isFavorite)
         XCTAssert(bookmarkList[bookmark.url]?.title == bookmark.title)
-        XCTAssert(bookmarkList.bookmarks().count == 1)
-        XCTAssert(bookmarkList.bookmarks().first == bookmark)
+        XCTAssert(bookmarkList.bookmarks()?.count == 1)
+        XCTAssert(bookmarkList.bookmarks()?.first == bookmark)
         XCTAssertNotNil(bookmarkList[bookmark.url])
         XCTAssertNil(bookmarkList[unknownBookmark.url])
         XCTAssertNil(updateUrlResult)
@@ -118,7 +118,7 @@ final class BookmarkListTests: XCTestCase {
 
         let newBookmark = bookmarkList.updateUrl(of: bookmarkToReplace, to: URL.duckDuckGoAutocomplete)
 
-        XCTAssert(bookmarkList.bookmarks().count == bookmarks.count)
+        XCTAssert(bookmarkList.bookmarks()?.count == bookmarks.count)
         XCTAssertNil(bookmarkList[bookmarkToReplace.url])
         XCTAssertNotNil(bookmarkList[newBookmark!.url])
     }

@@ -37,10 +37,10 @@ final class LocalBookmarkManagerTests: XCTestCase {
         XCTAssert(bookmarkManager.isUrlBookmarked(url: Bookmark.aBookmark.url))
         XCTAssertNotNil(bookmarkManager.getBookmark(for: Bookmark.aBookmark.url))
         XCTAssert(bookmarkStoreMock.loadAllCalled)
-        XCTAssert(bookmarkManager.list.bookmarks().count > 0)
+        XCTAssert(bookmarkManager.list.bookmarks()!.count > 0)
     }
 
-    func testWhenLoadFails_ThenTheManagerHoldsNoBookmarks() {
+    func testWhenLoadFails_ThenTheManagerHoldsBookmarksAreNil() {
         let bookmarkStoreMock = BookmarkStoreMock()
         let bookmarkManager = LocalBookmarkManager(bookmarkStore: bookmarkStoreMock)
 
@@ -48,7 +48,7 @@ final class LocalBookmarkManagerTests: XCTestCase {
         bookmarkStoreMock.loadError = BookmarkManagerError.somethingReallyBad
         bookmarkManager.loadBookmarks()
 
-        XCTAssert(bookmarkManager.list.bookmarks().isEmpty)
+        XCTAssertNil(bookmarkManager.list.bookmarks())
         XCTAssert(bookmarkStoreMock.loadAllCalled)
     }
 
