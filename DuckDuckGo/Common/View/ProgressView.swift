@@ -237,7 +237,9 @@ final class ProgressView: NSView, CAAnimationDelegate {
 
         } else if finished {
             let nextStep = self.nextStep(for: currentProgress)
-            guard nextStep.estimate > 0 else { return }
+            guard nextStep.estimate > 0,
+                  nextStep.progress > currentProgress
+            else { return }
             increaseProgress(to: nextStep.progress, animationDuration: nextStep.estimate)
         }
     }
