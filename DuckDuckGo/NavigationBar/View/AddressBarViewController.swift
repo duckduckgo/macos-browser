@@ -27,6 +27,7 @@ final class AddressBarViewController: NSViewController {
     @IBOutlet var inactiveBackgroundView: NSView!
     @IBOutlet var activeBackgroundView: NSView!
     @IBOutlet var activeBackgroundViewWithSuggestions: NSView!
+    @IBOutlet var progressIndicator: ProgressView!
 
     private(set) var addressBarButtonsViewController: AddressBarButtonsViewController?
     
@@ -49,6 +50,9 @@ final class AddressBarViewController: NSViewController {
     private var passiveAddressBarStringCancellable: AnyCancellable?
     private var isSuggestionsVisibleCancellable: AnyCancellable?
     private var frameCancellable: AnyCancellable?
+
+    private var progressCancellable: AnyCancellable?
+    private var loadingCancellable: AnyCancellable?
 
     private var clickPoint: NSPoint?
     private var mouseDownMonitor: Any?
@@ -114,6 +118,7 @@ final class AddressBarViewController: NSViewController {
     private func subscribeToSelectedTabViewModel() {
         selectedTabViewModelCancellable = tabCollectionViewModel.$selectedTabViewModel.receive(on: DispatchQueue.main).sink { [weak self] _ in
             self?.subscribeToPassiveAddressBarString()
+            self?.subscribeToProgressEvents()
             // don't resign first responder on tab switching
             self?.clickPoint = nil
         }
@@ -128,6 +133,42 @@ final class AddressBarViewController: NSViewController {
         }
         passiveAddressBarStringCancellable = selectedTabViewModel.$passiveAddressBarString.sink { [weak self] _ in
             self?.updatePassiveTextField()
+        }
+    }
+
+    private func subscribeToProgressEvents() {
+        progressCancellable = nil
+        loadingCancellable = nil
+        
+        guard let selectedTabViewModel = tabCollectionViewModel.selectedTabViewModel else {
+            progressIndicator.hide(animated: false)
+            return
+        }
+
+        if selectedTabViewModel.isLoading {
+            progressIndicator.show(progress: selectedTabViewModel.progress, startTime: selectedTabViewModel.loadingStartTime)
+        } else {
+            progressIndicator.hide(animated: false)
+        }
+
+        progressCancellable = selectedTabViewModel.$progress.sink { [weak self] value in
+            guard selectedTabViewModel.isLoading,
+                  let progressIndicator = self?.progressIndicator
+            else { return }
+
+            progressIndicator.increaseProgress(to: value)
+        }
+
+        loadingCancellable = selectedTabViewModel.$isLoading
+            .sink { [weak self] isLoading in
+                guard let progressIndicator = self?.progressIndicator else { return }
+
+                if isLoading {
+                    progressIndicator.show(progress: selectedTabViewModel.progress, startTime: selectedTabViewModel.loadingStartTime)
+
+                } else {
+                    progressIndicator.finishAndHide()
+                }
         }
     }
 

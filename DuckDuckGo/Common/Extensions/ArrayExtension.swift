@@ -1,5 +1,5 @@
 //
-//  Animation.swift
+//  ArrayExtension.swift
 //
 //  Copyright © 2021 DuckDuckGo. All rights reserved.
 //
@@ -16,27 +16,17 @@
 //  limitations under the License.
 //
 
-import AppKit
+import Foundation
 
-final class Animation: NSAnimation {
+extension RandomAccessCollection {
 
-    private let callback: (Progress) -> Void
-
-    init(duration: TimeInterval, curve: Curve, blockingMode: BlockingMode, callback: @escaping (Progress) -> Void) {
-        self.callback = callback
-
-        super.init(duration: duration, animationCurve: .easeOut)
-        self.animationBlockingMode = blockingMode
+    subscript(safe index: Index) -> Element? {
+        guard self.indices.contains(index) else { return nil }
+        return self[index]
     }
 
-    required init?(coder aDecoder: NSCoder) {
-        fatalError("Animation: Bad initializer")
-    }
-
-    override var currentProgress: Progress {
-        didSet {
-            callback(currentProgress)
-        }
+    subscript(_ index: Index, default value: Element) -> Element {
+        return self[safe: index] ?? value
     }
 
 }

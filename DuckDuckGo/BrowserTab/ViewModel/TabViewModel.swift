@@ -36,7 +36,13 @@ final class TabViewModel {
     @Published var canGoBack: Bool = false
     @Published var canReload: Bool = false
     @Published var canBeBookmarked: Bool = false
-    @Published var isLoading: Bool = false
+    @Published var isLoading: Bool = false {
+        didSet {
+            if isLoading {
+                loadingStartTime = CACurrentMediaTime()
+            }
+        }
+    }
     @Published var progress: Double = 0.0
     @Published var isErrorViewVisible: Bool = false {
         didSet {
@@ -45,6 +51,8 @@ final class TabViewModel {
             updateFavicon()
         }
     }
+
+    var loadingStartTime: CFTimeInterval?
 
     @Published private(set) var addressBarString: String = ""
     @PublishedAfter private(set) var passiveAddressBarString: String = ""
