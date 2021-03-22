@@ -36,11 +36,13 @@ extension URL {
     }
 
     static func makeURL(from addressBarString: String) -> URL? {
-        if let addressBarUrl = addressBarString.url, addressBarUrl.isValid {
+        let trimmed = addressBarString.trimmingWhitespaces()
+
+        if let addressBarUrl = trimmed.punycodedUrl, addressBarUrl.isValid {
             return addressBarUrl
         }
 
-        if let searchUrl = URL.makeSearchUrl(from: addressBarString) {
+        if let searchUrl = URL.makeSearchUrl(from: trimmed) {
             return searchUrl
         }
 
@@ -205,6 +207,22 @@ extension URL {
 
         os_log("Failed to move file to Downloads folder, attempt %d", type: .error, copy)
         return nil
+    }
+
+    // MARK: - Punycode
+
+    var punycodeDecodedString: String? {
+        guard let components = URLComponents(url: self, resolvingAgainstBaseURL: true),
+              let host = components.host,
+              let decodedHost = host.idnaDecoded,
+              host != decodedHost,
+              let hostRange = components.rangeOfHost,
+              var string = components.string
+        else { return nil }
+
+        string.replaceSubrange(hostRange, with: decodedHost)
+
+        return string
     }
 
 }

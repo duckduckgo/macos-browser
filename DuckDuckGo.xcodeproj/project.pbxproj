@@ -225,6 +225,9 @@
 		B63D466925BEB6C200874977 /* WKWebView+SessionState.swift in Sources */ = {isa = PBXBuildFile; fileRef = B63D466825BEB6C200874977 /* WKWebView+SessionState.swift */; };
 		B63D467125BFA6C100874977 /* DispatchQueueExtensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = B63D467025BFA6C100874977 /* DispatchQueueExtensions.swift */; };
 		B63D467A25BFC3E100874977 /* NSCoderExtensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = B63D467925BFC3E100874977 /* NSCoderExtensions.swift */; };
+		B65783E725F8AAFB00D8DB33 /* String+Punycode.swift in Sources */ = {isa = PBXBuildFile; fileRef = B65783E625F8AAFB00D8DB33 /* String+Punycode.swift */; };
+		B65783EC25F8AB9300D8DB33 /* String+PunycodeTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = B65783EB25F8AB9200D8DB33 /* String+PunycodeTests.swift */; };
+		B65783F525F8ACA400D8DB33 /* Punnycode in Frameworks */ = {isa = PBXBuildFile; productRef = B65783F425F8ACA400D8DB33 /* Punnycode */; };
 		B657841A25FA484B00D8DB33 /* NSException+Catch.m in Sources */ = {isa = PBXBuildFile; fileRef = B657841925FA484B00D8DB33 /* NSException+Catch.m */; };
 		B657841F25FA497600D8DB33 /* NSException+Catch.swift in Sources */ = {isa = PBXBuildFile; fileRef = B657841E25FA497600D8DB33 /* NSException+Catch.swift */; };
 		B68458B025C7E76A00DC17B6 /* WindowManager+StateRestoration.swift in Sources */ = {isa = PBXBuildFile; fileRef = B68458AF25C7E76A00DC17B6 /* WindowManager+StateRestoration.swift */; };
@@ -490,6 +493,8 @@
 		B63D466825BEB6C200874977 /* WKWebView+SessionState.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "WKWebView+SessionState.swift"; sourceTree = "<group>"; };
 		B63D467025BFA6C100874977 /* DispatchQueueExtensions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DispatchQueueExtensions.swift; sourceTree = "<group>"; };
 		B63D467925BFC3E100874977 /* NSCoderExtensions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NSCoderExtensions.swift; sourceTree = "<group>"; };
+		B65783E625F8AAFB00D8DB33 /* String+Punycode.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "String+Punycode.swift"; sourceTree = "<group>"; };
+		B65783EB25F8AB9200D8DB33 /* String+PunycodeTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "String+PunycodeTests.swift"; sourceTree = "<group>"; };
 		B657841825FA484B00D8DB33 /* NSException+Catch.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "NSException+Catch.h"; sourceTree = "<group>"; };
 		B657841925FA484B00D8DB33 /* NSException+Catch.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = "NSException+Catch.m"; sourceTree = "<group>"; };
 		B657841E25FA497600D8DB33 /* NSException+Catch.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "NSException+Catch.swift"; sourceTree = "<group>"; };
@@ -528,6 +533,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				85AE2FF224A33A2D002D507F /* WebKit.framework in Frameworks */,
+				B65783F525F8ACA400D8DB33 /* Punnycode in Frameworks */,
 				4B82E9B325B69E3E00656FE7 /* TrackerRadarKit in Frameworks */,
 				8524389725FA49B900DE9B83 /* BrowserServicesKit in Frameworks */,
 				85FF55C825F82E4F00E2AB99 /* Lottie in Frameworks */,
@@ -867,6 +873,7 @@
 		85F69B3A25EDE7F800978E59 /* Common */ = {
 			isa = PBXGroup;
 			children = (
+				B65783EB25F8AB9200D8DB33 /* String+PunycodeTests.swift */,
 				85F69B3B25EDE81F00978E59 /* URLExtensionTests.swift */,
 			);
 			path = Common;
@@ -1467,6 +1474,7 @@
 				4BB88B4925B7B690006F6B06 /* SequenceExtensions.swift */,
 				AA8EDF2624923EC70071C2E8 /* StringExtension.swift */,
 				B6AAAC3D26048F690029438D /* ArrayExtension.swift */,
+				B65783E625F8AAFB00D8DB33 /* String+Punycode.swift */,
 				AA8EDF2324923E980071C2E8 /* URLExtension.swift */,
 				AA88D14A252A557100980B4E /* URLRequestExtension.swift */,
 				B63D466725BEB6C200874977 /* WKWebView+SessionState.h */,
@@ -1586,6 +1594,7 @@
 			packageProductDependencies = (
 				4B82E9B225B69E3E00656FE7 /* TrackerRadarKit */,
 				85FF55C725F82E4F00E2AB99 /* Lottie */,
+				B65783F425F8ACA400D8DB33 /* Punnycode */,
 				8524389625FA49B900DE9B83 /* BrowserServicesKit */,
 			);
 			productName = DuckDuckGo;
@@ -1645,6 +1654,7 @@
 			packageReferences = (
 				4B82E9B125B69E3E00656FE7 /* XCRemoteSwiftPackageReference "TrackerRadarKit" */,
 				85FF55C625F82E4F00E2AB99 /* XCRemoteSwiftPackageReference "lottie-ios" */,
+				B65783F325F8ACA400D8DB33 /* XCRemoteSwiftPackageReference "PunycodeSwift" */,
 				8524389525FA49B900DE9B83 /* XCRemoteSwiftPackageReference "BrowserServicesKit" */,
 			);
 			productRefGroup = AA585D7F248FD31100E9A3E2 /* Products */;
@@ -1829,6 +1839,7 @@
 				4BB88B5B25B7BA50006F6B06 /* Instruments.swift in Sources */,
 				F44C130225C2DA0400426E3E /* NSAppearanceExtension.swift in Sources */,
 				4BA1A6B8258B081600F6F690 /* EncryptionKeyStoring.swift in Sources */,
+				B65783E725F8AAFB00D8DB33 /* String+Punycode.swift in Sources */,
 				B657841A25FA484B00D8DB33 /* NSException+Catch.m in Sources */,
 				B684592F25C93FBF00DC17B6 /* AppStateRestorationManager.swift in Sources */,
 				AAA892EA250A4CEF005B37B2 /* WindowControllersManager.swift in Sources */,
@@ -1933,6 +1944,7 @@
 				B62EB47C25BAD3BB005745C6 /* WKWebViewSessionDataTests.swift in Sources */,
 				B6A5A2A025B96E8300AA7ADA /* AppStateChangePublisherTests.swift in Sources */,
 				4B02199C25E063DE00ED7DEA /* FireproofDomainsTests.swift in Sources */,
+				B65783EC25F8AB9300D8DB33 /* String+PunycodeTests.swift in Sources */,
 				AA63745224C9BBE100AB2AC4 /* SuggestionsAPIMock.swift in Sources */,
 				142879DC24CE1185005419BB /* SuggestionsViewModelTests.swift in Sources */,
 				AA652CD325DDA6E9009059CC /* LocalBookmarkManagerTests.swift in Sources */,
@@ -2497,6 +2509,14 @@
 				kind = branch;
 			};
 		};
+		B65783F325F8ACA400D8DB33 /* XCRemoteSwiftPackageReference "PunycodeSwift" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/gumob/PunycodeSwift.git";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 2.1.0;
+			};
+		};
 /* End XCRemoteSwiftPackageReference section */
 
 /* Begin XCSwiftPackageProductDependency section */
@@ -2514,6 +2534,11 @@
 			isa = XCSwiftPackageProductDependency;
 			package = 85FF55C625F82E4F00E2AB99 /* XCRemoteSwiftPackageReference "lottie-ios" */;
 			productName = Lottie;
+		};
+		B65783F425F8ACA400D8DB33 /* Punnycode */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = B65783F325F8ACA400D8DB33 /* XCRemoteSwiftPackageReference "PunycodeSwift" */;
+			productName = Punnycode;
 		};
 /* End XCSwiftPackageProductDependency section */
 
