@@ -83,6 +83,12 @@ final class HomepageCollectionViewItem: NSCollectionViewItem {
         }
     }
 
+    override func viewDidDisappear() {
+        super.viewDidDisappear()
+
+        state = .normal
+    }
+
     private func setupView() {
         mouseOverView.delegate = self
         titleTextField.wantsLayer = true
@@ -124,12 +130,12 @@ final class HomepageCollectionViewItem: NSCollectionViewItem {
         }
     }
 
-    override var highlightState: NSCollectionViewItem.HighlightState {
+    override var isSelected: Bool {
         didSet {
             switch state {
-            case .normal: if highlightState == .forSelection { state = .active }
-            case .hover: if highlightState == .forSelection { state = .active }
-            case .active: if highlightState != .forSelection { state = isMouseOver ? .hover : .normal }
+            case .normal: if isSelected { state = .active }
+            case .hover: if isSelected { state = .active }
+            case .active: if !isSelected { state = isMouseOver ? .hover : .normal }
             }
         }
     }
