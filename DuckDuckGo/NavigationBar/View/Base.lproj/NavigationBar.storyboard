@@ -159,7 +159,7 @@
                                 </connections>
                             </button>
                             <button translatesAutoresizingMaskIntoConstraints="NO" id="XBe-xO-dXj" userLabel="Share Button" customClass="MouseOverButton" customModule="DuckDuckGo_Privacy_Browser" customModuleProvider="target">
-                                <rect key="frame" x="731" y="8" width="32" height="24"/>
+                                <rect key="frame" x="731" y="5" width="32.5" height="32"/>
                                 <constraints>
                                     <constraint firstAttribute="height" constant="24" id="Ile-vS-DrC"/>
                                     <constraint firstAttribute="width" constant="32" id="dww-gU-g9Y"/>
@@ -186,6 +186,7 @@
                             </button>
                         </subviews>
                         <constraints>
+                            <constraint firstItem="XBe-xO-dXj" firstAttribute="leading" relation="greaterThanOrEqual" secondItem="Wba-nA-FYj" secondAttribute="trailing" constant="8" id="1pf-1j-vMt"/>
                             <constraint firstAttribute="bottom" secondItem="EQw-GG-GMA" secondAttribute="bottom" id="4ye-CO-dDp"/>
                             <constraint firstItem="kky-0N-Cfd" firstAttribute="leading" secondItem="hYV-nu-QIp" secondAttribute="leading" constant="8" id="5xQ-lQ-hZc"/>
                             <constraint firstItem="iIF-Ky-unr" firstAttribute="centerY" secondItem="hYV-nu-QIp" secondAttribute="centerY" id="6EH-Ax-6p8"/>
@@ -194,6 +195,7 @@
                             <constraint firstItem="DqX-mW-o7G" firstAttribute="centerY" secondItem="hYV-nu-QIp" secondAttribute="centerY" id="VzY-vk-wmA"/>
                             <constraint firstItem="Wba-nA-FYj" firstAttribute="top" secondItem="hYV-nu-QIp" secondAttribute="top" constant="1" id="Whl-qs-kgy"/>
                             <constraint firstItem="iIF-Ky-unr" firstAttribute="leading" secondItem="XBe-xO-dXj" secondAttribute="trailing" id="XeF-9Z-4fx"/>
+                            <constraint firstItem="DqX-mW-o7G" firstAttribute="leading" relation="greaterThanOrEqual" secondItem="Wba-nA-FYj" secondAttribute="trailing" constant="8" id="Z7Y-uQ-LfG"/>
                             <constraint firstItem="B2U-XM-Vo0" firstAttribute="leading" secondItem="mdE-u0-Ei5" secondAttribute="trailing" id="aG0-IE-Xpr"/>
                             <constraint firstItem="XBe-xO-dXj" firstAttribute="centerY" secondItem="hYV-nu-QIp" secondAttribute="centerY" id="aq3-cG-JsH"/>
                             <constraint firstItem="EQw-GG-GMA" firstAttribute="top" secondItem="hYV-nu-QIp" secondAttribute="top" id="ctd-w7-EMF"/>
@@ -542,7 +544,7 @@
         <image name="Feedback" width="16" height="16"/>
         <image name="Forward" width="7" height="13"/>
         <image name="HomeFavicon" width="16" height="16"/>
-        <image name="NSShareTemplate" width="11" height="16"/>
+        <image name="NSShareTemplate" width="15" height="17"/>
         <image name="PrivacyEntryPoint" width="15" height="15"/>
         <image name="Refresh" width="12" height="15"/>
         <image name="Settings" width="12" height="3"/>
