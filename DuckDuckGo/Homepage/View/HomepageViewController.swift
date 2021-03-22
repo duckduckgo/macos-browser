@@ -105,7 +105,7 @@ final class HomepageViewController: NSViewController {
         defaultBrowserPromptView.translatesAutoresizingMaskIntoConstraints = false
         self.view.addSubview(defaultBrowserPromptView)
 
-        defaultBrowserPromptView.heightAnchor.constraint(equalToConstant: Constants.defaltPromptViewHeight).isActive = true
+        defaultBrowserPromptView.heightAnchor.constraint(equalToConstant: Constants.defaultPromptViewHeight).isActive = true
         defaultBrowserPromptView.topAnchor.constraint(equalTo: self.view.topAnchor).isActive = true
         defaultBrowserPromptView.leadingAnchor.constraint(equalTo: self.view.leadingAnchor).isActive = true
         defaultBrowserPromptView.trailingAnchor.constraint(equalTo: self.view.trailingAnchor).isActive = true
