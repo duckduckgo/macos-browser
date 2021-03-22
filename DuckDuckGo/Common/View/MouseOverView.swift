@@ -61,9 +61,7 @@ final class MouseOverView: NSView {
         didSet {
             updateBackgroundColor()
 
-            if oldValue != isMouseOver {
-                delegate?.mouseOverView(self, isMouseOver: isMouseOver)
-            }
+            delegate?.mouseOverView(self, isMouseOver: isMouseOver)
         }
     }
 
