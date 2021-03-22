@@ -38,7 +38,7 @@ final class HomepageViewController: NSViewController {
 
     enum Constants {
         static let maxNumberOfFavorites = 10
-        static let defaltPromptViewHeight: CGFloat = 66
+        static let defaultPromptViewHeight: CGFloat = 66
         static let collectionViewMinimumHeight: CGFloat = 216
     }
 
