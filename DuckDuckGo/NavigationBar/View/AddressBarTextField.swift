@@ -184,9 +184,8 @@ final class AddressBarTextField: NSTextField {
         } else {
             selectedTabViewModel.tab.update(url: url)
         }
-        if !url.isDuckDuckGoSearch {
-            self.window?.makeFirstResponder(nil)
-        }
+
+        self.window?.makeFirstResponder(nil)
     }
 
     private func openNewTab(selected: Bool) {

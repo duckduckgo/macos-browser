@@ -245,7 +245,6 @@ final class ProgressView: NSView, CAAnimationDelegate {
     }
 
     override func layout() {
-
         super.layout()
 
         progressLayer.frame = bounds

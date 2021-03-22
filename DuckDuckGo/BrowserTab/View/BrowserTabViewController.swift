@@ -180,14 +180,12 @@ final class BrowserTabViewController: NSViewController {
     }
 
     private func setFirstResponderIfNeeded() {
-        guard let url = webView?.url else {
+        guard webView?.url != nil else {
             return
         }
 
-        if !url.isDuckDuckGoSearch {
-            DispatchQueue.main.async { [weak self] in
-                self?.webView?.makeMeFirstResponder()
-            }
+        DispatchQueue.main.async { [weak self] in
+            self?.webView?.makeMeFirstResponder()
         }
     }
 
