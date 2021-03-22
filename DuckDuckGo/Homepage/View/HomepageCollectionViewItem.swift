@@ -41,6 +41,7 @@ final class HomepageCollectionViewItem: NSCollectionViewItem {
     }
 
     weak var delegate: HomepageCollectionViewItemDelegate?
+    var isPlaceholder: Bool = false
 
     @IBOutlet weak var wideBorderView: ColorView!
     @IBOutlet weak var narrowBorderView: ColorView!
@@ -55,11 +56,12 @@ final class HomepageCollectionViewItem: NSCollectionViewItem {
         super.awakeFromNib()
 
         setupView()
-        setupMenu()
         state = .normal
     }
 
-    func set(bookmarkViewModel: BookmarkViewModel) {
+    func set(bookmarkViewModel: BookmarkViewModel, isPlaceholder: Bool = false) {
+        self.isPlaceholder = isPlaceholder
+
         if let favicon = bookmarkViewModel.bookmark.favicon {
             faviconImageView.image = favicon
             faviconImageView.layer?.backgroundColor = NSColor.clear.cgColor
@@ -72,6 +74,8 @@ final class HomepageCollectionViewItem: NSCollectionViewItem {
         }
 
         titleTextField.stringValue = bookmarkViewModel.bookmark.title
+
+        setupMenu()
     }
 
     func setAddFavourite() {
@@ -81,6 +85,8 @@ final class HomepageCollectionViewItem: NSCollectionViewItem {
             representingCharacterTextField.isHidden = true
             titleTextField.stringValue = UserText.addFavorite
         }
+
+        view.menu = nil
     }
 
     override func viewDidDisappear() {
@@ -96,7 +102,7 @@ final class HomepageCollectionViewItem: NSCollectionViewItem {
         faviconImageView.wantsLayer = true
     }
 
-    private var isMouseOver: Bool = false
+    private var isMouseOver = false
 
     // MARK: - State
 
@@ -153,15 +159,20 @@ final class HomepageCollectionViewItem: NSCollectionViewItem {
                                 action: #selector(openInNewWindow(_:)),
                                 target: self,
                                 keyEquivalent: ""))
-        menu.addItem(NSMenuItem.separator())
-        menu.addItem(NSMenuItem(title: UserText.edit,
+
+        if !isPlaceholder {
+            menu.addItem(NSMenuItem.separator())
+
+            menu.addItem(NSMenuItem(title: UserText.edit,
                                 action: #selector(edit(_:)),
                                 target: self,
                                 keyEquivalent: ""))
-        menu.addItem(NSMenuItem(title: UserText.remove,
+            menu.addItem(NSMenuItem(title: UserText.remove,
                                 action: #selector(remove(_:)),
                                 target: self,
                                 keyEquivalent: ""))
+        }
+
         menu.delegate = self
         view.menu = menu
     }

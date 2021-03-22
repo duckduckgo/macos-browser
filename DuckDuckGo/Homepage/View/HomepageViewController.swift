@@ -53,9 +53,12 @@ final class HomepageViewController: NSViewController {
     private var bookmarkManager: BookmarkManager
     private var topFavorites: [Bookmark]? {
         didSet {
+            areFavoritesPlaceholders = topFavorites == Self.favoritePlaceholders
+
             collectionView.reloadData()
         }
     }
+    private var areFavoritesPlaceholders = false
 
     private var bookmarkListCancellable: AnyCancellable?
 
@@ -218,7 +221,7 @@ extension HomepageViewController: NSCollectionViewDataSource, NSCollectionViewDe
             return item
         }
 
-        item.set(bookmarkViewModel: BookmarkViewModel(bookmark: topFavorites[indexPath.item]))
+        item.set(bookmarkViewModel: BookmarkViewModel(bookmark: topFavorites[indexPath.item]), isPlaceholder: areFavoritesPlaceholders)
         item.delegate = self
         return item
     }
