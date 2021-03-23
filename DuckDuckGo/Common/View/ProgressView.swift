@@ -21,34 +21,11 @@ import AppKit
 @IBDesignable
 final class ProgressView: NSView, CAAnimationDelegate {
 
-    private struct Constants {
-        static let gradientAnimationKey = "animateGradient"
-        static let progressAnimationKey = "animateProgress"
-        static let fadeOutAnimationKey = "animateFadeOut"
-
-        static let max = 1.0
-
-        static let animationDuration: TimeInterval = 0.4
-        static let hideAnimationDuration: TimeInterval = 0.2
-        static let gradientAnimationDuration: TimeInterval = 0.4
-
-        // Progress steps – Progress Value : Estimated Loading time
-        static let milestones: KeyValuePairs<Double, CFTimeInterval> = [
-            0.25: 0.0,
-            0.40: 3.0,
-            0.65: 15.0,
-            0.80: 5.0,
-            0.85: 3.0,
-            1.00: 2.5
-        ]
-
-        static let initialValue = milestones[0].key
-    }
-
     private var progressLayer = CAGradientLayer()
     private var progressMask = CALayer()
 
     private var startTime: CFTimeInterval = 0.0
+    private var lastEvent: ProgressEvent?
 
     private var lastKnownBounds: CGRect = .zero
     private var targetProgress: Double = 0.0
@@ -108,6 +85,7 @@ final class ProgressView: NSView, CAAnimationDelegate {
     func show(progress: Double? = nil, startTime: CFTimeInterval? = nil) {
         let progress = progress.map { max($0, Constants.initialValue) } ?? Constants.initialValue
         self.startTime = startTime ?? CACurrentMediaTime()
+        self.lastEvent = nil
 
         progressMask.removeAllAnimations()
 
@@ -120,11 +98,12 @@ final class ProgressView: NSView, CAAnimationDelegate {
 
         startGradientAnimation()
 
-        let nextStep = self.nextStep(for: progress)
-        increaseProgress(to: nextStep.progress, animationDuration: nextStep.estimate)
+        guard let nextStep = ProgressEvent.nextStep(for: progress, lastProgressEvent: nil) else { return }
+        increaseProgress(to: nextStep.progress, animationDuration: nextStep.interval)
     }
 
     func increaseProgress(to progress: Double) {
+        self.lastEvent = ProgressEvent(progress: progress, interval: CACurrentMediaTime() - startTime)
         self.increaseProgress(to: progress, animationDuration: Constants.animationDuration)
     }
 
@@ -204,32 +183,6 @@ final class ProgressView: NSView, CAAnimationDelegate {
         }
     }
 
-    private func nextStep(for currentProgress: Double) -> (progress: Double, estimate: CFTimeInterval) {
-        let actualElapsedTime = CACurrentMediaTime() - self.startTime
-        var estimatedElapsedTime: CFTimeInterval = 0.0
-        var nextEstimate: CFTimeInterval = 0.0
-        var nextStep = 0.0
-
-        for (idx, step) in Constants.milestones.enumerated() {
-            if currentProgress >= step.key {
-                estimatedElapsedTime += step.value
-            } else {
-                // take percentage of estimated time for the current step based of (actual / estimated) progress difference
-                let prevStep = Constants.milestones[safe: idx - 1]?.key ?? 0.0
-                let percentagePassed = 1.0 - (step.key - currentProgress) / (step.key - prevStep)
-                let passedTime = percentagePassed * step.value
-                estimatedElapsedTime += passedTime
-
-                nextStep = step.key
-                nextEstimate = step.value - passedTime
-                break
-            }
-        }
-        let multiplier = estimatedElapsedTime > 0 ? min(10.0, max(0.1, actualElapsedTime / estimatedElapsedTime)) : 1.0
-
-        return (nextStep, max(multiplier * nextEstimate, Constants.animationDuration))
-    }
-
     func animationDidStop(_ animation: CAAnimation, finished: Bool) {
         self.progressAnimationDidStop(finished: finished)
     }
@@ -239,12 +192,10 @@ final class ProgressView: NSView, CAAnimationDelegate {
         if currentProgress >= Constants.max {
             hide(animated: true)
 
-        } else if finished {
-            let nextStep = self.nextStep(for: currentProgress)
-            guard nextStep.estimate > 0,
-                  nextStep.progress > currentProgress
-            else { return }
-            increaseProgress(to: nextStep.progress, animationDuration: nextStep.estimate)
+        } else if finished,
+                  let nextStep = ProgressEvent.nextStep(for: currentProgress, lastProgressEvent: self.lastEvent) {
+
+            increaseProgress(to: nextStep.progress, animationDuration: nextStep.interval)
         }
     }
 
@@ -301,6 +252,94 @@ final class ProgressView: NSView, CAAnimationDelegate {
     // MARK: IB
     override func prepareForInterfaceBuilder() {
         layer!.backgroundColor = NSColor.progressBarGradientDarkColor.cgColor
+    }
+
+}
+
+extension ProgressView {
+
+    struct Constants {
+        static let gradientAnimationKey = "animateGradient"
+        static let progressAnimationKey = "animateProgress"
+        static let fadeOutAnimationKey = "animateFadeOut"
+
+        static let max = 1.0
+
+        static let animationDuration: TimeInterval = 0.4
+        static let hideAnimationDuration: TimeInterval = 0.2
+        static let gradientAnimationDuration: TimeInterval = 0.4
+
+        // Progress steps – Progress Value : Estimated Loading time
+        static let milestones = [
+            ProgressEvent(progress: 0.25, interval: 0.0),
+            ProgressEvent(progress: 0.40, interval: 3.0),
+            ProgressEvent(progress: 0.65, interval: 15.0),
+            ProgressEvent(progress: 0.80, interval: 5.0),
+            ProgressEvent(progress: 0.85, interval: 3.0),
+            ProgressEvent(progress: 1.00, interval: 2.5)
+        ]
+
+        static let initialValue = milestones[0].progress
+
+        static let maxMultiplier = 10.0
+        static let minMultiplier = 0.1
+    }
+
+    struct ProgressEvent: Equatable {
+        var progress: Double
+        var interval: CFTimeInterval
+
+        init(progress: Double, interval: CFTimeInterval) {
+            self.progress = progress
+            self.interval = interval
+        }
+
+        static func nextStep(for currentProgress: Double,
+                             lastProgressEvent: ProgressEvent?,
+                             milestones: [ProgressEvent] = Constants.milestones) -> Self? {
+            assert(currentProgress >= lastProgressEvent?.progress ?? 0)
+
+            var estimatedElapsedTime: CFTimeInterval = 0.0
+            var nextStepIdx: Int!
+
+            for (idx, step) in milestones.enumerated() {
+                if let event = lastProgressEvent {
+                    if event.progress >= step.progress {
+                        estimatedElapsedTime += step.interval
+                    } else {
+                        // take percentage of estimated time for the current step based of (actual / estimated) progress difference
+                        let prevStep = milestones[safe: idx - 1]?.progress ?? 0.0
+                        let percentagePassed = max(0, (event.progress - prevStep) / (step.progress - prevStep))
+                        let passedTime = percentagePassed * step.interval
+                        estimatedElapsedTime += passedTime
+                    }
+                }
+
+                if currentProgress < step.progress {
+                    nextStepIdx = idx
+                    break
+                }
+            }
+
+            guard nextStepIdx != nil else { return nil }
+            var nextStep = milestones[nextStepIdx]
+            let prevStepProgress = milestones[safe: nextStepIdx - 1]?.progress ?? 0.0
+
+            // subtract already passed percentage from the step
+            let percentagePassed = (currentProgress - prevStepProgress) / (nextStep.progress - prevStepProgress)
+            let passedTime = percentagePassed * nextStep.interval
+            nextStep.interval -= passedTime
+
+            // multiply next step duration by (actual / estimated) elapsed time
+            let multiplier = estimatedElapsedTime > 0
+                ? min(Constants.maxMultiplier, max(Constants.minMultiplier,
+                                                   (lastProgressEvent?.interval ?? 0.0) / estimatedElapsedTime))
+                : 1.0
+            nextStep.interval = max(multiplier * nextStep.interval, Constants.animationDuration)
+
+            return nextStep
+        }
+
     }
 
 }
