@@ -125,8 +125,8 @@ final class HomepageViewController: NSViewController {
             }
     }
 
-    private func updateFavourites(from bookmarkList: BookmarkList) {
-        guard let favorites = bookmarkList.bookmarks()?.filter({ $0.isFavorite }) else {
+    private func updateFavourites(from bookmarkList: BookmarkList?) {
+        guard let favorites = bookmarkList?.bookmarks().filter({ $0.isFavorite }) else {
             return
         }
 

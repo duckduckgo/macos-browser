@@ -30,7 +30,7 @@ protocol BookmarkManager: AnyObject {
     @discardableResult func updateUrl(of bookmark: Bookmark, to newUrl: URL) -> Bookmark?
 
     // Wrapper definition in a protocol is not supported yet
-    var listPublisher: Published<BookmarkList>.Publisher { get }
+    var listPublisher: Published<BookmarkList?>.Publisher { get }
 
 }
 
@@ -49,8 +49,8 @@ final class LocalBookmarkManager: BookmarkManager {
         subscribeToCachedFavicons()
     }
 
-    @Published private(set) var list = BookmarkList()
-    var listPublisher: Published<BookmarkList>.Publisher { $list }
+    @Published private(set) var list: BookmarkList?
+    var listPublisher: Published<BookmarkList?>.Publisher { $list }
 
     private lazy var bookmarkStore: BookmarkStore = LocalBookmarkStore()
     private lazy var faviconService: FaviconService = LocalFaviconService.shared
@@ -62,19 +62,20 @@ final class LocalBookmarkManager: BookmarkManager {
                 return
             }
 
-            self?.list.reinit(with: bookmarks)
+            self?.list = BookmarkList(bookmarks: bookmarks)
         }
     }
 
     func isUrlBookmarked(url: URL) -> Bool {
-        return list[url] != nil
+        return list?[url] != nil
     }
 
     func getBookmark(for url: URL) -> Bookmark? {
-        return list[url]
+        return list?[url]
     }
 
     @discardableResult func makeBookmark(for url: URL, title: String, favicon: NSImage?, isFavorite: Bool) -> Bookmark? {
+        guard list != nil else { return nil }
         guard !isUrlBookmarked(url: url) else {
             os_log("LocalBookmarkManager: Url is already bookmarked", type: .error)
             return nil
@@ -82,10 +83,10 @@ final class LocalBookmarkManager: BookmarkManager {
 
         let bookmark = Bookmark(url: url, title: title, favicon: favicon, isFavorite: isFavorite)
 
-        list.insert(bookmark)
+        list?.insert(bookmark)
         bookmarkStore.save(bookmark: bookmark) { [weak self] success, objectId, _  in
             guard success, let objectId = objectId else {
-                self?.list.remove(bookmark)
+                self?.list?.remove(bookmark)
                 return
             }
 
@@ -96,20 +97,22 @@ final class LocalBookmarkManager: BookmarkManager {
     }
 
     func remove(bookmark: Bookmark) {
+        guard list != nil else { return }
         guard let latestBookmark = getBookmark(for: bookmark.url) else {
             os_log("LocalBookmarkManager: Attempt to remove already removed bookmark", type: .error)
             return
         }
 
-        list.remove(latestBookmark)
+        list?.remove(latestBookmark)
         bookmarkStore.remove(bookmark: latestBookmark) { [weak self] success, _ in
             if !success {
-                self?.list.insert(bookmark)
+                self?.list?.insert(bookmark)
             }
         }
     }
 
     func update(bookmark: Bookmark) {
+        guard list != nil else { return }
         guard let latestBookmark = getBookmark(for: bookmark.url) else {
             os_log("LocalBookmarkManager: Failed to update bookmark - not in the list.", type: .error)
             return
@@ -118,11 +121,12 @@ final class LocalBookmarkManager: BookmarkManager {
         var bookmark = bookmark
         bookmark.managedObjectId = latestBookmark.managedObjectId
 
-        list.update(with: bookmark)
+        list?.update(with: bookmark)
         bookmarkStore.update(bookmark: bookmark)
     }
 
     func updateUrl(of bookmark: Bookmark, to newUrl: URL) -> Bookmark? {
+        guard list != nil else { return nil }
         guard let latestBookmark = getBookmark(for: bookmark.url) else {
             os_log("LocalBookmarkManager: Failed to update bookmark - not in the list.", type: .error)
             return nil
@@ -130,7 +134,7 @@ final class LocalBookmarkManager: BookmarkManager {
 
         let managedObjectId = latestBookmark.managedObjectId
 
-        guard var newBookmark = list.updateUrl(of: bookmark, to: newUrl) else {
+        guard var newBookmark = list?.updateUrl(of: bookmark, to: newUrl) else {
             os_log("LocalBookmarkManager: Failed to update URL of bookmark.", type: .error)
             return nil
         }
@@ -146,7 +150,7 @@ final class LocalBookmarkManager: BookmarkManager {
         }
 
         latestBookmark.managedObjectId = objectId
-        list.update(with: latestBookmark)
+        list?.update(with: latestBookmark)
 
         if bookmark.isFavorite != latestBookmark.isFavorite ||
             bookmark.title != latestBookmark.title ||
@@ -168,7 +172,7 @@ final class LocalBookmarkManager: BookmarkManager {
     }
 
     private func update(favicon: NSImage, for host: String) {
-        guard let bookmarks = list.bookmarks() else { return }
+        guard let bookmarks = list?.bookmarks() else { return }
 
         bookmarks
             .filter { $0.url.host == host &&

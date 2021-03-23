@@ -21,22 +21,10 @@ import os.log
 
 struct BookmarkList {
 
-    private var keysOrdered: [URL]?
-    private var itemsDict: [URL: Bookmark] = [:]
+    private var keysOrdered: [URL]
+    private var itemsDict: [URL: Bookmark]
 
-    mutating func insert(_ bookmark: Bookmark) {
-        if keysOrdered == nil { keysOrdered = [] }
-
-        guard itemsDict[bookmark.url] == nil else {
-            os_log("BookmarkList: Adding failed, the item already is in the bookmark list", type: .error)
-            return
-        }
-
-        keysOrdered!.insert(bookmark.url, at: 0)
-        itemsDict[bookmark.url] = bookmark
-    }
-
-    mutating func reinit(with bookmarks: [Bookmark]) {
+    init(bookmarks: [Bookmark] = []) {
         let keysOrdered = bookmarks.map { $0.url }
 
         var itemsDict = [URL: Bookmark]()
@@ -46,12 +34,22 @@ struct BookmarkList {
         self.itemsDict = itemsDict
     }
 
+    mutating func insert(_ bookmark: Bookmark) {
+        guard itemsDict[bookmark.url] == nil else {
+            os_log("BookmarkList: Adding failed, the item already is in the bookmark list", type: .error)
+            return
+        }
+
+        keysOrdered.insert(bookmark.url, at: 0)
+        itemsDict[bookmark.url] = bookmark
+    }
+
     subscript(url: URL) -> Bookmark? {
         return itemsDict[url]
     }
 
     mutating func remove(_ bookmark: Bookmark) {
-        keysOrdered?.removeAll { $0 == bookmark.url }
+        keysOrdered.removeAll { $0 == bookmark.url }
         itemsDict.removeValue(forKey: bookmark.url)
     }
 
@@ -65,13 +63,13 @@ struct BookmarkList {
     }
 
     mutating func updateUrl(of bookmark: Bookmark, to newUrl: URL) -> Bookmark? {
-        guard itemsDict[bookmark.url] != nil, keysOrdered != nil, let index = keysOrdered!.firstIndex(of: bookmark.url) else {
+        guard itemsDict[bookmark.url] != nil, let index = keysOrdered.firstIndex(of: bookmark.url) else {
             os_log("BookmarkList: Update failed, no such item in bookmark list")
             return nil
         }
 
-        keysOrdered!.remove(at: index)
-        keysOrdered!.insert(newUrl, at: index)
+        keysOrdered.remove(at: index)
+        keysOrdered.insert(newUrl, at: index)
 
         itemsDict[bookmark.url] = nil
         let newBookmark = Bookmark(from: bookmark, with: newUrl)
@@ -79,10 +77,8 @@ struct BookmarkList {
         return newBookmark
     }
 
-    func bookmarks() -> [Bookmark]? {
-        guard let keysOrdered = keysOrdered else { return nil }
-
-        return keysOrdered
+    func bookmarks() -> [Bookmark] {
+        keysOrdered
             .map { itemsDict[$0] }
             .compactMap { $0 }
     }
