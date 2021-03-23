@@ -153,7 +153,8 @@ final class AddressBarViewController: NSViewController {
 
         progressCancellable = selectedTabViewModel.$progress.sink { [weak self] value in
             guard selectedTabViewModel.isLoading,
-                  let progressIndicator = self?.progressIndicator
+                  let progressIndicator = self?.progressIndicator,
+                  progressIndicator.isShown
             else { return }
 
             progressIndicator.increaseProgress(to: value)
@@ -163,10 +164,12 @@ final class AddressBarViewController: NSViewController {
             .sink { [weak self] isLoading in
                 guard let progressIndicator = self?.progressIndicator else { return }
 
-                if isLoading {
+                if isLoading,
+                   selectedTabViewModel.tab.url?.isDuckDuckGoSearch == false {
+
                     progressIndicator.show(progress: selectedTabViewModel.progress, startTime: selectedTabViewModel.loadingStartTime)
 
-                } else {
+                } else if progressIndicator.isShown {
                     progressIndicator.finishAndHide()
                 }
         }

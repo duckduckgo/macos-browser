@@ -54,6 +54,10 @@ final class ProgressView: NSView, CAAnimationDelegate {
     private var targetProgress: Double = 0.0
     private var targetTime: CFTimeInterval = 0.0
 
+    var isShown: Bool {
+        progressMask.opacity == 1.0
+    }
+
     override init(frame: CGRect) {
         super.init(frame: frame)
 
