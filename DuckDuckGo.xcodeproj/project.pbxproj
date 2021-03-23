@@ -772,6 +772,7 @@
 				4BB88B4F25B7BA2B006F6B06 /* TabInstrumentation.swift */,
 				85C6A29525CC1FFD00EEB5F1 /* UserDefaultsWrapper.swift */,
 				4B65027E25E5FEBE0054432E /* Browser.swift */,
+				B6AAAC2C260330580029438D /* PublishedAfter.swift */,
 			);
 			path = Utilities;
 			sourceTree = "<group>";
@@ -1486,7 +1487,6 @@
 				AAA0CC69253CC43C0079BC96 /* WKUserContentControllerExtension.swift */,
 				AA92127625ADA07900600CD4 /* WKWebViewExtension.swift */,
 				AAFCB37E25E545D400859DD4 /* PublisherExtension.swift */,
-				B6AAAC2C260330580029438D /* PublishedAfter.swift */,
 				B657841825FA484B00D8DB33 /* NSException+Catch.h */,
 				B657841925FA484B00D8DB33 /* NSException+Catch.m */,
 				B657841E25FA497600D8DB33 /* NSException+Catch.swift */,
