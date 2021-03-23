@@ -72,7 +72,7 @@ final class Tab: NSObject {
         // cache session-restored favicon if present
         if let favicon = favicon,
            let host = url?.host {
-            faviconService.storeIfNeeded(favicon: favicon, for: host, isFromUserScript: false)
+            faviconService.cacheIfNeeded(favicon: favicon, for: host, isFromUserScript: false)
         }
 
     }

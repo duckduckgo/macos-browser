@@ -18,6 +18,7 @@
 
 import Cocoa
 import os.log
+import Combine
 
 protocol BookmarkManager: AnyObject {
 
@@ -37,16 +38,22 @@ final class LocalBookmarkManager: BookmarkManager {
 
     static let shared = LocalBookmarkManager()
 
-    private init() {}
+    private init() {
+        subscribeToCachedFavicons()
+    }
 
-    init(bookmarkStore: BookmarkStore) {
+    init(bookmarkStore: BookmarkStore, faviconService: FaviconService) {
         self.bookmarkStore = bookmarkStore
+        self.faviconService = faviconService
+
+        subscribeToCachedFavicons()
     }
 
     @Published private(set) var list = BookmarkList()
     var listPublisher: Published<BookmarkList>.Publisher { $list }
 
     private lazy var bookmarkStore: BookmarkStore = LocalBookmarkStore()
+    private lazy var faviconService: FaviconService = LocalFaviconService.shared
 
     func loadBookmarks() {
         bookmarkStore.loadAll { [weak self] (bookmarks, error) in
@@ -147,6 +154,31 @@ final class LocalBookmarkManager: BookmarkManager {
             // Save recent changes to the bookmark (While objectId was unknown, nothing is persisted)
             bookmarkStore.update(bookmark: latestBookmark)
         }
+    }
+
+    // MARK: - Favicons
+
+    private var faviconCancellable: AnyCancellable?
+
+    private func subscribeToCachedFavicons() {
+        faviconCancellable = faviconService.cachedFaviconsPublisher
+            .sink(receiveValue: { [weak self] (host, favicon) in
+                self?.update(favicon: favicon, for: host)
+            })
+    }
+
+    private func update(favicon: NSImage, for host: String) {
+        guard let bookmarks = list.bookmarks() else { return }
+
+        bookmarks
+            .filter { $0.url.host == host &&
+                $0.favicon?.size.isSmaller(than: favicon.size) ?? true
+            }
+            .forEach {
+                var bookmark = $0
+                bookmark.favicon = favicon
+                update(bookmark: bookmark)
+            }
     }
 
 }
