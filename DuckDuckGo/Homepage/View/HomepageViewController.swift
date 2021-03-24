@@ -249,7 +249,7 @@ extension HomepageViewController: NSCollectionViewDataSource, NSCollectionViewDe
         }
 
         let favorite = topFavorites[index]
-        tabCollectionViewModel.selectedTabViewModel?.tab.update(url: favorite.url, userEntered: false)
+        tabCollectionViewModel.selectedTabViewModel?.tab.update(url: favorite.url, userEntered: true)
     }
 
  }
