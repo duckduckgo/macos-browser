@@ -7,7 +7,7 @@
         <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
     </dependencies>
     <objects>
-        <customObject id="-2" userLabel="File's Owner" customClass="HomepageCollectionViewItem" customModule="DuckDuckGo_Privacy_Browser" customModuleProvider="target">
+        <customObject id="-2" userLabel="File's Owner">
             <connections>
                 <outlet property="view" destination="Hz6-mo-xeY" id="0bl-1N-x8E"/>
             </connections>
@@ -148,7 +148,7 @@
             <color red="0.050980392156862744" green="0.078431372549019607" blue="0.14509803921568629" alpha="0.079999998211860657" colorSpace="custom" customColorSpace="sRGB"/>
         </namedColor>
         <namedColor name="HomepageRepresentingCharacterColor">
-            <color red="0.0" green="0.0" blue="0.0" alpha="0.80000000000000004" colorSpace="custom" customColorSpace="sRGB"/>
+            <color red="0.0" green="0.0" blue="0.0" alpha="0.80000001192092896" colorSpace="custom" customColorSpace="sRGB"/>
         </namedColor>
     </resources>
 </document>
