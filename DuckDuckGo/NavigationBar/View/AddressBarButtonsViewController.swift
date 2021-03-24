@@ -187,6 +187,7 @@ final class AddressBarButtonsViewController: NSViewController {
             updateBookmarkButtonImage()
             return
         }
+
         urlCancellable = selectedTabViewModel.tab.$url.receive(on: DispatchQueue.main).sink { [weak self] _ in
             self?.updateBookmarkButtonImage()
         }

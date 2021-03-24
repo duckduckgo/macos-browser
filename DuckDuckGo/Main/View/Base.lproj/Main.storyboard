@@ -35,6 +35,10 @@
                             </containerView>
                             <containerView translatesAutoresizingMaskIntoConstraints="NO" id="SYo-8W-jl3">
                                 <rect key="frame" x="0.0" y="0.0" width="1024" height="711"/>
+                                <constraints>
+                                    <constraint firstAttribute="width" relation="greaterThanOrEqual" constant="512" id="FeK-TC-TkT"/>
+                                    <constraint firstAttribute="height" relation="greaterThanOrEqual" constant="178" id="OOl-4a-Y8I"/>
+                                </constraints>
                                 <connections>
                                     <segue destination="wo6-dV-Q3Q" kind="embed" destinationCreationSelector="createWebViewControllerWithCoder:sender:segueIdentifier:" id="A2b-sp-a54"/>
                                 </connections>

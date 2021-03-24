@@ -212,14 +212,6 @@ final class TabBarViewItem: NSCollectionViewItem {
             self?.currentURL = url
             self?.setupMenu()
         }.store(in: &cancellables)
-
-        tabViewModel.$isLoading.sink { [weak self] isLoading in
-            if isLoading {
-                self?.loadingView.startAnimation()
-            } else {
-                self?.loadingView.stopAnimation()
-            }
-        }.store(in: &cancellables)
     }
 
     func clear() {

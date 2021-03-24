@@ -35,8 +35,12 @@ extension NSColor {
     static var suggestionsShadowColor: NSColor {
         NSColor(named: "SuggestionsShadowColor")!
     }
-    
-    static let addressBarSuffixColor = NSColor(catalogName: "System", colorName: "detailAccentColor") ?? .controlAccentColor
+
+    static let detailAccentColor = NSColor(catalogName: "System", colorName: "detailAccentColor") ?? .controlAccentColor
+
+    static var addressBarSuffixColor: NSColor {
+        .detailAccentColor
+    }
 
     static var findInPageFocusedBackgroundColor: NSColor {
         NSColor(named: "FindInPageFocusedBackgroundColor")!
@@ -61,4 +65,13 @@ extension NSColor {
     static var tabMouseOverColor: NSColor {
         NSColor(named: "TabMouseOverColor")!
     }
+
+    static var progressBarGradientDarkColor: NSColor {
+        .controlAccentColor
+    }
+
+    static var progressBarGradientLightColor: NSColor {
+        .detailAccentColor
+    }
+
 }

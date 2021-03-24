@@ -40,6 +40,7 @@ final class WebViewStateObserver: NSObject {
         webView?.removeObserver(self, forKeyPath: #keyPath(WKWebView.canGoForward))
         webView?.removeObserver(self, forKeyPath: #keyPath(WKWebView.isLoading))
         webView?.removeObserver(self, forKeyPath: #keyPath(WKWebView.title))
+        webView?.removeObserver(self, forKeyPath: #keyPath(WKWebView.estimatedProgress))
     }
 
     private func matchFlagValues() {
@@ -64,6 +65,7 @@ final class WebViewStateObserver: NSObject {
         webView.addObserver(self, forKeyPath: #keyPath(WKWebView.canGoForward), options: .new, context: nil)
         webView.addObserver(self, forKeyPath: #keyPath(WKWebView.isLoading), options: .new, context: nil)
         webView.addObserver(self, forKeyPath: #keyPath(WKWebView.title), options: .new, context: nil)
+        webView.addObserver(self, forKeyPath: #keyPath(WKWebView.estimatedProgress), options: .new, context: nil)
     }
 
     override func observeValue(forKeyPath keyPath: String?,
@@ -94,6 +96,7 @@ final class WebViewStateObserver: NSObject {
         case #keyPath(WKWebView.canGoForward): tabViewModel.canGoForward = webView.canGoForward
         case #keyPath(WKWebView.isLoading): tabViewModel.isLoading = webView.isLoading
         case #keyPath(WKWebView.title): updateTitle()
+        case #keyPath(WKWebView.estimatedProgress): tabViewModel.progress = webView.estimatedProgress
         default:
             os_log("%s: keyPath %s not handled", type: .error, className, keyPath)
             super.observeValue(forKeyPath: keyPath, of: object, change: change, context: context)
@@ -102,7 +105,7 @@ final class WebViewStateObserver: NSObject {
 
     private func updateTitle() {
         if webView?.title?.trimmingWhitespaces().isEmpty ?? true {
-            tabViewModel?.tab.title = webView?.url?.host?.drop(prefix: "www.")
+            tabViewModel?.tab.title = webView?.url?.host?.dropWWW()
             return
         }
 
