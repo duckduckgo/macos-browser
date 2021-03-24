@@ -108,7 +108,6 @@ final class BookmarkListTests: XCTestCase {
         XCTAssertNotNil(bookmarkList[newBookmark!.url])
     }
 
-
     func testWhenBookmarkUrlIsUpdatedToAlreadyBookmarkedUrl_ThenUpdatingMustFail() {
         var bookmarkList = BookmarkList()
 
