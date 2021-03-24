@@ -98,9 +98,12 @@ final class AddEditFavoriteViewController: NSViewController {
     }
 
     private var isInputValid: Bool {
-        let url = urlInputTextField.stringValue.url
-        return !titleInputTextField.stringValue.isEmpty &&
-            url?.isValid ?? false
+        guard let url = urlInputTextField.stringValue.url else { return false }
+        let isBookmarked = bookmarkManager.isUrlBookmarked(url: url)
+        let isInputValid = !titleInputTextField.stringValue.isEmpty &&
+            url.isValid &&
+            (!isBookmarked || url == originalBookmark?.url)
+        return isInputValid
     }
 
     private func updateConfirmButton() {
