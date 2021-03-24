@@ -30,7 +30,7 @@ final class HomepageViewController: NSViewController {
                  isFavorite: true,
                  managedObjectId: nil),
         Bookmark(url: URL.duckDuckGoEmail,
-                 title: "Email | Dashboard",
+                 title: "Email",
                  favicon: NSImage(named: "HomepageEmail"),
                  isFavorite: true,
                  managedObjectId: nil),
