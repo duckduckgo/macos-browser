@@ -38,7 +38,7 @@ extension Bookmark: Equatable {
     init(from bookmark: Bookmark, with newUrl: URL) {
         self.init(url: newUrl,
                   title: bookmark.title,
-                  favicon: bookmark.favicon,
+                  favicon: nil,
                   isFavorite: bookmark.isFavorite,
                   managedObjectId: bookmark.managedObjectId)
     }
