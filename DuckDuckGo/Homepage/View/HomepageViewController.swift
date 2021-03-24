@@ -26,12 +26,17 @@ final class HomepageViewController: NSViewController {
     static let favoritePlaceholders: [Bookmark] = [
         Bookmark(url: URL.duckDuckGo,
                  title: "Search",
-                 favicon: nil,
+                 favicon: NSImage(named: "HomepageSearch"),
+                 isFavorite: true,
+                 managedObjectId: nil),
+        Bookmark(url: URL.duckDuckGoEmail,
+                 title: "Email | Dashboard",
+                 favicon: NSImage(named: "HomepageEmail"),
                  isFavorite: true,
                  managedObjectId: nil),
         Bookmark(url: URL(string: "https://spreadprivacy.com/")!,
                  title: "Spread Privacy",
-                 favicon: nil,
+                 favicon: NSImage(named: "HomepageSpreadPrivacy"),
                  isFavorite: true,
                  managedObjectId: nil)
     ]
