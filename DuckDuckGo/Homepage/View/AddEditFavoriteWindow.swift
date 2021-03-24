@@ -1,5 +1,5 @@
 //
-//  NSSizeExtension.swift
+//  AddEditFavoriteWindow.swift
 //
 //  Copyright © 2021 DuckDuckGo. All rights reserved.
 //
@@ -16,15 +16,21 @@
 //  limitations under the License.
 //
 
-import Foundation
+import Cocoa
 
-extension NSSize {
+final class AddEditFavoriteWindow: NSWindow {
 
-    static var faviconSize: NSSize { NSSize(width: 16, height: 16) }
-
-    // Smaller in both width and height, not area
-    func isSmaller(than size: CGSize) -> Bool {
-        width < size.width && height < size.height
+    enum Size {
+        static let width: CGFloat = 450
+        static let height: CGFloat = 175
     }
+
+    override var canBecomeMain: Bool { false }
+
+    // swiftlint:disable force_cast
+    var addEditFavoriteViewController: AddEditFavoriteViewController {
+        contentViewController as! AddEditFavoriteViewController
+    }
+    // swiftlint:enable force_cast
 
 }

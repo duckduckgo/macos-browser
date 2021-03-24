@@ -17,18 +17,23 @@
 //
 
 import Cocoa
+import Combine
 
 protocol FaviconService {
 
+    var cachedFaviconsPublisher: PassthroughSubject<(host: String, favicon: NSImage), Never> { get }
+
     func fetchFavicon(_ faviconUrl: URL?, for host: String, isFromUserScript: Bool, completion: @escaping (NSImage?, Error?) -> Void)
     func getCachedFavicon(for host: String, mustBeFromUserScript: Bool) -> NSImage?
-    func storeIfNeeded(favicon: NSImage, for host: String, isFromUserScript: Bool)
+    func cacheIfNeeded(favicon: NSImage, for host: String, isFromUserScript: Bool)
 
 }
 
 final class LocalFaviconService: FaviconService {
 
     static let shared = LocalFaviconService()
+
+    var cachedFaviconsPublisher = PassthroughSubject<(host: String, favicon: NSImage), Never>()
 
     private enum FaviconName {
         static let favicon = "favicon.ico"
@@ -97,12 +102,12 @@ final class LocalFaviconService: FaviconService {
                 return
             }
 
-            self.storeIfNeeded(favicon: image, for: host, isFromUserScript: isFromUserScript)
+            self.cacheIfNeeded(favicon: image, for: host, isFromUserScript: isFromUserScript)
             mainQueueCompletion(image, nil)
         }
     }
 
-    func storeIfNeeded(favicon: NSImage, for host: String, isFromUserScript: Bool) {
+    func cacheIfNeeded(favicon: NSImage, for host: String, isFromUserScript: Bool) {
         queue.async(flags: .barrier) {
             // Don't replace a favicon from the UserScript with one that isn't from the UserScript
             if let entry = self.cache[host],
@@ -110,6 +115,10 @@ final class LocalFaviconService: FaviconService {
                 return
             }
             self.cache[host] = CacheEntry(image: favicon, isFromUserScript: isFromUserScript)
+
+            DispatchQueue.main.async { [weak self] in
+                self?.cachedFaviconsPublisher.send((host, favicon))
+            }
         }
     }
 

@@ -56,7 +56,7 @@ extension WindowControllersManager {
 
             if tabCollection.tabs.count == 1,
                let firstTab = tabCollection.tabs.first,
-               firstTab.isHomepageLoaded {
+               firstTab.isHomepageShown {
                 firstTab.url = url
             } else {
                 let newTab = Tab()

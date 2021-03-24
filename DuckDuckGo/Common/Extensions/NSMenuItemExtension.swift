@@ -1,5 +1,5 @@
 //
-//  NSSizeExtension.swift
+//  NSMenuItemExtension.swift
 //
 //  Copyright © 2021 DuckDuckGo. All rights reserved.
 //
@@ -16,15 +16,13 @@
 //  limitations under the License.
 //
 
-import Foundation
+import Cocoa
 
-extension NSSize {
+extension NSMenuItem {
 
-    static var faviconSize: NSSize { NSSize(width: 16, height: 16) }
-
-    // Smaller in both width and height, not area
-    func isSmaller(than size: CGSize) -> Bool {
-        width < size.width && height < size.height
+    convenience init(title string: String, action selector: Selector?, target: AnyObject?, keyEquivalent charCode: String) {
+        self.init(title: string, action: selector, keyEquivalent: charCode)
+        self.target = target
     }
 
 }

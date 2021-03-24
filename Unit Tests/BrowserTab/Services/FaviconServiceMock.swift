@@ -1,5 +1,5 @@
 //
-//  NSSizeExtension.swift
+//  FaviconServiceMock.swift
 //
 //  Copyright © 2021 DuckDuckGo. All rights reserved.
 //
@@ -16,15 +16,22 @@
 //  limitations under the License.
 //
 
-import Foundation
+import XCTest
+import Combine
+@testable import DuckDuckGo_Privacy_Browser
 
-extension NSSize {
+final class FaviconServiceMock: FaviconService {
 
-    static var faviconSize: NSSize { NSSize(width: 16, height: 16) }
+    var cachedFaviconsPublisher = PassthroughSubject<(host: String, favicon: NSImage), Never>()
 
-    // Smaller in both width and height, not area
-    func isSmaller(than size: CGSize) -> Bool {
-        width < size.width && height < size.height
+    func fetchFavicon(_ faviconUrl: URL?, for host: String, isFromUserScript: Bool, completion: @escaping (NSImage?, Error?) -> Void) {
+    }
+
+    func getCachedFavicon(for host: String, mustBeFromUserScript: Bool) -> NSImage? {
+        return nil
+    }
+
+    func cacheIfNeeded(favicon: NSImage, for host: String, isFromUserScript: Bool) {
     }
 
 }

@@ -74,7 +74,7 @@ final class Tab: NSObject {
         // cache session-restored favicon if present
         if let favicon = favicon,
            let host = url?.host {
-            faviconService.storeIfNeeded(favicon: favicon, for: host, isFromUserScript: false)
+            faviconService.cacheIfNeeded(favicon: favicon, for: host, isFromUserScript: false)
         }
 
     }
@@ -138,7 +138,7 @@ final class Tab: NSObject {
     private var loginDetectionService: LoginDetectionService?
     private let instrumentation = TabInstrumentation()
 
-    var isHomepageLoaded: Bool {
+    var isHomepageShown: Bool {
         url == nil || url == URL.emptyPage
     }
 

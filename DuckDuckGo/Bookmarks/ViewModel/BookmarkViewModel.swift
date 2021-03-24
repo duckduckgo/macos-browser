@@ -36,7 +36,32 @@ struct BookmarkViewModel {
     var menuFavicon: NSImage? {
         // Once we have bookmark folders
         // bookmark.isFavorite ? bookmark.favicon?.makeFavoriteOverlay() : bookmark.favicon
-        bookmark.favicon
+
+        let favicon = bookmark.favicon?.copy() as? NSImage
+        favicon?.size = NSSize.faviconSize
+        return favicon
+    }
+
+    // MARK: - Representing Color and Character
+
+    static var representingColors = [
+        NSColor(named: "BookmarkRepresentingColor1")!,
+        NSColor(named: "BookmarkRepresentingColor2")!,
+        NSColor(named: "BookmarkRepresentingColor3")!,
+        NSColor(named: "BookmarkRepresentingColor4")!,
+        NSColor(named: "BookmarkRepresentingColor5")!
+    ]
+
+    // Representing color is a color shown as a background of homepage item when
+    // the bookmark has no favicon
+    var representingColor: NSColor {
+        let index = bookmark.url.absoluteString.count % Self.representingColors.count
+        return Self.representingColors[index]
+    }
+
+    // Representing character is on top of representing color
+    var representingCharacter: String {
+        return bookmark.url.host?.dropWWW().first?.uppercased() ?? "-"
     }
 
 }

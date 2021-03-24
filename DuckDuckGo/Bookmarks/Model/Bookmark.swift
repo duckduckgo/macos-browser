@@ -35,4 +35,12 @@ extension Bookmark: Equatable {
         lhs.url == rhs.url
     }
 
+    init(from bookmark: Bookmark, with newUrl: URL) {
+        self.init(url: newUrl,
+                  title: bookmark.title,
+                  favicon: nil,
+                  isFavorite: bookmark.isFavorite,
+                  managedObjectId: bookmark.managedObjectId)
+    }
+
 }

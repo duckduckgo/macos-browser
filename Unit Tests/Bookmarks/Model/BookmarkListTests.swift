@@ -45,21 +45,6 @@ final class BookmarkListTests: XCTestCase {
         XCTAssert(bookmarkList.bookmarks().first == bookmark)
     }
 
-    func testWhenBookmarkListIsReinitialized_ThenItCannotContainOriginalBookmarks() {
-        var bookmarkList = BookmarkList()
-
-        let bookmark = Bookmark.aBookmark
-        bookmarkList.insert(bookmark)
-
-        let newBookmarks = [
-            Bookmark(url: URL.duckDuckGoAutocomplete, title: "Title", favicon: nil, isFavorite: false, managedObjectId: nil)
-        ]
-        bookmarkList.reinit(with: newBookmarks)
-
-        XCTAssertFalse(bookmarkList.bookmarks().contains(bookmark))
-        XCTAssertNil(bookmarkList[bookmark.url])
-    }
-
     func testWhenBookmarkIsRemoved_ThenItIsNoLongerInList() {
         var bookmarkList = BookmarkList()
 
@@ -94,6 +79,7 @@ final class BookmarkListTests: XCTestCase {
         let unknownBookmark = Bookmark(url: URL.duckDuckGoAutocomplete, title: "Unknown title", favicon: nil, isFavorite: true, managedObjectId: nil)
 
         bookmarkList.update(with: unknownBookmark)
+        let updateUrlResult = bookmarkList.updateUrl(of: unknownBookmark, to: URL.duckDuckGo)
 
         XCTAssert(bookmarkList[bookmark.url]?.isFavorite == bookmark.isFavorite)
         XCTAssert(bookmarkList[bookmark.url]?.title == bookmark.title)
@@ -101,6 +87,45 @@ final class BookmarkListTests: XCTestCase {
         XCTAssert(bookmarkList.bookmarks().first == bookmark)
         XCTAssertNotNil(bookmarkList[bookmark.url])
         XCTAssertNil(bookmarkList[unknownBookmark.url])
+        XCTAssertNil(updateUrlResult)
+    }
+
+    func testWhenBookmarkUrlIsUpdated_ThenJustTheBookmarkUrlIsUpdated() {
+        var bookmarkList = BookmarkList()
+
+        let bookmarks = [
+            Bookmark(url: URL(string: "wikipedia.org")!, title: "Title", favicon: nil, isFavorite: true, managedObjectId: nil),
+            Bookmark(url: URL.duckDuckGo, title: "Title", favicon: nil, isFavorite: true, managedObjectId: nil),
+            Bookmark(url: URL(string: "apple.com")!, title: "Title", favicon: nil, isFavorite: true, managedObjectId: nil)
+        ]
+        bookmarks.forEach { bookmarkList.insert($0) }
+        let bookmarkToReplace = bookmarks[2]
+
+        let newBookmark = bookmarkList.updateUrl(of: bookmarkToReplace, to: URL.duckDuckGoAutocomplete)
+
+        XCTAssert(bookmarkList.bookmarks().count == bookmarks.count)
+        XCTAssertNil(bookmarkList[bookmarkToReplace.url])
+        XCTAssertNotNil(bookmarkList[newBookmark!.url])
+    }
+
+    func testWhenBookmarkUrlIsUpdatedToAlreadyBookmarkedUrl_ThenUpdatingMustFail() {
+        var bookmarkList = BookmarkList()
+
+        let firstUrl = URL(string: "wikipedia.org")!
+        let bookmarks = [
+            Bookmark(url: firstUrl, title: "Title", favicon: nil, isFavorite: true, managedObjectId: nil),
+            Bookmark(url: URL.duckDuckGo, title: "Title", favicon: nil, isFavorite: true, managedObjectId: nil)
+        ]
+
+        bookmarks.forEach { bookmarkList.insert($0) }
+
+        let bookmarkToReplace = bookmarks[1]
+        let newBookmark = bookmarkList.updateUrl(of: bookmarkToReplace, to: firstUrl)
+
+        XCTAssert(bookmarkList.bookmarks().count == bookmarks.count)
+        XCTAssertNotNil(bookmarkList[firstUrl])
+        XCTAssertNotNil(bookmarkList[bookmarkToReplace.url])
+        XCTAssertNil(newBookmark)
     }
 
 }

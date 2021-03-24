@@ -128,6 +128,8 @@ extension URL {
         duckDuckGo.appendingPathComponent("ac/")
     }
 
+    static var duckDuckGoEmail = URL(string: "https://quack.duckduckgo.com/email/dashboard")!
+
     var isDuckDuckGo: Bool {
         absoluteString.starts(with: Self.duckDuckGo.absoluteString)
     }

@@ -18,17 +18,19 @@
 
 import Cocoa
 import os.log
+import Combine
 
 protocol BookmarkManager: AnyObject {
 
     func isUrlBookmarked(url: URL) -> Bool
     func getBookmark(for url: URL) -> Bookmark?
-    @discardableResult func makeBookmark(for url: URL, title: String, favicon: NSImage?) -> Bookmark?
+    @discardableResult func makeBookmark(for url: URL, title: String, favicon: NSImage?, isFavorite: Bool) -> Bookmark?
     func remove(bookmark: Bookmark)
     func update(bookmark: Bookmark)
+    @discardableResult func updateUrl(of bookmark: Bookmark, to newUrl: URL) -> Bookmark?
 
     // Wrapper definition in a protocol is not supported yet
-    var listPublisher: Published<BookmarkList>.Publisher { get }
+    var listPublisher: Published<BookmarkList?>.Publisher { get }
 
 }
 
@@ -36,16 +38,22 @@ final class LocalBookmarkManager: BookmarkManager {
 
     static let shared = LocalBookmarkManager()
 
-    private init() {}
-
-    init(bookmarkStore: BookmarkStore) {
-        self.bookmarkStore = bookmarkStore
+    private init() {
+        subscribeToCachedFavicons()
     }
 
-    @Published private(set) var list = BookmarkList()
-    var listPublisher: Published<BookmarkList>.Publisher { $list }
+    init(bookmarkStore: BookmarkStore, faviconService: FaviconService) {
+        self.bookmarkStore = bookmarkStore
+        self.faviconService = faviconService
+
+        subscribeToCachedFavicons()
+    }
+
+    @Published private(set) var list: BookmarkList?
+    var listPublisher: Published<BookmarkList?>.Publisher { $list }
 
     private lazy var bookmarkStore: BookmarkStore = LocalBookmarkStore()
+    private lazy var faviconService: FaviconService = LocalFaviconService.shared
 
     func loadBookmarks() {
         bookmarkStore.loadAll { [weak self] (bookmarks, error) in
@@ -54,30 +62,31 @@ final class LocalBookmarkManager: BookmarkManager {
                 return
             }
 
-            self?.list.reinit(with: bookmarks)
+            self?.list = BookmarkList(bookmarks: bookmarks)
         }
     }
 
     func isUrlBookmarked(url: URL) -> Bool {
-        return list[url] != nil
+        return list?[url] != nil
     }
 
     func getBookmark(for url: URL) -> Bookmark? {
-        return list[url]
+        return list?[url]
     }
 
-    @discardableResult func makeBookmark(for url: URL, title: String, favicon: NSImage?) -> Bookmark? {
+    @discardableResult func makeBookmark(for url: URL, title: String, favicon: NSImage?, isFavorite: Bool) -> Bookmark? {
+        guard list != nil else { return nil }
         guard !isUrlBookmarked(url: url) else {
             os_log("LocalBookmarkManager: Url is already bookmarked", type: .error)
             return nil
         }
-        favicon?.size = NSSize.faviconSize
-        let bookmark = Bookmark(url: url, title: title, favicon: favicon, isFavorite: false)
 
-        list.insert(bookmark)
+        let bookmark = Bookmark(url: url, title: title, favicon: favicon, isFavorite: isFavorite)
+
+        list?.insert(bookmark)
         bookmarkStore.save(bookmark: bookmark) { [weak self] success, objectId, _  in
             guard success, let objectId = objectId else {
-                self?.list.remove(bookmark)
+                self?.list?.remove(bookmark)
                 return
             }
 
@@ -88,20 +97,22 @@ final class LocalBookmarkManager: BookmarkManager {
     }
 
     func remove(bookmark: Bookmark) {
+        guard list != nil else { return }
         guard let latestBookmark = getBookmark(for: bookmark.url) else {
             os_log("LocalBookmarkManager: Attempt to remove already removed bookmark", type: .error)
             return
         }
 
-        list.remove(latestBookmark)
+        list?.remove(latestBookmark)
         bookmarkStore.remove(bookmark: latestBookmark) { [weak self] success, _ in
             if !success {
-                self?.list.insert(bookmark)
+                self?.list?.insert(bookmark)
             }
         }
     }
 
     func update(bookmark: Bookmark) {
+        guard list != nil else { return }
         guard let latestBookmark = getBookmark(for: bookmark.url) else {
             os_log("LocalBookmarkManager: Failed to update bookmark - not in the list.", type: .error)
             return
@@ -110,8 +121,26 @@ final class LocalBookmarkManager: BookmarkManager {
         var bookmark = bookmark
         bookmark.managedObjectId = latestBookmark.managedObjectId
 
-        list.update(with: bookmark)
+        list?.update(with: bookmark)
         bookmarkStore.update(bookmark: bookmark)
+    }
+
+    func updateUrl(of bookmark: Bookmark, to newUrl: URL) -> Bookmark? {
+        guard list != nil else { return nil }
+        guard let latestBookmark = getBookmark(for: bookmark.url) else {
+            os_log("LocalBookmarkManager: Failed to update bookmark - not in the list.", type: .error)
+            return nil
+        }
+
+        let managedObjectId = latestBookmark.managedObjectId
+
+        guard var newBookmark = list?.updateUrl(of: bookmark, to: newUrl) else {
+            os_log("LocalBookmarkManager: Failed to update URL of bookmark.", type: .error)
+            return nil
+        }
+        newBookmark.managedObjectId = managedObjectId
+        bookmarkStore.update(bookmark: newBookmark)
+        return newBookmark
     }
 
     private func set(objectId: NSManagedObjectID, for bookmark: Bookmark) {
@@ -121,7 +150,7 @@ final class LocalBookmarkManager: BookmarkManager {
         }
 
         latestBookmark.managedObjectId = objectId
-        list.update(with: latestBookmark)
+        list?.update(with: latestBookmark)
 
         if bookmark.isFavorite != latestBookmark.isFavorite ||
             bookmark.title != latestBookmark.title ||
@@ -129,6 +158,31 @@ final class LocalBookmarkManager: BookmarkManager {
             // Save recent changes to the bookmark (While objectId was unknown, nothing is persisted)
             bookmarkStore.update(bookmark: latestBookmark)
         }
+    }
+
+    // MARK: - Favicons
+
+    private var faviconCancellable: AnyCancellable?
+
+    private func subscribeToCachedFavicons() {
+        faviconCancellable = faviconService.cachedFaviconsPublisher
+            .sink(receiveValue: { [weak self] (host, favicon) in
+                self?.update(favicon: favicon, for: host)
+            })
+    }
+
+    private func update(favicon: NSImage, for host: String) {
+        guard let bookmarks = list?.bookmarks() else { return }
+
+        bookmarks
+            .filter { $0.url.host == host &&
+                $0.favicon?.size.isSmaller(than: favicon.size) ?? true
+            }
+            .forEach {
+                var bookmark = $0
+                bookmark.favicon = favicon
+                update(bookmark: bookmark)
+            }
     }
 
 }

@@ -181,11 +181,12 @@ fileprivate extension Bookmark {
 fileprivate extension BookmarkManagedObject {
 
     func update(with bookmark: Bookmark) {
-        guard objectID == bookmark.managedObjectId, urlEncrypted as? URL == bookmark.url else {
+        guard objectID == bookmark.managedObjectId else {
             assertionFailure("BookmarkManagedObject: Incorrect bookmark struct for the update")
             return
         }
 
+        urlEncrypted = bookmark.url as NSURL
         titleEncrypted = bookmark.title as NSString
         faviconEncrypted = bookmark.favicon
         isFavorite = bookmark.isFavorite

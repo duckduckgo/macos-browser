@@ -20,11 +20,14 @@ import Cocoa
 import WebKit
 import os.log
 import Combine
+import SwiftUI
 
 final class BrowserTabViewController: NSViewController {
 
     @IBOutlet weak var errorView: NSView!
+    @IBOutlet weak var homepageView: NSView!
     weak var webView: WebView?
+
     var tabViewModel: TabViewModel?
 
     private let tabCollectionViewModel: TabCollectionViewModel
@@ -33,13 +36,6 @@ final class BrowserTabViewController: NSViewController {
     private var isErrorViewVisibleCancellable: AnyCancellable?
     private var contextMenuLink: URL?
     private var contextMenuImage: URL?
-    private var defaultBrowserPromptView: DefaultBrowserPromptView?
-    private var canShowEmptyTabInterface: Bool {
-        return tabViewModel?.tab.url == nil
-    }
-
-    @UserDefaultsWrapper(key: .defaultBrowserDismissed, defaultValue: false)
-    var defaultBrowserPromptDismissed: Bool
 
     required init?(coder: NSCoder) {
         fatalError("BrowserTabViewController: Bad initializer")
@@ -51,13 +47,17 @@ final class BrowserTabViewController: NSViewController {
         super.init(coder: coder)
     }
 
+    @IBSegueAction func createHomepageViewController(_ coder: NSCoder) -> NSViewController? {
+        guard let controller = HomepageViewController(coder: coder,
+                                                      tabCollectionViewModel: tabCollectionViewModel,
+                                                      bookmarkManager: LocalBookmarkManager.shared) else {
+            fatalError("BrowserTabViewController: Failed to init HomepageViewController")
+        }
+        return controller
+    }
+
     override func viewDidLoad() {
         super.viewDidLoad()
-
-        NotificationCenter.default.addObserver(self,
-                                               selector: #selector(displayDefaultBrowserPromptIfNeeded),
-                                               name: NSApplication.didBecomeActiveNotification,
-                                               object: nil)
 
         subscribeToSelectedTabViewModel()
         subscribeToIsErrorViewVisible()
@@ -78,46 +78,25 @@ final class BrowserTabViewController: NSViewController {
     private func updateInterface(url: URL?) {
         changeWebView()
 
-        if url != nil {
+        if url != nil && url != URL.emptyPage {
             showWebView()
         } else {
-            showDefaultTabInterface()
+            showHomepage()
         }
     }
 
     private func showWebView() {
-        defaultBrowserPromptView?.removeFromSuperview()
-        defaultBrowserPromptView = nil
+        self.homepageView.removeFromSuperview()
 
         if let webView = self.webView {
             addWebViewToViewHierarchy(webView)
         }
     }
 
-    private func showDefaultTabInterface() {
+    private func showHomepage() {
         self.webView?.removeFromSuperview()
-        displayDefaultBrowserPromptIfNeeded()
-    }
 
-    @objc
-    private func displayDefaultBrowserPromptIfNeeded() {
-        if Browser.isDefault || defaultBrowserPromptDismissed {
-            defaultBrowserPromptView?.removeFromSuperview()
-            defaultBrowserPromptView = nil
-        } else {
-            guard self.defaultBrowserPromptView == nil, canShowEmptyTabInterface else { return }
-
-            let view = DefaultBrowserPromptView.createFromNib()
-            view.delegate = self
-            view.translatesAutoresizingMaskIntoConstraints = false
-            self.view.addSubview(view)
-
-            view.topAnchor.constraint(equalTo: self.view.topAnchor).isActive = true
-            view.leadingAnchor.constraint(equalTo: self.view.leadingAnchor).isActive = true
-            view.trailingAnchor.constraint(equalTo: self.view.trailingAnchor).isActive = true
-
-            self.defaultBrowserPromptView = view
-        }
+        view.addAndLayout(homepageView)
     }
 
     private func addWebViewToViewHierarchy(_ webView: WebView) {
@@ -197,6 +176,7 @@ final class BrowserTabViewController: NSViewController {
 
         errorView.isHidden = !shown
         webView.isHidden = shown
+        homepageView.isHidden = shown
     }
 
     private func openNewTab(with url: URL?, selected: Bool = false) {
@@ -531,20 +511,6 @@ fileprivate extension NSAlert {
         alert.alertStyle = .warning
         alert.addButton(withTitle: UserText.ok)
         return alert
-    }
-
-}
-
-extension BrowserTabViewController: DefaultBrowserPromptViewDelegate {
-
-    func defaultBrowserPromptViewDismissed(_ view: DefaultBrowserPromptView) {
-        defaultBrowserPromptDismissed = true
-        displayDefaultBrowserPromptIfNeeded()
-    }
-
-    func defaultBrowserPromptViewRequestedDefaultBrowserPrompt(_ view: DefaultBrowserPromptView) {
-        Browser.becomeDefault()
-        displayDefaultBrowserPromptIfNeeded()
     }
 
 }
