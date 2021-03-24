@@ -31,6 +31,8 @@ protocol TabDelegate: class {
     func tab(_ tab: Tab, detectedLogin host: String)
 	func tab(_ tab: Tab, requestedOpenExternalURL url: URL, forUserEnteredURL: Bool)
 
+    func tabPageDOMLoaded(_ tab: Tab)
+
 }
 
 final class Tab: NSObject {
@@ -84,7 +86,7 @@ final class Tab: NSObject {
     let webView: WebView
 	var userEnteredUrl = true
 
-    @Published var url: URL? {
+    @PublishedAfter var url: URL? {
         didSet {
             if oldValue?.host != url?.host {
                 fetchFavicon(nil, for: url?.host, isFromUserScript: false)
@@ -94,8 +96,8 @@ final class Tab: NSObject {
         }
     }
 
-    @Published var title: String?
-    @Published var error: Error?
+    @PublishedAfter var title: String?
+    @PublishedAfter var error: Error?
 
     weak var findInPage: FindInPageModel? {
         didSet {
@@ -280,6 +282,7 @@ final class Tab: NSObject {
             userScripts.contentBlockerRulesScript.delegate = self
             userScripts.emailScript.webView = webView
             userScripts.emailScript.delegate = emailManager
+            userScripts.pageObserverScript.delegate = self
 
             attachFindInPage()
 
@@ -309,6 +312,14 @@ final class Tab: NSObject {
     private func attachFindInPage() {
         userScripts.findInPageScript.model = findInPage
         subscribeToFindInPageTextChange()
+    }
+
+}
+
+extension Tab: PageObserverUserScriptDelegate {
+
+    func pageDOMLoaded() {
+        self.delegate?.tabPageDOMLoaded(self)
     }
 
 }

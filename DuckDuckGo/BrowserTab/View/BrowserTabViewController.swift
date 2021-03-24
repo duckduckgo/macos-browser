@@ -180,14 +180,12 @@ final class BrowserTabViewController: NSViewController {
     }
 
     private func setFirstResponderIfNeeded() {
-        guard let url = webView?.url else {
+        guard webView?.url != nil else {
             return
         }
 
-        if !url.isDuckDuckGoSearch {
-            DispatchQueue.main.async { [weak self] in
-                self?.webView?.makeMeFirstResponder()
-            }
+        DispatchQueue.main.async { [weak self] in
+            self?.webView?.makeMeFirstResponder()
         }
     }
 
@@ -242,12 +240,23 @@ extension BrowserTabViewController: TabDelegate {
 				searchForExternalUrl()
 			}
         }
+    }
 
+    func tabPageDOMLoaded(_ tab: Tab) {
+        if tabViewModel?.tab == tab {
+            tabViewModel?.isLoading = false
+        }
     }
 
     func tabDidStartNavigation(_ tab: Tab) {
         setFirstResponderIfNeeded()
-        tabViewModel?.closeFindInPage()
+        guard let tabViewModel = tabViewModel else { return }
+
+        tabViewModel.closeFindInPage()
+        if !tabViewModel.isLoading,
+           tabViewModel.tab.webView.isLoading {
+            tabViewModel.isLoading = true
+        }
     }
 
     func tab(_ tab: Tab, requestedNewTab url: URL?, selected: Bool) {

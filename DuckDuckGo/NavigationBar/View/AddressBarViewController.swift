@@ -26,7 +26,8 @@ final class AddressBarViewController: NSViewController {
     @IBOutlet weak var passiveTextField: NSTextField!
     @IBOutlet var inactiveBackgroundView: NSView!
     @IBOutlet var activeBackgroundView: NSView!
-    @IBOutlet var activeBackgroundViewOverHeight: NSLayoutConstraint!
+    @IBOutlet var activeBackgroundViewWithSuggestions: NSView!
+    @IBOutlet var progressIndicator: ProgressView!
 
     private(set) var addressBarButtonsViewController: AddressBarButtonsViewController?
     
@@ -49,6 +50,9 @@ final class AddressBarViewController: NSViewController {
     private var passiveAddressBarStringCancellable: AnyCancellable?
     private var isSuggestionsVisibleCancellable: AnyCancellable?
     private var frameCancellable: AnyCancellable?
+
+    private var progressCancellable: AnyCancellable?
+    private var loadingCancellable: AnyCancellable?
 
     private var clickPoint: NSPoint?
     private var mouseDownMonitor: Any?
@@ -114,6 +118,7 @@ final class AddressBarViewController: NSViewController {
     private func subscribeToSelectedTabViewModel() {
         selectedTabViewModelCancellable = tabCollectionViewModel.$selectedTabViewModel.receive(on: DispatchQueue.main).sink { [weak self] _ in
             self?.subscribeToPassiveAddressBarString()
+            self?.subscribeToProgressEvents()
             // don't resign first responder on tab switching
             self?.clickPoint = nil
         }
@@ -126,8 +131,47 @@ final class AddressBarViewController: NSViewController {
             passiveTextField.stringValue = ""
             return
         }
-        passiveAddressBarStringCancellable = selectedTabViewModel.$passiveAddressBarString.receive(on: DispatchQueue.main).sink { [weak self] _ in
+        passiveAddressBarStringCancellable = selectedTabViewModel.$passiveAddressBarString.sink { [weak self] _ in
             self?.updatePassiveTextField()
+        }
+    }
+
+    private func subscribeToProgressEvents() {
+        progressCancellable = nil
+        loadingCancellable = nil
+        
+        guard let selectedTabViewModel = tabCollectionViewModel.selectedTabViewModel else {
+            progressIndicator.hide(animated: false)
+            return
+        }
+
+        if selectedTabViewModel.isLoading {
+            progressIndicator.show(progress: selectedTabViewModel.progress, startTime: selectedTabViewModel.loadingStartTime)
+        } else {
+            progressIndicator.hide(animated: false)
+        }
+
+        progressCancellable = selectedTabViewModel.$progress.sink { [weak self] value in
+            guard selectedTabViewModel.isLoading,
+                  let progressIndicator = self?.progressIndicator,
+                  progressIndicator.isShown
+            else { return }
+
+            progressIndicator.increaseProgress(to: value)
+        }
+
+        loadingCancellable = selectedTabViewModel.$isLoading
+            .sink { [weak self] isLoading in
+                guard let progressIndicator = self?.progressIndicator else { return }
+
+                if isLoading,
+                   selectedTabViewModel.tab.url?.isDuckDuckGoSearch == false {
+
+                    progressIndicator.show(progress: selectedTabViewModel.progress, startTime: selectedTabViewModel.loadingStartTime)
+
+                } else if progressIndicator.isShown {
+                    progressIndicator.finishAndHide()
+                }
         }
     }
 
@@ -169,7 +213,9 @@ final class AddressBarViewController: NSViewController {
             self?.shadowView.shadowSides = visible ? [.left, .top, .right] : .all
             self?.shadowView.shadowColor = visible ? .suggestionsShadowColor : .addressBarShadowColor
             self?.shadowView.shadowRadius = visible ? 8.0 : 4.0
-            self?.activeBackgroundViewOverHeight.isActive = visible
+
+            self?.activeBackgroundView.isHidden = visible
+            self?.activeBackgroundViewWithSuggestions.isHidden = !visible
         }
         frameCancellable = self.view.superview?.publisher(for: \.frame).sink { [weak self] _ in
             self?.layoutShadowView()

@@ -237,10 +237,21 @@
                         <rect key="frame" x="0.0" y="0.0" width="600" height="38"/>
                         <autoresizingMask key="autoresizingMask"/>
                         <subviews>
-                            <customView translatesAutoresizingMaskIntoConstraints="NO" id="ENV-0H-Fcc" customClass="ColorView" customModule="DuckDuckGo_Privacy_Browser" customModuleProvider="target">
+                            <customView translatesAutoresizingMaskIntoConstraints="NO" id="ENV-0H-Fcc" userLabel="Inactive Background View with Progress" customClass="ColorView" customModule="DuckDuckGo_Privacy_Browser" customModuleProvider="target">
                                 <rect key="frame" x="5" y="4" width="590" height="30"/>
+                                <subviews>
+                                    <customView translatesAutoresizingMaskIntoConstraints="NO" id="4x6-Xn-fNv" customClass="ProgressView" customModule="DuckDuckGo_Privacy_Browser" customModuleProvider="target">
+                                        <rect key="frame" x="0.0" y="0.0" width="590" height="2"/>
+                                        <constraints>
+                                            <constraint firstAttribute="height" constant="2" id="phH-XL-CIq"/>
+                                        </constraints>
+                                    </customView>
+                                </subviews>
                                 <constraints>
+                                    <constraint firstItem="4x6-Xn-fNv" firstAttribute="leading" secondItem="ENV-0H-Fcc" secondAttribute="leading" id="991-AR-3Be"/>
                                     <constraint firstAttribute="height" constant="30" id="Iw7-li-uNF"/>
+                                    <constraint firstAttribute="bottom" secondItem="4x6-Xn-fNv" secondAttribute="bottom" id="pcl-m3-yAC"/>
+                                    <constraint firstAttribute="trailing" secondItem="4x6-Xn-fNv" secondAttribute="trailing" id="y94-AB-Flr"/>
                                 </constraints>
                                 <userDefinedRuntimeAttributes>
                                     <userDefinedRuntimeAttribute type="color" keyPath="backgroundColor">
@@ -252,10 +263,10 @@
                                 </userDefinedRuntimeAttributes>
                             </customView>
                             <customView translatesAutoresizingMaskIntoConstraints="NO" id="e0p-7S-Gan" customClass="ColorView" customModule="DuckDuckGo_Privacy_Browser" customModuleProvider="target">
-                                <rect key="frame" x="0.0" y="-22" width="600" height="60"/>
+                                <rect key="frame" x="0.0" y="0.0" width="600" height="38"/>
                                 <subviews>
                                     <customView translatesAutoresizingMaskIntoConstraints="NO" id="okL-f2-MVs" userLabel="Inner Border View" customClass="ColorView" customModule="DuckDuckGo_Privacy_Browser" customModuleProvider="target">
-                                        <rect key="frame" x="1" y="1" width="598" height="58"/>
+                                        <rect key="frame" x="1" y="1" width="598" height="36"/>
                                         <userDefinedRuntimeAttributes>
                                             <userDefinedRuntimeAttribute type="color" keyPath="borderColor">
                                                 <color key="value" name="AddressBarInnerBorderColor"/>
@@ -272,9 +283,48 @@
                                 <constraints>
                                     <constraint firstAttribute="trailing" secondItem="okL-f2-MVs" secondAttribute="trailing" constant="1" id="2om-qd-Lmk"/>
                                     <constraint firstAttribute="bottom" secondItem="okL-f2-MVs" secondAttribute="bottom" constant="1" id="Mew-1J-SIB"/>
-                                    <constraint firstAttribute="height" constant="60" id="WCn-tU-JoP"/>
                                     <constraint firstItem="okL-f2-MVs" firstAttribute="top" secondItem="e0p-7S-Gan" secondAttribute="top" constant="1" id="fT5-Th-J4n"/>
                                     <constraint firstItem="okL-f2-MVs" firstAttribute="leading" secondItem="e0p-7S-Gan" secondAttribute="leading" constant="1" id="klT-Ox-vJw"/>
+                                </constraints>
+                                <userDefinedRuntimeAttributes>
+                                    <userDefinedRuntimeAttribute type="color" keyPath="backgroundColor">
+                                        <color key="value" name="AddressBarBackgroundColor"/>
+                                    </userDefinedRuntimeAttribute>
+                                    <userDefinedRuntimeAttribute type="number" keyPath="cornerRadius">
+                                        <real key="value" value="14"/>
+                                    </userDefinedRuntimeAttribute>
+                                    <userDefinedRuntimeAttribute type="color" keyPath="borderColor">
+                                        <color key="value" name="AddressBarBorderColor"/>
+                                    </userDefinedRuntimeAttribute>
+                                    <userDefinedRuntimeAttribute type="number" keyPath="borderWidth">
+                                        <real key="value" value="1"/>
+                                    </userDefinedRuntimeAttribute>
+                                </userDefinedRuntimeAttributes>
+                            </customView>
+                            <customView translatesAutoresizingMaskIntoConstraints="NO" id="Ij9-fc-CLI" customClass="ColorView" customModule="DuckDuckGo_Privacy_Browser" customModuleProvider="target">
+                                <rect key="frame" x="0.0" y="-22" width="600" height="60"/>
+                                <subviews>
+                                    <customView translatesAutoresizingMaskIntoConstraints="NO" id="INL-zs-eEh" userLabel="Inner Border View" customClass="ColorView" customModule="DuckDuckGo_Privacy_Browser" customModuleProvider="target">
+                                        <rect key="frame" x="1" y="1" width="598" height="58"/>
+                                        <userDefinedRuntimeAttributes>
+                                            <userDefinedRuntimeAttribute type="color" keyPath="borderColor">
+                                                <color key="value" name="AddressBarInnerBorderColor"/>
+                                            </userDefinedRuntimeAttribute>
+                                            <userDefinedRuntimeAttribute type="number" keyPath="borderWidth">
+                                                <real key="value" value="1"/>
+                                            </userDefinedRuntimeAttribute>
+                                            <userDefinedRuntimeAttribute type="number" keyPath="cornerRadius">
+                                                <real key="value" value="14"/>
+                                            </userDefinedRuntimeAttribute>
+                                        </userDefinedRuntimeAttributes>
+                                    </customView>
+                                </subviews>
+                                <constraints>
+                                    <constraint firstItem="INL-zs-eEh" firstAttribute="leading" secondItem="Ij9-fc-CLI" secondAttribute="leading" constant="1" id="4kW-oy-mTm"/>
+                                    <constraint firstAttribute="trailing" secondItem="INL-zs-eEh" secondAttribute="trailing" constant="1" id="5Xn-fr-BZ1"/>
+                                    <constraint firstItem="INL-zs-eEh" firstAttribute="top" secondItem="Ij9-fc-CLI" secondAttribute="top" constant="1" id="X7U-Sj-ZgA"/>
+                                    <constraint firstAttribute="bottom" secondItem="INL-zs-eEh" secondAttribute="bottom" constant="1" id="scf-1X-Mb0"/>
+                                    <constraint firstAttribute="height" constant="60" id="yqE-CB-eEx"/>
                                 </constraints>
                                 <userDefinedRuntimeAttributes>
                                     <userDefinedRuntimeAttribute type="color" keyPath="backgroundColor">
@@ -344,23 +394,27 @@
                             <constraint firstItem="zaX-wZ-E3D" firstAttribute="centerY" secondItem="wj6-L2-5rJ" secondAttribute="centerY" id="M2U-b3-Z0t"/>
                             <constraint firstItem="bOl-8Z-hTh" firstAttribute="leading" secondItem="wj6-L2-5rJ" secondAttribute="leading" constant="4" id="OSv-yy-Yz5"/>
                             <constraint firstItem="e0p-7S-Gan" firstAttribute="top" secondItem="wj6-L2-5rJ" secondAttribute="top" id="QK2-Pt-rY4"/>
+                            <constraint firstAttribute="trailing" secondItem="Ij9-fc-CLI" secondAttribute="trailing" id="Rcu-uf-Zn8"/>
                             <constraint firstItem="bOl-8Z-hTh" firstAttribute="top" secondItem="wj6-L2-5rJ" secondAttribute="top" constant="4" id="SwY-O9-MAQ"/>
                             <constraint firstAttribute="trailing" secondItem="e0p-7S-Gan" secondAttribute="trailing" id="V8Z-LH-nT9"/>
                             <constraint firstAttribute="trailing" secondItem="bOl-8Z-hTh" secondAttribute="trailing" constant="4" id="VD0-WJ-LdG"/>
                             <constraint firstItem="ENV-0H-Fcc" firstAttribute="leading" secondItem="wj6-L2-5rJ" secondAttribute="leading" constant="5" id="WGn-g2-wT7"/>
                             <constraint firstAttribute="bottom" secondItem="bOl-8Z-hTh" secondAttribute="bottom" constant="4" id="WNn-YA-PHP"/>
+                            <constraint firstItem="Ij9-fc-CLI" firstAttribute="top" secondItem="wj6-L2-5rJ" secondAttribute="top" id="XhY-ag-U21"/>
                             <constraint firstItem="zaX-wZ-E3D" firstAttribute="leading" secondItem="wj6-L2-5rJ" secondAttribute="leading" constant="37" id="bY3-LA-cuF"/>
                             <constraint firstItem="ENV-0H-Fcc" firstAttribute="centerY" secondItem="wj6-L2-5rJ" secondAttribute="centerY" id="knb-UX-IQW"/>
+                            <constraint firstItem="Ij9-fc-CLI" firstAttribute="leading" secondItem="wj6-L2-5rJ" secondAttribute="leading" id="mPy-45-VDH"/>
                             <constraint firstAttribute="bottom" secondItem="e0p-7S-Gan" secondAttribute="bottom" priority="300" id="nuB-My-vJR"/>
                             <constraint firstItem="le0-Hn-ZAC" firstAttribute="centerY" secondItem="wj6-L2-5rJ" secondAttribute="centerY" id="wEn-eS-Lat"/>
                         </constraints>
                     </view>
                     <connections>
                         <outlet property="activeBackgroundView" destination="e0p-7S-Gan" id="2FB-uy-8tO"/>
-                        <outlet property="activeBackgroundViewOverHeight" destination="WCn-tU-JoP" id="8FS-jG-1qv"/>
+                        <outlet property="activeBackgroundViewWithSuggestions" destination="Ij9-fc-CLI" id="JWC-g2-hrM"/>
                         <outlet property="addressBarTextField" destination="zaX-wZ-E3D" id="pfO-d4-i46"/>
                         <outlet property="inactiveBackgroundView" destination="ENV-0H-Fcc" id="OV5-2s-Ggq"/>
                         <outlet property="passiveTextField" destination="le0-Hn-ZAC" id="npL-R1-gmH"/>
+                        <outlet property="progressIndicator" destination="4x6-Xn-fNv" id="Ydu-ob-RJz"/>
                         <outlet property="shadowView" destination="ktI-g4-Uk6" id="v81-tf-DGJ"/>
                         <outlet property="view" destination="wj6-L2-5rJ" id="bsr-e7-gS7"/>
                     </connections>
