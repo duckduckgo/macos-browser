@@ -63,6 +63,10 @@ struct BookmarkList {
     }
 
     mutating func updateUrl(of bookmark: Bookmark, to newUrl: URL) -> Bookmark? {
+        guard itemsDict[newUrl] == nil else {
+            os_log("BookmarkList: Update failed, new url already in bookmark list")
+            return nil
+        }
         guard itemsDict[bookmark.url] != nil, let index = keysOrdered.firstIndex(of: bookmark.url) else {
             os_log("BookmarkList: Update failed, no such item in bookmark list")
             return nil

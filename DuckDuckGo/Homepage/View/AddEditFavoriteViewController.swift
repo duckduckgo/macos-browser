@@ -55,11 +55,6 @@ final class AddEditFavoriteViewController: NSViewController {
             }
         }
 
-        // Updating a URL means
-        func update(bookmark: Bookmark, url: String, title: String) {
-
-        }
-
         guard isInputValid, let newUrl = urlInputTextField.stringValue.url else {
             assertionFailure("Not valid input")
             return

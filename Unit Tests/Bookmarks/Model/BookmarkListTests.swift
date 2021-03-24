@@ -108,6 +108,27 @@ final class BookmarkListTests: XCTestCase {
         XCTAssertNotNil(bookmarkList[newBookmark!.url])
     }
 
+
+    func testWhenBookmarkUrlIsUpdatedToAlreadyBookmarkedUrl_ThenUpdatingMustFail() {
+        var bookmarkList = BookmarkList()
+
+        let firstUrl = URL(string: "wikipedia.org")!
+        let bookmarks = [
+            Bookmark(url: firstUrl, title: "Title", favicon: nil, isFavorite: true, managedObjectId: nil),
+            Bookmark(url: URL.duckDuckGo, title: "Title", favicon: nil, isFavorite: true, managedObjectId: nil)
+        ]
+
+        bookmarks.forEach { bookmarkList.insert($0) }
+
+        let bookmarkToReplace = bookmarks[1]
+        let newBookmark = bookmarkList.updateUrl(of: bookmarkToReplace, to: firstUrl)
+
+        XCTAssert(bookmarkList.bookmarks().count == bookmarks.count)
+        XCTAssertNotNil(bookmarkList[firstUrl])
+        XCTAssertNotNil(bookmarkList[bookmarkToReplace.url])
+        XCTAssertNil(newBookmark)
+    }
+
 }
 
 fileprivate extension Bookmark {
