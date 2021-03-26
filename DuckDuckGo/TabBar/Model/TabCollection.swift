@@ -96,4 +96,8 @@ final class TabCollection: NSObject {
         self.lastRemovedTabCache = nil
     }
 
+    func cleanLastRemovedTab() {
+        lastRemovedTabCache = nil
+    }
+
 }

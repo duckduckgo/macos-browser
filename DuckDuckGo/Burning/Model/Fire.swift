@@ -42,6 +42,7 @@ final class Fire {
             DispatchQueue.main.async {
                 if tabCollectionViewModel.tabCollection.tabs.count > 0 {
                     tabCollectionViewModel.removeAllTabsAndAppendNewTab()
+                    tabCollectionViewModel.tabCollection.cleanLastRemovedTab()
                 } else {
                     tabCollectionViewModel.appendNewTab()
                 }
