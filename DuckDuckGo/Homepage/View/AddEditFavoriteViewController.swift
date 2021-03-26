@@ -69,7 +69,7 @@ final class AddEditFavoriteViewController: NSViewController {
             if let bookmark = bookmarkManager.getBookmark(for: newUrl) {
                 update(bookmark: bookmark, newTitle: newTitle)
             } else {
-                bookmarkManager.makeBookmark(for: newUrl, title: newTitle, favicon: nil, isFavorite: true)
+                bookmarkManager.makeBookmark(for: newUrl, title: newTitle, isFavorite: true)
             }
         }
         view.window?.close()

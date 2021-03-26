@@ -24,7 +24,7 @@ protocol BookmarkManager: AnyObject {
 
     func isUrlBookmarked(url: URL) -> Bool
     func getBookmark(for url: URL) -> Bookmark?
-    @discardableResult func makeBookmark(for url: URL, title: String, favicon: NSImage?, isFavorite: Bool) -> Bookmark?
+    @discardableResult func makeBookmark(for url: URL, title: String, isFavorite: Bool) -> Bookmark?
     func remove(bookmark: Bookmark)
     func update(bookmark: Bookmark)
     @discardableResult func updateUrl(of bookmark: Bookmark, to newUrl: URL) -> Bookmark?
@@ -74,14 +74,14 @@ final class LocalBookmarkManager: BookmarkManager {
         return list?[url]
     }
 
-    @discardableResult func makeBookmark(for url: URL, title: String, favicon: NSImage?, isFavorite: Bool) -> Bookmark? {
+    @discardableResult func makeBookmark(for url: URL, title: String, isFavorite: Bool) -> Bookmark? {
         guard list != nil else { return nil }
         guard !isUrlBookmarked(url: url) else {
             os_log("LocalBookmarkManager: Url is already bookmarked", type: .error)
             return nil
         }
 
-        let bookmark = Bookmark(url: url, title: title, favicon: favicon, isFavorite: isFavorite)
+        let bookmark = Bookmark(url: url, title: title, favicon: favicon(for: url.host), isFavorite: isFavorite)
 
         list?.insert(bookmark)
         bookmarkStore.save(bookmark: bookmark) { [weak self] success, objectId, _  in
@@ -183,6 +183,14 @@ final class LocalBookmarkManager: BookmarkManager {
                 bookmark.favicon = favicon
                 update(bookmark: bookmark)
             }
+    }
+
+    private func favicon(for host: String?) -> NSImage? {
+        if let host = host {
+            return faviconService.getCachedFavicon(for: host, mustBeFromUserScript: false)
+        }
+
+        return nil
     }
 
 }
