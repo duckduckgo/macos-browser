@@ -41,7 +41,7 @@ final class FireTests: XCTestCase {
         XCTAssert(tabCollectionViewModel.tabCollection.tabs.first?.isHomepageShown ?? false)
     }
 
-    func testWhenBurnAllThenAllWebsiteDataAreRemovedAndLastClosedTabIsCleaned() {
+    func testWhenBurnAllThenAllWebsiteDataAreRemovedAndLastRemovedTabCacheIsNil() {
         let manager = WebCacheManagerMock()
         let fire = Fire(cacheManager: manager)
         let tabCollectionViewModel = TabCollectionViewModel.aTabCollectionViewModel
