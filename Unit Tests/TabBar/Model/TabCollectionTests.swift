@@ -180,4 +180,21 @@ final class TabCollectionTests: XCTestCase {
         XCTAssertNil(tabCollection.lastRemovedTabCache)
     }
 
+    func testWhenLastRemovedTabCacheWasCleaned_ThenPutBackLastRemovedTabDoesNothing() {
+        let tabCollection = TabCollection()
+
+        let tab = Tab()
+        tab.url = URL.duckDuckGo
+        tabCollection.append(tab: tab)
+        XCTAssert(tabCollection.remove(at: 0))
+
+        let tabsCount = tabCollection.tabs.count
+
+        tabCollection.cleanLastRemovedTab()
+        tabCollection.putBackLastRemovedTab()
+
+        XCTAssertNil(tabCollection.lastRemovedTabCache)
+        XCTAssertEqual(tabsCount, tabCollection.tabs.count)
+    }
+
 }

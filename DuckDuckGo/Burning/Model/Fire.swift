@@ -46,6 +46,8 @@ final class Fire {
                     tabCollectionViewModel.appendNewTab()
                 }
 
+                tabCollectionViewModel.tabCollection.cleanLastRemovedTab()
+
                 completion?()
             }
         }
