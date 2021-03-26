@@ -180,7 +180,7 @@ final class TabCollectionTests: XCTestCase {
         XCTAssertNil(tabCollection.lastRemovedTabCache)
     }
 
-    func testWhenLastRemovedTabCacheWasCleaned_ThenThenPutBackLastRemovedTabDoesNothing() {
+    func testWhenLastRemovedTabCacheWasCleaned_ThenPutBackLastRemovedTabDoesNothing() {
         let tabCollection = TabCollection()
 
         let tab = Tab()
