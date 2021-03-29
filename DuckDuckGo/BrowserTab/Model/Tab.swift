@@ -235,7 +235,7 @@ final class Tab: NSObject {
 
     // MARK: - Favicon
 
-    @Published private(set) var favicon: NSImage?
+    @Published var favicon: NSImage?
     let faviconService: FaviconService
 
     private func fetchFavicon(_ faviconURL: URL?, for host: String?, isFromUserScript: Bool) {
