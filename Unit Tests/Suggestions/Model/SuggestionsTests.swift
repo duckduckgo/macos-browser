@@ -23,7 +23,7 @@ final class SuggestionsTests: XCTestCase {
 
     func testWhenQueryIsEmptyThenSuggestionsAreNil() {
         let suggestionsAPIMock = SuggestionsAPIMock()
-        let suggestions = Suggestions(suggestionsAPI: suggestionsAPIMock)
+        let suggestions = SuggestionList(suggestionsAPI: suggestionsAPIMock)
 
         let query = ""
         suggestions.getSuggestions(for: query)
@@ -33,7 +33,7 @@ final class SuggestionsTests: XCTestCase {
 
     func testWhenQueryIsNotEmptyThenAPIResultAreLoaded() {
         let suggestionsAPIMock = SuggestionsAPIMock()
-        let suggestions = Suggestions(suggestionsAPI: suggestionsAPIMock)
+        let suggestions = SuggestionList(suggestionsAPI: suggestionsAPIMock)
 
         let suggestionsAPIResult = SuggestionsAPIResult.aSuggestionsAPIResult
         suggestionsAPIMock.suggestionsAPIResult = suggestionsAPIResult

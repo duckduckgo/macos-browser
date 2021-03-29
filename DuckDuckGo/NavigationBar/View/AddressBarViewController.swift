@@ -32,7 +32,7 @@ final class AddressBarViewController: NSViewController {
     private(set) var addressBarButtonsViewController: AddressBarButtonsViewController?
     
     private var tabCollectionViewModel: TabCollectionViewModel
-    private let suggestionsViewModel = SuggestionsViewModel(suggestions: Suggestions())
+    private let suggestionListViewModel = SuggestionListViewModel(suggestionList: SuggestionList())
 
     enum Mode: Equatable {
         case searching(withUrl: Bool)
@@ -73,7 +73,7 @@ final class AddressBarViewController: NSViewController {
 
         updateView(firstResponder: false)
         addressBarTextField.tabCollectionViewModel = tabCollectionViewModel
-        addressBarTextField.suggestionsViewModel = suggestionsViewModel
+        addressBarTextField.suggestionListViewModel = suggestionListViewModel
         subscribeToSelectedTabViewModel()
         subscribeToAddressBarTextFieldValue()
         registerForMouseEnteredAndExitedEvents()
@@ -209,7 +209,7 @@ final class AddressBarViewController: NSViewController {
             return
         }
 
-        isSuggestionsVisibleCancellable = addressBarTextField.isSuggestionsWindowVisible.sink { [weak self] visible in
+        isSuggestionsVisibleCancellable = addressBarTextField.isSuggestionWindowVisible.sink { [weak self] visible in
             self?.shadowView.shadowSides = visible ? [.left, .top, .right] : .all
             self?.shadowView.shadowColor = visible ? .suggestionsShadowColor : .addressBarShadowColor
             self?.shadowView.shadowRadius = visible ? 8.0 : 4.0

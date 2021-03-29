@@ -10,7 +10,7 @@
         <!--Window Controller-->
         <scene sceneID="kK0-bi-Mi6">
             <objects>
-                <windowController storyboardIdentifier="SuggestionsWindowController" id="cvc-K3-VCn" sceneMemberID="viewController">
+                <windowController storyboardIdentifier="SuggestionWindowController" id="cvc-K3-VCn" sceneMemberID="viewController">
                     <window key="window" allowsToolTipsWhenApplicationIsInactive="NO" autorecalculatesKeyViewLoop="NO" restorable="NO" hasShadow="NO" visibleAtLaunch="NO" frameAutosaveName="" animationBehavior="default" titlebarAppearsTransparent="YES" titleVisibility="hidden" id="k4G-BH-yNc">
                         <windowStyleMask key="styleMask" fullSizeContentView="YES"/>
                         <windowPositionMask key="initialPositionMask" leftStrut="YES" rightStrut="YES" topStrut="YES" bottomStrut="YES"/>
@@ -45,22 +45,22 @@
             </objects>
             <point key="canvasLocation" x="-344" y="601"/>
         </scene>
-        <!--Suggestions View Controller-->
+        <!--Suggestion View Controller-->
         <scene sceneID="uJh-kd-sy1">
             <objects>
-                <viewController storyboardIdentifier="SuggestionsViewController" id="JbS-WE-3yw" customClass="SuggestionsViewController" customModule="DuckDuckGo_Privacy_Browser" customModuleProvider="target" sceneMemberID="viewController">
+                <viewController storyboardIdentifier="SuggestionViewController" id="JbS-WE-3yw" customClass="SuggestionViewController" customModule="DuckDuckGo_Privacy_Browser" customModuleProvider="target" sceneMemberID="viewController">
                     <view key="view" misplaced="YES" id="PAv-y7-vhB">
                         <rect key="frame" x="0.0" y="0.0" width="510" height="81"/>
                         <autoresizingMask key="autoresizingMask"/>
                         <subviews>
                             <customView translatesAutoresizingMaskIntoConstraints="NO" id="bEL-6C-4Mq" userLabel="Layout View">
-                                <rect key="frame" x="0.0" y="0.0" width="538" height="101"/>
+                                <rect key="frame" x="0.0" y="0.0" width="538" height="220"/>
                                 <subviews>
                                     <customView translatesAutoresizingMaskIntoConstraints="NO" id="KKJ-SW-5gR" userLabel="Shadow Clip View">
-                                        <rect key="frame" x="0.0" y="0.0" width="538" height="100"/>
+                                        <rect key="frame" x="0.0" y="0.0" width="538" height="219"/>
                                         <subviews>
                                             <customView translatesAutoresizingMaskIntoConstraints="NO" id="cHT-Cf-UOB" customClass="ShadowView" customModule="DuckDuckGo_Privacy_Browser" customModuleProvider="target">
-                                                <rect key="frame" x="20" y="20" width="498" height="100"/>
+                                                <rect key="frame" x="20" y="20" width="498" height="219"/>
                                                 <userDefinedRuntimeAttributes>
                                                     <userDefinedRuntimeAttribute type="color" keyPath="shadowColor">
                                                         <color key="value" name="SuggestionsShadowColor"/>
@@ -88,13 +88,13 @@
                                         </constraints>
                                     </customView>
                                     <customView translatesAutoresizingMaskIntoConstraints="NO" id="Svf-wj-SjJ" userLabel="Clip View">
-                                        <rect key="frame" x="20" y="20" width="498" height="81"/>
+                                        <rect key="frame" x="20" y="20" width="498" height="200"/>
                                         <subviews>
                                             <customView translatesAutoresizingMaskIntoConstraints="NO" id="j2X-bv-VAU" userLabel="Background View" customClass="ColorView" customModule="DuckDuckGo_Privacy_Browser" customModuleProvider="target">
-                                                <rect key="frame" x="0.0" y="0.0" width="498" height="101"/>
+                                                <rect key="frame" x="0.0" y="0.0" width="498" height="220"/>
                                                 <subviews>
                                                     <customView translatesAutoresizingMaskIntoConstraints="NO" id="MtO-b9-tF8" userLabel="Inner Border View" customClass="ColorView" customModule="DuckDuckGo_Privacy_Browser" customModuleProvider="target">
-                                                        <rect key="frame" x="1" y="1" width="496" height="82"/>
+                                                        <rect key="frame" x="1" y="1" width="496" height="201"/>
                                                         <userDefinedRuntimeAttributes>
                                                             <userDefinedRuntimeAttribute type="color" keyPath="borderColor">
                                                                 <color key="value" name="AddressBarInnerBorderColor"/>
@@ -108,13 +108,13 @@
                                                         </userDefinedRuntimeAttributes>
                                                     </customView>
                                                     <scrollView borderType="none" horizontalLineScroll="28" horizontalPageScroll="10" verticalLineScroll="28" verticalPageScroll="10" hasHorizontalScroller="NO" hasVerticalScroller="NO" usesPredominantAxisScrolling="NO" translatesAutoresizingMaskIntoConstraints="NO" id="cx3-LG-ZUH">
-                                                        <rect key="frame" x="5" y="0.0" width="488" height="63"/>
+                                                        <rect key="frame" x="5" y="0.0" width="488" height="182"/>
                                                         <clipView key="contentView" drawsBackground="NO" copiesOnScroll="NO" id="pb8-sX-fSc">
-                                                            <rect key="frame" x="0.0" y="0.0" width="488" height="63"/>
+                                                            <rect key="frame" x="0.0" y="0.0" width="488" height="182"/>
                                                             <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                                             <subviews>
                                                                 <tableView verticalHuggingPriority="750" allowsExpansionToolTips="YES" columnAutoresizingStyle="lastColumnOnly" selectionHighlightStyle="none" columnSelection="YES" multipleSelection="NO" autosaveColumns="NO" rowHeight="28" viewBased="YES" id="4Z2-d8-NA2">
-                                                                    <rect key="frame" x="0.0" y="0.0" width="488" height="46"/>
+                                                                    <rect key="frame" x="0.0" y="0.0" width="488" height="165"/>
                                                                     <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                                                     <color key="backgroundColor" name="ClearColor"/>
                                                                     <color key="gridColor" name="gridColor" catalog="System" colorSpace="catalog"/>
@@ -212,7 +212,7 @@
                                                 </userDefinedRuntimeAttributes>
                                             </customView>
                                             <customView translatesAutoresizingMaskIntoConstraints="NO" id="ATb-xt-XAg" userLabel="Separator" customClass="ColorView" customModule="DuckDuckGo_Privacy_Browser" customModuleProvider="target">
-                                                <rect key="frame" x="2" y="80" width="494" height="1"/>
+                                                <rect key="frame" x="2" y="199" width="494" height="1"/>
                                                 <constraints>
                                                     <constraint firstAttribute="height" constant="1" id="G3c-nz-oCJ"/>
                                                 </constraints>

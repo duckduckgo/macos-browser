@@ -8,7 +8,7 @@
 
 /* Begin PBXBuildFile section */
 		142879DA24CE1179005419BB /* SuggestionViewModelTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 142879D924CE1179005419BB /* SuggestionViewModelTests.swift */; };
-		142879DC24CE1185005419BB /* SuggestionsViewModelTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 142879DB24CE1185005419BB /* SuggestionsViewModelTests.swift */; };
+		142879DC24CE1185005419BB /* SuggestionListViewModelTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 142879DB24CE1185005419BB /* SuggestionListViewModelTests.swift */; };
 		1430DFF524D0580F00B8978C /* TabBarViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1430DFF424D0580F00B8978C /* TabBarViewController.swift */; };
 		14505A08256084EF00272CC6 /* UserAgent.swift in Sources */ = {isa = PBXBuildFile; fileRef = 14505A07256084EF00272CC6 /* UserAgent.swift */; };
 		1456D6E124EFCBC300775049 /* TabBarCollectionView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1456D6E024EFCBC300775049 /* TabBarCollectionView.swift */; };
@@ -158,7 +158,7 @@
 		AA80EC54256BE3BC007083E7 /* UserText.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA80EC53256BE3BC007083E7 /* UserText.swift */; };
 		AA80EC67256C4691007083E7 /* BrowserTab.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = AA80EC69256C4691007083E7 /* BrowserTab.storyboard */; };
 		AA80EC6D256C469C007083E7 /* NavigationBar.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = AA80EC6F256C469C007083E7 /* NavigationBar.storyboard */; };
-		AA80EC73256C46A2007083E7 /* Suggestions.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = AA80EC75256C46A2007083E7 /* Suggestions.storyboard */; };
+		AA80EC73256C46A2007083E7 /* Suggestion.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = AA80EC75256C46A2007083E7 /* Suggestion.storyboard */; };
 		AA80EC79256C46AA007083E7 /* TabBar.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = AA80EC7B256C46AA007083E7 /* TabBar.storyboard */; };
 		AA80EC89256C49B8007083E7 /* Localizable.strings in Resources */ = {isa = PBXBuildFile; fileRef = AA80EC8B256C49B8007083E7 /* Localizable.strings */; };
 		AA80EC8F256C49BC007083E7 /* Localizable.stringsdict in Resources */ = {isa = PBXBuildFile; fileRef = AA80EC91256C49BC007083E7 /* Localizable.stringsdict */; };
@@ -190,10 +190,10 @@
 		AABAF59C260A7D130085060C /* FaviconServiceMock.swift in Sources */ = {isa = PBXBuildFile; fileRef = AABAF59B260A7D130085060C /* FaviconServiceMock.swift */; };
 		AABEE69324A4E2F80043105B /* SuggestionsAPI.swift in Sources */ = {isa = PBXBuildFile; fileRef = AABEE69224A4E2F80043105B /* SuggestionsAPI.swift */; };
 		AABEE69824A5FD930043105B /* SuggestionsAPIResult.swift in Sources */ = {isa = PBXBuildFile; fileRef = AABEE69724A5FD930043105B /* SuggestionsAPIResult.swift */; };
-		AABEE69A24A902A90043105B /* SuggestionsViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = AABEE69924A902A90043105B /* SuggestionsViewModel.swift */; };
-		AABEE69C24A902BB0043105B /* Suggestions.swift in Sources */ = {isa = PBXBuildFile; fileRef = AABEE69B24A902BB0043105B /* Suggestions.swift */; };
+		AABEE69A24A902A90043105B /* SuggestionListViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = AABEE69924A902A90043105B /* SuggestionListViewModel.swift */; };
+		AABEE69C24A902BB0043105B /* SuggestionList.swift in Sources */ = {isa = PBXBuildFile; fileRef = AABEE69B24A902BB0043105B /* SuggestionList.swift */; };
 		AABEE69E24A9C5C30043105B /* Suggestion.swift in Sources */ = {isa = PBXBuildFile; fileRef = AABEE69D24A9C5C30043105B /* Suggestion.swift */; };
-		AABEE6A524AA0A7F0043105B /* SuggestionsViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = AABEE6A424AA0A7F0043105B /* SuggestionsViewController.swift */; };
+		AABEE6A524AA0A7F0043105B /* SuggestionViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = AABEE6A424AA0A7F0043105B /* SuggestionViewController.swift */; };
 		AABEE6A924AB4B910043105B /* SuggestionTableCellView.swift in Sources */ = {isa = PBXBuildFile; fileRef = AABEE6A824AB4B910043105B /* SuggestionTableCellView.swift */; };
 		AABEE6AB24ACA0F90043105B /* SuggestionTableRowView.swift in Sources */ = {isa = PBXBuildFile; fileRef = AABEE6AA24ACA0F90043105B /* SuggestionTableRowView.swift */; };
 		AABEE6AF24AD22B90043105B /* AddressBarTextField.swift in Sources */ = {isa = PBXBuildFile; fileRef = AABEE6AE24AD22B90043105B /* AddressBarTextField.swift */; };
@@ -280,7 +280,7 @@
 
 /* Begin PBXFileReference section */
 		142879D924CE1179005419BB /* SuggestionViewModelTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SuggestionViewModelTests.swift; sourceTree = "<group>"; };
-		142879DB24CE1185005419BB /* SuggestionsViewModelTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SuggestionsViewModelTests.swift; sourceTree = "<group>"; };
+		142879DB24CE1185005419BB /* SuggestionListViewModelTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SuggestionListViewModelTests.swift; sourceTree = "<group>"; };
 		1430DFF424D0580F00B8978C /* TabBarViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TabBarViewController.swift; sourceTree = "<group>"; };
 		14505A07256084EF00272CC6 /* UserAgent.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UserAgent.swift; sourceTree = "<group>"; };
 		1456D6E024EFCBC300775049 /* TabBarCollectionView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TabBarCollectionView.swift; sourceTree = "<group>"; };
@@ -434,7 +434,7 @@
 		AA80EC53256BE3BC007083E7 /* UserText.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UserText.swift; sourceTree = "<group>"; };
 		AA80EC68256C4691007083E7 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/BrowserTab.storyboard; sourceTree = "<group>"; };
 		AA80EC6E256C469C007083E7 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/NavigationBar.storyboard; sourceTree = "<group>"; };
-		AA80EC74256C46A2007083E7 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/Suggestions.storyboard; sourceTree = "<group>"; };
+		AA80EC74256C46A2007083E7 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/Suggestion.storyboard; sourceTree = "<group>"; };
 		AA80EC7A256C46AA007083E7 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/TabBar.storyboard; sourceTree = "<group>"; };
 		AA80EC8A256C49B8007083E7 /* en */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = en; path = en.lproj/Localizable.strings; sourceTree = "<group>"; };
 		AA80EC90256C49BC007083E7 /* en */ = {isa = PBXFileReference; lastKnownFileType = text.plist.stringsdict; name = en; path = en.lproj/Localizable.stringsdict; sourceTree = "<group>"; };
@@ -466,10 +466,10 @@
 		AABAF59B260A7D130085060C /* FaviconServiceMock.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FaviconServiceMock.swift; sourceTree = "<group>"; };
 		AABEE69224A4E2F80043105B /* SuggestionsAPI.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SuggestionsAPI.swift; sourceTree = "<group>"; };
 		AABEE69724A5FD930043105B /* SuggestionsAPIResult.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SuggestionsAPIResult.swift; sourceTree = "<group>"; };
-		AABEE69924A902A90043105B /* SuggestionsViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SuggestionsViewModel.swift; sourceTree = "<group>"; };
-		AABEE69B24A902BB0043105B /* Suggestions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Suggestions.swift; sourceTree = "<group>"; };
+		AABEE69924A902A90043105B /* SuggestionListViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SuggestionListViewModel.swift; sourceTree = "<group>"; };
+		AABEE69B24A902BB0043105B /* SuggestionList.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SuggestionList.swift; sourceTree = "<group>"; };
 		AABEE69D24A9C5C30043105B /* Suggestion.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Suggestion.swift; sourceTree = "<group>"; };
-		AABEE6A424AA0A7F0043105B /* SuggestionsViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SuggestionsViewController.swift; sourceTree = "<group>"; };
+		AABEE6A424AA0A7F0043105B /* SuggestionViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SuggestionViewController.swift; sourceTree = "<group>"; };
 		AABEE6A824AB4B910043105B /* SuggestionTableCellView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SuggestionTableCellView.swift; sourceTree = "<group>"; };
 		AABEE6AA24ACA0F90043105B /* SuggestionTableRowView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SuggestionTableRowView.swift; sourceTree = "<group>"; };
 		AABEE6AE24AD22B90043105B /* AddressBarTextField.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AddressBarTextField.swift; sourceTree = "<group>"; };
@@ -571,7 +571,7 @@
 		142879D824CE1139005419BB /* ViewModel */ = {
 			isa = PBXGroup;
 			children = (
-				142879DB24CE1185005419BB /* SuggestionsViewModelTests.swift */,
+				142879DB24CE1185005419BB /* SuggestionListViewModelTests.swift */,
 				142879D924CE1179005419BB /* SuggestionViewModelTests.swift */,
 			);
 			path = ViewModel;
@@ -1358,7 +1358,7 @@
 		AABEE68F24A4CB290043105B /* Model */ = {
 			isa = PBXGroup;
 			children = (
-				AABEE69B24A902BB0043105B /* Suggestions.swift */,
+				AABEE69B24A902BB0043105B /* SuggestionList.swift */,
 				AABEE69D24A9C5C30043105B /* Suggestion.swift */,
 			);
 			path = Model;
@@ -1367,7 +1367,7 @@
 		AABEE69024A4CB300043105B /* ViewModel */ = {
 			isa = PBXGroup;
 			children = (
-				AABEE69924A902A90043105B /* SuggestionsViewModel.swift */,
+				AABEE69924A902A90043105B /* SuggestionListViewModel.swift */,
 				AA3F895224C18AD500628DDE /* SuggestionViewModel.swift */,
 			);
 			path = ViewModel;
@@ -1385,8 +1385,8 @@
 		AABEE6A124A9F3C90043105B /* View */ = {
 			isa = PBXGroup;
 			children = (
-				AA80EC75256C46A2007083E7 /* Suggestions.storyboard */,
-				AABEE6A424AA0A7F0043105B /* SuggestionsViewController.swift */,
+				AA80EC75256C46A2007083E7 /* Suggestion.storyboard */,
+				AABEE6A424AA0A7F0043105B /* SuggestionViewController.swift */,
 				AABEE6A824AB4B910043105B /* SuggestionTableCellView.swift */,
 				AABEE6AA24ACA0F90043105B /* SuggestionTableRowView.swift */,
 			);
@@ -1732,7 +1732,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				4B02198C25E05FAC00ED7DEA /* Fireproofing.storyboard in Resources */,
-				AA80EC73256C46A2007083E7 /* Suggestions.storyboard in Resources */,
+				AA80EC73256C46A2007083E7 /* Suggestion.storyboard in Resources */,
 				8511E18425F82B34002F516B /* 01_Fire_really_small.json in Resources */,
 				85A0117425AF2EDF00FA6A0C /* FindInPage.storyboard in Resources */,
 				AA80EC89256C49B8007083E7 /* Localizable.strings in Resources */,
@@ -1827,7 +1827,7 @@
 				4B6160DD25B152C5007DE5B2 /* ContentBlockerRulesUserScript.swift in Sources */,
 				85AC3B3525DA82A600C7D2AA /* DataTaskProviding.swift in Sources */,
 				4BA1A6B3258B080A00F6F690 /* EncryptionKeyGeneration.swift in Sources */,
-				AABEE6A524AA0A7F0043105B /* SuggestionsViewController.swift in Sources */,
+				AABEE6A524AA0A7F0043105B /* SuggestionViewController.swift in Sources */,
 				85AC3AF725D5DBFD00C7D2AA /* DataExtension.swift in Sources */,
 				85480FCF25D1AA22009424E3 /* ConfigurationStoring.swift in Sources */,
 				4BB88B4A25B7B690006F6B06 /* SequenceExtensions.swift in Sources */,
@@ -1854,7 +1854,7 @@
 				AABEE6AF24AD22B90043105B /* AddressBarTextField.swift in Sources */,
 				AA68C3D32490ED62001B8783 /* NavigationBarViewController.swift in Sources */,
 				AA585DAF2490E6E600E9A3E2 /* MainViewController.swift in Sources */,
-				AABEE69A24A902A90043105B /* SuggestionsViewModel.swift in Sources */,
+				AABEE69A24A902A90043105B /* SuggestionListViewModel.swift in Sources */,
 				B657841F25FA497600D8DB33 /* NSException+Catch.swift in Sources */,
 				AA6820E425502F19005ED0D5 /* WebsiteDataStore.swift in Sources */,
 				85D438B6256E7C9E00F3BAF8 /* ContextMenuUserScript.swift in Sources */,
@@ -1945,7 +1945,7 @@
 				AA585D82248FD31100E9A3E2 /* AppDelegate.swift in Sources */,
 				AA72D5F025FEA49900C77619 /* AddEditFavoriteWindow.swift in Sources */,
 				1456D6E124EFCBC300775049 /* TabBarCollectionView.swift in Sources */,
-				AABEE69C24A902BB0043105B /* Suggestions.swift in Sources */,
+				AABEE69C24A902BB0043105B /* SuggestionList.swift in Sources */,
 				85AC3AEF25D5CE9800C7D2AA /* UserScripts.swift in Sources */,
 				4B677439255DBEB800025BD8 /* HTTPSUpgradeStore.swift in Sources */,
 				4B02199325E060C600ED7DEA /* LoginDetectionUserScript.swift in Sources */,
@@ -2004,7 +2004,7 @@
 				4B02199C25E063DE00ED7DEA /* FireproofDomainsTests.swift in Sources */,
 				B65783EC25F8AB9300D8DB33 /* String+PunycodeTests.swift in Sources */,
 				AA63745224C9BBE100AB2AC4 /* SuggestionsAPIMock.swift in Sources */,
-				142879DC24CE1185005419BB /* SuggestionsViewModelTests.swift in Sources */,
+				142879DC24CE1185005419BB /* SuggestionListViewModelTests.swift in Sources */,
 				AA652CD325DDA6E9009059CC /* LocalBookmarkManagerTests.swift in Sources */,
 				AAE39D1B24F44885008EF28B /* TabCollectionViewModelDelegateMock.swift in Sources */,
 				AA9C363025518CA9004B1BA3 /* FireTests.swift in Sources */,
@@ -2073,12 +2073,12 @@
 			name = NavigationBar.storyboard;
 			sourceTree = "<group>";
 		};
-		AA80EC75256C46A2007083E7 /* Suggestions.storyboard */ = {
+		AA80EC75256C46A2007083E7 /* Suggestion.storyboard */ = {
 			isa = PBXVariantGroup;
 			children = (
 				AA80EC74256C46A2007083E7 /* Base */,
 			);
-			name = Suggestions.storyboard;
+			name = Suggestion.storyboard;
 			sourceTree = "<group>";
 		};
 		AA80EC7B256C46AA007083E7 /* TabBar.storyboard */ = {

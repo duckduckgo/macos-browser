@@ -1,5 +1,5 @@
 //
-//  Suggestions.swift
+//  SuggestionList.swift
 //
 //  Copyright © 2020 DuckDuckGo. All rights reserved.
 //
@@ -19,7 +19,7 @@
 import Foundation
 import os.log
 
-final class Suggestions {
+final class SuggestionList {
 
     let suggestionsAPI: SuggestionsAPI
 
