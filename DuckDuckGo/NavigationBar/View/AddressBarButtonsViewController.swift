@@ -219,7 +219,6 @@ final class AddressBarButtonsViewController: NSViewController {
         if bookmark == nil {
             bookmark = bookmarkManager.makeBookmark(for: url,
                                                     title: selectedTabViewModel.title,
-                                                    favicon: selectedTabViewModel.favicon,
                                                     isFavorite: false)
             updateBookmarkButtonImage(isUrlBookmarked: bookmark != nil)
         }

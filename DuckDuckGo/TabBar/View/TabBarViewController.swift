@@ -663,7 +663,7 @@ extension TabBarViewController: TabBarViewItemDelegate {
         }
 
         if !bookmarkManager.isUrlBookmarked(url: url) {
-            bookmarkManager.makeBookmark(for: url, title: tabViewModel.title, favicon: tabViewModel.favicon, isFavorite: false)
+            bookmarkManager.makeBookmark(for: url, title: tabViewModel.title, isFavorite: false)
         }
     }
 
