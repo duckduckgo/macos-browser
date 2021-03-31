@@ -265,6 +265,7 @@
 		B6A9E48426146AAB0067D1B9 /* PixelParameters.swift in Sources */ = {isa = PBXBuildFile; fileRef = B6A9E48326146AAB0067D1B9 /* PixelParameters.swift */; };
 		B6A9E48926146ABF0067D1B9 /* PixelCounter.swift in Sources */ = {isa = PBXBuildFile; fileRef = B6A9E48826146ABF0067D1B9 /* PixelCounter.swift */; };
 		B6A9E499261474120067D1B9 /* TimedPixel.swift in Sources */ = {isa = PBXBuildFile; fileRef = B6A9E498261474120067D1B9 /* TimedPixel.swift */; };
+		B6A9E4A3261475C70067D1B9 /* AppUsageActivityMonitor.swift in Sources */ = {isa = PBXBuildFile; fileRef = B6A9E4A2261475C70067D1B9 /* AppUsageActivityMonitor.swift */; };
 		B6AAAC24260328950029438D /* ProgressView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B6AAAC23260328950029438D /* ProgressView.swift */; };
 		B6AAAC2D260330580029438D /* PublishedAfter.swift in Sources */ = {isa = PBXBuildFile; fileRef = B6AAAC2C260330580029438D /* PublishedAfter.swift */; };
 		B6AAAC3E26048F690029438D /* RandomAccessCollectionExtension.swift in Sources */ = {isa = PBXBuildFile; fileRef = B6AAAC3D26048F690029438D /* RandomAccessCollectionExtension.swift */; };
@@ -555,6 +556,7 @@
 		B6A9E48326146AAB0067D1B9 /* PixelParameters.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PixelParameters.swift; sourceTree = "<group>"; };
 		B6A9E48826146ABF0067D1B9 /* PixelCounter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PixelCounter.swift; sourceTree = "<group>"; };
 		B6A9E498261474120067D1B9 /* TimedPixel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TimedPixel.swift; sourceTree = "<group>"; };
+		B6A9E4A2261475C70067D1B9 /* AppUsageActivityMonitor.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppUsageActivityMonitor.swift; sourceTree = "<group>"; };
 		B6AAAC23260328950029438D /* ProgressView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProgressView.swift; sourceTree = "<group>"; };
 		B6AAAC2C260330580029438D /* PublishedAfter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PublishedAfter.swift; sourceTree = "<group>"; };
 		B6AAAC3D26048F690029438D /* RandomAccessCollectionExtension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RandomAccessCollectionExtension.swift; sourceTree = "<group>"; };
@@ -1640,6 +1642,7 @@
 				B6A9E47E26146A800067D1B9 /* PixelArguments.swift */,
 				B6A9E48326146AAB0067D1B9 /* PixelParameters.swift */,
 				B6A9E48826146ABF0067D1B9 /* PixelCounter.swift */,
+				B6A9E4A2261475C70067D1B9 /* AppUsageActivityMonitor.swift */,
 			);
 			path = Statistics;
 			sourceTree = "<group>";
@@ -1908,6 +1911,7 @@
 				AA5D6DAC24A340F700C6FBCE /* WebViewStateObserver.swift in Sources */,
 				B6AAAC2D260330580029438D /* PublishedAfter.swift in Sources */,
 				85C6A29625CC1FFD00EEB5F1 /* UserDefaultsWrapper.swift in Sources */,
+				B6A9E4A3261475C70067D1B9 /* AppUsageActivityMonitor.swift in Sources */,
 				4BA1A6A0258B079600F6F690 /* DataEncryption.swift in Sources */,
 				AABEE6AF24AD22B90043105B /* AddressBarTextField.swift in Sources */,
 				AA68C3D32490ED62001B8783 /* NavigationBarViewController.swift in Sources */,

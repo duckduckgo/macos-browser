@@ -47,7 +47,12 @@ extension Pixel.Event {
         case repetitive = "repetitive"
 
         init(key: String, userDefaults: UserDefaults = .standard, now: Date = Date()) {
-            guard let lastUsedDay = userDefaults.value(forKey: "t_" + key) as? Int else {
+            let key = "t_" + key
+            defer {
+                userDefaults.set(now.daySinceReferenceDate, forKey: key)
+            }
+
+            guard let lastUsedDay = userDefaults.value(forKey: key) as? Int else {
                 self = .initial
                 return
             }

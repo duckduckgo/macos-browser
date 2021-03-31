@@ -84,6 +84,7 @@ extension Pixel.Event {
             return "ml_mac_app-launch_\(isDefault)_\(launch)"
         case .launchTiming:
             return "ml_mac_launch-timing"
+
         case .appActiveUsage(isDefault: let isDefault, avgTabs: let avgTabs):
             return "m_mac_active-usage_\(isDefault)_\(avgTabs)"
 

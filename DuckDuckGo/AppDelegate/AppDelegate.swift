@@ -34,6 +34,8 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
     private var fileStore: FileStore!
     private var stateRestorationManager: AppStateRestorationManager!
 
+    var appUsageActivityMonitor: AppUsageActivityMonitor?
+
     func applicationWillFinishLaunching(_ notification: Notification) {
         do {
             let encryptionKey = isRunningTests ? nil : try keyStore.readKey()
@@ -61,6 +63,8 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
             }
 
             launchTimingPixel.fire()
+
+            appUsageActivityMonitor = AppUsageActivityMonitor(delegate: self)
         }
     }
 
@@ -83,6 +87,19 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         applicationDockMenu.dataSource = WindowControllersManager.shared
         applicationDockMenu.applicationDockMenuDelegate = WindowControllersManager.shared
         return applicationDockMenu
+    }
+
+}
+
+extension AppDelegate: AppUsageActivityMonitorDelegate {
+
+    func countOpenWindowsAndTabs() -> [Int] {
+        return WindowControllersManager.shared.mainWindowControllers
+            .map { $0.mainViewController.tabCollectionViewModel.tabCollection.tabs.count }
+    }
+
+    func activeUsageTimeHasReachedThreshold(avgTabCount: Double) {
+        Pixel.fire(pixel: .appActiveUsage(avgTabs: .init(avgTabs: avgTabCount)))
     }
 
 }
