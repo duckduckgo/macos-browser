@@ -139,7 +139,7 @@ extension URL {
 
     static var duckDuckGoEmail = URL(string: "https://quack.duckduckgo.com/email/dashboard")!
 
-    static var improvingDuckDuckGo = URL(string: "https://improving.duckduckgo.com/")!
+    static var duckDuckGoMorePrivacyInfo = URL(string: "https://help.duckduckgo.com/duckduckgo-help-pages/privacy/atb/")!
 
     var isDuckDuckGo: Bool {
         absoluteString.starts(with: Self.duckDuckGo.absoluteString)

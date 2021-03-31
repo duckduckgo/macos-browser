@@ -34,7 +34,7 @@ enum Pixel {
         #endif
 
         var headers = headers
-        headers[APIHeaders.Name.improving] = URL.improvingDuckDuckGo.absoluteString
+        headers[APIHeaders.Name.moreInfo] = "See " + URL.duckDuckGoMorePrivacyInfo.absoluteString
 
         let url = URL.pixelUrl(forPixelNamed: pixelName)
 

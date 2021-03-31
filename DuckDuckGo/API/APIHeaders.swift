@@ -29,7 +29,7 @@ final class APIHeaders {
         static let userAgent = "User-Agent"
         static let etag = "ETag"
         static let ifNoneMatch = "If-None-Match"
-        static let improving = "X-DuckDuckGo-Improving"
+        static let moreInfo = "X-DuckDuckGo-MoreInfo"
     }
 
     private let appVersion: AppVersion
