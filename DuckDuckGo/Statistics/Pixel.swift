@@ -52,23 +52,3 @@ extension Pixel {
         fire(pixelNamed: event.name, withAdditionalParameters: event.parameters)
     }
 }
-
-struct TimedPixel {
-    
-    let pixel: Pixel.Event
-    let time: CFTimeInterval
-    
-    init(_ pixel: Pixel.Event, time: CFTimeInterval = CACurrentMediaTime()) {
-        self.pixel = pixel
-        self.time = time
-    }
-    
-    func fire(_ fireTime: CFTimeInterval = CACurrentMediaTime(), withAdditionalParmaeters params: [String: String] = [:]) {
-        let duration = String(format: "%.2f", fireTime - self.time)
-        var newParams = pixel.parameters ?? [:]
-        newParams.merge(params, uniquingKeysWith: { $1 })
-        newParams[Pixel.Parameters.duration] = duration
-        Pixel.fire(pixelNamed: pixel.name, withAdditionalParameters: newParams)
-    }
-    
-}

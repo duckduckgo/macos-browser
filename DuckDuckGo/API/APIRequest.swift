@@ -63,7 +63,6 @@ enum APIRequest {
                         timeoutInterval: TimeInterval = 60.0,
                         callBackOnMainThread: Bool = false,
                         completion: @escaping APIRequestCompletion) -> URLSessionDataTask {
-        os_log("Requesting %s", type: .debug, url.absoluteString)
         
         let urlRequest = urlRequestFor(url: url, method: method, parameters: parameters, headers: headers, timeoutInterval: timeoutInterval)
         
@@ -72,13 +71,7 @@ enum APIRequest {
         let task = session.dataTask(with: urlRequest) { (data, response, error) in
             
             let httpResponse = response as? HTTPURLResponse
-            
-            os_log("Request for %s completed with response code: %s and headers %s",
-                   type: .debug,
-                   url.absoluteString,
-                   String(describing: httpResponse?.statusCode),
-                   String(describing: httpResponse?.allHeaderFields))
-            
+
             if let error = error {
                 completion(nil, error)
             } else if let error = httpResponse?.validateStatusCode(statusCode: 200..<300) { 

@@ -19,7 +19,7 @@
 extension Pixel {
 
     enum Parameters {
-        static let duration = "dur"
+        static let duration = "duration"
         static let test = "test"
         static let appVersion = "appVersion"
 
@@ -63,6 +63,7 @@ extension Pixel.Event {
             return params
 
         case .appLaunch,
+             .launchTiming,
              .appActiveUsage,
              .burn,
              .fireproof,

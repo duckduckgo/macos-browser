@@ -22,6 +22,7 @@ import os.log
 
 @NSApplicationMain
 final class AppDelegate: NSObject, NSApplicationDelegate {
+    let launchTimingPixel = TimedPixel(.launchTiming)
 
     private var isRunningTests: Bool {
         ProcessInfo.processInfo.environment["XCTestConfigurationFilePath"] != nil
@@ -58,6 +59,8 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
             if WindowsManager.windows.isEmpty {
                 WindowsManager.openNewWindow()
             }
+
+            launchTimingPixel.fire()
         }
     }
 

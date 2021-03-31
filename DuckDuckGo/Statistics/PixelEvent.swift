@@ -22,6 +22,7 @@ extension Pixel {
 
     enum Event {
         case appLaunch(isDefault: IsDefaultBrowser = .init(), launch: AppLaunch)
+        case launchTiming
 
         case appActiveUsage(isDefault: IsDefaultBrowser = .init(), avgTabs: AverageTabsCount)
 
@@ -81,6 +82,8 @@ extension Pixel.Event {
         switch self {
         case .appLaunch(isDefault: let isDefault, launch: let launch):
             return "ml_mac_app-launch_\(isDefault)_\(launch)"
+        case .launchTiming:
+            return "ml_mac_launch-timing"
         case .appActiveUsage(isDefault: let isDefault, avgTabs: let avgTabs):
             return "m_mac_active-usage_\(isDefault)_\(avgTabs)"
 
