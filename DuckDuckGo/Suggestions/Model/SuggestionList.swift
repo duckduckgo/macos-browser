@@ -21,59 +21,60 @@ import os.log
 
 final class SuggestionList {
 
-    let suggestionsAPI: SuggestionsAPI
+    static let maximumNumberOfSuggestions = 9
 
-    @Published private(set) var items: [Suggestion]?
+    @Published private(set) var suggestions: [Suggestion]?
 
-    init(suggestionsAPI: SuggestionsAPI) {
-        self.suggestionsAPI = suggestionsAPI
+    private let bookmarkManager: BookmarkManager
+    private let coordinator = SuggestionCoordinator()
+
+    private var latestQuery: Query?
+
+    init(bookmarkManager: BookmarkManager) {
+        self.bookmarkManager = bookmarkManager
+
+        coordinator.dataSource = self
     }
 
     convenience init () {
-        self.init(suggestionsAPI: DuckDuckGoSuggestionsAPI())
+        self.init(bookmarkManager: LocalBookmarkManager.shared)
     }
 
     func getSuggestions(for query: String) {
-        if query == "" {
-            items = nil
-            return
-        }
-        suggestionsAPI.fetchSuggestions(for: query) { (result, error) in
-            guard let result = result, error == nil else {
-                self.items = nil
-                os_log("Suggestions: Failed to fetch remote suggestions - %s",
+        latestQuery = query
+        coordinator.getSuggestions(query: query, maximum: Self.maximumNumberOfSuggestions) { [weak self] (suggestions, error) in
+            guard self?.latestQuery == query else { return }
+            guard let suggestions = suggestions, error == nil else {
+                self?.suggestions = nil
+                os_log("Suggestions: Failed to get suggestions - %s",
                        type: .error,
-                       error?.localizedDescription ?? "")
+                       "\(String(describing: error))")
                 return
             }
-
-            var suggestions = [Suggestion]()
-            for resultItem in result.items {
-                for (key, value) in resultItem {
-                    suggestions.append(Suggestion.makeSuggestion(key: key, value: value))
-                }
-            }
-
-            self.items = suggestions
+            self?.suggestions = suggestions
         }
     }
 
-    func stopFetchingSuggestions() {
-        suggestionsAPI.stopFetchingSuggestions()
+    func stopGettingSuggestions() {
+        latestQuery = nil
     }
 
 }
 
-fileprivate extension Suggestion {
+extension SuggestionList: SuggestionCoordinatorDataSource {
 
-    static let phraseKey = "phrase"
+    func bookmarks(for suggestionCoordinator: SuggestionCoordinator) -> [BookmarkProtocol] {
+        bookmarkManager.list?.bookmarks() ?? []
+    }
 
-    static func makeSuggestion(key: String, value: String) -> Suggestion {
-        let suggestion = key == Self.phraseKey ? Suggestion.phrase(phrase: value) : Suggestion.unknown(value: value)
-        if key != Self.phraseKey {
-            os_log("SuggestionsAPIResult: Unknown suggestion type", type: .error)
-        }
-        return suggestion
+    func suggestionCoordinator(_ suggestionCoordinator: SuggestionCoordinator,
+                               suggestionDataFromUrlRequest urlRequest: URLRequest,
+                               completion: @escaping (Data?, Error?) -> Void) {
+        URLSession.shared.dataTask(with: urlRequest) { (data, _, error) in
+            completion(data, error)
+        }.resume()
     }
 
 }
+
+extension Bookmark: BookmarkProtocol {}

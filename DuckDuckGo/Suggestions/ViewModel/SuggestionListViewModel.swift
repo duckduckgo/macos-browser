@@ -29,7 +29,7 @@ final class SuggestionListViewModel {
     }
 
     var numberOfSuggestions: Int {
-        suggestionList.items?.count ?? 0
+        suggestionList.suggestions?.count ?? 0
     }
 
     @Published private(set) var selectionIndex: Int? {
@@ -55,7 +55,7 @@ final class SuggestionListViewModel {
     }
     
     func suggestionViewModel(at index: Int) -> SuggestionViewModel? {
-        let items = suggestionList.items ?? []
+        let items = suggestionList.suggestions ?? []
 
         guard index < items.count else {
             os_log("SuggestionListViewModel: Absolute index is out of bounds", type: .error)

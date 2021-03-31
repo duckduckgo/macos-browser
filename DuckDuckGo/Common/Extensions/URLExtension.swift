@@ -103,6 +103,15 @@ extension URL {
         }
     }
 
+    var absoluteStringWithoutSchemeAndWWW: String {
+        let absoluteString = self.punycodeDecodedString ?? self.absoluteString
+        if let scheme = scheme {
+            return absoluteString.drop(prefix: scheme + "://").drop(prefix: "www.")
+        } else {
+            return absoluteString
+        }
+    }
+
     // MARK: - Validity
 
     var isValid: Bool {

@@ -69,14 +69,14 @@ final class AddressBarTextField: NSTextField {
     func clearValue() {
         value = .text("")
         suggestionListViewModel.clearSelection()
-        suggestionListViewModel.suggestionList.stopFetchingSuggestions()
+        suggestionListViewModel.suggestionList.stopGettingSuggestions()
         suggestionListViewModel.userStringValue = nil
         hideSuggestionWindow()
     }
 
     private func subscribeToSuggestionItems() {
-        suggestionItemsCancellable = suggestionListViewModel.suggestionList.$items.receive(on: DispatchQueue.main).sink { [weak self] _ in
-            if self?.suggestionListViewModel.suggestionList.items?.count ?? 0 > 0 {
+        suggestionItemsCancellable = suggestionListViewModel.suggestionList.$suggestions.receive(on: DispatchQueue.main).sink { [weak self] _ in
+            if self?.suggestionListViewModel.suggestionList.suggestions?.count ?? 0 > 0 {
                 self?.showSuggestionWindow()
             }
         }
@@ -154,7 +154,7 @@ final class AddressBarTextField: NSTextField {
     }
 
     private func addressBarEnterPressed() {
-        suggestionListViewModel.suggestionList.stopFetchingSuggestions()
+        suggestionListViewModel.suggestionList.stopGettingSuggestions()
         hideSuggestionWindow()
 
         if NSApp.isCommandPressed {
@@ -223,7 +223,11 @@ final class AddressBarTextField: NSTextField {
             switch self {
             case .text(let text): return text
             case .url(urlString: let urlString, url: _, userTyped: _): return urlString
-            case .suggestion(let suggestionViewModel): return suggestionViewModel.string
+            case .suggestion(let suggestionViewModel):
+                switch suggestionViewModel.suggestion {
+                case .bookmark(title: _, url: let url, isFavorite: _): return url.absoluteStringWithoutSchemeAndWWW
+                default: return suggestionViewModel.string
+                }
             }
         }
 
@@ -278,7 +282,7 @@ final class AddressBarTextField: NSTextField {
                 switch suggestionViewModel.suggestion {
                 case .phrase(phrase: _):
                     self = Suffix.search
-                case .website(url: let url):
+                case .website(url: let url), .bookmark(title: _, url: let url, isFavorite: _):
                     guard let host = url.host else { return nil }
                     self = Suffix.visit(host: host)
                 case .unknown(value: _):
@@ -444,7 +448,7 @@ extension Notification.Name {
 extension AddressBarTextField: NSTextFieldDelegate {
 
     func controlTextDidEndEditing(_ obj: Notification) {
-        suggestionListViewModel.suggestionList.stopFetchingSuggestions()
+        suggestionListViewModel.suggestionList.stopGettingSuggestions()
         hideSuggestionWindow()
         updateValue()
     }
@@ -460,7 +464,7 @@ extension AddressBarTextField: NSTextFieldDelegate {
         }
 
         if stringValue == "" {
-            suggestionListViewModel.suggestionList.stopFetchingSuggestions()
+            suggestionListViewModel.suggestionList.stopGettingSuggestions()
             hideSuggestionWindow()
         }
     }

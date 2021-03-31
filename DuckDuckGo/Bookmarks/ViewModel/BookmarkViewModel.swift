@@ -27,8 +27,7 @@ struct BookmarkViewModel {
         if bookmark.title.count <= Self.maxMenuTitleLength {
             return bookmark.title
         } else {
-            let suffix = "..."
-            return String(bookmark.title.prefix(Self.maxMenuTitleLength - suffix.count)) + suffix
+            return String(bookmark.title.truncated(length: Self.maxMenuTitleLength))
         }
 
     }

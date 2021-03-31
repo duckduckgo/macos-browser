@@ -1,5 +1,5 @@
 //
-//  SuggestionsAPIResult.swift
+//  RemoteSuggestionsAPIResult.swift
 //
 //  Copyright © 2020 DuckDuckGo. All rights reserved.
 //
@@ -19,7 +19,7 @@
 import Foundation
 import os.log
 
-struct SuggestionsAPIResult: Decodable {
+struct RemoteSuggestionsAPIResult: Decodable {
 
     var items = [[String: String]]()
 

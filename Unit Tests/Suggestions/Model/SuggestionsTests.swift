@@ -28,14 +28,14 @@ final class SuggestionsTests: XCTestCase {
         let query = ""
         suggestions.getSuggestions(for: query)
 
-        XCTAssertNil(suggestions.items)
+        XCTAssertNil(suggestions.suggestions)
     }
 
     func testWhenQueryIsNotEmptyThenAPIResultAreLoaded() {
         let suggestionsAPIMock = SuggestionsAPIMock()
         let suggestions = SuggestionList(suggestionsAPI: suggestionsAPIMock)
 
-        let suggestionsAPIResult = SuggestionsAPIResult.aSuggestionsAPIResult
+        let suggestionsAPIResult = RemoteSuggestionsAPIResult.aSuggestionsAPIResult
         suggestionsAPIMock.suggestionsAPIResult = suggestionsAPIResult
 
         let query = "test"
@@ -46,9 +46,9 @@ final class SuggestionsTests: XCTestCase {
 
 }
 
-extension SuggestionsAPIResult {
+extension RemoteSuggestionsAPIResult {
 
-    static var aSuggestionsAPIResult: SuggestionsAPIResult {
+    static var aSuggestionsAPIResult: RemoteSuggestionsAPIResult {
         let phrase1 = "phrase"
         let value1 = "value1"
         let phrase2 = "phrase"
@@ -60,7 +60,7 @@ extension SuggestionsAPIResult {
         let data = json.data(using: .utf8)!
 
         // swiftlint:disable force_try
-        return try! JSONDecoder().decode(SuggestionsAPIResult.self, from: data)
+        return try! JSONDecoder().decode(RemoteSuggestionsAPIResult.self, from: data)
         // swiftlint:enable force_try
     }
 

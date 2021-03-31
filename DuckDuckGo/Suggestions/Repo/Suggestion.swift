@@ -22,6 +22,21 @@ public enum Suggestion: Equatable {
     
     case phrase(phrase: String)
     case website(url: URL)
+    case bookmark(title: String, url: URL, isFavorite: Bool)
     case unknown(value: String)
+
+}
+
+extension Suggestion {
+
+    init(bookmark: BookmarkProtocol) {
+        self = .bookmark(title: bookmark.title, url: bookmark.url, isFavorite: bookmark.isFavorite)
+    }
+
+    static let phraseKey = "phrase"
+
+    init(key: String, value: String) {
+        self = key == Self.phraseKey ? .phrase(phrase: value) : .unknown(value: value)
+    }
 
 }

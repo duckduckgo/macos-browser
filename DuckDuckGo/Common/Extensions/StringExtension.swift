@@ -32,6 +32,10 @@ extension String {
                        length: self[range].utf16.count)
     }
 
+    func truncated(length: Int, trailing: String = "…") -> String {
+      return (self.count > length) ? self.prefix(length) + trailing : self
+    }
+
     // MARK: - Regular Expression
 
     func matches(pattern: String) -> Bool {

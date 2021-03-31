@@ -22,10 +22,10 @@ import XCTest
 final class SuggestionsAPIMock: SuggestionsAPI {
 
     var fetchSuggestionsCalled = false
-    var suggestionsAPIResult: SuggestionsAPIResult?
+    var suggestionsAPIResult: RemoteSuggestionsAPIResult?
     var error: Error?
 
-    func fetchSuggestions(for query: String, completion: @escaping (SuggestionsAPIResult?, Error?) -> Void) {
+    func fetchSuggestions(for query: String, completion: @escaping (RemoteSuggestionsAPIResult?, Error?) -> Void) {
         completion(suggestionsAPIResult, error)
     }
 

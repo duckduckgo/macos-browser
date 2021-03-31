@@ -48,7 +48,7 @@ final class SuggestionListViewModelTests: XCTestCase {
         let selectedSuggestionViewModelExpectation = expectation(description: "Selected suggestion view model expectation")
 
         suggestionListViewModel.$selectedSuggestionViewModel.debounce(for: 0.1, scheduler: RunLoop.main).sink { selectedSuggestionViewModel in
-            XCTAssertEqual(suggestionListViewModel.suggestionList.items?[index], selectedSuggestionViewModel?.suggestion)
+            XCTAssertEqual(suggestionListViewModel.suggestionList.suggestions?[index], selectedSuggestionViewModel?.suggestion)
             selectedSuggestionViewModelExpectation.fulfill()
         } .store(in: &cancellables)
         waitForExpectations(timeout: 1, handler: nil)
@@ -130,7 +130,7 @@ extension SuggestionListViewModel {
         let suggestionList = SuggestionList(suggestionsAPI: suggestionsAPIMock)
         let suggestionListViewModel = SuggestionListViewModel(suggestionList: suggestionList)
 
-        let suggestionsAPIResult = SuggestionsAPIResult.aSuggestionsAPIResult
+        let suggestionsAPIResult = RemoteSuggestionsAPIResult.aSuggestionsAPIResult
         suggestionsAPIMock.suggestionsAPIResult = suggestionsAPIResult
 
         let query = "query"

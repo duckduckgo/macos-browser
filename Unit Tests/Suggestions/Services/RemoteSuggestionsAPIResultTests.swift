@@ -1,5 +1,5 @@
 //
-//  SuggestionsAPIResultTests.swift
+//  RemoteSuggestionsAPIResultTests.swift
 //
 //  Copyright © 2020 DuckDuckGo. All rights reserved.
 //
@@ -21,7 +21,7 @@ import Foundation
 import XCTest
 @testable import DuckDuckGo_Privacy_Browser
 
-final class SuggestionsAPIResultTests: XCTestCase {
+final class RemoteSuggestionsAPIResultTests: XCTestCase {
 
     func testWhenInitializedFromEmptyThenNoItemsAreInTheResult() {
         let json = """
@@ -29,7 +29,7 @@ final class SuggestionsAPIResultTests: XCTestCase {
         """
         let data = json.data(using: .utf8)!
 
-        guard let suggestionsAPIResult = try? JSONDecoder().decode(SuggestionsAPIResult.self, from: data) else {
+        guard let suggestionsAPIResult = try? JSONDecoder().decode(RemoteSuggestionsAPIResult.self, from: data) else {
             XCTFail("Decoding of SuggestionsAPIResult failed")
             return
         }
@@ -48,7 +48,7 @@ final class SuggestionsAPIResultTests: XCTestCase {
         """
         let data = json.data(using: .utf8)!
 
-        guard let suggestionsAPIResult = try? JSONDecoder().decode(SuggestionsAPIResult.self, from: data) else {
+        guard let suggestionsAPIResult = try? JSONDecoder().decode(RemoteSuggestionsAPIResult.self, from: data) else {
             XCTFail("Decoding of SuggestionsAPIResult failed")
             return
         }
@@ -64,7 +64,7 @@ final class SuggestionsAPIResultTests: XCTestCase {
         """
         let data = json.data(using: .utf8)!
 
-        let suggestionsAPIResult = try? JSONDecoder().decode(SuggestionsAPIResult.self, from: data)
+        let suggestionsAPIResult = try? JSONDecoder().decode(RemoteSuggestionsAPIResult.self, from: data)
         if suggestionsAPIResult != nil {
             XCTFail("Decoding should fail")
             return

@@ -129,7 +129,7 @@ final class SuggestionViewController: NSViewController {
     }
 
     private func subscribeToSuggestionList() {
-        suggestionListCancellable = suggestionListViewModel.suggestionList.$items.receive(on: DispatchQueue.main).sink { [weak self] _ in
+        suggestionListCancellable = suggestionListViewModel.suggestionList.$suggestions.receive(on: DispatchQueue.main).sink { [weak self] _ in
             self?.displayNewSuggestions()
         }
     }
@@ -150,7 +150,7 @@ final class SuggestionViewController: NSViewController {
         }
 
         // Remove the second reload that causes visual glitch in the beginning of typing
-        if suggestionListViewModel.suggestionList.items != nil {
+        if suggestionListViewModel.suggestionList.suggestions != nil {
             updateHeight()
             tableView.reloadData()
             self.selectRow(at: self.suggestionListViewModel.selectionIndex)
