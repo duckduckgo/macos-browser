@@ -54,6 +54,15 @@ extension URL {
         return URL(string: "about:blank")!
     }
 
+    static let pixelBase = ProcessInfo.processInfo.environment["PIXEL_BASE_URL", default: "https://improving.duckduckgo.com"]
+
+    static func pixelUrl(forPixelNamed pixelName: String) -> URL {
+        let urlString = "\(Self.pixelBase)/t/\(pixelName)"
+        let url = URL(string: urlString)!
+        #warning("url = url.addParameter(name: \"atb\", value: statisticsStore.atbWithVariant ?? \"\")")
+        return url
+    }
+
     // MARK: - Parameters
 
     enum ParameterError: Error {
@@ -129,6 +138,8 @@ extension URL {
     }
 
     static var duckDuckGoEmail = URL(string: "https://quack.duckduckgo.com/email/dashboard")!
+
+    static var improvingDuckDuckGo = URL(string: "https://improving.duckduckgo.com/")!
 
     var isDuckDuckGo: Bool {
         absoluteString.starts(with: Self.duckDuckGo.absoluteString)
