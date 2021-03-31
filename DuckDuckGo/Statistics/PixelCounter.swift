@@ -22,9 +22,9 @@ extension Pixel {
 
     struct Counter {
 
-        public struct Constants {
-            public static let maxCount = 20
-            fileprivate static let prefix = "c_"
+        private enum Constants {
+            static let maxCount = 20
+            static let prefix = "c_"
         }
 
         let store: UserDefaults

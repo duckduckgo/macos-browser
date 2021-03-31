@@ -19,7 +19,7 @@
 
 import Foundation
 
-public protocol InfoBundle {
+protocol InfoBundle {
     func object(forInfoDictionaryKey key: String) -> Any?
 }
 

@@ -19,6 +19,6 @@
 
 import Foundation
 
-public enum ApiRequestError: Error {
+enum ApiRequestError: Error {
     case noData
 }

@@ -19,26 +19,26 @@
 
 import Foundation
 
-public typealias HTTPHeaders = [String: String]
+typealias HTTPHeaders = [String: String]
 
-public class APIHeaders {
+final class APIHeaders {
 
-    public struct Name {
-        public static let acceptEncoding = "Accept-Encoding"
-        public static let acceptLanguage = "Accept-Language"
-        public static let userAgent = "User-Agent"
-        public static let etag = "ETag"
-        public static let ifNoneMatch = "If-None-Match"
-        public static let improving = "X-DuckDuckGo-Improving"
+    enum Name {
+        static let acceptEncoding = "Accept-Encoding"
+        static let acceptLanguage = "Accept-Language"
+        static let userAgent = "User-Agent"
+        static let etag = "ETag"
+        static let ifNoneMatch = "If-None-Match"
+        static let improving = "X-DuckDuckGo-Improving"
     }
 
     private let appVersion: AppVersion
 
-    public init(appVersion: AppVersion = AppVersion.shared) {
+    init(appVersion: AppVersion = AppVersion.shared) {
         self.appVersion = appVersion
     }
 
-    public var defaultHeaders: HTTPHeaders {
+    var defaultHeaders: HTTPHeaders {
         let acceptEncoding = "gzip;q=1.0, compress;q=0.5"
         let languages = Locale.preferredLanguages.prefix(6)
         let acceptLanguage = languages.enumerated().map { index, language in
@@ -53,12 +53,12 @@ public class APIHeaders {
         ]
     }
 
-    public var userAgent: String {
+    var userAgent: String {
         let osVersion = ProcessInfo.processInfo.operatingSystemVersion
         return "ddg_ios/\(appVersion.versionAndBuildNumber) (\(appVersion.identifier); macOS \(osVersion))"
     }
 
-    public func defaultHeaders(with etag: String?) -> HTTPHeaders {
+    func defaultHeaders(with etag: String?) -> HTTPHeaders {
         guard let etag = etag else {
             return defaultHeaders
         }
@@ -66,7 +66,7 @@ public class APIHeaders {
         return defaultHeaders.merging([Name.ifNoneMatch: etag]) { (_, new) in new }
     }
 
-    public func addHeaders(to request: inout URLRequest) {
+    func addHeaders(to request: inout URLRequest) {
         request.addValue(Name.userAgent, forHTTPHeaderField: userAgent)
     }
 

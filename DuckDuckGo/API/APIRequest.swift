@@ -20,9 +20,9 @@
 import Foundation
 import os.log
 
-public typealias APIRequestCompletion = (APIRequest.Response?, Error?) -> Void
+typealias APIRequestCompletion = (APIRequest.Response?, Error?) -> Void
 
-public class APIRequest {
+enum APIRequest {
     
     private static var defaultCallbackQueue: OperationQueue = {
         let queue = OperationQueue()
@@ -35,7 +35,7 @@ public class APIRequest {
     private static let defaultSession = URLSession(configuration: .default, delegate: nil, delegateQueue: defaultCallbackQueue)
     private static let mainThreadCallbackSession = URLSession(configuration: .default, delegate: nil, delegateQueue: OperationQueue.main)
     
-    public struct Response {
+    struct Response {
         
         var data: Data?
         var etag: String?
@@ -43,7 +43,7 @@ public class APIRequest {
         
     }
     
-    public enum HTTPMethod: String {
+    enum HTTPMethod: String {
         case get = "GET"
         case head = "HEAD"
         case post = "POST"
@@ -56,13 +56,13 @@ public class APIRequest {
     }
     
     @discardableResult
-    public static func request(url: URL,
-                               method: HTTPMethod = .get,
-                               parameters: [String: String]? = nil,
-                               headers: HTTPHeaders = APIHeaders().defaultHeaders,
-                               timeoutInterval: TimeInterval = 60.0,
-                               callBackOnMainThread: Bool = false,
-                               completion: @escaping APIRequestCompletion) -> URLSessionDataTask {
+    static func request(url: URL,
+                        method: HTTPMethod = .get,
+                        parameters: [String: String]? = nil,
+                        headers: HTTPHeaders = APIHeaders().defaultHeaders,
+                        timeoutInterval: TimeInterval = 60.0,
+                        callBackOnMainThread: Bool = false,
+                        completion: @escaping APIRequestCompletion) -> URLSessionDataTask {
         os_log("Requesting %s", type: .debug, url.absoluteString)
         
         let urlRequest = urlRequestFor(url: url, method: method, parameters: parameters, headers: headers, timeoutInterval: timeoutInterval)
@@ -95,11 +95,11 @@ public class APIRequest {
         return task
     }
     
-    public static func urlRequestFor(url: URL,
-                                     method: HTTPMethod = .get,
-                                     parameters: [String: String]? = nil,
-                                     headers: HTTPHeaders = APIHeaders().defaultHeaders,
-                                     timeoutInterval: TimeInterval = 60.0) -> URLRequest {
+    static func urlRequestFor(url: URL,
+                              method: HTTPMethod = .get,
+                              parameters: [String: String]? = nil,
+                              headers: HTTPHeaders = APIHeaders().defaultHeaders,
+                              timeoutInterval: TimeInterval = 60.0) -> URLRequest {
         let url = (try? parameters?.reduce(url) { try $0.addParameter(name: $1.key, value: $1.value) }) ?? url
         var urlRequest = URLRequest(url: url)
         urlRequest.allHTTPHeaderFields = headers
@@ -109,7 +109,7 @@ public class APIRequest {
     }
 }
 
-public extension HTTPURLResponse {
+extension HTTPURLResponse {
         
     enum HTTPURLResponseError: Error {
         case invalidStatusCode

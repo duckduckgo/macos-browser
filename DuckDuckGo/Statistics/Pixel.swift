@@ -20,14 +20,12 @@
 import Foundation
 import os.log
 
-public class Pixel {
+enum Pixel {
 
-    private init() {}
-
-    public static func fire(pixelNamed pixelName: String,
-                            withAdditionalParameters params: [String: String]? = nil,
-                            withHeaders headers: HTTPHeaders = APIHeaders().defaultHeaders,
-                            onComplete: @escaping (Error?) -> Void = {_ in }) {
+    static func fire(pixelNamed pixelName: String,
+                     withAdditionalParameters params: [String: String]? = nil,
+                     withHeaders headers: HTTPHeaders = APIHeaders().defaultHeaders,
+                     onComplete: @escaping (Error?) -> Void = {_ in }) {
 
         var newParams = params ?? [:]
         newParams[Parameters.appVersion] = AppVersion.shared.versionAndBuildNumber
@@ -55,7 +53,7 @@ extension Pixel {
     }
 }
 
-public class TimedPixel {
+struct TimedPixel {
     
     let pixel: Pixel.Event
     let time: CFTimeInterval

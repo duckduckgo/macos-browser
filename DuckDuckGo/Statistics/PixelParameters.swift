@@ -18,8 +18,8 @@
 
 extension Pixel {
 
-    public struct Parameters {
-        public static let duration = "dur"
+    enum Parameters {
+        static let duration = "dur"
         static let test = "test"
         static let appVersion = "appVersion"
 
@@ -30,7 +30,7 @@ extension Pixel {
         static let underlyingErrorDesc = "ud"
     }
 
-    public struct Values {
+    enum Values {
         static let test = "1"
     }
 

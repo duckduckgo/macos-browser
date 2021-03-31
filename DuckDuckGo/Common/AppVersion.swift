@@ -19,7 +19,7 @@
 
 import Foundation
 
-public struct AppVersion {
+struct AppVersion {
 
     struct Keys {
         static let name = kCFBundleNameKey as String
@@ -28,39 +28,39 @@ public struct AppVersion {
         static let versionNumber = "CFBundleShortVersionString"
     }
 
-    public static let shared = AppVersion()
+    static let shared = AppVersion()
     
     private let bundle: InfoBundle
 
-    public init(bundle: InfoBundle = Bundle.main) {
+    init(bundle: InfoBundle = Bundle.main) {
         self.bundle = bundle
     }
 
-    public var name: String {
+    var name: String {
         return bundle.object(forInfoDictionaryKey: Keys.name) as? String ?? ""
     }
 
-    public var identifier: String {
+    var identifier: String {
         return bundle.object(forInfoDictionaryKey: Keys.identifier) as? String ?? ""
     }
     
-    public var majorVersionNumber: String {
+    var majorVersionNumber: String {
         return String(versionNumber.split(separator: ".").first ?? "")
     }
 
-    public var versionNumber: String {
+    var versionNumber: String {
         return bundle.object(forInfoDictionaryKey: Keys.versionNumber) as? String ?? ""
     }
 
-    public var buildNumber: String {
+    var buildNumber: String {
         return bundle.object(forInfoDictionaryKey: Keys.buildNumber) as? String ?? ""
     }
     
-    public var versionAndBuildNumber: String {
+    var versionAndBuildNumber: String {
         return "\(versionNumber).\(buildNumber)"
     }
     
-    public var localized: String {
+    var localized: String {
         return "\(name) \(versionAndBuildNumber)"
     }
 }
