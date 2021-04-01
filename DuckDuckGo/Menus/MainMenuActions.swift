@@ -151,18 +151,18 @@ extension MainViewController {
     }
 
     // MARK: - Bookmarks
-    @IBAction func bookmarkThisPage(_ sender: Any?) {
+    @IBAction func bookmarkThisPage(_ sender: Any) {
         navigationBarViewController?
             .addressBarViewController?
             .addressBarButtonsViewController?
-            .openBookmarkPopover(setFavorite: false)
+            .openBookmarkPopover(setFavorite: false, accessPoint: .init(sender: sender, default: .moreMenu))
     }
     
-    @IBAction func favoriteThisPage(_ sender: Any?) {
+    @IBAction func favoriteThisPage(_ sender: Any) {
         navigationBarViewController?
             .addressBarViewController?
             .addressBarButtonsViewController?
-            .openBookmarkPopover(setFavorite: true)
+            .openBookmarkPopover(setFavorite: true, accessPoint: .init(sender: sender, default: .moreMenu))
     }
     
     @IBAction func navigateToBookmark(_ sender: Any?) {

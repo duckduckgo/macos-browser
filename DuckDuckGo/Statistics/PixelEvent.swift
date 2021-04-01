@@ -36,11 +36,11 @@ extension Pixel {
         case bookmark(fireproofed: IsBookmarkFireproofed, repetition: Repetition = .init(key: "bookmark"), source: AccessPoint)
         case favorite(fireproofed: IsBookmarkFireproofed, repetition: Repetition = .init(key: "favorite"), source: AccessPoint)
 
-        static func bookmark(isFavorite: Bool, isFireproofed: Bool, source: AccessPoint) -> Event {
+        static func bookmark(isFavorite: Bool, fireproofed: IsBookmarkFireproofed, source: AccessPoint) -> Event {
             if isFavorite {
-                return .favorite(fireproofed: IsBookmarkFireproofed(booleanLiteral: isFireproofed), source: source)
+                return .favorite(fireproofed: fireproofed, source: source)
             }
-            return .bookmark(fireproofed: IsBookmarkFireproofed(booleanLiteral: isFireproofed), source: source)
+            return .bookmark(fireproofed: fireproofed, source: source)
         }
 
         case navigation(kind: NavigationKind, source: NavigationAccessPoint)

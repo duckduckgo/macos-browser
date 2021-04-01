@@ -154,13 +154,19 @@ extension Pixel.Event {
         }
     }
 
-    enum IsBookmarkFireproofed: String, ExpressibleByBooleanLiteral {
+    enum IsBookmarkFireproofed: String {
         case fireproofed = "fireproofed"
         case nonFireproofed = "non-fireproofed"
 
-        init(booleanLiteral value: Bool) {
-            self = value ? .fireproofed : .nonFireproofed
+        init(url: URL?, fireproofDomains: FireproofDomains = .shared) {
+            if let host = url?.host,
+               fireproofDomains.isAllowed(fireproofDomain: host) {
+                self = .fireproofed
+            } else {
+                self = .nonFireproofed
+            }
         }
+
     }
 
     enum AccessPoint: String {
@@ -169,6 +175,32 @@ extension Pixel.Event {
         case tabMenu = "source-tab-menu"
         case hotKey = "source-keyboard"
         case moreMenu = "source-more-menu"
+        case newTab = "source-new-tab"
+
+        init(sender: Any, default: AccessPoint) {
+            switch sender {
+            case let menuItem as NSMenuItem:
+                if menuItem.topMenu is MainMenu {
+                    if case .keyDown = NSApp.currentEvent?.type,
+                       NSApp.isCommandPressed,
+                       !NSApp.isReturnOrEnterPressed {
+
+                        self = .hotKey
+                    } else {
+                        self = .mainMenu
+                    }
+                } else {
+                    self = `default`
+                }
+
+            case is NSButton:
+                self = .button
+
+            default:
+                self = `default`
+            }
+        }
+
     }
 
     enum NavigationKind: String {

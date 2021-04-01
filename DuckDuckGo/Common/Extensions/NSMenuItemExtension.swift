@@ -25,4 +25,13 @@ extension NSMenuItem {
         self.target = target
     }
 
+    var topMenu: NSMenu? {
+        var menuItem = self
+        while let parent = menuItem.parent {
+            menuItem = parent
+        }
+
+        return menuItem.menu
+    }
+
 }
