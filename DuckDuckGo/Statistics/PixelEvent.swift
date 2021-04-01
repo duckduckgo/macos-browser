@@ -26,7 +26,9 @@ extension Pixel {
 
         case appActiveUsage(isDefault: IsDefaultBrowser = .init(), avgTabs: AverageTabsCount)
 
-        case burn(repetition: Repetition = .init(key: "fire"), burnedTabs: BurnedTabs, burnedWindows: BurnedWindows)
+        case burn(repetition: Repetition = .init(key: "fire"),
+                  burnedTabs: BurnedTabs = .init(),
+                  burnedWindows: BurnedWindows = .init())
 
         case fireproof(kind: FireproofKind, repetition: Repetition = .init(key: "fireproof"), suggested: FireproofingSuggested)
 

@@ -95,6 +95,8 @@ final class TabBarViewController: NSViewController {
     @IBAction func burnButtonAction(_ sender: NSButton) {
         let response = NSAlert.burnButtonAlert.runModal()
         if response == NSApplication.ModalResponse.alertFirstButtonReturn {
+            Pixel.fire(.burn())
+
             WindowsManager.closeWindows(except: self.view.window)
             playFireAnimation()
         }
