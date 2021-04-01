@@ -383,11 +383,20 @@ final class AddressBarTextField: NSTextField {
         self.suggestionsWindowController = windowController
     }
 
+    private func suggestionsContainBookmarkOrFavorite() -> (hasBookmark: Bool, hasFavorite: Bool) {
+        var result = (hasBookmark: false, hasFavorite: false)
+        // fix this to correctly search suggested bookmarks/favorites
+        return result
+    }
+
     private func showSuggestionsWindow() {
         guard let window = window, let suggestionsWindow = suggestionsWindowController?.window else {
             os_log("AddressBarTextField: Window not available", type: .error)
             return
         }
+
+        Pixel.fire(.suggestionsDisplayed(suggestionsContainBookmarkOrFavorite()))
+
         guard !suggestionsWindow.isVisible, window.firstResponder == currentEditor() else { return }
 
         window.addChildWindow(suggestionsWindow, ordered: .above)

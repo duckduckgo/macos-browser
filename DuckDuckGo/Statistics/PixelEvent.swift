@@ -47,6 +47,11 @@ extension Pixel {
 
         case suggestionsDisplayed(hasBookmark: HasBookmark, hasFavorite: HasFavorite)
 
+        static func suggestionsDisplayed(_ arg: (hasBookmark: Bool, hasFavorite: Bool)) -> Event {
+            return .suggestionsDisplayed(hasBookmark: arg.hasBookmark ? .hasBookmark : .noBookmarks,
+                                         hasFavorite: arg.hasFavorite ? .hasFavorite : .noFavorites)
+        }
+
         case sharingMenu(repetition: Repetition = .init(key: "sharing"), result: SharingResult)
 
         case moreMenu(repetition: Repetition = .init(key: "more"), result: MoreResult)

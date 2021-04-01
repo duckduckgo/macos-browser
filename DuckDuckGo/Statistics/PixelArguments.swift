@@ -238,22 +238,14 @@ extension Pixel.Event {
         case newTab = "source-new-tab"
     }
 
-    enum HasBookmark: String, ExpressibleByBooleanLiteral {
+    enum HasBookmark: String {
         case hasBookmark = "has-bookmark"
         case noBookmarks = "no-bookmarks"
-
-        init(booleanLiteral value: Bool) {
-            self = value ? .hasBookmark : .noBookmarks
-        }
     }
 
-    enum HasFavorite: String, ExpressibleByBooleanLiteral {
+    enum HasFavorite: String {
         case hasFavorite = "has-favorite"
         case noFavorites = "no-favorites"
-
-        init(booleanLiteral value: Bool) {
-            self = value ? .hasFavorite : .noFavorites
-        }
     }
 
     enum SharingResult: String {
