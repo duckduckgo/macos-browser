@@ -249,8 +249,9 @@ extension Pixel.Event {
     }
 
     enum SharingResult: String {
-        case success = "success"
-        case failure = "cancelled"
+        case success
+        case failure
+        case cancelled
     }
 
     enum MoreResult: String {

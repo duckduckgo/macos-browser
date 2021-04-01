@@ -113,6 +113,7 @@ final class NavigationBarViewController: NSViewController {
     @IBAction func shareButtonAction(_ sender: NSButton) {
         guard let url = tabCollectionViewModel.selectedTabViewModel?.tab.url else { return }
         let sharing = NSSharingServicePicker(items: [url])
+        sharing.delegate = self
         sharing.show(relativeTo: .zero, of: sender, preferredEdge: .minY)
     }
 
@@ -172,6 +173,31 @@ final class NavigationBarViewController: NSViewController {
         refreshButton.isEnabled = selectedTabViewModel.canReload
         shareButton.isEnabled = selectedTabViewModel.canReload
         shareButton.isEnabled = selectedTabViewModel.tab.url != nil
+    }
+
+}
+
+extension NavigationBarViewController: NSSharingServicePickerDelegate {
+
+    func sharingServicePicker(_ sharingServicePicker: NSSharingServicePicker, delegateFor sharingService: NSSharingService) -> NSSharingServiceDelegate? {
+        return self
+    }
+
+    func sharingServicePicker(_ sharingServicePicker: NSSharingServicePicker, didChoose service: NSSharingService?) {
+        if service == nil {
+            Pixel.fire(.sharingMenu(result: .cancelled))
+        }
+    }
+}
+
+extension NavigationBarViewController: NSSharingServiceDelegate {
+
+    func sharingService(_ sharingService: NSSharingService, didFailToShareItems items: [Any], error: Error) {
+        Pixel.fire(.sharingMenu(result: .failure))
+    }
+
+    func sharingService(_ sharingService: NSSharingService, didShareItems items: [Any]) {
+        Pixel.fire(.sharingMenu(result: .success))
     }
 
 }
