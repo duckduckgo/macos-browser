@@ -71,7 +71,13 @@ extension AppDelegate {
         }
 
         let tab = Tab()
-        tab.url = menuItem.representedObject as? URL
+        guard let bookmark = menuItem.representedObject as? Bookmark else {
+            assertionFailure("Unexpected type of menuItem.representedObject: \(type(of: menuItem.representedObject))")
+            return
+        }
+        Pixel.fire(.navigation(kind: .bookmark(isFavorite: bookmark.isFavorite), source: .mainMenu))
+
+        tab.url = bookmark.url
         WindowsManager.openNewWindow(with: tab)
     }
 
@@ -174,8 +180,13 @@ extension MainViewController {
             os_log("MainViewController: No tab view model selected", type: .error)
             return
         }
-        
-        selectedTabViewModel.tab.url = menuItem.representedObject as? URL
+        guard let bookmark = menuItem.representedObject as? Bookmark else {
+            assertionFailure("Unexpected type of menuItem.representedObject: \(type(of: menuItem.representedObject))")
+            return
+        }
+        Pixel.fire(.navigation(kind: .bookmark(isFavorite: bookmark.isFavorite), source: .mainMenu))
+
+        selectedTabViewModel.tab.url = bookmark.url
     }
 
     // MARK: - Window

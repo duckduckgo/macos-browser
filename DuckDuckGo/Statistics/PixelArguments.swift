@@ -208,6 +208,27 @@ extension Pixel.Event {
         case url
         case bookmark
         case favorite
+
+        static func bookmark(isFavorite: Bool) -> NavigationKind {
+            if isFavorite {
+                return .favorite
+            }
+            return .bookmark
+        }
+
+        init(url: URL?, bookmarkManager: BookmarkManager = LocalBookmarkManager.shared) {
+            guard let url = url,
+                  !url.isDuckDuckGoSearch else {
+                self = .search
+                return
+            }
+            guard let bookmark = bookmarkManager.getBookmark(for: url) else {
+                self = .url
+                return
+            }
+            self = .bookmark(isFavorite: bookmark.isFavorite)
+        }
+
     }
 
     enum NavigationAccessPoint: String {

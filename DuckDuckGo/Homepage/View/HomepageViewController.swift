@@ -248,6 +248,8 @@ extension HomepageViewController: NSCollectionViewDataSource, NSCollectionViewDe
             return
         }
 
+        Pixel.fire(.navigation(kind: .favorite, source: .newTab))
+
         let favorite = topFavorites[index]
         tabCollectionViewModel.selectedTabViewModel?.tab.update(url: favorite.url, userEntered: true)
     }
