@@ -179,7 +179,8 @@ final class NavigationBarViewController: NSViewController {
 
 extension NavigationBarViewController: NSSharingServicePickerDelegate {
 
-    func sharingServicePicker(_ sharingServicePicker: NSSharingServicePicker, delegateFor sharingService: NSSharingService) -> NSSharingServiceDelegate? {
+    func sharingServicePicker(_ sharingServicePicker: NSSharingServicePicker,
+                              delegateFor sharingService: NSSharingService) -> NSSharingServiceDelegate? {
         return self
     }
 
