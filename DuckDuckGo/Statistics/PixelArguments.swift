@@ -181,9 +181,9 @@ extension Pixel.Event {
             switch sender {
             case let menuItem as NSMenuItem:
                 if menuItem.topMenu is MainMenu {
-                    if case .keyDown = NSApp.currentEvent?.type,
-                       NSApp.isCommandPressed,
-                       !NSApp.isReturnOrEnterPressed {
+                    if let event = NSApp.currentEvent,
+                        case .keyDown = event.type,
+                        event.characters == menuItem.keyEquivalent {
 
                         self = .hotKey
                     } else {
