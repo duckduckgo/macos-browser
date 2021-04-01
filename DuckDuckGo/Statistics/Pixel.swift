@@ -20,12 +20,18 @@
 import Foundation
 import os.log
 
-enum Pixel {
+final class Pixel {
 
-    static func fire(pixelNamed pixelName: String,
-                     withAdditionalParameters params: [String: String]? = nil,
-                     withHeaders headers: HTTPHeaders = APIHeaders().defaultHeaders,
-                     onComplete: @escaping (Error?) -> Void = {_ in }) {
+    static private(set) var shared: Pixel?
+
+    static func setUp() {
+        shared = Pixel()
+    }
+
+    func fire(pixelNamed pixelName: String,
+              withAdditionalParameters params: [String: String]? = nil,
+              withHeaders headers: HTTPHeaders = APIHeaders().defaultHeaders,
+              onComplete: @escaping (Error?) -> Void = {_ in }) {
 
         var newParams = params ?? [:]
         newParams[Parameters.appVersion] = AppVersion.shared.versionAndBuildNumber
@@ -44,11 +50,21 @@ enum Pixel {
             onComplete(error)
         }
     }
-    
-}
 
-extension Pixel {
-    static func fire(_ event: Pixel.Event) {
-        fire(pixelNamed: event.name, withAdditionalParameters: event.parameters)
+    static func fire(_ event: Pixel.Event, withAdditionalParameters parameters: [String: String]? = nil) {
+        let newParams: [String: String]?
+        switch (event.parameters, parameters) {
+        case (.some(let parameters), .none):
+            newParams = parameters
+        case (.none, .some(let parameters)):
+            newParams = parameters
+        case (.some(let params1), .some(let params2)):
+            newParams = params1.merging(params2) { $1 }
+        case (.none, .none):
+            newParams = nil
+        }
+
+        Self.shared?.fire(pixelNamed: event.name, withAdditionalParameters: newParams)
     }
+
 }

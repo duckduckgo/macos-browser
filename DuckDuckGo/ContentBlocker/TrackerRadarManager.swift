@@ -70,6 +70,8 @@ final class TrackerRadarManager {
             data = loadEmbeddedAsData()
             trackerData = (try? JSONDecoder().decode(TrackerData.self, from: data))!
             dataSet = .embeddedFallback
+
+            Pixel.fire(.debug(event: .trackerDataParseFailed, error: error))
         }
 
         return (trackerData, data.utf8String()!, dataSet)
@@ -79,6 +81,11 @@ final class TrackerRadarManager {
     public func reload() -> DataSet {
         let dataSet: DataSet
         (self.trackerData, self.encodedTrackerData, dataSet) = Self.loadData()
+
+        if dataSet != .downloaded {
+            Pixel.fire(.debug(event: .trackerDataReloadFailed))
+        }
+
         return dataSet
     }
 

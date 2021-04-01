@@ -48,6 +48,8 @@ final class FileStore: FileStoring {
 
             return true
         } catch {
+            Pixel.fire(.debug(event: .fileStoreWriteFailed, error: error),
+                       withAdditionalParameters: ["config": fileName])
             return false
         }
     }

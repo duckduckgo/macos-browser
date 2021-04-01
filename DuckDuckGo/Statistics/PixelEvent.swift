@@ -58,7 +58,7 @@ extension Pixel {
 
         case refresh(source: RefreshAccessPoint)
 
-        case debug(event: Debug, error: Error, countedBy: Pixel.Counter? = nil)
+        case debug(event: Debug, error: Error? = nil, countedBy: Pixel.Counter? = nil)
 
         enum Debug: String {
             case dbMigrationError = "dbme"

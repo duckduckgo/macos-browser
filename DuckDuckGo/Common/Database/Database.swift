@@ -57,6 +57,9 @@ final class Database {
     func loadStore(migrationHandler: @escaping (NSManagedObjectContext) -> Void = { _ in }) {
         container.loadPersistentStores { _, error in
             if let error = error {
+                Pixel.fire(.debug(event: .dbInitializationError, error: error, countedBy: .counter))
+                // Give Pixel a chance to be sent, but not too long
+                Thread.sleep(forTimeInterval: 1)
                 fatalError("Could not load DB: \(error.localizedDescription)")
             }
             

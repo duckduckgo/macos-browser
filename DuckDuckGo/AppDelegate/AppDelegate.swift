@@ -37,6 +37,10 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
     var appUsageActivityMonitor: AppUsageActivityMonitor?
 
     func applicationWillFinishLaunching(_ notification: Notification) {
+        if !isRunningTests {
+            Pixel.setUp()
+        }
+
         do {
             let encryptionKey = isRunningTests ? nil : try keyStore.readKey()
             fileStore = FileStore(encryptionKey: encryptionKey)

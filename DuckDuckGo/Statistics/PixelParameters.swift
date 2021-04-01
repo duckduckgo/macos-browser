@@ -41,23 +41,25 @@ extension Pixel.Event {
     var parameters: [String: String]? {
         switch self {
         case .debug(event: let event, error: let error, countedBy: let counter):
-            let nsError = error as NSError
-            var params = [
-                Pixel.Parameters.errorCode: "\(nsError.code)",
-                Pixel.Parameters.errorDesc: nsError.domain
-            ]
+            var params = [String: String]()
 
             if let counter = counter {
                 let count = counter.incrementedCount(for: event)
                 params[Pixel.Parameters.errorCount] = "\(count)"
             }
 
-            if let underlyingError = nsError.userInfo["NSUnderlyingError"] as? NSError {
-                params[Pixel.Parameters.underlyingErrorCode] = "\(underlyingError.code)"
-                params[Pixel.Parameters.underlyingErrorDesc] = underlyingError.domain
-            } else if let sqlErrorCode = nsError.userInfo["NSSQLiteErrorDomain"] as? NSNumber {
-                params[Pixel.Parameters.underlyingErrorCode] = "\(sqlErrorCode.intValue)"
-                params[Pixel.Parameters.underlyingErrorDesc] = "NSSQLiteErrorDomain"
+            if let error = error {
+                let nsError = error as NSError
+
+                params[Pixel.Parameters.errorCode] = "\(nsError.code)"
+                params[Pixel.Parameters.errorDesc] = nsError.domain
+                if let underlyingError = nsError.userInfo["NSUnderlyingError"] as? NSError {
+                    params[Pixel.Parameters.underlyingErrorCode] = "\(underlyingError.code)"
+                    params[Pixel.Parameters.underlyingErrorDesc] = underlyingError.domain
+                } else if let sqlErrorCode = nsError.userInfo["NSSQLiteErrorDomain"] as? NSNumber {
+                    params[Pixel.Parameters.underlyingErrorCode] = "\(sqlErrorCode.intValue)"
+                    params[Pixel.Parameters.underlyingErrorDesc] = "NSSQLiteErrorDomain"
+                }
             }
 
             return params

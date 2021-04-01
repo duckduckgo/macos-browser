@@ -29,7 +29,9 @@ extension Pixel {
 
         let store: UserDefaults
 
-        init(store: UserDefaults = .standard) {
+        static let counter = Counter(store: .standard)
+
+        init(store: UserDefaults) {
             self.store = store
         }
 

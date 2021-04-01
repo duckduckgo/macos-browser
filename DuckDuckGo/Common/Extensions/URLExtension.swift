@@ -202,6 +202,7 @@ extension URL {
               let resolvedFolderUrl = try? URL(resolvingAliasFileAt: folderUrl),
               fm.isWritableFile(atPath: resolvedFolderUrl.path) else {
             os_log("Failed to access Downloads folder")
+            Pixel.fire(.debug(event: .fileMoveToDownloadsFailed, error: CocoaError(.fileWriteUnknown)))
             return nil
         }
 
@@ -212,8 +213,11 @@ extension URL {
             do {
                 try fm.moveItem(at: self, to: fileInDownloads)
                 return fileInDownloads.path
-            } catch {
+            } catch CocoaError.fileWriteFileExists {
                 // This is expected, as moveItem throws an error if the file already exists
+            } catch {
+                Pixel.fire(.debug(event: .fileMoveToDownloadsFailed, error: error))
+                break // swiftlint:disable:this unneeded_break_in_switch
             }
             copy += 1
         }
