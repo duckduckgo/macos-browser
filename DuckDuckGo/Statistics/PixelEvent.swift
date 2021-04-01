@@ -26,6 +26,8 @@ extension Pixel {
 
         case appActiveUsage(isDefault: IsDefaultBrowser = .init(), avgTabs: AverageTabsCount)
 
+        case browserMadeDefault
+
         case burn(repetition: Repetition = .init(key: "fire"),
                   burnedTabs: BurnedTabs = .init(),
                   burnedWindows: BurnedWindows = .init())
@@ -95,6 +97,9 @@ extension Pixel.Event {
 
         case .appActiveUsage(isDefault: let isDefault, avgTabs: let avgTabs):
             return "m_mac_active-usage_\(isDefault)_\(avgTabs)"
+
+        case .browserMadeDefault:
+            return "m_mac_made-default-browser"
 
         case .burn(repetition: let repetition, burnedTabs: let tabs, burnedWindows: let windows):
             return "m_mac_fire-button.\(repetition)_\(tabs)_\(windows)"

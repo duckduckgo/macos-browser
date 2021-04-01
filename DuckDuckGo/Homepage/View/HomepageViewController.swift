@@ -193,6 +193,7 @@ extension HomepageViewController: DefaultBrowserPromptViewDelegate {
     func defaultBrowserPromptViewRequestedDefaultBrowserPrompt(_ view: DefaultBrowserPromptView) {
         Browser.becomeDefault()
         displayDefaultBrowserPromptIfNeeded()
+        Pixel.fire(.browserMadeDefault)
     }
 
 }
