@@ -25,7 +25,23 @@ final class OptionsButtonMenu: NSMenu {
 
     private let tabCollectionViewModel: TabCollectionViewModel
     private let emailManager: EmailManager
-    
+
+    enum Result {
+        case moveTabToNewWindow
+        case feedback
+        case fireproof
+
+        case emailProtection
+        case emailProtectionOff
+        case emailProtectionCreateAddress
+        case emailProtectionDashboard
+
+        case bookmarkThisPage
+        case favoriteThisPage
+        case navigateToBookmark
+    }
+    fileprivate(set) var result: Result?
+
     required init(coder: NSCoder) {
         fatalError("OptionsButtonMenu: Bad initializer")
     }
@@ -41,6 +57,7 @@ final class OptionsButtonMenu: NSMenu {
     let bookmarksMenuItem = NSMenuItem(title: UserText.bookmarks, action: nil, keyEquivalent: "")
 
     override func update() {
+        self.result = nil
         updateBookmarks()
 
         super.update()
@@ -103,7 +120,7 @@ final class OptionsButtonMenu: NSMenu {
     
     private func updateBookmarks() {
         // The bookmarks section is the same with the main menu
-        bookmarksMenuItem.submenu = NSApplication.shared.mainMenuTyped?.bookmarksMenuItem?.submenu?.copy() as? NSMenu
+        bookmarksMenuItem.submenu = BookmarksSubMenu()
     }
 
     @objc func moveTabToNewWindowAction(_ sender: NSMenuItem) {
@@ -125,7 +142,84 @@ final class OptionsButtonMenu: NSMenu {
         
         selectedTabViewModel.tab.requestFireproofToggle()
     }
-    
+
+    override func performActionForItem(at index: Int) {
+        defer {
+            super.performActionForItem(at: index)
+        }
+
+        guard let item = self.item(at: index) else {
+            assertionFailure("MainViewController: No Menu Item at index \(index)")
+            return
+        }
+
+        switch item.action {
+        case #selector(moveTabToNewWindowAction(_:)):
+            self.result = .moveTabToNewWindow
+        case #selector(AppDelegate.openFeedback(_:)):
+            self.result = .feedback
+        case #selector(toggleFireproofing(_:)):
+            self.result = .fireproof
+        case .none:
+            break
+        default:
+            assertionFailure("MainViewController: no case for selector \(item.action!)")
+        }
+    }
+
+}
+
+final class BookmarksSubMenu: NSMenu {
+
+    init(menu: NSMenu?) {
+        super.init(title: menu?.title ?? "")
+
+        for item in menu?.items ?? [] {
+            let item = (item.copy() as? NSMenuItem)!
+            self.addItem(item)
+            if let submenu = item.submenu {
+                item.submenu = BookmarksSubMenu(menu: submenu)
+            }
+        }
+    }
+
+    convenience init() {
+        let bookmarksMenu = NSApplication.shared.mainMenuTyped?.bookmarksMenuItem?.submenu
+
+        self.init(menu: bookmarksMenu)
+    }
+
+    required init(coder: NSCoder) {
+        fatalError("init(coder:) has not been implemented")
+    }
+
+    override func performActionForItem(at index: Int) {
+        defer {
+            super.performActionForItem(at: index)
+        }
+        guard let item = self.item(at: index) else {
+            assertionFailure("MainViewController: No Menu Item at index \(index)")
+            return
+        }
+        guard let supermenu = item.topMenu as? OptionsButtonMenu else {
+            assertionFailure("Unexpected supermenu kind: \(type(of: item.topMenu))")
+            return
+        }
+
+        switch item.action {
+        case #selector(MainViewController.bookmarkThisPage(_:)):
+            supermenu.result = .bookmarkThisPage
+        case #selector(MainViewController.favoriteThisPage(_:)):
+            supermenu.result = .favoriteThisPage
+        case #selector(MainViewController.navigateToBookmark(_:)):
+            supermenu.result = .navigateToBookmark
+        case .none:
+            break
+        default:
+            assertionFailure("MainViewController: no case for selector \(item.action!)")
+        }
+    }
+
 }
 
 final class EmailOptionsButtonSubMenu: NSMenu {
@@ -195,22 +289,30 @@ final class EmailOptionsButtonSubMenu: NSMenu {
         let tab = Tab()
         tab.url = url
         tabCollectionViewModel.append(tab: tab)
+
+        (supermenu as? OptionsButtonMenu)?.result = .emailProtectionCreateAddress
     }
     
     @objc func viewDashboardAction(_ sender: NSMenuItem) {
         let tab = Tab()
         tab.url = EmailUrls().emailDashboardPage
         tabCollectionViewModel.append(tab: tab)
+
+        (supermenu as? OptionsButtonMenu)?.result = .emailProtectionDashboard
     }
     
     @objc func turnOffEmailAction(_ sender: NSMenuItem) {
         emailManager.signOut()
+
+        (supermenu as? OptionsButtonMenu)?.result = .emailProtectionOff
     }
     
     @objc func turnOnEmailAction(_ sender: NSMenuItem) {
         let tab = Tab()
         tab.url = EmailUrls().emailLandingPage
         tabCollectionViewModel.append(tab: tab)
+
+        (supermenu as? OptionsButtonMenu)?.result = .emailProtection
     }
 
     @objc func emailDidSignInNotification(_ notification: Notification) {

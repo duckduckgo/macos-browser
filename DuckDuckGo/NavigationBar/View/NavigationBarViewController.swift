@@ -107,6 +107,28 @@ final class NavigationBarViewController: NSViewController {
         if let event = NSApplication.shared.currentEvent {
             let menu = OptionsButtonMenu(tabCollectionViewModel: tabCollectionViewModel)
             NSMenu.popUpContextMenu(menu, with: event, for: sender)
+
+            switch menu.result {
+            case .navigateToBookmark:
+                Pixel.fire(.moreMenu(result: .bookmark))
+            case .emailProtection:
+                Pixel.fire(.moreMenu(result: .emailProtection))
+            case .feedback:
+                Pixel.fire(.moreMenu(result: .feedback))
+            case .fireproof:
+                Pixel.fire(.moreMenu(result: .fireproof))
+            case .moveTabToNewWindow:
+                Pixel.fire(.moreMenu(result: .moveTabToNewWindow))
+            case .none:
+                Pixel.fire(.moreMenu(result: .cancelled))
+
+            case .emailProtectionOff,
+                 .emailProtectionCreateAddress,
+                 .emailProtectionDashboard,
+                 .bookmarkThisPage,
+                 .favoriteThisPage:
+                break
+            }
         }
     }
 
