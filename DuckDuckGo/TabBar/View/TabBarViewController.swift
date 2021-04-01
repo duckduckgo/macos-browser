@@ -697,16 +697,18 @@ extension TabBarViewController: TabBarViewItemDelegate {
     }
 
     func tabBarViewItemFireproofSite(_ tabBarViewItem: TabBarViewItem) {
-        if let url = tabCollectionViewModel.selectedTabViewModel?.tab.url?.host {
-            FireproofDomains.shared.addToAllowed(domain: url)
+        if let url = tabCollectionViewModel.selectedTabViewModel?.tab.url,
+           let host = url.host {
+            Pixel.fire(.fireproof(kind: .init(url: url), suggested: .manual))
+            FireproofDomains.shared.addToAllowed(domain: host)
         }
 
         tabBarViewItem.setupMenu()
     }
 
     func tabBarViewItemRemoveFireproofing(_ tabBarViewItem: TabBarViewItem) {
-        if let url = tabCollectionViewModel.selectedTabViewModel?.tab.url?.host {
-            FireproofDomains.shared.remove(domain: url)
+        if let host = tabCollectionViewModel.selectedTabViewModel?.tab.url?.host {
+            FireproofDomains.shared.remove(domain: host)
         }
 
         tabBarViewItem.setupMenu()

@@ -129,6 +129,20 @@ extension Pixel.Event {
         case bookmarked
         case favorite
         case website
+
+        init(url: URL?, bookmarkManager: BookmarkManager = LocalBookmarkManager.shared) {
+            guard let url = url,
+                  let bookmark = bookmarkManager.getBookmark(for: url) else {
+                self = .website
+                return
+            }
+            if bookmark.isFavorite {
+                self = .favorite
+            } else {
+                self = .bookmarked
+            }
+        }
+
     }
 
     enum FireproofingSuggested: String, ExpressibleByBooleanLiteral {

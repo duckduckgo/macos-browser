@@ -67,6 +67,7 @@ extension Pixel.Event {
              .appActiveUsage,
              .burn,
              .fireproof,
+             .fireproofSuggested,
              .bookmark,
              .favorite,
              .navigation,
