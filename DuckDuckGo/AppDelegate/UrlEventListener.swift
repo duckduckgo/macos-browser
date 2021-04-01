@@ -23,9 +23,7 @@ final class UrlEventListener {
 
     private let handler: ((URL) -> Void)
 
-    init(handler: @escaping ((URL) -> Void) = { url in
-        WindowControllersManager.shared.show(url: url)
-    }) {
+    init(handler: @escaping ((URL) -> Void)) {
         self.handler = handler
     }
 

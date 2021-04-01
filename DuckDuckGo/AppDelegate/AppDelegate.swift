@@ -28,7 +28,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         ProcessInfo.processInfo.environment["XCTestConfigurationFilePath"] != nil
     }
 
-    let urlEventListener = UrlEventListener()
+    let urlEventListener = UrlEventListener(handler: AppDelegate.handleURL)
 
     private let keyStore = EncryptionKeyStore()
     private var fileStore: FileStore!
@@ -49,13 +49,17 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         urlEventListener.listen()
     }
 
-    func applicationDidFinishLaunching(_ aNotification: Notification) {
+    func applicationDidFinishLaunching(_ notification: Notification) {
         Database.shared.loadStore()
         HTTPSUpgrade.shared.loadDataAsync()
         LocalBookmarkManager.shared.loadBookmarks()
         _=ConfigurationManager.shared
 
         if !isRunningTests {
+            if (notification.userInfo?[NSApplication.launchIsDefaultUserInfoKey] as? NSNumber)?.boolValue == true {
+                Pixel.fire(.appLaunch(launch: .autoInitialOrRegular()))
+            }
+
             stateRestorationManager.applicationDidFinishLaunching()
 
             if WindowsManager.windows.isEmpty {
@@ -89,6 +93,21 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         return applicationDockMenu
     }
 
+    func application(_ sender: NSApplication, openFiles files: [String]) {
+        for path in files {
+            guard FileManager.default.fileExists(atPath: path) else { continue }
+            let url = URL(fileURLWithPath: path)
+
+            Self.handleURL(url)
+        }
+    }
+
+    static func handleURL(_ url: URL) {
+        Pixel.fire(.appLaunch(launch: url.isFileURL ? .openFile : .openURL))
+
+        WindowControllersManager.shared.show(url: url)
+    }
+
 }
 
 extension AppDelegate: AppUsageActivityMonitorDelegate {
@@ -99,7 +118,7 @@ extension AppDelegate: AppUsageActivityMonitorDelegate {
     }
 
     func activeUsageTimeHasReachedThreshold(avgTabCount: Double) {
-        Pixel.fire(pixel: .appActiveUsage(avgTabs: .init(avgTabs: avgTabCount)))
+        Pixel.fire(.appActiveUsage(avgTabs: .init(avgTabs: avgTabCount)))
     }
 
 }

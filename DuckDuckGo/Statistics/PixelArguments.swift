@@ -25,6 +25,19 @@ extension Pixel.Event {
         case regular = "app-launch"
         case openURL = "open-url"
         case openFile = "open-file"
+
+        private static let AppInitiallyLaunchedKey = "init"
+
+        static func autoInitialOrRegular(store: UserDefaults = .standard, now: Date = Date()) -> AppLaunch {
+            let launchRepetition = Repetition(key: Self.AppInitiallyLaunchedKey, store: store, now: now)
+            switch launchRepetition {
+            case .initial:
+                return .initial
+            case .dailyFirst, .repetitive:
+                return .regular
+            }
+        }
+
     }
 
     enum IsDefaultBrowser: String {
@@ -46,13 +59,13 @@ extension Pixel.Event {
         case dailyFirst = "first-in-a-day"
         case repetitive = "repetitive"
 
-        init(key: String, userDefaults: UserDefaults = .standard, now: Date = Date()) {
+        init(key: String, store: UserDefaults = .standard, now: Date = Date()) {
             let key = "t_" + key
             defer {
-                userDefaults.set(now.daySinceReferenceDate, forKey: key)
+                store.set(now.daySinceReferenceDate, forKey: key)
             }
 
-            guard let lastUsedDay = userDefaults.value(forKey: key) as? Int else {
+            guard let lastUsedDay = store.value(forKey: key) as? Int else {
                 self = .initial
                 return
             }

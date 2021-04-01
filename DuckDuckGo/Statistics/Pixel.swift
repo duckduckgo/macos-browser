@@ -48,7 +48,7 @@ enum Pixel {
 }
 
 extension Pixel {
-    static func fire(pixel event: Pixel.Event) {
+    static func fire(_ event: Pixel.Event) {
         fire(pixelNamed: event.name, withAdditionalParameters: event.parameters)
     }
 }
