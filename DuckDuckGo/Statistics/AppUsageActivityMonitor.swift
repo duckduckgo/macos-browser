@@ -37,6 +37,7 @@ final class AppUsageActivityMonitor: NSObject {
 
         static let usageTimeKey = "activityTime"
         static let activityDateKey = "activityDate"
+        static let activityAvgTabsKey = "activityAvgTabs"
     }
 
     private let storage: PixelDataStore
@@ -51,7 +52,11 @@ final class AppUsageActivityMonitor: NSObject {
             storage.set(Int(self.lastActivityDate), forKey: Constants.activityDateKey)
         }
     }
-    private var avgTabCount: Double = 0
+    private var avgTabCount: Double {
+        didSet {
+            storage.set(self.avgTabCount, forKey: Constants.activityAvgTabsKey)
+        }
+    }
 
     private let maxIdleTime: TimeInterval
     private let threshold: TimeInterval
@@ -63,7 +68,7 @@ final class AppUsageActivityMonitor: NSObject {
     private var timer: Timer?
 
     init(delegate: AppUsageActivityMonitorDelegate,
-         dateProvider: @escaping () -> TimeInterval = { Date().timeIntervalSinceReferenceDate },
+         dateProvider: @escaping @autoclosure () -> TimeInterval = Date().timeIntervalSinceReferenceDate,
          storage: PixelDataStore = LocalPixelDataStore.shared,
          throttle: TimeInterval = Constants.throttle,
          maxIdleTime: TimeInterval = Constants.maxIdleTime,
@@ -74,9 +79,9 @@ final class AppUsageActivityMonitor: NSObject {
         self.maxIdleTime = maxIdleTime
         self.threshold = threshold
 
-        self.usageTime = storage.value(forKey: Constants.usageTimeKey).map(TimeInterval.init) ?? 0
-        self.lastActivityDate = storage.value(forKey: Constants.activityDateKey).map(TimeInterval.init) ?? 0
-
+        self.usageTime = storage.value(forKey: Constants.usageTimeKey) ?? 0.0
+        self.lastActivityDate = storage.value(forKey: Constants.activityDateKey) ?? 0.0
+        self.avgTabCount = storage.value(forKey: Constants.activityAvgTabsKey) ?? 0.0
         self.currentTime = dateProvider
         self.delegate = delegate
 
@@ -85,22 +90,27 @@ final class AppUsageActivityMonitor: NSObject {
         let kinds: NSEvent.EventTypeMask = [.keyDown, .mouseMoved, .scrollWheel]
 
         self.monitor = NSEvent.addLocalMonitorForEvents(matching: kinds) { [weak self] event in
-            if let self = self,
-               self.timer == nil {
-                self.timer = .scheduledTimer(withTimeInterval: throttle, repeats: false) { [weak self] _ in
-                    self?.timer = nil
-                    self?.monitorDidReceiveEvent()
+            if let self = self, NSApp.isActive {
+
+                if self.timer == nil, throttle > 0 {
+                    self.timer = .scheduledTimer(withTimeInterval: throttle, repeats: false) { [weak self] _ in
+                        self?.timer = nil
+                        self?.monitorDidReceiveEvent()
+                    }
+
+                } else if throttle == 0 {
+                    self.monitorDidReceiveEvent()
                 }
             }
             return event
         }
     }
 
-    private func countAvgTabs() -> Double {
+    private func countTabs() -> Double {
         guard let delegate = delegate else { return 0 }
 
         let uiInfo = delegate.countOpenWindowsAndTabs()
-        return Double(uiInfo.reduce(0, +)) / Double(uiInfo.count)
+        return Double(uiInfo.reduce(0, +))
     }
 
     private func monitorDidReceiveEvent() {
@@ -112,14 +122,14 @@ final class AppUsageActivityMonitor: NSObject {
 
         if interval < maxIdleTime {
             // continuous active usage
-            self.avgTabCount = (self.avgTabCount + self.countAvgTabs()) / 2.0
+            self.avgTabCount = (self.avgTabCount + self.countTabs()) / 2.0
 
             self.incrementUsageTime(by: interval)
 
         } else if Int(currentTime / Constants.day) != Int(lastActivityDate / Constants.day) {
             // reset on next day
             usageTime = 0
-            self.avgTabCount = self.countAvgTabs()
+            self.avgTabCount = self.countTabs()
         }
     }
 
@@ -127,7 +137,7 @@ final class AppUsageActivityMonitor: NSObject {
         guard self.usageTime < self.threshold else { return }
 
         self.usageTime += interval
-        if interval >= self.threshold {
+        if self.usageTime >= self.threshold {
             delegate?.activeUsageTimeHasReachedThreshold(avgTabCount: self.avgTabCount)
         }
     }

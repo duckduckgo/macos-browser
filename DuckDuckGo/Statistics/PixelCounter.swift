@@ -31,7 +31,7 @@ extension Pixel {
 
         static let counter = Counter(store: LocalPixelDataStore.shared)
 
-        init(store: LocalPixelDataStore) {
+        init(store: PixelDataStore) {
             self.store = store
         }
 

@@ -273,6 +273,12 @@
 		B6D7A2EE25D2418B002B2AE1 /* ShadowView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B6D7A2ED25D2418B002B2AE1 /* ShadowView.swift */; };
 		B6DA44022616B28300DD1EC2 /* PixelDataStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = B6DA44012616B28300DD1EC2 /* PixelDataStore.swift */; };
 		B6DA44082616B30600DD1EC2 /* PixelDataModel.xcdatamodeld in Sources */ = {isa = PBXBuildFile; fileRef = B6DA44062616B30600DD1EC2 /* PixelDataModel.xcdatamodeld */; };
+		B6DA44112616C0FC00DD1EC2 /* PixelTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = B6DA44102616C0FC00DD1EC2 /* PixelTests.swift */; };
+		B6DA44172616C13800DD1EC2 /* OHHTTPStubs in Frameworks */ = {isa = PBXBuildFile; productRef = B6DA44162616C13800DD1EC2 /* OHHTTPStubs */; };
+		B6DA44192616C13800DD1EC2 /* OHHTTPStubsSwift in Frameworks */ = {isa = PBXBuildFile; productRef = B6DA44182616C13800DD1EC2 /* OHHTTPStubsSwift */; };
+		B6DA441E2616C84600DD1EC2 /* PixelStoreMock.swift in Sources */ = {isa = PBXBuildFile; fileRef = B6DA441D2616C84600DD1EC2 /* PixelStoreMock.swift */; };
+		B6DA44232616CABC00DD1EC2 /* PixelArgumentsTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = B6DA44222616CABC00DD1EC2 /* PixelArgumentsTests.swift */; };
+		B6DA44282616CAE000DD1EC2 /* AppUsageActivityMonitorTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = B6DA44272616CAE000DD1EC2 /* AppUsageActivityMonitorTests.swift */; };
 		F41D174125CB131900472416 /* NSColorExtension.swift in Sources */ = {isa = PBXBuildFile; fileRef = F41D174025CB131900472416 /* NSColorExtension.swift */; };
 		F44C130225C2DA0400426E3E /* NSAppearanceExtension.swift in Sources */ = {isa = PBXBuildFile; fileRef = F44C130125C2DA0400426E3E /* NSAppearanceExtension.swift */; };
 /* End PBXBuildFile section */
@@ -566,6 +572,10 @@
 		B6D7A2ED25D2418B002B2AE1 /* ShadowView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ShadowView.swift; sourceTree = "<group>"; };
 		B6DA44012616B28300DD1EC2 /* PixelDataStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PixelDataStore.swift; sourceTree = "<group>"; };
 		B6DA44072616B30600DD1EC2 /* PixelDataModel.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = PixelDataModel.xcdatamodel; sourceTree = "<group>"; };
+		B6DA44102616C0FC00DD1EC2 /* PixelTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = PixelTests.swift; sourceTree = "<group>"; };
+		B6DA441D2616C84600DD1EC2 /* PixelStoreMock.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PixelStoreMock.swift; sourceTree = "<group>"; };
+		B6DA44222616CABC00DD1EC2 /* PixelArgumentsTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PixelArgumentsTests.swift; sourceTree = "<group>"; };
+		B6DA44272616CAE000DD1EC2 /* AppUsageActivityMonitorTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppUsageActivityMonitorTests.swift; sourceTree = "<group>"; };
 		F41D174025CB131900472416 /* NSColorExtension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NSColorExtension.swift; sourceTree = "<group>"; };
 		F44C130125C2DA0400426E3E /* NSAppearanceExtension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NSAppearanceExtension.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
@@ -594,6 +604,8 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				B6DA44172616C13800DD1EC2 /* OHHTTPStubs in Frameworks */,
+				B6DA44192616C13800DD1EC2 /* OHHTTPStubsSwift in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -1024,6 +1036,7 @@
 				AAC9C01224CAFBB700AD1325 /* TabBar */,
 				B61F012125ECBACE00ABB5A3 /* UserScripts */,
 				B6AE74322609AFBB005B9B1A /* Progress */,
+				B6DA440F2616C0F200DD1EC2 /* Statistics */,
 				AA585D96248FD31400E9A3E2 /* Info.plist */,
 			);
 			path = "Unit Tests";
@@ -1671,6 +1684,17 @@
 			path = Progress;
 			sourceTree = "<group>";
 		};
+		B6DA440F2616C0F200DD1EC2 /* Statistics */ = {
+			isa = PBXGroup;
+			children = (
+				B6DA44102616C0FC00DD1EC2 /* PixelTests.swift */,
+				B6DA44222616CABC00DD1EC2 /* PixelArgumentsTests.swift */,
+				B6DA44272616CAE000DD1EC2 /* AppUsageActivityMonitorTests.swift */,
+				B6DA441D2616C84600DD1EC2 /* PixelStoreMock.swift */,
+			);
+			path = Statistics;
+			sourceTree = "<group>";
+		};
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
@@ -1730,6 +1754,10 @@
 				AA585D92248FD31400E9A3E2 /* PBXTargetDependency */,
 			);
 			name = "Unit Tests";
+			packageProductDependencies = (
+				B6DA44162616C13800DD1EC2 /* OHHTTPStubs */,
+				B6DA44182616C13800DD1EC2 /* OHHTTPStubsSwift */,
+			);
 			productName = DuckDuckGoTests;
 			productReference = AA585D90248FD31400E9A3E2 /* Unit Tests.xctest */;
 			productType = "com.apple.product-type.bundle.unit-test";
@@ -1771,6 +1799,7 @@
 				85FF55C625F82E4F00E2AB99 /* XCRemoteSwiftPackageReference "lottie-ios" */,
 				B65783F325F8ACA400D8DB33 /* XCRemoteSwiftPackageReference "PunycodeSwift" */,
 				8524389525FA49B900DE9B83 /* XCRemoteSwiftPackageReference "BrowserServicesKit" */,
+				B6DA44152616C13800DD1EC2 /* XCRemoteSwiftPackageReference "OHHTTPStubs" */,
 			);
 			productRefGroup = AA585D7F248FD31100E9A3E2 /* Products */;
 			projectDirPath = "";
@@ -2064,16 +2093,19 @@
 			buildActionMask = 2147483647;
 			files = (
 				142879DA24CE1179005419BB /* SuggestionViewModelTests.swift in Sources */,
+				B6DA44232616CABC00DD1EC2 /* PixelArgumentsTests.swift in Sources */,
 				85F1B0C925EF9759004792B6 /* URLEventListenerTests.swift in Sources */,
 				B6A5A27925B93FFF00AA7ADA /* StateRestorationManagerTests.swift in Sources */,
 				4B0219A825E0646500ED7DEA /* WebsiteDataStoreTests.swift in Sources */,
 				AAC9C01E24CB6BEB00AD1325 /* TabCollectionViewModelTests.swift in Sources */,
 				85E11C3725E7F1E100974CAF /* ExternalURLHandlerTests.swift in Sources */,
 				4B02199B25E063DE00ED7DEA /* LoginDetectionServiceTests.swift in Sources */,
+				B6DA44282616CAE000DD1EC2 /* AppUsageActivityMonitorTests.swift in Sources */,
 				AAC9C01724CAFBDC00AD1325 /* TabCollectionTests.swift in Sources */,
 				4B82E9B925B6A05800656FE7 /* DetectedTrackerTests.swift in Sources */,
 				4BA1A6DE258C100A00F6F690 /* FileStoreTests.swift in Sources */,
 				AAC9C01C24CB594C00AD1325 /* TabViewModelTests.swift in Sources */,
+				B6DA441E2616C84600DD1EC2 /* PixelStoreMock.swift in Sources */,
 				4B11060525903E570039B979 /* CoreDataEncryptionTesting.xcdatamodeld in Sources */,
 				8546DE6225C03056000CA5E1 /* UserAgentTests.swift in Sources */,
 				4B82E9C125B6A1CD00656FE7 /* TrackerRadarManagerTests.swift in Sources */,
@@ -2095,6 +2127,7 @@
 				B6AE74342609AFCE005B9B1A /* ProgressEstimationTests.swift in Sources */,
 				4BA1A6FE258C5C1300F6F690 /* EncryptedValueTransformerTests.swift in Sources */,
 				85F69B3C25EDE81F00978E59 /* URLExtensionTests.swift in Sources */,
+				B6DA44112616C0FC00DD1EC2 /* PixelTests.swift in Sources */,
 				AA63745624C9EB3C00AB2AC4 /* SuggestionsAPIResultTests.swift in Sources */,
 				AA652CCE25DD9071009059CC /* BookmarkListTests.swift in Sources */,
 				B6A5A2A825BAA35500AA7ADA /* WindowManagerStateRestorationTests.swift in Sources */,
@@ -2657,6 +2690,14 @@
 				minimumVersion = 2.1.0;
 			};
 		};
+		B6DA44152616C13800DD1EC2 /* XCRemoteSwiftPackageReference "OHHTTPStubs" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/AliSoftware/OHHTTPStubs.git";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 9.1.0;
+			};
+		};
 /* End XCRemoteSwiftPackageReference section */
 
 /* Begin XCSwiftPackageProductDependency section */
@@ -2679,6 +2720,16 @@
 			isa = XCSwiftPackageProductDependency;
 			package = B65783F325F8ACA400D8DB33 /* XCRemoteSwiftPackageReference "PunycodeSwift" */;
 			productName = Punnycode;
+		};
+		B6DA44162616C13800DD1EC2 /* OHHTTPStubs */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = B6DA44152616C13800DD1EC2 /* XCRemoteSwiftPackageReference "OHHTTPStubs" */;
+			productName = OHHTTPStubs;
+		};
+		B6DA44182616C13800DD1EC2 /* OHHTTPStubsSwift */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = B6DA44152616C13800DD1EC2 /* XCRemoteSwiftPackageReference "OHHTTPStubs" */;
+			productName = OHHTTPStubsSwift;
 		};
 /* End XCSwiftPackageProductDependency section */
 

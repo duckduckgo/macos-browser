@@ -29,7 +29,7 @@ struct TimedPixel {
     }
 
     func fire(_ fireTime: CFTimeInterval = CACurrentMediaTime(), withAdditionalParmaeters params: [String: String] = [:]) {
-        let duration = String(format: "%.2f", fireTime - self.time)
+        let duration = String(format: "%.1f", fireTime - self.time)
         var newParams = pixel.parameters ?? [:]
         newParams.merge(params, uniquingKeysWith: { $1 })
         newParams[Pixel.Parameters.duration] = duration

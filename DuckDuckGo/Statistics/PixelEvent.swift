@@ -62,7 +62,9 @@ extension Pixel {
 
         case debug(event: Debug, error: Error? = nil, countedBy: Pixel.Counter? = nil)
 
-        enum Debug: String {
+        enum Debug: String, CustomStringConvertible {
+            var description: String { rawValue }
+
             case dbMigrationError = "dbme"
             case dbInitializationError = "dbie"
             case dbSaveExcludedHTTPSDomainsError = "dbsw"
@@ -131,7 +133,7 @@ extension Pixel.Event {
             return "m_mac_refresh_\(source)"
 
         case .debug(event: let event, error: _, countedBy: _):
-            return "m_debug_\(event)"
+            return "m_mac_debug_\(event)"
         }
     }
 

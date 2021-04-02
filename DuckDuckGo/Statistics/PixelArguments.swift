@@ -20,7 +20,9 @@ import Foundation
 
 extension Pixel.Event {
 
-    enum AppLaunch: String {
+    enum AppLaunch: String, CustomStringConvertible {
+        var description: String { rawValue }
+
         case initial = "initial"
         case regular = "app-launch"
         case openURL = "open-url"
@@ -40,7 +42,8 @@ extension Pixel.Event {
 
     }
 
-    enum IsDefaultBrowser: String {
+    enum IsDefaultBrowser: String, CustomStringConvertible {
+        var description: String { rawValue }
 
         case `default` = "as-default"
         case nonDefault = "as-nondefault"
@@ -54,7 +57,9 @@ extension Pixel.Event {
         }
     }
 
-    enum Repetition: String {
+    enum Repetition: String, CustomStringConvertible {
+        var description: String { rawValue }
+
         case initial = "initial"
         case dailyFirst = "first-in-a-day"
         case repetitive = "repetitive"
@@ -64,36 +69,43 @@ extension Pixel.Event {
                 store.set(now.daySinceReferenceDate, forKey: key)
             }
 
-            guard let lastUsedDay = store.value(forKey: key) else {
+            guard let lastUsedDay: Int = store.value(forKey: key) else {
                 self = .initial
                 return
             }
             if lastUsedDay == now.daySinceReferenceDate {
                 self = .repetitive
+                return
             }
             self = .dailyFirst
         }
     }
 
-    enum AverageTabsCount: String {
+    enum AverageTabsCount: String, CustomStringConvertible {
+        var description: String { rawValue }
+
         case lessThan6 = "less-than-6-tabs"
         case moreThan6 = "more-than-6-tabs"
 
         init(avgTabs: Double) {
             if avgTabs >= 6 {
                 self = .moreThan6
+                return
             }
             self = .lessThan6
         }
     }
 
-    enum BurnedTabs: String {
+    enum BurnedTabs: String, CustomStringConvertible {
+        var description: String { rawValue }
+
         case lessThan6 = "burn-less-than-6-tabs"
         case moreThan6 = "burn-more-than-6-tabs"
 
         init(_ tabs: Int) {
             if tabs >= 6 {
                 self = .moreThan6
+                return
             }
             self = .lessThan6
         }
@@ -106,13 +118,16 @@ extension Pixel.Event {
 
     }
 
-    enum BurnedWindows: String {
+    enum BurnedWindows: String, CustomStringConvertible {
+        var description: String { rawValue }
+
         case one = "burn-1-window"
         case moreThan1 = "burn-more-than-1-window"
 
         init(_ windows: Int) {
             if windows <= 1 {
                 self = .one
+                return
             }
             self = .moreThan1
         }
@@ -124,7 +139,9 @@ extension Pixel.Event {
 
     }
 
-    enum FireproofKind: String {
+    enum FireproofKind: String, CustomStringConvertible {
+        var description: String { rawValue }
+
         case bookmarked
         case favorite
         case website
@@ -144,16 +161,16 @@ extension Pixel.Event {
 
     }
 
-    enum FireproofingSuggested: String, ExpressibleByBooleanLiteral {
+    enum FireproofingSuggested: String, CustomStringConvertible {
+        var description: String { rawValue }
+
         case suggested
         case manual
-
-        init(booleanLiteral value: Bool) {
-            self = value ? .suggested : .manual
-        }
     }
 
-    enum IsBookmarkFireproofed: String {
+    enum IsBookmarkFireproofed: String, CustomStringConvertible {
+        var description: String { rawValue }
+
         case fireproofed = "fireproofed"
         case nonFireproofed = "non-fireproofed"
 
@@ -168,7 +185,9 @@ extension Pixel.Event {
 
     }
 
-    enum AccessPoint: String {
+    enum AccessPoint: String, CustomStringConvertible {
+        var description: String { rawValue }
+
         case button = "source-button"
         case mainMenu = "source-menu"
         case tabMenu = "source-tab-menu"
@@ -176,10 +195,10 @@ extension Pixel.Event {
         case moreMenu = "source-more-menu"
         case newTab = "source-new-tab"
 
-        init(sender: Any, default: AccessPoint) {
+        init(sender: Any, default: AccessPoint, mainMenuCheck: (NSMenu?) -> Bool = { $0 is MainMenu }) {
             switch sender {
             case let menuItem as NSMenuItem:
-                if menuItem.topMenu is MainMenu {
+                if mainMenuCheck(menuItem.topMenu) {
                     if let event = NSApp.currentEvent,
                         case .keyDown = event.type,
                         event.characters == menuItem.keyEquivalent {
@@ -196,13 +215,16 @@ extension Pixel.Event {
                 self = .button
 
             default:
+                assertionFailure("AccessPoint: Unexpected type of sender: \(type(of: sender))")
                 self = `default`
             }
         }
 
     }
 
-    enum NavigationKind: String {
+    enum NavigationKind: String, CustomStringConvertible {
+        var description: String { rawValue }
+
         case search
         case url
         case bookmark
@@ -230,30 +252,40 @@ extension Pixel.Event {
 
     }
 
-    enum NavigationAccessPoint: String {
+    enum NavigationAccessPoint: String, CustomStringConvertible {
+        var description: String { rawValue }
+
         case mainMenu = "source-menu"
         case addressBar = "source-address-bar"
         case suggestion = "source-suggestion"
         case newTab = "source-new-tab"
     }
 
-    enum HasBookmark: String {
+    enum HasBookmark: String, CustomStringConvertible {
+        var description: String { rawValue }
+
         case hasBookmark = "has-bookmark"
         case noBookmarks = "no-bookmarks"
     }
 
-    enum HasFavorite: String {
+    enum HasFavorite: String, CustomStringConvertible {
+        var description: String { rawValue }
+
         case hasFavorite = "has-favorite"
         case noFavorites = "no-favorites"
     }
 
-    enum SharingResult: String {
+    enum SharingResult: String, CustomStringConvertible {
+        var description: String { rawValue }
+
         case success
         case failure
         case cancelled
     }
 
-    enum MoreResult: String {
+    enum MoreResult: String, CustomStringConvertible {
+        var description: String { rawValue }
+
         case cancelled = "cancelled"
         case moveTabToNewWindow = "new-window"
         case feedback = "feedback"
@@ -262,7 +294,9 @@ extension Pixel.Event {
         case fireproof = "fireproof"
     }
 
-    enum RefreshAccessPoint: String {
+    enum RefreshAccessPoint: String, CustomStringConvertible {
+        var description: String { rawValue }
+
         case hotKey = "source-cmd-r"
         case button = "source-button"
         case mainMenu = "source-menu"

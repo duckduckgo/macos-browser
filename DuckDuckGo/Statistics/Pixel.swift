@@ -28,6 +28,10 @@ final class Pixel {
         shared = Pixel()
     }
 
+    static func tearDown() {
+        shared = nil
+    }
+
     func fire(pixelNamed pixelName: String,
               withAdditionalParameters params: [String: String]? = nil,
               withHeaders headers: HTTPHeaders = APIHeaders().defaultHeaders,

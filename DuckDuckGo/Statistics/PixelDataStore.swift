@@ -21,6 +21,9 @@ import CoreData
 
 protocol PixelDataStore {
 
+    func value(forKey key: String) -> Double?
+    func set(_ value: Double, forKey: String)
+
     func value(forKey key: String) -> Int?
     func set(_ value: Int, forKey: String)
 
@@ -29,7 +32,7 @@ protocol PixelDataStore {
 final class LocalPixelDataStore: PixelDataStore {
     static let shared = LocalPixelDataStore()
 
-    private lazy var cache: [String: Int] = loadAll()
+    private lazy var cache: [String: NSNumber] = loadAll()
 
     private init() {}
 
@@ -39,9 +42,9 @@ final class LocalPixelDataStore: PixelDataStore {
 
     private lazy var context = Database.shared.makeContext(concurrencyType: .privateQueueConcurrencyType, name: "PixelData")
 
-    private func loadAll() -> [String: Int] {
+    private func loadAll() -> [String: NSNumber] {
         let fetchRequest = PixelData.fetchRequest() as NSFetchRequest<PixelData>
-        var dict = [String: Int]()
+        var dict = [String: NSNumber]()
         do {
             let result = try context.fetch(fetchRequest)
             for item in result {
@@ -53,7 +56,7 @@ final class LocalPixelDataStore: PixelDataStore {
                     assertionFailure("LocalPixelDataStore: Could not decrypt value")
                     continue
                 }
-                dict[key] = value.intValue
+                dict[key] = value
             }
         } catch {
             assertionFailure("LocalPixelDataStore: loadAll failed \(error)")
@@ -62,10 +65,14 @@ final class LocalPixelDataStore: PixelDataStore {
     }
 
     func value(forKey key: String) -> Int? {
-        return cache[key]
+        return cache[key]?.intValue
     }
 
-    func set(_ value: Int, forKey key: String) {
+    func value(forKey key: String) -> Double? {
+        return cache[key]?.doubleValue
+    }
+
+    private func set(_ value: NSNumber, forKey key: String) {
         cache[key] = value
 
         context.perform { [context] in
@@ -73,7 +80,7 @@ final class LocalPixelDataStore: PixelDataStore {
                 let fetchRequest = PixelData.fetchRequest() as NSFetchRequest<PixelData>
                 fetchRequest.predicate = NSPredicate(format: "key = %@", key)
                 if let pixelData = try context.fetch(fetchRequest).first {
-                    pixelData.valueEncrypted = NSNumber(value: value)
+                    pixelData.valueEncrypted = value
                 } else {
                     let mobj = NSEntityDescription.insertNewObject(forEntityName: PixelData.className(),
                                                                    into: self.context)
@@ -83,7 +90,7 @@ final class LocalPixelDataStore: PixelDataStore {
                     }
 
                     pixelData.key = key
-                    pixelData.valueEncrypted = NSNumber(value: value)
+                    pixelData.valueEncrypted = value
                 }
 
                 try self.context.save()
@@ -91,6 +98,14 @@ final class LocalPixelDataStore: PixelDataStore {
                 assertionFailure("LocalPixelDataStore: Saving of context failed")
             }
         }
+    }
+
+    func set(_ value: Int, forKey key: String) {
+        self.set(NSNumber(value: value), forKey: key)
+    }
+
+    func set(_ value: Double, forKey key: String) {
+        self.set(NSNumber(value: value), forKey: key)
     }
 
 }

@@ -54,26 +54,26 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
     }
 
     func applicationDidFinishLaunching(_ notification: Notification) {
+        guard !isRunningTests else { return }
+        
         Database.shared.loadStore()
         HTTPSUpgrade.shared.loadDataAsync()
         LocalBookmarkManager.shared.loadBookmarks()
         _=ConfigurationManager.shared
 
-        if !isRunningTests {
-            if (notification.userInfo?[NSApplication.launchIsDefaultUserInfoKey] as? NSNumber)?.boolValue == true {
-                Pixel.fire(.appLaunch(launch: .autoInitialOrRegular()))
-            }
-
-            stateRestorationManager.applicationDidFinishLaunching()
-
-            if WindowsManager.windows.isEmpty {
-                WindowsManager.openNewWindow()
-            }
-
-            launchTimingPixel.fire()
-
-            appUsageActivityMonitor = AppUsageActivityMonitor(delegate: self)
+        if (notification.userInfo?[NSApplication.launchIsDefaultUserInfoKey] as? NSNumber)?.boolValue == true {
+            Pixel.fire(.appLaunch(launch: .autoInitialOrRegular()))
         }
+
+        stateRestorationManager.applicationDidFinishLaunching()
+
+        if WindowsManager.windows.isEmpty {
+            WindowsManager.openNewWindow()
+        }
+
+        launchTimingPixel.fire()
+
+        appUsageActivityMonitor = AppUsageActivityMonitor(delegate: self)
     }
 
     func applicationShouldTerminate(_ sender: NSApplication) -> NSApplication.TerminateReply {
