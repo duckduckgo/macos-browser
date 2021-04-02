@@ -27,17 +27,17 @@ extension Pixel {
             static let prefix = "c_"
         }
 
-        let store: UserDefaults
+        let store: PixelDataStore
 
-        static let counter = Counter(store: .standard)
+        static let counter = Counter(store: LocalPixelDataStore.shared)
 
-        init(store: UserDefaults) {
+        init(store: LocalPixelDataStore) {
             self.store = store
         }
 
         func incrementedCount(for event: Pixel.Event.Debug) -> Int {
             let key = Constants.prefix + event.rawValue
-            var count = store.value(forKey: key) as? Int ?? 0
+            var count = store.value(forKey: key) ?? 0
 
             guard count < Constants.maxCount else { return count }
 

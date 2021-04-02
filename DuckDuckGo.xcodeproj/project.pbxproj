@@ -271,6 +271,8 @@
 		B6AAAC3E26048F690029438D /* RandomAccessCollectionExtension.swift in Sources */ = {isa = PBXBuildFile; fileRef = B6AAAC3D26048F690029438D /* RandomAccessCollectionExtension.swift */; };
 		B6AE74342609AFCE005B9B1A /* ProgressEstimationTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = B6AE74332609AFCE005B9B1A /* ProgressEstimationTests.swift */; };
 		B6D7A2EE25D2418B002B2AE1 /* ShadowView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B6D7A2ED25D2418B002B2AE1 /* ShadowView.swift */; };
+		B6DA44022616B28300DD1EC2 /* PixelDataStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = B6DA44012616B28300DD1EC2 /* PixelDataStore.swift */; };
+		B6DA44082616B30600DD1EC2 /* PixelDataModel.xcdatamodeld in Sources */ = {isa = PBXBuildFile; fileRef = B6DA44062616B30600DD1EC2 /* PixelDataModel.xcdatamodeld */; };
 		F41D174125CB131900472416 /* NSColorExtension.swift in Sources */ = {isa = PBXBuildFile; fileRef = F41D174025CB131900472416 /* NSColorExtension.swift */; };
 		F44C130225C2DA0400426E3E /* NSAppearanceExtension.swift in Sources */ = {isa = PBXBuildFile; fileRef = F44C130125C2DA0400426E3E /* NSAppearanceExtension.swift */; };
 /* End PBXBuildFile section */
@@ -562,6 +564,8 @@
 		B6AAAC3D26048F690029438D /* RandomAccessCollectionExtension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RandomAccessCollectionExtension.swift; sourceTree = "<group>"; };
 		B6AE74332609AFCE005B9B1A /* ProgressEstimationTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProgressEstimationTests.swift; sourceTree = "<group>"; };
 		B6D7A2ED25D2418B002B2AE1 /* ShadowView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ShadowView.swift; sourceTree = "<group>"; };
+		B6DA44012616B28300DD1EC2 /* PixelDataStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PixelDataStore.swift; sourceTree = "<group>"; };
+		B6DA44072616B30600DD1EC2 /* PixelDataModel.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = PixelDataModel.xcdatamodel; sourceTree = "<group>"; };
 		F41D174025CB131900472416 /* NSColorExtension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NSColorExtension.swift; sourceTree = "<group>"; };
 		F44C130125C2DA0400426E3E /* NSAppearanceExtension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NSAppearanceExtension.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
@@ -1643,6 +1647,8 @@
 				B6A9E48326146AAB0067D1B9 /* PixelParameters.swift */,
 				B6A9E48826146ABF0067D1B9 /* PixelCounter.swift */,
 				B6A9E4A2261475C70067D1B9 /* AppUsageActivityMonitor.swift */,
+				B6DA44012616B28300DD1EC2 /* PixelDataStore.swift */,
+				B6DA44062616B30600DD1EC2 /* PixelDataModel.xcdatamodeld */,
 			);
 			path = Statistics;
 			sourceTree = "<group>";
@@ -1922,6 +1928,7 @@
 				85D438B6256E7C9E00F3BAF8 /* ContextMenuUserScript.swift in Sources */,
 				85D438BE256E8E6400F3BAF8 /* ContextMenuElement.swift in Sources */,
 				4BA1A6BD258B082300F6F690 /* EncryptionKeyStore.swift in Sources */,
+				B6DA44082616B30600DD1EC2 /* PixelDataModel.xcdatamodeld in Sources */,
 				AAC5E4F125D6BF10007F5990 /* AddressBarButton.swift in Sources */,
 				B6D7A2EE25D2418B002B2AE1 /* ShadowView.swift in Sources */,
 				AA88D14B252A557100980B4E /* URLRequestExtension.swift in Sources */,
@@ -1969,6 +1976,7 @@
 				B6A9E45C261460350067D1B9 /* APIRequest.swift in Sources */,
 				AA9FF95D24A1FA1C0039E328 /* TabCollection.swift in Sources */,
 				85A0118225AF60E700FA6A0C /* FindInPageModel.swift in Sources */,
+				B6DA44022616B28300DD1EC2 /* PixelDataStore.swift in Sources */,
 				B6A9E45326142B070067D1B9 /* Pixel.swift in Sources */,
 				B6A9E47726146A570067D1B9 /* PixelEvent.swift in Sources */,
 				85799C3425DFCD1B0007EC87 /* TrackerRadarManager.swift in Sources */,
@@ -2702,6 +2710,16 @@
 			);
 			currentVersion = AAC5E4D825D6A710007F5990 /* Bookmark.xcdatamodel */;
 			path = Bookmark.xcdatamodeld;
+			sourceTree = "<group>";
+			versionGroupType = wrapper.xcdatamodel;
+		};
+		B6DA44062616B30600DD1EC2 /* PixelDataModel.xcdatamodeld */ = {
+			isa = XCVersionGroup;
+			children = (
+				B6DA44072616B30600DD1EC2 /* PixelDataModel.xcdatamodel */,
+			);
+			currentVersion = B6DA44072616B30600DD1EC2 /* PixelDataModel.xcdatamodel */;
+			path = PixelDataModel.xcdatamodeld;
 			sourceTree = "<group>";
 			versionGroupType = wrapper.xcdatamodel;
 		};

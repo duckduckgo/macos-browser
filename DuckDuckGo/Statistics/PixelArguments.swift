@@ -28,7 +28,7 @@ extension Pixel.Event {
 
         private static let AppInitiallyLaunchedKey = "init"
 
-        static func autoInitialOrRegular(store: UserDefaults = .standard, now: Date = Date()) -> AppLaunch {
+        static func autoInitialOrRegular(store: PixelDataStore = LocalPixelDataStore.shared, now: Date = Date()) -> AppLaunch {
             let launchRepetition = Repetition(key: Self.AppInitiallyLaunchedKey, store: store, now: now)
             switch launchRepetition {
             case .initial:
@@ -59,13 +59,12 @@ extension Pixel.Event {
         case dailyFirst = "first-in-a-day"
         case repetitive = "repetitive"
 
-        init(key: String, store: UserDefaults = .standard, now: Date = Date()) {
-            let key = "t_" + key
+        init(key: String, store: PixelDataStore = LocalPixelDataStore.shared, now: Date = Date()) {
             defer {
                 store.set(now.daySinceReferenceDate, forKey: key)
             }
 
-            guard let lastUsedDay = store.value(forKey: key) as? Int else {
+            guard let lastUsedDay = store.value(forKey: key) else {
                 self = .initial
                 return
             }

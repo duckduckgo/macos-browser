@@ -39,16 +39,16 @@ final class AppUsageActivityMonitor: NSObject {
         static let activityDateKey = "activityDate"
     }
 
-    private let storage: UserDefaults
+    private let storage: PixelDataStore
 
     private var usageTime: TimeInterval {
         didSet {
-            storage.setValue(self.usageTime, forKey: Constants.usageTimeKey)
+            storage.set(Int(self.usageTime), forKey: Constants.usageTimeKey)
         }
     }
     private var lastActivityDate: TimeInterval {
         didSet {
-            storage.setValue(self.lastActivityDate, forKey: Constants.activityDateKey)
+            storage.set(Int(self.lastActivityDate), forKey: Constants.activityDateKey)
         }
     }
     private var avgTabCount: Double = 0
@@ -64,7 +64,7 @@ final class AppUsageActivityMonitor: NSObject {
 
     init(delegate: AppUsageActivityMonitorDelegate,
          dateProvider: @escaping () -> TimeInterval = { Date().timeIntervalSinceReferenceDate },
-         storage: UserDefaults = .standard,
+         storage: PixelDataStore = LocalPixelDataStore.shared,
          throttle: TimeInterval = Constants.throttle,
          maxIdleTime: TimeInterval = Constants.maxIdleTime,
          threshold: TimeInterval = Constants.threshold) {
@@ -74,8 +74,8 @@ final class AppUsageActivityMonitor: NSObject {
         self.maxIdleTime = maxIdleTime
         self.threshold = threshold
 
-        self.usageTime = storage.value(forKey: Constants.usageTimeKey) as? TimeInterval ?? 0
-        self.lastActivityDate = storage.value(forKey: Constants.activityDateKey) as? TimeInterval ?? 0
+        self.usageTime = storage.value(forKey: Constants.usageTimeKey).map(TimeInterval.init) ?? 0
+        self.lastActivityDate = storage.value(forKey: Constants.activityDateKey).map(TimeInterval.init) ?? 0
 
         self.currentTime = dateProvider
         self.delegate = delegate

@@ -47,6 +47,7 @@ final class Database {
             try EncryptedValueTransformer<NSImage>.registerTransformer()
             try EncryptedValueTransformer<NSString>.registerTransformer()
             try EncryptedValueTransformer<NSURL>.registerTransformer()
+            try EncryptedValueTransformer<NSNumber>.registerTransformer()
         } catch {
             fatalError("Failed to register encryption value transformers")
         }
