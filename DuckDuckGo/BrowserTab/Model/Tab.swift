@@ -345,11 +345,14 @@ extension Tab: HTML5DownloadDelegate {
 extension Tab: FaviconUserScriptDelegate {
 
     func faviconUserScript(_ faviconUserScript: FaviconUserScript, didFindFavicon faviconUrl: URL) {
-        guard let host = url?.host else {
+        guard let host = self.url?.host else {
             return
         }
 
         faviconService.fetchFavicon(faviconUrl, for: host, isFromUserScript: true) { (image, error) in
+            guard host == self.url?.host else {
+                return
+            }
             guard error == nil, let image = image else {
                 return
             }
