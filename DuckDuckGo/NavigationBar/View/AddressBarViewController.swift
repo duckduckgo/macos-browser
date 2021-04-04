@@ -32,7 +32,7 @@ final class AddressBarViewController: NSViewController {
     private(set) var addressBarButtonsViewController: AddressBarButtonsViewController?
     
     private var tabCollectionViewModel: TabCollectionViewModel
-    private let suggestionListViewModel = SuggestionListViewModel(suggestionList: SuggestionList())
+    private let suggestionContainerViewModel = SuggestionContainerViewModel(suggestionContainer: SuggestionContainer())
 
     enum Mode: Equatable {
         case searching(withUrl: Bool)
@@ -73,7 +73,7 @@ final class AddressBarViewController: NSViewController {
 
         updateView(firstResponder: false)
         addressBarTextField.tabCollectionViewModel = tabCollectionViewModel
-        addressBarTextField.suggestionListViewModel = suggestionListViewModel
+        addressBarTextField.suggestionContainerViewModel = suggestionContainerViewModel
         subscribeToSelectedTabViewModel()
         subscribeToAddressBarTextFieldValue()
         registerForMouseEnteredAndExitedEvents()

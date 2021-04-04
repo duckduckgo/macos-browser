@@ -1,5 +1,5 @@
 //
-//  SuggestionList.swift
+//  SuggestionContainer.swift
 //
 //  Copyright © 2020 DuckDuckGo. All rights reserved.
 //
@@ -18,31 +18,32 @@
 
 import Foundation
 import os.log
+import BrowserServicesKit
 
-final class SuggestionList {
+final class SuggestionContainer {
 
     static let maximumNumberOfSuggestions = 9
 
     @Published private(set) var suggestions: [Suggestion]?
 
     private let bookmarkManager: BookmarkManager
-    private let coordinator = SuggestionCoordinator()
+    private let loader: SuggestionLoader
 
     private var latestQuery: Query?
 
-    init(bookmarkManager: BookmarkManager) {
+    init(suggestionLoader: SuggestionLoader, bookmarkManager: BookmarkManager) {
         self.bookmarkManager = bookmarkManager
-
-        coordinator.dataSource = self
+        self.loader = suggestionLoader
+        self.loader.dataSource = self
     }
 
     convenience init () {
-        self.init(bookmarkManager: LocalBookmarkManager.shared)
+        self.init(suggestionLoader: KitSuggestionLoader(), bookmarkManager: LocalBookmarkManager.shared)
     }
 
     func getSuggestions(for query: String) {
         latestQuery = query
-        coordinator.getSuggestions(query: query, maximum: Self.maximumNumberOfSuggestions) { [weak self] (suggestions, error) in
+        loader.getSuggestions(query: query, maximum: Self.maximumNumberOfSuggestions) { [weak self] (suggestions, error) in
             guard self?.latestQuery == query else { return }
             guard let suggestions = suggestions, error == nil else {
                 self?.suggestions = nil
@@ -61,20 +62,31 @@ final class SuggestionList {
 
 }
 
-extension SuggestionList: SuggestionCoordinatorDataSource {
+extension SuggestionContainer: SuggestionLoaderDataSource {
 
-    func bookmarks(for suggestionCoordinator: SuggestionCoordinator) -> [BookmarkProtocol] {
+    func bookmarks(for suggestionLoader: SuggestionLoader) -> [BrowserServicesKit.Bookmark] {
         bookmarkManager.list?.bookmarks() ?? []
     }
 
-    func suggestionCoordinator(_ suggestionCoordinator: SuggestionCoordinator,
-                               suggestionDataFromUrlRequest urlRequest: URLRequest,
-                               completion: @escaping (Data?, Error?) -> Void) {
-        URLSession.shared.dataTask(with: urlRequest) { (data, _, error) in
+    func suggestionLoader(_ suggestionLoader: SuggestionLoader,
+                          suggestionDataFromUrl url: URL,
+                          withParameters parameters: [String: String],
+                          completion: @escaping (Data?, Error?) -> Void) {
+        var url = url
+        parameters.forEach {
+            if let newUrl = try? url.addParameter(name: $0.key, value: $0.value) {
+                url = newUrl
+            } else {
+                assertionFailure("SuggestionContainer: Failed to add parameter")
+            }
+        }
+        let request = URLRequest.defaultRequest(with: url)
+
+        URLSession.shared.dataTask(with: request) { (data, _, error) in
             completion(data, error)
         }.resume()
     }
 
 }
 
-extension Bookmark: BookmarkProtocol {}
+extension Bookmark: BrowserServicesKit.Bookmark {}

@@ -1,5 +1,5 @@
 //
-//  SuggestionsTests.swift
+//  SuggestionContainerTests.swift
 //
 //  Copyright © 2020 DuckDuckGo. All rights reserved.
 //
@@ -19,11 +19,11 @@
 import XCTest
 @testable import DuckDuckGo_Privacy_Browser
 
-final class SuggestionsTests: XCTestCase {
+final class SuggestionContainerTests: XCTestCase {
 
     func testWhenQueryIsEmptyThenSuggestionsAreNil() {
         let suggestionsAPIMock = SuggestionsAPIMock()
-        let suggestions = SuggestionList(suggestionsAPI: suggestionsAPIMock)
+        let suggestions = SuggestionContainer(suggestionsAPI: suggestionsAPIMock)
 
         let query = ""
         suggestions.getSuggestions(for: query)
@@ -33,7 +33,7 @@ final class SuggestionsTests: XCTestCase {
 
     func testWhenQueryIsNotEmptyThenAPIResultAreLoaded() {
         let suggestionsAPIMock = SuggestionsAPIMock()
-        let suggestions = SuggestionList(suggestionsAPI: suggestionsAPIMock)
+        let suggestions = SuggestionContainer(suggestionsAPI: suggestionsAPIMock)
 
         let suggestionsAPIResult = RemoteSuggestionsAPIResult.aSuggestionsAPIResult
         suggestionsAPIMock.suggestionsAPIResult = suggestionsAPIResult

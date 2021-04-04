@@ -1,5 +1,5 @@
 //
-//  SuggestionListViewModelTests.swift
+//  SuggestionContainerViewModelTests.swift
 //
 //  Copyright © 2020 DuckDuckGo. All rights reserved.
 //
@@ -20,27 +20,27 @@ import XCTest
 import Combine
 @testable import DuckDuckGo_Privacy_Browser
 
-final class SuggestionListViewModelTests: XCTestCase {
+final class SuggestionContainerViewModelTests: XCTestCase {
 
     var cancellables = Set<AnyCancellable>()
     
     func testWhenNoSuggestionsThenNumberOfSuggestionsIs0() {
-        let suggestionList = SuggestionList()
-        let suggestionListViewModel = SuggestionListViewModel(suggestionList: suggestionList)
+        let suggestionList = SuggestionContainer()
+        let suggestionListViewModel = SuggestionContainerViewModel(suggestionList: suggestionList)
         
         XCTAssertEqual(suggestionListViewModel.numberOfSuggestions, 0)
     }
     
     func testWhenSelectionIndexIsNilThenSelectedSuggestionViewModelIsNil() {
-        let suggestionList = SuggestionList()
-        let suggestionListViewModel = SuggestionListViewModel(suggestionList: suggestionList)
+        let suggestionList = SuggestionContainer()
+        let suggestionListViewModel = SuggestionContainerViewModel(suggestionList: suggestionList)
         
         XCTAssertNil(suggestionListViewModel.selectionIndex)
         XCTAssertNil(suggestionListViewModel.selectedSuggestionViewModel)
     }
     
     func testWhenSuggestionIsSelectedThenSelectedSuggestionViewModelMatchSuggestions() {
-        let suggestionListViewModel = SuggestionListViewModel.aSuggestionListViewModel
+        let suggestionListViewModel = SuggestionContainerViewModel.aSuggestionListViewModel
 
         let index = 0
         suggestionListViewModel.select(at: index)
@@ -55,8 +55,8 @@ final class SuggestionListViewModelTests: XCTestCase {
     }
     
     func testWhenSelectCalledWithIndexOutOfBoundsThenSelectedSuggestionViewModelIsNil() {
-        let suggestionList = SuggestionList()
-        let suggestionListViewModel = SuggestionListViewModel(suggestionList: suggestionList)
+        let suggestionList = SuggestionContainer()
+        let suggestionListViewModel = SuggestionContainerViewModel(suggestionList: suggestionList)
         
         suggestionListViewModel.select(at: 0)
 
@@ -71,7 +71,7 @@ final class SuggestionListViewModelTests: XCTestCase {
     }
     
     func testWhenClearSelectionIsCalledThenNoSuggestonIsSeleted() {
-        let suggestionListViewModel = SuggestionListViewModel.aSuggestionListViewModel
+        let suggestionListViewModel = SuggestionContainerViewModel.aSuggestionListViewModel
 
         suggestionListViewModel.select(at: 0)
 
@@ -88,7 +88,7 @@ final class SuggestionListViewModelTests: XCTestCase {
     }
     
     func testSelectNextIfPossible() {
-        let suggestionListViewModel = SuggestionListViewModel.aSuggestionListViewModel
+        let suggestionListViewModel = SuggestionContainerViewModel.aSuggestionListViewModel
         
         suggestionListViewModel.selectNextIfPossible()
         XCTAssertEqual(suggestionListViewModel.selectionIndex, 0)
@@ -105,7 +105,7 @@ final class SuggestionListViewModelTests: XCTestCase {
     }
     
     func testSelectPreviousIfPossible() {
-        let suggestionListViewModel = SuggestionListViewModel.aSuggestionListViewModel
+        let suggestionListViewModel = SuggestionContainerViewModel.aSuggestionListViewModel
         
         suggestionListViewModel.selectPreviousIfPossible()
         XCTAssertEqual(suggestionListViewModel.selectionIndex, suggestionListViewModel.numberOfSuggestions - 1)
@@ -123,12 +123,12 @@ final class SuggestionListViewModelTests: XCTestCase {
 
 }
 
-extension SuggestionListViewModel {
+extension SuggestionContainerViewModel {
     
-    static var aSuggestionListViewModel: SuggestionListViewModel {
+    static var aSuggestionListViewModel: SuggestionContainerViewModel {
         let suggestionsAPIMock = SuggestionsAPIMock()
-        let suggestionList = SuggestionList(suggestionsAPI: suggestionsAPIMock)
-        let suggestionListViewModel = SuggestionListViewModel(suggestionList: suggestionList)
+        let suggestionList = SuggestionContainer(suggestionsAPI: suggestionsAPIMock)
+        let suggestionListViewModel = SuggestionContainerViewModel(suggestionList: suggestionList)
 
         let suggestionsAPIResult = RemoteSuggestionsAPIResult.aSuggestionsAPIResult
         suggestionsAPIMock.suggestionsAPIResult = suggestionsAPIResult

@@ -35,19 +35,19 @@ final class SuggestionViewController: NSViewController {
     @IBOutlet weak var tableViewHeightConstraint: NSLayoutConstraint!
     @IBOutlet weak var pixelPerfectConstraint: NSLayoutConstraint!
 
-    let suggestionListViewModel: SuggestionListViewModel
+    let suggestionContainerViewModel: SuggestionContainerViewModel
 
     required init?(coder: NSCoder) {
         fatalError("SuggestionViewController: Bad initializer")
     }
 
-    required init?(coder: NSCoder, suggestionListViewModel: SuggestionListViewModel) {
-        self.suggestionListViewModel = suggestionListViewModel
+    required init?(coder: NSCoder, suggestionContainerViewModel: SuggestionContainerViewModel) {
+        self.suggestionContainerViewModel = suggestionContainerViewModel
 
         super.init(coder: coder)
     }
 
-    var suggestionListCancellable: AnyCancellable?
+    var suggestionContainerCancellable: AnyCancellable?
     var selectionIndexCancellable: AnyCancellable?
 
     private var mouseUpEventsMonitor: Any?
@@ -62,7 +62,7 @@ final class SuggestionViewController: NSViewController {
 
         setupTableView()
         addTrackingArea()
-        subscribeToSuggestionList()
+        subscribeToSuggestions()
         subscribeToSelectionIndex()
     }
 
@@ -128,32 +128,34 @@ final class SuggestionViewController: NSViewController {
         }
     }
 
-    private func subscribeToSuggestionList() {
-        suggestionListCancellable = suggestionListViewModel.suggestionList.$suggestions.receive(on: DispatchQueue.main).sink { [weak self] _ in
+    private func subscribeToSuggestions() {
+        suggestionContainerCancellable = suggestionContainerViewModel.suggestionContainer.$suggestions
+            .receive(on: DispatchQueue.main)
+            .sink { [weak self] _ in
             self?.displayNewSuggestions()
         }
     }
 
     private func subscribeToSelectionIndex() {
-        selectionIndexCancellable = suggestionListViewModel.$selectionIndex.receive(on: DispatchQueue.main).sink { [weak self] _ in
+        selectionIndexCancellable = suggestionContainerViewModel.$selectionIndex.receive(on: DispatchQueue.main).sink { [weak self] _ in
             if let weakSelf = self {
-                weakSelf.selectRow(at: weakSelf.suggestionListViewModel.selectionIndex)
+                weakSelf.selectRow(at: weakSelf.suggestionContainerViewModel.selectionIndex)
             }
         }
     }
 
     private func displayNewSuggestions() {
-        guard suggestionListViewModel.numberOfSuggestions > 0 else {
+        guard suggestionContainerViewModel.numberOfSuggestions > 0 else {
             closeWindow()
             tableView.reloadData()
             return
         }
 
         // Remove the second reload that causes visual glitch in the beginning of typing
-        if suggestionListViewModel.suggestionList.suggestions != nil {
+        if suggestionContainerViewModel.suggestionContainer.suggestions != nil {
             updateHeight()
             tableView.reloadData()
-            self.selectRow(at: self.suggestionListViewModel.selectionIndex)
+            self.selectRow(at: self.suggestionContainerViewModel.selectionIndex)
         }
     }
 
@@ -162,8 +164,8 @@ final class SuggestionViewController: NSViewController {
 
         guard let index = index,
               index >= 0,
-              suggestionListViewModel.numberOfSuggestions != 0,
-              index < suggestionListViewModel.numberOfSuggestions else {
+              suggestionContainerViewModel.numberOfSuggestions != 0,
+              index < suggestionContainerViewModel.numberOfSuggestions else {
             self.clearSelection()
             return
         }
@@ -212,14 +214,14 @@ final class SuggestionViewController: NSViewController {
     }
 
     private func updateHeight() {
-        guard suggestionListViewModel.numberOfSuggestions > 0 else {
+        guard suggestionContainerViewModel.numberOfSuggestions > 0 else {
             tableViewHeightConstraint.constant = 0
             return
         }
 
         let rowHeight = tableView.rowHeight
 
-        tableViewHeightConstraint.constant = CGFloat(suggestionListViewModel.numberOfSuggestions) * rowHeight
+        tableViewHeightConstraint.constant = CGFloat(suggestionContainerViewModel.numberOfSuggestions) * rowHeight
             + (tableView.enclosingScrollView?.contentInsets.top ?? 0)
             + (tableView.enclosingScrollView?.contentInsets.bottom ?? 0)
     }
@@ -238,7 +240,7 @@ final class SuggestionViewController: NSViewController {
 extension SuggestionViewController: NSTableViewDataSource {
 
     func numberOfRows(in tableView: NSTableView) -> Int {
-        return suggestionListViewModel.numberOfSuggestions
+        return suggestionContainerViewModel.numberOfSuggestions
     }
 
 }
@@ -253,7 +255,7 @@ extension SuggestionViewController: NSTableViewDelegate {
             return nil
         }
 
-        guard let suggestionViewModel = suggestionListViewModel.suggestionViewModel(at: row) else {
+        guard let suggestionViewModel = suggestionContainerViewModel.suggestionViewModel(at: row) else {
             assertionFailure("SuggestionViewController: Failed to get suggestion")
             return nil
         }
@@ -274,12 +276,12 @@ extension SuggestionViewController: NSTableViewDelegate {
 
     func tableViewSelectionDidChange(_ notification: Notification) {
         if tableView.selectedRow == -1 {
-            suggestionListViewModel.clearSelection()
+            suggestionContainerViewModel.clearSelection()
             return
         }
 
-        if suggestionListViewModel.selectionIndex != tableView.selectedRow {
-            suggestionListViewModel.select(at: tableView.selectedRow)
+        if suggestionContainerViewModel.selectionIndex != tableView.selectedRow {
+            suggestionContainerViewModel.select(at: tableView.selectedRow)
         }
     }
 

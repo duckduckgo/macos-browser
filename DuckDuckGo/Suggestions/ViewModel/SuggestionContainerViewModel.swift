@@ -20,16 +20,16 @@ import Foundation
 import Combine
 import os.log
 
-final class SuggestionListViewModel {
+final class SuggestionContainerViewModel {
 
-    let suggestionList: SuggestionList
+    let suggestionContainer: SuggestionContainer
 
-    init(suggestionList: SuggestionList) {
-        self.suggestionList = suggestionList
+    init(suggestionContainer: SuggestionContainer) {
+        self.suggestionContainer = suggestionContainer
     }
 
     var numberOfSuggestions: Int {
-        suggestionList.suggestions?.count ?? 0
+        suggestionContainer.suggestions?.count ?? 0
     }
 
     @Published private(set) var selectionIndex: Int? {
@@ -41,7 +41,7 @@ final class SuggestionListViewModel {
     var userStringValue: String? {
         didSet {
             if let userStringValue = userStringValue {
-                suggestionList.getSuggestions(for: userStringValue)
+                suggestionContainer.getSuggestions(for: userStringValue)
             }
         }
     }
@@ -55,10 +55,10 @@ final class SuggestionListViewModel {
     }
     
     func suggestionViewModel(at index: Int) -> SuggestionViewModel? {
-        let items = suggestionList.suggestions ?? []
+        let items = suggestionContainer.suggestions ?? []
 
         guard index < items.count else {
-            os_log("SuggestionListViewModel: Absolute index is out of bounds", type: .error)
+            os_log("SuggestionContainerViewModel: Absolute index is out of bounds", type: .error)
             return nil
         }
 
@@ -67,7 +67,7 @@ final class SuggestionListViewModel {
 
     func select(at index: Int) {
         guard index >= 0, index < numberOfSuggestions else {
-            os_log("SuggestionListViewModel: Index out of bounds", type: .error)
+            os_log("SuggestionContainerViewModel: Index out of bounds", type: .error)
             selectionIndex = nil
             return
         }

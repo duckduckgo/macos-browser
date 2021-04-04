@@ -17,6 +17,7 @@
 //
 
 import Cocoa
+import BrowserServicesKit
 
 final class SuggestionViewModel {
 
