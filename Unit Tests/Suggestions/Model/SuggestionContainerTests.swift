@@ -17,51 +17,41 @@
 //
 
 import XCTest
+import BrowserServicesKit
 @testable import DuckDuckGo_Privacy_Browser
 
 final class SuggestionContainerTests: XCTestCase {
 
-    func testWhenQueryIsEmptyThenSuggestionsAreNil() {
-        let suggestionsAPIMock = SuggestionsAPIMock()
-        let suggestions = SuggestionContainer(suggestionsAPI: suggestionsAPIMock)
+    func testWhenGetSuggestionsIsCalled_ThenContainerAsksAndHoldsSuggestionsFromLoader() {
+        let suggestionLoaderMock = SuggestionLoaderMock()
+        let suggestionContainer = SuggestionContainer(suggestionLoader: suggestionLoaderMock,
+                                              bookmarkManager: LocalBookmarkManager.shared)
 
-        let query = ""
-        suggestions.getSuggestions(for: query)
+        suggestionContainer.getSuggestions(for: "test")
 
-        XCTAssertNil(suggestions.suggestions)
+        let suggestions = [
+            Suggestion.website(url: URL.duckDuckGo),
+            Suggestion.website(url: URL.duckDuckGoAutocomplete)
+        ]
+        suggestionLoaderMock.completion?(suggestions, nil)
+
+        XCTAssert(suggestionLoaderMock.getSuggestionsCalled)
+        XCTAssertEqual(suggestionContainer.suggestions, suggestions)
     }
 
-    func testWhenQueryIsNotEmptyThenAPIResultAreLoaded() {
-        let suggestionsAPIMock = SuggestionsAPIMock()
-        let suggestions = SuggestionContainer(suggestionsAPI: suggestionsAPIMock)
+    func testWhenStopGettingSuggestionsIsCalled_ThenNoSuggestionsArePublished() {
+        let suggestionLoaderMock = SuggestionLoaderMock()
+        let suggestionContainer = SuggestionContainer(suggestionLoader: suggestionLoaderMock,
+                                              bookmarkManager: LocalBookmarkManager.shared)
 
-        let suggestionsAPIResult = RemoteSuggestionsAPIResult.aSuggestionsAPIResult
-        suggestionsAPIMock.suggestionsAPIResult = suggestionsAPIResult
+        suggestionContainer.getSuggestions(for: "test")
+        suggestionContainer.stopGettingSuggestions()
 
-        let query = "test"
-        suggestions.getSuggestions(for: query)
+        let suggestions = [ Suggestion.website(url: URL.duckDuckGo) ]
+        suggestionLoaderMock.completion?(suggestions, nil)
 
-        XCTAssertTrue(suggestions.items?.count == suggestionsAPIResult.items.count)
-    }
-
-}
-
-extension RemoteSuggestionsAPIResult {
-
-    static var aSuggestionsAPIResult: RemoteSuggestionsAPIResult {
-        let phrase1 = "phrase"
-        let value1 = "value1"
-        let phrase2 = "phrase"
-        let value2 = "value2"
-
-        let json = """
-        [ { "\(phrase1)": "\(value1)" }, { "\(phrase2)": "\(value2)" } ]
-        """
-        let data = json.data(using: .utf8)!
-
-        // swiftlint:disable force_try
-        return try! JSONDecoder().decode(RemoteSuggestionsAPIResult.self, from: data)
-        // swiftlint:enable force_try
+        XCTAssert(suggestionLoaderMock.getSuggestionsCalled)
+        XCTAssertNil(suggestionContainer.suggestions)
     }
 
 }

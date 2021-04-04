@@ -18,46 +18,40 @@
 
 import XCTest
 import Combine
+import BrowserServicesKit
 @testable import DuckDuckGo_Privacy_Browser
 
 final class SuggestionContainerViewModelTests: XCTestCase {
 
     var cancellables = Set<AnyCancellable>()
-    
-    func testWhenNoSuggestionsThenNumberOfSuggestionsIs0() {
-        let suggestionList = SuggestionContainer()
-        let suggestionListViewModel = SuggestionContainerViewModel(suggestionList: suggestionList)
-        
-        XCTAssertEqual(suggestionListViewModel.numberOfSuggestions, 0)
-    }
-    
+
     func testWhenSelectionIndexIsNilThenSelectedSuggestionViewModelIsNil() {
-        let suggestionList = SuggestionContainer()
-        let suggestionListViewModel = SuggestionContainerViewModel(suggestionList: suggestionList)
-        
-        XCTAssertNil(suggestionListViewModel.selectionIndex)
-        XCTAssertNil(suggestionListViewModel.selectedSuggestionViewModel)
+        let suggestionContainer = SuggestionContainer()
+        let suggestionContainerViewModel = SuggestionContainerViewModel(suggestionContainer: suggestionContainer)
+
+        XCTAssertNil(suggestionContainerViewModel.selectionIndex)
+        XCTAssertNil(suggestionContainerViewModel.selectedSuggestionViewModel)
     }
-    
+
     func testWhenSuggestionIsSelectedThenSelectedSuggestionViewModelMatchSuggestions() {
-        let suggestionListViewModel = SuggestionContainerViewModel.aSuggestionListViewModel
+        let suggestionContainerViewModel = SuggestionContainerViewModel.aSuggestionContainerViewModel
 
         let index = 0
-        suggestionListViewModel.select(at: index)
+        suggestionContainerViewModel.select(at: index)
 
         let selectedSuggestionViewModelExpectation = expectation(description: "Selected suggestion view model expectation")
 
-        suggestionListViewModel.$selectedSuggestionViewModel.debounce(for: 0.1, scheduler: RunLoop.main).sink { selectedSuggestionViewModel in
-            XCTAssertEqual(suggestionListViewModel.suggestionList.suggestions?[index], selectedSuggestionViewModel?.suggestion)
+        suggestionContainerViewModel.$selectedSuggestionViewModel.debounce(for: 0.1, scheduler: RunLoop.main).sink { selectedSuggestionViewModel in
+            XCTAssertEqual(suggestionContainerViewModel.suggestionContainer.suggestions?[index], selectedSuggestionViewModel?.suggestion)
             selectedSuggestionViewModelExpectation.fulfill()
         } .store(in: &cancellables)
         waitForExpectations(timeout: 1, handler: nil)
     }
-    
+
     func testWhenSelectCalledWithIndexOutOfBoundsThenSelectedSuggestionViewModelIsNil() {
-        let suggestionList = SuggestionContainer()
-        let suggestionListViewModel = SuggestionContainerViewModel(suggestionList: suggestionList)
-        
+        let suggestionContainer = SuggestionContainer()
+        let suggestionListViewModel = SuggestionContainerViewModel(suggestionContainer: suggestionContainer)
+
         suggestionListViewModel.select(at: 0)
 
         let selectedSuggestionViewModelExpectation = expectation(description: "Selected suggestion view model expectation")
@@ -69,9 +63,9 @@ final class SuggestionContainerViewModelTests: XCTestCase {
         } .store(in: &cancellables)
         waitForExpectations(timeout: 1, handler: nil)
     }
-    
+
     func testWhenClearSelectionIsCalledThenNoSuggestonIsSeleted() {
-        let suggestionListViewModel = SuggestionContainerViewModel.aSuggestionListViewModel
+        let suggestionListViewModel = SuggestionContainerViewModel.aSuggestionContainerViewModel
 
         suggestionListViewModel.select(at: 0)
 
@@ -86,26 +80,26 @@ final class SuggestionContainerViewModelTests: XCTestCase {
         } .store(in: &cancellables)
         waitForExpectations(timeout: 1, handler: nil)
     }
-    
+
     func testSelectNextIfPossible() {
-        let suggestionListViewModel = SuggestionContainerViewModel.aSuggestionListViewModel
-        
+        let suggestionListViewModel = SuggestionContainerViewModel.aSuggestionContainerViewModel
+
         suggestionListViewModel.selectNextIfPossible()
         XCTAssertEqual(suggestionListViewModel.selectionIndex, 0)
-        
+
         suggestionListViewModel.selectNextIfPossible()
         XCTAssertEqual(suggestionListViewModel.selectionIndex, 1)
-        
+
         let lastIndex = suggestionListViewModel.numberOfSuggestions - 1
         suggestionListViewModel.select(at: lastIndex)
         XCTAssertEqual(suggestionListViewModel.selectionIndex, lastIndex)
-        
+
         suggestionListViewModel.selectNextIfPossible()
         XCTAssertNil(suggestionListViewModel.selectionIndex)
     }
-    
+
     func testSelectPreviousIfPossible() {
-        let suggestionListViewModel = SuggestionContainerViewModel.aSuggestionListViewModel
+        let suggestionListViewModel = SuggestionContainerViewModel.aSuggestionContainerViewModel
         
         suggestionListViewModel.selectPreviousIfPossible()
         XCTAssertEqual(suggestionListViewModel.selectionIndex, suggestionListViewModel.numberOfSuggestions - 1)
@@ -124,19 +118,20 @@ final class SuggestionContainerViewModelTests: XCTestCase {
 }
 
 extension SuggestionContainerViewModel {
-    
-    static var aSuggestionListViewModel: SuggestionContainerViewModel {
-        let suggestionsAPIMock = SuggestionsAPIMock()
-        let suggestionList = SuggestionContainer(suggestionsAPI: suggestionsAPIMock)
-        let suggestionListViewModel = SuggestionContainerViewModel(suggestionList: suggestionList)
 
-        let suggestionsAPIResult = RemoteSuggestionsAPIResult.aSuggestionsAPIResult
-        suggestionsAPIMock.suggestionsAPIResult = suggestionsAPIResult
+    static var aSuggestionContainerViewModel: SuggestionContainerViewModel {
+        let suggestionLoaderMock = SuggestionLoaderMock()
+        let suggestionContainer = SuggestionContainer(suggestionLoader: suggestionLoaderMock,
+                                                      bookmarkManager: LocalBookmarkManager.shared)
+        let suggestionContainerViewModel = SuggestionContainerViewModel(suggestionContainer: suggestionContainer)
 
-        let query = "query"
-        suggestionList.getSuggestions(for: query)
-        
-        return suggestionListViewModel
+        suggestionContainer.getSuggestions(for: "Test")
+        suggestionLoaderMock.completion?( [
+            Suggestion.website(url: URL.duckDuckGo),
+            Suggestion.website(url: URL.duckDuckGoAutocomplete)
+        ], nil )
+
+        return suggestionContainerViewModel
     }
-    
+
 }
