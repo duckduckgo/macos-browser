@@ -301,6 +301,31 @@ extension Pixel.Event {
         case button = "source-button"
         case mainMenu = "source-menu"
         case reloadURL = "source-url"
+
+        init(sender: Any, default: RefreshAccessPoint, mainMenuCheck: (NSMenu?) -> Bool = { $0 is MainMenu }) {
+            switch sender {
+            case let menuItem as NSMenuItem:
+                if mainMenuCheck(menuItem.topMenu) {
+                    if let event = NSApp.currentEvent,
+                        case .keyDown = event.type,
+                        event.characters == menuItem.keyEquivalent {
+
+                        self = .hotKey
+                    } else {
+                        self = .mainMenu
+                    }
+                } else {
+                    self = `default`
+                }
+
+            case is NSButton:
+                self = .button
+
+            default:
+                assertionFailure("RefreshAccessPoint: Unexpected type of sender: \(type(of: sender))")
+                self = `default`
+            }
+        }
     }
 
 }

@@ -105,16 +105,17 @@ extension MainViewController {
 
     // MARK: - View
 
-    @IBAction func reloadPage(_ sender: Any?) {
+    @IBAction func reloadPage(_ sender: Any) {
         guard let selectedTabViewModel = tabCollectionViewModel.selectedTabViewModel else {
             os_log("MainViewController: No tab view model selected", type: .error)
             return
         }
 
+        Pixel.fire(.refresh(source: .init(sender: sender, default: .mainMenu)))
         selectedTabViewModel.tab.reload()
     }
 
-    @IBAction func stopLoading(_ sender: Any?) {
+    @IBAction func stopLoading(_ sender: Any) {
         guard let selectedTabViewModel = tabCollectionViewModel.selectedTabViewModel else {
             os_log("MainViewController: No tab view model selected", type: .error)
             return
