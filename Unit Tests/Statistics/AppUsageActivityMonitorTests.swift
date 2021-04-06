@@ -77,7 +77,7 @@ class AppUsageActivityMonitorTests: XCTestCase {
         sendKeyEvent()
 
         withExtendedLifetime(mon) {
-            waitForExpectations(timeout: 1)
+            waitForExpectations(timeout: 5)
         }
 
     }
