@@ -203,7 +203,7 @@ fileprivate extension NSMenuItem {
         
         title = bookmarkViewModel.menuTitle
         image = bookmarkViewModel.menuFavicon
-        representedObject = bookmarkViewModel.bookmark.url
+        representedObject = bookmarkViewModel.bookmark
         action = #selector(MainViewController.navigateToBookmark(_:))
     }
 

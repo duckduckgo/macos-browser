@@ -54,6 +54,15 @@ extension URL {
         return URL(string: "about:blank")!
     }
 
+    static let pixelBase = ProcessInfo.processInfo.environment["PIXEL_BASE_URL", default: "https://improving.duckduckgo.com"]
+
+    static func pixelUrl(forPixelNamed pixelName: String) -> URL {
+        let urlString = "\(Self.pixelBase)/t/\(pixelName)"
+        let url = URL(string: urlString)!
+        #warning("url = url.addParameter(name: \"atb\", value: statisticsStore.atbWithVariant ?? \"\")")
+        return url
+    }
+
     // MARK: - Parameters
 
     enum ParameterError: Error {
@@ -130,6 +139,8 @@ extension URL {
 
     static var duckDuckGoEmail = URL(string: "https://quack.duckduckgo.com/email/dashboard")!
 
+    static var duckDuckGoMorePrivacyInfo = URL(string: "https://help.duckduckgo.com/duckduckgo-help-pages/privacy/atb/")!
+
     var isDuckDuckGo: Bool {
         absoluteString.starts(with: Self.duckDuckGo.absoluteString)
     }
@@ -191,6 +202,7 @@ extension URL {
               let resolvedFolderUrl = try? URL(resolvingAliasFileAt: folderUrl),
               fm.isWritableFile(atPath: resolvedFolderUrl.path) else {
             os_log("Failed to access Downloads folder")
+            Pixel.fire(.debug(event: .fileMoveToDownloadsFailed, error: CocoaError(.fileWriteUnknown)))
             return nil
         }
 
@@ -201,8 +213,11 @@ extension URL {
             do {
                 try fm.moveItem(at: self, to: fileInDownloads)
                 return fileInDownloads.path
-            } catch {
+            } catch CocoaError.fileWriteFileExists {
                 // This is expected, as moveItem throws an error if the file already exists
+            } catch {
+                Pixel.fire(.debug(event: .fileMoveToDownloadsFailed, error: error))
+                break // swiftlint:disable:this unneeded_break_in_switch
             }
             copy += 1
         }

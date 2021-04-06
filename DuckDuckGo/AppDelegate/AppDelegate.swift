@@ -22,18 +22,25 @@ import os.log
 
 @NSApplicationMain
 final class AppDelegate: NSObject, NSApplicationDelegate {
+    let launchTimingPixel = TimedPixel(.launchTiming)
 
     private var isRunningTests: Bool {
         ProcessInfo.processInfo.environment["XCTestConfigurationFilePath"] != nil
     }
 
-    let urlEventListener = UrlEventListener()
+    let urlEventListener = UrlEventListener(handler: AppDelegate.handleURL)
 
     private let keyStore = EncryptionKeyStore()
     private var fileStore: FileStore!
     private var stateRestorationManager: AppStateRestorationManager!
 
+    var appUsageActivityMonitor: AppUsageActivityMonitor?
+
     func applicationWillFinishLaunching(_ notification: Notification) {
+        if !isRunningTests {
+            Pixel.setUp()
+        }
+
         do {
             let encryptionKey = isRunningTests ? nil : try keyStore.readKey()
             fileStore = FileStore(encryptionKey: encryptionKey)
@@ -46,19 +53,27 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         urlEventListener.listen()
     }
 
-    func applicationDidFinishLaunching(_ aNotification: Notification) {
+    func applicationDidFinishLaunching(_ notification: Notification) {
+        guard !isRunningTests else { return }
+        
         Database.shared.loadStore()
         HTTPSUpgrade.shared.loadDataAsync()
         LocalBookmarkManager.shared.loadBookmarks()
         _=ConfigurationManager.shared
 
-        if !isRunningTests {
-            stateRestorationManager.applicationDidFinishLaunching()
-
-            if WindowsManager.windows.isEmpty {
-                WindowsManager.openNewWindow()
-            }
+        if (notification.userInfo?[NSApplication.launchIsDefaultUserInfoKey] as? NSNumber)?.boolValue == true {
+            Pixel.fire(.appLaunch(launch: .autoInitialOrRegular()))
         }
+
+        stateRestorationManager.applicationDidFinishLaunching()
+
+        if WindowsManager.windows.isEmpty {
+            WindowsManager.openNewWindow()
+        }
+
+        launchTimingPixel.fire()
+
+        appUsageActivityMonitor = AppUsageActivityMonitor(delegate: self)
     }
 
     func applicationShouldTerminate(_ sender: NSApplication) -> NSApplication.TerminateReply {
@@ -80,6 +95,34 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         applicationDockMenu.dataSource = WindowControllersManager.shared
         applicationDockMenu.applicationDockMenuDelegate = WindowControllersManager.shared
         return applicationDockMenu
+    }
+
+    func application(_ sender: NSApplication, openFiles files: [String]) {
+        for path in files {
+            guard FileManager.default.fileExists(atPath: path) else { continue }
+            let url = URL(fileURLWithPath: path)
+
+            Self.handleURL(url)
+        }
+    }
+
+    static func handleURL(_ url: URL) {
+        Pixel.fire(.appLaunch(launch: url.isFileURL ? .openFile : .openURL))
+
+        WindowControllersManager.shared.show(url: url)
+    }
+
+}
+
+extension AppDelegate: AppUsageActivityMonitorDelegate {
+
+    func countOpenWindowsAndTabs() -> [Int] {
+        return WindowControllersManager.shared.mainWindowControllers
+            .map { $0.mainViewController.tabCollectionViewModel.tabCollection.tabs.count }
+    }
+
+    func activeUsageTimeHasReachedThreshold(avgTabCount: Double) {
+        Pixel.fire(.appActiveUsage(avgTabs: .init(avgTabs: avgTabCount)))
     }
 
 }

@@ -35,11 +35,13 @@ internal class FireproofDomains {
         }
     }
 
-    func toggle(domain: String) {
+    func toggle(domain: String) -> Bool {
         if isAllowed(fireproofDomain: domain) {
             remove(domain: domain)
+            return false
         } else {
             addToAllowed(domain: domain)
+            return true
         }
     }
 

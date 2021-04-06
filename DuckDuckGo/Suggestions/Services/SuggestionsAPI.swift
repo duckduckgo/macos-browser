@@ -50,6 +50,7 @@ final class DuckDuckGoSuggestionsAPI: SuggestionsAPI {
         let url = URL.duckDuckGoAutocomplete
         guard let searchUrl = try? url.addParameter(name: URL.DuckDuckGoParameters.search.rawValue, value: query) else {
             os_log("DuckDuckGoSuggestionsAPI: Failed to add parameter", type: .error)
+            Pixel.fire(.debug(event: .suggestionsFetchFailed, error: NSError(domain: "FailedToAddQueryParam", code: -1, userInfo: nil)))
             mainQueueCompletion(nil, FetchSuggestionsError.urlInitFailed)
             return
         }
@@ -66,18 +67,21 @@ final class DuckDuckGoSuggestionsAPI: SuggestionsAPI {
             guard let data = data else {
                 os_log("DuckDuckGoSuggestionsAPI: Failed to fetch suggestions - %s",
                        type: .error, error?.localizedDescription ?? "")
+                Pixel.fire(.debug(event: .suggestionsFetchFailed, error: error))
                 mainQueueCompletion(nil, error)
                 return
             }
 
             let decoder = JSONDecoder()
-            guard let suggestionsResult = try? decoder.decode(SuggestionsAPIResult.self, from: data) else {
+            do {
+                let suggestionsResult = try decoder.decode(SuggestionsAPIResult.self, from: data)
+                mainQueueCompletion(suggestionsResult, nil)
+            } catch {
                 os_log("DuckDuckGoSuggestionsAPI: Failed to decode suggestions", type: .error)
+                Pixel.fire(.debug(event: .suggestionsFetchFailed, error: error))
                 mainQueueCompletion(nil, FetchSuggestionsError.decodingFailed)
-                return
             }
-
-            mainQueueCompletion(suggestionsResult, nil)
+            
         })
 
         self.task = task

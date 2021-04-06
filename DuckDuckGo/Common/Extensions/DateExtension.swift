@@ -1,5 +1,5 @@
 //
-//  NSMenuItemExtension.swift
+//  DateExtension.swift
 //
 //  Copyright © 2021 DuckDuckGo. All rights reserved.
 //
@@ -16,22 +16,10 @@
 //  limitations under the License.
 //
 
-import Cocoa
+import Foundation
 
-extension NSMenuItem {
-
-    convenience init(title string: String, action selector: Selector?, target: AnyObject?, keyEquivalent charCode: String) {
-        self.init(title: string, action: selector, keyEquivalent: charCode)
-        self.target = target
+extension Date {
+    var daySinceReferenceDate: Int {
+        Int(self.timeIntervalSinceReferenceDate / (60 * 60 * 24))
     }
-
-    var topMenu: NSMenu? {
-        var menuItem = self
-        while let parent = menuItem.parent {
-            menuItem = parent
-        }
-
-        return menuItem.menu
-    }
-
 }

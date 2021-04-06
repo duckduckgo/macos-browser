@@ -89,7 +89,7 @@ final class AddressBarButtonsViewController: NSViewController {
     }
 
     @IBAction func bookmarkButtonAction(_ sender: Any) {
-        openBookmarkPopover(setFavorite: false)
+        openBookmarkPopover(setFavorite: false, accessPoint: .button)
     }
 
     @IBAction func clearButtonAction(_ sender: Any) {
@@ -111,15 +111,10 @@ final class AddressBarButtonsViewController: NSViewController {
         }
     }
 
-    func openBookmarkPopover(setFavorite: Bool) {
-        guard var bookmark = bookmarkForCurrentUrl() else {
+    func openBookmarkPopover(setFavorite: Bool, accessPoint: Pixel.Event.AccessPoint) {
+        guard let bookmark = bookmarkForCurrentUrl(setFavorite: setFavorite, accessPoint: accessPoint) else {
             assertionFailure("Failed to get a bookmark for the popover")
             return
-        }
-
-        if setFavorite {
-            bookmark.isFavorite = true
-            bookmarkManager.update(bookmark: bookmark)
         }
 
         if !bookmarkPopover.isShown {
@@ -208,20 +203,29 @@ final class AddressBarButtonsViewController: NSViewController {
         }
     }
 
-    private func bookmarkForCurrentUrl() -> Bookmark? {
+    private func bookmarkForCurrentUrl(setFavorite: Bool, accessPoint: Pixel.Event.AccessPoint) -> Bookmark? {
         guard let selectedTabViewModel = tabCollectionViewModel.selectedTabViewModel,
               let url = selectedTabViewModel.tab.url else {
             assertionFailure("No URL for bookmarking")
             return nil
         }
 
-        var bookmark = bookmarkManager.getBookmark(for: url)
-        if bookmark == nil {
-            bookmark = bookmarkManager.makeBookmark(for: url,
-                                                    title: selectedTabViewModel.title,
-                                                    isFavorite: false)
-            updateBookmarkButtonImage(isUrlBookmarked: bookmark != nil)
+        if var bookmark = bookmarkManager.getBookmark(for: url) {
+            if setFavorite {
+                bookmark.isFavorite = true
+                bookmarkManager.update(bookmark: bookmark)
+            }
+
+            return bookmark
         }
+
+        let bookmark = bookmarkManager.makeBookmark(for: url,
+                                                title: selectedTabViewModel.title,
+                                                isFavorite: setFavorite)
+        updateBookmarkButtonImage(isUrlBookmarked: bookmark != nil)
+
+        Pixel.fire(.bookmark(isFavorite: setFavorite, fireproofed: .init(url: url), source: accessPoint))
+
         return bookmark
     }
 
