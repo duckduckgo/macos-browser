@@ -30,9 +30,9 @@ struct AppVersion {
 
     static let shared = AppVersion()
     
-    private let bundle: InfoBundle
+    private let bundle: Bundle
 
-    init(bundle: InfoBundle = Bundle.main) {
+    init(bundle: Bundle = .main) {
         self.bundle = bundle
     }
 
