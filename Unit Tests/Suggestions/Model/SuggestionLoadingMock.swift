@@ -1,7 +1,7 @@
 //
-//  Suggestion.swift
+//  SuggestionLoadingMock.swift
 //
-//  Copyright © 2020 DuckDuckGo. All rights reserved.
+//  Copyright © 2021 DuckDuckGo. All rights reserved.
 //
 //  Licensed under the Apache License, Version 2.0 (the "License");
 //  you may not use this file except in compliance with the License.
@@ -16,12 +16,19 @@
 //  limitations under the License.
 //
 
-import Foundation
+import XCTest
+import BrowserServicesKit
+@testable import DuckDuckGo_Privacy_Browser
 
-enum Suggestion: Equatable {
-    
-    case phrase(phrase: String)
-    case website(url: URL)
-    case unknown(value: String)
+final class SuggestionLoadingMock: SuggestionLoading {
+
+    var getSuggestionsCalled = false
+    var completion: (([Suggestion]?, Error?) -> Void)?
+    func getSuggestions(query: Query, maximum: Int, completion: @escaping ([Suggestion]?, Error?) -> Void) {
+        getSuggestionsCalled = true
+        self.completion = completion
+    }
+
+    var dataSource: SuggestionLoadingDataSource?
 
 }

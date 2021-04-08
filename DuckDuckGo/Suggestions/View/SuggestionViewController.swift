@@ -1,5 +1,5 @@
 //
-//  SearchSuggestionsViewController.swift
+//  SearchSuggestionViewController.swift
 //
 //  Copyright © 2020 DuckDuckGo. All rights reserved.
 //
@@ -20,34 +20,34 @@ import Cocoa
 import Combine
 import os.log
 
-protocol SuggestionsViewControllerDelegate: AnyObject {
+protocol SuggestionViewControllerDelegate: AnyObject {
 
-    func shouldCloseSuggestionsWindow(forMouseEvent event: NSEvent) -> Bool
-    func suggestionsViewControllerDidConfirmSelection(_ suggestionsViewController: SuggestionsViewController)
+    func shouldCloseSuggestionWindow(forMouseEvent event: NSEvent) -> Bool
+    func suggestionViewControllerDidConfirmSelection(_ suggestionViewController: SuggestionViewController)
 
 }
 
-final class SuggestionsViewController: NSViewController {
+final class SuggestionViewController: NSViewController {
 
-    weak var delegate: SuggestionsViewControllerDelegate?
+    weak var delegate: SuggestionViewControllerDelegate?
 
     @IBOutlet weak var tableView: NSTableView!
     @IBOutlet weak var tableViewHeightConstraint: NSLayoutConstraint!
     @IBOutlet weak var pixelPerfectConstraint: NSLayoutConstraint!
 
-    let suggestionsViewModel: SuggestionsViewModel
+    let suggestionContainerViewModel: SuggestionContainerViewModel
 
     required init?(coder: NSCoder) {
-        fatalError("SuggestionsViewController: Bad initializer")
+        fatalError("SuggestionViewController: Bad initializer")
     }
 
-    required init?(coder: NSCoder, suggestionsViewModel: SuggestionsViewModel) {
-        self.suggestionsViewModel = suggestionsViewModel
+    required init?(coder: NSCoder, suggestionContainerViewModel: SuggestionContainerViewModel) {
+        self.suggestionContainerViewModel = suggestionContainerViewModel
 
         super.init(coder: coder)
     }
 
-    var suggestionsCancellable: AnyCancellable?
+    var suggestionContainerCancellable: AnyCancellable?
     var selectionIndexCancellable: AnyCancellable?
 
     private var mouseUpEventsMonitor: Any?
@@ -129,31 +129,33 @@ final class SuggestionsViewController: NSViewController {
     }
 
     private func subscribeToSuggestions() {
-        suggestionsCancellable = suggestionsViewModel.suggestions.$items.receive(on: DispatchQueue.main).sink { [weak self] _ in
+        suggestionContainerCancellable = suggestionContainerViewModel.suggestionContainer.$suggestions
+            .receive(on: DispatchQueue.main)
+            .sink { [weak self] _ in
             self?.displayNewSuggestions()
         }
     }
 
     private func subscribeToSelectionIndex() {
-        selectionIndexCancellable = suggestionsViewModel.$selectionIndex.receive(on: DispatchQueue.main).sink { [weak self] _ in
+        selectionIndexCancellable = suggestionContainerViewModel.$selectionIndex.receive(on: DispatchQueue.main).sink { [weak self] _ in
             if let weakSelf = self {
-                weakSelf.selectRow(at: weakSelf.suggestionsViewModel.selectionIndex)
+                weakSelf.selectRow(at: weakSelf.suggestionContainerViewModel.selectionIndex)
             }
         }
     }
 
     private func displayNewSuggestions() {
-        guard suggestionsViewModel.numberOfSuggestions > 0 else {
+        guard suggestionContainerViewModel.numberOfSuggestions > 0 else {
             closeWindow()
             tableView.reloadData()
             return
         }
 
         // Remove the second reload that causes visual glitch in the beginning of typing
-        if suggestionsViewModel.suggestions.items != nil {
+        if suggestionContainerViewModel.suggestionContainer.suggestions != nil {
             updateHeight()
             tableView.reloadData()
-            self.selectRow(at: self.suggestionsViewModel.selectionIndex)
+            self.selectRow(at: self.suggestionContainerViewModel.selectionIndex)
         }
     }
 
@@ -162,8 +164,8 @@ final class SuggestionsViewController: NSViewController {
 
         guard let index = index,
               index >= 0,
-              suggestionsViewModel.numberOfSuggestions != 0,
-              index < suggestionsViewModel.numberOfSuggestions else {
+              suggestionContainerViewModel.numberOfSuggestions != 0,
+              index < suggestionContainerViewModel.numberOfSuggestions else {
             self.clearSelection()
             return
         }
@@ -193,7 +195,7 @@ final class SuggestionsViewController: NSViewController {
         if event.window === view.window {
             return nil
         }
-        if delegate?.shouldCloseSuggestionsWindow(forMouseEvent: event) ?? true {
+        if delegate?.shouldCloseSuggestionWindow(forMouseEvent: event) ?? true {
             closeWindow()
         }
         
@@ -205,21 +207,21 @@ final class SuggestionsViewController: NSViewController {
            tableView.bounds.contains(tableView.convert(event.locationInWindow, from: nil)) {
 
             closeWindow()
-            delegate?.suggestionsViewControllerDidConfirmSelection(self)
+            delegate?.suggestionViewControllerDidConfirmSelection(self)
             return nil
         }
         return event
     }
 
     private func updateHeight() {
-        guard suggestionsViewModel.numberOfSuggestions > 0 else {
+        guard suggestionContainerViewModel.numberOfSuggestions > 0 else {
             tableViewHeightConstraint.constant = 0
             return
         }
 
         let rowHeight = tableView.rowHeight
 
-        tableViewHeightConstraint.constant = CGFloat(suggestionsViewModel.numberOfSuggestions) * rowHeight
+        tableViewHeightConstraint.constant = CGFloat(suggestionContainerViewModel.numberOfSuggestions) * rowHeight
             + (tableView.enclosingScrollView?.contentInsets.top ?? 0)
             + (tableView.enclosingScrollView?.contentInsets.bottom ?? 0)
     }
@@ -235,26 +237,26 @@ final class SuggestionsViewController: NSViewController {
 
 }
 
-extension SuggestionsViewController: NSTableViewDataSource {
+extension SuggestionViewController: NSTableViewDataSource {
 
     func numberOfRows(in tableView: NSTableView) -> Int {
-        return suggestionsViewModel.numberOfSuggestions
+        return suggestionContainerViewModel.numberOfSuggestions
     }
 
 }
 
-extension SuggestionsViewController: NSTableViewDelegate {
+extension SuggestionViewController: NSTableViewDelegate {
 
     func tableView(_ tableView: NSTableView, viewFor tableColumn: NSTableColumn?, row: Int) -> NSView? {
         guard let suggestionTableCellView = tableView.makeView(
                 withIdentifier: NSUserInterfaceItemIdentifier(rawValue: SuggestionTableCellView.identifier), owner: self)
                 as? SuggestionTableCellView else {
-            assertionFailure("SuggestionsViewController: Making of table cell view failed")
+            assertionFailure("SuggestionViewController: Making of table cell view failed")
             return nil
         }
 
-        guard let suggestionViewModel = suggestionsViewModel.suggestionViewModel(at: row) else {
-            assertionFailure("SuggestionsViewController: Failed to get suggestion")
+        guard let suggestionViewModel = suggestionContainerViewModel.suggestionViewModel(at: row) else {
+            assertionFailure("SuggestionViewController: Failed to get suggestion")
             return nil
         }
 
@@ -266,7 +268,7 @@ extension SuggestionsViewController: NSTableViewDelegate {
         guard let suggestionTableRowView = tableView.makeView(
                 withIdentifier: NSUserInterfaceItemIdentifier(rawValue: SuggestionTableRowView.identifier), owner: self)
                 as? SuggestionTableRowView else {
-            assertionFailure("SuggestionsViewController: Making of table row view failed")
+            assertionFailure("SuggestionViewController: Making of table row view failed")
             return nil
         }
         return suggestionTableRowView
@@ -274,12 +276,12 @@ extension SuggestionsViewController: NSTableViewDelegate {
 
     func tableViewSelectionDidChange(_ notification: Notification) {
         if tableView.selectedRow == -1 {
-            suggestionsViewModel.clearSelection()
+            suggestionContainerViewModel.clearSelection()
             return
         }
 
-        if suggestionsViewModel.selectionIndex != tableView.selectedRow {
-            suggestionsViewModel.select(at: tableView.selectedRow)
+        if suggestionContainerViewModel.selectionIndex != tableView.selectedRow {
+            suggestionContainerViewModel.select(at: tableView.selectedRow)
         }
     }
 

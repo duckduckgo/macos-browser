@@ -17,11 +17,12 @@
 //
 
 import XCTest
+import BrowserServicesKit
 @testable import DuckDuckGo_Privacy_Browser
 
 final class SuggestionViewModelTests: XCTestCase {
 
-    func testWhenSuggestionIsPhraseThenStringIsTheSame() {
+    func testWhenSuggestionIsPhrase_ThenStringIsTheSame() {
         let phrase = "phrase"
         let suggestion = Suggestion.phrase(phrase: phrase)
         let suggestionViewModel = SuggestionViewModel(suggestion: suggestion, userStringValue: "")
@@ -29,7 +30,7 @@ final class SuggestionViewModelTests: XCTestCase {
         XCTAssertEqual(phrase, suggestionViewModel.string)
     }
     
-    func testWhenSuggestionIsWebsiteThenStringIsUrlStringWithoutSchemeAndWWW() {
+    func testWhenSuggestionIsWebsite_ThenStringIsUrlStringWithoutSchemeAndWWW() {
         let urlString = "https://spreadprivacy.com"
         let url = URL(string: urlString)!
         let suggestion = Suggestion.website(url: url)
@@ -38,14 +39,14 @@ final class SuggestionViewModelTests: XCTestCase {
         XCTAssert(suggestionViewModel.string.hasSuffix("spreadprivacy.com"))
         XCTAssert(!suggestionViewModel.string.hasPrefix("https://"))
     }
-    
-    func testWhenSuggestionIsWebsiteWithTitleThenStringIsTitleAndURLWithoutScheme() {
-        let urlString = "https://spreadprivacy.com"
-        let url = URL(string: urlString)!
-        let suggestion = Suggestion.website(url: url)
+
+    func testWhenSuggestionIsBookmark_ThenStringIsTitle() {
+        let url = URL(string: "https://spreadprivacy.com")!
+        let title = "Title"
+        let suggestion = Suggestion.bookmark(title: title, url: url, isFavorite: true)
         let suggestionViewModel = SuggestionViewModel(suggestion: suggestion, userStringValue: "")
 
-        XCTAssertEqual(suggestionViewModel.string, "spreadprivacy.com")
+        XCTAssertEqual(suggestionViewModel.string, title)
     }
 
 }

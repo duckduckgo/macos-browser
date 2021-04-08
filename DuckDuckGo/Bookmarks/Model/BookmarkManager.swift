@@ -31,6 +31,7 @@ protocol BookmarkManager: AnyObject {
 
     // Wrapper definition in a protocol is not supported yet
     var listPublisher: Published<BookmarkList?>.Publisher { get }
+    var list: BookmarkList? { get }
 
 }
 

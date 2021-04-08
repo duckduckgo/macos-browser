@@ -50,7 +50,6 @@ final class Pixel {
 
         APIRequest.request(url: url, parameters: newParams, headers: headers, callBackOnMainThread: true) { (_, error) in
 
-            os_log("Pixel fired %s %s", type: .debug, pixelName, "\(params?.debugDescription ?? "<nil>")")
             onComplete(error)
         }
     }

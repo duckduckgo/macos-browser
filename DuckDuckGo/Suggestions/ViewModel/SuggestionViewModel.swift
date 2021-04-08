@@ -17,6 +17,7 @@
 //
 
 import Cocoa
+import BrowserServicesKit
 
 final class SuggestionViewModel {
 
@@ -34,8 +35,21 @@ final class SuggestionViewModel {
 
     // MARK: - Attributed Strings
 
-    static let tableRowViewStandardAttributes = [NSAttributedString.Key.font: NSFont.systemFont(ofSize: 13, weight: .regular)]
-    static let tableRowViewBoldAttributes = [NSAttributedString.Key.font: NSFont.systemFont(ofSize: 13, weight: .bold)]
+    static let paragraphStyle: NSParagraphStyle = {
+        let style = NSMutableParagraphStyle()
+        style.lineBreakMode = .byTruncatingTail
+        return style
+    }()
+
+    static let tableRowViewStandardAttributes: [NSAttributedString.Key: Any] = [
+        .font: NSFont.systemFont(ofSize: 13, weight: .regular),
+        .paragraphStyle: paragraphStyle
+    ]
+
+    static let tableRowViewBoldAttributes: [NSAttributedString.Key: Any] = [
+        NSAttributedString.Key.font: NSFont.systemFont(ofSize: 13, weight: .bold),
+        .paragraphStyle: paragraphStyle
+    ]
 
     var tableCellViewAttributedString: NSAttributedString {
         var firstPart = ""
@@ -57,6 +71,8 @@ final class SuggestionViewModel {
             return phrase
         case .website(url: let url):
             return url.absoluteStringWithoutSchemeAndWWW
+        case .bookmark(title: let title, url: _, isFavorite: _):
+            return title
         case .unknown(value: let value):
             return value
         }
@@ -66,6 +82,7 @@ final class SuggestionViewModel {
 
     static let webImage = NSImage(named: "Web")
     static let searchImage = NSImage(named: "Search")
+    static let bookmarkImage = NSImage(named: "BookmarkSuggestion")
 
     var icon: NSImage? {
         switch suggestion {
@@ -73,21 +90,10 @@ final class SuggestionViewModel {
             return Self.searchImage
         case .website(url: _):
             return Self.webImage
+        case .bookmark(title: _, url: _, isFavorite: _):
+            return Self.bookmarkImage
         case .unknown(value: _):
             return Self.webImage
-        }
-    }
-
-}
-
-fileprivate extension URL {
-
-    var absoluteStringWithoutSchemeAndWWW: String {
-        let absoluteString = self.punycodeDecodedString ?? self.absoluteString
-        if let scheme = scheme {
-            return absoluteString.drop(prefix: scheme + "://").drop(prefix: "www.")
-        } else {
-            return absoluteString
         }
     }
 
