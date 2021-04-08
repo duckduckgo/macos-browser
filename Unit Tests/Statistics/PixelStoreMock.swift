@@ -1,5 +1,5 @@
 //
-//  NSMenuItemExtension.swift
+//  PixelStoreMock.swift
 //
 //  Copyright © 2021 DuckDuckGo. All rights reserved.
 //
@@ -16,22 +16,26 @@
 //  limitations under the License.
 //
 
-import Cocoa
+import Foundation
+@testable import DuckDuckGo_Privacy_Browser
 
-extension NSMenuItem {
+final class PixelStoreMock: PixelDataStore {
+    var data = [String: NSNumber]()
 
-    convenience init(title string: String, action selector: Selector?, target: AnyObject?, keyEquivalent charCode: String) {
-        self.init(title: string, action: selector, keyEquivalent: charCode)
-        self.target = target
+    func value(forKey key: String) -> Int? {
+        return data[key]?.intValue
     }
 
-    var topMenu: NSMenu? {
-        var menuItem = self
-        while let parent = menuItem.parent {
-            menuItem = parent
-        }
+    func set(_ value: Int, forKey key: String) {
+        data[key] = NSNumber(value: value)
+    }
 
-        return menuItem.menu
+    func value(forKey key: String) -> Double? {
+        return data[key]?.doubleValue
+    }
+
+    func set(_ value: Double, forKey key: String) {
+        data[key] = NSNumber(value: value)
     }
 
 }

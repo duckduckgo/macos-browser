@@ -70,6 +70,7 @@ final class AddEditFavoriteViewController: NSViewController {
                 update(bookmark: bookmark, newTitle: newTitle)
             } else {
                 bookmarkManager.makeBookmark(for: newUrl, title: newTitle, isFavorite: true)
+                Pixel.fire(.favorite(fireproofed: .init(url: newUrl), source: .newTab))
             }
         }
         view.window?.close()

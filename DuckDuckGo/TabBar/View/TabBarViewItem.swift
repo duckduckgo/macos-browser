@@ -181,7 +181,7 @@ final class TabBarViewItem: NSCollectionViewItem {
         delegate?.tabBarViewItemRemoveFireproofing(self)
     }
 
-    @objc func bookmarkThisPageAction(_ sender: NSButton) {
+    @objc func bookmarkThisPageAction(_ sender: Any) {
         delegate?.tabBarViewItemBookmarkThisPageAction(self)
     }
 

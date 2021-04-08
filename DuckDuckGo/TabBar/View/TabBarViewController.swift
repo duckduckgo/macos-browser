@@ -95,6 +95,8 @@ final class TabBarViewController: NSViewController {
     @IBAction func burnButtonAction(_ sender: NSButton) {
         let response = NSAlert.burnButtonAlert.runModal()
         if response == NSApplication.ModalResponse.alertFirstButtonReturn {
+            Pixel.fire(.burn())
+
             WindowsManager.closeWindows(except: self.view.window)
             playFireAnimation()
         }
@@ -664,6 +666,7 @@ extension TabBarViewController: TabBarViewItemDelegate {
 
         if !bookmarkManager.isUrlBookmarked(url: url) {
             bookmarkManager.makeBookmark(for: url, title: tabViewModel.title, isFavorite: false)
+            Pixel.fire(.bookmark(fireproofed: .init(url: url), source: .tabMenu))
         }
     }
 
@@ -695,16 +698,18 @@ extension TabBarViewController: TabBarViewItemDelegate {
     }
 
     func tabBarViewItemFireproofSite(_ tabBarViewItem: TabBarViewItem) {
-        if let url = tabCollectionViewModel.selectedTabViewModel?.tab.url?.host {
-            FireproofDomains.shared.addToAllowed(domain: url)
+        if let url = tabCollectionViewModel.selectedTabViewModel?.tab.url,
+           let host = url.host {
+            Pixel.fire(.fireproof(kind: .init(url: url), suggested: .manual))
+            FireproofDomains.shared.addToAllowed(domain: host)
         }
 
         tabBarViewItem.setupMenu()
     }
 
     func tabBarViewItemRemoveFireproofing(_ tabBarViewItem: TabBarViewItem) {
-        if let url = tabCollectionViewModel.selectedTabViewModel?.tab.url?.host {
-            FireproofDomains.shared.remove(domain: url)
+        if let host = tabCollectionViewModel.selectedTabViewModel?.tab.url?.host {
+            FireproofDomains.shared.remove(domain: host)
         }
 
         tabBarViewItem.setupMenu()

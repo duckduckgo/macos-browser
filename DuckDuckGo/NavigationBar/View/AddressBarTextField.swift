@@ -156,23 +156,25 @@ final class AddressBarTextField: NSTextField {
     }
 
     private func addressBarEnterPressed() {
+        let suggestionUsed = suggestionContainerViewModel.selectedSuggestionViewModel != nil
         suggestionContainerViewModel.suggestionContainer.stopGettingSuggestions()
         hideSuggestionWindow()
 
         if NSApp.isCommandPressed {
-            openNewTab(selected: NSApp.isShiftPressed)
+            openNewTab(selected: NSApp.isShiftPressed, suggestionUsed: suggestionUsed)
         } else {
-            navigate()
+            navigate(suggestionUsed: suggestionUsed)
         }
     }
 
-    private func navigate() {
+    private func navigate(suggestionUsed: Bool) {
         hideSuggestionWindow()
-        updateTabUrl()
+        updateTabUrl(suggestionUsed: suggestionUsed)
+
         currentEditor()?.selectAll(self)
     }
 
-    private func updateTabUrl() {
+    private func updateTabUrl(suggestionUsed: Bool) {
         guard let selectedTabViewModel = tabCollectionViewModel.selectedTabViewModel else {
             os_log("%s: Selected tab view model is nil", type: .error, className)
             return
@@ -181,21 +183,26 @@ final class AddressBarTextField: NSTextField {
             os_log("%s: Making url from address bar string failed", type: .error, className)
             return
         }
+
         if selectedTabViewModel.tab.url == url {
+            Pixel.fire(.refresh(source: .reloadURL))
             selectedTabViewModel.tab.reload()
         } else {
+            
+            Pixel.fire(.navigation(kind: .init(url: url), source: suggestionUsed ? .suggestion : .addressBar))
             selectedTabViewModel.tab.update(url: url)
         }
 
         self.window?.makeFirstResponder(nil)
     }
 
-    private func openNewTab(selected: Bool) {
+    private func openNewTab(selected: Bool, suggestionUsed: Bool) {
         guard let url = URL.makeURL(from: stringValueWithoutSuffix) else {
             os_log("%s: Making url from address bar string failed", type: .error, className)
             return
         }
 
+        Pixel.fire(.navigation(kind: .init(url: url), source: suggestionUsed ? .suggestion : .addressBar))
         let tab = Tab(url: url, shouldLoadInBackground: true)
         tabCollectionViewModel.append(tab: tab, selected: selected)
     }
@@ -383,11 +390,20 @@ final class AddressBarTextField: NSTextField {
         self.suggestionWindowController = windowController
     }
 
+    private func suggestionsContainBookmarkOrFavorite() -> (hasBookmark: Bool, hasFavorite: Bool) {
+        let result = (hasBookmark: false, hasFavorite: false)
+        #warning("fix this to correctly search suggested bookmarks/favorites")
+        return result
+    }
+
     private func showSuggestionWindow() {
         guard let window = window, let suggestionWindow = suggestionWindowController?.window else {
             os_log("AddressBarTextField: Window not available", type: .error)
             return
         }
+
+        Pixel.fire(.suggestionsDisplayed(suggestionsContainBookmarkOrFavorite()))
+
         guard !suggestionWindow.isVisible, window.firstResponder == currentEditor() else { return }
 
         window.addChildWindow(suggestionWindow, ordered: .above)
@@ -507,10 +523,10 @@ extension AddressBarTextField: SuggestionViewControllerDelegate {
 
     func suggestionViewControllerDidConfirmSelection(_ suggestionViewController: SuggestionViewController) {
         if NSApp.isCommandPressed {
-            openNewTab(selected: NSApp.isShiftPressed)
+            openNewTab(selected: NSApp.isShiftPressed, suggestionUsed: true)
             return
         }
-        navigate()
+        navigate(suggestionUsed: true)
     }
 
     func shouldCloseSuggestionWindow(forMouseEvent event: NSEvent) -> Bool {

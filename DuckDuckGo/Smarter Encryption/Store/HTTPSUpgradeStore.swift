@@ -135,7 +135,7 @@ final class HTTPSUpgradePersistence: HTTPSUpgradeStore {
             do {
                 try context.save()
             } catch {
-
+                Pixel.fire(.debug(event: .dbSaveBloomFilterError, error: error, countedBy: .counter))
             }
         }
     }
@@ -171,6 +171,7 @@ final class HTTPSUpgradePersistence: HTTPSUpgradeStore {
             do {
                 try context.save()
             } catch {
+                Pixel.fire(.debug(event: .dbSaveExcludedHTTPSDomainsError, error: error, countedBy: .counter))
                 result = false
             }
         }

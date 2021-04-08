@@ -1,7 +1,8 @@
 //
-//  NSMenuItemExtension.swift
+//  ApiRequestError.swift
+//  DuckDuckGo
 //
-//  Copyright © 2021 DuckDuckGo. All rights reserved.
+//  Copyright © 2017 DuckDuckGo. All rights reserved.
 //
 //  Licensed under the Apache License, Version 2.0 (the "License");
 //  you may not use this file except in compliance with the License.
@@ -16,22 +17,8 @@
 //  limitations under the License.
 //
 
-import Cocoa
+import Foundation
 
-extension NSMenuItem {
-
-    convenience init(title string: String, action selector: Selector?, target: AnyObject?, keyEquivalent charCode: String) {
-        self.init(title: string, action: selector, keyEquivalent: charCode)
-        self.target = target
-    }
-
-    var topMenu: NSMenu? {
-        var menuItem = self
-        while let parent = menuItem.parent {
-            menuItem = parent
-        }
-
-        return menuItem.menu
-    }
-
+enum ApiRequestError: Error {
+    case noData
 }

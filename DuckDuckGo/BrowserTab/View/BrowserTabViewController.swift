@@ -265,9 +265,12 @@ extension BrowserTabViewController: TabDelegate {
         let alert = NSAlert.fireproofAlert(with: host.dropWWW())
         alert.beginSheetModal(for: window) { response in
             if response == NSApplication.ModalResponse.alertFirstButtonReturn {
+                Pixel.fire(.fireproof(kind: .init(url: tab.url), suggested: .suggested))
                 FireproofDomains.shared.addToAllowed(domain: host)
             }
         }
+
+        Pixel.fire(.fireproofSuggested())
     }
 
 }

@@ -50,6 +50,7 @@ final class SuggestionContainer {
                 os_log("Suggestions: Failed to get suggestions - %s",
                        type: .error,
                        "\(String(describing: error))")
+                Pixel.fire(.debug(event: .suggestionsFetchFailed, error: error))
                 return
             }
             self?.suggestions = suggestions
@@ -69,9 +70,9 @@ extension SuggestionContainer: SuggestionLoadingDataSource {
     }
 
     func suggestionLoading(_ suggestionLoading: SuggestionLoading,
-                          suggestionDataFromUrl url: URL,
-                          withParameters parameters: [String: String],
-                          completion: @escaping (Data?, Error?) -> Void) {
+                           suggestionDataFromUrl url: URL,
+                           withParameters parameters: [String: String],
+                           completion: @escaping (Data?, Error?) -> Void) {
         var url = url
         parameters.forEach {
             if let newUrl = try? url.addParameter(name: $0.key, value: $0.value) {

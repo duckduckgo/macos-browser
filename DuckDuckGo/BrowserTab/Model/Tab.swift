@@ -196,8 +196,14 @@ final class Tab: NSObject {
     }
 
     func requestFireproofToggle() {
-         guard let host = url?.host else { return }
-         FireproofDomains.shared.toggle(domain: host)
+        guard let url = url,
+              let host = url.host
+        else { return }
+
+        let added = FireproofDomains.shared.toggle(domain: host)
+        if added {
+            Pixel.fire(.fireproof(kind: .init(url: url), suggested: .manual))
+        }
      }
 
     private var superviewObserver: NSKeyValueObservation?
@@ -345,11 +351,14 @@ extension Tab: HTML5DownloadDelegate {
 extension Tab: FaviconUserScriptDelegate {
 
     func faviconUserScript(_ faviconUserScript: FaviconUserScript, didFindFavicon faviconUrl: URL) {
-        guard let host = url?.host else {
+        guard let host = self.url?.host else {
             return
         }
 
         faviconService.fetchFavicon(faviconUrl, for: host, isFromUserScript: true) { (image, error) in
+            guard host == self.url?.host else {
+                return
+            }
             guard error == nil, let image = image else {
                 return
             }

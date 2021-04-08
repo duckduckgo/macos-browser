@@ -100,6 +100,7 @@ final class NavigationBarViewController: NSViewController {
             return
         }
 
+        Pixel.fire(.refresh(source: .init(sender: sender, default: .button)))
         selectedTabViewModel.tab.reload()
     }
 
@@ -107,12 +108,35 @@ final class NavigationBarViewController: NSViewController {
         if let event = NSApplication.shared.currentEvent {
             let menu = OptionsButtonMenu(tabCollectionViewModel: tabCollectionViewModel)
             NSMenu.popUpContextMenu(menu, with: event, for: sender)
+
+            switch menu.result {
+            case .navigateToBookmark:
+                Pixel.fire(.moreMenu(result: .bookmark))
+            case .emailProtection:
+                Pixel.fire(.moreMenu(result: .emailProtection))
+            case .feedback:
+                Pixel.fire(.moreMenu(result: .feedback))
+            case .fireproof:
+                Pixel.fire(.moreMenu(result: .fireproof))
+            case .moveTabToNewWindow:
+                Pixel.fire(.moreMenu(result: .moveTabToNewWindow))
+            case .none:
+                Pixel.fire(.moreMenu(result: .cancelled))
+
+            case .emailProtectionOff,
+                 .emailProtectionCreateAddress,
+                 .emailProtectionDashboard,
+                 .bookmarkThisPage,
+                 .favoriteThisPage:
+                break
+            }
         }
     }
 
     @IBAction func shareButtonAction(_ sender: NSButton) {
         guard let url = tabCollectionViewModel.selectedTabViewModel?.tab.url else { return }
         let sharing = NSSharingServicePicker(items: [url])
+        sharing.delegate = self
         sharing.show(relativeTo: .zero, of: sender, preferredEdge: .minY)
     }
 
@@ -172,6 +196,32 @@ final class NavigationBarViewController: NSViewController {
         refreshButton.isEnabled = selectedTabViewModel.canReload
         shareButton.isEnabled = selectedTabViewModel.canReload
         shareButton.isEnabled = selectedTabViewModel.tab.url != nil
+    }
+
+}
+
+extension NavigationBarViewController: NSSharingServicePickerDelegate {
+
+    func sharingServicePicker(_ sharingServicePicker: NSSharingServicePicker,
+                              delegateFor sharingService: NSSharingService) -> NSSharingServiceDelegate? {
+        return self
+    }
+
+    func sharingServicePicker(_ sharingServicePicker: NSSharingServicePicker, didChoose service: NSSharingService?) {
+        if service == nil {
+            Pixel.fire(.sharingMenu(result: .cancelled))
+        }
+    }
+}
+
+extension NavigationBarViewController: NSSharingServiceDelegate {
+
+    func sharingService(_ sharingService: NSSharingService, didFailToShareItems items: [Any], error: Error) {
+        Pixel.fire(.sharingMenu(result: .failure))
+    }
+
+    func sharingService(_ sharingService: NSSharingService, didShareItems items: [Any]) {
+        Pixel.fire(.sharingMenu(result: .success))
     }
 
 }

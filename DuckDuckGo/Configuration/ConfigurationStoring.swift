@@ -108,7 +108,12 @@ final class DefaultConfigurationStorage: ConfigurationStoring {
 
     func loadData(for config: ConfigurationLocation) -> Data? {
         let file = fileUrl(for: config)
-        return try? Data(contentsOf: file)
+        do {
+            return try Data(contentsOf: file)
+        } catch {
+            Pixel.fire(.debug(event: .trackerDataCouldNotBeLoaded, error: error))
+            return nil
+        }
     }
 
     func saveData(_ data: Data, for config: ConfigurationLocation) throws {
