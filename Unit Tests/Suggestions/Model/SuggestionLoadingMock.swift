@@ -1,5 +1,5 @@
 //
-//  SuggestionLoaderMock.swift
+//  SuggestionLoadingMock.swift
 //
 //  Copyright © 2021 DuckDuckGo. All rights reserved.
 //
@@ -20,7 +20,7 @@ import XCTest
 import BrowserServicesKit
 @testable import DuckDuckGo_Privacy_Browser
 
-final class SuggestionLoaderMock: SuggestionLoader {
+final class SuggestionLoadingMock: SuggestionLoading {
 
     var getSuggestionsCalled = false
     var completion: (([Suggestion]?, Error?) -> Void)?
@@ -29,6 +29,6 @@ final class SuggestionLoaderMock: SuggestionLoader {
         self.completion = completion
     }
 
-    var dataSource: SuggestionLoaderDataSource?
+    var dataSource: SuggestionLoadingDataSource?
 
 }

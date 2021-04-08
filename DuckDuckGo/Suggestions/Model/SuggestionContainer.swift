@@ -27,23 +27,23 @@ final class SuggestionContainer {
     @Published private(set) var suggestions: [Suggestion]?
 
     private let bookmarkManager: BookmarkManager
-    private let loader: SuggestionLoader
+    private let loading: SuggestionLoading
 
     private var latestQuery: Query?
 
-    init(suggestionLoader: SuggestionLoader, bookmarkManager: BookmarkManager) {
+    init(suggestionLoading: SuggestionLoading, bookmarkManager: BookmarkManager) {
         self.bookmarkManager = bookmarkManager
-        self.loader = suggestionLoader
-        self.loader.dataSource = self
+        self.loading = suggestionLoading
+        self.loading.dataSource = self
     }
 
     convenience init () {
-        self.init(suggestionLoader: KitSuggestionLoader(), bookmarkManager: LocalBookmarkManager.shared)
+        self.init(suggestionLoading: SuggestionLoader(), bookmarkManager: LocalBookmarkManager.shared)
     }
 
     func getSuggestions(for query: String) {
         latestQuery = query
-        loader.getSuggestions(query: query, maximum: Self.maximumNumberOfSuggestions) { [weak self] (suggestions, error) in
+        loading.getSuggestions(query: query, maximum: Self.maximumNumberOfSuggestions) { [weak self] (suggestions, error) in
             guard self?.latestQuery == query else { return }
             guard let suggestions = suggestions, error == nil else {
                 self?.suggestions = nil
@@ -62,13 +62,13 @@ final class SuggestionContainer {
 
 }
 
-extension SuggestionContainer: SuggestionLoaderDataSource {
+extension SuggestionContainer: SuggestionLoadingDataSource {
 
-    func bookmarks(for suggestionLoader: SuggestionLoader) -> [BrowserServicesKit.Bookmark] {
+    func bookmarks(for suggestionLoading: SuggestionLoading) -> [BrowserServicesKit.Bookmark] {
         bookmarkManager.list?.bookmarks() ?? []
     }
 
-    func suggestionLoader(_ suggestionLoader: SuggestionLoader,
+    func suggestionLoading(_ suggestionLoading: SuggestionLoading,
                           suggestionDataFromUrl url: URL,
                           withParameters parameters: [String: String],
                           completion: @escaping (Data?, Error?) -> Void) {

@@ -23,8 +23,8 @@ import BrowserServicesKit
 final class SuggestionContainerTests: XCTestCase {
 
     func testWhenGetSuggestionsIsCalled_ThenContainerAsksAndHoldsSuggestionsFromLoader() {
-        let suggestionLoaderMock = SuggestionLoaderMock()
-        let suggestionContainer = SuggestionContainer(suggestionLoader: suggestionLoaderMock,
+        let suggestionLoadingMock = SuggestionLoadingMock()
+        let suggestionContainer = SuggestionContainer(suggestionLoading: suggestionLoadingMock,
                                               bookmarkManager: LocalBookmarkManager.shared)
 
         suggestionContainer.getSuggestions(for: "test")
@@ -33,24 +33,24 @@ final class SuggestionContainerTests: XCTestCase {
             Suggestion.website(url: URL.duckDuckGo),
             Suggestion.website(url: URL.duckDuckGoAutocomplete)
         ]
-        suggestionLoaderMock.completion?(suggestions, nil)
+        suggestionLoadingMock.completion?(suggestions, nil)
 
-        XCTAssert(suggestionLoaderMock.getSuggestionsCalled)
+        XCTAssert(suggestionLoadingMock.getSuggestionsCalled)
         XCTAssertEqual(suggestionContainer.suggestions, suggestions)
     }
 
     func testWhenStopGettingSuggestionsIsCalled_ThenNoSuggestionsArePublished() {
-        let suggestionLoaderMock = SuggestionLoaderMock()
-        let suggestionContainer = SuggestionContainer(suggestionLoader: suggestionLoaderMock,
+        let suggestionLoadingMock = SuggestionLoadingMock()
+        let suggestionContainer = SuggestionContainer(suggestionLoading: suggestionLoadingMock,
                                               bookmarkManager: LocalBookmarkManager.shared)
 
         suggestionContainer.getSuggestions(for: "test")
         suggestionContainer.stopGettingSuggestions()
 
         let suggestions = [ Suggestion.website(url: URL.duckDuckGo) ]
-        suggestionLoaderMock.completion?(suggestions, nil)
+        suggestionLoadingMock.completion?(suggestions, nil)
 
-        XCTAssert(suggestionLoaderMock.getSuggestionsCalled)
+        XCTAssert(suggestionLoadingMock.getSuggestionsCalled)
         XCTAssertNil(suggestionContainer.suggestions)
     }
 

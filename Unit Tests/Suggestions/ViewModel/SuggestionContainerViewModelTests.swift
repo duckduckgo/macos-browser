@@ -120,13 +120,13 @@ final class SuggestionContainerViewModelTests: XCTestCase {
 extension SuggestionContainerViewModel {
 
     static var aSuggestionContainerViewModel: SuggestionContainerViewModel {
-        let suggestionLoaderMock = SuggestionLoaderMock()
-        let suggestionContainer = SuggestionContainer(suggestionLoader: suggestionLoaderMock,
+        let suggestionLoadingMock = SuggestionLoadingMock()
+        let suggestionContainer = SuggestionContainer(suggestionLoading: suggestionLoadingMock,
                                                       bookmarkManager: LocalBookmarkManager.shared)
         let suggestionContainerViewModel = SuggestionContainerViewModel(suggestionContainer: suggestionContainer)
 
         suggestionContainer.getSuggestions(for: "Test")
-        suggestionLoaderMock.completion?( [
+        suggestionLoadingMock.completion?( [
             Suggestion.website(url: URL.duckDuckGo),
             Suggestion.website(url: URL.duckDuckGoAutocomplete)
         ], nil )
