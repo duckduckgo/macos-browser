@@ -48,7 +48,7 @@ final class WindowsManager {
     class func openNewWindow(with tab: Tab, droppingPoint: NSPoint? = nil) {
         let tabCollection = TabCollection()
         tabCollection.append(tab: tab)
-        openNewWindow(with: TabCollectionViewModel(tabCollection: tabCollection))
+        openNewWindow(with: TabCollectionViewModel(tabCollection: tabCollection), droppingPoint: droppingPoint)
     }
 
     class func openNewWindow(with initialUrl: URL) {
