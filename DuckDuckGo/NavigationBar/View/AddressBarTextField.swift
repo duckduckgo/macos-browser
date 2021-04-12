@@ -391,8 +391,20 @@ final class AddressBarTextField: NSTextField {
     }
 
     private func suggestionsContainBookmarkOrFavorite() -> (hasBookmark: Bool, hasFavorite: Bool) {
-        let result = (hasBookmark: false, hasFavorite: false)
-        #warning("fix this to correctly search suggested bookmarks/favorites")
+        var result = (hasBookmark: false, hasFavorite: false)
+        for suggestion in self.suggestionContainerViewModel.suggestionContainer.suggestions ?? [] {
+            guard case .bookmark(title: _, url: _, isFavorite: let isFavorite) = suggestion else { continue }
+
+            if isFavorite {
+                result.hasFavorite = true
+            } else {
+                result.hasBookmark = true
+            }
+
+            if result.hasFavorite && result.hasBookmark {
+                break
+            }
+        }
         return result
     }
 
