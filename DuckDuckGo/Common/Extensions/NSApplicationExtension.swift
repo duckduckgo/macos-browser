@@ -20,9 +20,11 @@ import Cocoa
 
 extension NSApplication {
 
-    var mainMenuTyped: MainMenu? {
-        return mainMenu as? MainMenu
+    // swiftlint:disable force_cast
+    var mainMenuTyped: MainMenu {
+        return mainMenu as! MainMenu
     }
+    // swiftlint:enable force_cast
 
     var isCommandPressed: Bool {
         currentEvent?.modifierFlags.contains(.command) ?? false

@@ -71,7 +71,7 @@ final class MainViewController: NSViewController {
     }
 
     func windowDidBecomeMain() {
-        NSApplication.shared.mainMenuTyped?.setWindowRelatedMenuItems(enabled: true)
+        NSApplication.shared.mainMenuTyped.setWindowRelatedMenuItems(enabled: true)
 
         updateBackMenuItem()
         updateForwardMenuItem()
@@ -79,7 +79,7 @@ final class MainViewController: NSViewController {
     }
 
     func windowDidResignMain() {
-        NSApplication.shared.mainMenuTyped?.setWindowRelatedMenuItems(enabled: false)
+        NSApplication.shared.mainMenuTyped.setWindowRelatedMenuItems(enabled: false)
     }
 
     func windowWillClose() {
@@ -195,7 +195,7 @@ final class MainViewController: NSViewController {
             os_log("MainViewController: No tab view model selected", type: .error)
             return
         }
-        guard let backMenuItem = NSApplication.shared.mainMenuTyped?.backMenuItem else {
+        guard let backMenuItem = NSApplication.shared.mainMenuTyped.backMenuItem else {
             os_log("MainViewController: Failed to get reference to back menu item", type: .error)
             return
         }
@@ -208,7 +208,7 @@ final class MainViewController: NSViewController {
             os_log("MainViewController: No tab view model selected", type: .error)
             return
         }
-        guard let forwardMenuItem = NSApplication.shared.mainMenuTyped?.forwardMenuItem else {
+        guard let forwardMenuItem = NSApplication.shared.mainMenuTyped.forwardMenuItem else {
             os_log("MainViewController: Failed to get reference to back menu item", type: .error)
             return
         }
@@ -221,9 +221,8 @@ final class MainViewController: NSViewController {
             os_log("MainViewController: No tab view model selected", type: .error)
             return
         }
-        guard let mainMenu = NSApplication.shared.mainMenuTyped,
-              let bookmarkThisPageMenuItem = mainMenu.bookmarkThisPageMenuItem,
-              let favoriteThisPageMenuItem = mainMenu.favoriteThisPageMenuItem else {
+        guard let bookmarkThisPageMenuItem = NSApplication.shared.mainMenuTyped.bookmarkThisPageMenuItem,
+              let favoriteThisPageMenuItem = NSApplication.shared.mainMenuTyped.favoriteThisPageMenuItem else {
             os_log("MainViewController: Failed to get reference to bookmarks menu items", type: .error)
             return
         }
@@ -233,7 +232,7 @@ final class MainViewController: NSViewController {
     }
 
     func updateReopenLastClosedTabMenuItem() {
-        guard let reopenLastClosedTabMenuItem = NSApplication.shared.mainMenuTyped?.reopenLastClosedTabMenuItem else {
+        guard let reopenLastClosedTabMenuItem = NSApplication.shared.mainMenuTyped.reopenLastClosedTabMenuItem else {
             os_log("MainViewController: Failed to get reference to back menu item", type: .error)
             return
         }

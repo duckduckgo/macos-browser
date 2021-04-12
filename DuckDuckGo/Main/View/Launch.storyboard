@@ -519,6 +519,12 @@ CQ
                                                 <action selector="resetDefaultBrowserPrompt:" target="Ady-hI-5gd" id="Esm-iy-0kW"/>
                                             </connections>
                                         </menuItem>
+                                        <menuItem title="Reset Default Grammar Checks" tag="80" id="xUM-bO-mMw" userLabel="Reset Default Browser Prompt">
+                                            <modifierMask key="keyEquivalentModifierMask"/>
+                                            <connections>
+                                                <action selector="resetDefaultGrammarChecks:" target="Ady-hI-5gd" id="Ces-GX-TM5"/>
+                                            </connections>
+                                        </menuItem>
                                     </items>
                                 </menu>
                             </menuItem>
@@ -543,6 +549,8 @@ CQ
                             </menuItem>
                         </items>
                         <connections>
+                            <outlet property="checkGrammarWithSpellingMenuItem" destination="mK6-2p-4JG" id="hA4-qY-11q"/>
+                            <outlet property="checkSpellingWhileTypingMenuItem" destination="rbD-Rh-wIN" id="I0y-qO-6tE"/>
                             <outlet property="printMenuItem" destination="uFk-FD-FTB" id="mOP-Xp-myS"/>
                             <outlet property="printSeparatorItem" destination="anH-0y-7dE" id="E6b-rl-clQ"/>
                         </connections>

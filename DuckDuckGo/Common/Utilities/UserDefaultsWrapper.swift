@@ -35,6 +35,9 @@ public struct UserDefaultsWrapper<T> {
 
         case defaultBrowserDismissed = "browser.default.dismissed"
 
+        case spellingCheckEnabledOnce = "spelling.check.enabled.once"
+        case grammarCheckEnabledOnce = "grammar.check.enabled.once"
+
     }
 
     private let key: Key

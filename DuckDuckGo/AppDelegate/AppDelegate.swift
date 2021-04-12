@@ -33,6 +33,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
     private let keyStore = EncryptionKeyStore()
     private var fileStore: FileStore!
     private var stateRestorationManager: AppStateRestorationManager!
+    private var grammarCheckEnabler: GrammarCheckEnabler!
 
     var appUsageActivityMonitor: AppUsageActivityMonitor?
 
@@ -70,6 +71,9 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         if WindowsManager.windows.isEmpty {
             WindowsManager.openNewWindow()
         }
+
+        grammarCheckEnabler = GrammarCheckEnabler(windowControllersManager: WindowControllersManager.shared)
+        grammarCheckEnabler.enableIfNeeded()
 
         launchTimingPixel.fire()
 

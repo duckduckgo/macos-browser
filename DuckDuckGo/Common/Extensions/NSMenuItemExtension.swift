@@ -25,6 +25,11 @@ extension NSMenuItem {
         self.target = target
     }
 
+    convenience init(action selector: Selector?) {
+        self.init()
+        self.action = selector
+    }
+
     var topMenu: NSMenu? {
         var menuItem = self
         while let parent = menuItem.parent {

@@ -24,6 +24,8 @@ final class MainMenu: NSMenu {
 
     @IBOutlet weak var printSeparatorItem: NSMenuItem?
     @IBOutlet weak var printMenuItem: NSMenuItem?
+    @IBOutlet weak var checkSpellingWhileTypingMenuItem: NSMenuItem?
+    @IBOutlet weak var checkGrammarWithSpellingMenuItem: NSMenuItem?
 
     required init(coder: NSCoder) {
         super.init(coder: coder)
