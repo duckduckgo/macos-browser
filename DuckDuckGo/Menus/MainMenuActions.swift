@@ -273,6 +273,11 @@ extension MainViewController {
         UserDefaultsWrapper<Bool>.clear(.defaultBrowserDismissed)
     }
 
+    @IBAction func resetDefaultGrammarChecks(_ sender: Any?) {
+        UserDefaultsWrapper<Bool>.clear(.spellingCheckEnabledOnce)
+        UserDefaultsWrapper<Bool>.clear(.grammarCheckEnabledOnce)
+    }
+
 }
 
 extension MainViewController: FindInPageDelegate {

@@ -336,27 +336,27 @@
                                     </items>
                                 </menu>
                             </menuItem>
-                            <menuItem title="History" tag="4" id="sRV-6k-P2o">
+                            <menuItem title="History" id="sRV-6k-P2o">
                                 <modifierMask key="keyEquivalentModifierMask"/>
                                 <menu key="submenu" title="History" autoenablesItems="NO" id="yLz-zX-NKV">
                                     <items>
-                                        <menuItem title="Back" tag="40" enabled="NO" keyEquivalent="[" id="VWV-vB-Mtc">
+                                        <menuItem title="Back" enabled="NO" keyEquivalent="[" id="VWV-vB-Mtc">
                                             <connections>
                                                 <action selector="back:" target="Ady-hI-5gd" id="h04-cY-Ixk"/>
                                             </connections>
                                         </menuItem>
-                                        <menuItem title="Forward" tag="41" enabled="NO" keyEquivalent="]" id="Gbj-sV-aI3">
+                                        <menuItem title="Forward" enabled="NO" keyEquivalent="]" id="Gbj-sV-aI3">
                                             <connections>
                                                 <action selector="forward:" target="Ady-hI-5gd" id="eVr-CZ-DBf"/>
                                             </connections>
                                         </menuItem>
-                                        <menuItem title="Home" tag="42" keyEquivalent="H" id="FPm-eZ-BQ8">
+                                        <menuItem title="Home" keyEquivalent="H" id="FPm-eZ-BQ8">
                                             <connections>
                                                 <action selector="home:" target="Ady-hI-5gd" id="z3t-iv-FBh"/>
                                             </connections>
                                         </menuItem>
                                         <menuItem isSeparatorItem="YES" id="IJK-jz-3WO"/>
-                                        <menuItem title="Reopen Last Closed Tab" tag="44" enabled="NO" keyEquivalent="T" id="c3l-v1-kxk">
+                                        <menuItem title="Reopen Last Closed Tab" enabled="NO" keyEquivalent="T" id="c3l-v1-kxk">
                                             <connections>
                                                 <action selector="reopenLastClosedTab:" target="Ady-hI-5gd" id="jzQ-2q-HGB"/>
                                             </connections>
@@ -364,21 +364,21 @@
                                     </items>
                                 </menu>
                             </menuItem>
-                            <menuItem title="Bookmarks" tag="5" id="xf8-PW-TOA">
+                            <menuItem title="Bookmarks" id="xf8-PW-TOA">
                                 <modifierMask key="keyEquivalentModifierMask"/>
                                 <menu key="submenu" title="Bookmarks" autoenablesItems="NO" id="AGQ-XC-31O">
                                     <items>
-                                        <menuItem title="Bookmark this page..." tag="50" enabled="NO" keyEquivalent="d" id="Nkm-zy-JXD">
+                                        <menuItem title="Bookmark this page..." enabled="NO" keyEquivalent="d" id="Nkm-zy-JXD">
                                             <connections>
                                                 <action selector="bookmarkThisPage:" target="Ady-hI-5gd" id="Mah-44-bE1"/>
                                             </connections>
                                         </menuItem>
                                         <menuItem isSeparatorItem="YES" id="aPG-H0-BrG"/>
-                                        <menuItem title="Favorites" image="Favorite" tag="52" id="Y9I-ZC-gGg">
+                                        <menuItem title="Favorites" image="Favorite" id="Y9I-ZC-gGg">
                                             <modifierMask key="keyEquivalentModifierMask"/>
                                             <menu key="submenu" autoenablesItems="NO" id="Nxf-cs-uVD">
                                                 <items>
-                                                    <menuItem title="Favorite This Page..." image="Favorite" tag="520" enabled="NO" id="cHZ-Fb-aKU">
+                                                    <menuItem title="Favorite This Page..." image="Favorite" enabled="NO" id="cHZ-Fb-aKU">
                                                         <modifierMask key="keyEquivalentModifierMask"/>
                                                         <connections>
                                                             <action selector="favoriteThisPage:" target="Ady-hI-5gd" id="wPO-TZ-mVB"/>
@@ -395,7 +395,7 @@
                                     </items>
                                 </menu>
                             </menuItem>
-                            <menuItem title="Window" tag="5" id="aUF-d1-5bR">
+                            <menuItem title="Window" id="aUF-d1-5bR">
                                 <modifierMask key="keyEquivalentModifierMask"/>
                                 <menu key="submenu" title="Window" systemMenu="window" id="Td7-aD-5lo">
                                     <items>
@@ -509,14 +509,20 @@ CQ
                                     </items>
                                 </menu>
                             </menuItem>
-                            <menuItem title="Debug" tag="8" id="ilv-5f-YpZ" userLabel="Debug">
+                            <menuItem title="Debug" id="ilv-5f-YpZ" userLabel="Debug">
                                 <modifierMask key="keyEquivalentModifierMask"/>
                                 <menu key="submenu" title="Debug" systemMenu="help" autoenablesItems="NO" id="y0w-AM-Bho">
                                     <items>
-                                        <menuItem title="Reset Default Browser Prompt" tag="80" id="3Ve-bg-l5b" userLabel="Reset Default Browser Prompt">
+                                        <menuItem title="Reset Default Browser Prompt" id="3Ve-bg-l5b" userLabel="Reset Default Browser Prompt">
                                             <modifierMask key="keyEquivalentModifierMask"/>
                                             <connections>
                                                 <action selector="resetDefaultBrowserPrompt:" target="Ady-hI-5gd" id="Esm-iy-0kW"/>
+                                            </connections>
+                                        </menuItem>
+                                        <menuItem title="Reset Default Grammar Checks" id="xUM-bO-mMw" userLabel="Reset Default Browser Prompt">
+                                            <modifierMask key="keyEquivalentModifierMask"/>
+                                            <connections>
+                                                <action selector="resetDefaultGrammarChecks:" target="Ady-hI-5gd" id="Ces-GX-TM5"/>
                                             </connections>
                                         </menuItem>
                                     </items>
@@ -531,8 +537,8 @@ CQ
                                                 <action selector="showHelp:" target="Ady-hI-5gd" id="y7X-2Q-9no"/>
                                             </connections>
                                         </menuItem>
-                                        <menuItem isSeparatorItem="YES" tag="71" id="ESk-wA-tC4"/>
-                                        <menuItem title="Send Feedback" tag="72" id="V8t-Ts-q0L">
+                                        <menuItem isSeparatorItem="YES" id="ESk-wA-tC4"/>
+                                        <menuItem title="Send Feedback" id="V8t-Ts-q0L">
                                             <modifierMask key="keyEquivalentModifierMask"/>
                                             <connections>
                                                 <action selector="openFeedback:" target="Ady-hI-5gd" id="FWM-NE-Ftt"/>
@@ -543,8 +549,22 @@ CQ
                             </menuItem>
                         </items>
                         <connections>
+                            <outlet property="backMenuItem" destination="VWV-vB-Mtc" id="Keo-4E-dRW"/>
+                            <outlet property="bookmarkThisPageMenuItem" destination="Nkm-zy-JXD" id="HVV-JT-gvV"/>
+                            <outlet property="bookmarksMenuItem" destination="xf8-PW-TOA" id="Pfa-kN-nIj"/>
+                            <outlet property="checkGrammarWithSpellingMenuItem" destination="mK6-2p-4JG" id="hA4-qY-11q"/>
+                            <outlet property="checkSpellingWhileTypingMenuItem" destination="rbD-Rh-wIN" id="I0y-qO-6tE"/>
+                            <outlet property="debugMenuItem" destination="ilv-5f-YpZ" id="4F7-9b-Mve"/>
+                            <outlet property="favoriteThisPageMenuItem" destination="cHZ-Fb-aKU" id="uPM-LY-AmL"/>
+                            <outlet property="favoritesMenuItem" destination="Y9I-ZC-gGg" id="zk1-XL-x3e"/>
+                            <outlet property="forwardMenuItem" destination="Gbj-sV-aI3" id="54P-Ym-Ic2"/>
+                            <outlet property="helpMenuItem" destination="wpr-3q-Mcd" id="PSe-Hj-hck"/>
+                            <outlet property="helpSeparatorMenuItem" destination="ESk-wA-tC4" id="XV6-OM-YLi"/>
+                            <outlet property="homeMenuItem" destination="FPm-eZ-BQ8" id="Taj-EN-6R8"/>
                             <outlet property="printMenuItem" destination="uFk-FD-FTB" id="mOP-Xp-myS"/>
                             <outlet property="printSeparatorItem" destination="anH-0y-7dE" id="E6b-rl-clQ"/>
+                            <outlet property="reopenLastClosedTabMenuItem" destination="c3l-v1-kxk" id="eGw-Dg-del"/>
+                            <outlet property="sendFeedbackMenuItem" destination="V8t-Ts-q0L" id="qwz-Oh-HGm"/>
                         </connections>
                     </menu>
                     <connections>

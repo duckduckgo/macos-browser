@@ -25,75 +25,29 @@ final class MainMenu: NSMenu {
     @IBOutlet weak var printSeparatorItem: NSMenuItem?
     @IBOutlet weak var printMenuItem: NSMenuItem?
 
+    @IBOutlet weak var checkSpellingWhileTypingMenuItem: NSMenuItem?
+    @IBOutlet weak var checkGrammarWithSpellingMenuItem: NSMenuItem?
+
+    @IBOutlet weak var backMenuItem: NSMenuItem?
+    @IBOutlet weak var forwardMenuItem: NSMenuItem?
+    @IBOutlet weak var homeMenuItem: NSMenuItem?
+    @IBOutlet weak var reopenLastClosedTabMenuItem: NSMenuItem?
+
+    @IBOutlet weak var bookmarksMenuItem: NSMenuItem?
+    @IBOutlet weak var bookmarkThisPageMenuItem: NSMenuItem?
+    @IBOutlet weak var favoritesMenuItem: NSMenuItem?
+    @IBOutlet weak var favoriteThisPageMenuItem: NSMenuItem?
+
+    @IBOutlet weak var debugMenuItem: NSMenuItem?
+
+    @IBOutlet weak var helpMenuItem: NSMenuItem?
+    @IBOutlet weak var helpSeparatorMenuItem: NSMenuItem?
+    @IBOutlet weak var sendFeedbackMenuItem: NSMenuItem?
+
     required init(coder: NSCoder) {
         super.init(coder: coder)
 
         setup()
-    }
-
-    enum Tag: Int {
-        case history = 4
-        case back = 40
-        case forward = 41
-        case home = 42
-        case reopenLastClosedTab = 44
-        case bookmarks = 5
-        case bookmarkThisPage = 50
-        case favorites = 52
-        case favoriteThisPage = 520
-        case help = 7
-        case helpSeparator = 71
-        case sendFeedback = 72
-        case debug = 8
-        case debugResetDefaultBrowserPrompt = 80
-    }
-
-    var backMenuItem: NSMenuItem? {
-        return item(withTag: Tag.history.rawValue)?.submenu?.item(withTag: Tag.back.rawValue)
-    }
-
-    var forwardMenuItem: NSMenuItem? {
-        return item(withTag: Tag.history.rawValue)?.submenu?.item(withTag: Tag.forward.rawValue)
-    }
-
-    var homeMenuItem: NSMenuItem? {
-        return item(withTag: Tag.history.rawValue)?.submenu?.item(withTag: Tag.home.rawValue)
-    }
-
-    var reopenLastClosedTabMenuItem: NSMenuItem? {
-        return item(withTag: Tag.history.rawValue)?.submenu?.item(withTag: Tag.reopenLastClosedTab.rawValue)
-    }
-
-    var bookmarksMenuItem: NSMenuItem? {
-        item(withTag: Tag.bookmarks.rawValue)
-    }
-
-    var bookmarkThisPageMenuItem: NSMenuItem? {
-        bookmarksMenuItem?.submenu?.item(withTag: Tag.bookmarkThisPage.rawValue)
-    }
-
-    var favoritesMenuItem: NSMenuItem? {
-        bookmarksMenuItem?.submenu?.item(withTag: Tag.favorites.rawValue)
-    }
-
-    var favoriteThisPageMenuItem: NSMenuItem? {
-        favoritesMenuItem?.submenu?.item(withTag: Tag.favoriteThisPage.rawValue)
-    }
-
-    var helpMenuItem: NSMenuItem? {
-        return item(withTag: Tag.help.rawValue)
-    }
-
-    var helpSeparatorMenuItem: NSMenuItem? {
-        helpMenuItem?.submenu?.item(withTag: Tag.helpSeparator.rawValue)
-    }
-
-    var sendFeedbackMenuItem: NSMenuItem? {
-        helpMenuItem?.submenu?.item(withTag: Tag.sendFeedback.rawValue)
-    }
-
-    var debugMenuItem: NSMenuItem? {
-        item(withTag: Tag.debug.rawValue)
     }
   
     override func update() {

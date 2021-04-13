@@ -184,7 +184,7 @@ final class BookmarksSubMenu: NSMenu {
     }
 
     convenience init() {
-        let bookmarksMenu = NSApplication.shared.mainMenuTyped?.bookmarksMenuItem?.submenu
+        let bookmarksMenu = NSApplication.shared.mainMenuTyped.bookmarksMenuItem?.submenu
 
         self.init(menu: bookmarksMenu)
     }
