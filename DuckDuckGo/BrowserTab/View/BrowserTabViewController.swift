@@ -34,6 +34,8 @@ final class BrowserTabViewController: NSViewController {
     private var urlCancellable: AnyCancellable?
     private var selectedTabViewModelCancellable: AnyCancellable?
     private var isErrorViewVisibleCancellable: AnyCancellable?
+
+    private var contextMenuExpected = false
     private var contextMenuLink: URL?
     private var contextMenuImage: URL?
 
@@ -254,6 +256,7 @@ extension BrowserTabViewController: TabDelegate {
     func tab(_ tab: Tab, willShowContextMenuAt position: NSPoint, image: URL?, link: URL?) {
         contextMenuImage = image
         contextMenuLink = link
+        contextMenuExpected = true
     }
 
     func tab(_ tab: Tab, detectedLogin host: String) {
@@ -271,6 +274,20 @@ extension BrowserTabViewController: TabDelegate {
         }
 
         Pixel.fire(.fireproofSuggested())
+    }
+
+}
+
+extension BrowserTabViewController: NSMenuDelegate {
+
+    func menuWillOpen(_ menu: NSMenu) {
+        guard contextMenuExpected else {
+            os_log("%s: Unexpected menuWillOpen", type: .error, className)
+            contextMenuLink = nil
+            contextMenuImage = nil
+            return
+        }
+        contextMenuExpected = false
     }
 
 }
