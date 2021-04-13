@@ -63,6 +63,8 @@ final class WebView: WKWebView {
                                                 target: uiDelegate,
                                                 selector: #selector(ImageMenuItemSelectors.copyImageAddress(_:)))
 
+        // calling .menuWillOpen here manually as it's already calling the latter Menu Owner's willOpenMenu at this point
+        (uiDelegate as? NSMenuDelegate)?.menuWillOpen?(menu)
     }
 
     private func updateActionsAndTitles(_ items: [NSMenuItem]) {
