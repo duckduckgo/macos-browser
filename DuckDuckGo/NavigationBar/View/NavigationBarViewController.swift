@@ -120,6 +120,8 @@ final class NavigationBarViewController: NSViewController {
                 Pixel.fire(.moreMenu(result: .fireproof))
             case .moveTabToNewWindow:
                 Pixel.fire(.moreMenu(result: .moveTabToNewWindow))
+            case .preferences:
+                Pixel.fire(.moreMenu(result: .preferences))
             case .none:
                 Pixel.fire(.moreMenu(result: .cancelled))
 

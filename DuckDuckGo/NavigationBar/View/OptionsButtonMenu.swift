@@ -39,6 +39,8 @@ final class OptionsButtonMenu: NSMenu {
         case bookmarkThisPage
         case favoriteThisPage
         case navigateToBookmark
+
+        case preferences
     }
     fileprivate(set) var result: Result?
 
@@ -169,6 +171,8 @@ final class OptionsButtonMenu: NSMenu {
             self.result = .feedback
         case #selector(toggleFireproofing(_:)):
             self.result = .fireproof
+        case #selector(openPreferences(_:)):
+            self.result = .preferences
         case .none:
             break
         default:

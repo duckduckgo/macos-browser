@@ -292,6 +292,7 @@ extension Pixel.Event {
         case bookmark = "bookmark"
         case emailProtection = "email-protection"
         case fireproof = "fireproof"
+        case preferences = "preferences"
     }
 
     enum RefreshAccessPoint: String, CustomStringConvertible {
