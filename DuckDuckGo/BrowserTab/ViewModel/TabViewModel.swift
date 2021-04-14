@@ -135,6 +135,11 @@ final class TabViewModel {
             return
         }
 
+        if tab.tabType == .preferences {
+            title = UserText.tabPreferencesTitle
+            return
+        }
+
         if tab.isHomepageShown {
             title = UserText.tabHomeTitle
             return
@@ -156,6 +161,13 @@ final class TabViewModel {
         if tab.isHomepageShown {
             favicon = Favicon.home
             return
+        }
+
+        switch tab.tabType {
+        case .preferences:
+            favicon = Favicon.preferences
+            return
+        case .standard: break
         }
 
         if let favicon = tab.favicon {

@@ -35,6 +35,7 @@ struct UserText {
     static let openInNewWindow = NSLocalizedString("open.in.new.window", value: "Open in New Window", comment: "Menu item that opens the link in a new window")
 
     static let tabHomeTitle = NSLocalizedString("tab.home.title", value: "Home", comment: "Tab home title")
+    static let tabPreferencesTitle = NSLocalizedString("tab.preferences.title", value: "Preferences", comment: "Tab preferences title")
     static let tabErrorTitle = NSLocalizedString("tab.error.title", value: "Oops!", comment: "Tab error title")
 
     static let moveTabToNewWindow = NSLocalizedString("options.menu.move.tab.to.new.window",

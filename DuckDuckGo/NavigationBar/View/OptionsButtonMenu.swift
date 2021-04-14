@@ -116,6 +116,11 @@ final class OptionsButtonMenu: NSMenu {
 
              addItem(NSMenuItem.separator())
          }
+
+        let preferencesItem = NSMenuItem(title: UserText.preferences, action: #selector(openPreferences(_:)), keyEquivalent: "")
+        preferencesItem.target = self
+        preferencesItem.image = NSImage(named: "Preferences")
+        addItem(preferencesItem)
     }
     
     private func updateBookmarks() {
@@ -141,6 +146,10 @@ final class OptionsButtonMenu: NSMenu {
         }
         
         selectedTabViewModel.tab.requestFireproofToggle()
+    }
+
+    @objc func openPreferences(_ sender: NSMenuItem) {
+        WindowControllersManager.shared.showPreferencesTab()
     }
 
     override func performActionForItem(at index: Int) {

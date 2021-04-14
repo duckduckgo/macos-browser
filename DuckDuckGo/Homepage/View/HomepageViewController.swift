@@ -119,7 +119,7 @@ final class HomepageViewController: NSViewController {
 
     @objc
     private func displayDefaultBrowserPromptIfNeeded() {
-        defaultBrowserPromptView.isHidden = Browser.isDefault || defaultBrowserPromptDismissed
+        defaultBrowserPromptView.isHidden = DefaultBrowserPreferences.isDefault || defaultBrowserPromptDismissed
     }
 
     private func subscribeToBookmarkList() {
@@ -191,7 +191,7 @@ extension HomepageViewController: DefaultBrowserPromptViewDelegate {
     }
 
     func defaultBrowserPromptViewRequestedDefaultBrowserPrompt(_ view: DefaultBrowserPromptView) {
-        Browser.becomeDefault()
+        DefaultBrowserPreferences.becomeDefault()
         displayDefaultBrowserPromptIfNeeded()
         Pixel.fire(.browserMadeDefault)
     }

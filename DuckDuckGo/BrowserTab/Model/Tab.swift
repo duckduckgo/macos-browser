@@ -37,9 +37,20 @@ protocol TabDelegate: class {
 
 final class Tab: NSObject {
 
+    enum TabType: Int {
+        case standard = 0
+        case preferences = 1
+
+        static func rawValue(_ type: Int?) -> TabType {
+            let tabType = type ?? TabType.standard.rawValue
+            return TabType(rawValue: tabType) ?? .standard
+        }
+    }
+
     weak var delegate: TabDelegate?
 
-    init(faviconService: FaviconService = LocalFaviconService.shared,
+    init(tabType: TabType = .standard,
+         faviconService: FaviconService = LocalFaviconService.shared,
          webCacheManager: WebCacheManager = .shared,
          webViewConfiguration: WebViewConfiguration? = nil,
          url: URL? = nil,
@@ -49,6 +60,7 @@ final class Tab: NSObject {
          sessionStateData: Data? = nil,
          shouldLoadInBackground: Bool = false) {
 
+        self.tabType = tabType
         self.faviconService = faviconService
 
         self.url = url
@@ -83,6 +95,7 @@ final class Tab: NSObject {
         userScripts?.remove(from: webView.configuration.userContentController)
     }
 
+    let tabType: TabType
     let webView: WebView
 	var userEnteredUrl = true
 

@@ -53,7 +53,7 @@ extension Pixel.Event {
         }
 
         init() {
-            self.init(isDefault: Browser.isDefault)
+            self.init(isDefault: DefaultBrowserPreferences.isDefault)
         }
     }
 
