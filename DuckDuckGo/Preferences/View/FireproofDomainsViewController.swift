@@ -36,19 +36,10 @@ final class FireproofDomainsViewController: NSViewController {
 
     private var fireproofDomains = [String]()
 
-    override func viewWillAppear() {
-        super.viewWillAppear()
-        applyModalWindowStyle()
+    override func viewDidLoad() {
+        super.viewDidLoad()
+        applyModalWindowStyleIfNeeded()
         reloadData()
-    }
-
-    private func applyModalWindowStyle() {
-        self.view.window?.titleVisibility = .hidden
-        self.view.window?.titlebarAppearsTransparent = true
-        self.view.window?.standardWindowButton(.zoomButton)?.isHidden = true
-        self.view.window?.standardWindowButton(.closeButton)?.isHidden = true
-        self.view.window?.standardWindowButton(.miniaturizeButton)?.isHidden = true
-        self.view.window?.styleMask = [.resizable, .titled, .fullSizeContentView]
     }
 
     private func updateRemoveButtonState() {
@@ -65,7 +56,7 @@ final class FireproofDomainsViewController: NSViewController {
     }
 
     @IBAction func doneButtonClicked(_ sender: NSButton) {
-        presentingViewController?.dismiss(self)
+        dismiss()
     }
 
     @IBAction func removeSelectedDomain(_ sender: NSButton) {

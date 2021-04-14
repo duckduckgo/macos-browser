@@ -153,7 +153,7 @@ extension PreferencesListViewController: PrivacySecurityPreferencesTableCellView
 
     func privacySecurityPreferencesTableCellViewRequestedFireproofManagementModal(_ cell: PrivacySecurityPreferencesTableCellView) {
         let viewController = FireproofDomainsViewController.create()
-        presentAsModalWindow(viewController)
+        beginSheet(viewController)
     }
 
 }
