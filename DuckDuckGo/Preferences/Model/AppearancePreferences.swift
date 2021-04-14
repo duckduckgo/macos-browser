@@ -24,18 +24,10 @@ enum ThemeName: String {
     case dark
 }
 
-struct AppearancePreferences: Preference {
+struct AppearancePreferences {
 
     private struct Keys {
         static let currentThemeNameKey = "com.duckduckgo.macos.currentThemeNameKey"
-    }
-
-    var displayName: String {
-        return "Appearance"
-    }
-
-    var preferenceIcon: NSImage {
-        return NSImage(named: "Appearance")!
     }
 
     var currentThemeName: ThemeName {
@@ -72,6 +64,18 @@ struct AppearancePreferences: Preference {
         default:
             NSApp.appearance = nil
         }
+    }
+
+}
+
+extension AppearancePreferences: Preference {
+
+    var displayName: String {
+        return "Appearance"
+    }
+
+    var preferenceIcon: NSImage {
+        return NSImage(named: "Appearance")!
     }
 
 }
