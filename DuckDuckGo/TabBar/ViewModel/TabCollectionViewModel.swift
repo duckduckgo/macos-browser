@@ -43,10 +43,17 @@ final class TabCollectionViewModel: NSObject {
     @Published private(set) var selectionIndex: Int? {
         didSet {
             updateSelectedTabViewModel()
+
+            shouldPersistPreviousSelection = false
+            previousSelectionIndex = oldValue
         }
     }
     @Published private(set) var selectedTabViewModel: TabViewModel?
     @Published private(set) var canInsertLastRemovedTab: Bool = false
+
+    // In a special occasion, we want to return back to the "parent" tab after closing the currently selected tab
+    private var previousSelectionIndex: Int?
+    private var shouldPersistPreviousSelection = false
 
     private var cancellables = Set<AnyCancellable>()
 
@@ -149,7 +156,7 @@ final class TabCollectionViewModel: NSObject {
         delegate?.tabCollectionViewModel(self, didInsertAndSelectAt: newIndex)
     }
 
-    func append(tab: Tab, selected: Bool = true) {
+    func append(tab: Tab, selected: Bool = true, shouldPersistPreviousSelection: Bool = false) {
         guard let selectionIndex = self.selectionIndex else {
             os_log("TabCollectionViewModel: No tab selected", type: .error)
             return
@@ -163,6 +170,8 @@ final class TabCollectionViewModel: NSObject {
             select(at: selectionIndex)
             delegate?.tabCollectionViewModelDidAppend(self, selected: false)
         }
+
+        self.shouldPersistPreviousSelection = shouldPersistPreviousSelection
     }
 
     func append(tabs: [Tab]) {
@@ -201,7 +210,9 @@ final class TabCollectionViewModel: NSObject {
         }
 
         let newSelectionIndex: Int
-        if selectionIndex > index {
+        if shouldPersistPreviousSelection, let previousSelectionIndex = previousSelectionIndex {
+            newSelectionIndex = previousSelectionIndex
+        } else if selectionIndex > index {
             newSelectionIndex = max(selectionIndex - 1, 0)
         } else {
             newSelectionIndex = max(min(selectionIndex, tabCollection.tabs.count - 1), 0)

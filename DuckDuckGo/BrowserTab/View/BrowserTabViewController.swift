@@ -183,7 +183,7 @@ final class BrowserTabViewController: NSViewController {
 
     private func openNewTab(with url: URL?, selected: Bool = false) {
         let tab = Tab(url: url, shouldLoadInBackground: true)
-        tabCollectionViewModel.append(tab: tab, selected: selected)
+        tabCollectionViewModel.append(tab: tab, selected: selected, shouldPersistPreviousSelection: selected)
     }
 
 }
