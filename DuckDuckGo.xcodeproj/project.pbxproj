@@ -53,6 +53,7 @@
 		4B54CE6226269E3200CBA7B3 /* DownloadPreferencesTableCellView.xib in Resources */ = {isa = PBXBuildFile; fileRef = 4B54CE4D26269E3200CBA7B3 /* DownloadPreferencesTableCellView.xib */; };
 		4B54CE6326269E3200CBA7B3 /* AppearancePreferencesTableCellView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B54CE4E26269E3200CBA7B3 /* AppearancePreferencesTableCellView.swift */; };
 		4B54CE6426269E3200CBA7B3 /* AppearancePreferencesTableCellView.xib in Resources */ = {isa = PBXBuildFile; fileRef = 4B54CE4F26269E3200CBA7B3 /* AppearancePreferencesTableCellView.xib */; };
+		4B54CE6C26269F8800CBA7B3 /* RoundedSelectionRowView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B54CE6B26269F8800CBA7B3 /* RoundedSelectionRowView.swift */; };
 		4B6160D825B150E4007DE5B2 /* trackerData.json in Resources */ = {isa = PBXBuildFile; fileRef = 4B6160D725B150E4007DE5B2 /* trackerData.json */; };
 		4B6160DD25B152C5007DE5B2 /* ContentBlockerRulesUserScript.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B6160DC25B152C5007DE5B2 /* ContentBlockerRulesUserScript.swift */; };
 		4B6160E525B152FA007DE5B2 /* ContentBlockerUserScript.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B6160E425B152FA007DE5B2 /* ContentBlockerUserScript.swift */; };
@@ -362,6 +363,7 @@
 		4B54CE4D26269E3200CBA7B3 /* DownloadPreferencesTableCellView.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = DownloadPreferencesTableCellView.xib; sourceTree = "<group>"; };
 		4B54CE4E26269E3200CBA7B3 /* AppearancePreferencesTableCellView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AppearancePreferencesTableCellView.swift; sourceTree = "<group>"; };
 		4B54CE4F26269E3200CBA7B3 /* AppearancePreferencesTableCellView.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = AppearancePreferencesTableCellView.xib; sourceTree = "<group>"; };
+		4B54CE6B26269F8800CBA7B3 /* RoundedSelectionRowView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = RoundedSelectionRowView.swift; sourceTree = "<group>"; };
 		4B6160D225B14E6E007DE5B2 /* TrackerRadarManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TrackerRadarManager.swift; sourceTree = "<group>"; };
 		4B6160D725B150E4007DE5B2 /* trackerData.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; path = trackerData.json; sourceTree = "<group>"; };
 		4B6160DC25B152C5007DE5B2 /* ContentBlockerRulesUserScript.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentBlockerRulesUserScript.swift; sourceTree = "<group>"; };
@@ -752,6 +754,7 @@
 		4B54CE4026269E3200CBA7B3 /* View */ = {
 			isa = PBXGroup;
 			children = (
+				4B54CE6B26269F8800CBA7B3 /* RoundedSelectionRowView.swift */,
 				4B54CE4126269E3200CBA7B3 /* PrivacySecurityPreferencesTableCellView.xib */,
 				4B54CE4226269E3200CBA7B3 /* PreferencesAboutViewController.swift */,
 				4B54CE4326269E3200CBA7B3 /* Preferences.storyboard */,
@@ -2086,6 +2089,7 @@
 				85AC3B0525D6B1D800C7D2AA /* ScriptSourceProviding.swift in Sources */,
 				4B02198E25E05FAC00ED7DEA /* LoginDetectionService.swift in Sources */,
 				4B54CE5C26269E3200CBA7B3 /* PreferenceTableCellView.swift in Sources */,
+				4B54CE6C26269F8800CBA7B3 /* RoundedSelectionRowView.swift in Sources */,
 				AA3F895324C18AD500628DDE /* SuggestionViewModel.swift in Sources */,
 				4B677431255DBEB800025BD8 /* BloomFilterWrapper.mm in Sources */,
 				B684592725C93C0500DC17B6 /* Publishers.NestedObjectChanges.swift in Sources */,

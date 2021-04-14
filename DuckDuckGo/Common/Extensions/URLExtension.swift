@@ -146,6 +146,10 @@ extension URL {
         duckDuckGo.appendingPathComponent("ac/")
     }
 
+    static var aboutDuckDuckGo: URL {
+        return URL(string: "https://duckduckgo.com/about")!
+    }
+
     static var duckDuckGoEmail = URL(string: "https://quack.duckduckgo.com/email/dashboard")!
 
     static var duckDuckGoMorePrivacyInfo = URL(string: "https://help.duckduckgo.com/duckduckgo-help-pages/privacy/atb/")!
