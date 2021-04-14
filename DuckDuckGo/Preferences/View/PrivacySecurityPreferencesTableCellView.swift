@@ -21,6 +21,7 @@ import Foundation
 protocol PrivacySecurityPreferencesTableCellViewDelegate: class {
 
     func privacySecurityPreferencesTableCellViewRequestedFireproofManagementModal(_ cell: PrivacySecurityPreferencesTableCellView)
+    func privacySecurityPreferencesTableCellView(_ cell: PrivacySecurityPreferencesTableCellView, setLoginDetectionEnabled: Bool)
 
 }
 
@@ -32,10 +33,21 @@ final class PrivacySecurityPreferencesTableCellView: NSTableCellView {
         return NSNib(nibNamed: "PrivacySecurityPreferencesTableCellView", bundle: Bundle.main)!
     }
 
+    @IBOutlet var loginDetectionCheckbox: NSButton!
+
     weak var delegate: PrivacySecurityPreferencesTableCellViewDelegate?
+
+    func update(loginDetectionEnabled: Bool) {
+        loginDetectionCheckbox.state = loginDetectionEnabled ? .on : .off
+    }
 
     @IBAction func manageFireproofWebsitesButtonClicked(_ sender: NSButton) {
         delegate?.privacySecurityPreferencesTableCellViewRequestedFireproofManagementModal(self)
+    }
+
+    @IBAction func toggledLoginDetectionCheckbox(_ sender: NSButton) {
+        let loginDetectionEnabled = loginDetectionCheckbox.state == .on
+        delegate?.privacySecurityPreferencesTableCellView(self, setLoginDetectionEnabled: loginDetectionEnabled)
     }
 
 }

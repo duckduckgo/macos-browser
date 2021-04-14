@@ -27,6 +27,9 @@
                         <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
                         <font key="font" metaFont="system"/>
                     </buttonCell>
+                    <connections>
+                        <action selector="toggledLoginDetectionCheckbox:" target="ZOv-mQ-BdW" id="Edx-4D-gM7"/>
+                    </connections>
                 </button>
                 <button verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="3Oj-RS-EIB">
                     <rect key="frame" x="-6" y="13" width="211" height="32"/>
@@ -70,6 +73,9 @@
                 <constraint firstAttribute="trailing" secondItem="1Hn-nJ-bFt" secondAttribute="trailing" constant="20" symbolic="YES" id="r4a-mD-LWN"/>
                 <constraint firstItem="Fd2-fn-gaX" firstAttribute="top" secondItem="4U5-6s-Y6q" secondAttribute="bottom" constant="12" id="ycV-8V-FW2"/>
             </constraints>
+            <connections>
+                <outlet property="loginDetectionCheckbox" destination="Fd2-fn-gaX" id="7R3-cm-RFP"/>
+            </connections>
             <point key="canvasLocation" x="-481" y="223"/>
         </tableCellView>
     </objects>

@@ -38,6 +38,8 @@ public struct UserDefaultsWrapper<T> {
         case spellingCheckEnabledOnce = "spelling.check.enabled.once"
         case grammarCheckEnabledOnce = "grammar.check.enabled.once"
 
+        case loginDetectionEnabled = "fireproofing.login-detection-enabled"
+
     }
 
     private let key: Key

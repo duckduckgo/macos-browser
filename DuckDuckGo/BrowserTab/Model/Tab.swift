@@ -77,9 +77,13 @@ final class Tab: NSObject {
         super.init()
 
         self.loginDetectionService = LoginDetectionService { [weak self] host in
-             guard let self = self else { return }
-             self.delegate?.tab(self, detectedLogin: host)
-         }
+            guard let self = self else { return }
+
+            let preferences = PrivacySecurityPreferences()
+            if preferences.loginDetectionEnabled {
+                self.delegate?.tab(self, detectedLogin: host)
+            }
+        }
 
         setupWebView(shouldLoadInBackground: shouldLoadInBackground)
 
