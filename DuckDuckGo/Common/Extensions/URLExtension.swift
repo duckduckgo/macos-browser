@@ -209,11 +209,9 @@ extension URL {
             return file
         }
 
-        let fm = FileManager.default
-        let folders = fm.urls(for: .downloadsDirectory, in: .userDomainMask)
-        guard let folderUrl = folders.first,
-              let resolvedFolderUrl = try? URL(resolvingAliasFileAt: folderUrl),
-              fm.isWritableFile(atPath: resolvedFolderUrl.path) else {
+        let preferences = DownloadPreferences()
+
+        guard let folderUrl = preferences.selectedDownloadLocation else {
             os_log("Failed to access Downloads folder")
             Pixel.fire(.debug(event: .fileMoveToDownloadsFailed, error: CocoaError(.fileWriteUnknown)))
             return nil
@@ -224,7 +222,7 @@ extension URL {
 
             let fileInDownloads = incrementFileName(in: folderUrl, named: fileName, copy: copy)
             do {
-                try fm.moveItem(at: self, to: fileInDownloads)
+                try FileManager.default.moveItem(at: self, to: fileInDownloads)
                 return fileInDownloads.path
             } catch CocoaError.fileWriteFileExists {
                 // This is expected, as moveItem throws an error if the file already exists

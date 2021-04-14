@@ -120,6 +120,10 @@ extension PreferencesListViewController: NSTableViewDataSource, NSTableViewDeleg
         }
     }
 
+    func selectionShouldChange(in tableView: NSTableView) -> Bool {
+        return false
+    }
+
     private func createCell<CellType>(withIdentifier identifier: NSUserInterfaceItemIdentifier, tableView: NSTableView) -> CellType? {
         if let view = tableView.makeView(withIdentifier: identifier, owner: self) as? CellType {
             return view
