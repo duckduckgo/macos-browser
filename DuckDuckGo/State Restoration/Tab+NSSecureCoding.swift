@@ -32,11 +32,11 @@ extension Tab: NSSecureCoding {
     static var supportsSecureCoding: Bool { true }
 
     convenience init?(coder decoder: NSCoder) {
-        self.init(url: decoder.decodeIfPresent(at: NSCodingKeys.url),
+        self.init(tabType: TabType.rawValue(decoder.decodeIfPresent(at: NSCodingKeys.tabType)),
+                  url: decoder.decodeIfPresent(at: NSCodingKeys.url),
                   title: decoder.decodeIfPresent(at: NSCodingKeys.title),
                   favicon: decoder.decodeIfPresent(at: NSCodingKeys.favicon),
-                  sessionStateData: decoder.decodeIfPresent(at: NSCodingKeys.sessionStateData),
-                  tabType: TabType.rawValue(decoder.decodeIfPresent(at: NSCodingKeys.tabType)))
+                  sessionStateData: decoder.decodeIfPresent(at: NSCodingKeys.sessionStateData))
     }
 
     func encode(with coder: NSCoder) {
