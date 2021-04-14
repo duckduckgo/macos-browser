@@ -142,7 +142,7 @@ extension PreferencesListViewController: DownloadPreferencesTableCellViewDelegat
 
         let result = panel.runModal()
         if result == .OK, let selectedURL = panel.url {
-            downloadPreferences.select(downloadLocationURL: selectedURL)
+            downloadPreferences.select(downloadLocation: selectedURL)
             preferencesTableView.reloadData()
         }
     }

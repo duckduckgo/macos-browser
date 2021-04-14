@@ -21,17 +21,15 @@ import Foundation
 struct DownloadPreferences {
 
     private struct Keys {
-        static let selectedDownloadLocationKey = "com.duckduckgo.macos.selectedDownloadLocation"
+        static let selectedDownloadLocationKey = "preferences.download-location"
     }
 
     var selectedDownloadLocation: URL? {
-        var location: URL?
-
         if let selectedLocation = userDefaults.string(forKey: Keys.selectedDownloadLocationKey) {
-            location = URL(string: selectedLocation)
+             return URL(string: selectedLocation)
+        } else {
+            return defaultDownloadLocation()
         }
-
-        return location ?? defaultDownloadLocation()
     }
 
     private let userDefaults: UserDefaults
@@ -40,17 +38,17 @@ struct DownloadPreferences {
         self.userDefaults = userDefaults
     }
 
-    func select(downloadLocationURL: URL) {
-        select(downloadLocation: downloadLocationURL.absoluteString)
+    func select(downloadLocation: URL) {
+        select(downloadLocation: downloadLocation.absoluteString)
     }
 
-    func select(downloadLocation: String) {
+    private func select(downloadLocation: String) {
         if pathIsValid(downloadLocation) {
             userDefaults.setValue(downloadLocation, forKey: Keys.selectedDownloadLocationKey)
         }
     }
 
-    func pathIsValid(_ directoryUrl: String) -> Bool {
+    private func pathIsValid(_ directoryUrl: String) -> Bool {
         let fileManager = FileManager.default
         guard let directoryURL = URL(string: directoryUrl),
               let resolvedURL = try? URL(resolvingAliasFileAt: directoryURL) else { return false }
