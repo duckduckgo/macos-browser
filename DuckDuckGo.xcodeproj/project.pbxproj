@@ -37,7 +37,6 @@
 		4B54CE5226269E3200CBA7B3 /* PrivacySecurityPreferences.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B54CE3C26269E3200CBA7B3 /* PrivacySecurityPreferences.swift */; };
 		4B54CE5326269E3200CBA7B3 /* DownloadPreferences.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B54CE3D26269E3200CBA7B3 /* DownloadPreferences.swift */; };
 		4B54CE5426269E3200CBA7B3 /* PreferenceSections.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B54CE3E26269E3200CBA7B3 /* PreferenceSections.swift */; };
-		4B54CE5526269E3200CBA7B3 /* Preference.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B54CE3F26269E3200CBA7B3 /* Preference.swift */; };
 		4B54CE5626269E3200CBA7B3 /* PrivacySecurityPreferencesTableCellView.xib in Resources */ = {isa = PBXBuildFile; fileRef = 4B54CE4126269E3200CBA7B3 /* PrivacySecurityPreferencesTableCellView.xib */; };
 		4B54CE5726269E3200CBA7B3 /* PreferencesAboutViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B54CE4226269E3200CBA7B3 /* PreferencesAboutViewController.swift */; };
 		4B54CE5826269E3200CBA7B3 /* Preferences.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 4B54CE4326269E3200CBA7B3 /* Preferences.storyboard */; };
@@ -347,7 +346,6 @@
 		4B54CE3C26269E3200CBA7B3 /* PrivacySecurityPreferences.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = PrivacySecurityPreferences.swift; sourceTree = "<group>"; };
 		4B54CE3D26269E3200CBA7B3 /* DownloadPreferences.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = DownloadPreferences.swift; sourceTree = "<group>"; };
 		4B54CE3E26269E3200CBA7B3 /* PreferenceSections.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = PreferenceSections.swift; sourceTree = "<group>"; };
-		4B54CE3F26269E3200CBA7B3 /* Preference.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Preference.swift; sourceTree = "<group>"; };
 		4B54CE4126269E3200CBA7B3 /* PrivacySecurityPreferencesTableCellView.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = PrivacySecurityPreferencesTableCellView.xib; sourceTree = "<group>"; };
 		4B54CE4226269E3200CBA7B3 /* PreferencesAboutViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = PreferencesAboutViewController.swift; sourceTree = "<group>"; };
 		4B54CE4326269E3200CBA7B3 /* Preferences.storyboard */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.storyboard; path = Preferences.storyboard; sourceTree = "<group>"; };
@@ -741,12 +739,11 @@
 		4B54CE3926269E3200CBA7B3 /* Model */ = {
 			isa = PBXGroup;
 			children = (
-				4B54CE3A26269E3200CBA7B3 /* DefaultBrowserPreferences.swift */,
 				4B54CE3B26269E3200CBA7B3 /* AppearancePreferences.swift */,
-				4B54CE3C26269E3200CBA7B3 /* PrivacySecurityPreferences.swift */,
+				4B54CE3A26269E3200CBA7B3 /* DefaultBrowserPreferences.swift */,
 				4B54CE3D26269E3200CBA7B3 /* DownloadPreferences.swift */,
 				4B54CE3E26269E3200CBA7B3 /* PreferenceSections.swift */,
-				4B54CE3F26269E3200CBA7B3 /* Preference.swift */,
+				4B54CE3C26269E3200CBA7B3 /* PrivacySecurityPreferences.swift */,
 			);
 			path = Model;
 			sourceTree = "<group>";
@@ -754,22 +751,22 @@
 		4B54CE4026269E3200CBA7B3 /* View */ = {
 			isa = PBXGroup;
 			children = (
-				4B54CE6B26269F8800CBA7B3 /* RoundedSelectionRowView.swift */,
-				4B54CE4126269E3200CBA7B3 /* PrivacySecurityPreferencesTableCellView.xib */,
-				4B54CE4226269E3200CBA7B3 /* PreferencesAboutViewController.swift */,
-				4B54CE4326269E3200CBA7B3 /* Preferences.storyboard */,
-				4B54CE4426269E3200CBA7B3 /* PreferencesSidebarViewController.swift */,
-				4B54CE4526269E3200CBA7B3 /* PrivacySecurityPreferencesTableCellView.swift */,
-				4B54CE4626269E3200CBA7B3 /* DefaultBrowserTableCellView.xib */,
-				4B54CE4726269E3200CBA7B3 /* PreferenceTableCellView.swift */,
-				4B54CE4826269E3200CBA7B3 /* PreferencesListViewController.swift */,
-				4B54CE4926269E3200CBA7B3 /* FireproofDomainsViewController.swift */,
-				4B54CE4A26269E3200CBA7B3 /* DownloadPreferencesTableCellView.swift */,
-				4B54CE4B26269E3200CBA7B3 /* PreferencesSplitViewController.swift */,
-				4B54CE4C26269E3200CBA7B3 /* DefaultBrowserTableCellView.swift */,
-				4B54CE4D26269E3200CBA7B3 /* DownloadPreferencesTableCellView.xib */,
 				4B54CE4E26269E3200CBA7B3 /* AppearancePreferencesTableCellView.swift */,
 				4B54CE4F26269E3200CBA7B3 /* AppearancePreferencesTableCellView.xib */,
+				4B54CE4C26269E3200CBA7B3 /* DefaultBrowserTableCellView.swift */,
+				4B54CE4626269E3200CBA7B3 /* DefaultBrowserTableCellView.xib */,
+				4B54CE4A26269E3200CBA7B3 /* DownloadPreferencesTableCellView.swift */,
+				4B54CE4D26269E3200CBA7B3 /* DownloadPreferencesTableCellView.xib */,
+				4B54CE4926269E3200CBA7B3 /* FireproofDomainsViewController.swift */,
+				4B54CE4326269E3200CBA7B3 /* Preferences.storyboard */,
+				4B54CE4226269E3200CBA7B3 /* PreferencesAboutViewController.swift */,
+				4B54CE4826269E3200CBA7B3 /* PreferencesListViewController.swift */,
+				4B54CE4426269E3200CBA7B3 /* PreferencesSidebarViewController.swift */,
+				4B54CE4B26269E3200CBA7B3 /* PreferencesSplitViewController.swift */,
+				4B54CE4726269E3200CBA7B3 /* PreferenceTableCellView.swift */,
+				4B54CE4526269E3200CBA7B3 /* PrivacySecurityPreferencesTableCellView.swift */,
+				4B54CE4126269E3200CBA7B3 /* PrivacySecurityPreferencesTableCellView.xib */,
+				4B54CE6B26269F8800CBA7B3 /* RoundedSelectionRowView.swift */,
 			);
 			path = View;
 			sourceTree = "<group>";
@@ -1969,7 +1966,6 @@
 				B6A9E45A261460350067D1B9 /* ApiRequestError.swift in Sources */,
 				85799C1825DEBB3F0007EC87 /* Logging.swift in Sources */,
 				AA86490C24D3494C001BABEE /* GradientView.swift in Sources */,
-				4B54CE5526269E3200CBA7B3 /* Preference.swift in Sources */,
 				B684590825C9027900DC17B6 /* AppStateChangedPublisher.swift in Sources */,
 				AA80EC54256BE3BC007083E7 /* UserText.swift in Sources */,
 				4B54CE5326269E3200CBA7B3 /* DownloadPreferences.swift in Sources */,

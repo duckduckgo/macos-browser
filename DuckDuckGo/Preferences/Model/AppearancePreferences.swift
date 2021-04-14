@@ -68,7 +68,7 @@ struct AppearancePreferences {
 
 }
 
-extension AppearancePreferences: Preference {
+extension AppearancePreferences: PreferenceSection {
 
     var displayName: String {
         return "Appearance"

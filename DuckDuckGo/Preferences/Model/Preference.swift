@@ -17,10 +17,3 @@
 //
 
 import Foundation
-
-protocol Preference {
-
-    var displayName: String { get }
-    var preferenceIcon: NSImage { get }
-
-}

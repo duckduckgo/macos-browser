@@ -51,7 +51,7 @@ struct DefaultBrowserPreferences {
 
 }
 
-extension DefaultBrowserPreferences: Preference {
+extension DefaultBrowserPreferences: PreferenceSection {
 
     var displayName: String {
         return UserText.defaultBrowser

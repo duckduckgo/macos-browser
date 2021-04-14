@@ -26,16 +26,12 @@ final class PreferenceTableCellView: NSTableCellView {
     @IBOutlet var preferenceTitleLabel: NSTextField!
     @IBOutlet var dividerView: NSBox!
 
-    var isSelected: Bool = false {
-        didSet {
-            updateAppearance()
-        }
-    }
+    var isSelected: Bool = false
 
-    func update(with preference: Preference) {
+    func update(with section: PreferenceSection) {
         dividerView.isHidden = true
-        preferenceImageView.image = preference.preferenceIcon
-        preferenceTitleLabel.stringValue = preference.displayName
+        preferenceImageView.image = section.preferenceIcon
+        preferenceTitleLabel.stringValue = section.displayName
     }
 
     func update(with image: NSImage, title: String) {
@@ -46,11 +42,6 @@ final class PreferenceTableCellView: NSTableCellView {
 
     private func resetSelectionState() {
         isSelected = false
-        updateAppearance()
-    }
-
-    private func updateAppearance() {
-
     }
 
 }

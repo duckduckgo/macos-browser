@@ -22,7 +22,7 @@ struct PrivacySecurityPreferences {
 
 }
 
-extension PrivacySecurityPreferences: Preference {
+extension PrivacySecurityPreferences: PreferenceSection {
     
     var displayName: String {
         return UserText.privacyAndSecurity

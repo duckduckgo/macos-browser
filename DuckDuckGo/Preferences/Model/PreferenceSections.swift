@@ -18,11 +18,18 @@
 
 import Foundation
 
+protocol PreferenceSection {
+
+    var displayName: String { get }
+    var preferenceIcon: NSImage { get }
+
+}
+
 struct PreferenceSections {
 
-    let sections: [Preference]
+    let sections: [PreferenceSection]
 
-    init(sections: [Preference] = [
+    init(sections: [PreferenceSection] = [
         DefaultBrowserPreferences(),
         AppearancePreferences(),
         PrivacySecurityPreferences(),

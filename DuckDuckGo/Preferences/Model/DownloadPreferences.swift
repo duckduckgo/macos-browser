@@ -69,7 +69,7 @@ struct DownloadPreferences {
 
 }
 
-extension DownloadPreferences: Preference {
+extension DownloadPreferences: PreferenceSection {
 
     var displayName: String {
         return UserText.downloads
