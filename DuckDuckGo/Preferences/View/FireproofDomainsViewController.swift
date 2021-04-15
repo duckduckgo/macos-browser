@@ -43,6 +43,7 @@ final class FireproofDomainsViewController: NSViewController {
 
     override func viewDidLoad() {
         super.viewDidLoad()
+
         applyModalWindowStyleIfNeeded()
         reloadData()
     }

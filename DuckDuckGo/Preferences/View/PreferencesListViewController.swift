@@ -64,10 +64,21 @@ final class PreferencesListViewController: NSViewController {
 
         preferencesTableView.postsBoundsChangedNotifications = true
         preferencesTableView.enclosingScrollView?.contentView.postsBoundsChangedNotifications = true
+
         NotificationCenter.default.addObserver(self,
                                                selector: #selector(contentViewDidChangeBounds),
                                                name: NSView.boundsDidChangeNotification,
                                                object: preferencesTableView.enclosingScrollView?.contentView)
+
+        NotificationCenter.default.addObserver(self,
+                                               selector: #selector(reloadDefaultBrowserRow),
+                                               name: NSApplication.willBecomeActiveNotification,
+                                               object: nil)
+    }
+
+    override func viewWillAppear() {
+        super.viewWillAppear()
+        reloadDefaultBrowserRow()
     }
 
     func select(row: Int) {
@@ -77,6 +88,14 @@ final class PreferencesListViewController: NSViewController {
     @objc
     func contentViewDidChangeBounds(_ notification: Notification) {
         self.firstVisibleCellIndex = indexForFirstVisibleRow()
+    }
+
+    @objc
+    private func reloadDefaultBrowserRow() {
+        // In order to detect whether the default browser has changed, this function checks every time the view appears or the app comes back from
+        // the background.
+        let defaultBrowserRow = PreferenceSection.defaultBrowser.rawValue
+        preferencesTableView.reloadData(forRowIndexes: IndexSet(integer: defaultBrowserRow), columnIndexes: IndexSet(integer: 0))
     }
 
     private func indexForFirstVisibleRow() -> Int {
@@ -98,6 +117,7 @@ extension PreferencesListViewController: NSTableViewDataSource, NSTableViewDeleg
 
         switch section {
         case .defaultBrowser:
+            print("LOADING DEFAULT BROWSER")
             let cell: DefaultBrowserTableCellView? = createCell(withIdentifier: DefaultBrowserTableCellView.reuseIdentifier,
                                                                 tableView: tableView)
             cell?.isDefaultBrowser = DefaultBrowserPreferences.isDefault
