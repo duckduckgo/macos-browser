@@ -210,8 +210,23 @@ extension URL {
         }
 
         let preferences = DownloadPreferences()
+        var downloadLocation: URL?
 
-        guard let folderUrl = preferences.selectedDownloadLocation else {
+        if preferences.alwaysRequestDownloadLocation {
+            let panel = NSOpenPanel()
+            panel.canChooseFiles = false
+            panel.canChooseDirectories = true
+            panel.canCreateDirectories = true
+
+            let result = panel.runModal()
+            if result == .OK, let selectedURL = panel.url {
+                downloadLocation = selectedURL
+            }
+        } else {
+            downloadLocation = preferences.selectedDownloadLocation
+        }
+
+        guard let folderUrl = downloadLocation else {
             os_log("Failed to access Downloads folder")
             Pixel.fire(.debug(event: .fileMoveToDownloadsFailed, error: CocoaError(.fileWriteUnknown)))
             return nil
