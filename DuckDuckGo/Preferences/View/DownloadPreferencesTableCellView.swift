@@ -66,6 +66,7 @@ final class DownloadPreferencesTableCellView: NSTableCellView {
     private func updateInterface(downloadLocationSelectionEnabled: Bool) {
         changeLocationButton.isEnabled = downloadLocationSelectionEnabled
         downloadLocationPathControl.isEnabled = downloadLocationSelectionEnabled
+        downloadLocationPathControl.alphaValue = downloadLocationSelectionEnabled ? 1 : 0.5
     }
 
 }

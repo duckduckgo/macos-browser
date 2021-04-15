@@ -34,7 +34,12 @@ final class FireproofDomainsViewController: NSViewController {
     @IBOutlet var tableView: NSTableView!
     @IBOutlet var removeDomainButton: NSButton!
 
-    private var fireproofDomains = [String]()
+    private var allFireproofDomains = [String]()
+    private var filteredFireproofDomains: [String]?
+
+    private var fireproofDomains: [String] {
+        return filteredFireproofDomains ?? allFireproofDomains
+    }
 
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -47,7 +52,7 @@ final class FireproofDomainsViewController: NSViewController {
     }
 
     fileprivate func reloadData() {
-        fireproofDomains = FireproofDomains.shared.fireproofDomains.sorted { (lhs, rhs) -> Bool in
+        allFireproofDomains = FireproofDomains.shared.fireproofDomains.sorted { (lhs, rhs) -> Bool in
             return lhs < rhs
         }
 
@@ -99,6 +104,22 @@ extension FireproofDomainsViewController: NSTableViewDataSource, NSTableViewDele
 
     func tableViewSelectionDidChange(_ notification: Notification) {
         updateRemoveButtonState()
+    }
+
+}
+
+extension FireproofDomainsViewController: NSTextFieldDelegate {
+
+    func controlTextDidChange(_ notification: Notification) {
+        guard let field = notification.object as? NSSearchField else { return }
+
+        if field.stringValue.isEmpty {
+            filteredFireproofDomains = nil
+        } else {
+            filteredFireproofDomains = allFireproofDomains.filter { $0.contains(field.stringValue) }
+        }
+
+        reloadData()
     }
 
 }
