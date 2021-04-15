@@ -22,6 +22,7 @@ struct DownloadPreferences {
 
     private struct Keys {
         static let selectedDownloadLocationKey = "preferences.download-location"
+        static let alwaysRequestDownloadLocationKey = "preferences.download-location.always-request"
     }
 
     var selectedDownloadLocation: URL? {
@@ -29,6 +30,16 @@ struct DownloadPreferences {
              return URL(string: selectedLocation)
         } else {
             return defaultDownloadLocation()
+        }
+    }
+
+    var alwaysRequestDownloadLocation: Bool {
+        get {
+            return userDefaults.bool(forKey: Keys.alwaysRequestDownloadLocationKey)
+        }
+
+        set {
+            userDefaults.setValue(newValue, forKey: Keys.alwaysRequestDownloadLocationKey)
         }
     }
 

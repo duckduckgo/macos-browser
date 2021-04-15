@@ -52,6 +52,9 @@
                         <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
                         <font key="font" metaFont="system"/>
                     </buttonCell>
+                    <connections>
+                        <action selector="toggledAlwaysRequestDownloadLocationCheckbox:" target="tk2-MC-4bP" id="kTG-Px-a38"/>
+                    </connections>
                 </button>
             </subviews>
             <constraints>
@@ -69,6 +72,8 @@
                 <constraint firstItem="Buv-Vi-7hm" firstAttribute="top" secondItem="hjS-ig-C0w" secondAttribute="bottom" constant="8" symbolic="YES" id="v4y-go-fxd"/>
             </constraints>
             <connections>
+                <outlet property="alwaysRequestDownloadLocationCheckbox" destination="5tH-CI-co0" id="3iu-UH-8Mk"/>
+                <outlet property="changeLocationButton" destination="pt9-Dk-ki9" id="zfh-rW-0kt"/>
                 <outlet property="downloadLocationPathControl" destination="Buv-Vi-7hm" id="apY-06-f19"/>
             </connections>
             <point key="canvasLocation" x="-34.5" y="206.5"/>

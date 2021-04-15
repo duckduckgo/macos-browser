@@ -354,7 +354,7 @@
             <objects>
                 <viewController storyboardIdentifier="FireproofDomainsViewController" id="Clu-Bo-JRW" customClass="FireproofDomainsViewController" customModule="DuckDuckGo_Privacy_Browser" customModuleProvider="target" sceneMemberID="viewController">
                     <view key="view" misplaced="YES" id="fBT-ND-Nbh">
-                        <rect key="frame" x="0.0" y="0.0" width="463" height="307"/>
+                        <rect key="frame" x="0.0" y="0.0" width="373" height="307"/>
                         <autoresizingMask key="autoresizingMask"/>
                         <subviews>
                             <button verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="DEQ-Uh-Y7p">
@@ -373,11 +373,14 @@
                                     <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
                                     <font key="font" metaFont="system"/>
                                 </buttonCell>
+                                <connections>
+                                    <action selector="removeAllDomains:" target="Clu-Bo-JRW" id="oQr-Dn-QVf"/>
+                                </connections>
                             </button>
                             <scrollView autohidesScrollers="YES" horizontalLineScroll="24" horizontalPageScroll="10" verticalLineScroll="24" verticalPageScroll="10" usesPredominantAxisScrolling="NO" translatesAutoresizingMaskIntoConstraints="NO" id="aPG-Pg-rGL">
-                                <rect key="frame" x="20" y="60" width="393" height="195"/>
+                                <rect key="frame" x="20" y="60" width="333" height="195"/>
                                 <clipView key="contentView" id="9Xg-Fr-c4J">
-                                    <rect key="frame" x="1" y="1" width="391" height="193"/>
+                                    <rect key="frame" x="1" y="1" width="331" height="193"/>
                                     <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                     <subviews>
                                         <tableView verticalHuggingPriority="750" allowsExpansionToolTips="YES" columnAutoresizingStyle="lastColumnOnly" alternatingRowBackgroundColors="YES" columnReordering="NO" columnSelection="YES" columnResizing="NO" multipleSelection="NO" autosaveColumns="NO" rowHeight="24" usesAutomaticRowHeights="YES" viewBased="YES" id="pIp-Qw-5G1">
@@ -432,7 +435,7 @@
                                     </subviews>
                                 </clipView>
                                 <scroller key="horizontalScroller" wantsLayer="YES" verticalHuggingPriority="750" horizontal="YES" id="acr-B4-e7X">
-                                    <rect key="frame" x="1" y="178" width="391" height="16"/>
+                                    <rect key="frame" x="1" y="178" width="331" height="16"/>
                                     <autoresizingMask key="autoresizingMask"/>
                                 </scroller>
                                 <scroller key="verticalScroller" hidden="YES" wantsLayer="YES" verticalHuggingPriority="750" horizontal="NO" id="ieF-iM-ov2">
@@ -449,7 +452,7 @@
                                 </textFieldCell>
                             </textField>
                             <searchField wantsLayer="YES" verticalHuggingPriority="750" textCompletion="NO" translatesAutoresizingMaskIntoConstraints="NO" id="mWM-R4-iMO">
-                                <rect key="frame" x="238" y="268" width="155" height="22"/>
+                                <rect key="frame" x="178" y="268" width="155" height="22"/>
                                 <constraints>
                                     <constraint firstAttribute="width" constant="155" id="dkQ-Pw-ZiZ"/>
                                 </constraints>
@@ -460,7 +463,7 @@
                                 </searchFieldCell>
                             </searchField>
                             <button verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="goL-jl-7Gp">
-                                <rect key="frame" x="334" y="13" width="66" height="32"/>
+                                <rect key="frame" x="274" y="13" width="66" height="32"/>
                                 <buttonCell key="cell" type="push" title="Done" bezelStyle="rounded" alignment="center" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="Rw2-lG-7Wa">
                                     <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
                                     <font key="font" metaFont="system"/>

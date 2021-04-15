@@ -35,6 +35,8 @@ final class PreferencesListViewController: NSViewController {
 
     @Published var firstVisibleCellIndex: Int = 0
 
+    private var downloadPreferences = DownloadPreferences()
+
     enum PreferenceSection: Int, CaseIterable {
         case defaultBrowser
         case appearance
@@ -114,7 +116,8 @@ extension PreferencesListViewController: NSTableViewDataSource, NSTableViewDeleg
         case .downloads:
             let cell: DownloadPreferencesTableCellView? = createCell(withIdentifier: DownloadPreferencesTableCellView.identifier,
                                                                      tableView: tableView)
-            cell?.update(downloadLocation: DownloadPreferences().selectedDownloadLocation)
+            cell?.update(downloadLocation: downloadPreferences.selectedDownloadLocation,
+                         alwaysRequestDownloadLocation: downloadPreferences.alwaysRequestDownloadLocation)
             cell?.delegate = self
             return cell
         }
@@ -150,6 +153,11 @@ extension PreferencesListViewController: DownloadPreferencesTableCellViewDelegat
             downloadPreferences.select(downloadLocation: selectedURL)
             preferencesTableView.reloadData()
         }
+    }
+
+    func downloadPreferencesTableCellView(_ cell: DownloadPreferencesTableCellView,
+                                          setAlwaysRequestDownloadLocation alwaysRequest: Bool) {
+        downloadPreferences.alwaysRequestDownloadLocation = alwaysRequest
     }
 
 }

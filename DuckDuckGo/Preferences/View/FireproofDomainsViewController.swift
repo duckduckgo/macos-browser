@@ -70,6 +70,10 @@ final class FireproofDomainsViewController: NSViewController {
         reloadData()
     }
 
+    @IBAction func removeAllDomains(_ sender: NSButton) {
+        FireproofDomains.shared.clearAll()
+    }
+
 }
 
 extension FireproofDomainsViewController: NSTableViewDataSource, NSTableViewDelegate {

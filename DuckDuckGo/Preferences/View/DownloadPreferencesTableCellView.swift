@@ -21,6 +21,7 @@ import Foundation
 protocol DownloadPreferencesTableCellViewDelegate: class {
 
     func downloadPreferencesTableCellViewRequestedDownloadLocationPicker(_ cell: DownloadPreferencesTableCellView)
+    func downloadPreferencesTableCellView(_ cell: DownloadPreferencesTableCellView, setAlwaysRequestDownloadLocation: Bool)
 
 }
 
@@ -41,14 +42,30 @@ final class DownloadPreferencesTableCellView: NSTableCellView {
         }
     }
 
+    @IBOutlet var changeLocationButton: NSButton!
+    @IBOutlet var alwaysRequestDownloadLocationCheckbox: NSButton!
+
     weak var delegate: DownloadPreferencesTableCellViewDelegate?
 
     @IBAction func changeLocationButtonClicked(_ sender: NSButton) {
         delegate?.downloadPreferencesTableCellViewRequestedDownloadLocationPicker(self)
     }
 
-    func update(downloadLocation: URL?) {
+    @IBAction func toggledAlwaysRequestDownloadLocationCheckbox(_ sender: NSButton) {
+        let alwaysRequestDownloadLocation = alwaysRequestDownloadLocationCheckbox.state == .on
+        updateInterface(downloadLocationSelectionEnabled: !alwaysRequestDownloadLocation)
+        delegate?.downloadPreferencesTableCellView(self, setAlwaysRequestDownloadLocation: alwaysRequestDownloadLocation)
+    }
+
+    func update(downloadLocation: URL?, alwaysRequestDownloadLocation: Bool) {
         downloadLocationPathControl.url = downloadLocation
+        alwaysRequestDownloadLocationCheckbox.state = alwaysRequestDownloadLocation ? .on : .off
+        updateInterface(downloadLocationSelectionEnabled: !alwaysRequestDownloadLocation)
+    }
+
+    private func updateInterface(downloadLocationSelectionEnabled: Bool) {
+        changeLocationButton.isEnabled = downloadLocationSelectionEnabled
+        downloadLocationPathControl.isEnabled = downloadLocationSelectionEnabled
     }
 
 }
