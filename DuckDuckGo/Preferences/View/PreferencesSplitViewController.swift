@@ -53,6 +53,7 @@ final class PreferencesSplitViewController: NSSplitViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
 
+        splitView.setValue(NSColor.windowBackgroundColor, forKey: "dividerColor")
         sidebarViewController.delegate = self
         subscribeToListViewControllerVisibleIndex()
     }
@@ -65,6 +66,7 @@ final class PreferencesSplitViewController: NSSplitViewController {
             self?.sidebarViewController.select(rowAtIndex: index)
         }.store(in: &cancellables)
     }
+
 }
 
 extension PreferencesSplitViewController: PreferencesSidebarViewControllerDelegate {

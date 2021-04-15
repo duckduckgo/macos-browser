@@ -166,8 +166,8 @@
         <scene sceneID="TFG-Ri-mjK">
             <objects>
                 <viewController id="Wvn-8x-UfB" customClass="PreferencesSidebarViewController" customModule="DuckDuckGo_Privacy_Browser" customModuleProvider="target" sceneMemberID="viewController">
-                    <view key="view" misplaced="YES" id="sPP-2C-UYe">
-                        <rect key="frame" x="0.0" y="0.0" width="234" height="373"/>
+                    <view key="view" id="sPP-2C-UYe">
+                        <rect key="frame" x="0.0" y="0.0" width="252" height="405"/>
                         <autoresizingMask key="autoresizingMask"/>
                         <subviews>
                             <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="OiU-Rl-ozQ">
@@ -280,7 +280,7 @@
                 </viewController>
                 <customObject id="aUM-Zi-k0J" userLabel="First Responder" customClass="NSResponder" sceneMemberID="firstResponder"/>
             </objects>
-            <point key="canvasLocation" x="201" y="-6.5"/>
+            <point key="canvasLocation" x="205" y="-8"/>
         </scene>
         <!--Preferences List View Controller-->
         <scene sceneID="8kB-Nj-7oA">

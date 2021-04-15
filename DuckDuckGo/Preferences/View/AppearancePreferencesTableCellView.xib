@@ -9,7 +9,7 @@
         <customObject id="-2" userLabel="File's Owner"/>
         <customObject id="-1" userLabel="First Responder" customClass="FirstResponder"/>
         <customObject id="-3" userLabel="Application" customClass="NSObject"/>
-        <tableCellView misplaced="YES" id="gHC-fA-eY6" customClass="AppearancePreferencesTableCellView" customModule="DuckDuckGo_Privacy_Browser" customModuleProvider="target">
+        <tableCellView id="gHC-fA-eY6" customClass="AppearancePreferencesTableCellView" customModule="DuckDuckGo_Privacy_Browser" customModuleProvider="target">
             <rect key="frame" x="0.0" y="0.0" width="392" height="200"/>
             <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
             <subviews>
@@ -21,16 +21,20 @@
                         <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
                     </textFieldCell>
                 </textField>
-                <button verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="BOj-QM-L7T">
+                <button verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="BOj-QM-L7T" customClass="PaddedImageButton" customModule="DuckDuckGo_Privacy_Browser" customModuleProvider="target">
                     <rect key="frame" x="0.0" y="44" width="96" height="64"/>
-                    <constraints>
-                        <constraint firstAttribute="height" constant="64" id="I7g-H1-BWm"/>
-                        <constraint firstAttribute="width" constant="96" id="nBO-wl-UC4"/>
-                    </constraints>
-                    <buttonCell key="cell" type="bevel" bezelStyle="rounded" image="LightModePreview" imagePosition="overlaps" alignment="center" imageScaling="proportionallyDown" inset="2" id="H43-A1-lyb">
+                    <buttonCell key="cell" type="bevel" bezelStyle="rounded" image="LightModePreview" imagePosition="only" alignment="center" imageScaling="axesIndependently" inset="2" id="H43-A1-lyb">
                         <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
                         <font key="font" metaFont="system"/>
                     </buttonCell>
+                    <userDefinedRuntimeAttributes>
+                        <userDefinedRuntimeAttribute type="number" keyPath="verticalImagePadding">
+                            <real key="value" value="4"/>
+                        </userDefinedRuntimeAttribute>
+                        <userDefinedRuntimeAttribute type="number" keyPath="horizontalImagePadding">
+                            <real key="value" value="4"/>
+                        </userDefinedRuntimeAttribute>
+                    </userDefinedRuntimeAttributes>
                     <connections>
                         <action selector="selectedTheme:" target="gHC-fA-eY6" id="4hv-7o-5VK"/>
                     </connections>
@@ -51,16 +55,20 @@
                         <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
                     </textFieldCell>
                 </textField>
-                <button verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="TBg-li-2gv">
-                    <rect key="frame" x="128" y="44" width="96" height="64"/>
-                    <constraints>
-                        <constraint firstAttribute="width" constant="96" id="8aN-wQ-LiW"/>
-                        <constraint firstAttribute="height" constant="64" id="LBz-U9-7Of"/>
-                    </constraints>
-                    <buttonCell key="cell" type="bevel" bezelStyle="rounded" image="DarkModePreview" imagePosition="overlaps" alignment="center" imageScaling="proportionallyDown" inset="2" id="UCd-7C-f2j">
+                <button verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="TBg-li-2gv" customClass="PaddedImageButton" customModule="DuckDuckGo_Privacy_Browser" customModuleProvider="target">
+                    <rect key="frame" x="128" y="44" width="97" height="64"/>
+                    <buttonCell key="cell" type="bevel" bezelStyle="rounded" image="DarkModePreview" imagePosition="only" alignment="center" imageScaling="axesIndependently" inset="2" id="UCd-7C-f2j">
                         <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
                         <font key="font" metaFont="system"/>
                     </buttonCell>
+                    <userDefinedRuntimeAttributes>
+                        <userDefinedRuntimeAttribute type="number" keyPath="horizontalImagePadding">
+                            <real key="value" value="4"/>
+                        </userDefinedRuntimeAttribute>
+                        <userDefinedRuntimeAttribute type="number" keyPath="verticalImagePadding">
+                            <real key="value" value="4"/>
+                        </userDefinedRuntimeAttribute>
+                    </userDefinedRuntimeAttributes>
                     <connections>
                         <action selector="selectedTheme:" target="gHC-fA-eY6" id="XWq-eh-Tdj"/>
                     </connections>
@@ -73,22 +81,26 @@
                         <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
                     </textFieldCell>
                 </textField>
-                <button verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="DKk-i0-rk7">
-                    <rect key="frame" x="256" y="44" width="96" height="64"/>
-                    <constraints>
-                        <constraint firstAttribute="height" constant="64" id="hgF-ES-zEl"/>
-                        <constraint firstAttribute="width" constant="96" id="nK2-a3-Hxv"/>
-                    </constraints>
-                    <buttonCell key="cell" type="bevel" bezelStyle="rounded" image="SystemDefaultPreview" imagePosition="overlaps" alignment="center" imageScaling="proportionallyDown" inset="2" id="sjr-as-3zo">
+                <button verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="DKk-i0-rk7" customClass="PaddedImageButton" customModule="DuckDuckGo_Privacy_Browser" customModuleProvider="target">
+                    <rect key="frame" x="257" y="44" width="97" height="64"/>
+                    <buttonCell key="cell" type="bevel" bezelStyle="rounded" image="SystemDefaultPreview" imagePosition="only" alignment="center" imageScaling="axesIndependently" inset="2" id="sjr-as-3zo">
                         <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
                         <font key="font" metaFont="system"/>
                     </buttonCell>
+                    <userDefinedRuntimeAttributes>
+                        <userDefinedRuntimeAttribute type="number" keyPath="verticalImagePadding">
+                            <real key="value" value="4"/>
+                        </userDefinedRuntimeAttribute>
+                        <userDefinedRuntimeAttribute type="number" keyPath="horizontalImagePadding">
+                            <real key="value" value="4"/>
+                        </userDefinedRuntimeAttribute>
+                    </userDefinedRuntimeAttributes>
                     <connections>
                         <action selector="selectedTheme:" target="gHC-fA-eY6" id="l30-Bb-dJp"/>
                     </connections>
                 </button>
                 <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="zoM-9m-Wo1">
-                    <rect key="frame" x="278" y="20" width="53" height="16"/>
+                    <rect key="frame" x="279" y="20" width="53" height="16"/>
                     <textFieldCell key="cell" lineBreakMode="clipping" alignment="center" title="System" id="A2V-Nt-afA">
                         <font key="font" metaFont="system"/>
                         <color key="textColor" name="labelColor" catalog="System" colorSpace="catalog"/>

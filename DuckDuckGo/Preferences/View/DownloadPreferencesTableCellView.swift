@@ -37,7 +37,7 @@ final class DownloadPreferencesTableCellView: NSTableCellView {
         didSet {
             downloadLocationPathControl.wantsLayer = true
             downloadLocationPathControl.layer?.cornerRadius = 3.0
-            downloadLocationPathControl.layer?.borderColor = NSColor.separatorColor.cgColor
+            downloadLocationPathControl.layer?.borderColor = NSColor.quaternaryLabelColor.cgColor
             downloadLocationPathControl.layer?.borderWidth = 1.0
         }
     }
@@ -55,6 +55,11 @@ final class DownloadPreferencesTableCellView: NSTableCellView {
         let alwaysRequestDownloadLocation = alwaysRequestDownloadLocationCheckbox.state == .on
         updateInterface(downloadLocationSelectionEnabled: !alwaysRequestDownloadLocation)
         delegate?.downloadPreferencesTableCellView(self, setAlwaysRequestDownloadLocation: alwaysRequestDownloadLocation)
+    }
+
+    override func viewDidChangeEffectiveAppearance() {
+        super.viewDidChangeEffectiveAppearance()
+        downloadLocationPathControl.layer?.borderColor = NSColor.quaternaryLabelColor.cgColor
     }
 
     func update(downloadLocation: URL?, alwaysRequestDownloadLocation: Bool) {

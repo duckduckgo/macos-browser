@@ -26,9 +26,9 @@ final class AppearancePreferencesTableCellView: NSTableCellView {
         return NSNib(nibNamed: "AppearancePreferencesTableCellView", bundle: Bundle.main)!
     }
 
-    @IBOutlet var lightModeAppearanceButton: NSButton!
-    @IBOutlet var darkModeAppearanceButton: NSButton!
-    @IBOutlet var systemDefaultAppearanceButton: NSButton!
+    @IBOutlet var lightModeAppearanceButton: PaddedImageButton!
+    @IBOutlet var darkModeAppearanceButton: PaddedImageButton!
+    @IBOutlet var systemDefaultAppearanceButton: PaddedImageButton!
 
     private var appearancePreferences = AppearancePreferences()
     private var buttons: [NSButton] {
@@ -66,7 +66,7 @@ final class AppearancePreferencesTableCellView: NSTableCellView {
 
     func applyBorderedStyle(to button: NSButton) {
         button.wantsLayer = true
-        button.layer?.cornerRadius = 3.0
+        button.layer?.cornerRadius = 7.0
         button.layer?.borderWidth = 2
         button.layer?.borderColor = NSColor(named: "BlueButtonBorderColor")!.cgColor
     }

@@ -65,6 +65,7 @@ final class OptionsButtonMenu: NSMenu {
         super.update()
     }
 
+    // swiftlint:disable function_body_length
     private func setupMenuItems() {
         let moveTabMenuItem = NSMenuItem(title: UserText.moveTabToNewWindow,
                                          action: #selector(moveTabToNewWindowAction(_:)),
@@ -124,6 +125,7 @@ final class OptionsButtonMenu: NSMenu {
         preferencesItem.image = NSImage(named: "Preferences")
         addItem(preferencesItem)
     }
+    // swiftlint:enable function_body_length
     
     private func updateBookmarks() {
         // The bookmarks section is the same with the main menu

@@ -213,12 +213,9 @@ extension URL {
         var downloadLocation: URL?
 
         if preferences.alwaysRequestDownloadLocation {
-            let panel = NSOpenPanel()
-            panel.canChooseFiles = false
-            panel.canChooseDirectories = true
-            panel.canCreateDirectories = true
-
+            let panel = NSOpenPanel.downloadDirectoryPanel()
             let result = panel.runModal()
+
             if result == .OK, let selectedURL = panel.url {
                 downloadLocation = selectedURL
             }
