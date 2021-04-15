@@ -71,7 +71,7 @@ struct AppearancePreferences {
 extension AppearancePreferences: PreferenceSection {
 
     var displayName: String {
-        return "Appearance"
+        return UserText.appearance
     }
 
     var preferenceIcon: NSImage {
