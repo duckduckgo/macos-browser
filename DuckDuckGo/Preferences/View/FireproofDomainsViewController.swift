@@ -72,6 +72,7 @@ final class FireproofDomainsViewController: NSViewController {
 
     @IBAction func removeAllDomains(_ sender: NSButton) {
         FireproofDomains.shared.clearAll()
+        reloadData()
     }
 
 }
