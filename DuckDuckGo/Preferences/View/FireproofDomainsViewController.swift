@@ -53,7 +53,7 @@ final class FireproofDomainsViewController: NSViewController {
 
     fileprivate func reloadData() {
         allFireproofDomains = FireproofDomains.shared.fireproofDomains.sorted { (lhs, rhs) -> Bool in
-            return lhs < rhs
+            return lhs.dropWWW() < rhs.dropWWW()
         }
 
         tableView.reloadData()
@@ -95,7 +95,7 @@ extension FireproofDomainsViewController: NSTableViewDataSource, NSTableViewDele
     func tableView(_ tableView: NSTableView, viewFor tableColumn: NSTableColumn?, row: Int) -> NSView? {
         if let cell = tableView.makeView(withIdentifier: Constants.cellIdentifier, owner: nil) as? NSTableCellView {
             let domain = fireproofDomains[row]
-            cell.textField?.stringValue = domain
+            cell.textField?.stringValue = domain.dropWWW()
             return cell
         }
 
@@ -116,7 +116,7 @@ extension FireproofDomainsViewController: NSTextFieldDelegate {
         if field.stringValue.isEmpty {
             filteredFireproofDomains = nil
         } else {
-            filteredFireproofDomains = allFireproofDomains.filter { $0.contains(field.stringValue) }
+            filteredFireproofDomains = allFireproofDomains.filter { $0.dropWWW().contains(field.stringValue) }
         }
 
         reloadData()
