@@ -94,14 +94,18 @@ final class PreferencesListViewController: NSViewController {
     private func reloadDefaultBrowserRow() {
         // In order to detect whether the default browser has changed, this function checks every time the view appears or the app comes back from
         // the background.
-        let defaultBrowserRow = PreferenceSection.defaultBrowser.rawValue
-        preferencesTableView.reloadData(forRowIndexes: IndexSet(integer: defaultBrowserRow), columnIndexes: IndexSet(integer: 0))
+        reloadRow(for: .defaultBrowser)
     }
 
     private func indexForFirstVisibleRow() -> Int {
         let visibleRect = preferencesTableView.visibleRect
         let rows = preferencesTableView.rows(in: visibleRect)
         return rows.location
+    }
+
+    fileprivate func reloadRow(for preferenceSection: PreferenceSection) {
+        let row = preferenceSection.rawValue
+        preferencesTableView.reloadData(forRowIndexes: IndexSet(integer: row), columnIndexes: IndexSet(integer: 0))
     }
 
 }
@@ -168,7 +172,7 @@ extension PreferencesListViewController: DownloadPreferencesTableCellViewDelegat
         let result = panel.runModal()
         if result == .OK, let selectedURL = panel.url {
             downloadPreferences.select(downloadLocation: selectedURL)
-            preferencesTableView.reloadData()
+            reloadRow(for: .downloads)
         }
     }
 

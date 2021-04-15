@@ -75,6 +75,8 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         grammarCheckEnabler = GrammarCheckEnabler(windowControllersManager: WindowControllersManager.shared)
         grammarCheckEnabler.enableIfNeeded()
 
+        applyPreferredTheme()
+
         launchTimingPixel.fire()
 
         appUsageActivityMonitor = AppUsageActivityMonitor(delegate: self)
@@ -114,6 +116,11 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         Pixel.fire(.appLaunch(launch: url.isFileURL ? .openFile : .openURL))
 
         WindowControllersManager.shared.show(url: url)
+    }
+
+    private func applyPreferredTheme() {
+        let appearancePreferences = AppearancePreferences()
+        appearancePreferences.updateUserInterfaceStyle()
     }
 
 }

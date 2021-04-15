@@ -29,9 +29,9 @@
                         <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
                     </textFieldCell>
                 </textField>
-                <pathControl verticalHuggingPriority="750" allowsExpansionToolTips="YES" translatesAutoresizingMaskIntoConstraints="NO" id="Buv-Vi-7hm">
+                <pathControl horizontalHuggingPriority="1000" verticalHuggingPriority="750" horizontalCompressionResistancePriority="250" allowsExpansionToolTips="YES" translatesAutoresizingMaskIntoConstraints="NO" id="Buv-Vi-7hm">
                     <rect key="frame" x="0.0" y="44" width="218" height="22"/>
-                    <pathCell key="cell" selectable="YES" alignment="left" placeholderString="" id="0JQ-RO-eTV">
+                    <pathCell key="cell" selectable="YES" refusesFirstResponder="YES" alignment="left" placeholderString="" id="0JQ-RO-eTV">
                         <font key="font" metaFont="system"/>
                         <url key="url" string="file:///Downloads"/>
                     </pathCell>
@@ -66,7 +66,7 @@
                 <constraint firstItem="BYf-Lj-89w" firstAttribute="top" secondItem="tk2-MC-4bP" secondAttribute="top" constant="20" symbolic="YES" id="V5c-Vv-pOM"/>
                 <constraint firstItem="5tH-CI-co0" firstAttribute="leading" secondItem="tk2-MC-4bP" secondAttribute="leading" id="Vfh-ow-yXR"/>
                 <constraint firstItem="pt9-Dk-ki9" firstAttribute="leading" secondItem="Buv-Vi-7hm" secondAttribute="trailing" constant="8" symbolic="YES" id="WEU-P6-4Sw"/>
-                <constraint firstAttribute="trailing" relation="greaterThanOrEqual" secondItem="pt9-Dk-ki9" secondAttribute="trailing" constant="20" symbolic="YES" id="ZOS-D1-F8O"/>
+                <constraint firstAttribute="trailing" relation="greaterThanOrEqual" secondItem="pt9-Dk-ki9" secondAttribute="trailing" constant="1" id="ZOS-D1-F8O"/>
                 <constraint firstItem="5tH-CI-co0" firstAttribute="top" secondItem="Buv-Vi-7hm" secondAttribute="bottom" constant="8" symbolic="YES" id="l64-Zl-mDW"/>
                 <constraint firstItem="pt9-Dk-ki9" firstAttribute="centerY" secondItem="Buv-Vi-7hm" secondAttribute="centerY" id="uek-xK-2u6"/>
                 <constraint firstItem="Buv-Vi-7hm" firstAttribute="top" secondItem="hjS-ig-C0w" secondAttribute="bottom" constant="8" symbolic="YES" id="v4y-go-fxd"/>

@@ -55,7 +55,7 @@ struct AppearancePreferences {
         self.userDefaults = userDefaults
     }
 
-    func updateUserInterfaceStyle(windows: [NSWindow] = WindowsManager.windows) {
+    func updateUserInterfaceStyle() {
         switch currentThemeName {
         case .dark:
             NSApp.appearance = NSAppearance(named: .darkAqua)
