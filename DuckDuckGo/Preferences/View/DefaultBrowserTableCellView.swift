@@ -20,7 +20,7 @@ import AppKit
 
 final class DefaultBrowserTableCellView: NSTableCellView {
 
-    static let reuseIdentifier = NSUserInterfaceItemIdentifier("DefaultBrowserTableCellView")
+    static let identifier = NSUserInterfaceItemIdentifier("DefaultBrowserTableCellView")
     private static let nibName = "DefaultBrowserTableCellView"
 
     static func nib() -> NSNib {

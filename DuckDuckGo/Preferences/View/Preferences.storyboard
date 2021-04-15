@@ -353,8 +353,8 @@
         <scene sceneID="YwQ-9C-eXK">
             <objects>
                 <viewController storyboardIdentifier="FireproofDomainsViewController" id="Clu-Bo-JRW" customClass="FireproofDomainsViewController" customModule="DuckDuckGo_Privacy_Browser" customModuleProvider="target" sceneMemberID="viewController">
-                    <view key="view" misplaced="YES" id="fBT-ND-Nbh">
-                        <rect key="frame" x="0.0" y="0.0" width="373" height="307"/>
+                    <view key="view" id="fBT-ND-Nbh">
+                        <rect key="frame" x="0.0" y="0.0" width="475" height="307"/>
                         <autoresizingMask key="autoresizingMask"/>
                         <subviews>
                             <button verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="DEQ-Uh-Y7p">
@@ -378,19 +378,19 @@
                                 </connections>
                             </button>
                             <scrollView autohidesScrollers="YES" horizontalLineScroll="24" horizontalPageScroll="10" verticalLineScroll="24" verticalPageScroll="10" usesPredominantAxisScrolling="NO" translatesAutoresizingMaskIntoConstraints="NO" id="aPG-Pg-rGL">
-                                <rect key="frame" x="20" y="60" width="333" height="195"/>
+                                <rect key="frame" x="20" y="60" width="435" height="195"/>
                                 <clipView key="contentView" id="9Xg-Fr-c4J">
-                                    <rect key="frame" x="1" y="1" width="331" height="193"/>
+                                    <rect key="frame" x="1" y="1" width="433" height="193"/>
                                     <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                     <subviews>
-                                        <tableView verticalHuggingPriority="750" allowsExpansionToolTips="YES" columnAutoresizingStyle="lastColumnOnly" alternatingRowBackgroundColors="YES" columnReordering="NO" columnSelection="YES" columnResizing="NO" multipleSelection="NO" autosaveColumns="NO" rowHeight="24" usesAutomaticRowHeights="YES" viewBased="YES" id="pIp-Qw-5G1">
-                                            <rect key="frame" x="0.0" y="0.0" width="411" height="193"/>
+                                        <tableView verticalHuggingPriority="750" allowsExpansionToolTips="YES" columnAutoresizingStyle="none" tableStyle="plain" alternatingRowBackgroundColors="YES" columnReordering="NO" columnSelection="YES" columnResizing="NO" multipleSelection="NO" autosaveColumns="NO" rowHeight="24" usesAutomaticRowHeights="YES" viewBased="YES" id="pIp-Qw-5G1">
+                                            <rect key="frame" x="0.0" y="0.0" width="433" height="193"/>
                                             <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                             <size key="intercellSpacing" width="17" height="0.0"/>
                                             <color key="backgroundColor" name="controlBackgroundColor" catalog="System" colorSpace="catalog"/>
                                             <color key="gridColor" name="gridColor" catalog="System" colorSpace="catalog"/>
                                             <tableColumns>
-                                                <tableColumn width="399" minWidth="40" maxWidth="1000" id="ECi-Df-Yqk">
+                                                <tableColumn width="416" minWidth="40" maxWidth="1000" id="ECi-Df-Yqk">
                                                     <tableHeaderCell key="headerCell" lineBreakMode="truncatingTail" borderStyle="border">
                                                         <color key="textColor" name="headerTextColor" catalog="System" colorSpace="catalog"/>
                                                         <color key="backgroundColor" name="headerColor" catalog="System" colorSpace="catalog"/>
@@ -403,11 +403,11 @@
                                                     <tableColumnResizingMask key="resizingMask" resizeWithTable="YES" userResizable="YES"/>
                                                     <prototypeCellViews>
                                                         <tableCellView identifier="FireproofDomainCell" id="SIf-3r-xTz">
-                                                            <rect key="frame" x="8" y="0.0" width="394" height="24"/>
+                                                            <rect key="frame" x="8" y="0.0" width="416" height="24"/>
                                                             <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                                             <subviews>
                                                                 <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" horizontalCompressionResistancePriority="250" translatesAutoresizingMaskIntoConstraints="NO" id="xe6-Rk-8Bn">
-                                                                    <rect key="frame" x="0.0" y="4" width="394" height="16"/>
+                                                                    <rect key="frame" x="0.0" y="4" width="416" height="16"/>
                                                                     <textFieldCell key="cell" lineBreakMode="truncatingTail" sendsActionOnEndEditing="YES" title="Fireproof Domain" id="DUF-uC-HJj">
                                                                         <font key="font" usesAppearanceFont="YES"/>
                                                                         <color key="textColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
@@ -434,8 +434,12 @@
                                         </tableView>
                                     </subviews>
                                 </clipView>
-                                <scroller key="horizontalScroller" wantsLayer="YES" verticalHuggingPriority="750" horizontal="YES" id="acr-B4-e7X">
-                                    <rect key="frame" x="1" y="178" width="331" height="16"/>
+                                <constraints>
+                                    <constraint firstAttribute="width" relation="greaterThanOrEqual" constant="435" id="7Tg-Z7-UZm"/>
+                                    <constraint firstAttribute="height" relation="greaterThanOrEqual" constant="195" id="K5u-bQ-vbI"/>
+                                </constraints>
+                                <scroller key="horizontalScroller" hidden="YES" wantsLayer="YES" verticalHuggingPriority="750" horizontal="YES" id="acr-B4-e7X">
+                                    <rect key="frame" x="1" y="178" width="433" height="16"/>
                                     <autoresizingMask key="autoresizingMask"/>
                                 </scroller>
                                 <scroller key="verticalScroller" hidden="YES" wantsLayer="YES" verticalHuggingPriority="750" horizontal="NO" id="ieF-iM-ov2">
@@ -452,7 +456,7 @@
                                 </textFieldCell>
                             </textField>
                             <searchField wantsLayer="YES" verticalHuggingPriority="750" textCompletion="NO" translatesAutoresizingMaskIntoConstraints="NO" id="mWM-R4-iMO">
-                                <rect key="frame" x="178" y="268" width="155" height="22"/>
+                                <rect key="frame" x="300" y="268" width="155" height="22"/>
                                 <constraints>
                                     <constraint firstAttribute="width" constant="155" id="dkQ-Pw-ZiZ"/>
                                 </constraints>
@@ -466,7 +470,7 @@
                                 </connections>
                             </searchField>
                             <button verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="goL-jl-7Gp">
-                                <rect key="frame" x="274" y="13" width="66" height="32"/>
+                                <rect key="frame" x="396" y="13" width="66" height="32"/>
                                 <buttonCell key="cell" type="push" title="Done" bezelStyle="rounded" alignment="center" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="Rw2-lG-7Wa">
                                     <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
                                     <font key="font" metaFont="system"/>
@@ -503,7 +507,7 @@ DQ
                 </viewController>
                 <customObject id="fm2-qY-a3s" userLabel="First Responder" customClass="NSResponder" sceneMemberID="firstResponder"/>
             </objects>
-            <point key="canvasLocation" x="360.5" y="781.5"/>
+            <point key="canvasLocation" x="354.5" y="780.5"/>
         </scene>
     </scenes>
     <resources>

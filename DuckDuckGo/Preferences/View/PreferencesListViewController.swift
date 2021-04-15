@@ -51,7 +51,7 @@ final class PreferencesListViewController: NSViewController {
         preferencesTableView.gridStyleMask = [.solidHorizontalGridLineMask]
 
         let defaultBrowserNib = DefaultBrowserTableCellView.nib()
-        preferencesTableView.register(defaultBrowserNib, forIdentifier: DefaultBrowserTableCellView.reuseIdentifier)
+        preferencesTableView.register(defaultBrowserNib, forIdentifier: DefaultBrowserTableCellView.identifier)
 
         let appearanceNib = AppearancePreferencesTableCellView.nib()
         preferencesTableView.register(appearanceNib, forIdentifier: AppearancePreferencesTableCellView.identifier)
@@ -117,25 +117,22 @@ extension PreferencesListViewController: NSTableViewDataSource, NSTableViewDeleg
 
         switch section {
         case .defaultBrowser:
-            print("LOADING DEFAULT BROWSER")
-            let cell: DefaultBrowserTableCellView? = createCell(withIdentifier: DefaultBrowserTableCellView.reuseIdentifier,
-                                                                tableView: tableView)
+            let cell: DefaultBrowserTableCellView? = createCell(identifier: DefaultBrowserTableCellView.identifier, tableView: tableView)
             cell?.isDefaultBrowser = DefaultBrowserPreferences.isDefault
             return cell
         case .appearance:
-            let cell: AppearancePreferencesTableCellView? = createCell(withIdentifier: AppearancePreferencesTableCellView.identifier,
+            let cell: AppearancePreferencesTableCellView? = createCell(identifier: AppearancePreferencesTableCellView.identifier,
                                                                        tableView: tableView)
             cell?.update(with: AppearancePreferences().currentThemeName)
             return cell
         case .privacySecurity:
-            let cell: PrivacySecurityPreferencesTableCellView? = createCell(withIdentifier: PrivacySecurityPreferencesTableCellView.identifier,
+            let cell: PrivacySecurityPreferencesTableCellView? = createCell(identifier: PrivacySecurityPreferencesTableCellView.identifier,
                                                                             tableView: tableView)
             cell?.delegate = self
             cell?.update(loginDetectionEnabled: PrivacySecurityPreferences().loginDetectionEnabled)
             return cell
         case .downloads:
-            let cell: DownloadPreferencesTableCellView? = createCell(withIdentifier: DownloadPreferencesTableCellView.identifier,
-                                                                     tableView: tableView)
+            let cell: DownloadPreferencesTableCellView? = createCell(identifier: DownloadPreferencesTableCellView.identifier, tableView: tableView)
             cell?.update(downloadLocation: downloadPreferences.selectedDownloadLocation,
                          alwaysRequestDownloadLocation: downloadPreferences.alwaysRequestDownloadLocation)
             cell?.delegate = self
@@ -147,7 +144,7 @@ extension PreferencesListViewController: NSTableViewDataSource, NSTableViewDeleg
         return false
     }
 
-    private func createCell<CellType>(withIdentifier identifier: NSUserInterfaceItemIdentifier, tableView: NSTableView) -> CellType? {
+    private func createCell<CellType>(identifier: NSUserInterfaceItemIdentifier, tableView: NSTableView) -> CellType? {
         if let view = tableView.makeView(withIdentifier: identifier, owner: self) as? CellType {
             return view
         } else {
