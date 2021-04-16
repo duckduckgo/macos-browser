@@ -27,7 +27,9 @@ struct DownloadPreferences {
 
     var selectedDownloadLocation: URL? {
         if let selectedLocation = userDefaults.string(forKey: Keys.selectedDownloadLocationKey) {
-             return URL(string: selectedLocation)
+            // The selected URL needs to be checked that it is still present and writable. If not, fall back to the Downloads directory.
+            let selectedLocationURL = URL(string: selectedLocation)
+            return URL(string: selectedLocation)
         } else {
             return defaultDownloadLocation()
         }

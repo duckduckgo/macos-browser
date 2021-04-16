@@ -30,6 +30,11 @@ final class PreferencesSidebarViewController: NSViewController {
 
     weak var delegate: PreferencesSidebarViewControllerDelegate?
 
+    /// PreferencesSidebarViewController monitors `tableViewSelectionDidChange` in order to tell the detail view which section to scroll to.
+    /// However, the detail view also communicates its row changes back to this view controller, so this property tracks if that change is currently being handled.
+    /// Otherwise, when the detail view selects a new index, the table view selection will change here and be forwarded _back_ to the detail view controller, causing visual issues.
+    private var handlingDetailViewScrollEvent = false
+
     var preferenceSections = PreferenceSections() {
         didSet {
             preferencesTableView.reloadData()
@@ -51,7 +56,8 @@ final class PreferencesSidebarViewController: NSViewController {
         preferencesTableView.makeMeFirstResponder()
     }
 
-    func select(rowAtIndex row: Int) {
+    func detailViewScrolledTo(rowAtIndex row: Int) {
+        handlingDetailViewScrollEvent = true
         let indexSet = IndexSet(integer: row)
         preferencesTableView.selectRowIndexes(indexSet, byExtendingSelection: false)
     }
@@ -91,7 +97,7 @@ extension PreferencesSidebarViewController: NSTableViewDataSource, NSTableViewDe
             assertionFailure("\(#file): Tried to update cell with invalid index")
             return nil
         }
-
+        
         return cell
     }
 
@@ -100,7 +106,11 @@ extension PreferencesSidebarViewController: NSTableViewDataSource, NSTableViewDe
     }
 
     func tableViewSelectionDidChange(_ notification: Notification) {
-        selectedRow()
+        if handlingDetailViewScrollEvent {
+            handlingDetailViewScrollEvent = false
+        } else {
+            selectedRow()
+        }
     }
 
 }

@@ -1,14 +1,8 @@
 {
   "images" : [
     {
-      "filename" : "DarkModePreview.png",
-      "idiom" : "mac",
-      "scale" : "1x"
-    },
-    {
-      "filename" : "DarkModePreview@2x.png",
-      "idiom" : "mac",
-      "scale" : "2x"
+      "filename" : "macos-dark-theme.pdf",
+      "idiom" : "mac"
     }
   ],
   "info" : {

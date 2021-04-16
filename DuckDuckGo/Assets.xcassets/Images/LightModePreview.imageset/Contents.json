@@ -1,14 +1,8 @@
 {
   "images" : [
     {
-      "filename" : "LightModePreview.png",
-      "idiom" : "mac",
-      "scale" : "1x"
-    },
-    {
-      "filename" : "LightModePreview@2x.png",
-      "idiom" : "mac",
-      "scale" : "2x"
+      "filename" : "macos-light-theme.pdf",
+      "idiom" : "mac"
     }
   ],
   "info" : {

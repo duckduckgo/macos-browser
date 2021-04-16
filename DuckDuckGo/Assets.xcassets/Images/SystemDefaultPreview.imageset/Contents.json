@@ -1,14 +1,8 @@
 {
   "images" : [
     {
-      "filename" : "SystemDefaultPreview.png",
-      "idiom" : "mac",
-      "scale" : "1x"
-    },
-    {
-      "filename" : "SystemDefaultPreview@2x.png",
-      "idiom" : "mac",
-      "scale" : "2x"
+      "filename" : "macos-system-theme.pdf",
+      "idiom" : "mac"
     }
   ],
   "info" : {
