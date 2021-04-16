@@ -59,7 +59,7 @@ final class DownloadPreferencesTableCellView: NSTableCellView {
 
     override func viewDidChangeEffectiveAppearance() {
         super.viewDidChangeEffectiveAppearance()
-        downloadLocationPathControl.layer?.borderColor = NSColor.quaternaryLabelColor.cgColor
+        downloadLocationPathControl.layer?.borderColor = NSColor(named: "SeparatorColor")!.cgColor
     }
 
     func update(downloadLocation: URL?, alwaysRequestDownloadLocation: Bool) {

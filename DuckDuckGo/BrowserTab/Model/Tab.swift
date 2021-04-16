@@ -46,12 +46,14 @@ final class Tab: NSObject {
             return TabType(rawValue: tabType) ?? .standard
         }
 
+        // swiftlint:disable identifier_name
         var tabAddressBarShouldBecomeFirstResponderWhenSelected: Bool {
             switch self {
             case .standard: return true
             case .preferences: return false
             }
         }
+        // swiftlint:enable identifier_name
     }
 
     weak var delegate: TabDelegate?
