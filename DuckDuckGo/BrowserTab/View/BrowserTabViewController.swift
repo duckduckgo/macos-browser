@@ -81,7 +81,12 @@ final class BrowserTabViewController: NSViewController {
         changeWebView()
 
         if tabCollectionViewModel.selectedTabViewModel?.tab.tabType == .preferences {
-            showPreferencesPage()
+            if url != nil {
+                tabCollectionViewModel.selectedTabViewModel?.tab.tabType = .standard
+                showWebView()
+            } else {
+                addPreferencesPage()
+            }
         } else if url != nil && url != URL.emptyPage {
             showWebView()
         } else {
@@ -91,6 +96,7 @@ final class BrowserTabViewController: NSViewController {
 
     private func showWebView() {
         self.homepageView.removeFromSuperview()
+        removePreferencesPage()
 
         if let webView = self.webView {
             addWebViewToViewHierarchy(webView)
@@ -192,14 +198,16 @@ final class BrowserTabViewController: NSViewController {
 
     private lazy var preferencesViewController = PreferencesSplitViewController.create()
 
-    private func showPreferencesPage() {
-        hidePreferencesPage()
+    private func addPreferencesPage() {
+        self.webView?.removeFromSuperview()
+
+        removePreferencesPage()
 
         self.addChild(preferencesViewController)
         view.addAndLayout(preferencesViewController.view)
     }
 
-    private func hidePreferencesPage() {
+    private func removePreferencesPage() {
         preferencesViewController.removeFromParent()
         preferencesViewController.view.removeFromSuperview()
     }

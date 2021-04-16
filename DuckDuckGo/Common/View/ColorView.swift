@@ -66,4 +66,19 @@ final class ColorView: NSView {
         layer?.backgroundColor = backgroundColor?.cgColor
         layer?.borderColor = borderColor?.cgColor
     }
+
+    // MARK: - NSResponder Propogation
+
+    // ColorView is frequently used as a background view, and should not pass touch events onto the views behind it.
+    // By providing empty implementations of these NSResponder methods, the events are prevented from propogating through the responder chain.
+
+    override func mouseDown(with event: NSEvent) {}
+    override func mouseDragged(with event: NSEvent) {}
+    override func mouseUp(with event: NSEvent) {}
+
+    override func rightMouseDown(with event: NSEvent) {}
+    override func rightMouseDragged(with event: NSEvent) {}
+    override func rightMouseUp(with event: NSEvent) {}
+
+    override func mouseMoved(with event: NSEvent) {}
 }

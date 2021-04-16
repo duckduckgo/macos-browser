@@ -99,8 +99,8 @@ final class Tab: NSObject {
         userScripts?.remove(from: webView.configuration.userContentController)
     }
 
-    let tabType: TabType
     let webView: WebView
+    var tabType: TabType
 	var userEnteredUrl = true
 
     @PublishedAfter var url: URL? {
