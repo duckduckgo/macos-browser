@@ -75,6 +75,11 @@ final class PreferencesListViewController: NSViewController {
                                                selector: #selector(reloadDefaultBrowserRow),
                                                name: NSApplication.willBecomeActiveNotification,
                                                object: nil)
+
+        DistributedNotificationCenter.default().addObserver(self,
+                                                            selector: #selector(reloadAppearanceSensitiveRows),
+                                                            name: Notification.Name("AppleColorPreferencesChangedNotification"),
+                                                            object: nil)
     }
 
     override func viewWillAppear() {
@@ -101,6 +106,11 @@ final class PreferencesListViewController: NSViewController {
         // In order to detect whether the default browser has changed, this function checks every time the view appears or the app comes back from
         // the background.
         reloadRow(for: .defaultBrowser)
+    }
+
+    @objc
+    private func reloadAppearanceSensitiveRows() {
+        reloadRow(for: .appearance)
     }
 
     private func indexForFirstVisibleRow() -> Int {

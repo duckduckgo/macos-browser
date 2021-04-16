@@ -20,6 +20,11 @@ import Foundation
 
 final class AppearancePreferencesTableCellView: NSTableCellView {
 
+    private enum Constants {
+        static let appearanceButtonCornerRadius: CGFloat = 7
+        static let appearanceButtonBorderWidth: CGFloat = 2
+    }
+
     static let identifier = NSUserInterfaceItemIdentifier("AppearancePreferencesTableCellView")
 
     static func nib() -> NSNib {
@@ -66,9 +71,9 @@ final class AppearancePreferencesTableCellView: NSTableCellView {
 
     func applyBorderedStyle(to button: NSButton) {
         button.wantsLayer = true
-        button.layer?.cornerRadius = 7.0
-        button.layer?.borderWidth = 2
-        button.layer?.borderColor = NSColor(named: "BlueButtonBorderColor")!.cgColor
+        button.layer?.cornerRadius = Constants.appearanceButtonCornerRadius
+        button.layer?.borderWidth = Constants.appearanceButtonBorderWidth
+        button.layer?.borderColor = NSColor.controlAccentColor.cgColor
     }
 
     func resetButtonStyle(for button: NSButton) {
