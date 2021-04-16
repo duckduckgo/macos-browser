@@ -39,7 +39,7 @@ final class ExternalURLHandler {
     }
 
     func isExternal(scheme: String) -> Bool {
-        return !["https", "http", "about", "data"].contains(scheme)
+        return !["https", "http", "about", "data", "file"].contains(scheme)
     }
 
     func handle(url: URL, onPage page: URL?, fromFrame: Bool, triggeredByUser: Bool) {
