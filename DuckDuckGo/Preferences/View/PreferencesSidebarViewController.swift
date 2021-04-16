@@ -46,6 +46,11 @@ final class PreferencesSidebarViewController: NSViewController {
         preferencesTableView.action = #selector(selectedRow)
     }
 
+    override func viewDidAppear() {
+        super.viewDidAppear()
+        preferencesTableView.makeMeFirstResponder()
+    }
+
     func select(rowAtIndex row: Int) {
         let indexSet = IndexSet(integer: row)
         preferencesTableView.selectRowIndexes(indexSet, byExtendingSelection: false)
