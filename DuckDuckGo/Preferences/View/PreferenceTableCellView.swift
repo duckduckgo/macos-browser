@@ -20,11 +20,20 @@ import Foundation
 
 final class PreferenceTableCellView: NSTableCellView {
 
+    private enum Constants {
+        // The padding constants are used when rendering cells that have a divider at the top, such as the About row in Preferences.
+        static let rowTopPadding: CGFloat = 10
+        static let rowBottomPadding: CGFloat = 20
+    }
+
     static let identifier = NSUserInterfaceItemIdentifier("PreferenceTableCellView")
 
     @IBOutlet var preferenceImageView: NSImageView!
     @IBOutlet var preferenceTitleLabel: NSTextField!
+
     @IBOutlet var dividerView: NSBox!
+    @IBOutlet var dividerViewTopConstraint: NSLayoutConstraint!
+    @IBOutlet var dividerViewBottomConstraint: NSLayoutConstraint!
 
     var isSelected: Bool = false
 
@@ -34,10 +43,15 @@ final class PreferenceTableCellView: NSTableCellView {
         preferenceTitleLabel.stringValue = section.displayName
     }
 
-    func update(with image: NSImage, title: String) {
+    func update(with image: NSImage, title: String, addDividerPadding: Bool = false) {
         dividerView.isHidden = false
         preferenceImageView.image = image
         preferenceTitleLabel.stringValue = title
+        
+        if addDividerPadding {
+            dividerViewTopConstraint.constant += Constants.rowTopPadding
+            dividerViewBottomConstraint.constant += Constants.rowBottomPadding
+        }
     }
 
     private func resetSelectionState() {

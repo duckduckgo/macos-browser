@@ -253,17 +253,19 @@
                                                             </subviews>
                                                             <constraints>
                                                                 <constraint firstItem="meh-tN-nVj" firstAttribute="top" secondItem="kB6-Wr-fV5" secondAttribute="top" constant="12" id="1Ff-6e-FOq"/>
+                                                                <constraint firstItem="g35-Kc-4ye" firstAttribute="centerY" secondItem="meh-tN-nVj" secondAttribute="centerY" id="C46-vz-otF"/>
                                                                 <constraint firstItem="meh-tN-nVj" firstAttribute="leading" secondItem="g35-Kc-4ye" secondAttribute="trailing" constant="8" symbolic="YES" id="Jma-yq-ADS"/>
                                                                 <constraint firstAttribute="bottom" secondItem="meh-tN-nVj" secondAttribute="bottom" constant="12" id="N2m-Hx-gNF"/>
                                                                 <constraint firstItem="Jt5-nc-KVD" firstAttribute="top" secondItem="kB6-Wr-fV5" secondAttribute="top" id="NrK-ns-imt"/>
                                                                 <constraint firstAttribute="trailing" secondItem="meh-tN-nVj" secondAttribute="trailing" constant="20" symbolic="YES" id="P5T-2f-1HC"/>
                                                                 <constraint firstItem="g35-Kc-4ye" firstAttribute="leading" secondItem="kB6-Wr-fV5" secondAttribute="leading" constant="2" id="efc-ia-TZB"/>
                                                                 <constraint firstItem="Jt5-nc-KVD" firstAttribute="leading" secondItem="kB6-Wr-fV5" secondAttribute="leading" id="km8-ha-pPL"/>
-                                                                <constraint firstItem="g35-Kc-4ye" firstAttribute="centerY" secondItem="kB6-Wr-fV5" secondAttribute="centerY" id="mPZ-4X-gtG"/>
                                                                 <constraint firstAttribute="trailing" secondItem="Jt5-nc-KVD" secondAttribute="trailing" id="ypu-t0-fXV"/>
                                                             </constraints>
                                                             <connections>
                                                                 <outlet property="dividerView" destination="Jt5-nc-KVD" id="mfJ-cU-aiO"/>
+                                                                <outlet property="dividerViewBottomConstraint" destination="1Ff-6e-FOq" id="PNa-8O-HcR"/>
+                                                                <outlet property="dividerViewTopConstraint" destination="NrK-ns-imt" id="m6s-dY-vdw"/>
                                                                 <outlet property="preferenceImageView" destination="g35-Kc-4ye" id="6A2-jn-TkZ"/>
                                                                 <outlet property="preferenceTitleLabel" destination="meh-tN-nVj" id="5ud-eq-D4i"/>
                                                             </connections>

@@ -92,7 +92,7 @@ extension PreferencesSidebarViewController: NSTableViewDataSource, NSTableViewDe
             let preference = preferenceSections.sections[row]
             cell.update(with: preference)
         } else if row == preferenceSections.sections.count {
-            cell.update(with: NSImage(named: "Preferences")!, title: "About")
+            cell.update(with: NSImage(named: "Preferences")!, title: "About", addDividerPadding: true)
         } else {
             assertionFailure("\(#file): Tried to update cell with invalid index")
             return nil
@@ -102,7 +102,13 @@ extension PreferencesSidebarViewController: NSTableViewDataSource, NSTableViewDe
     }
 
     func tableView(_ tableView: NSTableView, rowViewForRow row: Int) -> NSTableRowView? {
-        return RoundedSelectionRowView()
+        let view = RoundedSelectionRowView()
+
+        if row == preferenceSections.sections.count {
+            view.insets = NSEdgeInsets(top: 20, left: 0, bottom: 0, right: 0)
+        }
+
+        return view
     }
 
     func tableViewSelectionDidChange(_ notification: Notification) {
