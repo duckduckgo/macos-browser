@@ -36,6 +36,7 @@ final class PreferencesListViewController: NSViewController {
     @Published var firstVisibleCellIndex: Int = 0
 
     private var downloadPreferences = DownloadPreferences()
+    private var isScrollingToNewPreferenceSection = false
 
     enum PreferenceSection: Int, CaseIterable {
         case defaultBrowser
@@ -82,12 +83,17 @@ final class PreferencesListViewController: NSViewController {
     }
 
     func select(row: Int) {
+        isScrollingToNewPreferenceSection = true
         preferencesTableView.scrollRowToVisible(row)
     }
 
     @objc
     func contentViewDidChangeBounds(_ notification: Notification) {
-        self.firstVisibleCellIndex = indexForFirstVisibleRow()
+        if isScrollingToNewPreferenceSection {
+            isScrollingToNewPreferenceSection = false
+        } else {
+            self.firstVisibleCellIndex = indexForFirstVisibleRow()
+        }
     }
 
     @objc

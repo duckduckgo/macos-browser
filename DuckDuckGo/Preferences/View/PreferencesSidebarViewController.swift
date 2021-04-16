@@ -99,4 +99,8 @@ extension PreferencesSidebarViewController: NSTableViewDataSource, NSTableViewDe
         return RoundedSelectionRowView()
     }
 
+    func tableViewSelectionDidChange(_ notification: Notification) {
+        selectedRow()
+    }
+
 }

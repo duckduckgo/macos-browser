@@ -62,7 +62,7 @@ final class PreferencesSplitViewController: NSSplitViewController {
         cancellables.forEach { $0.cancel() }
         cancellables.removeAll()
 
-        preferencesListDetailViewController?.$firstVisibleCellIndex.sink { [weak self] index in
+        preferencesListDetailViewController?.$firstVisibleCellIndex.dropFirst().sink { [weak self] index in
             self?.sidebarViewController.select(rowAtIndex: index)
         }.store(in: &cancellables)
     }
