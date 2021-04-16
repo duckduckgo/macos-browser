@@ -202,7 +202,6 @@
 		AAC5E4D925D6A711007F5990 /* BookmarkStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = AAC5E4D625D6A710007F5990 /* BookmarkStore.swift */; };
 		AAC5E4DA25D6A711007F5990 /* Bookmark.xcdatamodeld in Sources */ = {isa = PBXBuildFile; fileRef = AAC5E4D725D6A710007F5990 /* Bookmark.xcdatamodeld */; };
 		AAC5E4E425D6BA9C007F5990 /* NSSizeExtension.swift in Sources */ = {isa = PBXBuildFile; fileRef = AAC5E4E325D6BA9C007F5990 /* NSSizeExtension.swift */; };
-		AAC5E4E925D6BB4F007F5990 /* Popover.swift in Sources */ = {isa = PBXBuildFile; fileRef = AAC5E4E825D6BB4F007F5990 /* Popover.swift */; };
 		AAC5E4F125D6BF10007F5990 /* AddressBarButton.swift in Sources */ = {isa = PBXBuildFile; fileRef = AAC5E4F025D6BF10007F5990 /* AddressBarButton.swift */; };
 		AAC5E4F625D6BF2C007F5990 /* AddressBarButtonsViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = AAC5E4F525D6BF2C007F5990 /* AddressBarButtonsViewController.swift */; };
 		AAC82C60258B6CB5009B6B42 /* TooltipWindowController.swift in Sources */ = {isa = PBXBuildFile; fileRef = AAC82C5F258B6CB5009B6B42 /* TooltipWindowController.swift */; };
@@ -495,7 +494,6 @@
 		AAC5E4D625D6A710007F5990 /* BookmarkStore.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = BookmarkStore.swift; sourceTree = "<group>"; };
 		AAC5E4D825D6A710007F5990 /* Bookmark.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = Bookmark.xcdatamodel; sourceTree = "<group>"; };
 		AAC5E4E325D6BA9C007F5990 /* NSSizeExtension.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = NSSizeExtension.swift; sourceTree = "<group>"; };
-		AAC5E4E825D6BB4F007F5990 /* Popover.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Popover.swift; sourceTree = "<group>"; };
 		AAC5E4F025D6BF10007F5990 /* AddressBarButton.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AddressBarButton.swift; sourceTree = "<group>"; };
 		AAC5E4F525D6BF2C007F5990 /* AddressBarButtonsViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AddressBarButtonsViewController.swift; sourceTree = "<group>"; };
 		AAC82C5F258B6CB5009B6B42 /* TooltipWindowController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TooltipWindowController.swift; sourceTree = "<group>"; };
@@ -1203,7 +1201,6 @@
 				AAA8E8BE24EA8A0A0055E685 /* MouseOverButton.swift */,
 				AAA8E8C024EACA700055E685 /* MouseOverView.swift */,
 				AA4E633925E79C0A00134434 /* MouseClickView.swift */,
-				AAC5E4E825D6BB4F007F5990 /* Popover.swift */,
 				AA361A3524EBF0B500EEC649 /* WindowDraggingView.swift */,
 				B6D7A2ED25D2418B002B2AE1 /* ShadowView.swift */,
 				4B65028925E6CBF40054432E /* NibLoadable.swift */,
@@ -2046,7 +2043,6 @@
 				AA4E633A25E79C0A00134434 /* MouseClickView.swift in Sources */,
 				4B6160ED25B15417007DE5B2 /* DetectedTracker.swift in Sources */,
 				B61F015525EDD5A700ABB5A3 /* UserContentController.swift in Sources */,
-				AAC5E4E925D6BB4F007F5990 /* Popover.swift in Sources */,
 				AAC5E4D925D6A711007F5990 /* BookmarkStore.swift in Sources */,
 				AA72D5FE25FFF94E00C77619 /* NSMenuItemExtension.swift in Sources */,
 				4BA1A6C2258B0A1300F6F690 /* ContiguousBytesExtension.swift in Sources */,

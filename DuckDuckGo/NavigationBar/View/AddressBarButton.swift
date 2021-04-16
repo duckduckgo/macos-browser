@@ -46,20 +46,4 @@ final class AddressBarButton: MouseOverButton {
         }
     }
 
-    override var state: NSControl.StateValue {
-        get { super.state }
-        set {
-            super.state = newValue
-            updateBackgroundColor()
-        }
-    }
-
-    override func updateBackgroundColor() {
-        if state == .on {
-            layer?.backgroundColor = mouseOverColor?.cgColor ?? NSColor.clear.cgColor
-        } else {
-            super.updateBackgroundColor()
-        }
-    }
-
 }

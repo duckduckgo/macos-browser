@@ -18,11 +18,12 @@
 
 import Cocoa
 
-final class BookmarkPopover: Popover {
+final class BookmarkPopover: NSPopover {
 
     override init() {
         super.init()
 
+        behavior = .transient
         setupContentController()
     }
 
