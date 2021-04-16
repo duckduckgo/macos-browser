@@ -53,7 +53,7 @@ final class PreferencesSplitViewController: NSSplitViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
 
-        splitView.setValue(NSColor.windowBackgroundColor, forKey: "dividerColor")
+        splitView.setValue(NSColor(named: "SeparatorColor"), forKey: "dividerColor")
         sidebarViewController.delegate = self
         subscribeToListViewControllerVisibleIndex()
     }
