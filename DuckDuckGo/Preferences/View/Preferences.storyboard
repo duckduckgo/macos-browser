@@ -448,8 +448,16 @@
                                                             <rect key="frame" x="8" y="0.0" width="416" height="24"/>
                                                             <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                                             <subviews>
+                                                                <imageView horizontalHuggingPriority="251" verticalHuggingPriority="251" translatesAutoresizingMaskIntoConstraints="NO" id="lpI-89-tZi">
+                                                                    <rect key="frame" x="0.0" y="4" width="16" height="16"/>
+                                                                    <constraints>
+                                                                        <constraint firstAttribute="width" constant="16" id="UEz-nl-2uG"/>
+                                                                        <constraint firstAttribute="height" constant="16" id="fHf-5U-d5r"/>
+                                                                    </constraints>
+                                                                    <imageCell key="cell" refusesFirstResponder="YES" alignment="left" imageScaling="proportionallyDown" image="Web" id="NnR-kL-cYY"/>
+                                                                </imageView>
                                                                 <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" horizontalCompressionResistancePriority="250" translatesAutoresizingMaskIntoConstraints="NO" id="xe6-Rk-8Bn">
-                                                                    <rect key="frame" x="0.0" y="4" width="416" height="16"/>
+                                                                    <rect key="frame" x="18" y="4" width="109" height="16"/>
                                                                     <textFieldCell key="cell" lineBreakMode="truncatingTail" sendsActionOnEndEditing="YES" title="Fireproof Domain" id="DUF-uC-HJj">
                                                                         <font key="font" usesAppearanceFont="YES"/>
                                                                         <color key="textColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
@@ -458,11 +466,15 @@
                                                                 </textField>
                                                             </subviews>
                                                             <constraints>
-                                                                <constraint firstItem="xe6-Rk-8Bn" firstAttribute="centerX" secondItem="SIf-3r-xTz" secondAttribute="centerX" id="0oE-Ju-JnI"/>
-                                                                <constraint firstItem="xe6-Rk-8Bn" firstAttribute="centerY" secondItem="SIf-3r-xTz" secondAttribute="centerY" id="3xa-nX-thw"/>
-                                                                <constraint firstItem="xe6-Rk-8Bn" firstAttribute="leading" secondItem="SIf-3r-xTz" secondAttribute="leading" constant="2" id="upt-fO-U5F"/>
+                                                                <constraint firstAttribute="bottom" secondItem="xe6-Rk-8Bn" secondAttribute="bottom" constant="4" id="4do-te-ccJ"/>
+                                                                <constraint firstItem="xe6-Rk-8Bn" firstAttribute="leading" secondItem="lpI-89-tZi" secondAttribute="trailing" constant="4" id="JTO-iu-o2U"/>
+                                                                <constraint firstItem="lpI-89-tZi" firstAttribute="centerY" secondItem="xe6-Rk-8Bn" secondAttribute="centerY" id="M9C-IL-1xS"/>
+                                                                <constraint firstAttribute="trailing" relation="greaterThanOrEqual" secondItem="xe6-Rk-8Bn" secondAttribute="trailing" constant="20" symbolic="YES" id="oIf-5A-EuT"/>
+                                                                <constraint firstItem="lpI-89-tZi" firstAttribute="leading" secondItem="SIf-3r-xTz" secondAttribute="leading" id="sf4-Vf-nFq"/>
+                                                                <constraint firstItem="xe6-Rk-8Bn" firstAttribute="top" secondItem="SIf-3r-xTz" secondAttribute="top" constant="4" id="tjv-bA-9hq"/>
                                                             </constraints>
                                                             <connections>
+                                                                <outlet property="imageView" destination="lpI-89-tZi" id="Mfb-Hw-EVJ"/>
                                                                 <outlet property="textField" destination="xe6-Rk-8Bn" id="hdX-03-QPQ"/>
                                                             </connections>
                                                         </tableCellView>
@@ -555,6 +567,7 @@ DQ
     <resources>
         <image name="HomeFavicon" width="16" height="16"/>
         <image name="Logo" width="128" height="128"/>
+        <image name="Web" width="15" height="15"/>
         <namedColor name="BlueButtonBorderColor">
             <color red="0.22699999809265137" green="0.40999999642372131" blue="0.93699997663497925" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
         </namedColor>
