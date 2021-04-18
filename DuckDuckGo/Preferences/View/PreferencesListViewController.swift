@@ -178,13 +178,13 @@ extension PreferencesListViewController: NSTableViewDataSource, NSTableViewDeleg
 extension PreferencesListViewController: DownloadPreferencesTableCellViewDelegate {
 
     func downloadPreferencesTableCellViewRequestedDownloadLocationPicker(_ cell: DownloadPreferencesTableCellView) {
-        let downloadPreferences = DownloadPreferences()
+        var downloadPreferences = DownloadPreferences()
 
         let panel = NSOpenPanel.downloadDirectoryPanel()
         let result = panel.runModal()
 
         if result == .OK, let selectedURL = panel.url {
-            downloadPreferences.select(downloadLocation: selectedURL)
+            downloadPreferences.selectedDownloadLocation = selectedURL
             reloadRow(for: .downloads)
         }
     }

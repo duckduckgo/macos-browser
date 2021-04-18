@@ -26,24 +26,30 @@ struct DownloadPreferences {
     }
 
     var selectedDownloadLocation: URL? {
-        if let selectedLocation = userDefaults.string(forKey: Keys.selectedDownloadLocationKey) {
-            // The selected URL needs to be checked that it is still present and writable. If not, fall back to the Downloads directory.
-            let selectedLocationURL = URL(string: selectedLocation)
-            return URL(string: selectedLocation)
-        } else {
-            return defaultDownloadLocation()
-        }
-    }
-
-    var alwaysRequestDownloadLocation: Bool {
         get {
-            return userDefaults.bool(forKey: Keys.alwaysRequestDownloadLocationKey)
+            if let selectedLocation = userDefaults.string(forKey: Keys.selectedDownloadLocationKey),
+               let selectedLocationURL = URL(string: selectedLocation),
+               downloadLocationIsValid(selectedLocationURL) {
+                return selectedLocationURL
+            }
+
+            return defaultDownloadLocation()
         }
 
         set {
-            userDefaults.setValue(newValue, forKey: Keys.alwaysRequestDownloadLocationKey)
+            guard let newDownloadLocation = newValue else {
+                userDefaults.setValue(nil, forKey: Keys.selectedDownloadLocationKey)
+                return
+            }
+
+            if downloadLocationIsValid(newDownloadLocation) {
+                userDefaults.setValue(newDownloadLocation.absoluteString, forKey: Keys.selectedDownloadLocationKey)
+            }
         }
     }
+
+    @UserDefaultsWrapper(key: .alwaysRequestDownloadLocationKey, defaultValue: false)
+    var alwaysRequestDownloadLocation: Bool
 
     private let userDefaults: UserDefaults
 
@@ -51,25 +57,7 @@ struct DownloadPreferences {
         self.userDefaults = userDefaults
     }
 
-    func select(downloadLocation: URL) {
-        select(downloadLocation: downloadLocation.absoluteString)
-    }
-
-    private func select(downloadLocation: String) {
-        if pathIsValid(downloadLocation) {
-            userDefaults.setValue(downloadLocation, forKey: Keys.selectedDownloadLocationKey)
-        }
-    }
-
-    private func pathIsValid(_ directoryUrl: String) -> Bool {
-        let fileManager = FileManager.default
-        guard let directoryURL = URL(string: directoryUrl),
-              let resolvedURL = try? URL(resolvingAliasFileAt: directoryURL) else { return false }
-
-        return fileManager.isWritableFile(atPath: resolvedURL.path)
-    }
-
-    private func defaultDownloadLocation() -> URL? {
+    func defaultDownloadLocation() -> URL? {
         let fileManager = FileManager.default
         let folders = fileManager.urls(for: .downloadsDirectory, in: .userDomainMask)
 
@@ -78,6 +66,18 @@ struct DownloadPreferences {
               fileManager.isWritableFile(atPath: resolvedURL.path) else { return nil }
 
         return resolvedURL
+    }
+
+    private func downloadLocationIsValid(_ directoryLocation: String) -> Bool {
+        guard let directoryURL = URL(string: directoryLocation) else { return false }
+        return downloadLocationIsValid(directoryURL)
+    }
+
+    private func downloadLocationIsValid(_ directoryLocation: URL) -> Bool {
+        let fileManager = FileManager.default
+        guard let resolvedURL = try? URL(resolvingAliasFileAt: directoryLocation) else { return false }
+
+        return fileManager.isWritableFile(atPath: resolvedURL.path)
     }
 
 }

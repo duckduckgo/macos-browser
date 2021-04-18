@@ -40,6 +40,7 @@ public struct UserDefaultsWrapper<T> {
 
         case loginDetectionEnabled = "fireproofing.login-detection-enabled"
 
+        case alwaysRequestDownloadLocationKey = "preferences.download-location.always-request"
     }
 
     private let key: Key
