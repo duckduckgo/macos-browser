@@ -31,7 +31,6 @@
 		4B0511BD262CAA5A00F6079C /* PrivacySecurityPreferences.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B0511A6262CAA5A00F6079C /* PrivacySecurityPreferences.swift */; };
 		4B0511BE262CAA5A00F6079C /* DownloadPreferences.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B0511A7262CAA5A00F6079C /* DownloadPreferences.swift */; };
 		4B0511BF262CAA5A00F6079C /* PreferenceSections.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B0511A8262CAA5A00F6079C /* PreferenceSections.swift */; };
-		4B0511C0262CAA5A00F6079C /* Preference.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B0511A9262CAA5A00F6079C /* Preference.swift */; };
 		4B0511C1262CAA5A00F6079C /* PrivacySecurityPreferencesTableCellView.xib in Resources */ = {isa = PBXBuildFile; fileRef = 4B0511AB262CAA5A00F6079C /* PrivacySecurityPreferencesTableCellView.xib */; };
 		4B0511C2262CAA5A00F6079C /* PreferencesAboutViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B0511AC262CAA5A00F6079C /* PreferencesAboutViewController.swift */; };
 		4B0511C3262CAA5A00F6079C /* Preferences.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 4B0511AD262CAA5A00F6079C /* Preferences.storyboard */; };
@@ -344,7 +343,6 @@
 		4B0511A6262CAA5A00F6079C /* PrivacySecurityPreferences.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = PrivacySecurityPreferences.swift; sourceTree = "<group>"; };
 		4B0511A7262CAA5A00F6079C /* DownloadPreferences.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = DownloadPreferences.swift; sourceTree = "<group>"; };
 		4B0511A8262CAA5A00F6079C /* PreferenceSections.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = PreferenceSections.swift; sourceTree = "<group>"; };
-		4B0511A9262CAA5A00F6079C /* Preference.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Preference.swift; sourceTree = "<group>"; };
 		4B0511AB262CAA5A00F6079C /* PrivacySecurityPreferencesTableCellView.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = PrivacySecurityPreferencesTableCellView.xib; sourceTree = "<group>"; };
 		4B0511AC262CAA5A00F6079C /* PreferencesAboutViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = PreferencesAboutViewController.swift; sourceTree = "<group>"; };
 		4B0511AD262CAA5A00F6079C /* Preferences.storyboard */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.storyboard; path = Preferences.storyboard; sourceTree = "<group>"; };
@@ -740,7 +738,6 @@
 				4B0511A6262CAA5A00F6079C /* PrivacySecurityPreferences.swift */,
 				4B0511A7262CAA5A00F6079C /* DownloadPreferences.swift */,
 				4B0511A8262CAA5A00F6079C /* PreferenceSections.swift */,
-				4B0511A9262CAA5A00F6079C /* Preference.swift */,
 			);
 			path = Model;
 			sourceTree = "<group>";
@@ -2083,7 +2080,6 @@
 				AA9FF95D24A1FA1C0039E328 /* TabCollection.swift in Sources */,
 				85A0118225AF60E700FA6A0C /* FindInPageModel.swift in Sources */,
 				B6DA44022616B28300DD1EC2 /* PixelDataStore.swift in Sources */,
-				4B0511C0262CAA5A00F6079C /* Preference.swift in Sources */,
 				B6A9E45326142B070067D1B9 /* Pixel.swift in Sources */,
 				B6A9E47726146A570067D1B9 /* PixelEvent.swift in Sources */,
 				85799C3425DFCD1B0007EC87 /* TrackerRadarManager.swift in Sources */,
