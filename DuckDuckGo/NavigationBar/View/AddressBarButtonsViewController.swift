@@ -240,7 +240,7 @@ final class AddressBarButtonsViewController: NSViewController {
                          asPopoverRelativeTo: frame,
                          of: self.fireproofedButton.superview!,
                          preferredEdge: .minY,
-                         behavior: .transient)
+                         behavior: .applicationDefined)
         }
     }
 

@@ -105,6 +105,12 @@ final class HomepageViewController: NSViewController {
         displayDefaultBrowserPromptIfNeeded()
     }
 
+    override func mouseDown(with event: NSEvent) {
+        super.mouseDown(with: event)
+
+        view.window?.makeFirstResponder(nil)
+    }
+
     func layoutDefaultBrowserPromptView() {
         defaultBrowserPromptView.delegate = self
         defaultBrowserPromptView.translatesAutoresizingMaskIntoConstraints = false
