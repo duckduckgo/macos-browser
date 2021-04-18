@@ -19,16 +19,6 @@
 import Foundation
 @testable import DuckDuckGo_Privacy_Browser
 
-extension UserDefaults {
-
-    static func clearStandard() {
-        if let bundleID = Bundle.main.bundleIdentifier {
-            UserDefaults.standard.removePersistentDomain(forName: bundleID)
-        }
-    }
-
-}
-
 extension UserDefaultsWrapper {
 
     public static func clearAll() {
