@@ -22,6 +22,17 @@ enum ThemeName: String {
     case systemDefault
     case light
     case dark
+
+    var appearance: NSAppearance? {
+        switch self {
+        case .dark:
+            return NSAppearance(named: .darkAqua)
+        case .light:
+            return NSAppearance(named: .aqua)
+        default:
+            return nil
+        }
+    }
 }
 
 struct AppearancePreferences {
@@ -56,14 +67,7 @@ struct AppearancePreferences {
     }
 
     func updateUserInterfaceStyle() {
-        switch currentThemeName {
-        case .dark:
-            NSApp.appearance = NSAppearance(named: .darkAqua)
-        case .light:
-            NSApp.appearance = NSAppearance(named: .aqua)
-        default:
-            NSApp.appearance = nil
-        }
+        NSApp.appearance = currentThemeName.appearance
     }
 
 }

@@ -39,13 +39,13 @@ struct DefaultBrowserPreferences {
             return false
         }
 
-         let httpResult = LSSetDefaultHandlerForURLScheme("http" as CFString, bundleID as CFString)
-         return httpResult == 0
+         let result = LSSetDefaultHandlerForURLScheme("http" as CFString, bundleID as CFString)
+         return result == 0
     }
 
     private static func openSystemPreferences() {
         // Apple provides a more general URL for opening System Preferences in the form of "x-apple.systempreferences:com.apple.preference" but it
-        // doesn't support opening the General prefpane directly.
+        // doesn't support opening the Appearance prefpane directly.
         NSWorkspace.shared.open(URL(fileURLWithPath: "/System/Library/PreferencePanes/Appearance.prefPane"))
     }
 
