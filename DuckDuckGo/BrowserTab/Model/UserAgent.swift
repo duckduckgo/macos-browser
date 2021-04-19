@@ -26,7 +26,6 @@ enum UserAgent {
     static let `default` = UserAgent.safari
 
     static let domainUserAgents = [
-        "mail.google.com": UserAgent.safari,
         "*.google.com": UserAgent.chrome
     ]
 
