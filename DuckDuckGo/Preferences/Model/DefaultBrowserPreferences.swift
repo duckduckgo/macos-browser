@@ -25,6 +25,12 @@ struct DefaultBrowserPreferences {
             return false
         }
 
+        #if DEBUG
+        if defaultBrowserURL.absoluteString.hasPrefix("Debug/DuckDuckGo%20Privacy%20Browser.app/") {
+            return true
+        }
+        #endif
+
         return Bundle.main.bundleURL == defaultBrowserURL
     }
 
