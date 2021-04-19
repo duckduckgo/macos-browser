@@ -45,6 +45,13 @@ final class Tab: NSObject {
             let tabType = type ?? TabType.standard.rawValue
             return TabType(rawValue: tabType) ?? .standard
         }
+
+        var focusTabAddressBarWhenSelected: Bool {
+            switch self {
+            case .standard: return true
+            case .preferences: return false
+            }
+        }
     }
 
     weak var delegate: TabDelegate?
