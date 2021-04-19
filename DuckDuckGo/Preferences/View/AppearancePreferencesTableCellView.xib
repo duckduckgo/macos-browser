@@ -1,0 +1,144 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<document type="com.apple.InterfaceBuilder3.Cocoa.XIB" version="3.0" toolsVersion="17701" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none" useAutolayout="YES" customObjectInstantitationMethod="direct">
+    <dependencies>
+        <deployment identifier="macosx"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="17701"/>
+        <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
+    </dependencies>
+    <objects>
+        <customObject id="-2" userLabel="File's Owner"/>
+        <customObject id="-1" userLabel="First Responder" customClass="FirstResponder"/>
+        <customObject id="-3" userLabel="Application" customClass="NSObject"/>
+        <tableCellView id="gHC-fA-eY6" customClass="AppearancePreferencesTableCellView" customModule="DuckDuckGo_Privacy_Browser" customModuleProvider="target">
+            <rect key="frame" x="0.0" y="0.0" width="392" height="200"/>
+            <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+            <subviews>
+                <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="e3W-uW-tkk">
+                    <rect key="frame" x="-2" y="159" width="106" height="21"/>
+                    <textFieldCell key="cell" lineBreakMode="clipping" title="Appearance" id="CHr-Ux-cGW">
+                        <font key="font" metaFont="systemSemibold" size="18"/>
+                        <color key="textColor" name="labelColor" catalog="System" colorSpace="catalog"/>
+                        <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
+                    </textFieldCell>
+                </textField>
+                <button verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="BOj-QM-L7T" customClass="PaddedImageButton" customModule="DuckDuckGo_Privacy_Browser" customModuleProvider="target">
+                    <rect key="frame" x="0.0" y="44" width="96" height="64"/>
+                    <buttonCell key="cell" type="bevel" bezelStyle="rounded" image="LightModePreview" imagePosition="only" alignment="center" imageScaling="axesIndependently" inset="2" id="H43-A1-lyb">
+                        <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
+                        <font key="font" metaFont="system"/>
+                    </buttonCell>
+                    <userDefinedRuntimeAttributes>
+                        <userDefinedRuntimeAttribute type="number" keyPath="verticalImagePadding">
+                            <real key="value" value="4"/>
+                        </userDefinedRuntimeAttribute>
+                        <userDefinedRuntimeAttribute type="number" keyPath="horizontalImagePadding">
+                            <real key="value" value="4"/>
+                        </userDefinedRuntimeAttribute>
+                    </userDefinedRuntimeAttributes>
+                    <connections>
+                        <action selector="selectedTheme:" target="gHC-fA-eY6" id="4hv-7o-5VK"/>
+                    </connections>
+                </button>
+                <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="F2o-j4-gQP">
+                    <rect key="frame" x="-2" y="120" width="56" height="19"/>
+                    <textFieldCell key="cell" lineBreakMode="clipping" title="Theme" id="Q0n-SX-fKA">
+                        <font key="font" metaFont="systemMedium" size="16"/>
+                        <color key="textColor" name="labelColor" catalog="System" colorSpace="catalog"/>
+                        <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
+                    </textFieldCell>
+                </textField>
+                <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="dqb-gY-I9G">
+                    <rect key="frame" x="29" y="20" width="39" height="16"/>
+                    <textFieldCell key="cell" lineBreakMode="clipping" alignment="center" title="Light" id="cOz-Ki-E2Q">
+                        <font key="font" metaFont="system"/>
+                        <color key="textColor" name="labelColor" catalog="System" colorSpace="catalog"/>
+                        <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
+                    </textFieldCell>
+                </textField>
+                <button verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="TBg-li-2gv" customClass="PaddedImageButton" customModule="DuckDuckGo_Privacy_Browser" customModuleProvider="target">
+                    <rect key="frame" x="128" y="44" width="97" height="64"/>
+                    <buttonCell key="cell" type="bevel" bezelStyle="rounded" image="DarkModePreview" imagePosition="only" alignment="center" imageScaling="axesIndependently" inset="2" id="UCd-7C-f2j">
+                        <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
+                        <font key="font" metaFont="system"/>
+                    </buttonCell>
+                    <userDefinedRuntimeAttributes>
+                        <userDefinedRuntimeAttribute type="number" keyPath="horizontalImagePadding">
+                            <real key="value" value="4"/>
+                        </userDefinedRuntimeAttribute>
+                        <userDefinedRuntimeAttribute type="number" keyPath="verticalImagePadding">
+                            <real key="value" value="4"/>
+                        </userDefinedRuntimeAttribute>
+                    </userDefinedRuntimeAttributes>
+                    <connections>
+                        <action selector="selectedTheme:" target="gHC-fA-eY6" id="XWq-eh-Tdj"/>
+                    </connections>
+                </button>
+                <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="foN-Md-8eh">
+                    <rect key="frame" x="158" y="20" width="37" height="16"/>
+                    <textFieldCell key="cell" lineBreakMode="clipping" alignment="center" title="Dark" id="uKI-wY-yUp">
+                        <font key="font" metaFont="system"/>
+                        <color key="textColor" name="labelColor" catalog="System" colorSpace="catalog"/>
+                        <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
+                    </textFieldCell>
+                </textField>
+                <button verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="DKk-i0-rk7" customClass="PaddedImageButton" customModule="DuckDuckGo_Privacy_Browser" customModuleProvider="target">
+                    <rect key="frame" x="257" y="44" width="97" height="64"/>
+                    <buttonCell key="cell" type="bevel" bezelStyle="rounded" image="SystemDefaultPreview" imagePosition="only" alignment="center" imageScaling="axesIndependently" inset="2" id="sjr-as-3zo">
+                        <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
+                        <font key="font" metaFont="system"/>
+                    </buttonCell>
+                    <userDefinedRuntimeAttributes>
+                        <userDefinedRuntimeAttribute type="number" keyPath="verticalImagePadding">
+                            <real key="value" value="4"/>
+                        </userDefinedRuntimeAttribute>
+                        <userDefinedRuntimeAttribute type="number" keyPath="horizontalImagePadding">
+                            <real key="value" value="4"/>
+                        </userDefinedRuntimeAttribute>
+                    </userDefinedRuntimeAttributes>
+                    <connections>
+                        <action selector="selectedTheme:" target="gHC-fA-eY6" id="l30-Bb-dJp"/>
+                    </connections>
+                </button>
+                <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="zoM-9m-Wo1">
+                    <rect key="frame" x="279" y="20" width="53" height="16"/>
+                    <textFieldCell key="cell" lineBreakMode="clipping" alignment="center" title="System" id="A2V-Nt-afA">
+                        <font key="font" metaFont="system"/>
+                        <color key="textColor" name="labelColor" catalog="System" colorSpace="catalog"/>
+                        <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
+                    </textFieldCell>
+                </textField>
+            </subviews>
+            <constraints>
+                <constraint firstItem="BOj-QM-L7T" firstAttribute="top" secondItem="F2o-j4-gQP" secondAttribute="bottom" constant="12" id="18e-Yi-aZR"/>
+                <constraint firstItem="e3W-uW-tkk" firstAttribute="leading" secondItem="gHC-fA-eY6" secondAttribute="leading" id="1IJ-l5-yEX"/>
+                <constraint firstItem="dqb-gY-I9G" firstAttribute="top" secondItem="BOj-QM-L7T" secondAttribute="bottom" constant="8" symbolic="YES" id="4kW-67-zZ2"/>
+                <constraint firstItem="DKk-i0-rk7" firstAttribute="centerY" secondItem="TBg-li-2gv" secondAttribute="centerY" id="9lc-xG-mrS"/>
+                <constraint firstItem="BOj-QM-L7T" firstAttribute="leading" secondItem="gHC-fA-eY6" secondAttribute="leading" id="IXX-Uy-Bv3"/>
+                <constraint firstItem="F2o-j4-gQP" firstAttribute="leading" secondItem="gHC-fA-eY6" secondAttribute="leading" id="P1K-we-LuB"/>
+                <constraint firstItem="foN-Md-8eh" firstAttribute="top" secondItem="TBg-li-2gv" secondAttribute="bottom" constant="8" symbolic="YES" id="PjV-qc-zlb"/>
+                <constraint firstItem="TBg-li-2gv" firstAttribute="leading" secondItem="BOj-QM-L7T" secondAttribute="trailing" constant="32" id="Tvr-sm-XyF"/>
+                <constraint firstItem="zoM-9m-Wo1" firstAttribute="top" secondItem="DKk-i0-rk7" secondAttribute="bottom" constant="8" symbolic="YES" id="Uqq-3j-gID"/>
+                <constraint firstItem="TBg-li-2gv" firstAttribute="centerY" secondItem="BOj-QM-L7T" secondAttribute="centerY" id="V2c-6n-5fl"/>
+                <constraint firstAttribute="bottom" secondItem="dqb-gY-I9G" secondAttribute="bottom" constant="20" symbolic="YES" id="Z6I-mm-Flr"/>
+                <constraint firstItem="zoM-9m-Wo1" firstAttribute="centerX" secondItem="DKk-i0-rk7" secondAttribute="centerX" id="bCm-RI-xwL"/>
+                <constraint firstItem="e3W-uW-tkk" firstAttribute="top" secondItem="gHC-fA-eY6" secondAttribute="top" constant="20" symbolic="YES" id="dEE-sz-74u"/>
+                <constraint firstItem="foN-Md-8eh" firstAttribute="centerX" secondItem="TBg-li-2gv" secondAttribute="centerX" id="g46-8Q-yjp"/>
+                <constraint firstItem="DKk-i0-rk7" firstAttribute="leading" secondItem="TBg-li-2gv" secondAttribute="trailing" constant="32" id="mg5-uI-CVw"/>
+                <constraint firstItem="F2o-j4-gQP" firstAttribute="top" secondItem="e3W-uW-tkk" secondAttribute="bottom" constant="20" id="wVF-Oe-uKt"/>
+                <constraint firstAttribute="trailing" relation="greaterThanOrEqual" secondItem="DKk-i0-rk7" secondAttribute="trailing" id="x9G-ru-n7n"/>
+                <constraint firstItem="dqb-gY-I9G" firstAttribute="centerX" secondItem="BOj-QM-L7T" secondAttribute="centerX" id="zJL-vS-SAx"/>
+            </constraints>
+            <connections>
+                <outlet property="darkModeAppearanceButton" destination="TBg-li-2gv" id="QSx-cs-jh4"/>
+                <outlet property="lightModeAppearanceButton" destination="BOj-QM-L7T" id="sZy-b0-G6y"/>
+                <outlet property="systemDefaultAppearanceButton" destination="DKk-i0-rk7" id="lfP-zp-uOL"/>
+            </connections>
+            <point key="canvasLocation" x="-32" y="495.5"/>
+        </tableCellView>
+    </objects>
+    <resources>
+        <image name="DarkModePreview" width="96" height="64"/>
+        <image name="LightModePreview" width="96" height="64"/>
+        <image name="SystemDefaultPreview" width="96" height="64"/>
+    </resources>
+</document>

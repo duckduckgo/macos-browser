@@ -39,6 +39,8 @@ final class OptionsButtonMenu: NSMenu {
         case bookmarkThisPage
         case favoriteThisPage
         case navigateToBookmark
+
+        case preferences
     }
     fileprivate(set) var result: Result?
 
@@ -63,6 +65,7 @@ final class OptionsButtonMenu: NSMenu {
         super.update()
     }
 
+    // swiftlint:disable function_body_length
     private func setupMenuItems() {
         let moveTabMenuItem = NSMenuItem(title: UserText.moveTabToNewWindow,
                                          action: #selector(moveTabToNewWindowAction(_:)),
@@ -116,7 +119,13 @@ final class OptionsButtonMenu: NSMenu {
 
              addItem(NSMenuItem.separator())
          }
+
+        let preferencesItem = NSMenuItem(title: UserText.preferences, action: #selector(openPreferences(_:)), keyEquivalent: "")
+        preferencesItem.target = self
+        preferencesItem.image = NSImage(named: "Preferences")
+        addItem(preferencesItem)
     }
+    // swiftlint:enable function_body_length
     
     private func updateBookmarks() {
         // The bookmarks section is the same with the main menu
@@ -143,6 +152,10 @@ final class OptionsButtonMenu: NSMenu {
         selectedTabViewModel.tab.requestFireproofToggle()
     }
 
+    @objc func openPreferences(_ sender: NSMenuItem) {
+        WindowControllersManager.shared.showPreferencesTab()
+    }
+
     override func performActionForItem(at index: Int) {
         defer {
             super.performActionForItem(at: index)
@@ -160,6 +173,8 @@ final class OptionsButtonMenu: NSMenu {
             self.result = .feedback
         case #selector(toggleFireproofing(_:)):
             self.result = .fireproof
+        case #selector(openPreferences(_:)):
+            self.result = .preferences
         case .none:
             break
         default:

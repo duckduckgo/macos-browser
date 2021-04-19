@@ -116,7 +116,12 @@ final class TabBarViewItem: NSCollectionViewItem {
         return menu
     }
 
-    @IBOutlet weak var faviconImageView: NSImageView!
+    @IBOutlet weak var faviconImageView: NSImageView! {
+        didSet {
+            faviconImageView.applyFaviconStyle()
+        }
+    }
+
     @IBOutlet weak var titleTextField: NSTextField!
     @IBOutlet weak var closeButton: MouseOverButton!
     @IBOutlet weak var rightSeparatorView: ColorView!

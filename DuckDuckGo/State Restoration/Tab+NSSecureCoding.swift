@@ -26,12 +26,14 @@ extension Tab: NSSecureCoding {
         static let title = "title"
         static let sessionStateData = "ssdata"
         static let favicon = "icon"
+        static let tabType = "tabType"
     }
 
     static var supportsSecureCoding: Bool { true }
 
     convenience init?(coder decoder: NSCoder) {
-        self.init(url: decoder.decodeIfPresent(at: NSCodingKeys.url),
+        self.init(tabType: TabType.rawValue(decoder.decodeIfPresent(at: NSCodingKeys.tabType)),
+                  url: decoder.decodeIfPresent(at: NSCodingKeys.url),
                   title: decoder.decodeIfPresent(at: NSCodingKeys.title),
                   favicon: decoder.decodeIfPresent(at: NSCodingKeys.favicon),
                   sessionStateData: decoder.decodeIfPresent(at: NSCodingKeys.sessionStateData))
@@ -44,6 +46,7 @@ extension Tab: NSSecureCoding {
         title.map(coder.encode(forKey: NSCodingKeys.title))
         favicon.map(coder.encode(forKey: NSCodingKeys.favicon))
         getActualSessionStateData().map(coder.encode(forKey: NSCodingKeys.sessionStateData))
+        coder.encode(tabType.rawValue, forKey: NSCodingKeys.tabType)
     }
 
 }

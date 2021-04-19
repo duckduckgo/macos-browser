@@ -1,5 +1,5 @@
 //
-//  Browser.swift
+//  PreferenceSection.swift
 //
 //  Copyright © 2021 DuckDuckGo. All rights reserved.
 //
@@ -18,12 +18,18 @@
 
 import Foundation
 
-struct Browser {
+struct DefaultBrowserPreferences {
 
     static var isDefault: Bool {
         guard let defaultBrowserURL = NSWorkspace.shared.urlForApplication(toOpen: URL(string: "http://")!) else {
             return false
         }
+
+        #if DEBUG
+        if defaultBrowserURL.absoluteString.contains("DuckDuckGo%20Privacy%20Browser.app") {
+            return true
+        }
+        #endif
 
         return Bundle.main.bundleURL == defaultBrowserURL
     }
@@ -39,14 +45,26 @@ struct Browser {
             return false
         }
 
-         let httpResult = LSSetDefaultHandlerForURLScheme("http" as CFString, bundleID as CFString)
-         return httpResult == 0
+         let result = LSSetDefaultHandlerForURLScheme("http" as CFString, bundleID as CFString)
+         return result == 0
     }
 
     private static func openSystemPreferences() {
         // Apple provides a more general URL for opening System Preferences in the form of "x-apple.systempreferences:com.apple.preference" but it
-        // doesn't support opening the General prefpane directly.
+        // doesn't support opening the Appearance prefpane directly.
         NSWorkspace.shared.open(URL(fileURLWithPath: "/System/Library/PreferencePanes/Appearance.prefPane"))
+    }
+
+}
+
+extension DefaultBrowserPreferences: PreferenceSection {
+
+    var displayName: String {
+        return UserText.defaultBrowser
+    }
+
+    var preferenceIcon: NSImage {
+        return NSImage(named: "DefaultBrowser")!
     }
 
 }

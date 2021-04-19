@@ -53,7 +53,7 @@ extension Pixel.Event {
         }
 
         init() {
-            self.init(isDefault: Browser.isDefault)
+            self.init(isDefault: DefaultBrowserPreferences.isDefault)
         }
     }
 
@@ -292,6 +292,7 @@ extension Pixel.Event {
         case bookmark = "bookmark"
         case emailProtection = "email-protection"
         case fireproof = "fireproof"
+        case preferences = "preferences"
     }
 
     enum RefreshAccessPoint: String, CustomStringConvertible {

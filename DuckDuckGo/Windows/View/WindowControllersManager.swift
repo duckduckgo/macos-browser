@@ -45,6 +45,16 @@ final class WindowControllersManager {
 
 extension WindowControllersManager {
 
+    func showPreferencesTab() {
+        guard let windowController = mainWindowControllers.first(where: { $0.window?.isMainWindow ?? false }) else {
+            return
+        }
+
+        let viewController = windowController.mainViewController
+        let tabCollectionViewModel = viewController.tabCollectionViewModel
+        tabCollectionViewModel.appendNewTab(type: .preferences)
+    }
+    
     func show(url: URL) {
 
         func show(url: URL, in windowController: MainWindowController) {

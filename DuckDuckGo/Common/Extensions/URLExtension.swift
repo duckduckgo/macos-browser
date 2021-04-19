@@ -146,6 +146,10 @@ extension URL {
         duckDuckGo.appendingPathComponent("ac/")
     }
 
+    static var aboutDuckDuckGo: URL {
+        return URL(string: "https://duckduckgo.com/about")!
+    }
+
     static var duckDuckGoEmail = URL(string: "https://quack.duckduckgo.com/email/dashboard")!
 
     static var duckDuckGoMorePrivacyInfo = URL(string: "https://help.duckduckgo.com/duckduckgo-help-pages/privacy/atb/")!
@@ -205,11 +209,21 @@ extension URL {
             return file
         }
 
-        let fm = FileManager.default
-        let folders = fm.urls(for: .downloadsDirectory, in: .userDomainMask)
-        guard let folderUrl = folders.first,
-              let resolvedFolderUrl = try? URL(resolvingAliasFileAt: folderUrl),
-              fm.isWritableFile(atPath: resolvedFolderUrl.path) else {
+        let preferences = DownloadPreferences()
+        var downloadLocation: URL?
+
+        if preferences.alwaysRequestDownloadLocation {
+            let panel = NSOpenPanel.downloadDirectoryPanel()
+            let result = panel.runModal()
+
+            if result == .OK, let selectedURL = panel.url {
+                downloadLocation = selectedURL
+            }
+        } else {
+            downloadLocation = preferences.selectedDownloadLocation
+        }
+
+        guard let folderUrl = downloadLocation else {
             os_log("Failed to access Downloads folder")
             Pixel.fire(.debug(event: .fileMoveToDownloadsFailed, error: CocoaError(.fileWriteUnknown)))
             return nil
@@ -220,7 +234,7 @@ extension URL {
 
             let fileInDownloads = incrementFileName(in: folderUrl, named: fileName, copy: copy)
             do {
-                try fm.moveItem(at: self, to: fileInDownloads)
+                try FileManager.default.moveItem(at: self, to: fileInDownloads)
                 return fileInDownloads.path
             } catch CocoaError.fileWriteFileExists {
                 // This is expected, as moveItem throws an error if the file already exists

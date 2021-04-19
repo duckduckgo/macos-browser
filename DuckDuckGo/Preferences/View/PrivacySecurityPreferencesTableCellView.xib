@@ -1,0 +1,82 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<document type="com.apple.InterfaceBuilder3.Cocoa.XIB" version="3.0" toolsVersion="17701" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none" useAutolayout="YES" customObjectInstantitationMethod="direct">
+    <dependencies>
+        <deployment identifier="macosx"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="17701"/>
+        <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
+    </dependencies>
+    <objects>
+        <customObject id="-2" userLabel="File's Owner"/>
+        <customObject id="-1" userLabel="First Responder" customClass="FirstResponder"/>
+        <customObject id="-3" userLabel="Application" customClass="NSObject"/>
+        <tableCellView id="ZOv-mQ-BdW" customClass="PrivacySecurityPreferencesTableCellView" customModule="DuckDuckGo_Privacy_Browser" customModuleProvider="target">
+            <rect key="frame" x="0.0" y="0.0" width="480" height="216"/>
+            <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+            <subviews>
+                <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="UTK-kg-11g">
+                    <rect key="frame" x="-2" y="175" width="158" height="21"/>
+                    <textFieldCell key="cell" lineBreakMode="clipping" title="Privacy &amp; Security" id="gee-cf-Edf">
+                        <font key="font" metaFont="systemSemibold" size="18"/>
+                        <color key="textColor" name="labelColor" catalog="System" colorSpace="catalog"/>
+                        <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
+                    </textFieldCell>
+                </textField>
+                <button verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="Fd2-fn-gaX">
+                    <rect key="frame" x="-2" y="111" width="278" height="18"/>
+                    <buttonCell key="cell" type="check" title="Ask to Fireproof websites when signing in" bezelStyle="regularSquare" imagePosition="left" state="on" inset="2" id="ek6-wk-QQo">
+                        <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
+                        <font key="font" metaFont="system"/>
+                    </buttonCell>
+                    <connections>
+                        <action selector="toggledLoginDetectionCheckbox:" target="ZOv-mQ-BdW" id="Edx-4D-gM7"/>
+                    </connections>
+                </button>
+                <button verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="3Oj-RS-EIB">
+                    <rect key="frame" x="-6" y="13" width="211" height="32"/>
+                    <buttonCell key="cell" type="push" title="Manage Fireproof Websites…" bezelStyle="rounded" alignment="center" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="0HE-gw-PLQ">
+                        <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
+                        <font key="font" metaFont="system"/>
+                    </buttonCell>
+                    <connections>
+                        <action selector="manageFireproofWebsitesButtonClicked:" target="ZOv-mQ-BdW" id="IZz-CL-VKe"/>
+                    </connections>
+                </button>
+                <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="4U5-6s-Y6q">
+                    <rect key="frame" x="-2" y="140" width="72" height="19"/>
+                    <textFieldCell key="cell" lineBreakMode="clipping" title="Fireproof" id="UhZ-7t-gWn">
+                        <font key="font" metaFont="systemMedium" size="16"/>
+                        <color key="textColor" name="labelColor" catalog="System" colorSpace="catalog"/>
+                        <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
+                    </textFieldCell>
+                </textField>
+                <textField verticalHuggingPriority="750" horizontalCompressionResistancePriority="250" translatesAutoresizingMaskIntoConstraints="NO" id="1Hn-nJ-bFt">
+                    <rect key="frame" x="-2" y="52" width="464" height="48"/>
+                    <textFieldCell key="cell" selectable="YES" id="VcP-EL-hod">
+                        <font key="font" metaFont="system"/>
+                        <string key="title">Websites rely on cookies to keep you signed in. When you Fireproof a site, cookies won't be erased and you'll stay signed in, even after using the Fire Button.</string>
+                        <color key="textColor" name="labelColor" catalog="System" colorSpace="catalog"/>
+                        <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
+                    </textFieldCell>
+                </textField>
+            </subviews>
+            <constraints>
+                <constraint firstItem="1Hn-nJ-bFt" firstAttribute="leading" secondItem="ZOv-mQ-BdW" secondAttribute="leading" id="F45-Xp-jFH"/>
+                <constraint firstItem="1Hn-nJ-bFt" firstAttribute="top" secondItem="Fd2-fn-gaX" secondAttribute="bottom" constant="12" id="Qpx-ee-2UM"/>
+                <constraint firstItem="Fd2-fn-gaX" firstAttribute="leading" secondItem="ZOv-mQ-BdW" secondAttribute="leading" id="Ucq-ST-8rU"/>
+                <constraint firstItem="4U5-6s-Y6q" firstAttribute="top" secondItem="UTK-kg-11g" secondAttribute="bottom" constant="16" id="WJB-Wr-Qug"/>
+                <constraint firstItem="3Oj-RS-EIB" firstAttribute="leading" secondItem="ZOv-mQ-BdW" secondAttribute="leading" constant="1" id="b4L-nr-UPf"/>
+                <constraint firstItem="3Oj-RS-EIB" firstAttribute="top" secondItem="1Hn-nJ-bFt" secondAttribute="bottom" constant="12" id="daF-ap-Cg8"/>
+                <constraint firstAttribute="bottom" secondItem="3Oj-RS-EIB" secondAttribute="bottom" constant="20" symbolic="YES" id="hnZ-LM-oiD"/>
+                <constraint firstItem="UTK-kg-11g" firstAttribute="top" secondItem="ZOv-mQ-BdW" secondAttribute="top" constant="20" symbolic="YES" id="jD6-pn-pAA"/>
+                <constraint firstItem="UTK-kg-11g" firstAttribute="leading" secondItem="ZOv-mQ-BdW" secondAttribute="leading" id="pSJ-Bb-9wM"/>
+                <constraint firstItem="4U5-6s-Y6q" firstAttribute="leading" secondItem="ZOv-mQ-BdW" secondAttribute="leading" id="r09-c5-p7U"/>
+                <constraint firstAttribute="trailing" secondItem="1Hn-nJ-bFt" secondAttribute="trailing" constant="20" symbolic="YES" id="r4a-mD-LWN"/>
+                <constraint firstItem="Fd2-fn-gaX" firstAttribute="top" secondItem="4U5-6s-Y6q" secondAttribute="bottom" constant="12" id="ycV-8V-FW2"/>
+            </constraints>
+            <connections>
+                <outlet property="loginDetectionCheckbox" destination="Fd2-fn-gaX" id="7R3-cm-RFP"/>
+            </connections>
+            <point key="canvasLocation" x="-481" y="223"/>
+        </tableCellView>
+    </objects>
+</document>

@@ -123,8 +123,8 @@ final class TabCollectionViewModel: NSObject {
         }
     }
 
-    func appendNewTab() {
-        tabCollection.append(tab: Tab())
+    func appendNewTab(type: Tab.TabType = .standard) {
+        tabCollection.append(tab: Tab(tabType: type))
         select(at: tabCollection.tabs.count - 1)
 
         delegate?.tabCollectionViewModelDidAppend(self, selected: true)

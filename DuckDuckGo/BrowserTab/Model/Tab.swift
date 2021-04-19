@@ -37,9 +37,27 @@ protocol TabDelegate: class {
 
 final class Tab: NSObject {
 
+    enum TabType: Int {
+        case standard = 0
+        case preferences = 1
+
+        static func rawValue(_ type: Int?) -> TabType {
+            let tabType = type ?? TabType.standard.rawValue
+            return TabType(rawValue: tabType) ?? .standard
+        }
+
+        var focusTabAddressBarWhenSelected: Bool {
+            switch self {
+            case .standard: return true
+            case .preferences: return false
+            }
+        }
+    }
+
     weak var delegate: TabDelegate?
 
-    init(faviconService: FaviconService = LocalFaviconService.shared,
+    init(tabType: TabType = .standard,
+         faviconService: FaviconService = LocalFaviconService.shared,
          webCacheManager: WebCacheManager = .shared,
          webViewConfiguration: WebViewConfiguration? = nil,
          url: URL? = nil,
@@ -49,8 +67,8 @@ final class Tab: NSObject {
          sessionStateData: Data? = nil,
          shouldLoadInBackground: Bool = false) {
 
+        self.tabType = tabType
         self.faviconService = faviconService
-
         self.url = url
         self.title = title
         self.error = error
@@ -65,9 +83,13 @@ final class Tab: NSObject {
         super.init()
 
         self.loginDetectionService = LoginDetectionService { [weak self] host in
-             guard let self = self else { return }
-             self.delegate?.tab(self, detectedLogin: host)
-         }
+            guard let self = self else { return }
+
+            let preferences = PrivacySecurityPreferences()
+            if preferences.loginDetectionEnabled {
+                self.delegate?.tab(self, detectedLogin: host)
+            }
+        }
 
         setupWebView(shouldLoadInBackground: shouldLoadInBackground)
 
@@ -84,13 +106,19 @@ final class Tab: NSObject {
     }
 
     let webView: WebView
+    private(set) var tabType: TabType
 	var userEnteredUrl = true
 
     @PublishedAfter var url: URL? {
         didSet {
+            if url != nil {
+                tabType = .standard
+            }
+
             if oldValue?.host != url?.host {
                 fetchFavicon(nil, for: url?.host, isFromUserScript: false)
             }
+
             invalidateSessionStateData()
             reloadIfNeeded()
         }
@@ -106,6 +134,10 @@ final class Tab: NSObject {
     }
 
     var sessionStateData: Data?
+
+    func set(tabType: TabType) {
+        self.tabType = tabType
+    }
 
     func invalidateSessionStateData() {
         sessionStateData = nil

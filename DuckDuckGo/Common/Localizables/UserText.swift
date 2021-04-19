@@ -35,6 +35,7 @@ struct UserText {
     static let openInNewWindow = NSLocalizedString("open.in.new.window", value: "Open in New Window", comment: "Menu item that opens the link in a new window")
 
     static let tabHomeTitle = NSLocalizedString("tab.home.title", value: "Home", comment: "Tab home title")
+    static let tabPreferencesTitle = NSLocalizedString("tab.preferences.title", value: "Preferences", comment: "Tab preferences title")
     static let tabErrorTitle = NSLocalizedString("tab.error.title", value: "Oops!", comment: "Tab error title")
 
     static let moveTabToNewWindow = NSLocalizedString("options.menu.move.tab.to.new.window",
@@ -117,4 +118,19 @@ struct UserText {
     static let openExternalURLMessageUnknownApp = NSLocalizedString("open.external.url.message.unknown.app", value: "Do you want to view this content in another app?", comment: "Open URL in another app dialog message for unknown app")
     static let failedToOpenExternally = NSLocalizedString("open.externally.failed", value: "The app required to open that link can’t be found", comment: "’Link’ is link on a website")
 
+    static let preferences = NSLocalizedString("preferences", value: "Preferences", comment: "Menu item for opening preferences")
+
+    static let defaultBrowser = NSLocalizedString("preferences.default-browser", value: "Default Browser", comment: "Show default browser preferences")
+    static let appearance = NSLocalizedString("preferences.appearance", value: "Appearance", comment: "Show appearance preferences")
+    static let privacyAndSecurity = NSLocalizedString("preferences.privacy-and-security", value: "Privacy & Security", comment: "Show privacy and security browser preferences")
+    static let downloads = NSLocalizedString("preferences.downloads", value: "Downloads", comment: "Show downloads browser preferences")
+    static let isDefaultBrowser = NSLocalizedString("preferences.default-browser.active", value: "DuckDuckGo is your default browser", comment: "Indicate that the browser is the default")
+    static let isNotDefaultBrowser = NSLocalizedString("preferences.default-browser.inactive", value: "DuckDuckGo is not your default browser.", comment: "Indicate that the browser is not the default")
+
+    static func versionLabel(version: String, build: String) -> String {
+        let localized = NSLocalizedString("version",
+                                          value: "Version %@ (%@)",
+                                          comment: "Displays the version and build numbers")
+        return String(format: localized, version, build)
+    }
 }

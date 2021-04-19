@@ -66,4 +66,5 @@ final class ColorView: NSView {
         layer?.backgroundColor = backgroundColor?.cgColor
         layer?.borderColor = borderColor?.cgColor
     }
+
 }

@@ -85,6 +85,12 @@ extension AppDelegate {
 
 extension MainViewController {
 
+    // MARK: - Main Menu
+
+    @IBAction func openPreferences(_ sender: Any?) {
+        tabCollectionViewModel.appendNewTab(type: .preferences)
+    }
+
     // MARK: - File
 
     @IBAction func newTab(_ sender: Any?) {
