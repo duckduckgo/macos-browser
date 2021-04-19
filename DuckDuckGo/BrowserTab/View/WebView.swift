@@ -35,10 +35,28 @@ final class WebView: WKWebView {
     ]
 
     static let itemTitles: [String: String] = [
-
         "WKMenuItemIdentifierOpenLink": UserText.openLinkInNewTab
-
     ]
+
+    override var isLoading: Bool {
+        fakeIsLoading || super.isLoading
+    }
+
+    var fakeIsLoading: Bool = false {
+        willSet {
+            guard newValue != fakeIsLoading else { return }
+            willChangeValue(for: \.isLoading)
+        }
+        didSet {
+            guard oldValue != fakeIsLoading else { return }
+            didChangeValue(for: \.isLoading)
+        }
+    }
+
+    override func stopLoading() {
+        fakeIsLoading = false
+        super.stopLoading()
+    }
 
     deinit {
         self.configuration.userContentController.removeAllUserScripts()

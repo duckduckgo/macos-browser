@@ -94,12 +94,29 @@ final class WebViewStateObserver: NSObject {
 
         case #keyPath(WKWebView.canGoBack): tabViewModel.canGoBack = webView.canGoBack
         case #keyPath(WKWebView.canGoForward): tabViewModel.canGoForward = webView.canGoForward
-        case #keyPath(WKWebView.isLoading): tabViewModel.isLoading = webView.isLoading
+        case #keyPath(WKWebView.isLoading):
+            updateProgress()
+            tabViewModel.isLoading = webView.isLoading
         case #keyPath(WKWebView.title): updateTitle()
-        case #keyPath(WKWebView.estimatedProgress): tabViewModel.progress = webView.estimatedProgress
+        case #keyPath(WKWebView.estimatedProgress):
+            updateProgress()
         default:
             os_log("%s: keyPath %s not handled", type: .error, className, keyPath)
             super.observeValue(forKeyPath: keyPath, of: object, change: change, context: context)
+        }
+    }
+
+    private func updateProgress() {
+        guard let webView = webView,
+              let tabViewModel = tabViewModel
+            else { return }
+
+        if case .loaded = ContentBlockerRulesManager.shared.blockingRules {
+            // start progress from 30% (webView's initial 10% + 20%)
+            tabViewModel.progress = 0.2 + webView.estimatedProgress * 0.8
+        } else {
+            // display fake progress going from 5% to 25% while Content Rules are compiling
+            tabViewModel.progress = 0.05
         }
     }
 

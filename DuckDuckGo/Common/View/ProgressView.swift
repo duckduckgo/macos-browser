@@ -271,7 +271,8 @@ extension ProgressView {
 
         // Progress steps – Progress Value : Estimated Loading time
         static let milestones = [
-            ProgressEvent(progress: 0.25, interval: 0.0),
+            ProgressEvent(progress: 0.00, interval: 0.0),
+            ProgressEvent(progress: 0.25, interval: 30.0),
             ProgressEvent(progress: 0.40, interval: 3.0),
             ProgressEvent(progress: 0.65, interval: 15.0),
             ProgressEvent(progress: 0.80, interval: 5.0),
@@ -297,8 +298,6 @@ extension ProgressView {
         static func nextStep(for currentProgress: Double,
                              lastProgressEvent: ProgressEvent?,
                              milestones: [ProgressEvent] = Constants.milestones) -> Self? {
-            assert(currentProgress >= lastProgressEvent?.progress ?? 0)
-
             var estimatedElapsedTime: CFTimeInterval = 0.0
             var nextStepIdx: Int!
 

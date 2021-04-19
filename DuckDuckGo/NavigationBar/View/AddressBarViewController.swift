@@ -165,7 +165,7 @@ final class AddressBarViewController: NSViewController {
                 guard let progressIndicator = self?.progressIndicator else { return }
 
                 if isLoading,
-                   selectedTabViewModel.tab.url?.isDuckDuckGoSearch == false {
+                   (selectedTabViewModel.tab.url?.isDuckDuckGoSearch == false || selectedTabViewModel.tab.webView.fakeIsLoading) {
 
                     progressIndicator.show(progress: selectedTabViewModel.progress, startTime: selectedTabViewModel.loadingStartTime)
 

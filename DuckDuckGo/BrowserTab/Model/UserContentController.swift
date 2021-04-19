@@ -22,7 +22,8 @@ import Combine
 final class UserContentController: WKUserContentController {
     private var blockingRulesUpdatedCancellable: AnyCancellable?
 
-    public init(rulesPublisher: AnyPublisher<WKContentRuleList?, Never> = ContentBlockerRulesManager.shared.blockingRules) {
+    public init(rulesPublisher: AnyPublisher<WKContentRuleList?, Never>
+                    = ContentBlockerRulesManager.shared.$blockingRules.map { $0.value ?? nil }.eraseToAnyPublisher()) {
         super.init()
 
         installContentBlockingRules(publisher: rulesPublisher)

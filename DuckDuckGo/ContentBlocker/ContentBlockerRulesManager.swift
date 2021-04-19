@@ -26,19 +26,42 @@ final class ContentBlockerRulesManager {
 
     static let shared = ContentBlockerRulesManager()
 
-    private let blockingRulesSubject = CurrentValueSubject<WKContentRuleList?, Never>(nil)
-    var blockingRules: AnyPublisher<WKContentRuleList?, Never> {
-        blockingRulesSubject.eraseToAnyPublisher()
-    }
+    @Published private(set) var blockingRules: Loadable<WKContentRuleList?>
+
+    private let store: WKContentRuleListStore = {
+        guard let store = WKContentRuleListStore.default() else {
+            assert(false, "Failed to access the default WKContentRuleListStore for rules compiliation checking")
+            let url = FileManager.default.urls(for: .applicationSupportDirectory, in: .userDomainMask)[0]
+                .appendingPathComponent("contentRules")
+            return WKContentRuleListStore(url: url)
+        }
+        return store
+    }()
+
+    private static let identifier = "tds"
 
     private init() {
-        compileRules()
+        self.blockingRules = .loading
+
+        // try loading rules from previous session
+        store.lookUpContentRuleList(forIdentifier: Self.identifier) { [weak self] (ruleList, _) in
+            dispatchPrecondition(condition: .onQueue(.main))
+            guard let self = self else { return }
+
+            if let rules = ruleList {
+                self.blockingRules = .loaded(rules)
+            } else {
+                self.compileRules()
+            }
+        }
     }
 
     func compileRules(completion: ((WKContentRuleList?) -> Void)? = nil) {
         let trackerData = TrackerRadarManager.shared.trackerData
 
-        DispatchQueue.global(qos: .background).async {
+        // run initial rules compilation initiated from main thread with higher priority
+        let qos: DispatchQoS.QoSClass = Thread.isMainThread ? .userInitiated : .background
+        DispatchQueue.global(qos: qos).async {
             self.compileRules(with: trackerData, completion: completion)
         }
     }
@@ -46,10 +69,7 @@ final class ContentBlockerRulesManager {
     private func compileRules(with trackerData: TrackerData, completion: ((WKContentRuleList?) -> Void)?) {
         let rules = ContentBlockerRulesBuilder(trackerData: trackerData).buildRules(withExceptions: [],
                                                                                     andTemporaryUnprotectedDomains: [])
-        guard let store = WKContentRuleListStore.default() else {
-            assert(false, "Failed to access the default WKContentRuleListStore for rules compiliation checking")
-            return
-        }
+
         guard let data = try? JSONEncoder().encode(rules),
               let encoded = String(data: data, encoding: .utf8)
         else {
@@ -57,13 +77,23 @@ final class ContentBlockerRulesManager {
             return
         }
 
-        store.compileContentRuleList(forIdentifier: "tds", encodedContentRuleList: encoded) { [weak self] ruleList, error in
+        store.compileContentRuleList(forIdentifier: Self.identifier, encodedContentRuleList: encoded) { [weak self] ruleList, error in
             guard let self = self else {
                 assert(false, "self is gone")
                 return
             }
 
-            self.blockingRulesSubject.send(ruleList)
+            switch self.blockingRules {
+            // only populate rules when never loaded before
+            case .loading, .loaded(.none),
+                 // or when actually loaded
+                 .loaded(.some) where ruleList != nil:
+                self.blockingRules = .loaded(ruleList)
+            case .loaded(.some):
+                // don't populate if had loaded some before and failed to compile
+                break
+            }
+
             completion?(ruleList)
             if let error = error {
                 os_log("Failed to compile rules %{public}s", type: .error, error.localizedDescription)

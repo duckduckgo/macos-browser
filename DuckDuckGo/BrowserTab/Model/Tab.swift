@@ -226,6 +226,47 @@ final class Tab: NSObject {
         reloadIfNeeded(shouldLoadInBackground: shouldLoadInBackground)
     }
 
+    private var contentBlockingRulesCancellable: AnyCancellable?
+
+    private final class DecisionHandler {
+        var decisionHandler: ((WKNavigationActionPolicy) -> Void)?
+
+        init(decisionHandler: @escaping (WKNavigationActionPolicy) -> Void) {
+            self.decisionHandler = decisionHandler
+        }
+
+        func allow() {
+            decisionHandler?(.allow)
+            decisionHandler = nil
+        }
+
+        deinit {
+            decisionHandler?(.cancel)
+        }
+    }
+
+    private func ensureContentBlockingRulesLoaded(for url: URL, decisionHandler: @escaping (WKNavigationActionPolicy) -> Void) -> Bool {
+        // allow navigating to safe (DuckDuckGo URLs without ContentRules in effect)
+        guard url.isSafeURL == false,
+              case .loading = ContentBlockerRulesManager.shared.blockingRules
+        else {
+            contentBlockingRulesCancellable = nil
+            decisionHandler(.allow)
+            return false
+        }
+
+        // decisionHandler should always be called
+        // it will be called on DecisionHandler.deinit
+        // if replacing the Cancellable
+        let handler = DecisionHandler(decisionHandler: decisionHandler)
+        contentBlockingRulesCancellable = ContentBlockerRulesManager.shared.$blockingRules
+            .sink { rules in
+                guard case .loaded = rules else { return }
+                handler.allow()
+            }
+        return true
+    }
+
     // MARK: - Open External URL
 
     let externalUrlHandler = ExternalURLHandler()
@@ -479,13 +520,19 @@ extension Tab: WKNavigationDelegate {
         }
 
         HTTPSUpgrade.shared.isUpgradeable(url: url) { [weak self] isUpgradable in
+            guard let self = self else { return }
+
             if isUpgradable, let upgradedUrl = url.toHttps() {
-                self?.webView.load(upgradedUrl)
+                self.webView.load(upgradedUrl)
                 decisionHandler(.cancel)
                 return
             }
 
-            decisionHandler(.allow)
+            // fake WebView isLoading when waiting for ContentRules to compile
+            self.webView.fakeIsLoading = self.ensureContentBlockingRulesLoaded(for: url) { [weak self] decision in
+                decisionHandler(decision)
+                self?.webView.fakeIsLoading = false
+            }
         }
     }
 
