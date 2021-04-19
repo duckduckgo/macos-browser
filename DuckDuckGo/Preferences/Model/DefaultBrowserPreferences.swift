@@ -26,7 +26,7 @@ struct DefaultBrowserPreferences {
         }
 
         #if DEBUG
-        if defaultBrowserURL.absoluteString.hasSuffix("Debug/DuckDuckGo%20Privacy%20Browser.app/") {
+        if defaultBrowserURL.absoluteString.contains("DuckDuckGo%20Privacy%20Browser.app") {
             return true
         }
         #endif
