@@ -246,7 +246,7 @@ final class Tab: NSObject {
     }
 
     private func ensureContentBlockingRulesLoaded(for url: URL, decisionHandler: @escaping (WKNavigationActionPolicy) -> Void) -> Bool {
-        // allow navigating to safe (DuckDuckGo URLs without ContentRules in effect)
+        // allow navigating to safe (DuckDuckGo) URLs without wairing for ContentRules
         guard url.isSafeURL == false,
               case .loading = ContentBlockerRulesManager.shared.blockingRules
         else {
@@ -256,8 +256,7 @@ final class Tab: NSObject {
         }
 
         // decisionHandler should always be called
-        // it will be called on DecisionHandler.deinit
-        // if replacing the Cancellable
+        // it will be called on DecisionHandler.deinit when new request comes in
         let handler = DecisionHandler(decisionHandler: decisionHandler)
         contentBlockingRulesCancellable = ContentBlockerRulesManager.shared.$blockingRules
             .sink { [weak self] rules in
