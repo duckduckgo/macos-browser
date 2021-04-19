@@ -99,14 +99,19 @@ final class Tab: NSObject {
     }
 
     let webView: WebView
-    var tabType: TabType
+    private(set) var tabType: TabType
 	var userEnteredUrl = true
 
     @PublishedAfter var url: URL? {
         didSet {
+            if url != nil {
+                tabType = .standard
+            }
+
             if oldValue?.host != url?.host {
                 fetchFavicon(nil, for: url?.host, isFromUserScript: false)
             }
+
             invalidateSessionStateData()
             reloadIfNeeded()
         }
@@ -122,6 +127,10 @@ final class Tab: NSObject {
     }
 
     var sessionStateData: Data?
+
+    func set(tabType: TabType) {
+        self.tabType = tabType
+    }
 
     func invalidateSessionStateData() {
         sessionStateData = nil
