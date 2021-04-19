@@ -260,9 +260,11 @@ final class Tab: NSObject {
         // if replacing the Cancellable
         let handler = DecisionHandler(decisionHandler: decisionHandler)
         contentBlockingRulesCancellable = ContentBlockerRulesManager.shared.$blockingRules
-            .sink { rules in
+            .sink { [weak self] rules in
+                dispatchPrecondition(condition: .onQueue(.main))
                 guard case .loaded = rules else { return }
                 handler.allow()
+                self?.contentBlockingRulesCancellable = nil
             }
         return true
     }
