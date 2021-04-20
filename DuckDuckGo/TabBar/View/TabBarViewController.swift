@@ -83,7 +83,7 @@ final class TabBarViewController: NSViewController {
     override func viewDidLayout() {
         super.viewDidLayout()
 
-        updateTabMode(for: collectionView.numberOfItems(inSection: 0))
+        updateTabMode()
         updateEmptyTabArea()
         collectionView.invalidateLayout()
     }
@@ -237,7 +237,7 @@ final class TabBarViewController: NSViewController {
     }
 
     private func updateTabMode(for numberOfItems: Int? = nil) {
-        let items = CGFloat(numberOfItems ?? collectionView.numberOfItems(inSection: 0))
+        let items = CGFloat(numberOfItems ?? self.layoutNumberOfItems())
         let tabsWidth = scrollView.bounds.width
 
         if max(0, (items - 1)) * TabBarViewItem.Width.minimum.rawValue + TabBarViewItem.Width.minimumSelected.rawValue < tabsWidth {
@@ -247,8 +247,25 @@ final class TabBarViewController: NSViewController {
         }
     }
 
+    private var cachedLayoutNumberOfItems: Int?
+
+    private func layoutNumberOfItems() -> Int {
+        let actualNumber = collectionView.numberOfItems(inSection: 0)
+
+        guard let numberOfItems = self.cachedLayoutNumberOfItems,
+              // skip updating number of items when closing Tab
+              numberOfItems > actualNumber,
+              self.view.isMouseLocationInsideBounds()
+        else {
+            self.cachedLayoutNumberOfItems = actualNumber
+            return actualNumber
+        }
+
+        return numberOfItems
+    }
+
     private func currentTabWidth(selected: Bool = false) -> CGFloat {
-        let numberOfItems = CGFloat(collectionView.numberOfItems(inSection: 0))
+        let numberOfItems = CGFloat(self.layoutNumberOfItems())
         let tabsWidth = scrollView.bounds.width
         let minimumWidth = selected ? TabBarViewItem.Width.minimumSelected.rawValue : TabBarViewItem.Width.minimum.rawValue
 
@@ -261,6 +278,20 @@ final class TabBarViewController: NSViewController {
             return min(TabBarViewItem.Width.maximum.rawValue, max(minimumWidth, dividedWidth))
         } else {
             return minimumWidth
+        }
+    }
+
+    override func mouseExited(with event: NSEvent) {
+        guard !view.isMouseLocationInsideBounds(event.locationInWindow) else { return }
+
+        if cachedLayoutNumberOfItems != collectionView.numberOfItems(inSection: 0) {
+            cachedLayoutNumberOfItems = nil
+            collectionView.animator().performBatchUpdates(nil) { [weak self] _ in
+                self?.updateTabMode()
+                self?.updateEmptyTabArea()
+                self?.enableScrollButtons()
+                self?.hideTooltip()
+            }
         }
     }
 

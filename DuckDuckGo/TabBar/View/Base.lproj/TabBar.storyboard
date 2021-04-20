@@ -11,7 +11,7 @@
         <scene sceneID="1uN-YZ-dtj">
             <objects>
                 <viewController id="uSf-9n-QMw" customClass="TabBarViewController" customModule="DuckDuckGo_Privacy_Browser" customModuleProvider="target" sceneMemberID="viewController">
-                    <view key="view" id="JQD-ov-FCr">
+                    <view key="view" id="JQD-ov-FCr" customClass="MouseOverView" customModule="DuckDuckGo_Privacy_Browser" customModuleProvider="target">
                         <rect key="frame" x="0.0" y="0.0" width="845" height="38"/>
                         <autoresizingMask key="autoresizingMask"/>
                         <subviews>
