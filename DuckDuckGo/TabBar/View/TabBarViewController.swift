@@ -22,6 +22,7 @@ import Combine
 import Lottie
 
 // swiftlint:disable file_length
+// swiftlint:disable type_body_length
 final class TabBarViewController: NSViewController {
 
     enum HorizontalSpace: CGFloat {
@@ -83,6 +84,7 @@ final class TabBarViewController: NSViewController {
     override func viewDidLayout() {
         super.viewDidLayout()
 
+        frozenLayout = view.isMouseLocationInsideBounds()
         updateTabMode()
         updateEmptyTabArea()
         collectionView.invalidateLayout()
@@ -225,36 +227,48 @@ final class TabBarViewController: NSViewController {
         case overflow
     }
 
-    private var tabMode = TabMode.divided {
-        didSet {
-            if oldValue != tabMode {
-                scrollView.updateScrollElasticity(with: tabMode)
-                displayScrollButtons()
-                updateEmptyTabArea()
-                collectionView.invalidateLayout()
-            }
-        }
-    }
+    private var frozenLayout = false
+    private var tabMode = TabMode.divided
 
-    private func updateTabMode(for numberOfItems: Int? = nil) {
+    private func updateTabMode(for numberOfItems: Int? = nil, updateLayout: Bool? = nil) {
         let items = CGFloat(numberOfItems ?? self.layoutNumberOfItems())
         let tabsWidth = scrollView.bounds.width
 
+        let newMode: TabMode
         if max(0, (items - 1)) * TabBarViewItem.Width.minimum.rawValue + TabBarViewItem.Width.minimumSelected.rawValue < tabsWidth {
-            tabMode = .divided
+            newMode = .divided
         } else {
-            tabMode = .overflow
+            newMode = .overflow
+        }
+
+        guard self.tabMode != newMode else { return }
+        self.tabMode = newMode
+        if updateLayout ?? !self.frozenLayout {
+            self.updateLayout()
         }
     }
 
-    private var cachedLayoutNumberOfItems: Int?
+    private func updateLayout() {
+        scrollView.updateScrollElasticity(with: tabMode)
+        displayScrollButtons()
+        updateEmptyTabArea()
+        collectionView.invalidateLayout()
+        frozenLayout = false
+    }
 
-    private func layoutNumberOfItems() -> Int {
+    private var cachedLayoutNumberOfItems: Int?
+    private func layoutNumberOfItems(removedIndex: Int? = nil) -> Int {
         let actualNumber = collectionView.numberOfItems(inSection: 0)
+        // don't cache number of items before removal when closing the last Tab
+        guard removedIndex ?? 0 < (actualNumber - 1) else {
+            self.cachedLayoutNumberOfItems = nil
+            return actualNumber
+        }
 
         guard let numberOfItems = self.cachedLayoutNumberOfItems,
-              // skip updating number of items when closing Tab
+              // skip updating number of items when closing not last Tab
               numberOfItems > actualNumber,
+              tabMode == .divided,
               self.view.isMouseLocationInsideBounds()
         else {
             self.cachedLayoutNumberOfItems = actualNumber
@@ -264,8 +278,8 @@ final class TabBarViewController: NSViewController {
         return numberOfItems
     }
 
-    private func currentTabWidth(selected: Bool = false) -> CGFloat {
-        let numberOfItems = CGFloat(self.layoutNumberOfItems())
+    private func currentTabWidth(selected: Bool = false, removedIndex: Int? = nil) -> CGFloat {
+        let numberOfItems = CGFloat(self.layoutNumberOfItems(removedIndex: removedIndex))
         let tabsWidth = scrollView.bounds.width
         let minimumWidth = selected ? TabBarViewItem.Width.minimumSelected.rawValue : TabBarViewItem.Width.minimum.rawValue
 
@@ -284,14 +298,19 @@ final class TabBarViewController: NSViewController {
     override func mouseExited(with event: NSEvent) {
         guard !view.isMouseLocationInsideBounds(event.locationInWindow) else { return }
 
-        if cachedLayoutNumberOfItems != collectionView.numberOfItems(inSection: 0) {
+        if cachedLayoutNumberOfItems != collectionView.numberOfItems(inSection: 0) || frozenLayout {
             cachedLayoutNumberOfItems = nil
-            collectionView.animator().performBatchUpdates(nil) { [weak self] _ in
-                self?.updateTabMode()
-                self?.updateEmptyTabArea()
-                self?.enableScrollButtons()
-                self?.hideTooltip()
-            }
+            let shouldScroll = collectionView.isAtEndScrollPosition
+            collectionView.animator().performBatchUpdates({
+                if shouldScroll {
+                    collectionView.animator().scroll(CGPoint(x: scrollView.contentView.bounds.origin.x, y: 0))
+                }
+            }, completionHandler: { [weak self] _ in
+                guard let self = self else { return }
+                self.updateLayout()
+                self.enableScrollButtons()
+                self.hideTooltip()
+            })
         }
     }
 
@@ -394,10 +413,16 @@ extension TabBarViewController: TabCollectionViewModelDelegate {
         }
         let selectionIndexPathSet = Set(arrayLiteral: IndexPath(item: selectionIndex))
 
+        self.updateTabMode(for: collectionView.numberOfItems(inSection: 0) - 1, updateLayout: false)
+
+        // don't scroll when mouse over and removing non-last Tab
         let shouldScroll = collectionView.isAtEndScrollPosition
+            && (!self.view.isMouseLocationInsideBounds() || removedIndex == self.collectionView.numberOfItems(inSection: 0) - 1)
+        let visiRect = collectionView.enclosingScrollView!.contentView.documentVisibleRect
         collectionView.animator().performBatchUpdates {
+            let tabWidth = currentTabWidth(removedIndex: removedIndex)
             if shouldScroll {
-                collectionView.animator().scroll(CGPoint(x: scrollView.contentView.bounds.origin.x - currentTabWidth(), y: 0))
+                collectionView.animator().scroll(CGPoint(x: scrollView.contentView.bounds.origin.x - tabWidth, y: 0))
             }
 
             if collectionView.selectionIndexPaths != selectionIndexPathSet {
@@ -406,10 +431,19 @@ extension TabBarViewController: TabCollectionViewModelDelegate {
             }
             collectionView.animator().deleteItems(at: removedIndexPathSet)
         } completionHandler: { [weak self] _ in
-            self?.updateTabMode()
-            self?.updateEmptyTabArea()
-            self?.enableScrollButtons()
-            self?.hideTooltip()
+            guard let self = self else { return }
+
+            self.frozenLayout = self.view.isMouseLocationInsideBounds()
+            if !self.frozenLayout {
+                self.updateLayout()
+            }
+            self.updateEmptyTabArea()
+            self.enableScrollButtons()
+            self.hideTooltip()
+
+            if !shouldScroll {
+                self.collectionView.enclosingScrollView!.contentView.scroll(to: visiRect.origin)
+            }
         }
     }
 
@@ -443,12 +477,19 @@ extension TabBarViewController: TabCollectionViewModelDelegate {
         enableScrollButtons()
         hideTooltip()
         updateEmptyTabArea()
+
+        if frozenLayout {
+            updateLayout()
+        }
     }
 
     private func appendToCollectionView(selected: Bool) {
         let lastIndex = max(0, tabCollectionViewModel.tabCollection.tabs.count - 1)
         let lastIndexPathSet = Set(arrayLiteral: IndexPath(item: lastIndex))
 
+        if frozenLayout {
+            updateLayout()
+        }
         updateTabMode(for: collectionView.numberOfItems(inSection: 0) + 1)
 
         collectionView.clearSelection()
@@ -798,4 +839,5 @@ fileprivate extension NSAlert {
     }
 
 }
+// swiftlint:enable type_body_length
 // swiftlint:enable file_length
