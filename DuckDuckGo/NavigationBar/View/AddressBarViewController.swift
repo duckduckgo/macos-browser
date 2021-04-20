@@ -340,8 +340,7 @@ extension AddressBarViewController {
         self.clickPoint = nil
         guard event.window === self.view.window else { return event }
 
-        let point = self.view.convert(event.locationInWindow, from: nil)
-        if self.view.bounds.contains(point) {
+        if let point = self.view.mouseLocationInsideBounds(event.locationInWindow) {
             guard self.view.window?.firstResponder !== addressBarTextField.currentEditor(),
                 !(self.view.hitTest(point) is NSButton)
             else { return event }

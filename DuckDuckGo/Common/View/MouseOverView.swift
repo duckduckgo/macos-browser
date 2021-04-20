@@ -90,22 +90,7 @@ final class MouseOverView: NSView {
                                           owner: self,
                                           userInfo: nil)
         addTrackingArea(trackingArea)
-        updateIsMouseOver()
+        self.isMouseOver = self.isMouseLocationInsideBounds()
     }
-
-    // swiftlint:disable legacy_nsgeometry_functions
-    private func updateIsMouseOver() {
-        guard let window = window else {
-            return
-        }
-
-        let mouseLocation = window.mouseLocationOutsideOfEventStream
-        if NSPointInRect(mouseLocation, bounds) {
-            isMouseOver = true
-        } else {
-            isMouseOver = false
-        }
-    }
-    // swiftlint:enable legacy_nsgeometry_functions
 
 }
