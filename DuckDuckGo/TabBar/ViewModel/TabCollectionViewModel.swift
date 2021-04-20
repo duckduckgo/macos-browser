@@ -45,15 +45,12 @@ final class TabCollectionViewModel: NSObject {
             updateSelectedTabViewModel()
         }
     }
-    @Published private(set) var selectedTabViewModel: TabViewModel? {
-        didSet {
-            previouslySelectedTabViewModel = oldValue
-        }
-    }
+    @Published private(set) var selectedTabViewModel: TabViewModel?
+    private weak var previouslySelectedTabViewModel: TabViewModel?
+
     @Published private(set) var canInsertLastRemovedTab: Bool = false
 
     // In a special occasion, we want to select the "parent" tab after closing the currently selected tab
-    private weak var previouslySelectedTabViewModel: TabViewModel?
     private var selectParentOnRemoval = false
 
     private var cancellables = Set<AnyCancellable>()
@@ -64,6 +61,7 @@ final class TabCollectionViewModel: NSObject {
 
         subscribeToTabs()
         subscribeToLastRemovedTab()
+        subscribeToSelectedTabViewModel()
 
         if tabCollection.tabs.isEmpty {
             appendNewTab()
@@ -173,7 +171,9 @@ final class TabCollectionViewModel: NSObject {
             delegate?.tabCollectionViewModelDidAppend(self, selected: false)
         }
 
-        self.selectParentOnRemoval = true
+        if selected {
+            self.selectParentOnRemoval = true
+        }
     }
 
     func append(tabs: [Tab]) {
@@ -314,6 +314,14 @@ final class TabCollectionViewModel: NSObject {
         tabCollection.$lastRemovedTabCache.receive(on: DispatchQueue.main).sink { [weak self] _ in
             self?.updateCanInsertLastRemovedTab()
         } .store(in: &cancellables)
+    }
+
+    private func subscribeToSelectedTabViewModel() {
+        $selectedTabViewModel
+            .scan((nil, nil)) { return ($0.1, $1) }
+            .sink { [weak self] (previouslySelectedTabViewModel, _) in
+                self?.previouslySelectedTabViewModel = previouslySelectedTabViewModel
+            }.store(in: &cancellables)
     }
 
     private func removeTabViewModels(_ removed: Set<Tab>) {
