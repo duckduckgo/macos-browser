@@ -181,9 +181,9 @@ final class BrowserTabViewController: NSViewController {
         homepageView.isHidden = shown
     }
 
-    private func openNewTab(with url: URL?, selected: Bool = false) {
-        let tab = Tab(url: url, shouldLoadInBackground: true)
-        tabCollectionViewModel.append(tab: tab, selected: selected, shouldPersistPreviousSelection: selected)
+    private func openNewTab(with url: URL?, parentTab: Tab?, selected: Bool = false) {
+        let tab = Tab(url: url, parentTab: parentTab, shouldLoadInBackground: true)
+        tabCollectionViewModel.append(tab: tab, selected: selected)
     }
 
 }
@@ -242,7 +242,7 @@ extension BrowserTabViewController: TabDelegate {
     }
 
     func tab(_ tab: Tab, requestedNewTab url: URL?, selected: Bool) {
-        openNewTab(with: url, selected: selected)
+        openNewTab(with: url, parentTab: tab, selected: selected)
     }
 
     func tab(_ tab: Tab, requestedFileDownload download: FileDownload) {
@@ -296,7 +296,7 @@ extension BrowserTabViewController: LinkMenuItemSelectors {
 
     func openLinkInNewTab(_ sender: NSMenuItem) {
         guard let url = contextMenuLink else { return }
-        openNewTab(with: url)
+        openNewTab(with: url, parentTab: tabViewModel?.tab)
     }
 
     func openLinkInNewWindow(_ sender: NSMenuItem) {
@@ -325,7 +325,7 @@ extension BrowserTabViewController: ImageMenuItemSelectors {
 
     func openImageInNewTab(_ sender: NSMenuItem) {
         guard let url = contextMenuImage else { return }
-        openNewTab(with: url)
+        openNewTab(with: url, parentTab: tabViewModel?.tab)
     }
 
     func openImageInNewWindow(_ sender: NSMenuItem) {
