@@ -21,17 +21,19 @@ import Foundation
 struct DefaultBrowserPreferences {
 
     static var isDefault: Bool {
-        guard let defaultBrowserURL = NSWorkspace.shared.urlForApplication(toOpen: URL(string: "http://")!) else {
+        var bundleID = AppVersion.shared.identifier
+        #if DEBUG
+        bundleID = bundleID.drop(suffix: ".debug")
+        #endif
+
+        guard let defaultBrowserURL = NSWorkspace.shared.urlForApplication(toOpen: URL(string: "http://")!),
+              // Another App Instance of the Browser may be already registered as the scheme handler
+              let ddgBrowserURL = NSWorkspace.shared.urlForApplication(withBundleIdentifier: bundleID)
+        else {
             return false
         }
 
-        #if DEBUG
-        if defaultBrowserURL.absoluteString.contains("DuckDuckGo%20Privacy%20Browser.app") {
-            return true
-        }
-        #endif
-
-        return Bundle.main.bundleURL == defaultBrowserURL
+        return ddgBrowserURL == defaultBrowserURL
     }
 
     static func becomeDefault() {
@@ -41,12 +43,10 @@ struct DefaultBrowserPreferences {
     }
 
     private static func presentDefaultBrowserPromptIfPossible() -> Bool {
-        guard let bundleID = Bundle.main.object(forInfoDictionaryKey: "CFBundleIdentifier") as? String else {
-            return false
-        }
+        let bundleID = AppVersion.shared.identifier
 
-         let result = LSSetDefaultHandlerForURLScheme("http" as CFString, bundleID as CFString)
-         return result == 0
+        let result = LSSetDefaultHandlerForURLScheme("http" as CFString, bundleID as CFString)
+        return result == 0
     }
 
     private static func openSystemPreferences() {
