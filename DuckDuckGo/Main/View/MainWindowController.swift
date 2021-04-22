@@ -78,9 +78,8 @@ final class MainWindowController: NSWindowController {
         // slide tabs to the left in full screen
         trafficLightsAlphaCancellable = window?.standardWindowButton(.closeButton)?
             .publisher(for: \.alphaValue)
-            .map { alphaValue in 80.0 * alphaValue }
-            .weakAssign(to: \.constant, on: tabBarViewController.scrollViewLeadingConstraint)
-
+            .map { alphaValue in TabBarViewController.HorizontalSpace.leadingStackViewPadding.rawValue * alphaValue }
+            .weakAssign(to: \.constant, on: tabBarViewController.leadingStackViewLeadingConstraint)
     }
 
     override func showWindow(_ sender: Any?) {
@@ -103,6 +102,14 @@ extension MainWindowController: NSWindowDelegate {
 
     func windowDidBecomeKey(_ notification: Notification) {
         WindowControllersManager.shared.lastKeyMainWindowController = self
+    }
+
+    func windowWillEnterFullScreen(_ notification: Notification) {
+        mainViewController.tabBarViewController.draggingSpace.isHidden = true
+    }
+
+    func windowWillExitFullScreen(_ notification: Notification) {
+        mainViewController.tabBarViewController.draggingSpace.isHidden = false
     }
 
     func windowDidResignMain(_ notification: Notification) {

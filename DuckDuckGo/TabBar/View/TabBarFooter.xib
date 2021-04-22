@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<document type="com.apple.InterfaceBuilder3.Cocoa.XIB" version="3.0" toolsVersion="17506" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none" useAutolayout="YES" customObjectInstantitationMethod="direct">
+<document type="com.apple.InterfaceBuilder3.Cocoa.XIB" version="3.0" toolsVersion="17701" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none" useAutolayout="YES" customObjectInstantitationMethod="direct">
     <dependencies>
         <deployment identifier="macosx"/>
-        <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="17506"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="17701"/>
         <capability name="Named colors" minToolsVersion="9.0"/>
         <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
     </dependencies>
@@ -15,10 +15,10 @@
             <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
             <subviews>
                 <button translatesAutoresizingMaskIntoConstraints="NO" id="SoA-RN-wcO" userLabel="Add Button" customClass="MouseOverButton" customModule="DuckDuckGo_Privacy_Browser" customModuleProvider="target">
-                    <rect key="frame" x="4" y="8" width="32" height="24"/>
+                    <rect key="frame" x="6" y="2" width="28" height="28"/>
                     <constraints>
-                        <constraint firstAttribute="height" constant="24" id="JZ3-zG-Blg"/>
-                        <constraint firstAttribute="width" constant="32" id="tO2-sL-qXC"/>
+                        <constraint firstAttribute="height" constant="28" id="JZ3-zG-Blg"/>
+                        <constraint firstAttribute="width" constant="28" id="tO2-sL-qXC"/>
                     </constraints>
                     <buttonCell key="cell" type="square" bezelStyle="shadowlessSquare" image="Add" imagePosition="overlaps" alignment="center" imageScaling="proportionallyDown" inset="2" id="MkF-gk-J1W">
                         <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
@@ -40,7 +40,7 @@
             </subviews>
             <constraints>
                 <constraint firstItem="SoA-RN-wcO" firstAttribute="centerX" secondItem="c22-O7-iKe" secondAttribute="centerX" id="PqP-lv-5KX"/>
-                <constraint firstItem="SoA-RN-wcO" firstAttribute="centerY" secondItem="c22-O7-iKe" secondAttribute="centerY" id="myh-g5-1Qq"/>
+                <constraint firstAttribute="bottom" secondItem="SoA-RN-wcO" secondAttribute="bottom" constant="2" id="vr6-tg-21f"/>
             </constraints>
             <connections>
                 <outlet property="addButton" destination="SoA-RN-wcO" id="BvG-VP-8hs"/>
