@@ -44,16 +44,56 @@ final class SuggestionContainer {
     func getSuggestions(for query: String) {
         latestQuery = query
         loading.getSuggestions(query: query, maximum: Self.maximumNumberOfSuggestions) { [weak self] (suggestions, error) in
-            guard self?.latestQuery == query else { return }
-            guard let suggestions = suggestions, error == nil else {
-                self?.suggestions = nil
-                os_log("Suggestions: Failed to get suggestions - %s",
-                       type: .error,
-                       "\(String(describing: error))")
-                Pixel.fire(.debug(event: .suggestionsFetchFailed, error: error))
-                return
+            let suggestions = suggestions?.map { suggestion -> Suggestion in
+                if case .phrase(phrase: let phrase) = suggestion,
+                   let url = phrase.punycodedUrl, url.isValid {
+                    return .website(url: url)
+                }
+                return suggestion
             }
-            self?.suggestions = suggestions
+            .enumerated()
+            .sorted { lhs, rhs -> Bool in
+                switch (lhs.element, rhs.element) {
+                case (.bookmark, .bookmark),
+                     (.phrase, .phrase),
+                     (.website, .website):
+                    // keep original order for same-kind entities
+                    return lhs.offset < rhs.offset
+
+                // bookmarks go first
+                case (.bookmark, _):
+                    return true
+                case (_, .bookmark):
+                    return false
+
+                // unknown go last
+                case (_, .unknown):
+                    return true
+                case (.unknown, _):
+                    return false
+
+                // websites before phrases
+                case (.website, .phrase):
+                    return true
+                case (.phrase, .website):
+                    return false
+                }
+            }
+            .map(\.element)
+
+            DispatchQueue.main.async {
+                guard self?.latestQuery == query else { return }
+                guard let suggestions = suggestions, error == nil else {
+                    self?.suggestions = nil
+                    os_log("Suggestions: Failed to get suggestions - %s",
+                           type: .error,
+                           "\(String(describing: error))")
+                    Pixel.fire(.debug(event: .suggestionsFetchFailed, error: error))
+                    return
+                }
+
+                self?.suggestions = suggestions
+            }
         }
     }
 

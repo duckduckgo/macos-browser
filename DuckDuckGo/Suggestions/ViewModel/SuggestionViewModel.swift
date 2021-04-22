@@ -25,11 +25,7 @@ final class SuggestionViewModel {
     let userStringValue: String
 
     init(suggestion: Suggestion, userStringValue: String) {
-        if case .phrase(phrase: let phrase) = suggestion, let url = phrase.punycodedUrl, url.isValid {
-            self.suggestion = .website(url: url)
-        } else {
-            self.suggestion = suggestion
-        }
+        self.suggestion = suggestion
         self.userStringValue = userStringValue
     }
 
@@ -75,6 +71,15 @@ final class SuggestionViewModel {
             return title
         case .unknown(value: let value):
             return value
+        }
+    }
+
+    var autocompletionString: String {
+        switch suggestion {
+        case .bookmark(title: _, url: let url, isFavorite: _):
+            return url.absoluteStringWithoutSchemeAndWWW
+        default:
+            return self.string
         }
     }
 
