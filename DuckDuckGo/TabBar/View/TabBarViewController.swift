@@ -25,22 +25,21 @@ import Lottie
 final class TabBarViewController: NSViewController {
 
     enum HorizontalSpace: CGFloat {
-        case scrollViewPaddingWithButtons = 112
-        case scrollViewPaddingWithoutButtons = 80
-        case button = 32
-        case buttonPadding = 8
+        case leadingStackViewPadding = 76
+        case button = 28
+        case buttonPadding = 4
     }
 
     @IBOutlet weak var collectionView: TabBarCollectionView!
     @IBOutlet weak var scrollView: TabBarScrollView!
-    @IBOutlet weak var scrollViewTrailingConstraint: NSLayoutConstraint!
-    @IBOutlet weak var scrollViewLeadingConstraint: NSLayoutConstraint!
+    @IBOutlet weak var leadingStackViewLeadingConstraint: NSLayoutConstraint!
     @IBOutlet weak var rightScrollButton: MouseOverButton!
     @IBOutlet weak var leftScrollButton: MouseOverButton!
     @IBOutlet weak var rightShadowImageView: NSImageView!
     @IBOutlet weak var leftShadowImageView: NSImageView!
     @IBOutlet weak var plusButton: MouseOverButton!
     @IBOutlet weak var burnButton: BurnButton!
+    @IBOutlet weak var draggingSpace: NSView!
     @IBOutlet weak var windowDraggingViewLeadingConstraint: NSLayoutConstraint!
 
     private let tabCollectionViewModel: TabCollectionViewModel
@@ -182,7 +181,8 @@ final class TabBarViewController: NSViewController {
         } else {
             isAddButtonFloating = false
         }
-        plusButton.isHidden = isAddButtonFloating
+        plusButton.alphaValue = isAddButtonFloating ? 0.0 : 1.0
+        plusButton.isEnabled = !isAddButtonFloating
     }
 
     private var isAddButtonFloating = false
@@ -286,12 +286,6 @@ final class TabBarViewController: NSViewController {
     }
 
     private func displayScrollButtons() {
-        let horizontalSpace = tabMode == .divided ?
-            HorizontalSpace.scrollViewPaddingWithoutButtons.rawValue :
-            HorizontalSpace.scrollViewPaddingWithButtons.rawValue
-        scrollViewLeadingConstraint.constant = horizontalSpace
-        scrollViewTrailingConstraint.constant = horizontalSpace
-
         let scrollViewsAreHidden = tabMode == .divided
         rightScrollButton.isHidden = scrollViewsAreHidden
         leftScrollButton.isHidden = scrollViewsAreHidden
@@ -323,7 +317,7 @@ final class TabBarViewController: NSViewController {
 
         var point = view.bounds.origin
         point.y -= TooltipWindowController.VerticalSpace.tooltipPadding.rawValue
-        point.x += scrollViewLeadingConstraint.constant + tabBarViewItem.view.frame.origin.x - clipView.bounds.origin.x
+        point.x += scrollView.frame.origin.x + tabBarViewItem.view.frame.origin.x - clipView.bounds.origin.x
         let converted = window.convertPoint(toScreen: view.convert(point, to: nil))
         let timerInterval = TooltipWindowController.TimerInterval(from: tabBarViewItem.widthStage)
         tooltipWindowController.scheduleShowing(parentWindow: window, timerInterval: timerInterval, topLeftPoint: converted)
