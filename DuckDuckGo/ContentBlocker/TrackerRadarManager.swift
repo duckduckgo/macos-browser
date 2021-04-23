@@ -79,8 +79,16 @@ final class TrackerRadarManager {
 
     @discardableResult
     public func reload() -> DataSet {
-        let dataSet: DataSet
-        (self.trackerData, self.encodedTrackerData, dataSet) = Self.loadData()
+        let (trackerData, encodedTrackerData, dataSet) = Self.loadData()
+        if Thread.isMainThread {
+            self.trackerData = trackerData
+            self.encodedTrackerData = encodedTrackerData
+        } else {
+            DispatchQueue.main.async {
+                self.trackerData = trackerData
+                self.encodedTrackerData = encodedTrackerData
+            }
+        }
 
         if dataSet != .downloaded {
             Pixel.fire(.debug(event: .trackerDataReloadFailed))
