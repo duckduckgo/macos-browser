@@ -144,9 +144,9 @@ final class TabCollectionViewModel: NSObject {
         }
         let tab: Tab
         if let webViewConfiguration = webViewConfiguration {
-            tab = Tab(webViewConfiguration: webViewConfiguration)
+            tab = Tab(webViewConfiguration: webViewConfiguration, parentTab: selectedTabViewModel?.tab)
         } else {
-            tab = Tab()
+            tab = Tab(parentTab: selectedTabViewModel?.tab)
         }
 
         let newIndex = selectionIndex + 1
@@ -154,6 +154,8 @@ final class TabCollectionViewModel: NSObject {
         select(at: newIndex)
 
         delegate?.tabCollectionViewModel(self, didInsertAndSelectAt: newIndex)
+
+        selectParentOnRemoval = true
     }
 
     func append(tab: Tab, selected: Bool = true) {
