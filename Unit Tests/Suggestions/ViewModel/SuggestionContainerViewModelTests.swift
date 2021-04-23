@@ -37,14 +37,16 @@ final class SuggestionContainerViewModelTests: XCTestCase {
         let suggestionContainerViewModel = SuggestionContainerViewModel.aSuggestionContainerViewModel
 
         let index = 0
-        suggestionContainerViewModel.select(at: index)
 
         let selectedSuggestionViewModelExpectation = expectation(description: "Selected suggestion view model expectation")
-
-        suggestionContainerViewModel.$selectedSuggestionViewModel.debounce(for: 0.1, scheduler: RunLoop.main).sink { selectedSuggestionViewModel in
-            XCTAssertEqual(suggestionContainerViewModel.suggestionContainer.suggestions?[index], selectedSuggestionViewModel?.suggestion)
-            selectedSuggestionViewModelExpectation.fulfill()
+        suggestionContainerViewModel.$selectedSuggestionViewModel.sink { selectedSuggestionViewModel in
+            if let selectedSuggestionViewModel = selectedSuggestionViewModel {
+                XCTAssertEqual(suggestionContainerViewModel.suggestionContainer.suggestions?[index], selectedSuggestionViewModel.suggestion)
+                selectedSuggestionViewModelExpectation.fulfill()
+            }
         } .store(in: &cancellables)
+
+        suggestionContainerViewModel.select(at: index)
         waitForExpectations(timeout: 1, handler: nil)
     }
 
@@ -130,6 +132,10 @@ extension SuggestionContainerViewModel {
             Suggestion.website(url: URL.duckDuckGo),
             Suggestion.website(url: URL.duckDuckGoAutocomplete)
         ], nil )
+
+        while suggestionContainer.suggestions == nil {
+            RunLoop.current.run(mode: .default, before: Date().addingTimeInterval(0.05))
+        }
 
         return suggestionContainerViewModel
     }
