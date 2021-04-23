@@ -88,6 +88,7 @@ final class SuggestionViewModel {
     static let webImage = NSImage(named: "Web")
     static let searchImage = NSImage(named: "Search")
     static let bookmarkImage = NSImage(named: "BookmarkSuggestion")
+    static let favoriteImage = NSImage(named: "FavoritedBookmarkSuggestion")
 
     var icon: NSImage? {
         switch suggestion {
@@ -95,8 +96,10 @@ final class SuggestionViewModel {
             return Self.searchImage
         case .website(url: _):
             return Self.webImage
-        case .bookmark(title: _, url: _, isFavorite: _):
+        case .bookmark(title: _, url: _, isFavorite: false):
             return Self.bookmarkImage
+        case .bookmark(title: _, url: _, isFavorite: true):
+            return Self.favoriteImage
         case .unknown(value: _):
             return Self.webImage
         }
