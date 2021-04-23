@@ -58,6 +58,7 @@ final class SuggestionViewModel {
         let attributedString = NSMutableAttributedString(string: firstPart, attributes: Self.tableRowViewStandardAttributes)
         let boldAttributedString = NSAttributedString(string: boldPart, attributes: Self.tableRowViewBoldAttributes)
         attributedString.append(boldAttributedString)
+
         return attributedString
     }
 
@@ -80,6 +81,15 @@ final class SuggestionViewModel {
             return url.absoluteStringWithoutSchemeAndWWW
         default:
             return self.string
+        }
+    }
+
+    var suffix: String {
+        switch suggestion {
+        case .phrase, .unknown, .website:
+            return ""
+        case .bookmark(title: _, url: let url, isFavorite: _):
+            return " – " + url.absoluteStringWithoutSchemeAndWWW
         }
     }
 

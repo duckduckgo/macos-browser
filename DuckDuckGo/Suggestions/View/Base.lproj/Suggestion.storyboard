@@ -4,6 +4,7 @@
         <deployment identifier="macosx"/>
         <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="17701"/>
         <capability name="Named colors" minToolsVersion="9.0"/>
+        <capability name="System colors introduced in macOS 10.14" minToolsVersion="10.0"/>
         <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
     </dependencies>
     <scenes>
@@ -50,17 +51,17 @@
             <objects>
                 <viewController storyboardIdentifier="SuggestionViewController" id="JbS-WE-3yw" customClass="SuggestionViewController" customModule="DuckDuckGo_Privacy_Browser" customModuleProvider="target" sceneMemberID="viewController">
                     <view key="view" misplaced="YES" id="PAv-y7-vhB">
-                        <rect key="frame" x="0.0" y="0.0" width="538" height="186"/>
+                        <rect key="frame" x="0.0" y="0.0" width="633" height="267"/>
                         <autoresizingMask key="autoresizingMask"/>
                         <subviews>
                             <customView misplaced="YES" translatesAutoresizingMaskIntoConstraints="NO" id="bEL-6C-4Mq" userLabel="Layout View">
-                                <rect key="frame" x="0.0" y="0.0" width="538" height="67"/>
+                                <rect key="frame" x="0.0" y="0.0" width="633" height="267"/>
                                 <subviews>
                                     <customView misplaced="YES" translatesAutoresizingMaskIntoConstraints="NO" id="KKJ-SW-5gR" userLabel="Shadow Clip View">
-                                        <rect key="frame" x="0.0" y="0.0" width="538" height="219"/>
+                                        <rect key="frame" x="0.0" y="0.0" width="633" height="267"/>
                                         <subviews>
-                                            <customView translatesAutoresizingMaskIntoConstraints="NO" id="cHT-Cf-UOB" customClass="ShadowView" customModule="DuckDuckGo_Privacy_Browser" customModuleProvider="target">
-                                                <rect key="frame" x="20" y="20" width="548" height="151"/>
+                                            <customView misplaced="YES" translatesAutoresizingMaskIntoConstraints="NO" id="cHT-Cf-UOB" customClass="ShadowView" customModule="DuckDuckGo_Privacy_Browser" customModuleProvider="target">
+                                                <rect key="frame" x="20" y="0.0" width="613" height="267"/>
                                                 <userDefinedRuntimeAttributes>
                                                     <userDefinedRuntimeAttribute type="color" keyPath="shadowColor">
                                                         <color key="value" name="SuggestionsShadowColor"/>
@@ -88,13 +89,13 @@
                                         </constraints>
                                     </customView>
                                     <customView misplaced="YES" translatesAutoresizingMaskIntoConstraints="NO" id="Svf-wj-SjJ" userLabel="Clip View">
-                                        <rect key="frame" x="20" y="20" width="538" height="200"/>
+                                        <rect key="frame" x="20" y="0.0" width="613" height="267"/>
                                         <subviews>
                                             <customView misplaced="YES" translatesAutoresizingMaskIntoConstraints="NO" id="j2X-bv-VAU" userLabel="Background View" customClass="ColorView" customModule="DuckDuckGo_Privacy_Browser" customModuleProvider="target">
-                                                <rect key="frame" x="0.0" y="0.0" width="538" height="203"/>
+                                                <rect key="frame" x="0.0" y="0.0" width="613" height="270"/>
                                                 <subviews>
                                                     <customView misplaced="YES" translatesAutoresizingMaskIntoConstraints="NO" id="MtO-b9-tF8" userLabel="Inner Border View" customClass="ColorView" customModule="DuckDuckGo_Privacy_Browser" customModuleProvider="target">
-                                                        <rect key="frame" x="1" y="1" width="538" height="167"/>
+                                                        <rect key="frame" x="1" y="0.0" width="612" height="270"/>
                                                         <userDefinedRuntimeAttributes>
                                                             <userDefinedRuntimeAttribute type="color" keyPath="borderColor">
                                                                 <color key="value" name="AddressBarInnerBorderColor"/>
@@ -108,18 +109,18 @@
                                                         </userDefinedRuntimeAttributes>
                                                     </customView>
                                                     <scrollView misplaced="YES" borderType="none" horizontalLineScroll="22" horizontalPageScroll="10" verticalLineScroll="22" verticalPageScroll="10" hasHorizontalScroller="NO" hasVerticalScroller="NO" usesPredominantAxisScrolling="NO" translatesAutoresizingMaskIntoConstraints="NO" id="cx3-LG-ZUH">
-                                                        <rect key="frame" x="5" y="0.0" width="538" height="131"/>
+                                                        <rect key="frame" x="5" y="1" width="608" height="264"/>
                                                         <clipView key="contentView" drawsBackground="NO" copiesOnScroll="NO" id="pb8-sX-fSc">
-                                                            <rect key="frame" x="0.0" y="0.0" width="538" height="131"/>
+                                                            <rect key="frame" x="0.0" y="0.0" width="608" height="264"/>
                                                             <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                                             <subviews>
                                                                 <tableView verticalHuggingPriority="750" allowsExpansionToolTips="YES" columnAutoresizingStyle="lastColumnOnly" selectionHighlightStyle="none" columnSelection="YES" multipleSelection="NO" autosaveColumns="NO" rowHeight="22" viewBased="YES" id="4Z2-d8-NA2">
-                                                                    <rect key="frame" x="0.0" y="0.0" width="538" height="114"/>
+                                                                    <rect key="frame" x="0.0" y="0.0" width="608" height="247"/>
                                                                     <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                                                     <color key="backgroundColor" name="ClearColor"/>
                                                                     <color key="gridColor" name="gridColor" catalog="System" colorSpace="catalog"/>
                                                                     <tableColumns>
-                                                                        <tableColumn width="506" minWidth="40" maxWidth="2000" id="0zj-Uc-AlR">
+                                                                        <tableColumn width="604" minWidth="40" maxWidth="2000" id="0zj-Uc-AlR">
                                                                             <tableHeaderCell key="headerCell" lineBreakMode="truncatingTail" borderStyle="border">
                                                                                 <color key="textColor" name="headerTextColor" catalog="System" colorSpace="catalog"/>
                                                                                 <color key="backgroundColor" name="headerColor" catalog="System" colorSpace="catalog"/>
@@ -132,23 +133,31 @@
                                                                             <tableColumnResizingMask key="resizingMask" resizeWithTable="YES" userResizable="YES"/>
                                                                             <prototypeCellViews>
                                                                                 <customView identifier="SuggestionTableRowView" id="9zN-fn-Ri0" customClass="SuggestionTableRowView" customModule="DuckDuckGo_Privacy_Browser" customModuleProvider="target">
-                                                                                    <rect key="frame" x="10" y="0.0" width="518" height="22"/>
+                                                                                    <rect key="frame" x="0.0" y="0.0" width="604" height="22"/>
                                                                                     <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                                                                 </customView>
                                                                                 <tableCellView identifier="SuggestionTableCellView" id="kX2-C1-38Y" customClass="SuggestionTableCellView" customModule="DuckDuckGo_Privacy_Browser" customModuleProvider="target">
-                                                                                    <rect key="frame" x="10" y="22" width="518" height="0.0"/>
+                                                                                    <rect key="frame" x="0.0" y="22" width="604" height="22"/>
                                                                                     <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                                                                     <subviews>
-                                                                                        <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" horizontalCompressionResistancePriority="250" translatesAutoresizingMaskIntoConstraints="NO" id="bOr-Go-gyW">
-                                                                                            <rect key="frame" x="34" y="-7" width="478" height="16"/>
-                                                                                            <textFieldCell key="cell" lineBreakMode="truncatingTail" sendsActionOnEndEditing="YES" title="Table View Cell" id="7bg-HA-vCm">
+                                                                                        <textField horizontalHuggingPriority="252" verticalHuggingPriority="750" horizontalCompressionResistancePriority="252" translatesAutoresizingMaskIntoConstraints="NO" id="bOr-Go-gyW">
+                                                                                            <rect key="frame" x="34" y="4" width="119" height="16"/>
+                                                                                            <textFieldCell key="cell" lineBreakMode="truncatingTail" sendsActionOnEndEditing="YES" title="Search Suggestion" id="7bg-HA-vCm">
                                                                                                 <font key="font" usesAppearanceFont="YES"/>
                                                                                                 <color key="textColor" name="textColor" catalog="System" colorSpace="catalog"/>
                                                                                                 <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
                                                                                             </textFieldCell>
                                                                                         </textField>
+                                                                                        <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" horizontalCompressionResistancePriority="252" translatesAutoresizingMaskIntoConstraints="NO" id="efo-Vy-aEh">
+                                                                                            <rect key="frame" x="149" y="4" width="449" height="15"/>
+                                                                                            <textFieldCell key="cell" lineBreakMode="truncatingTail" sendsActionOnEndEditing="YES" title=" – Search with DuckDuckGo" id="UZv-CE-fbV">
+                                                                                                <font key="font" metaFont="system" size="12"/>
+                                                                                                <color key="textColor" name="controlAccentColor" catalog="System" colorSpace="catalog"/>
+                                                                                                <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
+                                                                                            </textFieldCell>
+                                                                                        </textField>
                                                                                         <imageView horizontalHuggingPriority="251" verticalHuggingPriority="251" translatesAutoresizingMaskIntoConstraints="NO" id="vli-IP-Nr8">
-                                                                                            <rect key="frame" x="8" y="-8" width="16" height="16"/>
+                                                                                            <rect key="frame" x="8" y="3" width="16" height="16"/>
                                                                                             <constraints>
                                                                                                 <constraint firstAttribute="width" constant="16" id="Q25-Gx-Xzg"/>
                                                                                                 <constraint firstAttribute="height" constant="16" id="go3-c4-c3W"/>
@@ -157,14 +166,18 @@
                                                                                         </imageView>
                                                                                     </subviews>
                                                                                     <constraints>
+                                                                                        <constraint firstItem="efo-Vy-aEh" firstAttribute="leading" secondItem="bOr-Go-gyW" secondAttribute="trailing" id="0fY-Lm-dCs"/>
                                                                                         <constraint firstItem="vli-IP-Nr8" firstAttribute="centerY" secondItem="kX2-C1-38Y" secondAttribute="centerY" id="ICn-31-LAg"/>
                                                                                         <constraint firstItem="bOr-Go-gyW" firstAttribute="leading" secondItem="vli-IP-Nr8" secondAttribute="trailing" constant="12" id="JNb-pL-G7y"/>
-                                                                                        <constraint firstAttribute="trailing" secondItem="bOr-Go-gyW" secondAttribute="trailing" constant="8" id="b4A-tY-oOP"/>
+                                                                                        <constraint firstAttribute="trailing" secondItem="efo-Vy-aEh" secondAttribute="trailing" constant="8" id="XRI-uW-7gs"/>
+                                                                                        <constraint firstItem="efo-Vy-aEh" firstAttribute="firstBaseline" secondItem="bOr-Go-gyW" secondAttribute="firstBaseline" id="lQr-ay-EDp"/>
                                                                                         <constraint firstItem="bOr-Go-gyW" firstAttribute="centerY" secondItem="kX2-C1-38Y" secondAttribute="centerY" constant="-1" id="oAf-1Z-91H"/>
+                                                                                        <constraint firstItem="efo-Vy-aEh" firstAttribute="width" secondItem="bOr-Go-gyW" secondAttribute="width" multiplier="0.55" priority="250" id="xOl-gW-elN"/>
                                                                                         <constraint firstItem="vli-IP-Nr8" firstAttribute="leading" secondItem="kX2-C1-38Y" secondAttribute="leading" constant="8" id="zgq-le-RHJ"/>
                                                                                     </constraints>
                                                                                     <connections>
                                                                                         <outlet property="iconImageView" destination="vli-IP-Nr8" id="5lX-7Q-4Cw"/>
+                                                                                        <outlet property="suffixTextField" destination="efo-Vy-aEh" id="vDH-Af-pkR"/>
                                                                                         <outlet property="textField" destination="bOr-Go-gyW" id="wxi-1N-Bc4"/>
                                                                                     </connections>
                                                                                 </tableCellView>
@@ -212,7 +225,7 @@
                                                 </userDefinedRuntimeAttributes>
                                             </customView>
                                             <customView translatesAutoresizingMaskIntoConstraints="NO" id="ATb-xt-XAg" userLabel="Separator" customClass="ColorView" customModule="DuckDuckGo_Privacy_Browser" customModuleProvider="target">
-                                                <rect key="frame" x="2" y="131" width="544" height="1"/>
+                                                <rect key="frame" x="2" y="264" width="614" height="1"/>
                                                 <constraints>
                                                     <constraint firstAttribute="height" constant="1" id="G3c-nz-oCJ"/>
                                                 </constraints>
@@ -263,7 +276,7 @@
                 </viewController>
                 <customObject id="WHZ-eM-7SZ" userLabel="First Responder" customClass="NSResponder" sceneMemberID="firstResponder"/>
             </objects>
-            <point key="canvasLocation" x="250" y="599.5"/>
+            <point key="canvasLocation" x="297.5" y="639.5"/>
         </scene>
     </scenes>
     <resources>
