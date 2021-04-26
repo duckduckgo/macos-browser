@@ -93,7 +93,9 @@ struct UserText {
     static let editFavorite = NSLocalizedString("edit.favorite", value: "Edit Favorite", comment: "Header of the view that edits a favorite bookmark")
     static let removeFromFavorites = NSLocalizedString("remove.from.favorites", value: "Remove from Favorites", comment: "Button for removing bookmarks from favorites")
     static let bookmarkThisPage = NSLocalizedString("bookmark.this.page", value: "Bookmark This Page...", comment: "Menu item for bookmarking current page")
-    
+
+    static let zoom = NSLocalizedString("zoom", value: "Zoom", comment: "Menu with Zooming commands")
+
     static let emailOptionsMenuItem = NSLocalizedString("email.optionsMenu", value: "Email Protection", comment: "Menu item email feature")
     static let emailOptionsMenuCreateAddressSubItem = NSLocalizedString("email.optionsMenu.createAddress", value: "Create a Duck Address", comment: "Create an email alias sub menu item")
     static let emailOptionsMenuViewDashboardSubItem = NSLocalizedString("email.optionsMenu.viewDashboard", value: "View Dashboard", comment: "View email dashboard sub menu item")

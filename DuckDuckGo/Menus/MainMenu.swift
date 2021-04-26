@@ -44,6 +44,11 @@ final class MainMenu: NSMenu {
     @IBOutlet weak var helpSeparatorMenuItem: NSMenuItem?
     @IBOutlet weak var sendFeedbackMenuItem: NSMenuItem?
 
+    @IBOutlet weak var toggleFullscreenMenuItem: NSMenuItem?
+    @IBOutlet weak var zoomInMenuItem: NSMenuItem?
+    @IBOutlet weak var zoomOutMenuItem: NSMenuItem?
+    @IBOutlet weak var actualSizeMenuItem: NSMenuItem?
+
     required init(coder: NSCoder) {
         super.init(coder: coder)
 
@@ -59,15 +64,6 @@ final class MainMenu: NSMenu {
             printMenuItem?.removeFromParent()
             printSeparatorItem?.removeFromParent()
         }
-    }
-
-    func setWindowRelatedMenuItems(enabled: Bool) {
-        backMenuItem?.isEnabled = enabled
-        forwardMenuItem?.isEnabled = enabled
-        homeMenuItem?.isEnabled = enabled
-        reopenLastClosedTabMenuItem?.isEnabled = enabled
-        bookmarkThisPageMenuItem?.isEnabled = enabled
-        favoriteThisPageMenuItem?.isEnabled = enabled
     }
 
     private func setup() {
