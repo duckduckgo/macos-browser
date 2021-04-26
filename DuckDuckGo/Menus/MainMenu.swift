@@ -30,6 +30,8 @@ final class MainMenu: NSMenu {
 
     @IBOutlet weak var backMenuItem: NSMenuItem?
     @IBOutlet weak var forwardMenuItem: NSMenuItem?
+    @IBOutlet weak var reloadMenuItem: NSMenuItem?
+    @IBOutlet weak var stopMenuItem: NSMenuItem?
     @IBOutlet weak var homeMenuItem: NSMenuItem?
     @IBOutlet weak var reopenLastClosedTabMenuItem: NSMenuItem?
 

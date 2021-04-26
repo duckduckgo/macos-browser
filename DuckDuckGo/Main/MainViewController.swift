@@ -36,8 +36,7 @@ final class MainViewController: NSViewController {
     let tabCollectionViewModel: TabCollectionViewModel
 
     private var selectedTabViewModelCancellable: AnyCancellable?
-    private var canGoForwardCancellable: AnyCancellable?
-    private var canGoBackCancellable: AnyCancellable?
+    private var navigationalCancellables = Set<AnyCancellable>()
     private var canBookmarkCancellable: AnyCancellable?
     private var canInsertLastRemovedTabCancellable: AnyCancellable?
     private var findInPageCancellable: AnyCancellable?
@@ -119,16 +118,32 @@ final class MainViewController: NSViewController {
 
     private func subscribeToSelectedTabViewModel() {
         selectedTabViewModelCancellable = tabCollectionViewModel.$selectedTabViewModel.receive(on: DispatchQueue.main).sink { [weak self] _ in
+            self?.navigationalCancellables = []
+            self?.subscribeToCanGoBackForward()
             self?.subscribeToFindInPage()
         }
     }
 
     private func subscribeToFindInPage() {
-        findInPageCancellable?.cancel()
         let model = tabCollectionViewModel.selectedTabViewModel?.findInPage
-        findInPageCancellable = model?.$visible.receive(on: DispatchQueue.main).sink { [weak self] _ in
+        model?.$visible.receive(on: DispatchQueue.main).sink { [weak self] _ in
             self?.updateFindInPage()
-        }
+        }.store(in: &self.navigationalCancellables)
+    }
+
+    private func subscribeToCanGoBackForward() {
+        tabCollectionViewModel.selectedTabViewModel?.$canGoBack.receive(on: DispatchQueue.main).sink { [weak self] _ in
+            self?.updateBackMenuItem()
+        }.store(in: &self.navigationalCancellables)
+        tabCollectionViewModel.selectedTabViewModel?.$canGoForward.receive(on: DispatchQueue.main).sink { [weak self] _ in
+            self?.updateForwardMenuItem()
+        }.store(in: &self.navigationalCancellables)
+        tabCollectionViewModel.selectedTabViewModel?.$canReload.receive(on: DispatchQueue.main).sink { [weak self] _ in
+            self?.updateReloadMenuItem()
+        }.store(in: &self.navigationalCancellables)
+        tabCollectionViewModel.selectedTabViewModel?.$isLoading.receive(on: DispatchQueue.main).sink { [weak self] _ in
+            self?.updateStopMenuItem()
+        }.store(in: &self.navigationalCancellables)
     }
 
     private func updateFindInPage() {
@@ -148,6 +163,66 @@ final class MainViewController: NSViewController {
             tabCollectionViewModel.selectedTabViewModel?.tab.webView.makeMeFirstResponder()
         }
         
+    }
+
+    private func updateBackMenuItem() {
+        guard self.view.window?.isMainWindow == true,
+            let selectedTabViewModel = tabCollectionViewModel.selectedTabViewModel
+        else {
+            os_log("MainViewController: No tab view model selected", type: .error)
+            return
+        }
+        guard let backMenuItem = NSApplication.shared.mainMenuTyped.backMenuItem else {
+            assertionFailure("MainViewController: Failed to get reference to back menu item")
+            return
+        }
+
+        backMenuItem.isEnabled = selectedTabViewModel.canGoBack
+    }
+
+    private func updateForwardMenuItem() {
+        guard self.view.window?.isMainWindow == true,
+            let selectedTabViewModel = tabCollectionViewModel.selectedTabViewModel
+        else {
+            os_log("MainViewController: No tab view model selected", type: .error)
+            return
+        }
+        guard let forwardMenuItem = NSApplication.shared.mainMenuTyped.forwardMenuItem else {
+            assertionFailure("MainViewController: Failed to get reference to Forward menu item")
+            return
+        }
+
+        forwardMenuItem.isEnabled = selectedTabViewModel.canGoForward
+    }
+
+    private func updateReloadMenuItem() {
+        guard self.view.window?.isMainWindow == true,
+            let selectedTabViewModel = tabCollectionViewModel.selectedTabViewModel
+        else {
+            os_log("MainViewController: No tab view model selected", type: .error)
+            return
+        }
+        guard let reloadMenuItem =  NSApplication.shared.mainMenuTyped.reloadMenuItem else {
+            assertionFailure("MainViewController: Failed to get reference to Reload menu item")
+            return
+        }
+
+        reloadMenuItem.isEnabled = selectedTabViewModel.canReload
+    }
+
+    private func updateStopMenuItem() {
+        guard self.view.window?.isMainWindow == true,
+            let selectedTabViewModel = tabCollectionViewModel.selectedTabViewModel
+        else {
+            os_log("MainViewController: No tab view model selected", type: .error)
+            return
+        }
+        guard let stopMenuItem =  NSApplication.shared.mainMenuTyped.stopMenuItem else {
+            assertionFailure("MainViewController: Failed to get reference to Stop menu item")
+            return
+        }
+
+        stopMenuItem.isEnabled = selectedTabViewModel.isLoading
     }
 
 }
