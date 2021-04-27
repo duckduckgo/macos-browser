@@ -491,7 +491,8 @@ extension AddressBarTextField: NSTextFieldDelegate {
             suggestionContainerViewModel.clearUserStringValue()
             hideSuggestionWindow()
         } else {
-            suggestionContainerViewModel.setUserStringValue(value.string, userTyped: isHandlingUserAppendingText)
+            suggestionContainerViewModel.setUserStringValue(value.string,
+                                                            userAppendedStringToTheEnd: isHandlingUserAppendingText)
         }
 
         // reset user typed flag for the next didChange event

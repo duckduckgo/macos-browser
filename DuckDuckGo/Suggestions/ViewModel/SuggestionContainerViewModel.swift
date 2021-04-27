@@ -43,12 +43,12 @@ final class SuggestionContainerViewModel {
 
     private(set) var userStringValue: String?
 
-    private var userTyped = false
+    private var isTopSuggestionSelectionExpected = false
 
     private var shouldSelectTopSuggestion: Bool {
         guard self.suggestionContainer.suggestions?.isEmpty == false else { return false }
 
-        if self.userTyped,
+        if self.isTopSuggestionSelectionExpected,
            let userStringValue = self.userStringValue,
            let firstSuggestion = self.suggestionViewModel(at: 0) {
             // select first Bookmark/Website match
@@ -78,7 +78,7 @@ final class SuggestionContainerViewModel {
         }
     }
 
-    func setUserStringValue(_ userStringValue: String, userTyped: Bool) {
+    func setUserStringValue(_ userStringValue: String, userAppendedStringToTheEnd: Bool) {
         let oldValue = self.userStringValue
         self.userStringValue = userStringValue
 
@@ -88,7 +88,7 @@ final class SuggestionContainerViewModel {
         }
         guard userStringValue.lowercased() != oldValue?.lowercased() else { return }
 
-        self.userTyped = userTyped
+        self.isTopSuggestionSelectionExpected = userAppendedStringToTheEnd
         suggestionContainer.getSuggestions(for: userStringValue)
     }
 
