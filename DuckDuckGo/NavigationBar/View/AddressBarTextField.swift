@@ -483,15 +483,30 @@ extension AddressBarTextField: NSTextFieldDelegate {
     }
 
     func controlTextDidChange(_ obj: Notification) {
-        suggestionContainerViewModel.clearSelection()
+        let stringValueWithoutSuffix = self.stringValueWithoutSuffix
 
-        value = Value(stringValue: stringValueWithoutSuffix, userTyped: true)
+        // if user continues typing letters from displayed Suggestion
+        // don't blink and keep the Suggestion displayed
+        if case .suggestion(let suggestion) = self.value,
+           stringValueWithoutSuffix.hasPrefix(suggestion.userStringValue),
+           suggestion.autocompletionString.hasPrefix(stringValueWithoutSuffix),
+           let editor = currentEditor(),
+           editor.selectedRange.location == stringValueWithoutSuffix.utf16.count {
+
+            self.value = .suggestion(SuggestionViewModel(suggestion: suggestion.suggestion,
+                                                         userStringValue: stringValueWithoutSuffix))
+            self.selectToTheEnd(from: stringValueWithoutSuffix.count)
+
+        } else {
+            suggestionContainerViewModel.clearSelection()
+            self.value = Value(stringValue: stringValueWithoutSuffix, userTyped: true)
+        }
 
         if stringValue.isEmpty {
             suggestionContainerViewModel.clearUserStringValue()
             hideSuggestionWindow()
         } else {
-            suggestionContainerViewModel.setUserStringValue(value.string,
+            suggestionContainerViewModel.setUserStringValue(stringValueWithoutSuffix,
                                                             userAppendedStringToTheEnd: isHandlingUserAppendingText)
         }
 
