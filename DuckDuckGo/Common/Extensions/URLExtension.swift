@@ -50,6 +50,11 @@ extension URL {
         return nil
     }
 
+    static func makeURL(fromSuggestionPhrase phrase: String) -> URL? {
+        guard let url = phrase.punycodedUrl, url.isValid else { return nil }
+        return url
+    }
+
     static var emptyPage: URL {
         return URL(string: "about:blank")!
     }

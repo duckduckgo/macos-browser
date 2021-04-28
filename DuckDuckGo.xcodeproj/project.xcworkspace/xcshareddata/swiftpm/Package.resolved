@@ -3,11 +3,20 @@
     "pins": [
       {
         "package": "BrowserServicesKit",
-        "repositoryURL": "git@github.com:more-duckduckgo-org/BrowserServicesKit.git",
+        "repositoryURL": "git@github.com:duckduckgo/BrowserServicesKit.git",
         "state": {
-          "branch": null,
-          "revision": "75e61d3159f45641c70bc78a9bc489c40bea7a62",
-          "version": "0.7.0"
+          "branch": "feature/alex/suggestion-parse-website",
+          "revision": "2704f15523e47060d78e49de890e4d0b05717cb7",
+          "version": null
+        }
+      },
+      {
+        "package": "GRDB",
+        "repositoryURL": "https://github.com/duckduckgo/GRDB.swift.git",
+        "state": {
+          "branch": "SQLCipher",
+          "revision": "e5714d4b6ee1651d2271b04ae85aaf5a327fe70a",
+          "version": null
         }
       },
       {

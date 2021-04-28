@@ -43,28 +43,22 @@ final class SuggestionContainer {
 
     func getSuggestions(for query: String) {
         latestQuery = query
-        loading.getSuggestions(query: query, maximum: Self.maximumNumberOfSuggestions) { [weak self] (suggestions, error) in
-            let suggestions = suggestions?.map { suggestion -> Suggestion in
-                if case .phrase(phrase: let phrase) = suggestion,
-                   let url = phrase.punycodedUrl, url.isValid {
-                    return .website(url: url)
-                }
-                return suggestion
+        loading.getSuggestions(query: query,
+                               maximum: Self.maximumNumberOfSuggestions,
+                               urlFactory: URL.makeURL(fromSuggestionPhrase:)) { [weak self] (suggestions, error) in
+            dispatchPrecondition(condition: .onQueue(.main))
+
+            guard self?.latestQuery == query else { return }
+            guard let suggestions = suggestions, error == nil else {
+                self?.suggestions = nil
+                os_log("Suggestions: Failed to get suggestions - %s",
+                       type: .error,
+                       "\(String(describing: error))")
+                Pixel.fire(.debug(event: .suggestionsFetchFailed, error: error))
+                return
             }
 
-            DispatchQueue.main.async {
-                guard self?.latestQuery == query else { return }
-                guard let suggestions = suggestions, error == nil else {
-                    self?.suggestions = nil
-                    os_log("Suggestions: Failed to get suggestions - %s",
-                           type: .error,
-                           "\(String(describing: error))")
-                    Pixel.fire(.debug(event: .suggestionsFetchFailed, error: error))
-                    return
-                }
-
-                self?.suggestions = suggestions
-            }
+            self?.suggestions = suggestions
         }
     }
 

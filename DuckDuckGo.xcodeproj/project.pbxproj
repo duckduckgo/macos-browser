@@ -2768,10 +2768,10 @@
 		};
 		8524389525FA49B900DE9B83 /* XCRemoteSwiftPackageReference "BrowserServicesKit" */ = {
 			isa = XCRemoteSwiftPackageReference;
-			repositoryURL = "git@github.com:more-duckduckgo-org/BrowserServicesKit.git";
+			repositoryURL = "git@github.com:duckduckgo/BrowserServicesKit.git";
 			requirement = {
-				kind = upToNextMajorVersion;
-				minimumVersion = 0.7.0;
+				branch = "feature/alex/suggestion-parse-website";
+				kind = branch;
 			};
 		};
 		85FF55C625F82E4F00E2AB99 /* XCRemoteSwiftPackageReference "lottie-ios" */ = {
