@@ -70,6 +70,7 @@
 		4B65027525E5F2A70054432E /* DefaultBrowserPromptView.xib in Resources */ = {isa = PBXBuildFile; fileRef = 4B65027425E5F2A70054432E /* DefaultBrowserPromptView.xib */; };
 		4B65027A25E5F2B10054432E /* DefaultBrowserPromptView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B65027925E5F2B10054432E /* DefaultBrowserPromptView.swift */; };
 		4B65028A25E6CBF40054432E /* NibLoadable.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B65028925E6CBF40054432E /* NibLoadable.swift */; };
+		4B65143E263924B5005B46EB /* EmailUrlExtensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B65143D263924B5005B46EB /* EmailUrlExtensions.swift */; };
 		4B677431255DBEB800025BD8 /* BloomFilterWrapper.mm in Sources */ = {isa = PBXBuildFile; fileRef = 4B677424255DBEB800025BD8 /* BloomFilterWrapper.mm */; };
 		4B677432255DBEB800025BD8 /* httpsMobileV2BloomSpec.json in Resources */ = {isa = PBXBuildFile; fileRef = 4B677427255DBEB800025BD8 /* httpsMobileV2BloomSpec.json */; };
 		4B677433255DBEB800025BD8 /* httpsMobileV2Bloom.bin in Resources */ = {isa = PBXBuildFile; fileRef = 4B677428255DBEB800025BD8 /* httpsMobileV2Bloom.bin */; };
@@ -385,6 +386,7 @@
 		4B65027425E5F2A70054432E /* DefaultBrowserPromptView.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = DefaultBrowserPromptView.xib; sourceTree = "<group>"; };
 		4B65027925E5F2B10054432E /* DefaultBrowserPromptView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DefaultBrowserPromptView.swift; sourceTree = "<group>"; };
 		4B65028925E6CBF40054432E /* NibLoadable.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NibLoadable.swift; sourceTree = "<group>"; };
+		4B65143D263924B5005B46EB /* EmailUrlExtensions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EmailUrlExtensions.swift; sourceTree = "<group>"; };
 		4B677424255DBEB800025BD8 /* BloomFilterWrapper.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = BloomFilterWrapper.mm; sourceTree = "<group>"; };
 		4B677425255DBEB800025BD8 /* BloomFilterWrapper.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = BloomFilterWrapper.h; sourceTree = "<group>"; };
 		4B677427255DBEB800025BD8 /* httpsMobileV2BloomSpec.json */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.json; path = httpsMobileV2BloomSpec.json; sourceTree = "<group>"; };
@@ -806,6 +808,14 @@
 			path = ContentBlocker;
 			sourceTree = "<group>";
 		};
+		4B65143C26392483005B46EB /* Email */ = {
+			isa = PBXGroup;
+			children = (
+				4B65143D263924B5005B46EB /* EmailUrlExtensions.swift */,
+			);
+			path = Email;
+			sourceTree = "<group>";
+		};
 		4B677422255DBEB800025BD8 /* Smarter Encryption */ = {
 			isa = PBXGroup;
 			children = (
@@ -1082,13 +1092,15 @@
 		AA585D80248FD31100E9A3E2 /* DuckDuckGo */ = {
 			isa = PBXGroup;
 			children = (
+				B6A9E47526146A440067D1B9 /* API */,
 				AA4D700525545EDE00C3411E /* AppDelegate */,
 				AAC5E4C025D6A6A9007F5990 /* Bookmarks */,
 				AA86491B24D837DE001BABEE /* BrowserTab */,
 				AA6820E825503A21005ED0D5 /* Burning */,
 				AA86491324D831B9001BABEE /* Common */,
-				4B6160D125B14E5E007DE5B2 /* ContentBlocker */,
 				85D33F1025C82E93002B91A6 /* Configuration */,
+				4B6160D125B14E5E007DE5B2 /* ContentBlocker */,
+				4B65143C26392483005B46EB /* Email */,
 				8556A60C256C15C60092FA9D /* FileDownload */,
 				85A0115D25AF1C4700FA6A0C /* FindInPage */,
 				4B02197B25E05FAC00ED7DEA /* Fireproofing */,
@@ -1096,20 +1108,19 @@
 				AA585DB02490E6FA00E9A3E2 /* Main */,
 				AA97BF4425135CB60014931A /* Menus */,
 				AA86491524D83384001BABEE /* NavigationBar */,
+				4B0511A2262CAA5A00F6079C /* Preferences */,
 				4B677422255DBEB800025BD8 /* Smarter Encryption */,
+				B68458AE25C7E75100DC17B6 /* State Restoration */,
+				B6A9E44E26142AF90067D1B9 /* Statistics */,
 				4B677447255DBF1400025BD8 /* Submodules */,
 				AACB8E7224A4C8BC005F2218 /* Suggestions */,
 				AA86491124D8318F001BABEE /* TabBar */,
 				AAE8B0FD258A416F00E81239 /* Tooltip */,
 				AA6EF9AE25066F99004754E6 /* Windows */,
-				B68458AE25C7E75100DC17B6 /* State Restoration */,
-				B6A9E47526146A440067D1B9 /* API */,
-				B6A9E44E26142AF90067D1B9 /* Statistics */,
-				4B0511A2262CAA5A00F6079C /* Preferences */,
-				AA585D8B248FD31400E9A3E2 /* DuckDuckGo.entitlements */,
-				4B677454255DC18000025BD8 /* Bridging.h */,
-				AA585D8A248FD31400E9A3E2 /* Info.plist */,
 				AA585D85248FD31400E9A3E2 /* Assets.xcassets */,
+				4B677454255DC18000025BD8 /* Bridging.h */,
+				AA585D8B248FD31400E9A3E2 /* DuckDuckGo.entitlements */,
+				AA585D8A248FD31400E9A3E2 /* Info.plist */,
 			);
 			path = DuckDuckGo;
 			sourceTree = "<group>";
@@ -2095,6 +2106,7 @@
 				AAA0CC6A253CC43C0079BC96 /* WKUserContentControllerExtension.swift in Sources */,
 				B6A9E45C261460350067D1B9 /* APIRequest.swift in Sources */,
 				AA9FF95D24A1FA1C0039E328 /* TabCollection.swift in Sources */,
+				4B65143E263924B5005B46EB /* EmailUrlExtensions.swift in Sources */,
 				85A0118225AF60E700FA6A0C /* FindInPageModel.swift in Sources */,
 				B6DA44022616B28300DD1EC2 /* PixelDataStore.swift in Sources */,
 				B6A9E45326142B070067D1B9 /* Pixel.swift in Sources */,
