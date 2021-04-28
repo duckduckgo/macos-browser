@@ -65,6 +65,7 @@ final class Tab: NSObject {
          error: Error? = nil,
          favicon: NSImage? = nil,
          sessionStateData: Data? = nil,
+         parentTab: Tab? = nil,
          shouldLoadInBackground: Bool = false) {
 
         self.tabType = tabType
@@ -73,6 +74,7 @@ final class Tab: NSObject {
         self.title = title
         self.error = error
         self.favicon = favicon
+        self.parentTab = parentTab
         self.sessionStateData = sessionStateData
 
         let configuration = webViewConfiguration ?? WKWebViewConfiguration()
@@ -126,6 +128,8 @@ final class Tab: NSObject {
 
     @PublishedAfter var title: String?
     @PublishedAfter var error: Error?
+
+    weak private(set) var parentTab: Tab?
 
     weak var findInPage: FindInPageModel? {
         didSet {

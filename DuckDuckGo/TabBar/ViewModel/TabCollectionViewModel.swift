@@ -46,7 +46,12 @@ final class TabCollectionViewModel: NSObject {
         }
     }
     @Published private(set) var selectedTabViewModel: TabViewModel?
+    private weak var previouslySelectedTabViewModel: TabViewModel?
+
     @Published private(set) var canInsertLastRemovedTab: Bool = false
+
+    // In a special occasion, we want to select the "parent" tab after closing the currently selected tab
+    private var selectParentOnRemoval = false
 
     private var cancellables = Set<AnyCancellable>()
 
@@ -56,6 +61,7 @@ final class TabCollectionViewModel: NSObject {
 
         subscribeToTabs()
         subscribeToLastRemovedTab()
+        subscribeToSelectedTabViewModel()
 
         if tabCollection.tabs.isEmpty {
             appendNewTab()
@@ -88,6 +94,7 @@ final class TabCollectionViewModel: NSObject {
         }
 
         selectionIndex = index
+        selectParentOnRemoval = selectedTabViewModel === previouslySelectedTabViewModel && selectParentOnRemoval
         return true
     }
 
@@ -137,9 +144,9 @@ final class TabCollectionViewModel: NSObject {
         }
         let tab: Tab
         if let webViewConfiguration = webViewConfiguration {
-            tab = Tab(webViewConfiguration: webViewConfiguration)
+            tab = Tab(webViewConfiguration: webViewConfiguration, parentTab: selectedTabViewModel?.tab)
         } else {
-            tab = Tab()
+            tab = Tab(parentTab: selectedTabViewModel?.tab)
         }
 
         let newIndex = selectionIndex + 1
@@ -147,6 +154,8 @@ final class TabCollectionViewModel: NSObject {
         select(at: newIndex)
 
         delegate?.tabCollectionViewModel(self, didInsertAndSelectAt: newIndex)
+
+        selectParentOnRemoval = true
     }
 
     func append(tab: Tab, selected: Bool = true) {
@@ -162,6 +171,10 @@ final class TabCollectionViewModel: NSObject {
         } else {
             select(at: selectionIndex)
             delegate?.tabCollectionViewModelDidAppend(self, selected: false)
+        }
+
+        if selected {
+            self.selectParentOnRemoval = true
         }
     }
 
@@ -187,6 +200,7 @@ final class TabCollectionViewModel: NSObject {
     }
 
     func remove(at index: Int) {
+        let parentTab = tabCollection.tabs[safe: index]?.parentTab
         guard tabCollection.remove(at: index) else { return }
 
         guard tabCollection.tabs.count > 0 else {
@@ -201,7 +215,10 @@ final class TabCollectionViewModel: NSObject {
         }
 
         let newSelectionIndex: Int
-        if selectionIndex > index {
+        if selectionIndex == index, selectParentOnRemoval,
+           let parentTab = parentTab, let parentTabIndex = tabCollection.tabs.firstIndex(of: parentTab) {
+            newSelectionIndex = parentTabIndex
+        } else if selectionIndex > index {
             newSelectionIndex = max(selectionIndex - 1, 0)
         } else {
             newSelectionIndex = max(min(selectionIndex, tabCollection.tabs.count - 1), 0)
@@ -299,6 +316,14 @@ final class TabCollectionViewModel: NSObject {
         tabCollection.$lastRemovedTabCache.receive(on: DispatchQueue.main).sink { [weak self] _ in
             self?.updateCanInsertLastRemovedTab()
         } .store(in: &cancellables)
+    }
+
+    private func subscribeToSelectedTabViewModel() {
+        $selectedTabViewModel
+            .scan((nil, nil)) { return ($0.1, $1) }
+            .sink { [weak self] (previouslySelectedTabViewModel, _) in
+                self?.previouslySelectedTabViewModel = previouslySelectedTabViewModel
+            }.store(in: &cancellables)
     }
 
     private func removeTabViewModels(_ removed: Set<Tab>) {
