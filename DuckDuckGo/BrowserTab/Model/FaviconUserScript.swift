@@ -20,7 +20,7 @@ import Foundation
 import WebKit
 import BrowserServicesKit
 
-protocol FaviconUserScriptDelegate: class {
+protocol FaviconUserScriptDelegate: AnyObject {
 
     func faviconUserScript(_ faviconUserScript: FaviconUserScript, didFindFavicon faviconUrl: URL)
 

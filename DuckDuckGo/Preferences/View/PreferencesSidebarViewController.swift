@@ -18,7 +18,7 @@
 
 import Foundation
 
-protocol PreferencesSidebarViewControllerDelegate: class {
+protocol PreferencesSidebarViewControllerDelegate: AnyObject {
 
     func selected(detailViewType: PreferencesDetailViewType)
 

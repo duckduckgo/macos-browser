@@ -20,7 +20,7 @@ import WebKit
 import os
 import BrowserServicesKit
 
-protocol TabInstrumentationProtocol: class {
+protocol TabInstrumentationProtocol: AnyObject {
     func request(url: String, allowedIn timeInMs: Double)
     func tracker(url: String, allowedIn timeInMs: Double, reason: String?)
     func tracker(url: String, blockedIn timeInMs: Double)
