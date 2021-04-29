@@ -297,21 +297,19 @@ final class EmailOptionsButtonSubMenu: NSMenu {
     }
     
     @objc func createAddressAction(_ sender: NSMenuItem) {
-        fatalError()
-//        guard let url = emailManager.generateTokenPageURL else {
-//            assertionFailure("Could not get token page URL, token not available")
-//            return
-//        }
-//        let tab = Tab()
-//        tab.url = url
-//        tabCollectionViewModel.append(tab: tab)
-//
-//        (supermenu as? OptionsButtonMenu)?.result = .emailProtectionCreateAddress
+         guard let url = emailManager.generateTokenPageURL else {
+             assertionFailure("Could not get token page URL, token not available")
+             return
+         }
+         let tab = Tab()
+         tab.url = url
+         tabCollectionViewModel.append(tab: tab)
+         (supermenu as? OptionsButtonMenu)?.result = .emailProtectionCreateAddress
     }
     
     @objc func viewDashboardAction(_ sender: NSMenuItem) {
         let tab = Tab()
-//        tab.url = EmailUrls().emailDashboardPage
+        tab.url = EmailUrls().emailDashboardPage
         tabCollectionViewModel.append(tab: tab)
 
         (supermenu as? OptionsButtonMenu)?.result = .emailProtectionDashboard
@@ -325,7 +323,7 @@ final class EmailOptionsButtonSubMenu: NSMenu {
     
     @objc func turnOnEmailAction(_ sender: NSMenuItem) {
         let tab = Tab()
-//        tab.url = EmailUrls().emailLandingPage
+        tab.url = EmailUrls().emailLandingPage
         tabCollectionViewModel.append(tab: tab)
 
         (supermenu as? OptionsButtonMenu)?.result = .emailProtection
