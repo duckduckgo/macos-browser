@@ -38,14 +38,13 @@ final class SuggestionContainer {
     }
 
     convenience init () {
-        self.init(suggestionLoading: SuggestionLoader(), bookmarkManager: LocalBookmarkManager.shared)
+        self.init(suggestionLoading: SuggestionLoader(urlFactory: URL.makeURL(fromSuggestionPhrase:)), bookmarkManager: LocalBookmarkManager.shared)
     }
 
     func getSuggestions(for query: String) {
         latestQuery = query
         loading.getSuggestions(query: query,
-                               maximum: Self.maximumNumberOfSuggestions,
-                               urlFactory: URL.makeURL(fromSuggestionPhrase:)) { [weak self] (suggestions, error) in
+                               maximum: Self.maximumNumberOfSuggestions) { [weak self] (suggestions, error) in
             dispatchPrecondition(condition: .onQueue(.main))
 
             guard self?.latestQuery == query else { return }
