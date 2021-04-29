@@ -18,6 +18,7 @@
 
 import Cocoa
 import Combine
+import os
 
 final class FileDownloadManager {
 
@@ -26,37 +27,62 @@ final class FileDownloadManager {
     private init() { }
 
     private var subscriptions = Set<AnyCancellable>()
-    private (set) var downloads = Set<FileDownloadTask>()
+    private (set) var downloads = [FileDownloadTask]()
 
     @discardableResult
     func startDownload(_ download: FileDownload) -> FileDownloadTask {
-        let state = FileDownloadTask(download: download)
+        let state = download.downloadTask()
 
-        state.$filePath.receive(on: DispatchQueue.main).compactMap { $0 }.sink { filePath in
+        state.start(localFileURLCallback: self.localFileURL(for: download)) { result in
+            if case .success(let url) = result {
+                // For now, show the file in Finder
+                NSWorkspace.shared.activateFileViewerSelecting([url])
+            }
 
-            let file = URL(fileURLWithPath: filePath)
-
-            // For now, show the file in Finder
-            NSWorkspace.shared.activateFileViewerSelecting([file])
-
-        }.store(in: &subscriptions)
-
-        state.start()
+        }
 
         return state
     }
 
-    func saveDataToFile(_ data: Data, withSuggestedFileName suggestedFile: String, mimeType: String) {
+    private func localFileURL(for download: FileDownload) -> (FileDownloadTask, @escaping (URL?) -> Void) -> Void {
+        { downloadTask, callback in
 
-        let fm = FileManager.default
-        let temp = fm.temporaryDirectory.appendingPathComponent(UUID().uuidString)
-        guard fm.createFile(atPath: temp.path, contents: data, attributes: nil) else { return }
+            let preferences = DownloadPreferences()
+            guard download.shouldAlwaysPromptFileSaveLocation || preferences.alwaysRequestDownloadLocation else {
+                let fileName = downloadTask.suggestedFilename ?? .uniqueFilename(for: downloadTask.fileTypes?.first)
+                if let url = preferences.selectedDownloadLocation?.appendingPathComponent(fileName) {
+                    callback(url)
+                } else {
+                    os_log("Failed to access Downloads folder")
+                    Pixel.fire(.debug(event: .fileMoveToDownloadsFailed, error: CocoaError(.fileWriteUnknown)))
+                    callback(nil)
+                }
+                return
+            }
 
-        if let path = temp.moveToDownloadsFolder(withFileName: suggestedFile) {
-            let file = URL(fileURLWithPath: path)
-            NSWorkspace.shared.activateFileViewerSelecting([file])
+            let savePanel = NSSavePanel.withFileTypeChooser(fileTypes: downloadTask.fileTypes ?? [],
+                                                            suggestedFilename: downloadTask.suggestedFilename,
+                                                            directoryURL: preferences.selectedDownloadLocation)
+
+            func completionHandler(_ result: NSApplication.ModalResponse) {
+                guard case .OK = result, let url = savePanel.url else {
+                    callback(nil)
+                    return
+                }
+                if FileManager.default.fileExists(atPath: url.path) {
+                    // overwrite
+                    try? FileManager.default.removeItem(at: url)
+                }
+
+                callback(url)
+            }
+
+            if let window = download.window {
+                savePanel.beginSheetModal(for: window, completionHandler: completionHandler)
+            } else {
+                completionHandler(savePanel.runModal())
+            }
         }
-
     }
 
 }

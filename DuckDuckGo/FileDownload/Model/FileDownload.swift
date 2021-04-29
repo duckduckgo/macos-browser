@@ -17,82 +17,71 @@
 //
 
 import Foundation
+import WebKit
 
 struct FileDownload {
-
-    var request: URLRequest
-    var suggestedName: String?
-
-    /// Based on Content-Length header, if avialable.
-    var contentLength: Int? {
-        guard let contentLength = request.allHTTPHeaderFields?["Content-Length"] else { return nil }
-        return Int(contentLength)
+    enum DownloadKind {
+        case request(URLRequest)
+        case webContent(WKWebView, request: URLRequest?)
+        case data(Data, mimeType: String)
     }
 
-    func bestFileName(mimeType: String?) -> String {
-        let startName = suggestedName?.isEmpty ?? false ? nil : suggestedName
-        return startName ??
-            fileNameFromURL(mimeType: mimeType) ??
-            createUniqueFileName(mimeType: mimeType)
+    let kind: DownloadKind
+    let suggestedName: String?
+    let window: NSWindow?
+    let forceSaveLocationChooser: Bool
+
+    init(url: URL, window: NSWindow?, forceSaveLocationChooser: Bool = false) {
+        self.kind = .request(URLRequest(url: url))
+        self.window = window
+        self.forceSaveLocationChooser = forceSaveLocationChooser
+        self.suggestedName = nil
     }
 
-    func createUniqueFileName(mimeType: String?) -> String {
+    init(request: URLRequest, suggestedName: String?, window: NSWindow?, forceSaveLocationChooser: Bool = false) {
+        self.kind = .request(request)
+        self.window = window
+        self.forceSaveLocationChooser = forceSaveLocationChooser
+        self.suggestedName = suggestedName
+    }
 
-        let suffix: String
-        if let mimeType = mimeType, let ext = mimeToFileExtension(mimeType) {
-            suffix = "." + ext
-        } else {
-            suffix = ""
+    init(data: Data, mimeType: String, suggestedName: String?, window: NSWindow?, forceSaveLocationChooser: Bool = false) {
+        self.kind = .data(data, mimeType: mimeType)
+        self.window = window
+        self.forceSaveLocationChooser = forceSaveLocationChooser
+        self.suggestedName = suggestedName
+    }
+
+    init(webView: WKWebView, request: URLRequest?, window: NSWindow?, forceSaveLocationChooser: Bool) {
+        self.kind = .webContent(webView, request: request)
+        self.window = window
+        self.forceSaveLocationChooser = forceSaveLocationChooser
+        self.suggestedName = webView.title
+    }
+
+    func downloadTask() -> FileDownloadTask {
+        switch kind {
+        case .request(let request):
+            return URLRequestDownloadTask(session: nil, request: request)
+
+        case .webContent(let webView, request: let request):
+            if let url = webView.url, url.isFileURL == true {
+                return LocalFileSaveTask(url: url, fileType: UTType(fileExtension: url.pathExtension))
+            }
+            return WebContentDownloadTask(webView: webView, request: request)
+
+        case .data(let data, mimeType: let mimeType):
+            return DataSaveTask(data: data, mimeType: mimeType, suggestedFilename: suggestedName)
         }
+    }
 
-        let prefix: String
-        if let host = request.url?.host?.drop(prefix: "www.").replacingOccurrences(of: ".", with: "_") {
-            prefix = host + "_"
-        } else {
-            prefix = ""
+    var shouldAlwaysPromptFileSaveLocation: Bool {
+        switch kind {
+        case .webContent:
+            return true
+        case .request, .data:
+            return false
         }
-
-        return prefix + UUID().uuidString + suffix
-    }
-
-    /// Tries to use the file name part of the URL, if available, adjusting for content type, if available.
-    func fileNameFromURL(mimeType: String?) -> String? {
-        guard let url = request.url,
-              !url.pathComponents.isEmpty,
-              url.pathComponents != [ "/" ] else { return nil }
-
-        if let mimeType = mimeType,
-           hasMatchingMimeType(mimeType, extension: url.pathExtension) {
-            // Mime-type and extensio match so go with it
-            return url.lastPathComponent
-        }
-
-        if  let mimeType = mimeType,
-            let ext = mimeToFileExtension(mimeType) {
-            // there is a more appropriate extension, so use it
-            return url.lastPathComponent + "." + ext
-        }
-
-        return url.lastPathComponent
-    }
-
-    func hasMatchingMimeType(_ mimeType: String, extension ext: String) -> Bool {
-        return mimeToFileExtension(mimeType) == ext
-    }
-
-    func mimeToUti(_ mimeType: String) -> String? {
-        guard let contentType = UTTypeCreatePreferredIdentifierForTag(kUTTagClassMIMEType, mimeType as CFString, nil) else { return nil }
-        return contentType.takeRetainedValue() as String
-    }
-
-    func utiToFileExtension(_ utiType: String) -> String? {
-        guard let ext = UTTypeCopyPreferredTagWithClass(utiType as CFString, kUTTagClassFilenameExtension) else { return nil }
-        return ext.takeRetainedValue() as String
-    }
-
-    func mimeToFileExtension(_ mimeType: String) -> String? {
-        guard let uti = mimeToUti(mimeType) else { return nil }
-        return utiToFileExtension(uti)
     }
 
 }

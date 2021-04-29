@@ -98,6 +98,11 @@
                                                 <action selector="closeTab:" target="Ady-hI-5gd" id="zjx-YQ-d6C"/>
                                             </connections>
                                         </menuItem>
+                                        <menuItem title="Save As..." keyEquivalent="s" id="Gla-S3-yci">
+                                            <connections>
+                                                <action selector="saveAs:" target="Ady-hI-5gd" id="VSN-fV-7wi"/>
+                                            </connections>
+                                        </menuItem>
                                         <menuItem isSeparatorItem="YES" id="anH-0y-7dE"/>
                                         <menuItem title="Print..." keyEquivalent="p" id="uFk-FD-FTB">
                                             <connections>

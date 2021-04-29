@@ -380,7 +380,9 @@ extension Tab: HTML5DownloadDelegate {
     func startDownload(_ userScript: HTML5DownloadUserScript, from url: URL, withSuggestedName name: String) {
         var request = lastMainFrameRequest ?? URLRequest(url: url)
         request.url = url
-        delegate?.tab(self, requestedFileDownload: FileDownload(request: request, suggestedName: name))
+        delegate?.tab(self, requestedFileDownload: FileDownload(request: request,
+                                                                suggestedName: name,
+                                                                window: self.webView.window))
     }
 
 }
@@ -547,7 +549,9 @@ extension Tab: WKNavigationDelegate {
 
         if (!navigationResponse.canShowMIMEType || navigationResponse.shouldDownload),
            let request = lastMainFrameRequest {
-            let download = FileDownload(request: request, suggestedName: navigationResponse.response.suggestedFilename)
+            let download = FileDownload(request: request,
+                                        suggestedName: navigationResponse.response.suggestedFilename,
+                                        window: self.webView.window)
             delegate?.tab(self, requestedFileDownload: download)
             // Flag this here, because interrupting the frame load will cause an error and we need to know
             self.currentDownload = download
@@ -585,10 +589,10 @@ extension Tab: WKNavigationDelegate {
     func webView(_ webView: WKWebView, didFailProvisionalNavigation navigation: WKNavigation!, withError error: Error) {
         if currentDownload != nil && (error as NSError).code == ErrorCodes.frameLoadInterrupted {
             currentDownload = nil
-            os_log("didFailProvisionalNavigation due to download %s", type: .debug, currentDownload?.request.url?.absoluteString ?? "")
+//            os_log("didFailProvisionalNavigation due to download %s", type: .debug, currentDownload?.request.url?.absoluteString ?? "")
             return
         }
-
+        // TODO: Should we ignore currentDownload and always check frameLoadInterrupted (showing error for g! redirect)
         self.error = error
     }
 

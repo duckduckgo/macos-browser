@@ -300,6 +300,20 @@ extension MainViewController {
         }
     }
 
+    // MARK: - Saving
+
+    @IBAction func saveAs(_ sender: Any) {
+        guard let tabViewModel = self.tabCollectionViewModel.selectedTabViewModel else {
+            os_log("MainViewController: No tab view model selected", type: .error)
+            return
+        }
+        // TODO: save Tab.urlRequest for saving pages with POST data?
+        let webView = tabViewModel.tab.webView
+
+        let download = FileDownload(webView: webView, request: nil, window: self.view.window, forceSaveLocationChooser: true)
+        FileDownloadManager.shared.startDownload(download)
+    }
+
     // MARK: - Debug
 
     @IBAction func resetDefaultBrowserPrompt(_ sender: Any?) {
@@ -315,6 +329,7 @@ extension MainViewController {
 
 extension MainViewController: NSMenuItemValidation {
 
+    // swiftlint:disable cyclomatic_complexity
     func validateMenuItem(_ menuItem: NSMenuItem) -> Bool {
         switch menuItem.action {
         // Back/Forward
@@ -346,10 +361,16 @@ extension MainViewController: NSMenuItemValidation {
         case #selector(MainViewController.reopenLastClosedTab(_:)):
             return tabCollectionViewModel.canInsertLastRemovedTab == true
 
+        // Printing/saving
+        case #selector(MainViewController.saveAs(_:)),
+             #selector(MainViewController.printWebView(_:)):
+            return tabCollectionViewModel.selectedTabViewModel?.canReload == true
+
         default:
             return menuItem.isEnabled
         }
     }
+    // swiftlint:enable cyclomatic_complexity
 
 }
 

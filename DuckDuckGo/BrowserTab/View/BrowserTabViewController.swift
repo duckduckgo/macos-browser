@@ -330,7 +330,7 @@ extension BrowserTabViewController: LinkMenuItemSelectors {
         guard let tab = tabCollectionViewModel.selectedTabViewModel?.tab,
               let url = contextMenuLink else { return }
 
-        self.tab(tab, requestedFileDownload: FileDownload(request: URLRequest(url: url), suggestedName: nil))
+        self.tab(tab, requestedFileDownload: FileDownload(url: url, window: self.view.window))
     }
 
     func copyLink(_ sender: NSMenuItem) {
@@ -359,7 +359,7 @@ extension BrowserTabViewController: ImageMenuItemSelectors {
         guard let tab = tabCollectionViewModel.selectedTabViewModel?.tab,
               let url = contextMenuImage else { return }
 
-        self.tab(tab, requestedFileDownload: FileDownload(request: URLRequest(url: url), suggestedName: nil))
+        self.tab(tab, requestedFileDownload: FileDownload(url: url, window: view.window))
     }
 
     func copyImageAddress(_ sender: NSMenuItem) {
@@ -374,7 +374,10 @@ extension BrowserTabViewController: WKUIDelegate {
 
     // swiftlint:disable identifier_name
     @objc func _webView(_ webView: WKWebView, saveDataToFile data: NSData, suggestedFilename: NSString, mimeType: NSString, originatingURL: NSURL) {
-        FileDownloadManager.shared.saveDataToFile(data as Data, withSuggestedFileName: suggestedFilename as String, mimeType: mimeType as String)
+        FileDownloadManager.shared.startDownload(FileDownload(data: data as Data,
+                                                              mimeType: mimeType as String,
+                                                              suggestedName: suggestedFilename as String,
+                                                              window: self.view.window))
     }
     // swiftlint:enable identifier_name
 
