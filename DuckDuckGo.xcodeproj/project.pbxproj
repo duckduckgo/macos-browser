@@ -14,6 +14,7 @@
 		1456D6E124EFCBC300775049 /* TabBarCollectionView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1456D6E024EFCBC300775049 /* TabBarCollectionView.swift */; };
 		14D9B8FB24F7E089000D4D13 /* AddressBarViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 14D9B8F924F7E089000D4D13 /* AddressBarViewController.swift */; };
 		14D9B90224F91316000D4D13 /* FocusRingView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 14D9B90124F91316000D4D13 /* FocusRingView.swift */; };
+		336D5B18262D8D3C0052E0C9 /* findinpage.js in Resources */ = {isa = PBXBuildFile; fileRef = 336D5AEF262D8D3C0052E0C9 /* findinpage.js */; };
 		4B02198825E05FAC00ED7DEA /* login-detection.js in Resources */ = {isa = PBXBuildFile; fileRef = 4B02197D25E05FAC00ED7DEA /* login-detection.js */; };
 		4B02198925E05FAC00ED7DEA /* FireproofingURLExtensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B02197F25E05FAC00ED7DEA /* FireproofingURLExtensions.swift */; };
 		4B02198A25E05FAC00ED7DEA /* FireproofDomains.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B02198125E05FAC00ED7DEA /* FireproofDomains.swift */; };
@@ -120,7 +121,6 @@
 		85A0116925AF1D8900FA6A0C /* FindInPageViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 85A0116825AF1D8900FA6A0C /* FindInPageViewController.swift */; };
 		85A0117425AF2EDF00FA6A0C /* FindInPage.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 85A0117325AF2EDF00FA6A0C /* FindInPage.storyboard */; };
 		85A0118225AF60E700FA6A0C /* FindInPageModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 85A0118125AF60E700FA6A0C /* FindInPageModel.swift */; };
-		85A011E525B4D49400FA6A0C /* findinpage.js in Resources */ = {isa = PBXBuildFile; fileRef = 85A011E425B4D49400FA6A0C /* findinpage.js */; };
 		85A011EA25B4D4CA00FA6A0C /* FindInPageUserScript.swift in Sources */ = {isa = PBXBuildFile; fileRef = 85A011E925B4D4CA00FA6A0C /* FindInPageUserScript.swift */; };
 		85AC3AEF25D5CE9800C7D2AA /* UserScripts.swift in Sources */ = {isa = PBXBuildFile; fileRef = 85AC3AEE25D5CE9800C7D2AA /* UserScripts.swift */; };
 		85AC3AF725D5DBFD00C7D2AA /* DataExtension.swift in Sources */ = {isa = PBXBuildFile; fileRef = 85AC3AF625D5DBFD00C7D2AA /* DataExtension.swift */; };
@@ -329,6 +329,7 @@
 		1456D6E024EFCBC300775049 /* TabBarCollectionView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TabBarCollectionView.swift; sourceTree = "<group>"; };
 		14D9B8F924F7E089000D4D13 /* AddressBarViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AddressBarViewController.swift; sourceTree = "<group>"; };
 		14D9B90124F91316000D4D13 /* FocusRingView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FocusRingView.swift; sourceTree = "<group>"; };
+		336D5AEF262D8D3C0052E0C9 /* findinpage.js */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.javascript; path = findinpage.js; sourceTree = "<group>"; };
 		4B02197D25E05FAC00ED7DEA /* login-detection.js */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.javascript; path = "login-detection.js"; sourceTree = "<group>"; };
 		4B02197F25E05FAC00ED7DEA /* FireproofingURLExtensions.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = FireproofingURLExtensions.swift; sourceTree = "<group>"; };
 		4B02198125E05FAC00ED7DEA /* FireproofDomains.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = FireproofDomains.swift; sourceTree = "<group>"; };
@@ -436,7 +437,6 @@
 		85A0116825AF1D8900FA6A0C /* FindInPageViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FindInPageViewController.swift; sourceTree = "<group>"; };
 		85A0117325AF2EDF00FA6A0C /* FindInPage.storyboard */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; path = FindInPage.storyboard; sourceTree = "<group>"; };
 		85A0118125AF60E700FA6A0C /* FindInPageModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FindInPageModel.swift; sourceTree = "<group>"; };
-		85A011E425B4D49400FA6A0C /* findinpage.js */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.javascript; name = findinpage.js; path = Submodules/ios_js_support/src/findinpage.js; sourceTree = SOURCE_ROOT; };
 		85A011E925B4D4CA00FA6A0C /* FindInPageUserScript.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FindInPageUserScript.swift; sourceTree = "<group>"; };
 		85AC3AEE25D5CE9800C7D2AA /* UserScripts.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UserScripts.swift; sourceTree = "<group>"; };
 		85AC3AF625D5DBFD00C7D2AA /* DataExtension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DataExtension.swift; sourceTree = "<group>"; };
@@ -663,6 +663,23 @@
 			path = ViewModel;
 			sourceTree = "<group>";
 		};
+		336D5AEA262D8D3C0052E0C9 /* duckduckgo-find-in-page */ = {
+			isa = PBXGroup;
+			children = (
+				336D5AEE262D8D3C0052E0C9 /* dist */,
+			);
+			name = "duckduckgo-find-in-page";
+			path = "Submodules/duckduckgo-find-in-page";
+			sourceTree = SOURCE_ROOT;
+		};
+		336D5AEE262D8D3C0052E0C9 /* dist */ = {
+			isa = PBXGroup;
+			children = (
+				336D5AEF262D8D3C0052E0C9 /* findinpage.js */,
+			);
+			path = dist;
+			sourceTree = "<group>";
+		};
 		4B02197B25E05FAC00ED7DEA /* Fireproofing */ = {
 			isa = PBXGroup;
 			children = (
@@ -858,7 +875,7 @@
 		4B677447255DBF1400025BD8 /* Submodules */ = {
 			isa = PBXGroup;
 			children = (
-				85A011DB25B4D44800FA6A0C /* ios-js-support */,
+				336D5AEA262D8D3C0052E0C9 /* duckduckgo-find-in-page */,
 				4B677448255DBF2300025BD8 /* bloom_cpp */,
 			);
 			name = Submodules;
@@ -974,14 +991,6 @@
 				85A0116825AF1D8900FA6A0C /* FindInPageViewController.swift */,
 			);
 			path = FindInPage;
-			sourceTree = "<group>";
-		};
-		85A011DB25B4D44800FA6A0C /* ios-js-support */ = {
-			isa = PBXGroup;
-			children = (
-				85A011E425B4D49400FA6A0C /* findinpage.js */,
-			);
-			name = "ios-js-support";
 			sourceTree = "<group>";
 		};
 		85AC3B1525D9BBFA00C7D2AA /* Configuration */ = {
@@ -1912,7 +1921,6 @@
 				AA80EC89256C49B8007083E7 /* Localizable.strings in Resources */,
 				AAE8B102258A41C000E81239 /* Tooltip.storyboard in Resources */,
 				AA68C3D72490F821001B8783 /* README.md in Resources */,
-				85A011E525B4D49400FA6A0C /* findinpage.js in Resources */,
 				AA585D86248FD31400E9A3E2 /* Assets.xcassets in Resources */,
 				AA585D89248FD31400E9A3E2 /* Main.storyboard in Resources */,
 				4B6160F225B15792007DE5B2 /* contentblockerrules.js in Resources */,
@@ -1936,6 +1944,7 @@
 				4B0511C1262CAA5A00F6079C /* PrivacySecurityPreferencesTableCellView.xib in Resources */,
 				4B0511D0262CAA5A00F6079C /* AppearancePreferencesTableCellView.xib in Resources */,
 				4B6160F725B157BB007DE5B2 /* contentblocker.js in Resources */,
+				336D5B18262D8D3C0052E0C9 /* findinpage.js in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
