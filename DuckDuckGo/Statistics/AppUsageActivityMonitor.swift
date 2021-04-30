@@ -19,7 +19,7 @@
 import Cocoa
 import Combine
 
-protocol AppUsageActivityMonitorDelegate: class {
+protocol AppUsageActivityMonitorDelegate: AnyObject {
     func countOpenWindowsAndTabs() -> [Int]
     func activeUsageTimeHasReachedThreshold(avgTabCount: Double)
 }

@@ -572,14 +572,7 @@ extension AddressBarTextField: SuggestionViewControllerDelegate {
 
     func shouldCloseSuggestionWindow(forMouseEvent event: NSEvent) -> Bool {
         // don't hide suggestions if clicking somewhere inside the Address Bar view
-        if let screenPoint = event.window?.convertPoint(toScreen: event.locationInWindow),
-           let point = self.window?.convertPoint(fromScreen: screenPoint),
-           superview!.bounds.contains(superview!.convert(point, from: nil)) {
-
-            return false
-        }
-
-        return true
+        return superview?.isMouseLocationInsideBounds(event.locationInWindow) != true
     }
 }
 

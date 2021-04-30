@@ -34,7 +34,12 @@ internal class MouseOverButton: NSButton {
         didSet {
             updateCornerRadius()
         }
+    }
 
+    override var isEnabled: Bool {
+        didSet {
+            updateBackgroundColor()
+        }
     }
 
     override func awakeFromNib() {

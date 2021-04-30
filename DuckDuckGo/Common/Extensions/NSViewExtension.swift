@@ -92,4 +92,16 @@ extension NSView {
         }
     }
 
+    func isMouseLocationInsideBounds(_ point: NSPoint? = nil) -> Bool {
+        return mouseLocationInsideBounds(point) != nil
+    }
+
+    func mouseLocationInsideBounds(_ point: NSPoint?) -> NSPoint? {
+        guard let mouseLocation = point ?? window?.mouseLocationOutsideOfEventStream else { return nil }
+        let locationInView = self.convert(mouseLocation, from: nil)
+        guard self.bounds.contains(locationInView) else { return nil }
+
+        return locationInView
+    }
+
 }

@@ -190,7 +190,22 @@ final class TabBarViewItem: NSCollectionViewItem {
         delegate?.tabBarViewItemBookmarkThisPageAction(self)
     }
 
+    private var lastKnownIndexPath: IndexPath?
+
     @IBAction func closeButtonAction(_ sender: NSButton) {
+        guard let indexPath = self.collectionView?.indexPath(for: self) else {
+            // doubleclick event arrived at point when we're already removed
+            // pass the closeButton action to the next TabBarViewItem
+            if let indexPath = self.lastKnownIndexPath,
+               let nextItem = self.collectionView?.item(at: indexPath) as? Self {
+                // and set its lastKnownIndexPath in case clicks continue to arrive
+                nextItem.lastKnownIndexPath = indexPath
+                delegate?.tabBarViewItemCloseAction(nextItem)
+            }
+            return
+        }
+
+        self.lastKnownIndexPath = indexPath
         delegate?.tabBarViewItemCloseAction(self)
     }
 
@@ -288,9 +303,22 @@ extension TabBarViewItem: MouseOverViewDelegate {
 extension TabBarViewItem: MouseClickViewDelegate {
 
     func mouseClickView(_ mouseClickView: MouseClickView, otherMouseDownEvent: NSEvent) {
-        if otherMouseDownEvent.buttonNumber == 2 {
-            delegate?.tabBarViewItemCloseAction(self)
+        // close on middle-click
+        guard otherMouseDownEvent.buttonNumber == 2 else { return }
+
+        guard let indexPath = self.collectionView?.indexPath(for: self) else {
+            // doubleclick event arrived at point when we're already removed
+            // pass the closeButton action to the next TabBarViewItem
+            if let indexPath = self.lastKnownIndexPath,
+               let nextItem = self.collectionView?.item(at: indexPath) as? Self {
+                // and set its lastKnownIndexPath in case clicks continue to arrive
+                nextItem.lastKnownIndexPath = indexPath
+                delegate?.tabBarViewItemCloseAction(nextItem)
+            }
+            return
         }
+        self.lastKnownIndexPath = indexPath
+        delegate?.tabBarViewItemCloseAction(self)
     }
 
 }

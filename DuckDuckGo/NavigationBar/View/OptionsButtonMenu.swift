@@ -266,12 +266,15 @@ final class EmailOptionsButtonSubMenu: NSMenu {
     private func updateMenuItems() {
         removeAllItems()
         if emailManager.isSignedIn {
-            let createAddressItem = NSMenuItem(title: UserText.emailOptionsMenuCreateAddressSubItem,
-                                           action: #selector(createAddressAction(_:)),
-                                           keyEquivalent: "")
-            createAddressItem.target = self
-            createAddressItem.image = NSImage(named: "OptionsButtonMenuEmailGenerateAddress")
-            addItem(createAddressItem)
+            // The email feature in BrowserServicesKit is now publicly visible. As a part of that work, code relating to the beta on iOS was removed.
+            // This meant that the generate token page URL was removed, but it should be added back for the macOS browser.
+            //
+            // let createAddressItem = NSMenuItem(title: UserText.emailOptionsMenuCreateAddressSubItem,
+            //                                action: #selector(createAddressAction(_:)),
+            //                                keyEquivalent: "")
+            // createAddressItem.target = self
+            // createAddressItem.image = NSImage(named: "OptionsButtonMenuEmailGenerateAddress")
+            // addItem(createAddressItem)
             
             let viewDashboardItem = NSMenuItem(title: UserText.emailOptionsMenuViewDashboardSubItem,
                                            action: #selector(viewDashboardAction(_:)),
