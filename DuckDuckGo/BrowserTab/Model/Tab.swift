@@ -22,7 +22,7 @@ import os
 import Combine
 import BrowserServicesKit
 
-protocol TabDelegate: class {
+protocol TabDelegate: AnyObject {
 
     func tabDidStartNavigation(_ tab: Tab)
     func tab(_ tab: Tab, requestedNewTab url: URL?, selected: Bool)

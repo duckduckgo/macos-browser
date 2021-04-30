@@ -18,7 +18,7 @@
 
 import Foundation
 
-protocol DownloadPreferencesTableCellViewDelegate: class {
+protocol DownloadPreferencesTableCellViewDelegate: AnyObject {
 
     func downloadPreferencesTableCellViewRequestedDownloadLocationPicker(_ cell: DownloadPreferencesTableCellView)
     func downloadPreferencesTableCellView(_ cell: DownloadPreferencesTableCellView, setAlwaysRequestDownloadLocation: Bool)
