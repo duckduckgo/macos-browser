@@ -24,10 +24,16 @@ final class SuggestionTableCellView: NSTableCellView {
     static let identifier = "SuggestionTableCellView"
 
     static let textColor = NSColor.suggestionTextColor
+    static let suffixColor = NSColor.addressBarSuffixColor
     static let iconColor = NSColor.suggestionIconColor
     static let selectedTintColor = NSColor.selectedSuggestionTintColor
     
     @IBOutlet weak var iconImageView: NSImageView!
+    @IBOutlet weak var suffixTextField: NSTextField!
+
+    override func awakeFromNib() {
+        suffixTextField.textColor = Self.suffixColor
+    }
 
     var isSelected: Bool = false {
         didSet {
@@ -39,6 +45,7 @@ final class SuggestionTableCellView: NSTableCellView {
     func display(_ suggestionViewModel: SuggestionViewModel) {
         attributedString = suggestionViewModel.tableCellViewAttributedString
         iconImageView.image = suggestionViewModel.icon
+        suffixTextField.stringValue = suggestionViewModel.suffix
 
         updateTextField()
     }

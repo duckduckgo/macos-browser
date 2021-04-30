@@ -25,11 +25,7 @@ final class SuggestionViewModel {
     let userStringValue: String
 
     init(suggestion: Suggestion, userStringValue: String) {
-        if case .phrase(phrase: let phrase) = suggestion, let url = phrase.punycodedUrl, url.isValid {
-            self.suggestion = .website(url: url)
-        } else {
-            self.suggestion = suggestion
-        }
+        self.suggestion = suggestion
         self.userStringValue = userStringValue
     }
 
@@ -62,6 +58,7 @@ final class SuggestionViewModel {
         let attributedString = NSMutableAttributedString(string: firstPart, attributes: Self.tableRowViewStandardAttributes)
         let boldAttributedString = NSAttributedString(string: boldPart, attributes: Self.tableRowViewBoldAttributes)
         attributedString.append(boldAttributedString)
+
         return attributedString
     }
 
@@ -78,11 +75,30 @@ final class SuggestionViewModel {
         }
     }
 
+    var autocompletionString: String {
+        switch suggestion {
+        case .bookmark(title: _, url: let url, isFavorite: _):
+            return url.absoluteStringWithoutSchemeAndWWW
+        default:
+            return self.string
+        }
+    }
+
+    var suffix: String {
+        switch suggestion {
+        case .phrase, .unknown, .website:
+            return ""
+        case .bookmark(title: _, url: let url, isFavorite: _):
+            return " – " + url.absoluteStringWithoutSchemeAndWWW
+        }
+    }
+
     // MARK: - Icon
 
     static let webImage = NSImage(named: "Web")
     static let searchImage = NSImage(named: "Search")
     static let bookmarkImage = NSImage(named: "BookmarkSuggestion")
+    static let favoriteImage = NSImage(named: "FavoritedBookmarkSuggestion")
 
     var icon: NSImage? {
         switch suggestion {
@@ -90,8 +106,10 @@ final class SuggestionViewModel {
             return Self.searchImage
         case .website(url: _):
             return Self.webImage
-        case .bookmark(title: _, url: _, isFavorite: _):
+        case .bookmark(title: _, url: _, isFavorite: false):
             return Self.bookmarkImage
+        case .bookmark(title: _, url: _, isFavorite: true):
+            return Self.favoriteImage
         case .unknown(value: _):
             return Self.webImage
         }

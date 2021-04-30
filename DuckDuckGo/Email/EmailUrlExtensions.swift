@@ -42,3 +42,22 @@ extension EmailUrls {
     }
 
 }
+
+extension EmailManager {
+
+    private struct Url {
+        static let emailGenerateTokenPage = "https://quack.duckduckgo.com/email/new-address"
+    }
+
+    private func emailGenerateTokenPage(with token: String) -> URL {
+        var urlComponents = URLComponents(string: Url.emailGenerateTokenPage)!
+        urlComponents.queryItems = [URLQueryItem(name: "t", value: token)]
+        return urlComponents.url!
+    }
+
+    public var generateTokenPageURL: URL? {
+        guard let token = EmailKeychainManager().getToken() else { return nil }
+        return emailGenerateTokenPage(with: token)
+    }
+
+}

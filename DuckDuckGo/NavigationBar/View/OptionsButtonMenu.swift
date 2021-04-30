@@ -300,17 +300,14 @@ final class EmailOptionsButtonSubMenu: NSMenu {
     }
     
     @objc func createAddressAction(_ sender: NSMenuItem) {
-        // The email feature in BrowserServicesKit is now publicly visible. As a part of that work, code relating to the beta on iOS was removed.
-        // This meant that the generate token page URL was removed, but it should be added back for the macOS browser.
-        //
-        // guard let url = emailManager.generateTokenPageURL else {
-        //     assertionFailure("Could not get token page URL, token not available")
-        //     return
-        // }
-        // let tab = Tab()
-        // tab.url = url
-        // tabCollectionViewModel.append(tab: tab)
-        // (supermenu as? OptionsButtonMenu)?.result = .emailProtectionCreateAddress
+         guard let url = emailManager.generateTokenPageURL else {
+             assertionFailure("Could not get token page URL, token not available")
+             return
+         }
+         let tab = Tab()
+         tab.url = url
+         tabCollectionViewModel.append(tab: tab)
+         (supermenu as? OptionsButtonMenu)?.result = .emailProtectionCreateAddress
     }
     
     @objc func viewDashboardAction(_ sender: NSMenuItem) {

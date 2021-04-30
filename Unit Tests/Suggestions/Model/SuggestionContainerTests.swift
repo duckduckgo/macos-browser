@@ -25,7 +25,14 @@ final class SuggestionContainerTests: XCTestCase {
     func testWhenGetSuggestionsIsCalled_ThenContainerAsksAndHoldsSuggestionsFromLoader() {
         let suggestionLoadingMock = SuggestionLoadingMock()
         let suggestionContainer = SuggestionContainer(suggestionLoading: suggestionLoadingMock,
-                                              bookmarkManager: LocalBookmarkManager.shared)
+                                                      bookmarkManager: LocalBookmarkManager.shared)
+
+        let e = expectation(description: "Suggestions updated")
+        let cancellable = suggestionContainer.$suggestions.sink {
+            if $0 != nil {
+                e.fulfill()
+            }
+        }
 
         suggestionContainer.getSuggestions(for: "test")
 
@@ -33,9 +40,12 @@ final class SuggestionContainerTests: XCTestCase {
             Suggestion.website(url: URL.duckDuckGo),
             Suggestion.website(url: URL.duckDuckGoAutocomplete)
         ]
-        suggestionLoadingMock.completion?(suggestions, nil)
+        suggestionLoadingMock.completion!(suggestions, nil)
 
         XCTAssert(suggestionLoadingMock.getSuggestionsCalled)
+        withExtendedLifetime(cancellable) {
+            waitForExpectations(timeout: 1)
+        }
         XCTAssertEqual(suggestionContainer.suggestions, suggestions)
     }
 

@@ -62,4 +62,11 @@ final class SuggestionTableRowView: NSTableRowView {
         }
     }
 
+    override func layout() {
+        super.layout()
+
+        updateCellView()
+        updateBackgroundColor()
+    }
+
 }
