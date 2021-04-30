@@ -2782,8 +2782,8 @@
 			isa = XCRemoteSwiftPackageReference;
 			repositoryURL = "https://github.com/duckduckgo/BrowserServicesKit.git";
 			requirement = {
-				branch = "feature/alex/suggestion-parse-website";
-				kind = branch;
+				kind = revision;
+				revision = 02c3f69ba847a3f00cee497abb5d71b5e1748af6;
 			};
 		};
 		85FF55C625F82E4F00E2AB99 /* XCRemoteSwiftPackageReference "lottie-ios" */ = {

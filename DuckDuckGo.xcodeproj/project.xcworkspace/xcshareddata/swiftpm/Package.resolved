@@ -5,8 +5,8 @@
         "package": "BrowserServicesKit",
         "repositoryURL": "https://github.com/duckduckgo/BrowserServicesKit.git",
         "state": {
-          "branch": "feature/alex/suggestion-parse-website",
-          "revision": "af41685942967f4ce8203085c942977bfea902a6",
+          "branch": null,
+          "revision": "02c3f69ba847a3f00cee497abb5d71b5e1748af6",
           "version": null
         }
       },
