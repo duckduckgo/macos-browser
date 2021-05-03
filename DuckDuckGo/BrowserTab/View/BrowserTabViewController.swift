@@ -267,12 +267,27 @@ extension BrowserTabViewController: TabDelegate {
         openNewTab(with: url, parentTab: tab, selected: selected)
     }
 
-    func tab(_ tab: Tab, requestedFileDownload download: FileDownload) {
-        FileDownloadManager.shared.startDownload(download)
+    func tab(_ tab: Tab, requestedFileDownload request: FileDownload) {
+        FileDownloadManager.shared.startDownload(request, chooseDestinationCallback: self.chooseDestination)
 
         // Note this can result in tabs being left open, e.g. download button on this page:
         // https://en.wikipedia.org/wiki/Guitar#/media/File:GuitareClassique5.png
         //  Safari closes new tabs that were opened and then create a download instantly.  Should we do the same?
+    }
+
+    func chooseDestination(suggestedFilename: String?, directoryURL: URL?, fileTypes: [UTType], callback: @escaping (URL?) -> Void) {
+        dispatchPrecondition(condition: .onQueue(.main))
+        let savePanel = NSSavePanel.withFileTypeChooser(fileTypes: fileTypes, suggestedFilename: suggestedFilename, directoryURL: directoryURL)
+
+        func completionHandler(_ result: NSApplication.ModalResponse) {
+            callback(result == .OK ? savePanel.url : nil)
+        }
+
+        if let window = self.view.window {
+            savePanel.beginSheetModal(for: window, completionHandler: completionHandler)
+        } else {
+            completionHandler(savePanel.runModal())
+        }
     }
 
     func tab(_ tab: Tab, willShowContextMenuAt position: NSPoint, image: URL?, link: URL?) {
@@ -330,7 +345,7 @@ extension BrowserTabViewController: LinkMenuItemSelectors {
         guard let tab = tabCollectionViewModel.selectedTabViewModel?.tab,
               let url = contextMenuLink else { return }
 
-        self.tab(tab, requestedFileDownload: FileDownload(url: url, window: self.view.window))
+        self.tab(tab, requestedFileDownload: FileDownload(url: url))
     }
 
     func copyLink(_ sender: NSMenuItem) {
@@ -359,7 +374,7 @@ extension BrowserTabViewController: ImageMenuItemSelectors {
         guard let tab = tabCollectionViewModel.selectedTabViewModel?.tab,
               let url = contextMenuImage else { return }
 
-        self.tab(tab, requestedFileDownload: FileDownload(url: url, window: view.window))
+        self.tab(tab, requestedFileDownload: FileDownload(url: url))
     }
 
     func copyImageAddress(_ sender: NSMenuItem) {
@@ -374,10 +389,8 @@ extension BrowserTabViewController: WKUIDelegate {
 
     // swiftlint:disable identifier_name
     @objc func _webView(_ webView: WKWebView, saveDataToFile data: NSData, suggestedFilename: NSString, mimeType: NSString, originatingURL: NSURL) {
-        FileDownloadManager.shared.startDownload(FileDownload(data: data as Data,
-                                                              mimeType: mimeType as String,
-                                                              suggestedName: suggestedFilename as String,
-                                                              window: self.view.window))
+        FileDownloadManager.shared.startDownload(.data(data as Data, mimeType: mimeType as String, suggestedName: suggestedFilename as String),
+                                                 chooseDestinationCallback: self.chooseDestination)
     }
     // swiftlint:enable identifier_name
 

@@ -72,4 +72,30 @@ extension FileManager {
         fatalError("Unexpected flow")
     }
 
+    func setFractionCompleted(_ fraction: Double?, at url: URL) throws {
+        var attributes = try self.attributesOfItem(atPath: url.path)
+
+        var extendedAttributes = attributes[.extended] as? [FileAttributeKey: Any] ?? [:]
+        extendedAttributes[.fractionCompleted] = fraction.map { "\($0)" }?.data(using: .utf8)
+
+        attributes[.extended] = extendedAttributes
+        attributes[.creationDate] = Date.magicCreationDateForFileProgress
+
+        try self.setAttributes(attributes, ofItemAtPath: url.path)
+    }
+
+}
+
+private extension FileAttributeKey {
+
+    static let extended = FileAttributeKey("NSFileExtendedAttributes")
+    static let fractionCompleted = FileAttributeKey("com.apple.progress.fractionCompleted")
+    static let quarantine = FileAttributeKey("com.apple.quarantine")
+
+}
+
+private extension Date {
+
+    static let magicCreationDateForFileProgress = Date(timeIntervalSince1970: 443779200)
+
 }

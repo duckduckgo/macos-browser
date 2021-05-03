@@ -310,8 +310,8 @@ extension MainViewController {
         // TODO: save Tab.urlRequest for saving pages with POST data?
         let webView = tabViewModel.tab.webView
 
-        let download = FileDownload(webView: webView, request: nil, window: self.view.window, forceSaveLocationChooser: true)
-        FileDownloadManager.shared.startDownload(download)
+        let download = FileDownload.webContent(webView, request: nil)
+        FileDownloadManager.shared.startDownload(download, chooseDestinationCallback: self.browserTabViewController.chooseDestination)
     }
 
     // MARK: - Debug

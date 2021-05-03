@@ -21,30 +21,38 @@ import Foundation
 final class LocalFileSaveTask: FileDownloadTask {
 
     let url: URL
-    let fileTypes: [UTType]?
 
-    var suggestedFilename: String? {
-        url.lastPathComponent
+    override var suggestedFilename: String? {
+        get {
+            url.lastPathComponent
+        }
+        set { }
     }
 
-    init(url: URL, fileType: UTType?) {
+    init(download: FileDownload, url: URL, fileType: UTType?) {
         self.url = url
+        super.init(download: download)
+        
         self.fileTypes = fileType.map { [$0] }
     }
 
-    func start(localFileURLCallback: @escaping LocalFileURLCallback, completion: @escaping (Result<URL, FileDownloadError>) -> Void) {
-        localFileURLCallback(self) { url in
-            guard let destURL = url else {
-                completion(.failure(.cancelled))
-                return
-            }
+    override func start(delegate: FileDownloadTaskDelegate) {
+        super.start(delegate: delegate)
 
-            do {
-                let resultURL = try FileManager.default.copyItem(at: self.url, to: destURL, incrementingIndexIfExists: true)
-                completion(.success(resultURL))
-            } catch {
-                completion(.failure(.failedToMoveFileToDownloads))
-            }
+        delegate.fileDownloadTaskNeedsDestinationURL(self, completionHandler: self.localFileURLCompletionHandler)
+    }
+
+    private func localFileURLCompletionHandler(_ destURL: URL?) {
+        guard let destURL = destURL else {
+            delegate?.fileDownloadTask(self, didFinishWith: .failure(.cancelled))
+            return
+        }
+
+        do {
+            let resultURL = try FileManager.default.copyItem(at: self.url, to: destURL, incrementingIndexIfExists: true)
+            delegate?.fileDownloadTask(self, didFinishWith: .success(resultURL))
+        } catch {
+            delegate?.fileDownloadTask(self, didFinishWith: .failure(.failedToMoveFileToDownloads))
         }
     }
 

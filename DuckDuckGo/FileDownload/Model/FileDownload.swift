@@ -19,68 +19,51 @@
 import Foundation
 import WebKit
 
-struct FileDownload {
-    enum DownloadKind {
-        case request(URLRequest)
-        case webContent(WKWebView, request: URLRequest?)
-        case data(Data, mimeType: String)
-    }
+enum FileDownload {
+    case request(URLRequest, suggestedName: String?)
+    case webContent(WKWebView, request: URLRequest?)
+    case data(Data, mimeType: String, suggestedName: String?)
+}
 
-    let kind: DownloadKind
-    let suggestedName: String?
-    let window: NSWindow?
-    let forceSaveLocationChooser: Bool
+extension FileDownload {
 
-    init(url: URL, window: NSWindow?, forceSaveLocationChooser: Bool = false) {
-        self.kind = .request(URLRequest(url: url))
-        self.window = window
-        self.forceSaveLocationChooser = forceSaveLocationChooser
-        self.suggestedName = nil
-    }
-
-    init(request: URLRequest, suggestedName: String?, window: NSWindow?, forceSaveLocationChooser: Bool = false) {
-        self.kind = .request(request)
-        self.window = window
-        self.forceSaveLocationChooser = forceSaveLocationChooser
-        self.suggestedName = suggestedName
-    }
-
-    init(data: Data, mimeType: String, suggestedName: String?, window: NSWindow?, forceSaveLocationChooser: Bool = false) {
-        self.kind = .data(data, mimeType: mimeType)
-        self.window = window
-        self.forceSaveLocationChooser = forceSaveLocationChooser
-        self.suggestedName = suggestedName
-    }
-
-    init(webView: WKWebView, request: URLRequest?, window: NSWindow?, forceSaveLocationChooser: Bool) {
-        self.kind = .webContent(webView, request: request)
-        self.window = window
-        self.forceSaveLocationChooser = forceSaveLocationChooser
-        self.suggestedName = webView.title
-    }
-
-    func downloadTask() -> FileDownloadTask {
-        switch kind {
-        case .request(let request):
-            return URLRequestDownloadTask(session: nil, request: request)
-
-        case .webContent(let webView, request: let request):
-            if let url = webView.url, url.isFileURL == true {
-                return LocalFileSaveTask(url: url, fileType: UTType(fileExtension: url.pathExtension))
-            }
-            return WebContentDownloadTask(webView: webView, request: request)
-
-        case .data(let data, mimeType: let mimeType):
-            return DataSaveTask(data: data, mimeType: mimeType, suggestedFilename: suggestedName)
-        }
+    init(url: URL) {
+        self = .request(URLRequest(url: url), suggestedName: nil)
     }
 
     var shouldAlwaysPromptFileSaveLocation: Bool {
-        switch kind {
+        switch self {
         case .webContent:
             return true
         case .request, .data:
             return false
+        }
+    }
+
+    var suggestedName: String? {
+        switch self {
+        case .request(let request, suggestedName: let suggestedName):
+            return suggestedName
+        case .webContent(let webView, request: _):
+            return webView.title
+        case .data(_, mimeType: _, suggestedName: let suggestedName):
+            return suggestedName
+        }
+    }
+
+    func downloadTask() -> FileDownloadTask {
+        switch self {
+        case .request(let request, suggestedName: _):
+            return URLRequestDownloadTask(download: self, session: nil, request: request)
+
+        case .webContent(let webView, request: let request):
+            if let url = webView.url, url.isFileURL == true {
+                return LocalFileSaveTask(download: self, url: url, fileType: UTType(fileExtension: url.pathExtension))
+            }
+            return WebContentDownloadTask(download: self, webView: webView, request: request)
+
+        case .data(let data, mimeType: let mimeType, suggestedName: let suggestedName):
+            return DataSaveTask(download: self, data: data, mimeType: mimeType, suggestedFilename: suggestedName)
         }
     }
 

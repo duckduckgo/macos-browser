@@ -26,7 +26,7 @@ protocol TabDelegate: class {
 
     func tabDidStartNavigation(_ tab: Tab)
     func tab(_ tab: Tab, requestedNewTab url: URL?, selected: Bool)
-    func tab(_ tab: Tab, requestedFileDownload download: FileDownload)
+    func tab(_ tab: Tab, requestedFileDownload request: FileDownload)
     func tab(_ tab: Tab, willShowContextMenuAt position: NSPoint, image: URL?, link: URL?)
     func tab(_ tab: Tab, detectedLogin host: String)
 	func tab(_ tab: Tab, requestedOpenExternalURL url: URL, forUserEnteredURL: Bool)
@@ -380,9 +380,7 @@ extension Tab: HTML5DownloadDelegate {
     func startDownload(_ userScript: HTML5DownloadUserScript, from url: URL, withSuggestedName name: String) {
         var request = lastMainFrameRequest ?? URLRequest(url: url)
         request.url = url
-        delegate?.tab(self, requestedFileDownload: FileDownload(request: request,
-                                                                suggestedName: name,
-                                                                window: self.webView.window))
+        delegate?.tab(self, requestedFileDownload: FileDownload.request(request, suggestedName: name))
     }
 
 }
@@ -549,9 +547,7 @@ extension Tab: WKNavigationDelegate {
 
         if (!navigationResponse.canShowMIMEType || navigationResponse.shouldDownload),
            let request = lastMainFrameRequest {
-            let download = FileDownload(request: request,
-                                        suggestedName: navigationResponse.response.suggestedFilename,
-                                        window: self.webView.window)
+            let download = FileDownload.request(request, suggestedName: navigationResponse.response.suggestedFilename)
             delegate?.tab(self, requestedFileDownload: download)
             // Flag this here, because interrupting the frame load will cause an error and we need to know
             self.currentDownload = download

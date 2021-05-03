@@ -20,81 +20,52 @@ import Foundation
 import Combine
 import os
 
-final class URLRequestDownloadTask: NSObject, FileDownloadTask {
-    private var localFileURLCallback: LocalFileURLCallback?
-    private var completion: ((Result<URL, FileDownloadError>) -> Void)?
+final class URLRequestDownloadTask: FileDownloadTask {
     private var localFileURL: URL?
 
     private var session: URLSession?
     private let request: URLRequest
     private var task: URLSessionTask?
 
-    private(set) var fileTypes: [UTType]?
-    private(set) var suggestedFilename: String?
-    private var dispatchGroup: DispatchGroup?
+    private var downloadedFileLocationCancellable: AnyCancellable?
+
+    private var downloadedFile: DownloadedFile? {
+        didSet {
+            guard let downloadedFile = downloadedFile else { return }
+            downloadedFileLocationCancellable = downloadedFile.$url.sink { [weak self] url in
+                #warning("if newURL is in Trash stop download")
+                if url?.path.contains("/.Trash/") == true {
+                    self?.cancel()
+                }
+            }
+        }
+    }
 
     @Published var bytesDownloaded: Int64 = 0
 
     private var savedFileURL: URL?
     private var error: Error?
 
-    init(session: URLSession? = nil, request: URLRequest) {
+    init(download: FileDownload, session: URLSession? = nil, request: URLRequest) {
         self.session = session
         self.request = request
+
+        super.init(download: download)
     }
 
-    func start(localFileURLCallback: @escaping LocalFileURLCallback, completion: @escaping (Result<URL, FileDownloadError>) -> Void) {
-        self.localFileURLCallback = localFileURLCallback
-        self.completion = completion
+    override func start(delegate: FileDownloadTaskDelegate) {
+        super.start(delegate: delegate)
 
         session = URLSession(configuration: session?.configuration ?? .default, delegate: self, delegateQueue: nil)
-        task = session!.downloadTask(with: request)
-
-        let dispatchGroup = DispatchGroup()
-        self.dispatchGroup = dispatchGroup
-        // start download asynchronously while user chooses a filename
-        dispatchGroup.enter()
-        task!.resume()
+        task = session!.dataTask(with: request)
 
         self.suggestedFilename = self.bestFileName()
-        dispatchGroup.enter()
-        localFileURLCallback(self) { url in
-            // file save destination was chosen (or default)
-            defer {
-                dispatchGroup.leave()
-            }
-            guard let url = url else {
-                self.task?.cancel()
-                self.completion?(.failure(.cancelled))
-                return
-            }
 
-            self.localFileURL = url
-        }
+        task?.resume()
+    }
 
-        dispatchGroup.notify(queue: .global()) {
-            var result: Result<URL, FileDownloadError> = .failure(.cancelled)
-
-            if let localFileURL = self.localFileURL,
-               let url = self.savedFileURL {
-
-                do {
-                    let resultURL = try FileManager.default.moveItem(at: url,
-                                                                     to: localFileURL,
-                                                                     incrementingIndexIfExists: true)
-                    result = .success(resultURL)
-                } catch {
-                    result = .failure(.failedToMoveFileToDownloads)
-                }
-            } else if let error = self.error {
-                result = .failure(.failedToCompleteDownloadTask(underlyingError: error))
-            }
-
-            DispatchQueue.main.async {
-                self.completion?(result)
-            }
-        }
-
+    override func cancel() {
+        self.task?.cancel()
     }
 
     private func bestFileName() -> String? {
@@ -132,26 +103,88 @@ final class URLRequestDownloadTask: NSObject, FileDownloadTask {
 
 }
 
-extension URLRequestDownloadTask: URLSessionDownloadDelegate {
+extension URLRequestDownloadTask: URLSessionDataDelegate {
+
+    func urlSession(_ session: URLSession,
+                    dataTask: URLSessionDataTask,
+                    didReceive response: URLResponse,
+                    completionHandler: @escaping (URLSession.ResponseDisposition) -> Void) {
+
+        let downloadLocation = DownloadPreferences().selectedDownloadLocation
+        let fm = FileManager.default
+        let tempDir = (try? fm.url(for: .itemReplacementDirectory, in: .userDomainMask, appropriateFor: downloadLocation, create: false))
+            ?? fm.temporaryDirectory
+
+        let tempURL = tempDir.appendingPathComponent(.uniqueFilename())
+
+        self.downloadedFile = DownloadedFile(url: tempURL, expectedSize: response.expectedContentLength)
+        self.suggestedFilename = response.suggestedFilename ?? self.suggestedFilename
+        self.fileTypes = response.mimeType.flatMap(UTType.init(mimeType:)).map { [$0] }
+
+        DispatchQueue.main.async { [weak self, dataTask] in
+            guard let self = self else {
+                completionHandler(.cancel)
+                return
+            }
+            completionHandler(.allow)
+
+            self.delegate?.fileDownloadTaskNeedsDestinationURL(self) { url in
+                if let url = url, let downloadedFile = self.downloadedFile {
+                    self.localFileURL = url
+                    switch dataTask.state {
+                    case .completed:
+                        do {
+                            let finalURL = try downloadedFile.move(to: url, incrementingIndexIfExists: true)
+                            self.delegate?.fileDownloadTask(self, didFinishWith: .success(finalURL))
+                        } catch {
+                            self.delegate?.fileDownloadTask(self, didFinishWith: .failure(.failedToMoveFileToDownloads))
+                        }
+                    case .running, .suspended:
+                        let downloadURL = url.appendingPathExtension("duckDownload")
+                        _=try? self.downloadedFile?.move(to: downloadURL, incrementingIndexIfExists: true)
+                    case .canceling:
+                        break
+                    @unknown default:
+                        break
+                    }
+
+                } else {
+                    dataTask.cancel()
+                    try? self.downloadedFile?.delete()
+                    self.delegate?.fileDownloadTask(self, didFinishWith: .failure(.cancelled))
+                }
+            }
+        }
+    }
+
+    func urlSession(_ session: URLSession, dataTask: URLSessionDataTask, didReceive data: Data) {
+        self.downloadedFile?.write(data)
+    }
 
     func urlSession(_ session: URLSession, task: URLSessionTask, didCompleteWithError error: Error?) {
-        self.error = error
-        self.dispatchGroup?.leave()
-    }
+        self.downloadedFile?.close()
 
-    func urlSession(_ session: URLSession, downloadTask: URLSessionDownloadTask, didFinishDownloadingTo location: URL) {
-        // instantly move the downloaded file to a safe location before it gets removed
-        let fm = FileManager.default
-        let tmpURL = fm.temporaryDirectory.appendingPathComponent(.uniqueFilename())
-        try? fm.moveItem(at: location, to: tmpURL)
-        self.savedFileURL = tmpURL
-    }
+        if let error = error {
+            try? self.downloadedFile?.delete()
+            DispatchQueue.main.async {
+                self.delegate?.fileDownloadTask(self, didFinishWith: .failure(.failedToCompleteDownloadTask(underlyingError: error)))
+            }
 
-    func urlSession(_ session: URLSession, downloadTask: URLSessionDownloadTask,
-                    didWriteData bytesWritten: Int64,
-                    totalBytesWritten: Int64,
-                    totalBytesExpectedToWrite: Int64) {
-        bytesDownloaded = totalBytesWritten
+        } else if let destURL = DispatchQueue.main.sync(execute: { self.localFileURL }) {
+            do {
+                guard let finalURL = try self.downloadedFile?.move(to: destURL, incrementingIndexIfExists: true) else {
+                    throw FileDownloadError.cancelled
+                }
+                DispatchQueue.main.async {
+                    self.delegate?.fileDownloadTask(self, didFinishWith: .success(finalURL))
+                }
+            } catch {
+                try? self.downloadedFile?.delete()
+                DispatchQueue.main.async {
+                    self.delegate?.fileDownloadTask(self, didFinishWith: .failure(.failedToMoveFileToDownloads))
+                }
+            }
+        }
     }
 
 }

@@ -30,11 +30,28 @@ enum FileDownloadError: Error {
 
 }
 
-protocol FileDownloadTask {
-    var suggestedFilename: String? { get }
-    var fileTypes: [UTType]? { get }
+protocol FileDownloadTaskDelegate: AnyObject {
+    func fileDownloadTaskNeedsDestinationURL(_ task: FileDownloadTask, completionHandler: @escaping (URL?) -> Void)
+    func fileDownloadTask(_ task: FileDownloadTask, didFinishWith result: Result<URL, FileDownloadError>)
+}
 
-    typealias LocalFileURLCallback = (FileDownloadTask, @escaping (URL?) -> Void) -> Void
-    func start(localFileURLCallback: @escaping LocalFileURLCallback,
-               completion: @escaping (Result<URL, FileDownloadError>) -> Void)
+internal class FileDownloadTask: NSObject {
+    let download: FileDownload
+
+    var suggestedFilename: String?
+    var fileTypes: [UTType]?
+
+    weak var delegate: FileDownloadTaskDelegate?
+
+    init(download: FileDownload) {
+        self.download = download
+    }
+
+    func start(delegate: FileDownloadTaskDelegate) {
+        self.delegate = delegate
+    }
+
+    func cancel() {
+    }
+
 }

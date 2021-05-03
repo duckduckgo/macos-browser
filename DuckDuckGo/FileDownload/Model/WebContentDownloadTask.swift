@@ -24,61 +24,80 @@ final class WebContentDownloadTask: FileDownloadTask {
     let webView: WKWebView
     let request: URLRequest?
 
-    var suggestedFilename: String? {
-        webView.title?.replacingOccurrences(of: "[~#@*+%{}<>\\[\\]|\"\\_^\\/:]", with: "_", options: .regularExpression)
-    }
-
-    var fileTypes: [UTType]? {
-        if #available(OSX 11.0, *) {
-            return [.html, .webArchive]
-        } else {
-            return [.html]
+    override var suggestedFilename: String? {
+        get {
+            webView.title?.replacingOccurrences(of: "[~#@*+%{}<>\\[\\]|\"\\_^\\/:]", with: "_", options: .regularExpression)
         }
+        set { }
     }
 
-    init(webView: WKWebView, request: URLRequest?) {
+    override var fileTypes: [UTType]? {
+        get {
+            if #available(OSX 11.0, *) {
+                return [.html, .webArchive]
+            } else {
+                return [.html]
+            }
+        }
+        set { }
+    }
+
+    private var subTask: FileDownloadTask?
+    private var localURL: URL?
+
+    init(download: FileDownload, webView: WKWebView, request: URLRequest?) {
         self.webView = webView
         self.request = request
+
+        super.init(download: download)
     }
 
-    func start(localFileURLCallback: @escaping LocalFileURLCallback, completion: @escaping (Result<URL, FileDownloadError>) -> Void) {
+    override func start(delegate: FileDownloadTaskDelegate) {
+        super.start(delegate: delegate)
+        delegate.fileDownloadTaskNeedsDestinationURL(self, completionHandler: self.localFileURLCompletionHandler)
+    }
 
-        localFileURLCallback(self) { url in
-            guard let localURL = url else {
-                completion(.failure(.cancelled))
-                return
-            }
-
-            if #available(OSX 11.0, *),
-               case .some(.webArchive) = UTType(fileExtension: localURL.pathExtension) {
-                self.webView.createWebArchiveData { result in
-                    switch result {
-                    case .success(let data):
-                        let saveTask = DataSaveTask(data: data)
-                        saveTask.start(localFileURLCallback: { $1(localURL) }) { result in
-                            withExtendedLifetime(saveTask) {
-                                completion(result)
-                            }
-                        }
-                    case .failure(let error):
-                        completion(.failure(.failedToCompleteDownloadTask(underlyingError: error)))
-                    }
-                }
-
-            } else if let request = self.request
-                        ?? self.webView.url.map({ URLRequest(url: $0, cachePolicy: .returnCacheDataElseLoad) }) {
-                
-                let downloadTask = URLRequestDownloadTask(request: request)
-                downloadTask.start(localFileURLCallback: { $1(localURL) }) { result in
-                    withExtendedLifetime(downloadTask) {
-                        completion(result)
-                    }
-                }
-
-            } else {
-                completion(.failure(.cancelled))
-            }
+    private func localFileURLCompletionHandler(_ localURL: URL?) {
+        guard let localURL = localURL else {
+            delegate?.fileDownloadTask(self, didFinishWith: .failure(.cancelled))
+            return
         }
+        self.localURL = localURL
+
+        if #available(OSX 11.0, *),
+           case .some(.webArchive) = UTType(fileExtension: localURL.pathExtension) {
+            self.webView.createWebArchiveData { result in
+                switch result {
+                case .success(let data):
+                    self.subTask = DataSaveTask(download: self.download, data: data)
+                    self.subTask!.start(delegate: self)
+
+                case .failure(let error):
+                    self.delegate?.fileDownloadTask(self, didFinishWith: .failure(.failedToCompleteDownloadTask(underlyingError: error)))
+                }
+            }
+
+        } else if let request = self.request
+                    ?? self.webView.url.map({ URLRequest(url: $0, cachePolicy: .returnCacheDataElseLoad) }) {
+
+            self.subTask = URLRequestDownloadTask(download: self.download, request: request)
+            self.subTask!.start(delegate: self)
+
+        } else {
+            self.delegate?.fileDownloadTask(self, didFinishWith: .failure(.cancelled))
+        }
+    }
+
+}
+
+extension WebContentDownloadTask: FileDownloadTaskDelegate {
+
+    func fileDownloadTaskNeedsDestinationURL(_ task: FileDownloadTask, completionHandler: @escaping (URL?) -> Void) {
+        completionHandler(localURL)
+    }
+
+    func fileDownloadTask(_ task: FileDownloadTask, didFinishWith result: Result<URL, FileDownloadError>) {
+        self.delegate?.fileDownloadTask(self, didFinishWith: result)
     }
 
 }
