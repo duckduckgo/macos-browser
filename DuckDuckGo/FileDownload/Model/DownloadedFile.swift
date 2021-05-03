@@ -45,6 +45,9 @@ final class DownloadedFile: NSObject {
     func close() {
         handle?.closeFile()
         handle = nil
+        if let url = url {
+            try? FileManager.default.setFractionCompleted(nil, at: url)
+        }
     }
 
     func move(to newURL: URL, incrementingIndexIfExists: Bool) throws -> URL {

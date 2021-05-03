@@ -43,14 +43,15 @@ extension FileManager {
         if !suffix.isEmpty {
             suffix = "." + suffix
         }
-        let destWithoutExtension = destURL.deletingPathExtension()
+        let ownerDirectory = destURL.deletingLastPathComponent()
+        let fileNameWithoutExtension = destURL.deletingPathExtension().lastPathComponent
 
         for copy in 0... {
             let destURL: URL = {
                 // Zero means we haven't tried anything yet, so use the suggested name.
                 // Otherwise, simply append the file name with the copy number.
                 guard copy > 0 else { return destURL }
-                return destWithoutExtension.appendingPathComponent(" \(copy)\(suffix)")
+                return ownerDirectory.appendingPathComponent("\(fileNameWithoutExtension) \(copy)\(suffix)")
             }()
 
             do {
