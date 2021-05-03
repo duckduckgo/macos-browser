@@ -25,9 +25,12 @@ final class WebViewStateObserver: NSObject {
     weak var webView: WKWebView?
     weak var tabViewModel: TabViewModel?
 
-    init(webView: WKWebView, tabViewModel: TabViewModel) {
+    init(webView: WKWebView,
+         tabViewModel: TabViewModel,
+         historyCoordinating: HistoryCoordinating = HistoryCoordinator.shared) {
         self.webView = webView
         self.tabViewModel = tabViewModel
+        self.historyCoordinating = historyCoordinating
         super.init()
 
         matchFlagValues()
@@ -89,13 +92,20 @@ final class WebViewStateObserver: NSObject {
 
         switch keyPath {
         case #keyPath(WKWebView.url):
-            tabViewModel.tab.url = webView.url
+            if let url = webView.url {
+                tabViewModel.tab.url = url
+                addVisit(of: url)
+            }
             updateTitle() // The title might not change if webView doesn't think anything is different so update title here as well
 
         case #keyPath(WKWebView.canGoBack): tabViewModel.canGoBack = webView.canGoBack
         case #keyPath(WKWebView.canGoForward): tabViewModel.canGoForward = webView.canGoForward
         case #keyPath(WKWebView.isLoading): tabViewModel.isLoading = webView.isLoading
-        case #keyPath(WKWebView.title): updateTitle()
+        case #keyPath(WKWebView.title):
+            updateTitle()
+            if let title = webView.title, let url = webView.url {
+                historyCoordinating.updateTitleIfNeeded(title: title, url: url)
+            }
         case #keyPath(WKWebView.estimatedProgress): tabViewModel.progress = webView.estimatedProgress
         default:
             os_log("%s: keyPath %s not handled", type: .error, className, keyPath)
@@ -110,6 +120,18 @@ final class WebViewStateObserver: NSObject {
         }
 
         tabViewModel?.tab.title = webView?.title
+    }
+
+    // MARK: - History
+
+    var historyCoordinating: HistoryCoordinating
+
+    func addVisit(of url: URL) {
+        historyCoordinating.addVisit(of: url)
+    }
+
+    func updateTitleIfNeeded(title: String, url: URL) {
+        historyCoordinating.updateTitleIfNeeded(title: title, url: url)
     }
 
 }
