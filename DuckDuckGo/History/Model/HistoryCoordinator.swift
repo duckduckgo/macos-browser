@@ -54,33 +54,36 @@ final class HistoryCoordinator: HistoryCoordinating {
     private let queue = DispatchQueue(label: "history.coordinator.queue", qos: .userInitiated, attributes: .concurrent)
     private var regularCleaningTimer: Timer?
 
-    private var _history: History?
-    // TODO: get rid of dictionary - it's useless? - make set lookup more effective
+    // Source of truth
     private var historyDictionary: [URL: HistoryEntry]?
 
-    private var cancellables = Set<AnyCancellable>()
-
+    // Output
+    private var _history: History?
     var history: History? {
         queue.sync { self._history }
     }
 
+    private var cancellables = Set<AnyCancellable>()
+
     func addVisit(of url: URL) {
         queue.async(flags: .barrier) { [weak self] in
-            guard let self = self else { return }
-            guard self.historyDictionary != nil else {
+            guard var historyDictionary = self?.historyDictionary else {
                 os_log("Visit of %s ignored. On main thread: %s", log: .history, url.absoluteString, Thread.isMainThread ? "yes" : "no")
                 return
             }
 
             var entry: HistoryEntry
-            if let existingEntry = self.historyDictionary?[url] {
+            if let existingEntry = historyDictionary[url] {
                 entry = existingEntry
                 entry.addVisit()
             } else {
                 entry = HistoryEntry(url: url)
             }
-            self.historyDictionary?[url] = entry
-            self.save(entry: entry)
+
+            historyDictionary[url] = entry
+            self?.historyDictionary = historyDictionary
+            self?._history = self?.makeHistory(from: historyDictionary)
+            self?.save(entry: entry)
         }
     }
 
@@ -95,15 +98,15 @@ final class HistoryCoordinator: HistoryCoordinating {
 
             entry.title = title
             historyDictionary[url] = entry
-            self?._history = self?.makeHistory(from: historyDictionary)
             self?.historyDictionary = historyDictionary
+            self?._history = self?.makeHistory(from: historyDictionary)
             self?.save(entry: entry)
         }
     }
 
     func burnHistory(except fireproofedDomains: [String]) {
         queue.async(flags: .barrier) { [weak self] in
-            // TODO burn except domainsp
+            // TODO burn except domains
         }
     }
 
@@ -122,15 +125,11 @@ final class HistoryCoordinator: HistoryCoordinating {
                         os_log("Cleaning and loading of history failed: %s", log: .history, type: .error, error.localizedDescription)
                     }
                 }, receiveValue: { [weak self] history in
-                    self?._history = history
                     self?.historyDictionary = self?.makeHistoryDictionary(from: history)
+                    self?._history = history
                 })
                 .store(in: &self.cancellables)
         }
-    }
-
-    private func makeHistoryDictionary(from history: History) -> [URL: HistoryEntry] {
-        history.reduce(into: [URL: HistoryEntry](), { $0[$1.url] = $1 })
     }
 
     private func scheduleRegularCleaning() {
@@ -142,6 +141,10 @@ final class HistoryCoordinator: HistoryCoordinating {
                           repeats: true)
         RunLoop.main.add(timer, forMode: RunLoop.Mode.common)
         regularCleaningTimer = timer
+    }
+
+    private func makeHistoryDictionary(from history: History) -> [URL: HistoryEntry] {
+        history.reduce(into: [URL: HistoryEntry](), { $0[$1.url] = $1 })
     }
 
     private func makeHistory(from dictionary: [URL: HistoryEntry]) -> History {
