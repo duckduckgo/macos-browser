@@ -36,18 +36,26 @@ final class HistoryCoordinator: HistoryCoordinating {
     static let shared = HistoryCoordinator()
 
     private init() {
-        cleanAndReloadHistory()
-        // TODO: Set up timer that triggers cleaning every hour?
+        commonInit()
     }
 
     init(historyStoring: HistoryStoring) {
         self.historyStoring = historyStoring
+
+        commonInit()
+    }
+
+    func commonInit() {
+        cleanAndReloadHistory()
+        scheduleRegularCleaning()
     }
 
     private lazy var historyStoring: HistoryStoring = HistoryStore()
     private let queue = DispatchQueue(label: "history.coordinator.queue", qos: .userInitiated, attributes: .concurrent)
+    private var regularCleaningTimer: Timer?
 
     private var _history: History?
+    // TODO: get rid of dictionary - it's useless? - make set lookup more effective
     private var historyDictionary: [URL: HistoryEntry]?
 
     private var cancellables = Set<AnyCancellable>()
@@ -95,11 +103,11 @@ final class HistoryCoordinator: HistoryCoordinating {
 
     func burnHistory(except fireproofedDomains: [String]) {
         queue.async(flags: .barrier) { [weak self] in
-            // TODO burn except domains
+            // TODO burn except domainsp
         }
     }
 
-    private func cleanAndReloadHistory() {
+    @objc private func cleanAndReloadHistory() {
         queue.async(flags: .barrier) { [weak self] in
             guard let self = self else { return }
 
@@ -123,6 +131,17 @@ final class HistoryCoordinator: HistoryCoordinating {
 
     private func makeHistoryDictionary(from history: History) -> [URL: HistoryEntry] {
         history.reduce(into: [URL: HistoryEntry](), { $0[$1.url] = $1 })
+    }
+
+    private func scheduleRegularCleaning() {
+        let timer = Timer(fireAt: .midnight,
+                          interval: .day,
+                          target: self,
+                          selector: #selector(cleanAndReloadHistory),
+                          userInfo: nil,
+                          repeats: true)
+        RunLoop.main.add(timer, forMode: RunLoop.Mode.common)
+        regularCleaningTimer = timer
     }
 
     private func makeHistory(from dictionary: [URL: HistoryEntry]) -> History {
@@ -150,10 +169,24 @@ final class HistoryCoordinator: HistoryCoordinating {
 
 }
 
+fileprivate extension TimeInterval {
+
+    static var day: TimeInterval = 60 * 60 * 24 * 7
+
+}
+
 fileprivate extension Date {
 
     static var weekAgo: Date {
-        Date().addingTimeInterval( -1 * 60 * 60 * 24 * 7 )
+        Date().addingTimeInterval( -1 * TimeInterval.day )
+    }
+
+    static var midnight: Date {
+        return Calendar.current.date(
+            bySettingHour: 23,
+            minute: 59,
+            second: 0,
+            of: Date())!
     }
 
 }
