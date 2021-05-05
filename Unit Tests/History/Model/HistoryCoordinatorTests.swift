@@ -34,7 +34,7 @@ class HistoryCoordinatorTests: XCTestCase {
 
         let url = URL.duckDuckGo
         historyCoordinator.addVisit(of: url)
-        Thread.sleep(forTimeInterval: 0.05)
+        Thread.sleep(forTimeInterval: 0.1)
 
         XCTAssertNil(historyCoordinator.history)
         XCTAssertFalse(historyStoringMock.saveCalled)
@@ -45,7 +45,7 @@ class HistoryCoordinatorTests: XCTestCase {
 
         let url = URL.duckDuckGo
         historyCoordinator.addVisit(of: url)
-        Thread.sleep(forTimeInterval: 0.05)
+        Thread.sleep(forTimeInterval: 0.1)
 
         XCTAssert(historyCoordinator.history!.contains(where: { entry in
             entry.url == url
@@ -59,7 +59,7 @@ class HistoryCoordinatorTests: XCTestCase {
         let url = URL.duckDuckGo
         historyCoordinator.addVisit(of: url)
         historyCoordinator.addVisit(of: url)
-        Thread.sleep(forTimeInterval: 0.05)
+        Thread.sleep(forTimeInterval: 0.1)
 
         XCTAssert(historyCoordinator.history!.count == 1)
         XCTAssert(historyCoordinator.history!.first!.numberOfVisits == 2)
@@ -74,7 +74,7 @@ class HistoryCoordinatorTests: XCTestCase {
 
         let url = URL.duckDuckGo
         historyCoordinator.addVisit(of: url)
-        Thread.sleep(forTimeInterval: 0.05)
+        Thread.sleep(forTimeInterval: 0.1)
 
         XCTAssertNil(historyCoordinator.history!.first?.title)
     }
@@ -84,18 +84,19 @@ class HistoryCoordinatorTests: XCTestCase {
 
         let url = URL.duckDuckGo
         historyCoordinator.addVisit(of: url)
+        Thread.sleep(forTimeInterval: 0.1)
 
         historyStoringMock.saveCalled = false
         let title1 = "Title 1"
         historyCoordinator.updateTitleIfNeeded(title: title1, url: url)
-        Thread.sleep(forTimeInterval: 0.05)
+        Thread.sleep(forTimeInterval: 0.1)
         XCTAssert(historyStoringMock.saveCalled)
         XCTAssertEqual(historyCoordinator.history!.first?.title, title1)
 
         historyStoringMock.saveCalled = false
         let title2 = "Title 2"
         historyCoordinator.updateTitleIfNeeded(title: title2, url: url)
-        Thread.sleep(forTimeInterval: 0.05)
+        Thread.sleep(forTimeInterval: 0.1)
         XCTAssert(historyStoringMock.saveCalled)
         XCTAssertEqual(historyCoordinator.history!.first?.title, title2)
 
@@ -110,17 +111,20 @@ class HistoryCoordinatorTests: XCTestCase {
 
         let url1 = URL(string: "https://duckduckgo.com")!
         historyCoordinator.addVisit(of: url1)
+        Thread.sleep(forTimeInterval: 0.1)
 
         let url2 = URL(string: "https://test.duckduckgo.com")!
         historyCoordinator.addVisit(of: url2)
+        Thread.sleep(forTimeInterval: 0.1)
 
         let fireproofDomain = "wikipedia.org"
         let url3 = URL(string: "https://\(fireproofDomain)")!
         historyCoordinator.addVisit(of: url3)
+        Thread.sleep(forTimeInterval: 0.1)
 
         let url4 = URL(string: "https://subdomain.\(fireproofDomain)")!
         historyCoordinator.addVisit(of: url4)
-        Thread.sleep(forTimeInterval: 0.05)
+        Thread.sleep(forTimeInterval: 0.1)
 
         XCTAssert(historyCoordinator.history!.count == 4)
 
@@ -128,7 +132,7 @@ class HistoryCoordinatorTests: XCTestCase {
         fireproofDomains.addToAllowed(domain: fireproofDomain)
 
         historyCoordinator.burnHistory(except: fireproofDomains)
-        Thread.sleep(forTimeInterval: 0.05)
+        Thread.sleep(forTimeInterval: 0.1)
 
         XCTAssert(historyStoringMock.cleanAndReloadHistoryExteptions.count == 2)
         XCTAssert(historyStoringMock.cleanAndReloadHistoryExteptions.first!.url.host!.hasSuffix(fireproofDomain))
@@ -143,6 +147,7 @@ fileprivate extension HistoryCoordinator {
         let historyStoringMock = HistoryStoringMock()
         historyStoringMock.cleanAndReloadHistoryResult = .success(History())
         let historyCoordinator = HistoryCoordinator(historyStoring: historyStoringMock)
+        Thread.sleep(forTimeInterval: 0.1)
 
         return (historyStoringMock, historyCoordinator)
     }
