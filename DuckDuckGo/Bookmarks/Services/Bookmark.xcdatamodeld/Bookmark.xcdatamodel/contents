@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<model type="com.apple.IDECoreDataModeler.DataModel" documentVersion="1.0" lastSavedToolsVersion="17709" systemVersion="20C69" minimumToolsVersion="Automatic" sourceLanguage="Swift" userDefinedModelVersionIdentifier="">
+<model type="com.apple.IDECoreDataModeler.DataModel" documentVersion="1.0" lastSavedToolsVersion="17709" systemVersion="20D91" minimumToolsVersion="Automatic" sourceLanguage="Swift" userDefinedModelVersionIdentifier="">
     <entity name="BookmarkManagedObject" representedClassName="BookmarkManagedObject" syncable="YES" codeGenerationType="class">
         <attribute name="dateAdded" attributeType="Date" usesScalarValueType="NO"/>
         <attribute name="faviconEncrypted" optional="YES" attributeType="Transformable" valueTransformerName="NSImageTransformer"/>
@@ -11,6 +11,6 @@
         </fetchIndex>
     </entity>
     <elements>
-        <element name="BookmarkManagedObject" positionX="-54" positionY="-54" width="128" height="104"/>
+        <element name="BookmarkManagedObject" positionX="-2175.299011230469" positionY="-1978.109436035156" width="128" height="104"/>
     </elements>
 </model>
