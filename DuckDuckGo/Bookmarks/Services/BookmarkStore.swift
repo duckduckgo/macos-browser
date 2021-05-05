@@ -28,11 +28,11 @@ enum BookmarkStoreFetchPredicateType {
 protocol BookmarkStore {
 
     func loadAll(type: BookmarkStoreFetchPredicateType, completion: @escaping ([BaseBookmarkEntity]?, Error?) -> Void)
-    func save(bookmark: Bookmark, parent: Folder?, completion: @escaping (Bool, Error?) -> Void)
-    func save(folder: Folder, parent: Folder?, completion: @escaping (Bool, Error?) -> Void)
+    func save(bookmark: Bookmark, parent: BookmarkFolder?, completion: @escaping (Bool, Error?) -> Void)
+    func save(folder: BookmarkFolder, parent: BookmarkFolder?, completion: @escaping (Bool, Error?) -> Void)
     func remove(objectsWithUUIDs: [UUID], completion: @escaping (Bool, Error?) -> Void)
     func update(bookmark: Bookmark)
-    func add(objectsWithUUIDs: [UUID], to parent: Folder?, completion: @escaping (Error?) -> Void)
+    func add(objectsWithUUIDs: [UUID], to parent: BookmarkFolder?, completion: @escaping (Error?) -> Void)
 
 }
 
@@ -93,7 +93,7 @@ final class LocalBookmarkStore: BookmarkStore {
         }
     }
 
-    func save(bookmark: Bookmark, parent: Folder?, completion: @escaping (Bool, Error?) -> Void) {
+    func save(bookmark: Bookmark, parent: BookmarkFolder?, completion: @escaping (Bool, Error?) -> Void) {
         context.perform { [weak self] in
             guard let self = self else {
                 DispatchQueue.main.async { completion(false, BookmarkStoreError.storeDeallocated) }
@@ -187,7 +187,7 @@ final class LocalBookmarkStore: BookmarkStore {
         }
     }
 
-    func add(objectsWithUUIDs uuids: [UUID], to parent: Folder?, completion: @escaping (Error?) -> Void) {
+    func add(objectsWithUUIDs uuids: [UUID], to parent: BookmarkFolder?, completion: @escaping (Error?) -> Void) {
         context.perform { [weak self] in
             guard let self = self else {
                 completion(nil)
@@ -234,7 +234,7 @@ final class LocalBookmarkStore: BookmarkStore {
 
     // MARK: - Folders
 
-    func save(folder: Folder, parent: Folder?, completion: @escaping (Bool, Error?) -> Void) {
+    func save(folder: BookmarkFolder, parent: BookmarkFolder?, completion: @escaping (Bool, Error?) -> Void) {
         context.perform { [weak self] in
             guard let self = self else {
                 DispatchQueue.main.async { completion(false, BookmarkStoreError.storeDeallocated) }

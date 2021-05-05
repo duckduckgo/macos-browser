@@ -131,7 +131,7 @@ final class LocalBookmarkStoreTests: XCTestCase {
         let savingExpectation = self.expectation(description: "Saving")
         let loadingExpectation = self.expectation(description: "Loading")
 
-        let folder = Folder(id: UUID(), title: "Folder")
+        let folder = BookmarkFolder(id: UUID(), title: "Folder")
 
         bookmarkStore.save(folder: folder, parent: nil) { (success, error) in
             XCTAssert(success)
@@ -161,8 +161,8 @@ final class LocalBookmarkStoreTests: XCTestCase {
         let saveChildExpectation = self.expectation(description: "Save Child Folder")
         let loadingExpectation = self.expectation(description: "Loading")
 
-        let parentFolder = Folder(id: UUID(), title: "Parent")
-        let childFolder = Folder(id: UUID(), title: "Child")
+        let parentFolder = BookmarkFolder(id: UUID(), title: "Parent")
+        let childFolder = BookmarkFolder(id: UUID(), title: "Child")
 
         bookmarkStore.save(folder: parentFolder, parent: nil) { (success, error) in
             XCTAssert(success)
@@ -181,7 +181,7 @@ final class LocalBookmarkStoreTests: XCTestCase {
                     XCTAssertNil(error)
                     XCTAssert(entities?.count == 1)
 
-                    let parentLoadedFromStore = entities?.first as? Folder
+                    let parentLoadedFromStore = entities?.first as? BookmarkFolder
                     XCTAssertEqual(parentLoadedFromStore, parentFolder)
                     XCTAssert(parentLoadedFromStore?.children.count == 1)
                     XCTAssert(parentLoadedFromStore?.childFolders.count == 1)
@@ -204,7 +204,7 @@ final class LocalBookmarkStoreTests: XCTestCase {
         let firstSaveExpectation = self.expectation(description: "First Save")
         let secondSaveExpectation = self.expectation(description: "Second Save")
 
-        let folder = Folder(id: UUID(), title: "Folder")
+        let folder = BookmarkFolder(id: UUID(), title: "Folder")
 
         bookmarkStore.save(folder: folder, parent: nil) { (success, error) in
             XCTAssert(success)
@@ -232,7 +232,7 @@ final class LocalBookmarkStoreTests: XCTestCase {
         let saveBookmarkExpectation = self.expectation(description: "Save Bookmark")
         let loadingExpectation = self.expectation(description: "Loading")
 
-        let folder = Folder(id: UUID(), title: "Parent")
+        let folder = BookmarkFolder(id: UUID(), title: "Parent")
         let bookmark = Bookmark(id: UUID(), url: URL(string: "https://example.com")!, title: "Example", isFavorite: false)
 
         bookmarkStore.save(folder: folder, parent: nil) { (success, error) in
@@ -252,7 +252,7 @@ final class LocalBookmarkStoreTests: XCTestCase {
                     XCTAssertNil(error)
                     XCTAssert(entities?.count == 1)
 
-                    let parentLoadedFromStore = entities?.first as? Folder
+                    let parentLoadedFromStore = entities?.first as? BookmarkFolder
                     XCTAssertEqual(parentLoadedFromStore, folder)
                     XCTAssert(parentLoadedFromStore?.children.count == 1)
                     XCTAssert(parentLoadedFromStore?.childFolders.count == 0)

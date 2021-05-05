@@ -68,7 +68,7 @@ internal class BaseBookmarkEntity {
                 return BaseBookmarkEntity.from(managedObject: baseBookmarkEntity, parentFolderUUID: id)
             } ?? []
 
-            let folder = Folder(id: id, title: title, parentFolderUUID: parentFolderUUID, children: children)
+            let folder = BookmarkFolder(id: id, title: title, parentFolderUUID: parentFolderUUID, children: children)
 
             return folder
         } else {
@@ -88,7 +88,7 @@ internal class BaseBookmarkEntity {
 
 }
 
-final class Folder: BaseBookmarkEntity {
+final class BookmarkFolder: BaseBookmarkEntity {
 
     var parentFolderUUID: UUID?
 
@@ -98,8 +98,8 @@ final class Folder: BaseBookmarkEntity {
         return children.compactMap { $0 as? Bookmark }
     }
 
-    var childFolders: [Folder] {
-        return children.compactMap { $0 as? Folder }
+    var childFolders: [BookmarkFolder] {
+        return children.compactMap { $0 as? BookmarkFolder }
     }
 
     init(id: UUID,

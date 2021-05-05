@@ -25,12 +25,12 @@ protocol BookmarkManager: AnyObject {
     func isUrlBookmarked(url: URL) -> Bool
     func getBookmark(for url: URL) -> Bookmark?
     @discardableResult func makeBookmark(for url: URL, title: String, isFavorite: Bool) -> Bookmark?
-    @discardableResult func makeFolder(for title: String, parent: Folder?) -> Folder
+    @discardableResult func makeFolder(for title: String, parent: BookmarkFolder?) -> BookmarkFolder
     func remove(bookmark: Bookmark)
-    func remove(folder: Folder)
+    func remove(folder: BookmarkFolder)
     func update(bookmark: Bookmark)
     @discardableResult func updateUrl(of bookmark: Bookmark, to newUrl: URL) -> Bookmark?
-    func add(objectsWithUUIDs uuids: [UUID], to parent: Folder?, completion: @escaping (Error?) -> Void)
+    func add(objectsWithUUIDs uuids: [UUID], to parent: BookmarkFolder?, completion: @escaping (Error?) -> Void)
 
     // Wrapper definition in a protocol is not supported yet
     var listPublisher: Published<BookmarkList?>.Publisher { get }
@@ -137,7 +137,7 @@ final class LocalBookmarkManager: BookmarkManager {
         }
     }
 
-    func remove(folder: Folder) {
+    func remove(folder: BookmarkFolder) {
         bookmarkStore.remove(objectsWithUUIDs: [folder.id]) { [weak self] _, _ in
             self?.loadBookmarks()
         }
@@ -173,8 +173,8 @@ final class LocalBookmarkManager: BookmarkManager {
 
     // MARK: - Folders
 
-    @discardableResult func makeFolder(for title: String, parent: Folder?) -> Folder {
-        let folder = Folder(id: UUID(), title: title, parentFolderUUID: parent?.id, children: [])
+    @discardableResult func makeFolder(for title: String, parent: BookmarkFolder?) -> BookmarkFolder {
+        let folder = BookmarkFolder(id: UUID(), title: title, parentFolderUUID: parent?.id, children: [])
 
         bookmarkStore.save(folder: folder, parent: parent) { [weak self] success, _  in
             guard success else {
@@ -187,7 +187,7 @@ final class LocalBookmarkManager: BookmarkManager {
         return folder
     }
 
-    func add(objectsWithUUIDs uuids: [UUID], to parent: Folder?, completion: @escaping (Error?) -> Void) {
+    func add(objectsWithUUIDs uuids: [UUID], to parent: BookmarkFolder?, completion: @escaping (Error?) -> Void) {
         bookmarkStore.add(objectsWithUUIDs: uuids, to: parent) { [weak self] error in
             self?.loadBookmarks()
             completion(error)
