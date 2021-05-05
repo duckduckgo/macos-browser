@@ -72,13 +72,8 @@ final class HistoryCoordinator: HistoryCoordinating {
                 return
             }
 
-            var entry: HistoryEntry
-            if let existingEntry = historyDictionary[url] {
-                entry = existingEntry
-                entry.addVisit()
-            } else {
-                entry = HistoryEntry(url: url)
-            }
+            var entry = historyDictionary[url] ?? HistoryEntry(url: url)
+            entry.addVisit()
 
             historyDictionary[url] = entry
             self?.historyDictionary = historyDictionary

@@ -75,18 +75,8 @@ final class WebViewStateObserver: NSObject {
                                of object: Any?,
                                change: [NSKeyValueChangeKey: Any]?,
                                context: UnsafeMutableRawPointer?) {
-        guard let keyPath = keyPath else {
-            os_log("%s: keyPath not provided", type: .error, className)
-            return
-        }
-
-        guard let tabViewModel = tabViewModel else {
-            os_log("%s: TabViewModel was released from memory", type: .error, className)
-            return
-        }
-
-        guard let webView = webView else {
-            os_log("%s: TabViewModel was released from memory", type: .error, className)
+        guard let keyPath = keyPath, let tabViewModel = tabViewModel, let webView = webView else {
+            assertionFailure("Invalid state: keyPath, tabViewModel or webView is nil")
             return
         }
 
