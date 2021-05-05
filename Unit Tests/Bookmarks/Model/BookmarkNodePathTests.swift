@@ -1,5 +1,5 @@
 //
-//  NodePathTests.swift
+//  BookmarkNodePathTests.swift
 //
 //  Copyright © 2021 DuckDuckGo. All rights reserved.
 //
@@ -19,30 +19,30 @@
 import XCTest
 @testable import DuckDuckGo_Privacy_Browser
 
-class NodePathTests: XCTestCase {
+class BookmarkNodePathTests: XCTestCase {
 
     private class TestObject: NSObject {}
 
     func testWhenInitializingWithRootNode_ThenPathContainsOneNode() {
-        let node = Node(representedObject: TestObject(), parent: nil)
-        let path = NodePath(node: node)
+        let node = BookmarkNode(representedObject: TestObject(), parent: nil)
+        let path = BookmarkNode.Path(node: node)
 
         XCTAssertEqual(path.components, [node])
     }
 
     func testWhenInitializingWithChildNode_ThenPathContainsTwoNodes() {
-        let rootNode = Node(representedObject: TestObject(), parent: nil)
-        let childNode = Node(representedObject: TestObject(), parent: rootNode)
-        let path = NodePath(node: childNode)
+        let rootNode = BookmarkNode(representedObject: TestObject(), parent: nil)
+        let childNode = BookmarkNode(representedObject: TestObject(), parent: rootNode)
+        let path = BookmarkNode.Path(node: childNode)
 
         XCTAssertEqual(path.components, [rootNode, childNode])
     }
 
     func testWhenInitializingWithNestedNodes_ThenPathContainsThreeNodes() {
-        let rootNode = Node(representedObject: TestObject(), parent: nil)
-        let childNode = Node(representedObject: TestObject(), parent: rootNode)
-        let childOfChildNode = Node(representedObject: TestObject(), parent: childNode)
-        let path = NodePath(node: childOfChildNode)
+        let rootNode = BookmarkNode(representedObject: TestObject(), parent: nil)
+        let childNode = BookmarkNode(representedObject: TestObject(), parent: rootNode)
+        let childOfChildNode = BookmarkNode(representedObject: TestObject(), parent: childNode)
+        let path = BookmarkNode.Path(node: childOfChildNode)
 
         XCTAssertEqual(path.components, [rootNode, childNode, childOfChildNode])
     }

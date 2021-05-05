@@ -20,19 +20,19 @@ import Foundation
 
 protocol TreeControllerDataSource: AnyObject {
 
-    func treeController(treeController: TreeController, childNodesFor: Node) -> [Node]
+    func treeController(treeController: TreeController, childNodesFor: BookmarkNode) -> [BookmarkNode]
 
 }
 
-typealias NodeVisitor = (_ : Node) -> Void
+typealias NodeVisitor = (BookmarkNode) -> Void
 
 final class TreeController {
 
-    let rootNode: Node
+    let rootNode: BookmarkNode
 
     private weak var dataSource: TreeControllerDataSource?
 
-    init(dataSource: TreeControllerDataSource, rootNode: Node) {
+    init(dataSource: TreeControllerDataSource, rootNode: BookmarkNode) {
         self.dataSource = dataSource
         self.rootNode = rootNode
 
@@ -40,7 +40,7 @@ final class TreeController {
     }
 
     convenience init(dataSource: TreeControllerDataSource) {
-        self.init(dataSource: dataSource, rootNode: Node.genericRootNode())
+        self.init(dataSource: dataSource, rootNode: BookmarkNode.genericRootNode())
     }
 
     @discardableResult
@@ -52,11 +52,11 @@ final class TreeController {
         visit(node: rootNode, visitor: visitBlock)
     }
 
-    func nodeInTreeRepresentingObject(_ representedObject: AnyObject) -> Node? {
+    func nodeInTreeRepresentingObject(_ representedObject: AnyObject) -> BookmarkNode? {
         return nodeInArrayRepresentingObject(nodes: [rootNode], representedObject: representedObject, recurse: true)
     }
 
-    private func nodeInArrayRepresentingObject(nodes: [Node], representedObject: AnyObject, recurse: Bool = false) -> Node? {
+    private func nodeInArrayRepresentingObject(nodes: [BookmarkNode], representedObject: AnyObject, recurse: Bool = false) -> BookmarkNode? {
         for node in nodes {
             if node.representedObjectEquals(representedObject) {
                 return node
@@ -76,7 +76,7 @@ final class TreeController {
 
 private extension TreeController {
 
-    func visit(node: Node, visitor: NodeVisitor) {
+    func visit(node: BookmarkNode, visitor: NodeVisitor) {
         visitor(node)
 
         node.childNodes.forEach { childNode in
@@ -84,7 +84,7 @@ private extension TreeController {
         }
     }
 
-    func nodeArraysAreEqual(_ lhs: [Node]?, _ rhs: [Node]?) -> Bool {
+    func nodeArraysAreEqual(_ lhs: [BookmarkNode]?, _ rhs: [BookmarkNode]?) -> Bool {
         if lhs == nil && rhs == nil {
             return true
         }
@@ -92,14 +92,14 @@ private extension TreeController {
         return lhs == rhs
     }
 
-    func rebuildChildNodes(node: Node) -> Bool {
+    func rebuildChildNodes(node: BookmarkNode) -> Bool {
         if !node.canHaveChildNodes {
             return false
         }
 
         var childNodesDidChange = false
 
-        let childNodes = dataSource?.treeController(treeController: self, childNodesFor: node) ?? [Node]()
+        let childNodes = dataSource?.treeController(treeController: self, childNodesFor: node) ?? [BookmarkNode]()
 
         childNodesDidChange = !nodeArraysAreEqual(childNodes, node.childNodes)
 

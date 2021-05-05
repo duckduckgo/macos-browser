@@ -18,20 +18,20 @@
 
 import Foundation
 
-private final class GenericRootNode {}
+final class BookmarkNode: Hashable {
 
-final class Node: Hashable {
+    private final class RootNode {}
 
     private static var incrementingID = 0
 
-    class func genericRootNode() -> Node {
-        let node = Node(representedObject: GenericRootNode(), parent: nil)
+    class func genericRootNode() -> BookmarkNode {
+        let node = BookmarkNode(representedObject: RootNode(), parent: nil)
         node.canHaveChildNodes = true
 
         return node
     }
 
-    class func bookmarkNodesSortedAlphabetically(_ nodes: [Node]) -> [Node] {
+    class func bookmarkNodesSortedAlphabetically(_ nodes: [BookmarkNode]) -> [BookmarkNode] {
         return nodes.sorted { (firstNode, secondNode) -> Bool in
             guard let firstBookmark = firstNode.representedObject as? BaseBookmarkEntity,
                   let secondBookmark = secondNode.representedObject as? BaseBookmarkEntity else {
@@ -42,12 +42,12 @@ final class Node: Hashable {
         }
     }
 
-    weak var parent: Node?
+    weak var parent: BookmarkNode?
 
     let uniqueID: Int
     let representedObject: AnyObject
     var canHaveChildNodes = false
-    var childNodes = [Node]()
+    var childNodes = [BookmarkNode]()
 
     var isRoot: Bool {
         return parent == nil
@@ -78,14 +78,12 @@ final class Node: Hashable {
         return 0
     }
 
-    init(representedObject: AnyObject, parent: Node?) {
-        precondition(Thread.isMainThread)
-
+    init(representedObject: AnyObject, parent: BookmarkNode?) {
         self.representedObject = representedObject
         self.parent = parent
-        self.uniqueID = Node.incrementingID
+        self.uniqueID = BookmarkNode.incrementingID
 
-        Node.incrementingID += 1
+        BookmarkNode.incrementingID += 1
     }
 
     func representedObjectEquals(_ otherRepresentedObject: AnyObject) -> Bool {
@@ -106,7 +104,7 @@ final class Node: Hashable {
         return false
     }
 
-    func findOrCreateChildNode(with representedObject: AnyObject) -> Node {
+    func findOrCreateChildNode(with representedObject: AnyObject) -> BookmarkNode {
         if let node = childNodeRepresenting(object: representedObject) {
             return node
         }
@@ -114,11 +112,11 @@ final class Node: Hashable {
         return createChildNode(representedObject)
     }
 
-    func createChildNode(_ representedObject: AnyObject) -> Node {
-        return Node(representedObject: representedObject, parent: self)
+    func createChildNode(_ representedObject: AnyObject) -> BookmarkNode {
+        return BookmarkNode(representedObject: representedObject, parent: self)
     }
 
-    func childAtIndex(_ index: Int) -> Node? {
+    func childAtIndex(_ index: Int) -> BookmarkNode? {
         if index >= childNodes.count || index < 0 {
             return nil
         }
@@ -126,21 +124,21 @@ final class Node: Hashable {
         return childNodes[index]
     }
 
-    func indexOfChild(_ node: Node) -> Int? {
+    func indexOfChild(_ node: BookmarkNode) -> Int? {
         return childNodes.firstIndex { (childNode) -> Bool in
             childNode === node
         }
     }
 
-    func childNodeRepresenting(object: AnyObject) -> Node? {
+    func childNodeRepresenting(object: AnyObject) -> BookmarkNode? {
         return findNodeRepresenting(object: object, recursively: false)
     }
 
-    func descendantNodeRepresenting(object: AnyObject) -> Node? {
+    func descendantNodeRepresenting(object: AnyObject) -> BookmarkNode? {
         return findNodeRepresenting(object: object, recursively: true)
     }
 
-    func isAncestor(of node: Node) -> Bool {
+    func isAncestor(of node: BookmarkNode) -> Bool {
         guard node != self else { return false }
 
         var currentNode = node
@@ -158,7 +156,7 @@ final class Node: Hashable {
         }
     }
 
-    func findNodeRepresenting(object: AnyObject, recursively: Bool = false) -> Node? {
+    func findNodeRepresenting(object: AnyObject, recursively: Bool = false) -> BookmarkNode? {
         for childNode in childNodes {
             if childNode.representedObjectEquals(object) {
                 return childNode
@@ -188,20 +186,54 @@ final class Node: Hashable {
 
     // MARK: - Equatable
 
-    class func == (lhs: Node, rhs: Node) -> Bool {
+    class func == (lhs: BookmarkNode, rhs: BookmarkNode) -> Bool {
         return lhs === rhs
     }
 
 }
 
-extension Array where Element == Node {
+// MARK: - BookmarkNode.Path
+
+extension BookmarkNode {
+
+    struct Path {
+
+        let components: [BookmarkNode]
+
+        init(node: BookmarkNode) {
+            var pathComponents = [node]
+            var currentNode = node
+
+            while let parent = currentNode.parent {
+                pathComponents.append(parent)
+                currentNode = parent
+            }
+
+            self.components = pathComponents.reversed()
+        }
+
+        init?(representedObject: AnyObject, treeController: TreeController) {
+            if let node = treeController.nodeInTreeRepresentingObject(representedObject) {
+                self.init(node: node)
+            }
+
+            return nil
+        }
+
+    }
+
+}
+
+// MARK: - BookmarkNode Array Extensions
+
+extension Array where Element == BookmarkNode {
 
     func representedObjects() -> [AnyObject] {
         return self.map { $0.representedObject }
     }
 
-    func bookmarksSortedAlphabetically() -> [Node] {
-        return Node.bookmarkNodesSortedAlphabetically(self)
+    func bookmarksSortedAlphabetically() -> [BookmarkNode] {
+        return BookmarkNode.bookmarkNodesSortedAlphabetically(self)
     }
 
 }

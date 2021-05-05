@@ -67,12 +67,11 @@
 		4B44B3012642542C008F9F7D /* BookmarkMigrationPolicy.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B44B3002642542C008F9F7D /* BookmarkMigrationPolicy.swift */; };
 		4B44B303264254F0008F9F7D /* BookmarkManagedObjectTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B44B302264254F0008F9F7D /* BookmarkManagedObjectTests.swift */; };
 		4B44B30526425528008F9F7D /* BookmarkManagedObject.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B44B30426425528008F9F7D /* BookmarkManagedObject.swift */; };
-		4B44B30A26425F8C008F9F7D /* NodePath.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B44B30726425F8C008F9F7D /* NodePath.swift */; };
 		4B44B30B26425F8C008F9F7D /* TreeController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B44B30826425F8C008F9F7D /* TreeController.swift */; };
-		4B44B30C26425F8C008F9F7D /* Node.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B44B30926425F8C008F9F7D /* Node.swift */; };
-		4B44B31026425F98008F9F7D /* NodePathTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B44B30D26425F98008F9F7D /* NodePathTests.swift */; };
+		4B44B30C26425F8C008F9F7D /* BookmarkNode.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B44B30926425F8C008F9F7D /* BookmarkNode.swift */; };
+		4B44B31026425F98008F9F7D /* BookmarkNodePathTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B44B30D26425F98008F9F7D /* BookmarkNodePathTests.swift */; };
 		4B44B31126425F98008F9F7D /* TreeControllerTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B44B30E26425F98008F9F7D /* TreeControllerTests.swift */; };
-		4B44B31226425F98008F9F7D /* NodeTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B44B30F26425F98008F9F7D /* NodeTests.swift */; };
+		4B44B31226425F98008F9F7D /* BookmarkNodeTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B44B30F26425F98008F9F7D /* BookmarkNodeTests.swift */; };
 		4B44B31526425FB3008F9F7D /* SpacerNode.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B44B31326425FB3008F9F7D /* SpacerNode.swift */; };
 		4B44B31626425FB3008F9F7D /* PseudoFolder.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B44B31426425FB3008F9F7D /* PseudoFolder.swift */; };
 		4B44B31E2642F5A2008F9F7D /* Bookmark.xcdatamodeld in Sources */ = {isa = PBXBuildFile; fileRef = 4B44B31B2642F5A2008F9F7D /* Bookmark.xcdatamodeld */; };
@@ -395,12 +394,11 @@
 		4B44B3002642542C008F9F7D /* BookmarkMigrationPolicy.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = BookmarkMigrationPolicy.swift; sourceTree = "<group>"; };
 		4B44B302264254F0008F9F7D /* BookmarkManagedObjectTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = BookmarkManagedObjectTests.swift; sourceTree = "<group>"; };
 		4B44B30426425528008F9F7D /* BookmarkManagedObject.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = BookmarkManagedObject.swift; sourceTree = "<group>"; };
-		4B44B30726425F8C008F9F7D /* NodePath.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = NodePath.swift; sourceTree = "<group>"; };
 		4B44B30826425F8C008F9F7D /* TreeController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = TreeController.swift; sourceTree = "<group>"; };
-		4B44B30926425F8C008F9F7D /* Node.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Node.swift; sourceTree = "<group>"; };
-		4B44B30D26425F98008F9F7D /* NodePathTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = NodePathTests.swift; sourceTree = "<group>"; };
+		4B44B30926425F8C008F9F7D /* BookmarkNode.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = BookmarkNode.swift; sourceTree = "<group>"; };
+		4B44B30D26425F98008F9F7D /* BookmarkNodePathTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = BookmarkNodePathTests.swift; sourceTree = "<group>"; };
 		4B44B30E26425F98008F9F7D /* TreeControllerTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = TreeControllerTests.swift; sourceTree = "<group>"; };
-		4B44B30F26425F98008F9F7D /* NodeTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = NodeTests.swift; sourceTree = "<group>"; };
+		4B44B30F26425F98008F9F7D /* BookmarkNodeTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = BookmarkNodeTests.swift; sourceTree = "<group>"; };
 		4B44B31326425FB3008F9F7D /* SpacerNode.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SpacerNode.swift; sourceTree = "<group>"; };
 		4B44B31426425FB3008F9F7D /* PseudoFolder.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = PseudoFolder.swift; sourceTree = "<group>"; };
 		4B44B31C2642F5A2008F9F7D /* Bookmark 2.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = "Bookmark 2.xcdatamodel"; sourceTree = "<group>"; };
@@ -1230,8 +1228,8 @@
 				AA652CD225DDA6E9009059CC /* LocalBookmarkManagerTests.swift */,
 				4B44B2F8264251C1008F9F7D /* BookmarkMigrationTests.swift */,
 				4B44B302264254F0008F9F7D /* BookmarkManagedObjectTests.swift */,
-				4B44B30D26425F98008F9F7D /* NodePathTests.swift */,
-				4B44B30F26425F98008F9F7D /* NodeTests.swift */,
+				4B44B30D26425F98008F9F7D /* BookmarkNodePathTests.swift */,
+				4B44B30F26425F98008F9F7D /* BookmarkNodeTests.swift */,
 				4B44B30E26425F98008F9F7D /* TreeControllerTests.swift */,
 			);
 			path = Model;
@@ -1601,8 +1599,7 @@
 				AAC5E4CF25D6A709007F5990 /* BookmarkList.swift */,
 				4B44B30426425528008F9F7D /* BookmarkManagedObject.swift */,
 				AAC5E4CE25D6A709007F5990 /* BookmarkManager.swift */,
-				4B44B30926425F8C008F9F7D /* Node.swift */,
-				4B44B30726425F8C008F9F7D /* NodePath.swift */,
+				4B44B30926425F8C008F9F7D /* BookmarkNode.swift */,
 				4B44B31426425FB3008F9F7D /* PseudoFolder.swift */,
 				4B44B31326425FB3008F9F7D /* SpacerNode.swift */,
 				4B44B30826425F8C008F9F7D /* TreeController.swift */,
@@ -2154,7 +2151,6 @@
 				B684592F25C93FBF00DC17B6 /* AppStateRestorationManager.swift in Sources */,
 				AAA892EA250A4CEF005B37B2 /* WindowControllersManager.swift in Sources */,
 				AAC5E4C825D6A6E8007F5990 /* BookmarkPopoverViewController.swift in Sources */,
-				4B44B30A26425F8C008F9F7D /* NodePath.swift in Sources */,
 				AABEE6A924AB4B910043105B /* SuggestionTableCellView.swift in Sources */,
 				AA6820F125503DA9005ED0D5 /* FireViewModel.swift in Sources */,
 				AAA0CC6A253CC43C0079BC96 /* WKUserContentControllerExtension.swift in Sources */,
@@ -2204,7 +2200,7 @@
 				4B677436255DBEB800025BD8 /* HTTPSExcludedDomains.swift in Sources */,
 				AAC5E4D225D6A709007F5990 /* BookmarkList.swift in Sources */,
 				4B6160E525B152FA007DE5B2 /* ContentBlockerUserScript.swift in Sources */,
-				4B44B30C26425F8C008F9F7D /* Node.swift in Sources */,
+				4B44B30C26425F8C008F9F7D /* BookmarkNode.swift in Sources */,
 				AA7412B724D1687000D22FE0 /* TabBarScrollView.swift in Sources */,
 				4B0511C7262CAA5A00F6079C /* PreferenceTableCellView.swift in Sources */,
 				4B44B2FF2642535C008F9F7D /* Bookmark.xcmappingmodel in Sources */,
@@ -2308,14 +2304,14 @@
 				4B11060A25903EAC0039B979 /* CoreDataEncryptionTests.swift in Sources */,
 				8553FF52257523760029327F /* FileDownloadTests.swift in Sources */,
 				AABAF59C260A7D130085060C /* FaviconServiceMock.swift in Sources */,
-				4B44B31226425F98008F9F7D /* NodeTests.swift in Sources */,
+				4B44B31226425F98008F9F7D /* BookmarkNodeTests.swift in Sources */,
 				4BA1A6E6258C270800F6F690 /* EncryptionKeyGeneratorTests.swift in Sources */,
 				B61F012B25ECBB1700ABB5A3 /* UserScriptsManagerTests.swift in Sources */,
 				85AC3B1725D9BC1A00C7D2AA /* ConfigurationDownloaderTests.swift in Sources */,
 				4B0511E7262CAB3700F6079C /* UserDefaultsWrapperUtilities.swift in Sources */,
 				4BA1A6F6258C4F9600F6F690 /* EncryptionMocks.swift in Sources */,
 				4B02199D25E063DE00ED7DEA /* FireproofingURLExtensionsTests.swift in Sources */,
-				4B44B31026425F98008F9F7D /* NodePathTests.swift in Sources */,
+				4B44B31026425F98008F9F7D /* BookmarkNodePathTests.swift in Sources */,
 				4B0511F8262CB20F00F6079C /* DownloadPreferencesTests.swift in Sources */,
 				AA9C362825518C44004B1BA3 /* WebsiteDataStoreMock.swift in Sources */,
 				AA652CB125DD825B009059CC /* LocalBookmarkStoreTests.swift in Sources */,
