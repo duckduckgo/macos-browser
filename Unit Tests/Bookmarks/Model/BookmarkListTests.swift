@@ -76,7 +76,11 @@ final class BookmarkListTests: XCTestCase {
         let bookmark = Bookmark.aBookmark
         bookmarkList.insert(bookmark)
 
-        let unknownBookmark = Bookmark(url: URL.duckDuckGoAutocomplete, title: "Unknown title", favicon: nil, isFavorite: true, managedObjectId: nil)
+        let unknownBookmark = Bookmark(id: UUID(),
+                                       url: URL.duckDuckGoAutocomplete,
+                                       title: "Unknown title",
+                                       favicon: nil,
+                                       isFavorite: true)
 
         bookmarkList.update(with: unknownBookmark)
         let updateUrlResult = bookmarkList.updateUrl(of: unknownBookmark, to: URL.duckDuckGo)
@@ -94,9 +98,9 @@ final class BookmarkListTests: XCTestCase {
         var bookmarkList = BookmarkList()
 
         let bookmarks = [
-            Bookmark(url: URL(string: "wikipedia.org")!, title: "Title", favicon: nil, isFavorite: true, managedObjectId: nil),
-            Bookmark(url: URL.duckDuckGo, title: "Title", favicon: nil, isFavorite: true, managedObjectId: nil),
-            Bookmark(url: URL(string: "apple.com")!, title: "Title", favicon: nil, isFavorite: true, managedObjectId: nil)
+            Bookmark(id: UUID(), url: URL(string: "wikipedia.org")!, title: "Title", favicon: nil, isFavorite: true),
+            Bookmark(id: UUID(), url: URL.duckDuckGo, title: "Title", favicon: nil, isFavorite: true),
+            Bookmark(id: UUID(), url: URL(string: "apple.com")!, title: "Title", favicon: nil, isFavorite: true)
         ]
         bookmarks.forEach { bookmarkList.insert($0) }
         let bookmarkToReplace = bookmarks[2]
@@ -113,8 +117,8 @@ final class BookmarkListTests: XCTestCase {
 
         let firstUrl = URL(string: "wikipedia.org")!
         let bookmarks = [
-            Bookmark(url: firstUrl, title: "Title", favicon: nil, isFavorite: true, managedObjectId: nil),
-            Bookmark(url: URL.duckDuckGo, title: "Title", favicon: nil, isFavorite: true, managedObjectId: nil)
+            Bookmark(id: UUID(), url: firstUrl, title: "Title", favicon: nil, isFavorite: true),
+            Bookmark(id: UUID(), url: URL.duckDuckGo, title: "Title", favicon: nil, isFavorite: true)
         ]
 
         bookmarks.forEach { bookmarkList.insert($0) }
@@ -132,6 +136,10 @@ final class BookmarkListTests: XCTestCase {
 
 fileprivate extension Bookmark {
 
-    static var aBookmark: Bookmark = Bookmark(url: URL.duckDuckGo, title: "Title", favicon: nil, isFavorite: false, managedObjectId: nil)
+    static var aBookmark: Bookmark = Bookmark(id: UUID(),
+                                              url: URL.duckDuckGo,
+                                              title: "Title",
+                                              favicon: nil,
+                                              isFavorite: false)
 
 }

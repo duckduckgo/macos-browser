@@ -25,13 +25,19 @@ protocol BookmarkManager: AnyObject {
     func isUrlBookmarked(url: URL) -> Bool
     func getBookmark(for url: URL) -> Bookmark?
     @discardableResult func makeBookmark(for url: URL, title: String, isFavorite: Bool) -> Bookmark?
+    @discardableResult func makeFolder(for title: String, parent: Folder?) -> Folder
     func remove(bookmark: Bookmark)
+    func remove(folder: Folder)
     func update(bookmark: Bookmark)
     @discardableResult func updateUrl(of bookmark: Bookmark, to newUrl: URL) -> Bookmark?
+    func add(objectsWithUUIDs uuids: [UUID], to parent: Folder?, completion: @escaping (Error?) -> Void)
 
     // Wrapper definition in a protocol is not supported yet
     var listPublisher: Published<BookmarkList?>.Publisher { get }
     var list: BookmarkList? { get }
+
+    var topLevelItemsPublisher: Published<[BaseBookmarkEntity]?>.Publisher { get }
+    var topLevelItems: [BaseBookmarkEntity]? { get }
 
 }
 
@@ -53,17 +59,33 @@ final class LocalBookmarkManager: BookmarkManager {
     @Published private(set) var list: BookmarkList?
     var listPublisher: Published<BookmarkList?>.Publisher { $list }
 
+    // Defines an array of all top level items (anything that has no parent folder set).
+    @Published private(set) var topLevelItems: [BaseBookmarkEntity]?
+    var topLevelItemsPublisher: Published<[BaseBookmarkEntity]?>.Publisher { $topLevelItems }
+
     private lazy var bookmarkStore: BookmarkStore = LocalBookmarkStore()
     private lazy var faviconService: FaviconService = LocalFaviconService.shared
 
+    // MARK: - Bookmarks
+
+    // TODO: Clean this up. There are different types of data to load here, this can be done cleaner than 3 separate async requests.
     func loadBookmarks() {
-        bookmarkStore.loadAll { [weak self] (bookmarks, error) in
+        bookmarkStore.loadAll(type: .topLevelEntities) { [weak self] (entities, error) in
+            guard error == nil, let entities = entities else {
+                os_log("LocalBookmarkManager: Failed to fetch entities.", type: .error)
+                return
+            }
+
+            self?.topLevelItems = entities
+        }
+
+        bookmarkStore.loadAll(type: .bookmarks) { [weak self] (bookmarks, error) in
             guard error == nil, let bookmarks = bookmarks else {
                 os_log("LocalBookmarkManager: Failed to fetch bookmarks.", type: .error)
                 return
             }
 
-            self?.list = BookmarkList(bookmarks: bookmarks)
+            self?.list = BookmarkList(entities: bookmarks)
         }
     }
 
@@ -77,22 +99,23 @@ final class LocalBookmarkManager: BookmarkManager {
 
     @discardableResult func makeBookmark(for url: URL, title: String, isFavorite: Bool) -> Bookmark? {
         guard list != nil else { return nil }
+
         guard !isUrlBookmarked(url: url) else {
             os_log("LocalBookmarkManager: Url is already bookmarked", type: .error)
             return nil
         }
 
-        let bookmark = Bookmark(url: url, title: title, favicon: favicon(for: url.host), isFavorite: isFavorite)
+        let id = UUID()
+        let bookmark = Bookmark(id: id, url: url, title: title, favicon: favicon(for: url.host), isFavorite: isFavorite)
 
         list?.insert(bookmark)
-        bookmarkStore.save(bookmark: bookmark) { [weak self] success, objectId, _  in
-            guard success, let objectId = objectId else {
+        bookmarkStore.save(bookmark: bookmark, parent: nil) { [weak self] success, _  in
+            guard success else {
                 self?.list?.remove(bookmark)
                 return
             }
 
-            // Set the managed object id of created bookmark
-            self?.set(objectId: objectId, for: bookmark)
+            self?.loadBookmarks()
         }
         return bookmark
     }
@@ -105,10 +128,18 @@ final class LocalBookmarkManager: BookmarkManager {
         }
 
         list?.remove(latestBookmark)
-        bookmarkStore.remove(bookmark: latestBookmark) { [weak self] success, _ in
+        bookmarkStore.remove(objectsWithUUIDs: [bookmark.id]) { [weak self] success, _ in
             if !success {
                 self?.list?.insert(bookmark)
             }
+
+            self?.loadBookmarks()
+        }
+    }
+
+    func remove(folder: Folder) {
+        bookmarkStore.remove(objectsWithUUIDs: [folder.id]) { [weak self] _, _ in
+            self?.loadBookmarks()
         }
     }
 
@@ -119,45 +150,47 @@ final class LocalBookmarkManager: BookmarkManager {
             return
         }
 
-        var bookmark = bookmark
-        bookmark.managedObjectId = latestBookmark.managedObjectId
-
         list?.update(with: bookmark)
         bookmarkStore.update(bookmark: bookmark)
+        loadBookmarks()
     }
 
     func updateUrl(of bookmark: Bookmark, to newUrl: URL) -> Bookmark? {
         guard list != nil else { return nil }
         guard let latestBookmark = getBookmark(for: bookmark.url) else {
-            os_log("LocalBookmarkManager: Failed to update bookmark - not in the list.", type: .error)
+            os_log("LocalBookmarkManager: Failed to update bookmark url - not in the list.", type: .error)
             return nil
         }
 
-        let managedObjectId = latestBookmark.managedObjectId
-
-        guard var newBookmark = list?.updateUrl(of: bookmark, to: newUrl) else {
+        guard let newBookmark = list?.updateUrl(of: bookmark, to: newUrl) else {
             os_log("LocalBookmarkManager: Failed to update URL of bookmark.", type: .error)
             return nil
         }
-        newBookmark.managedObjectId = managedObjectId
+
         bookmarkStore.update(bookmark: newBookmark)
         return newBookmark
     }
 
-    private func set(objectId: NSManagedObjectID, for bookmark: Bookmark) {
-        guard var latestBookmark = getBookmark(for: bookmark.url) else {
-            // The bookmark was removed in the meantime
-            return
+    // MARK: - Folders
+
+    @discardableResult func makeFolder(for title: String, parent: Folder?) -> Folder {
+        let folder = Folder(id: UUID(), title: title, parentFolderUUID: parent?.id, children: [])
+
+        bookmarkStore.save(folder: folder, parent: parent) { [weak self] success, _  in
+            guard success else {
+                return
+            }
+
+            self?.loadBookmarks()
         }
 
-        latestBookmark.managedObjectId = objectId
-        list?.update(with: latestBookmark)
+        return folder
+    }
 
-        if bookmark.isFavorite != latestBookmark.isFavorite ||
-            bookmark.title != latestBookmark.title ||
-            bookmark.favicon != latestBookmark.favicon {
-            // Save recent changes to the bookmark (While objectId was unknown, nothing is persisted)
-            bookmarkStore.update(bookmark: latestBookmark)
+    func add(objectsWithUUIDs uuids: [UUID], to parent: Folder?, completion: @escaping (Error?) -> Void) {
+        bookmarkStore.add(objectsWithUUIDs: uuids, to: parent) { [weak self] error in
+            self?.loadBookmarks()
+            completion(error)
         }
     }
 
@@ -180,7 +213,7 @@ final class LocalBookmarkManager: BookmarkManager {
                 $0.favicon?.size.isSmaller(than: favicon.size) ?? true
             }
             .forEach {
-                var bookmark = $0
+                let bookmark = $0
                 bookmark.favicon = favicon
                 update(bookmark: bookmark)
             }
