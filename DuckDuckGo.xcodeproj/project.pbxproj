@@ -75,7 +75,7 @@
 		4B44B31226425F98008F9F7D /* NodeTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B44B30F26425F98008F9F7D /* NodeTests.swift */; };
 		4B44B31526425FB3008F9F7D /* SpacerNode.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B44B31326425FB3008F9F7D /* SpacerNode.swift */; };
 		4B44B31626425FB3008F9F7D /* PseudoFolder.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B44B31426425FB3008F9F7D /* PseudoFolder.swift */; };
-		4B44B31A2642EA95008F9F7D /* Bookmark.xcdatamodeld in Sources */ = {isa = PBXBuildFile; fileRef = 4B44B3172642EA95008F9F7D /* Bookmark.xcdatamodeld */; };
+		4B44B31E2642F5A2008F9F7D /* Bookmark.xcdatamodeld in Sources */ = {isa = PBXBuildFile; fileRef = 4B44B31B2642F5A2008F9F7D /* Bookmark.xcdatamodeld */; };
 		4B6160D825B150E4007DE5B2 /* trackerData.json in Resources */ = {isa = PBXBuildFile; fileRef = 4B6160D725B150E4007DE5B2 /* trackerData.json */; };
 		4B6160DD25B152C5007DE5B2 /* ContentBlockerRulesUserScript.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B6160DC25B152C5007DE5B2 /* ContentBlockerRulesUserScript.swift */; };
 		4B6160E525B152FA007DE5B2 /* ContentBlockerUserScript.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B6160E425B152FA007DE5B2 /* ContentBlockerUserScript.swift */; };
@@ -403,8 +403,8 @@
 		4B44B30F26425F98008F9F7D /* NodeTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = NodeTests.swift; sourceTree = "<group>"; };
 		4B44B31326425FB3008F9F7D /* SpacerNode.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SpacerNode.swift; sourceTree = "<group>"; };
 		4B44B31426425FB3008F9F7D /* PseudoFolder.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = PseudoFolder.swift; sourceTree = "<group>"; };
-		4B44B3182642EA95008F9F7D /* Bookmark 2.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = "Bookmark 2.xcdatamodel"; sourceTree = "<group>"; };
-		4B44B3192642EA95008F9F7D /* Bookmark.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = Bookmark.xcdatamodel; sourceTree = "<group>"; };
+		4B44B31C2642F5A2008F9F7D /* Bookmark 2.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = "Bookmark 2.xcdatamodel"; sourceTree = "<group>"; };
+		4B44B31D2642F5A2008F9F7D /* Bookmark.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = Bookmark.xcdatamodel; sourceTree = "<group>"; };
 		4B6160D225B14E6E007DE5B2 /* TrackerRadarManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TrackerRadarManager.swift; sourceTree = "<group>"; };
 		4B6160D725B150E4007DE5B2 /* trackerData.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; path = trackerData.json; sourceTree = "<group>"; };
 		4B6160DC25B152C5007DE5B2 /* ContentBlockerRulesUserScript.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentBlockerRulesUserScript.swift; sourceTree = "<group>"; };
@@ -1613,7 +1613,7 @@
 		AAC5E4C325D6A6CC007F5990 /* Services */ = {
 			isa = PBXGroup;
 			children = (
-				4B44B3172642EA95008F9F7D /* Bookmark.xcdatamodeld */,
+				4B44B31B2642F5A2008F9F7D /* Bookmark.xcdatamodeld */,
 				4B44B2FE2642535C008F9F7D /* Bookmark.xcmappingmodel */,
 				4B44B3002642542C008F9F7D /* BookmarkMigrationPolicy.swift */,
 				AAC5E4D625D6A710007F5990 /* BookmarkStore.swift */,
@@ -2086,7 +2086,7 @@
 				AA4D700725545EF800C3411E /* UrlEventListener.swift in Sources */,
 				AA92127725ADA07900600CD4 /* WKWebViewExtension.swift in Sources */,
 				B6A9E499261474120067D1B9 /* TimedPixel.swift in Sources */,
-				4B44B31A2642EA95008F9F7D /* Bookmark.xcdatamodeld in Sources */,
+				4B44B31E2642F5A2008F9F7D /* Bookmark.xcdatamodeld in Sources */,
 				B6AAAC24260328950029438D /* ProgressView.swift in Sources */,
 				856C98A6256EB59600A22F1F /* MenuItemSelectors.swift in Sources */,
 				AAFCB37F25E545D400859DD4 /* PublisherExtension.swift in Sources */,
@@ -2920,15 +2920,14 @@
 			sourceTree = "<group>";
 			versionGroupType = wrapper.xcdatamodel;
 		};
-		4B44B3172642EA95008F9F7D /* Bookmark.xcdatamodeld */ = {
+		4B44B31B2642F5A2008F9F7D /* Bookmark.xcdatamodeld */ = {
 			isa = XCVersionGroup;
 			children = (
-				4B44B3182642EA95008F9F7D /* Bookmark 2.xcdatamodel */,
-				4B44B3192642EA95008F9F7D /* Bookmark.xcdatamodel */,
+				4B44B31C2642F5A2008F9F7D /* Bookmark 2.xcdatamodel */,
+				4B44B31D2642F5A2008F9F7D /* Bookmark.xcdatamodel */,
 			);
-			currentVersion = 4B44B3182642EA95008F9F7D /* Bookmark 2.xcdatamodel */;
-			name = Bookmark.xcdatamodeld;
-			path = ../../../../macOS/DuckDuckGo/Bookmarks/Services/Bookmark.xcdatamodeld;
+			currentVersion = 4B44B31C2642F5A2008F9F7D /* Bookmark 2.xcdatamodel */;
+			path = Bookmark.xcdatamodeld;
 			sourceTree = "<group>";
 			versionGroupType = wrapper.xcdatamodel;
 		};
