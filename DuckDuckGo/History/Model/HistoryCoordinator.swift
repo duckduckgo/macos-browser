@@ -26,7 +26,7 @@ protocol HistoryCoordinating: AnyObject {
 
     func addVisit(of url: URL)
     func updateTitleIfNeeded(title: String, url: URL)
-    func burnHistory(except fireproofedDomains: [String])
+    func burnHistory(except fireproofDomains: FireproofDomains)
 
 }
 
@@ -46,7 +46,7 @@ final class HistoryCoordinator: HistoryCoordinating {
     }
 
     func commonInit() {
-        cleanAndReloadHistory()
+        cleanOldHistory()
         scheduleRegularCleaning()
     }
 
@@ -104,18 +104,31 @@ final class HistoryCoordinator: HistoryCoordinating {
         }
     }
 
-    func burnHistory(except fireproofedDomains: [String]) {
+    func burnHistory(except fireproofDomains: FireproofDomains) {
         queue.async(flags: .barrier) { [weak self] in
-            // TODO burn except domains
+            guard let history = self?._history else { return }
+            let exceptions: [HistoryEntry] = history.compactMap({ historyEntry in
+                if fireproofDomains.isURLFireproof(url: historyEntry.url) {
+                    return historyEntry
+                }
+                return nil
+            })
+
+            self?.cleanAndReloadHistory(until: Date(), except: exceptions)
         }
     }
 
-    @objc private func cleanAndReloadHistory() {
+    @objc private func cleanOldHistory() {
+        cleanAndReloadHistory(until: .weekAgo, except: [])
+    }
+
+    private func cleanAndReloadHistory(until date: Date,
+                                       except exceptions: [HistoryEntry]) {
         queue.async(flags: .barrier) { [weak self] in
             guard let self = self else { return }
 
             self.cancellables = Set<AnyCancellable>()
-            self.historyStoring.cleanAndReloadHistory(since: .weekAgo)
+            self.historyStoring.cleanAndReloadHistory(until: date, except: exceptions)
                 .receive(on: self.queue)
                 .sink(receiveCompletion: { completion in
                     switch completion {
@@ -136,7 +149,7 @@ final class HistoryCoordinator: HistoryCoordinating {
         let timer = Timer(fireAt: .midnight,
                           interval: .day,
                           target: self,
-                          selector: #selector(cleanAndReloadHistory),
+                          selector: #selector(cleanOldHistory),
                           userInfo: nil,
                           repeats: true)
         RunLoop.main.add(timer, forMode: RunLoop.Mode.common)

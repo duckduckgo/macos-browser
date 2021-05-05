@@ -23,7 +23,7 @@ import os.log
 
 protocol HistoryStoring {
 
-    func cleanAndReloadHistory(since date: Date) -> Future<History, Error>
+    func cleanAndReloadHistory(until date: Date, except exceptions: [HistoryEntry]) -> Future<History, Error>
     func save(entry: HistoryEntry) -> Future<Void, Error>
 
 }
@@ -43,7 +43,7 @@ final class HistoryStore: HistoryStoring {
 
     private lazy var context = Database.shared.makeContext(concurrencyType: .privateQueueConcurrencyType, name: "History")
 
-    func cleanAndReloadHistory(since date: Date) -> Future<History, Error> {
+    func cleanAndReloadHistory(until date: Date, except exceptions: [HistoryEntry]) -> Future<History, Error> {
         return Future { [weak self] promise in
             self?.context.perform {
                 guard let self = self else {
@@ -53,7 +53,9 @@ final class HistoryStore: HistoryStoring {
 
                 // Clean using batch delete request
                 let deleteRequest = NSFetchRequest<NSFetchRequestResult>(entityName: HistoryEntryManagedObject.className())
-                deleteRequest.predicate = NSPredicate(format: "lastVisit < %@", date as NSDate)
+                var predicates = exceptions.map({ NSPredicate(format: "identifier != %@", argumentArray: [$0.identifier]) })
+                predicates.append(NSPredicate(format: "lastVisit < %@", date as NSDate))
+                deleteRequest.predicate = NSCompoundPredicate(type: .and, subpredicates: predicates)
                 let batchDeleteRequest = NSBatchDeleteRequest(fetchRequest: deleteRequest)
                 batchDeleteRequest.resultType = .resultTypeObjectIDs
 
