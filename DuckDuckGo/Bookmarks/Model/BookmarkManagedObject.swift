@@ -21,10 +21,10 @@ import CoreData
 
 extension BookmarkManagedObject {
 
-    enum Error: Swift.Error {
-        case folderRecursion
-        case folderBookmarkDistinction
-        case bookmarkURLRequirement
+    enum BookmarkError: Error {
+        case folderStructureHasCycle
+        case folderHasURL
+        case bookmarkRequiresURL
     }
 
     public override func validateForInsert() throws {
@@ -41,25 +41,26 @@ extension BookmarkManagedObject {
 
     func validate() throws {
         try validateBookmarkURLRequirement()
-        try validateFolderBookmarkDistinction()
-        try validateFolderStructure()
+        try validateThatFoldersDoNotHaveURLs()
+        try validateThatFolderHierarchyHasNoCycles()
     }
 
     func validateBookmarkURLRequirement() throws {
         if !isFolder, urlEncrypted == nil {
-            throw Error.bookmarkURLRequirement
+            throw BookmarkError.bookmarkRequiresURL
         }
     }
 
-    func validateFolderBookmarkDistinction() throws {
+    func validateThatFoldersDoNotHaveURLs() throws {
         if isFolder, urlEncrypted != nil {
-            throw Error.folderBookmarkDistinction
+            throw BookmarkError.folderHasURL
         }
     }
 
-    func validateFolderStructure() throws {
+    /// Validates that folders do not reference any of their ancestors, causing a cycle.
+    func validateThatFolderHierarchyHasNoCycles() throws {
         if let parent = parentFolder, parent.id == self.id {
-            throw Error.folderRecursion
+            throw BookmarkError.folderStructureHasCycle
         }
 
         var parentUUIDs = Set<UUID>()
@@ -67,7 +68,7 @@ extension BookmarkManagedObject {
 
         while let current = currentFolder {
             if current.parentFolder?.id == self.id {
-                throw Error.folderRecursion
+                throw BookmarkError.folderStructureHasCycle
             }
 
             if let folderID = current.id {
@@ -83,7 +84,7 @@ extension BookmarkManagedObject {
         } ?? [UUID]())
 
         if !childUUIDs.isDisjoint(with: parentUUIDs) {
-            throw Error.folderRecursion
+            throw BookmarkError.folderStructureHasCycle
         }
     }
 

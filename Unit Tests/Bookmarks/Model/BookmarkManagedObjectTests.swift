@@ -67,7 +67,7 @@ class BookmarkManagedObjectTests: XCTestCase {
         bookmark.dateAdded = NSDate.now
 
         XCTAssertThrowsError(try context.save()) { error in
-            XCTAssertEqual(error as? BookmarkManagedObject.Error, BookmarkManagedObject.Error.bookmarkURLRequirement)
+            XCTAssertEqual(error as? BookmarkManagedObject.BookmarkError, BookmarkManagedObject.BookmarkError.bookmarkRequiresURL)
         }
     }
 
@@ -86,7 +86,7 @@ class BookmarkManagedObjectTests: XCTestCase {
         folder.dateAdded = NSDate.now
 
         XCTAssertThrowsError(try context.save()) { error in
-            XCTAssertEqual(error as? BookmarkManagedObject.Error, BookmarkManagedObject.Error.folderBookmarkDistinction)
+            XCTAssertEqual(error as? BookmarkManagedObject.BookmarkError, BookmarkManagedObject.BookmarkError.folderHasURL)
         }
     }
 
@@ -104,7 +104,7 @@ class BookmarkManagedObjectTests: XCTestCase {
         folder.parentFolder = folder
 
         XCTAssertThrowsError(try context.save()) { error in
-            XCTAssertEqual(error as? BookmarkManagedObject.Error, BookmarkManagedObject.Error.folderRecursion)
+            XCTAssertEqual(error as? BookmarkManagedObject.BookmarkError, BookmarkManagedObject.BookmarkError.folderStructureHasCycle)
         }
     }
 
