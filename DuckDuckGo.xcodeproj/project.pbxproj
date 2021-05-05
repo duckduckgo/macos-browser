@@ -62,6 +62,10 @@
 		4B1AD91725FC46FB00261379 /* CoreDataEncryptionTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B1AD91625FC46FB00261379 /* CoreDataEncryptionTests.swift */; };
 		4B1AD92125FC474E00261379 /* CoreDataEncryptionTesting.xcdatamodeld in Sources */ = {isa = PBXBuildFile; fileRef = 4B11060325903E570039B979 /* CoreDataEncryptionTesting.xcdatamodeld */; };
 		4B44B2F726424F37008F9F7D /* CoreDataTestUtilities.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B44B2F626424F37008F9F7D /* CoreDataTestUtilities.swift */; };
+		4B44B2F9264251C1008F9F7D /* BookmarkMigrationTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B44B2F8264251C1008F9F7D /* BookmarkMigrationTests.swift */; };
+		4B44B2FD2642534B008F9F7D /* Bookmark.xcdatamodeld in Sources */ = {isa = PBXBuildFile; fileRef = 4B44B2FA2642534B008F9F7D /* Bookmark.xcdatamodeld */; };
+		4B44B2FF2642535C008F9F7D /* Bookmark.xcmappingmodel in Sources */ = {isa = PBXBuildFile; fileRef = 4B44B2FE2642535C008F9F7D /* Bookmark.xcmappingmodel */; };
+		4B44B3012642542C008F9F7D /* BookmarkMigrationPolicy.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B44B3002642542C008F9F7D /* BookmarkMigrationPolicy.swift */; };
 		4B6160D825B150E4007DE5B2 /* trackerData.json in Resources */ = {isa = PBXBuildFile; fileRef = 4B6160D725B150E4007DE5B2 /* trackerData.json */; };
 		4B6160DD25B152C5007DE5B2 /* ContentBlockerRulesUserScript.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B6160DC25B152C5007DE5B2 /* ContentBlockerRulesUserScript.swift */; };
 		4B6160E525B152FA007DE5B2 /* ContentBlockerUserScript.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B6160E425B152FA007DE5B2 /* ContentBlockerUserScript.swift */; };
@@ -161,7 +165,6 @@
 		AA5D6DAC24A340F700C6FBCE /* WebViewStateObserver.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA5D6DAB24A340F700C6FBCE /* WebViewStateObserver.swift */; };
 		AA63745424C9BF9A00AB2AC4 /* SuggestionContainerTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA63745324C9BF9A00AB2AC4 /* SuggestionContainerTests.swift */; };
 		AA652CB125DD825B009059CC /* LocalBookmarkStoreTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA652CB025DD825B009059CC /* LocalBookmarkStoreTests.swift */; };
-		AA652CC925DD8981009059CC /* Bookmark.xcdatamodeld in Sources */ = {isa = PBXBuildFile; fileRef = AAC5E4D725D6A710007F5990 /* Bookmark.xcdatamodeld */; };
 		AA652CCE25DD9071009059CC /* BookmarkListTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA652CCD25DD9071009059CC /* BookmarkListTests.swift */; };
 		AA652CD325DDA6E9009059CC /* LocalBookmarkManagerTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA652CD225DDA6E9009059CC /* LocalBookmarkManagerTests.swift */; };
 		AA652CDB25DDAB32009059CC /* BookmarkStoreMock.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA652CDA25DDAB32009059CC /* BookmarkStoreMock.swift */; };
@@ -229,7 +232,6 @@
 		AAC5E4D125D6A709007F5990 /* BookmarkManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = AAC5E4CE25D6A709007F5990 /* BookmarkManager.swift */; };
 		AAC5E4D225D6A709007F5990 /* BookmarkList.swift in Sources */ = {isa = PBXBuildFile; fileRef = AAC5E4CF25D6A709007F5990 /* BookmarkList.swift */; };
 		AAC5E4D925D6A711007F5990 /* BookmarkStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = AAC5E4D625D6A710007F5990 /* BookmarkStore.swift */; };
-		AAC5E4DA25D6A711007F5990 /* Bookmark.xcdatamodeld in Sources */ = {isa = PBXBuildFile; fileRef = AAC5E4D725D6A710007F5990 /* Bookmark.xcdatamodeld */; };
 		AAC5E4E425D6BA9C007F5990 /* NSSizeExtension.swift in Sources */ = {isa = PBXBuildFile; fileRef = AAC5E4E325D6BA9C007F5990 /* NSSizeExtension.swift */; };
 		AAC5E4F125D6BF10007F5990 /* AddressBarButton.swift in Sources */ = {isa = PBXBuildFile; fileRef = AAC5E4F025D6BF10007F5990 /* AddressBarButton.swift */; };
 		AAC5E4F625D6BF2C007F5990 /* AddressBarButtonsViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = AAC5E4F525D6BF2C007F5990 /* AddressBarButtonsViewController.swift */; };
@@ -378,6 +380,11 @@
 		4B1AD8A125FC27E200261379 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		4B1AD91625FC46FB00261379 /* CoreDataEncryptionTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CoreDataEncryptionTests.swift; sourceTree = "<group>"; };
 		4B44B2F626424F37008F9F7D /* CoreDataTestUtilities.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CoreDataTestUtilities.swift; sourceTree = "<group>"; };
+		4B44B2F8264251C1008F9F7D /* BookmarkMigrationTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BookmarkMigrationTests.swift; sourceTree = "<group>"; };
+		4B44B2FB2642534B008F9F7D /* Bookmark 2.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = "Bookmark 2.xcdatamodel"; sourceTree = "<group>"; };
+		4B44B2FC2642534B008F9F7D /* Bookmark.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = Bookmark.xcdatamodel; sourceTree = "<group>"; };
+		4B44B2FE2642535C008F9F7D /* Bookmark.xcmappingmodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcmappingmodel; path = Bookmark.xcmappingmodel; sourceTree = "<group>"; };
+		4B44B3002642542C008F9F7D /* BookmarkMigrationPolicy.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = BookmarkMigrationPolicy.swift; sourceTree = "<group>"; };
 		4B6160D225B14E6E007DE5B2 /* TrackerRadarManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TrackerRadarManager.swift; sourceTree = "<group>"; };
 		4B6160D725B150E4007DE5B2 /* trackerData.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; path = trackerData.json; sourceTree = "<group>"; };
 		4B6160DC25B152C5007DE5B2 /* ContentBlockerRulesUserScript.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentBlockerRulesUserScript.swift; sourceTree = "<group>"; };
@@ -550,7 +557,6 @@
 		AAC5E4CE25D6A709007F5990 /* BookmarkManager.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = BookmarkManager.swift; sourceTree = "<group>"; };
 		AAC5E4CF25D6A709007F5990 /* BookmarkList.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = BookmarkList.swift; sourceTree = "<group>"; };
 		AAC5E4D625D6A710007F5990 /* BookmarkStore.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = BookmarkStore.swift; sourceTree = "<group>"; };
-		AAC5E4D825D6A710007F5990 /* Bookmark.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = Bookmark.xcdatamodel; sourceTree = "<group>"; };
 		AAC5E4E325D6BA9C007F5990 /* NSSizeExtension.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = NSSizeExtension.swift; sourceTree = "<group>"; };
 		AAC5E4F025D6BF10007F5990 /* AddressBarButton.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AddressBarButton.swift; sourceTree = "<group>"; };
 		AAC5E4F525D6BF2C007F5990 /* AddressBarButtonsViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AddressBarButtonsViewController.swift; sourceTree = "<group>"; };
@@ -1202,6 +1208,7 @@
 			children = (
 				AA652CCD25DD9071009059CC /* BookmarkListTests.swift */,
 				AA652CD225DDA6E9009059CC /* LocalBookmarkManagerTests.swift */,
+				4B44B2F8264251C1008F9F7D /* BookmarkMigrationTests.swift */,
 			);
 			path = Model;
 			sourceTree = "<group>";
@@ -1576,7 +1583,9 @@
 		AAC5E4C325D6A6CC007F5990 /* Services */ = {
 			isa = PBXGroup;
 			children = (
-				AAC5E4D725D6A710007F5990 /* Bookmark.xcdatamodeld */,
+				4B44B2FA2642534B008F9F7D /* Bookmark.xcdatamodeld */,
+				4B44B2FE2642535C008F9F7D /* Bookmark.xcmappingmodel */,
+				4B44B3002642542C008F9F7D /* BookmarkMigrationPolicy.swift */,
 				AAC5E4D625D6A710007F5990 /* BookmarkStore.swift */,
 			);
 			path = Services;
@@ -2141,6 +2150,7 @@
 				B684592725C93C0500DC17B6 /* Publishers.NestedObjectChanges.swift in Sources */,
 				85A011EA25B4D4CA00FA6A0C /* FindInPageUserScript.swift in Sources */,
 				AA9FF95B24A1EFC20039E328 /* TabViewModel.swift in Sources */,
+				4B44B2FD2642534B008F9F7D /* Bookmark.xcdatamodeld in Sources */,
 				AA9E9A5E25A4867200D1959D /* TabDragAndDropManager.swift in Sources */,
 				B68458C025C7E9E000DC17B6 /* TabCollectionViewModel+NSSecureCoding.swift in Sources */,
 				AA8EDF2724923EC70071C2E8 /* StringExtension.swift in Sources */,
@@ -2158,11 +2168,11 @@
 				AAFCB37A25E5403A00859DD4 /* BurnButton.swift in Sources */,
 				B6A9E47F26146A800067D1B9 /* PixelArguments.swift in Sources */,
 				4B677436255DBEB800025BD8 /* HTTPSExcludedDomains.swift in Sources */,
-				AAC5E4DA25D6A711007F5990 /* Bookmark.xcdatamodeld in Sources */,
 				AAC5E4D225D6A709007F5990 /* BookmarkList.swift in Sources */,
 				4B6160E525B152FA007DE5B2 /* ContentBlockerUserScript.swift in Sources */,
 				AA7412B724D1687000D22FE0 /* TabBarScrollView.swift in Sources */,
 				4B0511C7262CAA5A00F6079C /* PreferenceTableCellView.swift in Sources */,
+				4B44B2FF2642535C008F9F7D /* Bookmark.xcmappingmodel in Sources */,
 				14D9B8FB24F7E089000D4D13 /* AddressBarViewController.swift in Sources */,
 				4B051207262CD24400F6079C /* NSImageViewExtension.swift in Sources */,
 				AAC82C60258B6CB5009B6B42 /* TooltipWindowController.swift in Sources */,
@@ -2174,6 +2184,7 @@
 				AA585D82248FD31100E9A3E2 /* AppDelegate.swift in Sources */,
 				AA72D5F025FEA49900C77619 /* AddEditFavoriteWindow.swift in Sources */,
 				1456D6E124EFCBC300775049 /* TabBarCollectionView.swift in Sources */,
+				4B44B3012642542C008F9F7D /* BookmarkMigrationPolicy.swift in Sources */,
 				4B0511D8262CAA7000F6079C /* PaddedImageButton.swift in Sources */,
 				AABEE69C24A902BB0043105B /* SuggestionContainer.swift in Sources */,
 				B6A9E46B2614618A0067D1B9 /* OperatingSystemVersionExtension.swift in Sources */,
@@ -2249,6 +2260,7 @@
 				4BA1A6D9258C0CB300F6F690 /* DataEncryptionTests.swift in Sources */,
 				B6A5A27E25B9403E00AA7ADA /* FileStoreMock.swift in Sources */,
 				B6AE74342609AFCE005B9B1A /* ProgressEstimationTests.swift in Sources */,
+				4B44B2F9264251C1008F9F7D /* BookmarkMigrationTests.swift in Sources */,
 				4BA1A6FE258C5C1300F6F690 /* EncryptedValueTransformerTests.swift in Sources */,
 				85F69B3C25EDE81F00978E59 /* URLExtensionTests.swift in Sources */,
 				B6DA44112616C0FC00DD1EC2 /* PixelTests.swift in Sources */,
@@ -2267,7 +2279,6 @@
 				4B0511F8262CB20F00F6079C /* DownloadPreferencesTests.swift in Sources */,
 				AA9C362825518C44004B1BA3 /* WebsiteDataStoreMock.swift in Sources */,
 				AA652CB125DD825B009059CC /* LocalBookmarkStoreTests.swift in Sources */,
-				AA652CC925DD8981009059CC /* Bookmark.xcdatamodeld in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -2869,6 +2880,18 @@
 			sourceTree = "<group>";
 			versionGroupType = wrapper.xcdatamodel;
 		};
+		4B44B2FA2642534B008F9F7D /* Bookmark.xcdatamodeld */ = {
+			isa = XCVersionGroup;
+			children = (
+				4B44B2FB2642534B008F9F7D /* Bookmark 2.xcdatamodel */,
+				4B44B2FC2642534B008F9F7D /* Bookmark.xcdatamodel */,
+			);
+			currentVersion = 4B44B2FB2642534B008F9F7D /* Bookmark 2.xcdatamodel */;
+			name = Bookmark.xcdatamodeld;
+			path = ../../../../macOS/DuckDuckGo/Bookmarks/Services/Bookmark.xcdatamodeld;
+			sourceTree = "<group>";
+			versionGroupType = wrapper.xcdatamodel;
+		};
 		4B67742E255DBEB800025BD8 /* HTTPSUpgrade.xcdatamodeld */ = {
 			isa = XCVersionGroup;
 			children = (
@@ -2876,16 +2899,6 @@
 			);
 			currentVersion = 4B67742F255DBEB800025BD8 /* HTTPSUpgrade 3.xcdatamodel */;
 			path = HTTPSUpgrade.xcdatamodeld;
-			sourceTree = "<group>";
-			versionGroupType = wrapper.xcdatamodel;
-		};
-		AAC5E4D725D6A710007F5990 /* Bookmark.xcdatamodeld */ = {
-			isa = XCVersionGroup;
-			children = (
-				AAC5E4D825D6A710007F5990 /* Bookmark.xcdatamodel */,
-			);
-			currentVersion = AAC5E4D825D6A710007F5990 /* Bookmark.xcdatamodel */;
-			path = Bookmark.xcdatamodeld;
 			sourceTree = "<group>";
 			versionGroupType = wrapper.xcdatamodel;
 		};
