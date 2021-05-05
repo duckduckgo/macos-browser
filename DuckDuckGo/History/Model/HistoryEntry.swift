@@ -28,7 +28,7 @@ struct HistoryEntry {
 
     mutating func addVisit() {
         numberOfVisits += 1
-        lastVisit = Date()
+        lastVisit = Date.today
     }
 
 }
@@ -40,7 +40,7 @@ extension HistoryEntry {
                   url: url,
                   title: nil,
                   numberOfVisits: 0,
-                  lastVisit: Date())
+                  lastVisit: Date.today)
     }
 
 }
@@ -51,4 +51,16 @@ extension HistoryEntry: Hashable {
         hasher.combine(identifier.hashValue)
     }
 
+}
+
+extension Date {
+
+    static var today: Date {
+        return Calendar.current.date(
+            bySettingHour: 0,
+            minute: 0,
+            second: 0,
+            of: Date())!
+    }
+    
 }

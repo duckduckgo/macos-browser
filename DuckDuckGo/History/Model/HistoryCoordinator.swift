@@ -182,14 +182,19 @@ final class HistoryCoordinator: HistoryCoordinating {
 
 fileprivate extension TimeInterval {
 
-    static var day: TimeInterval = 60 * 60 * 24 * 7
+    static var day: TimeInterval = 60 * 60 * 24
 
 }
 
 fileprivate extension Date {
 
     static var weekAgo: Date {
-        Date().addingTimeInterval( -1 * TimeInterval.day )
+        let weekAgoDate = Date().addingTimeInterval( -1 * TimeInterval.day * 7 )
+        return Calendar.current.date(
+            bySettingHour: 0,
+            minute: 0,
+            second: 0,
+            of: weekAgoDate)!
     }
 
     static var midnight: Date {
