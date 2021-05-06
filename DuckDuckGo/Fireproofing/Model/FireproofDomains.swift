@@ -79,10 +79,7 @@ internal class FireproofDomains {
         guard let host = url.host else {
             return false
         }
-
-        return fireproofDomains.contains {
-            host.hasSuffix($0)
-        }
+        return isAllowed(fireproofDomain: host)
     }
 
 }

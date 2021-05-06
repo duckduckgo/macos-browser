@@ -134,9 +134,8 @@ class HistoryCoordinatorTests: XCTestCase {
         historyCoordinator.burnHistory(except: fireproofDomains)
         Thread.sleep(forTimeInterval: 0.1)
 
-        XCTAssert(historyStoringMock.cleanAndReloadHistoryExteptions.count == 2)
-        XCTAssert(historyStoringMock.cleanAndReloadHistoryExteptions.first!.url.host!.hasSuffix(fireproofDomain))
-        XCTAssert(historyStoringMock.cleanAndReloadHistoryExteptions.last!.url.host!.hasSuffix(fireproofDomain))
+        XCTAssert(historyStoringMock.cleanAndReloadHistoryExteptions.count == 1)
+        XCTAssert(historyStoringMock.cleanAndReloadHistoryExteptions.first!.url.host!.hasPrefix(fireproofDomain))
     }
 
 }
