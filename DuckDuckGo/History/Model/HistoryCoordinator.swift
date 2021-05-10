@@ -198,11 +198,8 @@ fileprivate extension Date {
     }
 
     static var midnight: Date {
-        return Calendar.current.date(
-            bySettingHour: 23,
-            minute: 59,
-            second: 0,
-            of: Date())!
+        let tomorrow = Calendar.current.date(byAdding: .day, value: 1, to: Date())!
+        return Calendar.current.startOfDay(for: tomorrow)
     }
 
 }
