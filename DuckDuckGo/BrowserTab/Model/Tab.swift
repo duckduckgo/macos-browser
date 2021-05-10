@@ -35,6 +35,7 @@ protocol TabDelegate: class {
 
 }
 
+// swiftlint:disable type_body_length
 final class Tab: NSObject {
 
     enum TabType: Int {
@@ -657,3 +658,4 @@ fileprivate extension WKNavigationAction {
         return targetFrame?.isMainFrame ?? false
     }
 }
+// swiftlint:enable type_body_length
