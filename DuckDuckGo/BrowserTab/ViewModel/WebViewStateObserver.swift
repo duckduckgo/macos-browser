@@ -92,7 +92,7 @@ final class WebViewStateObserver: NSObject {
         case #keyPath(WKWebView.title):
             updateTitle()
             if let title = webView.title, let url = webView.url {
-                tabViewModel.tab.historyCoordinating.updateTitleIfNeeded(title: title, url: url)
+                tabViewModel.tab.updateVisitTitle(title, url: url)
             }
         case #keyPath(WKWebView.estimatedProgress): tabViewModel.progress = webView.estimatedProgress
         default:

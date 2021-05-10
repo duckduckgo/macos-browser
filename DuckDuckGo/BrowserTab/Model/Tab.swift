@@ -379,7 +379,7 @@ final class Tab: NSObject {
         historyCoordinating.addVisit(of: url)
     }
 
-    func updateTitle(_ title: String, url: URL) {
+    func updateVisitTitle(_ title: String, url: URL) {
         historyCoordinating.updateTitleIfNeeded(title: title, url: url)
     }
 
