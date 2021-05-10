@@ -78,7 +78,7 @@ extension NavigationButtonMenuDelegate: NSMenuDelegate {
             return
         }
 
-        selectedTabViewModel.tab.webView.go(to: listItem)
+        selectedTabViewModel.tab.go(to: listItem)
     }
 
     private var listItems: [WKBackForwardListItem] {

@@ -26,11 +26,9 @@ final class WebViewStateObserver: NSObject {
     weak var tabViewModel: TabViewModel?
 
     init(webView: WKWebView,
-         tabViewModel: TabViewModel,
-         historyCoordinating: HistoryCoordinating = HistoryCoordinator.shared) {
+         tabViewModel: TabViewModel) {
         self.webView = webView
         self.tabViewModel = tabViewModel
-        self.historyCoordinating = historyCoordinating
         super.init()
 
         matchFlagValues()
@@ -84,7 +82,7 @@ final class WebViewStateObserver: NSObject {
         case #keyPath(WKWebView.url):
             if let url = webView.url {
                 tabViewModel.tab.url = url
-                addVisit(of: url)
+                tabViewModel.tab.addVisit(of: url)
             }
             updateTitle() // The title might not change if webView doesn't think anything is different so update title here as well
 
@@ -94,7 +92,7 @@ final class WebViewStateObserver: NSObject {
         case #keyPath(WKWebView.title):
             updateTitle()
             if let title = webView.title, let url = webView.url {
-                historyCoordinating.updateTitleIfNeeded(title: title, url: url)
+                tabViewModel.tab.historyCoordinating.updateTitleIfNeeded(title: title, url: url)
             }
         case #keyPath(WKWebView.estimatedProgress): tabViewModel.progress = webView.estimatedProgress
         default:
@@ -110,18 +108,6 @@ final class WebViewStateObserver: NSObject {
         }
 
         tabViewModel?.tab.title = webView?.title
-    }
-
-    // MARK: - History
-
-    var historyCoordinating: HistoryCoordinating
-
-    func addVisit(of url: URL) {
-        historyCoordinating.addVisit(of: url)
-    }
-
-    func updateTitleIfNeeded(title: String, url: URL) {
-        historyCoordinating.updateTitleIfNeeded(title: title, url: url)
     }
 
 }

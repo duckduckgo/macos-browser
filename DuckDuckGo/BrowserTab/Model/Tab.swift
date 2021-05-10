@@ -60,6 +60,7 @@ final class Tab: NSObject {
          faviconService: FaviconService = LocalFaviconService.shared,
          webCacheManager: WebCacheManager = .shared,
          webViewConfiguration: WebViewConfiguration? = nil,
+         historyCoordinating: HistoryCoordinating = HistoryCoordinator.shared,
          url: URL? = nil,
          title: String? = nil,
          error: Error? = nil,
@@ -70,6 +71,7 @@ final class Tab: NSObject {
 
         self.tabType = tabType
         self.faviconService = faviconService
+        self.historyCoordinating = historyCoordinating
         self.url = url
         self.title = title
         self.error = error
@@ -179,12 +181,20 @@ final class Tab: NSObject {
     }
 
     func goForward() {
+        shouldStoreNextVisit = false
         webView.goForward()
         loginDetectionService?.handle(navigationEvent: .userAction)
     }
 
     func goBack() {
+        shouldStoreNextVisit = false
         webView.goBack()
+        loginDetectionService?.handle(navigationEvent: .userAction)
+    }
+
+    func go(to item: WKBackForwardListItem) {
+        shouldStoreNextVisit = false
+        webView.go(to: item)
         loginDetectionService?.handle(navigationEvent: .userAction)
     }
 
@@ -354,6 +364,23 @@ final class Tab: NSObject {
     private func attachFindInPage() {
         userScripts.findInPageScript.model = findInPage
         subscribeToFindInPageTextChange()
+    }
+
+    // MARK: - History
+
+    private var historyCoordinating: HistoryCoordinating
+    private var shouldStoreNextVisit = true
+
+    func addVisit(of url: URL) {
+        guard shouldStoreNextVisit else {
+            shouldStoreNextVisit = true
+            return
+        }
+        historyCoordinating.addVisit(of: url)
+    }
+
+    func updateTitle(_ title: String, url: URL) {
+        historyCoordinating.updateTitleIfNeeded(title: title, url: url)
     }
 
 }
