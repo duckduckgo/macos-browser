@@ -188,13 +188,8 @@ fileprivate extension TimeInterval {
 
 fileprivate extension Date {
 
-    static var weekAgo: Date {
-        let weekAgoDate = Date().addingTimeInterval( -1 * TimeInterval.day * 7 )
-        return Calendar.current.date(
-            bySettingHour: 0,
-            minute: 0,
-            second: 0,
-            of: weekAgoDate)!
+    static var weekAgo: Date! {
+        return Calendar.current.date(byAdding: .weekOfMonth, value: -1, to: Date())!
     }
 
     static var midnight: Date {
