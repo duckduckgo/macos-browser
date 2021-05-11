@@ -124,6 +124,7 @@ final class HistoryStore: HistoryStoring {
                     try self.context.save()
                 } catch {
                     promise(.failure(HistoryStoreError.savingFailed))
+                    return
                 }
 
                 promise(.success(()))
