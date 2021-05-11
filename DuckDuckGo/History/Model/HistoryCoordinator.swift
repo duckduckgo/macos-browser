@@ -141,7 +141,7 @@ final class HistoryCoordinator: HistoryCoordinating {
     }
 
     private func scheduleRegularCleaning() {
-        let timer = Timer(fireAt: .midnight,
+        let timer = Timer(fireAt: .startOfDayTomorrow,
                           interval: .day,
                           target: self,
                           selector: #selector(cleanOldHistory),
@@ -176,25 +176,6 @@ final class HistoryCoordinator: HistoryCoordinating {
                 }
             }, receiveValue: {})
             .store(in: &self.cancellables)
-    }
-
-}
-
-fileprivate extension TimeInterval {
-
-    static var day: TimeInterval = 60 * 60 * 24
-
-}
-
-fileprivate extension Date {
-
-    static var weekAgo: Date! {
-        return Calendar.current.date(byAdding: .weekOfMonth, value: -1, to: Date())!
-    }
-
-    static var midnight: Date {
-        let tomorrow = Calendar.current.date(byAdding: .day, value: 1, to: Date())!
-        return Calendar.current.startOfDay(for: tomorrow)
     }
 
 }
