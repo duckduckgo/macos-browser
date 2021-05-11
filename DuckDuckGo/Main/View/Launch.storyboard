@@ -322,7 +322,7 @@
                                     <items>
                                         <menuItem title="Stop" keyEquivalent="." id="FyY-q1-f0k">
                                             <connections>
-                                                <action selector="stopLoading:" target="Ady-hI-5gd" id="hhx-Ut-x0X"/>
+                                                <action selector="stopLoadingPage:" target="Ady-hI-5gd" id="hhx-Ut-x0X"/>
                                             </connections>
                                         </menuItem>
                                         <menuItem title="Reload Page" keyEquivalent="r" id="aKZ-VG-MOp">
@@ -337,12 +337,28 @@
                                                 <action selector="toggleFullScreen:" target="Ady-hI-5gd" id="dU3-MA-1Rq"/>
                                             </connections>
                                         </menuItem>
+                                        <menuItem isSeparatorItem="YES" id="ZRv-VX-Njo"/>
+                                        <menuItem title="Actual Size" keyEquivalent="0" id="X4G-sF-YZC">
+                                            <connections>
+                                                <action selector="actualSize:" target="Ady-hI-5gd" id="fDo-Ir-xVA"/>
+                                            </connections>
+                                        </menuItem>
+                                        <menuItem title="Zoom In" keyEquivalent="+" id="lMK-tC-RJd">
+                                            <connections>
+                                                <action selector="zoomIn:" target="Ady-hI-5gd" id="Zdk-lO-aZk"/>
+                                            </connections>
+                                        </menuItem>
+                                        <menuItem title="Zoom Out" keyEquivalent="-" id="flw-Fc-cm6">
+                                            <connections>
+                                                <action selector="zoomOut:" target="Ady-hI-5gd" id="prL-67-8bi"/>
+                                            </connections>
+                                        </menuItem>
                                     </items>
                                 </menu>
                             </menuItem>
                             <menuItem title="History" id="sRV-6k-P2o">
                                 <modifierMask key="keyEquivalentModifierMask"/>
-                                <menu key="submenu" title="History" autoenablesItems="NO" id="yLz-zX-NKV">
+                                <menu key="submenu" title="History" id="yLz-zX-NKV">
                                     <items>
                                         <menuItem title="Back" enabled="NO" keyEquivalent="[" id="VWV-vB-Mtc">
                                             <connections>
@@ -553,6 +569,7 @@ CQ
                             </menuItem>
                         </items>
                         <connections>
+                            <outlet property="actualSizeMenuItem" destination="X4G-sF-YZC" id="7Yi-ui-Gp4"/>
                             <outlet property="backMenuItem" destination="VWV-vB-Mtc" id="Keo-4E-dRW"/>
                             <outlet property="bookmarkThisPageMenuItem" destination="Nkm-zy-JXD" id="HVV-JT-gvV"/>
                             <outlet property="bookmarksMenuItem" destination="xf8-PW-TOA" id="Pfa-kN-nIj"/>
@@ -567,8 +584,13 @@ CQ
                             <outlet property="homeMenuItem" destination="FPm-eZ-BQ8" id="Taj-EN-6R8"/>
                             <outlet property="printMenuItem" destination="uFk-FD-FTB" id="mOP-Xp-myS"/>
                             <outlet property="printSeparatorItem" destination="anH-0y-7dE" id="E6b-rl-clQ"/>
+                            <outlet property="reloadMenuItem" destination="aKZ-VG-MOp" id="J3D-X3-Xg3"/>
                             <outlet property="reopenLastClosedTabMenuItem" destination="c3l-v1-kxk" id="eGw-Dg-del"/>
                             <outlet property="sendFeedbackMenuItem" destination="V8t-Ts-q0L" id="qwz-Oh-HGm"/>
+                            <outlet property="stopMenuItem" destination="FyY-q1-f0k" id="BFN-Kd-aAb"/>
+                            <outlet property="toggleFullscreenMenuItem" destination="4J7-dP-txa" id="lyl-pp-TR0"/>
+                            <outlet property="zoomInMenuItem" destination="lMK-tC-RJd" id="Ddo-RX-A6Z"/>
+                            <outlet property="zoomOutMenuItem" destination="flw-Fc-cm6" id="1AB-0r-vvx"/>
                         </connections>
                     </menu>
                     <connections>

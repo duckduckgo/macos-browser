@@ -96,10 +96,6 @@ extension MainWindowController: NSWindowDelegate {
         return [.fullScreen, .autoHideMenuBar]
     }
 
-    func windowDidBecomeMain(_ notification: Notification) {
-        mainViewController.windowDidBecomeMain()
-    }
-
     func windowDidBecomeKey(_ notification: Notification) {
         WindowControllersManager.shared.lastKeyMainWindowController = self
     }
@@ -110,10 +106,6 @@ extension MainWindowController: NSWindowDelegate {
 
     func windowWillExitFullScreen(_ notification: Notification) {
         mainViewController.tabBarViewController.draggingSpace.isHidden = false
-    }
-
-    func windowDidResignMain(_ notification: Notification) {
-        mainViewController.windowDidResignMain()
     }
 
     func windowWillClose(_ notification: Notification) {
