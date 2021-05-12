@@ -14,6 +14,7 @@
 		1456D6E124EFCBC300775049 /* TabBarCollectionView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1456D6E024EFCBC300775049 /* TabBarCollectionView.swift */; };
 		14D9B8FB24F7E089000D4D13 /* AddressBarViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 14D9B8F924F7E089000D4D13 /* AddressBarViewController.swift */; };
 		14D9B90224F91316000D4D13 /* FocusRingView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 14D9B90124F91316000D4D13 /* FocusRingView.swift */; };
+		336D5B18262D8D3C0052E0C9 /* findinpage.js in Resources */ = {isa = PBXBuildFile; fileRef = 336D5AEF262D8D3C0052E0C9 /* findinpage.js */; };
 		4B02198825E05FAC00ED7DEA /* login-detection.js in Resources */ = {isa = PBXBuildFile; fileRef = 4B02197D25E05FAC00ED7DEA /* login-detection.js */; };
 		4B02198925E05FAC00ED7DEA /* FireproofingURLExtensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B02197F25E05FAC00ED7DEA /* FireproofingURLExtensions.swift */; };
 		4B02198A25E05FAC00ED7DEA /* FireproofDomains.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B02198125E05FAC00ED7DEA /* FireproofDomains.swift */; };
@@ -70,6 +71,7 @@
 		4B65027525E5F2A70054432E /* DefaultBrowserPromptView.xib in Resources */ = {isa = PBXBuildFile; fileRef = 4B65027425E5F2A70054432E /* DefaultBrowserPromptView.xib */; };
 		4B65027A25E5F2B10054432E /* DefaultBrowserPromptView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B65027925E5F2B10054432E /* DefaultBrowserPromptView.swift */; };
 		4B65028A25E6CBF40054432E /* NibLoadable.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B65028925E6CBF40054432E /* NibLoadable.swift */; };
+		4B65143E263924B5005B46EB /* EmailUrlExtensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B65143D263924B5005B46EB /* EmailUrlExtensions.swift */; };
 		4B677431255DBEB800025BD8 /* BloomFilterWrapper.mm in Sources */ = {isa = PBXBuildFile; fileRef = 4B677424255DBEB800025BD8 /* BloomFilterWrapper.mm */; };
 		4B677432255DBEB800025BD8 /* httpsMobileV2BloomSpec.json in Resources */ = {isa = PBXBuildFile; fileRef = 4B677427255DBEB800025BD8 /* httpsMobileV2BloomSpec.json */; };
 		4B677433255DBEB800025BD8 /* httpsMobileV2Bloom.bin in Resources */ = {isa = PBXBuildFile; fileRef = 4B677428255DBEB800025BD8 /* httpsMobileV2Bloom.bin */; };
@@ -82,6 +84,7 @@
 		4B677442255DBEEA00025BD8 /* Database.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B677440255DBEEA00025BD8 /* Database.swift */; };
 		4B67744B255DBF3A00025BD8 /* BloomFilter.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4B677449255DBF3A00025BD8 /* BloomFilter.cpp */; };
 		4B677450255DBFA300025BD8 /* HashExtension.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B67744F255DBFA300025BD8 /* HashExtension.swift */; };
+		4B7727A92645E1B800B64301 /* BrowserServicesKit in Frameworks */ = {isa = PBXBuildFile; productRef = 4B7727A82645E1B800B64301 /* BrowserServicesKit */; };
 		4B82E9B325B69E3E00656FE7 /* TrackerRadarKit in Frameworks */ = {isa = PBXBuildFile; productRef = 4B82E9B225B69E3E00656FE7 /* TrackerRadarKit */; };
 		4B82E9B925B6A05800656FE7 /* DetectedTrackerTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B82E9B825B6A05800656FE7 /* DetectedTrackerTests.swift */; };
 		4B82E9C125B6A1CD00656FE7 /* TrackerRadarManagerTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B82E9C025B6A1CD00656FE7 /* TrackerRadarManagerTests.swift */; };
@@ -102,7 +105,6 @@
 		4BB88B5025B7BA2B006F6B06 /* TabInstrumentation.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4BB88B4F25B7BA2B006F6B06 /* TabInstrumentation.swift */; };
 		4BB88B5B25B7BA50006F6B06 /* Instruments.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4BB88B5A25B7BA50006F6B06 /* Instruments.swift */; };
 		8511E18425F82B34002F516B /* 01_Fire_really_small.json in Resources */ = {isa = PBXBuildFile; fileRef = 8511E18325F82B34002F516B /* 01_Fire_really_small.json */; };
-		8524389725FA49B900DE9B83 /* BrowserServicesKit in Frameworks */ = {isa = PBXBuildFile; productRef = 8524389625FA49B900DE9B83 /* BrowserServicesKit */; };
 		853014D625E671A000FB8205 /* PageObserverUserScript.swift in Sources */ = {isa = PBXBuildFile; fileRef = 853014D525E671A000FB8205 /* PageObserverUserScript.swift */; };
 		8546DE6225C03056000CA5E1 /* UserAgentTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8546DE6125C03056000CA5E1 /* UserAgentTests.swift */; };
 		85480F8A25CDC360009424E3 /* Launch.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 85480F8925CDC360009424E3 /* Launch.storyboard */; };
@@ -120,7 +122,6 @@
 		85A0116925AF1D8900FA6A0C /* FindInPageViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 85A0116825AF1D8900FA6A0C /* FindInPageViewController.swift */; };
 		85A0117425AF2EDF00FA6A0C /* FindInPage.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 85A0117325AF2EDF00FA6A0C /* FindInPage.storyboard */; };
 		85A0118225AF60E700FA6A0C /* FindInPageModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 85A0118125AF60E700FA6A0C /* FindInPageModel.swift */; };
-		85A011E525B4D49400FA6A0C /* findinpage.js in Resources */ = {isa = PBXBuildFile; fileRef = 85A011E425B4D49400FA6A0C /* findinpage.js */; };
 		85A011EA25B4D4CA00FA6A0C /* FindInPageUserScript.swift in Sources */ = {isa = PBXBuildFile; fileRef = 85A011E925B4D4CA00FA6A0C /* FindInPageUserScript.swift */; };
 		85AC3AEF25D5CE9800C7D2AA /* UserScripts.swift in Sources */ = {isa = PBXBuildFile; fileRef = 85AC3AEE25D5CE9800C7D2AA /* UserScripts.swift */; };
 		85AC3AF725D5DBFD00C7D2AA /* DataExtension.swift in Sources */ = {isa = PBXBuildFile; fileRef = 85AC3AF625D5DBFD00C7D2AA /* DataExtension.swift */; };
@@ -338,6 +339,7 @@
 		1456D6E024EFCBC300775049 /* TabBarCollectionView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TabBarCollectionView.swift; sourceTree = "<group>"; };
 		14D9B8F924F7E089000D4D13 /* AddressBarViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AddressBarViewController.swift; sourceTree = "<group>"; };
 		14D9B90124F91316000D4D13 /* FocusRingView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FocusRingView.swift; sourceTree = "<group>"; };
+		336D5AEF262D8D3C0052E0C9 /* findinpage.js */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.javascript; path = findinpage.js; sourceTree = "<group>"; };
 		4B02197D25E05FAC00ED7DEA /* login-detection.js */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.javascript; path = "login-detection.js"; sourceTree = "<group>"; };
 		4B02197F25E05FAC00ED7DEA /* FireproofingURLExtensions.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = FireproofingURLExtensions.swift; sourceTree = "<group>"; };
 		4B02198125E05FAC00ED7DEA /* FireproofDomains.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = FireproofDomains.swift; sourceTree = "<group>"; };
@@ -394,6 +396,7 @@
 		4B65027425E5F2A70054432E /* DefaultBrowserPromptView.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = DefaultBrowserPromptView.xib; sourceTree = "<group>"; };
 		4B65027925E5F2B10054432E /* DefaultBrowserPromptView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DefaultBrowserPromptView.swift; sourceTree = "<group>"; };
 		4B65028925E6CBF40054432E /* NibLoadable.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NibLoadable.swift; sourceTree = "<group>"; };
+		4B65143D263924B5005B46EB /* EmailUrlExtensions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EmailUrlExtensions.swift; sourceTree = "<group>"; };
 		4B677424255DBEB800025BD8 /* BloomFilterWrapper.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = BloomFilterWrapper.mm; sourceTree = "<group>"; };
 		4B677425255DBEB800025BD8 /* BloomFilterWrapper.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = BloomFilterWrapper.h; sourceTree = "<group>"; };
 		4B677427255DBEB800025BD8 /* httpsMobileV2BloomSpec.json */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.json; path = httpsMobileV2BloomSpec.json; sourceTree = "<group>"; };
@@ -445,7 +448,6 @@
 		85A0116825AF1D8900FA6A0C /* FindInPageViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FindInPageViewController.swift; sourceTree = "<group>"; };
 		85A0117325AF2EDF00FA6A0C /* FindInPage.storyboard */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; path = FindInPage.storyboard; sourceTree = "<group>"; };
 		85A0118125AF60E700FA6A0C /* FindInPageModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FindInPageModel.swift; sourceTree = "<group>"; };
-		85A011E425B4D49400FA6A0C /* findinpage.js */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.javascript; name = findinpage.js; path = Submodules/ios_js_support/src/findinpage.js; sourceTree = SOURCE_ROOT; };
 		85A011E925B4D4CA00FA6A0C /* FindInPageUserScript.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FindInPageUserScript.swift; sourceTree = "<group>"; };
 		85AC3AEE25D5CE9800C7D2AA /* UserScripts.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UserScripts.swift; sourceTree = "<group>"; };
 		85AC3AF625D5DBFD00C7D2AA /* DataExtension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DataExtension.swift; sourceTree = "<group>"; };
@@ -655,7 +657,7 @@
 				85AE2FF224A33A2D002D507F /* WebKit.framework in Frameworks */,
 				B65783F525F8ACA400D8DB33 /* Punnycode in Frameworks */,
 				4B82E9B325B69E3E00656FE7 /* TrackerRadarKit in Frameworks */,
-				8524389725FA49B900DE9B83 /* BrowserServicesKit in Frameworks */,
+				4B7727A92645E1B800B64301 /* BrowserServicesKit in Frameworks */,
 				85FF55C825F82E4F00E2AB99 /* Lottie in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -679,6 +681,23 @@
 				142879D924CE1179005419BB /* SuggestionViewModelTests.swift */,
 			);
 			path = ViewModel;
+			sourceTree = "<group>";
+		};
+		336D5AEA262D8D3C0052E0C9 /* duckduckgo-find-in-page */ = {
+			isa = PBXGroup;
+			children = (
+				336D5AEE262D8D3C0052E0C9 /* dist */,
+			);
+			name = "duckduckgo-find-in-page";
+			path = "Submodules/duckduckgo-find-in-page";
+			sourceTree = SOURCE_ROOT;
+		};
+		336D5AEE262D8D3C0052E0C9 /* dist */ = {
+			isa = PBXGroup;
+			children = (
+				336D5AEF262D8D3C0052E0C9 /* findinpage.js */,
+			);
+			path = dist;
 			sourceTree = "<group>";
 		};
 		4B02197B25E05FAC00ED7DEA /* Fireproofing */ = {
@@ -824,6 +843,14 @@
 			path = ContentBlocker;
 			sourceTree = "<group>";
 		};
+		4B65143C26392483005B46EB /* Email */ = {
+			isa = PBXGroup;
+			children = (
+				4B65143D263924B5005B46EB /* EmailUrlExtensions.swift */,
+			);
+			path = Email;
+			sourceTree = "<group>";
+		};
 		4B677422255DBEB800025BD8 /* Smarter Encryption */ = {
 			isa = PBXGroup;
 			children = (
@@ -876,7 +903,7 @@
 		4B677447255DBF1400025BD8 /* Submodules */ = {
 			isa = PBXGroup;
 			children = (
-				85A011DB25B4D44800FA6A0C /* ios-js-support */,
+				336D5AEA262D8D3C0052E0C9 /* duckduckgo-find-in-page */,
 				4B677448255DBF2300025BD8 /* bloom_cpp */,
 			);
 			name = Submodules;
@@ -1000,14 +1027,6 @@
 			path = FindInPage;
 			sourceTree = "<group>";
 		};
-		85A011DB25B4D44800FA6A0C /* ios-js-support */ = {
-			isa = PBXGroup;
-			children = (
-				85A011E425B4D49400FA6A0C /* findinpage.js */,
-			);
-			name = "ios-js-support";
-			sourceTree = "<group>";
-		};
 		85AC3B1525D9BBFA00C7D2AA /* Configuration */ = {
 			isa = PBXGroup;
 			children = (
@@ -1106,13 +1125,15 @@
 		AA585D80248FD31100E9A3E2 /* DuckDuckGo */ = {
 			isa = PBXGroup;
 			children = (
+				B6A9E47526146A440067D1B9 /* API */,
 				AA4D700525545EDE00C3411E /* AppDelegate */,
 				AAC5E4C025D6A6A9007F5990 /* Bookmarks */,
 				AA86491B24D837DE001BABEE /* BrowserTab */,
 				AA6820E825503A21005ED0D5 /* Burning */,
 				AA86491324D831B9001BABEE /* Common */,
-				4B6160D125B14E5E007DE5B2 /* ContentBlocker */,
 				85D33F1025C82E93002B91A6 /* Configuration */,
+				4B6160D125B14E5E007DE5B2 /* ContentBlocker */,
+				4B65143C26392483005B46EB /* Email */,
 				8556A60C256C15C60092FA9D /* FileDownload */,
 				85A0115D25AF1C4700FA6A0C /* FindInPage */,
 				4B02197B25E05FAC00ED7DEA /* Fireproofing */,
@@ -1120,20 +1141,19 @@
 				AA585DB02490E6FA00E9A3E2 /* Main */,
 				AA97BF4425135CB60014931A /* Menus */,
 				AA86491524D83384001BABEE /* NavigationBar */,
+				4B0511A2262CAA5A00F6079C /* Preferences */,
 				4B677422255DBEB800025BD8 /* Smarter Encryption */,
+				B68458AE25C7E75100DC17B6 /* State Restoration */,
+				B6A9E44E26142AF90067D1B9 /* Statistics */,
 				4B677447255DBF1400025BD8 /* Submodules */,
 				AACB8E7224A4C8BC005F2218 /* Suggestions */,
 				AA86491124D8318F001BABEE /* TabBar */,
 				AAE8B0FD258A416F00E81239 /* Tooltip */,
 				AA6EF9AE25066F99004754E6 /* Windows */,
-				B68458AE25C7E75100DC17B6 /* State Restoration */,
-				B6A9E47526146A440067D1B9 /* API */,
-				B6A9E44E26142AF90067D1B9 /* Statistics */,
-				4B0511A2262CAA5A00F6079C /* Preferences */,
-				AA585D8B248FD31400E9A3E2 /* DuckDuckGo.entitlements */,
-				4B677454255DC18000025BD8 /* Bridging.h */,
-				AA585D8A248FD31400E9A3E2 /* Info.plist */,
 				AA585D85248FD31400E9A3E2 /* Assets.xcassets */,
+				4B677454255DC18000025BD8 /* Bridging.h */,
+				AA585D8B248FD31400E9A3E2 /* DuckDuckGo.entitlements */,
+				AA585D8A248FD31400E9A3E2 /* Info.plist */,
 			);
 			path = DuckDuckGo;
 			sourceTree = "<group>";
@@ -1828,6 +1848,7 @@
 			buildPhases = (
 				AA585D7A248FD31100E9A3E2 /* Sources */,
 				AA8EDF2824925E940071C2E8 /* Swift Lint */,
+				85CA9A2226455B3500145393 /* Check Filename Headers */,
 				AA585D7B248FD31100E9A3E2 /* Frameworks */,
 				AA585D7C248FD31100E9A3E2 /* Resources */,
 			);
@@ -1840,7 +1861,7 @@
 				4B82E9B225B69E3E00656FE7 /* TrackerRadarKit */,
 				85FF55C725F82E4F00E2AB99 /* Lottie */,
 				B65783F425F8ACA400D8DB33 /* Punnycode */,
-				8524389625FA49B900DE9B83 /* BrowserServicesKit */,
+				4B7727A82645E1B800B64301 /* BrowserServicesKit */,
 			);
 			productName = DuckDuckGo;
 			productReference = AA585D7E248FD31100E9A3E2 /* DuckDuckGo Privacy Browser.app */;
@@ -1904,8 +1925,8 @@
 				4B82E9B125B69E3E00656FE7 /* XCRemoteSwiftPackageReference "TrackerRadarKit" */,
 				85FF55C625F82E4F00E2AB99 /* XCRemoteSwiftPackageReference "lottie-ios" */,
 				B65783F325F8ACA400D8DB33 /* XCRemoteSwiftPackageReference "PunycodeSwift" */,
-				8524389525FA49B900DE9B83 /* XCRemoteSwiftPackageReference "BrowserServicesKit" */,
 				B6DA44152616C13800DD1EC2 /* XCRemoteSwiftPackageReference "OHHTTPStubs" */,
+				4B7727A72645E1B800B64301 /* XCRemoteSwiftPackageReference "BrowserServicesKit" */,
 			);
 			productRefGroup = AA585D7F248FD31100E9A3E2 /* Products */;
 			projectDirPath = "";
@@ -1939,7 +1960,6 @@
 				AA80EC89256C49B8007083E7 /* Localizable.strings in Resources */,
 				AAE8B102258A41C000E81239 /* Tooltip.storyboard in Resources */,
 				AA68C3D72490F821001B8783 /* README.md in Resources */,
-				85A011E525B4D49400FA6A0C /* findinpage.js in Resources */,
 				AA585D86248FD31400E9A3E2 /* Assets.xcassets in Resources */,
 				AA585D89248FD31400E9A3E2 /* Main.storyboard in Resources */,
 				4B6160F225B15792007DE5B2 /* contentblockerrules.js in Resources */,
@@ -1964,6 +1984,7 @@
 				4B0511C1262CAA5A00F6079C /* PrivacySecurityPreferencesTableCellView.xib in Resources */,
 				4B0511D0262CAA5A00F6079C /* AppearancePreferencesTableCellView.xib in Resources */,
 				4B6160F725B157BB007DE5B2 /* contentblocker.js in Resources */,
+				336D5B18262D8D3C0052E0C9 /* findinpage.js in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -1977,6 +1998,24 @@
 /* End PBXResourcesBuildPhase section */
 
 /* Begin PBXShellScriptBuildPhase section */
+		85CA9A2226455B3500145393 /* Check Filename Headers */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputFileListPaths = (
+			);
+			inputPaths = (
+			);
+			name = "Check Filename Headers";
+			outputFileListPaths = (
+			);
+			outputPaths = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "function check_filename_matches_header() {\n\n   filename=`basename \"$1\"`\n\n   grep -q $filename \"$1\"\n\n   if [ \"$?\" -ne \"0\" ]; then\n     echo \"$1:2:0: warning: File name does not match header\"\n   fi\n\n}\n\nexport -f check_filename_matches_header\n\nfind . -iname \"*.swift\" -type f -print0 | xargs -0 -I % bash -c 'check_filename_matches_header \"%\"'\n";
+		};
 		AA8EDF2824925E940071C2E8 /* Swift Lint */ = {
 			isa = PBXShellScriptBuildPhase;
 			buildActionMask = 2147483647;
@@ -2130,6 +2169,7 @@
 				AAA0CC6A253CC43C0079BC96 /* WKUserContentControllerExtension.swift in Sources */,
 				B6A9E45C261460350067D1B9 /* APIRequest.swift in Sources */,
 				AA9FF95D24A1FA1C0039E328 /* TabCollection.swift in Sources */,
+				4B65143E263924B5005B46EB /* EmailUrlExtensions.swift in Sources */,
 				85A0118225AF60E700FA6A0C /* FindInPageModel.swift in Sources */,
 				B6DA44022616B28300DD1EC2 /* PixelDataStore.swift in Sources */,
 				B6A9E45326142B070067D1B9 /* Pixel.swift in Sources */,
@@ -2478,7 +2518,7 @@
 					"$(inherited)",
 					"@executable_path/../Frameworks",
 				);
-				MARKETING_VERSION = 0.6.14;
+				MARKETING_VERSION = 0.6.15;
 				PRODUCT_BUNDLE_IDENTIFIER = com.duckduckgo.macos.browser.debug;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE_SPECIFIER = "";
@@ -2665,7 +2705,7 @@
 					"$(inherited)",
 					"@executable_path/../Frameworks",
 				);
-				MARKETING_VERSION = 0.6.14;
+				MARKETING_VERSION = 0.6.15;
 				PRODUCT_BUNDLE_IDENTIFIER = com.duckduckgo.macos.browser.debug;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_ACTIVE_COMPILATION_CONDITIONS = "FEEDBACK $(inherited)";
@@ -2691,7 +2731,7 @@
 					"$(inherited)",
 					"@executable_path/../Frameworks",
 				);
-				MARKETING_VERSION = 0.6.14;
+				MARKETING_VERSION = 0.6.15;
 				PRODUCT_BUNDLE_IDENTIFIER = com.duckduckgo.macos.browser;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_ACTIVE_COMPILATION_CONDITIONS = FEEDBACK;
@@ -2794,20 +2834,20 @@
 /* End XCConfigurationList section */
 
 /* Begin XCRemoteSwiftPackageReference section */
+		4B7727A72645E1B800B64301 /* XCRemoteSwiftPackageReference "BrowserServicesKit" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/duckduckgo/BrowserServicesKit.git";
+			requirement = {
+				kind = revision;
+				revision = d8d6579ff2b1e78f5a2e264b4a9a2cf77701e7eb;
+			};
+		};
 		4B82E9B125B69E3E00656FE7 /* XCRemoteSwiftPackageReference "TrackerRadarKit" */ = {
 			isa = XCRemoteSwiftPackageReference;
 			repositoryURL = "https://github.com/duckduckgo/TrackerRadarKit.git";
 			requirement = {
 				kind = upToNextMajorVersion;
 				minimumVersion = 1.0.2;
-			};
-		};
-		8524389525FA49B900DE9B83 /* XCRemoteSwiftPackageReference "BrowserServicesKit" */ = {
-			isa = XCRemoteSwiftPackageReference;
-			repositoryURL = "git@github.com:more-duckduckgo-org/BrowserServicesKit.git";
-			requirement = {
-				kind = upToNextMajorVersion;
-				minimumVersion = 0.7.0;
 			};
 		};
 		85FF55C625F82E4F00E2AB99 /* XCRemoteSwiftPackageReference "lottie-ios" */ = {
@@ -2837,15 +2877,15 @@
 /* End XCRemoteSwiftPackageReference section */
 
 /* Begin XCSwiftPackageProductDependency section */
+		4B7727A82645E1B800B64301 /* BrowserServicesKit */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 4B7727A72645E1B800B64301 /* XCRemoteSwiftPackageReference "BrowserServicesKit" */;
+			productName = BrowserServicesKit;
+		};
 		4B82E9B225B69E3E00656FE7 /* TrackerRadarKit */ = {
 			isa = XCSwiftPackageProductDependency;
 			package = 4B82E9B125B69E3E00656FE7 /* XCRemoteSwiftPackageReference "TrackerRadarKit" */;
 			productName = TrackerRadarKit;
-		};
-		8524389625FA49B900DE9B83 /* BrowserServicesKit */ = {
-			isa = XCSwiftPackageProductDependency;
-			package = 8524389525FA49B900DE9B83 /* XCRemoteSwiftPackageReference "BrowserServicesKit" */;
-			productName = BrowserServicesKit;
 		};
 		85FF55C725F82E4F00E2AB99 /* Lottie */ = {
 			isa = XCSwiftPackageProductDependency;

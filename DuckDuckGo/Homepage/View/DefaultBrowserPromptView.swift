@@ -18,7 +18,7 @@
 
 import AppKit
 
-protocol DefaultBrowserPromptViewDelegate: class {
+protocol DefaultBrowserPromptViewDelegate: AnyObject {
     func defaultBrowserPromptViewDismissed(_ view: DefaultBrowserPromptView)
     func defaultBrowserPromptViewRequestedDefaultBrowserPrompt(_ view: DefaultBrowserPromptView)
 }

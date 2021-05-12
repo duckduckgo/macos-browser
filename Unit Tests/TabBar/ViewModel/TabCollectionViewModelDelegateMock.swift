@@ -1,5 +1,5 @@
 //
-//  File.swift
+//  TabCollectionViewModelDelegateMock.swift
 //
 //  Copyright © 2020 DuckDuckGo. All rights reserved.
 //

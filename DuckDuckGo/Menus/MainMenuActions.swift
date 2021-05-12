@@ -328,7 +328,7 @@ extension MainViewController {
 }
 
 extension MainViewController: NSMenuItemValidation {
-
+    
     // swiftlint:disable cyclomatic_complexity
     func validateMenuItem(_ menuItem: NSMenuItem) -> Bool {
         switch menuItem.action {

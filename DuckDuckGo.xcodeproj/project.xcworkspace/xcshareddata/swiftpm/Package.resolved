@@ -2,15 +2,6 @@
   "object": {
     "pins": [
       {
-        "package": "BrowserServicesKit",
-        "repositoryURL": "git@github.com:more-duckduckgo-org/BrowserServicesKit.git",
-        "state": {
-          "branch": null,
-          "revision": "91f79e28800ffa58dfcadcbfb044aa19db4e0d10",
-          "version": "0.7.1"
-        }
-      },
-      {
         "package": "Lottie",
         "repositoryURL": "https://github.com/airbnb/lottie-ios",
         "state": {
