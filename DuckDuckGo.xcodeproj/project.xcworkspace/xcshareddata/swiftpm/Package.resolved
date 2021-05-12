@@ -2,24 +2,6 @@
   "object": {
     "pins": [
       {
-        "package": "BrowserServicesKit",
-        "repositoryURL": "https://github.com/duckduckgo/BrowserServicesKit.git",
-        "state": {
-          "branch": "main",
-          "revision": "a8f94445580bc1bc89536ecd44aefce129a06d45",
-          "version": null
-        }
-      },
-      {
-        "package": "GRDB",
-        "repositoryURL": "https://github.com/duckduckgo/GRDB.swift.git",
-        "state": {
-          "branch": null,
-          "revision": "e5714d4b6ee1651d2271b04ae85aaf5a327fe70a",
-          "version": null
-        }
-      },
-      {
         "package": "Lottie",
         "repositoryURL": "https://github.com/airbnb/lottie-ios",
         "state": {
