@@ -247,6 +247,7 @@ final class Tab: NSObject {
     private func setupWebView(shouldLoadInBackground: Bool) {
         webView.navigationDelegate = self
         webView.allowsBackForwardNavigationGestures = true
+        webView.allowsMagnification = true
 
         subscribeToUserScripts()
         subscribeToOpenExternalUrlEvents()

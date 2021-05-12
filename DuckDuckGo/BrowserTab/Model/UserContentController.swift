@@ -33,7 +33,7 @@ final class UserContentController: WKUserContentController {
     }
 
     func installContentBlockingRules(publisher: AnyPublisher<WKContentRuleList?, Never>) {
-        blockingRulesUpdatedCancellable = publisher.sink { [weak self] rules in
+        blockingRulesUpdatedCancellable = publisher.receive(on: RunLoop.main).sink { [weak self] rules in
             dispatchPrecondition(condition: .onQueue(.main))
 
             guard let self = self,
