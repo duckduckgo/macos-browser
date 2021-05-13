@@ -68,7 +68,6 @@ final class LocalBookmarkManager: BookmarkManager {
 
     // MARK: - Bookmarks
 
-    // TODO: Clean this up. There are different types of data to load here, this can be done cleaner than 3 separate async requests.
     func loadBookmarks() {
         bookmarkStore.loadAll(type: .topLevelEntities) { [weak self] (entities, error) in
             guard error == nil, let entities = entities else {
@@ -145,10 +144,6 @@ final class LocalBookmarkManager: BookmarkManager {
 
     func update(bookmark: Bookmark) {
         guard list != nil else { return }
-        guard let latestBookmark = getBookmark(for: bookmark.url) else {
-            os_log("LocalBookmarkManager: Failed to update bookmark - not in the list.", type: .error)
-            return
-        }
 
         list?.update(with: bookmark)
         bookmarkStore.update(bookmark: bookmark)
@@ -157,10 +152,6 @@ final class LocalBookmarkManager: BookmarkManager {
 
     func updateUrl(of bookmark: Bookmark, to newUrl: URL) -> Bookmark? {
         guard list != nil else { return nil }
-        guard let latestBookmark = getBookmark(for: bookmark.url) else {
-            os_log("LocalBookmarkManager: Failed to update bookmark url - not in the list.", type: .error)
-            return nil
-        }
 
         guard let newBookmark = list?.updateUrl(of: bookmark, to: newUrl) else {
             os_log("LocalBookmarkManager: Failed to update URL of bookmark.", type: .error)
