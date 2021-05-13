@@ -1,5 +1,5 @@
 //
-//  ViewModel.swift
+//  WKBackForwardListItemViewModel.swift
 //
 //  Copyright © 2020 DuckDuckGo. All rights reserved.
 //
