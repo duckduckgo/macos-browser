@@ -144,6 +144,10 @@ final class LocalBookmarkManager: BookmarkManager {
 
     func update(bookmark: Bookmark) {
         guard list != nil else { return }
+        guard getBookmark(for: bookmark.url) != nil else {
+            os_log("LocalBookmarkManager: Failed to update bookmark - not in the list.", type: .error)
+            return
+        }
 
         list?.update(with: bookmark)
         bookmarkStore.update(bookmark: bookmark)
@@ -152,6 +156,10 @@ final class LocalBookmarkManager: BookmarkManager {
 
     func updateUrl(of bookmark: Bookmark, to newUrl: URL) -> Bookmark? {
         guard list != nil else { return nil }
+        guard getBookmark(for: bookmark.url) != nil else {
+            os_log("LocalBookmarkManager: Failed to update bookmark url - not in the list.", type: .error)
+            return nil
+        }
 
         guard let newBookmark = list?.updateUrl(of: bookmark, to: newUrl) else {
             os_log("LocalBookmarkManager: Failed to update URL of bookmark.", type: .error)
