@@ -60,7 +60,7 @@ final class BookmarkListTests: XCTestCase {
     func testWhenBookmarkIsUpdatedInTheList_ThenListContainsChangedVersion() {
         var bookmarkList = BookmarkList()
 
-        var bookmark = Bookmark.aBookmark
+        let bookmark = Bookmark.aBookmark
         bookmarkList.insert(bookmark)
 
         let newIsFavoriteValue = !bookmark.isFavorite

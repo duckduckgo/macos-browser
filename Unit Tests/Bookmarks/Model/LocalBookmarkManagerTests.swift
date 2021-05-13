@@ -82,7 +82,7 @@ final class LocalBookmarkManagerTests: XCTestCase {
     }
 
     func testWhenUrlIsAlreadyBookmarked_ThenManagerReturnsNil() {
-        let (bookmarkManager, bookmarkStoreMock) = LocalBookmarkManager.aManager
+        let (bookmarkManager, _) = LocalBookmarkManager.aManager
         _ = bookmarkManager.makeBookmark(for: URL.duckDuckGo, title: "Title", isFavorite: false)!
 
         XCTAssertNil(bookmarkManager.makeBookmark(for: URL.duckDuckGo, title: "Title", isFavorite: false))
