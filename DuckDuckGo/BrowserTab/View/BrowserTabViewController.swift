@@ -275,12 +275,16 @@ extension BrowserTabViewController: TabDelegate {
         //  Safari closes new tabs that were opened and then create a download instantly.  Should we do the same?
     }
 
-    func chooseDestination(suggestedFilename: String?, directoryURL: URL?, fileTypes: [UTType], callback: @escaping (URL?) -> Void) {
+    func chooseDestination(suggestedFilename: String?, directoryURL: URL?, fileTypes: [UTType], callback: @escaping (URL?, UTType?) -> Void) {
         dispatchPrecondition(condition: .onQueue(.main))
         let savePanel = NSSavePanel.withFileTypeChooser(fileTypes: fileTypes, suggestedFilename: suggestedFilename, directoryURL: directoryURL)
 
         func completionHandler(_ result: NSApplication.ModalResponse) {
-            callback(result == .OK ? savePanel.url : nil)
+            guard case .OK = result else {
+                callback(nil, nil)
+                return
+            }
+            callback(savePanel.url, savePanel.selectedFileType)
         }
 
         if let window = self.view.window {

@@ -33,11 +33,7 @@ final class WebContentDownloadTask: FileDownloadTask {
 
     override var fileTypes: [UTType]? {
         get {
-            if #available(OSX 11.0, *) {
-                return [.html, .webArchive]
-            } else {
-                return [.html]
-            }
+            return [.html, .webArchive, .pdf]
         }
         set { }
     }
@@ -57,34 +53,56 @@ final class WebContentDownloadTask: FileDownloadTask {
         delegate.fileDownloadTaskNeedsDestinationURL(self, completionHandler: self.localFileURLCompletionHandler)
     }
 
-    private func localFileURLCompletionHandler(_ localURL: URL?) {
+    private func localFileURLCompletionHandler(_ localURL: URL?, fileType: UTType?) {
         guard let localURL = localURL else {
             delegate?.fileDownloadTask(self, didFinishWith: .failure(.cancelled))
             return
         }
         self.localURL = localURL
+        let fileType = fileType ?? UTType(fileExtension: localURL.pathExtension)
 
-        if #available(OSX 11.0, *),
-           case .some(.webArchive) = UTType(fileExtension: localURL.pathExtension) {
-            self.webView.createWebArchiveData { result in
-                switch result {
-                case .success(let data):
-                    self.subTask = DataSaveTask(download: self.download, data: data)
-                    self.subTask!.start(delegate: self)
+        let create: (@escaping (Data?, Error?) -> Void) -> Void
+        var transform: (Data) throws -> Data = { return $0 }
 
-                case .failure(let error):
-                    self.delegate?.fileDownloadTask(self, didFinishWith: .failure(.failedToCompleteDownloadTask(underlyingError: error)))
+        switch fileType {
+        case .some(.webArchive):
+            create = self.webView.createWebArchiveData
+
+        case .some(.pdf):
+            create = { self.webView.createPDF(withConfiguration: nil, completionHandler: $0) }
+
+        case .some(.html):
+            create = self.webView.createWebArchiveData
+            transform = { data in
+                // extract HTML from WebArchive bplist
+                guard let dict = try PropertyListSerialization.propertyList(from: data, options: [], format: nil) as? [String: Any],
+                      let mainResource = dict["WebMainResource"] as? [String: Any],
+                      let resourceData = mainResource["WebResourceData"] as? NSData
+                else {
+                    struct GetWebResourceDataFromWebArchiveData: Error { let data: Data }
+                    throw GetWebResourceDataFromWebArchiveData(data: data)
                 }
+
+                return resourceData as Data
             }
 
-        } else if let request = self.request
-                    ?? self.webView.url.map({ URLRequest(url: $0, cachePolicy: .returnCacheDataElseLoad) }) {
-
-            self.subTask = URLRequestDownloadTask(download: self.download, request: request)
-            self.subTask!.start(delegate: self)
-
-        } else {
+        default:
+            assertionFailure("WebContentDownloadTask.localFileURLCompletionHandler unexpected file type \(fileType?.fileExtension ?? "<nil>")")
             self.delegate?.fileDownloadTask(self, didFinishWith: .failure(.cancelled))
+            return
+        }
+
+        create { (data, error) in
+            do {
+                if let error = error { throw error }
+                guard let data = try data.map(transform) else { throw FileDownloadError.cancelled }
+
+                self.subTask = DataSaveTask(download: self.download, data: data)
+                self.subTask!.start(delegate: self)
+
+            } catch {
+                self.delegate?.fileDownloadTask(self, didFinishWith: .failure(.failedToCompleteDownloadTask(underlyingError: error)))
+            }
         }
     }
 
@@ -92,8 +110,8 @@ final class WebContentDownloadTask: FileDownloadTask {
 
 extension WebContentDownloadTask: FileDownloadTaskDelegate {
 
-    func fileDownloadTaskNeedsDestinationURL(_ task: FileDownloadTask, completionHandler: @escaping (URL?) -> Void) {
-        completionHandler(localURL)
+    func fileDownloadTaskNeedsDestinationURL(_ task: FileDownloadTask, completionHandler: @escaping (URL?, UTType?) -> Void) {
+        completionHandler(localURL, nil)
     }
 
     func fileDownloadTask(_ task: FileDownloadTask, didFinishWith result: Result<URL, FileDownloadError>) {

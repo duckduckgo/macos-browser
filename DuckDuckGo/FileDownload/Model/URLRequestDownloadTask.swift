@@ -128,7 +128,7 @@ extension URLRequestDownloadTask: URLSessionDataDelegate {
             }
             completionHandler(.allow)
 
-            self.delegate?.fileDownloadTaskNeedsDestinationURL(self) { url in
+            self.delegate?.fileDownloadTaskNeedsDestinationURL(self) { url, _ in
                 if let url = url, let downloadedFile = self.downloadedFile {
                     self.localFileURL = url
                     switch dataTask.state {

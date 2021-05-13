@@ -21,6 +21,7 @@ import Foundation
 struct UTType: RawRepresentable, Hashable {
     static let html = UTType(rawValue: kUTTypeHTML)
     static let webArchive = UTType(rawValue: kUTTypeWebArchive)
+    static let pdf = UTType(rawValue: kUTTypePDF)
 
     var rawValue: CFString
     init(rawValue: CFString) {

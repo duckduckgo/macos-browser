@@ -18,7 +18,12 @@
 //
 #import <WebKit/WebKit.h>
 
-@interface WKWebView (SessionState)
+@interface WKWebView (Private)
+
 - (void)_restoreFromSessionStateData:(NSData * _Nonnull)data;
 - (NSData * _Nullable)_sessionStateData;
+
+- (void)createWebArchiveDataWithCompletionHandler:(void (^ _Nonnull)(NSData * _Nullable, NSError * _Nullable))completionHandler;
+- (void)createPDFWithConfiguration:(id _Nullable)pdfConfiguration completionHandler:(void (^ _Nonnull)(NSData * _Nullable pdfDocumentData, NSError * _Nullable error))completionHandler;
+
 @end

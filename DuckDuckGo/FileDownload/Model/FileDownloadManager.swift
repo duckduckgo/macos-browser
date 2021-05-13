@@ -33,7 +33,7 @@ final class FileDownloadManager {
     typealias FileNameChooserCallback = (/*suggestedFilename:*/ String?,
                                          /*directoryURL:*/      URL?,
                                          /*fileTypes:*/         [UTType],
-                                         /*completionHandler*/  @escaping (URL?) -> Void) -> Void
+                                         /*completionHandler*/  @escaping (URL?, UTType?) -> Void) -> Void
 
     @discardableResult
     func startDownload(_ request: FileDownload, chooseDestinationCallback: @escaping FileNameChooserCallback) -> FileDownloadTask {
@@ -50,7 +50,7 @@ final class FileDownloadManager {
 
 extension FileDownloadManager: FileDownloadTaskDelegate {
 
-    func fileDownloadTaskNeedsDestinationURL(_ task: FileDownloadTask, completionHandler: @escaping (URL?) -> Void) {
+    func fileDownloadTaskNeedsDestinationURL(_ task: FileDownloadTask, completionHandler: @escaping (URL?, UTType?) -> Void) {
         dispatchPrecondition(condition: .onQueue(.main))
 
         defer {
@@ -61,25 +61,26 @@ extension FileDownloadManager: FileDownloadTaskDelegate {
         guard task.download.shouldAlwaysPromptFileSaveLocation || preferences.alwaysRequestDownloadLocation,
               let locationChooser = self.destinationChooserCallbacks[task]
         else {
-            let fileName = task.suggestedFilename ?? .uniqueFilename(for: task.fileTypes?.first)
+            let fileType = task.fileTypes?.first
+            let fileName = task.suggestedFilename ?? .uniqueFilename(for: fileType)
             if let url = preferences.selectedDownloadLocation?.appendingPathComponent(fileName) {
-                completionHandler(url)
+                completionHandler(url, fileType)
             } else {
                 os_log("Failed to access Downloads folder")
                 Pixel.fire(.debug(event: .fileMoveToDownloadsFailed, error: CocoaError(.fileWriteUnknown)))
-                completionHandler(nil)
+                completionHandler(nil, nil)
             }
             return
         }
 
-        locationChooser(task.suggestedFilename, preferences.selectedDownloadLocation, task.fileTypes ?? []) { url in
+        locationChooser(task.suggestedFilename, preferences.selectedDownloadLocation, task.fileTypes ?? []) { url, fileType in
             if let url = url,
                FileManager.default.fileExists(atPath: url.path) {
                 // overwrite
                 try? FileManager.default.removeItem(at: url)
             }
 
-            completionHandler(url)
+            completionHandler(url, fileType)
         }
     }
 

@@ -35,7 +35,7 @@ final class DataSaveTask: FileDownloadTask {
         delegate.fileDownloadTaskNeedsDestinationURL(self, completionHandler: self.localFileURLCompletionHandler)
     }
 
-    private func localFileURLCompletionHandler(_ localURL: URL?) {
+    private func localFileURLCompletionHandler(_ localURL: URL?, _: UTType?) {
         guard let localURL = localURL else {
             delegate?.fileDownloadTask(self, didFinishWith: .failure(.cancelled))
             return

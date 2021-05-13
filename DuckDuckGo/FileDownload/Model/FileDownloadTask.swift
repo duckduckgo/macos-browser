@@ -31,7 +31,7 @@ enum FileDownloadError: Error {
 }
 
 protocol FileDownloadTaskDelegate: AnyObject {
-    func fileDownloadTaskNeedsDestinationURL(_ task: FileDownloadTask, completionHandler: @escaping (URL?) -> Void)
+    func fileDownloadTaskNeedsDestinationURL(_ task: FileDownloadTask, completionHandler: @escaping (URL?, UTType?) -> Void)
     func fileDownloadTask(_ task: FileDownloadTask, didFinishWith result: Result<URL, FileDownloadError>)
 }
 

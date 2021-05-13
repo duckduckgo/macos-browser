@@ -22,6 +22,14 @@ extension NSSavePanel {
 
     static private let fileTypesPopupTag = 100
 
+    private var fileTypesPopup: NSPopUpButton? {
+        self.accessoryView?.viewWithTag(Self.fileTypesPopupTag) as? NSPopUpButton
+    }
+
+    var selectedFileType: UTType? {
+        self.fileTypesPopup?.selectedItem?.representedObject as? UTType
+    }
+
     static func withFileTypeChooser(fileTypes: [UTType], suggestedFilename: String?, directoryURL: URL? = nil) -> NSSavePanel {
         let savePanel = NSSavePanel()
 
@@ -30,7 +38,7 @@ extension NSSavePanel {
         }
         nib.instantiate(withOwner: savePanel, topLevelObjects: nil)
 
-        guard let popup = savePanel.accessoryView?.viewWithTag(Self.fileTypesPopupTag) as? NSPopUpButton else {
+        guard let popup = savePanel.fileTypesPopup else {
             fatalError("NSSavePanel: accessoryView not loaded")
         }
         popup.target = savePanel
