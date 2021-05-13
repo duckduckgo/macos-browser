@@ -67,7 +67,7 @@ final class BookmarkPopoverViewController: NSViewController {
     }
     
     @IBAction func favoritesButtonAction(_ sender: Any) {
-        guard var bookmark = bookmark else { return }
+        guard let bookmark = bookmark else { return }
         bookmark.isFavorite = !bookmark.isFavorite
         self.bookmark = bookmark
 
@@ -97,7 +97,7 @@ final class BookmarkPopoverViewController: NSViewController {
 extension BookmarkPopoverViewController: NSTextFieldDelegate {
 
     func controlTextDidChange(_ obj: Notification) {
-        guard var bookmark = bookmark else { return }
+        guard let bookmark = bookmark else { return }
         bookmark.title = textField.stringValue
         self.bookmark = bookmark
 

@@ -1,7 +1,7 @@
 //
-//  EncryptionKeyGeneration.swift
+//  SpacerNode.swift
 //
-//  Copyright © 2020 DuckDuckGo. All rights reserved.
+//  Copyright © 2021 DuckDuckGo. All rights reserved.
 //
 //  Licensed under the Apache License, Version 2.0 (the "License");
 //  you may not use this file except in compliance with the License.
@@ -17,16 +17,21 @@
 //
 
 import Foundation
-import CryptoKit
 
-protocol EncryptionKeyGenerating {
-    func randomKey() -> SymmetricKey
-}
+final class SpacerNode: Equatable {
 
-final class EncryptionKeyGenerator: EncryptionKeyGenerating {
+    static let blank = SpacerNode(name: "Blank")
+    static let divider = SpacerNode(name: "Divider")
 
-    func randomKey() -> SymmetricKey {
-        SymmetricKey(size: .bits256)
+    private let name: String
+
+    // SpacerNode instances don't need to be created directly, they are provided via the static values above.
+    private init(name: String) {
+        self.name = name
+    }
+
+    static func == (lhs: SpacerNode, rhs: SpacerNode) -> Bool {
+        return lhs.name == rhs.name
     }
 
 }

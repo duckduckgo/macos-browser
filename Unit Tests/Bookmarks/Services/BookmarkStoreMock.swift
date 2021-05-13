@@ -24,33 +24,52 @@ import XCTest
 final class BookmarkStoreMock: BookmarkStore {
 
     var loadAllCalled = false
-    var bookmarks: [Bookmark]?
+    var bookmarks: [BaseBookmarkEntity]?
     var loadError: Error?
-    func loadAll(completion: @escaping ([Bookmark]?, Error?) -> Void) {
+    func loadAll(type: BookmarkStoreFetchPredicateType, completion: @escaping ([BaseBookmarkEntity]?, Error?) -> Void) {
         loadAllCalled = true
         completion(bookmarks, loadError)
     }
 
-    var saveCalled = false
-    var managedObjectId: NSManagedObjectID?
-    var saveSuccess = true
-    var saveError: Error?
-    func save(bookmark: Bookmark, completion: @escaping (Bool, NSManagedObjectID?, Error?) -> Void) {
-        saveCalled = true
-        completion(saveSuccess, managedObjectId, saveError)
+    var saveBookmarkCalled = false
+    var saveBookmarkSuccess = true
+    var saveBookmarkError: Error?
+    func save(bookmark: Bookmark, parent: BookmarkFolder?, completion: @escaping (Bool, Error?) -> Void) {
+        saveBookmarkCalled = true
+        bookmarks?.append(bookmark)
+        completion(saveBookmarkSuccess, saveBookmarkError)
+    }
+
+    var saveFolderCalled = false
+    var saveFolderSuccess = true
+    var saveFolderError: Error?
+    func save(folder: BookmarkFolder, parent: BookmarkFolder?, completion: @escaping (Bool, Error?) -> Void) {
+        saveFolderCalled = true
+        completion(saveFolderSuccess, saveFolderError)
     }
 
     var removeCalled = false
     var removeSuccess = true
     var removeError: Error?
-    func remove(bookmark: Bookmark, completion: @escaping (Bool, Error?) -> Void) {
+    func remove(objectsWithUUIDs uuids: [UUID], completion: @escaping (Bool, Error?) -> Void) {
         removeCalled = true
+
+        // For the purpose of the mock, only remove bookmarks if `removeSuccess` is true.
+        if removeSuccess {
+            bookmarks?.removeAll { uuids.contains($0.id) }
+        }
+
         completion(removeSuccess, removeError)
     }
 
     var updateCalled = false
     func update(bookmark: Bookmark) {
         updateCalled = true
+    }
+
+    var addChildCalled = false
+    func add(objectsWithUUIDs: [UUID], to parent: BookmarkFolder?, completion: @escaping (Error?) -> Void) {
+        addChildCalled = true
     }
 
 }
