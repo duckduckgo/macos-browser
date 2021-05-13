@@ -57,6 +57,7 @@ final class OptionsButtonMenu: NSMenu {
     }
 
     let bookmarksMenuItem = NSMenuItem(title: UserText.bookmarks, action: nil, keyEquivalent: "")
+    let zoomMenuItem = NSMenuItem(title: UserText.zoom, action: nil, keyEquivalent: "")
 
     override func update() {
         self.result = nil
@@ -92,7 +93,12 @@ final class OptionsButtonMenu: NSMenu {
         addItem(emailItem)
     
         addItem(NSMenuItem.separator())
-        
+
+        zoomMenuItem.submenu = ZoomSubMenu(tabCollectionViewModel: tabCollectionViewModel)
+        addItem(zoomMenuItem)
+
+        addItem(NSMenuItem.separator())
+
         bookmarksMenuItem.image = NSImage(named: "Bookmark")
         addItem(bookmarksMenuItem)
 
@@ -266,16 +272,13 @@ final class EmailOptionsButtonSubMenu: NSMenu {
     private func updateMenuItems() {
         removeAllItems()
         if emailManager.isSignedIn {
-            // The email feature in BrowserServicesKit is now publicly visible. As a part of that work, code relating to the beta on iOS was removed.
-            // This meant that the generate token page URL was removed, but it should be added back for the macOS browser.
-            //
-            // let createAddressItem = NSMenuItem(title: UserText.emailOptionsMenuCreateAddressSubItem,
-            //                                action: #selector(createAddressAction(_:)),
-            //                                keyEquivalent: "")
-            // createAddressItem.target = self
-            // createAddressItem.image = NSImage(named: "OptionsButtonMenuEmailGenerateAddress")
-            // addItem(createAddressItem)
-            
+            let createAddressItem = NSMenuItem(title: UserText.emailOptionsMenuCreateAddressSubItem,
+                                           action: #selector(createAddressAction(_:)),
+                                           keyEquivalent: "")
+            createAddressItem.target = self
+            createAddressItem.image = NSImage(named: "OptionsButtonMenuEmailGenerateAddress")
+            addItem(createAddressItem)
+
             let viewDashboardItem = NSMenuItem(title: UserText.emailOptionsMenuViewDashboardSubItem,
                                            action: #selector(viewDashboardAction(_:)),
                                            keyEquivalent: "")
@@ -339,4 +342,36 @@ final class EmailOptionsButtonSubMenu: NSMenu {
     @objc func emailDidSignOutNotification(_ notification: Notification) {
         updateMenuItems()
     }
+}
+
+final class ZoomSubMenu: NSMenu {
+
+    init(tabCollectionViewModel: TabCollectionViewModel) {
+        super.init(title: UserText.zoom)
+
+        updateMenuItems(with: tabCollectionViewModel)
+    }
+
+    required init(coder: NSCoder) {
+        fatalError("init(coder:) has not been implemented")
+    }
+
+    private func updateMenuItems(with tabCollectionViewModel: TabCollectionViewModel) {
+        removeAllItems()
+
+        let fullScreenItem = (NSApplication.shared.mainMenuTyped.toggleFullscreenMenuItem?.copy() as? NSMenuItem)!
+        addItem(fullScreenItem)
+
+        addItem(.separator())
+
+        let zoomInItem = (NSApplication.shared.mainMenuTyped.zoomInMenuItem?.copy() as? NSMenuItem)!
+        addItem(zoomInItem)
+
+        let zoomOutItem = (NSApplication.shared.mainMenuTyped.zoomOutMenuItem?.copy() as? NSMenuItem)!
+        addItem(zoomOutItem)
+
+        let actualSizeItem = (NSApplication.shared.mainMenuTyped.actualSizeMenuItem?.copy() as? NSMenuItem)!
+        addItem(actualSizeItem)
+    }
+
 }

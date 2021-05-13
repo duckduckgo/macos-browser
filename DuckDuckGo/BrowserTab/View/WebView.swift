@@ -40,6 +40,32 @@ final class WebView: WKWebView {
 
     ]
 
+    static private let maxMagnification: CGFloat = 3.0
+    static private let minMagnification: CGFloat = 0.5
+    static private let magnificationStep: CGFloat = 0.1
+
+    var canZoomToActualSize: Bool {
+        self.window != nil && self.magnification != 1.0
+    }
+
+    var canZoomIn: Bool {
+        self.window != nil && self.magnification < Self.maxMagnification
+    }
+
+    var canZoomOut: Bool {
+        self.window != nil && self.magnification > Self.minMagnification
+    }
+
+    func zoomIn() {
+        guard canZoomIn else { return }
+        self.magnification = min(self.magnification + Self.magnificationStep, Self.maxMagnification)
+    }
+
+    func zoomOut() {
+        guard canZoomOut else { return }
+        self.magnification = max(self.magnification - Self.magnificationStep, Self.minMagnification)
+    }
+
     deinit {
         self.configuration.userContentController.removeAllUserScripts()
     }

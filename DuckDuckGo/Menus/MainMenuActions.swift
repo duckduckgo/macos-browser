@@ -121,13 +121,40 @@ extension MainViewController {
         selectedTabViewModel.tab.reload()
     }
 
-    @IBAction func stopLoading(_ sender: Any) {
+    @IBAction func stopLoadingPage(_ sender: Any) {
         guard let selectedTabViewModel = tabCollectionViewModel.selectedTabViewModel else {
             os_log("MainViewController: No tab view model selected", type: .error)
             return
         }
 
         selectedTabViewModel.tab.stopLoading()
+    }
+
+    @IBAction func zoomIn(_ sender: Any) {
+        guard let selectedTabViewModel = tabCollectionViewModel.selectedTabViewModel else {
+            os_log("MainViewController: No tab view model selected", type: .error)
+            return
+        }
+
+        selectedTabViewModel.tab.webView.zoomIn()
+    }
+
+    @IBAction func zoomOut(_ sender: Any) {
+        guard let selectedTabViewModel = tabCollectionViewModel.selectedTabViewModel else {
+            os_log("MainViewController: No tab view model selected", type: .error)
+            return
+        }
+
+        selectedTabViewModel.tab.webView.zoomOut()
+    }
+
+    @IBAction func actualSize(_ sender: Any) {
+        guard let selectedTabViewModel = tabCollectionViewModel.selectedTabViewModel else {
+            os_log("MainViewController: No tab view model selected", type: .error)
+            return
+        }
+
+        selectedTabViewModel.tab.webView.magnification = 1.0
     }
 
     // MARK: - History
@@ -282,6 +309,46 @@ extension MainViewController {
     @IBAction func resetDefaultGrammarChecks(_ sender: Any?) {
         UserDefaultsWrapper<Bool>.clear(.spellingCheckEnabledOnce)
         UserDefaultsWrapper<Bool>.clear(.grammarCheckEnabledOnce)
+    }
+
+}
+
+extension MainViewController: NSMenuItemValidation {
+
+    func validateMenuItem(_ menuItem: NSMenuItem) -> Bool {
+        switch menuItem.action {
+        // Back/Forward
+        case #selector(MainViewController.back(_:)):
+            return tabCollectionViewModel.selectedTabViewModel?.canGoBack == true
+        case #selector(MainViewController.forward(_:)):
+            return tabCollectionViewModel.selectedTabViewModel?.canGoForward == true
+
+        case #selector(MainViewController.stopLoadingPage(_:)):
+            return tabCollectionViewModel.selectedTabViewModel?.isLoading == true
+
+        case #selector(MainViewController.reloadPage(_:)):
+            return tabCollectionViewModel.selectedTabViewModel?.canReload == true
+
+        // Zoom
+        case #selector(MainViewController.zoomIn(_:)):
+            return tabCollectionViewModel.selectedTabViewModel?.tab.webView.canZoomIn == true
+        case #selector(MainViewController.zoomOut(_:)):
+            return tabCollectionViewModel.selectedTabViewModel?.tab.webView.canZoomOut == true
+        case #selector(MainViewController.actualSize(_:)):
+            return tabCollectionViewModel.selectedTabViewModel?.tab.webView.canZoomToActualSize == true
+
+        // Bookmarks
+        case #selector(MainViewController.bookmarkThisPage(_:)),
+             #selector(MainViewController.favoriteThisPage(_:)):
+            return tabCollectionViewModel.selectedTabViewModel?.canBeBookmarked == true
+
+        // Reopen Last Removed Tab
+        case #selector(MainViewController.reopenLastClosedTab(_:)):
+            return tabCollectionViewModel.canInsertLastRemovedTab == true
+
+        default:
+            return menuItem.isEnabled
+        }
     }
 
 }
