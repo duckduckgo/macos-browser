@@ -405,12 +405,20 @@ extension Tab: ContextMenuDelegate {
 
 extension Tab: HTML5DownloadDelegate {
 
-    func startDownload(_ userScript: HTML5DownloadUserScript, from url: URL, withSuggestedName name: String) {
+    func startDownload(_ userScript: HTML5DownloadUserScript, from url: URL, withSuggestedName name: String?) {
         var request = lastMainFrameRequest ?? URLRequest(url: url)
         request.url = url
         delegate?.tab(self, requestedFileDownload: FileDownload.request(request,
                                                                         suggestedName: name,
                                                                         promptForLocation: false))
+    }
+
+    func startDownload(_ userScript: HTML5DownloadUserScript, data: Data, mimeType: String, withSuggestedName name: String?) {
+        delegate?.tab(self,
+                      requestedFileDownload: FileDownload.data(data,
+                                                               mimeType: mimeType,
+                                                               suggestedName: name,
+                                                               sourceURL: self.url))
     }
 
 }

@@ -18,10 +18,12 @@
 
 import WebKit
 import BrowserServicesKit
+import os.log
 
 protocol HTML5DownloadDelegate: AnyObject {
 
-    func startDownload(_ userScript: HTML5DownloadUserScript, from: URL, withSuggestedName: String)
+    func startDownload(_ userScript: HTML5DownloadUserScript, from: URL, withSuggestedName: String?)
+    func startDownload(_ userScript: HTML5DownloadUserScript, data: Data, mimeType: String, withSuggestedName: String?)
 
 }
 
@@ -37,10 +39,24 @@ final class HTML5DownloadUserScript: NSObject, StaticUserScript {
     func userContentController(_ userContentController: WKUserContentController, didReceive message: WKScriptMessage) {
         guard let dict = message.body as? [String: String],
               let href = dict["href"],
-              let url = URL(string: href),
               let name = dict["download"]
-            else { return }
-        delegate?.startDownload(self, from: url, withSuggestedName: name)
+        else {
+            assertionFailure("HTML5DownloadUserScript: unexpected message body")
+            return
+        }
+
+        var mime = ""
+        if href.hasPrefix("data:"),
+           let data = Data(dataHref: href, mimeType: &mime) {
+
+            delegate?.startDownload(self, data: data, mimeType: mime, withSuggestedName: name)
+
+        } else if let url = URL(string: href) {
+            delegate?.startDownload(self, from: url, withSuggestedName: name)
+
+        } else {
+            os_log("HTML5DownloadUserScript: could not download from %s", type: .error, href)
+        }
     }
 
     static let source = """
@@ -48,10 +64,28 @@ final class HTML5DownloadUserScript: NSObject, StaticUserScript {
 
     document.addEventListener("click", function(e) {
         if (e.srcElement.tagName !== "A" || !e.srcElement.hasAttribute("download")) return;
-        webkit.messageHandlers.downloadFile.postMessage({
-            "href": e.srcElement.href,
-            "download": e.srcElement.download
-        });
+
+        // https://stackoverflow.com/questions/61702414/wkwebview-how-to-handle-blob-url#61703086
+        if (event.target.matches('a[href^="blob:"]'))
+            (async el=>{
+                const url = el.href;
+                const download = el.download;
+                const blob = await fetch(url).then(r => r.blob());
+
+                var fr = new FileReader();
+                fr.onload = function(e) {
+                    webkit.messageHandlers.downloadFile.postMessage({
+                        "href": e.target.result,
+                        "download": download
+                    });
+                }
+                fr.readAsDataURL(blob);
+            })(event.target);
+        else
+            webkit.messageHandlers.downloadFile.postMessage({
+                "href": e.srcElement.href,
+                "download": e.srcElement.download
+            });
         e.preventDefault();
     });
 
