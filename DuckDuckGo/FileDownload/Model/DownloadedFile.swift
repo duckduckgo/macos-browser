@@ -19,49 +19,103 @@
 import Foundation
 import Combine
 
-final class DownloadedFile: NSObject {
+final class DownloadedFile {
 
-    private static let queue: OperationQueue = {
-        let queue = OperationQueue()
-        queue.name = "DownloadedFile.queue"
-        queue.isSuspended = false
-        return queue
-    }()
+    private static let queue = DispatchQueue(label: "DownloadedFile.queue", qos: .background)
 
-    @Published private(set) var url: URL?
-    @Published private(set) var bytesWritten: UInt64 = 0
+    private var bookmark: Data?
 
-    private var handle: FileHandle?
+    // CurrentValueSubject used under the hood has locked value access so it's thread safe
+    @PublishedAfter private(set) var url: URL?
+    @PublishedAfter private(set) var bytesWritten: UInt64 = 0
 
-    init(url: URL, offset: UInt64 = 0) {
+    private var handle: FileHandle? {
+        didSet {
+            guard let handle = handle else {
+                self.fsSource = nil
+                return
+            }
+            self.fsSource = DispatchSource.makeFileSystemObjectSource(fileDescriptor: handle.fileDescriptor,
+                                                                      eventMask: [.rename, .delete],
+                                                                      queue: Self.queue)
+        }
+    }
+    private var fsSource: DispatchSourceFileSystemObject? {
+        didSet {
+            oldValue?.cancel()
+            fsSource?.setEventHandler { [weak self] in
+                self?.fileSystemSourceCallback()
+            }
+            fsSource?.resume()
+        }
+    }
+
+    init(url: URL, offset: UInt64 = 0) throws {
+        self.url = url
+
+        try self.open(url: url, offset: offset)
+    }
+
+    private func open(url: URL, offset: UInt64) throws {
         let fm = FileManager.default
         if !fm.fileExists(atPath: url.path) {
             fm.createFile(atPath: url.path, contents: nil, attributes: nil)
         }
         self.url = url
-        handle = FileHandle(forWritingAtPath: url.path)
+        self.bookmark = try? url.bookmarkData()
+        let handle = try FileHandle(forWritingTo: url)
 
         do {
-            try handle!.seek(toOffset: offset)
-            try handle!.truncate(atOffset: offset)
+            try handle.seek(toOffset: offset)
+            try handle.truncate(atOffset: offset)
             self.bytesWritten = offset
         } catch {
-            handle!.seek(toFileOffset: 0)
-            handle!.truncateFile(atOffset: 0)
+            try handle.seek(toOffset: 0)
+            try handle.truncate(atOffset: 0)
             self.bytesWritten = 0
         }
-
-        super.init()
-        
-        NSFileCoordinator.addFilePresenter(self)
+        self.handle = handle
     }
 
-    func close() {
+    private func fileSystemSourceCallback() {
+        if let currentURL = locateFile() {
+            if currentURL != self.url {
+                self.url = currentURL
+            }
+        } else { // file has been removed
+            self._close()
+            self.url = nil
+        }
+    }
+
+    private func locateFile() -> URL? {
+        if let url = self.url,
+           FileManager.default.fileExists(atPath: url.path) {
+            return url
+        }
+        var isStale = false
+        if let bookmark = self.bookmark,
+           let url = try? URL(resolvingBookmarkData: bookmark, bookmarkDataIsStale: &isStale) {
+            if isStale, let newData = try? url.bookmarkData() {
+                self.bookmark = newData
+            }
+            return url
+        }
+        return nil
+    }
+
+    private func _close() {
         handle?.closeFile()
         handle = nil
     }
 
-    func move(to newURL: URL, incrementingIndexIfExists: Bool, pathExtension: String? = nil) throws -> URL {
+    func close() {
+        Self.queue.async {
+            self._close()
+        }
+    }
+
+    private func _move(to newURL: URL, incrementingIndexIfExists: Bool, pathExtension: String?) throws -> URL {
         guard let currentURL = self.url,
               currentURL != newURL
         else { return newURL }
@@ -82,7 +136,7 @@ final class DownloadedFile: NSObject {
 
         if handle != nil,
            oldURLVolume == nil || oldURLVolume != newURLVolume {
-            handle = FileHandle(forWritingAtPath: resultURL.path)
+            handle = try FileHandle(forWritingTo: resultURL)
             handle!.seekToEndOfFile()
         }
         self.url = resultURL
@@ -90,48 +144,36 @@ final class DownloadedFile: NSObject {
         return resultURL
     }
 
+    func move(to newURL: URL, incrementingIndexIfExists: Bool, pathExtension: String? = nil) throws -> URL {
+        return try Self.queue.sync {
+            return try self._move(to: newURL, incrementingIndexIfExists: incrementingIndexIfExists, pathExtension: pathExtension)
+        }
+    }
+
     func write(_ data: Data) {
-        #warning("written in urlrequest callback, moved to in main thread")
-        self.handle?.write(data)
-        bytesWritten += UInt64(data.count)
+        Self.queue.async { [weak self] in
+            guard let self = self,
+                  let handle = self.handle
+            else { return }
+            handle.write(data)
+            self.bytesWritten += UInt64(data.count)
+        }
     }
 
     func delete() {
-        guard let url = url else { return }
-        close()
-        try? FileManager().removeItem(at: url)
+        Self.queue.async { [self] in
+            self._close()
 
-        self.url = nil
+            guard let url = url else { return }
+            try? FileManager().removeItem(at: url)
+
+            self.url = nil
+        }
     }
 
     deinit {
-        #warning("not deinited as it's added")
-        NSFileCoordinator.removeFilePresenter(self)
-    }
-
-}
-
-extension DownloadedFile: NSFilePresenter {
-
-    var presentedItemURL: URL? {
-        self.url
-    }
-
-    var presentedItemOperationQueue: OperationQueue {
-        Self.queue
-    }
-
-    func presentedItemDidMove(to newURL: URL) {
-        self.url = newURL
-    }
-
-    func presentedItemDidChange() {
-        // TODO: use GCD file mon?
-        if let url = self.url,
-           !FileManager.default.fileExists(atPath: url.path) {
-            close()
-            self.url = nil
-        }
+        fsSource?.cancel()
+        handle?.closeFile()
     }
 
 }

@@ -23,6 +23,7 @@ import os
 final class URLRequestDownloadTask: FileDownloadTask {
 
     private var session: URLSession?
+    private var sessionDelegateWrapper: WeakURLRequestDownloadTaskWrapper?
     private let request: URLRequest
     private var task: URLSessionTask?
 
@@ -32,15 +33,33 @@ final class URLRequestDownloadTask: FileDownloadTask {
 
     static private let downloadExtension = "duckDownload"
 
+    private var responseSuggestedFilename: String?
+
+    override var suggestedFilename: String {
+        guard let responseSuggestedFilename = responseSuggestedFilename,
+              !responseSuggestedFilename.isEmpty
+        else {
+            return super.suggestedFilename
+        }
+        return responseSuggestedFilename
+    }
+
     private var downloadedFile: DownloadedFile? {
         didSet {
             guard let downloadedFile = downloadedFile else { return }
-            downloadedFileLocationCancellable = downloadedFile.$url
-                .assign(to: \.fileURL, on: self.progress)
+            downloadedFileLocationCancellable = downloadedFile.$url.sink { [weak self] url in
+                guard let url = url else {
+                    // .download file removed: cancel download
+                    self?.progress.unpublishIfNeeded()
+                    self?.cancel()
+                    return
+                }
+                self?.progress.fileURL = url
+            }
             downloadedFileBytesWrittenCancellable = downloadedFile.$bytesWritten
                 .throttle(for: 0.3, scheduler: Self.progressThrottleQueue, latest: true)
                 .map(Int64.init)
-                .assign(to: \.completedUnitCount, on: self.progress)
+                .weakAssign(to: \.completedUnitCount, on: self.progress)
         }
     }
 
@@ -54,11 +73,12 @@ final class URLRequestDownloadTask: FileDownloadTask {
     override func start(delegate: FileDownloadTaskDelegate) {
         super.start(delegate: delegate)
 
-        session = URLSession(configuration: session?.configuration ?? .default, delegate: self, delegateQueue: nil)
-        task = session!.dataTask(with: request)
+        sessionDelegateWrapper = WeakURLRequestDownloadTaskWrapper(task: self)
+        session = URLSession(configuration: session?.configuration ?? .default,
+                             delegate: sessionDelegateWrapper,
+                             delegateQueue: nil)
+        task = session?.dataTask(with: request)
         self.progress.fileDownloadingSourceURL = request.url
-
-        self.suggestedFilename = self.bestFileName()
 
         task?.resume()
     }
@@ -67,123 +87,106 @@ final class URLRequestDownloadTask: FileDownloadTask {
         self.task?.cancel()
     }
 
-    private func finish(with result: Result<URL, FileDownloadError>) {
-        if self.downloadedFile != nil {
-            if !self.progress.isPublished {
-                self.progress.publish()
-            }
-            if case .success = result {
-                if self.progress.totalUnitCount == -1 {
-                    self.progress.totalUnitCount = 1
-                }
-                self.progress.completedUnitCount = self.progress.totalUnitCount
-            }
+    // Local Save URL and Type chosen using Save Panel or automatically
+    private func localFileURLCompletionHandler(_ destURL: URL?, _: UTType?) {
+        dispatchPrecondition(condition: .onQueue(.main))
 
-            self.progress.unpublish()
+        guard let url = destURL,
+              let task = self.task,
+              let downloadedFile = self.downloadedFile
+        else {
+            self.task?.cancel()
+            self.finish(with: .failure(.cancelled))
+            return
         }
 
-        DispatchQueue.main.async {
-            if case .failure = result {
-                self.downloadedFile?.delete()
+        switch task.state {
+        case .completed:
+            // move to final destination when already downloaded to temp location
+            do {
+                let finalURL = try downloadedFile.move(to: url, incrementingIndexIfExists: true)
+                self.finish(with: .success(finalURL))
+            } catch {
+                self.finish(with: .failure(.failedToMoveFileToDownloads))
             }
-            self.downloadedFile = nil
+
+        case .running, .suspended:
+            // move to Downloads folder with .duckDownload extension if download is still in progress
+            let downloadURL = url.appendingPathExtension(Self.downloadExtension)
+            let ext = url.pathExtension + (url.pathExtension.isEmpty ? "" : ".") + Self.downloadExtension
+            do {
+                _=try downloadedFile.move(to: downloadURL, incrementingIndexIfExists: true, pathExtension: ext)
+            } catch {
+                task.cancel()
+                self.finish(with: .failure(.failedToMoveFileToDownloads))
+            }
+
+            self.progress.publishIfNotPublished()
+
+        case .canceling:
+            break
+        @unknown default:
+            break
+        }
+    }
+
+    private func finish(with result: Result<URL, FileDownloadError>) {
+        DispatchQueue.main.async {
+            if let downloadedFile = self.downloadedFile {
+                self.progress.publishIfNotPublished()
+
+                if case .success = result {
+                    if self.progress.totalUnitCount == -1 {
+                        self.progress.totalUnitCount = 1
+                    }
+                    self.progress.completedUnitCount = self.progress.totalUnitCount
+                }
+
+                self.progress.unpublishIfNeeded()
+
+                if case .failure = result {
+                    downloadedFile.delete()
+                }
+                self.downloadedFile = nil
+            }
 
             self.delegate?.fileDownloadTask(self, didFinishWith: result)
-        }
-    }
-
-    private func bestFileName() -> String? {
-        if let suggestedFilename = self.suggestedFilename, !suggestedFilename.isEmpty {
-            return suggestedFilename
-        } else {
-            return fileNameFromURL()
-        }
-    }
-
-    /// Tries to use the file name part of the URL, if available, adjusting for content type, if available.
-    private func fileNameFromURL() -> String? {
-        guard let url = request.url,
-              !url.pathComponents.isEmpty,
-              url.pathComponents != [ "/" ]
-        else {
-            return request.url?.host?.drop(prefix: "www.").replacingOccurrences(of: ".", with: "_")
-        }
-
-        if let ext = self.fileTypes?.first?.fileExtension,
-           url.pathExtension != ext {
-
-            // there is a more appropriate extension, so use it
-            return url.lastPathComponent + "." + ext
-        }
-
-        return url.lastPathComponent
-    }
-
-    deinit {
-        if self.progress.isPublished {
-            self.progress.unpublish()
         }
     }
     
 }
 
-extension URLRequestDownloadTask: URLSessionDataDelegate {
+extension URLRequestDownloadTask {
 
     func urlSession(_ session: URLSession,
                     dataTask: URLSessionDataTask,
                     didReceive response: URLResponse,
                     completionHandler: @escaping (URLSession.ResponseDisposition) -> Void) {
 
+        // start download to temp location before final location is chosen
         let downloadLocation = DownloadPreferences().selectedDownloadLocation
+        // find appropriate temp folder for final destination URL
         let fm = FileManager.default
         let tempDir = (try? fm.url(for: .itemReplacementDirectory, in: .userDomainMask, appropriateFor: downloadLocation, create: false))
             ?? fm.temporaryDirectory
-
         let tempURL = tempDir.appendingPathComponent(.uniqueFilename())
 
-        self.downloadedFile = DownloadedFile(url: tempURL)
-        self.suggestedFilename = response.suggestedFilename ?? self.suggestedFilename
+        self.downloadedFile = try? DownloadedFile(url: tempURL)
+        self.responseSuggestedFilename = response.suggestedFilename
         self.fileTypes = response.mimeType.flatMap(UTType.init(mimeType:)).map { [$0] }
         self.progress.totalUnitCount = response.expectedContentLength
 
-        DispatchQueue.main.async { [weak self, dataTask] in
-            guard let self = self else {
+        // fire completionHandler asynchronously to satisfy URLSession
+        DispatchQueue.main.async {
+            guard self.downloadedFile != nil else {
                 completionHandler(.cancel)
                 return
             }
             completionHandler(.allow)
 
-            self.delegate?.fileDownloadTaskNeedsDestinationURL(self) { url, _ in
-                if let url = url, let downloadedFile = self.downloadedFile {
-                    switch dataTask.state {
-                    case .completed:
-                        do {
-                            let finalURL = try downloadedFile.move(to: url, incrementingIndexIfExists: true)
-                            self.finish(with: .success(finalURL))
-                        } catch {
-                            self.finish(with: .failure(.failedToMoveFileToDownloads))
-                        }
-
-                    case .running, .suspended:
-                        let downloadURL = url.appendingPathExtension(Self.downloadExtension)
-                        let ext = url.pathExtension + (url.pathExtension.isEmpty ? "" : ".") + Self.downloadExtension
-                        _=try? self.downloadedFile?.move(to: downloadURL, incrementingIndexIfExists: true, pathExtension: ext)
-
-                        // set this in thread safe var?
-                        self.progress.isPublished = true
-                        self.progress.publish()
-
-                    case .canceling:
-                        break
-                    @unknown default:
-                        break
-                    }
-
-                } else {
-                    dataTask.cancel()
-                    self.finish(with: .failure(.cancelled))
-                }
-            }
+            // and request final destination URL using Save Panel or automatically
+            self.delegate?.fileDownloadTaskNeedsDestinationURL(self,
+                                                               completionHandler: self.localFileURLCompletionHandler)
         }
     }
 
@@ -196,16 +199,44 @@ extension URLRequestDownloadTask: URLSessionDataDelegate {
             self.finish(with: .failure(.failedToCompleteDownloadTask(underlyingError: error)))
         } else {
             do {
-                guard let url = self.downloadedFile?.url?.path.drop(suffix: "." + Self.downloadExtension),
-                      let finalURL = try self.downloadedFile?.move(to: URL(fileURLWithPath: url), incrementingIndexIfExists: true)
+                guard let downloadedFile = self.downloadedFile,
+                      // .download file may have been renamed: respect this new name and just drop .download ext
+                      let url = downloadedFile.url?.path.drop(suffix: "." + Self.downloadExtension)
                 else {
                     throw FileDownloadError.cancelled
                 }
+                let finalURL = try downloadedFile.move(to: URL(fileURLWithPath: url), incrementingIndexIfExists: true)
+
                 self.finish(with: .success(finalURL))
             } catch {
                 self.finish(with: .failure(.failedToMoveFileToDownloads))
             }
         }
+    }
+
+}
+
+// URLSession strongly holds its delegate
+fileprivate final class WeakURLRequestDownloadTaskWrapper: NSObject, URLSessionDataDelegate {
+    weak var task: URLRequestDownloadTask?
+
+    init(task: URLRequestDownloadTask?) {
+        self.task = task
+    }
+
+    func urlSession(_ session: URLSession,
+                    dataTask: URLSessionDataTask,
+                    didReceive response: URLResponse,
+                    completionHandler: @escaping (URLSession.ResponseDisposition) -> Void) {
+        self.task?.urlSession(session, dataTask: dataTask, didReceive: response, completionHandler: completionHandler)
+    }
+
+    func urlSession(_ session: URLSession, dataTask: URLSessionDataTask, didReceive data: Data) {
+        self.task?.urlSession(session, dataTask: dataTask, didReceive: data)
+    }
+
+    func urlSession(_ session: URLSession, task: URLSessionTask, didCompleteWithError error: Error?) {
+        self.task?.urlSession(session, task: task, didCompleteWithError: error)
     }
 
 }

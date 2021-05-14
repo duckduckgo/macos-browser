@@ -22,30 +22,25 @@ import WebKit
 final class WebContentDownloadTask: FileDownloadTask {
 
     let webView: WKWebView
-    let request: URLRequest?
 
-    override var suggestedFilename: String? {
-        get {
-            webView.title?.replacingOccurrences(of: "[~#@*+%{}<>\\[\\]|\"\\_^\\/:]", with: "_", options: .regularExpression)
+    override var suggestedFilename: String {
+        guard let title = webView.title?.replacingOccurrences(of: "[~#@*+%{}<>\\[\\]|\"\\_^\\/:]",
+                                                              with: "_",
+                                                              options: .regularExpression),
+              !title.isEmpty
+        else {
+            return super.suggestedFilename
         }
-        set { }
-    }
-
-    override var fileTypes: [UTType]? {
-        get {
-            return [.html, .webArchive, .pdf]
-        }
-        set { }
+        return title
     }
 
     private var subTask: FileDownloadTask?
     private var localURL: URL?
 
-    init(download: FileDownload, webView: WKWebView, request: URLRequest?) {
+    init(download: FileDownload, webView: WKWebView) {
         self.webView = webView
-        self.request = request
-
         super.init(download: download)
+        self.fileTypes = [.html, .webArchive, .pdf]
     }
 
     override func start(delegate: FileDownloadTaskDelegate) {
@@ -97,8 +92,11 @@ final class WebContentDownloadTask: FileDownloadTask {
                 if let error = error { throw error }
                 guard let data = try data.map(transform) else { throw FileDownloadError.cancelled }
 
-                self.subTask = DataSaveTask(download: self.download, data: data)
-                self.subTask!.start(delegate: self)
+                let saveTask = DataSaveTask(download: self.download, data: data)
+                self.subTask = saveTask
+                saveTask.progress.flyToImage = self.progress.flyToImage
+                saveTask.progress.fileIconOriginalRect = self.progress.fileIconOriginalRect
+                saveTask.start(delegate: self)
 
             } catch {
                 self.delegate?.fileDownloadTask(self, didFinishWith: .failure(.failedToCompleteDownloadTask(underlyingError: error)))

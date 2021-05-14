@@ -309,7 +309,7 @@ extension MainViewController {
         }
 
         let webView = tabViewModel.tab.webView
-        let download = FileDownload.webContent(webView, request: nil)
+        let download = FileDownload.webContent(webView)
         FileDownloadManager.shared.startDownload(download,
                                                  chooseDestinationCallback: self.browserTabViewController.chooseDestination,
                                                  fileIconOriginalRectCallback: self.browserTabViewController.fileIconFlyAnimationOriginalRect)

@@ -20,6 +20,16 @@ import Foundation
 
 final class DataSaveTask: FileDownloadTask {
 
+    private var dataSuggestedFilename: String?
+    override var suggestedFilename: String {
+        guard let dataSuggestedFilename = dataSuggestedFilename,
+              !dataSuggestedFilename.isEmpty
+        else {
+            return super.suggestedFilename
+        }
+        return dataSuggestedFilename
+    }
+
     let data: Data
 
     init(download: FileDownload, data: Data, mimeType: String? = nil, suggestedFilename: String? = nil) {
@@ -27,7 +37,7 @@ final class DataSaveTask: FileDownloadTask {
         super.init(download: download)
 
         self.fileTypes = mimeType.flatMap(UTType.init(mimeType:)).map { [$0] }
-        self.suggestedFilename = suggestedFilename
+        self.dataSuggestedFilename = suggestedFilename
     }
 
     override func start(delegate: FileDownloadTaskDelegate) {
@@ -40,6 +50,11 @@ final class DataSaveTask: FileDownloadTask {
             delegate?.fileDownloadTask(self, didFinishWith: .failure(.cancelled))
             return
         }
+        let fileSize = Int64(self.data.count)
+        self.progress.totalUnitCount = fileSize
+        self.progress.fileDownloadingSourceURL = self.download.sourceURL
+        self.progress.fileURL = localURL
+        self.progress.publishIfNotPublished()
 
         DispatchQueue.global().async {
             let fm = FileManager()
@@ -53,6 +68,9 @@ final class DataSaveTask: FileDownloadTask {
 
             DispatchQueue.main.async { [weak self] in
                 guard let self = self, let delegate = self.delegate else { return }
+
+                self.progress.completedUnitCount = self.progress.totalUnitCount
+                self.progress.unpublishIfNeeded()
 
                 if let url = outURL {
                     delegate.fileDownloadTask(self, didFinishWith: .success(url))

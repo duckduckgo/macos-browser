@@ -27,7 +27,7 @@ final class FileDownloadManager {
     private init() { }
 
     private var subscriptions = Set<AnyCancellable>()
-    @Published private (set) var downloads = Set<FileDownloadTask>()
+    @PublishedAfter private (set) var downloads = Set<FileDownloadTask>()
 
     typealias FileNameChooserCallback = (/*suggestedFilename:*/ String?,
                                          /*directoryURL:*/      URL?,
@@ -41,9 +41,10 @@ final class FileDownloadManager {
     @discardableResult
     func startDownload(_ request: FileDownload,
                        chooseDestinationCallback: @escaping FileNameChooserCallback,
-                       fileIconOriginalRectCallback: FileIconOriginalRectCallback? = nil) -> FileDownloadTask {
+                       fileIconOriginalRectCallback: FileIconOriginalRectCallback? = nil) -> FileDownloadTask? {
 
-        let task = request.downloadTask()
+        guard let task = request.downloadTask() else { return nil }
+
         self.destinationChooserCallbacks[task] = chooseDestinationCallback
         self.fileIconOriginalRectCallbacks[task] = fileIconOriginalRectCallback
         
@@ -60,11 +61,6 @@ extension FileDownloadManager: FileDownloadTaskDelegate {
     func fileDownloadTaskNeedsDestinationURL(_ task: FileDownloadTask, completionHandler: @escaping (URL?, UTType?) -> Void) {
         dispatchPrecondition(condition: .onQueue(.main))
 
-        defer {
-            self.destinationChooserCallbacks[task] = nil
-            self.fileIconOriginalRectCallbacks[task] = nil
-        }
-
         let completion: (URL?, UTType?) -> Void = { url, fileType in
             if let url = url,
                let originalRect = self.fileIconOriginalRectCallbacks[task]?(task) {
@@ -73,6 +69,9 @@ extension FileDownloadManager: FileDownloadTaskDelegate {
             }
 
             completionHandler(url, fileType)
+            
+            self.destinationChooserCallbacks[task] = nil
+            self.fileIconOriginalRectCallbacks[task] = nil
         }
 
         let preferences = DownloadPreferences()
@@ -80,7 +79,10 @@ extension FileDownloadManager: FileDownloadTaskDelegate {
               let locationChooser = self.destinationChooserCallbacks[task]
         else {
             let fileType = task.fileTypes?.first
-            let fileName = task.suggestedFilename ?? .uniqueFilename(for: fileType)
+            var fileName = task.suggestedFilename
+            if fileName.isEmpty {
+                fileName = .uniqueFilename(for: fileType)
+            }
             if let url = preferences.selectedDownloadLocation?.appendingPathComponent(fileName) {
                 completion(url, fileType)
             } else {

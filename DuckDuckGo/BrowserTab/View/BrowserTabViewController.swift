@@ -412,7 +412,10 @@ extension BrowserTabViewController: WKUIDelegate {
 
     // swiftlint:disable identifier_name
     @objc func _webView(_ webView: WKWebView, saveDataToFile data: NSData, suggestedFilename: NSString, mimeType: NSString, originatingURL: NSURL) {
-        FileDownloadManager.shared.startDownload(.data(data as Data, mimeType: mimeType as String, suggestedName: suggestedFilename as String),
+        FileDownloadManager.shared.startDownload(.data(data as Data,
+                                                       mimeType: mimeType as String,
+                                                       suggestedName: suggestedFilename as String,
+                                                       sourceURL: originatingURL as URL),
                                                  chooseDestinationCallback: self.chooseDestination,
                                                  fileIconOriginalRectCallback: self.fileIconFlyAnimationOriginalRect)
     }

@@ -22,13 +22,6 @@ final class LocalFileSaveTask: FileDownloadTask {
 
     let url: URL
 
-    override var suggestedFilename: String? {
-        get {
-            url.lastPathComponent
-        }
-        set { }
-    }
-
     init(download: FileDownload, url: URL, fileType: UTType?) {
         self.url = url
         super.init(download: download)
@@ -49,7 +42,18 @@ final class LocalFileSaveTask: FileDownloadTask {
         }
 
         do {
+            let fileSize = Int64((try? self.url.resourceValues(forKeys: [.fileSizeKey]).fileSize) ?? 100)
+            self.progress.totalUnitCount = fileSize
+            self.progress.fileDownloadingSourceURL = self.url
+            self.progress.fileURL = destURL
+            self.progress.publishIfNotPublished()
+            defer {
+                self.progress.unpublishIfNeeded()
+            }
+
             let resultURL = try FileManager.default.copyItem(at: self.url, to: destURL, incrementingIndexIfExists: true)
+            self.progress.completedUnitCount = fileSize
+
             delegate?.fileDownloadTask(self, didFinishWith: .success(resultURL))
         } catch {
             delegate?.fileDownloadTask(self, didFinishWith: .failure(.failedToMoveFileToDownloads))

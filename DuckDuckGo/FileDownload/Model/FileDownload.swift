@@ -21,8 +21,8 @@ import WebKit
 
 enum FileDownload {
     case request(URLRequest, suggestedName: String?)
-    case webContent(WKWebView, request: URLRequest?)
-    case data(Data, mimeType: String, suggestedName: String?)
+    case webContent(WKWebView)
+    case data(Data, mimeType: String, suggestedName: String?, sourceURL: URL?)
 }
 
 extension FileDownload {
@@ -40,30 +40,39 @@ extension FileDownload {
         }
     }
 
-    var suggestedName: String? {
-        switch self {
-        case .request(let request, suggestedName: let suggestedName):
-            return suggestedName
-        case .webContent(let webView, request: _):
-            return webView.title
-        case .data(_, mimeType: _, suggestedName: let suggestedName):
-            return suggestedName
-        }
-    }
-
-    func downloadTask() -> FileDownloadTask {
+    func downloadTask() -> FileDownloadTask? {
         switch self {
         case .request(let request, suggestedName: _):
             return URLRequestDownloadTask(download: self, session: nil, request: request)
 
-        case .webContent(let webView, request: let request):
-            if let url = webView.url, url.isFileURL == true {
-                return LocalFileSaveTask(download: self, url: url, fileType: UTType(fileExtension: url.pathExtension))
-            }
-            return WebContentDownloadTask(download: self, webView: webView, request: request)
+        case .webContent(let webView):
+            let contentType = (try? webView.evaluateSynchronously("document.contentType", timeout: 1.0) as? String)
+                .flatMap(UTType.init(mimeType:)) ?? .html
 
-        case .data(let data, mimeType: let mimeType, suggestedName: let suggestedName):
+            if case .html = contentType {
+                return WebContentDownloadTask(download: self, webView: webView)
+
+            } else if let url = webView.url, url.isFileURL == true {
+                return LocalFileSaveTask(download: self, url: url, fileType: UTType(fileExtension: url.pathExtension))
+            } else if let url = webView.url {
+                return URLRequestDownloadTask(download: self, request: URLRequest(url: url, cachePolicy: .returnCacheDataElseLoad))
+            } else {
+                return nil
+            }
+
+        case .data(let data, mimeType: let mimeType, suggestedName: let suggestedName, sourceURL: _):
             return DataSaveTask(download: self, data: data, mimeType: mimeType, suggestedFilename: suggestedName)
+        }
+    }
+
+    var sourceURL: URL? {
+        switch self {
+        case .request(let request, suggestedName: _):
+            return request.url
+        case .webContent(let webView):
+            return webView.url
+        case .data(_, mimeType: _, suggestedName: _, sourceURL: let url):
+            return url
         }
     }
 

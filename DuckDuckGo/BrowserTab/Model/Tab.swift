@@ -547,7 +547,8 @@ extension Tab: WKNavigationDelegate {
 
         if (!navigationResponse.canShowMIMEType || navigationResponse.shouldDownload),
            let request = lastMainFrameRequest {
-            let download = FileDownload.request(request, suggestedName: navigationResponse.response.suggestedFilename)
+            let download = FileDownload.request(request,
+                                                suggestedName: navigationResponse.response.suggestedFilename)
             delegate?.tab(self, requestedFileDownload: download)
             // Flag this here, because interrupting the frame load will cause an error and we need to know
             self.currentDownload = download

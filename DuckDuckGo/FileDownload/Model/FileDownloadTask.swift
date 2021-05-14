@@ -38,7 +38,26 @@ protocol FileDownloadTaskDelegate: AnyObject {
 internal class FileDownloadTask: NSObject {
     let download: FileDownload
 
-    var suggestedFilename: String?
+    static let defaultFileName = "Unknown"
+
+    /// Tries to use the file name part of the URL, if available, adjusting for content type, if available.
+    var suggestedFilename: String {
+        guard let url = self.download.sourceURL else { return Self.defaultFileName }
+        guard !url.pathComponents.isEmpty, url.pathComponents != [ "/" ] else {
+            return url.host?.drop(prefix: "www.").replacingOccurrences(of: ".", with: "_")
+                ?? Self.defaultFileName
+        }
+
+        if let ext = self.fileTypes?.first?.fileExtension,
+           url.pathExtension != ext {
+
+            // there is a more appropriate extension, so use it
+            return url.lastPathComponent + "." + ext
+        }
+
+        return url.lastPathComponent
+    }
+
     var fileTypes: [UTType]?
     let progress: Progress
 
@@ -47,8 +66,7 @@ internal class FileDownloadTask: NSObject {
     init(download: FileDownload) {
         self.download = download
         self.progress = Progress(parent: nil, userInfo: [
-            .fileOperationKindKey: Progress.FileOperationKind.downloading,
-//            .fileLocationCanChangeKey: true
+            .fileOperationKindKey: Progress.FileOperationKind.downloading
         ])
         super.init()
 
@@ -68,6 +86,10 @@ internal class FileDownloadTask: NSObject {
     }
 
     func cancel() {
+    }
+
+    deinit {
+        self.progress.unpublishIfNeeded()
     }
 
 }
