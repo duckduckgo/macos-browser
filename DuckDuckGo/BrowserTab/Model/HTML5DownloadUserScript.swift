@@ -23,7 +23,7 @@ import os.log
 protocol HTML5DownloadDelegate: AnyObject {
 
     func startDownload(_ userScript: HTML5DownloadUserScript, from: URL, withSuggestedName: String?)
-    func startDownload(_ userScript: HTML5DownloadUserScript, data: Data, mimeType: String, withSuggestedName: String?)
+    func startDownload(_ userScript: HTML5DownloadUserScript, data: Data, mimeType: String, suggestedName: String?, sourceURL: URL?)
 
 }
 
@@ -49,7 +49,8 @@ final class HTML5DownloadUserScript: NSObject, StaticUserScript {
         if href.hasPrefix("data:"),
            let data = Data(dataHref: href, mimeType: &mime) {
 
-            delegate?.startDownload(self, data: data, mimeType: mime, withSuggestedName: name)
+            let sourceURL = dict["source"].flatMap(URL.init(string:))
+            delegate?.startDownload(self, data: data, mimeType: mime, suggestedName: name, sourceURL: sourceURL)
 
         } else if let url = URL(string: href) {
             delegate?.startDownload(self, from: url, withSuggestedName: name)
@@ -76,7 +77,8 @@ final class HTML5DownloadUserScript: NSObject, StaticUserScript {
                 fr.onload = function(e) {
                     webkit.messageHandlers.downloadFile.postMessage({
                         "href": e.target.result,
-                        "download": download
+                        "download": download,
+                        "source": url
                     });
                 }
                 fr.readAsDataURL(blob);

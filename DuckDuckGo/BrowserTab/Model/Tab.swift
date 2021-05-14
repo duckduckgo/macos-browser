@@ -413,12 +413,11 @@ extension Tab: HTML5DownloadDelegate {
                                                                         promptForLocation: false))
     }
 
-    func startDownload(_ userScript: HTML5DownloadUserScript, data: Data, mimeType: String, withSuggestedName name: String?) {
-        delegate?.tab(self,
-                      requestedFileDownload: FileDownload.data(data,
-                                                               mimeType: mimeType,
-                                                               suggestedName: name,
-                                                               sourceURL: self.url))
+    func startDownload(_ userScript: HTML5DownloadUserScript, data: Data, mimeType: String, suggestedName: String?, sourceURL: URL?) {
+        delegate?.tab(self, requestedFileDownload: FileDownload.data(data,
+                                                                     mimeType: mimeType,
+                                                                     suggestedName: suggestedName,
+                                                                     sourceURL: sourceURL))
     }
 
 }
