@@ -31,4 +31,39 @@ extension WKWebView {
         }
     }
 
+    struct EvaluateTimeout: Error {}
+    func evaluateSynchronously(_ script: String, timeout: TimeInterval? = nil) throws -> Any? {
+        var output: (result: Any?, error: Error?)?
+        let port = Port()
+        RunLoop.current.add(port, forMode: .default)
+
+        let timer = timeout.map { Timer(timeInterval: $0, repeats: false) { _ in
+            if output == nil {
+                output = (nil, EvaluateTimeout())
+            }
+        } }
+        timer.map { RunLoop.current.add($0, forMode: .default) }
+
+        self.evaluateJavaScript(script) { (result, error) in
+            output = (result, error)
+            
+            let sendPort = Port()
+            RunLoop.current.add(sendPort, forMode: .default)
+            sendPort.send(before: Date(), components: nil, from: port, reserved: 0)
+            RunLoop.current.remove(sendPort, forMode: .default)
+        }
+
+        while output == nil {
+            RunLoop.current.run(mode: .default, before: .distantFuture)
+        }
+        timer?.invalidate()
+        RunLoop.current.remove(port, forMode: .default)
+
+        if let error = output?.error {
+            throw error
+        } else {
+            return output?.result
+        }
+    }
+
 }
