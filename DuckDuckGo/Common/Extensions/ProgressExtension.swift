@@ -67,6 +67,32 @@ extension Progress {
         }
     }
 
+    var isUnpublished: Bool {
+        get {
+            self.userInfo[.isUnpublishedKey] as? Bool ?? false
+        }
+        set {
+            self.setUserInfoObject(newValue, forKey: .isUnpublishedKey)
+        }
+    }
+
+    func publishIfNotPublished() {
+        dispatchPrecondition(condition: .onQueue(.main))
+        guard !self.isPublished else { return }
+        self.isPublished = true
+
+        self.publish()
+    }
+
+    func unpublishIfNeeded() {
+        guard self.isPublished,
+              !self.isUnpublished
+        else { return }
+        self.isUnpublished = true
+
+        self.unpublish()
+    }
+
 }
 
 extension ProgressUserInfoKey {
@@ -75,5 +101,6 @@ extension ProgressUserInfoKey {
     static let flyToImageKey = ProgressUserInfoKey(rawValue: "NSProgressFlyToImageKey")
     static let fileIconOriginalRectKey = ProgressUserInfoKey(rawValue: "NSProgressFileAnimationImageOriginalRectKey")
 
-    static let isPublishedKey = ProgressUserInfoKey(rawValue: "isPublishedKey")
+    fileprivate static let isPublishedKey = ProgressUserInfoKey(rawValue: "isPublishedKey")
+    fileprivate static let isUnpublishedKey = ProgressUserInfoKey(rawValue: "isUnpublishedKey")
 }
