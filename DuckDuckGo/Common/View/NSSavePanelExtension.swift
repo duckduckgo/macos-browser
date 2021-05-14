@@ -30,6 +30,9 @@ extension NSSavePanel {
         self.fileTypesPopup?.selectedItem?.representedObject as? UTType
     }
 
+    @UserDefaultsWrapper(key: .saveAsPreferredFileType, defaultValue: nil)
+    static private var preferredFileType: String?
+
     static func withFileTypeChooser(fileTypes: [UTType], suggestedFilename: String?, directoryURL: URL? = nil) -> NSSavePanel {
         let savePanel = NSSavePanel()
 
@@ -45,10 +48,18 @@ extension NSSavePanel {
         popup.action = #selector(NSSavePanel.fileTypePopUpSelectionDidChange(_:))
 
         popup.removeAllItems()
+        var selectedItem: NSMenuItem?
+        let preferredFileType = Self.preferredFileType.map(UTType.init(mimeType:))
         for fileType in fileTypes {
             popup.addItem(withTitle: "\(fileType.description ?? "") (.\(fileType.fileExtension ?? ""))")
-            popup.item(at: popup.numberOfItems - 1)?.representedObject = fileType
+            let item = popup.item(at: popup.numberOfItems - 1)
+            item?.representedObject = fileType
+
+            if selectedItem == nil || fileType == preferredFileType {
+                selectedItem = item
+            }
         }
+        popup.select(selectedItem)
         savePanel.fileTypePopUpSelectionDidChange(popup)
 
         if let suggestedFilename = suggestedFilename {
@@ -63,11 +74,12 @@ extension NSSavePanel {
     }
 
     @objc private func fileTypePopUpSelectionDidChange(_ popup: NSPopUpButton) {
-        guard let ext = popup.selectedItem?.representedObject as? UTType else {
+        guard let fileType = popup.selectedItem?.representedObject as? UTType else {
             self.allowedFileTypes = nil
             return
         }
-        self.allowedFileTypes = [ext.rawValue as String]
+        Self.preferredFileType = fileType.mimeType
+        self.allowedFileTypes = [fileType.rawValue as String]
     }
 
 }
