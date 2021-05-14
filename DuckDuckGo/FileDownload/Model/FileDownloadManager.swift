@@ -28,17 +28,24 @@ final class FileDownloadManager {
 
     private var subscriptions = Set<AnyCancellable>()
     @Published private (set) var downloads = Set<FileDownloadTask>()
-    private var destinationChooserCallbacks = [FileDownloadTask: FileNameChooserCallback]()
 
     typealias FileNameChooserCallback = (/*suggestedFilename:*/ String?,
                                          /*directoryURL:*/      URL?,
                                          /*fileTypes:*/         [UTType],
                                          /*completionHandler*/  @escaping (URL?, UTType?) -> Void) -> Void
+    typealias FileIconOriginalRectCallback = (FileDownloadTask) -> NSRect?
+
+    private var destinationChooserCallbacks = [FileDownloadTask: FileNameChooserCallback]()
+    private var fileIconOriginalRectCallbacks = [FileDownloadTask: FileIconOriginalRectCallback]()
 
     @discardableResult
-    func startDownload(_ request: FileDownload, chooseDestinationCallback: @escaping FileNameChooserCallback) -> FileDownloadTask {
+    func startDownload(_ request: FileDownload,
+                       chooseDestinationCallback: @escaping FileNameChooserCallback,
+                       fileIconOriginalRectCallback: FileIconOriginalRectCallback? = nil) -> FileDownloadTask {
+
         let task = request.downloadTask()
         self.destinationChooserCallbacks[task] = chooseDestinationCallback
+        self.fileIconOriginalRectCallbacks[task] = fileIconOriginalRectCallback
         
         downloads.insert(task)
         task.start(delegate: self)
@@ -55,6 +62,17 @@ extension FileDownloadManager: FileDownloadTaskDelegate {
 
         defer {
             self.destinationChooserCallbacks[task] = nil
+            self.fileIconOriginalRectCallbacks[task] = nil
+        }
+
+        let completion: (URL?, UTType?) -> Void = { url, fileType in
+            if let url = url,
+               let originalRect = self.fileIconOriginalRectCallbacks[task]?(task) {
+                task.progress.flyToImage = (UTType(fileExtension: url.pathExtension) ?? fileType)?.icon
+                task.progress.fileIconOriginalRect = originalRect
+            }
+
+            completionHandler(url, fileType)
         }
 
         let preferences = DownloadPreferences()
@@ -64,11 +82,11 @@ extension FileDownloadManager: FileDownloadTaskDelegate {
             let fileType = task.fileTypes?.first
             let fileName = task.suggestedFilename ?? .uniqueFilename(for: fileType)
             if let url = preferences.selectedDownloadLocation?.appendingPathComponent(fileName) {
-                completionHandler(url, fileType)
+                completion(url, fileType)
             } else {
                 os_log("Failed to access Downloads folder")
                 Pixel.fire(.debug(event: .fileMoveToDownloadsFailed, error: CocoaError(.fileWriteUnknown)))
-                completionHandler(nil, nil)
+                completion(nil, nil)
             }
             return
         }
@@ -80,7 +98,7 @@ extension FileDownloadManager: FileDownloadTaskDelegate {
                 try? FileManager.default.removeItem(at: url)
             }
 
-            completionHandler(url, fileType)
+            completion(url, fileType)
         }
     }
 
@@ -89,6 +107,7 @@ extension FileDownloadManager: FileDownloadTaskDelegate {
 
         self.downloads.remove(task)
         self.destinationChooserCallbacks[task] = nil
+        self.fileIconOriginalRectCallbacks[task] = nil
 
         if case .success(let url) = result {
             // For now, show the file in Finder

@@ -268,7 +268,9 @@ extension BrowserTabViewController: TabDelegate {
     }
 
     func tab(_ tab: Tab, requestedFileDownload request: FileDownload) {
-        FileDownloadManager.shared.startDownload(request, chooseDestinationCallback: self.chooseDestination)
+        FileDownloadManager.shared.startDownload(request,
+                                                 chooseDestinationCallback: self.chooseDestination,
+                                                 fileIconOriginalRectCallback: self.fileIconFlyAnimationOriginalRect)
 
         // Note this can result in tabs being left open, e.g. download button on this page:
         // https://en.wikipedia.org/wiki/Guitar#/media/File:GuitareClassique5.png
@@ -292,6 +294,23 @@ extension BrowserTabViewController: TabDelegate {
         } else {
             completionHandler(savePanel.runModal())
         }
+    }
+
+    func fileIconFlyAnimationOriginalRect(for downloadTask: FileDownloadTask) -> NSRect? {
+        dispatchPrecondition(condition: .onQueue(.main))
+        guard let addressBar = (self.parent as? MainViewController)?.navigationBarViewController.addressBarViewController?.addressBarTextField,
+              let window = addressBar.window
+        else {
+            return nil
+        }
+
+        // fly 64x64 icon from center of Address Bar
+        let size = addressBar.bounds.size
+        let rect = NSRect(x: size.width / 2 - 32, y: size.height / 2 - 32, width: 64, height: 64)
+        let windowRect = addressBar.convert(rect, to: nil)
+        var globalRect = window.convertToScreen(windowRect)
+        globalRect.origin.x -= NSScreen.main?.frame.origin.x ?? 0
+        return globalRect
     }
 
     func tab(_ tab: Tab, willShowContextMenuAt position: NSPoint, image: URL?, link: URL?) {
@@ -394,7 +413,8 @@ extension BrowserTabViewController: WKUIDelegate {
     // swiftlint:disable identifier_name
     @objc func _webView(_ webView: WKWebView, saveDataToFile data: NSData, suggestedFilename: NSString, mimeType: NSString, originatingURL: NSURL) {
         FileDownloadManager.shared.startDownload(.data(data as Data, mimeType: mimeType as String, suggestedName: suggestedFilename as String),
-                                                 chooseDestinationCallback: self.chooseDestination)
+                                                 chooseDestinationCallback: self.chooseDestination,
+                                                 fileIconOriginalRectCallback: self.fileIconFlyAnimationOriginalRect)
     }
     // swiftlint:enable identifier_name
 

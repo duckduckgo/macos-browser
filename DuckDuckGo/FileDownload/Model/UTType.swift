@@ -17,6 +17,7 @@
 //
 
 import Foundation
+import UniformTypeIdentifiers
 
 struct UTType: RawRepresentable, Hashable {
     static let html = UTType(rawValue: kUTTypeHTML)
@@ -58,6 +59,19 @@ extension UTType {
 
     var description: String? {
         UTTypeCopyDescription(self.rawValue)?.takeRetainedValue() as String?
+    }
+
+    @available(OSX 11.0, *)
+    private var utType: UniformTypeIdentifiers.UTType {
+        UniformTypeIdentifiers.UTType(rawValue as String) ?? .plainText
+    }
+
+    var icon: NSImage {
+        if #available(OSX 11.0, *) {
+            return NSWorkspace.shared.icon(for: self.utType)
+        } else {
+            return NSWorkspace.shared.icon(forFileType: rawValue as String)
+        }
     }
 
 }

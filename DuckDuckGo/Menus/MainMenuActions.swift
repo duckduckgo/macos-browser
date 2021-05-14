@@ -307,11 +307,12 @@ extension MainViewController {
             os_log("MainViewController: No tab view model selected", type: .error)
             return
         }
-        // TODO: save Tab.urlRequest for saving pages with POST data?
-        let webView = tabViewModel.tab.webView
 
+        let webView = tabViewModel.tab.webView
         let download = FileDownload.webContent(webView, request: nil)
-        FileDownloadManager.shared.startDownload(download, chooseDestinationCallback: self.browserTabViewController.chooseDestination)
+        FileDownloadManager.shared.startDownload(download,
+                                                 chooseDestinationCallback: self.browserTabViewController.chooseDestination,
+                                                 fileIconOriginalRectCallback: self.browserTabViewController.fileIconFlyAnimationOriginalRect)
     }
 
     // MARK: - Debug

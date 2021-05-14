@@ -21,30 +21,28 @@ import Combine
 import os
 
 final class URLRequestDownloadTask: FileDownloadTask {
-    private var localFileURL: URL?
 
     private var session: URLSession?
     private let request: URLRequest
     private var task: URLSessionTask?
 
     private var downloadedFileLocationCancellable: AnyCancellable?
+    private var downloadedFileBytesWrittenCancellable: AnyCancellable?
+    static private let progressThrottleQueue = DispatchQueue(label: "URLRequestDownloadTask.progressThrottleQueue", qos: .background)
+
+    static private let downloadExtension = "duckDownload"
 
     private var downloadedFile: DownloadedFile? {
         didSet {
             guard let downloadedFile = downloadedFile else { return }
-            downloadedFileLocationCancellable = downloadedFile.$url.sink { [weak self] url in
-                #warning("if newURL is in Trash stop download")
-                if url?.path.contains("/.Trash/") == true {
-                    self?.cancel()
-                }
-            }
+            downloadedFileLocationCancellable = downloadedFile.$url
+                .assign(to: \.fileURL, on: self.progress)
+            downloadedFileBytesWrittenCancellable = downloadedFile.$bytesWritten
+                .throttle(for: 0.3, scheduler: Self.progressThrottleQueue, latest: true)
+                .map(Int64.init)
+                .assign(to: \.completedUnitCount, on: self.progress)
         }
     }
-
-    @Published var bytesDownloaded: Int64 = 0
-
-    private var savedFileURL: URL?
-    private var error: Error?
 
     init(download: FileDownload, session: URLSession? = nil, request: URLRequest) {
         self.session = session
@@ -58,6 +56,7 @@ final class URLRequestDownloadTask: FileDownloadTask {
 
         session = URLSession(configuration: session?.configuration ?? .default, delegate: self, delegateQueue: nil)
         task = session!.dataTask(with: request)
+        self.progress.fileDownloadingSourceURL = request.url
 
         self.suggestedFilename = self.bestFileName()
 
@@ -66,6 +65,31 @@ final class URLRequestDownloadTask: FileDownloadTask {
 
     override func cancel() {
         self.task?.cancel()
+    }
+
+    private func finish(with result: Result<URL, FileDownloadError>) {
+        if self.downloadedFile != nil {
+            if !self.progress.isPublished {
+                self.progress.publish()
+            }
+            if case .success = result {
+                if self.progress.totalUnitCount == -1 {
+                    self.progress.totalUnitCount = 1
+                }
+                self.progress.completedUnitCount = self.progress.totalUnitCount
+            }
+
+            self.progress.unpublish()
+        }
+
+        DispatchQueue.main.async {
+            if case .failure = result {
+                self.downloadedFile?.delete()
+            }
+            self.downloadedFile = nil
+
+            self.delegate?.fileDownloadTask(self, didFinishWith: result)
+        }
     }
 
     private func bestFileName() -> String? {
@@ -95,12 +119,12 @@ final class URLRequestDownloadTask: FileDownloadTask {
         return url.lastPathComponent
     }
 
-    /// Based on Content-Length header, if avialable.
-    var contentLength: Int? {
-        guard let contentLength = request.allHTTPHeaderFields?["Content-Length"] else { return nil }
-        return Int(contentLength)
+    deinit {
+        if self.progress.isPublished {
+            self.progress.unpublish()
+        }
     }
-
+    
 }
 
 extension URLRequestDownloadTask: URLSessionDataDelegate {
@@ -117,9 +141,10 @@ extension URLRequestDownloadTask: URLSessionDataDelegate {
 
         let tempURL = tempDir.appendingPathComponent(.uniqueFilename())
 
-        self.downloadedFile = DownloadedFile(url: tempURL, expectedSize: response.expectedContentLength)
+        self.downloadedFile = DownloadedFile(url: tempURL)
         self.suggestedFilename = response.suggestedFilename ?? self.suggestedFilename
         self.fileTypes = response.mimeType.flatMap(UTType.init(mimeType:)).map { [$0] }
+        self.progress.totalUnitCount = response.expectedContentLength
 
         DispatchQueue.main.async { [weak self, dataTask] in
             guard let self = self else {
@@ -130,18 +155,24 @@ extension URLRequestDownloadTask: URLSessionDataDelegate {
 
             self.delegate?.fileDownloadTaskNeedsDestinationURL(self) { url, _ in
                 if let url = url, let downloadedFile = self.downloadedFile {
-                    self.localFileURL = url
                     switch dataTask.state {
                     case .completed:
                         do {
                             let finalURL = try downloadedFile.move(to: url, incrementingIndexIfExists: true)
-                            self.delegate?.fileDownloadTask(self, didFinishWith: .success(finalURL))
+                            self.finish(with: .success(finalURL))
                         } catch {
-                            self.delegate?.fileDownloadTask(self, didFinishWith: .failure(.failedToMoveFileToDownloads))
+                            self.finish(with: .failure(.failedToMoveFileToDownloads))
                         }
+
                     case .running, .suspended:
-                        let downloadURL = url.appendingPathExtension("duckDownload")
-                        _=try? self.downloadedFile?.move(to: downloadURL, incrementingIndexIfExists: true)
+                        let downloadURL = url.appendingPathExtension(Self.downloadExtension)
+                        let ext = url.pathExtension + (url.pathExtension.isEmpty ? "" : ".") + Self.downloadExtension
+                        _=try? self.downloadedFile?.move(to: downloadURL, incrementingIndexIfExists: true, pathExtension: ext)
+
+                        // set this in thread safe var?
+                        self.progress.isPublished = true
+                        self.progress.publish()
+
                     case .canceling:
                         break
                     @unknown default:
@@ -150,8 +181,7 @@ extension URLRequestDownloadTask: URLSessionDataDelegate {
 
                 } else {
                     dataTask.cancel()
-                    try? self.downloadedFile?.delete()
-                    self.delegate?.fileDownloadTask(self, didFinishWith: .failure(.cancelled))
+                    self.finish(with: .failure(.cancelled))
                 }
             }
         }
@@ -162,27 +192,18 @@ extension URLRequestDownloadTask: URLSessionDataDelegate {
     }
 
     func urlSession(_ session: URLSession, task: URLSessionTask, didCompleteWithError error: Error?) {
-        self.downloadedFile?.close()
-
         if let error = error {
-            try? self.downloadedFile?.delete()
-            DispatchQueue.main.async {
-                self.delegate?.fileDownloadTask(self, didFinishWith: .failure(.failedToCompleteDownloadTask(underlyingError: error)))
-            }
-
-        } else if let destURL = DispatchQueue.main.sync(execute: { self.localFileURL }) {
+            self.finish(with: .failure(.failedToCompleteDownloadTask(underlyingError: error)))
+        } else {
             do {
-                guard let finalURL = try self.downloadedFile?.move(to: destURL, incrementingIndexIfExists: true) else {
+                guard let url = self.downloadedFile?.url?.path.drop(suffix: "." + Self.downloadExtension),
+                      let finalURL = try self.downloadedFile?.move(to: URL(fileURLWithPath: url), incrementingIndexIfExists: true)
+                else {
                     throw FileDownloadError.cancelled
                 }
-                DispatchQueue.main.async {
-                    self.delegate?.fileDownloadTask(self, didFinishWith: .success(finalURL))
-                }
+                self.finish(with: .success(finalURL))
             } catch {
-                try? self.downloadedFile?.delete()
-                DispatchQueue.main.async {
-                    self.delegate?.fileDownloadTask(self, didFinishWith: .failure(.failedToMoveFileToDownloads))
-                }
+                self.finish(with: .failure(.failedToMoveFileToDownloads))
             }
         }
     }

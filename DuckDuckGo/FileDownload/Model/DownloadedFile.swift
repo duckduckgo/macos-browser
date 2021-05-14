@@ -21,22 +21,36 @@ import Combine
 
 final class DownloadedFile: NSObject {
 
-    private static let queue = OperationQueue()
+    private static let queue: OperationQueue = {
+        let queue = OperationQueue()
+        queue.name = "DownloadedFile.queue"
+        queue.isSuspended = false
+        return queue
+    }()
 
     @Published private(set) var url: URL?
+    @Published private(set) var bytesWritten: UInt64 = 0
+
     private var handle: FileHandle?
 
-    private var bytesWritten: Int = 0
-    private var expectedSize: Int64?
-
-    init(url: URL, expectedSize: Int64?) {
-        let fm = FileManager()
+    init(url: URL, offset: UInt64 = 0) {
+        let fm = FileManager.default
         if !fm.fileExists(atPath: url.path) {
             fm.createFile(atPath: url.path, contents: nil, attributes: nil)
         }
         self.url = url
         handle = FileHandle(forWritingAtPath: url.path)
-        self.expectedSize = expectedSize
+
+        do {
+            try handle!.seek(toOffset: offset)
+            try handle!.truncate(atOffset: offset)
+            self.bytesWritten = offset
+        } catch {
+            handle!.seek(toFileOffset: 0)
+            handle!.truncateFile(atOffset: 0)
+            self.bytesWritten = 0
+        }
+
         super.init()
         
         NSFileCoordinator.addFilePresenter(self)
@@ -45,43 +59,53 @@ final class DownloadedFile: NSObject {
     func close() {
         handle?.closeFile()
         handle = nil
-        if let url = url {
-            try? FileManager.default.setFractionCompleted(nil, at: url)
-        }
     }
 
-    func move(to newURL: URL, incrementingIndexIfExists: Bool) throws -> URL {
+    func move(to newURL: URL, incrementingIndexIfExists: Bool, pathExtension: String? = nil) throws -> URL {
         guard let currentURL = self.url,
               currentURL != newURL
         else { return newURL }
 
-        let resultURL = try FileManager().moveItem(at: currentURL, to: newURL, incrementingIndexIfExists: incrementingIndexIfExists)
-        #warning("recreate FileHandle if moving to different volumt")
+        let oldURLVolume = try? currentURL.resourceValues(forKeys: [.volumeURLKey]).volume
+        let newURLVolume = try? newURL.resourceValues(forKeys: [.volumeURLKey]).volume
+        if let handle = handle,
+           oldURLVolume == nil || oldURLVolume != newURLVolume {
+            // reopen FileHandle when moving file between different volumes
+            handle.synchronizeFile()
+            handle.closeFile()
+        }
+
+        let resultURL = try FileManager.default.moveItem(at: currentURL,
+                                                         to: newURL,
+                                                         incrementingIndexIfExists: incrementingIndexIfExists,
+                                                         pathExtension: pathExtension)
+
+        if handle != nil,
+           oldURLVolume == nil || oldURLVolume != newURLVolume {
+            handle = FileHandle(forWritingAtPath: resultURL.path)
+            handle!.seekToEndOfFile()
+        }
         self.url = resultURL
 
         return resultURL
     }
 
     func write(_ data: Data) {
+        #warning("written in urlrequest callback, moved to in main thread")
         self.handle?.write(data)
-        bytesWritten += data.count
-
-        if let expectedSize = expectedSize,
-           let url = self.url {
-            let fractionCompleted = Double(bytesWritten) / Double(expectedSize)
-            try? FileManager.default.setFractionCompleted(fractionCompleted, at: url)
-        }
+        bytesWritten += UInt64(data.count)
     }
 
-    func delete() throws {
+    func delete() {
         guard let url = url else { return }
         close()
-        try FileManager().removeItem(at: url)
+        try? FileManager().removeItem(at: url)
 
         self.url = nil
     }
 
     deinit {
+        #warning("not deinited as it's added")
         NSFileCoordinator.removeFilePresenter(self)
     }
 
@@ -99,6 +123,15 @@ extension DownloadedFile: NSFilePresenter {
 
     func presentedItemDidMove(to newURL: URL) {
         self.url = newURL
+    }
+
+    func presentedItemDidChange() {
+        // TODO: use GCD file mon?
+        if let url = self.url,
+           !FileManager.default.fileExists(atPath: url.path) {
+            close()
+            self.url = nil
+        }
     }
 
 }

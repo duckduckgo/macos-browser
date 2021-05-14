@@ -40,11 +40,27 @@ internal class FileDownloadTask: NSObject {
 
     var suggestedFilename: String?
     var fileTypes: [UTType]?
+    let progress: Progress
 
     weak var delegate: FileDownloadTaskDelegate?
 
     init(download: FileDownload) {
         self.download = download
+        self.progress = Progress(parent: nil, userInfo: [
+            .fileOperationKindKey: Progress.FileOperationKind.downloading,
+//            .fileLocationCanChangeKey: true
+        ])
+        super.init()
+
+        progress.kind = .file
+        progress.totalUnitCount = -1
+        progress.completedUnitCount = 0
+
+        progress.isPausable = false
+        progress.isCancellable = true
+        progress.cancellationHandler = { [weak self] in
+            self?.cancel()
+        }
     }
 
     func start(delegate: FileDownloadTaskDelegate) {

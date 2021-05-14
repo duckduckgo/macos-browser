@@ -21,30 +21,39 @@ import os
 
 extension FileManager {
 
-    func moveItem(at srcURL: URL, to destURL: URL, incrementingIndexIfExists flag: Bool) throws -> URL {
-        return try self.perform(self.moveItem, from: srcURL, to: destURL, incrementingIndexIfExists: flag)
+    func moveItem(at srcURL: URL, to destURL: URL, incrementingIndexIfExists flag: Bool, pathExtension: String? = nil) throws -> URL {
+        return try self.perform(self.moveItem, from: srcURL, to: destURL, incrementingIndexIfExists: flag, pathExtension: pathExtension)
     }
 
-    func copyItem(at srcURL: URL, to destURL: URL, incrementingIndexIfExists flag: Bool) throws -> URL {
-        return try self.perform(self.copyItem, from: srcURL, to: destURL, incrementingIndexIfExists: flag)
+    func copyItem(at srcURL: URL, to destURL: URL, incrementingIndexIfExists flag: Bool, pathExtension: String? = nil) throws -> URL {
+        return try self.perform(self.copyItem, from: srcURL, to: destURL, incrementingIndexIfExists: flag, pathExtension: pathExtension)
     }
 
     private func perform(_ operation: (URL, URL) throws -> Void,
                          from srcURL: URL,
                          to destURL: URL,
-                         incrementingIndexIfExists: Bool) throws -> URL {
+                         incrementingIndexIfExists: Bool,
+                         pathExtension: String?) throws -> URL {
 
         guard incrementingIndexIfExists else {
             try operation(srcURL, destURL)
             return destURL
         }
 
-        var suffix = destURL.pathExtension
-        if !suffix.isEmpty {
+        var suffix = pathExtension ?? destURL.pathExtension
+        if !suffix.hasPrefix(".") {
             suffix = "." + suffix
         }
+        if !destURL.pathExtension.isEmpty {
+            if !destURL.path.hasSuffix(suffix) {
+                suffix = "." + destURL.pathExtension
+            }
+        } else {
+            suffix = ""
+        }
+
         let ownerDirectory = destURL.deletingLastPathComponent()
-        let fileNameWithoutExtension = destURL.deletingPathExtension().lastPathComponent
+        let fileNameWithoutExtension = destURL.lastPathComponent.drop(suffix: suffix)
 
         for copy in 0... {
             let destURL: URL = {
@@ -72,31 +81,5 @@ extension FileManager {
         }
         fatalError("Unexpected flow")
     }
-
-    func setFractionCompleted(_ fraction: Double?, at url: URL) throws {
-        var attributes = try self.attributesOfItem(atPath: url.path)
-
-        var extendedAttributes = attributes[.extended] as? [FileAttributeKey: Any] ?? [:]
-        extendedAttributes[.fractionCompleted] = fraction.map { "\($0)" }?.data(using: .utf8)
-
-        attributes[.extended] = extendedAttributes
-        attributes[.creationDate] = Date.magicCreationDateForFileProgress
-
-        try self.setAttributes(attributes, ofItemAtPath: url.path)
-    }
-
-}
-
-private extension FileAttributeKey {
-
-    static let extended = FileAttributeKey("NSFileExtendedAttributes")
-    static let fractionCompleted = FileAttributeKey("com.apple.progress.fractionCompleted")
-    static let quarantine = FileAttributeKey("com.apple.quarantine")
-
-}
-
-private extension Date {
-
-    static let magicCreationDateForFileProgress = Date(timeIntervalSince1970: 443779200)
 
 }
