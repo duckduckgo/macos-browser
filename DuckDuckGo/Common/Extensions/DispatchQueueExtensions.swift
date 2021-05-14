@@ -28,4 +28,13 @@ extension DispatchQueue {
         }
     }
 
+    func nowOrSync<T>(_ block: () throws -> T) rethrows -> T {
+        assert(self === DispatchQueue.main)
+        if Thread.isMainThread {
+            return try block()
+        } else {
+            return try self.sync(execute: block)
+        }
+    }
+
 }

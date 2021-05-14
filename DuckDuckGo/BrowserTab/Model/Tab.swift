@@ -586,10 +586,10 @@ extension Tab: WKNavigationDelegate {
     func webView(_ webView: WKWebView, didFailProvisionalNavigation navigation: WKNavigation!, withError error: Error) {
         if currentDownload != nil && (error as NSError).code == ErrorCodes.frameLoadInterrupted {
             currentDownload = nil
-//            os_log("didFailProvisionalNavigation due to download %s", type: .debug, currentDownload?.request.url?.absoluteString ?? "")
+            os_log("didFailProvisionalNavigation due to download %s", type: .debug, currentDownload?.sourceURL?.absoluteString ?? "")
             return
         }
-        // TODO: Should we ignore currentDownload and always check frameLoadInterrupted (showing error for g! redirect)
+        #warning("Should we ignore currentDownload and always check frameLoadInterrupted? (showing error for g! redirect)")
         self.error = error
     }
 

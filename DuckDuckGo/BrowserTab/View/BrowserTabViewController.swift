@@ -304,7 +304,7 @@ extension BrowserTabViewController: TabDelegate {
             return nil
         }
 
-        // fly 64x64 icon from center of Address Bar
+        // fly 64x64 icon from the center of Address Bar
         let size = addressBar.bounds.size
         let rect = NSRect(x: size.width / 2 - 32, y: size.height / 2 - 32, width: 64, height: 64)
         let windowRect = addressBar.convert(rect, to: nil)

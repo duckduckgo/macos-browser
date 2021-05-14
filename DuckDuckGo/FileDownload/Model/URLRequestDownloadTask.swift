@@ -34,6 +34,7 @@ final class URLRequestDownloadTask: FileDownloadTask {
     static private let downloadExtension = "duckDownload"
 
     private var responseSuggestedFilename: String?
+    private var downloadLocationChosen = false
 
     override var suggestedFilename: String {
         guard let responseSuggestedFilename = responseSuggestedFilename,
@@ -121,6 +122,7 @@ final class URLRequestDownloadTask: FileDownloadTask {
                 self.finish(with: .failure(.failedToMoveFileToDownloads))
             }
 
+            self.downloadLocationChosen = true
             self.progress.publishIfNotPublished()
 
         case .canceling:
@@ -154,9 +156,7 @@ final class URLRequestDownloadTask: FileDownloadTask {
         }
     }
     
-}
-
-extension URLRequestDownloadTask {
+    // MARK: - URLSessionDataDelegate
 
     func urlSession(_ session: URLSession,
                     dataTask: URLSessionDataTask,
@@ -166,9 +166,7 @@ extension URLRequestDownloadTask {
         // start download to temp location before final location is chosen
         let downloadLocation = DownloadPreferences().selectedDownloadLocation
         // find appropriate temp folder for final destination URL
-        let fm = FileManager.default
-        let tempDir = (try? fm.url(for: .itemReplacementDirectory, in: .userDomainMask, appropriateFor: downloadLocation, create: false))
-            ?? fm.temporaryDirectory
+        let tempDir = FileManager.default.temporaryDirectory(appropriateFor: downloadLocation)
         let tempURL = tempDir.appendingPathComponent(.uniqueFilename())
 
         self.downloadedFile = try? DownloadedFile(url: tempURL)
@@ -204,6 +202,11 @@ extension URLRequestDownloadTask {
                       let url = downloadedFile.url?.path.drop(suffix: "." + Self.downloadExtension)
                 else {
                     throw FileDownloadError.cancelled
+                }
+                // only move file to final destination if SavePanel did complete by the moment
+                // otherwise move and finish the task in the localFileURLCompletionHandler
+                guard DispatchQueue.main.nowOrSync({ self.downloadLocationChosen }) else {
+                    return
                 }
                 let finalURL = try downloadedFile.move(to: URL(fileURLWithPath: url), incrementingIndexIfExists: true)
 
