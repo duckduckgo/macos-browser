@@ -114,6 +114,7 @@
 		4BA1A6E6258C270800F6F690 /* EncryptionKeyGeneratorTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4BA1A6E5258C270800F6F690 /* EncryptionKeyGeneratorTests.swift */; };
 		4BA1A6F6258C4F9600F6F690 /* EncryptionMocks.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4BA1A6F5258C4F9600F6F690 /* EncryptionMocks.swift */; };
 		4BA1A6FE258C5C1300F6F690 /* EncryptedValueTransformerTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4BA1A6FD258C5C1300F6F690 /* EncryptedValueTransformerTests.swift */; };
+		4BA4618A2652009C0014DF3F /* NSOutlineViewExtensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4BA461892652009C0014DF3F /* NSOutlineViewExtensions.swift */; };
 		4BB88B4525B7B55C006F6B06 /* DebugUserScript.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4BB88B4425B7B55C006F6B06 /* DebugUserScript.swift */; };
 		4BB88B4A25B7B690006F6B06 /* SequenceExtensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4BB88B4925B7B690006F6B06 /* SequenceExtensions.swift */; };
 		4BB88B5025B7BA2B006F6B06 /* TabInstrumentation.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4BB88B4F25B7BA2B006F6B06 /* TabInstrumentation.swift */; };
@@ -445,6 +446,7 @@
 		4BA1A6EA258C288C00F6F690 /* EncryptionKeyStoreTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EncryptionKeyStoreTests.swift; sourceTree = "<group>"; };
 		4BA1A6F5258C4F9600F6F690 /* EncryptionMocks.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EncryptionMocks.swift; sourceTree = "<group>"; };
 		4BA1A6FD258C5C1300F6F690 /* EncryptedValueTransformerTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EncryptedValueTransformerTests.swift; sourceTree = "<group>"; };
+		4BA461892652009C0014DF3F /* NSOutlineViewExtensions.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = NSOutlineViewExtensions.swift; sourceTree = "<group>"; };
 		4BB88B4425B7B55C006F6B06 /* DebugUserScript.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DebugUserScript.swift; sourceTree = "<group>"; };
 		4BB88B4925B7B690006F6B06 /* SequenceExtensions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SequenceExtensions.swift; sourceTree = "<group>"; };
 		4BB88B4F25B7BA2B006F6B06 /* TabInstrumentation.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TabInstrumentation.swift; sourceTree = "<group>"; };
@@ -970,6 +972,14 @@
 				B6A5A27D25B9403E00AA7ADA /* FileStoreMock.swift */,
 			);
 			path = FileSystem;
+			sourceTree = "<group>";
+		};
+		4BA46188265200910014DF3F /* Extensions */ = {
+			isa = PBXGroup;
+			children = (
+				4BA461892652009C0014DF3F /* NSOutlineViewExtensions.swift */,
+			);
+			path = Extensions;
 			sourceTree = "<group>";
 		};
 		4BB88B4E25B7BA20006F6B06 /* Utilities */ = {
@@ -1574,10 +1584,11 @@
 		AAC5E4C025D6A6A9007F5990 /* Bookmarks */ = {
 			isa = PBXGroup;
 			children = (
-				AAC5E4C125D6A6C3007F5990 /* View */,
-				AAB549DD25DAB8E90058460B /* ViewModel */,
+				4BA46188265200910014DF3F /* Extensions */,
 				AAC5E4C225D6A6C7007F5990 /* Model */,
 				AAC5E4C325D6A6CC007F5990 /* Services */,
+				AAC5E4C125D6A6C3007F5990 /* View */,
+				AAB549DD25DAB8E90058460B /* ViewModel */,
 			);
 			path = Bookmarks;
 			sourceTree = "<group>";
@@ -2123,6 +2134,7 @@
 				AABEE6AF24AD22B90043105B /* AddressBarTextField.swift in Sources */,
 				AA68C3D32490ED62001B8783 /* NavigationBarViewController.swift in Sources */,
 				AA585DAF2490E6E600E9A3E2 /* MainViewController.swift in Sources */,
+				4BA4618A2652009C0014DF3F /* NSOutlineViewExtensions.swift in Sources */,
 				AABEE69A24A902A90043105B /* SuggestionContainerViewModel.swift in Sources */,
 				B657841F25FA497600D8DB33 /* NSException+Catch.swift in Sources */,
 				AA4FF40C2624751A004E2377 /* GrammarCheckEnabler.swift in Sources */,
