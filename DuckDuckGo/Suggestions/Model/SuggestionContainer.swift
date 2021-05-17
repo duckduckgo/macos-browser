@@ -38,12 +38,15 @@ final class SuggestionContainer {
     }
 
     convenience init () {
-        self.init(suggestionLoading: SuggestionLoader(), bookmarkManager: LocalBookmarkManager.shared)
+        self.init(suggestionLoading: SuggestionLoader(urlFactory: URL.makeURL(fromSuggestionPhrase:)), bookmarkManager: LocalBookmarkManager.shared)
     }
 
     func getSuggestions(for query: String) {
         latestQuery = query
-        loading.getSuggestions(query: query, maximum: Self.maximumNumberOfSuggestions) { [weak self] (suggestions, error) in
+        loading.getSuggestions(query: query,
+                               maximum: Self.maximumNumberOfSuggestions) { [weak self] (suggestions, error) in
+            dispatchPrecondition(condition: .onQueue(.main))
+
             guard self?.latestQuery == query else { return }
             guard let suggestions = suggestions, error == nil else {
                 self?.suggestions = nil
@@ -53,6 +56,7 @@ final class SuggestionContainer {
                 Pixel.fire(.debug(event: .suggestionsFetchFailed, error: error))
                 return
             }
+
             self?.suggestions = suggestions
         }
     }

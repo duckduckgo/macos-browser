@@ -69,10 +69,11 @@ final class AddressBarTextField: NSTextField {
     func clearValue() {
         value = .text("")
         suggestionContainerViewModel.clearSelection()
-        suggestionContainerViewModel.suggestionContainer.stopGettingSuggestions()
-        suggestionContainerViewModel.userStringValue = nil
+        suggestionContainerViewModel.clearUserStringValue()
         hideSuggestionWindow()
     }
+
+    private var isHandlingUserAppendingText = false
 
     private func subscribeToSuggestionItems() {
         suggestionItemsCancellable = suggestionContainerViewModel.suggestionContainer.$suggestions
@@ -148,7 +149,7 @@ final class AddressBarTextField: NSTextField {
 
         value = Value.suggestion(selectedSuggestionViewModel)
         if let originalStringValue = originalStringValue,
-           value.string.hasPrefix(originalStringValue) {
+           value.string.lowercased().hasPrefix(originalStringValue.lowercased()) {
 
             selectToTheEnd(from: originalStringValue.count)
         } else {
@@ -159,7 +160,7 @@ final class AddressBarTextField: NSTextField {
 
     private func addressBarEnterPressed() {
         let suggestionUsed = suggestionContainerViewModel.selectedSuggestionViewModel != nil
-        suggestionContainerViewModel.suggestionContainer.stopGettingSuggestions()
+        suggestionContainerViewModel.clearUserStringValue()
         hideSuggestionWindow()
 
         if NSApp.isCommandPressed {
@@ -234,11 +235,7 @@ final class AddressBarTextField: NSTextField {
             switch self {
             case .text(let text): return text
             case .url(urlString: let urlString, url: _, userTyped: _): return urlString
-            case .suggestion(let suggestionViewModel):
-                switch suggestionViewModel.suggestion {
-                case .bookmark(title: _, url: let url, isFavorite: _): return url.absoluteStringWithoutSchemeAndWWW
-                default: return suggestionViewModel.string
-                }
+            case .suggestion(let suggestionViewModel): return suggestionViewModel.autocompletionString
             }
         }
 
@@ -480,24 +477,54 @@ extension Notification.Name {
 extension AddressBarTextField: NSTextFieldDelegate {
 
     func controlTextDidEndEditing(_ obj: Notification) {
-        suggestionContainerViewModel.suggestionContainer.stopGettingSuggestions()
+        suggestionContainerViewModel.clearUserStringValue()
         hideSuggestionWindow()
         updateValue()
     }
 
     func controlTextDidChange(_ obj: Notification) {
-        suggestionContainerViewModel.clearSelection()
-        
-        value = Value(stringValue: stringValueWithoutSuffix, userTyped: true)
-        switch value {
-        case .text(let text): suggestionContainerViewModel.userStringValue = text
-        case .url(urlString: let urlString, url: _, userTyped: _): suggestionContainerViewModel.userStringValue = urlString
-        case .suggestion(let suggestionViewModel): suggestionContainerViewModel.userStringValue = suggestionViewModel.string
+        let stringValueWithoutSuffix = self.stringValueWithoutSuffix
+
+        // if user continues typing letters from displayed Suggestion
+        // don't blink and keep the Suggestion displayed
+        if case .suggestion(let suggestion) = self.value,
+           stringValueWithoutSuffix.hasPrefix(suggestion.userStringValue),
+           suggestion.autocompletionString.hasPrefix(stringValueWithoutSuffix),
+           let editor = currentEditor(),
+           editor.selectedRange.location == stringValueWithoutSuffix.utf16.count {
+
+            self.value = .suggestion(SuggestionViewModel(suggestion: suggestion.suggestion,
+                                                         userStringValue: stringValueWithoutSuffix))
+            self.selectToTheEnd(from: stringValueWithoutSuffix.count)
+
+        } else {
+            suggestionContainerViewModel.clearSelection()
+            self.value = Value(stringValue: stringValueWithoutSuffix, userTyped: true)
         }
 
-        if stringValue == "" {
-            suggestionContainerViewModel.suggestionContainer.stopGettingSuggestions()
+        if stringValue.isEmpty {
+            suggestionContainerViewModel.clearUserStringValue()
             hideSuggestionWindow()
+        } else {
+            suggestionContainerViewModel.setUserStringValue(stringValueWithoutSuffix,
+                                                            userAppendedStringToTheEnd: isHandlingUserAppendingText)
+        }
+
+        // reset user typed flag for the next didChange event
+        isHandlingUserAppendingText = false
+    }
+
+    func textView(_ textView: NSTextView, userTypedString typedString: String, at range: NSRange) {
+        let userTypedLength = suggestionContainerViewModel.userStringValue?.utf16.count ?? 0
+        let currentValueLength = self.stringValueWithoutSuffix.utf16.count
+        let selectedSuggestionRange = NSRange(location: userTypedLength, length: currentValueLength - userTypedLength)
+        assert(selectedSuggestionRange.upperBound <= currentValueLength)
+
+        // if user is typing in the end of current value or replacing selected suggestion range
+        // or replaces the whole string
+        if selectedSuggestionRange == range || range.length >= currentValueLength || range.location == NSNotFound {
+            // we'll select the first suggested item
+            isHandlingUserAppendingText = true
         }
     }
 
@@ -595,6 +622,19 @@ final class AddressBarTextEditor: NSTextView {
         return adjustedRange.location
     }
 
+    override func insertText(_ string: Any, replacementRange: NSRange) {
+        defer {
+            super.insertText(string, replacementRange: replacementRange)
+        }
+
+        guard let delegate = delegate as? AddressBarTextField else {
+            os_log("AddressBarTextEditor: unexpected kind of delegate")
+            return
+        }
+        guard let string = string as? String else { return }
+
+        delegate.textView(self, userTypedString: string, at: replacementRange)
+    }
 }
 
 final class AddressBarTextFieldCell: NSTextFieldCell {

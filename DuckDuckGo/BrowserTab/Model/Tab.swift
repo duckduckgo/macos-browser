@@ -22,7 +22,7 @@ import os
 import Combine
 import BrowserServicesKit
 
-protocol TabDelegate: class {
+protocol TabDelegate: AnyObject {
 
     func tabDidStartNavigation(_ tab: Tab)
     func tab(_ tab: Tab, requestedNewTab url: URL?, selected: Bool)
@@ -258,6 +258,7 @@ final class Tab: NSObject {
     private func setupWebView(shouldLoadInBackground: Bool) {
         webView.navigationDelegate = self
         webView.allowsBackForwardNavigationGestures = true
+        webView.allowsMagnification = true
 
         subscribeToUserScripts()
         subscribeToOpenExternalUrlEvents()
@@ -459,12 +460,16 @@ extension Tab: EmailManagerRequestDelegate {
                       headers: [String: String],
                       timeoutInterval: TimeInterval,
                       completion: @escaping (Data?, Error?) -> Void) {
+
+        let currentQueue = OperationQueue.current
         
         var request = URLRequest(url: url, timeoutInterval: timeoutInterval)
         request.allHTTPHeaderFields = headers
         request.httpMethod = method
         URLSession.shared.dataTask(with: request) { (data, _, error) in
-            completion(data, error)
+            currentQueue?.addOperation {
+                completion(data, error)
+            }
         }.resume()
     }
     // swiftlint:enable function_parameter_count

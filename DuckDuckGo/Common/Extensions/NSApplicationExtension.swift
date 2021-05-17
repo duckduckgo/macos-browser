@@ -1,5 +1,5 @@
 //
-//  NSAppExtension.swift
+//  NSApplicationExtension.swift
 //
 //  Copyright © 2020 DuckDuckGo. All rights reserved.
 //

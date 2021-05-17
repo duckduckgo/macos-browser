@@ -1,5 +1,5 @@
 //
-//  AutocompleteViewModel.swift
+//  SuggestionContainerViewModel.swift
 //
 //  Copyright © 2020 DuckDuckGo. All rights reserved.
 //
@@ -19,13 +19,16 @@
 import Foundation
 import Combine
 import os.log
+import BrowserServicesKit
 
 final class SuggestionContainerViewModel {
 
     let suggestionContainer: SuggestionContainer
+    private var suggestionsCancellable: AnyCancellable?
 
     init(suggestionContainer: SuggestionContainer) {
         self.suggestionContainer = suggestionContainer
+        subscribeToSuggestions()
     }
 
     var numberOfSuggestions: Int {
@@ -38,12 +41,60 @@ final class SuggestionContainerViewModel {
 
     @Published private(set) var selectedSuggestionViewModel: SuggestionViewModel?
 
-    var userStringValue: String? {
-        didSet {
-            if let userStringValue = userStringValue {
-                suggestionContainer.getSuggestions(for: userStringValue)
+    private(set) var userStringValue: String?
+
+    private var isTopSuggestionSelectionExpected = false
+
+    private var shouldSelectTopSuggestion: Bool {
+        guard self.suggestionContainer.suggestions?.isEmpty == false else { return false }
+
+        if self.isTopSuggestionSelectionExpected,
+           let userStringValue = self.userStringValue,
+           let firstSuggestion = self.suggestionViewModel(at: 0) {
+            // select first Bookmark/Website match
+            switch firstSuggestion.suggestion {
+            case .bookmark, .website:
+                // only select suggestion when the user value won't change
+                guard firstSuggestion.autocompletionString.lowercased()
+                        .hasPrefix(userStringValue.lowercased())
+                else { break }
+
+                return true
+            default:
+                break
             }
         }
+        return false
+    }
+
+    private func subscribeToSuggestions() {
+        suggestionsCancellable = suggestionContainer.$suggestions.receive(on: DispatchQueue.main)
+            .sink { [weak self] _ in
+            guard let self = self,
+                  self.shouldSelectTopSuggestion
+            else { return }
+
+            self.select(at: 0)
+        }
+    }
+
+    func setUserStringValue(_ userStringValue: String, userAppendedStringToTheEnd: Bool) {
+        let oldValue = self.userStringValue
+        self.userStringValue = userStringValue
+
+        guard !userStringValue.isEmpty else {
+            suggestionContainer.stopGettingSuggestions()
+            return
+        }
+        guard userStringValue.lowercased() != oldValue?.lowercased() else { return }
+
+        self.isTopSuggestionSelectionExpected = userAppendedStringToTheEnd
+        suggestionContainer.getSuggestions(for: userStringValue)
+    }
+
+    func clearUserStringValue() {
+        self.userStringValue = nil
+        suggestionContainer.stopGettingSuggestions()
     }
 
     private func updateSelectedSuggestionViewModel() {

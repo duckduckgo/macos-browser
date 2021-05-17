@@ -1,5 +1,5 @@
 //
-//  WindowManager.swift
+//  WindowsManager.swift
 //
 //  Copyright © 2020 DuckDuckGo. All rights reserved.
 //

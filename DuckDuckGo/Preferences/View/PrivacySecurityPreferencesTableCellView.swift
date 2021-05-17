@@ -18,7 +18,7 @@
 
 import Foundation
 
-protocol PrivacySecurityPreferencesTableCellViewDelegate: class {
+protocol PrivacySecurityPreferencesTableCellViewDelegate: AnyObject {
 
     func privacySecurityPreferencesTableCellViewRequestedFireproofManagementModal(_ cell: PrivacySecurityPreferencesTableCellView)
     func privacySecurityPreferencesTableCellView(_ cell: PrivacySecurityPreferencesTableCellView, setLoginDetectionEnabled: Bool)

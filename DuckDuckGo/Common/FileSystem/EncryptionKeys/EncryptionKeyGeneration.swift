@@ -1,5 +1,5 @@
 //
-//  EncryptionKeyGenerator.swift
+//  EncryptionKeyGeneration.swift
 //
 //  Copyright © 2020 DuckDuckGo. All rights reserved.
 //
