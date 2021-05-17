@@ -121,6 +121,8 @@
 		4BA461942652020D0014DF3F /* PasteboardBookmarkTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4BA461912652020D0014DF3F /* PasteboardBookmarkTests.swift */; };
 		4BA461952652020D0014DF3F /* PasteboardFolderTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4BA461922652020D0014DF3F /* PasteboardFolderTests.swift */; };
 		4BA461962652020D0014DF3F /* BookmarkTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4BA461932652020D0014DF3F /* BookmarkTests.swift */; };
+		4BA4619C2652046F0014DF3F /* BookmarkSidebarTreeControllerDataSourceTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4BA4619B2652046F0014DF3F /* BookmarkSidebarTreeControllerDataSourceTests.swift */; };
+		4BA4619D265206500014DF3F /* BookmarkSidebarTreeController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4BA46197265203890014DF3F /* BookmarkSidebarTreeController.swift */; };
 		4BB88B4525B7B55C006F6B06 /* DebugUserScript.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4BB88B4425B7B55C006F6B06 /* DebugUserScript.swift */; };
 		4BB88B4A25B7B690006F6B06 /* SequenceExtensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4BB88B4925B7B690006F6B06 /* SequenceExtensions.swift */; };
 		4BB88B5025B7BA2B006F6B06 /* TabInstrumentation.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4BB88B4F25B7BA2B006F6B06 /* TabInstrumentation.swift */; };
@@ -459,6 +461,8 @@
 		4BA461912652020D0014DF3F /* PasteboardBookmarkTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = PasteboardBookmarkTests.swift; sourceTree = "<group>"; };
 		4BA461922652020D0014DF3F /* PasteboardFolderTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = PasteboardFolderTests.swift; sourceTree = "<group>"; };
 		4BA461932652020D0014DF3F /* BookmarkTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = BookmarkTests.swift; sourceTree = "<group>"; };
+		4BA46197265203890014DF3F /* BookmarkSidebarTreeController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = BookmarkSidebarTreeController.swift; sourceTree = "<group>"; };
+		4BA4619B2652046F0014DF3F /* BookmarkSidebarTreeControllerDataSourceTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = BookmarkSidebarTreeControllerDataSourceTests.swift; sourceTree = "<group>"; };
 		4BB88B4425B7B55C006F6B06 /* DebugUserScript.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DebugUserScript.swift; sourceTree = "<group>"; };
 		4BB88B4925B7B690006F6B06 /* SequenceExtensions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SequenceExtensions.swift; sourceTree = "<group>"; };
 		4BB88B4F25B7BA2B006F6B06 /* TabInstrumentation.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TabInstrumentation.swift; sourceTree = "<group>"; };
@@ -1246,6 +1250,7 @@
 		AA652CAE25DD8228009059CC /* Model */ = {
 			isa = PBXGroup;
 			children = (
+				4BA4619B2652046F0014DF3F /* BookmarkSidebarTreeControllerDataSourceTests.swift */,
 				AA652CCD25DD9071009059CC /* BookmarkListTests.swift */,
 				4B44B302264254F0008F9F7D /* BookmarkManagedObjectTests.swift */,
 				4B44B2F8264251C1008F9F7D /* BookmarkMigrationTests.swift */,
@@ -1621,14 +1626,15 @@
 		AAC5E4C225D6A6C7007F5990 /* Model */ = {
 			isa = PBXGroup;
 			children = (
-				4BA4618C265201750014DF3F /* PasteboardBookmark.swift */,
-				4BA4618D265201750014DF3F /* PasteboardFolder.swift */,
-				4BA4618B265201750014DF3F /* PasteboardWriting.swift */,
 				AAC5E4CD25D6A709007F5990 /* Bookmark.swift */,
 				AAC5E4CF25D6A709007F5990 /* BookmarkList.swift */,
 				4B44B30426425528008F9F7D /* BookmarkManagedObject.swift */,
 				AAC5E4CE25D6A709007F5990 /* BookmarkManager.swift */,
 				4B44B30926425F8C008F9F7D /* BookmarkNode.swift */,
+				4BA46197265203890014DF3F /* BookmarkSidebarTreeController.swift */,
+				4BA4618C265201750014DF3F /* PasteboardBookmark.swift */,
+				4BA4618D265201750014DF3F /* PasteboardFolder.swift */,
+				4BA4618B265201750014DF3F /* PasteboardWriting.swift */,
 				4B44B31426425FB3008F9F7D /* PseudoFolder.swift */,
 				4B44B31326425FB3008F9F7D /* SpacerNode.swift */,
 				4B44B30826425F8C008F9F7D /* TreeController.swift */,
@@ -2240,6 +2246,7 @@
 				4B65028A25E6CBF40054432E /* NibLoadable.swift in Sources */,
 				AAA0CC472533833C0079BC96 /* OptionsButtonMenu.swift in Sources */,
 				4B677438255DBEB800025BD8 /* HTTPSUpgrade.xcdatamodeld in Sources */,
+				4BA4619D265206500014DF3F /* BookmarkSidebarTreeController.swift in Sources */,
 				4B0511E1262CAA8600F6079C /* NSOpenPanelExtensions.swift in Sources */,
 				4B44B31626425FB3008F9F7D /* PseudoFolder.swift in Sources */,
 				4B677434255DBEB800025BD8 /* HTTPSBloomFilterSpecification.swift in Sources */,
@@ -2340,6 +2347,7 @@
 				AA0F3DB7261A566C0077F2D9 /* SuggestionLoadingMock.swift in Sources */,
 				142879DC24CE1185005419BB /* SuggestionContainerViewModelTests.swift in Sources */,
 				AA652CD325DDA6E9009059CC /* LocalBookmarkManagerTests.swift in Sources */,
+				4BA4619C2652046F0014DF3F /* BookmarkSidebarTreeControllerDataSourceTests.swift in Sources */,
 				AAE39D1B24F44885008EF28B /* TabCollectionViewModelDelegateMock.swift in Sources */,
 				AA9C363025518CA9004B1BA3 /* FireTests.swift in Sources */,
 				AA63745424C9BF9A00AB2AC4 /* SuggestionContainerTests.swift in Sources */,
