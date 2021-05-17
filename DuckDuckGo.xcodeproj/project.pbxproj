@@ -124,6 +124,13 @@
 		4BA4619C2652046F0014DF3F /* BookmarkSidebarTreeControllerTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4BA4619B2652046F0014DF3F /* BookmarkSidebarTreeControllerTests.swift */; };
 		4BA4619D265206500014DF3F /* BookmarkSidebarTreeController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4BA46197265203890014DF3F /* BookmarkSidebarTreeController.swift */; };
 		4BA4619F2652072B0014DF3F /* BookmarksOutlineView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4BA4619E2652072B0014DF3F /* BookmarksOutlineView.swift */; };
+		4BA461A326520BC80014DF3F /* BookmarkOutlineViewDataSource.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4BA461A226520BC80014DF3F /* BookmarkOutlineViewDataSource.swift */; };
+		4BA461A526520BD30014DF3F /* BookmarkOutlineViewDataSourceTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4BA461A426520BD30014DF3F /* BookmarkOutlineViewDataSourceTests.swift */; };
+		4BA461AA26520BE70014DF3F /* BookmarkOutlineViewCell.xib in Resources */ = {isa = PBXBuildFile; fileRef = 4BA461A626520BE60014DF3F /* BookmarkOutlineViewCell.xib */; };
+		4BA461AB26520BE70014DF3F /* BookmarkTableCellView.xib in Resources */ = {isa = PBXBuildFile; fileRef = 4BA461A726520BE60014DF3F /* BookmarkTableCellView.xib */; };
+		4BA461AC26520BE70014DF3F /* BookmarkOutlineViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4BA461A826520BE60014DF3F /* BookmarkOutlineViewCell.swift */; };
+		4BA461AD26520BE70014DF3F /* BookmarkTableCellView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4BA461A926520BE60014DF3F /* BookmarkTableCellView.swift */; };
+		4BA461AF26520C260014DF3F /* OutlineSeparatorViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4BA461AE26520C260014DF3F /* OutlineSeparatorViewCell.swift */; };
 		4BB88B4525B7B55C006F6B06 /* DebugUserScript.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4BB88B4425B7B55C006F6B06 /* DebugUserScript.swift */; };
 		4BB88B4A25B7B690006F6B06 /* SequenceExtensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4BB88B4925B7B690006F6B06 /* SequenceExtensions.swift */; };
 		4BB88B5025B7BA2B006F6B06 /* TabInstrumentation.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4BB88B4F25B7BA2B006F6B06 /* TabInstrumentation.swift */; };
@@ -465,6 +472,13 @@
 		4BA46197265203890014DF3F /* BookmarkSidebarTreeController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = BookmarkSidebarTreeController.swift; sourceTree = "<group>"; };
 		4BA4619B2652046F0014DF3F /* BookmarkSidebarTreeControllerTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = BookmarkSidebarTreeControllerTests.swift; sourceTree = "<group>"; };
 		4BA4619E2652072B0014DF3F /* BookmarksOutlineView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = BookmarksOutlineView.swift; sourceTree = "<group>"; };
+		4BA461A226520BC80014DF3F /* BookmarkOutlineViewDataSource.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = BookmarkOutlineViewDataSource.swift; sourceTree = "<group>"; };
+		4BA461A426520BD30014DF3F /* BookmarkOutlineViewDataSourceTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = BookmarkOutlineViewDataSourceTests.swift; sourceTree = "<group>"; };
+		4BA461A626520BE60014DF3F /* BookmarkOutlineViewCell.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = BookmarkOutlineViewCell.xib; sourceTree = "<group>"; };
+		4BA461A726520BE60014DF3F /* BookmarkTableCellView.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = BookmarkTableCellView.xib; sourceTree = "<group>"; };
+		4BA461A826520BE60014DF3F /* BookmarkOutlineViewCell.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = BookmarkOutlineViewCell.swift; sourceTree = "<group>"; };
+		4BA461A926520BE60014DF3F /* BookmarkTableCellView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = BookmarkTableCellView.swift; sourceTree = "<group>"; };
+		4BA461AE26520C260014DF3F /* OutlineSeparatorViewCell.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = OutlineSeparatorViewCell.swift; sourceTree = "<group>"; };
 		4BB88B4425B7B55C006F6B06 /* DebugUserScript.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DebugUserScript.swift; sourceTree = "<group>"; };
 		4BB88B4925B7B690006F6B06 /* SequenceExtensions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SequenceExtensions.swift; sourceTree = "<group>"; };
 		4BB88B4F25B7BA2B006F6B06 /* TabInstrumentation.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TabInstrumentation.swift; sourceTree = "<group>"; };
@@ -1252,6 +1266,7 @@
 		AA652CAE25DD8228009059CC /* Model */ = {
 			isa = PBXGroup;
 			children = (
+				4BA461A426520BD30014DF3F /* BookmarkOutlineViewDataSourceTests.swift */,
 				4BA4619B2652046F0014DF3F /* BookmarkSidebarTreeControllerTests.swift */,
 				AA652CCD25DD9071009059CC /* BookmarkListTests.swift */,
 				4B44B302264254F0008F9F7D /* BookmarkManagedObjectTests.swift */,
@@ -1618,10 +1633,15 @@
 		AAC5E4C125D6A6C3007F5990 /* View */ = {
 			isa = PBXGroup;
 			children = (
+				4BA461A826520BE60014DF3F /* BookmarkOutlineViewCell.swift */,
+				4BA461A626520BE60014DF3F /* BookmarkOutlineViewCell.xib */,
 				AAC5E4C425D6A6E8007F5990 /* BookmarkPopover.swift */,
 				AAC5E4C525D6A6E8007F5990 /* BookmarkPopoverViewController.swift */,
 				AAC5E4C625D6A6E8007F5990 /* Bookmarks.storyboard */,
 				4BA4619E2652072B0014DF3F /* BookmarksOutlineView.swift */,
+				4BA461A926520BE60014DF3F /* BookmarkTableCellView.swift */,
+				4BA461A726520BE60014DF3F /* BookmarkTableCellView.xib */,
+				4BA461AE26520C260014DF3F /* OutlineSeparatorViewCell.swift */,
 			);
 			path = View;
 			sourceTree = "<group>";
@@ -1634,6 +1654,7 @@
 				4B44B30426425528008F9F7D /* BookmarkManagedObject.swift */,
 				AAC5E4CE25D6A709007F5990 /* BookmarkManager.swift */,
 				4B44B30926425F8C008F9F7D /* BookmarkNode.swift */,
+				4BA461A226520BC80014DF3F /* BookmarkOutlineViewDataSource.swift */,
 				4BA46197265203890014DF3F /* BookmarkSidebarTreeController.swift */,
 				4BA4618C265201750014DF3F /* PasteboardBookmark.swift */,
 				4BA4618D265201750014DF3F /* PasteboardFolder.swift */,
@@ -2006,6 +2027,7 @@
 				4B0511CE262CAA5A00F6079C /* DownloadPreferencesTableCellView.xib in Resources */,
 				8511E18425F82B34002F516B /* 01_Fire_really_small.json in Resources */,
 				4B0511C3262CAA5A00F6079C /* Preferences.storyboard in Resources */,
+				4BA461AA26520BE70014DF3F /* BookmarkOutlineViewCell.xib in Resources */,
 				85A0117425AF2EDF00FA6A0C /* FindInPage.storyboard in Resources */,
 				AA80EC89256C49B8007083E7 /* Localizable.strings in Resources */,
 				AAE8B102258A41C000E81239 /* Tooltip.storyboard in Resources */,
@@ -2015,6 +2037,7 @@
 				4B6160F225B15792007DE5B2 /* contentblockerrules.js in Resources */,
 				AA80EC79256C46AA007083E7 /* TabBar.storyboard in Resources */,
 				AAC5E4C925D6A6E8007F5990 /* Bookmarks.storyboard in Resources */,
+				4BA461AB26520BE70014DF3F /* BookmarkTableCellView.xib in Resources */,
 				4B65027525E5F2A70054432E /* DefaultBrowserPromptView.xib in Resources */,
 				AA7412B324D0B3AC00D22FE0 /* TabBarViewItem.xib in Resources */,
 				85480F8A25CDC360009424E3 /* Launch.storyboard in Resources */,
@@ -2154,6 +2177,7 @@
 				856C98DA2570149800A22F1F /* FileDownloadTask.swift in Sources */,
 				AA5D6DAC24A340F700C6FBCE /* WebViewStateObserver.swift in Sources */,
 				4B0511CD262CAA5A00F6079C /* DefaultBrowserTableCellView.swift in Sources */,
+				4BA461AF26520C260014DF3F /* OutlineSeparatorViewCell.swift in Sources */,
 				B6AAAC2D260330580029438D /* PublishedAfter.swift in Sources */,
 				85C6A29625CC1FFD00EEB5F1 /* UserDefaultsWrapper.swift in Sources */,
 				B6A9E4A3261475C70067D1B9 /* AppUsageActivityMonitor.swift in Sources */,
@@ -2178,6 +2202,7 @@
 				AA2E423424C8A2270048C0D5 /* ColorView.swift in Sources */,
 				AAECA42024EEA4AC00EFA63A /* IndexPathExtension.swift in Sources */,
 				AA5C8F632591021700748EB7 /* NSApplicationExtension.swift in Sources */,
+				4BA461AD26520BE70014DF3F /* BookmarkTableCellView.swift in Sources */,
 				AA9E9A5625A3AE8400D1959D /* NSWindowExtension.swift in Sources */,
 				4B0511C9262CAA5A00F6079C /* RoundedSelectionRowView.swift in Sources */,
 				AAC5E4C725D6A6E8007F5990 /* BookmarkPopover.swift in Sources */,
@@ -2202,6 +2227,7 @@
 				B68458B025C7E76A00DC17B6 /* WindowManager+StateRestoration.swift in Sources */,
 				B68458C525C7EA0C00DC17B6 /* TabCollection+NSSecureCoding.swift in Sources */,
 				4BB88B5B25B7BA50006F6B06 /* Instruments.swift in Sources */,
+				4BA461AC26520BE70014DF3F /* BookmarkOutlineViewCell.swift in Sources */,
 				4B0511E2262CAA8600F6079C /* NSViewControllerExtension.swift in Sources */,
 				F44C130225C2DA0400426E3E /* NSAppearanceExtension.swift in Sources */,
 				4BA4618F265201750014DF3F /* PasteboardBookmark.swift in Sources */,
@@ -2234,6 +2260,7 @@
 				AAE8B110258A456C00E81239 /* TooltipViewController.swift in Sources */,
 				85AC3B0525D6B1D800C7D2AA /* ScriptSourceProviding.swift in Sources */,
 				4B02198E25E05FAC00ED7DEA /* LoginDetectionService.swift in Sources */,
+				4BA461A326520BC80014DF3F /* BookmarkOutlineViewDataSource.swift in Sources */,
 				AA3F895324C18AD500628DDE /* SuggestionViewModel.swift in Sources */,
 				4B0511C5262CAA5A00F6079C /* PrivacySecurityPreferencesTableCellView.swift in Sources */,
 				4B677431255DBEB800025BD8 /* BloomFilterWrapper.mm in Sources */,
@@ -2325,6 +2352,7 @@
 				B6DA44232616CABC00DD1EC2 /* PixelArgumentsTests.swift in Sources */,
 				85F1B0C925EF9759004792B6 /* URLEventListenerTests.swift in Sources */,
 				B6A5A27925B93FFF00AA7ADA /* StateRestorationManagerTests.swift in Sources */,
+				4BA461A526520BD30014DF3F /* BookmarkOutlineViewDataSourceTests.swift in Sources */,
 				4B0219A825E0646500ED7DEA /* WebsiteDataStoreTests.swift in Sources */,
 				AAC9C01E24CB6BEB00AD1325 /* TabCollectionViewModelTests.swift in Sources */,
 				85E11C3725E7F1E100974CAF /* ExternalURLHandlerTests.swift in Sources */,

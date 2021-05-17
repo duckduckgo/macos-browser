@@ -1,5 +1,5 @@
 //
-//  BookmarkSidebarTreeControllerDataSourceTests.swift
+//  BookmarkSidebarTreeControllerTests.swift
 //
 //  Copyright © 2021 DuckDuckGo. All rights reserved.
 //
@@ -22,7 +22,7 @@ import XCTest
 class BookmarkSidebarTreeControllerTests: XCTestCase {
 
     func testWhenBookmarkStoreHasNoFolders_ThenOnlyDefaultNodesAreReturned() {
-        let dataSource = BookmarkSidebarTreeControllerDataSource()
+        let dataSource = BookmarkSidebarTreeController()
         let treeController = TreeController(dataSource: dataSource)
         let defaultNodes = treeController.rootNode.childNodes
         let representedObjects = defaultNodes.representedObjects()
@@ -52,7 +52,7 @@ class BookmarkSidebarTreeControllerTests: XCTestCase {
         bookmarkStoreMock.bookmarks = [Bookmark.mock]
         bookmarkManager.loadBookmarks()
 
-        let dataSource = BookmarkSidebarTreeControllerDataSource(bookmarkManager: bookmarkManager)
+        let dataSource = BookmarkSidebarTreeController(bookmarkManager: bookmarkManager)
         let treeController = TreeController(dataSource: dataSource)
         let defaultNodes = treeController.rootNode.childNodes
         XCTAssertEqual(defaultNodes.count, 3)
@@ -71,7 +71,7 @@ class BookmarkSidebarTreeControllerTests: XCTestCase {
         bookmarkStoreMock.bookmarks = [topLevelFolder]
         bookmarkManager.loadBookmarks()
 
-        let dataSource = BookmarkSidebarTreeControllerDataSource(bookmarkManager: bookmarkManager)
+        let dataSource = BookmarkSidebarTreeController(bookmarkManager: bookmarkManager)
         let treeController = TreeController(dataSource: dataSource)
         let defaultNodes = treeController.rootNode.childNodes
         XCTAssertEqual(defaultNodes.count, 3)
@@ -94,7 +94,7 @@ class BookmarkSidebarTreeControllerTests: XCTestCase {
         bookmarkStoreMock.bookmarks = [rootFolder]
         bookmarkManager.loadBookmarks()
 
-        let dataSource = BookmarkSidebarTreeControllerDataSource(bookmarkManager: bookmarkManager)
+        let dataSource = BookmarkSidebarTreeController(bookmarkManager: bookmarkManager)
         let treeController = TreeController(dataSource: dataSource)
         let defaultNodes = treeController.rootNode.childNodes
         XCTAssertEqual(defaultNodes.count, 3)

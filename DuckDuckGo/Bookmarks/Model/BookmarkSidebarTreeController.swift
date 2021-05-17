@@ -18,7 +18,7 @@
 
 import Foundation
 
-final class BookmarkSidebarTreeControllerDataSource: TreeControllerDataSource {
+final class BookmarkSidebarTreeController: TreeControllerDataSource {
 
     func treeController(treeController: TreeController, childNodesFor node: BookmarkNode) -> [BookmarkNode] {
         return node.isRoot ? childNodesForRootNode(node) : childNodes(for: node)
