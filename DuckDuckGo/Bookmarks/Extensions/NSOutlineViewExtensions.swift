@@ -42,4 +42,30 @@ extension NSOutlineView {
         selectedNodes.compactMap { $0.representedObject as? PseudoFolder }
     }
 
+    func revealAndSelect(nodePath: BookmarkNode.Path) {
+        let numberOfNodes = nodePath.components.count
+        if numberOfNodes < 2 {
+            return
+        }
+
+        let indexOfNodeToSelect = numberOfNodes - 1
+
+        for index in 1...indexOfNodeToSelect {
+            let node = nodePath.components[index]
+
+            let rowForNode = row(forItem: node)
+            if rowForNode < 0 {
+                return
+            }
+
+            if index == indexOfNodeToSelect {
+                selectRowIndexes(IndexSet(integer: rowForNode), byExtendingSelection: false)
+                scrollRowToVisible(rowForNode)
+                return
+            } else {
+                expandItem(node)
+            }
+        }
+    }
+
 }
