@@ -192,7 +192,6 @@ final class BookmarkOutlineViewDataSource: NSObject, NSOutlineViewDataSource, NS
                 return false
             }
 
-            // TODO: This should use `draggedNode.isAncestor(of:)`, but the descendant parent node property isn't being set.
             let descendant = draggedNode.descendantNodeRepresenting(object: destination.representedObject)
 
             return descendant != nil

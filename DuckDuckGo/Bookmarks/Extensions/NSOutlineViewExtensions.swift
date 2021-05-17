@@ -27,11 +27,7 @@ extension NSOutlineView {
     }
 
     var selectedNodes: [BookmarkNode] {
-        if let nodes = selectedItems as? [BookmarkNode] {
-            return nodes
-        }
-
-        return [BookmarkNode]()
+        return (selectedItems as? [BookmarkNode]) ?? []
     }
 
     var selectedFolders: [BookmarkFolder] {
@@ -43,14 +39,14 @@ extension NSOutlineView {
     }
 
     func revealAndSelect(nodePath: BookmarkNode.Path) {
-        let numberOfNodes = nodePath.components.count
-        if numberOfNodes < 2 {
+        let totalNodePathComponents = nodePath.components.count
+        if totalNodePathComponents < 2 {
             return
         }
 
-        let indexOfNodeToSelect = numberOfNodes - 1
+        let indexToSelect = totalNodePathComponents - 1
 
-        for index in 1...indexOfNodeToSelect {
+        for index in 1...indexToSelect {
             let node = nodePath.components[index]
 
             let rowForNode = row(forItem: node)
@@ -58,7 +54,7 @@ extension NSOutlineView {
                 return
             }
 
-            if index == indexOfNodeToSelect {
+            if index == indexToSelect {
                 selectRowIndexes(IndexSet(integer: rowForNode), byExtendingSelection: false)
                 scrollRowToVisible(rowForNode)
                 return

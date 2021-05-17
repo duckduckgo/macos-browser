@@ -21,6 +21,7 @@ import Foundation
 @objc protocol BookmarkTableCellViewDelegate: AnyObject {
 
     func bookmarkTableCellViewRequestedMenu(_ sender: NSButton, cell: BookmarkTableCellView)
+    func bookmarkTableCellViewToggledFavorite(cell: BookmarkTableCellView)
 
 }
 
@@ -80,17 +81,12 @@ final class BookmarkTableCellView: NSTableCellView, NibLoadable {
     }
 
     @IBAction func favoriteButtonClicked(_ sender: NSButton) {
-        guard let bookmark = entity as? Bookmark else {
+        guard entity is Bookmark else {
             assertionFailure("\(#file): Tried to favorite non-Bookmark object")
             return
         }
 
-        bookmark.isFavorite.toggle()
-        favoriteButton.image = bookmark.isFavorite ? Self.favoriteFilledAccessoryViewImage : Self.favoriteAccessoryViewImage
-
-        // TODO: Don't make model changes in a table view cell.
-
-        LocalBookmarkManager.shared.update(bookmark: bookmark)
+        delegate?.bookmarkTableCellViewToggledFavorite(cell: self)
     }
 
     @IBOutlet weak var delegate: BookmarkTableCellViewDelegate?
