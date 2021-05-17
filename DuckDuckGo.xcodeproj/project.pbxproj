@@ -123,6 +123,7 @@
 		4BA461962652020D0014DF3F /* BookmarkTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4BA461932652020D0014DF3F /* BookmarkTests.swift */; };
 		4BA4619C2652046F0014DF3F /* BookmarkSidebarTreeControllerDataSourceTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4BA4619B2652046F0014DF3F /* BookmarkSidebarTreeControllerDataSourceTests.swift */; };
 		4BA4619D265206500014DF3F /* BookmarkSidebarTreeController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4BA46197265203890014DF3F /* BookmarkSidebarTreeController.swift */; };
+		4BA4619F2652072B0014DF3F /* BookmarksOutlineView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4BA4619E2652072B0014DF3F /* BookmarksOutlineView.swift */; };
 		4BB88B4525B7B55C006F6B06 /* DebugUserScript.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4BB88B4425B7B55C006F6B06 /* DebugUserScript.swift */; };
 		4BB88B4A25B7B690006F6B06 /* SequenceExtensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4BB88B4925B7B690006F6B06 /* SequenceExtensions.swift */; };
 		4BB88B5025B7BA2B006F6B06 /* TabInstrumentation.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4BB88B4F25B7BA2B006F6B06 /* TabInstrumentation.swift */; };
@@ -463,6 +464,7 @@
 		4BA461932652020D0014DF3F /* BookmarkTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = BookmarkTests.swift; sourceTree = "<group>"; };
 		4BA46197265203890014DF3F /* BookmarkSidebarTreeController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = BookmarkSidebarTreeController.swift; sourceTree = "<group>"; };
 		4BA4619B2652046F0014DF3F /* BookmarkSidebarTreeControllerDataSourceTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = BookmarkSidebarTreeControllerDataSourceTests.swift; sourceTree = "<group>"; };
+		4BA4619E2652072B0014DF3F /* BookmarksOutlineView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = BookmarksOutlineView.swift; sourceTree = "<group>"; };
 		4BB88B4425B7B55C006F6B06 /* DebugUserScript.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DebugUserScript.swift; sourceTree = "<group>"; };
 		4BB88B4925B7B690006F6B06 /* SequenceExtensions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SequenceExtensions.swift; sourceTree = "<group>"; };
 		4BB88B4F25B7BA2B006F6B06 /* TabInstrumentation.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TabInstrumentation.swift; sourceTree = "<group>"; };
@@ -1616,9 +1618,10 @@
 		AAC5E4C125D6A6C3007F5990 /* View */ = {
 			isa = PBXGroup;
 			children = (
-				AAC5E4C625D6A6E8007F5990 /* Bookmarks.storyboard */,
 				AAC5E4C425D6A6E8007F5990 /* BookmarkPopover.swift */,
 				AAC5E4C525D6A6E8007F5990 /* BookmarkPopoverViewController.swift */,
+				AAC5E4C625D6A6E8007F5990 /* Bookmarks.storyboard */,
+				4BA4619E2652072B0014DF3F /* BookmarksOutlineView.swift */,
 			);
 			path = View;
 			sourceTree = "<group>";
@@ -2191,6 +2194,7 @@
 				85A0116925AF1D8900FA6A0C /* FindInPageViewController.swift in Sources */,
 				AA6FFB4424DC33320028F4D0 /* NSViewExtension.swift in Sources */,
 				AA4BBA3B25C58FA200C4FB0F /* MainMenu.swift in Sources */,
+				4BA4619F2652072B0014DF3F /* BookmarksOutlineView.swift in Sources */,
 				AA585D84248FD31100E9A3E2 /* BrowserTabViewController.swift in Sources */,
 				B6A9E48926146ABF0067D1B9 /* PixelCounter.swift in Sources */,
 				B63D467A25BFC3E100874977 /* NSCoderExtensions.swift in Sources */,
