@@ -115,6 +115,12 @@
 		4BA1A6F6258C4F9600F6F690 /* EncryptionMocks.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4BA1A6F5258C4F9600F6F690 /* EncryptionMocks.swift */; };
 		4BA1A6FE258C5C1300F6F690 /* EncryptedValueTransformerTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4BA1A6FD258C5C1300F6F690 /* EncryptedValueTransformerTests.swift */; };
 		4BA4618A2652009C0014DF3F /* NSOutlineViewExtensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4BA461892652009C0014DF3F /* NSOutlineViewExtensions.swift */; };
+		4BA4618E265201750014DF3F /* PasteboardWriting.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4BA4618B265201750014DF3F /* PasteboardWriting.swift */; };
+		4BA4618F265201750014DF3F /* PasteboardBookmark.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4BA4618C265201750014DF3F /* PasteboardBookmark.swift */; };
+		4BA46190265201750014DF3F /* PasteboardFolder.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4BA4618D265201750014DF3F /* PasteboardFolder.swift */; };
+		4BA461942652020D0014DF3F /* PasteboardBookmarkTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4BA461912652020D0014DF3F /* PasteboardBookmarkTests.swift */; };
+		4BA461952652020D0014DF3F /* PasteboardFolderTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4BA461922652020D0014DF3F /* PasteboardFolderTests.swift */; };
+		4BA461962652020D0014DF3F /* BookmarkTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4BA461932652020D0014DF3F /* BookmarkTests.swift */; };
 		4BB88B4525B7B55C006F6B06 /* DebugUserScript.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4BB88B4425B7B55C006F6B06 /* DebugUserScript.swift */; };
 		4BB88B4A25B7B690006F6B06 /* SequenceExtensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4BB88B4925B7B690006F6B06 /* SequenceExtensions.swift */; };
 		4BB88B5025B7BA2B006F6B06 /* TabInstrumentation.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4BB88B4F25B7BA2B006F6B06 /* TabInstrumentation.swift */; };
@@ -447,6 +453,12 @@
 		4BA1A6F5258C4F9600F6F690 /* EncryptionMocks.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EncryptionMocks.swift; sourceTree = "<group>"; };
 		4BA1A6FD258C5C1300F6F690 /* EncryptedValueTransformerTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EncryptedValueTransformerTests.swift; sourceTree = "<group>"; };
 		4BA461892652009C0014DF3F /* NSOutlineViewExtensions.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = NSOutlineViewExtensions.swift; sourceTree = "<group>"; };
+		4BA4618B265201750014DF3F /* PasteboardWriting.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = PasteboardWriting.swift; sourceTree = "<group>"; };
+		4BA4618C265201750014DF3F /* PasteboardBookmark.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = PasteboardBookmark.swift; sourceTree = "<group>"; };
+		4BA4618D265201750014DF3F /* PasteboardFolder.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = PasteboardFolder.swift; sourceTree = "<group>"; };
+		4BA461912652020D0014DF3F /* PasteboardBookmarkTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = PasteboardBookmarkTests.swift; sourceTree = "<group>"; };
+		4BA461922652020D0014DF3F /* PasteboardFolderTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = PasteboardFolderTests.swift; sourceTree = "<group>"; };
+		4BA461932652020D0014DF3F /* BookmarkTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = BookmarkTests.swift; sourceTree = "<group>"; };
 		4BB88B4425B7B55C006F6B06 /* DebugUserScript.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DebugUserScript.swift; sourceTree = "<group>"; };
 		4BB88B4925B7B690006F6B06 /* SequenceExtensions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SequenceExtensions.swift; sourceTree = "<group>"; };
 		4BB88B4F25B7BA2B006F6B06 /* TabInstrumentation.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TabInstrumentation.swift; sourceTree = "<group>"; };
@@ -1235,11 +1247,14 @@
 			isa = PBXGroup;
 			children = (
 				AA652CCD25DD9071009059CC /* BookmarkListTests.swift */,
-				AA652CD225DDA6E9009059CC /* LocalBookmarkManagerTests.swift */,
-				4B44B2F8264251C1008F9F7D /* BookmarkMigrationTests.swift */,
 				4B44B302264254F0008F9F7D /* BookmarkManagedObjectTests.swift */,
+				4B44B2F8264251C1008F9F7D /* BookmarkMigrationTests.swift */,
 				4B44B30D26425F98008F9F7D /* BookmarkNodePathTests.swift */,
 				4B44B30F26425F98008F9F7D /* BookmarkNodeTests.swift */,
+				4BA461932652020D0014DF3F /* BookmarkTests.swift */,
+				AA652CD225DDA6E9009059CC /* LocalBookmarkManagerTests.swift */,
+				4BA461912652020D0014DF3F /* PasteboardBookmarkTests.swift */,
+				4BA461922652020D0014DF3F /* PasteboardFolderTests.swift */,
 				4B44B30E26425F98008F9F7D /* TreeControllerTests.swift */,
 			);
 			path = Model;
@@ -1606,6 +1621,9 @@
 		AAC5E4C225D6A6C7007F5990 /* Model */ = {
 			isa = PBXGroup;
 			children = (
+				4BA4618C265201750014DF3F /* PasteboardBookmark.swift */,
+				4BA4618D265201750014DF3F /* PasteboardFolder.swift */,
+				4BA4618B265201750014DF3F /* PasteboardWriting.swift */,
 				AAC5E4CD25D6A709007F5990 /* Bookmark.swift */,
 				AAC5E4CF25D6A709007F5990 /* BookmarkList.swift */,
 				4B44B30426425528008F9F7D /* BookmarkManagedObject.swift */,
@@ -2176,6 +2194,7 @@
 				4BB88B5B25B7BA50006F6B06 /* Instruments.swift in Sources */,
 				4B0511E2262CAA8600F6079C /* NSViewControllerExtension.swift in Sources */,
 				F44C130225C2DA0400426E3E /* NSAppearanceExtension.swift in Sources */,
+				4BA4618F265201750014DF3F /* PasteboardBookmark.swift in Sources */,
 				4BA1A6B8258B081600F6F690 /* EncryptionKeyStoring.swift in Sources */,
 				B65783E725F8AAFB00D8DB33 /* String+Punycode.swift in Sources */,
 				B657841A25FA484B00D8DB33 /* NSException+Catch.m in Sources */,
@@ -2193,6 +2212,7 @@
 				B6DA44022616B28300DD1EC2 /* PixelDataStore.swift in Sources */,
 				B6A9E45326142B070067D1B9 /* Pixel.swift in Sources */,
 				B6A9E47726146A570067D1B9 /* PixelEvent.swift in Sources */,
+				4BA46190265201750014DF3F /* PasteboardFolder.swift in Sources */,
 				85799C3425DFCD1B0007EC87 /* TrackerRadarManager.swift in Sources */,
 				AA86490E24D49B54001BABEE /* TabLoadingView.swift in Sources */,
 				AA2CB1352587C29500AA6FBE /* TabBarFooter.swift in Sources */,
@@ -2229,6 +2249,7 @@
 				AAFCB37A25E5403A00859DD4 /* BurnButton.swift in Sources */,
 				B6A9E47F26146A800067D1B9 /* PixelArguments.swift in Sources */,
 				4B677436255DBEB800025BD8 /* HTTPSExcludedDomains.swift in Sources */,
+				4BA4618E265201750014DF3F /* PasteboardWriting.swift in Sources */,
 				AAC5E4D225D6A709007F5990 /* BookmarkList.swift in Sources */,
 				4B6160E525B152FA007DE5B2 /* ContentBlockerUserScript.swift in Sources */,
 				4B44B30C26425F8C008F9F7D /* BookmarkNode.swift in Sources */,
@@ -2288,6 +2309,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				4BA461942652020D0014DF3F /* PasteboardBookmarkTests.swift in Sources */,
 				142879DA24CE1179005419BB /* SuggestionViewModelTests.swift in Sources */,
 				B6DA44232616CABC00DD1EC2 /* PixelArgumentsTests.swift in Sources */,
 				85F1B0C925EF9759004792B6 /* URLEventListenerTests.swift in Sources */,
@@ -2305,6 +2327,7 @@
 				AAC9C01C24CB594C00AD1325 /* TabViewModelTests.swift in Sources */,
 				4B44B31126425F98008F9F7D /* TreeControllerTests.swift in Sources */,
 				B6DA441E2616C84600DD1EC2 /* PixelStoreMock.swift in Sources */,
+				4BA461952652020D0014DF3F /* PasteboardFolderTests.swift in Sources */,
 				4B11060525903E570039B979 /* CoreDataEncryptionTesting.xcdatamodeld in Sources */,
 				8546DE6225C03056000CA5E1 /* UserAgentTests.swift in Sources */,
 				4B82E9C125B6A1CD00656FE7 /* TrackerRadarManagerTests.swift in Sources */,
@@ -2336,6 +2359,7 @@
 				8553FF52257523760029327F /* FileDownloadTests.swift in Sources */,
 				AABAF59C260A7D130085060C /* FaviconServiceMock.swift in Sources */,
 				4B44B31226425F98008F9F7D /* BookmarkNodeTests.swift in Sources */,
+				4BA461962652020D0014DF3F /* BookmarkTests.swift in Sources */,
 				4BA1A6E6258C270800F6F690 /* EncryptionKeyGeneratorTests.swift in Sources */,
 				B61F012B25ECBB1700ABB5A3 /* UserScriptsManagerTests.swift in Sources */,
 				85AC3B1725D9BC1A00C7D2AA /* ConfigurationDownloaderTests.swift in Sources */,
