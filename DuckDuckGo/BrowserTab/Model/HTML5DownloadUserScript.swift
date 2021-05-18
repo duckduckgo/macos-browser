@@ -63,8 +63,8 @@ final class HTML5DownloadUserScript: NSObject, StaticUserScript {
     static let source = """
 (function() {
 
-    document.addEventListener("click", function(e) {
-        if (e.srcElement.tagName !== "A" || !e.srcElement.hasAttribute("download")) return;
+    function handleClick(e) {
+        if (e.srcElement.tagName.toUpperCase() !== "A" || !e.srcElement.hasAttribute("download")) return;
 
         // https://stackoverflow.com/questions/61702414/wkwebview-how-to-handle-blob-url#61703086
         if (event.target.matches('a[href^="blob:"]'))
@@ -89,7 +89,29 @@ final class HTML5DownloadUserScript: NSObject, StaticUserScript {
                 "download": e.srcElement.download
             });
         e.preventDefault();
-    });
+    }
+
+    document.addEventListener("click", handleClick);
+
+    document.originalCreateElementNS = document.createElementNS;
+    document.originalCreateElement = document.createElement;
+
+    // handle newly created A elements not in the document structure
+    // demo: https://eligrey.com/demos/FileSaver.js/?
+    document.createElementNS = function(namespace, tagName, options) {
+        const el = document.originalCreateElementNS(namespace, tagName, options);
+        if (tagName.toUpperCase() == "A") {
+            el.addEventListener("click", handleClick);
+        }
+        return el;
+    }
+    document.createElement = function(tagName, options) {
+        const el = document.originalCreateElement(tagName, options);
+        if (tagName.toUpperCase() == "A") {
+            el.addEventListener("click", handleClick);
+        }
+        return el;
+    }
 
 }) ();
 """

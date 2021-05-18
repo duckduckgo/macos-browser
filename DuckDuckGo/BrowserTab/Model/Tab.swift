@@ -543,7 +543,12 @@ extension Tab: WKNavigationDelegate {
             return
         }
 
-        if externalUrlHandler.isExternal(scheme: urlScheme) {
+        // blob:https links are handled by the HTML5DownloadUserScript,
+        // cancel request if it gets here
+        if externalUrlHandler.isBlob(scheme: urlScheme) {
+            decisionHandler(.cancel)
+            return
+        } else if externalUrlHandler.isExternal(scheme: urlScheme) {
             // ignore <iframe src="custom://url"> but allow via address bar
             let fromFrame = !(navigationAction.sourceFrame.isMainFrame || self.userEnteredUrl)
 
