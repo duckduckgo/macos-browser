@@ -241,4 +241,10 @@ fileprivate final class WeakURLRequestDownloadTaskWrapper: NSObject, URLSessionD
         self.task?.urlSession(session, task: task, didCompleteWithError: error)
     }
 
+    func urlSession(_ session: URLSession, task: URLSessionTask,
+                    didReceive challenge: URLAuthenticationChallenge,
+                    completionHandler: @escaping (URLSession.AuthChallengeDisposition, URLCredential?) -> Void) {
+        completionHandler(.performDefaultHandling, nil)
+    }
+
 }

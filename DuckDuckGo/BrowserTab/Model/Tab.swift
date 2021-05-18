@@ -172,7 +172,7 @@ final class Tab: NSObject {
     private var currentDownload: FileDownload?
 
     // Used as the request context for HTML 5 downloads
-    private var lastMainFrameRequest: URLRequest?
+    private var lastRequestCache = [URL: URLRequest]()
 
     private var loginDetectionService: LoginDetectionService?
     private let instrumentation = TabInstrumentation()
@@ -406,11 +406,14 @@ extension Tab: ContextMenuDelegate {
 extension Tab: HTML5DownloadDelegate {
 
     func startDownload(_ userScript: HTML5DownloadUserScript, from url: URL, withSuggestedName name: String?) {
-        var request = lastMainFrameRequest ?? URLRequest(url: url)
+        var request = self.lastRequestCache[url] ?? URLRequest(url: url)
+
         request.url = url
-        delegate?.tab(self, requestedFileDownload: FileDownload.request(request,
-                                                                        suggestedName: name,
-                                                                        promptForLocation: false))
+        request.applyCookies(from: webView.configuration.websiteDataStore.httpCookieStore) { request in
+            self.delegate?.tab(self, requestedFileDownload: FileDownload.request(request,
+                                                                                 suggestedName: name,
+                                                                                 promptForLocation: false))
+        }
     }
 
     func startDownload(_ userScript: HTML5DownloadUserScript, data: Data, mimeType: String, suggestedName: String?, sourceURL: URL?) {
@@ -526,8 +529,11 @@ extension Tab: WKNavigationDelegate {
         }
 
         if navigationAction.isTargetingMainFrame() {
-            lastMainFrameRequest = navigationAction.request
-            currentDownload = nil
+            self.lastRequestCache = [:]
+            self.currentDownload = nil
+        }
+        if let url = navigationAction.request.url {
+            self.lastRequestCache[url] = navigationAction.request
         }
 
         let isLinkActivated = navigationAction.navigationType == .linkActivated
@@ -587,18 +593,23 @@ extension Tab: WKNavigationDelegate {
     }
 
     private func navigationResponsePolicyForDownloads(_ navigationResponse: WKNavigationResponse) -> WKNavigationResponsePolicy {
-        guard navigationResponse.isForMainFrame else {
-            return .allow
-        }
 
         if (!navigationResponse.canShowMIMEType || navigationResponse.shouldDownload),
-           let request = lastMainFrameRequest {
-            let download = FileDownload.request(request,
-                                                suggestedName: navigationResponse.response.suggestedFilename,
-                                                promptForLocation: false)
-            delegate?.tab(self, requestedFileDownload: download)
-            // Flag this here, because interrupting the frame load will cause an error and we need to know
-            self.currentDownload = download
+           let url = navigationResponse.response.url,
+           let request = self.lastRequestCache[url] {
+
+            request.applyCookies(from: webView.configuration.websiteDataStore.httpCookieStore) { request in
+                let download = FileDownload.request(request,
+                                                    suggestedName: navigationResponse.response.suggestedFilename,
+                                                    promptForLocation: false)
+                // Flag this here, because interrupting the frame load will cause an error and we need to know
+                if navigationResponse.isForMainFrame {
+                    self.currentDownload = download
+                }
+
+                self.delegate?.tab(self, requestedFileDownload: download)
+            }
+
             return .cancel
         }
 

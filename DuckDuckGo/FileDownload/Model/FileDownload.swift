@@ -38,8 +38,14 @@ enum FileDownloadPostflight {
 
 extension FileDownload {
 
-    init(url: URL, promptForLocation: Bool) {
-        self = .request(URLRequest(url: url), suggestedName: nil, promptForLocation: promptForLocation)
+    static func with(url: URL,
+                     promptForLocation: Bool,
+                     cookieStore: WKHTTPCookieStore?,
+                     callback: @escaping (FileDownload) -> Void) {
+
+        URLRequest(url: url).applyCookies(from: cookieStore) { request in
+            callback(.request(request, suggestedName: nil, promptForLocation: promptForLocation))
+        }
     }
 
     var shouldAlwaysPromptFileSaveLocation: Bool {
