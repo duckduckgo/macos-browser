@@ -290,7 +290,9 @@ final class AddressBarTextField: NSTextField {
                 switch suggestionViewModel.suggestion {
                 case .phrase(phrase: _):
                     self = Suffix.search
-                case .website(url: let url), .bookmark(title: _, url: let url, isFavorite: _):
+                case .website(url: let url),
+                     .bookmark(title: _, url: let url, isFavorite: _),
+                     .historyEntry(title: _, url: let url):
                     guard let host = url.host else { return nil }
                     self = Suffix.visit(host: host)
                 case .unknown(value: _):

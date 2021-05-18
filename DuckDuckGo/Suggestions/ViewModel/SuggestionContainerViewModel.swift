@@ -53,14 +53,14 @@ final class SuggestionContainerViewModel {
            let firstSuggestion = self.suggestionViewModel(at: 0) {
             // select first Bookmark/Website match
             switch firstSuggestion.suggestion {
-            case .bookmark, .website:
+            case .bookmark, .website, .historyEntry:
                 // only select suggestion when the user value won't change
                 guard firstSuggestion.autocompletionString.lowercased()
                         .hasPrefix(userStringValue.lowercased())
                 else { break }
 
                 return true
-            default:
+            case .phrase, .unknown:
                 break
             }
         }

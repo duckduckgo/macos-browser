@@ -18,4 +18,4 @@
 
 import Foundation
 
-typealias History = Set<HistoryEntry>
+typealias History = [HistoryEntry]

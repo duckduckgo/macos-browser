@@ -68,6 +68,8 @@ final class SuggestionViewModel {
             return phrase
         case .website(url: let url):
             return url.absoluteStringWithoutSchemeAndWWW
+        case .historyEntry(title: let title, url: let url):
+            return title ?? url.absoluteStringWithoutSchemeAndWWW
         case .bookmark(title: let title, url: _, isFavorite: _):
             return title
         case .unknown(value: let value):
@@ -77,7 +79,8 @@ final class SuggestionViewModel {
 
     var autocompletionString: String {
         switch suggestion {
-        case .bookmark(title: _, url: let url, isFavorite: _):
+        case .historyEntry(title: _, url: let url),
+             .bookmark(title: _, url: let url, isFavorite: _):
             return url.absoluteStringWithoutSchemeAndWWW
         default:
             return self.string
@@ -88,7 +91,8 @@ final class SuggestionViewModel {
         switch suggestion {
         case .phrase, .unknown, .website:
             return ""
-        case .bookmark(title: _, url: let url, isFavorite: _):
+        case .historyEntry(title: _, url: let url),
+             .bookmark(title: _, url: let url, isFavorite: _):
             return " – " + url.absoluteStringWithoutSchemeAndWWW
         }
     }
@@ -97,6 +101,7 @@ final class SuggestionViewModel {
 
     static let webImage = NSImage(named: "Web")
     static let searchImage = NSImage(named: "Search")
+    static let historyImage = NSImage(named: "HistorySuggestion")
     static let bookmarkImage = NSImage(named: "BookmarkSuggestion")
     static let favoriteImage = NSImage(named: "FavoritedBookmarkSuggestion")
 
@@ -106,6 +111,8 @@ final class SuggestionViewModel {
             return Self.searchImage
         case .website(url: _):
             return Self.webImage
+        case .historyEntry(title: _, url: _):
+            return Self.historyImage
         case .bookmark(title: _, url: _, isFavorite: false):
             return Self.bookmarkImage
         case .bookmark(title: _, url: _, isFavorite: true):
