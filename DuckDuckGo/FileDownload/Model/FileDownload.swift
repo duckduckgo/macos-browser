@@ -20,29 +20,31 @@ import Foundation
 import WebKit
 
 enum FileDownload {
-    case request(URLRequest, suggestedName: String?)
+    case request(URLRequest, suggestedName: String?, promptForLocation: Bool)
     case webContent(WKWebView)
     case data(Data, mimeType: String, suggestedName: String?, sourceURL: URL?)
 }
 
 extension FileDownload {
 
-    init(url: URL) {
-        self = .request(URLRequest(url: url), suggestedName: nil)
+    init(url: URL, promptForLocation: Bool) {
+        self = .request(URLRequest(url: url), suggestedName: nil, promptForLocation: promptForLocation)
     }
 
     var shouldAlwaysPromptFileSaveLocation: Bool {
         switch self {
         case .webContent:
             return true
-        case .request, .data:
+        case .request(_, suggestedName: _, promptForLocation: let promptForLocation):
+            return promptForLocation
+        case .data:
             return false
         }
     }
 
     func downloadTask() -> FileDownloadTask? {
         switch self {
-        case .request(let request, suggestedName: _):
+        case .request(let request, suggestedName: _, promptForLocation: _):
             return URLRequestDownloadTask(download: self, session: nil, request: request)
 
         case .webContent(let webView):
@@ -67,7 +69,7 @@ extension FileDownload {
 
     var sourceURL: URL? {
         switch self {
-        case .request(let request, suggestedName: _):
+        case .request(let request, suggestedName: _, promptForLocation: _):
             return request.url
         case .webContent(let webView):
             return webView.url

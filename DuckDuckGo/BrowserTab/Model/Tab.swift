@@ -380,7 +380,9 @@ extension Tab: HTML5DownloadDelegate {
     func startDownload(_ userScript: HTML5DownloadUserScript, from url: URL, withSuggestedName name: String) {
         var request = lastMainFrameRequest ?? URLRequest(url: url)
         request.url = url
-        delegate?.tab(self, requestedFileDownload: FileDownload.request(request, suggestedName: name))
+        delegate?.tab(self, requestedFileDownload: FileDownload.request(request,
+                                                                        suggestedName: name,
+                                                                        promptForLocation: false))
     }
 
 }
@@ -548,7 +550,8 @@ extension Tab: WKNavigationDelegate {
         if (!navigationResponse.canShowMIMEType || navigationResponse.shouldDownload),
            let request = lastMainFrameRequest {
             let download = FileDownload.request(request,
-                                                suggestedName: navigationResponse.response.suggestedFilename)
+                                                suggestedName: navigationResponse.response.suggestedFilename,
+                                                promptForLocation: false)
             delegate?.tab(self, requestedFileDownload: download)
             // Flag this here, because interrupting the frame load will cause an error and we need to know
             self.currentDownload = download

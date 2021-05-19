@@ -364,11 +364,11 @@ extension BrowserTabViewController: LinkMenuItemSelectors {
         WindowsManager.openNewWindow(with: url)
     }
 
-    func downloadLinkedFile(_ sender: NSMenuItem) {
+    func downloadLinkedFileAs(_ sender: NSMenuItem) {
         guard let tab = tabCollectionViewModel.selectedTabViewModel?.tab,
               let url = contextMenuLink else { return }
 
-        self.tab(tab, requestedFileDownload: FileDownload(url: url))
+        self.tab(tab, requestedFileDownload: FileDownload(url: url, promptForLocation: true))
     }
 
     func copyLink(_ sender: NSMenuItem) {
@@ -393,11 +393,11 @@ extension BrowserTabViewController: ImageMenuItemSelectors {
         WindowsManager.openNewWindow(with: url)
     }
 
-    func saveImageToDownloads(_ sender: NSMenuItem) {
+    func saveImageAs(_ sender: NSMenuItem) {
         guard let tab = tabCollectionViewModel.selectedTabViewModel?.tab,
               let url = contextMenuImage else { return }
 
-        self.tab(tab, requestedFileDownload: FileDownload(url: url))
+        self.tab(tab, requestedFileDownload: FileDownload(url: url, promptForLocation: true))
     }
 
     func copyImageAddress(_ sender: NSMenuItem) {
