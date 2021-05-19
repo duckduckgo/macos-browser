@@ -264,6 +264,7 @@
 		B657841F25FA497600D8DB33 /* NSException+Catch.swift in Sources */ = {isa = PBXBuildFile; fileRef = B657841E25FA497600D8DB33 /* NSException+Catch.swift */; };
 		B67C6C3D2654B897006C872E /* WebViewExtensionTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = B67C6C3C2654B897006C872E /* WebViewExtensionTests.swift */; };
 		B67C6C422654BF49006C872E /* DuckDuckGo-Symbol.jpg in Resources */ = {isa = PBXBuildFile; fileRef = B67C6C412654BF49006C872E /* DuckDuckGo-Symbol.jpg */; };
+		B67C6C472654C643006C872E /* FileManagerExtensionTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = B67C6C462654C643006C872E /* FileManagerExtensionTests.swift */; };
 		B68458B025C7E76A00DC17B6 /* WindowManager+StateRestoration.swift in Sources */ = {isa = PBXBuildFile; fileRef = B68458AF25C7E76A00DC17B6 /* WindowManager+StateRestoration.swift */; };
 		B68458B825C7E8B200DC17B6 /* Tab+NSSecureCoding.swift in Sources */ = {isa = PBXBuildFile; fileRef = B68458B725C7E8B200DC17B6 /* Tab+NSSecureCoding.swift */; };
 		B68458C025C7E9E000DC17B6 /* TabCollectionViewModel+NSSecureCoding.swift in Sources */ = {isa = PBXBuildFile; fileRef = B68458BF25C7E9E000DC17B6 /* TabCollectionViewModel+NSSecureCoding.swift */; };
@@ -597,6 +598,7 @@
 		B657841E25FA497600D8DB33 /* NSException+Catch.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "NSException+Catch.swift"; sourceTree = "<group>"; };
 		B67C6C3C2654B897006C872E /* WebViewExtensionTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WebViewExtensionTests.swift; sourceTree = "<group>"; };
 		B67C6C412654BF49006C872E /* DuckDuckGo-Symbol.jpg */ = {isa = PBXFileReference; lastKnownFileType = image.jpeg; path = "DuckDuckGo-Symbol.jpg"; sourceTree = "<group>"; };
+		B67C6C462654C643006C872E /* FileManagerExtensionTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FileManagerExtensionTests.swift; sourceTree = "<group>"; };
 		B68458AF25C7E76A00DC17B6 /* WindowManager+StateRestoration.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "WindowManager+StateRestoration.swift"; sourceTree = "<group>"; };
 		B68458B725C7E8B200DC17B6 /* Tab+NSSecureCoding.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Tab+NSSecureCoding.swift"; sourceTree = "<group>"; };
 		B68458BF25C7E9E000DC17B6 /* TabCollectionViewModel+NSSecureCoding.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "TabCollectionViewModel+NSSecureCoding.swift"; sourceTree = "<group>"; };
@@ -1082,6 +1084,7 @@
 				B65783EB25F8AB9200D8DB33 /* String+PunycodeTests.swift */,
 				85F69B3B25EDE81F00978E59 /* URLExtensionTests.swift */,
 				4B0511E6262CAB3700F6079C /* UserDefaultsWrapperUtilities.swift */,
+				B67C6C462654C643006C872E /* FileManagerExtensionTests.swift */,
 			);
 			path = Common;
 			sourceTree = "<group>";
@@ -2277,6 +2280,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				B67C6C472654C643006C872E /* FileManagerExtensionTests.swift in Sources */,
 				142879DA24CE1179005419BB /* SuggestionViewModelTests.swift in Sources */,
 				B6DA44232616CABC00DD1EC2 /* PixelArgumentsTests.swift in Sources */,
 				85F1B0C925EF9759004792B6 /* URLEventListenerTests.swift in Sources */,
