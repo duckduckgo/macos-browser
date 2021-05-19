@@ -68,11 +68,10 @@ extension UTType {
     }
 
     var icon: NSImage {
-        if #available(OSX 11.0, *) {
-            return NSWorkspace.shared.icon(for: self.utType)
-        } else {
+        guard #available(OSX 11.0, *) else {
             return NSWorkspace.shared.icon(forFileType: rawValue as String)
         }
+        return NSWorkspace.shared.icon(for: self.utType)
     }
 
 }
