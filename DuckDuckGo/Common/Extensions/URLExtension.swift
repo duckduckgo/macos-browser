@@ -219,4 +219,10 @@ extension URL {
         return string
     }
 
+    // MARK: - File URL
+
+    var volume: URL? {
+        try? self.resourceValues(forKeys: [.volumeURLKey]).volume
+    }
+
 }

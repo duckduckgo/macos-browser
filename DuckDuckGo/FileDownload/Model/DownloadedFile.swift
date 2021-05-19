@@ -21,7 +21,7 @@ import Combine
 
 final class DownloadedFile {
 
-    private static let queue = DispatchQueue(label: "DownloadedFile.queue", qos: .background)
+    private static let queue = DispatchQueue(label: "DownloadedFile.queue")
 
     private var bookmark: Data?
 
@@ -66,6 +66,10 @@ final class DownloadedFile {
         let handle = try FileHandle(forWritingTo: url)
 
         do {
+            let end = handle.seekToEndOfFile()
+            struct OffsetGreaterThanEnd: Error {}
+            guard offset <= end else { throw OffsetGreaterThanEnd() }
+
             try handle.seek(toOffset: offset)
             try handle.truncate(atOffset: offset)
             self.bytesWritten = offset
@@ -78,10 +82,12 @@ final class DownloadedFile {
     }
 
     private func fileSystemSourceCallback() {
-        if let currentURL = locateFile() {
-            if currentURL != self.url {
-                self.url = currentURL
-            }
+        if let currentURL = url,
+           let newURL = locateFile(),
+           newURL.volume == currentURL.volume {
+            if newURL == currentURL { return }
+
+            self.url = newURL
         } else { // file has been removed
             self._close()
             self.url = nil
@@ -96,9 +102,6 @@ final class DownloadedFile {
         var isStale = false
         if let bookmark = self.bookmark,
            let url = try? URL(resolvingBookmarkData: bookmark, bookmarkDataIsStale: &isStale) {
-            if isStale, let newData = try? url.bookmarkData() {
-                self.bookmark = newData
-            }
             return url
         }
         return nil
@@ -116,12 +119,11 @@ final class DownloadedFile {
     }
 
     private func _move(to newURL: URL, incrementingIndexIfExists: Bool, pathExtension: String?) throws -> URL {
-        guard let currentURL = self.url,
-              currentURL != newURL
-        else { return newURL }
+        guard let currentURL = self.url else { throw CocoaError(.fileReadNoSuchFile) }
+        guard currentURL != newURL else { return newURL }
 
-        let oldURLVolume = try? currentURL.resourceValues(forKeys: [.volumeURLKey]).volume
-        let newURLVolume = try? newURL.resourceValues(forKeys: [.volumeURLKey]).volume
+        let oldURLVolume = currentURL.volume
+        let newURLVolume = newURL.volume
         if let handle = handle,
            oldURLVolume == nil || oldURLVolume != newURLVolume {
             // reopen FileHandle when moving file between different volumes
@@ -161,10 +163,10 @@ final class DownloadedFile {
     }
 
     func delete() {
-        Self.queue.async { [self] in
+        Self.queue.async {
             self._close()
 
-            guard let url = url else { return }
+            guard let url = self.url else { return }
             try? FileManager().removeItem(at: url)
 
             self.url = nil
