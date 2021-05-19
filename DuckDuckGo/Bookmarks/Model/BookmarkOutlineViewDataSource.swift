@@ -17,6 +17,7 @@
 //
 
 import Foundation
+import os.log
 
 final class BookmarkOutlineViewDataSource: NSObject, NSOutlineViewDataSource, NSOutlineViewDelegate {
 
@@ -31,12 +32,14 @@ final class BookmarkOutlineViewDataSource: NSObject, NSOutlineViewDataSource, NS
     var expandedNodes = Set<UUID>()
 
     private let contentMode: ContentMode
+    private let bookmarkManager: BookmarkManager
 
     private var favoritesPseudoFolder = PseudoFolder.favorites
     private var bookmarksPseudoFolder = PseudoFolder.bookmarks
 
-    init(contentMode: ContentMode, treeController: TreeController) {
+    init(contentMode: ContentMode, bookmarkManager: BookmarkManager = LocalBookmarkManager.shared, treeController: TreeController) {
         self.contentMode = contentMode
+        self.bookmarkManager = bookmarkManager
         self.treeController = treeController
 
         super.init()
@@ -45,8 +48,8 @@ final class BookmarkOutlineViewDataSource: NSObject, NSOutlineViewDataSource, NS
     }
 
     func reloadData() {
-        favoritesPseudoFolder.count = LocalBookmarkManager.shared.list?.favoriteBookmarks.count ?? 0
-        bookmarksPseudoFolder.count = LocalBookmarkManager.shared.list?.totalBookmarks ?? 0
+        favoritesPseudoFolder.count = bookmarkManager.list?.favoriteBookmarks.count ?? 0
+        bookmarksPseudoFolder.count = bookmarkManager.list?.totalBookmarks ?? 0
         treeController.rebuild()
     }
 
@@ -219,8 +222,10 @@ final class BookmarkOutlineViewDataSource: NSObject, NSOutlineViewDataSource, NS
         // Handle the nil destination case:
 
         if representedObject is PseudoFolder || item == nil {
-            LocalBookmarkManager.shared.add(objectsWithUUIDs: draggedObjectIdentifiers, to: nil) { _ in
-                // Handle error
+            bookmarkManager.add(objectsWithUUIDs: draggedObjectIdentifiers, to: nil) { error in
+                if let error = error {
+                    os_log("Failed to accept nil parent drop via outline view: %s", error.localizedDescription)
+                }
             }
 
             return true
@@ -230,8 +235,10 @@ final class BookmarkOutlineViewDataSource: NSObject, NSOutlineViewDataSource, NS
 
         guard let parent = representedObject as? BookmarkFolder else { return false }
 
-        LocalBookmarkManager.shared.add(objectsWithUUIDs: draggedObjectIdentifiers, to: parent) { _ in
-            print("Added object to parent")
+        bookmarkManager.add(objectsWithUUIDs: draggedObjectIdentifiers, to: parent) { error in
+            if let error = error {
+                os_log("Failed to accept existing parent drop via outline view: %s", error.localizedDescription)
+            }
         }
 
         return true
