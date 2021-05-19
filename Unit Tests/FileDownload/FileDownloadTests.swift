@@ -28,17 +28,17 @@ final class FileDownloadTests: XCTestCase {
     let requestWithLongerPath = URLRequest(url: URL(string: "https://www.example.com/Guitar")!)
 
     func testWhenPathAvailableThenCombineWithMimeTypeForBestName() {
-        let download = FileDownload.request(requestWithLongerPath, suggestedName: nil)
+        let download = FileDownload.request(requestWithLongerPath, suggestedName: nil, promptForLocation: false)
         XCTAssertEqual("Guitar", download.downloadTask()?.suggestedFilename)
     }
 
     func testWhenFileTypeMatchesThenNoExtensionDuplicationOccurs() {
-        let download = FileDownload.request(requestWithFileName, suggestedName: nil)
+        let download = FileDownload.request(requestWithFileName, suggestedName: nil, promptForLocation: false)
         XCTAssertEqual("file.html", download.downloadTask()?.suggestedFilename)
     }
 
     func testWhenSuggestedNameNotPresentAndURLHasFileNameThenFileNameIsBest() {
-        let download = FileDownload.request(requestWithFileName, suggestedName: nil)
+        let download = FileDownload.request(requestWithFileName, suggestedName: nil, promptForLocation: false)
         XCTAssertEqual("file.html", download.downloadTask()?.suggestedFilename)
     }
 

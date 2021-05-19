@@ -61,9 +61,9 @@ extension WKWebView {
 
         if let error = output?.error {
             throw error
-        } else {
-            return output?.result
         }
+
+        return output?.result
     }
 
     var mimeType: String? {
