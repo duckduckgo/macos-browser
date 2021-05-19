@@ -48,10 +48,7 @@ extension FileDownload {
             return URLRequestDownloadTask(download: self, session: nil, request: request)
 
         case .webContent(let webView):
-            let contentType = (try? webView.evaluateSynchronously("document.contentType", timeout: 1.0) as? String)
-                .flatMap(UTType.init(mimeType:)) ?? .html
-
-            if case .html = contentType {
+            if case .html = (webView.contentType ?? .html) {
                 return WebContentDownloadTask(download: self, webView: webView)
 
             } else if let url = webView.url, url.isFileURL == true {

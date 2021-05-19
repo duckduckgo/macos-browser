@@ -66,4 +66,13 @@ extension WKWebView {
         }
     }
 
+    var mimeType: String? {
+        try? self.evaluateSynchronously("document.contentType", timeout: 1.0) as? String
+    }
+
+    var contentType: UTType? {
+        guard let mimeType = self.mimeType else { return nil }
+        return UTType(mimeType: mimeType)
+    }
+
 }
