@@ -275,7 +275,12 @@ extension BrowserTabViewController: TabDelegate {
 
         // Note this can result in tabs being left open, e.g. download button on this page:
         // https://en.wikipedia.org/wiki/Guitar#/media/File:GuitareClassique5.png
-        //  Safari closes new tabs that were opened and then create a download instantly.  Should we do the same?
+        // Safari closes new tabs that were opened and then create a download instantly.
+        if tab.webView.canGoBack == false,
+           tab.parentTab != nil,
+           let index = tabCollectionViewModel.tabCollection.tabs.firstIndex(of: tab) {
+            tabCollectionViewModel.remove(at: index)
+        }
     }
 
     func chooseDestination(suggestedFilename: String?, directoryURL: URL?, fileTypes: [UTType], callback: @escaping (URL?, UTType?) -> Void) {
