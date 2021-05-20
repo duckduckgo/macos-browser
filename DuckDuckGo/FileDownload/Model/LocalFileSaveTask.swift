@@ -29,15 +29,9 @@ final class LocalFileSaveTask: FileDownloadTask {
         self.fileTypes = fileType.map { [$0] }
     }
 
-    override func start(delegate: FileDownloadTaskDelegate) {
-        super.start(delegate: delegate)
-
-        delegate.fileDownloadTaskNeedsDestinationURL(self, completionHandler: self.localFileURLCompletionHandler)
-    }
-
-    private func localFileURLCompletionHandler(_ destURL: URL?, _: UTType?) {
-        guard let destURL = destURL else {
-            delegate?.fileDownloadTask(self, didFinishWith: .failure(.cancelled))
+    override func localFileURLCompletionHandler(localURL: URL?, fileType: UTType?) {
+        guard let destURL = localURL else {
+            finish(with: .failure(.cancelled))
             return
         }
 
@@ -54,9 +48,9 @@ final class LocalFileSaveTask: FileDownloadTask {
             let resultURL = try FileManager.default.copyItem(at: self.url, to: destURL, incrementingIndexIfExists: true)
             self.progress.completedUnitCount = fileSize
 
-            delegate?.fileDownloadTask(self, didFinishWith: .success(resultURL))
+            finish(with: .success(resultURL))
         } catch {
-            delegate?.fileDownloadTask(self, didFinishWith: .failure(.failedToMoveFileToDownloads))
+            finish(with: .failure(.failedToMoveFileToDownloads))
         }
     }
 

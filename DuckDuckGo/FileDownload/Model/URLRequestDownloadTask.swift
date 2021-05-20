@@ -71,9 +71,7 @@ final class URLRequestDownloadTask: FileDownloadTask {
         super.init(download: download)
     }
 
-    override func start(delegate: FileDownloadTaskDelegate) {
-        super.start(delegate: delegate)
-
+    override func start() {
         sessionDelegateWrapper = WeakURLRequestDownloadTaskWrapper(task: self)
         session = URLSession(configuration: session?.configuration ?? .default,
                              delegate: sessionDelegateWrapper,
@@ -89,10 +87,10 @@ final class URLRequestDownloadTask: FileDownloadTask {
     }
 
     // Local Save URL and Type chosen using Save Panel or automatically
-    private func localFileURLCompletionHandler(_ destURL: URL?, _: UTType?) {
+    override func localFileURLCompletionHandler(localURL: URL?, fileType: UTType?) {
         dispatchPrecondition(condition: .onQueue(.main))
 
-        guard let url = destURL,
+        guard let url = localURL,
               let task = self.task,
               let downloadedFile = self.downloadedFile
         else {
@@ -132,28 +130,17 @@ final class URLRequestDownloadTask: FileDownloadTask {
         }
     }
 
-    private func finish(with result: Result<URL, FileDownloadError>) {
-        DispatchQueue.main.async {
-            if let downloadedFile = self.downloadedFile {
-                self.progress.publishIfNotPublished()
-
-                if case .success = result {
-                    if self.progress.totalUnitCount == -1 {
-                        self.progress.totalUnitCount = 1
-                    }
-                    self.progress.completedUnitCount = self.progress.totalUnitCount
-                }
-
-                self.progress.unpublishIfNeeded()
-
-                if case .failure = result {
-                    downloadedFile.delete()
-                }
-                self.downloadedFile = nil
-            }
-
-            self.delegate?.fileDownloadTask(self, didFinishWith: result)
+    override func _finish(with result: Result<URL, FileDownloadError>) {
+        if self.downloadedFile != nil {
+            self.progress.publishIfNotPublished()
         }
+
+        super._finish(with: result)
+
+        if case .failure = result {
+            self.downloadedFile?.delete()
+        }
+        self.downloadedFile = nil
     }
     
     // MARK: - URLSessionDataDelegate
@@ -183,8 +170,7 @@ final class URLRequestDownloadTask: FileDownloadTask {
             completionHandler(.allow)
 
             // and request final destination URL using Save Panel or automatically
-            self.delegate?.fileDownloadTaskNeedsDestinationURL(self,
-                                                               completionHandler: self.localFileURLCompletionHandler)
+            self.queryDestinationURL()
         }
     }
 

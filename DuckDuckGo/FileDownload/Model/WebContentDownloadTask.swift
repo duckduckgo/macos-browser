@@ -43,14 +43,9 @@ final class WebContentDownloadTask: FileDownloadTask {
         self.fileTypes = [.html, .webArchive, .pdf]
     }
 
-    override func start(delegate: FileDownloadTaskDelegate) {
-        super.start(delegate: delegate)
-        delegate.fileDownloadTaskNeedsDestinationURL(self, completionHandler: self.localFileURLCompletionHandler)
-    }
-
-    private func localFileURLCompletionHandler(_ localURL: URL?, fileType: UTType?) {
+    override func localFileURLCompletionHandler(localURL: URL?, fileType: UTType?) {
         guard let localURL = localURL else {
-            delegate?.fileDownloadTask(self, didFinishWith: .failure(.cancelled))
+            self.finish(with: .failure(.cancelled))
             return
         }
         self.localURL = localURL
@@ -83,7 +78,7 @@ final class WebContentDownloadTask: FileDownloadTask {
 
         default:
             assertionFailure("WebContentDownloadTask.localFileURLCompletionHandler unexpected file type \(fileType?.fileExtension ?? "<nil>")")
-            self.delegate?.fileDownloadTask(self, didFinishWith: .failure(.cancelled))
+            self.finish(with: .failure(.cancelled))
             return
         }
 
@@ -99,7 +94,7 @@ final class WebContentDownloadTask: FileDownloadTask {
                 saveTask.start(delegate: self)
 
             } catch {
-                self.delegate?.fileDownloadTask(self, didFinishWith: .failure(.failedToCompleteDownloadTask(underlyingError: error)))
+                self.finish(with: .failure(.failedToCompleteDownloadTask(underlyingError: error)))
             }
         }
     }
@@ -113,7 +108,7 @@ extension WebContentDownloadTask: FileDownloadTaskDelegate {
     }
 
     func fileDownloadTask(_ task: FileDownloadTask, didFinishWith result: Result<URL, FileDownloadError>) {
-        self.delegate?.fileDownloadTask(self, didFinishWith: result)
+        self.finish(with: result)
     }
 
 }

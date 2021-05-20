@@ -312,7 +312,8 @@ extension MainViewController {
         let download = FileDownload.webContent(webView)
         FileDownloadManager.shared.startDownload(download,
                                                  chooseDestinationCallback: self.browserTabViewController.chooseDestination,
-                                                 fileIconOriginalRectCallback: self.browserTabViewController.fileIconFlyAnimationOriginalRect)
+                                                 fileIconOriginalRectCallback: self.browserTabViewController.fileIconFlyAnimationOriginalRect,
+                                                 postflight: .reveal)
     }
 
     // MARK: - Debug

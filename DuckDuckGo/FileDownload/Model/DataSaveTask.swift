@@ -32,7 +32,7 @@ final class DataSaveTask: FileDownloadTask {
 
     let data: Data
 
-    init(download: FileDownload, data: Data, mimeType: String? = nil, suggestedFilename: String? = nil) {
+    init(download: FileDownloadRequest, data: Data, mimeType: String? = nil, suggestedFilename: String? = nil) {
         self.data = data
         super.init(download: download)
 
@@ -40,14 +40,9 @@ final class DataSaveTask: FileDownloadTask {
         self.dataSuggestedFilename = suggestedFilename
     }
 
-    override func start(delegate: FileDownloadTaskDelegate) {
-        super.start(delegate: delegate)
-        delegate.fileDownloadTaskNeedsDestinationURL(self, completionHandler: self.localFileURLCompletionHandler)
-    }
-
-    private func localFileURLCompletionHandler(_ localURL: URL?, _: UTType?) {
+    override func localFileURLCompletionHandler(localURL: URL?, fileType: UTType?) {
         guard let localURL = localURL else {
-            delegate?.fileDownloadTask(self, didFinishWith: .failure(.cancelled))
+            finish(with: .failure(.cancelled))
             return
         }
         let fileSize = Int64(self.data.count)
@@ -67,16 +62,15 @@ final class DataSaveTask: FileDownloadTask {
             }
 
             DispatchQueue.main.async { [weak self] in
-                guard let self = self, let delegate = self.delegate else { return }
+                guard let self = self else { return }
 
                 self.progress.completedUnitCount = self.progress.totalUnitCount
                 self.progress.unpublishIfNeeded()
 
                 if let url = outURL {
-                    delegate.fileDownloadTask(self, didFinishWith: .success(url))
+                    self.finish(with: .success(url))
                 } else {
-                    delegate.fileDownloadTask(self, didFinishWith: .failure(saved ? .failedToMoveFileToDownloads
-                                                                                : .failedToCreateTemporaryFile))
+                    self.finish(with: .failure(saved ? .failedToMoveFileToDownloads : .failedToCreateTemporaryFile))
                 }
             }
         }

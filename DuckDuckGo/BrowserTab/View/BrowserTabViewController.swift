@@ -270,7 +270,8 @@ extension BrowserTabViewController: TabDelegate {
     func tab(_ tab: Tab, requestedFileDownload request: FileDownload) {
         FileDownloadManager.shared.startDownload(request,
                                                  chooseDestinationCallback: self.chooseDestination,
-                                                 fileIconOriginalRectCallback: self.fileIconFlyAnimationOriginalRect)
+                                                 fileIconOriginalRectCallback: self.fileIconFlyAnimationOriginalRect,
+                                                 postflight: .reveal)
 
         // Note this can result in tabs being left open, e.g. download button on this page:
         // https://en.wikipedia.org/wiki/Guitar#/media/File:GuitareClassique5.png
@@ -412,12 +413,14 @@ extension BrowserTabViewController: WKUIDelegate {
 
     // swiftlint:disable identifier_name
     @objc func _webView(_ webView: WKWebView, saveDataToFile data: NSData, suggestedFilename: NSString, mimeType: NSString, originatingURL: NSURL) {
-        FileDownloadManager.shared.startDownload(.data(data as Data,
-                                                       mimeType: mimeType as String,
-                                                       suggestedName: suggestedFilename as String,
-                                                       sourceURL: originatingURL as URL),
+        let download = FileDownload.data(data as Data,
+                                         mimeType: mimeType as String,
+                                         suggestedName: suggestedFilename as String,
+                                         sourceURL: originatingURL as URL)
+        FileDownloadManager.shared.startDownload(download,
                                                  chooseDestinationCallback: self.chooseDestination,
-                                                 fileIconOriginalRectCallback: self.fileIconFlyAnimationOriginalRect)
+                                                 fileIconOriginalRectCallback: self.fileIconFlyAnimationOriginalRect,
+                                                 postflight: .reveal)
     }
     // swiftlint:enable identifier_name
 

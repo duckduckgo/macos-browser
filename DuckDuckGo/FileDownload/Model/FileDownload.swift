@@ -19,10 +19,22 @@
 import Foundation
 import WebKit
 
-enum FileDownload {
+protocol FileDownloadRequest {
+    var shouldAlwaysPromptFileSaveLocation: Bool { get }
+    var sourceURL: URL? { get }
+    func downloadTask() -> FileDownloadTask?
+}
+
+enum FileDownload: FileDownloadRequest {
     case request(URLRequest, suggestedName: String?, promptForLocation: Bool)
     case webContent(WKWebView)
     case data(Data, mimeType: String, suggestedName: String?, sourceURL: URL?)
+}
+
+
+enum FileDownloadPostflight {
+    case reveal
+    case open
 }
 
 extension FileDownload {

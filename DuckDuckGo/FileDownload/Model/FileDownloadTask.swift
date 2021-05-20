@@ -36,9 +36,9 @@ protocol FileDownloadTaskDelegate: AnyObject {
 }
 
 internal class FileDownloadTask: NSObject {
-    let download: FileDownload
+    let download: FileDownloadRequest
 
-    static let defaultFileName = "Unknown"
+    private static let defaultFileName = "Unknown"
 
     /// Tries to use the file name part of the URL, if available, adjusting for content type, if available.
     var suggestedFilename: String {
@@ -61,9 +61,15 @@ internal class FileDownloadTask: NSObject {
     var fileTypes: [UTType]?
     let progress: Progress
 
-    weak var delegate: FileDownloadTaskDelegate?
+    private var future: Future<URL, FileDownloadError>!
+    private var fulfill: Future<URL, FileDownloadError>.Promise?
+    var output: AnyPublisher<URL, FileDownloadError> { future.eraseToAnyPublisher() }
 
-    init(download: FileDownload) {
+    var postflight: FileDownloadPostflight?
+
+    private weak var delegate: FileDownloadTaskDelegate?
+
+    init(download: FileDownloadRequest) {
         self.download = download
         self.progress = Progress(parent: nil, userInfo: [
             .fileOperationKindKey: Progress.FileOperationKind.downloading
@@ -79,10 +85,52 @@ internal class FileDownloadTask: NSObject {
         progress.cancellationHandler = { [weak self] in
             self?.cancel()
         }
+
+        self.future = Future<URL, FileDownloadError> { self.fulfill = $0 }
+        assert(self.fulfill != nil)
     }
 
-    func start(delegate: FileDownloadTaskDelegate) {
+    final func start(delegate: FileDownloadTaskDelegate) {
         self.delegate = delegate
+        start()
+    }
+
+    func start() {
+        self.queryDestinationURL()
+    }
+
+    func _finish(with result: Result<URL, FileDownloadError>) { // swiftlint:disable:this identifier_name
+        dispatchPrecondition(condition: .onQueue(.main))
+
+        if case .success = result {
+            if self.progress.totalUnitCount == -1 {
+                self.progress.totalUnitCount = 1
+            }
+            self.progress.completedUnitCount = self.progress.totalUnitCount
+        }
+
+        self.progress.unpublishIfNeeded()
+
+        self.delegate?.fileDownloadTask(self, didFinishWith: result)
+        self.fulfill?(result)
+        self.fulfill = nil
+    }
+
+    final func finish(with result: Result<URL, FileDownloadError>) {
+        if Thread.isMainThread {
+            _finish(with: result)
+        } else {
+            DispatchQueue.main.async {
+                self._finish(with: result)
+            }
+        }
+    }
+
+    final func queryDestinationURL() {
+        delegate?.fileDownloadTaskNeedsDestinationURL(self, completionHandler: self.localFileURLCompletionHandler)
+    }
+
+    func localFileURLCompletionHandler(localURL: URL?, fileType: UTType?) {
     }
 
     func cancel() {
@@ -90,6 +138,7 @@ internal class FileDownloadTask: NSObject {
 
     deinit {
         self.progress.unpublishIfNeeded()
+        assert(fulfill == nil, "FileDownloadTask is deallocated without finish(with:) been called")
     }
 
 }

@@ -23,10 +23,14 @@ import os
 final class FileDownloadManager {
 
     static let shared = FileDownloadManager()
+    private let workspace: NSWorkspace
+    private let preferences: DownloadPreferences
 
-    private init() { }
+    init(workspace: NSWorkspace = .shared, preferences: DownloadPreferences = .init()) {
+        self.workspace = workspace
+        self.preferences = preferences
+    }
 
-    private var subscriptions = Set<AnyCancellable>()
     @PublishedAfter private (set) var downloads = Set<FileDownloadTask>()
 
     typealias FileNameChooserCallback = (/*suggestedFilename:*/ String?,
@@ -39,15 +43,17 @@ final class FileDownloadManager {
     private var fileIconOriginalRectCallbacks = [FileDownloadTask: FileIconOriginalRectCallback]()
 
     @discardableResult
-    func startDownload(_ request: FileDownload,
-                       chooseDestinationCallback: @escaping FileNameChooserCallback,
-                       fileIconOriginalRectCallback: FileIconOriginalRectCallback? = nil) -> FileDownloadTask? {
+    func startDownload(_ request: FileDownloadRequest,
+                       chooseDestinationCallback: FileNameChooserCallback? = nil,
+                       fileIconOriginalRectCallback: FileIconOriginalRectCallback? = nil,
+                       postflight: FileDownloadPostflight?) -> FileDownloadTask? {
 
         guard let task = request.downloadTask() else { return nil }
 
         self.destinationChooserCallbacks[task] = chooseDestinationCallback
         self.fileIconOriginalRectCallbacks[task] = fileIconOriginalRectCallback
-        
+        task.postflight = postflight
+
         downloads.insert(task)
         task.start(delegate: self)
 
@@ -74,7 +80,6 @@ extension FileDownloadManager: FileDownloadTaskDelegate {
             self.fileIconOriginalRectCallbacks[task] = nil
         }
 
-        let preferences = DownloadPreferences()
         guard task.download.shouldAlwaysPromptFileSaveLocation || preferences.alwaysRequestDownloadLocation,
               let locationChooser = self.destinationChooserCallbacks[task]
         else {
@@ -107,13 +112,21 @@ extension FileDownloadManager: FileDownloadTaskDelegate {
     func fileDownloadTask(_ task: FileDownloadTask, didFinishWith result: Result<URL, FileDownloadError>) {
         dispatchPrecondition(condition: .onQueue(.main))
 
-        self.downloads.remove(task)
-        self.destinationChooserCallbacks[task] = nil
-        self.fileIconOriginalRectCallbacks[task] = nil
+        defer {
+            self.downloads.remove(task)
+            self.destinationChooserCallbacks[task] = nil
+            self.fileIconOriginalRectCallbacks[task] = nil
+        }
 
         if case .success(let url) = result {
-            // For now, show the file in Finder
-            NSWorkspace.shared.activateFileViewerSelecting([url])
+            switch task.postflight {
+            case .open:
+                self.workspace.open(url)
+            case .reveal:
+                self.workspace.activateFileViewerSelecting([url])
+            case .none:
+                break
+            }
         }
     }
 
