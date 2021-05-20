@@ -315,7 +315,6 @@
 		B6E61EE3263AC0C8004E11AB /* FileManagerExtension.swift in Sources */ = {isa = PBXBuildFile; fileRef = B6E61EE2263AC0C8004E11AB /* FileManagerExtension.swift */; };
 		B6E61EE8263ACE16004E11AB /* UTType.swift in Sources */ = {isa = PBXBuildFile; fileRef = B6E61EE7263ACE16004E11AB /* UTType.swift */; };
 		B6E61EED263ACE58004E11AB /* URLRequestDownloadTask.swift in Sources */ = {isa = PBXBuildFile; fileRef = B6E61EEC263ACE58004E11AB /* URLRequestDownloadTask.swift */; };
-		B6F4101A264D0ABC003DA42C /* DataHrefTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = B6F41019264D0ABC003DA42C /* DataHrefTests.swift */; };
 		B6F41031264D2B23003DA42C /* ProgressExtension.swift in Sources */ = {isa = PBXBuildFile; fileRef = B6F41030264D2B23003DA42C /* ProgressExtension.swift */; };
 		F41D174125CB131900472416 /* NSColorExtension.swift in Sources */ = {isa = PBXBuildFile; fileRef = F41D174025CB131900472416 /* NSColorExtension.swift */; };
 		F44C130225C2DA0400426E3E /* NSAppearanceExtension.swift in Sources */ = {isa = PBXBuildFile; fileRef = F44C130125C2DA0400426E3E /* NSAppearanceExtension.swift */; };
@@ -650,7 +649,6 @@
 		B6E61EE2263AC0C8004E11AB /* FileManagerExtension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FileManagerExtension.swift; sourceTree = "<group>"; };
 		B6E61EE7263ACE16004E11AB /* UTType.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UTType.swift; sourceTree = "<group>"; };
 		B6E61EEC263ACE58004E11AB /* URLRequestDownloadTask.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = URLRequestDownloadTask.swift; sourceTree = "<group>"; };
-		B6F41019264D0ABC003DA42C /* DataHrefTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DataHrefTests.swift; sourceTree = "<group>"; };
 		B6F41030264D2B23003DA42C /* ProgressExtension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProgressExtension.swift; sourceTree = "<group>"; };
 		F41D174025CB131900472416 /* NSColorExtension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NSColorExtension.swift; sourceTree = "<group>"; };
 		F44C130125C2DA0400426E3E /* NSAppearanceExtension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NSAppearanceExtension.swift; sourceTree = "<group>"; };
@@ -1002,7 +1000,6 @@
 			isa = PBXGroup;
 			children = (
 				8553FF51257523760029327F /* FileDownloadTests.swift */,
-				B6F41019264D0ABC003DA42C /* DataHrefTests.swift */,
 				B6B3E09D2654FF9C0040E0A2 /* DownloadedFileTests.swift */,
 			);
 			path = FileDownload;
