@@ -36,7 +36,7 @@ final class ConfigurationManager {
 #if DEBUG
         static let refreshPeriodSeconds = 60.0 * 2 // 2 minutes when in debug mode
 #else
-        static let refreshPeriodSeconds = 60.0 * 60 * 12 // 12 hours
+        static let refreshPeriodSeconds = 60.0 * 30 // 30 minutes
 #endif
         static let retryDelaySeconds = 60.0 * 60 * 1 // 1 hour delay before checking again if something went wrong last time
         static let refreshCheckIntervalSeconds = 60.0 // Check if we need a refresh every minute
