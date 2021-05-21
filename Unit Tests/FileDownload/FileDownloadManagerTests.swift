@@ -160,7 +160,7 @@ final class FileDownloadManagerTests: XCTestCase {
         dm.startDownload(download,
                          chooseDestinationCallback: { suggestedFilename, directoryURL, fileTypes, callback in
                             dispatchPrecondition(condition: .onQueue(.main))
-                            XCTAssertEqual(suggestedFilename, "somefile.html")
+                            XCTAssertEqual(suggestedFilename, "somefile")
                             XCTAssertEqual(directoryURL, downloadsURL)
                             XCTAssertEqual(fileTypes, [.html, .jpeg])
                             e2.fulfill()
@@ -197,7 +197,7 @@ final class FileDownloadManagerTests: XCTestCase {
         dm.startDownload(download,
                          chooseDestinationCallback: { suggestedFilename, directoryURL, fileTypes, callback in
                             dispatchPrecondition(condition: .onQueue(.main))
-                            XCTAssertEqual(suggestedFilename, "somefile.html")
+                            XCTAssertEqual(suggestedFilename, "somefile")
                             XCTAssertEqual(directoryURL, downloadsURL)
                             XCTAssertEqual(fileTypes, [.html, .jpeg])
                             e2.fulfill()

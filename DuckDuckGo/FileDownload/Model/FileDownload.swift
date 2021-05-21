@@ -31,7 +31,6 @@ enum FileDownload: FileDownloadRequest {
     case data(Data, mimeType: String, suggestedName: String?, sourceURL: URL?)
 }
 
-
 enum FileDownloadPostflight {
     case reveal
     case open

@@ -22,6 +22,10 @@ final class LocalFileSaveTask: FileDownloadTask {
 
     let url: URL
 
+    override var suggestedFilename: String {
+        url.lastPathComponent
+    }
+
     init(download: FileDownloadRequest, url: URL, fileType: UTType?) {
         self.url = url
         super.init(download: download)

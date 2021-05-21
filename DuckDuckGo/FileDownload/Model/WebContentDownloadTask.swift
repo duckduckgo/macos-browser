@@ -24,14 +24,14 @@ final class WebContentDownloadTask: FileDownloadTask {
     let webView: WKWebView
 
     override var suggestedFilename: String {
-        guard let title = webView.title?.replacingOccurrences(of: "[~#@*+%{}<>\\[\\]|\"\\_^\\/:]",
+        guard let title = webView.title?.replacingOccurrences(of: "[~#@*+%{}<>\\[\\]|\"\\_^\\/:\\\\]",
                                                               with: "_",
                                                               options: .regularExpression),
               !title.isEmpty
         else {
             return super.suggestedFilename
         }
-        return title
+        return title.appending(".html")
     }
 
     private var subTask: FileDownloadTask?

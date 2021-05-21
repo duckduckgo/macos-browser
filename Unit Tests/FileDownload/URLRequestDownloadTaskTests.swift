@@ -177,7 +177,7 @@ final class URLRequestDownloadTaskTests: XCTestCase {
 
         task.start(delegate: taskDelegate)
 
-        waitForExpectations(timeout: 1)
+        waitForExpectations(timeout: 3)
     }
 
     func testIfRequestFailsThenDestinationURLCallbackNotCalled() {

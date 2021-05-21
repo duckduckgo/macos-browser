@@ -98,7 +98,9 @@ extension FileDownloadManager: FileDownloadTaskDelegate {
             return
         }
 
-        locationChooser(task.suggestedFilename, preferences.selectedDownloadLocation, task.fileTypes ?? []) { url, fileType in
+        // drop known extension, it would be appended by SavePanel
+        let suggestedFilename = task.fileTypes.flatMap(\.first?.fileExtension).map { task.suggestedFilename.drop(suffix: "." + $0) }
+        locationChooser(suggestedFilename, preferences.selectedDownloadLocation, task.fileTypes ?? []) { url, fileType in
             if let url = url,
                FileManager.default.fileExists(atPath: url.path) {
                 // overwrite

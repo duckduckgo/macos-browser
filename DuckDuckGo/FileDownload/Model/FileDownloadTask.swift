@@ -42,26 +42,39 @@ internal class FileDownloadTask: NSObject {
 
     /// Tries to use the file name part of the URL, if available, adjusting for content type, if available.
     var suggestedFilename: String {
-        guard let url = self.download.sourceURL else { return Self.defaultFileName }
-        guard !url.pathComponents.isEmpty, url.pathComponents != [ "/" ] else {
-            return url.host?.drop(prefix: "www.").replacingOccurrences(of: ".", with: "_")
-                ?? Self.defaultFileName
+        let url = self.download.sourceURL
+
+        var filename: String
+        if let url = url,
+           !url.pathComponents.isEmpty,
+           url.pathComponents != [ "/" ] {
+
+            filename = url.lastPathComponent
+        } else {
+            filename = url?.host?.drop(prefix: "www.").replacingOccurrences(of: ".", with: "_") ?? ""
+        }
+        if filename.isEmpty {
+            filename = Self.defaultFileName
         }
 
         if let ext = self.fileTypes?.first?.fileExtension,
-           url.pathExtension != ext {
-
+           !filename.hasSuffix("." + ext) {
             // there is a more appropriate extension, so use it
-            return url.lastPathComponent + "." + ext
+            filename += "." + ext
         }
-
-        return url.lastPathComponent
+        return filename
     }
 
     var fileTypes: [UTType]?
     let progress: Progress
 
-    private var future: Future<URL, FileDownloadError>!
+    private lazy var future: Future<URL, FileDownloadError> = {
+        dispatchPrecondition(condition: .onQueue(.main))
+        let future = Future<URL, FileDownloadError> { self.fulfill = $0 }
+        assert(self.fulfill != nil)
+        return future
+    }()
+
     private var fulfill: Future<URL, FileDownloadError>.Promise?
     var output: AnyPublisher<URL, FileDownloadError> { future.eraseToAnyPublisher() }
 
@@ -85,12 +98,10 @@ internal class FileDownloadTask: NSObject {
         progress.cancellationHandler = { [weak self] in
             self?.cancel()
         }
-
-        self.future = Future<URL, FileDownloadError> { self.fulfill = $0 }
-        assert(self.fulfill != nil)
     }
 
     final func start(delegate: FileDownloadTaskDelegate) {
+        _=future
         self.delegate = delegate
         start()
     }

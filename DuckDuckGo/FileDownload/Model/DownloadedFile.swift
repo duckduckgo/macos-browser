@@ -127,7 +127,12 @@ final class DownloadedFile {
         guard self.url != nil,
               let currentURL = self.locateFile()
         else { throw CocoaError(.fileReadNoSuchFile) }
-        guard currentURL != newURL else { return newURL }
+        guard currentURL != newURL else {
+            if self.url != currentURL {
+                self.url = currentURL
+            }
+            return newURL
+        }
 
         let oldURLVolume = currentURL.volume
         let newURLVolume = newURL.volume

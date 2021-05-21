@@ -22,7 +22,7 @@ import XCTest
 
 final class WebContentDownloadTaskTests: XCTestCase {
     var taskDelegate: FileDownloadTaskDelegateMock! // swiftlint:disable:this weak_delegate
-    var navigationDelegate: WebViewNavigationDelegateMock! // swiftlint:disable:this weak_delegate
+    var navigationDelegate: TestNavigationDelegate! // swiftlint:disable:this weak_delegate
     let testFile = "downloaded file"
     let testHtml = "<html><head><title>*** Title ***</title></head><body>test content</body></html>"
     var webView: WKWebView!
@@ -35,7 +35,7 @@ final class WebContentDownloadTaskTests: XCTestCase {
             try? fm.removeItem(at: tempDir.appendingPathComponent(file))
         }
         webView = WKWebView(frame: CGRect())
-        navigationDelegate = WebViewNavigationDelegateMock(e: expectation(description: "HTML loaded"))
+        navigationDelegate = TestNavigationDelegate(e: expectation(description: "HTML loaded"))
         webView.navigationDelegate = navigationDelegate
         webView.loadHTMLString(testHtml, baseURL: nil)
         waitForExpectations(timeout: 3)
@@ -190,15 +190,4 @@ final class WebContentDownloadTaskTests: XCTestCase {
         waitForExpectations(timeout: 3)
     }
 
-}
-
-final class WebViewNavigationDelegateMock: NSObject, WKNavigationDelegate {
-    let e: XCTestExpectation
-    init(e: XCTestExpectation) {
-        self.e = e
-    }
-
-    func webView(_ webView: WKWebView, didFinish navigation: WKNavigation!) {
-        e.fulfill()
-    }
 }

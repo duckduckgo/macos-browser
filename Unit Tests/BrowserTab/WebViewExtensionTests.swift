@@ -74,7 +74,7 @@ final class WebViewExtensionTests: XCTestCase {
 
         webView.loadHTMLString("<html></html>", baseURL: nil)
 
-        waitForExpectations(timeout: 1.0)
+        waitForExpectations(timeout: 5.0)
         XCTAssertEqual(webView.contentType, .html)
     }
 
@@ -88,7 +88,7 @@ final class WebViewExtensionTests: XCTestCase {
         webView.loadFileURL(url, allowingReadAccessTo: url.deletingLastPathComponent())
 
         withExtendedLifetime(delegate) {
-            waitForExpectations(timeout: 1.0)
+            waitForExpectations(timeout: 5.0)
         }
 
         XCTAssertEqual(webView.contentType, .jpeg)
@@ -96,7 +96,7 @@ final class WebViewExtensionTests: XCTestCase {
 
 }
 
-private class TestNavigationDelegate: NSObject, WKNavigationDelegate {
+final class TestNavigationDelegate: NSObject, WKNavigationDelegate {
     let e: XCTestExpectation
 
     init(e: XCTestExpectation) {
