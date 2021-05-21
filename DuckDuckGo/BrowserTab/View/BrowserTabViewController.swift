@@ -299,19 +299,19 @@ extension BrowserTabViewController: TabDelegate {
 
     func fileIconFlyAnimationOriginalRect(for downloadTask: FileDownloadTask) -> NSRect? {
         dispatchPrecondition(condition: .onQueue(.main))
-        guard let addressBar = (self.parent as? MainViewController)?.navigationBarViewController.addressBarViewController?.addressBarTextField,
-              let window = addressBar.window
-        else {
-            return nil
-        }
+        guard let window = self.view.window,
+              let dockScreen = NSScreen.dockScreen
+        else { return nil }
 
         // fly 64x64 icon from the center of Address Bar
-        let size = addressBar.bounds.size
+        let size = view.bounds.size
         let rect = NSRect(x: size.width / 2 - 32, y: size.height / 2 - 32, width: 64, height: 64)
-        let windowRect = addressBar.convert(rect, to: nil)
-        var globalRect = window.convertToScreen(windowRect)
-        globalRect.origin.x -= NSScreen.main?.frame.origin.x ?? 0
-        return globalRect
+        let windowRect = view.convert(rect, to: nil)
+        let globalRect = window.convertToScreen(windowRect)
+        // to the Downloads folder in Dock (in DockScreen coordinates)
+        let dockScreenRect = dockScreen.convert(globalRect)
+
+        return dockScreenRect
     }
 
     func tab(_ tab: Tab, willShowContextMenuAt position: NSPoint, image: URL?, link: URL?) {

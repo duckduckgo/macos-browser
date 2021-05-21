@@ -305,6 +305,7 @@
 		B6B3E0C12657599D0040E0A2 /* DataSaveTaskTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = B6B3E0C02657599D0040E0A2 /* DataSaveTaskTests.swift */; };
 		B6B3E0C626575BBB0040E0A2 /* WebContentDownloadTaskTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = B6B3E0C526575BBB0040E0A2 /* WebContentDownloadTaskTests.swift */; };
 		B6B3E0CB265764730040E0A2 /* URLRequestDownloadTaskTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = B6B3E0CA265764730040E0A2 /* URLRequestDownloadTaskTests.swift */; };
+		B6B3E0E12657EA7A0040E0A2 /* NSScreenExtension.swift in Sources */ = {isa = PBXBuildFile; fileRef = B6B3E0DC2657E9CF0040E0A2 /* NSScreenExtension.swift */; };
 		B6D7A2EE25D2418B002B2AE1 /* ShadowView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B6D7A2ED25D2418B002B2AE1 /* ShadowView.swift */; };
 		B6DA44022616B28300DD1EC2 /* PixelDataStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = B6DA44012616B28300DD1EC2 /* PixelDataStore.swift */; };
 		B6DA44082616B30600DD1EC2 /* PixelDataModel.xcdatamodeld in Sources */ = {isa = PBXBuildFile; fileRef = B6DA44062616B30600DD1EC2 /* PixelDataModel.xcdatamodeld */; };
@@ -648,6 +649,7 @@
 		B6B3E0C02657599D0040E0A2 /* DataSaveTaskTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DataSaveTaskTests.swift; sourceTree = "<group>"; };
 		B6B3E0C526575BBB0040E0A2 /* WebContentDownloadTaskTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WebContentDownloadTaskTests.swift; sourceTree = "<group>"; };
 		B6B3E0CA265764730040E0A2 /* URLRequestDownloadTaskTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = URLRequestDownloadTaskTests.swift; sourceTree = "<group>"; };
+		B6B3E0DC2657E9CF0040E0A2 /* NSScreenExtension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NSScreenExtension.swift; sourceTree = "<group>"; };
 		B6D7A2ED25D2418B002B2AE1 /* ShadowView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ShadowView.swift; sourceTree = "<group>"; };
 		B6DA44012616B28300DD1EC2 /* PixelDataStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PixelDataStore.swift; sourceTree = "<group>"; };
 		B6DA44072616B30600DD1EC2 /* PixelDataModel.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = PixelDataModel.xcdatamodel; sourceTree = "<group>"; };
@@ -1702,6 +1704,7 @@
 				AA5C8F58258FE21F00748EB7 /* NSTextFieldExtension.swift */,
 				AA6FFB4324DC33320028F4D0 /* NSViewExtension.swift */,
 				AA9E9A5525A3AE8400D1959D /* NSWindowExtension.swift */,
+				B6B3E0DC2657E9CF0040E0A2 /* NSScreenExtension.swift */,
 				B684592125C93BE000DC17B6 /* Publisher.asVoid.swift */,
 				B684592625C93C0500DC17B6 /* Publishers.NestedObjectChanges.swift */,
 				4BB88B4925B7B690006F6B06 /* SequenceExtensions.swift */,
@@ -2157,6 +2160,7 @@
 				AABEE69A24A902A90043105B /* SuggestionContainerViewModel.swift in Sources */,
 				B657841F25FA497600D8DB33 /* NSException+Catch.swift in Sources */,
 				AA4FF40C2624751A004E2377 /* GrammarCheckEnabler.swift in Sources */,
+				B6B3E0E12657EA7A0040E0A2 /* NSScreenExtension.swift in Sources */,
 				AA6820E425502F19005ED0D5 /* WebsiteDataStore.swift in Sources */,
 				85D438B6256E7C9E00F3BAF8 /* ContextMenuUserScript.swift in Sources */,
 				4BA1A6BD258B082300F6F690 /* EncryptionKeyStore.swift in Sources */,
