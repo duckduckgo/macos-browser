@@ -23,6 +23,7 @@ import XCTest
 final class LocalFileSaveTaskTests: XCTestCase {
     var taskDelegate: FileDownloadTaskDelegateMock! // swiftlint:disable:this weak_delegate
     let testFile = "downloaded file"
+    let testData = "test file contents".data(using: .utf8)!
     let fm = FileManager.default
 
     override func setUp() {
@@ -98,9 +99,9 @@ final class LocalFileSaveTaskTests: XCTestCase {
         waitForExpectations(timeout: 0.1)
     }
 
-    func testWhenDestinationFileExistsThenNumberIsIncreased() {
+    func testWhenDestinationFileExistsThenNumberIsIncreased() throws {
         let srcFile = fm.temporaryDirectory.appendingPathComponent(testFile + ".test")
-        fm.createFile(atPath: srcFile.path, contents: nil, attributes: nil)
+        fm.createFile(atPath: srcFile.path, contents: testData, attributes: nil)
         let existingURL = fm.temporaryDirectory.appendingPathComponent(testFile + " 1.test")
         fm.createFile(atPath: existingURL.path, contents: nil, attributes: nil)
         let expectedURL = fm.temporaryDirectory.appendingPathComponent(testFile + " 2.test")
@@ -123,6 +124,13 @@ final class LocalFileSaveTaskTests: XCTestCase {
         task.start(delegate: taskDelegate)
 
         waitForExpectations(timeout: 0.1)
+        XCTAssertTrue(fm.fileExists(atPath: srcFile.path))
+        XCTAssertTrue(fm.fileExists(atPath: existingURL.path))
+        XCTAssertTrue(fm.fileExists(atPath: expectedURL.path))
+
+        XCTAssertEqual(try Data(contentsOf: srcFile), testData)
+        XCTAssertEqual(try Data(contentsOf: expectedURL), testData)
+        XCTAssertNotEqual(try Data(contentsOf: existingURL), testData)
     }
 
 }

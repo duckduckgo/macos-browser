@@ -303,6 +303,7 @@
 		B6B3E0B726574BF80040E0A2 /* FileDownloadTaskDelegateMock.swift in Sources */ = {isa = PBXBuildFile; fileRef = B6B3E0B626574BF80040E0A2 /* FileDownloadTaskDelegateMock.swift */; };
 		B6B3E0BC2657537D0040E0A2 /* FileDownloadTaskMock.swift in Sources */ = {isa = PBXBuildFile; fileRef = B6B3E0BB2657537D0040E0A2 /* FileDownloadTaskMock.swift */; };
 		B6B3E0C12657599D0040E0A2 /* DataSaveTaskTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = B6B3E0C02657599D0040E0A2 /* DataSaveTaskTests.swift */; };
+		B6B3E0C626575BBB0040E0A2 /* WebContentDownloadTaskTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = B6B3E0C526575BBB0040E0A2 /* WebContentDownloadTaskTests.swift */; };
 		B6D7A2EE25D2418B002B2AE1 /* ShadowView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B6D7A2ED25D2418B002B2AE1 /* ShadowView.swift */; };
 		B6DA44022616B28300DD1EC2 /* PixelDataStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = B6DA44012616B28300DD1EC2 /* PixelDataStore.swift */; };
 		B6DA44082616B30600DD1EC2 /* PixelDataModel.xcdatamodeld in Sources */ = {isa = PBXBuildFile; fileRef = B6DA44062616B30600DD1EC2 /* PixelDataModel.xcdatamodeld */; };
@@ -644,6 +645,7 @@
 		B6B3E0B626574BF80040E0A2 /* FileDownloadTaskDelegateMock.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FileDownloadTaskDelegateMock.swift; sourceTree = "<group>"; };
 		B6B3E0BB2657537D0040E0A2 /* FileDownloadTaskMock.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FileDownloadTaskMock.swift; sourceTree = "<group>"; };
 		B6B3E0C02657599D0040E0A2 /* DataSaveTaskTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DataSaveTaskTests.swift; sourceTree = "<group>"; };
+		B6B3E0C526575BBB0040E0A2 /* WebContentDownloadTaskTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WebContentDownloadTaskTests.swift; sourceTree = "<group>"; };
 		B6D7A2ED25D2418B002B2AE1 /* ShadowView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ShadowView.swift; sourceTree = "<group>"; };
 		B6DA44012616B28300DD1EC2 /* PixelDataStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PixelDataStore.swift; sourceTree = "<group>"; };
 		B6DA44072616B30600DD1EC2 /* PixelDataModel.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = PixelDataModel.xcdatamodel; sourceTree = "<group>"; };
@@ -1014,6 +1016,7 @@
 				B6B3E0A92655F9CB0040E0A2 /* FileDownloadManagerTests.swift */,
 				B6B3E0B1265749D20040E0A2 /* LocalFileSaveTaskTests.swift */,
 				B6B3E0C02657599D0040E0A2 /* DataSaveTaskTests.swift */,
+				B6B3E0C526575BBB0040E0A2 /* WebContentDownloadTaskTests.swift */,
 				B6B3E0B626574BF80040E0A2 /* FileDownloadTaskDelegateMock.swift */,
 				B6B3E0BB2657537D0040E0A2 /* FileDownloadTaskMock.swift */,
 			);
@@ -2357,6 +2360,7 @@
 				4BA1A6F6258C4F9600F6F690 /* EncryptionMocks.swift in Sources */,
 				B6B3E0BC2657537D0040E0A2 /* FileDownloadTaskMock.swift in Sources */,
 				B6B3E0962654DACD0040E0A2 /* UTTypeTests.swift in Sources */,
+				B6B3E0C626575BBB0040E0A2 /* WebContentDownloadTaskTests.swift in Sources */,
 				4B02199D25E063DE00ED7DEA /* FireproofingURLExtensionsTests.swift in Sources */,
 				4B0511F8262CB20F00F6079C /* DownloadPreferencesTests.swift in Sources */,
 				B6B3E0B2265749D30040E0A2 /* LocalFileSaveTaskTests.swift in Sources */,

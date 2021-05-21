@@ -127,6 +127,8 @@ final class DataSaveTaskTests: XCTestCase {
         task.start(delegate: taskDelegate)
 
         waitForExpectations(timeout: 0.1)
+        XCTAssertEqual(try Data(contentsOf: expectedURL), testData)
+        XCTAssertNotEqual(try Data(contentsOf: existingURL), testData)
     }
 
 }

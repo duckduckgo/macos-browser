@@ -37,7 +37,7 @@ final class WebContentDownloadTask: FileDownloadTask {
     private var subTask: FileDownloadTask?
     private var localURL: URL?
 
-    init(download: FileDownload, webView: WKWebView) {
+    init(download: FileDownloadRequest, webView: WKWebView) {
         self.webView = webView
         super.init(download: download)
         self.fileTypes = [.html, .webArchive, .pdf]
