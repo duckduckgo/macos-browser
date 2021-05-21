@@ -60,11 +60,14 @@ extension FileDownload {
             return URLRequestDownloadTask(download: self, session: nil, request: request)
 
         case .webContent(let webView):
-            if case .html = (webView.contentType ?? .html) {
+            let contentType = webView.contentType
+            if case .html = (contentType ?? .html) {
                 return WebContentDownloadTask(download: self, webView: webView)
 
             } else if let url = webView.url, url.isFileURL == true {
-                return LocalFileSaveTask(download: self, url: url, fileType: UTType(fileExtension: url.pathExtension))
+                return LocalFileSaveTask(download: self,
+                                         url: url,
+                                         fileType: contentType ?? UTType(fileExtension: url.pathExtension))
             } else if let url = webView.url {
                 return URLRequestDownloadTask(download: self, request: URLRequest(url: url, cachePolicy: .returnCacheDataElseLoad))
             } else {

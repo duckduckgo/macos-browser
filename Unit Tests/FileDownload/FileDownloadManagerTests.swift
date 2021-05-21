@@ -403,54 +403,6 @@ final class FileDownloadManagerTests: XCTestCase {
 }
 // swiftlint:enable type_body_length
 
-enum FileDownloadRequestMock: FileDownloadRequest {
-    case download(URL?, prompt: Bool, task: ((FileDownloadRequestMock) -> FileDownloadTask?)? = nil)
-
-    var shouldAlwaysPromptFileSaveLocation: Bool {
-        switch self {
-        case .download(_, prompt: let prompt, task: _):
-            return prompt
-        }
-    }
-
-    var sourceURL: URL? {
-        switch self {
-        case .download(let url, prompt: _, task: _):
-            return url
-        }
-    }
-
-    func downloadTask() -> FileDownloadTask? {
-        switch self {
-        case .download(_, prompt: _, task: let getTask) where getTask != nil:
-            return getTask!(self)
-        case .download:
-            return FileDownloadTaskMock(download: self)
-        }
-    }
-}
-
-final class FileDownloadTaskMock: FileDownloadTask {
-    var isStarted = false
-    var onStarted: ((FileDownloadTaskMock) -> Void)?
-    var onLocalFileURLChosen: ((URL?, UTType?) -> Void)?
-    var filename: String?
-
-    override var suggestedFilename: String {
-        filename ?? super.suggestedFilename
-    }
-
-    override func start() {
-        isStarted = true
-        onStarted?(self)
-    }
-
-    override func localFileURLCompletionHandler(localURL: URL?, fileType: UTType?) {
-        onLocalFileURLChosen?(localURL, fileType)
-    }
-
-}
-
 final class TestWorkspace: NSWorkspace {
     var callback: ((Selector, [URL]) -> Void)?
 

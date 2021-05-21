@@ -22,7 +22,7 @@ final class LocalFileSaveTask: FileDownloadTask {
 
     let url: URL
 
-    init(download: FileDownload, url: URL, fileType: UTType?) {
+    init(download: FileDownloadRequest, url: URL, fileType: UTType?) {
         self.url = url
         super.init(download: download)
         
