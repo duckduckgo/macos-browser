@@ -58,7 +58,11 @@ final class DataSaveTask: FileDownloadTask {
             var outURL: URL?
 
             if saved {
-                outURL = try? fm.moveItem(at: temp, to: localURL, incrementingIndexIfExists: true)
+                do {
+                    outURL = try fm.moveItem(at: temp, to: localURL, incrementingIndexIfExists: true)
+                } catch {
+                    try? fm.removeItem(at: temp)
+                }
             }
 
             DispatchQueue.main.async { [weak self] in
