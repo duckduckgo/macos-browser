@@ -27,6 +27,9 @@ final class FileDownloadTests: XCTestCase {
     let requestWithPath = URLRequest(url: URL(string: "https://www.example.com/")!)
     let requestWithLongerPath = URLRequest(url: URL(string: "https://www.example.com/Guitar")!)
 
+    // test LocalFileSaveTask.suggestedFilename
+
+
     func testWhenPathAvailableThenCombineWithMimeTypeForBestName() {
         let download = FileDownload.request(requestWithLongerPath, suggestedName: nil, promptForLocation: false)
         XCTAssertEqual("Guitar", download.downloadTask()?.suggestedFilename)

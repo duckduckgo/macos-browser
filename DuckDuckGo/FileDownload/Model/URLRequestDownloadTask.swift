@@ -31,10 +31,17 @@ final class URLRequestDownloadTask: FileDownloadTask {
     private var downloadedFileBytesWrittenCancellable: AnyCancellable?
     static private let progressThrottleQueue = DispatchQueue(label: "URLRequestDownloadTask.progressThrottleQueue", qos: .background)
 
-    static private let downloadExtension = "duckDownload"
+    static let downloadExtension = "duckDownload"
 
     private var responseSuggestedFilename: String?
-    private var downloadLocationChosen = false
+
+    private enum State {
+        case initial
+        case waitingForDownloadLocation
+        case downloadLocationChosen
+        case finished
+    }
+    private var state: State = .initial
 
     override var suggestedFilename: String {
         guard let responseSuggestedFilename = responseSuggestedFilename,
@@ -118,9 +125,10 @@ final class URLRequestDownloadTask: FileDownloadTask {
             } catch {
                 task.cancel()
                 self.finish(with: .failure(.failedToMoveFileToDownloads))
+                return
             }
 
-            self.downloadLocationChosen = true
+            self.state = .downloadLocationChosen
             self.progress.publishIfNotPublished()
 
         case .canceling:
@@ -131,6 +139,9 @@ final class URLRequestDownloadTask: FileDownloadTask {
     }
 
     override func _finish(with result: Result<URL, FileDownloadError>) {
+        guard state != .finished else { return }
+        self.state = .finished
+
         if self.downloadedFile != nil {
             self.progress.publishIfNotPublished()
         }
@@ -163,13 +174,10 @@ final class URLRequestDownloadTask: FileDownloadTask {
 
         // fire completionHandler asynchronously to satisfy URLSession
         DispatchQueue.main.async {
-            guard self.downloadedFile != nil else {
-                completionHandler(.cancel)
-                return
-            }
             completionHandler(.allow)
 
             // and request final destination URL using Save Panel or automatically
+            self.state = .waitingForDownloadLocation
             self.queryDestinationURL()
         }
     }
@@ -180,23 +188,30 @@ final class URLRequestDownloadTask: FileDownloadTask {
 
     func urlSession(_ session: URLSession, task: URLSessionTask, didCompleteWithError error: Error?) {
         if let error = error {
-            self.finish(with: .failure(.failedToCompleteDownloadTask(underlyingError: error)))
+            if (error as? URLError)?.code == URLError.cancelled {
+                self.finish(with: .failure(.cancelled))
+            } else {
+                self.finish(with: .failure(.failedToCompleteDownloadTask(underlyingError: error)))
+            }
+
         } else {
             do {
+                // only move file to final destination if SavePanel did complete by the moment
+                // otherwise move and finish the task in the localFileURLCompletionHandler
+                guard case .downloadLocationChosen = DispatchQueue.main.nowOrSync({ self.state }) else {
+                    return
+                }
                 guard let downloadedFile = self.downloadedFile,
                       // .download file may have been renamed: respect this new name and just drop .download ext
                       let url = downloadedFile.url?.path.drop(suffix: "." + Self.downloadExtension)
                 else {
-                    throw FileDownloadError.cancelled
+                    throw FileDownloadError.failedToMoveFileToDownloads
                 }
-                // only move file to final destination if SavePanel did complete by the moment
-                // otherwise move and finish the task in the localFileURLCompletionHandler
-                guard DispatchQueue.main.nowOrSync({ self.downloadLocationChosen }) else {
-                    return
-                }
+                
                 let finalURL = try downloadedFile.move(to: URL(fileURLWithPath: url), incrementingIndexIfExists: true)
 
                 self.finish(with: .success(finalURL))
+
             } catch {
                 self.finish(with: .failure(.failedToMoveFileToDownloads))
             }

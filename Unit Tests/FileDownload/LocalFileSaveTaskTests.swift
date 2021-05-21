@@ -66,7 +66,7 @@ final class LocalFileSaveTaskTests: XCTestCase {
         taskDelegate.downloadDidFinish = { t, result in
             XCTAssertTrue(t === task)
             if case .failure(.cancelled) = result {} else {
-                XCTFail("unexpected result")
+                XCTFail("unexpected result \(result)")
             }
             e.fulfill()
         }
@@ -89,7 +89,7 @@ final class LocalFileSaveTaskTests: XCTestCase {
         taskDelegate.downloadDidFinish = { t, result in
             XCTAssertTrue(t === task)
             if case .failure(.failedToMoveFileToDownloads) = result {} else {
-                XCTFail("unexpected result")
+                XCTFail("unexpected result \(result)")
             }
             e.fulfill()
         }
@@ -116,7 +116,7 @@ final class LocalFileSaveTaskTests: XCTestCase {
         taskDelegate.downloadDidFinish = { t, result in
             XCTAssertTrue(t === task)
             if case .success(expectedURL) = result {} else {
-                XCTFail("unexpected result")
+                XCTFail("unexpected result \(result)")
             }
             e.fulfill()
         }

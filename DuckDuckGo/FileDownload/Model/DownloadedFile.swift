@@ -26,7 +26,12 @@ final class DownloadedFile {
     private var bookmark: Data?
 
     // CurrentValueSubject used under the hood has locked value access so it's thread safe
-    @PublishedAfter private(set) var url: URL?
+    @PublishedAfter private(set) var url: URL? {
+        didSet {
+            currentURLVolume = url?.volume
+        }
+    }
+    private var currentURLVolume: URL?
     @PublishedAfter private(set) var bytesWritten: UInt64 = 0
 
     private var handle: FileHandle? {
@@ -84,7 +89,7 @@ final class DownloadedFile {
     private func fileSystemSourceCallback() {
         if let currentURL = url,
            let newURL = locateFile(),
-           newURL.volume == currentURL.volume {
+           currentURLVolume == newURL.volume {
             if newURL == currentURL { return }
 
             self.url = newURL
@@ -119,16 +124,21 @@ final class DownloadedFile {
     }
 
     private func _move(to newURL: URL, incrementingIndexIfExists: Bool, pathExtension: String?) throws -> URL {
-        guard let currentURL = self.url else { throw CocoaError(.fileReadNoSuchFile) }
+        guard self.url != nil,
+              let currentURL = self.locateFile()
+        else { throw CocoaError(.fileReadNoSuchFile) }
         guard currentURL != newURL else { return newURL }
 
         let oldURLVolume = currentURL.volume
         let newURLVolume = newURL.volume
+
+        let handle = self.handle
         if let handle = handle,
            oldURLVolume == nil || oldURLVolume != newURLVolume {
             // reopen FileHandle when moving file between different volumes
             handle.synchronizeFile()
             handle.closeFile()
+            self.handle = nil
         }
 
         let resultURL = try FileManager.default.moveItem(at: currentURL,
@@ -138,8 +148,9 @@ final class DownloadedFile {
 
         if handle != nil,
            oldURLVolume == nil || oldURLVolume != newURLVolume {
-            handle = try FileHandle(forWritingTo: resultURL)
-            handle!.seekToEndOfFile()
+            let handle = try FileHandle(forWritingTo: resultURL)
+            handle.seekToEndOfFile()
+            self.handle = handle
         }
         self.url = resultURL
 
