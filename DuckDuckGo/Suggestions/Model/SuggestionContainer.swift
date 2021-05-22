@@ -55,13 +55,20 @@ final class SuggestionContainer {
             dispatchPrecondition(condition: .onQueue(.main))
 
             guard self?.latestQuery == query else { return }
-            guard let result = result, error == nil else {
+            guard let result = result else {
                 self?.suggestions = nil
                 os_log("Suggestions: Failed to get suggestions - %s",
                        type: .error,
                        "\(String(describing: error))")
                 Pixel.fire(.debug(event: .suggestionsFetchFailed, error: error))
                 return
+            }
+
+            if let error = error {
+                // Fetching remote suggestions failed but local can be presented
+                os_log("Suggestions: Error when getting suggestions - %s",
+                       type: .error,
+                       "\(String(describing: error))")
             }
 
             // TODO REIMPLEMENT
