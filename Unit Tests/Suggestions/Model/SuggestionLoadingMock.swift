@@ -23,8 +23,8 @@ import BrowserServicesKit
 final class SuggestionLoadingMock: SuggestionLoading {
 
     var getSuggestionsCalled = false
-    var completion: (([Suggestion]?, Error?) -> Void)?
-    func getSuggestions(query: Query, maximum: Int, completion: @escaping ([Suggestion]?, Error?) -> Void) {
+    var completion: ((SuggestionResult?, Error?) -> Void)?
+    func getSuggestions(query: Query, completion: @escaping (SuggestionResult?, Error?) -> Void) {
         getSuggestionsCalled = true
         self.completion = completion
     }

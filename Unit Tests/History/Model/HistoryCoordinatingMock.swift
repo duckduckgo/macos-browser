@@ -1,5 +1,5 @@
 //
-//  HistoryCoordinatorMock.swift
+//  HistoryCoordinatingMock.swift
 //
 //  Copyright © 2021 DuckDuckGo. All rights reserved.
 //
@@ -19,7 +19,7 @@
 import XCTest
 @testable import DuckDuckGo_Privacy_Browser
 
-final class HistoryCoordinatorMock: HistoryCoordinating {
+final class HistoryCoordinatingMock: HistoryCoordinating {
 
     var history: History?
 

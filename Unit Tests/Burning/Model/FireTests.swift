@@ -43,7 +43,7 @@ final class FireTests: XCTestCase {
 
     func testWhenBurnAll_ThenAllWebsiteDataAreRemovedAndHistoryIsCleanedAndLastRemovedTabCacheIsNil() {
         let manager = WebCacheManagerMock()
-        let historyCoordinator = HistoryCoordinatorMock()
+        let historyCoordinator = HistoryCoordinatingMock()
 
         let fire = Fire(cacheManager: manager, historyCoordinating: historyCoordinator)
         let tabCollectionViewModel = TabCollectionViewModel.aTabCollectionViewModel

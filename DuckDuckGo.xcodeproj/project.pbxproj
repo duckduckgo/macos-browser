@@ -250,7 +250,7 @@
 		AAE75282263B257700B973F8 /* History.swift in Sources */ = {isa = PBXBuildFile; fileRef = AAE75281263B257700B973F8 /* History.swift */; };
 		AAE8B102258A41C000E81239 /* Tooltip.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = AAE8B101258A41C000E81239 /* Tooltip.storyboard */; };
 		AAE8B110258A456C00E81239 /* TooltipViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = AAE8B10F258A456C00E81239 /* TooltipViewController.swift */; };
-		AAEC74B22642C57200C2EFBC /* HistoryCoordinatorMock.swift in Sources */ = {isa = PBXBuildFile; fileRef = AAEC74B12642C57200C2EFBC /* HistoryCoordinatorMock.swift */; };
+		AAEC74B22642C57200C2EFBC /* HistoryCoordinatingMock.swift in Sources */ = {isa = PBXBuildFile; fileRef = AAEC74B12642C57200C2EFBC /* HistoryCoordinatingMock.swift */; };
 		AAEC74B42642C69300C2EFBC /* HistoryCoordinatorTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = AAEC74B32642C69300C2EFBC /* HistoryCoordinatorTests.swift */; };
 		AAEC74B62642CC6A00C2EFBC /* HistoryStoringMock.swift in Sources */ = {isa = PBXBuildFile; fileRef = AAEC74B52642CC6A00C2EFBC /* HistoryStoringMock.swift */; };
 		AAEC74B82642E43800C2EFBC /* HistoryStoreTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = AAEC74B72642E43800C2EFBC /* HistoryStoreTests.swift */; };
@@ -582,7 +582,7 @@
 		AAE75281263B257700B973F8 /* History.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = History.swift; sourceTree = "<group>"; };
 		AAE8B101258A41C000E81239 /* Tooltip.storyboard */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; path = Tooltip.storyboard; sourceTree = "<group>"; };
 		AAE8B10F258A456C00E81239 /* TooltipViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TooltipViewController.swift; sourceTree = "<group>"; };
-		AAEC74B12642C57200C2EFBC /* HistoryCoordinatorMock.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HistoryCoordinatorMock.swift; sourceTree = "<group>"; };
+		AAEC74B12642C57200C2EFBC /* HistoryCoordinatingMock.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HistoryCoordinatingMock.swift; sourceTree = "<group>"; };
 		AAEC74B32642C69300C2EFBC /* HistoryCoordinatorTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HistoryCoordinatorTests.swift; sourceTree = "<group>"; };
 		AAEC74B52642CC6A00C2EFBC /* HistoryStoringMock.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HistoryStoringMock.swift; sourceTree = "<group>"; };
 		AAEC74B72642E43800C2EFBC /* HistoryStoreTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HistoryStoreTests.swift; sourceTree = "<group>"; };
@@ -1769,7 +1769,7 @@
 		AAEC74AF2642C48800C2EFBC /* Model */ = {
 			isa = PBXGroup;
 			children = (
-				AAEC74B12642C57200C2EFBC /* HistoryCoordinatorMock.swift */,
+				AAEC74B12642C57200C2EFBC /* HistoryCoordinatingMock.swift */,
 				AAEC74B32642C69300C2EFBC /* HistoryCoordinatorTests.swift */,
 			);
 			path = Model;
@@ -2381,7 +2381,7 @@
 				AAEC74B42642C69300C2EFBC /* HistoryCoordinatorTests.swift in Sources */,
 				4B0511F8262CB20F00F6079C /* DownloadPreferencesTests.swift in Sources */,
 				AA9C362825518C44004B1BA3 /* WebsiteDataStoreMock.swift in Sources */,
-				AAEC74B22642C57200C2EFBC /* HistoryCoordinatorMock.swift in Sources */,
+				AAEC74B22642C57200C2EFBC /* HistoryCoordinatingMock.swift in Sources */,
 				AAEC74B62642CC6A00C2EFBC /* HistoryStoringMock.swift in Sources */,
 				AA652CB125DD825B009059CC /* LocalBookmarkStoreTests.swift in Sources */,
 				AA652CC925DD8981009059CC /* Bookmark.xcdatamodeld in Sources */,
@@ -2905,7 +2905,7 @@
 			repositoryURL = "https://github.com/duckduckgo/BrowserServicesKit.git";
 			requirement = {
 				kind = revision;
-				revision = 020f2cc54bf4b37ce7e8791ea75c8a866417c320;
+				revision = 92015ff37b346f60eef31e775e6bcb1954d191dc;
 			};
 		};
 		4B82E9B125B69E3E00656FE7 /* XCRemoteSwiftPackageReference "TrackerRadarKit" */ = {
