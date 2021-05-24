@@ -27,7 +27,7 @@ protocol FileDownloadRequest {
 
 enum FileDownload: FileDownloadRequest {
     case request(URLRequest, suggestedName: String?, promptForLocation: Bool)
-    case webContent(WKWebView)
+    case webContent(WKWebView, mimeType: String?)
     case data(Data, mimeType: String, suggestedName: String?, sourceURL: URL?)
 }
 
@@ -58,8 +58,8 @@ extension FileDownload {
         case .request(let request, suggestedName: _, promptForLocation: _):
             return URLRequestDownloadTask(download: self, session: nil, request: request)
 
-        case .webContent(let webView):
-            let contentType = webView.contentType
+        case .webContent(let webView, mimeType: let mimeType):
+            let contentType = mimeType.flatMap(UTType.init(mimeType:))
             if case .html = (contentType ?? .html) {
                 return WebContentDownloadTask(download: self, webView: webView)
 
@@ -82,7 +82,7 @@ extension FileDownload {
         switch self {
         case .request(let request, suggestedName: _, promptForLocation: _):
             return request.url
-        case .webContent(let webView):
+        case .webContent(let webView, mimeType: _):
             return webView.url
         case .data(_, mimeType: _, suggestedName: _, sourceURL: let url):
             return url

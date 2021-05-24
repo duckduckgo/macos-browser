@@ -31,48 +31,10 @@ extension WKWebView {
         }
     }
 
-    struct EvaluateTimeout: Error {}
-    func evaluateSynchronously(_ script: String, timeout: TimeInterval? = nil) throws -> Any? {
-        var output: (result: Any?, error: Error?)?
-        let port = Port()
-        RunLoop.current.add(port, forMode: .default)
-
-        let timer = timeout.map { Timer(timeInterval: $0, repeats: false) { _ in
-            if output == nil {
-                output = (nil, EvaluateTimeout())
-            }
-        } }
-        timer.map { RunLoop.current.add($0, forMode: .default) }
-
-        self.evaluateJavaScript(script) { (result, error) in
-            output = (result, error)
-            
-            let sendPort = Port()
-            RunLoop.current.add(sendPort, forMode: .default)
-            sendPort.send(before: Date(), components: nil, from: port, reserved: 0)
-            RunLoop.current.remove(sendPort, forMode: .default)
+    func getMimeType(callback: @escaping (String?) -> Void) {
+        self.evaluateJavaScript("document.contentType") { (result, _) in
+            callback(result as? String)
         }
-
-        while output == nil {
-            RunLoop.current.run(mode: .default, before: .distantFuture)
-        }
-        timer?.invalidate()
-        RunLoop.current.remove(port, forMode: .default)
-
-        if let error = output?.error {
-            throw error
-        }
-
-        return output?.result
-    }
-
-    var mimeType: String? {
-        try? self.evaluateSynchronously("document.contentType", timeout: 1.0) as? String
-    }
-
-    var contentType: UTType? {
-        guard let mimeType = self.mimeType else { return nil }
-        return UTType(mimeType: mimeType)
     }
 
 }

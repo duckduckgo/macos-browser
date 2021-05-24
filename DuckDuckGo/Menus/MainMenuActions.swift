@@ -309,11 +309,13 @@ extension MainViewController {
         }
 
         let webView = tabViewModel.tab.webView
-        let download = FileDownload.webContent(webView)
-        FileDownloadManager.shared.startDownload(download,
-                                                 chooseDestinationCallback: self.browserTabViewController.chooseDestination,
-                                                 fileIconOriginalRectCallback: self.browserTabViewController.fileIconFlyAnimationOriginalRect,
-                                                 postflight: .reveal)
+        webView.getMimeType { (mimeType) in
+            let download = FileDownload.webContent(webView, mimeType: mimeType)
+            FileDownloadManager.shared.startDownload(download,
+                                                     chooseDestinationCallback: self.browserTabViewController.chooseDestination,
+                                                     fileIconOriginalRectCallback: self.browserTabViewController.fileIconFlyAnimationOriginalRect,
+                                                     postflight: .reveal)
+        }
     }
 
     // MARK: - Debug

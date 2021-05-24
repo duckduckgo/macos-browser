@@ -22,50 +22,6 @@ import WebKit
 
 final class WebViewExtensionTests: XCTestCase {
 
-    func testWebViewEvaluateSynchronously() {
-        let webView = WKWebView(frame: CGRect())
-
-        let result = try? webView.evaluateSynchronously("1 + 1") as? Int
-        XCTAssertEqual(result, 2)
-    }
-
-    func testWhenEvaluateSynchronouslySleepsThenEvaluationWaits() {
-        let webView = WKWebView(frame: CGRect())
-
-        let script = """
-            function sleep(millis) {
-                var date = new Date();
-                var curDate = null;
-                do { curDate = new Date(); }
-                while(curDate-date < millis);
-            }
-            sleep(100);
-            1;
-        """
-
-        let result = try? webView.evaluateSynchronously(script) as? Int
-        XCTAssertEqual(result, 1)
-    }
-
-    func testWhenEvaluateSynchronouslyTimeoutsThenErrorIsThrown() {
-        let webView = WKWebView(frame: CGRect())
-
-        let script = """
-            function sleep(millis) {
-                var date = new Date();
-                var curDate = null;
-                do { curDate = new Date(); }
-                while(curDate-date < millis);
-            }
-            sleep(1000);
-            1;
-        """
-
-        XCTAssertThrowsError(try webView.evaluateSynchronously(script, timeout: 0.1), "evaluateSynchronously should timeout") { error in
-            XCTAssertTrue(error is WKWebView.EvaluateTimeout)
-        }
-    }
-
     func testWhenWebViewDisplaysPageThenContentTypeIsHtml() {
         let webView = WKWebView(frame: CGRect())
 
@@ -75,7 +31,13 @@ final class WebViewExtensionTests: XCTestCase {
         webView.loadHTMLString("<html></html>", baseURL: nil)
 
         waitForExpectations(timeout: 5.0)
-        XCTAssertEqual(webView.contentType, .html)
+
+        let e = expectation(description: "mimeType callback")
+        webView.getMimeType { mimeType in
+            XCTAssertEqual(mimeType, UTType.html.mimeType!)
+            e.fulfill()
+        }
+        waitForExpectations(timeout: 1)
     }
 
     func testWhenWebViewDisplaysImageThenContentTypeIsJpeg() {
@@ -91,7 +53,12 @@ final class WebViewExtensionTests: XCTestCase {
             waitForExpectations(timeout: 5.0)
         }
 
-        XCTAssertEqual(webView.contentType, .jpeg)
+        let e = expectation(description: "mimeType callback")
+        webView.getMimeType { mimeType in
+            XCTAssertEqual(mimeType, UTType.jpeg.mimeType!)
+            e.fulfill()
+        }
+        waitForExpectations(timeout: 1)
     }
 
 }
