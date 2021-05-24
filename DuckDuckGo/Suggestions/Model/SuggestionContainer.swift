@@ -71,7 +71,6 @@ final class SuggestionContainer {
                        "\(String(describing: error))")
             }
 
-            // TODO REIMPLEMENT
             self?.suggestions = result.topHits + result.duckduckgoSuggestions + result.historyAndBookmarks
         }
     }

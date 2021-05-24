@@ -19,6 +19,7 @@
 import Cocoa
 import Combine
 import os.log
+import BrowserServicesKit
 
 // swiftlint:disable type_body_length
 
@@ -159,30 +160,32 @@ final class AddressBarTextField: NSTextField {
     }
 
     private func addressBarEnterPressed() {
-        let suggestionUsed = suggestionContainerViewModel.selectedSuggestionViewModel != nil
+        let suggestion = suggestionContainerViewModel.selectedSuggestionViewModel?.suggestion
         suggestionContainerViewModel.clearUserStringValue()
         hideSuggestionWindow()
 
         if NSApp.isCommandPressed {
-            openNewTab(selected: NSApp.isShiftPressed, suggestionUsed: suggestionUsed)
+            openNewTab(selected: NSApp.isShiftPressed, suggestion: suggestion)
         } else {
-            navigate(suggestionUsed: suggestionUsed)
+            navigate(suggestion: suggestion)
         }
     }
 
-    private func navigate(suggestionUsed: Bool) {
+    private func navigate(suggestion: Suggestion?) {
         hideSuggestionWindow()
-        updateTabUrl(suggestionUsed: suggestionUsed)
+        updateTabUrl(suggestion: suggestion)
 
         currentEditor()?.selectAll(self)
     }
 
-    private func updateTabUrl(suggestionUsed: Bool) {
+    private func updateTabUrl(suggestion: Suggestion?) {
         guard let selectedTabViewModel = tabCollectionViewModel.selectedTabViewModel else {
             os_log("%s: Selected tab view model is nil", type: .error, className)
             return
         }
-        guard let url = URL.makeURL(from: stringValueWithoutSuffix) else {
+
+        guard let url = makeUrl(suggestion: suggestion,
+                                stringValueWithoutSuffix: stringValueWithoutSuffix) else {
             os_log("%s: Making url from address bar string failed", type: .error, className)
             return
         }
@@ -192,22 +195,39 @@ final class AddressBarTextField: NSTextField {
             selectedTabViewModel.tab.reload()
         } else {
             
-            Pixel.fire(.navigation(kind: .init(url: url), source: suggestionUsed ? .suggestion : .addressBar))
+            Pixel.fire(.navigation(kind: .init(url: url), source: suggestion != nil ? .suggestion : .addressBar))
             selectedTabViewModel.tab.update(url: url)
         }
 
         self.window?.makeFirstResponder(nil)
     }
 
-    private func openNewTab(selected: Bool, suggestionUsed: Bool) {
-        guard let url = URL.makeURL(from: stringValueWithoutSuffix) else {
+    private func openNewTab(selected: Bool, suggestion: Suggestion?) {
+        guard let url = makeUrl(suggestion: suggestion,
+                                stringValueWithoutSuffix: stringValueWithoutSuffix) else {
             os_log("%s: Making url from address bar string failed", type: .error, className)
             return
         }
 
-        Pixel.fire(.navigation(kind: .init(url: url), source: suggestionUsed ? .suggestion : .addressBar))
+        Pixel.fire(.navigation(kind: .init(url: url), source: suggestion != nil ? .suggestion : .addressBar))
         let tab = Tab(url: url, shouldLoadInBackground: true)
         tabCollectionViewModel.append(tab: tab, selected: selected)
+    }
+
+    private func makeUrl(suggestion: Suggestion?, stringValueWithoutSuffix: String) -> URL? {
+        let finalUrl: URL?
+        switch suggestion {
+        case .bookmark(title: _, url: let url, isFavorite: _),
+             .historyEntry(title: _, url: let url),
+             .website(url: let url):
+            finalUrl = url
+        case .phrase(phrase: let phrase),
+             .unknown(value: let phrase):
+            finalUrl = URL.makeSearchUrl(from: phrase)
+        case .none:
+            finalUrl = URL.makeURL(from: stringValueWithoutSuffix)
+        }
+        return finalUrl
     }
 
     // MARK: - Value
@@ -565,11 +585,12 @@ extension AddressBarTextField: NSTextFieldDelegate {
 extension AddressBarTextField: SuggestionViewControllerDelegate {
 
     func suggestionViewControllerDidConfirmSelection(_ suggestionViewController: SuggestionViewController) {
+        let suggestion = suggestionContainerViewModel.selectedSuggestionViewModel?.suggestion
         if NSApp.isCommandPressed {
-            openNewTab(selected: NSApp.isShiftPressed, suggestionUsed: true)
+            openNewTab(selected: NSApp.isShiftPressed, suggestion: suggestion)
             return
         }
-        navigate(suggestionUsed: true)
+        navigate(suggestion: suggestion)
     }
 
     func shouldCloseSuggestionWindow(forMouseEvent event: NSEvent) -> Bool {
