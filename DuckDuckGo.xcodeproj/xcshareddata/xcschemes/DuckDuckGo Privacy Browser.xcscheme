@@ -59,6 +59,9 @@
                <Test
                   Identifier = "EncryptionKeyStoreTests">
                </Test>
+               <Test
+                  Identifier = "PixelTests/testWhenErrorPixelIsFiredThenParametersAdded()">
+               </Test>
             </SkippedTests>
          </TestableReference>
       </Testables>
