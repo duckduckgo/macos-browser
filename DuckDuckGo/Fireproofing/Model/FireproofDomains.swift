@@ -75,4 +75,11 @@ internal class FireproofDomains {
         return fireproofDomains.contains(domain)
     }
 
+    func isURLFireproof(url: URL) -> Bool {
+        guard let host = url.host else {
+            return false
+        }
+        return isAllowed(fireproofDomain: host)
+    }
+
 }

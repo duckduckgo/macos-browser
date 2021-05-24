@@ -1,5 +1,5 @@
 //
-//  DateExtension.swift
+//  HistoryCoordinatorMock.swift
 //
 //  Copyright © 2021 DuckDuckGo. All rights reserved.
 //
@@ -16,21 +16,26 @@
 //  limitations under the License.
 //
 
-import Foundation
+import XCTest
+@testable import DuckDuckGo_Privacy_Browser
 
-extension Date {
+final class HistoryCoordinatorMock: HistoryCoordinating {
 
-    static var weekAgo: Date! {
-        return Calendar.current.date(byAdding: .weekOfMonth, value: -1, to: Date())!
+    var history: History?
+
+    var addVisitCalled = false
+    func addVisit(of url: URL) {
+        addVisitCalled = true
     }
 
-    static var startOfDayTomorrow: Date {
-        let tomorrow = Calendar.current.date(byAdding: .day, value: 1, to: Date())!
-        return Calendar.current.startOfDay(for: tomorrow)
+    var updateTitleIfNeededCalled = false
+    func updateTitleIfNeeded(title: String, url: URL) {
+        updateTitleIfNeededCalled = true
     }
 
-    var daySinceReferenceDate: Int {
-        Int(self.timeIntervalSinceReferenceDate / TimeInterval.day)
+    var burnHistoryCalled = false
+    func burnHistory(except fireproofDomains: FireproofDomains) {
+        burnHistoryCalled = true
     }
 
 }
