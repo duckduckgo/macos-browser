@@ -54,6 +54,9 @@
             </BuildableReference>
             <SkippedTests>
                <Test
+                  Identifier = "AppStateChangePublisherTests/testWhenWindowIsClosedThenStateChangePublished()">
+               </Test>
+               <Test
                   Identifier = "EncryptionKeyStoreTests">
                </Test>
             </SkippedTests>
