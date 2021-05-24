@@ -390,6 +390,10 @@ private extension NSURL {
 private class NSURLMock: NSURL {
     static var resourceValuesForKeysReplacement = [URLResourceKey: Any]()
     override func resourceValues(forKeys keys: [URLResourceKey]) throws -> [URLResourceKey: Any] {
-        try super.resourceValues(forKeys: keys).merging(Self.resourceValuesForKeysReplacement) { $1 }
+        var resourceValues = try super.resourceValues(forKeys: keys)
+        for (key, replacementValue) in Self.resourceValuesForKeysReplacement where resourceValues[key] != nil {
+            resourceValues[key] = replacementValue
+        }
+        return resourceValues
     }
 }

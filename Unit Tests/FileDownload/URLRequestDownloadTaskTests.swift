@@ -41,6 +41,7 @@ final class URLRequestDownloadTaskTests: XCTestCase {
 
     override func tearDown() {
         HTTPStubs.removeAllStubs()
+        Progress.restoreUnpublish()
     }
 
     func testWhenTaskStartedThenDownloadIsStartedAndDestinationURLIsQueried() {
@@ -121,6 +122,8 @@ final class URLRequestDownloadTaskTests: XCTestCase {
 
         stub(condition: { _ in true }, response: { _ -> HTTPStubsResponse in
             let response = HTTPStubsResponse(data: self.testData, statusCode: 200, headers: nil)
+            // allow destinationURLCallback to finish before the URLSessionTask delivers the response
+            response.responseTime = 0.05
             return response
         })
 
@@ -131,6 +134,15 @@ final class URLRequestDownloadTaskTests: XCTestCase {
             }
             callback(destURL, nil)
         }
+        Progress.swizzleUnpublish { progress in
+            // simulate delay of DispatchSource FileSystem File Removal event
+            // by delaying Progress.unpublish() call delivery
+            // to allow URLSessionTask to finish before figuring out the downloaded
+            // file had been removed
+            usleep(UInt32(0.1 * 1_000_000))
+            progress.perform(#selector(Progress.swizzled_unpublish))
+        }
+
         let e = expectation(description: "URLRequestDownloadTask failed")
         taskDelegate.downloadDidFinish = { _, result in
             if case .failure(.failedToMoveFileToDownloads) = result {} else {
@@ -372,3 +384,34 @@ final class URLRequestDownloadTaskTests: XCTestCase {
 
 }
 // swiftlint:enable type_body_length
+
+private extension Progress {
+    private static var swizzledUnpublishBlock: ((Progress) -> Void)!
+    private static var isSwizzled = false
+    private static let originalUnpublish = {
+        class_getInstanceMethod(Progress.self, #selector(Progress.unpublish))!
+    }()
+    private static let swizzledUnpublish = {
+        class_getInstanceMethod(Progress.self, #selector(Progress.swizzled_unpublish))!
+    }()
+
+    static func swizzleUnpublish(with unpublish: @escaping ((Progress) -> Void)) {
+        if !self.isSwizzled {
+            self.isSwizzled = true
+            method_exchangeImplementations(originalUnpublish, swizzledUnpublish)
+        }
+        self.swizzledUnpublishBlock = unpublish
+    }
+
+    static func restoreUnpublish() {
+        if self.isSwizzled {
+            self.isSwizzled = false
+            method_exchangeImplementations(originalUnpublish, swizzledUnpublish)
+        }
+        self.swizzledUnpublishBlock = nil
+    }
+
+    @objc func swizzled_unpublish() {
+        Self.swizzledUnpublishBlock(self)
+    }
+}

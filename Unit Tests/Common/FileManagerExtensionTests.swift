@@ -192,7 +192,8 @@ class FileManagerExtensionTests: XCTestCase {
         let destURL = URL(fileURLWithPath: "/ro_volume_file")
 
         XCTAssertThrowsError(try fm.moveItem(at: srcURL, to: destURL, incrementingIndexIfExists: true), "should throw error") { (error) in
-            XCTAssertEqual((error as? CocoaError)?.code, CocoaError.fileWriteNoPermission)
+            XCTAssertTrue((error as? CocoaError)?.code == CocoaError.fileWriteNoPermission
+                          || (error as? CocoaError)?.code == CocoaError.fileWriteVolumeReadOnly)
         }
     }
 
