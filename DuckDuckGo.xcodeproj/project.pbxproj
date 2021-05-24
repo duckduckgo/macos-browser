@@ -2905,7 +2905,7 @@
 			repositoryURL = "https://github.com/duckduckgo/BrowserServicesKit.git";
 			requirement = {
 				kind = revision;
-				revision = d37eb59acc44cc15f8f1f79b2fbfac90795bcfc2;
+				revision = 020f2cc54bf4b37ce7e8791ea75c8a866417c320;
 			};
 		};
 		4B82E9B125B69E3E00656FE7 /* XCRemoteSwiftPackageReference "TrackerRadarKit" */ = {
