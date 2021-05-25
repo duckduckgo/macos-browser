@@ -310,11 +310,23 @@ final class AddressBarTextField: NSTextField {
                 switch suggestionViewModel.suggestion {
                 case .phrase(phrase: _):
                     self = Suffix.search
-                case .website(url: let url),
-                     .bookmark(title: _, url: let url, isFavorite: _),
-                     .historyEntry(title: _, url: let url):
+                case .website(url: let url):
                     guard let host = url.host else { return nil }
                     self = Suffix.visit(host: host)
+
+                case .bookmark(title: _, url: let url, isFavorite: _),
+                     .historyEntry(title: _, url: let url):
+                    if let title = suggestionViewModel.title,
+                       !title.isEmpty,
+                       suggestionViewModel.autocompletionString != title {
+                        self = .title(title)
+                    } else if let host = url.host,
+                              url.absoluteStringWithoutSchemeAndWWW.drop(suffix: "/") == host.dropWWW() {
+                        self = .visit(host: host)
+                    } else {
+                        self = .url(url)
+                    }
+
                 case .unknown(value: _):
                     self = Suffix.search
                 }
@@ -323,17 +335,14 @@ final class AddressBarTextField: NSTextField {
 
         case search
         case visit(host: String)
+        case url(URL)
+        case title(String)
 
         static let suffixAttributes = [NSAttributedString.Key.font: NSFont.systemFont(ofSize: 13, weight: .light),
                                        .foregroundColor: NSColor.addressBarSuffixColor]
 
         var attributedString: NSAttributedString {
-            switch self {
-            case .search:
-                return NSAttributedString(string: string, attributes: Self.suffixAttributes)
-            case .visit(host: _):
-                return NSAttributedString(string: string, attributes: Self.suffixAttributes)
-            }
+            NSAttributedString(string: string, attributes: Self.suffixAttributes)
         }
 
         static let searchSuffix = " – \(UserText.addressBarSearchSuffix)"
@@ -345,6 +354,10 @@ final class AddressBarTextField: NSTextField {
                 return "\(Self.searchSuffix)"
             case .visit(host: let host):
                 return "\(Self.visitSuffix) \(host)"
+            case .url(let url):
+                return " – " + url.absoluteStringWithoutSchemeAndWWW
+            case .title(let title):
+                return " – " + title
             }
         }
     }
@@ -510,6 +523,8 @@ extension AddressBarTextField: NSTextFieldDelegate {
         // if user continues typing letters from displayed Suggestion
         // don't blink and keep the Suggestion displayed
         if case .suggestion(let suggestion) = self.value,
+           // disable autocompletion when user entered Space
+           !stringValueWithoutSuffix.contains(" "),
            stringValueWithoutSuffix.hasPrefix(suggestion.userStringValue),
            suggestion.autocompletionString.hasPrefix(stringValueWithoutSuffix),
            let editor = currentEditor(),

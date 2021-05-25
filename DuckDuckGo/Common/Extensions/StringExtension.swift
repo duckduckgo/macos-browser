@@ -96,6 +96,21 @@ extension String {
         self.drop(prefix: "www.")
     }
 
+    func prependingWWW(andScheme scheme: String?, ifPrefixPresentIn userStringValue: String) -> String {
+        guard !userStringValue.isEmpty else { return self }
+
+        let userStringValue = userStringValue.lowercased()
+        for prefix in ["www.", scheme.map { $0 + "://" }, scheme.map { $0 + "://www." }] {
+            if let prefix = prefix,
+               userStringValue.hasPrefix(prefix.prefix(min(userStringValue.count, prefix.count))),
+               (prefix + self).hasPrefix(userStringValue) {
+
+                return prefix + self
+            }
+        }
+        return self
+    }
+
     // MARK: - Mutating
 
     @inlinable mutating func prepend(_ string: String) {

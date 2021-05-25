@@ -67,9 +67,9 @@ final class SuggestionViewModel {
         case .phrase(phrase: let phrase):
             return phrase
         case .website(url: let url):
-            return url.absoluteStringWithoutSchemeAndWWW
+            return url.absoluteStringWithoutSchemeAndWWW.prependingWWW(andScheme: url.scheme, ifPrefixPresentIn: self.userStringValue)
         case .historyEntry(title: let title, url: let url):
-            return title ?? url.absoluteStringWithoutSchemeAndWWW
+            return title ?? url.absoluteStringWithoutSchemeAndWWW.prependingWWW(andScheme: url.scheme, ifPrefixPresentIn: self.userStringValue)
         case .bookmark(title: let title, url: _, isFavorite: _):
             return title
         case .unknown(value: let value):
@@ -77,11 +77,36 @@ final class SuggestionViewModel {
         }
     }
 
+    var title: String? {
+        switch suggestion {
+        case .phrase(phrase: _),
+             .website(url: _),
+             .unknown(value: _):
+            return nil
+        case .historyEntry(title: let title, url: _):
+            return title
+        case .bookmark(title: let title, url: _, isFavorite: _):
+            return title
+        }
+    }
+
     var autocompletionString: String {
         switch suggestion {
         case .historyEntry(title: _, url: let url),
              .bookmark(title: _, url: let url, isFavorite: _):
-            return url.absoluteStringWithoutSchemeAndWWW
+
+            let userStringValue = self.userStringValue.lowercased()
+            let urlString = url.absoluteStringWithoutSchemeAndWWW
+                .prependingWWW(andScheme: url.scheme, ifPrefixPresentIn: userStringValue)
+
+            if !urlString.hasPrefix(userStringValue),
+               let title = self.title,
+               title.lowercased().hasPrefix(userStringValue) {
+                return title
+            }
+
+            return urlString
+
         default:
             return self.string
         }
