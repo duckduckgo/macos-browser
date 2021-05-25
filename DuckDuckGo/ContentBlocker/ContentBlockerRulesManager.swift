@@ -54,7 +54,8 @@ final class ContentBlockerRulesManager {
                               andTemporaryUnprotectedDomains tempUnprotectedDomains: [String],
                               completion: ((WKContentRuleList?) -> Void)?) {
 
-        #warning("When a user turns off protection for a site, it needs to be passed to the exceptions here")
+        // When a user turns off protection for a site, it needs to be passed to the exceptions here
+        // https://app.asana.com/0/1177771139624306/1183561025576937/f
 
         let rules = ContentBlockerRulesBuilder(trackerData: trackerData).buildRules(withExceptions: [],
                                                                                     andTemporaryUnprotectedDomains: tempUnprotectedDomains)
