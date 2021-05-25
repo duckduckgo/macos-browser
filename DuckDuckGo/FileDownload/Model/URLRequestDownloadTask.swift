@@ -198,9 +198,9 @@ final class URLRequestDownloadTask: FileDownloadTask {
             do {
                 // only move file to final destination if SavePanel did complete by the moment
                 // otherwise move and finish the task in the localFileURLCompletionHandler
-                guard case .downloadLocationChosen = DispatchQueue.main.nowOrSync({ self.state }) else {
-                    return
-                }
+                guard case .downloadLocationChosen = DispatchQueue.safeSyncOnMainQueue({ state })
+                else { return }
+                
                 guard let downloadedFile = self.downloadedFile,
                       // .download file may have been renamed: respect this new name and just drop .download ext
                       let url = downloadedFile.url?.path.drop(suffix: "." + Self.downloadExtension)

@@ -63,7 +63,7 @@ extension FileDownload {
             if case .html = (contentType ?? .html) {
                 return WebContentDownloadTask(download: self, webView: webView)
 
-            } else if let url = webView.url, url.isFileURL == true {
+            } else if let url = webView.url, url.isFileURL {
                 return LocalFileSaveTask(download: self,
                                          url: url,
                                          fileType: contentType ?? UTType(fileExtension: url.pathExtension))

@@ -87,6 +87,8 @@ final class DownloadedFile {
     }
 
     private func fileSystemSourceCallback() {
+        dispatchPrecondition(condition: .onQueue(Self.queue))
+
         if let currentURL = url,
            let newURL = locateFile(),
            currentURLVolume == newURL.volume {
@@ -100,6 +102,8 @@ final class DownloadedFile {
     }
 
     private func locateFile() -> URL? {
+        dispatchPrecondition(condition: .onQueue(Self.queue))
+
         if let url = self.url,
            FileManager.default.fileExists(atPath: url.path) {
             return url
@@ -113,17 +117,15 @@ final class DownloadedFile {
     }
 
     private func _close() {
+        dispatchPrecondition(condition: .onQueue(Self.queue))
+
         handle?.closeFile()
         handle = nil
     }
 
-    func close() {
-        Self.queue.async {
-            self._close()
-        }
-    }
-
     private func _move(to newURL: URL, incrementingIndexIfExists: Bool, pathExtension: String?) throws -> URL {
+        dispatchPrecondition(condition: .onQueue(Self.queue))
+
         guard self.url != nil,
               let currentURL = self.locateFile()
         else { throw CocoaError(.fileReadNoSuchFile) }

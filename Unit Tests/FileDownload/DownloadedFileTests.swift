@@ -20,7 +20,6 @@ import Foundation
 import XCTest
 @testable import DuckDuckGo_Privacy_Browser
 
-// swiftlint:disable type_body_length
 final class DownloadedFileTests: XCTestCase {
 
     let testFile = "downloaded file "
@@ -187,27 +186,6 @@ final class DownloadedFileTests: XCTestCase {
         XCTAssertEqual(result, expected)
     }
 
-    func testWhenFileClosedThenWritesAreNotAppended() throws {
-        let url = getURL()
-        let file = try DownloadedFile(url: url)
-
-        let origData = "some ".data(using: .utf8)!
-        file.write(origData)
-
-        file.close()
-
-        let appendedData = "file content".data(using: .utf8)!
-        file.write(appendedData)
-
-        _=try file.move(to: file.url!, incrementingIndexIfExists: false) // synchronize
-
-        let result = try Data(contentsOf: file.url!)
-        let expected = origData
-
-        XCTAssertEqual(Int(file.bytesWritten), result.count)
-        XCTAssertEqual(result, expected)
-    }
-
     func testWhenFileDeletedThenFileDoesNotExist() throws {
         let url = getURL()
         let file = try DownloadedFile(url: url)
@@ -348,7 +326,6 @@ final class DownloadedFileTests: XCTestCase {
     }
 
 }
-// swiftlint:enable type_body_length
 
 private extension NSURL {
     private static var nextBookmarkResolutionPath: (() -> NSURL)!
