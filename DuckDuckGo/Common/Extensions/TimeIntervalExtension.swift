@@ -1,5 +1,5 @@
 //
-//  DateExtension.swift
+//  TimeIntervalExtension.swift
 //
 //  Copyright © 2021 DuckDuckGo. All rights reserved.
 //
@@ -18,19 +18,8 @@
 
 import Foundation
 
-extension Date {
+extension TimeInterval {
 
-    static var weekAgo: Date! {
-        return Calendar.current.date(byAdding: .weekOfMonth, value: -1, to: Date())!
-    }
-
-    static var startOfDayTomorrow: Date {
-        let tomorrow = Calendar.current.date(byAdding: .day, value: 1, to: Date())!
-        return Calendar.current.startOfDay(for: tomorrow)
-    }
-
-    var daySinceReferenceDate: Int {
-        Int(self.timeIntervalSinceReferenceDate / TimeInterval.day)
-    }
+    static var day: TimeInterval = 60 * 60 * 24
 
 }
