@@ -86,7 +86,7 @@ final class HistoryCoordinator: HistoryCoordinating {
         queue.async(flags: .barrier) { [weak self] in
             guard var historyDictionary = self?.historyDictionary else { return }
             guard var entry = historyDictionary[url] else {
-                assertionFailure("URL not part of history yet")
+                os_log("Title update ignored - URL not part of history yet", type: .debug)
                 return
             }
             guard !title.isEmpty, entry.title != title else { return }
