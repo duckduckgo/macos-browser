@@ -60,6 +60,9 @@
                   Identifier = "EncryptionKeyStoreTests">
                </Test>
                <Test
+                  Identifier = "FireTests/testWhenBurnAllThenBurningFlagToggles()">
+               </Test>
+               <Test
                   Identifier = "PixelTests/testWhenErrorPixelIsFiredThenParametersAdded()">
                </Test>
             </SkippedTests>
