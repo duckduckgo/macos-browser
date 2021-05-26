@@ -308,29 +308,33 @@ final class AddressBarTextField: NSTextField {
                 else { return nil }
                 self = Suffix.visit(host: host)
             case .suggestion(let suggestionViewModel):
-                switch suggestionViewModel.suggestion {
-                case .phrase(phrase: _):
-                    self = Suffix.search
-                case .website(url: let url):
-                    guard let host = url.host else { return nil }
-                    self = Suffix.visit(host: host)
+                self.init(suggestionViewModel: suggestionViewModel)
+            }
+        }
 
-                case .bookmark(title: _, url: let url, isFavorite: _),
-                     .historyEntry(title: _, url: let url):
-                    if let title = suggestionViewModel.title,
-                       !title.isEmpty,
-                       suggestionViewModel.autocompletionString != title {
-                        self = .title(title)
-                    } else if let host = url.host,
-                              url.absoluteStringWithoutSchemeAndWWW.drop(suffix: "/") == host.dropWWW() {
-                        self = .visit(host: host)
-                    } else {
-                        self = .url(url)
-                    }
+        init?(suggestionViewModel: SuggestionViewModel) {
+            switch suggestionViewModel.suggestion {
+            case .phrase(phrase: _):
+                self = Suffix.search
+            case .website(url: let url):
+                guard let host = url.host else { return nil }
+                self = Suffix.visit(host: host)
 
-                case .unknown(value: _):
-                    self = Suffix.search
+            case .bookmark(title: _, url: let url, isFavorite: _),
+                 .historyEntry(title: _, url: let url):
+                if let title = suggestionViewModel.title,
+                   !title.isEmpty,
+                   suggestionViewModel.autocompletionString != title {
+                    self = .title(title)
+                } else if let host = url.host,
+                          url.absoluteStringWithoutSchemeAndWWW.drop(suffix: "/") == host.dropWWW() {
+                    self = .visit(host: host)
+                } else {
+                    self = .url(url)
                 }
+
+            case .unknown(value: _):
+                self = Suffix.search
             }
         }
 
@@ -570,10 +574,6 @@ extension AddressBarTextField: NSTextFieldDelegate {
         if NSApp.isReturnOrEnterPressed {
             self.addressBarEnterPressed()
             return true
-        }
-
-        guard suggestionWindowController?.window?.isVisible == true else {
-            return false
         }
 
         switch commandSelector {
