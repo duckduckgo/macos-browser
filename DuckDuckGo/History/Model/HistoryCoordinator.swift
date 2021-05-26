@@ -126,7 +126,7 @@ final class HistoryCoordinator: HistoryCoordinating {
 
             self.cancellables = Set<AnyCancellable>()
             self.historyStoring.cleanAndReloadHistory(until: date, except: exceptions)
-                .receive(on: self.queue)
+                .receive(on: self.queue, options: .init(flags: .barrier))
                 .sink(receiveCompletion: { completion in
                     switch completion {
                     case .finished:
@@ -163,7 +163,7 @@ final class HistoryCoordinator: HistoryCoordinating {
 
     private func save(entry: HistoryEntry) {
         self.historyStoring.save(entry: entry)
-            .receive(on: self.queue)
+            .receive(on: self.queue, options: .init(flags: .barrier))
             .sink(receiveCompletion: { completion in
                 switch completion {
                 case .finished:
