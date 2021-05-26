@@ -83,42 +83,6 @@ final class URLRequestDownloadTaskTests: XCTestCase {
         waitForExpectations(timeout: 1)
     }
 
-    func testWhenDownloadedFileIsRemovedThenTaskFails() {
-        let destURL = fm.temporaryDirectory.appendingPathComponent(testFile)
-        let tempURL = destURL.appendingPathExtension(URLRequestDownloadTask.downloadExtension)
-        let task = URLRequestDownloadTask(download: .request(testRequest, suggestedName: nil, promptForLocation: false), request: testRequest)
-
-        stub(condition: { _ in true }, response: { _ -> HTTPStubsResponse in
-            let response = HTTPStubsResponse(data: self.testData, statusCode: 200, headers: nil)
-            response.responseTime = 0.3
-            return response
-        })
-
-        taskDelegate.destinationURLCallback = { _, callback in
-            DispatchQueue.main.async {
-                XCTAssertTrue(self.fm.fileExists(atPath: tempURL.path), "temp file does not exist")
-                try? self.fm.removeItem(at: tempURL)
-            }
-            callback(destURL, nil)
-        }
-        let e = expectation(description: "URLRequestDownloadTask failed")
-        taskDelegate.downloadDidFinish = { _, result in
-            if case .failure = result {} else {
-                XCTFail("unexpected result \(result)")
-            }
-
-            e.fulfill()
-        }
-
-        task.start(delegate: taskDelegate)
-
-        waitForExpectations(timeout: 2) { error in
-            if let error = error {
-                XCTFail("failed waiting for expectation \(error)")
-            }
-        }
-    }
-
     func testWhenDownloadedFileIsRemovedButRequestFinishesThenTaskFails() {
         let destURL = fm.temporaryDirectory.appendingPathComponent(testFile)
         let tempURL = destURL.appendingPathExtension(URLRequestDownloadTask.downloadExtension)
