@@ -41,7 +41,6 @@ final class CoreDataEncryptionTests: XCTestCase {
 
     func testSavingEncryptedValues() {
         let container = CoreData.encryptionContainer()
-                                                                                bundle: Bundle(for: type(of: self)))
         let context = container.viewContext
 
         context.performAndWait {
@@ -59,7 +58,6 @@ final class CoreDataEncryptionTests: XCTestCase {
 
     func testFetchingEncryptedValues() {
         let container = CoreData.encryptionContainer()
-                                                                                bundle: Bundle(for: type(of: self)))
         let context = container.viewContext
         let timestamp = Date()
 
@@ -85,7 +83,6 @@ final class CoreDataEncryptionTests: XCTestCase {
     func testValueTransformers() {
         let transformer = self.mockValueTransformer
         let container = CoreData.encryptionContainer()
-                                                                                bundle: Bundle(for: type(of: self)))
         let context = container.viewContext
 
         context.performAndWait {
