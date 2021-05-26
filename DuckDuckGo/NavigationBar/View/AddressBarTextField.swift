@@ -134,10 +134,11 @@ final class AddressBarTextField: NSTextField {
             os_log("AddressBarTextField: Window not available", type: .error)
             return
         }
-        guard suggestionWindow.isVisible else { return }
 
         let originalStringValue = suggestionContainerViewModel.userStringValue
-        guard let selectedSuggestionViewModel = suggestionContainerViewModel.selectedSuggestionViewModel else {
+        guard suggestionWindow.isVisible,
+              let selectedSuggestionViewModel = suggestionContainerViewModel.selectedSuggestionViewModel
+        else {
             if let originalStringValue = originalStringValue {
                 value = Value(stringValue: originalStringValue, userTyped: true)
                 selectToTheEnd(from: originalStringValue.count)
@@ -577,9 +578,13 @@ extension AddressBarTextField: NSTextFieldDelegate {
 
         switch commandSelector {
         case #selector(NSResponder.moveDown(_:)):
-            suggestionContainerViewModel.selectNextIfPossible(); return true
+            guard suggestionWindowController?.window?.isVisible == true else { return false }
+            suggestionContainerViewModel.selectNextIfPossible()
+            return true
         case #selector(NSResponder.moveUp(_:)):
-            suggestionContainerViewModel.selectPreviousIfPossible(); return true
+            guard suggestionWindowController?.window?.isVisible == true else { return false }
+            suggestionContainerViewModel.selectPreviousIfPossible()
+            return true
         case #selector(NSResponder.deleteBackward(_:)),
              #selector(NSResponder.deleteForward(_:)),
              #selector(NSResponder.deleteToMark(_:)),
@@ -589,7 +594,12 @@ extension AddressBarTextField: NSTextFieldDelegate {
              #selector(NSResponder.deleteToEndOfParagraph(_:)),
              #selector(NSResponder.deleteToBeginningOfLine(_:)),
              #selector(NSResponder.deleteBackwardByDecomposingPreviousCharacter(_:)):
-            suggestionContainerViewModel.clearSelection(); return false
+            if suggestionContainerViewModel.selectionIndex != nil {
+                suggestionContainerViewModel.clearSelection()
+            } else {
+                displaySelectedSuggestionViewModel()
+            }
+            return false
         default:
             return false
         }
