@@ -90,31 +90,31 @@ final class URLRequestDownloadTaskTests: XCTestCase {
 
         stub(condition: { _ in true }, response: { _ -> HTTPStubsResponse in
             let response = HTTPStubsResponse(data: self.testData, statusCode: 200, headers: nil)
-            response.responseTime = 0.1
+            response.responseTime = 0.3
             return response
         })
 
         taskDelegate.destinationURLCallback = { _, callback in
             DispatchQueue.main.async {
-                print("exists", self.fm.fileExists(atPath: tempURL.path))
-                XCTAssertTrue(self.fm.fileExists(atPath: tempURL.path))
+                XCTAssertTrue(self.fm.fileExists(atPath: tempURL.path), "temp file does not exist")
                 try? self.fm.removeItem(at: tempURL)
             }
             callback(destURL, nil)
         }
         let e = expectation(description: "URLRequestDownloadTask failed")
         taskDelegate.downloadDidFinish = { _, result in
-            print("didFinish", result)
-//            if case .failure = result {} else {
-//                XCTFail("unexpected result \(result)")
-//            }
+            if case .failure = result {} else {
+                XCTFail("unexpected result \(result)")
+            }
 
             e.fulfill()
         }
 
         task.start(delegate: taskDelegate)
 
-        waitForExpectations(timeout: 2)
+        waitForExpectations(timeout: 2, handler: { (error) in
+            XCTFail("failed waiting for expectation \(String(describing: error))")
+        })
     }
 
     func testWhenDownloadedFileIsRemovedButRequestFinishesThenTaskFails() {
