@@ -67,9 +67,9 @@ final class SuggestionViewModel {
         case .phrase(phrase: let phrase):
             return phrase
         case .website(url: let url):
-            return url.absoluteStringWithoutSchemeAndWWW.prependingWWW(andScheme: url.scheme, ifPrefixPresentIn: self.userStringValue)
+            return url.displayString(forUserInput: userStringValue)
         case .historyEntry(title: let title, url: let url):
-            return title ?? url.absoluteStringWithoutSchemeAndWWW.prependingWWW(andScheme: url.scheme, ifPrefixPresentIn: self.userStringValue)
+            return title ?? url.displayString(forUserInput: userStringValue)
         case .bookmark(title: let title, url: _, isFavorite: _):
             return title
         case .unknown(value: let value):
@@ -96,9 +96,7 @@ final class SuggestionViewModel {
              .bookmark(title: _, url: let url, isFavorite: _):
 
             let userStringValue = self.userStringValue.lowercased()
-            let urlString = url.absoluteStringWithoutSchemeAndWWW
-                .prependingWWW(andScheme: url.scheme, ifPrefixPresentIn: userStringValue)
-
+            let urlString = url.displayString(forUserInput: userStringValue)
             if !urlString.hasPrefix(userStringValue),
                let title = self.title,
                title.lowercased().hasPrefix(userStringValue) {
@@ -114,11 +112,18 @@ final class SuggestionViewModel {
 
     var suffix: String {
         switch suggestion {
+        // for punycoded urls display real url as a suffix
+        case .website(url: let url) where url.displayString(forUserInput: userStringValue, decodePunycode: false) != self.string:
+            return " – " + url.displayString(decodePunycode: false, dropScheme: true, needsWWW: false, dropTrailingSlash: true)
+
         case .phrase, .unknown, .website:
             return ""
         case .historyEntry(title: _, url: let url),
              .bookmark(title: _, url: let url, isFavorite: _):
-            return " – " + url.absoluteStringWithoutSchemeAndWWW
+            return " – " + url.displayString(decodePunycode: true,
+                                             dropScheme: true,
+                                             needsWWW: false,
+                                             dropTrailingSlash: false)
         }
     }
 

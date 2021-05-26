@@ -21,6 +21,7 @@ import Combine
 import os.log
 import BrowserServicesKit
 
+// swiftlint:disable file_length
 // swiftlint:disable type_body_length
 
 final class AddressBarTextField: NSTextField {
@@ -134,14 +135,12 @@ final class AddressBarTextField: NSTextField {
             os_log("AddressBarTextField: Window not available", type: .error)
             return
         }
+        guard suggestionWindow.isVisible else { return }
 
         let originalStringValue = suggestionContainerViewModel.userStringValue
-        guard suggestionWindow.isVisible,
-              let selectedSuggestionViewModel = suggestionContainerViewModel.selectedSuggestionViewModel
-        else {
+        guard let selectedSuggestionViewModel = suggestionContainerViewModel.selectedSuggestionViewModel else {
             if let originalStringValue = originalStringValue {
                 value = Value(stringValue: originalStringValue, userTyped: true)
-                selectToTheEnd(from: originalStringValue.count)
             } else {
                 clearValue()
             }
@@ -254,9 +253,19 @@ final class AddressBarTextField: NSTextField {
 
         var string: String {
             switch self {
-            case .text(let text): return text
-            case .url(urlString: let urlString, url: _, userTyped: _): return urlString
-            case .suggestion(let suggestionViewModel): return suggestionViewModel.autocompletionString
+            case .text(let text):
+                return text
+            case .url(urlString: let urlString, url: _, userTyped: _):
+                return urlString
+            case .suggestion(let suggestionViewModel):
+                let autocompletionString = suggestionViewModel.autocompletionString
+                if autocompletionString.lowercased()
+                    .hasPrefix(suggestionViewModel.userStringValue.lowercased()) {
+                    // keep user input capitalization
+                    let suffixLength = autocompletionString.count - suggestionViewModel.userStringValue.count
+                    return suggestionViewModel.userStringValue + autocompletionString.suffix(suffixLength)
+                }
+                return autocompletionString
             }
         }
 
@@ -326,8 +335,11 @@ final class AddressBarTextField: NSTextField {
                    !title.isEmpty,
                    suggestionViewModel.autocompletionString != title {
                     self = .title(title)
-                } else if let host = url.host,
-                          url.absoluteStringWithoutSchemeAndWWW.drop(suffix: "/") == host.dropWWW() {
+                } else if let host = url.host?.dropWWW(),
+                          host == url.displayString(decodePunycode: false,
+                                                    dropScheme: true,
+                                                    needsWWW: false,
+                                                    dropTrailingSlash: true) {
                     self = .visit(host: host)
                 } else {
                     self = .url(url)
@@ -360,7 +372,10 @@ final class AddressBarTextField: NSTextField {
             case .visit(host: let host):
                 return "\(Self.visitSuffix) \(host)"
             case .url(let url):
-                return " – " + url.absoluteStringWithoutSchemeAndWWW
+                return " – " + url.displayString(decodePunycode: false,
+                                                 dropScheme: true,
+                                                 needsWWW: false,
+                                                 dropTrailingSlash: false)
             case .title(let title):
                 return " – " + title
             }
@@ -527,7 +542,8 @@ extension AddressBarTextField: NSTextFieldDelegate {
 
         // if user continues typing letters from displayed Suggestion
         // don't blink and keep the Suggestion displayed
-        if case .suggestion(let suggestion) = self.value,
+        if isHandlingUserAppendingText,
+           case .suggestion(let suggestion) = self.value,
            // disable autocompletion when user entered Space
            !stringValueWithoutSuffix.contains(" "),
            stringValueWithoutSuffix.hasPrefix(suggestion.userStringValue),
@@ -576,15 +592,15 @@ extension AddressBarTextField: NSTextFieldDelegate {
             return true
         }
 
+        guard suggestionWindowController?.window?.isVisible == true else {
+            return false
+        }
+
         switch commandSelector {
         case #selector(NSResponder.moveDown(_:)):
-            guard suggestionWindowController?.window?.isVisible == true else { return false }
-            suggestionContainerViewModel.selectNextIfPossible()
-            return true
+            suggestionContainerViewModel.selectNextIfPossible(); return true
         case #selector(NSResponder.moveUp(_:)):
-            guard suggestionWindowController?.window?.isVisible == true else { return false }
-            suggestionContainerViewModel.selectPreviousIfPossible()
-            return true
+            suggestionContainerViewModel.selectPreviousIfPossible(); return true
         case #selector(NSResponder.deleteBackward(_:)),
              #selector(NSResponder.deleteForward(_:)),
              #selector(NSResponder.deleteToMark(_:)),
@@ -594,12 +610,7 @@ extension AddressBarTextField: NSTextFieldDelegate {
              #selector(NSResponder.deleteToEndOfParagraph(_:)),
              #selector(NSResponder.deleteToBeginningOfLine(_:)),
              #selector(NSResponder.deleteBackwardByDecomposingPreviousCharacter(_:)):
-            if suggestionContainerViewModel.selectionIndex != nil {
-                suggestionContainerViewModel.clearSelection()
-            } else {
-                displaySelectedSuggestionViewModel()
-            }
-            return false
+            suggestionContainerViewModel.clearSelection(); return false
         default:
             return false
         }
@@ -681,7 +692,7 @@ final class AddressBarTextEditor: NSTextView {
         }
         guard let string = string as? String else { return }
 
-        delegate.textView(self, userTypedString: string, at: replacementRange)
+        delegate.textView(self, userTypedString: string, at: replacementRange.location == NSNotFound ? self.selectedRange() : replacementRange)
     }
 }
 
@@ -693,8 +704,9 @@ final class AddressBarTextFieldCell: NSTextFieldCell {
     }
 }
 
-// swiftlint:enable type_body_length
-
 fileprivate extension NSStoryboard {
     static let suggestion = NSStoryboard(name: "Suggestion", bundle: .main)
 }
+
+// swiftlint:enable type_body_length
+// swiftlint:enable file_length

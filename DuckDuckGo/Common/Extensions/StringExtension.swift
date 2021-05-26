@@ -93,22 +93,7 @@ extension String {
     }
 
     func dropWWW() -> String {
-        self.drop(prefix: "www.")
-    }
-
-    func prependingWWW(andScheme scheme: String?, ifPrefixPresentIn userStringValue: String) -> String {
-        guard !userStringValue.isEmpty else { return self }
-
-        let userStringValue = userStringValue.lowercased()
-        for prefix in ["www.", scheme.map { $0 + "://" }, scheme.map { $0 + "://www." }] {
-            if let prefix = prefix,
-               userStringValue.hasPrefix(prefix.prefix(min(userStringValue.count, prefix.count))),
-               (prefix + self).hasPrefix(userStringValue) {
-
-                return prefix + self
-            }
-        }
-        return self
+        self.drop(prefix: URL.HostPrefix.www.rawValue)
     }
 
     // MARK: - Mutating
@@ -118,6 +103,10 @@ extension String {
     }
 
     // MARK: - Prefix
+
+    func hasOrIsPrefix(of other: String) -> Bool {
+        return hasPrefix(other) || other.hasPrefix(self)
+    }
 
     func drop(prefix: String) -> String {
         return hasPrefix(prefix) ? String(dropFirst(prefix.count)) : self
