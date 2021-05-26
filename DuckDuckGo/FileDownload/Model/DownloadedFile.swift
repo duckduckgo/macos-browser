@@ -170,6 +170,22 @@ final class DownloadedFile {
         }
     }
 
+    func asyncMove(to newURL: URL, incrementingIndexIfExists: Bool, pathExtension: String? = nil, completion: ((Result<URL, Error>) -> Void)? = nil) {
+        Self.queue.async {
+            let result: Result<URL, Error>
+            do {
+                result = .success(try self._move(to: newURL, incrementingIndexIfExists: incrementingIndexIfExists, pathExtension: pathExtension))
+            } catch {
+                result = .failure(error)
+            }
+            
+            guard let completion = completion else { return }
+            DispatchQueue.main.async {
+                completion(result)
+            }
+        }
+    }
+
     func write(_ data: Data) {
         Self.queue.async { [weak self] in
             guard let self = self,

@@ -48,25 +48,4 @@ final class DispatchQueueExtensionsTests: XCTestCase {
         waitForExpectations(timeout: 0.1)
     }
 
-    func testNowOrSync_now() {
-        let r: Int = DispatchQueue.safeSyncOnMainQueue {
-            dispatchPrecondition(condition: .onQueue(.main))
-            return 42
-        }
-        XCTAssertEqual(r, 42)
-    }
-
-    func testNowOrSync_sync() {
-        let e = expectation(description: "Job dispatched")
-        DispatchQueue.global().async {
-            let r: Int = DispatchQueue.safeSyncOnMainQueue {
-                dispatchPrecondition(condition: .onQueue(.main))
-                return 42
-            }
-            XCTAssertEqual(r, 42)
-            e.fulfill()
-        }
-        waitForExpectations(timeout: 0.1)
-    }
-
 }

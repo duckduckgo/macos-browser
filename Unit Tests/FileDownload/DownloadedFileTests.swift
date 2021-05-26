@@ -20,6 +20,7 @@ import Foundation
 import XCTest
 @testable import DuckDuckGo_Privacy_Browser
 
+// swiftlint:disable type_body_length
 final class DownloadedFileTests: XCTestCase {
 
     let testFile = "downloaded file "
@@ -75,6 +76,31 @@ final class DownloadedFileTests: XCTestCase {
 
         XCTAssertEqual(Int(file.bytesWritten), result.count)
         XCTAssertEqual(result, expected)
+    }
+
+    func testFileWriteSequenceWithAsyncMove() throws {
+        let file = try DownloadedFile(url: getURL())
+        let dataArray = [
+            "the ".data(using: .utf8)!,
+            "file ".data(using: .utf8)!,
+            "content".data(using: .utf8)!
+        ]
+
+        for data in dataArray {
+            file.write(data)
+        }
+
+        let e = expectation(description: "file moved")
+        file.asyncMove(to: file.url!, incrementingIndexIfExists: false) { _ in
+            let result = try? Data(contentsOf: file.url!)
+            let expected = dataArray.reduce(Data(), +)
+
+            XCTAssertEqual(Int(file.bytesWritten), result?.count)
+            XCTAssertEqual(result, expected)
+
+            e.fulfill()
+        }
+        waitForExpectations(timeout: 1)
     }
 
     func testWhenFileAppendedThenBytesWrittenSubjectUpdates() throws {
@@ -322,6 +348,56 @@ final class DownloadedFileTests: XCTestCase {
             waitForExpectations(timeout: 1)
         }
         XCTAssertThrowsError(try file.move(to: url2, incrementingIndexIfExists: false))
+        XCTAssertNil(file.url)
+    }
+
+    func testWhenFileIsMovedBetweenVolumesThenAsyncMoveFails() throws {
+        let url1 = getURL()
+        let url2 = NSURLMock(fileURLWithPath: getURL().path) as URL
+        let syncQueue = DispatchQueue(label: "testWhenFileIsMovedBetweenVolumesThenWritingContinues.queue")
+
+        let e1 = expectation(description: "should resolve bookmark data")
+        NSURL.swizzleInitByResolvingBookmarkData {
+            syncQueue.sync {
+                e1.fulfill()
+                return url2 as NSURL
+            }
+        }
+        NSURLMock.resourceValuesForKeysReplacement[.volumeURLKey] = url2.pathComponents.first!
+
+        let file = try DownloadedFile(url: url1)
+
+        let e2 = expectation(description: "url should receive nil")
+        let cancellable = file.$url.sink { url in
+            if url == nil {
+                e2.fulfill()
+            }
+        }
+
+        let origData = "data ".data(using: .utf8)!
+        file.write(origData)
+
+        // simulate moving to another volume
+        try syncQueue.sync {
+            let data = try Data(contentsOf: url1)
+            try fm.removeItem(at: url1)
+            fm.createFile(atPath: url2.path, contents: data, attributes: nil)
+        }
+
+        let appendedData = "appended".data(using: .utf8)!
+        file.write(appendedData)
+
+        let e3 = expectation(description: "move fails")
+        file.asyncMove(to: url2, incrementingIndexIfExists: false) { result in
+            if case .failure = result {} else {
+                XCTFail("unexpected result \(result)")
+            }
+            e3.fulfill()
+        }
+
+        withExtendedLifetime(cancellable) {
+            waitForExpectations(timeout: 1)
+        }
         XCTAssertNil(file.url)
     }
 

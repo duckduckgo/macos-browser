@@ -28,11 +28,4 @@ extension DispatchQueue {
         }
     }
 
-    static func safeSyncOnMainQueue<T>(_ block: () throws -> T) rethrows -> T {
-        guard Thread.isMainThread else {
-            return try DispatchQueue.main.sync(execute: block)
-        }
-        return try block()
-    }
-
 }

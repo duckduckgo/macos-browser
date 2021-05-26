@@ -193,27 +193,25 @@ final class URLRequestDownloadTask: FileDownloadTask {
             } else {
                 self.finish(with: .failure(.failedToCompleteDownloadTask(underlyingError: error)))
             }
+            return
+        }
 
-        } else {
-            do {
-                // only move file to final destination if SavePanel did complete by the moment
-                // otherwise move and finish the task in the localFileURLCompletionHandler
-                guard case .downloadLocationChosen = DispatchQueue.safeSyncOnMainQueue({ state })
-                else { return }
-                
-                guard let downloadedFile = self.downloadedFile,
-                      // .download file may have been renamed: respect this new name and just drop .download ext
-                      let url = downloadedFile.url?.path.drop(suffix: "." + Self.downloadExtension)
-                else {
-                    throw FileDownloadError.failedToMoveFileToDownloads
-                }
-                
-                let finalURL = try downloadedFile.move(to: URL(fileURLWithPath: url), incrementingIndexIfExists: true)
-
-                self.finish(with: .success(finalURL))
-
-            } catch {
+        DispatchQueue.main.async {
+            // only move file to final destination if SavePanel did complete by the moment
+            // otherwise move and finish the task in the localFileURLCompletionHandler
+            guard case .downloadLocationChosen = self.state else { return }
+            guard let downloadedFile = self.downloadedFile,
+                  // .download file may have been renamed: respect this new name and just drop .download ext
+                  let url = downloadedFile.url?.path.drop(suffix: "." + Self.downloadExtension)
+            else {
                 self.finish(with: .failure(.failedToMoveFileToDownloads))
+                return
+            }
+
+            // perform move to final destination operation asynchronously
+            // to avoid waiting for writing operations to finish on the main queue
+            downloadedFile.asyncMove(to: URL(fileURLWithPath: url), incrementingIndexIfExists: true) { result in
+                self.finish(with: result.mapError { _ in .failedToMoveFileToDownloads })
             }
         }
     }
