@@ -29,7 +29,7 @@ final class UserScripts {
     let loginDetectionUserScript = LoginFormDetectionUserScript()
     let contentBlockerScript = ContentBlockerUserScript()
     let contentBlockerRulesScript = ContentBlockerRulesUserScript()
-    let emailScript = EmailUserScript()
+    let autofillScript = AutofillUserScript()
     let debugScript = DebugUserScript()
 
     init() {
@@ -49,7 +49,7 @@ final class UserScripts {
         self.loginDetectionUserScript,
         self.contentBlockerScript,
         self.contentBlockerRulesScript,
-        self.emailScript,
+        self.autofillScript,
         self.pageObserverScript
     ]
 

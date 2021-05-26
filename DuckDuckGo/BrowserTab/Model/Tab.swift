@@ -323,8 +323,7 @@ final class Tab: NSObject {
             userScripts.loginDetectionUserScript.delegate = self
             userScripts.contentBlockerScript.delegate = self
             userScripts.contentBlockerRulesScript.delegate = self
-            userScripts.emailScript.webView = webView
-            userScripts.emailScript.delegate = emailManager
+            userScripts.autofillScript.emailDelegate = emailManager
             userScripts.pageObserverScript.delegate = self
 
             attachFindInPage()

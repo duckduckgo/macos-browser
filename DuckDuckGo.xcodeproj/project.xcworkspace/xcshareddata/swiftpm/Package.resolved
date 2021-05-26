@@ -6,7 +6,7 @@
         "repositoryURL": "https://github.com/duckduckgo/BrowserServicesKit.git",
         "state": {
           "branch": null,
-          "revision": "a8f94445580bc1bc89536ecd44aefce129a06d45",
+          "revision": "ad5db22c5fb03a1a410a2b4d3c87f75223db9e9a",
           "version": null
         }
       },
@@ -15,8 +15,8 @@
         "repositoryURL": "https://github.com/duckduckgo/GRDB.swift.git",
         "state": {
           "branch": null,
-          "revision": "e5714d4b6ee1651d2271b04ae85aaf5a327fe70a",
-          "version": null
+          "revision": "995e7b639e4e5194fdff30778dbe080220bdb810",
+          "version": "1.0.0"
         }
       },
       {
