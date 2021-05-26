@@ -112,9 +112,11 @@ final class URLRequestDownloadTaskTests: XCTestCase {
 
         task.start(delegate: taskDelegate)
 
-        waitForExpectations(timeout: 2, handler: { (error) in
-            XCTFail("failed waiting for expectation \(String(describing: error))")
-        })
+        waitForExpectations(timeout: 2) { error in
+            if let error = error {
+                XCTFail("failed waiting for expectation \(error)")
+            }
+        }
     }
 
     func testWhenDownloadedFileIsRemovedButRequestFinishesThenTaskFails() {
