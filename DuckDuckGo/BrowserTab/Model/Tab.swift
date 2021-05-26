@@ -35,6 +35,7 @@ protocol TabDelegate: AnyObject {
 
 }
 
+// swiftlint:disable type_body_length
 final class Tab: NSObject {
 
     enum TabType: Int {
@@ -60,6 +61,7 @@ final class Tab: NSObject {
          faviconService: FaviconService = LocalFaviconService.shared,
          webCacheManager: WebCacheManager = .shared,
          webViewConfiguration: WebViewConfiguration? = nil,
+         historyCoordinating: HistoryCoordinating = HistoryCoordinator.shared,
          url: URL? = nil,
          title: String? = nil,
          error: Error? = nil,
@@ -70,6 +72,7 @@ final class Tab: NSObject {
 
         self.tabType = tabType
         self.faviconService = faviconService
+        self.historyCoordinating = historyCoordinating
         self.url = url
         self.title = title
         self.error = error
@@ -179,12 +182,20 @@ final class Tab: NSObject {
     }
 
     func goForward() {
+        shouldStoreNextVisit = false
         webView.goForward()
         loginDetectionService?.handle(navigationEvent: .userAction)
     }
 
     func goBack() {
+        shouldStoreNextVisit = false
         webView.goBack()
+        loginDetectionService?.handle(navigationEvent: .userAction)
+    }
+
+    func go(to item: WKBackForwardListItem) {
+        shouldStoreNextVisit = false
+        webView.go(to: item)
         loginDetectionService?.handle(navigationEvent: .userAction)
     }
 
@@ -357,6 +368,23 @@ final class Tab: NSObject {
         subscribeToFindInPageTextChange()
     }
 
+    // MARK: - History
+
+    private var historyCoordinating: HistoryCoordinating
+    private var shouldStoreNextVisit = true
+
+    func addVisit(of url: URL) {
+        guard shouldStoreNextVisit else {
+            shouldStoreNextVisit = true
+            return
+        }
+        historyCoordinating.addVisit(of: url)
+    }
+
+    func updateVisitTitle(_ title: String, url: URL) {
+        historyCoordinating.updateTitleIfNeeded(title: title, url: url)
+    }
+
 }
 
 extension Tab: PageObserverUserScriptDelegate {
@@ -432,12 +460,16 @@ extension Tab: EmailManagerRequestDelegate {
                       headers: [String: String],
                       timeoutInterval: TimeInterval,
                       completion: @escaping (Data?, Error?) -> Void) {
+
+        let currentQueue = OperationQueue.current
         
         var request = URLRequest(url: url, timeoutInterval: timeoutInterval)
         request.allHTTPHeaderFields = headers
         request.httpMethod = method
         URLSession.shared.dataTask(with: request) { (data, _, error) in
-            completion(data, error)
+            currentQueue?.addOperation {
+                completion(data, error)
+            }
         }.resume()
     }
     // swiftlint:enable function_parameter_count
@@ -631,3 +663,4 @@ fileprivate extension WKNavigationAction {
         return targetFrame?.isMainFrame ?? false
     }
 }
+// swiftlint:enable type_body_length

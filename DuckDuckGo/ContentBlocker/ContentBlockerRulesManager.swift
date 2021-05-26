@@ -37,15 +37,27 @@ final class ContentBlockerRulesManager {
 
     func compileRules(completion: ((WKContentRuleList?) -> Void)? = nil) {
         let trackerData = TrackerRadarManager.shared.trackerData
+        let unprotectedDomains = loadUnprotectedDomains()
 
         DispatchQueue.global(qos: .background).async {
-            self.compileRules(with: trackerData, completion: completion)
+            self.compileRules(with: trackerData, andTemporaryUnprotectedDomains: unprotectedDomains, completion: completion)
         }
     }
 
-    private func compileRules(with trackerData: TrackerData, completion: ((WKContentRuleList?) -> Void)?) {
+    private func loadUnprotectedDomains() -> [String] {
+        guard let data = DefaultConfigurationStorage.shared.loadData(for: .temporaryUnprotectedSites),
+              let string = String(data: data, encoding: .utf8) else { return [] }
+        return string.components(separatedBy: .newlines).map { $0.trimmingWhitespaces() }.filter { !$0.isEmpty }
+    }
+
+    private func compileRules(with trackerData: TrackerData,
+                              andTemporaryUnprotectedDomains tempUnprotectedDomains: [String],
+                              completion: ((WKContentRuleList?) -> Void)?) {
+
+        #warning("When a user turns off protection for a site, it needs to be passed to the exceptions here")
+
         let rules = ContentBlockerRulesBuilder(trackerData: trackerData).buildRules(withExceptions: [],
-                                                                                    andTemporaryUnprotectedDomains: [])
+                                                                                    andTemporaryUnprotectedDomains: tempUnprotectedDomains)
         guard let store = WKContentRuleListStore.default() else {
             assert(false, "Failed to access the default WKContentRuleListStore for rules compiliation checking")
             return

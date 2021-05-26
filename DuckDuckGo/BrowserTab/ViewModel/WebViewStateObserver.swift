@@ -25,7 +25,8 @@ final class WebViewStateObserver: NSObject {
     weak var webView: WKWebView?
     weak var tabViewModel: TabViewModel?
 
-    init(webView: WKWebView, tabViewModel: TabViewModel) {
+    init(webView: WKWebView,
+         tabViewModel: TabViewModel) {
         self.webView = webView
         self.tabViewModel = tabViewModel
         super.init()
@@ -72,30 +73,27 @@ final class WebViewStateObserver: NSObject {
                                of object: Any?,
                                change: [NSKeyValueChangeKey: Any]?,
                                context: UnsafeMutableRawPointer?) {
-        guard let keyPath = keyPath else {
-            os_log("%s: keyPath not provided", type: .error, className)
-            return
-        }
-
-        guard let tabViewModel = tabViewModel else {
-            os_log("%s: TabViewModel was released from memory", type: .error, className)
-            return
-        }
-
-        guard let webView = webView else {
-            os_log("%s: TabViewModel was released from memory", type: .error, className)
+        guard let keyPath = keyPath, let tabViewModel = tabViewModel, let webView = webView else {
+            assertionFailure("Invalid state: keyPath, tabViewModel or webView is nil")
             return
         }
 
         switch keyPath {
         case #keyPath(WKWebView.url):
-            tabViewModel.tab.url = webView.url
+            if let url = webView.url {
+                tabViewModel.tab.url = url
+                tabViewModel.tab.addVisit(of: url)
+            }
             updateTitle() // The title might not change if webView doesn't think anything is different so update title here as well
 
         case #keyPath(WKWebView.canGoBack): tabViewModel.canGoBack = webView.canGoBack
         case #keyPath(WKWebView.canGoForward): tabViewModel.canGoForward = webView.canGoForward
         case #keyPath(WKWebView.isLoading): tabViewModel.isLoading = webView.isLoading
-        case #keyPath(WKWebView.title): updateTitle()
+        case #keyPath(WKWebView.title):
+            updateTitle()
+            if let title = webView.title, let url = webView.url {
+                tabViewModel.tab.updateVisitTitle(title, url: url)
+            }
         case #keyPath(WKWebView.estimatedProgress): tabViewModel.progress = webView.estimatedProgress
         default:
             os_log("%s: keyPath %s not handled", type: .error, className, keyPath)
