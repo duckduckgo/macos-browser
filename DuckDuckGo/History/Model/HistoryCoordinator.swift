@@ -20,6 +20,8 @@ import Foundation
 import os.log
 import Combine
 
+typealias History = [HistoryEntry]
+
 protocol HistoryCoordinating: AnyObject {
 
     var history: History? { get }
