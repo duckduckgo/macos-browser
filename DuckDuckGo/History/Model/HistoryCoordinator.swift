@@ -111,7 +111,7 @@ final class HistoryCoordinator: HistoryCoordinating {
                 return nil
             })
 
-            self?.cleanAndReloadHistory(until: Date(), except: exceptions)
+            self?.cleanAndReloadHistory(until: .distantFuture, except: exceptions)
         }
     }
 
