@@ -103,7 +103,7 @@ final class URLRequestDownloadTaskTests: XCTestCase {
         }
         let e = expectation(description: "URLRequestDownloadTask failed")
         taskDelegate.downloadDidFinish = { _, result in
-            if case .failure(.cancelled) = result {} else {
+            if case .failure = result {} else {
                 XCTFail("unexpected result \(result)")
             }
 
