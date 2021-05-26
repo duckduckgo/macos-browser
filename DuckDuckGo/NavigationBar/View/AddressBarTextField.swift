@@ -160,15 +160,16 @@ final class AddressBarTextField: NSTextField {
     }
 
     private func addressBarEnterPressed() {
-        let suggestion = suggestionContainerViewModel.selectedSuggestionViewModel?.suggestion
         suggestionContainerViewModel.clearUserStringValue()
-        hideSuggestionWindow()
 
+        let suggestion = suggestionContainerViewModel.selectedSuggestionViewModel?.suggestion
         if NSApp.isCommandPressed {
             openNewTab(selected: NSApp.isShiftPressed, suggestion: suggestion)
         } else {
             navigate(suggestion: suggestion)
         }
+
+        hideSuggestionWindow()
     }
 
     private func navigate(suggestion: Suggestion?) {
