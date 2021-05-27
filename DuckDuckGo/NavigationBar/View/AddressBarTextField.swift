@@ -336,10 +336,10 @@ final class AddressBarTextField: NSTextField {
                    suggestionViewModel.autocompletionString != title {
                     self = .title(title)
                 } else if let host = url.host?.dropWWW(),
-                          host == url.displayString(decodePunycode: false,
-                                                    dropScheme: true,
-                                                    needsWWW: false,
-                                                    dropTrailingSlash: true) {
+                          host == url.toString(decodePunycode: false,
+                                               dropScheme: true,
+                                               needsWWW: false,
+                                               dropTrailingSlash: true) {
                     self = .visit(host: host)
                 } else {
                     self = .url(url)
@@ -372,10 +372,10 @@ final class AddressBarTextField: NSTextField {
             case .visit(host: let host):
                 return "\(Self.visitSuffix) \(host)"
             case .url(let url):
-                return " – " + url.displayString(decodePunycode: false,
-                                                 dropScheme: true,
-                                                 needsWWW: false,
-                                                 dropTrailingSlash: false)
+                return " – " + url.toString(decodePunycode: false,
+                                            dropScheme: true,
+                                            needsWWW: false,
+                                            dropTrailingSlash: false)
             case .title(let title):
                 return " – " + title
             }

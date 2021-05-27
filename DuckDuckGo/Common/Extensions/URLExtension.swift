@@ -123,10 +123,10 @@ extension URL {
         self.scheme.map { $0 + NavigationalScheme.separator }
     }
 
-    func displayString(decodePunycode: Bool,
-                       dropScheme: Bool,
-                       needsWWW: Bool? = nil,
-                       dropTrailingSlash: Bool) -> String {
+    func toString(decodePunycode: Bool,
+                  dropScheme: Bool,
+                  needsWWW: Bool? = nil,
+                  dropTrailingSlash: Bool) -> String {
         guard let components = URLComponents(url: self, resolvingAgainstBaseURL: true),
               var string = components.string
         else {
@@ -171,14 +171,13 @@ extension URL {
         return string
     }
 
-    func displayString(forUserInput input: String, decodePunycode: Bool = true) -> String {
-        self.displayString(decodePunycode: decodePunycode,
-                           dropScheme: input.isEmpty
-                            || !input.hasOrIsPrefix(of: self.separatedScheme ?? ""),
-                           needsWWW: !input.drop(prefix: self.separatedScheme ?? "").isEmpty
-                            && input.drop(prefix: self.separatedScheme ?? "")
-                            .hasOrIsPrefix(of: URL.HostPrefix.www.rawValue),
-                           dropTrailingSlash: false)
+    func toString(forUserInput input: String, decodePunycode: Bool = true) -> String {
+        self.toString(decodePunycode: decodePunycode,
+                      dropScheme: input.isEmpty
+                        || !input.hasOrIsPrefix(of: self.separatedScheme ?? ""),
+                      needsWWW: !input.drop(prefix: self.separatedScheme ?? "").isEmpty
+                        && input.drop(prefix: self.separatedScheme ?? "").hasOrIsPrefix(of: URL.HostPrefix.www.rawValue),
+                      dropTrailingSlash: false)
     }
 
     // MARK: - Validity
@@ -312,9 +311,7 @@ extension URL {
     // MARK: - Punycode
 
     var punycodeDecodedString: String? {
-        return displayString(decodePunycode: true,
-                             dropScheme: false,
-                             dropTrailingSlash: false)
+        return self.toString(decodePunycode: true, dropScheme: false, dropTrailingSlash: false)
     }
 
 }
