@@ -31,7 +31,7 @@ final class URLRequestDownloadTask: FileDownloadTask {
     private var downloadedFileBytesWrittenCancellable: AnyCancellable?
     static private let progressThrottleQueue = DispatchQueue(label: "URLRequestDownloadTask.progressThrottleQueue", qos: .background)
 
-    static let downloadExtension = "duckDownload"
+    static let downloadExtension = "duckload"
 
     private var responseSuggestedFilename: String?
 
