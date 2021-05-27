@@ -404,7 +404,8 @@ final class DownloadedFileTests: XCTestCase {
 }
 
 private extension NSURL {
-    private static var nextBookmarkResolutionPath: (() -> NSURL)!
+    private static var nextBookmarkResolutionPath: (() -> NSURL)?
+    private static let lock = NSLock()
     private static var isSwizzled = false
     private static let originalInitByResolvingBookmarkData = {
         class_getInstanceMethod(NSURL.self, #selector(NSURL.init(resolvingBookmarkData:options:relativeTo:bookmarkDataIsStale:)))!
@@ -414,6 +415,8 @@ private extension NSURL {
     }()
 
     static func swizzleInitByResolvingBookmarkData(with resolve: @escaping (() -> NSURL)) {
+        lock.lock()
+        defer { lock.unlock() }
         if !self.isSwizzled {
             self.isSwizzled = true
             method_exchangeImplementations(originalInitByResolvingBookmarkData, swizzledInitByResolvingBookmarkData)
@@ -422,6 +425,8 @@ private extension NSURL {
     }
 
     static func restoreInitByResolvingBookmarkData() {
+        lock.lock()
+        defer { lock.unlock() }
         if self.isSwizzled {
             self.isSwizzled = false
             method_exchangeImplementations(originalInitByResolvingBookmarkData, swizzledInitByResolvingBookmarkData)
@@ -434,8 +439,16 @@ private extension NSURL {
                        options: NSURL.BookmarkResolutionOptions = [],
                        relativeTo relativeURL: URL?,
                        bookmarkDataIsStale isStale: UnsafeMutablePointer<ObjCBool>?) throws -> NSURL {
+        Self.lock.lock()
+        defer { Self.lock.unlock() }
+        guard let nextBookmarkResolutionPath = Self.nextBookmarkResolutionPath else {
+            return try Self.init(resolvingBookmarkData: bookmarkData,
+                                 options: options,
+                                 relativeTo: relativeURL,
+                                 bookmarkDataIsStale: isStale)
+        }
 
-        Unmanaged<NSURL>.passRetained(Self.nextBookmarkResolutionPath()).takeUnretainedValue()
+        return Unmanaged<NSURL>.passRetained(nextBookmarkResolutionPath()).takeUnretainedValue()
     }
 
 }

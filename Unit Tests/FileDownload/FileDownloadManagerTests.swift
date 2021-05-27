@@ -418,7 +418,8 @@ final class TestWorkspace: NSWorkspace {
 }
 
 private extension FileManager {
-    private static var urlsForIn: ((SearchPathDirectory, SearchPathDomainMask) -> [URL])!
+    private static var urlsForIn: ((SearchPathDirectory, SearchPathDomainMask) -> [URL])?
+    private static let lock = NSLock()
     private static var isSwizzled = false
     private static let originalUrlsForIn = {
         class_getInstanceMethod(FileManager.self, #selector(FileManager.urls(for:in:)))!
@@ -428,6 +429,8 @@ private extension FileManager {
     }()
 
     static func swizzleUrlsForIn(with urlsForIn: @escaping ((SearchPathDirectory, SearchPathDomainMask) -> [URL])) {
+        lock.lock()
+        defer { lock.unlock() }
         if !self.isSwizzled {
             self.isSwizzled = true
             method_exchangeImplementations(originalUrlsForIn, swizzledUrlsForIn)
@@ -436,6 +439,8 @@ private extension FileManager {
     }
 
     static func restoreUrlsForIn() {
+        lock.lock()
+        defer { lock.unlock() }
         if self.isSwizzled {
             self.isSwizzled = false
             method_exchangeImplementations(originalUrlsForIn, swizzledUrlsForIn)
@@ -445,6 +450,10 @@ private extension FileManager {
 
     @objc
     func swizzled_urls(for directory: FileManager.SearchPathDirectory, in domainMask: FileManager.SearchPathDomainMask) -> [URL] {
-        return Self.urlsForIn?(directory, domainMask) ?? []
+        Self.lock.lock()
+        defer { Self.lock.unlock() }
+        guard let urlsForIn = Self.urlsForIn else { return self.urls(for: directory, in: domainMask) }
+
+        return urlsForIn(directory, domainMask)
     }
 }

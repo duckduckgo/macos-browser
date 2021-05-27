@@ -83,6 +83,43 @@ final class URLRequestDownloadTaskTests: XCTestCase {
         waitForExpectations(timeout: 1)
     }
 
+    func testWhenDownloadedFileIsRemovedThenTaskFails() {
+        let destURL = fm.temporaryDirectory.appendingPathComponent(testFile)
+        let tempURL = destURL.appendingPathExtension(URLRequestDownloadTask.downloadExtension)
+        let task = URLRequestDownloadTask(download: .request(testRequest, suggestedName: nil, promptForLocation: false), request: testRequest)
+
+        stub(condition: { _ in true }, response: { _ -> HTTPStubsResponse in
+            let response = HTTPStubsResponse(data: self.testData, statusCode: 200, headers: nil)
+            response.responseTime = 0.3
+            return response
+        })
+
+        taskDelegate.destinationURLCallback = { _, callback in
+            callback(destURL, nil)
+
+            // remove the .download file for DispatchSource event to be fired
+            // and URLRequestTask to be cancelled
+            XCTAssertTrue(self.fm.fileExists(atPath: tempURL.path), "temp file does not exist")
+            try? self.fm.removeItem(at: tempURL)
+        }
+        let e = expectation(description: "URLRequestDownloadTask failed")
+        taskDelegate.downloadDidFinish = { _, result in
+            if case .failure(.cancelled) = result {} else {
+                XCTFail("unexpected result \(result)")
+            }
+
+            e.fulfill()
+        }
+
+        task.start(delegate: taskDelegate)
+
+        waitForExpectations(timeout: 2) { error in
+            if let error = error {
+                XCTFail("failed waiting for expectation \(error)")
+            }
+        }
+    }
+
     func testWhenDownloadedFileIsRemovedButRequestFinishesThenTaskFails() {
         let destURL = fm.temporaryDirectory.appendingPathComponent(testFile)
         let tempURL = destURL.appendingPathExtension(URLRequestDownloadTask.downloadExtension)
@@ -140,10 +177,8 @@ final class URLRequestDownloadTaskTests: XCTestCase {
         })
 
         taskDelegate.destinationURLCallback = { _, callback in
-            DispatchQueue.main.async {
-                try? self.fm.moveItem(at: tempURL, to: tempURL2)
-            }
             callback(destURL, nil)
+            try? self.fm.moveItem(at: tempURL, to: tempURL2)
         }
         let e = expectation(description: "URLRequestDownloadTask failed")
         taskDelegate.downloadDidFinish = { _, result in
@@ -354,7 +389,8 @@ final class URLRequestDownloadTaskTests: XCTestCase {
 // swiftlint:enable type_body_length
 
 private extension Progress {
-    private static var swizzledUnpublishBlock: ((Progress) -> Void)!
+    private static var swizzledUnpublishBlock: ((Progress) -> Void)?
+    private static let lock = NSLock()
     private static var isSwizzled = false
     private static let originalUnpublish = {
         class_getInstanceMethod(Progress.self, #selector(Progress.unpublish))!
@@ -364,6 +400,8 @@ private extension Progress {
     }()
 
     static func swizzleUnpublish(with unpublish: @escaping ((Progress) -> Void)) {
+        lock.lock()
+        defer { lock.unlock() }
         if !self.isSwizzled {
             self.isSwizzled = true
             method_exchangeImplementations(originalUnpublish, swizzledUnpublish)
@@ -372,6 +410,8 @@ private extension Progress {
     }
 
     static func restoreUnpublish() {
+        lock.lock()
+        defer { lock.unlock() }
         if self.isSwizzled {
             self.isSwizzled = false
             method_exchangeImplementations(originalUnpublish, swizzledUnpublish)
@@ -380,6 +420,11 @@ private extension Progress {
     }
 
     @objc func swizzled_unpublish() {
-        Self.swizzledUnpublishBlock(self)
+        Self.lock.lock()
+        let swizzledUnpublishBlock = Self.swizzledUnpublishBlock
+        Self.lock.unlock()
+        swizzledUnpublishBlock?(self) ?? {
+            self.unpublish()
+        }()
     }
 }
