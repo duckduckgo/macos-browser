@@ -35,9 +35,89 @@ final class SuggestionViewModelTests: XCTestCase {
         let url = URL(string: urlString)!
         let suggestion = Suggestion.website(url: url)
         let suggestionViewModel = SuggestionViewModel(suggestion: suggestion, userStringValue: "")
-        
-        XCTAssert(suggestionViewModel.string.hasSuffix("spreadprivacy.com"))
-        XCTAssert(!suggestionViewModel.string.hasPrefix("https://"))
+
+        XCTAssertEqual(suggestionViewModel.string, "spreadprivacy.com")
+    }
+
+    func testWhenSuggestionIsWebsiteAndUserEnteredW_ThenStringIsUrlStringWithoutSchemeAndWithWWW() {
+        let urlString = "https://spreadprivacy.com"
+        let url = URL(string: urlString)!
+        let suggestion = Suggestion.website(url: url)
+        let suggestionViewModel = SuggestionViewModel(suggestion: suggestion, userStringValue: "w")
+
+        XCTAssertEqual(suggestionViewModel.string, "www.spreadprivacy.com")
+    }
+
+    func testWhenSuggestionIsWebsiteAndUserEnteredWWW_ThenStringIsUrlStringWithoutSchemeAndWithWWW() {
+        let urlString = "https://spreadprivacy.com"
+        let url = URL(string: urlString)!
+        let suggestion = Suggestion.website(url: url)
+        let suggestionViewModel = SuggestionViewModel(suggestion: suggestion, userStringValue: "www")
+
+        XCTAssertEqual(suggestionViewModel.string, "www.spreadprivacy.com")
+    }
+
+    func testWhenSuggestionIsWebsiteAndUserEnteredWWWAndDot_ThenStringIsUrlStringWithoutSchemeAndWithWWW() {
+        let urlString = "https://spreadprivacy.com"
+        let url = URL(string: urlString)!
+        let suggestion = Suggestion.website(url: url)
+        let suggestionViewModel = SuggestionViewModel(suggestion: suggestion, userStringValue: "www.")
+
+        XCTAssertEqual(suggestionViewModel.string, "www.spreadprivacy.com")
+    }
+
+    func testWhenSuggestionIsWebsiteAndUserEnteredH_ThenStringIsUrlStringWithSchemeAndWithoutWWW() {
+        let urlString = "https://spreadprivacy.com"
+        let url = URL(string: urlString)!
+        let suggestion = Suggestion.website(url: url)
+        let suggestionViewModel = SuggestionViewModel(suggestion: suggestion, userStringValue: "h")
+
+        XCTAssertEqual(suggestionViewModel.string, "https://spreadprivacy.com")
+    }
+
+    func testWhenSuggestionIsWebsiteAndUserEnteredHTTP_ThenStringIsUrlStringWithSchemeAndWithoutWWW() {
+        let urlString = "https://spreadprivacy.com"
+        let url = URL(string: urlString)!
+        let suggestion = Suggestion.website(url: url)
+        let suggestionViewModel = SuggestionViewModel(suggestion: suggestion, userStringValue: "http")
+
+        XCTAssertEqual(suggestionViewModel.string, "https://spreadprivacy.com")
+    }
+
+    func testWhenSuggestionIsWebsiteAndUserEnteredHTTPS_ThenStringIsUrlStringWithSchemeAndWithoutWWW() {
+        let urlString = "https://spreadprivacy.com"
+        let url = URL(string: urlString)!
+        let suggestion = Suggestion.website(url: url)
+        let suggestionViewModel = SuggestionViewModel(suggestion: suggestion, userStringValue: "https")
+
+        XCTAssertEqual(suggestionViewModel.string, "https://spreadprivacy.com")
+    }
+
+    func testWhenSuggestionIsWebsiteAndUserEnteredHTTPSAndSeparator_ThenStringIsUrlStringWithScheme() {
+        let urlString = "https://spreadprivacy.com"
+        let url = URL(string: urlString)!
+        let suggestion = Suggestion.website(url: url)
+        let suggestionViewModel = SuggestionViewModel(suggestion: suggestion, userStringValue: "https://")
+
+        XCTAssertEqual(suggestionViewModel.string, "https://spreadprivacy.com")
+    }
+
+    func testWhenSuggestionIsWebsiteAndUserEnteredHTTPSAndSeparatorAndWWW_ThenStringIsUrlStringWithScheme() {
+        let urlString = "https://spreadprivacy.com"
+        let url = URL(string: urlString)!
+        let suggestion = Suggestion.website(url: url)
+        let suggestionViewModel = SuggestionViewModel(suggestion: suggestion, userStringValue: "https://ww")
+
+        XCTAssertEqual(suggestionViewModel.string, "https://www.spreadprivacy.com")
+    }
+
+    func testWhenSuggestionIsWebsiteAndUserEnteredHTTPSAndSeparatorWWWAndDot_ThenStringIsUrlStringWithScheme() {
+        let urlString = "https://spreadprivacy.com"
+        let url = URL(string: urlString)!
+        let suggestion = Suggestion.website(url: url)
+        let suggestionViewModel = SuggestionViewModel(suggestion: suggestion, userStringValue: "https://www.")
+
+        XCTAssertEqual(suggestionViewModel.string, "https://www.spreadprivacy.com")
     }
 
     func testWhenSuggestionIsBookmark_ThenStringIsTitle() {

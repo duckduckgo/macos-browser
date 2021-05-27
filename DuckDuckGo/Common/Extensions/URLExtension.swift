@@ -101,11 +101,13 @@ extension URL {
     // MARK: - Components
 
     enum NavigationalScheme: String, CaseIterable {
+        static let separator = "://"
+
         case http
         case https
 
         func separated() -> String {
-            self.rawValue + "://"
+            self.rawValue + Self.separator
         }
     }
 
@@ -117,13 +119,65 @@ extension URL {
         }
     }
 
-    var absoluteStringWithoutSchemeAndWWW: String {
-        let absoluteString = self.punycodeDecodedString ?? self.absoluteString
-        if let scheme = scheme {
-            return absoluteString.drop(prefix: scheme + "://").drop(prefix: "www.")
-        } else {
+    var separatedScheme: String? {
+        self.scheme.map { $0 + NavigationalScheme.separator }
+    }
+
+    func toString(decodePunycode: Bool,
+                  dropScheme: Bool,
+                  needsWWW: Bool? = nil,
+                  dropTrailingSlash: Bool) -> String {
+        guard let components = URLComponents(url: self, resolvingAgainstBaseURL: true),
+              var string = components.string
+        else {
             return absoluteString
         }
+
+        if var host = components.host,
+           let hostRange = components.rangeOfHost {
+
+            switch (needsWWW, host.hasPrefix(HostPrefix.www.separated())) {
+            case (.some(true), true),
+                 (.some(false), false),
+                 (.none, _):
+                break
+            case (.some(false), true):
+                host = host.drop(prefix: HostPrefix.www.separated())
+            case (.some(true), false):
+                host = HostPrefix.www.separated() + host
+            }
+
+            if decodePunycode,
+               let decodedHost = host.idnaDecoded {
+                host = decodedHost
+            }
+
+            string.replaceSubrange(hostRange, with: host)
+        }
+
+        if dropScheme,
+           let schemeRange = components.rangeOfScheme {
+            string.replaceSubrange(schemeRange, with: "")
+            if string.hasPrefix(URL.NavigationalScheme.separator) {
+                string = string.drop(prefix: URL.NavigationalScheme.separator)
+            }
+        }
+
+        if dropTrailingSlash,
+           string.hasSuffix("/") {
+            string = String(string.dropLast(1))
+        }
+
+        return string
+    }
+
+    func toString(forUserInput input: String, decodePunycode: Bool = true) -> String {
+        self.toString(decodePunycode: decodePunycode,
+                      dropScheme: input.isEmpty
+                        || !input.hasOrIsPrefix(of: self.separatedScheme ?? ""),
+                      needsWWW: !input.drop(prefix: self.separatedScheme ?? "").isEmpty
+                        && input.drop(prefix: self.separatedScheme ?? "").hasOrIsPrefix(of: URL.HostPrefix.www.rawValue),
+                      dropTrailingSlash: false)
     }
 
     // MARK: - Validity
@@ -257,17 +311,7 @@ extension URL {
     // MARK: - Punycode
 
     var punycodeDecodedString: String? {
-        guard let components = URLComponents(url: self, resolvingAgainstBaseURL: true),
-              let host = components.host,
-              let decodedHost = host.idnaDecoded,
-              host != decodedHost,
-              let hostRange = components.rangeOfHost,
-              var string = components.string
-        else { return nil }
-
-        string.replaceSubrange(hostRange, with: decodedHost)
-
-        return string
+        return self.toString(decodePunycode: true, dropScheme: false, dropTrailingSlash: false)
     }
 
 }

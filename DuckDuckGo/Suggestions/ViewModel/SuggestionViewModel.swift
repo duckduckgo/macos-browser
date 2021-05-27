@@ -67,9 +67,9 @@ final class SuggestionViewModel {
         case .phrase(phrase: let phrase):
             return phrase
         case .website(url: let url):
-            return url.absoluteStringWithoutSchemeAndWWW
+            return url.toString(forUserInput: userStringValue)
         case .historyEntry(title: let title, url: let url):
-            return title ?? url.absoluteStringWithoutSchemeAndWWW
+            return title ?? url.toString(forUserInput: userStringValue)
         case .bookmark(title: let title, url: _, isFavorite: _):
             return title
         case .unknown(value: let value):
@@ -77,11 +77,34 @@ final class SuggestionViewModel {
         }
     }
 
+    var title: String? {
+        switch suggestion {
+        case .phrase(phrase: _),
+             .website(url: _),
+             .unknown(value: _):
+            return nil
+        case .historyEntry(title: let title, url: _):
+            return title
+        case .bookmark(title: let title, url: _, isFavorite: _):
+            return title
+        }
+    }
+
     var autocompletionString: String {
         switch suggestion {
         case .historyEntry(title: _, url: let url),
              .bookmark(title: _, url: let url, isFavorite: _):
-            return url.absoluteStringWithoutSchemeAndWWW
+
+            let userStringValue = self.userStringValue.lowercased()
+            let urlString = url.toString(forUserInput: userStringValue)
+            if !urlString.hasPrefix(userStringValue),
+               let title = self.title,
+               title.lowercased().hasPrefix(userStringValue) {
+                return title
+            }
+
+            return urlString
+
         default:
             return self.string
         }
@@ -89,11 +112,18 @@ final class SuggestionViewModel {
 
     var suffix: String {
         switch suggestion {
+        // for punycoded urls display real url as a suffix
+        case .website(url: let url) where url.toString(forUserInput: userStringValue, decodePunycode: false) != self.string:
+            return " – " + url.toString(decodePunycode: false, dropScheme: true, needsWWW: false, dropTrailingSlash: true)
+
         case .phrase, .unknown, .website:
             return ""
         case .historyEntry(title: _, url: let url),
              .bookmark(title: _, url: let url, isFavorite: _):
-            return " – " + url.absoluteStringWithoutSchemeAndWWW
+            return " – " + url.toString(decodePunycode: true,
+                                        dropScheme: true,
+                                        needsWWW: false,
+                                        dropTrailingSlash: false)
         }
     }
 
