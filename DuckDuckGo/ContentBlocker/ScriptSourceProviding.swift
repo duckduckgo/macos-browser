@@ -67,7 +67,6 @@ final class DefaultScriptSourceProvider: ScriptSourceProviding {
     private func buildContentBlockerSource() -> String {
 
         // Use sensible defaults in case the upstream data is unparsable
-        #warning("encodedTrackerData Data Race here!")
         let trackerData = TrackerRadarManager.shared.encodedTrackerData
         let surrogates = configStorage.loadData(for: .surrogates)?.utf8String() ?? ""
         let unprotectedSites = configStorage.loadData(for: .temporaryUnprotectedSites)?.utf8String() ?? ""

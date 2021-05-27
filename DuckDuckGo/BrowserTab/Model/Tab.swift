@@ -624,7 +624,6 @@ extension Tab: WKNavigationDelegate {
             os_log("didFailProvisionalNavigation due to download %s", type: .debug, currentDownload?.sourceURL?.absoluteString ?? "")
             return
         }
-        #warning("Should we ignore currentDownload and always check frameLoadInterrupted? (showing error for g! redirect)")
         self.error = error
     }
 
