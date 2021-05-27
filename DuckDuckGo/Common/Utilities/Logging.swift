@@ -28,6 +28,10 @@ extension OSLog {
         Logging.fireLoggingEnabled ? Logging.fireLog : .disabled
     }
 
+    static var history: OSLog {
+        Logging.historyLoggingEnabled ? Logging.historyLog : .disabled
+    }
+
 }
 
 struct Logging {
@@ -37,5 +41,8 @@ struct Logging {
 
     fileprivate static let fireLoggingEnabled = false
     fileprivate static let fireLog: OSLog = OSLog(subsystem: Bundle.main.bundleIdentifier ?? "DuckDuckGo", category: "Fire/Login Detection")
+
+    fileprivate static let historyLoggingEnabled = false
+    fileprivate static let historyLog: OSLog = OSLog(subsystem: Bundle.main.bundleIdentifier ?? "DuckDuckGo", category: "History")
 
 }
