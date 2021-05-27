@@ -96,6 +96,16 @@ extension String {
         self.drop(prefix: "www.")
     }
 
+    static func uniqueFilename(for fileType: UTType? = nil) -> String {
+        let fileName = UUID().uuidString
+
+        if let ext = fileType?.fileExtension {
+            return fileName.appending("." + ext)
+        }
+
+        return fileName
+    }
+
     // MARK: - Mutating
 
     @inlinable mutating func prepend(_ string: String) {

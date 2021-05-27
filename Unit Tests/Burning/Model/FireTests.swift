@@ -35,7 +35,7 @@ final class FireTests: XCTestCase {
             burningExpectation.fulfill()
         }
 
-        waitForExpectations(timeout: 1, handler: nil)
+        waitForExpectations(timeout: 5, handler: nil)
 
         XCTAssertEqual(tabCollectionViewModel.tabCollection.tabs.count, 1)
         XCTAssert(tabCollectionViewModel.tabCollection.tabs.first?.isHomepageShown ?? false)
@@ -62,21 +62,17 @@ final class FireTests: XCTestCase {
         let isBurningExpectation = expectation(description: "Burning")
         let finishedBurningExpectation = expectation(description: "Finished burning")
 
-        var burningStarted = false
-        fire.$isBurning.sink { isBurning in
+        fire.$isBurning.dropFirst().sink { isBurning in
             if isBurning {
-                burningStarted = true
                 isBurningExpectation.fulfill()
             } else {
-                if burningStarted {
-                    finishedBurningExpectation.fulfill()
-                }
+                finishedBurningExpectation.fulfill()
             }
         } .store(in: &cancellables)
 
         fire.burnAll(tabCollectionViewModel: tabCollectionViewModel)
 
-        waitForExpectations(timeout: 1, handler: nil)
+        waitForExpectations(timeout: 5, handler: nil)
     }
 
 }
