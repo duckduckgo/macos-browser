@@ -60,9 +60,11 @@ final class SuggestionTableCellView: NSTableCellView {
         if isSelected {
             textField?.attributedStringValue = attributedString
             textField?.textColor = Self.selectedTintColor
+            suffixTextField.textColor = Self.selectedTintColor
         } else {
             textField?.attributedStringValue = attributedString
             textField?.textColor = Self.textColor
+            suffixTextField.textColor = Self.suffixColor
         }
     }
 

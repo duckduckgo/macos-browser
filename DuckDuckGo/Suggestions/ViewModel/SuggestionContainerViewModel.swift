@@ -88,7 +88,7 @@ final class SuggestionContainerViewModel {
         }
         guard userStringValue.lowercased() != oldValue?.lowercased() else { return }
 
-        self.isTopSuggestionSelectionExpected = userAppendedStringToTheEnd
+        self.isTopSuggestionSelectionExpected = userAppendedStringToTheEnd && !userStringValue.contains(" ")
         suggestionContainer.getSuggestions(for: userStringValue)
     }
 
@@ -123,7 +123,7 @@ final class SuggestionContainerViewModel {
             return
         }
 
-        if selectionIndex != index {
+        if suggestionViewModel(at: index) !== self.selectedSuggestionViewModel {
             selectionIndex = index
         }
     }

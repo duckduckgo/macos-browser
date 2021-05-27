@@ -21,6 +21,7 @@ import Combine
 import os.log
 import BrowserServicesKit
 
+// swiftlint:disable file_length
 // swiftlint:disable type_body_length
 
 final class AddressBarTextField: NSTextField {
@@ -140,7 +141,6 @@ final class AddressBarTextField: NSTextField {
         guard let selectedSuggestionViewModel = suggestionContainerViewModel.selectedSuggestionViewModel else {
             if let originalStringValue = originalStringValue {
                 value = Value(stringValue: originalStringValue, userTyped: true)
-                selectToTheEnd(from: originalStringValue.count)
             } else {
                 clearValue()
             }
@@ -254,9 +254,19 @@ final class AddressBarTextField: NSTextField {
 
         var string: String {
             switch self {
-            case .text(let text): return text
-            case .url(urlString: let urlString, url: _, userTyped: _): return urlString
-            case .suggestion(let suggestionViewModel): return suggestionViewModel.autocompletionString
+            case .text(let text):
+                return text
+            case .url(urlString: let urlString, url: _, userTyped: _):
+                return urlString
+            case .suggestion(let suggestionViewModel):
+                let autocompletionString = suggestionViewModel.autocompletionString
+                if autocompletionString.lowercased()
+                    .hasPrefix(suggestionViewModel.userStringValue.lowercased()) {
+                    // keep user input capitalization
+                    let suffixLength = autocompletionString.count - suggestionViewModel.userStringValue.count
+                    return suggestionViewModel.userStringValue + autocompletionString.suffix(suffixLength)
+                }
+                return autocompletionString
             }
         }
 
@@ -308,33 +318,49 @@ final class AddressBarTextField: NSTextField {
                 else { return nil }
                 self = Suffix.visit(host: host)
             case .suggestion(let suggestionViewModel):
-                switch suggestionViewModel.suggestion {
-                case .phrase(phrase: _):
-                    self = Suffix.search
-                case .website(url: let url),
-                     .bookmark(title: _, url: let url, isFavorite: _),
-                     .historyEntry(title: _, url: let url):
-                    guard let host = url.host else { return nil }
-                    self = Suffix.visit(host: host)
-                case .unknown(value: _):
-                    self = Suffix.search
+                self.init(suggestionViewModel: suggestionViewModel)
+            }
+        }
+
+        init?(suggestionViewModel: SuggestionViewModel) {
+            switch suggestionViewModel.suggestion {
+            case .phrase(phrase: _):
+                self = Suffix.search
+            case .website(url: let url):
+                guard let host = url.host else { return nil }
+                self = Suffix.visit(host: host)
+
+            case .bookmark(title: _, url: let url, isFavorite: _),
+                 .historyEntry(title: _, url: let url):
+                if let title = suggestionViewModel.title,
+                   !title.isEmpty,
+                   suggestionViewModel.autocompletionString != title {
+                    self = .title(title)
+                } else if let host = url.host?.dropWWW(),
+                          host == url.toString(decodePunycode: false,
+                                               dropScheme: true,
+                                               needsWWW: false,
+                                               dropTrailingSlash: true) {
+                    self = .visit(host: host)
+                } else {
+                    self = .url(url)
                 }
+
+            case .unknown(value: _):
+                self = Suffix.search
             }
         }
 
         case search
         case visit(host: String)
+        case url(URL)
+        case title(String)
 
         static let suffixAttributes = [NSAttributedString.Key.font: NSFont.systemFont(ofSize: 13, weight: .light),
                                        .foregroundColor: NSColor.addressBarSuffixColor]
 
         var attributedString: NSAttributedString {
-            switch self {
-            case .search:
-                return NSAttributedString(string: string, attributes: Self.suffixAttributes)
-            case .visit(host: _):
-                return NSAttributedString(string: string, attributes: Self.suffixAttributes)
-            }
+            NSAttributedString(string: string, attributes: Self.suffixAttributes)
         }
 
         static let searchSuffix = " – \(UserText.addressBarSearchSuffix)"
@@ -346,6 +372,13 @@ final class AddressBarTextField: NSTextField {
                 return "\(Self.searchSuffix)"
             case .visit(host: let host):
                 return "\(Self.visitSuffix) \(host)"
+            case .url(let url):
+                return " – " + url.toString(decodePunycode: false,
+                                            dropScheme: true,
+                                            needsWWW: false,
+                                            dropTrailingSlash: false)
+            case .title(let title):
+                return " – " + title
             }
         }
     }
@@ -510,7 +543,10 @@ extension AddressBarTextField: NSTextFieldDelegate {
 
         // if user continues typing letters from displayed Suggestion
         // don't blink and keep the Suggestion displayed
-        if case .suggestion(let suggestion) = self.value,
+        if isHandlingUserAppendingText,
+           case .suggestion(let suggestion) = self.value,
+           // disable autocompletion when user entered Space
+           !stringValueWithoutSuffix.contains(" "),
            stringValueWithoutSuffix.hasPrefix(suggestion.userStringValue),
            suggestion.autocompletionString.hasPrefix(stringValueWithoutSuffix),
            let editor = currentEditor(),
@@ -657,7 +693,7 @@ final class AddressBarTextEditor: NSTextView {
         }
         guard let string = string as? String else { return }
 
-        delegate.textView(self, userTypedString: string, at: replacementRange)
+        delegate.textView(self, userTypedString: string, at: replacementRange.location == NSNotFound ? self.selectedRange() : replacementRange)
     }
 }
 
@@ -669,8 +705,9 @@ final class AddressBarTextFieldCell: NSTextFieldCell {
     }
 }
 
-// swiftlint:enable type_body_length
-
 fileprivate extension NSStoryboard {
     static let suggestion = NSStoryboard(name: "Suggestion", bundle: .main)
 }
+
+// swiftlint:enable type_body_length
+// swiftlint:enable file_length
