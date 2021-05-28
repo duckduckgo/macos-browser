@@ -31,4 +31,10 @@ extension WKWebView {
         }
     }
 
+    func getMimeType(callback: @escaping (String?) -> Void) {
+        self.evaluateJavaScript("document.contentType") { (result, _) in
+            callback(result as? String)
+        }
+    }
+
 }

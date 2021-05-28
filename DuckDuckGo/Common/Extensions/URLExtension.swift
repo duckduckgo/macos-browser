@@ -257,61 +257,16 @@ extension URL {
         return components.url
     }
 
-    // MARK: - File Downloads
-
-    func moveToDownloadsFolder(withFileName fileName: String) -> String? {
-
-        func incrementFileName(in folder: URL, named name: String, copy: Int) -> URL {
-            // Zero means we haven't tried anything yet, so use the suggested name.  Otherwise, simply prefix the file name with the copy number.
-            let path = copy == 0 ? name : "\(copy)_\(name)"
-            let file = folder.appendingPathComponent(path)
-            return file
-        }
-
-        let preferences = DownloadPreferences()
-        var downloadLocation: URL?
-
-        if preferences.alwaysRequestDownloadLocation {
-            let panel = NSOpenPanel.downloadDirectoryPanel()
-            let result = panel.runModal()
-
-            if result == .OK, let selectedURL = panel.url {
-                downloadLocation = selectedURL
-            }
-        } else {
-            downloadLocation = preferences.selectedDownloadLocation
-        }
-
-        guard let folderUrl = downloadLocation else {
-            os_log("Failed to access Downloads folder")
-            Pixel.fire(.debug(event: .fileMoveToDownloadsFailed, error: CocoaError(.fileWriteUnknown)))
-            return nil
-        }
-
-        var copy = 0
-        while copy < 1000 { // If it gets to 1000 of these then chances are something else is wrong
-
-            let fileInDownloads = incrementFileName(in: folderUrl, named: fileName, copy: copy)
-            do {
-                try FileManager.default.moveItem(at: self, to: fileInDownloads)
-                return fileInDownloads.path
-            } catch CocoaError.fileWriteFileExists {
-                // This is expected, as moveItem throws an error if the file already exists
-            } catch {
-                Pixel.fire(.debug(event: .fileMoveToDownloadsFailed, error: error))
-                break // swiftlint:disable:this unneeded_break_in_switch
-            }
-            copy += 1
-        }
-
-        os_log("Failed to move file to Downloads folder, attempt %d", type: .error, copy)
-        return nil
-    }
-
     // MARK: - Punycode
 
     var punycodeDecodedString: String? {
         return self.toString(decodePunycode: true, dropScheme: false, dropTrailingSlash: false)
+    }
+
+    // MARK: - File URL
+
+    var volume: URL? {
+        try? self.resourceValues(forKeys: [.volumeURLKey]).volume
     }
 
 }

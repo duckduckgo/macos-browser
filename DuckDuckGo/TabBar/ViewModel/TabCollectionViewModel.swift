@@ -45,7 +45,11 @@ final class TabCollectionViewModel: NSObject {
             updateSelectedTabViewModel()
         }
     }
-    @Published private(set) var selectedTabViewModel: TabViewModel?
+    @Published private(set) var selectedTabViewModel: TabViewModel? {
+        didSet {
+            previouslySelectedTabViewModel = oldValue
+        }
+    }
     private weak var previouslySelectedTabViewModel: TabViewModel?
 
     @Published private(set) var canInsertLastRemovedTab: Bool = false
@@ -61,7 +65,6 @@ final class TabCollectionViewModel: NSObject {
 
         subscribeToTabs()
         subscribeToLastRemovedTab()
-        subscribeToSelectedTabViewModel()
 
         if tabCollection.tabs.isEmpty {
             appendNewTab()
@@ -316,14 +319,6 @@ final class TabCollectionViewModel: NSObject {
         tabCollection.$lastRemovedTabCache.receive(on: DispatchQueue.main).sink { [weak self] _ in
             self?.updateCanInsertLastRemovedTab()
         } .store(in: &cancellables)
-    }
-
-    private func subscribeToSelectedTabViewModel() {
-        $selectedTabViewModel
-            .scan((nil, nil)) { return ($0.1, $1) }
-            .sink { [weak self] (previouslySelectedTabViewModel, _) in
-                self?.previouslySelectedTabViewModel = previouslySelectedTabViewModel
-            }.store(in: &cancellables)
     }
 
     private func removeTabViewModels(_ removed: Set<Tab>) {

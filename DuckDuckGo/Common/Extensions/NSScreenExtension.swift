@@ -1,7 +1,7 @@
 //
-//  MenuItemSelectors.swift
+//  NSScreenExtension.swift
 //
-//  Copyright © 2020 DuckDuckGo. All rights reserved.
+//  Copyright © 2021 DuckDuckGo. All rights reserved.
 //
 //  Licensed under the Apache License, Version 2.0 (the "License");
 //  you may not use this file except in compliance with the License.
@@ -16,22 +16,21 @@
 //  limitations under the License.
 //
 
-import Cocoa
+import AppKit
 
-@objc protocol LinkMenuItemSelectors {
+extension NSScreen {
 
-    func openLinkInNewTab(_ sender: NSMenuItem)
-    func openLinkInNewWindow(_ sender: NSMenuItem)
-    func downloadLinkedFileAs(_ sender: NSMenuItem)
-    func copyLink(_ sender: NSMenuItem)
+    static var dockScreen: NSScreen? {
+        screens.min(by: { ($0.frame.height - $0.visibleFrame.height) > ($1.frame.height - $1.visibleFrame.height) })
+    }
 
-}
+    func convert(_ point: NSPoint) -> NSPoint {
+        return NSPoint(x: point.x - self.frame.origin.x,
+                       y: point.y - self.frame.origin.y)
+    }
 
-@objc protocol ImageMenuItemSelectors {
-
-    func openImageInNewTab(_ sender: NSMenuItem)
-    func openImageInNewWindow(_ sender: NSMenuItem)
-    func saveImageAs(_ sender: NSMenuItem)
-    func copyImageAddress(_ sender: NSMenuItem)
+    func convert(_ rect: NSRect) -> NSRect {
+        return NSRect(origin: self.convert(rect.origin), size: rect.size)
+    }
 
 }

@@ -1,7 +1,7 @@
 //
-//  MenuItemSelectors.swift
+//  History.swift
 //
-//  Copyright © 2020 DuckDuckGo. All rights reserved.
+//  Copyright © 2021 DuckDuckGo. All rights reserved.
 //
 //  Licensed under the Apache License, Version 2.0 (the "License");
 //  you may not use this file except in compliance with the License.
@@ -16,22 +16,6 @@
 //  limitations under the License.
 //
 
-import Cocoa
+import Foundation
 
-@objc protocol LinkMenuItemSelectors {
-
-    func openLinkInNewTab(_ sender: NSMenuItem)
-    func openLinkInNewWindow(_ sender: NSMenuItem)
-    func downloadLinkedFileAs(_ sender: NSMenuItem)
-    func copyLink(_ sender: NSMenuItem)
-
-}
-
-@objc protocol ImageMenuItemSelectors {
-
-    func openImageInNewTab(_ sender: NSMenuItem)
-    func openImageInNewWindow(_ sender: NSMenuItem)
-    func saveImageAs(_ sender: NSMenuItem)
-    func copyImageAddress(_ sender: NSMenuItem)
-
-}
+typealias History = Set<HistoryEntry>

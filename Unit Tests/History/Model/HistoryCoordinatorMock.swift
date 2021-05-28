@@ -1,6 +1,5 @@
 //
-//  WKWebView+SessionState.h
-//  DuckDuckGo
+//  HistoryCoordinatorMock.swift
 //
 //  Copyright © 2021 DuckDuckGo. All rights reserved.
 //
@@ -16,9 +15,27 @@
 //  See the License for the specific language governing permissions and
 //  limitations under the License.
 //
-#import <WebKit/WebKit.h>
 
-@interface WKWebView (SessionState)
-- (void)_restoreFromSessionStateData:(NSData * _Nonnull)data;
-- (NSData * _Nullable)_sessionStateData;
-@end
+import XCTest
+@testable import DuckDuckGo_Privacy_Browser
+
+final class HistoryCoordinatorMock: HistoryCoordinating {
+
+    var history: History?
+
+    var addVisitCalled = false
+    func addVisit(of url: URL) {
+        addVisitCalled = true
+    }
+
+    var updateTitleIfNeededCalled = false
+    func updateTitleIfNeeded(title: String, url: URL) {
+        updateTitleIfNeededCalled = true
+    }
+
+    var burnHistoryCalled = false
+    func burnHistory(except fireproofDomains: FireproofDomains) {
+        burnHistoryCalled = true
+    }
+
+}

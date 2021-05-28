@@ -26,7 +26,7 @@ protocol TabDelegate: AnyObject {
 
     func tabDidStartNavigation(_ tab: Tab)
     func tab(_ tab: Tab, requestedNewTab url: URL?, selected: Bool)
-    func tab(_ tab: Tab, requestedFileDownload download: FileDownload)
+    func tab(_ tab: Tab, requestedFileDownload request: FileDownload)
     func tab(_ tab: Tab, willShowContextMenuAt position: NSPoint, image: URL?, link: URL?)
     func tab(_ tab: Tab, detectedLogin host: String)
 	func tab(_ tab: Tab, requestedOpenExternalURL url: URL, forUserEnteredURL: Bool)
@@ -408,7 +408,9 @@ extension Tab: HTML5DownloadDelegate {
     func startDownload(_ userScript: HTML5DownloadUserScript, from url: URL, withSuggestedName name: String) {
         var request = lastMainFrameRequest ?? URLRequest(url: url)
         request.url = url
-        delegate?.tab(self, requestedFileDownload: FileDownload(request: request, suggestedName: name))
+        delegate?.tab(self, requestedFileDownload: FileDownload.request(request,
+                                                                        suggestedName: name,
+                                                                        promptForLocation: false))
     }
 
 }
@@ -579,7 +581,9 @@ extension Tab: WKNavigationDelegate {
 
         if (!navigationResponse.canShowMIMEType || navigationResponse.shouldDownload),
            let request = lastMainFrameRequest {
-            let download = FileDownload(request: request, suggestedName: navigationResponse.response.suggestedFilename)
+            let download = FileDownload.request(request,
+                                                suggestedName: navigationResponse.response.suggestedFilename,
+                                                promptForLocation: false)
             delegate?.tab(self, requestedFileDownload: download)
             // Flag this here, because interrupting the frame load will cause an error and we need to know
             self.currentDownload = download
@@ -617,10 +621,9 @@ extension Tab: WKNavigationDelegate {
     func webView(_ webView: WKWebView, didFailProvisionalNavigation navigation: WKNavigation!, withError error: Error) {
         if currentDownload != nil && (error as NSError).code == ErrorCodes.frameLoadInterrupted {
             currentDownload = nil
-            os_log("didFailProvisionalNavigation due to download %s", type: .debug, currentDownload?.request.url?.absoluteString ?? "")
+            os_log("didFailProvisionalNavigation due to download %s", type: .debug, currentDownload?.sourceURL?.absoluteString ?? "")
             return
         }
-
         self.error = error
     }
 
