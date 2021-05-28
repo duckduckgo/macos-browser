@@ -1,5 +1,5 @@
 //
-//  WebsiteVisit.swift
+//  HistoryEntry.swift
 //
 //  Copyright © 2021 DuckDuckGo. All rights reserved.
 //
@@ -28,7 +28,7 @@ struct HistoryEntry {
 
     mutating func addVisit() {
         numberOfVisits += 1
-        lastVisit = Date.today
+        lastVisit = Date.startOfDayToday
     }
 
 }
@@ -40,7 +40,7 @@ extension HistoryEntry {
                   url: url,
                   title: nil,
                   numberOfVisits: 0,
-                  lastVisit: Date.today)
+                  lastVisit: Date.startOfDayToday)
     }
 
 }
@@ -51,16 +51,4 @@ extension HistoryEntry: Hashable {
         hasher.combine(identifier.hashValue)
     }
 
-}
-
-extension Date {
-
-    static var today: Date {
-        return Calendar.current.date(
-            bySettingHour: 0,
-            minute: 0,
-            second: 0,
-            of: Date())!
-    }
-    
 }

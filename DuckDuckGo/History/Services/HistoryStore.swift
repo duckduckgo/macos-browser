@@ -138,7 +138,7 @@ fileprivate extension History {
     init(historyEntries: [HistoryEntryManagedObject]) {
         self = historyEntries.reduce(into: History(), {
             if let historyEntry = HistoryEntry(historyMO: $1) {
-                $0.insert(historyEntry)
+                $0.append(historyEntry)
             }
         })
     }

@@ -29,6 +29,10 @@ extension Date {
         return Calendar.current.startOfDay(for: tomorrow)
     }
 
+    static var startOfDayToday: Date {
+        return Calendar.current.startOfDay(for: Date())
+    }
+
     var daySinceReferenceDate: Int {
         Int(self.timeIntervalSinceReferenceDate / TimeInterval.day)
     }
