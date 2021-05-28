@@ -24,21 +24,21 @@ extension WKUserContentController {
 
     func addHandler(_ userScript: UserScript) {
         for messageName in userScript.messageNames {
-            if #available(OSX 11.0, *) {
-                add(userScript, contentWorld: .defaultClient, name: messageName)
-            } else {
+//            if #available(OSX 11.0, *) {
+//                add(userScript, contentWorld: .defaultClient, name: messageName)
+//            } else {
                 add(userScript, name: messageName)
-            }
+//            }
         }
     }
 
     func removeHandler(_ userScript: UserScript) {
         userScript.messageNames.forEach {
-            if #available(OSX 11.0, *) {
-                removeScriptMessageHandler(forName: $0, contentWorld: .defaultClient)
-            } else {
+//            if #available(OSX 11.0, *) {
+//                removeScriptMessageHandler(forName: $0, contentWorld: .defaultClient)
+//            } else {
                 removeScriptMessageHandler(forName: $0)
-            }
+//            }
         }
     }
 
