@@ -128,7 +128,7 @@ final class LocalBookmarkManagerTests: XCTestCase {
         let updateUrlResult = bookmarkManager.updateUrl(of: Bookmark.aBookmark, to: URL.duckDuckGoAutocomplete)
 
         XCTAssertFalse(bookmarkManager.isUrlBookmarked(url: Bookmark.aBookmark.url))
-        XCTAssertFalse(bookmarkStoreMock.updateCalled)
+        XCTAssertFalse(bookmarkStoreMock.updateBookmarkCalled)
         XCTAssertNil(updateUrlResult)
     }
 
@@ -140,7 +140,7 @@ final class LocalBookmarkManagerTests: XCTestCase {
         bookmarkManager.update(bookmark: bookmark)
 
         XCTAssert(bookmarkManager.isUrlBookmarked(url: bookmark.url))
-        XCTAssert(bookmarkStoreMock.updateCalled)
+        XCTAssert(bookmarkStoreMock.updateBookmarkCalled)
     }
 
     func testWhenBookmarkUrlIsUpdated_ThenManagerUpdatesItAlsoInStore() {
@@ -155,7 +155,7 @@ final class LocalBookmarkManagerTests: XCTestCase {
         XCTAssertFalse(bookmarkManager.isUrlBookmarked(url: bookmark.url))
         XCTAssert(bookmarkManager.isUrlBookmarked(url: newBookmark!.url))
         XCTAssert(bookmarkManager.isUrlBookmarked(url: newURL))
-        XCTAssert(bookmarkStoreMock.updateCalled)
+        XCTAssert(bookmarkStoreMock.updateBookmarkCalled)
     }
 
     func testWhenNewFaviconIsCached_ThenManagerUpdatesItAlsoInStore() {
@@ -169,7 +169,7 @@ final class LocalBookmarkManagerTests: XCTestCase {
         let newFavicon = NSImage(named: "HomeFavicon")!
         faviconServiceMock.cachedFaviconsPublisher.send((URL.duckDuckGo.host!, newFavicon))
 
-        XCTAssert(bookmarkStoreMock.updateCalled)
+        XCTAssert(bookmarkStoreMock.updateBookmarkCalled)
         XCTAssert(bookmarkManager.getBookmark(for: URL.duckDuckGo)?.favicon == newFavicon)
     }
 

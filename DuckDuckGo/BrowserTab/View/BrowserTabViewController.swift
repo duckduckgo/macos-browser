@@ -32,6 +32,7 @@ final class BrowserTabViewController: NSViewController {
 
     private let tabCollectionViewModel: TabCollectionViewModel
     private var urlCancellable: AnyCancellable?
+    private var selectedTabCancellables = Set<AnyCancellable>()
     private var selectedTabViewModelCancellable: AnyCancellable?
     private var isErrorViewVisibleCancellable: AnyCancellable?
 
@@ -82,6 +83,8 @@ final class BrowserTabViewController: NSViewController {
 
         if tabCollectionViewModel.selectedTabViewModel?.tab.tabType == .preferences {
             showPreferencesPage()
+        } else if tabCollectionViewModel.selectedTabViewModel?.tab.tabType == .bookmarks {
+            showBookmarksPage()
         } else if url != nil && url != URL.emptyPage {
             showWebView()
         } else {
@@ -92,6 +95,7 @@ final class BrowserTabViewController: NSViewController {
     private func showWebView() {
         self.homepageView.removeFromSuperview()
         removePreferencesPage()
+        removeBookmarksPage()
 
         if let webView = self.webView {
             addWebViewToViewHierarchy(webView)
@@ -101,6 +105,7 @@ final class BrowserTabViewController: NSViewController {
     private func showHomepage() {
         self.webView?.removeFromSuperview()
         removePreferencesPage()
+        removeBookmarksPage()
 
         view.addAndLayout(homepageView)
     }
@@ -190,22 +195,82 @@ final class BrowserTabViewController: NSViewController {
         tabCollectionViewModel.append(tab: tab, selected: selected)
     }
 
+    // MARK: - Browser Tabs
+
+    private func displayTab(at index: Int) {
+        // The tab switcher only displays displayable tab types.
+        let tabType = Tab.TabType.displayableTabTypes[index]
+        tabCollectionViewModel.selectedTabViewModel?.tab.set(tabType: tabType)
+
+        self.webView?.removeFromSuperview()
+        self.homepageView.removeFromSuperview()
+        removePreferencesPage()
+        removeBookmarksPage()
+
+        switch tabType {
+        case .bookmarks: showBookmarksPage()
+        case .preferences: showPreferencesPage()
+        case .standard: assertionFailure("Cannot select standard tab type via tab switcher")
+        }
+    }
+
     // MARK: - Preferences
 
-    private lazy var preferencesViewController = PreferencesSplitViewController.create()
+    private lazy var preferencesViewController: PreferencesSplitViewController = {
+        let viewController = PreferencesSplitViewController.create()
+        _ = viewController.view
+
+        viewController.tabSwitcherButton.displayBrowserTabButtons(for: .preferences)
+        viewController.tabSwitcherButton.selectionPublisher.sink { [weak self] index in
+            self?.displayTab(at: index)
+        }.store(in: &selectedTabCancellables)
+
+        return viewController
+    }()
 
     private func showPreferencesPage() {
         self.webView?.removeFromSuperview()
 
+        removeBookmarksPage()
         removePreferencesPage()
 
         self.addChild(preferencesViewController)
         view.addAndLayout(preferencesViewController.view)
+
+        bookmarksViewController.tabSwitcherButton.select(tabType: .preferences)
     }
 
     private func removePreferencesPage() {
         preferencesViewController.removeFromParent()
         preferencesViewController.view.removeFromSuperview()
+    }
+
+    // MARK: - Bookmarks
+
+    private lazy var bookmarksViewController: BookmarkManagementSplitViewController = {
+        let viewController = BookmarkManagementSplitViewController.create()
+        _ = viewController.view
+
+        viewController.tabSwitcherButton.displayBrowserTabButtons(for: .bookmarks)
+        viewController.tabSwitcherButton.selectionPublisher.sink { [weak self] index in
+            self?.displayTab(at: index)
+        }.store(in: &selectedTabCancellables)
+
+        return viewController
+    }()
+
+    private func showBookmarksPage() {
+        removeBookmarksPage()
+
+        self.addChild(bookmarksViewController)
+        view.addAndLayout(bookmarksViewController.view)
+
+        bookmarksViewController.tabSwitcherButton.select(tabType: .bookmarks)
+    }
+
+    private func removeBookmarksPage() {
+        bookmarksViewController.removeFromParent()
+        bookmarksViewController.view.removeFromSuperview()
     }
 
 }

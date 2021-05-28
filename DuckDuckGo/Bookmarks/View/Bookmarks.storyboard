@@ -1,12 +1,271 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<document type="com.apple.InterfaceBuilder3.Cocoa.Storyboard.XIB" version="3.0" toolsVersion="17701" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none" useAutolayout="YES">
+<document type="com.apple.InterfaceBuilder3.Cocoa.Storyboard.XIB" version="3.0" toolsVersion="18122" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none" useAutolayout="YES" initialViewController="cTg-Rr-Tjp">
     <dependencies>
         <deployment identifier="macosx"/>
-        <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="17701"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="18122"/>
         <capability name="Named colors" minToolsVersion="9.0"/>
         <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
     </dependencies>
     <scenes>
+        <!--Bookmarks-->
+        <scene sceneID="q4A-kX-Gcw">
+            <objects>
+                <splitViewController title="Bookmarks" storyboardIdentifier="BookmarkManagementSplitViewController" id="cTg-Rr-Tjp" customClass="BookmarkManagementSplitViewController" customModule="DuckDuckGo_Privacy_Browser" customModuleProvider="target" sceneMemberID="viewController">
+                    <splitViewItems>
+                        <splitViewItem holdingPriority="255" behavior="contentList" id="Gzb-7F-4E7"/>
+                        <splitViewItem id="Z59-qq-Yho"/>
+                    </splitViewItems>
+                    <splitView key="splitView" dividerStyle="thin" vertical="YES" id="2T2-t4-KZZ">
+                        <rect key="frame" x="0.0" y="0.0" width="618" height="351"/>
+                        <autoresizingMask key="autoresizingMask"/>
+                        <userDefinedRuntimeAttributes>
+                            <userDefinedRuntimeAttribute type="color" keyPath="dividerColor">
+                                <color key="value" name="quaternaryLabelColor" catalog="System" colorSpace="catalog"/>
+                            </userDefinedRuntimeAttribute>
+                        </userDefinedRuntimeAttributes>
+                        <connections>
+                            <outlet property="delegate" destination="cTg-Rr-Tjp" id="Ijo-yi-ebF"/>
+                        </connections>
+                    </splitView>
+                    <connections>
+                        <outlet property="splitView" destination="2T2-t4-KZZ" id="J8S-Ps-o2H"/>
+                        <segue destination="cOb-MX-4XZ" kind="relationship" relationship="splitItems" id="AOY-HD-7cC"/>
+                        <segue destination="nlv-9S-Ioa" kind="relationship" relationship="splitItems" id="A8B-Ny-wEZ"/>
+                    </connections>
+                </splitViewController>
+                <customObject id="5Sa-aZ-qTG" userLabel="First Responder" customClass="NSResponder" sceneMemberID="firstResponder"/>
+            </objects>
+            <point key="canvasLocation" x="-101" y="28.5"/>
+        </scene>
+        <!--Bookmark Management Sidebar View Controller-->
+        <scene sceneID="kSB-yp-ZWy">
+            <objects>
+                <viewController id="cOb-MX-4XZ" customClass="BookmarkManagementSidebarViewController" customModule="DuckDuckGo_Privacy_Browser" customModuleProvider="target" sceneMemberID="viewController">
+                    <view key="view" id="oQD-6b-AhT">
+                        <rect key="frame" x="0.0" y="0.0" width="250" height="499"/>
+                        <autoresizingMask key="autoresizingMask"/>
+                        <subviews>
+                            <scrollView borderType="none" autohidesScrollers="YES" horizontalLineScroll="17" horizontalPageScroll="10" verticalLineScroll="17" verticalPageScroll="10" hasHorizontalScroller="NO" usesPredominantAxisScrolling="NO" translatesAutoresizingMaskIntoConstraints="NO" id="SqK-FW-C0t">
+                                <rect key="frame" x="0.0" y="26" width="250" height="409"/>
+                                <clipView key="contentView" drawsBackground="NO" id="4R3-QO-s8T">
+                                    <rect key="frame" x="0.0" y="0.0" width="250" height="409"/>
+                                    <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+                                    <subviews>
+                                        <outlineView verticalHuggingPriority="750" allowsExpansionToolTips="YES" columnAutoresizingStyle="lastColumnOnly" columnResizing="NO" multipleSelection="NO" emptySelection="NO" autosaveColumns="NO" rowSizeStyle="automatic" usesAutomaticRowHeights="YES" viewBased="YES" indentationPerLevel="13" outlineTableColumn="Eur-dh-ZOY" id="dHL-py-g9k" customClass="BookmarksOutlineView" customModule="DuckDuckGo_Privacy_Browser" customModuleProvider="target">
+                                            <rect key="frame" x="0.0" y="0.0" width="250" height="409"/>
+                                            <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+                                            <size key="intercellSpacing" width="17" height="0.0"/>
+                                            <color key="backgroundColor" name="ClearColor"/>
+                                            <color key="gridColor" name="gridColor" catalog="System" colorSpace="catalog"/>
+                                            <tableColumns>
+                                                <tableColumn width="218" minWidth="120" maxWidth="1000" id="Eur-dh-ZOY">
+                                                    <tableHeaderCell key="headerCell" lineBreakMode="truncatingTail" borderStyle="border">
+                                                        <color key="textColor" name="headerTextColor" catalog="System" colorSpace="catalog"/>
+                                                        <color key="backgroundColor" name="headerColor" catalog="System" colorSpace="catalog"/>
+                                                    </tableHeaderCell>
+                                                    <textFieldCell key="dataCell" lineBreakMode="truncatingTail" selectable="YES" editable="YES" title="Text Cell" id="mHD-nb-jJ6">
+                                                        <font key="font" metaFont="system"/>
+                                                        <color key="textColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
+                                                        <color key="backgroundColor" name="controlBackgroundColor" catalog="System" colorSpace="catalog"/>
+                                                    </textFieldCell>
+                                                    <tableColumnResizingMask key="resizingMask" resizeWithTable="YES" userResizable="YES"/>
+                                                </tableColumn>
+                                            </tableColumns>
+                                        </outlineView>
+                                    </subviews>
+                                    <color key="backgroundColor" name="ClearColor"/>
+                                </clipView>
+                                <constraints>
+                                    <constraint firstAttribute="width" relation="greaterThanOrEqual" constant="250" id="US8-1O-ver"/>
+                                </constraints>
+                                <scroller key="horizontalScroller" hidden="YES" wantsLayer="YES" verticalHuggingPriority="750" horizontal="YES" id="d87-IE-xBD">
+                                    <rect key="frame" x="-100" y="-100" width="238" height="16"/>
+                                    <autoresizingMask key="autoresizingMask"/>
+                                </scroller>
+                                <scroller key="verticalScroller" hidden="YES" wantsLayer="YES" verticalHuggingPriority="750" horizontal="NO" id="5Se-gc-sGX">
+                                    <rect key="frame" x="231" y="29" width="16" height="332"/>
+                                    <autoresizingMask key="autoresizingMask"/>
+                                </scroller>
+                                <connections>
+                                    <outlet property="menu" destination="DJD-ds-MWN" id="JOq-D4-ugf"/>
+                                </connections>
+                            </scrollView>
+                            <popUpButton translatesAutoresizingMaskIntoConstraints="NO" id="oJB-Na-CzV">
+                                <rect key="frame" x="21" y="455" width="215" height="24"/>
+                                <popUpButtonCell key="cell" type="bevel" title="Bookmarks" bezelStyle="rounded" alignment="left" controlSize="large" lineBreakMode="truncatingTail" state="on" imageScaling="proportionallyDown" inset="2" selectedItem="Pxw-Jh-Zh0" id="Hfh-Gh-9qt">
+                                    <behavior key="behavior" lightByBackground="YES" lightByGray="YES"/>
+                                    <font key="font" size="20" name="SFProDisplay-Semibold"/>
+                                    <menu key="menu" id="VEx-gs-amO">
+                                        <items>
+                                            <menuItem title="Bookmarks" state="on" id="Pxw-Jh-Zh0"/>
+                                        </items>
+                                    </menu>
+                                </popUpButtonCell>
+                            </popUpButton>
+                        </subviews>
+                        <constraints>
+                            <constraint firstAttribute="trailing" secondItem="SqK-FW-C0t" secondAttribute="trailing" id="6Zz-Nc-u6E"/>
+                            <constraint firstAttribute="trailing" secondItem="oJB-Na-CzV" secondAttribute="trailing" constant="14" id="7d2-Rx-hjg"/>
+                            <constraint firstItem="SqK-FW-C0t" firstAttribute="top" secondItem="oJB-Na-CzV" secondAttribute="bottom" constant="20" id="Owf-hJ-AhH"/>
+                            <constraint firstItem="oJB-Na-CzV" firstAttribute="leading" secondItem="oQD-6b-AhT" secondAttribute="leading" constant="26" id="QuW-mr-Xwh"/>
+                            <constraint firstItem="SqK-FW-C0t" firstAttribute="leading" secondItem="oQD-6b-AhT" secondAttribute="leading" id="RiX-eQ-VCL"/>
+                            <constraint firstAttribute="bottom" secondItem="SqK-FW-C0t" secondAttribute="bottom" constant="26" id="Tc8-Ir-jea"/>
+                            <constraint firstItem="oJB-Na-CzV" firstAttribute="top" secondItem="oQD-6b-AhT" secondAttribute="top" constant="20" id="vPa-lb-Lo1"/>
+                        </constraints>
+                    </view>
+                    <connections>
+                        <outlet property="outlineView" destination="dHL-py-g9k" id="api-Ie-inb"/>
+                        <outlet property="tabSwitcherButton" destination="oJB-Na-CzV" id="bTP-2t-WcW"/>
+                    </connections>
+                </viewController>
+                <customObject id="c3J-Is-VRx" userLabel="First Responder" customClass="NSResponder" sceneMemberID="firstResponder"/>
+                <menu id="DJD-ds-MWN">
+                    <connections>
+                        <outlet property="delegate" destination="cOb-MX-4XZ" id="KGh-uM-H1x"/>
+                    </connections>
+                </menu>
+            </objects>
+            <point key="canvasLocation" x="522" y="-274.5"/>
+        </scene>
+        <!--Bookmark Management Detail View Controller-->
+        <scene sceneID="6Fs-Ad-ECj">
+            <objects>
+                <viewController id="nlv-9S-Ioa" customClass="BookmarkManagementDetailViewController" customModule="DuckDuckGo_Privacy_Browser" customModuleProvider="target" sceneMemberID="viewController">
+                    <view key="view" id="0G1-O6-fPI">
+                        <rect key="frame" x="0.0" y="0.0" width="676" height="155"/>
+                        <autoresizingMask key="autoresizingMask"/>
+                        <subviews>
+                            <box verticalHuggingPriority="750" boxType="separator" translatesAutoresizingMaskIntoConstraints="NO" id="fLo-NU-bGv">
+                                <rect key="frame" x="32" y="80" width="612" height="5"/>
+                            </box>
+                            <scrollView borderType="none" autohidesScrollers="YES" horizontalLineScroll="17" horizontalPageScroll="10" verticalLineScroll="17" verticalPageScroll="10" usesPredominantAxisScrolling="NO" translatesAutoresizingMaskIntoConstraints="NO" id="mTh-HU-7C9">
+                                <rect key="frame" x="22" y="0.0" width="632" height="82"/>
+                                <clipView key="contentView" drawsBackground="NO" id="Cld-aq-MYg">
+                                    <rect key="frame" x="0.0" y="0.0" width="632" height="82"/>
+                                    <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+                                    <subviews>
+                                        <tableView verticalHuggingPriority="750" allowsExpansionToolTips="YES" tableStyle="plain" columnReordering="NO" columnResizing="NO" multipleSelection="NO" autosaveColumns="NO" rowSizeStyle="automatic" usesAutomaticRowHeights="YES" viewBased="YES" id="b59-XH-JSp">
+                                            <rect key="frame" x="0.0" y="0.0" width="632" height="26"/>
+                                            <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+                                            <color key="backgroundColor" name="ClearColor"/>
+                                            <color key="gridColor" name="gridColor" catalog="System" colorSpace="catalog"/>
+                                            <tableColumns>
+                                                <tableColumn width="632" minWidth="40" maxWidth="3000" id="pHc-7X-LDD">
+                                                    <tableHeaderCell key="headerCell" lineBreakMode="truncatingTail" borderStyle="border">
+                                                        <color key="textColor" name="headerTextColor" catalog="System" colorSpace="catalog"/>
+                                                        <color key="backgroundColor" name="headerColor" catalog="System" colorSpace="catalog"/>
+                                                    </tableHeaderCell>
+                                                    <textFieldCell key="dataCell" lineBreakMode="truncatingTail" selectable="YES" editable="YES" title="Text Cell" id="nuV-mZ-YqP">
+                                                        <font key="font" metaFont="system"/>
+                                                        <color key="textColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
+                                                        <color key="backgroundColor" name="controlBackgroundColor" catalog="System" colorSpace="catalog"/>
+                                                    </textFieldCell>
+                                                    <tableColumnResizingMask key="resizingMask" resizeWithTable="YES"/>
+                                                </tableColumn>
+                                            </tableColumns>
+                                            <connections>
+                                                <action selector="handleClick:" target="nlv-9S-Ioa" id="qSg-4S-bnN"/>
+                                                <outlet property="dataSource" destination="nlv-9S-Ioa" id="ahR-2l-ec7"/>
+                                                <outlet property="delegate" destination="nlv-9S-Ioa" id="ESF-kr-3T5"/>
+                                            </connections>
+                                        </tableView>
+                                    </subviews>
+                                    <color key="backgroundColor" name="ClearColor"/>
+                                </clipView>
+                                <edgeInsets key="contentInsets" left="0.0" right="0.0" top="28" bottom="28"/>
+                                <scroller key="horizontalScroller" hidden="YES" wantsLayer="YES" verticalHuggingPriority="750" horizontal="YES" id="Q9m-pm-N39">
+                                    <rect key="frame" x="0.0" y="38" width="632" height="16"/>
+                                    <autoresizingMask key="autoresizingMask"/>
+                                </scroller>
+                                <scroller key="verticalScroller" hidden="YES" wantsLayer="YES" verticalHuggingPriority="750" horizontal="NO" id="NnO-QN-vHX">
+                                    <rect key="frame" x="224" y="17" width="15" height="102"/>
+                                    <autoresizingMask key="autoresizingMask"/>
+                                </scroller>
+                                <connections>
+                                    <outlet property="menu" destination="f4d-eZ-YLo" id="Rgr-Lz-a1f"/>
+                                </connections>
+                            </scrollView>
+                            <button verticalHuggingPriority="750" imageHugsTitle="YES" translatesAutoresizingMaskIntoConstraints="NO" id="nQu-I8-OqK" customClass="MouseOverButton" customModule="DuckDuckGo_Privacy_Browser" customModuleProvider="target">
+                                <rect key="frame" x="168" y="107" width="110" height="24"/>
+                                <constraints>
+                                    <constraint firstAttribute="width" constant="110" id="fCv-XV-yrO"/>
+                                    <constraint firstAttribute="height" constant="24" id="ys9-mF-qNi"/>
+                                </constraints>
+                                <buttonCell key="cell" type="square" title="  New Folder" bezelStyle="shadowlessSquare" image="AddFolder" imagePosition="leading" alignment="center" inset="2" id="luj-VO-HpO">
+                                    <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
+                                    <font key="font" metaFont="system"/>
+                                </buttonCell>
+                                <color key="contentTintColor" name="ButtonColor"/>
+                                <userDefinedRuntimeAttributes>
+                                    <userDefinedRuntimeAttribute type="color" keyPath="mouseOverColor">
+                                        <color key="value" name="ButtonMouseOverColor"/>
+                                    </userDefinedRuntimeAttribute>
+                                    <userDefinedRuntimeAttribute type="color" keyPath="mouseDownColor">
+                                        <color key="value" name="ButtonMouseDownColor"/>
+                                    </userDefinedRuntimeAttribute>
+                                    <userDefinedRuntimeAttribute type="number" keyPath="cornerRadius">
+                                        <real key="value" value="4"/>
+                                    </userDefinedRuntimeAttribute>
+                                </userDefinedRuntimeAttributes>
+                                <connections>
+                                    <action selector="presentAddFolderModal:" target="nlv-9S-Ioa" id="Dv0-j9-4ha"/>
+                                </connections>
+                            </button>
+                            <button verticalHuggingPriority="750" imageHugsTitle="YES" translatesAutoresizingMaskIntoConstraints="NO" id="96h-Ck-yux" customClass="MouseOverButton" customModule="DuckDuckGo_Privacy_Browser" customModuleProvider="target">
+                                <rect key="frame" x="22" y="107" width="130" height="24"/>
+                                <constraints>
+                                    <constraint firstAttribute="height" constant="24" id="CKf-3f-aSt"/>
+                                    <constraint firstAttribute="width" constant="130" id="hTU-md-bGM"/>
+                                </constraints>
+                                <buttonCell key="cell" type="square" title="  New Bookmark" bezelStyle="shadowlessSquare" image="AddBookmark" imagePosition="leading" alignment="center" inset="2" id="hNH-Va-fKg">
+                                    <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
+                                    <font key="font" metaFont="system"/>
+                                </buttonCell>
+                                <color key="contentTintColor" name="ButtonColor"/>
+                                <userDefinedRuntimeAttributes>
+                                    <userDefinedRuntimeAttribute type="color" keyPath="mouseOverColor">
+                                        <color key="value" name="ButtonMouseOverColor"/>
+                                    </userDefinedRuntimeAttribute>
+                                    <userDefinedRuntimeAttribute type="color" keyPath="mouseDownColor">
+                                        <color key="value" name="ButtonMouseDownColor"/>
+                                    </userDefinedRuntimeAttribute>
+                                    <userDefinedRuntimeAttribute type="number" keyPath="cornerRadius">
+                                        <real key="value" value="4"/>
+                                    </userDefinedRuntimeAttribute>
+                                </userDefinedRuntimeAttributes>
+                                <connections>
+                                    <action selector="presentAddBookmarkModal:" target="nlv-9S-Ioa" id="diA-I5-6yl"/>
+                                </connections>
+                            </button>
+                        </subviews>
+                        <constraints>
+                            <constraint firstItem="96h-Ck-yux" firstAttribute="leading" secondItem="0G1-O6-fPI" secondAttribute="leading" constant="22" id="0ct-US-dZ7"/>
+                            <constraint firstAttribute="trailing" secondItem="mTh-HU-7C9" secondAttribute="trailing" constant="22" id="72i-pd-gJ1"/>
+                            <constraint firstItem="fLo-NU-bGv" firstAttribute="top" secondItem="96h-Ck-yux" secondAttribute="bottom" constant="24" id="9cg-ih-8W3"/>
+                            <constraint firstItem="mTh-HU-7C9" firstAttribute="top" secondItem="fLo-NU-bGv" secondAttribute="bottom" id="Nof-ez-kWz"/>
+                            <constraint firstAttribute="bottom" secondItem="mTh-HU-7C9" secondAttribute="bottom" id="ZSL-bc-yTD"/>
+                            <constraint firstAttribute="trailing" relation="greaterThanOrEqual" secondItem="nQu-I8-OqK" secondAttribute="trailing" constant="20" id="eYV-TZ-5bu"/>
+                            <constraint firstAttribute="trailing" secondItem="fLo-NU-bGv" secondAttribute="trailing" constant="32" id="ep6-4T-swC"/>
+                            <constraint firstItem="nQu-I8-OqK" firstAttribute="leading" secondItem="96h-Ck-yux" secondAttribute="trailing" constant="16" id="hKM-YS-17O"/>
+                            <constraint firstItem="nQu-I8-OqK" firstAttribute="centerY" secondItem="96h-Ck-yux" secondAttribute="centerY" id="qi0-9n-sUF"/>
+                            <constraint firstItem="fLo-NU-bGv" firstAttribute="leading" secondItem="0G1-O6-fPI" secondAttribute="leading" constant="32" id="rWx-rp-2nh"/>
+                            <constraint firstItem="96h-Ck-yux" firstAttribute="top" secondItem="0G1-O6-fPI" secondAttribute="top" constant="24" id="rg7-1o-hhd"/>
+                            <constraint firstItem="mTh-HU-7C9" firstAttribute="leading" secondItem="0G1-O6-fPI" secondAttribute="leading" constant="22" id="rza-vo-ne6"/>
+                        </constraints>
+                    </view>
+                    <connections>
+                        <outlet property="tableView" destination="b59-XH-JSp" id="PpV-fJ-Dcg"/>
+                    </connections>
+                </viewController>
+                <customObject id="XlR-OF-11b" userLabel="First Responder" customClass="NSResponder" sceneMemberID="firstResponder"/>
+                <menu id="f4d-eZ-YLo">
+                    <connections>
+                        <outlet property="delegate" destination="nlv-9S-Ioa" id="Ine-5B-iJl"/>
+                    </connections>
+                </menu>
+            </objects>
+            <point key="canvasLocation" x="731" y="173.5"/>
+        </scene>
         <!--Bookmark Popover View Controller-->
         <scene sceneID="3pH-Ju-wLu">
             <objects>
@@ -103,13 +362,398 @@ DQ
                 </viewController>
                 <customObject id="AD4-gD-7Lp" userLabel="First Responder" customClass="NSResponder" sceneMemberID="firstResponder"/>
             </objects>
-            <point key="canvasLocation" x="-260" y="385"/>
+            <point key="canvasLocation" x="-588" y="-47"/>
+        </scene>
+        <!--Add Bookmark Modal View Controller-->
+        <scene sceneID="D4i-le-BSY">
+            <objects>
+                <viewController storyboardIdentifier="AddBookmarkModalViewController" id="iFE-Lt-gjz" customClass="AddBookmarkModalViewController" customModule="DuckDuckGo_Privacy_Browser" customModuleProvider="target" sceneMemberID="viewController">
+                    <view key="view" id="LEv-d8-u9h">
+                        <rect key="frame" x="0.0" y="0.0" width="437" height="164"/>
+                        <autoresizingMask key="autoresizingMask"/>
+                        <subviews>
+                            <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="oOL-3u-yUF">
+                                <rect key="frame" x="18" y="128" width="100" height="16"/>
+                                <textFieldCell key="cell" lineBreakMode="clipping" title="New Bookmark" id="xc7-ad-mGJ">
+                                    <font key="font" metaFont="systemSemibold" size="13"/>
+                                    <color key="textColor" name="labelColor" catalog="System" colorSpace="catalog"/>
+                                    <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
+                                </textFieldCell>
+                            </textField>
+                            <button verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="dgc-zb-fvL">
+                                <rect key="frame" x="365" y="13" width="59" height="32"/>
+                                <buttonCell key="cell" type="push" title="Add" bezelStyle="rounded" alignment="center" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="ZPL-TO-ALm">
+                                    <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
+                                    <font key="font" metaFont="system"/>
+                                    <string key="keyEquivalent" base64-UTF8="YES">
+DQ
+</string>
+                                </buttonCell>
+                                <connections>
+                                    <action selector="addBookmark:" target="iFE-Lt-gjz" id="0u5-OG-MgT"/>
+                                </connections>
+                            </button>
+                            <button verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="HgR-2u-c44">
+                                <rect key="frame" x="291" y="13" width="76" height="32"/>
+                                <buttonCell key="cell" type="push" title="Cancel" bezelStyle="rounded" alignment="center" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="9NB-Ry-DvI">
+                                    <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
+                                    <font key="font" metaFont="system"/>
+                                    <string key="keyEquivalent" base64-UTF8="YES">
+Gw
+</string>
+                                </buttonCell>
+                                <connections>
+                                    <action selector="cancel:" target="iFE-Lt-gjz" id="sba-5b-PVC"/>
+                                </connections>
+                            </button>
+                            <textField verticalHuggingPriority="750" horizontalCompressionResistancePriority="1000" translatesAutoresizingMaskIntoConstraints="NO" id="Rch-BQ-Djd" userLabel="Address Text Field">
+                                <rect key="frame" x="90" y="60" width="327" height="22"/>
+                                <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" selectable="YES" editable="YES" sendsActionOnEndEditing="YES" borderStyle="bezel" bezelStyle="round" id="TxQ-jc-7Zj">
+                                    <font key="font" metaFont="system"/>
+                                    <color key="textColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
+                                    <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
+                                </textFieldCell>
+                                <connections>
+                                    <outlet property="delegate" destination="iFE-Lt-gjz" id="TER-qt-SeX"/>
+                                </connections>
+                            </textField>
+                            <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="ryO-Do-ov5">
+                                <rect key="frame" x="18" y="63" width="58" height="16"/>
+                                <textFieldCell key="cell" lineBreakMode="clipping" title="Address:" id="py7-ho-J5N">
+                                    <font key="font" metaFont="system"/>
+                                    <color key="textColor" name="labelColor" catalog="System" colorSpace="catalog"/>
+                                    <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
+                                </textFieldCell>
+                            </textField>
+                            <textField verticalHuggingPriority="750" horizontalCompressionResistancePriority="1000" translatesAutoresizingMaskIntoConstraints="NO" id="wUW-im-K6u">
+                                <rect key="frame" x="90" y="90" width="327" height="22"/>
+                                <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" selectable="YES" editable="YES" sendsActionOnEndEditing="YES" borderStyle="bezel" bezelStyle="round" id="faG-U3-7h9">
+                                    <font key="font" metaFont="system"/>
+                                    <color key="textColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
+                                    <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
+                                </textFieldCell>
+                                <connections>
+                                    <outlet property="delegate" destination="iFE-Lt-gjz" id="bag-UZ-NsA"/>
+                                </connections>
+                            </textField>
+                            <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="Ifb-uf-I6q">
+                                <rect key="frame" x="18" y="93" width="35" height="16"/>
+                                <textFieldCell key="cell" lineBreakMode="clipping" title="Title:" id="GDn-BD-1AO">
+                                    <font key="font" metaFont="system"/>
+                                    <color key="textColor" name="labelColor" catalog="System" colorSpace="catalog"/>
+                                    <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
+                                </textFieldCell>
+                            </textField>
+                        </subviews>
+                        <constraints>
+                            <constraint firstItem="HgR-2u-c44" firstAttribute="centerY" secondItem="dgc-zb-fvL" secondAttribute="centerY" id="0wg-lL-61Z"/>
+                            <constraint firstItem="ryO-Do-ov5" firstAttribute="centerY" secondItem="Rch-BQ-Djd" secondAttribute="centerY" id="1rv-dq-hga"/>
+                            <constraint firstAttribute="trailing" secondItem="Rch-BQ-Djd" secondAttribute="trailing" constant="20" symbolic="YES" id="7pU-2z-ysX"/>
+                            <constraint firstItem="dgc-zb-fvL" firstAttribute="leading" secondItem="HgR-2u-c44" secondAttribute="trailing" constant="12" symbolic="YES" id="8hF-BY-iRb"/>
+                            <constraint firstItem="wUW-im-K6u" firstAttribute="width" secondItem="Rch-BQ-Djd" secondAttribute="width" id="Bya-Ux-Yb9"/>
+                            <constraint firstItem="Rch-BQ-Djd" firstAttribute="leading" secondItem="ryO-Do-ov5" secondAttribute="trailing" constant="16" id="Dk2-LI-Jl6"/>
+                            <constraint firstItem="dgc-zb-fvL" firstAttribute="top" secondItem="Rch-BQ-Djd" secondAttribute="bottom" constant="20" symbolic="YES" id="EuW-jN-PZi"/>
+                            <constraint firstItem="oOL-3u-yUF" firstAttribute="top" secondItem="LEv-d8-u9h" secondAttribute="top" constant="20" symbolic="YES" id="Fok-Ne-M6X"/>
+                            <constraint firstAttribute="trailing" secondItem="wUW-im-K6u" secondAttribute="trailing" constant="20" symbolic="YES" id="Gj3-Az-SE1"/>
+                            <constraint firstItem="Rch-BQ-Djd" firstAttribute="top" secondItem="wUW-im-K6u" secondAttribute="bottom" constant="8" symbolic="YES" id="NVp-N2-ngy"/>
+                            <constraint firstItem="Ifb-uf-I6q" firstAttribute="leading" secondItem="LEv-d8-u9h" secondAttribute="leading" constant="20" symbolic="YES" id="WcS-7c-3WQ"/>
+                            <constraint firstAttribute="bottom" secondItem="dgc-zb-fvL" secondAttribute="bottom" constant="20" symbolic="YES" id="fcW-7B-uaZ"/>
+                            <constraint firstAttribute="trailing" secondItem="dgc-zb-fvL" secondAttribute="trailing" constant="20" symbolic="YES" id="loJ-nH-0pJ"/>
+                            <constraint firstItem="ryO-Do-ov5" firstAttribute="leading" secondItem="LEv-d8-u9h" secondAttribute="leading" constant="20" symbolic="YES" id="nvf-HF-xuv"/>
+                            <constraint firstItem="Ifb-uf-I6q" firstAttribute="centerY" secondItem="wUW-im-K6u" secondAttribute="centerY" id="pqU-gh-s0q"/>
+                            <constraint firstItem="oOL-3u-yUF" firstAttribute="leading" secondItem="LEv-d8-u9h" secondAttribute="leading" constant="20" symbolic="YES" id="s1y-9w-7cO"/>
+                            <constraint firstItem="wUW-im-K6u" firstAttribute="top" secondItem="oOL-3u-yUF" secondAttribute="bottom" constant="16" id="tbE-fJ-wOQ"/>
+                        </constraints>
+                    </view>
+                    <connections>
+                        <outlet property="addButton" destination="dgc-zb-fvL" id="61T-p5-zDv"/>
+                        <outlet property="titleTextField" destination="wUW-im-K6u" id="anT-Wa-vDH"/>
+                        <outlet property="urlTextField" destination="Rch-BQ-Djd" id="9zy-3H-EVK"/>
+                    </connections>
+                </viewController>
+                <customObject id="omR-6r-6qA" userLabel="First Responder" customClass="NSResponder" sceneMemberID="firstResponder"/>
+            </objects>
+            <point key="canvasLocation" x="-521.5" y="433"/>
+        </scene>
+        <!--Add Folder Modal View Controller-->
+        <scene sceneID="Ggh-5g-8vh">
+            <objects>
+                <viewController storyboardIdentifier="AddFolderModalViewController" id="6vl-fZ-16D" customClass="AddFolderModalViewController" customModule="DuckDuckGo_Privacy_Browser" customModuleProvider="target" sceneMemberID="viewController">
+                    <view key="view" id="zwT-eh-oPu">
+                        <rect key="frame" x="0.0" y="0.0" width="450" height="131"/>
+                        <autoresizingMask key="autoresizingMask"/>
+                        <subviews>
+                            <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="5aD-5k-Z0e">
+                                <rect key="frame" x="18" y="95" width="76" height="16"/>
+                                <textFieldCell key="cell" lineBreakMode="clipping" title="New Folder" id="0xR-b3-mfS">
+                                    <font key="font" metaFont="systemSemibold" size="13"/>
+                                    <color key="textColor" name="labelColor" catalog="System" colorSpace="catalog"/>
+                                    <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
+                                </textFieldCell>
+                            </textField>
+                            <button verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="XHD-7s-IQg">
+                                <rect key="frame" x="378" y="13" width="59" height="32"/>
+                                <buttonCell key="cell" type="push" title="Add" bezelStyle="rounded" alignment="center" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="0CD-Rj-MZj">
+                                    <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
+                                    <font key="font" metaFont="system"/>
+                                    <string key="keyEquivalent" base64-UTF8="YES">
+DQ
+</string>
+                                </buttonCell>
+                                <connections>
+                                    <action selector="addFolder:" target="6vl-fZ-16D" id="TfI-Us-UPV"/>
+                                </connections>
+                            </button>
+                            <button verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="NPt-pY-c7a">
+                                <rect key="frame" x="304" y="13" width="76" height="32"/>
+                                <buttonCell key="cell" type="push" title="Cancel" bezelStyle="rounded" alignment="center" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="DRk-3p-Es5">
+                                    <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
+                                    <font key="font" metaFont="system"/>
+                                    <string key="keyEquivalent" base64-UTF8="YES">
+Gw
+</string>
+                                </buttonCell>
+                                <connections>
+                                    <action selector="cancel:" target="6vl-fZ-16D" id="QjB-a8-G7w"/>
+                                </connections>
+                            </button>
+                            <textField verticalHuggingPriority="750" horizontalCompressionResistancePriority="1000" translatesAutoresizingMaskIntoConstraints="NO" id="S5h-FN-E1I" userLabel="Address Text Field">
+                                <rect key="frame" x="76" y="60" width="354" height="22"/>
+                                <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" selectable="YES" editable="YES" sendsActionOnEndEditing="YES" borderStyle="bezel" bezelStyle="round" id="LYP-a3-C7P">
+                                    <font key="font" metaFont="system"/>
+                                    <color key="textColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
+                                    <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
+                                </textFieldCell>
+                                <connections>
+                                    <outlet property="delegate" destination="6vl-fZ-16D" id="IAT-Vo-RCQ"/>
+                                </connections>
+                            </textField>
+                            <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="ydi-WQ-mDx">
+                                <rect key="frame" x="18" y="63" width="44" height="16"/>
+                                <textFieldCell key="cell" lineBreakMode="clipping" title="Name:" id="Rp2-5r-NVK">
+                                    <font key="font" metaFont="system"/>
+                                    <color key="textColor" name="labelColor" catalog="System" colorSpace="catalog"/>
+                                    <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
+                                </textFieldCell>
+                            </textField>
+                        </subviews>
+                        <constraints>
+                            <constraint firstAttribute="bottom" secondItem="XHD-7s-IQg" secondAttribute="bottom" constant="20" symbolic="YES" id="1Sq-2U-u3s"/>
+                            <constraint firstItem="5aD-5k-Z0e" firstAttribute="leading" secondItem="zwT-eh-oPu" secondAttribute="leading" constant="20" symbolic="YES" id="Ag5-c5-15g"/>
+                            <constraint firstItem="S5h-FN-E1I" firstAttribute="leading" secondItem="ydi-WQ-mDx" secondAttribute="trailing" constant="16" id="Agm-bu-BuY"/>
+                            <constraint firstAttribute="trailing" secondItem="XHD-7s-IQg" secondAttribute="trailing" constant="20" symbolic="YES" id="As7-m2-wfc"/>
+                            <constraint firstItem="XHD-7s-IQg" firstAttribute="top" secondItem="S5h-FN-E1I" secondAttribute="bottom" constant="20" symbolic="YES" id="E9U-j4-KGq"/>
+                            <constraint firstItem="ydi-WQ-mDx" firstAttribute="centerY" secondItem="S5h-FN-E1I" secondAttribute="centerY" id="Ig6-gM-yo2"/>
+                            <constraint firstItem="ydi-WQ-mDx" firstAttribute="top" secondItem="5aD-5k-Z0e" secondAttribute="bottom" constant="16" id="Tc0-bZ-inP"/>
+                            <constraint firstAttribute="trailing" secondItem="S5h-FN-E1I" secondAttribute="trailing" constant="20" symbolic="YES" id="Z4V-dR-Yoy"/>
+                            <constraint firstItem="XHD-7s-IQg" firstAttribute="leading" secondItem="NPt-pY-c7a" secondAttribute="trailing" constant="12" symbolic="YES" id="dAT-Mw-JrL"/>
+                            <constraint firstItem="NPt-pY-c7a" firstAttribute="centerY" secondItem="XHD-7s-IQg" secondAttribute="centerY" id="mV0-in-hOg"/>
+                            <constraint firstItem="5aD-5k-Z0e" firstAttribute="top" secondItem="zwT-eh-oPu" secondAttribute="top" constant="20" symbolic="YES" id="nNe-88-quC"/>
+                            <constraint firstItem="ydi-WQ-mDx" firstAttribute="leading" secondItem="zwT-eh-oPu" secondAttribute="leading" constant="20" symbolic="YES" id="v1v-bL-nBa"/>
+                        </constraints>
+                    </view>
+                    <connections>
+                        <outlet property="addButton" destination="XHD-7s-IQg" id="p91-Pf-6vL"/>
+                        <outlet property="folderNameTextField" destination="S5h-FN-E1I" id="NyW-Q9-Pz8"/>
+                        <outlet property="titleTextField" destination="5aD-5k-Z0e" id="kfQ-Eb-0DY"/>
+                    </connections>
+                </viewController>
+                <customObject id="zAL-EC-rqe" userLabel="First Responder" customClass="NSResponder" sceneMemberID="firstResponder"/>
+            </objects>
+            <point key="canvasLocation" x="-513" y="668"/>
+        </scene>
+        <!--Bookmark List View Controller-->
+        <scene sceneID="zFa-lt-gPi">
+            <objects>
+                <viewController storyboardIdentifier="BookmarkListViewController" id="Scx-gG-IP9" customClass="BookmarkListViewController" customModule="DuckDuckGo_Privacy_Browser" customModuleProvider="target" sceneMemberID="viewController">
+                    <view key="view" id="xb9-2G-g28">
+                        <rect key="frame" x="0.0" y="0.0" width="357" height="489"/>
+                        <autoresizingMask key="autoresizingMask"/>
+                        <subviews>
+                            <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="TJx-89-ls4">
+                                <rect key="frame" x="13" y="457" width="89" height="20"/>
+                                <textFieldCell key="cell" lineBreakMode="clipping" title="Bookmarks" id="HqW-8W-PJu">
+                                    <font key="font" size="17" name="SFProDisplay-Semibold"/>
+                                    <color key="textColor" name="labelColor" catalog="System" colorSpace="catalog"/>
+                                    <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
+                                </textFieldCell>
+                            </textField>
+                            <box verticalHuggingPriority="750" boxType="separator" translatesAutoresizingMaskIntoConstraints="NO" id="Wgx-ZT-vUV" userLabel="Divider">
+                                <rect key="frame" x="0.0" y="442" width="357" height="5"/>
+                            </box>
+                            <button translatesAutoresizingMaskIntoConstraints="NO" id="qBa-rT-8sF" userLabel="New Bookmark Button" customClass="MouseOverButton" customModule="DuckDuckGo_Privacy_Browser" customModuleProvider="target">
+                                <rect key="frame" x="245" y="455" width="24" height="24"/>
+                                <constraints>
+                                    <constraint firstAttribute="height" constant="24" id="9mk-iy-mXT"/>
+                                    <constraint firstAttribute="width" constant="24" id="kiL-Lk-pWq"/>
+                                </constraints>
+                                <buttonCell key="cell" type="square" bezelStyle="shadowlessSquare" image="AddBookmark" imagePosition="only" alignment="center" imageScaling="proportionallyDown" inset="2" id="KBc-mO-g1J">
+                                    <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
+                                    <font key="font" metaFont="system"/>
+                                </buttonCell>
+                                <color key="contentTintColor" name="ButtonColor"/>
+                                <userDefinedRuntimeAttributes>
+                                    <userDefinedRuntimeAttribute type="color" keyPath="mouseOverColor">
+                                        <color key="value" name="ButtonMouseOverColor"/>
+                                    </userDefinedRuntimeAttribute>
+                                    <userDefinedRuntimeAttribute type="color" keyPath="mouseDownColor">
+                                        <color key="value" name="ButtonMouseDownColor"/>
+                                    </userDefinedRuntimeAttribute>
+                                    <userDefinedRuntimeAttribute type="number" keyPath="cornerRadius">
+                                        <real key="value" value="4"/>
+                                    </userDefinedRuntimeAttribute>
+                                </userDefinedRuntimeAttributes>
+                                <connections>
+                                    <action selector="newBookmarkButtonClicked:" target="Scx-gG-IP9" id="65N-1I-jOo"/>
+                                </connections>
+                            </button>
+                            <button translatesAutoresizingMaskIntoConstraints="NO" id="xMD-lr-ArK" userLabel="New Folder Button" customClass="MouseOverButton" customModule="DuckDuckGo_Privacy_Browser" customModuleProvider="target">
+                                <rect key="frame" x="279" y="455" width="24" height="24"/>
+                                <constraints>
+                                    <constraint firstAttribute="height" constant="24" id="BWu-UC-Ow7"/>
+                                    <constraint firstAttribute="width" constant="24" id="wml-gt-OK1"/>
+                                </constraints>
+                                <buttonCell key="cell" type="square" bezelStyle="shadowlessSquare" image="AddFolder" imagePosition="only" alignment="center" imageScaling="proportionallyDown" inset="2" id="EkA-sE-QuN">
+                                    <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
+                                    <font key="font" metaFont="system"/>
+                                </buttonCell>
+                                <color key="contentTintColor" name="ButtonColor"/>
+                                <userDefinedRuntimeAttributes>
+                                    <userDefinedRuntimeAttribute type="color" keyPath="mouseOverColor">
+                                        <color key="value" name="ButtonMouseOverColor"/>
+                                    </userDefinedRuntimeAttribute>
+                                    <userDefinedRuntimeAttribute type="color" keyPath="mouseDownColor">
+                                        <color key="value" name="ButtonMouseDownColor"/>
+                                    </userDefinedRuntimeAttribute>
+                                    <userDefinedRuntimeAttribute type="number" keyPath="cornerRadius">
+                                        <real key="value" value="4"/>
+                                    </userDefinedRuntimeAttribute>
+                                </userDefinedRuntimeAttributes>
+                                <connections>
+                                    <action selector="newFolderButtonClicked:" target="Scx-gG-IP9" id="Pk2-ov-PP7"/>
+                                </connections>
+                            </button>
+                            <button translatesAutoresizingMaskIntoConstraints="NO" id="pTk-xE-OqR" userLabel="Show Management UI Button" customClass="MouseOverButton" customModule="DuckDuckGo_Privacy_Browser" customModuleProvider="target">
+                                <rect key="frame" x="313" y="455" width="24" height="24"/>
+                                <constraints>
+                                    <constraint firstAttribute="width" constant="24" id="cBD-Aw-Rsl"/>
+                                    <constraint firstAttribute="height" constant="24" id="rgG-V6-CDn"/>
+                                </constraints>
+                                <buttonCell key="cell" type="square" bezelStyle="shadowlessSquare" image="Expand" imagePosition="only" alignment="center" imageScaling="proportionallyDown" inset="2" id="jdG-cU-IZR">
+                                    <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
+                                    <font key="font" metaFont="system"/>
+                                </buttonCell>
+                                <color key="contentTintColor" name="ButtonColor"/>
+                                <userDefinedRuntimeAttributes>
+                                    <userDefinedRuntimeAttribute type="color" keyPath="mouseOverColor">
+                                        <color key="value" name="ButtonMouseOverColor"/>
+                                    </userDefinedRuntimeAttribute>
+                                    <userDefinedRuntimeAttribute type="color" keyPath="mouseDownColor">
+                                        <color key="value" name="ButtonMouseDownColor"/>
+                                    </userDefinedRuntimeAttribute>
+                                    <userDefinedRuntimeAttribute type="number" keyPath="cornerRadius">
+                                        <real key="value" value="4"/>
+                                    </userDefinedRuntimeAttribute>
+                                </userDefinedRuntimeAttributes>
+                                <connections>
+                                    <action selector="openManagementInterface:" target="Scx-gG-IP9" id="kQf-pI-TID"/>
+                                </connections>
+                            </button>
+                            <scrollView borderType="none" autohidesScrollers="YES" horizontalLineScroll="24" horizontalPageScroll="10" verticalLineScroll="24" verticalPageScroll="10" usesPredominantAxisScrolling="NO" translatesAutoresizingMaskIntoConstraints="NO" id="sfH-at-DQe" userLabel="Bookmarks Outline View">
+                                <rect key="frame" x="0.0" y="0.0" width="357" height="444"/>
+                                <clipView key="contentView" drawsBackground="NO" id="jhZ-VR-onf">
+                                    <rect key="frame" x="0.0" y="0.0" width="357" height="444"/>
+                                    <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+                                    <subviews>
+                                        <outlineView verticalHuggingPriority="750" allowsExpansionToolTips="YES" columnAutoresizingStyle="none" columnResizing="NO" multipleSelection="NO" autosaveColumns="NO" rowHeight="24" usesAutomaticRowHeights="YES" viewBased="YES" indentationPerLevel="13" outlineTableColumn="UgF-sw-0QC" id="66p-cd-DbA" customClass="BookmarksOutlineView" customModule="DuckDuckGo_Privacy_Browser" customModuleProvider="target">
+                                            <rect key="frame" x="0.0" y="0.0" width="357" height="444"/>
+                                            <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+                                            <size key="intercellSpacing" width="17" height="0.0"/>
+                                            <color key="backgroundColor" name="ClearColor"/>
+                                            <color key="gridColor" name="ClearColor"/>
+                                            <tableColumns>
+                                                <tableColumn width="315" minWidth="40" maxWidth="1000" id="UgF-sw-0QC">
+                                                    <tableHeaderCell key="headerCell" lineBreakMode="truncatingTail" borderStyle="border">
+                                                        <color key="textColor" name="headerTextColor" catalog="System" colorSpace="catalog"/>
+                                                        <color key="backgroundColor" name="headerColor" catalog="System" colorSpace="catalog"/>
+                                                    </tableHeaderCell>
+                                                    <textFieldCell key="dataCell" lineBreakMode="truncatingTail" selectable="YES" editable="YES" title="Text Cell" id="8Ea-Di-Wdb">
+                                                        <font key="font" metaFont="system"/>
+                                                        <color key="textColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
+                                                        <color key="backgroundColor" name="windowBackgroundColor" catalog="System" colorSpace="catalog"/>
+                                                    </textFieldCell>
+                                                    <tableColumnResizingMask key="resizingMask" resizeWithTable="YES" userResizable="YES"/>
+                                                </tableColumn>
+                                            </tableColumns>
+                                            <connections>
+                                                <action selector="handleClick:" target="Scx-gG-IP9" id="A5m-kr-E8c"/>
+                                            </connections>
+                                        </outlineView>
+                                    </subviews>
+                                    <color key="backgroundColor" name="ClearColor"/>
+                                </clipView>
+                                <edgeInsets key="scrollerInsets" left="0.0" right="0.0" top="28" bottom="0.0"/>
+                                <scroller key="horizontalScroller" hidden="YES" wantsLayer="YES" verticalHuggingPriority="750" horizontal="YES" id="pGx-TG-Ed0">
+                                    <rect key="frame" x="0.0" y="385" width="357" height="16"/>
+                                    <autoresizingMask key="autoresizingMask"/>
+                                </scroller>
+                                <scroller key="verticalScroller" hidden="YES" wantsLayer="YES" verticalHuggingPriority="750" horizontal="NO" id="k1f-FW-gMc">
+                                    <rect key="frame" x="224" y="17" width="15" height="102"/>
+                                    <autoresizingMask key="autoresizingMask"/>
+                                </scroller>
+                                <connections>
+                                    <outlet property="menu" destination="glL-gu-nIh" id="iAr-HS-i2o"/>
+                                </connections>
+                            </scrollView>
+                        </subviews>
+                        <constraints>
+                            <constraint firstItem="sfH-at-DQe" firstAttribute="top" secondItem="Wgx-ZT-vUV" secondAttribute="bottom" id="HCS-40-lt3"/>
+                            <constraint firstAttribute="trailing" secondItem="Wgx-ZT-vUV" secondAttribute="trailing" id="IHY-bB-P4D"/>
+                            <constraint firstAttribute="trailing" secondItem="pTk-xE-OqR" secondAttribute="trailing" constant="20" symbolic="YES" id="JB3-nj-EBU"/>
+                            <constraint firstItem="Wgx-ZT-vUV" firstAttribute="leading" secondItem="xb9-2G-g28" secondAttribute="leading" id="MbT-Yq-ETA"/>
+                            <constraint firstItem="xMD-lr-ArK" firstAttribute="centerY" secondItem="TJx-89-ls4" secondAttribute="centerY" id="ORV-Cg-vc3"/>
+                            <constraint firstItem="TJx-89-ls4" firstAttribute="top" secondItem="xb9-2G-g28" secondAttribute="top" constant="12" id="RQs-Js-8RE"/>
+                            <constraint firstAttribute="bottom" secondItem="sfH-at-DQe" secondAttribute="bottom" id="TRV-pD-KPb"/>
+                            <constraint firstAttribute="trailing" secondItem="sfH-at-DQe" secondAttribute="trailing" id="XpF-rq-lc0"/>
+                            <constraint firstItem="pTk-xE-OqR" firstAttribute="leading" secondItem="xMD-lr-ArK" secondAttribute="trailing" constant="10" symbolic="YES" id="ZVK-LI-192"/>
+                            <constraint firstItem="Wgx-ZT-vUV" firstAttribute="top" secondItem="TJx-89-ls4" secondAttribute="bottom" constant="12" id="c2w-eV-aIm"/>
+                            <constraint firstItem="sfH-at-DQe" firstAttribute="leading" secondItem="xb9-2G-g28" secondAttribute="leading" id="j7E-WK-AS8"/>
+                            <constraint firstItem="xMD-lr-ArK" firstAttribute="leading" secondItem="qBa-rT-8sF" secondAttribute="trailing" constant="10" symbolic="YES" id="jLx-74-nNz"/>
+                            <constraint firstItem="TJx-89-ls4" firstAttribute="leading" secondItem="xb9-2G-g28" secondAttribute="leading" constant="15" id="jlk-qH-vHa"/>
+                            <constraint firstItem="qBa-rT-8sF" firstAttribute="centerY" secondItem="TJx-89-ls4" secondAttribute="centerY" id="pkc-Pa-8yn"/>
+                            <constraint firstItem="pTk-xE-OqR" firstAttribute="centerY" secondItem="TJx-89-ls4" secondAttribute="centerY" id="umv-FL-gFh"/>
+                        </constraints>
+                    </view>
+                    <connections>
+                        <outlet property="outlineView" destination="66p-cd-DbA" id="Shg-RA-vKK"/>
+                    </connections>
+                </viewController>
+                <customObject id="mvI-Nr-XXc" userLabel="First Responder" customClass="NSResponder" sceneMemberID="firstResponder"/>
+                <menu id="glL-gu-nIh">
+                    <connections>
+                        <outlet property="delegate" destination="Scx-gG-IP9" id="Wfq-MB-h7O"/>
+                    </connections>
+                </menu>
+            </objects>
+            <point key="canvasLocation" x="-967.5" y="97.5"/>
         </scene>
     </scenes>
     <resources>
+        <image name="AddBookmark" width="16" height="16"/>
+        <image name="AddFolder" width="16" height="16"/>
+        <image name="Expand" width="16" height="16"/>
         <image name="Favorite" width="15" height="15"/>
         <namedColor name="ButtonColor">
             <color red="0.28627450980392155" green="0.28627450980392155" blue="0.28627450980392155" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+        </namedColor>
+        <namedColor name="ButtonMouseDownColor">
+            <color red="0.0" green="0.0" blue="0.0" alpha="0.20000000298023224" colorSpace="custom" customColorSpace="sRGB"/>
+        </namedColor>
+        <namedColor name="ButtonMouseOverColor">
+            <color red="0.0" green="0.0" blue="0.0" alpha="0.10000000149011612" colorSpace="custom" customColorSpace="sRGB"/>
+        </namedColor>
+        <namedColor name="ClearColor">
+            <color red="1" green="1" blue="1" alpha="0.0" colorSpace="custom" customColorSpace="sRGB"/>
         </namedColor>
         <namedColor name="SeparatorColor">
             <color red="0.0" green="0.0" blue="0.0" alpha="0.10000000149011612" colorSpace="custom" customColorSpace="sRGB"/>

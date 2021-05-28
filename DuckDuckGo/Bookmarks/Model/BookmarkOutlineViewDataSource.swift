@@ -245,7 +245,10 @@ final class BookmarkOutlineViewDataSource: NSObject, NSOutlineViewDataSource, NS
     }
 
     func outlineView(_ outlineView: NSOutlineView, rowViewForItem item: Any) -> NSTableRowView? {
-        return RoundedSelectionRowView()
+        let view = RoundedSelectionRowView()
+        view.insets = NSEdgeInsets(top: 0, left: 8, bottom: 0, right: 8)
+
+        return view
     }
 
     // MARK: - NSTableViewDelegate

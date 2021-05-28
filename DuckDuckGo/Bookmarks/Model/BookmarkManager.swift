@@ -29,6 +29,7 @@ protocol BookmarkManager: AnyObject {
     func remove(bookmark: Bookmark)
     func remove(folder: BookmarkFolder)
     func update(bookmark: Bookmark)
+    func update(folder: BookmarkFolder)
     @discardableResult func updateUrl(of bookmark: Bookmark, to newUrl: URL) -> Bookmark?
     func add(objectsWithUUIDs uuids: [UUID], to parent: BookmarkFolder?, completion: @escaping (Error?) -> Void)
 
@@ -151,6 +152,11 @@ final class LocalBookmarkManager: BookmarkManager {
 
         list?.update(with: bookmark)
         bookmarkStore.update(bookmark: bookmark)
+        loadBookmarks()
+    }
+
+    func update(folder: BookmarkFolder) {
+        bookmarkStore.update(folder: folder)
         loadBookmarks()
     }
 

@@ -45,17 +45,15 @@ final class WindowControllersManager {
 
 extension WindowControllersManager {
 
-    func showPreferencesTab() {
-        guard let windowController = mainWindowControllers.first(where: { $0.window?.isMainWindow ?? false }) else {
-            return
-        }
+    func showBookmarksTab() {
+        showTab(type: .bookmarks)
+    }
 
-        let viewController = windowController.mainViewController
-        let tabCollectionViewModel = viewController.tabCollectionViewModel
-        tabCollectionViewModel.appendNewTab(type: .preferences)
+    func showPreferencesTab() {
+        showTab(type: .preferences)
     }
     
-    func show(url: URL) {
+    func show(url: URL, newTab: Bool = false) {
 
         func show(url: URL, in windowController: MainWindowController) {
             let viewController = windowController.mainViewController
@@ -66,8 +64,11 @@ extension WindowControllersManager {
 
             if tabCollection.tabs.count == 1,
                let firstTab = tabCollection.tabs.first,
-               firstTab.isHomepageShown {
+               firstTab.isHomepageShown,
+               !newTab {
                 firstTab.url = url
+            } else if let tab = tabCollectionViewModel.selectedTabViewModel?.tab, tab.isBookmarksShown, !newTab {
+                tab.url = url
             } else {
                 let newTab = Tab()
                 newTab.url = url
@@ -101,6 +102,16 @@ extension WindowControllersManager {
 
         // Open a new window
         WindowsManager.openNewWindow(with: url)
+    }
+
+    private func showTab(type: Tab.TabType) {
+        guard let windowController = mainWindowControllers.first(where: { $0.window?.isMainWindow ?? false }) else {
+            return
+        }
+
+        let viewController = windowController.mainViewController
+        let tabCollectionViewModel = viewController.tabCollectionViewModel
+        tabCollectionViewModel.appendNewTab(type: type)
     }
 
 }

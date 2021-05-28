@@ -265,4 +265,5 @@ final class BookmarkTableCellView: NSTableCellView, NibLoadable {
 
         return titleString
     }
+
 }

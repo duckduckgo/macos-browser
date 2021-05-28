@@ -26,6 +26,7 @@ protocol PreferencesSidebarViewControllerDelegate: AnyObject {
 
 final class PreferencesSidebarViewController: NSViewController {
 
+    @IBOutlet var tabSwitcherButton: NSPopUpButton!
     @IBOutlet var preferencesTableView: NSTableView!
 
     weak var delegate: PreferencesSidebarViewControllerDelegate?

@@ -62,9 +62,14 @@ final class BookmarkStoreMock: BookmarkStore {
         completion(removeSuccess, removeError)
     }
 
-    var updateCalled = false
+    var updateBookmarkCalled = false
     func update(bookmark: Bookmark) {
-        updateCalled = true
+        updateBookmarkCalled = true
+    }
+
+    var updateFolderCalled = false
+    func update(folder: BookmarkFolder) {
+        updateFolderCalled = true
     }
 
     var addChildCalled = false

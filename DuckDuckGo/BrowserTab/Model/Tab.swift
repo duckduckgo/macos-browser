@@ -38,19 +38,33 @@ protocol TabDelegate: AnyObject {
 // swiftlint:disable type_body_length
 final class Tab: NSObject {
 
-    enum TabType: Int {
+    enum TabType: Int, CaseIterable {
         case standard = 0
         case preferences = 1
+        case bookmarks = 2
 
         static func rawValue(_ type: Int?) -> TabType {
             let tabType = type ?? TabType.standard.rawValue
             return TabType(rawValue: tabType) ?? .standard
         }
 
+        static var displayableTabTypes: [TabType] {
+            return TabType.allCases.filter { $0 != .standard }
+        }
+
+        var title: String? {
+            switch self {
+            case .standard: return nil
+            case .preferences: return UserText.preferences
+            case .bookmarks: return UserText.bookmarks
+            }
+        }
+
         var focusTabAddressBarWhenSelected: Bool {
             switch self {
             case .standard: return true
             case .preferences: return false
+            case .bookmarks: return false
             }
         }
     }
@@ -179,6 +193,10 @@ final class Tab: NSObject {
 
     var isHomepageShown: Bool {
         url == nil || url == URL.emptyPage
+    }
+
+    var isBookmarksShown: Bool {
+        (url == nil || url == URL.emptyPage) && tabType == .bookmarks
     }
 
     func goForward() {

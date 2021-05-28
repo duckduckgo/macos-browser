@@ -94,3 +94,11 @@ extension PreferencesSplitViewController: PreferencesSidebarViewControllerDelega
     }
 
 }
+
+extension PreferencesSplitViewController: BrowserTabEmbeddable {
+
+    var tabSwitcherButton: NSPopUpButton {
+        return sidebarViewController.tabSwitcherButton
+    }
+
+}

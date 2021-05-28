@@ -32,6 +32,7 @@ protocol BookmarkStore {
     func save(folder: BookmarkFolder, parent: BookmarkFolder?, completion: @escaping (Bool, Error?) -> Void)
     func remove(objectsWithUUIDs: [UUID], completion: @escaping (Bool, Error?) -> Void)
     func update(bookmark: Bookmark)
+    func update(folder: BookmarkFolder)
     func add(objectsWithUUIDs: [UUID], to parent: BookmarkFolder?, completion: @escaping (Error?) -> Void)
 
 }
@@ -187,6 +188,30 @@ final class LocalBookmarkStore: BookmarkStore {
         }
     }
 
+    func update(folder: BookmarkFolder) {
+        context.performAndWait { [weak self] in
+            guard let self = self else {
+                return
+            }
+
+            let folderFetchRequest = BaseBookmarkEntity.singleEntity(with: folder.id)
+            let folderFetchRequestResults = try? self.context.fetch(folderFetchRequest)
+
+            guard let bookmarkFolderMO = folderFetchRequestResults?.first else {
+                assertionFailure("LocalBookmarkStore: Failed to get BookmarkManagedObject from the context")
+                return
+            }
+
+            bookmarkFolderMO.update(with: folder)
+
+            do {
+                try self.context.save()
+            } catch {
+                assertionFailure("LocalBookmarkStore: Saving of context failed")
+            }
+        }
+    }
+
     func add(objectsWithUUIDs uuids: [UUID], to parent: BookmarkFolder?, completion: @escaping (Error?) -> Void) {
         context.perform { [weak self] in
             guard let self = self else {
@@ -286,7 +311,14 @@ fileprivate extension BookmarkManagedObject {
         titleEncrypted = bookmark.title as NSString
         faviconEncrypted = bookmark.favicon
         isFavorite = bookmark.isFavorite
-        isFolder = bookmark.isFolder
+        isFolder = false
+    }
+
+    func update(with folder: BookmarkFolder) {
+        id = folder.id
+        titleEncrypted = folder.title as NSString
+        isFavorite = false
+        isFolder = true
     }
 
 }
