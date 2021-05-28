@@ -178,7 +178,7 @@ extension UserScriptsTests {
             assert(handlers[name] == nil)
             handlers[name] = scriptMessageHandler
         }
-        @available(OSX 11.0, *)
+        @available(macOS 11.0, *)
         override func add(_ scriptMessageHandler: WKScriptMessageHandler, contentWorld world: WKContentWorld, name: String) {
             add(scriptMessageHandler, name: name)
         }
@@ -186,7 +186,7 @@ extension UserScriptsTests {
         override func removeScriptMessageHandler(forName name: String) {
             handlers[name] = nil
         }
-        @available(OSX 11.0, *)
+        @available(macOS 11.0, *)
         override func removeScriptMessageHandler(forName name: String, contentWorld: WKContentWorld) {
             removeScriptMessageHandler(forName: name)
         }
