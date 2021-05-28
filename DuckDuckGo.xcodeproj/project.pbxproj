@@ -2267,7 +2267,6 @@
 				AAECA42024EEA4AC00EFA63A /* IndexPathExtension.swift in Sources */,
 				AA5C8F632591021700748EB7 /* NSApplicationExtension.swift in Sources */,
 				AA9E9A5625A3AE8400D1959D /* NSWindowExtension.swift in Sources */,
-				AAE75282263B257700B973F8 /* History.swift in Sources */,
 				4B0511C9262CAA5A00F6079C /* RoundedSelectionRowView.swift in Sources */,
 				AAC5E4C725D6A6E8007F5990 /* BookmarkPopover.swift in Sources */,
 				B6E61EE3263AC0C8004E11AB /* FileManagerExtension.swift in Sources */,
@@ -2457,7 +2456,6 @@
 				B61F012325ECBAE400ABB5A3 /* UserScriptsTest.swift in Sources */,
 				4B11060A25903EAC0039B979 /* CoreDataEncryptionTests.swift in Sources */,
 				AAEC74BB2642E67C00C2EFBC /* NSPersistentContainerExtension.swift in Sources */,
-				8553FF52257523760029327F /* FileDownloadTests.swift in Sources */,
 				AABAF59C260A7D130085060C /* FaviconServiceMock.swift in Sources */,
 				AAEC74B82642E43800C2EFBC /* HistoryStoreTests.swift in Sources */,
 				4BA1A6E6258C270800F6F690 /* EncryptionKeyGeneratorTests.swift in Sources */,
@@ -2676,7 +2674,7 @@
 					"$(inherited)",
 					"@executable_path/../Frameworks",
 				);
-				MARKETING_VERSION = 0.6.16;
+				MARKETING_VERSION = 0.6.17;
 				PRODUCT_BUNDLE_IDENTIFIER = com.duckduckgo.macos.browser.debug;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE_SPECIFIER = "";
@@ -2863,7 +2861,7 @@
 					"$(inherited)",
 					"@executable_path/../Frameworks",
 				);
-				MARKETING_VERSION = 0.6.16;
+				MARKETING_VERSION = 0.6.17;
 				PRODUCT_BUNDLE_IDENTIFIER = com.duckduckgo.macos.browser.debug;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_ACTIVE_COMPILATION_CONDITIONS = "FEEDBACK $(inherited)";
@@ -2889,7 +2887,7 @@
 					"$(inherited)",
 					"@executable_path/../Frameworks",
 				);
-				MARKETING_VERSION = 0.6.16;
+				MARKETING_VERSION = 0.6.17;
 				PRODUCT_BUNDLE_IDENTIFIER = com.duckduckgo.macos.browser;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_ACTIVE_COMPILATION_CONDITIONS = FEEDBACK;
