@@ -78,13 +78,15 @@ final class BookmarkListViewController: NSViewController {
     }
 
     @IBAction func newBookmarkButtonClicked(_ sender: AnyObject) {
-
+        let newBookmarkViewController = AddBookmarkModalViewController.create()
+        newBookmarkViewController.delegate = self
+        presentAsModalWindow(newBookmarkViewController)
     }
 
     @IBAction func newFolderButtonClicked(_ sender: AnyObject) {
-        let addFolderViewController = AddFolderModalViewController.create()
-        addFolderViewController.delegate = self
-        presentAsModalWindow(addFolderViewController)
+        let newFolderViewController = AddFolderModalViewController.create()
+        newFolderViewController.delegate = self
+        presentAsModalWindow(newFolderViewController)
     }
 
     @IBAction func openManagementInterface(_ sender: NSButton) {
@@ -121,7 +123,7 @@ extension BookmarkListViewController: AddBookmarkModalViewControllerDelegate, Ad
     }
 
     func addFolderViewController(_ viewController: AddFolderModalViewController, saved folder: BookmarkFolder) {
-        print("Saved folder")
+        bookmarkManager.update(folder: folder)
     }
 
 }
@@ -227,7 +229,15 @@ extension BookmarkListViewController: FolderMenuItemSelectors {
     }
 
     func renameFolder(_ sender: NSMenuItem) {
-        print("Rename")
+        guard let folder = sender.representedObject as? BookmarkFolder else {
+            assertionFailure("Failed to retrieve Bookmark from Rename Folder context menu item")
+            return
+        }
+
+        let addFolderViewController = AddFolderModalViewController.create()
+        addFolderViewController.delegate = self
+        addFolderViewController.edit(folder: folder)
+        presentAsModalWindow(addFolderViewController)
     }
 
     func deleteFolder(_ sender: NSMenuItem) {

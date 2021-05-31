@@ -202,7 +202,15 @@ extension BookmarkManagementSidebarViewController: FolderMenuItemSelectors {
     }
 
     func renameFolder(_ sender: NSMenuItem) {
-        print("Rename")
+        guard let folder = sender.representedObject as? BookmarkFolder else {
+            assertionFailure("Failed to retrieve Bookmark from Rename Folder context menu item")
+            return
+        }
+        
+        let addFolderViewController = AddFolderModalViewController.create()
+        addFolderViewController.delegate = self
+        addFolderViewController.edit(folder: folder)
+        presentAsModalWindow(addFolderViewController)
     }
 
     func deleteFolder(_ sender: NSMenuItem) {
