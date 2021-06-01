@@ -80,8 +80,6 @@ final class BookmarkManagementDetailViewController: NSViewController {
 
     func configureTableHighlight() {
         tableView.selectionHighlightStyle = .none
-        let area = NSTrackingArea(rect: tableView.frame, options: [.mouseMoved, .activeInKeyWindow, .inVisibleRect], owner: self, userInfo: nil)
-        tableView.addTrackingArea(area)
     }
 
     fileprivate func reloadData() {
@@ -382,14 +380,6 @@ extension BookmarkManagementDetailViewController: BookmarkTableCellViewDelegate 
 
         bookmark.isFavorite.toggle()
         LocalBookmarkManager.shared.update(bookmark: bookmark)
-    }
-
-    func bookmarkTableCellView(_ cell: BookmarkTableCellView,
-                               committedEditForBookmark bookmarkID: UUID,
-                               title: String,
-                               url: String,
-                               isFavorite: Bool) {
-        print("Committed edit")
     }
 
 }
