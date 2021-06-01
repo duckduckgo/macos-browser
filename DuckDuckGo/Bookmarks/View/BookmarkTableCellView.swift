@@ -113,7 +113,7 @@ final class BookmarkTableCellView: NSTableCellView, NibLoadable {
             accessoryImageView.isHidden = mouseInside || isEditing
             menuButton.isHidden = !mouseInside || isEditing
 
-            if !mouseInside || isEditing {
+            if !mouseInside && !isEditing {
                 resetAppearanceFromBookmark()
             }
 
@@ -176,6 +176,7 @@ final class BookmarkTableCellView: NSTableCellView, NibLoadable {
     }
 
     private func resetCellState() {
+        mouseInside = false
         bookmarkURLLabel.isHidden = true
         favoriteButton.isHidden = true
         titleLabelBottomConstraint.priority = .required
@@ -196,6 +197,7 @@ final class BookmarkTableCellView: NSTableCellView, NibLoadable {
         titleLabelBottomConstraint.priority = .defaultLow
 
         titleLabel.becomeFirstResponder()
+        hideTertiaryValueInTitleLabel()
     }
 
     private func exitEditingMode() {
@@ -246,13 +248,25 @@ final class BookmarkTableCellView: NSTableCellView, NibLoadable {
     }
 
     private func updateTitleLabelValue() {
-        if let tertiaryValue = tertiaryTitleLabelValue, mouseInside, !isEditing {
-            titleLabel.stringValue = ""
-            titleLabel.attributedStringValue = buildTitleAttributedString(tertiaryValue: tertiaryValue)
-        } else {
-            titleLabel.attributedStringValue = NSAttributedString()
-            titleLabel.stringValue = primaryTitleLabelValue
+        guard !isEditing else {
+            return
         }
+
+        if let tertiaryValue = tertiaryTitleLabelValue, mouseInside, !isEditing {
+            showTertiaryValueInTitleLabel(tertiaryValue)
+        } else {
+            hideTertiaryValueInTitleLabel()
+        }
+    }
+
+    private func showTertiaryValueInTitleLabel(_ tertiaryValue: String) {
+        titleLabel.stringValue = ""
+        titleLabel.attributedStringValue = buildTitleAttributedString(tertiaryValue: tertiaryValue)
+    }
+
+    private func hideTertiaryValueInTitleLabel() {
+        titleLabel.attributedStringValue = NSAttributedString()
+        titleLabel.stringValue = primaryTitleLabelValue
     }
 
     private func buildTitleAttributedString(tertiaryValue: String) -> NSAttributedString {

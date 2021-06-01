@@ -250,18 +250,18 @@ extension BookmarkManagementDetailViewController: NSTableViewDelegate, NSTableVi
         if let cell = tableView.makeView(withIdentifier: Constants.bookmarkCellIdentifier, owner: nil) as? BookmarkTableCellView {
             cell.delegate = self
 
-            if let index = editingBookmarkIndex, index == row {
-                cell.isEditing = true
-            } else {
-                cell.isEditing = false
-            }
-
             if let bookmark = entity as? Bookmark {
                 cell.update(from: bookmark)
             } else if let folder = entity as? BookmarkFolder {
                 cell.update(from: folder)
             } else {
                 assertionFailure("Failed to cast bookmark")
+            }
+
+            if let index = editingBookmarkIndex, index == row {
+                cell.isEditing = true
+            } else {
+                cell.isEditing = false
             }
 
             return cell
