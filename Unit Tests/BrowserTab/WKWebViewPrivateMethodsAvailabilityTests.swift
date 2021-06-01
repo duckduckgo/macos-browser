@@ -1,5 +1,5 @@
 //
-//  WKWebViewSessionDataTests.swift
+//  WKWebViewPrivateMethodsAvailabilityTests.swift
 //  DuckDuckGo
 //
 //  Copyright © 2021 DuckDuckGo. All rights reserved.
@@ -21,7 +21,7 @@ import XCTest
 import WebKit
 @testable import DuckDuckGo_Privacy_Browser
 
-final class WKWebViewSessionStateAvailabilityTests: XCTestCase {
+final class WKWebViewPrivateMethodsAvailabilityTests: XCTestCase {
 
     func testWebViewRespondsTo_sessionStateData() {
         let webView = WebView.init(frame: CGRect(), configuration: .init())
@@ -33,4 +33,14 @@ final class WKWebViewSessionStateAvailabilityTests: XCTestCase {
         let webView = WebView(frame: CGRect(), configuration: .init())
         XCTAssertNoThrow(try webView.restoreSessionState(from: Data()))
     }
+
+    func testWKProcessPoolRespondsTo_downloadDelegate() {
+        let obj = NSObject()
+        let webView = WebView(frame: CGRect(), configuration: .init())
+        webView.configuration.processPool.setValue(obj, forKey: WKProcessPool.downloadDelegateKey)
+        let delegate = webView.configuration.processPool
+            .value(forKey: WKProcessPool.downloadDelegateKey) as? NSObject
+        XCTAssertEqual(obj, delegate)
+    }
+
 }

@@ -38,12 +38,12 @@ final class ExternalURLHandler {
         self.scheduler = scheduler
     }
 
-    func isBlob(scheme: String) -> Bool {
-        return scheme == "blob"
+    func isBlobOrData(scheme: String) -> Bool {
+        return ["blob", "data"].contains(scheme)
     }
 
     func isExternal(scheme: String) -> Bool {
-        return !["https", "http", "about", "data", "file"].contains(scheme)
+        return !["https", "http", "about", "file"].contains(scheme)
     }
 
     func handle(url: URL, onPage page: URL?, fromFrame: Bool, triggeredByUser: Bool) {

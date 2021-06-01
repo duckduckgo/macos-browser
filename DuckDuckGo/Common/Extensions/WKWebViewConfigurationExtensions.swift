@@ -30,4 +30,12 @@ extension WKWebViewConfiguration {
         self.userContentController = UserContentController()
      }
 
+    func setDownloadDelegate(_ delegate: WebKitDownloadDelegate?) {
+        self.processPool.setValue(delegate, forKey: WKProcessPool.downloadDelegateKey)
+    }
+
+}
+
+extension WKProcessPool {
+    static let downloadDelegateKey = "downloadDelegate"
 }

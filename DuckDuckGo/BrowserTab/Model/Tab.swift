@@ -259,6 +259,7 @@ final class Tab: NSObject {
         webView.navigationDelegate = self
         webView.allowsBackForwardNavigationGestures = true
         webView.allowsMagnification = true
+        webView.configuration.setDownloadDelegate(WebKitDownloadCoordinator.shared)
 
         subscribeToUserScripts()
         subscribeToOpenExternalUrlEvents()
@@ -329,7 +330,6 @@ final class Tab: NSObject {
         didSet {
             userScripts.debugScript.instrumentation = instrumentation
             userScripts.faviconScript.delegate = self
-            userScripts.html5downloadScript.delegate = self
             userScripts.contextMenuScript.delegate = self
             userScripts.loginDetectionUserScript.delegate = self
             userScripts.contentBlockerScript.delegate = self
@@ -399,28 +399,6 @@ extension Tab: ContextMenuDelegate {
 
     func contextMenu(forUserScript script: ContextMenuUserScript, willShowAt position: NSPoint, image: URL?, link: URL?) {
         delegate?.tab(self, willShowContextMenuAt: position, image: image, link: link)
-    }
-
-}
-
-extension Tab: HTML5DownloadDelegate {
-
-    func startDownload(_ userScript: HTML5DownloadUserScript, from url: URL, withSuggestedName name: String?) {
-        var request = self.lastRequestCache[url] ?? URLRequest(url: url)
-
-        request.url = url
-        request.applyCookies(from: webView.configuration.websiteDataStore.httpCookieStore) { request in
-            self.delegate?.tab(self, requestedFileDownload: FileDownload.request(request,
-                                                                                 suggestedName: name,
-                                                                                 promptForLocation: false))
-        }
-    }
-
-    func startDownload(_ userScript: HTML5DownloadUserScript, data: Data, mimeType: String, suggestedName: String?, sourceURL: URL?) {
-        delegate?.tab(self, requestedFileDownload: FileDownload.data(data,
-                                                                     mimeType: mimeType,
-                                                                     suggestedName: suggestedName,
-                                                                     sourceURL: sourceURL))
     }
 
 }
@@ -549,10 +527,10 @@ extension Tab: WKNavigationDelegate {
             return
         }
 
-        // blob:https links are handled by the HTML5DownloadUserScript,
-        // cancel request if it gets here
-        if externalUrlHandler.isBlob(scheme: urlScheme) {
-            decisionHandler(.cancel)
+        // blob:https and data:https links are handled by private _WKDownload
+        if externalUrlHandler.isBlobOrData(scheme: urlScheme) {
+            // further download will be handled by WebKitDownloadCoordinator._downloadDidStart(_:)
+            decisionHandler(.download)
             return
         } else if externalUrlHandler.isExternal(scheme: urlScheme) {
             // ignore <iframe src="custom://url"> but allow via address bar
@@ -689,4 +667,10 @@ fileprivate extension WKNavigationAction {
         return targetFrame?.isMainFrame ?? false
     }
 }
+
+private extension WKNavigationActionPolicy {
+    // https://github.com/WebKit/WebKit/blob/9a6f03d46238213231cf27641ed1a55e1949d074/Source/WebKit/UIProcess/API/Cocoa/WKNavigationDelegate.h#L49
+    static let download = WKNavigationActionPolicy(rawValue: Self.allow.rawValue + 1) ?? .cancel
+}
+
 // swiftlint:enable type_body_length

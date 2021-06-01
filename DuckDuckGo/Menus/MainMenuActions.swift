@@ -312,8 +312,7 @@ extension MainViewController {
         webView.getMimeType { mimeType in
             let download = FileDownload.webContent(webView, mimeType: mimeType)
             FileDownloadManager.shared.startDownload(download,
-                                                     chooseDestinationCallback: self.browserTabViewController.chooseDestination,
-                                                     fileIconOriginalRectCallback: self.browserTabViewController.fileIconFlyAnimationOriginalRect,
+                                                     delegate: self.browserTabViewController,
                                                      postflight: .reveal)
         }
     }

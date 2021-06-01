@@ -28,7 +28,7 @@ protocol FileDownloadRequest {
 enum FileDownload: FileDownloadRequest {
     case request(URLRequest, suggestedName: String?, promptForLocation: Bool)
     case webContent(WKWebView, mimeType: String?)
-    case data(Data, mimeType: String, suggestedName: String?, sourceURL: URL?)
+    case wkDownload(WebKitDownload)
 }
 
 enum FileDownloadPostflight {
@@ -54,7 +54,7 @@ extension FileDownload {
             return true
         case .request(_, suggestedName: _, promptForLocation: let promptForLocation):
             return promptForLocation
-        case .data:
+        case .wkDownload:
             return false
         }
     }
@@ -79,8 +79,8 @@ extension FileDownload {
                 return nil
             }
 
-        case .data(let data, mimeType: let mimeType, suggestedName: let suggestedName, sourceURL: _):
-            return DataSaveTask(download: self, data: data, mimeType: mimeType, suggestedFilename: suggestedName)
+        case .wkDownload(let download):
+            return WebKitDownloadTask(download: download)
         }
     }
 
@@ -90,8 +90,8 @@ extension FileDownload {
             return request.url
         case .webContent(let webView, mimeType: _):
             return webView.url
-        case .data(_, mimeType: _, suggestedName: _, sourceURL: let url):
-            return url
+        case .wkDownload(let download):
+            return download.request?.url
         }
     }
 

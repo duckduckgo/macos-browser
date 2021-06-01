@@ -20,7 +20,12 @@ import Cocoa
 import Combine
 import os
 
-final class FileDownloadManager {
+protocol FileDownloadManagerDelegate: AnyObject {
+    func chooseDestination(suggestedFilename: String?, directoryURL: URL?, fileTypes: [UTType], callback: @escaping (URL?, UTType?) -> Void)
+    func fileIconFlyAnimationOriginalRect(for downloadTask: FileDownloadTask) -> NSRect?
+}
+
+final class FileDownloadManager: NSObject {
 
     static let shared = FileDownloadManager()
     private let workspace: NSWorkspace
@@ -32,6 +37,7 @@ final class FileDownloadManager {
     }
 
     @PublishedAfter private (set) var downloads = Set<FileDownloadTask>()
+    private var wkDownloads = [NSObject: WebKitDownloadTask]()
 
     typealias FileNameChooserCallback = (/*suggestedFilename:*/ String?,
                                          /*directoryURL:*/      URL?,
@@ -44,14 +50,13 @@ final class FileDownloadManager {
 
     @discardableResult
     func startDownload(_ request: FileDownloadRequest,
-                       chooseDestinationCallback: FileNameChooserCallback? = nil,
-                       fileIconOriginalRectCallback: FileIconOriginalRectCallback? = nil,
+                       delegate: FileDownloadManagerDelegate?,
                        postflight: FileDownloadPostflight?) -> FileDownloadTask? {
 
         guard let task = request.downloadTask() else { return nil }
 
-        self.destinationChooserCallbacks[task] = chooseDestinationCallback
-        self.fileIconOriginalRectCallbacks[task] = fileIconOriginalRectCallback
+        self.destinationChooserCallbacks[task] = delegate?.chooseDestination
+        self.fileIconOriginalRectCallbacks[task] = delegate?.fileIconFlyAnimationOriginalRect
         task.postflight = postflight
 
         downloads.insert(task)

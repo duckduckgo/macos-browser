@@ -268,10 +268,7 @@ extension BrowserTabViewController: TabDelegate {
     }
 
     func tab(_ tab: Tab, requestedFileDownload request: FileDownload) {
-        FileDownloadManager.shared.startDownload(request,
-                                                 chooseDestinationCallback: self.chooseDestination,
-                                                 fileIconOriginalRectCallback: self.fileIconFlyAnimationOriginalRect,
-                                                 postflight: .reveal)
+        FileDownloadManager.shared.startDownload(request, delegate: self, postflight: .reveal)
 
         // Note this can result in tabs being left open, e.g. download button on this page:
         // https://en.wikipedia.org/wiki/Guitar#/media/File:GuitareClassique5.png
@@ -282,6 +279,33 @@ extension BrowserTabViewController: TabDelegate {
             tabCollectionViewModel.remove(at: index)
         }
     }
+
+    func tab(_ tab: Tab, willShowContextMenuAt position: NSPoint, image: URL?, link: URL?) {
+        contextMenuImage = image
+        contextMenuLink = link
+        contextMenuExpected = true
+    }
+
+    func tab(_ tab: Tab, detectedLogin host: String) {
+        guard let window = view.window, !FireproofDomains.shared.isAllowed(fireproofDomain: host) else {
+            os_log("%s: Window is nil", type: .error, className)
+            return
+        }
+
+        let alert = NSAlert.fireproofAlert(with: host.dropWWW())
+        alert.beginSheetModal(for: window) { response in
+            if response == NSApplication.ModalResponse.alertFirstButtonReturn {
+                Pixel.fire(.fireproof(kind: .init(url: tab.url), suggested: .suggested))
+                FireproofDomains.shared.addToAllowed(domain: host)
+            }
+        }
+
+        Pixel.fire(.fireproofSuggested())
+    }
+
+}
+
+extension BrowserTabViewController: FileDownloadManagerDelegate {
 
     func chooseDestination(suggestedFilename: String?, directoryURL: URL?, fileTypes: [UTType], callback: @escaping (URL?, UTType?) -> Void) {
         dispatchPrecondition(condition: .onQueue(.main))
@@ -317,29 +341,6 @@ extension BrowserTabViewController: TabDelegate {
         let dockScreenRect = dockScreen.convert(globalRect)
 
         return dockScreenRect
-    }
-
-    func tab(_ tab: Tab, willShowContextMenuAt position: NSPoint, image: URL?, link: URL?) {
-        contextMenuImage = image
-        contextMenuLink = link
-        contextMenuExpected = true
-    }
-
-    func tab(_ tab: Tab, detectedLogin host: String) {
-        guard let window = view.window, !FireproofDomains.shared.isAllowed(fireproofDomain: host) else {
-            os_log("%s: Window is nil", type: .error, className)
-            return
-        }
-
-        let alert = NSAlert.fireproofAlert(with: host.dropWWW())
-        alert.beginSheetModal(for: window) { response in
-            if response == NSApplication.ModalResponse.alertFirstButtonReturn {
-                Pixel.fire(.fireproof(kind: .init(url: tab.url), suggested: .suggested))
-                FireproofDomains.shared.addToAllowed(domain: host)
-            }
-        }
-
-        Pixel.fire(.fireproofSuggested())
     }
 
 }
@@ -425,19 +426,6 @@ extension BrowserTabViewController: ImageMenuItemSelectors {
 }
 
 extension BrowserTabViewController: WKUIDelegate {
-
-    // swiftlint:disable identifier_name
-    @objc func _webView(_ webView: WKWebView, saveDataToFile data: NSData, suggestedFilename: NSString, mimeType: NSString, originatingURL: NSURL) {
-        let download = FileDownload.data(data as Data,
-                                         mimeType: mimeType as String,
-                                         suggestedName: suggestedFilename as String,
-                                         sourceURL: originatingURL as URL)
-        FileDownloadManager.shared.startDownload(download,
-                                                 chooseDestinationCallback: self.chooseDestination,
-                                                 fileIconOriginalRectCallback: self.fileIconFlyAnimationOriginalRect,
-                                                 postflight: .reveal)
-    }
-    // swiftlint:enable identifier_name
 
     func webView(_ webView: WKWebView,
                  createWebViewWith configuration: WKWebViewConfiguration,

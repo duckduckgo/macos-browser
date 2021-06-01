@@ -23,7 +23,6 @@ final class UserScripts {
 
     let pageObserverScript = PageObserverUserScript()
     let faviconScript = FaviconUserScript()
-    let html5downloadScript = HTML5DownloadUserScript()
     let contextMenuScript = ContextMenuUserScript()
     let findInPageScript = FindInPageUserScript()
     let loginDetectionUserScript = LoginFormDetectionUserScript()
@@ -43,7 +42,6 @@ final class UserScripts {
     lazy var userScripts: [UserScript] = [
         self.debugScript,
         self.faviconScript,
-        self.html5downloadScript,
         self.contextMenuScript,
         self.findInPageScript,
         self.loginDetectionUserScript,
