@@ -1,5 +1,5 @@
 //
-//  BookmarkListTreeController.swift
+//  BookmarkListTreeControllerDataSource.swift
 //
 //  Copyright © 2021 DuckDuckGo. All rights reserved.
 //
@@ -36,8 +36,9 @@ final class BookmarkListTreeControllerDataSource: TreeControllerDataSource {
 
         let topLevelNodes = LocalBookmarkManager.shared.topLevelItems?.compactMap { (item) -> BookmarkNode? in
             if let folder = item as? BookmarkFolder {
-                let itemNode = node.findOrCreateChildNode(with: item)
+                let itemNode = node.createChildNode(item)
                 itemNode.canHaveChildNodes = !folder.children.isEmpty
+
                 return itemNode
             } else if item is Bookmark {
                 let itemNode = node.findOrCreateChildNode(with: item)

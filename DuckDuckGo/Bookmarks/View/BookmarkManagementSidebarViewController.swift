@@ -198,7 +198,7 @@ extension BookmarkManagementSidebarViewController: FolderMenuItemSelectors {
     func newFolder(_ sender: NSMenuItem) {
         let addFolderViewController = AddFolderModalViewController.create()
         addFolderViewController.delegate = self
-        presentAsModalWindow(addFolderViewController)
+        beginSheet(addFolderViewController)
     }
 
     func renameFolder(_ sender: NSMenuItem) {
@@ -210,7 +210,7 @@ extension BookmarkManagementSidebarViewController: FolderMenuItemSelectors {
         let addFolderViewController = AddFolderModalViewController.create()
         addFolderViewController.delegate = self
         addFolderViewController.edit(folder: folder)
-        presentAsModalWindow(addFolderViewController)
+        beginSheet(addFolderViewController)
     }
 
     func deleteFolder(_ sender: NSMenuItem) {

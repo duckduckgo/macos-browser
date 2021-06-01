@@ -48,7 +48,7 @@ final class BookmarkTableCellView: NSTableCellView, NibLoadable {
         didSet {
             shadowView.isHidden = true
             shadowView.wantsLayer = true
-            shadowView.layer?.backgroundColor = .white
+            shadowView.layer?.backgroundColor = NSColor(named: "TableCellEditingColor")!.cgColor
             shadowView.layer?.cornerRadius = 6
 
             let shadow = NSShadow()
@@ -131,6 +131,7 @@ final class BookmarkTableCellView: NSTableCellView, NibLoadable {
     override func updateTrackingAreas() {
         super.updateTrackingAreas()
         ensureTrackingArea()
+
         if !trackingAreas.contains(trackingArea!) {
             addTrackingArea(trackingArea!)
         }

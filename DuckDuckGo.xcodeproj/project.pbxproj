@@ -68,7 +68,7 @@
 		4B2248FC26607B77003FCE1F /* BookmarkManagementSplitViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B2248F826607B77003FCE1F /* BookmarkManagementSplitViewController.swift */; };
 		4B2248FE26607BA2003FCE1F /* BookmarkListViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B2248FD26607BA2003FCE1F /* BookmarkListViewController.swift */; };
 		4B22490026607D22003FCE1F /* ContextualMenu.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B2248FF26607D22003FCE1F /* ContextualMenu.swift */; };
-		4B22490226607D53003FCE1F /* BookmarkListTreeController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B22490126607D53003FCE1F /* BookmarkListTreeController.swift */; };
+		4B22490226607D53003FCE1F /* BookmarkListTreeControllerDataSource.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B22490126607D53003FCE1F /* BookmarkListTreeControllerDataSource.swift */; };
 		4B22490426607DCE003FCE1F /* BookmarkTableRowView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B22490326607DCE003FCE1F /* BookmarkTableRowView.swift */; };
 		4B224906266343CE003FCE1F /* BrowserTabEmbeddable.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B224905266343CE003FCE1F /* BrowserTabEmbeddable.swift */; };
 		4B22490826635157003FCE1F /* NSPopUpButtonExtension.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B22490726635157003FCE1F /* NSPopUpButtonExtension.swift */; };
@@ -435,7 +435,7 @@
 		4B2248F826607B77003FCE1F /* BookmarkManagementSplitViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = BookmarkManagementSplitViewController.swift; sourceTree = "<group>"; };
 		4B2248FD26607BA2003FCE1F /* BookmarkListViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = BookmarkListViewController.swift; sourceTree = "<group>"; };
 		4B2248FF26607D22003FCE1F /* ContextualMenu.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ContextualMenu.swift; sourceTree = "<group>"; };
-		4B22490126607D53003FCE1F /* BookmarkListTreeController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = BookmarkListTreeController.swift; sourceTree = "<group>"; };
+		4B22490126607D53003FCE1F /* BookmarkListTreeControllerDataSource.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = BookmarkListTreeControllerDataSource.swift; sourceTree = "<group>"; };
 		4B22490326607DCE003FCE1F /* BookmarkTableRowView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = BookmarkTableRowView.swift; sourceTree = "<group>"; };
 		4B224905266343CE003FCE1F /* BrowserTabEmbeddable.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BrowserTabEmbeddable.swift; sourceTree = "<group>"; };
 		4B22490726635157003FCE1F /* NSPopUpButtonExtension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NSPopUpButtonExtension.swift; sourceTree = "<group>"; };
@@ -1708,7 +1708,7 @@
 			children = (
 				AAC5E4CD25D6A709007F5990 /* Bookmark.swift */,
 				AAC5E4CF25D6A709007F5990 /* BookmarkList.swift */,
-				4B22490126607D53003FCE1F /* BookmarkListTreeController.swift */,
+				4B22490126607D53003FCE1F /* BookmarkListTreeControllerDataSource.swift */,
 				4B967CEF265DF0F5007E2070 /* BookmarkManagedObject.swift */,
 				AAC5E4CE25D6A709007F5990 /* BookmarkManager.swift */,
 				4B967CF0265DF0F5007E2070 /* BookmarkNode.swift */,
@@ -2366,7 +2366,7 @@
 				B65783E725F8AAFB00D8DB33 /* String+Punycode.swift in Sources */,
 				B657841A25FA484B00D8DB33 /* NSException+Catch.m in Sources */,
 				B684592F25C93FBF00DC17B6 /* AppStateRestorationManager.swift in Sources */,
-				4B22490226607D53003FCE1F /* BookmarkListTreeController.swift in Sources */,
+				4B22490226607D53003FCE1F /* BookmarkListTreeControllerDataSource.swift in Sources */,
 				AAA892EA250A4CEF005B37B2 /* WindowControllersManager.swift in Sources */,
 				4B967CEA265DF0E6007E2070 /* BookmarkOutlineViewCell.swift in Sources */,
 				AAC5E4C825D6A6E8007F5990 /* BookmarkPopoverViewController.swift in Sources */,

@@ -51,7 +51,9 @@ final class BookmarkManagementDetailViewController: NSViewController {
                 context.duration = Constants.animationSpeed
 
                 if editingBookmarkIndex != nil {
-                    view.animator().layer?.backgroundColor = #colorLiteral(red: 0.9489164948, green: 0.9490790963, blue: 0.9489063621, alpha: 1).cgColor
+                    NSAppearance.withAppAppearance {
+                        view.animator().layer?.backgroundColor = NSColor(named: "BackgroundSecondaryColor")!.cgColor
+                    }
                 } else {
                     view.animator().layer?.backgroundColor = NSColor.clear.cgColor
                 }
@@ -215,7 +217,7 @@ extension BookmarkManagementDetailViewController: AddBookmarkModalViewController
     }
 
     func addFolderViewController(_ viewController: AddFolderModalViewController, saved folder: BookmarkFolder) {
-        print("Saved folder")
+        bookmarkManager.update(folder: folder)
     }
 
 }
