@@ -52,6 +52,11 @@ final class PreferencesSidebarViewController: NSViewController {
         preferencesTableView.action = #selector(selectedRow)
     }
 
+    override func viewWillAppear() {
+        super.viewWillAppear()
+        tabSwitcherButton.select(tabType: .preferences)
+    }
+
     override func viewDidAppear() {
         super.viewDidAppear()
         preferencesTableView.makeMeFirstResponder()
