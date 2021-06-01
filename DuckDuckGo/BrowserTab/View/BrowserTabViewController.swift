@@ -32,7 +32,6 @@ final class BrowserTabViewController: NSViewController {
 
     private let tabCollectionViewModel: TabCollectionViewModel
     private var urlCancellable: AnyCancellable?
-    private var selectedTabCancellables = Set<AnyCancellable>()
     private var selectedTabViewModelCancellable: AnyCancellable?
     private var isErrorViewVisibleCancellable: AnyCancellable?
 
@@ -218,12 +217,7 @@ final class BrowserTabViewController: NSViewController {
 
     private lazy var preferencesViewController: PreferencesSplitViewController = {
         let viewController = PreferencesSplitViewController.create()
-        _ = viewController.view
-
-        viewController.tabSwitcherButton.displayBrowserTabButtons(for: .preferences)
-        viewController.tabSwitcherButton.selectionPublisher.sink { [weak self] index in
-            self?.displayTab(at: index)
-        }.store(in: &selectedTabCancellables)
+        viewController.delegate = self
 
         return viewController
     }()
@@ -249,12 +243,7 @@ final class BrowserTabViewController: NSViewController {
 
     private lazy var bookmarksViewController: BookmarkManagementSplitViewController = {
         let viewController = BookmarkManagementSplitViewController.create()
-        _ = viewController.view
-
-        viewController.tabSwitcherButton.displayBrowserTabButtons(for: .bookmarks)
-        viewController.tabSwitcherButton.selectionPublisher.sink { [weak self] index in
-            self?.displayTab(at: index)
-        }.store(in: &selectedTabCancellables)
+        viewController.delegate = self
 
         return viewController
     }()
@@ -618,6 +607,14 @@ fileprivate extension NSAlert {
         alert.alertStyle = .warning
         alert.addButton(withTitle: UserText.ok)
         return alert
+    }
+
+}
+
+extension BrowserTabViewController: BrowserTabSelectionDelegate {
+
+    func selectedTab(at index: Int) {
+        displayTab(at: index)
     }
 
 }

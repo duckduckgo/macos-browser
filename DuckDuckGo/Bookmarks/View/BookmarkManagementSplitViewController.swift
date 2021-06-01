@@ -17,6 +17,7 @@
 //
 
 import AppKit
+import Combine
 
 final class BookmarkManagementSplitViewController: NSSplitViewController {
 
@@ -40,11 +41,20 @@ final class BookmarkManagementSplitViewController: NSSplitViewController {
     }
     // swiftlint:enable force_cast
 
+    weak var delegate: BrowserTabSelectionDelegate?
+
+    private var selectedTabCancellable: AnyCancellable?
+
     override func viewDidLoad() {
         super.viewDidLoad()
 
         sidebarViewController.delegate = self
         detailViewController.delegate = self
+        tabSwitcherButton.displayBrowserTabButtons(withSelectedTab: .bookmarks)
+
+        selectedTabCancellable = tabSwitcherButton.selectionPublisher.sink { [weak self] index in
+            self?.delegate?.selectedTab(at: index)
+        }
     }
 
 }

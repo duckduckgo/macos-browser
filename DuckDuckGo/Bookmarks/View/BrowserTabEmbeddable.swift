@@ -23,3 +23,9 @@ protocol BrowserTabEmbeddable {
     var tabSwitcherButton: NSPopUpButton { get }
 
 }
+
+protocol BrowserTabSelectionDelegate: AnyObject {
+
+    func selectedTab(at index: Int)
+
+}

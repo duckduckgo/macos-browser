@@ -48,6 +48,8 @@ final class PreferencesSplitViewController: NSSplitViewController {
         return splitViewItems[1].viewController as? PreferencesListViewController
     }
 
+    weak var delegate: BrowserTabSelectionDelegate?
+
     private let preferenceSections = PreferenceSections()
 
     override func viewDidLoad() {
@@ -56,6 +58,8 @@ final class PreferencesSplitViewController: NSSplitViewController {
         splitView.setValue(NSColor(named: "DividerColor"), forKey: "dividerColor")
         sidebarViewController.delegate = self
         subscribeToListViewControllerVisibleIndex()
+
+        tabSwitcherButton.displayBrowserTabButtons(withSelectedTab: .preferences)
     }
 
     private func subscribeToListViewControllerVisibleIndex() {
@@ -64,6 +68,10 @@ final class PreferencesSplitViewController: NSSplitViewController {
 
         preferencesListDetailViewController?.$firstVisibleCellIndex.dropFirst().sink { [weak self] index in
             self?.sidebarViewController.detailViewScrolledTo(rowAtIndex: index)
+        }.store(in: &cancellables)
+
+        tabSwitcherButton.selectionPublisher.sink { [weak self] index in
+            self?.delegate?.selectedTab(at: index)
         }.store(in: &cancellables)
     }
 
