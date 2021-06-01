@@ -112,6 +112,10 @@ internal class FileDownloadTask: NSObject {
 
     func _finish(with result: Result<URL, FileDownloadError>) { // swiftlint:disable:this identifier_name
         dispatchPrecondition(condition: .onQueue(.main))
+        guard let fulfill = self.fulfill else {
+            // already finished
+            return
+        }
 
         if case .success = result {
             if self.progress.totalUnitCount == -1 {
@@ -123,8 +127,8 @@ internal class FileDownloadTask: NSObject {
         self.progress.unpublishIfNeeded()
 
         self.delegate?.fileDownloadTask(self, didFinishWith: result)
-        self.fulfill?(result)
         self.fulfill = nil
+        fulfill(result)
     }
 
     final func finish(with result: Result<URL, FileDownloadError>) {
