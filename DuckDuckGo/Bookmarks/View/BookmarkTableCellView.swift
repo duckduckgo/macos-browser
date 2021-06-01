@@ -49,7 +49,7 @@ final class BookmarkTableCellView: NSTableCellView, NibLoadable {
         didSet {
             shadowView.isHidden = true
             shadowView.wantsLayer = true
-            shadowView.layer?.backgroundColor = NSColor(named: "TableCellEditingColor")!.cgColor
+            shadowView.layer?.backgroundColor = NSColor.tableCellEditingColor.cgColor
             shadowView.layer?.cornerRadius = 6
 
             let shadow = NSShadow()

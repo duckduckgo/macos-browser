@@ -74,4 +74,16 @@ extension NSColor {
         .detailAccentColor
     }
 
+    static var backgroundSecondaryColor: NSColor {
+        NSColor(named: "BackgroundSecondaryColor")!
+    }
+
+    static var tableCellEditingColor: NSColor {
+        NSColor(named: "TableCellEditingColor")!
+    }
+
+    static var rowHoverColor: NSColor {
+        NSColor(named: "RowHoverColor")!
+    }
+
 }

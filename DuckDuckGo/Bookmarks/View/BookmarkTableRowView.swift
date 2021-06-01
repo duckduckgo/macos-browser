@@ -34,7 +34,7 @@ final class BookmarkTableRowView: NSTableRowView {
 
         if mouseInside && !editing {
             let path = NSBezierPath(roundedRect: bounds, xRadius: 6, yRadius: 6)
-            NSColor(named: "RowHoverColor")!.setFill()
+            NSColor.rowHoverColor.setFill()
             path.fill()
         }
     }

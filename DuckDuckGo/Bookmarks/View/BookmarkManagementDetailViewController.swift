@@ -52,7 +52,7 @@ final class BookmarkManagementDetailViewController: NSViewController {
 
                 if editingBookmarkIndex != nil {
                     NSAppearance.withAppAppearance {
-                        view.animator().layer?.backgroundColor = NSColor(named: "BackgroundSecondaryColor")!.cgColor
+                        view.animator().layer?.backgroundColor = NSColor.backgroundSecondaryColor.cgColor
                     }
                 } else {
                     view.animator().layer?.backgroundColor = NSColor.clear.cgColor
