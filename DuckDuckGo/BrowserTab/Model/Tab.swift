@@ -259,7 +259,7 @@ final class Tab: NSObject {
         webView.navigationDelegate = self
         webView.allowsBackForwardNavigationGestures = true
         webView.allowsMagnification = true
-        webView.configuration.setDownloadDelegate(WebKitDownloadCoordinator.shared)
+        webView.configuration.setDownloadDelegate(WebKitDownloadDelegate.shared)
 
         subscribeToUserScripts()
         subscribeToOpenExternalUrlEvents()
@@ -562,7 +562,6 @@ extension Tab: WKNavigationDelegate {
 		userEnteredUrl = false // subsequent requests will be navigations
         let policy = navigationResponsePolicyForDownloads(navigationResponse)
         decisionHandler(policy)
-
     }
 
     private func updateUserAgentForDomain(_ host: String?) {
@@ -668,7 +667,7 @@ fileprivate extension WKNavigationAction {
     }
 }
 
-private extension WKNavigationActionPolicy {
+extension WKNavigationActionPolicy {
     // https://github.com/WebKit/WebKit/blob/9a6f03d46238213231cf27641ed1a55e1949d074/Source/WebKit/UIProcess/API/Cocoa/WKNavigationDelegate.h#L49
     static let download = WKNavigationActionPolicy(rawValue: Self.allow.rawValue + 1) ?? .cancel
 }

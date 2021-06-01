@@ -98,7 +98,13 @@ final class WebKitDownloadTask: FileDownloadTask {
 extension WebKitDownloadTask: WebKitDownloadTaskProtocol {
 
     func download(_ download: WebKitDownload, didReceiveResponse response: URLResponse) {
-        self.fileTypes = response.mimeType.flatMap(UTType.init(mimeType:)).map { [$0] }
+        if var mimeType = response.mimeType {
+            // drop ;charset=.. from "text/plain;charset=utf-8"
+            if let charsetRange = mimeType.range(of: ";charset=") {
+                mimeType = String(mimeType[..<charsetRange.lowerBound])
+            }
+            self.fileTypes = UTType(mimeType: mimeType).map { [$0] }
+        }
         self.progress.totalUnitCount = response.expectedContentLength
     }
 

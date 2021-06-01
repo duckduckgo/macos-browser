@@ -1,5 +1,5 @@
 //
-//  WebKitDownloadCoordinator.swift
+//  WebKitDownloadDelegate.swift
 //
 //  Copyright © 2021 DuckDuckGo. All rights reserved.
 //
@@ -20,16 +20,27 @@ import Foundation
 import WebKit
 import Combine
 
-final class WebKitDownloadCoordinator: NSObject, WebKitDownloadDelegate {
+protocol FileDownloadManagerProtocol {
+    func startDownload(_ request: FileDownloadRequest,
+                       delegate: FileDownloadManagerDelegate?,
+                       postflight: FileDownloadPostflight?) -> FileDownloadTask?
+}
 
-    static let shared = WebKitDownloadCoordinator()
-    private let downloadManager: FileDownloadManager
+extension FileDownloadManager: FileDownloadManagerProtocol {}
+
+final class WebKitDownloadDelegate: NSObject {
+
+    static let shared = WebKitDownloadDelegate()
+    private let downloadManager: FileDownloadManagerProtocol
+    private let postflight: FileDownloadPostflight
 
     private var tasks = [NSObject: WebKitDownloadTaskProtocol]()
     private var cancellables = [NSObject: AnyCancellable]()
 
-    init(downloadManager: FileDownloadManager = .shared) {
+    init(downloadManager: FileDownloadManagerProtocol = FileDownloadManager.shared,
+         postflightAction: FileDownloadPostflight = .reveal) {
         self.downloadManager = downloadManager
+        self.postflight = postflightAction
     }
 
     private func setTask(_ task: WebKitDownloadTaskProtocol?,
@@ -48,15 +59,16 @@ final class WebKitDownloadCoordinator: NSObject, WebKitDownloadDelegate {
 }
 
 // swiftlint:disable identifier_name
-extension WebKitDownloadCoordinator {
+// https://github.com/WebKit/webkit/blob/main/Source/WebKit/UIProcess/API/Cocoa/_WKDownloadDelegate.h
+extension WebKitDownloadDelegate {
 
-    func _downloadDidStart(_ download: WebKitDownload) {
+    @objc func _downloadDidStart(_ download: WebKitDownload) {
         let delegate = download.originatingWebView?.uiDelegate as? FileDownloadManagerDelegate
         assert(delegate != nil, "webView.uiDelegate does not conform to FileDownloadManagerDelegate")
 
         guard let task = downloadManager.startDownload(FileDownload.wkDownload(download),
                                                        delegate: delegate,
-                                                       postflight: .reveal) as? WebKitDownloadTaskProtocol
+                                                       postflight: postflight) as? WebKitDownloadTaskProtocol
         else {
             assertionFailure("Task returned by DownloadManager should conform to WebKitDownloadTaskProtocol")
             return
@@ -70,43 +82,43 @@ extension WebKitDownloadCoordinator {
         self.setTask(task, cancellable: cancellable, for: download)
     }
 
-    func _download(_ download: WebKitDownload, didReceiveResponse response: URLResponse) {
+    @objc func _download(_ download: WebKitDownload, didReceiveResponse response: URLResponse) {
         task(for: download)?.download(download, didReceiveResponse: response)
     }
 
-    func _download(_ download: WebKitDownload,
-                   didWriteData bytesWritten: UInt64,
-                   totalBytesWritten: UInt64,
-                   totalBytesExpectedToWrite: UInt64) {
+    @objc func _download(_ download: WebKitDownload,
+                         didWriteData bytesWritten: UInt64,
+                         totalBytesWritten: UInt64,
+                         totalBytesExpectedToWrite: UInt64) {
         task(for: download)?.download(download,
                                       didWriteData: bytesWritten,
                                       totalBytesWritten: totalBytesWritten,
                                       totalBytesExpectedToWrite: totalBytesExpectedToWrite)
     }
 
-    func _download(_ download: WebKitDownload,
-                   decideDestinationWithSuggestedFilename suggestedFilename: String?,
-                   completionHandler: @escaping (Bool, String?) -> Void) {
+    @objc func _download(_ download: WebKitDownload,
+                         decideDestinationWithSuggestedFilename suggestedFilename: String?,
+                         completionHandler: @escaping (Bool, String?) -> Void) {
         task(for: download)?.download(download,
                                       decideDestinationWithSuggestedFilename: suggestedFilename,
                                       completionHandler: completionHandler)
     }
 
-    func _downloadDidFinish(_ download: WebKitDownload) {
+    @objc func _downloadDidFinish(_ download: WebKitDownload) {
         task(for: download)?.downloadDidFinish(download)
     }
 
-    func _downloadDidCancel(_ download: WebKitDownload) {
+    @objc func _downloadDidCancel(_ download: WebKitDownload) {
         task(for: download)?.downloadDidCancel(download)
     }
 
-    func _download(_ download: WebKitDownload, didFailWithError error: Error) {
+    @objc func _download(_ download: WebKitDownload, didFailWithError error: Error) {
         task(for: download)?.download(download, didFailWithError: error)
     }
 
-    func _download(_ download: WebKitDownload,
-                   didReceiveAuthenticationChallenge challenge: URLAuthenticationChallenge,
-                   completionHandler: @escaping (URLSession.AuthChallengeDisposition, URLCredential?) -> Void) {
+    @objc func _download(_ download: WebKitDownload,
+                         didReceiveAuthenticationChallenge challenge: URLAuthenticationChallenge,
+                         completionHandler: @escaping (URLSession.AuthChallengeDisposition, URLCredential?) -> Void) {
         task(for: download)?.download(download,
                                       didReceiveAuthenticationChallenge: challenge,
                                       completionHandler: completionHandler)

@@ -20,11 +20,6 @@ import Cocoa
 import Combine
 import os
 
-protocol FileDownloadManagerDelegate: AnyObject {
-    func chooseDestination(suggestedFilename: String?, directoryURL: URL?, fileTypes: [UTType], callback: @escaping (URL?, UTType?) -> Void)
-    func fileIconFlyAnimationOriginalRect(for downloadTask: FileDownloadTask) -> NSRect?
-}
-
 final class FileDownloadManager: NSObject {
 
     static let shared = FileDownloadManager()
@@ -50,13 +45,14 @@ final class FileDownloadManager: NSObject {
 
     @discardableResult
     func startDownload(_ request: FileDownloadRequest,
-                       delegate: FileDownloadManagerDelegate?,
+                       chooseDestinationCallback: FileNameChooserCallback? = nil,
+                       fileIconOriginalRectCallback: FileIconOriginalRectCallback? = nil,
                        postflight: FileDownloadPostflight?) -> FileDownloadTask? {
 
         guard let task = request.downloadTask() else { return nil }
 
-        self.destinationChooserCallbacks[task] = delegate?.chooseDestination
-        self.fileIconOriginalRectCallbacks[task] = delegate?.fileIconFlyAnimationOriginalRect
+        self.destinationChooserCallbacks[task] = chooseDestinationCallback
+        self.fileIconOriginalRectCallbacks[task] = fileIconOriginalRectCallback
         task.postflight = postflight
 
         downloads.insert(task)
@@ -135,6 +131,27 @@ extension FileDownloadManager: FileDownloadTaskDelegate {
                 break
             }
         }
+    }
+
+}
+
+protocol FileDownloadManagerDelegate: AnyObject {
+
+    func chooseDestination(suggestedFilename: String?, directoryURL: URL?, fileTypes: [UTType], callback: @escaping (URL?, UTType?) -> Void)
+    func fileIconFlyAnimationOriginalRect(for downloadTask: FileDownloadTask) -> NSRect?
+
+}
+
+extension FileDownloadManager {
+
+    @discardableResult
+    func startDownload(_ request: FileDownloadRequest,
+                       delegate: FileDownloadManagerDelegate?,
+                       postflight: FileDownloadPostflight?) -> FileDownloadTask? {
+        return self.startDownload(request,
+                                  chooseDestinationCallback: delegate?.chooseDestination,
+                                  fileIconOriginalRectCallback: delegate?.fileIconFlyAnimationOriginalRect,
+                                  postflight: postflight)
     }
 
 }
