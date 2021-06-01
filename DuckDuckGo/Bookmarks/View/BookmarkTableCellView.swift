@@ -22,6 +22,7 @@ import Foundation
 
     func bookmarkTableCellViewRequestedMenu(_ sender: NSButton, cell: BookmarkTableCellView)
     func bookmarkTableCellViewToggledFavorite(cell: BookmarkTableCellView)
+    func bookmarkTableCellView(_ cellView: BookmarkTableCellView, updatedBookmarkWithUUID uuid: UUID, newTitle: String, newUrl: String)
 
 }
 
@@ -215,6 +216,14 @@ final class BookmarkTableCellView: NSTableCellView, NibLoadable {
         bookmarkURLLabel.isHidden = true
         favoriteButton.isHidden = true
         titleLabelBottomConstraint.priority = .required
+
+        if let editedBookmark = self.entity as? Bookmark,
+           titleLabel.stringValue != editedBookmark.title || bookmarkURLLabel.stringValue != editedBookmark.url.absoluteString {
+            delegate?.bookmarkTableCellView(self,
+                                            updatedBookmarkWithUUID: editedBookmark.id,
+                                            newTitle: titleLabel.stringValue,
+                                            newUrl: bookmarkURLLabel.stringValue)
+        }
     }
 
     private func ensureTrackingArea() {

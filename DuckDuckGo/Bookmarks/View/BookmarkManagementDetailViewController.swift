@@ -83,6 +83,11 @@ final class BookmarkManagementDetailViewController: NSViewController {
     }
 
     fileprivate func reloadData() {
+        guard editingBookmarkIndex == nil else {
+            // If the table view is editing, the reload will be deferred until after the cell animation has completed.
+            return
+        }
+
         DispatchQueue.main.async {
             self.tableView.reloadData()
         }
@@ -137,8 +142,9 @@ final class BookmarkManagementDetailViewController: NSViewController {
     private func updateEditingState(forRowAt index: Int) {
         guard index != -1 else {
             if let expandedIndex = self.editingBookmarkIndex {
-                animateEditingState(forRowAt: expandedIndex, editing: false)
-                self.editingBookmarkIndex = nil
+                animateEditingState(forRowAt: expandedIndex, editing: false) {
+                    self.editingBookmarkIndex = nil
+                }
             }
 
             return
@@ -160,7 +166,7 @@ final class BookmarkManagementDetailViewController: NSViewController {
         }
     }
 
-    private func animateEditingState(forRowAt index: Int, editing: Bool) {
+    private func animateEditingState(forRowAt index: Int, editing: Bool, completion: (() -> Void)? = nil) {
         if let cell = tableView.view(atColumn: 0, row: index, makeIfNecessary: false) as? BookmarkTableCellView,
            let row = tableView.rowView(atRow: index, makeIfNecessary: false) as? BookmarkTableRowView {
 
@@ -168,6 +174,7 @@ final class BookmarkManagementDetailViewController: NSViewController {
             NSAnimationContext.runAnimationGroup { context in
                 context.allowsImplicitAnimation = true
                 context.duration = Constants.animationSpeed
+                context.completionHandler = completion
 
                 cell.isEditing = editing
                 row.editing = editing
@@ -380,6 +387,23 @@ extension BookmarkManagementDetailViewController: BookmarkTableCellViewDelegate 
 
         bookmark.isFavorite.toggle()
         LocalBookmarkManager.shared.update(bookmark: bookmark)
+    }
+
+    func bookmarkTableCellView(_ cell: BookmarkTableCellView, updatedBookmarkWithUUID uuid: UUID, newTitle: String, newUrl: String) {
+        let row = tableView.row(for: cell)
+
+        guard let bookmark = fetchEntity(at: row) as? Bookmark else {
+            assertionFailure("BookmarkManagementDetailViewController: Tried to favorite object which is not bookmark")
+            return
+        }
+
+        if let newURL = URL(string: newUrl) {
+            // TODO: This should be consolidated into a single edit call, and then verify that the table view is reloaded correctly.
+            _ = LocalBookmarkManager.shared.updateUrl(of: bookmark, to: newURL)
+            bookmark.title = newTitle
+
+            LocalBookmarkManager.shared.update(bookmark: bookmark)
+        }
     }
 
 }
