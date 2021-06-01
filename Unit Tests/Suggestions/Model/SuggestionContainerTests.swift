@@ -24,7 +24,9 @@ final class SuggestionContainerTests: XCTestCase {
 
     func testWhenGetSuggestionsIsCalled_ThenContainerAsksAndHoldsSuggestionsFromLoader() {
         let suggestionLoadingMock = SuggestionLoadingMock()
+        let historyCoordinatingMock = HistoryCoordinatingMock()
         let suggestionContainer = SuggestionContainer(suggestionLoading: suggestionLoadingMock,
+                                                      historyCoordinating: historyCoordinatingMock,
                                                       bookmarkManager: LocalBookmarkManager.shared)
 
         let e = expectation(description: "Suggestions updated")
@@ -35,30 +37,26 @@ final class SuggestionContainerTests: XCTestCase {
         }
 
         suggestionContainer.getSuggestions(for: "test")
-
-        let suggestions = [
-            Suggestion.website(url: URL.duckDuckGo),
-            Suggestion.website(url: URL.duckDuckGoAutocomplete)
-        ]
-        suggestionLoadingMock.completion!(suggestions, nil)
+        let result = SuggestionResult.aSuggestionResult
+        suggestionLoadingMock.completion!(result, nil)
 
         XCTAssert(suggestionLoadingMock.getSuggestionsCalled)
         withExtendedLifetime(cancellable) {
             waitForExpectations(timeout: 1)
         }
-        XCTAssertEqual(suggestionContainer.suggestions, suggestions)
+        XCTAssertEqual(suggestionContainer.suggestions, result.topHits + result.duckduckgoSuggestions + result.historyAndBookmarks)
     }
 
     func testWhenStopGettingSuggestionsIsCalled_ThenNoSuggestionsArePublished() {
         let suggestionLoadingMock = SuggestionLoadingMock()
+        let historyCoordinatingMock = HistoryCoordinatingMock()
         let suggestionContainer = SuggestionContainer(suggestionLoading: suggestionLoadingMock,
+                                                      historyCoordinating: historyCoordinatingMock,
                                               bookmarkManager: LocalBookmarkManager.shared)
 
         suggestionContainer.getSuggestions(for: "test")
         suggestionContainer.stopGettingSuggestions()
-
-        let suggestions = [ Suggestion.website(url: URL.duckDuckGo) ]
-        suggestionLoadingMock.completion?(suggestions, nil)
+        suggestionLoadingMock.completion?(SuggestionResult.aSuggestionResult, nil)
 
         XCTAssert(suggestionLoadingMock.getSuggestionsCalled)
         XCTAssertNil(suggestionContainer.suggestions)

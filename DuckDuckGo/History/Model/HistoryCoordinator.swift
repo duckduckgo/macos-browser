@@ -20,6 +20,8 @@ import Foundation
 import os.log
 import Combine
 
+typealias History = [HistoryEntry]
+
 protocol HistoryCoordinating: AnyObject {
 
     var history: History? { get }
@@ -86,7 +88,7 @@ final class HistoryCoordinator: HistoryCoordinating {
         queue.async(flags: .barrier) { [weak self] in
             guard var historyDictionary = self?.historyDictionary else { return }
             guard var entry = historyDictionary[url] else {
-                assertionFailure("URL not part of history yet")
+                os_log("Title update ignored - URL not part of history yet", type: .debug)
                 return
             }
             guard !title.isEmpty, entry.title != title else { return }
@@ -109,7 +111,7 @@ final class HistoryCoordinator: HistoryCoordinating {
                 return nil
             })
 
-            self?.cleanAndReloadHistory(until: Date(), except: exceptions)
+            self?.cleanAndReloadHistory(until: .distantFuture, except: exceptions)
         }
     }
 
@@ -124,7 +126,7 @@ final class HistoryCoordinator: HistoryCoordinating {
 
             self.cancellables = Set<AnyCancellable>()
             self.historyStoring.cleanAndReloadHistory(until: date, except: exceptions)
-                .receive(on: self.queue)
+                .receive(on: self.queue, options: .init(flags: .barrier))
                 .sink(receiveCompletion: { completion in
                     switch completion {
                     case .finished:
@@ -161,7 +163,7 @@ final class HistoryCoordinator: HistoryCoordinating {
 
     private func save(entry: HistoryEntry) {
         self.historyStoring.save(entry: entry)
-            .receive(on: self.queue)
+            .receive(on: self.queue, options: .init(flags: .barrier))
             .sink(receiveCompletion: { completion in
                 switch completion {
                 case .finished:

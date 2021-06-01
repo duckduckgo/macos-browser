@@ -123,21 +123,34 @@ extension SuggestionContainerViewModel {
 
     static var aSuggestionContainerViewModel: SuggestionContainerViewModel {
         let suggestionLoadingMock = SuggestionLoadingMock()
+        let historyCoordinatingMock = HistoryCoordinatingMock()
         let suggestionContainer = SuggestionContainer(suggestionLoading: suggestionLoadingMock,
+                                                      historyCoordinating: historyCoordinatingMock,
                                                       bookmarkManager: LocalBookmarkManager.shared)
         let suggestionContainerViewModel = SuggestionContainerViewModel(suggestionContainer: suggestionContainer)
 
         suggestionContainer.getSuggestions(for: "Test")
-        suggestionLoadingMock.completion?( [
-            Suggestion.website(url: URL.duckDuckGo),
-            Suggestion.website(url: URL.duckDuckGoAutocomplete)
-        ], nil )
+        suggestionLoadingMock.completion?(SuggestionResult.aSuggestionResult, nil )
 
         while suggestionContainer.suggestions == nil {
             RunLoop.current.run(mode: .default, before: Date().addingTimeInterval(0.05))
         }
 
         return suggestionContainerViewModel
+    }
+
+}
+
+extension SuggestionResult {
+
+    static var aSuggestionResult: SuggestionResult {
+        let topHits = [
+            Suggestion.website(url: URL.duckDuckGo),
+            Suggestion.website(url: URL.duckDuckGoAutocomplete)
+        ]
+        return SuggestionResult(topHits: topHits,
+                                duckduckgoSuggestions: [],
+                                historyAndBookmarks: [])
     }
 
 }

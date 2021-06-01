@@ -1,5 +1,5 @@
 //
-//  SuggestionLoadingMock.swift
+//  HistoryCoordinatingMock.swift
 //
 //  Copyright © 2021 DuckDuckGo. All rights reserved.
 //
@@ -17,18 +17,25 @@
 //
 
 import XCTest
-import BrowserServicesKit
 @testable import DuckDuckGo_Privacy_Browser
 
-final class SuggestionLoadingMock: SuggestionLoading {
+final class HistoryCoordinatingMock: HistoryCoordinating {
 
-    var getSuggestionsCalled = false
-    var completion: ((SuggestionResult?, Error?) -> Void)?
-    func getSuggestions(query: Query, completion: @escaping (SuggestionResult?, Error?) -> Void) {
-        getSuggestionsCalled = true
-        self.completion = completion
+    var history: History?
+
+    var addVisitCalled = false
+    func addVisit(of url: URL) {
+        addVisitCalled = true
     }
 
-    var dataSource: SuggestionLoadingDataSource?
+    var updateTitleIfNeededCalled = false
+    func updateTitleIfNeeded(title: String, url: URL) {
+        updateTitleIfNeededCalled = true
+    }
+
+    var burnHistoryCalled = false
+    func burnHistory(except fireproofDomains: FireproofDomains) {
+        burnHistoryCalled = true
+    }
 
 }
