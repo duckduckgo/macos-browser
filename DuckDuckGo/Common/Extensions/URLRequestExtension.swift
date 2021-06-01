@@ -46,20 +46,4 @@ extension URLRequest {
         return request
     }
 
-    func applyCookies(from store: WKHTTPCookieStore?, completion: @escaping (URLRequest) -> Void) {
-        guard let store = store else {
-            completion(self)
-            return
-        }
-        store.getAllCookies { cookies in
-            var request = self
-            let filtered = cookies.filter { $0.domain == request.url?.host }
-            let headers = HTTPCookie.requestHeaderFields(with: filtered)
-            for (key, value) in headers {
-                request.setValue(value, forHTTPHeaderField: key)
-            }
-            completion(request)
-        }
-    }
-
 }

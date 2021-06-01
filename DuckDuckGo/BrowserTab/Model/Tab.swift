@@ -172,7 +172,7 @@ final class Tab: NSObject {
     private var currentDownload: FileDownload?
 
     // Used as the request context for HTML 5 downloads
-    private var lastRequestCache = [URL: URLRequest]()
+    private var lastMainFrameRequest: URLRequest?
 
     private var loginDetectionService: LoginDetectionService?
     private let instrumentation = TabInstrumentation()
@@ -507,11 +507,8 @@ extension Tab: WKNavigationDelegate {
         }
 
         if navigationAction.isTargetingMainFrame() {
-            self.lastRequestCache = [:]
-            self.currentDownload = nil
-        }
-        if let url = navigationAction.request.url {
-            self.lastRequestCache[url] = navigationAction.request
+            lastMainFrameRequest = navigationAction.request
+            currentDownload = nil
         }
 
         let isLinkActivated = navigationAction.navigationType == .linkActivated
@@ -570,23 +567,18 @@ extension Tab: WKNavigationDelegate {
     }
 
     private func navigationResponsePolicyForDownloads(_ navigationResponse: WKNavigationResponse) -> WKNavigationResponsePolicy {
+        guard navigationResponse.isForMainFrame else {
+            return .allow
+        }
 
         if (!navigationResponse.canShowMIMEType || navigationResponse.shouldDownload),
-           let url = navigationResponse.response.url,
-           let request = self.lastRequestCache[url] {
-
-            request.applyCookies(from: webView.configuration.websiteDataStore.httpCookieStore) { request in
-                let download = FileDownload.request(request,
-                                                    suggestedName: navigationResponse.response.suggestedFilename,
-                                                    promptForLocation: false)
-                // Flag this here, because interrupting the frame load will cause an error and we need to know
-                if navigationResponse.isForMainFrame {
-                    self.currentDownload = download
-                }
-
-                self.delegate?.tab(self, requestedFileDownload: download)
-            }
-
+           let request = lastMainFrameRequest {
+            let download = FileDownload.request(request,
+                                                suggestedName: navigationResponse.response.suggestedFilename,
+                                                promptForLocation: false)
+            delegate?.tab(self, requestedFileDownload: download)
+            // Flag this here, because interrupting the frame load will cause an error and we need to know
+            self.currentDownload = download
             return .cancel
         }
 

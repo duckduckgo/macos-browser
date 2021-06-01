@@ -375,12 +375,7 @@ extension BrowserTabViewController: LinkMenuItemSelectors {
         guard let tab = tabCollectionViewModel.selectedTabViewModel?.tab,
               let url = contextMenuLink else { return }
 
-        let cookieStore = tab.webView.configuration.websiteDataStore.httpCookieStore
-        FileDownload.with(url: url,
-                          promptForLocation: true,
-                          cookieStore: cookieStore) { dl in
-            self.tab(tab, requestedFileDownload: dl)
-        }
+        self.tab(tab, requestedFileDownload: FileDownload(url: url, promptForLocation: true))
     }
 
     func copyLink(_ sender: NSMenuItem) {
@@ -409,12 +404,7 @@ extension BrowserTabViewController: ImageMenuItemSelectors {
         guard let tab = tabCollectionViewModel.selectedTabViewModel?.tab,
               let url = contextMenuImage else { return }
 
-        let cookieStore = tab.webView.configuration.websiteDataStore.httpCookieStore
-        FileDownload.with(url: url,
-                          promptForLocation: true,
-                          cookieStore: cookieStore) { dl in
-            self.tab(tab, requestedFileDownload: dl)
-        }
+        self.tab(tab, requestedFileDownload: FileDownload(url: url, promptForLocation: true))
     }
 
     func copyImageAddress(_ sender: NSMenuItem) {
