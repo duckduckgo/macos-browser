@@ -20,6 +20,6 @@ import Foundation
 
 extension TimeInterval {
 
-    static var day: TimeInterval = 60 * 60 * 24
+    static let day: TimeInterval = 60 * 60 * 24
 
 }

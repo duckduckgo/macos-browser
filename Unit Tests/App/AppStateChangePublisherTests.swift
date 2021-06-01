@@ -100,7 +100,7 @@ final class AppStateChangePublisherTests: XCTestCase {
             }.store(in: &cancellables)
 
         window!.close()
-        waitForExpectations(timeout: 0.3, handler: nil)
+        waitForExpectations(timeout: 3, handler: nil)
     }
 
     func testWhenWindowIsPositionedThenStateChangePublished() {

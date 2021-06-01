@@ -26,18 +26,18 @@ final class WebView: WKWebView {
         // Links
         "WKMenuItemIdentifierOpenLink": #selector(LinkMenuItemSelectors.openLinkInNewTab(_:)),
         "WKMenuItemIdentifierOpenLinkInNewWindow": #selector(LinkMenuItemSelectors.openLinkInNewWindow(_:)),
-        "WKMenuItemIdentifierDownloadLinkedFile": #selector(LinkMenuItemSelectors.downloadLinkedFile(_:)),
+        "WKMenuItemIdentifierDownloadLinkedFile": #selector(LinkMenuItemSelectors.downloadLinkedFileAs(_:)),
         "WKMenuItemIdentifierCopyLink": #selector(LinkMenuItemSelectors.copyLink(_:)),
 
         // Images
         "WKMenuItemIdentifierOpenImageInNewWindow": #selector(ImageMenuItemSelectors.openImageInNewWindow(_:)),
-        "WKMenuItemIdentifierDownloadImage": #selector(ImageMenuItemSelectors.saveImageToDownloads(_:))
+        "WKMenuItemIdentifierDownloadImage": #selector(ImageMenuItemSelectors.saveImageAs(_:))
     ]
 
     static let itemTitles: [String: String] = [
-
-        "WKMenuItemIdentifierOpenLink": UserText.openLinkInNewTab
-
+        "WKMenuItemIdentifierOpenLink": UserText.openLinkInNewTab,
+        "WKMenuItemIdentifierDownloadImage": UserText.saveImageAs,
+        "WKMenuItemIdentifierDownloadLinkedFile": UserText.downloadLinkedFileAs
     ]
 
     static private let maxMagnification: CGFloat = 3.0

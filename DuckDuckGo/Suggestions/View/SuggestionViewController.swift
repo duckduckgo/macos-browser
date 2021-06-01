@@ -206,8 +206,8 @@ final class SuggestionViewController: NSViewController {
         if event.window === view.window,
            tableView.isMouseLocationInsideBounds(event.locationInWindow) {
 
-            closeWindow()
             delegate?.suggestionViewControllerDidConfirmSelection(self)
+            closeWindow()
             return nil
         }
         return event
