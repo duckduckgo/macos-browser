@@ -10,7 +10,7 @@
         <customObject id="-2" userLabel="File's Owner"/>
         <customObject id="-1" userLabel="First Responder" customClass="FirstResponder"/>
         <customObject id="-3" userLabel="Application" customClass="NSObject"/>
-        <tableCellView misplaced="YES" id="Vr0-6g-JMm" customClass="BookmarkTableCellView" customModule="DuckDuckGo_Privacy_Browser" customModuleProvider="target">
+        <tableCellView id="Vr0-6g-JMm" customClass="BookmarkTableCellView" customModule="DuckDuckGo_Privacy_Browser" customModuleProvider="target">
             <rect key="frame" x="0.0" y="0.0" width="462" height="84"/>
             <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
             <subviews>

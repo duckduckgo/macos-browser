@@ -49,7 +49,14 @@ final class Tab: NSObject {
         }
 
         static var displayableTabTypes: [TabType] {
-            return TabType.allCases.filter { $0 != .standard }
+            let cases = TabType.allCases.filter { $0 != .standard }
+            return cases.sorted { first, second in
+                guard let firstTitle = first.title, let secondTitle = second.title else {
+                    return true // Arbitrary sort order, only non-standard tabs are displayable.
+                }
+
+                return firstTitle.localizedStandardCompare(secondTitle) == .orderedAscending
+            }
         }
 
         var title: String? {
