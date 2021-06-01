@@ -20,7 +20,7 @@ import Cocoa
 import Combine
 import os
 
-final class FileDownloadManager: NSObject {
+final class FileDownloadManager {
 
     static let shared = FileDownloadManager()
     private let workspace: NSWorkspace
@@ -32,7 +32,6 @@ final class FileDownloadManager: NSObject {
     }
 
     @PublishedAfter private (set) var downloads = Set<FileDownloadTask>()
-    private var wkDownloads = [NSObject: WebKitDownloadTask]()
 
     typealias FileNameChooserCallback = (/*suggestedFilename:*/ String?,
                                          /*directoryURL:*/      URL?,
