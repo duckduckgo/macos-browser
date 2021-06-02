@@ -133,7 +133,7 @@ final class TabViewModelTests: XCTestCase {
 
         let faviconExpectation = expectation(description: "Favicon")
 
-        tabViewModel.$favicon.debounce(for: 0.1, scheduler: RunLoop.main).sink { favicon in
+        tabViewModel.$favicon.debounce(for: 0.3, scheduler: RunLoop.main).sink { favicon in
             XCTAssertNotNil(favicon)
             XCTAssertNotEqual(favicon, TabViewModel.Favicon.home)
             if favicon != TabViewModel.Favicon.defaultFavicon {

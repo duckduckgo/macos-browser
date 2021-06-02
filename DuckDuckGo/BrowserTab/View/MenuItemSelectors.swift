@@ -22,7 +22,7 @@ import Cocoa
 
     func openLinkInNewTab(_ sender: NSMenuItem)
     func openLinkInNewWindow(_ sender: NSMenuItem)
-    func downloadLinkedFile(_ sender: NSMenuItem)
+    func downloadLinkedFileAs(_ sender: NSMenuItem)
     func copyLink(_ sender: NSMenuItem)
 
 }
@@ -31,7 +31,7 @@ import Cocoa
 
     func openImageInNewTab(_ sender: NSMenuItem)
     func openImageInNewWindow(_ sender: NSMenuItem)
-    func saveImageToDownloads(_ sender: NSMenuItem)
+    func saveImageAs(_ sender: NSMenuItem)
     func copyImageAddress(_ sender: NSMenuItem)
 
 }
