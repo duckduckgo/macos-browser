@@ -61,11 +61,11 @@ struct BookmarkViewModel {
     // MARK: - Representing Color and Character
 
     static var representingColors = [
-        NSColor(named: "BookmarkRepresentingColor1")!,
-        NSColor(named: "BookmarkRepresentingColor2")!,
-        NSColor(named: "BookmarkRepresentingColor3")!,
-        NSColor(named: "BookmarkRepresentingColor4")!,
-        NSColor(named: "BookmarkRepresentingColor5")!
+        NSColor.bookmarkRepresentingColor1,
+        NSColor.bookmarkRepresentingColor2,
+        NSColor.bookmarkRepresentingColor3,
+        NSColor.bookmarkRepresentingColor4,
+        NSColor.bookmarkRepresentingColor5,
     ]
 
     // Representing color is a color shown as a background of homepage item when
