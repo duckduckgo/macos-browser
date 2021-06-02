@@ -64,6 +64,8 @@ struct UserText {
     static let openLinkInNewTab = NSLocalizedString("open.link.in.new.tab", value: "Open Link in New Tab", comment: "Context menu item")
     static let openImageInNewTab = NSLocalizedString("open.image.in.new.tab", value: "Open Image in New Tab", comment: "Context menu item")
     static let copyImageAddress = NSLocalizedString("copy.image.address", value: "Copy Image Address", comment: "Context menu item")
+    static let saveImageAs = NSLocalizedString("save.image.as", value: "Save Image As...", comment: "Context menu item")
+    static let downloadLinkedFileAs = NSLocalizedString("save.image.as", value: "Download Linked File As...", comment: "Context menu item")
 
     static let findInPage = NSLocalizedString("find.in.page", value: "%1$d of %2$d", comment: "Find in page status (e.g. 1 of 99)")
 

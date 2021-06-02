@@ -267,12 +267,51 @@ extension BrowserTabViewController: TabDelegate {
         openNewTab(with: url, parentTab: tab, selected: selected)
     }
 
-    func tab(_ tab: Tab, requestedFileDownload download: FileDownload) {
-        FileDownloadManager.shared.startDownload(download)
+    func tab(_ tab: Tab, requestedFileDownload request: FileDownload) {
+        FileDownloadManager.shared.startDownload(request,
+                                                 chooseDestinationCallback: self.chooseDestination,
+                                                 fileIconOriginalRectCallback: self.fileIconFlyAnimationOriginalRect,
+                                                 postflight: .reveal)
 
         // Note this can result in tabs being left open, e.g. download button on this page:
         // https://en.wikipedia.org/wiki/Guitar#/media/File:GuitareClassique5.png
         //  Safari closes new tabs that were opened and then create a download instantly.  Should we do the same?
+    }
+
+    func chooseDestination(suggestedFilename: String?, directoryURL: URL?, fileTypes: [UTType], callback: @escaping (URL?, UTType?) -> Void) {
+        dispatchPrecondition(condition: .onQueue(.main))
+        let savePanel = NSSavePanel.withFileTypeChooser(fileTypes: fileTypes, suggestedFilename: suggestedFilename, directoryURL: directoryURL)
+
+        func completionHandler(_ result: NSApplication.ModalResponse) {
+            guard case .OK = result else {
+                callback(nil, nil)
+                return
+            }
+            callback(savePanel.url, savePanel.selectedFileType)
+        }
+
+        if let window = self.view.window {
+            savePanel.beginSheetModal(for: window, completionHandler: completionHandler)
+        } else {
+            completionHandler(savePanel.runModal())
+        }
+    }
+
+    func fileIconFlyAnimationOriginalRect(for downloadTask: FileDownloadTask) -> NSRect? {
+        dispatchPrecondition(condition: .onQueue(.main))
+        guard let window = self.view.window,
+              let dockScreen = NSScreen.dockScreen
+        else { return nil }
+
+        // fly 64x64 icon from the center of Address Bar
+        let size = view.bounds.size
+        let rect = NSRect(x: size.width / 2 - 32, y: size.height / 2 - 32, width: 64, height: 64)
+        let windowRect = view.convert(rect, to: nil)
+        let globalRect = window.convertToScreen(windowRect)
+        // to the Downloads folder in Dock (in DockScreen coordinates)
+        let dockScreenRect = dockScreen.convert(globalRect)
+
+        return dockScreenRect
     }
 
     func tab(_ tab: Tab, willShowContextMenuAt position: NSPoint, image: URL?, link: URL?) {
@@ -326,11 +365,11 @@ extension BrowserTabViewController: LinkMenuItemSelectors {
         WindowsManager.openNewWindow(with: url)
     }
 
-    func downloadLinkedFile(_ sender: NSMenuItem) {
+    func downloadLinkedFileAs(_ sender: NSMenuItem) {
         guard let tab = tabCollectionViewModel.selectedTabViewModel?.tab,
               let url = contextMenuLink else { return }
 
-        self.tab(tab, requestedFileDownload: FileDownload(request: URLRequest(url: url), suggestedName: nil))
+        self.tab(tab, requestedFileDownload: FileDownload(url: url, promptForLocation: true))
     }
 
     func copyLink(_ sender: NSMenuItem) {
@@ -355,11 +394,11 @@ extension BrowserTabViewController: ImageMenuItemSelectors {
         WindowsManager.openNewWindow(with: url)
     }
 
-    func saveImageToDownloads(_ sender: NSMenuItem) {
+    func saveImageAs(_ sender: NSMenuItem) {
         guard let tab = tabCollectionViewModel.selectedTabViewModel?.tab,
               let url = contextMenuImage else { return }
 
-        self.tab(tab, requestedFileDownload: FileDownload(request: URLRequest(url: url), suggestedName: nil))
+        self.tab(tab, requestedFileDownload: FileDownload(url: url, promptForLocation: true))
     }
 
     func copyImageAddress(_ sender: NSMenuItem) {
@@ -374,7 +413,14 @@ extension BrowserTabViewController: WKUIDelegate {
 
     // swiftlint:disable identifier_name
     @objc func _webView(_ webView: WKWebView, saveDataToFile data: NSData, suggestedFilename: NSString, mimeType: NSString, originatingURL: NSURL) {
-        FileDownloadManager.shared.saveDataToFile(data as Data, withSuggestedFileName: suggestedFilename as String, mimeType: mimeType as String)
+        let download = FileDownload.data(data as Data,
+                                         mimeType: mimeType as String,
+                                         suggestedName: suggestedFilename as String,
+                                         sourceURL: originatingURL as URL)
+        FileDownloadManager.shared.startDownload(download,
+                                                 chooseDestinationCallback: self.chooseDestination,
+                                                 fileIconOriginalRectCallback: self.fileIconFlyAnimationOriginalRect,
+                                                 postflight: .reveal)
     }
     // swiftlint:enable identifier_name
 

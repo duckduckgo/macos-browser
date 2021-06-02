@@ -16,69 +16,140 @@
 //  limitations under the License.
 //
 
+import Foundation
 import Combine
-import os
 
-final class FileDownloadTask: NSObject {
+enum FileDownloadError: Error {
+    case cancelled
 
-    enum FileDownloadError: Error {
-
-        case restartResumeNotSupported
-        case failedToCreateTemporaryFile
-        case failedToCreateTemporaryDir
-        case failedToMoveFileToDownloads
-        case failedToCompleteDownloadTask
-
-    }
-
-    let download: FileDownload
-
-    @Published var bytesDownloaded: Int64 = 0
-    @Published var filePath: String?
-    @Published var error: Error?
-
-    var session: URLSession?
-
-    init(download: FileDownload) {
-        self.download = download
-    }
-
-    func start() {
-        if session != nil {
-            error = FileDownloadError.restartResumeNotSupported
-            return
-        }
-        session = URLSession(configuration: .default, delegate: self, delegateQueue: .main)
-        session?.downloadTask(with: download.request).resume()
-    }
+    case restartResumeNotSupported
+    case failedToCreateTemporaryFile
+    case failedToCreateTemporaryDir
+    case failedToMoveFileToDownloads
+    case failedToCompleteDownloadTask(underlyingError: Error)
 
 }
 
-extension FileDownloadTask: URLSessionDownloadDelegate {
+protocol FileDownloadTaskDelegate: AnyObject {
+    func fileDownloadTaskNeedsDestinationURL(_ task: FileDownloadTask, completionHandler: @escaping (URL?, UTType?) -> Void)
+    func fileDownloadTask(_ task: FileDownloadTask, didFinishWith result: Result<URL, FileDownloadError>)
+}
 
-    func urlSession(_ session: URLSession, task: URLSessionTask, didCompleteWithError error: Error?) {
-        os_log("download task failed %s", type: .error, error?.localizedDescription ?? "")
-        self.error = FileDownloadError.failedToCompleteDownloadTask
-    }
+internal class FileDownloadTask: NSObject {
+    let download: FileDownloadRequest
 
-    func urlSession(_ session: URLSession, downloadTask: URLSessionDownloadTask, didFinishDownloadingTo location: URL) {
+    private static let defaultFileName = "Unknown"
 
-        let fileName = download.bestFileName(mimeType: downloadTask.response?.mimeType)
+    /// Tries to use the file name part of the URL, if available, adjusting for content type, if available.
+    var suggestedFilename: String {
+        let url = self.download.sourceURL
 
-        // Don't reassign nil and trigger an event
-        if let filePath = location.moveToDownloadsFolder(withFileName: fileName) {
-            self.filePath = filePath
+        var filename: String
+        if let url = url,
+           !url.pathComponents.isEmpty,
+           url.pathComponents != [ "/" ] {
+
+            filename = url.lastPathComponent
         } else {
-            error = FileDownloadError.failedToMoveFileToDownloads
+            filename = url?.host?.drop(prefix: "www.").replacingOccurrences(of: ".", with: "_") ?? ""
+        }
+        if filename.isEmpty {
+            filename = Self.defaultFileName
         }
 
+        if let ext = self.fileTypes?.first?.fileExtension,
+           !filename.hasSuffix("." + ext) {
+            // there is a more appropriate extension, so use it
+            filename += "." + ext
+        }
+        return filename
     }
 
-    func urlSession(_ session: URLSession, downloadTask: URLSessionDownloadTask,
-                    didWriteData bytesWritten: Int64,
-                    totalBytesWritten: Int64,
-                    totalBytesExpectedToWrite: Int64) {
-        bytesDownloaded = totalBytesWritten
+    var fileTypes: [UTType]?
+    let progress: Progress
+
+    private lazy var future: Future<URL, FileDownloadError> = {
+        dispatchPrecondition(condition: .onQueue(.main))
+        let future = Future<URL, FileDownloadError> { self.fulfill = $0 }
+        assert(self.fulfill != nil)
+        return future
+    }()
+
+    private var fulfill: Future<URL, FileDownloadError>.Promise?
+    var output: AnyPublisher<URL, FileDownloadError> { future.eraseToAnyPublisher() }
+
+    var postflight: FileDownloadPostflight?
+
+    private weak var delegate: FileDownloadTaskDelegate?
+
+    init(download: FileDownloadRequest) {
+        self.download = download
+        self.progress = Progress(parent: nil, userInfo: [
+            .fileOperationKindKey: Progress.FileOperationKind.downloading
+        ])
+        super.init()
+
+        progress.kind = .file
+        progress.totalUnitCount = -1
+        progress.completedUnitCount = 0
+
+        progress.isPausable = false
+        progress.isCancellable = true
+        progress.cancellationHandler = { [weak self] in
+            self?.cancel()
+        }
+    }
+
+    final func start(delegate: FileDownloadTaskDelegate) {
+        _=future
+        self.delegate = delegate
+        start()
+    }
+
+    func start() {
+        self.queryDestinationURL()
+    }
+
+    func _finish(with result: Result<URL, FileDownloadError>) { // swiftlint:disable:this identifier_name
+        dispatchPrecondition(condition: .onQueue(.main))
+
+        if case .success = result {
+            if self.progress.totalUnitCount == -1 {
+                self.progress.totalUnitCount = 1
+            }
+            self.progress.completedUnitCount = self.progress.totalUnitCount
+        }
+
+        self.progress.unpublishIfNeeded()
+
+        self.delegate?.fileDownloadTask(self, didFinishWith: result)
+        self.fulfill?(result)
+        self.fulfill = nil
+    }
+
+    final func finish(with result: Result<URL, FileDownloadError>) {
+        if Thread.isMainThread {
+            _finish(with: result)
+        } else {
+            DispatchQueue.main.async {
+                self._finish(with: result)
+            }
+        }
+    }
+
+    final func queryDestinationURL() {
+        delegate?.fileDownloadTaskNeedsDestinationURL(self, completionHandler: self.localFileURLCompletionHandler)
+    }
+
+    func localFileURLCompletionHandler(localURL: URL?, fileType: UTType?) {
+    }
+
+    func cancel() {
+    }
+
+    deinit {
+        self.progress.unpublishIfNeeded()
+        assert(fulfill == nil, "FileDownloadTask is deallocated without finish(with:) been called")
     }
 
 }

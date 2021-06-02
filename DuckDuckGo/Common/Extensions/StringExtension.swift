@@ -93,7 +93,17 @@ extension String {
     }
 
     func dropWWW() -> String {
-        self.drop(prefix: "www.")
+        self.drop(prefix: URL.HostPrefix.www.rawValue)
+    }
+
+    static func uniqueFilename(for fileType: UTType? = nil) -> String {
+        let fileName = UUID().uuidString
+
+        if let ext = fileType?.fileExtension {
+            return fileName.appending("." + ext)
+        }
+
+        return fileName
     }
 
     // MARK: - Mutating
@@ -103,6 +113,10 @@ extension String {
     }
 
     // MARK: - Prefix
+
+    func hasOrIsPrefix(of other: String) -> Bool {
+        return hasPrefix(other) || other.hasPrefix(self)
+    }
 
     func drop(prefix: String) -> String {
         return hasPrefix(prefix) ? String(dropFirst(prefix.count)) : self

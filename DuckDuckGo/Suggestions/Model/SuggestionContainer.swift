@@ -26,29 +26,36 @@ final class SuggestionContainer {
 
     @Published private(set) var suggestions: [Suggestion]?
 
+    private let historyCoordinating: HistoryCoordinating
     private let bookmarkManager: BookmarkManager
     private let loading: SuggestionLoading
 
     private var latestQuery: Query?
 
-    init(suggestionLoading: SuggestionLoading, bookmarkManager: BookmarkManager) {
+    init(suggestionLoading: SuggestionLoading, historyCoordinating: HistoryCoordinating, bookmarkManager: BookmarkManager) {
         self.bookmarkManager = bookmarkManager
+        self.historyCoordinating = historyCoordinating
         self.loading = suggestionLoading
         self.loading.dataSource = self
     }
 
     convenience init () {
-        self.init(suggestionLoading: SuggestionLoader(urlFactory: URL.makeURL(fromSuggestionPhrase:)), bookmarkManager: LocalBookmarkManager.shared)
+        let urlFactory = { urlString in
+            return URL.makeURL(fromSuggestionPhrase: urlString)
+        }
+
+        self.init(suggestionLoading: SuggestionLoader(urlFactory: urlFactory),
+                  historyCoordinating: HistoryCoordinator.shared,
+                  bookmarkManager: LocalBookmarkManager.shared)
     }
 
     func getSuggestions(for query: String) {
         latestQuery = query
-        loading.getSuggestions(query: query,
-                               maximum: Self.maximumNumberOfSuggestions) { [weak self] (suggestions, error) in
+        loading.getSuggestions(query: query) { [weak self] result, error in
             dispatchPrecondition(condition: .onQueue(.main))
 
             guard self?.latestQuery == query else { return }
-            guard let suggestions = suggestions, error == nil else {
+            guard let result = result else {
                 self?.suggestions = nil
                 os_log("Suggestions: Failed to get suggestions - %s",
                        type: .error,
@@ -57,7 +64,14 @@ final class SuggestionContainer {
                 return
             }
 
-            self?.suggestions = suggestions
+            if let error = error {
+                // Fetching remote suggestions failed but local can be presented
+                os_log("Suggestions: Error when getting suggestions - %s",
+                       type: .error,
+                       "\(String(describing: error))")
+            }
+
+            self?.suggestions = result.topHits + result.duckduckgoSuggestions + result.historyAndBookmarks
         }
     }
 
@@ -68,6 +82,10 @@ final class SuggestionContainer {
 }
 
 extension SuggestionContainer: SuggestionLoadingDataSource {
+
+    func history(for suggestionLoading: SuggestionLoading) -> [BrowserServicesKit.HistoryEntry] {
+        return historyCoordinating.history ?? []
+    }
 
     func bookmarks(for suggestionLoading: SuggestionLoading) -> [BrowserServicesKit.Bookmark] {
         bookmarkManager.list?.bookmarks() ?? []
@@ -93,5 +111,7 @@ extension SuggestionContainer: SuggestionLoadingDataSource {
     }
 
 }
+
+extension HistoryEntry: BrowserServicesKit.HistoryEntry {}
 
 extension Bookmark: BrowserServicesKit.Bookmark {}

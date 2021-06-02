@@ -101,11 +101,13 @@ extension URL {
     // MARK: - Components
 
     enum NavigationalScheme: String, CaseIterable {
+        static let separator = "://"
+
         case http
         case https
 
         func separated() -> String {
-            self.rawValue + "://"
+            self.rawValue + Self.separator
         }
     }
 
@@ -117,13 +119,65 @@ extension URL {
         }
     }
 
-    var absoluteStringWithoutSchemeAndWWW: String {
-        let absoluteString = self.punycodeDecodedString ?? self.absoluteString
-        if let scheme = scheme {
-            return absoluteString.drop(prefix: scheme + "://").drop(prefix: "www.")
-        } else {
+    var separatedScheme: String? {
+        self.scheme.map { $0 + NavigationalScheme.separator }
+    }
+
+    func toString(decodePunycode: Bool,
+                  dropScheme: Bool,
+                  needsWWW: Bool? = nil,
+                  dropTrailingSlash: Bool) -> String {
+        guard let components = URLComponents(url: self, resolvingAgainstBaseURL: true),
+              var string = components.string
+        else {
             return absoluteString
         }
+
+        if var host = components.host,
+           let hostRange = components.rangeOfHost {
+
+            switch (needsWWW, host.hasPrefix(HostPrefix.www.separated())) {
+            case (.some(true), true),
+                 (.some(false), false),
+                 (.none, _):
+                break
+            case (.some(false), true):
+                host = host.drop(prefix: HostPrefix.www.separated())
+            case (.some(true), false):
+                host = HostPrefix.www.separated() + host
+            }
+
+            if decodePunycode,
+               let decodedHost = host.idnaDecoded {
+                host = decodedHost
+            }
+
+            string.replaceSubrange(hostRange, with: host)
+        }
+
+        if dropScheme,
+           let schemeRange = components.rangeOfScheme {
+            string.replaceSubrange(schemeRange, with: "")
+            if string.hasPrefix(URL.NavigationalScheme.separator) {
+                string = string.drop(prefix: URL.NavigationalScheme.separator)
+            }
+        }
+
+        if dropTrailingSlash,
+           string.hasSuffix("/") {
+            string = String(string.dropLast(1))
+        }
+
+        return string
+    }
+
+    func toString(forUserInput input: String, decodePunycode: Bool = true) -> String {
+        self.toString(decodePunycode: decodePunycode,
+                      dropScheme: input.isEmpty
+                        || !input.hasOrIsPrefix(of: self.separatedScheme ?? ""),
+                      needsWWW: !input.drop(prefix: self.separatedScheme ?? "").isEmpty
+                        && input.drop(prefix: self.separatedScheme ?? "").hasOrIsPrefix(of: URL.HostPrefix.www.rawValue),
+                      dropTrailingSlash: false)
     }
 
     // MARK: - Validity
@@ -203,71 +257,16 @@ extension URL {
         return components.url
     }
 
-    // MARK: - File Downloads
-
-    func moveToDownloadsFolder(withFileName fileName: String) -> String? {
-
-        func incrementFileName(in folder: URL, named name: String, copy: Int) -> URL {
-            // Zero means we haven't tried anything yet, so use the suggested name.  Otherwise, simply prefix the file name with the copy number.
-            let path = copy == 0 ? name : "\(copy)_\(name)"
-            let file = folder.appendingPathComponent(path)
-            return file
-        }
-
-        let preferences = DownloadPreferences()
-        var downloadLocation: URL?
-
-        if preferences.alwaysRequestDownloadLocation {
-            let panel = NSOpenPanel.downloadDirectoryPanel()
-            let result = panel.runModal()
-
-            if result == .OK, let selectedURL = panel.url {
-                downloadLocation = selectedURL
-            }
-        } else {
-            downloadLocation = preferences.selectedDownloadLocation
-        }
-
-        guard let folderUrl = downloadLocation else {
-            os_log("Failed to access Downloads folder")
-            Pixel.fire(.debug(event: .fileMoveToDownloadsFailed, error: CocoaError(.fileWriteUnknown)))
-            return nil
-        }
-
-        var copy = 0
-        while copy < 1000 { // If it gets to 1000 of these then chances are something else is wrong
-
-            let fileInDownloads = incrementFileName(in: folderUrl, named: fileName, copy: copy)
-            do {
-                try FileManager.default.moveItem(at: self, to: fileInDownloads)
-                return fileInDownloads.path
-            } catch CocoaError.fileWriteFileExists {
-                // This is expected, as moveItem throws an error if the file already exists
-            } catch {
-                Pixel.fire(.debug(event: .fileMoveToDownloadsFailed, error: error))
-                break // swiftlint:disable:this unneeded_break_in_switch
-            }
-            copy += 1
-        }
-
-        os_log("Failed to move file to Downloads folder, attempt %d", type: .error, copy)
-        return nil
-    }
-
     // MARK: - Punycode
 
     var punycodeDecodedString: String? {
-        guard let components = URLComponents(url: self, resolvingAgainstBaseURL: true),
-              let host = components.host,
-              let decodedHost = host.idnaDecoded,
-              host != decodedHost,
-              let hostRange = components.rangeOfHost,
-              var string = components.string
-        else { return nil }
+        return self.toString(decodePunycode: true, dropScheme: false, dropTrailingSlash: false)
+    }
 
-        string.replaceSubrange(hostRange, with: decodedHost)
+    // MARK: - File URL
 
-        return string
+    var volume: URL? {
+        try? self.resourceValues(forKeys: [.volumeURLKey]).volume
     }
 
 }
