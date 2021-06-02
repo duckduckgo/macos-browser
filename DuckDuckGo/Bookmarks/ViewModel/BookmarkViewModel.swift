@@ -65,7 +65,7 @@ struct BookmarkViewModel {
         NSColor.bookmarkRepresentingColor2,
         NSColor.bookmarkRepresentingColor3,
         NSColor.bookmarkRepresentingColor4,
-        NSColor.bookmarkRepresentingColor5,
+        NSColor.bookmarkRepresentingColor5
     ]
 
     // Representing color is a color shown as a background of homepage item when
