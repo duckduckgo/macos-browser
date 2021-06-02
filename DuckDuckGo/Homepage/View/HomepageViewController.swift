@@ -233,7 +233,7 @@ extension HomepageViewController: NSCollectionViewDataSource, NSCollectionViewDe
             return item
         }
 
-        item.set(bookmarkViewModel: BookmarkViewModel(bookmark: topFavorites[indexPath.item]), isPlaceholder: areFavoritesPlaceholders)
+        item.set(bookmarkViewModel: BookmarkViewModel(entity: topFavorites[indexPath.item]), isPlaceholder: areFavoritesPlaceholders)
         item.delegate = self
         return item
     }

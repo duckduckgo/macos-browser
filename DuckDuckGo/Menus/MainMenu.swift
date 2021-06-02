@@ -99,8 +99,8 @@ final class MainMenu: NSMenu {
 
     var bookmarkListCancellable: AnyCancellable?
     private func subscribeToBookmarkList() {
-        bookmarkListCancellable = LocalBookmarkManager.shared.$list
-            .compactMap({ $0?.bookmarks().map(BookmarkViewModel.init(bookmark:)) })
+        bookmarkListCancellable = LocalBookmarkManager.shared.$topLevelItems
+            .compactMap({ $0?.map(BookmarkViewModel.init(entity:)) })
             .receive(on: DispatchQueue.main).sink { [weak self] bookmarkViewModels in
                 self?.updateBookmarksMenu(bookmarkViewModels: bookmarkViewModels)
         }
@@ -109,14 +109,34 @@ final class MainMenu: NSMenu {
     func updateBookmarksMenu(bookmarkViewModels: [BookmarkViewModel]) {
 
         func bookmarkMenuItems(from bookmarkViewModels: [BookmarkViewModel]) -> [NSMenuItem] {
-            bookmarkViewModels
-                .filter { !$0.bookmark.isFavorite }
-                .map { NSMenuItem(bookmarkViewModel: $0) }
+            var menuItems = [NSMenuItem]()
+
+            for viewModel in bookmarkViewModels {
+                let menuItem = NSMenuItem(bookmarkViewModel: viewModel)
+
+                if let folder = viewModel.entity as? BookmarkFolder {
+                    // Avoid creating a submenu for empty folders.
+                    guard !folder.children.isEmpty else {
+                        continue
+                    }
+
+                    let subMenu = NSMenu(title: folder.title)
+                    let childViewModels = folder.children.map(BookmarkViewModel.init)
+                    let childMenuItems = bookmarkMenuItems(from: childViewModels)
+                    subMenu.items = childMenuItems
+
+                    menuItem.submenu = subMenu
+                }
+
+                menuItems.append(menuItem)
+            }
+
+            return menuItems
         }
 
         func favoriteMenuItems(from bookmarkViewModels: [BookmarkViewModel]) -> [NSMenuItem] {
             bookmarkViewModels
-                .filter { $0.bookmark.isFavorite }
+                .filter { $0.entity.isFavoriteBookmark }
                 .enumerated()
                 .map { index, bookmarkViewModel in
                     let item = NSMenuItem(bookmarkViewModel: bookmarkViewModel)
@@ -155,7 +175,7 @@ fileprivate extension NSMenuItem {
         
         title = bookmarkViewModel.menuTitle
         image = bookmarkViewModel.menuFavicon
-        representedObject = bookmarkViewModel.bookmark
+        representedObject = bookmarkViewModel.entity
         action = #selector(MainViewController.navigateToBookmark(_:))
     }
 

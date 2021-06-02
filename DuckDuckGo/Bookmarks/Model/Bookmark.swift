@@ -42,9 +42,21 @@ internal class BaseBookmarkEntity {
         return BookmarkManagedObject.fetchRequest()
     }
 
+    var asBookmark: Bookmark? {
+        self as? Bookmark
+    }
+
     let id: UUID
     var title: String
     let isFolder: Bool
+
+    var isFavoriteBookmark: Bool {
+        if let bookmark = self as? Bookmark {
+            return bookmark.isFavorite
+        } else {
+            return false
+        }
+    }
 
     fileprivate init(id: UUID,
                      title: String,

@@ -20,14 +20,24 @@ import Foundation
 
 struct BookmarkViewModel {
 
-    let bookmark: Bookmark
+    let entity: BaseBookmarkEntity
 
     static let maxMenuTitleLength = 55
     var menuTitle: String {
-        if bookmark.title.count <= Self.maxMenuTitleLength {
-            return bookmark.title
+        let title: String
+
+        if let bookmark = entity as? Bookmark {
+            title = bookmark.title
+        } else if let folder = entity as? BookmarkFolder {
+            title = folder.title
         } else {
-            return String(bookmark.title.truncated(length: Self.maxMenuTitleLength))
+            preconditionFailure("\(#file): Failed to case BaseBookmarkEntity to Bookmark or Folder")
+        }
+
+        if title.count <= Self.maxMenuTitleLength {
+            return title
+        } else {
+            return String(title.truncated(length: Self.maxMenuTitleLength))
         }
 
     }
@@ -36,9 +46,16 @@ struct BookmarkViewModel {
         // Once we have bookmark folders
         // bookmark.isFavorite ? bookmark.favicon?.makeFavoriteOverlay() : bookmark.favicon
 
-        let favicon = bookmark.favicon?.copy() as? NSImage
-        favicon?.size = NSSize.faviconSize
-        return favicon
+        if let bookmark = entity as? Bookmark {
+            let favicon = bookmark.favicon?.copy() as? NSImage
+            favicon?.size = NSSize.faviconSize
+            return favicon
+        } else if entity is BookmarkFolder {
+            return NSImage(named: "Folder")
+        } else {
+            return nil
+        }
+
     }
 
     // MARK: - Representing Color and Character
@@ -54,12 +71,20 @@ struct BookmarkViewModel {
     // Representing color is a color shown as a background of homepage item when
     // the bookmark has no favicon
     var representingColor: NSColor {
+        guard let bookmark = entity as? Bookmark else {
+            preconditionFailure("\(#file): Attempted to provide representing color for non-Bookmark")
+        }
+        
         let index = bookmark.url.absoluteString.count % Self.representingColors.count
         return Self.representingColors[index]
     }
 
     // Representing character is on top of representing color
     var representingCharacter: String {
+        guard let bookmark = entity as? Bookmark else {
+            preconditionFailure("\(#file): Attempted to provide representing character for non-Bookmark")
+        }
+
         return bookmark.url.host?.dropWWW().first?.uppercased() ?? "-"
     }
 

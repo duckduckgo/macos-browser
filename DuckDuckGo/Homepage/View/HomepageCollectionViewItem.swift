@@ -62,7 +62,7 @@ final class HomepageCollectionViewItem: NSCollectionViewItem {
     func set(bookmarkViewModel: BookmarkViewModel, isPlaceholder: Bool = false) {
         self.isPlaceholder = isPlaceholder
 
-        if let favicon = bookmarkViewModel.bookmark.favicon {
+        if let favicon = bookmarkViewModel.entity.asBookmark?.favicon {
             faviconImageView.image = favicon
             faviconImageView.layer?.backgroundColor = NSColor.clear.cgColor
             representingCharacterTextField.isHidden = true
@@ -73,7 +73,7 @@ final class HomepageCollectionViewItem: NSCollectionViewItem {
             representingCharacterTextField.stringValue = bookmarkViewModel.representingCharacter
         }
 
-        titleTextField.stringValue = bookmarkViewModel.bookmark.title
+        titleTextField.stringValue = bookmarkViewModel.entity.asBookmark!.title
 
         setupMenu()
     }
