@@ -25,6 +25,11 @@ protocol BookmarkManagementDetailViewControllerDelegate: AnyObject {
 
 }
 
+private struct EditedBookmarkMetadata {
+    let uuid: UUID
+    let index: Int
+}
+
 final class BookmarkManagementDetailViewController: NSViewController {
 
     fileprivate enum Constants {
@@ -44,7 +49,7 @@ final class BookmarkManagementDetailViewController: NSViewController {
         }
     }
 
-    private var editingBookmarkIndex: Int? {
+    private var editingBookmarkIndex: EditedBookmarkMetadata? {
         didSet {
             NSAnimationContext.runAnimationGroup { context in
                 context.allowsImplicitAnimation = true
@@ -141,7 +146,7 @@ final class BookmarkManagementDetailViewController: NSViewController {
 
     private func updateEditingState(forRowAt index: Int) {
         guard index != -1 else {
-            if let expandedIndex = self.editingBookmarkIndex {
+            if let expandedIndex = self.editingBookmarkIndex?.index {
                 animateEditingState(forRowAt: expandedIndex, editing: false) {
                     self.editingBookmarkIndex = nil
                 }
@@ -151,17 +156,18 @@ final class BookmarkManagementDetailViewController: NSViewController {
         }
 
         // Cancel the current editing state, if one exists.
-        if let expandedIndex = self.editingBookmarkIndex {
+        if let expandedIndex = self.editingBookmarkIndex?.index {
             animateEditingState(forRowAt: expandedIndex, editing: false)
             self.editingBookmarkIndex = nil
         }
 
         // If the current expanded row matches the one that has just been double clicked, we're going to deselect it.
-        if editingBookmarkIndex == index {
+        if editingBookmarkIndex?.index == index {
             editingBookmarkIndex = nil
             animateEditingState(forRowAt: index, editing: false)
         } else {
-            editingBookmarkIndex = index
+            let entity = fetchEntity(at: index)!
+            editingBookmarkIndex = EditedBookmarkMetadata(uuid: entity.id, index: index)
             animateEditingState(forRowAt: index, editing: true)
         }
     }
@@ -241,8 +247,9 @@ extension BookmarkManagementDetailViewController: NSTableViewDelegate, NSTableVi
 
     func tableView(_ tableView: NSTableView, rowViewForRow row: Int) -> NSTableRowView? {
         let rowView = BookmarkTableRowView()
+        let entity = fetchEntity(at: row)
 
-        if let index = editingBookmarkIndex, index == row {
+        if let uuid = editingBookmarkIndex?.uuid, uuid == entity?.id {
             rowView.editing = true
         }
 
@@ -257,16 +264,12 @@ extension BookmarkManagementDetailViewController: NSTableViewDelegate, NSTableVi
 
             if let bookmark = entity as? Bookmark {
                 cell.update(from: bookmark)
+                cell.isEditing = bookmark.id == editingBookmarkIndex?.uuid
             } else if let folder = entity as? BookmarkFolder {
                 cell.update(from: folder)
+                cell.isEditing = folder.id == editingBookmarkIndex?.uuid
             } else {
                 assertionFailure("Failed to cast bookmark")
-            }
-
-            if let index = editingBookmarkIndex, index == row {
-                cell.isEditing = true
-            } else {
-                cell.isEditing = false
             }
 
             return cell
