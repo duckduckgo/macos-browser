@@ -108,6 +108,17 @@
 		4B9292AB26670D3700AD2C21 /* BookmarkMigrationPolicy.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B9292A626670D3700AD2C21 /* BookmarkMigrationPolicy.swift */; };
 		4B9292AC26670D3700AD2C21 /* Bookmark.xcdatamodeld in Sources */ = {isa = PBXBuildFile; fileRef = 4B9292A726670D3700AD2C21 /* Bookmark.xcdatamodeld */; };
 		4B9292AF26670F5300AD2C21 /* NSOutlineViewExtensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B9292AE26670F5300AD2C21 /* NSOutlineViewExtensions.swift */; };
+		4B9292BA2667103100AD2C21 /* BookmarkNodePathTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B9292B02667103000AD2C21 /* BookmarkNodePathTests.swift */; };
+		4B9292BB2667103100AD2C21 /* BookmarkNodeTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B9292B12667103000AD2C21 /* BookmarkNodeTests.swift */; };
+		4B9292BC2667103100AD2C21 /* BookmarkSidebarTreeControllerTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B9292B22667103000AD2C21 /* BookmarkSidebarTreeControllerTests.swift */; };
+		4B9292BD2667103100AD2C21 /* BookmarkOutlineViewDataSourceTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B9292B32667103000AD2C21 /* BookmarkOutlineViewDataSourceTests.swift */; };
+		4B9292BE2667103100AD2C21 /* PasteboardFolderTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B9292B42667103000AD2C21 /* PasteboardFolderTests.swift */; };
+		4B9292BF2667103100AD2C21 /* TreeControllerTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B9292B52667103000AD2C21 /* TreeControllerTests.swift */; };
+		4B9292C02667103100AD2C21 /* BookmarkManagedObjectTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B9292B62667103000AD2C21 /* BookmarkManagedObjectTests.swift */; };
+		4B9292C12667103100AD2C21 /* BookmarkMigrationTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B9292B72667103000AD2C21 /* BookmarkMigrationTests.swift */; };
+		4B9292C22667103100AD2C21 /* BookmarkTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B9292B82667103000AD2C21 /* BookmarkTests.swift */; };
+		4B9292C32667103100AD2C21 /* PasteboardBookmarkTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B9292B92667103100AD2C21 /* PasteboardBookmarkTests.swift */; };
+		4B9292C52667104B00AD2C21 /* CoreDataTestUtilities.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B9292C42667104B00AD2C21 /* CoreDataTestUtilities.swift */; };
 		4BA1A69B258B076900F6F690 /* FileStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4BA1A69A258B076900F6F690 /* FileStore.swift */; };
 		4BA1A6A0258B079600F6F690 /* DataEncryption.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4BA1A69F258B079600F6F690 /* DataEncryption.swift */; };
 		4BA1A6A5258B07DF00F6F690 /* EncryptedValueTransformer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4BA1A6A4258B07DF00F6F690 /* EncryptedValueTransformer.swift */; };
@@ -478,6 +489,17 @@
 		4B9292A826670D3700AD2C21 /* Bookmark 2.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = "Bookmark 2.xcdatamodel"; sourceTree = "<group>"; };
 		4B9292A926670D3700AD2C21 /* Bookmark.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = Bookmark.xcdatamodel; sourceTree = "<group>"; };
 		4B9292AE26670F5300AD2C21 /* NSOutlineViewExtensions.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = NSOutlineViewExtensions.swift; sourceTree = "<group>"; };
+		4B9292B02667103000AD2C21 /* BookmarkNodePathTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = BookmarkNodePathTests.swift; sourceTree = "<group>"; };
+		4B9292B12667103000AD2C21 /* BookmarkNodeTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = BookmarkNodeTests.swift; sourceTree = "<group>"; };
+		4B9292B22667103000AD2C21 /* BookmarkSidebarTreeControllerTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = BookmarkSidebarTreeControllerTests.swift; sourceTree = "<group>"; };
+		4B9292B32667103000AD2C21 /* BookmarkOutlineViewDataSourceTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = BookmarkOutlineViewDataSourceTests.swift; sourceTree = "<group>"; };
+		4B9292B42667103000AD2C21 /* PasteboardFolderTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = PasteboardFolderTests.swift; sourceTree = "<group>"; };
+		4B9292B52667103000AD2C21 /* TreeControllerTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = TreeControllerTests.swift; sourceTree = "<group>"; };
+		4B9292B62667103000AD2C21 /* BookmarkManagedObjectTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = BookmarkManagedObjectTests.swift; sourceTree = "<group>"; };
+		4B9292B72667103000AD2C21 /* BookmarkMigrationTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = BookmarkMigrationTests.swift; sourceTree = "<group>"; };
+		4B9292B82667103000AD2C21 /* BookmarkTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = BookmarkTests.swift; sourceTree = "<group>"; };
+		4B9292B92667103100AD2C21 /* PasteboardBookmarkTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = PasteboardBookmarkTests.swift; sourceTree = "<group>"; };
+		4B9292C42667104B00AD2C21 /* CoreDataTestUtilities.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CoreDataTestUtilities.swift; sourceTree = "<group>"; };
 		4BA1A69A258B076900F6F690 /* FileStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FileStore.swift; sourceTree = "<group>"; };
 		4BA1A69F258B079600F6F690 /* DataEncryption.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DataEncryption.swift; sourceTree = "<group>"; };
 		4BA1A6A4258B07DF00F6F690 /* EncryptedValueTransformer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EncryptedValueTransformer.swift; sourceTree = "<group>"; };
@@ -1177,6 +1199,7 @@
 		85F69B3A25EDE7F800978E59 /* Common */ = {
 			isa = PBXGroup;
 			children = (
+				4B9292C42667104B00AD2C21 /* CoreDataTestUtilities.swift */,
 				AAEC74B92642E66600C2EFBC /* Extensions */,
 				B65783EB25F8AB9200D8DB33 /* String+PunycodeTests.swift */,
 				85F69B3B25EDE81F00978E59 /* URLExtensionTests.swift */,
@@ -1331,6 +1354,16 @@
 		AA652CAE25DD8228009059CC /* Model */ = {
 			isa = PBXGroup;
 			children = (
+				4B9292B62667103000AD2C21 /* BookmarkManagedObjectTests.swift */,
+				4B9292B72667103000AD2C21 /* BookmarkMigrationTests.swift */,
+				4B9292B02667103000AD2C21 /* BookmarkNodePathTests.swift */,
+				4B9292B12667103000AD2C21 /* BookmarkNodeTests.swift */,
+				4B9292B32667103000AD2C21 /* BookmarkOutlineViewDataSourceTests.swift */,
+				4B9292B22667103000AD2C21 /* BookmarkSidebarTreeControllerTests.swift */,
+				4B9292B82667103000AD2C21 /* BookmarkTests.swift */,
+				4B9292B92667103100AD2C21 /* PasteboardBookmarkTests.swift */,
+				4B9292B42667103000AD2C21 /* PasteboardFolderTests.swift */,
+				4B9292B52667103000AD2C21 /* TreeControllerTests.swift */,
 				AA652CCD25DD9071009059CC /* BookmarkListTests.swift */,
 				AA652CD225DDA6E9009059CC /* LocalBookmarkManagerTests.swift */,
 			);
@@ -2491,11 +2524,15 @@
 			files = (
 				B67C6C472654C643006C872E /* FileManagerExtensionTests.swift in Sources */,
 				142879DA24CE1179005419BB /* SuggestionViewModelTests.swift in Sources */,
+				4B9292C12667103100AD2C21 /* BookmarkMigrationTests.swift in Sources */,
+				4B9292BC2667103100AD2C21 /* BookmarkSidebarTreeControllerTests.swift in Sources */,
 				B6DA44232616CABC00DD1EC2 /* PixelArgumentsTests.swift in Sources */,
 				AAEC74BC2642F0F800C2EFBC /* History.xcdatamodeld in Sources */,
 				85F1B0C925EF9759004792B6 /* URLEventListenerTests.swift in Sources */,
+				4B9292BD2667103100AD2C21 /* BookmarkOutlineViewDataSourceTests.swift in Sources */,
 				B6A5A27925B93FFF00AA7ADA /* StateRestorationManagerTests.swift in Sources */,
 				B6B3E0B726574BF80040E0A2 /* FileDownloadTaskDelegateMock.swift in Sources */,
+				4B9292BB2667103100AD2C21 /* BookmarkNodeTests.swift in Sources */,
 				4B0219A825E0646500ED7DEA /* WebsiteDataStoreTests.swift in Sources */,
 				AAC9C01E24CB6BEB00AD1325 /* TabCollectionViewModelTests.swift in Sources */,
 				85E11C3725E7F1E100974CAF /* ExternalURLHandlerTests.swift in Sources */,
@@ -2510,6 +2547,7 @@
 				AAC9C01C24CB594C00AD1325 /* TabViewModelTests.swift in Sources */,
 				B65349AA265CF45000DCC645 /* DispatchQueueExtensionsTests.swift in Sources */,
 				B6DA441E2616C84600DD1EC2 /* PixelStoreMock.swift in Sources */,
+				4B9292BF2667103100AD2C21 /* TreeControllerTests.swift in Sources */,
 				4B11060525903E570039B979 /* CoreDataEncryptionTesting.xcdatamodeld in Sources */,
 				8546DE6225C03056000CA5E1 /* UserAgentTests.swift in Sources */,
 				4B82E9C125B6A1CD00656FE7 /* TrackerRadarManagerTests.swift in Sources */,
@@ -2520,6 +2558,9 @@
 				4B02199C25E063DE00ED7DEA /* FireproofDomainsTests.swift in Sources */,
 				B65783EC25F8AB9300D8DB33 /* String+PunycodeTests.swift in Sources */,
 				AA0F3DB7261A566C0077F2D9 /* SuggestionLoadingMock.swift in Sources */,
+				4B9292BE2667103100AD2C21 /* PasteboardFolderTests.swift in Sources */,
+				4B9292C52667104B00AD2C21 /* CoreDataTestUtilities.swift in Sources */,
+				4B9292C22667103100AD2C21 /* BookmarkTests.swift in Sources */,
 				142879DC24CE1185005419BB /* SuggestionContainerViewModelTests.swift in Sources */,
 				AA652CD325DDA6E9009059CC /* LocalBookmarkManagerTests.swift in Sources */,
 				AAE39D1B24F44885008EF28B /* TabCollectionViewModelDelegateMock.swift in Sources */,
@@ -2535,10 +2576,13 @@
 				4BA1A6FE258C5C1300F6F690 /* EncryptedValueTransformerTests.swift in Sources */,
 				85F69B3C25EDE81F00978E59 /* URLExtensionTests.swift in Sources */,
 				B6DA44112616C0FC00DD1EC2 /* PixelTests.swift in Sources */,
+				4B9292BA2667103100AD2C21 /* BookmarkNodePathTests.swift in Sources */,
+				4B9292C02667103100AD2C21 /* BookmarkManagedObjectTests.swift in Sources */,
 				AA652CCE25DD9071009059CC /* BookmarkListTests.swift in Sources */,
 				B6A5A2A825BAA35500AA7ADA /* WindowManagerStateRestorationTests.swift in Sources */,
 				B61F012325ECBAE400ABB5A3 /* UserScriptsTest.swift in Sources */,
 				4B11060A25903EAC0039B979 /* CoreDataEncryptionTests.swift in Sources */,
+				4B9292C32667103100AD2C21 /* PasteboardBookmarkTests.swift in Sources */,
 				AAEC74BB2642E67C00C2EFBC /* NSPersistentContainerExtension.swift in Sources */,
 				AABAF59C260A7D130085060C /* FaviconServiceMock.swift in Sources */,
 				AAEC74B82642E43800C2EFBC /* HistoryStoreTests.swift in Sources */,
