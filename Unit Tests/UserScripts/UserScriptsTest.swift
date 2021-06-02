@@ -45,19 +45,20 @@ final class UserScriptsTests: XCTestCase {
         XCTAssertEqual(scripts1, scripts2)
     }
 
-    func testWhenUserScriptsCopiedScriptsAreNotReloaded() {
+    func testWhenUserScriptsCopiedScriptsAreNotReloadedExceptForAutofillScript() {
         let userScripts1 = UserScripts()
         let userScripts2 = UserScripts(copy: userScripts1)
 
-        let scripts1 = Set(userScripts1.scripts)
-        let scripts2 = Set(userScripts2.scripts)
+        let scripts1 = userScripts1.scripts
+        let scripts2 = userScripts2.scripts
 
         // swiftlint:disable force_cast
         let set1 = Set(userScripts1.userScripts as! [NSObject])
         let set2 = Set(userScripts2.userScripts as! [NSObject])
         // swiftlint:enable force_cast
 
-        XCTAssertEqual(scripts1, scripts2)
+        XCTAssertEqual(scripts1.dropLast(), scripts2.dropLast())
+        XCTAssertNotEqual(scripts1.last, scripts2.last)
         XCTAssertNotEqual(set1, set2)
     }
 
@@ -104,7 +105,7 @@ final class UserScriptsTests: XCTestCase {
         let installedScripts = Set(userContentController.userScripts)
 
         XCTAssertEqual(scripts, installedScripts)
-        XCTAssertEqual(messageHandlersCount, userContentController.handlers.count)
+        XCTAssertEqual(messageHandlersCount, userContentController.handlers.count + userContentController.handlersWithReply.count)
         waitForExpectations(timeout: 0.3)
     }
 
@@ -165,6 +166,7 @@ extension UserScriptsTests {
         // swiftlint:enable identifier_name
         override var userScripts: [WKUserScript] { _userScripts }
         var handlers = [String: WKScriptMessageHandler]()
+        var handlersWithReply = [String: WKScriptMessageHandlerWithReply]()
 
         override func addUserScript(_ userScript: WKUserScript) {
             _userScripts.append(userScript)
@@ -189,6 +191,12 @@ extension UserScriptsTests {
         @available(macOS 11.0, *)
         override func removeScriptMessageHandler(forName name: String, contentWorld: WKContentWorld) {
             removeScriptMessageHandler(forName: name)
+        }
+
+        @available(macOS 11, *)
+        override func addScriptMessageHandler(_ scriptMessageHandlerWithReply: WKScriptMessageHandlerWithReply,
+                                              contentWorld: WKContentWorld, name: String) {
+            handlersWithReply[name] = scriptMessageHandlerWithReply
         }
     }
 

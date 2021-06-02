@@ -35,15 +35,10 @@ final class UserScripts {
     init() {
     }
 
-// Copy means that the instance which generated the source is not the same instance that handles the message.
-//  This is require for the autofill script which uses a secret token to make sure the page isn't
-//   sending messages on old versions of WebKit.
-//
-// See AutofillUserScript.swift:157
-//
     init(copy other: UserScripts) {
-        // copy compiled scripts to avoid repeated loading from disk
-//        self.scripts = other.scripts
+        scripts = other.scripts
+        scripts.removeLast()
+        scripts.append(autofillScript.makeWKUserScript())
     }
 
     lazy var userScripts: [UserScript] = [
@@ -55,8 +50,8 @@ final class UserScripts {
         self.loginDetectionUserScript,
         self.contentBlockerScript,
         self.contentBlockerRulesScript,
-        self.autofillScript,
-        self.pageObserverScript
+        self.pageObserverScript,
+        self.autofillScript
     ]
 
     lazy var scripts = userScripts.map { $0.makeWKUserScript() }
