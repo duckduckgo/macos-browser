@@ -62,18 +62,22 @@ final class HomepageCollectionViewItem: NSCollectionViewItem {
     func set(bookmarkViewModel: BookmarkViewModel, isPlaceholder: Bool = false) {
         self.isPlaceholder = isPlaceholder
 
-        if let favicon = bookmarkViewModel.entity.asBookmark?.favicon {
-            faviconImageView.image = favicon
-            faviconImageView.layer?.backgroundColor = NSColor.clear.cgColor
-            representingCharacterTextField.isHidden = true
-        } else {
-            faviconImageView.image = nil
-            faviconImageView.layer?.backgroundColor = bookmarkViewModel.representingColor.cgColor
-            representingCharacterTextField.isHidden = false
-            representingCharacterTextField.stringValue = bookmarkViewModel.representingCharacter
-        }
+        if let bookmark = bookmarkViewModel.entity as? Bookmark {
+            if let favicon = bookmark.favicon {
+                faviconImageView.image = favicon
+                faviconImageView.layer?.backgroundColor = NSColor.clear.cgColor
+                representingCharacterTextField.isHidden = true
+            } else {
+                faviconImageView.image = nil
+                faviconImageView.layer?.backgroundColor = bookmarkViewModel.representingColor.cgColor
+                representingCharacterTextField.isHidden = false
+                representingCharacterTextField.stringValue = bookmarkViewModel.representingCharacter
+            }
 
-        titleTextField.stringValue = bookmarkViewModel.entity.asBookmark!.title
+            titleTextField.stringValue = bookmark.title
+        } else {
+            assertionFailure("\(#file): Tried to display non-Bookmark type on the homepage")
+        }
 
         setupMenu()
     }

@@ -42,10 +42,6 @@ internal class BaseBookmarkEntity {
         return BookmarkManagedObject.fetchRequest()
     }
 
-    var asBookmark: Bookmark? {
-        self as? Bookmark
-    }
-
     let id: UUID
     var title: String
     let isFolder: Bool
