@@ -38,8 +38,8 @@ final class OptionsButtonMenu: NSMenu {
 
         case bookmarkThisPage
         case favoriteThisPage
-        case navigateToBookmark
 
+        case bookmarks
         case preferences
     }
     fileprivate(set) var result: Result?
@@ -56,13 +56,10 @@ final class OptionsButtonMenu: NSMenu {
         setupMenuItems()
     }
 
-    let bookmarksMenuItem = NSMenuItem(title: UserText.bookmarks, action: nil, keyEquivalent: "")
     let zoomMenuItem = NSMenuItem(title: UserText.zoom, action: nil, keyEquivalent: "")
 
     override func update() {
         self.result = nil
-        updateBookmarks()
-
         super.update()
     }
 
@@ -99,32 +96,34 @@ final class OptionsButtonMenu: NSMenu {
 
         addItem(NSMenuItem.separator())
 
-        bookmarksMenuItem.image = NSImage(named: "Bookmark")
-        addItem(bookmarksMenuItem)
-
         if let url = tabCollectionViewModel.selectedTabViewModel?.tab.url, url.canFireproof, let host = url.host {
-             if FireproofDomains.shared.isAllowed(fireproofDomain: host) {
+            if FireproofDomains.shared.isAllowed(fireproofDomain: host) {
 
                 let removeFireproofingItem = NSMenuItem(title: UserText.removeFireproofing,
-                                                 action: #selector(toggleFireproofing(_:)),
-                                                 keyEquivalent: "")
+                                                        action: #selector(toggleFireproofing(_:)),
+                                                        keyEquivalent: "")
                 removeFireproofingItem.target = self
                 removeFireproofingItem.image = NSImage(named: "BurnProof")
                 addItem(removeFireproofingItem)
 
-             } else {
+            } else {
 
                 let fireproofSiteItem = NSMenuItem(title: UserText.fireproofSite,
-                                                 action: #selector(toggleFireproofing(_:)),
-                                                 keyEquivalent: "")
+                                                   action: #selector(toggleFireproofing(_:)),
+                                                   keyEquivalent: "")
                 fireproofSiteItem.target = self
                 fireproofSiteItem.image = NSImage(named: "BurnProof")
                 addItem(fireproofSiteItem)
 
-             }
+            }
 
-             addItem(NSMenuItem.separator())
-         }
+            addItem(NSMenuItem.separator())
+        }
+
+        let bookmarksMenuItem = NSMenuItem(title: UserText.bookmarks, action: #selector(openBookmarks), keyEquivalent: "")
+        bookmarksMenuItem.target = self
+        bookmarksMenuItem.image = NSImage(named: "Bookmarks")
+        addItem(bookmarksMenuItem)
 
         let preferencesItem = NSMenuItem(title: UserText.preferences, action: #selector(openPreferences(_:)), keyEquivalent: "")
         preferencesItem.target = self
@@ -132,11 +131,6 @@ final class OptionsButtonMenu: NSMenu {
         addItem(preferencesItem)
     }
     // swiftlint:enable function_body_length
-    
-    private func updateBookmarks() {
-        // The bookmarks section is the same with the main menu
-        bookmarksMenuItem.submenu = BookmarksSubMenu()
-    }
 
     @objc func moveTabToNewWindowAction(_ sender: NSMenuItem) {
         guard let selectedTabViewModel = tabCollectionViewModel.selectedTabViewModel else {
@@ -156,6 +150,10 @@ final class OptionsButtonMenu: NSMenu {
         }
         
         selectedTabViewModel.tab.requestFireproofToggle()
+    }
+
+    @objc func openBookmarks(_ sender: NSMenuItem) {
+        WindowControllersManager.shared.showBookmarksTab()
     }
 
     @objc func openPreferences(_ sender: NSMenuItem) {
@@ -179,61 +177,10 @@ final class OptionsButtonMenu: NSMenu {
             self.result = .feedback
         case #selector(toggleFireproofing(_:)):
             self.result = .fireproof
+        case #selector(openBookmarks(_:)):
+            self.result = .bookmarks
         case #selector(openPreferences(_:)):
             self.result = .preferences
-        case .none:
-            break
-        default:
-            assertionFailure("MainViewController: no case for selector \(item.action!)")
-        }
-    }
-
-}
-
-final class BookmarksSubMenu: NSMenu {
-
-    init(menu: NSMenu?) {
-        super.init(title: menu?.title ?? "")
-
-        for item in menu?.items ?? [] {
-            let item = (item.copy() as? NSMenuItem)!
-            self.addItem(item)
-            if let submenu = item.submenu {
-                item.submenu = BookmarksSubMenu(menu: submenu)
-            }
-        }
-    }
-
-    convenience init() {
-        let bookmarksMenu = NSApplication.shared.mainMenuTyped.bookmarksMenuItem?.submenu
-
-        self.init(menu: bookmarksMenu)
-    }
-
-    required init(coder: NSCoder) {
-        fatalError("init(coder:) has not been implemented")
-    }
-
-    override func performActionForItem(at index: Int) {
-        defer {
-            super.performActionForItem(at: index)
-        }
-        guard let item = self.item(at: index) else {
-            assertionFailure("MainViewController: No Menu Item at index \(index)")
-            return
-        }
-        guard let supermenu = item.topMenu as? OptionsButtonMenu else {
-            assertionFailure("Unexpected supermenu kind: \(type(of: item.topMenu))")
-            return
-        }
-
-        switch item.action {
-        case #selector(MainViewController.bookmarkThisPage(_:)):
-            supermenu.result = .bookmarkThisPage
-        case #selector(MainViewController.favoriteThisPage(_:)):
-            supermenu.result = .favoriteThisPage
-        case #selector(MainViewController.navigateToBookmark(_:)):
-            supermenu.result = .navigateToBookmark
         case .none:
             break
         default:

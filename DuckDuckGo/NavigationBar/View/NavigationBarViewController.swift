@@ -113,7 +113,7 @@ final class NavigationBarViewController: NSViewController {
             NSMenu.popUpContextMenu(menu, with: event, for: sender)
 
             switch menu.result {
-            case .navigateToBookmark:
+            case .bookmarks:
                 Pixel.fire(.moreMenu(result: .bookmark))
             case .emailProtection:
                 Pixel.fire(.moreMenu(result: .emailProtection))
