@@ -136,7 +136,7 @@ final class MainMenu: NSMenu {
 
         func favoriteMenuItems(from bookmarkViewModels: [BookmarkViewModel]) -> [NSMenuItem] {
             bookmarkViewModels
-                .filter { $0.entity.isFavoriteBookmark }
+                .filter { ($0.entity as? Bookmark)?.isFavorite ?? false }
                 .enumerated()
                 .map { index, bookmarkViewModel in
                     let item = NSMenuItem(bookmarkViewModel: bookmarkViewModel)

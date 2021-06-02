@@ -46,14 +46,6 @@ internal class BaseBookmarkEntity {
     var title: String
     let isFolder: Bool
 
-    var isFavoriteBookmark: Bool {
-        if let bookmark = self as? Bookmark {
-            return bookmark.isFavorite
-        } else {
-            return false
-        }
-    }
-
     fileprivate init(id: UUID,
                      title: String,
                      isFolder: Bool) {
