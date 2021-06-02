@@ -81,23 +81,13 @@ final class BrowserTabViewController: NSViewController {
         changeWebView()
 
         if tabCollectionViewModel.selectedTabViewModel?.tab.tabType == .preferences {
-            showPreferencesPage()
+            show(tab: .preferences)
         } else if tabCollectionViewModel.selectedTabViewModel?.tab.tabType == .bookmarks {
-            showBookmarksPage()
+            show(tab: .bookmarks)
         } else if url != nil && url != URL.emptyPage {
-            showWebView()
+            show(tab: .standard)
         } else {
             showHomepage()
-        }
-    }
-
-    private func showWebView() {
-        self.homepageView.removeFromSuperview()
-        removePreferencesPage()
-        removeBookmarksPage()
-
-        if let webView = self.webView {
-            addWebViewToViewHierarchy(webView)
         }
     }
 
@@ -196,20 +186,35 @@ final class BrowserTabViewController: NSViewController {
 
     // MARK: - Browser Tabs
 
-    private func displayTab(at index: Int) {
+    private func show(displayableTabAtIndex index: Int) {
         // The tab switcher only displays displayable tab types.
         let tabType = Tab.TabType.displayableTabTypes[index]
-        tabCollectionViewModel.selectedTabViewModel?.tab.set(tabType: tabType)
+        show(tab: tabType)
+    }
+
+    private func show(tab type: Tab.TabType) {
+        tabCollectionViewModel.selectedTabViewModel?.tab.set(tabType: type)
 
         self.webView?.removeFromSuperview()
         self.homepageView.removeFromSuperview()
         removePreferencesPage()
         removeBookmarksPage()
 
-        switch tabType {
-        case .bookmarks: showBookmarksPage()
-        case .preferences: showPreferencesPage()
-        case .standard: assertionFailure("Cannot select standard tab type via tab switcher")
+        switch type {
+        case .bookmarks:
+            self.addChild(bookmarksViewController)
+            view.addAndLayout(bookmarksViewController.view)
+            bookmarksViewController.tabSwitcherButton.select(tabType: .bookmarks)
+
+        case .preferences:
+            self.addChild(preferencesViewController)
+            view.addAndLayout(preferencesViewController.view)
+            bookmarksViewController.tabSwitcherButton.select(tabType: .preferences)
+
+        case .standard:
+            if let webView = self.webView {
+                addWebViewToViewHierarchy(webView)
+            }
         }
     }
 
@@ -221,18 +226,6 @@ final class BrowserTabViewController: NSViewController {
 
         return viewController
     }()
-
-    private func showPreferencesPage() {
-        self.webView?.removeFromSuperview()
-
-        removeBookmarksPage()
-        removePreferencesPage()
-
-        self.addChild(preferencesViewController)
-        view.addAndLayout(preferencesViewController.view)
-
-        bookmarksViewController.tabSwitcherButton.select(tabType: .preferences)
-    }
 
     private func removePreferencesPage() {
         preferencesViewController.removeFromParent()
@@ -247,15 +240,6 @@ final class BrowserTabViewController: NSViewController {
 
         return viewController
     }()
-
-    private func showBookmarksPage() {
-        removeBookmarksPage()
-
-        self.addChild(bookmarksViewController)
-        view.addAndLayout(bookmarksViewController.view)
-
-        bookmarksViewController.tabSwitcherButton.select(tabType: .bookmarks)
-    }
 
     private func removeBookmarksPage() {
         bookmarksViewController.removeFromParent()
@@ -660,7 +644,7 @@ fileprivate extension NSAlert {
 extension BrowserTabViewController: BrowserTabSelectionDelegate {
 
     func selectedTab(at index: Int) {
-        displayTab(at: index)
+        show(displayableTabAtIndex: index)
     }
 
 }
