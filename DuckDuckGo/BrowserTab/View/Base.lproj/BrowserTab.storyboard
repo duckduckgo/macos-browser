@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<document type="com.apple.InterfaceBuilder3.Cocoa.Storyboard.XIB" version="3.0" toolsVersion="17701" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none" useAutolayout="YES" initialViewController="D9y-55-iLO">
+<document type="com.apple.InterfaceBuilder3.Cocoa.Storyboard.XIB" version="3.0" toolsVersion="18122" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none" useAutolayout="YES" initialViewController="D9y-55-iLO">
     <dependencies>
         <deployment identifier="macosx"/>
-        <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="17701"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="18122"/>
         <capability name="Named colors" minToolsVersion="9.0"/>
         <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
     </dependencies>
@@ -12,20 +12,40 @@
             <objects>
                 <viewController id="D9y-55-iLO" customClass="BrowserTabViewController" customModule="DuckDuckGo_Privacy_Browser" customModuleProvider="target" sceneMemberID="viewController">
                     <view key="view" id="aev-t9-Epw" customClass="ColorView" customModule="DuckDuckGo_Privacy_Browser" customModuleProvider="target">
-                        <rect key="frame" x="0.0" y="0.0" width="512" height="492"/>
+                        <rect key="frame" x="0.0" y="0.0" width="1341" height="754"/>
                         <autoresizingMask key="autoresizingMask"/>
                         <subviews>
                             <containerView translatesAutoresizingMaskIntoConstraints="NO" id="aUo-25-0iW">
-                                <rect key="frame" x="0.0" y="0.0" width="512" height="492"/>
+                                <rect key="frame" x="0.0" y="0.0" width="1341" height="754"/>
                                 <connections>
                                     <segue destination="fQy-ie-1zy" kind="embed" destinationCreationSelector="createHomepageViewController:" id="XdA-0x-M1n"/>
                                 </connections>
                             </containerView>
+                            <customView hidden="YES" translatesAutoresizingMaskIntoConstraints="NO" id="8yx-Kg-dQL" customClass="ColorView" customModule="DuckDuckGo_Privacy_Browser" customModuleProvider="target">
+                                <rect key="frame" x="0.0" y="0.0" width="1341" height="754"/>
+                                <subviews>
+                                    <imageView horizontalHuggingPriority="251" verticalHuggingPriority="251" translatesAutoresizingMaskIntoConstraints="NO" id="QFA-VO-RnN">
+                                        <rect key="frame" x="0.0" y="0.0" width="1341" height="754"/>
+                                        <imageCell key="cell" refusesFirstResponder="YES" alignment="left" imageScaling="proportionallyDown" image="Gandalf" id="gog-rO-SxA"/>
+                                    </imageView>
+                                </subviews>
+                                <constraints>
+                                    <constraint firstItem="QFA-VO-RnN" firstAttribute="leading" secondItem="8yx-Kg-dQL" secondAttribute="leading" id="4d4-qs-rDx"/>
+                                    <constraint firstAttribute="trailing" secondItem="QFA-VO-RnN" secondAttribute="trailing" id="eHt-m2-zce"/>
+                                    <constraint firstAttribute="bottom" secondItem="QFA-VO-RnN" secondAttribute="bottom" id="y9S-35-Ad4"/>
+                                    <constraint firstItem="QFA-VO-RnN" firstAttribute="top" secondItem="8yx-Kg-dQL" secondAttribute="top" id="ySi-26-H8s"/>
+                                </constraints>
+                                <userDefinedRuntimeAttributes>
+                                    <userDefinedRuntimeAttribute type="color" keyPath="backgroundColor">
+                                        <color key="value" red="0.0" green="0.0" blue="0.0" alpha="1" colorSpace="calibratedRGB"/>
+                                    </userDefinedRuntimeAttribute>
+                                </userDefinedRuntimeAttributes>
+                            </customView>
                             <customView hidden="YES" translatesAutoresizingMaskIntoConstraints="NO" id="bol-qn-wuI" customClass="ColorView" customModule="DuckDuckGo_Privacy_Browser" customModuleProvider="target">
-                                <rect key="frame" x="0.0" y="0.0" width="512" height="492"/>
+                                <rect key="frame" x="0.0" y="0.0" width="1341" height="754"/>
                                 <subviews>
                                     <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="RNn-86-Wkx">
-                                        <rect key="frame" x="140" y="253" width="232" height="17"/>
+                                        <rect key="frame" x="555" y="384" width="232" height="17"/>
                                         <textFieldCell key="cell" lineBreakMode="clipping" title="DuckDuckGo can't load this page." id="W60-yd-bv3">
                                             <font key="font" metaFont="systemSemibold" size="14"/>
                                             <color key="textColor" name="labelColor" catalog="System" colorSpace="catalog"/>
@@ -33,7 +53,7 @@
                                         </textFieldCell>
                                     </textField>
                                     <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="iH5-FT-P9e">
-                                        <rect key="frame" x="81" y="228" width="350" height="16"/>
+                                        <rect key="frame" x="496" y="359" width="350" height="16"/>
                                         <textFieldCell key="cell" lineBreakMode="clipping" title="A server with the specified hostname could not be found." id="rLZ-IC-OXf">
                                             <font key="font" metaFont="system"/>
                                             <color key="textColor" name="labelColor" catalog="System" colorSpace="catalog"/>
@@ -59,8 +79,12 @@
                             <constraint firstItem="bol-qn-wuI" firstAttribute="leading" secondItem="aev-t9-Epw" secondAttribute="leading" id="ROr-Er-6IN"/>
                             <constraint firstAttribute="trailing" secondItem="bol-qn-wuI" secondAttribute="trailing" id="ea5-1F-Gwm"/>
                             <constraint firstAttribute="bottom" secondItem="bol-qn-wuI" secondAttribute="bottom" id="ef9-7H-3hy"/>
+                            <constraint firstItem="8yx-Kg-dQL" firstAttribute="leading" secondItem="aev-t9-Epw" secondAttribute="leading" id="kKE-EV-TeD"/>
                             <constraint firstItem="aUo-25-0iW" firstAttribute="top" secondItem="aev-t9-Epw" secondAttribute="top" id="m93-YS-jGz"/>
+                            <constraint firstItem="8yx-Kg-dQL" firstAttribute="top" secondItem="aev-t9-Epw" secondAttribute="top" id="mVG-cp-1OH"/>
+                            <constraint firstAttribute="trailing" secondItem="8yx-Kg-dQL" secondAttribute="trailing" id="rAF-Zn-pdT"/>
                             <constraint firstAttribute="trailing" secondItem="aUo-25-0iW" secondAttribute="trailing" id="u46-hj-61D"/>
+                            <constraint firstAttribute="bottom" secondItem="8yx-Kg-dQL" secondAttribute="bottom" id="u5x-yZ-avM"/>
                             <constraint firstItem="bol-qn-wuI" firstAttribute="top" secondItem="aev-t9-Epw" secondAttribute="top" id="v8E-6v-8Tx"/>
                             <constraint firstAttribute="bottom" secondItem="aUo-25-0iW" secondAttribute="bottom" id="yMX-f1-FK0"/>
                         </constraints>
@@ -73,6 +97,7 @@
                     <connections>
                         <outlet property="errorView" destination="bol-qn-wuI" id="gbL-AN-fxw"/>
                         <outlet property="homepageView" destination="aUo-25-0iW" id="ScM-C9-V67"/>
+                        <outlet property="phishingView" destination="8yx-Kg-dQL" id="thO-gE-amt"/>
                     </connections>
                 </viewController>
                 <customObject id="xRE-VM-YeG" userLabel="First Responder" customClass="NSResponder" sceneMemberID="firstResponder"/>
@@ -89,6 +114,7 @@
         </scene>
     </scenes>
     <resources>
+        <image name="Gandalf" width="1341" height="754"/>
         <namedColor name="BrowserTabBackgroundColor">
             <color red="0.98039215686274506" green="0.98039215686274506" blue="0.98039215686274506" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
         </namedColor>

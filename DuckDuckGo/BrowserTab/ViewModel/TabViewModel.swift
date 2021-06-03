@@ -52,6 +52,13 @@ final class TabViewModel {
             updateFavicon()
         }
     }
+    @Published var isPhishingViewVisible: Bool = false {
+        didSet {
+            updateAddressBarStrings()
+            updateTitle()
+            updateFavicon()
+        }
+    }
 
     var loadingStartTime: CFTimeInterval?
 
@@ -70,6 +77,7 @@ final class TabViewModel {
         subscribeToTitle()
         subscribeToFavicon()
         subscribeToTabError()
+        subscribeToPhishingAttempt()
     }
 
     private func subscribeToUrl() {
@@ -92,6 +100,13 @@ final class TabViewModel {
         tab.$error.receive(on: DispatchQueue.main).sink { [weak self] _ in
             guard let self = self else { return }
             self.isErrorViewVisible = self.tab.error != nil
+        } .store(in: &cancellables)
+    }
+
+    private func subscribeToPhishingAttempt() {
+        tab.$phishingAttempt.receive(on: DispatchQueue.main).sink { [weak self] _ in
+            guard let self = self else { return }
+            self.isPhishingViewVisible = self.tab.phishingAttempt
         } .store(in: &cancellables)
     }
 

@@ -25,6 +25,7 @@ import SwiftUI
 final class BrowserTabViewController: NSViewController {
 
     @IBOutlet weak var errorView: NSView!
+    @IBOutlet weak var phishingView: NSView!
     @IBOutlet weak var homepageView: NSView!
     weak var webView: WebView?
 
@@ -34,6 +35,7 @@ final class BrowserTabViewController: NSViewController {
     private var urlCancellable: AnyCancellable?
     private var selectedTabViewModelCancellable: AnyCancellable?
     private var isErrorViewVisibleCancellable: AnyCancellable?
+    private var isPhishingViewVisibleCancellable: AnyCancellable?
 
     private var contextMenuExpected = false
     private var contextMenuLink: URL?
@@ -63,12 +65,14 @@ final class BrowserTabViewController: NSViewController {
 
         subscribeToSelectedTabViewModel()
         subscribeToIsErrorViewVisible()
+        subscribeToIsPhishingViewVisible()
     }
 
     private func subscribeToSelectedTabViewModel() {
         selectedTabViewModelCancellable = tabCollectionViewModel.$selectedTabViewModel.receive(on: DispatchQueue.main).sink { [weak self] viewModel in
             self?.updateInterface(url: viewModel?.tab.url)
             self?.subscribeToIsErrorViewVisible()
+            self?.subscribeToIsPhishingViewVisible()
         }
     }
 
@@ -164,6 +168,12 @@ final class BrowserTabViewController: NSViewController {
         }
     }
 
+    private func subscribeToIsPhishingViewVisible() {
+        isPhishingViewVisibleCancellable = tabViewModel?.$isPhishingViewVisible.receive(on: DispatchQueue.main).sink { [weak self] _ in
+            self?.displayPhishingView(self?.tabViewModel?.isPhishingViewVisible ?? false)
+        }
+    }
+
     private func setFirstResponderIfNeeded() {
         guard webView?.url != nil else {
             return
@@ -181,6 +191,19 @@ final class BrowserTabViewController: NSViewController {
         }
 
         errorView.isHidden = !shown
+//        phishingView.isHidden = shown
+        webView.isHidden = shown
+        homepageView.isHidden = shown
+    }
+
+    private func displayPhishingView(_ shown: Bool) {
+        guard let webView = webView else {
+            os_log("BrowserTabViewController: Web view is nil", type: .error)
+            return
+        }
+
+        phishingView.isHidden = !shown
+//        errorView.isHidden = shown
         webView.isHidden = shown
         homepageView.isHidden = shown
     }

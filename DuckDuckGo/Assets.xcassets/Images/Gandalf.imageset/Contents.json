@@ -1,0 +1,12 @@
+{
+  "images" : [
+    {
+      "filename" : "you_shall_not_pass.jpg",
+      "idiom" : "universal"
+    }
+  ],
+  "info" : {
+    "author" : "xcode",
+    "version" : 1
+  }
+}

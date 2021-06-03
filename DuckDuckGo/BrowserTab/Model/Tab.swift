@@ -384,6 +384,10 @@ final class Tab: NSObject {
         historyCoordinating.updateTitleIfNeeded(title: title, url: url)
     }
 
+    // MARK: - Anti-Phishing
+
+    private let antiPhishingCoordinating: AntiPhishingCoordinating = AntiPhishingCoordinator.shared
+    @PublishedAfter var phishingAttempt: Bool = false
 }
 
 extension Tab: PageObserverUserScriptDelegate {
@@ -547,6 +551,13 @@ extension Tab: WKNavigationDelegate {
             decisionHandler(.cancel)
             return
         }
+
+        guard !antiPhishingCoordinating.isPhishingUrl(url) else {
+            decisionHandler(.cancel)
+            phishingAttempt = true
+            return
+        }
+        if phishingAttempt { phishingAttempt = false }
 
         HTTPSUpgrade.shared.isUpgradeable(url: url) { [weak self] isUpgradable in
             if isUpgradable, let upgradedUrl = url.toHttps() {
