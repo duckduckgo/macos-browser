@@ -52,9 +52,6 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         stateRestorationManager = AppStateRestorationManager(fileStore: fileStore)
 
         urlEventListener.listen()
-
-        //todo remove
-        _=AntiPhishingCoordinator.shared
     }
 
     func applicationDidFinishLaunching(_ notification: Notification) {
