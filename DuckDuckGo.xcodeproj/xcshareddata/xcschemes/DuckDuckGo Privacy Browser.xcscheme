@@ -54,13 +54,7 @@
             </BuildableReference>
             <SkippedTests>
                <Test
-                  Identifier = "AppStateChangePublisherTests/testWhenWindowIsClosedThenStateChangePublished()">
-               </Test>
-               <Test
                   Identifier = "EncryptionKeyStoreTests">
-               </Test>
-               <Test
-                  Identifier = "FireTests/testWhenBurnAllThenBurningFlagToggles()">
                </Test>
                <Test
                   Identifier = "PixelTests/testWhenErrorPixelIsFiredThenParametersAdded()">
