@@ -34,7 +34,7 @@ final class BookmarkListTreeControllerDataSource: TreeControllerDataSource {
         let blankSpacer = SpacerNode.blank
         let spacerNode = BookmarkNode(representedObject: blankSpacer, parent: nil)
 
-        let topLevelNodes = LocalBookmarkManager.shared.topLevelItems?.compactMap { (item) -> BookmarkNode? in
+        let topLevelNodes = LocalBookmarkManager.shared.list?.topLevelEntities.compactMap { (item) -> BookmarkNode? in
             if let folder = item as? BookmarkFolder {
                 let itemNode = node.createChildNode(item)
                 itemNode.canHaveChildNodes = !folder.children.isEmpty

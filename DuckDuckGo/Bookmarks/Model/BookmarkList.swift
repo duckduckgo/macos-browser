@@ -21,6 +21,8 @@ import os.log
 
 struct BookmarkList {
 
+    var topLevelEntities: [BaseBookmarkEntity] = []
+
     private var allBookmarkURLsOrdered: [URL]
     private var favoriteBookmarkURLsOrdered: [URL]
     private var itemsDict: [URL: Bookmark]
@@ -35,7 +37,7 @@ struct BookmarkList {
         }
     }
 
-    init(entities: [BaseBookmarkEntity] = []) {
+    init(entities: [BaseBookmarkEntity] = [], topLevelEntities: [BaseBookmarkEntity] = []) {
         let bookmarks = entities.compactMap { $0 as? Bookmark }
         let keysOrdered = bookmarks.compactMap { $0.url }
         var favoriteKeysOrdered = [URL]()
@@ -52,6 +54,7 @@ struct BookmarkList {
         self.allBookmarkURLsOrdered = keysOrdered
         self.favoriteBookmarkURLsOrdered = favoriteKeysOrdered
         self.itemsDict = itemsDict
+        self.topLevelEntities = topLevelEntities
     }
 
     mutating func insert(_ bookmark: Bookmark) {

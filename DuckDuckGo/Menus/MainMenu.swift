@@ -99,8 +99,8 @@ final class MainMenu: NSMenu {
 
     var bookmarkListCancellable: AnyCancellable?
     private func subscribeToBookmarkList() {
-        bookmarkListCancellable = LocalBookmarkManager.shared.$topLevelItems
-            .compactMap({ $0?.map(BookmarkViewModel.init(entity:)) })
+        bookmarkListCancellable = LocalBookmarkManager.shared.$list
+            .compactMap({ $0?.topLevelEntities.map(BookmarkViewModel.init(entity:)) })
             .receive(on: DispatchQueue.main).sink { [weak self] bookmarkViewModels in
                 self?.updateBookmarksMenu(bookmarkViewModels: bookmarkViewModels)
         }

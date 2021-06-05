@@ -68,7 +68,7 @@ final class BookmarkSidebarTreeController: TreeControllerDataSource {
     }
 
     private func childNodesForBookmarksPseudoFolder(_ parent: BookmarkNode) -> [BookmarkNode] {
-        let nodes = bookmarkManager.topLevelItems?.compactMap { (possibleFolder) -> BookmarkNode? in
+        let nodes = bookmarkManager.list?.topLevelEntities.compactMap { (possibleFolder) -> BookmarkNode? in
             guard let folder = possibleFolder as? BookmarkFolder else { return nil }
 
             let folderNode = parent.findOrCreateChildNode(with: folder)

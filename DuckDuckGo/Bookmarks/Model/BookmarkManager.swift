@@ -38,9 +38,6 @@ protocol BookmarkManager: AnyObject {
     var listPublisher: Published<BookmarkList?>.Publisher { get }
     var list: BookmarkList? { get }
 
-    var topLevelItemsPublisher: Published<[BaseBookmarkEntity]?>.Publisher { get }
-    var topLevelItems: [BaseBookmarkEntity]? { get }
-
 }
 
 final class LocalBookmarkManager: BookmarkManager {
@@ -61,32 +58,26 @@ final class LocalBookmarkManager: BookmarkManager {
     @Published private(set) var list: BookmarkList?
     var listPublisher: Published<BookmarkList?>.Publisher { $list }
 
-    // Defines an array of all top level items (anything that has no parent folder set).
-    @Published private(set) var topLevelItems: [BaseBookmarkEntity]?
-    var topLevelItemsPublisher: Published<[BaseBookmarkEntity]?>.Publisher { $topLevelItems }
-
     private lazy var bookmarkStore: BookmarkStore = LocalBookmarkStore()
     private lazy var faviconService: FaviconService = LocalFaviconService.shared
 
     // MARK: - Bookmarks
 
     func loadBookmarks() {
-        bookmarkStore.loadAll(type: .topLevelEntities) { [weak self] (entities, error) in
-            guard error == nil, let entities = entities else {
+        bookmarkStore.loadAll(type: .topLevelEntities) { [weak self] (topLevelEntities, error) in
+            guard error == nil, let topLevelEntities = topLevelEntities else {
                 os_log("LocalBookmarkManager: Failed to fetch entities.", type: .error)
                 return
             }
 
-            self?.topLevelItems = entities
-        }
+            self?.bookmarkStore.loadAll(type: .bookmarks) { [weak self] (bookmarks, error) in
+                guard error == nil, let bookmarks = bookmarks else {
+                    os_log("LocalBookmarkManager: Failed to fetch bookmarks.", type: .error)
+                    return
+                }
 
-        bookmarkStore.loadAll(type: .bookmarks) { [weak self] (bookmarks, error) in
-            guard error == nil, let bookmarks = bookmarks else {
-                os_log("LocalBookmarkManager: Failed to fetch bookmarks.", type: .error)
-                return
+                self?.list = BookmarkList(entities: bookmarks, topLevelEntities: topLevelEntities)
             }
-
-            self?.list = BookmarkList(entities: bookmarks)
         }
     }
 

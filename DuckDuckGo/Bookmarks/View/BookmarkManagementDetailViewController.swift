@@ -198,7 +198,7 @@ final class BookmarkManagementDetailViewController: NSViewController {
     private func totalRows() -> Int {
         switch selectionState {
         case .empty:
-            return LocalBookmarkManager.shared.topLevelItems?.count ?? 0
+            return LocalBookmarkManager.shared.list?.topLevelEntities.count ?? 0
         case .folder(let folder):
             return folder.children.count
         case .favorites:
@@ -332,18 +332,18 @@ extension BookmarkManagementDetailViewController: NSTableViewDelegate, NSTableVi
     private func fetchEntity(at row: Int) -> BaseBookmarkEntity? {
         switch selectionState {
         case .empty:
-            return LocalBookmarkManager.shared.topLevelItems?[row]
+            return LocalBookmarkManager.shared.list?.topLevelEntities[safe: row]
         case .folder(let folder):
-            return folder.children[row]
+            return folder.children[safe: row]
         case .favorites:
-            return LocalBookmarkManager.shared.list?.favoriteBookmarks[row]
+            return LocalBookmarkManager.shared.list?.favoriteBookmarks[safe: row]
         }
     }
 
     private func index(for entity: Bookmark) -> Int? {
         switch selectionState {
         case .empty:
-            return LocalBookmarkManager.shared.topLevelItems?.firstIndex(of: entity)
+            return LocalBookmarkManager.shared.list?.topLevelEntities.firstIndex(of: entity)
         case .folder(let folder):
             return folder.children.firstIndex(of: entity)
         case .favorites:
