@@ -77,4 +77,9 @@ final class BookmarkStoreMock: BookmarkStore {
         addChildCalled = true
     }
 
+    var updateObjectsCalled = false
+    func update(objectsWithUUIDs uuids: [UUID], update: @escaping (BaseBookmarkEntity) -> Void, completion: @escaping (Error?) -> Void) {
+        updateObjectsCalled = true
+    }
+
 }
