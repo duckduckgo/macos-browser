@@ -45,6 +45,7 @@ final class BookmarkManagementDetailViewController: NSViewController {
     private var bookmarkListCancellable: AnyCancellable?
     private var selectionState: BookmarkManagementSidebarViewController.SelectionState = .empty {
         didSet {
+            editingBookmarkIndex = nil
             reloadData()
         }
     }
@@ -115,6 +116,8 @@ final class BookmarkManagementDetailViewController: NSViewController {
         // 1. Command: Open in Background Tab
         // 2. Command + Shift: Open in New Window
         // 3. Default: Open in Current Tab
+
+        editingBookmarkIndex = nil
 
         if let bookmark = entity as? Bookmark {
             if NSApplication.shared.isCommandPressed && NSApplication.shared.isShiftPressed {
