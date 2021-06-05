@@ -165,10 +165,11 @@ final class BookmarkManagementDetailViewController: NSViewController {
         if editingBookmarkIndex?.index == index {
             editingBookmarkIndex = nil
             animateEditingState(forRowAt: index, editing: false)
-        } else {
-            let entity = fetchEntity(at: index)!
+        } else if let entity = fetchEntity(at: index) {
             editingBookmarkIndex = EditedBookmarkMetadata(uuid: entity.id, index: index)
             animateEditingState(forRowAt: index, editing: true)
+        } else {
+            assertionFailure("\(#file): Failed to find entity when updating editing state")
         }
     }
 
