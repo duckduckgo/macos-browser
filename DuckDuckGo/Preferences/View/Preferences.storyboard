@@ -195,7 +195,7 @@
                                 </userDefinedRuntimeAttributes>
                             </customView>
                             <popUpButton translatesAutoresizingMaskIntoConstraints="NO" id="Nnt-T4-Csk">
-                                <rect key="frame" x="15" y="361" width="217" height="24"/>
+                                <rect key="frame" x="21" y="361" width="217" height="24"/>
                                 <popUpButtonCell key="cell" type="bevel" title="Preferences" bezelStyle="rounded" alignment="left" controlSize="large" lineBreakMode="truncatingTail" state="on" imageScaling="proportionallyDown" inset="2" selectedItem="0iN-ch-YVA" id="Ury-Yl-asN">
                                     <behavior key="behavior" lightByBackground="YES" lightByGray="YES"/>
                                     <font key="font" size="20" name="SFProDisplay-Semibold"/>
@@ -301,11 +301,11 @@
                             <constraint firstAttribute="bottom" secondItem="INm-nm-wzI" secondAttribute="bottom" id="JkA-ji-QzR"/>
                             <constraint firstAttribute="trailing" secondItem="sq7-U9-0Ib" secondAttribute="trailing" id="Ouf-Kt-LaR"/>
                             <constraint firstItem="INm-nm-wzI" firstAttribute="top" secondItem="Nnt-T4-Csk" secondAttribute="bottom" constant="8" symbolic="YES" id="PkJ-2t-qL9"/>
-                            <constraint firstItem="Nnt-T4-Csk" firstAttribute="leading" secondItem="sPP-2C-UYe" secondAttribute="leading" constant="20" symbolic="YES" id="TOe-fF-tN7"/>
+                            <constraint firstItem="Nnt-T4-Csk" firstAttribute="leading" secondItem="sPP-2C-UYe" secondAttribute="leading" constant="26" id="TOe-fF-tN7"/>
                             <constraint firstItem="INm-nm-wzI" firstAttribute="leading" secondItem="sPP-2C-UYe" secondAttribute="leading" constant="20" symbolic="YES" id="bgV-QY-sWe"/>
                             <constraint firstItem="Nnt-T4-Csk" firstAttribute="top" secondItem="sPP-2C-UYe" secondAttribute="top" constant="20" symbolic="YES" id="geb-7K-tdE"/>
                             <constraint firstAttribute="bottom" secondItem="sq7-U9-0Ib" secondAttribute="bottom" id="oXm-CF-Mbc"/>
-                            <constraint firstAttribute="trailing" secondItem="Nnt-T4-Csk" secondAttribute="trailing" constant="20" symbolic="YES" id="tUb-Sa-LsC"/>
+                            <constraint firstAttribute="trailing" secondItem="Nnt-T4-Csk" secondAttribute="trailing" constant="14" id="tUb-Sa-LsC"/>
                             <constraint firstItem="sq7-U9-0Ib" firstAttribute="top" secondItem="sPP-2C-UYe" secondAttribute="top" id="ziV-Df-38v"/>
                         </constraints>
                     </view>

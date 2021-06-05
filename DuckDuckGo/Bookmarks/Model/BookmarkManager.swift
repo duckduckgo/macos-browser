@@ -32,6 +32,7 @@ protocol BookmarkManager: AnyObject {
     func update(folder: BookmarkFolder)
     @discardableResult func updateUrl(of bookmark: Bookmark, to newUrl: URL) -> Bookmark?
     func add(objectsWithUUIDs uuids: [UUID], to parent: BookmarkFolder?, completion: @escaping (Error?) -> Void)
+    func update(objectsWithUUIDs uuids: [UUID], update: @escaping (BaseBookmarkEntity) -> Void, completion: @escaping (Error?) -> Void)
 
     // Wrapper definition in a protocol is not supported yet
     var listPublisher: Published<BookmarkList?>.Publisher { get }
@@ -194,6 +195,13 @@ final class LocalBookmarkManager: BookmarkManager {
 
     func add(objectsWithUUIDs uuids: [UUID], to parent: BookmarkFolder?, completion: @escaping (Error?) -> Void) {
         bookmarkStore.add(objectsWithUUIDs: uuids, to: parent) { [weak self] error in
+            self?.loadBookmarks()
+            completion(error)
+        }
+    }
+
+    func update(objectsWithUUIDs uuids: [UUID], update: @escaping (BaseBookmarkEntity) -> Void, completion: @escaping (Error?) -> Void) {
+        bookmarkStore.update(objectsWithUUIDs: uuids, update: update) { [weak self] error in
             self?.loadBookmarks()
             completion(error)
         }

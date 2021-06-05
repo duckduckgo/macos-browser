@@ -221,10 +221,21 @@ final class BookmarkOutlineViewDataSource: NSObject, NSOutlineViewDataSource, NS
 
         // Handle the nil destination case:
 
-        if representedObject is PseudoFolder || item == nil {
-            bookmarkManager.add(objectsWithUUIDs: draggedObjectIdentifiers, to: nil) { error in
-                if let error = error {
-                    os_log("Failed to accept nil parent drop via outline view: %s", error.localizedDescription)
+        if let pseudoFolder = representedObject as? PseudoFolder {
+            if pseudoFolder == .favorites {
+                bookmarkManager.update(objectsWithUUIDs: draggedObjectIdentifiers, update: { entity in
+                    let bookmark = entity as? Bookmark
+                    bookmark?.isFavorite = true
+                }, completion: { error in
+                    if let error = error {
+                        os_log("Failed to update entities during drop via outline view: %s", error.localizedDescription)
+                    }
+                })
+            } else if pseudoFolder == .bookmarks {
+                bookmarkManager.add(objectsWithUUIDs: draggedObjectIdentifiers, to: nil) { error in
+                    if let error = error {
+                        os_log("Failed to accept nil parent drop via outline view: %s", error.localizedDescription)
+                    }
                 }
             }
 

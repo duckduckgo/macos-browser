@@ -34,6 +34,7 @@ protocol BookmarkStore {
     func update(bookmark: Bookmark)
     func update(folder: BookmarkFolder)
     func add(objectsWithUUIDs: [UUID], to parent: BookmarkFolder?, completion: @escaping (Error?) -> Void)
+    func update(objectsWithUUIDs uuids: [UUID], update: @escaping (BaseBookmarkEntity) -> Void, completion: @escaping (Error?) -> Void)
 
 }
 
@@ -257,6 +258,41 @@ final class LocalBookmarkStore: BookmarkStore {
         }
     }
 
+    func update(objectsWithUUIDs uuids: [UUID], update: @escaping (BaseBookmarkEntity) -> Void, completion: @escaping (Error?) -> Void) {
+        context.perform { [weak self] in
+            guard let self = self else {
+                completion(nil)
+                return
+            }
+
+            let bookmarksFetchRequest = BaseBookmarkEntity.entities(with: uuids)
+            let bookmarksResults = try? self.context.fetch(bookmarksFetchRequest)
+
+            guard let bookmarkManagedObjects = bookmarksResults else {
+                assertionFailure("\(#file): Failed to get BookmarkManagedObject from the context")
+                completion(nil)
+                return
+            }
+
+            bookmarkManagedObjects.forEach { managedObject in
+                if let entity = BaseBookmarkEntity.from(managedObject: managedObject) {
+                    update(entity)
+                    managedObject.update(with: entity)
+                }
+            }
+
+            do {
+                try self.context.save()
+            } catch {
+                assertionFailure("\(#file): Saving of context failed")
+                DispatchQueue.main.async { completion(error) }
+                return
+            }
+
+            DispatchQueue.main.async { completion(nil) }
+        }
+    }
+
     // MARK: - Folders
 
     func save(folder: BookmarkFolder, parent: BookmarkFolder?, completion: @escaping (Bool, Error?) -> Void) {
@@ -304,6 +340,16 @@ final class LocalBookmarkStore: BookmarkStore {
 }
 
 fileprivate extension BookmarkManagedObject {
+
+    func update(with baseEntity: BaseBookmarkEntity) {
+        if let bookmark = baseEntity as? Bookmark {
+            update(with: bookmark)
+        } else if let folder = baseEntity as? BookmarkFolder {
+            update(with: folder)
+        } else {
+            assertionFailure("\(#file): Failed to cast base entity to Bookmark or BookmarkFolder")
+        }
+    }
 
     func update(with bookmark: Bookmark) {
         id = bookmark.id
