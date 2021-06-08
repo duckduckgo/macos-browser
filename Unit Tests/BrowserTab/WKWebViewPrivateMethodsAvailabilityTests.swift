@@ -34,13 +34,12 @@ final class WKWebViewPrivateMethodsAvailabilityTests: XCTestCase {
         XCTAssertNoThrow(try webView.restoreSessionState(from: Data()))
     }
 
-    func testWKProcessPoolRespondsTo_downloadDelegate() {
-        let obj = NSObject()
-        let webView = WebView(frame: CGRect(), configuration: .init())
-        webView.configuration.processPool.setValue(obj, forKey: WKProcessPool.downloadDelegateKey)
-        let delegate = webView.configuration.processPool
-            .value(forKey: WKProcessPool.downloadDelegateKey) as? NSObject
-        XCTAssertEqual(obj, delegate)
+    func testWebViewRespondsTo_createWebArchiveDataWithCompletionHandler() {
+        XCTAssertTrue(WKWebView.instancesRespond(to: #selector(WKWebView.createWebArchiveData(completionHandler:))))
+    }
+
+    func testWebViewRespondsTo_createPDFWithConfiguration() {
+        XCTAssertTrue(WKWebView.instancesRespond(to: #selector(WKWebView.createPDF(withConfiguration:completionHandler:))))
     }
 
 }

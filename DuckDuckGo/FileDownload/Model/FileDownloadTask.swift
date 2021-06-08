@@ -117,7 +117,10 @@ internal class FileDownloadTask: NSObject {
             return
         }
 
-        if case .success = result {
+        if case .success(let url) = result {
+            if progress.fileURL != url {
+                progress.fileURL = url
+            }
             if self.progress.totalUnitCount == -1 {
                 self.progress.totalUnitCount = 1
             }

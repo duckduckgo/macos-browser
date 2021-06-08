@@ -60,6 +60,13 @@ final class FileDownloadManager {
         return task
     }
 
+    func add(_ download: WebKitDownload, delegate: FileDownloadManagerDelegate?, promptForLocation: Bool, postflight: FileDownloadPostflight?) {
+        self.startDownload(FileDownload.wkDownload(download, promptForLocation: promptForLocation),
+                           chooseDestinationCallback: delegate?.chooseDestination,
+                           fileIconOriginalRectCallback: delegate?.fileIconFlyAnimationOriginalRect,
+                           postflight: postflight)
+    }
+
 }
 
 extension FileDownloadManager: FileDownloadTaskDelegate {

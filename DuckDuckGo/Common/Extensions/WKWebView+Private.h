@@ -26,4 +26,15 @@
 - (void)createWebArchiveDataWithCompletionHandler:(void (^ _Nonnull)(NSData * _Nullable, NSError * _Nullable))completionHandler;
 - (void)createPDFWithConfiguration:(id _Nullable)pdfConfiguration completionHandler:(void (^ _Nonnull)(NSData * _Nullable pdfDocumentData, NSError * _Nullable error))completionHandler;
 
+- (void)startDownloadUsingRequest:(NSURLRequest * _Nonnull)request completionHandler:(void(^ _Nonnull)(NSObject * _Nonnull))completionHandler;
+- (void)resumeDownloadFromResumeData:(NSData * _Nonnull)resumeData completionHandler:(void(^ _Nonnull)(NSObject * _Nonnull))completionHandler;
+
+@end
+
+@interface WKProcessPool (Private)
+
+// https://github.com/WebKit/WebKit/blob/8afe31a018b11741abdf9b4d5bb973d7c1d9ff05/Source/WebKit/UIProcess/API/Cocoa/WKProcessPool.mm#L522
+- (NSObject * _Nonnull)_downloadURLRequest:(NSURLRequest * _Nonnull)request websiteDataStore:(WKWebsiteDataStore * _Nonnull)dataStore originatingWebView:(WKWebView * _Nonnull)webView;
+- (NSObject * _Nonnull)_resumeDownloadFromData:(NSData * _Nonnull)resumeData websiteDataStore:(WKWebsiteDataStore * _Nonnull)dataStore path:(NSString * _Nonnull)path originatingWebView:(WKWebView * _Nonnull)webView;
+
 @end

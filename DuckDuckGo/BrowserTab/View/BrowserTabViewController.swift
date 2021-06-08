@@ -267,17 +267,12 @@ extension BrowserTabViewController: TabDelegate {
         openNewTab(with: url, parentTab: tab, selected: selected)
     }
 
-    func tab(_ tab: Tab, requestedFileDownload request: FileDownload) {
-        FileDownloadManager.shared.startDownload(request, delegate: self, postflight: .reveal)
+    func closeTab(_ tab: Tab) {
+        guard let index = tabCollectionViewModel.tabCollection.tabs.firstIndex(of: tab) else {
 
-        // Note this can result in tabs being left open, e.g. download button on this page:
-        // https://en.wikipedia.org/wiki/Guitar#/media/File:GuitareClassique5.png
-        // Safari closes new tabs that were opened and then create a download instantly.
-        if tab.webView.canGoBack == false,
-           tab.parentTab != nil,
-           let index = tabCollectionViewModel.tabCollection.tabs.firstIndex(of: tab) {
-            tabCollectionViewModel.remove(at: index)
+            return
         }
+        tabCollectionViewModel.remove(at: index)
     }
 
     func tab(_ tab: Tab, willShowContextMenuAt position: NSPoint, image: URL?, link: URL?) {
@@ -375,7 +370,7 @@ extension BrowserTabViewController: LinkMenuItemSelectors {
         guard let tab = tabCollectionViewModel.selectedTabViewModel?.tab,
               let url = contextMenuLink else { return }
 
-        self.tab(tab, requestedFileDownload: FileDownload(url: url, promptForLocation: true))
+        tab.download(from: url)
     }
 
     func copyLink(_ sender: NSMenuItem) {
@@ -404,7 +399,7 @@ extension BrowserTabViewController: ImageMenuItemSelectors {
         guard let tab = tabCollectionViewModel.selectedTabViewModel?.tab,
               let url = contextMenuImage else { return }
 
-        self.tab(tab, requestedFileDownload: FileDownload(url: url, promptForLocation: true))
+        tab.download(from: url)
     }
 
     func copyImageAddress(_ sender: NSMenuItem) {

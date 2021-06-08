@@ -26,9 +26,8 @@ protocol FileDownloadRequest {
 }
 
 enum FileDownload: FileDownloadRequest {
-    case request(URLRequest, suggestedName: String?, promptForLocation: Bool)
     case webContent(WKWebView, mimeType: String?)
-    case wkDownload(WebKitDownload)
+    case wkDownload(WebKitDownload, promptForLocation: Bool)
 }
 
 enum FileDownloadPostflight {
@@ -38,26 +37,17 @@ enum FileDownloadPostflight {
 
 extension FileDownload {
 
-    init(url: URL, promptForLocation: Bool) {
-        self = .request(URLRequest(url: url), suggestedName: nil, promptForLocation: promptForLocation)
-    }
-
     var shouldAlwaysPromptFileSaveLocation: Bool {
         switch self {
         case .webContent:
             return true
-        case .request(_, suggestedName: _, promptForLocation: let promptForLocation):
+        case .wkDownload(_, promptForLocation: let promptForLocation):
             return promptForLocation
-        case .wkDownload:
-            return false
         }
     }
 
     func downloadTask() -> FileDownloadTask? {
         switch self {
-        case .request(let request, suggestedName: _, promptForLocation: _):
-            return URLRequestDownloadTask(download: self, session: nil, request: request)
-
         case .webContent(let webView, mimeType: let mimeType):
             let contentType = mimeType.flatMap(UTType.init(mimeType:))
             if case .html = (contentType ?? .html) {
@@ -68,23 +58,22 @@ extension FileDownload {
                                          url: url,
                                          fileType: contentType ?? UTType(fileExtension: url.pathExtension))
             } else if let url = webView.url {
-                return URLRequestDownloadTask(download: self, request: URLRequest(url: url, cachePolicy: .returnCacheDataElseLoad))
+                #warning("fix this")
+                return nil// URLRequestDownloadTask(download: self, request: URLRequest(url: url, cachePolicy: .returnCacheDataElseLoad))
             } else {
                 return nil
             }
 
-        case .wkDownload(let download):
-            return WebKitDownloadTask(download: download)
+        case .wkDownload(let download, promptForLocation: let promptForLocation):
+            return WebKitDownloadTask(download: download, promptForLocation: promptForLocation)
         }
     }
 
     var sourceURL: URL? {
         switch self {
-        case .request(let request, suggestedName: _, promptForLocation: _):
-            return request.url
         case .webContent(let webView, mimeType: _):
             return webView.url
-        case .wkDownload(let download):
+        case .wkDownload(let download, promptForLocation: _):
             return download.request?.url
         }
     }

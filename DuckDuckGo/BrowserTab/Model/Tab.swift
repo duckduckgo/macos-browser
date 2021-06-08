@@ -22,16 +22,16 @@ import os
 import Combine
 import BrowserServicesKit
 
-protocol TabDelegate: AnyObject {
+protocol TabDelegate: FileDownloadManagerDelegate {
 
     func tabDidStartNavigation(_ tab: Tab)
     func tab(_ tab: Tab, requestedNewTab url: URL?, selected: Bool)
-    func tab(_ tab: Tab, requestedFileDownload request: FileDownload)
     func tab(_ tab: Tab, willShowContextMenuAt position: NSPoint, image: URL?, link: URL?)
     func tab(_ tab: Tab, detectedLogin host: String)
 	func tab(_ tab: Tab, requestedOpenExternalURL url: URL, forUserEnteredURL: Bool)
 
     func tabPageDOMLoaded(_ tab: Tab)
+    func closeTab(_ tab: Tab)
 
 }
 
@@ -169,10 +169,13 @@ final class Tab: NSObject {
      }
 
     // Used to track if an error was caused by a download navigation.
-    private var currentDownload: FileDownload?
+    private var currentDownload: URL?
 
-    // Used as the request context for HTML 5 downloads
-    private var lastMainFrameRequest: URLRequest?
+    func download(from url: URL) {
+        webView.startDownload(from: url) { download in
+            FileDownloadManager.shared.add(download, delegate: self.delegate, promptForLocation: true, postflight: .reveal)
+        }
+    }
 
     private var loginDetectionService: LoginDetectionService?
     private let instrumentation = TabInstrumentation()
@@ -259,7 +262,6 @@ final class Tab: NSObject {
         webView.navigationDelegate = self
         webView.allowsBackForwardNavigationGestures = true
         webView.allowsMagnification = true
-        webView.configuration.setDownloadDelegate(WebKitDownloadDelegate.shared)
 
         subscribeToUserScripts()
         subscribeToOpenExternalUrlEvents()
@@ -507,7 +509,6 @@ extension Tab: WKNavigationDelegate {
         }
 
         if navigationAction.isTargetingMainFrame() {
-            lastMainFrameRequest = navigationAction.request
             currentDownload = nil
         }
 
@@ -527,8 +528,9 @@ extension Tab: WKNavigationDelegate {
         // blob:https and data:https links are handled by private _WKDownload
         if externalUrlHandler.isBlobOrData(scheme: urlScheme) {
             // further download will be handled by WebKitDownloadCoordinator._downloadDidStart(_:)
-            decisionHandler(.download)
+            decisionHandler(.download(navigationAction, using: webView))
             return
+
         } else if externalUrlHandler.isExternal(scheme: urlScheme) {
             // ignore <iframe src="custom://url"> but allow via address bar
             let fromFrame = !(navigationAction.sourceFrame.isMainFrame || self.userEnteredUrl)
@@ -557,32 +559,22 @@ extension Tab: WKNavigationDelegate {
                  decidePolicyFor navigationResponse: WKNavigationResponse,
                  decisionHandler: @escaping (WKNavigationResponsePolicy) -> Void) {
 		userEnteredUrl = false // subsequent requests will be navigations
-        let policy = navigationResponsePolicyForDownloads(navigationResponse)
-        decisionHandler(policy)
+
+        if !navigationResponse.canShowMIMEType || navigationResponse.shouldDownload {
+            if navigationResponse.isForMainFrame {
+                currentDownload = navigationResponse.response.url
+            }
+
+            decisionHandler(.download(navigationResponse, using: webView))
+
+        } else {
+            decisionHandler(.allow)
+        }
     }
 
     private func updateUserAgentForDomain(_ host: String?) {
         let domain = host ?? ""
         webView.customUserAgent = UserAgent.forDomain(domain)
-    }
-
-    private func navigationResponsePolicyForDownloads(_ navigationResponse: WKNavigationResponse) -> WKNavigationResponsePolicy {
-        guard navigationResponse.isForMainFrame else {
-            return .allow
-        }
-
-        if (!navigationResponse.canShowMIMEType || navigationResponse.shouldDownload),
-           let request = lastMainFrameRequest {
-            let download = FileDownload.request(request,
-                                                suggestedName: navigationResponse.response.suggestedFilename,
-                                                promptForLocation: false)
-            delegate?.tab(self, requestedFileDownload: download)
-            // Flag this here, because interrupting the frame load will cause an error and we need to know
-            self.currentDownload = download
-            return .cancel
-        }
-
-        return .allow
     }
 
     func webView(_ webView: WKWebView, didStartProvisionalNavigation navigation: WKNavigation!) {
@@ -595,7 +587,7 @@ extension Tab: WKNavigationDelegate {
 
         if let url = webView.url {
              loginDetectionService?.handle(navigationEvent: .pageBeganLoading(url: url))
-         }
+        }
     }
 
     func webView(_ webView: WKWebView, didFinish navigation: WKNavigation!) {
@@ -613,7 +605,15 @@ extension Tab: WKNavigationDelegate {
     func webView(_ webView: WKWebView, didFailProvisionalNavigation navigation: WKNavigation!, withError error: Error) {
         if currentDownload != nil && (error as NSError).code == ErrorCodes.frameLoadInterrupted {
             currentDownload = nil
-            os_log("didFailProvisionalNavigation due to download %s", type: .debug, currentDownload?.sourceURL?.absoluteString ?? "")
+
+            // Note this can result in tabs being left open, e.g. download button on this page:
+            // https://en.wikipedia.org/wiki/Guitar#/media/File:GuitareClassique5.png
+            // Safari closes new tabs that were opened and then create a download instantly.
+            if self.webView.canGoBack == false,
+               self.parentTab != nil {
+                delegate?.closeTab(self)
+            }
+
             return
         }
         self.error = error
@@ -623,6 +623,18 @@ extension Tab: WKNavigationDelegate {
          guard let url = webView.url else { return }
          loginDetectionService?.handle(navigationEvent: .redirect(url: url))
      }
+
+}
+
+extension Tab: WKWebViewDownloadDelegate {
+
+    func webView(_ webView: WKWebView, navigationAction: WKNavigationAction, didBecomeDownload download: WebKitDownload) {
+        FileDownloadManager.shared.add(download, delegate: self.delegate, promptForLocation: false, postflight: .reveal)
+    }
+
+    func webView(_ webView: WKWebView, navigationResponse: WKNavigationResponse, didBecomeDownload download: WebKitDownload) {
+        FileDownloadManager.shared.add(download, delegate: self.delegate, promptForLocation: false, postflight: .reveal)
+    }
 
 }
 
@@ -657,11 +669,6 @@ fileprivate extension WKNavigationAction {
     func isTargetingMainFrame() -> Bool {
         return targetFrame?.isMainFrame ?? false
     }
-}
-
-extension WKNavigationActionPolicy {
-    // https://github.com/WebKit/WebKit/blob/9a6f03d46238213231cf27641ed1a55e1949d074/Source/WebKit/UIProcess/API/Cocoa/WKNavigationDelegate.h#L49
-    static let download = WKNavigationActionPolicy(rawValue: Self.allow.rawValue + 1) ?? .cancel
 }
 
 // swiftlint:enable type_body_length

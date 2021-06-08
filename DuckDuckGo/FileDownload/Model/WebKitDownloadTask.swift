@@ -17,23 +17,11 @@
 //
 
 import Foundation
-
-protocol WebKitDownloadTaskProtocol: FileDownloadTask {
-    func download(_ download: WebKitDownload, didReceiveResponse response: URLResponse)
-    func download(_ download: WebKitDownload,
-                  decideDestinationWithSuggestedFilename suggestedFilename: String?,
-                  completionHandler: @escaping (/*allowOverwrite:*/ Bool, /*destination:*/ String?) -> Void)
-    func download(_ download: WebKitDownload, didWriteData bytesWritten: UInt64, totalBytesWritten: UInt64, totalBytesExpectedToWrite: UInt64)
-
-    func downloadDidFinish(_ download: WebKitDownload)
-    func downloadDidCancel(_ download: WebKitDownload)
-    func download(_ download: WebKitDownload, didFailWithError error: Error)
-    func download(_ download: WebKitDownload,
-                  didReceiveAuthenticationChallenge challenge: URLAuthenticationChallenge,
-                  completionHandler: @escaping (URLSession.AuthChallengeDisposition, URLCredential?) -> Void)
-}
+import Combine
 
 final class WebKitDownloadTask: FileDownloadTask {
+
+    static let downloadExtension = "duckload"
 
     private let wkDownload: WebKitDownload
 
@@ -47,46 +35,67 @@ final class WebKitDownloadTask: FileDownloadTask {
         return wkSuggestedFilename
     }
 
-    typealias DecideDestinationCompletionHandler = (/*allowOverwrite:*/ Bool, /*destination:*/ String?) -> Void
-    private var decideDestinationCompletionHandler: DecideDestinationCompletionHandler?
+    private var decideDestinationCompletionHandler: ((URL?) -> Void)?
     private var tempURL: URL?
     private var destinationURL: URL?
 
-    init(download: WebKitDownload) {
+    private var cancellables = Set<AnyCancellable>()
+
+    init(download: WebKitDownload, promptForLocation: Bool) {
         self.wkDownload = download
-        super.init(download: FileDownload.wkDownload(download))
+        super.init(download: FileDownload.wkDownload(download, promptForLocation: promptForLocation))
+        download.delegate = self
     }
 
     override func start() {
         self.progress.fileDownloadingSourceURL = wkDownload.request?.url
+        self.wkDownload.getProgress { [weak self] progress in
+            guard let self = self else { return }
+            
+            progress?.publisher(for: \.totalUnitCount)
+                .weakAssign(to: \.totalUnitCount, on: self.progress)
+                .store(in: &self.cancellables)
+            progress?.publisher(for: \.completedUnitCount)
+                .weakAssign(to: \.completedUnitCount, on: self.progress)
+                .store(in: &self.cancellables)
+        }
     }
 
     override func localFileURLCompletionHandler(localURL: URL?, fileType: UTType?) {
         dispatchPrecondition(condition: .onQueue(.main))
 
-        let path: String?
-        if let localURL = localURL {
-            // _WKDownload doesn't increase file index counter if destination file exists
-            // check if it exists and move the file incrementing index if needed on completion
-            if FileManager.default.fileExists(atPath: localURL.path) {
-                self.tempURL = localURL.deletingLastPathComponent()
-                    .appendingPathComponent(.uniqueFilename(for: self.fileTypes?.first))
-                path = self.tempURL?.path
-            } else {
-                path = localURL.path
+        do {
+            struct ThrowableError: Error {}
+            guard let localURL = localURL else { throw URLError(.cancelled) }
+
+            var downloadURL = localURL.appendingPathExtension(Self.downloadExtension)
+            let ext = localURL.pathExtension + (localURL.pathExtension.isEmpty ? "" : ".") + Self.downloadExtension
+
+            // create temp file and move to Downloads folder with .duckload extension increasing index if needed
+            let fm = FileManager.default
+            let tempURL = fm.temporaryDirectory(appropriateFor: localURL).appendingPathComponent(.uniqueFilename())
+            fm.createFile(atPath: tempURL.path, contents: nil, attributes: nil)
+            do {
+                downloadURL = try fm.moveItem(at: tempURL, to: downloadURL, incrementingIndexIfExists: true, pathExtension: ext)
+                // remove temp item and let WebKit download the file
+                try? fm.removeItem(at: downloadURL)
+            } catch CocoaError.fileWriteNoPermission {
+                downloadURL = localURL
             }
 
-            self.progress.fileURL = path.map(URL.init(fileURLWithPath:))
+            self.tempURL = downloadURL
+            self.destinationURL = localURL
+
+            self.progress.fileURL = downloadURL
             self.progress.publishIfNotPublished()
 
-        } else {
+            self.decideDestinationCompletionHandler?(downloadURL)
+
+        } catch {
             self.wkDownload.cancel()
             self.finish(with: .failure(.cancelled))
-            path = nil
+            self.decideDestinationCompletionHandler?(nil)
         }
-
-        self.destinationURL = localURL
-        self.decideDestinationCompletionHandler?(/*allowOverwrite:*/ false, path)
     }
 
     override func cancel() {
@@ -95,30 +104,23 @@ final class WebKitDownloadTask: FileDownloadTask {
 
 }
 
-extension WebKitDownloadTask: WebKitDownloadTaskProtocol {
+extension WebKitDownloadTask: WebKitDownloadDelegate {
 
-    func download(_ download: WebKitDownload, didReceiveResponse response: URLResponse) {
-        if var mimeType = response.mimeType {
+    func download(_ download: WebKitDownload,
+                  decideDestinationUsing response: URLResponse?,
+                  suggestedFilename: String,
+                  completionHandler: @escaping (URL?) -> Void) {
+
+        if var mimeType = response?.mimeType {
             // drop ;charset=.. from "text/plain;charset=utf-8"
             if let charsetRange = mimeType.range(of: ";charset=") {
                 mimeType = String(mimeType[..<charsetRange.lowerBound])
             }
             self.fileTypes = UTType(mimeType: mimeType).map { [$0] }
         }
-        self.progress.totalUnitCount = response.expectedContentLength
-    }
-
-    func download(_ download: WebKitDownload,
-                  decideDestinationWithSuggestedFilename suggestedFilename: String?,
-                  completionHandler: @escaping DecideDestinationCompletionHandler) {
         self.wkSuggestedFilename = suggestedFilename
         self.decideDestinationCompletionHandler = completionHandler
         self.queryDestinationURL()
-    }
-
-    func download(_ download: WebKitDownload, didWriteData bytesWritten: UInt64, totalBytesWritten: UInt64, totalBytesExpectedToWrite: UInt64) {
-        self.progress.totalUnitCount = Int64(totalBytesExpectedToWrite)
-        self.progress.completedUnitCount = Int64(totalBytesWritten)
     }
 
     func downloadDidFinish(_ download: WebKitDownload) {
@@ -129,9 +131,7 @@ extension WebKitDownloadTask: WebKitDownloadTaskProtocol {
 
         if let tempURL = tempURL, tempURL != destinationURL {
             do {
-                destinationURL = try FileManager.default.moveItem(at: tempURL,
-                                                                  to: destinationURL,
-                                                                  incrementingIndexIfExists: true)
+                destinationURL = try FileManager.default.moveItem(at: tempURL, to: destinationURL, incrementingIndexIfExists: true)
             } catch {
                 destinationURL = tempURL
             }
@@ -139,19 +139,14 @@ extension WebKitDownloadTask: WebKitDownloadTaskProtocol {
 
         self.finish(with: .success(destinationURL))
     }
-
-    func downloadDidCancel(_ download: WebKitDownload) {
-        self.finish(with: .failure(.cancelled))
-    }
-
-    func download(_ download: WebKitDownload, didFailWithError error: Error) {
-        self.finish(with: .failure(.failedToCompleteDownloadTask(underlyingError: error)))
-    }
-
-    func download(_ download: WebKitDownload,
-                  didReceiveAuthenticationChallenge challenge: URLAuthenticationChallenge,
-                  completionHandler: @escaping (URLSession.AuthChallengeDisposition, URLCredential?) -> Void) {
-        completionHandler(.performDefaultHandling, nil)
-    }
     
+    func download(_ download: WebKitDownload, didFailWithError error: Error, resumeData: Data?) {
+        try? tempURL.map(FileManager.default.removeItem(at:))
+        if (error as? URLError)?.code == URLError.cancelled {
+            self.finish(with: .failure(.cancelled))
+        } else {
+            self.finish(with: .failure(.failedToCompleteDownloadTask(underlyingError: error)))
+        }
+    }
+
 }
