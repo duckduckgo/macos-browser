@@ -49,7 +49,7 @@ final class Database {
             try EncryptedValueTransformer<NSURL>.registerTransformer()
             try EncryptedValueTransformer<NSNumber>.registerTransformer()
         } catch {
-//            fatalError("Failed to register encryption value transformers")
+            fatalError("Failed to register encryption value transformers")
         }
 
         container = DDGPersistentContainer(name: name, managedObjectModel: model)
