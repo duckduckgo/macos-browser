@@ -35,7 +35,7 @@ extension WKProcessPool {
     func setDownloadDelegateIfNeeded(using makeDelegate: () -> LegacyWebKitDownloadDelegate)
     -> LegacyWebKitDownloadDelegate? {
         // we don't need LegacyWebKitDownloadDelegate if WKDownload is already supported
-        guard NSClassFromString("WKDownload") == nil else { return nil }
+        if #available(macOS 11.3, *) { return nil }
 
         if let downloadDelegate = self.downloadDelegate as? LegacyWebKitDownloadDelegate {
             return downloadDelegate
