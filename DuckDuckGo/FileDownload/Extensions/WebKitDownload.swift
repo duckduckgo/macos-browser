@@ -58,12 +58,31 @@ extension _WKDownload: WebKitDownload {
     private static let downloadDelegateKey = UnsafeRawPointer(bitPattern: "_WKDownloadDelegateKey".hashValue)!
     private static let subscriberRemoverKey = "subscriberRemoverKey"
 
+    private class WeakDownloadDelegateRef: NSObject {
+        weak var delegate: WebKitDownloadDelegate?
+        init(_ delegate: WebKitDownloadDelegate?) {
+            self.delegate = delegate
+        }
+    }
+
+    private class ProgressSubscriberRemover: NSObject {
+        let subscriber: Any
+
+        init(subscriber: Any) {
+            self.subscriber = subscriber
+        }
+
+        deinit {
+            Progress.removeSubscriber(subscriber)
+        }
+    }
+
     var downloadDelegate: WebKitDownloadDelegate? {
         get {
-            objc_getAssociatedObject(self, Self.downloadDelegateKey) as? WebKitDownloadDelegate
+            (objc_getAssociatedObject(self, Self.downloadDelegateKey) as? WeakDownloadDelegateRef)?.delegate
         }
         set {
-            objc_setAssociatedObject(self, Self.downloadDelegateKey, newValue, .OBJC_ASSOCIATION_ASSIGN)
+            objc_setAssociatedObject(self, Self.downloadDelegateKey, WeakDownloadDelegateRef(newValue), .OBJC_ASSOCIATION_RETAIN)
         }
     }
 
@@ -121,18 +140,6 @@ extension _WKDownload: WebKitDownload {
         self
     }
 
-}
-
-private class ProgressSubscriberRemover: NSObject {
-    let subscriber: Any
-
-    init(subscriber: Any) {
-        self.subscriber = subscriber
-    }
-
-    deinit {
-        Progress.removeSubscriber(subscriber)
-    }
 }
 
 @available(macOS 11.3, *)
