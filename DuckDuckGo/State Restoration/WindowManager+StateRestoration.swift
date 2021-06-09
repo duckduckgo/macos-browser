@@ -31,17 +31,21 @@ extension WindowsManager {
     }
 
     private class func restoreWindows(from state: WindowManagerStateRestoration) {
-        var keyWindow: NSWindow?
+        let isOriginalKeyWindowPresent = Self.windows.contains(where: {$0.isKeyWindow})
+
+        var newKeyWindow: NSWindow?
         for (idx, item) in state.windows.enumerated() {
-            guard let window = self.openNewWindow(with: item.model) else { continue }
+            guard let window = self.openNewWindow(with: item.model, showWindow: false) else { continue }
             window.setContentSize(item.frame.size)
             window.setFrameOrigin(item.frame.origin)
 
             if idx == state.keyWindowIndex {
-                keyWindow = window
+                newKeyWindow = window
             }
         }
-        keyWindow?.makeKeyAndOrderFront(self)
+        if !isOriginalKeyWindowPresent {
+            newKeyWindow?.makeKeyAndOrderFront(self)
+        }
 
         if !state.windows.isEmpty {
             NSApp.activate(ignoringOtherApps: true)

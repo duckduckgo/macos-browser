@@ -34,13 +34,19 @@ final class WindowsManager {
     }
 
     @discardableResult
-    class func openNewWindow(with tabCollectionViewModel: TabCollectionViewModel? = nil, droppingPoint: NSPoint? = nil) -> NSWindow? {
+    class func openNewWindow(with tabCollectionViewModel: TabCollectionViewModel? = nil,
+                             droppingPoint: NSPoint? = nil,
+                             showWindow: Bool = true) -> NSWindow? {
         let mainWindowController = makeNewWindow(tabCollectionViewModel: tabCollectionViewModel)
 
         if let droppingPoint = droppingPoint {
             mainWindowController.window?.setFrameOrigin(droppingPoint: droppingPoint)
         }
-        mainWindowController.showWindow(self)
+        if showWindow {
+            mainWindowController.showWindow(self)
+        } else {
+            mainWindowController.orderWindowBack(self)
+        }
 
         return mainWindowController.window
     }
