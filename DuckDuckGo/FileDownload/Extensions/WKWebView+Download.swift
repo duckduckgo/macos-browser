@@ -21,24 +21,16 @@ import WebKit
 extension WKWebView {
 
     func startDownload(from url: URL, completionHandler: @escaping (WebKitDownload) -> Void) {
-        func completion(_ download: NSObject) {
-            let casted = withUnsafePointer(to: download) {
-                $0.withMemoryRebound(to: WebKitDownload.self, capacity: 1) { $0.pointee }
-            }
-            completionHandler(casted)
-        }
-
         let request = URLRequest(url: url)
         if #available(macOS 11.3, *) {
-            self.startDownload(using: request) { download in
-                completion(download)
-            }
+            self.startDownload(using: request) { completionHandler($0) }
+
         } else if configuration.processPool.responds(to: #selector(WKProcessPool._downloadURLRequest(_:websiteDataStore:originatingWebView:))) {
             configuration.processPool.setDownloadDelegateIfNeeded(using: LegacyWebKitDownloadDelegate.init)
             let download = configuration.processPool._downloadURLRequest(request,
                                                                          websiteDataStore: self.configuration.websiteDataStore,
                                                                          originatingWebView: self)
-            completion(download)
+            completionHandler(download)
         } else {
             assertionFailure("WKProcessPool does not respond to _downloadURLRequest:websiteDataStore:originatingWebView:")
         }

@@ -16,13 +16,15 @@
 //  limitations under the License.
 //
 
+#import "_WKDownload.h"
+
 NS_ASSUME_NONNULL_BEGIN
 
 @interface WKProcessPool (Private)
 
 // https://github.com/WebKit/WebKit/blob/8afe31a018b11741abdf9b4d5bb973d7c1d9ff05/Source/WebKit/UIProcess/API/Cocoa/WKProcessPool.mm#L522
-- (NSObject *)_downloadURLRequest:(NSURLRequest *)request websiteDataStore:(WKWebsiteDataStore *)dataStore originatingWebView:(WKWebView *)webView;
-- (NSObject *)_resumeDownloadFromData:(NSData *)resumeData websiteDataStore:(WKWebsiteDataStore *)dataStore path:(NSString *)path originatingWebView:(WKWebView *)webView;
+- (_WKDownload *)_downloadURLRequest:(NSURLRequest *)request websiteDataStore:(WKWebsiteDataStore *)dataStore originatingWebView:(WKWebView *)webView;
+- (_WKDownload *)_resumeDownloadFromData:(NSData *)resumeData websiteDataStore:(WKWebsiteDataStore *)dataStore path:(NSString *)path originatingWebView:(WKWebView *)webView;
 
 @end
 
