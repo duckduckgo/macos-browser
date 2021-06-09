@@ -95,8 +95,6 @@ final class WindowManagerStateRestoration: NSObject, NSSecureCoding {
     }
 
     func encode(with coder: NSCoder) {
-        #warning("Skip Private Windows coding")
-
         coder.encode(windows as NSArray, forKey: NSCodingKeys.controllers)
         keyWindowIndex.map(coder.encode(forKey: NSCodingKeys.keyWindowIndex))
     }

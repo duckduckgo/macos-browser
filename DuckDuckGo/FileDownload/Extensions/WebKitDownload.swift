@@ -16,6 +16,8 @@
 //  limitations under the License.
 //
 
+import WebKit
+
 @objc protocol WebKitDownload {
 
     var downloadRequest: URLRequest? { get }

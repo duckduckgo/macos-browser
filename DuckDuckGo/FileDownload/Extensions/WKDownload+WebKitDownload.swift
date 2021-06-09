@@ -17,6 +17,7 @@
 //
 
 import Foundation
+import WebKit
 
 @available(macOS 11.3, *)
 extension WKDownload: WebKitDownload {
