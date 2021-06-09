@@ -6,3 +6,6 @@
 
 #import "WKWebView+Private.h"
 #import "NSException+Catch.h"
+#import "WKDownload.h"
+#import "_WKDownload.h"
+#import "WKProcessPool+Private.h"

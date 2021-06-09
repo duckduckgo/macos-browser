@@ -48,7 +48,7 @@
     @objc optional func download(_ download: WebKitDownload, didFailWithError error: Error, resumeData: Data?)
 }
 
-protocol WKWebViewDownloadDelegate {
+protocol WKWebViewDownloadDelegate: AnyObject {
     func webView(_ webView: WKWebView, navigationAction: WKNavigationAction, didBecomeDownload download: WebKitDownload)
     func webView(_ webView: WKWebView, navigationResponse: WKNavigationResponse, didBecomeDownload download: WebKitDownload)
 }
