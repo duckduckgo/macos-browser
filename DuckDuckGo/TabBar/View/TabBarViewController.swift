@@ -21,6 +21,137 @@ import os.log
 import Combine
 import Lottie
 
+extension CGRect {
+    func rounded() -> CGRect {
+        CGRect(x: CGFloat(Int(origin.x * 2)) / 2, y: CGFloat(Int(origin.y * 2)) / 2,
+               width: CGFloat(Int(width * 2)) / 2, height: CGFloat(Int(height * 2)) / 2)
+    }
+}
+
+final class Layout: NSCollectionViewFlowLayout {
+    var focusPoint: CGFloat?
+
+//    func centerOfCollapsedItem(at index: Int) -> CGFloat {
+//        collapsedItemSize.width * 0.5 + CGFloat(index) * (itemOffset + collapsedItemSize.width)
+//    }
+
+    func collapsedItemIndex(at point: CGFloat, attributes: [NSCollectionViewLayoutAttributes]) -> Int? {
+        for (idx, attribute) in attributes.enumerated() {
+            if idx == 0 && point < attribute.frame.minX { return nil }
+            if point <= attribute.frame.maxX {
+                return idx
+            }
+
+        }
+        return nil
+    }
+
+    var itemOffset: CGFloat = 0
+
+//    var collapsedItemSize = CGSize(width: 60, height: 30)
+
+    var expandedItemSize = CGSize(width: 120, height: 50)
+
+    let maxExpansionFunctionNeighbors: CGFloat = 3
+
+    var expansionSize: CGFloat = 240
+
+    var lastAttributes: [NSCollectionViewLayoutAttributes] = []
+
+    func scale(forItemAtDistance distance: CGFloat?) -> CGFloat {
+        if let absDistance = distance.map(abs),
+           absDistance <= expansionSize {
+            // distance from 0 (center): expanded; till expansionsNeighbors * collapsedItemWidth => 1.0
+            return 1.0 - absDistance / expansionSize
+        }
+        return 0
+    }
+
+    func widthForItem(at index: Int, focusPoint: CGFloat?, attributes: [NSCollectionViewLayoutAttributes]) -> CGFloat {
+        let collapsedWidth = attributes[index].frame.width
+        guard let focusPoint = focusPoint else { return collapsedWidth }
+        let distance = focusPoint - attributes[index].frame.midX
+        let scale = self.scale(forItemAtDistance: distance)
+
+        return (collapsedWidth + itemOffset) + (expandedItemSize.width - collapsedWidth) * scale
+    }
+
+    // swiftlint:disable function_body_length
+    override func layoutAttributesForElements(in rect: NSRect) -> [NSCollectionViewLayoutAttributes] {
+        var layoutAttributes = super
+            .layoutAttributesForElements(in: rect)
+            .map { ($0.copy() as? NSCollectionViewLayoutAttributes)! }
+
+         var removed = [(Int, NSCollectionViewLayoutAttributes)]()
+        for (idx, item) in layoutAttributes.enumerated().reversed() where item.representedElementKind != nil {
+            removed.append( (idx, layoutAttributes.remove(at: idx)) )
+        }
+        guard !layoutAttributes.isEmpty else { return [] }
+
+        let itemHeight = layoutAttributes.first!.frame.height
+
+        let focusIndex = focusPoint.flatMap { self.collapsedItemIndex(at: $0, attributes: layoutAttributes) }
+        var focusedItemCenter = layoutAttributes[focusIndex ?? 0].frame.midX
+        let focusedItemWidth: CGFloat
+        if let focusPoint = focusPoint, let focusIndex = focusIndex {
+            let distance = focusPoint - focusedItemCenter
+            let absDistance = abs(distance)
+            let sign: CGFloat = distance == absDistance ? -1.0 : 1.0
+            let originalWidth = layoutAttributes[focusIndex].frame.width
+            let perc = min(absDistance / (originalWidth * 0.5), 1.0)
+            focusedItemWidth = self.widthForItem(at: focusIndex, focusPoint: focusPoint, attributes: layoutAttributes)
+            focusedItemCenter += sign * (focusedItemWidth - originalWidth) * 0.5 * perc
+
+        } else {
+            focusedItemWidth = layoutAttributes[focusIndex ?? 0].frame.width
+        }
+        let centerItemFrame = CGRect(x: focusedItemCenter - focusedItemWidth * 0.5, y: 0,
+                                     width: focusedItemWidth, height: itemHeight).rounded()
+        layoutAttributes[focusIndex ?? 0].frame = centerItemFrame
+
+        var layoutOffset = centerItemFrame.minX - itemOffset
+        // go left from focused item
+        if let focusPoint = focusPoint,
+           let focusIndex = focusIndex,
+           focusIndex > 0 {
+
+            for index in (0..<focusIndex).reversed() {
+                let width = self.widthForItem(at: index, focusPoint: focusPoint, attributes: layoutAttributes)
+                let frame = CGRect(x: layoutOffset - width, y: 0,
+                                   width: width, height: itemHeight).rounded()
+                layoutAttributes[index].frame = frame
+                layoutOffset -= itemOffset + width
+            }
+        }
+        // go right from focused item
+        if (focusIndex ?? 0) + 1 < layoutAttributes.count {
+            layoutOffset = centerItemFrame.maxX + itemOffset
+            for index in ((focusIndex ?? 0) + 1)..<layoutAttributes.count {
+                let width = focusIndex != nil
+                    ? self.widthForItem(at: index, focusPoint: focusPoint, attributes: layoutAttributes)
+                    : layoutAttributes[index].frame.width
+                let frame = CGRect(x: layoutOffset, y: 0,
+                                   width: width, height: itemHeight).rounded()
+                layoutAttributes[index].frame = frame
+                layoutOffset += itemOffset + width
+            }
+        }
+
+        for (idx, item) in removed {
+            layoutAttributes.insert(item, at: idx)
+        }
+
+        return layoutAttributes
+    }
+    // swiftlint:enable function_body_length
+    
+    override func layoutAttributesForItem(at indexPath: IndexPath) -> NSCollectionViewLayoutAttributes? {
+        guard indexPath.item < lastAttributes.count else { return super.layoutAttributesForItem(at: indexPath) }
+        return lastAttributes[indexPath.item]
+    }
+
+}
+
 // swiftlint:disable file_length
 // swiftlint:disable type_body_length
 final class TabBarViewController: NSViewController {
@@ -61,8 +192,11 @@ final class TabBarViewController: NSViewController {
         super.init(coder: coder)
     }
 
+    var layout: Layout!
     override func viewDidLoad() {
         super.viewDidLoad()
+
+        layout = collectionView.collectionViewLayout as? Layout
 
         scrollView.updateScrollElasticity(with: tabMode)
         observeToScrollNotifications()
@@ -70,6 +204,22 @@ final class TabBarViewController: NSViewController {
         subscribeToIsBurning()
 
         warmupFireAnimation()
+
+        registerForMouseEnteredAndExitedEvents()
+    }
+
+    func registerForMouseEnteredAndExitedEvents() {
+        let trackingArea = NSTrackingArea(rect: self.view.bounds,
+                                          options: [.activeAlways, .mouseMoved, .mouseEnteredAndExited],
+                                          owner: self,
+                                          userInfo: nil)
+        self.view.addTrackingArea(trackingArea)
+    }
+
+    func updateTrackingAreas() {
+        view.trackingAreas.forEach(view.removeTrackingArea)
+
+        registerForMouseEnteredAndExitedEvents()
     }
 
     override func viewWillAppear() {
@@ -87,6 +237,7 @@ final class TabBarViewController: NSViewController {
         updateTabMode()
         updateEmptyTabArea()
         collectionView.invalidateLayout()
+        updateTrackingAreas()
     }
 
     deinit {
@@ -295,8 +446,23 @@ final class TabBarViewController: NSViewController {
         }
     }
 
+    override func mouseMoved(with event: NSEvent) {
+        let point = self.collectionView.convert(event.locationInWindow, from: nil)
+        if view.isMouseLocationInsideBounds(event.locationInWindow) {
+            layout.focusPoint = point.x
+            updateLayout()
+        } else if layout.focusPoint != nil {
+            layout.focusPoint = nil
+            updateLayout()
+        } else {
+            return
+        }
+    }
+
     override func mouseExited(with event: NSEvent) {
         guard !view.isMouseLocationInsideBounds(event.locationInWindow) else { return }
+        layout.focusPoint = nil
+        updateLayout()
 
         if cachedLayoutNumberOfItems != collectionView.numberOfItems(inSection: 0) || frozenLayout {
             cachedLayoutNumberOfItems = nil
