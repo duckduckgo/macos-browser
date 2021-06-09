@@ -29,7 +29,7 @@ extension WKWebView {
         }
 
         let request = URLRequest(url: url)
-        if self.responds(to: #selector(WKWebView.startDownload(using:completionHandler:))) {
+        if #available(macOS 11.3, *) {
             self.startDownload(using: request) { download in
                 completion(download)
             }

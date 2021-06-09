@@ -18,6 +18,7 @@
 
 import Foundation
 import Combine
+import WebKit
 
 final class WebKitDownloadTask: FileDownloadTask {
 
@@ -44,11 +45,11 @@ final class WebKitDownloadTask: FileDownloadTask {
     init(download: WebKitDownload, promptForLocation: Bool) {
         self.wkDownload = download
         super.init(download: FileDownload.wkDownload(download, promptForLocation: promptForLocation))
-        download.delegate = self
+        download.downloadDelegate = self
     }
 
     override func start() {
-        self.progress.fileDownloadingSourceURL = wkDownload.request?.url
+        self.progress.fileDownloadingSourceURL = wkDownload.downloadRequest?.url
         self.wkDownload.getProgress { [weak self] progress in
             guard let self = self else { return }
             

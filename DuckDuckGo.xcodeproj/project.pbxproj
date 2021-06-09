@@ -1749,7 +1749,6 @@
 				B6A9E46A2614618A0067D1B9 /* OperatingSystemVersionExtension.swift */,
 				4B0511FC262CD20D00F6079C /* NSImageViewExtension.swift */,
 				B6E61EE2263AC0C8004E11AB /* FileManagerExtension.swift */,
-				B6F41030264D2B23003DA42C /* ProgressExtension.swift */,
 				AAADFD05264AA282001555EA /* TimeIntervalExtension.swift */,
 			);
 			path = Extensions;
@@ -1869,6 +1868,7 @@
 		B61EF3EA266F91D700B4D78F /* Extensions */ = {
 			isa = PBXGroup;
 			children = (
+				B6F41030264D2B23003DA42C /* ProgressExtension.swift */,
 				B6A924D32664BBB9001A28CA /* WebKitDownload.swift */,
 				B61EF3EB266F91E700B4D78F /* WKWebView+Download.swift */,
 				B61EF3F0266F922200B4D78F /* WKProcessPool+DownloadDelegate.swift */,

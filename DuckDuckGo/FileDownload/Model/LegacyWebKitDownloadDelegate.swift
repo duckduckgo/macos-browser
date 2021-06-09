@@ -24,7 +24,7 @@ final class LegacyWebKitDownloadDelegate: NSObject {
 
     private var navigationActions = [URL: WKNavigationAction]()
     private var navigationResponses = [URL: WKNavigationResponse]()
-    private var responseCache = [WebKitDownload: URLResponse]()
+    private var responseCache = [NSObject: URLResponse]()
 
     override init() {
     }
@@ -51,7 +51,7 @@ final class LegacyWebKitDownloadDelegate: NSObject {
 private extension LegacyWebKitDownloadDelegate {
 
     @objc func _downloadDidStart(_ download: WebKitDownload) {
-        guard let webView = download.webView, let url = download.request?.url else {
+        guard let webView = download.webView, let url = download.downloadRequest?.url else {
             assertionFailure("WebKitDownload webView or url is nil")
             return
         }
@@ -70,42 +70,42 @@ private extension LegacyWebKitDownloadDelegate {
     }
 
     @objc func _download(_ download: WebKitDownload, didReceiveResponse response: URLResponse) {
-        self.responseCache[download] = response
+        self.responseCache[download.asNSObject()] = response
     }
 
     @objc func _download(_ download: WebKitDownload,
                          decideDestinationWithSuggestedFilename suggestedFilename: String,
                          completionHandler: @escaping (Bool, String?) -> Void) {
         defer {
-            self.responseCache[download] = nil
+            self.responseCache[download.asNSObject()] = nil
         }
-        guard let delegate = download.delegate else {
+        guard let delegate = download.downloadDelegate else {
             assertionFailure("_download:decideDestinationWithSuggestedFilename: delegate not set")
             completionHandler(false, nil)
             return
         }
 
-        delegate.download(download, decideDestinationUsing: self.responseCache[download], suggestedFilename: suggestedFilename) { url in
+        delegate.download(download, decideDestinationUsing: self.responseCache[download.asNSObject()], suggestedFilename: suggestedFilename) { url in
             completionHandler(false, url?.path)
         }
     }
 
     @objc func _downloadDidFinish(_ download: WebKitDownload) {
-        download.delegate?.downloadDidFinish?(download)
+        download.downloadDelegate?.downloadDidFinish?(download)
     }
 
     @objc func _downloadDidCancel(_ download: WebKitDownload) {
-        download.delegate?.download?(download, didFailWithError: URLError(.cancelled), resumeData: nil)
+        download.downloadDelegate?.download?(download, didFailWithError: URLError(.cancelled), resumeData: nil)
     }
 
     @objc func _download(_ download: WebKitDownload, didFailWithError error: Error) {
-        download.delegate?.download?(download, didFailWithError: error, resumeData: nil)
+        download.downloadDelegate?.download?(download, didFailWithError: error, resumeData: nil)
     }
 
     @objc func _download(_ download: WebKitDownload,
                          didReceiveAuthenticationChallenge challenge: URLAuthenticationChallenge,
                          completionHandler: @escaping (URLSession.AuthChallengeDisposition, URLCredential?) -> Void) {
-        download.delegate?.download?(download, didReceiveAuthenticationChallenge: challenge, completionHandler: completionHandler)
+        download.downloadDelegate?.download?(download, didReceiveAuthenticationChallenge: challenge, completionHandler: completionHandler)
             ?? download.webView?.navigationDelegate?.webView?(download.webView!, didReceive: challenge, completionHandler: completionHandler)
     }
 

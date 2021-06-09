@@ -624,6 +624,17 @@ extension Tab: WKNavigationDelegate {
          loginDetectionService?.handle(navigationEvent: .redirect(url: url))
      }
 
+
+    @available(macOS 11.3, *)
+    func webView(_ webView: WKWebView, navigationAction: WKNavigationAction, didBecome download: WKDownload) {
+        self.webView(webView, navigationAction: navigationAction, didBecomeDownload: download)
+    }
+
+    @available(macOS 11.3, *)
+    func webView(_ webView: WKWebView, navigationResponse: WKNavigationResponse, didBecome download: WKDownload) {
+        self.webView(webView, navigationResponse: navigationResponse, didBecomeDownload: download)
+    }
+
 }
 
 extension Tab: WKWebViewDownloadDelegate {
