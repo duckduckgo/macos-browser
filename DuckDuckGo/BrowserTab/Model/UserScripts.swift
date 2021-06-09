@@ -28,15 +28,16 @@ final class UserScripts {
     let loginDetectionUserScript = LoginFormDetectionUserScript()
     let contentBlockerScript = ContentBlockerUserScript()
     let contentBlockerRulesScript = ContentBlockerRulesUserScript()
-    let emailScript = EmailUserScript()
+    let autofillScript = AutofillUserScript()
     let debugScript = DebugUserScript()
 
     init() {
     }
 
     init(copy other: UserScripts) {
-        // copy compiled scripts to avoid repeated loading from disk
-        self.scripts = other.scripts
+        scripts = other.scripts
+        scripts.removeLast()
+        scripts.append(autofillScript.makeWKUserScript())
     }
 
     lazy var userScripts: [UserScript] = [
@@ -47,8 +48,8 @@ final class UserScripts {
         self.loginDetectionUserScript,
         self.contentBlockerScript,
         self.contentBlockerRulesScript,
-        self.emailScript,
-        self.pageObserverScript
+        self.pageObserverScript,
+        self.autofillScript
     ]
 
     lazy var scripts = userScripts.map { $0.makeWKUserScript() }
