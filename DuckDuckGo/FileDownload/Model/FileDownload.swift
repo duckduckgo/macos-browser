@@ -49,8 +49,20 @@ extension FileDownload {
     func downloadTask() -> FileDownloadTask? {
         switch self {
         case .webContent(let webView, mimeType: let mimeType):
-            let contentType = mimeType.flatMap(UTType.init(mimeType:)) ?? .html
-            return WebContentDownloadTask(download: self, webView: webView, contentType: contentType)
+            let contentType = mimeType.flatMap(UTType.init(mimeType:))
+            if case .html = (contentType ?? .html) {
+                return WebContentDownloadTask(download: self, webView: webView)
+
+            } else if let url = webView.url, url.isFileURL {
+                return LocalFileSaveTask(download: self,
+                                         url: url,
+                                         fileType: contentType ?? UTType(fileExtension: url.pathExtension))
+            } else if let url = webView.url {
+                #warning("fix this")
+                return nil// URLRequestDownloadTask(download: self, request: URLRequest(url: url, cachePolicy: .returnCacheDataElseLoad))
+            } else {
+                return nil
+            }
 
         case .wkDownload(let download, promptForLocation: let promptForLocation):
             return WebKitDownloadTask(download: download, promptForLocation: promptForLocation)

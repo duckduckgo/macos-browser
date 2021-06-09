@@ -18,7 +18,6 @@
 
 import Foundation
 import WebKit
-import UniformTypeIdentifiers
 
 final class WebContentDownloadTask: FileDownloadTask {
 
@@ -32,20 +31,16 @@ final class WebContentDownloadTask: FileDownloadTask {
         else {
             return super.suggestedFilename
         }
-        if let ext = self.fileTypes?.first?.fileExtension {
-            return title.appending("." + ext)
-        } else {
-            return title
-        }
+        return title.appending(".html")
     }
 
     private var subTask: FileDownloadTask?
     private var localURL: URL?
 
-    init(download: FileDownloadRequest, webView: WKWebView, contentType: UTType) {
+    init(download: FileDownloadRequest, webView: WKWebView) {
         self.webView = webView
         super.init(download: download)
-        self.fileTypes = [contentType, .webArchive, .pdf]
+        self.fileTypes = [.html, .webArchive, .pdf]
     }
 
     override func localFileURLCompletionHandler(localURL: URL?, fileType: UTType?) {
@@ -66,7 +61,7 @@ final class WebContentDownloadTask: FileDownloadTask {
         case .some(.pdf):
             create = { self.webView.createPDF(withConfiguration: nil, completionHandler: $0) }
 
-        default:
+        case .some(.html):
             create = self.webView.createWebArchiveData
             transform = { data in
                 // extract HTML from WebArchive bplist
@@ -80,6 +75,11 @@ final class WebContentDownloadTask: FileDownloadTask {
 
                 return resourceData as Data
             }
+
+        default:
+            assertionFailure("WebContentDownloadTask.localFileURLCompletionHandler unexpected file type \(fileType?.fileExtension ?? "<nil>")")
+            self.finish(with: .failure(.cancelled))
+            return
         }
 
         create { (data, error) in

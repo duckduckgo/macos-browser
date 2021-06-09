@@ -43,7 +43,7 @@ final class WebContentDownloadTaskTests: XCTestCase {
 
     func testWhenTaskStartedDestinationURLIsQueried() {
         let task = WebContentDownloadTask(download: FileDownloadRequestMock.download(nil, prompt: false),
-                                          webView: webView, contentType: .html)
+                                          webView: webView)
 
         let e = expectation(description: "destinationURLCallback called")
         taskDelegate.destinationURLCallback = { t, callback in
@@ -61,7 +61,7 @@ final class WebContentDownloadTaskTests: XCTestCase {
 
     func testWhenTaskDestinationURLCallbackIsCancelledThenTaskIsCancelled() {
         let task = WebContentDownloadTask(download: FileDownloadRequestMock.download(nil, prompt: false),
-                                          webView: webView, contentType: .html)
+                                          webView: webView)
 
         taskDelegate.destinationURLCallback = { _, callback in
             callback(nil, nil)
@@ -83,7 +83,7 @@ final class WebContentDownloadTaskTests: XCTestCase {
     func testWhenWriteFailsThenTaskFailsWithError() {
         let destURL = URL(fileURLWithPath: "/test/file")
         let task = WebContentDownloadTask(download: FileDownloadRequestMock.download(nil, prompt: false),
-                                          webView: webView, contentType: .html)
+                                          webView: webView)
 
         taskDelegate.destinationURLCallback = { _, callback in
             callback(destURL, .html)
@@ -106,7 +106,7 @@ final class WebContentDownloadTaskTests: XCTestCase {
         let destURL = fm.temporaryDirectory.appendingPathComponent(testFile)
 
         let task = WebContentDownloadTask(download: FileDownloadRequestMock.download(nil, prompt: false),
-                                          webView: webView, contentType: .html)
+                                          webView: webView)
 
         taskDelegate.destinationURLCallback = { _, callback in
             callback(destURL, .html)
@@ -126,7 +126,7 @@ final class WebContentDownloadTaskTests: XCTestCase {
         let destURL = fm.temporaryDirectory.appendingPathComponent(testFile)
 
         let task = WebContentDownloadTask(download: FileDownloadRequestMock.download(nil, prompt: false),
-                                          webView: webView, contentType: .html)
+                                          webView: webView)
 
         taskDelegate.destinationURLCallback = { _, callback in
             callback(destURL, .webArchive)
@@ -147,7 +147,7 @@ final class WebContentDownloadTaskTests: XCTestCase {
         let destURL = fm.temporaryDirectory.appendingPathComponent(testFile)
 
         let task = WebContentDownloadTask(download: FileDownloadRequestMock.download(nil, prompt: false),
-                                          webView: webView, contentType: .html)
+                                          webView: webView)
 
         taskDelegate.destinationURLCallback = { _, callback in
             callback(destURL, .pdf)
@@ -171,7 +171,7 @@ final class WebContentDownloadTaskTests: XCTestCase {
         let expectedURL = fm.temporaryDirectory.appendingPathComponent(testFile + " 1.test")
 
         let task = WebContentDownloadTask(download: FileDownloadRequestMock.download(nil, prompt: false),
-                                          webView: webView, contentType: .html)
+                                          webView: webView)
 
         taskDelegate.destinationURLCallback = { _, callback in
             callback(existingURL, .html)
