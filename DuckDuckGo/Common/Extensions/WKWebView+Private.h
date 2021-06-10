@@ -17,6 +17,7 @@
 //  limitations under the License.
 //
 #import <WebKit/WebKit.h>
+#import "_WKDownload.h"
 
 NS_ASSUME_NONNULL_BEGIN
 
@@ -29,8 +30,8 @@ NS_ASSUME_NONNULL_BEGIN
 - (void)createPDFWithConfiguration:(id _Nullable)pdfConfiguration completionHandler:(void (^)(NSData * _Nullable pdfDocumentData, NSError * _Nullable error))completionHandler;
 
 #ifndef __MAC_11_3
-- (void)startDownloadUsingRequest:(NSURLRequest * _Nonnull)request completionHandler:(void(^ _Nonnull)(NSObject * _Nonnull))completionHandler;
-- (void)resumeDownloadFromResumeData:(NSData * _Nonnull)resumeData completionHandler:(void(^ _Nonnull)(NSObject * _Nonnull))completionHandler;
+- (void)startDownloadUsingRequest:(NSURLRequest *)request completionHandler:(void(^)(_WKDownload *))completionHandler;
+- (void)resumeDownloadFromResumeData:(NSData *)resumeData completionHandler:(void(^)(_WKDownload *))completionHandler;
 #endif
 
 @end
