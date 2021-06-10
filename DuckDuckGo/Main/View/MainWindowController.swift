@@ -83,7 +83,16 @@ final class MainWindowController: NSWindowController {
     }
 
     override func showWindow(_ sender: Any?) {
-        window!.makeKeyAndOrderFront(sender)
+        window?.makeKeyAndOrderFront(sender)
+        register()
+    }
+
+    func orderWindowBack(_ sender: Any?) {
+        window?.orderBack(sender)
+        register()
+    }
+
+    private func register() {
         WindowControllersManager.shared.register(self)
     }
 
