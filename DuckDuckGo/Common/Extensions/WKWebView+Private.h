@@ -36,4 +36,26 @@ NS_ASSUME_NONNULL_BEGIN
 
 @end
 
+#ifndef __MAC_11_3
+
+typedef NS_ENUM(NSInteger, WKMediaCaptureType) {
+    WKMediaCaptureTypeCamera,
+    WKMediaCaptureTypeMicrophone,
+    WKMediaCaptureTypeCameraAndMicrophone,
+} API_AVAILABLE(macosx(11.3));
+
+typedef NS_ENUM(NSInteger, WKPermissionDecision) {
+    WKPermissionDecisionPrompt,
+    WKPermissionDecisionGrant,
+    WKPermissionDecisionDeny,
+} API_AVAILABLE(macosx(11.3));
+
+typedef NS_OPTIONS(NSUInteger, _WKCaptureDevices) {
+    _WKCaptureDeviceMicrophone = 1 << 0,
+    _WKCaptureDeviceCamera = 1 << 1,
+    _WKCaptureDeviceDisplay = 1 << 2,
+} API_AVAILABLE(macosx(10.3));
+
+#endif
+
 NS_ASSUME_NONNULL_END

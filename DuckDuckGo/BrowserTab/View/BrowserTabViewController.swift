@@ -464,7 +464,35 @@ extension BrowserTabViewController: WKUIDelegate {
         // WebKit loads the request in the returned web view.
         return selectedViewModel.tab.webView
     }
-    
+
+    override func responds(to aSelector: Selector!) -> Bool {
+        let r = super.responds(to: aSelector)
+        print("respondsToSelector", aSelector, r)
+        return r
+    }
+// https://github.com/WebKit/WebKit/blob/71ca17d470c5818c1bacc18faa94109e43b739bc/Source/WebKit/UIProcess/Cocoa/UIDelegate.mm
+    @objc(webView:requestMediaCapturePermissionForOrigin:initiatedByFrame:type:decisionHandler:)
+    @available(macOS 11.3, *)
+    func webView(_ webView: WKWebView,
+                 requestMediaCapturePermissionFor origin: WKSecurityOrigin,
+                 initiatedByFrame frame: WKFrameInfo,
+                 type: WKMediaCaptureType,
+                 decisionHandler: @escaping (WKPermissionDecision) -> Void) {
+        print("webView:requestMediaCapturePermissionForOrigin:initiatedByFrame:type:", origin, frame, type)
+        decisionHandler(.prompt)
+    }
+
+    // https://github.com/WebKit/WebKit/blob/9d7278159234e0bfa3d27909a19e695928f3b31e/Source/WebKit/UIProcess/API/Cocoa/WKUIDelegatePrivate.h#L126
+    @objc(_webView:requestUserMediaAuthorizationForDevices:url:mainFrameURL:decisionHandler:)
+    func webView(_ webView: WKWebView,
+                 requestUserMediaAuthorizationForDevices devices: _WKCaptureDevices,
+                 url: URL,
+                 mainFrameURL: URL,
+                 decisionHandler: @escaping (Bool) -> Void) {
+        print("_webView:requestUserMediaAuthorizationForDevices:url:mainFrameURL:", devices, url, mainFrameURL)
+        decisionHandler(true)
+    }
+
     func webView(_ webView: WKWebView,
                  runOpenPanelWith parameters: WKOpenPanelParameters,
                  initiatedByFrame frame: WKFrameInfo,

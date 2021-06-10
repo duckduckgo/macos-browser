@@ -39,6 +39,10 @@
 	<string>$(PRODUCT_BUNDLE_PACKAGE_TYPE)</string>
 	<key>CFBundleShortVersionString</key>
 	<string>$(MARKETING_VERSION)</string>
+	<key>NSCameraUsageDescription</key>
+	<string>Allows you to upload photographs and videos</string>
+	<key>NSMicrophoneUsageDescription</key>
+	<string>Allows you to share recordings</string>
 	<key>CFBundleURLTypes</key>
 	<array>
 		<dict>
