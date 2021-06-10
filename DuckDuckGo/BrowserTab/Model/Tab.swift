@@ -611,7 +611,8 @@ extension Tab: WKNavigationDelegate {
     }
 
     func webView(_ webView: WKWebView, didFail navigation: WKNavigation!, withError error: Error) {
-        #warning("Failing not captured. Seems the method is called after calling the webview's method goBack()")
+        // Failing not captured. Seems the method is called after calling the webview's method goBack()
+        // https://app.asana.com/0/1199230911884351/1200381133504356/f
 //        hasError = true
 
         self.invalidateSessionStateData()
