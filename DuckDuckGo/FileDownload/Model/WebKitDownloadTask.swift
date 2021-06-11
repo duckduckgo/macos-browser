@@ -164,16 +164,6 @@ final class WebKitDownloadTask: NSObject, ProgressReporting {
     }
 
     private func finish(with result: Result<URL, FileDownloadError>) {
-        if Thread.isMainThread {
-            unsafeFinish(with: result)
-        } else {
-            DispatchQueue.main.async {
-                self.unsafeFinish(with: result)
-            }
-        }
-    }
-
-    private func unsafeFinish(with result: Result<URL, FileDownloadError>) {
         dispatchPrecondition(condition: .onQueue(.main))
         guard let fulfill = self.fulfill else {
             // already finished
