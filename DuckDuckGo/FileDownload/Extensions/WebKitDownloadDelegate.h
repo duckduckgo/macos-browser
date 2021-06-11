@@ -31,12 +31,17 @@ typedef NS_ENUM(NSInteger, WKDownloadRedirectPolicy) {
 
 @protocol WebKitDownload;
 
+typedef NS_ENUM(NSInteger, WebKitDownloadRedirectPolicy) {
+    WebKitDownloadRedirectPolicyCancel,
+    WebKitDownloadRedirectPolicyAllow,
+};
+
 @protocol WebKitDownloadDelegate <NSObject>
 @required
 - (void)download:(id <WebKitDownload>)download decideDestinationUsingResponse:(NSURLResponse * _Nullable)response suggestedFilename:(NSString *)suggestedFilename completionHandler:(void (^)(NSURL * _Nullable destination))completionHandler;
 
 @optional
-- (void)download:(id <WebKitDownload>)download willPerformHTTPRedirection:(NSHTTPURLResponse *)response newRequest:(NSURLRequest *)request decisionHandler:(void (^)(WKDownloadRedirectPolicy))decisionHandler;
+- (void)download:(id <WebKitDownload>)download willPerformHTTPRedirection:(NSHTTPURLResponse *)response newRequest:(NSURLRequest *)request decisionHandler:(void (^)(WebKitDownloadRedirectPolicy))decisionHandler;
 - (void)download:(id <WebKitDownload>)download didReceiveAuthenticationChallenge:(NSURLAuthenticationChallenge *)challenge completionHandler:(void (^)(NSURLSessionAuthChallengeDisposition, NSURLCredential * _Nullable))completionHandler;
 - (void)downloadDidFinish:(id <WebKitDownload>)download;
 - (void)download:(id <WebKitDownload>)download didFailWithError:(NSError *)error resumeData:(NSData * _Nullable)resumeData;

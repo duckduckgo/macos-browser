@@ -9,4 +9,3 @@
 #import "WKDownload.h"
 #import "_WKDownload.h"
 #import "WKProcessPool+Private.h"
-#import "WKDownloadCancellation.h"

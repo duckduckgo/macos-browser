@@ -42,20 +42,24 @@ NS_ASSUME_NONNULL_BEGIN
 - (void)download:(WKDownload *)download didFailWithError:(NSError *)error resumeData:(nullable NSData *)resumeData;
 @end
 
+#endif
+
+API_AVAILABLE(macosx(11.3))
+@protocol ObjCWKDownloadProtocol <NSObject>
+@property (nonatomic, weak) id <WKDownloadDelegate> delegate;
+- (void)cancel:(void(^ _Nullable)(NSData * _Nullable resumeData))completionHandler;
+@end
+
+#ifndef __MAC_11_3
+
 // https://github.com/WebKit/WebKit/blob/9a6f03d46238213231cf27641ed1a55e1949d074/Source/WebKit/UIProcess/API/Cocoa/WKDownload.h
 API_AVAILABLE(macosx(11.3))
-@interface WKDownload : NSObject<NSProgressReporting, WebKitDownload>
+@interface WKDownload : NSObject<NSProgressReporting, WebKitDownload, ObjCWKDownloadProtocol>
 @property (nonatomic, readonly, nullable) NSURLRequest *originalRequest;
 @property (nonatomic, readonly, weak) WKWebView *webView;
 @property (nonatomic, weak) id <WKDownloadDelegate> delegate;
 
 - (void)cancel:(void(^ _Nullable)(NSData * _Nullable resumeData))completionHandler;
-@end
-
-#else
-
-// in post-macOS 11.3 will just add WebKitDownload conforming category to the WKDownload
-@interface WKDownload <WebKitDownload>
 @end
 
 #endif
