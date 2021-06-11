@@ -543,7 +543,8 @@ extension Tab: WKNavigationDelegate {
 
         // blob:https and data:https links are handled by private _WKDownload
         if externalUrlHandler.isBlobOrData(scheme: urlScheme) {
-            // further download will be handled by WebKitDownloadCoordinator._downloadDidStart(_:)
+            // register the navigationAction for legacy _WKDownload to be called back on the Tab
+            // further download will be passed to webView:navigationAction:didBecomeDownload:
             decisionHandler(.download(navigationAction, using: webView))
             return
 
@@ -580,6 +581,8 @@ extension Tab: WKNavigationDelegate {
             if navigationResponse.isForMainFrame {
                 currentDownload = navigationResponse.response.url
             }
+            // register the navigationResponse for legacy _WKDownload to be called back on the Tab
+            // further download will be passed to webView:navigationResponse:didBecomeDownload:
             decisionHandler(.download(navigationResponse, using: webView))
 
         } else {
@@ -653,8 +656,8 @@ extension Tab: WKNavigationDelegate {
 
 }
 
+// universal download event handlers for Legacy _WKDownload and modern WKDownload
 extension Tab: WKWebViewDownloadDelegate {
-
     func webView(_ webView: WKWebView, navigationAction: WKNavigationAction, didBecomeDownload download: WebKitDownload) {
         FileDownloadManager.shared.add(download, delegate: self.delegate, promptForLocation: false, postflight: .reveal)
     }
@@ -662,11 +665,9 @@ extension Tab: WKWebViewDownloadDelegate {
     func webView(_ webView: WKWebView, navigationResponse: WKNavigationResponse, didBecomeDownload download: WebKitDownload) {
         FileDownloadManager.shared.add(download, delegate: self.delegate, promptForLocation: false, postflight: .reveal)
     }
-
 }
 
 extension Tab {
-
     private func find(text: String) {
         userScripts.findInPageScript.find(text: text, inWebView: webView)
     }
@@ -682,7 +683,6 @@ extension Tab {
     func findPrevious() {
         userScripts.findInPageScript.previous(withWebView: webView)
     }
-
 }
 
 fileprivate extension WKNavigationResponse {
@@ -696,5 +696,4 @@ fileprivate extension WKNavigationAction {
         return targetFrame?.isMainFrame ?? false
     }
 }
-
 // swiftlint:enable type_body_length

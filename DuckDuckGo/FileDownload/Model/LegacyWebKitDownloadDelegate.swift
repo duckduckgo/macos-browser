@@ -102,9 +102,10 @@ private extension LegacyWebKitDownloadDelegate {
         download.downloadDelegate?.download?(download, didFailWithError: error, resumeData: nil)
     }
 
-    @objc func _download(_ download: WebKitDownload,
-                         didReceiveAuthenticationChallenge challenge: URLAuthenticationChallenge,
-                         completionHandler: @escaping (URLSession.AuthChallengeDisposition, URLCredential?) -> Void) {
+    @objc(_download:didReceiveAuthenticationChallenge:completionHandler:)
+    func _download(_ download: WebKitDownload,
+                   didReceive challenge: URLAuthenticationChallenge,
+                   completionHandler: @escaping (URLSession.AuthChallengeDisposition, URLCredential?) -> Void) {
         download.downloadDelegate?.download?(download, didReceive: challenge, completionHandler: completionHandler)
             ?? download.webView?.navigationDelegate?.webView?(download.webView!, didReceive: challenge, completionHandler: completionHandler)
     }
