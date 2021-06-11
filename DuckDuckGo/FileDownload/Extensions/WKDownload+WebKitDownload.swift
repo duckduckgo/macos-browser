@@ -53,11 +53,10 @@ extension WebKitDownload {
         }
         set {
             _=initWKDownload
-            if #available(OSX 11.3, *) {
-               if let download = self as? ObjCWKDownloadProtocol {
+            if #available(OSX 11.3, *),
+               let download = self as? ObjCWKDownloadProtocol {
                 let delegateWrapper = newValue.map(WKDownloadDelegateWrapper.init(delegate:))
                 download.delegate = delegateWrapper
-               }
             } else {
                 objc_setAssociatedObject(self, downloadDelegateKey, WeakDownloadDelegateRef(newValue), .OBJC_ASSOCIATION_RETAIN)
             }
