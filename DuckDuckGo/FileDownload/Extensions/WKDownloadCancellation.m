@@ -1,5 +1,5 @@
 //
-//  WKDownloadMock.swift
+//  WKDownloadCancellation.m
 //
 //  Copyright © 2021 DuckDuckGo. All rights reserved.
 //
@@ -16,12 +16,11 @@
 //  limitations under the License.
 //
 
-import Foundation
-@testable import DuckDuckGo_Privacy_Browser
+#import "WKDownloadCancellation.h"
+#import "WKDownload.h"
 
-final class WKDownloadMock: NSObject, WebKitDownload, ProgressReporting {
-    var originalRequest: URLRequest?
-    var webView: WKWebView?
-    var progress = Progress()
-
+@implementation WKDownloadCancellation
++ (void)cancel:(id)download completionHandler:(void(^ _Nullable)(NSData * _Nullable resumeData))completion {
+    [download cancel:completion];
 }
+@end

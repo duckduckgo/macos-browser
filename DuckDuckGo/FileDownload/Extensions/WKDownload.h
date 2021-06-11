@@ -17,15 +17,17 @@
 //
 
 #import <WebKit/WebKit.h>
+#import "WebKitDownloadDelegate.h"
 
 NS_ASSUME_NONNULL_BEGIN
 
-#ifndef __MAC_11_3
+@protocol WebKitDownload <NSObject>
+@property (nonatomic, readonly, nullable) NSURLRequest *originalRequest;
+@property (nonatomic, readonly, weak) WKWebView *webView;
+@end
 
-typedef NS_ENUM(NSInteger, WKDownloadRedirectPolicy) {
-    WKDownloadRedirectPolicyCancel,
-    WKDownloadRedirectPolicyAllow,
-} NS_SWIFT_NAME(WKDownload.RedirectPolicy);
+#ifndef __MAC_11_3
+// defining non-existing in pre-macOS 11.3 WKDownload; WKDownloadDelegate
 
 @class WKDownload;
 
@@ -42,12 +44,18 @@ typedef NS_ENUM(NSInteger, WKDownloadRedirectPolicy) {
 
 // https://github.com/WebKit/WebKit/blob/9a6f03d46238213231cf27641ed1a55e1949d074/Source/WebKit/UIProcess/API/Cocoa/WKDownload.h
 API_AVAILABLE(macosx(11.3))
-@interface WKDownload : NSObject<NSProgressReporting>
+@interface WKDownload : NSObject<NSProgressReporting, WebKitDownload>
 @property (nonatomic, readonly, nullable) NSURLRequest *originalRequest;
 @property (nonatomic, readonly, weak) WKWebView *webView;
 @property (nonatomic, weak) id <WKDownloadDelegate> delegate;
 
 - (void)cancel:(void(^ _Nullable)(NSData * _Nullable resumeData))completionHandler;
+@end
+
+#else
+
+// in post-macOS 11.3 will just add WebKitDownload conforming category to the WKDownload
+@interface WKDownload <WebKitDownload>
 @end
 
 #endif

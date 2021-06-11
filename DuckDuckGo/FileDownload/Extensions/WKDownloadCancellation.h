@@ -1,5 +1,5 @@
 //
-//  WKDownloadMock.swift
+//  WKDownloadCancellation.h
 //
 //  Copyright © 2021 DuckDuckGo. All rights reserved.
 //
@@ -16,12 +16,11 @@
 //  limitations under the License.
 //
 
-import Foundation
-@testable import DuckDuckGo_Privacy_Browser
+#import <Foundation/Foundation.h>
 
-final class WKDownloadMock: NSObject, WebKitDownload, ProgressReporting {
-    var originalRequest: URLRequest?
-    var webView: WKWebView?
-    var progress = Progress()
-
-}
+NS_ASSUME_NONNULL_BEGIN
+@interface WKDownloadCancellation : NSObject
+// passing a Swift callback to an ObjC method through a performSelector can be hard..
++ (void)cancel:(id)download completionHandler:(void(^ _Nullable)(NSData * _Nullable resumeData))completionHandler;
+@end
+NS_ASSUME_NONNULL_END

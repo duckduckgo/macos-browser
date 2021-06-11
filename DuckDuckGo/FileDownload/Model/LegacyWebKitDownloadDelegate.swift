@@ -51,7 +51,7 @@ final class LegacyWebKitDownloadDelegate: NSObject {
 private extension LegacyWebKitDownloadDelegate {
 
     @objc func _downloadDidStart(_ download: WebKitDownload) {
-        guard let webView = download.webView, let url = download.downloadRequest?.url else {
+        guard let webView = download.webView, let url = download.originalRequest?.url else {
             assertionFailure("WebKitDownload webView or url is nil")
             return
         }
@@ -105,7 +105,7 @@ private extension LegacyWebKitDownloadDelegate {
     @objc func _download(_ download: WebKitDownload,
                          didReceiveAuthenticationChallenge challenge: URLAuthenticationChallenge,
                          completionHandler: @escaping (URLSession.AuthChallengeDisposition, URLCredential?) -> Void) {
-        download.downloadDelegate?.download?(download, didReceiveAuthenticationChallenge: challenge, completionHandler: completionHandler)
+        download.downloadDelegate?.download?(download, didReceive: challenge, completionHandler: completionHandler)
             ?? download.webView?.navigationDelegate?.webView?(download.webView!, didReceive: challenge, completionHandler: completionHandler)
     }
 

@@ -264,8 +264,8 @@
 		B630793526731BC400DCEE41 /* URLSuggestedFilenameTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8553FF51257523760029327F /* URLSuggestedFilenameTests.swift */; };
 		B630793A26731F2600DCEE41 /* FileDownloadManagerTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = B630793926731F2600DCEE41 /* FileDownloadManagerTests.swift */; };
 		B630794226731F5400DCEE41 /* WKDownloadMock.swift in Sources */ = {isa = PBXBuildFile; fileRef = B630794126731F5400DCEE41 /* WKDownloadMock.swift */; };
+		B630795A26734F6300DCEE41 /* WKDownloadCancellation.m in Sources */ = {isa = PBXBuildFile; fileRef = B630795926734F6300DCEE41 /* WKDownloadCancellation.m */; };
 		B633C86D25E797D800E4B352 /* UserScriptsManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = B633C86C25E797D800E4B352 /* UserScriptsManager.swift */; };
-		B63B9C4C2670B24300C45B91 /* WKDownload.m in Sources */ = {isa = PBXBuildFile; fileRef = B63B9C4B2670B24300C45B91 /* WKDownload.m */; };
 		B63D466925BEB6C200874977 /* WKWebView+SessionState.swift in Sources */ = {isa = PBXBuildFile; fileRef = B63D466825BEB6C200874977 /* WKWebView+SessionState.swift */; };
 		B63D467125BFA6C100874977 /* DispatchQueueExtensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = B63D467025BFA6C100874977 /* DispatchQueueExtensions.swift */; };
 		B63D467A25BFC3E100874977 /* NSCoderExtensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = B63D467925BFC3E100874977 /* NSCoderExtensions.swift */; };
@@ -294,7 +294,7 @@
 		B6A5A27E25B9403E00AA7ADA /* FileStoreMock.swift in Sources */ = {isa = PBXBuildFile; fileRef = B6A5A27D25B9403E00AA7ADA /* FileStoreMock.swift */; };
 		B6A5A2A025B96E8300AA7ADA /* AppStateChangePublisherTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = B6A5A29F25B96E8300AA7ADA /* AppStateChangePublisherTests.swift */; };
 		B6A5A2A825BAA35500AA7ADA /* WindowManagerStateRestorationTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = B6A5A2A725BAA35500AA7ADA /* WindowManagerStateRestorationTests.swift */; };
-		B6A924D42664BBBB001A28CA /* WebKitDownload.swift in Sources */ = {isa = PBXBuildFile; fileRef = B6A924D32664BBB9001A28CA /* WebKitDownload.swift */; };
+		B6A924D42664BBBB001A28CA /* WKWebViewDownloadDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = B6A924D32664BBB9001A28CA /* WKWebViewDownloadDelegate.swift */; };
 		B6A924D92664C72E001A28CA /* WebKitDownloadTask.swift in Sources */ = {isa = PBXBuildFile; fileRef = B6A924D82664C72D001A28CA /* WebKitDownloadTask.swift */; };
 		B6A924DE2664CA09001A28CA /* LegacyWebKitDownloadDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = B6A924DD2664CA08001A28CA /* LegacyWebKitDownloadDelegate.swift */; };
 		B6A9E45326142B070067D1B9 /* Pixel.swift in Sources */ = {isa = PBXBuildFile; fileRef = B6A9E45226142B070067D1B9 /* Pixel.swift */; };
@@ -612,9 +612,11 @@
 		B62EB47B25BAD3BB005745C6 /* WKWebViewPrivateMethodsAvailabilityTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = WKWebViewPrivateMethodsAvailabilityTests.swift; sourceTree = "<group>"; };
 		B630793926731F2600DCEE41 /* FileDownloadManagerTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = FileDownloadManagerTests.swift; sourceTree = "<group>"; };
 		B630794126731F5400DCEE41 /* WKDownloadMock.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WKDownloadMock.swift; sourceTree = "<group>"; };
+		B630794F2673491500DCEE41 /* WebKitDownloadDelegate.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = WebKitDownloadDelegate.h; sourceTree = "<group>"; };
+		B630795826734F6300DCEE41 /* WKDownloadCancellation.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = WKDownloadCancellation.h; sourceTree = "<group>"; };
+		B630795926734F6300DCEE41 /* WKDownloadCancellation.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = WKDownloadCancellation.m; sourceTree = "<group>"; };
 		B633C86C25E797D800E4B352 /* UserScriptsManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UserScriptsManager.swift; sourceTree = "<group>"; };
 		B63B9C4A2670B24300C45B91 /* WKDownload.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = WKDownload.h; sourceTree = "<group>"; };
-		B63B9C4B2670B24300C45B91 /* WKDownload.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = WKDownload.m; sourceTree = "<group>"; };
 		B63B9C502670B2B200C45B91 /* _WKDownload.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = _WKDownload.h; sourceTree = "<group>"; };
 		B63B9C542670B32000C45B91 /* WKProcessPool+Private.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "WKProcessPool+Private.h"; sourceTree = "<group>"; };
 		B63D466725BEB6C200874977 /* WKWebView+Private.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "WKWebView+Private.h"; sourceTree = "<group>"; };
@@ -646,7 +648,7 @@
 		B6A5A27D25B9403E00AA7ADA /* FileStoreMock.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FileStoreMock.swift; sourceTree = "<group>"; };
 		B6A5A29F25B96E8300AA7ADA /* AppStateChangePublisherTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppStateChangePublisherTests.swift; sourceTree = "<group>"; };
 		B6A5A2A725BAA35500AA7ADA /* WindowManagerStateRestorationTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WindowManagerStateRestorationTests.swift; sourceTree = "<group>"; };
-		B6A924D32664BBB9001A28CA /* WebKitDownload.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WebKitDownload.swift; sourceTree = "<group>"; };
+		B6A924D32664BBB9001A28CA /* WKWebViewDownloadDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WKWebViewDownloadDelegate.swift; sourceTree = "<group>"; };
 		B6A924D82664C72D001A28CA /* WebKitDownloadTask.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WebKitDownloadTask.swift; sourceTree = "<group>"; };
 		B6A924DD2664CA08001A28CA /* LegacyWebKitDownloadDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LegacyWebKitDownloadDelegate.swift; sourceTree = "<group>"; };
 		B6A9E45226142B070067D1B9 /* Pixel.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Pixel.swift; sourceTree = "<group>"; };
@@ -1852,14 +1854,16 @@
 			isa = PBXGroup;
 			children = (
 				B6F41030264D2B23003DA42C /* ProgressExtension.swift */,
-				B6A924D32664BBB9001A28CA /* WebKitDownload.swift */,
+				B6A924D32664BBB9001A28CA /* WKWebViewDownloadDelegate.swift */,
 				B66E9DD12670EB2A00E53BB5 /* _WKDownload+WebKitDownload.swift */,
 				B66E9DD32670EB4A00E53BB5 /* WKDownload+WebKitDownload.swift */,
 				B61EF3EB266F91E700B4D78F /* WKWebView+Download.swift */,
 				B61EF3F0266F922200B4D78F /* WKProcessPool+DownloadDelegate.swift */,
 				B63B9C4A2670B24300C45B91 /* WKDownload.h */,
-				B63B9C4B2670B24300C45B91 /* WKDownload.m */,
 				B63B9C502670B2B200C45B91 /* _WKDownload.h */,
+				B630795826734F6300DCEE41 /* WKDownloadCancellation.h */,
+				B630795926734F6300DCEE41 /* WKDownloadCancellation.m */,
+				B630794F2673491500DCEE41 /* WebKitDownloadDelegate.h */,
 				B63B9C542670B32000C45B91 /* WKProcessPool+Private.h */,
 			);
 			path = Extensions;
@@ -2211,7 +2215,7 @@
 				4BA1A6B3258B080A00F6F690 /* EncryptionKeyGeneration.swift in Sources */,
 				AABEE6A524AA0A7F0043105B /* SuggestionViewController.swift in Sources */,
 				85AC3AF725D5DBFD00C7D2AA /* DataExtension.swift in Sources */,
-				B6A924D42664BBBB001A28CA /* WebKitDownload.swift in Sources */,
+				B6A924D42664BBBB001A28CA /* WKWebViewDownloadDelegate.swift in Sources */,
 				85480FCF25D1AA22009424E3 /* ConfigurationStoring.swift in Sources */,
 				4BB88B4A25B7B690006F6B06 /* SequenceExtensions.swift in Sources */,
 				B6A924DE2664CA09001A28CA /* LegacyWebKitDownloadDelegate.swift in Sources */,
@@ -2335,7 +2339,6 @@
 				B68458B825C7E8B200DC17B6 /* Tab+NSSecureCoding.swift in Sources */,
 				4B65028A25E6CBF40054432E /* NibLoadable.swift in Sources */,
 				AAA0CC472533833C0079BC96 /* OptionsButtonMenu.swift in Sources */,
-				B63B9C4C2670B24300C45B91 /* WKDownload.m in Sources */,
 				4B677438255DBEB800025BD8 /* HTTPSUpgrade.xcdatamodeld in Sources */,
 				4B0511E1262CAA8600F6079C /* NSOpenPanelExtensions.swift in Sources */,
 				AAE75280263B0A4D00B973F8 /* HistoryCoordinator.swift in Sources */,
@@ -2379,6 +2382,7 @@
 				AA7412B524D1536B00D22FE0 /* MainWindowController.swift in Sources */,
 				4B0511CF262CAA5A00F6079C /* AppearancePreferencesTableCellView.swift in Sources */,
 				AA9FF95924A1ECF20039E328 /* Tab.swift in Sources */,
+				B630795A26734F6300DCEE41 /* WKDownloadCancellation.m in Sources */,
 				B63D467125BFA6C100874977 /* DispatchQueueExtensions.swift in Sources */,
 				AA6FFB4624DC3B5A0028F4D0 /* WebView.swift in Sources */,
 				AA7412B224D0B3AC00D22FE0 /* TabBarViewItem.swift in Sources */,

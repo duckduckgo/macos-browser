@@ -43,20 +43,11 @@ extension _WKDownload: WebKitDownload {
         }
     }
 
-    var downloadDelegate: WebKitDownloadDelegate? {
-        get {
-            (objc_getAssociatedObject(self, Self.downloadDelegateKey) as? WeakDownloadDelegateRef)?.delegate
-        }
-        set {
-            objc_setAssociatedObject(self, Self.downloadDelegateKey, WeakDownloadDelegateRef(newValue), .OBJC_ASSOCIATION_RETAIN)
-        }
-    }
-
-    var downloadRequest: URLRequest? {
+    public var originalRequest: URLRequest? {
         request
     }
 
-    var webView: WKWebView? {
+    public var webView: WKWebView? {
         originatingWebView
     }
 
@@ -100,10 +91,6 @@ extension _WKDownload: WebKitDownload {
         }
 
         self.publishProgress(at: tempURL)
-    }
-
-    func asNSObject() -> NSObject {
-        self
     }
 
 }

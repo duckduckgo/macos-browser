@@ -19,67 +19,100 @@
 import Foundation
 import WebKit
 
-@available(macOS 11.3, *)
-extension WKDownload: WebKitDownload {
+private let downloadDelegateKey = UnsafeRawPointer(bitPattern: "_WKDownloadDelegateKey".hashValue)!
+private let WKDownloadClass: AnyClass? = NSClassFromString("WKDownload")
 
-    // Used for forwarding WKDownloadDelegate methods with WKDownload sender to WebKitDownloadDelegate methods
-    // with universal sender protocol WebKitDownload representing both WKDownload and Legacy _WKDownload classes
-    final class WKDownloadDelegateWrapper: NSObject, WKDownloadDelegate {
-        weak var delegate: WebKitDownloadDelegate?
-
-        private static let delegateWrapperKey = "WKDownloadDelegateWrapperKey"
-
-        init(delegate: WebKitDownloadDelegate) {
-            self.delegate = delegate
-            super.init()
-            // keep the Wrapper alive while actual WebKitDownloadDelegate is alive
-            objc_setAssociatedObject(delegate, Self.delegateWrapperKey, self, .OBJC_ASSOCIATION_RETAIN)
-        }
-
-        func download(_ download: WKDownload,
-                      decideDestinationUsing response: URLResponse,
-                      suggestedFilename: String,
-                      completionHandler: @escaping (URL?) -> Void) {
-
-            delegate?.download(download, decideDestinationUsing: response, suggestedFilename: suggestedFilename, completionHandler: completionHandler)
-        }
-
-        func downloadDidFinish(_ download: WKDownload) {
-            delegate?.downloadDidFinish?(download)
-        }
-
-        func download(_ download: WKDownload, didFailWithError error: Error, resumeData: Data?) {
-            delegate?.download?(download, didFailWithError: error, resumeData: resumeData)
-        }
-    }
+// Implemented as a Swift Protocol extension to avoid missing WKDownload Symbol requirement in macOS 10.13 causing build to crash
+extension WebKitDownload {
 
     var downloadDelegate: WebKitDownloadDelegate? {
         get {
-            (self.delegate as? WKDownloadDelegateWrapper)?.delegate
+            if #available(OSX 11.3, *),
+               type(of: self) == WKDownloadClass {
+                guard let delegate = self.perform(#selector(getter: WKDownload.delegate))?.takeUnretainedValue() as? WKDownloadDelegateWrapper
+                else { return nil }
+                return delegate.delegate
+
+            } else {
+                return (objc_getAssociatedObject(self, downloadDelegateKey) as? WeakDownloadDelegateRef)?.delegate
+            }
         }
         set {
-            self.delegate = newValue.map(WKDownloadDelegateWrapper.init(delegate:))
+            if #available(OSX 11.3, *),
+               type(of: self) == WKDownloadClass {
+                let delegateWrapper = newValue.map(WKDownloadDelegateWrapper.init(delegate:))
+                self.perform(#selector(setter: WKDownload.delegate), with: delegateWrapper)
+            } else {
+                objc_setAssociatedObject(self, downloadDelegateKey, WeakDownloadDelegateRef(newValue), .OBJC_ASSOCIATION_RETAIN)
+            }
         }
-    }
-
-    var downloadRequest: URLRequest? {
-        originalRequest
     }
 
     func getProgress(_ completionHandler: @escaping (Progress?) -> Void) {
-        completionHandler(self.progress)
+        if let progressReporting = self as? ProgressReporting {
+            completionHandler(progressReporting.progress)
+        } else if let download = self as? _WKDownload {
+            download.getProgress(completionHandler)
+        } else {
+            assertionFailure("Unexpected Download class: \(self)")
+            completionHandler(nil)
+        }
     }
 
     func cancel() {
-        self.cancel { [weak self] resumeData in
-            // WKDownload.cancel does not produce delegate method call whereas _WKDownload.cancel calls _downloadDidCancel(:_)
-            // calling delegate method here to make it consistent
-            self?.delegate?.download?(self!, didFailWithError: URLError(.cancelled), resumeData: resumeData)
+        if #available(OSX 11.3, *),
+           type(of: self) == WKDownloadClass {
+            WKDownloadCancellation.cancel(self) { [weak self] resumeData in
+                // WKDownload.cancel(_:) does not produce delegate method call whereas _WKDownload.cancel calls _downloadDidCancel(:_)
+                // calling delegate method here to make it consistent
+                self?.downloadDelegate?.download?(self!, didFailWithError: URLError(.cancelled), resumeData: resumeData)
+            }
+        } else if let download = self as? _WKDownload {
+            return download.cancel()
         }
     }
 
     func asNSObject() -> NSObject {
-        self
+        self as! NSObject // swiftlint:disable:this force_cast
     }
 
+}
+
+// Used for forwarding WKDownloadDelegate methods with WKDownload sender to WebKitDownloadDelegate methods
+// with universal sender protocol WebKitDownload representing both WKDownload and Legacy _WKDownload classes
+@available(macOS 11.3, *)
+final private class WKDownloadDelegateWrapper: NSObject, WKDownloadDelegate {
+    weak var delegate: WebKitDownloadDelegate?
+
+    private static let delegateWrapperKey = "WKDownloadDelegateWrapperKey"
+
+    init(delegate: WebKitDownloadDelegate) {
+        self.delegate = delegate
+        super.init()
+        // keep the Wrapper alive while actual WebKitDownloadDelegate is alive
+        objc_setAssociatedObject(delegate, Self.delegateWrapperKey, self, .OBJC_ASSOCIATION_RETAIN)
+    }
+
+    func download(_ download: WKDownload,
+                  decideDestinationUsing response: URLResponse,
+                  suggestedFilename: String,
+                  completionHandler: @escaping (URL?) -> Void) {
+
+        delegate?.download(download, decideDestinationUsing: response, suggestedFilename: suggestedFilename, completionHandler: completionHandler)
+    }
+
+    func downloadDidFinish(_ download: WKDownload) {
+        delegate?.downloadDidFinish?(download)
+    }
+
+    func download(_ download: WKDownload, didFailWithError error: Error, resumeData: Data?) {
+        delegate?.download?(download, didFailWithError: error, resumeData: resumeData)
+    }
+}
+
+final private class WeakDownloadDelegateRef: NSObject {
+    weak var delegate: WebKitDownloadDelegate?
+    init(_ delegate: WebKitDownloadDelegate?) {
+        self.delegate = delegate
+    }
 }

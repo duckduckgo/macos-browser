@@ -1,5 +1,5 @@
 //
-//  WKDownload.m
+//  WKWebViewDownloadDelegate.swift
 //
 //  Copyright © 2021 DuckDuckGo. All rights reserved.
 //
@@ -16,11 +16,11 @@
 //  limitations under the License.
 //
 
-#import "WKDownload.h"
+import WebKit
 
-#ifndef __MAC_11_3
-@implementation WKDownload
-@synthesize progress;
-- (void)cancel:(void (^)(NSData * _Nullable))completionHandler {}
-@end
-#endif
+protocol WKWebViewDownloadDelegate: AnyObject {
+
+    func webView(_ webView: WKWebView, navigationAction: WKNavigationAction, didBecomeDownload download: WebKitDownload)
+    func webView(_ webView: WKWebView, navigationResponse: WKNavigationResponse, didBecomeDownload download: WebKitDownload)
+
+}

@@ -94,7 +94,7 @@ final class WebKitDownloadTask: NSObject, ProgressReporting {
     }
 
     private func start() {
-        self.progress.fileDownloadingSourceURL = download.downloadRequest?.url
+        self.progress.fileDownloadingSourceURL = download.originalRequest?.url
         self.download.getProgress { [weak self] progress in
             guard let self = self else { return }
 
