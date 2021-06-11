@@ -6,12 +6,12 @@
         "repositoryURL": "https://github.com/duckduckgo/BrowserServicesKit.git",
         "state": {
           "branch": null,
-          "revision": "ce04eb0c0914486d6e85b037fb2afbeda13a343e",
-          "version": "4.0.0"
+          "revision": "3f965c5065e3cd33d3b07e0bc192780b34601e28",
+          "version": "4.0.1"
         }
       },
       {
-        "package": "GRDB",
+        "package": "GRDB.swift",
         "repositoryURL": "https://github.com/duckduckgo/GRDB.swift.git",
         "state": {
           "branch": null,
@@ -20,7 +20,7 @@
         }
       },
       {
-        "package": "Lottie",
+        "package": "lottie-ios",
         "repositoryURL": "https://github.com/airbnb/lottie-ios",
         "state": {
           "branch": "lottie/macos-spm",
@@ -38,7 +38,7 @@
         }
       },
       {
-        "package": "Punycode",
+        "package": "PunycodeSwift",
         "repositoryURL": "https://github.com/gumob/PunycodeSwift.git",
         "state": {
           "branch": null,

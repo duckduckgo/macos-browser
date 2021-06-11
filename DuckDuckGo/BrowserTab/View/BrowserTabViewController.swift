@@ -321,7 +321,7 @@ extension BrowserTabViewController: FileDownloadManagerDelegate {
         }
     }
 
-    func fileIconFlyAnimationOriginalRect(for downloadTask: FileDownloadTask) -> NSRect? {
+    func fileIconFlyAnimationOriginalRect(for downloadTask: WebKitDownloadTask) -> NSRect? {
         dispatchPrecondition(condition: .onQueue(.main))
         guard let window = self.view.window,
               let dockScreen = NSScreen.dockScreen

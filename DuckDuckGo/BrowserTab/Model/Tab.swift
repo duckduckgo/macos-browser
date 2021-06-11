@@ -23,7 +23,6 @@ import Combine
 import BrowserServicesKit
 
 protocol TabDelegate: FileDownloadManagerDelegate {
-
     func tabDidStartNavigation(_ tab: Tab)
     func tab(_ tab: Tab, requestedNewTab url: URL?, selected: Bool)
     func tab(_ tab: Tab, willShowContextMenuAt position: NSPoint, image: URL?, link: URL?)
@@ -32,7 +31,6 @@ protocol TabDelegate: FileDownloadManagerDelegate {
 
     func tabPageDOMLoaded(_ tab: Tab)
     func closeTab(_ tab: Tab)
-
 }
 
 // swiftlint:disable type_body_length
@@ -103,7 +101,6 @@ final class Tab: NSObject {
            let host = url?.host {
             faviconService.cacheIfNeeded(favicon: favicon, for: host, isFromUserScript: false)
         }
-
     }
 
     deinit {
@@ -171,9 +168,29 @@ final class Tab: NSObject {
     // Used to track if an error was caused by a download navigation.
     private var currentDownload: URL?
 
-    func download(from url: URL) {
-        webView.startDownload(from: url) { download in
-            FileDownloadManager.shared.add(download, delegate: self.delegate, promptForLocation: true, postflight: .reveal)
+    func download(from url: URL, promptForLocation: Bool = true) {
+        webView.startDownload(URLRequest(url: url, cachePolicy: .returnCacheDataElseLoad)) { download in
+            FileDownloadManager.shared.add(download, delegate: self.delegate, promptForLocation: promptForLocation, postflight: .reveal)
+        }
+    }
+
+    func saveWebContentAs(completionHandler: ((Result<URL, Error>) -> Void)? = nil) {
+        webView.getMimeType { mimeType in
+            if case .html = mimeType.flatMap(UTType.init(mimeType:)) ?? .html {
+                self.delegate?.chooseDestination(suggestedFilename: self.webView.suggestedFilename,
+                                                 directoryURL: DownloadPreferences().selectedDownloadLocation,
+                                                 fileTypes: [.html, .webArchive, .pdf]) { url, fileType in
+                    guard let url = url else {
+                        completionHandler?(.failure(URLError(.cancelled)))
+                        return
+                    }
+                    self.webView.exportWebContent(to: url,
+                                                  as: fileType.flatMap(WKWebView.ContentExportType.init) ?? .html,
+                                                  completionHandler: completionHandler)
+                }
+            } else if let url = self.webView.url {
+                self.download(from: url, promptForLocation: true)
+            }
         }
     }
 
@@ -673,7 +690,6 @@ fileprivate extension WKNavigationResponse {
         return contentDisposition?.hasPrefix("attachment") ?? false
     }
 }
-
 fileprivate extension WKNavigationAction {
     func isTargetingMainFrame() -> Bool {
         return targetFrame?.isMainFrame ?? false

@@ -180,6 +180,23 @@ extension URL {
                       dropTrailingSlash: false)
     }
 
+    /// Tries to use the file name part of the URL, if available, adjusting for content type, if available.
+    var suggestedFilename: String? {
+        let url = self
+
+        var filename: String
+        if !url.pathComponents.isEmpty,
+           url.pathComponents != [ "/" ] {
+
+            filename = url.lastPathComponent
+        } else {
+            filename = url.host?.dropWWW().replacingOccurrences(of: ".", with: "_") ?? ""
+        }
+        guard !filename.isEmpty else { return nil }
+
+        return filename
+    }
+
     // MARK: - Validity
 
     var isValid: Bool {

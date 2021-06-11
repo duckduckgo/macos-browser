@@ -18,41 +18,86 @@
 
 import Foundation
 import Combine
-import WebKit
 
-final class WebKitDownloadTask: FileDownloadTask {
+enum FileDownloadError: Error {
+    case cancelled
+
+    case restartResumeNotSupported
+    case failedToCreateTemporaryDir
+    case failedToMoveFileToDownloads
+    case failedToCompleteDownloadTask(underlyingError: Error, resumeData: Data?)
+}
+
+protocol WebKitDownloadTaskDelegate: AnyObject {
+    func fileDownloadTaskNeedsDestinationURL(_ task: WebKitDownloadTask,
+                                             suggestedFilename: String,
+                                             completionHandler: @escaping (URL?, UTType?) -> Void)
+    func fileDownloadTask(_ task: WebKitDownloadTask, didFinishWith result: Result<URL, FileDownloadError>)
+}
+
+/// WKDownload wrapper managing Finder File Progress and coordinating file URLs
+final class WebKitDownloadTask: NSObject, ProgressReporting {
 
     static let downloadExtension = "duckload"
 
-    private let wkDownload: WebKitDownload
+    let progress: Progress
+    let shouldPromptForLocation: Bool
+    /// Action that should be performed on file after it's downloaded
+    var postflight: FileDownloadManager.PostflightAction?
+    /// Desired local destination file URL used to display download location
+    @PublishedAfter private(set) var destinationURL: URL?
+    /// File Type used for File Icon generation
+    @PublishedAfter private(set) var fileType: UTType?
 
-    private var wkSuggestedFilename: String?
-    override var suggestedFilename: String {
-        guard let wkSuggestedFilename = wkSuggestedFilename,
-              !wkSuggestedFilename.isEmpty
-        else {
-            return super.suggestedFilename
-        }
-        return wkSuggestedFilename
-    }
+    private lazy var future: Future<URL, FileDownloadError> = {
+        dispatchPrecondition(condition: .onQueue(.main))
+        let future = Future<URL, FileDownloadError> { self.fulfill = $0 }
+        assert(self.fulfill != nil)
+        return future
+    }()
+    private var fulfill: Future<URL, FileDownloadError>.Promise?
+    /// Task completion Publisher outputting destination URL or failure Error with Resume Data if available
+    var output: AnyPublisher<URL, FileDownloadError> { future.eraseToAnyPublisher() }
+
+    private weak var delegate: WebKitDownloadTaskDelegate?
+
+    private let download: WebKitDownload
+    private var cancellables = Set<AnyCancellable>()
 
     private var decideDestinationCompletionHandler: ((URL?) -> Void)?
     private var tempURL: URL?
-    private var destinationURL: URL?
 
-    private var cancellables = Set<AnyCancellable>()
+    init(download: WebKitDownload, promptForLocation: Bool, postflight: FileDownloadManager.PostflightAction?) {
+        self.download = download
+        self.progress = Progress(totalUnitCount: -1)
+        self.shouldPromptForLocation = promptForLocation
+        self.postflight = postflight
+        super.init()
 
-    init(download: WebKitDownload, promptForLocation: Bool) {
-        self.wkDownload = download
-        super.init(download: FileDownload.wkDownload(download, promptForLocation: promptForLocation))
         download.downloadDelegate = self
+
+        progress.fileOperationKind = .downloading
+        progress.kind = .file
+        progress.completedUnitCount = 0
+
+        progress.isPausable = false
+        progress.isCancellable = true
+        progress.cancellationHandler = { [weak self] in
+            self?.cancel()
+        }
     }
 
-    override func start() {
-        self.progress.fileDownloadingSourceURL = wkDownload.downloadRequest?.url
-        self.wkDownload.getProgress { [weak self] progress in
+    func start(delegate: WebKitDownloadTaskDelegate) {
+        _=future
+        self.delegate = delegate
+        start()
+    }
+
+    private func start() {
+        self.progress.fileDownloadingSourceURL = download.downloadRequest?.url
+        self.download.getProgress { [weak self] progress in
             guard let self = self else { return }
-            
+
             progress?.publisher(for: \.totalUnitCount)
                 .weakAssign(to: \.totalUnitCount, on: self.progress)
                 .store(in: &self.cancellables)
@@ -62,27 +107,15 @@ final class WebKitDownloadTask: FileDownloadTask {
         }
     }
 
-    override func localFileURLCompletionHandler(localURL: URL?, fileType: UTType?) {
+    func localFileURLCompletionHandler(localURL: URL?, fileType: UTType?) {
         dispatchPrecondition(condition: .onQueue(.main))
 
         do {
-            struct ThrowableError: Error {}
-            guard let localURL = localURL else { throw URLError(.cancelled) }
+            guard let localURL = localURL,
+                  let completionHandler = self.decideDestinationCompletionHandler
+            else { throw URLError(.cancelled) }
 
-            var downloadURL = localURL.appendingPathExtension(Self.downloadExtension)
-            let ext = localURL.pathExtension + (localURL.pathExtension.isEmpty ? "" : ".") + Self.downloadExtension
-
-            // create temp file and move to Downloads folder with .duckload extension increasing index if needed
-            let fm = FileManager.default
-            let tempURL = fm.temporaryDirectory(appropriateFor: localURL).appendingPathComponent(.uniqueFilename())
-            fm.createFile(atPath: tempURL.path, contents: nil, attributes: nil)
-            do {
-                downloadURL = try fm.moveItem(at: tempURL, to: downloadURL, incrementingIndexIfExists: true, pathExtension: ext)
-                // remove temp item and let WebKit download the file
-                try? fm.removeItem(at: downloadURL)
-            } catch CocoaError.fileWriteNoPermission {
-                downloadURL = localURL
-            }
+            let downloadURL = try self.downloadURL(for: localURL)
 
             self.tempURL = downloadURL
             self.destinationURL = localURL
@@ -90,17 +123,83 @@ final class WebKitDownloadTask: FileDownloadTask {
             self.progress.fileURL = downloadURL
             self.progress.publishIfNotPublished()
 
-            self.decideDestinationCompletionHandler?(downloadURL)
+            completionHandler(downloadURL)
 
         } catch {
-            self.wkDownload.cancel()
+            self.download.cancel()
             self.finish(with: .failure(.cancelled))
             self.decideDestinationCompletionHandler?(nil)
         }
     }
 
-    override func cancel() {
-        wkDownload.cancel()
+    private func downloadURL(for localURL: URL) throws -> URL {
+        var downloadURL = localURL.appendingPathExtension(Self.downloadExtension)
+        let ext = localURL.pathExtension + (localURL.pathExtension.isEmpty ? "" : ".") + Self.downloadExtension
+
+        // create temp file and move to Downloads folder with .duckload extension increasing index if needed
+        let fm = FileManager.default
+        let tempURL = fm.temporaryDirectory(appropriateFor: localURL).appendingPathComponent(.uniqueFilename())
+        do {
+            guard fm.createFile(atPath: tempURL.path, contents: nil, attributes: nil) else {
+                throw CocoaError(.fileWriteNoPermission)
+            }
+            downloadURL = try fm.moveItem(at: tempURL, to: downloadURL, incrementingIndexIfExists: true, pathExtension: ext)
+        } catch CocoaError.fileWriteNoPermission {
+            try? fm.removeItem(at: tempURL)
+            downloadURL = localURL
+            // make sure we can write to the download location
+            guard fm.createFile(atPath: downloadURL.path, contents: nil, attributes: nil) else {
+                throw CocoaError(.fileWriteNoPermission)
+            }
+        }
+
+        // remove temp item and let WebKit download the file
+        try? fm.removeItem(at: downloadURL)
+
+        return downloadURL
+    }
+
+    func cancel() {
+        download.cancel()
+    }
+
+    private func finish(with result: Result<URL, FileDownloadError>) {
+        if Thread.isMainThread {
+            unsafeFinish(with: result)
+        } else {
+            DispatchQueue.main.async {
+                self.unsafeFinish(with: result)
+            }
+        }
+    }
+
+    private func unsafeFinish(with result: Result<URL, FileDownloadError>) {
+        dispatchPrecondition(condition: .onQueue(.main))
+        guard let fulfill = self.fulfill else {
+            // already finished
+            return
+        }
+
+        if case .success(let url) = result {
+            if progress.fileURL != url {
+                progress.fileURL = url
+            }
+            if self.progress.totalUnitCount == -1 {
+                self.progress.totalUnitCount = 1
+            }
+            self.progress.completedUnitCount = self.progress.totalUnitCount
+        }
+
+        self.progress.unpublishIfNeeded()
+
+        self.delegate?.fileDownloadTask(self, didFinishWith: result)
+        self.fulfill = nil
+        fulfill(result)
+    }
+
+    deinit {
+        self.progress.unpublishIfNeeded()
+        assert(fulfill == nil, "FileDownloadTask is deallocated without finish(with:) been called")
     }
 
 }
@@ -117,11 +216,13 @@ extension WebKitDownloadTask: WebKitDownloadDelegate {
             if let charsetRange = mimeType.range(of: ";charset=") {
                 mimeType = String(mimeType[..<charsetRange.lowerBound])
             }
-            self.fileTypes = UTType(mimeType: mimeType).map { [$0] }
+            self.fileType = UTType(mimeType: mimeType)
         }
-        self.wkSuggestedFilename = suggestedFilename
+
         self.decideDestinationCompletionHandler = completionHandler
-        self.queryDestinationURL()
+        delegate?.fileDownloadTaskNeedsDestinationURL(self,
+                                                      suggestedFilename: suggestedFilename,
+                                                      completionHandler: self.localFileURLCompletionHandler)
     }
 
     func downloadDidFinish(_ download: WebKitDownload) {
@@ -140,13 +241,17 @@ extension WebKitDownloadTask: WebKitDownloadDelegate {
 
         self.finish(with: .success(destinationURL))
     }
-    
+
     func download(_ download: WebKitDownload, didFailWithError error: Error, resumeData: Data?) {
-        try? tempURL.map(FileManager.default.removeItem(at:))
+        if resumeData == nil,
+           let tempURL = tempURL {
+            try? FileManager.default.removeItem(at: tempURL)
+        }
         if (error as? URLError)?.code == URLError.cancelled {
             self.finish(with: .failure(.cancelled))
         } else {
-            self.finish(with: .failure(.failedToCompleteDownloadTask(underlyingError: error)))
+            self.finish(with: .failure(.failedToCompleteDownloadTask(underlyingError: error,
+                                                                     resumeData: resumeData)))
         }
     }
 

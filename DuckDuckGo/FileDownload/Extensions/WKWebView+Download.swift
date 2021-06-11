@@ -20,8 +20,7 @@ import WebKit
 
 extension WKWebView {
 
-    func startDownload(from url: URL, completionHandler: @escaping (WebKitDownload) -> Void) {
-        let request = URLRequest(url: url)
+    func startDownload(_ request: URLRequest, completionHandler: @escaping (WebKitDownload) -> Void) {
         if #available(macOS 11.3, *) {
             self.startDownload(using: request) { completionHandler($0) }
 
@@ -33,6 +32,92 @@ extension WKWebView {
             completionHandler(download)
         } else {
             assertionFailure("WKProcessPool does not respond to _downloadURLRequest:websiteDataStore:originatingWebView:")
+        }
+    }
+
+    var suggestedFilename: String? {
+        guard let title = self.title?.replacingOccurrences(of: "[~#@*+%{}<>\\[\\]|\"\\_^\\/:\\\\]",
+                                                           with: "_",
+                                                           options: .regularExpression),
+              !title.isEmpty
+        else {
+            return url?.suggestedFilename
+        }
+        return title.appending(".html")
+    }
+
+    enum ContentExportType {
+        case html
+        case pdf
+        case webArchive
+
+        init?(utType: UTType) {
+            switch utType {
+            case .html:
+                self = .html
+            case .webArchive:
+                self = .webArchive
+            case .pdf:
+                self = .pdf
+            default:
+                return nil
+            }
+        }
+    }
+
+    func exportWebContent(to url: URL,
+                          as exportType: ContentExportType,
+                          completionHandler: ((Result<URL, Error>) -> Void)? = nil) {
+        let create: (@escaping (Data?, Error?) -> Void) -> Void
+        var transform: (Data) throws -> Data = { return $0 }
+
+        switch exportType {
+        case .webArchive:
+            create = self.createWebArchiveData
+
+        case .pdf:
+            create = { self.createPDF(withConfiguration: nil, completionHandler: $0) }
+
+        case .html:
+            create = self.createWebArchiveData
+            transform = { data in
+                // extract HTML from WebArchive bplist
+                guard let dict = try PropertyListSerialization.propertyList(from: data, options: [], format: nil) as? [String: Any],
+                      let mainResource = dict["WebMainResource"] as? [String: Any],
+                      let resourceData = mainResource["WebResourceData"] as? NSData
+                else {
+                    struct GetWebResourceDataFromWebArchiveData: Error { let data: Data }
+                    throw GetWebResourceDataFromWebArchiveData(data: data)
+                }
+
+                return resourceData as Data
+            }
+        }
+
+        let progress = Progress(totalUnitCount: 1)
+        progress.fileOperationKind = .downloading
+        progress.kind = .file
+        progress.isPausable = false
+        progress.isCancellable = false
+        progress.fileURL = url
+
+        progress.publish()
+
+        create { (data, error) in
+            defer {
+                progress.completedUnitCount = progress.totalUnitCount
+                progress.unpublish()
+            }
+            do {
+                if let error = error { throw error }
+                guard let data = try data.map(transform) else { throw URLError(.cancelled) }
+
+                try data.write(to: url)
+                completionHandler?(.success(url))
+
+            } catch {
+                completionHandler?(.failure(error))
+            }
         }
     }
 
