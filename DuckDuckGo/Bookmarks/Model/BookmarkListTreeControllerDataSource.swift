@@ -68,7 +68,7 @@ final class BookmarkListTreeControllerDataSource: TreeControllerDataSource {
     private func createNode(_ object: BaseBookmarkEntity, parent: BookmarkNode) -> BookmarkNode {
         let node = BookmarkNode(representedObject: object, parent: parent)
 
-        if let folder = object as? BookmarkFolder, !folder.childFolders.isEmpty {
+        if let folder = object as? BookmarkFolder, !folder.children.isEmpty {
             node.canHaveChildNodes = true
         } else {
             node.canHaveChildNodes = false
