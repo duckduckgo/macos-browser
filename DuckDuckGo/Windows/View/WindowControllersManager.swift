@@ -52,6 +52,17 @@ extension WindowControllersManager {
     func showPreferencesTab() {
         showTab(type: .preferences)
     }
+
+    /// Opens a bookmark in a tab, respecting the current modifier keys when deciding where to open the bookmark's URL.
+    func open(bookmark: Bookmark) {
+        if NSApplication.shared.isCommandPressed && NSApplication.shared.isShiftPressed {
+            WindowsManager.openNewWindow(with: bookmark.url)
+        } else if NSApplication.shared.isCommandPressed {
+            show(url: bookmark.url, newTab: true)
+        } else {
+            show(url: bookmark.url)
+        }
+    }
     
     func show(url: URL, newTab: Bool = false) {
 
@@ -67,7 +78,7 @@ extension WindowControllersManager {
                firstTab.isHomepageShown,
                !newTab {
                 firstTab.url = url
-            } else if let tab = tabCollectionViewModel.selectedTabViewModel?.tab, tab.isBookmarksShown, !newTab {
+            } else if let tab = tabCollectionViewModel.selectedTabViewModel?.tab, !newTab {
                 tab.url = url
             } else {
                 let newTab = Tab()

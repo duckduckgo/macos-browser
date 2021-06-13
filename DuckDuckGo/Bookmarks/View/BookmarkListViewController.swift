@@ -95,7 +95,7 @@ final class BookmarkListViewController: NSViewController {
 
         if let node = sender.item(atRow: sender.clickedRow) as? BookmarkNode,
            let bookmark = node.representedObject as? Bookmark {
-            WindowControllersManager.shared.show(url: bookmark.url)
+            WindowControllersManager.shared.open(bookmark: bookmark)
             delegate?.popoverShouldClose(self)
         }
     }
