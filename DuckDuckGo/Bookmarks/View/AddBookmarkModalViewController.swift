@@ -21,7 +21,7 @@ import Combine
 
 protocol AddBookmarkModalViewControllerDelegate: AnyObject {
 
-    func addBookmarkViewController(_ viewController: AddBookmarkModalViewController, addedBookmarkWithTitle title: String, url: String)
+    func addBookmarkViewController(_ viewController: AddBookmarkModalViewController, addedBookmarkWithTitle title: String, url: URL)
 
 }
 
@@ -67,7 +67,11 @@ final class AddBookmarkModalViewController: NSViewController {
     }
 
     @IBAction private func addBookmark(_ sender: NSButton) {
-        delegate?.addBookmarkViewController(self, addedBookmarkWithTitle: titleTextField.stringValue, url: urlTextField.stringValue)
+        guard let url = urlTextField.stringValue.url else {
+            return
+        }
+
+        delegate?.addBookmarkViewController(self, addedBookmarkWithTitle: titleTextField.stringValue, url: url)
         dismiss()
     }
 
