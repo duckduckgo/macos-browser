@@ -191,6 +191,7 @@ extension MainViewController {
     }
 
     // MARK: - Bookmarks
+
     @IBAction func bookmarkThisPage(_ sender: Any) {
         navigationBarViewController?
             .addressBarViewController?
