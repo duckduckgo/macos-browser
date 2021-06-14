@@ -72,6 +72,12 @@
 	<false/>
 	<key>NSSupportsSuddenTermination</key>
 	<false/>
+	<key>SUEnableAutomaticChecks</key>
+	<true/>
+	<key>SUFeedURL</key>
+	<string>https://staticcdn.duckduckgo.com/macos-desktop-browser/appcast.xml</string>
+	<key>SUScheduledCheckInterval</key>
+	<integer>10800</integer>
 	<key>ViewBridgeService</key>
 	<false/>
 </dict>
