@@ -129,7 +129,7 @@ final class BookmarkManagementSidebarViewController: NSViewController {
         restoreSelection(to: selectedNodes)
     }
 
-    func restoreSelection(to nodes: [BookmarkNode]) {
+    private func restoreSelection(to nodes: [BookmarkNode]) {
         guard selectedNodes != nodes else { return }
 
         var indexes = IndexSet()

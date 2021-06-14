@@ -53,6 +53,13 @@ final class BookmarkListViewController: NSViewController {
         BookmarkOutlineViewDataSource(contentMode: .bookmarksAndFolders, treeController: treeController)
     }()
 
+    private var selectedNodes: [BookmarkNode] {
+        if let nodes = outlineView.selectedItems as? [BookmarkNode] {
+            return nodes
+        }
+        return [BookmarkNode]()
+    }
+
     override func viewDidLoad() {
         super.viewDidLoad()
 
@@ -69,8 +76,12 @@ final class BookmarkListViewController: NSViewController {
     }
 
     private func reloadData() {
+        let selectedNodes = self.selectedNodes
+
         treeController.rebuild()
         outlineView.reloadData()
+
+        expandAndRestore(selectedNodes: selectedNodes)
     }
 
     @IBAction func newBookmarkButtonClicked(_ sender: AnyObject) {
@@ -98,6 +109,49 @@ final class BookmarkListViewController: NSViewController {
             WindowControllersManager.shared.open(bookmark: bookmark)
             delegate?.popoverShouldClose(self)
         }
+    }
+
+    // MARK: NSOutlineView Configuration
+
+    private func expandAndRestore(selectedNodes: [BookmarkNode]) {
+        treeController.visitNodes { node in
+            if let objectID = (node.representedObject as? BaseBookmarkEntity)?.id {
+                if dataSource.expandedNodes.contains(objectID) {
+                    outlineView.expandItem(node)
+                } else {
+                    outlineView.collapseItem(node)
+                }
+            }
+
+            // Expand the Bookmarks pseudo folder automatically.
+            if let pseudoFolder = node.representedObject as? PseudoFolder, pseudoFolder == PseudoFolder.bookmarks {
+                outlineView.expandItem(node)
+            }
+        }
+
+        restoreSelection(to: selectedNodes)
+    }
+
+    private func restoreSelection(to nodes: [BookmarkNode]) {
+        guard selectedNodes != nodes else { return }
+
+        var indexes = IndexSet()
+        for node in nodes {
+            // The actual instance of the Bookmark may have changed after reloading, so this is a hack to get the right one.
+            let foundNode = treeController.nodeInTreeRepresentingObject(node.representedObject)
+            let row = outlineView.row(forItem: foundNode as Any)
+            if row > -1 {
+                indexes.insert(row)
+            }
+        }
+
+        if indexes.isEmpty {
+            let node = treeController.nodeInTreeRepresentingObject(PseudoFolder.bookmarks)
+            let row = outlineView.row(forItem: node as Any)
+            indexes.insert(row)
+        }
+
+        outlineView.selectRowIndexes(indexes, byExtendingSelection: false)
     }
 
 }
