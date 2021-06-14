@@ -92,9 +92,9 @@ final class BookmarkTableCellView: NSTableCellView, NibLoadable {
 
     @IBOutlet weak var delegate: BookmarkTableCellViewDelegate?
 
-    var isEditing: Bool = false {
+    var editing: Bool = false {
         didSet {
-            if isEditing {
+            if editing {
                 enterEditingMode()
             } else {
                 exitEditingMode()
@@ -111,10 +111,10 @@ final class BookmarkTableCellView: NSTableCellView, NibLoadable {
                 return
             }
 
-            accessoryImageView.isHidden = mouseInside || isEditing
-            menuButton.isHidden = !mouseInside || isEditing
+            accessoryImageView.isHidden = mouseInside || editing
+            menuButton.isHidden = !mouseInside || editing
 
-            if !mouseInside && !isEditing {
+            if !mouseInside && !editing {
                 resetAppearanceFromBookmark()
             }
 
@@ -177,6 +177,8 @@ final class BookmarkTableCellView: NSTableCellView, NibLoadable {
     }
 
     private func resetCellState() {
+        self.entity = nil
+        editing = false
         mouseInside = false
         bookmarkURLLabel.isHidden = true
         favoriteButton.isHidden = true
@@ -257,11 +259,11 @@ final class BookmarkTableCellView: NSTableCellView, NibLoadable {
     }
 
     private func updateTitleLabelValue() {
-        guard !isEditing else {
+        guard !editing else {
             return
         }
 
-        if let tertiaryValue = tertiaryTitleLabelValue, mouseInside, !isEditing {
+        if let tertiaryValue = tertiaryTitleLabelValue, mouseInside, !editing {
             showTertiaryValueInTitleLabel(tertiaryValue)
         } else {
             hideTertiaryValueInTitleLabel()

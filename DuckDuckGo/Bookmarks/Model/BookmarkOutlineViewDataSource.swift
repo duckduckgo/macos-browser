@@ -168,7 +168,11 @@ final class BookmarkOutlineViewDataSource: NSObject, NSOutlineViewDataSource, NS
     }
 
     func validateDrop(for draggedFolders: Set<PasteboardFolder>, destination: BookmarkNode) -> NSDragOperation {
-        if destination.representedObject is PseudoFolder || destination.isRoot {
+        if destination.isRoot {
+            return .move
+        }
+
+        if let pseudoFolder = destination.representedObject as? PseudoFolder, pseudoFolder == .bookmarks {
             return .move
         }
 

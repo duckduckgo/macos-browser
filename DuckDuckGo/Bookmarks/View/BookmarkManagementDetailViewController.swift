@@ -50,6 +50,10 @@ final class BookmarkManagementDetailViewController: NSViewController {
         }
     }
 
+    private var isEditing: Bool {
+        return editingBookmarkIndex != nil
+    }
+
     private var editingBookmarkIndex: EditedBookmarkMetadata? {
         didSet {
             NSAnimationContext.runAnimationGroup { context in
@@ -76,11 +80,17 @@ final class BookmarkManagementDetailViewController: NSViewController {
 
         let nib = NSNib(nibNamed: "BookmarkTableCellView", bundle: Bundle.main)
         tableView.register(nib, forIdentifier: Constants.bookmarkCellIdentifier)
-        tableView.setDraggingSourceOperationMask([.copy], forLocal: true)
+        tableView.setDraggingSourceOperationMask([.move], forLocal: true)
         tableView.registerForDraggedTypes([BookmarkPasteboardWriter.bookmarkUTIInternalType,
                                            FolderPasteboardWriter.folderUTIInternalType])
 
         configureTableHighlight()
+        reloadData()
+    }
+
+    override func viewDidDisappear() {
+        super.viewDidDisappear()
+        editingBookmarkIndex = nil
         reloadData()
     }
 
@@ -109,7 +119,7 @@ final class BookmarkManagementDetailViewController: NSViewController {
 
         let row = sender.view(atColumn: 0, row: index, makeIfNecessary: false) as? BookmarkTableCellView
 
-        if row?.isEditing ?? false {
+        if row?.editing ?? false {
             return
         }
 
@@ -186,7 +196,7 @@ final class BookmarkManagementDetailViewController: NSViewController {
                 context.duration = Constants.animationSpeed
                 context.completionHandler = completion
 
-                cell.isEditing = editing
+                cell.editing = editing
                 row.editing = editing
 
                 row.layoutSubtreeIfNeeded()
@@ -266,10 +276,10 @@ extension BookmarkManagementDetailViewController: NSTableViewDelegate, NSTableVi
 
             if let bookmark = entity as? Bookmark {
                 cell.update(from: bookmark)
-                cell.isEditing = bookmark.id == editingBookmarkIndex?.uuid
+                cell.editing = bookmark.id == editingBookmarkIndex?.uuid
             } else if let folder = entity as? BookmarkFolder {
                 cell.update(from: folder)
-                cell.isEditing = folder.id == editingBookmarkIndex?.uuid
+                cell.editing = folder.id == editingBookmarkIndex?.uuid
             } else {
                 assertionFailure("Failed to cast bookmark")
             }
@@ -292,15 +302,17 @@ extension BookmarkManagementDetailViewController: NSTableViewDelegate, NSTableVi
 
         guard dropOperation == .on,
               row < totalRows(),
-              let proposedBookmark = fetchEntity(at: row),
-              proposedBookmark.isFolder else {
+              let proposedDestination = fetchEntity(at: row),
+              proposedDestination.isFolder else {
             return .none
         }
+
+        print("DEBUG: Validated drop for \(row), drop \(info), operation \(dropOperation)")
 
         let draggedBookmarks = PasteboardBookmark.pasteboardBookmarks(with: info.draggingPasteboard) ?? Set<PasteboardBookmark>()
 
         let tryingToDragOntoSameFolder = draggedBookmarks.contains { folder in
-            return folder.id == proposedBookmark.id.uuidString
+            return folder.id == proposedDestination.id.uuidString
         }
 
         if tryingToDragOntoSameFolder {
@@ -365,6 +377,8 @@ extension BookmarkManagementDetailViewController: NSTableViewDelegate, NSTableVi
 extension BookmarkManagementDetailViewController: BookmarkTableCellViewDelegate {
 
     func bookmarkTableCellViewRequestedMenu(_ sender: NSButton, cell: BookmarkTableCellView) {
+        guard !isEditing else { return }
+
         let row = tableView.row(for: cell)
 
         guard let bookmark = fetchEntity(at: row) as? Bookmark else {
@@ -397,8 +411,7 @@ extension BookmarkManagementDetailViewController: BookmarkTableCellViewDelegate 
     func bookmarkTableCellView(_ cell: BookmarkTableCellView, updatedBookmarkWithUUID uuid: UUID, newTitle: String, newUrl: String) {
         let row = tableView.row(for: cell)
 
-        guard let bookmark = fetchEntity(at: row) as? Bookmark else {
-            assertionFailure("BookmarkManagementDetailViewController: Tried to favorite object which is not bookmark")
+        guard let bookmark = fetchEntity(at: row) as? Bookmark, bookmark.id == editingBookmarkIndex?.uuid else {
             return
         }
 
@@ -418,6 +431,8 @@ extension BookmarkManagementDetailViewController: BookmarkTableCellViewDelegate 
 extension BookmarkManagementDetailViewController: NSMenuDelegate {
 
     func contextualMenuForClickedRows() -> NSMenu? {
+        guard !isEditing else { return nil }
+
         let row = tableView.clickedRow
 
         guard row != -1 else {

@@ -249,7 +249,7 @@ final class LocalBookmarkStore: BookmarkStore {
             do {
                 try self.context.save()
             } catch {
-                assertionFailure("\(#file): Saving of context failed")
+                assertionFailure("\(#file): Saving of context failed: \(error)")
                 DispatchQueue.main.async { completion(error) }
                 return
             }

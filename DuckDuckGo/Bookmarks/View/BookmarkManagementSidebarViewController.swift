@@ -64,7 +64,7 @@ final class BookmarkManagementSidebarViewController: NSViewController {
         outlineView.register(BookmarkOutlineViewCell.nib, forIdentifier: BookmarkOutlineViewCell.identifier)
         outlineView.dataSource = dataSource
         outlineView.delegate = dataSource
-        outlineView.setDraggingSourceOperationMask([.copy], forLocal: true)
+        outlineView.setDraggingSourceOperationMask([.move], forLocal: true)
         outlineView.registerForDraggedTypes([BookmarkPasteboardWriter.bookmarkUTIInternalType,
                                              FolderPasteboardWriter.folderUTIInternalType])
 
