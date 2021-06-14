@@ -307,12 +307,32 @@ extension BookmarkManagementDetailViewController: NSTableViewDelegate, NSTableVi
             return .none
         }
 
-        print("DEBUG: Validated drop for \(row), drop \(info), operation \(dropOperation)")
+        if let bookmarks = PasteboardBookmark.pasteboardBookmarks(with: info.draggingPasteboard) {
+            return validateDrop(for: bookmarks, destination: proposedDestination)
+        }
 
-        let draggedBookmarks = PasteboardBookmark.pasteboardBookmarks(with: info.draggingPasteboard) ?? Set<PasteboardBookmark>()
+        if let folders = PasteboardFolder.pasteboardFolders(with: info.draggingPasteboard) {
+            return validateDrop(for: folders, destination: proposedDestination)
+        }
 
-        let tryingToDragOntoSameFolder = draggedBookmarks.contains { folder in
-            return folder.id == proposedDestination.id.uuidString
+        return .none
+    }
+
+    private func validateDrop(for draggedBookmarks: Set<PasteboardBookmark>, destination: BaseBookmarkEntity) -> NSDragOperation {
+        guard destination is BookmarkFolder else {
+            return .none
+        }
+
+        return .move
+    }
+
+    private func validateDrop(for draggedFolders: Set<PasteboardFolder>, destination: BaseBookmarkEntity) -> NSDragOperation {
+        guard destination is BookmarkFolder else {
+            return .none
+        }
+
+        let tryingToDragOntoSameFolder = draggedFolders.contains { folder in
+            return folder.id == destination.id.uuidString
         }
 
         if tryingToDragOntoSameFolder {
