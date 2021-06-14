@@ -439,7 +439,7 @@ extension BookmarkManagementDetailViewController: BookmarkTableCellViewDelegate 
         bookmarkManager.update(bookmark: bookmark)
 
         if let newURL = URL(string: newUrl), newURL != bookmark.url {
-            LocalBookmarkManager.shared.updateUrl(of: bookmark, to: newURL)
+            _ = LocalBookmarkManager.shared.updateUrl(of: bookmark, to: newURL)
         }
     }
 
