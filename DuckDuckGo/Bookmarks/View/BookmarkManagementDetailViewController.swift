@@ -435,12 +435,11 @@ extension BookmarkManagementDetailViewController: BookmarkTableCellViewDelegate 
             return
         }
 
-        if let newURL = URL(string: newUrl) {
-            // This should be consolidated into a single edit call, and then verify that the table view is reloaded correctly.
-            _ = LocalBookmarkManager.shared.updateUrl(of: bookmark, to: newURL)
-            bookmark.title = newTitle
+        bookmark.title = newTitle
+        bookmarkManager.update(bookmark: bookmark)
 
-            LocalBookmarkManager.shared.update(bookmark: bookmark)
+        if let newURL = URL(string: newUrl), newURL != bookmark.url {
+            LocalBookmarkManager.shared.updateUrl(of: bookmark, to: newURL)
         }
     }
 
