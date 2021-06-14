@@ -28,6 +28,11 @@ final class WindowControllersManager {
     weak var lastKeyMainWindowController: MainWindowController?
 
     func register(_ windowController: MainWindowController) {
+        guard !mainWindowControllers.contains(windowController) else {
+            assertionFailure("Window controller already registered")
+            return
+        }
+
         mainWindowControllers.append(windowController)
     }
 
