@@ -39,8 +39,6 @@ final class NavigationBarViewController: NSViewController {
     private let goForwardButtonMenuDelegate: NavigationButtonMenuDelegate
     // swiftlint:enable weak_delegate
 
-    private lazy var bookmarkListPopover = BookmarkListPopover()
-
     private var selectedTabViewModelCancellable: AnyCancellable?
     private var navigationButtonsCancellables = Set<AnyCancellable>()
 
@@ -139,7 +137,7 @@ final class NavigationBarViewController: NSViewController {
     }
 
     @IBAction func bookmarksButtonAction(_ sender: NSButton) {
-        openBookmarkListPopover()
+        openBookmarkListPanel()
     }
 
     @IBAction func shareButtonAction(_ sender: NSButton) {
@@ -149,8 +147,27 @@ final class NavigationBarViewController: NSViewController {
         sharing.show(relativeTo: .zero, of: sender, preferredEdge: .minY)
     }
 
-    func openBookmarkListPopover() {
-        bookmarkListPopover.show(relativeTo: .zero, of: bookmarkListButton, preferredEdge: .maxY)
+    private var bookmarkListWindowController: NSWindowController?
+
+    private func openBookmarkListPanel() {
+        let windowController = NSStoryboard.bookmarks.instantiateController(withIdentifier: "BookmarkListWindowController") as? NSWindowController
+
+        guard let window = windowController?.window else {
+            assertionFailure("\(#file): Failed to create bookmark list window")
+            return
+        }
+
+        self.bookmarkListWindowController = windowController
+
+        view.window?.addChildWindow(window, ordered: .above)
+
+        let preferredSize = windowController?.contentViewController?.preferredContentSize ?? .zero
+        let buttonFrame = bookmarkListButton.frame
+        let bookmarkFrameConvertedToWindow = bookmarkListButton.convert(bookmarkListButton.frame, to: nil)
+        let pointToConvert = NSPoint(x: buttonFrame.origin.x - preferredSize.width + buttonFrame.width, y: bookmarkFrameConvertedToWindow.origin.y)
+        let convertedPoint = view.window?.convertPoint(toScreen: pointToConvert) ?? .zero
+
+        window.setFrameTopLeftPoint(convertedPoint)
     }
 
 #if !FEEDBACK

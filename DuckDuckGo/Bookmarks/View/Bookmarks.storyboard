@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<document type="com.apple.InterfaceBuilder3.Cocoa.Storyboard.XIB" version="3.0" toolsVersion="18122" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none" useAutolayout="YES" initialViewController="cTg-Rr-Tjp">
+<document type="com.apple.InterfaceBuilder3.Cocoa.Storyboard.XIB" version="3.0" toolsVersion="18122" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none" useAutolayout="YES">
     <dependencies>
         <deployment identifier="macosx"/>
         <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="18122"/>
@@ -46,13 +46,13 @@
                         <autoresizingMask key="autoresizingMask"/>
                         <subviews>
                             <scrollView borderType="none" autohidesScrollers="YES" horizontalLineScroll="17" horizontalPageScroll="10" verticalLineScroll="17" verticalPageScroll="10" hasHorizontalScroller="NO" usesPredominantAxisScrolling="NO" translatesAutoresizingMaskIntoConstraints="NO" id="SqK-FW-C0t">
-                                <rect key="frame" x="0.0" y="26" width="250" height="409"/>
+                                <rect key="frame" x="0.0" y="0.0" width="250" height="435"/>
                                 <clipView key="contentView" drawsBackground="NO" id="4R3-QO-s8T">
-                                    <rect key="frame" x="0.0" y="0.0" width="250" height="409"/>
+                                    <rect key="frame" x="0.0" y="0.0" width="250" height="435"/>
                                     <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                     <subviews>
                                         <outlineView verticalHuggingPriority="750" allowsExpansionToolTips="YES" columnAutoresizingStyle="lastColumnOnly" columnResizing="NO" multipleSelection="NO" emptySelection="NO" autosaveColumns="NO" rowSizeStyle="automatic" usesAutomaticRowHeights="YES" viewBased="YES" indentationPerLevel="13" outlineTableColumn="Eur-dh-ZOY" id="dHL-py-g9k" customClass="BookmarksOutlineView" customModule="DuckDuckGo_Privacy_Browser" customModuleProvider="target">
-                                            <rect key="frame" x="0.0" y="0.0" width="250" height="409"/>
+                                            <rect key="frame" x="0.0" y="0.0" width="250" height="435"/>
                                             <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                             <size key="intercellSpacing" width="17" height="0.0"/>
                                             <color key="backgroundColor" name="ClearColor"/>
@@ -109,7 +109,7 @@
                             <constraint firstItem="SqK-FW-C0t" firstAttribute="top" secondItem="oJB-Na-CzV" secondAttribute="bottom" constant="20" id="Owf-hJ-AhH"/>
                             <constraint firstItem="oJB-Na-CzV" firstAttribute="leading" secondItem="oQD-6b-AhT" secondAttribute="leading" constant="26" id="QuW-mr-Xwh"/>
                             <constraint firstItem="SqK-FW-C0t" firstAttribute="leading" secondItem="oQD-6b-AhT" secondAttribute="leading" id="RiX-eQ-VCL"/>
-                            <constraint firstAttribute="bottom" secondItem="SqK-FW-C0t" secondAttribute="bottom" constant="26" id="Tc8-Ir-jea"/>
+                            <constraint firstAttribute="bottom" secondItem="SqK-FW-C0t" secondAttribute="bottom" id="Tc8-Ir-jea"/>
                             <constraint firstItem="oJB-Na-CzV" firstAttribute="top" secondItem="oQD-6b-AhT" secondAttribute="top" constant="20" id="vPa-lb-Lo1"/>
                         </constraints>
                     </view>
@@ -362,7 +362,7 @@ DQ
                 </viewController>
                 <customObject id="AD4-gD-7Lp" userLabel="First Responder" customClass="NSResponder" sceneMemberID="firstResponder"/>
             </objects>
-            <point key="canvasLocation" x="-588" y="-47"/>
+            <point key="canvasLocation" x="-588" y="-104"/>
         </scene>
         <!--Add Bookmark Modal View Controller-->
         <scene sceneID="D4i-le-BSY">
@@ -562,13 +562,36 @@ Gw
             </objects>
             <point key="canvasLocation" x="-513" y="668"/>
         </scene>
+        <!--Window Controller-->
+        <scene sceneID="Cj0-d9-QaG">
+            <objects>
+                <windowController storyboardIdentifier="BookmarkListWindowController" id="ccq-RZ-e1f" sceneMemberID="viewController">
+                    <window key="window" title="Window" allowsToolTipsWhenApplicationIsInactive="NO" autorecalculatesKeyViewLoop="NO" releasedWhenClosed="NO" visibleAtLaunch="NO" frameAutosaveName="" animationBehavior="default" id="ZuU-pa-ZNY">
+                        <windowPositionMask key="initialPositionMask" leftStrut="YES" rightStrut="YES" topStrut="YES" bottomStrut="YES"/>
+                        <rect key="contentRect" x="294" y="313" width="480" height="270"/>
+                        <rect key="screenRect" x="0.0" y="0.0" width="1920" height="1055"/>
+                        <view key="contentView" id="YIe-Rk-0az">
+                            <rect key="frame" x="0.0" y="0.0" width="480" height="270"/>
+                            <autoresizingMask key="autoresizingMask"/>
+                        </view>
+                        <connections>
+                            <outlet property="delegate" destination="ccq-RZ-e1f" id="AfT-mF-zuh"/>
+                        </connections>
+                    </window>
+                    <connections>
+                        <segue destination="Scx-gG-IP9" kind="relationship" relationship="window.shadowedContentViewController" id="ybZ-4s-4Mf"/>
+                    </connections>
+                </windowController>
+                <customObject id="ekm-pI-sAL" userLabel="First Responder" customClass="NSResponder" sceneMemberID="firstResponder"/>
+            </objects>
+            <point key="canvasLocation" x="-968" y="-442"/>
+        </scene>
         <!--Bookmark List View Controller-->
         <scene sceneID="zFa-lt-gPi">
             <objects>
                 <viewController storyboardIdentifier="BookmarkListViewController" id="Scx-gG-IP9" customClass="BookmarkListViewController" customModule="DuckDuckGo_Privacy_Browser" customModuleProvider="target" sceneMemberID="viewController">
-                    <view key="view" id="xb9-2G-g28">
+                    <view key="view" autoresizesSubviews="NO" translatesAutoresizingMaskIntoConstraints="NO" id="xb9-2G-g28">
                         <rect key="frame" x="0.0" y="0.0" width="357" height="489"/>
-                        <autoresizingMask key="autoresizingMask"/>
                         <subviews>
                             <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="TJx-89-ls4">
                                 <rect key="frame" x="13" y="457" width="89" height="20"/>
@@ -659,13 +682,13 @@ Gw
                                     <action selector="openManagementInterface:" target="Scx-gG-IP9" id="kQf-pI-TID"/>
                                 </connections>
                             </button>
-                            <scrollView borderType="none" autohidesScrollers="YES" horizontalLineScroll="24" horizontalPageScroll="10" verticalLineScroll="24" verticalPageScroll="10" usesPredominantAxisScrolling="NO" translatesAutoresizingMaskIntoConstraints="NO" id="sfH-at-DQe" userLabel="Bookmarks Outline View">
+                            <scrollView borderType="none" autohidesScrollers="YES" horizontalLineScroll="24" horizontalPageScroll="10" verticalLineScroll="24" verticalPageScroll="10" hasHorizontalScroller="NO" usesPredominantAxisScrolling="NO" translatesAutoresizingMaskIntoConstraints="NO" id="sfH-at-DQe" userLabel="Bookmarks Outline View">
                                 <rect key="frame" x="0.0" y="0.0" width="357" height="444"/>
-                                <clipView key="contentView" drawsBackground="NO" id="jhZ-VR-onf">
+                                <clipView key="contentView" drawsBackground="NO" translatesAutoresizingMaskIntoConstraints="NO" id="jhZ-VR-onf">
                                     <rect key="frame" x="0.0" y="0.0" width="357" height="444"/>
                                     <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                     <subviews>
-                                        <outlineView verticalHuggingPriority="750" allowsExpansionToolTips="YES" columnAutoresizingStyle="none" columnResizing="NO" multipleSelection="NO" autosaveColumns="NO" rowHeight="24" usesAutomaticRowHeights="YES" viewBased="YES" indentationPerLevel="13" outlineTableColumn="UgF-sw-0QC" id="66p-cd-DbA" customClass="BookmarksOutlineView" customModule="DuckDuckGo_Privacy_Browser" customModuleProvider="target">
+                                        <outlineView verticalHuggingPriority="750" allowsExpansionToolTips="YES" columnAutoresizingStyle="lastColumnOnly" columnResizing="NO" multipleSelection="NO" autosaveColumns="NO" rowHeight="24" usesAutomaticRowHeights="YES" viewBased="YES" indentationPerLevel="13" outlineTableColumn="UgF-sw-0QC" translatesAutoresizingMaskIntoConstraints="NO" id="66p-cd-DbA" customClass="BookmarksOutlineView" customModule="DuckDuckGo_Privacy_Browser" customModuleProvider="target">
                                             <rect key="frame" x="0.0" y="0.0" width="357" height="444"/>
                                             <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                             <size key="intercellSpacing" width="17" height="0.0"/>
@@ -682,7 +705,7 @@ Gw
                                                         <color key="textColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
                                                         <color key="backgroundColor" name="windowBackgroundColor" catalog="System" colorSpace="catalog"/>
                                                     </textFieldCell>
-                                                    <tableColumnResizingMask key="resizingMask" resizeWithTable="YES" userResizable="YES"/>
+                                                    <tableColumnResizingMask key="resizingMask" resizeWithTable="YES"/>
                                                 </tableColumn>
                                             </tableColumns>
                                             <connections>
@@ -694,7 +717,7 @@ Gw
                                 </clipView>
                                 <edgeInsets key="scrollerInsets" left="0.0" right="0.0" top="28" bottom="0.0"/>
                                 <scroller key="horizontalScroller" hidden="YES" wantsLayer="YES" verticalHuggingPriority="750" horizontal="YES" id="pGx-TG-Ed0">
-                                    <rect key="frame" x="0.0" y="385" width="357" height="16"/>
+                                    <rect key="frame" x="-100" y="-100" width="357" height="16"/>
                                     <autoresizingMask key="autoresizingMask"/>
                                 </scroller>
                                 <scroller key="verticalScroller" hidden="YES" wantsLayer="YES" verticalHuggingPriority="750" horizontal="NO" id="k1f-FW-gMc">

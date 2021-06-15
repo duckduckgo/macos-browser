@@ -147,6 +147,7 @@
 		4BB88B4A25B7B690006F6B06 /* SequenceExtensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4BB88B4925B7B690006F6B06 /* SequenceExtensions.swift */; };
 		4BB88B5025B7BA2B006F6B06 /* TabInstrumentation.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4BB88B4F25B7BA2B006F6B06 /* TabInstrumentation.swift */; };
 		4BB88B5B25B7BA50006F6B06 /* Instruments.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4BB88B5A25B7BA50006F6B06 /* Instruments.swift */; };
+		4BE0DF06267819A1006337B7 /* NSStoryboardExtension.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4BE0DF0426781961006337B7 /* NSStoryboardExtension.swift */; };
 		8511E18425F82B34002F516B /* 01_Fire_really_small.json in Resources */ = {isa = PBXBuildFile; fileRef = 8511E18325F82B34002F516B /* 01_Fire_really_small.json */; };
 		853014D625E671A000FB8205 /* PageObserverUserScript.swift in Sources */ = {isa = PBXBuildFile; fileRef = 853014D525E671A000FB8205 /* PageObserverUserScript.swift */; };
 		8546DE6225C03056000CA5E1 /* UserAgentTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8546DE6125C03056000CA5E1 /* UserAgentTests.swift */; };
@@ -541,6 +542,7 @@
 		4BB88B4925B7B690006F6B06 /* SequenceExtensions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SequenceExtensions.swift; sourceTree = "<group>"; };
 		4BB88B4F25B7BA2B006F6B06 /* TabInstrumentation.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TabInstrumentation.swift; sourceTree = "<group>"; };
 		4BB88B5A25B7BA50006F6B06 /* Instruments.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Instruments.swift; sourceTree = "<group>"; };
+		4BE0DF0426781961006337B7 /* NSStoryboardExtension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NSStoryboardExtension.swift; sourceTree = "<group>"; };
 		8511E18325F82B34002F516B /* 01_Fire_really_small.json */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.json; path = 01_Fire_really_small.json; sourceTree = "<group>"; };
 		853014D525E671A000FB8205 /* PageObserverUserScript.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PageObserverUserScript.swift; sourceTree = "<group>"; };
 		8546DE6125C03056000CA5E1 /* UserAgentTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UserAgentTests.swift; sourceTree = "<group>"; };
@@ -1881,6 +1883,7 @@
 				B657841825FA484B00D8DB33 /* NSException+Catch.h */,
 				B657841925FA484B00D8DB33 /* NSException+Catch.m */,
 				B657841E25FA497600D8DB33 /* NSException+Catch.swift */,
+				4BE0DF0426781961006337B7 /* NSStoryboardExtension.swift */,
 				B6A9E46A2614618A0067D1B9 /* OperatingSystemVersionExtension.swift */,
 				4B0511FC262CD20D00F6079C /* NSImageViewExtension.swift */,
 				B6E61EE2263AC0C8004E11AB /* FileManagerExtension.swift */,
@@ -2552,6 +2555,7 @@
 				4B02198B25E05FAC00ED7DEA /* FireproofInfoViewController.swift in Sources */,
 				AA8EDF2424923E980071C2E8 /* URLExtension.swift in Sources */,
 				4B67744B255DBF3A00025BD8 /* BloomFilter.cpp in Sources */,
+				4BE0DF06267819A1006337B7 /* NSStoryboardExtension.swift in Sources */,
 				4B02198A25E05FAC00ED7DEA /* FireproofDomains.swift in Sources */,
 				4B677442255DBEEA00025BD8 /* Database.swift in Sources */,
 				4B92928B26670D1700AD2C21 /* BookmarksOutlineView.swift in Sources */,
