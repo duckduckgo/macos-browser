@@ -363,6 +363,8 @@ extension MainViewController: NSMenuItemValidation {
         case #selector(MainViewController.bookmarkThisPage(_:)),
              #selector(MainViewController.favoriteThisPage(_:)):
             return tabCollectionViewModel.selectedTabViewModel?.canBeBookmarked == true
+        case #selector(MainViewController.navigateToBookmark(_:)):
+            return true
 
         // Reopen Last Removed Tab
         case #selector(MainViewController.reopenLastClosedTab(_:)):
