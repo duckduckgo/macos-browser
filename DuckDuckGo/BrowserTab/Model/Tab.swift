@@ -62,8 +62,8 @@ final class Tab: NSObject {
         var title: String? {
             switch self {
             case .standard: return nil
-            case .preferences: return UserText.preferences
-            case .bookmarks: return UserText.bookmarks
+            case .preferences: return UserText.tabPreferencesTitle
+            case .bookmarks: return UserText.tabBookmarksTitle
             }
         }
 
@@ -165,6 +165,7 @@ final class Tab: NSObject {
 
     func set(tabType: TabType) {
         self.tabType = tabType
+        self.title = tabType.title
     }
 
     func invalidateSessionStateData() {
