@@ -102,16 +102,18 @@ final class BookmarkFolder: BaseBookmarkEntity {
         return children.compactMap { $0 as? BookmarkFolder }
     }
 
+    lazy var isEmpty: Bool = {
+        return childBookmarks.isEmpty && childFolders.allSatisfy { $0.isEmpty }
+    }()
+
     init(id: UUID,
          title: String,
          parentFolderUUID: UUID? = nil,
          children: [BaseBookmarkEntity] = []) {
-
         super.init(id: id, title: title, isFolder: true)
 
         self.parentFolderUUID = parentFolderUUID
         self.children = children
-
     }
 }
 

@@ -121,7 +121,7 @@ final class MainMenu: NSMenu {
 
                 if let folder = viewModel.entity as? BookmarkFolder {
                     // Avoid creating a submenu for empty folders.
-                    guard !folder.children.isEmpty else {
+                    guard !folder.isEmpty else {
                         continue
                     }
 
