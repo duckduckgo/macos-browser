@@ -100,13 +100,18 @@ final class MainMenu: NSMenu {
     var bookmarkListCancellable: AnyCancellable?
     private func subscribeToBookmarkList() {
         bookmarkListCancellable = LocalBookmarkManager.shared.$list
-            .compactMap({ $0?.topLevelEntities.map(BookmarkViewModel.init(entity:)) })
-            .receive(on: DispatchQueue.main).sink { [weak self] bookmarkViewModels in
-                self?.updateBookmarksMenu(bookmarkViewModels: bookmarkViewModels)
-        }
+            .compactMap({
+                let favorites = $0?.favoriteBookmarks.compactMap(BookmarkViewModel.init(entity:)) ?? []
+                let topLevelEntities = $0?.topLevelEntities.compactMap(BookmarkViewModel.init(entity:)) ?? []
+
+                return (favorites, topLevelEntities)
+            })
+            .receive(on: DispatchQueue.main).sink { [weak self] favorites, topLevel in
+                self?.updateBookmarksMenu(favoriteViewModels: favorites, topLevelBookmarkViewModels: topLevel)
+            }
     }
 
-    func updateBookmarksMenu(bookmarkViewModels: [BookmarkViewModel]) {
+    func updateBookmarksMenu(favoriteViewModels: [BookmarkViewModel], topLevelBookmarkViewModels: [BookmarkViewModel]) {
 
         func bookmarkMenuItems(from bookmarkViewModels: [BookmarkViewModel]) -> [NSMenuItem] {
             var menuItems = [NSMenuItem]()
@@ -158,11 +163,11 @@ final class MainMenu: NSMenu {
         }
 
         let cleanedBookmarkItems = bookmarksMenu.items.dropLast(bookmarksMenu.items.count - (favoritesSeparatorIndex + 1))
-        let bookmarkItems = bookmarkMenuItems(from: bookmarkViewModels)
+        let bookmarkItems = bookmarkMenuItems(from: topLevelBookmarkViewModels)
         bookmarksMenu.items = Array(cleanedBookmarkItems) + bookmarkItems
 
         let cleanedFavoriteItems = favoritesMenu.items.dropLast(favoritesMenu.items.count - (favoriteThisPageSeparatorIndex + 1))
-        let favoriteItems = favoriteMenuItems(from: bookmarkViewModels)
+        let favoriteItems = favoriteMenuItems(from: favoriteViewModels)
         favoritesMenu.items = Array(cleanedFavoriteItems) + favoriteItems
     }
 
