@@ -19,6 +19,12 @@
 import AppKit
 import Combine
 
+protocol BookmarkListViewControllerDelegate: AnyObject {
+
+    func popoverShouldClose(_ bookmarkListViewController: BookmarkListViewController)
+
+}
+
 final class BookmarkListViewController: NSViewController {
     
     private enum Constants {
@@ -30,7 +36,9 @@ final class BookmarkListViewController: NSViewController {
         let storyboard = NSStoryboard(name: Constants.storyboardName, bundle: nil)
         return storyboard.instantiateController(identifier: Constants.identifier)
     }
-    
+
+    weak var delegate: BookmarkListViewControllerDelegate?
+
     @IBOutlet var outlineView: NSOutlineView!
     
     private var cancellables = Set<AnyCancellable>()
@@ -59,7 +67,7 @@ final class BookmarkListViewController: NSViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         
-        preferredContentSize = CGSize(width: 320, height: 500)
+        preferredContentSize = CGSize(width: 420, height: 500)
         
         outlineView.register(BookmarkOutlineViewCell.nib, forIdentifier: BookmarkOutlineViewCell.identifier)
         outlineView.dataSource = dataSource
@@ -72,27 +80,7 @@ final class BookmarkListViewController: NSViewController {
             self?.reloadData()
         }.store(in: &cancellables)
     }
-    
-    private func applyWindowStyle() {
-        view.window?.titleVisibility = .hidden
-        view.window?.titlebarAppearsTransparent = true
-        view.window?.standardWindowButton(.zoomButton)?.isHidden = true
-        view.window?.standardWindowButton(.closeButton)?.isHidden = true
-        view.window?.standardWindowButton(.miniaturizeButton)?.isHidden = true
-        view.window?.styleMask = [.titled, .fullSizeContentView]
-    }
-    
-    override func viewWillAppear() {
-        super.viewWillAppear()
-        applyWindowStyle()
-        addMonitors()
-    }
-    
-    override func viewWillDisappear() {
-        super.viewWillDisappear()
-        removeMouseEventsMonitor()
-    }
-    
+
     private func reloadData() {
         let selectedNodes = self.selectedNodes
         
@@ -116,7 +104,7 @@ final class BookmarkListViewController: NSViewController {
     
     @IBAction func openManagementInterface(_ sender: NSButton) {
         WindowControllersManager.shared.showBookmarksTab()
-        closeWindow()
+        delegate?.popoverShouldClose(self)
     }
     
     @IBAction func handleClick(_ sender: NSOutlineView) {
@@ -125,7 +113,7 @@ final class BookmarkListViewController: NSViewController {
         if let node = sender.item(atRow: sender.clickedRow) as? BookmarkNode,
            let bookmark = node.representedObject as? Bookmark {
             WindowControllersManager.shared.open(bookmark: bookmark)
-            closeWindow()
+            delegate?.popoverShouldClose(self)
         }
     }
     
@@ -317,64 +305,38 @@ extension BookmarkListViewController: FolderMenuItemSelectors {
     
 }
 
-extension BookmarkListViewController {
-    
-    private func closeWindow() {
-        guard let window = view.window else {
-            return
-        }
-        
-        window.parent?.removeChildWindow(window)
-        window.orderOut(nil)
+// MARK: - BookmarkListPopover
+
+final class BookmarkListPopover: NSPopover {
+
+    override init() {
+        super.init()
+
+        self.animates = false
+        self.behavior = .transient
+
+        setupContentController()
     }
-    
-    private func addMonitors() {
-        let upEventTypes: NSEvent.EventTypeMask = [.leftMouseUp, .rightMouseUp]
-        mouseUpEventsMonitor = NSEvent.addLocalMonitorForEvents(matching: upEventTypes) { [weak self] event in
-            self?.mouseUp(with: event)
-        }
-        
-        let downEventTypes: NSEvent.EventTypeMask = [.leftMouseDown, .rightMouseDown]
-        mouseDownEventsMonitor = NSEvent.addLocalMonitorForEvents(matching: downEventTypes) { [weak self] event in
-            self?.mouseDown(with: event)
-        }
-        
-        appObserver = NotificationCenter.default.addObserver(forName: NSApplication.didResignActiveNotification,
-                                                             object: nil,
-                                                             queue: nil) { [weak self] _ in
-            self?.closeWindow()
-        }
+
+    required init?(coder: NSCoder) {
+        fatalError("BookmarkListPopover: Bad initializer")
     }
-    
-    private func removeMouseEventsMonitor() {
-        if let upEventMonitor = mouseUpEventsMonitor {
-            NSEvent.removeMonitor(upEventMonitor)
-            mouseUpEventsMonitor = nil
-        }
-        
-        if let downEventMonitor = mouseDownEventsMonitor {
-            NSEvent.removeMonitor(downEventMonitor)
-            mouseDownEventsMonitor = nil
-        }
+
+    // swiftlint:disable force_cast
+    var viewController: BookmarkListViewController { contentViewController as! BookmarkListViewController }
+    // swiftlint:enable force_cast
+    private func setupContentController() {
+        let controller = BookmarkListViewController.create()
+        controller.delegate = self
+        contentViewController = controller
     }
-    
-    func mouseDown(with event: NSEvent) -> NSEvent? {
-        if event.window === view.window {
-            return event
-        }
-        
-        closeWindow()
-        
-        return event
+
+}
+
+extension BookmarkListPopover: BookmarkListViewControllerDelegate {
+
+    func popoverShouldClose(_ bookmarkListViewController: BookmarkListViewController) {
+        close()
     }
-    
-    func mouseUp(with event: NSEvent) -> NSEvent? {
-        if event.window === view.window, view.isMouseLocationInsideBounds(event.locationInWindow) {
-            return event
-        }
-        
-        closeWindow()
-        return nil
-    }
-    
+
 }

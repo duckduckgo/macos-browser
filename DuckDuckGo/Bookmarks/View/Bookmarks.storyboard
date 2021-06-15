@@ -35,7 +35,7 @@
                 </splitViewController>
                 <customObject id="5Sa-aZ-qTG" userLabel="First Responder" customClass="NSResponder" sceneMemberID="firstResponder"/>
             </objects>
-            <point key="canvasLocation" x="-101" y="28.5"/>
+            <point key="canvasLocation" x="-91" y="-29"/>
         </scene>
         <!--Bookmark Management Sidebar View Controller-->
         <scene sceneID="kSB-yp-ZWy">
@@ -125,7 +125,7 @@
                     </connections>
                 </menu>
             </objects>
-            <point key="canvasLocation" x="522" y="-274.5"/>
+            <point key="canvasLocation" x="456" y="-321"/>
         </scene>
         <!--Bookmark Management Detail View Controller-->
         <scene sceneID="6Fs-Ad-ECj">
@@ -264,7 +264,7 @@
                     </connections>
                 </menu>
             </objects>
-            <point key="canvasLocation" x="731" y="173.5"/>
+            <point key="canvasLocation" x="669" y="172"/>
         </scene>
         <!--Bookmark Popover View Controller-->
         <scene sceneID="3pH-Ju-wLu">
@@ -562,30 +562,6 @@ Gw
             </objects>
             <point key="canvasLocation" x="-513" y="668"/>
         </scene>
-        <!--Window Controller-->
-        <scene sceneID="Cj0-d9-QaG">
-            <objects>
-                <windowController storyboardIdentifier="BookmarkListWindowController" id="ccq-RZ-e1f" sceneMemberID="viewController">
-                    <window key="window" title="Window" allowsToolTipsWhenApplicationIsInactive="NO" autorecalculatesKeyViewLoop="NO" releasedWhenClosed="NO" visibleAtLaunch="NO" frameAutosaveName="" animationBehavior="default" id="ZuU-pa-ZNY">
-                        <windowPositionMask key="initialPositionMask" leftStrut="YES" rightStrut="YES" topStrut="YES" bottomStrut="YES"/>
-                        <rect key="contentRect" x="294" y="313" width="480" height="270"/>
-                        <rect key="screenRect" x="0.0" y="0.0" width="1920" height="1055"/>
-                        <view key="contentView" id="YIe-Rk-0az">
-                            <rect key="frame" x="0.0" y="0.0" width="480" height="270"/>
-                            <autoresizingMask key="autoresizingMask"/>
-                        </view>
-                        <connections>
-                            <outlet property="delegate" destination="ccq-RZ-e1f" id="AfT-mF-zuh"/>
-                        </connections>
-                    </window>
-                    <connections>
-                        <segue destination="Scx-gG-IP9" kind="relationship" relationship="window.shadowedContentViewController" id="ybZ-4s-4Mf"/>
-                    </connections>
-                </windowController>
-                <customObject id="ekm-pI-sAL" userLabel="First Responder" customClass="NSResponder" sceneMemberID="firstResponder"/>
-            </objects>
-            <point key="canvasLocation" x="-968" y="-442"/>
-        </scene>
         <!--Bookmark List View Controller-->
         <scene sceneID="zFa-lt-gPi">
             <objects>
@@ -758,7 +734,7 @@ Gw
                     </connections>
                 </menu>
             </objects>
-            <point key="canvasLocation" x="-967.5" y="97.5"/>
+            <point key="canvasLocation" x="-958" y="41"/>
         </scene>
     </scenes>
     <resources>
