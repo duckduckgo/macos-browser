@@ -165,7 +165,10 @@ final class Tab: NSObject {
 
     func set(tabType: TabType) {
         self.tabType = tabType
-        self.title = tabType.title
+
+        if let title = tabType.title {
+            self.title = title
+        }
     }
 
     func invalidateSessionStateData() {

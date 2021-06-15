@@ -21,7 +21,7 @@
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                     </view>
                     <color key="borderColor" name="ClearColor"/>
-                    <color key="fillColor" name="ClearColor"/>
+                    <color key="fillColor" name="TableCellEditingColor"/>
                 </box>
                 <box boxType="custom" borderType="none" cornerRadius="4" title="Box" translatesAutoresizingMaskIntoConstraints="NO" id="l8T-z1-Im8" userLabel="Container View">
                     <rect key="frame" x="3" y="3" width="456" height="78"/>
@@ -150,6 +150,9 @@
         </namedColor>
         <namedColor name="ClearColor">
             <color red="1" green="1" blue="1" alpha="0.0" colorSpace="custom" customColorSpace="sRGB"/>
+        </namedColor>
+        <namedColor name="TableCellEditingColor">
+            <color red="1" green="1" blue="1" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
         </namedColor>
     </resources>
 </document>
