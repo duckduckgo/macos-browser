@@ -391,7 +391,7 @@
                             </menuItem>
                             <menuItem title="Bookmarks" id="xf8-PW-TOA">
                                 <modifierMask key="keyEquivalentModifierMask"/>
-                                <menu key="submenu" title="Bookmarks" autoenablesItems="NO" id="AGQ-XC-31O">
+                                <menu key="submenu" title="Bookmarks" id="AGQ-XC-31O">
                                     <items>
                                         <menuItem title="Bookmark this page..." enabled="NO" keyEquivalent="d" id="Nkm-zy-JXD">
                                             <connections>
@@ -412,9 +412,6 @@
                                                     <menuItem isSeparatorItem="YES" tag="521" id="eL9-aR-XDR"/>
                                                 </items>
                                             </menu>
-                                            <connections>
-                                                <action selector="forward:" target="Ady-hI-5gd" id="cu9-Pd-5QV"/>
-                                            </connections>
                                         </menuItem>
                                         <menuItem isSeparatorItem="YES" tag="53" id="s02-vH-KA3"/>
                                     </items>
