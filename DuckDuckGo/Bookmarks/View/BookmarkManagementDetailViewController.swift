@@ -435,10 +435,10 @@ extension BookmarkManagementDetailViewController: BookmarkTableCellViewDelegate 
             return
         }
 
-        bookmark.title = newTitle
+        bookmark.title = newTitle.isEmpty ? bookmark.title : newTitle
         bookmarkManager.update(bookmark: bookmark)
 
-        if let newURL = URL(string: newUrl), newURL != bookmark.url {
+        if let newURL = newUrl.url, newURL != bookmark.url {
             _ = LocalBookmarkManager.shared.updateUrl(of: bookmark, to: newURL)
         }
     }
