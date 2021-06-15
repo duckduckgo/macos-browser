@@ -189,6 +189,7 @@ final class Tab: NSObject {
                                                   completionHandler: completionHandler)
                 }
             } else if let url = self.webView.url {
+                assert(completionHandler == nil, "Completion handling not implemented for downloaded content, use WebKitDownloadTask.output")
                 self.download(from: url, promptForLocation: true)
             }
         }
@@ -656,7 +657,6 @@ extension Tab: WKNavigationDelegate {
     }
 
 }
-
 // universal download event handlers for Legacy _WKDownload and modern WKDownload
 extension Tab: WKWebViewDownloadDelegate {
     func webView(_ webView: WKWebView, navigationAction: WKNavigationAction, didBecomeDownload download: WebKitDownload) {

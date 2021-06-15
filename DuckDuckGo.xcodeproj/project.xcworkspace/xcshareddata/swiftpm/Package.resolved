@@ -11,7 +11,7 @@
         }
       },
       {
-        "package": "GRDB.swift",
+        "package": "GRDB",
         "repositoryURL": "https://github.com/duckduckgo/GRDB.swift.git",
         "state": {
           "branch": null,
@@ -20,7 +20,7 @@
         }
       },
       {
-        "package": "lottie-ios",
+        "package": "Lottie",
         "repositoryURL": "https://github.com/airbnb/lottie-ios",
         "state": {
           "branch": "lottie/macos-spm",
@@ -38,7 +38,7 @@
         }
       },
       {
-        "package": "PunycodeSwift",
+        "package": "Punycode",
         "repositoryURL": "https://github.com/gumob/PunycodeSwift.git",
         "state": {
           "branch": null,
