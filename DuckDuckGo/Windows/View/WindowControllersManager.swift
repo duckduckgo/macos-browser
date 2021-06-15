@@ -116,9 +116,12 @@ extension WindowControllersManager {
     }
 
     private func showTab(type: Tab.TabType) {
-        guard let windowController = mainWindowControllers.first(where: { $0.window?.isMainWindow ?? false }) else {
-            return
-        }
+        guard let windowController = mainWindowControllers.first(where: {
+            let isMain = $0.window?.isMainWindow ?? false
+            let hasMainChildWindow = $0.window?.childWindows?.contains { $0.isMainWindow } ?? false
+
+            return isMain || hasMainChildWindow
+        }) else { return }
 
         let viewController = windowController.mainViewController
         let tabCollectionViewModel = viewController.tabCollectionViewModel
