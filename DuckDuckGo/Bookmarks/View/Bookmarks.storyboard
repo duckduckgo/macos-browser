@@ -12,7 +12,7 @@
             <objects>
                 <splitViewController title="Bookmarks" storyboardIdentifier="BookmarkManagementSplitViewController" id="cTg-Rr-Tjp" customClass="BookmarkManagementSplitViewController" customModule="DuckDuckGo_Privacy_Browser" customModuleProvider="target" sceneMemberID="viewController">
                     <splitViewItems>
-                        <splitViewItem holdingPriority="255" behavior="contentList" id="Gzb-7F-4E7"/>
+                        <splitViewItem holdingPriority="1000" behavior="contentList" id="Gzb-7F-4E7"/>
                         <splitViewItem id="Z59-qq-Yho"/>
                     </splitViewItems>
                     <splitView key="splitView" dividerStyle="thin" vertical="YES" id="2T2-t4-KZZ">
@@ -42,11 +42,11 @@
             <objects>
                 <viewController id="cOb-MX-4XZ" customClass="BookmarkManagementSidebarViewController" customModule="DuckDuckGo_Privacy_Browser" customModuleProvider="target" sceneMemberID="viewController">
                     <view key="view" id="oQD-6b-AhT">
-                        <rect key="frame" x="0.0" y="0.0" width="256" height="499"/>
+                        <rect key="frame" x="0.0" y="0.0" width="258" height="500"/>
                         <autoresizingMask key="autoresizingMask"/>
                         <subviews>
                             <customView translatesAutoresizingMaskIntoConstraints="NO" id="eJ4-cO-2QO" customClass="ColorView" customModule="DuckDuckGo_Privacy_Browser" customModuleProvider="target">
-                                <rect key="frame" x="0.0" y="0.0" width="256" height="499"/>
+                                <rect key="frame" x="0.0" y="0.0" width="258" height="500"/>
                                 <userDefinedRuntimeAttributes>
                                     <userDefinedRuntimeAttribute type="color" keyPath="backgroundColor">
                                         <color key="value" name="FindInPageBackgroundColor"/>
@@ -54,19 +54,19 @@
                                 </userDefinedRuntimeAttributes>
                             </customView>
                             <scrollView borderType="none" autohidesScrollers="YES" horizontalLineScroll="17" horizontalPageScroll="10" verticalLineScroll="17" verticalPageScroll="10" hasHorizontalScroller="NO" usesPredominantAxisScrolling="NO" translatesAutoresizingMaskIntoConstraints="NO" id="SqK-FW-C0t">
-                                <rect key="frame" x="0.0" y="0.0" width="256" height="435"/>
+                                <rect key="frame" x="12" y="0.0" width="234" height="436"/>
                                 <clipView key="contentView" drawsBackground="NO" id="4R3-QO-s8T">
-                                    <rect key="frame" x="0.0" y="0.0" width="256" height="435"/>
+                                    <rect key="frame" x="0.0" y="0.0" width="234" height="436"/>
                                     <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                     <subviews>
                                         <outlineView verticalHuggingPriority="750" allowsExpansionToolTips="YES" columnAutoresizingStyle="lastColumnOnly" columnResizing="NO" multipleSelection="NO" emptySelection="NO" autosaveColumns="NO" rowSizeStyle="automatic" usesAutomaticRowHeights="YES" viewBased="YES" indentationPerLevel="13" outlineTableColumn="Eur-dh-ZOY" id="dHL-py-g9k" customClass="BookmarksOutlineView" customModule="DuckDuckGo_Privacy_Browser" customModuleProvider="target">
-                                            <rect key="frame" x="0.0" y="0.0" width="256" height="435"/>
+                                            <rect key="frame" x="0.0" y="0.0" width="234" height="436"/>
                                             <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                             <size key="intercellSpacing" width="17" height="0.0"/>
                                             <color key="backgroundColor" name="ClearColor"/>
                                             <color key="gridColor" name="gridColor" catalog="System" colorSpace="catalog"/>
                                             <tableColumns>
-                                                <tableColumn width="224" minWidth="120" maxWidth="1000" id="Eur-dh-ZOY">
+                                                <tableColumn width="202" minWidth="120" maxWidth="1000" id="Eur-dh-ZOY">
                                                     <tableHeaderCell key="headerCell" lineBreakMode="truncatingTail" borderStyle="border">
                                                         <color key="textColor" name="headerTextColor" catalog="System" colorSpace="catalog"/>
                                                         <color key="backgroundColor" name="headerColor" catalog="System" colorSpace="catalog"/>
@@ -83,9 +83,6 @@
                                     </subviews>
                                     <color key="backgroundColor" name="ClearColor"/>
                                 </clipView>
-                                <constraints>
-                                    <constraint firstAttribute="width" relation="greaterThanOrEqual" constant="250" id="US8-1O-ver"/>
-                                </constraints>
                                 <scroller key="horizontalScroller" hidden="YES" wantsLayer="YES" verticalHuggingPriority="750" horizontal="YES" id="d87-IE-xBD">
                                     <rect key="frame" x="-100" y="-100" width="238" height="16"/>
                                     <autoresizingMask key="autoresizingMask"/>
@@ -99,7 +96,7 @@
                                 </connections>
                             </scrollView>
                             <popUpButton translatesAutoresizingMaskIntoConstraints="NO" id="oJB-Na-CzV">
-                                <rect key="frame" x="21" y="455" width="221" height="24"/>
+                                <rect key="frame" x="21" y="456" width="219" height="24"/>
                                 <popUpButtonCell key="cell" type="bevel" title="Bookmarks" bezelStyle="rounded" alignment="left" controlSize="large" lineBreakMode="truncatingTail" state="on" imageScaling="proportionallyDown" inset="2" selectedItem="Pxw-Jh-Zh0" id="Hfh-Gh-9qt">
                                     <behavior key="behavior" lightByBackground="YES" lightByGray="YES"/>
                                     <font key="font" size="20" name="SFProDisplay-Semibold"/>
@@ -112,12 +109,12 @@
                             </popUpButton>
                         </subviews>
                         <constraints>
-                            <constraint firstAttribute="trailing" secondItem="SqK-FW-C0t" secondAttribute="trailing" id="6Zz-Nc-u6E"/>
-                            <constraint firstAttribute="trailing" secondItem="oJB-Na-CzV" secondAttribute="trailing" constant="14" id="7d2-Rx-hjg"/>
+                            <constraint firstAttribute="trailing" secondItem="SqK-FW-C0t" secondAttribute="trailing" constant="12" id="6Zz-Nc-u6E"/>
+                            <constraint firstAttribute="trailing" secondItem="oJB-Na-CzV" secondAttribute="trailing" constant="18" id="7d2-Rx-hjg"/>
                             <constraint firstItem="SqK-FW-C0t" firstAttribute="top" secondItem="oJB-Na-CzV" secondAttribute="bottom" constant="20" id="Owf-hJ-AhH"/>
                             <constraint firstItem="eJ4-cO-2QO" firstAttribute="leading" secondItem="oQD-6b-AhT" secondAttribute="leading" id="QcT-qP-dwG"/>
                             <constraint firstItem="oJB-Na-CzV" firstAttribute="leading" secondItem="oQD-6b-AhT" secondAttribute="leading" constant="26" id="QuW-mr-Xwh"/>
-                            <constraint firstItem="SqK-FW-C0t" firstAttribute="leading" secondItem="oQD-6b-AhT" secondAttribute="leading" id="RiX-eQ-VCL"/>
+                            <constraint firstItem="SqK-FW-C0t" firstAttribute="leading" secondItem="oQD-6b-AhT" secondAttribute="leading" constant="12" id="RiX-eQ-VCL"/>
                             <constraint firstAttribute="bottom" secondItem="SqK-FW-C0t" secondAttribute="bottom" id="Tc8-Ir-jea"/>
                             <constraint firstAttribute="trailing" secondItem="eJ4-cO-2QO" secondAttribute="trailing" id="qjZ-an-5zF"/>
                             <constraint firstAttribute="bottom" secondItem="eJ4-cO-2QO" secondAttribute="bottom" id="rV2-0V-grm"/>
@@ -156,21 +153,21 @@
                                 </userDefinedRuntimeAttributes>
                             </customView>
                             <box verticalHuggingPriority="750" boxType="separator" translatesAutoresizingMaskIntoConstraints="NO" id="fLo-NU-bGv">
-                                <rect key="frame" x="42" y="62" width="592" height="5"/>
+                                <rect key="frame" x="58" y="72" width="560" height="5"/>
                             </box>
                             <scrollView borderType="none" autohidesScrollers="YES" horizontalLineScroll="17" horizontalPageScroll="10" verticalLineScroll="17" verticalPageScroll="10" usesPredominantAxisScrolling="NO" translatesAutoresizingMaskIntoConstraints="NO" id="mTh-HU-7C9">
-                                <rect key="frame" x="42" y="0.0" width="592" height="64"/>
+                                <rect key="frame" x="48" y="0.0" width="580" height="74"/>
                                 <clipView key="contentView" drawsBackground="NO" id="Cld-aq-MYg">
-                                    <rect key="frame" x="0.0" y="0.0" width="592" height="64"/>
+                                    <rect key="frame" x="0.0" y="0.0" width="580" height="74"/>
                                     <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                     <subviews>
                                         <tableView verticalHuggingPriority="750" allowsExpansionToolTips="YES" tableStyle="plain" columnReordering="NO" columnResizing="NO" multipleSelection="NO" autosaveColumns="NO" rowSizeStyle="automatic" usesAutomaticRowHeights="YES" viewBased="YES" id="b59-XH-JSp">
-                                            <rect key="frame" x="0.0" y="0.0" width="592" height="8"/>
+                                            <rect key="frame" x="0.0" y="0.0" width="580" height="30"/>
                                             <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                             <color key="backgroundColor" name="ClearColor"/>
                                             <color key="gridColor" name="gridColor" catalog="System" colorSpace="catalog"/>
                                             <tableColumns>
-                                                <tableColumn width="592" minWidth="40" maxWidth="3000" id="pHc-7X-LDD">
+                                                <tableColumn width="580" minWidth="40" maxWidth="3000" id="pHc-7X-LDD">
                                                     <tableHeaderCell key="headerCell" lineBreakMode="truncatingTail" borderStyle="border">
                                                         <color key="textColor" name="headerTextColor" catalog="System" colorSpace="catalog"/>
                                                         <color key="backgroundColor" name="headerColor" catalog="System" colorSpace="catalog"/>
@@ -192,9 +189,9 @@
                                     </subviews>
                                     <color key="backgroundColor" name="ClearColor"/>
                                 </clipView>
-                                <edgeInsets key="contentInsets" left="0.0" right="0.0" top="28" bottom="28"/>
+                                <edgeInsets key="contentInsets" left="0.0" right="0.0" top="22" bottom="22"/>
                                 <scroller key="horizontalScroller" hidden="YES" wantsLayer="YES" verticalHuggingPriority="750" horizontal="YES" id="Q9m-pm-N39">
-                                    <rect key="frame" x="0.0" y="20" width="592" height="16"/>
+                                    <rect key="frame" x="0.0" y="36" width="580" height="16"/>
                                     <autoresizingMask key="autoresizingMask"/>
                                 </scroller>
                                 <scroller key="verticalScroller" hidden="YES" wantsLayer="YES" verticalHuggingPriority="750" horizontal="NO" id="NnO-QN-vHX">
@@ -206,7 +203,7 @@
                                 </connections>
                             </scrollView>
                             <button verticalHuggingPriority="750" imageHugsTitle="YES" translatesAutoresizingMaskIntoConstraints="NO" id="nQu-I8-OqK" customClass="MouseOverButton" customModule="DuckDuckGo_Privacy_Browser" customModuleProvider="target">
-                                <rect key="frame" x="188" y="89" width="110" height="24"/>
+                                <rect key="frame" x="194" y="99" width="110" height="24"/>
                                 <constraints>
                                     <constraint firstAttribute="width" constant="110" id="fCv-XV-yrO"/>
                                     <constraint firstAttribute="height" constant="24" id="ys9-mF-qNi"/>
@@ -232,7 +229,7 @@
                                 </connections>
                             </button>
                             <button verticalHuggingPriority="750" imageHugsTitle="YES" translatesAutoresizingMaskIntoConstraints="NO" id="96h-Ck-yux" customClass="MouseOverButton" customModule="DuckDuckGo_Privacy_Browser" customModuleProvider="target">
-                                <rect key="frame" x="42" y="89" width="130" height="24"/>
+                                <rect key="frame" x="48" y="99" width="130" height="24"/>
                                 <constraints>
                                     <constraint firstAttribute="height" constant="24" id="CKf-3f-aSt"/>
                                     <constraint firstAttribute="width" constant="130" id="hTU-md-bGM"/>
@@ -259,8 +256,8 @@
                             </button>
                         </subviews>
                         <constraints>
-                            <constraint firstItem="96h-Ck-yux" firstAttribute="leading" secondItem="0G1-O6-fPI" secondAttribute="leading" constant="42" id="0ct-US-dZ7"/>
-                            <constraint firstAttribute="trailing" secondItem="mTh-HU-7C9" secondAttribute="trailing" constant="42" id="72i-pd-gJ1"/>
+                            <constraint firstItem="96h-Ck-yux" firstAttribute="leading" secondItem="0G1-O6-fPI" secondAttribute="leading" constant="48" id="0ct-US-dZ7"/>
+                            <constraint firstAttribute="trailing" secondItem="mTh-HU-7C9" secondAttribute="trailing" constant="48" id="72i-pd-gJ1"/>
                             <constraint firstItem="fLo-NU-bGv" firstAttribute="top" secondItem="96h-Ck-yux" secondAttribute="bottom" constant="24" id="9cg-ih-8W3"/>
                             <constraint firstItem="mTh-HU-7C9" firstAttribute="top" secondItem="fLo-NU-bGv" secondAttribute="bottom" id="Nof-ez-kWz"/>
                             <constraint firstItem="pWh-Hk-YzZ" firstAttribute="leading" secondItem="0G1-O6-fPI" secondAttribute="leading" id="Qru-FU-YrV"/>
@@ -268,13 +265,13 @@
                             <constraint firstAttribute="bottom" secondItem="mTh-HU-7C9" secondAttribute="bottom" id="ZSL-bc-yTD"/>
                             <constraint firstItem="pWh-Hk-YzZ" firstAttribute="top" secondItem="0G1-O6-fPI" secondAttribute="top" id="aGZ-X7-K6H"/>
                             <constraint firstAttribute="trailing" relation="greaterThanOrEqual" secondItem="nQu-I8-OqK" secondAttribute="trailing" constant="20" id="eYV-TZ-5bu"/>
-                            <constraint firstAttribute="trailing" secondItem="fLo-NU-bGv" secondAttribute="trailing" constant="42" id="ep6-4T-swC"/>
+                            <constraint firstAttribute="trailing" secondItem="fLo-NU-bGv" secondAttribute="trailing" constant="58" id="ep6-4T-swC"/>
                             <constraint firstItem="nQu-I8-OqK" firstAttribute="leading" secondItem="96h-Ck-yux" secondAttribute="trailing" constant="16" id="hKM-YS-17O"/>
                             <constraint firstAttribute="trailing" secondItem="pWh-Hk-YzZ" secondAttribute="trailing" id="qXD-FT-b4Y"/>
                             <constraint firstItem="nQu-I8-OqK" firstAttribute="centerY" secondItem="96h-Ck-yux" secondAttribute="centerY" id="qi0-9n-sUF"/>
-                            <constraint firstItem="fLo-NU-bGv" firstAttribute="leading" secondItem="0G1-O6-fPI" secondAttribute="leading" constant="42" id="rWx-rp-2nh"/>
-                            <constraint firstItem="96h-Ck-yux" firstAttribute="top" secondItem="0G1-O6-fPI" secondAttribute="top" constant="42" id="rg7-1o-hhd"/>
-                            <constraint firstItem="mTh-HU-7C9" firstAttribute="leading" secondItem="0G1-O6-fPI" secondAttribute="leading" constant="42" id="rza-vo-ne6"/>
+                            <constraint firstItem="fLo-NU-bGv" firstAttribute="leading" secondItem="0G1-O6-fPI" secondAttribute="leading" constant="58" id="rWx-rp-2nh"/>
+                            <constraint firstItem="96h-Ck-yux" firstAttribute="top" secondItem="0G1-O6-fPI" secondAttribute="top" constant="32" id="rg7-1o-hhd"/>
+                            <constraint firstItem="mTh-HU-7C9" firstAttribute="leading" secondItem="0G1-O6-fPI" secondAttribute="leading" constant="48" id="rza-vo-ne6"/>
                         </constraints>
                     </view>
                     <connections>
