@@ -48,6 +48,7 @@ final class BookmarkManagementSplitViewController: NSSplitViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
 
+        splitView.setValue(NSColor(named: "DividerColor"), forKey: "dividerColor")
         sidebarViewController.delegate = self
         detailViewController.delegate = self
         tabSwitcherButton.displayBrowserTabButtons(withSelectedTab: .bookmarks)
