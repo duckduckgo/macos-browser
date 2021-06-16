@@ -199,8 +199,12 @@ final class BookmarkTableCellView: NSTableCellView, NibLoadable {
         favoriteButton.isHidden = false
         titleLabelBottomConstraint.priority = .defaultLow
 
-        titleLabel.becomeFirstResponder()
         hideTertiaryValueInTitleLabel()
+
+        // Reluctantly use GCD as a workaround for a rare label layout issue, in which the text field shows no text upon becoming first responder.
+        DispatchQueue.main.async {
+            self.titleLabel.becomeFirstResponder()
+        }
     }
 
     private func exitEditingMode() {
