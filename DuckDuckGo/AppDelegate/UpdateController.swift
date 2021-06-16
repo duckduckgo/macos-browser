@@ -35,6 +35,8 @@ final class UpdateController: NSObject {
     }
 
     private func configureUpdater() {
+    // The default configuration of Sparkle updates is in Info.plist
+
 #if DEBUG
         updater.automaticallyChecksForUpdates = false
         updater.updateCheckInterval = 0
