@@ -64,7 +64,8 @@ extension URL {
     static func pixelUrl(forPixelNamed pixelName: String) -> URL {
         let urlString = "\(Self.pixelBase)/t/\(pixelName)"
         let url = URL(string: urlString)!
-        #warning("url = url.addParameter(name: \"atb\", value: statisticsStore.atbWithVariant ?? \"\")")
+        // url = url.addParameter(name: \"atb\", value: statisticsStore.atbWithVariant ?? \"\")")
+        // https://app.asana.com/0/1177771139624306/1199951074455863/f
         return url
     }
 
@@ -178,6 +179,23 @@ extension URL {
                       needsWWW: !input.drop(prefix: self.separatedScheme ?? "").isEmpty
                         && input.drop(prefix: self.separatedScheme ?? "").hasOrIsPrefix(of: URL.HostPrefix.www.rawValue),
                       dropTrailingSlash: false)
+    }
+
+    /// Tries to use the file name part of the URL, if available, adjusting for content type, if available.
+    var suggestedFilename: String? {
+        let url = self
+
+        var filename: String
+        if !url.pathComponents.isEmpty,
+           url.pathComponents != [ "/" ] {
+
+            filename = url.lastPathComponent
+        } else {
+            filename = url.host?.dropWWW().replacingOccurrences(of: ".", with: "_") ?? ""
+        }
+        guard !filename.isEmpty else { return nil }
+
+        return filename
     }
 
     // MARK: - Validity

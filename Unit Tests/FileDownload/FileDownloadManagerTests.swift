@@ -22,10 +22,16 @@ import XCTest
 
 // swiftlint:disable type_body_length
 final class FileDownloadManagerTests: XCTestCase {
+
     private let testGroupName = "test"
     var defaults: UserDefaults!
     var workspace: TestWorkspace!
     var dm: FileDownloadManager!
+    let fm = FileManager.default
+    let testFile = "downloaded file"
+
+    var chooseDestination: ((String?, URL?, [UTType], (URL?, UTType?) -> Void) -> Void)?
+    var fileIconFlyAnimationOriginalRect: ((WebKitDownloadTask) -> NSRect?)?
 
     override func setUp() {
         defaults = UserDefaults(suiteName: testGroupName)!
@@ -34,51 +40,32 @@ final class FileDownloadManagerTests: XCTestCase {
         prefs.alwaysRequestDownloadLocation = false
         self.workspace = TestWorkspace()
         self.dm = FileDownloadManager(workspace: workspace, preferences: DownloadPreferences(userDefaults: defaults))
+        let tempDir = fm.temporaryDirectory
+        for file in (try? fm.contentsOfDirectory(atPath: tempDir.path)) ?? [] where file.hasPrefix(testFile) {
+            try? fm.removeItem(at: tempDir.appendingPathComponent(file))
+        }
     }
 
     override func tearDown() {
         FileManager.restoreUrlsForIn()
-    }
-
-    func testWhenDownloadIsAddedThenItsStarted() {
-        weak var task: FileDownloadTaskMock!
-        let e = expectation(description: "FileDownloadTask instantiated")
-        let download = FileDownloadRequestMock.download(nil, prompt: false) { download in
-            e.fulfill()
-            let downloadTask = FileDownloadTaskMock(download: download)
-            task = downloadTask
-            return task
-        }
-        dm.startDownload(download, postflight: .none)
-
-        waitForExpectations(timeout: 0.3)
-        XCTAssertTrue(task.isStarted)
+        self.chooseDestination = nil
+        self.fileIconFlyAnimationOriginalRect = nil
     }
 
     func testWhenDownloadIsAddedThenItsPublished() {
         let e1 = expectation(description: "empty downloads populated")
         let e2 = expectation(description: "FileDownloadTask populated")
         let cancellable = dm.$downloads.sink { downloads in
-            if let task = downloads.first {
-                XCTAssertTrue(task is FileDownloadTaskMock)
-                e2.fulfill()
-            } else {
+            if downloads.isEmpty {
                 e1.fulfill()
+            } else if downloads.count == 1 {
+                e2.fulfill()
             }
         }
 
-        dm.startDownload(FileDownloadRequestMock.download(nil, prompt: false), postflight: .none)
-        withExtendedLifetime(cancellable) {
-            waitForExpectations(timeout: 0.3)
-        }
-    }
+        let download = WKDownloadMock()
+        dm.add(download, delegate: nil, promptForLocation: false, postflight: .none)
 
-    func testTestWhenDownloadTaskIsNilThenDownloadIsNotAdded() {
-        let e = expectation(description: "empty downloads populated")
-        let cancellable = dm.$downloads.sink { _ in e.fulfill() }
-
-        let download = FileDownloadRequestMock.download(nil, prompt: false) { _ in nil }
-        dm.startDownload(download, postflight: .none)
         withExtendedLifetime(cancellable) {
             waitForExpectations(timeout: 0.3)
         }
@@ -95,14 +82,11 @@ final class FileDownloadManagerTests: XCTestCase {
             }
         }
 
-        let download = FileDownloadRequestMock.download(nil, prompt: false) { download in
-            let task = FileDownloadTaskMock(download: download)
-            task.onStarted = { task in
-                task.finish(with: .failure(.restartResumeNotSupported))
-            }
-            return task
-        }
-        dm.startDownload(download, postflight: .none)
+        let download = WKDownloadMock()
+        dm.add(download, delegate: nil, promptForLocation: false, postflight: .none)
+
+        struct TestError: Error {}
+        download.downloadDelegate?.download?(download, didFailWithError: TestError(), resumeData: nil)
 
         withExtendedLifetime(cancellable) {
             waitForExpectations(timeout: 0.3)
@@ -121,14 +105,10 @@ final class FileDownloadManagerTests: XCTestCase {
             }
         }
 
-        let download = FileDownloadRequestMock.download(nil, prompt: false) { download in
-            let task = FileDownloadTaskMock(download: download)
-            task.onStarted = { task in
-                task.finish(with: .success(URL(fileURLWithPath: "/")))
-            }
-            return task
-        }
-        dm.startDownload(download, postflight: .none)
+        let download = WKDownloadMock()
+        dm.add(download, delegate: nil, promptForLocation: false, postflight: .none)
+
+        download.downloadDelegate?.downloadDidFinish?(download)
 
         withExtendedLifetime(cancellable) {
             waitForExpectations(timeout: 0.3)
@@ -137,169 +117,133 @@ final class FileDownloadManagerTests: XCTestCase {
     }
 
     func testWhenRequiredByDownloadRequestThenDownloadLocationChooserIsCalled() {
-        let url = URL(string: "https://duckduckgo.com/somefile.html")!
         var prefs = DownloadPreferences(userDefaults: defaults)
-        let downloadsURL = FileManager.default.temporaryDirectory
+        let downloadsURL = fm.temporaryDirectory
         prefs.selectedDownloadLocation = downloadsURL
 
-        let localURL = URL(fileURLWithPath: "/test/path")
-        let e1 = expectation(description: "localFileURLCompletionHandler called")
-        let download = FileDownloadRequestMock.download(url, prompt: true) { download in
-            let task = FileDownloadTaskMock(download: download)
-            task.onStarted = { $0.queryDestinationURL() }
-            task.onLocalFileURLChosen = { url, fileType in
-                XCTAssertEqual(url, localURL)
-                XCTAssertEqual(fileType, .pdf)
-                e1.fulfill()
-            }
-            task.fileTypes = [.html, .jpeg]
-            return task
+        let e1 = expectation(description: "chooseDestinationCallback called")
+        self.chooseDestination = { suggestedFilename, directoryURL, fileTypes, callback in
+            dispatchPrecondition(condition: .onQueue(.main))
+            XCTAssertEqual(suggestedFilename, "suggested.filename")
+            XCTAssertEqual(directoryURL, downloadsURL)
+            XCTAssertEqual(fileTypes, [.pdf])
+            e1.fulfill()
+
+            callback(nil, nil)
         }
 
-        let e2 = expectation(description: "chooseDestinationCallback called")
-        dm.startDownload(download,
-                         chooseDestinationCallback: { suggestedFilename, directoryURL, fileTypes, callback in
-                            dispatchPrecondition(condition: .onQueue(.main))
-                            XCTAssertEqual(suggestedFilename, "somefile")
-                            XCTAssertEqual(directoryURL, downloadsURL)
-                            XCTAssertEqual(fileTypes, [.html, .jpeg])
-                            e2.fulfill()
+        let download = WKDownloadMock()
+        dm.add(download, delegate: self, promptForLocation: true, postflight: .none)
 
-                            callback(localURL, .pdf)
-                         },
-                         postflight: .none)
+        let url = URL(string: "https://duckduckgo.com/somefile.html")!
+        let response = URLResponse(url: url, mimeType: UTType.pdf.mimeType, expectedContentLength: 1, textEncodingName: "utf-8")
+        let e2 = expectation(description: "WKDownload callback called")
+        download.downloadDelegate?.download(download,
+                                            decideDestinationUsing: response,
+                                            suggestedFilename: "suggested.filename") { url in
+            XCTAssertNil(url)
+            e2.fulfill()
+        }
 
         waitForExpectations(timeout: 0.3)
     }
 
     func testWhenRequiredByPreferencesThenDownloadLocationChooserIsCalled() {
-        let url = URL(string: "https://duckduckgo.com/somefile.html")!
         var prefs = DownloadPreferences(userDefaults: defaults)
         prefs.alwaysRequestDownloadLocation = true
-        let downloadsURL = FileManager.default.temporaryDirectory
+        let downloadsURL = fm.temporaryDirectory
         prefs.selectedDownloadLocation = downloadsURL
 
-        let localURL = URL(fileURLWithPath: "/test/path")
-        let e1 = expectation(description: "localFileURLCompletionHandler called")
-        let download = FileDownloadRequestMock.download(url, prompt: false) { download in
-            let task = FileDownloadTaskMock(download: download)
-            task.onStarted = { $0.queryDestinationURL() }
-            task.onLocalFileURLChosen = { url, fileType in
-                XCTAssertEqual(url, localURL)
-                XCTAssertEqual(fileType, .pdf)
-                e1.fulfill()
-            }
-            task.fileTypes = [.html, .jpeg]
-            return task
+        let localURL = downloadsURL.appendingPathComponent(testFile)
+        let e1 = expectation(description: "chooseDestinationCallback called")
+        self.chooseDestination = { suggestedFilename, directoryURL, fileTypes, callback in
+            dispatchPrecondition(condition: .onQueue(.main))
+            XCTAssertEqual(suggestedFilename, "suggested.filename")
+            XCTAssertEqual(directoryURL, downloadsURL)
+            XCTAssertEqual(fileTypes, [.html])
+            e1.fulfill()
+
+            callback(localURL, .html)
         }
 
-        let e2 = expectation(description: "chooseDestinationCallback called")
-        dm.startDownload(download,
-                         chooseDestinationCallback: { suggestedFilename, directoryURL, fileTypes, callback in
-                            dispatchPrecondition(condition: .onQueue(.main))
-                            XCTAssertEqual(suggestedFilename, "somefile")
-                            XCTAssertEqual(directoryURL, downloadsURL)
-                            XCTAssertEqual(fileTypes, [.html, .jpeg])
-                            e2.fulfill()
+        let download = WKDownloadMock()
+        dm.add(download, delegate: self, promptForLocation: false, postflight: .none)
 
-                            callback(localURL, .pdf)
-                         },
-                         postflight: .none)
+        let url = URL(string: "https://duckduckgo.com/somefile.html")!
+        let response = URLResponse(url: url, mimeType: UTType.html.mimeType, expectedContentLength: 1, textEncodingName: "utf-8")
+        let e2 = expectation(description: "WKDownload callback called")
+        download.downloadDelegate?.download(download,
+                                            decideDestinationUsing: response,
+                                            suggestedFilename: "suggested.filename") { url in
+            dispatchPrecondition(condition: .onQueue(.main))
+            XCTAssertEqual(url, localURL.appendingPathExtension(WebKitDownloadTask.downloadExtension))
+            e2.fulfill()
+        }
 
         waitForExpectations(timeout: 0.3)
     }
 
     func testWhenChosenDownloadLocationExistsThenItsOverwritten() {
-        let localURL = FileManager.default.temporaryDirectory.appendingPathComponent(.uniqueFilename())
-        FileManager.default.createFile(atPath: localURL.path, contents: nil, attributes: nil)
-        XCTAssertTrue(FileManager.default.fileExists(atPath: localURL.path))
+        let localURL = fm.temporaryDirectory.appendingPathComponent(testFile + ".jpg")
+        fm.createFile(atPath: localURL.path, contents: nil, attributes: nil)
+        XCTAssertTrue(fm.fileExists(atPath: localURL.path))
 
-        let download = FileDownloadRequestMock.download(nil, prompt: true) { download in
-            let task = FileDownloadTaskMock(download: download)
-            task.onStarted = { $0.queryDestinationURL() }
-            return task
+        let download = WKDownloadMock()
+        dm.add(download, delegate: self, promptForLocation: true, postflight: .none)
+        self.chooseDestination = { _, _, _, callback in
+            callback(localURL, nil)
         }
 
-        let e = expectation(description: "chooseDestinationCallback called")
-        dm.startDownload(download,
-                         chooseDestinationCallback: { _, _, _, callback in
-                            e.fulfill()
-                            callback(localURL, nil)
-                         },
-                         postflight: .none)
+        let e = expectation(description: "WKDownload called")
+        download.downloadDelegate?.download(download, decideDestinationUsing: nil, suggestedFilename: "suggested.filename") { url in
+            XCTAssertEqual(url, localURL.appendingPathExtension(WebKitDownloadTask.downloadExtension))
+            e.fulfill()
+        }
 
         waitForExpectations(timeout: 0.3)
 
-        XCTAssertFalse(FileManager.default.fileExists(atPath: localURL.path))
+        XCTAssertFalse(fm.fileExists(atPath: localURL.path))
     }
 
     func testWhenNotRequiredByPreferencesThenDefaultDownloadLocationIsChosen() {
-        let url = URL(string: "https://duckduckgo.com/somefile.pdf")!
         var prefs = DownloadPreferences(userDefaults: defaults)
-        let downloadsURL = FileManager.default.temporaryDirectory
+        let downloadsURL = fm.temporaryDirectory
         prefs.selectedDownloadLocation = downloadsURL
 
-        let e = expectation(description: "localFileURLCompletionHandler called")
-        let download = FileDownloadRequestMock.download(url, prompt: false) { download in
-            let task = FileDownloadTaskMock(download: download)
-            task.fileTypes = [.pdf]
-            task.onStarted = { $0.queryDestinationURL() }
-            task.onLocalFileURLChosen = { url, fileType in
-                XCTAssertEqual(url, downloadsURL.appendingPathComponent("somefile.pdf"))
-                XCTAssertEqual(fileType, .pdf)
-                e.fulfill()
-            }
-            return task
+        let download = WKDownloadMock()
+        dm.add(download, delegate: self, promptForLocation: false, postflight: .none)
+        self.chooseDestination = { _, _, _, _ in
+            XCTFail("Unpected chooseDestination call")
         }
 
-        dm.startDownload(download,
-                         chooseDestinationCallback: { _, _, _, _ in
-                            XCTFail("chooseDestinationCallback shouldn't be called")
-                         },
-                         postflight: .none)
+        let e = expectation(description: "WKDownload called")
+        download.downloadDelegate?.download(download, decideDestinationUsing: nil, suggestedFilename: testFile) { [testFile] url in
+            XCTAssertEqual(url, downloadsURL.appendingPathComponent(testFile).appendingPathExtension(WebKitDownloadTask.downloadExtension))
+            e.fulfill()
+        }
 
         waitForExpectations(timeout: 0.3)
     }
 
     func testWhenSuggestedFilenameIsEmptyThenItsUniquelyGenerated() {
         var prefs = DownloadPreferences(userDefaults: defaults)
-        let downloadsURL = FileManager.default.temporaryDirectory
+        let downloadsURL = fm.temporaryDirectory
         prefs.selectedDownloadLocation = downloadsURL
 
-        let e1 = expectation(description: "localFileURLCompletionHandler1 called")
-        var localURL: URL!
-        let download1 = FileDownloadRequestMock.download(nil, prompt: false) { download in
-            let task = FileDownloadTaskMock(download: download)
-            task.filename = ""
-            task.onStarted = { $0.queryDestinationURL() }
-            task.onLocalFileURLChosen = { url, fileType in
-                localURL = url
-                XCTAssertEqual(url?.deletingLastPathComponent(), downloadsURL)
-                XCTAssertNil(fileType)
-                e1.fulfill()
-            }
-            return task
+        let download = WKDownloadMock()
+        dm.add(download, delegate: self, promptForLocation: false, postflight: .none)
+        self.chooseDestination = { _, _, _, _ in
+            XCTFail("Unpected chooseDestination call")
         }
 
-        dm.startDownload(download1, postflight: .none)
-        waitForExpectations(timeout: 0.3)
-
-        FileManager.default.createFile(atPath: localURL.path, contents: nil, attributes: nil)
-        let e2 = expectation(description: "localFileURLCompletionHandler2 called")
-        let download2 = FileDownloadRequestMock.download(nil, prompt: false) { download in
-            let task = FileDownloadTaskMock(download: download)
-            task.filename = ""
-            task.onStarted = { $0.queryDestinationURL() }
-            task.onLocalFileURLChosen = { url, fileType in
-                XCTAssertEqual(url?.deletingLastPathComponent(), downloadsURL)
-                XCTAssertNotEqual(url, localURL)
-                XCTAssertNil(fileType)
-                e2.fulfill()
-            }
-            return task
+        let e = expectation(description: "WKDownload called")
+        download.downloadDelegate?.download(download, decideDestinationUsing: nil, suggestedFilename: "") { url in
+            XCTAssertEqual(url?.pathExtension, WebKitDownloadTask.downloadExtension)
+            XCTAssertTrue(url?.lastPathComponent.count ?? 0 > WebKitDownloadTask.downloadExtension.count + 1)
+            XCTAssertEqual(url?.deletingLastPathComponent(), downloadsURL)
+            e.fulfill()
         }
 
-        dm.startDownload(download2, postflight: .none)
         waitForExpectations(timeout: 0.3)
     }
 
@@ -310,98 +254,100 @@ final class FileDownloadManagerTests: XCTestCase {
             [URL(fileURLWithPath: "/")]
         }
 
-        let e = expectation(description: "localFileURLCompletionHandler called")
-        let download = FileDownloadRequestMock.download(nil, prompt: false) { download in
-            let task = FileDownloadTaskMock(download: download)
-            task.onStarted = { $0.queryDestinationURL() }
-            task.onLocalFileURLChosen = { url, fileType in
-                XCTAssertNil(url)
-                XCTAssertNil(fileType)
-                e.fulfill()
+        let download = WKDownloadMock()
+        dm.add(download, delegate: self, promptForLocation: false, postflight: .none)
+
+        let e1 = expectation(description: "FileDownloadTask populated")
+        let e2 = expectation(description: "empty downloads populated")
+        let cancellable = dm.$downloads.sink { downloads in
+            if downloads.count == 1 {
+                e1.fulfill()
+            } else {
+                e2.fulfill()
             }
-            return task
         }
 
-        dm.startDownload(download, postflight: .none)
-        waitForExpectations(timeout: 0.3)
+        let e3 = expectation(description: "WKDownload called")
+        download.downloadDelegate?.download(download, decideDestinationUsing: nil, suggestedFilename: "") { url in
+            XCTAssertNil(url)
+            e3.fulfill()
+        }
+
+        withExtendedLifetime(cancellable) {
+            waitForExpectations(timeout: 0.3)
+        }
+    }
+
+    func performPostflightTest(at url: URL, with postflight: FileDownloadManager.PostflightAction?, completion: @escaping (Selector, [URL]) -> Void) {
+        let download = WKDownloadMock()
+        let task = dm.add(download, delegate: self, promptForLocation: true, postflight: postflight)
+        chooseDestination = { _, _, _, callback in
+            callback(url, nil)
+        }
+        self.workspace.callback = { sel, urls in
+            completion(sel, urls)
+        }
+
+        download.downloadDelegate?.download(download, decideDestinationUsing: nil, suggestedFilename: "") { [fm] url in
+            fm.createFile(atPath: url!.path, contents: nil, attributes: nil)
+        }
+
+        let e = expectation(description: "WKDownload completed")
+        let cancellable = task.output.sink { completion in
+            if case .failure(let error) = completion {
+                XCTFail("download failed with \(error)")
+            }
+            e.fulfill()
+        } receiveValue: { dest in
+            XCTAssertEqual(dest, url)
+        }
+
+        download.downloadDelegate?.downloadDidFinish?(download)
+
+        withExtendedLifetime(cancellable) {
+            waitForExpectations(timeout: 0.3)
+        }
     }
 
     func testWhenNoPostflightThenNoWorkspaceCalls() {
-        let url = URL(string: "https://duckduckgo.com/somefile.pdf")!
-        let localURL = URL(fileURLWithPath: "/test/download/path")
-
-        let e = expectation(description: "Task finished")
-        let download = FileDownloadRequestMock.download(url, prompt: false) { download in
-            let task = FileDownloadTaskMock(download: download)
-            task.fileTypes = [.pdf]
-            task.onStarted = { $0.queryDestinationURL() }
-            task.onLocalFileURLChosen = { [unowned task] _, _ in
-                task.finish(with: .success(localURL))
-                e.fulfill()
-            }
-            return task
-        }
-
-        self.workspace.callback = { _, _ in
+        let localURL = fm.temporaryDirectory.appendingPathComponent(testFile)
+        performPostflightTest(at: localURL, with: .none) { _, _ in
             XCTFail("Unexpected workspace call")
         }
-
-        dm.startDownload(download, postflight: .none)
-        waitForExpectations(timeout: 0.3)
     }
 
     func testWhenPostflightIsOpenThenFileIsOpened() {
-        let url = URL(string: "https://duckduckgo.com/somefile.pdf")!
-        let localURL = URL(fileURLWithPath: "/test/download/path")
-
-        let download = FileDownloadRequestMock.download(url, prompt: false) { download in
-            let task = FileDownloadTaskMock(download: download)
-            task.fileTypes = [.pdf]
-            task.onStarted = { $0.queryDestinationURL() }
-            task.onLocalFileURLChosen = { [unowned task] _, _ in
-                task.finish(with: .success(localURL))
-            }
-            return task
-        }
-
+        let localURL = fm.temporaryDirectory.appendingPathComponent(testFile)
         let e = expectation(description: "Open File postflight called")
-        self.workspace.callback = { sel, urls in
+        performPostflightTest(at: localURL, with: .open) { (sel, urls) in
             XCTAssertEqual(sel, #selector(NSWorkspace.open(_:)))
             XCTAssertEqual(urls, [localURL])
             e.fulfill()
         }
-
-        dm.startDownload(download, postflight: .open)
-        waitForExpectations(timeout: 0.3)
     }
 
     func testWhenPostflightIsRevealThenFileIsRevealed() {
-        let url = URL(string: "https://duckduckgo.com/somefile.pdf")!
-        let localURL = URL(fileURLWithPath: "/test/download/path")
-
-        let download = FileDownloadRequestMock.download(url, prompt: false) { download in
-            let task = FileDownloadTaskMock(download: download)
-            task.fileTypes = [.pdf]
-            task.onStarted = { $0.queryDestinationURL() }
-            task.onLocalFileURLChosen = { [unowned task] _, _ in
-                task.finish(with: .success(localURL))
-            }
-            return task
-        }
-
+        let localURL = fm.temporaryDirectory.appendingPathComponent(testFile)
         let e = expectation(description: "Open File postflight called")
-        self.workspace.callback = { sel, urls in
+        performPostflightTest(at: localURL, with: .reveal) { (sel, urls) in
             XCTAssertEqual(sel, #selector(NSWorkspace.activateFileViewerSelecting(_:)))
             XCTAssertEqual(urls, [localURL])
             e.fulfill()
         }
-
-        dm.startDownload(download, postflight: .reveal)
-        waitForExpectations(timeout: 0.3)
     }
 
 }
 // swiftlint:enable type_body_length
+
+extension FileDownloadManagerTests: FileDownloadManagerDelegate {
+    func chooseDestination(suggestedFilename: String?, directoryURL: URL?, fileTypes: [UTType], callback: @escaping (URL?, UTType?) -> Void) {
+        self.chooseDestination?(suggestedFilename, directoryURL, fileTypes, callback)
+    }
+
+    func fileIconFlyAnimationOriginalRect(for downloadTask: WebKitDownloadTask) -> NSRect? {
+        self.fileIconFlyAnimationOriginalRect?(downloadTask)
+    }
+}
 
 final class TestWorkspace: NSWorkspace {
     var callback: ((Selector, [URL]) -> Void)?

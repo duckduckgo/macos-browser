@@ -53,7 +53,7 @@ final class FindInPageUserScript: NSObject, StaticUserScript {
     }
 
     private func evaluate(js: String, inWebView webView: WKWebView) {
-        if #available(OSX 11.0, *) {
+        if #available(macOS 11.0, *) {
             webView.evaluateJavaScript(js, in: nil, in: WKContentWorld.defaultClient)
         } else {
             webView.evaluateJavaScript(js)

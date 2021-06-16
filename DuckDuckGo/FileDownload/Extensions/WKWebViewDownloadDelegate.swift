@@ -1,6 +1,5 @@
 //
-//  WKWebViewSessionDataTests.swift
-//  DuckDuckGo
+//  WKWebViewDownloadDelegate.swift
 //
 //  Copyright © 2021 DuckDuckGo. All rights reserved.
 //
@@ -17,20 +16,11 @@
 //  limitations under the License.
 //
 
-import XCTest
 import WebKit
-@testable import DuckDuckGo_Privacy_Browser
 
-final class WKWebViewSessionStateAvailabilityTests: XCTestCase {
+protocol WKWebViewDownloadDelegate: AnyObject {
 
-    func testWebViewRespondsTo_sessionStateData() {
-        let webView = WebView.init(frame: CGRect(), configuration: .init())
+    func webView(_ webView: WKWebView, navigationAction: WKNavigationAction, didBecomeDownload download: WebKitDownload)
+    func webView(_ webView: WKWebView, navigationResponse: WKNavigationResponse, didBecomeDownload download: WebKitDownload)
 
-        XCTAssertNoThrow(try XCTAssertNotNil(webView.sessionStateData()))
-    }
-
-    func testWebViewRespondsTo_restoreFromSessionStateData() {
-        let webView = WebView(frame: CGRect(), configuration: .init())
-        XCTAssertNoThrow(try webView.restoreSessionState(from: Data()))
-    }
 }

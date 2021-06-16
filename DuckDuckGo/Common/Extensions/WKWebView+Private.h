@@ -17,13 +17,23 @@
 //  limitations under the License.
 //
 #import <WebKit/WebKit.h>
+#import "_WKDownload.h"
+
+NS_ASSUME_NONNULL_BEGIN
 
 @interface WKWebView (Private)
 
-- (void)_restoreFromSessionStateData:(NSData * _Nonnull)data;
+- (void)_restoreFromSessionStateData:(NSData *)data;
 - (NSData * _Nullable)_sessionStateData;
 
-- (void)createWebArchiveDataWithCompletionHandler:(void (^ _Nonnull)(NSData * _Nullable, NSError * _Nullable))completionHandler;
-- (void)createPDFWithConfiguration:(id _Nullable)pdfConfiguration completionHandler:(void (^ _Nonnull)(NSData * _Nullable pdfDocumentData, NSError * _Nullable error))completionHandler;
+- (void)createWebArchiveDataWithCompletionHandler:(void (^)(NSData * _Nullable, NSError * _Nullable))completionHandler;
+- (void)createPDFWithConfiguration:(id _Nullable)pdfConfiguration completionHandler:(void (^)(NSData * _Nullable pdfDocumentData, NSError * _Nullable error))completionHandler;
+
+#ifndef __MAC_11_3
+- (void)startDownloadUsingRequest:(NSURLRequest *)request completionHandler:(void(^)(_WKDownload *))completionHandler;
+- (void)resumeDownloadFromResumeData:(NSData *)resumeData completionHandler:(void(^)(_WKDownload *))completionHandler;
+#endif
 
 @end
+
+NS_ASSUME_NONNULL_END

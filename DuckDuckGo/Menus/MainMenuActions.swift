@@ -296,7 +296,7 @@ extension MainViewController {
 
     @IBAction func printWebView(_ sender: Any?) {
         guard let webView = tabCollectionViewModel.selectedTabViewModel?.tab.webView else { return }
-        if #available(OSX 11.0, *) {
+        if #available(macOS 11.0, *) {
             // This might crash when running from Xcode, hit resume and it should be fine.
             // Release builds work fine.
             webView.printOperation(with: NSPrintInfo.shared).run()
@@ -311,14 +311,7 @@ extension MainViewController {
             return
         }
 
-        let webView = tabViewModel.tab.webView
-        webView.getMimeType { mimeType in
-            let download = FileDownload.webContent(webView, mimeType: mimeType)
-            FileDownloadManager.shared.startDownload(download,
-                                                     chooseDestinationCallback: self.browserTabViewController.chooseDestination,
-                                                     fileIconOriginalRectCallback: self.browserTabViewController.fileIconFlyAnimationOriginalRect,
-                                                     postflight: .reveal)
-        }
+        tabViewModel.tab.saveWebContentAs()
     }
 
     // MARK: - Debug

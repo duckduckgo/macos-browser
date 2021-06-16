@@ -297,8 +297,6 @@ extension ProgressView {
         static func nextStep(for currentProgress: Double,
                              lastProgressEvent: ProgressEvent?,
                              milestones: [ProgressEvent] = Constants.milestones) -> Self? {
-            assert(currentProgress >= lastProgressEvent?.progress ?? 0)
-
             var estimatedElapsedTime: CFTimeInterval = 0.0
             var nextStepIdx: Int!
 

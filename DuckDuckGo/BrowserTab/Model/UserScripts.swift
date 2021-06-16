@@ -23,34 +23,33 @@ final class UserScripts {
 
     let pageObserverScript = PageObserverUserScript()
     let faviconScript = FaviconUserScript()
-    let html5downloadScript = HTML5DownloadUserScript()
     let contextMenuScript = ContextMenuUserScript()
     let findInPageScript = FindInPageUserScript()
     let loginDetectionUserScript = LoginFormDetectionUserScript()
     let contentBlockerScript = ContentBlockerUserScript()
     let contentBlockerRulesScript = ContentBlockerRulesUserScript()
-    let emailScript = EmailUserScript()
+    let autofillScript = AutofillUserScript()
     let debugScript = DebugUserScript()
 
     init() {
     }
 
     init(copy other: UserScripts) {
-        // copy compiled scripts to avoid repeated loading from disk
-        self.scripts = other.scripts
+        scripts = other.scripts
+        scripts.removeLast()
+        scripts.append(autofillScript.makeWKUserScript())
     }
 
     lazy var userScripts: [UserScript] = [
         self.debugScript,
         self.faviconScript,
-        self.html5downloadScript,
         self.contextMenuScript,
         self.findInPageScript,
         self.loginDetectionUserScript,
         self.contentBlockerScript,
         self.contentBlockerRulesScript,
-        self.emailScript,
-        self.pageObserverScript
+        self.pageObserverScript,
+        self.autofillScript
     ]
 
     lazy var scripts = userScripts.map { $0.makeWKUserScript() }

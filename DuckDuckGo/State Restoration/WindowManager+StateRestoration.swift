@@ -31,17 +31,21 @@ extension WindowsManager {
     }
 
     private class func restoreWindows(from state: WindowManagerStateRestoration) {
-        var keyWindow: NSWindow?
+        let isOriginalKeyWindowPresent = Self.windows.contains(where: {$0.isKeyWindow})
+
+        var newKeyWindow: NSWindow?
         for (idx, item) in state.windows.enumerated() {
-            guard let window = self.openNewWindow(with: item.model) else { continue }
+            guard let window = self.openNewWindow(with: item.model, showWindow: false) else { continue }
             window.setContentSize(item.frame.size)
             window.setFrameOrigin(item.frame.origin)
 
             if idx == state.keyWindowIndex {
-                keyWindow = window
+                newKeyWindow = window
             }
         }
-        keyWindow?.makeKeyAndOrderFront(self)
+        if !isOriginalKeyWindowPresent {
+            newKeyWindow?.makeKeyAndOrderFront(self)
+        }
 
         if !state.windows.isEmpty {
             NSApp.activate(ignoringOtherApps: true)
@@ -95,7 +99,8 @@ final class WindowManagerStateRestoration: NSObject, NSSecureCoding {
     }
 
     func encode(with coder: NSCoder) {
-        #warning("Skip Private Windows coding")
+        // Skip Private Windows coding
+        // https://app.asana.com/0/1199230911884351/1200381133504358/f
 
         coder.encode(windows as NSArray, forKey: NSCodingKeys.controllers)
         keyWindowIndex.map(coder.encode(forKey: NSCodingKeys.keyWindowIndex))

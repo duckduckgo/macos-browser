@@ -93,7 +93,7 @@ extension String {
     }
 
     func dropWWW() -> String {
-        self.drop(prefix: URL.HostPrefix.www.rawValue)
+        self.drop(prefix: URL.HostPrefix.www.separated())
     }
 
     static func uniqueFilename(for fileType: UTType? = nil) -> String {
