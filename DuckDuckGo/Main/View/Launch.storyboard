@@ -10,7 +10,6 @@
             <objects>
                 <customObject id="Voe-Tx-rLC" customClass="AppDelegate" customModule="DuckDuckGo_Privacy_Browser" customModuleProvider="target"/>
                 <customObject id="Ady-hI-5gd" userLabel="First Responder" customClass="NSResponder" sceneMemberID="firstResponder"/>
-                <customObject id="MM4-nS-AZ0" customClass="SUUpdater"/>
                 <customObject id="YLy-65-1bz" customClass="NSFontManager"/>
                 <application id="hnw-xV-0zn" sceneMemberID="viewController">
                     <menu key="mainMenu" title="Main Menu" systemMenu="main" id="AYu-sK-qS6" customClass="MainMenu" customModule="DuckDuckGo_Privacy_Browser" customModuleProvider="target">
@@ -40,7 +39,7 @@
                                         <menuItem title="Check for Updates..." id="RbH-ua-rrN">
                                             <modifierMask key="keyEquivalentModifierMask"/>
                                             <connections>
-                                                <action selector="checkForUpdates:" target="MM4-nS-AZ0" id="Omk-J9-rr5"/>
+                                                <action selector="checkForUpdates:" target="Ady-hI-5gd" id="Xyf-1S-VhK"/>
                                             </connections>
                                         </menuItem>
                                         <menuItem isSeparatorItem="YES" id="gNj-hj-EIc"/>

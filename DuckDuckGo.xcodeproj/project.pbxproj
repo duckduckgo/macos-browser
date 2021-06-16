@@ -238,6 +238,7 @@
 		AAC9C01724CAFBDC00AD1325 /* TabCollectionTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = AAC9C01624CAFBDC00AD1325 /* TabCollectionTests.swift */; };
 		AAC9C01C24CB594C00AD1325 /* TabViewModelTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = AAC9C01B24CB594C00AD1325 /* TabViewModelTests.swift */; };
 		AAC9C01E24CB6BEB00AD1325 /* TabCollectionViewModelTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = AAC9C01D24CB6BEB00AD1325 /* TabCollectionViewModelTests.swift */; };
+		AAD86E52267A0DFF005C11BE /* UpdateController.swift in Sources */ = {isa = PBXBuildFile; fileRef = AAD86E51267A0DFF005C11BE /* UpdateController.swift */; };
 		AAE39D1B24F44885008EF28B /* TabCollectionViewModelDelegateMock.swift in Sources */ = {isa = PBXBuildFile; fileRef = AAE39D1A24F44885008EF28B /* TabCollectionViewModelDelegateMock.swift */; };
 		AAE71E2C25F781EA00D74437 /* Homepage.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = AAE71E2B25F781EA00D74437 /* Homepage.storyboard */; };
 		AAE71E3125F7855400D74437 /* HomepageViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = AAE71E3025F7855400D74437 /* HomepageViewController.swift */; };
@@ -594,6 +595,7 @@
 		AAC9C01B24CB594C00AD1325 /* TabViewModelTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TabViewModelTests.swift; sourceTree = "<group>"; };
 		AAC9C01D24CB6BEB00AD1325 /* TabCollectionViewModelTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TabCollectionViewModelTests.swift; sourceTree = "<group>"; };
 		AAD86E502678D104005C11BE /* DuckDuckGo Privacy Browser.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = "DuckDuckGo Privacy Browser.entitlements"; sourceTree = "<group>"; };
+		AAD86E51267A0DFF005C11BE /* UpdateController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UpdateController.swift; sourceTree = "<group>"; };
 		AAE39D1A24F44885008EF28B /* TabCollectionViewModelDelegateMock.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TabCollectionViewModelDelegateMock.swift; sourceTree = "<group>"; };
 		AAE71E2B25F781EA00D74437 /* Homepage.storyboard */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; path = Homepage.storyboard; sourceTree = "<group>"; };
 		AAE71E3025F7855400D74437 /* HomepageViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HomepageViewController.swift; sourceTree = "<group>"; };
@@ -1151,6 +1153,7 @@
 				AA585D81248FD31100E9A3E2 /* AppDelegate.swift */,
 				AA4D700625545EF800C3411E /* UrlEventListener.swift */,
 				AA4FF40B2624751A004E2377 /* GrammarCheckEnabler.swift */,
+				AAD86E51267A0DFF005C11BE /* UpdateController.swift */,
 			);
 			path = AppDelegate;
 			sourceTree = "<group>";
@@ -2313,6 +2316,7 @@
 				B6A9E45C261460350067D1B9 /* APIRequest.swift in Sources */,
 				AA9FF95D24A1FA1C0039E328 /* TabCollection.swift in Sources */,
 				4B65143E263924B5005B46EB /* EmailUrlExtensions.swift in Sources */,
+				AAD86E52267A0DFF005C11BE /* UpdateController.swift in Sources */,
 				85A0118225AF60E700FA6A0C /* FindInPageModel.swift in Sources */,
 				B6DA44022616B28300DD1EC2 /* PixelDataStore.swift in Sources */,
 				B6A9E45326142B070067D1B9 /* Pixel.swift in Sources */,

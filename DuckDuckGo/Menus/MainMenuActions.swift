@@ -25,6 +25,12 @@ import os.log
 
 extension AppDelegate {
 
+    // MARK: - DuckDuckGo
+
+    @IBAction func checkForUpdates(_ sender: Any?) {
+        updateController.checkForUpdates(sender)
+    }
+
     // MARK: - File
 
     @IBAction func newWindow(_ sender: Any?) {
