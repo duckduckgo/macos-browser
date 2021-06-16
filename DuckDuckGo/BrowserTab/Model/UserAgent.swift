@@ -25,25 +25,20 @@ enum UserAgent {
 
     static let `default` = UserAgent.safari
 
-    static let domainUserAgents = [
-        "mail.google.com": UserAgent.safari,
-        "*.google.com": UserAgent.chrome
+    static let domainUserAgents: KeyValuePairs<RegEx, String> = [
+        // fix broken spreadsheets
+        regex("https://docs\\.google\\.com/spreadsheets/.*"): UserAgent.chrome,
+        regex("https://ogs\\.google\\.com/u/0/widget/app.*?origin=https\\%3A\\%2F\\%2Fdocs\\.google\\.com"): UserAgent.chrome
     ]
 
-    static func forDomain(_ domain: String) -> String {
-        if let agent = domainUserAgents[domain] ?? domainUserAgents["*." + domain] {
-            return agent
-        }
-
-        let components = domain.split(separator: ".")
-        guard components.count > 1 else {
+    static func `for`(_ url: URL?) -> String {
+        guard let absoluteString = url?.absoluteString else {
             return Self.default
         }
 
-        for i in 1..<(components.count - 1) {
-            let wildcard = "*." + components[i...].joined(separator: ".")
-            if let agent = domainUserAgents[wildcard] {
-                return agent
+        for (regex, userAgent) in domainUserAgents {
+            if absoluteString.matches(regex) {
+                return userAgent
             }
         }
 
