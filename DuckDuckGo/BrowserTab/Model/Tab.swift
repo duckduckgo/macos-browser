@@ -34,6 +34,7 @@ protocol TabDelegate: FileDownloadManagerDelegate {
 }
 
 // swiftlint:disable type_body_length
+// swiftlint:disable file_length
 final class Tab: NSObject {
 
     enum TabType: Int, CaseIterable {
@@ -727,3 +728,4 @@ fileprivate extension WKNavigationAction {
     }
 }
 // swiftlint:enable type_body_length
+// swiftlint:enable file_length
