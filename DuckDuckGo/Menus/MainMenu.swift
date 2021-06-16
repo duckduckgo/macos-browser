@@ -120,17 +120,14 @@ final class MainMenu: NSMenu {
                 let menuItem = NSMenuItem(bookmarkViewModel: viewModel)
 
                 if let folder = viewModel.entity as? BookmarkFolder {
-                    // Avoid creating a submenu for empty folders.
-                    guard !folder.isEmpty else {
-                        continue
-                    }
-
                     let subMenu = NSMenu(title: folder.title)
                     let childViewModels = folder.children.map(BookmarkViewModel.init)
                     let childMenuItems = bookmarkMenuItems(from: childViewModels)
                     subMenu.items = childMenuItems
 
-                    menuItem.submenu = subMenu
+                    if !subMenu.items.isEmpty {
+                        menuItem.submenu = subMenu
+                    }
                 }
 
                 menuItems.append(menuItem)
