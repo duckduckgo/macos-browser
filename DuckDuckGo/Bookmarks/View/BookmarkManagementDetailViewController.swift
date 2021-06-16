@@ -343,6 +343,13 @@ extension BookmarkManagementDetailViewController: NSTableViewDelegate, NSTableVi
     }
 
     func tableView(_ tableView: NSTableView, acceptDrop info: NSDraggingInfo, row: Int, dropOperation: NSTableView.DropOperation) -> Bool {
+        let draggingLocation = info.draggingLocation
+        let draggingLocationInTableViewCoordinates = tableView.convert(draggingLocation, to: nil)
+        let draggingLocationRow = tableView.row(at: draggingLocationInTableViewCoordinates)
+
+        // Prevent drops from being accepted below the final row in the table view. Should likely use an outline view here instead of hacking this in.
+        guard draggingLocationRow != -1 else { return false }
+
         guard let parent = fetchEntity(at: row) as? BookmarkFolder else { return false }
 
         let draggedBookmarks = PasteboardBookmark.pasteboardBookmarks(with: info.draggingPasteboard) ?? Set<PasteboardBookmark>()

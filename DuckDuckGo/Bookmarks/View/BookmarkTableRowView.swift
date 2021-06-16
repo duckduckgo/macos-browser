@@ -21,12 +21,13 @@ import Foundation
 final class BookmarkTableRowView: NSTableRowView {
 
     var editing = false
-    var trackingArea: NSTrackingArea?
     var mouseInside: Bool = false {
         didSet {
             needsDisplay = true
         }
     }
+
+    private var trackingArea: NSTrackingArea?
 
     override func drawBackground(in dirtyRect: NSRect) {
         backgroundColor.setFill()
