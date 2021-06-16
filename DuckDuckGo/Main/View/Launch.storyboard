@@ -585,6 +585,8 @@ CQ
                             <outlet property="backMenuItem" destination="VWV-vB-Mtc" id="Keo-4E-dRW"/>
                             <outlet property="bookmarkThisPageMenuItem" destination="Nkm-zy-JXD" id="HVV-JT-gvV"/>
                             <outlet property="bookmarksMenuItem" destination="xf8-PW-TOA" id="Pfa-kN-nIj"/>
+                            <outlet property="checkForUpdatesMenuItem" destination="RbH-ua-rrN" id="pdB-jS-fc3"/>
+                            <outlet property="checkForUpdatesSeparatorItem" destination="gNj-hj-EIc" id="EH1-yf-r5I"/>
                             <outlet property="checkGrammarWithSpellingMenuItem" destination="mK6-2p-4JG" id="hA4-qY-11q"/>
                             <outlet property="checkSpellingWhileTypingMenuItem" destination="rbD-Rh-wIN" id="I0y-qO-6tE"/>
                             <outlet property="debugMenuItem" destination="ilv-5f-YpZ" id="4F7-9b-Mve"/>

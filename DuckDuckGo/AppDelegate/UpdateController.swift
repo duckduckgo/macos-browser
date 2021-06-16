@@ -19,6 +19,7 @@
 import Foundation
 import Sparkle
 
+#if OUT_OF_APPSTORE
 final class UpdateController: NSObject {
 
     private let updater = SUUpdater()
@@ -34,10 +35,11 @@ final class UpdateController: NSObject {
     }
 
     private func configureUpdater() {
-        #if DEBUG
+#if DEBUG
         updater.automaticallyChecksForUpdates = false
         updater.updateCheckInterval = 0
-        #endif
+#endif
     }
 
 }
+#endif

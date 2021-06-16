@@ -22,6 +22,9 @@ import Combine
 
 final class MainMenu: NSMenu {
 
+    @IBOutlet weak var checkForUpdatesMenuItem: NSMenuItem?
+    @IBOutlet weak var checkForUpdatesSeparatorItem: NSMenuItem?
+    
     @IBOutlet weak var printSeparatorItem: NSMenuItem?
     @IBOutlet weak var printMenuItem: NSMenuItem?
 
@@ -66,6 +69,13 @@ final class MainMenu: NSMenu {
             printMenuItem?.removeFromParent()
             printSeparatorItem?.removeFromParent()
         }
+
+#if !OUT_OF_APPSTORE
+
+        checkForUpdatesMenuItem?.removeFromParent()
+        checkForUpdatesSeparatorItem?.removeFromParent()
+
+#endif
     }
 
     private func setup() {

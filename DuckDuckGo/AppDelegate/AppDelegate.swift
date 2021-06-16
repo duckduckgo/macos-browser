@@ -34,7 +34,10 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
     private var fileStore: FileStore!
     private var stateRestorationManager: AppStateRestorationManager!
     private var grammarCheckEnabler: GrammarCheckEnabler!
+
+#if OUT_OF_APPSTORE
     let updateController = UpdateController()
+#endif
 
     var appUsageActivityMonitor: AppUsageActivityMonitor?
 
