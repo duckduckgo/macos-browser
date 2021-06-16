@@ -27,8 +27,7 @@ enum UserAgent {
 
     static let domainUserAgents: KeyValuePairs<RegEx, String> = [
         // fix broken spreadsheets
-        regex("https://docs\\.google\\.com/spreadsheets/.*"): UserAgent.chrome,
-        regex("https://ogs\\.google\\.com/u/0/widget/app.*?origin=https\\%3A\\%2F\\%2Fdocs\\.google\\.com"): UserAgent.chrome
+        regex("https://docs\\.google\\.com/spreadsheets/.*"): UserAgent.chrome
     ]
 
     static func `for`(_ url: URL?) -> String {
