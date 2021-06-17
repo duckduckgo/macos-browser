@@ -315,6 +315,7 @@
 		B6AE74342609AFCE005B9B1A /* ProgressEstimationTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = B6AE74332609AFCE005B9B1A /* ProgressEstimationTests.swift */; };
 		B6B3E0962654DACD0040E0A2 /* UTTypeTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = B6B3E0952654DACD0040E0A2 /* UTTypeTests.swift */; };
 		B6B3E0E12657EA7A0040E0A2 /* NSScreenExtension.swift in Sources */ = {isa = PBXBuildFile; fileRef = B6B3E0DC2657E9CF0040E0A2 /* NSScreenExtension.swift */; };
+		B6CF78DE267B099C00CD4F13 /* WKNavigationActionExtension.swift in Sources */ = {isa = PBXBuildFile; fileRef = B6CF78DD267B099C00CD4F13 /* WKNavigationActionExtension.swift */; };
 		B6D7A2EE25D2418B002B2AE1 /* ShadowView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B6D7A2ED25D2418B002B2AE1 /* ShadowView.swift */; };
 		B6DA44022616B28300DD1EC2 /* PixelDataStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = B6DA44012616B28300DD1EC2 /* PixelDataStore.swift */; };
 		B6DA44082616B30600DD1EC2 /* PixelDataModel.xcdatamodeld in Sources */ = {isa = PBXBuildFile; fileRef = B6DA44062616B30600DD1EC2 /* PixelDataModel.xcdatamodeld */; };
@@ -667,6 +668,8 @@
 		B6AE74332609AFCE005B9B1A /* ProgressEstimationTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProgressEstimationTests.swift; sourceTree = "<group>"; };
 		B6B3E0952654DACD0040E0A2 /* UTTypeTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UTTypeTests.swift; sourceTree = "<group>"; };
 		B6B3E0DC2657E9CF0040E0A2 /* NSScreenExtension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NSScreenExtension.swift; sourceTree = "<group>"; };
+		B6CF78DD267B099C00CD4F13 /* WKNavigationActionExtension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WKNavigationActionExtension.swift; sourceTree = "<group>"; };
+		B6CF78E2267B0A1900CD4F13 /* WKNavigationAction+Private.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "WKNavigationAction+Private.h"; sourceTree = "<group>"; };
 		B6D7A2ED25D2418B002B2AE1 /* ShadowView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ShadowView.swift; sourceTree = "<group>"; };
 		B6DA44012616B28300DD1EC2 /* PixelDataStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PixelDataStore.swift; sourceTree = "<group>"; };
 		B6DA44072616B30600DD1EC2 /* PixelDataModel.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = PixelDataModel.xcdatamodel; sourceTree = "<group>"; };
@@ -1724,6 +1727,7 @@
 				B63D466825BEB6C200874977 /* WKWebView+SessionState.swift */,
 				B68458CC25C7EB9000DC17B6 /* WKWebViewConfigurationExtensions.swift */,
 				AA92127625ADA07900600CD4 /* WKWebViewExtension.swift */,
+				B6CF78DD267B099C00CD4F13 /* WKNavigationActionExtension.swift */,
 				AAFCB37E25E545D400859DD4 /* PublisherExtension.swift */,
 				B657841825FA484B00D8DB33 /* NSException+Catch.h */,
 				B657841925FA484B00D8DB33 /* NSException+Catch.m */,
@@ -1860,6 +1864,7 @@
 				B63B9C502670B2B200C45B91 /* _WKDownload.h */,
 				B630794F2673491500DCEE41 /* WebKitDownloadDelegate.h */,
 				B63B9C542670B32000C45B91 /* WKProcessPool+Private.h */,
+				B6CF78E2267B0A1900CD4F13 /* WKNavigationAction+Private.h */,
 			);
 			path = Extensions;
 			sourceTree = "<group>";
@@ -2379,6 +2384,7 @@
 				AA9FF95924A1ECF20039E328 /* Tab.swift in Sources */,
 				B63D467125BFA6C100874977 /* DispatchQueueExtensions.swift in Sources */,
 				AA6FFB4624DC3B5A0028F4D0 /* WebView.swift in Sources */,
+				B6CF78DE267B099C00CD4F13 /* WKNavigationActionExtension.swift in Sources */,
 				AA7412B224D0B3AC00D22FE0 /* TabBarViewItem.swift in Sources */,
 				856C98D52570116900A22F1F /* NSWindow+Toast.swift in Sources */,
 				4B02198B25E05FAC00ED7DEA /* FireproofInfoViewController.swift in Sources */,

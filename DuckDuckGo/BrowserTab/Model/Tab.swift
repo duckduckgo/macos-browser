@@ -525,7 +525,7 @@ extension Tab: WKNavigationDelegate {
             userScripts.loginDetectionUserScript.scanForLoginForm(in: webView)
         }
 
-        if navigationAction.isTargetingMainFrame() {
+        if navigationAction.isTargetingMainFrame {
             currentDownload = nil
         }
 
@@ -542,8 +542,7 @@ extension Tab: WKNavigationDelegate {
             return
         }
 
-        // blob:https and data:https links are handled by private _WKDownload
-        if externalUrlHandler.isBlobOrData(scheme: urlScheme) {
+        if navigationAction.shouldDownload {
             // register the navigationAction for legacy _WKDownload to be called back on the Tab
             // further download will be passed to webView:navigationAction:didBecomeDownload:
             decisionHandler(.download(navigationAction, using: webView))
@@ -692,9 +691,5 @@ fileprivate extension WKNavigationResponse {
         return contentDisposition?.hasPrefix("attachment") ?? false
     }
 }
-fileprivate extension WKNavigationAction {
-    func isTargetingMainFrame() -> Bool {
-        return targetFrame?.isMainFrame ?? false
-    }
-}
+
 // swiftlint:enable type_body_length
