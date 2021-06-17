@@ -95,6 +95,11 @@ final class BookmarkManagementDetailViewController: NSViewController {
         reloadData()
     }
 
+    override func mouseUp(with event: NSEvent) {
+        // Clicking anywhere outside of the table view should end editing mode for a given cell.
+        updateEditingState(forRowAt: -1)
+    }
+
     func configureTableHighlight() {
         tableView.selectionHighlightStyle = .none
     }

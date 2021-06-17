@@ -208,7 +208,7 @@ final class BookmarkTableCellView: NSTableCellView, NibLoadable {
     }
 
     private func exitEditingMode() {
-        titleLabel.resignFirstResponder()
+        window?.makeFirstResponder(nil)
 
         titleLabel.isEditable = false
         bookmarkURLLabel.isEditable = false
