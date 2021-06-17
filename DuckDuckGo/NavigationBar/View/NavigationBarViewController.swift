@@ -182,7 +182,7 @@ final class NavigationBarViewController: NSViewController {
 
     private func promptToSaveCredentials(_ credentials: SecureVaultModels.WebsiteCredentials) {
         // TODO
-        print("*** SHOW SAVE CREDENTIALS ***")
+        print(">>> SHOW SAVE CREDENTIALS <<<")
     }
 
     private func subscribeToNavigationActionFlags() {
