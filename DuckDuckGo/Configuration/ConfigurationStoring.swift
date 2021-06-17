@@ -133,9 +133,7 @@ final class DefaultConfigurationStorage: ConfigurationStoring {
     func fileUrl(for config: ConfigurationLocation) -> URL {
         let fm = FileManager.default
 
-        guard let dir = fm.urls(for: .applicationSupportDirectory, in: .userDomainMask).first else {
-            fatalError("Could  not find application support directory")
-        }
+        let dir = URL.sandboxApplicationSupportURL
         let subDir = dir.appendingPathComponent("Configuration")
 
         var isDir: ObjCBool = false

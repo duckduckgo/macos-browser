@@ -37,8 +37,7 @@ final class HTTPSUpgradePersistence: HTTPSUpgradeStore {
     
     private struct Resource {
         static var bloomFilter: URL {
-            let path = FileManager.default.urls(for: .applicationSupportDirectory, in: .userDomainMask).first
-            return path!.appendingPathComponent("HttpsBloomFilter.bin")
+            return URL.sandboxApplicationSupportURL.appendingPathComponent("HttpsBloomFilter.bin")
         }
     }
     

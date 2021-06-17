@@ -21,6 +21,14 @@ import os.log
 
 extension URL {
 
+    // MARK: - Local
+
+    static var sandboxApplicationSupportURL: URL {
+        let sandboxPathComponent = "Containers/\(Bundle.main.bundleIdentifier!)/Data/Library/Application Support/"
+        let libraryURL = FileManager.default.urls(for: .libraryDirectory, in: .userDomainMask).first!
+        return libraryURL.appendingPathComponent(sandboxPathComponent)
+    }
+
     // MARK: - Factory
 
     static func makeSearchUrl(from searchQuery: String) -> URL? {
