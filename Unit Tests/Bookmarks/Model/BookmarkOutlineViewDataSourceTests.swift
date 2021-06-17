@@ -85,7 +85,7 @@ class BookmarkOutlineViewDataSourceTests: XCTestCase {
         bookmarkManager.loadBookmarks()
 
         let treeDataSource = BookmarkSidebarTreeController(bookmarkManager: bookmarkManager)
-        let treeController = TreeController(dataSource: treeDataSource)
+        let treeController = BookmarkTreeController(dataSource: treeDataSource)
         let mockDestinationNode = treeController.nodeInTreeRepresentingObject(mockDestinationFolder)!
         let dataSource = BookmarkOutlineViewDataSource(contentMode: .foldersOnly, treeController: treeController)
 
@@ -105,7 +105,7 @@ class BookmarkOutlineViewDataSourceTests: XCTestCase {
         bookmarkManager.loadBookmarks()
 
         let treeDataSource = BookmarkSidebarTreeController(bookmarkManager: bookmarkManager)
-        let treeController = TreeController(dataSource: treeDataSource)
+        let treeController = BookmarkTreeController(dataSource: treeDataSource)
         let mockDestinationNode = treeController.nodeInTreeRepresentingObject(mockDestinationFolder)!
         let dataSource = BookmarkOutlineViewDataSource(contentMode: .foldersOnly, treeController: treeController)
 
@@ -125,7 +125,7 @@ class BookmarkOutlineViewDataSourceTests: XCTestCase {
         bookmarkManager.loadBookmarks()
 
         let treeDataSource = BookmarkSidebarTreeController(bookmarkManager: bookmarkManager)
-        let treeController = TreeController(dataSource: treeDataSource)
+        let treeController = BookmarkTreeController(dataSource: treeDataSource)
         let dataSource = BookmarkOutlineViewDataSource(contentMode: .foldersOnly, treeController: treeController)
         let mockDestinationNode = treeController.nodeInTreeRepresentingObject(mockDestinationFolder)!
 
@@ -147,7 +147,7 @@ class BookmarkOutlineViewDataSourceTests: XCTestCase {
         bookmarkManager.loadBookmarks()
 
         let treeDataSource = BookmarkSidebarTreeController(bookmarkManager: bookmarkManager)
-        let treeController = TreeController(dataSource: treeDataSource)
+        let treeController = BookmarkTreeController(dataSource: treeDataSource)
         let dataSource = BookmarkOutlineViewDataSource(contentMode: .foldersOnly, treeController: treeController)
         let mockDestinationNode = treeController.nodeInTreeRepresentingObject(childFolder)!
 
@@ -160,7 +160,7 @@ class BookmarkOutlineViewDataSourceTests: XCTestCase {
 
     // MARK: - Private
 
-    private func createTreeController(with bookmarks: [BaseBookmarkEntity]) -> TreeController {
+    private func createTreeController(with bookmarks: [BaseBookmarkEntity]) -> BookmarkTreeController {
         let bookmarkStoreMock = BookmarkStoreMock()
         let faviconServiceMock = FaviconServiceMock()
         let bookmarkManager = LocalBookmarkManager(bookmarkStore: bookmarkStoreMock, faviconService: faviconServiceMock)
@@ -169,7 +169,7 @@ class BookmarkOutlineViewDataSourceTests: XCTestCase {
         bookmarkManager.loadBookmarks()
 
         let treeDataSource = BookmarkSidebarTreeController(bookmarkManager: bookmarkManager)
-        return TreeController(dataSource: treeDataSource)
+        return BookmarkTreeController(dataSource: treeDataSource)
     }
 
 }

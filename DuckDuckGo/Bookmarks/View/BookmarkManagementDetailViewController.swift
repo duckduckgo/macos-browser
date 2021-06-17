@@ -110,9 +110,7 @@ final class BookmarkManagementDetailViewController: NSViewController {
             return
         }
 
-        DispatchQueue.main.async {
-            self.tableView.reloadData()
-        }
+        self.tableView.reloadData()
     }
 
     @IBAction func handleClick(_ sender: NSTableView) {

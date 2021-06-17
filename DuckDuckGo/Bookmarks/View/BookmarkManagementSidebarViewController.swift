@@ -41,8 +41,8 @@ final class BookmarkManagementSidebarViewController: NSViewController {
 
     private let treeControllerDataSource = BookmarkSidebarTreeController()
 
-    private lazy var treeController: TreeController = {
-        return TreeController(dataSource: treeControllerDataSource)
+    private lazy var treeController: BookmarkTreeController = {
+        return BookmarkTreeController(dataSource: treeControllerDataSource)
     }()
 
     private lazy var dataSource: BookmarkOutlineViewDataSource = {
@@ -94,7 +94,7 @@ final class BookmarkManagementSidebarViewController: NSViewController {
     }
 
     func select(folder: BookmarkFolder) {
-        if let node = treeController.nodeInTreeRepresentingObject(folder) {
+        if let node = treeController.node(representing: folder) {
             let path = BookmarkNode.Path(node: node)
             outlineView.revealAndSelect(nodePath: path)
         }
@@ -135,7 +135,7 @@ final class BookmarkManagementSidebarViewController: NSViewController {
         var indexes = IndexSet()
         for node in nodes {
             // The actual instance of the Bookmark may have changed after reloading, so this is a hack to get the right one.
-            let foundNode = treeController.nodeInTreeRepresentingObject(node.representedObject)
+            let foundNode = treeController.node(representing: node.representedObject)
             let row = outlineView.row(forItem: foundNode as Any)
             if row > -1 {
                 indexes.insert(row)
@@ -143,7 +143,7 @@ final class BookmarkManagementSidebarViewController: NSViewController {
         }
 
         if indexes.isEmpty {
-            let node = treeController.nodeInTreeRepresentingObject(PseudoFolder.bookmarks)
+            let node = treeController.node(representing: PseudoFolder.bookmarks)
             let row = outlineView.row(forItem: node as Any)
             indexes.insert(row)
         }

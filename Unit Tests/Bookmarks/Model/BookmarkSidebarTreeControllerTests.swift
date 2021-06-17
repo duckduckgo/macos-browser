@@ -23,7 +23,7 @@ class BookmarkSidebarTreeControllerTests: XCTestCase {
 
     func testWhenBookmarkStoreHasNoFolders_ThenOnlyDefaultNodesAreReturned() {
         let dataSource = BookmarkSidebarTreeController()
-        let treeController = TreeController(dataSource: dataSource)
+        let treeController = BookmarkTreeController(dataSource: dataSource)
         let defaultNodes = treeController.rootNode.childNodes
         let representedObjects = defaultNodes.representedObjects()
 
@@ -53,7 +53,7 @@ class BookmarkSidebarTreeControllerTests: XCTestCase {
         bookmarkManager.loadBookmarks()
 
         let dataSource = BookmarkSidebarTreeController(bookmarkManager: bookmarkManager)
-        let treeController = TreeController(dataSource: dataSource)
+        let treeController = BookmarkTreeController(dataSource: dataSource)
         let defaultNodes = treeController.rootNode.childNodes
         XCTAssertEqual(defaultNodes.count, 3)
 
@@ -72,7 +72,7 @@ class BookmarkSidebarTreeControllerTests: XCTestCase {
         bookmarkManager.loadBookmarks()
 
         let dataSource = BookmarkSidebarTreeController(bookmarkManager: bookmarkManager)
-        let treeController = TreeController(dataSource: dataSource)
+        let treeController = BookmarkTreeController(dataSource: dataSource)
         let defaultNodes = treeController.rootNode.childNodes
         XCTAssertEqual(defaultNodes.count, 3)
 
@@ -95,7 +95,7 @@ class BookmarkSidebarTreeControllerTests: XCTestCase {
         bookmarkManager.loadBookmarks()
 
         let dataSource = BookmarkSidebarTreeController(bookmarkManager: bookmarkManager)
-        let treeController = TreeController(dataSource: dataSource)
+        let treeController = BookmarkTreeController(dataSource: dataSource)
         let defaultNodes = treeController.rootNode.childNodes
         XCTAssertEqual(defaultNodes.count, 3)
 

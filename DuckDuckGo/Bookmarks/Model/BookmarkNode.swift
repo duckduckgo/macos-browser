@@ -212,8 +212,8 @@ extension BookmarkNode {
             self.components = pathComponents.reversed()
         }
 
-        init?(representedObject: AnyObject, treeController: TreeController) {
-            if let node = treeController.nodeInTreeRepresentingObject(representedObject) {
+        init?(representedObject: AnyObject, treeController: BookmarkTreeController) {
+            if let node = treeController.node(representing: representedObject) {
                 self.init(node: node)
             }
 

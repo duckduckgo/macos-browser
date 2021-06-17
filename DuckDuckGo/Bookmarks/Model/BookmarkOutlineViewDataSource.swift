@@ -28,7 +28,7 @@ final class BookmarkOutlineViewDataSource: NSObject, NSOutlineViewDataSource, NS
 
     @Published var selectedFolders: [BookmarkFolder] = []
 
-    let treeController: TreeController
+    let treeController: BookmarkTreeController
     var expandedNodes = Set<UUID>()
 
     private let contentMode: ContentMode
@@ -37,7 +37,7 @@ final class BookmarkOutlineViewDataSource: NSObject, NSOutlineViewDataSource, NS
     private var favoritesPseudoFolder = PseudoFolder.favorites
     private var bookmarksPseudoFolder = PseudoFolder.bookmarks
 
-    init(contentMode: ContentMode, bookmarkManager: BookmarkManager = LocalBookmarkManager.shared, treeController: TreeController) {
+    init(contentMode: ContentMode, bookmarkManager: BookmarkManager = LocalBookmarkManager.shared, treeController: BookmarkTreeController) {
         self.contentMode = contentMode
         self.bookmarkManager = bookmarkManager
         self.treeController = treeController
@@ -195,7 +195,7 @@ final class BookmarkOutlineViewDataSource: NSObject, NSOutlineViewDataSource, NS
         let containsDescendantOfDestination = draggedFolders.contains { draggedFolder in
             let folder = BookmarkFolder(id: UUID(uuidString: draggedFolder.id)!, title: draggedFolder.name)
 
-            guard let draggedNode = treeController.nodeInTreeRepresentingObject(folder) else {
+            guard let draggedNode = treeController.node(representing: folder) else {
                 return false
             }
 
