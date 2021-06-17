@@ -17,6 +17,7 @@
 //
 
 import Cocoa
+import os.log
 
 final class MainWindow: NSWindow {
 
@@ -79,6 +80,16 @@ final class MainWindow: NSWindow {
 
     private func postFirstResponderNotification(with firstResponder: NSResponder?) {
         NotificationCenter.default.post(name: .firstResponder, object: firstResponder)
+    }
+
+    override func _postNeedsUpdateConstraintsUnlessPostingDisabled() {
+        do {
+            try NSException.catch {
+                super._postNeedsUpdateConstraintsUnlessPostingDisabled()
+            }
+        } catch {
+            os_log("Exception thrown in _postNeedsUpdateConstraintsUnlessPostingDisabled: %s", "\(error)")
+        }
     }
 
 }
