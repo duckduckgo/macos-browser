@@ -19,6 +19,22 @@
 import Foundation
 import os.log
 
+typealias RegEx = NSRegularExpression
+
+func regex(_ pattern: String, _ options: NSRegularExpression.Options = []) -> NSRegularExpression {
+    // swiftlint:disable force_try
+    return try! NSRegularExpression(pattern: pattern, options: options)
+    // swiftlint:enable force_try
+}
+
+private extension RegEx {
+    // from https://stackoverflow.com/a/25717506/73479
+    static let hostName = regex("^(((?!-)[A-Za-z0-9-]{1,63}(?<!-)\\.)+[A-Za-z0-9-]{2,63})$", .caseInsensitive)
+    // from https://stackoverflow.com/a/30023010/73479
+    static let ipAddress = regex("^((25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\\.){3}(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)$",
+                                 .caseInsensitive)
+}
+
 extension String {
 
     // MARK: - General
@@ -38,10 +54,7 @@ extension String {
 
     // MARK: - Regular Expression
 
-    func matches(pattern: String) -> Bool {
-        guard let regex = try? NSRegularExpression(pattern: pattern, options: .caseInsensitive) else {
-            return false
-        }
+    func matches(_ regex: NSRegularExpression) -> Bool {
         let matches = regex.matches(in: self, options: .anchored, range: NSRange(location: 0, length: self.utf16.count))
         return matches.count == 1
     }
@@ -62,16 +75,11 @@ extension String {
         if self == Self.localhost {
             return true
         }
-
-        // from https://stackoverflow.com/a/25717506/73479
-        let hostNameRegex = "^(((?!-)[A-Za-z0-9-]{1,63}(?<!-)\\.)+[A-Za-z0-9-]{2,63})$"
-        return matches(pattern: hostNameRegex)
+        return matches(.hostName)
     }
 
     var isValidIpHost: Bool {
-        // from https://stackoverflow.com/a/30023010/73479
-        let ipRegex = "^((25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\\.){3}(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)$"
-        return matches(pattern: ipRegex)
+        return matches(.ipAddress)
     }
 
     // Replaces plus symbols in a string with the space character encoding

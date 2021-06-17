@@ -518,7 +518,7 @@ extension Tab: WKNavigationDelegate {
                  decidePolicyFor navigationAction: WKNavigationAction,
                  decisionHandler: @escaping (WKNavigationActionPolicy) -> Void) {
 
-        updateUserAgentForDomain(navigationAction.request.url?.host)
+        webView.customUserAgent = UserAgent.for(navigationAction.request.url)
 
         // Check if a POST request is being made, and if it matches the appearance of a login request.
         if let method = navigationAction.request.httpMethod, method == "POST", navigationAction.request.url?.isLoginURL ?? false {
@@ -589,11 +589,6 @@ extension Tab: WKNavigationDelegate {
         } else {
             decisionHandler(.allow)
         }
-    }
-
-    private func updateUserAgentForDomain(_ host: String?) {
-        let domain = host ?? ""
-        webView.customUserAgent = UserAgent.forDomain(domain)
     }
 
     func webView(_ webView: WKWebView, didStartProvisionalNavigation navigation: WKNavigation!) {
