@@ -12,7 +12,7 @@
             <objects>
                 <splitViewController title="Bookmarks" storyboardIdentifier="BookmarkManagementSplitViewController" id="cTg-Rr-Tjp" customClass="BookmarkManagementSplitViewController" customModule="DuckDuckGo_Privacy_Browser" customModuleProvider="target" sceneMemberID="viewController">
                     <splitViewItems>
-                        <splitViewItem holdingPriority="1000" behavior="contentList" id="Gzb-7F-4E7"/>
+                        <splitViewItem holdingPriority="255" behavior="contentList" id="Gzb-7F-4E7"/>
                         <splitViewItem id="Z59-qq-Yho"/>
                     </splitViewItems>
                     <splitView key="splitView" dividerStyle="thin" vertical="YES" id="2T2-t4-KZZ">
@@ -686,13 +686,13 @@ Gw
                                     <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                     <subviews>
                                         <outlineView verticalHuggingPriority="750" allowsExpansionToolTips="YES" columnAutoresizingStyle="lastColumnOnly" columnResizing="NO" multipleSelection="NO" autosaveColumns="NO" rowHeight="24" usesAutomaticRowHeights="YES" viewBased="YES" indentationPerLevel="13" outlineTableColumn="UgF-sw-0QC" translatesAutoresizingMaskIntoConstraints="NO" id="66p-cd-DbA" customClass="BookmarksOutlineView" customModule="DuckDuckGo_Privacy_Browser" customModuleProvider="target">
-                                            <rect key="frame" x="0.0" y="0.0" width="412" height="444"/>
+                                            <rect key="frame" x="0.0" y="0.0" width="357" height="444"/>
                                             <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                             <size key="intercellSpacing" width="17" height="0.0"/>
                                             <color key="backgroundColor" name="ClearColor"/>
                                             <color key="gridColor" name="ClearColor"/>
                                             <tableColumns>
-                                                <tableColumn width="380" minWidth="380" maxWidth="1000" id="UgF-sw-0QC">
+                                                <tableColumn width="325" minWidth="325" maxWidth="1000" id="UgF-sw-0QC">
                                                     <tableHeaderCell key="headerCell" lineBreakMode="truncatingTail" borderStyle="border">
                                                         <color key="textColor" name="headerTextColor" catalog="System" colorSpace="catalog"/>
                                                         <color key="backgroundColor" name="headerColor" catalog="System" colorSpace="catalog"/>
@@ -712,7 +712,8 @@ Gw
                                     </subviews>
                                     <color key="backgroundColor" name="ClearColor"/>
                                 </clipView>
-                                <edgeInsets key="scrollerInsets" left="0.0" right="0.0" top="28" bottom="0.0"/>
+                                <edgeInsets key="contentInsets" left="0.0" right="12" top="0.0" bottom="0.0"/>
+                                <edgeInsets key="scrollerInsets" left="0.0" right="0.0" top="5" bottom="5"/>
                                 <scroller key="horizontalScroller" hidden="YES" wantsLayer="YES" verticalHuggingPriority="750" horizontal="YES" id="pGx-TG-Ed0">
                                     <rect key="frame" x="-100" y="-100" width="357" height="16"/>
                                     <autoresizingMask key="autoresizingMask"/>
