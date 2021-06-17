@@ -275,6 +275,7 @@
                         </constraints>
                     </view>
                     <connections>
+                        <outlet property="colorView" destination="pWh-Hk-YzZ" id="n4l-p3-mej"/>
                         <outlet property="tableView" destination="b59-XH-JSp" id="PpV-fJ-Dcg"/>
                     </connections>
                 </viewController>

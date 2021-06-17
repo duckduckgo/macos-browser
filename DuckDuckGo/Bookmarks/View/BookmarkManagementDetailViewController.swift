@@ -38,6 +38,7 @@ final class BookmarkManagementDetailViewController: NSViewController {
     }
 
     @IBOutlet var tableView: NSTableView!
+    @IBOutlet var colorView: ColorView!
 
     weak var delegate: BookmarkManagementDetailViewControllerDelegate?
 
@@ -62,10 +63,10 @@ final class BookmarkManagementDetailViewController: NSViewController {
 
                 if editingBookmarkIndex != nil {
                     NSAppearance.withAppAppearance {
-                        view.animator().layer?.backgroundColor = NSColor.backgroundSecondaryColor.cgColor
+                        colorView.animator().layer?.backgroundColor = NSColor.backgroundSecondaryColor.cgColor
                     }
                 } else {
-                    view.animator().layer?.backgroundColor = NSColor.clear.cgColor
+                    colorView.animator().layer?.backgroundColor = NSColor.homepageBackgroundColor.cgColor
                 }
             }
         }
