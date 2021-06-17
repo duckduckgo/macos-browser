@@ -21,6 +21,7 @@ import WebKit
 import os.log
 import Combine
 import SwiftUI
+import BrowserServicesKit
 
 final class BrowserTabViewController: NSViewController {
 
@@ -335,6 +336,10 @@ extension BrowserTabViewController: TabDelegate {
         }
 
         Pixel.fire(.fireproofSuggested())
+    }
+
+    func tab(_ tab: Tab, requestedSaveCredentials credentials: SecureVaultModels.WebsiteCredentials) {
+        tabViewModel?.credentialsToSave = credentials
     }
 
 }

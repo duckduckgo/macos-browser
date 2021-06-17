@@ -19,6 +19,7 @@
 import Cocoa
 import Combine
 import os.log
+import BrowserServicesKit
 
 final class NavigationBarViewController: NSViewController {
 
@@ -30,6 +31,7 @@ final class NavigationBarViewController: NSViewController {
     @IBOutlet weak var shareButton: NSButton!
 
     var addressBarViewController: AddressBarViewController?
+    var saveCredentialsPopover: SaveCredentialsPopover?
 
     private var tabCollectionViewModel: TabCollectionViewModel
 
@@ -39,6 +41,7 @@ final class NavigationBarViewController: NSViewController {
     // swiftlint:enable weak_delegate
 
     private var selectedTabViewModelCancellable: AnyCancellable?
+    private var credentialsToSaveCancellable: AnyCancellable?
     private var navigationButtonsCancellables = Set<AnyCancellable>()
 
     required init?(coder: NSCoder) {
@@ -162,7 +165,24 @@ final class NavigationBarViewController: NSViewController {
     private func subscribeToSelectedTabViewModel() {
         selectedTabViewModelCancellable = tabCollectionViewModel.$selectedTabViewModel.receive(on: DispatchQueue.main).sink { [weak self] _ in
             self?.subscribeToNavigationActionFlags()
+            self?.subscribeToCredentialsToSave()
         }
+    }
+
+    private func subscribeToCredentialsToSave() {
+        credentialsToSaveCancellable = tabCollectionViewModel.selectedTabViewModel?.$credentialsToSave
+            .receive(on: DispatchQueue.main)
+            .sink(receiveValue: { [weak self] in
+                if let credentials = $0 {
+                    self?.promptToSaveCredentials(credentials)
+                }
+                self?.tabCollectionViewModel.selectedTabViewModel?.credentialsToSave = nil
+        })
+    }
+
+    private func promptToSaveCredentials(_ credentials: SecureVaultModels.WebsiteCredentials) {
+        // TODO
+        print("*** SHOW SAVE CREDENTIALS ***")
     }
 
     private func subscribeToNavigationActionFlags() {
@@ -225,5 +245,43 @@ extension NavigationBarViewController: NSSharingServiceDelegate {
     func sharingService(_ sharingService: NSSharingService, didShareItems items: [Any]) {
         Pixel.fire(.sharingMenu(result: .success))
     }
+
+}
+
+final class SaveCredentialsPopover: NSPopover {
+
+    override init() {
+        super.init()
+
+        self.animates = false
+        self.behavior = .transient
+
+        setupContentController()
+    }
+
+    required init?(coder: NSCoder) {
+        fatalError("\(Self.self): Bad initializer")
+    }
+
+    // swiftlint:disable force_cast
+    var viewController: SaveCredentialsViewController { contentViewController as! SaveCredentialsViewController }
+    // swiftlint:enable force_cast
+
+    private func setupContentController() {
+        let controller = SaveCredentialsViewController.create()
+        // TODO controller.delegate = self
+        contentViewController = controller
+    }
+
+}
+
+final class SaveCredentialsViewController: NSViewController {
+
+    static func create() -> SaveCredentialsViewController {
+         let storyboard = NSStoryboard(name: "SaveCredentials", bundle: nil)
+        // swiftlint:disable force_cast
+         return storyboard.instantiateInitialController() as! SaveCredentialsViewController
+        // swiftlint:enable force_cast
+     }
 
 }

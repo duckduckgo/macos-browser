@@ -1075,6 +1075,13 @@
 			path = Model;
 			sourceTree = "<group>";
 		};
+		85890634267B6CC500D23B0D /* SecureVault */ = {
+			isa = PBXGroup;
+			children = (
+			);
+			path = SecureVault;
+			sourceTree = "<group>";
+		};
 		85A0115D25AF1C4700FA6A0C /* FindInPage */ = {
 			isa = PBXGroup;
 			children = (
@@ -1207,6 +1214,7 @@
 				AA97BF4425135CB60014931A /* Menus */,
 				AA86491524D83384001BABEE /* NavigationBar */,
 				4B0511A2262CAA5A00F6079C /* Preferences */,
+				85890634267B6CC500D23B0D /* SecureVault */,
 				4B677422255DBEB800025BD8 /* Smarter Encryption */,
 				B68458AE25C7E75100DC17B6 /* State Restoration */,
 				B6A9E44E26142AF90067D1B9 /* Statistics */,
@@ -3005,7 +3013,7 @@
 			repositoryURL = "https://github.com/duckduckgo/BrowserServicesKit.git";
 			requirement = {
 				kind = upToNextMajorVersion;
-				minimumVersion = 4.0.0;
+				minimumVersion = 4.0.2;
 			};
 		};
 		85FF55C625F82E4F00E2AB99 /* XCRemoteSwiftPackageReference "lottie-ios" */ = {

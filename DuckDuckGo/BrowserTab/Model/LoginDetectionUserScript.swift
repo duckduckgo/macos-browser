@@ -30,7 +30,7 @@ final class LoginFormDetectionUserScript: NSObject, StaticUserScript {
 
     static var injectionTime: WKUserScriptInjectionTime { .atDocumentStart }
     static var forMainFrameOnly: Bool { false }
-    static var source: String = LoginFormDetectionUserScript.loadJS("login-detection", from: .main)
+    static var source: String = "// See autofill.js" // LoginFormDetectionUserScript.loadJS("login-detection", from: .main)
     static var script: WKUserScript = LoginFormDetectionUserScript.makeWKUserScript()
     var messageNames: [String] { ["loginFormDetected"] }
 

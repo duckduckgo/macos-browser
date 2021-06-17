@@ -30,6 +30,7 @@ protocol TabDelegate: AnyObject {
     func tab(_ tab: Tab, willShowContextMenuAt position: NSPoint, image: URL?, link: URL?)
     func tab(_ tab: Tab, detectedLogin host: String)
 	func tab(_ tab: Tab, requestedOpenExternalURL url: URL, forUserEnteredURL: Bool)
+    func tab(_ tab: Tab, requestedSaveCredentials credentials: SecureVaultModels.WebsiteCredentials)
 
     func tabPageDOMLoaded(_ tab: Tab)
 
@@ -318,6 +319,12 @@ final class Tab: NSObject {
         return emailManager
     }()
 
+    lazy var vaultManager: SecureVaultManager = {
+        let manager = SecureVaultManager()
+        manager.delegate = self
+        return manager
+    }()
+
     private var userScriptsUpdatedCancellable: AnyCancellable?
 
     private var userScripts: UserScripts! {
@@ -335,6 +342,7 @@ final class Tab: NSObject {
             userScripts.contentBlockerScript.delegate = self
             userScripts.contentBlockerRulesScript.delegate = self
             userScripts.autofillScript.emailDelegate = emailManager
+            userScripts.autofillScript.vaultDelegate = vaultManager
             userScripts.pageObserverScript.delegate = self
 
             attachFindInPage()
@@ -484,7 +492,15 @@ extension Tab: LoginFormDetectionDelegate {
          loginDetectionService?.handle(navigationEvent: .detectedLogin(url: url))
      }
 
- }
+}
+
+extension Tab: SecureVaultManagerDelegate {
+
+    func secureVaultManager(_: SecureVaultManager, promptUserToStoreCredentials credentials: SecureVaultModels.WebsiteCredentials) {
+        delegate?.tab(self, requestedSaveCredentials: credentials)
+    }
+
+}
 
 extension Tab: WKNavigationDelegate {
 
