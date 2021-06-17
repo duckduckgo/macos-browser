@@ -63,7 +63,7 @@
 		<true/>
 	</dict>
 	<key>NSHumanReadableCopyright</key>
-	<string>Copyright © 2020 DuckDuckGo. All rights reserved.</string>
+	<string>Copyright © 2021 DuckDuckGo. All rights reserved.</string>
 	<key>NSMainStoryboardFile</key>
 	<string>Launch</string>
 	<key>NSPrincipalClass</key>
