@@ -38,7 +38,7 @@
                                 <imageCell key="cell" refusesFirstResponder="YES" alignment="left" imageScaling="proportionallyDown" image="Web" id="Joa-RU-nuz"/>
                             </imageView>
                             <textField focusRingType="none" horizontalHuggingPriority="251" verticalHuggingPriority="750" horizontalCompressionResistancePriority="250" translatesAutoresizingMaskIntoConstraints="NO" id="uOv-ms-Lo9">
-                                <rect key="frame" x="30" y="58" width="386" height="15"/>
+                                <rect key="frame" x="30" y="58" width="390" height="15"/>
                                 <textFieldCell key="cell" lineBreakMode="truncatingTail" sendsActionOnEndEditing="YES" focusRingType="none" title="Bookmark" drawsBackground="YES" usesSingleLineMode="YES" id="62n-V4-1nG">
                                     <font key="font" size="13" name="SFProText-Regular"/>
                                     <color key="textColor" name="labelColor" catalog="System" colorSpace="catalog"/>
@@ -46,10 +46,10 @@
                                 </textFieldCell>
                             </textField>
                             <button verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="bkm-Zu-lYh">
-                                <rect key="frame" x="424" y="50" width="32" height="32"/>
+                                <rect key="frame" x="428" y="50" width="28" height="32"/>
                                 <constraints>
                                     <constraint firstAttribute="height" constant="32" id="NUK-j8-E1Z"/>
-                                    <constraint firstAttribute="width" constant="32" id="PbZ-KD-GkK"/>
+                                    <constraint firstAttribute="width" constant="28" id="PbZ-KD-GkK"/>
                                 </constraints>
                                 <buttonCell key="cell" type="square" bezelStyle="shadowlessSquare" image="Settings" imagePosition="overlaps" alignment="center" imageScaling="proportionallyDown" inset="2" id="dQt-Qo-qer">
                                     <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
@@ -61,9 +61,9 @@
                                 </connections>
                             </button>
                             <imageView horizontalHuggingPriority="251" verticalHuggingPriority="251" translatesAutoresizingMaskIntoConstraints="NO" id="SX1-hs-kkX" userLabel="Accessory Image View">
-                                <rect key="frame" x="424" y="50" width="32" height="32"/>
+                                <rect key="frame" x="434" y="50" width="22" height="32"/>
                                 <constraints>
-                                    <constraint firstAttribute="width" constant="32" id="7Fq-Wq-riB"/>
+                                    <constraint firstAttribute="width" constant="22" id="7Fq-Wq-riB"/>
                                     <constraint firstAttribute="height" constant="32" id="e5J-97-uFp"/>
                                 </constraints>
                                 <imageCell key="cell" refusesFirstResponder="YES" alignment="left" imageScaling="proportionallyDown" image="Forward" id="vnu-27-HAX"/>
