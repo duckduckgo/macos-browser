@@ -20,4 +20,7 @@
 
 @interface NSWindow (Private)
 - (void)_postWindowNeedsUpdateConstraintsUnlessPostingDisabled;
+- (void)_postWindowNeedsLayoutUnlessPostingDisabled;
+- (void)_postWindowNeedsDisplayUnlessPostingDisabled;
+- (void)_updateStructuralRegionsOnNextDisplayCycle;
 @end

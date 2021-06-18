@@ -92,6 +92,36 @@ final class MainWindow: NSWindow {
         }
     }
 
+    override func _postNeedsLayoutUnlessPostingDisabled() {
+        do {
+            try NSException.catch {
+                super._postNeedsLayoutUnlessPostingDisabled()
+            }
+        } catch {
+            os_log("Exception thrown in _postNeedsLayoutUnlessPostingDisabled: %s", "\(error)")
+        }
+    }
+
+    override func _postNeedsDisplayUnlessPostingDisabled() {
+        do {
+            try NSException.catch {
+                super._postNeedsDisplayUnlessPostingDisabled()
+            }
+        } catch {
+            os_log("Exception thrown in _postNeedsDisplayUnlessPostingDisabled: %s", "\(error)")
+        }
+    }
+
+    override func _updateStructuralRegionsOnNextDisplayCycle() {
+        do {
+            try NSException.catch {
+                super._updateStructuralRegionsOnNextDisplayCycle()
+            }
+        } catch {
+            os_log("Exception thrown in _updateStructuralRegionsOnNextDisplayCycle: %s", "\(error)")
+        }
+    }
+
 }
 
 extension Notification.Name {
