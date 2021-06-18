@@ -175,14 +175,23 @@ final class NavigationBarViewController: NSViewController {
             .sink(receiveValue: { [weak self] in
                 if let credentials = $0 {
                     self?.promptToSaveCredentials(credentials)
+                    self?.tabCollectionViewModel.selectedTabViewModel?.credentialsToSave = nil
                 }
-                self?.tabCollectionViewModel.selectedTabViewModel?.credentialsToSave = nil
         })
     }
 
     private func promptToSaveCredentials(_ credentials: SecureVaultModels.WebsiteCredentials) {
-        // TODO
-        print(">>> SHOW SAVE CREDENTIALS <<<")
+        print("***", #function, credentials.account.domain)
+        guard let view = addressBarViewController?.view else { return }
+
+        // saveCredentialsPopover.viewController.credentials = credentials
+        if saveCredentialsPopover == nil {
+            saveCredentialsPopover = SaveCredentialsPopover(credentials: credentials)
+        } else {
+            saveCredentialsPopover?.credentials = credentials
+        }
+
+        saveCredentialsPopover?.show(relativeTo: .zero, of: view, preferredEdge: .minY)
     }
 
     private func subscribeToNavigationActionFlags() {
@@ -245,43 +254,5 @@ extension NavigationBarViewController: NSSharingServiceDelegate {
     func sharingService(_ sharingService: NSSharingService, didShareItems items: [Any]) {
         Pixel.fire(.sharingMenu(result: .success))
     }
-
-}
-
-final class SaveCredentialsPopover: NSPopover {
-
-    override init() {
-        super.init()
-
-        self.animates = false
-        self.behavior = .transient
-
-        setupContentController()
-    }
-
-    required init?(coder: NSCoder) {
-        fatalError("\(Self.self): Bad initializer")
-    }
-
-    // swiftlint:disable force_cast
-    var viewController: SaveCredentialsViewController { contentViewController as! SaveCredentialsViewController }
-    // swiftlint:enable force_cast
-
-    private func setupContentController() {
-        let controller = SaveCredentialsViewController.create()
-        // TODO controller.delegate = self
-        contentViewController = controller
-    }
-
-}
-
-final class SaveCredentialsViewController: NSViewController {
-
-    static func create() -> SaveCredentialsViewController {
-         let storyboard = NSStoryboard(name: "SaveCredentials", bundle: nil)
-        // swiftlint:disable force_cast
-         return storyboard.instantiateInitialController() as! SaveCredentialsViewController
-        // swiftlint:enable force_cast
-     }
 
 }
