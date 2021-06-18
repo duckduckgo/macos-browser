@@ -177,8 +177,8 @@ final class HomepageViewController: NSViewController {
             window.addEditFavoriteViewController.edit(bookmark: bookmark)
         }
 
-        let windowFrame = NSRect(x: screen.frame.size.width / 2.0 - AddEditFavoriteWindow.Size.width / 2.0,
-                                 y: screen.frame.size.height / 2.0 - AddEditFavoriteWindow.Size.height / 2.0,
+        let windowFrame = NSRect(x: screen.frame.origin.x + screen.frame.size.width / 2.0 - AddEditFavoriteWindow.Size.width / 2.0,
+                                 y: screen.frame.origin.y + screen.frame.size.height / 2.0 - AddEditFavoriteWindow.Size.height / 2.0,
                                  width: AddEditFavoriteWindow.Size.width,
                                  height: AddEditFavoriteWindow.Size.height)
 
