@@ -548,14 +548,14 @@ extension Tab: WKNavigationDelegate {
                  decidePolicyFor navigationAction: WKNavigationAction,
                  decisionHandler: @escaping (WKNavigationActionPolicy) -> Void) {
 
-        updateUserAgentForDomain(navigationAction.request.url?.host)
+        webView.customUserAgent = UserAgent.for(navigationAction.request.url)
 
         // Check if a POST request is being made, and if it matches the appearance of a login request.
         if let method = navigationAction.request.httpMethod, method == "POST", navigationAction.request.url?.isLoginURL ?? false {
             userScripts.loginDetectionUserScript.scanForLoginForm(in: webView)
         }
 
-        if navigationAction.isTargetingMainFrame() {
+        if navigationAction.isTargetingMainFrame {
             currentDownload = nil
         }
 
@@ -572,8 +572,7 @@ extension Tab: WKNavigationDelegate {
             return
         }
 
-        // blob:https and data:https links are handled by private _WKDownload
-        if externalUrlHandler.isBlobOrData(scheme: urlScheme) {
+        if navigationAction.shouldDownload {
             // register the navigationAction for legacy _WKDownload to be called back on the Tab
             // further download will be passed to webView:navigationAction:didBecomeDownload:
             decisionHandler(.download(navigationAction, using: webView))
@@ -619,11 +618,6 @@ extension Tab: WKNavigationDelegate {
         } else {
             decisionHandler(.allow)
         }
-    }
-
-    private func updateUserAgentForDomain(_ host: String?) {
-        let domain = host ?? ""
-        webView.customUserAgent = UserAgent.forDomain(domain)
     }
 
     func webView(_ webView: WKWebView, didStartProvisionalNavigation navigation: WKNavigation!) {
@@ -722,10 +716,6 @@ fileprivate extension WKNavigationResponse {
         return contentDisposition?.hasPrefix("attachment") ?? false
     }
 }
-fileprivate extension WKNavigationAction {
-    func isTargetingMainFrame() -> Bool {
-        return targetFrame?.isMainFrame ?? false
-    }
-}
+
 // swiftlint:enable type_body_length
 // swiftlint:enable file_length
