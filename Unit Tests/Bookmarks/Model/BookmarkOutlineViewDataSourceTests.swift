@@ -24,7 +24,7 @@ class BookmarkOutlineViewDataSourceTests: XCTestCase {
     func testWhenOutlineViewExpandsItem_ThenTheObjectIDIsAddedToExpandedItems() {
         let mockFolder = BookmarkFolder.mock
         let treeController = createTreeController(with: [mockFolder])
-        let mockFolderNode = treeController.nodeInTreeRepresentingObject(mockFolder)!
+        let mockFolderNode = treeController.node(representing: mockFolder)!
         let dataSource = BookmarkOutlineViewDataSource(contentMode: .foldersOnly, treeController: treeController)
 
         let notification = Notification(name: NSOutlineView.itemDidExpandNotification, object: nil, userInfo: ["NSObject": mockFolderNode])
@@ -36,7 +36,7 @@ class BookmarkOutlineViewDataSourceTests: XCTestCase {
     func testWhenOutlineViewCollapsesItem_ThenTheObjectIDIsRemovedFromExpandedItems() {
         let mockFolder = BookmarkFolder.mock
         let treeController = createTreeController(with: [mockFolder])
-        let mockFolderNode = treeController.nodeInTreeRepresentingObject(mockFolder)!
+        let mockFolderNode = treeController.node(representing: mockFolder)!
         let dataSource = BookmarkOutlineViewDataSource(contentMode: .foldersOnly, treeController: treeController)
 
         let expandNotification = Notification(name: NSOutlineView.itemDidExpandNotification, object: nil, userInfo: ["NSObject": mockFolderNode])
@@ -54,7 +54,7 @@ class BookmarkOutlineViewDataSourceTests: XCTestCase {
         let mockFolder = BookmarkFolder.mock
         let mockOutlineView = NSOutlineView(frame: .zero)
         let treeController = createTreeController(with: [mockFolder])
-        let mockFolderNode = treeController.nodeInTreeRepresentingObject(mockFolder)!
+        let mockFolderNode = treeController.node(representing: mockFolder)!
         let dataSource = BookmarkOutlineViewDataSource(contentMode: .foldersOnly, treeController: treeController)
 
         let writer = dataSource.outlineView(mockOutlineView, pasteboardWriterForItem: mockFolderNode) as? FolderPasteboardWriter
@@ -86,7 +86,7 @@ class BookmarkOutlineViewDataSourceTests: XCTestCase {
 
         let treeDataSource = BookmarkSidebarTreeController(bookmarkManager: bookmarkManager)
         let treeController = BookmarkTreeController(dataSource: treeDataSource)
-        let mockDestinationNode = treeController.nodeInTreeRepresentingObject(mockDestinationFolder)!
+        let mockDestinationNode = treeController.node(representing: mockDestinationFolder)!
         let dataSource = BookmarkOutlineViewDataSource(contentMode: .foldersOnly, treeController: treeController)
 
         let pasteboardBookmark = PasteboardBookmark(id: UUID().uuidString, url: "https://example.com", title: "Pasteboard Bookmark")
@@ -106,7 +106,7 @@ class BookmarkOutlineViewDataSourceTests: XCTestCase {
 
         let treeDataSource = BookmarkSidebarTreeController(bookmarkManager: bookmarkManager)
         let treeController = BookmarkTreeController(dataSource: treeDataSource)
-        let mockDestinationNode = treeController.nodeInTreeRepresentingObject(mockDestinationFolder)!
+        let mockDestinationNode = treeController.node(representing: mockDestinationFolder)!
         let dataSource = BookmarkOutlineViewDataSource(contentMode: .foldersOnly, treeController: treeController)
 
         let pasteboardFolder = PasteboardFolder(id: UUID().uuidString, name: "Pasteboard Folder")
@@ -127,7 +127,7 @@ class BookmarkOutlineViewDataSourceTests: XCTestCase {
         let treeDataSource = BookmarkSidebarTreeController(bookmarkManager: bookmarkManager)
         let treeController = BookmarkTreeController(dataSource: treeDataSource)
         let dataSource = BookmarkOutlineViewDataSource(contentMode: .foldersOnly, treeController: treeController)
-        let mockDestinationNode = treeController.nodeInTreeRepresentingObject(mockDestinationFolder)!
+        let mockDestinationNode = treeController.node(representing: mockDestinationFolder)!
 
         let pasteboardFolder = PasteboardFolder(id: mockDestinationFolder.id.uuidString, name: "Pasteboard Folder")
         let result = dataSource.validateDrop(for: [pasteboardFolder], destination: mockDestinationNode)
@@ -149,7 +149,7 @@ class BookmarkOutlineViewDataSourceTests: XCTestCase {
         let treeDataSource = BookmarkSidebarTreeController(bookmarkManager: bookmarkManager)
         let treeController = BookmarkTreeController(dataSource: treeDataSource)
         let dataSource = BookmarkOutlineViewDataSource(contentMode: .foldersOnly, treeController: treeController)
-        let mockDestinationNode = treeController.nodeInTreeRepresentingObject(childFolder)!
+        let mockDestinationNode = treeController.node(representing: childFolder)!
 
         // Simulate dragging the root folder onto the child folder:
         let draggedFolder = PasteboardFolder(id: rootFolder.id.uuidString, name: "Root")

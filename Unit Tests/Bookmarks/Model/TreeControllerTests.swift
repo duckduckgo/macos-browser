@@ -19,7 +19,7 @@
 import XCTest
 @testable import DuckDuckGo_Privacy_Browser
 
-private class MockTreeControllerDataSource: TreeControllerDataSource {
+private class MockTreeControllerDataSource: BookmarkTreeControllerDataSource {
 
     func treeController(treeController: BookmarkTreeController, childNodesFor node: BookmarkNode) -> [BookmarkNode] {
         return node.childNodes
@@ -59,7 +59,7 @@ class TreeControllerTests: XCTestCase {
         let dataSource = MockTreeControllerDataSource()
         let treeController = BookmarkTreeController(dataSource: dataSource, rootNode: rootNode)
 
-        let foundNode = treeController.nodeInTreeRepresentingObject(desiredObject)
+        let foundNode = treeController.node(representing: desiredObject)
         XCTAssertEqual(foundNode, secondChildNode)
     }
 
@@ -74,7 +74,7 @@ class TreeControllerTests: XCTestCase {
         let dataSource = MockTreeControllerDataSource()
         let treeController = BookmarkTreeController(dataSource: dataSource, rootNode: rootNode)
 
-        let foundNode = treeController.nodeInTreeRepresentingObject(TestObject())
+        let foundNode = treeController.node(representing: TestObject())
         XCTAssertNil(foundNode)
     }
 
