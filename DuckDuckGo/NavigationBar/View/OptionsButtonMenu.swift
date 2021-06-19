@@ -21,7 +21,15 @@ import os.log
 import WebKit
 import BrowserServicesKit
 
+protocol OptionsButtonMenuDelegate: AnyObject {
+
+    func optionsButtonMenuRequestedBookmarkPopover(_ menu: NSMenu)
+
+}
+
 final class OptionsButtonMenu: NSMenu {
+
+    weak var actionDelegate: OptionsButtonMenuDelegate?
 
     private let tabCollectionViewModel: TabCollectionViewModel
     private let emailManager: EmailManager
@@ -42,6 +50,7 @@ final class OptionsButtonMenu: NSMenu {
         case bookmarks
         case preferences
     }
+
     fileprivate(set) var result: Result?
 
     required init(coder: NSCoder) {
@@ -153,7 +162,7 @@ final class OptionsButtonMenu: NSMenu {
     }
 
     @objc func openBookmarks(_ sender: NSMenuItem) {
-        WindowControllersManager.shared.showBookmarksTab()
+        actionDelegate?.optionsButtonMenuRequestedBookmarkPopover(self)
     }
 
     @objc func openPreferences(_ sender: NSMenuItem) {

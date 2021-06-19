@@ -110,6 +110,8 @@ final class NavigationBarViewController: NSViewController {
     @IBAction func optionsButtonAction(_ sender: NSButton) {
         if let event = NSApplication.shared.currentEvent {
             let menu = OptionsButtonMenu(tabCollectionViewModel: tabCollectionViewModel)
+            menu.actionDelegate = self
+
             NSMenu.popUpContextMenu(menu, with: event, for: sender)
 
             switch menu.result {
@@ -139,7 +141,7 @@ final class NavigationBarViewController: NSViewController {
     }
 
     @IBAction func bookmarksButtonAction(_ sender: NSButton) {
-        openBookmarkListPopover()
+        showBookmarkListPopover()
     }
 
     @IBAction func shareButtonAction(_ sender: NSButton) {
@@ -149,7 +151,7 @@ final class NavigationBarViewController: NSViewController {
         sharing.show(relativeTo: .zero, of: sender, preferredEdge: .minY)
     }
 
-    private func openBookmarkListPopover() {
+    func showBookmarkListPopover() {
         bookmarkListPopover.show(relativeTo: .zero, of: bookmarkListButton, preferredEdge: .maxY)
     }
 
@@ -235,6 +237,14 @@ extension NavigationBarViewController: NSSharingServiceDelegate {
 
     func sharingService(_ sharingService: NSSharingService, didShareItems items: [Any]) {
         Pixel.fire(.sharingMenu(result: .success))
+    }
+
+}
+
+extension NavigationBarViewController: OptionsButtonMenuDelegate {
+
+    func optionsButtonMenuRequestedBookmarkPopover(_ menu: NSMenu) {
+        showBookmarkListPopover()
     }
 
 }
