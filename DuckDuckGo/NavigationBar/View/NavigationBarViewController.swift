@@ -149,8 +149,6 @@ final class NavigationBarViewController: NSViewController {
         sharing.show(relativeTo: .zero, of: sender, preferredEdge: .minY)
     }
 
-    private var bookmarkListWindowController: NSWindowController?
-
     private func openBookmarkListPopover() {
         bookmarkListPopover.show(relativeTo: .zero, of: bookmarkListButton, preferredEdge: .maxY)
     }
