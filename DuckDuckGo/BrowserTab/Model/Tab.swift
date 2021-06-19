@@ -22,18 +22,16 @@ import os
 import Combine
 import BrowserServicesKit
 
-protocol TabDelegate: AnyObject {
-
+protocol TabDelegate: FileDownloadManagerDelegate {
     func tabDidStartNavigation(_ tab: Tab)
     func tab(_ tab: Tab, requestedNewTab url: URL?, selected: Bool)
-    func tab(_ tab: Tab, requestedFileDownload request: FileDownload)
     func tab(_ tab: Tab, willShowContextMenuAt position: NSPoint, image: URL?, link: URL?)
     func tab(_ tab: Tab, detectedLogin host: String)
 	func tab(_ tab: Tab, requestedOpenExternalURL url: URL, forUserEnteredURL: Bool)
     func tab(_ tab: Tab, requestedSaveCredentials credentials: SecureVaultModels.WebsiteCredentials)
 
     func tabPageDOMLoaded(_ tab: Tab)
-
+    func closeTab(_ tab: Tab)
 }
 
 // swiftlint:disable type_body_length
@@ -104,7 +102,6 @@ final class Tab: NSObject {
            let host = url?.host {
             faviconService.cacheIfNeeded(favicon: favicon, for: host, isFromUserScript: false)
         }
-
     }
 
     deinit {
@@ -170,10 +167,34 @@ final class Tab: NSObject {
      }
 
     // Used to track if an error was caused by a download navigation.
-    private var currentDownload: FileDownload?
+    private var currentDownload: URL?
 
-    // Used as the request context for HTML 5 downloads
-    private var lastMainFrameRequest: URLRequest?
+    func download(from url: URL, promptForLocation: Bool = true) {
+        webView.startDownload(URLRequest(url: url, cachePolicy: .returnCacheDataElseLoad)) { download in
+            FileDownloadManager.shared.add(download, delegate: self.delegate, promptForLocation: promptForLocation, postflight: .reveal)
+        }
+    }
+
+    func saveWebContentAs(completionHandler: ((Result<URL, Error>) -> Void)? = nil) {
+        webView.getMimeType { mimeType in
+            if case .html = mimeType.flatMap(UTType.init(mimeType:)) ?? .html {
+                self.delegate?.chooseDestination(suggestedFilename: self.webView.suggestedFilename,
+                                                 directoryURL: DownloadPreferences().selectedDownloadLocation,
+                                                 fileTypes: [.html, .webArchive, .pdf]) { url, fileType in
+                    guard let url = url else {
+                        completionHandler?(.failure(URLError(.cancelled)))
+                        return
+                    }
+                    self.webView.exportWebContent(to: url,
+                                                  as: fileType.flatMap(WKWebView.ContentExportType.init) ?? .html,
+                                                  completionHandler: completionHandler)
+                }
+            } else if let url = self.webView.url {
+                assert(completionHandler == nil, "Completion handling not implemented for downloaded content, use WebKitDownloadTask.output")
+                self.download(from: url, promptForLocation: true)
+            }
+        }
+    }
 
     private var loginDetectionService: LoginDetectionService?
     private let instrumentation = TabInstrumentation()
@@ -336,7 +357,6 @@ final class Tab: NSObject {
         didSet {
             userScripts.debugScript.instrumentation = instrumentation
             userScripts.faviconScript.delegate = self
-            userScripts.html5downloadScript.delegate = self
             userScripts.contextMenuScript.delegate = self
             userScripts.loginDetectionUserScript.delegate = self
             userScripts.contentBlockerScript.delegate = self
@@ -406,18 +426,6 @@ extension Tab: ContextMenuDelegate {
 
     func contextMenu(forUserScript script: ContextMenuUserScript, willShowAt position: NSPoint, image: URL?, link: URL?) {
         delegate?.tab(self, willShowContextMenuAt: position, image: image, link: link)
-    }
-
-}
-
-extension Tab: HTML5DownloadDelegate {
-
-    func startDownload(_ userScript: HTML5DownloadUserScript, from url: URL, withSuggestedName name: String) {
-        var request = lastMainFrameRequest ?? URLRequest(url: url)
-        request.url = url
-        delegate?.tab(self, requestedFileDownload: FileDownload.request(request,
-                                                                        suggestedName: name,
-                                                                        promptForLocation: false))
     }
 
 }
@@ -526,15 +534,14 @@ extension Tab: WKNavigationDelegate {
                  decidePolicyFor navigationAction: WKNavigationAction,
                  decisionHandler: @escaping (WKNavigationActionPolicy) -> Void) {
 
-        updateUserAgentForDomain(navigationAction.request.url?.host)
+        webView.customUserAgent = UserAgent.for(navigationAction.request.url)
 
         // Check if a POST request is being made, and if it matches the appearance of a login request.
         if let method = navigationAction.request.httpMethod, method == "POST", navigationAction.request.url?.isLoginURL ?? false {
             userScripts.loginDetectionUserScript.scanForLoginForm(in: webView)
         }
 
-        if navigationAction.isTargetingMainFrame() {
-            lastMainFrameRequest = navigationAction.request
+        if navigationAction.isTargetingMainFrame {
             currentDownload = nil
         }
 
@@ -551,7 +558,13 @@ extension Tab: WKNavigationDelegate {
             return
         }
 
-        if externalUrlHandler.isExternal(scheme: urlScheme) {
+        if navigationAction.shouldDownload {
+            // register the navigationAction for legacy _WKDownload to be called back on the Tab
+            // further download will be passed to webView:navigationAction:didBecomeDownload:
+            decisionHandler(.download(navigationAction, using: webView))
+            return
+
+        } else if externalUrlHandler.isExternal(scheme: urlScheme) {
             // ignore <iframe src="custom://url"> but allow via address bar
             let fromFrame = !(navigationAction.sourceFrame.isMainFrame || self.userEnteredUrl)
 
@@ -579,33 +592,18 @@ extension Tab: WKNavigationDelegate {
                  decidePolicyFor navigationResponse: WKNavigationResponse,
                  decisionHandler: @escaping (WKNavigationResponsePolicy) -> Void) {
 		userEnteredUrl = false // subsequent requests will be navigations
-        let policy = navigationResponsePolicyForDownloads(navigationResponse)
-        decisionHandler(policy)
 
-    }
+        if !navigationResponse.canShowMIMEType || navigationResponse.shouldDownload {
+            if navigationResponse.isForMainFrame {
+                currentDownload = navigationResponse.response.url
+            }
+            // register the navigationResponse for legacy _WKDownload to be called back on the Tab
+            // further download will be passed to webView:navigationResponse:didBecomeDownload:
+            decisionHandler(.download(navigationResponse, using: webView))
 
-    private func updateUserAgentForDomain(_ host: String?) {
-        let domain = host ?? ""
-        webView.customUserAgent = UserAgent.forDomain(domain)
-    }
-
-    private func navigationResponsePolicyForDownloads(_ navigationResponse: WKNavigationResponse) -> WKNavigationResponsePolicy {
-        guard navigationResponse.isForMainFrame else {
-            return .allow
+        } else {
+            decisionHandler(.allow)
         }
-
-        if (!navigationResponse.canShowMIMEType || navigationResponse.shouldDownload),
-           let request = lastMainFrameRequest {
-            let download = FileDownload.request(request,
-                                                suggestedName: navigationResponse.response.suggestedFilename,
-                                                promptForLocation: false)
-            delegate?.tab(self, requestedFileDownload: download)
-            // Flag this here, because interrupting the frame load will cause an error and we need to know
-            self.currentDownload = download
-            return .cancel
-        }
-
-        return .allow
     }
 
     func webView(_ webView: WKWebView, didStartProvisionalNavigation navigation: WKNavigation!) {
@@ -618,7 +616,7 @@ extension Tab: WKNavigationDelegate {
 
         if let url = webView.url {
              loginDetectionService?.handle(navigationEvent: .pageBeganLoading(url: url))
-         }
+        }
     }
 
     func webView(_ webView: WKWebView, didFinish navigation: WKNavigation!) {
@@ -637,7 +635,15 @@ extension Tab: WKNavigationDelegate {
     func webView(_ webView: WKWebView, didFailProvisionalNavigation navigation: WKNavigation!, withError error: Error) {
         if currentDownload != nil && (error as NSError).code == ErrorCodes.frameLoadInterrupted {
             currentDownload = nil
-            os_log("didFailProvisionalNavigation due to download %s", type: .debug, currentDownload?.sourceURL?.absoluteString ?? "")
+
+            // Note this can result in tabs being left open, e.g. download button on this page:
+            // https://en.wikipedia.org/wiki/Guitar#/media/File:GuitareClassique5.png
+            // Safari closes new tabs that were opened and then create a download instantly.
+            if self.webView.canGoBack == false,
+               self.parentTab != nil {
+                delegate?.closeTab(self)
+            }
+
             return
         }
         self.error = error
@@ -648,10 +654,31 @@ extension Tab: WKNavigationDelegate {
          loginDetectionService?.handle(navigationEvent: .redirect(url: url))
      }
 
+    @available(macOS 11.3, *)
+    @objc(webView:navigationAction:didBecomeDownload:)
+    func webView(_ webView: WKWebView, navigationAction: WKNavigationAction, didBecome download: WKDownload) {
+        self.webView(webView, navigationAction: navigationAction, didBecomeDownload: download)
+    }
+
+    @available(macOS 11.3, *)
+    @objc(webView:navigationResponse:didBecomeDownload:)
+    func webView(_ webView: WKWebView, navigationResponse: WKNavigationResponse, didBecome download: WKDownload) {
+        self.webView(webView, navigationResponse: navigationResponse, didBecomeDownload: download)
+    }
+
+}
+// universal download event handlers for Legacy _WKDownload and modern WKDownload
+extension Tab: WKWebViewDownloadDelegate {
+    func webView(_ webView: WKWebView, navigationAction: WKNavigationAction, didBecomeDownload download: WebKitDownload) {
+        FileDownloadManager.shared.add(download, delegate: self.delegate, promptForLocation: false, postflight: .reveal)
+    }
+
+    func webView(_ webView: WKWebView, navigationResponse: WKNavigationResponse, didBecomeDownload download: WebKitDownload) {
+        FileDownloadManager.shared.add(download, delegate: self.delegate, promptForLocation: false, postflight: .reveal)
+    }
 }
 
 extension Tab {
-
     private func find(text: String) {
         userScripts.findInPageScript.find(text: text, inWebView: webView)
     }
@@ -667,7 +694,6 @@ extension Tab {
     func findPrevious() {
         userScripts.findInPageScript.previous(withWebView: webView)
     }
-
 }
 
 fileprivate extension WKNavigationResponse {
@@ -677,9 +703,4 @@ fileprivate extension WKNavigationResponse {
     }
 }
 
-fileprivate extension WKNavigationAction {
-    func isTargetingMainFrame() -> Bool {
-        return targetFrame?.isMainFrame ?? false
-    }
-}
 // swiftlint:enable type_body_length

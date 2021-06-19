@@ -49,12 +49,6 @@ extension URL {
         "duosecurity.com": [regex("oauth/v\\d.*/authorize"), regex("frame/prompt")]
     ]
 
-    private static func regex(_ pattern: String) -> NSRegularExpression {
-        // swiftlint:disable force_try
-        try! NSRegularExpression(pattern: pattern)
-        // swiftlint:enable force_try
-    }
-
     var isLoginURL: Bool {
         if isOAuthURL {
             return true

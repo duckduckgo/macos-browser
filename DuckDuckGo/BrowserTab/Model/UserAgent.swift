@@ -21,29 +21,23 @@ import Foundation
 enum UserAgent {
 
     static let safari = "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/14.1.1 Safari/605.1.15"
-    static let chrome = "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/90.0.4430.212 Safari/537.36"
+    static let chrome = "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.101 Safari/537.36"
 
     static let `default` = UserAgent.safari
 
-    static let domainUserAgents = [
-        "mail.google.com": UserAgent.safari,
-        "*.google.com": UserAgent.chrome
+    static let domainUserAgents: KeyValuePairs<RegEx, String> = [
+        // fix broken spreadsheets
+        regex("https://docs\\.google\\.com/spreadsheets/.*"): UserAgent.chrome
     ]
 
-    static func forDomain(_ domain: String) -> String {
-        if let agent = domainUserAgents[domain] ?? domainUserAgents["*." + domain] {
-            return agent
-        }
-
-        let components = domain.split(separator: ".")
-        guard components.count > 1 else {
+    static func `for`(_ url: URL?) -> String {
+        guard let absoluteString = url?.absoluteString else {
             return Self.default
         }
 
-        for i in 1..<(components.count - 1) {
-            let wildcard = "*." + components[i...].joined(separator: ".")
-            if let agent = domainUserAgents[wildcard] {
-                return agent
+        for (regex, userAgent) in domainUserAgents {
+            if absoluteString.matches(regex) {
+                return userAgent
             }
         }
 

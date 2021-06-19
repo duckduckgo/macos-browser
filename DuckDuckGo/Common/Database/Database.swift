@@ -112,6 +112,7 @@ extension NSManagedObjectContext {
 private class DDGPersistentContainer: NSPersistentContainer {
 
     override class func defaultDirectoryURL() -> URL {
-        return FileManager.default.urls(for: .applicationSupportDirectory, in: .userDomainMask).first!
-    } 
+        return URL.sandboxApplicationSupportURL
+    }
+
 }

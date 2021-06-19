@@ -25,6 +25,16 @@ import os.log
 
 extension AppDelegate {
 
+    // MARK: - DuckDuckGo
+
+#if OUT_OF_APPSTORE
+
+    @IBAction func checkForUpdates(_ sender: Any?) {
+        updateController.checkForUpdates(sender)
+    }
+
+#endif
+
     // MARK: - File
 
     @IBAction func newWindow(_ sender: Any?) {
@@ -308,14 +318,7 @@ extension MainViewController {
             return
         }
 
-        let webView = tabViewModel.tab.webView
-        webView.getMimeType { mimeType in
-            let download = FileDownload.webContent(webView, mimeType: mimeType)
-            FileDownloadManager.shared.startDownload(download,
-                                                     chooseDestinationCallback: self.browserTabViewController.chooseDestination,
-                                                     fileIconOriginalRectCallback: self.browserTabViewController.fileIconFlyAnimationOriginalRect,
-                                                     postflight: .reveal)
-        }
+        tabViewModel.tab.saveWebContentAs()
     }
 
     // MARK: - Debug
@@ -360,6 +363,8 @@ extension MainViewController: NSMenuItemValidation {
         case #selector(MainViewController.bookmarkThisPage(_:)),
              #selector(MainViewController.favoriteThisPage(_:)):
             return tabCollectionViewModel.selectedTabViewModel?.canBeBookmarked == true
+        case #selector(MainViewController.navigateToBookmark(_:)):
+            return true
 
         // Reopen Last Removed Tab
         case #selector(MainViewController.reopenLastClosedTab(_:)):

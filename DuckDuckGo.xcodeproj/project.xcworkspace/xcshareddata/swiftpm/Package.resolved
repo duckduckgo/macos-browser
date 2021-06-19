@@ -2,6 +2,15 @@
   "object": {
     "pins": [
       {
+        "package": "BrowserServicesKit",
+        "repositoryURL": "https://github.com/duckduckgo/BrowserServicesKit.git",
+        "state": {
+          "branch": null,
+          "revision": "0a7e1dffcdcd6a33cd713d575b7bafd19c4b1ebc",
+          "version": "4.0.2"
+        }
+      },
+      {
         "package": "GRDB",
         "repositoryURL": "https://github.com/duckduckgo/GRDB.swift.git",
         "state": {
@@ -35,6 +44,15 @@
           "branch": null,
           "revision": "4356ec54e073741449640d3d50a1fd24fd1e1b8b",
           "version": "2.1.0"
+        }
+      },
+      {
+        "package": "Sparkle",
+        "repositoryURL": "https://github.com/sparkle-project/Sparkle.git",
+        "state": {
+          "branch": null,
+          "revision": "c0933a516b420806e9216e71bd13ba76c54f0de6",
+          "version": "1.26.0"
         }
       },
       {

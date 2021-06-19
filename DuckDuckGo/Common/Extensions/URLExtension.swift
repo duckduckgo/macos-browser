@@ -21,6 +21,14 @@ import os.log
 
 extension URL {
 
+    // MARK: - Local
+
+    static var sandboxApplicationSupportURL: URL {
+        let sandboxPathComponent = "Containers/\(Bundle.main.bundleIdentifier!)/Data/Library/Application Support/"
+        let libraryURL = FileManager.default.urls(for: .libraryDirectory, in: .userDomainMask).first!
+        return libraryURL.appendingPathComponent(sandboxPathComponent)
+    }
+
     // MARK: - Factory
 
     static func makeSearchUrl(from searchQuery: String) -> URL? {
@@ -179,6 +187,23 @@ extension URL {
                       needsWWW: !input.drop(prefix: self.separatedScheme ?? "").isEmpty
                         && input.drop(prefix: self.separatedScheme ?? "").hasOrIsPrefix(of: URL.HostPrefix.www.rawValue),
                       dropTrailingSlash: false)
+    }
+
+    /// Tries to use the file name part of the URL, if available, adjusting for content type, if available.
+    var suggestedFilename: String? {
+        let url = self
+
+        var filename: String
+        if !url.pathComponents.isEmpty,
+           url.pathComponents != [ "/" ] {
+
+            filename = url.lastPathComponent
+        } else {
+            filename = url.host?.dropWWW().replacingOccurrences(of: ".", with: "_") ?? ""
+        }
+        guard !filename.isEmpty else { return nil }
+
+        return filename
     }
 
     // MARK: - Validity

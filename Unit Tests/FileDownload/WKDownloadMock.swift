@@ -1,5 +1,5 @@
 //
-//  FileDownloadTaskDelegateMock.swift
+//  WKDownloadMock.swift
 //
 //  Copyright © 2021 DuckDuckGo. All rights reserved.
 //
@@ -19,15 +19,9 @@
 import Foundation
 @testable import DuckDuckGo_Privacy_Browser
 
-final class FileDownloadTaskDelegateMock: FileDownloadTaskDelegate {
-    var destinationURLCallback: ((FileDownloadTask, @escaping (URL?, UTType?) -> Void) -> Void)?
-    var downloadDidFinish: ((FileDownloadTask, Result<URL, FileDownloadError>) -> Void)?
+final class WKDownloadMock: NSObject, WebKitDownload, ProgressReporting {
+    var originalRequest: URLRequest?
+    var webView: WKWebView?
+    var progress = Progress()
 
-    func fileDownloadTaskNeedsDestinationURL(_ task: FileDownloadTask, completionHandler: @escaping (URL?, UTType?) -> Void) {
-        destinationURLCallback?(task, completionHandler)
-    }
-
-    func fileDownloadTask(_ task: FileDownloadTask, didFinishWith result: Result<URL, FileDownloadError>) {
-        downloadDidFinish?(task, result)
-    }
 }

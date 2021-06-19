@@ -35,6 +35,10 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
     private var stateRestorationManager: AppStateRestorationManager!
     private var grammarCheckEnabler: GrammarCheckEnabler!
 
+#if OUT_OF_APPSTORE
+    let updateController = UpdateController()
+#endif
+
     var appUsageActivityMonitor: AppUsageActivityMonitor?
 
     func applicationWillFinishLaunching(_ notification: Notification) {
