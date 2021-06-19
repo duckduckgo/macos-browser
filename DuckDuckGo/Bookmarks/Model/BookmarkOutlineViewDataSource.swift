@@ -57,9 +57,16 @@ final class BookmarkOutlineViewDataSource: NSObject, NSOutlineViewDataSource, NS
 
     private func id(from notification: Notification) -> UUID? {
         let node = notification.userInfo?["NSObject"] as? BookmarkNode
-        let objectID = (node?.representedObject as? BaseBookmarkEntity)?.id
 
-        return objectID
+        if let bookmark = node?.representedObject as? BaseBookmarkEntity {
+            return bookmark.id
+        }
+
+        if let pseudoFolder = node?.representedObject as? PseudoFolder {
+            return pseudoFolder.id
+        }
+
+        return nil
     }
 
     // MARK: - NSOutlineViewDataSource

@@ -20,9 +20,10 @@ import Foundation
 
 final class PseudoFolder: Equatable {
 
-    static let favorites = PseudoFolder(name: "Favorites", icon: NSImage(named: "FavoriteFilledBorder")!)
-    static let bookmarks = PseudoFolder(name: "Bookmarks", icon: NSImage(named: "Folder")!)
+    static let favorites = PseudoFolder(id: UUID(), name: "Favorites", icon: NSImage(named: "FavoriteFilledBorder")!)
+    static let bookmarks = PseudoFolder(id: UUID(), name: "Bookmarks", icon: NSImage(named: "Folder")!)
 
+    let id: UUID
     let name: String
     let icon: NSImage
 
@@ -30,7 +31,8 @@ final class PseudoFolder: Equatable {
     var count: Int = 0
 
     // PseudoFolder instances aren't created directly, they are provided via the static values above.
-    private init(name: String, icon: NSImage) {
+    private init(id: UUID, name: String, icon: NSImage) {
+        self.id = id
         self.name = name
         self.icon = icon
     }

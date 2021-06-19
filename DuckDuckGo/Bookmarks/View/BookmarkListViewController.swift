@@ -128,10 +128,18 @@ final class BookmarkListViewController: NSViewController {
                     outlineView.collapseItem(node)
                 }
             }
-            
-            // Expand the Bookmarks pseudo folder automatically.
-            if let pseudoFolder = node.representedObject as? PseudoFolder, pseudoFolder == PseudoFolder.bookmarks {
-                outlineView.expandItem(node)
+
+            // Expand the Bookmarks pseudo folder automatically, and remember the expansion state of the Favorites pseudofolder.
+            if let pseudoFolder = node.representedObject as? PseudoFolder {
+                if pseudoFolder == PseudoFolder.bookmarks {
+                    outlineView.expandItem(node)
+                } else {
+                    if dataSource.expandedNodes.contains(pseudoFolder.id) {
+                        outlineView.expandItem(node)
+                    } else {
+                        outlineView.collapseItem(node)
+                    }
+                }
             }
         }
         
