@@ -398,6 +398,12 @@
                                                 <action selector="bookmarkThisPage:" target="Ady-hI-5gd" id="Mah-44-bE1"/>
                                             </connections>
                                         </menuItem>
+                                        <menuItem title="Manage Bookmarks" id="BaO-sP-wbQ">
+                                            <modifierMask key="keyEquivalentModifierMask"/>
+                                            <connections>
+                                                <action selector="showManageBookmarks:" target="Ady-hI-5gd" id="meV-V2-zJ2"/>
+                                            </connections>
+                                        </menuItem>
                                         <menuItem isSeparatorItem="YES" id="aPG-H0-BrG"/>
                                         <menuItem title="Favorites" image="Favorite" id="Y9I-ZC-gGg">
                                             <modifierMask key="keyEquivalentModifierMask"/>
