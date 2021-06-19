@@ -39,22 +39,15 @@ final class SaveCredentialsPopover: NSPopover {
         fatalError("\(Self.self): Bad initializer")
     }
 
-    func setupContentController() {
-        let model = SaveCredentialsModel(credentials: credentials)
-        let controller = NSHostingController<SaveCredentialsView>(rootView: SaveCredentialsView(model: model))
-        contentViewController = controller
-    }
+    // swiftlint:disable force_cast
+    var viewController: SaveCredentialsViewController { contentViewController as! SaveCredentialsViewController }
+    // swiftlint:enable force_cast
 
-//
-//    // :disable force_cast
-//    var viewController: SaveCredentialsViewController { contentViewController as! SaveCredentialsViewController }
-//    // :enable force_cast
-//
-//    private func setupContentController() {
-//        let controller = SaveCredentialsViewController.create()
-//        // controller.loadView()
-//        // xTODO controller.delegate = self
-//        contentViewController = controller
-//    }
+    private func setupContentController() {
+        let controller = SaveCredentialsViewController.create()
+        // TODO controller.delegate = self
+        contentViewController = controller
+        viewController.credentials = credentials
+    }
 
 }

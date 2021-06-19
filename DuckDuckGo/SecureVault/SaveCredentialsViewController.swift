@@ -19,37 +19,31 @@
 import AppKit
 import BrowserServicesKit
 
-import SwiftUI
-
-//final class SaveCredentialsViewController: NSHostingController<SaveCredentialsView> {
-//
-//    static func create() -> SaveCredentialsViewController {
-//        return SaveCredentialsViewController(rootView: SaveCredentialsView())
-//    }
-//
-//}
-
-/*
 final class SaveCredentialsViewController: NSViewController {
 
     static func create() -> SaveCredentialsViewController {
-         let storyboard = NSStoryboard(name: "SaveCredentials", bundle: nil)
-        // :disable force_cast
-         return storyboard.instantiateInitialController() as! SaveCredentialsViewController
+        let storyboard = NSStoryboard(name: "SaveCredentials", bundle: nil)
+        // swiftlint:disable force_cast
+        let controller = storyboard.instantiateInitialController() as! SaveCredentialsViewController
+        controller.loadView()
         // swiftlint:enable force_cast
+        return controller
     }
 
     @IBOutlet var faviconImage: NSImageView!
     @IBOutlet var domainLabel: NSTextField!
     @IBOutlet var usernameField: NSTextField!
-    @IBOutlet var passwordField: NSSecureTextField!
+    @IBOutlet var hiddenPasswordField: NSSecureTextField!
+    @IBOutlet var visiblePasswordField: NSTextField!
 
     var credentials: SecureVaultModels.WebsiteCredentials? {
         didSet {
             guard let credentials = self.credentials else { return }
             self.domainLabel.stringValue = credentials.account.domain
             self.usernameField.stringValue = credentials.account.username
-            self.passwordField.stringValue = String(data: credentials.password, encoding: .utf8) ?? ""
+            self.hiddenPasswordField.stringValue = String(data: credentials.password, encoding: .utf8) ?? ""
+            self.visiblePasswordField.stringValue = self.hiddenPasswordField.stringValue
+            self.loadFaviconForDomain(credentials.account.domain)
         }
     }
 
@@ -63,17 +57,28 @@ final class SaveCredentialsViewController: NSViewController {
     }
 
     @IBAction func onTogglePasswordVisibility(sender: Any?) {
-        guard let passwordCell = passwordField.cell as? NSSecureTextFieldCell else { return }
-        print("***", #function, passwordCell.echosBullets)
-        let value = passwordField.stringValue
-        passwordCell.echosBullets = !passwordCell.echosBullets
-        passwordField.stringValue = value
+
+        if hiddenPasswordField.isHidden {
+            hiddenPasswordField.stringValue = visiblePasswordField.stringValue
+            hiddenPasswordField.isHidden = false
+            visiblePasswordField.isHidden = true
+        } else {
+            visiblePasswordField.stringValue = hiddenPasswordField.stringValue
+            visiblePasswordField.isHidden = false
+            hiddenPasswordField.isHidden = true
+        }
+
     }
 
     override func viewDidLoad() {
         super.viewDidLoad()
         print("***", #function)
+        visiblePasswordField.isHidden = true
+    }
+
+    func loadFaviconForDomain(_ domain: String) {
+        faviconImage.image = LocalFaviconService.shared.getCachedFavicon(for: domain, mustBeFromUserScript: false)
+            ?? NSImage(named: NSImage.Name("Web"))
     }
 
 }
-*/

@@ -120,7 +120,6 @@
 		85890638267B88B800D23B0D /* SaveCredentials.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 85890637267B88B800D23B0D /* SaveCredentials.storyboard */; };
 		8589063A267BCD8E00D23B0D /* SaveCredentialsPopover.swift in Sources */ = {isa = PBXBuildFile; fileRef = 85890639267BCD8E00D23B0D /* SaveCredentialsPopover.swift */; };
 		8589063C267BCDC000D23B0D /* SaveCredentialsViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8589063B267BCDC000D23B0D /* SaveCredentialsViewController.swift */; };
-		8589063E267BE11600D23B0D /* SaveCredentialsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8589063D267BE11600D23B0D /* SaveCredentialsView.swift */; };
 		85A0116925AF1D8900FA6A0C /* FindInPageViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 85A0116825AF1D8900FA6A0C /* FindInPageViewController.swift */; };
 		85A0117425AF2EDF00FA6A0C /* FindInPage.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 85A0117325AF2EDF00FA6A0C /* FindInPage.storyboard */; };
 		85A0118225AF60E700FA6A0C /* FindInPageModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 85A0118125AF60E700FA6A0C /* FindInPageModel.swift */; };
@@ -478,7 +477,6 @@
 		85890637267B88B800D23B0D /* SaveCredentials.storyboard */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; path = SaveCredentials.storyboard; sourceTree = "<group>"; };
 		85890639267BCD8E00D23B0D /* SaveCredentialsPopover.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SaveCredentialsPopover.swift; sourceTree = "<group>"; };
 		8589063B267BCDC000D23B0D /* SaveCredentialsViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SaveCredentialsViewController.swift; sourceTree = "<group>"; };
-		8589063D267BE11600D23B0D /* SaveCredentialsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SaveCredentialsView.swift; sourceTree = "<group>"; };
 		85A0116825AF1D8900FA6A0C /* FindInPageViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FindInPageViewController.swift; sourceTree = "<group>"; };
 		85A0117325AF2EDF00FA6A0C /* FindInPage.storyboard */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; path = FindInPage.storyboard; sourceTree = "<group>"; };
 		85A0118125AF60E700FA6A0C /* FindInPageModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FindInPageModel.swift; sourceTree = "<group>"; };
@@ -1089,7 +1087,6 @@
 				85890637267B88B800D23B0D /* SaveCredentials.storyboard */,
 				85890639267BCD8E00D23B0D /* SaveCredentialsPopover.swift */,
 				8589063B267BCDC000D23B0D /* SaveCredentialsViewController.swift */,
-				8589063D267BE11600D23B0D /* SaveCredentialsView.swift */,
 			);
 			path = SecureVault;
 			sourceTree = "<group>";
@@ -2360,7 +2357,6 @@
 				AA8EDF2724923EC70071C2E8 /* StringExtension.swift in Sources */,
 				8589063A267BCD8E00D23B0D /* SaveCredentialsPopover.swift in Sources */,
 				AA72D5E325FE977F00C77619 /* AddEditFavoriteViewController.swift in Sources */,
-				8589063E267BE11600D23B0D /* SaveCredentialsView.swift in Sources */,
 				AA361A3624EBF0B500EEC649 /* WindowDraggingView.swift in Sources */,
 				B68458B825C7E8B200DC17B6 /* Tab+NSSecureCoding.swift in Sources */,
 				4B65028A25E6CBF40054432E /* NibLoadable.swift in Sources */,
