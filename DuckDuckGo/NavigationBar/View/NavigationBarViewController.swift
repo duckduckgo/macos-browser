@@ -153,6 +153,7 @@ final class NavigationBarViewController: NSViewController {
 
     func showBookmarkListPopover() {
         bookmarkListPopover.show(relativeTo: .zero, of: bookmarkListButton, preferredEdge: .maxY)
+        Pixel.fire(.bookmarksList(source: .button))
     }
 
 #if !FEEDBACK
