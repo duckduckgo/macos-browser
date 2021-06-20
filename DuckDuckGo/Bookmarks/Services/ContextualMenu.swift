@@ -20,7 +20,8 @@ import Foundation
 
 struct ContextualMenu {
 
-    static func menu(for objects: [Any]?) -> NSMenu? {
+    // Not all contexts support an editing option for bookmarks. The option is displayed by default, but `includeBookmarkEditMenu` can disable it.
+    static func menu(for objects: [Any]?, includeBookmarkEditMenu: Bool = true) -> NSMenu? {
         guard let objects = objects, objects.count > 0 else {
             return menuForNoSelection()
         }
@@ -33,7 +34,7 @@ struct ContextualMenu {
         let object = node?.representedObject ?? objects.first as? BaseBookmarkEntity
 
         if let bookmark = object as? Bookmark {
-            return menu(for: bookmark)
+            return menu(for: bookmark, includeBookmarkEditMenu: includeBookmarkEditMenu)
         } else if let folder = object as? BookmarkFolder {
             return menu(for: folder)
         } else {
@@ -48,7 +49,7 @@ struct ContextualMenu {
         return menu
     }
 
-    private static func menu(for bookmark: Bookmark) -> NSMenu {
+    private static func menu(for bookmark: Bookmark, includeBookmarkEditMenu: Bool) -> NSMenu {
         let menu = NSMenu(title: "")
 
         menu.addItem(openBookmarkInNewTabMenuItem(bookmark: bookmark))
@@ -56,7 +57,11 @@ struct ContextualMenu {
         menu.addItem(NSMenuItem.separator())
 
         menu.addItem(addBookmarkToFavoritesMenuItem(bookmark: bookmark))
-        menu.addItem(editBookmarkMenuItem(bookmark: bookmark))
+
+        if includeBookmarkEditMenu {
+            menu.addItem(editBookmarkMenuItem(bookmark: bookmark))
+        }
+
         menu.addItem(NSMenuItem.separator())
 
         menu.addItem(copyBookmarkMenuItem(bookmark: bookmark))

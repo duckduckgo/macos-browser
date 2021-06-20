@@ -202,11 +202,11 @@ extension BookmarkListViewController: NSMenuDelegate {
         }
         
         if outlineView.selectedRowIndexes.contains(row) {
-            return ContextualMenu.menu(for: outlineView.selectedItems)
+            return ContextualMenu.menu(for: outlineView.selectedItems, includeBookmarkEditMenu: false)
         }
         
         if let item = outlineView.item(atRow: row) {
-            return ContextualMenu.menu(for: [item])
+            return ContextualMenu.menu(for: [item], includeBookmarkEditMenu: false)
         } else {
             return nil
         }
@@ -259,7 +259,7 @@ extension BookmarkListViewController: BookmarkMenuItemSelectors {
     }
     
     func editBookmark(_ sender: NSMenuItem) {
-        // No-op
+        // Unsupported in the list view for the initial release.
     }
     
     func copyBookmark(_ sender: NSMenuItem) {
