@@ -61,12 +61,12 @@ final class BookmarkManagementDetailViewController: NSViewController {
                 context.allowsImplicitAnimation = true
                 context.duration = Constants.animationSpeed
 
-                if editingBookmarkIndex != nil {
-                    NSAppearance.withAppAppearance {
+                NSAppearance.withAppAppearance {
+                    if editingBookmarkIndex != nil {
                         colorView.animator().layer?.backgroundColor = NSColor.backgroundSecondaryColor.cgColor
+                    } else {
+                        colorView.animator().layer?.backgroundColor = NSColor.homepageBackgroundColor.cgColor
                     }
-                } else {
-                    colorView.animator().layer?.backgroundColor = NSColor.homepageBackgroundColor.cgColor
                 }
             }
         }
