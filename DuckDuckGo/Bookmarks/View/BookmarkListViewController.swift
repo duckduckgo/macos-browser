@@ -105,6 +105,7 @@ final class BookmarkListViewController: NSViewController {
     @IBAction func openManagementInterface(_ sender: NSButton) {
         WindowControllersManager.shared.showBookmarksTab()
         delegate?.popoverShouldClose(self)
+        Pixel.fire(.manageBookmarks(source: .button))
     }
     
     @IBAction func handleClick(_ sender: NSOutlineView) {
@@ -114,6 +115,7 @@ final class BookmarkListViewController: NSViewController {
            let bookmark = node.representedObject as? Bookmark {
             WindowControllersManager.shared.open(bookmark: bookmark)
             delegate?.popoverShouldClose(self)
+            Pixel.fire(.navigation(kind: .bookmark(isFavorite: bookmark.isFavorite), source: .listInterface))
         }
     }
     

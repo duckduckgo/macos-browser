@@ -142,6 +142,8 @@ final class BookmarkManagementDetailViewController: NSViewController {
                 WindowControllersManager.shared.show(url: bookmark.url)
                 tableView.deselectAll(nil)
             }
+
+            Pixel.fire(.navigation(kind: .bookmark(isFavorite: bookmark.isFavorite), source: .managementInterface))
         } else if let folder = entity as? BookmarkFolder {
             delegate?.bookmarkManagementDetailViewControllerDidSelectFolder(folder)
         } else {

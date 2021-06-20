@@ -35,6 +35,7 @@ extension Pixel {
         case fireproof(kind: FireproofKind, repetition: Repetition = .init(key: "fireproof"), suggested: FireproofingSuggested)
         case fireproofSuggested(repetition: Repetition = .init(key: "fireproof-suggested"))
 
+        case manageBookmarks(repetition: Repetition = .init(key: "manage-bookmarks"), source: AccessPoint)
         case bookmark(fireproofed: IsBookmarkFireproofed, repetition: Repetition = .init(key: "bookmark"), source: AccessPoint)
         case favorite(fireproofed: IsBookmarkFireproofed, repetition: Repetition = .init(key: "favorite"), source: AccessPoint)
 
@@ -112,8 +113,12 @@ extension Pixel.Event {
         case .fireproofSuggested(repetition: let repetition):
             return "m_mac_fireproof-suggested_\(repetition)"
 
+        case .manageBookmarks(repetition: let repetition, source: let source):
+            return "m_mac_manage-bookmarks_\(repetition)_\(source)"
+
         case .bookmark(fireproofed: let fireproofed, repetition: let repetition, source: let source):
             return "m_mac_bookmark_\(fireproofed)_\(repetition)_\(source)"
+
         case .favorite(fireproofed: let fireproofed, repetition: let repetition, source: let source):
             return "m_mac_favorite_\(fireproofed)_\(repetition)_\(source)"
 

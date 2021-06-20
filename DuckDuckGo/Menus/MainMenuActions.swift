@@ -238,6 +238,7 @@ extension MainViewController {
 
     @IBAction func showManageBookmarks(_ sender: Any?) {
         tabCollectionViewModel.appendNewTab(type: .bookmarks)
+        Pixel.fire(.manageBookmarks(source: .mainMenu))
     }
 
     // MARK: - Window

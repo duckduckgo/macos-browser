@@ -259,6 +259,8 @@ extension Pixel.Event {
         case addressBar = "source-address-bar"
         case suggestion = "source-suggestion"
         case newTab = "source-new-tab"
+        case listInterface = "source-list-interface"
+        case managementInterface = "source-management-interface"
     }
 
     enum HasBookmark: String, CustomStringConvertible {
