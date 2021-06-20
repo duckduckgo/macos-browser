@@ -291,7 +291,7 @@ extension Pixel.Event {
         case cancelled = "cancelled"
         case moveTabToNewWindow = "new-window"
         case feedback = "feedback"
-        case bookmark = "bookmark"
+        case bookmarksList = "bookmarks-list"
         case emailProtection = "email-protection"
         case fireproof = "fireproof"
         case preferences = "preferences"

@@ -116,7 +116,7 @@ final class NavigationBarViewController: NSViewController {
 
             switch menu.result {
             case .bookmarks:
-                Pixel.fire(.moreMenu(result: .bookmark))
+                Pixel.fire(.moreMenu(result: .bookmarksList))
             case .emailProtection:
                 Pixel.fire(.moreMenu(result: .emailProtection))
             case .feedback:
