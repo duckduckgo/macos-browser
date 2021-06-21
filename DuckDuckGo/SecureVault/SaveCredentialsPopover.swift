@@ -45,9 +45,19 @@ final class SaveCredentialsPopover: NSPopover {
 
     private func setupContentController() {
         let controller = SaveCredentialsViewController.create()
-        // TODO controller.delegate = self
+        controller.delegate = self
         contentViewController = controller
         viewController.credentials = credentials
+    }
+
+}
+
+extension SaveCredentialsPopover: SaveCredentialsDelegate {
+
+    func shouldCloseSaveCredentialsViewController(_: SaveCredentialsViewController) {
+        DispatchQueue.main.async {
+            self.close()
+        }
     }
 
 }

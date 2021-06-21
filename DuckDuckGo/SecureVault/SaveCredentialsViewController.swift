@@ -18,6 +18,15 @@
 
 import AppKit
 import BrowserServicesKit
+import Combine
+import os
+
+protocol SaveCredentialsDelegate: AnyObject {
+
+    /// May not be called on main thread.
+    func shouldCloseSaveCredentialsViewController(_: SaveCredentialsViewController)
+
+}
 
 final class SaveCredentialsViewController: NSViewController {
 
@@ -35,10 +44,14 @@ final class SaveCredentialsViewController: NSViewController {
     @IBOutlet var usernameField: NSTextField!
     @IBOutlet var hiddenPasswordField: NSSecureTextField!
     @IBOutlet var visiblePasswordField: NSTextField!
+    @IBOutlet var saveButton: NSButton!
+    @IBOutlet var fireproofCheck: NSButton!
+
+    weak var delegate: SaveCredentialsDelegate?
 
     var credentials: SecureVaultModels.WebsiteCredentials? {
         didSet {
-            guard let credentials = self.credentials else { return }
+            guard let credentials = credentials else { return }
             self.domainLabel.stringValue = credentials.account.domain
             self.usernameField.stringValue = credentials.account.username
             self.hiddenPasswordField.stringValue = String(data: credentials.password, encoding: .utf8) ?? ""
@@ -47,13 +60,61 @@ final class SaveCredentialsViewController: NSViewController {
         }
     }
 
+    var passwordData: Data {
+        let string = hiddenPasswordField.isHidden ? visiblePasswordField.stringValue : hiddenPasswordField.stringValue
+        return string.data(using: .utf8)!
+    }
+
     @IBAction func onSaveClicked(sender: Any?) {
+
+        let account = SecureVaultModels.WebsiteAccount(username: usernameField.stringValue.trimmingWhitespaces(),
+                                                       domain: domainLabel.stringValue)
+        let credentials = SecureVaultModels.WebsiteCredentials(account: account, password: passwordData)
+
+        var cancellable: AnyCancellable?
+        cancellable = SecureVaultFactory.default.makeVault().flatMap { vault in
+            vault.storeWebsiteCredentials(credentials)
+        }
+        .sink { [weak self] _ in
+            // Later, check for errors
+            self?.delegate?.shouldCloseSaveCredentialsViewController(self!)
+            cancellable?.cancel()
+        } receiveValue: { [weak self] _ in
+            DispatchQueue.main.async {
+                if self?.fireproofCheck.state == .on {
+                    Pixel.fire(.fireproof(kind: .pwm, suggested: .pwm))
+                    FireproofDomains.shared.addToAllowed(domain: account.domain)
+                }
+            }
+            cancellable?.cancel()
+        }
     }
 
     @IBAction func onNotNowClicked(sender: Any?) {
+        delegate?.shouldCloseSaveCredentialsViewController(self)
+
+        let host = domainLabel.stringValue
+
+        guard let window = view.window, !FireproofDomains.shared.isAllowed(fireproofDomain: host) else {
+            os_log("%s: Window is nil", type: .error, className)
+            return
+        }
+
+        let alert = NSAlert.fireproofAlert(with: host.dropWWW())
+        alert.beginSheetModal(for: window) { response in
+            if response == NSApplication.ModalResponse.alertFirstButtonReturn {
+                Pixel.fire(.fireproof(kind: .pwm, suggested: .suggested))
+                FireproofDomains.shared.addToAllowed(domain: host)
+            }
+        }
+
+        Pixel.fire(.fireproofSuggested())
     }
 
+    /// Assuming per website basis.
     @IBAction func onNeverClicked(sender: Any?) {
+        PasswordManagerSettings().doNotPromptOnDomain(domainLabel.stringValue)
+        delegate?.shouldCloseSaveCredentialsViewController(self)
     }
 
     @IBAction func onTogglePasswordVisibility(sender: Any?) {
@@ -74,6 +135,7 @@ final class SaveCredentialsViewController: NSViewController {
         super.viewDidLoad()
         print("***", #function)
         visiblePasswordField.isHidden = true
+        saveButton.becomeFirstResponder()
     }
 
     func loadFaviconForDomain(_ domain: String) {

@@ -22,6 +22,8 @@ import os
 import Combine
 import BrowserServicesKit
 
+// swiftlint:disable file_length
+
 protocol TabDelegate: FileDownloadManagerDelegate {
     func tabDidStartNavigation(_ tab: Tab)
     func tab(_ tab: Tab, requestedNewTab url: URL?, selected: Bool)
@@ -704,3 +706,4 @@ fileprivate extension WKNavigationResponse {
 }
 
 // swiftlint:enable type_body_length
+// swiftlint:enable file_length

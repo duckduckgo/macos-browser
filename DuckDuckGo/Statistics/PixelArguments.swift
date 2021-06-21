@@ -145,6 +145,7 @@ extension Pixel.Event {
         case bookmarked
         case favorite
         case website
+        case pwm
 
         init(url: URL?, bookmarkManager: BookmarkManager = LocalBookmarkManager.shared) {
             guard let url = url,
@@ -166,6 +167,7 @@ extension Pixel.Event {
 
         case suggested
         case manual
+        case pwm
     }
 
     enum IsBookmarkFireproofed: String, CustomStringConvertible {

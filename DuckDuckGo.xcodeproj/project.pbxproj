@@ -105,6 +105,8 @@
 		4BB88B5B25B7BA50006F6B06 /* Instruments.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4BB88B5A25B7BA50006F6B06 /* Instruments.swift */; };
 		8511E18425F82B34002F516B /* 01_Fire_really_small.json in Resources */ = {isa = PBXBuildFile; fileRef = 8511E18325F82B34002F516B /* 01_Fire_really_small.json */; };
 		853014D625E671A000FB8205 /* PageObserverUserScript.swift in Sources */ = {isa = PBXBuildFile; fileRef = 853014D525E671A000FB8205 /* PageObserverUserScript.swift */; };
+		85308E25267FC9F2001ABD76 /* NSAlertExtension.swift in Sources */ = {isa = PBXBuildFile; fileRef = 85308E24267FC9F2001ABD76 /* NSAlertExtension.swift */; };
+		85308E27267FCB22001ABD76 /* PasswordManagerSettings.swift in Sources */ = {isa = PBXBuildFile; fileRef = 85308E26267FCB22001ABD76 /* PasswordManagerSettings.swift */; };
 		8546DE6225C03056000CA5E1 /* UserAgentTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8546DE6125C03056000CA5E1 /* UserAgentTests.swift */; };
 		85480F8A25CDC360009424E3 /* Launch.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 85480F8925CDC360009424E3 /* Launch.storyboard */; };
 		85480FBB25D181CB009424E3 /* ConfigurationDownloading.swift in Sources */ = {isa = PBXBuildFile; fileRef = 85480FBA25D181CB009424E3 /* ConfigurationDownloading.swift */; };
@@ -459,6 +461,8 @@
 		8511E18325F82B34002F516B /* 01_Fire_really_small.json */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.json; path = 01_Fire_really_small.json; sourceTree = "<group>"; };
 		853014D525E671A000FB8205 /* PageObserverUserScript.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PageObserverUserScript.swift; sourceTree = "<group>"; };
 		85308E23267E87E8001ABD76 /* BrowserServicesKit */ = {isa = PBXFileReference; lastKnownFileType = folder; name = BrowserServicesKit; path = ../BrowserServicesKit; sourceTree = "<group>"; };
+		85308E24267FC9F2001ABD76 /* NSAlertExtension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NSAlertExtension.swift; sourceTree = "<group>"; };
+		85308E26267FCB22001ABD76 /* PasswordManagerSettings.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PasswordManagerSettings.swift; sourceTree = "<group>"; };
 		8546DE6125C03056000CA5E1 /* UserAgentTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UserAgentTests.swift; sourceTree = "<group>"; };
 		85480F8925CDC360009424E3 /* Launch.storyboard */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; path = Launch.storyboard; sourceTree = "<group>"; };
 		85480FBA25D181CB009424E3 /* ConfigurationDownloading.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ConfigurationDownloading.swift; sourceTree = "<group>"; };
@@ -1076,6 +1080,7 @@
 				85890637267B88B800D23B0D /* SaveCredentials.storyboard */,
 				85890639267BCD8E00D23B0D /* SaveCredentialsPopover.swift */,
 				8589063B267BCDC000D23B0D /* SaveCredentialsViewController.swift */,
+				85308E26267FCB22001ABD76 /* PasswordManagerSettings.swift */,
 			);
 			path = SecureVault;
 			sourceTree = "<group>";
@@ -1719,49 +1724,50 @@
 		AADC60E92493B305008F8EF7 /* Extensions */ = {
 			isa = PBXGroup;
 			children = (
-				4B0511DF262CAA8600F6079C /* NSOpenPanelExtensions.swift */,
-				4B0511E0262CAA8600F6079C /* NSViewControllerExtension.swift */,
 				4BA1A6C1258B0A1300F6F690 /* ContiguousBytesExtension.swift */,
 				85AC3AF625D5DBFD00C7D2AA /* DataExtension.swift */,
 				B6A9E46F26146A250067D1B9 /* DateExtension.swift */,
 				B63D467025BFA6C100874977 /* DispatchQueueExtensions.swift */,
 				AA92126E25ACCB1100600CD4 /* ErrorExtension.swift */,
+				B6E61EE2263AC0C8004E11AB /* FileManagerExtension.swift */,
 				4B67744F255DBFA300025BD8 /* HashExtension.swift */,
 				AAECA41F24EEA4AC00EFA63A /* IndexPathExtension.swift */,
+				85308E24267FC9F2001ABD76 /* NSAlertExtension.swift */,
 				F44C130125C2DA0400426E3E /* NSAppearanceExtension.swift */,
 				AA5C8F622591021700748EB7 /* NSApplicationExtension.swift */,
 				B63D467925BFC3E100874977 /* NSCoderExtensions.swift */,
 				F41D174025CB131900472416 /* NSColorExtension.swift */,
+				B657841825FA484B00D8DB33 /* NSException+Catch.h */,
+				B657841925FA484B00D8DB33 /* NSException+Catch.m */,
+				B657841E25FA497600D8DB33 /* NSException+Catch.swift */,
+				4B0511FC262CD20D00F6079C /* NSImageViewExtension.swift */,
 				AA6EF9B2250785D5004754E6 /* NSMenuExtension.swift */,
 				AA72D5FD25FFF94E00C77619 /* NSMenuItemExtension.swift */,
+				4B0511DF262CAA8600F6079C /* NSOpenPanelExtensions.swift */,
 				AA5C8F5D2590EEE800748EB7 /* NSPointExtension.swift */,
+				B6B3E0DC2657E9CF0040E0A2 /* NSScreenExtension.swift */,
 				AAC5E4E325D6BA9C007F5990 /* NSSizeExtension.swift */,
 				AA5C8F58258FE21F00748EB7 /* NSTextFieldExtension.swift */,
+				4B0511E0262CAA8600F6079C /* NSViewControllerExtension.swift */,
 				AA6FFB4324DC33320028F4D0 /* NSViewExtension.swift */,
 				AA9E9A5525A3AE8400D1959D /* NSWindowExtension.swift */,
-				B6B3E0DC2657E9CF0040E0A2 /* NSScreenExtension.swift */,
+				B6A9E46A2614618A0067D1B9 /* OperatingSystemVersionExtension.swift */,
 				B684592125C93BE000DC17B6 /* Publisher.asVoid.swift */,
+				AAFCB37E25E545D400859DD4 /* PublisherExtension.swift */,
 				B684592625C93C0500DC17B6 /* Publishers.NestedObjectChanges.swift */,
-				4BB88B4925B7B690006F6B06 /* SequenceExtensions.swift */,
-				AA8EDF2624923EC70071C2E8 /* StringExtension.swift */,
 				B6AAAC3D26048F690029438D /* RandomAccessCollectionExtension.swift */,
+				4BB88B4925B7B690006F6B06 /* SequenceExtensions.swift */,
 				B65783E625F8AAFB00D8DB33 /* String+Punycode.swift */,
+				AA8EDF2624923EC70071C2E8 /* StringExtension.swift */,
+				AAADFD05264AA282001555EA /* TimeIntervalExtension.swift */,
 				AA8EDF2324923E980071C2E8 /* URLExtension.swift */,
 				AA88D14A252A557100980B4E /* URLRequestExtension.swift */,
+				B6CF78DD267B099C00CD4F13 /* WKNavigationActionExtension.swift */,
 				AAA0CC69253CC43C0079BC96 /* WKUserContentControllerExtension.swift */,
 				B63D466725BEB6C200874977 /* WKWebView+Private.h */,
 				B63D466825BEB6C200874977 /* WKWebView+SessionState.swift */,
 				B68458CC25C7EB9000DC17B6 /* WKWebViewConfigurationExtensions.swift */,
 				AA92127625ADA07900600CD4 /* WKWebViewExtension.swift */,
-				B6CF78DD267B099C00CD4F13 /* WKNavigationActionExtension.swift */,
-				AAFCB37E25E545D400859DD4 /* PublisherExtension.swift */,
-				B657841825FA484B00D8DB33 /* NSException+Catch.h */,
-				B657841925FA484B00D8DB33 /* NSException+Catch.m */,
-				B657841E25FA497600D8DB33 /* NSException+Catch.swift */,
-				B6A9E46A2614618A0067D1B9 /* OperatingSystemVersionExtension.swift */,
-				4B0511FC262CD20D00F6079C /* NSImageViewExtension.swift */,
-				B6E61EE2263AC0C8004E11AB /* FileManagerExtension.swift */,
-				AAADFD05264AA282001555EA /* TimeIntervalExtension.swift */,
 			);
 			path = Extensions;
 			sourceTree = "<group>";
@@ -2313,6 +2319,7 @@
 				B63D466925BEB6C200874977 /* WKWebView+SessionState.swift in Sources */,
 				B6A924D92664C72E001A28CA /* WebKitDownloadTask.swift in Sources */,
 				85E11C2F25E7DC7E00974CAF /* ExternalURLHandler.swift in Sources */,
+				85308E27267FCB22001ABD76 /* PasswordManagerSettings.swift in Sources */,
 				85A0116925AF1D8900FA6A0C /* FindInPageViewController.swift in Sources */,
 				AA6FFB4424DC33320028F4D0 /* NSViewExtension.swift in Sources */,
 				AA4BBA3B25C58FA200C4FB0F /* MainMenu.swift in Sources */,
@@ -2397,6 +2404,7 @@
 				AA585D82248FD31100E9A3E2 /* AppDelegate.swift in Sources */,
 				AA72D5F025FEA49900C77619 /* AddEditFavoriteWindow.swift in Sources */,
 				1456D6E124EFCBC300775049 /* TabBarCollectionView.swift in Sources */,
+				85308E25267FC9F2001ABD76 /* NSAlertExtension.swift in Sources */,
 				4B0511D8262CAA7000F6079C /* PaddedImageButton.swift in Sources */,
 				AABEE69C24A902BB0043105B /* SuggestionContainer.swift in Sources */,
 				B6A9E46B2614618A0067D1B9 /* OperatingSystemVersionExtension.swift in Sources */,

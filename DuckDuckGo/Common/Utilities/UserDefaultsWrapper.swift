@@ -43,6 +43,8 @@ public struct UserDefaultsWrapper<T> {
         case alwaysRequestDownloadLocationKey = "preferences.download-location.always-request"
 
         case saveAsPreferredFileType = "saveAs.selected.filetype"
+
+        case passwordManagerDoNotPromptDomains = "com.duckduckgo.passwordmanager.do-not-prompt-domains"
     }
 
     private let key: Key

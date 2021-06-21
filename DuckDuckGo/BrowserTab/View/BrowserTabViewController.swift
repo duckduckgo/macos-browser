@@ -283,7 +283,10 @@ extension BrowserTabViewController: TabDelegate {
     }
 
     func tab(_ tab: Tab, detectedLogin host: String) {
-        guard let window = view.window, !FireproofDomains.shared.isAllowed(fireproofDomain: host) else {
+        guard let window = view.window,
+              !FireproofDomains.shared.isAllowed(fireproofDomain: host),
+              !PasswordManagerSettings().canPromptOnDomain(host)
+              else {
             os_log("%s: Window is nil", type: .error, className)
             return
         }
@@ -520,78 +523,6 @@ extension BrowserTabViewController: WKUIDelegate {
         }
 
         tabCollectionViewModel.remove(ownerOf: webView)
-    }
-
-}
-
-fileprivate extension NSAlert {
-
-    static var cautionImage = NSImage(named: "NSCaution")
-
-    static func javascriptAlert(with message: String) -> NSAlert {
-        let alert = NSAlert()
-        alert.icon = Self.cautionImage
-        alert.messageText = message
-        alert.addButton(withTitle: UserText.ok)
-        return alert
-    }
-
-    static func javascriptConfirmation(with message: String) -> NSAlert {
-        let alert = NSAlert()
-        alert.icon = Self.cautionImage
-        alert.messageText = message
-        alert.addButton(withTitle: UserText.ok)
-        alert.addButton(withTitle: UserText.cancel)
-        return alert
-    }
-
-    static func javascriptTextInput(prompt: String, defaultText: String?) -> NSAlert {
-        let alert = NSAlert()
-        alert.icon = Self.cautionImage
-        alert.messageText = prompt
-        alert.addButton(withTitle: UserText.ok)
-        alert.addButton(withTitle: UserText.cancel)
-        let textField = NSTextField(frame: NSRect(x: 0, y: 0, width: 200, height: 24))
-        textField.placeholderString = defaultText
-        alert.accessoryView = textField
-        alert.window.initialFirstResponder = textField
-        return alert
-    }
-
-    static func fireproofAlert(with domain: String) -> NSAlert {
-        let alert = NSAlert()
-        alert.messageText = UserText.fireproofConfirmationTitle(domain: domain)
-        alert.informativeText = UserText.fireproofConfirmationMessage
-        alert.alertStyle = .warning
-        alert.icon = #imageLiteral(resourceName: "Fireproof")
-        alert.addButton(withTitle: UserText.fireproof)
-        alert.addButton(withTitle: UserText.notNow)
-        return alert
-    }
-
-    static func openExternalURLAlert(with appName: String?) -> NSAlert {
-        let alert = NSAlert()
-
-        if let appName = appName {
-            alert.messageText = UserText.openExternalURLTitle(forAppName: appName)
-            alert.informativeText = UserText.openExternalURLMessage(forAppName: appName)
-        } else {
-            alert.messageText = UserText.openExternalURLTitleUnknownApp
-            alert.informativeText = UserText.openExternalURLMessageUnknownApp
-        }
-
-        alert.alertStyle = .warning
-        alert.addButton(withTitle: UserText.open)
-        alert.addButton(withTitle: UserText.cancel)
-        return alert
-    }
-
-    static func unableToOpenExernalURLAlert() -> NSAlert {
-        let alert = NSAlert()
-        alert.messageText = UserText.failedToOpenExternally
-        alert.alertStyle = .warning
-        alert.addButton(withTitle: UserText.ok)
-        return alert
     }
 
 }
