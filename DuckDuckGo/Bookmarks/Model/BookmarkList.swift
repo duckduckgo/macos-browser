@@ -21,17 +21,40 @@ import os.log
 
 struct BookmarkList {
 
-    private var keysOrdered: [URL]
+    var topLevelEntities: [BaseBookmarkEntity] = []
+
+    private var allBookmarkURLsOrdered: [URL]
+    private var favoriteBookmarkURLsOrdered: [URL]
     private var itemsDict: [URL: Bookmark]
 
-    init(bookmarks: [Bookmark] = []) {
-        let keysOrdered = bookmarks.map { $0.url }
+    var totalBookmarks: Int {
+        return allBookmarkURLsOrdered.count
+    }
+
+    var favoriteBookmarks: [Bookmark] {
+        return favoriteBookmarkURLsOrdered.compactMap {
+            itemsDict[$0]
+        }
+    }
+
+    init(entities: [BaseBookmarkEntity] = [], topLevelEntities: [BaseBookmarkEntity] = []) {
+        let bookmarks = entities.compactMap { $0 as? Bookmark }
+        let keysOrdered = bookmarks.compactMap { $0.url }
+        var favoriteKeysOrdered = [URL]()
 
         var itemsDict = [URL: Bookmark]()
-        bookmarks.forEach { itemsDict[$0.url] = $0 }
+        for bookmark in bookmarks {
+            itemsDict[bookmark.url] = bookmark
 
-        self.keysOrdered = keysOrdered
+            if bookmark.isFavorite {
+                favoriteKeysOrdered.append(bookmark.url)
+            }
+        }
+
+        self.allBookmarkURLsOrdered = keysOrdered
+        self.favoriteBookmarkURLsOrdered = favoriteKeysOrdered
         self.itemsDict = itemsDict
+        self.topLevelEntities = topLevelEntities
     }
 
     mutating func insert(_ bookmark: Bookmark) {
@@ -40,7 +63,7 @@ struct BookmarkList {
             return
         }
 
-        keysOrdered.insert(bookmark.url, at: 0)
+        allBookmarkURLsOrdered.insert(bookmark.url, at: 0)
         itemsDict[bookmark.url] = bookmark
     }
 
@@ -49,11 +72,13 @@ struct BookmarkList {
     }
 
     mutating func remove(_ bookmark: Bookmark) {
-        keysOrdered.removeAll { $0 == bookmark.url }
+        allBookmarkURLsOrdered.removeAll { $0 == bookmark.url }
         itemsDict.removeValue(forKey: bookmark.url)
     }
 
     mutating func update(with bookmark: Bookmark) {
+        guard !bookmark.isFolder else { return }
+
         guard itemsDict[bookmark.url] != nil else {
             os_log("BookmarkList: Update failed, no such item in bookmark list")
             return
@@ -63,17 +88,19 @@ struct BookmarkList {
     }
 
     mutating func updateUrl(of bookmark: Bookmark, to newUrl: URL) -> Bookmark? {
+        guard !bookmark.isFolder else { return nil }
+
         guard itemsDict[newUrl] == nil else {
             os_log("BookmarkList: Update failed, new url already in bookmark list")
             return nil
         }
-        guard itemsDict[bookmark.url] != nil, let index = keysOrdered.firstIndex(of: bookmark.url) else {
+        guard itemsDict[bookmark.url] != nil, let index = allBookmarkURLsOrdered.firstIndex(of: bookmark.url) else {
             os_log("BookmarkList: Update failed, no such item in bookmark list")
             return nil
         }
 
-        keysOrdered.remove(at: index)
-        keysOrdered.insert(newUrl, at: index)
+        allBookmarkURLsOrdered.remove(at: index)
+        allBookmarkURLsOrdered.insert(newUrl, at: index)
 
         itemsDict[bookmark.url] = nil
         let newBookmark = Bookmark(from: bookmark, with: newUrl)
@@ -82,7 +109,7 @@ struct BookmarkList {
     }
 
     func bookmarks() -> [Bookmark] {
-        keysOrdered
+        allBookmarkURLsOrdered
             .map { itemsDict[$0] }
             .compactMap { $0 }
     }

@@ -26,6 +26,7 @@ protocol PreferencesSidebarViewControllerDelegate: AnyObject {
 
 final class PreferencesSidebarViewController: NSViewController {
 
+    @IBOutlet var tabSwitcherButton: NSPopUpButton!
     @IBOutlet var preferencesTableView: NSTableView!
 
     weak var delegate: PreferencesSidebarViewControllerDelegate?
@@ -49,6 +50,11 @@ final class PreferencesSidebarViewController: NSViewController {
 
         preferencesTableView.target = self
         preferencesTableView.action = #selector(selectedRow)
+    }
+
+    override func viewWillAppear() {
+        super.viewWillAppear()
+        tabSwitcherButton.select(tabType: .preferences)
     }
 
     override func viewDidAppear() {

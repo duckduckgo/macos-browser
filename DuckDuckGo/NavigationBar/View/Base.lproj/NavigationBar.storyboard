@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<document type="com.apple.InterfaceBuilder3.Cocoa.Storyboard.XIB" version="3.0" toolsVersion="17701" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none" useAutolayout="YES" initialViewController="o2v-eH-jTI">
+<document type="com.apple.InterfaceBuilder3.Cocoa.Storyboard.XIB" version="3.0" toolsVersion="18122" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none" useAutolayout="YES" initialViewController="o2v-eH-jTI">
     <dependencies>
         <deployment identifier="macosx"/>
-        <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="17701"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="18122"/>
         <capability name="Named colors" minToolsVersion="9.0"/>
         <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
     </dependencies>
@@ -123,7 +123,7 @@
                                 </connections>
                             </button>
                             <containerView translatesAutoresizingMaskIntoConstraints="NO" id="Wba-nA-FYj">
-                                <rect key="frame" x="130" y="1" width="560" height="38"/>
+                                <rect key="frame" x="112" y="1" width="559" height="38"/>
                                 <constraints>
                                     <constraint firstAttribute="width" relation="greaterThanOrEqual" priority="301" constant="560" id="UmE-2a-hW4"/>
                                     <constraint firstAttribute="height" constant="38" id="fDM-4Y-Nvs"/>
@@ -133,7 +133,7 @@
                                 </connections>
                             </containerView>
                             <button translatesAutoresizingMaskIntoConstraints="NO" id="DqX-mW-o7G" customClass="MouseOverButton" customModule="DuckDuckGo_Privacy_Browser" customModuleProvider="target">
-                                <rect key="frame" x="703" y="6" width="28" height="28"/>
+                                <rect key="frame" x="679" y="6" width="28" height="28"/>
                                 <constraints>
                                     <constraint firstAttribute="width" constant="28" id="VYL-F0-tet"/>
                                     <constraint firstAttribute="height" constant="28" id="fPk-l3-pz2"/>
@@ -184,9 +184,34 @@
                                     <action selector="shareButtonAction:" target="o2v-eH-jTI" id="VBL-Ae-zB0"/>
                                 </connections>
                             </button>
+                            <button translatesAutoresizingMaskIntoConstraints="NO" id="4sj-qN-UUY" userLabel="Bookmarks Button" customClass="MouseOverButton" customModule="DuckDuckGo_Privacy_Browser" customModuleProvider="target">
+                                <rect key="frame" x="707" y="6" width="28" height="28"/>
+                                <constraints>
+                                    <constraint firstAttribute="height" constant="28" id="Qzm-SN-RXg"/>
+                                    <constraint firstAttribute="width" constant="28" id="q0c-3z-K6Y"/>
+                                </constraints>
+                                <buttonCell key="cell" type="square" bezelStyle="shadowlessSquare" image="Bookmarks" imagePosition="only" alignment="center" imageScaling="proportionallyDown" inset="2" id="ybv-cj-wPr">
+                                    <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
+                                    <font key="font" metaFont="system"/>
+                                </buttonCell>
+                                <color key="contentTintColor" name="ButtonColor"/>
+                                <userDefinedRuntimeAttributes>
+                                    <userDefinedRuntimeAttribute type="color" keyPath="mouseOverColor">
+                                        <color key="value" name="ButtonMouseOverColor"/>
+                                    </userDefinedRuntimeAttribute>
+                                    <userDefinedRuntimeAttribute type="color" keyPath="mouseDownColor">
+                                        <color key="value" name="ButtonMouseDownColor"/>
+                                    </userDefinedRuntimeAttribute>
+                                    <userDefinedRuntimeAttribute type="number" keyPath="cornerRadius">
+                                        <real key="value" value="4"/>
+                                    </userDefinedRuntimeAttribute>
+                                </userDefinedRuntimeAttributes>
+                                <connections>
+                                    <action selector="bookmarksButtonAction:" target="o2v-eH-jTI" id="feR-3s-kbn"/>
+                                </connections>
+                            </button>
                         </subviews>
                         <constraints>
-                            <constraint firstItem="XBe-xO-dXj" firstAttribute="leading" relation="greaterThanOrEqual" secondItem="Wba-nA-FYj" secondAttribute="trailing" constant="8" id="1pf-1j-vMt"/>
                             <constraint firstAttribute="bottom" secondItem="EQw-GG-GMA" secondAttribute="bottom" id="4ye-CO-dDp"/>
                             <constraint firstItem="kky-0N-Cfd" firstAttribute="leading" secondItem="hYV-nu-QIp" secondAttribute="leading" constant="8" id="5xQ-lQ-hZc"/>
                             <constraint firstItem="iIF-Ky-unr" firstAttribute="centerY" secondItem="hYV-nu-QIp" secondAttribute="centerY" id="6EH-Ax-6p8"/>
@@ -203,9 +228,11 @@
                             <constraint firstAttribute="trailing" secondItem="iIF-Ky-unr" secondAttribute="trailing" constant="8" id="gaO-bl-clp"/>
                             <constraint firstItem="EQw-GG-GMA" firstAttribute="leading" secondItem="hYV-nu-QIp" secondAttribute="leading" id="hpe-5Y-XTJ"/>
                             <constraint firstItem="mdE-u0-Ei5" firstAttribute="centerY" secondItem="hYV-nu-QIp" secondAttribute="centerY" id="hpv-rt-wVQ"/>
-                            <constraint firstItem="XBe-xO-dXj" firstAttribute="leading" secondItem="DqX-mW-o7G" secondAttribute="trailing" constant="4" id="jwc-uv-Z8J"/>
+                            <constraint firstItem="4sj-qN-UUY" firstAttribute="centerY" secondItem="hYV-nu-QIp" secondAttribute="centerY" id="mPG-9Z-Wva"/>
+                            <constraint firstItem="4sj-qN-UUY" firstAttribute="leading" secondItem="DqX-mW-o7G" secondAttribute="trailing" id="nMJ-nc-Xts"/>
                             <constraint firstItem="kky-0N-Cfd" firstAttribute="centerY" secondItem="hYV-nu-QIp" secondAttribute="centerY" id="nim-fw-Zt3"/>
                             <constraint firstAttribute="trailing" secondItem="EQw-GG-GMA" secondAttribute="trailing" id="oYK-XH-0iN"/>
+                            <constraint firstItem="XBe-xO-dXj" firstAttribute="leading" secondItem="4sj-qN-UUY" secondAttribute="trailing" id="otW-AC-yMG"/>
                             <constraint firstItem="Wba-nA-FYj" firstAttribute="leading" relation="greaterThanOrEqual" secondItem="hYV-nu-QIp" secondAttribute="leading" constant="112" id="sKj-TU-b0z"/>
                             <constraint firstItem="B2U-XM-Vo0" firstAttribute="centerY" secondItem="hYV-nu-QIp" secondAttribute="centerY" id="tVV-qE-2xE"/>
                             <constraint firstItem="Wba-nA-FYj" firstAttribute="width" secondItem="hYV-nu-QIp" secondAttribute="width" multiplier="0.6" priority="300" id="yyv-y0-Is1"/>
@@ -217,6 +244,7 @@
                         </userDefinedRuntimeAttributes>
                     </view>
                     <connections>
+                        <outlet property="bookmarkListButton" destination="4sj-qN-UUY" id="Fjs-KE-Lfp"/>
                         <outlet property="feedbackButton" destination="DqX-mW-o7G" id="cwM-B1-ntW"/>
                         <outlet property="goBackButton" destination="kky-0N-Cfd" id="RA9-yE-URS"/>
                         <outlet property="goForwardButton" destination="mdE-u0-Ei5" id="7wT-nX-Avr"/>
@@ -603,6 +631,7 @@
     <resources>
         <image name="Back" width="7" height="13"/>
         <image name="Bookmark" width="11" height="15"/>
+        <image name="Bookmarks" width="16" height="16"/>
         <image name="BurnProof" width="16" height="16"/>
         <image name="Clear" width="9" height="9"/>
         <image name="Feedback" width="16" height="16"/>

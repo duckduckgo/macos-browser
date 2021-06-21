@@ -76,34 +76,4 @@ class CoreDataEncryptionTests: XCTestCase {
         return nil
     }
 
-    private func createInMemoryPersistentContainer() -> NSPersistentContainer {
-        let modelName = "CoreDataEncryptionTesting"
-
-        guard let modelURL = Bundle(for: type(of: self)).url(forResource: modelName, withExtension: "momd") else {
-            fatalError("Error loading model from bundle")
-        }
-
-        guard let objectModel = NSManagedObjectModel(contentsOf: modelURL) else {
-            fatalError("Error initializing object model from: \(modelURL)")
-        }
-
-        let container = NSPersistentContainer(name: modelName, managedObjectModel: objectModel)
-
-        // Creates a persistent store using the in-memory model, no state will be written to disk.
-        // This was the approach I had seen recommended in a WWDC session, but there is also a
-        // `NSInMemoryStoreType` option for doing this.
-        //
-        // This approach is apparently the recommended choice: https://www.donnywals.com/setting-up-a-core-data-store-for-unit-tests/
-        let description = NSPersistentStoreDescription()
-        description.url = URL(fileURLWithPath: "/dev/null")
-        container.persistentStoreDescriptions = [description]
-
-        container.loadPersistentStores(completionHandler: { _, error in
-          if let error = error as NSError? {
-            fatalError("Failed to load stores: \(error), \(error.userInfo)")
-          }
-        })
-
-        return container
-    }
 }

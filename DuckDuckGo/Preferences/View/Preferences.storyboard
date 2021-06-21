@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<document type="com.apple.InterfaceBuilder3.Cocoa.Storyboard.XIB" version="3.0" toolsVersion="17701" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none" useAutolayout="YES">
+<document type="com.apple.InterfaceBuilder3.Cocoa.Storyboard.XIB" version="3.0" toolsVersion="18122" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none" useAutolayout="YES">
     <dependencies>
         <deployment identifier="macosx"/>
-        <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="17701"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="18122"/>
         <capability name="Named colors" minToolsVersion="9.0"/>
         <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
     </dependencies>
@@ -194,14 +194,18 @@
                                     </userDefinedRuntimeAttribute>
                                 </userDefinedRuntimeAttributes>
                             </customView>
-                            <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="OiU-Rl-ozQ">
-                                <rect key="frame" x="18" y="361" width="110" height="24"/>
-                                <textFieldCell key="cell" lineBreakMode="clipping" title="Preferences" id="oMT-33-ZQm">
+                            <popUpButton translatesAutoresizingMaskIntoConstraints="NO" id="Nnt-T4-Csk">
+                                <rect key="frame" x="21" y="361" width="217" height="24"/>
+                                <popUpButtonCell key="cell" type="bevel" title="Preferences" bezelStyle="rounded" alignment="left" controlSize="large" lineBreakMode="truncatingTail" state="on" imageScaling="proportionallyDown" inset="2" selectedItem="0iN-ch-YVA" id="Ury-Yl-asN">
+                                    <behavior key="behavior" lightByBackground="YES" lightByGray="YES"/>
                                     <font key="font" size="20" name="SFProDisplay-Semibold"/>
-                                    <color key="textColor" name="labelColor" catalog="System" colorSpace="catalog"/>
-                                    <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
-                                </textFieldCell>
-                            </textField>
+                                    <menu key="menu" id="Dlp-Gp-7Fm">
+                                        <items>
+                                            <menuItem title="Preferences" state="on" id="0iN-ch-YVA"/>
+                                        </items>
+                                    </menu>
+                                </popUpButtonCell>
+                            </popUpButton>
                             <scrollView borderType="none" autohidesScrollers="YES" horizontalLineScroll="40" horizontalPageScroll="10" verticalLineScroll="40" verticalPageScroll="10" usesPredominantAxisScrolling="NO" translatesAutoresizingMaskIntoConstraints="NO" id="INm-nm-wzI">
                                 <rect key="frame" x="20" y="0.0" width="212" height="353"/>
                                 <clipView key="contentView" drawsBackground="NO" id="Q8G-nL-uiv">
@@ -295,17 +299,19 @@
                             <constraint firstAttribute="trailing" secondItem="INm-nm-wzI" secondAttribute="trailing" constant="20" symbolic="YES" id="07G-nH-FXa"/>
                             <constraint firstItem="sq7-U9-0Ib" firstAttribute="leading" secondItem="sPP-2C-UYe" secondAttribute="leading" id="BLA-wl-eXn"/>
                             <constraint firstAttribute="bottom" secondItem="INm-nm-wzI" secondAttribute="bottom" id="JkA-ji-QzR"/>
-                            <constraint firstItem="OiU-Rl-ozQ" firstAttribute="leading" secondItem="sPP-2C-UYe" secondAttribute="leading" constant="20" symbolic="YES" id="LPr-qq-jeF"/>
                             <constraint firstAttribute="trailing" secondItem="sq7-U9-0Ib" secondAttribute="trailing" id="Ouf-Kt-LaR"/>
-                            <constraint firstItem="INm-nm-wzI" firstAttribute="top" secondItem="OiU-Rl-ozQ" secondAttribute="bottom" constant="8" symbolic="YES" id="Yc2-AX-LKw"/>
+                            <constraint firstItem="INm-nm-wzI" firstAttribute="top" secondItem="Nnt-T4-Csk" secondAttribute="bottom" constant="8" symbolic="YES" id="PkJ-2t-qL9"/>
+                            <constraint firstItem="Nnt-T4-Csk" firstAttribute="leading" secondItem="sPP-2C-UYe" secondAttribute="leading" constant="26" id="TOe-fF-tN7"/>
                             <constraint firstItem="INm-nm-wzI" firstAttribute="leading" secondItem="sPP-2C-UYe" secondAttribute="leading" constant="20" symbolic="YES" id="bgV-QY-sWe"/>
-                            <constraint firstItem="OiU-Rl-ozQ" firstAttribute="top" secondItem="sPP-2C-UYe" secondAttribute="top" constant="20" symbolic="YES" id="emT-B9-SqU"/>
+                            <constraint firstItem="Nnt-T4-Csk" firstAttribute="top" secondItem="sPP-2C-UYe" secondAttribute="top" constant="20" symbolic="YES" id="geb-7K-tdE"/>
                             <constraint firstAttribute="bottom" secondItem="sq7-U9-0Ib" secondAttribute="bottom" id="oXm-CF-Mbc"/>
+                            <constraint firstAttribute="trailing" secondItem="Nnt-T4-Csk" secondAttribute="trailing" constant="14" id="tUb-Sa-LsC"/>
                             <constraint firstItem="sq7-U9-0Ib" firstAttribute="top" secondItem="sPP-2C-UYe" secondAttribute="top" id="ziV-Df-38v"/>
                         </constraints>
                     </view>
                     <connections>
                         <outlet property="preferencesTableView" destination="dSc-nl-SqF" id="4jd-rD-PE6"/>
+                        <outlet property="tabSwitcherButton" destination="Nnt-T4-Csk" id="t2g-w2-bN6"/>
                     </connections>
                 </viewController>
                 <customObject id="aUM-Zi-k0J" userLabel="First Responder" customClass="NSResponder" sceneMemberID="firstResponder"/>

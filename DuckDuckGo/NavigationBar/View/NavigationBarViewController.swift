@@ -27,6 +27,7 @@ final class NavigationBarViewController: NSViewController {
     @IBOutlet weak var refreshButton: NSButton!
     @IBOutlet weak var feedbackButton: NSButton!
     @IBOutlet weak var optionsButton: NSButton!
+    @IBOutlet weak var bookmarkListButton: NSButton!
     @IBOutlet weak var shareButton: NSButton!
 
     var addressBarViewController: AddressBarViewController?
@@ -37,6 +38,8 @@ final class NavigationBarViewController: NSViewController {
     private let goBackButtonMenuDelegate: NavigationButtonMenuDelegate
     private let goForwardButtonMenuDelegate: NavigationButtonMenuDelegate
     // swiftlint:enable weak_delegate
+
+    private lazy var bookmarkListPopover = BookmarkListPopover()
 
     private var selectedTabViewModelCancellable: AnyCancellable?
     private var navigationButtonsCancellables = Set<AnyCancellable>()
@@ -107,11 +110,13 @@ final class NavigationBarViewController: NSViewController {
     @IBAction func optionsButtonAction(_ sender: NSButton) {
         if let event = NSApplication.shared.currentEvent {
             let menu = OptionsButtonMenu(tabCollectionViewModel: tabCollectionViewModel)
+            menu.actionDelegate = self
+
             NSMenu.popUpContextMenu(menu, with: event, for: sender)
 
             switch menu.result {
-            case .navigateToBookmark:
-                Pixel.fire(.moreMenu(result: .bookmark))
+            case .bookmarks:
+                Pixel.fire(.moreMenu(result: .bookmarksList))
             case .emailProtection:
                 Pixel.fire(.moreMenu(result: .emailProtection))
             case .feedback:
@@ -135,11 +140,20 @@ final class NavigationBarViewController: NSViewController {
         }
     }
 
+    @IBAction func bookmarksButtonAction(_ sender: NSButton) {
+        showBookmarkListPopover()
+    }
+
     @IBAction func shareButtonAction(_ sender: NSButton) {
         guard let url = tabCollectionViewModel.selectedTabViewModel?.tab.url else { return }
         let sharing = NSSharingServicePicker(items: [url])
         sharing.delegate = self
         sharing.show(relativeTo: .zero, of: sender, preferredEdge: .minY)
+    }
+
+    func showBookmarkListPopover() {
+        bookmarkListPopover.show(relativeTo: .zero, of: bookmarkListButton, preferredEdge: .maxY)
+        Pixel.fire(.bookmarksList(source: .button))
     }
 
 #if !FEEDBACK
@@ -224,6 +238,14 @@ extension NavigationBarViewController: NSSharingServiceDelegate {
 
     func sharingService(_ sharingService: NSSharingService, didShareItems items: [Any]) {
         Pixel.fire(.sharingMenu(result: .success))
+    }
+
+}
+
+extension NavigationBarViewController: OptionsButtonMenuDelegate {
+
+    func optionsButtonMenuRequestedBookmarkPopover(_ menu: NSMenu) {
+        showBookmarkListPopover()
     }
 
 }
