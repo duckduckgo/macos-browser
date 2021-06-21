@@ -44,7 +44,11 @@ final class SaveCredentialsViewController: NSViewController {
     @IBOutlet var usernameField: NSTextField!
     @IBOutlet var hiddenPasswordField: NSSecureTextField!
     @IBOutlet var visiblePasswordField: NSTextField!
+    @IBOutlet var neverButton: NSButton!
+    @IBOutlet var notNowButton: NSButton!
     @IBOutlet var saveButton: NSButton!
+    @IBOutlet var updateButton: NSButton!
+    @IBOutlet var dontUpdateButton: NSButton!
     @IBOutlet var fireproofCheck: NSButton!
 
     weak var delegate: SaveCredentialsDelegate?
@@ -58,26 +62,47 @@ final class SaveCredentialsViewController: NSViewController {
         return string.data(using: .utf8)!
     }
 
+    /// Note that if the credentials.account.id is not nil, then we consider this an update rather than a save.
     func saveCredentials(_ credentials: SecureVaultModels.WebsiteCredentials) {
         self.credentials = credentials
-        populateUIFromCredentials(credentials)
+        self.domainLabel.stringValue = credentials.account.domain
+        self.usernameField.stringValue = credentials.account.username
+        self.hiddenPasswordField.stringValue = String(data: credentials.password, encoding: .utf8) ?? ""
+        self.visiblePasswordField.stringValue = self.hiddenPasswordField.stringValue
+        self.loadFaviconForDomain(credentials.account.domain)
 
-        self.saveButtonAction = { [weak self] in
-            self?.performSave()
-        }
-    }
+        notNowButton.isHidden = credentials.account.id != nil
+        neverButton.isHidden = credentials.account.id != nil
+        saveButton.isHidden = credentials.account.id != nil
 
-    func updateCredentials(_ credentials: SecureVaultModels.WebsiteCredentials) {
-        self.credentials = credentials
-        populateUIFromCredentials(credentials)
-
-        self.saveButtonAction = { [weak self] in
-            self?.performUpdate()
-        }
+        updateButton.isHidden = credentials.account.id == nil
+        dontUpdateButton.isHidden = credentials.account.id == nil
     }
 
     @IBAction func onSaveClicked(sender: Any?) {
-        saveButtonAction?()
+        defer {
+            self.delegate?.shouldCloseSaveCredentialsViewController(self)
+        }
+
+        var account = SecureVaultModels.WebsiteAccount(username: usernameField.stringValue.trimmingWhitespaces(),
+                                                       domain: domainLabel.stringValue)
+        account.id = credentials?.account.id
+        let credentials = SecureVaultModels.WebsiteCredentials(account: account, password: passwordData)
+
+        do {
+            try SecureVaultFactory.default.makeVault().storeWebsiteCredentials(credentials)
+        } catch {
+            // TODO log
+        }
+
+        if self.fireproofCheck.state == .on {
+            Pixel.fire(.fireproof(kind: .pwm, suggested: .pwm))
+            FireproofDomains.shared.addToAllowed(domain: account.domain)
+        }
+    }
+
+    @IBAction func onDontUpdateClicked(_ sender: Any) {
+        delegate?.shouldCloseSaveCredentialsViewController(self)
     }
 
     @IBAction func onNotNowClicked(sender: Any?) {
@@ -133,53 +158,10 @@ final class SaveCredentialsViewController: NSViewController {
             ?? NSImage(named: NSImage.Name("Web"))
     }
 
-    func performSave() {
-        let account = SecureVaultModels.WebsiteAccount(username: usernameField.stringValue.trimmingWhitespaces(),
-                                                       domain: domainLabel.stringValue)
-        let credentials = SecureVaultModels.WebsiteCredentials(account: account, password: passwordData)
-
-        var cancellable: AnyCancellable?
-        cancellable = SecureVaultFactory.default.makeVault().flatMap { vault in
-            vault.storeWebsiteCredentials(credentials)
-        }
-        .sink { [weak self] _ in
-            // Later, check for errors
-            self?.delegate?.shouldCloseSaveCredentialsViewController(self!)
-            cancellable?.cancel()
-        } receiveValue: { [weak self] _ in
-            DispatchQueue.main.async {
-                if self?.fireproofCheck.state == .on {
-                    Pixel.fire(.fireproof(kind: .pwm, suggested: .pwm))
-                    FireproofDomains.shared.addToAllowed(domain: account.domain)
-                }
-            }
-            cancellable?.cancel()
-        }
+    func refreshUIForSave() {
     }
 
-    func performUpdate() {
-        let account = SecureVaultModels.WebsiteAccount(username: usernameField.stringValue.trimmingWhitespaces(),
-                                                       domain: domainLabel.stringValue)
-        let credentials = SecureVaultModels.WebsiteCredentials(account: account, password: passwordData)
-
-        var cancellable: AnyCancellable?
-        cancellable = SecureVaultFactory.default.makeVault().flatMap { vault in
-            vault.storeWebsiteCredentials(credentials)
-        }
-        .sink { [weak self] _ in
-            // Later, check for errors
-            self?.delegate?.shouldCloseSaveCredentialsViewController(self!)
-            cancellable?.cancel()
-        } receiveValue: { _ in
-            cancellable?.cancel()
-        }
+    func refreshUIForUpdate() {
     }
 
-    func populateUIFromCredentials(_ credentials: SecureVaultModels.WebsiteCredentials) {
-        self.domainLabel.stringValue = credentials.account.domain
-        self.usernameField.stringValue = credentials.account.username
-        self.hiddenPasswordField.stringValue = String(data: credentials.password, encoding: .utf8) ?? ""
-        self.visiblePasswordField.stringValue = self.hiddenPasswordField.stringValue
-        self.loadFaviconForDomain(credentials.account.domain)
-    }
 }
