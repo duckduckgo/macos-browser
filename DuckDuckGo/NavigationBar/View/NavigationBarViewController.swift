@@ -182,15 +182,15 @@ final class NavigationBarViewController: NSViewController {
 
     private func promptToSaveCredentials(_ credentials: SecureVaultModels.WebsiteCredentials) {
         print("***", #function, credentials.account.domain)
+        showSaveCredentialsPopover()
+        saveCredentialsPopover?.viewController.saveCredentials(credentials)
+    }
+
+    private func showSaveCredentialsPopover() {
         guard let view = addressBarViewController?.view else { return }
-
-        // saveCredentialsPopover.viewController.credentials = credentials
         if saveCredentialsPopover == nil {
-            saveCredentialsPopover = SaveCredentialsPopover(credentials: credentials)
-        } else {
-            saveCredentialsPopover?.credentials = credentials
+            saveCredentialsPopover = SaveCredentialsPopover()
         }
-
         saveCredentialsPopover?.show(relativeTo: .zero, of: view, preferredEdge: .minY)
     }
 

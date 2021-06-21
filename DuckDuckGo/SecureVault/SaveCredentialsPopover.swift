@@ -22,11 +22,7 @@ import SwiftUI
 
 final class SaveCredentialsPopover: NSPopover {
 
-    var credentials: SecureVaultModels.WebsiteCredentials
-
-    init(credentials: SecureVaultModels.WebsiteCredentials) {
-        self.credentials = credentials
-
+    override init() {
         super.init()
 
         self.animates = false
@@ -47,7 +43,6 @@ final class SaveCredentialsPopover: NSPopover {
         let controller = SaveCredentialsViewController.create()
         controller.delegate = self
         contentViewController = controller
-        viewController.credentials = credentials
     }
 
 }
