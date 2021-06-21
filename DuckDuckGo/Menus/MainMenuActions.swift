@@ -346,6 +346,11 @@ extension MainViewController: NSMenuItemValidation {
     
     // swiftlint:disable cyclomatic_complexity
     func validateMenuItem(_ menuItem: NSMenuItem) -> Bool {
+        // Enable "Move to another Display" menu item (is there a better way?)
+        for item in menuItem.menu!.items where item.action == Selector(("_moveToDisplay:")) {
+            item.isEnabled = true
+        }
+
         switch menuItem.action {
         // Back/Forward
         case #selector(MainViewController.back(_:)):
@@ -383,6 +388,16 @@ extension MainViewController: NSMenuItemValidation {
         case #selector(MainViewController.saveAs(_:)),
              #selector(MainViewController.printWebView(_:)):
             return tabCollectionViewModel.selectedTabViewModel?.canReload == true
+
+        // Marge all windows
+        case #selector(MainViewController.mergeAllWindows(_:)):
+            return WindowControllersManager.shared.mainWindowControllers.count > 1
+
+        // Move Tab to New Window, Select Next/Prev Tab
+        case #selector(MainViewController.moveTabToNewWindow(_:)),
+             #selector(MainViewController.showNextTab(_:)),
+             #selector(MainViewController.showPreviousTab(_:)):
+            return tabCollectionViewModel.tabCollection.tabs.count > 1
 
         default:
             return menuItem.isEnabled
