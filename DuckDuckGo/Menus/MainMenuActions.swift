@@ -91,6 +91,19 @@ extension AppDelegate {
         WindowsManager.openNewWindow(with: tab)
     }
 
+    @IBAction func showManageBookmarks(_ sender: Any?) {
+        let tabCollection = TabCollection(tabs: [Tab(tabType: .bookmarks)])
+        let tabCollectionViewModel = TabCollectionViewModel(tabCollection: tabCollection)
+        Pixel.fire(.manageBookmarks(source: .mainMenu))
+        WindowsManager.openNewWindow(with: tabCollectionViewModel)
+    }
+
+    @IBAction func openPreferences(_ sender: Any?) {
+        let tabCollection = TabCollection(tabs: [Tab(tabType: .preferences)])
+        let tabCollectionViewModel = TabCollectionViewModel(tabCollection: tabCollection)
+        WindowsManager.openNewWindow(with: tabCollectionViewModel)
+    }
+
 }
 
 extension MainViewController {
@@ -400,10 +413,25 @@ extension MainViewController: NSMenuItemValidation {
             return tabCollectionViewModel.tabCollection.tabs.count > 1
 
         default:
-            return menuItem.isEnabled
+            return true
         }
     }
     // swiftlint:enable cyclomatic_complexity
+
+}
+
+extension AppDelegate: NSMenuItemValidation {
+
+    func validateMenuItem(_ menuItem: NSMenuItem) -> Bool {
+        switch menuItem.action {
+        // Close all windows
+        case #selector(AppDelegate.closeAllWindows(_:)):
+            return !WindowControllersManager.shared.mainWindowControllers.isEmpty
+
+        default:
+            return true
+        }
+    }
 
 }
 
