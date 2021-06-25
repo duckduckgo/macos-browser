@@ -92,7 +92,7 @@ final class SaveCredentialsViewController: NSViewController {
         do {
             try SecureVaultFactory.default.makeVault().storeWebsiteCredentials(credentials)
         } catch {
-            // TODO log
+            os_log("%s:%: failed to store credentials %s", type: .error, className, #function, error.localizedDescription)
         }
 
         if self.fireproofCheck.state == .on {
@@ -148,7 +148,6 @@ final class SaveCredentialsViewController: NSViewController {
 
     override func viewDidLoad() {
         super.viewDidLoad()
-        print("***", #function)
         visiblePasswordField.isHidden = true
         saveButton.becomeFirstResponder()
     }
@@ -156,12 +155,6 @@ final class SaveCredentialsViewController: NSViewController {
     func loadFaviconForDomain(_ domain: String) {
         faviconImage.image = LocalFaviconService.shared.getCachedFavicon(for: domain, mustBeFromUserScript: false)
             ?? NSImage(named: NSImage.Name("Web"))
-    }
-
-    func refreshUIForSave() {
-    }
-
-    func refreshUIForUpdate() {
     }
 
 }

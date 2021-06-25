@@ -181,7 +181,6 @@ final class NavigationBarViewController: NSViewController {
     }
 
     private func promptToSaveCredentials(_ credentials: SecureVaultModels.WebsiteCredentials) {
-        print("***", #function, credentials.account.domain)
         showSaveCredentialsPopover()
         saveCredentialsPopover?.viewController.saveCredentials(credentials)
     }
