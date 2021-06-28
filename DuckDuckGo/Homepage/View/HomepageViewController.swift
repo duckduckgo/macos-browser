@@ -24,21 +24,21 @@ final class HomepageViewController: NSViewController {
     // Temporary placeholders that are displayed when user has no favorites
     // Should be removed when the search element of the homepage is implemented
     static let favoritePlaceholders: [Bookmark] = [
-        Bookmark(url: URL.duckDuckGo,
+        Bookmark(id: UUID(),
+                 url: URL.duckDuckGo,
                  title: "Search",
                  favicon: NSImage(named: "HomepageSearch"),
-                 isFavorite: true,
-                 managedObjectId: nil),
-        Bookmark(url: URL.duckDuckGoEmail,
+                 isFavorite: true),
+        Bookmark(id: UUID(),
+                 url: URL.duckDuckGoEmail,
                  title: "Email",
                  favicon: NSImage(named: "HomepageEmail"),
-                 isFavorite: true,
-                 managedObjectId: nil),
-        Bookmark(url: URL(string: "https://spreadprivacy.com/")!,
+                 isFavorite: true),
+        Bookmark(id: UUID(),
+                 url: URL(string: "https://spreadprivacy.com/")!,
                  title: "Spread Privacy",
                  favicon: NSImage(named: "HomepageSpreadPrivacy"),
-                 isFavorite: true,
-                 managedObjectId: nil)
+                 isFavorite: true)
     ]
 
     enum Constants {
@@ -233,7 +233,7 @@ extension HomepageViewController: NSCollectionViewDataSource, NSCollectionViewDe
             return item
         }
 
-        item.set(bookmarkViewModel: BookmarkViewModel(bookmark: topFavorites[indexPath.item]), isPlaceholder: areFavoritesPlaceholders)
+        item.set(bookmarkViewModel: BookmarkViewModel(entity: topFavorites[indexPath.item]), isPlaceholder: areFavoritesPlaceholders)
         item.delegate = self
         return item
     }

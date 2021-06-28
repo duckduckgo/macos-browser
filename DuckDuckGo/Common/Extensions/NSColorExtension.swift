@@ -19,7 +19,11 @@
 import Cocoa
 
 extension NSColor {
-    
+
+    static var homepageBackgroundColor: NSColor {
+        NSColor(named: "HomepageBackgroundColor")!
+    }
+
     static var addressBarFocusedBackgroundColor: NSColor {
         NSColor(named: "AddressBarFocusedBackgroundColor")!
     }
@@ -73,5 +77,27 @@ extension NSColor {
     static var progressBarGradientLightColor: NSColor {
         .detailAccentColor
     }
+
+    static var backgroundSecondaryColor: NSColor {
+        NSColor(named: "BackgroundSecondaryColor")!
+    }
+
+    static var tableCellEditingColor: NSColor {
+        NSColor(named: "TableCellEditingColor")!
+    }
+
+    static var rowHoverColor: NSColor {
+        NSColor(named: "RowHoverColor")!
+    }
+
+    static var rowDragDropColor: NSColor {
+        NSColor(named: "RowDragDropColor")!
+    }
+
+    static let bookmarkRepresentingColor1 = NSColor(named: "BookmarkRepresentingColor1")!
+    static let bookmarkRepresentingColor2 = NSColor(named: "BookmarkRepresentingColor2")!
+    static let bookmarkRepresentingColor3 = NSColor(named: "BookmarkRepresentingColor3")!
+    static let bookmarkRepresentingColor4 = NSColor(named: "BookmarkRepresentingColor4")!
+    static let bookmarkRepresentingColor5 = NSColor(named: "BookmarkRepresentingColor5")!
 
 }

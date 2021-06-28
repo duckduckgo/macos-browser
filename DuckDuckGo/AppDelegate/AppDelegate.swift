@@ -24,7 +24,7 @@ import os.log
 final class AppDelegate: NSObject, NSApplicationDelegate {
     let launchTimingPixel = TimedPixel(.launchTiming)
 
-    private var isRunningTests: Bool {
+    static var isRunningTests: Bool {
         ProcessInfo.processInfo.environment["XCTestConfigurationFilePath"] != nil
     }
 
@@ -42,12 +42,12 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
     var appUsageActivityMonitor: AppUsageActivityMonitor?
 
     func applicationWillFinishLaunching(_ notification: Notification) {
-        if !isRunningTests {
+        if !Self.isRunningTests {
             Pixel.setUp()
         }
 
         do {
-            let encryptionKey = isRunningTests ? nil : try keyStore.readKey()
+            let encryptionKey = Self.isRunningTests ? nil : try keyStore.readKey()
             fileStore = FileStore(encryptionKey: encryptionKey)
         } catch {
             os_log("App Encryption Key could not be read: %s", "\(error)")
@@ -59,7 +59,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
     }
 
     func applicationDidFinishLaunching(_ notification: Notification) {
-        guard !isRunningTests else { return }
+        guard !Self.isRunningTests else { return }
         
         Database.shared.loadStore()
         HTTPSUpgrade.shared.loadDataAsync()

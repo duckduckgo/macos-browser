@@ -22,19 +22,30 @@ final class RoundedSelectionRowView: NSTableRowView {
 
     var insets = NSEdgeInsets()
 
+    override func drawDraggingDestinationFeedback(in dirtyRect: NSRect) {
+        var selectionRect = self.bounds
+
+        selectionRect.origin.x += insets.left
+        selectionRect.origin.y += insets.top
+        selectionRect.size.width -= (insets.left + insets.right)
+        selectionRect.size.height -= (insets.top + insets.bottom)
+
+        let path = NSBezierPath(roundedRect: selectionRect, xRadius: 6, yRadius: 6)
+        NSColor.rowDragDropColor.setFill()
+        path.fill()
+    }
+
     override func drawSelection(in dirtyRect: NSRect) {
-        if self.selectionHighlightStyle != .none {
-            var selectionRect = self.bounds
+        var selectionRect = self.bounds
 
-            selectionRect.origin.x += insets.left
-            selectionRect.origin.y += insets.top
-            selectionRect.size.width -= (insets.left + insets.right)
-            selectionRect.size.height -= (insets.top + insets.bottom)
+        selectionRect.origin.x += insets.left
+        selectionRect.origin.y += insets.top
+        selectionRect.size.width -= (insets.left + insets.right)
+        selectionRect.size.height -= (insets.top + insets.bottom)
 
-            let path = NSBezierPath(roundedRect: selectionRect, xRadius: 6, yRadius: 6)
-            NSColor(named: "RowHoverColor")!.setFill()
-            path.fill()
-        }
+        let path = NSBezierPath(roundedRect: selectionRect, xRadius: 6, yRadius: 6)
+        NSColor.rowHoverColor.setFill()
+        path.fill()
     }
 
     override var interiorBackgroundStyle: NSView.BackgroundStyle {

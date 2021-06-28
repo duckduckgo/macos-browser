@@ -201,6 +201,7 @@ extension MainViewController {
     }
 
     // MARK: - Bookmarks
+
     @IBAction func bookmarkThisPage(_ sender: Any) {
         navigationBarViewController?
             .addressBarViewController?
@@ -220,17 +221,24 @@ extension MainViewController {
             os_log("MainViewController: Casting to menu item failed", type: .error)
             return
         }
+
         guard let selectedTabViewModel = tabCollectionViewModel.selectedTabViewModel else {
             os_log("MainViewController: No tab view model selected", type: .error)
             return
         }
+
         guard let bookmark = menuItem.representedObject as? Bookmark else {
-            assertionFailure("Unexpected type of menuItem.representedObject: \(type(of: menuItem.representedObject))")
             return
         }
+
         Pixel.fire(.navigation(kind: .bookmark(isFavorite: bookmark.isFavorite), source: .mainMenu))
 
         selectedTabViewModel.tab.url = bookmark.url
+    }
+
+    @IBAction func showManageBookmarks(_ sender: Any?) {
+        tabCollectionViewModel.appendNewTab(type: .bookmarks)
+        Pixel.fire(.manageBookmarks(source: .mainMenu))
     }
 
     // MARK: - Window
@@ -363,7 +371,8 @@ extension MainViewController: NSMenuItemValidation {
         case #selector(MainViewController.bookmarkThisPage(_:)),
              #selector(MainViewController.favoriteThisPage(_:)):
             return tabCollectionViewModel.selectedTabViewModel?.canBeBookmarked == true
-        case #selector(MainViewController.navigateToBookmark(_:)):
+        case #selector(MainViewController.navigateToBookmark(_:)),
+             #selector(MainViewController.showManageBookmarks(_:)):
             return true
 
         // Reopen Last Removed Tab

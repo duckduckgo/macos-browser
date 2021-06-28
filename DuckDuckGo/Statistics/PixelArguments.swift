@@ -261,6 +261,8 @@ extension Pixel.Event {
         case addressBar = "source-address-bar"
         case suggestion = "source-suggestion"
         case newTab = "source-new-tab"
+        case listInterface = "source-list-interface"
+        case managementInterface = "source-management-interface"
     }
 
     enum HasBookmark: String, CustomStringConvertible {
@@ -291,7 +293,7 @@ extension Pixel.Event {
         case cancelled = "cancelled"
         case moveTabToNewWindow = "new-window"
         case feedback = "feedback"
-        case bookmark = "bookmark"
+        case bookmarksList = "bookmarks-list"
         case emailProtection = "email-protection"
         case fireproof = "fireproof"
         case preferences = "preferences"

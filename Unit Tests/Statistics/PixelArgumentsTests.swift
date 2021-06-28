@@ -65,7 +65,6 @@ class PixelArgumentsTests: XCTestCase {
     func testWhenInitWithBookmarkedURLThenNavigationKindIsBookmark() {
         let url = URL(string: "https://duckduckgo.com")!
 
-        bookmarkStore.managedObjectId = .init()
         bookmarkManager.makeBookmark(for: url, title: "DDG", isFavorite: false)
 
         let kind = Pixel.Event.NavigationKind(url: url, bookmarkManager: bookmarkManager)
@@ -75,7 +74,6 @@ class PixelArgumentsTests: XCTestCase {
     func testWhenInitWithFavoriteURLThenNavigationKindIsBookmark() {
         let url = URL(string: "https://duckduckgo.com")!
 
-        bookmarkStore.managedObjectId = .init()
         bookmarkManager.makeBookmark(for: url, title: "DDG", isFavorite: true)
 
         let kind = Pixel.Event.NavigationKind(url: url, bookmarkManager: bookmarkManager)
@@ -174,7 +172,6 @@ class PixelArgumentsTests: XCTestCase {
     func testWhenInitWithBookmarkedURLThenFireproofKindIsBookmark() {
         let url = URL(string: "https://duckduckgo.com")!
 
-        bookmarkStore.managedObjectId = .init()
         bookmarkManager.makeBookmark(for: url, title: "DDG", isFavorite: false)
 
         let kind = Pixel.Event.FireproofKind(url: url, bookmarkManager: bookmarkManager)
@@ -184,7 +181,6 @@ class PixelArgumentsTests: XCTestCase {
     func testWhenInitWithFavoriteURLThenFireproofKindIsBookmark() {
         let url = URL(string: "https://duckduckgo.com")!
 
-        bookmarkStore.managedObjectId = .init()
         bookmarkManager.makeBookmark(for: url, title: "DDG", isFavorite: true)
 
         let kind = Pixel.Event.FireproofKind(url: url, bookmarkManager: bookmarkManager)

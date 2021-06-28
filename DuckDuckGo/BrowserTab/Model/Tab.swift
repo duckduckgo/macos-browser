@@ -37,21 +37,43 @@ protocol TabDelegate: FileDownloadManagerDelegate {
 }
 
 // swiftlint:disable type_body_length
+// swiftlint:disable file_length
 final class Tab: NSObject {
 
-    enum TabType: Int {
+    enum TabType: Int, CaseIterable {
         case standard = 0
         case preferences = 1
+        case bookmarks = 2
 
         static func rawValue(_ type: Int?) -> TabType {
             let tabType = type ?? TabType.standard.rawValue
             return TabType(rawValue: tabType) ?? .standard
         }
 
+        static var displayableTabTypes: [TabType] {
+            let cases = TabType.allCases.filter { $0 != .standard }
+            return cases.sorted { first, second in
+                guard let firstTitle = first.title, let secondTitle = second.title else {
+                    return true // Arbitrary sort order, only non-standard tabs are displayable.
+                }
+
+                return firstTitle.localizedStandardCompare(secondTitle) == .orderedAscending
+            }
+        }
+
+        var title: String? {
+            switch self {
+            case .standard: return nil
+            case .preferences: return UserText.tabPreferencesTitle
+            case .bookmarks: return UserText.tabBookmarksTitle
+            }
+        }
+
         var focusTabAddressBarWhenSelected: Bool {
             switch self {
             case .standard: return true
             case .preferences: return false
+            case .bookmarks: return false
             }
         }
     }
@@ -144,6 +166,10 @@ final class Tab: NSObject {
 
     func set(tabType: TabType) {
         self.tabType = tabType
+
+        if let title = tabType.title {
+            self.title = title
+        }
     }
 
     func invalidateSessionStateData() {
@@ -203,6 +229,10 @@ final class Tab: NSObject {
 
     var isHomepageShown: Bool {
         url == nil || url == URL.emptyPage
+    }
+
+    var isBookmarksShown: Bool {
+        (url == nil || url == URL.emptyPage) && tabType == .bookmarks
     }
 
     func goForward() {

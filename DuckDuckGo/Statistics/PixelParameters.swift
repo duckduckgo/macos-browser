@@ -72,6 +72,8 @@ extension Pixel.Event {
              .fireproof,
              .fireproofSuggested,
              .bookmark,
+             .manageBookmarks,
+             .bookmarksList,
              .favorite,
              .navigation,
              .suggestionsDisplayed,
