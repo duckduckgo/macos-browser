@@ -20,9 +20,6 @@ import Foundation
 
 struct PrivacySecurityPreferences {
 
-    @UserDefaultsWrapper(key: .loginDetectionEnabled, defaultValue: true)
-    public var loginDetectionEnabled: Bool
-
 }
 
 extension PrivacySecurityPreferences: PreferenceSection {
