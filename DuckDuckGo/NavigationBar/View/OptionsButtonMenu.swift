@@ -235,13 +235,6 @@ final class EmailOptionsButtonSubMenu: NSMenu {
             createAddressItem.image = NSImage(named: "OptionsButtonMenuEmailGenerateAddress")
             addItem(createAddressItem)
 
-            let viewDashboardItem = NSMenuItem(title: UserText.emailOptionsMenuViewDashboardSubItem,
-                                           action: #selector(viewDashboardAction(_:)),
-                                           keyEquivalent: "")
-            viewDashboardItem.target = self
-            viewDashboardItem.image = NSImage(named: "OptionsButtonMenuEmailDashboard")
-            addItem(viewDashboardItem)
-            
             let turnOnOffItem = NSMenuItem(title: UserText.emailOptionsMenuTurnOffSubItem,
                                            action: #selector(turnOffEmailAction(_:)),
                                            keyEquivalent: "")
