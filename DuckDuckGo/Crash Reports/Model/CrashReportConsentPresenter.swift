@@ -1,5 +1,5 @@
 //
-//  UpdateController.swift
+//  CrashReportConsentPresenter.swift
 //
 //  Copyright © 2021 DuckDuckGo. All rights reserved.
 //
@@ -17,34 +17,10 @@
 //
 
 import Foundation
-import Sparkle
 
 #if OUT_OF_APPSTORE
 
-final class UpdateController: NSObject {
-
-    private let updater = SUUpdater()
-
-    override init() {
-        super.init()
-
-        configureUpdater()
-    }
-
-    func checkForUpdates(_ sender: Any!) {
-        updater.checkForUpdates(sender)
-    }
-
-    private func configureUpdater() {
-    // The default configuration of Sparkle updates is in Info.plist
-
-#if DEBUG
-
-        updater.automaticallyChecksForUpdates = false
-        updater.updateCheckInterval = 0
-
-#endif
-    }
+final class CrashReportConsentPresenter {
 
 }
 

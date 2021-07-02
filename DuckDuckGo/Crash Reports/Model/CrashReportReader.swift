@@ -1,0 +1,77 @@
+//
+//  CrashReportReader.swift
+//
+//  Copyright © 2021 DuckDuckGo. All rights reserved.
+//
+//  Licensed under the Apache License, Version 2.0 (the "License");
+//  you may not use this file except in compliance with the License.
+//  You may obtain a copy of the License at
+//
+//  http://www.apache.org/licenses/LICENSE-2.0
+//
+//  Unless required by applicable law or agreed to in writing, software
+//  distributed under the License is distributed on an "AS IS" BASIS,
+//  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+//  See the License for the specific language governing permissions and
+//  limitations under the License.
+//
+
+import Foundation
+
+#if OUT_OF_APPSTORE
+
+final class CrashReportReader {
+
+    static let displayName = Bundle.main.displayName!
+
+    func getCrashReports() -> [CrashReport] {
+        let allPaths: [URL]
+        do {
+            allPaths = try FileManager.default.contentsOfDirectory(at: FileManager.diagnosticReports,
+                                                                   includingPropertiesForKeys: nil,
+                                                                   options: [])
+        } catch {
+            assertionFailure("CrashReportReader: Can't read content of diagnostic reports \(error.localizedDescription)")
+            return []
+        }
+
+        return allPaths
+            .filter({ isCrashReportPath($0) && belongsToThisApp($0) && !isChecked($0) })
+            .map({ CrashReport(url: $0) })
+    }
+
+    private func isCrashReportPath(_ path: URL) -> Bool {
+        return path.pathExtension == "crash"
+    }
+
+    private func belongsToThisApp(_ path: URL) -> Bool {
+        return path.lastPathComponent.hasPrefix(Self.displayName)
+    }
+
+    private func isChecked(_ path: URL) -> Bool {
+        // TODO
+        return false
+    }
+
+}
+
+fileprivate extension FileManager {
+
+    static let diagnosticReports: URL = {
+        let homeDirectoryURL = FileManager.default.homeDirectoryForCurrentUser
+        return homeDirectoryURL
+            .appendingPathComponent("Library/Logs/DiagnosticReports")
+    }()
+
+}
+
+fileprivate extension Bundle {
+
+    var displayName: String? {
+            return object(forInfoDictionaryKey: "CFBundleDisplayName") as? String ??
+                object(forInfoDictionaryKey: "CFBundleName") as? String
+    }
+
+}
+
+#endif
