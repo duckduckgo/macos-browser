@@ -119,7 +119,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
     static func handleURL(_ url: URL) {
         Pixel.fire(.appLaunch(launch: url.isFileURL ? .openFile : .openURL))
 
-        WindowControllersManager.shared.show(url: url)
+        WindowControllersManager.shared.show(url: url, newTab: true)
     }
 
     private func applyPreferredTheme() {

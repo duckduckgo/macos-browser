@@ -152,7 +152,8 @@ final class TabBarViewController: NSViewController {
 
     private func closeWindowIfNeeded() {
         if tabCollectionViewModel.tabCollection.tabs.isEmpty {
-            guard let window = view.window else {
+            // when in fullscreen self.view.window will return NSToolbarFullScreenWindow instead of MainWindow
+            guard let window = parent?.view.window else {
                 os_log("AddressBarTextField: Window not available", type: .error)
                 return
             }
