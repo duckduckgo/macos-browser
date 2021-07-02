@@ -19,6 +19,7 @@
 import Cocoa
 import Combine
 import os.log
+import BrowserServicesKit
 
 final class TabViewModel {
 
@@ -53,6 +54,8 @@ final class TabViewModel {
             updateFavicon()
         }
     }
+
+    @Published var credentialsToSave: SecureVaultModels.WebsiteCredentials?
 
     var loadingStartTime: CFTimeInterval?
 

@@ -1,5 +1,5 @@
 //
-//  PrivacySecurityPreferences.swift
+//  PasswordManagerSettings.swift
 //
 //  Copyright © 2021 DuckDuckGo. All rights reserved.
 //
@@ -18,18 +18,18 @@
 
 import Foundation
 
-struct PrivacySecurityPreferences {
+final class PasswordManagerSettings {
 
-}
+    @UserDefaultsWrapper(key: .passwordManagerDoNotPromptDomains, defaultValue: [])
+    private(set) var doNotPromptDomains: [String]
 
-extension PrivacySecurityPreferences: PreferenceSection {
-    
-    var displayName: String {
-        return UserText.privacyAndSecurity
+    func doNotPromptOnDomain(_ domain: String) {
+        doNotPromptDomains = [String](Set<String>(doNotPromptDomains))
     }
 
-    var preferenceIcon: NSImage {
-        return NSImage(named: "Privacy")!
+    func canPromptOnDomain(_ domain: String) -> Bool {
+        let doNotPrompt = doNotPromptDomains.contains(domain) || doNotPromptDomains.contains(domain.dropWWW())
+        return !doNotPrompt
     }
 
 }

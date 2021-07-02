@@ -102,7 +102,6 @@ struct UserText {
 
     static let emailOptionsMenuItem = NSLocalizedString("email.optionsMenu", value: "Email Protection", comment: "Menu item email feature")
     static let emailOptionsMenuCreateAddressSubItem = NSLocalizedString("email.optionsMenu.createAddress", value: "Create a Duck Address", comment: "Create an email alias sub menu item")
-    static let emailOptionsMenuViewDashboardSubItem = NSLocalizedString("email.optionsMenu.viewDashboard", value: "View Dashboard", comment: "View email dashboard sub menu item")
     static let emailOptionsMenuTurnOffSubItem = NSLocalizedString("email.optionsMenu.turnOff", value: "Turn off Email Protection", comment: "Turn off email sub menu item")
     static let emailOptionsMenuTurnOnSubItem = NSLocalizedString("email.optionsMenu.turnOn", value: "Turn on Email Protection", comment: "Turn on email sub menu item")
 

@@ -28,13 +28,13 @@ protocol TabDelegate: FileDownloadManagerDelegate {
     func tab(_ tab: Tab, willShowContextMenuAt position: NSPoint, image: URL?, link: URL?)
     func tab(_ tab: Tab, detectedLogin host: String)
 	func tab(_ tab: Tab, requestedOpenExternalURL url: URL, forUserEnteredURL: Bool)
+    func tab(_ tab: Tab, requestedSaveCredentials credentials: SecureVaultModels.WebsiteCredentials)
 
     func tabPageDOMLoaded(_ tab: Tab)
     func closeTab(_ tab: Tab)
 }
 
 // swiftlint:disable type_body_length
-// swiftlint:disable file_length
 final class Tab: NSObject {
 
     enum TabType: Int, CaseIterable {
@@ -106,15 +106,6 @@ final class Tab: NSObject {
         webView = WebView(frame: CGRect.zero, configuration: configuration)
 
         super.init()
-
-        self.loginDetectionService = LoginDetectionService { [weak self] host in
-            guard let self = self else { return }
-
-            let preferences = PrivacySecurityPreferences()
-            if preferences.loginDetectionEnabled {
-                self.delegate?.tab(self, detectedLogin: host)
-            }
-        }
 
         setupWebView(shouldLoadInBackground: shouldLoadInBackground)
 
@@ -188,7 +179,6 @@ final class Tab: NSObject {
 
         // This function is called when the user has manually typed in a new address, which should reset the login detection flow.
 		userEnteredUrl = userEntered
-		loginDetectionService?.handle(navigationEvent: .userAction)
      }
 
     // Used to track if an error was caused by a download navigation.
@@ -221,7 +211,6 @@ final class Tab: NSObject {
         }
     }
 
-    private var loginDetectionService: LoginDetectionService?
     private let instrumentation = TabInstrumentation()
 
     var isHomepageShown: Bool {
@@ -235,19 +224,16 @@ final class Tab: NSObject {
     func goForward() {
         shouldStoreNextVisit = false
         webView.goForward()
-        loginDetectionService?.handle(navigationEvent: .userAction)
     }
 
     func goBack() {
         shouldStoreNextVisit = false
         webView.goBack()
-        loginDetectionService?.handle(navigationEvent: .userAction)
     }
 
     func go(to item: WKBackForwardListItem) {
         shouldStoreNextVisit = false
         webView.go(to: item)
-        loginDetectionService?.handle(navigationEvent: .userAction)
     }
 
     func openHomepage() {
@@ -266,7 +252,6 @@ final class Tab: NSObject {
         } else {
             webView.reload()
         }
-        loginDetectionService?.handle(navigationEvent: .userAction)
     }
 
     private func reloadIfNeeded(shouldLoadInBackground: Bool = false) {
@@ -369,6 +354,12 @@ final class Tab: NSObject {
         return emailManager
     }()
 
+    lazy var vaultManager: SecureVaultManager = {
+        let manager = SecureVaultManager()
+        manager.delegate = self
+        return manager
+    }()
+
     private var userScriptsUpdatedCancellable: AnyCancellable?
 
     private var userScripts: UserScripts! {
@@ -381,10 +372,10 @@ final class Tab: NSObject {
             userScripts.debugScript.instrumentation = instrumentation
             userScripts.faviconScript.delegate = self
             userScripts.contextMenuScript.delegate = self
-            userScripts.loginDetectionUserScript.delegate = self
             userScripts.contentBlockerScript.delegate = self
             userScripts.contentBlockerRulesScript.delegate = self
             userScripts.autofillScript.emailDelegate = emailManager
+            userScripts.autofillScript.vaultDelegate = vaultManager
             userScripts.pageObserverScript.delegate = self
 
             attachFindInPage()
@@ -515,14 +506,13 @@ extension Tab: EmailManagerRequestDelegate {
     
 }
 
-extension Tab: LoginFormDetectionDelegate {
+extension Tab: SecureVaultManagerDelegate {
 
-     func loginFormDetectionUserScriptDetectedLoginForm(_ script: LoginFormDetectionUserScript) {
-         guard let url = webView.url else { return }
-         loginDetectionService?.handle(navigationEvent: .detectedLogin(url: url))
-     }
+    func secureVaultManager(_: SecureVaultManager, promptUserToStoreCredentials credentials: SecureVaultModels.WebsiteCredentials) {
+        delegate?.tab(self, requestedSaveCredentials: credentials)
+    }
 
- }
+}
 
 extension Tab: WKNavigationDelegate {
 
@@ -549,11 +539,6 @@ extension Tab: WKNavigationDelegate {
                  decisionHandler: @escaping (WKNavigationActionPolicy) -> Void) {
 
         webView.customUserAgent = UserAgent.for(navigationAction.request.url)
-
-        // Check if a POST request is being made, and if it matches the appearance of a login request.
-        if let method = navigationAction.request.httpMethod, method == "POST", navigationAction.request.url?.isLoginURL ?? false {
-            userScripts.loginDetectionUserScript.scanForLoginForm(in: webView)
-        }
 
         if navigationAction.isTargetingMainFrame {
             currentDownload = nil
@@ -627,15 +612,10 @@ extension Tab: WKNavigationDelegate {
         if error != nil { error = nil }
 
         self.invalidateSessionStateData()
-
-        if let url = webView.url {
-             loginDetectionService?.handle(navigationEvent: .pageBeganLoading(url: url))
-        }
     }
 
     func webView(_ webView: WKWebView, didFinish navigation: WKNavigation!) {
         self.invalidateSessionStateData()
-        loginDetectionService?.handle(navigationEvent: .pageFinishedLoading)
     }
 
     func webView(_ webView: WKWebView, didFail navigation: WKNavigation!, withError error: Error) {
@@ -662,11 +642,6 @@ extension Tab: WKNavigationDelegate {
         }
         self.error = error
     }
-
-    func webView(_ webView: WKWebView, didReceiveServerRedirectForProvisionalNavigation navigation: WKNavigation!) {
-         guard let url = webView.url else { return }
-         loginDetectionService?.handle(navigationEvent: .redirect(url: url))
-     }
 
     @available(macOS 11.3, *)
     @objc(webView:navigationAction:didBecomeDownload:)
@@ -718,4 +693,3 @@ fileprivate extension WKNavigationResponse {
 }
 
 // swiftlint:enable type_body_length
-// swiftlint:enable file_length
