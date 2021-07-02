@@ -171,6 +171,8 @@
 		85AC3B3525DA82A600C7D2AA /* DataTaskProviding.swift in Sources */ = {isa = PBXBuildFile; fileRef = 85AC3B3425DA82A600C7D2AA /* DataTaskProviding.swift */; };
 		85AC3B4925DAC9BD00C7D2AA /* ConfigurationStorageTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 85AC3B4825DAC9BD00C7D2AA /* ConfigurationStorageTests.swift */; };
 		85AE2FF224A33A2D002D507F /* WebKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 85AE2FF124A33A2D002D507F /* WebKit.framework */; };
+		85AF2F4C268F4C9E00C89759 /* LoginDetectionService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 85AF2F4B268F4C9E00C89759 /* LoginDetectionService.swift */; };
+		85AF2F4E268F52F400C89759 /* LoginDetectionServiceTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 85AF2F4D268F52F400C89759 /* LoginDetectionServiceTests.swift */; };
 		85C6A29625CC1FFD00EEB5F1 /* UserDefaultsWrapper.swift in Sources */ = {isa = PBXBuildFile; fileRef = 85C6A29525CC1FFD00EEB5F1 /* UserDefaultsWrapper.swift */; };
 		85D33F1225C82EB3002B91A6 /* ConfigurationManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 85D33F1125C82EB3002B91A6 /* ConfigurationManager.swift */; };
 		85D438B6256E7C9E00F3BAF8 /* ContextMenuUserScript.swift in Sources */ = {isa = PBXBuildFile; fileRef = 85D438B5256E7C9E00F3BAF8 /* ContextMenuUserScript.swift */; };
@@ -566,6 +568,8 @@
 		85AC3B3425DA82A600C7D2AA /* DataTaskProviding.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DataTaskProviding.swift; sourceTree = "<group>"; };
 		85AC3B4825DAC9BD00C7D2AA /* ConfigurationStorageTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ConfigurationStorageTests.swift; sourceTree = "<group>"; };
 		85AE2FF124A33A2D002D507F /* WebKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = WebKit.framework; path = System/Library/Frameworks/WebKit.framework; sourceTree = SDKROOT; };
+		85AF2F4B268F4C9E00C89759 /* LoginDetectionService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LoginDetectionService.swift; sourceTree = "<group>"; };
+		85AF2F4D268F52F400C89759 /* LoginDetectionServiceTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LoginDetectionServiceTests.swift; sourceTree = "<group>"; };
 		85C6A29525CC1FFD00EEB5F1 /* UserDefaultsWrapper.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UserDefaultsWrapper.swift; sourceTree = "<group>"; };
 		85D33F1125C82EB3002B91A6 /* ConfigurationManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ConfigurationManager.swift; sourceTree = "<group>"; };
 		85D438B5256E7C9E00F3BAF8 /* ContextMenuUserScript.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContextMenuUserScript.swift; sourceTree = "<group>"; };
@@ -1246,6 +1250,7 @@
 		AA512D1224D99D4900230283 /* Services */ = {
 			isa = PBXGroup;
 			children = (
+				85AF2F4B268F4C9E00C89759 /* LoginDetectionService.swift */,
 				AA512D1324D99D9800230283 /* FaviconService.swift */,
 				AA6820E325502F19005ED0D5 /* WebsiteDataStore.swift */,
 			);
@@ -1676,6 +1681,7 @@
 				4B0219A725E0646500ED7DEA /* WebsiteDataStoreTests.swift */,
 				AA9C362725518C44004B1BA3 /* WebsiteDataStoreMock.swift */,
 				AABAF59B260A7D130085060C /* FaviconServiceMock.swift */,
+				85AF2F4D268F52F400C89759 /* LoginDetectionServiceTests.swift */,
 			);
 			path = Services;
 			sourceTree = "<group>";
@@ -2381,6 +2387,7 @@
 				85480FCF25D1AA22009424E3 /* ConfigurationStoring.swift in Sources */,
 				4B9292D22667123700AD2C21 /* AddFolderModalViewController.swift in Sources */,
 				4B92929E26670D2A00AD2C21 /* BookmarkSidebarTreeController.swift in Sources */,
+				85AF2F4C268F4C9E00C89759 /* LoginDetectionService.swift in Sources */,
 				4BB88B4A25B7B690006F6B06 /* SequenceExtensions.swift in Sources */,
 				B6A924DE2664CA09001A28CA /* LegacyWebKitDownloadDelegate.swift in Sources */,
 				AAA0CC3C25337FAB0079BC96 /* WKBackForwardListItemViewModel.swift in Sources */,
@@ -2635,6 +2642,7 @@
 				4B4F72EC266B2ED300814C60 /* CollectionExtension.swift in Sources */,
 				AAE39D1B24F44885008EF28B /* TabCollectionViewModelDelegateMock.swift in Sources */,
 				AA9C363025518CA9004B1BA3 /* FireTests.swift in Sources */,
+				85AF2F4E268F52F400C89759 /* LoginDetectionServiceTests.swift in Sources */,
 				AA63745424C9BF9A00AB2AC4 /* SuggestionContainerTests.swift in Sources */,
 				AAC9C01524CAFBCE00AD1325 /* TabTests.swift in Sources */,
 				4BA1A6D9258C0CB300F6F690 /* DataEncryptionTests.swift in Sources */,
