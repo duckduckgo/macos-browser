@@ -61,6 +61,16 @@
                </Test>
             </SkippedTests>
          </TestableReference>
+         <TestableReference
+            skipped = "NO">
+            <BuildableReference
+               BuildableIdentifier = "primary"
+               BlueprintIdentifier = "BrowserServicesKitTests"
+               BuildableName = "BrowserServicesKitTests"
+               BlueprintName = "BrowserServicesKitTests"
+               ReferencedContainer = "container:../BrowserServicesKit">
+            </BuildableReference>
+         </TestableReference>
       </Testables>
    </TestAction>
    <LaunchAction
