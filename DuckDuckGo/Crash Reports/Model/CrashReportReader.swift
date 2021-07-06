@@ -24,7 +24,7 @@ final class CrashReportReader {
 
     static let displayName = Bundle.main.displayName!
 
-    func getCrashReports() -> [CrashReport] {
+    func getCrashReports(since lastCheckDate: Date) -> [CrashReport] {
         let allPaths: [URL]
         do {
             allPaths = try FileManager.default.contentsOfDirectory(at: FileManager.diagnosticReports,
@@ -36,7 +36,9 @@ final class CrashReportReader {
         }
 
         return allPaths
-            .filter({ isCrashReportPath($0) && belongsToThisApp($0) && !isChecked($0) })
+            .filter({ isCrashReportPath($0) &&
+                        belongsToThisApp($0) &&
+                        !isChecked($0, lastCheckDate: lastCheckDate) })
             .map({ CrashReport(url: $0) })
     }
 
@@ -48,7 +50,7 @@ final class CrashReportReader {
         return path.lastPathComponent.hasPrefix(Self.displayName)
     }
 
-    private func isChecked(_ path: URL) -> Bool {
+    private func isChecked(_ path: URL, lastCheckDate: Date) -> Bool {
         // TODO
         return false
     }

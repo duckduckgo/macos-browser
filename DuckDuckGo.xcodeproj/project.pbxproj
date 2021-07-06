@@ -268,7 +268,7 @@
 		AAC30A28268E045400D2D9CD /* CrashReportReader.swift in Sources */ = {isa = PBXBuildFile; fileRef = AAC30A27268E045400D2D9CD /* CrashReportReader.swift */; };
 		AAC30A2A268E239100D2D9CD /* CrashReport.swift in Sources */ = {isa = PBXBuildFile; fileRef = AAC30A29268E239100D2D9CD /* CrashReport.swift */; };
 		AAC30A2C268F1ECD00D2D9CD /* CrashReportSender.swift in Sources */ = {isa = PBXBuildFile; fileRef = AAC30A2B268F1ECD00D2D9CD /* CrashReportSender.swift */; };
-		AAC30A2E268F1EE300D2D9CD /* CrashReportConsentPresenter.swift in Sources */ = {isa = PBXBuildFile; fileRef = AAC30A2D268F1EE300D2D9CD /* CrashReportConsentPresenter.swift */; };
+		AAC30A2E268F1EE300D2D9CD /* CrashReportPromptPresenter.swift in Sources */ = {isa = PBXBuildFile; fileRef = AAC30A2D268F1EE300D2D9CD /* CrashReportPromptPresenter.swift */; };
 		AAC5E4C725D6A6E8007F5990 /* BookmarkPopover.swift in Sources */ = {isa = PBXBuildFile; fileRef = AAC5E4C425D6A6E8007F5990 /* BookmarkPopover.swift */; };
 		AAC5E4C825D6A6E8007F5990 /* BookmarkPopoverViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = AAC5E4C525D6A6E8007F5990 /* BookmarkPopoverViewController.swift */; };
 		AAC5E4C925D6A6E8007F5990 /* Bookmarks.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = AAC5E4C625D6A6E8007F5990 /* Bookmarks.storyboard */; };
@@ -670,7 +670,7 @@
 		AAC30A27268E045400D2D9CD /* CrashReportReader.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CrashReportReader.swift; sourceTree = "<group>"; };
 		AAC30A29268E239100D2D9CD /* CrashReport.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CrashReport.swift; sourceTree = "<group>"; };
 		AAC30A2B268F1ECD00D2D9CD /* CrashReportSender.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CrashReportSender.swift; sourceTree = "<group>"; };
-		AAC30A2D268F1EE300D2D9CD /* CrashReportConsentPresenter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CrashReportConsentPresenter.swift; sourceTree = "<group>"; };
+		AAC30A2D268F1EE300D2D9CD /* CrashReportPromptPresenter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CrashReportPromptPresenter.swift; sourceTree = "<group>"; };
 		AAC5E4C425D6A6E8007F5990 /* BookmarkPopover.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = BookmarkPopover.swift; sourceTree = "<group>"; };
 		AAC5E4C525D6A6E8007F5990 /* BookmarkPopoverViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = BookmarkPopoverViewController.swift; sourceTree = "<group>"; };
 		AAC5E4C625D6A6E8007F5990 /* Bookmarks.storyboard */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.storyboard; path = Bookmarks.storyboard; sourceTree = "<group>"; };
@@ -1757,7 +1757,7 @@
 				AAC30A25268DFEE200D2D9CD /* CrashReporter.swift */,
 				AAC30A27268E045400D2D9CD /* CrashReportReader.swift */,
 				AAC30A2B268F1ECD00D2D9CD /* CrashReportSender.swift */,
-				AAC30A2D268F1EE300D2D9CD /* CrashReportConsentPresenter.swift */,
+				AAC30A2D268F1EE300D2D9CD /* CrashReportPromptPresenter.swift */,
 				AAC30A29268E239100D2D9CD /* CrashReport.swift */,
 			);
 			path = Model;
@@ -2374,7 +2374,7 @@
 				AAA0CC572539EBC90079BC96 /* FaviconUserScript.swift in Sources */,
 				B6A9E45A261460350067D1B9 /* ApiRequestError.swift in Sources */,
 				85799C1825DEBB3F0007EC87 /* Logging.swift in Sources */,
-				AAC30A2E268F1EE300D2D9CD /* CrashReportConsentPresenter.swift in Sources */,
+				AAC30A2E268F1EE300D2D9CD /* CrashReportPromptPresenter.swift in Sources */,
 				AA86490C24D3494C001BABEE /* GradientView.swift in Sources */,
 				B684590825C9027900DC17B6 /* AppStateChangedPublisher.swift in Sources */,
 				4B92928F26670D1700AD2C21 /* BookmarkTableCellView.swift in Sources */,

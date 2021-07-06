@@ -1,5 +1,5 @@
 //
-//  CrashReportConsentPresenter.swift
+//  CrashReportPromptPresenter.swift
 //
 //  Copyright © 2021 DuckDuckGo. All rights reserved.
 //
@@ -20,7 +20,26 @@ import Foundation
 
 #if OUT_OF_APPSTORE
 
-final class CrashReportConsentPresenter {
+final class CrashReportPromptPresenter {
+
+    func showPrompt() -> Bool {
+        let response = NSAlert.crashReportAlert.runModal()
+        return response == NSApplication.ModalResponse.alertFirstButtonReturn
+    }
+
+}
+
+fileprivate extension NSAlert {
+
+    static var crashReportAlert: NSAlert {
+        let alert = NSAlert()
+        alert.messageText = UserText.crashPromptMessageText
+        alert.informativeText = UserText.crashPromptInformativeText
+        alert.alertStyle = .critical
+        alert.addButton(withTitle: UserText.report)
+        alert.addButton(withTitle: UserText.cancel)
+        return alert
+    }
 
 }
 

@@ -24,17 +24,34 @@ final class CrashReporter {
 
     private let reader = CrashReportReader()
     private let sender = CrashReportSender()
-    private let consentPresenter = CrashReportConsentPresenter()
+    private let promptPresenter = CrashReportPromptPresenter()
+
+    @UserDefaultsWrapper(key: .grammarCheckEnabledOnce, defaultValue: Date())
+    private var lastCheckDate: Date
 
     func checkForNewReports() {
-        let crashReports = reader.getCrashReports()
+
+//#if !DEBUG
+
+        let crashReports = reader.getCrashReports(since: lastCheckDate)
+        lastCheckDate = Date()
 
         guard let latest = crashReports.last else {
+            // No new crash report
             return
         }
 
-        let content = latest.content
-        print("\(content)")
+//        Pixel.fire(.crash)
+
+        guard promptPresenter.showPrompt() else {
+            // User didn't allow sending the report
+            return
+        }
+
+        sender.send(latest)
+
+//#endif
+
     }
 
 }

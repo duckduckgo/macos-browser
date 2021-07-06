@@ -22,7 +22,9 @@ import Foundation
 
 final class CrashReportSender {
 
-    
+    func send(_ crashReport: CrashReport) {
+        // TODO
+    }
 
 }
 
