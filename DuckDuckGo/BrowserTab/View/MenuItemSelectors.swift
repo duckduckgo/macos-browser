@@ -36,6 +36,12 @@ import Cocoa
 
 }
 
+@objc protocol MenuItemSelectors {
+
+    func search(_ sender: NSMenuItem)
+
+}
+
 @objc protocol FolderMenuItemSelectors {
 
     func newFolder(_ sender: NSMenuItem)

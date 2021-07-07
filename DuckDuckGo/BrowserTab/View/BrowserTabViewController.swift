@@ -39,6 +39,7 @@ final class BrowserTabViewController: NSViewController {
     private var contextMenuExpected = false
     private var contextMenuLink: URL?
     private var contextMenuImage: URL?
+    private var contextMenuSelectedText: String?
 
     required init?(coder: NSCoder) {
         fatalError("BrowserTabViewController: Bad initializer")
@@ -314,10 +315,15 @@ extension BrowserTabViewController: TabDelegate {
         tabCollectionViewModel.remove(at: index)
     }
 
-    func tab(_ tab: Tab, willShowContextMenuAt position: NSPoint, image: URL?, link: URL?) {
+    func tab(_ tab: Tab,
+             willShowContextMenuAt position: NSPoint,
+             image: URL?,
+             link: URL?,
+             selectedText: String?) {
         contextMenuImage = image
         contextMenuLink = link
         contextMenuExpected = true
+        contextMenuSelectedText = selectedText
     }
 
     func tab(_ tab: Tab, detectedLogin host: String) {
@@ -452,6 +458,16 @@ extension BrowserTabViewController: ImageMenuItemSelectors {
         guard let url = contextMenuImage else { return }
         NSPasteboard.general.clearContents()
         NSPasteboard.general.setString(url.absoluteString, forType: .URL)
+    }
+
+}
+
+extension BrowserTabViewController: MenuItemSelectors {
+
+    func search(_ sender: NSMenuItem) {
+        let selectedText = contextMenuSelectedText ?? ""
+        let url = URL.makeSearchUrl(from: selectedText)
+        openNewTab(with: url, parentTab: tabViewModel?.tab, selected: true)
     }
 
 }

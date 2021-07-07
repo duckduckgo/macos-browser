@@ -31,13 +31,16 @@ final class WebView: WKWebView {
 
         // Images
         "WKMenuItemIdentifierOpenImageInNewWindow": #selector(ImageMenuItemSelectors.openImageInNewWindow(_:)),
-        "WKMenuItemIdentifierDownloadImage": #selector(ImageMenuItemSelectors.saveImageAs(_:))
+        "WKMenuItemIdentifierDownloadImage": #selector(ImageMenuItemSelectors.saveImageAs(_:)),
+
+        "WKMenuItemIdentifierSearchWeb": #selector(MenuItemSelectors.search(_:))
     ]
 
     static let itemTitles: [String: String] = [
         "WKMenuItemIdentifierOpenLink": UserText.openLinkInNewTab,
         "WKMenuItemIdentifierDownloadImage": UserText.saveImageAs,
-        "WKMenuItemIdentifierDownloadLinkedFile": UserText.downloadLinkedFileAs
+        "WKMenuItemIdentifierDownloadLinkedFile": UserText.downloadLinkedFileAs,
+        "WKMenuItemIdentifierSearchWeb": UserText.searchWithDuckDuckGo
     ]
 
     static private let maxMagnification: CGFloat = 3.0
