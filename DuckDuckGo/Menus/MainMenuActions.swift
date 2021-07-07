@@ -353,6 +353,10 @@ extension MainViewController {
         UserDefaultsWrapper<Bool>.clear(.grammarCheckEnabledOnce)
     }
 
+    @IBAction func triggerFatalError(_ sender: Any?) {
+        fatalError("Fatal error triggered from the Debug menu")
+    }
+
 }
 
 extension MainViewController: NSMenuItemValidation {

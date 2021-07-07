@@ -26,15 +26,21 @@ final class CrashReporter {
     private let sender = CrashReportSender()
     private let promptPresenter = CrashReportPromptPresenter()
 
-    @UserDefaultsWrapper(key: .grammarCheckEnabledOnce, defaultValue: Date())
-    private var lastCheckDate: Date
+    @UserDefaultsWrapper(key: .lastCrashReportCheckDate, defaultValue: nil)
+    private var lastCheckDate: Date?
 
     func checkForNewReports() {
 
 //#if !DEBUG
 
+        guard let lastCheckDate = lastCheckDate else {
+            // Initial run
+            lastCheckDate = Date()
+            return
+        }
+
         let crashReports = reader.getCrashReports(since: lastCheckDate)
-        lastCheckDate = Date()
+        self.lastCheckDate = Date()
 
         guard let latest = crashReports.last else {
             // No new crash report

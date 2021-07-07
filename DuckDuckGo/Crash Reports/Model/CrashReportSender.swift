@@ -22,8 +22,23 @@ import Foundation
 
 final class CrashReportSender {
 
+    static let reportServiceUrl = URL(string: "https://duckduckgo.com/crash.js")!
+
     func send(_ crashReport: CrashReport) {
-        // TODO
+        guard let content = crashReport.content else {
+            fatalError("CrashReportSender: Can't get the content of the crash report")
+        }
+        var request = URLRequest(url: Self.reportServiceUrl)
+        request.setValue("text/plain", forHTTPHeaderField: "Content-Type")
+        request.setValue("ddg_mac", forHTTPHeaderField: "User-Agent")
+        request.httpMethod = "POST"
+        request.httpBody = content
+
+        URLSession.shared.dataTask(with: request) { (_, _, error) in
+            if error != nil {
+                fatalError("CrashReportSender: Failed to send the crash reprot")
+            }
+        }.resume()
     }
 
 }

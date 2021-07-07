@@ -51,8 +51,12 @@ final class CrashReportReader {
     }
 
     private func isChecked(_ path: URL, lastCheckDate: Date) -> Bool {
-        // TODO
-        return false
+        guard let creationDate = FileManager.default.fileCreationDate(url: path) else {
+            assertionFailure("CrashReportReader: Can't get the creation date of the report")
+            return true
+        }
+
+        return creationDate <= lastCheckDate
     }
 
 }
@@ -64,6 +68,11 @@ fileprivate extension FileManager {
         return homeDirectoryURL
             .appendingPathComponent("Library/Logs/DiagnosticReports")
     }()
+
+    func fileCreationDate(url: URL) -> Date? {
+        let fileAttributes: [FileAttributeKey: Any] = (try? self.attributesOfItem(atPath: url.path)) ?? [:]
+        return fileAttributes[.creationDate] as? Date
+    }
 
 }
 
