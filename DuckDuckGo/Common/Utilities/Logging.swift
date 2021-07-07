@@ -28,6 +28,10 @@ extension OSLog {
         Logging.fireLoggingEnabled ? Logging.fireLog : .disabled
     }
 
+    static var passwordManager: OSLog {
+        Logging.passwordManagerEnabled ? Logging.passwordManagerLog : .disabled
+    }
+
     static var history: OSLog {
         Logging.historyLoggingEnabled ? Logging.historyLog : .disabled
     }
@@ -40,7 +44,10 @@ struct Logging {
     fileprivate static let configLog: OSLog = OSLog(subsystem: Bundle.main.bundleIdentifier ?? "DuckDuckGo", category: "Configuration Downloading")
 
     fileprivate static let fireLoggingEnabled = false
-    fileprivate static let fireLog: OSLog = OSLog(subsystem: Bundle.main.bundleIdentifier ?? "DuckDuckGo", category: "Fire/Login Detection")
+    fileprivate static let fireLog: OSLog = OSLog(subsystem: Bundle.main.bundleIdentifier ?? "DuckDuckGo", category: "Fire")
+
+    fileprivate static let passwordManagerEnabled = false
+    fileprivate static let passwordManagerLog: OSLog = OSLog(subsystem: Bundle.main.bundleIdentifier ?? "DuckDuckGo", category: "Password Manager")
 
     fileprivate static let historyLoggingEnabled = false
     fileprivate static let historyLog: OSLog = OSLog(subsystem: Bundle.main.bundleIdentifier ?? "DuckDuckGo", category: "History")

@@ -63,7 +63,7 @@ final class LoginDetectionService {
     func handle(navigationEvent: NavigationEvent, delayAfterFinishingPageLoad: Bool = true) {
         switch navigationEvent {
         case .userAction:
-            os_log("Received user action, discard login attempt", log: .fire)
+            os_log("Received user action, discard login attempt", log: .passwordManager)
             discardLoginAttempt()
 
         case .pageBeganLoading(let url):
@@ -86,7 +86,7 @@ final class LoginDetectionService {
                     self?.handleLoginDetection()
                 }
 
-                os_log("Queueing login detection job", log: .fire)
+                os_log("Queueing login detection job", log: .passwordManager)
                 DispatchQueue.main.asyncAfter(deadline: DispatchTime.now() + 0.25, execute: loginDetectionWorkItem!)
             } else {
                 loginDetectionWorkItem?.cancel()
@@ -94,7 +94,7 @@ final class LoginDetectionService {
             }
 
         case .detectedLogin(let url):
-            os_log("Setting detected login URL: %s", log: .fire, url.absoluteString)
+            os_log("Setting detected login URL: %s", log: .passwordManager, url.absoluteString)
             self.detectedLoginURL = url
 
         case .redirect(let url):
@@ -111,19 +111,19 @@ final class LoginDetectionService {
         detectedLoginURL = nil
         authDetectedHosts = []
 
-        os_log("Discarded login attempt", log: .fire)
+        os_log("Discarded login attempt", log: .passwordManager)
     }
 
     private func handleLoginDetection() {
-        os_log("Login detection work item fired", log: .fire)
+        os_log("Login detection work item fired", log: .passwordManager)
 
         guard let urlToCheck = postLoginURL else {
-            os_log("Login detection work item has no URL to detect logins for, discarding attempt", log: .fire)
+            os_log("Login detection work item has no URL to detect logins for, discarding attempt", log: .passwordManager)
             return
         }
 
         guard let result = detectLogin(url: urlToCheck) else {
-            os_log("Login detection couldn't detect login, discarding attempt", log: .fire)
+            os_log("Login detection couldn't detect login, discarding attempt", log: .passwordManager)
             discardLoginAttempt()
             return
         }
@@ -143,30 +143,30 @@ final class LoginDetectionService {
 
     private func detectLogin(url: URL) -> LoginResult? {
         guard let validLoginAttempt = detectedLoginURL, let host = url.host else {
-            os_log("Login detection hit guard statement", log: .fire)
+            os_log("Login detection hit guard statement", log: .passwordManager)
             return nil
         }
 
         if authDetectedHosts.contains(host) {
-            os_log("Login detection returning auth flow", log: .fire)
+            os_log("Login detection returning auth flow", log: .passwordManager)
             return LoginResult.authenticationFlow(authenticationDomain: host)
         }
 
         if url.isOAuthURL || url.isSingleSignOnURL {
-            os_log("Login detection returning OAuth/SSO auth flow", log: .fire)
+            os_log("Login detection returning OAuth/SSO auth flow", log: .passwordManager)
             return LoginResult.authenticationFlow(authenticationDomain: host)
         }
 
         if url.isTwoFactorURL {
-            os_log("Login detection returning 2FA flow", log: .fire)
+            os_log("Login detection returning 2FA flow", log: .passwordManager)
             return LoginResult.twoFactorAuthFlow(authenticationDomain: host)
         }
 
         if domainOrPathDidChange(validLoginAttempt, url) {
-            os_log("Detected login to %{public}s (auth domain %{public}s)", log: .fire, host, validLoginAttempt.host!)
+            os_log("Detected login to %{public}s (auth domain %{public}s)", log: .passwordManager, host, validLoginAttempt.host!)
             return LoginResult.loginDetected(authenticationDomain: validLoginAttempt.host!, forwardedDomain: host)
         } else {
-            os_log("DID NOT detect login to %{public}s (auth domain %{public}s)", log: .fire, host, validLoginAttempt.host!)
+            os_log("DID NOT detect login to %{public}s (auth domain %{public}s)", log: .passwordManager, host, validLoginAttempt.host!)
         }
 
         return nil
@@ -176,7 +176,7 @@ final class LoginDetectionService {
         guard let host = url.host else { return }
 
         if url.isOAuthURL || url.isSingleSignOnURL {
-            os_log("Redirection added authentication host %{public}s", log: .fire, host)
+            os_log("Redirection added authentication host %{public}s", log: .passwordManager, host)
             authDetectedHosts.append(host)
         }
 
