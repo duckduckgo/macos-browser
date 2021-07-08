@@ -126,6 +126,11 @@ final class MainMenu: NSMenu {
         func bookmarkMenuItems(from bookmarkViewModels: [BookmarkViewModel]) -> [NSMenuItem] {
             var menuItems = [NSMenuItem]()
 
+            if bookmarkViewModels.count > 1 {
+                menuItems.append(NSMenuItem(bookmarkViewModels: bookmarkViewModels))
+                menuItems.append(.separator())
+            }
+
             for viewModel in bookmarkViewModels {
                 let menuItem = NSMenuItem(bookmarkViewModel: viewModel)
 
@@ -189,6 +194,14 @@ fileprivate extension NSMenuItem {
         image = bookmarkViewModel.menuFavicon
         representedObject = bookmarkViewModel.entity
         action = #selector(MainViewController.navigateToBookmark(_:))
+    }
+
+    convenience init(bookmarkViewModels: [BookmarkViewModel]) {
+        self.init()
+
+        title = UserText.bookmarksOpenInNewTabs
+        representedObject = bookmarkViewModels
+        action = #selector(MainViewController.openAllInTabs(_:))
     }
 
     func removeFromParent() {
