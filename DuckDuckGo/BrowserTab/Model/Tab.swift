@@ -25,7 +25,7 @@ import BrowserServicesKit
 protocol TabDelegate: FileDownloadManagerDelegate {
     func tabDidStartNavigation(_ tab: Tab)
     func tab(_ tab: Tab, requestedNewTab url: URL?, selected: Bool)
-    func tab(_ tab: Tab, willShowContextMenuAt position: NSPoint, image: URL?, link: URL?)
+    func tab(_ tab: Tab, willShowContextMenuAt position: NSPoint, image: URL?, link: URL?, selectedText: String?)
     func tab(_ tab: Tab, detectedLogin host: String)
 	func tab(_ tab: Tab, requestedOpenExternalURL url: URL, forUserEnteredURL: Bool)
     func tab(_ tab: Tab, requestedSaveCredentials credentials: SecureVaultModels.WebsiteCredentials)
@@ -453,8 +453,12 @@ extension Tab: PageObserverUserScriptDelegate {
 
 extension Tab: ContextMenuDelegate {
 
-    func contextMenu(forUserScript script: ContextMenuUserScript, willShowAt position: NSPoint, image: URL?, link: URL?) {
-        delegate?.tab(self, willShowContextMenuAt: position, image: image, link: link)
+    func contextMenu(forUserScript script: ContextMenuUserScript,
+                     willShowAt position: NSPoint,
+                     image: URL?,
+                     link: URL?,
+                     selectedText: String?) {
+        delegate?.tab(self, willShowContextMenuAt: position, image: image, link: link, selectedText: selectedText)
     }
 
 }
