@@ -37,7 +37,7 @@ final class CrashReporter {
 
         guard let lastCheckDate = lastCheckDate else {
             // Initial run
-            lastCheckDate = Date()
+            self.lastCheckDate = Date()
             return
         }
 
