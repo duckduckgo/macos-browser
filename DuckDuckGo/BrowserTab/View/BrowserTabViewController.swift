@@ -326,26 +326,6 @@ extension BrowserTabViewController: TabDelegate {
         contextMenuSelectedText = selectedText
     }
 
-    func tab(_ tab: Tab, detectedLogin host: String) {
-        guard let window = view.window,
-              !FireproofDomains.shared.isAllowed(fireproofDomain: host),
-              !PasswordManagerSettings().canPromptOnDomain(host)
-              else {
-            os_log("%s: Window is nil", type: .error, className)
-            return
-        }
-
-        let alert = NSAlert.fireproofAlert(with: host.dropWWW())
-        alert.beginSheetModal(for: window) { response in
-            if response == NSApplication.ModalResponse.alertFirstButtonReturn {
-                Pixel.fire(.fireproof(kind: .init(url: tab.url), suggested: .suggested))
-                FireproofDomains.shared.addToAllowed(domain: host)
-            }
-        }
-
-        Pixel.fire(.fireproofSuggested())
-    }
-
 }
 
 extension BrowserTabViewController: FileDownloadManagerDelegate {
@@ -387,6 +367,12 @@ extension BrowserTabViewController: FileDownloadManagerDelegate {
     }
 
     func tab(_ tab: Tab, requestedSaveCredentials credentials: SecureVaultModels.WebsiteCredentials) {
+
+        guard !FireproofDomains.shared.isAllowed(fireproofDomain: credentials.account.domain),
+              PasswordManagerSettings().canPromptOnDomain(credentials.account.domain) else {
+            return
+        }
+
         tabViewModel?.credentialsToSave = credentials
     }
 
