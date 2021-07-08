@@ -1,5 +1,5 @@
 //
-//  PasswordManagerSettings.swift
+//  PasswordManagerSettingsTests.swift
 //
 //  Copyright © 2021 DuckDuckGo. All rights reserved.
 //
@@ -17,20 +17,20 @@
 //
 
 import Foundation
+import XCTest
+@testable import DuckDuckGo_Privacy_Browser
 
-final class PasswordManagerSettings {
+final class PasswordManagerSettingsTests: XCTestCase {
 
-    @UserDefaultsWrapper(key: .passwordManagerDoNotPromptDomains, defaultValue: [])
-    private(set) var doNotPromptDomains: [String]
-
-    func doNotPromptOnDomain(_ domain: String) {
-        doNotPromptDomains.append(domain)
-        doNotPromptDomains = [String](Set<String>(doNotPromptDomains))
+    override func setUp() {
+        super.setUp()
+        UserDefaults().removeObject(forKey: UserDefaultsWrapper<Any>.Key.passwordManagerDoNotPromptDomains.rawValue)
     }
 
-    func canPromptOnDomain(_ domain: String) -> Bool {
-        let doNotPrompt = doNotPromptDomains.contains(domain) || doNotPromptDomains.contains(domain.dropWWW())
-        return !doNotPrompt
+    func testWhenDomainAddedToDoNotPromptList_ThenDoNotPrompt() {
+        XCTAssertTrue(PasswordManagerSettings().canPromptOnDomain("example.com"))
+        PasswordManagerSettings().doNotPromptOnDomain("example.com")
+        XCTAssertFalse(PasswordManagerSettings().canPromptOnDomain("example.com"))
     }
 
 }

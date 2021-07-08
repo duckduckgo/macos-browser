@@ -160,6 +160,7 @@
 		85890638267B88B800D23B0D /* SaveCredentials.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 85890637267B88B800D23B0D /* SaveCredentials.storyboard */; };
 		8589063A267BCD8E00D23B0D /* SaveCredentialsPopover.swift in Sources */ = {isa = PBXBuildFile; fileRef = 85890639267BCD8E00D23B0D /* SaveCredentialsPopover.swift */; };
 		8589063C267BCDC000D23B0D /* SaveCredentialsViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8589063B267BCDC000D23B0D /* SaveCredentialsViewController.swift */; };
+		858C1BED26974E6600E6C014 /* PasswordManagerSettingsTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 858C1BEC26974E6600E6C014 /* PasswordManagerSettingsTests.swift */; };
 		85A0116925AF1D8900FA6A0C /* FindInPageViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 85A0116825AF1D8900FA6A0C /* FindInPageViewController.swift */; };
 		85A0117425AF2EDF00FA6A0C /* FindInPage.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 85A0117325AF2EDF00FA6A0C /* FindInPage.storyboard */; };
 		85A0118225AF60E700FA6A0C /* FindInPageModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 85A0118125AF60E700FA6A0C /* FindInPageModel.swift */; };
@@ -557,6 +558,7 @@
 		85890637267B88B800D23B0D /* SaveCredentials.storyboard */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; path = SaveCredentials.storyboard; sourceTree = "<group>"; };
 		85890639267BCD8E00D23B0D /* SaveCredentialsPopover.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SaveCredentialsPopover.swift; sourceTree = "<group>"; };
 		8589063B267BCDC000D23B0D /* SaveCredentialsViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SaveCredentialsViewController.swift; sourceTree = "<group>"; };
+		858C1BEC26974E6600E6C014 /* PasswordManagerSettingsTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PasswordManagerSettingsTests.swift; sourceTree = "<group>"; };
 		85A0116825AF1D8900FA6A0C /* FindInPageViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FindInPageViewController.swift; sourceTree = "<group>"; };
 		85A0117325AF2EDF00FA6A0C /* FindInPage.storyboard */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; path = FindInPage.storyboard; sourceTree = "<group>"; };
 		85A0118125AF60E700FA6A0C /* FindInPageModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FindInPageModel.swift; sourceTree = "<group>"; };
@@ -1167,6 +1169,14 @@
 			path = SecureVault;
 			sourceTree = "<group>";
 		};
+		858C1BEB26974E5500E6C014 /* SecureVault */ = {
+			isa = PBXGroup;
+			children = (
+				858C1BEC26974E6600E6C014 /* PasswordManagerSettingsTests.swift */,
+			);
+			path = SecureVault;
+			sourceTree = "<group>";
+		};
 		85A0115D25AF1C4700FA6A0C /* FindInPage */ = {
 			isa = PBXGroup;
 			children = (
@@ -1336,6 +1346,7 @@
 				AAEC74AE2642C47300C2EFBC /* History */,
 				4B0511EE262CAEB300F6079C /* Preferences */,
 				AA63744E24C9BB4A00AB2AC4 /* Suggestions */,
+				858C1BEB26974E5500E6C014 /* SecureVault */,
 				AAC9C01224CAFBB700AD1325 /* TabBar */,
 				B61F012125ECBACE00ABB5A3 /* UserScripts */,
 				B6AE74322609AFBB005B9B1A /* Progress */,
@@ -2646,6 +2657,7 @@
 				AA63745424C9BF9A00AB2AC4 /* SuggestionContainerTests.swift in Sources */,
 				AAC9C01524CAFBCE00AD1325 /* TabTests.swift in Sources */,
 				4BA1A6D9258C0CB300F6F690 /* DataEncryptionTests.swift in Sources */,
+				858C1BED26974E6600E6C014 /* PasswordManagerSettingsTests.swift in Sources */,
 				B6A5A27E25B9403E00AA7ADA /* FileStoreMock.swift in Sources */,
 				B6AE74342609AFCE005B9B1A /* ProgressEstimationTests.swift in Sources */,
 				4BA1A6FE258C5C1300F6F690 /* EncryptedValueTransformerTests.swift in Sources */,
