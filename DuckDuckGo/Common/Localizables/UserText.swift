@@ -143,11 +143,4 @@ struct UserText {
         return String(format: localized, version, build)
     }
 
-    static let crashPromptMessageText = NSLocalizedString("crash.prompt.message.text",
-                                                          value: "App quit unexpectedly",
-                                                          comment: "")
-    static let crashPromptInformativeText = NSLocalizedString("crash.prompt.informative.text",
-                                                              value: "Click \"Report...\" to submit the report to DuckDuckGo. No personal infomation is sent with this report.",
-                                                              comment: "")
-    static let report = NSLocalizedString("report", value: "Report...", comment: "Burn button")
 }

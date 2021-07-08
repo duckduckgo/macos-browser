@@ -24,9 +24,14 @@ struct CrashReport {
 
     let url: URL
 
-    var content: Data? {
-        return try? String(contentsOf: url).data(using: .utf8)
+    var content: String? {
+        try? String(contentsOf: url)
     }
+
+    var contentData: Data? {
+        content?.data(using: .utf8)
+    }
+
 }
 
 #endif

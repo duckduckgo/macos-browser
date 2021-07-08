@@ -23,15 +23,17 @@ import Foundation
 final class CrashReporter {
 
     private let reader = CrashReportReader()
-    private let sender = CrashReportSender()
-    private let promptPresenter = CrashReportPromptPresenter()
+    private lazy var sender = CrashReportSender()
+    private lazy var promptPresenter = CrashReportPromptPresenter()
 
     @UserDefaultsWrapper(key: .lastCrashReportCheckDate, defaultValue: nil)
     private var lastCheckDate: Date?
 
+    private var latestCrashReport: CrashReport?
+
     func checkForNewReports() {
 
-//#if !DEBUG
+#if !DEBUG
 
         guard let lastCheckDate = lastCheckDate else {
             // Initial run
@@ -47,17 +49,31 @@ final class CrashReporter {
             return
         }
 
-//        Pixel.fire(.crash)
+        Pixel.fire(.crash)
 
-        guard promptPresenter.showPrompt() else {
-            // User didn't allow sending the report
+        latestCrashReport = latest
+        promptPresenter.showPrompt(self, for: latest)
+
+#endif
+
+    }
+
+}
+
+extension CrashReporter: CrashReportPromptViewControllerDelegate {
+
+    func crashReportPromptViewController(_ crashReportPromptViewController: CrashReportPromptViewController,
+                                         userDidAllowToReport: Bool) {
+        guard userDidAllowToReport else {
             return
         }
 
-        sender.send(latest)
+        guard let latestCrashReport = latestCrashReport else {
+            assertionFailure("CrashReporter: The latest crash report is nil")
+            return
+        }
 
-//#endif
-
+        sender.send(latestCrashReport)
     }
 
 }

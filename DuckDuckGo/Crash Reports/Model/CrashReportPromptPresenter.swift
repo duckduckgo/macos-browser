@@ -16,29 +16,29 @@
 //  limitations under the License.
 //
 
-import Foundation
+import Cocoa
 
 #if OUT_OF_APPSTORE
 
 final class CrashReportPromptPresenter {
 
-    func showPrompt() -> Bool {
-        let response = NSAlert.crashReportAlert.runModal()
-        return response == NSApplication.ModalResponse.alertFirstButtonReturn
+    lazy var windowController: NSWindowController = {
+        let storyboard = NSStoryboard(name: "CrashReports", bundle: nil)
+        return storyboard.instantiateController(identifier: "CrashReportPromptWindowController")
+    }()
+
+    var viewController: CrashReportPromptViewController {
+        // swiftlint:disable force_cast
+        return windowController.contentViewController as! CrashReportPromptViewController
+        // swiftlint:enable force_cast
     }
 
-}
+    func showPrompt(_ delegate: CrashReportPromptViewControllerDelegate, for crashReport: CrashReport) {
+        viewController.delegate = delegate
+        viewController.crashReport = crashReport
 
-fileprivate extension NSAlert {
-
-    static var crashReportAlert: NSAlert {
-        let alert = NSAlert()
-        alert.messageText = UserText.crashPromptMessageText
-        alert.informativeText = UserText.crashPromptInformativeText
-        alert.alertStyle = .critical
-        alert.addButton(withTitle: UserText.report)
-        alert.addButton(withTitle: UserText.cancel)
-        return alert
+        windowController.showWindow(self)
+        windowController.window?.center()
     }
 
 }
