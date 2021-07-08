@@ -126,7 +126,8 @@ final class MainMenu: NSMenu {
         func bookmarkMenuItems(from bookmarkViewModels: [BookmarkViewModel]) -> [NSMenuItem] {
             var menuItems = [NSMenuItem]()
 
-            if bookmarkViewModels.count > 1 {
+            let showOpenInTabsItem = bookmarkViewModels.compactMap { $0.entity as? Bookmark }.count > 1
+            if  showOpenInTabsItem {
                 menuItems.append(NSMenuItem(bookmarkViewModels: bookmarkViewModels))
                 menuItems.append(.separator())
             }
