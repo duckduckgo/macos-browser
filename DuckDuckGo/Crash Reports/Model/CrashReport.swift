@@ -22,10 +22,23 @@ import Foundation
 
 struct CrashReport {
 
+    static let headerItemsToFilter = [
+        "Anonymous UUID:",
+        "Sleep/Wake UUID:"
+    ]
+
     let url: URL
 
     var content: String? {
         try? String(contentsOf: url)
+            .components(separatedBy: "\n")
+            .filter({ line in
+                for headerItemToFilder in Self.headerItemsToFilter {
+                    if line.hasPrefix(headerItemToFilder) { return false }
+                }
+                return true
+            })
+            .joined(separator: "\n")
     }
 
     var contentData: Data? {
