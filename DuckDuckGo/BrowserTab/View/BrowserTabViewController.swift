@@ -417,6 +417,7 @@ extension BrowserTabViewController: LinkMenuItemSelectors {
         let pasteboard = NSPasteboard.general
         pasteboard.declareTypes([.URL], owner: nil)
         url.write(to: pasteboard)
+        pasteboard.setString(url.absoluteString ?? "", forType: .string)
     }
 
 }
