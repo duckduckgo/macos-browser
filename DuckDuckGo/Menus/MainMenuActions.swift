@@ -104,6 +104,17 @@ extension AppDelegate {
         WindowsManager.openNewWindow(with: tabCollectionViewModel)
     }
 
+    @IBAction func openImportBrowserDataWindow(_ sender: Any?) {
+        guard let windowController = WindowControllersManager.shared.lastKeyMainWindowController,
+              windowController.window?.isKeyWindow == true else {
+
+            return
+        }
+
+        let viewController = DataImportViewController.create()
+        windowController.mainViewController.beginSheet(viewController)
+    }
+
 }
 
 extension MainViewController {
