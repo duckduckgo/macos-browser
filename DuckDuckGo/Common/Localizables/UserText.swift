@@ -144,4 +144,5 @@ struct UserText {
                                           comment: "Displays the version and build numbers")
         return String(format: localized, version, build)
     }
+
 }

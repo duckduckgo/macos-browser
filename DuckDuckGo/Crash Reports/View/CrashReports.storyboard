@@ -1,0 +1,150 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<document type="com.apple.InterfaceBuilder3.Cocoa.Storyboard.XIB" version="3.0" toolsVersion="18122" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none" useAutolayout="YES">
+    <dependencies>
+        <deployment identifier="macosx"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="18122"/>
+        <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
+    </dependencies>
+    <scenes>
+        <!--Window Controller-->
+        <scene sceneID="7LF-Sq-Iey">
+            <objects>
+                <windowController storyboardIdentifier="CrashReportPromptWindowController" id="6Hc-2I-I76" sceneMemberID="viewController">
+                    <window key="window" title="Problem Report" allowsToolTipsWhenApplicationIsInactive="NO" autorecalculatesKeyViewLoop="NO" visibleAtLaunch="NO" frameAutosaveName="" animationBehavior="default" id="lxw-Tj-7vr">
+                        <windowStyleMask key="styleMask" titled="YES" closable="YES"/>
+                        <windowPositionMask key="initialPositionMask" leftStrut="YES" rightStrut="YES" topStrut="YES" bottomStrut="YES"/>
+                        <rect key="contentRect" x="294" y="313" width="550" height="427"/>
+                        <rect key="screenRect" x="0.0" y="0.0" width="1920" height="1055"/>
+                        <view key="contentView" id="upA-ud-kGp">
+                            <rect key="frame" x="0.0" y="0.0" width="550" height="427"/>
+                            <autoresizingMask key="autoresizingMask"/>
+                        </view>
+                        <connections>
+                            <outlet property="delegate" destination="6Hc-2I-I76" id="PvE-9S-4D2"/>
+                        </connections>
+                    </window>
+                    <connections>
+                        <segue destination="XEv-He-h8z" kind="relationship" relationship="window.shadowedContentViewController" id="NVj-be-51C"/>
+                    </connections>
+                </windowController>
+                <customObject id="zMa-eI-3L2" userLabel="First Responder" customClass="NSResponder" sceneMemberID="firstResponder"/>
+            </objects>
+            <point key="canvasLocation" x="-128" y="-146"/>
+        </scene>
+        <!--Crash Report Prompt View Controller-->
+        <scene sceneID="bFJ-VC-qQo">
+            <objects>
+                <viewController id="XEv-He-h8z" customClass="CrashReportPromptViewController" customModule="DuckDuckGo_Privacy_Browser" customModuleProvider="target" sceneMemberID="viewController">
+                    <view key="view" id="dl0-Bx-eMX">
+                        <rect key="frame" x="0.0" y="0.0" width="550" height="432"/>
+                        <autoresizingMask key="autoresizingMask"/>
+                        <subviews>
+                            <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="8pY-q4-yXW">
+                                <rect key="frame" x="18" y="360" width="514" height="28"/>
+                                <constraints>
+                                    <constraint firstAttribute="width" constant="510" id="axz-QQ-mY7"/>
+                                </constraints>
+                                <textFieldCell key="cell" title="Click &quot;Send to DuckDuckGo&quot; to submit report to DuckDuckGo. No personal infomation is sent with this report." id="FNu-TK-DVM">
+                                    <font key="font" metaFont="smallSystem"/>
+                                    <color key="textColor" name="labelColor" catalog="System" colorSpace="catalog"/>
+                                    <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
+                                </textFieldCell>
+                            </textField>
+                            <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="qpb-iS-ipd">
+                                <rect key="frame" x="18" y="319" width="514" height="16"/>
+                                <textFieldCell key="cell" lineBreakMode="clipping" title="Problem Details" id="iOH-0S-sSX">
+                                    <font key="font" metaFont="system"/>
+                                    <color key="textColor" name="labelColor" catalog="System" colorSpace="catalog"/>
+                                    <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
+                                </textFieldCell>
+                            </textField>
+                            <scrollView borderType="none" horizontalLineScroll="10" horizontalPageScroll="10" verticalLineScroll="10" verticalPageScroll="10" hasHorizontalScroller="NO" translatesAutoresizingMaskIntoConstraints="NO" id="BCE-ZT-Gcn">
+                                <rect key="frame" x="20" y="50" width="510" height="261"/>
+                                <clipView key="contentView" drawsBackground="NO" id="7d5-pg-ric">
+                                    <rect key="frame" x="0.0" y="0.0" width="495" height="261"/>
+                                    <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+                                    <subviews>
+                                        <textView editable="NO" importsGraphics="NO" richText="NO" verticallyResizable="YES" fieldEditor="YES" usesRuler="YES" smartInsertDelete="YES" id="kX4-zd-AAp">
+                                            <rect key="frame" x="0.0" y="0.0" width="495" height="261"/>
+                                            <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+                                            <color key="textColor" name="secondaryLabelColor" catalog="System" colorSpace="catalog"/>
+                                            <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
+                                            <size key="minSize" width="495" height="261"/>
+                                            <size key="maxSize" width="562" height="10000000"/>
+                                            <color key="insertionPointColor" name="textColor" catalog="System" colorSpace="catalog"/>
+                                        </textView>
+                                    </subviews>
+                                </clipView>
+                                <constraints>
+                                    <constraint firstAttribute="height" constant="261" id="aY8-ps-wVW"/>
+                                </constraints>
+                                <scroller key="horizontalScroller" hidden="YES" verticalHuggingPriority="750" horizontal="YES" id="xTu-AP-Svq">
+                                    <rect key="frame" x="-100" y="-100" width="225" height="15"/>
+                                    <autoresizingMask key="autoresizingMask"/>
+                                </scroller>
+                                <scroller key="verticalScroller" verticalHuggingPriority="750" horizontal="NO" id="w5p-4h-eAs">
+                                    <rect key="frame" x="495" y="0.0" width="15" height="261"/>
+                                    <autoresizingMask key="autoresizingMask"/>
+                                </scroller>
+                            </scrollView>
+                            <button verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="9qO-yz-kTg">
+                                <rect key="frame" x="373" y="13" width="164" height="32"/>
+                                <buttonCell key="cell" type="push" title="Send to DuckDuckGo" bezelStyle="rounded" alignment="center" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="WT1-d4-2gp">
+                                    <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
+                                    <font key="font" metaFont="system"/>
+                                    <string key="keyEquivalent" base64-UTF8="YES">
+DQ
+</string>
+                                </buttonCell>
+                                <connections>
+                                    <action selector="sendAction:" target="XEv-He-h8z" id="SvS-IV-yVv"/>
+                                </connections>
+                            </button>
+                            <button verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="CAq-Gi-cda">
+                                <rect key="frame" x="273" y="13" width="102" height="32"/>
+                                <buttonCell key="cell" type="push" title="Don't Send" bezelStyle="rounded" alignment="center" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="BUX-UX-TAr">
+                                    <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
+                                    <font key="font" metaFont="system"/>
+                                </buttonCell>
+                                <connections>
+                                    <action selector="dontSendAction:" target="XEv-He-h8z" id="vrp-q8-LkV"/>
+                                </connections>
+                            </button>
+                            <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="kaF-DY-AaS">
+                                <rect key="frame" x="18" y="396" width="514" height="16"/>
+                                <textFieldCell key="cell" lineBreakMode="clipping" title="DuckDuckGo Privacy Browser quit unexpectedly." id="dqk-Wm-ePw">
+                                    <font key="font" metaFont="systemSemibold" size="13"/>
+                                    <color key="textColor" name="labelColor" catalog="System" colorSpace="catalog"/>
+                                    <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
+                                </textFieldCell>
+                            </textField>
+                        </subviews>
+                        <constraints>
+                            <constraint firstAttribute="trailing" secondItem="9qO-yz-kTg" secondAttribute="trailing" constant="20" symbolic="YES" id="8Ny-yB-Wtg"/>
+                            <constraint firstAttribute="trailing" secondItem="qpb-iS-ipd" secondAttribute="trailing" constant="20" id="Eod-kc-lai"/>
+                            <constraint firstAttribute="bottom" secondItem="9qO-yz-kTg" secondAttribute="bottom" constant="20" symbolic="YES" id="K6q-Mn-MQX"/>
+                            <constraint firstItem="qpb-iS-ipd" firstAttribute="top" secondItem="8pY-q4-yXW" secondAttribute="bottom" constant="25" id="RAE-2J-N0B"/>
+                            <constraint firstAttribute="trailing" secondItem="8pY-q4-yXW" secondAttribute="trailing" constant="20" symbolic="YES" id="RLp-sf-3P4"/>
+                            <constraint firstAttribute="bottom" secondItem="CAq-Gi-cda" secondAttribute="bottom" constant="20" symbolic="YES" id="TGJ-vr-Rue"/>
+                            <constraint firstAttribute="bottom" secondItem="BCE-ZT-Gcn" secondAttribute="bottom" constant="50" id="Un9-DV-cvo"/>
+                            <constraint firstItem="qpb-iS-ipd" firstAttribute="leading" secondItem="dl0-Bx-eMX" secondAttribute="leading" constant="20" symbolic="YES" id="WW2-wU-eBg"/>
+                            <constraint firstAttribute="trailing" secondItem="BCE-ZT-Gcn" secondAttribute="trailing" constant="20" symbolic="YES" id="WbJ-sf-165"/>
+                            <constraint firstAttribute="trailing" secondItem="kaF-DY-AaS" secondAttribute="trailing" constant="20" id="auM-Zy-6I7"/>
+                            <constraint firstItem="BCE-ZT-Gcn" firstAttribute="top" secondItem="qpb-iS-ipd" secondAttribute="bottom" constant="8" symbolic="YES" id="dIg-7u-A8M"/>
+                            <constraint firstItem="8pY-q4-yXW" firstAttribute="top" secondItem="kaF-DY-AaS" secondAttribute="bottom" constant="8" id="j7s-jC-Uc4"/>
+                            <constraint firstItem="kaF-DY-AaS" firstAttribute="leading" secondItem="dl0-Bx-eMX" secondAttribute="leading" constant="20" symbolic="YES" id="kvi-dt-JMo"/>
+                            <constraint firstItem="BCE-ZT-Gcn" firstAttribute="leading" secondItem="dl0-Bx-eMX" secondAttribute="leading" constant="20" symbolic="YES" id="mjb-9M-QiX"/>
+                            <constraint firstItem="8pY-q4-yXW" firstAttribute="leading" secondItem="dl0-Bx-eMX" secondAttribute="leading" constant="20" symbolic="YES" id="nCg-fg-Erm"/>
+                            <constraint firstItem="9qO-yz-kTg" firstAttribute="leading" secondItem="CAq-Gi-cda" secondAttribute="trailing" constant="12" symbolic="YES" id="ykY-0d-xZK"/>
+                        </constraints>
+                    </view>
+                    <connections>
+                        <outlet property="textView" destination="kX4-zd-AAp" id="SYu-5w-BSd"/>
+                    </connections>
+                </viewController>
+                <customObject id="flF-ji-2et" userLabel="First Responder" customClass="NSResponder" sceneMemberID="firstResponder"/>
+            </objects>
+            <point key="canvasLocation" x="-128" y="473"/>
+        </scene>
+    </scenes>
+</document>
