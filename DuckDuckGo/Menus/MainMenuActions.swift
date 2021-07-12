@@ -249,6 +249,20 @@ extension MainViewController {
         selectedTabViewModel.tab.url = bookmark.url
     }
 
+    @IBAction func openAllInTabs(_ sender: Any?) {
+        guard let menuItem = sender as? NSMenuItem else {
+            os_log("MainViewController: Casting to menu item failed", type: .error)
+            return
+        }
+
+        guard let models = menuItem.representedObject as? [BookmarkViewModel] else {
+            return
+        }
+
+        let tabs = models.compactMap { $0.entity as? Bookmark }.map { Tab(url: $0.url, shouldLoadInBackground: true) }
+        tabCollectionViewModel.append(tabs: tabs)
+    }
+
     @IBAction func showManageBookmarks(_ sender: Any?) {
         tabCollectionViewModel.appendNewTab(type: .bookmarks)
         Pixel.fire(.manageBookmarks(source: .mainMenu))
