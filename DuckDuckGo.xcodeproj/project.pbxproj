@@ -770,7 +770,6 @@
 		B6AE74332609AFCE005B9B1A /* ProgressEstimationTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProgressEstimationTests.swift; sourceTree = "<group>"; };
 		B6B3E0952654DACD0040E0A2 /* UTTypeTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UTTypeTests.swift; sourceTree = "<group>"; };
 		B6B3E0DC2657E9CF0040E0A2 /* NSScreenExtension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NSScreenExtension.swift; sourceTree = "<group>"; };
-		B6CF78D3267AFBBB00CD4F13 /* NSWindow+Private.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "NSWindow+Private.h"; sourceTree = "<group>"; };
 		B6CF78DD267B099C00CD4F13 /* WKNavigationActionExtension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WKNavigationActionExtension.swift; sourceTree = "<group>"; };
 		B6CF78E2267B0A1900CD4F13 /* WKNavigationAction+Private.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "WKNavigationAction+Private.h"; sourceTree = "<group>"; };
 		B6D7A2ED25D2418B002B2AE1 /* ShadowView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ShadowView.swift; sourceTree = "<group>"; };
@@ -1894,7 +1893,6 @@
 				AA88D14A252A557100980B4E /* URLRequestExtension.swift */,
 				AAA0CC69253CC43C0079BC96 /* WKUserContentControllerExtension.swift */,
 				B63D466725BEB6C200874977 /* WKWebView+Private.h */,
-				B6CF78D3267AFBBB00CD4F13 /* NSWindow+Private.h */,
 				B63D466825BEB6C200874977 /* WKWebView+SessionState.swift */,
 				B68458CC25C7EB9000DC17B6 /* WKWebViewConfigurationExtensions.swift */,
 				AA92127625ADA07900600CD4 /* WKWebViewExtension.swift */,
