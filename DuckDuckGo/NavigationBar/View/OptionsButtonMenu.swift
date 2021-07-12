@@ -136,10 +136,10 @@ final class OptionsButtonMenu: NSMenu {
         bookmarksMenuItem.image = NSImage(named: "Bookmarks")
         addItem(bookmarksMenuItem)
 
-        let loginsMenuItem = NSMenuItem(title: UserText.logins, action: #selector(openLogins), keyEquivalent: "")
-        loginsMenuItem.target = self
-        loginsMenuItem.image = NSImage(named: "Logins")
-        addItem(loginsMenuItem)
+        let passwordManagementMenuItem = NSMenuItem(title: UserText.passwordManagement, action: #selector(openLogins), keyEquivalent: "")
+        passwordManagementMenuItem.target = self
+        passwordManagementMenuItem.image = NSImage(named: "PasswordManagement")
+        addItem(passwordManagementMenuItem)
 
         addItem(NSMenuItem.separator())
 

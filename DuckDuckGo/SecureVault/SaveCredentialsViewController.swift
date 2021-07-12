@@ -30,10 +30,10 @@ protocol SaveCredentialsDelegate: AnyObject {
 
 final class SaveCredentialsViewController: NSViewController {
 
-    static func create() -> SaveCredentialsViewController {
-        let storyboard = NSStoryboard(name: "SaveCredentials", bundle: nil)
+    static func create() -> Self {
+        let storyboard = NSStoryboard(name: "PasswordManager", bundle: nil)
         // swiftlint:disable force_cast
-        let controller = storyboard.instantiateInitialController() as! SaveCredentialsViewController
+        let controller = storyboard.instantiateController(withIdentifier: "SaveCredentials") as! Self
         controller.loadView()
         // swiftlint:enable force_cast
         return controller

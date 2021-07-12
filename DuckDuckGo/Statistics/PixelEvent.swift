@@ -37,6 +37,7 @@ extension Pixel {
 
         case manageBookmarks(repetition: Repetition = .init(key: "manage-bookmarks"), source: AccessPoint)
         case bookmarksList(repetition: Repetition = .init(key: "bookmarks-list"), source: AccessPoint)
+        case logins(repetition: Repetition = .init(key: "logins"), source: AccessPoint)
 
         case bookmark(fireproofed: IsBookmarkFireproofed, repetition: Repetition = .init(key: "bookmark"), source: AccessPoint)
         case favorite(fireproofed: IsBookmarkFireproofed, repetition: Repetition = .init(key: "favorite"), source: AccessPoint)
@@ -120,6 +121,9 @@ extension Pixel.Event {
 
         case .bookmarksList(repetition: let repetition, source: let source):
             return "m_mac_bookmarks-list_\(repetition)_\(source)"
+
+        case .logins(repetition: let repetition, source: let source):
+            return "m_mac_logins_\(repetition)_\(source)"
 
         case .bookmark(fireproofed: let fireproofed, repetition: let repetition, source: let source):
             return "m_mac_bookmark_\(fireproofed)_\(repetition)_\(source)"

@@ -91,7 +91,7 @@ struct UserText {
                                                                 value: "Fireproofing this site will keep you signed in after using the Fire Button.",
                                                                 comment: "Fireproof confirmation message")
 
-    static let logins = NSLocalizedString("logins", value: "Logins", comment: "Used as title for password management user interface")
+    static let passwordManagement = NSLocalizedString("passsword.management", value: "Logins", comment: "Used as title for password management user interface")
 
     static let bookmarks = NSLocalizedString("bookmarks", value: "Bookmarks", comment: "Button for bookmarks")
     static let bookmarksOpenInNewTabs = NSLocalizedString("bookmarks.open.in.new.tabs", value: "Open in New Tabs", comment: "Open all bookmarks in folder in new tabs")
