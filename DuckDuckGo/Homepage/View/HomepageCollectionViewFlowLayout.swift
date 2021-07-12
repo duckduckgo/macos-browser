@@ -17,8 +17,6 @@
 //
 
 import Cocoa
-import Foundation
-import CoreGraphics
 
 final class HomepageCollectionViewFlowLayout: NSCollectionViewFlowLayout {
 
@@ -45,12 +43,8 @@ final class HomepageCollectionViewFlowLayout: NSCollectionViewFlowLayout {
     }
 
     override func layoutAttributesForElements(in rect: NSRect) -> [NSCollectionViewLayoutAttributes] {
-        let largestRect = NSRect(x: 0,
-                                 y: 0,
-                                 width: CGFloat.greatestFiniteMagnitude,
-                                 height: CGFloat.greatestFiniteMagnitude)
-        let attributes = super.layoutAttributesForElements(in: largestRect)
-            .map { ($0.copy() as? NSCollectionViewLayoutAttributes)! }
+        let largestRect = NSRect(x: 0, y: 0, width: CGFloat.greatestFiniteMagnitude, height: CGFloat.greatestFiniteMagnitude)
+        let attributes = super.layoutAttributesForElements(in: largestRect).map { ($0.copy() as? NSCollectionViewLayoutAttributes)! }
         guard !attributes.isEmpty,
               let scrollView = collectionView?.enclosingScrollView
         else { return [] }

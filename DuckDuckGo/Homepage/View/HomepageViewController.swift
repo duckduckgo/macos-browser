@@ -43,7 +43,6 @@ final class HomepageViewController: NSViewController {
 
     enum Constants {
         static let maxNumberOfFavorites = 10
-        static let defaultPromptViewHeight: CGFloat = 66
     }
 
     private var defaultBrowserPromptView = DefaultBrowserPromptView.createFromNib()
@@ -254,8 +253,7 @@ extension HomepageViewController: NSCollectionViewDataSource, NSCollectionViewDe
      func collectionView(_ collectionView: NSCollectionView,
                          layout collectionViewLayout: NSCollectionViewLayout,
                          sizeForItemAt indexPath: IndexPath) -> NSSize {
-         self.view.needsLayout = true
-         return NSSize(width: HomepageCollectionViewItem.Size.width, height: HomepageCollectionViewItem.Size.height)
+        return NSSize(width: HomepageCollectionViewItem.Size.width, height: HomepageCollectionViewItem.Size.height)
      }
 
  }

@@ -20,16 +20,7 @@ import Cocoa
 
 final class HomepageBackgroundView: NSView {
 
-    enum Constants {
-        static let collectionViewMaximumWidth: CGFloat = 562
-        static let collectionViewMinimumHeight: CGFloat = 216
-        static let collectionViewMinimumTop: CGFloat = 64
-        static let collectionViewYOffset: CGFloat = 20
-        static let collectionViewCenterYOffset: CGFloat = -10
-        static let collectionViewXOffset: CGFloat = 20
-    }
-
-    @IBOutlet var collectionView: NSCollectionView!
+    @IBOutlet weak var collectionView: NSCollectionView!
     weak var defaultBrowserPromptView: DefaultBrowserPromptView?
 
     required init?(coder: NSCoder) {
