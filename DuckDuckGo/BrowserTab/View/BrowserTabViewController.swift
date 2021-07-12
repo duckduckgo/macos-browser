@@ -21,6 +21,7 @@ import WebKit
 import os.log
 import Combine
 import SwiftUI
+import BrowserServicesKit
 
 final class BrowserTabViewController: NSViewController {
 
@@ -38,6 +39,7 @@ final class BrowserTabViewController: NSViewController {
     private var contextMenuExpected = false
     private var contextMenuLink: URL?
     private var contextMenuImage: URL?
+    private var contextMenuSelectedText: String?
 
     required init?(coder: NSCoder) {
         fatalError("BrowserTabViewController: Bad initializer")
@@ -81,26 +83,20 @@ final class BrowserTabViewController: NSViewController {
         changeWebView()
 
         if tabCollectionViewModel.selectedTabViewModel?.tab.tabType == .preferences {
-            showPreferencesPage()
+            show(tab: .preferences)
+        } else if tabCollectionViewModel.selectedTabViewModel?.tab.tabType == .bookmarks {
+            show(tab: .bookmarks)
         } else if url != nil && url != URL.emptyPage {
-            showWebView()
+            show(tab: .standard)
         } else {
             showHomepage()
-        }
-    }
-
-    private func showWebView() {
-        self.homepageView.removeFromSuperview()
-        removePreferencesPage()
-
-        if let webView = self.webView {
-            addWebViewToViewHierarchy(webView)
         }
     }
 
     private func showHomepage() {
         self.webView?.removeFromSuperview()
         removePreferencesPage()
+        removeBookmarksPage()
 
         view.addAndLayout(homepageView)
     }
@@ -190,22 +186,66 @@ final class BrowserTabViewController: NSViewController {
         tabCollectionViewModel.append(tab: tab, selected: selected)
     }
 
+    // MARK: - Browser Tabs
+
+    private func show(displayableTabAtIndex index: Int) {
+        // The tab switcher only displays displayable tab types.
+        let tabType = Tab.TabType.displayableTabTypes[index]
+        show(tab: tabType)
+    }
+
+    private func show(tab type: Tab.TabType) {
+        tabCollectionViewModel.selectedTabViewModel?.tab.set(tabType: type)
+
+        self.webView?.removeFromSuperview()
+        self.homepageView.removeFromSuperview()
+        removePreferencesPage()
+        removeBookmarksPage()
+
+        switch type {
+        case .bookmarks:
+            self.addChild(bookmarksViewController)
+            view.addAndLayout(bookmarksViewController.view)
+            bookmarksViewController.tabSwitcherButton.select(tabType: .bookmarks)
+
+        case .preferences:
+            self.addChild(preferencesViewController)
+            view.addAndLayout(preferencesViewController.view)
+            bookmarksViewController.tabSwitcherButton.select(tabType: .preferences)
+
+        case .standard:
+            if let webView = self.webView {
+                addWebViewToViewHierarchy(webView)
+            }
+        }
+    }
+
     // MARK: - Preferences
 
-    private lazy var preferencesViewController = PreferencesSplitViewController.create()
+    private lazy var preferencesViewController: PreferencesSplitViewController = {
+        let viewController = PreferencesSplitViewController.create()
+        viewController.delegate = self
 
-    private func showPreferencesPage() {
-        self.webView?.removeFromSuperview()
-
-        removePreferencesPage()
-
-        self.addChild(preferencesViewController)
-        view.addAndLayout(preferencesViewController.view)
-    }
+        return viewController
+    }()
 
     private func removePreferencesPage() {
         preferencesViewController.removeFromParent()
         preferencesViewController.view.removeFromSuperview()
+    }
+
+    // MARK: - Bookmarks
+
+    private lazy var bookmarksViewController: BookmarkManagementSplitViewController = {
+        let viewController = BookmarkManagementSplitViewController.create()
+        viewController.delegate = self
+
+        return viewController
+    }()
+
+    private func removeBookmarksPage() {
+        bookmarksViewController.removeFromParent()
+        bookmarksViewController.view.removeFromSuperview()
     }
 
 }
@@ -275,27 +315,15 @@ extension BrowserTabViewController: TabDelegate {
         tabCollectionViewModel.remove(at: index)
     }
 
-    func tab(_ tab: Tab, willShowContextMenuAt position: NSPoint, image: URL?, link: URL?) {
+    func tab(_ tab: Tab,
+             willShowContextMenuAt position: NSPoint,
+             image: URL?,
+             link: URL?,
+             selectedText: String?) {
         contextMenuImage = image
         contextMenuLink = link
         contextMenuExpected = true
-    }
-
-    func tab(_ tab: Tab, detectedLogin host: String) {
-        guard let window = view.window, !FireproofDomains.shared.isAllowed(fireproofDomain: host) else {
-            os_log("%s: Window is nil", type: .error, className)
-            return
-        }
-
-        let alert = NSAlert.fireproofAlert(with: host.dropWWW())
-        alert.beginSheetModal(for: window) { response in
-            if response == NSApplication.ModalResponse.alertFirstButtonReturn {
-                Pixel.fire(.fireproof(kind: .init(url: tab.url), suggested: .suggested))
-                FireproofDomains.shared.addToAllowed(domain: host)
-            }
-        }
-
-        Pixel.fire(.fireproofSuggested())
+        contextMenuSelectedText = selectedText
     }
 
 }
@@ -336,6 +364,16 @@ extension BrowserTabViewController: FileDownloadManagerDelegate {
         let dockScreenRect = dockScreen.convert(globalRect)
 
         return dockScreenRect
+    }
+
+    func tab(_ tab: Tab, requestedSaveCredentials credentials: SecureVaultModels.WebsiteCredentials) {
+
+        guard !FireproofDomains.shared.isAllowed(fireproofDomain: credentials.account.domain),
+              PasswordManagerSettings().canPromptOnDomain(credentials.account.domain) else {
+            return
+        }
+
+        tabViewModel?.credentialsToSave = credentials
     }
 
 }
@@ -406,6 +444,16 @@ extension BrowserTabViewController: ImageMenuItemSelectors {
         guard let url = contextMenuImage else { return }
         NSPasteboard.general.clearContents()
         NSPasteboard.general.setString(url.absoluteString, forType: .URL)
+    }
+
+}
+
+extension BrowserTabViewController: MenuItemSelectors {
+
+    func search(_ sender: NSMenuItem) {
+        let selectedText = contextMenuSelectedText ?? ""
+        let url = URL.makeSearchUrl(from: selectedText)
+        openNewTab(with: url, parentTab: tabViewModel?.tab, selected: true)
     }
 
 }
@@ -519,74 +567,10 @@ extension BrowserTabViewController: WKUIDelegate {
 
 }
 
-fileprivate extension NSAlert {
+extension BrowserTabViewController: BrowserTabSelectionDelegate {
 
-    static var cautionImage = NSImage(named: "NSCaution")
-
-    static func javascriptAlert(with message: String) -> NSAlert {
-        let alert = NSAlert()
-        alert.icon = Self.cautionImage
-        alert.messageText = message
-        alert.addButton(withTitle: UserText.ok)
-        return alert
-    }
-
-    static func javascriptConfirmation(with message: String) -> NSAlert {
-        let alert = NSAlert()
-        alert.icon = Self.cautionImage
-        alert.messageText = message
-        alert.addButton(withTitle: UserText.ok)
-        alert.addButton(withTitle: UserText.cancel)
-        return alert
-    }
-
-    static func javascriptTextInput(prompt: String, defaultText: String?) -> NSAlert {
-        let alert = NSAlert()
-        alert.icon = Self.cautionImage
-        alert.messageText = prompt
-        alert.addButton(withTitle: UserText.ok)
-        alert.addButton(withTitle: UserText.cancel)
-        let textField = NSTextField(frame: NSRect(x: 0, y: 0, width: 200, height: 24))
-        textField.placeholderString = defaultText
-        alert.accessoryView = textField
-        alert.window.initialFirstResponder = textField
-        return alert
-    }
-
-    static func fireproofAlert(with domain: String) -> NSAlert {
-        let alert = NSAlert()
-        alert.messageText = UserText.fireproofConfirmationTitle(domain: domain)
-        alert.informativeText = UserText.fireproofConfirmationMessage
-        alert.alertStyle = .warning
-        alert.icon = #imageLiteral(resourceName: "Fireproof")
-        alert.addButton(withTitle: UserText.fireproof)
-        alert.addButton(withTitle: UserText.notNow)
-        return alert
-    }
-
-    static func openExternalURLAlert(with appName: String?) -> NSAlert {
-        let alert = NSAlert()
-
-        if let appName = appName {
-            alert.messageText = UserText.openExternalURLTitle(forAppName: appName)
-            alert.informativeText = UserText.openExternalURLMessage(forAppName: appName)
-        } else {
-            alert.messageText = UserText.openExternalURLTitleUnknownApp
-            alert.informativeText = UserText.openExternalURLMessageUnknownApp
-        }
-
-        alert.alertStyle = .warning
-        alert.addButton(withTitle: UserText.open)
-        alert.addButton(withTitle: UserText.cancel)
-        return alert
-    }
-
-    static func unableToOpenExernalURLAlert() -> NSAlert {
-        let alert = NSAlert()
-        alert.messageText = UserText.failedToOpenExternally
-        alert.alertStyle = .warning
-        alert.addButton(withTitle: UserText.ok)
-        return alert
+    func selectedTab(at index: Int) {
+        show(displayableTabAtIndex: index)
     }
 
 }

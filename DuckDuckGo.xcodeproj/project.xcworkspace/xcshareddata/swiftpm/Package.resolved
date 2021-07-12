@@ -6,8 +6,8 @@
         "repositoryURL": "https://github.com/duckduckgo/BrowserServicesKit.git",
         "state": {
           "branch": null,
-          "revision": "3f965c5065e3cd33d3b07e0bc192780b34601e28",
-          "version": "4.0.1"
+          "revision": "f241b1339d70f0308a9fcb01447d8f705aac011b",
+          "version": "5.0.0"
         }
       },
       {
@@ -44,6 +44,15 @@
           "branch": null,
           "revision": "4356ec54e073741449640d3d50a1fd24fd1e1b8b",
           "version": "2.1.0"
+        }
+      },
+      {
+        "package": "Sparkle",
+        "repositoryURL": "https://github.com/sparkle-project/Sparkle.git",
+        "state": {
+          "branch": null,
+          "revision": "c0933a516b420806e9216e71bd13ba76c54f0de6",
+          "version": "1.26.0"
         }
       },
       {

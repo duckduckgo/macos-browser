@@ -9,4 +9,4 @@
 #import "WKDownload.h"
 #import "_WKDownload.h"
 #import "WKProcessPool+Private.h"
-#import "NSWindow+Private.h"
+#import "WKNavigationAction+Private.h"

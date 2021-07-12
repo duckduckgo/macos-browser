@@ -1,5 +1,5 @@
 //
-//  NSWindow+Private.h
+//  CollectionExtension.swift
 //
 //  Copyright © 2021 DuckDuckGo. All rights reserved.
 //
@@ -16,11 +16,12 @@
 //  limitations under the License.
 //
 
-#import <AppKit/AppKit.h>
+import Foundation
 
-@interface NSWindow (Private)
-- (void)_postWindowNeedsUpdateConstraintsUnlessPostingDisabled;
-- (void)_postWindowNeedsLayoutUnlessPostingDisabled;
-- (void)_postWindowNeedsDisplayUnlessPostingDisabled;
-- (void)_updateStructuralRegionsOnNextDisplayCycle;
-@end
+extension Collection {
+
+    subscript (safe index: Index) -> Element? {
+        return indices.contains(index) ? self[index] : nil
+    }
+
+}

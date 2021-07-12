@@ -26,11 +26,26 @@ final class LoginDetectionServiceTests: XCTestCase {
         FireproofDomains.shared.clearAll()
     }
 
+    func testWhenNotReallyALoginThenLoginDiscarded() throws {
+        let ex = expectation(description: #function)
+
+        let service = LoginDetectionService(loginDiscardedHandler: {
+            ex.fulfill()
+        }) { _ in }
+
+        service.handle(navigationEvent: .detectedLogin(url: URL(string: "http://example.com/login")!))
+        service.handle(navigationEvent: .pageBeganLoading(url: URL(string: "http://example.com/login")!))
+        service.handle(navigationEvent: .pageFinishedLoading)
+
+        waitForExpectations(timeout: 1, handler: nil)
+
+    }
+
     func testWhenLoginAttemptedAndUserForwardedToNewPageThenLoginDetected() throws {
-        let receivedLoginsExpectation = expectation(description: "Login detection expectation")
+        let receivedLoginsExpectation = expectation(description: #function)
         var receivedLogins = [String]()
 
-        let service = LoginDetectionService {
+        let service = LoginDetectionService(loginDiscardedHandler: {}) {
             receivedLogins.append($0)
             receivedLoginsExpectation.fulfill()
         }
@@ -43,10 +58,10 @@ final class LoginDetectionServiceTests: XCTestCase {
     }
 
     func testWhenLoginAttemptedInsideOAuthFlowThenLoginDetectedWhenUserForwardedToDifferentDomain() {
-        let receivedLoginsExpectation = expectation(description: "Login detection expectation")
+        let receivedLoginsExpectation = expectation(description: #function)
         var receivedLogins = [String]()
 
-        let service = LoginDetectionService {
+        let service = LoginDetectionService(loginDiscardedHandler: {}) {
             receivedLogins.append($0)
             receivedLoginsExpectation.fulfill()
         }
@@ -63,10 +78,10 @@ final class LoginDetectionServiceTests: XCTestCase {
     }
 
     func testWhenLoginAttemptedInsideSSOFlowThenLoginDetectedWhenUserForwardedToDifferentDomain() {
-        let receivedLoginsExpectation = expectation(description: "Login detection expectation")
+        let receivedLoginsExpectation = expectation(description: #function)
         var receivedLogins = [String]()
 
-        let service = LoginDetectionService {
+        let service = LoginDetectionService(loginDiscardedHandler: {}) {
             receivedLogins.append($0)
             receivedLoginsExpectation.fulfill()
         }
@@ -83,10 +98,10 @@ final class LoginDetectionServiceTests: XCTestCase {
     }
 
     func testWhenLoginAttemptedSkip2FAUrlsThenLoginDetectedForLatestOne() {
-        let receivedLoginsExpectation = expectation(description: "Login detection expectation")
+        let receivedLoginsExpectation = expectation(description: #function)
         var receivedLogins = [String]()
 
-        let service = LoginDetectionService {
+        let service = LoginDetectionService(loginDiscardedHandler: {}) {
             receivedLogins.append($0)
             receivedLoginsExpectation.fulfill()
         }
@@ -102,10 +117,10 @@ final class LoginDetectionServiceTests: XCTestCase {
     }
 
     func testWhenLoginAttemptedAndUserForwardedToMultipleNewPagesThenLoginDetectedForLatestOne() {
-        let receivedLoginsExpectation = expectation(description: "Login detection expectation")
+        let receivedLoginsExpectation = expectation(description: #function)
         var receivedLogins = [String]()
 
-        let service = LoginDetectionService {
+        let service = LoginDetectionService(loginDiscardedHandler: {}) {
             receivedLogins.append($0)
             receivedLoginsExpectation.fulfill()
         }
@@ -121,11 +136,11 @@ final class LoginDetectionServiceTests: XCTestCase {
     }
 
     func testWhenLoginAttemptedAndUserForwardedToSamePageThenLoginNotDetected() {
-        let receivedLoginsExpectation = expectation(description: "Login detection expectation")
+        let receivedLoginsExpectation = expectation(description: #function)
         receivedLoginsExpectation.isInverted = true
         var receivedLogins = [String]()
 
-        let service = LoginDetectionService {
+        let service = LoginDetectionService(loginDiscardedHandler: {}) {
             receivedLogins.append($0)
             receivedLoginsExpectation.fulfill()
         }
@@ -138,11 +153,11 @@ final class LoginDetectionServiceTests: XCTestCase {
     }
 
     func testWhenNotDetectedLoginAttemptAndForwardedToNewPageThenLoginNotDetected() {
-        let receivedLoginsExpectation = expectation(description: "Login detection expectation")
+        let receivedLoginsExpectation = expectation(description: #function)
         receivedLoginsExpectation.isInverted = true
         var receivedLogins = [String]()
 
-        let service = LoginDetectionService {
+        let service = LoginDetectionService(loginDiscardedHandler: {}) {
             receivedLogins.append($0)
             receivedLoginsExpectation.fulfill()
         }
@@ -154,11 +169,11 @@ final class LoginDetectionServiceTests: XCTestCase {
     }
 
     func testWhenLoginAttemptedAndUserNavigatesBackThenNewPageDoesNotDetectLogin() {
-        let receivedLoginsExpectation = expectation(description: "Login detection expectation")
+        let receivedLoginsExpectation = expectation(description: #function)
         receivedLoginsExpectation.isInverted = true
         var receivedLogins = [String]()
 
-        let service = LoginDetectionService {
+        let service = LoginDetectionService(loginDiscardedHandler: {}) {
             receivedLogins.append($0)
             receivedLoginsExpectation.fulfill()
         }

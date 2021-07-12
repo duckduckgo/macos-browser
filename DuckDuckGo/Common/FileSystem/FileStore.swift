@@ -80,8 +80,8 @@ final class FileStore: FileStoring {
     }
 
     func persistenceLocation(for fileName: String) -> URL {
-        let applicationSupportPath = FileManager.default.urls(for: .applicationSupportDirectory, in: .userDomainMask).first
-        return applicationSupportPath!.appendingPathComponent(fileName)
+        let applicationSupportPath = URL.sandboxApplicationSupportURL
+        return applicationSupportPath.appendingPathComponent(fileName)
     }
 
 }

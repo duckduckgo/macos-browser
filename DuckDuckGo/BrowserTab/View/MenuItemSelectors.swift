@@ -35,3 +35,28 @@ import Cocoa
     func copyImageAddress(_ sender: NSMenuItem)
 
 }
+
+@objc protocol MenuItemSelectors {
+
+    func search(_ sender: NSMenuItem)
+
+}
+
+@objc protocol FolderMenuItemSelectors {
+
+    func newFolder(_ sender: NSMenuItem)
+    func renameFolder(_ sender: NSMenuItem)
+    func deleteFolder(_ sender: NSMenuItem)
+
+}
+
+@objc protocol BookmarkMenuItemSelectors {
+
+    func openBookmarkInNewTab(_ sender: NSMenuItem)
+    func openBookmarkInNewWindow(_ sender: NSMenuItem)
+    func toggleBookmarkAsFavorite(_ sender: NSMenuItem)
+    func editBookmark(_ sender: NSMenuItem)
+    func copyBookmark(_ sender: NSMenuItem)
+    func deleteBookmark(_ sender: NSMenuItem)
+
+}

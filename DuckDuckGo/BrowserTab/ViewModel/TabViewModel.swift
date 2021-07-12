@@ -19,12 +19,14 @@
 import Cocoa
 import Combine
 import os.log
+import BrowserServicesKit
 
 final class TabViewModel {
 
     enum Favicon {
         static let home = NSImage(named: "HomeFavicon")!
         static let preferences = NSImage(named: "Preferences")!
+        static let bookmarks = NSImage(named: "Bookmarks")!
         static let defaultFavicon = NSImage()
     }
 
@@ -52,6 +54,8 @@ final class TabViewModel {
             updateFavicon()
         }
     }
+
+    @Published var credentialsToSave: SecureVaultModels.WebsiteCredentials?
 
     var loadingStartTime: CFTimeInterval?
 
@@ -140,6 +144,11 @@ final class TabViewModel {
             return
         }
 
+        if tab.tabType == .bookmarks {
+            title = UserText.tabBookmarksTitle
+            return
+        }
+
         if tab.isHomepageShown {
             title = UserText.tabHomeTitle
             return
@@ -166,6 +175,9 @@ final class TabViewModel {
         switch tab.tabType {
         case .preferences:
             favicon = Favicon.preferences
+            return
+        case .bookmarks:
+            favicon = Favicon.bookmarks
             return
         case .standard: break
         }

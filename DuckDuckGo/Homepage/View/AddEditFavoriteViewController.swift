@@ -45,7 +45,7 @@ final class AddEditFavoriteViewController: NSViewController {
     @IBAction func saveAction(_ sender: NSButton) {
 
         func update(bookmark: Bookmark, newTitle: String, newUrl: URL? = nil) {
-            var bookmark = bookmark
+            let bookmark = bookmark
             bookmark.isFavorite = true
             bookmark.title = newTitle
             bookmarkManager.update(bookmark: bookmark)

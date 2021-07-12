@@ -36,6 +36,13 @@
                                             <menu key="submenu" title="Services" systemMenu="services" id="hz9-B4-Xy5"/>
                                         </menuItem>
                                         <menuItem isSeparatorItem="YES" id="4je-JR-u6R"/>
+                                        <menuItem title="Check for Updates..." id="RbH-ua-rrN">
+                                            <modifierMask key="keyEquivalentModifierMask"/>
+                                            <connections>
+                                                <action selector="checkForUpdates:" target="Ady-hI-5gd" id="Xyf-1S-VhK"/>
+                                            </connections>
+                                        </menuItem>
+                                        <menuItem isSeparatorItem="YES" id="gNj-hj-EIc"/>
                                         <menuItem title="Hide DuckDuckGo" keyEquivalent="h" id="Olw-nP-bQN">
                                             <connections>
                                                 <action selector="hide:" target="Ady-hI-5gd" id="PnN-Uc-m68"/>
@@ -398,10 +405,16 @@
                                                 <action selector="bookmarkThisPage:" target="Ady-hI-5gd" id="Mah-44-bE1"/>
                                             </connections>
                                         </menuItem>
+                                        <menuItem title="Manage Bookmarks" id="BaO-sP-wbQ">
+                                            <modifierMask key="keyEquivalentModifierMask"/>
+                                            <connections>
+                                                <action selector="showManageBookmarks:" target="Ady-hI-5gd" id="meV-V2-zJ2"/>
+                                            </connections>
+                                        </menuItem>
                                         <menuItem isSeparatorItem="YES" id="aPG-H0-BrG"/>
                                         <menuItem title="Favorites" image="Favorite" id="Y9I-ZC-gGg">
                                             <modifierMask key="keyEquivalentModifierMask"/>
-                                            <menu key="submenu" autoenablesItems="NO" id="Nxf-cs-uVD">
+                                            <menu key="submenu" id="Nxf-cs-uVD">
                                                 <items>
                                                     <menuItem title="Favorite This Page..." image="Favorite" enabled="NO" id="cHZ-Fb-aKU">
                                                         <modifierMask key="keyEquivalentModifierMask"/>
@@ -554,7 +567,7 @@ CQ
                                 <modifierMask key="keyEquivalentModifierMask"/>
                                 <menu key="submenu" title="Help" systemMenu="help" id="F2S-fz-NVQ">
                                     <items>
-                                        <menuItem title="DuckDuckGo Help" keyEquivalent="?" id="FKE-Sm-Kum">
+                                        <menuItem title="DuckDuckGo Help" hidden="YES" enabled="NO" keyEquivalent="?" id="FKE-Sm-Kum">
                                             <connections>
                                                 <action selector="showHelp:" target="Ady-hI-5gd" id="y7X-2Q-9no"/>
                                             </connections>
@@ -575,6 +588,8 @@ CQ
                             <outlet property="backMenuItem" destination="VWV-vB-Mtc" id="Keo-4E-dRW"/>
                             <outlet property="bookmarkThisPageMenuItem" destination="Nkm-zy-JXD" id="HVV-JT-gvV"/>
                             <outlet property="bookmarksMenuItem" destination="xf8-PW-TOA" id="Pfa-kN-nIj"/>
+                            <outlet property="checkForUpdatesMenuItem" destination="RbH-ua-rrN" id="pdB-jS-fc3"/>
+                            <outlet property="checkForUpdatesSeparatorItem" destination="gNj-hj-EIc" id="EH1-yf-r5I"/>
                             <outlet property="checkGrammarWithSpellingMenuItem" destination="mK6-2p-4JG" id="hA4-qY-11q"/>
                             <outlet property="checkSpellingWhileTypingMenuItem" destination="rbD-Rh-wIN" id="I0y-qO-6tE"/>
                             <outlet property="debugMenuItem" destination="ilv-5f-YpZ" id="4F7-9b-Mve"/>
