@@ -38,7 +38,7 @@ final class CrashReportReader {
         return allPaths
             .filter({ isCrashReportPath($0) &&
                         belongsToThisApp($0) &&
-                        !isChecked($0, lastCheckDate: lastCheckDate) })
+                        isFile(at: $0, newerThan: lastCheckDate) })
             .map({ CrashReport(url: $0) })
     }
 
@@ -50,13 +50,13 @@ final class CrashReportReader {
         return path.lastPathComponent.hasPrefix(Self.displayName)
     }
 
-    private func isChecked(_ path: URL, lastCheckDate: Date) -> Bool {
+    private func isFile(at path: URL, newerThan lastCheckDate: Date) -> Bool {
         guard let creationDate = FileManager.default.fileCreationDate(url: path) else {
             assertionFailure("CrashReportReader: Can't get the creation date of the report")
             return true
         }
 
-        return creationDate <= lastCheckDate
+        return creationDate > lastCheckDate && creationDate < Date()
     }
 
 }

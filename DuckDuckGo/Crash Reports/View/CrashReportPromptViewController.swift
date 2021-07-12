@@ -44,7 +44,7 @@ final class CrashReportPromptViewController: NSViewController {
             return
         }
 
-        textView.string = content
+        textView?.string = content
     }
 
     @IBAction func sendAction(_ sender: Any) {
