@@ -294,6 +294,7 @@ extension Pixel.Event {
         case moveTabToNewWindow = "new-window"
         case feedback = "feedback"
         case bookmarksList = "bookmarks-list"
+        case logins = "logins"
         case emailProtection = "email-protection"
         case fireproof = "fireproof"
         case preferences = "preferences"

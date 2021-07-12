@@ -24,6 +24,7 @@ import BrowserServicesKit
 protocol OptionsButtonMenuDelegate: AnyObject {
 
     func optionsButtonMenuRequestedBookmarkPopover(_ menu: NSMenu)
+    func optionsButtonMenuRequestedLoginsPopover(_ menu: NSMenu)
 
 }
 
@@ -48,6 +49,7 @@ final class OptionsButtonMenu: NSMenu {
         case favoriteThisPage
 
         case bookmarks
+        case logins
         case preferences
     }
 
@@ -134,6 +136,13 @@ final class OptionsButtonMenu: NSMenu {
         bookmarksMenuItem.image = NSImage(named: "Bookmarks")
         addItem(bookmarksMenuItem)
 
+        let loginsMenuItem = NSMenuItem(title: UserText.logins, action: #selector(openLogins), keyEquivalent: "")
+        loginsMenuItem.target = self
+        loginsMenuItem.image = NSImage(named: "Logins")
+        addItem(loginsMenuItem)
+
+        addItem(NSMenuItem.separator())
+
         let preferencesItem = NSMenuItem(title: UserText.preferences, action: #selector(openPreferences(_:)), keyEquivalent: "")
         preferencesItem.target = self
         preferencesItem.image = NSImage(named: "Preferences")
@@ -165,6 +174,10 @@ final class OptionsButtonMenu: NSMenu {
         actionDelegate?.optionsButtonMenuRequestedBookmarkPopover(self)
     }
 
+    @objc func openLogins(_ sender: NSMenuItem) {
+        actionDelegate?.optionsButtonMenuRequestedLoginsPopover(self)
+    }
+
     @objc func openPreferences(_ sender: NSMenuItem) {
         WindowControllersManager.shared.showPreferencesTab()
     }
@@ -190,6 +203,8 @@ final class OptionsButtonMenu: NSMenu {
             self.result = .bookmarks
         case #selector(openPreferences(_:)):
             self.result = .preferences
+        case #selector(openLogins(_:)):
+            self.result = .logins
         case .none:
             break
         default:

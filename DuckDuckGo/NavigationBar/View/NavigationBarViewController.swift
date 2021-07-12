@@ -120,6 +120,8 @@ final class NavigationBarViewController: NSViewController {
             switch menu.result {
             case .bookmarks:
                 Pixel.fire(.moreMenu(result: .bookmarksList))
+            case .logins:
+                Pixel.fire(.moreMenu(result: .logins))
             case .emailProtection:
                 Pixel.fire(.moreMenu(result: .emailProtection))
             case .feedback:
@@ -274,6 +276,10 @@ extension NavigationBarViewController: OptionsButtonMenuDelegate {
 
     func optionsButtonMenuRequestedBookmarkPopover(_ menu: NSMenu) {
         showBookmarkListPopover()
+    }
+
+    func optionsButtonMenuRequestedLoginsPopover(_ menu: NSMenu) {
+        print(#function)
     }
 
 }
