@@ -17,6 +17,7 @@
 //
 
 import AppKit
+import BrowserServicesKit
 
 final class DataImportViewController: NSViewController {
 
@@ -30,8 +31,10 @@ final class DataImportViewController: NSViewController {
         return storyboard.instantiateController(identifier: Constants.identifier)
     }
 
-    var importer: CSVLoginImporter?
+    private var importer: CSVLoginImporter?
+    private weak var currentChildViewController: NSViewController?
 
+    @IBOutlet var containerView: NSView!
     @IBOutlet var importButton: NSButton!
 
     @IBAction func cancelButtonClicked(_ sender: Any) {
@@ -44,11 +47,15 @@ final class DataImportViewController: NSViewController {
             return
         }
 
-        let data = importer.readLoginEntries()
-        print(data)
+        let importableTypes = importer.importableTypes()
+        importer.importData(types: importableTypes) { result in
+            print("Result: \(result)")
+        }
     }
 
     override func prepare(for segue: NSStoryboardSegue, sender: Any?) {
+        currentChildViewController = segue.destinationController as? NSViewController
+
         if let csvImportViewController = segue.destinationController as? CSVImportViewController {
             csvImportViewController.delegate = self
         }
@@ -60,8 +67,15 @@ extension DataImportViewController: CSVImportViewControllerDelegate {
 
     func csvImportViewController(_ viewController: CSVImportViewController, didSelectCSVFileWithURL url: URL?) {
         if let url = url {
-            self.importer = CSVLoginImporter(fileURL: url)
             self.importButton.isEnabled = true
+
+            do {
+                let secureVault = try SecureVaultFactory.default.makeVault()
+                let secureVaultImporter = SecureVaultLoginImporter(secureVault: secureVault)
+                self.importer = CSVLoginImporter(fileURL: url, loginImporter: secureVaultImporter)
+            } catch {
+                // TODO: Handle an error when creating the vault
+            }
         } else {
             self.importButton.isEnabled = false
         }

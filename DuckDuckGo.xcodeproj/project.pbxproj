@@ -63,6 +63,10 @@
 		4B26FB502697BACE0010AF6A /* CSVImportViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B26FB4F2697BACE0010AF6A /* CSVImportViewController.swift */; };
 		4B26FB532697C1BD0010AF6A /* CSVLoginImporter.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B26FB522697C1BD0010AF6A /* CSVLoginImporter.swift */; };
 		4B26FB582697DEB50010AF6A /* CSVParsing.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B26FB572697DEB50010AF6A /* CSVParsing.swift */; };
+		4B26FB5A269A93BD0010AF6A /* DataImport.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B26FB59269A93BD0010AF6A /* DataImport.swift */; };
+		4B26FB5E269AA31C0010AF6A /* BrowserImportViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B26FB5D269AA31C0010AF6A /* BrowserImportViewController.swift */; };
+		4B26FB60269BF5C40010AF6A /* SecureVaultLoginImporter.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B26FB5F269BF5C40010AF6A /* SecureVaultLoginImporter.swift */; };
+		4B3A4330269D1B9800C66BBC /* LoginImport.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B3A432F269D1B9800C66BBC /* LoginImport.swift */; };
 		4B4F72EC266B2ED300814C60 /* CollectionExtension.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B4F72EB266B2ED300814C60 /* CollectionExtension.swift */; };
 		4B6160D825B150E4007DE5B2 /* trackerData.json in Resources */ = {isa = PBXBuildFile; fileRef = 4B6160D725B150E4007DE5B2 /* trackerData.json */; };
 		4B6160DD25B152C5007DE5B2 /* ContentBlockerRulesUserScript.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B6160DC25B152C5007DE5B2 /* ContentBlockerRulesUserScript.swift */; };
@@ -461,6 +465,10 @@
 		4B26FB4F2697BACE0010AF6A /* CSVImportViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CSVImportViewController.swift; sourceTree = "<group>"; };
 		4B26FB522697C1BD0010AF6A /* CSVLoginImporter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CSVLoginImporter.swift; sourceTree = "<group>"; };
 		4B26FB572697DEB50010AF6A /* CSVParsing.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CSVParsing.swift; sourceTree = "<group>"; };
+		4B26FB59269A93BD0010AF6A /* DataImport.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DataImport.swift; sourceTree = "<group>"; };
+		4B26FB5D269AA31C0010AF6A /* BrowserImportViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BrowserImportViewController.swift; sourceTree = "<group>"; };
+		4B26FB5F269BF5C40010AF6A /* SecureVaultLoginImporter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SecureVaultLoginImporter.swift; sourceTree = "<group>"; };
+		4B3A432F269D1B9800C66BBC /* LoginImport.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LoginImport.swift; sourceTree = "<group>"; };
 		4B4F72EB266B2ED300814C60 /* CollectionExtension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CollectionExtension.swift; sourceTree = "<group>"; };
 		4B6160D225B14E6E007DE5B2 /* TrackerRadarManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TrackerRadarManager.swift; sourceTree = "<group>"; };
 		4B6160D725B150E4007DE5B2 /* trackerData.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; path = trackerData.json; sourceTree = "<group>"; };
@@ -975,8 +983,8 @@
 		4B26FB4726977FCD0010AF6A /* Data Import */ = {
 			isa = PBXGroup;
 			children = (
-				4B26FB542697DA070010AF6A /* CSV */,
-				4B26FB512697C1AE0010AF6A /* Services */,
+				4B26FB59269A93BD0010AF6A /* DataImport.swift */,
+				4B3A4332269D1BDA00C66BBC /* Logins */,
 				4B26FB4E2697A6A00010AF6A /* View */,
 			);
 			path = "Data Import";
@@ -987,25 +995,37 @@
 			children = (
 				4B26FB4C269781CB0010AF6A /* DataImportViewController.swift */,
 				4B26FB4F2697BACE0010AF6A /* CSVImportViewController.swift */,
+				4B26FB5D269AA31C0010AF6A /* BrowserImportViewController.swift */,
 				4B26FB4A269781B00010AF6A /* DataImport.storyboard */,
 			);
 			path = View;
-			sourceTree = "<group>";
-		};
-		4B26FB512697C1AE0010AF6A /* Services */ = {
-			isa = PBXGroup;
-			children = (
-				4B26FB522697C1BD0010AF6A /* CSVLoginImporter.swift */,
-			);
-			path = Services;
 			sourceTree = "<group>";
 		};
 		4B26FB542697DA070010AF6A /* CSV */ = {
 			isa = PBXGroup;
 			children = (
 				4B26FB572697DEB50010AF6A /* CSVParsing.swift */,
+				4B26FB522697C1BD0010AF6A /* CSVLoginImporter.swift */,
 			);
 			path = CSV;
+			sourceTree = "<group>";
+		};
+		4B3A4331269D1BAA00C66BBC /* SecureVault */ = {
+			isa = PBXGroup;
+			children = (
+				4B26FB5F269BF5C40010AF6A /* SecureVaultLoginImporter.swift */,
+			);
+			path = SecureVault;
+			sourceTree = "<group>";
+		};
+		4B3A4332269D1BDA00C66BBC /* Logins */ = {
+			isa = PBXGroup;
+			children = (
+				4B3A432F269D1B9800C66BBC /* LoginImport.swift */,
+				4B3A4331269D1BAA00C66BBC /* SecureVault */,
+				4B26FB542697DA070010AF6A /* CSV */,
+			);
+			path = Logins;
 			sourceTree = "<group>";
 		};
 		4B6160D125B14E5E007DE5B2 /* ContentBlocker */ = {
@@ -2420,6 +2440,7 @@
 				AA7412BD24D2BEEE00D22FE0 /* MainWindow.swift in Sources */,
 				4B6160FF25B15BB1007DE5B2 /* ContentBlockerRulesManager.swift in Sources */,
 				AA5C8F5E2590EEE800748EB7 /* NSPointExtension.swift in Sources */,
+				4B26FB5A269A93BD0010AF6A /* DataImport.swift in Sources */,
 				AA6EF9AD25066F42004754E6 /* WindowsManager.swift in Sources */,
 				B68458CD25C7EB9000DC17B6 /* WKWebViewConfigurationExtensions.swift in Sources */,
 				B6E61ED0263A6F97004E11AB /* NSSavePanelExtension.swift in Sources */,
@@ -2542,6 +2563,7 @@
 				4BB88B5B25B7BA50006F6B06 /* Instruments.swift in Sources */,
 				4B0511E2262CAA8600F6079C /* NSViewControllerExtension.swift in Sources */,
 				F44C130225C2DA0400426E3E /* NSAppearanceExtension.swift in Sources */,
+				4B26FB5E269AA31C0010AF6A /* BrowserImportViewController.swift in Sources */,
 				4BA1A6B8258B081600F6F690 /* EncryptionKeyStoring.swift in Sources */,
 				B65783E725F8AAFB00D8DB33 /* String+Punycode.swift in Sources */,
 				B657841A25FA484B00D8DB33 /* NSException+Catch.m in Sources */,
@@ -2564,6 +2586,7 @@
 				AA86490E24D49B54001BABEE /* TabLoadingView.swift in Sources */,
 				AA2CB1352587C29500AA6FBE /* TabBarFooter.swift in Sources */,
 				4B0511C2262CAA5A00F6079C /* PreferencesAboutViewController.swift in Sources */,
+				4B26FB60269BF5C40010AF6A /* SecureVaultLoginImporter.swift in Sources */,
 				14D9B90224F91316000D4D13 /* FocusRingView.swift in Sources */,
 				4B9292AB26670D3700AD2C21 /* BookmarkMigrationPolicy.swift in Sources */,
 				AA92126F25ACCB1100600CD4 /* ErrorExtension.swift in Sources */,
@@ -2596,6 +2619,7 @@
 				AAE75280263B0A4D00B973F8 /* HistoryCoordinator.swift in Sources */,
 				4B677434255DBEB800025BD8 /* HTTPSBloomFilterSpecification.swift in Sources */,
 				AA97BF4625135DD30014931A /* ApplicationDockMenu.swift in Sources */,
+				4B3A4330269D1B9800C66BBC /* LoginImport.swift in Sources */,
 				4BA1A69B258B076900F6F690 /* FileStore.swift in Sources */,
 				4B0511CC262CAA5A00F6079C /* PreferencesSplitViewController.swift in Sources */,
 				AAFCB37A25E5403A00859DD4 /* BurnButton.swift in Sources */,

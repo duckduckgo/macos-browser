@@ -87,6 +87,7 @@ Gw
                         </constraints>
                     </view>
                     <connections>
+                        <outlet property="containerView" destination="3Nx-ic-8u2" id="jxH-P6-MgC"/>
                         <outlet property="importButton" destination="p3M-G6-gOX" id="S3v-kX-VOm"/>
                     </connections>
                 </viewController>

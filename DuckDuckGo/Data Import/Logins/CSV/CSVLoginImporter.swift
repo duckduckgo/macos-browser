@@ -18,48 +18,47 @@
 
 import Foundation
 
-final class CSVLoginImporter {
+final class CSVLoginImporter: DataImporter {
 
-    struct LoginCredential {
-        let url: String
-        let username: String
-        let password: String
-
-        init(url: String, username: String, password: String) {
-            self.url = url
-            self.username = username
-            self.password = password
-        }
-
-        init?(row: [String]) {
-            if row.count == 3 {
-                self.init(url: row[0], username: row[1], password: row[2])
-            }
-
-            return nil
-        }
-    }
-
-    enum CSVParseError: Error {
-        case cannotReadFile
-        case invalidFormat
-    }
+    typealias ImportedType = [LoginCredential]
 
     private let fileURL: URL
+    private let loginImporter: LoginImporter
 
-    init(fileURL: URL) {
+    init(fileURL: URL, loginImporter: LoginImporter) {
         self.fileURL = fileURL
+        self.loginImporter = loginImporter
     }
 
-    func readLoginEntries() -> Result<[LoginCredential], CSVParseError> {
+    func importableTypes() -> [DataImport.DataType] {
+        if fileURL.pathExtension == "csv" {
+            return [.logins]
+        } else {
+            return []
+        }
+    }
+
+    func importData(types: [DataImport.DataType], completion: (Result<[LoginCredential], DataImportError>) -> Void) {
         guard let fileContents = try? String(contentsOf: fileURL, encoding: .utf8) else {
-            return .failure(.cannotReadFile)
+            completion(.failure(.cannotReadFile))
+            return
         }
 
+        let loginCredentials = extractLogins(from: fileContents)
+
+        do {
+            try loginImporter.importLogins(loginCredentials)
+            completion(.success(loginCredentials))
+        } catch {
+            completion(.failure(.temporaryError))
+        }
+    }
+
+    private func extractLogins(from fileContents: String) -> [LoginCredential] {
         let parsed = fileContents.parseAlt()
         let loginCredentials: [LoginCredential] = parsed.compactMap(LoginCredential.init(row:))
 
-        return .success(loginCredentials)
+        return loginCredentials
     }
 
 }
