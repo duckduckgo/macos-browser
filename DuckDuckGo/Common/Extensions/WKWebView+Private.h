@@ -21,22 +21,21 @@
 
 NS_ASSUME_NONNULL_BEGIN
 
-@interface WKWebView (Private)
+typedef NS_OPTIONS(NSUInteger, _WKMediaCaptureStateDeprecated) {
+    _WKMediaCaptureStateDeprecatedNone = 0,
+    _WKMediaCaptureStateDeprecatedActiveMicrophone = 1 << 0,
+    _WKMediaCaptureStateDeprecatedActiveCamera = 1 << 1,
+    _WKMediaCaptureStateDeprecatedMutedMicrophone = 1 << 2,
+    _WKMediaCaptureStateDeprecatedMutedCamera = 1 << 3,
+};
+typedef NS_OPTIONS(NSUInteger, _WKMediaMutedState) {
+    _WKMediaNoneMuted = 0,
+    _WKMediaAudioMuted = 1 << 0,
+    _WKMediaCaptureDevicesMuted = 1 << 1,
+    _WKMediaScreenCaptureMuted = 1 << 2,
+};
 
-- (void)_restoreFromSessionStateData:(NSData *)data;
-- (NSData * _Nullable)_sessionStateData;
-
-- (void)createWebArchiveDataWithCompletionHandler:(void (^)(NSData * _Nullable, NSError * _Nullable))completionHandler;
-- (void)createPDFWithConfiguration:(id _Nullable)pdfConfiguration completionHandler:(void (^)(NSData * _Nullable pdfDocumentData, NSError * _Nullable error))completionHandler;
-
-#ifndef __MAC_11_3
-- (void)startDownloadUsingRequest:(NSURLRequest *)request completionHandler:(void(^)(_WKDownload *))completionHandler;
-- (void)resumeDownloadFromResumeData:(NSData *)resumeData completionHandler:(void(^)(_WKDownload *))completionHandler;
-#endif
-
-@end
-
-#ifndef __MAC_11_3
+#ifndef __MAC_12
 
 typedef NS_ENUM(NSInteger, WKMediaCaptureType) {
     WKMediaCaptureTypeCamera,
@@ -56,6 +55,43 @@ typedef NS_OPTIONS(NSUInteger, _WKCaptureDevices) {
     _WKCaptureDeviceDisplay = 1 << 2,
 } API_AVAILABLE(macosx(10.3));
 
+typedef NS_ENUM(NSInteger, WKMediaCaptureState) {
+    WKMediaCaptureStateNone,
+    WKMediaCaptureStateActive,
+    WKMediaCaptureStateMuted,
+} API_AVAILABLE(macos(12.0), ios(15.0));;
+
 #endif
+
+@interface WKWebView (Private)
+
+- (void)_restoreFromSessionStateData:(NSData *)data;
+- (NSData * _Nullable)_sessionStateData;
+
+- (void)createWebArchiveDataWithCompletionHandler:(void (^)(NSData * _Nullable, NSError * _Nullable))completionHandler;
+- (void)createPDFWithConfiguration:(id _Nullable)pdfConfiguration completionHandler:(void (^)(NSData * _Nullable pdfDocumentData, NSError * _Nullable error))completionHandler;
+
+#ifndef __MAC_11_3
+- (void)startDownloadUsingRequest:(NSURLRequest *)request completionHandler:(void(^)(_WKDownload *))completionHandler;
+- (void)resumeDownloadFromResumeData:(NSData *)resumeData completionHandler:(void(^)(_WKDownload *))completionHandler;
+
+#endif
+
+#ifndef __MAC_12
+
+@property (nonatomic, readonly) WKMediaCaptureState cameraCaptureState API_AVAILABLE(macos(12.0), ios(15.0));
+@property (nonatomic, readonly) WKMediaCaptureState microphoneCaptureState API_AVAILABLE(macos(12.0), ios(15.0));
+
+#endif
+
+@property (nonatomic, readonly) _WKMediaCaptureStateDeprecated _mediaCaptureState;
+
+- (void)setMicrophoneCaptureState:(WKMediaCaptureState)state completionHandler:(void (^)(void))completionHandler API_AVAILABLE(macos(12.0), ios(15.0));
+- (void)setCameraCaptureState:(WKMediaCaptureState)state completionHandler:(void (^)(void))completionHandler API_AVAILABLE(macos(12.0), ios(15.0));
+- (void)_stopMediaCapture;
+
+- (_WKMediaMutedState)_mediaMutedState;
+- (void)_setPageMuted:(_WKMediaMutedState)mutedState;
+@end
 
 NS_ASSUME_NONNULL_END

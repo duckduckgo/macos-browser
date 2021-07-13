@@ -221,6 +221,14 @@ final class Tab: NSObject {
         }
     }
 
+    func setPermission(_ permission: PermissionType, muted: Bool) {
+        webView.setPermission(permission, muted: muted)
+    }
+
+    func revokePermission(_ permission: PermissionType) {
+        webView.revokePermission(permission)
+    }
+
     private var loginDetectionService: LoginDetectionService?
     private let instrumentation = TabInstrumentation()
 

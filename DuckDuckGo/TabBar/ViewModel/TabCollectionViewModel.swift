@@ -202,6 +202,10 @@ final class TabCollectionViewModel: NSObject {
         insert(tab: Tab(), at: index)
     }
 
+    func index(ofTabOwning webView: WKWebView) -> Int? {
+        return tabCollection.tabs.firstIndex(where: { $0.webView === webView })
+    }
+
     func remove(at index: Int) {
         let parentTab = tabCollection.tabs[safe: index]?.parentTab
         guard tabCollection.remove(at: index) else { return }
@@ -249,9 +253,8 @@ final class TabCollectionViewModel: NSObject {
         delegate?.tabCollectionViewModelDidMultipleChanges(self)
     }
 
-    func remove(ownerOf webView: WebView) {
-        let webViews = tabCollection.tabs.map { $0.webView }
-        guard let index = webViews.firstIndex(of: webView) else {
+    func remove(ownerOf webView: WKWebView) {
+        guard let index = index(ofTabOwning: webView) else {
             os_log("TabCollection: Failed to get index of the tab", type: .error)
             return
         }

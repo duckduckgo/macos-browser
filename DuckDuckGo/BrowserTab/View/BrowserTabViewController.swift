@@ -22,6 +22,7 @@ import os.log
 import Combine
 import SwiftUI
 
+// swiftlint:disable file_length
 final class BrowserTabViewController: NSViewController {
 
     @IBOutlet weak var errorView: NSView!
@@ -295,6 +296,7 @@ extension BrowserTabViewController: TabDelegate {
         guard let tabViewModel = tabViewModel else { return }
 
         tabViewModel.closeFindInPage()
+        tabViewModel.resetAuthorizationQueries()
         if !tabViewModel.isLoading,
            tabViewModel.tab.webView.isLoading {
             tabViewModel.isLoading = true
@@ -465,32 +467,117 @@ extension BrowserTabViewController: WKUIDelegate {
         return selectedViewModel.tab.webView
     }
 
-    override func responds(to aSelector: Selector!) -> Bool {
-        let r = super.responds(to: aSelector)
-        print("respondsToSelector", aSelector, r)
-        return r
-    }
-// https://github.com/WebKit/WebKit/blob/71ca17d470c5818c1bacc18faa94109e43b739bc/Source/WebKit/UIProcess/Cocoa/UIDelegate.mm
+    // https://github.com/WebKit/WebKit/blob/995f6b1595611c934e742a4f3a9af2e678bc6b8d/Source/WebKit/UIProcess/API/Cocoa/WKUIDelegate.h#L147
     @objc(webView:requestMediaCapturePermissionForOrigin:initiatedByFrame:type:decisionHandler:)
-    @available(macOS 11.3, *)
+    @available(macOS 12, *)
     func webView(_ webView: WKWebView,
                  requestMediaCapturePermissionFor origin: WKSecurityOrigin,
-                 initiatedByFrame frame: WKFrameInfo,
+                 initiatedBy frame: WKFrameInfo,
                  type: WKMediaCaptureType,
                  decisionHandler: @escaping (WKPermissionDecision) -> Void) {
-        print("webView:requestMediaCapturePermissionForOrigin:initiatedByFrame:type:", origin, frame, type)
-        decisionHandler(.prompt)
+        guard let index = tabCollectionViewModel.index(ofTabOwning: webView),
+              let tabViewModel = tabCollectionViewModel.tabViewModel(at: index),
+              let permissionType = PermissionType(devices: type)
+        else {
+            os_log("requestMediaCapturePermissionForOrigin: Failed to get index of the tab", type: .error)
+            decisionHandler(.deny)
+            return
+        }
+
+        if let allow = PermissionManager.shared.permission(forDomain: origin.host, permissionType: permissionType) {
+            decisionHandler(allow ? .grant : .deny)
+            return
+        }
+
+        tabViewModel.queryPermissionAuthorization(forDomain: origin.host, permissionType: permissionType) { granted in
+            decisionHandler(granted ? .grant : .deny)
+        }
     }
 
     // https://github.com/WebKit/WebKit/blob/9d7278159234e0bfa3d27909a19e695928f3b31e/Source/WebKit/UIProcess/API/Cocoa/WKUIDelegatePrivate.h#L126
     @objc(_webView:requestUserMediaAuthorizationForDevices:url:mainFrameURL:decisionHandler:)
     func webView(_ webView: WKWebView,
-                 requestUserMediaAuthorizationForDevices devices: _WKCaptureDevices,
+                 requestUserMediaAuthorizationFor devices: _WKCaptureDevices,
                  url: URL,
                  mainFrameURL: URL,
                  decisionHandler: @escaping (Bool) -> Void) {
-        print("_webView:requestUserMediaAuthorizationForDevices:url:mainFrameURL:", devices, url, mainFrameURL)
-        decisionHandler(true)
+        guard let index = tabCollectionViewModel.index(ofTabOwning: webView),
+              let tabViewModel = tabCollectionViewModel.tabViewModel(at: index),
+              let permissionType = PermissionType(devices: devices)
+        else {
+            os_log("requestUserMediaAuthorizationForDevices: Failed to get index of the tab", type: .error)
+            decisionHandler(false)
+            return
+        }
+
+        if let allow = PermissionManager.shared
+            .permission(forDomain: url.host ?? url.absoluteString, permissionType: permissionType) {
+
+            decisionHandler(allow)
+            return
+        }
+
+        tabViewModel.queryPermissionAuthorization(forDomain: url.host ?? url.absoluteString, permissionType: permissionType) { granted in
+            decisionHandler(granted)
+        }
+    }
+
+    @objc(_webView:mediaCaptureStateDidChange:)
+    func webView(_ webView: WKWebView,
+                 mediaCaptureStateDidChange state: _WKMediaCaptureStateDeprecated) {
+        guard let index = tabCollectionViewModel.index(ofTabOwning: webView),
+              let tabViewModel = tabCollectionViewModel.tabViewModel(at: index)
+        else {
+            os_log("mediaCaptureStateDidChange: Failed to get index of the tab", type: .error)
+            return
+        }
+        tabViewModel.updateUsedPermissions()
+    }
+
+    // https://github.com/WebKit/WebKit/blob/9d7278159234e0bfa3d27909a19e695928f3b31e/Source/WebKit/UIProcess/API/Cocoa/WKUIDelegatePrivate.h#L131
+    @objc(_webView:requestGeolocationPermissionForFrame:decisionHandler:)
+    func webView(_ webView: WKWebView, requestGeolocationPermissionFor frame: WKFrameInfo, decisionHandler: @escaping (Bool) -> Void) {
+        guard let index = tabCollectionViewModel.index(ofTabOwning: webView),
+              let tabViewModel = tabCollectionViewModel.tabViewModel(at: index)
+        else {
+            os_log("requestGeolocationPermissionForFrame: Failed to get index of the tab", type: .error)
+            decisionHandler(false)
+            return
+        }
+
+        if let allow = PermissionManager.shared.permission(forDomain: frame.request.url?.host ?? "", permissionType: .geolocation) {
+            decisionHandler(allow)
+            return
+        }
+
+        tabViewModel.queryPermissionAuthorization(forDomain: frame.request.url?.host ?? "", permissionType: .geolocation) { granted in
+            decisionHandler(granted)
+        }
+    }
+
+    // https://github.com/WebKit/WebKit/blob/9d7278159234e0bfa3d27909a19e695928f3b31e/Source/WebKit/UIProcess/API/Cocoa/WKUIDelegatePrivate.h#L132
+    @objc(_webView:requestGeolocationPermissionForOrigin:initiatedByFrame:decisionHandler:)
+    @available(macOS 12, *)
+    func webView(_ webView: WKWebView,
+                 requestGeolocationPermissionFor origin: WKSecurityOrigin,
+                 initiatedBy frame: WKFrameInfo,
+                 decisionHandler: @escaping (WKPermissionDecision) -> Void) {
+        guard let index = tabCollectionViewModel.index(ofTabOwning: webView),
+              let tabViewModel = tabCollectionViewModel.tabViewModel(at: index)
+        else {
+            os_log("requestGeolocationPermissionForOrigin: Failed to get index of the tab", type: .error)
+            decisionHandler(.deny)
+            return
+        }
+
+        if let allow = PermissionManager.shared.permission(forDomain: origin.host, permissionType: .geolocation) {
+            decisionHandler(allow ? .grant : .deny)
+            return
+        }
+
+        tabViewModel.queryPermissionAuthorization(forDomain: origin.host, permissionType: .geolocation) { granted in
+            decisionHandler(granted ? .grant : .deny)
+        }
     }
 
     func webView(_ webView: WKWebView,
@@ -664,3 +751,4 @@ extension BrowserTabViewController: BrowserTabSelectionDelegate {
     }
 
 }
+// swiftlint:enable file_length

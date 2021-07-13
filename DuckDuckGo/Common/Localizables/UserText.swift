@@ -128,6 +128,27 @@ struct UserText {
     static let openExternalURLMessageUnknownApp = NSLocalizedString("open.external.url.message.unknown.app", value: "Do you want to view this content in another app?", comment: "Open URL in another app dialog message for unknown app")
     static let failedToOpenExternally = NSLocalizedString("open.externally.failed", value: "The app required to open that link can’t be found", comment: "’Link’ is link on a website")
 
+    static let permissionAuthorizationFormat = NSLocalizedString("permission.authorization.format",
+                                      value: "Allow “%@“ to use your %@?",
+                                      comment: "Displays the version and build numbers")
+    static let permissionMicrophone = NSLocalizedString("permission.microphone", value: "microphone", comment: "Microphone input media device name")
+    static let permissionCamera = NSLocalizedString("permission.camera", value: "camera", comment: "Camera input media device name")
+    static let permissionCameraAndMicrophone = NSLocalizedString("permission.cameraAndMicrophone", value: "camera and microphone", comment: "Camera and Microphone input media devices name")
+    static let permissionGeolocation = NSLocalizedString("permission.geolocation", value: "geolocation", comment: "User's Geolocation permission access name")
+    static let permissionSound = NSLocalizedString("permission.sound", value: "audio playback", comment: "User's Audio Playback permission name")
+
+    static let permissionMute = NSLocalizedString("permission.mute", value: "Pause", comment: "Temporarily pause input media device access")
+    static let permissionUnmute = NSLocalizedString("permission.unmute", value: "Resume", comment: "Resume input media device access")
+    static let permissionReloadToEnable = NSLocalizedString("permission.reloadPage", value: "Reload to Ask Again", comment: "Reload webpage to ask for input media device access permission again")
+
+    static let permissionAlwaysAllowFormat = NSLocalizedString("permission.always.allow", value: "Always Allow on “%@“", comment: "Make input media device access permanently allowed for current domain")
+    static let permissionAlwaysAskFormat = NSLocalizedString("permission.always.ask", value: "Always Ask on “%@“", comment: "Make input media device access always asked from user for current domain")
+    static let permissionAlwaysDenyFormat = NSLocalizedString("permission.always.deny", value: "Never ask again for “%@“", comment: "Make input media device access permanently allowed for current domain")
+
+    static let privacyDashboardPermissionAsk = NSLocalizedString("dashboard.permission.ask", value: "Ask", comment: "Privacy Dashboard: Website should always Ask for permission for input media device access")
+    static let privacyDashboardPermissionAlwaysAllow = NSLocalizedString("dashboard.permission.allow", value: "Allow Always", comment: "Privacy Dashboard: Website can always access input media device")
+    static let privacyDashboardPermissionAlwaysDeny = NSLocalizedString("dashboard.permission.deny", value: "Deny Always", comment: "Privacy Dashboard: Website can never access input media device")
+
     static let preferences = NSLocalizedString("preferences", value: "Preferences", comment: "Menu item for opening preferences")
 
     static let defaultBrowser = NSLocalizedString("preferences.default-browser", value: "Default Browser", comment: "Show default browser preferences")

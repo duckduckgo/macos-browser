@@ -1,5 +1,5 @@
 //
-//  WKWebViewConfigurationExtensions.swift
+//  WKProcessPool+GeolocationProvider.swift
 //
 //  Copyright © 2021 DuckDuckGo. All rights reserved.
 //
@@ -17,18 +17,17 @@
 //
 
 import WebKit
-import Combine
 
-extension WKWebViewConfiguration {
+extension WKProcessPool {
+    private static let geolocationProviderKey = UnsafeRawPointer(bitPattern: "WKProcessPoolGeolocationProviderKey".hashValue)!
 
-    func applyStandardConfiguration() {
-        allowsAirPlayForMediaPlayback = true
-        preferences.setValue(true, forKey: "fullScreenEnabled")
-        preferences.setValue(true, forKey: "allowsPictureInPictureMediaPlayback")
-        preferences.setValue(true, forKey: "developerExtrasEnabled")
-        preferences.javaScriptCanOpenWindowsAutomatically = false
-        self.userContentController = UserContentController()
-        self.processPool.geolocationProvider = GeolocationProvider(processPool: self.processPool)
-     }
+    @nonobjc var geolocationProvider: GeolocationProvider? {
+        get {
+            return objc_getAssociatedObject(self, Self.geolocationProviderKey) as? GeolocationProvider
+        }
+        set {
+            objc_setAssociatedObject(self, Self.geolocationProviderKey, newValue, .OBJC_ASSOCIATION_RETAIN)
+        }
+    }
 
 }
