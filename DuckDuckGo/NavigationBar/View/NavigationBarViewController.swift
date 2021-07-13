@@ -33,8 +33,6 @@ final class NavigationBarViewController: NSViewController {
     @IBOutlet weak var passwordManagementButton: NSButton!
 
     var addressBarViewController: AddressBarViewController?
-    var saveCredentialsPopover: SaveCredentialsPopover?
-    lazy var passwordManagement: PasswordManagementPopover = PasswordManagementPopover()
 
     private var tabCollectionViewModel: TabCollectionViewModel
 
@@ -44,7 +42,10 @@ final class NavigationBarViewController: NSViewController {
     // swiftlint:enable weak_delegate
 
     private lazy var bookmarkListPopover = BookmarkListPopover()
+    private lazy var saveCredentialsPopover: SaveCredentialsPopover = SaveCredentialsPopover()
+    private lazy var passwordManagement: PasswordManagementPopover = PasswordManagementPopover()
 
+    private var urlCancellable: AnyCancellable?
     private var selectedTabViewModelCancellable: AnyCancellable?
     private var credentialsToSaveCancellable: AnyCancellable?
     private var navigationButtonsCancellables = Set<AnyCancellable>()
@@ -196,7 +197,30 @@ final class NavigationBarViewController: NSViewController {
         selectedTabViewModelCancellable = tabCollectionViewModel.$selectedTabViewModel.receive(on: DispatchQueue.main).sink { [weak self] _ in
             self?.subscribeToNavigationActionFlags()
             self?.subscribeToCredentialsToSave()
+            self?.subscribeToTabUrl()
         }
+    }
+
+    private func subscribeToTabUrl() {
+        urlCancellable = tabCollectionViewModel.selectedTabViewModel?.tab.$url
+            .receive(on: DispatchQueue.main)
+            .sink(receiveValue: { [weak self] url in
+                self?.onUrlChanged(url)
+            })
+    }
+
+    private func onUrlChanged(_ url: URL?) {
+        if passwordManagement.viewController.isDirty {
+            passwordManagementButton.isHidden = false
+            return
+        }
+
+        guard let url = url, let domain = url.host else {
+            passwordManagementButton.isHidden = true
+            return
+        }
+        
+        passwordManagementButton.isHidden = (try? SecureVaultFactory.default.makeVault().accountsFor(domain: domain).isEmpty) ?? false
     }
 
     private func subscribeToCredentialsToSave() {
@@ -212,18 +236,15 @@ final class NavigationBarViewController: NSViewController {
 
     private func promptToSaveCredentials(_ credentials: SecureVaultModels.WebsiteCredentials) {
         showSaveCredentialsPopover()
-        saveCredentialsPopover?.viewController.saveCredentials(credentials)
+        saveCredentialsPopover.viewController.saveCredentials(credentials)
     }
 
     private func showSaveCredentialsPopover() {
-        if saveCredentialsPopover == nil {
-            saveCredentialsPopover = SaveCredentialsPopover()
-        }
         passwordManagementButton.isHidden = false
 
-        saveCredentialsPopover?.show(relativeTo: passwordManagementButton.bounds.insetFromLineOfDeath(),
-                                     of: passwordManagementButton,
-                                     preferredEdge: .minY)
+        saveCredentialsPopover.show(relativeTo: passwordManagementButton.bounds.insetFromLineOfDeath(),
+                                    of: passwordManagementButton,
+                                    preferredEdge: .minY)
     }
 
     private func subscribeToNavigationActionFlags() {

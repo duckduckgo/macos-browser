@@ -17,6 +17,7 @@
 //
 
 import Foundation
+import Combine
 
 final class PasswordManagementViewController: NSViewController {
 
@@ -28,5 +29,7 @@ final class PasswordManagementViewController: NSViewController {
         // swiftlint:enable force_cast
         return controller
     }
+
+    @Published var isDirty = false
 
 }
