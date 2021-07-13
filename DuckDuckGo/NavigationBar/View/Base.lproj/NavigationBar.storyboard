@@ -172,6 +172,9 @@
                                                 <real key="value" value="4"/>
                                             </userDefinedRuntimeAttribute>
                                         </userDefinedRuntimeAttributes>
+                                        <connections>
+                                            <action selector="passwordManagementButtonAction:" target="o2v-eH-jTI" id="CkE-56-a4p"/>
+                                        </connections>
                                     </button>
                                     <button translatesAutoresizingMaskIntoConstraints="NO" id="4sj-qN-UUY" userLabel="Bookmarks Button" customClass="MouseOverButton" customModule="DuckDuckGo_Privacy_Browser" customModuleProvider="target">
                                         <rect key="frame" x="29" y="0.0" width="28" height="28"/>

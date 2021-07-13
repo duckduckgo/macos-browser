@@ -152,8 +152,8 @@ final class NavigationBarViewController: NSViewController {
         showBookmarkListPopover()
     }
 
-    @IBAction func loginsButtonAction(_ sender: NSButton) {
-        showLoginsPopover()
+    @IBAction func passwordManagementButtonAction(_ sender: NSButton) {
+        showPasswordManagementPopover()
     }
 
     @IBAction func shareButtonAction(_ sender: NSButton) {
@@ -168,7 +168,7 @@ final class NavigationBarViewController: NSViewController {
         Pixel.fire(.bookmarksList(source: .button))
     }
 
-    func showLoginsPopover() {
+    func showPasswordManagementPopover() {
         passwordManagementButton.isHidden = false
         passwordManagement.show(relativeTo: passwordManagementButton.bounds.insetFromLineOfDeath(),
                                 of: passwordManagementButton,
@@ -210,7 +210,11 @@ final class NavigationBarViewController: NSViewController {
     }
 
     private func onUrlChanged(_ url: URL?) {
+        passwordManagementButton.image = NSImage(named: "PasswordManagement")
+
         if passwordManagement.viewController.isDirty {
+            // Remember to reset this once the controller is not dirty
+            passwordManagementButton.image = NSImage(named: "PasswordManagementDirty")
             passwordManagementButton.isHidden = false
             return
         }
@@ -219,7 +223,7 @@ final class NavigationBarViewController: NSViewController {
             passwordManagementButton.isHidden = true
             return
         }
-        
+
         passwordManagementButton.isHidden = (try? SecureVaultFactory.default.makeVault().accountsFor(domain: domain).isEmpty) ?? false
     }
 
@@ -317,7 +321,7 @@ extension NavigationBarViewController: OptionsButtonMenuDelegate {
     }
 
     func optionsButtonMenuRequestedLoginsPopover(_ menu: NSMenu) {
-        showLoginsPopover()
+        showPasswordManagementPopover()
     }
 
 }
