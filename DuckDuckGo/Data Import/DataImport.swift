@@ -42,6 +42,8 @@ enum DataImportError: Error {
 
 }
 
+/// Represents an object able to import data from an outside source. The outside source may be capable of importing multiple types of data.
+/// For instance, a browser data importer may be able to import logins and bookmarks.
 protocol DataImporter {
 
     associatedtype ImportedType

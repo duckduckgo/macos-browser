@@ -18,6 +18,7 @@
 
 import Cocoa
 import os.log
+import BrowserServicesKit
 
 // Actions are sent to objects of responder chain
 
@@ -113,6 +114,28 @@ extension AppDelegate {
 
         let viewController = DataImportViewController.create()
         windowController.mainViewController.beginSheet(viewController)
+    }
+
+    @IBAction func openExportBrowserDataWindow(_ sender: Any?) {
+        guard let windowController = WindowControllersManager.shared.lastKeyMainWindowController,
+              let window = windowController.window else {
+
+            return
+        }
+
+        let savePanel = NSSavePanel()
+        savePanel.nameFieldStringValue = "DuckDuckGo Logins"
+        savePanel.allowedFileTypes = ["csv"]
+
+        savePanel.beginSheetModal(for: window) { response in
+            guard response == .OK, let selectedURL = savePanel.url else {
+                return
+            }
+
+            let vault = try? SecureVaultFactory.default.makeVault()
+            let exporter = CSVLoginExporter(secureVault: vault!)
+            exporter.exportVaultLogins(to: selectedURL)
+        }
     }
 
 }
@@ -362,6 +385,10 @@ extension MainViewController {
     @IBAction func resetDefaultGrammarChecks(_ sender: Any?) {
         UserDefaultsWrapper<Bool>.clear(.spellingCheckEnabledOnce)
         UserDefaultsWrapper<Bool>.clear(.grammarCheckEnabledOnce)
+    }
+
+    @IBAction func resetSecureVaultData(_ sender: Any?) {
+        // TODO: Allow resetting the vault
     }
 
 }

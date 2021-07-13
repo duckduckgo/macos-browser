@@ -49,7 +49,7 @@ final class DataImportViewController: NSViewController {
 
         let importableTypes = importer.importableTypes()
         importer.importData(types: importableTypes) { result in
-            print("Result: \(result)")
+            self.dismiss()
         }
     }
 

@@ -68,8 +68,9 @@ final class CSVImportViewController: NSViewController {
             selectedFileLabel.isHidden = true
             selectFileButton.isHidden = false
         case .selectedValidFile(let fileURL):
-            selectedFileLabel.stringValue = "Importing File: \(fileURL.relativeString)"
+            selectedFileLabel.stringValue = "Importing File: \(fileURL.path)"
             selectedFileLabel.isHidden = false
+            selectFileButton.title = "Select Different File"
             selectFileButton.isHidden = false
         case .selectedInvalidFile:
             selectedFileLabel.stringValue = "Invalid File"
