@@ -156,14 +156,14 @@ private struct WKGeolocationManager {
 
 }
 
-private typealias WKGeolocationPositionCreate_c_type =  @convention(c)
+private typealias WKGeolocationPositionCreate_c_type =  @convention(c) // swiftlint:disable:this type_name
     (/*timestamp:*/ Double, /*latitude:*/ Double, /*longitude:*/ Double, /*accuracy:*/ Double,
      /*providesAltitude:*/ Bool, /*altitude:*/ Double, /*providesAltitudeAccuracy:*/ Bool,
      /*altitudeAccuracy:*/ Double, /*providesHeading:*/ Bool, /*heading:*/ Double,
      /*providesSpeed:*/ Bool, /*speed:*/ Double, /*providesFloorLevel:*/ Bool, /*floorLevel:*/ Double)
     -> UnsafeRawPointer?
 
-private let WKGeolocationPositionCreate_c: WKGeolocationPositionCreate_c_type? =
+private let WKGeolocationPositionCreate_c: WKGeolocationPositionCreate_c_type? = // swiftlint:disable:this identifier_name
     dynamicSymbol(named: "WKGeolocationPositionCreate_c")
 
 private func createWKGeolocationPosition(_ location: CLLocation) -> UnsafeRawPointer? {
