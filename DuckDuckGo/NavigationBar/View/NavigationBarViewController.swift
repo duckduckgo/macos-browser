@@ -204,12 +204,14 @@ final class NavigationBarViewController: NSViewController {
     private func subscribeToTabUrl() {
         urlCancellable = tabCollectionViewModel.selectedTabViewModel?.tab.$url
             .receive(on: DispatchQueue.main)
-            .sink(receiveValue: { [weak self] url in
-                self?.onUrlChanged(url)
+            .sink(receiveValue: { [weak self] _ in
+                self?.updatePasswordManagementButton()
             })
     }
 
-    private func onUrlChanged(_ url: URL?) {
+    private func updatePasswordManagementButton() {
+        let url = tabCollectionViewModel.selectedTabViewModel?.tab.url
+
         passwordManagementButton.image = NSImage(named: "PasswordManagement")
 
         if passwordManagement.viewController.isDirty {
@@ -219,11 +221,12 @@ final class NavigationBarViewController: NSViewController {
             return
         }
 
+        passwordManagement.viewController.domain = nil
         guard let url = url, let domain = url.host else {
             passwordManagementButton.isHidden = true
             return
         }
-
+        passwordManagement.viewController.domain = domain
         passwordManagementButton.isHidden = (try? SecureVaultFactory.default.makeVault().accountsFor(domain: domain).isEmpty) ?? false
     }
 

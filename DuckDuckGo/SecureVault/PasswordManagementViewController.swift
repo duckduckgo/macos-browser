@@ -33,7 +33,9 @@ final class PasswordManagementViewController: NSViewController {
     }
 
     @IBOutlet var listContainer: NSView!
+    @IBOutlet var searchField: NSTextField!
 
+    @Published var domain: String?
     @Published var isDirty = false
 
     var model = AccountListModel(accounts: []) {
@@ -49,11 +51,33 @@ final class PasswordManagementViewController: NSViewController {
 
     override func viewDidAppear() {
         super.viewDidAppear()
-        model.accounts = (try? SecureVaultFactory.default.makeVault().accounts()) ?? []
+        fetchAccounts { [weak self] accounts in
+            self?.model.accounts = accounts
+            self?.searchField.stringValue = self?.domain ?? ""
+            self?.updateFilter()
+        }
     }
 
     @IBAction func deleteAction(sender: Any) {
         model.accounts = [SecureVaultModels.WebsiteAccount](model.accounts.dropFirst())
+    }
+
+    func updateFilter() {
+        guard let domain = domain else { return }
+        let accounts = model.accounts
+        model.accounts = accounts.filter { domain == $0.domain }
+        if model.accounts.isEmpty {
+            model.accounts = accounts
+        }
+    }
+
+    func fetchAccounts(completion: @escaping ([SecureVaultModels.WebsiteAccount]) -> Void) {
+        DispatchQueue.global(qos: .userInitiated).async {
+            let accounts = (try? SecureVaultFactory.default.makeVault().accounts()) ?? []
+            DispatchQueue.main.async {
+                completion(accounts)
+            }
+        }
     }
 
 }
