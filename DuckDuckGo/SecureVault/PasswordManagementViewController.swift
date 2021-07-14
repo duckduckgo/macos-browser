@@ -109,7 +109,7 @@ struct AccountView: View {
 
     var body: some View {
 
-        let favicon = LocalFaviconService.shared.getCachedFavicon(for: account.domain, mustBeFromUserScript: false) ?? NSImage(named: "Web")
+        let favicon = LocalFaviconService.shared.getCachedFavicon(for: account.domain, mustBeFromUserScript: false) ?? NSImage(named: "WebLarge")
         let selectedTextColor = Color(NSColor.selectedControlTextColor)
 
         Button(action: action, label: {
