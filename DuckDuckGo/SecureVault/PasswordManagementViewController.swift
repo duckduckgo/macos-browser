@@ -38,15 +38,15 @@ final class PasswordManagementViewController: NSViewController {
     @Published var domain: String?
     @Published var isDirty = false
 
-    var model = AccountListModel(accounts: []) {
+    var filterText: String = ""
+
+    var model = PasswordManagementItemListModel(accounts: []) {
         print("Item selected \($0)")
     }
 
     override func viewDidLoad() {
         super.viewDidLoad()
-        let view = NSHostingView(rootView: AccountListView().environmentObject(model))
-        view.frame = listContainer.frame
-        listContainer.addSubview(view)
+        createListView()
     }
 
     override func viewDidAppear() {
@@ -62,16 +62,17 @@ final class PasswordManagementViewController: NSViewController {
         model.accounts = [SecureVaultModels.WebsiteAccount](model.accounts.dropFirst())
     }
 
-    func updateFilter() {
-        guard let domain = domain else { return }
-        let accounts = model.accounts
-        model.accounts = accounts.filter { domain == $0.domain }
-        if model.accounts.isEmpty {
-            model.accounts = accounts
-        }
+    private func createListView() {
+        let view = NSHostingView(rootView: PasswordManagementItemListView().environmentObject(model))
+        view.frame = listContainer.frame
+        listContainer.addSubview(view)
     }
 
-    func fetchAccounts(completion: @escaping ([SecureVaultModels.WebsiteAccount]) -> Void) {
+    private func updateFilter() {
+        model.filterUsing(text: searchField.stringValue)
+    }
+
+    private func fetchAccounts(completion: @escaping ([SecureVaultModels.WebsiteAccount]) -> Void) {
         DispatchQueue.global(qos: .userInitiated).async {
             let accounts = (try? SecureVaultFactory.default.makeVault().accounts()) ?? []
             DispatchQueue.main.async {
@@ -79,99 +80,13 @@ final class PasswordManagementViewController: NSViewController {
             }
         }
     }
-
+    
 }
 
-struct WrappedAccount: Identifiable {
+extension PasswordManagementViewController: NSTextFieldDelegate {
 
-    let id: Int64
-    let name: String
-
-}
-
-final class AccountListModel: ObservableObject {
-
-    @Published var accounts: [SecureVaultModels.WebsiteAccount]
-    @Published var selected: SecureVaultModels.WebsiteAccount?
-
-    var itemSelected: (SecureVaultModels.WebsiteAccount) -> Void
-
-    init(accounts: [SecureVaultModels.WebsiteAccount], itemSelected: @escaping (Any) -> Void) {
-        self.accounts = accounts
-        self.itemSelected = itemSelected
+    func controlTextDidChange(_ obj: Notification) {
+        updateFilter()
     }
 
-    func selectAccount(_ account: SecureVaultModels.WebsiteAccount) {
-        selected = account
-        itemSelected(account)
-    }
-
-}
-
-struct AccountListView: View {
-
-    @EnvironmentObject var model: AccountListModel
-
-    var body: some View {
-        List(model.accounts, id: \.id) { account in
-
-            AccountView(account: account, selected: model.selected?.id == account.id) {
-                model.selectAccount(account)
-            }
-
-        }
-        .listStyle(SidebarListStyle())
-    }
-
-}
-
-struct AccountView: View {
-
-    let account: SecureVaultModels.WebsiteAccount
-    let selected: Bool
-    let action: () -> Void
-
-    var body: some View {
-
-        let favicon = LocalFaviconService.shared.getCachedFavicon(for: account.domain, mustBeFromUserScript: false) ?? NSImage(named: "WebLarge")
-        let selectedTextColor = Color(NSColor.selectedControlTextColor)
-
-        Button(action: action, label: {
-            HStack(spacing: 4) {
-                Image(nsImage: favicon!)
-                    .resizable()
-                    .aspectRatio(contentMode: .fit)
-                    .frame(width: 32)
-
-                VStack(alignment: .leading, spacing: 4) {
-                    Text(account.domain).bold()
-                        .foregroundColor(selected ? selectedTextColor : nil)
-                    Text(account.username)
-                        .foregroundColor(selected ? selectedTextColor : nil)
-                }
-            }
-        })
-        .buttonStyle(selected ?
-                        CustomButtonStyle(bgColor: Color(NSColor.selectedControlColor)) :
-                        // Almost clear, so that whole view is clickable
-                        CustomButtonStyle(bgColor: Color(NSColor.windowBackgroundColor.withAlphaComponent(0.01))))
-
-    }
-
-}
-
-struct CustomButtonStyle: ButtonStyle {
-
-    let bgColor: Color
-
-    func makeBody(configuration: Self.Configuration) -> some View {
-
-        let fillColor = configuration.isPressed ? Color.accentColor : bgColor
-
-        configuration.label
-            .padding(4)
-            .frame(maxWidth: .infinity, alignment: .leading)
-            .background(RoundedRectangle(cornerRadius: 3, style: .continuous).fill(fillColor))
-
-    }
 }
