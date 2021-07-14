@@ -36,4 +36,12 @@ final class CSVParserTests: XCTestCase {
         XCTAssertEqual(parsed, [["one"], ["two", "three"], ["four", "five", "six"]])
     }
 
+    func testParsingCSVStringsWithManyEntries() throws {
+        let largeCSVString = String(repeating: "\nhttps://example.com/,username,password", count: 100_000)
+
+        self.measure {
+            _ = CSVParser.parse(string: largeCSVString)
+        }
+    }
+
 }

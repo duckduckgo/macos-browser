@@ -1,5 +1,5 @@
 //
-//  LoginImport.swift
+//  DataImportMocks.swift
 //
 //  Copyright © 2021 DuckDuckGo. All rights reserved.
 //
@@ -17,31 +17,14 @@
 //
 
 import Foundation
+@testable import DuckDuckGo_Privacy_Browser
 
-struct LoginCredential: Equatable {
+final class MockLoginImporter: LoginImporter {
 
-    let url: String
-    let username: String
-    let password: String
+    var importedLogins: [LoginCredential] = []
 
-    init(url: String, username: String, password: String) {
-        self.url = url
-        self.username = username
-        self.password = password
+    func importLogins(_ logins: [LoginCredential]) throws {
+        self.importedLogins = logins
     }
-
-    init?(row: [String]) {
-        if row.count == 3 {
-            self.init(url: row[0], username: row[1], password: row[2])
-        } else {
-            return nil
-        }
-    }
-
-}
-
-protocol LoginImporter {
-
-    func importLogins(_ logins: [LoginCredential]) throws
 
 }

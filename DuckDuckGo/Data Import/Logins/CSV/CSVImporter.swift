@@ -18,7 +18,7 @@
 
 import Foundation
 
-final class CSVLoginImporter: DataImporter {
+final class CSVImporter: DataImporter {
 
     typealias ImportedType = [LoginCredential]
 

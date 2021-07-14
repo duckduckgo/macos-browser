@@ -31,7 +31,7 @@ final class DataImportViewController: NSViewController {
         return storyboard.instantiateController(identifier: Constants.identifier)
     }
 
-    private var importer: CSVLoginImporter?
+    private var importer: CSVImporter?
     private weak var currentChildViewController: NSViewController?
 
     @IBOutlet var containerView: NSView!
@@ -72,7 +72,7 @@ extension DataImportViewController: CSVImportViewControllerDelegate {
             do {
                 let secureVault = try SecureVaultFactory.default.makeVault()
                 let secureVaultImporter = SecureVaultLoginImporter(secureVault: secureVault)
-                self.importer = CSVLoginImporter(fileURL: url, loginImporter: secureVaultImporter)
+                self.importer = CSVImporter(fileURL: url, loginImporter: secureVaultImporter)
             } catch {
                 // TODO: Handle an error when creating the vault
             }
