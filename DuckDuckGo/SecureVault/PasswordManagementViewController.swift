@@ -33,43 +33,60 @@ final class PasswordManagementViewController: NSViewController {
     }
 
     @IBOutlet var listContainer: NSView!
+    @IBOutlet var itemContainer: NSView!
     @IBOutlet var searchField: NSTextField!
 
     @Published var domain: String?
     @Published var isDirty = false
 
-    var filterText: String = ""
-
-    var model = PasswordManagementItemListModel(accounts: []) {
-        print("Item selected \($0)")
-    }
+    var listModel: PasswordManagementItemListModel?
+    var itemModel: PasswordManagementItemModel?
 
     override func viewDidLoad() {
         super.viewDidLoad()
         createListView()
+        createItemView()
     }
 
     override func viewDidAppear() {
         super.viewDidAppear()
         fetchAccounts { [weak self] accounts in
-            self?.model.accounts = accounts
+            self?.listModel?.accounts = accounts
             self?.searchField.stringValue = self?.domain ?? ""
             self?.updateFilter()
+            self?.listModel?.selectFirst()
         }
     }
 
-    @IBAction func deleteAction(sender: Any) {
-        model.accounts = [SecureVaultModels.WebsiteAccount](model.accounts.dropFirst())
+    private func createItemView() {
+        let itemModel = PasswordManagementItemModel(onEditBegan: { [weak self] in
+            self?.isDirty = true
+        }, onSave: {
+            print("Item saved \($0)")
+        })
+        self.itemModel = itemModel
+
+        let view = NSHostingView(rootView: PasswordManagementItemView().environmentObject(itemModel))
+        view.frame = itemContainer.bounds
+        print(itemContainer.bounds)
+        itemContainer.addSubview(view)
+        itemContainer.wantsLayer = true
     }
 
     private func createListView() {
-        let view = NSHostingView(rootView: PasswordManagementItemListView().environmentObject(model))
-        view.frame = listContainer.frame
+        let listModel = PasswordManagementItemListModel(accounts: []) { [weak self] in
+            guard let id = $0.id else { return }
+            self?.itemModel?.credentials = try? SecureVaultFactory.default.makeVault().websiteCredentialsFor(accountId: id)
+        }
+        self.listModel = listModel
+
+        let view = NSHostingView(rootView: PasswordManagementItemListView().environmentObject(listModel))
+        view.frame = listContainer.bounds
         listContainer.addSubview(view)
     }
 
     private func updateFilter() {
-        model.filterUsing(text: searchField.stringValue)
+        listModel?.filterUsing(text: searchField.stringValue.trimmingWhitespaces())
     }
 
     private func fetchAccounts(completion: @escaping ([SecureVaultModels.WebsiteAccount]) -> Void) {

@@ -30,21 +30,33 @@ final class PasswordManagementItemListModel: ObservableObject {
     @Published private(set) var displayedAccounts: [SecureVaultModels.WebsiteAccount]
     @Published private(set) var selected: SecureVaultModels.WebsiteAccount?
 
-    var itemSelected: (SecureVaultModels.WebsiteAccount) -> Void
+    var onItemSelected: (SecureVaultModels.WebsiteAccount) -> Void
 
-    init(accounts: [SecureVaultModels.WebsiteAccount], itemSelected: @escaping (Any) -> Void) {
+    init(accounts: [SecureVaultModels.WebsiteAccount], onItemSelected: @escaping (SecureVaultModels.WebsiteAccount) -> Void) {
         self.accounts = accounts
         self.displayedAccounts = accounts
-        self.itemSelected = itemSelected
+        self.onItemSelected = onItemSelected
     }
 
     func selectAccount(_ account: SecureVaultModels.WebsiteAccount) {
         selected = account
-        itemSelected(account)
+        onItemSelected(account)
     }
 
     func filterUsing(text: String) {
-        displayedAccounts = accounts.filter { $0.domain.contains(text) || $0.username.contains(text) }
+        if text.isEmpty {
+            displayedAccounts = accounts
+        } else {
+            let filter = text.lowercased()
+            displayedAccounts = accounts.filter { $0.domain.lowercased().contains(filter) || $0.username.lowercased().contains(filter) }
+        }
+    }
+
+    func selectFirst() {
+        selected = nil
+        if let selected = displayedAccounts.first {
+            selectAccount(selected)
+        }
     }
 
 }
@@ -74,15 +86,11 @@ private struct ItemView: View {
 
     var body: some View {
 
-        let favicon = LocalFaviconService.shared.getCachedFavicon(for: account.domain, mustBeFromUserScript: false) ?? NSImage(named: "WebLarge")
         let selectedTextColor = Color(NSColor.selectedControlTextColor)
 
         Button(action: action, label: {
             HStack(spacing: 4) {
-                Image(nsImage: favicon!)
-                    .resizable()
-                    .aspectRatio(contentMode: .fit)
-                    .frame(width: 32)
+                FaviconView(domain: account.domain)
 
                 VStack(alignment: .leading, spacing: 4) {
                     Text(account.domain).bold()
