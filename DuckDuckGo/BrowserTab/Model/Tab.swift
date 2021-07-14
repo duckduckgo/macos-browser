@@ -25,9 +25,9 @@ import BrowserServicesKit
 protocol TabDelegate: FileDownloadManagerDelegate {
     func tabDidStartNavigation(_ tab: Tab)
     func tab(_ tab: Tab, requestedNewTab url: URL?, selected: Bool)
-    func tab(_ tab: Tab, willShowContextMenuAt position: NSPoint, image: URL?, link: URL?)
-    func tab(_ tab: Tab, detectedLogin host: String)
+    func tab(_ tab: Tab, willShowContextMenuAt position: NSPoint, image: URL?, link: URL?, selectedText: String?)
 	func tab(_ tab: Tab, requestedOpenExternalURL url: URL, forUserEnteredURL: Bool)
+    func tab(_ tab: Tab, requestedSaveCredentials credentials: SecureVaultModels.WebsiteCredentials)
 
     func tabPageDOMLoaded(_ tab: Tab)
     func closeTab(_ tab: Tab)
@@ -107,13 +107,12 @@ final class Tab: NSObject {
 
         super.init()
 
-        self.loginDetectionService = LoginDetectionService { [weak self] host in
-            guard let self = self else { return }
-
-            let preferences = PrivacySecurityPreferences()
-            if preferences.loginDetectionEnabled {
-                self.delegate?.tab(self, detectedLogin: host)
-            }
+        self.loginDetectionService = LoginDetectionService(loginDiscardedHandler: { [weak self] in
+            self?.lastSeenCredentials = nil
+        }) { [weak self] _ in
+            guard let credentials = self?.lastSeenCredentials else { return }
+            self?.delegate?.tab(self!, requestedSaveCredentials: credentials)
+            self?.lastSeenCredentials = nil
         }
 
         setupWebView(shouldLoadInBackground: shouldLoadInBackground)
@@ -131,7 +130,8 @@ final class Tab: NSObject {
 
     let webView: WebView
     private(set) var tabType: TabType
-	var userEnteredUrl = true
+    var userEnteredUrl = true
+    var lastSeenCredentials: SecureVaultModels.WebsiteCredentials?
 
     @PublishedAfter var url: URL? {
         didSet {
@@ -183,12 +183,12 @@ final class Tab: NSObject {
         return self.sessionStateData
     }
 
-	func update(url: URL?, userEntered: Bool = true) {
+    func update(url: URL?, userEntered: Bool = true) {
         self.url = url
 
         // This function is called when the user has manually typed in a new address, which should reset the login detection flow.
-		userEnteredUrl = userEntered
-		loginDetectionService?.handle(navigationEvent: .userAction)
+        userEnteredUrl = userEntered
+        loginDetectionService?.handle(navigationEvent: .userAction)
      }
 
     // Used to track if an error was caused by a download navigation.
@@ -377,6 +377,12 @@ final class Tab: NSObject {
         return emailManager
     }()
 
+    lazy var vaultManager: SecureVaultManager = {
+        let manager = SecureVaultManager()
+        manager.delegate = self
+        return manager
+    }()
+
     private var userScriptsUpdatedCancellable: AnyCancellable?
 
     private var userScripts: UserScripts! {
@@ -389,10 +395,10 @@ final class Tab: NSObject {
             userScripts.debugScript.instrumentation = instrumentation
             userScripts.faviconScript.delegate = self
             userScripts.contextMenuScript.delegate = self
-            userScripts.loginDetectionUserScript.delegate = self
             userScripts.contentBlockerScript.delegate = self
             userScripts.contentBlockerRulesScript.delegate = self
             userScripts.autofillScript.emailDelegate = emailManager
+            userScripts.autofillScript.vaultDelegate = vaultManager
             userScripts.pageObserverScript.delegate = self
 
             attachFindInPage()
@@ -454,8 +460,12 @@ extension Tab: PageObserverUserScriptDelegate {
 
 extension Tab: ContextMenuDelegate {
 
-    func contextMenu(forUserScript script: ContextMenuUserScript, willShowAt position: NSPoint, image: URL?, link: URL?) {
-        delegate?.tab(self, willShowContextMenuAt: position, image: image, link: link)
+    func contextMenu(forUserScript script: ContextMenuUserScript,
+                     willShowAt position: NSPoint,
+                     image: URL?,
+                     link: URL?,
+                     selectedText: String?) {
+        delegate?.tab(self, willShowContextMenuAt: position, image: image, link: link, selectedText: selectedText)
     }
 
 }
@@ -499,7 +509,7 @@ extension Tab: ContentBlockerUserScriptDelegate {
 }
 
 extension Tab: EmailManagerRequestDelegate {
-    
+
     // swiftlint:disable function_parameter_count
     func emailManager(_ emailManager: EmailManager,
                       didRequestAliasWithURL url: URL,
@@ -509,7 +519,7 @@ extension Tab: EmailManagerRequestDelegate {
                       completion: @escaping (Data?, Error?) -> Void) {
 
         let currentQueue = OperationQueue.current
-        
+
         var request = URLRequest(url: url, timeoutInterval: timeoutInterval)
         request.allHTTPHeaderFields = headers
         request.httpMethod = method
@@ -523,14 +533,15 @@ extension Tab: EmailManagerRequestDelegate {
     
 }
 
-extension Tab: LoginFormDetectionDelegate {
+extension Tab: SecureVaultManagerDelegate {
 
-     func loginFormDetectionUserScriptDetectedLoginForm(_ script: LoginFormDetectionUserScript) {
-         guard let url = webView.url else { return }
-         loginDetectionService?.handle(navigationEvent: .detectedLogin(url: url))
-     }
+    func secureVaultManager(_: SecureVaultManager, promptUserToStoreCredentials credentials: SecureVaultModels.WebsiteCredentials) {
+        guard let url = webView.url else { return }
+        lastSeenCredentials = credentials
+        loginDetectionService?.handle(navigationEvent: .detectedLogin(url: url))
+    }
 
- }
+}
 
 extension Tab: WKNavigationDelegate {
 
@@ -557,11 +568,6 @@ extension Tab: WKNavigationDelegate {
                  decisionHandler: @escaping (WKNavigationActionPolicy) -> Void) {
 
         webView.customUserAgent = UserAgent.for(navigationAction.request.url)
-
-        // Check if a POST request is being made, and if it matches the appearance of a login request.
-        if let method = navigationAction.request.httpMethod, method == "POST", navigationAction.request.url?.isLoginURL ?? false {
-            userScripts.loginDetectionUserScript.scanForLoginForm(in: webView)
-        }
 
         if navigationAction.isTargetingMainFrame {
             currentDownload = nil
@@ -613,7 +619,7 @@ extension Tab: WKNavigationDelegate {
     func webView(_ webView: WKWebView,
                  decidePolicyFor navigationResponse: WKNavigationResponse,
                  decisionHandler: @escaping (WKNavigationResponsePolicy) -> Void) {
-		userEnteredUrl = false // subsequent requests will be navigations
+        userEnteredUrl = false // subsequent requests will be navigations
 
         if !navigationResponse.canShowMIMEType || navigationResponse.shouldDownload {
             if navigationResponse.isForMainFrame {

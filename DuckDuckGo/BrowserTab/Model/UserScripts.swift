@@ -25,7 +25,6 @@ final class UserScripts {
     let faviconScript = FaviconUserScript()
     let contextMenuScript = ContextMenuUserScript()
     let findInPageScript = FindInPageUserScript()
-    let loginDetectionUserScript = LoginFormDetectionUserScript()
     let contentBlockerScript = ContentBlockerUserScript()
     let contentBlockerRulesScript = ContentBlockerRulesUserScript()
     let autofillScript = AutofillUserScript()
@@ -45,7 +44,6 @@ final class UserScripts {
         self.faviconScript,
         self.contextMenuScript,
         self.findInPageScript,
-        self.loginDetectionUserScript,
         self.contentBlockerScript,
         self.contentBlockerRulesScript,
         self.pageObserverScript,
