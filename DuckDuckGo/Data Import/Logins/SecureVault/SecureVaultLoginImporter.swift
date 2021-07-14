@@ -28,6 +28,8 @@ final class SecureVaultLoginImporter: LoginImporter {
     }
 
     func importLogins(_ logins: [LoginCredential]) throws {
+        let vault = try SecureVaultFactory.default.makeVault()
+
         for login in logins {
             print("Importing account for \(login.url), username: '\(login.username)'")
 
@@ -35,9 +37,10 @@ final class SecureVaultLoginImporter: LoginImporter {
             let credentials = SecureVaultModels.WebsiteCredentials(account: account, password: login.password.data(using: .utf8)!)
 
             do {
-                try SecureVaultFactory.default.makeVault().storeWebsiteCredentials(credentials)
+                try vault.storeWebsiteCredentials(credentials)
             } catch {
                 // TODO: Handle errors
+                print("Failed to import credential: \(error)")
             }
         }
     }

@@ -62,7 +62,7 @@
 		4B26FB4D269781CB0010AF6A /* DataImportViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B26FB4C269781CB0010AF6A /* DataImportViewController.swift */; };
 		4B26FB502697BACE0010AF6A /* CSVImportViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B26FB4F2697BACE0010AF6A /* CSVImportViewController.swift */; };
 		4B26FB532697C1BD0010AF6A /* CSVLoginImporter.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B26FB522697C1BD0010AF6A /* CSVLoginImporter.swift */; };
-		4B26FB582697DEB50010AF6A /* CSVParsing.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B26FB572697DEB50010AF6A /* CSVParsing.swift */; };
+		4B26FB582697DEB50010AF6A /* CSVParser.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B26FB572697DEB50010AF6A /* CSVParser.swift */; };
 		4B26FB5A269A93BD0010AF6A /* DataImport.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B26FB59269A93BD0010AF6A /* DataImport.swift */; };
 		4B26FB5E269AA31C0010AF6A /* BrowserImportViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B26FB5D269AA31C0010AF6A /* BrowserImportViewController.swift */; };
 		4B26FB60269BF5C40010AF6A /* SecureVaultLoginImporter.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B26FB5F269BF5C40010AF6A /* SecureVaultLoginImporter.swift */; };
@@ -94,6 +94,7 @@
 		4B677442255DBEEA00025BD8 /* Database.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B677440255DBEEA00025BD8 /* Database.swift */; };
 		4B67744B255DBF3A00025BD8 /* BloomFilter.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4B677449255DBF3A00025BD8 /* BloomFilter.cpp */; };
 		4B677450255DBFA300025BD8 /* HashExtension.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B67744F255DBFA300025BD8 /* HashExtension.swift */; };
+		4B6FB1CA269E631E005DD826 /* CSVParserTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B6FB1C9269E631E005DD826 /* CSVParserTests.swift */; };
 		4B82E9B325B69E3E00656FE7 /* TrackerRadarKit in Frameworks */ = {isa = PBXBuildFile; productRef = 4B82E9B225B69E3E00656FE7 /* TrackerRadarKit */; };
 		4B82E9B925B6A05800656FE7 /* DetectedTrackerTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B82E9B825B6A05800656FE7 /* DetectedTrackerTests.swift */; };
 		4B82E9C125B6A1CD00656FE7 /* TrackerRadarManagerTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B82E9C025B6A1CD00656FE7 /* TrackerRadarManagerTests.swift */; };
@@ -467,7 +468,7 @@
 		4B26FB4C269781CB0010AF6A /* DataImportViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DataImportViewController.swift; sourceTree = "<group>"; };
 		4B26FB4F2697BACE0010AF6A /* CSVImportViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CSVImportViewController.swift; sourceTree = "<group>"; };
 		4B26FB522697C1BD0010AF6A /* CSVLoginImporter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CSVLoginImporter.swift; sourceTree = "<group>"; };
-		4B26FB572697DEB50010AF6A /* CSVParsing.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CSVParsing.swift; sourceTree = "<group>"; };
+		4B26FB572697DEB50010AF6A /* CSVParser.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CSVParser.swift; sourceTree = "<group>"; };
 		4B26FB59269A93BD0010AF6A /* DataImport.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DataImport.swift; sourceTree = "<group>"; };
 		4B26FB5D269AA31C0010AF6A /* BrowserImportViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BrowserImportViewController.swift; sourceTree = "<group>"; };
 		4B26FB5F269BF5C40010AF6A /* SecureVaultLoginImporter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SecureVaultLoginImporter.swift; sourceTree = "<group>"; };
@@ -503,6 +504,8 @@
 		4B67744A255DBF3A00025BD8 /* BloomFilter.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = BloomFilter.hpp; path = Submodules/bloom_cpp/src/BloomFilter.hpp; sourceTree = SOURCE_ROOT; };
 		4B67744F255DBFA300025BD8 /* HashExtension.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = HashExtension.swift; sourceTree = "<group>"; };
 		4B677454255DC18000025BD8 /* Bridging.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Bridging.h; sourceTree = "<group>"; };
+		4B6FB1C7269DF96A005DD826 /* BrowserServicesKit */ = {isa = PBXFileReference; lastKnownFileType = folder; name = BrowserServicesKit; path = ../BrowserServicesKit; sourceTree = "<group>"; };
+		4B6FB1C9269E631E005DD826 /* CSVParserTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CSVParserTests.swift; sourceTree = "<group>"; };
 		4B82E9B825B6A05800656FE7 /* DetectedTrackerTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DetectedTrackerTests.swift; sourceTree = "<group>"; };
 		4B82E9C025B6A1CD00656FE7 /* TrackerRadarManagerTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TrackerRadarManagerTests.swift; sourceTree = "<group>"; };
 		4B92928526670D1600AD2C21 /* BookmarksOutlineView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = BookmarksOutlineView.swift; sourceTree = "<group>"; };
@@ -1010,7 +1013,7 @@
 		4B26FB542697DA070010AF6A /* CSV */ = {
 			isa = PBXGroup;
 			children = (
-				4B26FB572697DEB50010AF6A /* CSVParsing.swift */,
+				4B26FB572697DEB50010AF6A /* CSVParser.swift */,
 				4B26FB522697C1BD0010AF6A /* CSVLoginImporter.swift */,
 			);
 			path = CSV;
@@ -1149,6 +1152,14 @@
 				4B67744A255DBF3A00025BD8 /* BloomFilter.hpp */,
 			);
 			name = bloom_cpp;
+			sourceTree = "<group>";
+		};
+		4B6FB1C8269E6059005DD826 /* Data Import */ = {
+			isa = PBXGroup;
+			children = (
+				4B6FB1C9269E631E005DD826 /* CSVParserTests.swift */,
+			);
+			path = "Data Import";
 			sourceTree = "<group>";
 		};
 		4B82E9B725B6A04B00656FE7 /* ContentBlocker */ = {
@@ -1369,6 +1380,7 @@
 			isa = PBXGroup;
 			children = (
 				AA68C3D62490F821001B8783 /* README.md */,
+				4B6FB1C7269DF96A005DD826 /* BrowserServicesKit */,
 				AA585D80248FD31100E9A3E2 /* DuckDuckGo */,
 				AA585D93248FD31400E9A3E2 /* Unit Tests */,
 				4B1AD89E25FC27E200261379 /* Integration Tests */,
@@ -1440,17 +1452,18 @@
 				85F69B3A25EDE7F800978E59 /* Common */,
 				85AC3B1525D9BBFA00C7D2AA /* Configuration */,
 				4B82E9B725B6A04B00656FE7 /* ContentBlocker */,
+				4B6FB1C8269E6059005DD826 /* Data Import */,
 				8553FF50257523630029327F /* FileDownload */,
 				4BA1A6CE258BF58C00F6F690 /* FileSystem */,
 				4B02199725E063DE00ED7DEA /* Fireproofing */,
 				AAEC74AE2642C47300C2EFBC /* History */,
 				4B0511EE262CAEB300F6079C /* Preferences */,
-				AA63744E24C9BB4A00AB2AC4 /* Suggestions */,
+				B6AE74322609AFBB005B9B1A /* Progress */,
 				858C1BEB26974E5500E6C014 /* SecureVault */,
+				B6DA440F2616C0F200DD1EC2 /* Statistics */,
+				AA63744E24C9BB4A00AB2AC4 /* Suggestions */,
 				AAC9C01224CAFBB700AD1325 /* TabBar */,
 				B61F012125ECBACE00ABB5A3 /* UserScripts */,
-				B6AE74322609AFBB005B9B1A /* Progress */,
-				B6DA440F2616C0F200DD1EC2 /* Statistics */,
 				AA585D96248FD31400E9A3E2 /* Info.plist */,
 			);
 			path = "Unit Tests";
@@ -2693,7 +2706,7 @@
 				853014D625E671A000FB8205 /* PageObserverUserScript.swift in Sources */,
 				B6A9E45B261460350067D1B9 /* APIHeaders.swift in Sources */,
 				AA6EF9B3250785D5004754E6 /* NSMenuExtension.swift in Sources */,
-				4B26FB582697DEB50010AF6A /* CSVParsing.swift in Sources */,
+				4B26FB582697DEB50010AF6A /* CSVParser.swift in Sources */,
 				AA7412B524D1536B00D22FE0 /* MainWindowController.swift in Sources */,
 				4B0511CF262CAA5A00F6079C /* AppearancePreferencesTableCellView.swift in Sources */,
 				AA9FF95924A1ECF20039E328 /* Tab.swift in Sources */,
@@ -2782,6 +2795,7 @@
 				B61F012325ECBAE400ABB5A3 /* UserScriptsTest.swift in Sources */,
 				4B11060A25903EAC0039B979 /* CoreDataEncryptionTests.swift in Sources */,
 				4B9292C32667103100AD2C21 /* PasteboardBookmarkTests.swift in Sources */,
+				4B6FB1CA269E631E005DD826 /* CSVParserTests.swift in Sources */,
 				AAEC74BB2642E67C00C2EFBC /* NSPersistentContainerExtension.swift in Sources */,
 				AABAF59C260A7D130085060C /* FaviconServiceMock.swift in Sources */,
 				AAEC74B82642E43800C2EFBC /* HistoryStoreTests.swift in Sources */,

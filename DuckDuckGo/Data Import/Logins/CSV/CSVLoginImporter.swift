@@ -55,7 +55,7 @@ final class CSVLoginImporter: DataImporter {
     }
 
     private func extractLogins(from fileContents: String) -> [LoginCredential] {
-        let parsed = fileContents.parseAlt()
+        let parsed = CSVParser.parse(string: fileContents)
         let loginCredentials: [LoginCredential] = parsed.compactMap(LoginCredential.init(row:))
 
         return loginCredentials

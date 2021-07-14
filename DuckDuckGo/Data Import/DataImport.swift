@@ -20,14 +20,12 @@ import Foundation
 
 enum DataImport {
 
+    // Third-party browser support will be added later.
     enum Source: CaseIterable {
-        case brave
-        case chrome
         case csv
-        case edge
-        case firefox
     }
 
+    // Different data types (e.g. bookmarks) will be added later.
     enum DataType {
         case logins
     }
