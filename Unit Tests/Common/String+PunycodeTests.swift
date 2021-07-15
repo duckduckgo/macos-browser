@@ -38,6 +38,10 @@ class StringPunycodeTests: XCTestCase {
         XCTAssertNil("💩".punycodedUrl?.absoluteString)
     }
 
+    func testWhenPunycodeUrlSinglePeriodIsLastThenUrlIsNotReturned() {
+        XCTAssertNil("duckduckgo.".punycodedUrl?.absoluteString)
+    }
+
     func testWhenPunycodeUrlIsCalledWithSimpleUrlsThenUrlIsReturned() {
         let addresses = [
             "https://",
