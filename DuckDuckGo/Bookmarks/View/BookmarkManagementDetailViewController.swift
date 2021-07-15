@@ -573,6 +573,7 @@ extension BookmarkManagementDetailViewController: BookmarkMenuItemSelectors {
         let pasteboard = NSPasteboard.general
         pasteboard.declareTypes([.URL], owner: nil)
         bookmarkURL.write(to: pasteboard)
+        pasteboard.setString(bookmarkURL.absoluteString ?? "", forType: .string)
     }
 
     func deleteBookmark(_ sender: NSMenuItem) {

@@ -21,7 +21,11 @@ import BrowserServicesKit
 
 protocol ContextMenuDelegate: AnyObject {
 
-    func contextMenu(forUserScript script: ContextMenuUserScript, willShowAt position: NSPoint, image: URL?, link: URL?)
+    func contextMenu(forUserScript script: ContextMenuUserScript,
+                     willShowAt position: NSPoint,
+                     image: URL?,
+                     link: URL?,
+                     selectedText: String?)
 
 }
 
@@ -44,6 +48,7 @@ final class ContextMenuUserScript: NSObject, StaticUserScript {
 
         var image: URL?
         var link: URL?
+        let selectedText = dict["selectedText"] as? String
 
         guard let elements = dict["elements"] as? [[String: String]] else { return }
         elements.forEach { dict in
@@ -61,7 +66,11 @@ final class ContextMenuUserScript: NSObject, StaticUserScript {
             }
         }
 
-        delegate?.contextMenu(forUserScript: self, willShowAt: point, image: image, link: link)
+        delegate?.contextMenu(forUserScript: self,
+                              willShowAt: point,
+                              image: image,
+                              link: link,
+                              selectedText: selectedText)
     }
 
     private func point(from dict: [String: Any]) -> NSPoint? {
@@ -100,7 +109,8 @@ final class ContextMenuUserScript: NSObject, StaticUserScript {
                 "y": e.clientY
             },
             "elements": [
-            ]
+            ],
+            "selectedText": window.getSelection().toString()
         };
 
         if (e.srcElement.tagName === "A") {

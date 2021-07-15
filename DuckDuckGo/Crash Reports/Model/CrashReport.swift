@@ -1,5 +1,5 @@
 //
-//  PrivacySecurityPreferences.swift
+//  CrashReport.swift
 //
 //  Copyright © 2021 DuckDuckGo. All rights reserved.
 //
@@ -18,18 +18,33 @@
 
 import Foundation
 
-struct PrivacySecurityPreferences {
+#if OUT_OF_APPSTORE
+
+struct CrashReport {
+
+    static let headerItemsToFilter = [
+        "Anonymous UUID:",
+        "Sleep/Wake UUID:"
+    ]
+
+    let url: URL
+
+    var content: String? {
+        try? String(contentsOf: url)
+            .components(separatedBy: "\n")
+            .filter({ line in
+                for headerItemToFilder in Self.headerItemsToFilter {
+                    if line.hasPrefix(headerItemToFilder) { return false }
+                }
+                return true
+            })
+            .joined(separator: "\n")
+    }
+
+    var contentData: Data? {
+        content?.data(using: .utf8)
+    }
 
 }
 
-extension PrivacySecurityPreferences: PreferenceSection {
-    
-    var displayName: String {
-        return UserText.privacyAndSecurity
-    }
-
-    var preferenceIcon: NSImage {
-        return NSImage(named: "Privacy")!
-    }
-
-}
+#endif

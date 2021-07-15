@@ -560,6 +560,12 @@ CQ
                                                 <action selector="resetDefaultGrammarChecks:" target="Ady-hI-5gd" id="Ces-GX-TM5"/>
                                             </connections>
                                         </menuItem>
+                                        <menuItem title="Fatal Error" id="FeS-hb-rvM" userLabel="Reset Default Browser Prompt">
+                                            <modifierMask key="keyEquivalentModifierMask"/>
+                                            <connections>
+                                                <action selector="triggerFatalError:" target="Ady-hI-5gd" id="pS0-iQ-TPe"/>
+                                            </connections>
+                                        </menuItem>
                                     </items>
                                 </menu>
                             </menuItem>
@@ -567,7 +573,7 @@ CQ
                                 <modifierMask key="keyEquivalentModifierMask"/>
                                 <menu key="submenu" title="Help" systemMenu="help" id="F2S-fz-NVQ">
                                     <items>
-                                        <menuItem title="DuckDuckGo Help" keyEquivalent="?" id="FKE-Sm-Kum">
+                                        <menuItem title="DuckDuckGo Help" hidden="YES" enabled="NO" keyEquivalent="?" id="FKE-Sm-Kum">
                                             <connections>
                                                 <action selector="showHelp:" target="Ady-hI-5gd" id="y7X-2Q-9no"/>
                                             </connections>

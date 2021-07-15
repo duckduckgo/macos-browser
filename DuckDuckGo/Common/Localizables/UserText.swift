@@ -67,6 +67,7 @@ struct UserText {
     static let copyImageAddress = NSLocalizedString("copy.image.address", value: "Copy Image Address", comment: "Context menu item")
     static let saveImageAs = NSLocalizedString("save.image.as", value: "Save Image As...", comment: "Context menu item")
     static let downloadLinkedFileAs = NSLocalizedString("save.image.as", value: "Download Linked File As...", comment: "Context menu item")
+    static let searchWithDuckDuckGo = NSLocalizedString("search.with.DuckDuckGo", value: "Search with DuckDuckGo", comment: "Context menu item")
 
     static let findInPage = NSLocalizedString("find.in.page", value: "%1$d of %2$d", comment: "Find in page status (e.g. 1 of 99)")
 
@@ -91,6 +92,7 @@ struct UserText {
                                                                 comment: "Fireproof confirmation message")
 
     static let bookmarks = NSLocalizedString("bookmarks", value: "Bookmarks", comment: "Button for bookmarks")
+    static let bookmarksOpenInNewTabs = NSLocalizedString("bookmarks.open.in.new.tabs", value: "Open in New Tabs", comment: "Open all bookmarks in folder in new tabs")
     static let addToFavorites = NSLocalizedString("add.to.favorites", value: "Add to Favorites", comment: "Button for adding bookmarks to favorites")
     static let addFavorite = NSLocalizedString("add.favorite", value: "Add Favorite", comment: "Button for adding a favorite bookmark")
     static let editFavorite = NSLocalizedString("edit.favorite", value: "Edit Favorite", comment: "Header of the view that edits a favorite bookmark")
@@ -102,7 +104,6 @@ struct UserText {
 
     static let emailOptionsMenuItem = NSLocalizedString("email.optionsMenu", value: "Email Protection", comment: "Menu item email feature")
     static let emailOptionsMenuCreateAddressSubItem = NSLocalizedString("email.optionsMenu.createAddress", value: "Create a Duck Address", comment: "Create an email alias sub menu item")
-    static let emailOptionsMenuViewDashboardSubItem = NSLocalizedString("email.optionsMenu.viewDashboard", value: "View Dashboard", comment: "View email dashboard sub menu item")
     static let emailOptionsMenuTurnOffSubItem = NSLocalizedString("email.optionsMenu.turnOff", value: "Turn off Email Protection", comment: "Turn off email sub menu item")
     static let emailOptionsMenuTurnOnSubItem = NSLocalizedString("email.optionsMenu.turnOn", value: "Turn on Email Protection", comment: "Turn on email sub menu item")
 
@@ -164,4 +165,5 @@ struct UserText {
                                           comment: "Displays the version and build numbers")
         return String(format: localized, version, build)
     }
+
 }

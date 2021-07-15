@@ -19,6 +19,7 @@
 import Cocoa
 import Combine
 import os.log
+import BrowserServicesKit
 
 final class NavigationBarViewController: NSViewController {
 
@@ -31,6 +32,7 @@ final class NavigationBarViewController: NSViewController {
     @IBOutlet weak var shareButton: NSButton!
 
     var addressBarViewController: AddressBarViewController?
+    var saveCredentialsPopover: SaveCredentialsPopover?
 
     private var tabCollectionViewModel: TabCollectionViewModel
 
@@ -42,6 +44,7 @@ final class NavigationBarViewController: NSViewController {
     private lazy var bookmarkListPopover = BookmarkListPopover()
 
     private var selectedTabViewModelCancellable: AnyCancellable?
+    private var credentialsToSaveCancellable: AnyCancellable?
     private var navigationButtonsCancellables = Set<AnyCancellable>()
 
     required init?(coder: NSCoder) {
@@ -176,7 +179,32 @@ final class NavigationBarViewController: NSViewController {
     private func subscribeToSelectedTabViewModel() {
         selectedTabViewModelCancellable = tabCollectionViewModel.$selectedTabViewModel.receive(on: DispatchQueue.main).sink { [weak self] _ in
             self?.subscribeToNavigationActionFlags()
+            self?.subscribeToCredentialsToSave()
         }
+    }
+
+    private func subscribeToCredentialsToSave() {
+        credentialsToSaveCancellable = tabCollectionViewModel.selectedTabViewModel?.$credentialsToSave
+            .receive(on: DispatchQueue.main)
+            .sink(receiveValue: { [weak self] in
+                if let credentials = $0 {
+                    self?.promptToSaveCredentials(credentials)
+                    self?.tabCollectionViewModel.selectedTabViewModel?.credentialsToSave = nil
+                }
+        })
+    }
+
+    private func promptToSaveCredentials(_ credentials: SecureVaultModels.WebsiteCredentials) {
+        showSaveCredentialsPopover()
+        saveCredentialsPopover?.viewController.saveCredentials(credentials)
+    }
+
+    private func showSaveCredentialsPopover() {
+        guard let view = addressBarViewController?.view else { return }
+        if saveCredentialsPopover == nil {
+            saveCredentialsPopover = SaveCredentialsPopover()
+        }
+        saveCredentialsPopover?.show(relativeTo: .zero, of: view, preferredEdge: .minY)
     }
 
     private func subscribeToNavigationActionFlags() {

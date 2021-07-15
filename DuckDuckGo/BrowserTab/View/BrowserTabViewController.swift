@@ -21,6 +21,7 @@ import WebKit
 import os.log
 import Combine
 import SwiftUI
+import BrowserServicesKit
 
 // swiftlint:disable file_length
 final class BrowserTabViewController: NSViewController {
@@ -39,6 +40,7 @@ final class BrowserTabViewController: NSViewController {
     private var contextMenuExpected = false
     private var contextMenuLink: URL?
     private var contextMenuImage: URL?
+    private var contextMenuSelectedText: String?
 
     required init?(coder: NSCoder) {
         fatalError("BrowserTabViewController: Bad initializer")
@@ -315,27 +317,15 @@ extension BrowserTabViewController: TabDelegate {
         tabCollectionViewModel.remove(at: index)
     }
 
-    func tab(_ tab: Tab, willShowContextMenuAt position: NSPoint, image: URL?, link: URL?) {
+    func tab(_ tab: Tab,
+             willShowContextMenuAt position: NSPoint,
+             image: URL?,
+             link: URL?,
+             selectedText: String?) {
         contextMenuImage = image
         contextMenuLink = link
         contextMenuExpected = true
-    }
-
-    func tab(_ tab: Tab, detectedLogin host: String) {
-        guard let window = view.window, !FireproofDomains.shared.isAllowed(fireproofDomain: host) else {
-            os_log("%s: Window is nil", type: .error, className)
-            return
-        }
-
-        let alert = NSAlert.fireproofAlert(with: host.dropWWW())
-        alert.beginSheetModal(for: window) { response in
-            if response == NSApplication.ModalResponse.alertFirstButtonReturn {
-                Pixel.fire(.fireproof(kind: .init(url: tab.url), suggested: .suggested))
-                FireproofDomains.shared.addToAllowed(domain: host)
-            }
-        }
-
-        Pixel.fire(.fireproofSuggested())
+        contextMenuSelectedText = selectedText
     }
 
 }
@@ -376,6 +366,11 @@ extension BrowserTabViewController: FileDownloadManagerDelegate {
         let dockScreenRect = dockScreen.convert(globalRect)
 
         return dockScreenRect
+    }
+
+    func tab(_ tab: Tab, requestedSaveCredentials credentials: SecureVaultModels.WebsiteCredentials) {
+        guard PasswordManagerSettings().canPromptOnDomain(credentials.account.domain) else { return }
+        tabViewModel?.credentialsToSave = credentials
     }
 
 }
@@ -419,6 +414,7 @@ extension BrowserTabViewController: LinkMenuItemSelectors {
         let pasteboard = NSPasteboard.general
         pasteboard.declareTypes([.URL], owner: nil)
         url.write(to: pasteboard)
+        pasteboard.setString(url.absoluteString ?? "", forType: .string)
     }
 
 }
@@ -446,6 +442,16 @@ extension BrowserTabViewController: ImageMenuItemSelectors {
         guard let url = contextMenuImage else { return }
         NSPasteboard.general.clearContents()
         NSPasteboard.general.setString(url.absoluteString, forType: .URL)
+    }
+
+}
+
+extension BrowserTabViewController: MenuItemSelectors {
+
+    func search(_ sender: NSMenuItem) {
+        let selectedText = contextMenuSelectedText ?? ""
+        let url = URL.makeSearchUrl(from: selectedText)
+        openNewTab(with: url, parentTab: tabViewModel?.tab, selected: true)
     }
 
 }
@@ -668,78 +674,6 @@ extension BrowserTabViewController: WKUIDelegate {
         }
 
         tabCollectionViewModel.remove(ownerOf: webView)
-    }
-
-}
-
-fileprivate extension NSAlert {
-
-    static var cautionImage = NSImage(named: "NSCaution")
-
-    static func javascriptAlert(with message: String) -> NSAlert {
-        let alert = NSAlert()
-        alert.icon = Self.cautionImage
-        alert.messageText = message
-        alert.addButton(withTitle: UserText.ok)
-        return alert
-    }
-
-    static func javascriptConfirmation(with message: String) -> NSAlert {
-        let alert = NSAlert()
-        alert.icon = Self.cautionImage
-        alert.messageText = message
-        alert.addButton(withTitle: UserText.ok)
-        alert.addButton(withTitle: UserText.cancel)
-        return alert
-    }
-
-    static func javascriptTextInput(prompt: String, defaultText: String?) -> NSAlert {
-        let alert = NSAlert()
-        alert.icon = Self.cautionImage
-        alert.messageText = prompt
-        alert.addButton(withTitle: UserText.ok)
-        alert.addButton(withTitle: UserText.cancel)
-        let textField = NSTextField(frame: NSRect(x: 0, y: 0, width: 200, height: 24))
-        textField.placeholderString = defaultText
-        alert.accessoryView = textField
-        alert.window.initialFirstResponder = textField
-        return alert
-    }
-
-    static func fireproofAlert(with domain: String) -> NSAlert {
-        let alert = NSAlert()
-        alert.messageText = UserText.fireproofConfirmationTitle(domain: domain)
-        alert.informativeText = UserText.fireproofConfirmationMessage
-        alert.alertStyle = .warning
-        alert.icon = #imageLiteral(resourceName: "Fireproof")
-        alert.addButton(withTitle: UserText.fireproof)
-        alert.addButton(withTitle: UserText.notNow)
-        return alert
-    }
-
-    static func openExternalURLAlert(with appName: String?) -> NSAlert {
-        let alert = NSAlert()
-
-        if let appName = appName {
-            alert.messageText = UserText.openExternalURLTitle(forAppName: appName)
-            alert.informativeText = UserText.openExternalURLMessage(forAppName: appName)
-        } else {
-            alert.messageText = UserText.openExternalURLTitleUnknownApp
-            alert.informativeText = UserText.openExternalURLMessageUnknownApp
-        }
-
-        alert.alertStyle = .warning
-        alert.addButton(withTitle: UserText.open)
-        alert.addButton(withTitle: UserText.cancel)
-        return alert
-    }
-
-    static func unableToOpenExernalURLAlert() -> NSAlert {
-        let alert = NSAlert()
-        alert.messageText = UserText.failedToOpenExternally
-        alert.alertStyle = .warning
-        alert.addButton(withTitle: UserText.ok)
-        return alert
     }
 
 }

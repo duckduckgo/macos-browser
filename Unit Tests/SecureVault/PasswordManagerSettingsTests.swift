@@ -1,5 +1,5 @@
 //
-//  PrivacySecurityPreferences.swift
+//  PasswordManagerSettingsTests.swift
 //
 //  Copyright © 2021 DuckDuckGo. All rights reserved.
 //
@@ -17,19 +17,20 @@
 //
 
 import Foundation
+import XCTest
+@testable import DuckDuckGo_Privacy_Browser
 
-struct PrivacySecurityPreferences {
+final class PasswordManagerSettingsTests: XCTestCase {
 
-}
-
-extension PrivacySecurityPreferences: PreferenceSection {
-    
-    var displayName: String {
-        return UserText.privacyAndSecurity
+    override func setUp() {
+        super.setUp()
+        UserDefaults().removeObject(forKey: UserDefaultsWrapper<Any>.Key.passwordManagerDoNotPromptDomains.rawValue)
     }
 
-    var preferenceIcon: NSImage {
-        return NSImage(named: "Privacy")!
+    func testWhenDomainAddedToDoNotPromptList_ThenDoNotPrompt() {
+        XCTAssertTrue(PasswordManagerSettings().canPromptOnDomain("example.com"))
+        PasswordManagerSettings().doNotPromptOnDomain("example.com")
+        XCTAssertFalse(PasswordManagerSettings().canPromptOnDomain("example.com"))
     }
 
 }
