@@ -33,8 +33,7 @@ final class PrivacyDashboardViewController: NSViewController {
     }
 
     override func viewWillAppear() {
-        let url = Bundle.main.url(forResource: "popup", withExtension: "html", subdirectory: "macos/html")!
-        print(url)
+        let url = Bundle.main.url(forResource: "popup", withExtension: "html", subdirectory: "duckduckgo-privacy-dashboard/build/macos/html")!
         webView.loadFileURL(url, allowingReadAccessTo: url.deletingLastPathComponent())
     }
 
