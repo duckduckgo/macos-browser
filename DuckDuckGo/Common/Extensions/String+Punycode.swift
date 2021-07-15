@@ -43,7 +43,7 @@ extension String {
             scheme = URL.NavigationalScheme.http.separated()
         } else if hasPrefix(URL.NavigationalScheme.https.separated()) {
             scheme = URL.NavigationalScheme.https.separated()
-        } else if !contains(".") {
+        } else if components(separatedBy: ".").count < 2 {
             // could be a local domain but user needs to use the protocol to specify that
             return nil
         } else {
