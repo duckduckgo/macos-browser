@@ -23,6 +23,13 @@ enum DataImport {
     // Third-party browser support will be added later.
     enum Source: CaseIterable {
         case csv
+
+        var importSourceName: String {
+            switch self {
+            case .csv:
+                return "CSV Logins File"
+            }
+        }
     }
 
     // Different data types (e.g. bookmarks) will be added later.

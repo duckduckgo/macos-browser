@@ -30,6 +30,15 @@ final class CSVImporter: DataImporter {
         self.loginImporter = loginImporter
     }
 
+    static func totalValidLogins(in fileURL: URL) -> Int {
+        guard let fileContents = try? String(contentsOf: fileURL, encoding: .utf8) else {
+            return 0
+        }
+
+        let logins = extractLogins(from: fileContents)
+        return logins.count
+    }
+
     func importableTypes() -> [DataImport.DataType] {
         if fileURL.pathExtension == "csv" {
             return [.logins]
@@ -44,7 +53,7 @@ final class CSVImporter: DataImporter {
             return
         }
 
-        let loginCredentials = extractLogins(from: fileContents)
+        let loginCredentials = Self.extractLogins(from: fileContents)
 
         do {
             try loginImporter.importLogins(loginCredentials)
@@ -54,7 +63,7 @@ final class CSVImporter: DataImporter {
         }
     }
 
-    private func extractLogins(from fileContents: String) -> [LoginCredential] {
+    private static func extractLogins(from fileContents: String) -> [LoginCredential] {
         let parsed = CSVParser.parse(string: fileContents)
         let loginCredentials: [LoginCredential] = parsed.compactMap(LoginCredential.init(row:))
 

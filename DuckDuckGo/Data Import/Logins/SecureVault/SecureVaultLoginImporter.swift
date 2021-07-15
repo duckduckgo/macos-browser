@@ -31,17 +31,10 @@ final class SecureVaultLoginImporter: LoginImporter {
         let vault = try SecureVaultFactory.default.makeVault()
 
         for login in logins {
-            print("Importing account for \(login.url), username: '\(login.username)'")
-
             let account = SecureVaultModels.WebsiteAccount(username: login.username, domain: login.url)
             let credentials = SecureVaultModels.WebsiteCredentials(account: account, password: login.password.data(using: .utf8)!)
 
-            do {
-                try vault.storeWebsiteCredentials(credentials)
-            } catch {
-                // TODO: Handle errors
-                print("Failed to import credential: \(error)")
-            }
+            try? vault.storeWebsiteCredentials(credentials)
         }
     }
 

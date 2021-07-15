@@ -36,6 +36,7 @@ final class CSVImportViewController: NSViewController {
         return storyboard.instantiateController(identifier: Constants.identifier)
     }
 
+    @IBOutlet var descriptionLabel: NSTextField!
     @IBOutlet var selectedFileLabel: NSTextField!
     @IBOutlet var selectFileButton: NSButton!
 
@@ -63,19 +64,21 @@ final class CSVImportViewController: NSViewController {
     }
 
     private func render(state: ImportState) {
+        descriptionLabel.stringValue = "CSV import supports rows with the format 'URL, Username, Password'"
+
         switch state {
         case .awaitingFileSelection:
             selectedFileLabel.isHidden = true
-            selectFileButton.isHidden = false
+            selectFileButton.title = "Select File"
         case .selectedValidFile(let fileURL):
-            selectedFileLabel.stringValue = "Importing File: \(fileURL.path)"
+            let totalLoginsToImport = CSVImporter.totalValidLogins(in: fileURL)
+            selectedFileLabel.stringValue = "Importing File: \(fileURL.path) (\(totalLoginsToImport) logins)"
             selectedFileLabel.isHidden = false
-            selectFileButton.title = "Select Different File"
-            selectFileButton.isHidden = false
+            selectFileButton.title = "Select Another File"
         case .selectedInvalidFile:
-            selectedFileLabel.stringValue = "Invalid File"
+            selectedFileLabel.stringValue = "Failed to get CSV file URL"
             selectedFileLabel.isHidden = false
-            selectFileButton.isHidden = true
+            selectFileButton.title = "Select File"
         }
     }
 
@@ -83,12 +86,14 @@ final class CSVImportViewController: NSViewController {
         let panel = NSOpenPanel.filePanel(allowedExtension: "csv")
         let result = panel.runModal()
 
-        if result == .OK, let selectedURL = panel.url {
-            currentImportState = .selectedValidFile(fileURL: selectedURL)
-            delegate?.csvImportViewController(self, didSelectCSVFileWithURL: selectedURL)
-        } else {
-            currentImportState = .selectedInvalidFile
-            delegate?.csvImportViewController(self, didSelectCSVFileWithURL: nil)
+        if result == .OK {
+            if let selectedURL = panel.url {
+                currentImportState = .selectedValidFile(fileURL: selectedURL)
+                delegate?.csvImportViewController(self, didSelectCSVFileWithURL: selectedURL)
+            } else {
+                currentImportState = .selectedInvalidFile
+                delegate?.csvImportViewController(self, didSelectCSVFileWithURL: nil)
+            }
         }
 
         renderCurrentState()

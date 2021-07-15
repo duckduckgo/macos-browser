@@ -35,6 +35,7 @@ final class DataImportViewController: NSViewController {
     private weak var currentChildViewController: NSViewController?
 
     @IBOutlet var containerView: NSView!
+    @IBOutlet var importSourcePopUpButton: NSPopUpButton!
     @IBOutlet var importButton: NSButton!
 
     @IBAction func cancelButtonClicked(_ sender: Any) {
@@ -49,8 +50,20 @@ final class DataImportViewController: NSViewController {
 
         let importableTypes = importer.importableTypes()
         importer.importData(types: importableTypes) { result in
-            self.dismiss()
+            switch result {
+            case .success:
+                self.dismiss()
+            case .failure(let error):
+                break // TODO: Show an error
+            }
         }
+    }
+
+    override func viewDidLoad() {
+        super.viewDidLoad()
+
+        // This will change later to select the user's default browser.
+        importSourcePopUpButton.displayImportSources(withSelectedSource: .csv)
     }
 
     override func prepare(for segue: NSStoryboardSegue, sender: Any?) {
@@ -79,6 +92,26 @@ extension DataImportViewController: CSVImportViewControllerDelegate {
         } else {
             self.importButton.isEnabled = false
         }
+    }
+
+}
+
+extension NSPopUpButton {
+
+    func displayImportSources(withSelectedSource selectedSource: DataImport.Source) {
+        removeAllItems()
+
+        var selectedSourceIndex: Int?
+
+        for (index, source) in DataImport.Source.allCases.enumerated() {
+            addItem(withTitle: source.importSourceName)
+
+            if source == selectedSource {
+                selectedSourceIndex = index
+            }
+        }
+
+        selectItem(at: selectedSourceIndex ?? 0)
     }
 
 }
