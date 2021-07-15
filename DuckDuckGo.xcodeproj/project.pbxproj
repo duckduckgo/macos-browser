@@ -181,6 +181,8 @@
 		85CC1D73269EF1880062F04E /* PasswordManagementItemList.swift in Sources */ = {isa = PBXBuildFile; fileRef = 85CC1D72269EF1880062F04E /* PasswordManagementItemList.swift */; };
 		85CC1D75269F6B420062F04E /* PasswordManagementItemView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 85CC1D74269F6B420062F04E /* PasswordManagementItemView.swift */; };
 		85CC1D77269FA1160062F04E /* FaviconView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 85CC1D76269FA1160062F04E /* FaviconView.swift */; };
+		85CC1D7B26A05ECF0062F04E /* PasswordManagementItemListModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 85CC1D7A26A05ECF0062F04E /* PasswordManagementItemListModel.swift */; };
+		85CC1D7D26A05F250062F04E /* PasswordManagementItemModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 85CC1D7C26A05F250062F04E /* PasswordManagementItemModel.swift */; };
 		85D33F1225C82EB3002B91A6 /* ConfigurationManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 85D33F1125C82EB3002B91A6 /* ConfigurationManager.swift */; };
 		85D438B6256E7C9E00F3BAF8 /* ContextMenuUserScript.swift in Sources */ = {isa = PBXBuildFile; fileRef = 85D438B5256E7C9E00F3BAF8 /* ContextMenuUserScript.swift */; };
 		85E11C2F25E7DC7E00974CAF /* ExternalURLHandler.swift in Sources */ = {isa = PBXBuildFile; fileRef = 85E11C2E25E7DC7E00974CAF /* ExternalURLHandler.swift */; };
@@ -585,6 +587,8 @@
 		85CC1D72269EF1880062F04E /* PasswordManagementItemList.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PasswordManagementItemList.swift; sourceTree = "<group>"; };
 		85CC1D74269F6B420062F04E /* PasswordManagementItemView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PasswordManagementItemView.swift; sourceTree = "<group>"; };
 		85CC1D76269FA1160062F04E /* FaviconView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FaviconView.swift; sourceTree = "<group>"; };
+		85CC1D7A26A05ECF0062F04E /* PasswordManagementItemListModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PasswordManagementItemListModel.swift; sourceTree = "<group>"; };
+		85CC1D7C26A05F250062F04E /* PasswordManagementItemModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PasswordManagementItemModel.swift; sourceTree = "<group>"; };
 		85D33F1125C82EB3002B91A6 /* ConfigurationManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ConfigurationManager.swift; sourceTree = "<group>"; };
 		85D438B5256E7C9E00F3BAF8 /* ContextMenuUserScript.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContextMenuUserScript.swift; sourceTree = "<group>"; };
 		85E11C2E25E7DC7E00974CAF /* ExternalURLHandler.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ExternalURLHandler.swift; sourceTree = "<group>"; };
@@ -1173,15 +1177,9 @@
 		85890634267B6CC500D23B0D /* SecureVault */ = {
 			isa = PBXGroup;
 			children = (
-				85CC1D72269EF1880062F04E /* PasswordManagementItemList.swift */,
-				85CC1D74269F6B420062F04E /* PasswordManagementItemView.swift */,
-				85625997269C9C5F00EE44BC /* PasswordManagementPopover.swift */,
-				85625995269C953C00EE44BC /* PasswordManagementViewController.swift */,
-				85625993269C8F9600EE44BC /* PasswordManager.storyboard */,
-				85308E26267FCB22001ABD76 /* PasswordManagerSettings.swift */,
-				85890639267BCD8E00D23B0D /* SaveCredentialsPopover.swift */,
-				8589063B267BCDC000D23B0D /* SaveCredentialsViewController.swift */,
-				85CC1D76269FA1160062F04E /* FaviconView.swift */,
+				85CC1D7826A05E790062F04E /* Model */,
+				85CC1D7F26A05F6C0062F04E /* Services */,
+				85CC1D7926A05E820062F04E /* View */,
 			);
 			path = SecureVault;
 			sourceTree = "<group>";
@@ -1228,6 +1226,37 @@
 				85AE2FF124A33A2D002D507F /* WebKit.framework */,
 			);
 			name = Frameworks;
+			sourceTree = "<group>";
+		};
+		85CC1D7826A05E790062F04E /* Model */ = {
+			isa = PBXGroup;
+			children = (
+				85CC1D7A26A05ECF0062F04E /* PasswordManagementItemListModel.swift */,
+				85CC1D7C26A05F250062F04E /* PasswordManagementItemModel.swift */,
+			);
+			path = Model;
+			sourceTree = "<group>";
+		};
+		85CC1D7926A05E820062F04E /* View */ = {
+			isa = PBXGroup;
+			children = (
+				8589063B267BCDC000D23B0D /* SaveCredentialsViewController.swift */,
+				85890639267BCD8E00D23B0D /* SaveCredentialsPopover.swift */,
+				85625995269C953C00EE44BC /* PasswordManagementViewController.swift */,
+				85625997269C9C5F00EE44BC /* PasswordManagementPopover.swift */,
+				85625993269C8F9600EE44BC /* PasswordManager.storyboard */,
+				85CC1D74269F6B420062F04E /* PasswordManagementItemView.swift */,
+				85CC1D72269EF1880062F04E /* PasswordManagementItemList.swift */,
+			);
+			path = View;
+			sourceTree = "<group>";
+		};
+		85CC1D7F26A05F6C0062F04E /* Services */ = {
+			isa = PBXGroup;
+			children = (
+				85308E26267FCB22001ABD76 /* PasswordManagerSettings.swift */,
+			);
+			path = Services;
 			sourceTree = "<group>";
 		};
 		85D33F1025C82E93002B91A6 /* Configuration */ = {
@@ -1549,18 +1578,19 @@
 			isa = PBXGroup;
 			children = (
 				AA2E423324C8A2270048C0D5 /* ColorView.swift */,
+				85CC1D76269FA1160062F04E /* FaviconView.swift */,
 				14D9B90124F91316000D4D13 /* FocusRingView.swift */,
 				AA86490B24D3494C001BABEE /* GradientView.swift */,
 				AA4E633925E79C0A00134434 /* MouseClickView.swift */,
 				AAA8E8BE24EA8A0A0055E685 /* MouseOverButton.swift */,
 				AAA8E8C024EACA700055E685 /* MouseOverView.swift */,
 				4B65028925E6CBF40054432E /* NibLoadable.swift */,
+				B6E61ECF263A6F97004E11AB /* NSSavePanelExtension.swift */,
 				4B0511D7262CAA7000F6079C /* PaddedImageButton.swift */,
 				B6AAAC23260328950029438D /* ProgressView.swift */,
+				B6E61ED4263A6FC4004E11AB /* SavePanelAccessoryView.xib */,
 				B6D7A2ED25D2418B002B2AE1 /* ShadowView.swift */,
 				AA361A3524EBF0B500EEC649 /* WindowDraggingView.swift */,
-				B6E61ECF263A6F97004E11AB /* NSSavePanelExtension.swift */,
-				B6E61ED4263A6FC4004E11AB /* SavePanelAccessoryView.xib */,
 			);
 			path = View;
 			sourceTree = "<group>";
@@ -2519,12 +2549,14 @@
 				B684592F25C93FBF00DC17B6 /* AppStateRestorationManager.swift in Sources */,
 				AAA892EA250A4CEF005B37B2 /* WindowControllersManager.swift in Sources */,
 				AAC5E4C825D6A6E8007F5990 /* BookmarkPopoverViewController.swift in Sources */,
+				85CC1D7B26A05ECF0062F04E /* PasswordManagementItemListModel.swift in Sources */,
 				AABEE6A924AB4B910043105B /* SuggestionTableCellView.swift in Sources */,
 				AA6820F125503DA9005ED0D5 /* FireViewModel.swift in Sources */,
 				AAA0CC6A253CC43C0079BC96 /* WKUserContentControllerExtension.swift in Sources */,
 				B6A9E45C261460350067D1B9 /* APIRequest.swift in Sources */,
 				AA9FF95D24A1FA1C0039E328 /* TabCollection.swift in Sources */,
 				4B65143E263924B5005B46EB /* EmailUrlExtensions.swift in Sources */,
+				85CC1D7D26A05F250062F04E /* PasswordManagementItemModel.swift in Sources */,
 				AAD86E52267A0DFF005C11BE /* UpdateController.swift in Sources */,
 				85A0118225AF60E700FA6A0C /* FindInPageModel.swift in Sources */,
 				4B9292A226670D2A00AD2C21 /* PseudoFolder.swift in Sources */,

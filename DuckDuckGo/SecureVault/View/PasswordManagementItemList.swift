@@ -20,47 +20,6 @@ import Foundation
 import SwiftUI
 import BrowserServicesKit
 
-//// Using generic "item list" term as eventually this will be more than just accounts.
-///
-/// Could maybe even abstract a bunch of this code to be more generic re-usable styled list for use elsewhere.
-final class PasswordManagementItemListModel: ObservableObject {
-
-    var accounts: [SecureVaultModels.WebsiteAccount]
-
-    @Published private(set) var displayedAccounts: [SecureVaultModels.WebsiteAccount]
-    @Published private(set) var selected: SecureVaultModels.WebsiteAccount?
-
-    var onItemSelected: (SecureVaultModels.WebsiteAccount) -> Void
-
-    init(accounts: [SecureVaultModels.WebsiteAccount], onItemSelected: @escaping (SecureVaultModels.WebsiteAccount) -> Void) {
-        self.accounts = accounts
-        self.displayedAccounts = accounts
-        self.onItemSelected = onItemSelected
-    }
-
-    func selectAccount(_ account: SecureVaultModels.WebsiteAccount) {
-        selected = account
-        onItemSelected(account)
-    }
-
-    func filterUsing(text: String) {
-        if text.isEmpty {
-            displayedAccounts = accounts
-        } else {
-            let filter = text.lowercased()
-            displayedAccounts = accounts.filter { $0.domain.lowercased().contains(filter) || $0.username.lowercased().contains(filter) }
-        }
-    }
-
-    func selectFirst() {
-        selected = nil
-        if let selected = displayedAccounts.first {
-            selectAccount(selected)
-        }
-    }
-
-}
-
 struct PasswordManagementItemListView: View {
 
     @EnvironmentObject var model: PasswordManagementItemListModel
