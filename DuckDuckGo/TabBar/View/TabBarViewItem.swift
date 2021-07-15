@@ -116,6 +116,12 @@ final class TabBarViewItem: NSCollectionViewItem {
         return menu
     }
 
+    var isLeftToSelected: Bool = false {
+        didSet {
+            updateSeparatorView()
+        }
+    }
+
     @IBOutlet weak var faviconImageView: NSImageView! {
         didSet {
             faviconImageView.applyFaviconStyle()
@@ -269,12 +275,19 @@ final class TabBarViewItem: NSCollectionViewItem {
             mouseOverView.mouseOverColor = isSelected || isDragged ? NSColor.clear : NSColor.tabMouseOverColor
         }
 
-        rightSeparatorView.isHidden = isSelected || isDragged
+        updateSeparatorView()
         closeButton.isHidden = !isSelected && !isDragged && widthStage.isCloseButtonHidden
         titleTextField.isHidden = widthStage.isTitleHidden
 
         tabLoadingViewCenterConstraint.priority = widthStage.isTitleHidden && widthStage.isCloseButtonHidden ? .defaultHigh : .defaultLow
         tabLoadingViewLeadingConstraint.priority = widthStage.isTitleHidden && widthStage.isCloseButtonHidden ? .defaultLow : .defaultHigh
+    }
+
+    private func updateSeparatorView() {
+        let newIsHidden = isSelected || isDragged || isLeftToSelected
+        if rightSeparatorView.isHidden != newIsHidden {
+            rightSeparatorView.isHidden = newIsHidden
+        }
     }
 
     @objc func setupMenu() {
