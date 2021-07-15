@@ -69,16 +69,16 @@ final class CSVImportViewController: NSViewController {
         switch state {
         case .awaitingFileSelection:
             selectedFileLabel.isHidden = true
-            selectFileButton.title = "Select File"
+            selectFileButton.title = UserText.importLoginsSelectCSVFile
         case .selectedValidFile(let fileURL):
             let totalLoginsToImport = CSVImporter.totalValidLogins(in: fileURL)
             selectedFileLabel.stringValue = "Importing File: \(fileURL.path) (\(totalLoginsToImport) logins)"
             selectedFileLabel.isHidden = false
-            selectFileButton.title = "Select Another File"
+            selectFileButton.title = UserText.importLoginsSelectAnotherFile
         case .selectedInvalidFile:
             selectedFileLabel.stringValue = "Failed to get CSV file URL"
             selectedFileLabel.isHidden = false
-            selectFileButton.title = "Select File"
+            selectFileButton.title = UserText.importLoginsSelectCSVFile
         }
     }
 

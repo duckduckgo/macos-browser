@@ -143,4 +143,8 @@ struct UserText {
                                           comment: "Displays the version and build numbers")
         return String(format: localized, version, build)
     }
+
+    static let importLoginsSelectCSVFile = NSLocalizedString("import.logins.select-csv-file", value: "Select CSV File", comment: "Button text for selecting a CSV file")
+    static let importLoginsSelectAnotherFile = NSLocalizedString("import.logins.select-another-file", value: "Select Another File", comment: "Button text for selecting another file")
+
 }

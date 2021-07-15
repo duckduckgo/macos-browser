@@ -23,8 +23,9 @@ final class MockLoginImporter: LoginImporter {
 
     var importedLogins: [LoginCredential] = []
 
-    func importLogins(_ logins: [LoginCredential]) throws {
+    func importLogins(_ logins: [LoginCredential]) throws -> LoginImport.Summary {
         self.importedLogins = logins
+        return LoginImport.Summary(successful: logins.map(\.username), duplicates: [], failed: [])
     }
 
 }

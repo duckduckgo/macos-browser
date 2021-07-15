@@ -18,6 +18,18 @@
 
 import Foundation
 
+enum LoginImport {
+
+    struct Summary {
+
+        let successful: [String]
+        let duplicates: [String]
+        let failed: [String]
+
+    }
+
+}
+
 struct LoginCredential: Equatable {
 
     let url: String
@@ -42,6 +54,6 @@ struct LoginCredential: Equatable {
 
 protocol LoginImporter {
 
-    func importLogins(_ logins: [LoginCredential]) throws
+    func importLogins(_ logins: [LoginCredential]) throws -> LoginImport.Summary
 
 }

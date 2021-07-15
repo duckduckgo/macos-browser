@@ -43,7 +43,7 @@ enum DataImportError: Error {
 
     case cannotReadFile
     case malformedData
-    case temporaryError
+    case cannotAccessSecureVault
 
 }
 

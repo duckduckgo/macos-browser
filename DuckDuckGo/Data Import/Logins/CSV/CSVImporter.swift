@@ -1,5 +1,5 @@
 //
-//  CSVLoginImporter.swift
+//  CSVImporter.swift
 //
 //  Copyright © 2021 DuckDuckGo. All rights reserved.
 //
@@ -20,7 +20,7 @@ import Foundation
 
 final class CSVImporter: DataImporter {
 
-    typealias ImportedType = [LoginCredential]
+    typealias ImportedType = LoginImport.Summary
 
     private let fileURL: URL
     private let loginImporter: LoginImporter
@@ -47,7 +47,7 @@ final class CSVImporter: DataImporter {
         }
     }
 
-    func importData(types: [DataImport.DataType], completion: (Result<[LoginCredential], DataImportError>) -> Void) {
+    func importData(types: [DataImport.DataType], completion: (Result<LoginImport.Summary, DataImportError>) -> Void) {
         guard let fileContents = try? String(contentsOf: fileURL, encoding: .utf8) else {
             completion(.failure(.cannotReadFile))
             return
@@ -56,10 +56,10 @@ final class CSVImporter: DataImporter {
         let loginCredentials = Self.extractLogins(from: fileContents)
 
         do {
-            try loginImporter.importLogins(loginCredentials)
-            completion(.success(loginCredentials))
+            let summary = try loginImporter.importLogins(loginCredentials)
+            completion(.success(summary))
         } catch {
-            completion(.failure(.temporaryError))
+            completion(.failure(.cannotAccessSecureVault))
         }
     }
 

@@ -27,15 +27,31 @@ final class SecureVaultLoginImporter: LoginImporter {
         self.secureVault = secureVault
     }
 
-    func importLogins(_ logins: [LoginCredential]) throws {
+    func importLogins(_ logins: [LoginCredential]) throws -> LoginImport.Summary {
         let vault = try SecureVaultFactory.default.makeVault()
+
+        var successful: [String] = []
+        var duplicates: [String] = []
+        var failed: [String] = []
 
         for login in logins {
             let account = SecureVaultModels.WebsiteAccount(username: login.username, domain: login.url)
             let credentials = SecureVaultModels.WebsiteCredentials(account: account, password: login.password.data(using: .utf8)!)
+            let importSummaryValue = "\(credentials.account.domain) (\(credentials.account.username))"
 
-            try? vault.storeWebsiteCredentials(credentials)
+            do {
+                try vault.storeWebsiteCredentials(credentials)
+                successful.append(importSummaryValue)
+            } catch {
+                if case .duplicateRecord = error as? SecureVaultError {
+                    duplicates.append(importSummaryValue)
+                } else {
+                    failed.append(importSummaryValue)
+                }
+            }
         }
+
+        return LoginImport.Summary(successful: successful, duplicates: duplicates, failed: failed)
     }
 
 }

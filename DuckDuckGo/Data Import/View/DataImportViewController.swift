@@ -26,12 +26,25 @@ final class DataImportViewController: NSViewController {
         static let identifier = "DataImportViewController"
     }
 
+    enum ViewState {
+        case unableToImport
+        case ableToImport
+        case failedToImport
+        case completedImport
+    }
+
     static func create() -> DataImportViewController {
         let storyboard = NSStoryboard(name: Constants.storyboardName, bundle: nil)
         return storyboard.instantiateController(identifier: Constants.identifier)
     }
 
     private var importer: CSVImporter?
+    private var viewState: ViewState = .unableToImport {
+        didSet {
+            renderCurrentViewState()
+        }
+    }
+
     private weak var currentChildViewController: NSViewController?
 
     @IBOutlet var containerView: NSView!
@@ -52,9 +65,9 @@ final class DataImportViewController: NSViewController {
         importer.importData(types: importableTypes) { result in
             switch result {
             case .success:
-                self.dismiss()
-            case .failure(let error):
-                break // TODO: Show an error
+                self.viewState = .completedImport
+            case .failure:
+                self.viewState = .failedToImport
             }
         }
     }
@@ -74,23 +87,40 @@ final class DataImportViewController: NSViewController {
         }
     }
 
+    private func renderCurrentViewState() {
+        switch viewState {
+        case .unableToImport:
+            self.importButton.title = "Import"
+            self.importButton.isEnabled = false
+        case .ableToImport:
+            self.importButton.title = "Import"
+            self.importButton.isEnabled = true
+        case .completedImport:
+            self.importButton.title = "Done"
+            self.importButton.isEnabled = true
+        case .failedToImport:
+            self.importButton.title = "Done"
+            self.importButton.isEnabled = true
+        }
+    }
+
 }
 
 extension DataImportViewController: CSVImportViewControllerDelegate {
 
     func csvImportViewController(_ viewController: CSVImportViewController, didSelectCSVFileWithURL url: URL?) {
-        if let url = url {
-            self.importButton.isEnabled = true
+        guard let url = url else {
+            self.viewState = .unableToImport
+            return
+        }
 
-            do {
-                let secureVault = try SecureVaultFactory.default.makeVault()
-                let secureVaultImporter = SecureVaultLoginImporter(secureVault: secureVault)
-                self.importer = CSVImporter(fileURL: url, loginImporter: secureVaultImporter)
-            } catch {
-                // TODO: Handle an error when creating the vault
-            }
-        } else {
-            self.importButton.isEnabled = false
+        do {
+            let secureVault = try SecureVaultFactory.default.makeVault()
+            let secureVaultImporter = SecureVaultLoginImporter(secureVault: secureVault)
+            self.importer = CSVImporter(fileURL: url, loginImporter: secureVaultImporter)
+            self.viewState = .ableToImport
+        } catch {
+            self.viewState = .unableToImport
         }
     }
 
