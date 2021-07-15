@@ -30,12 +30,11 @@ final class PrivacyDashboardViewController: NSViewController {
 
     override func viewDidLoad() {
         privacyDashboarScript.delegate = self
-        webView.configuration.userContentController.addUserScript(privacyDashboarScript.makeWKUserScript())
-        webView.configuration.userContentController.addHandler(privacyDashboarScript)
     }
 
     override func viewWillAppear() {
-        let url = Bundle.main.url(forResource: "privacy_dashboard", withExtension: "html")!
+        let url = Bundle.main.url(forResource: "popup", withExtension: "html", subdirectory: "macos/html")!
+        print(url)
         webView.loadFileURL(url, allowingReadAccessTo: url.deletingLastPathComponent())
     }
 

@@ -15,6 +15,7 @@
 		14D9B8FB24F7E089000D4D13 /* AddressBarViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 14D9B8F924F7E089000D4D13 /* AddressBarViewController.swift */; };
 		14D9B90224F91316000D4D13 /* FocusRingView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 14D9B90124F91316000D4D13 /* FocusRingView.swift */; };
 		336D5B18262D8D3C0052E0C9 /* findinpage.js in Resources */ = {isa = PBXBuildFile; fileRef = 336D5AEF262D8D3C0052E0C9 /* findinpage.js */; };
+		33D48120269F3665006A0C4D /* macos in Resources */ = {isa = PBXBuildFile; fileRef = 33D4811F269F3664006A0C4D /* macos */; };
 		4B02198825E05FAC00ED7DEA /* login-detection.js in Resources */ = {isa = PBXBuildFile; fileRef = 4B02197D25E05FAC00ED7DEA /* login-detection.js */; };
 		4B02198925E05FAC00ED7DEA /* FireproofingURLExtensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B02197F25E05FAC00ED7DEA /* FireproofingURLExtensions.swift */; };
 		4B02198A25E05FAC00ED7DEA /* FireproofDomains.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B02198125E05FAC00ED7DEA /* FireproofDomains.swift */; };
@@ -424,6 +425,7 @@
 		14D9B8F924F7E089000D4D13 /* AddressBarViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AddressBarViewController.swift; sourceTree = "<group>"; };
 		14D9B90124F91316000D4D13 /* FocusRingView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FocusRingView.swift; sourceTree = "<group>"; };
 		336D5AEF262D8D3C0052E0C9 /* findinpage.js */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.javascript; path = findinpage.js; sourceTree = "<group>"; };
+		33D4811F269F3664006A0C4D /* macos */ = {isa = PBXFileReference; lastKnownFileType = folder; name = macos; path = "../../../../duckduckgo-privacy-dashboard/build/macos"; sourceTree = "<group>"; };
 		4B02197D25E05FAC00ED7DEA /* login-detection.js */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.javascript; path = "login-detection.js"; sourceTree = "<group>"; };
 		4B02197F25E05FAC00ED7DEA /* FireproofingURLExtensions.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = FireproofingURLExtensions.swift; sourceTree = "<group>"; };
 		4B02198125E05FAC00ED7DEA /* FireproofDomains.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = FireproofDomains.swift; sourceTree = "<group>"; };
@@ -2121,7 +2123,6 @@
 			isa = PBXGroup;
 			children = (
 				B68172A8269C487D006D1092 /* PrivacyDashboardUserScript.swift */,
-				B68172AA269C48CE006D1092 /* privacy_dashboard.js */,
 			);
 			path = Model;
 			sourceTree = "<group>";
@@ -2217,6 +2218,8 @@
 		B6FA8942269C427B00588ECD /* Resources */ = {
 			isa = PBXGroup;
 			children = (
+				33D4811F269F3664006A0C4D /* macos */,
+				B68172AA269C48CE006D1092 /* privacy_dashboard.js */,
 				B6FA8943269C42A300588ECD /* privacy_dashboard.html */,
 				B6FA8945269C42B900588ECD /* privacy_dashboard.css */,
 			);
@@ -2378,6 +2381,7 @@
 				B6FA8944269C42A300588ECD /* privacy_dashboard.html in Resources */,
 				AAE71E3825F7869300D74437 /* HomepageCollectionViewItem.xib in Resources */,
 				4B92929026670D1700AD2C21 /* BookmarkTableCellView.xib in Resources */,
+				33D48120269F3665006A0C4D /* macos in Resources */,
 				4B02198825E05FAC00ED7DEA /* login-detection.js in Resources */,
 				B6E61ED5263A6FC4004E11AB /* SavePanelAccessoryView.xib in Resources */,
 				4B92928E26670D1700AD2C21 /* BookmarkOutlineViewCell.xib in Resources */,

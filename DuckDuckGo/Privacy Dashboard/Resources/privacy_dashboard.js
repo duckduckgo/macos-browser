@@ -2,6 +2,7 @@
 (function() {
 
     function onChangeTrackerBlocking(arg) {
+        
         document.getElementById("trackerBlocking").value = JSON.stringify(arg);
     }
 
