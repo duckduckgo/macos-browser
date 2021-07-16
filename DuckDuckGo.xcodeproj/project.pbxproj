@@ -1240,13 +1240,13 @@
 		85CC1D7926A05E820062F04E /* View */ = {
 			isa = PBXGroup;
 			children = (
-				8589063B267BCDC000D23B0D /* SaveCredentialsViewController.swift */,
-				85890639267BCD8E00D23B0D /* SaveCredentialsPopover.swift */,
-				85625995269C953C00EE44BC /* PasswordManagementViewController.swift */,
-				85625997269C9C5F00EE44BC /* PasswordManagementPopover.swift */,
-				85625993269C8F9600EE44BC /* PasswordManager.storyboard */,
-				85CC1D74269F6B420062F04E /* PasswordManagementItemView.swift */,
 				85CC1D72269EF1880062F04E /* PasswordManagementItemList.swift */,
+				85CC1D74269F6B420062F04E /* PasswordManagementItemView.swift */,
+				85625997269C9C5F00EE44BC /* PasswordManagementPopover.swift */,
+				85625995269C953C00EE44BC /* PasswordManagementViewController.swift */,
+				85625993269C8F9600EE44BC /* PasswordManager.storyboard */,
+				85890639267BCD8E00D23B0D /* SaveCredentialsPopover.swift */,
+				8589063B267BCDC000D23B0D /* SaveCredentialsViewController.swift */,
 			);
 			path = View;
 			sourceTree = "<group>";

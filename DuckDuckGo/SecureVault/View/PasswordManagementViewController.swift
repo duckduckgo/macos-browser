@@ -59,10 +59,13 @@ final class PasswordManagementViewController: NSViewController {
     }
 
     private func createItemView() {
-        let itemModel = PasswordManagementItemModel(onEditBegan: { [weak self] in
-            self?.isDirty = true
+        let itemModel = PasswordManagementItemModel(onEditChanged: { [weak self] isEditing in
+            print("Editing \(isEditing)")
+            self?.isDirty = isEditing
         }, onSave: {
             print("Item saved \($0)")
+        }, onDeleteRequested: {
+            print("Request delete \($0)")
         })
         self.itemModel = itemModel
 

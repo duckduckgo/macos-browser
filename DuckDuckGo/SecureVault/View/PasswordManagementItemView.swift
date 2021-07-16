@@ -53,7 +53,7 @@ private struct ShowItemView: View {
                 Text(model.username)
                 if isHoveringOverUsername {
                     Button {
-                        print("Copy username")
+                        model.copyUsername()
                     } label: {
                         Image("Copy")
                     }.buttonStyle(PlainButtonStyle())
@@ -78,7 +78,6 @@ private struct ShowItemView: View {
 
                 if isHoveringOverPassword || isPasswordVisible {
                     Button {
-                        print("Toggle password")
                         isPasswordVisible = !isPasswordVisible
                     } label: {
                         Image("SecureEyeToggle")
@@ -87,7 +86,7 @@ private struct ShowItemView: View {
 
                 if isHoveringOverPassword {
                     Button {
-                        print("Copy password")
+                        model.copyPassword()
                     } label: {
                         Image("Copy")
                     }.buttonStyle(PlainButtonStyle())
@@ -188,7 +187,6 @@ private struct EditItemView: View {
                 }
 
                 Button {
-                    print("Toggle password")
                     isPasswordVisible = !isPasswordVisible
                 } label: {
                     Image("SecureEyeToggle")
@@ -217,8 +215,6 @@ struct PasswordManagementItemView: View {
 
     @EnvironmentObject var model: PasswordManagementItemModel
 
-    @State var isEditing = false
-
     var body: some View {
 
         if model.credentials != nil {
@@ -226,7 +222,7 @@ struct PasswordManagementItemView: View {
             VStack {
 
                 ZStack {
-                    if isEditing {
+                    if model.isEditing {
                         EditItemView()
                     } else {
                         ShowItemView()
@@ -235,7 +231,7 @@ struct PasswordManagementItemView: View {
 
                 HStack {
 
-                    if isEditing {
+                    if model.isEditing {
                         Button("Delete") {
                             print("Delete")
                         }
@@ -243,31 +239,30 @@ struct PasswordManagementItemView: View {
 
                     Spacer()
 
-                    if isEditing {
+                    if model.isEditing {
                         Button("Cancel") {
                             print("Cancel")
-                            isEditing = false
+                            model.cancel()
                         }
 
                         if #available(macOS 11, *) {
                             Button("Save") {
-                                print("Save")
+                                model.save()
                             }
-                            .keyboardShortcut(.defaultAction)
+                            .keyboardShortcut(.defaultAction) // macOS 11+
                         } else {
                             Button("Save") {
-                                print("Save")
+                                model.save()
                             }
                         }
 
                     } else {
                         Button("Delete") {
-                            print("Delete")
+                            model.requestDelete()
                         }
 
                         Button("Edit") {
-                            print("Edit")
-                            isEditing = true
+                            model.edit()
                         }
                     }
 

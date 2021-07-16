@@ -28,27 +28,13 @@ final class PasswordManagementItemModel: ObservableObject {
         return dateFormatter
     } ()
 
-    var onEditBegan: () -> Void
+    var onEditChanged: (Bool) -> Void
     var onSave: (SecureVaultModels.WebsiteCredentials) -> Void
+    var onDeleteRequested: (SecureVaultModels.WebsiteCredentials) -> Void
 
     var credentials: SecureVaultModels.WebsiteCredentials? {
         didSet {
-            title = credentials?.account.domain ?? ""
-            username = credentials?.account.username ?? ""
-            password = String(data: credentials?.password ?? Data(), encoding: .utf8) ?? ""
-            domain = credentials?.account.domain ?? ""
-
-            if let date = credentials?.account.created {
-                createdDate = Self.dateFormatter.string(from: date)
-            } else {
-                createdDate = ""
-            }
-
-            if let date = credentials?.account.lastUpdated {
-                lastUpdatedDate = Self.dateFormatter.string(from: date)
-            } else {
-                lastUpdatedDate = ""
-            }
+            populateViewModelFromCredentials()
         }
     }
 
@@ -56,13 +42,72 @@ final class PasswordManagementItemModel: ObservableObject {
     @Published var username: String = ""
     @Published var password: String = ""
 
+    @Published var isEditing = false {
+        didSet {
+            self.onEditChanged(isEditing)
+        }
+    }
+
     var domain: String = ""
     var lastUpdatedDate: String = ""
     var createdDate: String = ""
 
-    init(onEditBegan: @escaping () -> Void, onSave: @escaping (SecureVaultModels.WebsiteCredentials) -> Void) {
-        self.onEditBegan = onEditBegan
+    init(onEditChanged: @escaping (Bool) -> Void,
+         onSave: @escaping (SecureVaultModels.WebsiteCredentials) -> Void,
+         onDeleteRequested: @escaping (SecureVaultModels.WebsiteCredentials) -> Void) {
+        self.onEditChanged = onEditChanged
         self.onSave = onSave
+        self.onDeleteRequested = onDeleteRequested
     }
 
+    func copyPassword() {
+        NSPasteboard.general.clearContents()
+        NSPasteboard.general.setString(password, forType: .string)
+    }
+
+    func copyUsername() {
+        NSPasteboard.general.clearContents()
+        NSPasteboard.general.setString(username, forType: .string)
+    }
+
+    func save() {
+        guard var credentials = credentials else { return }
+        // TODO credentials.account.title = title
+        credentials.account.username = username
+        credentials.password = password.data(using: .utf8)! // let it crash?
+        onSave(credentials)
+    }
+
+    func requestDelete() {
+        guard let credentials = credentials else { return }
+        onDeleteRequested(credentials)
+    }
+
+    func edit() {
+        isEditing = true
+    }
+
+    func cancel() {
+        populateViewModelFromCredentials()
+        isEditing = false
+    }
+
+    func populateViewModelFromCredentials() {
+        title = credentials?.account.domain ?? ""
+        username = credentials?.account.username ?? ""
+        password = String(data: credentials?.password ?? Data(), encoding: .utf8) ?? ""
+        domain = credentials?.account.domain ?? ""
+
+        if let date = credentials?.account.created {
+            createdDate = Self.dateFormatter.string(from: date)
+        } else {
+            createdDate = ""
+        }
+
+        if let date = credentials?.account.lastUpdated {
+            lastUpdatedDate = Self.dateFormatter.string(from: date)
+        } else {
+            lastUpdatedDate = ""
+        }
+    }
 }
