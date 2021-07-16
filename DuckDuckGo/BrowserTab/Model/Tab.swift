@@ -115,6 +115,8 @@ final class Tab: NSObject {
            let host = url?.host {
             faviconService.cacheIfNeeded(favicon: favicon, for: host, isFromUserScript: false)
         }
+
+        updateTrackerInfo(url: url)
     }
 
     deinit {
@@ -136,6 +138,7 @@ final class Tab: NSObject {
             }
 
             invalidateSessionStateData()
+            updateTrackerInfo(oldUrl: oldValue, url: url)
             reloadIfNeeded()
         }
     }
@@ -393,7 +396,7 @@ final class Tab: NSObject {
             .weakAssign(to: \.userScripts, on: self)
     }
 
-    // MARK: Find in Page
+    // MARK: - Find in Page
 
     var findInPageCancellable: AnyCancellable?
     private func subscribeToFindInPageTextChange() {
@@ -425,6 +428,21 @@ final class Tab: NSObject {
 
     func updateVisitTitle(_ title: String, url: URL) {
         historyCoordinating.updateTitleIfNeeded(title: title, url: url)
+    }
+
+    // MARK: - Site Rating
+
+    @Published var trackerInfo: TrackerInfo?
+
+    private func updateTrackerInfo(oldUrl: URL? = nil, url: URL?) {
+        guard let url = url, let host = url.host else {
+            trackerInfo = nil
+            return
+        }
+
+        if oldUrl?.host != host {
+            trackerInfo = TrackerInfo(host: host)
+        }
     }
 
 }
@@ -473,16 +491,22 @@ extension Tab: FaviconUserScriptDelegate {
 extension Tab: ContentBlockerUserScriptDelegate {
 
     func contentBlockerUserScriptShouldProcessTrackers(_ script: UserScript) -> Bool {
-        // Not used until site rating support is implemented.
-        return true
+        guard let trackerInfo = trackerInfo else {
+            return false
+        }
+        return trackerInfo.host == url?.host
     }
 
-    func contentBlockerUserScript(_ script: ContentBlockerUserScript, detectedTracker tracker: DetectedTracker, withSurrogate host: String) {
-        // Not used until site rating support is implemented.
+    func contentBlockerUserScript(_ script: ContentBlockerUserScript,
+                                  detectedTracker tracker: DetectedTracker,
+                                  withSurrogate host: String) {
+        trackerInfo?.add(installedSurrogateHost: host)
+
+        contentBlockerUserScript(script, detectedTracker: tracker)
     }
 
     func contentBlockerUserScript(_ script: UserScript, detectedTracker tracker: DetectedTracker) {
-        // Not used until site rating support is implemented.
+        trackerInfo?.add(detectedTracker: tracker)
     }
 
 }
