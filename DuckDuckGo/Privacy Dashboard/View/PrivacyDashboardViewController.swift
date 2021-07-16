@@ -27,6 +27,7 @@ final class PrivacyDashboardViewController: NSViewController {
     private var cancellables = Set<AnyCancellable>()
 
     var tabViewModel: TabViewModel?
+    var trackerInfoViewModel: TrackerInfoViewModel?
 
     override func viewDidLoad() {
         privacyDashboarScript.delegate = self
@@ -72,6 +73,18 @@ final class PrivacyDashboardViewController: NSViewController {
         privacyDashboarScript.setPermissions(usedPermissions, authorizationState: authState, domain: domain, in: webView)
     }
 
+    private func subscribeToTrackerInfo() {
+        #warning("Inject isProtectionOn to TrackerInfoViewModel based on protectionState")
+
+        tabViewModel?.tab.$trackerInfo
+            .receive(on: DispatchQueue.main)
+            .map { trackerInfo in
+                TrackerInfoViewModel(trackerInfo: trackerInfo, isProtectionOn: true)
+            }
+            .weakAssign(to: \.trackerInfoViewModel, on: self)
+            .store(in: &cancellables)
+    }
+
 }
 
 extension PrivacyDashboardViewController: PrivacyDashboardUserScriptDelegate {
@@ -96,7 +109,8 @@ extension PrivacyDashboardViewController: PrivacyDashboardUserScriptDelegate {
 extension PrivacyDashboardViewController: WKNavigationDelegate {
 
     func webView(_ webView: WKWebView, didFinish navigation: WKNavigation!) {
-        self.subscribeToPermissions()
+        subscribeToPermissions()
+        subscribeToTrackerInfo()
     }
 
 }
