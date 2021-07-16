@@ -1,5 +1,5 @@
 //
-//  UpdateController.swift
+//  CrashReport.swift
 //
 //  Copyright © 2021 DuckDuckGo. All rights reserved.
 //
@@ -17,33 +17,32 @@
 //
 
 import Foundation
-import Sparkle
 
 #if OUT_OF_APPSTORE
 
-final class UpdateController: NSObject {
+struct CrashReport {
 
-    private let updater = SUUpdater()
+    static let headerItemsToFilter = [
+        "Anonymous UUID:",
+        "Sleep/Wake UUID:"
+    ]
 
-    override init() {
-        super.init()
+    let url: URL
 
-        configureUpdater()
+    var content: String? {
+        try? String(contentsOf: url)
+            .components(separatedBy: "\n")
+            .filter({ line in
+                for headerItemToFilder in Self.headerItemsToFilter {
+                    if line.hasPrefix(headerItemToFilder) { return false }
+                }
+                return true
+            })
+            .joined(separator: "\n")
     }
 
-    func checkForUpdates(_ sender: Any!) {
-        updater.checkForUpdates(sender)
-    }
-
-    private func configureUpdater() {
-    // The default configuration of Sparkle updates is in Info.plist
-
-#if DEBUG
-
-        updater.automaticallyChecksForUpdates = false
-        updater.updateCheckInterval = 0
-
-#endif
+    var contentData: Data? {
+        content?.data(using: .utf8)
     }
 
 }

@@ -32,6 +32,8 @@ extension Pixel {
                   burnedTabs: BurnedTabs = .init(),
                   burnedWindows: BurnedWindows = .init())
 
+        case crash
+
         case fireproof(kind: FireproofKind, repetition: Repetition = .init(key: "fireproof"), suggested: FireproofingSuggested)
         case fireproofSuggested(repetition: Repetition = .init(key: "fireproof-suggested"))
 
@@ -109,6 +111,9 @@ extension Pixel.Event {
 
         case .burn(repetition: let repetition, burnedTabs: let tabs, burnedWindows: let windows):
             return "m_mac_fire-button.\(repetition)_\(tabs)_\(windows)"
+
+        case .crash:
+            return "m_mac_crash"
 
         case .fireproof(kind: let kind, repetition: let repetition, suggested: let suggested):
             return "m_mac_fireproof_\(kind)_\(repetition)_\(suggested)"

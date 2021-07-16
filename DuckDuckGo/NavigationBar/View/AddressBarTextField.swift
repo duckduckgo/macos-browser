@@ -593,6 +593,11 @@ extension AddressBarTextField: NSTextFieldDelegate {
             return true
         }
 
+        if commandSelector == #selector(NSResponder.insertTab(_:)) {
+            window?.makeFirstResponder(nextKeyView)
+            return false
+        }
+
         guard suggestionWindowController?.window?.isVisible == true else {
             return false
         }
