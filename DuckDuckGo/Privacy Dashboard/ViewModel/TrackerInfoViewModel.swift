@@ -37,16 +37,19 @@ struct TrackerInfoViewModel {
         let value: String
     }
 
-    init(trackerInfo: TrackerInfo, isProtectionOn: Bool) {
+    private(set) var trackerInfo: TrackerInfo
+    private(set) var sections = [Section]()
+
+    init?(trackerInfo: TrackerInfo?, isProtectionOn: Bool) {
+        guard let trackerInfo = trackerInfo else {
+            return nil
+        }
+
         self.trackerInfo = trackerInfo
 
         let trackers = isProtectionOn ? trackerInfo.trackersBlocked : trackerInfo.trackersDetected
         sections = makeSections(from: Array(trackers))
     }
-
-    private(set) var trackerInfo: TrackerInfo
-
-    private(set) var sections = [Section]()
 
     private func makeSections(from trackers: [DetectedTracker]) -> [Section] {
         var sections = [Section]()
@@ -79,17 +82,6 @@ struct TrackerInfoViewModel {
 
     func compareTrackersByHostName(tracker1: DetectedTracker, tracker2: DetectedTracker) -> Bool {
         return tracker1.domain ?? "" < tracker2.domain ?? ""
-    }
-
-}
-
-extension TrackerInfoViewModel {
-
-    init?(trackerInfo: TrackerInfo?, isProtectionOn: Bool) {
-        guard let trackerInfo = trackerInfo else {
-            return nil
-        }
-        self.init(trackerInfo: trackerInfo, isProtectionOn: isProtectionOn)
     }
 
 }

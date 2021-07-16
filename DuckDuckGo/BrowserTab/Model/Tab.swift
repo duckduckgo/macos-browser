@@ -116,7 +116,7 @@ final class Tab: NSObject {
             faviconService.cacheIfNeeded(favicon: favicon, for: host, isFromUserScript: false)
         }
 
-        updateTrackerInfo(url: url)
+        updateDashboardInfo(url: url)
     }
 
     deinit {
@@ -138,7 +138,7 @@ final class Tab: NSObject {
             }
 
             invalidateSessionStateData()
-            updateTrackerInfo(oldUrl: oldValue, url: url)
+            updateDashboardInfo(oldUrl: oldValue, url: url)
             reloadIfNeeded()
         }
     }
@@ -430,18 +430,21 @@ final class Tab: NSObject {
         historyCoordinating.updateTitleIfNeeded(title: title, url: url)
     }
 
-    // MARK: - Site Rating
+    // MARK: - Dashboard Info
 
     @Published var trackerInfo: TrackerInfo?
+    @Published var serverTrust: ServerTrust?
 
-    private func updateTrackerInfo(oldUrl: URL? = nil, url: URL?) {
+    private func updateDashboardInfo(oldUrl: URL? = nil, url: URL?) {
         guard let url = url, let host = url.host else {
             trackerInfo = nil
+            serverTrust = nil
             return
         }
 
-        if oldUrl?.host != host {
+        if oldUrl?.host != host || oldUrl?.scheme != url.scheme {
             trackerInfo = TrackerInfo(host: host)
+            serverTrust = nil
         }
     }
 
@@ -569,6 +572,9 @@ extension Tab: WKNavigationDelegate {
             return
         }
         completionHandler(.performDefaultHandling, nil)
+        if let host = webView.url?.host, let serverTrust = challenge.protectionSpace.serverTrust {
+            self.serverTrust = ServerTrust(host: host, secTrust: serverTrust)
+        }
     }
 
     struct Constants {

@@ -289,6 +289,8 @@
 		AA97BF4625135DD30014931A /* ApplicationDockMenu.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA97BF4525135DD30014931A /* ApplicationDockMenu.swift */; };
 		AA9B7C7E26A06E040008D425 /* TrackerInfo.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA9B7C7D26A06E040008D425 /* TrackerInfo.swift */; };
 		AA9B7C8126A06E880008D425 /* TrackerInfoViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA9B7C8026A06E880008D425 /* TrackerInfoViewModel.swift */; };
+		AA9B7C8326A197A00008D425 /* ServerTrust.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA9B7C8226A197A00008D425 /* ServerTrust.swift */; };
+		AA9B7C8526A199B60008D425 /* ServerTrustViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA9B7C8426A199B60008D425 /* ServerTrustViewModel.swift */; };
 		AA9C362825518C44004B1BA3 /* WebsiteDataStoreMock.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA9C362725518C44004B1BA3 /* WebsiteDataStoreMock.swift */; };
 		AA9C363025518CA9004B1BA3 /* FireTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA9C362F25518CA9004B1BA3 /* FireTests.swift */; };
 		AA9E9A5625A3AE8400D1959D /* NSWindowExtension.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA9E9A5525A3AE8400D1959D /* NSWindowExtension.swift */; };
@@ -783,6 +785,8 @@
 		AA97BF4525135DD30014931A /* ApplicationDockMenu.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ApplicationDockMenu.swift; sourceTree = "<group>"; };
 		AA9B7C7D26A06E040008D425 /* TrackerInfo.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TrackerInfo.swift; sourceTree = "<group>"; };
 		AA9B7C8026A06E880008D425 /* TrackerInfoViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TrackerInfoViewModel.swift; sourceTree = "<group>"; };
+		AA9B7C8226A197A00008D425 /* ServerTrust.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ServerTrust.swift; sourceTree = "<group>"; };
+		AA9B7C8426A199B60008D425 /* ServerTrustViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ServerTrustViewModel.swift; sourceTree = "<group>"; };
 		AA9C362725518C44004B1BA3 /* WebsiteDataStoreMock.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WebsiteDataStoreMock.swift; sourceTree = "<group>"; };
 		AA9C362F25518CA9004B1BA3 /* FireTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FireTests.swift; sourceTree = "<group>"; };
 		AA9E9A5525A3AE8400D1959D /* NSWindowExtension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NSWindowExtension.swift; sourceTree = "<group>"; };
@@ -2039,6 +2043,7 @@
 			isa = PBXGroup;
 			children = (
 				AA9B7C8026A06E880008D425 /* TrackerInfoViewModel.swift */,
+				AA9B7C8426A199B60008D425 /* ServerTrustViewModel.swift */,
 			);
 			path = ViewModel;
 			sourceTree = "<group>";
@@ -2531,6 +2536,7 @@
 				B68172A8269C487D006D1092 /* PrivacyDashboardUserScript.swift */,
 				B6106BA226A7BEA00013B453 /* PermissionAuthorizationState.swift */,
 				AA9B7C7D26A06E040008D425 /* TrackerInfo.swift */,
+				AA9B7C8226A197A00008D425 /* ServerTrust.swift */,
 			);
 			path = Model;
 			sourceTree = "<group>";
@@ -2926,6 +2932,7 @@
 				AABEE6A524AA0A7F0043105B /* SuggestionViewController.swift in Sources */,
 				85AC3AF725D5DBFD00C7D2AA /* DataExtension.swift in Sources */,
 				B6A924D42664BBBB001A28CA /* WKWebViewDownloadDelegate.swift in Sources */,
+				AA9B7C8526A199B60008D425 /* ServerTrustViewModel.swift in Sources */,
 				85480FCF25D1AA22009424E3 /* ConfigurationStoring.swift in Sources */,
 				858A798326A8B75F00A75A42 /* CopyHandler.swift in Sources */,
 				4B9292D22667123700AD2C21 /* AddFolderModalViewController.swift in Sources */,
@@ -2958,6 +2965,7 @@
 				4B0511CB262CAA5A00F6079C /* DownloadPreferencesTableCellView.swift in Sources */,
 				4B9292AA26670D3700AD2C21 /* Bookmark.xcmappingmodel in Sources */,
 				AAC5E4D025D6A709007F5990 /* Bookmark.swift in Sources */,
+				AA9B7C8326A197A00008D425 /* ServerTrust.swift in Sources */,
 				B64C853826944B880048FEBE /* StoredPermission.swift in Sources */,
 				AA5D6DAC24A340F700C6FBCE /* WebViewStateObserver.swift in Sources */,
 				4B92928C26670D1700AD2C21 /* OutlineSeparatorViewCell.swift in Sources */,

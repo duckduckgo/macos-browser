@@ -28,6 +28,7 @@ final class PrivacyDashboardViewController: NSViewController {
 
     weak var tabViewModel: TabViewModel?
     var trackerInfoViewModel: TrackerInfoViewModel?
+    var serverTrustViewModel: ServerTrustViewModel?
 
     override func viewDidLoad() {
         privacyDashboarScript.delegate = self
@@ -77,11 +78,23 @@ final class PrivacyDashboardViewController: NSViewController {
         #warning("Inject isProtectionOn to TrackerInfoViewModel based on protectionState")
 
         tabViewModel?.tab.$trackerInfo
-            .receive(on: DispatchQueue.main)
+            .receive(on: DispatchQueue.global(qos: .userInitiated))
             .map { trackerInfo in
                 TrackerInfoViewModel(trackerInfo: trackerInfo, isProtectionOn: true)
             }
+            .receive(on: DispatchQueue.main)
             .weakAssign(to: \.trackerInfoViewModel, on: self)
+            .store(in: &cancellables)
+    }
+
+    private func subscribeToServerTrust() {
+        tabViewModel?.tab.$serverTrust
+            .receive(on: DispatchQueue.global(qos: .userInitiated))
+            .map { serverTrust in
+                ServerTrustViewModel(serverTrust: serverTrust)
+            }
+            .receive(on: DispatchQueue.main)
+            .weakAssign(to: \.serverTrustViewModel, on: self)
             .store(in: &cancellables)
     }
 
@@ -117,6 +130,7 @@ extension PrivacyDashboardViewController: WKNavigationDelegate {
     func webView(_ webView: WKWebView, didFinish navigation: WKNavigation!) {
         subscribeToPermissions()
         subscribeToTrackerInfo()
+        subscribeToServerTrust()
     }
 
 }
