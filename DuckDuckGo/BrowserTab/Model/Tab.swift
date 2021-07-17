@@ -504,12 +504,13 @@ extension Tab: EmailManagerRequestDelegate {
 
     // swiftlint:disable function_parameter_count
     func emailManager(_ emailManager: EmailManager,
-                      didRequestAliasWithURL url: URL,
+                      requested url: URL,
                       method: String,
                       headers: [String: String],
+                      parameters: [String: String]?,
+                      httpBody: Data?,
                       timeoutInterval: TimeInterval,
                       completion: @escaping (Data?, Error?) -> Void) {
-
         let currentQueue = OperationQueue.current
 
         var request = URLRequest(url: url, timeoutInterval: timeoutInterval)
