@@ -513,9 +513,18 @@ extension Tab: EmailManagerRequestDelegate {
                       completion: @escaping (Data?, Error?) -> Void) {
         let currentQueue = OperationQueue.current
 
-        var request = URLRequest(url: url, timeoutInterval: timeoutInterval)
+        let finalURL: URL
+
+        if let parameters = parameters {
+            finalURL = (try? url.addParameters(parameters)) ?? url
+        } else {
+            finalURL = url
+        }
+
+        var request = URLRequest(url: finalURL, timeoutInterval: timeoutInterval)
         request.allHTTPHeaderFields = headers
         request.httpMethod = method
+        request.httpBody = httpBody
         URLSession.shared.dataTask(with: request) { (data, _, error) in
             currentQueue?.addOperation {
                 completion(data, error)
