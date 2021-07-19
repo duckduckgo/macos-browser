@@ -29,7 +29,7 @@ final class PasswordManagementItemModel: ObservableObject {
     } ()
 
     var onEditChanged: (Bool) -> Void
-    var onSave: (SecureVaultModels.WebsiteCredentials) -> Void
+    var onSaveRequested: (SecureVaultModels.WebsiteCredentials) -> Void
     var onDeleteRequested: (SecureVaultModels.WebsiteCredentials) -> Void
 
     var credentials: SecureVaultModels.WebsiteCredentials? {
@@ -53,10 +53,10 @@ final class PasswordManagementItemModel: ObservableObject {
     var createdDate: String = ""
 
     init(onEditChanged: @escaping (Bool) -> Void,
-         onSave: @escaping (SecureVaultModels.WebsiteCredentials) -> Void,
+         onSaveRequested: @escaping (SecureVaultModels.WebsiteCredentials) -> Void,
          onDeleteRequested: @escaping (SecureVaultModels.WebsiteCredentials) -> Void) {
         self.onEditChanged = onEditChanged
-        self.onSave = onSave
+        self.onSaveRequested = onSaveRequested
         self.onDeleteRequested = onDeleteRequested
     }
 
@@ -75,7 +75,7 @@ final class PasswordManagementItemModel: ObservableObject {
         // TODO credentials.account.title = title
         credentials.account.username = username
         credentials.password = password.data(using: .utf8)! // let it crash?
-        onSave(credentials)
+        onSaveRequested(credentials)
     }
 
     func requestDelete() {

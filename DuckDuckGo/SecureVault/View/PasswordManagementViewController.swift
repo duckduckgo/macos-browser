@@ -62,8 +62,10 @@ final class PasswordManagementViewController: NSViewController {
         let itemModel = PasswordManagementItemModel(onEditChanged: { [weak self] isEditing in
             print("Editing \(isEditing)")
             self?.isDirty = isEditing
-        }, onSave: {
-            print("Item saved \($0)")
+        }, onSaveRequested: { [weak self] in
+            print("Requested save \($0)")
+            try? SecureVaultFactory.default.makeVault().storeWebsiteCredentials($0)
+            self?.parent?.dismiss()
         }, onDeleteRequested: {
             print("Request delete \($0)")
         })
