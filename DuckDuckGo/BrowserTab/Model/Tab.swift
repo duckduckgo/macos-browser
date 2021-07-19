@@ -173,6 +173,10 @@ final class Tab: NSObject {
         sessionStateData = nil
     }
 
+    func refreshAutofill() {
+        // userScripts.autofillScript.refresh()
+    }
+
     func getActualSessionStateData() -> Data? {
         if let sessionStateData = sessionStateData {
             return sessionStateData

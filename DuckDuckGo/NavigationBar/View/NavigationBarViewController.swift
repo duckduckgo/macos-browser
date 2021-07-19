@@ -43,7 +43,7 @@ final class NavigationBarViewController: NSViewController {
 
     private lazy var bookmarkListPopover = BookmarkListPopover()
     private lazy var saveCredentialsPopover: SaveCredentialsPopover = SaveCredentialsPopover()
-    private lazy var passwordManagement: PasswordManagementPopover = PasswordManagementPopover()
+    private lazy var passwordManagementPopover: PasswordManagementPopover = PasswordManagementPopover()
 
     private var urlCancellable: AnyCancellable?
     private var selectedTabViewModelCancellable: AnyCancellable?
@@ -168,6 +168,7 @@ final class NavigationBarViewController: NSViewController {
     func listenToPasswordManagerNotifications() {
         passwordManagerNotificationCancellable = NotificationCenter.default.publisher(for: .PasswordManagerChanged).sink { [weak self] _ in
             self?.updatePasswordManagementButton()
+            self?.updatePageCredentials()
         }
     }
 
@@ -177,8 +178,10 @@ final class NavigationBarViewController: NSViewController {
     }
 
     func showPasswordManagementPopover() {
+        guard !saveCredentialsPopover.isShown else { return }
+
         passwordManagementButton.isHidden = false
-        passwordManagement.show(relativeTo: passwordManagementButton.bounds.insetFromLineOfDeath(),
+        passwordManagementPopover.show(relativeTo: passwordManagementButton.bounds.insetFromLineOfDeath(),
                                 of: passwordManagementButton,
                                 preferredEdge: .minY)
         Pixel.fire(.logins(source: .button))
@@ -222,7 +225,7 @@ final class NavigationBarViewController: NSViewController {
 
         passwordManagementButton.image = NSImage(named: "PasswordManagement")
 
-        if passwordManagement.viewController.isDirty {
+        if passwordManagementPopover.viewController.isDirty {
             // Remember to reset this once the controller is not dirty
             passwordManagementButton.image = NSImage(named: "PasswordManagementDirty")
             passwordManagementButton.isHidden = false
@@ -230,17 +233,21 @@ final class NavigationBarViewController: NSViewController {
         }
 
         // We don't want to remove the button if the popever is showing
-        if passwordManagement.isShown {
+        if passwordManagementPopover.isShown {
             return
         }
 
-        passwordManagement.viewController.domain = nil
+        passwordManagementPopover.viewController.domain = nil
         guard let url = url, let domain = url.host else {
             passwordManagementButton.isHidden = true
             return
         }
-        passwordManagement.viewController.domain = domain
+        passwordManagementPopover.viewController.domain = domain
         passwordManagementButton.isHidden = (try? SecureVaultFactory.default.makeVault().accountsFor(domain: domain).isEmpty) ?? false
+    }
+
+    private func updatePageCredentials() {
+        tabCollectionViewModel.selectedTabViewModel?.tab.refreshAutofill()
     }
 
     private func subscribeToCredentialsToSave() {
