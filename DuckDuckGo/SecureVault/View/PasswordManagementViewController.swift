@@ -71,8 +71,8 @@ final class PasswordManagementViewController: NSViewController {
     }
 
     private func syncModelsOnCredentials(_ credentials: SecureVaultModels.WebsiteCredentials) {
-        self?.itemModel?.credentials = $0
-        self?.listModel?.updateAccount($0.account)
+        self.itemModel?.credentials = credentials
+        self.listModel?.updateAccount(credentials.account)
     }
 
     private func createItemView() {
