@@ -27,11 +27,10 @@ final class PrivacyDashboardViewController: NSViewController {
     private var cancellables = Set<AnyCancellable>()
 
     var tabViewModel: TabViewModel?
-    var trackerInfoViewModel: TrackerInfoViewModel?
-    var serverTrustViewModel: ServerTrustViewModel?
 
     override func viewDidLoad() {
         privacyDashboarScript.delegate = self
+        initWebView()
     }
 
     override func viewWillAppear() {
@@ -41,6 +40,20 @@ final class PrivacyDashboardViewController: NSViewController {
 
     override func viewWillDisappear() {
         cancellables.removeAll()
+    }
+
+    private func initWebView() {
+
+#if DEBUG
+        let configuration = WKWebViewConfiguration()
+        configuration.preferences.setValue(true, forKey: "developerExtrasEnabled")
+        let webView = WKWebView(frame: .zero, configuration: configuration)
+#else
+        let webView = WKWebView(frame: .zero)
+#endif
+        webView.navigationDelegate = self
+        self.webView = webView
+        view.addAndLayout(webView)
     }
 
     private func subscribeToPermissions() {
@@ -83,7 +96,10 @@ final class PrivacyDashboardViewController: NSViewController {
                 TrackerInfoViewModel(trackerInfo: trackerInfo, isProtectionOn: true)
             }
             .receive(on: DispatchQueue.main)
-            .weakAssign(to: \.trackerInfoViewModel, on: self)
+            .sink(receiveValue: { [weak self] trackerInfoViewModel in
+                guard let self = self, let trackerInfoViewModel = trackerInfoViewModel else { return }
+                self.privacyDashboarScript.setTrackerInfo(trackerInfoViewModel, webView: self.webView)
+            })
             .store(in: &cancellables)
     }
 
@@ -94,7 +110,10 @@ final class PrivacyDashboardViewController: NSViewController {
                 ServerTrustViewModel(serverTrust: serverTrust)
             }
             .receive(on: DispatchQueue.main)
-            .weakAssign(to: \.serverTrustViewModel, on: self)
+            .sink(receiveValue: { [weak self] serverTrustViewModel in
+                guard let self = self, let serverTrustViewModel = serverTrustViewModel else { return }
+                self.privacyDashboarScript.setServerTrust(serverTrustViewModel, webView: self.webView)
+            })
             .store(in: &cancellables)
     }
 

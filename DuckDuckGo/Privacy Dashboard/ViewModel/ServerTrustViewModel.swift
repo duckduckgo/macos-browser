@@ -18,9 +18,9 @@
 
 import Foundation
 
-struct ServerTrustViewModel {
+struct ServerTrustViewModel: Encodable {
 
-    struct SecCertificateViewModel {
+    struct SecCertificateViewModel: Encodable {
 
         let summary: String?
         let commonName: String?
@@ -51,7 +51,7 @@ struct ServerTrustViewModel {
 
     }
 
-    struct SecKeyViewModel {
+    struct SecKeyViewModel: Encodable {
 
         static func typeToString(_ type: String) -> String? {
             switch type as CFString {
@@ -112,7 +112,6 @@ struct ServerTrustViewModel {
 
     }
 
-    let serverTrust: ServerTrust
     let secCertificateViewModels: [SecCertificateViewModel]
 
     init?(serverTrust: ServerTrust?) {
@@ -131,7 +130,6 @@ struct ServerTrustViewModel {
             secCertificateViewModels.append(certificateViewModel)
         }
 
-        self.serverTrust = serverTrust
         self.secCertificateViewModels = secCertificateViewModels
     }
 

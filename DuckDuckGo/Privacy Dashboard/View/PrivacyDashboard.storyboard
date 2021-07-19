@@ -1,9 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<document type="com.apple.InterfaceBuilder3.Cocoa.Storyboard.XIB" version="3.0" toolsVersion="17701" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none" useAutolayout="YES">
+<document type="com.apple.InterfaceBuilder3.Cocoa.Storyboard.XIB" version="3.0" toolsVersion="18122" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none" useAutolayout="YES">
     <dependencies>
         <deployment identifier="macosx"/>
-        <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="17701"/>
-        <plugIn identifier="com.apple.WebKit2IBPlugin" version="17701"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="18122"/>
         <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
     </dependencies>
     <scenes>
@@ -14,24 +13,7 @@
                     <view key="view" id="tOy-S4-hL0">
                         <rect key="frame" x="0.0" y="0.0" width="350" height="563"/>
                         <autoresizingMask key="autoresizingMask"/>
-                        <subviews>
-                            <wkWebView wantsLayer="YES" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="2mW-o7-Kfq">
-                                <rect key="frame" x="0.0" y="0.0" width="350" height="563"/>
-                                <autoresizingMask key="autoresizingMask"/>
-                                <wkWebViewConfiguration key="configuration">
-                                    <audiovisualMediaTypes key="mediaTypesRequiringUserActionForPlayback" none="YES"/>
-                                    <wkPreferences key="preferences"/>
-                                </wkWebViewConfiguration>
-                                <connections>
-                                    <outlet property="UIDelegate" destination="bU7-R8-ocO" id="cMm-NO-oSU"/>
-                                    <outlet property="navigationDelegate" destination="bU7-R8-ocO" id="ekr-Ab-YJT"/>
-                                </connections>
-                            </wkWebView>
-                        </subviews>
                     </view>
-                    <connections>
-                        <outlet property="webView" destination="2mW-o7-Kfq" id="x8B-F2-OuV"/>
-                    </connections>
                 </viewController>
                 <customObject id="9uD-mB-xHs" userLabel="First Responder" customClass="NSResponder" sceneMemberID="firstResponder"/>
             </objects>

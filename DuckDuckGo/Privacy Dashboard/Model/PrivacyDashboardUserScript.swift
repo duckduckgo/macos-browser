@@ -138,6 +138,26 @@ final class PrivacyDashboardUserScript: NSObject {
         evaluate(js: "window.onChangeAllowedPermissions(\(arg))", in: webView)
     }
 
+    func setTrackerInfo(_ trackerInfoViewModel: TrackerInfoViewModel, webView: WKWebView) {
+        guard let json = try? JSONEncoder().encode(trackerInfoViewModel).utf8String() else {
+            assertionFailure("Can't encode trackerInfoViewModel into JSON")
+            return
+        }
+
+        print(json)
+        //evaluate(js: "window.onSomething(\(json))", in: webView)
+    }
+
+    func setServerTrust(_ serverTrustViewModel: ServerTrustViewModel, webView: WKWebView) {
+        guard let json = try? JSONEncoder().encode(serverTrustViewModel).utf8String() else {
+            assertionFailure("Can't encode serverTrustViewModel into JSON")
+            return
+        }
+
+        print(json)
+        //evaluate(js: "window.onSomething(\(json))", in: webView)
+    }
+
     private func evaluate(js: String, in webView: WKWebView) {
         if #available(macOS 11.0, *) {
             webView.evaluateJavaScript(js, in: nil, in: WKContentWorld.defaultClient)
