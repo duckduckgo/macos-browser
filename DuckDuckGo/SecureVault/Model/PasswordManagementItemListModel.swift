@@ -42,6 +42,11 @@ final class PasswordManagementItemListModel: ObservableObject {
         onItemSelected(account)
     }
 
+    func selectAccountWithId(_ id: Int64) {
+        selected = displayedAccounts.first(where: { $0.id == id })
+        print("***", selected, "was selected by id")
+    }
+
     func filterUsing(text: String) {
         if text.isEmpty {
             displayedAccounts = accounts

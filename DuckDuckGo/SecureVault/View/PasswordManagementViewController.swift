@@ -91,13 +91,40 @@ final class PasswordManagementViewController: NSViewController {
     }
 
     private func createListView() {
-        let listModel = PasswordManagementItemListModel(accounts: []) { [weak self] in
-            guard let id = $0.id else { return }
+        let listModel = PasswordManagementItemListModel(accounts: []) { [weak self] account in
+            guard let id = account.id,
+                  let window = self?.view.window else { return }
 
-            // TODO if is dirty then prompt
-            print("*** changing credentials", $0)
+            func loadCredentials() {
+                self?.itemModel?.credentials = try? SecureVaultFactory.default.makeVault().websiteCredentialsFor(accountId: id)
+            }
 
-            self?.itemModel?.credentials = try? SecureVaultFactory.default.makeVault().websiteCredentialsFor(accountId: id)
+            if self?.isDirty == true {
+                print("*** changing credentials", account)
+                let alert = NSAlert.saveChangesToLogin()
+                alert.beginSheetModal(for: window) { response in
+
+                    switch response {
+                    case .alertFirstButtonReturn:
+                        self?.itemModel?.save()
+                        loadCredentials()
+
+                    case .alertSecondButtonReturn:
+                        self?.itemModel?.cancel()
+                        loadCredentials()
+
+                    case .alertThirdButtonReturn:
+                        print("reset selection to ", id)
+                        self?.listModel?.selectAccountWithId(id)
+
+                    default:
+                        fatalError("Unknown response \(response)")
+                    }
+
+                }
+            } else {
+                loadCredentials()
+            }
         }
         self.listModel = listModel
 

@@ -25,14 +25,16 @@ struct PasswordManagementItemListView: View {
     @EnvironmentObject var model: PasswordManagementItemListModel
 
     var body: some View {
+
         List(model.displayedAccounts, id: \.id) { account in
 
-            ItemView(account: account, selected: model.selected?.id == account.id) {
+            ItemView(account: account, selected: model.selected?.id) {
                 model.selectAccount(account)
             }
 
         }
         .listStyle(SidebarListStyle())
+
     }
 
 }
@@ -40,7 +42,7 @@ struct PasswordManagementItemListView: View {
 private struct ItemView: View {
 
     let account: SecureVaultModels.WebsiteAccount
-    let selected: Bool
+    var selected: Int64?
     let action: () -> Void
 
     var body: some View {
@@ -53,13 +55,13 @@ private struct ItemView: View {
 
                 VStack(alignment: .leading, spacing: 4) {
                     Text(account.domain).bold()
-                        .foregroundColor(selected ? selectedTextColor : nil)
+                        .foregroundColor(selected == account.id ? selectedTextColor : nil)
                     Text(account.username)
-                        .foregroundColor(selected ? selectedTextColor : nil)
+                        .foregroundColor(selected == account.id ? selectedTextColor : nil)
                 }
             }
         })
-        .buttonStyle(selected ?
+        .buttonStyle(selected == account.id ?
                         CustomButtonStyle(bgColor: Color(NSColor.selectedControlColor)) :
                         // Almost clear, so that whole view is clickable
                         CustomButtonStyle(bgColor: Color(NSColor.windowBackgroundColor.withAlphaComponent(0.01))))
