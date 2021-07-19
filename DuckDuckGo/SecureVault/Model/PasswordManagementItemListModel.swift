@@ -29,22 +29,32 @@ final class PasswordManagementItemListModel: ObservableObject {
     @Published private(set) var displayedAccounts: [SecureVaultModels.WebsiteAccount]
     @Published private(set) var selected: SecureVaultModels.WebsiteAccount?
 
-    var onItemSelected: (SecureVaultModels.WebsiteAccount) -> Void
+    var onItemSelected: (_ old: SecureVaultModels.WebsiteAccount?, _ new: SecureVaultModels.WebsiteAccount) -> Void
 
-    init(accounts: [SecureVaultModels.WebsiteAccount], onItemSelected: @escaping (SecureVaultModels.WebsiteAccount) -> Void) {
+    init(accounts: [SecureVaultModels.WebsiteAccount],
+         onItemSelected: @escaping (_ old: SecureVaultModels.WebsiteAccount?, _ new: SecureVaultModels.WebsiteAccount) -> Void) {
+
         self.accounts = accounts
         self.displayedAccounts = accounts
         self.onItemSelected = onItemSelected
     }
 
     func selectAccount(_ account: SecureVaultModels.WebsiteAccount) {
+        let previous = selected
         selected = account
-        onItemSelected(account)
+        onItemSelected(previous, account)
     }
 
     func selectAccountWithId(_ id: Int64) {
         selected = displayedAccounts.first(where: { $0.id == id })
-        print("***", selected, "was selected by id")
+    }
+
+    func updateAccount(_ account: SecureVaultModels.WebsiteAccount) {
+        var accounts = displayedAccounts
+        if let index = accounts.firstIndex(where: { $0.id == account.id }) {
+            accounts[index] = account
+            displayedAccounts = accounts
+        }
     }
 
     func filterUsing(text: String) {

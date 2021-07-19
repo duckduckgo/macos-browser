@@ -70,14 +70,18 @@ final class PasswordManagementViewController: NSViewController {
         }
     }
 
+    private func syncModelsOnCredentials(_ credentials: SecureVaultModels.WebsiteCredentials) {
+        self?.itemModel?.credentials = $0
+        self?.listModel?.updateAccount($0.account)
+    }
+
     private func createItemView() {
         let itemModel = PasswordManagementItemModel(onDirtyChanged: { [weak self] isDirty in
-            print("Dirty \(isDirty)")
             self?.isDirty = isDirty
             NotificationCenter.default.post(name: .PasswordManagerDirtyStateChanged, object: isDirty)
-        }, onSaveRequested: {
-            print("Requested save \($0)")
+        }, onSaveRequested: { [weak self] in
             try? SecureVaultFactory.default.makeVault().storeWebsiteCredentials($0)
+            self?.syncModelsOnCredentials($0)
         }, onDeleteRequested: {
             print("Request delete \($0)")
         })
@@ -91,16 +95,16 @@ final class PasswordManagementViewController: NSViewController {
     }
 
     private func createListView() {
-        let listModel = PasswordManagementItemListModel(accounts: []) { [weak self] account in
-            guard let id = account.id,
+        let listModel = PasswordManagementItemListModel(accounts: []) { [weak self] previousValue, newValue in
+            guard let id = newValue.id,
                   let window = self?.view.window else { return }
 
             func loadCredentials() {
-                self?.itemModel?.credentials = try? SecureVaultFactory.default.makeVault().websiteCredentialsFor(accountId: id)
+                guard let credentials = try? SecureVaultFactory.default.makeVault().websiteCredentialsFor(accountId: id) else { return }
+                self?.syncModelsOnCredentials(credentials)
             }
 
             if self?.isDirty == true {
-                print("*** changing credentials", account)
                 let alert = NSAlert.saveChangesToLogin()
                 alert.beginSheetModal(for: window) { response in
 
@@ -114,8 +118,10 @@ final class PasswordManagementViewController: NSViewController {
                         loadCredentials()
 
                     case .alertThirdButtonReturn:
-                        print("reset selection to ", id)
-                        self?.listModel?.selectAccountWithId(id)
+                        if let previousId = previousValue?.id {
+                            // TODO cancel and re-sync, then delete this func?
+                            self?.listModel?.selectAccountWithId(previousId)
+                        }
 
                     default:
                         fatalError("Unknown response \(response)")
@@ -135,7 +141,6 @@ final class PasswordManagementViewController: NSViewController {
 
     private func updateFilter() {
         let text = searchField.stringValue.trimmingWhitespaces()
-        print("*** filtering with", text)
         listModel?.filterUsing(text: text)
     }
 
