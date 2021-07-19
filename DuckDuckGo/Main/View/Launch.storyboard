@@ -31,19 +31,6 @@
                                             </connections>
                                         </menuItem>
                                         <menuItem isSeparatorItem="YES" id="wFC-TO-SCJ"/>
-                                        <menuItem title="Import Browser Data..." id="cjx-Dl-3Ee">
-                                            <modifierMask key="keyEquivalentModifierMask"/>
-                                            <connections>
-                                                <action selector="openImportBrowserDataWindow:" target="Ady-hI-5gd" id="qEF-dO-46Y"/>
-                                            </connections>
-                                        </menuItem>
-                                        <menuItem title="Export Browser Data..." id="vta-9Y-Afe">
-                                            <modifierMask key="keyEquivalentModifierMask"/>
-                                            <connections>
-                                                <action selector="openExportBrowserDataWindow:" target="Ady-hI-5gd" id="K5l-AF-4Yn"/>
-                                            </connections>
-                                        </menuItem>
-                                        <menuItem isSeparatorItem="YES" id="yfw-P5-xpf"/>
                                         <menuItem title="Services" id="NMo-om-nkz">
                                             <modifierMask key="keyEquivalentModifierMask"/>
                                             <menu key="submenu" title="Services" systemMenu="services" id="hz9-B4-Xy5"/>
@@ -573,10 +560,10 @@ CQ
                                                 <action selector="resetDefaultGrammarChecks:" target="Ady-hI-5gd" id="Ces-GX-TM5"/>
                                             </connections>
                                         </menuItem>
-                                        <menuItem title="Reset Secure Vault Data" id="d3t-2o-9wg">
+                                        <menuItem title="Fatal Error" id="FeS-hb-rvM" userLabel="Reset Default Browser Prompt">
                                             <modifierMask key="keyEquivalentModifierMask"/>
                                             <connections>
-                                                <action selector="resetSecureVaultData:" target="Ady-hI-5gd" id="Ybr-ky-wrj"/>
+                                                <action selector="triggerFatalError:" target="Ady-hI-5gd" id="pS0-iQ-TPe"/>
                                             </connections>
                                         </menuItem>
                                     </items>

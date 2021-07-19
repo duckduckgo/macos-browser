@@ -43,6 +43,8 @@ public struct UserDefaultsWrapper<T> {
         case saveAsPreferredFileType = "saveAs.selected.filetype"
 
         case passwordManagerDoNotPromptDomains = "com.duckduckgo.passwordmanager.do-not-prompt-domains"
+
+        case lastCrashReportCheckDate = "last.crash.report.check.date"
     }
 
     private let key: Key

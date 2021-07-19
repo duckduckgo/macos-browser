@@ -36,7 +36,10 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
     private var grammarCheckEnabler: GrammarCheckEnabler!
 
 #if OUT_OF_APPSTORE
+
     let updateController = UpdateController()
+    let crashReporter = CrashReporter()
+
 #endif
 
     var appUsageActivityMonitor: AppUsageActivityMonitor?
@@ -84,6 +87,13 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         launchTimingPixel.fire()
 
         appUsageActivityMonitor = AppUsageActivityMonitor(delegate: self)
+
+#if OUT_OF_APPSTORE
+
+        crashReporter.checkForNewReports()
+
+#endif
+
     }
 
     func applicationShouldTerminate(_ sender: NSApplication) -> NSApplication.TerminateReply {

@@ -252,7 +252,6 @@ extension MainViewController {
         if Int(event.keyCode) == kVK_Escape {
             findInPageViewController?.findInPageDone(self)
             checkForEndAddressBarEditing()
-            return true
         }
 
         return false
@@ -268,7 +267,6 @@ extension MainViewController {
         } else {
             navigationBarContainerView.makeMeFirstResponder()
         }
-
     }
 
 }

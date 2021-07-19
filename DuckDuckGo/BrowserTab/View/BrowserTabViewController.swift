@@ -367,12 +367,7 @@ extension BrowserTabViewController: FileDownloadManagerDelegate {
     }
 
     func tab(_ tab: Tab, requestedSaveCredentials credentials: SecureVaultModels.WebsiteCredentials) {
-
-        guard !FireproofDomains.shared.isAllowed(fireproofDomain: credentials.account.domain),
-              PasswordManagerSettings().canPromptOnDomain(credentials.account.domain) else {
-            return
-        }
-
+        guard PasswordManagerSettings().canPromptOnDomain(credentials.account.domain) else { return }
         tabViewModel?.credentialsToSave = credentials
     }
 
@@ -417,6 +412,7 @@ extension BrowserTabViewController: LinkMenuItemSelectors {
         let pasteboard = NSPasteboard.general
         pasteboard.declareTypes([.URL], owner: nil)
         url.write(to: pasteboard)
+        pasteboard.setString(url.absoluteString ?? "", forType: .string)
     }
 
 }
