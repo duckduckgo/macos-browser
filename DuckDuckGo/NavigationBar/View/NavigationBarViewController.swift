@@ -168,7 +168,6 @@ final class NavigationBarViewController: NSViewController {
     func listenToPasswordManagerNotifications() {
         passwordManagerNotificationCancellable = NotificationCenter.default.publisher(for: .PasswordManagerChanged).sink { [weak self] _ in
             self?.updatePasswordManagementButton()
-            self?.updatePageCredentials()
         }
     }
 
@@ -244,10 +243,6 @@ final class NavigationBarViewController: NSViewController {
         }
         passwordManagementPopover.viewController.domain = domain
         passwordManagementButton.isHidden = (try? SecureVaultFactory.default.makeVault().accountsFor(domain: domain).isEmpty) ?? false
-    }
-
-    private func updatePageCredentials() {
-        tabCollectionViewModel.selectedTabViewModel?.tab.refreshAutofill()
     }
 
     private func subscribeToCredentialsToSave() {

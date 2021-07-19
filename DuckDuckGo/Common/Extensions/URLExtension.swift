@@ -85,6 +85,16 @@ extension URL {
         case creatingFailed
     }
 
+    func addParameters(_ parameters: [String: String]) throws -> URL {
+        var url = self
+
+        for parameter in parameters {
+            url = try url.addParameter(name: parameter.key, value: parameter.value)
+        }
+
+        return url
+    }
+
     func addParameter(name: String, value: String) throws -> URL {
         guard var components = URLComponents(url: self, resolvingAgainstBaseURL: false) else { throw ParameterError.parsingFailed }
         var queryItems = components.queryItems ?? [URLQueryItem]()
