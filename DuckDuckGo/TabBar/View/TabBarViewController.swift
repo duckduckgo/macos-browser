@@ -386,11 +386,17 @@ extension TabBarViewController: TabCollectionViewModelDelegate {
         appendToCollectionView(selected: selected)
     }
 
-    func tabCollectionViewModel(_ tabCollectionViewModel: TabCollectionViewModel, didInsertAndSelectAt index: Int) {
+    func tabCollectionViewModelDidInsert(_ tabCollectionViewModel: TabCollectionViewModel,
+                                at index: Int,
+                                selected: Bool) {
         let indexPathSet = Set(arrayLiteral: IndexPath(item: index))
-        collectionView.clearSelection(animated: true)
+        if selected {
+            collectionView.clearSelection(animated: true)
+        }
         collectionView.animator().insertItems(at: indexPathSet)
-        collectionView.selectItems(at: indexPathSet, scrollPosition: .centeredHorizontally)
+        if selected {
+            collectionView.selectItems(at: indexPathSet, scrollPosition: .centeredHorizontally)
+        }
 
         updateTabMode()
         updateEmptyTabArea()

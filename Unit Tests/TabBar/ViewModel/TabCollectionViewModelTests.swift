@@ -118,22 +118,6 @@ final class TabCollectionViewModelTests: XCTestCase {
         XCTAssert(tabCollectionViewModel.selectedTabViewModel === tabCollectionViewModel.tabViewModel(at: index))
     }
 
-    func testAppendAfterSelected() {
-        let tabCollectionViewModel = TabCollectionViewModel.aTabCollectionViewModel()
-
-        tabCollectionViewModel.appendNewTab()
-
-        let tab1 = tabCollectionViewModel.tabCollection.tabs[0]
-        let tab2 = tabCollectionViewModel.tabCollection.tabs[1]
-
-        let index = tabCollectionViewModel.tabCollection.tabs.count
-        tabCollectionViewModel.appendNewTabAfterSelected()
-
-        XCTAssert(tabCollectionViewModel.selectedTabViewModel === tabCollectionViewModel.tabViewModel(at: index))
-        XCTAssertNotEqual(tabCollectionViewModel.selectedTabViewModel?.tab, tab1)
-        XCTAssertNotEqual(tabCollectionViewModel.selectedTabViewModel?.tab, tab2)
-    }
-
     func testWhenTabIsAppendedWithSelectedAsFalseThenSelectionIsPreserved() {
         let tabCollectionViewModel = TabCollectionViewModel.aTabCollectionViewModel()
         let selectedTabViewModel = tabCollectionViewModel.selectedTabViewModel
@@ -171,6 +155,69 @@ final class TabCollectionViewModelTests: XCTestCase {
 
         XCTAssert(originalFirstTabViewModel !== tabCollectionViewModel.tabViewModel(at: 0))
         XCTAssert(tabCollectionViewModel.tabCollection.tabs.count == 2)
+    }
+
+    func testWhenInsertChildAndParentIsNil_ThenNoChildIsInserted() {
+        let tabCollectionViewModel = TabCollectionViewModel.aTabCollectionViewModel()
+
+        let tab = Tab()
+        tabCollectionViewModel.insertChild(tab: tab, selected: false)
+
+        XCTAssert(tab !== tabCollectionViewModel.tabViewModel(at: 0)?.tab)
+        XCTAssert(tabCollectionViewModel.tabCollection.tabs.count == 1)
+    }
+
+    func testWhenInsertChildAndParentIsntPartOfTheTabCollection_ThenNoChildIsInserted() {
+        let tabCollectionViewModel = TabCollectionViewModel.aTabCollectionViewModel()
+
+        let parentTab = Tab()
+        let tab = Tab(parentTab: parentTab)
+        tabCollectionViewModel.insertChild(tab: tab, selected: false)
+
+        XCTAssert(tab !== tabCollectionViewModel.tabViewModel(at: 0)?.tab)
+        XCTAssert(tabCollectionViewModel.tabCollection.tabs.count == 1)
+    }
+
+    func testWhenInsertChildAndNoOtherChildTabIsNearParent_ThenTabIsInsertedRightNextToParent() {
+        let tabCollectionViewModel = TabCollectionViewModel.aTabCollectionViewModel()
+
+        let parentTab = Tab()
+        tabCollectionViewModel.append(tab: parentTab)
+
+        let tab = Tab(parentTab: parentTab)
+        tabCollectionViewModel.insertChild(tab: tab, selected: false)
+
+        XCTAssert(tab === tabCollectionViewModel.tabViewModel(at: 2)?.tab)
+    }
+
+    func testWhenInsertChildAndOtherChildTabsAreNearParent_ThenTabIsInsertedAtTheEndOfChildList() {
+        let tabCollectionViewModel = TabCollectionViewModel.aTabCollectionViewModel()
+        tabCollectionViewModel.appendNewTab()
+
+        let parentTab = Tab()
+        tabCollectionViewModel.insert(tab: parentTab, at: 1, selected: true)
+
+        tabCollectionViewModel.insertChild(tab: Tab(parentTab: parentTab), selected: false)
+        tabCollectionViewModel.insertChild(tab: Tab(parentTab: parentTab), selected: false)
+        tabCollectionViewModel.insertChild(tab: Tab(parentTab: parentTab), selected: false)
+
+        let tab = Tab(parentTab: parentTab)
+        tabCollectionViewModel.insertChild(tab: tab, selected: true)
+
+        XCTAssert(tab === tabCollectionViewModel.tabViewModel(at: 5)?.tab)
+    }
+
+    func testWhenInsertChildAndParentIsLast_ThenTabIsAppendedAtTheEnd() {
+        let tabCollectionViewModel = TabCollectionViewModel.aTabCollectionViewModel()
+        tabCollectionViewModel.appendNewTab()
+
+        let parentTab = Tab()
+        tabCollectionViewModel.insert(tab: parentTab, at: 1, selected: true)
+
+        let tab = Tab(parentTab: parentTab)
+        tabCollectionViewModel.insertChild(tab: tab, selected: false)
+
+        XCTAssert(tab === tabCollectionViewModel.tabViewModel(at: 2)?.tab)
     }
 
     // MARK: - Remove

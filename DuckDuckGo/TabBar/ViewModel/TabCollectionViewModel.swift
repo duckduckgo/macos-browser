@@ -23,7 +23,7 @@ import Combine
 protocol TabCollectionViewModelDelegate: AnyObject {
 
     func tabCollectionViewModelDidAppend(_ tabCollectionViewModel: TabCollectionViewModel, selected: Bool)
-    func tabCollectionViewModel(_ tabCollectionViewModel: TabCollectionViewModel, didInsertAndSelectAt index: Int)
+    func tabCollectionViewModelDidInsert(_ tabCollectionViewModel: TabCollectionViewModel, at index: Int, selected: Bool)
     func tabCollectionViewModel(_ tabCollectionViewModel: TabCollectionViewModel,
                                 didRemoveTabAt removalIndex: Int,
                                 andSelectTabAt selectionIndex: Int?)
@@ -134,45 +134,16 @@ final class TabCollectionViewModel: NSObject {
     }
 
     func appendNewTab(type: Tab.TabType = .standard) {
-        tabCollection.append(tab: Tab(tabType: type))
-        select(at: tabCollection.tabs.count - 1)
-
-        delegate?.tabCollectionViewModelDidAppend(self, selected: true)
-    }
-
-    func appendNewTabAfterSelected(with webViewConfiguration: WebViewConfiguration? = nil) {
-        guard let selectionIndex = selectionIndex else {
-            os_log("TabCollectionViewModel: No tab selected", type: .error)
-            return
-        }
-        let tab: Tab
-        if let webViewConfiguration = webViewConfiguration {
-            tab = Tab(webViewConfiguration: webViewConfiguration, parentTab: selectedTabViewModel?.tab)
-        } else {
-            tab = Tab(parentTab: selectedTabViewModel?.tab)
-        }
-
-        let newIndex = selectionIndex + 1
-        tabCollection.insert(tab: tab, at: newIndex)
-        select(at: newIndex)
-
-        delegate?.tabCollectionViewModel(self, didInsertAndSelectAt: newIndex)
-
-        selectParentOnRemoval = true
+        append(tab: Tab(tabType: type), selected: true)
     }
 
     func append(tab: Tab, selected: Bool = true) {
-        guard let selectionIndex = self.selectionIndex else {
-            os_log("TabCollectionViewModel: No tab selected", type: .error)
-            return
-        }
-
         tabCollection.append(tab: tab)
+
         if selected {
             select(at: tabCollection.tabs.count - 1)
             delegate?.tabCollectionViewModelDidAppend(self, selected: true)
         } else {
-            select(at: selectionIndex)
             delegate?.tabCollectionViewModelDidAppend(self, selected: false)
         }
 
@@ -191,15 +162,33 @@ final class TabCollectionViewModel: NSObject {
         delegate?.tabCollectionViewModelDidMultipleChanges(self)
     }
 
-    func insert(tab: Tab, at index: Int = 0) {
+    func insert(tab: Tab, at index: Int = 0, selected: Bool = true) {
         tabCollection.insert(tab: tab, at: index)
-        select(at: index)
+        if selected {
+            select(at: index)
+        }
+        delegate?.tabCollectionViewModelDidInsert(self, at: index, selected: selected)
 
-        delegate?.tabCollectionViewModel(self, didInsertAndSelectAt: index)
+        if selected {
+            self.selectParentOnRemoval = true
+        }
     }
 
     func insertNewTab(at index: Int = 0) {
         insert(tab: Tab(), at: index)
+    }
+
+    func insertChild(tab: Tab, selected: Bool) {
+        guard let parentTab = tab.parentTab,
+              let parentTabIndex = tabCollection.tabs.firstIndex(where: { $0 === parentTab }) else {
+            os_log("TabCollection: No tab selected", type: .error)
+            return
+        }
+
+        // Insert at the end of the child tabs
+        var newIndex = parentTabIndex + 1
+        while tabCollection.tabs[safe:newIndex]?.parentTab === parentTab { newIndex += 1 }
+        insert(tab: tab, at: newIndex, selected: selected)
     }
 
     func remove(at index: Int) {
@@ -275,7 +264,7 @@ final class TabCollectionViewModel: NSObject {
         if let lastRemovedTabIndex = lastRemovedTabIndex {
             select(at: lastRemovedTabIndex)
 
-            delegate?.tabCollectionViewModel(self, didInsertAndSelectAt: lastRemovedTabIndex)
+            delegate?.tabCollectionViewModelDidInsert(self, at: lastRemovedTabIndex, selected: true)
         }
     }
 
@@ -293,7 +282,7 @@ final class TabCollectionViewModel: NSObject {
         tabCollection.insert(tab: tabCopy, at: newIndex)
         select(at: newIndex)
 
-        delegate?.tabCollectionViewModel(self, didInsertAndSelectAt: newIndex)
+        delegate?.tabCollectionViewModelDidInsert(self, at: newIndex, selected: true)
     }
 
     func moveTab(at index: Int, to newIndex: Int) {
