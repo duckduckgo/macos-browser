@@ -104,6 +104,7 @@ final class Tab: NSObject {
         configuration.applyStandardConfiguration()
 
         webView = WebView(frame: CGRect.zero, configuration: configuration)
+        permissions = PermissionModel(webView: webView)
 
         super.init()
 
@@ -150,6 +151,7 @@ final class Tab: NSObject {
 
     @PublishedAfter var title: String?
     @PublishedAfter var error: Error?
+    let permissions: PermissionModel
 
     weak private(set) var parentTab: Tab?
 
@@ -219,14 +221,6 @@ final class Tab: NSObject {
                 self.download(from: url, promptForLocation: true)
             }
         }
-    }
-
-    func setPermission(_ permission: PermissionType, muted: Bool) {
-        webView.setPermission(permission, muted: muted)
-    }
-
-    func revokePermission(_ permission: PermissionType) {
-        webView.revokePermission(permission)
     }
 
     private var loginDetectionService: LoginDetectionService?

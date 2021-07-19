@@ -25,12 +25,13 @@ extension PermissionType {
             return UserText.permissionCamera
         case .microphone:
             return UserText.permissionMicrophone
-        case .cameraAndMicrophone:
-            return UserText.permissionCameraAndMicrophone
         case .geolocation:
             return UserText.permissionGeolocation
         case .sound:
             return UserText.permissionSound
+        case .display:
+            assertionFailure("Unexpected permission")
+            return "display capture"
         }
     }
 }
@@ -39,15 +40,7 @@ final class PermissionAuthorizationViewController: NSViewController {
 
     @IBOutlet var descriptionLabel: NSTextField!
 
-    var query: PermissionAuthorizationQuery? {
-        guard let query = representedObject as? PermissionAuthorizationQuery? else {
-            assertionFailure("Unexpected object type: \(type(of: representedObject))")
-            return nil
-        }
-        return query
-    }
-
-    override var representedObject: Any? {
+    weak var query: PermissionAuthorizationQuery? {
         didSet {
             updateText()
         }
@@ -61,16 +54,21 @@ final class PermissionAuthorizationViewController: NSViewController {
         guard isViewLoaded,
               let query = query
         else { return }
+        let localizedPermissions = query.permissions.map(\.localizedDescription).reduce("") {
+            $0.isEmpty ? $1 : String(format: UserText.permissionAndPermissionFormat, $0, $1)
+        }
         self.descriptionLabel.stringValue = String(format: UserText.permissionAuthorizationFormat,
                                                    query.domain,
-                                                   query.type.localizedDescription)
+                                                   localizedPermissions)
     }
 
     @IBAction func grantAction(_ sender: NSButton) {
+        self.dismiss()
         query?.handleDecision(grant: true)
     }
 
     @IBAction func denyAction(_ sender: NSButton) {
+        self.dismiss()
         query?.handleDecision(grant: false)
     }
 

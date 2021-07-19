@@ -23,7 +23,6 @@ import Combine
 import SwiftUI
 import BrowserServicesKit
 
-// swiftlint:disable file_length
 final class BrowserTabViewController: NSViewController {
 
     @IBOutlet weak var errorView: NSView!
@@ -298,7 +297,7 @@ extension BrowserTabViewController: TabDelegate {
         guard let tabViewModel = tabViewModel else { return }
 
         tabViewModel.closeFindInPage()
-        tabViewModel.resetAuthorizationQueries()
+        tab.permissions.tabDidStartNavigation()
         if !tabViewModel.isLoading,
            tabViewModel.tab.webView.isLoading {
             tabViewModel.isLoading = true
@@ -473,6 +472,20 @@ extension BrowserTabViewController: WKUIDelegate {
         return selectedViewModel.tab.webView
     }
 
+    @objc(_webView:checkUserMediaPermissionForURL:mainFrameURL:frameIdentifier:decisionHandler:)
+    func webView(_ webView: WKWebView,
+                 checkUserMediaPermissionFor url: URL,
+                 mainFrameURL: URL,
+                 frameIdentifier frame: UInt,
+                 decisionHandler: @escaping (String, Bool) -> Void) {
+        guard let tab = webView.navigationDelegate as? Tab else {
+            assertionFailure("webView.navigationDelegate is not a Tab")
+            decisionHandler("", false)
+            return
+        }
+        tab.permissions.checkUserMediaPermission(for: url, mainFrameURL: mainFrameURL, decisionHandler: decisionHandler)
+    }
+
     // https://github.com/WebKit/WebKit/blob/995f6b1595611c934e742a4f3a9af2e678bc6b8d/Source/WebKit/UIProcess/API/Cocoa/WKUIDelegate.h#L147
     @objc(webView:requestMediaCapturePermissionForOrigin:initiatedByFrame:type:decisionHandler:)
     @available(macOS 12, *)
@@ -481,21 +494,15 @@ extension BrowserTabViewController: WKUIDelegate {
                  initiatedBy frame: WKFrameInfo,
                  type: WKMediaCaptureType,
                  decisionHandler: @escaping (WKPermissionDecision) -> Void) {
-        guard let index = tabCollectionViewModel.index(ofTabOwning: webView),
-              let tabViewModel = tabCollectionViewModel.tabViewModel(at: index),
-              let permissionType = PermissionType(devices: type)
+        guard let tab = webView.navigationDelegate as? Tab,
+              let permissions = [PermissionType](devices: type)
         else {
-            os_log("requestMediaCapturePermissionForOrigin: Failed to get index of the tab", type: .error)
+            assertionFailure("webView.navigationDelegate is not a Tab or could not decode PermissionType")
             decisionHandler(.deny)
             return
         }
 
-        if let allow = PermissionManager.shared.permission(forDomain: origin.host, permissionType: permissionType) {
-            decisionHandler(allow ? .grant : .deny)
-            return
-        }
-
-        tabViewModel.queryPermissionAuthorization(forDomain: origin.host, permissionType: permissionType) { granted in
+        tab.permissions.permissions(permissions, requestedForDomain: origin.host) { granted in
             decisionHandler(granted ? .grant : .deny)
         }
     }
@@ -507,58 +514,36 @@ extension BrowserTabViewController: WKUIDelegate {
                  url: URL,
                  mainFrameURL: URL,
                  decisionHandler: @escaping (Bool) -> Void) {
-        guard let index = tabCollectionViewModel.index(ofTabOwning: webView),
-              let tabViewModel = tabCollectionViewModel.tabViewModel(at: index),
-              let permissionType = PermissionType(devices: devices)
+        guard let tab = webView.navigationDelegate as? Tab,
+              let permissions = [PermissionType](devices: devices)
         else {
-            os_log("requestUserMediaAuthorizationForDevices: Failed to get index of the tab", type: .error)
+            assertionFailure("webView.navigationDelegate is not a Tab or could not decode PermissionType")
             decisionHandler(false)
             return
         }
 
-        if let allow = PermissionManager.shared
-            .permission(forDomain: url.host ?? url.absoluteString, permissionType: permissionType) {
-
-            decisionHandler(allow)
-            return
-        }
-
-        tabViewModel.queryPermissionAuthorization(forDomain: url.host ?? url.absoluteString, permissionType: permissionType) { granted in
-            decisionHandler(granted)
-        }
+        tab.permissions.permissions(permissions, requestedForDomain: url.host, decisionHandler: decisionHandler)
     }
 
     @objc(_webView:mediaCaptureStateDidChange:)
-    func webView(_ webView: WKWebView,
-                 mediaCaptureStateDidChange state: _WKMediaCaptureStateDeprecated) {
-        guard let index = tabCollectionViewModel.index(ofTabOwning: webView),
-              let tabViewModel = tabCollectionViewModel.tabViewModel(at: index)
-        else {
-            os_log("mediaCaptureStateDidChange: Failed to get index of the tab", type: .error)
+    func webView(_ webView: WKWebView, mediaCaptureStateDidChange state: _WKMediaCaptureStateDeprecated) {
+        guard let tab = webView.navigationDelegate as? Tab else {
+            assertionFailure("webView.navigationDelegate is not a Tab")
             return
         }
-        tabViewModel.updateUsedPermissions()
+        tab.permissions.mediaCaptureStateDidChange()
     }
 
     // https://github.com/WebKit/WebKit/blob/9d7278159234e0bfa3d27909a19e695928f3b31e/Source/WebKit/UIProcess/API/Cocoa/WKUIDelegatePrivate.h#L131
     @objc(_webView:requestGeolocationPermissionForFrame:decisionHandler:)
     func webView(_ webView: WKWebView, requestGeolocationPermissionFor frame: WKFrameInfo, decisionHandler: @escaping (Bool) -> Void) {
-        guard let index = tabCollectionViewModel.index(ofTabOwning: webView),
-              let tabViewModel = tabCollectionViewModel.tabViewModel(at: index)
-        else {
-            os_log("requestGeolocationPermissionForFrame: Failed to get index of the tab", type: .error)
+        guard let tab = webView.navigationDelegate as? Tab else {
+            assertionFailure("webView.navigationDelegate is not a Tab")
             decisionHandler(false)
             return
         }
 
-        if let allow = PermissionManager.shared.permission(forDomain: frame.request.url?.host ?? "", permissionType: .geolocation) {
-            decisionHandler(allow)
-            return
-        }
-
-        tabViewModel.queryPermissionAuthorization(forDomain: frame.request.url?.host ?? "", permissionType: .geolocation) { granted in
-            decisionHandler(granted)
-        }
+        tab.permissions.permissions([.geolocation], requestedForDomain: frame.request.url?.host, decisionHandler: decisionHandler)
     }
 
     // https://github.com/WebKit/WebKit/blob/9d7278159234e0bfa3d27909a19e695928f3b31e/Source/WebKit/UIProcess/API/Cocoa/WKUIDelegatePrivate.h#L132
@@ -568,20 +553,13 @@ extension BrowserTabViewController: WKUIDelegate {
                  requestGeolocationPermissionFor origin: WKSecurityOrigin,
                  initiatedBy frame: WKFrameInfo,
                  decisionHandler: @escaping (WKPermissionDecision) -> Void) {
-        guard let index = tabCollectionViewModel.index(ofTabOwning: webView),
-              let tabViewModel = tabCollectionViewModel.tabViewModel(at: index)
-        else {
-            os_log("requestGeolocationPermissionForOrigin: Failed to get index of the tab", type: .error)
+        guard let tab = webView.navigationDelegate as? Tab else {
+            assertionFailure("webView.navigationDelegate is not a Tab")
             decisionHandler(.deny)
             return
         }
 
-        if let allow = PermissionManager.shared.permission(forDomain: origin.host, permissionType: .geolocation) {
-            decisionHandler(allow ? .grant : .deny)
-            return
-        }
-
-        tabViewModel.queryPermissionAuthorization(forDomain: origin.host, permissionType: .geolocation) { granted in
+        tab.permissions.permissions([.geolocation], requestedForDomain: frame.request.url?.host) {granted in
             decisionHandler(granted ? .grant : .deny)
         }
     }
@@ -685,4 +663,3 @@ extension BrowserTabViewController: BrowserTabSelectionDelegate {
     }
 
 }
-// swiftlint:enable file_length

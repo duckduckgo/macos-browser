@@ -20,21 +20,90 @@ import WebKit
 
 extension WKWebView {
 
-    var permissions: Permissions {
-        var permissions = Permissions()
-        if self.responds(to: #selector(getter: WKWebView._mediaCaptureState)) {
-            permissions = Permissions(mediaCaptureState: self._mediaCaptureState)
-        } else if #available(macOS 12.0, *) {
-            #warning("Sound state")
-            permissions = Permissions(microphoneCaptureState: self.microphoneCaptureState,
-                                      cameraCaptureState: self.cameraCaptureState,
-                                      soundState: .none)
+    static var canMuteCameraAndMicrophoneSeparately: Bool {
+        if #available(macOS 12.0, *) {
+            return true
         }
-        if let geolocationProvider = self.configuration.processPool.geolocationProvider {
-            permissions.geolocation = PermissionState(isActive: geolocationProvider.isActive,
-                                                      isPaused: geolocationProvider.isDisabled)
+        return false
+    }
+
+    enum CaptureState {
+        case none
+        case active
+        case muted
+
+        @available(macOS 12.0, *)
+        init(_ state: WKMediaCaptureState) {
+            switch state {
+            case .none: self = .none
+            case .active: self = .active
+            case .muted: self = .muted
+            @unknown default: self = .none
+            }
         }
-        return permissions
+
+        init(permissionType: PermissionType, mediaCaptureState: _WKMediaCaptureStateDeprecated) {
+            switch permissionType {
+            case .microphone:
+                if mediaCaptureState.contains(.activeMicrophone) {
+                    self = .active
+                } else if mediaCaptureState.contains(.mutedMicrophone) {
+                    self = .muted
+                } else {
+                    self = .none
+                }
+            case .camera:
+                if mediaCaptureState.contains(.activeCamera) {
+                    self = .active
+                } else if mediaCaptureState.contains(.mutedCamera) {
+                    self = .muted
+                } else {
+                    self = .none
+                }
+            default:
+                fatalError("Not implemented")
+            }
+        }
+
+    }
+
+    var microphoneState: CaptureState {
+        if #available(macOS 12.0, *) {
+            return CaptureState(self.microphoneCaptureState)
+        } else if self.responds(to: #selector(getter: WKWebView._mediaCaptureState)) {
+            return CaptureState(permissionType: .microphone, mediaCaptureState: self._mediaCaptureState)
+        }
+        assertionFailure("WKWebView does not respond to selector _mediaCaptureState")
+        return .none
+    }
+
+    var cameraState: CaptureState {
+        if #available(macOS 12.0, *) {
+            return CaptureState(self.cameraCaptureState)
+        } else if self.responds(to: #selector(getter: WKWebView._mediaCaptureState)) {
+            return CaptureState(permissionType: .camera, mediaCaptureState: self._mediaCaptureState)
+        }
+        assertionFailure("WKWebView does not respond to selector _mediaCaptureState")
+        return .none
+    }
+
+    var geolocationState: CaptureState {
+        guard let geolocationProvider = self.configuration.processPool.geolocationProvider,
+              [.authorizedAlways, .authorized].contains(geolocationProvider.authorizationStatus),
+              !geolocationProvider.isRevoked,
+              geolocationProvider.isActive
+        else {
+            return .none
+        }
+        if geolocationProvider.isPaused {
+            return .muted
+        } else {
+            return .active
+        }
+    }
+
+    var soundState: CaptureState {
+        return .none
     }
 
     private func setMediaCaptureMuted(_ muted: Bool) {
@@ -54,72 +123,57 @@ extension WKWebView {
         self._setPageMuted(mutedState)
     }
 
-    var canMuteCameraAndMicrophoneSeparately: Bool {
-        if #available(macOS 12.0, *) {
-            return true
+    func stopMediaCapture() {
+        guard self.responds(to: #selector(_stopMediaCapture)) else {
+            assertionFailure("WKWebView does not respond to _stopMediaCapture")
+            return
         }
-        return false
+        self._stopMediaCapture()
     }
 
-    func setPermission(_ permission: PermissionType, muted: Bool) {
-        switch permission {
-        case .camera:
-            if #available(macOS 12.0, *) {
-                self.setCameraCaptureState(muted ? .muted : .active, completionHandler: {})
-            } else {
-                self.setMediaCaptureMuted(muted)
+    func setPermissions(_ permissions: [PermissionType], muted: Bool) {
+        for permission in permissions {
+            switch permission {
+            case .camera:
+                if #available(macOS 12.0, *) {
+                    self.setCameraCaptureState(muted ? .muted : .active, completionHandler: {})
+                } else {
+                    self.setMediaCaptureMuted(muted)
+                }
+            case .microphone:
+                if #available(macOS 12.0, *) {
+                    self.setMicrophoneCaptureState(muted ? .muted : .active, completionHandler: {})
+                } else {
+                    self.setMediaCaptureMuted(muted)
+                }
+            case .geolocation:
+                self.configuration.processPool.geolocationProvider?.isPaused = muted
+            case .sound, .display:
+                fatalError("Not implemented")
             }
-        case .microphone:
-            if #available(macOS 12.0, *) {
-                self.setMicrophoneCaptureState(muted ? .muted : .active, completionHandler: {})
-            } else {
-                self.setMediaCaptureMuted(muted)
-            }
-        case .cameraAndMicrophone:
-            if #available(macOS 12.0, *) {
-                self.setCameraCaptureState(muted ? .muted : .active, completionHandler: {})
-                self.setMicrophoneCaptureState(muted ? .muted : .active, completionHandler: {})
-            } else {
-                self.setMediaCaptureMuted(muted)
-            }
-        case .geolocation:
-            self.configuration.processPool.geolocationProvider?.isDisabled = muted
-        case .sound:
-            break
         }
     }
 
-    func revokePermission(_ permission: PermissionType) {
-        switch permission {
-        case .camera:
-            if #available(macOS 12.0, *) {
-                self.setCameraCaptureState(.none, completionHandler: {})
-            } else if self.responds(to: #selector(_stopMediaCapture)) {
-                self._stopMediaCapture()
-            } else {
-                assertionFailure("WKWebView does not respond to _stopMediaCapture")
+    func revokePermissions(_ permissions: [PermissionType]) {
+        for permission in permissions {
+            switch permission {
+            case .camera:
+                if #available(macOS 12.0, *) {
+                    self.setCameraCaptureState(.none, completionHandler: {})
+                } else {
+                    self.stopMediaCapture()
+                }
+            case .microphone:
+                if #available(macOS 12.0, *) {
+                    self.setMicrophoneCaptureState(.none, completionHandler: {})
+                } else {
+                    self.stopMediaCapture()
+                }
+            case .geolocation:
+                self.configuration.processPool.geolocationProvider?.stop()
+            case .sound, .display:
+                fatalError("Not implemented")
             }
-        case .microphone:
-            if #available(macOS 12.0, *) {
-                self.setMicrophoneCaptureState(.none, completionHandler: {})
-            } else if self.responds(to: #selector(_stopMediaCapture)) {
-                self._stopMediaCapture()
-            } else {
-                assertionFailure("WKWebView does not respond to _stopMediaCapture")
-            }
-        case .cameraAndMicrophone:
-            if #available(macOS 12.0, *) {
-                self.setCameraCaptureState(.none, completionHandler: {})
-                self.setMicrophoneCaptureState(.none, completionHandler: {})
-            } else if self.responds(to: #selector(_stopMediaCapture)) {
-                self._stopMediaCapture()
-            } else {
-                assertionFailure("WKWebView does not respond to _stopMediaCapture")
-            }
-        case .geolocation:
-            self.configuration.processPool.geolocationProvider?.isDisabled = true
-        case .sound:
-            break
         }
     }
 

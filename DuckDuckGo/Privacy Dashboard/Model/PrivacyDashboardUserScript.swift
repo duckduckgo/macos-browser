@@ -123,8 +123,8 @@ final class PrivacyDashboardUserScript: NSObject, StaticUserScript {
             $0[$1.key.rawValue] = [
                 "title": $1.key.localizedDescription,
                 "permission": $1.value.rawValue,
-                "used": usedPermissions.permissions[$1.key] != nil,
-                "paused": usedPermissions.permissions[$1.key]?.isPaused ?? false,
+                "used": usedPermissions[$1.key] != nil,
+                "paused": usedPermissions[$1.key] == .paused,
                 "options": PermissionAuthorizationState.allCases.map {
                     [
                         "id": $0.rawValue,

@@ -21,37 +21,42 @@ import Foundation
 enum PermissionType: String, CaseIterable {
     case camera
     case microphone
-    case cameraAndMicrophone
     case geolocation
     case sound
+    case display
+}
+
+extension Array where Element == PermissionType {
 
     @available(OSX 11.3, *)
     init?(devices: WKMediaCaptureType) {
         switch devices {
         case .camera:
-            self = .camera
+            self = [.camera]
         case .microphone:
-            self = .microphone
+            self = [.microphone]
         case .cameraAndMicrophone:
-            self = .cameraAndMicrophone
+            self = [.camera, .microphone]
         @unknown default:
             return nil
         }
     }
 
     init?(devices: _WKCaptureDevices) {
+        var result = Array()
         if devices.contains(.camera) {
-            if devices.contains(.microphone) {
-                self = .cameraAndMicrophone
-            } else {
-                self = .camera
-            }
-        } else if devices.contains(.microphone) {
-            self = .microphone
-        } else {
-            return nil
+            result.append(.camera)
         }
+        if devices.contains(.microphone) {
+            result.append(.microphone)
+        }
+        if devices.contains(.display) {
+            result.append(.display)
+        }
+        guard !result.isEmpty else { return nil }
+        self = result
     }
+
 }
 
 enum PermissionAuthorizationState: String, CaseIterable {
@@ -62,13 +67,13 @@ enum PermissionAuthorizationState: String, CaseIterable {
 
 final class PermissionAuthorizationQuery {
     let domain: String
-    let type: PermissionType
+    let permissions: [PermissionType]
 
     private var completionHandler: ((PermissionAuthorizationQuery?, Bool) -> Void)?
 
-    init(domain: String, type: PermissionType, completionHandler: @escaping (PermissionAuthorizationQuery?, Bool) -> Void) {
+    init(domain: String, permissions: [PermissionType], completionHandler: @escaping (PermissionAuthorizationQuery?, Bool) -> Void) {
         self.domain = domain
-        self.type = type
+        self.permissions = permissions
         self.completionHandler = completionHandler
     }
 
@@ -79,104 +84,76 @@ final class PermissionAuthorizationQuery {
 
     deinit {
         if let completionHandler = completionHandler {
-            DispatchQueue.main.async {
-                completionHandler(nil, false)
-            }
+            completionHandler(nil, false)
         }
     }
 
 }
 
-enum PermissionState {
+enum PermissionState: Equatable {
+    case disabled(systemWide: Bool)
+    case requested(PermissionAuthorizationQuery)
     case active
+    case revoking
+    case denied
     case paused
+    case inactive
 
-    init?(isActive: Bool, isPaused: Bool) {
-        switch (isActive, isPaused) {
-        case (true, false):
-            self = .active
-        case (true, true):
-            self = .paused
-        case (false, _):
-            return nil
+    // swiftlint:disable cyclomatic_complexity
+    static func == (lhs: PermissionState, rhs: PermissionState) -> Bool {
+        switch lhs {
+        case .disabled(systemWide: let systemWide): if case .disabled(systemWide) = rhs { return true }
+        case .requested(let query1): if case .requested(let query2) = rhs, query1 === query2 { return true }
+        case .active: if case .active = rhs { return true }
+        case .revoking: if case .revoking = rhs { return true }
+        case .denied: if case .denied = rhs { return true }
+        case .paused: if case .paused = rhs { return true }
+        case .inactive: if case .inactive = rhs { return true }
         }
+        return false
     }
-
-    @available(macOS 12.0, *)
-    init?(mediaCaptureState: WKMediaCaptureState) {
-        switch mediaCaptureState {
-        case .active:
-            self = .active
-        case .muted:
-            self = .paused
-        case .none: fallthrough
-        @unknown default:
-            return nil
-        }
-    }
-
-    var isPaused: Bool {
-        self == .paused
-    }
+    // swiftlint:enable cyclomatic_complexity
 
 }
 
-struct Permissions {
-    var permissions = [PermissionType: PermissionState]()
+typealias Permissions = [PermissionType: PermissionState]
+
+extension Dictionary where Key == PermissionType, Value == PermissionState {
 
     var microphone: PermissionState? {
         get {
-            permissions[.microphone]
+            self[.microphone]
         }
         set {
-            permissions[.microphone] = newValue
+            self[.microphone] = newValue
         }
     }
+    
     var camera: PermissionState? {
         get {
-            permissions[.camera]
+            self[.camera]
         }
         set {
-            permissions[.camera] = newValue
+            self[.camera] = newValue
         }
     }
+
     var sound: PermissionState? {
         get {
-            permissions[.sound]
+            self[.sound]
         }
         set {
-            permissions[.sound] = newValue
+            self[.sound] = newValue
         }
     }
+
     var geolocation: PermissionState? {
         get {
-            permissions[.geolocation]
+            self[.geolocation]
         }
         set {
-            permissions[.geolocation] = newValue
+            self[.geolocation] = newValue
         }
-    }
-
-    init() {}
-
-    init(mediaCaptureState: _WKMediaCaptureStateDeprecated) {
-        if mediaCaptureState.contains(.activeMicrophone) {
-            self.microphone = .active
-        } else if mediaCaptureState.contains(.mutedMicrophone) {
-            self.microphone = .paused
-        }
-        if mediaCaptureState.contains(.activeCamera) {
-            self.camera = .active
-        } else if mediaCaptureState.contains(.mutedCamera) {
-            self.camera = .paused
-        }
-    }
-
-    @available(macOS 12, *)
-    init(microphoneCaptureState: WKMediaCaptureState, cameraCaptureState: WKMediaCaptureState, soundState: WKMediaCaptureState) {
-        self.microphone = PermissionState(mediaCaptureState: microphoneCaptureState)
-        self.camera = PermissionState(mediaCaptureState: cameraCaptureState)
-        self.sound = PermissionState(mediaCaptureState: soundState)
     }
 
 }

@@ -134,17 +134,25 @@ struct UserText {
                                       comment: "Displays the version and build numbers")
     static let permissionMicrophone = NSLocalizedString("permission.microphone", value: "microphone", comment: "Microphone input media device name")
     static let permissionCamera = NSLocalizedString("permission.camera", value: "camera", comment: "Camera input media device name")
-    static let permissionCameraAndMicrophone = NSLocalizedString("permission.cameraAndMicrophone", value: "camera and microphone", comment: "Camera and Microphone input media devices name")
+    static let permissionAndPermissionFormat = NSLocalizedString("permission.permissionAndPermission", value: "%@ and %@", comment: "%@(camera) and %@(microphone) input media devices name")
     static let permissionGeolocation = NSLocalizedString("permission.geolocation", value: "geolocation", comment: "User's Geolocation permission access name")
     static let permissionSound = NSLocalizedString("permission.sound", value: "audio playback", comment: "User's Audio Playback permission name")
 
-    static let permissionMute = NSLocalizedString("permission.mute", value: "Pause", comment: "Temporarily pause input media device access")
-    static let permissionUnmute = NSLocalizedString("permission.unmute", value: "Resume", comment: "Resume input media device access")
+    static let permissionMuteFormat = NSLocalizedString("permission.mute", value: "Pause %@", comment: "Temporarily pause input media device %@ access")
+    static let permissionUnmuteFormat = NSLocalizedString("permission.unmute", value: "Resume %@", comment: "Resume input media device %@ access")
     static let permissionReloadToEnable = NSLocalizedString("permission.reloadPage", value: "Reload to Ask Again", comment: "Reload webpage to ask for input media device access permission again")
 
     static let permissionAlwaysAllowFormat = NSLocalizedString("permission.always.allow", value: "Always Allow on “%@“", comment: "Make input media device access permanently allowed for current domain")
     static let permissionAlwaysAskFormat = NSLocalizedString("permission.always.ask", value: "Always Ask on “%@“", comment: "Make input media device access always asked from user for current domain")
     static let permissionAlwaysDenyFormat = NSLocalizedString("permission.always.deny", value: "Never ask again for “%@“", comment: "Make input media device access permanently allowed for current domain")
+
+    static let permissionAlwaysAllowDeviceFormat = NSLocalizedString("permission.always.allow", value: "Always Allow %@ on “%@“", comment: "Make input media device access permanently allowed for current domain")
+    static let permissionAlwaysAskDeviceFormat = NSLocalizedString("permission.always.ask", value: "Always Ask for %@ on “%@“", comment: "Make input media device access always asked from user for current domain")
+    static let permissionAlwaysDenyDeviceFormat = NSLocalizedString("permission.always.deny", value: "Never ask for %@ again for “%@“", comment: "Make input media device access permanently allowed for current domain")
+
+    static let permissionAppPermissionDisabledFormat = NSLocalizedString("permission.disabled.app", value: "%@ %@ access is disabled", comment: "The app (%@) has no access permission to %@ media device")
+    static let permissionGeolocationServicesDisabled = NSLocalizedString("permission.disabled.system", value: "System Geolocation Services are disabled", comment: "Geolocation Services are disabled in System Preferences")
+    static let permissionOpenSystemPreferences = NSLocalizedString("permission.open.preferences", value: "Open System Preferences", comment: "Open System Preferences (to re-enable permission for the App)")
 
     static let privacyDashboardPermissionAsk = NSLocalizedString("dashboard.permission.ask", value: "Ask", comment: "Privacy Dashboard: Website should always Ask for permission for input media device access")
     static let privacyDashboardPermissionAlwaysAllow = NSLocalizedString("dashboard.permission.allow", value: "Allow Always", comment: "Privacy Dashboard: Website can always access input media device")

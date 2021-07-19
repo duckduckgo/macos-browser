@@ -66,9 +66,7 @@ final class TabViewModel {
     @Published private(set) var findInPage: FindInPageModel = FindInPageModel()
 
     @Published private(set) var usedPermissions = Permissions()
-    @Published private(set) var deniedPermissions = Set<PermissionType>()
-    @Published private(set) var mediaAuthorizationQuery: PermissionAuthorizationQuery?
-    @Published private(set) var geolocationAuthorizationQuery: PermissionAuthorizationQuery?
+    @Published private(set) var permissionAuthorizationQuery: PermissionAuthorizationQuery?
 
     init(tab: Tab) {
         self.tab = tab
@@ -79,6 +77,7 @@ final class TabViewModel {
         subscribeToTitle()
         subscribeToFavicon()
         subscribeToTabError()
+        subscribeToPermissions()
     }
 
     private func subscribeToUrl() {
@@ -102,6 +101,13 @@ final class TabViewModel {
             guard let self = self else { return }
             self.isErrorViewVisible = self.tab.error != nil
         } .store(in: &cancellables)
+    }
+
+    private func subscribeToPermissions() {
+        tab.permissions.$permissions.weakAssign(to: \.usedPermissions, on: self)
+            .store(in: &cancellables)
+        tab.permissions.$authorizationQuery.weakAssign(to: \.permissionAuthorizationQuery, on: self)
+            .store(in: &cancellables)
     }
 
     private func updateCanReload() {
@@ -191,37 +197,6 @@ final class TabViewModel {
             self.favicon = favicon
         } else {
             favicon = Favicon.defaultFavicon
-        }
-    }
-
-    func updateUsedPermissions() {
-        self.usedPermissions = tab.webView.permissions
-    }
-
-    func resetAuthorizationQueries() {
-        self.mediaAuthorizationQuery = nil
-        self.geolocationAuthorizationQuery = nil
-        self.deniedPermissions = []
-    }
-
-    func queryPermissionAuthorization(forDomain domain: String,
-                                      permissionType: PermissionType,
-                                      completionHandler: @escaping (Bool) -> Void) {
-        let query = PermissionAuthorizationQuery(domain: domain, type: permissionType) { [weak self] query, granted in
-            if self?.geolocationAuthorizationQuery === query {
-                self?.geolocationAuthorizationQuery = nil
-            } else if self?.mediaAuthorizationQuery === query {
-                self?.mediaAuthorizationQuery = nil
-            }
-            if !granted {
-                self?.deniedPermissions.insert(permissionType)
-            }
-            completionHandler(granted)
-        }
-        if case .geolocation = permissionType {
-            self.geolocationAuthorizationQuery = query
-        } else {
-            self.mediaAuthorizationQuery = query
         }
     }
 

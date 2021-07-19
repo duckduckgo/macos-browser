@@ -26,7 +26,7 @@ final class PrivacyDashboardViewController: NSViewController {
     private let privacyDashboarScript = PrivacyDashboardUserScript()
     private var cancellables = Set<AnyCancellable>()
 
-    var tabViewModel: TabViewModel?
+    weak var tabViewModel: TabViewModel?
 
     override func viewDidLoad() {
         privacyDashboarScript.delegate = self
@@ -63,7 +63,7 @@ final class PrivacyDashboardViewController: NSViewController {
         var authState = [PermissionType: PermissionAuthorizationState]()
         for permissionType in PermissionType.allCases {
             guard let alwaysGrant = PermissionManager.shared.permission(forDomain: domain, permissionType: permissionType) else {
-                if usedPermissions.permissions[permissionType] != nil {
+                if usedPermissions[permissionType] != nil {
                     authState[permissionType] = .ask
                 }
                 continue
@@ -83,14 +83,20 @@ extension PrivacyDashboardViewController: PrivacyDashboardUserScriptDelegate {
     }
 
     func userScript(_ userScript: PrivacyDashboardUserScript, didSetPermission permission: PermissionType, to state: PermissionAuthorizationState) {
-        if case .deny = state,
-           tabViewModel?.usedPermissions.permissions[permission] != nil {
-            tabViewModel?.tab.revokePermission(permission)
+        guard let domain = tabViewModel?.tab.url?.host else {
+            assertionFailure("PrivacyDashboardViewController: no domain available")
+            return
+        }
+        switch state {
+        case .ask:
+            PermissionManager.shared.removePermission(forDomain: domain, permissionType: permission)
+        case .deny, .grant:
+            PermissionManager.shared.setPermission(state == .grant, forDomain: domain, permissionType: permission)
         }
     }
 
     func userScript(_ userScript: PrivacyDashboardUserScript, setPermission permission: PermissionType, paused: Bool) {
-        tabViewModel?.tab.setPermission(permission, muted: paused)
+        tabViewModel?.tab.permissions.set(permission, muted: paused)
     }
 
 }

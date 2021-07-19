@@ -17,9 +17,13 @@
 //
 
 import Foundation
+import Combine
 import os.log
 
 protocol PermissionManagerProtocol: AnyObject {
+
+    typealias PublishedPermission = (domain: String, permissionType: PermissionType, grant: Bool?)
+    var permissionPublisher: AnyPublisher<PublishedPermission, Never> { get }
 
     func permission(forDomain domain: String, permissionType: PermissionType) -> Bool?
     func setPermission(_ permission: Bool, forDomain domain: String, permissionType: PermissionType)
@@ -33,6 +37,9 @@ final class PermissionManager: PermissionManagerProtocol {
 
     private let store: PermissionStore
     private var permissions = [String: [PermissionType: StoredPermission]]()
+
+    private let permissionSubject = PassthroughSubject<PublishedPermission, Never>()
+    var permissionPublisher: AnyPublisher<PublishedPermission, Never> { permissionSubject.eraseToAnyPublisher() }
 
     init(store: PermissionStore = .init()) {
         self.store = store
@@ -70,6 +77,8 @@ final class PermissionManager: PermissionManagerProtocol {
             }
         }
         self.permissions[domain, default: [:]][permissionType] = storedPermission
+
+        self.permissionSubject.send( (domain, permissionType, allow) )
     }
 
     func removePermission(forDomain domain: String, permissionType: PermissionType) {
@@ -80,6 +89,8 @@ final class PermissionManager: PermissionManagerProtocol {
         }
         permissions[domain]?[permissionType] = nil
         store.remove(objectWithId: oldValue.id)
+
+        self.permissionSubject.send( (domain, permissionType, nil) )
     }
 
 }

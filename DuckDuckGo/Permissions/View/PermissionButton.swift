@@ -24,51 +24,34 @@ final class PermissionButton: AddressBarButton {
     private var defaultTint: NSColor?
     @IBInspectable var activeImage: NSImage?
     @IBInspectable var activeTintColor: NSColor?
+    @IBInspectable var inactiveImage: NSImage?
+    @IBInspectable var inactiveTintColor: NSColor?
     @IBInspectable var disabledImage: NSImage?
     @IBInspectable var disabledTintColor: NSColor?
     @IBInspectable var mutedImage: NSImage?
     @IBInspectable var mutedTintColor: NSColor?
 
-    enum ButtonState {
-        case inactive
-        case requested
-        case active
-        case muted
-        case disabled
-
-        init(isRequested: Bool, isDenied: Bool, permissionState: PermissionState?) {
-            if isRequested {
-                self = .requested
-            } else if isDenied {
-                self = .disabled
-            } else if case .some(.active) = permissionState {
-                self = .active
-            } else if case .some(.paused) = permissionState {
-                self = .muted
-            } else {
-                self = .inactive
-            }
-        }
-    }
-
-    var buttonState: ButtonState = .inactive {
+    var buttonState: PermissionState? {
         didSet {
             var isHidden = false
             switch buttonState {
-            case .inactive:
+            case .none:
                 isHidden = true
             case .active:
                 self.image = activeImage ?? defaultImage
                 self.contentTintColor = activeTintColor
-            case .muted:
+            case .paused:
                 self.image = mutedImage ?? defaultImage
                 self.contentTintColor = mutedTintColor
-            case .disabled:
+            case .disabled, .denied, .revoking:
                 self.image = disabledImage ?? defaultImage
                 self.contentTintColor = disabledTintColor
             case .requested:
                 self.image = defaultImage
                 self.contentTintColor = defaultTint
+            case .inactive:
+                self.image = inactiveImage ?? defaultImage
+                self.contentTintColor = inactiveTintColor ?? defaultTint
             }
             self.isHidden = isHidden
         }

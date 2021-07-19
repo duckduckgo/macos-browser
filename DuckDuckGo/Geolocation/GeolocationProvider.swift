@@ -24,9 +24,16 @@ final class GeolocationProvider: NSObject {
     private let geolocationService: GeolocationServiceProtocol
     private var geolocationManager: WKGeolocationManager
     private var locationCancellable: AnyCancellable?
+    private var authorizationStatusCancellable: AnyCancellable?
 
     @PublishedAfter private(set) var isActive: Bool = false
-    @PublishedAfter var isDisabled: Bool = false
+    @PublishedAfter var isPaused: Bool = false {
+        didSet {
+            self.updateLocation(with: geolocationService.currentLocation)
+        }
+    }
+    @PublishedAfter var isRevoked: Bool = false
+    @PublishedAfter var authorizationStatus = CLAuthorizationStatus.notDetermined
 
     init?(processPool: WKProcessPool,
           geolocationService: GeolocationServiceProtocol = GeolocationService.shared) {
@@ -41,6 +48,8 @@ final class GeolocationProvider: NSObject {
         super.init()
 
         geolocationManager.setProvider(self)
+        authorizationStatusCancellable = geolocationService.authorizationStatusPublisher
+            .weakAssign(to: \.authorizationStatus, on: self)
     }
 
     private struct GeolocationDisabled: Error, LocalizedError {
@@ -49,26 +58,44 @@ final class GeolocationProvider: NSObject {
         }
     }
 
+    func stop() {
+        self.isActive = false
+        self.isRevoked = true
+        locationCancellable?.cancel()
+    }
+
+    func reset() {
+        self.isActive = false
+        self.isRevoked = false
+        self.isPaused = false
+        locationCancellable?.cancel()
+    }
+
     fileprivate func startUpdatingLocation(geolocationManager: WKGeolocationManager) {
+        guard !isRevoked else { return }
         self.isActive = true
 
         locationCancellable = geolocationService.locationPublisher.sink { [weak self] result in
-            guard let self = self,
-                  self.isActive,
-                  !self.isDisabled
-            else {
-                geolocationManager.providerDidFailToDeterminePosition(GeolocationDisabled())
-                return
-            }
+            self?.updateLocation(with: result)
+        }
+    }
 
-            switch result {
-            case .none:
-                break
-            case .success(let location):
-                geolocationManager.providerDidChangePosition(location)
-            case .failure(let error):
-                geolocationManager.providerDidFailToDeterminePosition(error)
-            }
+    private func updateLocation(with result: Result<CLLocation, Error>?) {
+        guard self.isActive,
+            !self.isPaused,
+            !self.isRevoked
+        else {
+            geolocationManager.providerDidFailToDeterminePosition(GeolocationDisabled())
+            return
+        }
+
+        switch result {
+        case .none:
+            break
+        case .success(let location):
+            geolocationManager.providerDidChangePosition(location)
+        case .failure(let error):
+            geolocationManager.providerDidFailToDeterminePosition(error)
         }
     }
 
@@ -167,20 +194,20 @@ private let WKGeolocationPositionCreate_c: WKGeolocationPositionCreate_c_type? =
     dynamicSymbol(named: "WKGeolocationPositionCreate_c")
 
 private func createWKGeolocationPosition(_ location: CLLocation) -> UnsafeRawPointer? {
-    WKGeolocationPositionCreate_c?(location.timestamp.timeIntervalSince1970,
-                                   location.coordinate.latitude,
-                                   location.coordinate.longitude,
-                                   location.horizontalAccuracy,
-                                   /*providesAltitude:*/ true,
-                                   location.altitude,
-                                   /*providesAltitudeAccuracy:*/ true,
-                                   location.verticalAccuracy,
-                                   /*providesHeading:*/ true,
-                                   location.course,
-                                   /*providesSpeed:*/ true,
-                                   location.speed,
-                                   location.floor != nil,
-                                   location.floor.map { Double($0.level) } ?? 0)
+    WKGeolocationPositionCreate_c?(/*timestamp:*/ location.timestamp.timeIntervalSince1970,
+                                   /*latitude:*/ location.coordinate.latitude,
+                                   /*longitude:*/ location.coordinate.longitude,
+                                   /*accuracy:*/ location.horizontalAccuracy,
+                                   /*providesAltitude:*/ location.verticalAccuracy >= 0.0,
+                                   /*altitude:*/ location.verticalAccuracy >= 0.0 ? location.altitude : 0.0,
+                                   /*providesAltitudeAccuracy:*/ location.verticalAccuracy >= 0.0,
+                                   /*altitudeAccuracy:*/ location.verticalAccuracy,
+                                   /*providesHeading:*/ location.course >= 0.0,
+                                   /*heading:*/ location.course >= 0.0 ? location.course : 0.0,
+                                   /*providesSpeed:*/ location.speed >= 0.0,
+                                   /*speed:*/ location.speed >= 0.0 ? location.speed : 0.0,
+                                   /*providesFloorLevel:*/ location.floor != nil,
+                                   /*floorLevel:*/ location.floor.map { Double($0.level) } ?? 0.0)
 }
 
 private func startUpdatingCallback(geolocationManager: UnsafeRawPointer?, clientInfo: UnsafeRawPointer?) {

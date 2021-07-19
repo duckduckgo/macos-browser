@@ -25,7 +25,6 @@ final class WebViewStateObserver: NSObject {
 
     weak var webView: WKWebView?
     weak var tabViewModel: TabViewModel?
-    private var cancellables = Set<AnyCancellable>()
 
     init(webView: WKWebView,
          tabViewModel: TabViewModel) {
@@ -69,22 +68,6 @@ final class WebViewStateObserver: NSObject {
         webView.addObserver(self, forKeyPath: #keyPath(WKWebView.isLoading), options: .new, context: nil)
         webView.addObserver(self, forKeyPath: #keyPath(WKWebView.title), options: .new, context: nil)
         webView.addObserver(self, forKeyPath: #keyPath(WKWebView.estimatedProgress), options: .new, context: nil)
-
-        if #available(macOS 12, *) {
-            webView.publisher(for: \.cameraCaptureState).sink { [weak self] _ in
-                self?.tabViewModel?.updateUsedPermissions()
-            }.store(in: &cancellables)
-            webView.publisher(for: \.microphoneCaptureState).sink { [weak self] _ in
-                self?.tabViewModel?.updateUsedPermissions()
-            }.store(in: &cancellables)
-        }
-
-        webView.configuration.processPool.geolocationProvider?.$isActive.sink { [weak self] _ in
-            self?.tabViewModel?.updateUsedPermissions()
-        }.store(in: &cancellables)
-        webView.configuration.processPool.geolocationProvider?.$isDisabled.sink { [weak self] _ in
-            self?.tabViewModel?.updateUsedPermissions()
-        }.store(in: &cancellables)
     }
 
     override func observeValue(forKeyPath keyPath: String?,

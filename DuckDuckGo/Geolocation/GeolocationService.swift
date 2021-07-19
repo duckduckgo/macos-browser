@@ -21,7 +21,9 @@ import Combine
 import CoreLocation
 
 protocol GeolocationServiceProtocol: AnyObject {
+    var currentLocation: Result<CLLocation, Error>? { get }
     var locationPublisher: AnyPublisher<Result<CLLocation, Error>?, Never> { get }
+    var authorizationStatusPublisher: AnyPublisher<CLAuthorizationStatus, Never> { get }
 }
 
 final class GeolocationService: NSObject, GeolocationServiceProtocol {
@@ -29,27 +31,59 @@ final class GeolocationService: NSObject, GeolocationServiceProtocol {
 
     private let locationManager: CLLocationManager
 
-    @Published private var currentLocation: Result<CLLocation, Error>?
-    @Published private(set) var authorizationStatus: CLAuthorizationStatus?
+    @Published private var currentLocationPublished: Result<CLLocation, Error>?
+    @Published private var authorizationStatus: CLAuthorizationStatus
+    private var locationPublisherEventsHandler: AnyPublisher<Result<CLLocation, Error>?, Never>!
 
-    private var pub: AnyPublisher<Result<CLLocation, Error>?, Never>!
+    var currentLocation: Result<CLLocation, Error>? {
+        currentLocationPublished
+    }
     var locationPublisher: AnyPublisher<Result<CLLocation, Error>?, Never> {
-        pub
+        locationPublisherEventsHandler
+    }
+    var authorizationStatusPublisher: AnyPublisher<CLAuthorizationStatus, Never> {
+        $authorizationStatus.eraseToAnyPublisher()
     }
 
-    init(locationManager: CLLocationManager = .init()) {
+    init(locationManager: CLLocationManager = .init(),
+         authorizationStatus: CLAuthorizationStatus = CLLocationManager.authorizationStatus()) {
         self.locationManager = locationManager
+        self.authorizationStatus = authorizationStatus
         super.init()
 
         locationManager.delegate = self
-        self.pub = $currentLocation
-            .handleEvents(receiveSubscription: { _ in
-                locationManager.desiredAccuracy = kCLLocationAccuracyBest
-                locationManager.startUpdatingLocation()
-            }, receiveCancel: {
-                locationManager.stopUpdatingLocation()
-            }).share()
+        locationManager.desiredAccuracy = kCLLocationAccuracyBest
+        setupEventsHandler()
+    }
+
+    private func setupEventsHandler() {
+        locationPublisherEventsHandler = $currentLocationPublished
+            .handleEvents(receiveSubscription: self.didReceiveSubscription, receiveCancel: self.didReceiveCancel)
             .eraseToAnyPublisher()
+    }
+
+    private var subscriptionCounter = 0 {
+        didSet {
+            assert(subscriptionCounter >= 0)
+            switch subscriptionCounter {
+            case 1:
+                locationManager.startUpdatingLocation()
+            case 0:
+                locationManager.stopUpdatingLocation()
+                if case .failure = currentLocation {
+                    currentLocationPublished = nil
+                }
+            default: break
+            }
+        }
+    }
+
+    private func didReceiveSubscription(_ s: Subscription) {
+        subscriptionCounter += 1
+    }
+
+    private func didReceiveCancel() {
+        subscriptionCounter -= 1
     }
 
 }
@@ -62,12 +96,12 @@ extension GeolocationService: CLLocationManagerDelegate {
 
     func locationManager(_ manager: CLLocationManager, didUpdateLocations locations: [CLLocation]) {
         for location in locations {
-            currentLocation = .success(location)
+            currentLocationPublished = .success(location)
         }
     }
 
     func locationManager(_ manager: CLLocationManager, didFailWithError error: Error) {
-        currentLocation = .failure(error)
+        currentLocationPublished = .failure(error)
     }
 
 }
