@@ -18,9 +18,9 @@
 
 import Foundation
 
-struct TrackerInfoViewModel {
+struct TrackerInfoViewModel: Encodable {
 
-    struct Section {
+    struct Section: Encodable {
         let name: String
         let rows: [Row]
 
@@ -32,20 +32,17 @@ struct TrackerInfoViewModel {
         }
     }
 
-    struct Row {
+    struct Row: Encodable {
         let name: String
         let value: String
     }
 
-    private(set) var trackerInfo: TrackerInfo
     private(set) var sections = [Section]()
 
     init?(trackerInfo: TrackerInfo?, isProtectionOn: Bool) {
         guard let trackerInfo = trackerInfo else {
             return nil
         }
-
-        self.trackerInfo = trackerInfo
 
         let trackers = isProtectionOn ? trackerInfo.trackersBlocked : trackerInfo.trackersDetected
         sections = makeSections(from: Array(trackers))
