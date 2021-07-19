@@ -51,6 +51,10 @@ final class PasswordManagementViewController: NSViewController {
     var listModel: PasswordManagementItemListModel?
     var itemModel: PasswordManagementItemModel?
 
+    var secureVault: SecureVault? {
+        try? SecureVaultFactory.default.makeVault()
+    }
+
     override func viewDidLoad() {
         super.viewDidLoad()
         createListView()
@@ -59,9 +63,13 @@ final class PasswordManagementViewController: NSViewController {
 
     override func viewDidAppear() {
         super.viewDidAppear()
+        refetchWithText(isDirty ? "" : domain ?? "")
+    }
+
+    private func refetchWithText(_ text: String) {
         fetchAccounts { [weak self] accounts in
             self?.listModel?.accounts = accounts
-            self?.searchField.stringValue = self?.isDirty == true ? "" : self?.domain ?? ""
+            self?.searchField.stringValue = text
             self?.updateFilter()
 
             if self?.isDirty == false {
@@ -78,20 +86,49 @@ final class PasswordManagementViewController: NSViewController {
     private func createItemView() {
         let itemModel = PasswordManagementItemModel(onDirtyChanged: { [weak self] isDirty in
             self?.isDirty = isDirty
-            NotificationCenter.default.post(name: .PasswordManagerDirtyStateChanged, object: isDirty)
+            self?.postChange()
         }, onSaveRequested: { [weak self] in
-            try? SecureVaultFactory.default.makeVault().storeWebsiteCredentials($0)
+            try? self?.secureVault?.storeWebsiteCredentials($0)
             self?.syncModelsOnCredentials($0)
-        }, onDeleteRequested: {
-            print("Request delete \($0)")
+            self?.postChange()
+        }, onDeleteRequested: { [weak self] in
+            self?.promptToDelete($0)
         })
         self.itemModel = itemModel
 
         let view = NSHostingView(rootView: PasswordManagementItemView().environmentObject(itemModel))
         view.frame = itemContainer.bounds
-        print(itemContainer.bounds)
         itemContainer.addSubview(view)
         itemContainer.wantsLayer = true
+    }
+
+    func postChange() {
+        NotificationCenter.default.post(name: .PasswordManagerChanged, object: isDirty)
+    }
+
+    func promptToDelete(_ credentials: SecureVaultModels.WebsiteCredentials) {
+        guard let window = self.view.window,
+              let id = credentials.account.id else { return }
+
+        let alert = NSAlert.confirmDeleteLogin()
+        alert.beginSheetModal(for: window) { response in
+
+            switch response {
+            case .alertFirstButtonReturn:
+                try? self.secureVault?.deleteWebsiteCredentialsFor(accountId: id)
+                self.itemModel?.credentials = nil
+                self.refetchWithText(self.searchField.stringValue)
+                self.postChange()
+
+            case .alertSecondButtonReturn:
+                break // cancel, do nothing
+
+            default:
+                fatalError("Unknown response \(response)")
+            }
+
+        }
+
     }
 
     private func createListView() {
@@ -99,8 +136,8 @@ final class PasswordManagementViewController: NSViewController {
             guard let id = newValue.id,
                   let window = self?.view.window else { return }
 
-            func loadCredentials() {
-                guard let credentials = try? SecureVaultFactory.default.makeVault().websiteCredentialsFor(accountId: id) else { return }
+            func loadCredentialsWithId(_ id: Int64) {
+                guard let credentials = try? self?.secureVault?.websiteCredentialsFor(accountId: id) else { return }
                 self?.syncModelsOnCredentials(credentials)
             }
 
@@ -109,17 +146,16 @@ final class PasswordManagementViewController: NSViewController {
                 alert.beginSheetModal(for: window) { response in
 
                     switch response {
-                    case .alertFirstButtonReturn:
+                    case .alertFirstButtonReturn: // Save
                         self?.itemModel?.save()
-                        loadCredentials()
+                        loadCredentialsWithId(id)
 
-                    case .alertSecondButtonReturn:
+                    case .alertSecondButtonReturn: // Discard
                         self?.itemModel?.cancel()
-                        loadCredentials()
+                        loadCredentialsWithId(id)
 
-                    case .alertThirdButtonReturn:
+                    case .alertThirdButtonReturn: // Cancel
                         if let previousId = previousValue?.id {
-                            // TODO cancel and re-sync, then delete this func?
                             self?.listModel?.selectAccountWithId(previousId)
                         }
 
@@ -129,7 +165,7 @@ final class PasswordManagementViewController: NSViewController {
 
                 }
             } else {
-                loadCredentials()
+                loadCredentialsWithId(id)
             }
         }
         self.listModel = listModel
@@ -146,7 +182,7 @@ final class PasswordManagementViewController: NSViewController {
 
     private func fetchAccounts(completion: @escaping ([SecureVaultModels.WebsiteAccount]) -> Void) {
         DispatchQueue.global(qos: .userInitiated).async {
-            let accounts = (try? SecureVaultFactory.default.makeVault().accounts()) ?? []
+            let accounts = (try? self.secureVault?.accounts()) ?? []
             DispatchQueue.main.async {
                 completion(accounts)
             }

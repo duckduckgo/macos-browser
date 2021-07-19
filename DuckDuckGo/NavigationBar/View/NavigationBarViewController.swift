@@ -166,7 +166,7 @@ final class NavigationBarViewController: NSViewController {
     }
 
     func listenToPasswordManagerNotifications() {
-        passwordManagerNotificationCancellable = NotificationCenter.default.publisher(for: .PasswordManagerDirtyStateChanged).sink { [weak self] _ in
+        passwordManagerNotificationCancellable = NotificationCenter.default.publisher(for: .PasswordManagerChanged).sink { [weak self] _ in
             self?.updatePasswordManagementButton()
         }
     }

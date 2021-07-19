@@ -233,7 +233,7 @@ struct PasswordManagementItemView: View {
 
                     if model.isEditing {
                         Button("Delete") {
-                            print("Delete")
+                            model.requestDelete()
                         }
                     }
 

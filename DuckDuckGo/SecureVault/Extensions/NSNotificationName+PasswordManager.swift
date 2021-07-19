@@ -20,6 +20,6 @@ import Foundation
 
 extension NSNotification.Name {
 
-    static let PasswordManagerDirtyStateChanged = NSNotification.Name("PasswordManagerDirtyStateChanged")
+    static let PasswordManagerChanged = NSNotification.Name("PasswordManagerChanged")
 
 }
