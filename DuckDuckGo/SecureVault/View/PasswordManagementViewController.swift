@@ -63,6 +63,11 @@ final class PasswordManagementViewController: NSViewController {
 
     override func viewDidAppear() {
         super.viewDidAppear()
+
+        if !isDirty {
+            itemModel?.credentials = nil
+        }
+
         refetchWithText(isDirty ? "" : domain ?? "")
     }
 

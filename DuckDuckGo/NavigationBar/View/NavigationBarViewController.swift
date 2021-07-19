@@ -229,6 +229,11 @@ final class NavigationBarViewController: NSViewController {
             return
         }
 
+        // We don't want to remove the button if the popever is showing
+        if passwordManagement.isShown {
+            return
+        }
+
         passwordManagement.viewController.domain = nil
         guard let url = url, let domain = url.host else {
             passwordManagementButton.isHidden = true
