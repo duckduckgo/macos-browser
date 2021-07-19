@@ -28,7 +28,7 @@ final class PasswordManagementItemModel: ObservableObject {
         return dateFormatter
     } ()
 
-    var onEditChanged: (Bool) -> Void
+    var onDirtyChanged: (Bool) -> Void
     var onSaveRequested: (SecureVaultModels.WebsiteCredentials) -> Void
     var onDeleteRequested: (SecureVaultModels.WebsiteCredentials) -> Void
 
@@ -38,13 +38,29 @@ final class PasswordManagementItemModel: ObservableObject {
         }
     }
 
-    @Published var title: String = ""
-    @Published var username: String = ""
-    @Published var password: String = ""
-
-    @Published var isEditing = false {
+    @Published var title: String = "" {
         didSet {
-            self.onEditChanged(isEditing)
+            isDirty = true
+        }
+    }
+
+    @Published var username: String = "" {
+        didSet {
+            isDirty = true
+        }
+    }
+
+    @Published var password: String = "" {
+        didSet {
+            isDirty = true
+        }
+    }
+
+    @Published var isEditing = false
+
+    var isDirty = false {
+        didSet {
+            self.onDirtyChanged(isDirty)
         }
     }
 
@@ -52,10 +68,10 @@ final class PasswordManagementItemModel: ObservableObject {
     var lastUpdatedDate: String = ""
     var createdDate: String = ""
 
-    init(onEditChanged: @escaping (Bool) -> Void,
+    init(onDirtyChanged: @escaping (Bool) -> Void,
          onSaveRequested: @escaping (SecureVaultModels.WebsiteCredentials) -> Void,
          onDeleteRequested: @escaping (SecureVaultModels.WebsiteCredentials) -> Void) {
-        self.onEditChanged = onEditChanged
+        self.onDirtyChanged = onDirtyChanged
         self.onSaveRequested = onSaveRequested
         self.onDeleteRequested = onDeleteRequested
     }
@@ -76,6 +92,7 @@ final class PasswordManagementItemModel: ObservableObject {
         credentials.account.username = username
         credentials.password = password.data(using: .utf8)! // let it crash?
         onSaveRequested(credentials)
+        cancel()
     }
 
     func requestDelete() {
@@ -97,6 +114,7 @@ final class PasswordManagementItemModel: ObservableObject {
         username = credentials?.account.username ?? ""
         password = String(data: credentials?.password ?? Data(), encoding: .utf8) ?? ""
         domain = credentials?.account.domain ?? ""
+        isDirty = false
 
         if let date = credentials?.account.created {
             createdDate = Self.dateFormatter.string(from: date)

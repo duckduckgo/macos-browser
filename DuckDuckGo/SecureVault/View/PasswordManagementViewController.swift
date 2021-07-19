@@ -21,6 +21,13 @@ import Combine
 import SwiftUI
 import BrowserServicesKit
 
+protocol PasswordManagementDelegate: AnyObject {
+
+    /// May not be called on main thread.
+    func shouldClosePasswordManagementViewController(_: PasswordManagementViewController)
+
+}
+
 final class PasswordManagementViewController: NSViewController {
 
     static func create() -> Self {
@@ -31,6 +38,8 @@ final class PasswordManagementViewController: NSViewController {
         // swiftlint:enable force_cast
         return controller
     }
+
+    weak var delegate: PasswordManagementDelegate?
 
     @IBOutlet var listContainer: NSView!
     @IBOutlet var itemContainer: NSView!
@@ -52,20 +61,23 @@ final class PasswordManagementViewController: NSViewController {
         super.viewDidAppear()
         fetchAccounts { [weak self] accounts in
             self?.listModel?.accounts = accounts
-            self?.searchField.stringValue = self?.domain ?? ""
+            self?.searchField.stringValue = self?.isDirty == true ? "" : self?.domain ?? ""
             self?.updateFilter()
-            self?.listModel?.selectFirst()
+
+            if self?.isDirty == false {
+                self?.listModel?.selectFirst()
+            }
         }
     }
 
     private func createItemView() {
-        let itemModel = PasswordManagementItemModel(onEditChanged: { [weak self] isEditing in
-            print("Editing \(isEditing)")
-            self?.isDirty = isEditing
-        }, onSaveRequested: { [weak self] in
+        let itemModel = PasswordManagementItemModel(onDirtyChanged: { [weak self] isDirty in
+            print("Dirty \(isDirty)")
+            self?.isDirty = isDirty
+            NotificationCenter.default.post(name: .PasswordManagerDirtyStateChanged, object: isDirty)
+        }, onSaveRequested: {
             print("Requested save \($0)")
             try? SecureVaultFactory.default.makeVault().storeWebsiteCredentials($0)
-            self?.parent?.dismiss()
         }, onDeleteRequested: {
             print("Request delete \($0)")
         })
@@ -81,6 +93,10 @@ final class PasswordManagementViewController: NSViewController {
     private func createListView() {
         let listModel = PasswordManagementItemListModel(accounts: []) { [weak self] in
             guard let id = $0.id else { return }
+
+            // TODO if is dirty then prompt
+            print("*** changing credentials", $0)
+
             self?.itemModel?.credentials = try? SecureVaultFactory.default.makeVault().websiteCredentialsFor(accountId: id)
         }
         self.listModel = listModel
@@ -91,7 +107,9 @@ final class PasswordManagementViewController: NSViewController {
     }
 
     private func updateFilter() {
-        listModel?.filterUsing(text: searchField.stringValue.trimmingWhitespaces())
+        let text = searchField.stringValue.trimmingWhitespaces()
+        print("*** filtering with", text)
+        listModel?.filterUsing(text: text)
     }
 
     private func fetchAccounts(completion: @escaping ([SecureVaultModels.WebsiteAccount]) -> Void) {

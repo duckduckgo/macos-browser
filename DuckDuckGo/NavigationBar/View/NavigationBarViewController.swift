@@ -48,6 +48,7 @@ final class NavigationBarViewController: NSViewController {
     private var urlCancellable: AnyCancellable?
     private var selectedTabViewModelCancellable: AnyCancellable?
     private var credentialsToSaveCancellable: AnyCancellable?
+    private var passwordManagerNotificationCancellable: AnyCancellable?
     private var navigationButtonsCancellables = Set<AnyCancellable>()
 
     required init?(coder: NSCoder) {
@@ -66,6 +67,7 @@ final class NavigationBarViewController: NSViewController {
 
         setupNavigationButtonMenus()
         subscribeToSelectedTabViewModel()
+        listenToPasswordManagerNotifications()
 
 #if !FEEDBACK
 
@@ -161,6 +163,12 @@ final class NavigationBarViewController: NSViewController {
         let sharing = NSSharingServicePicker(items: [url])
         sharing.delegate = self
         sharing.show(relativeTo: .zero, of: sender, preferredEdge: .minY)
+    }
+
+    func listenToPasswordManagerNotifications() {
+        passwordManagerNotificationCancellable = NotificationCenter.default.publisher(for: .PasswordManagerDirtyStateChanged).sink { [weak self] _ in
+            self?.updatePasswordManagementButton()
+        }
     }
 
     func showBookmarkListPopover() {

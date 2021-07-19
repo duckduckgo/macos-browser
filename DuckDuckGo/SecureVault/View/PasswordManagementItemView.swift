@@ -250,10 +250,12 @@ struct PasswordManagementItemView: View {
                                 model.save()
                             }
                             .keyboardShortcut(.defaultAction) // macOS 11+
+                            .disabled(!model.isDirty)
                         } else {
                             Button("Save") {
                                 model.save()
                             }
+                            .disabled(!model.isDirty)
                         }
 
                     } else {
