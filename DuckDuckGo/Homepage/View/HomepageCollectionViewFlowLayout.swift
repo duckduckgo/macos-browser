@@ -77,10 +77,9 @@ final class HomepageCollectionViewFlowLayout: NSCollectionViewFlowLayout {
 
     override func layoutAttributesForItem(at indexPath: IndexPath) -> NSCollectionViewLayoutAttributes? {
         guard let savedAttributes = savedAttributes,
-              savedAttributes?.indices.contains(indexPath.item)
+              savedAttributes.indices.contains(indexPath.item)
         else { return nil }
         return savedAttributes[indexPath.item]
     }
-
 
 }
