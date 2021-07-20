@@ -90,7 +90,7 @@ final class SaveCredentialsViewController: NSViewController {
         let credentials = SecureVaultModels.WebsiteCredentials(account: account, password: passwordData)
 
         do {
-            try SecureVaultFactory.default.makeVault().storeWebsiteCredentials(credentials)
+            _ = try SecureVaultFactory.default.makeVault().storeWebsiteCredentials(credentials)
         } catch {
             os_log("%s:%: failed to store credentials %s", type: .error, className, #function, error.localizedDescription)
         }

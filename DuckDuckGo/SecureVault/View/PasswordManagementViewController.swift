@@ -171,7 +171,7 @@ final class PasswordManagementViewController: NSViewController {
 
             itemModel?.cancel()
             if isNew {
-                refetchWithText(savedCredentials.account.domain) { [weak self] in
+                refetchWithText(searchField.stringValue) { [weak self] in
                     self?.syncModelsOnCredentials(savedCredentials, select: true)
                 }
             } else {
