@@ -23,6 +23,7 @@ final class HomepageCollectionViewFlowLayout: NSCollectionViewFlowLayout {
     @IBInspectable var columns: Int = 1
     @IBInspectable var insets: CGSize = .zero
     @IBInspectable var verticalShift: CGFloat = 0
+    private var savedAttributes: [NSCollectionViewLayoutAttributes]?
 
     private var contentHeight: CGFloat {
         guard let collectionView = collectionView else { return 0 }
@@ -66,11 +67,20 @@ final class HomepageCollectionViewFlowLayout: NSCollectionViewFlowLayout {
             attribute.frame.origin.y = startY + (attribute.frame.height + minimumLineSpacing) * CGFloat(idx / columns)
         }
 
+        savedAttributes = attributes
         return attributes
     }
 
     override func shouldInvalidateLayout(forBoundsChange newBounds: NSRect) -> Bool {
         true
     }
+
+    override func layoutAttributesForItem(at indexPath: IndexPath) -> NSCollectionViewLayoutAttributes? {
+        guard let savedAttributes = savedAttributes,
+              savedAttributes?.indices.contains(indexPath.item)
+        else { return nil }
+        return savedAttributes[indexPath.item]
+    }
+
 
 }
