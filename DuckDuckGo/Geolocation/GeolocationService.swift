@@ -44,11 +44,12 @@ final class GeolocationService: NSObject, GeolocationServiceProtocol {
     var authorizationStatusPublisher: AnyPublisher<CLAuthorizationStatus, Never> {
         $authorizationStatus.eraseToAnyPublisher()
     }
+    private(set) var locationServicesEnabled: () -> Bool
 
-    init(locationManager: CLLocationManager = .init(),
-         authorizationStatus: CLAuthorizationStatus = CLLocationManager.authorizationStatus()) {
+    init(locationManager: CLLocationManager = .init()) {
         self.locationManager = locationManager
-        self.authorizationStatus = authorizationStatus
+        self.authorizationStatus = type(of: locationManager).authorizationStatus()
+        self.locationServicesEnabled = type(of: locationManager).locationServicesEnabled
         super.init()
 
         locationManager.delegate = self
@@ -65,10 +66,10 @@ final class GeolocationService: NSObject, GeolocationServiceProtocol {
     private var subscriptionCounter = 0 {
         didSet {
             assert(subscriptionCounter >= 0)
-            switch subscriptionCounter {
-            case 1:
+            switch (oldValue, subscriptionCounter) {
+            case (0, 1):
                 locationManager.startUpdatingLocation()
-            case 0:
+            case (1, 0):
                 locationManager.stopUpdatingLocation()
                 if case .failure = currentLocation {
                     currentLocationPublished = nil
@@ -101,6 +102,7 @@ extension GeolocationService: CLLocationManagerDelegate {
     }
 
     func locationManager(_ manager: CLLocationManager, didFailWithError error: Error) {
+        guard subscriptionCounter > 0 else { return }
         currentLocationPublished = .failure(error)
     }
 

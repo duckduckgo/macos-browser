@@ -33,17 +33,16 @@ final class PermissionModel {
     }
 
     private let permissionManager: PermissionManagerProtocol
+    private let geolocationService: GeolocationService
     private weak var webView: WKWebView?
     private var cancellables = Set<AnyCancellable>()
 
-    private let systemLocationServicesEnabled: () -> Bool
-
     init(webView: WKWebView,
          permissionManager: PermissionManagerProtocol = PermissionManager.shared,
-         systemLocationServicesEnabled: @escaping () -> Bool = CLLocationManager.locationServicesEnabled) {
+         geolocationService: GeolocationService = GeolocationService.shared) {
         self.permissionManager = permissionManager
         self.webView = webView
-        self.systemLocationServicesEnabled = systemLocationServicesEnabled
+        self.geolocationService = geolocationService
 
         self.subscribe(to: webView)
         self.subscribe(to: permissionManager)
@@ -96,7 +95,7 @@ final class PermissionModel {
                 let authorizationStatus = webView.configuration.processPool.geolocationProvider?.authorizationStatus
                 if [.denied, .restricted].contains(authorizationStatus) {
                     permissions.geolocation
-                        .systemMediaAuthorizationDenied(systemWide: !self.systemLocationServicesEnabled())
+                        .systemMediaAuthorizationDenied(systemWide: !geolocationService.locationServicesEnabled())
                 } else {
                     permissions.geolocation.update(with: webView.geolocationState)
                 }
@@ -242,10 +241,10 @@ final class PermissionModel {
                                                             $0.permissions.contains(.geolocation)
                                                     }))
             self.updatePermissions()
-            
+
         case .denied, .restricted:
             self.permissions.geolocation
-                .systemMediaAuthorizationDenied(systemWide: !self.systemLocationServicesEnabled())
+                .systemMediaAuthorizationDenied(systemWide: !geolocationService.locationServicesEnabled())
 
         case .notDetermined: break
         @unknown default: break
