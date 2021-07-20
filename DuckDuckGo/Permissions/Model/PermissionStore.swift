@@ -29,6 +29,10 @@ final class PermissionStore {
     }
 
     func loadPermissions() throws -> [PermissionEntity] {
+#if DEBUG
+        if AppDelegate.isRunningTests { return [] }
+#endif
+
         let fetchRequest = NSFetchRequest<PermissionManagedObject>(entityName: PermissionManagedObject.className())
 
         fetchRequest.returnsObjectsAsFaults = false

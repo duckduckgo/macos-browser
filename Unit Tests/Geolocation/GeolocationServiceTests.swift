@@ -35,7 +35,7 @@ extension GeolocationServiceTests: CLLocationManagerDelegate {
 final class GeolocationServiceTests: XCTestCase {
     var cancelled = false
 
-    func testG() {
+    func disabled_testG() {
         let lm1 = CLLocationManager()
         let lm2 = CLLocationManager()
 
@@ -56,7 +56,7 @@ final class GeolocationServiceTests: XCTestCase {
 
     }
 
-    func testGeo() {
+    func disabled_testGeo() {
         let locationManager = CLLocationManagerMock()
         let service = GeolocationService(locationManager: locationManager)
 
