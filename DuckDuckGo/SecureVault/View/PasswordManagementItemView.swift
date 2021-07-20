@@ -40,7 +40,7 @@ struct PasswordManagementItemView: View {
                 if editMode {
 
                     RoundedRectangle(cornerRadius: 8)
-                        .foregroundColor(Color(NSColor.backgroundSecondaryColor))
+                        .foregroundColor(Color(NSColor.editingPanelColor))
                         .shadow(radius: 6)
 
                 }
