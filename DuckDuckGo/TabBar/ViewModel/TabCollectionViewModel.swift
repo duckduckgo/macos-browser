@@ -207,9 +207,19 @@ final class TabCollectionViewModel: NSObject {
         }
 
         let newSelectionIndex: Int
-        if selectionIndex == index, selectParentOnRemoval,
-           let parentTab = parentTab, let parentTabIndex = tabCollection.tabs.firstIndex(of: parentTab) {
+        if selectionIndex == index,
+           selectParentOnRemoval,
+           let parentTab = parentTab,
+           let parentTabIndex = tabCollection.tabs.firstIndex(of: parentTab) {
+            // Select parent tab
             newSelectionIndex = parentTabIndex
+        } else if selectionIndex == index,
+                  let parentTab = parentTab,
+                  let leftTab = tabCollection.tabs[safe: index - 1],
+                  let rightTab = tabCollection.tabs[safe: index],
+                  rightTab.parentTab !== parentTab && (leftTab.parentTab === parentTab || leftTab === parentTab) {
+            // Select parent tab on left or another child tab on left instead of the tab on right
+            newSelectionIndex = max(selectionIndex - 1, 0)
         } else if selectionIndex > index {
             newSelectionIndex = max(selectionIndex - 1, 0)
         } else {

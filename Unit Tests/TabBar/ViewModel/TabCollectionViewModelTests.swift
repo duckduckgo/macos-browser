@@ -263,6 +263,57 @@ final class TabCollectionViewModelTests: XCTestCase {
         XCTAssertEqual(firstTab, tabCollectionViewModel.selectedTabViewModel?.tab)
     }
 
+    func testWhenLastTabIsRemoved_ThenSelectionIsNil() {
+        let tabCollectionViewModel = TabCollectionViewModel.aTabCollectionViewModel()
+
+        tabCollectionViewModel.remove(at: 0)
+
+        XCTAssertNil(tabCollectionViewModel.selectionIndex)
+        XCTAssertEqual(tabCollectionViewModel.tabCollection.tabs.count, 0)
+    }
+
+    func testWhenNoTabIsSelectedAndTabIsRemoved_ThenSelectionStaysEmpty() {
+        let tabCollectionViewModel = TabCollectionViewModel.aTabCollectionViewModel()
+        tabCollectionViewModel.appendNewTab()
+        tabCollectionViewModel.appendNewTab()
+
+        // Clear selection
+        tabCollectionViewModel.select(at: -1)
+
+        tabCollectionViewModel.remove(at: 1)
+
+        XCTAssertNil(tabCollectionViewModel.selectionIndex)
+    }
+
+    func testWhenChildTabIsInsertedAndRemoved_ThenParentIsSelectedBack() {
+        let tabCollectionViewModel = TabCollectionViewModel.aTabCollectionViewModel()
+        let parentTab = tabCollectionViewModel.tabCollection.tabs[0]
+        let childTab1 = Tab(parentTab: parentTab)
+        tabCollectionViewModel.append(tab: childTab1, selected: false)
+        let childTab2 = Tab(parentTab: parentTab)
+        tabCollectionViewModel.append(tab: childTab2, selected: true)
+
+        tabCollectionViewModel.remove(at: 2)
+
+        XCTAssertEqual(tabCollectionViewModel.selectedTabViewModel?.tab, parentTab)
+    }
+
+    func testWhenChildTabOnLeftHasTheSameParentAndTabOnRightDont_ThenTabOnLeftIsSelectedAfterRemoval() {
+        let tabCollectionViewModel = TabCollectionViewModel.aTabCollectionViewModel()
+        let parentTab = tabCollectionViewModel.tabCollection.tabs[0]
+        let childTab1 = Tab(parentTab: parentTab)
+        tabCollectionViewModel.append(tab: childTab1, selected: false)
+        let childTab2 = Tab(parentTab: parentTab)
+        tabCollectionViewModel.append(tab: childTab2, selected: true)
+        tabCollectionViewModel.appendNewTab()
+
+        // Select and remove childTab2
+        tabCollectionViewModel.selectPrevious()
+        tabCollectionViewModel.removeSelected()
+
+        XCTAssertEqual(tabCollectionViewModel.selectedTabViewModel?.tab, childTab1)
+    }
+
     func testWhenOwnerOfWebviewIsRemovedThenAllOtherTabsRemained() {
         let tabCollectionViewModel = TabCollectionViewModel.aTabCollectionViewModel()
 
