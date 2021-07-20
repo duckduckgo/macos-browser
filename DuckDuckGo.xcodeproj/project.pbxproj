@@ -98,6 +98,7 @@
 		4B6FB1CC269E7262005DD826 /* CSVImporterTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B6FB1CB269E7262005DD826 /* CSVImporterTests.swift */; };
 		4B6FB1CE269E7913005DD826 /* DataImportMocks.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B6FB1CD269E7913005DD826 /* DataImportMocks.swift */; };
 		4B6FB1D0269E79A3005DD826 /* FileSystemTestUtility.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B6FB1CF269E79A3005DD826 /* FileSystemTestUtility.swift */; };
+		4B75EA9626A62E0E00018634 /* CSVImportSummaryViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B75EA9526A62E0E00018634 /* CSVImportSummaryViewController.swift */; };
 		4B82E9B325B69E3E00656FE7 /* TrackerRadarKit in Frameworks */ = {isa = PBXBuildFile; productRef = 4B82E9B225B69E3E00656FE7 /* TrackerRadarKit */; };
 		4B82E9B925B6A05800656FE7 /* DetectedTrackerTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B82E9B825B6A05800656FE7 /* DetectedTrackerTests.swift */; };
 		4B82E9C125B6A1CD00656FE7 /* TrackerRadarManagerTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B82E9C025B6A1CD00656FE7 /* TrackerRadarManagerTests.swift */; };
@@ -518,6 +519,8 @@
 		4B6FB1CB269E7262005DD826 /* CSVImporterTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CSVImporterTests.swift; sourceTree = "<group>"; };
 		4B6FB1CD269E7913005DD826 /* DataImportMocks.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DataImportMocks.swift; sourceTree = "<group>"; };
 		4B6FB1CF269E79A3005DD826 /* FileSystemTestUtility.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FileSystemTestUtility.swift; sourceTree = "<group>"; };
+		4B75EA9426A6156600018634 /* BrowserServicesKit */ = {isa = PBXFileReference; lastKnownFileType = folder; name = BrowserServicesKit; path = ../BrowserServicesKit; sourceTree = "<group>"; };
+		4B75EA9526A62E0E00018634 /* CSVImportSummaryViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CSVImportSummaryViewController.swift; sourceTree = "<group>"; };
 		4B82E9B825B6A05800656FE7 /* DetectedTrackerTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DetectedTrackerTests.swift; sourceTree = "<group>"; };
 		4B82E9C025B6A1CD00656FE7 /* TrackerRadarManagerTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TrackerRadarManagerTests.swift; sourceTree = "<group>"; };
 		4B92928526670D1600AD2C21 /* BookmarksOutlineView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = BookmarksOutlineView.swift; sourceTree = "<group>"; };
@@ -1025,6 +1028,7 @@
 				4B26FB4C269781CB0010AF6A /* DataImportViewController.swift */,
 				4B26FB4F2697BACE0010AF6A /* CSVImportViewController.swift */,
 				4B26FB5D269AA31C0010AF6A /* BrowserImportViewController.swift */,
+				4B75EA9526A62E0E00018634 /* CSVImportSummaryViewController.swift */,
 			);
 			path = View;
 			sourceTree = "<group>";
@@ -1402,6 +1406,7 @@
 			isa = PBXGroup;
 			children = (
 				AA68C3D62490F821001B8783 /* README.md */,
+				4B75EA9426A6156600018634 /* BrowserServicesKit */,
 				AA585D80248FD31100E9A3E2 /* DuckDuckGo */,
 				AA585D93248FD31400E9A3E2 /* Unit Tests */,
 				4B1AD89E25FC27E200261379 /* Integration Tests */,
@@ -2756,6 +2761,7 @@
 				AABEE69C24A902BB0043105B /* SuggestionContainer.swift in Sources */,
 				B6A9E46B2614618A0067D1B9 /* OperatingSystemVersionExtension.swift in Sources */,
 				85AC3AEF25D5CE9800C7D2AA /* UserScripts.swift in Sources */,
+				4B75EA9626A62E0E00018634 /* CSVImportSummaryViewController.swift in Sources */,
 				4B677439255DBEB800025BD8 /* HTTPSUpgradeStore.swift in Sources */,
 				AAB549DF25DAB8F80058460B /* BookmarkViewModel.swift in Sources */,
 				F41D174125CB131900472416 /* NSColorExtension.swift in Sources */,

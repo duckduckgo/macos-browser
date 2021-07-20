@@ -31,6 +31,19 @@
                                             </connections>
                                         </menuItem>
                                         <menuItem isSeparatorItem="YES" id="wFC-TO-SCJ"/>
+                                        <menuItem title="Import Browser Data..." id="w5o-Sf-Npb">
+                                            <modifierMask key="keyEquivalentModifierMask"/>
+                                            <connections>
+                                                <action selector="openImportBrowserDataWindow:" target="Ady-hI-5gd" id="eKR-F1-4L0"/>
+                                            </connections>
+                                        </menuItem>
+                                        <menuItem title="Export Browser Data..." id="4jH-4s-nco">
+                                            <modifierMask key="keyEquivalentModifierMask"/>
+                                            <connections>
+                                                <action selector="openExportBrowserDataWindow:" target="Ady-hI-5gd" id="hFS-kh-HJ5"/>
+                                            </connections>
+                                        </menuItem>
+                                        <menuItem isSeparatorItem="YES" id="t1R-yn-9NQ"/>
                                         <menuItem title="Services" id="NMo-om-nkz">
                                             <modifierMask key="keyEquivalentModifierMask"/>
                                             <menu key="submenu" title="Services" systemMenu="services" id="hz9-B4-Xy5"/>

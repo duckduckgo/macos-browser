@@ -98,4 +98,5 @@ final class CSVImportViewController: NSViewController {
 
         renderCurrentState()
     }
+
 }

@@ -10,12 +10,11 @@
         <scene sceneID="PEd-7d-5j0">
             <objects>
                 <viewController storyboardIdentifier="DataImportViewController" id="bU7-R8-ocO" customClass="DataImportViewController" customModule="DuckDuckGo_Privacy_Browser" customModuleProvider="target" sceneMemberID="viewController">
-                    <view key="view" id="tOy-S4-hL0">
-                        <rect key="frame" x="0.0" y="0.0" width="492" height="343"/>
-                        <autoresizingMask key="autoresizingMask"/>
+                    <view key="view" translatesAutoresizingMaskIntoConstraints="NO" id="tOy-S4-hL0">
+                        <rect key="frame" x="0.0" y="0.0" width="522" height="329"/>
                         <subviews>
                             <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="0i7-MK-KZ1">
-                                <rect key="frame" x="18" y="308" width="136" height="15"/>
+                                <rect key="frame" x="18" y="294" width="136" height="15"/>
                                 <textFieldCell key="cell" lineBreakMode="clipping" title="Import Browser Data" id="Qne-Wm-qAI">
                                     <font key="font" size="13" name="SFProText-Semibold"/>
                                     <color key="textColor" name="labelColor" catalog="System" colorSpace="catalog"/>
@@ -23,7 +22,7 @@
                                 </textFieldCell>
                             </textField>
                             <popUpButton verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="sh9-5v-T9e" userLabel="Import Source Picker">
-                                <rect key="frame" x="17" y="256" width="207" height="25"/>
+                                <rect key="frame" x="17" y="242" width="207" height="25"/>
                                 <constraints>
                                     <constraint firstAttribute="width" priority="500" constant="200" id="gkZ-Iu-IBm"/>
                                 </constraints>
@@ -37,14 +36,8 @@
                                     </menu>
                                 </popUpButtonCell>
                             </popUpButton>
-                            <containerView translatesAutoresizingMaskIntoConstraints="NO" id="3Nx-ic-8u2">
-                                <rect key="frame" x="20" y="60" width="452" height="180"/>
-                                <connections>
-                                    <segue destination="Meg-M8-8oL" kind="embed" id="OaY-IU-1H7"/>
-                                </connections>
-                            </containerView>
                             <button verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="p3M-G6-gOX">
-                                <rect key="frame" x="404" y="13" width="75" height="32"/>
+                                <rect key="frame" x="434" y="13" width="75" height="32"/>
                                 <buttonCell key="cell" type="push" title="Import" bezelStyle="rounded" alignment="center" enabled="NO" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="HD2-Mw-Fjl">
                                     <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
                                     <font key="font" metaFont="system"/>
@@ -57,7 +50,7 @@ DQ
                                 </connections>
                             </button>
                             <button verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="UkV-S4-sID">
-                                <rect key="frame" x="330" y="13" width="76" height="32"/>
+                                <rect key="frame" x="360" y="13" width="76" height="32"/>
                                 <buttonCell key="cell" type="push" title="Cancel" bezelStyle="rounded" alignment="center" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="XaU-cZ-jqv">
                                     <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
                                     <font key="font" metaFont="system"/>
@@ -69,42 +62,71 @@ Gw
                                     <action selector="cancelButtonClicked:" target="bU7-R8-ocO" id="Ti4-Gg-geM"/>
                                 </connections>
                             </button>
+                            <customView translatesAutoresizingMaskIntoConstraints="NO" id="Bde-GS-Qx1">
+                                <rect key="frame" x="20" y="58" width="482" height="170"/>
+                            </customView>
                         </subviews>
                         <constraints>
                             <constraint firstAttribute="trailing" secondItem="p3M-G6-gOX" secondAttribute="trailing" constant="20" symbolic="YES" id="2Pk-Jt-TVr"/>
                             <constraint firstItem="p3M-G6-gOX" firstAttribute="leading" secondItem="UkV-S4-sID" secondAttribute="trailing" constant="12" symbolic="YES" id="2q4-wX-FIX"/>
                             <constraint firstItem="0i7-MK-KZ1" firstAttribute="top" secondItem="tOy-S4-hL0" secondAttribute="top" constant="20" symbolic="YES" id="Aep-ee-MBT"/>
                             <constraint firstAttribute="bottom" secondItem="UkV-S4-sID" secondAttribute="bottom" constant="20" symbolic="YES" id="Dcb-ww-ZTA"/>
+                            <constraint firstItem="Bde-GS-Qx1" firstAttribute="top" secondItem="sh9-5v-T9e" secondAttribute="bottom" constant="18" id="EEW-EO-4Iy"/>
+                            <constraint firstItem="Bde-GS-Qx1" firstAttribute="leading" secondItem="tOy-S4-hL0" secondAttribute="leading" constant="20" symbolic="YES" id="GQY-oe-i7P"/>
                             <constraint firstAttribute="trailing" relation="greaterThanOrEqual" secondItem="0i7-MK-KZ1" secondAttribute="trailing" constant="20" symbolic="YES" id="Oab-xU-Wp2"/>
-                            <constraint firstAttribute="trailing" secondItem="3Nx-ic-8u2" secondAttribute="trailing" constant="20" symbolic="YES" id="Pl4-vE-qnV"/>
                             <constraint firstItem="sh9-5v-T9e" firstAttribute="leading" secondItem="tOy-S4-hL0" secondAttribute="leading" constant="20" symbolic="YES" id="Spt-Wv-v3y"/>
                             <constraint firstAttribute="bottom" secondItem="p3M-G6-gOX" secondAttribute="bottom" constant="20" symbolic="YES" id="d6F-cy-53u"/>
-                            <constraint firstItem="3Nx-ic-8u2" firstAttribute="top" secondItem="sh9-5v-T9e" secondAttribute="bottom" constant="20" id="eLq-6U-Ztv"/>
-                            <constraint firstItem="p3M-G6-gOX" firstAttribute="top" secondItem="3Nx-ic-8u2" secondAttribute="bottom" constant="20" symbolic="YES" id="ff8-JP-wdO"/>
                             <constraint firstItem="0i7-MK-KZ1" firstAttribute="leading" secondItem="tOy-S4-hL0" secondAttribute="leading" constant="20" symbolic="YES" id="g7P-bX-xpj"/>
-                            <constraint firstItem="3Nx-ic-8u2" firstAttribute="leading" secondItem="tOy-S4-hL0" secondAttribute="leading" constant="20" symbolic="YES" id="qnT-wX-eSD"/>
+                            <constraint firstAttribute="trailing" secondItem="Bde-GS-Qx1" secondAttribute="trailing" constant="20" symbolic="YES" id="mm5-fe-nTF"/>
+                            <constraint firstItem="p3M-G6-gOX" firstAttribute="top" secondItem="Bde-GS-Qx1" secondAttribute="bottom" constant="18" id="oji-iH-bCG"/>
                             <constraint firstItem="sh9-5v-T9e" firstAttribute="top" secondItem="0i7-MK-KZ1" secondAttribute="bottom" constant="28" id="zOc-EF-N9F"/>
                         </constraints>
                     </view>
                     <connections>
-                        <outlet property="containerView" destination="3Nx-ic-8u2" id="jxH-P6-MgC"/>
+                        <outlet property="containerView" destination="Bde-GS-Qx1" id="SMY-ti-olQ"/>
                         <outlet property="importButton" destination="p3M-G6-gOX" id="S3v-kX-VOm"/>
                         <outlet property="importSourcePopUpButton" destination="sh9-5v-T9e" id="0My-NY-rjb"/>
                     </connections>
                 </viewController>
                 <customObject id="9uD-mB-xHs" userLabel="First Responder" customClass="NSResponder" sceneMemberID="firstResponder"/>
             </objects>
-            <point key="canvasLocation" x="72" y="152.5"/>
+            <point key="canvasLocation" x="75" y="146"/>
+        </scene>
+        <!--Import Summary View Controller-->
+        <scene sceneID="lq1-B2-i1k">
+            <objects>
+                <viewController storyboardIdentifier="CSVImportSummaryViewController" id="SBx-aI-Zdd" customClass="CSVImportSummaryViewController" customModule="DuckDuckGo_Privacy_Browser" customModuleProvider="target" sceneMemberID="viewController">
+                    <view key="view" id="VAn-Ub-6ym">
+                        <rect key="frame" x="0.0" y="0.0" width="469" height="329"/>
+                        <autoresizingMask key="autoresizingMask"/>
+                        <subviews>
+                            <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="kEX-xf-rNu">
+                                <rect key="frame" x="182" y="157" width="106" height="16"/>
+                                <textFieldCell key="cell" lineBreakMode="clipping" title="Import Complete" id="rJC-Qi-wHX">
+                                    <font key="font" usesAppearanceFont="YES"/>
+                                    <color key="textColor" name="labelColor" catalog="System" colorSpace="catalog"/>
+                                    <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
+                                </textFieldCell>
+                            </textField>
+                        </subviews>
+                        <constraints>
+                            <constraint firstItem="kEX-xf-rNu" firstAttribute="centerY" secondItem="VAn-Ub-6ym" secondAttribute="centerY" id="BxO-kR-rI3"/>
+                            <constraint firstItem="kEX-xf-rNu" firstAttribute="centerX" secondItem="VAn-Ub-6ym" secondAttribute="centerX" id="dHN-fx-8Aq"/>
+                        </constraints>
+                    </view>
+                </viewController>
+                <customObject id="9fr-6f-wQR" userLabel="First Responder" customClass="NSResponder" sceneMemberID="firstResponder"/>
+            </objects>
+            <point key="canvasLocation" x="604.5" y="145.5"/>
         </scene>
         <!--Import View Controller-->
         <scene sceneID="e65-WV-kqF">
             <objects>
-                <viewController id="Meg-M8-8oL" customClass="CSVImportViewController" customModule="DuckDuckGo_Privacy_Browser" customModuleProvider="target" sceneMemberID="viewController">
-                    <view key="view" id="n2z-bE-Ka8">
+                <viewController storyboardIdentifier="CSVImportViewController" id="Meg-M8-8oL" customClass="CSVImportViewController" customModule="DuckDuckGo_Privacy_Browser" customModuleProvider="target" sceneMemberID="viewController">
+                    <view key="view" translatesAutoresizingMaskIntoConstraints="NO" id="n2z-bE-Ka8">
                         <rect key="frame" x="0.0" y="0.0" width="313" height="116"/>
-                        <autoresizingMask key="autoresizingMask"/>
                         <subviews>
-                            <stackView distribution="fill" orientation="vertical" alignment="centerX" spacing="12" horizontalStackHuggingPriority="249.99998474121094" verticalStackHuggingPriority="249.99998474121094" detachesHiddenViews="YES" translatesAutoresizingMaskIntoConstraints="NO" id="HLb-Dw-Y0O">
+                            <stackView distribution="fill" orientation="vertical" alignment="centerX" spacing="12" horizontalStackHuggingPriority="249.99998474121094" verticalStackHuggingPriority="249.99998474121094" horizontalHuggingPriority="249" detachesHiddenViews="YES" translatesAutoresizingMaskIntoConstraints="NO" id="HLb-Dw-Y0O">
                                 <rect key="frame" x="20" y="20" width="273" height="76"/>
                                 <subviews>
                                     <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="qiB-A6-LS4">
@@ -161,7 +183,7 @@ Gw
                 </viewController>
                 <customObject id="Xcz-bj-sHR" userLabel="First Responder" customClass="NSResponder" sceneMemberID="firstResponder"/>
             </objects>
-            <point key="canvasLocation" x="71.5" y="678.5"/>
+            <point key="canvasLocation" x="-18.5" y="522"/>
         </scene>
     </scenes>
 </document>
