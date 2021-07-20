@@ -21,37 +21,158 @@ import Foundation
 import SwiftUI
 import BrowserServicesKit
 
-private struct ShowItemView: View {
+private let interItemSpacing: CGFloat = 16
+private let itemSpacing: CGFloat = 10
+
+struct PasswordManagementItemView: View {
 
     @EnvironmentObject var model: PasswordManagementItemModel
 
-    @State var isHoveringOverUsername = false
-    @State var isHoveringOverPassword = false
-    @State var isPasswordVisible = false
+    var body: some View {
+
+        if model.credentials != nil {
+
+            let editMode = model.isEditing || model.isNew
+
+            ZStack(alignment: .top) {
+                Spacer()
+
+                if editMode {
+
+                    RoundedRectangle(cornerRadius: 8)
+                        .foregroundColor(Color(NSColor.backgroundSecondaryColor))
+                        .shadow(radius: 6)
+
+                }
+
+                VStack(alignment: .leading, spacing: 0) {
+
+                    HeaderView()
+                        .padding(.bottom, editMode ? 20 : 30)
+
+                    if model.isEditing || model.isNew {
+                        Divider()
+                            .padding(.bottom, 10)
+
+                        LoginTitleView()
+                    }
+
+                    UsernameView()
+
+                    PasswordView()
+
+                    WebsiteView()
+
+                    if !model.isEditing && !model.isNew {
+                        DatesView()
+                    }
+
+                    Spacer(minLength: 0)
+
+                    Buttons()
+
+                }
+                .frame(maxWidth: .infinity, maxHeight: .infinity)
+                .padding()
+
+            }
+            .padding()
+        }
+
+    }
+
+}
+
+private struct Buttons: View {
+
+    @EnvironmentObject var model: PasswordManagementItemModel
+
+    var body: some View {
+        HStack {
+
+            if model.isEditing {
+                Button("Delete") {
+                    model.requestDelete()
+                }
+            }
+
+            Spacer()
+
+            if model.isEditing || model.isNew {
+                Button("Cancel") {
+                    print("Cancel")
+                    model.cancel()
+                }
+
+                if #available(macOS 11, *) {
+                    Button("Save") {
+                        model.save()
+                    }
+                    .keyboardShortcut(.defaultAction) // macOS 11+
+                    .disabled(!model.isDirty)
+                } else {
+                    Button("Save") {
+                        model.save()
+                    }
+                    .disabled(!model.isDirty)
+                }
+
+            } else {
+                Button("Delete") {
+                    model.requestDelete()
+                }
+
+                Button("Edit") {
+                    model.edit()
+                }
+            }
+
+        }.padding()
+    }
+
+}
+
+private struct LoginTitleView: View {
+
+    @EnvironmentObject var model: PasswordManagementItemModel
 
     var body: some View {
 
-        VStack(alignment: .leading) {
+        Text("Login Title")
+            .bold()
+            .padding(.bottom, itemSpacing)
 
-            HStack(alignment: .top, spacing: 10) {
+        TextField("", text: $model.title)
+            .textFieldStyle(RoundedBorderTextFieldStyle())
+            .padding(.bottom, interItemSpacing)
 
-                FaviconView(domain: model.domain)
+    }
 
-                Text(model.domain)
-                    .font(.title)
+}
 
-                Spacer()
+private struct UsernameView: View {
 
-            }
-            .padding(.bottom, 30)
+    @EnvironmentObject var model: PasswordManagementItemModel
 
-            Text("Username")
-                .bold()
-                .padding(.bottom, 4.5)
+    @State var isHovering = false
+
+    var body: some View {
+        Text("Username")
+            .bold()
+            .padding(.bottom, itemSpacing)
+
+        if model.isEditing || model.isNew {
+
+            TextField("", text: $model.username)
+                .textFieldStyle(RoundedBorderTextFieldStyle())
+                .padding(.bottom, interItemSpacing)
+
+        } else {
 
             HStack(spacing: 6) {
                 Text(model.username)
-                if isHoveringOverUsername {
+
+                if isHovering {
                     Button {
                         model.copyUsername()
                     } label: {
@@ -60,117 +181,29 @@ private struct ShowItemView: View {
                 }
             }
             .onHover {
-                isHoveringOverUsername = $0
+                isHovering = $0
             }
-            .padding(.bottom, 20.5)
-
-            Text("Password")
-                .bold()
-                .padding(.bottom, 4.5)
-
-            HStack(spacing: 6) {
-
-                if isPasswordVisible {
-                    Text(model.password)
-                } else {
-                    Text(model.password.isEmpty ? "" : "••••••••••••")
-                }
-
-                if isHoveringOverPassword || isPasswordVisible {
-                    Button {
-                        isPasswordVisible = !isPasswordVisible
-                    } label: {
-                        Image("SecureEyeToggle")
-                    }.buttonStyle(PlainButtonStyle())
-                }
-
-                if isHoveringOverPassword {
-                    Button {
-                        model.copyPassword()
-                    } label: {
-                        Image("Copy")
-                    }.buttonStyle(PlainButtonStyle())
-                }
-            }
-            .onHover {
-                isHoveringOverPassword = $0
-            }
-            .padding(.bottom, 20.5)
-
-            Text("Website")
-                .bold()
-                .padding(.bottom, 4.5)
-
-            Text(model.domain)
-
-            Spacer()
-
-            HStack {
-                Text("Added")
-                    .bold()
-                    .opacity(0.5)
-                Text(model.createdDate)
-                    .opacity(0.5)
-            }
-
-            HStack {
-                Text("Last Updated")
-                    .bold()
-                    .opacity(0.5)
-                Text(model.lastUpdatedDate)
-                    .opacity(0.5)
-            }
-            .padding(.bottom, 10)
+            .padding(.bottom, interItemSpacing)
 
         }
-        .padding(EdgeInsets(top: 30, leading: 20, bottom: 0, trailing: 0))
+
     }
 
 }
 
-private struct EditItemView: View {
+private struct PasswordView: View {
 
     @EnvironmentObject var model: PasswordManagementItemModel
 
+    @State var isHovering = false
     @State var isPasswordVisible = false
 
     var body: some View {
-        VStack(alignment: .leading) {
+        Text("Password")
+            .bold()
+            .padding(.bottom, itemSpacing)
 
-            HStack(alignment: .top, spacing: 10) {
-
-                FaviconView(domain: model.domain)
-
-                Text("Edit")
-                    .font(.title)
-
-                Text(model.domain)
-                    .font(.title)
-
-                Spacer()
-
-            }
-            .padding(.bottom, 30)
-
-            Text("Login Title")
-                .bold()
-                .padding(.bottom, 4)
-
-            TextField("", text: $model.title)
-                .padding(.bottom, 10)
-                .textFieldStyle(RoundedBorderTextFieldStyle())
-
-            Text("Username")
-                .bold()
-                .padding(.bottom, 4)
-
-            TextField("", text: $model.username)
-                .padding(.bottom, 10)
-                .textFieldStyle(RoundedBorderTextFieldStyle())
-
-            Text("Password")
-                .bold()
-                .padding(.bottom, 4)
+        if model.isEditing || model.isNew {
 
             ZStack(alignment: .trailing) {
 
@@ -195,80 +228,126 @@ private struct EditItemView: View {
                 .padding(.trailing, 10)
 
             }
-            .padding(.bottom, 10)
+            .padding(.bottom, interItemSpacing)
 
-            Text("Website")
-                .bold()
-                .padding(.bottom, 4.5)
+        } else {
 
-            Text(model.domain)
+            HStack(alignment: .center, spacing: 6) {
 
-            Spacer()
+                if isPasswordVisible {
+                    Text(model.password)
+                } else {
+                    Text(model.password.isEmpty ? "" : "••••••••••••")
+                }
+
+                if isHovering || isPasswordVisible {
+                    Button {
+                        isPasswordVisible = !isPasswordVisible
+                    } label: {
+                        Image("SecureEyeToggle")
+                    }.buttonStyle(PlainButtonStyle())
+                }
+
+                if isHovering {
+                    Button {
+                        model.copyPassword()
+                    } label: {
+                        Image("Copy")
+                    }.buttonStyle(PlainButtonStyle())
+                }
+            }
+            .onHover {
+                isHovering = $0
+            }
+            .padding(.bottom, interItemSpacing)
 
         }
-        .padding(EdgeInsets(top: 30, leading: 20, bottom: 0, trailing: 20))
     }
 
 }
 
-struct PasswordManagementItemView: View {
+private struct WebsiteView: View {
 
     @EnvironmentObject var model: PasswordManagementItemModel
 
     var body: some View {
 
-        if model.credentials != nil {
+        Text("Website")
+            .bold()
+            .padding(.bottom, itemSpacing)
 
-            VStack {
+        if model.isEditing || model.isNew {
 
-                ZStack {
-                    if model.isEditing {
-                        EditItemView()
-                    } else {
-                        ShowItemView()
-                    }
+            TextField("", text: $model.domain)
+                .textFieldStyle(RoundedBorderTextFieldStyle())
+                .padding(.bottom, interItemSpacing)
+
+        } else {
+
+            Text(model.domain)
+                .padding(.bottom, interItemSpacing)
+
+        }
+
+    }
+
+}
+
+private struct DatesView: View {
+
+    @EnvironmentObject var model: PasswordManagementItemModel
+
+    var body: some View {
+        VStack(alignment: .leading, spacing: 4) {
+            HStack {
+                Text("Added")
+                    .bold()
+                    .opacity(0.5)
+                Text(model.createdDate)
+                    .opacity(0.5)
+            }
+
+            HStack {
+                Text("Last Updated")
+                    .bold()
+                    .opacity(0.5)
+                Text(model.lastUpdatedDate)
+                    .opacity(0.5)
+            }
+        }
+    }
+
+}
+
+private struct HeaderView: View {
+
+    @EnvironmentObject var model: PasswordManagementItemModel
+
+    var body: some View {
+
+        HStack(alignment: .center, spacing: 0) {
+
+            FaviconView(domain: model.domain)
+                .padding(.trailing, 10)
+
+            if model.isNew {
+
+                Text("New Login")
+                    .font(.title)
+                    .padding(.trailing, 4)
+
+            } else {
+
+                if model.isEditing {
+
+                    Text("Edit")
+                        .font(.title)
+                        .padding(.trailing, 4)
+
                 }
 
-                HStack {
-
-                    if model.isEditing {
-                        Button("Delete") {
-                            model.requestDelete()
-                        }
-                    }
-
-                    Spacer()
-
-                    if model.isEditing {
-                        Button("Cancel") {
-                            print("Cancel")
-                            model.cancel()
-                        }
-
-                        if #available(macOS 11, *) {
-                            Button("Save") {
-                                model.save()
-                            }
-                            .keyboardShortcut(.defaultAction) // macOS 11+
-                            .disabled(!model.isDirty)
-                        } else {
-                            Button("Save") {
-                                model.save()
-                            }
-                            .disabled(!model.isDirty)
-                        }
-
-                    } else {
-                        Button("Delete") {
-                            model.requestDelete()
-                        }
-
-                        Button("Edit") {
-                            model.edit()
-                        }
-                    }
-
-                }.padding()
+                Text(model.domain)
+                    .font(.title)
 
             }
 

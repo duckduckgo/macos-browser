@@ -56,7 +56,14 @@ final class PasswordManagementItemModel: ObservableObject {
         }
     }
 
+    @Published var domain: String = "" {
+        didSet {
+            isDirty = true
+        }
+    }
+
     @Published var isEditing = false
+    @Published var isNew = false
 
     var isDirty = false {
         didSet {
@@ -64,7 +71,14 @@ final class PasswordManagementItemModel: ObservableObject {
         }
     }
 
-    var domain: String = ""
+    var normalizedDomain: String {
+        // Remove any possible scheme entry
+        let domainOnly = domain.trimmingWhitespaces().drop(prefix: "http://").drop(prefix: "https://").trimmingWhitespaces()
+
+        // Construct components with a fully qualified domain name
+        return URLComponents(string: "https://" + domainOnly)?.host ?? ""
+    }
+
     var lastUpdatedDate: String = ""
     var createdDate: String = ""
 
@@ -90,6 +104,7 @@ final class PasswordManagementItemModel: ObservableObject {
         guard var credentials = credentials else { return }
         // TODO credentials.account.title = title
         credentials.account.username = username
+        credentials.account.domain = normalizedDomain
         credentials.password = password.data(using: .utf8)! // let it crash?
         onSaveRequested(credentials)
         cancel()
@@ -107,6 +122,17 @@ final class PasswordManagementItemModel: ObservableObject {
     func cancel() {
         populateViewModelFromCredentials()
         isEditing = false
+
+        if isNew {
+            credentials = nil
+            isNew = false
+        }
+
+    }
+
+    func createNew() {
+        credentials = .init(account: .init(username: "", domain: ""), password: Data())
+        isNew = true
     }
 
     private func populateViewModelFromCredentials() {

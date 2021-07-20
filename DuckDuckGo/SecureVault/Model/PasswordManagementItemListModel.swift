@@ -73,4 +73,8 @@ final class PasswordManagementItemListModel: ObservableObject {
         }
     }
 
+    func clearSelection() {
+        selected = nil
+    }
+
 }

@@ -71,6 +71,41 @@ final class PasswordManagementViewController: NSViewController {
         refetchWithText(isDirty ? "" : domain ?? "")
     }
 
+    @IBAction func onNewClicked(_ sender: Any?) {
+
+        guard let window = view.window else { return }
+
+        func createNew() {
+            listModel?.clearSelection()
+            itemModel?.createNew()
+        }
+
+        if isDirty {
+            let alert = NSAlert.saveChangesToLogin()
+            alert.beginSheetModal(for: window) { response in
+
+                switch response {
+                case .alertFirstButtonReturn: // Save
+                    self.itemModel?.save()
+                    createNew()
+
+                case .alertSecondButtonReturn: // Discard
+                    self.itemModel?.cancel()
+                    createNew()
+
+                case .alertThirdButtonReturn: // Cancel
+                    break // just do nothing
+
+                default:
+                    fatalError("Unknown response \(response)")
+                }
+
+            }
+        } else {
+            createNew()
+        }
+    }
+
     private func refetchWithText(_ text: String) {
         fetchAccounts { [weak self] accounts in
             self?.listModel?.accounts = accounts
@@ -93,8 +128,13 @@ final class PasswordManagementViewController: NSViewController {
             self?.isDirty = isDirty
             self?.postChange()
         }, onSaveRequested: { [weak self] in
+            let isNew = $0.account.id == nil
             try? self?.secureVault?.storeWebsiteCredentials($0)
-            self?.syncModelsOnCredentials($0)
+            if isNew {
+                self?.refetchWithText($0.account.domain)
+            } else {
+                self?.syncModelsOnCredentials($0)
+            }
             self?.postChange()
         }, onDeleteRequested: { [weak self] in
             self?.promptToDelete($0)
@@ -141,7 +181,7 @@ final class PasswordManagementViewController: NSViewController {
             guard let id = newValue.id,
                   let window = self?.view.window else { return }
 
-            func loadCredentialsWithId(_ id: Int64) {
+            func loadCredentialsWithId() {
                 guard let credentials = try? self?.secureVault?.websiteCredentialsFor(accountId: id) else { return }
                 self?.syncModelsOnCredentials(credentials)
             }
@@ -153,11 +193,11 @@ final class PasswordManagementViewController: NSViewController {
                     switch response {
                     case .alertFirstButtonReturn: // Save
                         self?.itemModel?.save()
-                        loadCredentialsWithId(id)
+                        loadCredentialsWithId()
 
                     case .alertSecondButtonReturn: // Discard
                         self?.itemModel?.cancel()
-                        loadCredentialsWithId(id)
+                        loadCredentialsWithId()
 
                     case .alertThirdButtonReturn: // Cancel
                         if let previousId = previousValue?.id {
@@ -170,7 +210,7 @@ final class PasswordManagementViewController: NSViewController {
 
                 }
             } else {
-                loadCredentialsWithId(id)
+                loadCredentialsWithId()
             }
         }
         self.listModel = listModel
