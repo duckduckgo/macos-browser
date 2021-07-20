@@ -20,7 +20,7 @@ import Foundation
 
 extension NSAlert {
 
-    static func confirmDeleteLogin() -> NSAlert {
+    static func passwordManagerConfirmDeleteLogin() -> NSAlert {
         let alert = NSAlert()
         alert.messageText = "Are you sure you want to delete this login?"
         alert.informativeText = "You cannot revert this action."
@@ -30,13 +30,22 @@ extension NSAlert {
         return alert
     }
 
-    static func saveChangesToLogin() -> NSAlert {
+    static func passwordManagerSaveChangesToLogin() -> NSAlert {
         let alert = NSAlert()
         alert.messageText = "Save the changes you made?"
         alert.alertStyle = .warning
         alert.addButton(withTitle: "Save")
         alert.addButton(withTitle: "Discard")
         alert.addButton(withTitle: "Cancel")
+        return alert
+    }
+
+    static func passwordManagerDuplicateLogin() -> NSAlert {
+        let alert = NSAlert()
+        alert.messageText = "Duplicate login"
+        alert.informativeText = "You already have a login for this username and website."
+        alert.alertStyle = .warning
+        alert.addButton(withTitle: "OK")
         return alert
     }
 

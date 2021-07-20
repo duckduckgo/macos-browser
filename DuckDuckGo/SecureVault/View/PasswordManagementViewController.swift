@@ -81,7 +81,7 @@ final class PasswordManagementViewController: NSViewController {
         }
 
         if isDirty {
-            let alert = NSAlert.saveChangesToLogin()
+            let alert = NSAlert.passwordManagerSaveChangesToLogin()
             alert.beginSheetModal(for: window) { response in
 
                 switch response {
@@ -106,7 +106,7 @@ final class PasswordManagementViewController: NSViewController {
         }
     }
 
-    private func refetchWithText(_ text: String, clearWhenNoMatches: Bool = false) {
+    private func refetchWithText(_ text: String, clearWhenNoMatches: Bool = false, completion: (() -> Void)? = nil) {
         fetchAccounts { [weak self] accounts in
             self?.listModel?.accounts = accounts
             self?.searchField.stringValue = text
@@ -118,6 +118,8 @@ final class PasswordManagementViewController: NSViewController {
             } else if self?.isDirty == false {
                 self?.listModel?.selectFirst()
             }
+
+            completion?()
         }
     }
 
@@ -132,24 +134,21 @@ final class PasswordManagementViewController: NSViewController {
         self.itemModel?.credentials = nil
     }
 
-    private func syncModelsOnCredentials(_ credentials: SecureVaultModels.WebsiteCredentials) {
+    private func syncModelsOnCredentials(_ credentials: SecureVaultModels.WebsiteCredentials, select: Bool = false) {
         self.itemModel?.credentials = credentials
         self.listModel?.updateAccount(credentials.account)
+
+        if select {
+            self.listModel?.selectAccount(credentials.account)
+        }
     }
 
     private func createItemView() {
         let itemModel = PasswordManagementItemModel(onDirtyChanged: { [weak self] isDirty in
             self?.isDirty = isDirty
             self?.postChange()
-        }, onSaveRequested: { [weak self] in
-            let isNew = $0.account.id == nil
-            try? self?.secureVault?.storeWebsiteCredentials($0)
-            if isNew {
-                self?.refetchWithText($0.account.domain)
-            } else {
-                self?.syncModelsOnCredentials($0)
-            }
-            self?.postChange()
+        }, onSaveRequested: { [weak self] credentials in
+            self?.doSaveCredentials(credentials)
         }, onDeleteRequested: { [weak self] in
             self?.promptToDelete($0)
         })
@@ -161,11 +160,37 @@ final class PasswordManagementViewController: NSViewController {
         itemContainer.wantsLayer = true
     }
 
+    private func doSaveCredentials(_ credentials: SecureVaultModels.WebsiteCredentials) {
+        let isNew = credentials.account.id == nil
+
+        do {
+            guard let id = try secureVault?.storeWebsiteCredentials(credentials),
+                  let savedCredentials = try secureVault?.websiteCredentialsFor(accountId: id) else {
+                return
+            }
+
+            itemModel?.cancel()
+            if isNew {
+                refetchWithText(savedCredentials.account.domain) { [weak self] in
+                    self?.syncModelsOnCredentials(savedCredentials, select: true)
+                }
+            } else {
+                syncModelsOnCredentials(savedCredentials)
+            }
+            postChange()
+
+        } catch {
+            if let window = view.window, case SecureVaultError.duplicateRecord = error {
+                NSAlert.passwordManagerDuplicateLogin().beginSheetModal(for: window)
+            }
+        }
+    }
+
     private func promptToDelete(_ credentials: SecureVaultModels.WebsiteCredentials) {
         guard let window = self.view.window,
               let id = credentials.account.id else { return }
 
-        let alert = NSAlert.confirmDeleteLogin()
+        let alert = NSAlert.passwordManagerConfirmDeleteLogin()
         alert.beginSheetModal(for: window) { response in
 
             switch response {
@@ -197,7 +222,7 @@ final class PasswordManagementViewController: NSViewController {
             }
 
             if self?.isDirty == true {
-                let alert = NSAlert.saveChangesToLogin()
+                let alert = NSAlert.passwordManagerSaveChangesToLogin()
                 alert.beginSheetModal(for: window) { response in
 
                     switch response {

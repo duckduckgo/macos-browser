@@ -107,7 +107,6 @@ final class PasswordManagementItemModel: ObservableObject {
         credentials.account.domain = normalizedDomain
         credentials.password = password.data(using: .utf8)! // let it crash?
         onSaveRequested(credentials)
-        cancel()
     }
 
     func requestDelete() {
