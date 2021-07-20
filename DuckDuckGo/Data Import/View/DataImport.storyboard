@@ -46,7 +46,7 @@ DQ
 </string>
                                 </buttonCell>
                                 <connections>
-                                    <action selector="importButtonClicked:" target="bU7-R8-ocO" id="btN-Ia-nOG"/>
+                                    <action selector="actionButtonClicked:" target="bU7-R8-ocO" id="NSv-w5-y1z"/>
                                 </connections>
                             </button>
                             <button verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="UkV-S4-sID">

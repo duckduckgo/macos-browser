@@ -25,9 +25,23 @@ final class CSVImportSummaryViewController: NSViewController {
         static let identifier = "CSVImportSummaryViewController"
     }
 
-    static func create() -> CSVImportSummaryViewController {
+    static func create(summary: DataImport.Summary?) -> CSVImportSummaryViewController {
         let storyboard = NSStoryboard(name: Constants.storyboardName, bundle: nil)
-        return storyboard.instantiateController(identifier: Constants.identifier)
+
+        return storyboard.instantiateController(identifier: Constants.identifier) { (coder) -> CSVImportSummaryViewController? in
+            return CSVImportSummaryViewController(coder: coder, summary: summary)
+        }
+    }
+
+    private let summary: DataImport.Summary?
+
+    init?(coder: NSCoder, summary: DataImport.Summary?) {
+        self.summary = summary
+        super.init(coder: coder)
+    }
+
+    required init?(coder: NSCoder) {
+        fatalError("init(coder:) has not been implemented")
     }
 
 }

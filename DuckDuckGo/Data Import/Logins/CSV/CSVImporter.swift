@@ -20,8 +20,6 @@ import Foundation
 
 final class CSVImporter: DataImporter {
 
-    typealias ImportedType = LoginImport.Summary
-
     private let fileURL: URL
     private let loginImporter: LoginImporter
 
@@ -47,7 +45,7 @@ final class CSVImporter: DataImporter {
         }
     }
 
-    func importData(types: [DataImport.DataType], completion: (Result<LoginImport.Summary, DataImportError>) -> Void) {
+    func importData(types: [DataImport.DataType], completion: (Result<[DataImport.Summary], DataImportError>) -> Void) {
         guard let fileContents = try? String(contentsOf: fileURL, encoding: .utf8) else {
             completion(.failure(.cannotReadFile))
             return
@@ -56,8 +54,12 @@ final class CSVImporter: DataImporter {
         let loginCredentials = Self.extractLogins(from: fileContents)
 
         do {
-            let summary = try loginImporter.importLogins(loginCredentials)
-            completion(.success(summary))
+            let loginImportSummary = try loginImporter.importLogins(loginCredentials)
+            let dataImportSummary = [
+                DataImport.Summary(type: .logins, summaryDetail: loginImportSummary)
+            ]
+
+            completion(.success(dataImportSummary))
         } catch {
             completion(.failure(.cannotAccessSecureVault))
         }

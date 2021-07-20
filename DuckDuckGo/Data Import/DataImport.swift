@@ -37,6 +37,11 @@ enum DataImport {
         case logins
     }
 
+    struct Summary {
+        let type: DataType
+        let summaryDetail: Any
+    }
+
 }
 
 enum DataImportError: Error {
@@ -51,12 +56,10 @@ enum DataImportError: Error {
 /// For instance, a browser data importer may be able to import logins and bookmarks.
 protocol DataImporter {
 
-    associatedtype ImportedType
-
     /// Performs a quick check to determine if the data is able to be imported. It does not guarantee that the import will succeed.
     /// For example, a CSV importer will return true if the URL it has been created with is a CSV file, but does not check whether the CSV data matches the expected format.
     func importableTypes() -> [DataImport.DataType]
 
-    func importData(types: [DataImport.DataType], completion: (Result<ImportedType, DataImportError>) -> Void)
+    func importData(types: [DataImport.DataType], completion: (Result<[DataImport.Summary], DataImportError>) -> Void)
 
 }

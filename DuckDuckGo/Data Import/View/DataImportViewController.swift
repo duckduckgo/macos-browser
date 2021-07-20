@@ -30,7 +30,7 @@ final class DataImportViewController: NSViewController {
         case unableToImport
         case ableToImport
         case failedToImport
-        case completedImport
+        case completedImport([DataImport.Summary])
     }
 
     private struct ViewState {
@@ -43,7 +43,6 @@ final class DataImportViewController: NSViewController {
         return storyboard.instantiateController(identifier: Constants.identifier)
     }
 
-    private var importer: CSVImporter?
     private var viewState: ViewState = ViewState(selectedImportSource: .csv, interactionState: .unableToImport) {
         didSet {
             renderCurrentViewState()
@@ -51,6 +50,7 @@ final class DataImportViewController: NSViewController {
     }
 
     private weak var currentChildViewController: NSViewController?
+    private var dataImporter: DataImporter?
 
     @IBOutlet var containerView: NSView!
     @IBOutlet var importSourcePopUpButton: NSPopUpButton!
@@ -60,9 +60,9 @@ final class DataImportViewController: NSViewController {
         dismiss()
     }
 
-    @IBAction func importButtonClicked(_ sender: Any) {
+    @IBAction func actionButtonClicked(_ sender: Any) {
         switch viewState.interactionState {
-        case .ableToImport: importLogins()
+        case .ableToImport: importData()
         case .completedImport: dismiss()
         default:
             assertionFailure("\(#file): Import button should be disabled when unable to import")
@@ -78,14 +78,6 @@ final class DataImportViewController: NSViewController {
         importSourcePopUpButton.displayImportSources(withSelectedSource: .csv)
         renderCurrentViewState()
     }
-
-//    override func prepare(for segue: NSStoryboardSegue, sender: Any?) {
-//        currentChildViewController = segue.destinationController as? NSViewController
-//
-//        if let csvImportViewController = segue.destinationController as? CSVImportViewController {
-//            csvImportViewController.delegate = self
-//        }
-//    }
 
     private func renderCurrentViewState() {
         updateActionButton(with: viewState.interactionState)
@@ -115,19 +107,17 @@ final class DataImportViewController: NSViewController {
     private func newChildViewController(for importSource: DataImport.Source, interactionState: InteractionState) -> NSViewController? {
         switch importSource {
         case .csv:
-            if interactionState == .completedImport {
+            if case let .completedImport(summaryArray) = interactionState {
                 if currentChildViewController is CSVImportSummaryViewController { return nil }
-                return CSVImportSummaryViewController.create()
+                let loginImportSummary = summaryArray.first { $0.type == .logins }
+                return CSVImportSummaryViewController.create(summary: loginImportSummary)
             } else {
                 if currentChildViewController is CSVImportViewController { return nil }
-
                 let viewController = CSVImportViewController.create()
                 viewController.delegate = self
                 return viewController
             }
         }
-
-        return nil
     }
 
     private func embed(viewController newChildViewController: NSViewController) {
@@ -150,17 +140,17 @@ final class DataImportViewController: NSViewController {
 
     // MARK: - Actions
 
-    private func importLogins() {
-        guard let importer = importer else {
+    private func importData() {
+        guard let importer = self.dataImporter else {
             assertionFailure("\(#file): No data importer found")
             return
         }
 
-        let importableTypes = importer.importableTypes()
-        importer.importData(types: importableTypes) { result in
+        // When importing data from specific browsers, this will change to only import those types which the user has selected.
+        importer.importData(types: importer.importableTypes()) { result in
             switch result {
-            case .success:
-                self.viewState.interactionState = .completedImport
+            case .success(let summaryArray):
+                self.viewState.interactionState = .completedImport(summaryArray)
             case .failure:
                 self.viewState.interactionState = .failedToImport
             }
@@ -180,7 +170,7 @@ extension DataImportViewController: CSVImportViewControllerDelegate {
         do {
             let secureVault = try SecureVaultFactory.default.makeVault()
             let secureVaultImporter = SecureVaultLoginImporter(secureVault: secureVault)
-            self.importer = CSVImporter(fileURL: url, loginImporter: secureVaultImporter)
+            self.dataImporter = CSVImporter(fileURL: url, loginImporter: secureVaultImporter)
             self.viewState.interactionState = .ableToImport
         } catch {
             self.viewState.interactionState = .unableToImport
