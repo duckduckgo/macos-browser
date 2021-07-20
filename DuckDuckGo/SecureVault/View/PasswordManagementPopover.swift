@@ -27,6 +27,7 @@ final class PasswordManagementPopover: NSPopover {
 
         self.animates = false
         self.behavior = .semitransient
+        self.delegate = self
 
         setupContentController()
     }
@@ -42,6 +43,17 @@ final class PasswordManagementPopover: NSPopover {
     private func setupContentController() {
         let controller = PasswordManagementViewController.create()
         contentViewController = controller
+    }
+
+}
+
+extension PasswordManagementPopover: NSPopoverDelegate {
+
+    func popoverDidClose(_ notification: Notification) {
+        viewController.postChange()
+        if !viewController.isDirty {
+            viewController.clear()
+        }
     }
 
 }

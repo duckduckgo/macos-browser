@@ -45,8 +45,8 @@ final class PasswordManagementViewController: NSViewController {
     @IBOutlet var itemContainer: NSView!
     @IBOutlet var searchField: NSTextField!
 
-    @Published var domain: String?
-    @Published var isDirty = false
+    var domain: String?
+    var isDirty = false
 
     var listModel: PasswordManagementItemListModel?
     var itemModel: PasswordManagementItemModel?
@@ -68,7 +68,7 @@ final class PasswordManagementViewController: NSViewController {
             itemModel?.credentials = nil
         }
 
-        refetchWithText(isDirty ? "" : domain ?? "")
+        refetchWithText(isDirty ? "" : domain ?? "", clearWhenNoMatches: true)
     }
 
     @IBAction func onNewClicked(_ sender: Any?) {
@@ -106,16 +106,30 @@ final class PasswordManagementViewController: NSViewController {
         }
     }
 
-    private func refetchWithText(_ text: String) {
+    private func refetchWithText(_ text: String, clearWhenNoMatches: Bool = false) {
         fetchAccounts { [weak self] accounts in
             self?.listModel?.accounts = accounts
             self?.searchField.stringValue = text
             self?.updateFilter()
 
-            if self?.isDirty == false {
+            if clearWhenNoMatches && self?.listModel?.displayedAccounts.isEmpty == true {
+                self?.searchField.stringValue = ""
+                self?.updateFilter()
+            } else if self?.isDirty == false {
                 self?.listModel?.selectFirst()
             }
         }
+    }
+
+    func postChange() {
+        NotificationCenter.default.post(name: .PasswordManagerChanged, object: isDirty)
+    }
+
+    func clear() {
+        self.listModel?.accounts = []
+        self.listModel?.filterUsing(text: "")
+        self.listModel?.clearSelection()
+        self.itemModel?.credentials = nil
     }
 
     private func syncModelsOnCredentials(_ credentials: SecureVaultModels.WebsiteCredentials) {
@@ -147,11 +161,7 @@ final class PasswordManagementViewController: NSViewController {
         itemContainer.wantsLayer = true
     }
 
-    func postChange() {
-        NotificationCenter.default.post(name: .PasswordManagerChanged, object: isDirty)
-    }
-
-    func promptToDelete(_ credentials: SecureVaultModels.WebsiteCredentials) {
+    private func promptToDelete(_ credentials: SecureVaultModels.WebsiteCredentials) {
         guard let window = self.view.window,
               let id = credentials.account.id else { return }
 
