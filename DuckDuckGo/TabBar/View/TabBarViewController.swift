@@ -387,8 +387,8 @@ extension TabBarViewController: TabCollectionViewModelDelegate {
     }
 
     func tabCollectionViewModelDidInsert(_ tabCollectionViewModel: TabCollectionViewModel,
-                                at index: Int,
-                                selected: Bool) {
+                                         at index: Int,
+                                         selected: Bool) {
         let indexPathSet = Set(arrayLiteral: IndexPath(item: index))
         if selected {
             collectionView.clearSelection(animated: true)
