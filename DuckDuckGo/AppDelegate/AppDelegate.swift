@@ -141,7 +141,6 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
     }
 
     @IBAction func copy(_ sender: Any?) {
-        print(#function, sender as Any)
 
         guard let responder = NSApp.keyWindow?.firstResponder else { return }
 
