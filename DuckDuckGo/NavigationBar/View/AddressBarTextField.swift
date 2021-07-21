@@ -659,7 +659,7 @@ final class AddressBarTextEditor: NSTextView {
     }
 
     override func copy(_ sender: Any?) {
-        (NSApp.delegate as? AppDelegate)?.copy(sender)
+        CopyHandler().copy(sender)
     }
 
     override func selectionRange(forProposedRange proposedCharRange: NSRange, granularity: NSSelectionGranularity) -> NSRange {
