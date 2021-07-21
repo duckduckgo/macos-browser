@@ -93,14 +93,10 @@ final class PrivacyDashboardViewController: NSViewController {
         #warning("Inject isProtectionOn to TrackerInfoViewModel based on protectionState")
 
         tabViewModel?.tab.$trackerInfo
-            .receive(on: DispatchQueue.global(qos: .userInitiated))
-            .map { trackerInfo in
-                TrackerInfoViewModel(trackerInfo: trackerInfo, isProtectionOn: true)
-            }
             .receive(on: DispatchQueue.main)
-            .sink(receiveValue: { [weak self] trackerInfoViewModel in
-                guard let self = self, let trackerInfoViewModel = trackerInfoViewModel else { return }
-                self.privacyDashboarScript.setTrackerInfo(trackerInfoViewModel, webView: self.webView)
+            .sink(receiveValue: { [weak self] trackerInfo in
+                guard let self = self, let trackerInfo = trackerInfo, let tabUrl = self.tabViewModel?.tab.url else { return }
+                self.privacyDashboarScript.setTrackerInfo(tabUrl, trackerInfo: trackerInfo, webView: self.webView)
             })
             .store(in: &cancellables)
     }

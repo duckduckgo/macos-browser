@@ -18,7 +18,7 @@
 
 import Foundation
 
-struct TrackerInfo {
+struct TrackerInfo: Encodable {
 
     private(set) var host: String
 

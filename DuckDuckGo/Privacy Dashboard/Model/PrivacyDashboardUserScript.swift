@@ -105,12 +105,11 @@ final class PrivacyDashboardUserScript: NSObject {
         }
 
         delegate?.userScript(self, setPermission: permission, paused: paused)
-
     }
 
-    func setTrackerBlocking(_ trackerBlockingEnabled: Bool, in webView: WKWebView) {
-        evaluate(js: "window.onChangeTrackerBlocking(\(trackerBlockingEnabled))", in: webView)
-    }
+//    func setTrackerBlocking(_ trackerBlockingEnabled: Bool, in webView: WKWebView) {
+//        evaluate(js: "window.onChangeTrackerBlocking(\(trackerBlockingEnabled))", in: webView)
+//    }
 
     func setPermissions(_ usedPermissions: Permissions,
                         authorizationState: [PermissionType: PermissionAuthorizationState],
@@ -131,31 +130,35 @@ final class PrivacyDashboardUserScript: NSObject {
                 }
             ]
         }
-        guard let arg = (try? JSONSerialization.data(withJSONObject: dict, options: []))?.utf8String() else {
+        guard let allowedPermissionsJson = (try? JSONSerialization.data(withJSONObject: dict, options: []))?.utf8String() else {
             assertionFailure("PrivacyDashboardUserScript: could not serialize permissions object")
             return
         }
-        evaluate(js: "window.onChangeAllowedPermissions(\(arg))", in: webView)
+
+        evaluate(js: "window.onChangeAllowedPermissions(\(allowedPermissionsJson))", in: webView)
     }
 
-    func setTrackerInfo(_ trackerInfoViewModel: TrackerInfoViewModel, webView: WKWebView) {
-        guard let json = try? JSONEncoder().encode(trackerInfoViewModel).utf8String() else {
+    func setTrackerInfo(_ tabUrl: URL, trackerInfo: TrackerInfo, webView: WKWebView) {
+        guard let trackerBlockingDataJson = try? JSONEncoder().encode(trackerInfo).utf8String() else {
             assertionFailure("Can't encode trackerInfoViewModel into JSON")
             return
         }
 
-        print(json)
-        //evaluate(js: "window.onSomething(\(json))", in: webView)
+        guard let safeTabUrl = try? JSONEncoder().encode(tabUrl).utf8String() else {
+            assertionFailure("Can't encode tabUrl into JSON")
+            return
+        }
+
+        evaluate(js: "window.onChangeTrackerBlockingData(\(safeTabUrl), \(trackerBlockingDataJson))", in: webView)
     }
 
     func setServerTrust(_ serverTrustViewModel: ServerTrustViewModel, webView: WKWebView) {
-        guard let json = try? JSONEncoder().encode(serverTrustViewModel).utf8String() else {
+        guard let certificateDataJson = try? JSONEncoder().encode(serverTrustViewModel).utf8String() else {
             assertionFailure("Can't encode serverTrustViewModel into JSON")
             return
         }
 
-        print(json)
-        //evaluate(js: "window.onSomething(\(json))", in: webView)
+        evaluate(js: "window.onChangeCertificateData(\(certificateDataJson))", in: webView)
     }
 
     private func evaluate(js: String, in webView: WKWebView) {
