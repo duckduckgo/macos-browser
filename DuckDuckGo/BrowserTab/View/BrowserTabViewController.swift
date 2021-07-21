@@ -197,24 +197,25 @@ final class BrowserTabViewController: NSViewController {
     private func show(tab type: Tab.TabType) {
         tabCollectionViewModel.selectedTabViewModel?.tab.set(tabType: type)
 
-        self.webView?.removeFromSuperview()
         self.homepageView.removeFromSuperview()
         removePreferencesPage()
         removeBookmarksPage()
 
         switch type {
         case .bookmarks:
+            self.webView?.removeFromSuperview()
             self.addChild(bookmarksViewController)
             view.addAndLayout(bookmarksViewController.view)
             bookmarksViewController.tabSwitcherButton.select(tabType: .bookmarks)
 
         case .preferences:
+            self.webView?.removeFromSuperview()
             self.addChild(preferencesViewController)
             view.addAndLayout(preferencesViewController.view)
             bookmarksViewController.tabSwitcherButton.select(tabType: .preferences)
 
         case .standard:
-            if let webView = self.webView {
+            if let webView = self.webView, webView.superview == nil {
                 addWebViewToViewHierarchy(webView)
             }
         }
