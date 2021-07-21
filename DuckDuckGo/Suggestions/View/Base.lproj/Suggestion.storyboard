@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<document type="com.apple.InterfaceBuilder3.Cocoa.Storyboard.XIB" version="3.0" toolsVersion="17701" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none" useAutolayout="YES" initialViewController="cvc-K3-VCn">
+<document type="com.apple.InterfaceBuilder3.Cocoa.Storyboard.XIB" version="3.0" toolsVersion="18122" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none" useAutolayout="YES" initialViewController="cvc-K3-VCn">
     <dependencies>
         <deployment identifier="macosx"/>
-        <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="17701"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="18122"/>
         <capability name="Named colors" minToolsVersion="9.0"/>
         <capability name="System colors introduced in macOS 10.14" minToolsVersion="10.0"/>
         <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
@@ -120,7 +120,7 @@
                                                                     <color key="backgroundColor" name="ClearColor"/>
                                                                     <color key="gridColor" name="gridColor" catalog="System" colorSpace="catalog"/>
                                                                     <tableColumns>
-                                                                        <tableColumn width="604" minWidth="40" maxWidth="2000" id="0zj-Uc-AlR">
+                                                                        <tableColumn width="572" minWidth="40" maxWidth="2000" id="0zj-Uc-AlR">
                                                                             <tableHeaderCell key="headerCell" lineBreakMode="truncatingTail" borderStyle="border">
                                                                                 <color key="textColor" name="headerTextColor" catalog="System" colorSpace="catalog"/>
                                                                                 <color key="backgroundColor" name="headerColor" catalog="System" colorSpace="catalog"/>
@@ -133,11 +133,11 @@
                                                                             <tableColumnResizingMask key="resizingMask" resizeWithTable="YES" userResizable="YES"/>
                                                                             <prototypeCellViews>
                                                                                 <customView identifier="SuggestionTableRowView" id="9zN-fn-Ri0" customClass="SuggestionTableRowView" customModule="DuckDuckGo_Privacy_Browser" customModuleProvider="target">
-                                                                                    <rect key="frame" x="0.0" y="0.0" width="604" height="22"/>
+                                                                                    <rect key="frame" x="10" y="0.0" width="584" height="22"/>
                                                                                     <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                                                                 </customView>
                                                                                 <tableCellView identifier="SuggestionTableCellView" id="kX2-C1-38Y" customClass="SuggestionTableCellView" customModule="DuckDuckGo_Privacy_Browser" customModuleProvider="target">
-                                                                                    <rect key="frame" x="0.0" y="22" width="604" height="22"/>
+                                                                                    <rect key="frame" x="10" y="22" width="584" height="22"/>
                                                                                     <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                                                                     <subviews>
                                                                                         <textField horizontalHuggingPriority="252" verticalHuggingPriority="750" horizontalCompressionResistancePriority="252" translatesAutoresizingMaskIntoConstraints="NO" id="bOr-Go-gyW">
@@ -149,9 +149,9 @@
                                                                                             </textFieldCell>
                                                                                         </textField>
                                                                                         <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" horizontalCompressionResistancePriority="252" translatesAutoresizingMaskIntoConstraints="NO" id="efo-Vy-aEh">
-                                                                                            <rect key="frame" x="149" y="4" width="449" height="15"/>
+                                                                                            <rect key="frame" x="149" y="4" width="429" height="15"/>
                                                                                             <textFieldCell key="cell" lineBreakMode="truncatingTail" sendsActionOnEndEditing="YES" title=" – Search with DuckDuckGo" id="UZv-CE-fbV">
-                                                                                                <font key="font" metaFont="system" size="12"/>
+                                                                                                <font key="font" metaFont="cellTitle"/>
                                                                                                 <color key="textColor" name="controlAccentColor" catalog="System" colorSpace="catalog"/>
                                                                                                 <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
                                                                                             </textFieldCell>
@@ -225,7 +225,7 @@
                                                 </userDefinedRuntimeAttributes>
                                             </customView>
                                             <customView translatesAutoresizingMaskIntoConstraints="NO" id="ATb-xt-XAg" userLabel="Separator" customClass="ColorView" customModule="DuckDuckGo_Privacy_Browser" customModuleProvider="target">
-                                                <rect key="frame" x="2" y="264" width="614" height="1"/>
+                                                <rect key="frame" x="2" y="262" width="614" height="1"/>
                                                 <constraints>
                                                     <constraint firstAttribute="height" constant="1" id="G3c-nz-oCJ"/>
                                                 </constraints>
@@ -237,7 +237,7 @@
                                             </customView>
                                         </subviews>
                                         <constraints>
-                                            <constraint firstItem="ATb-xt-XAg" firstAttribute="top" secondItem="Svf-wj-SjJ" secondAttribute="top" id="FoQ-BR-ASj"/>
+                                            <constraint firstItem="ATb-xt-XAg" firstAttribute="top" secondItem="Svf-wj-SjJ" secondAttribute="top" constant="2" id="FoQ-BR-ASj"/>
                                             <constraint firstItem="j2X-bv-VAU" firstAttribute="leading" secondItem="Svf-wj-SjJ" secondAttribute="leading" id="Izj-JF-mOk"/>
                                             <constraint firstItem="ATb-xt-XAg" firstAttribute="leading" secondItem="Svf-wj-SjJ" secondAttribute="leading" constant="2" id="PIu-nj-NP2"/>
                                             <constraint firstAttribute="height" priority="950" constant="200" id="aJH-FU-o7W"/>

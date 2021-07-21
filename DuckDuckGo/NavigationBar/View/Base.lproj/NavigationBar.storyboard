@@ -123,10 +123,10 @@
                                 </connections>
                             </button>
                             <containerView translatesAutoresizingMaskIntoConstraints="NO" id="Wba-nA-FYj">
-                                <rect key="frame" x="112" y="1" width="547" height="38"/>
+                                <rect key="frame" x="112" y="2" width="547" height="36"/>
                                 <constraints>
                                     <constraint firstAttribute="width" relation="greaterThanOrEqual" priority="301" constant="560" id="UmE-2a-hW4"/>
-                                    <constraint firstAttribute="height" constant="38" id="fDM-4Y-Nvs"/>
+                                    <constraint firstAttribute="height" constant="36" id="fDM-4Y-Nvs"/>
                                 </constraints>
                                 <connections>
                                     <segue destination="H4f-bE-T92" kind="embed" destinationCreationSelector="createAddressBarViewController:" id="5BM-Q3-tYH"/>
@@ -218,7 +218,7 @@
                             <constraint firstItem="Wba-nA-FYj" firstAttribute="centerX" secondItem="hYV-nu-QIp" secondAttribute="centerX" priority="300" constant="8" id="Ofg-Pb-s0m"/>
                             <constraint firstAttribute="trailing" relation="greaterThanOrEqual" secondItem="Wba-nA-FYj" secondAttribute="trailing" constant="80" id="RR5-n6-acI"/>
                             <constraint firstItem="DqX-mW-o7G" firstAttribute="centerY" secondItem="hYV-nu-QIp" secondAttribute="centerY" id="VzY-vk-wmA"/>
-                            <constraint firstItem="Wba-nA-FYj" firstAttribute="top" secondItem="hYV-nu-QIp" secondAttribute="top" constant="1" id="Whl-qs-kgy"/>
+                            <constraint firstItem="Wba-nA-FYj" firstAttribute="top" secondItem="hYV-nu-QIp" secondAttribute="top" constant="2" id="Whl-qs-kgy"/>
                             <constraint firstItem="iIF-Ky-unr" firstAttribute="leading" secondItem="XBe-xO-dXj" secondAttribute="trailing" constant="4" id="XeF-9Z-4fx"/>
                             <constraint firstItem="DqX-mW-o7G" firstAttribute="leading" relation="greaterThanOrEqual" secondItem="Wba-nA-FYj" secondAttribute="trailing" constant="8" id="Z7Y-uQ-LfG"/>
                             <constraint firstItem="B2U-XM-Vo0" firstAttribute="leading" secondItem="mdE-u0-Ei5" secondAttribute="trailing" constant="4" id="aG0-IE-Xpr"/>
@@ -262,11 +262,11 @@
             <objects>
                 <viewController id="H4f-bE-T92" customClass="AddressBarViewController" customModule="DuckDuckGo_Privacy_Browser" customModuleProvider="target" sceneMemberID="viewController">
                     <view key="view" wantsLayer="YES" id="wj6-L2-5rJ">
-                        <rect key="frame" x="0.0" y="0.0" width="600" height="38"/>
+                        <rect key="frame" x="0.0" y="0.0" width="600" height="36"/>
                         <autoresizingMask key="autoresizingMask"/>
                         <subviews>
                             <customView translatesAutoresizingMaskIntoConstraints="NO" id="ENV-0H-Fcc" userLabel="Inactive Background View with Progress" customClass="ColorView" customModule="DuckDuckGo_Privacy_Browser" customModuleProvider="target">
-                                <rect key="frame" x="5" y="4" width="590" height="30"/>
+                                <rect key="frame" x="5" y="3" width="590" height="30"/>
                                 <subviews>
                                     <customView translatesAutoresizingMaskIntoConstraints="NO" id="4x6-Xn-fNv" customClass="ProgressView" customModule="DuckDuckGo_Privacy_Browser" customModuleProvider="target">
                                         <rect key="frame" x="0.0" y="0.0" width="590" height="2"/>
@@ -291,10 +291,10 @@
                                 </userDefinedRuntimeAttributes>
                             </customView>
                             <customView translatesAutoresizingMaskIntoConstraints="NO" id="e0p-7S-Gan" customClass="ColorView" customModule="DuckDuckGo_Privacy_Browser" customModuleProvider="target">
-                                <rect key="frame" x="0.0" y="0.0" width="600" height="38"/>
+                                <rect key="frame" x="0.0" y="0.0" width="600" height="36"/>
                                 <subviews>
                                     <customView translatesAutoresizingMaskIntoConstraints="NO" id="okL-f2-MVs" userLabel="Inner Border View" customClass="ColorView" customModule="DuckDuckGo_Privacy_Browser" customModuleProvider="target">
-                                        <rect key="frame" x="1" y="1" width="598" height="36"/>
+                                        <rect key="frame" x="1" y="1" width="598" height="34"/>
                                         <userDefinedRuntimeAttributes>
                                             <userDefinedRuntimeAttribute type="color" keyPath="borderColor">
                                                 <color key="value" name="AddressBarInnerBorderColor"/>
@@ -330,7 +330,7 @@
                                 </userDefinedRuntimeAttributes>
                             </customView>
                             <customView translatesAutoresizingMaskIntoConstraints="NO" id="Ij9-fc-CLI" customClass="ColorView" customModule="DuckDuckGo_Privacy_Browser" customModuleProvider="target">
-                                <rect key="frame" x="0.0" y="-22" width="600" height="60"/>
+                                <rect key="frame" x="0.0" y="-24" width="600" height="60"/>
                                 <subviews>
                                     <customView translatesAutoresizingMaskIntoConstraints="NO" id="INL-zs-eEh" userLabel="Inner Border View" customClass="ColorView" customModule="DuckDuckGo_Privacy_Browser" customModuleProvider="target">
                                         <rect key="frame" x="1" y="1" width="598" height="58"/>
@@ -370,7 +370,7 @@
                                 </userDefinedRuntimeAttributes>
                             </customView>
                             <textField horizontalHuggingPriority="750" verticalHuggingPriority="750" horizontalCompressionResistancePriority="250" translatesAutoresizingMaskIntoConstraints="NO" id="le0-Hn-ZAC">
-                                <rect key="frame" x="223" y="11" width="154" height="16"/>
+                                <rect key="frame" x="223" y="10" width="154" height="16"/>
                                 <textFieldCell key="cell" lineBreakMode="truncatingTail" refusesFirstResponder="YES" alignment="center" placeholderString="Search or enter address" usesSingleLineMode="YES" id="rpt-TE-48N">
                                     <font key="font" metaFont="system"/>
                                     <color key="textColor" name="labelColor" catalog="System" colorSpace="catalog"/>
@@ -378,7 +378,7 @@
                                 </textFieldCell>
                             </textField>
                             <textField focusRingType="none" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="zaX-wZ-E3D" customClass="AddressBarTextField" customModule="DuckDuckGo_Privacy_Browser" customModuleProvider="target">
-                                <rect key="frame" x="35" y="11" width="522" height="16"/>
+                                <rect key="frame" x="35" y="10" width="522" height="16"/>
                                 <textFieldCell key="cell" lineBreakMode="truncatingTail" selectable="YES" editable="YES" sendsActionOnEndEditing="YES" focusRingType="none" tag="5" placeholderString="Search or enter address" usesSingleLineMode="YES" id="1ah-Qg-8lr" customClass="AddressBarTextFieldCell" customModule="DuckDuckGo_Privacy_Browser" customModuleProvider="target">
                                     <font key="font" metaFont="system"/>
                                     <color key="textColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
@@ -386,13 +386,13 @@
                                 </textFieldCell>
                             </textField>
                             <containerView translatesAutoresizingMaskIntoConstraints="NO" id="bOl-8Z-hTh">
-                                <rect key="frame" x="4" y="4" width="592" height="30"/>
+                                <rect key="frame" x="4" y="4" width="592" height="28"/>
                                 <connections>
                                     <segue destination="mcr-nj-GmC" kind="embed" destinationCreationSelector="createAddressBarButtonsViewController:" id="zZO-zH-MBi"/>
                                 </connections>
                             </containerView>
                             <customView id="ktI-g4-Uk6" customClass="ShadowView" customModule="DuckDuckGo_Privacy_Browser" customModuleProvider="target">
-                                <rect key="frame" x="410" y="5" width="135" height="32"/>
+                                <rect key="frame" x="410" y="3" width="135" height="32"/>
                                 <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                 <userDefinedRuntimeAttributes>
                                     <userDefinedRuntimeAttribute type="color" keyPath="shadowColor">
