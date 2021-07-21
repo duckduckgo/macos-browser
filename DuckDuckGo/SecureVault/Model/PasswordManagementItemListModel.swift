@@ -62,7 +62,10 @@ final class PasswordManagementItemListModel: ObservableObject {
             displayedAccounts = accounts
         } else {
             let filter = text.lowercased()
-            displayedAccounts = accounts.filter { $0.domain.lowercased().contains(filter) || $0.username.lowercased().contains(filter) }
+            displayedAccounts = accounts.filter { $0.domain.lowercased().contains(filter) ||
+                $0.username.lowercased().contains(filter) ||
+                $0.title?.lowercased().contains(filter) ?? false
+            }
         }
     }
 

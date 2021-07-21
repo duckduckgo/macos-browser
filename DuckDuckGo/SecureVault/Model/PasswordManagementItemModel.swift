@@ -102,7 +102,7 @@ final class PasswordManagementItemModel: ObservableObject {
 
     func save() {
         guard var credentials = credentials else { return }
-        // TODO credentials.account.title = title
+        credentials.account.title = title
         credentials.account.username = username
         credentials.account.domain = normalizedDomain
         credentials.password = password.data(using: .utf8)! // let it crash?
@@ -135,7 +135,7 @@ final class PasswordManagementItemModel: ObservableObject {
     }
 
     private func populateViewModelFromCredentials() {
-        title = credentials?.account.domain ?? ""
+        title =  (credentials?.account.title?.isEmpty == true ? credentials?.account.domain : credentials?.account.title) ?? ""
         username = credentials?.account.username ?? ""
         password = String(data: credentials?.password ?? Data(), encoding: .utf8) ?? ""
         domain = credentials?.account.domain ?? ""

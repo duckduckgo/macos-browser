@@ -46,13 +46,14 @@ private struct ItemView: View {
     var body: some View {
 
         let selectedTextColor = Color(NSColor.selectedControlTextColor)
+        let displayName = ((account.title ?? "").isEmpty == true ? account.domain : account.title) ?? ""
 
         Button(action: action, label: {
             HStack(spacing: 4) {
                 FaviconView(domain: account.domain)
 
                 VStack(alignment: .leading, spacing: 4) {
-                    Text(account.domain).bold()
+                    Text(displayName).bold()
                         .foregroundColor(selected ? selectedTextColor : nil)
                     Text(account.username)
                         .foregroundColor(selected ? selectedTextColor : nil)

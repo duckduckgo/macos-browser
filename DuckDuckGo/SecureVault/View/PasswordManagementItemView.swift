@@ -346,7 +346,7 @@ private struct HeaderView: View {
 
                 }
 
-                Text(model.domain)
+                Text(model.title.isEmpty ? model.domain : model.title)
                     .font(.title)
 
             }
