@@ -91,7 +91,7 @@ private struct Buttons: View {
         HStack {
 
             if model.isEditing {
-                Button("Delete") {
+                Button(UserText.pmDelete) {
                     model.requestDelete()
                 }
             }
@@ -99,30 +99,29 @@ private struct Buttons: View {
             Spacer()
 
             if model.isEditing || model.isNew {
-                Button("Cancel") {
-                    print("Cancel")
+                Button(UserText.pmCancel) {
                     model.cancel()
                 }
 
                 if #available(macOS 11, *) {
-                    Button("Save") {
+                    Button(UserText.pmSave) {
                         model.save()
                     }
                     .keyboardShortcut(.defaultAction) // macOS 11+
                     .disabled(!model.isDirty)
                 } else {
-                    Button("Save") {
+                    Button(UserText.pmSave) {
                         model.save()
                     }
                     .disabled(!model.isDirty)
                 }
 
             } else {
-                Button("Delete") {
+                Button(UserText.pmDelete) {
                     model.requestDelete()
                 }
 
-                Button("Edit") {
+                Button(UserText.pmEdit) {
                     model.edit()
                 }
             }
@@ -138,7 +137,7 @@ private struct LoginTitleView: View {
 
     var body: some View {
 
-        Text("Login Title")
+        Text(UserText.pmLoginTitle)
             .bold()
             .padding(.bottom, itemSpacing)
 
@@ -157,7 +156,7 @@ private struct UsernameView: View {
     @State var isHovering = false
 
     var body: some View {
-        Text("Username")
+        Text(UserText.pmUsername)
             .bold()
             .padding(.bottom, itemSpacing)
 
@@ -199,7 +198,7 @@ private struct PasswordView: View {
     @State var isPasswordVisible = false
 
     var body: some View {
-        Text("Password")
+        Text(UserText.pmPassword)
             .bold()
             .padding(.bottom, itemSpacing)
 
@@ -272,7 +271,7 @@ private struct WebsiteView: View {
 
     var body: some View {
 
-        Text("Website")
+        Text(UserText.pmWebsite)
             .bold()
             .padding(.bottom, itemSpacing)
 
@@ -300,7 +299,7 @@ private struct DatesView: View {
     var body: some View {
         VStack(alignment: .leading, spacing: 4) {
             HStack {
-                Text("Added")
+                Text(UserText.pmLoginAdded)
                     .bold()
                     .opacity(0.5)
                 Text(model.createdDate)
@@ -308,7 +307,7 @@ private struct DatesView: View {
             }
 
             HStack {
-                Text("Last Updated")
+                Text(UserText.pmLoginLastUpdated)
                     .bold()
                     .opacity(0.5)
                 Text(model.lastUpdatedDate)
@@ -332,7 +331,7 @@ private struct HeaderView: View {
 
             if model.isNew {
 
-                Text("New Login")
+                Text(UserText.pmNewLogin)
                     .font(.title)
                     .padding(.trailing, 4)
 
@@ -340,7 +339,7 @@ private struct HeaderView: View {
 
                 if model.isEditing {
 
-                    Text("Edit")
+                    Text(UserText.pmEdit)
                         .font(.title)
                         .padding(.trailing, 4)
 

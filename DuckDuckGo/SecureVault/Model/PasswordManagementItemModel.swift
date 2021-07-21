@@ -131,7 +131,6 @@ final class PasswordManagementItemModel: ObservableObject {
 
     func createNew() {
         credentials = .init(account: .init(username: "", domain: ""), password: Data())
-        isNew = true
     }
 
     private func populateViewModelFromCredentials() {
@@ -140,6 +139,7 @@ final class PasswordManagementItemModel: ObservableObject {
         password = String(data: credentials?.password ?? Data(), encoding: .utf8) ?? ""
         domain = credentials?.account.domain ?? ""
         isDirty = false
+        isNew = credentials?.account.id == nil
 
         if let date = credentials?.account.created {
             createdDate = Self.dateFormatter.string(from: date)
