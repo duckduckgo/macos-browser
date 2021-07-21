@@ -18,20 +18,37 @@
 
 import Foundation
 
-final class PermissionStore {
-    private lazy var context = Database.shared.makeContext(concurrencyType: .privateQueueConcurrencyType, name: "Permissions")
+protocol PermissionStore: AnyObject {
+    func loadPermissions() throws -> [PermissionEntity]
+    func update(objectWithId id: NSManagedObjectID, allow: Bool?)
+    func remove(objectWithId id: NSManagedObjectID)
+    func add(domain: String, permissionType: PermissionType, allow: Bool) throws -> StoredPermission
+}
+
+final class LocalPermissionStore: PermissionStore {
+    private var _context: NSManagedObjectContext??
+    private var context: NSManagedObjectContext? {
+        if case .none = _context {
+#if DEBUG
+            if AppDelegate.isRunningTests {
+                _context = .some(.none)
+                return .none
+            }
+#endif
+            _context = Database.shared.makeContext(concurrencyType: .privateQueueConcurrencyType, name: "Permissions")
+        }
+        return _context!
+    }
 
     init() {
     }
 
     init(context: NSManagedObjectContext) {
-        self.context = context
+        self._context = .some(context)
     }
 
     func loadPermissions() throws -> [PermissionEntity] {
-#if DEBUG
-        if AppDelegate.isRunningTests { return [] }
-#endif
+        guard let context = context else { return [] }
 
         let fetchRequest = NSFetchRequest<PermissionManagedObject>(entityName: PermissionManagedObject.className())
 
@@ -44,6 +61,8 @@ final class PermissionStore {
     }
 
     func update(objectWithId id: NSManagedObjectID, allow: Bool?) {
+        guard let context = context else { return }
+
         context.perform { [context] in
             guard let managedObject = try? context.existingObject(with: id) as? PermissionManagedObject else {
                 assertionFailure("PermissionStore: Failed to get PermissionManagedObject from the context")
@@ -57,7 +76,7 @@ final class PermissionStore {
             }
 
             do {
-                try self.context.save()
+                try context.save()
             } catch {
                 assertionFailure("PermissionStore: Saving of context failed")
             }
@@ -68,12 +87,16 @@ final class PermissionStore {
         update(objectWithId: id, allow: nil)
     }
 
-    func add(domain: String, permissionType: PermissionType, allow: Bool) throws -> StoredPermission {
+    private func performAdd(domain: String,
+                            permissionType: PermissionType,
+                            allow: Bool) -> Result<NSManagedObjectID, Error>? {
+        guard let context = context else { return nil }
+
         var result: Result<NSManagedObjectID, Error>?
         context.performAndWait { [context] in
-
-            guard let managedObject = NSEntityDescription.insertNewObject(forEntityName: PermissionManagedObject.className(),
-                                                                          into: context) as? PermissionManagedObject
+            let entityName = PermissionManagedObject.className()
+            guard let managedObject = NSEntityDescription
+                    .insertNewObject(forEntityName: entityName, into: context) as? PermissionManagedObject
             else { return }
 
             managedObject.domainEncrypted = domain as NSString
@@ -81,13 +104,17 @@ final class PermissionStore {
             managedObject.allow = allow
 
             do {
-                try self.context.save()
+                try context.save()
                 result = .success(managedObject.objectID)
             } catch {
                 result = .failure(error)
             }
         }
+        return result
+    }
 
+    func add(domain: String, permissionType: PermissionType, allow: Bool) throws -> StoredPermission {
+        let result = performAdd(domain: domain, permissionType: permissionType, allow: allow)
         switch result {
         case .success(let id):
             return StoredPermission(id: id, allow: allow)

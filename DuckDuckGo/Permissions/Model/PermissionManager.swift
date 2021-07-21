@@ -41,7 +41,7 @@ final class PermissionManager: PermissionManagerProtocol {
     private let permissionSubject = PassthroughSubject<PublishedPermission, Never>()
     var permissionPublisher: AnyPublisher<PublishedPermission, Never> { permissionSubject.eraseToAnyPublisher() }
 
-    init(store: PermissionStore = .init()) {
+    init(store: PermissionStore = LocalPermissionStore()) {
         self.store = store
         loadPermissions()
     }
@@ -50,10 +50,10 @@ final class PermissionManager: PermissionManagerProtocol {
         do {
             let entities = try store.loadPermissions()
             for entity in entities {
-                self.permissions[entity.domain, default: [:]][entity.type] = entity.permission
+                self.permissions[entity.domain.dropWWW(), default: [:]][entity.type] = entity.permission
             }
         } catch {
-            assertionFailure("PermissionStore: Failed to load permissions \(String(describing: error))")
+            os_log("PermissionStore: Failed to load permissions", type: .error)
         }
     }
 
@@ -64,6 +64,10 @@ final class PermissionManager: PermissionManagerProtocol {
     func setPermission(_ allow: Bool, forDomain domain: String, permissionType: PermissionType) {
         let storedPermission: StoredPermission
         let domain = domain.dropWWW()
+
+        defer {
+            self.permissionSubject.send( (domain, permissionType, allow) )
+        }
         if var oldValue = permissions[domain]?[permissionType] {
             oldValue.allow = allow
             storedPermission = oldValue
@@ -72,13 +76,11 @@ final class PermissionManager: PermissionManagerProtocol {
             do {
                 storedPermission = try store.add(domain: domain, permissionType: permissionType, allow: allow)
             } catch {
-                assertionFailure("PermissionStore: Failed to store permission: \(error)")
+                os_log("PermissionStore: Failed to store permission", type: .error)
                 return
             }
         }
         self.permissions[domain, default: [:]][permissionType] = storedPermission
-
-        self.permissionSubject.send( (domain, permissionType, allow) )
     }
 
     func removePermission(forDomain domain: String, permissionType: PermissionType) {

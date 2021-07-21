@@ -28,6 +28,12 @@ struct PermissionEntity {
     let domain: String
     let type: PermissionType
 
+    init(permission: StoredPermission, domain: String, type: PermissionType) {
+        self.permission = permission
+        self.domain = domain
+        self.type = type
+    }
+
     init?(managedObject: PermissionManagedObject) {
         guard let domain = managedObject.domainEncrypted as? String,
               let permissionTypeString = managedObject.permissionType,
