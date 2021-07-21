@@ -40,12 +40,14 @@ final class PermissionStoreMock: PermissionStore {
         return permissions
     }
 
-    func update(objectWithId id: NSManagedObjectID, allow: Bool?) {
+    func update(objectWithId id: NSManagedObjectID, allow: Bool?, completionHandler: ((Error?) -> Void)?) {
         history.append(.update(id: id, allow: allow))
+        completionHandler?(nil)
     }
 
-    func remove(objectWithId id: NSManagedObjectID) {
+    func remove(objectWithId id: NSManagedObjectID, completionHandler: ((Error?) -> Void)?) {
         history.append(.remove(id))
+        completionHandler?(nil)
     }
 
     func add(domain: String, permissionType: PermissionType, allow: Bool) throws -> StoredPermission {

@@ -318,6 +318,7 @@
 		B6106BAB26A7BF1D0013B453 /* PermissionType.swift in Sources */ = {isa = PBXBuildFile; fileRef = B6106BAA26A7BF1D0013B453 /* PermissionType.swift */; };
 		B6106BAD26A7BF390013B453 /* PermissionState.swift in Sources */ = {isa = PBXBuildFile; fileRef = B6106BAC26A7BF390013B453 /* PermissionState.swift */; };
 		B6106BAF26A7C6180013B453 /* PermissionStoreMock.swift in Sources */ = {isa = PBXBuildFile; fileRef = B6106BAE26A7C6180013B453 /* PermissionStoreMock.swift */; };
+		B6106BB126A7D8720013B453 /* PermissionStoreTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = B6106BB026A7D8720013B453 /* PermissionStoreTests.swift */; };
 		B61EF3EC266F91E700B4D78F /* WKWebView+Download.swift in Sources */ = {isa = PBXBuildFile; fileRef = B61EF3EB266F91E700B4D78F /* WKWebView+Download.swift */; };
 		B61EF3F1266F922200B4D78F /* WKProcessPool+DownloadDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = B61EF3F0266F922200B4D78F /* WKProcessPool+DownloadDelegate.swift */; };
 		B61F012325ECBAE400ABB5A3 /* UserScriptsTest.swift in Sources */ = {isa = PBXBuildFile; fileRef = B61F012225ECBAE400ABB5A3 /* UserScriptsTest.swift */; };
@@ -756,6 +757,7 @@
 		B6106BAA26A7BF1D0013B453 /* PermissionType.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PermissionType.swift; sourceTree = "<group>"; };
 		B6106BAC26A7BF390013B453 /* PermissionState.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PermissionState.swift; sourceTree = "<group>"; };
 		B6106BAE26A7C6180013B453 /* PermissionStoreMock.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PermissionStoreMock.swift; sourceTree = "<group>"; };
+		B6106BB026A7D8720013B453 /* PermissionStoreTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PermissionStoreTests.swift; sourceTree = "<group>"; };
 		B61EF3EB266F91E700B4D78F /* WKWebView+Download.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "WKWebView+Download.swift"; sourceTree = "<group>"; };
 		B61EF3F0266F922200B4D78F /* WKProcessPool+DownloadDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "WKProcessPool+DownloadDelegate.swift"; sourceTree = "<group>"; };
 		B61F012225ECBAE400ABB5A3 /* UserScriptsTest.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UserScriptsTest.swift; sourceTree = "<group>"; };
@@ -2138,6 +2140,7 @@
 			children = (
 				B6106B9F26A7BE0B0013B453 /* PermissionManagerTests.swift */,
 				B6106BAE26A7C6180013B453 /* PermissionStoreMock.swift */,
+				B6106BB026A7D8720013B453 /* PermissionStoreTests.swift */,
 			);
 			path = Permissions;
 			sourceTree = "<group>";
@@ -2911,6 +2914,7 @@
 				AAE39D1B24F44885008EF28B /* TabCollectionViewModelDelegateMock.swift in Sources */,
 				AA9C363025518CA9004B1BA3 /* FireTests.swift in Sources */,
 				85AF2F4E268F52F400C89759 /* LoginDetectionServiceTests.swift in Sources */,
+				B6106BB126A7D8720013B453 /* PermissionStoreTests.swift in Sources */,
 				AA63745424C9BF9A00AB2AC4 /* SuggestionContainerTests.swift in Sources */,
 				AAC9C01524CAFBCE00AD1325 /* TabTests.swift in Sources */,
 				4BA1A6D9258C0CB300F6F690 /* DataEncryptionTests.swift in Sources */,

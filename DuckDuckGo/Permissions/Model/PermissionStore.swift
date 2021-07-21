@@ -20,9 +20,17 @@ import Foundation
 
 protocol PermissionStore: AnyObject {
     func loadPermissions() throws -> [PermissionEntity]
-    func update(objectWithId id: NSManagedObjectID, allow: Bool?)
-    func remove(objectWithId id: NSManagedObjectID)
+    func update(objectWithId id: NSManagedObjectID, allow: Bool?, completionHandler: ((Error?) -> Void)?)
+    func remove(objectWithId id: NSManagedObjectID, completionHandler: ((Error?) -> Void)?)
     func add(domain: String, permissionType: PermissionType, allow: Bool) throws -> StoredPermission
+}
+extension PermissionStore {
+    func update(objectWithId id: NSManagedObjectID, allow: Bool?) {
+        update(objectWithId: id, allow: allow, completionHandler: nil)
+    }
+    func remove(objectWithId id: NSManagedObjectID) {
+        remove(objectWithId: id, completionHandler: nil)
+    }
 }
 
 final class LocalPermissionStore: PermissionStore {
@@ -60,12 +68,20 @@ final class LocalPermissionStore: PermissionStore {
         return entities
     }
 
-    func update(objectWithId id: NSManagedObjectID, allow: Bool?) {
+    func update(objectWithId id: NSManagedObjectID, allow: Bool?, completionHandler: ((Error?) -> Void)?) {
         guard let context = context else { return }
+        func mainQueueCompletion(error: Error?) {
+            guard completionHandler != nil else { return }
+            DispatchQueue.main.async {
+                completionHandler?(error)
+            }
+        }
 
         context.perform { [context] in
             guard let managedObject = try? context.existingObject(with: id) as? PermissionManagedObject else {
                 assertionFailure("PermissionStore: Failed to get PermissionManagedObject from the context")
+                struct PermissionManagedObjectNotFound: Error {}
+                mainQueueCompletion(error: PermissionManagedObjectNotFound())
                 return
             }
 
@@ -77,14 +93,16 @@ final class LocalPermissionStore: PermissionStore {
 
             do {
                 try context.save()
+                mainQueueCompletion(error: nil)
             } catch {
                 assertionFailure("PermissionStore: Saving of context failed")
+                mainQueueCompletion(error: error)
             }
         }
     }
 
-    func remove(objectWithId id: NSManagedObjectID) {
-        update(objectWithId: id, allow: nil)
+    func remove(objectWithId id: NSManagedObjectID, completionHandler: ((Error?) -> Void)?) {
+        update(objectWithId: id, allow: nil, completionHandler: completionHandler)
     }
 
     private func performAdd(domain: String,

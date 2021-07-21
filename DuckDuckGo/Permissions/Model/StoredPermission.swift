@@ -18,12 +18,12 @@
 
 import Foundation
 
-struct StoredPermission {
+struct StoredPermission: Equatable {
     let id: NSManagedObjectID
     var allow: Bool
 }
 
-struct PermissionEntity {
+struct PermissionEntity: Equatable {
     let permission: StoredPermission
     let domain: String
     let type: PermissionType
