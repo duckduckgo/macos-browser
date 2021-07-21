@@ -19,7 +19,7 @@
                                 <rect key="frame" x="0.0" y="0.0" width="803" height="40"/>
                             </customView>
                             <button translatesAutoresizingMaskIntoConstraints="NO" id="kky-0N-Cfd" customClass="MouseOverButton" customModule="DuckDuckGo_Privacy_Browser" customModuleProvider="target">
-                                <rect key="frame" x="8" y="6" width="28" height="28"/>
+                                <rect key="frame" x="12" y="6" width="28" height="28"/>
                                 <constraints>
                                     <constraint firstAttribute="height" constant="28" id="0zh-Jn-l2h"/>
                                     <constraint firstAttribute="width" constant="28" id="8sl-Tr-gSd"/>
@@ -45,7 +45,7 @@
                                 </connections>
                             </button>
                             <button translatesAutoresizingMaskIntoConstraints="NO" id="mdE-u0-Ei5" customClass="MouseOverButton" customModule="DuckDuckGo_Privacy_Browser" customModuleProvider="target">
-                                <rect key="frame" x="40" y="6" width="28" height="28"/>
+                                <rect key="frame" x="44" y="6" width="28" height="28"/>
                                 <constraints>
                                     <constraint firstAttribute="height" constant="28" id="VXS-B2-jFA"/>
                                     <constraint firstAttribute="width" constant="28" id="jYM-So-c8l"/>
@@ -71,7 +71,7 @@
                                 </connections>
                             </button>
                             <button translatesAutoresizingMaskIntoConstraints="NO" id="B2U-XM-Vo0" customClass="MouseOverButton" customModule="DuckDuckGo_Privacy_Browser" customModuleProvider="target">
-                                <rect key="frame" x="72" y="6" width="28" height="28"/>
+                                <rect key="frame" x="76" y="6" width="28" height="28"/>
                                 <constraints>
                                     <constraint firstAttribute="height" constant="28" id="Jkc-qJ-YzZ"/>
                                     <constraint firstAttribute="width" constant="28" id="Rf0-Vt-PDX"/>
@@ -97,7 +97,7 @@
                                 </connections>
                             </button>
                             <button translatesAutoresizingMaskIntoConstraints="NO" id="iIF-Ky-unr" customClass="MouseOverButton" customModule="DuckDuckGo_Privacy_Browser" customModuleProvider="target">
-                                <rect key="frame" x="767" y="6" width="28" height="28"/>
+                                <rect key="frame" x="763" y="6" width="28" height="28"/>
                                 <constraints>
                                     <constraint firstAttribute="width" constant="28" id="2ry-8Q-yfk"/>
                                     <constraint firstAttribute="height" constant="28" id="s7E-4e-eTj"/>
@@ -123,7 +123,7 @@
                                 </connections>
                             </button>
                             <containerView translatesAutoresizingMaskIntoConstraints="NO" id="Wba-nA-FYj">
-                                <rect key="frame" x="112" y="1" width="559" height="38"/>
+                                <rect key="frame" x="112" y="1" width="547" height="38"/>
                                 <constraints>
                                     <constraint firstAttribute="width" relation="greaterThanOrEqual" priority="301" constant="560" id="UmE-2a-hW4"/>
                                     <constraint firstAttribute="height" constant="38" id="fDM-4Y-Nvs"/>
@@ -133,7 +133,7 @@
                                 </connections>
                             </containerView>
                             <button translatesAutoresizingMaskIntoConstraints="NO" id="DqX-mW-o7G" customClass="MouseOverButton" customModule="DuckDuckGo_Privacy_Browser" customModuleProvider="target">
-                                <rect key="frame" x="679" y="6" width="28" height="28"/>
+                                <rect key="frame" x="667" y="6" width="28" height="28"/>
                                 <constraints>
                                     <constraint firstAttribute="width" constant="28" id="VYL-F0-tet"/>
                                     <constraint firstAttribute="height" constant="28" id="fPk-l3-pz2"/>
@@ -159,7 +159,7 @@
                                 </connections>
                             </button>
                             <button translatesAutoresizingMaskIntoConstraints="NO" id="XBe-xO-dXj" userLabel="Share Button" customClass="MouseOverButton" customModule="DuckDuckGo_Privacy_Browser" customModuleProvider="target">
-                                <rect key="frame" x="735" y="6" width="28" height="28"/>
+                                <rect key="frame" x="731" y="6" width="28" height="28"/>
                                 <constraints>
                                     <constraint firstAttribute="height" constant="28" id="Ile-vS-DrC"/>
                                     <constraint firstAttribute="width" constant="28" id="dww-gU-g9Y"/>
@@ -185,7 +185,7 @@
                                 </connections>
                             </button>
                             <button translatesAutoresizingMaskIntoConstraints="NO" id="4sj-qN-UUY" userLabel="Bookmarks Button" customClass="MouseOverButton" customModule="DuckDuckGo_Privacy_Browser" customModuleProvider="target">
-                                <rect key="frame" x="707" y="6" width="28" height="28"/>
+                                <rect key="frame" x="699" y="6" width="28" height="28"/>
                                 <constraints>
                                     <constraint firstAttribute="height" constant="28" id="Qzm-SN-RXg"/>
                                     <constraint firstAttribute="width" constant="28" id="q0c-3z-K6Y"/>
@@ -213,7 +213,7 @@
                         </subviews>
                         <constraints>
                             <constraint firstAttribute="bottom" secondItem="EQw-GG-GMA" secondAttribute="bottom" id="4ye-CO-dDp"/>
-                            <constraint firstItem="kky-0N-Cfd" firstAttribute="leading" secondItem="hYV-nu-QIp" secondAttribute="leading" constant="8" id="5xQ-lQ-hZc"/>
+                            <constraint firstItem="kky-0N-Cfd" firstAttribute="leading" secondItem="hYV-nu-QIp" secondAttribute="leading" constant="12" id="5xQ-lQ-hZc"/>
                             <constraint firstItem="iIF-Ky-unr" firstAttribute="centerY" secondItem="hYV-nu-QIp" secondAttribute="centerY" id="6EH-Ax-6p8"/>
                             <constraint firstItem="Wba-nA-FYj" firstAttribute="centerX" secondItem="hYV-nu-QIp" secondAttribute="centerX" priority="300" constant="8" id="Ofg-Pb-s0m"/>
                             <constraint firstAttribute="trailing" relation="greaterThanOrEqual" secondItem="Wba-nA-FYj" secondAttribute="trailing" constant="80" id="RR5-n6-acI"/>
@@ -225,15 +225,15 @@
                             <constraint firstItem="XBe-xO-dXj" firstAttribute="centerY" secondItem="hYV-nu-QIp" secondAttribute="centerY" id="aq3-cG-JsH"/>
                             <constraint firstItem="EQw-GG-GMA" firstAttribute="top" secondItem="hYV-nu-QIp" secondAttribute="top" id="ctd-w7-EMF"/>
                             <constraint firstItem="mdE-u0-Ei5" firstAttribute="leading" secondItem="kky-0N-Cfd" secondAttribute="trailing" constant="4" id="dfl-Lh-pZe"/>
-                            <constraint firstAttribute="trailing" secondItem="iIF-Ky-unr" secondAttribute="trailing" constant="8" id="gaO-bl-clp"/>
+                            <constraint firstAttribute="trailing" secondItem="iIF-Ky-unr" secondAttribute="trailing" constant="12" id="gaO-bl-clp"/>
                             <constraint firstItem="EQw-GG-GMA" firstAttribute="leading" secondItem="hYV-nu-QIp" secondAttribute="leading" id="hpe-5Y-XTJ"/>
                             <constraint firstItem="mdE-u0-Ei5" firstAttribute="centerY" secondItem="hYV-nu-QIp" secondAttribute="centerY" id="hpv-rt-wVQ"/>
                             <constraint firstItem="4sj-qN-UUY" firstAttribute="centerY" secondItem="hYV-nu-QIp" secondAttribute="centerY" id="mPG-9Z-Wva"/>
-                            <constraint firstItem="4sj-qN-UUY" firstAttribute="leading" secondItem="DqX-mW-o7G" secondAttribute="trailing" id="nMJ-nc-Xts"/>
+                            <constraint firstItem="4sj-qN-UUY" firstAttribute="leading" secondItem="DqX-mW-o7G" secondAttribute="trailing" constant="4" id="nMJ-nc-Xts"/>
                             <constraint firstItem="kky-0N-Cfd" firstAttribute="centerY" secondItem="hYV-nu-QIp" secondAttribute="centerY" id="nim-fw-Zt3"/>
                             <constraint firstAttribute="trailing" secondItem="EQw-GG-GMA" secondAttribute="trailing" id="oYK-XH-0iN"/>
-                            <constraint firstItem="XBe-xO-dXj" firstAttribute="leading" secondItem="4sj-qN-UUY" secondAttribute="trailing" id="otW-AC-yMG"/>
-                            <constraint firstItem="Wba-nA-FYj" firstAttribute="leading" relation="greaterThanOrEqual" secondItem="hYV-nu-QIp" secondAttribute="leading" constant="112" id="sKj-TU-b0z"/>
+                            <constraint firstItem="XBe-xO-dXj" firstAttribute="leading" secondItem="4sj-qN-UUY" secondAttribute="trailing" constant="4" id="otW-AC-yMG"/>
+                            <constraint firstItem="Wba-nA-FYj" firstAttribute="leading" relation="greaterThanOrEqual" secondItem="B2U-XM-Vo0" secondAttribute="trailing" constant="8" id="sKj-TU-b0z"/>
                             <constraint firstItem="B2U-XM-Vo0" firstAttribute="centerY" secondItem="hYV-nu-QIp" secondAttribute="centerY" id="tVV-qE-2xE"/>
                             <constraint firstItem="Wba-nA-FYj" firstAttribute="width" secondItem="hYV-nu-QIp" secondAttribute="width" multiplier="0.6" priority="300" id="yyv-y0-Is1"/>
                         </constraints>
@@ -629,16 +629,16 @@
         </scene>
     </scenes>
     <resources>
-        <image name="Back" width="7" height="13"/>
-        <image name="Bookmark" width="11" height="15"/>
+        <image name="Back" width="16" height="16"/>
+        <image name="Bookmark" width="16" height="16"/>
         <image name="Bookmarks" width="16" height="16"/>
         <image name="BurnProof" width="16" height="16"/>
         <image name="Clear" width="9" height="9"/>
         <image name="Feedback" width="16" height="16"/>
-        <image name="Forward" width="7" height="13"/>
+        <image name="Forward" width="16" height="16"/>
         <image name="HomeFavicon" width="16" height="16"/>
-        <image name="PrivacyEntryPoint" width="15" height="15"/>
-        <image name="Refresh" width="12" height="15"/>
+        <image name="PrivacyEntryPoint" width="16" height="16"/>
+        <image name="Refresh" width="16" height="16"/>
         <image name="Settings" width="12" height="3"/>
         <image name="Share" width="16" height="16"/>
         <namedColor name="AddressBarBackgroundColor">
