@@ -22,6 +22,9 @@ import os.log
 
 @NSApplicationMain
 final class AppDelegate: NSObject, NSApplicationDelegate {
+
+    static let copySelector = #selector(AppDelegate.copy(_:))
+
     let launchTimingPixel = TimedPixel(.launchTiming)
 
     static var isRunningTests: Bool {
@@ -135,6 +138,27 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
     private func applyPreferredTheme() {
         let appearancePreferences = AppearancePreferences()
         appearancePreferences.updateUserInterfaceStyle()
+    }
+
+    @IBAction func copy(_ sender: Any?) {
+        print(#function, sender as Any)
+
+        guard let responder = NSApp.keyWindow?.firstResponder else { return }
+
+        if responder is AddressBarTextEditor,
+           let controller = NSApp.keyWindow?.contentViewController as? MainViewController,
+           let url = controller.tabCollectionViewModel.selectedTabViewModel?.tab.url {
+
+            // When copying from the address bar text field always use the URL in case we're showing something else
+
+            NSPasteboard.general.clearContents()
+            NSPasteboard.general.setString(url.absoluteString, forType: .string)
+            NSPasteboard.general.setString(url.absoluteString, forType: .URL)
+
+        } else if responder.responds(to: Self.copySelector) {
+            responder.perform(Self.copySelector)
+        }
+
     }
 
 }
