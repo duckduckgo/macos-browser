@@ -386,7 +386,7 @@
                                 </textFieldCell>
                             </textField>
                             <containerView translatesAutoresizingMaskIntoConstraints="NO" id="bOl-8Z-hTh">
-                                <rect key="frame" x="4" y="4" width="592" height="28"/>
+                                <rect key="frame" x="4" y="3" width="592" height="30"/>
                                 <connections>
                                     <segue destination="mcr-nj-GmC" kind="embed" destinationCreationSelector="createAddressBarButtonsViewController:" id="zZO-zH-MBi"/>
                                 </connections>
@@ -423,11 +423,11 @@
                             <constraint firstItem="bOl-8Z-hTh" firstAttribute="leading" secondItem="wj6-L2-5rJ" secondAttribute="leading" constant="4" id="OSv-yy-Yz5"/>
                             <constraint firstItem="e0p-7S-Gan" firstAttribute="top" secondItem="wj6-L2-5rJ" secondAttribute="top" id="QK2-Pt-rY4"/>
                             <constraint firstAttribute="trailing" secondItem="Ij9-fc-CLI" secondAttribute="trailing" id="Rcu-uf-Zn8"/>
-                            <constraint firstItem="bOl-8Z-hTh" firstAttribute="top" secondItem="wj6-L2-5rJ" secondAttribute="top" constant="4" id="SwY-O9-MAQ"/>
+                            <constraint firstItem="bOl-8Z-hTh" firstAttribute="top" secondItem="wj6-L2-5rJ" secondAttribute="top" constant="3" id="SwY-O9-MAQ"/>
                             <constraint firstAttribute="trailing" secondItem="e0p-7S-Gan" secondAttribute="trailing" id="V8Z-LH-nT9"/>
                             <constraint firstAttribute="trailing" secondItem="bOl-8Z-hTh" secondAttribute="trailing" constant="4" id="VD0-WJ-LdG"/>
                             <constraint firstItem="ENV-0H-Fcc" firstAttribute="leading" secondItem="wj6-L2-5rJ" secondAttribute="leading" constant="5" id="WGn-g2-wT7"/>
-                            <constraint firstAttribute="bottom" secondItem="bOl-8Z-hTh" secondAttribute="bottom" constant="4" id="WNn-YA-PHP"/>
+                            <constraint firstAttribute="bottom" secondItem="bOl-8Z-hTh" secondAttribute="bottom" constant="3" id="WNn-YA-PHP"/>
                             <constraint firstItem="Ij9-fc-CLI" firstAttribute="top" secondItem="wj6-L2-5rJ" secondAttribute="top" id="XhY-ag-U21"/>
                             <constraint firstItem="zaX-wZ-E3D" firstAttribute="leading" secondItem="wj6-L2-5rJ" secondAttribute="leading" constant="37" id="bY3-LA-cuF"/>
                             <constraint firstItem="le0-Hn-ZAC" firstAttribute="leading" relation="greaterThanOrEqual" secondItem="wj6-L2-5rJ" secondAttribute="leading" constant="37" id="eJI-rp-ptx"/>
@@ -465,6 +465,7 @@
                                 <rect key="frame" x="545" y="0.0" width="32" height="32"/>
                                 <constraints>
                                     <constraint firstAttribute="width" constant="32" id="3ze-iM-E0b"/>
+                                    <constraint firstAttribute="height" constant="32" id="nLM-v6-jHW"/>
                                 </constraints>
                                 <buttonCell key="cell" type="square" bezelStyle="shadowlessSquare" image="Bookmark" imagePosition="only" alignment="center" imageScaling="proportionallyDown" inset="2" id="H3Y-Sk-Xp8">
                                     <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
@@ -479,7 +480,7 @@
                                         <color key="value" name="ButtonMouseDownColor"/>
                                     </userDefinedRuntimeAttribute>
                                     <userDefinedRuntimeAttribute type="number" keyPath="cornerRadius">
-                                        <real key="value" value="9"/>
+                                        <integer key="value" value="7"/>
                                     </userDefinedRuntimeAttribute>
                                 </userDefinedRuntimeAttributes>
                                 <connections>
@@ -487,7 +488,7 @@
                                 </connections>
                             </button>
                             <button translatesAutoresizingMaskIntoConstraints="NO" id="kRc-0m-oqe" customClass="MouseOverButton" customModule="DuckDuckGo_Privacy_Browser" customModuleProvider="target">
-                                <rect key="frame" x="545" y="1" width="32" height="28"/>
+                                <rect key="frame" x="545" y="2" width="32" height="28"/>
                                 <constraints>
                                     <constraint firstAttribute="width" constant="32" id="8Ag-uG-RA7"/>
                                     <constraint firstAttribute="height" constant="28" id="B6E-P0-EL6"/>
@@ -556,7 +557,7 @@
                                                 <color key="value" name="ButtonMouseDownColor"/>
                                             </userDefinedRuntimeAttribute>
                                             <userDefinedRuntimeAttribute type="number" keyPath="cornerRadius">
-                                                <real key="value" value="9"/>
+                                                <integer key="value" value="7"/>
                                             </userDefinedRuntimeAttribute>
                                         </userDefinedRuntimeAttributes>
                                         <connections>
@@ -606,11 +607,10 @@
                         <constraints>
                             <constraint firstAttribute="trailing" secondItem="taC-vG-1fV" secondAttribute="trailing" constant="1" id="26X-xU-JjT"/>
                             <constraint firstItem="HEu-ro-RSA" firstAttribute="centerY" secondItem="Bhg-sv-n5J" secondAttribute="centerY" id="BRs-q1-MOh"/>
-                            <constraint firstItem="taC-vG-1fV" firstAttribute="top" secondItem="Bhg-sv-n5J" secondAttribute="top" id="DZu-Mp-6eA"/>
                             <constraint firstItem="HEu-ro-RSA" firstAttribute="leading" secondItem="Bhg-sv-n5J" secondAttribute="leading" constant="1" id="JJu-Ej-iFq"/>
-                            <constraint firstAttribute="bottom" secondItem="kRc-0m-oqe" secondAttribute="bottom" constant="1" id="Trl-Jy-VjP"/>
+                            <constraint firstItem="kRc-0m-oqe" firstAttribute="centerY" secondItem="Bhg-sv-n5J" secondAttribute="centerY" id="T0S-fo-y1J"/>
                             <constraint firstAttribute="trailing" secondItem="kRc-0m-oqe" secondAttribute="trailing" constant="1" id="WeU-Fb-omO"/>
-                            <constraint firstAttribute="bottom" secondItem="taC-vG-1fV" secondAttribute="bottom" id="u8B-3l-kXC"/>
+                            <constraint firstItem="taC-vG-1fV" firstAttribute="centerY" secondItem="Bhg-sv-n5J" secondAttribute="centerY" id="j0x-vX-dys"/>
                         </constraints>
                     </view>
                     <connections>
@@ -639,7 +639,7 @@
         <image name="HomeFavicon" width="16" height="16"/>
         <image name="PrivacyEntryPoint" width="16" height="16"/>
         <image name="Refresh" width="16" height="16"/>
-        <image name="Settings" width="12" height="3"/>
+        <image name="Settings" width="16" height="16"/>
         <image name="Share" width="16" height="16"/>
         <namedColor name="AddressBarBackgroundColor">
             <color red="1" green="1" blue="1" alpha="1" colorSpace="custom" customColorSpace="displayP3"/>

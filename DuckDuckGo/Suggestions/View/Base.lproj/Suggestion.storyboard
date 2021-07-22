@@ -225,7 +225,7 @@
                                                 </userDefinedRuntimeAttributes>
                                             </customView>
                                             <customView translatesAutoresizingMaskIntoConstraints="NO" id="ATb-xt-XAg" userLabel="Separator" customClass="ColorView" customModule="DuckDuckGo_Privacy_Browser" customModuleProvider="target">
-                                                <rect key="frame" x="2" y="262" width="614" height="1"/>
+                                                <rect key="frame" x="2" y="264" width="614" height="1"/>
                                                 <constraints>
                                                     <constraint firstAttribute="height" constant="1" id="G3c-nz-oCJ"/>
                                                 </constraints>
@@ -237,7 +237,7 @@
                                             </customView>
                                         </subviews>
                                         <constraints>
-                                            <constraint firstItem="ATb-xt-XAg" firstAttribute="top" secondItem="Svf-wj-SjJ" secondAttribute="top" constant="2" id="FoQ-BR-ASj"/>
+                                            <constraint firstItem="ATb-xt-XAg" firstAttribute="top" secondItem="Svf-wj-SjJ" secondAttribute="top" id="FoQ-BR-ASj"/>
                                             <constraint firstItem="j2X-bv-VAU" firstAttribute="leading" secondItem="Svf-wj-SjJ" secondAttribute="leading" id="Izj-JF-mOk"/>
                                             <constraint firstItem="ATb-xt-XAg" firstAttribute="leading" secondItem="Svf-wj-SjJ" secondAttribute="leading" constant="2" id="PIu-nj-NP2"/>
                                             <constraint firstAttribute="height" priority="950" constant="200" id="aJH-FU-o7W"/>
