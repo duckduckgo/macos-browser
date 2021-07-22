@@ -72,7 +72,10 @@ final class GeolocationProvider: NSObject {
     }
 
     fileprivate func startUpdatingLocation(geolocationManager: WKGeolocationManager) {
-        guard !isRevoked else { return }
+        guard !isRevoked else {
+            geolocationManager.providerDidFailToDeterminePosition(GeolocationDisabled())
+            return
+        }
         self.isActive = true
 
         locationCancellable = geolocationService.locationPublisher.sink { [weak self] result in
@@ -81,13 +84,12 @@ final class GeolocationProvider: NSObject {
     }
 
     private func updateLocation(with result: Result<CLLocation, Error>?) {
-        guard self.isActive,
-            !self.isPaused,
-            !self.isRevoked
-        else {
+        guard self.isActive else { return }
+        guard !self.isRevoked else {
             geolocationManager.providerDidFailToDeterminePosition(GeolocationDisabled())
             return
         }
+        guard !self.isPaused else { return }
 
         switch result {
         case .none:
