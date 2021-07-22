@@ -24,18 +24,24 @@ import BrowserServicesKit
 /// Could maybe even abstract a bunch of this code to be more generic re-usable styled list for use elsewhere.
 final class PasswordManagementItemListModel: ObservableObject {
 
-    var accounts: [SecureVaultModels.WebsiteAccount]
+    var accounts = [SecureVaultModels.WebsiteAccount]() {
+        didSet {
+            refresh()
+        }
+    }
 
-    @Published private(set) var displayedAccounts: [SecureVaultModels.WebsiteAccount]
+    var filter: String = "" {
+        didSet {
+            refresh()
+        }
+    }
+
+    @Published private(set) var displayedAccounts = [SecureVaultModels.WebsiteAccount]()
     @Published private(set) var selected: SecureVaultModels.WebsiteAccount?
 
     var onItemSelected: (_ old: SecureVaultModels.WebsiteAccount?, _ new: SecureVaultModels.WebsiteAccount) -> Void
 
-    init(accounts: [SecureVaultModels.WebsiteAccount],
-         onItemSelected: @escaping (_ old: SecureVaultModels.WebsiteAccount?, _ new: SecureVaultModels.WebsiteAccount) -> Void) {
-
-        self.accounts = accounts
-        self.displayedAccounts = accounts
+    init(onItemSelected: @escaping (_ old: SecureVaultModels.WebsiteAccount?, _ new: SecureVaultModels.WebsiteAccount) -> Void) {
         self.onItemSelected = onItemSelected
     }
 
@@ -57,11 +63,12 @@ final class PasswordManagementItemListModel: ObservableObject {
         }
     }
 
-    func filterUsing(text: String) {
-        if text.isEmpty {
+    func refresh() {
+        let filter = self.filter.lowercased()
+        if filter.isEmpty {
             displayedAccounts = accounts
         } else {
-            let filter = text.lowercased()
+            let filter = filter.lowercased()
             displayedAccounts = accounts.filter { $0.domain.lowercased().contains(filter) ||
                 $0.username.lowercased().contains(filter) ||
                 $0.title?.lowercased().contains(filter) ?? false

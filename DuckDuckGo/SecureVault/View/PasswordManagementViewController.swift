@@ -129,7 +129,7 @@ final class PasswordManagementViewController: NSViewController {
 
     func clear() {
         self.listModel?.accounts = []
-        self.listModel?.filterUsing(text: "")
+        self.listModel?.filter = ""
         self.listModel?.clearSelection()
         self.itemModel?.credentials = nil
     }
@@ -212,7 +212,7 @@ final class PasswordManagementViewController: NSViewController {
     }
 
     private func createListView() {
-        let listModel = PasswordManagementItemListModel(accounts: []) { [weak self] previousValue, newValue in
+        let listModel = PasswordManagementItemListModel { [weak self] previousValue, newValue in
             guard let id = newValue.id,
                   let window = self?.view.window else { return }
 
@@ -257,7 +257,7 @@ final class PasswordManagementViewController: NSViewController {
 
     private func updateFilter() {
         let text = searchField.stringValue.trimmingWhitespaces()
-        listModel?.filterUsing(text: text)
+        listModel?.filter = text
     }
 
     private func fetchAccounts(completion: @escaping ([SecureVaultModels.WebsiteAccount]) -> Void) {
