@@ -645,7 +645,7 @@
             <color red="1" green="1" blue="1" alpha="1" colorSpace="custom" customColorSpace="displayP3"/>
         </namedColor>
         <namedColor name="AddressBarBorderColor">
-            <color red="0.83137254901960789" green="0.83137254901960789" blue="0.83137254901960789" alpha="0.69999998807907104" colorSpace="custom" customColorSpace="displayP3"/>
+            <color red="0.0" green="0.0" blue="0.0" alpha="0.20000000000000001" colorSpace="custom" customColorSpace="displayP3"/>
         </namedColor>
         <namedColor name="AddressBarInnerBorderColor">
             <color red="1" green="1" blue="1" alpha="0.0" colorSpace="custom" customColorSpace="displayP3"/>
