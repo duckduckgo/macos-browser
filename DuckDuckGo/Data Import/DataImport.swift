@@ -59,6 +59,6 @@ protocol DataImporter {
     /// For example, a CSV importer will return true if the URL it has been created with is a CSV file, but does not check whether the CSV data matches the expected format.
     func importableTypes() -> [DataImport.DataType]
 
-    func importData(types: [DataImport.DataType], completion: (Result<[DataImport.Summary], DataImportError>) -> Void)
+    func importData(types: [DataImport.DataType], completion: @escaping (Result<[DataImport.Summary], DataImportError>) -> Void)
 
 }

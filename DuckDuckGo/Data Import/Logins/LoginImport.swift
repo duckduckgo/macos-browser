@@ -31,7 +31,7 @@ struct LoginCredential: Equatable {
     }
 
     init?(row: [String]) {
-        if row.count == 3 {
+        if row.count >= 3 {
             self.init(url: row[0], username: row[1], password: row[2])
         } else {
             return nil

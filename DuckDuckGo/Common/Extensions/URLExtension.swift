@@ -29,6 +29,11 @@ extension URL {
         return libraryURL.appendingPathComponent(sandboxPathComponent)
     }
 
+    static func persistenceLocation(for fileName: String) -> URL {
+        let applicationSupportPath = URL.sandboxApplicationSupportURL
+        return applicationSupportPath.appendingPathComponent(fileName)
+    }
+
     // MARK: - Factory
 
     static func makeSearchUrl(from searchQuery: String) -> URL? {

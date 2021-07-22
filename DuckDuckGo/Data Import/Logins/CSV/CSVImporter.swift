@@ -45,19 +45,22 @@ final class CSVImporter: DataImporter {
         }
     }
 
-    func importData(types: [DataImport.DataType], completion: (Result<[DataImport.Summary], DataImportError>) -> Void) {
+    // This will change to return an array of DataImport.Summary objects, indicating the status of each import type that was requested.
+    func importData(types: [DataImport.DataType], completion: @escaping (Result<[DataImport.Summary], DataImportError>) -> Void) {
         guard let fileContents = try? String(contentsOf: fileURL, encoding: .utf8) else {
             completion(.failure(.cannotReadFile))
             return
         }
 
-        let loginCredentials = Self.extractLogins(from: fileContents)
+        DispatchQueue.global(qos: .userInitiated).async {
+            let loginCredentials = Self.extractLogins(from: fileContents)
 
-        do {
-            let loginImportSummary = try loginImporter.importLogins(loginCredentials)
-            completion(.success([loginImportSummary]))
-        } catch {
-            completion(.failure(.cannotAccessSecureVault))
+            do {
+                let loginImportSummary = try self.loginImporter.importLogins(loginCredentials)
+                DispatchQueue.main.async { completion(.success([loginImportSummary])) }
+            } catch {
+                DispatchQueue.main.async { completion(.failure(.cannotAccessSecureVault)) }
+            }
         }
     }
 

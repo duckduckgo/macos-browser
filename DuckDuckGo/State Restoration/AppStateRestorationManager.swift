@@ -26,7 +26,7 @@ final class AppStateRestorationManager {
     private let service: StatePersistenceService
     private var cancellable: AnyCancellable!
 
-    init(fileStore: FileStoring) {
+    init(fileStore: FileStore) {
         self.service = StatePersistenceService(fileStore: fileStore, fileName: AppStateRestorationManager.fileName)
     }
 

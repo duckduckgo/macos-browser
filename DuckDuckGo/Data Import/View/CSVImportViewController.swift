@@ -72,7 +72,7 @@ final class CSVImportViewController: NSViewController {
             selectFileButton.title = UserText.importLoginsSelectCSVFile
         case .selectedValidFile(let fileURL):
             let totalLoginsToImport = CSVImporter.totalValidLogins(in: fileURL)
-            selectedFileLabel.stringValue = "Importing File: \(fileURL.path) (\(totalLoginsToImport) logins)"
+            selectedFileLabel.stringValue = "Importing File: \(fileURL.path) (\(totalLoginsToImport) valid logins)"
             selectedFileLabel.isHidden = false
             selectFileButton.title = UserText.importLoginsSelectAnotherFile
         case .selectedInvalidFile:

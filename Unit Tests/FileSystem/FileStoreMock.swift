@@ -19,7 +19,7 @@
 import Foundation
 @testable import DuckDuckGo_Privacy_Browser
 
-final class FileStoreMock: NSObject, FileStoring {
+final class FileStoreMock: NSObject, FileStore {
 
     private var _storage = [String: Data]()
     private let lock = NSLock()
@@ -45,26 +45,26 @@ final class FileStoreMock: NSObject, FileStoring {
     var failWithError: Error?
     var delay: TimeInterval = 0
 
-    func persist(_ data: Data, fileName: String) -> Bool {
+    func persist(_ data: Data, url: URL) -> Bool {
         if delay > 0 {
             usleep(UInt32(delay * 1_000_000))
         }
         guard failWithError == nil else { return false }
-        storage[fileName] = data
+        storage[url.lastPathComponent] = data
         return true
     }
 
-    func loadData(named fileName: String) -> Data? {
+    func loadData(at url: URL) -> Data? {
         guard failWithError == nil else { return nil }
-        guard let data = storage[fileName] else { return nil }
+        guard let data = storage[url.lastPathComponent] else { return nil }
         return data
     }
 
-    func hasData(for fileName: String) -> Bool {
-        storage[fileName] != nil
+    func hasData(at url: URL) -> Bool {
+        storage[url.lastPathComponent] != nil
     }
 
-    func remove(_ fileName: String) {
-        storage[fileName] = nil
+    func remove(fileAtURL url: URL) {
+        storage[url.lastPathComponent] = nil
     }
 }

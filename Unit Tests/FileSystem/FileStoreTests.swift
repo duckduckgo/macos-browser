@@ -22,6 +22,7 @@ import CryptoKit
 
 final class FileStoreTests: XCTestCase {
     private let testFileName = "TestFile"
+    private lazy var testFileLocation = URL.persistenceLocation(for: testFileName)
     private let testData = "Hello, World".data(using: .utf8)!
 
     override func setUp() {
@@ -35,24 +36,24 @@ final class FileStoreTests: XCTestCase {
     }
 
     func testStoringDataWithoutEncryption() {
-        let store = FileStore()
-        let success = store.persist(testData, fileName: testFileName)
+        let store = EncryptedFileStore()
+        let success = store.persist(testData, url: testFileLocation)
 
         XCTAssertTrue(success)
     }
 
     func testReadingNonExistentData() {
-        let store = FileStore()
-        let data = store.loadData(named: testFileName)
+        let store = EncryptedFileStore()
+        let data = store.loadData(at: testFileLocation)
 
         XCTAssertNil(data)
     }
 
     func testReadingDataWithoutEncryption() {
-        let store = FileStore()
+        let store = EncryptedFileStore()
 
-        _ = store.persist(testData, fileName: testFileName)
-        let readData = store.loadData(named: testFileName)
+        _ = store.persist(testData, url: testFileLocation)
+        let readData = store.loadData(at: testFileLocation)
 
         XCTAssertEqual(testData, readData)
     }
@@ -60,52 +61,52 @@ final class FileStoreTests: XCTestCase {
     func testStoringAndRetrievingEncryptedData() {
         let keyStore = MockEncryptionKeyStore(generator: EncryptionKeyGenerator(), account: "mock-account")
         let key = try? keyStore.readKey()
-        let encryptedStore = FileStore(encryptionKey: key!)
+        let encryptedStore = EncryptedFileStore(encryptionKey: key!)
 
-        XCTAssertTrue(encryptedStore.persist(testData, fileName: testFileName))
+        XCTAssertTrue(encryptedStore.persist(testData, url: testFileLocation))
 
         // A new key should have been generated in the key store.
         XCTAssertEqual(keyStore.storedKeys.count, 1)
 
         // Verify that there is data at the location that was written to.
-        XCTAssertTrue(encryptedStore.hasData(for: testFileName))
+        XCTAssertTrue(encryptedStore.hasData(at: testFileLocation))
 
         // Data should come back decrypted, so it should be equal to the original test data.
-        let data = encryptedStore.loadData(named: testFileName)
+        let data = encryptedStore.loadData(at: testFileLocation)
         XCTAssertEqual(data, testData)
     }
 
     func testOverwritingStoredFiles() {
         let keyStore = MockEncryptionKeyStore(generator: EncryptionKeyGenerator(), account: "mock-account")
         let key = try? keyStore.readKey()
-        let encryptedStore = FileStore(encryptionKey: key!)
+        let encryptedStore = EncryptedFileStore(encryptionKey: key!)
 
-        XCTAssertTrue(encryptedStore.persist("First Write".data(using: .utf8)!, fileName: testFileName))
-        XCTAssertTrue(encryptedStore.persist("Second Write".data(using: .utf8)!, fileName: testFileName))
-        XCTAssertTrue(encryptedStore.persist("Third Write".data(using: .utf8)!, fileName: testFileName))
+        XCTAssertTrue(encryptedStore.persist("First Write".data(using: .utf8)!, url: testFileLocation))
+        XCTAssertTrue(encryptedStore.persist("Second Write".data(using: .utf8)!, url: testFileLocation))
+        XCTAssertTrue(encryptedStore.persist("Third Write".data(using: .utf8)!, url: testFileLocation))
 
-        let data = encryptedStore.loadData(named: testFileName)
+        let data = encryptedStore.loadData(at: testFileLocation)
         XCTAssertEqual("Third Write".data(using: .utf8), data)
     }
 
     func testCheckingFilePresence() {
-        let store = FileStore()
+        let store = EncryptedFileStore()
 
         let data = "Hello, World".data(using: .utf8)!
-        XCTAssertTrue(store.persist(data, fileName: testFileName))
-        XCTAssertTrue(store.hasData(for: testFileName))
+        XCTAssertTrue(store.persist(data, url: testFileLocation))
+        XCTAssertTrue(store.hasData(at: testFileLocation))
     }
 
     func testPersistenceLocation() {
         let fileName = "TestFile"
-        let location = FileStore().persistenceLocation(for: fileName)
+        let location = URL.persistenceLocation(for: fileName)
         let components = location.pathComponents
 
         XCTAssertEqual(components.last!, fileName)
     }
 
     private func removeTestFiles() {
-        try? FileManager.default.removeItem(at: FileStore().persistenceLocation(for: testFileName))
+        try? FileManager.default.removeItem(at: URL.persistenceLocation(for: testFileName))
     }
 
 }
