@@ -11,12 +11,13 @@
         <scene sceneID="lhD-K8-q8j">
             <objects>
                 <viewController id="NgM-AV-NvE" customClass="HomepageViewController" customModule="DuckDuckGo_Privacy_Browser" customModuleProvider="target" sceneMemberID="viewController">
-                    <view key="view" id="Veh-DK-43v" customClass="ColorView" customModule="DuckDuckGo_Privacy_Browser" customModuleProvider="target">
+                    <view key="view" autoresizesSubviews="NO" id="Veh-DK-43v" customClass="HomepageBackgroundView" customModule="DuckDuckGo_Privacy_Browser" customModuleProvider="target">
                         <rect key="frame" x="0.0" y="0.0" width="628" height="381"/>
                         <autoresizingMask key="autoresizingMask"/>
                         <subviews>
-                            <scrollView wantsLayer="YES" borderType="none" autohidesScrollers="YES" horizontalLineScroll="10" horizontalPageScroll="10" verticalLineScroll="10" verticalPageScroll="10" hasHorizontalScroller="NO" usesPredominantAxisScrolling="NO" horizontalScrollElasticity="none" verticalScrollElasticity="none" translatesAutoresizingMaskIntoConstraints="NO" id="yHP-1u-VXv">
+                            <scrollView wantsLayer="YES" fixedFrame="YES" borderType="none" autohidesScrollers="YES" horizontalLineScroll="10" horizontalPageScroll="10" verticalLineScroll="10" verticalPageScroll="10" hasHorizontalScroller="NO" usesPredominantAxisScrolling="NO" horizontalScrollElasticity="none" verticalScrollElasticity="none" translatesAutoresizingMaskIntoConstraints="NO" id="yHP-1u-VXv">
                                 <rect key="frame" x="33" y="93" width="562" height="216"/>
+                                <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                 <clipView key="contentView" drawsBackground="NO" id="w2D-bw-AI3">
                                     <rect key="frame" x="0.0" y="0.0" width="562" height="216"/>
                                     <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
@@ -24,8 +25,19 @@
                                         <collectionView selectable="YES" id="MU6-iJ-Oba">
                                             <rect key="frame" x="0.0" y="0.0" width="562" height="216"/>
                                             <autoresizingMask key="autoresizingMask" widthSizable="YES"/>
-                                            <collectionViewFlowLayout key="collectionViewLayout" minimumInteritemSpacing="24" minimumLineSpacing="32" id="DoO-9t-4cf">
+                                            <collectionViewFlowLayout key="collectionViewLayout" minimumInteritemSpacing="24" minimumLineSpacing="32" id="DoO-9t-4cf" customClass="HomepageCollectionViewFlowLayout" customModule="DuckDuckGo_Privacy_Browser">
                                                 <size key="itemSize" width="50" height="50"/>
+                                                <userDefinedRuntimeAttributes>
+                                                    <userDefinedRuntimeAttribute type="number" keyPath="columns">
+                                                        <integer key="value" value="5"/>
+                                                    </userDefinedRuntimeAttribute>
+                                                    <userDefinedRuntimeAttribute type="size" keyPath="insets">
+                                                        <size key="value" width="20" height="64"/>
+                                                    </userDefinedRuntimeAttribute>
+                                                    <userDefinedRuntimeAttribute type="number" keyPath="verticalShift">
+                                                        <integer key="value" value="-10"/>
+                                                    </userDefinedRuntimeAttribute>
+                                                </userDefinedRuntimeAttributes>
                                             </collectionViewFlowLayout>
                                             <color key="primaryBackgroundColor" name="ClearColor"/>
                                             <connections>
@@ -36,10 +48,6 @@
                                     </subviews>
                                     <color key="backgroundColor" name="ClearColor"/>
                                 </clipView>
-                                <constraints>
-                                    <constraint firstAttribute="height" constant="216" id="B9J-V4-PQV"/>
-                                    <constraint firstAttribute="width" priority="250" constant="562" id="KJY-Xv-KbH"/>
-                                </constraints>
                                 <scroller key="horizontalScroller" hidden="YES" wantsLayer="YES" verticalHuggingPriority="750" horizontal="YES" id="Jii-b1-70r">
                                     <rect key="frame" x="-100" y="-100" width="233" height="15"/>
                                     <autoresizingMask key="autoresizingMask"/>
@@ -50,23 +58,17 @@
                                 </scroller>
                             </scrollView>
                         </subviews>
-                        <constraints>
-                            <constraint firstAttribute="bottom" relation="greaterThanOrEqual" secondItem="yHP-1u-VXv" secondAttribute="bottom" constant="20" id="88q-UH-Ss9"/>
-                            <constraint firstItem="yHP-1u-VXv" firstAttribute="centerY" secondItem="Veh-DK-43v" secondAttribute="centerY" constant="-10" id="Cc3-wS-Y0b"/>
-                            <constraint firstAttribute="trailing" relation="greaterThanOrEqual" secondItem="yHP-1u-VXv" secondAttribute="trailing" constant="20" id="Loo-dG-uq6"/>
-                            <constraint firstItem="yHP-1u-VXv" firstAttribute="top" relation="greaterThanOrEqual" secondItem="Veh-DK-43v" secondAttribute="top" constant="20" id="gXZ-9j-16Z"/>
-                            <constraint firstItem="yHP-1u-VXv" firstAttribute="leading" relation="greaterThanOrEqual" secondItem="Veh-DK-43v" secondAttribute="leading" constant="20" id="pUh-al-NUM"/>
-                            <constraint firstItem="yHP-1u-VXv" firstAttribute="centerX" secondItem="Veh-DK-43v" secondAttribute="centerX" id="rYE-l9-Pkw"/>
-                        </constraints>
                         <userDefinedRuntimeAttributes>
                             <userDefinedRuntimeAttribute type="color" keyPath="backgroundColor">
                                 <color key="value" name="HomepageBackgroundColor"/>
                             </userDefinedRuntimeAttribute>
                         </userDefinedRuntimeAttributes>
+                        <connections>
+                            <outlet property="collectionView" destination="MU6-iJ-Oba" id="XHQ-vx-Fzp"/>
+                        </connections>
                     </view>
                     <connections>
                         <outlet property="collectionView" destination="MU6-iJ-Oba" id="dUx-ve-GKd"/>
-                        <outlet property="collectionViewHeight" destination="B9J-V4-PQV" id="vtf-ez-uP2"/>
                     </connections>
                 </viewController>
                 <customObject id="0P8-8S-i0z" userLabel="First Responder" customClass="NSResponder" sceneMemberID="firstResponder"/>
@@ -137,7 +139,7 @@
                                     </gridCell>
                                     <gridCell row="1G0-DG-YgP" column="jEV-wa-iSE" id="UYO-eE-UtK">
                                         <textField key="contentView" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="bLd-Hj-ttQ">
-                                            <rect key="frame" x="60" y="27" width="100" height="21"/>
+                                            <rect key="frame" x="310" y="27" width="100" height="21"/>
                                             <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" selectable="YES" editable="YES" sendsActionOnEndEditing="YES" borderStyle="bezel" drawsBackground="YES" id="W3q-og-79e">
                                                 <font key="font" metaFont="system"/>
                                                 <color key="textColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
@@ -157,7 +159,7 @@
                                     </gridCell>
                                     <gridCell row="d3W-kk-2Ht" column="jEV-wa-iSE" id="efH-IF-rgE">
                                         <textField key="contentView" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="bB4-9W-QHG">
-                                            <rect key="frame" x="60" y="0.0" width="100" height="21"/>
+                                            <rect key="frame" x="310" y="0.0" width="100" height="21"/>
                                             <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" selectable="YES" editable="YES" sendsActionOnEndEditing="YES" borderStyle="bezel" drawsBackground="YES" id="vPZ-Ig-irl">
                                                 <font key="font" metaFont="system"/>
                                                 <color key="textColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>

@@ -43,13 +43,10 @@ final class HomepageViewController: NSViewController {
 
     enum Constants {
         static let maxNumberOfFavorites = 10
-        static let defaultPromptViewHeight: CGFloat = 66
-        static let collectionViewMinimumHeight: CGFloat = 216
     }
 
     private var defaultBrowserPromptView = DefaultBrowserPromptView.createFromNib()
     @IBOutlet weak var collectionView: NSCollectionView!
-    @IBOutlet weak var collectionViewHeight: NSLayoutConstraint!
 
     @UserDefaultsWrapper(key: .defaultBrowserDismissed, defaultValue: false)
     var defaultBrowserPromptDismissed: Bool
@@ -82,6 +79,7 @@ final class HomepageViewController: NSViewController {
         super.viewDidLoad()
 
         layoutDefaultBrowserPromptView()
+        (self.view as? HomepageBackgroundView)?.defaultBrowserPromptView = defaultBrowserPromptView
         let nib = NSNib(nibNamed: "HomepageCollectionViewItem", bundle: nil)
         collectionView.register(nib, forItemWithIdentifier: HomepageCollectionViewItem.identifier)
 
@@ -91,12 +89,6 @@ final class HomepageViewController: NSViewController {
                                                object: nil)
 
         subscribeToBookmarkList()
-    }
-
-    override func viewDidLayout() {
-        super.viewDidLayout()
-
-        adjustCollectionViewHeight()
     }
 
     override func viewWillAppear() {
@@ -113,14 +105,13 @@ final class HomepageViewController: NSViewController {
 
     func layoutDefaultBrowserPromptView() {
         defaultBrowserPromptView.delegate = self
-        defaultBrowserPromptView.translatesAutoresizingMaskIntoConstraints = false
+        defaultBrowserPromptView.frame = NSRect(x: 0,
+                                                y: self.view.bounds.height - defaultBrowserPromptView.frame.height,
+                                                width: self.view.bounds.width,
+                                                height: defaultBrowserPromptView.frame.height)
+        defaultBrowserPromptView.autoresizingMask = [.width, .minYMargin]
+        defaultBrowserPromptView.translatesAutoresizingMaskIntoConstraints = true
         self.view.addSubview(defaultBrowserPromptView)
-
-        defaultBrowserPromptView.heightAnchor.constraint(equalToConstant: Constants.defaultPromptViewHeight).isActive = true
-        defaultBrowserPromptView.topAnchor.constraint(equalTo: self.view.topAnchor).isActive = true
-        defaultBrowserPromptView.leadingAnchor.constraint(equalTo: self.view.leadingAnchor).isActive = true
-        defaultBrowserPromptView.trailingAnchor.constraint(equalTo: self.view.trailingAnchor).isActive = true
-        defaultBrowserPromptView.bottomAnchor.constraint(lessThanOrEqualTo: collectionView.topAnchor).isActive = true
     }
 
     @objc
@@ -150,12 +141,6 @@ final class HomepageViewController: NSViewController {
         }
     }
 
-    private func adjustCollectionViewHeight() {
-        if let layout = collectionView.collectionViewLayout {
-            collectionViewHeight.constant = max(layout.collectionViewContentSize.height, Constants.collectionViewMinimumHeight)
-        }
-    }
-
     // MARK: - Add/Edit Favorite Popover
 
     private func showAddEditController(for bookmark: Bookmark? = nil) {
@@ -177,8 +162,8 @@ final class HomepageViewController: NSViewController {
             window.addEditFavoriteViewController.edit(bookmark: bookmark)
         }
 
-        let windowFrame = NSRect(x: screen.frame.size.width / 2.0 - AddEditFavoriteWindow.Size.width / 2.0,
-                                 y: screen.frame.size.height / 2.0 - AddEditFavoriteWindow.Size.height / 2.0,
+        let windowFrame = NSRect(x: screen.frame.origin.x + screen.frame.size.width / 2.0 - AddEditFavoriteWindow.Size.width / 2.0,
+                                 y: screen.frame.origin.y + screen.frame.size.height / 2.0 - AddEditFavoriteWindow.Size.height / 2.0,
                                  width: AddEditFavoriteWindow.Size.width,
                                  height: AddEditFavoriteWindow.Size.height)
 
