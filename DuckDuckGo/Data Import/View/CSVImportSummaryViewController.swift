@@ -53,10 +53,10 @@ final class CSVImportSummaryViewController: NSViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
 
-        if let summary = self.summary?.summaryDetail as? LoginImport.Summary {
-            successfulImportsLabel.stringValue = "Successful Imports: \(summary.successful.count)"
-            duplicateImportsLabel.stringValue = "Duplicate Imports: \(summary.duplicates.count)"
-            failedImportsLabel.stringValue = "Failed Imports: \(summary.failed.count)"
+        if case let .logins(successful, duplicates, failed) = summary {
+            successfulImportsLabel.stringValue = "Successful Imports: \(successful.count)"
+            duplicateImportsLabel.stringValue = "Duplicate Imports: \(duplicates.count)"
+            failedImportsLabel.stringValue = "Failed Imports: \(failed.count)"
         } else {
             successfulImportsLabel.isHidden = true
             duplicateImportsLabel.isHidden = true

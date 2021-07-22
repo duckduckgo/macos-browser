@@ -27,7 +27,7 @@ final class CSVLoginExporter: LoginExporter {
         self.secureVault = secureVault
     }
 
-    func exportVaultLogins(to url: URL) {
+    func exportVaultLogins(to url: URL) throws {
         guard let accounts = try? secureVault.accounts() else {
             return
         }
@@ -44,22 +44,14 @@ final class CSVLoginExporter: LoginExporter {
             }
         }
 
-        save(credentials: credentialsToExport, to: url)
+        try save(credentials: credentialsToExport, to: url)
     }
 
-    func exportLogins(_ logins: [LoginCredential], toURL url: URL) throws {
-
-    }
-
-    private func save(credentials: [SecureVaultModels.WebsiteCredentials], to url: URL) {
+    private func save(credentials: [SecureVaultModels.WebsiteCredentials], to url: URL) throws {
         let credentialsAsCSVRows = credentials.map { "\($0.account.domain),\($0.account.username),\($0.password.utf8String()!)" }
         let finalString = credentialsAsCSVRows.joined(separator: "\n")
 
-        do {
-            try finalString.write(toFile: url.path, atomically: true, encoding: .utf8)
-        } catch {
-            print("Failed to write string, error: \(error)")
-        }
+        try finalString.write(toFile: url.path, atomically: true, encoding: .utf8)
     }
 
 }

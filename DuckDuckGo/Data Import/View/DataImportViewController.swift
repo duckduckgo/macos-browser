@@ -109,7 +109,15 @@ final class DataImportViewController: NSViewController {
         case .csv:
             if case let .completedImport(summaryArray) = interactionState {
                 if currentChildViewController is CSVImportSummaryViewController { return nil }
-                let loginImportSummary = summaryArray.first { $0.type == .logins }
+
+                let loginImportSummary: DataImport.Summary? = summaryArray.first {
+                    if case .logins = $0 {
+                        return true
+                    }
+
+                    return false
+                }
+
                 return CSVImportSummaryViewController.create(summary: loginImportSummary)
             } else {
                 if currentChildViewController is CSVImportViewController { return nil }
@@ -149,8 +157,8 @@ final class DataImportViewController: NSViewController {
         // When importing data from specific browsers, this will change to only import those types which the user has selected.
         importer.importData(types: importer.importableTypes()) { result in
             switch result {
-            case .success(let summaryArray):
-                self.viewState.interactionState = .completedImport(summaryArray)
+            case .success(let summary):
+                self.viewState.interactionState = .completedImport(summary)
             case .failure:
                 self.viewState.interactionState = .failedToImport
             }

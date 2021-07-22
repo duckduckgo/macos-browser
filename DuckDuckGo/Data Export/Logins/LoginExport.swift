@@ -20,6 +20,6 @@ import Foundation
 
 protocol LoginExporter {
 
-    func exportLogins(_ logins: [LoginCredential], toURL url: URL) throws
+    func exportVaultLogins(to: URL) throws
 
 }

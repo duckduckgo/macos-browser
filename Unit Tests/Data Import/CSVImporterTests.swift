@@ -39,10 +39,10 @@ class CSVImporterTests: XCTestCase {
         let expectation = expectation(description: #function)
         csvImporter.importData(types: [.logins]) { result in
             switch result {
-            case .success(let importedCredentials):
-                let expectedCredential = LoginCredential(url: "url", username: "username", password: "password")
-                XCTAssertEqual(importedCredentials, [expectedCredential])
-                XCTAssertEqual(mockLoginImporter.importedLogins, [expectedCredential])
+            case .success(let summary):
+                let expectedSummary = DataImport.Summary.logins(successfulImports: ["username"], duplicateImports: [], failedImports: [])
+                XCTAssertEqual(summary, [expectedSummary])
+                XCTAssertEqual(mockLoginImporter.importedLogins, expectedSummary)
             case .failure(let error):
                 XCTFail(error.localizedDescription)
             }

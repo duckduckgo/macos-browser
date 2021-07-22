@@ -55,11 +55,7 @@ final class CSVImporter: DataImporter {
 
         do {
             let loginImportSummary = try loginImporter.importLogins(loginCredentials)
-            let dataImportSummary = [
-                DataImport.Summary(type: .logins, summaryDetail: loginImportSummary)
-            ]
-
-            completion(.success(dataImportSummary))
+            completion(.success([loginImportSummary]))
         } catch {
             completion(.failure(.cannotAccessSecureVault))
         }

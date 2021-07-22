@@ -37,9 +37,8 @@ enum DataImport {
         case logins
     }
 
-    struct Summary {
-        let type: DataType
-        let summaryDetail: Any
+    enum Summary: Equatable {
+        case logins(successfulImports: [String], duplicateImports: [String], failedImports: [String])
     }
 
 }

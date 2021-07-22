@@ -134,7 +134,7 @@ extension AppDelegate {
 
             let vault = try? SecureVaultFactory.default.makeVault()
             let exporter = CSVLoginExporter(secureVault: vault!)
-            exporter.exportVaultLogins(to: selectedURL)
+            try? exporter.exportVaultLogins(to: selectedURL)
         }
     }
 
