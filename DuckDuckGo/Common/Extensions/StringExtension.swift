@@ -52,6 +52,10 @@ extension String {
       return (self.count > length) ? self.prefix(length) + trailing : self
     }
 
+    subscript (_ range: NSRange) -> Self {
+        .init(self[index(startIndex, offsetBy: range.lowerBound) ..< index(startIndex, offsetBy: range.upperBound)])
+    }
+
     // MARK: - Regular Expression
 
     func matches(_ regex: NSRegularExpression) -> Bool {

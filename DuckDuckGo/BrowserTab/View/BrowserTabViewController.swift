@@ -183,7 +183,12 @@ final class BrowserTabViewController: NSViewController {
 
     private func openNewTab(with url: URL?, parentTab: Tab?, selected: Bool = false) {
         let tab = Tab(url: url, parentTab: parentTab, shouldLoadInBackground: true)
-        tabCollectionViewModel.append(tab: tab, selected: selected)
+
+        if parentTab != nil {
+            tabCollectionViewModel.insertChild(tab: tab, selected: selected)
+        } else {
+            tabCollectionViewModel.append(tab: tab, selected: selected)
+        }
     }
 
     // MARK: - Browser Tabs
@@ -440,6 +445,7 @@ extension BrowserTabViewController: ImageMenuItemSelectors {
     func copyImageAddress(_ sender: NSMenuItem) {
         guard let url = contextMenuImage else { return }
         NSPasteboard.general.clearContents()
+        NSPasteboard.general.setString(url.absoluteString, forType: .string)
         NSPasteboard.general.setString(url.absoluteString, forType: .URL)
     }
 
@@ -463,13 +469,10 @@ extension BrowserTabViewController: WKUIDelegate {
                  windowFeatures: WKWindowFeatures) -> WKWebView? {
 
         // Returned web view must be created with the specified configuration.
-        tabCollectionViewModel.appendNewTabAfterSelected(with: configuration)
-        guard let selectedViewModel = tabCollectionViewModel.selectedTabViewModel else {
-            os_log("%s: Selected tab view model is nil", type: .error, className)
-            return nil
-        }
+        let tab = Tab(webViewConfiguration: configuration, parentTab: tabViewModel?.tab)
+        tabCollectionViewModel.insertChild(tab: tab, selected: true)
         // WebKit loads the request in the returned web view.
-        return selectedViewModel.tab.webView
+        return tab.webView
     }
     
     func webView(_ webView: WKWebView,

@@ -164,6 +164,8 @@
 		8589063A267BCD8E00D23B0D /* SaveCredentialsPopover.swift in Sources */ = {isa = PBXBuildFile; fileRef = 85890639267BCD8E00D23B0D /* SaveCredentialsPopover.swift */; };
 		8589063C267BCDC000D23B0D /* SaveCredentialsViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8589063B267BCDC000D23B0D /* SaveCredentialsViewController.swift */; };
 		858A797F26A79EAA00A75A42 /* UserText+PasswordManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 858A797E26A79EAA00A75A42 /* UserText+PasswordManager.swift */; };
+		858A798326A8B75F00A75A42 /* CopyHandler.swift in Sources */ = {isa = PBXBuildFile; fileRef = 858A798226A8B75F00A75A42 /* CopyHandler.swift */; };
+		858A798526A8BB5D00A75A42 /* NSTextViewExtension.swift in Sources */ = {isa = PBXBuildFile; fileRef = 858A798426A8BB5D00A75A42 /* NSTextViewExtension.swift */; };
 		858C1BED26974E6600E6C014 /* PasswordManagerSettingsTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 858C1BEC26974E6600E6C014 /* PasswordManagerSettingsTests.swift */; };
 		85A0116925AF1D8900FA6A0C /* FindInPageViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 85A0116825AF1D8900FA6A0C /* FindInPageViewController.swift */; };
 		85A0117425AF2EDF00FA6A0C /* FindInPage.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 85A0117325AF2EDF00FA6A0C /* FindInPage.storyboard */; };
@@ -392,6 +394,8 @@
 		B6DA441E2616C84600DD1EC2 /* PixelStoreMock.swift in Sources */ = {isa = PBXBuildFile; fileRef = B6DA441D2616C84600DD1EC2 /* PixelStoreMock.swift */; };
 		B6DA44232616CABC00DD1EC2 /* PixelArgumentsTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = B6DA44222616CABC00DD1EC2 /* PixelArgumentsTests.swift */; };
 		B6DA44282616CAE000DD1EC2 /* AppUsageActivityMonitorTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = B6DA44272616CAE000DD1EC2 /* AppUsageActivityMonitorTests.swift */; };
+		B6E53883267C83420010FEA9 /* HomepageBackgroundView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B6E53882267C83420010FEA9 /* HomepageBackgroundView.swift */; };
+		B6E53888267C94A00010FEA9 /* HomepageCollectionViewFlowLayout.swift in Sources */ = {isa = PBXBuildFile; fileRef = B6E53887267C94A00010FEA9 /* HomepageCollectionViewFlowLayout.swift */; };
 		B6E61ED0263A6F97004E11AB /* NSSavePanelExtension.swift in Sources */ = {isa = PBXBuildFile; fileRef = B6E61ECF263A6F97004E11AB /* NSSavePanelExtension.swift */; };
 		B6E61ED5263A6FC4004E11AB /* SavePanelAccessoryView.xib in Resources */ = {isa = PBXBuildFile; fileRef = B6E61ED4263A6FC4004E11AB /* SavePanelAccessoryView.xib */; };
 		B6E61EE3263AC0C8004E11AB /* FileManagerExtension.swift in Sources */ = {isa = PBXBuildFile; fileRef = B6E61EE2263AC0C8004E11AB /* FileManagerExtension.swift */; };
@@ -581,6 +585,8 @@
 		8589063B267BCDC000D23B0D /* SaveCredentialsViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SaveCredentialsViewController.swift; sourceTree = "<group>"; };
 		858A797D26A7945800A75A42 /* BrowserServicesKit */ = {isa = PBXFileReference; lastKnownFileType = folder; name = BrowserServicesKit; path = ../BrowserServicesKit; sourceTree = "<group>"; };
 		858A797E26A79EAA00A75A42 /* UserText+PasswordManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "UserText+PasswordManager.swift"; sourceTree = "<group>"; };
+		858A798226A8B75F00A75A42 /* CopyHandler.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CopyHandler.swift; sourceTree = "<group>"; };
+		858A798426A8BB5D00A75A42 /* NSTextViewExtension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NSTextViewExtension.swift; sourceTree = "<group>"; };
 		858C1BEC26974E6600E6C014 /* PasswordManagerSettingsTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PasswordManagerSettingsTests.swift; sourceTree = "<group>"; };
 		85A0116825AF1D8900FA6A0C /* FindInPageViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FindInPageViewController.swift; sourceTree = "<group>"; };
 		85A0117325AF2EDF00FA6A0C /* FindInPage.storyboard */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; path = FindInPage.storyboard; sourceTree = "<group>"; };
@@ -814,6 +820,8 @@
 		B6DA441D2616C84600DD1EC2 /* PixelStoreMock.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PixelStoreMock.swift; sourceTree = "<group>"; };
 		B6DA44222616CABC00DD1EC2 /* PixelArgumentsTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PixelArgumentsTests.swift; sourceTree = "<group>"; };
 		B6DA44272616CAE000DD1EC2 /* AppUsageActivityMonitorTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppUsageActivityMonitorTests.swift; sourceTree = "<group>"; };
+		B6E53882267C83420010FEA9 /* HomepageBackgroundView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HomepageBackgroundView.swift; sourceTree = "<group>"; };
+		B6E53887267C94A00010FEA9 /* HomepageCollectionViewFlowLayout.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HomepageCollectionViewFlowLayout.swift; sourceTree = "<group>"; };
 		B6E61ECF263A6F97004E11AB /* NSSavePanelExtension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NSSavePanelExtension.swift; sourceTree = "<group>"; };
 		B6E61ED4263A6FC4004E11AB /* SavePanelAccessoryView.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = SavePanelAccessoryView.xib; sourceTree = "<group>"; };
 		B6E61EE2263AC0C8004E11AB /* FileManagerExtension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FileManagerExtension.swift; sourceTree = "<group>"; };
@@ -1331,6 +1339,7 @@
 				AA4D700625545EF800C3411E /* UrlEventListener.swift */,
 				AA4FF40B2624751A004E2377 /* GrammarCheckEnabler.swift */,
 				AAD86E51267A0DFF005C11BE /* UpdateController.swift */,
+				858A798226A8B75F00A75A42 /* CopyHandler.swift */,
 			);
 			path = AppDelegate;
 			sourceTree = "<group>";
@@ -2014,6 +2023,7 @@
 				B68458CC25C7EB9000DC17B6 /* WKWebViewConfigurationExtensions.swift */,
 				AA92127625ADA07900600CD4 /* WKWebViewExtension.swift */,
 				85625999269CA0A600EE44BC /* NSRectExtension.swift */,
+				858A798426A8BB5D00A75A42 /* NSTextViewExtension.swift */,
 			);
 			path = Extensions;
 			sourceTree = "<group>";
@@ -2031,6 +2041,8 @@
 			children = (
 				AAE71E2B25F781EA00D74437 /* Homepage.storyboard */,
 				AAE71E3025F7855400D74437 /* HomepageViewController.swift */,
+				B6E53887267C94A00010FEA9 /* HomepageCollectionViewFlowLayout.swift */,
+				B6E53882267C83420010FEA9 /* HomepageBackgroundView.swift */,
 				4B65027925E5F2B10054432E /* DefaultBrowserPromptView.swift */,
 				4B65027425E5F2A70054432E /* DefaultBrowserPromptView.xib */,
 				AAE71E3525F7869300D74437 /* HomepageCollectionViewItem.swift */,
@@ -2481,6 +2493,7 @@
 				AA80EC54256BE3BC007083E7 /* UserText.swift in Sources */,
 				B61EF3EC266F91E700B4D78F /* WKWebView+Download.swift in Sources */,
 				4B0511C4262CAA5A00F6079C /* PreferencesSidebarViewController.swift in Sources */,
+				B6E53888267C94A00010FEA9 /* HomepageCollectionViewFlowLayout.swift in Sources */,
 				B61EF3F1266F922200B4D78F /* WKProcessPool+DownloadDelegate.swift in Sources */,
 				14505A08256084EF00272CC6 /* UserAgent.swift in Sources */,
 				AA7412BD24D2BEEE00D22FE0 /* MainWindow.swift in Sources */,
@@ -2514,6 +2527,7 @@
 				85AC3AF725D5DBFD00C7D2AA /* DataExtension.swift in Sources */,
 				B6A924D42664BBBB001A28CA /* WKWebViewDownloadDelegate.swift in Sources */,
 				85480FCF25D1AA22009424E3 /* ConfigurationStoring.swift in Sources */,
+				858A798326A8B75F00A75A42 /* CopyHandler.swift in Sources */,
 				4B9292D22667123700AD2C21 /* AddFolderModalViewController.swift in Sources */,
 				4B92929E26670D2A00AD2C21 /* BookmarkSidebarTreeController.swift in Sources */,
 				85AF2F4C268F4C9E00C89759 /* LoginDetectionService.swift in Sources */,
@@ -2544,6 +2558,7 @@
 				AA5D6DAC24A340F700C6FBCE /* WebViewStateObserver.swift in Sources */,
 				4B92928C26670D1700AD2C21 /* OutlineSeparatorViewCell.swift in Sources */,
 				4B0511CD262CAA5A00F6079C /* DefaultBrowserTableCellView.swift in Sources */,
+				858A798526A8BB5D00A75A42 /* NSTextViewExtension.swift in Sources */,
 				B6AAAC2D260330580029438D /* PublishedAfter.swift in Sources */,
 				85C6A29625CC1FFD00EEB5F1 /* UserDefaultsWrapper.swift in Sources */,
 				85625998269C9C5F00EE44BC /* PasswordManagementPopover.swift in Sources */,
@@ -2665,6 +2680,7 @@
 				AA72D5E325FE977F00C77619 /* AddEditFavoriteViewController.swift in Sources */,
 				AA361A3624EBF0B500EEC649 /* WindowDraggingView.swift in Sources */,
 				B68458B825C7E8B200DC17B6 /* Tab+NSSecureCoding.swift in Sources */,
+				B6E53883267C83420010FEA9 /* HomepageBackgroundView.swift in Sources */,
 				4B65028A25E6CBF40054432E /* NibLoadable.swift in Sources */,
 				AAA0CC472533833C0079BC96 /* OptionsButtonMenu.swift in Sources */,
 				4B92929D26670D2A00AD2C21 /* BookmarkNode.swift in Sources */,

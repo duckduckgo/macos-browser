@@ -22,6 +22,7 @@ import os.log
 
 @NSApplicationMain
 final class AppDelegate: NSObject, NSApplicationDelegate {
+
     let launchTimingPixel = TimedPixel(.launchTiming)
 
     static var isRunningTests: Bool {

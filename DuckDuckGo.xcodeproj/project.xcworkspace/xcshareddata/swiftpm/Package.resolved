@@ -2,15 +2,6 @@
   "object": {
     "pins": [
       {
-        "package": "BrowserServicesKit",
-        "repositoryURL": "https://github.com/duckduckgo/BrowserServicesKit.git",
-        "state": {
-          "branch": null,
-          "revision": "dec2b61be57587da7b417ba9db2bcf3ac58e5cb0",
-          "version": null
-        }
-      },
-      {
         "package": "GRDB",
         "repositoryURL": "https://github.com/duckduckgo/GRDB.swift.git",
         "state": {
