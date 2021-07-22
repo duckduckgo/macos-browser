@@ -27,7 +27,6 @@ final class PrivacyDashboardViewController: NSViewController {
     private var cancellables = Set<AnyCancellable>()
 
     weak var tabViewModel: TabViewModel?
-    var trackerInfoViewModel: TrackerInfoViewModel?
     var serverTrustViewModel: ServerTrustViewModel?
 
     override func viewDidLoad() {
