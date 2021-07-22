@@ -108,6 +108,8 @@ final class SaveCredentialsViewController: NSViewController {
     @IBAction func onNotNowClicked(sender: Any?) {
         delegate?.shouldCloseSaveCredentialsViewController(self)
 
+        guard PrivacySecurityPreferences().loginDetectionEnabled else { return }
+
         guard let window = view.window else {
             os_log("%s: Window is nil", type: .error, className)
             return
@@ -115,7 +117,7 @@ final class SaveCredentialsViewController: NSViewController {
 
         let host = domainLabel.stringValue
         // Don't ask if already fireproofed.
-        guard !FireproofDomains.shared.isAllowed(fireproofDomain: host) else { return }
+        guard !FireproofDomains.shared.isFireproof(fireproofDomain: host) else { return }
 
         let alert = NSAlert.fireproofAlert(with: host.dropWWW())
         alert.beginSheetModal(for: window) { response in

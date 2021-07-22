@@ -108,7 +108,7 @@ final class OptionsButtonMenu: NSMenu {
         addItem(NSMenuItem.separator())
 
         if let url = tabCollectionViewModel.selectedTabViewModel?.tab.url, url.canFireproof, let host = url.host {
-            if FireproofDomains.shared.isAllowed(fireproofDomain: host) {
+            if FireproofDomains.shared.isFireproof(fireproofDomain: host) {
 
                 let removeFireproofingItem = NSMenuItem(title: UserText.removeFireproofing,
                                                         action: #selector(toggleFireproofing(_:)),

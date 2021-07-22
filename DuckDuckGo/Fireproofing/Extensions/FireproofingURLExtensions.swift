@@ -78,7 +78,7 @@ extension URL {
 
     var showFireproofStatus: Bool {
         guard let host = self.host else { return false }
-        return canFireproof && FireproofDomains.shared.isAllowed(fireproofDomain: host)
+        return canFireproof && FireproofDomains.shared.isFireproof(fireproofDomain: host)
     }
 
     private func matches(any patterns: URLPatterns) -> Bool {

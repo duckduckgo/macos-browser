@@ -64,7 +64,7 @@ internal class WebCacheManager {
                 let group = DispatchGroup()
 
                 cookieStore.getAllCookies { cookies in
-                    let cookiesToRemove = cookies.filter { !logins.isAllowed(cookieDomain: $0.domain) && $0.domain != URL.cookieDomain }
+                    let cookiesToRemove = cookies.filter { !logins.isFireproof(cookieDomain: $0.domain) && $0.domain != URL.cookieDomain }
 
                     for cookie in cookiesToRemove {
                         group.enter()

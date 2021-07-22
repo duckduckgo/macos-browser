@@ -178,7 +178,7 @@ extension Pixel.Event {
 
         init(url: URL?, fireproofDomains: FireproofDomains = .shared) {
             if let host = url?.host,
-               fireproofDomains.isAllowed(fireproofDomain: host) {
+               fireproofDomains.isFireproof(fireproofDomain: host) {
                 self = .fireproofed
             } else {
                 self = .nonFireproofed

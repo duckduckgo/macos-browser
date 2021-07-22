@@ -36,7 +36,7 @@ internal class FireproofDomains {
     }
 
     func toggle(domain: String) -> Bool {
-        if isAllowed(fireproofDomain: domain) {
+        if isFireproof(fireproofDomain: domain) {
             remove(domain: domain)
             return false
         } else {
@@ -53,7 +53,7 @@ internal class FireproofDomains {
         ])
     }
 
-    public func isAllowed(cookieDomain: String) -> Bool {
+    public func isFireproof(cookieDomain: String) -> Bool {
         fireproofDomains.contains {
             $0 == cookieDomain
                 || ".\($0)" == cookieDomain
@@ -71,7 +71,7 @@ internal class FireproofDomains {
         fireproofDomains = []
     }
 
-    func isAllowed(fireproofDomain domain: String) -> Bool {
+    func isFireproof(fireproofDomain domain: String) -> Bool {
         return fireproofDomains.contains(domain)
     }
 
@@ -79,7 +79,7 @@ internal class FireproofDomains {
         guard let host = url.host else {
             return false
         }
-        return isAllowed(fireproofDomain: host)
+        return isFireproof(fireproofDomain: host)
     }
 
 }
