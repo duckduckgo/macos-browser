@@ -19,6 +19,7 @@
 import Foundation
 import os.log
 import Combine
+import BrowserServicesKit
 
 typealias History = [HistoryEntry]
 
@@ -81,6 +82,8 @@ final class HistoryCoordinator: HistoryCoordinating {
             self?.historyDictionary = historyDictionary
             self?._history = self?.makeHistory(from: historyDictionary)
             self?.save(entry: entry)
+
+            self?.generateRootUrlIfNeeded(from: url)
         }
     }
 
@@ -178,6 +181,29 @@ final class HistoryCoordinator: HistoryCoordinating {
                 }
             }, receiveValue: {})
             .store(in: &self.cancellables)
+    }
+
+    /// For the better user experience
+    /// When visiting a non-root URL for the first time, generating its root URL and adding into the history with the visit count 0
+    /// triggers the autocompletion of the root URL instead of the visited URL in the future.
+    private func generateRootUrlIfNeeded(from url: URL) {
+        queue.async(flags: .barrier) { [weak self] in
+            guard var historyDictionary = self?.historyDictionary else {
+                os_log("Root URL of %s not saved. History not loaded yet", log: .history, url.absoluteString, Thread.isMainThread ? "yes" : "no")
+                return
+            }
+
+            guard !url.isRoot, let rootUrl = url.root, historyDictionary[rootUrl] == nil else {
+                return
+            }
+
+            let entry = HistoryEntry(url: rootUrl)
+
+            historyDictionary[rootUrl] = entry
+            self?.historyDictionary = historyDictionary
+            self?._history = self?.makeHistory(from: historyDictionary)
+            self?.save(entry: entry)
+        }
     }
 
 }
