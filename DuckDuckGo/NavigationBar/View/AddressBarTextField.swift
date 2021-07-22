@@ -658,6 +658,10 @@ final class AddressBarTextEditor: NSTextView {
         }
     }
 
+    override func copy(_ sender: Any?) {
+        CopyHandler().copy(sender)
+    }
+
     override func selectionRange(forProposedRange proposedCharRange: NSRange, granularity: NSSelectionGranularity) -> NSRange {
         guard let delegate = delegate as? AddressBarTextField else {
             os_log("AddressBarTextEditor: unexpected kind of delegate")

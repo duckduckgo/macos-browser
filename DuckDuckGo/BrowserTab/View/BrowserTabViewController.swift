@@ -445,6 +445,7 @@ extension BrowserTabViewController: ImageMenuItemSelectors {
     func copyImageAddress(_ sender: NSMenuItem) {
         guard let url = contextMenuImage else { return }
         NSPasteboard.general.clearContents()
+        NSPasteboard.general.setString(url.absoluteString, forType: .string)
         NSPasteboard.general.setString(url.absoluteString, forType: .URL)
     }
 
