@@ -119,7 +119,7 @@ final class HistoryCoordinator: HistoryCoordinating {
     }
 
     @objc private func cleanOldHistory() {
-        cleanAndReloadHistory(until: .weekAgo, except: [])
+        cleanAndReloadHistory(until: .monthAgo, except: [])
     }
 
     private func cleanAndReloadHistory(until date: Date,
