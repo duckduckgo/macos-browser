@@ -39,7 +39,7 @@ final class PasswordManagementItemListModel: ObservableObject {
     @Published private(set) var displayedAccounts = [SecureVaultModels.WebsiteAccount]()
     @Published private(set) var selected: SecureVaultModels.WebsiteAccount?
 
-    var onItemSelected: (_ old: SecureVaultModels.WebsiteAccount?, _ new: SecureVaultModels.WebsiteAccount) -> Void
+    private var onItemSelected: (_ old: SecureVaultModels.WebsiteAccount?, _ new: SecureVaultModels.WebsiteAccount) -> Void
 
     init(onItemSelected: @escaping (_ old: SecureVaultModels.WebsiteAccount?, _ new: SecureVaultModels.WebsiteAccount) -> Void) {
         self.onItemSelected = onItemSelected

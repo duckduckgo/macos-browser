@@ -131,6 +131,7 @@ final class PasswordManagementItemModel: ObservableObject {
 
     func createNew() {
         credentials = .init(account: .init(username: "", domain: ""), password: Data())
+        isEditing = true
     }
 
     private func populateViewModelFromCredentials() {
