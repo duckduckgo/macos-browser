@@ -33,6 +33,12 @@ final class CSVImportSummaryViewController: NSViewController {
         }
     }
 
+    @IBOutlet var importCompleteLabel: NSTextField!
+
+    @IBOutlet var successfulImportsLabel: NSTextField!
+    @IBOutlet var duplicateImportsLabel: NSTextField!
+    @IBOutlet var failedImportsLabel: NSTextField!
+
     private let summary: DataImport.Summary?
 
     init?(coder: NSCoder, summary: DataImport.Summary?) {
@@ -42,6 +48,20 @@ final class CSVImportSummaryViewController: NSViewController {
 
     required init?(coder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
+    }
+
+    override func viewDidLoad() {
+        super.viewDidLoad()
+
+        if let summary = self.summary?.summaryDetail as? LoginImport.Summary {
+            successfulImportsLabel.stringValue = "Successful Imports: \(summary.successful.count)"
+            duplicateImportsLabel.stringValue = "Duplicate Imports: \(summary.duplicates.count)"
+            failedImportsLabel.stringValue = "Failed Imports: \(summary.failed.count)"
+        } else {
+            successfulImportsLabel.isHidden = true
+            duplicateImportsLabel.isHidden = true
+            failedImportsLabel.isHidden = true
+        }
     }
 
 }
