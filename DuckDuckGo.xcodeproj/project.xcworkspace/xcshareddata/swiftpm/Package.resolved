@@ -5,9 +5,9 @@
         "package": "BrowserServicesKit",
         "repositoryURL": "https://github.com/duckduckgo/BrowserServicesKit.git",
         "state": {
-          "branch": null,
-          "revision": "bff55eec59b07398778bfb5fb0a28fe6a278c008",
-          "version": "6.0.0"
+          "branch": "tom/history",
+          "revision": "7c3b423b863e330c8991cf5d25484071bc3d61a7",
+          "version": null
         }
       },
       {
