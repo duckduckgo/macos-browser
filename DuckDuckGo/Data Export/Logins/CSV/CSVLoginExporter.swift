@@ -21,10 +21,16 @@ import BrowserServicesKit
 
 final class CSVLoginExporter: LoginExporter {
 
-    private let secureVault: SecureVault
+    enum CSVLoginExportError: Error {
+        case failedToEncodeLogins
+    }
 
-    init(secureVault: SecureVault) {
+    private let secureVault: SecureVault
+    private let fileStore: FileStore
+
+    init(secureVault: SecureVault, fileStore: FileStore = FileManager.default) {
         self.secureVault = secureVault
+        self.fileStore = fileStore
     }
 
     func exportVaultLogins(to url: URL) throws {
@@ -51,7 +57,11 @@ final class CSVLoginExporter: LoginExporter {
         let credentialsAsCSVRows = credentials.map { "\($0.account.domain),\($0.account.username),\($0.password.utf8String()!)" }
         let finalString = credentialsAsCSVRows.joined(separator: "\n")
 
-        try finalString.write(toFile: url.path, atomically: true, encoding: .utf8)
+        if let stringData = finalString.data(using: .utf8) {
+            _ = fileStore.persist(stringData, url: url)
+        } else {
+            throw CSVLoginExportError.failedToEncodeLogins
+        }
     }
 
 }
