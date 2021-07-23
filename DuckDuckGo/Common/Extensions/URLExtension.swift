@@ -245,7 +245,7 @@ extension URL {
         return URL(string: "https://duckduckgo.com/about")!
     }
 
-    static var duckDuckGoEmail = URL(string: "https://duckduckgo.com/email/login")!
+    static var duckDuckGoEmail = URL(string: "https://duckduckgo.com/email-protection")!
 
     static var duckDuckGoMorePrivacyInfo = URL(string: "https://help.duckduckgo.com/duckduckgo-help-pages/privacy/atb/")!
 
