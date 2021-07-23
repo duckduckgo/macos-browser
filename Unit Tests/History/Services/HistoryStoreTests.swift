@@ -154,3 +154,17 @@ final class HistoryStoreTests: XCTestCase {
     }
 
 }
+
+fileprivate extension HistoryEntry {
+
+    init(identifier: UUID, url: URL, title: String?, numberOfVisits: Int, lastVisit: Date) {
+        self.init(identifier: identifier,
+                  url: url,
+                  title: title,
+                  numberOfVisits: numberOfVisits,
+                  lastVisit: lastVisit,
+                  failedToLoad: false,
+                  isDownload: false)
+    }
+
+}
