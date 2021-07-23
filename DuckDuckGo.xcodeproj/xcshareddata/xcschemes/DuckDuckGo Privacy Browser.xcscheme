@@ -36,7 +36,7 @@
          </BuildActionEntry>
          <BuildActionEntry
             buildForTesting = "YES"
-            buildForRunning = "YES"
+            buildForRunning = "NO"
             buildForProfiling = "NO"
             buildForArchiving = "NO"
             buildForAnalyzing = "NO">
@@ -74,16 +74,6 @@
                   Identifier = "PixelTests/testWhenErrorPixelIsFiredThenParametersAdded()">
                </Test>
             </SkippedTests>
-         </TestableReference>
-         <TestableReference
-            skipped = "NO">
-            <BuildableReference
-               BuildableIdentifier = "primary"
-               BlueprintIdentifier = "BrowserServicesKitTests"
-               BuildableName = "BrowserServicesKitTests"
-               BlueprintName = "BrowserServicesKitTests"
-               ReferencedContainer = "container:../BrowserServicesKit">
-            </BuildableReference>
          </TestableReference>
       </Testables>
    </TestAction>
