@@ -54,6 +54,9 @@
 		4B051207262CD24400F6079C /* NSImageViewExtension.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B0511FC262CD20D00F6079C /* NSImageViewExtension.swift */; };
 		4B11060525903E570039B979 /* CoreDataEncryptionTesting.xcdatamodeld in Sources */ = {isa = PBXBuildFile; fileRef = 4B11060325903E570039B979 /* CoreDataEncryptionTesting.xcdatamodeld */; };
 		4B11060A25903EAC0039B979 /* CoreDataEncryptionTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B11060925903EAC0039B979 /* CoreDataEncryptionTests.swift */; };
+		4B15CC5326AA0EB6000E6BA3 /* CSVLoginExporterTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B15CC5226AA0EB6000E6BA3 /* CSVLoginExporterTests.swift */; };
+		4B15CC5526AA4475000E6BA3 /* MockFileStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B15CC5426AA4475000E6BA3 /* MockFileStore.swift */; };
+		4B15CC5926AA4954000E6BA3 /* MockSecureVault.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B15CC5826AA4954000E6BA3 /* MockSecureVault.swift */; };
 		4B1AD8D525FC38DD00261379 /* EncryptionKeyStoreTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4BA1A6EA258C288C00F6F690 /* EncryptionKeyStoreTests.swift */; };
 		4B1AD8E225FC390B00261379 /* EncryptionMocks.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4BA1A6F5258C4F9600F6F690 /* EncryptionMocks.swift */; };
 		4B1AD91725FC46FB00261379 /* CoreDataEncryptionTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B1AD91625FC46FB00261379 /* CoreDataEncryptionTests.swift */; };
@@ -97,7 +100,7 @@
 		4B6FB1CA269E631E005DD826 /* CSVParserTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B6FB1C9269E631E005DD826 /* CSVParserTests.swift */; };
 		4B6FB1CC269E7262005DD826 /* CSVImporterTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B6FB1CB269E7262005DD826 /* CSVImporterTests.swift */; };
 		4B6FB1CE269E7913005DD826 /* DataImportMocks.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B6FB1CD269E7913005DD826 /* DataImportMocks.swift */; };
-		4B6FB1D0269E79A3005DD826 /* FileSystemTestUtility.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B6FB1CF269E79A3005DD826 /* FileSystemTestUtility.swift */; };
+		4B6FB1D0269E79A3005DD826 /* TemporaryFileCreator.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B6FB1CF269E79A3005DD826 /* TemporaryFileCreator.swift */; };
 		4B75EA9626A62E0E00018634 /* CSVImportSummaryViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B75EA9526A62E0E00018634 /* CSVImportSummaryViewController.swift */; };
 		4B82E9B325B69E3E00656FE7 /* TrackerRadarKit in Frameworks */ = {isa = PBXBuildFile; productRef = 4B82E9B225B69E3E00656FE7 /* TrackerRadarKit */; };
 		4B82E9B925B6A05800656FE7 /* DetectedTrackerTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B82E9B825B6A05800656FE7 /* DetectedTrackerTests.swift */; };
@@ -472,6 +475,9 @@
 		4B0511FC262CD20D00F6079C /* NSImageViewExtension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NSImageViewExtension.swift; sourceTree = "<group>"; };
 		4B11060425903E570039B979 /* CoreDataEncryptionTesting.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = CoreDataEncryptionTesting.xcdatamodel; sourceTree = "<group>"; };
 		4B11060925903EAC0039B979 /* CoreDataEncryptionTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CoreDataEncryptionTests.swift; sourceTree = "<group>"; };
+		4B15CC5226AA0EB6000E6BA3 /* CSVLoginExporterTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CSVLoginExporterTests.swift; sourceTree = "<group>"; };
+		4B15CC5426AA4475000E6BA3 /* MockFileStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MockFileStore.swift; sourceTree = "<group>"; };
+		4B15CC5826AA4954000E6BA3 /* MockSecureVault.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MockSecureVault.swift; sourceTree = "<group>"; };
 		4B1AD89D25FC27E200261379 /* Integration Tests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = "Integration Tests.xctest"; sourceTree = BUILT_PRODUCTS_DIR; };
 		4B1AD8A125FC27E200261379 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		4B1AD91625FC46FB00261379 /* CoreDataEncryptionTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CoreDataEncryptionTests.swift; sourceTree = "<group>"; };
@@ -518,7 +524,7 @@
 		4B6FB1C9269E631E005DD826 /* CSVParserTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CSVParserTests.swift; sourceTree = "<group>"; };
 		4B6FB1CB269E7262005DD826 /* CSVImporterTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CSVImporterTests.swift; sourceTree = "<group>"; };
 		4B6FB1CD269E7913005DD826 /* DataImportMocks.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DataImportMocks.swift; sourceTree = "<group>"; };
-		4B6FB1CF269E79A3005DD826 /* FileSystemTestUtility.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FileSystemTestUtility.swift; sourceTree = "<group>"; };
+		4B6FB1CF269E79A3005DD826 /* TemporaryFileCreator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TemporaryFileCreator.swift; sourceTree = "<group>"; };
 		4B75EA9526A62E0E00018634 /* CSVImportSummaryViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CSVImportSummaryViewController.swift; sourceTree = "<group>"; };
 		4B82E9B825B6A05800656FE7 /* DetectedTrackerTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DetectedTrackerTests.swift; sourceTree = "<group>"; };
 		4B82E9C025B6A1CD00656FE7 /* TrackerRadarManagerTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TrackerRadarManagerTests.swift; sourceTree = "<group>"; };
@@ -1000,6 +1006,15 @@
 			path = Preferences;
 			sourceTree = "<group>";
 		};
+		4B15CC5126AA0EA3000E6BA3 /* Data Export */ = {
+			isa = PBXGroup;
+			children = (
+				4B15CC5226AA0EB6000E6BA3 /* CSVLoginExporterTests.swift */,
+				4B15CC5826AA4954000E6BA3 /* MockSecureVault.swift */,
+			);
+			path = "Data Export";
+			sourceTree = "<group>";
+		};
 		4B1AD89E25FC27E200261379 /* Integration Tests */ = {
 			isa = PBXGroup;
 			children = (
@@ -1181,7 +1196,6 @@
 			children = (
 				4B6FB1C9269E631E005DD826 /* CSVParserTests.swift */,
 				4B6FB1CB269E7262005DD826 /* CSVImporterTests.swift */,
-				4B6FB1CF269E79A3005DD826 /* FileSystemTestUtility.swift */,
 				4B6FB1CD269E7913005DD826 /* DataImportMocks.swift */,
 			);
 			path = "Data Import";
@@ -1368,6 +1382,7 @@
 		85F69B3A25EDE7F800978E59 /* Common */ = {
 			isa = PBXGroup;
 			children = (
+				4B6FB1CF269E79A3005DD826 /* TemporaryFileCreator.swift */,
 				4B9292C42667104B00AD2C21 /* CoreDataTestUtilities.swift */,
 				AAEC74B92642E66600C2EFBC /* Extensions */,
 				B65783EB25F8AB9200D8DB33 /* String+PunycodeTests.swift */,
@@ -1376,6 +1391,7 @@
 				B67C6C462654C643006C872E /* FileManagerExtensionTests.swift */,
 				B6B3E0952654DACD0040E0A2 /* UTTypeTests.swift */,
 				B65349A9265CF45000DCC645 /* DispatchQueueExtensionsTests.swift */,
+				4B15CC5426AA4475000E6BA3 /* MockFileStore.swift */,
 			);
 			path = Common;
 			sourceTree = "<group>";
@@ -1478,6 +1494,7 @@
 				85AC3B1525D9BBFA00C7D2AA /* Configuration */,
 				4B82E9B725B6A04B00656FE7 /* ContentBlocker */,
 				4B6FB1C8269E6059005DD826 /* Data Import */,
+				4B15CC5126AA0EA3000E6BA3 /* Data Export */,
 				8553FF50257523630029327F /* FileDownload */,
 				4BA1A6CE258BF58C00F6F690 /* FileSystem */,
 				4B02199725E063DE00ED7DEA /* Fireproofing */,
@@ -2828,6 +2845,7 @@
 				4B82E9C125B6A1CD00656FE7 /* TrackerRadarManagerTests.swift in Sources */,
 				85AC3B4925DAC9BD00C7D2AA /* ConfigurationStorageTests.swift in Sources */,
 				AA652CDB25DDAB32009059CC /* BookmarkStoreMock.swift in Sources */,
+				4B15CC5526AA4475000E6BA3 /* MockFileStore.swift in Sources */,
 				B62EB47C25BAD3BB005745C6 /* WKWebViewPrivateMethodsAvailabilityTests.swift in Sources */,
 				B6A5A2A025B96E8300AA7ADA /* AppStateChangePublisherTests.swift in Sources */,
 				4B02199C25E063DE00ED7DEA /* FireproofDomainsTests.swift in Sources */,
@@ -2850,6 +2868,8 @@
 				B6A5A27E25B9403E00AA7ADA /* FileStoreMock.swift in Sources */,
 				B6AE74342609AFCE005B9B1A /* ProgressEstimationTests.swift in Sources */,
 				4BA1A6FE258C5C1300F6F690 /* EncryptedValueTransformerTests.swift in Sources */,
+				4B15CC5326AA0EB6000E6BA3 /* CSVLoginExporterTests.swift in Sources */,
+				4B15CC5926AA4954000E6BA3 /* MockSecureVault.swift in Sources */,
 				4B6FB1CE269E7913005DD826 /* DataImportMocks.swift in Sources */,
 				85F69B3C25EDE81F00978E59 /* URLExtensionTests.swift in Sources */,
 				B6DA44112616C0FC00DD1EC2 /* PixelTests.swift in Sources */,
@@ -2868,7 +2888,7 @@
 				B61F012B25ECBB1700ABB5A3 /* UserScriptsManagerTests.swift in Sources */,
 				85AC3B1725D9BC1A00C7D2AA /* ConfigurationDownloaderTests.swift in Sources */,
 				4B0511E7262CAB3700F6079C /* UserDefaultsWrapperUtilities.swift in Sources */,
-				4B6FB1D0269E79A3005DD826 /* FileSystemTestUtility.swift in Sources */,
+				4B6FB1D0269E79A3005DD826 /* TemporaryFileCreator.swift in Sources */,
 				4BA1A6F6258C4F9600F6F690 /* EncryptionMocks.swift in Sources */,
 				B6B3E0962654DACD0040E0A2 /* UTTypeTests.swift in Sources */,
 				4B02199D25E063DE00ED7DEA /* FireproofingURLExtensionsTests.swift in Sources */,

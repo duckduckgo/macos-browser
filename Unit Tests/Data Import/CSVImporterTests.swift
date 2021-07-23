@@ -22,18 +22,17 @@ import XCTest
 
 class CSVImporterTests: XCTestCase {
 
-    let fileSystemUtility = FileSystemTestUtility()
+    let temporaryFileCreator = TemporaryFileCreator()
 
     override func tearDown() {
         super.tearDown()
-        fileSystemUtility.deleteCreatedTemporaryFiles()
+        temporaryFileCreator.deleteCreatedTemporaryFiles()
     }
 
     func testWhenImportingCSVDataFromTheFileSystem_ThenLoginCredentialsAreImported() {
         let mockLoginImporter = MockLoginImporter()
         let file = "url,username,password"
-        let fileSystemUtility = FileSystemTestUtility()
-        let savedFileURL = fileSystemUtility.persist(fileContents: file.data(using: .utf8)!, named: "test.csv")!
+        let savedFileURL = temporaryFileCreator.persist(fileContents: file.data(using: .utf8)!, named: "test.csv")!
         let csvImporter = CSVImporter(fileURL: savedFileURL, loginImporter: mockLoginImporter)
 
         let expectation = expectation(description: #function)

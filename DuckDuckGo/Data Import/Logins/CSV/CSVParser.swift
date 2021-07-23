@@ -39,6 +39,7 @@ private extension String {
         }
 
         for character in self.unicodeScalars {
+            print("PARSING: \(character)")
             switch (character, inQuotes) {
             case (",", false):
                 flush()

@@ -1,5 +1,5 @@
 //
-//  FileSystemTestUtility.swift
+//  TemporaryFileCreator.swift
 //
 //  Copyright © 2021 DuckDuckGo. All rights reserved.
 //
@@ -19,7 +19,7 @@
 import Foundation
 import XCTest
 
-final class FileSystemTestUtility {
+final class TemporaryFileCreator {
 
     var createdFileNames: [String] = []
 

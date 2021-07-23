@@ -36,6 +36,26 @@ final class CSVParserTests: XCTestCase {
         XCTAssertEqual(parsed, [["one"], ["two", "three"], ["four", "five", "six"]])
     }
 
+    func testWhenParsingRowsSurroundedByQuotesThenQuotesAreRemoved() {
+        let string = """
+        "url","username","password"
+        """
+
+        let parsed = CSVParser.parse(string: string)
+
+        XCTAssertEqual(parsed, [["url", "username", "password"]])
+    }
+
+    func testWhenParsingRowsWithAnEscapedQuoteThenQuoteIsUnescaped() {
+        let string = """
+        "url","username","some\"password\""
+        """
+
+        let parsed = CSVParser.parse(string: string)
+
+        XCTAssertEqual(parsed, [["url", "username", "some\"password\""]])
+    }
+
     func testParsingCSVStringsWithManyEntries() throws {
         let largeCSVString = String(repeating: "\nhttps://example.com/,username,password", count: 100_000)
 
