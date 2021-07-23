@@ -3378,8 +3378,8 @@
 			isa = XCRemoteSwiftPackageReference;
 			repositoryURL = "https://github.com/duckduckgo/BrowserServicesKit.git";
 			requirement = {
-				branch = "sam/delete-website-credentials";
-				kind = branch;
+				kind = exactVersion;
+				version = 7.0.0;
 			};
 		};
 		85FF55C625F82E4F00E2AB99 /* XCRemoteSwiftPackageReference "lottie-ios" */ = {
