@@ -28,7 +28,7 @@ protocol PrivacyDashboardUserScriptDelegate: AnyObject {
 
 }
 
-final class PrivacyDashboardUserScript: NSObject {
+final class PrivacyDashboardUserScript: NSObject, StaticUserScript {
 
     enum MessageNames: String, CaseIterable {
         case privacyDashboardSetProtection
@@ -39,6 +39,8 @@ final class PrivacyDashboardUserScript: NSObject {
 
     static var injectionTime: WKUserScriptInjectionTime { .atDocumentStart }
     static var forMainFrameOnly: Bool { false }
+    static var source: String = ""
+    static var script: WKUserScript = PrivacyDashboardUserScript.makeWKUserScript()
     var messageNames: [String] { MessageNames.allCases.map(\.rawValue) }
 
     weak var delegate: PrivacyDashboardUserScriptDelegate?

@@ -32,6 +32,7 @@ final class PrivacyDashboardViewController: NSViewController {
     override func viewDidLoad() {
         privacyDashboarScript.delegate = self
         initWebView()
+        webView.configuration.userContentController.addHandler(privacyDashboarScript)
     }
 
     override func viewWillAppear() {
