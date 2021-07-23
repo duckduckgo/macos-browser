@@ -17,7 +17,7 @@
 //
 
 import XCTest
-@testable import BrowserServicesKit
+import BrowserServicesKit
 @testable import DuckDuckGo_Privacy_Browser
 
 final class PasswordManagementItemListModelTests: XCTestCase {
@@ -74,9 +74,7 @@ final class PasswordManagementItemListModelTests: XCTestCase {
         return SecureVaultModels.WebsiteAccount(id: id,
                                                 title: title,
                                                 username: username,
-                                                domain: domain,
-                                                created: Date(),
-                                                lastUpdated: Date())
+                                                domain: domain)
     }
 
     func onItemSelected(old: SecureVaultModels.WebsiteAccount?, new: SecureVaultModels.WebsiteAccount) {

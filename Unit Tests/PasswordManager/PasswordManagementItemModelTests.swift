@@ -17,7 +17,7 @@
 //
 
 import XCTest
-@testable import BrowserServicesKit
+import BrowserServicesKit
 @testable import DuckDuckGo_Privacy_Browser
 
 final class PasswordManagementItemModelTests: XCTestCase {
@@ -119,8 +119,17 @@ final class PasswordManagementItemModelTests: XCTestCase {
                          domain: String = "domain",
                          password: String = "password") -> SecureVaultModels.WebsiteCredentials {
 
-        let account = SecureVaultModels.WebsiteAccount(id: id, username: username, domain: domain, created: Date(), lastUpdated: Date())
+        let account = SecureVaultModels.WebsiteAccount(id: id, username: username, domain: domain)
         return SecureVaultModels.WebsiteCredentials(account: account, password: password.data(using: .utf8)!)
+    }
+
+}
+
+extension SecureVaultModels.WebsiteAccount {
+
+    init(id: Int64, title: String? = nil, username: String = "username", domain: String = "domain") {
+        self.init(title: title, username: username, domain: domain)
+        self.id = id
     }
 
 }
