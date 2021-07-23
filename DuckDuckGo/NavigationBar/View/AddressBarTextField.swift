@@ -219,7 +219,7 @@ final class AddressBarTextField: NSTextField {
         let finalUrl: URL?
         switch suggestion {
         case .bookmark(title: _, url: let url, isFavorite: _),
-             .historyEntry(title: _, url: let url),
+             .historyEntry(title: _, url: let url, allowedInTopHits: _),
              .website(url: let url):
             finalUrl = url
         case .phrase(phrase: let phrase),
@@ -331,7 +331,7 @@ final class AddressBarTextField: NSTextField {
                 self = Suffix.visit(host: host)
 
             case .bookmark(title: _, url: let url, isFavorite: _),
-                 .historyEntry(title: _, url: let url):
+                 .historyEntry(title: _, url: let url, allowedInTopHits: _):
                 if let title = suggestionViewModel.title,
                    !title.isEmpty,
                    suggestionViewModel.autocompletionString != title {

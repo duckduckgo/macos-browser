@@ -80,6 +80,7 @@ final class HistoryCoordinator: HistoryCoordinating {
 
             var entry = historyDictionary[url] ?? HistoryEntry(url: url)
             entry.addVisit()
+            entry.isDownload = false
 
             historyDictionary[url] = entry
             self?.historyDictionary = historyDictionary
