@@ -22,18 +22,13 @@ import BrowserServicesKit
 extension EmailUrls {
 
     private struct Url {
-        static let emailLandingPage = "https://quack.duckduckgo.com/email-protection"
-        static let emailDashboardPage = "https://quack.duckduckgo.com/email/dashboard"
-        static let emailGenerateTokenPage = "https://quack.duckduckgo.com/email/new-address"
+        static let emailLandingPage = "https://duckduckgo.com/email-protection"
+        static let emailGenerateTokenPage = "https://duckduckgo.com/email/new-address"
         static let emailAuthenticationHosts = ["quack.duckduckgo.com", "quackdev.duckduckgo.com"]
     }
 
     var emailLandingPage: URL {
         return URL(string: Url.emailLandingPage)!
-    }
-
-    var emailDashboardPage: URL {
-        return URL(string: Url.emailDashboardPage)!
     }
 
     func shouldAuthenticateWithEmailCredentials(url: URL) -> Bool {
@@ -46,7 +41,7 @@ extension EmailUrls {
 extension EmailManager {
 
     private struct Url {
-        static let emailGenerateTokenPage = "https://quack.duckduckgo.com/email/new-address"
+        static let emailGenerateTokenPage = "https://duckduckgo.com/email/new-address"
     }
 
     private func emailGenerateTokenPage(with token: String) -> URL {

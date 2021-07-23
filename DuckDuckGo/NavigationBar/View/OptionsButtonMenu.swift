@@ -42,7 +42,6 @@ final class OptionsButtonMenu: NSMenu {
         case emailProtection
         case emailProtectionOff
         case emailProtectionCreateAddress
-        case emailProtectionDashboard
 
         case bookmarkThisPage
         case favoriteThisPage
@@ -260,14 +259,6 @@ final class EmailOptionsButtonSubMenu: NSMenu {
          tab.url = url
          tabCollectionViewModel.append(tab: tab)
          (supermenu as? OptionsButtonMenu)?.result = .emailProtectionCreateAddress
-    }
-    
-    @objc func viewDashboardAction(_ sender: NSMenuItem) {
-        let tab = Tab()
-        tab.url = EmailUrls().emailDashboardPage
-        tabCollectionViewModel.append(tab: tab)
-
-        (supermenu as? OptionsButtonMenu)?.result = .emailProtectionDashboard
     }
     
     @objc func turnOffEmailAction(_ sender: NSMenuItem) {

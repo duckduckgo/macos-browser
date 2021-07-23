@@ -135,7 +135,6 @@ final class NavigationBarViewController: NSViewController {
 
             case .emailProtectionOff,
                  .emailProtectionCreateAddress,
-                 .emailProtectionDashboard,
                  .bookmarkThisPage,
                  .favoriteThisPage:
                 break
