@@ -196,7 +196,7 @@ extension URL {
                         || !input.hasOrIsPrefix(of: self.separatedScheme ?? ""),
                       needsWWW: !input.drop(prefix: self.separatedScheme ?? "").isEmpty
                         && input.drop(prefix: self.separatedScheme ?? "").hasOrIsPrefix(of: URL.HostPrefix.www.rawValue),
-                      dropTrailingSlash: false)
+                      dropTrailingSlash: !input.hasSuffix("/"))
     }
 
     /// Tries to use the file name part of the URL, if available, adjusting for content type, if available.
