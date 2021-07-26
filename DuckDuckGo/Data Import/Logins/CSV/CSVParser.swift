@@ -32,6 +32,7 @@ private extension String {
         var result: [[String]] = [[]]
         var currentField = "".unicodeScalars
         var inQuotes = false
+        var hasPrecedingBackslash = false
 
         @inline(__always) func flush() {
             result[result.endIndex - 1].append(String(currentField))
@@ -39,16 +40,24 @@ private extension String {
         }
 
         for character in self.unicodeScalars {
-            print("PARSING: \(character)")
-            switch (character, inQuotes) {
-            case (",", false):
+            switch (character, inQuotes, hasPrecedingBackslash) {
+            case (",", false, _):
+                hasPrecedingBackslash = false
                 flush()
-            case ("\n", false):
+            case ("\n", false, _):
+                hasPrecedingBackslash = false
                 flush()
                 result.append([])
-            case ("\"", _):
+            case ("\\", true, _):
+                hasPrecedingBackslash = true
+            case ("\"", _, false):
                 inQuotes = !inQuotes
+            case ("\"", _, true):
+                // The preceding characters was a backslash, so append the quote to the string instead of treating it as a delimiter
+                hasPrecedingBackslash = false
+                currentField.append(character)
             default:
+                hasPrecedingBackslash = false
                 currentField.append(character)
             }
         }
