@@ -5,9 +5,9 @@
         "package": "BrowserServicesKit",
         "repositoryURL": "https://github.com/duckduckgo/BrowserServicesKit.git",
         "state": {
-          "branch": "sam/delete-website-credentials",
-          "revision": "b60aeb0eeb63b78bbb9a3d061ad5a45bc2f16ea0",
-          "version": null
+          "branch": null,
+          "revision": "0601d78642d76e14a42558bc73abe5050b862c9e",
+          "version": "7.0.0"
         }
       },
       {
