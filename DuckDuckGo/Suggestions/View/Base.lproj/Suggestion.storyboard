@@ -104,7 +104,7 @@
                                                                 <real key="value" value="1"/>
                                                             </userDefinedRuntimeAttribute>
                                                             <userDefinedRuntimeAttribute type="number" keyPath="cornerRadius">
-                                                                <real key="value" value="14"/>
+                                                                <real key="value" value="8"/>
                                                             </userDefinedRuntimeAttribute>
                                                         </userDefinedRuntimeAttributes>
                                                     </customView>
@@ -214,7 +214,7 @@
                                                         <color key="value" name="AddressBarBackgroundColor"/>
                                                     </userDefinedRuntimeAttribute>
                                                     <userDefinedRuntimeAttribute type="number" keyPath="cornerRadius">
-                                                        <real key="value" value="14"/>
+                                                        <real key="value" value="8"/>
                                                     </userDefinedRuntimeAttribute>
                                                     <userDefinedRuntimeAttribute type="color" keyPath="borderColor">
                                                         <color key="value" name="AddressBarBorderColor"/>
@@ -284,7 +284,7 @@
             <color red="1" green="1" blue="1" alpha="1" colorSpace="custom" customColorSpace="displayP3"/>
         </namedColor>
         <namedColor name="AddressBarBorderColor">
-            <color red="0.0" green="0.0" blue="0.0" alpha="0.20000000000000001" colorSpace="custom" customColorSpace="displayP3"/>
+            <color red="0.0" green="0.0" blue="0.0" alpha="0.20000000298023224" colorSpace="custom" customColorSpace="displayP3"/>
         </namedColor>
         <namedColor name="AddressBarInnerBorderColor">
             <color red="1" green="1" blue="1" alpha="0.0" colorSpace="custom" customColorSpace="displayP3"/>
