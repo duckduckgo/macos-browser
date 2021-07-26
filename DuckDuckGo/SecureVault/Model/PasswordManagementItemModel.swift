@@ -71,12 +71,15 @@ final class PasswordManagementItemModel: ObservableObject {
         }
     }
 
-    var normalizedDomain: String {
-        // Remove any possible scheme entry
-        let domainOnly = domain.trimmingWhitespaces().drop(prefix: "http://").drop(prefix: "https://").trimmingWhitespaces()
+    func normalizedDomain(_ domain: String) -> String {
+        let trimmed = domain.trimmingWhitespaces()
+        if !trimmed.starts(with: "https://") && !trimmed.starts(with: "http://") && trimmed.contains("://") {
+            // Contains some other protocol, so don't mess with it
+            return domain
+        }
 
-        // Construct components with a fully qualified domain name
-        return URLComponents(string: "https://" + domainOnly)?.host ?? ""
+        let noSchemeOrWWW = domain.drop(prefix: "https://").drop(prefix: "http://").dropWWW()
+        return URLComponents(string: "https://\(noSchemeOrWWW)")?.host ?? ""
     }
 
     var lastUpdatedDate: String = ""
@@ -104,7 +107,7 @@ final class PasswordManagementItemModel: ObservableObject {
         guard var credentials = credentials else { return }
         credentials.account.title = title
         credentials.account.username = username
-        credentials.account.domain = normalizedDomain
+        credentials.account.domain = normalizedDomain(domain)
         credentials.password = password.data(using: .utf8)! // let it crash?
         onSaveRequested(credentials)
     }
@@ -138,7 +141,7 @@ final class PasswordManagementItemModel: ObservableObject {
         title =  credentials?.account.title ?? ""
         username = credentials?.account.username ?? ""
         password = String(data: credentials?.password ?? Data(), encoding: .utf8) ?? ""
-        domain = credentials?.account.domain ?? ""
+        domain = normalizedDomain(credentials?.account.domain ?? "")
         isDirty = false
         isNew = credentials?.account.id == nil
 
