@@ -172,6 +172,11 @@ final class NavigationBarViewController: NSViewController {
     }
 
     func showBookmarkListPopover() {
+        if bookmarkListPopover.isShown {
+            bookmarkListPopover.close()
+            return
+        }
+
         bookmarkListPopover.show(relativeTo: bookmarkListButton.bounds.insetFromLineOfDeath(), of: bookmarkListButton, preferredEdge: .maxY)
         Pixel.fire(.bookmarksList(source: .button))
     }
@@ -179,11 +184,17 @@ final class NavigationBarViewController: NSViewController {
     func showPasswordManagementPopover() {
         guard !saveCredentialsPopover.isShown else { return }
 
+        if passwordManagementPopover.isShown {
+            passwordManagementPopover.close()
+            return
+        }
+
         passwordManagementButton.isHidden = false
         passwordManagementPopover.show(relativeTo: passwordManagementButton.bounds.insetFromLineOfDeath(),
                                 of: passwordManagementButton,
                                 preferredEdge: .minY)
-        Pixel.fire(.logins(source: .button))
+
+        Pixel.fire(.manageLogins(source: .button))
     }
 
 #if !FEEDBACK
