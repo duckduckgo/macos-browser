@@ -63,7 +63,7 @@ Gw
                                 </connections>
                             </button>
                             <customView translatesAutoresizingMaskIntoConstraints="NO" id="Bde-GS-Qx1">
-                                <rect key="frame" x="20" y="58" width="482" height="170"/>
+                                <rect key="frame" x="0.0" y="58" width="522" height="170"/>
                             </customView>
                         </subviews>
                         <constraints>
@@ -72,12 +72,12 @@ Gw
                             <constraint firstItem="0i7-MK-KZ1" firstAttribute="top" secondItem="tOy-S4-hL0" secondAttribute="top" constant="20" symbolic="YES" id="Aep-ee-MBT"/>
                             <constraint firstAttribute="bottom" secondItem="UkV-S4-sID" secondAttribute="bottom" constant="20" symbolic="YES" id="Dcb-ww-ZTA"/>
                             <constraint firstItem="Bde-GS-Qx1" firstAttribute="top" secondItem="sh9-5v-T9e" secondAttribute="bottom" constant="18" id="EEW-EO-4Iy"/>
-                            <constraint firstItem="Bde-GS-Qx1" firstAttribute="leading" secondItem="tOy-S4-hL0" secondAttribute="leading" constant="20" symbolic="YES" id="GQY-oe-i7P"/>
+                            <constraint firstItem="Bde-GS-Qx1" firstAttribute="leading" secondItem="tOy-S4-hL0" secondAttribute="leading" id="GQY-oe-i7P"/>
                             <constraint firstAttribute="trailing" relation="greaterThanOrEqual" secondItem="0i7-MK-KZ1" secondAttribute="trailing" constant="20" symbolic="YES" id="Oab-xU-Wp2"/>
                             <constraint firstItem="sh9-5v-T9e" firstAttribute="leading" secondItem="tOy-S4-hL0" secondAttribute="leading" constant="20" symbolic="YES" id="Spt-Wv-v3y"/>
                             <constraint firstAttribute="bottom" secondItem="p3M-G6-gOX" secondAttribute="bottom" constant="20" symbolic="YES" id="d6F-cy-53u"/>
                             <constraint firstItem="0i7-MK-KZ1" firstAttribute="leading" secondItem="tOy-S4-hL0" secondAttribute="leading" constant="20" symbolic="YES" id="g7P-bX-xpj"/>
-                            <constraint firstAttribute="trailing" secondItem="Bde-GS-Qx1" secondAttribute="trailing" constant="20" symbolic="YES" id="mm5-fe-nTF"/>
+                            <constraint firstAttribute="trailing" secondItem="Bde-GS-Qx1" secondAttribute="trailing" id="mm5-fe-nTF"/>
                             <constraint firstItem="p3M-G6-gOX" firstAttribute="top" secondItem="Bde-GS-Qx1" secondAttribute="bottom" constant="18" id="oji-iH-bCG"/>
                             <constraint firstItem="sh9-5v-T9e" firstAttribute="top" secondItem="0i7-MK-KZ1" secondAttribute="bottom" constant="28" id="zOc-EF-N9F"/>
                         </constraints>
@@ -170,6 +170,62 @@ Gw
                 <customObject id="9fr-6f-wQR" userLabel="First Responder" customClass="NSResponder" sceneMemberID="firstResponder"/>
             </objects>
             <point key="canvasLocation" x="601" y="118"/>
+        </scene>
+        <!--Browser Import View Controller-->
+        <scene sceneID="gvn-jW-XyL">
+            <objects>
+                <viewController storyboardIdentifier="BrowserImportViewController" id="NYV-k5-Kxh" customClass="BrowserImportViewController" customModule="DuckDuckGo_Privacy_Browser" customModuleProvider="target" sceneMemberID="viewController">
+                    <view key="view" id="jY2-NF-ftb">
+                        <rect key="frame" x="0.0" y="0.0" width="469" height="84"/>
+                        <autoresizingMask key="autoresizingMask"/>
+                        <subviews>
+                            <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="cub-aJ-1ti">
+                                <rect key="frame" x="18" y="48" width="433" height="16"/>
+                                <textFieldCell key="cell" lineBreakMode="clipping" title="Select Data to Import:" id="Wce-nN-umc">
+                                    <font key="font" usesAppearanceFont="YES"/>
+                                    <color key="textColor" name="labelColor" catalog="System" colorSpace="catalog"/>
+                                    <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
+                                </textFieldCell>
+                            </textField>
+                            <stackView distribution="fill" orientation="vertical" alignment="leading" horizontalStackHuggingPriority="249.99998474121094" verticalStackHuggingPriority="249.99998474121094" detachesHiddenViews="YES" translatesAutoresizingMaskIntoConstraints="NO" id="ubR-la-MhZ">
+                                <rect key="frame" x="20" y="20" width="429" height="16"/>
+                                <subviews>
+                                    <button verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="GGX-yw-24n">
+                                        <rect key="frame" x="-2" y="-1" width="91" height="18"/>
+                                        <buttonCell key="cell" type="check" title="Passwords" bezelStyle="regularSquare" imagePosition="left" state="on" inset="2" id="dM3-0G-bfD">
+                                            <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
+                                            <font key="font" metaFont="system"/>
+                                        </buttonCell>
+                                        <connections>
+                                            <action selector="selectedImportOptionsChanged:" target="NYV-k5-Kxh" id="WiI-Zl-dlz"/>
+                                        </connections>
+                                    </button>
+                                </subviews>
+                                <visibilityPriorities>
+                                    <integer value="1000"/>
+                                </visibilityPriorities>
+                                <customSpacing>
+                                    <real value="3.4028234663852886e+38"/>
+                                </customSpacing>
+                            </stackView>
+                        </subviews>
+                        <constraints>
+                            <constraint firstItem="ubR-la-MhZ" firstAttribute="top" secondItem="cub-aJ-1ti" secondAttribute="bottom" constant="12" id="09O-f9-JMK"/>
+                            <constraint firstAttribute="bottom" secondItem="ubR-la-MhZ" secondAttribute="bottom" constant="20" symbolic="YES" id="5VO-La-ExP"/>
+                            <constraint firstItem="ubR-la-MhZ" firstAttribute="leading" secondItem="jY2-NF-ftb" secondAttribute="leading" constant="20" symbolic="YES" id="JaX-LM-Wo4"/>
+                            <constraint firstItem="cub-aJ-1ti" firstAttribute="leading" secondItem="jY2-NF-ftb" secondAttribute="leading" constant="20" symbolic="YES" id="Kpu-AR-KzD"/>
+                            <constraint firstAttribute="trailing" secondItem="cub-aJ-1ti" secondAttribute="trailing" constant="20" symbolic="YES" id="gjD-Xk-6FE"/>
+                            <constraint firstItem="cub-aJ-1ti" firstAttribute="top" secondItem="jY2-NF-ftb" secondAttribute="top" constant="20" symbolic="YES" id="slq-rw-f5b"/>
+                            <constraint firstAttribute="trailing" secondItem="ubR-la-MhZ" secondAttribute="trailing" constant="20" symbolic="YES" id="yMi-o7-niJ"/>
+                        </constraints>
+                    </view>
+                    <connections>
+                        <outlet property="passwordsCheckbox" destination="GGX-yw-24n" id="Jva-fg-K11"/>
+                    </connections>
+                </viewController>
+                <customObject id="o7C-xg-CgQ" userLabel="First Responder" customClass="NSResponder" sceneMemberID="firstResponder"/>
+            </objects>
+            <point key="canvasLocation" x="600.5" y="368"/>
         </scene>
         <!--Import View Controller-->
         <scene sceneID="e65-WV-kqF">

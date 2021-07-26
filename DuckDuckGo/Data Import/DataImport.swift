@@ -22,10 +22,13 @@ enum DataImport {
 
     // Third-party browser support will be added later.
     enum Source: CaseIterable {
+        case chrome
         case csv
 
         var importSourceName: String {
             switch self {
+            case .chrome:
+                return "Chrome"
             case .csv:
                 return UserText.importLoginsCSV
             }

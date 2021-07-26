@@ -18,6 +18,7 @@
 
 import AppKit
 import BrowserServicesKit
+import Combine
 
 final class DataImportViewController: NSViewController {
 
@@ -43,7 +44,7 @@ final class DataImportViewController: NSViewController {
         return storyboard.instantiateController(identifier: Constants.identifier)
     }
 
-    private var viewState: ViewState = ViewState(selectedImportSource: .csv, interactionState: .unableToImport) {
+    private var viewState: ViewState = ViewState(selectedImportSource: .chrome, interactionState: .ableToImport) {
         didSet {
             renderCurrentViewState()
         }
@@ -51,6 +52,7 @@ final class DataImportViewController: NSViewController {
 
     private weak var currentChildViewController: NSViewController?
     private var dataImporter: DataImporter?
+    private var selectedImportSourceCancellable: AnyCancellable?
 
     @IBOutlet var containerView: NSView!
     @IBOutlet var importSourcePopUpButton: NSPopUpButton!
@@ -75,8 +77,13 @@ final class DataImportViewController: NSViewController {
         super.viewDidLoad()
 
         // This will change later to select the user's default browser.
-        importSourcePopUpButton.displayImportSources(withSelectedSource: .csv)
+        importSourcePopUpButton.displayImportSources(withSelectedSource: .chrome)
         renderCurrentViewState()
+
+        selectedImportSourceCancellable = importSourcePopUpButton.selectionPublisher.sink { [weak self] index in
+            let selectedOption = DataImport.Source.allCases[index]
+            self?.viewState = ViewState(selectedImportSource: selectedOption, interactionState: .ableToImport)
+        }
     }
 
     private func renderCurrentViewState() {
@@ -106,6 +113,11 @@ final class DataImportViewController: NSViewController {
 
     private func newChildViewController(for importSource: DataImport.Source, interactionState: InteractionState) -> NSViewController? {
         switch importSource {
+        case .chrome:
+            let browserImportViewController = BrowserImportViewController.create()
+            browserImportViewController.delegate = self
+
+            return browserImportViewController
         case .csv:
             if case let .completedImport(summaryArray) = interactionState {
                 if currentChildViewController is CSVImportSummaryViewController { return nil }
@@ -183,6 +195,14 @@ extension DataImportViewController: CSVImportViewControllerDelegate {
         } catch {
             self.viewState.interactionState = .unableToImport
         }
+    }
+
+}
+
+extension DataImportViewController: BrowserImportViewControllerDelegate {
+
+    func browserImportViewController(_ viewController: BrowserImportViewController, didChangeSelectedImportOptions options: [DataImport.DataType]) {
+        self.viewState.interactionState = options.isEmpty ? .unableToImport : .ableToImport
     }
 
 }

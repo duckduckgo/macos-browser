@@ -1,0 +1,57 @@
+//
+//  BrowserImportViewController.swift
+//
+//  Copyright © 2021 DuckDuckGo. All rights reserved.
+//
+//  Licensed under the Apache License, Version 2.0 (the "License");
+//  you may not use this file except in compliance with the License.
+//  You may obtain a copy of the License at
+//
+//  http://www.apache.org/licenses/LICENSE-2.0
+//
+//  Unless required by applicable law or agreed to in writing, software
+//  distributed under the License is distributed on an "AS IS" BASIS,
+//  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+//  See the License for the specific language governing permissions and
+//  limitations under the License.
+//
+
+import Foundation
+
+protocol BrowserImportViewControllerDelegate: AnyObject {
+
+    func browserImportViewController(_ viewController: BrowserImportViewController, didChangeSelectedImportOptions options: [DataImport.DataType])
+
+}
+
+final class BrowserImportViewController: NSViewController {
+
+    enum Constants {
+        static let storyboardName = "DataImport"
+        static let identifier = "BrowserImportViewController"
+    }
+
+    static func create() -> BrowserImportViewController {
+        let storyboard = NSStoryboard(name: Constants.storyboardName, bundle: nil)
+        return storyboard.instantiateController(identifier: Constants.identifier)
+    }
+
+    @IBOutlet var passwordsCheckbox: NSButton!
+
+    weak var delegate: BrowserImportViewControllerDelegate?
+
+    var selectedImportOptions: [DataImport.DataType] {
+        var options = [DataImport.DataType]()
+
+        if passwordsCheckbox.state == .on {
+            options.append(.logins)
+        }
+
+        return options
+    }
+
+    @IBAction func selectedImportOptionsChanged(_ sender: NSButton) {
+        delegate?.browserImportViewController(self, didChangeSelectedImportOptions: selectedImportOptions)
+    }
+
+}
