@@ -27,7 +27,7 @@ enum DataImport {
         var importSourceName: String {
             switch self {
             case .csv:
-                return "CSV Logins File"
+                return UserText.importLoginsCSV
             }
         }
     }
@@ -46,7 +46,6 @@ enum DataImport {
 enum DataImportError: Error {
 
     case cannotReadFile
-    case malformedData
     case cannotAccessSecureVault
 
 }
