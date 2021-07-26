@@ -35,7 +35,7 @@ final class SecureVaultLoginImporter: LoginImporter {
         var failed: [String] = []
 
         for login in logins {
-            let account = SecureVaultModels.WebsiteAccount(username: login.username, domain: login.url)
+            let account = SecureVaultModels.WebsiteAccount(title: login.title, username: login.username, domain: login.url)
             let credentials = SecureVaultModels.WebsiteCredentials(account: account, password: login.password.data(using: .utf8)!)
             let importSummaryValue = "\(credentials.account.domain) (\(credentials.account.username))"
 

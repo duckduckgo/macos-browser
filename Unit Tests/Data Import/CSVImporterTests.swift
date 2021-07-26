@@ -29,9 +29,31 @@ class CSVImporterTests: XCTestCase {
         temporaryFileCreator.deleteCreatedTemporaryFiles()
     }
 
-    func testWhenImportingCSVDataFromTheFileSystem_ThenLoginCredentialsAreImported() {
+    func testWhenImportingCSVDataFromTheFileSystem_AndNoTitleIsIncluded_ThenLoginCredentialsAreImported() {
         let mockLoginImporter = MockLoginImporter()
         let file = "url,username,password"
+        let savedFileURL = temporaryFileCreator.persist(fileContents: file.data(using: .utf8)!, named: "test.csv")!
+        let csvImporter = CSVImporter(fileURL: savedFileURL, loginImporter: mockLoginImporter)
+
+        let expectation = expectation(description: #function)
+        csvImporter.importData(types: [.logins]) { result in
+            switch result {
+            case .success(let summary):
+                let expectedSummary = DataImport.Summary.logins(successfulImports: ["username"], duplicateImports: [], failedImports: [])
+                XCTAssertEqual(summary, [expectedSummary])
+                XCTAssertEqual(mockLoginImporter.importedLogins, expectedSummary)
+            case .failure(let error):
+                XCTFail(error.localizedDescription)
+            }
+            expectation.fulfill()
+        }
+
+        waitForExpectations(timeout: 1.0, handler: nil)
+    }
+
+    func testWhenImportingCSVDataFromTheFileSystem_AndTitleIsIncluded_ThenLoginCredentialsAreImported() {
+        let mockLoginImporter = MockLoginImporter()
+        let file = "title,url,username,password"
         let savedFileURL = temporaryFileCreator.persist(fileContents: file.data(using: .utf8)!, named: "test.csv")!
         let csvImporter = CSVImporter(fileURL: savedFileURL, loginImporter: mockLoginImporter)
 

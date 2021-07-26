@@ -20,18 +20,22 @@ import Foundation
 
 struct LoginCredential: Equatable {
 
+    let title: String?
     let url: String
     let username: String
     let password: String
 
-    init(url: String, username: String, password: String) {
+    init(title: String? = nil, url: String, username: String, password: String) {
+        self.title = title
         self.url = url
         self.username = username
         self.password = password
     }
 
     init?(row: [String]) {
-        if row.count >= 3 {
+        if row.count >= 4 {
+            self.init(title: row[0], url: row[1], username: row[2], password: row[3])
+        } else if row.count >= 3 {
             self.init(url: row[0], username: row[1], password: row[2])
         } else {
             return nil
