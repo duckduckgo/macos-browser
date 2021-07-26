@@ -67,7 +67,6 @@
 		4B26FB532697C1BD0010AF6A /* CSVImporter.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B26FB522697C1BD0010AF6A /* CSVImporter.swift */; };
 		4B26FB582697DEB50010AF6A /* CSVParser.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B26FB572697DEB50010AF6A /* CSVParser.swift */; };
 		4B26FB5A269A93BD0010AF6A /* DataImport.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B26FB59269A93BD0010AF6A /* DataImport.swift */; };
-		4B26FB5E269AA31C0010AF6A /* BrowserImportViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B26FB5D269AA31C0010AF6A /* BrowserImportViewController.swift */; };
 		4B26FB60269BF5C40010AF6A /* SecureVaultLoginImporter.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B26FB5F269BF5C40010AF6A /* SecureVaultLoginImporter.swift */; };
 		4B3A4330269D1B9800C66BBC /* LoginImport.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B3A432F269D1B9800C66BBC /* LoginImport.swift */; };
 		4B3A4335269D254200C66BBC /* DataExport.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B3A4334269D254200C66BBC /* DataExport.swift */; };
@@ -487,7 +486,6 @@
 		4B26FB522697C1BD0010AF6A /* CSVImporter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CSVImporter.swift; sourceTree = "<group>"; };
 		4B26FB572697DEB50010AF6A /* CSVParser.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CSVParser.swift; sourceTree = "<group>"; };
 		4B26FB59269A93BD0010AF6A /* DataImport.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DataImport.swift; sourceTree = "<group>"; };
-		4B26FB5D269AA31C0010AF6A /* BrowserImportViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BrowserImportViewController.swift; sourceTree = "<group>"; };
 		4B26FB5F269BF5C40010AF6A /* SecureVaultLoginImporter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SecureVaultLoginImporter.swift; sourceTree = "<group>"; };
 		4B3A432F269D1B9800C66BBC /* LoginImport.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LoginImport.swift; sourceTree = "<group>"; };
 		4B3A4334269D254200C66BBC /* DataExport.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DataExport.swift; sourceTree = "<group>"; };
@@ -1041,7 +1039,6 @@
 				4B26FB4A269781B00010AF6A /* DataImport.storyboard */,
 				4B26FB4C269781CB0010AF6A /* DataImportViewController.swift */,
 				4B26FB4F2697BACE0010AF6A /* CSVImportViewController.swift */,
-				4B26FB5D269AA31C0010AF6A /* BrowserImportViewController.swift */,
 				4B75EA9526A62E0E00018634 /* CSVImportSummaryViewController.swift */,
 			);
 			path = View;
@@ -2691,7 +2688,6 @@
 				4BB88B5B25B7BA50006F6B06 /* Instruments.swift in Sources */,
 				4B0511E2262CAA8600F6079C /* NSViewControllerExtension.swift in Sources */,
 				F44C130225C2DA0400426E3E /* NSAppearanceExtension.swift in Sources */,
-				4B26FB5E269AA31C0010AF6A /* BrowserImportViewController.swift in Sources */,
 				4BA1A6B8258B081600F6F690 /* EncryptionKeyStoring.swift in Sources */,
 				B65783E725F8AAFB00D8DB33 /* String+Punycode.swift in Sources */,
 				B657841A25FA484B00D8DB33 /* NSException+Catch.m in Sources */,
