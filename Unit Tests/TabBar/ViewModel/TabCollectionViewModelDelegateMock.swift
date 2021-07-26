@@ -29,7 +29,7 @@ final class TabCollectionViewModelDelegateMock: TabCollectionViewModelDelegate {
 
     var didInsertCalled = false
 
-    func tabCollectionViewModel(_ tabCollectionViewModel: TabCollectionViewModel, didInsertAndSelectAt index: Int) {
+    func tabCollectionViewModelDidInsert(_ tabCollectionViewModel: TabCollectionViewModel, at index: Int, selected: Bool) {
         didInsertCalled = true
     }
 
