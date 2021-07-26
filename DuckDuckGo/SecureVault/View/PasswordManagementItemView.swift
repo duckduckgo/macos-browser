@@ -76,7 +76,7 @@ struct PasswordManagementItemView: View {
                 .padding()
 
             }
-            .padding()
+            .padding(EdgeInsets(top: 10, leading: 0, bottom: 10, trailing: 10))
         }
 
     }

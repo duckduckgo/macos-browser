@@ -44,6 +44,9 @@ final class PasswordManagementViewController: NSViewController {
     @IBOutlet var listContainer: NSView!
     @IBOutlet var itemContainer: NSView!
     @IBOutlet var searchField: NSTextField!
+    @IBOutlet var divider: NSView!
+
+    var editingCancellable: AnyCancellable?
 
     var domain: String?
     var isDirty = false
@@ -59,6 +62,7 @@ final class PasswordManagementViewController: NSViewController {
         super.viewDidLoad()
         createListView()
         createItemView()
+        subscribeToEditingState()
     }
 
     override func viewDidAppear() {
@@ -104,6 +108,12 @@ final class PasswordManagementViewController: NSViewController {
         } else {
             createNew()
         }
+    }
+
+    private func subscribeToEditingState() {
+        editingCancellable = itemModel?.$isEditing.sink(receiveValue: { [weak self] isEditing in
+            self?.divider.isHidden = isEditing
+        })
     }
 
     private func refetchWithText(_ text: String, clearWhenNoMatches: Bool = false, completion: (() -> Void)? = nil) {
