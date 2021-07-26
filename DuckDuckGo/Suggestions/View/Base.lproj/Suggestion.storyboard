@@ -225,7 +225,7 @@
                                                 </userDefinedRuntimeAttributes>
                                             </customView>
                                             <customView translatesAutoresizingMaskIntoConstraints="NO" id="ATb-xt-XAg" userLabel="Separator" customClass="ColorView" customModule="DuckDuckGo_Privacy_Browser" customModuleProvider="target">
-                                                <rect key="frame" x="2" y="264" width="610" height="1"/>
+                                                <rect key="frame" x="1" y="264" width="612" height="1"/>
                                                 <constraints>
                                                     <constraint firstAttribute="height" constant="1" id="G3c-nz-oCJ"/>
                                                 </constraints>
@@ -239,12 +239,12 @@
                                         <constraints>
                                             <constraint firstItem="ATb-xt-XAg" firstAttribute="top" secondItem="Svf-wj-SjJ" secondAttribute="top" id="FoQ-BR-ASj"/>
                                             <constraint firstItem="j2X-bv-VAU" firstAttribute="leading" secondItem="Svf-wj-SjJ" secondAttribute="leading" id="Izj-JF-mOk"/>
-                                            <constraint firstItem="ATb-xt-XAg" firstAttribute="leading" secondItem="Svf-wj-SjJ" secondAttribute="leading" constant="2" id="PIu-nj-NP2"/>
+                                            <constraint firstItem="ATb-xt-XAg" firstAttribute="leading" secondItem="Svf-wj-SjJ" secondAttribute="leading" constant="1" id="PIu-nj-NP2"/>
                                             <constraint firstAttribute="height" priority="950" constant="200" id="aJH-FU-o7W"/>
                                             <constraint firstAttribute="bottom" secondItem="j2X-bv-VAU" secondAttribute="bottom" id="aeB-Jm-z2x"/>
                                             <constraint firstAttribute="trailing" secondItem="j2X-bv-VAU" secondAttribute="trailing" id="ct6-Vy-WYG"/>
                                             <constraint firstAttribute="height" relation="greaterThanOrEqual" constant="28" id="g17-AI-L6x"/>
-                                            <constraint firstAttribute="trailing" secondItem="ATb-xt-XAg" secondAttribute="trailing" constant="2" id="rIw-Jg-tIG"/>
+                                            <constraint firstAttribute="trailing" secondItem="ATb-xt-XAg" secondAttribute="trailing" constant="1" id="rIw-Jg-tIG"/>
                                             <constraint firstItem="j2X-bv-VAU" firstAttribute="top" secondItem="Svf-wj-SjJ" secondAttribute="top" constant="-20" id="sSl-Lo-qub"/>
                                         </constraints>
                                     </customView>
