@@ -38,7 +38,7 @@ class CSVLoginExporterTests: XCTestCase {
 
         let data = mockFileStore.loadData(at: mockURL)
         XCTAssertNotNil(data)
-        XCTAssertEqual(data, "\"domain-1\",\"user-1\",\"password\\\"containing\\\"quotes\"".data(using: .utf8)!)
+        XCTAssertEqual(data, "\"title-1\",\"domain-1\",\"user-1\",\"password\\\"containing\\\"quotes\"".data(using: .utf8)!)
     }
 
     private func websiteCredentials(identifiers: [Int64]) -> [Int64: SecureVaultModels.WebsiteCredentials] {
@@ -46,6 +46,7 @@ class CSVLoginExporterTests: XCTestCase {
 
         for identifier in identifiers {
             let account = SecureVaultModels.WebsiteAccount(id: identifier,
+                                                           title: "title-\(identifier)",
                                                            username: "user-\(identifier)",
                                                            domain: "domain-\(identifier)",
                                                            created: Date(),

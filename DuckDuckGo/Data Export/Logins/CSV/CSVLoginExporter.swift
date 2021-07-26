@@ -55,6 +55,7 @@ final class CSVLoginExporter: LoginExporter {
 
     private func save(credentials: [SecureVaultModels.WebsiteCredentials], to url: URL) throws {
         let credentialsAsCSVRows: [String] = credentials.compactMap { credential in
+            let title = credential.account.title ?? ""
             let domain = credential.account.domain
             let username = credential.account.username
             let password = credential.password.utf8String() ?? ""
@@ -66,7 +67,7 @@ final class CSVLoginExporter: LoginExporter {
             // Ensure that exported passwords escape any quotes they contain
             let escapedPassword = password.replacingOccurrences(of: "\"", with: "\\\"")
 
-            return "\"\(domain)\",\"\(username)\",\"\(escapedPassword)\""
+            return "\"\(title)\",\"\(domain)\",\"\(username)\",\"\(escapedPassword)\""
         }
 
         let finalString = credentialsAsCSVRows.joined(separator: "\n")
