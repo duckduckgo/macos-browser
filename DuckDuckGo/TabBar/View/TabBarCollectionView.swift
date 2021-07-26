@@ -33,8 +33,6 @@ final class TabBarCollectionView: NSCollectionView {
 
         // Register for the dropped object types we can accept.
         registerForDraggedTypes([.URL])
-        // Enable dragging items from our CollectionView to other applications.
-        setDraggingSourceOperationMask([.private], forLocal: false)
         // Enable dragging items within and into our CollectionView.
         setDraggingSourceOperationMask([.private], forLocal: true)
     }
