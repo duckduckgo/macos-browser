@@ -37,7 +37,13 @@ final class SecureVaultLoginImporter: LoginImporter {
         for login in logins {
             let account = SecureVaultModels.WebsiteAccount(title: login.title, username: login.username, domain: login.url)
             let credentials = SecureVaultModels.WebsiteCredentials(account: account, password: login.password.data(using: .utf8)!)
-            let importSummaryValue = "\(credentials.account.domain) (\(credentials.account.username))"
+            let importSummaryValue: String
+
+            if let title = account.title {
+                importSummaryValue = "\(title): \(credentials.account.domain) (\(credentials.account.username))"
+            } else {
+                importSummaryValue = "\(credentials.account.domain) (\(credentials.account.username))"
+            }
 
             do {
                 try vault.storeWebsiteCredentials(credentials)
