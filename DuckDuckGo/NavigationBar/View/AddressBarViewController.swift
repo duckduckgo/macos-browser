@@ -189,7 +189,10 @@ final class AddressBarViewController: NSViewController {
             return
         }
 
-        passiveTextField.stringValue = selectedTabViewModel.passiveAddressBarString
+        // To make sure passiveTextField is changed after the mode when selectedTabViewModel is updated
+        DispatchQueue.main.async { [weak self] in
+            self?.passiveTextField.stringValue = selectedTabViewModel.passiveAddressBarString
+        }
     }
 
     private func updateView(firstResponder: Bool) {
