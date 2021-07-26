@@ -414,7 +414,7 @@ extension MainViewController {
             do {
                 try vault?.deleteWebsiteCredentialsFor(accountId: accountID)
             } catch {
-                os_log("MainViewController: Failed to remove credential with account ID %d", type: .error, accountID)
+                os_log("Failed to remove credential with account ID %d", type: .error, accountID)
             }
         }
     }

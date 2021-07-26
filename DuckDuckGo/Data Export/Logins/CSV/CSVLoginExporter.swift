@@ -63,7 +63,10 @@ final class CSVLoginExporter: LoginExporter {
                 return nil
             }
 
-            return "\"\(domain)\",\"\(username)\",\"\(password.replacingOccurrences(of: "\"", with: "\\\""))\""
+            // Ensure that exported passwords escape any quotes they contain
+            let escapedPassword = password.replacingOccurrences(of: "\"", with: "\\\"")
+
+            return "\"\(domain)\",\"\(username)\",\"\(escapedPassword)\""
         }
 
         let finalString = credentialsAsCSVRows.joined(separator: "\n")

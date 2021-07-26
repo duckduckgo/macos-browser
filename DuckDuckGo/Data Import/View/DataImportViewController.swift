@@ -90,16 +90,16 @@ final class DataImportViewController: NSViewController {
     private func updateActionButton(with interactionState: InteractionState) {
         switch interactionState {
         case .unableToImport:
-            self.importButton.title = "Import"
+            self.importButton.title = UserText.initiateImport
             self.importButton.isEnabled = false
         case .ableToImport:
-            self.importButton.title = "Import"
+            self.importButton.title = UserText.initiateImport
             self.importButton.isEnabled = true
         case .completedImport:
-            self.importButton.title = "Done"
+            self.importButton.title = UserText.doneImporting
             self.importButton.isEnabled = true
         case .failedToImport:
-            self.importButton.title = "Done"
+            self.importButton.title = UserText.doneImporting
             self.importButton.isEnabled = true
         }
     }

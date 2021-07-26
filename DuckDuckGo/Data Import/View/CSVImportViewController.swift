@@ -64,7 +64,7 @@ final class CSVImportViewController: NSViewController {
     }
 
     private func render(state: ImportState) {
-        descriptionLabel.stringValue = "CSV import supports rows with the format 'URL, Username, Password'"
+        descriptionLabel.stringValue = UserText.csvImportDescription
 
         switch state {
         case .awaitingFileSelection:
@@ -72,11 +72,11 @@ final class CSVImportViewController: NSViewController {
             selectFileButton.title = UserText.importLoginsSelectCSVFile
         case .selectedValidFile(let fileURL):
             let totalLoginsToImport = CSVImporter.totalValidLogins(in: fileURL)
-            selectedFileLabel.stringValue = "Importing File: \(fileURL.path) (\(totalLoginsToImport) valid logins)"
+            selectedFileLabel.stringValue = UserText.importingFile(at: fileURL.path, validLogins: totalLoginsToImport)
             selectedFileLabel.isHidden = false
             selectFileButton.title = UserText.importLoginsSelectAnotherFile
         case .selectedInvalidFile:
-            selectedFileLabel.stringValue = "Failed to get CSV file URL"
+            selectedFileLabel.stringValue = UserText.importLoginsFailedToReadCSVFile
             selectedFileLabel.isHidden = false
             selectFileButton.title = UserText.importLoginsSelectCSVFile
         }
