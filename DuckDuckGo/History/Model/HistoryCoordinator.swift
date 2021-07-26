@@ -80,7 +80,7 @@ final class HistoryCoordinator: HistoryCoordinating {
 
             var entry = historyDictionary[url] ?? HistoryEntry(url: url)
             entry.addVisit()
-            entry.isDownload = false
+            entry.failedToLoad = false
 
             historyDictionary[url] = entry
             self?.historyDictionary = historyDictionary
@@ -204,8 +204,8 @@ final class HistoryCoordinator: HistoryCoordinating {
     }
 
     /// For the better user experience
-    /// When visiting a non-root URL for the first time, generating its root URL and adding into the history with the visit count 0
-    /// triggers the autocompletion of the root URL instead of the visited URL in the future.
+    /// When visiting a domain for the first time using a non-root URL, generating its root URL and adding into the history with the visit count 0
+    /// triggers the autocompletion of the root URL.
     private func generateRootUrlIfNeeded(from url: URL) {
         queue.async(flags: .barrier) { [weak self] in
             guard var historyDictionary = self?.historyDictionary else {

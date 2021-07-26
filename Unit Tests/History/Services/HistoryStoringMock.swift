@@ -43,8 +43,10 @@ final class HistoryStoringMock: HistoryStoring {
     }
 
     var saveCalled = false
+    var savedHistoryEntries = [HistoryEntry]()
     func save(entry: HistoryEntry) -> Future<Void, Error> {
         saveCalled = true
+        savedHistoryEntries.append(entry)
         return Future { promise in
             promise(.success(()))
         }
