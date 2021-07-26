@@ -135,7 +135,7 @@ final class PasswordManagementItemModel: ObservableObject {
     }
 
     private func populateViewModelFromCredentials() {
-        title =  (credentials?.account.title?.isEmpty == true ? credentials?.account.domain : credentials?.account.title) ?? ""
+        title =  credentials?.account.title ?? ""
         username = credentials?.account.username ?? ""
         password = String(data: credentials?.password ?? Data(), encoding: .utf8) ?? ""
         domain = credentials?.account.domain ?? ""

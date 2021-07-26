@@ -46,7 +46,7 @@ private struct ItemView: View {
     var body: some View {
 
         let selectedTextColor = Color(NSColor.selectedControlTextColor)
-        let displayName = ((account.title ?? "").isEmpty == true ? account.domain : account.title) ?? ""
+        let displayName = ((account.title ?? "").isEmpty == true ? account.domain.dropWWW() : account.title) ?? ""
 
         Button(action: action, label: {
             HStack(spacing: 4) {

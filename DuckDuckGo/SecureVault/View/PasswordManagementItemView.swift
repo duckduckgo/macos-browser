@@ -90,7 +90,7 @@ private struct Buttons: View {
     var body: some View {
         HStack {
 
-            if model.isEditing {
+            if model.isEditing && !model.isNew {
                 Button(UserText.pmDelete) {
                     model.requestDelete()
                 }
@@ -345,7 +345,7 @@ private struct HeaderView: View {
 
                 }
 
-                Text(model.title.isEmpty ? model.domain : model.title)
+                Text(model.title.isEmpty ? model.domain.dropWWW() : model.title)
                     .font(.title)
 
             }
