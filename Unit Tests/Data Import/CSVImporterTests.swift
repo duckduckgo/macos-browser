@@ -29,9 +29,28 @@ class CSVImporterTests: XCTestCase {
         temporaryFileCreator.deleteCreatedTemporaryFiles()
     }
 
+    func testWhenImportingCSVFileWithHeader_ThenHeaderRowIsExcluded() {
+        let csvFileContents = """
+        title,url,username,password
+        Some Title,duck.com,username,p4ssw0rd
+        """
+
+        let logins = CSVImporter.extractLogins(from: csvFileContents)
+        XCTAssertEqual(logins, [ImportedLoginCredential(title: "Some Title", url: "duck.com", username: "username", password: "p4ssw0rd")])
+    }
+
+    func testWhenImportingCSVFileWithoutHeader_ThenNoRowsAreExcluded() {
+        let csvFileContents = """
+        Some Title,duck.com,username,p4ssw0rd
+        """
+
+        let logins = CSVImporter.extractLogins(from: csvFileContents)
+        XCTAssertEqual(logins, [ImportedLoginCredential(title: "Some Title", url: "duck.com", username: "username", password: "p4ssw0rd")])
+    }
+
     func testWhenImportingCSVDataFromTheFileSystem_AndNoTitleIsIncluded_ThenLoginCredentialsAreImported() {
         let mockLoginImporter = MockLoginImporter()
-        let file = "url,username,password"
+        let file = "https://example.com/,username,password"
         let savedFileURL = temporaryFileCreator.persist(fileContents: file.data(using: .utf8)!, named: "test.csv")!
         let csvImporter = CSVImporter(fileURL: savedFileURL, loginImporter: mockLoginImporter)
 
@@ -53,7 +72,7 @@ class CSVImporterTests: XCTestCase {
 
     func testWhenImportingCSVDataFromTheFileSystem_AndTitleIsIncluded_ThenLoginCredentialsAreImported() {
         let mockLoginImporter = MockLoginImporter()
-        let file = "title,url,username,password"
+        let file = "title,https://example.com/,username,password"
         let savedFileURL = temporaryFileCreator.persist(fileContents: file.data(using: .utf8)!, named: "test.csv")!
         let csvImporter = CSVImporter(fileURL: savedFileURL, loginImporter: mockLoginImporter)
 

@@ -37,6 +37,17 @@ final class CSVImporter: DataImporter {
         return logins.count
     }
 
+    static func extractLogins(from fileContents: String) -> [ImportedLoginCredential] {
+        let parsed = CSVParser.parse(string: fileContents)
+        var loginCredentials = parsed.compactMap(ImportedLoginCredential.init(row:))
+
+        if loginCredentials.first?.isHeaderRow ?? false {
+            loginCredentials.removeFirst()
+        }
+
+        return loginCredentials
+    }
+
     func importableTypes() -> [DataImport.DataType] {
         if fileURL.pathExtension == "csv" {
             return [.logins]
@@ -64,11 +75,26 @@ final class CSVImporter: DataImporter {
         }
     }
 
-    private static func extractLogins(from fileContents: String) -> [LoginCredential] {
-        let parsed = CSVParser.parse(string: fileContents)
-        let loginCredentials: [LoginCredential] = parsed.compactMap(LoginCredential.init(row:))
+}
 
-        return loginCredentials
+extension ImportedLoginCredential {
+
+    // Some browsers will export credentials with a header row. To detect this, the URL field on the first parsed row is checked whether it passes
+    // the data detector test. If it doesn't, it's assumed to be a header row.
+    fileprivate var isHeaderRow: Bool {
+        let types: NSTextCheckingResult.CheckingType = [.link]
+
+        guard let detector = try? NSDataDetector(types: types.rawValue), self.url.count > 0 else {
+            return false
+        }
+
+        if detector.numberOfMatches(in: self.url,
+                                    options: NSRegularExpression.MatchingOptions(rawValue: 0),
+                                    range: NSRange(location: 0, length: self.url.count)) > 0 {
+            return false
+        }
+
+        return true
     }
 
 }

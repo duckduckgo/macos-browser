@@ -18,7 +18,20 @@
 
 import Foundation
 
-struct LoginCredential: Equatable {
+struct ImportedLoginCredential: Equatable {
+
+    private enum RowFormatWithTitle: Int {
+        case title = 0
+        case url
+        case username
+        case password
+    }
+
+    private enum RowFormatWithoutTitle: Int {
+        case url = 0
+        case username
+        case password
+    }
 
     let title: String?
     let url: String
@@ -34,9 +47,14 @@ struct LoginCredential: Equatable {
 
     init?(row: [String]) {
         if row.count >= 4 {
-            self.init(title: row[0], url: row[1], username: row[2], password: row[3])
+            self.init(title: row[RowFormatWithTitle.title.rawValue],
+                      url: row[RowFormatWithTitle.url.rawValue],
+                      username: row[RowFormatWithTitle.username.rawValue],
+                      password: row[RowFormatWithTitle.password.rawValue])
         } else if row.count >= 3 {
-            self.init(url: row[0], username: row[1], password: row[2])
+            self.init(url: row[RowFormatWithoutTitle.url.rawValue],
+                      username: row[RowFormatWithoutTitle.username.rawValue],
+                      password: row[RowFormatWithoutTitle.password.rawValue])
         } else {
             return nil
         }
@@ -46,6 +64,6 @@ struct LoginCredential: Equatable {
 
 protocol LoginImporter {
 
-    func importLogins(_ logins: [LoginCredential]) throws -> DataImport.Summary
+    func importLogins(_ logins: [ImportedLoginCredential]) throws -> DataImport.Summary
 
 }

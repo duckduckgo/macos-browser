@@ -27,7 +27,7 @@ final class SecureVaultLoginImporter: LoginImporter {
         self.secureVault = secureVault
     }
 
-    func importLogins(_ logins: [LoginCredential]) throws -> DataImport.Summary {
+    func importLogins(_ logins: [ImportedLoginCredential]) throws -> DataImport.Summary {
         let vault = try SecureVaultFactory.default.makeVault()
 
         var successful: [String] = []
