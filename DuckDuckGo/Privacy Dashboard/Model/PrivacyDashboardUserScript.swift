@@ -160,11 +160,7 @@ final class PrivacyDashboardUserScript: NSObject, StaticUserScript {
     }
 
     private func evaluate(js: String, in webView: WKWebView) {
-        if #available(macOS 11.0, *) {
-            webView.evaluateJavaScript(js, in: nil, in: WKContentWorld.defaultClient)
-        } else {
             webView.evaluateJavaScript(js)
-        }
     }
 
 }
