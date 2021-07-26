@@ -204,7 +204,7 @@ private struct PasswordView: View {
 
         if model.isEditing || model.isNew {
 
-            ZStack(alignment: .trailing) {
+            HStack {
 
                 if isPasswordVisible {
 
