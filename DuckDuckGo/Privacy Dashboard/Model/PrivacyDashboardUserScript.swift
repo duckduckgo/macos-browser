@@ -109,10 +109,6 @@ final class PrivacyDashboardUserScript: NSObject, StaticUserScript {
         delegate?.userScript(self, setPermission: permission, paused: paused)
     }
 
-//    func setTrackerBlocking(_ trackerBlockingEnabled: Bool, in webView: WKWebView) {
-//        evaluate(js: "window.onChangeTrackerBlocking(\(trackerBlockingEnabled))", in: webView)
-//    }
-
     func setPermissions(_ usedPermissions: Permissions,
                         authorizationState: [PermissionType: PermissionAuthorizationState],
                         domain: String,
