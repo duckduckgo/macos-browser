@@ -20,7 +20,7 @@ import Foundation
 
 extension NSRect {
 
-    // Apply an offset so that we don't get caught by the "Line of Death" https://app.asana.com/0/392891325557410/1200554841469719
+    // Apply an offset so that we don't get caught by the "Line of Death" https://textslashplain.com/2017/01/14/the-line-of-death/
     func insetFromLineOfDeath() -> NSRect {
         return insetBy(dx: 0, dy: -5)
     }
