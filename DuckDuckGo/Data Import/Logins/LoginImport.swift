@@ -40,7 +40,7 @@ struct ImportedLoginCredential: Equatable {
 
     init(title: String? = nil, url: String, username: String, password: String) {
         self.title = title
-        self.url = url
+        self.url = URL(string: url)?.host ?? url // TODO: Hack to workaround an autofill issue
         self.username = username
         self.password = password
     }

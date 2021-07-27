@@ -129,7 +129,7 @@ final class DataImportViewController: NSViewController {
     private func newChildViewController(for importSource: DataImport.Source, interactionState: InteractionState) -> NSViewController? {
         switch importSource {
         case .chrome:
-            let browserImportViewController = BrowserImportViewController.create()
+            let browserImportViewController = BrowserImportViewController.create(browserName: "Chrome")
             browserImportViewController.delegate = self
 
             return browserImportViewController

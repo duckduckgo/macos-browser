@@ -64,7 +64,7 @@ Gw
                                 </connections>
                             </button>
                             <customView translatesAutoresizingMaskIntoConstraints="NO" id="Bde-GS-Qx1">
-                                <rect key="frame" x="0.0" y="58" width="522" height="170"/>
+                                <rect key="frame" x="0.0" y="60" width="522" height="168"/>
                             </customView>
                         </subviews>
                         <constraints>
@@ -79,7 +79,7 @@ Gw
                             <constraint firstAttribute="bottom" secondItem="p3M-G6-gOX" secondAttribute="bottom" constant="20" symbolic="YES" id="d6F-cy-53u"/>
                             <constraint firstItem="0i7-MK-KZ1" firstAttribute="leading" secondItem="tOy-S4-hL0" secondAttribute="leading" constant="20" symbolic="YES" id="g7P-bX-xpj"/>
                             <constraint firstAttribute="trailing" secondItem="Bde-GS-Qx1" secondAttribute="trailing" id="mm5-fe-nTF"/>
-                            <constraint firstItem="p3M-G6-gOX" firstAttribute="top" secondItem="Bde-GS-Qx1" secondAttribute="bottom" constant="18" id="oji-iH-bCG"/>
+                            <constraint firstItem="p3M-G6-gOX" firstAttribute="top" secondItem="Bde-GS-Qx1" secondAttribute="bottom" constant="20" id="oji-iH-bCG"/>
                             <constraint firstItem="sh9-5v-T9e" firstAttribute="top" secondItem="0i7-MK-KZ1" secondAttribute="bottom" constant="28" id="zOc-EF-N9F"/>
                         </constraints>
                     </view>
@@ -176,8 +176,8 @@ Gw
         <scene sceneID="gvn-jW-XyL">
             <objects>
                 <viewController storyboardIdentifier="BrowserImportViewController" id="NYV-k5-Kxh" customClass="BrowserImportViewController" customModule="DuckDuckGo_Privacy_Browser" customModuleProvider="target" sceneMemberID="viewController">
-                    <view key="view" id="jY2-NF-ftb">
-                        <rect key="frame" x="0.0" y="0.0" width="469" height="118"/>
+                    <view key="view" misplaced="YES" id="jY2-NF-ftb">
+                        <rect key="frame" x="0.0" y="0.0" width="469" height="102"/>
                         <autoresizingMask key="autoresizingMask"/>
                         <subviews>
                             <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="cub-aJ-1ti">
@@ -213,18 +213,28 @@ Gw
                                 <rect key="frame" x="0.0" y="1" width="469" height="32"/>
                                 <subviews>
                                     <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="Lgq-ti-uAf" userLabel="Close Browser Warning Label">
-                                        <rect key="frame" x="18" y="8" width="433" height="16"/>
+                                        <rect key="frame" x="42" y="8" width="409" height="16"/>
                                         <textFieldCell key="cell" lineBreakMode="clipping" title="You must quit Browser before importing data." id="rrK-J8-BjO">
                                             <font key="font" usesAppearanceFont="YES"/>
                                             <color key="textColor" name="labelColor" catalog="System" colorSpace="catalog"/>
                                             <color key="backgroundColor" name="ClearColor"/>
                                         </textFieldCell>
                                     </textField>
+                                    <imageView horizontalHuggingPriority="251" verticalHuggingPriority="251" translatesAutoresizingMaskIntoConstraints="NO" id="S2w-Uj-JqW">
+                                        <rect key="frame" x="16" y="4" width="24" height="24"/>
+                                        <constraints>
+                                            <constraint firstAttribute="width" constant="24" id="2Yb-tg-67M"/>
+                                            <constraint firstAttribute="height" constant="24" id="Hyx-0Z-Kg9"/>
+                                        </constraints>
+                                        <imageCell key="cell" refusesFirstResponder="YES" alignment="left" imageScaling="proportionallyDown" image="WarningTriangle" id="fyq-H2-rea"/>
+                                    </imageView>
                                 </subviews>
                                 <constraints>
                                     <constraint firstAttribute="bottom" secondItem="Lgq-ti-uAf" secondAttribute="bottom" constant="8" id="2mO-Nb-gKj"/>
                                     <constraint firstAttribute="trailing" secondItem="Lgq-ti-uAf" secondAttribute="trailing" constant="20" symbolic="YES" id="7W7-8I-vMe"/>
-                                    <constraint firstItem="Lgq-ti-uAf" firstAttribute="leading" secondItem="1FX-Lc-Hmx" secondAttribute="leading" constant="20" symbolic="YES" id="ab2-wt-K4F"/>
+                                    <constraint firstItem="S2w-Uj-JqW" firstAttribute="centerY" secondItem="1FX-Lc-Hmx" secondAttribute="centerY" id="EUt-NP-qWc"/>
+                                    <constraint firstItem="Lgq-ti-uAf" firstAttribute="leading" secondItem="S2w-Uj-JqW" secondAttribute="trailing" constant="4" id="Hng-ei-RIC"/>
+                                    <constraint firstItem="S2w-Uj-JqW" firstAttribute="leading" secondItem="1FX-Lc-Hmx" secondAttribute="leading" constant="16" id="X8O-hf-ib4"/>
                                     <constraint firstItem="Lgq-ti-uAf" firstAttribute="top" secondItem="1FX-Lc-Hmx" secondAttribute="top" constant="8" id="m9a-NZ-AKC"/>
                                 </constraints>
                             </customView>
@@ -250,7 +260,7 @@ Gw
                             <constraint firstAttribute="bottom" secondItem="T9n-wZ-7iu" secondAttribute="bottom" id="k0W-7w-qDW"/>
                             <constraint firstItem="T9n-wZ-7iu" firstAttribute="leading" secondItem="jY2-NF-ftb" secondAttribute="leading" id="lla-d4-Ymg"/>
                             <constraint firstItem="1FX-Lc-Hmx" firstAttribute="top" secondItem="ubR-la-MhZ" secondAttribute="bottom" constant="21" id="pKq-n4-7bX"/>
-                            <constraint firstItem="cub-aJ-1ti" firstAttribute="top" secondItem="jY2-NF-ftb" secondAttribute="top" constant="20" symbolic="YES" id="slq-rw-f5b"/>
+                            <constraint firstItem="cub-aJ-1ti" firstAttribute="top" secondItem="jY2-NF-ftb" secondAttribute="top" constant="4" id="slq-rw-f5b"/>
                             <constraint firstAttribute="trailing" secondItem="ubR-la-MhZ" secondAttribute="trailing" constant="20" symbolic="YES" id="yMi-o7-niJ"/>
                         </constraints>
                     </view>
@@ -332,6 +342,7 @@ Gw
         </scene>
     </scenes>
     <resources>
+        <image name="WarningTriangle" width="16" height="15"/>
         <namedColor name="ClearColor">
             <color red="1" green="1" blue="1" alpha="0.0" colorSpace="custom" customColorSpace="sRGB"/>
         </namedColor>

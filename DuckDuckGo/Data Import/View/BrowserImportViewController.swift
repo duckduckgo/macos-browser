@@ -31,16 +31,19 @@ final class BrowserImportViewController: NSViewController {
         static let identifier = "BrowserImportViewController"
     }
 
-    static func create() -> BrowserImportViewController {
+    static func create(browserName: String) -> BrowserImportViewController {
         let storyboard = NSStoryboard(name: Constants.storyboardName, bundle: nil)
-        return storyboard.instantiateController(identifier: Constants.identifier)
+
+        return storyboard.instantiateController(identifier: Constants.identifier) { (coder) -> BrowserImportViewController? in
+            return BrowserImportViewController(coder: coder, browserName: browserName)
+        }
     }
 
     @IBOutlet var passwordsCheckbox: NSButton!
     @IBOutlet var closeBrowserWarningLabel: NSTextField!
     @IBOutlet var closeBrowserWarningView: ColorView! {
         didSet {
-            closeBrowserWarningView.backgroundColor = NSColor.lightGray
+            closeBrowserWarningView.backgroundColor = NSColor.black.withAlphaComponent(0.05)
         }
     }
 
@@ -54,6 +57,22 @@ final class BrowserImportViewController: NSViewController {
         }
 
         return options
+    }
+
+    private let browserName: String
+
+    init?(coder: NSCoder, browserName: String) {
+        self.browserName = browserName
+        super.init(coder: coder)
+    }
+
+    required init?(coder: NSCoder) {
+        fatalError("init(coder:) has not been implemented")
+    }
+
+    override func viewDidLoad() {
+        super.viewDidLoad()
+        self.closeBrowserWarningLabel.stringValue = "You must close \(browserName) before importing data."
     }
 
     @IBAction func selectedImportOptionsChanged(_ sender: NSButton) {
