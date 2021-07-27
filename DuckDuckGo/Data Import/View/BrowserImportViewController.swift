@@ -31,11 +31,11 @@ final class BrowserImportViewController: NSViewController {
         static let identifier = "BrowserImportViewController"
     }
 
-    static func create(browserName: String) -> BrowserImportViewController {
+    static func create(with browser: DataImport.Source) -> BrowserImportViewController {
         let storyboard = NSStoryboard(name: Constants.storyboardName, bundle: nil)
 
         return storyboard.instantiateController(identifier: Constants.identifier) { (coder) -> BrowserImportViewController? in
-            return BrowserImportViewController(coder: coder, browserName: browserName)
+            return BrowserImportViewController(coder: coder, browser: browser)
         }
     }
 
@@ -59,10 +59,10 @@ final class BrowserImportViewController: NSViewController {
         return options
     }
 
-    private let browserName: String
+    let browser: DataImport.Source
 
-    init?(coder: NSCoder, browserName: String) {
-        self.browserName = browserName
+    init?(coder: NSCoder, browser: DataImport.Source) {
+        self.browser = browser
         super.init(coder: coder)
     }
 
@@ -72,7 +72,7 @@ final class BrowserImportViewController: NSViewController {
 
     override func viewDidLoad() {
         super.viewDidLoad()
-        self.closeBrowserWarningLabel.stringValue = "You must close \(browserName) before importing data."
+        self.closeBrowserWarningLabel.stringValue = "You must close \(browser.importSourceName) before importing data."
     }
 
     @IBAction func selectedImportOptionsChanged(_ sender: NSButton) {

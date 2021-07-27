@@ -55,10 +55,8 @@ internal class ChromiumDataImporter: DataImporter {
             }
         case .failure:
             print("Data Import (Chromium): Cannot read database")
-            completion(.failure(.cannotReadFile))
+            completion(.failure(.browserNeedsToBeClosed))
         }
-
-        completion(.success([]))
     }
 
 }

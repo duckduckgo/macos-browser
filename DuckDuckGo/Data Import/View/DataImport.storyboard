@@ -176,7 +176,7 @@ Gw
         <scene sceneID="gvn-jW-XyL">
             <objects>
                 <viewController storyboardIdentifier="BrowserImportViewController" id="NYV-k5-Kxh" customClass="BrowserImportViewController" customModule="DuckDuckGo_Privacy_Browser" customModuleProvider="target" sceneMemberID="viewController">
-                    <view key="view" misplaced="YES" id="jY2-NF-ftb">
+                    <view key="view" id="jY2-NF-ftb">
                         <rect key="frame" x="0.0" y="0.0" width="469" height="102"/>
                         <autoresizingMask key="autoresizingMask"/>
                         <subviews>
@@ -198,7 +198,7 @@ Gw
                                             <font key="font" metaFont="system"/>
                                         </buttonCell>
                                         <connections>
-                                            <action selector="selectedImportOptionsChanged:" target="NYV-k5-Kxh" id="WiI-Zl-dlz"/>
+                                            <action selector="selectedImportOptionsChanged:" target="NYV-k5-Kxh" id="1m9-zx-oXo"/>
                                         </connections>
                                     </button>
                                 </subviews>

@@ -80,7 +80,7 @@ final class DataImportViewController: NSViewController {
 
     @IBAction func actionButtonClicked(_ sender: Any) {
         switch viewState.interactionState {
-        case .ableToImport: importData()
+        case .ableToImport, .failedToImport: importData()
         case .completedImport: dismiss()
         default:
             assertionFailure("\(#file): Import button should be disabled when unable to import")
@@ -125,7 +125,7 @@ final class DataImportViewController: NSViewController {
             self.importButton.title = UserText.doneImporting
             self.importButton.isEnabled = true
         case .failedToImport:
-            self.importButton.title = UserText.doneImporting
+            self.importButton.title = UserText.initiateImport
             self.importButton.isEnabled = true
         }
     }
@@ -133,11 +133,15 @@ final class DataImportViewController: NSViewController {
     private func newChildViewController(for importSource: DataImport.Source, interactionState: InteractionState) -> NSViewController? {
         switch importSource {
         case .brave:
-            let browserImportViewController = BrowserImportViewController.create(browserName: "Brave")
+            if let viewController = currentChildViewController as? BrowserImportViewController, viewController.browser == .brave { return nil }
+
+            let browserImportViewController = BrowserImportViewController.create(with: .brave)
             browserImportViewController.delegate = self
             return browserImportViewController
         case .chrome:
-            let browserImportViewController = BrowserImportViewController.create(browserName: "Chrome")
+            if let viewController = currentChildViewController as? BrowserImportViewController, viewController.browser == .chrome { return nil }
+
+            let browserImportViewController = BrowserImportViewController.create(with: .chrome)
             browserImportViewController.delegate = self
             return browserImportViewController
         case .csv:
@@ -195,11 +199,31 @@ final class DataImportViewController: NSViewController {
                 if summary.isEmpty {
                     self.dismiss()
                 } else {
-                    self.viewState.interactionState = .completedImport(summary)
+                    if self.viewState.selectedImportSource.showSuccessScreen {
+                        self.viewState.interactionState = .completedImport(summary)
+                    } else {
+                        self.dismiss()
+                    }
                 }
-            case .failure:
+            case .failure(let error):
                 self.viewState.interactionState = .failedToImport
+                self.presentAlert(for: error)
             }
+        }
+    }
+
+    private func presentAlert(for error: DataImportError) {
+        guard let window = view.window else { return }
+
+        switch error {
+        case .browserNeedsToBeClosed:
+            let alert = NSAlert()
+            alert.messageText = "Failed to import browser data"
+            alert.informativeText = "\(self.viewState.selectedImportSource.importSourceName) must be closed before importing data"
+            alert.alertStyle = .warning
+            alert.addButton(withTitle: "Okay")
+            alert.beginSheetModal(for: window, completionHandler: nil)
+        default: break
         }
     }
 

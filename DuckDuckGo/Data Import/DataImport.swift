@@ -47,6 +47,13 @@ enum DataImport {
                 return nil
             }
         }
+
+        var showSuccessScreen: Bool {
+            switch self {
+            case .csv: return true
+            default: return false
+            }
+        }
     }
 
     // Different data types (e.g. bookmarks) will be added later.
@@ -63,6 +70,7 @@ enum DataImport {
 enum DataImportError: Error {
 
     case cannotReadFile
+    case browserNeedsToBeClosed
     case cannotAccessSecureVault
 
 }
