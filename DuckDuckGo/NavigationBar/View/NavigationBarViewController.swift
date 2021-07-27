@@ -30,9 +30,9 @@ final class NavigationBarViewController: NSViewController {
     @IBOutlet weak var optionsButton: NSButton!
     @IBOutlet weak var bookmarkListButton: NSButton!
     @IBOutlet weak var shareButton: NSButton!
+    @IBOutlet weak var passwordManagementButton: NSButton!
 
     var addressBarViewController: AddressBarViewController?
-    var saveCredentialsPopover: SaveCredentialsPopover?
 
     private var tabCollectionViewModel: TabCollectionViewModel
 
@@ -42,9 +42,13 @@ final class NavigationBarViewController: NSViewController {
     // swiftlint:enable weak_delegate
 
     private lazy var bookmarkListPopover = BookmarkListPopover()
+    private lazy var saveCredentialsPopover: SaveCredentialsPopover = SaveCredentialsPopover()
+    private lazy var passwordManagementPopover: PasswordManagementPopover = PasswordManagementPopover()
 
+    private var urlCancellable: AnyCancellable?
     private var selectedTabViewModelCancellable: AnyCancellable?
     private var credentialsToSaveCancellable: AnyCancellable?
+    private var passwordManagerNotificationCancellable: AnyCancellable?
     private var navigationButtonsCancellables = Set<AnyCancellable>()
 
     required init?(coder: NSCoder) {
@@ -63,6 +67,7 @@ final class NavigationBarViewController: NSViewController {
 
         setupNavigationButtonMenus()
         subscribeToSelectedTabViewModel()
+        listenToPasswordManagerNotifications()
 
 #if !FEEDBACK
 
@@ -120,6 +125,8 @@ final class NavigationBarViewController: NSViewController {
             switch menu.result {
             case .bookmarks:
                 Pixel.fire(.moreMenu(result: .bookmarksList))
+            case .logins:
+                Pixel.fire(.moreMenu(result: .logins))
             case .emailProtection:
                 Pixel.fire(.moreMenu(result: .emailProtection))
             case .feedback:
@@ -147,6 +154,10 @@ final class NavigationBarViewController: NSViewController {
         showBookmarkListPopover()
     }
 
+    @IBAction func passwordManagementButtonAction(_ sender: NSButton) {
+        showPasswordManagementPopover()
+    }
+
     @IBAction func shareButtonAction(_ sender: NSButton) {
         guard let url = tabCollectionViewModel.selectedTabViewModel?.tab.url else { return }
         let sharing = NSSharingServicePicker(items: [url])
@@ -154,9 +165,36 @@ final class NavigationBarViewController: NSViewController {
         sharing.show(relativeTo: .zero, of: sender, preferredEdge: .minY)
     }
 
+    func listenToPasswordManagerNotifications() {
+        passwordManagerNotificationCancellable = NotificationCenter.default.publisher(for: .PasswordManagerChanged).sink { [weak self] _ in
+            self?.updatePasswordManagementButton()
+        }
+    }
+
     func showBookmarkListPopover() {
-        bookmarkListPopover.show(relativeTo: .zero, of: bookmarkListButton, preferredEdge: .maxY)
+        if bookmarkListPopover.isShown {
+            bookmarkListPopover.close()
+            return
+        }
+
+        bookmarkListPopover.show(relativeTo: bookmarkListButton.bounds.insetFromLineOfDeath(), of: bookmarkListButton, preferredEdge: .maxY)
         Pixel.fire(.bookmarksList(source: .button))
+    }
+
+    func showPasswordManagementPopover() {
+        guard !saveCredentialsPopover.isShown else { return }
+
+        if passwordManagementPopover.isShown {
+            passwordManagementPopover.close()
+            return
+        }
+
+        passwordManagementButton.isHidden = false
+        passwordManagementPopover.show(relativeTo: passwordManagementButton.bounds.insetFromLineOfDeath(),
+                                of: passwordManagementButton,
+                                preferredEdge: .minY)
+
+        Pixel.fire(.manageLogins(source: .button))
     }
 
 #if !FEEDBACK
@@ -180,7 +218,42 @@ final class NavigationBarViewController: NSViewController {
         selectedTabViewModelCancellable = tabCollectionViewModel.$selectedTabViewModel.receive(on: DispatchQueue.main).sink { [weak self] _ in
             self?.subscribeToNavigationActionFlags()
             self?.subscribeToCredentialsToSave()
+            self?.subscribeToTabUrl()
         }
+    }
+
+    private func subscribeToTabUrl() {
+        urlCancellable = tabCollectionViewModel.selectedTabViewModel?.tab.$url
+            .receive(on: DispatchQueue.main)
+            .sink(receiveValue: { [weak self] _ in
+                self?.updatePasswordManagementButton()
+            })
+    }
+
+    private func updatePasswordManagementButton() {
+        let url = tabCollectionViewModel.selectedTabViewModel?.tab.url
+
+        passwordManagementButton.image = NSImage(named: "PasswordManagement")
+
+        if passwordManagementPopover.viewController.isDirty {
+            // Remember to reset this once the controller is not dirty
+            passwordManagementButton.image = NSImage(named: "PasswordManagementDirty")
+            passwordManagementButton.isHidden = false
+            return
+        }
+
+        // We don't want to remove the button if the popever is showing
+        if passwordManagementPopover.isShown {
+            return
+        }
+
+        passwordManagementPopover.viewController.domain = nil
+        guard let url = url, let domain = url.host else {
+            passwordManagementButton.isHidden = true
+            return
+        }
+        passwordManagementPopover.viewController.domain = domain
+        passwordManagementButton.isHidden = (try? SecureVaultFactory.default.makeVault().accountsFor(domain: domain).isEmpty) ?? false
     }
 
     private func subscribeToCredentialsToSave() {
@@ -196,15 +269,15 @@ final class NavigationBarViewController: NSViewController {
 
     private func promptToSaveCredentials(_ credentials: SecureVaultModels.WebsiteCredentials) {
         showSaveCredentialsPopover()
-        saveCredentialsPopover?.viewController.saveCredentials(credentials)
+        saveCredentialsPopover.viewController.saveCredentials(credentials)
     }
 
     private func showSaveCredentialsPopover() {
-        guard let view = addressBarViewController?.view else { return }
-        if saveCredentialsPopover == nil {
-            saveCredentialsPopover = SaveCredentialsPopover()
-        }
-        saveCredentialsPopover?.show(relativeTo: .zero, of: view, preferredEdge: .minY)
+        passwordManagementButton.isHidden = false
+
+        saveCredentialsPopover.show(relativeTo: passwordManagementButton.bounds.insetFromLineOfDeath(),
+                                    of: passwordManagementButton,
+                                    preferredEdge: .minY)
     }
 
     private func subscribeToNavigationActionFlags() {
@@ -274,6 +347,10 @@ extension NavigationBarViewController: OptionsButtonMenuDelegate {
 
     func optionsButtonMenuRequestedBookmarkPopover(_ menu: NSMenu) {
         showBookmarkListPopover()
+    }
+
+    func optionsButtonMenuRequestedLoginsPopover(_ menu: NSMenu) {
+        showPasswordManagementPopover()
     }
 
 }

@@ -10,6 +10,7 @@
             <objects>
                 <customObject id="Voe-Tx-rLC" customClass="AppDelegate" customModule="DuckDuckGo_Privacy_Browser" customModuleProvider="target"/>
                 <customObject id="Ady-hI-5gd" userLabel="First Responder" customClass="NSResponder" sceneMemberID="firstResponder"/>
+                <customObject id="WIK-gq-Ncg" customClass="CopyHandler" customModule="DuckDuckGo_Privacy_Browser" customModuleProvider="target"/>
                 <customObject id="YLy-65-1bz" customClass="NSFontManager"/>
                 <application id="hnw-xV-0zn" sceneMemberID="viewController">
                     <menu key="mainMenu" title="Main Menu" systemMenu="main" id="AYu-sK-qS6" customClass="MainMenu" customModule="DuckDuckGo_Privacy_Browser" customModuleProvider="target">
@@ -141,7 +142,7 @@
                                         </menuItem>
                                         <menuItem title="Copy" keyEquivalent="c" id="x3v-GG-iWU">
                                             <connections>
-                                                <action selector="copy:" target="Ady-hI-5gd" id="G1f-GL-Joy"/>
+                                                <action selector="copy:" target="WIK-gq-Ncg" id="Lhc-7L-v7f"/>
                                             </connections>
                                         </menuItem>
                                         <menuItem title="Paste" keyEquivalent="v" id="gVA-U4-sdL">
