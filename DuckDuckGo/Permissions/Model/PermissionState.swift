@@ -23,7 +23,7 @@ enum PermissionState: Equatable {
     case requested(PermissionAuthorizationQuery)
     case active
     case revoking
-    case denied
+    case denied(explicitly: Bool)
     case paused
     case inactive
 
@@ -34,7 +34,7 @@ enum PermissionState: Equatable {
         case .requested(let query1): if case .requested(let query2) = rhs, query1 === query2 { return true }
         case .active: if case .active = rhs { return true }
         case .revoking: if case .revoking = rhs { return true }
-        case .denied: if case .denied = rhs { return true }
+        case .denied(explicitly: let explicitly): if case .denied(explicitly) = rhs { return true }
         case .paused: if case .paused = rhs { return true }
         case .inactive: if case .inactive = rhs { return true }
         }
@@ -54,21 +54,16 @@ extension Optional where Wrapped == PermissionState {
         self = .requested(query)
     }
 
-    mutating func systemMediaAuthorizationDenied(systemWide: Bool) {
-        guard case .some = self else { return }
+    mutating func systemAuthorizationDenied(systemWide: Bool) {
         self = .disabled(systemWide: systemWide)
     }
 
-    mutating func systemMediaAuthorizationGranted(pendingQuery: PermissionAuthorizationQuery?) {
-        guard case .some(.disabled) = self,
-           let query = pendingQuery else {
-            return
-        }
-        self = .requested(query)
+    mutating func systemAuthorizationGranted(pendingQuery: PermissionAuthorizationQuery) {
+        self = .requested(pendingQuery)
     }
 
-    mutating func userDenied() {
-        self = .denied
+    mutating func denied(explicitly: Bool) {
+        self = .denied(explicitly: explicitly)
     }
 
     mutating func update(with captureState: WKWebView.CaptureState) {
@@ -103,29 +98,18 @@ extension Optional where Wrapped == PermissionState {
 
         // Permission revoked
         case (.revoking, .none):
-            self = .denied
+            self = .denied(explicitly: true)
         }
-    }
-
-    mutating func paused() {
-        guard case .some(.active) = self else {
-            assertionFailure("PermissionState: trying to pause from non-active state")
-            return
-        }
-        self = .paused
-    }
-
-    mutating func resumed() {
-        guard case .some(.paused) = self else {
-            assertionFailure("PermissionState: trying to resume from non-paused state")
-            return
-        }
-        self = .active
     }
 
     mutating func revoke() {
         guard case .some = self else { return }
         self = .revoking
+    }
+
+    mutating func resetIfInactive() {
+        guard case .some(.inactive) = self else { return }
+        self = .none
     }
 
 }

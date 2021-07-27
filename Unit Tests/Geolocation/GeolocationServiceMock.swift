@@ -30,8 +30,8 @@ final class GeolocationServiceMock: GeolocationServiceProtocol {
     }
     var history = [CallHistoryItem]()
 
-    @Published var authorizationStatus: CLAuthorizationStatus = .notDetermined
-    @Published var currentLocationPublished: Result<CLLocation, Error>? {
+    @PublishedAfter var authorizationStatus: CLAuthorizationStatus = .notDetermined
+    @PublishedAfter var currentLocationPublished: Result<CLLocation, Error>? {
         willSet {
             history.append(.locationPublished)
         }
@@ -56,6 +56,15 @@ final class GeolocationServiceMock: GeolocationServiceProtocol {
     }
     var authorizationStatusPublisher: AnyPublisher<CLAuthorizationStatus, Never> {
         $authorizationStatus.eraseToAnyPublisher()
+    }
+
+    var locationServicesEnabledValue = true {
+        didSet {
+            authorizationStatus = (authorizationStatus)
+        }
+    }
+    var locationServicesEnabled: () -> Bool {
+        { self.locationServicesEnabledValue }
     }
 
     private func didReceiveSubscription(_ s: Subscription) {

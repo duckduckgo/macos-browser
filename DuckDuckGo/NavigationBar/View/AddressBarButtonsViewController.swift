@@ -143,9 +143,6 @@ final class AddressBarButtonsViewController: NSViewController {
     }
     
     @IBAction func privacyEntryPointButtonAction(_ sender: Any) {
-        if _permissionAuthorizationPopover?.isShown == true {
-            permissionAuthorizationPopover.close()
-        }
         openPrivacyDashboard()
     }
 
@@ -252,6 +249,10 @@ final class AddressBarButtonsViewController: NSViewController {
             os_log("%s: Selected tab view model is nil or no camera state", type: .error, className)
             return
         }
+        if case .requested(let query) = state {
+            openPermissionAuthorizationPopover(for: query)
+            return
+        }
 
         let permissions: [PermissionType] = selectedTabViewModel.usedPermissions.microphone != nil
             ? [.camera, .microphone]
@@ -262,11 +263,16 @@ final class AddressBarButtonsViewController: NSViewController {
                               delegate: self)
             .popUp(positioning: nil, at: NSPoint(x: 0, y: sender.bounds.height), in: sender)
     }
+
     @IBAction func microphoneButtonAction(_ sender: NSButton) {
         guard let selectedTabViewModel = tabCollectionViewModel.selectedTabViewModel,
               let state = selectedTabViewModel.usedPermissions.microphone
         else {
             os_log("%s: Selected tab view model is nil or no microphone state", type: .error, className)
+            return
+        }
+        if case .requested(let query) = state {
+            openPermissionAuthorizationPopover(for: query)
             return
         }
 
@@ -276,11 +282,16 @@ final class AddressBarButtonsViewController: NSViewController {
                               delegate: self)
             .popUp(positioning: nil, at: NSPoint(x: 0, y: sender.bounds.height), in: sender)
     }
+
     @IBAction func geolocationButtonAction(_ sender: NSButton) {
         guard let selectedTabViewModel = tabCollectionViewModel.selectedTabViewModel,
               let state = selectedTabViewModel.usedPermissions.geolocation
         else {
             os_log("%s: Selected tab view model is nil or no geolocation state", type: .error, className)
+            return
+        }
+        if case .requested(let query) = state {
+            openPermissionAuthorizationPopover(for: query)
             return
         }
 
@@ -298,9 +309,11 @@ final class AddressBarButtonsViewController: NSViewController {
     }
 
     private func subscribeToSelectedTabViewModel() {
-        selectedTabViewModelCancellable = tabCollectionViewModel.$selectedTabViewModel.receive(on: DispatchQueue.main).sink { [weak self] _ in
-            self?.subscribeToUrl()
-            self?.subscribeToPermissions()
+        selectedTabViewModelCancellable = tabCollectionViewModel.$selectedTabViewModel
+            .scan((oldValue: TabViewModel?.none, value: TabViewModel?.none)) { ($0.value, $1) }
+            .receive(on: DispatchQueue.main).sink { [weak self] arg in
+                self?.subscribeToUrl()
+                self?.subscribeToPermissions(oldValue: arg.oldValue)
         }
     }
 
@@ -317,8 +330,14 @@ final class AddressBarButtonsViewController: NSViewController {
         }
     }
 
-    private func subscribeToPermissions() {
+    private func subscribeToPermissions(oldValue: TabViewModel?) {
         permissionsCancellables = []
+
+        // deny all the postponed Permission Popovers automatically
+        while let query = oldValue?.permissionAuthorizationQuery {
+            query.denyAutomatically()
+        }
+
         guard let selectedTabViewModel = tabCollectionViewModel.selectedTabViewModel else {
             return
         }
@@ -344,7 +363,8 @@ final class AddressBarButtonsViewController: NSViewController {
         microphoneButton.buttonState = selectedTabViewModel.usedPermissions.microphone
 
         if let query = selectedTabViewModel.permissionAuthorizationQuery {
-            if !permissionAuthorizationPopover.isShown {
+            // don't reopen Permission Popover if was closed by clicking outside of the popover
+            if permissionAuthorizationPopover.viewController.query !== query {
                 openPermissionAuthorizationPopover(for: query)
             }
         } else if _permissionAuthorizationPopover?.isShown == true {

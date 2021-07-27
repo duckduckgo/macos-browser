@@ -22,23 +22,36 @@ final class PermissionAuthorizationQuery {
     let domain: String
     let permissions: [PermissionType]
 
-    private var completionHandler: ((PermissionAuthorizationQuery?, Bool) -> Void)?
+    enum Decision {
+        case granted(PermissionAuthorizationQuery)
+        case denied(query: PermissionAuthorizationQuery, explicitly: Bool)
+        case postponed
+        case deinitialized
+    }
+    private var decisionHandler: ((Decision) -> Void)?
 
-    init(domain: String, permissions: [PermissionType], completionHandler: @escaping (PermissionAuthorizationQuery?, Bool) -> Void) {
+    init(domain: String, permissions: [PermissionType], decisionHandler: @escaping (Decision) -> Void) {
         self.domain = domain
         self.permissions = permissions
-        self.completionHandler = completionHandler
+        self.decisionHandler = decisionHandler
     }
 
     func handleDecision(grant: Bool) {
-        completionHandler?(self, grant)
-        completionHandler = nil
+        decisionHandler?(grant ? .granted(self) : .denied(query: self, explicitly: true))
+        decisionHandler = nil
+    }
+
+    func denyAutomatically() {
+        decisionHandler?(.denied(query: self, explicitly: false))
+        decisionHandler = nil
+    }
+
+    func postpone() {
+        decisionHandler?(.postponed)
     }
 
     deinit {
-        if let completionHandler = completionHandler {
-            completionHandler(nil, false)
-        }
+        decisionHandler?(.deinitialized)
     }
 
 }

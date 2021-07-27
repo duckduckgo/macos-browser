@@ -28,18 +28,18 @@ final class PermissionModel {
 
     private var authorizationQueries = [PermissionAuthorizationQuery]() {
         didSet {
-            authorizationQuery = authorizationQueries.first
+            authorizationQuery = authorizationQueries.last
         }
     }
 
     private let permissionManager: PermissionManagerProtocol
-    private let geolocationService: GeolocationService
+    private let geolocationService: GeolocationServiceProtocol
     private weak var webView: WKWebView?
     private var cancellables = Set<AnyCancellable>()
 
     init(webView: WKWebView,
          permissionManager: PermissionManagerProtocol = PermissionManager.shared,
-         geolocationService: GeolocationService = GeolocationService.shared) {
+         geolocationService: GeolocationServiceProtocol = GeolocationService.shared) {
         self.permissionManager = permissionManager
         self.webView = webView
         self.geolocationService = geolocationService
@@ -59,13 +59,13 @@ final class PermissionModel {
         } // else: will receive mediaCaptureStateDidChange()
 
         let geolocationProvider = webView.configuration.processPool.geolocationProvider
-        geolocationProvider?.$isActive.sink { [weak self] _ in
+        geolocationProvider?.isActivePublisher.sink { [weak self] _ in
             self?.updatePermissions()
         }.store(in: &cancellables)
-        geolocationProvider?.$isPaused.sink { [weak self] _ in
+        geolocationProvider?.isPausedPublisher.sink { [weak self] _ in
             self?.updatePermissions()
         }.store(in: &cancellables)
-        geolocationProvider?.$authorizationStatus.sink { [weak self] authorizationStatus in
+        geolocationProvider?.authorizationStatusPublisher.sink { [weak self] authorizationStatus in
             self?.geolocationAuthorizationStatusDidChange(to: authorizationStatus)
         }.store(in: &cancellables)
     }
@@ -78,6 +78,10 @@ final class PermissionModel {
 
     private func resetPermissions() {
         webView?.configuration.processPool.geolocationProvider?.reset()
+        webView?.revokePermissions([.camera, .microphone]) { [weak self] in
+            self?.permissions.camera.resetIfInactive()
+            self?.permissions.microphone.resetIfInactive()
+        }
         permissions = Permissions()
         authorizationQueries = []
         updatePermissions()
@@ -93,9 +97,13 @@ final class PermissionModel {
                 permissions.camera.update(with: webView.cameraState)
             case .geolocation:
                 let authorizationStatus = webView.configuration.processPool.geolocationProvider?.authorizationStatus
-                if [.denied, .restricted].contains(authorizationStatus) {
+                // Geolocation Authorization is queried before checking the System Permission
+                // if it is nil means there was no query made,
+                // if query was made but System Permission is disabled: switch to Disabled state
+                if permissions.geolocation != nil,
+                   [.denied, .restricted].contains(authorizationStatus) {
                     permissions.geolocation
-                        .systemMediaAuthorizationDenied(systemWide: !geolocationService.locationServicesEnabled())
+                        .systemAuthorizationDenied(systemWide: !geolocationService.locationServicesEnabled())
                 } else {
                     permissions.geolocation.update(with: webView.geolocationState)
                 }
@@ -108,7 +116,31 @@ final class PermissionModel {
     }
 
     private func queryAuthorization(for permissions: [PermissionType], domain: String, decisionHandler: @escaping (Bool) -> Void) {
-        let query = PermissionAuthorizationQuery(domain: domain, permissions: permissions) { [weak self] query, granted in
+        let query = PermissionAuthorizationQuery(domain: domain, permissions: permissions) { [weak self] decision in
+            let query: PermissionAuthorizationQuery?
+            let granted: Bool
+            switch decision {
+            case .postponed:
+                return
+            case .deinitialized:
+                query = nil
+                granted = false
+
+            case .denied(query: let completedQuery, explicitly: let explicitly):
+                query = completedQuery
+                granted = false
+
+                for permission in permissions {
+                    self?.permissions[permission].denied(explicitly: explicitly)
+                }
+
+            case .granted(let completedQuery):
+                query = completedQuery
+                granted = true
+
+                // granted handled through activation of a permission usage by the WebView
+            }
+
             defer {
                 decisionHandler(granted)
             }
@@ -119,10 +151,13 @@ final class PermissionModel {
                 return
             }
             self.authorizationQueries.remove(at: idx)
+        }
 
-            if !granted { // granted handled through activation of the permission usage
-                permissions.forEach { self.permissions[$0].userDenied() }
-            }
+        if permissions.contains(.geolocation),
+           [.denied, .restricted].contains(self.geolocationService.authorizationStatus)
+            || !geolocationService.locationServicesEnabled() {
+            self.permissions.geolocation
+                .systemAuthorizationDenied(systemWide: !geolocationService.locationServicesEnabled())
         }
 
         permissions.forEach { self.permissions[$0].authorizationQueried(query) }
@@ -145,7 +180,7 @@ final class PermissionModel {
         self.webView?.revokePermissions([permissionType])
     }
 
-    // MARK: API
+    // MARK: Pausing/Revoking
 
     func set(_ permissions: [PermissionType], muted: Bool) {
         webView?.setPermissions(permissions, muted: muted)
@@ -165,15 +200,21 @@ final class PermissionModel {
     // Called before requestMediaCapturePermissionFor: to validate System Permissions
     func checkUserMediaPermission(for url: URL, mainFrameURL: URL, decisionHandler: @escaping (String, Bool) -> Void) {
         // If media capture is denied in System Preferences, reflect it in current permissions
+        // AVCaptureDevice.authorizationStatus(for:mediaType) is swizzled to determine requested media type
+        // otherwise WebView won't call any other delegate methods if System Permission is denied
         AVCaptureDevice.swizzleAuthorizationStatusForMediaType { mediaType, authorizationStatus in
-            if case .denied = authorizationStatus {
+            switch authorizationStatus {
+            case .denied, .restricted:
                 switch mediaType {
                 case .audio:
-                    self.permissions.microphone.systemMediaAuthorizationDenied(systemWide: false)
+                    self.permissions.microphone.systemAuthorizationDenied(systemWide: false)
                 case .video:
-                    self.permissions.camera.systemMediaAuthorizationDenied(systemWide: false)
+                    self.permissions.camera.systemAuthorizationDenied(systemWide: false)
                 default: break
                 }
+
+            case .notDetermined, .authorized: break
+            @unknown default: break
             }
         }
         decisionHandler("", false)
@@ -195,22 +236,23 @@ final class PermissionModel {
                 grant = stored
             } else if let state = self.permissions[permission] {
                 switch state {
-                case .active, .inactive, .paused:
-                    grant = true
+                // deny if already denied during current page being displayed
                 case .denied, .revoking:
                     grant = false
-                case .disabled, .requested:
+                // ask otherwise
+                case .disabled, .requested, .active, .inactive, .paused:
                     break
                 }
             }
 
             if let grant = grant {
                 if grant == false {
-                    // deny if at least one permission permanently or prior denied
+                    // deny if at least one permission denied permanently
+                    // or during current page being displayed
                     decisionHandler(false)
                     return
                 }
-                // else if grant == true: allow if all permissions permanently or prior allowed
+                // else if grant == true: allow if all permissions allowed permanently
             } else {
                 // if at least one permission is not set: ask
                 shouldGrant = false
@@ -233,20 +275,29 @@ final class PermissionModel {
     }
 
     func geolocationAuthorizationStatusDidChange(to authorizationStatus: CLAuthorizationStatus) {
-        switch authorizationStatus {
-        case .authorized, .authorizedAlways:
-            self.permissions.geolocation
-                .systemMediaAuthorizationGranted(pendingQuery:
-                                                    self.authorizationQueries.first(where: {
-                                                            $0.permissions.contains(.geolocation)
-                                                    }))
-            self.updatePermissions()
+        switch (authorizationStatus, geolocationService.locationServicesEnabled()) {
+        case (.authorized, true), (.authorizedAlways, true):
+            if let query = self.authorizationQueries.first(where: { $0.permissions.contains(.geolocation) }),
+               case .disabled = self.permissions.geolocation {
 
-        case .denied, .restricted:
-            self.permissions.geolocation
-                .systemMediaAuthorizationDenied(systemWide: !geolocationService.locationServicesEnabled())
+                self.permissions.geolocation.systemAuthorizationGranted(pendingQuery: query)
+            } else {
+                self.updatePermissions()
+            }
 
-        case .notDetermined: break
+        case (.notDetermined, true):
+            break
+
+        case (.denied, true), (.restricted, true):
+            guard self.permissions.geolocation != nil else { break }
+            self.permissions.geolocation
+                .systemAuthorizationDenied(systemWide: false)
+
+        case (_, false): // Geolocation Services disabled globally
+            guard self.permissions.geolocation != nil else { break }
+            self.permissions.geolocation
+                .systemAuthorizationDenied(systemWide: true)
+
         @unknown default: break
         }
     }

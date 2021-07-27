@@ -23,6 +23,9 @@ import CoreLocation
 protocol GeolocationServiceProtocol: AnyObject {
     var currentLocation: Result<CLLocation, Error>? { get }
     var locationPublisher: AnyPublisher<Result<CLLocation, Error>?, Never> { get }
+    var locationServicesEnabled: () -> Bool { get }
+
+    var authorizationStatus: CLAuthorizationStatus { get }
     var authorizationStatusPublisher: AnyPublisher<CLAuthorizationStatus, Never> { get }
 }
 
@@ -31,8 +34,8 @@ final class GeolocationService: NSObject, GeolocationServiceProtocol {
 
     private let locationManager: CLLocationManager
 
-    @Published private var currentLocationPublished: Result<CLLocation, Error>?
-    @Published private var authorizationStatus: CLAuthorizationStatus
+    @PublishedAfter private var currentLocationPublished: Result<CLLocation, Error>?
+    @PublishedAfter private(set) var authorizationStatus: CLAuthorizationStatus
     private var locationPublisherEventsHandler: AnyPublisher<Result<CLLocation, Error>?, Never>!
 
     var currentLocation: Result<CLLocation, Error>? {

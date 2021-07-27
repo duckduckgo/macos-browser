@@ -97,9 +97,8 @@ extension WKWebView {
         }
         if geolocationProvider.isPaused {
             return .muted
-        } else {
-            return .active
         }
+        return .active
     }
 
     var soundState: CaptureState {
@@ -111,16 +110,18 @@ extension WKWebView {
             assertionFailure("WKWebView does not respond to selector _stopMediaCapture")
             return
         }
-        var mutedState: _WKMediaMutedState = {
+        let mutedState: _WKMediaMutedState = {
             guard self.responds(to: #selector(WKWebView._mediaMutedState)) else { return [] }
             return self._mediaMutedState()
         }()
+        var newState = mutedState
         if muted {
-            mutedState.insert(.captureDevicesMuted)
+            newState.insert(.captureDevicesMuted)
         } else {
-            mutedState.remove(.captureDevicesMuted)
+            newState.remove(.captureDevicesMuted)
         }
-        self._setPageMuted(mutedState)
+        guard newState != mutedState else { return }
+        self._setPageMuted(newState)
     }
 
     func stopMediaCapture() {
@@ -154,26 +155,32 @@ extension WKWebView {
         }
     }
 
-    func revokePermissions(_ permissions: [PermissionType]) {
+    func revokePermissions(_ permissions: [PermissionType], completionHandler: (() -> Void)? = nil) {
+        let group = DispatchGroup()
         for permission in permissions {
             switch permission {
             case .camera:
                 if #available(macOS 12.0, *) {
-                    self.setCameraCaptureState(.none, completionHandler: {})
+                    group.enter()
+                    self.setCameraCaptureState(.none, completionHandler: { group.leave() })
                 } else {
                     self.stopMediaCapture()
                 }
             case .microphone:
                 if #available(macOS 12.0, *) {
-                    self.setMicrophoneCaptureState(.none, completionHandler: {})
+                    group.enter()
+                    self.setMicrophoneCaptureState(.none, completionHandler: { group.leave() })
                 } else {
                     self.stopMediaCapture()
                 }
             case .geolocation:
-                self.configuration.processPool.geolocationProvider?.stop()
+                self.configuration.processPool.geolocationProvider?.revoke()
             case .sound, .display:
                 fatalError("Not implemented")
             }
+        }
+        group.notify(queue: .main) {
+            completionHandler?()
         }
     }
 

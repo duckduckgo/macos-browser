@@ -20,20 +20,65 @@ import Foundation
 import CoreLocation
 import Combine
 
-final class GeolocationProvider: NSObject {
+protocol GeolocationProviderProtocol: AnyObject {
+    var isActive: Bool { get }
+    var isActivePublisher: AnyPublisher<Bool, Never> { get }
+
+    var isPaused: Bool { get set }
+    var isPausedPublisher: AnyPublisher<Bool, Never> { get }
+
+    var isRevoked: Bool { get set }
+
+    var authorizationStatusPublisher: AnyPublisher<CLAuthorizationStatus, Never> { get }
+    var authorizationStatus: CLAuthorizationStatus { get }
+
+    func revoke()
+    func reset()
+}
+
+final class GeolocationProvider: NSObject, GeolocationProviderProtocol {
     private let geolocationService: GeolocationServiceProtocol
     private var geolocationManager: WKGeolocationManager
     private var locationCancellable: AnyCancellable?
-    private var authorizationStatusCancellable: AnyCancellable?
 
-    @PublishedAfter private(set) var isActive: Bool = false
-    @PublishedAfter var isPaused: Bool = false {
+    @PublishedAfter private var publishedIsActive: Bool = false
+    private(set) var isActive: Bool {
+        get {
+            publishedIsActive
+        }
+        set {
+            publishedIsActive = newValue
+        }
+    }
+    var isActivePublisher: AnyPublisher<Bool, Never> {
+        $publishedIsActive.eraseToAnyPublisher()
+    }
+
+    @PublishedAfter private var publishedIsPaused: Bool = false {
         didSet {
             self.updateLocation(with: geolocationService.currentLocation)
         }
     }
-    @PublishedAfter var isRevoked: Bool = false
-    @PublishedAfter var authorizationStatus = CLAuthorizationStatus.notDetermined
+    var isPaused: Bool {
+        get {
+            publishedIsPaused
+        }
+        set {
+            publishedIsPaused = newValue
+        }
+    }
+    var isPausedPublisher: AnyPublisher<Bool, Never> {
+        $publishedIsPaused.eraseToAnyPublisher()
+    }
+
+    var isRevoked: Bool = false
+
+    var authorizationStatusPublisher: AnyPublisher<CLAuthorizationStatus, Never> {
+        self.geolocationService.authorizationStatusPublisher
+    }
+    var authorizationStatus: CLAuthorizationStatus {
+        self.geolocationService.authorizationStatus
+    }
 
     init?(processPool: WKProcessPool,
           geolocationService: GeolocationServiceProtocol = GeolocationService.shared) {
@@ -48,8 +93,6 @@ final class GeolocationProvider: NSObject {
         super.init()
 
         geolocationManager.setProvider(self)
-        authorizationStatusCancellable = geolocationService.authorizationStatusPublisher
-            .weakAssign(to: \.authorizationStatus, on: self)
     }
 
     private struct GeolocationDisabled: Error, LocalizedError {
@@ -58,7 +101,7 @@ final class GeolocationProvider: NSObject {
         }
     }
 
-    func stop() {
+    func revoke() {
         self.isActive = false
         self.isRevoked = true
         locationCancellable?.cancel()
@@ -107,7 +150,7 @@ final class GeolocationProvider: NSObject {
     }
 
     fileprivate func geolocationManager(_ geolocationManager: WKGeolocationManager, setEnableHighAccuracyCallback enable: Bool) {
-
+        #warning("Set accuracy")
     }
 
 }

@@ -559,7 +559,7 @@ extension BrowserTabViewController: WKUIDelegate {
             return
         }
 
-        tab.permissions.permissions([.geolocation], requestedForDomain: frame.request.url?.host) {granted in
+        tab.permissions.permissions([.geolocation], requestedForDomain: frame.request.url?.host) { granted in
             decisionHandler(granted ? .grant : .deny)
         }
     }

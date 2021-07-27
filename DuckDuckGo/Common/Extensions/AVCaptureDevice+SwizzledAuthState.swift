@@ -27,15 +27,18 @@ extension AVCaptureDevice: AVCaptureDevice_Swizzled {
     private static var isSwizzled: Bool { authorizationStatusForMediaType != nil }
 
     private static let originalAuthorizationStatusForMediaType = {
-        class_getClassMethod(AVCaptureDevice.self, #selector(authorizationStatus(for:)))!
+        class_getClassMethod(AVCaptureDevice.self, #selector(authorizationStatus(for:)))
     }()
     private static let swizzledAuthorizationStatusForMediaType = {
-        class_getClassMethod(AVCaptureDevice.self, #selector(swizzled_authorizationStatus(for:)))!
+        class_getClassMethod(AVCaptureDevice.self, #selector(swizzled_authorizationStatus(for:)))
     }()
 
     static func swizzleAuthorizationStatusForMediaType(with replacement: @escaping ((AVMediaType, inout AVAuthorizationStatus) -> Void)) {
         dispatchPrecondition(condition: .onQueue(.main))
-        guard !self.isSwizzled else {
+        guard !self.isSwizzled,
+              let originalAuthorizationStatusForMediaType = originalAuthorizationStatusForMediaType,
+              let swizzledAuthorizationStatusForMediaType = swizzledAuthorizationStatusForMediaType
+        else {
             assertionFailure("Already swizzled")
             return
         }
@@ -46,7 +49,10 @@ extension AVCaptureDevice: AVCaptureDevice_Swizzled {
 
     static func restoreAuthorizationStatusForMediaType() {
         dispatchPrecondition(condition: .onQueue(.main))
-        guard self.isSwizzled else {
+        guard self.isSwizzled,
+              let originalAuthorizationStatusForMediaType = originalAuthorizationStatusForMediaType,
+              let swizzledAuthorizationStatusForMediaType = swizzledAuthorizationStatusForMediaType
+        else {
             assertionFailure("Method is not swizzled")
             return
         }

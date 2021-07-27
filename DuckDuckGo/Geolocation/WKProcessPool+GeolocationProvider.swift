@@ -21,9 +21,9 @@ import WebKit
 extension WKProcessPool {
     private static let geolocationProviderKey = UnsafeRawPointer(bitPattern: "WKProcessPoolGeolocationProviderKey".hashValue)!
 
-    @nonobjc var geolocationProvider: GeolocationProvider? {
+    @nonobjc var geolocationProvider: GeolocationProviderProtocol? {
         get {
-            return objc_getAssociatedObject(self, Self.geolocationProviderKey) as? GeolocationProvider
+            return objc_getAssociatedObject(self, Self.geolocationProviderKey) as? GeolocationProviderProtocol
         }
         set {
             objc_setAssociatedObject(self, Self.geolocationProviderKey, newValue, .OBJC_ASSOCIATION_RETAIN)
