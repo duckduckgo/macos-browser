@@ -47,6 +47,16 @@ final class DataImportViewController: NSViewController {
     private var viewState: ViewState = ViewState(selectedImportSource: .chrome, interactionState: .ableToImport) {
         didSet {
             renderCurrentViewState()
+
+            switch viewState.selectedImportSource {
+            case .chrome:
+                self.dataImporter = ChromeImporter()
+            case .csv:
+                // Reset the data importer if the view has switched to the .csv state and a Chromium importer is still in use.
+                if self.dataImporter is ChromiumImporter {
+                    self.dataImporter = nil
+                }
+            }
         }
     }
 
@@ -77,6 +87,7 @@ final class DataImportViewController: NSViewController {
         super.viewDidLoad()
 
         // This will change later to select the user's default browser.
+        self.dataImporter = ChromeImporter()
         importSourcePopUpButton.displayImportSources(withSelectedSource: .chrome)
         renderCurrentViewState()
 
@@ -170,7 +181,11 @@ final class DataImportViewController: NSViewController {
         importer.importData(types: importer.importableTypes()) { result in
             switch result {
             case .success(let summary):
-                self.viewState.interactionState = .completedImport(summary)
+                if summary.isEmpty {
+                    self.dismiss()
+                } else {
+                    self.viewState.interactionState = .completedImport(summary)
+                }
             case .failure:
                 self.viewState.interactionState = .failedToImport
             }

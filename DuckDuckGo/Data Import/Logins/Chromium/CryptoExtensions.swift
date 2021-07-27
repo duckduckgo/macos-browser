@@ -1,5 +1,5 @@
 //
-//  ChromeImporter.swift
+//  CryptoExtensions.swift
 //
 //  Copyright © 2021 DuckDuckGo. All rights reserved.
 //
@@ -16,18 +16,28 @@
 //  limitations under the License.
 //
 
-import Foundation
+import CommonCrypto
 
-final class ChromeImporter: ChromiumImporter {
+struct SHA {
 
-    override var processName: String {
-        return "Chrome"
+    static func from(data: Data) -> [UInt8] {
+        var digest = [UInt8](repeating: 0, count: Int(CC_SHA1_DIGEST_LENGTH))
+        CC_SHA1(data.bytes, CC_LONG(data.count), &digest)
+
+        return digest
     }
 
-    init() {
-        let applicationSupport = FileManager.default.urls(for: .applicationSupportDirectory, in: .userDomainMask).first!
-        let path = applicationSupport.appendingPathComponent("Google/Chrome/Default/").absoluteString
-        super.init(applicationDataDirectoryPath: path)
+    static func hexFrom(data: Data) -> String {
+        var digest = [UInt8](repeating: 0, count: Int(CC_SHA1_DIGEST_LENGTH))
+        CC_SHA1(data.bytes, CC_LONG(data.count), &digest)
+
+        var digestHex = ""
+
+        for index in 0..<Int(CC_SHA1_DIGEST_LENGTH) {
+            digestHex += String(format: "%02x", digest[index])
+        }
+
+        return digestHex
     }
 
 }
