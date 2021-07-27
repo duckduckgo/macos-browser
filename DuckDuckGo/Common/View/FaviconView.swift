@@ -1,5 +1,5 @@
 //
-//  PrivacySecurityPreferences.swift
+//  FaviconView.swift
 //
 //  Copyright © 2021 DuckDuckGo. All rights reserved.
 //
@@ -16,23 +16,23 @@
 //  limitations under the License.
 //
 
-import Foundation
+import SwiftUI
 
-struct PrivacySecurityPreferences {
+struct FaviconView: View {
 
-    @UserDefaultsWrapper(key: .loginDetectionEnabled, defaultValue: true)
-    public var loginDetectionEnabled: Bool
+    let domain: String
 
-}
+    var body: some View {
 
-extension PrivacySecurityPreferences: PreferenceSection {
-    
-    var displayName: String {
-        return UserText.privacyAndSecurity
-    }
+        let favicon = LocalFaviconService.shared.getCachedFavicon(for: domain, mustBeFromUserScript: false) ?? NSImage(named: "WebLarge")
 
-    var preferenceIcon: NSImage {
-        return NSImage(named: "Privacy")!
+        if let image = favicon {
+            Image(nsImage: image)
+                .resizable()
+                .aspectRatio(contentMode: .fit)
+                .frame(width: 32)
+        }
+
     }
 
 }

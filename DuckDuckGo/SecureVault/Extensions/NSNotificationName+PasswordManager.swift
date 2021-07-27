@@ -1,5 +1,5 @@
 //
-//  PrivacySecurityPreferences.swift
+//  NSNotificationName+PasswordManager.swift
 //
 //  Copyright © 2021 DuckDuckGo. All rights reserved.
 //
@@ -18,21 +18,8 @@
 
 import Foundation
 
-struct PrivacySecurityPreferences {
+extension NSNotification.Name {
 
-    @UserDefaultsWrapper(key: .loginDetectionEnabled, defaultValue: true)
-    public var loginDetectionEnabled: Bool
-
-}
-
-extension PrivacySecurityPreferences: PreferenceSection {
-    
-    var displayName: String {
-        return UserText.privacyAndSecurity
-    }
-
-    var preferenceIcon: NSImage {
-        return NSImage(named: "Privacy")!
-    }
+    static let PasswordManagerChanged = NSNotification.Name("PasswordManagerChanged")
 
 }

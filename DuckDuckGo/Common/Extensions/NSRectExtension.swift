@@ -1,5 +1,5 @@
 //
-//  PrivacySecurityPreferences.swift
+//  NSRectExtension.swift
 //
 //  Copyright © 2021 DuckDuckGo. All rights reserved.
 //
@@ -18,21 +18,11 @@
 
 import Foundation
 
-struct PrivacySecurityPreferences {
+extension NSRect {
 
-    @UserDefaultsWrapper(key: .loginDetectionEnabled, defaultValue: true)
-    public var loginDetectionEnabled: Bool
-
-}
-
-extension PrivacySecurityPreferences: PreferenceSection {
-    
-    var displayName: String {
-        return UserText.privacyAndSecurity
-    }
-
-    var preferenceIcon: NSImage {
-        return NSImage(named: "Privacy")!
+    // Apply an offset so that we don't get caught by the "Line of Death" https://textslashplain.com/2017/01/14/the-line-of-death/
+    func insetFromLineOfDeath() -> NSRect {
+        return insetBy(dx: 0, dy: -5)
     }
 
 }
