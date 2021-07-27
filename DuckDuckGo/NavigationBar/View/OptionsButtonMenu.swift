@@ -24,6 +24,7 @@ import BrowserServicesKit
 protocol OptionsButtonMenuDelegate: AnyObject {
 
     func optionsButtonMenuRequestedBookmarkPopover(_ menu: NSMenu)
+    func optionsButtonMenuRequestedLoginsPopover(_ menu: NSMenu)
 
 }
 
@@ -48,6 +49,7 @@ final class OptionsButtonMenu: NSMenu {
         case favoriteThisPage
 
         case bookmarks
+        case logins
         case preferences
     }
 
@@ -106,7 +108,7 @@ final class OptionsButtonMenu: NSMenu {
         addItem(NSMenuItem.separator())
 
         if let url = tabCollectionViewModel.selectedTabViewModel?.tab.url, url.canFireproof, let host = url.host {
-            if FireproofDomains.shared.isAllowed(fireproofDomain: host) {
+            if FireproofDomains.shared.isFireproof(fireproofDomain: host) {
 
                 let removeFireproofingItem = NSMenuItem(title: UserText.removeFireproofing,
                                                         action: #selector(toggleFireproofing(_:)),
@@ -133,6 +135,13 @@ final class OptionsButtonMenu: NSMenu {
         bookmarksMenuItem.target = self
         bookmarksMenuItem.image = NSImage(named: "Bookmarks")
         addItem(bookmarksMenuItem)
+
+        let passwordManagementMenuItem = NSMenuItem(title: UserText.passwordManagement, action: #selector(openLogins), keyEquivalent: "")
+        passwordManagementMenuItem.target = self
+        passwordManagementMenuItem.image = NSImage(named: "PasswordManagement")
+        addItem(passwordManagementMenuItem)
+
+        addItem(NSMenuItem.separator())
 
         let preferencesItem = NSMenuItem(title: UserText.preferences, action: #selector(openPreferences(_:)), keyEquivalent: "")
         preferencesItem.target = self
@@ -165,6 +174,10 @@ final class OptionsButtonMenu: NSMenu {
         actionDelegate?.optionsButtonMenuRequestedBookmarkPopover(self)
     }
 
+    @objc func openLogins(_ sender: NSMenuItem) {
+        actionDelegate?.optionsButtonMenuRequestedLoginsPopover(self)
+    }
+
     @objc func openPreferences(_ sender: NSMenuItem) {
         WindowControllersManager.shared.showPreferencesTab()
     }
@@ -190,6 +203,8 @@ final class OptionsButtonMenu: NSMenu {
             self.result = .bookmarks
         case #selector(openPreferences(_:)):
             self.result = .preferences
+        case #selector(openLogins(_:)):
+            self.result = .logins
         case .none:
             break
         default:

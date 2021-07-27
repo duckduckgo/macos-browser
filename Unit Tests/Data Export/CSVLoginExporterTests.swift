@@ -57,12 +57,3 @@ class CSVLoginExporterTests: XCTestCase {
     }
 
 }
-
-fileprivate extension SecureVaultModels.WebsiteAccount {
-
-     init(id: Int64, title: String? = nil, username: String = "username", domain: String = "domain") {
-         self.init(title: title, username: username, domain: domain)
-         self.id = id
-     }
-
- }
