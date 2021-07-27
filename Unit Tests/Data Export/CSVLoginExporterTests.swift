@@ -18,7 +18,7 @@
 
 import Foundation
 import XCTest
-@testable import BrowserServicesKit
+import BrowserServicesKit
 @testable import DuckDuckGo_Privacy_Browser
 
 class CSVLoginExporterTests: XCTestCase {
@@ -48,9 +48,7 @@ class CSVLoginExporterTests: XCTestCase {
             let account = SecureVaultModels.WebsiteAccount(id: identifier,
                                                            title: "title-\(identifier)",
                                                            username: "user-\(identifier)",
-                                                           domain: "domain-\(identifier)",
-                                                           created: Date(),
-                                                           lastUpdated: Date())
+                                                           domain: "domain-\(identifier)")
             let credential = SecureVaultModels.WebsiteCredentials(account: account, password: "password\"containing\"quotes".data(using: .utf8)!)
             credentials[identifier] = credential
         }
@@ -59,3 +57,12 @@ class CSVLoginExporterTests: XCTestCase {
     }
 
 }
+
+fileprivate extension SecureVaultModels.WebsiteAccount {
+
+     init(id: Int64, title: String? = nil, username: String = "username", domain: String = "domain") {
+         self.init(title: title, username: username, domain: domain)
+         self.id = id
+     }
+
+ }
