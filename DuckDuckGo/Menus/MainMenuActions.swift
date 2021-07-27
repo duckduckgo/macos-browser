@@ -137,7 +137,15 @@ extension AppDelegate {
             do {
                 try exporter.exportVaultLogins(to: selectedURL)
                 Pixel.fire(.exportedLogins())
-            } catch {}
+            } catch {
+                // @samsymons Move this into an extension in the followup login import PR:
+                let alert = NSAlert()
+                alert.messageText = "Failed to Export Logins"
+                alert.informativeText = "Please check that no file exists at the location you selected."
+                alert.alertStyle = .warning
+                alert.addButton(withTitle: "OK")
+                alert.beginSheetModal(for: window, completionHandler: nil)
+            }
         }
     }
 
