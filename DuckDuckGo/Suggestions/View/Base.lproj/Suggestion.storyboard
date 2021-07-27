@@ -84,7 +84,7 @@
                                         <constraints>
                                             <constraint firstAttribute="bottom" secondItem="cHT-Cf-UOB" secondAttribute="bottom" constant="20" id="8AL-RN-SoQ"/>
                                             <constraint firstItem="cHT-Cf-UOB" firstAttribute="leading" secondItem="KKJ-SW-5gR" secondAttribute="leading" constant="20" id="E9b-KN-Xdh"/>
-                                            <constraint firstItem="cHT-Cf-UOB" firstAttribute="top" secondItem="KKJ-SW-5gR" secondAttribute="top" constant="-20" id="r2a-5g-qnG"/>
+                                            <constraint firstItem="cHT-Cf-UOB" firstAttribute="top" secondItem="KKJ-SW-5gR" secondAttribute="top" constant="-14" id="r2a-5g-qnG"/>
                                             <constraint firstAttribute="trailing" secondItem="cHT-Cf-UOB" secondAttribute="trailing" constant="20" id="xH1-iA-ulc"/>
                                         </constraints>
                                     </customView>
