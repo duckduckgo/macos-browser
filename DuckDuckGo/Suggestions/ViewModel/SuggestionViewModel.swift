@@ -123,7 +123,7 @@ final class SuggestionViewModel {
             return " – " + url.toString(decodePunycode: true,
                                         dropScheme: true,
                                         needsWWW: false,
-                                        dropTrailingSlash: false)
+                                        dropTrailingSlash: true)
         }
     }
 
