@@ -45,8 +45,19 @@ struct ImportedLoginCredential: Equatable {
         self.password = password
     }
 
-    init?(row: [String]) {
-        if row.count >= 4 {
+    init?(row: [String], inferredColumnPositions: CSVImporter.InferredCredentialColumnPositions? = nil) {
+        if let inferredPositions = inferredColumnPositions {
+            var title: String?
+
+            if let titleIndex = inferredPositions.titleIndex {
+                title = row[titleIndex]
+            }
+
+            self.init(title: title,
+                      url: row[inferredPositions.urlIndex],
+                      username: row[inferredPositions.usernameIndex],
+                      password: row[inferredPositions.passwordIndex])
+        } else if row.count >= 4 {
             self.init(title: row[RowFormatWithTitle.title.rawValue],
                       url: row[RowFormatWithTitle.url.rawValue],
                       username: row[RowFormatWithTitle.username.rawValue],
