@@ -134,7 +134,10 @@ extension AppDelegate {
 
             let vault = try? SecureVaultFactory.default.makeVault()
             let exporter = CSVLoginExporter(secureVault: vault!)
-            try? exporter.exportVaultLogins(to: selectedURL)
+            do {
+                try exporter.exportVaultLogins(to: selectedURL)
+                Pixel.fire(.exportedLogins())
+            } catch {}
         }
     }
 

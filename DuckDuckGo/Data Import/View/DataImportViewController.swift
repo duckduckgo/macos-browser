@@ -159,6 +159,7 @@ final class DataImportViewController: NSViewController {
             switch result {
             case .success(let summary):
                 self.viewState.interactionState = .completedImport(summary)
+                Pixel.fire(.importedLogins(source: .csv))
             case .failure:
                 self.viewState.interactionState = .failedToImport
             }
