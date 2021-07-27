@@ -41,7 +41,7 @@ class CSVImporterTests: XCTestCase {
 
     func testWhenImportingCSVFileWithHeader_ThenHeaderColumnPositionsAreRespected() {
         let csvFileContents = """
-        password,title,username,url
+        Password,Title,Username,Url
         p4ssw0rd,"Some Title",username,duck.com
         """
 

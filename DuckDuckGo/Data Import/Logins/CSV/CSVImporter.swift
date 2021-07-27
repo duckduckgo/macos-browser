@@ -43,7 +43,7 @@ final class CSVImporter: DataImporter {
             var passwordPosition: Int?
 
             for (index, value) in csvValues.enumerated() {
-                switch value {
+                switch value.lowercased() {
                 case "url": urlPosition = index
                 case "username": usernamePosition = index
                 case "password": passwordPosition = index
