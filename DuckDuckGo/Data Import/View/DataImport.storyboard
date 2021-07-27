@@ -279,23 +279,23 @@ Gw
             <objects>
                 <viewController storyboardIdentifier="CSVImportViewController" id="Meg-M8-8oL" customClass="CSVImportViewController" customModule="DuckDuckGo_Privacy_Browser" customModuleProvider="target" sceneMemberID="viewController">
                     <view key="view" translatesAutoresizingMaskIntoConstraints="NO" id="n2z-bE-Ka8">
-                        <rect key="frame" x="0.0" y="0.0" width="313" height="116"/>
+                        <rect key="frame" x="0.0" y="0.0" width="313" height="114"/>
                         <subviews>
                             <stackView distribution="fill" orientation="vertical" alignment="centerX" spacing="12" horizontalStackHuggingPriority="249.99998474121094" verticalStackHuggingPriority="249.99998474121094" horizontalHuggingPriority="249" detachesHiddenViews="YES" translatesAutoresizingMaskIntoConstraints="NO" id="HLb-Dw-Y0O">
-                                <rect key="frame" x="20" y="20" width="273" height="76"/>
+                                <rect key="frame" x="20" y="20" width="273" height="74"/>
                                 <subviews>
                                     <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="qiB-A6-LS4">
-                                        <rect key="frame" x="82" y="60" width="110" height="16"/>
-                                        <textFieldCell key="cell" title="Description Label" id="SpT-id-yTr">
-                                            <font key="font" metaFont="system"/>
+                                        <rect key="frame" x="81" y="59" width="112" height="15"/>
+                                        <textFieldCell key="cell" alignment="left" title="Description Label" id="SpT-id-yTr">
+                                            <font key="font" size="13" name="SFProText-Regular"/>
                                             <color key="textColor" name="labelColor" catalog="System" colorSpace="catalog"/>
                                             <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
                                         </textFieldCell>
                                     </textField>
                                     <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="cam-am-7aM">
-                                        <rect key="frame" x="71" y="32" width="132" height="16"/>
+                                        <rect key="frame" x="70" y="32" width="133" height="15"/>
                                         <textFieldCell key="cell" lineBreakMode="clipping" title="Importing From File:" id="c4x-MU-RpJ">
-                                            <font key="font" metaFont="systemSemibold" size="13"/>
+                                            <font key="font" size="13" name="SFProText-Semibold"/>
                                             <color key="textColor" name="labelColor" catalog="System" colorSpace="catalog"/>
                                             <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
                                         </textFieldCell>
