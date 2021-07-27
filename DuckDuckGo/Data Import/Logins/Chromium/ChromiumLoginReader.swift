@@ -1,5 +1,5 @@
 //
-//  ChromiumImporter.swift
+//  ChromiumLoginReader.swift
 //
 //  Copyright © 2021 DuckDuckGo. All rights reserved.
 //
@@ -20,64 +20,46 @@ import Foundation
 import CryptoSwift
 import GRDB
 
-internal class ChromiumImporter: DataImporter {
+final class ChromiumLoginReader {
 
-    var processName: String {
-        fatalError("Subclasses must provide their own process name")
+    enum ImportError: Error {
+        case failedToAccessDatabase
     }
 
-    private let applicationDataDirectoryPath: String
+    private let chromiumLoginDirectoryPath: String
+    private let processName: String
 
-    private var loginDataPath: String {
-        return applicationDataDirectoryPath + "/Login Data"
+    init(chromiumDataDirectoryPath: String, processName: String) {
+        self.chromiumLoginDirectoryPath = chromiumDataDirectoryPath + "/Login Data"
+        self.processName = processName
     }
 
-    init(applicationDataDirectoryPath: String) {
-        self.applicationDataDirectoryPath = applicationDataDirectoryPath
-    }
-
-    func importableTypes() -> [DataImport.DataType] {
-        // TODO: Check if browser data exists at the application directory path
-        return [.logins]
-    }
-
-    func importData(types: [DataImport.DataType], completion: @escaping (Result<[DataImport.Summary], DataImportError>) -> Void) {
-        print("Importing from Chromium")
-        importLogins()
-
-        completion(.success([]))
-    }
-
-    // MARK: - Private
-
-    func importLogins() {
+    func readLogins() -> Result<[ImportedLoginCredential], ChromiumLoginReader.ImportError> {
         let chromiumDecryptionKey = shell("security find-generic-password -wa '\(processName)'").replacingOccurrences(of: "\n", with: "")
         let derivedKey = deriveKey(from: chromiumDecryptionKey)
 
-        print(String(repeating: "=", count: 80))
-        print("Decrypting \(processName) logins with original key: \(chromiumDecryptionKey), derived key: \(derivedKey.toHexString())")
-        print("")
+        var importedLogins = [ImportedLoginCredential]()
 
         do {
-            let queue = try DatabaseQueue(path: loginDataPath)
+            let queue = try DatabaseQueue(path: chromiumLoginDirectoryPath)
 
             try queue.read { database in
-                let loginsRows = (try? Row.fetchAll(database, sql: "SELECT action_url, username_value, password_value FROM logins;")) ?? []
+                let loginsRows = (try? Row.fetchAll(database, sql: "SELECT signon_realm, username_value, password_value FROM logins;")) ?? []
 
                 for row in loginsRows {
-                    let url: String = row["action_url"]!
+                    let url: String = row["signon_realm"]!
                     let username: String = row["username_value"]!
                     let encryptedPassword: Data = row["password_value"]!
                     let decryptedPassword = decrypt(passwordData: encryptedPassword, with: derivedKey)
 
-                    print("• \(processName) Credential (\(url)): Username = \(username), Password = \(decryptedPassword)")
+                    importedLogins.append(ImportedLoginCredential(url: url, username: username, password: decryptedPassword))
                 }
             }
         } catch {
-            print("Failed to read database, with error: \(error)")
+            return .failure(.failedToAccessDatabase)
         }
 
-        print(String(repeating: "=", count: 80))
+        return .success(importedLogins)
     }
 
     // Step 1: Derive the key from the value stored in the Keychain under "Chrome Safe Storage".

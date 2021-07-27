@@ -37,6 +37,12 @@ final class BrowserImportViewController: NSViewController {
     }
 
     @IBOutlet var passwordsCheckbox: NSButton!
+    @IBOutlet var closeBrowserWarningLabel: NSTextField!
+    @IBOutlet var closeBrowserWarningView: ColorView! {
+        didSet {
+            closeBrowserWarningView.backgroundColor = NSColor.lightGray
+        }
+    }
 
     weak var delegate: BrowserImportViewControllerDelegate?
 

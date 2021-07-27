@@ -1,5 +1,5 @@
 //
-//  ChromeImporter.swift
+//  ChromeDataImporter.swift
 //
 //  Copyright © 2021 DuckDuckGo. All rights reserved.
 //
@@ -18,16 +18,25 @@
 
 import Foundation
 
-final class ChromeImporter: ChromiumImporter {
+final class ChromeDataImporter: ChromiumDataImporter {
+
+    static func chromeAppIcon() -> NSImage? {
+        guard let chromePath = NSWorkspace.shared.absolutePathForApplication(withBundleIdentifier: "com.google.Chrome") else {
+            return nil
+        }
+
+        return NSWorkspace.shared.icon(forFile: chromePath)
+    }
 
     override var processName: String {
         return "Chrome"
     }
 
-    init() {
+    init(loginImporter: LoginImporter) {
         let applicationSupport = FileManager.default.urls(for: .applicationSupportDirectory, in: .userDomainMask).first!
         let path = applicationSupport.appendingPathComponent("Google/Chrome/Default/").absoluteString
-        super.init(applicationDataDirectoryPath: path)
+
+        super.init(applicationDataDirectoryPath: path, loginImporter: loginImporter)
     }
 
 }

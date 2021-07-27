@@ -50,10 +50,12 @@ final class DataImportViewController: NSViewController {
 
             switch viewState.selectedImportSource {
             case .chrome:
-                self.dataImporter = ChromeImporter()
+                let secureVault = try? SecureVaultFactory.default.makeVault()
+                let secureVaultImporter = SecureVaultLoginImporter(secureVault: secureVault!)
+                self.dataImporter = ChromeDataImporter(loginImporter: secureVaultImporter)
             case .csv:
                 // Reset the data importer if the view has switched to the .csv state and a Chromium importer is still in use.
-                if self.dataImporter is ChromiumImporter {
+                if self.dataImporter is ChromiumDataImporter {
                     self.dataImporter = nil
                 }
             }
@@ -87,7 +89,9 @@ final class DataImportViewController: NSViewController {
         super.viewDidLoad()
 
         // This will change later to select the user's default browser.
-        self.dataImporter = ChromeImporter()
+        let secureVault = try? SecureVaultFactory.default.makeVault()
+        let secureVaultImporter = SecureVaultLoginImporter(secureVault: secureVault!)
+        self.dataImporter = ChromeDataImporter(loginImporter: secureVaultImporter)
         importSourcePopUpButton.displayImportSources(withSelectedSource: .chrome)
         renderCurrentViewState()
 
@@ -231,6 +235,7 @@ extension NSPopUpButton {
 
         for (index, source) in DataImport.Source.allCases.enumerated() {
             addItem(withTitle: source.importSourceName)
+            lastItem?.image = source.importSourceImage
 
             if source == selectedSource {
                 selectedSourceIndex = index

@@ -158,11 +158,12 @@
 		4BA1A6E6258C270800F6F690 /* EncryptionKeyGeneratorTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4BA1A6E5258C270800F6F690 /* EncryptionKeyGeneratorTests.swift */; };
 		4BA1A6F6258C4F9600F6F690 /* EncryptionMocks.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4BA1A6F5258C4F9600F6F690 /* EncryptionMocks.swift */; };
 		4BA1A6FE258C5C1300F6F690 /* EncryptedValueTransformerTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4BA1A6FD258C5C1300F6F690 /* EncryptedValueTransformerTests.swift */; };
-		4BB673F726AF6BD7006FC103 /* ChromiumImporter.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4BB673F626AF6BD7006FC103 /* ChromiumImporter.swift */; };
+		4BB673F726AF6BD7006FC103 /* ChromiumDataImporter.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4BB673F626AF6BD7006FC103 /* ChromiumDataImporter.swift */; };
 		4BB673F926AF741E006FC103 /* BrowserImportViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4BB673F826AF741E006FC103 /* BrowserImportViewController.swift */; };
-		4BB673FB26AF80A5006FC103 /* ChromeImporter.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4BB673FA26AF80A5006FC103 /* ChromeImporter.swift */; };
+		4BB673FB26AF80A5006FC103 /* ChromeDataImporter.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4BB673FA26AF80A5006FC103 /* ChromeDataImporter.swift */; };
 		4BB673FE26AF86F0006FC103 /* CryptoSwift in Frameworks */ = {isa = PBXBuildFile; productRef = 4BB673FD26AF86F0006FC103 /* CryptoSwift */; };
 		4BB6740026AF877F006FC103 /* CryptoExtensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4BB673FF26AF877F006FC103 /* CryptoExtensions.swift */; };
+		4BB6740226AF9E60006FC103 /* ChromiumLoginReader.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4BB6740126AF9E60006FC103 /* ChromiumLoginReader.swift */; };
 		4BB88B4525B7B55C006F6B06 /* DebugUserScript.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4BB88B4425B7B55C006F6B06 /* DebugUserScript.swift */; };
 		4BB88B4A25B7B690006F6B06 /* SequenceExtensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4BB88B4925B7B690006F6B06 /* SequenceExtensions.swift */; };
 		4BB88B5025B7BA2B006F6B06 /* TabInstrumentation.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4BB88B4F25B7BA2B006F6B06 /* TabInstrumentation.swift */; };
@@ -591,10 +592,11 @@
 		4BA1A6EA258C288C00F6F690 /* EncryptionKeyStoreTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EncryptionKeyStoreTests.swift; sourceTree = "<group>"; };
 		4BA1A6F5258C4F9600F6F690 /* EncryptionMocks.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EncryptionMocks.swift; sourceTree = "<group>"; };
 		4BA1A6FD258C5C1300F6F690 /* EncryptedValueTransformerTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EncryptedValueTransformerTests.swift; sourceTree = "<group>"; };
-		4BB673F626AF6BD7006FC103 /* ChromiumImporter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChromiumImporter.swift; sourceTree = "<group>"; };
+		4BB673F626AF6BD7006FC103 /* ChromiumDataImporter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChromiumDataImporter.swift; sourceTree = "<group>"; };
 		4BB673F826AF741E006FC103 /* BrowserImportViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BrowserImportViewController.swift; sourceTree = "<group>"; };
-		4BB673FA26AF80A5006FC103 /* ChromeImporter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChromeImporter.swift; sourceTree = "<group>"; };
+		4BB673FA26AF80A5006FC103 /* ChromeDataImporter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChromeDataImporter.swift; sourceTree = "<group>"; };
 		4BB673FF26AF877F006FC103 /* CryptoExtensions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CryptoExtensions.swift; sourceTree = "<group>"; };
+		4BB6740126AF9E60006FC103 /* ChromiumLoginReader.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChromiumLoginReader.swift; sourceTree = "<group>"; };
 		4BB88B4425B7B55C006F6B06 /* DebugUserScript.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DebugUserScript.swift; sourceTree = "<group>"; };
 		4BB88B4925B7B690006F6B06 /* SequenceExtensions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SequenceExtensions.swift; sourceTree = "<group>"; };
 		4BB88B4F25B7BA2B006F6B06 /* TabInstrumentation.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TabInstrumentation.swift; sourceTree = "<group>"; };
@@ -1276,8 +1278,9 @@
 		4BB673F526AF6BC4006FC103 /* Chromium */ = {
 			isa = PBXGroup;
 			children = (
-				4BB673F626AF6BD7006FC103 /* ChromiumImporter.swift */,
-				4BB673FA26AF80A5006FC103 /* ChromeImporter.swift */,
+				4BB673F626AF6BD7006FC103 /* ChromiumDataImporter.swift */,
+				4BB6740126AF9E60006FC103 /* ChromiumLoginReader.swift */,
+				4BB673FA26AF80A5006FC103 /* ChromeDataImporter.swift */,
 				4BB673FF26AF877F006FC103 /* CryptoExtensions.swift */,
 			);
 			path = Chromium;
@@ -2685,7 +2688,7 @@
 				B6A9E4612614608B0067D1B9 /* AppVersion.swift in Sources */,
 				856C98DF257014BD00A22F1F /* FileDownloadManager.swift in Sources */,
 				85480FBB25D181CB009424E3 /* ConfigurationDownloading.swift in Sources */,
-				4BB673FB26AF80A5006FC103 /* ChromeImporter.swift in Sources */,
+				4BB673FB26AF80A5006FC103 /* ChromeDataImporter.swift in Sources */,
 				AA2E423424C8A2270048C0D5 /* ColorView.swift in Sources */,
 				AAECA42024EEA4AC00EFA63A /* IndexPathExtension.swift in Sources */,
 				AA5C8F632591021700748EB7 /* NSApplicationExtension.swift in Sources */,
@@ -2738,7 +2741,7 @@
 				AA6820F125503DA9005ED0D5 /* FireViewModel.swift in Sources */,
 				AAA0CC6A253CC43C0079BC96 /* WKUserContentControllerExtension.swift in Sources */,
 				B6A9E45C261460350067D1B9 /* APIRequest.swift in Sources */,
-				4BB673F726AF6BD7006FC103 /* ChromiumImporter.swift in Sources */,
+				4BB673F726AF6BD7006FC103 /* ChromiumDataImporter.swift in Sources */,
 				4BB6740026AF877F006FC103 /* CryptoExtensions.swift in Sources */,
 				AA9FF95D24A1FA1C0039E328 /* TabCollection.swift in Sources */,
 				4B65143E263924B5005B46EB /* EmailUrlExtensions.swift in Sources */,
@@ -2823,6 +2826,7 @@
 				4B02198D25E05FAC00ED7DEA /* UndoFireproofingViewController.swift in Sources */,
 				AAE71E3725F7869300D74437 /* HomepageCollectionViewItem.swift in Sources */,
 				AAC5E4F625D6BF2C007F5990 /* AddressBarButtonsViewController.swift in Sources */,
+				4BB6740226AF9E60006FC103 /* ChromiumLoginReader.swift in Sources */,
 				853014D625E671A000FB8205 /* PageObserverUserScript.swift in Sources */,
 				B6A9E45B261460350067D1B9 /* APIHeaders.swift in Sources */,
 				AA6EF9B3250785D5004754E6 /* NSMenuExtension.swift in Sources */,

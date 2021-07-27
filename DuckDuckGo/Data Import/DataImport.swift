@@ -33,6 +33,15 @@ enum DataImport {
                 return UserText.importLoginsCSV
             }
         }
+
+        var importSourceImage: NSImage? {
+            switch self {
+            case .chrome:
+                return ChromeDataImporter.chromeAppIcon()
+            case .csv:
+                return nil
+            }
+        }
     }
 
     // Different data types (e.g. bookmarks) will be added later.
