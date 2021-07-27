@@ -164,6 +164,7 @@
 		4BB673FE26AF86F0006FC103 /* CryptoSwift in Frameworks */ = {isa = PBXBuildFile; productRef = 4BB673FD26AF86F0006FC103 /* CryptoSwift */; };
 		4BB6740026AF877F006FC103 /* CryptoExtensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4BB673FF26AF877F006FC103 /* CryptoExtensions.swift */; };
 		4BB6740226AF9E60006FC103 /* ChromiumLoginReader.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4BB6740126AF9E60006FC103 /* ChromiumLoginReader.swift */; };
+		4BB6740426AFBAA8006FC103 /* BraveImporter.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4BB6740326AFBAA8006FC103 /* BraveImporter.swift */; };
 		4BB88B4525B7B55C006F6B06 /* DebugUserScript.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4BB88B4425B7B55C006F6B06 /* DebugUserScript.swift */; };
 		4BB88B4A25B7B690006F6B06 /* SequenceExtensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4BB88B4925B7B690006F6B06 /* SequenceExtensions.swift */; };
 		4BB88B5025B7BA2B006F6B06 /* TabInstrumentation.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4BB88B4F25B7BA2B006F6B06 /* TabInstrumentation.swift */; };
@@ -597,6 +598,7 @@
 		4BB673FA26AF80A5006FC103 /* ChromeDataImporter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChromeDataImporter.swift; sourceTree = "<group>"; };
 		4BB673FF26AF877F006FC103 /* CryptoExtensions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CryptoExtensions.swift; sourceTree = "<group>"; };
 		4BB6740126AF9E60006FC103 /* ChromiumLoginReader.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChromiumLoginReader.swift; sourceTree = "<group>"; };
+		4BB6740326AFBAA8006FC103 /* BraveImporter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BraveImporter.swift; sourceTree = "<group>"; };
 		4BB88B4425B7B55C006F6B06 /* DebugUserScript.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DebugUserScript.swift; sourceTree = "<group>"; };
 		4BB88B4925B7B690006F6B06 /* SequenceExtensions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SequenceExtensions.swift; sourceTree = "<group>"; };
 		4BB88B4F25B7BA2B006F6B06 /* TabInstrumentation.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TabInstrumentation.swift; sourceTree = "<group>"; };
@@ -1281,6 +1283,7 @@
 				4BB673F626AF6BD7006FC103 /* ChromiumDataImporter.swift */,
 				4BB6740126AF9E60006FC103 /* ChromiumLoginReader.swift */,
 				4BB673FA26AF80A5006FC103 /* ChromeDataImporter.swift */,
+				4BB6740326AFBAA8006FC103 /* BraveImporter.swift */,
 				4BB673FF26AF877F006FC103 /* CryptoExtensions.swift */,
 			);
 			path = Chromium;
@@ -2720,6 +2723,7 @@
 				4B9292D52667123700AD2C21 /* BookmarkManagementDetailViewController.swift in Sources */,
 				AA4BBA3B25C58FA200C4FB0F /* MainMenu.swift in Sources */,
 				4B26FB4D269781CB0010AF6A /* DataImportViewController.swift in Sources */,
+				4BB6740426AFBAA8006FC103 /* BraveImporter.swift in Sources */,
 				AA585D84248FD31100E9A3E2 /* BrowserTabViewController.swift in Sources */,
 				B6A9E48926146ABF0067D1B9 /* PixelCounter.swift in Sources */,
 				AAE7527C263B056C00B973F8 /* HistoryStore.swift in Sources */,

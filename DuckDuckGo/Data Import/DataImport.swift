@@ -22,11 +22,14 @@ enum DataImport {
 
     // Third-party browser support will be added later.
     enum Source: CaseIterable {
+        case brave
         case chrome
         case csv
 
         var importSourceName: String {
             switch self {
+            case .brave:
+                return "Brave"
             case .chrome:
                 return "Chrome"
             case .csv:
@@ -36,6 +39,8 @@ enum DataImport {
 
         var importSourceImage: NSImage? {
             switch self {
+            case .brave:
+                return BraveDataImporter.braveAppIcon()
             case .chrome:
                 return ChromeDataImporter.chromeAppIcon()
             case .csv:

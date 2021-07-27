@@ -49,6 +49,10 @@ final class DataImportViewController: NSViewController {
             renderCurrentViewState()
 
             switch viewState.selectedImportSource {
+            case .brave:
+                let secureVault = try? SecureVaultFactory.default.makeVault()
+                let secureVaultImporter = SecureVaultLoginImporter(secureVault: secureVault!)
+                self.dataImporter = BraveDataImporter(loginImporter: secureVaultImporter)
             case .chrome:
                 let secureVault = try? SecureVaultFactory.default.makeVault()
                 let secureVaultImporter = SecureVaultLoginImporter(secureVault: secureVault!)
@@ -128,10 +132,13 @@ final class DataImportViewController: NSViewController {
 
     private func newChildViewController(for importSource: DataImport.Source, interactionState: InteractionState) -> NSViewController? {
         switch importSource {
+        case .brave:
+            let browserImportViewController = BrowserImportViewController.create(browserName: "Brave")
+            browserImportViewController.delegate = self
+            return browserImportViewController
         case .chrome:
             let browserImportViewController = BrowserImportViewController.create(browserName: "Chrome")
             browserImportViewController.delegate = self
-
             return browserImportViewController
         case .csv:
             if case let .completedImport(summaryArray) = interactionState {
