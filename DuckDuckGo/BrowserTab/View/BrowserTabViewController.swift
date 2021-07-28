@@ -183,7 +183,12 @@ final class BrowserTabViewController: NSViewController {
 
     private func openNewTab(with url: URL?, parentTab: Tab?, selected: Bool = false) {
         let tab = Tab(url: url, parentTab: parentTab, shouldLoadInBackground: true)
-        tabCollectionViewModel.append(tab: tab, selected: selected)
+
+        if parentTab != nil {
+            tabCollectionViewModel.insertChild(tab: tab, selected: selected)
+        } else {
+            tabCollectionViewModel.append(tab: tab, selected: selected)
+        }
     }
 
     // MARK: - Browser Tabs
@@ -197,24 +202,25 @@ final class BrowserTabViewController: NSViewController {
     private func show(tab type: Tab.TabType) {
         tabCollectionViewModel.selectedTabViewModel?.tab.set(tabType: type)
 
-        self.webView?.removeFromSuperview()
         self.homepageView.removeFromSuperview()
         removePreferencesPage()
         removeBookmarksPage()
 
         switch type {
         case .bookmarks:
+            self.webView?.removeFromSuperview()
             self.addChild(bookmarksViewController)
             view.addAndLayout(bookmarksViewController.view)
             bookmarksViewController.tabSwitcherButton.select(tabType: .bookmarks)
 
         case .preferences:
+            self.webView?.removeFromSuperview()
             self.addChild(preferencesViewController)
             view.addAndLayout(preferencesViewController.view)
             bookmarksViewController.tabSwitcherButton.select(tabType: .preferences)
 
         case .standard:
-            if let webView = self.webView {
+            if let webView = self.webView, webView.superview == nil {
                 addWebViewToViewHierarchy(webView)
             }
         }
@@ -440,6 +446,7 @@ extension BrowserTabViewController: ImageMenuItemSelectors {
     func copyImageAddress(_ sender: NSMenuItem) {
         guard let url = contextMenuImage else { return }
         NSPasteboard.general.clearContents()
+        NSPasteboard.general.setString(url.absoluteString, forType: .string)
         NSPasteboard.general.setString(url.absoluteString, forType: .URL)
     }
 
@@ -463,13 +470,10 @@ extension BrowserTabViewController: WKUIDelegate {
                  windowFeatures: WKWindowFeatures) -> WKWebView? {
 
         // Returned web view must be created with the specified configuration.
-        tabCollectionViewModel.appendNewTabAfterSelected(with: configuration)
-        guard let selectedViewModel = tabCollectionViewModel.selectedTabViewModel else {
-            os_log("%s: Selected tab view model is nil", type: .error, className)
-            return nil
-        }
+        let tab = Tab(webViewConfiguration: configuration, parentTab: tabViewModel?.tab)
+        tabCollectionViewModel.insertChild(tab: tab, selected: true)
         // WebKit loads the request in the returned web view.
-        return selectedViewModel.tab.webView
+        return tab.webView
     }
 
     @objc(_webView:checkUserMediaPermissionForURL:mainFrameURL:frameIdentifier:decisionHandler:)

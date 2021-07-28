@@ -94,7 +94,7 @@ final class TabBarViewItem: NSCollectionViewItem {
         if let url = currentURL, url.canFireproof {
             let menuItem: NSMenuItem
 
-            if FireproofDomains.shared.isAllowed(fireproofDomain: url.host ?? "") {
+            if FireproofDomains.shared.isFireproof(fireproofDomain: url.host ?? "") {
                 menuItem = NSMenuItem(title: UserText.removeFireproofing, action: #selector(removeFireproofingAction(_:)), keyEquivalent: "")
             } else {
                 menuItem = NSMenuItem(title: UserText.fireproofSite, action: #selector(fireproofSiteAction(_:)), keyEquivalent: "")
@@ -114,6 +114,12 @@ final class TabBarViewItem: NSCollectionViewItem {
         menu.addItem(moveToNewWindowMenuItem)
 
         return menu
+    }
+
+    var isLeftToSelected: Bool = false {
+        didSet {
+            updateSeparatorView()
+        }
     }
 
     @IBOutlet weak var faviconImageView: NSImageView! {
@@ -269,12 +275,19 @@ final class TabBarViewItem: NSCollectionViewItem {
             mouseOverView.mouseOverColor = isSelected || isDragged ? NSColor.clear : NSColor.tabMouseOverColor
         }
 
-        rightSeparatorView.isHidden = isSelected || isDragged
+        updateSeparatorView()
         closeButton.isHidden = !isSelected && !isDragged && widthStage.isCloseButtonHidden
         titleTextField.isHidden = widthStage.isTitleHidden
 
         tabLoadingViewCenterConstraint.priority = widthStage.isTitleHidden && widthStage.isCloseButtonHidden ? .defaultHigh : .defaultLow
         tabLoadingViewLeadingConstraint.priority = widthStage.isTitleHidden && widthStage.isCloseButtonHidden ? .defaultLow : .defaultHigh
+    }
+
+    private func updateSeparatorView() {
+        let newIsHidden = isSelected || isDragged || isLeftToSelected
+        if rightSeparatorView.isHidden != newIsHidden {
+            rightSeparatorView.isHidden = newIsHidden
+        }
     }
 
     @objc func setupMenu() {

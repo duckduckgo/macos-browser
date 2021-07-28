@@ -203,6 +203,11 @@ final class ProgressView: NSView, CAAnimationDelegate {
         super.layout()
 
         progressLayer.frame = bounds
+        defer {
+            lastKnownBounds = bounds
+        }
+        guard isShown else { return }
+
         let currentProgress = self.currentProgress(parentBounds: lastKnownBounds)
         progressMask.frame = calculateProgressMaskRect(for: currentProgress)
         progressMask.removeAnimation(forKey: Constants.progressAnimationKey)
@@ -210,8 +215,6 @@ final class ProgressView: NSView, CAAnimationDelegate {
         if targetProgress > currentProgress {
             self.increaseProgress(to: targetProgress, animationDuration: min(0, targetTime - CACurrentMediaTime()))
         }
-
-        lastKnownBounds = bounds
     }
 
     private func startGradientAnimation() {

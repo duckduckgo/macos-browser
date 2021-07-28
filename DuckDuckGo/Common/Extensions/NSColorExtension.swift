@@ -98,6 +98,10 @@ extension NSColor {
         NSColor(named: "PrivacyEnabledColor")!
     }
 
+    static var editingPanelColor: NSColor {
+        NSColor(named: "EditingPanelColor")!
+    }
+
     static let bookmarkRepresentingColor1 = NSColor(named: "BookmarkRepresentingColor1")!
     static let bookmarkRepresentingColor2 = NSColor(named: "BookmarkRepresentingColor2")!
     static let bookmarkRepresentingColor3 = NSColor(named: "BookmarkRepresentingColor3")!

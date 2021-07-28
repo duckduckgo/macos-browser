@@ -75,6 +75,7 @@ extension Pixel.Event {
              .bookmark,
              .manageBookmarks,
              .bookmarksList,
+             .manageLogins,
              .favorite,
              .navigation,
              .suggestionsDisplayed,

@@ -149,6 +149,7 @@ extension PreferencesListViewController: NSTableViewDataSource, NSTableViewDeleg
             let cell: PrivacySecurityPreferencesTableCellView? = createCell(identifier: PrivacySecurityPreferencesTableCellView.identifier,
                                                                             tableView: tableView)
             cell?.delegate = self
+            cell?.update(loginDetectionEnabled: PrivacySecurityPreferences().loginDetectionEnabled)
             return cell
         case .downloads:
             let cell: DownloadPreferencesTableCellView? = createCell(identifier: DownloadPreferencesTableCellView.identifier, tableView: tableView)
@@ -200,6 +201,11 @@ extension PreferencesListViewController: PrivacySecurityPreferencesTableCellView
     func privacySecurityPreferencesTableCellViewRequestedFireproofManagementModal(_ cell: PrivacySecurityPreferencesTableCellView) {
         let viewController = FireproofDomainsViewController.create()
         beginSheet(viewController)
+    }
+
+    func privacySecurityPreferencesTableCellView(_ cell: PrivacySecurityPreferencesTableCellView, setLoginDetectionEnabled enabled: Bool) {
+        var preferences = PrivacySecurityPreferences()
+        preferences.loginDetectionEnabled = enabled
     }
 
 }

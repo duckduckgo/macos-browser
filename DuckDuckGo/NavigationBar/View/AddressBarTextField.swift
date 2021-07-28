@@ -593,6 +593,11 @@ extension AddressBarTextField: NSTextFieldDelegate {
             return true
         }
 
+        if commandSelector == #selector(NSResponder.insertTab(_:)) {
+            window?.makeFirstResponder(nextKeyView)
+            return false
+        }
+
         guard suggestionWindowController?.window?.isVisible == true else {
             return false
         }
@@ -651,6 +656,10 @@ final class AddressBarTextEditor: NSTextView {
         } else {
             super.paste(sender)
         }
+    }
+
+    override func copy(_ sender: Any?) {
+        CopyHandler().copy(sender)
     }
 
     override func selectionRange(forProposedRange proposedCharRange: NSRange, granularity: NSSelectionGranularity) -> NSRange {

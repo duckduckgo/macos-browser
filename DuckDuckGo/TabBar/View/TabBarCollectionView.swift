@@ -39,6 +39,12 @@ final class TabBarCollectionView: NSCollectionView {
         setDraggingSourceOperationMask([.private], forLocal: true)
     }
 
+    override func selectItems(at indexPaths: Set<IndexPath>, scrollPosition: NSCollectionView.ScrollPosition) {
+        super.selectItems(at: indexPaths, scrollPosition: scrollPosition)
+
+        updateItemsLeftToSelectedItems(indexPaths)
+    }
+
     func clearSelection(animated: Bool = false) {
         if animated {
             animator().deselectItems(at: selectionIndexPaths)
@@ -74,6 +80,17 @@ final class TabBarCollectionView: NSCollectionView {
     func invalidateLayout() {
         NSAnimationContext.current.duration = 1/3
         collectionViewLayout?.invalidateLayout()
+    }
+
+    private func updateItemsLeftToSelectedItems(_ selectionIndexPaths: Set<IndexPath>) {
+        visibleItems().forEach {
+            ($0 as? TabBarViewItem)?.isLeftToSelected = false
+        }
+
+        for indexPath in selectionIndexPaths where indexPath.item > 0 {
+            let leftToSelectionIndexPath = IndexPath(item: indexPath.item - 1)
+            (item(at: leftToSelectionIndexPath) as? TabBarViewItem)?.isLeftToSelected = true
+        }
     }
 }
 
