@@ -24,6 +24,7 @@ import WebKit
 @testable import DuckDuckGo_Privacy_Browser
 
 // swiftlint:disable type_body_length
+// swiftlint:disable function_body_length
 final class GeolocationProviderTests: XCTestCase {
 
     let geolocationServiceMock = GeolocationServiceMock()
@@ -76,7 +77,6 @@ final class GeolocationProviderTests: XCTestCase {
     }
 
     override func setUp() {
-        NSApplication.swizzleIsActive(with: true)
         webView = makeWebView()
     }
 
@@ -102,7 +102,6 @@ final class GeolocationProviderTests: XCTestCase {
     }
 
     override func tearDown() {
-        NSApplication.restoreIsActive()
         geolocationServiceMock.onSubscriptionReceived = nil
         geolocationServiceMock.onSubscriptionCancelled = nil
         geolocationHandler = nil
@@ -133,6 +132,8 @@ final class GeolocationProviderTests: XCTestCase {
         }
 
         webView.loadHTMLString(Self.getCurrentPosition, baseURL: .duckDuckGo)
+        NSApp.activate(ignoringOtherApps: true)
+        webView.window?.orderFrontRegardless()
 
         waitForExpectations(timeout: 10.0)
         XCTAssertEqual(geolocationServiceMock.history, [.subscribed,
@@ -164,6 +165,9 @@ final class GeolocationProviderTests: XCTestCase {
         }
 
         webView.loadHTMLString(Self.getCurrentPosition, baseURL: .duckDuckGo)
+
+        NSApp.activate(ignoringOtherApps: true)
+        webView.window?.orderFrontRegardless()
         waitForExpectations(timeout: 10.0)
     }
 
@@ -178,6 +182,9 @@ final class GeolocationProviderTests: XCTestCase {
         }
 
         webView.loadHTMLString(Self.getCurrentPosition, baseURL: .duckDuckGo)
+        NSApp.activate(ignoringOtherApps: true)
+        webView.window?.orderFrontRegardless()
+
         waitForExpectations(timeout: 10.0)
 
     }
@@ -206,6 +213,9 @@ final class GeolocationProviderTests: XCTestCase {
         }
 
         webView.loadHTMLString(Self.watchPosition(), baseURL: .duckDuckGo)
+        NSApp.activate(ignoringOtherApps: true)
+        webView.window?.orderFrontRegardless()
+
         waitForExpectations(timeout: 10.0)
 
         XCTAssertEqual(geolocationServiceMock.history, [.subscribed,
@@ -253,6 +263,10 @@ final class GeolocationProviderTests: XCTestCase {
 
         webView.loadHTMLString(Self.watchPosition(), baseURL: .duckDuckGo)
         webView2.loadHTMLString(Self.watchPosition(), baseURL: .duckDuckGo)
+        NSApp.activate(ignoringOtherApps: true)
+        webView.window?.orderFrontRegardless()
+        webView2.window?.orderFrontRegardless()
+
         waitForExpectations(timeout: 10.0)
 
         let ec1 = expectation(description: "watch 1 cancelled")
@@ -312,6 +326,10 @@ final class GeolocationProviderTests: XCTestCase {
 
         webView.loadHTMLString(Self.watchPosition(), baseURL: .duckDuckGo)
         webView2.loadHTMLString(Self.watchPosition(), baseURL: .duckDuckGo)
+        NSApp.activate(ignoringOtherApps: true)
+        webView.window?.orderFrontRegardless()
+        webView2.window?.orderFrontRegardless()
+
         waitForExpectations(timeout: 10.0)
 
         let ec1 = expectation(description: "watch 1 cancelled")
@@ -355,6 +373,8 @@ final class GeolocationProviderTests: XCTestCase {
         }
 
         webView.loadHTMLString(Self.watchPosition(), baseURL: .duckDuckGo)
+        NSApp.activate(ignoringOtherApps: true)
+        webView.window?.orderFrontRegardless()
 
         waitForExpectations(timeout: 10.0)
 
@@ -384,6 +404,9 @@ final class GeolocationProviderTests: XCTestCase {
         }
 
         webView.loadHTMLString(Self.watchPosition(), baseURL: .duckDuckGo)
+        NSApp.activate(ignoringOtherApps: true)
+        webView.window?.orderFrontRegardless()
+
         waitForExpectations(timeout: 5)
 
         let e2 = expectation(description: "subscription received again")
@@ -422,6 +445,9 @@ final class GeolocationProviderTests: XCTestCase {
         }
 
         webView.loadHTMLString(Self.getCurrentPosition, baseURL: .duckDuckGo)
+        NSApp.activate(ignoringOtherApps: true)
+        webView.window?.orderFrontRegardless()
+        
         waitForExpectations(timeout: 5)
     }
 
@@ -443,6 +469,9 @@ final class GeolocationProviderTests: XCTestCase {
         }
 
         webView.loadHTMLString(Self.watchPosition(), baseURL: .duckDuckGo)
+        NSApp.activate(ignoringOtherApps: true)
+        webView.window?.orderFrontRegardless()
+
         waitForExpectations(timeout: 5)
 
         let e3 = expectation(description: "provider received error")
@@ -451,6 +480,8 @@ final class GeolocationProviderTests: XCTestCase {
             e3.fulfill()
         }
         webView.loadHTMLString(Self.watchPosition(), baseURL: .duckDuckGo)
+        NSApp.activate(ignoringOtherApps: true)
+        webView.window?.orderFrontRegardless()
 
         waitForExpectations(timeout: 5)
 
@@ -475,6 +506,9 @@ final class GeolocationProviderTests: XCTestCase {
         webView.configuration.processPool.geolocationProvider!.revoke()
 
         webView.loadHTMLString(Self.getCurrentPosition, baseURL: .duckDuckGo)
+        NSApp.activate(ignoringOtherApps: true)
+        webView.window?.orderFrontRegardless()
+
         waitForExpectations(timeout: 5)
 
         XCTAssertEqual(geolocationServiceMock.history, [.locationPublished])
@@ -492,6 +526,9 @@ final class GeolocationProviderTests: XCTestCase {
         webView.configuration.processPool.geolocationProvider!.revoke()
 
         webView.loadHTMLString(Self.getCurrentPosition, baseURL: .duckDuckGo)
+        NSApp.activate(ignoringOtherApps: true)
+        webView.window?.orderFrontRegardless()
+
         waitForExpectations(timeout: 5)
 
         let e2 = expectation(description: "received location")
@@ -506,6 +543,8 @@ final class GeolocationProviderTests: XCTestCase {
         }
         webView.configuration.processPool.geolocationProvider!.reset()
         webView.loadHTMLString(Self.getCurrentPosition, baseURL: .duckDuckGo)
+        NSApp.activate(ignoringOtherApps: true)
+        webView.window?.orderFrontRegardless()
 
         waitForExpectations(timeout: 5)
         XCTAssertEqual(geolocationServiceMock.history, [.locationPublished, .subscribed, .cancelled])
@@ -513,6 +552,7 @@ final class GeolocationProviderTests: XCTestCase {
 
 }
 // swiftlint:enable type_body_length
+// swiftlint:enable function_body_length
 
 extension GeolocationProviderTests: WKUIDelegate {
     @objc(_webView:requestGeolocationPermissionForFrame:decisionHandler:)
@@ -603,44 +643,4 @@ extension GeolocationProviderTests {
         }
 
     }
-}
-
-extension NSApplication {
-    private static var repIsActive: Bool?
-    private static var isSwizzled: Bool { repIsActive != nil }
-
-    private static let originalIsActive = {
-        class_getInstanceMethod(NSApplication.self, #selector(getter: isActive))!
-    }()
-    private static let swizzledIsActive = {
-        class_getInstanceMethod(NSApplication.self, #selector(swizzled_isActive))!
-    }()
-
-    static func swizzleIsActive(with replacement: Bool) {
-        dispatchPrecondition(condition: .onQueue(.main))
-        guard !self.isSwizzled else {
-            assertionFailure("Already swizzled")
-            return
-        }
-
-        method_exchangeImplementations(originalIsActive, swizzledIsActive)
-        self.repIsActive = replacement
-    }
-
-    static func restoreIsActive() {
-        dispatchPrecondition(condition: .onQueue(.main))
-        guard self.isSwizzled else {
-            assertionFailure("Method is not swizzled")
-            return
-        }
-
-        method_exchangeImplementations(originalIsActive, swizzledIsActive)
-        self.repIsActive = nil
-    }
-
-    @objc
-    func swizzled_isActive() -> Bool {
-        return Self.repIsActive!
-    }
-
 }
