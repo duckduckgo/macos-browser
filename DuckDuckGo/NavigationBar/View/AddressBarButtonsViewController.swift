@@ -105,7 +105,7 @@ final class AddressBarButtonsViewController: NSViewController {
             return
         }
 
-        if let host = selectedTabViewModel.tab.url?.host, FireproofDomains.shared.isAllowed(fireproofDomain: host) {
+        if let host = selectedTabViewModel.tab.url?.host, FireproofDomains.shared.isFireproof(fireproofDomain: host) {
             let viewController = FireproofInfoViewController.create(for: host)
             present(viewController, asPopoverRelativeTo: button.frame, of: button.superview!, preferredEdge: .minY, behavior: .transient)
         }
@@ -156,8 +156,8 @@ final class AddressBarButtonsViewController: NSViewController {
 
         // Fireproof button
         if let url = selectedTabViewModel.tab.url, url.showFireproofStatus, !privacyEntryPointButton.isHidden {
-            fireproofedButtonDivider.isHidden = !FireproofDomains.shared.isAllowed(fireproofDomain: url.host ?? "")
-            fireproofedButton.isHidden = !FireproofDomains.shared.isAllowed(fireproofDomain: url.host ?? "")
+            fireproofedButtonDivider.isHidden = !FireproofDomains.shared.isFireproof(fireproofDomain: url.host ?? "")
+            fireproofedButton.isHidden = !FireproofDomains.shared.isFireproof(fireproofDomain: url.host ?? "")
         } else {
             fireproofedButtonDivider.isHidden = true
             fireproofedButton.isHidden = true
@@ -199,8 +199,10 @@ final class AddressBarButtonsViewController: NSViewController {
         if let url = tabCollectionViewModel.selectedTabViewModel?.tab.url,
            isUrlBookmarked || bookmarkManager.isUrlBookmarked(url: url) {
             bookmarkButton.image = Self.bookmarkFilledImage
+            bookmarkButton.contentTintColor = NSColor.bookmarkFilledTint
         } else {
             bookmarkButton.image = Self.bookmarkImage
+            bookmarkButton.contentTintColor = nil
         }
     }
 
