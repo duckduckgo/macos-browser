@@ -279,6 +279,13 @@ extension Pixel.Event {
         case noFavorites = "no-favorites"
     }
 
+    enum HasHistoryEntry: String, CustomStringConvertible {
+        var description: String { rawValue }
+
+        case hasHistoryEntry = "has-history-entry"
+        case noHistoryEntry = "no-history-entry"
+    }
+
     enum SharingResult: String, CustomStringConvertible {
         var description: String { rawValue }
 

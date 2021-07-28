@@ -52,11 +52,12 @@ extension Pixel {
 
         case navigation(kind: NavigationKind, source: NavigationAccessPoint)
 
-        case suggestionsDisplayed(hasBookmark: HasBookmark, hasFavorite: HasFavorite)
+        case suggestionsDisplayed(hasBookmark: HasBookmark, hasFavorite: HasFavorite, hasHistoryEntry: HasHistoryEntry)
 
-        static func suggestionsDisplayed(_ arg: (hasBookmark: Bool, hasFavorite: Bool)) -> Event {
+        static func suggestionsDisplayed(_ arg: (hasBookmark: Bool, hasFavorite: Bool, hasHistoryEntry: Bool)) -> Event {
             return .suggestionsDisplayed(hasBookmark: arg.hasBookmark ? .hasBookmark : .noBookmarks,
-                                         hasFavorite: arg.hasFavorite ? .hasFavorite : .noFavorites)
+                                         hasFavorite: arg.hasFavorite ? .hasFavorite : .noFavorites,
+                                         hasHistoryEntry: arg.hasHistoryEntry ? .hasHistoryEntry : .noHistoryEntry)
         }
 
         case sharingMenu(repetition: Repetition = .init(key: "sharing"), result: SharingResult)
@@ -135,8 +136,8 @@ extension Pixel.Event {
         case .navigation(kind: let kind, source: let source):
             return "m_mac_navigation_\(kind)_\(source)"
 
-        case .suggestionsDisplayed(hasBookmark: let hasBookmark, hasFavorite: let hasFavorite):
-            return "m_mac_suggestions-displayed_\(hasBookmark)_\(hasFavorite)"
+        case .suggestionsDisplayed(hasBookmark: let hasBookmark, hasFavorite: let hasFavorite, hasHistoryEntry: let hasHistoryEntry):
+            return "m_mac_suggestions-displayed_\(hasBookmark)_\(hasFavorite)_\(hasHistoryEntry)"
 
         case .sharingMenu(repetition: let repetition, result: let result):
             return "m_mac_share_\(repetition)_\(result)"

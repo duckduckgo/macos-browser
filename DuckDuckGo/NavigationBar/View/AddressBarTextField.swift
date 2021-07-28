@@ -81,10 +81,12 @@ final class AddressBarTextField: NSTextField {
         suggestionItemsCancellable = suggestionContainerViewModel.suggestionContainer.$suggestions
             .receive(on: DispatchQueue.main)
             .sink { [weak self] _ in
-            if self?.suggestionContainerViewModel.suggestionContainer.suggestions?.count ?? 0 > 0 {
-                self?.showSuggestionWindow()
+                guard let self = self else { return }
+                if self.suggestionContainerViewModel.suggestionContainer.suggestions?.count ?? 0 > 0 {
+                    self.showSuggestionWindow()
+                    Pixel.fire(.suggestionsDisplayed(self.suggestionsContainLocalItems()))
+                }
             }
-        }
     }
 
     private func subscribeToSelectedSuggestionViewModel() {
@@ -445,18 +447,22 @@ final class AddressBarTextField: NSTextField {
         self.suggestionWindowController = windowController
     }
 
-    private func suggestionsContainBookmarkOrFavorite() -> (hasBookmark: Bool, hasFavorite: Bool) {
-        var result = (hasBookmark: false, hasFavorite: false)
+    private func suggestionsContainLocalItems() -> (hasBookmark: Bool, hasFavorite: Bool, hasHistoryEntry: Bool) {
+        var result = (hasBookmark: false, hasFavorite: false, hasHistoryEntry: false)
         for suggestion in self.suggestionContainerViewModel.suggestionContainer.suggestions ?? [] {
-            guard case .bookmark(title: _, url: _, isFavorite: let isFavorite) = suggestion else { continue }
-
-            if isFavorite {
-                result.hasFavorite = true
+            if case .bookmark(title: _, url: _, isFavorite: let isFavorite) = suggestion {
+                if isFavorite {
+                    result.hasFavorite = true
+                } else {
+                    result.hasBookmark = true
+                }
+            } else if case .historyEntry = suggestion {
+                result.hasHistoryEntry = true
             } else {
-                result.hasBookmark = true
+                continue
             }
 
-            if result.hasFavorite && result.hasBookmark {
+            if result.hasFavorite && result.hasBookmark && result.hasHistoryEntry {
                 break
             }
         }
@@ -468,8 +474,6 @@ final class AddressBarTextField: NSTextField {
             os_log("AddressBarTextField: Window not available", type: .error)
             return
         }
-
-        Pixel.fire(.suggestionsDisplayed(suggestionsContainBookmarkOrFavorite()))
 
         guard !suggestionWindow.isVisible, window.firstResponder == currentEditor() else { return }
 
