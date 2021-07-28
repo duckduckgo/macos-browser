@@ -95,12 +95,6 @@ final class GeolocationProvider: NSObject, GeolocationProviderProtocol {
         geolocationManager.setProvider(self)
     }
 
-    private struct GeolocationDisabled: Error, LocalizedError {
-        var errorDescription: String? {
-            "Geolocation sharing disabled"
-        }
-    }
-
     func revoke() {
         self.isActive = false
         self.isRevoked = true
@@ -114,6 +108,7 @@ final class GeolocationProvider: NSObject, GeolocationProviderProtocol {
         locationCancellable?.cancel()
     }
 
+    private struct GeolocationDisabled: Error {}
     fileprivate func startUpdatingLocation(geolocationManager: WKGeolocationManager) {
         guard !isRevoked else {
             geolocationManager.providerDidFailToDeterminePosition(GeolocationDisabled())
@@ -165,6 +160,7 @@ private func dynamicSymbol<T>(named symbolName: String) -> T? {
 
 private extension WKProcessPool {
 
+    // https://github.com/WebKit/WebKit/blob/8afe31a018b11741abdf9b4d5bb973d7c1d9ff05/Source/WebKit/UIProcess/API/C/WKContext.h#L171
     typealias WKContextGetGeolocationManagerType = @convention(c)
         (UnsafeRawPointer?) -> UnsafeRawPointer?
 
@@ -228,6 +224,7 @@ private struct WKGeolocationManager {
 
 }
 
+// https://github.com/WebKit/WebKit/blob/8afe31a018b11741abdf9b4d5bb973d7c1d9ff05/Source/WebKit/UIProcess/API/C/WKGeolocationPosition.h
 private typealias WKGeolocationPositionCreate_c_type =  @convention(c) // swiftlint:disable:this type_name
     (/*timestamp:*/ Double, /*latitude:*/ Double, /*longitude:*/ Double, /*accuracy:*/ Double,
      /*providesAltitude:*/ Bool, /*altitude:*/ Double, /*providesAltitudeAccuracy:*/ Bool,

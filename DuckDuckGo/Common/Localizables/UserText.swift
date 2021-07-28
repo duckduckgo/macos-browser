@@ -138,7 +138,6 @@ struct UserText {
     static let permissionCamera = NSLocalizedString("permission.camera", value: "camera", comment: "Camera input media device name")
     static let permissionAndPermissionFormat = NSLocalizedString("permission.permissionAndPermission", value: "%@ and %@", comment: "%@(camera) and %@(microphone) input media devices name")
     static let permissionGeolocation = NSLocalizedString("permission.geolocation", value: "geolocation", comment: "User's Geolocation permission access name")
-    static let permissionSound = NSLocalizedString("permission.sound", value: "audio playback", comment: "User's Audio Playback permission name")
 
     static let permissionMuteFormat = NSLocalizedString("permission.mute", value: "Pause %@", comment: "Temporarily pause input media device %@ access")
     static let permissionUnmuteFormat = NSLocalizedString("permission.unmute", value: "Resume %@", comment: "Resume input media device %@ access")

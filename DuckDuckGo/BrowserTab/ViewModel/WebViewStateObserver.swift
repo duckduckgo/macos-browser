@@ -19,7 +19,6 @@
 import Cocoa
 import WebKit
 import os.log
-import Combine
 
 final class WebViewStateObserver: NSObject {
 

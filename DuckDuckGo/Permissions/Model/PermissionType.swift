@@ -22,8 +22,6 @@ enum PermissionType: String, CaseIterable {
     case camera
     case microphone
     case geolocation
-    case sound
-    case display
 }
 
 extension Array where Element == PermissionType {
@@ -51,7 +49,7 @@ extension Array where Element == PermissionType {
             result.append(.microphone)
         }
         if devices.contains(.display) {
-            result.append(.display)
+            assertionFailure("Unexpected permission")
         }
         guard !result.isEmpty else { return nil }
         self = result

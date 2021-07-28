@@ -146,12 +146,6 @@ final class PermissionContextMenu: NSMenu {
             deeplink = URL(string: "x-apple.systempreferences:com.apple.preference.security?Privacy_Microphone")!
         case .geolocation:
             deeplink = URL(string: "x-apple.systempreferences:com.apple.preference.security?Privacy_LocationServices")!
-        case .some(.sound):
-            assertionFailure("Unexpected Sound permission")
-            return
-        case .display:
-            assertionFailure("Not implemented")
-            return
         case .none:
             assertionFailure("Permissions expected")
             return

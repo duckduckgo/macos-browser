@@ -40,15 +40,6 @@ extension Dictionary where Key == PermissionType, Value == PermissionState {
         }
     }
 
-    var sound: PermissionState? {
-        get {
-            self[.sound]
-        }
-        set {
-            self[.sound] = newValue
-        }
-    }
-
     var geolocation: PermissionState? {
         get {
             self[.geolocation]

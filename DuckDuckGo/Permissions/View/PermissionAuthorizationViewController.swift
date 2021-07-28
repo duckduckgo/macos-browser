@@ -27,11 +27,6 @@ extension PermissionType {
             return UserText.permissionMicrophone
         case .geolocation:
             return UserText.permissionGeolocation
-        case .sound:
-            return UserText.permissionSound
-        case .display:
-            assertionFailure("Unexpected permission")
-            return "display capture"
         }
     }
 }

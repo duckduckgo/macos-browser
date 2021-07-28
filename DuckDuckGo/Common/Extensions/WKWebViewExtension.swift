@@ -64,7 +64,6 @@ extension WKWebView {
                 fatalError("Not implemented")
             }
         }
-
     }
 
     var microphoneState: CaptureState {
@@ -99,10 +98,6 @@ extension WKWebView {
             return .muted
         }
         return .active
-    }
-
-    var soundState: CaptureState {
-        return .none
     }
 
     private func setMediaCaptureMuted(_ muted: Bool) {
@@ -149,8 +144,6 @@ extension WKWebView {
                 }
             case .geolocation:
                 self.configuration.processPool.geolocationProvider?.isPaused = muted
-            case .sound, .display:
-                fatalError("Not implemented")
             }
         }
     }
@@ -175,8 +168,6 @@ extension WKWebView {
                 }
             case .geolocation:
                 self.configuration.processPool.geolocationProvider?.revoke()
-            case .sound, .display:
-                fatalError("Not implemented")
             }
         }
         group.notify(queue: .main) {
