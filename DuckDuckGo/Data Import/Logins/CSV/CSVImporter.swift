@@ -22,16 +22,19 @@ final class CSVImporter: DataImporter {
 
     struct InferredCredentialColumnPositions {
 
+        let maximumIndex: Int
+
         let titleIndex: Int?
         let urlIndex: Int
         let usernameIndex: Int
         let passwordIndex: Int
 
-        internal init(titleIndex: Int?, urlIndex: Int, usernameIndex: Int, passwordIndex: Int) {
+        init(titleIndex: Int?, urlIndex: Int, usernameIndex: Int, passwordIndex: Int, maximumIndex: Int) {
             self.titleIndex = titleIndex
             self.urlIndex = urlIndex
             self.usernameIndex = usernameIndex
             self.passwordIndex = passwordIndex
+            self.maximumIndex = maximumIndex
         }
 
         init?(csvValues: [String]) {
@@ -53,7 +56,11 @@ final class CSVImporter: DataImporter {
             }
 
             if let url = urlPosition, let  username = usernamePosition, let password = passwordPosition {
-                self.init(titleIndex: titlePosition, urlIndex: url, usernameIndex: username, passwordIndex: password)
+                self.init(titleIndex: titlePosition,
+                          urlIndex: url,
+                          usernameIndex: username,
+                          passwordIndex: password,
+                          maximumIndex: csvValues.count - 1)
             } else {
                 return nil
             }

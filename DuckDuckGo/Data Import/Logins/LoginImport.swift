@@ -47,6 +47,8 @@ struct ImportedLoginCredential: Equatable {
 
     init?(row: [String], inferredColumnPositions: CSVImporter.InferredCredentialColumnPositions? = nil) {
         if let inferredPositions = inferredColumnPositions {
+            guard row.count - 1 == inferredPositions.maximumIndex else { return nil }
+
             var title: String?
 
             if let titleIndex = inferredPositions.titleIndex {

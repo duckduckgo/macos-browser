@@ -60,10 +60,6 @@ final class CSVLoginExporter: LoginExporter {
             let username = credential.account.username
             let password = credential.password.utf8String() ?? ""
 
-            if domain.isEmpty || username.isEmpty || password.isEmpty {
-                return nil
-            }
-
             // Ensure that exported passwords escape any quotes they contain
             let escapedPassword = password.replacingOccurrences(of: "\"", with: "\\\"")
 
