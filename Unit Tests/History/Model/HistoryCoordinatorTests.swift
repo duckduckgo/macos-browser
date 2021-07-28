@@ -182,7 +182,6 @@ class HistoryCoordinatorTests: XCTestCase {
         XCTAssert(historyStoringMock.savedHistoryEntries.last?.failedToLoad ?? false)
     }
 
-
     func testWhenUrlIsMarkedAsFailedToLoadAndItIsVisitedAgain_ThenFailedToLoadFlagIsSetToFalse() {
         let (historyStoringMock, historyCoordinator) = HistoryCoordinator.aHistoryCoordinator
 
