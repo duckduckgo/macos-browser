@@ -199,8 +199,10 @@ final class AddressBarButtonsViewController: NSViewController {
         if let url = tabCollectionViewModel.selectedTabViewModel?.tab.url,
            isUrlBookmarked || bookmarkManager.isUrlBookmarked(url: url) {
             bookmarkButton.image = Self.bookmarkFilledImage
+            bookmarkButton.contentTintColor = NSColor.bookmarkFilledTint
         } else {
             bookmarkButton.image = Self.bookmarkImage
+            bookmarkButton.contentTintColor = nil
         }
     }
 
