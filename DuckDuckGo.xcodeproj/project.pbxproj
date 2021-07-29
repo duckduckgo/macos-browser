@@ -59,6 +59,13 @@
 		4B1AD91725FC46FB00261379 /* CoreDataEncryptionTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B1AD91625FC46FB00261379 /* CoreDataEncryptionTests.swift */; };
 		4B1AD92125FC474E00261379 /* CoreDataEncryptionTesting.xcdatamodeld in Sources */ = {isa = PBXBuildFile; fileRef = 4B11060325903E570039B979 /* CoreDataEncryptionTesting.xcdatamodeld */; };
 		4B4F72EC266B2ED300814C60 /* CollectionExtension.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B4F72EB266B2ED300814C60 /* CollectionExtension.swift */; };
+		4B59023D26B35F3600489384 /* ChromeDataImporter.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B59023826B35F3600489384 /* ChromeDataImporter.swift */; };
+		4B59023E26B35F3600489384 /* ChromiumLoginReader.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B59023926B35F3600489384 /* ChromiumLoginReader.swift */; };
+		4B59023F26B35F3600489384 /* CryptoExtensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B59023A26B35F3600489384 /* CryptoExtensions.swift */; };
+		4B59024026B35F3600489384 /* ChromiumDataImporter.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B59023B26B35F3600489384 /* ChromiumDataImporter.swift */; };
+		4B59024126B35F3600489384 /* BraveImporter.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B59023C26B35F3600489384 /* BraveImporter.swift */; };
+		4B59024326B35F7C00489384 /* BrowserImportViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B59024226B35F7C00489384 /* BrowserImportViewController.swift */; };
+		4B59024626B35FFE00489384 /* CryptoSwift in Frameworks */ = {isa = PBXBuildFile; productRef = 4B59024526B35FFE00489384 /* CryptoSwift */; };
 		4B6160D825B150E4007DE5B2 /* trackerData.json in Resources */ = {isa = PBXBuildFile; fileRef = 4B6160D725B150E4007DE5B2 /* trackerData.json */; };
 		4B6160DD25B152C5007DE5B2 /* ContentBlockerRulesUserScript.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B6160DC25B152C5007DE5B2 /* ContentBlockerRulesUserScript.swift */; };
 		4B6160E525B152FA007DE5B2 /* ContentBlockerUserScript.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B6160E425B152FA007DE5B2 /* ContentBlockerUserScript.swift */; };
@@ -494,6 +501,12 @@
 		4B1AD8A125FC27E200261379 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		4B1AD91625FC46FB00261379 /* CoreDataEncryptionTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CoreDataEncryptionTests.swift; sourceTree = "<group>"; };
 		4B4F72EB266B2ED300814C60 /* CollectionExtension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CollectionExtension.swift; sourceTree = "<group>"; };
+		4B59023826B35F3600489384 /* ChromeDataImporter.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ChromeDataImporter.swift; sourceTree = "<group>"; };
+		4B59023926B35F3600489384 /* ChromiumLoginReader.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ChromiumLoginReader.swift; sourceTree = "<group>"; };
+		4B59023A26B35F3600489384 /* CryptoExtensions.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CryptoExtensions.swift; sourceTree = "<group>"; };
+		4B59023B26B35F3600489384 /* ChromiumDataImporter.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ChromiumDataImporter.swift; sourceTree = "<group>"; };
+		4B59023C26B35F3600489384 /* BraveImporter.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = BraveImporter.swift; sourceTree = "<group>"; };
+		4B59024226B35F7C00489384 /* BrowserImportViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = BrowserImportViewController.swift; sourceTree = "<group>"; };
 		4B6160D225B14E6E007DE5B2 /* TrackerRadarManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TrackerRadarManager.swift; sourceTree = "<group>"; };
 		4B6160D725B150E4007DE5B2 /* trackerData.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; path = trackerData.json; sourceTree = "<group>"; };
 		4B6160DC25B152C5007DE5B2 /* ContentBlockerRulesUserScript.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentBlockerRulesUserScript.swift; sourceTree = "<group>"; };
@@ -889,6 +902,7 @@
 				AA06B6B72672AF8100F541C5 /* Sparkle in Frameworks */,
 				85F4D1C4266695C9002DD869 /* BrowserServicesKit in Frameworks */,
 				85FF55C825F82E4F00E2AB99 /* Lottie in Frameworks */,
+				4B59024626B35FFE00489384 /* CryptoSwift in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -1047,6 +1061,18 @@
 			path = "Integration Tests";
 			sourceTree = "<group>";
 		};
+		4B59023726B35F3600489384 /* Chromium */ = {
+			isa = PBXGroup;
+			children = (
+				4B59023826B35F3600489384 /* ChromeDataImporter.swift */,
+				4B59023926B35F3600489384 /* ChromiumLoginReader.swift */,
+				4B59023A26B35F3600489384 /* CryptoExtensions.swift */,
+				4B59023B26B35F3600489384 /* ChromiumDataImporter.swift */,
+				4B59023C26B35F3600489384 /* BraveImporter.swift */,
+			);
+			path = Chromium;
+			sourceTree = "<group>";
+		};
 		4B6160D125B14E5E007DE5B2 /* ContentBlocker */ = {
 			isa = PBXGroup;
 			children = (
@@ -1151,6 +1177,7 @@
 		4B723DEC26B0002B00E14D75 /* View */ = {
 			isa = PBXGroup;
 			children = (
+				4B59024226B35F7C00489384 /* BrowserImportViewController.swift */,
 				4B723DED26B0002B00E14D75 /* DataImport.storyboard */,
 				4B723DEE26B0002B00E14D75 /* DataImportViewController.swift */,
 				4B723DEF26B0002B00E14D75 /* CSVImportViewController.swift */,
@@ -1162,6 +1189,7 @@
 		4B723DF126B0002B00E14D75 /* Logins */ = {
 			isa = PBXGroup;
 			children = (
+				4B59023726B35F3600489384 /* Chromium */,
 				4B723DF426B0002B00E14D75 /* LoginImport.swift */,
 				4B723DF226B0002B00E14D75 /* SecureVault */,
 				4B723DF526B0002B00E14D75 /* CSV */,
@@ -2433,6 +2461,7 @@
 				B65783F425F8ACA400D8DB33 /* Punnycode */,
 				85F4D1C3266695C9002DD869 /* BrowserServicesKit */,
 				AA06B6B62672AF8100F541C5 /* Sparkle */,
+				4B59024526B35FFE00489384 /* CryptoSwift */,
 			);
 			productName = DuckDuckGo;
 			productReference = AA585D7E248FD31100E9A3E2 /* DuckDuckGo Privacy Browser.app */;
@@ -2499,6 +2528,7 @@
 				B6DA44152616C13800DD1EC2 /* XCRemoteSwiftPackageReference "OHHTTPStubs" */,
 				85F4D1C2266695C9002DD869 /* XCRemoteSwiftPackageReference "BrowserServicesKit" */,
 				AA06B6B52672AF8100F541C5 /* XCRemoteSwiftPackageReference "Sparkle" */,
+				4B59024426B35FFE00489384 /* XCRemoteSwiftPackageReference "CryptoSwift" */,
 			);
 			productRefGroup = AA585D7F248FD31100E9A3E2 /* Products */;
 			projectDirPath = "";
@@ -2658,6 +2688,7 @@
 				4B0511BC262CAA5A00F6079C /* AppearancePreferences.swift in Sources */,
 				4B92928D26670D1700AD2C21 /* BookmarkOutlineViewCell.swift in Sources */,
 				4BB88B5025B7BA2B006F6B06 /* TabInstrumentation.swift in Sources */,
+				4B59024326B35F7C00489384 /* BrowserImportViewController.swift in Sources */,
 				4B9292D72667124000AD2C21 /* NSPopUpButtonExtension.swift in Sources */,
 				4B677437255DBEB800025BD8 /* HTTPSUpgrade.swift in Sources */,
 				85D33F1225C82EB3002B91A6 /* ConfigurationManager.swift in Sources */,
@@ -2681,6 +2712,7 @@
 				4B9292D22667123700AD2C21 /* AddFolderModalViewController.swift in Sources */,
 				4B92929E26670D2A00AD2C21 /* BookmarkSidebarTreeController.swift in Sources */,
 				4BB88B4A25B7B690006F6B06 /* SequenceExtensions.swift in Sources */,
+				4B59024026B35F3600489384 /* ChromiumDataImporter.swift in Sources */,
 				B6A924DE2664CA09001A28CA /* LegacyWebKitDownloadDelegate.swift in Sources */,
 				AAA0CC3C25337FAB0079BC96 /* WKBackForwardListItemViewModel.swift in Sources */,
 				AAE71E3125F7855400D74437 /* HomepageViewController.swift in Sources */,
@@ -2744,6 +2776,7 @@
 				B6A9E4612614608B0067D1B9 /* AppVersion.swift in Sources */,
 				856C98DF257014BD00A22F1F /* FileDownloadManager.swift in Sources */,
 				85CC1D73269EF1880062F04E /* PasswordManagementItemList.swift in Sources */,
+				4B59023F26B35F3600489384 /* CryptoExtensions.swift in Sources */,
 				85480FBB25D181CB009424E3 /* ConfigurationDownloading.swift in Sources */,
 				AA2E423424C8A2270048C0D5 /* ColorView.swift in Sources */,
 				AAECA42024EEA4AC00EFA63A /* IndexPathExtension.swift in Sources */,
@@ -2769,6 +2802,7 @@
 				B63D466925BEB6C200874977 /* WKWebView+SessionState.swift in Sources */,
 				4B723E1226B0006E00E14D75 /* DataImport.swift in Sources */,
 				B6A924D92664C72E001A28CA /* WebKitDownloadTask.swift in Sources */,
+				4B59023E26B35F3600489384 /* ChromiumLoginReader.swift in Sources */,
 				85D885B326A5A9DE0077C374 /* NSAlert+PasswordManager.swift in Sources */,
 				85E11C2F25E7DC7E00974CAF /* ExternalURLHandler.swift in Sources */,
 				85308E27267FCB22001ABD76 /* PasswordManagerSettings.swift in Sources */,
@@ -2875,6 +2909,7 @@
 				85308E25267FC9F2001ABD76 /* NSAlertExtension.swift in Sources */,
 				4B0511D8262CAA7000F6079C /* PaddedImageButton.swift in Sources */,
 				AABEE69C24A902BB0043105B /* SuggestionContainer.swift in Sources */,
+				4B59024126B35F3600489384 /* BraveImporter.swift in Sources */,
 				B6A9E46B2614618A0067D1B9 /* OperatingSystemVersionExtension.swift in Sources */,
 				85AC3AEF25D5CE9800C7D2AA /* UserScripts.swift in Sources */,
 				4B677439255DBEB800025BD8 /* HTTPSUpgradeStore.swift in Sources */,
@@ -2883,6 +2918,7 @@
 				4B02198D25E05FAC00ED7DEA /* UndoFireproofingViewController.swift in Sources */,
 				AAE71E3725F7869300D74437 /* HomepageCollectionViewItem.swift in Sources */,
 				AAC5E4F625D6BF2C007F5990 /* AddressBarButtonsViewController.swift in Sources */,
+				4B59023D26B35F3600489384 /* ChromeDataImporter.swift in Sources */,
 				853014D625E671A000FB8205 /* PageObserverUserScript.swift in Sources */,
 				B6A9E45B261460350067D1B9 /* APIHeaders.swift in Sources */,
 				85625996269C953C00EE44BC /* PasswordManagementViewController.swift in Sources */,
@@ -3519,6 +3555,14 @@
 /* End XCConfigurationList section */
 
 /* Begin XCRemoteSwiftPackageReference section */
+		4B59024426B35FFE00489384 /* XCRemoteSwiftPackageReference "CryptoSwift" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "git@github.com:krzyzanowskim/CryptoSwift.git";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 1.4.1;
+			};
+		};
 		4B82E9B125B69E3E00656FE7 /* XCRemoteSwiftPackageReference "TrackerRadarKit" */ = {
 			isa = XCRemoteSwiftPackageReference;
 			repositoryURL = "https://github.com/duckduckgo/TrackerRadarKit.git";
@@ -3570,6 +3614,11 @@
 /* End XCRemoteSwiftPackageReference section */
 
 /* Begin XCSwiftPackageProductDependency section */
+		4B59024526B35FFE00489384 /* CryptoSwift */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 4B59024426B35FFE00489384 /* XCRemoteSwiftPackageReference "CryptoSwift" */;
+			productName = CryptoSwift;
+		};
 		4B82E9B225B69E3E00656FE7 /* TrackerRadarKit */ = {
 			isa = XCSwiftPackageProductDependency;
 			package = 4B82E9B125B69E3E00656FE7 /* XCRemoteSwiftPackageReference "TrackerRadarKit" */;
