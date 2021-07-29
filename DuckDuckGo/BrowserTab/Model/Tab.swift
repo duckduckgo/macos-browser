@@ -392,6 +392,7 @@ final class Tab: NSObject {
             userScripts.autofillScript.emailDelegate = emailManager
             userScripts.autofillScript.vaultDelegate = vaultManager
             userScripts.pageObserverScript.delegate = self
+            userScripts.printingUserScript.delegate = self
 
             attachFindInPage()
 
@@ -438,6 +439,18 @@ final class Tab: NSObject {
 
     func updateVisitTitle(_ title: String, url: URL) {
         historyCoordinating.updateTitleIfNeeded(title: title, url: url)
+    }
+
+}
+
+extension Tab: PrintingUserScriptDelegate {
+
+    func printingUserScriptDidRequestPrintController(_ script: PrintingUserScript) {
+        if #available(macOS 11.0, *) {
+            // This might throw an exception when running from Xcode, hit resume and it will continue.
+            // Release builds work fine.
+            webView.printOperation(with: NSPrintInfo.shared).run()
+        }
     }
 
 }

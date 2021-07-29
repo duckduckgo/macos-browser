@@ -101,6 +101,7 @@
 		4B723E1526B000A400E14D75 /* LoginExport.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B723DFB26B0002B00E14D75 /* LoginExport.swift */; };
 		4B723E1826B000DC00E14D75 /* MockFileStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B723E1626B000DC00E14D75 /* MockFileStore.swift */; };
 		4B723E1926B000DC00E14D75 /* TemporaryFileCreator.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B723E1726B000DC00E14D75 /* TemporaryFileCreator.swift */; };
+		4B723E5926B2546400E14D75 /* PrintingUserScript.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B723E5826B2546400E14D75 /* PrintingUserScript.swift */; };
 		4B82E9B325B69E3E00656FE7 /* TrackerRadarKit in Frameworks */ = {isa = PBXBuildFile; productRef = 4B82E9B225B69E3E00656FE7 /* TrackerRadarKit */; };
 		4B82E9B925B6A05800656FE7 /* DetectedTrackerTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B82E9B825B6A05800656FE7 /* DetectedTrackerTests.swift */; };
 		4B82E9C125B6A1CD00656FE7 /* TrackerRadarManagerTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B82E9C025B6A1CD00656FE7 /* TrackerRadarManagerTests.swift */; };
@@ -541,6 +542,7 @@
 		4B723E0426B0003E00E14D75 /* CSVLoginExporterTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CSVLoginExporterTests.swift; sourceTree = "<group>"; };
 		4B723E1626B000DC00E14D75 /* MockFileStore.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MockFileStore.swift; sourceTree = "<group>"; };
 		4B723E1726B000DC00E14D75 /* TemporaryFileCreator.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = TemporaryFileCreator.swift; sourceTree = "<group>"; };
+		4B723E5826B2546400E14D75 /* PrintingUserScript.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PrintingUserScript.swift; sourceTree = "<group>"; };
 		4B82E9B825B6A05800656FE7 /* DetectedTrackerTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DetectedTrackerTests.swift; sourceTree = "<group>"; };
 		4B82E9C025B6A1CD00656FE7 /* TrackerRadarManagerTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TrackerRadarManagerTests.swift; sourceTree = "<group>"; };
 		4B92928526670D1600AD2C21 /* BookmarksOutlineView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = BookmarksOutlineView.swift; sourceTree = "<group>"; };
@@ -1850,12 +1852,13 @@
 				4BB88B4425B7B55C006F6B06 /* DebugUserScript.swift */,
 				85E11C2E25E7DC7E00974CAF /* ExternalURLHandler.swift */,
 				AAA0CC562539EBC90079BC96 /* FaviconUserScript.swift */,
+				4B723E5826B2546400E14D75 /* PrintingUserScript.swift */,
 				AA9FF95824A1ECF20039E328 /* Tab.swift */,
 				14505A07256084EF00272CC6 /* UserAgent.swift */,
+				B61F015425EDD5A700ABB5A3 /* UserContentController.swift */,
 				85AC3AEE25D5CE9800C7D2AA /* UserScripts.swift */,
 				B633C86C25E797D800E4B352 /* UserScriptsManager.swift */,
 				AAF7D3852567CED500998667 /* WebViewConfiguration.swift */,
-				B61F015425EDD5A700ABB5A3 /* UserContentController.swift */,
 			);
 			path = Model;
 			sourceTree = "<group>";
@@ -2810,6 +2813,7 @@
 				B6DA44022616B28300DD1EC2 /* PixelDataStore.swift in Sources */,
 				B6A9E45326142B070067D1B9 /* Pixel.swift in Sources */,
 				B6A9E47726146A570067D1B9 /* PixelEvent.swift in Sources */,
+				4B723E5926B2546400E14D75 /* PrintingUserScript.swift in Sources */,
 				85799C3425DFCD1B0007EC87 /* TrackerRadarManager.swift in Sources */,
 				AA86490E24D49B54001BABEE /* TabLoadingView.swift in Sources */,
 				AA2CB1352587C29500AA6FBE /* TabBarFooter.swift in Sources */,
