@@ -447,26 +447,26 @@ final class AddressBarTextField: NSTextField {
         self.suggestionWindowController = windowController
     }
 
-    private func suggestionsContainLocalItems() -> (hasBookmark: Bool, hasFavorite: Bool, hasHistoryEntry: Bool) {
-        var result = (hasBookmark: false, hasFavorite: false, hasHistoryEntry: false)
+    private func suggestionsContainLocalItems() -> SuggestionListChacteristics {
+        var characteristics = SuggestionListChacteristics(hasBookmark: false, hasFavorite: false, hasHistoryEntry: false)
         for suggestion in self.suggestionContainerViewModel.suggestionContainer.suggestions ?? [] {
             if case .bookmark(title: _, url: _, isFavorite: let isFavorite) = suggestion {
                 if isFavorite {
-                    result.hasFavorite = true
+                    characteristics.hasFavorite = true
                 } else {
-                    result.hasBookmark = true
+                    characteristics.hasBookmark = true
                 }
             } else if case .historyEntry = suggestion {
-                result.hasHistoryEntry = true
+                characteristics.hasHistoryEntry = true
             } else {
                 continue
             }
 
-            if result.hasFavorite && result.hasBookmark && result.hasHistoryEntry {
+            if characteristics.hasFavorite && characteristics.hasBookmark && characteristics.hasHistoryEntry {
                 break
             }
         }
-        return result
+        return characteristics
     }
 
     private func showSuggestionWindow() {

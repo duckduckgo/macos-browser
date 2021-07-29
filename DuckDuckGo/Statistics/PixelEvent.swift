@@ -55,10 +55,10 @@ extension Pixel {
 
         case suggestionsDisplayed(hasBookmark: HasBookmark, hasFavorite: HasFavorite, hasHistoryEntry: HasHistoryEntry)
 
-        static func suggestionsDisplayed(_ arg: (hasBookmark: Bool, hasFavorite: Bool, hasHistoryEntry: Bool)) -> Event {
-            return .suggestionsDisplayed(hasBookmark: arg.hasBookmark ? .hasBookmark : .noBookmarks,
-                                         hasFavorite: arg.hasFavorite ? .hasFavorite : .noFavorites,
-                                         hasHistoryEntry: arg.hasHistoryEntry ? .hasHistoryEntry : .noHistoryEntry)
+        static func suggestionsDisplayed(_ characteristics: SuggestionListChacteristics) -> Event {
+            return .suggestionsDisplayed(hasBookmark: characteristics.hasBookmark ? .hasBookmark : .noBookmarks,
+                                         hasFavorite: characteristics.hasFavorite ? .hasFavorite : .noFavorites,
+                                         hasHistoryEntry: characteristics.hasHistoryEntry ? .hasHistoryEntry : .noHistoryEntry)
         }
 
         case sharingMenu(repetition: Repetition = .init(key: "sharing"), result: SharingResult)
