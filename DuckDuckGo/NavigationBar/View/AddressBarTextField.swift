@@ -81,10 +81,12 @@ final class AddressBarTextField: NSTextField {
         suggestionItemsCancellable = suggestionContainerViewModel.suggestionContainer.$suggestions
             .receive(on: DispatchQueue.main)
             .sink { [weak self] _ in
-            if self?.suggestionContainerViewModel.suggestionContainer.suggestions?.count ?? 0 > 0 {
-                self?.showSuggestionWindow()
+                guard let self = self else { return }
+                if self.suggestionContainerViewModel.suggestionContainer.suggestions?.count ?? 0 > 0 {
+                    self.showSuggestionWindow()
+                    Pixel.fire(.suggestionsDisplayed(self.suggestionsContainLocalItems()))
+                }
             }
-        }
     }
 
     private func subscribeToSelectedSuggestionViewModel() {
@@ -219,7 +221,7 @@ final class AddressBarTextField: NSTextField {
         let finalUrl: URL?
         switch suggestion {
         case .bookmark(title: _, url: let url, isFavorite: _),
-             .historyEntry(title: _, url: let url),
+             .historyEntry(title: _, url: let url, allowedInTopHits: _),
              .website(url: let url):
             finalUrl = url
         case .phrase(phrase: let phrase),
@@ -331,7 +333,7 @@ final class AddressBarTextField: NSTextField {
                 self = Suffix.visit(host: host)
 
             case .bookmark(title: _, url: let url, isFavorite: _),
-                 .historyEntry(title: _, url: let url):
+                 .historyEntry(title: _, url: let url, allowedInTopHits: _):
                 if let title = suggestionViewModel.title,
                    !title.isEmpty,
                    suggestionViewModel.autocompletionString != title {
@@ -445,22 +447,26 @@ final class AddressBarTextField: NSTextField {
         self.suggestionWindowController = windowController
     }
 
-    private func suggestionsContainBookmarkOrFavorite() -> (hasBookmark: Bool, hasFavorite: Bool) {
-        var result = (hasBookmark: false, hasFavorite: false)
+    private func suggestionsContainLocalItems() -> SuggestionListChacteristics {
+        var characteristics = SuggestionListChacteristics(hasBookmark: false, hasFavorite: false, hasHistoryEntry: false)
         for suggestion in self.suggestionContainerViewModel.suggestionContainer.suggestions ?? [] {
-            guard case .bookmark(title: _, url: _, isFavorite: let isFavorite) = suggestion else { continue }
-
-            if isFavorite {
-                result.hasFavorite = true
+            if case .bookmark(title: _, url: _, isFavorite: let isFavorite) = suggestion {
+                if isFavorite {
+                    characteristics.hasFavorite = true
+                } else {
+                    characteristics.hasBookmark = true
+                }
+            } else if case .historyEntry = suggestion {
+                characteristics.hasHistoryEntry = true
             } else {
-                result.hasBookmark = true
+                continue
             }
 
-            if result.hasFavorite && result.hasBookmark {
+            if characteristics.hasFavorite && characteristics.hasBookmark && characteristics.hasHistoryEntry {
                 break
             }
         }
-        return result
+        return characteristics
     }
 
     private func showSuggestionWindow() {
@@ -468,8 +474,6 @@ final class AddressBarTextField: NSTextField {
             os_log("AddressBarTextField: Window not available", type: .error)
             return
         }
-
-        Pixel.fire(.suggestionsDisplayed(suggestionsContainBookmarkOrFavorite()))
 
         guard !suggestionWindow.isVisible, window.firstResponder == currentEditor() else { return }
 

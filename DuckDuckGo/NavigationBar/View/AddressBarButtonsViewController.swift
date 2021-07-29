@@ -199,8 +199,10 @@ final class AddressBarButtonsViewController: NSViewController {
         if let url = tabCollectionViewModel.selectedTabViewModel?.tab.url,
            isUrlBookmarked || bookmarkManager.isUrlBookmarked(url: url) {
             bookmarkButton.image = Self.bookmarkFilledImage
+            bookmarkButton.contentTintColor = NSColor.bookmarkFilledTint
         } else {
             bookmarkButton.image = Self.bookmarkImage
+            bookmarkButton.contentTintColor = nil
         }
     }
 
@@ -231,11 +233,12 @@ final class AddressBarButtonsViewController: NSViewController {
     }
 
     @objc private func showUndoFireproofingPopover(_ sender: Notification) {
-        guard let domain = sender.userInfo?[FireproofDomains.Constants.newFireproofDomainKey] as? String else { return }
+        guard view.window?.isKeyWindow == true,
+            let domain = sender.userInfo?[FireproofDomains.Constants.newFireproofDomainKey] as? String else { return }
 
         DispatchQueue.main.async {
             let viewController = UndoFireproofingViewController.create(for: domain)
-            let frame = self.fireproofedButton.frame.insetBy(dx: -10, dy: -10)
+            let frame = self.fireproofedButton.frame.insetFromLineOfDeath()
 
             self.present(viewController,
                          asPopoverRelativeTo: frame,

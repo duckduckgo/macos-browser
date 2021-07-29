@@ -121,15 +121,19 @@ final class MainMenu: NSMenu {
             }
     }
 
+    // Nested recursing functions cause body length
+    // swiftlint:disable function_body_length
     func updateBookmarksMenu(favoriteViewModels: [BookmarkViewModel], topLevelBookmarkViewModels: [BookmarkViewModel]) {
 
-        func bookmarkMenuItems(from bookmarkViewModels: [BookmarkViewModel]) -> [NSMenuItem] {
+        func bookmarkMenuItems(from bookmarkViewModels: [BookmarkViewModel], topLevel: Bool = true) -> [NSMenuItem] {
             var menuItems = [NSMenuItem]()
 
-            let showOpenInTabsItem = bookmarkViewModels.compactMap { $0.entity as? Bookmark }.count > 1
-            if  showOpenInTabsItem {
-                menuItems.append(NSMenuItem(bookmarkViewModels: bookmarkViewModels))
-                menuItems.append(.separator())
+            if !topLevel {
+                let showOpenInTabsItem = bookmarkViewModels.compactMap { $0.entity as? Bookmark }.count > 1
+                if showOpenInTabsItem {
+                    menuItems.append(NSMenuItem(bookmarkViewModels: bookmarkViewModels))
+                    menuItems.append(.separator())
+                }
             }
 
             for viewModel in bookmarkViewModels {
@@ -138,7 +142,7 @@ final class MainMenu: NSMenu {
                 if let folder = viewModel.entity as? BookmarkFolder {
                     let subMenu = NSMenu(title: folder.title)
                     let childViewModels = folder.children.map(BookmarkViewModel.init)
-                    let childMenuItems = bookmarkMenuItems(from: childViewModels)
+                    let childMenuItems = bookmarkMenuItems(from: childViewModels, topLevel: false)
                     subMenu.items = childMenuItems
 
                     if !subMenu.items.isEmpty {
@@ -183,6 +187,7 @@ final class MainMenu: NSMenu {
         let favoriteItems = favoriteMenuItems(from: favoriteViewModels)
         favoritesMenu.items = Array(cleanedFavoriteItems) + favoriteItems
     }
+    // swiftlint:enable function_body_length
 
 }
 

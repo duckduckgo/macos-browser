@@ -50,21 +50,13 @@ final class SuggestionContainerViewModel {
 
         if self.isTopSuggestionSelectionExpected,
            let userStringValue = self.userStringValue,
-           let firstSuggestion = self.suggestionViewModel(at: 0) {
-            // select first Bookmark/Website match
-            switch firstSuggestion.suggestion {
-            case .bookmark, .website, .historyEntry:
-                // only select suggestion when the user value won't change
-                guard firstSuggestion.autocompletionString.lowercased()
-                        .hasPrefix(userStringValue.lowercased())
-                else { break }
-
-                return true
-            case .phrase, .unknown:
-                break
-            }
+           let firstSuggestion = self.suggestionViewModel(at: 0),
+           firstSuggestion.suggestion.allowedForAutocompletion,
+           firstSuggestion.autocompletionString.lowercased().hasPrefix(userStringValue.lowercased()) {
+            return true
+        } else {
+            return false
         }
-        return false
     }
 
     private func subscribeToSuggestions() {

@@ -196,12 +196,16 @@ extension URL {
     }
 
     func toString(forUserInput input: String, decodePunycode: Bool = true) -> String {
-        self.toString(decodePunycode: decodePunycode,
-                      dropScheme: input.isEmpty
-                        || !input.hasOrIsPrefix(of: self.separatedScheme ?? ""),
-                      needsWWW: !input.drop(prefix: self.separatedScheme ?? "").isEmpty
-                        && input.drop(prefix: self.separatedScheme ?? "").hasOrIsPrefix(of: URL.HostPrefix.www.rawValue),
-                      dropTrailingSlash: false)
+        let hasInputScheme = input.hasOrIsPrefix(of: self.separatedScheme ?? "")
+        let hasInputWww = input.drop(prefix: self.separatedScheme ?? "").hasOrIsPrefix(of: URL.HostPrefix.www.rawValue)
+        let hasInputHost = (decodePunycode ? host?.idnaDecoded : host)?.hasOrIsPrefix(of: input) ?? false
+
+        return self.toString(decodePunycode: decodePunycode,
+                             dropScheme: input.isEmpty || !(hasInputScheme && !hasInputHost),
+                             needsWWW: !input.drop(prefix: self.separatedScheme ?? "").isEmpty
+                                && hasInputWww
+                                && !hasInputHost,
+                             dropTrailingSlash: !input.hasSuffix("/"))
     }
 
     /// Tries to use the file name part of the URL, if available, adjusting for content type, if available.
@@ -250,7 +254,7 @@ extension URL {
         return URL(string: "https://duckduckgo.com/about")!
     }
 
-    static var duckDuckGoEmail = URL(string: "https://quack.duckduckgo.com/email/dashboard")!
+    static var duckDuckGoEmail = URL(string: "https://duckduckgo.com/email-protection")!
 
     static var duckDuckGoMorePrivacyInfo = URL(string: "https://help.duckduckgo.com/duckduckgo-help-pages/privacy/atb/")!
 

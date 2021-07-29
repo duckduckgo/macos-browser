@@ -131,9 +131,9 @@ final class AddressBarViewController: NSViewController {
             passiveTextField.stringValue = ""
             return
         }
-        passiveAddressBarStringCancellable = selectedTabViewModel.$passiveAddressBarString.sink { [weak self] _ in
-            self?.updatePassiveTextField()
-        }
+        passiveAddressBarStringCancellable = selectedTabViewModel.$passiveAddressBarString
+            .receive(on: DispatchQueue.main)
+            .weakAssign(to: \.stringValue, on: passiveTextField)
     }
 
     private func subscribeToProgressEvents() {
@@ -181,15 +181,6 @@ final class AddressBarViewController: NSViewController {
             self.updateMode()
             self.updateButtons()
         }
-    }
-
-    private func updatePassiveTextField() {
-        guard let selectedTabViewModel = tabCollectionViewModel.selectedTabViewModel else {
-            os_log("%s: Selected tab view model is nil", type: .error, className)
-            return
-        }
-
-        passiveTextField.stringValue = selectedTabViewModel.passiveAddressBarString
     }
 
     private func updateView(firstResponder: Bool) {
