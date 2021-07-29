@@ -23,16 +23,16 @@ import Combine
 final class PrivacyDashboardViewController: NSViewController {
 
     @IBOutlet var webView: WKWebView!
-    private let privacyDashboarScript = PrivacyDashboardUserScript()
+    private let privacyDashboardScript = PrivacyDashboardUserScript()
     private var cancellables = Set<AnyCancellable>()
 
     weak var tabViewModel: TabViewModel?
     var serverTrustViewModel: ServerTrustViewModel?
 
     override func viewDidLoad() {
-        privacyDashboarScript.delegate = self
+        privacyDashboardScript.delegate = self
         initWebView()
-        webView.configuration.userContentController.addHandler(privacyDashboarScript)
+        webView.configuration.userContentController.addHandlerNoContentWorld(privacyDashboardScript)
     }
 
     override func viewWillAppear() {
@@ -45,14 +45,13 @@ final class PrivacyDashboardViewController: NSViewController {
     }
 
     private func initWebView() {
-
-#if DEBUG
         let configuration = WKWebViewConfiguration()
+        
+#if DEBUG
         configuration.preferences.setValue(true, forKey: "developerExtrasEnabled")
-        let webView = WKWebView(frame: .zero, configuration: configuration)
-#else
-        let webView = WKWebView(frame: .zero)
 #endif
+        
+        let webView = WKWebView(frame: .zero, configuration: configuration)
         webView.navigationDelegate = self
         self.webView = webView
         view.addAndLayout(webView)
@@ -71,7 +70,7 @@ final class PrivacyDashboardViewController: NSViewController {
             return
         }
         guard let domain = tabViewModel?.tab.url?.host else {
-            privacyDashboarScript.setPermissions(Permissions(), authorizationState: [:], domain: "", in: webView)
+            privacyDashboardScript.setPermissions(Permissions(), authorizationState: [:], domain: "", in: webView)
             return
         }
 
@@ -86,7 +85,7 @@ final class PrivacyDashboardViewController: NSViewController {
             authState[permissionType] = alwaysGrant ? .grant : .deny
         }
 
-        privacyDashboarScript.setPermissions(usedPermissions, authorizationState: authState, domain: domain, in: webView)
+        privacyDashboardScript.setPermissions(usedPermissions, authorizationState: authState, domain: domain, in: webView)
     }
 
     private func subscribeToTrackerInfo() {
@@ -96,7 +95,7 @@ final class PrivacyDashboardViewController: NSViewController {
             .receive(on: DispatchQueue.main)
             .sink(receiveValue: { [weak self] trackerInfo in
                 guard let self = self, let trackerInfo = trackerInfo, let tabUrl = self.tabViewModel?.tab.url else { return }
-                self.privacyDashboarScript.setTrackerInfo(tabUrl, trackerInfo: trackerInfo, webView: self.webView)
+                self.privacyDashboardScript.setTrackerInfo(tabUrl, trackerInfo: trackerInfo, webView: self.webView)
             })
             .store(in: &cancellables)
     }
@@ -110,7 +109,7 @@ final class PrivacyDashboardViewController: NSViewController {
             .receive(on: DispatchQueue.main)
             .sink(receiveValue: { [weak self] serverTrustViewModel in
                 guard let self = self, let serverTrustViewModel = serverTrustViewModel else { return }
-                self.privacyDashboarScript.setServerTrust(serverTrustViewModel, webView: self.webView)
+                self.privacyDashboardScript.setServerTrust(serverTrustViewModel, webView: self.webView)
             })
             .store(in: &cancellables)
     }

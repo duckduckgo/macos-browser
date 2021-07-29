@@ -160,7 +160,7 @@ final class PrivacyDashboardUserScript: NSObject, StaticUserScript {
     }
 
     private func evaluate(js: String, in webView: WKWebView) {
-            webView.evaluateJavaScript(js)
+        webView.evaluateJavaScript(js)
     }
 
 }

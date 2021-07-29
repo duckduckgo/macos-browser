@@ -22,27 +22,33 @@ import BrowserServicesKit
 
 extension WKUserContentController {
 
+    func addHandlerNoContentWorld(_ userScript: UserScript) {
+        for messageName in userScript.messageNames {
+            add(userScript, name: messageName)
+        }
+    }
+    
     func addHandler(_ userScript: UserScript) {
         for messageName in userScript.messageNames {
-//            if #available(macOS 11.0, *) {
-//                if let handlerWithReply = userScript as? WKScriptMessageHandlerWithReply {
-//                    addScriptMessageHandler(handlerWithReply, contentWorld: .defaultClient, name: messageName)
-//                } else {
-//                    add(userScript, contentWorld: .defaultClient, name: messageName)
-//                }
-//            } else {
+            if #available(macOS 11.0, *) {
+                if let handlerWithReply = userScript as? WKScriptMessageHandlerWithReply {
+                    addScriptMessageHandler(handlerWithReply, contentWorld: .defaultClient, name: messageName)
+                } else {
+                    add(userScript, contentWorld: .defaultClient, name: messageName)
+                }
+            } else {
                 add(userScript, name: messageName)
-//            }
+            }
         }
     }
 
     func removeHandler(_ userScript: UserScript) {
         userScript.messageNames.forEach {
-//            if #available(macOS 11.0, *) {
-//                removeScriptMessageHandler(forName: $0, contentWorld: .defaultClient)
-//            } else {
+            if #available(macOS 11.0, *) {
+                removeScriptMessageHandler(forName: $0, contentWorld: .defaultClient)
+            } else {
                 removeScriptMessageHandler(forName: $0)
-//            }
+            }
         }
     }
 
