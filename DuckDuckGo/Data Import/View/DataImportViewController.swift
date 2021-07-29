@@ -93,7 +93,7 @@ final class DataImportViewController: NSViewController {
         case .unableToImport:
             importButton.title = UserText.initiateImport
             importButton.isEnabled = false
-            cancelButton.isHidden = true
+            cancelButton.isHidden = false
         case .ableToImport:
             importButton.title = UserText.initiateImport
             importButton.isEnabled = true
