@@ -57,6 +57,8 @@ final class DataImportViewController: NSViewController {
                 let secureVault = try? SecureVaultFactory.default.makeVault()
                 let secureVaultImporter = SecureVaultLoginImporter(secureVault: secureVault!)
                 self.dataImporter = ChromeDataImporter(loginImporter: secureVaultImporter)
+            case .edge:
+                assertionFailure()
             case .csv:
                 // Reset the data importer if the view has switched to the .csv state and a Chromium importer is still in use.
                 if self.dataImporter is ChromiumDataImporter {
@@ -149,6 +151,12 @@ final class DataImportViewController: NSViewController {
             let browserImportViewController = BrowserImportViewController.create(with: .chrome)
             browserImportViewController.delegate = self
             return browserImportViewController
+        case .edge:
+            if let viewController = currentChildViewController as? BrowserImportViewController, viewController.browser == .edge { return nil }
+
+            let browserImportViewController = BrowserImportViewController.create(with: .edge)
+            browserImportViewController.delegate = self
+            return browserImportViewController
         case .csv:
             if case let .completedImport(summaryArray) = interactionState {
                 if currentChildViewController is CSVImportSummaryViewController { return nil }
@@ -195,6 +203,18 @@ final class DataImportViewController: NSViewController {
         guard let importer = self.dataImporter else {
             assertionFailure("\(#file): No data importer found")
             return
+        }
+
+        if let browser = ThirdPartyBrowser.browser(for: viewState.selectedImportSource), browser.isRunning {
+            let alert = NSAlert.closeRunningBrowserAlert()
+            let result = alert.runModal()
+
+            if result == NSApplication.ModalResponse.alertFirstButtonReturn {
+                browser.forceTerminate()
+            } else {
+                // If the cancel button was selected, abandon the import.
+                return
+            }
         }
 
         // When importing data from specific browsers, this will change to only import those types which the user has selected.
@@ -267,9 +287,12 @@ extension NSPopUpButton {
     func displayImportSources(withSelectedSource selectedSource: DataImport.Source) {
         removeAllItems()
 
+        let validSources = DataImport.Source.allCases.filter(\.canUseAsSource)
         var selectedSourceIndex: Int?
 
-        for (index, source) in DataImport.Source.allCases.enumerated() {
+        for (index, source) in validSources.enumerated() {
+            guard source.canUseAsSource else { continue }
+
             addItem(withTitle: source.importSourceName)
             lastItem?.image = source.importSourceImage
 
@@ -279,6 +302,22 @@ extension NSPopUpButton {
         }
 
         selectItem(at: selectedSourceIndex ?? 0)
+    }
+
+}
+
+extension NSAlert {
+
+    static func closeRunningBrowserAlert() -> NSAlert {
+        let alert = NSAlert()
+
+        alert.messageText = "Close Browser"
+        alert.informativeText = "This browser must be closed before importing data. Would you like to close it now?"
+        alert.alertStyle = .warning
+        alert.addButton(withTitle: "Close Browser")
+        alert.addButton(withTitle: "Cancel")
+
+        return alert
     }
 
 }

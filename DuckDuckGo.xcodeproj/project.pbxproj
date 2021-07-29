@@ -66,6 +66,7 @@
 		4B59024126B35F3600489384 /* BraveImporter.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B59023C26B35F3600489384 /* BraveImporter.swift */; };
 		4B59024326B35F7C00489384 /* BrowserImportViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B59024226B35F7C00489384 /* BrowserImportViewController.swift */; };
 		4B59024626B35FFE00489384 /* CryptoSwift in Frameworks */ = {isa = PBXBuildFile; productRef = 4B59024526B35FFE00489384 /* CryptoSwift */; };
+		4B59024826B3673600489384 /* ThirdPartyBrowser.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B59024726B3673600489384 /* ThirdPartyBrowser.swift */; };
 		4B6160D825B150E4007DE5B2 /* trackerData.json in Resources */ = {isa = PBXBuildFile; fileRef = 4B6160D725B150E4007DE5B2 /* trackerData.json */; };
 		4B6160DD25B152C5007DE5B2 /* ContentBlockerRulesUserScript.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B6160DC25B152C5007DE5B2 /* ContentBlockerRulesUserScript.swift */; };
 		4B6160E525B152FA007DE5B2 /* ContentBlockerUserScript.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B6160E425B152FA007DE5B2 /* ContentBlockerUserScript.swift */; };
@@ -507,6 +508,7 @@
 		4B59023B26B35F3600489384 /* ChromiumDataImporter.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ChromiumDataImporter.swift; sourceTree = "<group>"; };
 		4B59023C26B35F3600489384 /* BraveImporter.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = BraveImporter.swift; sourceTree = "<group>"; };
 		4B59024226B35F7C00489384 /* BrowserImportViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = BrowserImportViewController.swift; sourceTree = "<group>"; };
+		4B59024726B3673600489384 /* ThirdPartyBrowser.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ThirdPartyBrowser.swift; sourceTree = "<group>"; };
 		4B6160D225B14E6E007DE5B2 /* TrackerRadarManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TrackerRadarManager.swift; sourceTree = "<group>"; };
 		4B6160D725B150E4007DE5B2 /* trackerData.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; path = trackerData.json; sourceTree = "<group>"; };
 		4B6160DC25B152C5007DE5B2 /* ContentBlockerRulesUserScript.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentBlockerRulesUserScript.swift; sourceTree = "<group>"; };
@@ -1168,6 +1170,7 @@
 			isa = PBXGroup;
 			children = (
 				4B723DEB26B0002B00E14D75 /* DataImport.swift */,
+				4B59024726B3673600489384 /* ThirdPartyBrowser.swift */,
 				4B723DEC26B0002B00E14D75 /* View */,
 				4B723DF126B0002B00E14D75 /* Logins */,
 			);
@@ -2907,6 +2910,7 @@
 				AA72D5F025FEA49900C77619 /* AddEditFavoriteWindow.swift in Sources */,
 				1456D6E124EFCBC300775049 /* TabBarCollectionView.swift in Sources */,
 				85308E25267FC9F2001ABD76 /* NSAlertExtension.swift in Sources */,
+				4B59024826B3673600489384 /* ThirdPartyBrowser.swift in Sources */,
 				4B0511D8262CAA7000F6079C /* PaddedImageButton.swift in Sources */,
 				AABEE69C24A902BB0043105B /* SuggestionContainer.swift in Sources */,
 				4B59024126B35F3600489384 /* BraveImporter.swift in Sources */,

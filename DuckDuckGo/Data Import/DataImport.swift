@@ -20,10 +20,10 @@ import Foundation
 
 enum DataImport {
 
-    // Third-party browser support will be added later.
     enum Source: CaseIterable {
         case brave
         case chrome
+        case edge
         case csv
 
         var importSourceName: String {
@@ -32,6 +32,8 @@ enum DataImport {
                 return "Brave"
             case .chrome:
                 return "Chrome"
+            case .edge:
+                return "Edge"
             case .csv:
                 return UserText.importLoginsCSV
             }
@@ -40,11 +42,26 @@ enum DataImport {
         var importSourceImage: NSImage? {
             switch self {
             case .brave:
-                return BraveDataImporter.braveAppIcon()
+                return ThirdPartyBrowser.brave.applicationIcon
             case .chrome:
-                return ChromeDataImporter.chromeAppIcon()
+                return ThirdPartyBrowser.chrome.applicationIcon
+            case .edge:
+                return ThirdPartyBrowser.edge.applicationIcon
             case .csv:
                 return nil
+            }
+        }
+
+        var canUseAsSource: Bool {
+            switch self {
+            case .brave:
+                return ThirdPartyBrowser.brave.isInstalled
+            case .chrome:
+                return ThirdPartyBrowser.chrome.isInstalled
+            case .edge:
+                return ThirdPartyBrowser.edge.isInstalled
+            case .csv:
+                return true
             }
         }
 
