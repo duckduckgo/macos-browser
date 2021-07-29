@@ -27,7 +27,6 @@ final class SaveCredentialsPopover: NSPopover {
 
         self.animates = false
         self.behavior = .applicationDefined
-        self.delegate = self
 
         setupContentController()
     }
@@ -54,14 +53,6 @@ extension SaveCredentialsPopover: SaveCredentialsDelegate {
         DispatchQueue.main.async {
             self.close()
         }
-    }
-
-}
-
-extension SaveCredentialsPopover: NSPopoverDelegate {
-
-    func popoverWillClose(_ notification: Notification) {
-        print(#function, notification)
     }
 
 }
