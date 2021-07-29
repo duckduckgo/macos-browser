@@ -549,6 +549,7 @@ extension Tab: WKNavigationDelegate {
 
     struct ErrorCodes {
         static let frameLoadInterrupted = 102
+        static let internetConnectionOffline = -1009
     }
     
     func webView(_ webView: WKWebView,
@@ -676,7 +677,12 @@ extension Tab: WKNavigationDelegate {
 
             return
         }
+
         self.error = error
+
+        if (error as NSError).code != ErrorCodes.internetConnectionOffline, let failingUrl = error.failingUrl {
+            historyCoordinating.markFailedToLoadUrl(failingUrl)
+        }
     }
 
     func webView(_ webView: WKWebView, didReceiveServerRedirectForProvisionalNavigation navigation: WKNavigation!) {
