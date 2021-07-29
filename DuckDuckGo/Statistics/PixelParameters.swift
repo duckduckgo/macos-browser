@@ -75,12 +75,15 @@ extension Pixel.Event {
              .bookmark,
              .manageBookmarks,
              .bookmarksList,
+             .manageLogins,
              .favorite,
              .navigation,
              .suggestionsDisplayed,
              .sharingMenu,
              .moreMenu,
-             .refresh:
+             .refresh,
+             .importedLogins,
+             .exportedLogins:
 
             return nil
         }

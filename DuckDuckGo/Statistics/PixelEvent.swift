@@ -39,6 +39,7 @@ extension Pixel {
 
         case manageBookmarks(repetition: Repetition = .init(key: "manage-bookmarks"), source: AccessPoint)
         case bookmarksList(repetition: Repetition = .init(key: "bookmarks-list"), source: AccessPoint)
+        case manageLogins(repetition: Repetition = .init(key: "manage-logins"), source: AccessPoint)
 
         case bookmark(fireproofed: IsBookmarkFireproofed, repetition: Repetition = .init(key: "bookmark"), source: AccessPoint)
         case favorite(fireproofed: IsBookmarkFireproofed, repetition: Repetition = .init(key: "favorite"), source: AccessPoint)
@@ -64,6 +65,9 @@ extension Pixel {
         case moreMenu(repetition: Repetition = .init(key: "more"), result: MoreResult)
 
         case refresh(source: RefreshAccessPoint)
+
+        case importedLogins(repetition: Repetition = .init(key: "imported-logins"), source: DataImportSource)
+        case exportedLogins(repetition: Repetition = .init(key: "exported-logins"))
 
         case debug(event: Debug, error: Error? = nil, countedBy: Pixel.Counter? = nil)
 
@@ -126,6 +130,9 @@ extension Pixel.Event {
         case .bookmarksList(repetition: let repetition, source: let source):
             return "m_mac_bookmarks-list_\(repetition)_\(source)"
 
+        case .manageLogins(repetition: let repetition, source: let source):
+            return "m_mac_manage-logins_\(repetition)_\(source)"
+
         case .bookmark(fireproofed: let fireproofed, repetition: let repetition, source: let source):
             return "m_mac_bookmark_\(fireproofed)_\(repetition)_\(source)"
 
@@ -146,6 +153,12 @@ extension Pixel.Event {
 
         case .refresh(source: let source):
             return "m_mac_refresh_\(source)"
+
+        case .importedLogins(repetition: let repetition, source: let source):
+            return "m_mac_imported-logins_\(repetition)_\(source)"
+
+        case .exportedLogins(repetition: let repetition):
+            return "m_mac_exported-logins_\(repetition)"
 
         case .debug(event: let event, error: _, countedBy: _):
             return "m_mac_debug_\(event)"

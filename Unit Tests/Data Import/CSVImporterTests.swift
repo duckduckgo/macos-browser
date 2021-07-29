@@ -39,6 +39,16 @@ class CSVImporterTests: XCTestCase {
         XCTAssertEqual(logins, [ImportedLoginCredential(title: "Some Title", url: "duck.com", username: "username", password: "p4ssw0rd")])
     }
 
+    func testWhenImportingCSVFileWithHeader_ThenHeaderColumnPositionsAreRespected() {
+        let csvFileContents = """
+        Password,Title,Username,Url
+        p4ssw0rd,"Some Title",username,duck.com
+        """
+
+        let logins = CSVImporter.extractLogins(from: csvFileContents)
+        XCTAssertEqual(logins, [ImportedLoginCredential(title: "Some Title", url: "duck.com", username: "username", password: "p4ssw0rd")])
+    }
+
     func testWhenImportingCSVFileWithoutHeader_ThenNoRowsAreExcluded() {
         let csvFileContents = """
         Some Title,duck.com,username,p4ssw0rd
@@ -90,6 +100,33 @@ class CSVImporterTests: XCTestCase {
         }
 
         waitForExpectations(timeout: 1.0, handler: nil)
+    }
+
+    func testWhenInferringColumnPostions_AndColumnsAreValid_AndTitleIsIncluded_ThenPositionsAreCalculated() {
+        let csvValues = ["url", "username", "password", "title"]
+        let inferred = CSVImporter.InferredCredentialColumnPositions(csvValues: csvValues)
+
+        XCTAssertEqual(inferred?.urlIndex, 0)
+        XCTAssertEqual(inferred?.usernameIndex, 1)
+        XCTAssertEqual(inferred?.passwordIndex, 2)
+        XCTAssertEqual(inferred?.titleIndex, 3)
+    }
+
+    func testWhenInferringColumnPostions_AndColumnsAreValid_AndTitleIsNotIncluded_ThenPositionsAreCalculated() {
+        let csvValues = ["url", "username", "password"]
+        let inferred = CSVImporter.InferredCredentialColumnPositions(csvValues: csvValues)
+
+        XCTAssertEqual(inferred?.urlIndex, 0)
+        XCTAssertEqual(inferred?.usernameIndex, 1)
+        XCTAssertEqual(inferred?.passwordIndex, 2)
+        XCTAssertNil(inferred?.titleIndex)
+    }
+
+    func testWhenInferringColumnPostions_AndColumnsAreInvalidThenPositionsAreCalculated() {
+        let csvValues = ["url", "username", "title"] // `password` is required, this test verifies that the inference fails when it's missing
+        let inferred = CSVImporter.InferredCredentialColumnPositions(csvValues: csvValues)
+
+        XCTAssertNil(inferred)
     }
 
 }

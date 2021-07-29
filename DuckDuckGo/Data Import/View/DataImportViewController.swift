@@ -73,6 +73,7 @@ final class DataImportViewController: NSViewController {
     @IBOutlet var containerView: NSView!
     @IBOutlet var importSourcePopUpButton: NSPopUpButton!
     @IBOutlet var importButton: NSButton!
+    @IBOutlet var cancelButton: NSButton!
 
     @IBAction func cancelButtonClicked(_ sender: Any) {
         dismiss()
@@ -116,17 +117,21 @@ final class DataImportViewController: NSViewController {
     private func updateActionButton(with interactionState: InteractionState) {
         switch interactionState {
         case .unableToImport:
-            self.importButton.title = UserText.initiateImport
-            self.importButton.isEnabled = false
+            importButton.title = UserText.initiateImport
+            importButton.isEnabled = false
+            cancelButton.isHidden = false
         case .ableToImport:
-            self.importButton.title = UserText.initiateImport
-            self.importButton.isEnabled = true
+            importButton.title = UserText.initiateImport
+            importButton.isEnabled = true
+            cancelButton.isHidden = false
         case .completedImport:
-            self.importButton.title = UserText.doneImporting
-            self.importButton.isEnabled = true
+            importButton.title = UserText.doneImporting
+            importButton.isEnabled = true
+            cancelButton.isHidden = true
         case .failedToImport:
             self.importButton.title = UserText.initiateImport
-            self.importButton.isEnabled = true
+            importButton.isEnabled = true
+            cancelButton.isHidden = true
         }
     }
 

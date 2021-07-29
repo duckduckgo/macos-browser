@@ -17,7 +17,7 @@
 //
 
 import Foundation
-@testable import BrowserServicesKit
+import BrowserServicesKit
 
 final class MockSecureVault: SecureVault {
 

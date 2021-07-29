@@ -84,6 +84,7 @@ Gw
                         </constraints>
                     </view>
                     <connections>
+                        <outlet property="cancelButton" destination="UkV-S4-sID" id="JVC-O8-cjJ"/>
                         <outlet property="containerView" destination="Bde-GS-Qx1" id="SMY-ti-olQ"/>
                         <outlet property="importButton" destination="p3M-G6-gOX" id="S3v-kX-VOm"/>
                         <outlet property="importSourcePopUpButton" destination="sh9-5v-T9e" id="0My-NY-rjb"/>

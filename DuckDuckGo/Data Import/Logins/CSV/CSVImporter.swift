@@ -20,6 +20,54 @@ import Foundation
 
 final class CSVImporter: DataImporter {
 
+    struct InferredCredentialColumnPositions {
+
+        let maximumIndex: Int
+
+        let titleIndex: Int?
+        let urlIndex: Int
+        let usernameIndex: Int
+        let passwordIndex: Int
+
+        init(titleIndex: Int?, urlIndex: Int, usernameIndex: Int, passwordIndex: Int, maximumIndex: Int) {
+            self.titleIndex = titleIndex
+            self.urlIndex = urlIndex
+            self.usernameIndex = usernameIndex
+            self.passwordIndex = passwordIndex
+            self.maximumIndex = maximumIndex
+        }
+
+        init?(csvValues: [String]) {
+            guard csvValues.count >= 3 else { return nil }
+
+            var titlePosition: Int?
+            var urlPosition: Int?
+            var usernamePosition: Int?
+            var passwordPosition: Int?
+
+            for (index, value) in csvValues.enumerated() {
+                switch value.lowercased() {
+                case "url": urlPosition = index
+                case "username": usernamePosition = index
+                case "password": passwordPosition = index
+                case "title", "name": titlePosition = index
+                default: break
+                }
+            }
+
+            if let url = urlPosition, let  username = usernamePosition, let password = passwordPosition {
+                self.init(titleIndex: titlePosition,
+                          urlIndex: url,
+                          usernameIndex: username,
+                          passwordIndex: password,
+                          maximumIndex: csvValues.count - 1)
+            } else {
+                return nil
+            }
+        }
+
+    }
+
     private let fileURL: URL
     private let loginImporter: LoginImporter
 
@@ -39,13 +87,16 @@ final class CSVImporter: DataImporter {
 
     static func extractLogins(from fileContents: String) -> [ImportedLoginCredential] {
         let parsed = CSVParser.parse(string: fileContents)
-        var loginCredentials = parsed.compactMap(ImportedLoginCredential.init(row:))
 
-        if loginCredentials.first?.isHeaderRow ?? false {
-            loginCredentials.removeFirst()
+        if let possibleHeaderRow = parsed.first, let inferredColumnPositions = InferredCredentialColumnPositions(csvValues: possibleHeaderRow) {
+            return parsed.dropFirst().compactMap {
+                ImportedLoginCredential(row: $0, inferredColumnPositions: inferredColumnPositions)
+            }
+        } else {
+            return parsed.compactMap {
+                ImportedLoginCredential(row: $0)
+            }
         }
-
-        return loginCredentials
     }
 
     func importableTypes() -> [DataImport.DataType] {

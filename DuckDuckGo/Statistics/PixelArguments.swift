@@ -178,7 +178,7 @@ extension Pixel.Event {
 
         init(url: URL?, fireproofDomains: FireproofDomains = .shared) {
             if let host = url?.host,
-               fireproofDomains.isAllowed(fireproofDomain: host) {
+               fireproofDomains.isFireproof(fireproofDomain: host) {
                 self = .fireproofed
             } else {
                 self = .nonFireproofed
@@ -294,6 +294,7 @@ extension Pixel.Event {
         case moveTabToNewWindow = "new-window"
         case feedback = "feedback"
         case bookmarksList = "bookmarks-list"
+        case logins = "logins"
         case emailProtection = "email-protection"
         case fireproof = "fireproof"
         case preferences = "preferences"
@@ -331,6 +332,12 @@ extension Pixel.Event {
                 self = `default`
             }
         }
+    }
+
+    enum DataImportSource: String, CustomStringConvertible {
+        var description: String { rawValue }
+
+        case csv = "source-csv"
     }
 
 }

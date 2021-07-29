@@ -60,19 +60,16 @@ final class CSVLoginExporter: LoginExporter {
             let username = credential.account.username
             let password = credential.password.utf8String() ?? ""
 
-            if domain.isEmpty || username.isEmpty || password.isEmpty {
-                return nil
-            }
-
             // Ensure that exported passwords escape any quotes they contain
             let escapedPassword = password.replacingOccurrences(of: "\"", with: "\\\"")
 
             return "\"\(title)\",\"\(domain)\",\"\(username)\",\"\(escapedPassword)\""
         }
 
-        let finalString = credentialsAsCSVRows.joined(separator: "\n")
+        let headerRow = ["\"title\",\"url\",\"username\",\"password\""]
+        let csvString = (headerRow + credentialsAsCSVRows).joined(separator: "\n")
 
-        if let stringData = finalString.data(using: .utf8) {
+        if let stringData = csvString.data(using: .utf8) {
             _ = fileStore.persist(stringData, url: url)
         } else {
             throw CSVLoginExportError.failedToEncodeLogins

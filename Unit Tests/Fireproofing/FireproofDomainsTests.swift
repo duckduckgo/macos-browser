@@ -25,14 +25,14 @@ final class FireproofDomainsTests: XCTestCase {
         UserDefaultsWrapper<Any>.clearAll()
     }
 
-    func testWhenAllowedDomainsContainsFireproofedDomainThenReturnsTrue() {
+    func testWhenFireproofDomainsContainsFireproofedDomainThenReturnsTrue() {
         let logins = FireproofDomains()
-        XCTAssertFalse(logins.isAllowed(fireproofDomain: "example.com"))
+        XCTAssertFalse(logins.isFireproof(fireproofDomain: "example.com"))
         logins.addToAllowed(domain: "example.com")
-        XCTAssertTrue(logins.isAllowed(fireproofDomain: "example.com"))
+        XCTAssertTrue(logins.isFireproof(fireproofDomain: "example.com"))
     }
 
-    func testWhenNewThenAllowedDomainsIsEmpty() {
+    func testWhenNewThenFireproofDomainsIsEmpty() {
         let logins = FireproofDomains()
         XCTAssertTrue(logins.fireproofDomains.isEmpty)
     }
@@ -41,22 +41,22 @@ final class FireproofDomainsTests: XCTestCase {
         let logins = FireproofDomains()
         logins.addToAllowed(domain: "example.com")
         logins.addToAllowed(domain: "secondexample.com")
-        XCTAssertTrue(logins.isAllowed(fireproofDomain: "example.com"))
-        XCTAssertTrue(logins.isAllowed(fireproofDomain: "secondexample.com"))
+        XCTAssertTrue(logins.isFireproof(fireproofDomain: "example.com"))
+        XCTAssertTrue(logins.isFireproof(fireproofDomain: "secondexample.com"))
 
         logins.remove(domain: "secondexample.com")
-        XCTAssertTrue(logins.isAllowed(fireproofDomain: "example.com"))
-        XCTAssertFalse(logins.isAllowed(fireproofDomain: "secondexample.com"))
+        XCTAssertTrue(logins.isFireproof(fireproofDomain: "example.com"))
+        XCTAssertFalse(logins.isFireproof(fireproofDomain: "secondexample.com"))
         XCTAssertFalse(logins.fireproofDomains.isEmpty)
     }
 
     func testWhenClearAllIsCalledThenAllDomainsAreRemoved() {
         let logins = FireproofDomains()
         logins.addToAllowed(domain: "example.com")
-        XCTAssertTrue(logins.isAllowed(fireproofDomain: "example.com"))
+        XCTAssertTrue(logins.isFireproof(fireproofDomain: "example.com"))
 
         logins.clearAll()
-        XCTAssertFalse(logins.isAllowed(fireproofDomain: "example.com"))
+        XCTAssertFalse(logins.isFireproof(fireproofDomain: "example.com"))
         XCTAssertTrue(logins.fireproofDomains.isEmpty)
     }
 
