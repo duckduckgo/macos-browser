@@ -107,14 +107,6 @@ final class Tab: NSObject {
 
         super.init()
 
-        self.loginDetectionService = LoginDetectionService(loginDiscardedHandler: { [weak self] in
-            self?.lastSeenCredentials = nil
-        }) { [weak self] _ in
-            guard let credentials = self?.lastSeenCredentials else { return }
-            self?.delegate?.tab(self!, requestedSaveCredentials: credentials)
-            self?.lastSeenCredentials = nil
-        }
-
         setupWebView(shouldLoadInBackground: shouldLoadInBackground)
 
         // cache session-restored favicon if present
@@ -131,7 +123,6 @@ final class Tab: NSObject {
     let webView: WebView
     private(set) var tabType: TabType
     var userEnteredUrl = true
-    var lastSeenCredentials: SecureVaultModels.WebsiteCredentials?
 
     @PublishedAfter var url: URL? {
         didSet {
@@ -188,7 +179,6 @@ final class Tab: NSObject {
 
         // This function is called when the user has manually typed in a new address, which should reset the login detection flow.
         userEnteredUrl = userEntered
-        loginDetectionService?.handle(navigationEvent: .userAction)
      }
 
     // Used to track if an error was caused by a download navigation.
@@ -221,7 +211,6 @@ final class Tab: NSObject {
         }
     }
 
-    private var loginDetectionService: LoginDetectionService?
     private let instrumentation = TabInstrumentation()
 
     var isHomepageShown: Bool {
@@ -235,19 +224,16 @@ final class Tab: NSObject {
     func goForward() {
         shouldStoreNextVisit = false
         webView.goForward()
-        loginDetectionService?.handle(navigationEvent: .userAction)
     }
 
     func goBack() {
         shouldStoreNextVisit = false
         webView.goBack()
-        loginDetectionService?.handle(navigationEvent: .userAction)
     }
 
     func go(to item: WKBackForwardListItem) {
         shouldStoreNextVisit = false
         webView.go(to: item)
-        loginDetectionService?.handle(navigationEvent: .userAction)
     }
 
     func openHomepage() {
@@ -266,7 +252,6 @@ final class Tab: NSObject {
         } else {
             webView.reload()
         }
-        loginDetectionService?.handle(navigationEvent: .userAction)
     }
 
     private func reloadIfNeeded(shouldLoadInBackground: Bool = false) {
@@ -538,9 +523,7 @@ extension Tab: EmailManagerRequestDelegate {
 extension Tab: SecureVaultManagerDelegate {
 
     func secureVaultManager(_: SecureVaultManager, promptUserToStoreCredentials credentials: SecureVaultModels.WebsiteCredentials) {
-        guard let url = webView.url else { return }
-        lastSeenCredentials = credentials
-        loginDetectionService?.handle(navigationEvent: .detectedLogin(url: url))
+        delegate?.tab(self, requestedSaveCredentials: credentials)
     }
 
 }
@@ -643,15 +626,10 @@ extension Tab: WKNavigationDelegate {
         if error != nil { error = nil }
 
         self.invalidateSessionStateData()
-
-        if let url = webView.url {
-             loginDetectionService?.handle(navigationEvent: .pageBeganLoading(url: url))
-        }
     }
 
     func webView(_ webView: WKWebView, didFinish navigation: WKNavigation!) {
         self.invalidateSessionStateData()
-        loginDetectionService?.handle(navigationEvent: .pageFinishedLoading)
     }
 
     func webView(_ webView: WKWebView, didFail navigation: WKNavigation!, withError error: Error) {
@@ -678,11 +656,6 @@ extension Tab: WKNavigationDelegate {
         }
         self.error = error
     }
-
-    func webView(_ webView: WKWebView, didReceiveServerRedirectForProvisionalNavigation navigation: WKNavigation!) {
-         guard let url = webView.url else { return }
-         loginDetectionService?.handle(navigationEvent: .redirect(url: url))
-     }
 
     @available(macOS 11.3, *)
     @objc(webView:navigationAction:didBecomeDownload:)
