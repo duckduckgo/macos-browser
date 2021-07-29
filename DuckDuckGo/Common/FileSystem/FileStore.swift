@@ -19,14 +19,14 @@
 import Foundation
 import CryptoKit
 
-protocol FileStoring {
-    func persist(_ data: Data, fileName: String) -> Bool
-    func loadData(named fileName: String) -> Data?
-    func hasData(for fileName: String) -> Bool
-    func remove(_ fileName: String)
+protocol FileStore {
+    func persist(_ data: Data, url: URL) -> Bool
+    func loadData(at url: URL) -> Data?
+    func hasData(at url: URL) -> Bool
+    func remove(fileAtURL url: URL)
 }
 
-final class FileStore: FileStoring {
+final class EncryptedFileStore: FileStore {
 
     private let encryptionKey: SymmetricKey?
 
@@ -34,7 +34,7 @@ final class FileStore: FileStoring {
         self.encryptionKey = encryptionKey
     }
 
-    func persist(_ data: Data, fileName: String) -> Bool {
+    func persist(_ data: Data, url: URL) -> Bool {
         do {
             let dataToWrite: Data
 
@@ -44,18 +44,18 @@ final class FileStore: FileStoring {
                 dataToWrite = data
             }
 
-            try dataToWrite.write(to: persistenceLocation(for: fileName))
+            try dataToWrite.write(to: url)
 
             return true
         } catch {
             Pixel.fire(.debug(event: .fileStoreWriteFailed, error: error),
-                       withAdditionalParameters: ["config": fileName])
+                       withAdditionalParameters: ["config": url.lastPathComponent])
             return false
         }
     }
 
-    func loadData(named fileName: String) -> Data? {
-        guard let data = try? Data(contentsOf: persistenceLocation(for: fileName)) else {
+    func loadData(at url: URL) -> Data? {
+        guard let data = try? Data(contentsOf: url) else {
             return nil
         }
 
@@ -66,22 +66,40 @@ final class FileStore: FileStoring {
         }
     }
 
-    func hasData(for fileName: String) -> Bool {
-        let path = persistenceLocation(for: fileName).path
-        return FileManager.default.fileExists(atPath: path)
+    func hasData(at url: URL) -> Bool {
+        return FileManager.default.fileExists(atPath: url.path)
     }
 
-    func remove(_ fileName: String) {
-        let url = persistenceLocation(for: fileName)
+    func remove(fileAtURL url: URL) {
         var isDir: ObjCBool = false
         let fileManager = FileManager()
         guard fileManager.fileExists(atPath: url.path, isDirectory: &isDir) && !isDir.boolValue else { return }
         try? fileManager.removeItem(at: url)
     }
 
-    func persistenceLocation(for fileName: String) -> URL {
-        let applicationSupportPath = URL.sandboxApplicationSupportURL
-        return applicationSupportPath.appendingPathComponent(fileName)
+}
+
+extension FileManager: FileStore {
+
+    func persist(_ data: Data, url: URL) -> Bool {
+        do {
+            try data.write(to: url)
+            return true
+        } catch {
+            return false
+        }
+    }
+
+    func loadData(at url: URL) -> Data? {
+        try? Data(contentsOf: url)
+    }
+
+    func hasData(at url: URL) -> Bool {
+        return fileExists(atPath: url.path)
+    }
+
+    func remove(fileAtURL url: URL) {
+        try? removeItem(at: url)
     }
 
 }

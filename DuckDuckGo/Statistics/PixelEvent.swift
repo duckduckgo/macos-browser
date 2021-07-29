@@ -66,6 +66,9 @@ extension Pixel {
 
         case refresh(source: RefreshAccessPoint)
 
+        case importedLogins(repetition: Repetition = .init(key: "imported-logins"), source: DataImportSource)
+        case exportedLogins(repetition: Repetition = .init(key: "exported-logins"))
+
         case debug(event: Debug, error: Error? = nil, countedBy: Pixel.Counter? = nil)
 
         enum Debug: String, CustomStringConvertible {
@@ -150,6 +153,12 @@ extension Pixel.Event {
 
         case .refresh(source: let source):
             return "m_mac_refresh_\(source)"
+
+        case .importedLogins(repetition: let repetition, source: let source):
+            return "m_mac_imported-logins_\(repetition)_\(source)"
+
+        case .exportedLogins(repetition: let repetition):
+            return "m_mac_exported-logins_\(repetition)"
 
         case .debug(event: let event, error: _, countedBy: _):
             return "m_mac_debug_\(event)"

@@ -52,10 +52,10 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
 
         do {
             let encryptionKey = Self.isRunningTests ? nil : try keyStore.readKey()
-            fileStore = FileStore(encryptionKey: encryptionKey)
+            fileStore = EncryptedFileStore(encryptionKey: encryptionKey)
         } catch {
             os_log("App Encryption Key could not be read: %s", "\(error)")
-            fileStore = FileStore()
+            fileStore = EncryptedFileStore()
         }
         stateRestorationManager = AppStateRestorationManager(fileStore: fileStore)
 

@@ -334,4 +334,10 @@ extension Pixel.Event {
         }
     }
 
+    enum DataImportSource: String, CustomStringConvertible {
+        var description: String { rawValue }
+
+        case csv = "source-csv"
+    }
+
 }

@@ -81,7 +81,9 @@ extension Pixel.Event {
              .suggestionsDisplayed,
              .sharingMenu,
              .moreMenu,
-             .refresh:
+             .refresh,
+             .importedLogins,
+             .exportedLogins:
 
             return nil
         }

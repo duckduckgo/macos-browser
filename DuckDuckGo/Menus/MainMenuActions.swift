@@ -18,6 +18,7 @@
 
 import Cocoa
 import os.log
+import BrowserServicesKit
 
 // Actions are sent to objects of responder chain
 
@@ -102,6 +103,50 @@ extension AppDelegate {
         let tabCollection = TabCollection(tabs: [Tab(tabType: .preferences)])
         let tabCollectionViewModel = TabCollectionViewModel(tabCollection: tabCollection)
         WindowsManager.openNewWindow(with: tabCollectionViewModel)
+    }
+
+    @IBAction func openImportBrowserDataWindow(_ sender: Any?) {
+        guard let windowController = WindowControllersManager.shared.lastKeyMainWindowController,
+              windowController.window?.isKeyWindow == true else {
+
+            return
+        }
+
+        let viewController = DataImportViewController.create()
+        windowController.mainViewController.beginSheet(viewController)
+    }
+
+    @IBAction func openExportBrowserDataWindow(_ sender: Any?) {
+        guard let windowController = WindowControllersManager.shared.lastKeyMainWindowController,
+              let window = windowController.window else {
+
+            return
+        }
+
+        let savePanel = NSSavePanel()
+        savePanel.nameFieldStringValue = "DuckDuckGo Logins"
+        savePanel.allowedFileTypes = ["csv"]
+
+        savePanel.beginSheetModal(for: window) { response in
+            guard response == .OK, let selectedURL = savePanel.url else {
+                return
+            }
+
+            let vault = try? SecureVaultFactory.default.makeVault()
+            let exporter = CSVLoginExporter(secureVault: vault!)
+            do {
+                try exporter.exportVaultLogins(to: selectedURL)
+                Pixel.fire(.exportedLogins())
+            } catch {
+                // @samsymons Move this into an extension in the followup login import PR:
+                let alert = NSAlert()
+                alert.messageText = "Failed to Export Logins"
+                alert.informativeText = "Please check that no file exists at the location you selected."
+                alert.alertStyle = .warning
+                alert.addButton(withTitle: "OK")
+                alert.beginSheetModal(for: window, completionHandler: nil)
+            }
+        }
     }
 
 }
@@ -369,6 +414,20 @@ extension MainViewController {
 
     @IBAction func triggerFatalError(_ sender: Any?) {
         fatalError("Fatal error triggered from the Debug menu")
+    }
+
+    @IBAction func resetSecureVaultData(_ sender: Any?) {
+        let vault = try? SecureVaultFactory.default.makeVault()
+        let accounts = (try? vault?.accounts()) ?? []
+        let accountIDs = accounts.compactMap(\.id)
+
+        for accountID in accountIDs {
+            do {
+                try vault?.deleteWebsiteCredentialsFor(accountId: accountID)
+            } catch {
+                os_log("Failed to remove credential with account ID %d", type: .error, accountID)
+            }
+        }
     }
 
 }

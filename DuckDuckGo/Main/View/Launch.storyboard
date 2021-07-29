@@ -31,7 +31,7 @@
                                                 <action selector="openPreferences:" target="Ady-hI-5gd" id="hyM-Fd-dVF"/>
                                             </connections>
                                         </menuItem>
-                                        <menuItem isSeparatorItem="YES" id="wFC-TO-SCJ"/>
+                                        <menuItem isSeparatorItem="YES" id="t1R-yn-9NQ"/>
                                         <menuItem title="Services" id="NMo-om-nkz">
                                             <modifierMask key="keyEquivalentModifierMask"/>
                                             <menu key="submenu" title="Services" systemMenu="services" id="hz9-B4-Xy5"/>
@@ -109,6 +109,19 @@
                                         <menuItem title="Save As..." keyEquivalent="s" id="Gla-S3-yci">
                                             <connections>
                                                 <action selector="saveAs:" target="Ady-hI-5gd" id="VSN-fV-7wi"/>
+                                            </connections>
+                                        </menuItem>
+                                        <menuItem isSeparatorItem="YES" id="u7E-4A-OQP"/>
+                                        <menuItem title="Import Browser Data..." id="gTV-od-6G5">
+                                            <modifierMask key="keyEquivalentModifierMask"/>
+                                            <connections>
+                                                <action selector="openImportBrowserDataWindow:" target="Ady-hI-5gd" id="UU7-vO-0ol"/>
+                                            </connections>
+                                        </menuItem>
+                                        <menuItem title="Export Browser Data..." id="raM-fX-nRg">
+                                            <modifierMask key="keyEquivalentModifierMask"/>
+                                            <connections>
+                                                <action selector="openExportBrowserDataWindow:" target="Ady-hI-5gd" id="KJ1-rb-kec"/>
                                             </connections>
                                         </menuItem>
                                         <menuItem isSeparatorItem="YES" id="anH-0y-7dE"/>
@@ -559,6 +572,12 @@ CQ
                                             <modifierMask key="keyEquivalentModifierMask"/>
                                             <connections>
                                                 <action selector="resetDefaultGrammarChecks:" target="Ady-hI-5gd" id="Ces-GX-TM5"/>
+                                            </connections>
+                                        </menuItem>
+                                        <menuItem title="Reset Secure Vault Data" id="opO-fm-tW5">
+                                            <modifierMask key="keyEquivalentModifierMask"/>
+                                            <connections>
+                                                <action selector="resetSecureVaultData:" target="Ady-hI-5gd" id="5uS-MI-2BN"/>
                                             </connections>
                                         </menuItem>
                                         <menuItem title="Fatal Error" id="FeS-hb-rvM" userLabel="Reset Default Browser Prompt">

@@ -82,6 +82,25 @@
 		4B677442255DBEEA00025BD8 /* Database.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B677440255DBEEA00025BD8 /* Database.swift */; };
 		4B67744B255DBF3A00025BD8 /* BloomFilter.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4B677449255DBF3A00025BD8 /* BloomFilter.cpp */; };
 		4B677450255DBFA300025BD8 /* HashExtension.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B67744F255DBFA300025BD8 /* HashExtension.swift */; };
+		4B723E0526B0003E00E14D75 /* DataImportMocks.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B723DFF26B0003E00E14D75 /* DataImportMocks.swift */; };
+		4B723E0626B0003E00E14D75 /* CSVParserTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B723E0026B0003E00E14D75 /* CSVParserTests.swift */; };
+		4B723E0726B0003E00E14D75 /* CSVImporterTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B723E0126B0003E00E14D75 /* CSVImporterTests.swift */; };
+		4B723E0826B0003E00E14D75 /* MockSecureVault.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B723E0326B0003E00E14D75 /* MockSecureVault.swift */; };
+		4B723E0926B0003E00E14D75 /* CSVLoginExporterTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B723E0426B0003E00E14D75 /* CSVLoginExporterTests.swift */; };
+		4B723E0A26B0005900E14D75 /* DataImportViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B723DEE26B0002B00E14D75 /* DataImportViewController.swift */; };
+		4B723E0B26B0005B00E14D75 /* CSVImportViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B723DEF26B0002B00E14D75 /* CSVImportViewController.swift */; };
+		4B723E0C26B0005D00E14D75 /* CSVImportSummaryViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B723DF026B0002B00E14D75 /* CSVImportSummaryViewController.swift */; };
+		4B723E0D26B0006100E14D75 /* SecureVaultLoginImporter.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B723DF326B0002B00E14D75 /* SecureVaultLoginImporter.swift */; };
+		4B723E0E26B0006300E14D75 /* LoginImport.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B723DF426B0002B00E14D75 /* LoginImport.swift */; };
+		4B723E0F26B0006500E14D75 /* CSVParser.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B723DF626B0002B00E14D75 /* CSVParser.swift */; };
+		4B723E1026B0006700E14D75 /* CSVImporter.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B723DF726B0002B00E14D75 /* CSVImporter.swift */; };
+		4B723E1126B0006C00E14D75 /* DataImport.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 4B723DED26B0002B00E14D75 /* DataImport.storyboard */; };
+		4B723E1226B0006E00E14D75 /* DataImport.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B723DEB26B0002B00E14D75 /* DataImport.swift */; };
+		4B723E1326B0007A00E14D75 /* CSVLoginExporter.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B723DFD26B0002B00E14D75 /* CSVLoginExporter.swift */; };
+		4B723E1426B000A100E14D75 /* DataExport.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B723DF926B0002B00E14D75 /* DataExport.swift */; };
+		4B723E1526B000A400E14D75 /* LoginExport.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B723DFB26B0002B00E14D75 /* LoginExport.swift */; };
+		4B723E1826B000DC00E14D75 /* MockFileStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B723E1626B000DC00E14D75 /* MockFileStore.swift */; };
+		4B723E1926B000DC00E14D75 /* TemporaryFileCreator.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B723E1726B000DC00E14D75 /* TemporaryFileCreator.swift */; };
 		4B82E9B325B69E3E00656FE7 /* TrackerRadarKit in Frameworks */ = {isa = PBXBuildFile; productRef = 4B82E9B225B69E3E00656FE7 /* TrackerRadarKit */; };
 		4B82E9B925B6A05800656FE7 /* DetectedTrackerTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B82E9B825B6A05800656FE7 /* DetectedTrackerTests.swift */; };
 		4B82E9C125B6A1CD00656FE7 /* TrackerRadarManagerTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B82E9C025B6A1CD00656FE7 /* TrackerRadarManagerTests.swift */; };
@@ -503,6 +522,25 @@
 		4B67744A255DBF3A00025BD8 /* BloomFilter.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = BloomFilter.hpp; path = Submodules/bloom_cpp/src/BloomFilter.hpp; sourceTree = SOURCE_ROOT; };
 		4B67744F255DBFA300025BD8 /* HashExtension.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = HashExtension.swift; sourceTree = "<group>"; };
 		4B677454255DC18000025BD8 /* Bridging.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Bridging.h; sourceTree = "<group>"; };
+		4B723DEB26B0002B00E14D75 /* DataImport.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DataImport.swift; sourceTree = "<group>"; };
+		4B723DED26B0002B00E14D75 /* DataImport.storyboard */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; path = DataImport.storyboard; sourceTree = "<group>"; };
+		4B723DEE26B0002B00E14D75 /* DataImportViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DataImportViewController.swift; sourceTree = "<group>"; };
+		4B723DEF26B0002B00E14D75 /* CSVImportViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CSVImportViewController.swift; sourceTree = "<group>"; };
+		4B723DF026B0002B00E14D75 /* CSVImportSummaryViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CSVImportSummaryViewController.swift; sourceTree = "<group>"; };
+		4B723DF326B0002B00E14D75 /* SecureVaultLoginImporter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SecureVaultLoginImporter.swift; sourceTree = "<group>"; };
+		4B723DF426B0002B00E14D75 /* LoginImport.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LoginImport.swift; sourceTree = "<group>"; };
+		4B723DF626B0002B00E14D75 /* CSVParser.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CSVParser.swift; sourceTree = "<group>"; };
+		4B723DF726B0002B00E14D75 /* CSVImporter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CSVImporter.swift; sourceTree = "<group>"; };
+		4B723DF926B0002B00E14D75 /* DataExport.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DataExport.swift; sourceTree = "<group>"; };
+		4B723DFB26B0002B00E14D75 /* LoginExport.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LoginExport.swift; sourceTree = "<group>"; };
+		4B723DFD26B0002B00E14D75 /* CSVLoginExporter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CSVLoginExporter.swift; sourceTree = "<group>"; };
+		4B723DFF26B0003E00E14D75 /* DataImportMocks.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = DataImportMocks.swift; sourceTree = "<group>"; };
+		4B723E0026B0003E00E14D75 /* CSVParserTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CSVParserTests.swift; sourceTree = "<group>"; };
+		4B723E0126B0003E00E14D75 /* CSVImporterTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CSVImporterTests.swift; sourceTree = "<group>"; };
+		4B723E0326B0003E00E14D75 /* MockSecureVault.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MockSecureVault.swift; sourceTree = "<group>"; };
+		4B723E0426B0003E00E14D75 /* CSVLoginExporterTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CSVLoginExporterTests.swift; sourceTree = "<group>"; };
+		4B723E1626B000DC00E14D75 /* MockFileStore.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MockFileStore.swift; sourceTree = "<group>"; };
+		4B723E1726B000DC00E14D75 /* TemporaryFileCreator.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = TemporaryFileCreator.swift; sourceTree = "<group>"; };
 		4B82E9B825B6A05800656FE7 /* DetectedTrackerTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DetectedTrackerTests.swift; sourceTree = "<group>"; };
 		4B82E9C025B6A1CD00656FE7 /* TrackerRadarManagerTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TrackerRadarManagerTests.swift; sourceTree = "<group>"; };
 		4B92928526670D1600AD2C21 /* BookmarksOutlineView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = BookmarksOutlineView.swift; sourceTree = "<group>"; };
@@ -1101,6 +1139,99 @@
 			name = bloom_cpp;
 			sourceTree = "<group>";
 		};
+		4B723DEA26B0002B00E14D75 /* Data Import */ = {
+			isa = PBXGroup;
+			children = (
+				4B723DEB26B0002B00E14D75 /* DataImport.swift */,
+				4B723DEC26B0002B00E14D75 /* View */,
+				4B723DF126B0002B00E14D75 /* Logins */,
+			);
+			path = "Data Import";
+			sourceTree = "<group>";
+		};
+		4B723DEC26B0002B00E14D75 /* View */ = {
+			isa = PBXGroup;
+			children = (
+				4B723DED26B0002B00E14D75 /* DataImport.storyboard */,
+				4B723DEE26B0002B00E14D75 /* DataImportViewController.swift */,
+				4B723DEF26B0002B00E14D75 /* CSVImportViewController.swift */,
+				4B723DF026B0002B00E14D75 /* CSVImportSummaryViewController.swift */,
+			);
+			path = View;
+			sourceTree = "<group>";
+		};
+		4B723DF126B0002B00E14D75 /* Logins */ = {
+			isa = PBXGroup;
+			children = (
+				4B723DF426B0002B00E14D75 /* LoginImport.swift */,
+				4B723DF226B0002B00E14D75 /* SecureVault */,
+				4B723DF526B0002B00E14D75 /* CSV */,
+			);
+			path = Logins;
+			sourceTree = "<group>";
+		};
+		4B723DF226B0002B00E14D75 /* SecureVault */ = {
+			isa = PBXGroup;
+			children = (
+				4B723DF326B0002B00E14D75 /* SecureVaultLoginImporter.swift */,
+			);
+			path = SecureVault;
+			sourceTree = "<group>";
+		};
+		4B723DF526B0002B00E14D75 /* CSV */ = {
+			isa = PBXGroup;
+			children = (
+				4B723DF626B0002B00E14D75 /* CSVParser.swift */,
+				4B723DF726B0002B00E14D75 /* CSVImporter.swift */,
+			);
+			path = CSV;
+			sourceTree = "<group>";
+		};
+		4B723DF826B0002B00E14D75 /* Data Export */ = {
+			isa = PBXGroup;
+			children = (
+				4B723DF926B0002B00E14D75 /* DataExport.swift */,
+				4B723DFA26B0002B00E14D75 /* Logins */,
+			);
+			path = "Data Export";
+			sourceTree = "<group>";
+		};
+		4B723DFA26B0002B00E14D75 /* Logins */ = {
+			isa = PBXGroup;
+			children = (
+				4B723DFB26B0002B00E14D75 /* LoginExport.swift */,
+				4B723DFC26B0002B00E14D75 /* CSV */,
+			);
+			path = Logins;
+			sourceTree = "<group>";
+		};
+		4B723DFC26B0002B00E14D75 /* CSV */ = {
+			isa = PBXGroup;
+			children = (
+				4B723DFD26B0002B00E14D75 /* CSVLoginExporter.swift */,
+			);
+			path = CSV;
+			sourceTree = "<group>";
+		};
+		4B723DFE26B0003E00E14D75 /* Data Import */ = {
+			isa = PBXGroup;
+			children = (
+				4B723DFF26B0003E00E14D75 /* DataImportMocks.swift */,
+				4B723E0026B0003E00E14D75 /* CSVParserTests.swift */,
+				4B723E0126B0003E00E14D75 /* CSVImporterTests.swift */,
+			);
+			path = "Data Import";
+			sourceTree = "<group>";
+		};
+		4B723E0226B0003E00E14D75 /* Data Export */ = {
+			isa = PBXGroup;
+			children = (
+				4B723E0326B0003E00E14D75 /* MockSecureVault.swift */,
+				4B723E0426B0003E00E14D75 /* CSVLoginExporterTests.swift */,
+			);
+			path = "Data Export";
+			sourceTree = "<group>";
+		};
 		4B82E9B725B6A04B00656FE7 /* ContentBlocker */ = {
 			isa = PBXGroup;
 			children = (
@@ -1332,6 +1463,8 @@
 		85F69B3A25EDE7F800978E59 /* Common */ = {
 			isa = PBXGroup;
 			children = (
+				4B723E1626B000DC00E14D75 /* MockFileStore.swift */,
+				4B723E1726B000DC00E14D75 /* TemporaryFileCreator.swift */,
 				4B9292C42667104B00AD2C21 /* CoreDataTestUtilities.swift */,
 				AAEC74B92642E66600C2EFBC /* Extensions */,
 				B65783EB25F8AB9200D8DB33 /* String+PunycodeTests.swift */,
@@ -1401,6 +1534,8 @@
 				85D33F1025C82E93002B91A6 /* Configuration */,
 				4B6160D125B14E5E007DE5B2 /* ContentBlocker */,
 				AAC30A24268DF93500D2D9CD /* Crash Reports */,
+				4B723DEA26B0002B00E14D75 /* Data Import */,
+				4B723DF826B0002B00E14D75 /* Data Export */,
 				4B65143C26392483005B46EB /* Email */,
 				8556A60C256C15C60092FA9D /* FileDownload */,
 				85A0115D25AF1C4700FA6A0C /* FindInPage */,
@@ -1440,6 +1575,8 @@
 				85F69B3A25EDE7F800978E59 /* Common */,
 				85AC3B1525D9BBFA00C7D2AA /* Configuration */,
 				4B82E9B725B6A04B00656FE7 /* ContentBlocker */,
+				4B723DFE26B0003E00E14D75 /* Data Import */,
+				4B723E0226B0003E00E14D75 /* Data Export */,
 				8553FF50257523630029327F /* FileDownload */,
 				4BA1A6CE258BF58C00F6F690 /* FileSystem */,
 				4B02199725E063DE00ED7DEA /* Fireproofing */,
@@ -2408,6 +2545,7 @@
 				85480F8A25CDC360009424E3 /* Launch.storyboard in Resources */,
 				4B677435255DBEB800025BD8 /* httpsMobileV2FalsePositives.json in Resources */,
 				AAE71E3825F7869300D74437 /* HomepageCollectionViewItem.xib in Resources */,
+				4B723E1126B0006C00E14D75 /* DataImport.storyboard in Resources */,
 				4B92929026670D1700AD2C21 /* BookmarkTableCellView.xib in Resources */,
 				4B02198825E05FAC00ED7DEA /* login-detection.js in Resources */,
 				B6E61ED5263A6FC4004E11AB /* SavePanelAccessoryView.xib in Resources */,
@@ -2496,6 +2634,7 @@
 			files = (
 				AAA0CC572539EBC90079BC96 /* FaviconUserScript.swift in Sources */,
 				B6A9E45A261460350067D1B9 /* ApiRequestError.swift in Sources */,
+				4B723E0E26B0006300E14D75 /* LoginImport.swift in Sources */,
 				85799C1825DEBB3F0007EC87 /* Logging.swift in Sources */,
 				AAC30A2E268F1EE300D2D9CD /* CrashReportPromptPresenter.swift in Sources */,
 				AA86490C24D3494C001BABEE /* GradientView.swift in Sources */,
@@ -2534,6 +2673,7 @@
 				4B6160DD25B152C5007DE5B2 /* ContentBlockerRulesUserScript.swift in Sources */,
 				85AC3B3525DA82A600C7D2AA /* DataTaskProviding.swift in Sources */,
 				4BA1A6B3258B080A00F6F690 /* EncryptionKeyGeneration.swift in Sources */,
+				4B723E0B26B0005B00E14D75 /* CSVImportViewController.swift in Sources */,
 				8589063C267BCDC000D23B0D /* SaveCredentialsViewController.swift in Sources */,
 				AABEE6A524AA0A7F0043105B /* SuggestionViewController.swift in Sources */,
 				85AC3AF725D5DBFD00C7D2AA /* DataExtension.swift in Sources */,
@@ -2549,6 +2689,7 @@
 				AAE71E3125F7855400D74437 /* HomepageViewController.swift in Sources */,
 				4BB88B4525B7B55C006F6B06 /* DebugUserScript.swift in Sources */,
 				4B65027A25E5F2B10054432E /* DefaultBrowserPromptView.swift in Sources */,
+				4B723E0A26B0005900E14D75 /* DataImportViewController.swift in Sources */,
 				4B0511BB262CAA5A00F6079C /* DefaultBrowserPreferences.swift in Sources */,
 				4B0511CA262CAA5A00F6079C /* FireproofDomainsViewController.swift in Sources */,
 				AA4D700725545EF800C3411E /* UrlEventListener.swift in Sources */,
@@ -2564,6 +2705,7 @@
 				AAC30A2A268E239100D2D9CD /* CrashReport.swift in Sources */,
 				AA512D1424D99D9800230283 /* FaviconService.swift in Sources */,
 				AABEE6AB24ACA0F90043105B /* SuggestionTableRowView.swift in Sources */,
+				4B723E1426B000A100E14D75 /* DataExport.swift in Sources */,
 				4B0511CB262CAA5A00F6079C /* DownloadPreferencesTableCellView.swift in Sources */,
 				4B9292AA26670D3700AD2C21 /* Bookmark.xcmappingmodel in Sources */,
 				AAC5E4D025D6A709007F5990 /* Bookmark.swift in Sources */,
@@ -2571,6 +2713,7 @@
 				4B92928C26670D1700AD2C21 /* OutlineSeparatorViewCell.swift in Sources */,
 				4B0511CD262CAA5A00F6079C /* DefaultBrowserTableCellView.swift in Sources */,
 				858A798526A8BB5D00A75A42 /* NSTextViewExtension.swift in Sources */,
+				4B723E0C26B0005D00E14D75 /* CSVImportSummaryViewController.swift in Sources */,
 				B6AAAC2D260330580029438D /* PublishedAfter.swift in Sources */,
 				85C6A29625CC1FFD00EEB5F1 /* UserDefaultsWrapper.swift in Sources */,
 				85625998269C9C5F00EE44BC /* PasswordManagementPopover.swift in Sources */,
@@ -2589,11 +2732,13 @@
 				85D438B6256E7C9E00F3BAF8 /* ContextMenuUserScript.swift in Sources */,
 				4BA1A6BD258B082300F6F690 /* EncryptionKeyStore.swift in Sources */,
 				B6F41031264D2B23003DA42C /* ProgressExtension.swift in Sources */,
+				4B723E0F26B0006500E14D75 /* CSVParser.swift in Sources */,
 				B6DA44082616B30600DD1EC2 /* PixelDataModel.xcdatamodeld in Sources */,
 				AAC5E4F125D6BF10007F5990 /* AddressBarButton.swift in Sources */,
 				AAE7527E263B05C600B973F8 /* HistoryEntry.swift in Sources */,
 				AAADFD06264AA282001555EA /* TimeIntervalExtension.swift in Sources */,
 				4B9292D42667123700AD2C21 /* BookmarkListViewController.swift in Sources */,
+				4B723E0D26B0006100E14D75 /* SecureVaultLoginImporter.swift in Sources */,
 				B6D7A2EE25D2418B002B2AE1 /* ShadowView.swift in Sources */,
 				4B9292D32667123700AD2C21 /* AddBookmarkModalViewController.swift in Sources */,
 				AA88D14B252A557100980B4E /* URLRequestExtension.swift in Sources */,
@@ -2624,6 +2769,7 @@
 				4B9292AC26670D3700AD2C21 /* Bookmark.xcdatamodeld in Sources */,
 				AA6EF9B525081B4C004754E6 /* MainMenuActions.swift in Sources */,
 				B63D466925BEB6C200874977 /* WKWebView+SessionState.swift in Sources */,
+				4B723E1226B0006E00E14D75 /* DataImport.swift in Sources */,
 				B6A924D92664C72E001A28CA /* WebKitDownloadTask.swift in Sources */,
 				85D885B326A5A9DE0077C374 /* NSAlert+PasswordManager.swift in Sources */,
 				85E11C2F25E7DC7E00974CAF /* ExternalURLHandler.swift in Sources */,
@@ -2631,6 +2777,7 @@
 				85A0116925AF1D8900FA6A0C /* FindInPageViewController.swift in Sources */,
 				AA6FFB4424DC33320028F4D0 /* NSViewExtension.swift in Sources */,
 				4B9292D52667123700AD2C21 /* BookmarkManagementDetailViewController.swift in Sources */,
+				4B723E1026B0006700E14D75 /* CSVImporter.swift in Sources */,
 				AA4BBA3B25C58FA200C4FB0F /* MainMenu.swift in Sources */,
 				AA585D84248FD31100E9A3E2 /* BrowserTabViewController.swift in Sources */,
 				B6A9E48926146ABF0067D1B9 /* PixelCounter.swift in Sources */,
@@ -2677,6 +2824,7 @@
 				85AC3B0525D6B1D800C7D2AA /* ScriptSourceProviding.swift in Sources */,
 				AA3F895324C18AD500628DDE /* SuggestionViewModel.swift in Sources */,
 				4B9292A326670D2A00AD2C21 /* BookmarkManagedObject.swift in Sources */,
+				4B723E1326B0007A00E14D75 /* CSVLoginExporter.swift in Sources */,
 				8562599A269CA0A600EE44BC /* NSRectExtension.swift in Sources */,
 				4B0511C5262CAA5A00F6079C /* PrivacySecurityPreferencesTableCellView.swift in Sources */,
 				4B677431255DBEB800025BD8 /* BloomFilterWrapper.mm in Sources */,
@@ -2701,6 +2849,7 @@
 				AAE75280263B0A4D00B973F8 /* HistoryCoordinator.swift in Sources */,
 				4B677434255DBEB800025BD8 /* HTTPSBloomFilterSpecification.swift in Sources */,
 				AA97BF4625135DD30014931A /* ApplicationDockMenu.swift in Sources */,
+				4B723E1526B000A400E14D75 /* LoginExport.swift in Sources */,
 				4BA1A69B258B076900F6F690 /* FileStore.swift in Sources */,
 				4B0511CC262CAA5A00F6079C /* PreferencesSplitViewController.swift in Sources */,
 				AAFCB37A25E5403A00859DD4 /* BurnButton.swift in Sources */,
@@ -2796,9 +2945,11 @@
 				4B11060525903E570039B979 /* CoreDataEncryptionTesting.xcdatamodeld in Sources */,
 				858A798826A99DBE00A75A42 /* PasswordManagementItemListModelTests.swift in Sources */,
 				8546DE6225C03056000CA5E1 /* UserAgentTests.swift in Sources */,
+				4B723E0926B0003E00E14D75 /* CSVLoginExporterTests.swift in Sources */,
 				B630793526731BC400DCEE41 /* URLSuggestedFilenameTests.swift in Sources */,
 				4B82E9C125B6A1CD00656FE7 /* TrackerRadarManagerTests.swift in Sources */,
 				85AC3B4925DAC9BD00C7D2AA /* ConfigurationStorageTests.swift in Sources */,
+				4B723E0726B0003E00E14D75 /* CSVImporterTests.swift in Sources */,
 				AA652CDB25DDAB32009059CC /* BookmarkStoreMock.swift in Sources */,
 				B62EB47C25BAD3BB005745C6 /* WKWebViewPrivateMethodsAvailabilityTests.swift in Sources */,
 				B6A5A2A025B96E8300AA7ADA /* AppStateChangePublisherTests.swift in Sources */,
@@ -2807,8 +2958,10 @@
 				AA0F3DB7261A566C0077F2D9 /* SuggestionLoadingMock.swift in Sources */,
 				4B9292BE2667103100AD2C21 /* PasteboardFolderTests.swift in Sources */,
 				4B9292C52667104B00AD2C21 /* CoreDataTestUtilities.swift in Sources */,
+				4B723E1926B000DC00E14D75 /* TemporaryFileCreator.swift in Sources */,
 				4B9292C22667103100AD2C21 /* BookmarkTests.swift in Sources */,
 				142879DC24CE1185005419BB /* SuggestionContainerViewModelTests.swift in Sources */,
+				4B723E1826B000DC00E14D75 /* MockFileStore.swift in Sources */,
 				AA652CD325DDA6E9009059CC /* LocalBookmarkManagerTests.swift in Sources */,
 				4B4F72EC266B2ED300814C60 /* CollectionExtension.swift in Sources */,
 				AAE39D1B24F44885008EF28B /* TabCollectionViewModelDelegateMock.swift in Sources */,
@@ -2825,6 +2978,7 @@
 				B6DA44112616C0FC00DD1EC2 /* PixelTests.swift in Sources */,
 				4B9292BA2667103100AD2C21 /* BookmarkNodePathTests.swift in Sources */,
 				4B9292C02667103100AD2C21 /* BookmarkManagedObjectTests.swift in Sources */,
+				4B723E0626B0003E00E14D75 /* CSVParserTests.swift in Sources */,
 				AA652CCE25DD9071009059CC /* BookmarkListTests.swift in Sources */,
 				B6A5A2A825BAA35500AA7ADA /* WindowManagerStateRestorationTests.swift in Sources */,
 				B61F012325ECBAE400ABB5A3 /* UserScriptsTest.swift in Sources */,
@@ -2835,6 +2989,7 @@
 				AAEC74B82642E43800C2EFBC /* HistoryStoreTests.swift in Sources */,
 				4BA1A6E6258C270800F6F690 /* EncryptionKeyGeneratorTests.swift in Sources */,
 				B61F012B25ECBB1700ABB5A3 /* UserScriptsManagerTests.swift in Sources */,
+				4B723E0526B0003E00E14D75 /* DataImportMocks.swift in Sources */,
 				85AC3B1725D9BC1A00C7D2AA /* ConfigurationDownloaderTests.swift in Sources */,
 				4B0511E7262CAB3700F6079C /* UserDefaultsWrapperUtilities.swift in Sources */,
 				4BA1A6F6258C4F9600F6F690 /* EncryptionMocks.swift in Sources */,
@@ -2843,6 +2998,7 @@
 				AAEC74B42642C69300C2EFBC /* HistoryCoordinatorTests.swift in Sources */,
 				4B0511F8262CB20F00F6079C /* DownloadPreferencesTests.swift in Sources */,
 				AA9C362825518C44004B1BA3 /* WebsiteDataStoreMock.swift in Sources */,
+				4B723E0826B0003E00E14D75 /* MockSecureVault.swift in Sources */,
 				AAEC74B22642C57200C2EFBC /* HistoryCoordinatingMock.swift in Sources */,
 				AAEC74B62642CC6A00C2EFBC /* HistoryStoringMock.swift in Sources */,
 				AA652CB125DD825B009059CC /* LocalBookmarkStoreTests.swift in Sources */,
