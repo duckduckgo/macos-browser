@@ -69,9 +69,10 @@ struct ThirdPartyBrowser {
 
     private let type: Type
 
-    func forceTerminate() {
+    @discardableResult
+    func forceTerminate() -> Bool {
         let application = findRunningApplication()
-        application?.forceTerminate()
+        return application?.forceTerminate() ?? false
     }
 
     private func findRunningApplication() -> NSRunningApplication? {

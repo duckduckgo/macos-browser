@@ -85,7 +85,7 @@ final class DataImportViewController: NSViewController {
 
     @IBAction func actionButtonClicked(_ sender: Any) {
         switch viewState.interactionState {
-        case .ableToImport, .failedToImport: importData()
+        case .ableToImport, .failedToImport: beginImport()
         case .completedImport: dismiss()
         default:
             assertionFailure("\(#file): Import button should be disabled when unable to import")
@@ -196,22 +196,33 @@ final class DataImportViewController: NSViewController {
 
     // MARK: - Actions
 
-    private func importData() {
-        guard let importer = self.dataImporter else {
-            assertionFailure("\(#file): No data importer found")
-            return
-        }
-
+    private func beginImport() {
         if let browser = ThirdPartyBrowser.browser(for: viewState.selectedImportSource), browser.isRunning {
-            let alert = NSAlert.closeRunningBrowserAlert()
+            let alert = NSAlert.closeRunningBrowserAlert(source: viewState.selectedImportSource)
             let result = alert.runModal()
 
             if result == NSApplication.ModalResponse.alertFirstButtonReturn {
                 browser.forceTerminate()
+
+                // Add a delay before completing the import. Completing the import immediately after a successful `forceTerminate` call does not
+                // always leave enough time for the browser's SQLite data to become unlocked.
+                DispatchQueue.main.asyncAfter(deadline: DispatchTime.now() + 1) {
+                    self.completeImport()
+                }
             } else {
                 // If the cancel button was selected, abandon the import.
                 return
             }
+        } else {
+            completeImport()
+        }
+
+    }
+
+    private func completeImport() {
+        guard let importer = self.dataImporter else {
+            assertionFailure("\(#file): No data importer found")
+            return
         }
 
         // When importing data from specific browsers, this will change to only import those types which the user has selected.
@@ -281,15 +292,13 @@ extension DataImportViewController: BrowserImportViewControllerDelegate {
 
 extension NSPopUpButton {
 
-    func displayImportSources(withSelectedSource selectedSource: DataImport.Source) {
+    fileprivate func displayImportSources(withSelectedSource selectedSource: DataImport.Source) {
         removeAllItems()
 
-        let validSources = DataImport.Source.allCases.filter(\.canUseAsSource)
+        let validSources = DataImport.Source.allCases.filter(\.canImportData)
         var selectedSourceIndex: Int?
 
         for (index, source) in validSources.enumerated() {
-            guard source.canUseAsSource else { continue }
-
             addItem(withTitle: source.importSourceName)
             lastItem?.image = source.importSourceImage
 
@@ -299,22 +308,6 @@ extension NSPopUpButton {
         }
 
         selectItem(at: selectedSourceIndex ?? 0)
-    }
-
-}
-
-extension NSAlert {
-
-    static func closeRunningBrowserAlert() -> NSAlert {
-        let alert = NSAlert()
-
-        alert.messageText = "Close Browser"
-        alert.informativeText = "This browser must be closed before importing data. Would you like to close it now?"
-        alert.alertStyle = .warning
-        alert.addButton(withTitle: "Close Browser")
-        alert.addButton(withTitle: "Cancel")
-
-        return alert
     }
 
 }

@@ -52,7 +52,7 @@ enum DataImport {
             }
         }
 
-        var canUseAsSource: Bool {
+        var canImportData: Bool {
             switch self {
             case .brave:
                 return ThirdPartyBrowser.brave.isInstalled
