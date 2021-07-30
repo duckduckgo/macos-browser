@@ -131,7 +131,7 @@ final class DataImportViewController: NSViewController {
             importButton.isEnabled = true
             cancelButton.isHidden = true
         case .failedToImport:
-            self.importButton.title = UserText.initiateImport
+            importButton.title = UserText.initiateImport
             importButton.isEnabled = true
             cancelButton.isHidden = true
         }
@@ -139,24 +139,9 @@ final class DataImportViewController: NSViewController {
 
     private func newChildViewController(for importSource: DataImport.Source, interactionState: InteractionState) -> NSViewController? {
         switch importSource {
-        case .brave:
-            if let viewController = currentChildViewController as? BrowserImportViewController, viewController.browser == .brave { return nil }
+        case .brave, .chrome, .edge:
+            return createBrowserImportViewController(for: importSource)
 
-            let browserImportViewController = BrowserImportViewController.create(with: .brave)
-            browserImportViewController.delegate = self
-            return browserImportViewController
-        case .chrome:
-            if let viewController = currentChildViewController as? BrowserImportViewController, viewController.browser == .chrome { return nil }
-
-            let browserImportViewController = BrowserImportViewController.create(with: .chrome)
-            browserImportViewController.delegate = self
-            return browserImportViewController
-        case .edge:
-            if let viewController = currentChildViewController as? BrowserImportViewController, viewController.browser == .edge { return nil }
-
-            let browserImportViewController = BrowserImportViewController.create(with: .edge)
-            browserImportViewController.delegate = self
-            return browserImportViewController
         case .csv:
             if case let .completedImport(summaryArray) = interactionState {
                 if currentChildViewController is CSVImportSummaryViewController { return nil }
@@ -195,6 +180,16 @@ final class DataImportViewController: NSViewController {
         newChildViewController.view.leadingAnchor.constraint(equalTo: containerView.leadingAnchor).isActive = true
         newChildViewController.view.trailingAnchor.constraint(equalTo: containerView.trailingAnchor).isActive = true
         newChildViewController.view.bottomAnchor.constraint(equalTo: containerView.bottomAnchor).isActive = true
+    }
+
+    private func createBrowserImportViewController(for source: DataImport.Source) -> BrowserImportViewController? {
+        // Prevent transitioning to the same view controller.
+        if let viewController = currentChildViewController as? BrowserImportViewController, viewController.browser == source { return nil }
+
+        let browserImportViewController = BrowserImportViewController.create(with: source)
+        browserImportViewController.delegate = self
+
+        return browserImportViewController
     }
 
     // MARK: - Actions

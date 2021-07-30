@@ -33,13 +33,10 @@ internal class ChromiumDataImporter: DataImporter {
     }
 
     func importableTypes() -> [DataImport.DataType] {
-        // TODO: Check if browser data exists at the application directory path
         return [.logins]
     }
 
     func importData(types: [DataImport.DataType], completion: @escaping (Result<[DataImport.Summary], DataImportError>) -> Void) {
-        print("Data Import (Chromium): Beginning import...")
-
         let loginReader = ChromiumLoginReader(chromiumDataDirectoryPath: applicationDataDirectoryPath, processName: processName)
         let loginResult = loginReader.readLogins()
 
@@ -47,14 +44,11 @@ internal class ChromiumDataImporter: DataImporter {
         case .success(let logins):
             do {
                 let summary = try loginImporter.importLogins(logins)
-                print("Data Import (Chromium): Success! \(summary)")
                 completion(.success([summary]))
             } catch {
-                print("Data Import (Chromium): Cannot access vault")
                 completion(.failure(.cannotAccessSecureVault))
             }
         case .failure:
-            print("Data Import (Chromium): Cannot read database")
             completion(.failure(.browserNeedsToBeClosed))
         }
     }

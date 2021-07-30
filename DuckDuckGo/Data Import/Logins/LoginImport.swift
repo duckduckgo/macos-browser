@@ -40,7 +40,7 @@ struct ImportedLoginCredential: Equatable {
 
     init(title: String? = nil, url: String, username: String, password: String) {
         self.title = title
-        self.url = URL(string: url)?.host ?? url // TODO: Hack to workaround an autofill issue
+        self.url = URL(string: url)?.host ?? url // Try to use the host if possible, as the Secure Vault saves credentials using the host.
         self.username = username
         self.password = password
     }
