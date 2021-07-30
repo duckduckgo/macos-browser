@@ -225,7 +225,7 @@ final class DataImportViewController: NSViewController {
             return
         }
 
-        // When importing data from specific browsers, this will change to only import those types which the user has selected.
+        // When we support multiple types of data, this will change to check which ones were selected. For now, import everything.
         importer.importData(types: importer.importableTypes()) { result in
             switch result {
             case .success(let summary):
@@ -237,6 +237,13 @@ final class DataImportViewController: NSViewController {
                     } else {
                         self.dismiss()
                     }
+                }
+
+                switch self.viewState.selectedImportSource {
+                case .brave: Pixel.fire(.importedLogins(source: .brave))
+                case .chrome: Pixel.fire(.importedLogins(source: .chrome))
+                case .csv: Pixel.fire(.importedLogins(source: .csv))
+                case .edge: Pixel.fire(.importedLogins(source: .edge))
                 }
             case .failure(let error):
                 self.viewState.interactionState = .failedToImport
