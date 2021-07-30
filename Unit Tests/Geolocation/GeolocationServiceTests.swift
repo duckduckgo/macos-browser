@@ -266,4 +266,16 @@ final class GeolocationServiceTests: XCTestCase {
         waitForExpectations(timeout: 0)
     }
 
+    func testWhenHighAccuracyRequestedThenAccuracyIsSetToBest() {
+        let c1 = service.locationPublisher.sink { _ in }
+        XCTAssertEqual(locationManagerMock.desiredAccuracy, kCLLocationAccuracyHundredMeters)
+
+        let c2 = service.highAccuracyPublisher.sink { _ in }
+        XCTAssertEqual(locationManagerMock.desiredAccuracy, kCLLocationAccuracyBest)
+
+        c2.cancel()
+        XCTAssertEqual(locationManagerMock.desiredAccuracy, kCLLocationAccuracyHundredMeters)
+        withExtendedLifetime(c1) {}
+    }
+
 }

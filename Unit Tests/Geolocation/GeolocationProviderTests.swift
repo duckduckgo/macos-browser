@@ -227,6 +227,45 @@ final class GeolocationProviderTests: XCTestCase {
                                                         .cancelled])
     }
 
+    func testWhenHighAccuracyIsRequestedThenHighAccuracyIsActivated() {
+        let e = expectation(description: "high accuracy requested")
+        geolocationServiceMock.onHighAccuracyRequested = { _ in
+            e.fulfill()
+        }
+
+        webView.loadHTMLString(Self.watchPosition(enableHighAccuracy: true), baseURL: .duckDuckGo)
+        NSApp.activate(ignoringOtherApps: true)
+        webView.window?.orderFrontRegardless()
+
+        waitForExpectations(timeout: 5.0)
+
+        XCTAssertEqual(geolocationServiceMock.history, [.highAccuracyRequested,
+                                                        .subscribed])
+    }
+
+    func testWhenGeolocationWatchIsCancelledThenHighAccuracyIsReset() {
+        geolocationServiceMock.onSubscriptionReceived = { [webView] _ in
+            DispatchQueue.main.async {
+                webView!.evaluateJavaScript("clearWatch()") { _, _ in }
+            }
+        }
+        let e = expectation(description: "high accuracy cancelled")
+        geolocationServiceMock.onHighAccuracyCancelled = {
+            e.fulfill()
+        }
+
+        webView.loadHTMLString(Self.watchPosition(enableHighAccuracy: true), baseURL: .duckDuckGo)
+        NSApp.activate(ignoringOtherApps: true)
+        webView.window?.orderFrontRegardless()
+
+        waitForExpectations(timeout: 5.0)
+
+        XCTAssertEqual(geolocationServiceMock.history, [.highAccuracyRequested,
+                                                        .subscribed,
+                                                        .cancelled,
+                                                        .highAccuracyCancelled])
+    }
+
     func testWhenMultipleWebViewsRequestLocationThenItIsSubscribedAndCancelledCorrectly() {
         let webView2 = makeWebView()
 

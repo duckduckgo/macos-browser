@@ -27,6 +27,8 @@ final class GeolocationServiceMock: GeolocationServiceProtocol {
         case subscribed
         case locationPublished
         case cancelled
+        case highAccuracyRequested
+        case highAccuracyCancelled
     }
     var history = [CallHistoryItem]()
 
@@ -37,13 +39,21 @@ final class GeolocationServiceMock: GeolocationServiceProtocol {
         }
     }
     private var locationPublisherEventsHandler: AnyPublisher<Result<CLLocation, Error>?, Never>!
+    private var highAccuracyEventsHandler: AnyPublisher<Void, Never>!
 
     var onSubscriptionReceived: ((Subscription) -> Void)?
     var onSubscriptionCancelled: (() -> Void)?
 
+    var onHighAccuracyRequested: ((Subscription) -> Void)?
+    var onHighAccuracyCancelled: (() -> Void)?
+
     init() {
         locationPublisherEventsHandler = $currentLocationPublished
             .handleEvents(receiveSubscription: self.didReceiveSubscription, receiveCancel: self.didReceiveCancel)
+            .eraseToAnyPublisher()
+        highAccuracyEventsHandler = $currentLocationPublished.map { _ in }
+            .handleEvents(receiveSubscription: self.didReceiveHighAccuracySubscription,
+                          receiveCancel: self.didReceiveHighAccuracyCancel)
             .eraseToAnyPublisher()
     }
 
@@ -56,6 +66,10 @@ final class GeolocationServiceMock: GeolocationServiceProtocol {
     }
     var authorizationStatusPublisher: AnyPublisher<CLAuthorizationStatus, Never> {
         $authorizationStatus.eraseToAnyPublisher()
+    }
+
+    var highAccuracyPublisher: AnyPublisher<Void, Never> {
+        highAccuracyEventsHandler
     }
 
     var locationServicesEnabledValue = true {
@@ -75,6 +89,15 @@ final class GeolocationServiceMock: GeolocationServiceProtocol {
     private func didReceiveCancel() {
         history.append(.cancelled)
         onSubscriptionCancelled?()
+    }
+
+    private func didReceiveHighAccuracySubscription(_ s: Subscription) {
+        history.append(.highAccuracyRequested)
+        onHighAccuracyRequested?(s)
+    }
+    private func didReceiveHighAccuracyCancel() {
+        history.append(.highAccuracyCancelled)
+        onHighAccuracyCancelled?()
     }
 
 }

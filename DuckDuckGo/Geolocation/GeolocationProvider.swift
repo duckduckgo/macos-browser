@@ -41,6 +41,7 @@ final class GeolocationProvider: NSObject, GeolocationProviderProtocol {
     private var geolocationManager: WKGeolocationManager
     private var locationCancellable: AnyCancellable?
     private var appIsActiveCancellable: AnyCancellable?
+    private var highAccuracyCancellable: AnyCancellable?
 
     @PublishedAfter private var publishedIsActive: Bool = false {
         didSet {
@@ -174,11 +175,13 @@ final class GeolocationProvider: NSObject, GeolocationProviderProtocol {
 
     fileprivate func stopUpdatingLocation(geolocationManager: WKGeolocationManager) {
         self.isActive = false
+        highAccuracyCancellable?.cancel()
+        highAccuracyCancellable = nil
         updateLocationSubscription()
     }
 
     fileprivate func geolocationManager(_ geolocationManager: WKGeolocationManager, setEnableHighAccuracyCallback enable: Bool) {
-        #warning("Set accuracy")
+        highAccuracyCancellable = enable ? geolocationService.highAccuracyPublisher.sink { _ in } : nil
     }
 
 }
