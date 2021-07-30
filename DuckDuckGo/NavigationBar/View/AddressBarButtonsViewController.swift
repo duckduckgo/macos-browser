@@ -143,6 +143,9 @@ final class AddressBarButtonsViewController: NSViewController {
     }
     
     @IBAction func privacyEntryPointButtonAction(_ sender: Any) {
+        if _permissionAuthorizationPopover?.isShown == true {
+            permissionAuthorizationPopover.close()
+        }
         openPrivacyDashboard()
     }
 
@@ -309,11 +312,9 @@ final class AddressBarButtonsViewController: NSViewController {
     }
 
     private func subscribeToSelectedTabViewModel() {
-        selectedTabViewModelCancellable = tabCollectionViewModel.$selectedTabViewModel
-            .scan((oldValue: TabViewModel?.none, value: TabViewModel?.none)) { ($0.value, $1) }
-            .receive(on: DispatchQueue.main).sink { [weak self] arg in
-                self?.subscribeToUrl()
-                self?.subscribeToPermissions(oldValue: arg.oldValue)
+        selectedTabViewModelCancellable = tabCollectionViewModel.$selectedTabViewModel.receive(on: DispatchQueue.main).sink { [weak self] _ in
+            self?.subscribeToUrl()
+            self?.subscribeToPermissions()
         }
     }
 
@@ -330,14 +331,8 @@ final class AddressBarButtonsViewController: NSViewController {
         }
     }
 
-    private func subscribeToPermissions(oldValue: TabViewModel?) {
+    private func subscribeToPermissions() {
         permissionsCancellables = []
-
-        // deny all the postponed Permission Popovers automatically
-        while let query = oldValue?.permissionAuthorizationQuery {
-            query.denyAutomatically()
-        }
-
         guard let selectedTabViewModel = tabCollectionViewModel.selectedTabViewModel else {
             return
         }
@@ -363,8 +358,7 @@ final class AddressBarButtonsViewController: NSViewController {
         microphoneButton.buttonState = selectedTabViewModel.usedPermissions.microphone
 
         if let query = selectedTabViewModel.permissionAuthorizationQuery {
-            // don't reopen Permission Popover if was closed by clicking outside of the popover
-            if permissionAuthorizationPopover.viewController.query !== query {
+            if !permissionAuthorizationPopover.isShown {
                 openPermissionAuthorizationPopover(for: query)
             }
         } else if _permissionAuthorizationPopover?.isShown == true {

@@ -177,54 +177,6 @@ final class PermissionModelTests: XCTestCase {
                                            .microphone: .active])
     }
 
-    func testWhenQueryIsPostponedThenItCanBeGrantedLater() {
-        let e1 = expectation(description: "Query published")
-        let c = model.$authorizationQuery.sink {
-            guard let query = $0 else { return }
-            query.postpone()
-            e1.fulfill()
-        }
-
-        var e2: XCTestExpectation!
-        self.webView(webView, requestUserMediaAuthorizationFor: [.microphone, .camera],
-                     url: .duckDuckGo,
-                     mainFrameURL: .duckDuckGo) { granted in
-            XCTAssertTrue(granted)
-            e2.fulfill()
-        }
-
-        waitForExpectations(timeout: 1)
-        c.cancel()
-
-        e2 = expectation(description: "Permission granted")
-        model.authorizationQuery?.handleDecision(grant: true)
-        waitForExpectations(timeout: 1)
-    }
-
-    func testWhenQueryIsPostponedThenItCanBeDeniedLater() {
-        let e1 = expectation(description: "Query published")
-        let c = model.$authorizationQuery.sink {
-            guard let query = $0 else { return }
-            query.postpone()
-            e1.fulfill()
-        }
-
-        var e2: XCTestExpectation!
-        self.webView(webView, requestUserMediaAuthorizationFor: [.microphone, .camera],
-                     url: .duckDuckGo,
-                     mainFrameURL: .duckDuckGo) { granted in
-            XCTAssertFalse(granted)
-            e2.fulfill()
-        }
-
-        waitForExpectations(timeout: 1)
-        c.cancel()
-
-        e2 = expectation(description: "Permission granted")
-        model.authorizationQuery?.handleDecision(grant: false)
-        waitForExpectations(timeout: 1)
-    }
-
     func testWhenLocationPermissionIsGrantedThenItIsProvidedToDecisionHandler() {
         self.geolocationServiceMock.authorizationStatus = .authorized
         let c = model.$authorizationQuery.sink {
@@ -827,9 +779,9 @@ final class PermissionModelTests: XCTestCase {
         model.revoke(.microphone)
         waitForExpectations(timeout: 0)
         if #available(macOS 12, *) {
-            XCTAssertEqual(model.permissions, [.camera: .active, .microphone: .denied(explicitly: true)])
+            XCTAssertEqual(model.permissions, [.camera: .active, .microphone: .denied])
         } else {
-            XCTAssertEqual(model.permissions, [.camera: .inactive, .microphone: .denied(explicitly: true)])
+            XCTAssertEqual(model.permissions, [.camera: .inactive, .microphone: .denied])
         }
     }
 
@@ -855,9 +807,9 @@ final class PermissionModelTests: XCTestCase {
         waitForExpectations(timeout: 0)
 
         if #available(macOS 12, *) {
-            XCTAssertEqual(model.permissions, [.camera: .denied(explicitly: true), .microphone: .active])
+            XCTAssertEqual(model.permissions, [.camera: .denied, .microphone: .active])
         } else {
-            XCTAssertEqual(model.permissions, [.camera: .denied(explicitly: true), .microphone: .inactive])
+            XCTAssertEqual(model.permissions, [.camera: .denied, .microphone: .inactive])
         }
     }
 
@@ -888,7 +840,7 @@ final class PermissionModelTests: XCTestCase {
         model.revoke(.microphone)
         waitForExpectations(timeout: 0)
 
-        XCTAssertEqual(model.permissions, [.camera: .denied(explicitly: true), .microphone: .denied(explicitly: true)])
+        XCTAssertEqual(model.permissions, [.camera: .denied, .microphone: .denied])
     }
 
     func testWhenGeolocationIsRevokedThenRevokeGeolocationIsCalled() {
@@ -896,7 +848,7 @@ final class PermissionModelTests: XCTestCase {
         geolocationProviderMock.isActive = true
 
         model.revoke(.geolocation)
-        XCTAssertEqual(model.permissions, [.geolocation: .denied(explicitly: true)])
+        XCTAssertEqual(model.permissions, [.geolocation: .denied])
     }
 
 }

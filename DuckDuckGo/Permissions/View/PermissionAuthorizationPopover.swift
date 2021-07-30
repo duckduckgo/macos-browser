@@ -23,7 +23,7 @@ final class PermissionAuthorizationPopover: NSPopover {
     override init() {
         super.init()
 
-        behavior = .transient
+        behavior = .applicationDefined
         setupContentController()
     }
 

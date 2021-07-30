@@ -24,8 +24,7 @@ final class PermissionAuthorizationQuery {
 
     enum Decision {
         case granted(PermissionAuthorizationQuery)
-        case denied(query: PermissionAuthorizationQuery, explicitly: Bool)
-        case postponed
+        case denied(PermissionAuthorizationQuery)
         case deinitialized
     }
     private var decisionHandler: ((Decision) -> Void)?
@@ -37,17 +36,8 @@ final class PermissionAuthorizationQuery {
     }
 
     func handleDecision(grant: Bool) {
-        decisionHandler?(grant ? .granted(self) : .denied(query: self, explicitly: true))
+        decisionHandler?(grant ? .granted(self) : .denied(self))
         decisionHandler = nil
-    }
-
-    func denyAutomatically() {
-        decisionHandler?(.denied(query: self, explicitly: false))
-        decisionHandler = nil
-    }
-
-    func postpone() {
-        decisionHandler?(.postponed)
     }
 
     deinit {

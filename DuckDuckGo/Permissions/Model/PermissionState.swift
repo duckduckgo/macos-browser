@@ -23,7 +23,7 @@ enum PermissionState: Equatable {
     case requested(PermissionAuthorizationQuery)
     case active
     case revoking
-    case denied(explicitly: Bool)
+    case denied
     case paused
     case inactive
 
@@ -34,7 +34,7 @@ enum PermissionState: Equatable {
         case .requested(let query1): if case .requested(let query2) = rhs, query1 === query2 { return true }
         case .active: if case .active = rhs { return true }
         case .revoking: if case .revoking = rhs { return true }
-        case .denied(explicitly: let explicitly): if case .denied(explicitly) = rhs { return true }
+        case .denied: if case .denied = rhs { return true }
         case .paused: if case .paused = rhs { return true }
         case .inactive: if case .inactive = rhs { return true }
         }
@@ -62,8 +62,8 @@ extension Optional where Wrapped == PermissionState {
         self = .requested(pendingQuery)
     }
 
-    mutating func denied(explicitly: Bool) {
-        self = .denied(explicitly: explicitly)
+    mutating func denied() {
+        self = .denied
     }
 
     mutating func update(with captureState: WKWebView.CaptureState) {
@@ -98,7 +98,7 @@ extension Optional where Wrapped == PermissionState {
 
         // Permission revoked
         case (.revoking, .none):
-            self = .denied(explicitly: true)
+            self = .denied
         }
     }
 

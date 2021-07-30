@@ -28,7 +28,7 @@ final class PermissionModel {
 
     private var authorizationQueries = [PermissionAuthorizationQuery]() {
         didSet {
-            authorizationQuery = authorizationQueries.last
+            authorizationQuery = authorizationQueries.first
         }
     }
 
@@ -123,18 +123,16 @@ final class PermissionModel {
             let query: PermissionAuthorizationQuery?
             let granted: Bool
             switch decision {
-            case .postponed:
-                return
             case .deinitialized:
                 query = nil
                 granted = false
 
-            case .denied(query: let completedQuery, explicitly: let explicitly):
+            case .denied(let completedQuery):
                 query = completedQuery
                 granted = false
 
                 for permission in permissions {
-                    self?.permissions[permission].denied(explicitly: explicitly)
+                    self?.permissions[permission].denied()
                 }
 
             case .granted(let completedQuery):

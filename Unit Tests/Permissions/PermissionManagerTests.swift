@@ -30,7 +30,7 @@ final class PermissionManagerTests: XCTestCase {
         store = PermissionStoreMock()
     }
 
-    func testWhenPermissionManagerInitializedPermissionsAreLoaded() {
+    func testWhenPermissionManagerInitializedThenPermissionsAreLoaded() {
         store.permissions = [.entity1, .entity2]
         let result1 = manager.permission(forDomain: "www." + PermissionEntity.entity1.domain,
                                          permissionType: PermissionEntity.entity1.type)
@@ -65,7 +65,7 @@ final class PermissionManagerTests: XCTestCase {
         XCTAssertEqual(result, true)
     }
 
-    func testWhenPermissionUpdatedItsValueIsUpdated() {
+    func testWhenPermissionUpdatedThenItsValueIsUpdated() {
         store.permissions = [.entity1]
         manager.setPermission(!PermissionEntity.entity1.permission.allow,
                               forDomain: "www." + PermissionEntity.entity1.domain,
@@ -80,7 +80,7 @@ final class PermissionManagerTests: XCTestCase {
         XCTAssertEqual(result, !PermissionEntity.entity1.permission.allow)
     }
 
-    func testWhenPermissionRemovedItsValueBecomesNil() {
+    func testWhenPermissionRemovedThenItsValueBecomesNil() {
         store.permissions = [.entity1]
         manager.removePermission(forDomain: PermissionEntity.entity1.domain,
                                  permissionType: PermissionEntity.entity1.type)
@@ -93,7 +93,7 @@ final class PermissionManagerTests: XCTestCase {
         XCTAssertNil(result)
     }
 
-    func testWhenNewPermissionIsSetItIsSavedAndUpdated() {
+    func testWhenNewPermissionIsSetThenItIsSavedAndUpdated() {
         store.permissions = []
         XCTAssertNil(manager.permission(forDomain: PermissionEntity.entity1.domain,
                                         permissionType: PermissionEntity.entity1.type))
@@ -123,7 +123,7 @@ final class PermissionManagerTests: XCTestCase {
         XCTAssertEqual(result2, false)
     }
 
-    func testWhenPermissionIsAddedSubjectIsPublished() {
+    func testWhenPermissionIsAddedThenSubjectIsPublished() {
         let e = expectation(description: "permission published")
         let c = manager.permissionPublisher.sink { value in
             XCTAssertEqual(value.domain, PermissionEntity.entity1.domain)
@@ -140,7 +140,7 @@ final class PermissionManagerTests: XCTestCase {
         }
     }
 
-    func testWhenPermissionAddFailsSubjectIsPublished() {
+    func testWhenPermissionAddFailsThenSubjectIsPublished() {
         let e = expectation(description: "permission published")
         let c = manager.permissionPublisher.sink { value in
             XCTAssertEqual(value.domain, PermissionEntity.entity1.domain)
@@ -159,7 +159,7 @@ final class PermissionManagerTests: XCTestCase {
         }
     }
 
-    func testWhenPermissionIsUpdatedSubjectIsPublished() {
+    func testWhenPermissionIsUpdatedThenSubjectIsPublished() {
         store.permissions = [.entity1]
 
         let e = expectation(description: "permission published")
@@ -178,7 +178,7 @@ final class PermissionManagerTests: XCTestCase {
         }
     }
 
-    func testWhenPermissionIsRemovedSubjectIsPublished() {
+    func testWhenPermissionIsRemovedThenSubjectIsPublished() {
         store.permissions = [.entity2]
 
         let e = expectation(description: "permission published")
