@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<document type="com.apple.InterfaceBuilder3.Cocoa.Storyboard.XIB" version="3.0" toolsVersion="17701" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none" useAutolayout="YES" initialViewController="uSf-9n-QMw">
+<document type="com.apple.InterfaceBuilder3.Cocoa.Storyboard.XIB" version="3.0" toolsVersion="18122" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none" useAutolayout="YES" initialViewController="uSf-9n-QMw">
     <dependencies>
         <deployment identifier="macosx"/>
-        <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="17701"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="18122"/>
         <capability name="Named colors" minToolsVersion="9.0"/>
         <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
     </dependencies>
@@ -76,11 +76,11 @@
                             <scrollView wantsLayer="YES" borderType="none" horizontalLineScroll="10" horizontalPageScroll="10" verticalLineScroll="10" verticalPageScroll="10" hasVerticalScroller="NO" verticalScrollElasticity="none" translatesAutoresizingMaskIntoConstraints="NO" id="O0X-yp-zLn" customClass="TabBarScrollView" customModule="DuckDuckGo_Privacy_Browser" customModuleProvider="target">
                                 <rect key="frame" x="76" y="0.0" width="661" height="32"/>
                                 <clipView key="contentView" drawsBackground="NO" copiesOnScroll="NO" translatesAutoresizingMaskIntoConstraints="NO" id="zdf-RD-hTG">
-                                    <rect key="frame" x="0.0" y="0.0" width="661" height="32"/>
+                                    <rect key="frame" x="0.0" y="0.0" width="661" height="17"/>
                                     <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                     <subviews>
                                         <collectionView selectable="YES" allowsEmptySelection="NO" translatesAutoresizingMaskIntoConstraints="NO" id="OEu-5P-cRF" customClass="TabBarCollectionView" customModule="DuckDuckGo_Privacy_Browser" customModuleProvider="target">
-                                            <rect key="frame" x="0.0" y="0.0" width="661" height="32"/>
+                                            <rect key="frame" x="0.0" y="0.0" width="661" height="17"/>
                                             <autoresizingMask key="autoresizingMask" heightSizable="YES"/>
                                             <collectionViewFlowLayout key="collectionViewLayout" scrollDirection="horizontal" id="oAv-jh-KDw">
                                                 <size key="itemSize" width="120" height="32"/>
@@ -97,7 +97,7 @@
                                 </clipView>
                                 <edgeInsets key="contentInsets" left="0.0" right="0.0" top="0.0" bottom="0.0"/>
                                 <scroller key="horizontalScroller" wantsLayer="YES" verticalHuggingPriority="750" horizontal="YES" id="f6A-N1-Ed1">
-                                    <rect key="frame" x="0.0" y="16" width="661" height="16"/>
+                                    <rect key="frame" x="0.0" y="17" width="661" height="15"/>
                                     <autoresizingMask key="autoresizingMask"/>
                                 </scroller>
                                 <scroller key="verticalScroller" hidden="YES" wantsLayer="YES" verticalHuggingPriority="750" horizontal="NO" id="tXZ-5R-7cy">
@@ -274,10 +274,10 @@
         </scene>
     </scenes>
     <resources>
-        <image name="Add" width="14" height="14"/>
-        <image name="Back" width="7" height="13"/>
+        <image name="Add" width="16" height="16"/>
+        <image name="Back" width="16" height="16"/>
         <image name="Burn" width="16" height="16"/>
-        <image name="Forward" width="7" height="13"/>
+        <image name="Forward" width="16" height="16"/>
         <image name="TabBarShadowLeft" width="5" height="34"/>
         <image name="TabBarShadowRight" width="5" height="34"/>
         <namedColor name="ButtonColor">

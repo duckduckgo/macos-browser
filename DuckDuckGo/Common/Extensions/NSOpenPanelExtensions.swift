@@ -31,4 +31,16 @@ extension NSOpenPanel {
 
         return panel
     }
+
+    static func filePanel(allowedExtension: String) -> NSOpenPanel {
+        let panel = NSOpenPanel()
+
+        panel.directoryURL = FileManager.default.homeDirectoryForCurrentUser.appendingPathComponent("Desktop")
+        panel.canChooseFiles = true
+        panel.allowedFileTypes = [allowedExtension]
+        panel.canChooseDirectories = false
+
+        return panel
+    }
+
 }

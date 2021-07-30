@@ -142,7 +142,6 @@ final class NavigationBarViewController: NSViewController {
 
             case .emailProtectionOff,
                  .emailProtectionCreateAddress,
-                 .emailProtectionDashboard,
                  .bookmarkThisPage,
                  .favoriteThisPage:
                 break
@@ -253,7 +252,8 @@ final class NavigationBarViewController: NSViewController {
             return
         }
         passwordManagementPopover.viewController.domain = domain
-        passwordManagementButton.isHidden = (try? SecureVaultFactory.default.makeVault().accountsFor(domain: domain).isEmpty) ?? false
+        let hide = (try? SecureVaultFactory.default.makeVault().accountsFor(domain: domain).isEmpty) ?? false
+        passwordManagementButton.isHidden = hide && !saveCredentialsPopover.isShown && !passwordManagementPopover.isShown
     }
 
     private func subscribeToCredentialsToSave() {

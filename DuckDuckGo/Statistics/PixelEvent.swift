@@ -53,11 +53,12 @@ extension Pixel {
 
         case navigation(kind: NavigationKind, source: NavigationAccessPoint)
 
-        case suggestionsDisplayed(hasBookmark: HasBookmark, hasFavorite: HasFavorite)
+        case suggestionsDisplayed(hasBookmark: HasBookmark, hasFavorite: HasFavorite, hasHistoryEntry: HasHistoryEntry)
 
-        static func suggestionsDisplayed(_ arg: (hasBookmark: Bool, hasFavorite: Bool)) -> Event {
-            return .suggestionsDisplayed(hasBookmark: arg.hasBookmark ? .hasBookmark : .noBookmarks,
-                                         hasFavorite: arg.hasFavorite ? .hasFavorite : .noFavorites)
+        static func suggestionsDisplayed(_ characteristics: SuggestionListChacteristics) -> Event {
+            return .suggestionsDisplayed(hasBookmark: characteristics.hasBookmark ? .hasBookmark : .noBookmarks,
+                                         hasFavorite: characteristics.hasFavorite ? .hasFavorite : .noFavorites,
+                                         hasHistoryEntry: characteristics.hasHistoryEntry ? .hasHistoryEntry : .noHistoryEntry)
         }
 
         case sharingMenu(repetition: Repetition = .init(key: "sharing"), result: SharingResult)
@@ -65,6 +66,9 @@ extension Pixel {
         case moreMenu(repetition: Repetition = .init(key: "more"), result: MoreResult)
 
         case refresh(source: RefreshAccessPoint)
+
+        case importedLogins(repetition: Repetition = .init(key: "imported-logins"), source: DataImportSource)
+        case exportedLogins(repetition: Repetition = .init(key: "exported-logins"))
 
         case debug(event: Debug, error: Error? = nil, countedBy: Pixel.Counter? = nil)
 
@@ -139,8 +143,8 @@ extension Pixel.Event {
         case .navigation(kind: let kind, source: let source):
             return "m_mac_navigation_\(kind)_\(source)"
 
-        case .suggestionsDisplayed(hasBookmark: let hasBookmark, hasFavorite: let hasFavorite):
-            return "m_mac_suggestions-displayed_\(hasBookmark)_\(hasFavorite)"
+        case .suggestionsDisplayed(hasBookmark: let hasBookmark, hasFavorite: let hasFavorite, hasHistoryEntry: let hasHistoryEntry):
+            return "m_mac_suggestions-displayed_\(hasBookmark)_\(hasFavorite)_\(hasHistoryEntry)"
 
         case .sharingMenu(repetition: let repetition, result: let result):
             return "m_mac_share_\(repetition)_\(result)"
@@ -150,6 +154,12 @@ extension Pixel.Event {
 
         case .refresh(source: let source):
             return "m_mac_refresh_\(source)"
+
+        case .importedLogins(repetition: let repetition, source: let source):
+            return "m_mac_imported-logins_\(repetition)_\(source)"
+
+        case .exportedLogins(repetition: let repetition):
+            return "m_mac_exported-logins_\(repetition)"
 
         case .debug(event: let event, error: _, countedBy: _):
             return "m_mac_debug_\(event)"

@@ -20,14 +20,14 @@ import Foundation
 import os.log
 
 final class StatePersistenceService {
-    private let fileStore: FileStoring
+    private let fileStore: FileStore
     private let fileName: String
     private let queue = DispatchQueue(label: "StateRestorationManager.queue", qos: .background)
     private var job: DispatchWorkItem?
 
     private(set) var error: Error?
 
-    init(fileStore: FileStoring, fileName: String) {
+    init(fileStore: FileStore, fileName: String) {
         self.fileStore = fileStore
         self.fileName = fileName
     }
@@ -42,7 +42,8 @@ final class StatePersistenceService {
         job?.cancel()
         job = DispatchWorkItem {
             self.error = nil
-            if !self.fileStore.persist(data, fileName: self.fileName) {
+            let location = URL.persistenceLocation(for: self.fileName)
+            if !self.fileStore.persist(data, url: location) {
                 self.error = CocoaError(.fileWriteNoPermission)
             }
         }
@@ -61,7 +62,8 @@ final class StatePersistenceService {
 
         job?.cancel()
         job = DispatchWorkItem {
-            self.fileStore.remove(self.fileName)
+            let location = URL.persistenceLocation(for: self.fileName)
+            self.fileStore.remove(fileAtURL: location)
         }
         queue.dispatch(job!, sync: sync)
     }
@@ -71,7 +73,7 @@ final class StatePersistenceService {
     }
 
     func restoreState(using restore: @escaping (NSCoder) throws -> Void) throws {
-        guard let data = fileStore.loadData(named: fileName) else {
+        guard let data = fileStore.loadData(at: URL.persistenceLocation(for: self.fileName)) else {
             throw CocoaError(.fileReadNoSuchFile)
         }
         let unarchiver = try NSKeyedUnarchiver.init(forReadingFrom: data)

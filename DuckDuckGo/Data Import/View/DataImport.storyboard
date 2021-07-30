@@ -1,0 +1,242 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<document type="com.apple.InterfaceBuilder3.Cocoa.Storyboard.XIB" version="3.0" toolsVersion="18122" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none" useAutolayout="YES">
+    <dependencies>
+        <deployment identifier="macosx"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="18122"/>
+        <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
+    </dependencies>
+    <scenes>
+        <!--Data Import View Controller-->
+        <scene sceneID="PEd-7d-5j0">
+            <objects>
+                <viewController storyboardIdentifier="DataImportViewController" id="bU7-R8-ocO" customClass="DataImportViewController" customModule="DuckDuckGo_Privacy_Browser" customModuleProvider="target" sceneMemberID="viewController">
+                    <view key="view" translatesAutoresizingMaskIntoConstraints="NO" id="tOy-S4-hL0">
+                        <rect key="frame" x="0.0" y="0.0" width="522" height="329"/>
+                        <subviews>
+                            <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="0i7-MK-KZ1">
+                                <rect key="frame" x="18" y="294" width="136" height="15"/>
+                                <textFieldCell key="cell" lineBreakMode="clipping" title="Import Browser Data" id="Qne-Wm-qAI">
+                                    <font key="font" size="13" name="SFProText-Semibold"/>
+                                    <color key="textColor" name="labelColor" catalog="System" colorSpace="catalog"/>
+                                    <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
+                                </textFieldCell>
+                            </textField>
+                            <popUpButton verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="sh9-5v-T9e" userLabel="Import Source Picker">
+                                <rect key="frame" x="17" y="242" width="207" height="25"/>
+                                <constraints>
+                                    <constraint firstAttribute="width" priority="500" constant="200" id="gkZ-Iu-IBm"/>
+                                </constraints>
+                                <popUpButtonCell key="cell" type="push" title="CSV" bezelStyle="rounded" alignment="left" lineBreakMode="truncatingTail" state="on" borderStyle="borderAndBezel" imageScaling="proportionallyDown" inset="2" selectedItem="JdU-Ne-uLi" id="6q4-5Y-MHI" userLabel="CSV">
+                                    <behavior key="behavior" lightByBackground="YES" lightByGray="YES"/>
+                                    <font key="font" metaFont="menu"/>
+                                    <menu key="menu" id="6wh-Tc-88e">
+                                        <items>
+                                            <menuItem title="CSV" state="on" id="JdU-Ne-uLi" userLabel="CSV"/>
+                                        </items>
+                                    </menu>
+                                </popUpButtonCell>
+                            </popUpButton>
+                            <button verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="p3M-G6-gOX">
+                                <rect key="frame" x="434" y="13" width="75" height="32"/>
+                                <buttonCell key="cell" type="push" title="Import" bezelStyle="rounded" alignment="center" enabled="NO" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="HD2-Mw-Fjl">
+                                    <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
+                                    <font key="font" metaFont="system"/>
+                                    <string key="keyEquivalent" base64-UTF8="YES">
+DQ
+</string>
+                                </buttonCell>
+                                <connections>
+                                    <action selector="actionButtonClicked:" target="bU7-R8-ocO" id="NSv-w5-y1z"/>
+                                </connections>
+                            </button>
+                            <button verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="UkV-S4-sID">
+                                <rect key="frame" x="360" y="13" width="76" height="32"/>
+                                <buttonCell key="cell" type="push" title="Cancel" bezelStyle="rounded" alignment="center" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="XaU-cZ-jqv">
+                                    <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
+                                    <font key="font" metaFont="system"/>
+                                    <string key="keyEquivalent" base64-UTF8="YES">
+Gw
+</string>
+                                </buttonCell>
+                                <connections>
+                                    <action selector="cancelButtonClicked:" target="bU7-R8-ocO" id="Ti4-Gg-geM"/>
+                                </connections>
+                            </button>
+                            <customView translatesAutoresizingMaskIntoConstraints="NO" id="Bde-GS-Qx1">
+                                <rect key="frame" x="20" y="58" width="482" height="170"/>
+                            </customView>
+                        </subviews>
+                        <constraints>
+                            <constraint firstAttribute="trailing" secondItem="p3M-G6-gOX" secondAttribute="trailing" constant="20" symbolic="YES" id="2Pk-Jt-TVr"/>
+                            <constraint firstItem="p3M-G6-gOX" firstAttribute="leading" secondItem="UkV-S4-sID" secondAttribute="trailing" constant="12" symbolic="YES" id="2q4-wX-FIX"/>
+                            <constraint firstItem="0i7-MK-KZ1" firstAttribute="top" secondItem="tOy-S4-hL0" secondAttribute="top" constant="20" symbolic="YES" id="Aep-ee-MBT"/>
+                            <constraint firstAttribute="bottom" secondItem="UkV-S4-sID" secondAttribute="bottom" constant="20" symbolic="YES" id="Dcb-ww-ZTA"/>
+                            <constraint firstItem="Bde-GS-Qx1" firstAttribute="top" secondItem="sh9-5v-T9e" secondAttribute="bottom" constant="18" id="EEW-EO-4Iy"/>
+                            <constraint firstItem="Bde-GS-Qx1" firstAttribute="leading" secondItem="tOy-S4-hL0" secondAttribute="leading" constant="20" symbolic="YES" id="GQY-oe-i7P"/>
+                            <constraint firstAttribute="trailing" relation="greaterThanOrEqual" secondItem="0i7-MK-KZ1" secondAttribute="trailing" constant="20" symbolic="YES" id="Oab-xU-Wp2"/>
+                            <constraint firstItem="sh9-5v-T9e" firstAttribute="leading" secondItem="tOy-S4-hL0" secondAttribute="leading" constant="20" symbolic="YES" id="Spt-Wv-v3y"/>
+                            <constraint firstAttribute="bottom" secondItem="p3M-G6-gOX" secondAttribute="bottom" constant="20" symbolic="YES" id="d6F-cy-53u"/>
+                            <constraint firstItem="0i7-MK-KZ1" firstAttribute="leading" secondItem="tOy-S4-hL0" secondAttribute="leading" constant="20" symbolic="YES" id="g7P-bX-xpj"/>
+                            <constraint firstAttribute="trailing" secondItem="Bde-GS-Qx1" secondAttribute="trailing" constant="20" symbolic="YES" id="mm5-fe-nTF"/>
+                            <constraint firstItem="p3M-G6-gOX" firstAttribute="top" secondItem="Bde-GS-Qx1" secondAttribute="bottom" constant="18" id="oji-iH-bCG"/>
+                            <constraint firstItem="sh9-5v-T9e" firstAttribute="top" secondItem="0i7-MK-KZ1" secondAttribute="bottom" constant="28" id="zOc-EF-N9F"/>
+                        </constraints>
+                    </view>
+                    <connections>
+                        <outlet property="cancelButton" destination="UkV-S4-sID" id="JVC-O8-cjJ"/>
+                        <outlet property="containerView" destination="Bde-GS-Qx1" id="SMY-ti-olQ"/>
+                        <outlet property="importButton" destination="p3M-G6-gOX" id="S3v-kX-VOm"/>
+                        <outlet property="importSourcePopUpButton" destination="sh9-5v-T9e" id="0My-NY-rjb"/>
+                    </connections>
+                </viewController>
+                <customObject id="9uD-mB-xHs" userLabel="First Responder" customClass="NSResponder" sceneMemberID="firstResponder"/>
+            </objects>
+            <point key="canvasLocation" x="75" y="146"/>
+        </scene>
+        <!--Import Summary View Controller-->
+        <scene sceneID="lq1-B2-i1k">
+            <objects>
+                <viewController storyboardIdentifier="CSVImportSummaryViewController" id="SBx-aI-Zdd" customClass="CSVImportSummaryViewController" customModule="DuckDuckGo_Privacy_Browser" customModuleProvider="target" sceneMemberID="viewController">
+                    <view key="view" id="VAn-Ub-6ym">
+                        <rect key="frame" x="0.0" y="0.0" width="469" height="56"/>
+                        <autoresizingMask key="autoresizingMask"/>
+                        <subviews>
+                            <stackView distribution="fill" orientation="vertical" alignment="centerX" horizontalStackHuggingPriority="249.99998474121094" verticalStackHuggingPriority="249.99998474121094" horizontalHuggingPriority="1000" detachesHiddenViews="YES" translatesAutoresizingMaskIntoConstraints="NO" id="Z3O-9X-zTx">
+                                <rect key="frame" x="20" y="20" width="429" height="16"/>
+                                <subviews>
+                                    <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="kEX-xf-rNu">
+                                        <rect key="frame" x="158" y="24" width="114" height="16"/>
+                                        <textFieldCell key="cell" lineBreakMode="clipping" title="Import Complete" id="rJC-Qi-wHX">
+                                            <font key="font" textStyle="headline" name=".SFNS-Bold"/>
+                                            <color key="textColor" name="labelColor" catalog="System" colorSpace="catalog"/>
+                                            <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
+                                        </textFieldCell>
+                                    </textField>
+                                    <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" id="Wew-SV-bZw">
+                                        <rect key="frame" x="-2" y="0.0" width="131" height="16"/>
+                                        <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+                                        <textFieldCell key="cell" lineBreakMode="clipping" title="Successful Imports:" id="6Z7-fj-AbX">
+                                            <font key="font" metaFont="systemSemibold" size="13"/>
+                                            <color key="textColor" name="labelColor" catalog="System" colorSpace="catalog"/>
+                                            <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
+                                        </textFieldCell>
+                                    </textField>
+                                    <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" id="bui-vy-kLo">
+                                        <rect key="frame" x="-2" y="0.0" width="121" height="16"/>
+                                        <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+                                        <textFieldCell key="cell" lineBreakMode="clipping" title="Duplicate Imports:" id="JPh-Uz-ajf">
+                                            <font key="font" metaFont="systemSemibold" size="13"/>
+                                            <color key="textColor" name="labelColor" catalog="System" colorSpace="catalog"/>
+                                            <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
+                                        </textFieldCell>
+                                    </textField>
+                                    <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" id="Vkm-fr-rZ8">
+                                        <rect key="frame" x="-2" y="0.0" width="99" height="16"/>
+                                        <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+                                        <textFieldCell key="cell" lineBreakMode="clipping" title="Failed Imports:" id="HSj-UI-lbS">
+                                            <font key="font" metaFont="systemSemibold" size="13"/>
+                                            <color key="textColor" name="labelColor" catalog="System" colorSpace="catalog"/>
+                                            <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
+                                        </textFieldCell>
+                                    </textField>
+                                </subviews>
+                                <visibilityPriorities>
+                                    <integer value="1000"/>
+                                    <integer value="1000"/>
+                                    <integer value="1000"/>
+                                    <integer value="1000"/>
+                                </visibilityPriorities>
+                                <customSpacing>
+                                    <real value="3.4028234663852886e+38"/>
+                                    <real value="3.4028234663852886e+38"/>
+                                    <real value="3.4028234663852886e+38"/>
+                                    <real value="3.4028234663852886e+38"/>
+                                </customSpacing>
+                            </stackView>
+                        </subviews>
+                        <constraints>
+                            <constraint firstItem="Z3O-9X-zTx" firstAttribute="leading" secondItem="VAn-Ub-6ym" secondAttribute="leading" constant="20" symbolic="YES" id="09A-gQ-1he"/>
+                            <constraint firstItem="Z3O-9X-zTx" firstAttribute="top" secondItem="VAn-Ub-6ym" secondAttribute="top" constant="20" symbolic="YES" id="4xH-RA-Tb8"/>
+                            <constraint firstAttribute="bottom" secondItem="Z3O-9X-zTx" secondAttribute="bottom" constant="20" symbolic="YES" id="Fj5-g3-Lmp"/>
+                            <constraint firstAttribute="trailing" secondItem="Z3O-9X-zTx" secondAttribute="trailing" constant="20" symbolic="YES" id="TCH-6y-MpT"/>
+                        </constraints>
+                    </view>
+                    <connections>
+                        <outlet property="duplicateImportsLabel" destination="bui-vy-kLo" id="86Y-hE-itQ"/>
+                        <outlet property="failedImportsLabel" destination="Vkm-fr-rZ8" id="9ga-ma-PpF"/>
+                        <outlet property="importCompleteLabel" destination="kEX-xf-rNu" id="c3O-E1-wxS"/>
+                        <outlet property="successfulImportsLabel" destination="Wew-SV-bZw" id="9Cf-U1-eeQ"/>
+                    </connections>
+                </viewController>
+                <customObject id="9fr-6f-wQR" userLabel="First Responder" customClass="NSResponder" sceneMemberID="firstResponder"/>
+            </objects>
+            <point key="canvasLocation" x="601" y="118"/>
+        </scene>
+        <!--Import View Controller-->
+        <scene sceneID="e65-WV-kqF">
+            <objects>
+                <viewController storyboardIdentifier="CSVImportViewController" id="Meg-M8-8oL" customClass="CSVImportViewController" customModule="DuckDuckGo_Privacy_Browser" customModuleProvider="target" sceneMemberID="viewController">
+                    <view key="view" translatesAutoresizingMaskIntoConstraints="NO" id="n2z-bE-Ka8">
+                        <rect key="frame" x="0.0" y="0.0" width="313" height="114"/>
+                        <subviews>
+                            <stackView distribution="fill" orientation="vertical" alignment="centerX" spacing="12" horizontalStackHuggingPriority="249.99998474121094" verticalStackHuggingPriority="249.99998474121094" horizontalHuggingPriority="249" detachesHiddenViews="YES" translatesAutoresizingMaskIntoConstraints="NO" id="HLb-Dw-Y0O">
+                                <rect key="frame" x="20" y="20" width="273" height="74"/>
+                                <subviews>
+                                    <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="qiB-A6-LS4">
+                                        <rect key="frame" x="81" y="59" width="112" height="15"/>
+                                        <textFieldCell key="cell" alignment="left" title="Description Label" id="SpT-id-yTr">
+                                            <font key="font" size="13" name="SFProText-Regular"/>
+                                            <color key="textColor" name="labelColor" catalog="System" colorSpace="catalog"/>
+                                            <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
+                                        </textFieldCell>
+                                    </textField>
+                                    <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="cam-am-7aM">
+                                        <rect key="frame" x="70" y="32" width="133" height="15"/>
+                                        <textFieldCell key="cell" lineBreakMode="clipping" title="Importing From File:" id="c4x-MU-RpJ">
+                                            <font key="font" size="13" name="SFProText-Semibold"/>
+                                            <color key="textColor" name="labelColor" catalog="System" colorSpace="catalog"/>
+                                            <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
+                                        </textFieldCell>
+                                    </textField>
+                                    <button horizontalHuggingPriority="1000" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="A1C-Th-KJZ">
+                                        <rect key="frame" x="73" y="-7" width="127" height="32"/>
+                                        <buttonCell key="cell" type="push" title="Select CSV File" bezelStyle="rounded" alignment="center" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="L8K-VD-A0V">
+                                            <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
+                                            <font key="font" metaFont="system"/>
+                                        </buttonCell>
+                                        <connections>
+                                            <action selector="selectFileButtonClicked:" target="Meg-M8-8oL" id="dai-DN-ip2"/>
+                                        </connections>
+                                    </button>
+                                </subviews>
+                                <visibilityPriorities>
+                                    <integer value="1000"/>
+                                    <integer value="1000"/>
+                                    <integer value="1000"/>
+                                </visibilityPriorities>
+                                <customSpacing>
+                                    <real value="3.4028234663852886e+38"/>
+                                    <real value="3.4028234663852886e+38"/>
+                                    <real value="3.4028234663852886e+38"/>
+                                </customSpacing>
+                            </stackView>
+                        </subviews>
+                        <constraints>
+                            <constraint firstAttribute="trailing" secondItem="HLb-Dw-Y0O" secondAttribute="trailing" constant="20" symbolic="YES" id="DHD-Tl-7vS"/>
+                            <constraint firstItem="HLb-Dw-Y0O" firstAttribute="top" secondItem="n2z-bE-Ka8" secondAttribute="top" constant="20" symbolic="YES" id="XJo-Xp-qkT"/>
+                            <constraint firstItem="HLb-Dw-Y0O" firstAttribute="leading" secondItem="n2z-bE-Ka8" secondAttribute="leading" constant="20" symbolic="YES" id="dOV-9U-Egj"/>
+                            <constraint firstAttribute="bottom" secondItem="HLb-Dw-Y0O" secondAttribute="bottom" constant="20" symbolic="YES" id="w9C-XD-FMz"/>
+                        </constraints>
+                    </view>
+                    <connections>
+                        <outlet property="descriptionLabel" destination="qiB-A6-LS4" id="I02-0q-idN"/>
+                        <outlet property="selectFileButton" destination="A1C-Th-KJZ" id="GdO-PB-u8I"/>
+                        <outlet property="selectedFileLabel" destination="cam-am-7aM" id="puL-BB-PUx"/>
+                    </connections>
+                </viewController>
+                <customObject id="Xcz-bj-sHR" userLabel="First Responder" customClass="NSResponder" sceneMemberID="firstResponder"/>
+            </objects>
+            <point key="canvasLocation" x="-18.5" y="522"/>
+        </scene>
+    </scenes>
+</document>
