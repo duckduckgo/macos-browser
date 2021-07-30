@@ -1,5 +1,5 @@
 //
-//  BraveImporter.swift
+//  EdgeImporter.swift
 //
 //  Copyright © 2021 DuckDuckGo. All rights reserved.
 //
@@ -18,15 +18,15 @@
 
 import Foundation
 
-final class BraveDataImporter: ChromiumDataImporter {
+final class EdgeDataImporter: ChromiumDataImporter {
 
     override var processName: String {
-        return "Brave"
+        return "Microsoft Edge"
     }
 
     init(loginImporter: LoginImporter) {
         let applicationSupport = FileManager.default.urls(for: .applicationSupportDirectory, in: .userDomainMask).first!
-        let path = applicationSupport.appendingPathComponent("BraveSoftware/Brave-Browser/Default/").absoluteString
+        let path = applicationSupport.appendingPathComponent("Microsoft Edge/Default/").absoluteString
 
         super.init(applicationDataDirectoryPath: path, loginImporter: loginImporter)
     }

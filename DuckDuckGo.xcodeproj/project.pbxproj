@@ -112,6 +112,7 @@
 		4B82E9B325B69E3E00656FE7 /* TrackerRadarKit in Frameworks */ = {isa = PBXBuildFile; productRef = 4B82E9B225B69E3E00656FE7 /* TrackerRadarKit */; };
 		4B82E9B925B6A05800656FE7 /* DetectedTrackerTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B82E9B825B6A05800656FE7 /* DetectedTrackerTests.swift */; };
 		4B82E9C125B6A1CD00656FE7 /* TrackerRadarManagerTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B82E9C025B6A1CD00656FE7 /* TrackerRadarManagerTests.swift */; };
+		4B8AC93326B3B06300879451 /* EdgeImporter.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B8AC93226B3B06300879451 /* EdgeImporter.swift */; };
 		4B92928B26670D1700AD2C21 /* BookmarksOutlineView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B92928526670D1600AD2C21 /* BookmarksOutlineView.swift */; };
 		4B92928C26670D1700AD2C21 /* OutlineSeparatorViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B92928626670D1600AD2C21 /* OutlineSeparatorViewCell.swift */; };
 		4B92928D26670D1700AD2C21 /* BookmarkOutlineViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B92928726670D1600AD2C21 /* BookmarkOutlineViewCell.swift */; };
@@ -558,6 +559,7 @@
 		4B723E1726B000DC00E14D75 /* TemporaryFileCreator.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = TemporaryFileCreator.swift; sourceTree = "<group>"; };
 		4B82E9B825B6A05800656FE7 /* DetectedTrackerTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DetectedTrackerTests.swift; sourceTree = "<group>"; };
 		4B82E9C025B6A1CD00656FE7 /* TrackerRadarManagerTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TrackerRadarManagerTests.swift; sourceTree = "<group>"; };
+		4B8AC93226B3B06300879451 /* EdgeImporter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EdgeImporter.swift; sourceTree = "<group>"; };
 		4B92928526670D1600AD2C21 /* BookmarksOutlineView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = BookmarksOutlineView.swift; sourceTree = "<group>"; };
 		4B92928626670D1600AD2C21 /* OutlineSeparatorViewCell.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = OutlineSeparatorViewCell.swift; sourceTree = "<group>"; };
 		4B92928726670D1600AD2C21 /* BookmarkOutlineViewCell.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = BookmarkOutlineViewCell.swift; sourceTree = "<group>"; };
@@ -1070,6 +1072,7 @@
 				4B59023926B35F3600489384 /* ChromiumLoginReader.swift */,
 				4B59023B26B35F3600489384 /* ChromiumDataImporter.swift */,
 				4B59023C26B35F3600489384 /* BraveImporter.swift */,
+				4B8AC93226B3B06300879451 /* EdgeImporter.swift */,
 			);
 			path = Chromium;
 			sourceTree = "<group>";
@@ -2813,6 +2816,7 @@
 				4B9292D52667123700AD2C21 /* BookmarkManagementDetailViewController.swift in Sources */,
 				4B723E1026B0006700E14D75 /* CSVImporter.swift in Sources */,
 				AA4BBA3B25C58FA200C4FB0F /* MainMenu.swift in Sources */,
+				4B8AC93326B3B06300879451 /* EdgeImporter.swift in Sources */,
 				AA585D84248FD31100E9A3E2 /* BrowserTabViewController.swift in Sources */,
 				B6A9E48926146ABF0067D1B9 /* PixelCounter.swift in Sources */,
 				AAE7527C263B056C00B973F8 /* HistoryStore.swift in Sources */,

@@ -58,7 +58,9 @@ final class DataImportViewController: NSViewController {
                 let secureVaultImporter = SecureVaultLoginImporter(secureVault: secureVault!)
                 self.dataImporter = ChromeDataImporter(loginImporter: secureVaultImporter)
             case .edge:
-                assertionFailure()
+                let secureVault = try? SecureVaultFactory.default.makeVault()
+                let secureVaultImporter = SecureVaultLoginImporter(secureVault: secureVault!)
+                self.dataImporter = EdgeDataImporter(loginImporter: secureVaultImporter)
             case .csv:
                 // Reset the data importer if the view has switched to the .csv state and a Chromium importer is still in use.
                 if self.dataImporter is ChromiumDataImporter {
