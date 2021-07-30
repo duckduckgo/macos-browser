@@ -67,6 +67,8 @@
 		4B59024326B35F7C00489384 /* BrowserImportViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B59024226B35F7C00489384 /* BrowserImportViewController.swift */; };
 		4B59024626B35FFE00489384 /* CryptoSwift in Frameworks */ = {isa = PBXBuildFile; productRef = 4B59024526B35FFE00489384 /* CryptoSwift */; };
 		4B59024826B3673600489384 /* ThirdPartyBrowser.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B59024726B3673600489384 /* ThirdPartyBrowser.swift */; };
+		4B59024A26B38B0B00489384 /* Login Data in Resources */ = {isa = PBXBuildFile; fileRef = 4B59024926B38B0B00489384 /* Login Data */; };
+		4B59024C26B38BB800489384 /* ChromiumLoginReaderTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B59024B26B38BB800489384 /* ChromiumLoginReaderTests.swift */; };
 		4B6160D825B150E4007DE5B2 /* trackerData.json in Resources */ = {isa = PBXBuildFile; fileRef = 4B6160D725B150E4007DE5B2 /* trackerData.json */; };
 		4B6160DD25B152C5007DE5B2 /* ContentBlockerRulesUserScript.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B6160DC25B152C5007DE5B2 /* ContentBlockerRulesUserScript.swift */; };
 		4B6160E525B152FA007DE5B2 /* ContentBlockerUserScript.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B6160E425B152FA007DE5B2 /* ContentBlockerUserScript.swift */; };
@@ -509,6 +511,8 @@
 		4B59023C26B35F3600489384 /* BraveImporter.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = BraveImporter.swift; sourceTree = "<group>"; };
 		4B59024226B35F7C00489384 /* BrowserImportViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = BrowserImportViewController.swift; sourceTree = "<group>"; };
 		4B59024726B3673600489384 /* ThirdPartyBrowser.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ThirdPartyBrowser.swift; sourceTree = "<group>"; };
+		4B59024926B38B0B00489384 /* Login Data */ = {isa = PBXFileReference; lastKnownFileType = file; path = "Login Data"; sourceTree = "<group>"; };
+		4B59024B26B38BB800489384 /* ChromiumLoginReaderTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChromiumLoginReaderTests.swift; sourceTree = "<group>"; };
 		4B6160D225B14E6E007DE5B2 /* TrackerRadarManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TrackerRadarManager.swift; sourceTree = "<group>"; };
 		4B6160D725B150E4007DE5B2 /* trackerData.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; path = trackerData.json; sourceTree = "<group>"; };
 		4B6160DC25B152C5007DE5B2 /* ContentBlockerRulesUserScript.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentBlockerRulesUserScript.swift; sourceTree = "<group>"; };
@@ -1249,6 +1253,8 @@
 				4B723DFF26B0003E00E14D75 /* DataImportMocks.swift */,
 				4B723E0026B0003E00E14D75 /* CSVParserTests.swift */,
 				4B723E0126B0003E00E14D75 /* CSVImporterTests.swift */,
+				4B59024B26B38BB800489384 /* ChromiumLoginReaderTests.swift */,
+				4B59024926B38B0B00489384 /* Login Data */,
 			);
 			path = "Data Import";
 			sourceTree = "<group>";
@@ -2603,6 +2609,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				B67C6C422654BF49006C872E /* DuckDuckGo-Symbol.jpg in Resources */,
+				4B59024A26B38B0B00489384 /* Login Data in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -2970,6 +2977,7 @@
 				AAC9C01E24CB6BEB00AD1325 /* TabCollectionViewModelTests.swift in Sources */,
 				85E11C3725E7F1E100974CAF /* ExternalURLHandlerTests.swift in Sources */,
 				B6DA44282616CAE000DD1EC2 /* AppUsageActivityMonitorTests.swift in Sources */,
+				4B59024C26B38BB800489384 /* ChromiumLoginReaderTests.swift in Sources */,
 				AAC9C01724CAFBDC00AD1325 /* TabCollectionTests.swift in Sources */,
 				4B82E9B925B6A05800656FE7 /* DetectedTrackerTests.swift in Sources */,
 				B67C6C3D2654B897006C872E /* WebViewExtensionTests.swift in Sources */,

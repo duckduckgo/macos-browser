@@ -23,20 +23,25 @@ import GRDB
 final class ChromiumLoginReader {
 
     enum ImportError: Error {
-        case failedToAccessDatabase
+        case databaseAccessFailed
+        case decryptionFailed
     }
 
     private let chromiumLoginDirectoryPath: String
     private let processName: String
+    private let decryptionKey: String?
 
-    init(chromiumDataDirectoryPath: String, processName: String) {
-        self.chromiumLoginDirectoryPath = chromiumDataDirectoryPath + "/Login Data"
+    init(chromiumDataDirectoryPath: String, processName: String, decryptionKey: String? = nil) {
+        self.chromiumLoginDirectoryPath = chromiumDataDirectoryPath // + "/Login Data"
         self.processName = processName
+        self.decryptionKey = decryptionKey
     }
 
     func readLogins() -> Result<[ImportedLoginCredential], ChromiumLoginReader.ImportError> {
-        let chromiumDecryptionKey = shell("security find-generic-password -wa '\(processName)'").replacingOccurrences(of: "\n", with: "")
-        let derivedKey = deriveKey(from: chromiumDecryptionKey)
+        let key = self.decryptionKey ?? shell("security find-generic-password -wa '\(processName)'").replacingOccurrences(of: "\n", with: "")
+        guard let derivedKey = deriveKey(from: key) else {
+            return .failure(.decryptionFailed)
+        }
 
         var importedLogins = [ImportedLoginCredential]()
 
@@ -44,19 +49,21 @@ final class ChromiumLoginReader {
             let queue = try DatabaseQueue(path: chromiumLoginDirectoryPath)
 
             try queue.read { database in
-                let loginsRows = (try? Row.fetchAll(database, sql: "SELECT signon_realm, username_value, password_value FROM logins;")) ?? []
+                let loginRows = try ChromiumCredential.fetchAll(database, sql: "SELECT signon_realm, username_value, password_value FROM logins;")
 
-                for row in loginsRows {
-                    let url: String = row["signon_realm"]!
-                    let username: String = row["username_value"]!
-                    let encryptedPassword: Data = row["password_value"]!
-                    let decryptedPassword = decrypt(passwordData: encryptedPassword, with: derivedKey)
+                for row in loginRows {
+                    let credential = ImportedLoginCredential(
+                        url: row.url,
+                        username: row.username,
+                        password: decrypt(passwordData: row.encryptedPassword, with: derivedKey)
+                    )
 
-                    importedLogins.append(ImportedLoginCredential(url: url, username: username, password: decryptedPassword))
+                    importedLogins.append(credential)
                 }
             }
         } catch {
-            return .failure(.failedToAccessDatabase)
+            print(error)
+            return .failure(.databaseAccessFailed)
         }
 
         return .success(importedLogins)
@@ -64,15 +71,14 @@ final class ChromiumLoginReader {
 
     // Step 1: Derive the key from the value stored in the Keychain under "Chrome Safe Storage".
     //         This step uses fixed salt and iteration values, hardcoded by Google.
-    private func deriveKey(from password: String) -> [UInt8] {
-        let key = try? PKCS5.PBKDF2(password: password.bytes,
+    private func deriveKey(from password: String) -> [UInt8]? {
+        guard let key = try? PKCS5.PBKDF2(password: password.bytes,
                                     salt: "saltysalt".bytes,
                                     iterations: 1003,
                                     keyLength: 16,
-                                    variant: .sha1)
-        let calculatedKey = try? key!.calculate()
+                                    variant: .sha1) else { return nil }
 
-        return calculatedKey!
+        return try? key.calculate()
     }
 
     // Step 2: Decrypt password values from the credential database.
@@ -103,6 +109,26 @@ final class ChromiumLoginReader {
         let output = String(data: data, encoding: .utf8)!
 
         return output
+    }
+
+}
+
+// MARK: - GRDB Fetchable Records
+
+private struct ChromiumCredential {
+
+    let url: String
+    var username: String
+    var encryptedPassword: Data
+
+}
+
+extension ChromiumCredential: FetchableRecord {
+
+    init(row: Row) {
+        url = row["signon_realm"]
+        username = row["username_value"]
+        encryptedPassword = row["password_value"]
     }
 
 }
