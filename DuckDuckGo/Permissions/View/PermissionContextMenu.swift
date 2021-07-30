@@ -60,7 +60,7 @@ final class PermissionContextMenu: NSMenu {
             }
             addItem(.separator())
 
-            for permission in permissions {
+            for permission in permissions where permission.canBePersisted {
                 if PermissionManager.shared.permission(forDomain: domain, permissionType: permission) == nil {
                     addItem(.alwaysAllow(permission, on: domain, target: self))
                 } else {
@@ -78,7 +78,7 @@ final class PermissionContextMenu: NSMenu {
             }
             addItem(NSMenuItem.separator())
 
-            for permission in permissions {
+            for permission in permissions where permission.canBePersisted {
                 if PermissionManager.shared.permission(forDomain: domain, permissionType: permission) == nil {
                     addItem(.alwaysAllow(permission, on: domain, target: self))
                 } else {
@@ -90,7 +90,7 @@ final class PermissionContextMenu: NSMenu {
             addItem(.reload(target: self))
             addItem(NSMenuItem.separator())
 
-            for permission in permissions {
+            for permission in permissions where permission.canBePersisted {
                 if PermissionManager.shared.permission(forDomain: domain, permissionType: permission) == nil {
                     addItem(.alwaysDeny(permission, on: domain, target: self))
                 } else {

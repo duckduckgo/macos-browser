@@ -217,8 +217,8 @@ final class PermissionManagerTests: XCTestCase {
 fileprivate extension PermissionEntity {
     static let entity1 = PermissionEntity(permission: .init(id: .init(), allow: true),
                                           domain: "duckduckgo.com",
-                                          type: .geolocation)
+                                          type: .camera)
     static let entity2 = PermissionEntity(permission: .init(id: .init(), allow: false),
                                           domain: "www.domain2.com",
-                                          type: .camera)
+                                          type: .microphone)
 }

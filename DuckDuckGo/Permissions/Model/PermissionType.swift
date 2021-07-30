@@ -24,6 +24,17 @@ enum PermissionType: String, CaseIterable {
     case geolocation
 }
 
+extension PermissionType {
+    var canBePersisted: Bool {
+        switch self {
+        case .camera, .microphone:
+            return true
+        case .geolocation:
+            return false
+        }
+    }
+}
+
 extension Array where Element == PermissionType {
 
     @available(OSX 11.3, *)

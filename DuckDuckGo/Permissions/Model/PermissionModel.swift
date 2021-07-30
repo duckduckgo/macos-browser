@@ -234,7 +234,8 @@ final class PermissionModel {
         var shouldGrant = true
         for permission in permissions {
             var grant: Bool?
-            if let stored = permissionManager.permission(forDomain: domain, permissionType: permission) {
+            if permission.canBePersisted,
+               let stored = permissionManager.permission(forDomain: domain, permissionType: permission) {
                 grant = stored
             } else if let state = self.permissions[permission] {
                 switch state {
