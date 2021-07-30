@@ -117,6 +117,10 @@
 		4B8AC93526B3B2FD00879451 /* NSAlert+DataImport.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B8AC93426B3B2FD00879451 /* NSAlert+DataImport.swift */; };
 		4B8AC93926B48A5100879451 /* FirefoxLoginReader.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B8AC93826B48A5100879451 /* FirefoxLoginReader.swift */; };
 		4B8AC93B26B48ADF00879451 /* ASN1Parser.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B8AC93A26B48ADF00879451 /* ASN1Parser.swift */; };
+		4B8AC93D26B49BE600879451 /* FirefoxLoginReaderTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B8AC93C26B49BE600879451 /* FirefoxLoginReaderTests.swift */; };
+		4B8AC94026B49BEE00879451 /* logins.json in Resources */ = {isa = PBXBuildFile; fileRef = 4B8AC93E26B49BEE00879451 /* logins.json */; };
+		4B8AC94126B49BEE00879451 /* key4.db in Resources */ = {isa = PBXBuildFile; fileRef = 4B8AC93F26B49BEE00879451 /* key4.db */; };
+		4B8AC94426B4C55E00879451 /* CryptoSwift in Frameworks */ = {isa = PBXBuildFile; productRef = 4B8AC94326B4C55E00879451 /* CryptoSwift */; };
 		4B92928B26670D1700AD2C21 /* BookmarksOutlineView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B92928526670D1600AD2C21 /* BookmarksOutlineView.swift */; };
 		4B92928C26670D1700AD2C21 /* OutlineSeparatorViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B92928626670D1600AD2C21 /* OutlineSeparatorViewCell.swift */; };
 		4B92928D26670D1700AD2C21 /* BookmarkOutlineViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B92928726670D1600AD2C21 /* BookmarkOutlineViewCell.swift */; };
@@ -568,6 +572,9 @@
 		4B8AC93426B3B2FD00879451 /* NSAlert+DataImport.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "NSAlert+DataImport.swift"; sourceTree = "<group>"; };
 		4B8AC93826B48A5100879451 /* FirefoxLoginReader.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FirefoxLoginReader.swift; sourceTree = "<group>"; };
 		4B8AC93A26B48ADF00879451 /* ASN1Parser.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ASN1Parser.swift; sourceTree = "<group>"; };
+		4B8AC93C26B49BE600879451 /* FirefoxLoginReaderTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FirefoxLoginReaderTests.swift; sourceTree = "<group>"; };
+		4B8AC93E26B49BEE00879451 /* logins.json */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.json; path = logins.json; sourceTree = "<group>"; };
+		4B8AC93F26B49BEE00879451 /* key4.db */ = {isa = PBXFileReference; lastKnownFileType = file; path = key4.db; sourceTree = "<group>"; };
 		4B92928526670D1600AD2C21 /* BookmarksOutlineView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = BookmarksOutlineView.swift; sourceTree = "<group>"; };
 		4B92928626670D1600AD2C21 /* OutlineSeparatorViewCell.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = OutlineSeparatorViewCell.swift; sourceTree = "<group>"; };
 		4B92928726670D1600AD2C21 /* BookmarkOutlineViewCell.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = BookmarkOutlineViewCell.swift; sourceTree = "<group>"; };
@@ -915,6 +922,7 @@
 				AA06B6B72672AF8100F541C5 /* Sparkle in Frameworks */,
 				85F4D1C4266695C9002DD869 /* BrowserServicesKit in Frameworks */,
 				85FF55C825F82E4F00E2AB99 /* Lottie in Frameworks */,
+				4B8AC94426B4C55E00879451 /* CryptoSwift in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -1262,7 +1270,10 @@
 				4B723E0026B0003E00E14D75 /* CSVParserTests.swift */,
 				4B723E0126B0003E00E14D75 /* CSVImporterTests.swift */,
 				4B59024B26B38BB800489384 /* ChromiumLoginReaderTests.swift */,
+				4B8AC93C26B49BE600879451 /* FirefoxLoginReaderTests.swift */,
 				4B59024926B38B0B00489384 /* Login Data */,
+				4B8AC93F26B49BEE00879451 /* key4.db */,
+				4B8AC93E26B49BEE00879451 /* logins.json */,
 			);
 			path = "Data Import";
 			sourceTree = "<group>";
@@ -2488,6 +2499,7 @@
 				B65783F425F8ACA400D8DB33 /* Punnycode */,
 				85F4D1C3266695C9002DD869 /* BrowserServicesKit */,
 				AA06B6B62672AF8100F541C5 /* Sparkle */,
+				4B8AC94326B4C55E00879451 /* CryptoSwift */,
 			);
 			productName = DuckDuckGo;
 			productReference = AA585D7E248FD31100E9A3E2 /* DuckDuckGo Privacy Browser.app */;
@@ -2554,6 +2566,7 @@
 				B6DA44152616C13800DD1EC2 /* XCRemoteSwiftPackageReference "OHHTTPStubs" */,
 				85F4D1C2266695C9002DD869 /* XCRemoteSwiftPackageReference "BrowserServicesKit" */,
 				AA06B6B52672AF8100F541C5 /* XCRemoteSwiftPackageReference "Sparkle" */,
+				4B8AC94226B4C55E00879451 /* XCRemoteSwiftPackageReference "CryptoSwift" */,
 			);
 			productRefGroup = AA585D7F248FD31100E9A3E2 /* Products */;
 			projectDirPath = "";
@@ -2624,7 +2637,9 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				4B8AC94126B49BEE00879451 /* key4.db in Resources */,
 				B67C6C422654BF49006C872E /* DuckDuckGo-Symbol.jpg in Resources */,
+				4B8AC94026B49BEE00879451 /* logins.json in Resources */,
 				4B59024A26B38B0B00489384 /* Login Data in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -3054,6 +3069,7 @@
 				AAEC74B82642E43800C2EFBC /* HistoryStoreTests.swift in Sources */,
 				4BA1A6E6258C270800F6F690 /* EncryptionKeyGeneratorTests.swift in Sources */,
 				B61F012B25ECBB1700ABB5A3 /* UserScriptsManagerTests.swift in Sources */,
+				4B8AC93D26B49BE600879451 /* FirefoxLoginReaderTests.swift in Sources */,
 				4B723E0526B0003E00E14D75 /* DataImportMocks.swift in Sources */,
 				85AC3B1725D9BC1A00C7D2AA /* ConfigurationDownloaderTests.swift in Sources */,
 				4B0511E7262CAB3700F6079C /* UserDefaultsWrapperUtilities.swift in Sources */,
@@ -3595,6 +3611,14 @@
 				minimumVersion = 1.0.2;
 			};
 		};
+		4B8AC94226B4C55E00879451 /* XCRemoteSwiftPackageReference "CryptoSwift" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/krzyzanowskim/CryptoSwift.git";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 1.4.1;
+			};
+		};
 		85F4D1C2266695C9002DD869 /* XCRemoteSwiftPackageReference "BrowserServicesKit" */ = {
 			isa = XCRemoteSwiftPackageReference;
 			repositoryURL = "https://github.com/duckduckgo/BrowserServicesKit.git";
@@ -3642,6 +3666,11 @@
 			isa = XCSwiftPackageProductDependency;
 			package = 4B82E9B125B69E3E00656FE7 /* XCRemoteSwiftPackageReference "TrackerRadarKit" */;
 			productName = TrackerRadarKit;
+		};
+		4B8AC94326B4C55E00879451 /* CryptoSwift */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 4B8AC94226B4C55E00879451 /* XCRemoteSwiftPackageReference "CryptoSwift" */;
+			productName = CryptoSwift;
 		};
 		85F4D1C3266695C9002DD869 /* BrowserServicesKit */ = {
 			isa = XCSwiftPackageProductDependency;

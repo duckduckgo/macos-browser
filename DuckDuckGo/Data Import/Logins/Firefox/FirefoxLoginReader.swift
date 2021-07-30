@@ -17,3 +17,411 @@
 //
 
 import Foundation
+import CommonCrypto
+import CryptoKit
+import GRDB
+import CryptoSwift
+
+final class FirefoxLoginReader {
+
+    /// Represents the logins.json file found in the Firefox profile directory
+    private struct Logins: Decodable {
+        struct Login: Decodable {
+            let hostname: String
+            let encryptedUsername: String
+            let encryptedPassword: String
+        }
+
+        let logins: [Login]
+    }
+
+    private let keyDatabaseName = "key4.db"
+    private let loginsFileName = "logins.json"
+
+    private let profileDirectoryPath: String
+
+    init(profileDirectoryPath: String, primaryPassword: String? = nil) {
+        self.profileDirectoryPath = profileDirectoryPath + "/Firefox/Profiles"
+    }
+
+    func importLogins() {
+        guard let profile = findProfile() else {
+            return
+        }
+
+        print("Got profile: \(profile)")
+
+        let databasePath = profile + "/" + keyDatabaseName
+        guard let key = getEncryptionKey(withDatabaseAt: databasePath) else {
+            return
+        }
+
+        let loginsPath = profile + "/" + loginsFileName
+        let logins = readLoginsFile(from: loginsPath)
+
+        decrypt(logins: logins, with: key)
+
+        print("")
+    }
+
+    private func findProfile() -> String? {
+        guard let potentialProfiles = try? FileManager.default.contentsOfDirectory(atPath: profileDirectoryPath) else {
+            print("No Profiles at \(profileDirectoryPath)")
+            return nil
+        }
+
+        let profiles = potentialProfiles.filter { $0.hasSuffix(".default-release") }
+        let selectedProfile = profiles.first // If multiple profiles, offer a choice of which one to import
+        print("Profile directory: \(profileDirectoryPath)")
+        print("Profiles: \(profiles)")
+
+        return profileDirectoryPath + "/" + selectedProfile!
+    }
+
+    private func getEncryptionKey(withDatabaseAt databasePath: String) -> Data? {
+        print("Opening connection to database: \(databasePath)")
+
+        var key: Data?
+
+        do {
+            let queue = try DatabaseQueue(path: databasePath)
+
+            try queue.read { database in
+                let metadataRow = try? Row.fetchOne(database, sql: "SELECT item1, item2 FROM metadata WHERE id = 'password'")
+                let globalSalt: Data = metadataRow!["item1"]
+                let item2: Data = metadataRow!["item2"]
+
+                let decodedItem2 = try? ASN1Parser.parse(data: item2)
+                let iv = extractInitializationVector(from: decodedItem2!)!
+
+                print("GLOBAL SALT: \(globalSalt.toHexString())")
+                print("IV: \(iv.toHexString())")
+
+                let decryptedItem2 = aesDecrypt(tlv: decodedItem2!,
+                                                iv: iv,
+                                                globalSalt: globalSalt)
+                let string = String(data: decryptedItem2!, encoding: .utf8)
+
+                // Decrypted check is technically "password-check\x02\x02", it's converted to UTF-8 and checked here
+                if string == "password-check" {
+                    print("Verified key")
+                } else {
+                    print("Failed to get key")
+                    return
+                }
+
+                let nssPrivateRow = try? Row.fetchOne(database, sql: "SELECT a11, a102 FROM nssPrivate;")
+                let a11: Data = nssPrivateRow!["a11"]
+                let a102: Data = nssPrivateRow!["a102"]
+
+                assert(a102 == Data([248, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1]))
+
+                let decodedA11 = try? ASN1Parser.parse(data: a11)
+
+                key = aesDecrypt(tlv: decodedA11!, iv: iv, globalSalt: globalSalt)
+            }
+        } catch {
+            print("Failed to open database: \(error.localizedDescription)")
+        }
+
+        return key
+    }
+
+    private func readLoginsFile(from loginsFilePath: String) -> Logins {
+        let loginsFileData = try? Data(contentsOf: URL(fileURLWithPath: loginsFilePath))
+        let logins = try? JSONDecoder().decode(Logins.self, from: loginsFileData!)
+
+        return logins!
+    }
+
+    private func aesDecrypt(tlv: ASN1Parser.Node,
+                            iv: Data,
+                            globalSalt: Data) -> Data? {
+        let data = extractCiphertext(from: tlv)!
+        let entrySalt = extractEntrySalt(from: tlv)!
+        let iterationCount = extractIterationCount(from: tlv)!
+        let keyLength = extractKeyLength(from: tlv)!
+
+        assert(keyLength == 32)
+
+        print("KDF PASSWORD: \(SHA.stringFrom(data: globalSalt))")
+        print("KDF ENTRY SALT: \(entrySalt.toHexString())")
+
+//        let calculatedKey = CommonCryptoUtilities.decryptPBKDF2(password: SHA.stringFrom(data: globalSalt),
+//                                                                salt: entrySalt,
+//                                                                keyByteCount: keyLength,
+//                                                                rounds: iterationCount,
+//                                                                kdf: .sha256)
+
+        let key = try? PKCS5.PBKDF2(password: SHA.from(data: globalSalt),
+                                    salt: entrySalt.bytes,
+                                    iterations: iterationCount,
+                                    keyLength: keyLength,
+                                    variant: .sha256)
+        let calculatedKey = try? key!.calculate()
+
+        print("DERIVED KEY: \(calculatedKey!.toHexString())")
+        let iv = Data([4, 14]) + iv
+
+        let decrypted = CommonCryptoUtilities.decryptAESCBC(data: data, key: calculatedKey!.dataRepresentation, iv: iv)
+
+        return Data(decrypted!)
+    }
+
+    private func decrypt(logins: Logins, with key: Data) {
+        print("Beginning entry decryption with key: \(key.toHexString())")
+
+        for login in logins.logins {
+            let decryptedUsername = decrypt(credential: login.encryptedUsername, key: key)
+            let decryptedPassword = decrypt(credential: login.encryptedPassword, key: key)
+
+            if let username = decryptedUsername, let password = decryptedPassword {
+                print("• Firefox Credential: Username = \(username), Password = \(password)")
+            } else {
+                print("• Firefox Credential: Failed to decrypt")
+            }
+        }
+    }
+
+    private func decrypt(credential: String, key: Data) -> String? {
+        let base64Decoded = Data(base64Encoded: credential)!
+        let asn1Decoded = try? ASN1Parser.parse(data: base64Decoded)
+
+        // Extract the top level sequence of the ASN1 value:
+        //
+        // Index 0 = magic number for verification, skipped here because this is bad code lol
+        // Index 1 = initialization vector
+        // Index 2 = ciphertext
+        guard case let .sequence(topLevelValues) = asn1Decoded else {
+            fatalError()
+        }
+
+        guard case let .sequence(initVectorValues) = topLevelValues[1] else {
+            fatalError()
+        }
+
+        guard case let .octetString(initVector) = initVectorValues[1] else {
+            fatalError()
+        }
+
+        guard case let .octetString(ciphertext) = topLevelValues[2] else {
+            fatalError()
+        }
+
+        let decryptedData = tripleDesDecrypt(data: ciphertext, keyData: key, iv: initVector)
+
+        // This isn't decrypting as expected, something's wrong somewhere
+        return String(data: decryptedData, encoding: .utf8)
+    }
+
+    private func tripleDesDecrypt(data: Data, keyData: Data, iv: Data) -> Data {
+        let data = CommonCryptoUtilities.decrypt3DES(data: data, key: keyData, iv: iv)
+        return data!
+    }
+
+}
+
+// The code here really sucks :( The class used to parse ASN1 values decodes them into enum values, which then have to be unwrapped
+// all the way down to the value you want. Something like case paths would help here: https://github.com/pointfreeco/swift-case-paths
+// When we do this for real, it would be better to write/use something that doesn't use enums.
+extension FirefoxLoginReader {
+
+    private func extractEntrySalt(from tlv: ASN1Parser.Node) -> Data? {
+        guard case let .sequence(values1) = tlv else {
+            return nil
+        }
+
+        let firstValue = values1[0]
+
+        guard case let .sequence(values2) = firstValue else {
+            return nil
+        }
+
+        let secondValue = values2[1]
+
+        guard case let .sequence(values3) = secondValue else {
+            return nil
+        }
+
+        let thirdValue = values3[0]
+
+        guard case let .sequence(values4) = thirdValue else {
+            return nil
+        }
+
+        let fourthValue = values4[1]
+
+        guard case let .sequence(values5) = fourthValue else {
+            return nil
+        }
+
+        // Get key
+        let fifthValue = values5[0]
+
+        guard case let .octetString(data: data) = fifthValue else {
+            return nil
+        }
+
+        return data
+    }
+
+    private func extractIterationCount(from tlv: ASN1Parser.Node) -> Int? {
+        guard case let .sequence(values1) = tlv else {
+            return nil
+        }
+
+        let firstValue = values1[0]
+
+        guard case let .sequence(values2) = firstValue else {
+            return nil
+        }
+
+        let secondValue = values2[1]
+
+        guard case let .sequence(values3) = secondValue else {
+            return nil
+        }
+
+        let thirdValue = values3[0]
+
+        guard case let .sequence(values4) = thirdValue else {
+            return nil
+        }
+
+        let fourthValue = values4[1]
+
+        guard case let .sequence(values5) = fourthValue else {
+            return nil
+        }
+
+        let fifthValue = values5[1]
+
+        guard case let .integer(data: data) = fifthValue else {
+            return nil
+        }
+
+        return data.withUnsafeBytes { $0.pointee }
+    }
+
+    private func extractKeyLength(from tlv: ASN1Parser.Node) -> Int? {
+        guard case let .sequence(values1) = tlv else {
+            return nil
+        }
+
+        let firstValue = values1[0]
+
+        guard case let .sequence(values2) = firstValue else {
+            return nil
+        }
+
+        let secondValue = values2[1]
+
+        guard case let .sequence(values3) = secondValue else {
+            return nil
+        }
+
+        let thirdValue = values3[0]
+
+        guard case let .sequence(values4) = thirdValue else {
+            return nil
+        }
+
+        let fourthValue = values4[1]
+
+        guard case let .sequence(values5) = fourthValue else {
+            return nil
+        }
+
+        let fifthValue = values5[2]
+
+        guard case let .integer(data: data) = fifthValue else {
+            return nil
+        }
+
+        return data.withUnsafeBytes { $0.pointee }
+    }
+
+    private func extractInitializationVector(from tlv: ASN1Parser.Node) -> Data? {
+        guard case let .sequence(values1) = tlv else {
+            return nil
+        }
+
+        let firstValue = values1[0]
+
+        guard case let .sequence(values2) = firstValue else {
+            return nil
+        }
+
+        let secondValue = values2[1]
+
+        guard case let .sequence(values3) = secondValue else {
+            return nil
+        }
+
+        let thirdValue = values3[1]
+
+        guard case let .sequence(values4) = thirdValue else {
+            return nil
+        }
+
+        let fourthValue = values4[1]
+
+        guard case let .octetString(data: data) = fourthValue else {
+            return nil
+        }
+
+        return data
+    }
+
+    private func extractCiphertext(from tlv: ASN1Parser.Node) -> Data? {
+        guard case let .sequence(values) = tlv else {
+            return nil
+        }
+
+        guard case let .octetString(data: data) = values[1] else {
+            return nil
+        }
+
+        return data
+    }
+
+}
+
+struct SHA {
+
+    static func from(data: Data) -> [UInt8] {
+        var digest = [UInt8](repeating: 0, count: Int(CC_SHA1_DIGEST_LENGTH))
+        CC_SHA1(data.bytes, CC_LONG(data.count), &digest)
+
+        return digest
+    }
+
+    static func from(data: Data) -> Data {
+        return Insecure.SHA1.hash(data: data).dataRepresentation
+    }
+
+    static func stringFrom(data: Data) -> String {
+        let data = Insecure.SHA1.hash(data: data)
+        return data.compactMap { String(format: "%02x", $0) }.joined()
+    }
+
+    static func hexFrom(data: Data) -> String {
+        let digest = Insecure.SHA1.hash(data: data).dataRepresentation
+        var digestHex = ""
+
+        for index in 0..<Int(CC_SHA1_DIGEST_LENGTH) {
+            digestHex += String(format: "%02x", digest[index])
+        }
+
+        return digestHex
+    }
+
+}
+
+extension Data {
+
+    func toHexString() -> String {
+        return reduce("") {$0 + String(format: "%02x", $1)}
+    }
+
+}
