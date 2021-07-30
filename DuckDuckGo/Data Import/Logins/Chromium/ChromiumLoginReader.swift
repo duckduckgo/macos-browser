@@ -19,6 +19,7 @@
 import Foundation
 import CryptoSwift // TODO: Get rid of this in favor of stdlib APIs
 import GRDB
+import CommonCrypto
 
 final class ChromiumLoginReader {
 
@@ -38,7 +39,7 @@ final class ChromiumLoginReader {
     }
 
     func readLogins() -> Result<[ImportedLoginCredential], ChromiumLoginReader.ImportError> {
-        let key = self.decryptionKey ?? shell("security find-generic-password -wa '\(processName)'").replacingOccurrences(of: "\n", with: "")
+        let key = self.decryptionKey ?? promptForChromiumPasswordKeychainAccess()
         guard let derivedKey = deriveKey(from: key) else {
             return .failure(.decryptionFailed)
         }
@@ -72,13 +73,12 @@ final class ChromiumLoginReader {
     // Step 1: Derive the key from the value stored in the Keychain under "Chrome Safe Storage".
     //         This step uses fixed salt and iteration values, hardcoded by Google.
     private func deriveKey(from password: String) -> [UInt8]? {
-        guard let key = try? PKCS5.PBKDF2(password: password.bytes,
-                                    salt: "saltysalt".bytes,
-                                    iterations: 1003,
-                                    keyLength: 16,
-                                    variant: .sha1) else { return nil }
-
-        return try? key.calculate()
+        let key = pbkdf2(password: password,
+                         salt: "saltysalt".data(using: .utf8)!,
+                         keyByteCount: 16,
+                         rounds: 1003)
+        
+        return key?.bytes
     }
 
     // Step 2: Decrypt password values from the credential database.
@@ -95,7 +95,8 @@ final class ChromiumLoginReader {
         return String(data: decryptedData, encoding: .utf8)!
     }
 
-    private func shell(_ command: String) -> String {
+    private func promptForChromiumPasswordKeychainAccess() -> String {
+        let command = "security find-generic-password -wa '\(processName)'"
         let task = Process()
         let pipe = Pipe()
 
@@ -108,7 +109,7 @@ final class ChromiumLoginReader {
         let data = pipe.fileHandleForReading.readDataToEndOfFile()
         let output = String(data: data, encoding: .utf8)!
 
-        return output
+        return output.replacingOccurrences(of: "\n", with: "")
     }
 
 }
@@ -131,4 +132,32 @@ extension ChromiumCredential: FetchableRecord {
         encryptedPassword = row["password_value"]
     }
 
+}
+
+// MARK: - CommonCrypto
+
+func pbkdf2(password: String, salt: Data, keyByteCount: Int, rounds: Int) -> Data? {
+    guard let passwordData = password.data(using: .utf8) else { return nil }
+
+    var derivedKeyData = Data(repeating: 0, count: keyByteCount)
+    let derivedCount = derivedKeyData.count
+
+    let derivationStatus: OSStatus = derivedKeyData.withUnsafeMutableBytes { derivedKeyBytes in
+        let derivedKeyRawBytes = derivedKeyBytes.bindMemory(to: UInt8.self).baseAddress
+        return salt.withUnsafeBytes { saltBytes in
+            let rawBytes = saltBytes.bindMemory(to: UInt8.self).baseAddress
+            return CCKeyDerivationPBKDF(
+                CCPBKDFAlgorithm(kCCPBKDF2),
+                password,
+                passwordData.count,
+                rawBytes,
+                salt.count,
+                CCPBKDFAlgorithm(kCCPRFHmacAlgSHA1),
+                UInt32(rounds),
+                derivedKeyRawBytes,
+                derivedCount)
+        }
+    }
+
+    return derivationStatus == kCCSuccess ? derivedKeyData : nil
 }
