@@ -33,4 +33,16 @@ extension NSAlert {
         return alert
     }
 
+    static func importFailedAlert(source: DataImport.Source) -> NSAlert {
+        let alert = NSAlert()
+
+        alert.icon = source.importSourceImage
+        alert.messageText = "Import Failed"
+        alert.informativeText = "Please ensure that \(source.importSourceName) is not running before importing data"
+        alert.alertStyle = .warning
+        alert.addButton(withTitle: "Okay")
+
+        return alert
+    }
+
 }

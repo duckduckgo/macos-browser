@@ -250,11 +250,7 @@ final class DataImportViewController: NSViewController {
 
         switch error {
         case .browserNeedsToBeClosed:
-            let alert = NSAlert()
-            alert.messageText = "Failed to import browser data"
-            alert.informativeText = "\(self.viewState.selectedImportSource.importSourceName) must be closed before importing data"
-            alert.alertStyle = .warning
-            alert.addButton(withTitle: "Okay")
+            let alert = NSAlert.importFailedAlert(source: viewState.selectedImportSource)
             alert.beginSheetModal(for: window, completionHandler: nil)
         default: break
         }
