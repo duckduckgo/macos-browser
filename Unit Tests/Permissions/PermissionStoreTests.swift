@@ -68,4 +68,28 @@ final class PermissionStoreTests: XCTestCase {
         waitForExpectations(timeout: 1)
     }
 
+    func testWhenPermissionsAreClearedThenOnlyExceptionsRemain() throws {
+        let stored1 = try store.add(domain: "duckduckgo.com", permissionType: .microphone, allow: true)
+        _=try store.add(domain: "otherdomain.com", permissionType: .geolocation, allow: true)
+        let stored3 = try store.add(domain: "wikipedia.org", permissionType: .camera, allow: false)
+        _=try store.add(domain: "permission.site", permissionType: .microphone, allow: false)
+
+        let e = expectation(description: "store cleared")
+        store.clear(except: [stored1, stored3]) { [store] error in
+            XCTAssertNil(error)
+
+            let permissions = try! store.loadPermissions() // swiftlint:disable:this force_try
+
+            XCTAssertEqual(permissions, [.init(permission: StoredPermission(id: stored1.id, allow: true),
+                                               domain: "duckduckgo.com",
+                                               type: .microphone),
+                                         .init(permission: StoredPermission(id: stored3.id, allow: false),
+                                                                            domain: "wikipedia.org",
+                                                                            type: .camera)])
+
+            e.fulfill()
+        }
+        waitForExpectations(timeout: 1)
+    }
+
 }

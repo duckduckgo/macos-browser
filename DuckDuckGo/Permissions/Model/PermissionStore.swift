@@ -23,6 +23,8 @@ protocol PermissionStore: AnyObject {
     func update(objectWithId id: NSManagedObjectID, allow: Bool?, completionHandler: ((Error?) -> Void)?)
     func remove(objectWithId id: NSManagedObjectID, completionHandler: ((Error?) -> Void)?)
     func add(domain: String, permissionType: PermissionType, allow: Bool) throws -> StoredPermission
+
+    func clear(except: [StoredPermission], completionHandler: ((Error?) -> Void)?)
 }
 extension PermissionStore {
     func update(objectWithId id: NSManagedObjectID, allow: Bool?) {
@@ -30,6 +32,9 @@ extension PermissionStore {
     }
     func remove(objectWithId id: NSManagedObjectID) {
         remove(objectWithId: id, completionHandler: nil)
+    }
+    func clear(except exceptions: [StoredPermission]) {
+        clear(except: exceptions, completionHandler: nil)
     }
 }
 
@@ -103,6 +108,34 @@ final class LocalPermissionStore: PermissionStore {
 
     func remove(objectWithId id: NSManagedObjectID, completionHandler: ((Error?) -> Void)?) {
         update(objectWithId: id, allow: nil, completionHandler: completionHandler)
+    }
+
+    func clear(except exceptions: [StoredPermission], completionHandler: ((Error?) -> Void)?) {
+        guard let context = context else { return }
+        func mainQueueCompletion(error: Error?) {
+            guard completionHandler != nil else { return }
+            DispatchQueue.main.async {
+                completionHandler?(error)
+            }
+        }
+
+        context.perform { [context] in
+            let deleteRequest = NSFetchRequest<NSFetchRequestResult>(entityName: PermissionManagedObject.className())
+            deleteRequest.predicate = NSPredicate(format: "NOT (self IN %@)",
+                                                  exceptions.map { context.object(with: $0.id) })
+            let batchDeleteRequest = NSBatchDeleteRequest(fetchRequest: deleteRequest)
+            batchDeleteRequest.resultType = .resultTypeObjectIDs
+
+            do {
+                let result = try context.execute(batchDeleteRequest) as? NSBatchDeleteResult
+                let deletedObjects = result?.result as? [NSManagedObjectID] ?? []
+                let changes: [AnyHashable: Any] = [NSDeletedObjectsKey: deletedObjects]
+                NSManagedObjectContext.mergeChanges(fromRemoteContextSave: changes, into: [context])
+                mainQueueCompletion(error: nil)
+            } catch {
+                mainQueueCompletion(error: error)
+            }
+        }
     }
 
     private func performAdd(domain: String,

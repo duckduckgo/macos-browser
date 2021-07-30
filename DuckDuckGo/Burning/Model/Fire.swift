@@ -23,13 +23,16 @@ final class Fire {
 
     let webCacheManager: WebCacheManager
     let historyCoordinating: HistoryCoordinating
+    let permissionManager: PermissionManagerProtocol
 
     @Published private(set) var isBurning = false
 
     init(cacheManager: WebCacheManager = .shared,
-         historyCoordinating: HistoryCoordinating = HistoryCoordinator.shared) {
+         historyCoordinating: HistoryCoordinating = HistoryCoordinator.shared,
+         permissionManager: PermissionManagerProtocol = PermissionManager.shared) {
         self.webCacheManager = cacheManager
         self.historyCoordinating = historyCoordinating
+        self.permissionManager = permissionManager
     }
 
     func burnAll(tabCollectionViewModel: TabCollectionViewModel, completion: (() -> Void)? = nil) {
@@ -44,6 +47,10 @@ final class Fire {
             os_log("HistoryCoordinating began history deletion", log: .fire)
             self?.historyCoordinating.burnHistory(except: FireproofDomains.shared)
             os_log("HistoryCoordinating completed history deletion", log: .fire)
+
+            os_log("PermissionManager began permissions deletion", log: .fire)
+            self?.permissionManager.burnPermissions(except: FireproofDomains.shared)
+            os_log("PermissionManager completed permissions deletion", log: .fire)
 
             self?.isBurning = false
 

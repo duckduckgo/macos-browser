@@ -28,6 +28,7 @@ final class PermissionStoreMock: PermissionStore {
         case update(id: NSManagedObjectID, allow: Bool?)
         case remove(NSManagedObjectID)
         case add(domain: String, permissionType: PermissionType, allow: Bool)
+        case clear(exceptions: [StoredPermission])
     }
 
     var history = [CallHistoryItem]()
@@ -56,6 +57,11 @@ final class PermissionStoreMock: PermissionStore {
             throw error
         }
         return StoredPermission(id: .init(), allow: allow)
+    }
+
+    func clear(except: [StoredPermission], completionHandler: ((Error?) -> Void)?) {
+        history.append(.clear(exceptions: except))
+        completionHandler?(nil)
     }
 
 }

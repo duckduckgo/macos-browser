@@ -196,6 +196,22 @@ final class PermissionManagerTests: XCTestCase {
         }
     }
 
+    func testWhenPermissionsBurnedThenTheyAreCleared() {
+        store.permissions = [.entity1, .entity2]
+
+        let fireproofDomains = FireproofDomains()
+        fireproofDomains.addToAllowed(domain: PermissionEntity.entity1.domain)
+
+        manager.burnPermissions(except: fireproofDomains)
+
+        XCTAssertEqual(store.history, [.load, .clear(exceptions: [PermissionEntity.entity1.permission])])
+        XCTAssertEqual(manager.permission(forDomain: PermissionEntity.entity1.domain,
+                                         permissionType: PermissionEntity.entity1.type),
+                       true)
+        XCTAssertNil(manager.permission(forDomain: PermissionEntity.entity2.domain,
+                                        permissionType: PermissionEntity.entity2.type))
+    }
+
 }
 
 fileprivate extension PermissionEntity {

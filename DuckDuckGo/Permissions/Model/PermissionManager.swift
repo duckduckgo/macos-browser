@@ -29,6 +29,8 @@ protocol PermissionManagerProtocol: AnyObject {
     func setPermission(_ permission: Bool, forDomain domain: String, permissionType: PermissionType)
     func removePermission(forDomain domain: String, permissionType: PermissionType)
 
+    func burnPermissions(except fireproofDomains: FireproofDomains)
+
 }
 
 final class PermissionManager: PermissionManagerProtocol {
@@ -93,6 +95,17 @@ final class PermissionManager: PermissionManagerProtocol {
         store.remove(objectWithId: oldValue.id)
 
         self.permissionSubject.send( (domain, permissionType, nil) )
+    }
+
+    func burnPermissions(except fireproofDomains: FireproofDomains) {
+        dispatchPrecondition(condition: .onQueue(.main))
+
+        permissions = permissions.filter {
+            fireproofDomains.isFireproof(fireproofDomain: $0.key)
+        }
+        store.clear(except: permissions.values.reduce(into: [StoredPermission](), {
+            $0.append(contentsOf: $1.values)
+        }))
     }
 
 }

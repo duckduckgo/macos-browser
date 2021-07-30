@@ -41,4 +41,10 @@ final class PermissionManagerMock: PermissionManagerProtocol {
         savedPermissions[domain.dropWWW(), default: [:]][permissionType] = nil
     }
 
+    var burnPermissionsCalled = false
+    func burnPermissions(except fireproofDomains: FireproofDomains) {
+        savedPermissions = savedPermissions.filter { fireproofDomains.isFireproof(fireproofDomain: $0.key) }
+        burnPermissionsCalled = true
+    }
+
 }
