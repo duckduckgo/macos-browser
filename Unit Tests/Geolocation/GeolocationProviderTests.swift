@@ -23,11 +23,13 @@ import CoreLocation
 import WebKit
 @testable import DuckDuckGo_Privacy_Browser
 
+// swiftlint:disable file_length
 // swiftlint:disable type_body_length
 // swiftlint:disable function_body_length
 final class GeolocationProviderTests: XCTestCase {
 
     let geolocationServiceMock = GeolocationServiceMock()
+    let appIsActive = CurrentValueSubject<Bool, Never>(true)
     var windows = [NSWindow]()
     var webViews = [WKWebView]()
     var webView: WKWebView!
@@ -88,7 +90,8 @@ final class GeolocationProviderTests: XCTestCase {
         webViews.append(webView)
 
         let geolocationProvider = GeolocationProvider(processPool: webView.configuration.processPool,
-                                                      geolocationService: geolocationServiceMock)
+                                                      geolocationService: geolocationServiceMock,
+                                                      appIsActivePublisher: appIsActive)
         webView.configuration.processPool.geolocationProvider = geolocationProvider
         webView.configuration.userContentController.add(self, name: "testHandler")
 
@@ -287,7 +290,67 @@ final class GeolocationProviderTests: XCTestCase {
                                                         .cancelled])
     }
 
-    func testWhenOneWebViewGeolocationIsPausedAnotherWebViewContinuesReceivingLocationUpdates() {
+    func testWhenGeolocationProviderIsPausedThenLocationSubscriptionIsCancelled() {
+        let location1 = CLLocation(latitude: 12.3, longitude: 0.1)
+
+        geolocationServiceMock.currentLocationPublished = .success(location1)
+
+        geolocationServiceMock.onSubscriptionReceived = { [webView] _ in
+            DispatchQueue.main.async {
+                webView!.configuration.processPool.geolocationProvider!.isPaused = true
+            }
+        }
+        let e = expectation(description: "subscription cancelled")
+        geolocationServiceMock.onSubscriptionCancelled = {
+            e.fulfill()
+        }
+
+        webView.loadHTMLString(Self.watchPosition(), baseURL: .duckDuckGo)
+        NSApp.activate(ignoringOtherApps: true)
+        webView.window?.orderFrontRegardless()
+
+        waitForExpectations(timeout: 10.0)
+
+        XCTAssertEqual(geolocationServiceMock.history, [.locationPublished,
+                                                        .subscribed,
+                                                        .cancelled])
+    }
+
+    func testWhenAppIsDeactivatedThenLocationSubscriptionIsCancelled() {
+        let location1 = CLLocation(latitude: 12.3, longitude: 0.1)
+
+        geolocationServiceMock.currentLocationPublished = .success(location1)
+        let e = expectation(description: "re-subscribed")
+        geolocationServiceMock.onSubscriptionReceived = { [geolocationServiceMock] _ in
+            if geolocationServiceMock.history == [.locationPublished, .subscribed] {
+                DispatchQueue.main.async {
+                    self.appIsActive.send(false)
+                }
+            } else if geolocationServiceMock.history == [.locationPublished, .subscribed, .cancelled, .subscribed] {
+                e.fulfill()
+            } else {
+                XCTFail("Unexpected call sequence")
+            }
+        }
+        geolocationServiceMock.onSubscriptionCancelled = {
+            DispatchQueue.main.async {
+                self.appIsActive.send(true)
+            }
+        }
+
+        webView.loadHTMLString(Self.watchPosition(), baseURL: .duckDuckGo)
+        NSApp.activate(ignoringOtherApps: true)
+        webView.window?.orderFrontRegardless()
+
+        waitForExpectations(timeout: 10.0)
+
+        XCTAssertEqual(geolocationServiceMock.history, [.locationPublished,
+                                                        .subscribed,
+                                                        .cancelled,
+                                                        .subscribed])
+    }
+
+    func testWhenOneWebViewGeolocationIsPausedThenAnotherWebViewContinuesReceivingLocationUpdates() {
         let webView2 = makeWebView()
 
         let location1 = CLLocation(latitude: 12.3, longitude: 0.1)
@@ -345,8 +408,8 @@ final class GeolocationProviderTests: XCTestCase {
         XCTAssertEqual(geolocationServiceMock.history, [.locationPublished,
                                                         .subscribed,
                                                         .subscribed,
-                                                        .locationPublished,
                                                         .cancelled,
+                                                        .locationPublished,
                                                         .cancelled])
     }
 
@@ -380,7 +443,9 @@ final class GeolocationProviderTests: XCTestCase {
 
         XCTAssertEqual(geolocationServiceMock.history, [.locationPublished,
                                                         .subscribed,
-                                                        .locationPublished])
+                                                        .cancelled,
+                                                        .locationPublished,
+                                                        .subscribed])
     }
 
     func testWhenWebViewIsHiddenThenItStopsGeolocationProvider() {
@@ -644,3 +709,4 @@ extension GeolocationProviderTests {
 
     }
 }
+// swiftlint:enable file_length
