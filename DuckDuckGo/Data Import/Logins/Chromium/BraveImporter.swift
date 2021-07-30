@@ -1,5 +1,5 @@
 //
-//  BraveImporter.swift
+//  BraveDataImporter.swift
 //
 //  Copyright © 2021 DuckDuckGo. All rights reserved.
 //

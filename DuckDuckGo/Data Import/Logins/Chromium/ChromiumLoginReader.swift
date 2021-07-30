@@ -65,7 +65,6 @@ final class ChromiumLoginReader {
                 }
             }
         } catch {
-            print(error)
             return .failure(.databaseAccessFailed)
         }
 
@@ -102,8 +101,11 @@ final class ChromiumLoginReader {
         let trimmedPasswordData = passwordData[3...]
         let iv = String(repeating: " ", count: 16).data(using: .utf8)!
 
-        let decrypted = ChromiumDecryption.decryptAESCBC(data: trimmedPasswordData, key: key, iv: iv)
-        return String(data: decrypted!, encoding: .utf8)!
+        guard let decrypted = ChromiumDecryption.decryptAESCBC(data: trimmedPasswordData, key: key, iv: iv) else {
+            return nil
+        }
+
+        return String(data: decrypted, encoding: .utf8)!
     }
 
 }
