@@ -7,4 +7,3 @@
 [submodule "Submodules/duckduckgo-privacy-dashboard"]
 	path = Submodules/duckduckgo-privacy-dashboard
 	url = git@github.com:more-duckduckgo-org/duckduckgo-privacy-dashboard.git
-	branch = abrown/initial-codebase
