@@ -17,9 +17,8 @@
 //
 
 import Foundation
-import CryptoSwift // TODO: Get rid of this in favor of stdlib APIs
-import GRDB
 import CommonCrypto
+import GRDB
 
 final class ChromiumLoginReader {
 
@@ -33,14 +32,13 @@ final class ChromiumLoginReader {
     private let decryptionKey: String?
 
     init(chromiumDataDirectoryPath: String, processName: String, decryptionKey: String? = nil) {
-        self.chromiumLoginDirectoryPath = chromiumDataDirectoryPath // + "/Login Data"
+        self.chromiumLoginDirectoryPath = chromiumDataDirectoryPath + "/Login Data"
         self.processName = processName
         self.decryptionKey = decryptionKey
     }
 
     func readLogins() -> Result<[ImportedLoginCredential], ChromiumLoginReader.ImportError> {
-        let key = self.decryptionKey ?? promptForChromiumPasswordKeychainAccess()
-        guard let derivedKey = deriveKey(from: key) else {
+        guard let key = self.decryptionKey ?? promptForChromiumPasswordKeychainAccess(), let derivedKey = deriveKey(from: key) else {
             return .failure(.decryptionFailed)
         }
 
@@ -53,10 +51,14 @@ final class ChromiumLoginReader {
                 let loginRows = try ChromiumCredential.fetchAll(database, sql: "SELECT signon_realm, username_value, password_value FROM logins;")
 
                 for row in loginRows {
+                    guard let decryptedPassword = decrypt(passwordData: row.encryptedPassword, with: derivedKey) else {
+                        continue
+                    }
+
                     let credential = ImportedLoginCredential(
                         url: row.url,
                         username: row.username,
-                        password: decrypt(passwordData: row.encryptedPassword, with: derivedKey)
+                        password: decryptedPassword
                     )
 
                     importedLogins.append(credential)
@@ -70,32 +72,9 @@ final class ChromiumLoginReader {
         return .success(importedLogins)
     }
 
-    // Step 1: Derive the key from the value stored in the Keychain under "Chrome Safe Storage".
-    //         This step uses fixed salt and iteration values, hardcoded by Google.
-    private func deriveKey(from password: String) -> [UInt8]? {
-        let key = pbkdf2(password: password,
-                         salt: "saltysalt".data(using: .utf8)!,
-                         keyByteCount: 16,
-                         rounds: 1003)
-        
-        return key?.bytes
-    }
-
-    // Step 2: Decrypt password values from the credential database.
-    private func decrypt(passwordData: Data, with key: [UInt8]) -> String {
-        let iv = String(repeating: " ", count: 16).data(using: .utf8)!
-        let blockMode = CBC(iv: iv.bytes)
-        let trimmedPasswordData = passwordData[3...]
-
-        let aes = try? CryptoSwift.AES(key: key, blockMode: blockMode)
-        let decrypted = try? aes?.decrypt(trimmedPasswordData.bytes)
-
-        let decryptedData = Data(decrypted!)
-
-        return String(data: decryptedData, encoding: .utf8)!
-    }
-
-    private func promptForChromiumPasswordKeychainAccess() -> String {
+    // Step 1: Prompt for permission to access the user's Chromium Safe Storage key.
+    //         This value is stored in the keychain under "[BROWSER] Safe Storage", e.g. "Chrome Safe Storage".
+    private func promptForChromiumPasswordKeychainAccess() -> String? {
         let command = "security find-generic-password -wa '\(processName)'"
         let task = Process()
         let pipe = Pipe()
@@ -107,9 +86,24 @@ final class ChromiumLoginReader {
         task.launch()
 
         let data = pipe.fileHandleForReading.readDataToEndOfFile()
-        let output = String(data: data, encoding: .utf8)!
+        let output = String(data: data, encoding: .utf8)
 
-        return output.replacingOccurrences(of: "\n", with: "")
+        return output?.replacingOccurrences(of: "\n", with: "")
+    }
+
+    // Step 2: Derive the decryption key from the Chromium Safe Storage key.
+    //         This step uses fixed salt and iteration values that are hardcoded in Chromium.
+    private func deriveKey(from password: String) -> Data? {
+        return ChromiumDecryption.decryptPBKDF2(password: password, salt: "saltysalt".data(using: .utf8)!, keyByteCount: 16, rounds: 1003)
+    }
+
+    // Step 3: Decrypt password values from the credential database.
+    private func decrypt(passwordData: Data, with key: Data) -> String? {
+        let trimmedPasswordData = passwordData[3...]
+        let iv = String(repeating: " ", count: 16).data(using: .utf8)!
+
+        let decrypted = ChromiumDecryption.decryptAESCBC(data: trimmedPasswordData, key: key, iv: iv)
+        return String(data: decrypted!, encoding: .utf8)!
     }
 
 }
@@ -134,30 +128,65 @@ extension ChromiumCredential: FetchableRecord {
 
 }
 
-// MARK: - CommonCrypto
+// MARK: - CommonCrypto Utilities
 
-func pbkdf2(password: String, salt: Data, keyByteCount: Int, rounds: Int) -> Data? {
-    guard let passwordData = password.data(using: .utf8) else { return nil }
+private struct ChromiumDecryption {
 
-    var derivedKeyData = Data(repeating: 0, count: keyByteCount)
-    let derivedCount = derivedKeyData.count
+    static func decryptPBKDF2(password: String, salt: Data, keyByteCount: Int, rounds: Int) -> Data? {
+        guard let passwordData = password.data(using: .utf8) else { return nil }
 
-    let derivationStatus: OSStatus = derivedKeyData.withUnsafeMutableBytes { derivedKeyBytes in
-        let derivedKeyRawBytes = derivedKeyBytes.bindMemory(to: UInt8.self).baseAddress
-        return salt.withUnsafeBytes { saltBytes in
-            let rawBytes = saltBytes.bindMemory(to: UInt8.self).baseAddress
-            return CCKeyDerivationPBKDF(
-                CCPBKDFAlgorithm(kCCPBKDF2),
-                password,
-                passwordData.count,
-                rawBytes,
-                salt.count,
-                CCPBKDFAlgorithm(kCCPRFHmacAlgSHA1),
-                UInt32(rounds),
-                derivedKeyRawBytes,
-                derivedCount)
+        var derivedKeyData = Data(repeating: 0, count: keyByteCount)
+        let derivedCount = derivedKeyData.count
+
+        let derivationStatus: OSStatus = derivedKeyData.withUnsafeMutableBytes { derivedKeyBytes in
+            let derivedKeyRawBytes = derivedKeyBytes.bindMemory(to: UInt8.self).baseAddress
+
+            return salt.withUnsafeBytes { saltBytes in
+                let rawBytes = saltBytes.bindMemory(to: UInt8.self).baseAddress
+                return CCKeyDerivationPBKDF(
+                    CCPBKDFAlgorithm(kCCPBKDF2),
+                    password,
+                    passwordData.count,
+                    rawBytes,
+                    salt.count,
+                    CCPBKDFAlgorithm(kCCPRFHmacAlgSHA1),
+                    UInt32(rounds),
+                    derivedKeyRawBytes,
+                    derivedCount)
+            }
         }
+
+        return derivationStatus == kCCSuccess ? derivedKeyData : nil
     }
 
-    return derivationStatus == kCCSuccess ? derivedKeyData : nil
+    static func decryptAESCBC(data: Data, key: Data, iv: Data) -> Data? {
+        var outLength = Int(0)
+        var outBytes = [UInt8](repeating: 0, count: data.count)
+        var status: CCCryptorStatus = CCCryptorStatus(kCCSuccess)
+
+        data.withUnsafeBytes { (encryptedBytes: UnsafePointer<UInt8>!) -> () in
+            iv.withUnsafeBytes { (ivBytes: UnsafePointer<UInt8>!) in
+                key.withUnsafeBytes { (keyBytes: UnsafePointer<UInt8>!) -> () in
+                    status = CCCrypt(CCOperation(kCCDecrypt),
+                                     CCAlgorithm(kCCAlgorithmAES128),            // algorithm
+                                     CCOptions(kCCOptionPKCS7Padding),           // options
+                                     keyBytes,                                   // key
+                                     key.count,                                  // keylength
+                                     ivBytes,                                    // iv
+                                     encryptedBytes,                             // dataIn
+                                     data.count,                                // dataInLength
+                                     &outBytes,                                  // dataOut
+                                     outBytes.count,                             // dataOutAvailable
+                                     &outLength)                                 // dataOutMoved
+                }
+            }
+        }
+
+        guard status == kCCSuccess else {
+            return nil
+        }
+
+        return Data(bytes: UnsafePointer<UInt8>(outBytes), count: outLength)
+    }
+
 }
