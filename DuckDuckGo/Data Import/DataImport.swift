@@ -40,29 +40,11 @@ enum DataImport {
         }
 
         var importSourceImage: NSImage? {
-            switch self {
-            case .brave:
-                return ThirdPartyBrowser.brave.applicationIcon
-            case .chrome:
-                return ThirdPartyBrowser.chrome.applicationIcon
-            case .edge:
-                return ThirdPartyBrowser.edge.applicationIcon
-            case .csv:
-                return nil
-            }
+            return ThirdPartyBrowser.browser(for: self)?.applicationIcon
         }
 
         var canImportData: Bool {
-            switch self {
-            case .brave:
-                return ThirdPartyBrowser.brave.isInstalled
-            case .chrome:
-                return ThirdPartyBrowser.chrome.isInstalled
-            case .edge:
-                return ThirdPartyBrowser.edge.isInstalled
-            case .csv:
-                return true
-            }
+            return ThirdPartyBrowser.browser(for: self)?.isInstalled ?? true
         }
 
         var showSuccessScreen: Bool {
