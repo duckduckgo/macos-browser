@@ -23,7 +23,6 @@ extension NSAlert {
     static func closeRunningBrowserAlert(source: DataImport.Source) -> NSAlert {
         let alert = NSAlert()
 
-        alert.icon = source.importSourceImage
         alert.messageText = "Close Browser"
         alert.informativeText = "\(source.importSourceName) must be closed before importing data. Would you like to close it now?"
         alert.alertStyle = .warning
@@ -36,7 +35,6 @@ extension NSAlert {
     static func importFailedAlert(source: DataImport.Source) -> NSAlert {
         let alert = NSAlert()
 
-        alert.icon = source.importSourceImage
         alert.messageText = "Import Failed"
         alert.informativeText = "Please ensure that \(source.importSourceName) is not running before importing data"
         alert.alertStyle = .warning

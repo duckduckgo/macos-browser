@@ -105,7 +105,8 @@ final class DataImportViewController: NSViewController {
         renderCurrentViewState()
 
         selectedImportSourceCancellable = importSourcePopUpButton.selectionPublisher.sink { [weak self] index in
-            let selectedOption = DataImport.Source.allCases[index]
+            let validSources = DataImport.Source.allCases.filter(\.canImportData)
+            let selectedOption = validSources[index]
             self?.viewState = ViewState(selectedImportSource: selectedOption, interactionState: .ableToImport)
         }
     }
