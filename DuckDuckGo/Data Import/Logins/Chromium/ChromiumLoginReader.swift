@@ -164,20 +164,26 @@ private struct ChromiumDecryption {
         var outBytes = [UInt8](repeating: 0, count: data.count)
         var status: CCCryptorStatus = CCCryptorStatus(kCCSuccess)
 
-        data.withUnsafeBytes { (encryptedBytes: UnsafePointer<UInt8>!) -> () in
-            iv.withUnsafeBytes { (ivBytes: UnsafePointer<UInt8>!) in
-                key.withUnsafeBytes { (keyBytes: UnsafePointer<UInt8>!) -> () in
+        data.withUnsafeBytes { dataBytes in
+            let dataRawBytes = dataBytes.bindMemory(to: UInt8.self).baseAddress
+
+            iv.withUnsafeBytes { ivBytes in
+                let ivRawBytes = ivBytes.bindMemory(to: UInt8.self).baseAddress
+
+                key.withUnsafeBytes { keyBytes in
+                    let keyRawBytes = keyBytes.bindMemory(to: UInt8.self).baseAddress
+
                     status = CCCrypt(CCOperation(kCCDecrypt),
-                                     CCAlgorithm(kCCAlgorithmAES128),            // algorithm
-                                     CCOptions(kCCOptionPKCS7Padding),           // options
-                                     keyBytes,                                   // key
-                                     key.count,                                  // keylength
-                                     ivBytes,                                    // iv
-                                     encryptedBytes,                             // dataIn
-                                     data.count,                                // dataInLength
-                                     &outBytes,                                  // dataOut
-                                     outBytes.count,                             // dataOutAvailable
-                                     &outLength)                                 // dataOutMoved
+                                     CCAlgorithm(kCCAlgorithmAES128),
+                                     CCOptions(kCCOptionPKCS7Padding),
+                                     keyRawBytes,
+                                     key.count,
+                                     ivRawBytes,
+                                     dataRawBytes,
+                                     data.count,
+                                     &outBytes,
+                                     outBytes.count,
+                                     &outLength)
                 }
             }
         }
@@ -186,7 +192,7 @@ private struct ChromiumDecryption {
             return nil
         }
 
-        return Data(bytes: UnsafePointer<UInt8>(outBytes), count: outLength)
+        return Data(bytes: &outBytes, count: outLength)
     }
 
 }
