@@ -43,7 +43,7 @@ class ChromiumLoginReaderTests: XCTestCase {
 
     private func databasePath() -> String {
         let bundle = Bundle(for: ChromiumLoginReaderTests.self)
-        return bundle.url(forResource: "Login Data", withExtension: nil)!.path
+        return bundle.resourcePath!
     }
 
 }
