@@ -304,7 +304,7 @@ extension NSPopUpButton {
 
         for (index, source) in validSources.enumerated() {
             addItem(withTitle: source.importSourceName)
-            lastItem?.image = source.importSourceImage
+            lastItem?.image = source.importSourceImage?.resized(to: NSSize(width: 16, height: 16))
 
             if source == selectedSource {
                 selectedSourceIndex = index
