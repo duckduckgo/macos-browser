@@ -1093,6 +1093,23 @@
 			path = Chromium;
 			sourceTree = "<group>";
 		};
+		4B5FF67526B5F26D00D42879 /* Test Firefox Data */ = {
+			isa = PBXGroup;
+			children = (
+				4B5FF67626B5F27800D42879 /* No Primary Password */,
+			);
+			path = "Test Firefox Data";
+			sourceTree = "<group>";
+		};
+		4B5FF67626B5F27800D42879 /* No Primary Password */ = {
+			isa = PBXGroup;
+			children = (
+				4B59024926B38B0B00489384 /* Login Data */,
+				4B8AC93F26B49BEE00879451 /* key4.db */,
+			);
+			path = "No Primary Password";
+			sourceTree = "<group>";
+		};
 		4B6160D125B14E5E007DE5B2 /* ContentBlocker */ = {
 			isa = PBXGroup;
 			children = (
@@ -1271,8 +1288,7 @@
 				4B723E0126B0003E00E14D75 /* CSVImporterTests.swift */,
 				4B59024B26B38BB800489384 /* ChromiumLoginReaderTests.swift */,
 				4B8AC93C26B49BE600879451 /* FirefoxLoginReaderTests.swift */,
-				4B59024926B38B0B00489384 /* Login Data */,
-				4B8AC93F26B49BEE00879451 /* key4.db */,
+				4B5FF67526B5F26D00D42879 /* Test Firefox Data */,
 				4B8AC93E26B49BEE00879451 /* logins.json */,
 			);
 			path = "Data Import";

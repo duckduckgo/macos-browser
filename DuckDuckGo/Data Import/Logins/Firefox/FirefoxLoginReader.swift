@@ -24,15 +24,12 @@ import CryptoSwift
 
 final class FirefoxLoginReader {
 
-    /// Represents the logins.json file found in the Firefox profile directory
-    private struct Logins: Decodable {
-        struct Login: Decodable {
-            let hostname: String
-            let encryptedUsername: String
-            let encryptedPassword: String
-        }
-
-        let logins: [Login]
+    enum ImportError: Error {
+        case databaseAccessFailed
+        case couldNotFindProfile
+        case couldNotGetDecryptionKey
+        case couldNotReadLoginsFile
+        case decryptionFailed
     }
 
     private let keyDatabaseName = "key4.db"
@@ -44,24 +41,23 @@ final class FirefoxLoginReader {
         self.profileDirectoryPath = profileDirectoryPath + "/Firefox/Profiles"
     }
 
-    func importLogins() {
+    func importLogins() -> Result<[ImportedLoginCredential], FirefoxLoginReader.ImportError> {
         guard let profile = findProfile() else {
-            return
+            return .failure(ImportError.couldNotFindProfile)
         }
-
-        print("Got profile: \(profile)")
 
         let databasePath = profile + "/" + keyDatabaseName
         guard let key = getEncryptionKey(withDatabaseAt: databasePath) else {
-            return
+            return .failure(.couldNotGetDecryptionKey)
         }
 
         let loginsPath = profile + "/" + loginsFileName
-        let logins = readLoginsFile(from: loginsPath)
+        guard let logins = readLoginsFile(from: loginsPath) else {
+            return .failure(.couldNotReadLoginsFile)
+        }
 
-        decrypt(logins: logins, with: key)
-
-        print("")
+        let decryptedLogins = decrypt(logins: logins, with: key)
+        return .success(decryptedLogins)
     }
 
     private func findProfile() -> String? {
@@ -79,8 +75,6 @@ final class FirefoxLoginReader {
     }
 
     private func getEncryptionKey(withDatabaseAt databasePath: String) -> Data? {
-        print("Opening connection to database: \(databasePath)")
-
         var key: Data?
 
         do {
@@ -93,9 +87,6 @@ final class FirefoxLoginReader {
 
                 let decodedItem2 = try? ASN1Parser.parse(data: item2)
                 let iv = extractInitializationVector(from: decodedItem2!)!
-
-                print("GLOBAL SALT: \(globalSalt.toHexString())")
-                print("IV: \(iv.toHexString())")
 
                 let decryptedItem2 = aesDecrypt(tlv: decodedItem2!,
                                                 iv: iv,
@@ -117,8 +108,9 @@ final class FirefoxLoginReader {
                 assert(a102 == Data([248, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1]))
 
                 let decodedA11 = try? ASN1Parser.parse(data: a11)
+                let newIV = extractInitializationVector(from: decodedA11!)!
 
-                key = aesDecrypt(tlv: decodedA11!, iv: iv, globalSalt: globalSalt)
+                key = aesDecrypt(tlv: decodedA11!, iv: newIV, globalSalt: globalSalt)
             }
         } catch {
             print("Failed to open database: \(error.localizedDescription)")
@@ -127,11 +119,12 @@ final class FirefoxLoginReader {
         return key
     }
 
-    private func readLoginsFile(from loginsFilePath: String) -> Logins {
-        let loginsFileData = try? Data(contentsOf: URL(fileURLWithPath: loginsFilePath))
-        let logins = try? JSONDecoder().decode(Logins.self, from: loginsFileData!)
+    private func readLoginsFile(from loginsFilePath: String) -> EncryptedFirefoxLogins? {
+        guard let loginsFileData = try? Data(contentsOf: URL(fileURLWithPath: loginsFilePath)) else {
+            return nil
+        }
 
-        return logins!
+        return try? JSONDecoder().decode(EncryptedFirefoxLogins.self, from: loginsFileData)
     }
 
     private func aesDecrypt(tlv: ASN1Parser.Node,
@@ -144,14 +137,12 @@ final class FirefoxLoginReader {
 
         assert(keyLength == 32)
 
-        print("KDF PASSWORD: \(SHA.stringFrom(data: globalSalt))")
-        print("KDF ENTRY SALT: \(entrySalt.toHexString())")
-
-//        let calculatedKey = CommonCryptoUtilities.decryptPBKDF2(password: SHA.stringFrom(data: globalSalt),
-//                                                                salt: entrySalt,
-//                                                                keyByteCount: keyLength,
-//                                                                rounds: iterationCount,
-//                                                                kdf: .sha256)
+        let base64String = SHA.from(data: globalSalt).base64EncodedString()
+        let commonCryptoKey = CommonCryptoUtilities.decryptPBKDF2(password: base64String,
+                                                                salt: entrySalt,
+                                                                keyByteCount: keyLength,
+                                                                rounds: iterationCount,
+                                                                kdf: .sha256)
 
         let key = try? PKCS5.PBKDF2(password: SHA.from(data: globalSalt),
                                     salt: entrySalt.bytes,
@@ -159,8 +150,6 @@ final class FirefoxLoginReader {
                                     keyLength: keyLength,
                                     variant: .sha256)
         let calculatedKey = try? key!.calculate()
-
-        print("DERIVED KEY: \(calculatedKey!.toHexString())")
         let iv = Data([4, 14]) + iv
 
         let decrypted = CommonCryptoUtilities.decryptAESCBC(data: data, key: calculatedKey!.dataRepresentation, iv: iv)
@@ -168,19 +157,19 @@ final class FirefoxLoginReader {
         return Data(decrypted!)
     }
 
-    private func decrypt(logins: Logins, with key: Data) {
-        print("Beginning entry decryption with key: \(key.toHexString())")
+    private func decrypt(logins: EncryptedFirefoxLogins, with key: Data) -> [ImportedLoginCredential] {
+        var credentials = [ImportedLoginCredential]()
 
         for login in logins.logins {
             let decryptedUsername = decrypt(credential: login.encryptedUsername, key: key)
             let decryptedPassword = decrypt(credential: login.encryptedPassword, key: key)
 
             if let username = decryptedUsername, let password = decryptedPassword {
-                print("• Firefox Credential: Username = \(username), Password = \(password)")
-            } else {
-                print("• Firefox Credential: Failed to decrypt")
+                credentials.append(ImportedLoginCredential(url: login.hostname, username: username, password: password))
             }
         }
+
+        return credentials
     }
 
     private func decrypt(credential: String, key: Data) -> String? {
@@ -193,31 +182,40 @@ final class FirefoxLoginReader {
         // Index 1 = initialization vector
         // Index 2 = ciphertext
         guard case let .sequence(topLevelValues) = asn1Decoded else {
-            fatalError()
+            return nil
         }
 
-        guard case let .sequence(initVectorValues) = topLevelValues[1] else {
-            fatalError()
+        guard case let .sequence(initializationVectorValues) = topLevelValues[1] else {
+            return nil
         }
 
-        guard case let .octetString(initVector) = initVectorValues[1] else {
-            fatalError()
+        guard case let .octetString(initializationVector) = initializationVectorValues[1] else {
+            return nil
         }
 
         guard case let .octetString(ciphertext) = topLevelValues[2] else {
-            fatalError()
+            return nil
         }
 
-        let decryptedData = tripleDesDecrypt(data: ciphertext, keyData: key, iv: initVector)
+        guard let decryptedData = CommonCryptoUtilities.decrypt3DES(data: ciphertext, key: key, iv: initializationVector) else {
+            return nil
+        }
 
-        // This isn't decrypting as expected, something's wrong somewhere
         return String(data: decryptedData, encoding: .utf8)
     }
 
-    private func tripleDesDecrypt(data: Data, keyData: Data, iv: Data) -> Data {
-        let data = CommonCryptoUtilities.decrypt3DES(data: data, key: keyData, iv: iv)
-        return data!
+}
+
+/// Represents the logins.json file found in the Firefox profile directory
+private struct EncryptedFirefoxLogins: Decodable {
+
+    struct Login: Decodable {
+        let hostname: String
+        let encryptedUsername: String
+        let encryptedPassword: String
     }
+
+    let logins: [Login]
 
 }
 
@@ -420,7 +418,7 @@ struct SHA {
 
 extension Data {
 
-    func toHexString() -> String {
+    func hexString() -> String {
         return reduce("") {$0 + String(format: "%02x", $1)}
     }
 
