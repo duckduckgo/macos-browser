@@ -23,6 +23,7 @@ struct ThirdPartyBrowser {
     static var brave: ThirdPartyBrowser { ThirdPartyBrowser(type: .brave) }
     static var chrome: ThirdPartyBrowser { ThirdPartyBrowser(type: .chrome) }
     static var edge: ThirdPartyBrowser { ThirdPartyBrowser(type: .edge) }
+    static var firefox: ThirdPartyBrowser { ThirdPartyBrowser(type: .firefox) }
 
     static func browser(for source: DataImport.Source) -> ThirdPartyBrowser? {
         switch source {
@@ -32,6 +33,8 @@ struct ThirdPartyBrowser {
             return Self.chrome
         case .edge:
             return Self.edge
+        case .firefox:
+            return Self.firefox
         case .csv:
             return nil
         }
@@ -57,6 +60,7 @@ struct ThirdPartyBrowser {
         case brave
         case chrome
         case edge
+        case firefox
     }
 
     private var bundleID: String {
@@ -64,6 +68,7 @@ struct ThirdPartyBrowser {
         case .brave: return "com.brave.Browser"
         case .chrome: return "com.google.Chrome"
         case .edge: return "com.microsoft.edgemac"
+        case .firefox: return "org.mozilla.firefox"
         }
     }
 

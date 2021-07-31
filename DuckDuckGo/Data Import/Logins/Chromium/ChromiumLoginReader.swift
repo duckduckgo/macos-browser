@@ -146,7 +146,8 @@ struct CommonCryptoUtilities {
     }
 
     static func decryptPBKDF2(password: String, salt: Data, keyByteCount: Int, rounds: Int, kdf: KDF) -> Data? {
-        guard let passwordData = password.data(using: .utf8) else { return nil }
+        // TODO: Fix Chrome import, which used to rely on .utf8 here
+        guard let passwordData = Data(base64Encoded: password) else { return nil }
 
         var derivedKeyData = Data(repeating: 0, count: keyByteCount)
         let derivedCount = derivedKeyData.count
@@ -217,7 +218,7 @@ struct CommonCryptoUtilities {
 
     static func decrypt3DES(data: Data, key: Data, iv: Data) -> Data? {
         var outLength = Int(0)
-        var outBytes = [UInt8](repeating: 0, count: data.count)
+        var outBytes = [UInt8](repeating: 0, count: data.count + kCCBlockSize3DES)
         var status: CCCryptorStatus = CCCryptorStatus(kCCSuccess)
 
         data.withUnsafeBytes { dataBytes in
@@ -238,7 +239,7 @@ struct CommonCryptoUtilities {
                                      dataRawBytes,
                                      data.count,
                                      &outBytes,
-                                     outBytes.count,
+                                     outBytes.count + kCCBlockSize3DES,
                                      &outLength)
                 }
             }

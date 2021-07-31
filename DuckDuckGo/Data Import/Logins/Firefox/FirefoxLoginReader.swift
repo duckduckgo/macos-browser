@@ -144,6 +144,7 @@ final class FirefoxLoginReader {
                                                                 rounds: iterationCount,
                                                                 kdf: .sha256)
 
+        // TODO: Remove CryptoSwift
         let key = try? PKCS5.PBKDF2(password: SHA.from(data: globalSalt),
                                     salt: entrySalt.bytes,
                                     iterations: iterationCount,

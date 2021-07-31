@@ -24,6 +24,7 @@ enum DataImport {
         case brave
         case chrome
         case edge
+        case firefox
         case csv
 
         var importSourceName: String {
@@ -34,6 +35,8 @@ enum DataImport {
                 return "Chrome"
             case .edge:
                 return "Edge"
+            case .firefox:
+                return "Firefox"
             case .csv:
                 return UserText.importLoginsCSV
             }
