@@ -23,11 +23,13 @@ extension NSImage {
 
     func resized(to size: NSSize) -> NSImage? {
         let image = NSImage(size: size)
+        let targetRect = NSRect(x: 0, y: 0, width: size.width, height: size.height)
+        let currentRect = NSRect(x: 0, y: 0, width: self.size.width, height: self.size.height)
 
         image.lockFocus()
         let graphicsContext = NSGraphicsContext.current
         graphicsContext?.imageInterpolation = .high
-        self.draw(in: NSMakeRect(0, 0, size.width, size.height), from: NSMakeRect(0, 0, self.size.width, self.size.height), operation: .copy, fraction: 1)
+        self.draw(in: targetRect, from: currentRect, operation: .copy, fraction: 1)
         image.unlockFocus()
 
         return image
