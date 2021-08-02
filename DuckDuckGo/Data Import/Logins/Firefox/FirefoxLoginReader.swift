@@ -124,7 +124,7 @@ final class FirefoxLoginReader {
         assert(keyLength == 32)
 
         let base64String = SHA.from(data: globalSalt).base64EncodedString()
-        let commonCryptoKey = Cryptography.decryptPBKDF2(password: base64String,
+        let commonCryptoKey = Cryptography.decryptPBKDF2(password: .base64(base64String),
                                                          salt: entrySalt,
                                                          keyByteCount: keyLength,
                                                          rounds: iterationCount,

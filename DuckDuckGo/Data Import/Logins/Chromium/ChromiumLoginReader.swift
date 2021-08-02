@@ -95,7 +95,7 @@ final class ChromiumLoginReader {
     // Step 2: Derive the decryption key from the Chromium Safe Storage key.
     //         This step uses fixed salt and iteration values that are hardcoded in Chromium.
     private func deriveKey(from password: String) -> Data? {
-        return Cryptography.decryptPBKDF2(password: password,
+        return Cryptography.decryptPBKDF2(password: .utf8(password),
                                           salt: "saltysalt".data(using: .utf8)!,
                                           keyByteCount: 16,
                                           rounds: 1003,
@@ -106,12 +106,12 @@ final class ChromiumLoginReader {
     private func decrypt(passwordData: Data, with key: Data) -> String? {
         let trimmedPasswordData = passwordData[3...]
         let iv = String(repeating: " ", count: 16).data(using: .utf8)!
-        
+
         guard let decrypted = Cryptography.decryptAESCBC(data: trimmedPasswordData, key: key, iv: iv) else {
             return nil
         }
         
-        return String(data: decrypted, encoding: .utf8)!
+        return String(data: decrypted, encoding: .utf8)
     }
 
 }

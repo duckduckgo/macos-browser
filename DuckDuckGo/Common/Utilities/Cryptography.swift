@@ -28,11 +28,28 @@ struct Cryptography {
     enum EncodedString {
         case base64(String)
         case utf8(String)
+
+        var string: String {
+            switch self {
+            case .base64(let string): return string
+            case .utf8(let string): return string
+            }
+        }
     }
 
-    static func decryptPBKDF2(password: String, salt: Data, keyByteCount: Int, rounds: Int, kdf: KDF) -> Data? {
-        // TODO: Fix Chrome import, which used to rely on .utf8 here
-        guard let passwordData = Data(base64Encoded: password) else { return nil }
+    static func decryptPBKDF2(password: EncodedString, salt: Data, keyByteCount: Int, rounds: Int, kdf: KDF) -> Data? {
+        let passwordData: Data?
+
+        switch password {
+        case .base64(let string):
+            passwordData = Data(base64Encoded: string)
+        case .utf8(let string):
+            passwordData = string.data(using: .utf8)
+        }
+
+        guard let passwordData = passwordData else {
+            return nil
+        }
 
         var derivedKeyData = Data(repeating: 0, count: keyByteCount)
         let derivedCount = derivedKeyData.count
@@ -51,7 +68,7 @@ struct Cryptography {
                 let rawBytes = saltBytes.bindMemory(to: UInt8.self).baseAddress
                 return CCKeyDerivationPBKDF(
                     CCPBKDFAlgorithm(kCCPBKDF2),
-                    password,
+                    password.string,
                     passwordData.count,
                     rawBytes,
                     salt.count,
