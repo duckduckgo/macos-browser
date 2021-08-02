@@ -176,6 +176,8 @@
 		4BA1A6E6258C270800F6F690 /* EncryptionKeyGeneratorTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4BA1A6E5258C270800F6F690 /* EncryptionKeyGeneratorTests.swift */; };
 		4BA1A6F6258C4F9600F6F690 /* EncryptionMocks.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4BA1A6F5258C4F9600F6F690 /* EncryptionMocks.swift */; };
 		4BA1A6FE258C5C1300F6F690 /* EncryptedValueTransformerTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4BA1A6FD258C5C1300F6F690 /* EncryptedValueTransformerTests.swift */; };
+		4BB46EA226B8954500222970 /* logins-encrypted.json in Resources */ = {isa = PBXBuildFile; fileRef = 4BB46EA026B8954500222970 /* logins-encrypted.json */; };
+		4BB46EA326B8954500222970 /* key4-encrypted.db in Resources */ = {isa = PBXBuildFile; fileRef = 4BB46EA126B8954500222970 /* key4-encrypted.db */; };
 		4BB6CE5F26B77ED000EC5860 /* Cryptography.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4BB6CE5E26B77ED000EC5860 /* Cryptography.swift */; };
 		4BB88B4525B7B55C006F6B06 /* DebugUserScript.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4BB88B4425B7B55C006F6B06 /* DebugUserScript.swift */; };
 		4BB88B4A25B7B690006F6B06 /* SequenceExtensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4BB88B4925B7B690006F6B06 /* SequenceExtensions.swift */; };
@@ -634,6 +636,8 @@
 		4BA1A6EA258C288C00F6F690 /* EncryptionKeyStoreTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EncryptionKeyStoreTests.swift; sourceTree = "<group>"; };
 		4BA1A6F5258C4F9600F6F690 /* EncryptionMocks.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EncryptionMocks.swift; sourceTree = "<group>"; };
 		4BA1A6FD258C5C1300F6F690 /* EncryptedValueTransformerTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EncryptedValueTransformerTests.swift; sourceTree = "<group>"; };
+		4BB46EA026B8954500222970 /* logins-encrypted.json */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.json; path = "logins-encrypted.json"; sourceTree = "<group>"; };
+		4BB46EA126B8954500222970 /* key4-encrypted.db */ = {isa = PBXFileReference; lastKnownFileType = file; path = "key4-encrypted.db"; sourceTree = "<group>"; };
 		4BB6CE5E26B77ED000EC5860 /* Cryptography.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Cryptography.swift; sourceTree = "<group>"; };
 		4BB88B4425B7B55C006F6B06 /* DebugUserScript.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DebugUserScript.swift; sourceTree = "<group>"; };
 		4BB88B4925B7B690006F6B06 /* SequenceExtensions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SequenceExtensions.swift; sourceTree = "<group>"; };
@@ -1100,6 +1104,7 @@
 		4B5FF67526B5F26D00D42879 /* Test Firefox Data */ = {
 			isa = PBXGroup;
 			children = (
+				4BB46E9F26B8953900222970 /* Primary Password */,
 				4B5FF67626B5F27800D42879 /* No Primary Password */,
 			);
 			path = "Test Firefox Data";
@@ -1108,8 +1113,8 @@
 		4B5FF67626B5F27800D42879 /* No Primary Password */ = {
 			isa = PBXGroup;
 			children = (
-				4B8AC93E26B49BEE00879451 /* logins.json */,
 				4B8AC93F26B49BEE00879451 /* key4.db */,
+				4B8AC93E26B49BEE00879451 /* logins.json */,
 			);
 			path = "No Primary Password";
 			sourceTree = "<group>";
@@ -1292,8 +1297,8 @@
 				4B723E0126B0003E00E14D75 /* CSVImporterTests.swift */,
 				4B59024B26B38BB800489384 /* ChromiumLoginReaderTests.swift */,
 				4B8AC93C26B49BE600879451 /* FirefoxLoginReaderTests.swift */,
+				4BB46EA526B8974500222970 /* Test Chrome Data */,
 				4B5FF67526B5F26D00D42879 /* Test Firefox Data */,
-				4B59024926B38B0B00489384 /* Login Data */,
 			);
 			path = "Data Import";
 			sourceTree = "<group>";
@@ -1370,6 +1375,23 @@
 				B6A5A27D25B9403E00AA7ADA /* FileStoreMock.swift */,
 			);
 			path = FileSystem;
+			sourceTree = "<group>";
+		};
+		4BB46E9F26B8953900222970 /* Primary Password */ = {
+			isa = PBXGroup;
+			children = (
+				4BB46EA126B8954500222970 /* key4-encrypted.db */,
+				4BB46EA026B8954500222970 /* logins-encrypted.json */,
+			);
+			path = "Primary Password";
+			sourceTree = "<group>";
+		};
+		4BB46EA526B8974500222970 /* Test Chrome Data */ = {
+			isa = PBXGroup;
+			children = (
+				4B59024926B38B0B00489384 /* Login Data */,
+			);
+			path = "Test Chrome Data";
 			sourceTree = "<group>";
 		};
 		4BB88B4E25B7BA20006F6B06 /* Utilities */ = {
@@ -2659,10 +2681,12 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				4BB46EA326B8954500222970 /* key4-encrypted.db in Resources */,
 				4B8AC94126B49BEE00879451 /* key4.db in Resources */,
 				B67C6C422654BF49006C872E /* DuckDuckGo-Symbol.jpg in Resources */,
 				4B8AC94026B49BEE00879451 /* logins.json in Resources */,
 				4B59024A26B38B0B00489384 /* Login Data in Resources */,
+				4BB46EA226B8954500222970 /* logins-encrypted.json in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

@@ -22,11 +22,40 @@ import XCTest
 
 class FirefoxLoginReaderTests: XCTestCase {
 
-    func testImport() {
-        let firefoxLoginReader = FirefoxLoginReader(firefoxProfileURL: resourcesURL())
-        let logins = firefoxLoginReader.readLogins()
+    func testWhenImportingLoginsWithNoPrimaryPassword_ThenImportSucceeds() {
+        let firefoxLoginReader = FirefoxLoginReader(firefoxProfileURL: resourcesURL(),
+                                                    databaseFileName: "key4.db",
+                                                    loginsFileName: "logins.json")
+        let result = firefoxLoginReader.readLogins()
 
-        if case let .success(logins) = logins {
+        if case let .success(logins) = result {
+            XCTAssertEqual(logins, [ImportedLoginCredential(url: "example.com", username: "testusername", password: "testpassword")])
+        } else {
+            XCTFail("Failed to decrypt Firefox logins")
+        }
+    }
+
+    func testWhenImportingLoginsWithPrimaryPassword_AndNoPrimaryPasswordIsProvided_ThenImportFails() {
+        let firefoxLoginReader = FirefoxLoginReader(firefoxProfileURL: resourcesURL(),
+                                                    databaseFileName: "key4-encrypted.db",
+                                                    loginsFileName: "logins-encrypted.json")
+        let result = firefoxLoginReader.readLogins()
+
+        if case let .failure(error) = result {
+            XCTAssertEqual(error, .requiresPrimaryPassword)
+        } else {
+            XCTFail("Expected to fail when decrypting a database that is protected with a Primary Password")
+        }
+    }
+
+    func testWhenImportingLoginsWithPrimaryPassword_AndPrimaryPasswordIsProvided_ThenImportSucceeds() {
+        let firefoxLoginReader = FirefoxLoginReader(firefoxProfileURL: resourcesURL(),
+                                                    primaryPassword: "testpassword",
+                                                    databaseFileName: "key4-encrypted.db",
+                                                    loginsFileName: "logins-encrypted.json")
+        let result = firefoxLoginReader.readLogins()
+
+        if case let .success(logins) = result {
             XCTAssertEqual(logins, [ImportedLoginCredential(url: "example.com", username: "testusername", password: "testpassword")])
         } else {
             XCTFail("Failed to decrypt Firefox logins")

@@ -25,6 +25,7 @@ import CryptoSwift
 final class FirefoxLoginReader {
 
     enum ImportError: Error {
+        case requiresPrimaryPassword
         case databaseAccessFailed
         case couldNotFindProfile
         case couldNotGetDecryptionKey
@@ -32,8 +33,14 @@ final class FirefoxLoginReader {
         case decryptionFailed
     }
 
-    private let keyDatabaseName = "key4.db"
-    private let loginsFileName = "logins.json"
+    private enum Constants {
+        static let defaultKeyDatabaseName = "key4.db"
+        static let defaultLoginsFileNane = "logins.json"
+    }
+
+    private let primaryPassword: String?
+    private let keyDatabaseName: String
+    private let loginsFileName: String
 
     private let firefoxProfileURL: URL
 
@@ -41,27 +48,39 @@ final class FirefoxLoginReader {
     ///
     /// - Parameter firefoxProfileURL: The path to the profile being imported from. This should be the base path of the profile, containing the `key4.db` and `logins.json` files.
     /// - Parameter primaryPassword: The password used to decrypt the login data. This is optional, as Firefox's primary password feature is optional.
-    init(firefoxProfileURL: URL, primaryPassword: String? = nil) {
+    init(firefoxProfileURL: URL,
+         primaryPassword: String? = nil,
+         databaseFileName: String = Constants.defaultKeyDatabaseName,
+         loginsFileName: String = Constants.defaultLoginsFileNane) {
+
+        self.primaryPassword = primaryPassword
+        self.keyDatabaseName = databaseFileName
+        self.loginsFileName = loginsFileName
         self.firefoxProfileURL = firefoxProfileURL
     }
 
     func readLogins() -> Result<[ImportedLoginCredential], FirefoxLoginReader.ImportError> {
         let databasePath = firefoxProfileURL.appendingPathComponent(keyDatabaseName).path
-        guard let key = getEncryptionKey(withDatabaseAt: databasePath) else {
-            return .failure(.couldNotGetDecryptionKey)
-        }
 
         let loginsPath = firefoxProfileURL.appendingPathComponent(loginsFileName).path
         guard let logins = readLoginsFile(from: loginsPath) else {
             return .failure(.couldNotReadLoginsFile)
         }
 
-        let decryptedLogins = decrypt(logins: logins, with: key)
-        return .success(decryptedLogins)
+        let encryptionKeyResult = getEncryptionKey(withDatabaseAt: databasePath)
+
+        switch encryptionKeyResult {
+        case .success(let keyData):
+            let decryptedLogins = decrypt(logins: logins, with: keyData)
+            return .success(decryptedLogins)
+        case .failure(let error):
+            return .failure(error)
+        }
     }
 
-    private func getEncryptionKey(withDatabaseAt databasePath: String) -> Data? {
+    private func getEncryptionKey(withDatabaseAt databasePath: String) -> Result<Data, FirefoxLoginReader.ImportError> {
         var key: Data?
+        var error: FirefoxLoginReader.ImportError?
 
         do {
             let queue = try DatabaseQueue(path: databasePath)
@@ -80,11 +99,8 @@ final class FirefoxLoginReader {
                 let string = String(data: decryptedItem2!, encoding: .utf8)
 
                 // Decrypted check is technically "password-check\x02\x02", it's converted to UTF-8 and checked here
-                if string == "password-check" {
-                    print("Verified key")
-                } else {
-                    print("Failed to get key")
-                    return
+                if string != "password-check" {
+                    error = .requiresPrimaryPassword
                 }
 
                 let nssPrivateRow = try? Row.fetchOne(database, sql: "SELECT a11, a102 FROM nssPrivate;")
@@ -99,10 +115,16 @@ final class FirefoxLoginReader {
                 key = aesDecrypt(tlv: decodedA11!, iv: newIV, globalSalt: globalSalt)
             }
         } catch {
-            print("Failed to open database: \(error.localizedDescription)")
+            return .failure(.databaseAccessFailed)
         }
 
-        return key
+        if let error = error {
+            return .failure(error)
+        } else if let key = key {
+            return .success(key)
+        } else {
+            return .failure(.databaseAccessFailed)
+        }
     }
 
     private func readLoginsFile(from loginsFilePath: String) -> EncryptedFirefoxLogins? {
@@ -123,7 +145,13 @@ final class FirefoxLoginReader {
 
         assert(keyLength == 32)
 
-        let base64String = SHA.from(data: globalSalt).base64EncodedString()
+        let hashData = globalSalt + (primaryPassword ?? "").data(using: .utf8)!
+        let base64String = SHA.from(data: hashData).base64EncodedString()
+
+        print("GLOBAL SALT: \(globalSalt.toHexString())")
+        print("KDF PASSWORD: \(hashData.toHexString())")
+        print("KDF SALT: \(entrySalt.toHexString())")
+        print("KDF ITERATION COUNT: \(iterationCount)")
         let commonCryptoKey = Cryptography.decryptPBKDF2(password: .base64(base64String),
                                                          salt: entrySalt,
                                                          keyByteCount: keyLength,
@@ -131,7 +159,8 @@ final class FirefoxLoginReader {
                                                          kdf: .sha256)
 
         // TODO: Remove CryptoSwift
-        let key = try? PKCS5.PBKDF2(password: SHA.from(data: globalSalt),
+        let passwordData = globalSalt + (primaryPassword ?? "").data(using: .utf8)!
+        let key = try? PKCS5.PBKDF2(password: SHA.from(data: passwordData),
                                     salt: entrySalt.bytes,
                                     iterations: iterationCount,
                                     keyLength: keyLength,
@@ -286,7 +315,7 @@ extension FirefoxLoginReader {
             return nil
         }
 
-        return data.withUnsafeBytes { $0.pointee }
+        return data.integer
     }
 
     private func extractKeyLength(from tlv: ASN1Parser.Node) -> Int? {
@@ -324,7 +353,7 @@ extension FirefoxLoginReader {
             return nil
         }
 
-        return data.withUnsafeBytes { $0.pointee }
+        return data.integer
     }
 
     private func extractInitializationVector(from tlv: ASN1Parser.Node) -> Data? {

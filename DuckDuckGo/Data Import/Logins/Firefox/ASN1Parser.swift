@@ -92,7 +92,7 @@ private class Scanner {
     }
 }
 
-private extension Data {
+extension Data {
 
     /// Returns the first byte of the current data
     var firstByte: UInt8 {
