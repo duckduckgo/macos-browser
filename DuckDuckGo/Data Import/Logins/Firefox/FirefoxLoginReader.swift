@@ -35,43 +35,29 @@ final class FirefoxLoginReader {
     private let keyDatabaseName = "key4.db"
     private let loginsFileName = "logins.json"
 
-    private let profileDirectoryPath: String
+    private let firefoxProfileURL: URL
 
-    init(profileDirectoryPath: String, primaryPassword: String? = nil) {
-        self.profileDirectoryPath = profileDirectoryPath + "/Firefox/Profiles"
+    /// Initialize a FirefoxLoginReader with a profile path and optional primary password.
+    ///
+    /// - Parameter firefoxProfileURL: The path to the profile being imported from. This should be the base path of the profile, containing the `key4.db` and `logins.json` files.
+    /// - Parameter primaryPassword: The password used to decrypt the login data. This is optional, as Firefox's primary password feature is optional.
+    init(firefoxProfileURL: URL, primaryPassword: String? = nil) {
+        self.firefoxProfileURL = firefoxProfileURL
     }
 
     func importLogins() -> Result<[ImportedLoginCredential], FirefoxLoginReader.ImportError> {
-        guard let profile = findProfile() else {
-            return .failure(ImportError.couldNotFindProfile)
-        }
-
-        let databasePath = profile + "/" + keyDatabaseName
+        let databasePath = firefoxProfileURL.appendingPathComponent(keyDatabaseName).path
         guard let key = getEncryptionKey(withDatabaseAt: databasePath) else {
             return .failure(.couldNotGetDecryptionKey)
         }
 
-        let loginsPath = profile + "/" + loginsFileName
+        let loginsPath = firefoxProfileURL.appendingPathComponent(loginsFileName).path
         guard let logins = readLoginsFile(from: loginsPath) else {
             return .failure(.couldNotReadLoginsFile)
         }
 
         let decryptedLogins = decrypt(logins: logins, with: key)
         return .success(decryptedLogins)
-    }
-
-    private func findProfile() -> String? {
-        guard let potentialProfiles = try? FileManager.default.contentsOfDirectory(atPath: profileDirectoryPath) else {
-            print("No Profiles at \(profileDirectoryPath)")
-            return nil
-        }
-
-        let profiles = potentialProfiles.filter { $0.hasSuffix(".default-release") }
-        let selectedProfile = profiles.first // If multiple profiles, offer a choice of which one to import
-        print("Profile directory: \(profileDirectoryPath)")
-        print("Profiles: \(profiles)")
-
-        return profileDirectoryPath + "/" + selectedProfile!
     }
 
     private func getEncryptionKey(withDatabaseAt databasePath: String) -> Data? {
@@ -138,11 +124,11 @@ final class FirefoxLoginReader {
         assert(keyLength == 32)
 
         let base64String = SHA.from(data: globalSalt).base64EncodedString()
-        let commonCryptoKey = CommonCryptoUtilities.decryptPBKDF2(password: base64String,
-                                                                salt: entrySalt,
-                                                                keyByteCount: keyLength,
-                                                                rounds: iterationCount,
-                                                                kdf: .sha256)
+        let commonCryptoKey = Cryptography.decryptPBKDF2(password: base64String,
+                                                         salt: entrySalt,
+                                                         keyByteCount: keyLength,
+                                                         rounds: iterationCount,
+                                                         kdf: .sha256)
 
         // TODO: Remove CryptoSwift
         let key = try? PKCS5.PBKDF2(password: SHA.from(data: globalSalt),
@@ -153,7 +139,7 @@ final class FirefoxLoginReader {
         let calculatedKey = try? key!.calculate()
         let iv = Data([4, 14]) + iv
 
-        let decrypted = CommonCryptoUtilities.decryptAESCBC(data: data, key: calculatedKey!.dataRepresentation, iv: iv)
+        let decrypted = Cryptography.decryptAESCBC(data: data, key: calculatedKey!.dataRepresentation, iv: iv)
 
         return Data(decrypted!)
     }
@@ -161,7 +147,8 @@ final class FirefoxLoginReader {
     private func decrypt(logins: EncryptedFirefoxLogins, with key: Data) -> [ImportedLoginCredential] {
         var credentials = [ImportedLoginCredential]()
 
-        for login in logins.logins {
+        // Drop the first login, which contains metadata about the login database.
+        for login in logins.logins.dropFirst() {
             let decryptedUsername = decrypt(credential: login.encryptedUsername, key: key)
             let decryptedPassword = decrypt(credential: login.encryptedPassword, key: key)
 
@@ -198,7 +185,7 @@ final class FirefoxLoginReader {
             return nil
         }
 
-        guard let decryptedData = CommonCryptoUtilities.decrypt3DES(data: ciphertext, key: key, iv: initializationVector) else {
+        guard let decryptedData = Cryptography.decrypt3DES(data: ciphertext, key: key, iv: initializationVector) else {
             return nil
         }
 

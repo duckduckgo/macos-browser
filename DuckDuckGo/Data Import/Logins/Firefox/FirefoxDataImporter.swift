@@ -17,3 +17,41 @@
 //
 
 import Foundation
+
+final class FirefoxDataImporter: DataImporter {
+
+    let loginImporter: LoginImporter
+
+    init(loginImporter: LoginImporter) {
+        self.loginImporter = loginImporter
+    }
+
+    func importableTypes() -> [DataImport.DataType] {
+        return [.logins]
+    }
+
+    func importData(types: [DataImport.DataType], completion: @escaping (Result<[DataImport.Summary], DataImportError>) -> Void) {
+        let defaultPath = defaultFirefoxProfilePath()
+        print(defaultPath)
+    }
+
+    private func defaultFirefoxProfilePath() -> URL? {
+        guard let potentialProfiles = try? FileManager.default.contentsOfDirectory(atPath: profilesDirectoryURL().path) else {
+            return nil
+        }
+
+        let profiles = potentialProfiles.filter { $0.hasSuffix(".default-release") }
+
+        guard let selectedProfile = profiles.first else {
+            return nil
+        }
+
+        return profilesDirectoryURL().appendingPathComponent(selectedProfile)
+    }
+
+    private func profilesDirectoryURL() -> URL {
+        let applicationSupportURL = FileManager.default.urls(for: .applicationSupportDirectory, in: .userDomainMask).first!
+        return applicationSupportURL.appendingPathComponent("Firefox/Profiles")
+    }
+
+}

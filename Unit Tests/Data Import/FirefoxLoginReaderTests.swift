@@ -23,18 +23,19 @@ import XCTest
 class FirefoxLoginReaderTests: XCTestCase {
 
     func testImport() {
-        let path = FileManager.default.urls(for: .applicationSupportDirectory, in: .userDomainMask).first!
-        let firefoxLoginReader = FirefoxLoginReader(profileDirectoryPath: path.path)
+        let firefoxLoginReader = FirefoxLoginReader(firefoxProfileURL: resourcesURL())
         let logins = firefoxLoginReader.importLogins()
 
-        print(logins)
-
-        XCTAssert(true)
+        if case let .success(logins) = logins {
+            XCTAssertEqual(logins, [ImportedLoginCredential(url: "example.com", username: "testusername", password: "testpassword")])
+        } else {
+            XCTFail("Failed to decrypt Firefox logins")
+        }
     }
 
-    private func databasePath() -> String {
+    private func resourcesURL() -> URL {
         let bundle = Bundle(for: FirefoxLoginReaderTests.self)
-        return bundle.resourcePath!
+        return bundle.resourceURL!
     }
 
 }

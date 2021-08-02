@@ -61,6 +61,10 @@ final class DataImportViewController: NSViewController {
                 let secureVault = try? SecureVaultFactory.default.makeVault()
                 let secureVaultImporter = SecureVaultLoginImporter(secureVault: secureVault!)
                 self.dataImporter = EdgeDataImporter(loginImporter: secureVaultImporter)
+            case .firefox:
+                let secureVault = try? SecureVaultFactory.default.makeVault()
+                let secureVaultImporter = SecureVaultLoginImporter(secureVault: secureVault!)
+                self.dataImporter = FirefoxDataImporter(loginImporter: secureVaultImporter)
             case .csv:
                 // Reset the data importer if the view has switched to the .csv state and a Chromium importer is still in use.
                 if self.dataImporter is ChromiumDataImporter {
@@ -142,7 +146,7 @@ final class DataImportViewController: NSViewController {
 
     private func newChildViewController(for importSource: DataImport.Source, interactionState: InteractionState) -> NSViewController? {
         switch importSource {
-        case .brave, .chrome, .edge:
+        case .brave, .chrome, .edge, .firefox:
             return createBrowserImportViewController(for: importSource)
 
         case .csv:
@@ -245,6 +249,7 @@ final class DataImportViewController: NSViewController {
                 case .chrome: Pixel.fire(.importedLogins(source: .chrome))
                 case .csv: Pixel.fire(.importedLogins(source: .csv))
                 case .edge: Pixel.fire(.importedLogins(source: .edge))
+                case .firefox: Pixel.fire(.importedLogins(source: .firefox))
                 }
             case .failure(let error):
                 self.viewState.interactionState = .failedToImport

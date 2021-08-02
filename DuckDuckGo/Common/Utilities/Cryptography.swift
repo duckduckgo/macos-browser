@@ -1,0 +1,140 @@
+//
+//  Cryptography.swift
+//
+//  Copyright © 2021 DuckDuckGo. All rights reserved.
+//
+//  Licensed under the Apache License, Version 2.0 (the "License");
+//  you may not use this file except in compliance with the License.
+//  You may obtain a copy of the License at
+//
+//  http://www.apache.org/licenses/LICENSE-2.0
+//
+//  Unless required by applicable law or agreed to in writing, software
+//  distributed under the License is distributed on an "AS IS" BASIS,
+//  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+//  See the License for the specific language governing permissions and
+//  limitations under the License.
+//
+
+import CommonCrypto
+
+struct Cryptography {
+
+    enum KDF {
+        case sha1
+        case sha256
+    }
+
+    enum EncodedString {
+        case base64(String)
+        case utf8(String)
+    }
+
+    static func decryptPBKDF2(password: String, salt: Data, keyByteCount: Int, rounds: Int, kdf: KDF) -> Data? {
+        // TODO: Fix Chrome import, which used to rely on .utf8 here
+        guard let passwordData = Data(base64Encoded: password) else { return nil }
+
+        var derivedKeyData = Data(repeating: 0, count: keyByteCount)
+        let derivedCount = derivedKeyData.count
+
+        let derivationStatus: OSStatus = derivedKeyData.withUnsafeMutableBytes { derivedKeyBytes in
+            let derivedKeyRawBytes = derivedKeyBytes.bindMemory(to: UInt8.self).baseAddress
+
+            let keyDerivationAlgorithm: CCPBKDFAlgorithm
+
+            switch kdf {
+            case .sha1: keyDerivationAlgorithm = CCPBKDFAlgorithm(kCCPRFHmacAlgSHA1)
+            case .sha256: keyDerivationAlgorithm = CCPBKDFAlgorithm(kCCPRFHmacAlgSHA256)
+            }
+
+            return salt.withUnsafeBytes { saltBytes in
+                let rawBytes = saltBytes.bindMemory(to: UInt8.self).baseAddress
+                return CCKeyDerivationPBKDF(
+                    CCPBKDFAlgorithm(kCCPBKDF2),
+                    password,
+                    passwordData.count,
+                    rawBytes,
+                    salt.count,
+                    keyDerivationAlgorithm,
+                    UInt32(rounds),
+                    derivedKeyRawBytes,
+                    derivedCount)
+            }
+        }
+
+        return derivationStatus == kCCSuccess ? derivedKeyData : nil
+    }
+
+    static func decryptAESCBC(data: Data, key: Data, iv: Data) -> Data? {
+        var outLength = Int(0)
+        var outBytes = [UInt8](repeating: 0, count: data.count)
+        var status: CCCryptorStatus = CCCryptorStatus(kCCSuccess)
+
+        data.withUnsafeBytes { dataBytes in
+            let dataRawBytes = dataBytes.bindMemory(to: UInt8.self).baseAddress
+
+            iv.withUnsafeBytes { ivBytes in
+                let ivRawBytes = ivBytes.bindMemory(to: UInt8.self).baseAddress
+
+                key.withUnsafeBytes { keyBytes in
+                    let keyRawBytes = keyBytes.bindMemory(to: UInt8.self).baseAddress
+
+                    status = CCCrypt(CCOperation(kCCDecrypt),
+                                     CCAlgorithm(kCCAlgorithmAES128),
+                                     CCOptions(kCCOptionPKCS7Padding),
+                                     keyRawBytes,
+                                     key.count,
+                                     ivRawBytes,
+                                     dataRawBytes,
+                                     data.count,
+                                     &outBytes,
+                                     outBytes.count,
+                                     &outLength)
+                }
+            }
+        }
+
+        guard status == kCCSuccess else {
+            return nil
+        }
+
+        return Data(bytes: &outBytes, count: outLength)
+    }
+
+    static func decrypt3DES(data: Data, key: Data, iv: Data) -> Data? {
+        var outLength = Int(0)
+        var outBytes = [UInt8](repeating: 0, count: data.count + kCCBlockSize3DES)
+        var status: CCCryptorStatus = CCCryptorStatus(kCCSuccess)
+
+        data.withUnsafeBytes { dataBytes in
+            let dataRawBytes = dataBytes.bindMemory(to: UInt8.self).baseAddress
+
+            iv.withUnsafeBytes { ivBytes in
+                let ivRawBytes = ivBytes.bindMemory(to: UInt8.self).baseAddress
+
+                key.withUnsafeBytes { keyBytes in
+                    let keyRawBytes = keyBytes.bindMemory(to: UInt8.self).baseAddress
+
+                    status = CCCrypt(CCOperation(kCCDecrypt),
+                                     CCAlgorithm(kCCAlgorithm3DES),
+                                     CCOptions(kCCOptionPKCS7Padding),
+                                     keyRawBytes,
+                                     key.count,
+                                     ivRawBytes,
+                                     dataRawBytes,
+                                     data.count,
+                                     &outBytes,
+                                     outBytes.count + kCCBlockSize3DES,
+                                     &outLength)
+                }
+            }
+        }
+
+        guard status == kCCSuccess else {
+            return nil
+        }
+
+        return Data(bytes: &outBytes, count: outLength)
+    }
+
+}

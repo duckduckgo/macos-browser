@@ -95,22 +95,22 @@ final class ChromiumLoginReader {
     // Step 2: Derive the decryption key from the Chromium Safe Storage key.
     //         This step uses fixed salt and iteration values that are hardcoded in Chromium.
     private func deriveKey(from password: String) -> Data? {
-        return CommonCryptoUtilities.decryptPBKDF2(password: password,
-                                                   salt: "saltysalt".data(using: .utf8)!,
-                                                   keyByteCount: 16,
-                                                   rounds: 1003,
-                                                   kdf: .sha1)
+        return Cryptography.decryptPBKDF2(password: password,
+                                          salt: "saltysalt".data(using: .utf8)!,
+                                          keyByteCount: 16,
+                                          rounds: 1003,
+                                          kdf: .sha1)
     }
 
     // Step 3: Decrypt password values from the credential database.
     private func decrypt(passwordData: Data, with key: Data) -> String? {
         let trimmedPasswordData = passwordData[3...]
         let iv = String(repeating: " ", count: 16).data(using: .utf8)!
-
-        guard let decrypted = CommonCryptoUtilities.decryptAESCBC(data: trimmedPasswordData, key: key, iv: iv) else {
+        
+        guard let decrypted = Cryptography.decryptAESCBC(data: trimmedPasswordData, key: key, iv: iv) else {
             return nil
         }
-
+        
         return String(data: decrypted, encoding: .utf8)!
     }
 
@@ -132,124 +132,6 @@ extension ChromiumCredential: FetchableRecord {
         url = row["signon_realm"]
         username = row["username_value"]
         encryptedPassword = row["password_value"]
-    }
-
-}
-
-// MARK: - CommonCrypto Utilities
-
-struct CommonCryptoUtilities {
-
-    enum KDF {
-        case sha1
-        case sha256
-    }
-
-    static func decryptPBKDF2(password: String, salt: Data, keyByteCount: Int, rounds: Int, kdf: KDF) -> Data? {
-        // TODO: Fix Chrome import, which used to rely on .utf8 here
-        guard let passwordData = Data(base64Encoded: password) else { return nil }
-
-        var derivedKeyData = Data(repeating: 0, count: keyByteCount)
-        let derivedCount = derivedKeyData.count
-
-        let derivationStatus: OSStatus = derivedKeyData.withUnsafeMutableBytes { derivedKeyBytes in
-            let derivedKeyRawBytes = derivedKeyBytes.bindMemory(to: UInt8.self).baseAddress
-
-            let keyDerivationAlgorithm: CCPBKDFAlgorithm
-
-            switch kdf {
-            case .sha1: keyDerivationAlgorithm = CCPBKDFAlgorithm(kCCPRFHmacAlgSHA1)
-            case .sha256: keyDerivationAlgorithm = CCPBKDFAlgorithm(kCCPRFHmacAlgSHA256)
-            }
-
-            return salt.withUnsafeBytes { saltBytes in
-                let rawBytes = saltBytes.bindMemory(to: UInt8.self).baseAddress
-                return CCKeyDerivationPBKDF(
-                    CCPBKDFAlgorithm(kCCPBKDF2),
-                    password,
-                    passwordData.count,
-                    rawBytes,
-                    salt.count,
-                    keyDerivationAlgorithm,
-                    UInt32(rounds),
-                    derivedKeyRawBytes,
-                    derivedCount)
-            }
-        }
-
-        return derivationStatus == kCCSuccess ? derivedKeyData : nil
-    }
-
-    static func decryptAESCBC(data: Data, key: Data, iv: Data) -> Data? {
-        var outLength = Int(0)
-        var outBytes = [UInt8](repeating: 0, count: data.count)
-        var status: CCCryptorStatus = CCCryptorStatus(kCCSuccess)
-
-        data.withUnsafeBytes { dataBytes in
-            let dataRawBytes = dataBytes.bindMemory(to: UInt8.self).baseAddress
-
-            iv.withUnsafeBytes { ivBytes in
-                let ivRawBytes = ivBytes.bindMemory(to: UInt8.self).baseAddress
-
-                key.withUnsafeBytes { keyBytes in
-                    let keyRawBytes = keyBytes.bindMemory(to: UInt8.self).baseAddress
-
-                    status = CCCrypt(CCOperation(kCCDecrypt),
-                                     CCAlgorithm(kCCAlgorithmAES128),
-                                     CCOptions(kCCOptionPKCS7Padding),
-                                     keyRawBytes,
-                                     key.count,
-                                     ivRawBytes,
-                                     dataRawBytes,
-                                     data.count,
-                                     &outBytes,
-                                     outBytes.count,
-                                     &outLength)
-                }
-            }
-        }
-
-        guard status == kCCSuccess else {
-            return nil
-        }
-
-        return Data(bytes: &outBytes, count: outLength)
-    }
-
-    static func decrypt3DES(data: Data, key: Data, iv: Data) -> Data? {
-        var outLength = Int(0)
-        var outBytes = [UInt8](repeating: 0, count: data.count + kCCBlockSize3DES)
-        var status: CCCryptorStatus = CCCryptorStatus(kCCSuccess)
-
-        data.withUnsafeBytes { dataBytes in
-            let dataRawBytes = dataBytes.bindMemory(to: UInt8.self).baseAddress
-
-            iv.withUnsafeBytes { ivBytes in
-                let ivRawBytes = ivBytes.bindMemory(to: UInt8.self).baseAddress
-
-                key.withUnsafeBytes { keyBytes in
-                    let keyRawBytes = keyBytes.bindMemory(to: UInt8.self).baseAddress
-
-                    status = CCCrypt(CCOperation(kCCDecrypt),
-                                     CCAlgorithm(kCCAlgorithm3DES),
-                                     CCOptions(kCCOptionPKCS7Padding),
-                                     keyRawBytes,
-                                     key.count,
-                                     ivRawBytes,
-                                     dataRawBytes,
-                                     data.count,
-                                     &outBytes,
-                                     outBytes.count + kCCBlockSize3DES,
-                                     &outLength)
-                }
-            }
-        }
-
-        guard status == kCCSuccess else {
-            return nil
-        }
-
-        return Data(bytes: &outBytes, count: outLength)
     }
 
 }
