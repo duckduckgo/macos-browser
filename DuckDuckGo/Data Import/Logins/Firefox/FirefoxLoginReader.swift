@@ -45,7 +45,7 @@ final class FirefoxLoginReader {
         self.firefoxProfileURL = firefoxProfileURL
     }
 
-    func importLogins() -> Result<[ImportedLoginCredential], FirefoxLoginReader.ImportError> {
+    func readLogins() -> Result<[ImportedLoginCredential], FirefoxLoginReader.ImportError> {
         let databasePath = firefoxProfileURL.appendingPathComponent(keyDatabaseName).path
         guard let key = getEncryptionKey(withDatabaseAt: databasePath) else {
             return .failure(.couldNotGetDecryptionKey)

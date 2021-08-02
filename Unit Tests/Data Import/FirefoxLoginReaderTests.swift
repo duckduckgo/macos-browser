@@ -24,7 +24,7 @@ class FirefoxLoginReaderTests: XCTestCase {
 
     func testImport() {
         let firefoxLoginReader = FirefoxLoginReader(firefoxProfileURL: resourcesURL())
-        let logins = firefoxLoginReader.importLogins()
+        let logins = firefoxLoginReader.readLogins()
 
         if case let .success(logins) = logins {
             XCTAssertEqual(logins, [ImportedLoginCredential(url: "example.com", username: "testusername", password: "testpassword")])

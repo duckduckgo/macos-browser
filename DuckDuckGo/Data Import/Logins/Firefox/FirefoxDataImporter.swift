@@ -31,8 +31,25 @@ final class FirefoxDataImporter: DataImporter {
     }
 
     func importData(types: [DataImport.DataType], completion: @escaping (Result<[DataImport.Summary], DataImportError>) -> Void) {
-        let defaultPath = defaultFirefoxProfilePath()
-        print(defaultPath)
+        guard let defaultPath = defaultFirefoxProfilePath() else {
+            completion(.failure(.cannotReadFile))
+            return
+        }
+
+        let loginReader = FirefoxLoginReader(firefoxProfileURL: defaultPath)
+        let loginResult = loginReader.readLogins()
+
+        switch loginResult {
+        case .success(let logins):
+            do {
+                let summary = try loginImporter.importLogins(logins)
+                completion(.success([summary]))
+            } catch {
+                completion(.failure(.cannotAccessSecureVault))
+            }
+        case .failure:
+            completion(.failure(.browserNeedsToBeClosed))
+        }
     }
 
     private func defaultFirefoxProfilePath() -> URL? {
