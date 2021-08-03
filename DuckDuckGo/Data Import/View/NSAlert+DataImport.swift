@@ -20,6 +20,10 @@ import Foundation
 
 extension NSAlert {
 
+    var stringValue: String? {
+        return (accessoryView as? NSTextField)?.stringValue
+    }
+
     static func closeRunningBrowserAlert(source: DataImport.Source) -> NSAlert {
         let alert = NSAlert()
 
@@ -39,6 +43,20 @@ extension NSAlert {
         alert.informativeText = "Please ensure that \(source.importSourceName) is not running before importing data"
         alert.alertStyle = .warning
         alert.addButton(withTitle: "Okay")
+
+        return alert
+    }
+
+    static func passwordRequiredAlert(source: DataImport.Source) -> NSAlert {
+        let textField = NSSecureTextField(frame: NSRect(x: 0, y: 0, width: 280, height: 24))
+        let alert = NSAlert()
+
+        alert.messageText = "Primary Password Required"
+        alert.informativeText = "A primary password is required to import \(source.importSourceName) logins."
+        alert.alertStyle = .warning
+        alert.accessoryView = textField
+        alert.addButton(withTitle: "Import")
+        alert.addButton(withTitle: "Cancel")
 
         return alert
     }

@@ -20,6 +20,8 @@ import Foundation
 
 final class FirefoxDataImporter: DataImporter {
 
+    var primaryPassword: String?
+
     let loginImporter: LoginImporter
 
     init(loginImporter: LoginImporter) {
@@ -36,7 +38,7 @@ final class FirefoxDataImporter: DataImporter {
             return
         }
 
-        let loginReader = FirefoxLoginReader(firefoxProfileURL: defaultPath)
+        let loginReader = FirefoxLoginReader(firefoxProfileURL: defaultPath, primaryPassword: self.primaryPassword)
         let loginResult = loginReader.readLogins()
 
         switch loginResult {
@@ -47,8 +49,13 @@ final class FirefoxDataImporter: DataImporter {
             } catch {
                 completion(.failure(.cannotAccessSecureVault))
             }
-        case .failure:
-            completion(.failure(.browserNeedsToBeClosed))
+        case .failure(let error):
+            switch error {
+            case .requiresPrimaryPassword:
+                completion(.failure(.needsLoginPrimaryPassword))
+            default:
+                completion(.failure(.browserNeedsToBeClosed))
+            }
         }
     }
 

@@ -252,8 +252,13 @@ final class DataImportViewController: NSViewController {
                 case .firefox: Pixel.fire(.importedLogins(source: .firefox))
                 }
             case .failure(let error):
-                self.viewState.interactionState = .failedToImport
-                self.presentAlert(for: error)
+                switch error {
+                case .needsLoginPrimaryPassword:
+                    self.presentAlert(for: error)
+                default:
+                    self.viewState.interactionState = .failedToImport
+                    self.presentAlert(for: error)
+                }
             }
         }
     }
@@ -262,10 +267,19 @@ final class DataImportViewController: NSViewController {
         guard let window = view.window else { return }
 
         switch error {
-        case .browserNeedsToBeClosed:
+        case .needsLoginPrimaryPassword:
+            let alert = NSAlert.passwordRequiredAlert(source: viewState.selectedImportSource)
+            let response = alert.runModal()
+
+            if response == .alertFirstButtonReturn {
+                let password = (alert.accessoryView as? NSSecureTextField)?.stringValue
+                (dataImporter as? FirefoxDataImporter)?.primaryPassword = password
+
+                completeImport()
+            }
+        default:
             let alert = NSAlert.importFailedAlert(source: viewState.selectedImportSource)
             alert.beginSheetModal(for: window, completionHandler: nil)
-        default: break
         }
     }
 

@@ -73,6 +73,7 @@ enum DataImportError: Error {
 
     case cannotReadFile
     case browserNeedsToBeClosed
+    case needsLoginPrimaryPassword
     case cannotAccessSecureVault
 
 }
