@@ -145,30 +145,16 @@ final class FirefoxLoginReader {
 
         assert(keyLength == 32)
 
-        let hashData = globalSalt + (primaryPassword ?? "").data(using: .utf8)!
-        let base64String = SHA.from(data: hashData).base64EncodedString()
-
-        print("GLOBAL SALT: \(globalSalt.toHexString())")
-        print("KDF PASSWORD: \(hashData.toHexString())")
-        print("KDF SALT: \(entrySalt.toHexString())")
-        print("KDF ITERATION COUNT: \(iterationCount)")
-        let commonCryptoKey = Cryptography.decryptPBKDF2(password: .base64(base64String),
+        let passwordData = globalSalt + (primaryPassword ?? "").data(using: .utf8)!
+        let hashDataArray: [UInt8] = SHA.from(data: passwordData)
+        let commonCryptoKey = Cryptography.decryptPBKDF2(password: .base64(Data(hashDataArray).base64EncodedString()),
                                                          salt: entrySalt,
                                                          keyByteCount: keyLength,
                                                          rounds: iterationCount,
                                                          kdf: .sha256)
 
-        // TODO: Remove CryptoSwift
-        let passwordData = globalSalt + (primaryPassword ?? "").data(using: .utf8)!
-        let key = try? PKCS5.PBKDF2(password: SHA.from(data: passwordData),
-                                    salt: entrySalt.bytes,
-                                    iterations: iterationCount,
-                                    keyLength: keyLength,
-                                    variant: .sha256)
-        let calculatedKey = try? key!.calculate()
         let iv = Data([4, 14]) + iv
-
-        let decrypted = Cryptography.decryptAESCBC(data: data, key: calculatedKey!.dataRepresentation, iv: iv)
+        let decrypted = Cryptography.decryptAESCBC(data: data, key: commonCryptoKey!.dataRepresentation, iv: iv)
 
         return Data(decrypted!)
     }
@@ -412,12 +398,8 @@ struct SHA {
     }
 
     static func from(data: Data) -> Data {
-        return Insecure.SHA1.hash(data: data).dataRepresentation
-    }
-
-    static func stringFrom(data: Data) -> String {
-        let data = Insecure.SHA1.hash(data: data)
-        return data.compactMap { String(format: "%02x", $0) }.joined()
+        let digest = Insecure.SHA1.hash(data: data)
+        return digest.dataRepresentation
     }
 
     static func hexFrom(data: Data) -> String {

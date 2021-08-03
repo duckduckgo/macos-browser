@@ -51,6 +51,8 @@ struct Cryptography {
             return nil
         }
 
+        let passwordDataArray: [Int8] = passwordData.map { Int8(bitPattern: $0) }
+
         var derivedKeyData = Data(repeating: 0, count: keyByteCount)
         let derivedCount = derivedKeyData.count
 
@@ -68,8 +70,8 @@ struct Cryptography {
                 let rawBytes = saltBytes.bindMemory(to: UInt8.self).baseAddress
                 return CCKeyDerivationPBKDF(
                     CCPBKDFAlgorithm(kCCPBKDF2),
-                    password.string,
-                    passwordData.count,
+                    passwordDataArray,
+                    passwordDataArray.count,
                     rawBytes,
                     salt.count,
                     keyDerivationAlgorithm,
