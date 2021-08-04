@@ -166,4 +166,7 @@ struct UserText {
     static let initiateImport = NSLocalizedString("import.logins.initiate", value: "Import", comment: "Button text for importing data")
     static let doneImporting = NSLocalizedString("import.logins.done", value: "Done", comment: "Button text for finishing the data import")
 
+    static let chromiumPasswordImportDisclaimer = NSLocalizedString("import.chromium.disclaimer", value: "DuckDuckGo will need to access your keychain information", comment: "Warning text for the Chromium password import option")
+    static let firefoxPasswordImportDisclaimer = NSLocalizedString("import.firefox.disclaimer", value: "DuckDuckGo will request your Primary Password if one has been set", comment: "Warning text for the Chromium password import option")
+
 }

@@ -40,6 +40,7 @@ final class BrowserImportViewController: NSViewController {
     }
 
     @IBOutlet var passwordsCheckbox: NSButton!
+    @IBOutlet var passwordDetailLabel: NSTextField!
     @IBOutlet var closeBrowserWarningLabel: NSTextField!
     @IBOutlet var closeBrowserWarningView: ColorView! {
         didSet {
@@ -73,6 +74,15 @@ final class BrowserImportViewController: NSViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         self.closeBrowserWarningLabel.stringValue = "You must close \(browser.importSourceName) before importing data."
+
+        switch browser {
+        case .brave, .chrome, .edge:
+            passwordDetailLabel.stringValue = UserText.chromiumPasswordImportDisclaimer
+        case .firefox:
+            passwordDetailLabel.stringValue = UserText.firefoxPasswordImportDisclaimer
+        default:
+            passwordDetailLabel.isHidden = true
+        }
     }
 
     @IBAction func selectedImportOptionsChanged(_ sender: NSButton) {

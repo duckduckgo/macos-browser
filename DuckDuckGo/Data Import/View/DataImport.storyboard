@@ -106,7 +106,7 @@ Gw
                                 <rect key="frame" x="20" y="20" width="429" height="16"/>
                                 <subviews>
                                     <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="kEX-xf-rNu">
-                                        <rect key="frame" x="158" y="24" width="114" height="16"/>
+                                        <rect key="frame" x="158" y="0.0" width="114" height="16"/>
                                         <textFieldCell key="cell" lineBreakMode="clipping" title="Import Complete" id="rJC-Qi-wHX">
                                             <font key="font" textStyle="headline" name=".SFNS-Bold"/>
                                             <color key="textColor" name="labelColor" catalog="System" colorSpace="catalog"/>
@@ -177,12 +177,12 @@ Gw
         <scene sceneID="gvn-jW-XyL">
             <objects>
                 <viewController storyboardIdentifier="BrowserImportViewController" id="NYV-k5-Kxh" customClass="BrowserImportViewController" customModule="DuckDuckGo_Privacy_Browser" customModuleProvider="target" sceneMemberID="viewController">
-                    <view key="view" id="jY2-NF-ftb">
+                    <view key="view" misplaced="YES" id="jY2-NF-ftb">
                         <rect key="frame" x="0.0" y="0.0" width="469" height="102"/>
                         <autoresizingMask key="autoresizingMask"/>
                         <subviews>
                             <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="cub-aJ-1ti">
-                                <rect key="frame" x="18" y="82" width="433" height="16"/>
+                                <rect key="frame" x="18" y="101" width="433" height="16"/>
                                 <textFieldCell key="cell" lineBreakMode="clipping" title="Select Data to Import:" id="Wce-nN-umc">
                                     <font key="font" usesAppearanceFont="YES"/>
                                     <color key="textColor" name="labelColor" catalog="System" colorSpace="catalog"/>
@@ -190,18 +190,42 @@ Gw
                                 </textFieldCell>
                             </textField>
                             <stackView distribution="fill" orientation="vertical" alignment="leading" horizontalStackHuggingPriority="249.99998474121094" verticalStackHuggingPriority="249.99998474121094" detachesHiddenViews="YES" translatesAutoresizingMaskIntoConstraints="NO" id="ubR-la-MhZ">
-                                <rect key="frame" x="20" y="54" width="429" height="16"/>
+                                <rect key="frame" x="20" y="54" width="429" height="35"/>
                                 <subviews>
-                                    <button verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="GGX-yw-24n">
-                                        <rect key="frame" x="-2" y="-1" width="91" height="18"/>
-                                        <buttonCell key="cell" type="check" title="Passwords" bezelStyle="regularSquare" imagePosition="left" state="on" inset="2" id="dM3-0G-bfD">
-                                            <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
-                                            <font key="font" metaFont="system"/>
-                                        </buttonCell>
-                                        <connections>
-                                            <action selector="selectedImportOptionsChanged:" target="NYV-k5-Kxh" id="1m9-zx-oXo"/>
-                                        </connections>
-                                    </button>
+                                    <stackView distribution="fill" orientation="vertical" alignment="leading" spacing="4" horizontalStackHuggingPriority="249.99998474121094" verticalStackHuggingPriority="249.99998474121094" detachesHiddenViews="YES" translatesAutoresizingMaskIntoConstraints="NO" id="4W0-UP-EJ0" userLabel="Passwords Stack View">
+                                        <rect key="frame" x="0.0" y="0.0" width="354" height="35"/>
+                                        <subviews>
+                                            <button verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="GGX-yw-24n">
+                                                <rect key="frame" x="-2" y="18" width="91" height="18"/>
+                                                <buttonCell key="cell" type="check" title="Passwords" bezelStyle="regularSquare" imagePosition="left" state="on" inset="2" id="dM3-0G-bfD">
+                                                    <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
+                                                    <font key="font" metaFont="system"/>
+                                                </buttonCell>
+                                                <connections>
+                                                    <action selector="selectedImportOptionsChanged:" target="NYV-k5-Kxh" id="1m9-zx-oXo"/>
+                                                </connections>
+                                            </button>
+                                            <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="prC-g0-GXu">
+                                                <rect key="frame" x="18" y="0.0" width="338" height="15"/>
+                                                <textFieldCell key="cell" lineBreakMode="clipping" title="DuckDuckGo will need to access your keychain information" id="vQp-rs-jkA">
+                                                    <font key="font" textStyle="callout" name=".SFNS-Regular"/>
+                                                    <color key="textColor" name="secondaryLabelColor" catalog="System" colorSpace="catalog"/>
+                                                    <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
+                                                </textFieldCell>
+                                            </textField>
+                                        </subviews>
+                                        <constraints>
+                                            <constraint firstItem="prC-g0-GXu" firstAttribute="leading" secondItem="4W0-UP-EJ0" secondAttribute="leading" constant="20" id="WBq-gz-9bd"/>
+                                        </constraints>
+                                        <visibilityPriorities>
+                                            <integer value="1000"/>
+                                            <integer value="1000"/>
+                                        </visibilityPriorities>
+                                        <customSpacing>
+                                            <real value="3.4028234663852886e+38"/>
+                                            <real value="3.4028234663852886e+38"/>
+                                        </customSpacing>
+                                    </stackView>
                                 </subviews>
                                 <visibilityPriorities>
                                     <integer value="1000"/>
@@ -269,12 +293,13 @@ Gw
                     <connections>
                         <outlet property="closeBrowserWarningLabel" destination="Lgq-ti-uAf" id="4UB-FQ-sWL"/>
                         <outlet property="closeBrowserWarningView" destination="1FX-Lc-Hmx" id="kwx-hK-hHy"/>
+                        <outlet property="passwordDetailLabel" destination="prC-g0-GXu" id="8i8-Yu-gdI"/>
                         <outlet property="passwordsCheckbox" destination="GGX-yw-24n" id="Jva-fg-K11"/>
                     </connections>
                 </viewController>
                 <customObject id="o7C-xg-CgQ" userLabel="First Responder" customClass="NSResponder" sceneMemberID="firstResponder"/>
             </objects>
-            <point key="canvasLocation" x="600.5" y="401.5"/>
+            <point key="canvasLocation" x="383" y="428"/>
         </scene>
         <!--Import View Controller-->
         <scene sceneID="e65-WV-kqF">
@@ -340,7 +365,7 @@ Gw
                 </viewController>
                 <customObject id="Xcz-bj-sHR" userLabel="First Responder" customClass="NSResponder" sceneMemberID="firstResponder"/>
             </objects>
-            <point key="canvasLocation" x="-18.5" y="522"/>
+            <point key="canvasLocation" x="-30" y="434"/>
         </scene>
     </scenes>
     <resources>
