@@ -333,7 +333,10 @@ extension MainViewController {
             return
         }
         let index = keyEquivalent - 1
-        if index >= 0 && index < tabCollectionViewModel.tabCollection.tabs.count {
+        if keyEquivalent == 9,
+           !tabCollectionViewModel.tabCollection.tabs.isEmpty {
+            tabCollectionViewModel.select(at: tabCollectionViewModel.tabCollection.tabs.count - 1)
+        } else if tabCollectionViewModel.tabCollection.tabs.indices.contains(index) {
             tabCollectionViewModel.select(at: index)
         }
     }

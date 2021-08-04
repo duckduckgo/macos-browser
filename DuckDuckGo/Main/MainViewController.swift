@@ -259,6 +259,13 @@ extension MainViewController {
             return false
 
         // Handle critical Main Menu actions before WebView
+        case kVK_ANSI_1, kVK_ANSI_2, kVK_ANSI_3, kVK_ANSI_4, kVK_ANSI_5, kVK_ANSI_6,
+             kVK_ANSI_7, kVK_ANSI_8, kVK_ANSI_9,
+             kVK_ANSI_Keypad1, kVK_ANSI_Keypad2, kVK_ANSI_Keypad3, kVK_ANSI_Keypad4,
+             kVK_ANSI_Keypad5, kVK_ANSI_Keypad6, kVK_ANSI_Keypad7, kVK_ANSI_Keypad8,
+             kVK_ANSI_Keypad9:
+            guard flags == .command else { return false }
+            fallthrough
         case kVK_Tab where [[.control], [.control, .shift]].contains(flags),
              kVK_ANSI_N where flags == .command,
              kVK_ANSI_W where flags.contains(.command),
