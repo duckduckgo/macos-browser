@@ -133,7 +133,7 @@ final class TabCollectionViewModel: NSObject {
         }
     }
 
-    func appendNewTab(type: Tab.TabType) {
+    func appendNewTab(type: Tab.TabType = .favorites) {
         append(tab: Tab(tabType: type), selected: true)
     }
 

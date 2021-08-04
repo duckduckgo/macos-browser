@@ -198,3 +198,9 @@ final class TabCollectionTests: XCTestCase {
     }
 
 }
+
+extension Tab {
+    convenience override init() {
+        self.init(tabType: .favorites)
+    }
+}

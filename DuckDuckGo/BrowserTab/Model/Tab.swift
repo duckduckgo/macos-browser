@@ -128,7 +128,7 @@ final class Tab: NSObject {
 
     @PublishedAfter var url: URL? {
         didSet {
-            if url != nil {
+            if url != nil && url != URL.emptyPage {
                 tabType = .standard
             }
 
@@ -216,7 +216,7 @@ final class Tab: NSObject {
     private let instrumentation = TabInstrumentation()
 
     var isHomepageShown: Bool {
-        url == nil || url == URL.emptyPage
+        url == nil || url == URL.emptyPage && tabType == .favorites
     }
 
     var isBookmarksShown: Bool {
