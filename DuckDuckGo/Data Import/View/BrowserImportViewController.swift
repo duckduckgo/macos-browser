@@ -42,6 +42,7 @@ final class BrowserImportViewController: NSViewController {
     @IBOutlet var passwordsCheckbox: NSButton!
     @IBOutlet var passwordDetailLabel: NSTextField!
     @IBOutlet var closeBrowserWarningLabel: NSTextField!
+    @IBOutlet var closeBrowserWarningViewHeightConstraint: NSLayoutConstraint!
     @IBOutlet var closeBrowserWarningView: ColorView! {
         didSet {
             closeBrowserWarningView.backgroundColor = NSColor.black.withAlphaComponent(0.05)
@@ -82,6 +83,12 @@ final class BrowserImportViewController: NSViewController {
             passwordDetailLabel.stringValue = UserText.firefoxPasswordImportDisclaimer
         default:
             passwordDetailLabel.isHidden = true
+        }
+
+        let browserIsRunning = ThirdPartyBrowser.browser(for: browser)?.isRunning ?? false
+
+        if !browserIsRunning {
+            closeBrowserWarningViewHeightConstraint.constant = 0
         }
     }
 

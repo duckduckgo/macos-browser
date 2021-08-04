@@ -177,12 +177,12 @@ Gw
         <scene sceneID="gvn-jW-XyL">
             <objects>
                 <viewController storyboardIdentifier="BrowserImportViewController" id="NYV-k5-Kxh" customClass="BrowserImportViewController" customModule="DuckDuckGo_Privacy_Browser" customModuleProvider="target" sceneMemberID="viewController">
-                    <view key="view" misplaced="YES" id="jY2-NF-ftb">
-                        <rect key="frame" x="0.0" y="0.0" width="469" height="102"/>
+                    <view key="view" id="jY2-NF-ftb">
+                        <rect key="frame" x="0.0" y="0.0" width="469" height="120"/>
                         <autoresizingMask key="autoresizingMask"/>
                         <subviews>
                             <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="cub-aJ-1ti">
-                                <rect key="frame" x="18" y="101" width="433" height="16"/>
+                                <rect key="frame" x="18" y="100" width="433" height="16"/>
                                 <textFieldCell key="cell" lineBreakMode="clipping" title="Select Data to Import:" id="Wce-nN-umc">
                                     <font key="font" usesAppearanceFont="YES"/>
                                     <color key="textColor" name="labelColor" catalog="System" colorSpace="catalog"/>
@@ -190,7 +190,7 @@ Gw
                                 </textFieldCell>
                             </textField>
                             <stackView distribution="fill" orientation="vertical" alignment="leading" horizontalStackHuggingPriority="249.99998474121094" verticalStackHuggingPriority="249.99998474121094" detachesHiddenViews="YES" translatesAutoresizingMaskIntoConstraints="NO" id="ubR-la-MhZ">
-                                <rect key="frame" x="20" y="54" width="429" height="35"/>
+                                <rect key="frame" x="20" y="53" width="429" height="35"/>
                                 <subviews>
                                     <stackView distribution="fill" orientation="vertical" alignment="leading" spacing="4" horizontalStackHuggingPriority="249.99998474121094" verticalStackHuggingPriority="249.99998474121094" detachesHiddenViews="YES" translatesAutoresizingMaskIntoConstraints="NO" id="4W0-UP-EJ0" userLabel="Passwords Stack View">
                                         <rect key="frame" x="0.0" y="0.0" width="354" height="35"/>
@@ -235,8 +235,11 @@ Gw
                                 </customSpacing>
                             </stackView>
                             <customView translatesAutoresizingMaskIntoConstraints="NO" id="1FX-Lc-Hmx" customClass="ColorView" customModule="DuckDuckGo_Privacy_Browser" customModuleProvider="target">
-                                <rect key="frame" x="0.0" y="1" width="469" height="32"/>
+                                <rect key="frame" x="0.0" y="0.0" width="469" height="32"/>
                                 <subviews>
+                                    <box verticalHuggingPriority="750" boxType="separator" translatesAutoresizingMaskIntoConstraints="NO" id="o7k-G5-sfX">
+                                        <rect key="frame" x="0.0" y="29" width="469" height="5"/>
+                                    </box>
                                     <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="Lgq-ti-uAf" userLabel="Close Browser Warning Label">
                                         <rect key="frame" x="42" y="8" width="409" height="16"/>
                                         <textFieldCell key="cell" lineBreakMode="clipping" title="You must quit Browser before importing data." id="rrK-J8-BjO">
@@ -256,17 +259,18 @@ Gw
                                     </imageView>
                                 </subviews>
                                 <constraints>
-                                    <constraint firstAttribute="bottom" secondItem="Lgq-ti-uAf" secondAttribute="bottom" constant="8" id="2mO-Nb-gKj"/>
-                                    <constraint firstAttribute="trailing" secondItem="Lgq-ti-uAf" secondAttribute="trailing" constant="20" symbolic="YES" id="7W7-8I-vMe"/>
+                                    <constraint firstAttribute="bottom" secondItem="Lgq-ti-uAf" secondAttribute="bottom" priority="750" constant="8" id="2mO-Nb-gKj"/>
+                                    <constraint firstAttribute="trailing" secondItem="Lgq-ti-uAf" secondAttribute="trailing" priority="750" constant="20" symbolic="YES" id="7W7-8I-vMe"/>
+                                    <constraint firstAttribute="height" constant="32" id="DBn-CK-Rzs"/>
                                     <constraint firstItem="S2w-Uj-JqW" firstAttribute="centerY" secondItem="1FX-Lc-Hmx" secondAttribute="centerY" id="EUt-NP-qWc"/>
-                                    <constraint firstItem="Lgq-ti-uAf" firstAttribute="leading" secondItem="S2w-Uj-JqW" secondAttribute="trailing" constant="4" id="Hng-ei-RIC"/>
+                                    <constraint firstItem="Lgq-ti-uAf" firstAttribute="leading" secondItem="S2w-Uj-JqW" secondAttribute="trailing" priority="750" constant="4" id="Hng-ei-RIC"/>
                                     <constraint firstItem="S2w-Uj-JqW" firstAttribute="leading" secondItem="1FX-Lc-Hmx" secondAttribute="leading" constant="16" id="X8O-hf-ib4"/>
-                                    <constraint firstItem="Lgq-ti-uAf" firstAttribute="top" secondItem="1FX-Lc-Hmx" secondAttribute="top" constant="8" id="m9a-NZ-AKC"/>
+                                    <constraint firstItem="o7k-G5-sfX" firstAttribute="top" secondItem="1FX-Lc-Hmx" secondAttribute="top" priority="750" id="fqh-D5-7l7"/>
+                                    <constraint firstItem="Lgq-ti-uAf" firstAttribute="top" secondItem="1FX-Lc-Hmx" secondAttribute="top" priority="750" constant="8" id="m9a-NZ-AKC"/>
+                                    <constraint firstItem="o7k-G5-sfX" firstAttribute="leading" secondItem="1FX-Lc-Hmx" secondAttribute="leading" priority="750" id="xKw-mC-JDM"/>
+                                    <constraint firstAttribute="trailing" secondItem="o7k-G5-sfX" secondAttribute="trailing" priority="750" id="zcG-xX-IGO"/>
                                 </constraints>
                             </customView>
-                            <box verticalHuggingPriority="750" boxType="separator" translatesAutoresizingMaskIntoConstraints="NO" id="o7k-G5-sfX">
-                                <rect key="frame" x="0.0" y="31" width="469" height="5"/>
-                            </box>
                             <box verticalHuggingPriority="750" boxType="separator" translatesAutoresizingMaskIntoConstraints="NO" id="T9n-wZ-7iu">
                                 <rect key="frame" x="0.0" y="-2" width="469" height="5"/>
                             </box>
@@ -276,23 +280,21 @@ Gw
                             <constraint firstItem="1FX-Lc-Hmx" firstAttribute="leading" secondItem="jY2-NF-ftb" secondAttribute="leading" id="356-2m-onM"/>
                             <constraint firstItem="ubR-la-MhZ" firstAttribute="leading" secondItem="jY2-NF-ftb" secondAttribute="leading" constant="20" symbolic="YES" id="JaX-LM-Wo4"/>
                             <constraint firstItem="cub-aJ-1ti" firstAttribute="leading" secondItem="jY2-NF-ftb" secondAttribute="leading" constant="20" symbolic="YES" id="Kpu-AR-KzD"/>
-                            <constraint firstAttribute="trailing" secondItem="o7k-G5-sfX" secondAttribute="trailing" id="Nu3-pg-HIK"/>
                             <constraint firstAttribute="trailing" secondItem="T9n-wZ-7iu" secondAttribute="trailing" id="SEV-gY-iXX"/>
-                            <constraint firstItem="o7k-G5-sfX" firstAttribute="leading" secondItem="jY2-NF-ftb" secondAttribute="leading" id="Spw-Jv-OKI"/>
-                            <constraint firstItem="1FX-Lc-Hmx" firstAttribute="top" secondItem="o7k-G5-sfX" secondAttribute="bottom" id="SuE-De-kmj"/>
                             <constraint firstAttribute="trailing" secondItem="1FX-Lc-Hmx" secondAttribute="trailing" id="TLZ-gg-QNH"/>
-                            <constraint firstItem="T9n-wZ-7iu" firstAttribute="top" secondItem="1FX-Lc-Hmx" secondAttribute="bottom" id="Y0J-O8-Ysz"/>
                             <constraint firstAttribute="trailing" secondItem="cub-aJ-1ti" secondAttribute="trailing" constant="20" symbolic="YES" id="gjD-Xk-6FE"/>
                             <constraint firstAttribute="bottom" secondItem="T9n-wZ-7iu" secondAttribute="bottom" id="k0W-7w-qDW"/>
                             <constraint firstItem="T9n-wZ-7iu" firstAttribute="leading" secondItem="jY2-NF-ftb" secondAttribute="leading" id="lla-d4-Ymg"/>
                             <constraint firstItem="1FX-Lc-Hmx" firstAttribute="top" secondItem="ubR-la-MhZ" secondAttribute="bottom" constant="21" id="pKq-n4-7bX"/>
                             <constraint firstItem="cub-aJ-1ti" firstAttribute="top" secondItem="jY2-NF-ftb" secondAttribute="top" constant="4" id="slq-rw-f5b"/>
+                            <constraint firstAttribute="bottom" secondItem="1FX-Lc-Hmx" secondAttribute="bottom" id="yEn-mA-TXg"/>
                             <constraint firstAttribute="trailing" secondItem="ubR-la-MhZ" secondAttribute="trailing" constant="20" symbolic="YES" id="yMi-o7-niJ"/>
                         </constraints>
                     </view>
                     <connections>
                         <outlet property="closeBrowserWarningLabel" destination="Lgq-ti-uAf" id="4UB-FQ-sWL"/>
                         <outlet property="closeBrowserWarningView" destination="1FX-Lc-Hmx" id="kwx-hK-hHy"/>
+                        <outlet property="closeBrowserWarningViewHeightConstraint" destination="DBn-CK-Rzs" id="biF-aA-vwH"/>
                         <outlet property="passwordDetailLabel" destination="prC-g0-GXu" id="8i8-Yu-gdI"/>
                         <outlet property="passwordsCheckbox" destination="GGX-yw-24n" id="Jva-fg-K11"/>
                     </connections>
