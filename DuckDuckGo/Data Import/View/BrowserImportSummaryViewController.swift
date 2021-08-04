@@ -61,7 +61,7 @@ final class BrowserImportSummaryViewController: NSViewController {
 
         for summary in summaries {
             switch summary {
-            case .logins(let successfulImports, let duplicateImports, let failedImports):
+            case .logins(let successfulImports, _, _):
                 passwordSummaryRow.isHidden = false
                 passwordSummaryLabel.stringValue = "Passwords: \(successfulImports.count)"
             }

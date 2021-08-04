@@ -248,13 +248,7 @@ final class DataImportViewController: NSViewController {
                     }
                 }
 
-                switch self.viewState.selectedImportSource {
-                case .brave: Pixel.fire(.importedLogins(source: .brave))
-                case .chrome: Pixel.fire(.importedLogins(source: .chrome))
-                case .csv: Pixel.fire(.importedLogins(source: .csv))
-                case .edge: Pixel.fire(.importedLogins(source: .edge))
-                case .firefox: Pixel.fire(.importedLogins(source: .firefox))
-                }
+                self.fireImportLoginsPixelForSelectedImportSource()
             case .failure(let error):
                 switch error {
                 case .needsLoginPrimaryPassword:
@@ -284,6 +278,16 @@ final class DataImportViewController: NSViewController {
         default:
             let alert = NSAlert.importFailedAlert(source: viewState.selectedImportSource)
             alert.beginSheetModal(for: window, completionHandler: nil)
+        }
+    }
+
+    private func fireImportLoginsPixelForSelectedImportSource() {
+        switch self.viewState.selectedImportSource {
+        case .brave: Pixel.fire(.importedLogins(source: .brave))
+        case .chrome: Pixel.fire(.importedLogins(source: .chrome))
+        case .csv: Pixel.fire(.importedLogins(source: .csv))
+        case .edge: Pixel.fire(.importedLogins(source: .edge))
+        case .firefox: Pixel.fire(.importedLogins(source: .firefox))
         }
     }
 
