@@ -74,20 +74,22 @@ final class ChromiumLoginReader {
     // Step 1: Prompt for permission to access the user's Chromium Safe Storage key.
     //         This value is stored in the keychain under "[BROWSER] Safe Storage", e.g. "Chrome Safe Storage".
     private func promptForChromiumPasswordKeychainAccess() -> String? {
-        let command = "security find-generic-password -wa '\(processName)'"
-        let task = Process()
-        let pipe = Pipe()
+        let key = "\(processName) Safe Storage"
 
-        task.standardOutput = pipe
-        task.standardError = pipe
-        task.arguments = ["-c", command]
-        task.launchPath = "/bin/zsh"
-        task.launch()
+        let query = [
+            kSecClass as String: kSecClassGenericPassword,
+            kSecAttrLabel as String: key,
+            kSecReturnData as String: kCFBooleanTrue!,
+            kSecMatchLimit as String: kSecMatchLimitOne] as [String: Any]
 
-        let data = pipe.fileHandleForReading.readDataToEndOfFile()
-        let output = String(data: data, encoding: .utf8)
+        var dataFromKeychain: AnyObject?
+        let status: OSStatus = SecItemCopyMatching(query as CFDictionary, &dataFromKeychain)
 
-        return output?.replacingOccurrences(of: "\n", with: "")
+        if status == noErr, let passwordData = dataFromKeychain as? Data, let password = String(data: passwordData, encoding: .utf8) {
+            return password
+        } else {
+            return nil
+        }
     }
 
     // Step 2: Derive the decryption key from the Chromium Safe Storage key.
