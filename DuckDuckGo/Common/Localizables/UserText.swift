@@ -43,7 +43,7 @@ struct UserText {
                                                       value: "Move Tab to New Window",
                                                       comment: "Context menu item")
 
-    static let addressBarSearchSuffix = NSLocalizedString("address.bar.search.suffix",
+    static let searchDuckDuckGoSuffix = NSLocalizedString("address.bar.search.suffix",
                                                           value: "Search DuckDuckGo",
                                                           comment: "Suffix of searched terms in address bar. Example: best watching machine . Search DuckDuckGo")
     static let addressBarVisitSuffix = NSLocalizedString("address.bar.visit.suffix",

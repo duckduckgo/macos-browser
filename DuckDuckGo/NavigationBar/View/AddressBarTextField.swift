@@ -365,20 +365,24 @@ final class AddressBarTextField: NSTextField {
             NSAttributedString(string: string, attributes: Self.suffixAttributes)
         }
 
-        static let searchSuffix = " – \(UserText.addressBarSearchSuffix)"
+        static let searchSuffix = " – \(UserText.searchDuckDuckGoSuffix)"
         static let visitSuffix = " – \(UserText.addressBarVisitSuffix)"
 
         var string: String {
             switch self {
             case .search:
-                return "\(Self.searchSuffix)"
+                return Self.searchSuffix
             case .visit(host: let host):
                 return "\(Self.visitSuffix) \(host)"
             case .url(let url):
-                return " – " + url.toString(decodePunycode: false,
-                                            dropScheme: true,
-                                            needsWWW: false,
-                                            dropTrailingSlash: false)
+                if url.isDuckDuckGoSearch {
+                    return Self.searchSuffix
+                } else {
+                    return " – " + url.toString(decodePunycode: false,
+                                                  dropScheme: true,
+                                                  needsWWW: false,
+                                                  dropTrailingSlash: false)
+                }
             case .title(let title):
                 return " – " + title
             }
