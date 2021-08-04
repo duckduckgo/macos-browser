@@ -147,7 +147,11 @@ final class DataImportViewController: NSViewController {
     private func newChildViewController(for importSource: DataImport.Source, interactionState: InteractionState) -> NSViewController? {
         switch importSource {
         case .brave, .chrome, .edge, .firefox:
-            return createBrowserImportViewController(for: importSource)
+            if case let .completedImport(summaryArray) = interactionState {
+                return BrowserImportSummaryViewController.create(importSummaries: summaryArray)
+            } else {
+                return createBrowserImportViewController(for: importSource)
+            }
 
         case .csv:
             if case let .completedImport(summaryArray) = interactionState {

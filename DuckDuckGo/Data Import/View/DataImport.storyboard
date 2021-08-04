@@ -94,10 +94,10 @@ Gw
             </objects>
             <point key="canvasLocation" x="75" y="146"/>
         </scene>
-        <!--Import Summary View Controller-->
+        <!--CSV Import Summary View Controller-->
         <scene sceneID="lq1-B2-i1k">
             <objects>
-                <viewController storyboardIdentifier="CSVImportSummaryViewController" id="SBx-aI-Zdd" customClass="CSVImportSummaryViewController" customModule="DuckDuckGo_Privacy_Browser" customModuleProvider="target" sceneMemberID="viewController">
+                <viewController storyboardIdentifier="CSVImportSummaryViewController" id="SBx-aI-Zdd" userLabel="CSV Import Summary View Controller" customClass="CSVImportSummaryViewController" customModule="DuckDuckGo_Privacy_Browser" customModuleProvider="target" sceneMemberID="viewController">
                     <view key="view" id="VAn-Ub-6ym">
                         <rect key="frame" x="0.0" y="0.0" width="469" height="56"/>
                         <autoresizingMask key="autoresizingMask"/>
@@ -171,18 +171,100 @@ Gw
                 </viewController>
                 <customObject id="9fr-6f-wQR" userLabel="First Responder" customClass="NSResponder" sceneMemberID="firstResponder"/>
             </objects>
-            <point key="canvasLocation" x="601" y="118"/>
+            <point key="canvasLocation" x="661" y="9"/>
+        </scene>
+        <!--Browser Import Summary View Controller-->
+        <scene sceneID="pTP-bs-7Ys">
+            <objects>
+                <viewController storyboardIdentifier="BrowserImportSummaryViewController" id="XjS-hv-All" customClass="BrowserImportSummaryViewController" customModule="DuckDuckGo_Privacy_Browser" customModuleProvider="target" sceneMemberID="viewController">
+                    <view key="view" id="ux1-hA-I34">
+                        <rect key="frame" x="0.0" y="0.0" width="509" height="42"/>
+                        <autoresizingMask key="autoresizingMask"/>
+                        <subviews>
+                            <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="pLM-zg-r5i">
+                                <rect key="frame" x="18" y="26" width="473" height="16"/>
+                                <textFieldCell key="cell" lineBreakMode="clipping" title="Successfully imported:" id="fnj-an-rLQ">
+                                    <font key="font" usesAppearanceFont="YES"/>
+                                    <color key="textColor" name="labelColor" catalog="System" colorSpace="catalog"/>
+                                    <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
+                                </textFieldCell>
+                            </textField>
+                            <stackView distribution="fillEqually" orientation="vertical" alignment="leading" horizontalStackHuggingPriority="249.99998474121094" verticalStackHuggingPriority="249.99998474121094" detachesHiddenViews="YES" translatesAutoresizingMaskIntoConstraints="NO" id="QDv-FK-S6H">
+                                <rect key="frame" x="20" y="0.0" width="469" height="16"/>
+                                <subviews>
+                                    <customView translatesAutoresizingMaskIntoConstraints="NO" id="Wd7-d2-7lv" userLabel="Passwords Row">
+                                        <rect key="frame" x="0.0" y="0.0" width="469" height="16"/>
+                                        <subviews>
+                                            <imageView horizontalHuggingPriority="251" verticalHuggingPriority="251" translatesAutoresizingMaskIntoConstraints="NO" id="iu0-qM-euh" userLabel="Checkmark">
+                                                <rect key="frame" x="0.0" y="0.0" width="16" height="16"/>
+                                                <constraints>
+                                                    <constraint firstAttribute="width" constant="16" id="0YB-Ii-Rye"/>
+                                                    <constraint firstAttribute="height" constant="16" id="Sgp-ew-AvV"/>
+                                                </constraints>
+                                                <imageCell key="cell" refusesFirstResponder="YES" alignment="left" imageScaling="proportionallyDown" image="SuccessCheckmark" id="H6P-Tb-seg"/>
+                                            </imageView>
+                                            <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="MKa-AL-0wK">
+                                                <rect key="frame" x="22" y="0.0" width="449" height="16"/>
+                                                <textFieldCell key="cell" lineBreakMode="clipping" title="Passwords:" id="MUr-67-5A3">
+                                                    <font key="font" metaFont="system"/>
+                                                    <color key="textColor" name="labelColor" catalog="System" colorSpace="catalog"/>
+                                                    <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
+                                                </textFieldCell>
+                                            </textField>
+                                        </subviews>
+                                        <constraints>
+                                            <constraint firstAttribute="bottom" secondItem="MKa-AL-0wK" secondAttribute="bottom" id="2cs-lx-ZhM"/>
+                                            <constraint firstAttribute="bottom" secondItem="iu0-qM-euh" secondAttribute="bottom" id="7xS-AE-NAh"/>
+                                            <constraint firstItem="iu0-qM-euh" firstAttribute="top" secondItem="Wd7-d2-7lv" secondAttribute="top" id="F7l-hH-aia"/>
+                                            <constraint firstItem="iu0-qM-euh" firstAttribute="leading" secondItem="Wd7-d2-7lv" secondAttribute="leading" id="L8t-70-iA6"/>
+                                            <constraint firstItem="MKa-AL-0wK" firstAttribute="top" secondItem="Wd7-d2-7lv" secondAttribute="top" id="XbK-N7-dKB"/>
+                                            <constraint firstAttribute="trailing" secondItem="MKa-AL-0wK" secondAttribute="trailing" id="fsP-E5-9DM"/>
+                                            <constraint firstItem="MKa-AL-0wK" firstAttribute="leading" secondItem="iu0-qM-euh" secondAttribute="trailing" constant="8" symbolic="YES" id="uWA-lJ-ByP"/>
+                                        </constraints>
+                                    </customView>
+                                </subviews>
+                                <constraints>
+                                    <constraint firstAttribute="trailing" secondItem="Wd7-d2-7lv" secondAttribute="trailing" id="dZT-av-cOc"/>
+                                    <constraint firstItem="Wd7-d2-7lv" firstAttribute="leading" secondItem="QDv-FK-S6H" secondAttribute="leading" id="p7C-Xi-mfV"/>
+                                </constraints>
+                                <visibilityPriorities>
+                                    <integer value="1000"/>
+                                </visibilityPriorities>
+                                <customSpacing>
+                                    <real value="3.4028234663852886e+38"/>
+                                </customSpacing>
+                            </stackView>
+                        </subviews>
+                        <constraints>
+                            <constraint firstItem="pLM-zg-r5i" firstAttribute="leading" secondItem="ux1-hA-I34" secondAttribute="leading" constant="20" symbolic="YES" id="8v8-w8-RzB"/>
+                            <constraint firstItem="pLM-zg-r5i" firstAttribute="top" secondItem="ux1-hA-I34" secondAttribute="top" id="Ei5-c6-TRE"/>
+                            <constraint firstAttribute="trailing" secondItem="pLM-zg-r5i" secondAttribute="trailing" constant="20" symbolic="YES" id="LAY-p1-EjC"/>
+                            <constraint firstAttribute="bottom" secondItem="QDv-FK-S6H" secondAttribute="bottom" id="LZg-jE-mei"/>
+                            <constraint firstAttribute="trailing" secondItem="QDv-FK-S6H" secondAttribute="trailing" constant="20" symbolic="YES" id="lDc-zc-X4j"/>
+                            <constraint firstItem="QDv-FK-S6H" firstAttribute="leading" secondItem="ux1-hA-I34" secondAttribute="leading" constant="20" symbolic="YES" id="mpL-bB-Z4d"/>
+                            <constraint firstItem="QDv-FK-S6H" firstAttribute="top" secondItem="pLM-zg-r5i" secondAttribute="bottom" constant="10" id="yQb-eE-Sj1"/>
+                        </constraints>
+                    </view>
+                    <connections>
+                        <outlet property="passwordSummaryLabel" destination="MKa-AL-0wK" id="1OS-WG-uW7"/>
+                        <outlet property="passwordSummaryRow" destination="Wd7-d2-7lv" id="RQ5-sc-EH4"/>
+                        <outlet property="summaryRowsStackView" destination="QDv-FK-S6H" id="4tz-i9-mrO"/>
+                    </connections>
+                </viewController>
+                <customObject id="Nb2-lz-q4t" userLabel="First Responder" customClass="NSResponder" sceneMemberID="firstResponder"/>
+            </objects>
+            <point key="canvasLocation" x="660.5" y="241"/>
         </scene>
         <!--Browser Import View Controller-->
         <scene sceneID="gvn-jW-XyL">
             <objects>
                 <viewController storyboardIdentifier="BrowserImportViewController" id="NYV-k5-Kxh" customClass="BrowserImportViewController" customModule="DuckDuckGo_Privacy_Browser" customModuleProvider="target" sceneMemberID="viewController">
                     <view key="view" id="jY2-NF-ftb">
-                        <rect key="frame" x="0.0" y="0.0" width="469" height="120"/>
+                        <rect key="frame" x="0.0" y="0.0" width="522" height="120"/>
                         <autoresizingMask key="autoresizingMask"/>
                         <subviews>
                             <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="cub-aJ-1ti">
-                                <rect key="frame" x="18" y="100" width="433" height="16"/>
+                                <rect key="frame" x="18" y="100" width="486" height="16"/>
                                 <textFieldCell key="cell" lineBreakMode="clipping" title="Select Data to Import:" id="Wce-nN-umc">
                                     <font key="font" usesAppearanceFont="YES"/>
                                     <color key="textColor" name="labelColor" catalog="System" colorSpace="catalog"/>
@@ -190,7 +272,7 @@ Gw
                                 </textFieldCell>
                             </textField>
                             <stackView distribution="fill" orientation="vertical" alignment="leading" horizontalStackHuggingPriority="249.99998474121094" verticalStackHuggingPriority="249.99998474121094" detachesHiddenViews="YES" translatesAutoresizingMaskIntoConstraints="NO" id="ubR-la-MhZ">
-                                <rect key="frame" x="20" y="53" width="429" height="35"/>
+                                <rect key="frame" x="20" y="53" width="482" height="35"/>
                                 <subviews>
                                     <stackView distribution="fill" orientation="vertical" alignment="leading" spacing="4" horizontalStackHuggingPriority="249.99998474121094" verticalStackHuggingPriority="249.99998474121094" detachesHiddenViews="YES" translatesAutoresizingMaskIntoConstraints="NO" id="4W0-UP-EJ0" userLabel="Passwords Stack View">
                                         <rect key="frame" x="0.0" y="0.0" width="354" height="35"/>
@@ -235,13 +317,13 @@ Gw
                                 </customSpacing>
                             </stackView>
                             <customView translatesAutoresizingMaskIntoConstraints="NO" id="1FX-Lc-Hmx" customClass="ColorView" customModule="DuckDuckGo_Privacy_Browser" customModuleProvider="target">
-                                <rect key="frame" x="0.0" y="0.0" width="469" height="32"/>
+                                <rect key="frame" x="0.0" y="0.0" width="522" height="32"/>
                                 <subviews>
                                     <box verticalHuggingPriority="750" boxType="separator" translatesAutoresizingMaskIntoConstraints="NO" id="o7k-G5-sfX">
-                                        <rect key="frame" x="0.0" y="29" width="469" height="5"/>
+                                        <rect key="frame" x="0.0" y="29" width="522" height="5"/>
                                     </box>
                                     <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="Lgq-ti-uAf" userLabel="Close Browser Warning Label">
-                                        <rect key="frame" x="42" y="8" width="409" height="16"/>
+                                        <rect key="frame" x="42" y="8" width="462" height="16"/>
                                         <textFieldCell key="cell" lineBreakMode="clipping" title="You must quit Browser before importing data." id="rrK-J8-BjO">
                                             <font key="font" usesAppearanceFont="YES"/>
                                             <color key="textColor" name="labelColor" catalog="System" colorSpace="catalog"/>
@@ -272,7 +354,7 @@ Gw
                                 </constraints>
                             </customView>
                             <box verticalHuggingPriority="750" boxType="separator" translatesAutoresizingMaskIntoConstraints="NO" id="T9n-wZ-7iu">
-                                <rect key="frame" x="0.0" y="-2" width="469" height="5"/>
+                                <rect key="frame" x="0.0" y="-2" width="522" height="5"/>
                             </box>
                         </subviews>
                         <constraints>
@@ -301,20 +383,20 @@ Gw
                 </viewController>
                 <customObject id="o7C-xg-CgQ" userLabel="First Responder" customClass="NSResponder" sceneMemberID="firstResponder"/>
             </objects>
-            <point key="canvasLocation" x="383" y="428"/>
+            <point key="canvasLocation" x="75" y="443"/>
         </scene>
         <!--Import View Controller-->
         <scene sceneID="e65-WV-kqF">
             <objects>
                 <viewController storyboardIdentifier="CSVImportViewController" id="Meg-M8-8oL" customClass="CSVImportViewController" customModule="DuckDuckGo_Privacy_Browser" customModuleProvider="target" sceneMemberID="viewController">
                     <view key="view" translatesAutoresizingMaskIntoConstraints="NO" id="n2z-bE-Ka8">
-                        <rect key="frame" x="0.0" y="0.0" width="313" height="114"/>
+                        <rect key="frame" x="0.0" y="0.0" width="522" height="114"/>
                         <subviews>
                             <stackView distribution="fill" orientation="vertical" alignment="centerX" spacing="12" horizontalStackHuggingPriority="249.99998474121094" verticalStackHuggingPriority="249.99998474121094" horizontalHuggingPriority="249" detachesHiddenViews="YES" translatesAutoresizingMaskIntoConstraints="NO" id="HLb-Dw-Y0O">
-                                <rect key="frame" x="20" y="20" width="273" height="74"/>
+                                <rect key="frame" x="20" y="20" width="482" height="74"/>
                                 <subviews>
                                     <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="qiB-A6-LS4">
-                                        <rect key="frame" x="81" y="59" width="112" height="15"/>
+                                        <rect key="frame" x="185" y="59" width="112" height="15"/>
                                         <textFieldCell key="cell" alignment="left" title="Description Label" id="SpT-id-yTr">
                                             <font key="font" size="13" name="SFProText-Regular"/>
                                             <color key="textColor" name="labelColor" catalog="System" colorSpace="catalog"/>
@@ -322,7 +404,7 @@ Gw
                                         </textFieldCell>
                                     </textField>
                                     <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="cam-am-7aM">
-                                        <rect key="frame" x="70" y="32" width="133" height="15"/>
+                                        <rect key="frame" x="175" y="32" width="133" height="15"/>
                                         <textFieldCell key="cell" lineBreakMode="clipping" title="Importing From File:" id="c4x-MU-RpJ">
                                             <font key="font" size="13" name="SFProText-Semibold"/>
                                             <color key="textColor" name="labelColor" catalog="System" colorSpace="catalog"/>
@@ -330,7 +412,7 @@ Gw
                                         </textFieldCell>
                                     </textField>
                                     <button horizontalHuggingPriority="1000" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="A1C-Th-KJZ">
-                                        <rect key="frame" x="73" y="-7" width="127" height="32"/>
+                                        <rect key="frame" x="178" y="-7" width="127" height="32"/>
                                         <buttonCell key="cell" type="push" title="Select CSV File" bezelStyle="rounded" alignment="center" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="L8K-VD-A0V">
                                             <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
                                             <font key="font" metaFont="system"/>
@@ -367,10 +449,11 @@ Gw
                 </viewController>
                 <customObject id="Xcz-bj-sHR" userLabel="First Responder" customClass="NSResponder" sceneMemberID="firstResponder"/>
             </objects>
-            <point key="canvasLocation" x="-30" y="434"/>
+            <point key="canvasLocation" x="75" y="632"/>
         </scene>
     </scenes>
     <resources>
+        <image name="SuccessCheckmark" width="16" height="16"/>
         <image name="WarningTriangle" width="16" height="15"/>
         <namedColor name="ClearColor">
             <color red="1" green="1" blue="1" alpha="0.0" colorSpace="custom" customColorSpace="sRGB"/>

@@ -53,7 +53,7 @@ enum DataImport {
         var showSuccessScreen: Bool {
             switch self {
             case .csv: return true
-            default: return false
+            default: return true
             }
         }
     }

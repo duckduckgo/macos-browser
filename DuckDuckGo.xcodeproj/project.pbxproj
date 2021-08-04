@@ -111,6 +111,7 @@
 		4B723E1526B000A400E14D75 /* LoginExport.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B723DFB26B0002B00E14D75 /* LoginExport.swift */; };
 		4B723E1826B000DC00E14D75 /* MockFileStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B723E1626B000DC00E14D75 /* MockFileStore.swift */; };
 		4B723E1926B000DC00E14D75 /* TemporaryFileCreator.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B723E1726B000DC00E14D75 /* TemporaryFileCreator.swift */; };
+		4B78A86B26BB3ADD0071BB16 /* BrowserImportSummaryViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B78A86A26BB3ADD0071BB16 /* BrowserImportSummaryViewController.swift */; };
 		4B82E9B325B69E3E00656FE7 /* TrackerRadarKit in Frameworks */ = {isa = PBXBuildFile; productRef = 4B82E9B225B69E3E00656FE7 /* TrackerRadarKit */; };
 		4B82E9B925B6A05800656FE7 /* DetectedTrackerTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B82E9B825B6A05800656FE7 /* DetectedTrackerTests.swift */; };
 		4B82E9C125B6A1CD00656FE7 /* TrackerRadarManagerTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B82E9C025B6A1CD00656FE7 /* TrackerRadarManagerTests.swift */; };
@@ -571,6 +572,7 @@
 		4B723E0426B0003E00E14D75 /* CSVLoginExporterTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CSVLoginExporterTests.swift; sourceTree = "<group>"; };
 		4B723E1626B000DC00E14D75 /* MockFileStore.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MockFileStore.swift; sourceTree = "<group>"; };
 		4B723E1726B000DC00E14D75 /* TemporaryFileCreator.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = TemporaryFileCreator.swift; sourceTree = "<group>"; };
+		4B78A86A26BB3ADD0071BB16 /* BrowserImportSummaryViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BrowserImportSummaryViewController.swift; sourceTree = "<group>"; };
 		4B82E9B825B6A05800656FE7 /* DetectedTrackerTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DetectedTrackerTests.swift; sourceTree = "<group>"; };
 		4B82E9C025B6A1CD00656FE7 /* TrackerRadarManagerTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TrackerRadarManagerTests.swift; sourceTree = "<group>"; };
 		4B8AC93226B3B06300879451 /* EdgeDataImporter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EdgeDataImporter.swift; sourceTree = "<group>"; };
@@ -1229,6 +1231,7 @@
 				4B723DEE26B0002B00E14D75 /* DataImportViewController.swift */,
 				4B723DEF26B0002B00E14D75 /* CSVImportViewController.swift */,
 				4B723DF026B0002B00E14D75 /* CSVImportSummaryViewController.swift */,
+				4B78A86A26BB3ADD0071BB16 /* BrowserImportSummaryViewController.swift */,
 				4B8AC93426B3B2FD00879451 /* NSAlert+DataImport.swift */,
 			);
 			path = View;
@@ -2821,6 +2824,7 @@
 				B684592225C93BE000DC17B6 /* Publisher.asVoid.swift in Sources */,
 				AAA0CC33252F181A0079BC96 /* NavigationButtonMenuDelegate.swift in Sources */,
 				AAC30A2A268E239100D2D9CD /* CrashReport.swift in Sources */,
+				4B78A86B26BB3ADD0071BB16 /* BrowserImportSummaryViewController.swift in Sources */,
 				AA512D1424D99D9800230283 /* FaviconService.swift in Sources */,
 				AABEE6AB24ACA0F90043105B /* SuggestionTableRowView.swift in Sources */,
 				4B723E1426B000A100E14D75 /* DataExport.swift in Sources */,
