@@ -249,12 +249,29 @@ extension MainViewController {
        guard let locWindow = self.view.window,
           NSApplication.shared.keyWindow === locWindow else { return false }
 
-        if Int(event.keyCode) == kVK_Escape {
+        let flags = event.modifierFlags.intersection(.deviceIndependentFlagsMask)
+            .subtracting(.capsLock)
+
+        switch Int(event.keyCode) {
+        case kVK_Escape:
             findInPageViewController?.findInPageDone(self)
             checkForEndAddressBarEditing()
-        }
+            return false
 
-        return false
+        // Handle critical Main Menu actions before WebView
+        case kVK_Tab where [[.control], [.control, .shift]].contains(flags),
+             kVK_ANSI_N where flags == .command,
+             kVK_ANSI_W where flags.contains(.command),
+             kVK_ANSI_T where [[.command], [.command, .shift]].contains(flags),
+             kVK_ANSI_Q where flags == .command,
+             kVK_ANSI_R where flags == .command:
+            guard view.window?.firstResponder is WebView else { return false }
+            NSApp.menu?.performKeyEquivalent(with: event)
+            return true
+
+        default:
+            return false
+        }
     }
 
     private func checkForEndAddressBarEditing() {
