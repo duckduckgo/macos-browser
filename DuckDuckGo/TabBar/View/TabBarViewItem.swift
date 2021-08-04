@@ -174,8 +174,15 @@ final class TabBarViewItem: NSCollectionViewItem {
         updateTitleTextFieldMask()
     }
 
+    override func viewWillDisappear() {
+        super.viewWillDisappear()
+        eventMonitor = nil
+    }
+
     deinit {
-        self.eventMonitor = nil
+        if let eventMonitor = eventMonitor {
+            NSEvent.removeMonitor(eventMonitor)
+        }
     }
 
     override var isSelected: Bool {
