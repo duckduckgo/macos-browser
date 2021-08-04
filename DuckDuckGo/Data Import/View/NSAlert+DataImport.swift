@@ -23,10 +23,10 @@ extension NSAlert {
     static func closeRunningBrowserAlert(source: DataImport.Source) -> NSAlert {
         let alert = NSAlert()
 
-        alert.messageText = "Close Browser"
-        alert.informativeText = "\(source.importSourceName) must be closed before importing data. Would you like to close it now?"
+        alert.messageText = "Would you like to quit \(source.importSourceName) now?"
+        alert.informativeText = "You must quit \(source.importSourceName) before importing data."
         alert.alertStyle = .warning
-        alert.addButton(withTitle: "Close Browser")
+        alert.addButton(withTitle: "Quit \(source.importSourceName)")
         alert.addButton(withTitle: "Cancel")
 
         return alert
