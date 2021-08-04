@@ -80,6 +80,14 @@ final class TabBarViewItem: NSCollectionViewItem {
 
     static let identifier = NSUserInterfaceItemIdentifier(rawValue: "TabBarViewItem")
 
+    private var eventMonitor: Any? {
+        didSet {
+            if let oldValue = oldValue {
+                NSEvent.removeMonitor(oldValue)
+            }
+        }
+    }
+
     var tabBarViewItemMenu: NSMenu {
         let menu = NSMenu()
 
@@ -136,6 +144,7 @@ final class TabBarViewItem: NSCollectionViewItem {
     @IBOutlet weak var mouseClickView: MouseClickView!
     @IBOutlet weak var tabLoadingViewCenterConstraint: NSLayoutConstraint!
     @IBOutlet weak var tabLoadingViewLeadingConstraint: NSLayoutConstraint!
+    @IBOutlet var closeButtonTrailintgConstraint: NSLayoutConstraint!
 
     private let titleTextFieldMaskLayer = CAGradientLayer()
 
@@ -163,6 +172,10 @@ final class TabBarViewItem: NSCollectionViewItem {
 
         updateSubviews()
         updateTitleTextFieldMask()
+    }
+
+    deinit {
+        self.eventMonitor = nil
     }
 
     override var isSelected: Bool {
@@ -281,6 +294,8 @@ final class TabBarViewItem: NSCollectionViewItem {
 
         tabLoadingViewCenterConstraint.priority = widthStage.isTitleHidden && widthStage.isCloseButtonHidden ? .defaultHigh : .defaultLow
         tabLoadingViewLeadingConstraint.priority = widthStage.isTitleHidden && widthStage.isCloseButtonHidden ? .defaultLow : .defaultHigh
+
+        closeButtonTrailintgConstraint.isActive = !widthStage.isCloseButtonHidden
     }
 
     private func updateSeparatorView() {
@@ -307,8 +322,27 @@ final class TabBarViewItem: NSCollectionViewItem {
 
 extension TabBarViewItem: MouseOverViewDelegate {
 
+    private func modifierFlagsChanged(_ event: NSEvent?) {
+        guard widthStage.isCloseButtonHidden else { return }
+        let commandPressed = event?.modifierFlags.contains(.command) ?? false
+
+        self.closeButton.isHidden = !commandPressed
+        self.faviconImageView.isHidden = commandPressed
+    }
+
     func mouseOverView(_ mouseOverView: MouseOverView, isMouseOver: Bool) {
         delegate?.tabBarViewItem(self, isMouseOver: isMouseOver)
+
+        if isMouseOver {
+            self.modifierFlagsChanged(NSApp.currentEvent)
+            eventMonitor = NSEvent.addLocalMonitorForEvents(matching: .flagsChanged) { [weak self] event in
+                self?.modifierFlagsChanged(event)
+                return event
+            }
+        } else {
+            self.modifierFlagsChanged(nil)
+            eventMonitor = nil
+        }
     }
 
 }
