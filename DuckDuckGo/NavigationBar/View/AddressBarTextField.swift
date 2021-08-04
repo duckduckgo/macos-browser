@@ -213,7 +213,7 @@ final class AddressBarTextField: NSTextField {
         }
 
         Pixel.fire(.navigation(kind: .init(url: url), source: suggestion != nil ? .suggestion : .addressBar))
-        let tab = Tab(url: url, shouldLoadInBackground: true)
+        let tab = Tab(tabType: .standard, url: url, shouldLoadInBackground: true)
         tabCollectionViewModel.append(tab: tab, selected: selected)
     }
 

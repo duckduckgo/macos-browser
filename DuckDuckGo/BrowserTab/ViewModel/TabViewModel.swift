@@ -179,7 +179,7 @@ final class TabViewModel {
         case .bookmarks:
             favicon = Favicon.bookmarks
             return
-        case .standard: break
+        case .standard, .favorites: break
         }
 
         if let favicon = tab.favicon {

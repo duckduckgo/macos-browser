@@ -66,7 +66,7 @@ extension AppDelegate {
         DefaultConfigurationStorage.shared.log()
         ConfigurationManager.shared.log()
 
-        let tab = Tab()
+        let tab = Tab(tabType: .standard)
         tab.url = URL.feedback
 
         let tabCollectionViewModel = mainViewController.tabCollectionViewModel
@@ -81,7 +81,7 @@ extension AppDelegate {
             return
         }
 
-        let tab = Tab()
+        let tab = Tab(tabType: .standard)
         guard let bookmark = menuItem.representedObject as? Bookmark else {
             assertionFailure("Unexpected type of menuItem.representedObject: \(type(of: menuItem.representedObject))")
             return
@@ -162,7 +162,7 @@ extension MainViewController {
     // MARK: - File
 
     @IBAction func newTab(_ sender: Any?) {
-        tabCollectionViewModel.appendNewTab()
+        tabCollectionViewModel.appendNewTab(type: .favorites)
     }
 
     @IBAction func openLocation(_ sender: Any?) {
@@ -304,7 +304,7 @@ extension MainViewController {
             return
         }
 
-        let tabs = models.compactMap { $0.entity as? Bookmark }.map { Tab(url: $0.url, shouldLoadInBackground: true) }
+        let tabs = models.compactMap { $0.entity as? Bookmark }.map { Tab(tabType: .standard, url: $0.url, shouldLoadInBackground: true) }
         tabCollectionViewModel.append(tabs: tabs)
     }
 

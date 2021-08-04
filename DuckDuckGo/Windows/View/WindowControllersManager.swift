@@ -86,7 +86,7 @@ extension WindowControllersManager {
             } else if let tab = tabCollectionViewModel.selectedTabViewModel?.tab, !newTab {
                 tab.url = url
             } else {
-                let newTab = Tab()
+                let newTab = Tab(tabType: .standard)
                 newTab.url = url
                 tabCollectionViewModel.append(tab: newTab)
             }

@@ -90,7 +90,7 @@ final class TabCollection: NSObject {
             return
         }
 
-        let tab = Tab()
+        let tab = Tab(tabType: .standard)
         tab.url = lastRemovedTabCache.url
         insert(tab: tab, at: min(lastRemovedTabCache.index, tabs.count))
         self.lastRemovedTabCache = nil

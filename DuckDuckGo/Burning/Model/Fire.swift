@@ -51,7 +51,7 @@ final class Fire {
                 if tabCollectionViewModel.tabCollection.tabs.count > 0 {
                     tabCollectionViewModel.removeAllTabsAndAppendNewTab()
                 } else {
-                    tabCollectionViewModel.appendNewTab()
+                    tabCollectionViewModel.appendNewTab(type: .favorites)
                 }
 
                 tabCollectionViewModel.tabCollection.cleanLastRemovedTab()

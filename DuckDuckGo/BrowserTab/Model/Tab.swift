@@ -41,6 +41,7 @@ final class Tab: NSObject {
         case standard = 0
         case preferences = 1
         case bookmarks = 2
+        case favorites = 3
 
         static func rawValue(_ type: Int?) -> TabType {
             let tabType = type ?? TabType.standard.rawValue
@@ -48,7 +49,7 @@ final class Tab: NSObject {
         }
 
         static var displayableTabTypes: [TabType] {
-            let cases = TabType.allCases.filter { $0 != .standard }
+            let cases = TabType.allCases.filter { ![.standard, .favorites].contains($0) }
             return cases.sorted { first, second in
                 guard let firstTitle = first.title, let secondTitle = second.title else {
                     return true // Arbitrary sort order, only non-standard tabs are displayable.
@@ -60,7 +61,7 @@ final class Tab: NSObject {
 
         var title: String? {
             switch self {
-            case .standard: return nil
+            case .standard, .favorites: return nil
             case .preferences: return UserText.tabPreferencesTitle
             case .bookmarks: return UserText.tabBookmarksTitle
             }
@@ -68,7 +69,7 @@ final class Tab: NSObject {
 
         var focusTabAddressBarWhenSelected: Bool {
             switch self {
-            case .standard: return true
+            case .standard, .favorites: return true
             case .preferences: return false
             case .bookmarks: return false
             }
@@ -77,7 +78,7 @@ final class Tab: NSObject {
 
     weak var delegate: TabDelegate?
 
-    init(tabType: TabType = .standard,
+    init(tabType: TabType,
          faviconService: FaviconService = LocalFaviconService.shared,
          webCacheManager: WebCacheManager = .shared,
          webViewConfiguration: WebViewConfiguration? = nil,
@@ -90,6 +91,7 @@ final class Tab: NSObject {
          parentTab: Tab? = nil,
          shouldLoadInBackground: Bool = false) {
 
+        assert(!(tabType == .favorites && url != nil))
         self.tabType = tabType
         self.faviconService = faviconService
         self.historyCoordinating = historyCoordinating

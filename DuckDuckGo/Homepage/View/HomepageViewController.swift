@@ -263,7 +263,7 @@ extension HomepageViewController: HomepageCollectionViewItemDelegate {
     func homepageCollectionViewItemOpenInNewTabAction(_ homepageCollectionViewItem: HomepageCollectionViewItem) {
         if let indexPath = collectionView.indexPath(for: homepageCollectionViewItem),
            let favorite = topFavorites?[indexPath.item] {
-            let tab = Tab(url: favorite.url, shouldLoadInBackground: true)
+            let tab = Tab(tabType: .standard, url: favorite.url, shouldLoadInBackground: true)
             tabCollectionViewModel.append(tab: tab, selected: false)
         }
     }

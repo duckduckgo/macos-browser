@@ -67,7 +67,7 @@ final class TabCollectionViewModel: NSObject {
         subscribeToLastRemovedTab()
 
         if tabCollection.tabs.isEmpty {
-            appendNewTab()
+            appendNewTab(type: .favorites)
         }
         if self.selectionIndex != selectionIndex {
             self.selectionIndex = selectionIndex
@@ -133,7 +133,7 @@ final class TabCollectionViewModel: NSObject {
         }
     }
 
-    func appendNewTab(type: Tab.TabType = .standard) {
+    func appendNewTab(type: Tab.TabType) {
         append(tab: Tab(tabType: type), selected: true)
     }
 
@@ -175,7 +175,7 @@ final class TabCollectionViewModel: NSObject {
     }
 
     func insertNewTab(at index: Int = 0) {
-        insert(tab: Tab(), at: index)
+        insert(tab: Tab(tabType: .favorites), at: index)
     }
 
     func insertChild(tab: Tab, selected: Bool) {
@@ -242,7 +242,7 @@ final class TabCollectionViewModel: NSObject {
     }
 
     func removeAllTabsAndAppendNewTab() {
-        tabCollection.removeAll(andAppend: Tab())
+        tabCollection.removeAll(andAppend: Tab(tabType: .favorites))
         select(at: 0)
 
         delegate?.tabCollectionViewModelDidMultipleChanges(self)
@@ -285,7 +285,7 @@ final class TabCollectionViewModel: NSObject {
         }
 
         let tab = tabCollection.tabs[index]
-        let tabCopy = Tab()
+        let tabCopy = Tab(tabType: tab.tabType)
         tabCopy.url = tab.url
         let newIndex = index + 1
 

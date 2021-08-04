@@ -81,16 +81,7 @@ final class BrowserTabViewController: NSViewController {
     /// 3. A URL is provided after already adding the webview, so the webview should be reloaded.
     private func updateInterface(url: URL?) {
         changeWebView()
-
-        if tabCollectionViewModel.selectedTabViewModel?.tab.tabType == .preferences {
-            show(tab: .preferences)
-        } else if tabCollectionViewModel.selectedTabViewModel?.tab.tabType == .bookmarks {
-            show(tab: .bookmarks)
-        } else if url != nil && url != URL.emptyPage {
-            show(tab: .standard)
-        } else {
-            showHomepage()
-        }
+        show(tab: tabCollectionViewModel.selectedTabViewModel?.tab.tabType)
     }
 
     private func showHomepage() {
@@ -182,7 +173,7 @@ final class BrowserTabViewController: NSViewController {
     }
 
     private func openNewTab(with url: URL?, parentTab: Tab?, selected: Bool = false) {
-        let tab = Tab(url: url, parentTab: parentTab, shouldLoadInBackground: true)
+        let tab = Tab(tabType: url == nil ? .favorites : .standard, url: url, parentTab: parentTab, shouldLoadInBackground: true)
 
         if parentTab != nil {
             tabCollectionViewModel.insertChild(tab: tab, selected: selected)
@@ -199,30 +190,39 @@ final class BrowserTabViewController: NSViewController {
         show(tab: tabType)
     }
 
-    private func show(tab type: Tab.TabType) {
+    private func show(tab type: Tab.TabType?) {
+        let type = type ?? .favorites
         tabCollectionViewModel.selectedTabViewModel?.tab.set(tabType: type)
-
-        self.homepageView.removeFromSuperview()
-        removePreferencesPage()
-        removeBookmarksPage()
 
         switch type {
         case .bookmarks:
+            self.homepageView.removeFromSuperview()
+            removePreferencesPage()
             self.webView?.removeFromSuperview()
             self.addChild(bookmarksViewController)
             view.addAndLayout(bookmarksViewController.view)
             bookmarksViewController.tabSwitcherButton.select(tabType: .bookmarks)
 
         case .preferences:
+            self.homepageView.removeFromSuperview()
+            removeBookmarksPage()
             self.webView?.removeFromSuperview()
             self.addChild(preferencesViewController)
             view.addAndLayout(preferencesViewController.view)
             bookmarksViewController.tabSwitcherButton.select(tabType: .preferences)
 
         case .standard:
+            self.homepageView.removeFromSuperview()
+            removeBookmarksPage()
+            removePreferencesPage()
             if let webView = self.webView, webView.superview == nil {
                 addWebViewToViewHierarchy(webView)
             }
+        case .favorites:
+            removeBookmarksPage()
+            removePreferencesPage()
+            self.webView?.removeFromSuperview()
+            showHomepage()
         }
     }
 
@@ -236,6 +236,7 @@ final class BrowserTabViewController: NSViewController {
     }()
 
     private func removePreferencesPage() {
+        guard preferencesViewController.parent != nil else { return }
         preferencesViewController.removeFromParent()
         preferencesViewController.view.removeFromSuperview()
     }
@@ -250,6 +251,7 @@ final class BrowserTabViewController: NSViewController {
     }()
 
     private func removeBookmarksPage() {
+        guard bookmarksViewController.parent != nil else { return }
         bookmarksViewController.removeFromParent()
         bookmarksViewController.view.removeFromSuperview()
     }
@@ -469,7 +471,7 @@ extension BrowserTabViewController: WKUIDelegate {
                  windowFeatures: WKWindowFeatures) -> WKWebView? {
 
         // Returned web view must be created with the specified configuration.
-        let tab = Tab(webViewConfiguration: configuration, parentTab: tabViewModel?.tab)
+        let tab = Tab(tabType: .standard, webViewConfiguration: configuration, parentTab: tabViewModel?.tab)
         tabCollectionViewModel.insertChild(tab: tab, selected: true)
         // WebKit loads the request in the returned web view.
         return tab.webView
