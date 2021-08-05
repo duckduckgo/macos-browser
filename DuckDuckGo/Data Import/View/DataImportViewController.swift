@@ -235,12 +235,14 @@ final class DataImportViewController: NSViewController {
 
     private func completeImport() {
         guard let importer = self.dataImporter else {
-            assertionFailure("\(#file): No data importer found")
+            assertionFailure("\(#file): No data importer or profile found")
             return
         }
 
+        let profile = (self.currentChildViewController as? BrowserImportViewController)?.selectedProfile
+
         // When we support multiple types of data, this will change to check which ones were selected. For now, import everything.
-        importer.importData(types: importer.importableTypes()) { result in
+        importer.importData(types: importer.importableTypes(), from: profile) { result in
             switch result {
             case .success(let summary):
                 if summary.isEmpty {

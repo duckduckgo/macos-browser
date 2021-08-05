@@ -67,6 +67,15 @@ final class BrowserImportViewController: NSViewController {
         return options
     }
 
+    var selectedProfile: DataImport.BrowserProfile? {
+        guard let selectedProfile = profileSelectionPopUpButton.selectedItem else {
+            // If there is no selected item, there should only be one item in the list.
+            return profileList.validImportableProfiles.first
+        }
+
+        return profileList.validImportableProfiles.first { $0.name == selectedProfile.title }
+    }
+
     let browser: DataImport.Source
     let profileList: DataImport.BrowserProfileList
 
@@ -86,12 +95,15 @@ final class BrowserImportViewController: NSViewController {
 
         // Update the profile picker:
 
+        importOptionsStackView.setCustomSpacing(18, after: profileSelectionPopUpButton)
+
         if profileList.showProfilePicker {
             profileSelectionPopUpButton.displayBrowserProfiles(profiles: profileList.validImportableProfiles,
                                                                defaultProfile: profileList.defaultProfile)
         } else {
             profileSelectionLabel.isHidden = true
             profileSelectionPopUpButton.isHidden = true
+            profileSelectionPopUpButton.removeAllItems()
         }
 
         // Update the disclaimer label on the password import row:

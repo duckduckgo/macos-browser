@@ -162,8 +162,7 @@ final class FirefoxLoginReader {
     private func decrypt(logins: EncryptedFirefoxLogins, with key: Data) -> [ImportedLoginCredential] {
         var credentials = [ImportedLoginCredential]()
 
-        // Drop the first login, which contains metadata about the login database.
-        for login in logins.logins.dropFirst() {
+        for login in logins.logins {
             let decryptedUsername = decrypt(credential: login.encryptedUsername, key: key)
             let decryptedPassword = decrypt(credential: login.encryptedPassword, key: key)
 
