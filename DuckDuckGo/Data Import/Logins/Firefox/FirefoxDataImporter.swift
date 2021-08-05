@@ -32,6 +32,7 @@ final class FirefoxDataImporter: DataImporter {
         return [.logins]
     }
 
+    // swiftlint:disable cyclomatic_complexity
     func importData(types: [DataImport.DataType], completion: @escaping (Result<[DataImport.Summary], DataImportError>) -> Void) {
         guard let defaultPath = defaultFirefoxProfilePath() else {
             completion(.failure(.cannotReadFile))
@@ -50,6 +51,26 @@ final class FirefoxDataImporter: DataImporter {
                 completion(.failure(.cannotAccessSecureVault))
             }
         case .failure(let error):
+
+            switch error {
+            case .couldNotFindProfile:
+                let alert = NSAlert.failureAlert(message: "Could not find profile")
+                alert.runModal()
+            case .couldNotGetDecryptionKey:
+                let alert = NSAlert.failureAlert(message: "Could not get decryption key")
+                alert.runModal()
+            case .couldNotReadLoginsFile:
+                let alert = NSAlert.failureAlert(message: "Could not read logins.json")
+                alert.runModal()
+            case .decryptionFailed:
+                let alert = NSAlert.failureAlert(message: "Decryption failed")
+                alert.runModal()
+            case .databaseAccessFailed:
+                let alert = NSAlert.failureAlert(message: "Firefox database access failed")
+                alert.runModal()
+            default: break
+            }
+
             switch error {
             case .requiresPrimaryPassword:
                 completion(.failure(.needsLoginPrimaryPassword))

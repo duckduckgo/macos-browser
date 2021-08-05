@@ -61,4 +61,15 @@ extension NSAlert {
         return alert
     }
 
+    static func failureAlert(message: String) -> NSAlert {
+        let alert = NSAlert()
+
+        alert.messageText = "Import Failed"
+        alert.informativeText = message
+        alert.alertStyle = .warning
+        alert.addButton(withTitle: "Okay")
+
+        return alert
+    }
+
 }
