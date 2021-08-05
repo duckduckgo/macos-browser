@@ -94,7 +94,6 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         crashReporter.checkForNewReports()
 
 #endif
-
     }
 
     func applicationShouldTerminate(_ sender: NSApplication) -> NSApplication.TerminateReply {

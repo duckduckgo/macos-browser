@@ -20,14 +20,23 @@ import Foundation
 
 enum UserAgent {
 
-    static let safari = "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/14.1.1 Safari/605.1.15"
+    static var safariVersion: String {
+        SafariVersionReader.getVersion()
+    }
+
+    static let safari =
+        "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/\(safariVersion) Safari/605.1.15"
     static let chrome = "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.101 Safari/537.36"
+    static let webViewDefault = ""
 
     static let `default` = UserAgent.safari
 
     static let domainUserAgents: KeyValuePairs<RegEx, String> = [
         // fix broken spreadsheets
-        regex("https://docs\\.google\\.com/spreadsheets/.*"): UserAgent.chrome
+        regex("https://docs\\.google\\.com/spreadsheets/.*"): UserAgent.chrome,
+
+        // use default WKWebView user agent for duckduckgo domain to remove CTA
+        regex("https://duckduckgo\\.com/.*"): UserAgent.webViewDefault
     ]
 
     static func `for`(_ url: URL?) -> String {

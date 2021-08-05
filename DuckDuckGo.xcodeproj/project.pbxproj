@@ -321,6 +321,8 @@
 		AAC9C01724CAFBDC00AD1325 /* TabCollectionTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = AAC9C01624CAFBDC00AD1325 /* TabCollectionTests.swift */; };
 		AAC9C01C24CB594C00AD1325 /* TabViewModelTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = AAC9C01B24CB594C00AD1325 /* TabViewModelTests.swift */; };
 		AAC9C01E24CB6BEB00AD1325 /* TabCollectionViewModelTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = AAC9C01D24CB6BEB00AD1325 /* TabCollectionViewModelTests.swift */; };
+		AACF6FD626BC366D00CF09F9 /* SafariVersionReader.swift in Sources */ = {isa = PBXBuildFile; fileRef = AACF6FD526BC366D00CF09F9 /* SafariVersionReader.swift */; };
+		AAD2F8B126BC3F55003C5DC8 /* BundleExtension.swift in Sources */ = {isa = PBXBuildFile; fileRef = AAD2F8B026BC3F55003C5DC8 /* BundleExtension.swift */; };
 		AAD6D8882696DF6D002393B3 /* CrashReportPromptViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = AAD6D8862696DF6D002393B3 /* CrashReportPromptViewController.swift */; };
 		AAD86E52267A0DFF005C11BE /* UpdateController.swift in Sources */ = {isa = PBXBuildFile; fileRef = AAD86E51267A0DFF005C11BE /* UpdateController.swift */; };
 		AAE39D1B24F44885008EF28B /* TabCollectionViewModelDelegateMock.swift in Sources */ = {isa = PBXBuildFile; fileRef = AAE39D1A24F44885008EF28B /* TabCollectionViewModelDelegateMock.swift */; };
@@ -764,6 +766,8 @@
 		AAC9C01624CAFBDC00AD1325 /* TabCollectionTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TabCollectionTests.swift; sourceTree = "<group>"; };
 		AAC9C01B24CB594C00AD1325 /* TabViewModelTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TabViewModelTests.swift; sourceTree = "<group>"; };
 		AAC9C01D24CB6BEB00AD1325 /* TabCollectionViewModelTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TabCollectionViewModelTests.swift; sourceTree = "<group>"; };
+		AACF6FD526BC366D00CF09F9 /* SafariVersionReader.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SafariVersionReader.swift; sourceTree = "<group>"; };
+		AAD2F8B026BC3F55003C5DC8 /* BundleExtension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BundleExtension.swift; sourceTree = "<group>"; };
 		AAD6D8862696DF6D002393B3 /* CrashReportPromptViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CrashReportPromptViewController.swift; sourceTree = "<group>"; };
 		AAD86E502678D104005C11BE /* DuckDuckGoCI.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = DuckDuckGoCI.entitlements; sourceTree = "<group>"; };
 		AAD86E51267A0DFF005C11BE /* UpdateController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UpdateController.swift; sourceTree = "<group>"; };
@@ -1552,6 +1556,7 @@
 				AACB8E7224A4C8BC005F2218 /* Suggestions */,
 				AA86491124D8318F001BABEE /* TabBar */,
 				AAE8B0FD258A416F00E81239 /* Tooltip */,
+				AACF6FD426BC35C200CF09F9 /* User Agent */,
 				AA6EF9AE25066F99004754E6 /* Windows */,
 				AA585D85248FD31400E9A3E2 /* Assets.xcassets */,
 				4B677454255DC18000025BD8 /* Bridging.h */,
@@ -1849,7 +1854,6 @@
 				85E11C2E25E7DC7E00974CAF /* ExternalURLHandler.swift */,
 				AAA0CC562539EBC90079BC96 /* FaviconUserScript.swift */,
 				AA9FF95824A1ECF20039E328 /* Tab.swift */,
-				14505A07256084EF00272CC6 /* UserAgent.swift */,
 				85AC3AEE25D5CE9800C7D2AA /* UserScripts.swift */,
 				B633C86C25E797D800E4B352 /* UserScriptsManager.swift */,
 				AAF7D3852567CED500998667 /* WebViewConfiguration.swift */,
@@ -2112,6 +2116,15 @@
 			path = Suggestions;
 			sourceTree = "<group>";
 		};
+		AACF6FD426BC35C200CF09F9 /* User Agent */ = {
+			isa = PBXGroup;
+			children = (
+				14505A07256084EF00272CC6 /* UserAgent.swift */,
+				AACF6FD526BC366D00CF09F9 /* SafariVersionReader.swift */,
+			);
+			path = "User Agent";
+			sourceTree = "<group>";
+		};
 		AAD6D8852696DF2A002393B3 /* View */ = {
 			isa = PBXGroup;
 			children = (
@@ -2124,6 +2137,7 @@
 		AADC60E92493B305008F8EF7 /* Extensions */ = {
 			isa = PBXGroup;
 			children = (
+				AAD2F8B026BC3F55003C5DC8 /* BundleExtension.swift */,
 				4BA1A6C1258B0A1300F6F690 /* ContiguousBytesExtension.swift */,
 				85AC3AF625D5DBFD00C7D2AA /* DataExtension.swift */,
 				B6A9E46F26146A250067D1B9 /* DateExtension.swift */,
@@ -2650,6 +2664,7 @@
 				4B6160FF25B15BB1007DE5B2 /* ContentBlockerRulesManager.swift in Sources */,
 				AA5C8F5E2590EEE800748EB7 /* NSPointExtension.swift in Sources */,
 				AA6EF9AD25066F42004754E6 /* WindowsManager.swift in Sources */,
+				AAD2F8B126BC3F55003C5DC8 /* BundleExtension.swift in Sources */,
 				B68458CD25C7EB9000DC17B6 /* WKWebViewConfigurationExtensions.swift in Sources */,
 				AAC30A26268DFEE200D2D9CD /* CrashReporter.swift in Sources */,
 				B6E61ED0263A6F97004E11AB /* NSSavePanelExtension.swift in Sources */,
@@ -2688,6 +2703,7 @@
 				4B65027A25E5F2B10054432E /* DefaultBrowserPromptView.swift in Sources */,
 				4B723E0A26B0005900E14D75 /* DataImportViewController.swift in Sources */,
 				4B0511BB262CAA5A00F6079C /* DefaultBrowserPreferences.swift in Sources */,
+				AACF6FD626BC366D00CF09F9 /* SafariVersionReader.swift in Sources */,
 				4B0511CA262CAA5A00F6079C /* FireproofDomainsViewController.swift in Sources */,
 				AA4D700725545EF800C3411E /* UrlEventListener.swift in Sources */,
 				AA92127725ADA07900600CD4 /* WKWebViewExtension.swift in Sources */,
