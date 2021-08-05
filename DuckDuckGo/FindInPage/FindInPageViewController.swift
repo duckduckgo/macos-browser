@@ -65,12 +65,17 @@ final class FindInPageViewController: NSViewController {
 
     func control(_ control: NSControl, textView: NSTextView, doCommandBy commandSelector: Selector) -> Bool {
         // Handle pressing enter here rather than didEndEditing otherwise it moving to the next match doesn't work.
-        switch commandSelector {
-        case #selector(noop(_:)) where NSApp.isReturnOrEnterPressed && NSApp.isShiftPressed,
-             #selector(insertNewline(_:)) where NSApp.isShiftPressed:
+        guard NSApp.isReturnOrEnterPressed,
+           var modifiers = NSApp.currentEvent?.modifierFlags.intersection(.deviceIndependentFlagsMask)
+        else {
+            return false
+        }
+        modifiers.remove(.capsLock)
+        switch modifiers {
+        case .shift:
             findInPagePrevious(self)
             return true
-        case #selector(insertNewline(_:)):
+        case []:
             findInPageNext(self)
             return true
         default:

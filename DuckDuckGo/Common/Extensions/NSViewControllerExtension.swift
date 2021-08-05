@@ -64,6 +64,4 @@ extension NSViewController {
         }
     }
 
-    @objc func noop(_ sender: Any) {}
-
 }
