@@ -41,6 +41,7 @@ final class MainViewController: NSViewController {
     private var canInsertLastRemovedTabCancellable: AnyCancellable?
     private var findInPageCancellable: AnyCancellable?
     private var keyDownMonitor: Any?
+    private var mouseNavButtonsMonitor: Any?
 
     required init?(coder: NSCoder) {
         self.tabCollectionViewModel = TabCollectionViewModel()
@@ -72,6 +73,10 @@ final class MainViewController: NSViewController {
         if let monitor = keyDownMonitor {
             NSEvent.removeMonitor(monitor)
             keyDownMonitor = nil
+        }
+        if let monitor = mouseNavButtonsMonitor {
+            NSEvent.removeMonitor(monitor)
+            mouseNavButtonsMonitor = nil
         }
 
         tabBarViewController?.hideTooltip()
@@ -243,6 +248,9 @@ extension MainViewController {
             guard let self = self else { return nil }
             return self.customKeyDown(with: event) ? nil : event
         }
+        self.mouseNavButtonsMonitor = NSEvent.addLocalMonitorForEvents(matching: .otherMouseUp) { [weak self] event in
+            return self?.otherMouseUp(with: event)
+        }
     }
 
     func customKeyDown(with event: NSEvent) -> Bool {
@@ -255,6 +263,25 @@ extension MainViewController {
         }
 
         return false
+    }
+
+    func otherMouseUp(with event: NSEvent) -> NSEvent? {
+        guard event.window === self.view.window,
+              self.webContainerView.isMouseLocationInsideBounds(event.locationInWindow)
+        else { return event }
+
+        if event.buttonNumber == 3,
+           tabCollectionViewModel.selectedTabViewModel?.canGoBack == true {
+            tabCollectionViewModel.selectedTabViewModel?.tab.goBack()
+            return nil
+        } else if event.buttonNumber == 4,
+                  tabCollectionViewModel.selectedTabViewModel?.canGoForward == true {
+            tabCollectionViewModel.selectedTabViewModel?.tab.goForward()
+            return nil
+        }
+
+        return event
+
     }
 
     private func checkForEndAddressBarEditing() {
