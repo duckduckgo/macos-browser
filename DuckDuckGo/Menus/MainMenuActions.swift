@@ -439,11 +439,30 @@ extension MainViewController {
         }
     }
 
+    // MARK: - Developer Tools
+
+    @IBAction func openDeveloperTools(_ sender: Any?) {
+        tabCollectionViewModel.selectedTabViewModel?.tab.webView.openDeveloperTools()
+    }
+
+    @IBAction func openJavaScriptConsole(_ sender: Any?) {
+        tabCollectionViewModel.selectedTabViewModel?.tab.webView.openJavaScriptConsole()
+    }
+
+    @IBAction func showPageSource(_ sender: Any?) {
+        tabCollectionViewModel.selectedTabViewModel?.tab.webView.showPageSource()
+    }
+
+    @IBAction func showPageResources(_ sender: Any?) {
+        tabCollectionViewModel.selectedTabViewModel?.tab.webView.showPageSource()
+    }
+
 }
 
 extension MainViewController: NSMenuItemValidation {
     
     // swiftlint:disable cyclomatic_complexity
+    // swiftlint:disable function_body_length
     func validateMenuItem(_ menuItem: NSMenuItem) -> Bool {
         // Enable "Move to another Display" menu item (is there a better way?)
         for item in menuItem.menu!.items where item.action == Selector(("_moveToDisplay:")) {
@@ -498,10 +517,18 @@ extension MainViewController: NSMenuItemValidation {
              #selector(MainViewController.showPreviousTab(_:)):
             return tabCollectionViewModel.tabCollection.tabs.count > 1
 
+        // Developer Tools
+        case #selector(MainViewController.openDeveloperTools(_:)),
+             #selector(MainViewController.openJavaScriptConsole(_:)),
+             #selector(MainViewController.showPageSource(_:)),
+             #selector(MainViewController.showPageResources(_:)):
+            return tabCollectionViewModel.selectedTabViewModel?.canReload == true
+
         default:
             return true
         }
     }
+    // swiftlint:enable function_body_length
     // swiftlint:enable cyclomatic_complexity
 
 }

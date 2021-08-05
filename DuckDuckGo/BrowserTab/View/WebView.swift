@@ -111,4 +111,41 @@ final class WebView: WKWebView {
         }
     }
 
+    // MARK: - Developer Tools
+
+    @nonobjc var mainFrame: AnyObject? {
+        guard self.responds(to: NSSelectorFromString("_mainFrame")) else {
+            assertionFailure("WKWebView does not respond to _mainFrame")
+            return nil
+        }
+        return self.perform(NSSelectorFromString("_mainFrame"))?.takeUnretainedValue()
+    }
+
+    private func inspectorPerform(_ selectorName: String, with object: Any? = nil) {
+        guard self.responds(to: NSSelectorFromString("_inspector")),
+              let inspector = self.value(forKey: "_inspector") as? NSObject,
+              inspector.responds(to: NSSelectorFromString(selectorName)) else {
+            assertionFailure("_WKInspector does not respond to \(selectorName)")
+            return
+        }
+        inspector.perform(NSSelectorFromString(selectorName), with: object)
+    }
+
+    @nonobjc func openDeveloperTools() {
+        inspectorPerform("show")
+    }
+
+    @nonobjc func openJavaScriptConsole() {
+        inspectorPerform("showConsole")
+    }
+
+    @nonobjc func showPageSource() {
+        guard let mainFrameHandle = self.mainFrame else { return }
+        inspectorPerform("showMainResourceForFrame:", with: mainFrameHandle)
+    }
+
+    @nonobjc func showPageResources() {
+        inspectorPerform("showResources")
+    }
+
 }
