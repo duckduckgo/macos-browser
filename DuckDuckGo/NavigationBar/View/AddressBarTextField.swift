@@ -187,10 +187,23 @@ final class AddressBarTextField: NSTextField {
             return
         }
 
-        guard let url = makeUrl(suggestion: suggestion,
+        guard var url = makeUrl(suggestion: suggestion,
                                 stringValueWithoutSuffix: stringValueWithoutSuffix) else {
             os_log("%s: Making url from address bar string failed", type: .error, className)
             return
+        }
+        // keep current search mode
+        if url.isDuckDuckGoSearch,
+           let oldURL = selectedTabViewModel.tab.url,
+            oldURL.isDuckDuckGoSearch {
+            if let ia = try? oldURL.getParameter(name: URL.DuckDuckGoParameters.ia.rawValue),
+               let newURL = try? url.addParameter(name: URL.DuckDuckGoParameters.ia.rawValue, value: ia) {
+                url = newURL
+            }
+            if let iax = try? oldURL.getParameter(name: URL.DuckDuckGoParameters.iax.rawValue),
+               let newURL = try? url.addParameter(name: URL.DuckDuckGoParameters.iax.rawValue, value: iax) {
+                url = newURL
+            }
         }
 
         if selectedTabViewModel.tab.url == url {

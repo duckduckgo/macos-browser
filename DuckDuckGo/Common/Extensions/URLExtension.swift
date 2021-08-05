@@ -274,6 +274,8 @@ extension URL {
 
     enum DuckDuckGoParameters: String {
         case search = "q"
+        case ia
+        case iax
     }
 
     // MARK: - Search
