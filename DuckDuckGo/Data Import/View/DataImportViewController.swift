@@ -140,7 +140,7 @@ final class DataImportViewController: NSViewController {
         case .failedToImport:
             importButton.title = UserText.initiateImport
             importButton.isEnabled = true
-            cancelButton.isHidden = true
+            cancelButton.isHidden = false
         }
     }
 
@@ -197,7 +197,12 @@ final class DataImportViewController: NSViewController {
         // Prevent transitioning to the same view controller.
         if let viewController = currentChildViewController as? BrowserImportViewController, viewController.browser == source { return nil }
 
-        let browserImportViewController = BrowserImportViewController.create(with: source)
+        guard let browser = ThirdPartyBrowser.browser(for: viewState.selectedImportSource), let profileList = browser.browserProfiles else {
+            assertionFailure("Attempted to create BrowserImportViewController without a valid browser selected")
+            return nil
+        }
+
+        let browserImportViewController = BrowserImportViewController.create(with: source, profileList: profileList)
         browserImportViewController.delegate = self
 
         return browserImportViewController

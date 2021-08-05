@@ -81,6 +81,8 @@ final class FirefoxDataImporter: DataImporter {
     }
 
     private func defaultFirefoxProfilePath() -> URL? {
+        let profile = ThirdPartyBrowser.firefox.browserProfiles
+        
         guard let potentialProfiles = try? FileManager.default.contentsOfDirectory(atPath: profilesDirectoryURL().path) else {
             return nil
         }

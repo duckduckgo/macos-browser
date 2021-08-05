@@ -67,6 +67,71 @@ enum DataImport {
         case logins(successfulImports: [String], duplicateImports: [String], failedImports: [String])
     }
 
+    struct BrowserProfileList {
+        let browser: ThirdPartyBrowser.BrowserType
+        let profiles: [BrowserProfile]
+
+        var validImportableProfiles: [BrowserProfile] {
+            return profiles.filter(\.hasLoginData)
+        }
+
+        init(browser: ThirdPartyBrowser.BrowserType, profileURLs: [URL]) {
+            self.browser = browser
+
+            switch browser {
+            case .brave, .chrome, .edge:
+                // Chromium profiles are either named "Default", or a series of incrementing profile names, i.e. "Profile 1", "Profile 2", etc.
+                let potentialProfiles = profileURLs.map(BrowserProfile.init(profileURL:))
+                let filteredProfiles =  potentialProfiles.filter { $0.name == "Default" || $0.name.hasPrefix("Profile ") }
+                let sortedProfiles = filteredProfiles.sorted()
+
+                self.profiles = sortedProfiles
+            case .firefox:
+                self.profiles = profileURLs.map(BrowserProfile.init(profileURL:)).sorted()
+            }
+        }
+
+        var showProfilePicker: Bool {
+            return validImportableProfiles.count > 1
+        }
+
+        var defaultProfile: BrowserProfile? {
+            switch browser {
+            case .brave, .chrome, .edge:
+                return profiles.first { $0.name == "Default" } ?? profiles.first
+            case .firefox:
+                return profiles.first { $0.name == "default-release" } ?? profiles.first
+            }
+        }
+    }
+
+    struct BrowserProfile: Comparable {
+        let profileURL: URL
+
+        init(profileURL: URL) {
+            self.profileURL = profileURL
+        }
+
+        var name: String {
+            return profileURL.lastPathComponent.components(separatedBy: ".").last ?? profileURL.lastPathComponent
+        }
+
+        var hasLoginData: Bool {
+            guard let profileDirectoryContents = try? FileManager.default.contentsOfDirectory(atPath: profileURL.path) else {
+                return false
+            }
+
+            let hasChromiumData = profileDirectoryContents.contains("Login Data")
+            let hasFirefoxData = profileDirectoryContents.contains("key4.db") && profileDirectoryContents.contains("logins.json")
+
+            return hasChromiumData || hasFirefoxData
+        }
+
+        static func < (lhs: DataImport.BrowserProfile, rhs: DataImport.BrowserProfile) -> Bool {
+            return lhs.name.localizedCompare(rhs.name) == .orderedAscending
+        }
+    }
+
 }
 
 enum DataImportError: Error {

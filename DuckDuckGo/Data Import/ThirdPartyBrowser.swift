@@ -40,6 +40,13 @@ struct ThirdPartyBrowser {
         }
     }
 
+    enum BrowserType {
+        case brave
+        case chrome
+        case edge
+        case firefox
+    }
+
     var isInstalled: Bool {
         return NSWorkspace.shared.absolutePathForApplication(withBundleIdentifier: bundleID) != nil
     }
@@ -56,11 +63,15 @@ struct ThirdPartyBrowser {
         return NSWorkspace.shared.icon(forFile: applicationPath)
     }
 
-    private enum `Type` {
-        case brave
-        case chrome
-        case edge
-        case firefox
+    var browserProfiles: DataImport.BrowserProfileList? {
+        guard let profilePath = profilesDirectory(),
+              let potentialProfileURLs = try? FileManager.default.contentsOfDirectory(at: profilePath,
+                                                                                    includingPropertiesForKeys: nil,
+                                                                                    options: [.skipsHiddenFiles]).filter(\.hasDirectoryPath) else {
+            return nil
+        }
+
+        return DataImport.BrowserProfileList(browser: self.type, profileURLs: potentialProfileURLs)
     }
 
     private var bundleID: String {
@@ -72,7 +83,7 @@ struct ThirdPartyBrowser {
         }
     }
 
-    private let type: Type
+    private let type: BrowserType
 
     @discardableResult
     func forceTerminate() -> Bool {
@@ -82,6 +93,20 @@ struct ThirdPartyBrowser {
 
     private func findRunningApplication() -> NSRunningApplication? {
         return NSRunningApplication.runningApplications(withBundleIdentifier: bundleID).first
+    }
+
+    // Returns the URL to the profiles for a given browser. This directory will contain a list of directories, each representing a profile.
+    private func profilesDirectory() -> URL? {
+        guard let applicationSupportURL = FileManager.default.urls(for: .applicationSupportDirectory, in: .userDomainMask).first else {
+            return nil
+        }
+
+        switch type {
+        case .brave: return applicationSupportURL.appendingPathComponent("BraveSoftware/Brave-Browser/")
+        case .chrome: return applicationSupportURL.appendingPathComponent("Google/Chrome/")
+        case .edge: return applicationSupportURL.appendingPathComponent("Microsoft Edge/")
+        case .firefox: return applicationSupportURL.appendingPathComponent("Firefox/Profiles/")
+        }
     }
 
 }

@@ -31,16 +31,22 @@ final class BrowserImportViewController: NSViewController {
         static let identifier = "BrowserImportViewController"
     }
 
-    static func create(with browser: DataImport.Source) -> BrowserImportViewController {
+    static func create(with browser: DataImport.Source, profileList: DataImport.BrowserProfileList) -> BrowserImportViewController {
         let storyboard = NSStoryboard(name: Constants.storyboardName, bundle: nil)
 
         return storyboard.instantiateController(identifier: Constants.identifier) { (coder) -> BrowserImportViewController? in
-            return BrowserImportViewController(coder: coder, browser: browser)
+            return BrowserImportViewController(coder: coder, browser: browser, profileList: profileList)
         }
     }
 
+    @IBOutlet var importOptionsStackView: NSStackView!
+
+    @IBOutlet var profileSelectionLabel: NSTextField!
+    @IBOutlet var profileSelectionPopUpButton: NSPopUpButton!
+
     @IBOutlet var passwordsCheckbox: NSButton!
     @IBOutlet var passwordDetailLabel: NSTextField!
+
     @IBOutlet var closeBrowserWarningLabel: NSTextField!
     @IBOutlet var closeBrowserWarningViewHeightConstraint: NSLayoutConstraint!
     @IBOutlet var closeBrowserWarningView: ColorView! {
@@ -62,9 +68,12 @@ final class BrowserImportViewController: NSViewController {
     }
 
     let browser: DataImport.Source
+    let profileList: DataImport.BrowserProfileList
 
-    init?(coder: NSCoder, browser: DataImport.Source) {
+    init?(coder: NSCoder, browser: DataImport.Source, profileList: DataImport.BrowserProfileList) {
         self.browser = browser
+        self.profileList = profileList
+
         super.init(coder: coder)
     }
 
@@ -74,7 +83,18 @@ final class BrowserImportViewController: NSViewController {
 
     override func viewDidLoad() {
         super.viewDidLoad()
-        self.closeBrowserWarningLabel.stringValue = "You must close \(browser.importSourceName) before importing data."
+
+        // Update the profile picker:
+
+        if profileList.showProfilePicker {
+            profileSelectionPopUpButton.displayBrowserProfiles(profiles: profileList.validImportableProfiles,
+                                                               defaultProfile: profileList.defaultProfile)
+        } else {
+            profileSelectionLabel.isHidden = true
+            profileSelectionPopUpButton.isHidden = true
+        }
+
+        // Update the disclaimer label on the password import row:
 
         switch browser {
         case .brave, .chrome, .edge:
@@ -85,8 +105,11 @@ final class BrowserImportViewController: NSViewController {
             passwordDetailLabel.isHidden = true
         }
 
-        let browserIsRunning = ThirdPartyBrowser.browser(for: browser)?.isRunning ?? false
+        // Toggle the browser warning bar:
 
+        self.closeBrowserWarningLabel.stringValue = "You must close \(browser.importSourceName) before importing data."
+
+        let browserIsRunning = ThirdPartyBrowser.browser(for: browser)?.isRunning ?? false
         if !browserIsRunning {
             closeBrowserWarningViewHeightConstraint.constant = 0
         }
@@ -94,6 +117,28 @@ final class BrowserImportViewController: NSViewController {
 
     @IBAction func selectedImportOptionsChanged(_ sender: NSButton) {
         delegate?.browserImportViewController(self, didChangeSelectedImportOptions: selectedImportOptions)
+    }
+
+}
+
+extension NSPopUpButton {
+
+    fileprivate func displayBrowserProfiles(profiles: [DataImport.BrowserProfile], defaultProfile: DataImport.BrowserProfile?) {
+        removeAllItems()
+
+        let validProfiles = profiles.filter { $0.hasLoginData }
+
+        var selectedSourceIndex: Int?
+
+        for (index, profile) in validProfiles.enumerated() {
+            addItem(withTitle: profile.name)
+
+            if profile.name == defaultProfile?.name {
+                selectedSourceIndex = index
+            }
+        }
+
+        selectItem(at: selectedSourceIndex ?? 0)
     }
 
 }
