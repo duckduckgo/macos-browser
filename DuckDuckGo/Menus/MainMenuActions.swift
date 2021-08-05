@@ -291,7 +291,13 @@ extension MainViewController {
 
         Pixel.fire(.navigation(kind: .bookmark(isFavorite: bookmark.isFavorite), source: .mainMenu))
 
-        selectedTabViewModel.tab.url = bookmark.url
+        if NSApplication.shared.isCommandPressed && NSApplication.shared.isShiftPressed {
+            WindowsManager.openNewWindow(with: bookmark.url)
+        } else if NSApplication.shared.isCommandPressed {
+            WindowControllersManager.shared.show(url: bookmark.url, newTab: true)
+        } else {
+            selectedTabViewModel.tab.url = bookmark.url
+        }
     }
 
     @IBAction func openAllInTabs(_ sender: Any?) {
