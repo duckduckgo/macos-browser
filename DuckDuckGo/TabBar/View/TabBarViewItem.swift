@@ -26,6 +26,7 @@ protocol TabBarViewItemDelegate: AnyObject {
 
     func tabBarViewItemCloseAction(_ tabBarViewItem: TabBarViewItem)
     func tabBarViewItemCloseOtherAction(_ tabBarViewItem: TabBarViewItem)
+    func tabBarViewItemCloseToTheRightAction(_ tabBarViewItem: TabBarViewItem)
     func tabBarViewItemDuplicateAction(_ tabBarViewItem: TabBarViewItem)
     func tabBarViewItemBookmarkThisPageAction(_ tabBarViewItem: TabBarViewItem)
     func tabBarViewItemMoveToNewWindowAction(_ tabBarViewItem: TabBarViewItem)
@@ -109,6 +110,11 @@ final class TabBarViewItem: NSCollectionViewItem {
 
         let closeOtherMenuItem = NSMenuItem(title: UserText.closeOtherTabs, action: #selector(closeOtherAction(_:)), keyEquivalent: "")
         menu.addItem(closeOtherMenuItem)
+
+        let closeTabsToTheRightMenuItem = NSMenuItem(title: UserText.closeTabsToTheRight,
+                                                     action: #selector(closeToTheRightAction(_:)),
+                                                     keyEquivalent: "")
+        menu.addItem(closeTabsToTheRightMenuItem)
 
         let moveToNewWindowMenuItem = NSMenuItem(title: UserText.moveTabToNewWindow, action: #selector(moveToNewWindowAction(_:)), keyEquivalent: "")
         menu.addItem(moveToNewWindowMenuItem)
@@ -215,11 +221,15 @@ final class TabBarViewItem: NSCollectionViewItem {
         delegate?.tabBarViewItemCloseAction(self)
     }
 
-    @objc func closeOtherAction(_ sender: NSButton) {
+    @objc func closeOtherAction(_ sender: NSMenuItem) {
         delegate?.tabBarViewItemCloseOtherAction(self)
     }
 
-    @objc func moveToNewWindowAction(_ sender: NSButton) {
+    @objc func closeToTheRightAction(_ sender: NSMenuItem) {
+        delegate?.tabBarViewItemCloseToTheRightAction(self)
+    }
+
+    @objc func moveToNewWindowAction(_ sender: NSMenuItem) {
         delegate?.tabBarViewItemMoveToNewWindowAction(self)
     }
 

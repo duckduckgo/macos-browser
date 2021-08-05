@@ -761,6 +761,15 @@ extension TabBarViewController: TabBarViewItemDelegate {
         tabCollectionViewModel.removeAllTabs(except: indexPath.item)
     }
 
+    func tabBarViewItemCloseToTheRightAction(_ tabBarViewItem: TabBarViewItem) {
+        guard let indexPath = collectionView.indexPath(for: tabBarViewItem) else {
+            os_log("TabBarViewController: Failed to get index path of tab bar view item", type: .error)
+            return
+        }
+
+        tabCollectionViewModel.removeTabs(after: indexPath.item)
+    }
+
     func tabBarViewItemMoveToNewWindowAction(_ tabBarViewItem: TabBarViewItem) {
         guard let indexPath = collectionView.indexPath(for: tabBarViewItem) else {
             os_log("TabBarViewController: Failed to get index path of tab bar view item", type: .error)
