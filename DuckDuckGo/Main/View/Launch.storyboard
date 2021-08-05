@@ -111,6 +111,16 @@
                                                 <action selector="saveAs:" target="Ady-hI-5gd" id="VSN-fV-7wi"/>
                                             </connections>
                                         </menuItem>
+                                        <menuItem isSeparatorItem="YES" id="lUm-8h-5el"/>
+                                        <menuItem title="Burn website Data..." id="b1E-Hc-xhP">
+                                            <string key="keyEquivalent" base64-UTF8="YES">
+CA
+</string>
+                                            <modifierMask key="keyEquivalentModifierMask" shift="YES" command="YES"/>
+                                            <connections>
+                                                <action selector="burnButtonAction:" target="Ady-hI-5gd" id="vT7-U8-BVg"/>
+                                            </connections>
+                                        </menuItem>
                                         <menuItem isSeparatorItem="YES" id="u7E-4A-OQP"/>
                                         <menuItem title="Import Browser Data..." id="gTV-od-6G5">
                                             <modifierMask key="keyEquivalentModifierMask"/>
@@ -645,6 +655,6 @@ CQ
         </scene>
     </scenes>
     <resources>
-        <image name="Favorite" width="15" height="15"/>
+        <image name="Favorite" width="16" height="16"/>
     </resources>
 </document>
