@@ -42,6 +42,10 @@ extension AppDelegate {
         WindowsManager.openNewWindow()
     }
 
+    @IBAction func newTab(_ sender: Any?) {
+        WindowsManager.openNewWindow()
+    }
+
     @IBAction func openLocation(_ sender: Any?) {
         WindowsManager.openNewWindow()
     }
@@ -142,6 +146,23 @@ extension AppDelegate {
                 alert.alertStyle = .warning
                 alert.addButton(withTitle: "OK")
                 alert.beginSheetModal(for: window, completionHandler: nil)
+            }
+        }
+    }
+
+    @IBAction func burnButtonAction(_ sender: NSButton) {
+        let response = NSAlert.burnButtonAlert().runModal()
+        if response == NSApplication.ModalResponse.alertFirstButtonReturn {
+            Pixel.fire(.burn())
+
+            let windowController = WindowControllersManager.shared.lastKeyMainWindowController
+            WindowsManager.closeWindows(except: windowController?.window)
+            if let tabBarViewController = windowController?.mainViewController.tabBarViewController {
+                tabBarViewController.playFireAnimation()
+            } else {
+                Fire().burnAll(tabCollectionViewModel: nil) {
+                    WindowsManager.openNewWindow()
+                }
             }
         }
     }

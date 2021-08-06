@@ -20,14 +20,37 @@ import Foundation
 
 enum DataImport {
 
-    // Third-party browser support will be added later.
     enum Source: CaseIterable {
+        case brave
+        case chrome
+        case edge
         case csv
 
         var importSourceName: String {
             switch self {
+            case .brave:
+                return "Brave"
+            case .chrome:
+                return "Chrome"
+            case .edge:
+                return "Edge"
             case .csv:
                 return UserText.importLoginsCSV
+            }
+        }
+
+        var importSourceImage: NSImage? {
+            return ThirdPartyBrowser.browser(for: self)?.applicationIcon
+        }
+
+        var canImportData: Bool {
+            return ThirdPartyBrowser.browser(for: self)?.isInstalled ?? true
+        }
+
+        var showSuccessScreen: Bool {
+            switch self {
+            case .csv: return true
+            default: return false
             }
         }
     }
@@ -46,6 +69,7 @@ enum DataImport {
 enum DataImportError: Error {
 
     case cannotReadFile
+    case browserNeedsToBeClosed
     case cannotAccessSecureVault
 
 }
