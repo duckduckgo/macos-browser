@@ -187,10 +187,23 @@ final class AddressBarTextField: NSTextField {
             return
         }
 
-        guard let url = makeUrl(suggestion: suggestion,
+        guard var url = makeUrl(suggestion: suggestion,
                                 stringValueWithoutSuffix: stringValueWithoutSuffix) else {
             os_log("%s: Making url from address bar string failed", type: .error, className)
             return
+        }
+        // keep current search mode
+        if url.isDuckDuckGoSearch,
+           let oldURL = selectedTabViewModel.tab.url,
+            oldURL.isDuckDuckGoSearch {
+            if let ia = try? oldURL.getParameter(name: URL.DuckDuckGoParameters.ia.rawValue),
+               let newURL = try? url.addParameter(name: URL.DuckDuckGoParameters.ia.rawValue, value: ia) {
+                url = newURL
+            }
+            if let iax = try? oldURL.getParameter(name: URL.DuckDuckGoParameters.iax.rawValue),
+               let newURL = try? url.addParameter(name: URL.DuckDuckGoParameters.iax.rawValue, value: iax) {
+                url = newURL
+            }
         }
 
         if selectedTabViewModel.tab.url == url {
@@ -365,20 +378,24 @@ final class AddressBarTextField: NSTextField {
             NSAttributedString(string: string, attributes: Self.suffixAttributes)
         }
 
-        static let searchSuffix = " – \(UserText.addressBarSearchSuffix)"
+        static let searchSuffix = " – \(UserText.searchDuckDuckGoSuffix)"
         static let visitSuffix = " – \(UserText.addressBarVisitSuffix)"
 
         var string: String {
             switch self {
             case .search:
-                return "\(Self.searchSuffix)"
+                return Self.searchSuffix
             case .visit(host: let host):
                 return "\(Self.visitSuffix) \(host)"
             case .url(let url):
-                return " – " + url.toString(decodePunycode: false,
-                                            dropScheme: true,
-                                            needsWWW: false,
-                                            dropTrailingSlash: false)
+                if url.isDuckDuckGoSearch {
+                    return Self.searchSuffix
+                } else {
+                    return " – " + url.toString(decodePunycode: false,
+                                                  dropScheme: true,
+                                                  needsWWW: false,
+                                                  dropTrailingSlash: false)
+                }
             case .title(let title):
                 return " – " + title
             }

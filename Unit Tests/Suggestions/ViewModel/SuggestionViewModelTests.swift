@@ -129,4 +129,33 @@ final class SuggestionViewModelTests: XCTestCase {
         XCTAssertEqual(suggestionViewModel.string, title)
     }
 
+    func testWhenSuggestionIsHistoryEntryOfDuckDuckGoSearch_ThenStringIsQuery() {
+        let query = "test search"
+        let searchUrl = URL.makeSearchUrl(from: query)!
+        let title = "Title"
+        let suggestion = Suggestion.historyEntry(title: title, url: searchUrl, allowedInTopHits: true)
+        let suggestionViewModel = SuggestionViewModel(suggestion: suggestion, userStringValue: "")
+
+        XCTAssertEqual(suggestionViewModel.string, query)
+    }
+
+    func testWhenSuggestionIsHistoryEntryOfDuckDuckGoSearch_ThenSuffixIsSearchDuckDuckGo() {
+        let searchUrl = URL.makeSearchUrl(from: "test search")!
+        let title = "Title"
+        let suggestion = Suggestion.historyEntry(title: title, url: searchUrl, allowedInTopHits: true)
+        let suggestionViewModel = SuggestionViewModel(suggestion: suggestion, userStringValue: "")
+
+        XCTAssert(suggestionViewModel.suffix.hasSuffix(UserText.searchDuckDuckGoSuffix))
+    }
+
+    func testWhenSuggestionIsHistoryEntryOfDuckDuckGoSearch_ThenTitleIsSearchQuery() {
+        let query = "test search"
+        let searchUrl = URL.makeSearchUrl(from: query)!
+        let title = "Title"
+        let suggestion = Suggestion.historyEntry(title: title, url: searchUrl, allowedInTopHits: true)
+        let suggestionViewModel = SuggestionViewModel(suggestion: suggestion, userStringValue: "")
+
+        XCTAssertEqual(suggestionViewModel.title, query)
+    }
+
 }

@@ -189,7 +189,7 @@
                                             </userDefinedRuntimeAttribute>
                                         </userDefinedRuntimeAttributes>
                                         <connections>
-                                            <action selector="burnButtonAction:" target="uSf-9n-QMw" id="ifc-Vj-HVz"/>
+                                            <action selector="burnButtonAction:" target="7J5-0H-rHB" id="4O7-R9-MHU"/>
                                         </connections>
                                     </button>
                                 </subviews>

@@ -93,16 +93,6 @@ final class TabBarViewController: NSViewController {
         NotificationCenter.default.removeObserver(self)
     }
 
-    @IBAction func burnButtonAction(_ sender: NSButton) {
-        let response = NSAlert.burnButtonAlert.runModal()
-        if response == NSApplication.ModalResponse.alertFirstButtonReturn {
-            Pixel.fire(.burn())
-
-            WindowsManager.closeWindows(except: self.view.window)
-            playFireAnimation()
-        }
-    }
-
     @IBAction func addButtonAction(_ sender: NSButton) {
         tabCollectionViewModel.appendNewTab()
     }
@@ -826,19 +816,5 @@ extension TabBarViewController {
 
 }
 
-fileprivate extension NSAlert {
-
-    static var burnButtonAlert: NSAlert {
-        let alert = NSAlert()
-        alert.messageText = UserText.burnAlertMessageText
-        alert.informativeText = UserText.burtAlertInformativeText
-        alert.alertStyle = .warning
-        alert.icon = NSImage(named: "BurnAlert")
-        alert.addButton(withTitle: UserText.burn)
-        alert.addButton(withTitle: UserText.cancel)
-        return alert
-    }
-
-}
 // swiftlint:enable type_body_length
 // swiftlint:enable file_length

@@ -111,6 +111,16 @@
                                                 <action selector="saveAs:" target="Ady-hI-5gd" id="VSN-fV-7wi"/>
                                             </connections>
                                         </menuItem>
+                                        <menuItem isSeparatorItem="YES" id="lUm-8h-5el"/>
+                                        <menuItem title="Burn Website Data..." id="b1E-Hc-xhP">
+                                            <string key="keyEquivalent" base64-UTF8="YES">
+CA
+</string>
+                                            <modifierMask key="keyEquivalentModifierMask" shift="YES" command="YES"/>
+                                            <connections>
+                                                <action selector="burnButtonAction:" target="Ady-hI-5gd" id="vT7-U8-BVg"/>
+                                            </connections>
+                                        </menuItem>
                                         <menuItem isSeparatorItem="YES" id="u7E-4A-OQP"/>
                                         <menuItem title="Import Browser Data..." id="gTV-od-6G5">
                                             <modifierMask key="keyEquivalentModifierMask"/>
@@ -123,6 +133,10 @@
                                             <connections>
                                                 <action selector="openExportBrowserDataWindow:" target="Ady-hI-5gd" id="KJ1-rb-kec"/>
                                             </connections>
+                                        </menuItem>
+                                        <menuItem isSeparatorItem="YES" id="wqo-x3-9Zn"/>
+                                        <menuItem title="Share" id="kUE-Qf-cwa">
+                                            <modifierMask key="keyEquivalentModifierMask"/>
                                         </menuItem>
                                         <menuItem isSeparatorItem="YES" id="anH-0y-7dE"/>
                                         <menuItem title="Print..." keyEquivalent="p" id="uFk-FD-FTB">
@@ -662,6 +676,7 @@ CQ
                             <outlet property="reloadMenuItem" destination="aKZ-VG-MOp" id="J3D-X3-Xg3"/>
                             <outlet property="reopenLastClosedTabMenuItem" destination="c3l-v1-kxk" id="eGw-Dg-del"/>
                             <outlet property="sendFeedbackMenuItem" destination="V8t-Ts-q0L" id="qwz-Oh-HGm"/>
+                            <outlet property="shareMenuItem" destination="kUE-Qf-cwa" id="kEZ-Kc-Wf4"/>
                             <outlet property="stopMenuItem" destination="FyY-q1-f0k" id="BFN-Kd-aAb"/>
                             <outlet property="toggleFullscreenMenuItem" destination="4J7-dP-txa" id="lyl-pp-TR0"/>
                             <outlet property="zoomInMenuItem" destination="lMK-tC-RJd" id="Ddo-RX-A6Z"/>
