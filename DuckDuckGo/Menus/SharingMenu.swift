@@ -75,16 +75,7 @@ final class SharingMenu: NSMenu {
 
         service.delegate = self
         service.subject = tabViewModel.title
-        let items: [Any]
-        if service.responds(to: NSSelectorFromString("name")),
-           let name = service.value(forKey: "name") as? String,
-           name == "com.apple.share.Twitter.post" {
-            items = [url, title]
-        } else {
-            items = [url]
-        }
-
-        service.perform(withItems: items)
+        service.perform(withItems: [url])
     }
 
 }
@@ -124,9 +115,9 @@ private extension NSMenuItem {
 private extension NSImage {
 
     static var more: NSImage? {
-        guard NSSharingServicePicker.responds(to: NSSelectorFromString("sharedMoreMenuImage")) else { return nil }
-        return NSSharingServicePicker.perform(NSSelectorFromString("sharedMoreMenuImage"))?
-            .takeUnretainedValue() as? NSImage
+        let sharedMoreMenuImageSelector = NSSelectorFromString("sharedMoreMenuImage")
+        guard NSSharingServicePicker.responds(to: sharedMoreMenuImageSelector) else { return nil }
+        return NSSharingServicePicker.perform(sharedMoreMenuImageSelector)?.takeUnretainedValue() as? NSImage
     }
 
 }

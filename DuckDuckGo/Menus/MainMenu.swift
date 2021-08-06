@@ -73,7 +73,7 @@ final class MainMenu: NSMenu {
             printSeparatorItem?.removeFromParent()
         }
         sharingMenu.title = shareMenuItem.title
-        self.shareMenuItem.submenu = sharingMenu
+        shareMenuItem.submenu = sharingMenu
 
 #if !OUT_OF_APPSTORE
 
