@@ -194,7 +194,7 @@ final class AddressBarTextField: NSTextField {
         }
         // keep current search mode
         if url.isDuckDuckGoSearch,
-           let oldURL = selectedTabViewModel.tab.url,
+           let oldURL = selectedTabViewModel.tab.content.url,
             oldURL.isDuckDuckGoSearch {
             if let ia = try? oldURL.getParameter(name: URL.DuckDuckGoParameters.ia.rawValue),
                let newURL = try? url.addParameter(name: URL.DuckDuckGoParameters.ia.rawValue, value: ia) {
