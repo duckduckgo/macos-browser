@@ -112,7 +112,7 @@
                                             </connections>
                                         </menuItem>
                                         <menuItem isSeparatorItem="YES" id="lUm-8h-5el"/>
-                                        <menuItem title="Burn website Data..." id="b1E-Hc-xhP">
+                                        <menuItem title="Burn Website Data..." id="b1E-Hc-xhP">
                                             <string key="keyEquivalent" base64-UTF8="YES">
 CA
 </string>
