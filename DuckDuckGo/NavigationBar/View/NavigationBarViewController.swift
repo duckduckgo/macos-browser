@@ -158,7 +158,7 @@ final class NavigationBarViewController: NSViewController {
     }
 
     @IBAction func shareButtonAction(_ sender: NSButton) {
-        guard let url = tabCollectionViewModel.selectedTabViewModel?.tab.url else { return }
+        guard let url = tabCollectionViewModel.selectedTabViewModel?.tab.content.url else { return }
         let sharing = NSSharingServicePicker(items: [url])
         sharing.delegate = self
         sharing.show(relativeTo: .zero, of: sender, preferredEdge: .minY)
@@ -222,7 +222,7 @@ final class NavigationBarViewController: NSViewController {
     }
 
     private func subscribeToTabUrl() {
-        urlCancellable = tabCollectionViewModel.selectedTabViewModel?.tab.$url
+        urlCancellable = tabCollectionViewModel.selectedTabViewModel?.tab.$content
             .receive(on: DispatchQueue.main)
             .sink(receiveValue: { [weak self] _ in
                 self?.updatePasswordManagementButton()
@@ -230,7 +230,7 @@ final class NavigationBarViewController: NSViewController {
     }
 
     private func updatePasswordManagementButton() {
-        let url = tabCollectionViewModel.selectedTabViewModel?.tab.url
+        let url = tabCollectionViewModel.selectedTabViewModel?.tab.content.url
 
         passwordManagementButton.image = NSImage(named: "PasswordManagement")
 
@@ -312,7 +312,7 @@ final class NavigationBarViewController: NSViewController {
         goForwardButton.isEnabled = selectedTabViewModel.canGoForward
         refreshButton.isEnabled = selectedTabViewModel.canReload
         shareButton.isEnabled = selectedTabViewModel.canReload
-        shareButton.isEnabled = selectedTabViewModel.tab.url != nil
+        shareButton.isEnabled = selectedTabViewModel.tab.content.url ?? .emptyPage != .emptyPage
     }
 
 }

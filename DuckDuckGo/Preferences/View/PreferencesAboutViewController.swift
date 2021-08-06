@@ -70,9 +70,7 @@ final class PreferencesAboutViewController: NSViewController {
         DefaultConfigurationStorage.shared.log()
         ConfigurationManager.shared.log()
 
-        let tab = Tab(tabType: .standard)
-        tab.url = url
-
+        let tab = Tab(content: .url(url))
         let tabCollectionViewModel = mainViewController.tabCollectionViewModel
         tabCollectionViewModel.append(tab: tab)
     }

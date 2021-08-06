@@ -46,14 +46,12 @@ final class WindowManagerStateRestorationTests: XCTestCase {
 
     func testWindowManagerStateRestoration() throws {
         let tabs1 = [
-            Tab(tabType: .standard,
-                url: URL(string: "https://duckduckgo.com"),
+            Tab(content: .url(URL(string: "https://duckduckgo.com")!),
                 title: "DDG",
                 error: nil,
                 sessionStateData: "data".data(using: .utf8)!),
             Tab(),
-            Tab(tabType: .standard,
-                url: URL(string: "https://duckduckgo.com/?q=search&t=osx&ia=web"),
+            Tab(content: .url(URL(string: "https://duckduckgo.com/?q=search&t=osx&ia=web")!),
                 title: "DDG search",
                 error: nil,
                 sessionStateData: "data 2".data(using: .utf8)!)
@@ -61,8 +59,7 @@ final class WindowManagerStateRestorationTests: XCTestCase {
         let tabs2 = [
             Tab(),
             Tab(),
-            Tab(tabType: .standard,
-                url: URL(string: "https://duckduckgo.com/?q=another_search&t=osx&ia=web"),
+            Tab(content: .url(URL(string: "https://duckduckgo.com/?q=another_search&t=osx&ia=web")!),
                 title: "DDG search",
                 error: nil,
                 sessionStateData: "data 3".data(using: .utf8)!)

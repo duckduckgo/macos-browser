@@ -125,7 +125,7 @@ final class AddressBarTextField: NSTextField {
     }
 
     private func makeMeFirstResponderIfNeeded() {
-        let focusTab = tabCollectionViewModel.selectedTabViewModel?.tab.tabType.focusTabAddressBarWhenSelected ?? true
+        let focusTab = tabCollectionViewModel.selectedTabViewModel?.tab.content.focusTabAddressBarWhenSelected ?? true
 
         if focusTab, stringValue == "" {
             makeMeFirstResponder()
@@ -193,7 +193,7 @@ final class AddressBarTextField: NSTextField {
             return
         }
 
-        if selectedTabViewModel.tab.url == url {
+        if selectedTabViewModel.tab.content.url == url {
             Pixel.fire(.refresh(source: .reloadURL))
             selectedTabViewModel.tab.reload()
         } else {
@@ -213,7 +213,7 @@ final class AddressBarTextField: NSTextField {
         }
 
         Pixel.fire(.navigation(kind: .init(url: url), source: suggestion != nil ? .suggestion : .addressBar))
-        let tab = Tab(tabType: .standard, url: url, shouldLoadInBackground: true)
+        let tab = Tab(content: .url(url), shouldLoadInBackground: true)
         tabCollectionViewModel.append(tab: tab, selected: selected)
     }
 

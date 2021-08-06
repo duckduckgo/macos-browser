@@ -201,6 +201,6 @@ final class TabCollectionTests: XCTestCase {
 
 extension Tab {
     convenience override init() {
-        self.init(tabType: .favorites)
+        self.init(content: .homepage)
     }
 }

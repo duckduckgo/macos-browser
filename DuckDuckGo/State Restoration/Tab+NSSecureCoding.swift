@@ -32,8 +32,12 @@ extension Tab: NSSecureCoding {
     static var supportsSecureCoding: Bool { true }
 
     convenience init?(coder decoder: NSCoder) {
-        self.init(tabType: TabType.rawValue(decoder.decodeIfPresent(at: NSCodingKeys.tabType)),
-                  url: decoder.decodeIfPresent(at: NSCodingKeys.url),
+        guard let tabTypeRawValue = decoder.decodeIfPresent(at: NSCodingKeys.tabType),
+              let tabType = TabContent.ContentType(rawValue: tabTypeRawValue),
+              let content = TabContent(type: tabType, url: decoder.decodeIfPresent(at: NSCodingKeys.url))
+        else { return nil }
+
+        self.init(content: content,
                   title: decoder.decodeIfPresent(at: NSCodingKeys.title),
                   favicon: decoder.decodeIfPresent(at: NSCodingKeys.favicon),
                   sessionStateData: decoder.decodeIfPresent(at: NSCodingKeys.sessionStateData))
@@ -42,11 +46,11 @@ extension Tab: NSSecureCoding {
     func encode(with coder: NSCoder) {
         guard webView.configuration.websiteDataStore.isPersistent == true else { return }
 
-        url.map(coder.encode(forKey: NSCodingKeys.url))
+        content.url.map(coder.encode(forKey: NSCodingKeys.url))
         title.map(coder.encode(forKey: NSCodingKeys.title))
         favicon.map(coder.encode(forKey: NSCodingKeys.favicon))
         getActualSessionStateData().map(coder.encode(forKey: NSCodingKeys.sessionStateData))
-        coder.encode(tabType.rawValue, forKey: NSCodingKeys.tabType)
+        coder.encode(content.type.rawValue, forKey: NSCodingKeys.tabType)
     }
 
 }

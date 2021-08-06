@@ -68,8 +68,8 @@ final class BrowserTabViewController: NSViewController {
     }
 
     private func subscribeToSelectedTabViewModel() {
-        selectedTabViewModelCancellable = tabCollectionViewModel.$selectedTabViewModel.receive(on: DispatchQueue.main).sink { [weak self] viewModel in
-            self?.updateInterface(url: viewModel?.tab.url)
+        selectedTabViewModelCancellable = tabCollectionViewModel.$selectedTabViewModel.receive(on: DispatchQueue.main).sink { [weak self] _ in
+            self?.updateInterface()
             self?.subscribeToIsErrorViewVisible()
         }
     }
@@ -79,9 +79,9 @@ final class BrowserTabViewController: NSViewController {
     /// 1. No URL is provided, so the webview should be hidden in favor of showing the default UI elements.
     /// 2. A URL is provided for the first time, so the webview should be added as a subview and the URL should be loaded.
     /// 3. A URL is provided after already adding the webview, so the webview should be reloaded.
-    private func updateInterface(url: URL?) {
+    private func updateInterface() {
         changeWebView()
-        show(tab: tabCollectionViewModel.selectedTabViewModel?.tab.tabType)
+        show(tabContent: tabCollectionViewModel.selectedTabViewModel?.tab.content)
     }
 
     private func showHomepage() {
@@ -140,8 +140,11 @@ final class BrowserTabViewController: NSViewController {
 
     func subscribeToUrl(of tabViewModel: TabViewModel) {
          urlCancellable?.cancel()
-         urlCancellable = tabViewModel.tab.$url.receive(on: DispatchQueue.main).sink { [weak self] url in
-            self?.updateInterface(url: url)
+         urlCancellable = tabViewModel.tab.$content
+            .removeDuplicates()
+            .receive(on: DispatchQueue.main)
+            .sink { [weak self] _ in
+                self?.updateInterface()
          }
     }
 
@@ -173,7 +176,7 @@ final class BrowserTabViewController: NSViewController {
     }
 
     private func openNewTab(with url: URL?, parentTab: Tab?, selected: Bool = false) {
-        let tab = Tab(tabType: url == nil ? .favorites : .standard, url: url, parentTab: parentTab, shouldLoadInBackground: true)
+        let tab = Tab(content: url != nil ? .url(url!) : .homepage, parentTab: parentTab, shouldLoadInBackground: true)
 
         if parentTab != nil {
             tabCollectionViewModel.insertChild(tab: tab, selected: selected)
@@ -186,15 +189,13 @@ final class BrowserTabViewController: NSViewController {
 
     private func show(displayableTabAtIndex index: Int) {
         // The tab switcher only displays displayable tab types.
-        let tabType = Tab.TabType.displayableTabTypes[index]
-        show(tab: tabType)
+        let tabType = Tab.TabContent.displayableTabTypes[index]
+        tabCollectionViewModel.selectedTabViewModel?.tab.content = .init(type: tabType, url: nil)!
+        updateInterface()
     }
 
-    private func show(tab type: Tab.TabType?) {
-        let type = type ?? .favorites
-        tabCollectionViewModel.selectedTabViewModel?.tab.set(tabType: type)
-
-        switch type {
+    private func show(tabContent content: Tab.TabContent?) {
+        switch content ?? .homepage {
         case .bookmarks:
             self.homepageView.removeFromSuperview()
             removePreferencesPage()
@@ -209,14 +210,15 @@ final class BrowserTabViewController: NSViewController {
             self.addChild(preferencesViewController)
             view.addAndLayout(preferencesViewController.view)
 
-        case .standard:
+        case .url:
             self.homepageView.removeFromSuperview()
             removeBookmarksPage()
             removePreferencesPage()
             if let webView = self.webView, webView.superview == nil {
                 addWebViewToViewHierarchy(webView)
             }
-        case .favorites:
+
+        case .homepage:
             removeBookmarksPage()
             removePreferencesPage()
             self.webView?.removeFromSuperview()
@@ -469,7 +471,7 @@ extension BrowserTabViewController: WKUIDelegate {
                  windowFeatures: WKWindowFeatures) -> WKWebView? {
 
         // Returned web view must be created with the specified configuration.
-        let tab = Tab(tabType: .standard, webViewConfiguration: configuration, parentTab: tabViewModel?.tab)
+        let tab = Tab(content: .url(.emptyPage), webViewConfiguration: configuration, parentTab: tabViewModel?.tab)
         tabCollectionViewModel.insertChild(tab: tab, selected: true)
         // WebKit loads the request in the returned web view.
         return tab.webView

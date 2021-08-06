@@ -106,7 +106,7 @@ final class OptionsButtonMenu: NSMenu {
 
         addItem(NSMenuItem.separator())
 
-        if let url = tabCollectionViewModel.selectedTabViewModel?.tab.url, url.canFireproof, let host = url.host {
+        if let url = tabCollectionViewModel.selectedTabViewModel?.tab.content.url, url.canFireproof, let host = url.host {
             if FireproofDomains.shared.isFireproof(fireproofDomain: host) {
 
                 let removeFireproofingItem = NSMenuItem(title: UserText.removeFireproofing,
@@ -270,8 +270,7 @@ final class EmailOptionsButtonSubMenu: NSMenu {
             assertionFailure("Could not get token page URL, token not available")
             return
         }
-        let tab = Tab(tabType: .standard)
-        tab.url = url
+        let tab = Tab(content: .url(url))
         tabCollectionViewModel.append(tab: tab)
         (supermenu as? OptionsButtonMenu)?.result = .emailProtectionCreateAddress
     }
@@ -283,8 +282,7 @@ final class EmailOptionsButtonSubMenu: NSMenu {
     }
     
     @objc func turnOnEmailAction(_ sender: NSMenuItem) {
-        let tab = Tab(tabType: .standard)
-        tab.url = EmailUrls().emailLandingPage
+        let tab = Tab(content: .url(EmailUrls().emailLandingPage))
         tabCollectionViewModel.append(tab: tab)
 
         (supermenu as? OptionsButtonMenu)?.result = .emailProtection
