@@ -183,7 +183,7 @@ Gw
                         <subviews>
                             <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="pLM-zg-r5i">
                                 <rect key="frame" x="18" y="26" width="473" height="16"/>
-                                <textFieldCell key="cell" lineBreakMode="clipping" title="Successfully imported:" id="fnj-an-rLQ">
+                                <textFieldCell key="cell" lineBreakMode="clipping" title="Import Complete:" id="fnj-an-rLQ">
                                     <font key="font" usesAppearanceFont="YES"/>
                                     <color key="textColor" name="labelColor" catalog="System" colorSpace="catalog"/>
                                     <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
@@ -416,30 +416,22 @@ Gw
             <objects>
                 <viewController storyboardIdentifier="CSVImportViewController" id="Meg-M8-8oL" customClass="CSVImportViewController" customModule="DuckDuckGo_Privacy_Browser" customModuleProvider="target" sceneMemberID="viewController">
                     <view key="view" translatesAutoresizingMaskIntoConstraints="NO" id="n2z-bE-Ka8">
-                        <rect key="frame" x="0.0" y="0.0" width="522" height="114"/>
+                        <rect key="frame" x="0.0" y="0.0" width="522" height="155"/>
                         <subviews>
-                            <stackView distribution="fill" orientation="vertical" alignment="centerX" spacing="12" horizontalStackHuggingPriority="249.99998474121094" verticalStackHuggingPriority="249.99998474121094" horizontalHuggingPriority="249" detachesHiddenViews="YES" translatesAutoresizingMaskIntoConstraints="NO" id="HLb-Dw-Y0O">
-                                <rect key="frame" x="20" y="20" width="482" height="74"/>
+                            <stackView distribution="fill" orientation="vertical" alignment="leading" spacing="20" horizontalStackHuggingPriority="249.99998474121094" verticalStackHuggingPriority="249.99998474121094" horizontalHuggingPriority="249" detachesHiddenViews="YES" translatesAutoresizingMaskIntoConstraints="NO" id="HLb-Dw-Y0O">
+                                <rect key="frame" x="20" y="3" width="482" height="149"/>
                                 <subviews>
                                     <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="qiB-A6-LS4">
-                                        <rect key="frame" x="185" y="59" width="112" height="15"/>
+                                        <rect key="frame" x="-2" y="134" width="112" height="15"/>
                                         <textFieldCell key="cell" alignment="left" title="Description Label" id="SpT-id-yTr">
                                             <font key="font" size="13" name="SFProText-Regular"/>
                                             <color key="textColor" name="labelColor" catalog="System" colorSpace="catalog"/>
                                             <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
                                         </textFieldCell>
                                     </textField>
-                                    <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="cam-am-7aM">
-                                        <rect key="frame" x="175" y="32" width="133" height="15"/>
-                                        <textFieldCell key="cell" lineBreakMode="clipping" title="Importing From File:" id="c4x-MU-RpJ">
-                                            <font key="font" size="13" name="SFProText-Semibold"/>
-                                            <color key="textColor" name="labelColor" catalog="System" colorSpace="catalog"/>
-                                            <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
-                                        </textFieldCell>
-                                    </textField>
                                     <button horizontalHuggingPriority="1000" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="A1C-Th-KJZ">
-                                        <rect key="frame" x="178" y="-7" width="127" height="32"/>
-                                        <buttonCell key="cell" type="push" title="Select CSV File" bezelStyle="rounded" alignment="center" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="L8K-VD-A0V">
+                                        <rect key="frame" x="-7" y="87" width="138" height="32"/>
+                                        <buttonCell key="cell" type="push" title="Select CSV File..." bezelStyle="rounded" alignment="center" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="L8K-VD-A0V">
                                             <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
                                             <font key="font" metaFont="system"/>
                                         </buttonCell>
@@ -447,6 +439,47 @@ Gw
                                             <action selector="selectFileButtonClicked:" target="Meg-M8-8oL" id="dai-DN-ip2"/>
                                         </connections>
                                     </button>
+                                    <customView translatesAutoresizingMaskIntoConstraints="NO" id="BED-XT-ikD" userLabel="Selected File Summary View">
+                                        <rect key="frame" x="0.0" y="0.0" width="195" height="74"/>
+                                        <subviews>
+                                            <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" verticalCompressionResistancePriority="1000" translatesAutoresizingMaskIntoConstraints="NO" id="AHq-K1-iYv">
+                                                <rect key="frame" x="-2" y="58" width="199" height="16"/>
+                                                <textFieldCell key="cell" lineBreakMode="clipping" title="File to Import:" id="hPm-nc-ZsM">
+                                                    <font key="font" metaFont="system"/>
+                                                    <color key="textColor" name="labelColor" catalog="System" colorSpace="catalog"/>
+                                                    <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
+                                                </textFieldCell>
+                                            </textField>
+                                            <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" verticalCompressionResistancePriority="1000" translatesAutoresizingMaskIntoConstraints="NO" id="cam-am-7aM">
+                                                <rect key="frame" x="-2" y="23" width="199" height="15"/>
+                                                <textFieldCell key="cell" lineBreakMode="clipping" title="/Users/dax/Desktop/logins.csv" id="c4x-MU-RpJ">
+                                                    <font key="font" size="13" name="SFProText-Semibold"/>
+                                                    <color key="textColor" name="labelColor" catalog="System" colorSpace="catalog"/>
+                                                    <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
+                                                </textFieldCell>
+                                            </textField>
+                                            <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" verticalCompressionResistancePriority="1000" translatesAutoresizingMaskIntoConstraints="NO" id="Q5d-A1-YEz">
+                                                <rect key="frame" x="-2" y="0.0" width="199" height="15"/>
+                                                <textFieldCell key="cell" lineBreakMode="clipping" title="Contains 42 valid logins" id="WHC-mX-EXO">
+                                                    <font key="font" textStyle="callout" name=".SFNS-Regular"/>
+                                                    <color key="textColor" name="secondaryLabelColor" catalog="System" colorSpace="catalog"/>
+                                                    <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
+                                                </textFieldCell>
+                                            </textField>
+                                        </subviews>
+                                        <constraints>
+                                            <constraint firstItem="cam-am-7aM" firstAttribute="top" secondItem="AHq-K1-iYv" secondAttribute="bottom" constant="20" id="6mL-UU-MAW"/>
+                                            <constraint firstAttribute="trailing" secondItem="AHq-K1-iYv" secondAttribute="trailing" id="7jr-df-Il6"/>
+                                            <constraint firstItem="AHq-K1-iYv" firstAttribute="top" secondItem="BED-XT-ikD" secondAttribute="top" id="Buh-pK-Fnb"/>
+                                            <constraint firstItem="Q5d-A1-YEz" firstAttribute="leading" secondItem="BED-XT-ikD" secondAttribute="leading" id="GfS-Ik-NY2"/>
+                                            <constraint firstAttribute="bottom" secondItem="Q5d-A1-YEz" secondAttribute="bottom" id="QSk-az-lhx"/>
+                                            <constraint firstAttribute="trailing" secondItem="cam-am-7aM" secondAttribute="trailing" id="RzK-vE-1re"/>
+                                            <constraint firstItem="cam-am-7aM" firstAttribute="leading" secondItem="BED-XT-ikD" secondAttribute="leading" id="Zxm-Kb-knP"/>
+                                            <constraint firstItem="AHq-K1-iYv" firstAttribute="leading" secondItem="BED-XT-ikD" secondAttribute="leading" id="ioJ-J7-eHT"/>
+                                            <constraint firstAttribute="trailing" secondItem="Q5d-A1-YEz" secondAttribute="trailing" id="kvg-Tb-aXy"/>
+                                            <constraint firstItem="Q5d-A1-YEz" firstAttribute="top" secondItem="cam-am-7aM" secondAttribute="bottom" constant="8" id="vAO-bc-quf"/>
+                                        </constraints>
+                                    </customView>
                                 </subviews>
                                 <visibilityPriorities>
                                     <integer value="1000"/>
@@ -462,20 +495,22 @@ Gw
                         </subviews>
                         <constraints>
                             <constraint firstAttribute="trailing" secondItem="HLb-Dw-Y0O" secondAttribute="trailing" constant="20" symbolic="YES" id="DHD-Tl-7vS"/>
-                            <constraint firstItem="HLb-Dw-Y0O" firstAttribute="top" secondItem="n2z-bE-Ka8" secondAttribute="top" constant="20" symbolic="YES" id="XJo-Xp-qkT"/>
+                            <constraint firstItem="HLb-Dw-Y0O" firstAttribute="top" secondItem="n2z-bE-Ka8" secondAttribute="top" constant="3" id="XJo-Xp-qkT"/>
                             <constraint firstItem="HLb-Dw-Y0O" firstAttribute="leading" secondItem="n2z-bE-Ka8" secondAttribute="leading" constant="20" symbolic="YES" id="dOV-9U-Egj"/>
-                            <constraint firstAttribute="bottom" secondItem="HLb-Dw-Y0O" secondAttribute="bottom" constant="20" symbolic="YES" id="w9C-XD-FMz"/>
+                            <constraint firstAttribute="bottom" secondItem="HLb-Dw-Y0O" secondAttribute="bottom" constant="3" id="w9C-XD-FMz"/>
                         </constraints>
                     </view>
                     <connections>
                         <outlet property="descriptionLabel" destination="qiB-A6-LS4" id="I02-0q-idN"/>
                         <outlet property="selectFileButton" destination="A1C-Th-KJZ" id="GdO-PB-u8I"/>
+                        <outlet property="selectedFileContainer" destination="BED-XT-ikD" id="95q-E3-ezP"/>
                         <outlet property="selectedFileLabel" destination="cam-am-7aM" id="puL-BB-PUx"/>
+                        <outlet property="totalValidLoginsLabel" destination="Q5d-A1-YEz" id="wSI-hD-nP5"/>
                     </connections>
                 </viewController>
                 <customObject id="Xcz-bj-sHR" userLabel="First Responder" customClass="NSResponder" sceneMemberID="firstResponder"/>
             </objects>
-            <point key="canvasLocation" x="75" y="712"/>
+            <point key="canvasLocation" x="75" y="739"/>
         </scene>
     </scenes>
     <resources>

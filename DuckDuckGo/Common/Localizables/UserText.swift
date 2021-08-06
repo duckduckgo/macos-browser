@@ -152,15 +152,15 @@ struct UserText {
     static let importLoginsCSV = NSLocalizedString("import.logins.csv.title", value: "CSV Logins File", comment: "Title text for the CSV importer")
 
     static let csvImportDescription = NSLocalizedString("import.logins.csv.description", value: "The CSV importer will try to match column headers to their position.\nIf there is no header, it supports two formats:\n\n1. URL, Username, Password\n2. Title, URL, Username, Password", comment: "Description text for the CSV importer")
-    static let importLoginsSelectCSVFile = NSLocalizedString("import.logins.select-csv-file", value: "Select CSV File", comment: "Button text for selecting a CSV file")
-    static let importLoginsSelectAnotherFile = NSLocalizedString("import.logins.select-another-file", value: "Select Another File", comment: "Button text for selecting another file")
+    static let importLoginsSelectCSVFile = NSLocalizedString("import.logins.select-csv-file", value: "Select CSV File...", comment: "Button text for selecting a CSV file")
+    static let importLoginsSelectAnotherFile = NSLocalizedString("import.logins.select-another-file", value: "Select Another CSV File...", comment: "Button text for selecting another file")
     static let importLoginsFailedToReadCSVFile = NSLocalizedString("import.logins.failed-to-read-file", value: "Failed to get CSV file URL", comment: "Error text when importing a CSV file")
 
-    static func importingFile(at filePath: String, validLogins: Int) -> String {
-        let localized = NSLocalizedString("import.logins.csv.file-description",
-                                          value: "Importing File: %@ (%@ valid logins)",
-                                          comment: "Displays the path of the file being imported")
-        return String(format: localized, filePath, String(validLogins))
+    static func importingFile(validLogins: Int) -> String {
+        let localized = NSLocalizedString("import.logins.csv.valid-logins",
+                                          value: "Contains %@ valid logins",
+                                          comment: "Displays the number of the logins being imported")
+        return String(format: localized, String(validLogins))
     }
 
     static let initiateImport = NSLocalizedString("import.logins.initiate", value: "Import", comment: "Button text for importing data")

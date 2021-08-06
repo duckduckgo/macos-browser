@@ -162,6 +162,8 @@ final class FirefoxLoginReader {
     private func decrypt(logins: EncryptedFirefoxLogins, with key: Data) -> [ImportedLoginCredential] {
         var credentials = [ImportedLoginCredential]()
 
+        // WARNING (@sam): This will need to look for a metadata row. Need to reproduce that and see what the row contains, I think it only happens
+        // when you're signed into a Mozilla account.
         for login in logins.logins {
             let decryptedUsername = decrypt(credential: login.encryptedUsername, key: key)
             let decryptedPassword = decrypt(credential: login.encryptedPassword, key: key)

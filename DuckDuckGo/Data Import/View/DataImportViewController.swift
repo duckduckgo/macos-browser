@@ -44,7 +44,7 @@ final class DataImportViewController: NSViewController {
         return storyboard.instantiateController(identifier: Constants.identifier)
     }
 
-    private var viewState: ViewState = ViewState(selectedImportSource: .chrome, interactionState: .ableToImport) {
+    private var viewState: ViewState = ViewState(selectedImportSource: .brave, interactionState: .ableToImport) {
         didSet {
             renderCurrentViewState()
 
@@ -105,13 +105,17 @@ final class DataImportViewController: NSViewController {
         let secureVault = try? SecureVaultFactory.default.makeVault()
         let secureVaultImporter = SecureVaultLoginImporter(secureVault: secureVault!)
         self.dataImporter = ChromeDataImporter(loginImporter: secureVaultImporter)
-        importSourcePopUpButton.displayImportSources(withSelectedSource: .chrome)
+        importSourcePopUpButton.displayImportSources()
         renderCurrentViewState()
 
         selectedImportSourceCancellable = importSourcePopUpButton.selectionPublisher.sink { [weak self] index in
+            guard let self = self else { return }
+
             let validSources = DataImport.Source.allCases.filter(\.canImportData)
-            let selectedOption = validSources[index]
-            self?.viewState = ViewState(selectedImportSource: selectedOption, interactionState: .ableToImport)
+            let item = self.importSourcePopUpButton.itemArray[index]
+            let source = validSources.first { $0.importSourceName == item.title }
+
+            self.viewState = ViewState(selectedImportSource: source!, interactionState: .ableToImport)
         }
     }
 
@@ -330,22 +334,21 @@ extension DataImportViewController: BrowserImportViewControllerDelegate {
 
 extension NSPopUpButton {
 
-    fileprivate func displayImportSources(withSelectedSource selectedSource: DataImport.Source) {
+    fileprivate func displayImportSources() {
         removeAllItems()
 
         let validSources = DataImport.Source.allCases.filter(\.canImportData)
-        var selectedSourceIndex: Int?
 
         for (index, source) in validSources.enumerated() {
+            // The CSV row is at the bottom of the picker, and requires a separator above it.
+            if source == .csv {
+                let separator = NSMenuItem.separator()
+                menu?.addItem(separator)
+            }
+
             addItem(withTitle: source.importSourceName)
             lastItem?.image = source.importSourceImage?.resized(to: NSSize(width: 16, height: 16))
-
-            if source == selectedSource {
-                selectedSourceIndex = index
-            }
         }
-
-        selectItem(at: selectedSourceIndex ?? 0)
     }
 
 }
