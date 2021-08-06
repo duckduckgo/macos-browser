@@ -66,8 +66,7 @@ final class DataImportViewController: NSViewController {
                 let secureVaultImporter = SecureVaultLoginImporter(secureVault: secureVault!)
                 self.dataImporter = FirefoxDataImporter(loginImporter: secureVaultImporter)
             case .csv:
-                // Reset the data importer if the view has switched to the .csv state and a Chromium importer is still in use.
-                if self.dataImporter is ChromiumDataImporter {
+                if !(self.dataImporter is CSVImporter) {
                     self.dataImporter = nil
                 }
             }
@@ -101,9 +100,9 @@ final class DataImportViewController: NSViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
 
-        // This will change later to select the user's default browser.
         let secureVault = try? SecureVaultFactory.default.makeVault()
         let secureVaultImporter = SecureVaultLoginImporter(secureVault: secureVault!)
+
         self.dataImporter = ChromeDataImporter(loginImporter: secureVaultImporter)
         importSourcePopUpButton.displayImportSources()
         renderCurrentViewState()
@@ -113,9 +112,13 @@ final class DataImportViewController: NSViewController {
 
             let validSources = DataImport.Source.allCases.filter(\.canImportData)
             let item = self.importSourcePopUpButton.itemArray[index]
-            let source = validSources.first { $0.importSourceName == item.title }
+            let source = validSources.first(where: { $0.importSourceName == item.title })!
 
-            self.viewState = ViewState(selectedImportSource: source!, interactionState: .ableToImport)
+            if source == .csv {
+                self.viewState = ViewState(selectedImportSource: source, interactionState: .unableToImport)
+            } else {
+                self.viewState = ViewState(selectedImportSource: source, interactionState: .ableToImport)
+            }
         }
     }
 

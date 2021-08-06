@@ -99,77 +99,87 @@ Gw
             <objects>
                 <viewController storyboardIdentifier="CSVImportSummaryViewController" id="SBx-aI-Zdd" userLabel="CSV Import Summary View Controller" customClass="CSVImportSummaryViewController" customModule="DuckDuckGo_Privacy_Browser" customModuleProvider="target" sceneMemberID="viewController">
                     <view key="view" id="VAn-Ub-6ym">
-                        <rect key="frame" x="0.0" y="0.0" width="469" height="56"/>
+                        <rect key="frame" x="0.0" y="0.0" width="509" height="40"/>
                         <autoresizingMask key="autoresizingMask"/>
                         <subviews>
-                            <stackView distribution="fill" orientation="vertical" alignment="centerX" horizontalStackHuggingPriority="249.99998474121094" verticalStackHuggingPriority="249.99998474121094" horizontalHuggingPriority="1000" detachesHiddenViews="YES" translatesAutoresizingMaskIntoConstraints="NO" id="Z3O-9X-zTx">
-                                <rect key="frame" x="20" y="20" width="429" height="16"/>
+                            <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="yOK-pe-Vf8">
+                                <rect key="frame" x="18" y="24" width="473" height="16"/>
+                                <textFieldCell key="cell" lineBreakMode="clipping" title="Successfully imported:" id="mrl-9h-fRs">
+                                    <font key="font" usesAppearanceFont="YES"/>
+                                    <color key="textColor" name="labelColor" catalog="System" colorSpace="catalog"/>
+                                    <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
+                                </textFieldCell>
+                            </textField>
+                            <stackView distribution="fillEqually" orientation="vertical" alignment="leading" horizontalStackHuggingPriority="249.99998474121094" verticalStackHuggingPriority="249.99998474121094" detachesHiddenViews="YES" translatesAutoresizingMaskIntoConstraints="NO" id="q5Y-aZ-YzJ">
+                                <rect key="frame" x="20" y="0.0" width="469" height="16"/>
                                 <subviews>
-                                    <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="kEX-xf-rNu">
-                                        <rect key="frame" x="158" y="0.0" width="114" height="16"/>
-                                        <textFieldCell key="cell" lineBreakMode="clipping" title="Import Complete" id="rJC-Qi-wHX">
-                                            <font key="font" textStyle="headline" name=".SFNS-Bold"/>
-                                            <color key="textColor" name="labelColor" catalog="System" colorSpace="catalog"/>
-                                            <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
-                                        </textFieldCell>
-                                    </textField>
-                                    <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" id="Wew-SV-bZw">
-                                        <rect key="frame" x="-2" y="0.0" width="131" height="16"/>
-                                        <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
-                                        <textFieldCell key="cell" lineBreakMode="clipping" title="Successful Imports:" id="6Z7-fj-AbX">
-                                            <font key="font" metaFont="systemSemibold" size="13"/>
-                                            <color key="textColor" name="labelColor" catalog="System" colorSpace="catalog"/>
-                                            <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
-                                        </textFieldCell>
-                                    </textField>
-                                    <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" id="bui-vy-kLo">
-                                        <rect key="frame" x="-2" y="0.0" width="121" height="16"/>
-                                        <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
-                                        <textFieldCell key="cell" lineBreakMode="clipping" title="Duplicate Imports:" id="JPh-Uz-ajf">
-                                            <font key="font" metaFont="systemSemibold" size="13"/>
-                                            <color key="textColor" name="labelColor" catalog="System" colorSpace="catalog"/>
-                                            <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
-                                        </textFieldCell>
-                                    </textField>
-                                    <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" id="Vkm-fr-rZ8">
-                                        <rect key="frame" x="-2" y="0.0" width="99" height="16"/>
-                                        <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
-                                        <textFieldCell key="cell" lineBreakMode="clipping" title="Failed Imports:" id="HSj-UI-lbS">
-                                            <font key="font" metaFont="systemSemibold" size="13"/>
-                                            <color key="textColor" name="labelColor" catalog="System" colorSpace="catalog"/>
-                                            <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
-                                        </textFieldCell>
-                                    </textField>
+                                    <customView translatesAutoresizingMaskIntoConstraints="NO" id="jDK-vu-W0v" userLabel="Passwords Row">
+                                        <rect key="frame" x="0.0" y="0.0" width="469" height="16"/>
+                                        <subviews>
+                                            <imageView horizontalHuggingPriority="251" verticalHuggingPriority="251" translatesAutoresizingMaskIntoConstraints="NO" id="zE2-HH-weC" userLabel="Checkmark">
+                                                <rect key="frame" x="0.0" y="0.0" width="16" height="16"/>
+                                                <constraints>
+                                                    <constraint firstAttribute="width" constant="16" id="gfb-3i-4IA"/>
+                                                    <constraint firstAttribute="height" constant="16" id="rYZ-FQ-Q2m"/>
+                                                </constraints>
+                                                <imageCell key="cell" refusesFirstResponder="YES" alignment="left" imageScaling="proportionallyDown" image="SuccessCheckmark" id="9mc-e8-dnZ"/>
+                                            </imageView>
+                                            <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="ztY-4S-VwY">
+                                                <rect key="frame" x="22" y="0.0" width="449" height="16"/>
+                                                <textFieldCell key="cell" lineBreakMode="clipping" title="New Logins:" id="Y8o-E7-bry">
+                                                    <font key="font" metaFont="system"/>
+                                                    <color key="textColor" name="labelColor" catalog="System" colorSpace="catalog"/>
+                                                    <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
+                                                </textFieldCell>
+                                            </textField>
+                                        </subviews>
+                                        <constraints>
+                                            <constraint firstAttribute="trailing" secondItem="ztY-4S-VwY" secondAttribute="trailing" id="7f2-Fm-Bho"/>
+                                            <constraint firstItem="ztY-4S-VwY" firstAttribute="leading" secondItem="zE2-HH-weC" secondAttribute="trailing" constant="8" symbolic="YES" id="CXt-Gu-sGo"/>
+                                            <constraint firstItem="zE2-HH-weC" firstAttribute="leading" secondItem="jDK-vu-W0v" secondAttribute="leading" id="ku6-qq-4hN"/>
+                                            <constraint firstAttribute="bottom" secondItem="ztY-4S-VwY" secondAttribute="bottom" id="nfa-1w-MpT"/>
+                                            <constraint firstItem="ztY-4S-VwY" firstAttribute="top" secondItem="jDK-vu-W0v" secondAttribute="top" id="osT-bv-UEy"/>
+                                            <constraint firstItem="zE2-HH-weC" firstAttribute="top" secondItem="jDK-vu-W0v" secondAttribute="top" id="rPj-U1-paV"/>
+                                            <constraint firstAttribute="bottom" secondItem="zE2-HH-weC" secondAttribute="bottom" id="t3l-KW-KGe"/>
+                                        </constraints>
+                                    </customView>
                                 </subviews>
+                                <constraints>
+                                    <constraint firstAttribute="trailing" secondItem="jDK-vu-W0v" secondAttribute="trailing" id="9XW-qk-7DF"/>
+                                    <constraint firstItem="jDK-vu-W0v" firstAttribute="leading" secondItem="q5Y-aZ-YzJ" secondAttribute="leading" id="OL0-y8-7vJ"/>
+                                </constraints>
                                 <visibilityPriorities>
-                                    <integer value="1000"/>
-                                    <integer value="1000"/>
-                                    <integer value="1000"/>
                                     <integer value="1000"/>
                                 </visibilityPriorities>
                                 <customSpacing>
-                                    <real value="3.4028234663852886e+38"/>
-                                    <real value="3.4028234663852886e+38"/>
-                                    <real value="3.4028234663852886e+38"/>
                                     <real value="3.4028234663852886e+38"/>
                                 </customSpacing>
                             </stackView>
                         </subviews>
                         <constraints>
-                            <constraint firstItem="Z3O-9X-zTx" firstAttribute="leading" secondItem="VAn-Ub-6ym" secondAttribute="leading" constant="20" symbolic="YES" id="09A-gQ-1he"/>
-                            <constraint firstItem="Z3O-9X-zTx" firstAttribute="top" secondItem="VAn-Ub-6ym" secondAttribute="top" constant="20" symbolic="YES" id="4xH-RA-Tb8"/>
-                            <constraint firstAttribute="bottom" secondItem="Z3O-9X-zTx" secondAttribute="bottom" constant="20" symbolic="YES" id="Fj5-g3-Lmp"/>
-                            <constraint firstAttribute="trailing" secondItem="Z3O-9X-zTx" secondAttribute="trailing" constant="20" symbolic="YES" id="TCH-6y-MpT"/>
+                            <constraint firstAttribute="trailing" secondItem="q5Y-aZ-YzJ" secondAttribute="trailing" constant="20" symbolic="YES" id="5DL-hf-UeQ"/>
+                            <constraint firstItem="yOK-pe-Vf8" firstAttribute="top" secondItem="VAn-Ub-6ym" secondAttribute="top" id="Huw-wP-QVq"/>
+                            <constraint firstAttribute="trailing" secondItem="yOK-pe-Vf8" secondAttribute="trailing" constant="20" symbolic="YES" id="KZ9-xn-ieI"/>
+                            <constraint firstItem="q5Y-aZ-YzJ" firstAttribute="leading" secondItem="VAn-Ub-6ym" secondAttribute="leading" constant="20" symbolic="YES" id="Nnt-nT-fbh"/>
+                            <constraint firstAttribute="bottom" secondItem="q5Y-aZ-YzJ" secondAttribute="bottom" id="TeH-hS-zK4"/>
+                            <constraint firstItem="q5Y-aZ-YzJ" firstAttribute="top" secondItem="yOK-pe-Vf8" secondAttribute="bottom" constant="8" symbolic="YES" id="etf-JR-ZVS"/>
+                            <constraint firstItem="yOK-pe-Vf8" firstAttribute="leading" secondItem="VAn-Ub-6ym" secondAttribute="leading" constant="20" symbolic="YES" id="xKW-n0-G7D"/>
                         </constraints>
                     </view>
                     <connections>
-                        <outlet property="duplicateImportsLabel" destination="bui-vy-kLo" id="86Y-hE-itQ"/>
-                        <outlet property="failedImportsLabel" destination="Vkm-fr-rZ8" id="9ga-ma-PpF"/>
-                        <outlet property="importCompleteLabel" destination="kEX-xf-rNu" id="c3O-E1-wxS"/>
-                        <outlet property="successfulImportsLabel" destination="Wew-SV-bZw" id="9Cf-U1-eeQ"/>
+                        <outlet property="successfulImportsLabel" destination="ztY-4S-VwY" id="5Vy-yT-Dr3"/>
                     </connections>
                 </viewController>
                 <customObject id="9fr-6f-wQR" userLabel="First Responder" customClass="NSResponder" sceneMemberID="firstResponder"/>
+                <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" id="TSR-vm-rkH">
+                    <rect key="frame" x="0.0" y="0.0" width="473" height="16"/>
+                    <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+                    <textFieldCell key="cell" lineBreakMode="clipping" title="Import Complete:" id="gEB-Fs-DeJ">
+                        <font key="font" usesAppearanceFont="YES"/>
+                        <color key="textColor" name="labelColor" catalog="System" colorSpace="catalog"/>
+                        <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
+                    </textFieldCell>
+                </textField>
             </objects>
             <point key="canvasLocation" x="661" y="9"/>
         </scene>
