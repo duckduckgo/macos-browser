@@ -46,19 +46,22 @@ final class LongPressButton: MouseOverButton {
 
         let timer = Timer(timeInterval: 0.3, repeats: false) { [weak self] _ in
             self?.displayMenu(menu)
-            guard let event = event.copyMouseEvent() else { return }
+            guard let event = event.makeMouseUpEvent() else { return }
             // post new event to unblock waiting for nextEvent
             self?.window?.postEvent(event, atStart: true)
         }
         menuTimer = timer
         RunLoop.current.add(timer, forMode: .eventTracking)
 
-        defer {
-            menuTimer?.invalidate()
-            menuTimer = nil
-            self.isMouseDown = false
-        }
+        trackMouseEvents(withDelayedMenu: menu)
 
+        menuTimer?.invalidate()
+        menuTimer = nil
+
+        self.isMouseDown = false
+    }
+
+    private func trackMouseEvents(withDelayedMenu menu: NSMenu) {
         while let event = self.window?.nextEvent(matching: [.leftMouseDragged, .leftMouseUp]) {
             switch event.type {
             case .leftMouseDragged:
@@ -83,7 +86,7 @@ final class LongPressButton: MouseOverButton {
         }
     }
 
-    func displayMenu(_ menu: NSMenu) {
+    private func displayMenu(_ menu: NSMenu) {
         menuTimer?.invalidate()
         menuTimer = nil
 
@@ -93,7 +96,7 @@ final class LongPressButton: MouseOverButton {
 }
 
 private extension NSEvent {
-    func copyMouseEvent() -> NSEvent? {
+    func makeMouseUpEvent() -> NSEvent? {
         return NSEvent.mouseEvent(with: .leftMouseUp,
                                   location: self.locationInWindow,
                                   modifierFlags: self.modifierFlags,
