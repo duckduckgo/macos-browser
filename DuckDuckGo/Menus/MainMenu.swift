@@ -27,6 +27,7 @@ final class MainMenu: NSMenu {
     
     @IBOutlet weak var printSeparatorItem: NSMenuItem?
     @IBOutlet weak var printMenuItem: NSMenuItem?
+    @IBOutlet weak var shareMenuItem: NSMenuItem!
 
     @IBOutlet weak var checkSpellingWhileTypingMenuItem: NSMenuItem?
     @IBOutlet weak var checkGrammarWithSpellingMenuItem: NSMenuItem?
@@ -54,6 +55,8 @@ final class MainMenu: NSMenu {
     @IBOutlet weak var zoomOutMenuItem: NSMenuItem?
     @IBOutlet weak var actualSizeMenuItem: NSMenuItem?
 
+    let sharingMenu = SharingMenu()
+
     required init(coder: NSCoder) {
         super.init(coder: coder)
 
@@ -69,6 +72,8 @@ final class MainMenu: NSMenu {
             printMenuItem?.removeFromParent()
             printSeparatorItem?.removeFromParent()
         }
+        sharingMenu.title = shareMenuItem.title
+        shareMenuItem.submenu = sharingMenu
 
 #if !OUT_OF_APPSTORE
 
@@ -79,7 +84,7 @@ final class MainMenu: NSMenu {
     }
 
     private func setup() {
-
+        self.delegate = self
 #if !FEEDBACK
 
         guard let helpMenuItemSubmenu = helpMenuItem?.submenu,
@@ -188,6 +193,19 @@ final class MainMenu: NSMenu {
         favoritesMenu.items = Array(cleanedFavoriteItems) + favoriteItems
     }
     // swiftlint:enable function_body_length
+
+}
+
+extension MainMenu: NSMenuDelegate {
+
+    func menuHasKeyEquivalent(_ menu: NSMenu,
+                              for event: NSEvent,
+                              target: AutoreleasingUnsafeMutablePointer<AnyObject?>,
+                              action: UnsafeMutablePointer<Selector?>) -> Bool {
+        sharingMenu.update()
+        shareMenuItem.submenu = sharingMenu
+        return false
+    }
 
 }
 
