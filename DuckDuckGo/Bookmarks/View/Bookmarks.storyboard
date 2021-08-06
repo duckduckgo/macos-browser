@@ -124,6 +124,7 @@
                     </view>
                     <connections>
                         <outlet property="outlineView" destination="dHL-py-g9k" id="api-Ie-inb"/>
+                        <outlet property="outlineViewMenu" destination="DJD-ds-MWN" id="uxv-hq-caC"/>
                         <outlet property="tabSwitcherButton" destination="oJB-Na-CzV" id="bTP-2t-WcW"/>
                     </connections>
                 </viewController>

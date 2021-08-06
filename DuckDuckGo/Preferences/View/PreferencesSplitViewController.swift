@@ -59,7 +59,7 @@ final class PreferencesSplitViewController: NSSplitViewController {
         sidebarViewController.delegate = self
         subscribeToListViewControllerVisibleIndex()
 
-        tabSwitcherButton.displayBrowserTabButtons(withSelectedTab: .preferences)
+        sidebarViewController.tabSwitcherButton.displayBrowserTabButtons(withSelectedTab: .preferences)
     }
 
     private func subscribeToListViewControllerVisibleIndex() {
@@ -70,7 +70,7 @@ final class PreferencesSplitViewController: NSSplitViewController {
             self?.sidebarViewController.detailViewScrolledTo(rowAtIndex: index)
         }.store(in: &cancellables)
 
-        tabSwitcherButton.selectionPublisher.sink { [weak self] index in
+        sidebarViewController.tabSwitcherButton.selectionPublisher.sink { [weak self] index in
             self?.delegate?.selectedTab(at: index)
         }.store(in: &cancellables)
     }
@@ -99,14 +99,6 @@ extension PreferencesSplitViewController: PreferencesSidebarViewControllerDelega
     private func showDetailViewController(_ viewController: NSViewController) {
         let splitViewItem = NSSplitViewItem(viewController: viewController)
         splitViewItems[1] = splitViewItem
-    }
-
-}
-
-extension PreferencesSplitViewController: BrowserTabEmbeddable {
-
-    var tabSwitcherButton: NSPopUpButton {
-        return sidebarViewController.tabSwitcherButton
     }
 
 }

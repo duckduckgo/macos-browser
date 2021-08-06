@@ -36,6 +36,7 @@ final class BookmarkManagementSidebarViewController: NSViewController {
 
     @IBOutlet var tabSwitcherButton: NSPopUpButton!
     @IBOutlet var outlineView: NSOutlineView!
+    @IBOutlet var outlineViewMenu: NSMenu!
 
     weak var delegate: BookmarkManagementSidebarViewControllerDelegate?
 
@@ -91,6 +92,11 @@ final class BookmarkManagementSidebarViewController: NSViewController {
         LocalBookmarkManager.shared.listPublisher.receive(on: RunLoop.main).sink { [weak self] _ in
             self?.reloadData()
         }.store(in: &cancellables)
+    }
+
+    override func viewWillAppear() {
+        super.viewWillAppear()
+        tabSwitcherButton.select(tabType: .bookmarks)
     }
 
     func select(folder: BookmarkFolder) {

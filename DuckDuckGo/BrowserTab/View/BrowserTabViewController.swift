@@ -201,7 +201,6 @@ final class BrowserTabViewController: NSViewController {
             self.webView?.removeFromSuperview()
             self.addChild(bookmarksViewController)
             view.addAndLayout(bookmarksViewController.view)
-            bookmarksViewController.tabSwitcherButton.select(tabType: .bookmarks)
 
         case .preferences:
             self.homepageView.removeFromSuperview()
@@ -209,7 +208,6 @@ final class BrowserTabViewController: NSViewController {
             self.webView?.removeFromSuperview()
             self.addChild(preferencesViewController)
             view.addAndLayout(preferencesViewController.view)
-            bookmarksViewController.tabSwitcherButton.select(tabType: .preferences)
 
         case .standard:
             self.homepageView.removeFromSuperview()
