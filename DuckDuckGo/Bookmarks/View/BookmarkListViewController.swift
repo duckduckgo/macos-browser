@@ -40,6 +40,7 @@ final class BookmarkListViewController: NSViewController {
     weak var delegate: BookmarkListViewControllerDelegate?
 
     @IBOutlet var outlineView: NSOutlineView!
+    @IBOutlet var contextMenu: NSMenu!
     
     private var cancellables = Set<AnyCancellable>()
     private var bookmarkManager: BookmarkManager = LocalBookmarkManager.shared

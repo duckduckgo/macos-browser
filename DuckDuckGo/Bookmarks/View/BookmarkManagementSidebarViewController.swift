@@ -36,7 +36,7 @@ final class BookmarkManagementSidebarViewController: NSViewController {
 
     @IBOutlet var tabSwitcherButton: NSPopUpButton!
     @IBOutlet var outlineView: NSOutlineView!
-    @IBOutlet var outlineViewMenu: NSMenu!
+    @IBOutlet var contextMenu: NSMenu!
 
     weak var delegate: BookmarkManagementSidebarViewControllerDelegate?
 

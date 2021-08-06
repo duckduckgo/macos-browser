@@ -123,8 +123,8 @@
                         </constraints>
                     </view>
                     <connections>
+                        <outlet property="contextMenu" destination="DJD-ds-MWN" id="aRT-7y-Ufb"/>
                         <outlet property="outlineView" destination="dHL-py-g9k" id="api-Ie-inb"/>
-                        <outlet property="outlineViewMenu" destination="DJD-ds-MWN" id="uxv-hq-caC"/>
                         <outlet property="tabSwitcherButton" destination="oJB-Na-CzV" id="bTP-2t-WcW"/>
                     </connections>
                 </viewController>
@@ -277,6 +277,7 @@
                     </view>
                     <connections>
                         <outlet property="colorView" destination="pWh-Hk-YzZ" id="n4l-p3-mej"/>
+                        <outlet property="contextMenu" destination="f4d-eZ-YLo" id="qae-Le-1CK"/>
                         <outlet property="tableView" destination="b59-XH-JSp" id="PpV-fJ-Dcg"/>
                     </connections>
                 </viewController>
@@ -766,6 +767,7 @@ Gw
                         </constraints>
                     </view>
                     <connections>
+                        <outlet property="contextMenu" destination="glL-gu-nIh" id="hNS-Ys-6PW"/>
                         <outlet property="outlineView" destination="66p-cd-DbA" id="Shg-RA-vKK"/>
                     </connections>
                 </viewController>
