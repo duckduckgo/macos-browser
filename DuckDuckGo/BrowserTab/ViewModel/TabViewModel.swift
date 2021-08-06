@@ -36,8 +36,8 @@ final class TabViewModel {
     private var webViewStateObserver: WebViewStateObserver?
 
     @Published var canGoForward: Bool = false
-    @Published var canGoBack: Bool = false
-    @Published var canReload: Bool = false
+    @Published private(set) var canGoBack: Bool = false
+    @Published private(set) var canReload: Bool = false
     @Published var canBeBookmarked: Bool = false
     @Published var isLoading: Bool = false {
         willSet {
@@ -101,6 +101,10 @@ final class TabViewModel {
 
     private func updateCanReload() {
         canReload = tab.url != nil
+    }
+
+    func updateCanGoBack() {
+        canGoBack = tab.webView.canGoBack || (tab.parentTab != nil && tab.canGoBackToClose)
     }
 
     private func updateCanBeBookmarked() {

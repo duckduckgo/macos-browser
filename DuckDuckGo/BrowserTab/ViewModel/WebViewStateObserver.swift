@@ -55,7 +55,7 @@ final class WebViewStateObserver: NSObject {
             return
         }
 
-        tabViewModel.canGoBack = webView.canGoBack
+        tabViewModel.updateCanGoBack()
         tabViewModel.canGoForward = webView.canGoForward
         tabViewModel.isLoading = webView.isLoading
     }
@@ -86,7 +86,7 @@ final class WebViewStateObserver: NSObject {
             }
             updateTitle() // The title might not change if webView doesn't think anything is different so update title here as well
 
-        case #keyPath(WKWebView.canGoBack): tabViewModel.canGoBack = webView.canGoBack
+        case #keyPath(WKWebView.canGoBack): tabViewModel.updateCanGoBack()
         case #keyPath(WKWebView.canGoForward): tabViewModel.canGoForward = webView.canGoForward
         case #keyPath(WKWebView.isLoading): tabViewModel.isLoading = webView.isLoading
         case #keyPath(WKWebView.title):

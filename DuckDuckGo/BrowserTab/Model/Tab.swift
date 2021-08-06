@@ -88,7 +88,8 @@ final class Tab: NSObject {
          favicon: NSImage? = nil,
          sessionStateData: Data? = nil,
          parentTab: Tab? = nil,
-         shouldLoadInBackground: Bool = false) {
+         shouldLoadInBackground: Bool = false,
+         canGoBackToClose: Bool = false) {
 
         self.tabType = tabType
         self.faviconService = faviconService
@@ -98,6 +99,7 @@ final class Tab: NSObject {
         self.error = error
         self.favicon = favicon
         self.parentTab = parentTab
+        self.canGoBackToClose = canGoBackToClose
         self.sessionStateData = sessionStateData
 
         let configuration = webViewConfiguration ?? WKWebViewConfiguration()
@@ -143,6 +145,7 @@ final class Tab: NSObject {
     @PublishedAfter var error: Error?
 
     weak private(set) var parentTab: Tab?
+    var canGoBackToClose: Bool
 
     weak var findInPage: FindInPageModel? {
         didSet {
@@ -227,6 +230,13 @@ final class Tab: NSObject {
     }
 
     func goBack() {
+        guard self.webView.canGoBack else {
+            if self.parentTab != nil {
+                delegate?.closeTab(self)
+            }
+            return
+        }
+
         shouldStoreNextVisit = false
         webView.goBack()
     }
@@ -414,6 +424,7 @@ final class Tab: NSObject {
     private var shouldStoreNextVisit = true
 
     func addVisit(of url: URL) {
+        canGoBackToClose = false
         guard shouldStoreNextVisit else {
             shouldStoreNextVisit = true
             return
