@@ -588,13 +588,13 @@
                                             <constraint firstAttribute="height" constant="32" id="fQf-sl-KYI"/>
                                         </constraints>
                                     </customView>
-                                    <button hidden="YES" translatesAutoresizingMaskIntoConstraints="NO" id="nOW-iY-XmO" customClass="AddressBarButton" customModule="DuckDuckGo_Privacy_Browser" customModuleProvider="target">
+                                    <button hidden="YES" translatesAutoresizingMaskIntoConstraints="NO" id="nOW-iY-XmO" customClass="PrivacyEntryPointAddressBarButton" customModule="DuckDuckGo_Privacy_Browser" customModuleProvider="target">
                                         <rect key="frame" x="0.0" y="0.0" width="32" height="32"/>
                                         <constraints>
                                             <constraint firstAttribute="width" constant="32" id="Hf1-nK-Kb4"/>
                                             <constraint firstAttribute="height" constant="32" id="NcD-Mf-Vae"/>
                                         </constraints>
-                                        <buttonCell key="cell" type="square" bezelStyle="shadowlessSquare" image="PrivacyEntryPoint" imagePosition="only" alignment="center" inset="2" id="ZJj-fb-53u">
+                                        <buttonCell key="cell" type="square" bezelStyle="shadowlessSquare" image="PrivacyIcon001" imagePosition="only" alignment="center" inset="2" id="ZJj-fb-53u">
                                             <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
                                             <font key="font" metaFont="system"/>
                                         </buttonCell>
@@ -688,7 +688,7 @@
         <image name="Forward" width="16" height="16"/>
         <image name="HomeFavicon" width="16" height="16"/>
         <image name="PasswordManagement" width="16" height="16"/>
-        <image name="PrivacyEntryPoint" width="16" height="16"/>
+        <image name="PrivacyIcon001" width="32" height="32"/>
         <image name="Refresh" width="16" height="16"/>
         <image name="Settings" width="16" height="16"/>
         <image name="Share" width="16" height="16"/>

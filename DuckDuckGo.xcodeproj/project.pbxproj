@@ -295,6 +295,8 @@
 		AAB549DF25DAB8F80058460B /* BookmarkViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = AAB549DE25DAB8F80058460B /* BookmarkViewModel.swift */; };
 		AAB8203C26B2DE0D00788AC3 /* SuggestionListCharacteristics.swift in Sources */ = {isa = PBXBuildFile; fileRef = AAB8203B26B2DE0D00788AC3 /* SuggestionListCharacteristics.swift */; };
 		AABAF59C260A7D130085060C /* FaviconServiceMock.swift in Sources */ = {isa = PBXBuildFile; fileRef = AABAF59B260A7D130085060C /* FaviconServiceMock.swift */; };
+		AABDEA0226BC80D600174FA6 /* PrivacyEntryPointAddressBarButton.swift in Sources */ = {isa = PBXBuildFile; fileRef = AABDEA0126BC80D600174FA6 /* PrivacyEntryPointAddressBarButton.swift */; };
+		AABDEA0426BD443900174FA6 /* TrackerInfo.swift in Sources */ = {isa = PBXBuildFile; fileRef = AABDEA0326BD443900174FA6 /* TrackerInfo.swift */; };
 		AABEE69A24A902A90043105B /* SuggestionContainerViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = AABEE69924A902A90043105B /* SuggestionContainerViewModel.swift */; };
 		AABEE69C24A902BB0043105B /* SuggestionContainer.swift in Sources */ = {isa = PBXBuildFile; fileRef = AABEE69B24A902BB0043105B /* SuggestionContainer.swift */; };
 		AABEE6A524AA0A7F0043105B /* SuggestionViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = AABEE6A424AA0A7F0043105B /* SuggestionViewController.swift */; };
@@ -738,6 +740,8 @@
 		AAB549DE25DAB8F80058460B /* BookmarkViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BookmarkViewModel.swift; sourceTree = "<group>"; };
 		AAB8203B26B2DE0D00788AC3 /* SuggestionListCharacteristics.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SuggestionListCharacteristics.swift; sourceTree = "<group>"; };
 		AABAF59B260A7D130085060C /* FaviconServiceMock.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FaviconServiceMock.swift; sourceTree = "<group>"; };
+		AABDEA0126BC80D600174FA6 /* PrivacyEntryPointAddressBarButton.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PrivacyEntryPointAddressBarButton.swift; sourceTree = "<group>"; };
+		AABDEA0326BD443900174FA6 /* TrackerInfo.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TrackerInfo.swift; sourceTree = "<group>"; };
 		AABEE69924A902A90043105B /* SuggestionContainerViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SuggestionContainerViewModel.swift; sourceTree = "<group>"; };
 		AABEE69B24A902BB0043105B /* SuggestionContainer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SuggestionContainer.swift; sourceTree = "<group>"; };
 		AABEE6A424AA0A7F0043105B /* SuggestionViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SuggestionViewController.swift; sourceTree = "<group>"; };
@@ -1804,6 +1808,7 @@
 				AABEE6AE24AD22B90043105B /* AddressBarTextField.swift */,
 				AAC5E4F525D6BF2C007F5990 /* AddressBarButtonsViewController.swift */,
 				AAC5E4F025D6BF10007F5990 /* AddressBarButton.swift */,
+				AABDEA0126BC80D600174FA6 /* PrivacyEntryPointAddressBarButton.swift */,
 				AAA0CC32252F181A0079BC96 /* NavigationButtonMenuDelegate.swift */,
 				AAA0CC462533833C0079BC96 /* OptionsButtonMenu.swift */,
 			);
@@ -1854,6 +1859,7 @@
 				B633C86C25E797D800E4B352 /* UserScriptsManager.swift */,
 				AAF7D3852567CED500998667 /* WebViewConfiguration.swift */,
 				B61F015425EDD5A700ABB5A3 /* UserContentController.swift */,
+				AABDEA0326BD443900174FA6 /* TrackerInfo.swift */,
 			);
 			path = Model;
 			sourceTree = "<group>";
@@ -2770,6 +2776,7 @@
 				4B723E1226B0006E00E14D75 /* DataImport.swift in Sources */,
 				B6A924D92664C72E001A28CA /* WebKitDownloadTask.swift in Sources */,
 				85D885B326A5A9DE0077C374 /* NSAlert+PasswordManager.swift in Sources */,
+				AABDEA0426BD443900174FA6 /* TrackerInfo.swift in Sources */,
 				85E11C2F25E7DC7E00974CAF /* ExternalURLHandler.swift in Sources */,
 				85308E27267FCB22001ABD76 /* PasswordManagerSettings.swift in Sources */,
 				85A0116925AF1D8900FA6A0C /* FindInPageViewController.swift in Sources */,
@@ -2850,6 +2857,7 @@
 				4B723E1526B000A400E14D75 /* LoginExport.swift in Sources */,
 				4BA1A69B258B076900F6F690 /* FileStore.swift in Sources */,
 				4B0511CC262CAA5A00F6079C /* PreferencesSplitViewController.swift in Sources */,
+				AABDEA0226BC80D600174FA6 /* PrivacyEntryPointAddressBarButton.swift in Sources */,
 				AAFCB37A25E5403A00859DD4 /* BurnButton.swift in Sources */,
 				B6A9E47F26146A800067D1B9 /* PixelArguments.swift in Sources */,
 				4B677436255DBEB800025BD8 /* HTTPSExcludedDomains.swift in Sources */,

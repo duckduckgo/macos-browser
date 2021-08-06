@@ -114,6 +114,8 @@ final class Tab: NSObject {
            let host = url?.host {
             faviconService.cacheIfNeeded(favicon: favicon, for: host, isFromUserScript: false)
         }
+
+        updateDashboardInfo(url: url)
     }
 
     deinit {
@@ -135,6 +137,7 @@ final class Tab: NSObject {
             }
 
             invalidateSessionStateData()
+            updateDashboardInfo(oldUrl: oldValue, url: url)
             reloadIfNeeded()
         }
     }
@@ -425,6 +428,21 @@ final class Tab: NSObject {
         historyCoordinating.updateTitleIfNeeded(title: title, url: url)
     }
 
+    // MARK: - Dashboard Info
+
+    @Published var trackerInfo: TrackerInfo?
+
+    private func updateDashboardInfo(oldUrl: URL? = nil, url: URL?) {
+        guard let url = url, let host = url.host else {
+            trackerInfo = nil
+            return
+        }
+
+        if oldUrl?.host != host || oldUrl?.scheme != url.scheme {
+            trackerInfo = TrackerInfo()
+        }
+    }
+
 }
 
 extension Tab: PageObserverUserScriptDelegate {
@@ -471,16 +489,19 @@ extension Tab: FaviconUserScriptDelegate {
 extension Tab: ContentBlockerUserScriptDelegate {
 
     func contentBlockerUserScriptShouldProcessTrackers(_ script: UserScript) -> Bool {
-        // Not used until site rating support is implemented.
         return true
     }
 
-    func contentBlockerUserScript(_ script: ContentBlockerUserScript, detectedTracker tracker: DetectedTracker, withSurrogate host: String) {
-        // Not used until site rating support is implemented.
+    func contentBlockerUserScript(_ script: ContentBlockerUserScript,
+                                  detectedTracker tracker: DetectedTracker,
+                                  withSurrogate host: String) {
+        trackerInfo?.add(installedSurrogateHost: host)
+
+        contentBlockerUserScript(script, detectedTracker: tracker)
     }
 
     func contentBlockerUserScript(_ script: UserScript, detectedTracker tracker: DetectedTracker) {
-        // Not used until site rating support is implemented.
+        trackerInfo?.add(detectedTracker: tracker)
     }
 
 }

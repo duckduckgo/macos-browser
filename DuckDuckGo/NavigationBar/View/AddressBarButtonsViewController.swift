@@ -37,7 +37,7 @@ final class AddressBarButtonsViewController: NSViewController {
 
     private lazy var bookmarkPopover = BookmarkPopover()
 
-    @IBOutlet weak var privacyEntryPointButton: AddressBarButton!
+    @IBOutlet weak var privacyEntryPointButton: PrivacyEntryPointAddressBarButton!
     @IBOutlet weak var bookmarkButton: AddressBarButton!
     @IBOutlet weak var imageButtonWrapper: NSView!
     @IBOutlet weak var imageButton: NSButton!
@@ -62,6 +62,7 @@ final class AddressBarButtonsViewController: NSViewController {
 
     private var selectedTabViewModelCancellable: AnyCancellable?
     private var urlCancellable: AnyCancellable?
+    private var trackerInfoCancellable: AnyCancellable?
     private var bookmarkListCancellable: AnyCancellable?
 
     required init?(coder: NSCoder) {
@@ -90,6 +91,8 @@ final class AddressBarButtonsViewController: NSViewController {
 
     @IBAction func bookmarkButtonAction(_ sender: Any) {
         openBookmarkPopover(setFavorite: false, accessPoint: .button)
+
+        privacyEntryPointButton.animate()
     }
 
     @IBAction func clearButtonAction(_ sender: Any) {
@@ -173,6 +176,7 @@ final class AddressBarButtonsViewController: NSViewController {
     private func subscribeToSelectedTabViewModel() {
         selectedTabViewModelCancellable = tabCollectionViewModel.$selectedTabViewModel.receive(on: DispatchQueue.main).sink { [weak self] _ in
             self?.subscribeToUrl()
+            self?.subscribeToTrackerInfo()
         }
     }
 
@@ -189,6 +193,18 @@ final class AddressBarButtonsViewController: NSViewController {
         }
     }
 
+    private func subscribeToTrackerInfo() {
+        trackerInfoCancellable?.cancel()
+
+        updatePrivacyEntryPointButton(trackerInfo: tabCollectionViewModel.selectedTabViewModel?.tab.trackerInfo, animated: false)
+        trackerInfoCancellable = tabCollectionViewModel.selectedTabViewModel?.tab.$trackerInfo
+            .dropFirst()
+            .receive(on: DispatchQueue.main)
+            .sink { [weak self] trackerInfo in
+                self?.updatePrivacyEntryPointButton(trackerInfo: trackerInfo, animated: true)
+            }
+    }
+
     private func subscribeToBookmarkList() {
         bookmarkListCancellable = bookmarkManager.listPublisher.receive(on: DispatchQueue.main).sink { [weak self] _ in
             self?.updateBookmarkButtonImage()
@@ -203,6 +219,20 @@ final class AddressBarButtonsViewController: NSViewController {
         } else {
             bookmarkButton.image = Self.bookmarkImage
             bookmarkButton.contentTintColor = nil
+        }
+    }
+
+    private func updatePrivacyEntryPointButton(trackerInfo: TrackerInfo?, animated: Bool) {
+        guard let trackerInfo = trackerInfo,
+              !trackerInfo.trackersBlocked.isEmpty else {
+            privacyEntryPointButton.reset()
+            return
+        }
+
+        if animated {
+            privacyEntryPointButton.animate()
+        } else {
+            privacyEntryPointButton.setFinal()
         }
     }
 
