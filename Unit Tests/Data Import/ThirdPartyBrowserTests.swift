@@ -1,5 +1,5 @@
 //
-//  MockFileStore.swift
+//  ThirdPartyBrowserTests.swift
 //
 //  Copyright © 2021 DuckDuckGo. All rights reserved.
 //
@@ -17,27 +17,11 @@
 //
 
 import Foundation
+import XCTest
 @testable import DuckDuckGo_Privacy_Browser
 
-final class MockFileStore: FileStore {
+class ThirdPartyBrowserTests: XCTestCase {
 
-    var persistedFiles: [URL: Data] = [:]
-
-    func persist(_ data: Data, url: URL) -> Bool {
-        persistedFiles[url] = data
-        return true
-    }
-
-    func loadData(at url: URL) -> Data? {
-        return persistedFiles[url]
-    }
-
-    func hasData(at url: URL) -> Bool {
-        return persistedFiles[url] != nil
-    }
-
-    func remove(fileAtURL url: URL) {
-        persistedFiles[url] = nil
-    }
+    
 
 }
