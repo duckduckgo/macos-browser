@@ -162,9 +162,10 @@ final class FirefoxLoginReader {
     private func decrypt(logins: EncryptedFirefoxLogins, with key: Data) -> [ImportedLoginCredential] {
         var credentials = [ImportedLoginCredential]()
 
-        // WARNING (@sam): This will need to look for a metadata row. Need to reproduce that and see what the row contains, I think it only happens
-        // when you're signed into a Mozilla account.
-        for login in logins.logins {
+        // Filter out rows that are used by the Firefox sync service.
+        let loginsToImport = logins.logins.filter { $0.hostname != "chrome://FirefoxAccounts" }
+
+        for login in loginsToImport {
             let decryptedUsername = decrypt(credential: login.encryptedUsername, key: key)
             let decryptedPassword = decrypt(credential: login.encryptedPassword, key: key)
 
@@ -177,7 +178,10 @@ final class FirefoxLoginReader {
     }
 
     private func decrypt(credential: String, key: Data) -> String? {
-        let base64Decoded = Data(base64Encoded: credential)!
+        guard let base64Decoded = Data(base64Encoded: credential) else {
+            return nil
+        }
+
         let asn1Decoded = try? ASN1Parser.parse(data: base64Decoded)
 
         // Extract the top level sequence of the ASN1 value:
@@ -223,9 +227,6 @@ private struct EncryptedFirefoxLogins: Decodable {
 
 }
 
-// The code here really sucks :( The class used to parse ASN1 values decodes them into enum values, which then have to be unwrapped
-// all the way down to the value you want. Something like case paths would help here: https://github.com/pointfreeco/swift-case-paths
-// When we do this for real, it would be better to write/use something that doesn't use enums.
 extension FirefoxLoginReader {
 
     private func extractEntrySalt(from tlv: ASN1Parser.Node) -> Data? {
@@ -257,7 +258,6 @@ extension FirefoxLoginReader {
             return nil
         }
 
-        // Get key
         let fifthValue = values5[0]
 
         guard case let .octetString(data: data) = fifthValue else {
