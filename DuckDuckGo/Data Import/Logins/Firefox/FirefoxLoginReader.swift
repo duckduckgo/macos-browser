@@ -86,33 +86,44 @@ final class FirefoxLoginReader {
             let queue = try DatabaseQueue(path: databasePath)
 
             try queue.read { database in
-                let metadataRow = try? Row.fetchOne(database, sql: "SELECT item1, item2 FROM metadata WHERE id = 'password'")
-                let globalSalt: Data = metadataRow!["item1"]
-                let item2: Data = metadataRow!["item2"]
+                guard let metadataRow = try? Row.fetchOne(database, sql: "SELECT item1, item2 FROM metadata WHERE id = 'password'") else {
+                    error = .databaseAccessFailed
+                    return
+                }
 
-                let decodedItem2 = try? ASN1Parser.parse(data: item2)
-                let iv = extractInitializationVector(from: decodedItem2!)!
+                let globalSalt: Data = metadataRow["item1"]
+                let item2: Data = metadataRow["item2"]
 
-                let decryptedItem2 = aesDecrypt(tlv: decodedItem2!,
-                                                iv: iv,
-                                                globalSalt: globalSalt)
-                let string = String(data: decryptedItem2!, encoding: .utf8)
+                guard let decodedItem2 = try? ASN1Parser.parse(data: item2),
+                      let iv = extractInitializationVector(from: decodedItem2),
+                      let decryptedItem2 = aesDecrypt(tlv: decodedItem2, iv: iv, globalSalt: globalSalt) else {
+                    error = .decryptionFailed
+                    return
+                }
 
-                // Decrypted check is technically "password-check\x02\x02", it's converted to UTF-8 and checked here
+                let string = String(data: decryptedItem2, encoding: .utf8)
+
+                // The password check is technically "password-check\x02\x02", it's converted to UTF-8 and checked here for simplicity
                 if string != "password-check" {
                     error = .requiresPrimaryPassword
                 }
 
-                let nssPrivateRow = try? Row.fetchOne(database, sql: "SELECT a11, a102 FROM nssPrivate;")
-                let a11: Data = nssPrivateRow!["a11"]
-                let a102: Data = nssPrivateRow!["a102"]
+                guard let nssPrivateRow = try? Row.fetchOne(database, sql: "SELECT a11, a102 FROM nssPrivate;") else {
+                    error = .decryptionFailed
+                    return
+                }
+
+                let a11: Data = nssPrivateRow["a11"]
+                let a102: Data = nssPrivateRow["a102"]
 
                 assert(a102 == Data([248, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1]))
 
-                let decodedA11 = try? ASN1Parser.parse(data: a11)
-                let newIV = extractInitializationVector(from: decodedA11!)!
+                guard let decodedA11 = try? ASN1Parser.parse(data: a11), let finalIV = extractInitializationVector(from: decodedA11) else {
+                    error = .decryptionFailed
+                    return
+                }
 
-                key = aesDecrypt(tlv: decodedA11!, iv: newIV, globalSalt: globalSalt)
+                key = aesDecrypt(tlv: decodedA11, iv: finalIV, globalSalt: globalSalt)
             }
         } catch {
             return .failure(.databaseAccessFailed)
@@ -138,25 +149,27 @@ final class FirefoxLoginReader {
     private func aesDecrypt(tlv: ASN1Parser.Node,
                             iv: Data,
                             globalSalt: Data) -> Data? {
-        let data = extractCiphertext(from: tlv)!
-        let entrySalt = extractEntrySalt(from: tlv)!
-        let iterationCount = extractIterationCount(from: tlv)!
-        let keyLength = extractKeyLength(from: tlv)!
+        guard let data = extractCiphertext(from: tlv),
+              let entrySalt = extractEntrySalt(from: tlv),
+              let iterationCount = extractIterationCount(from: tlv),
+              let keyLength = extractKeyLength(from: tlv) else { return nil }
 
         assert(keyLength == 32)
 
         let passwordData = globalSalt + (primaryPassword ?? "").data(using: .utf8)!
         let hashDataArray: [UInt8] = SHA.from(data: passwordData)
-        let commonCryptoKey = Cryptography.decryptPBKDF2(password: .base64(Data(hashDataArray).base64EncodedString()),
-                                                         salt: entrySalt,
-                                                         keyByteCount: keyLength,
-                                                         rounds: iterationCount,
-                                                         kdf: .sha256)
+        guard let commonCryptoKey = Cryptography.decryptPBKDF2(password: .base64(Data(hashDataArray).base64EncodedString()),
+                                                               salt: entrySalt,
+                                                               keyByteCount: keyLength,
+                                                               rounds: iterationCount,
+                                                               kdf: .sha256) else { return nil }
 
         let iv = Data([4, 14]) + iv
-        let decrypted = Cryptography.decryptAESCBC(data: data, key: commonCryptoKey!.dataRepresentation, iv: iv)
+        guard let decryptedData = Cryptography.decryptAESCBC(data: data, key: commonCryptoKey.dataRepresentation, iv: iv) else {
+            return nil
+        }
 
-        return Data(decrypted!)
+        return Data(decryptedData)
     }
 
     private func decrypt(logins: EncryptedFirefoxLogins, with key: Data) -> [ImportedLoginCredential] {
@@ -184,24 +197,10 @@ final class FirefoxLoginReader {
 
         let asn1Decoded = try? ASN1Parser.parse(data: base64Decoded)
 
-        // Extract the top level sequence of the ASN1 value:
-        //
-        // Index 0 = magic number for verification, skipped here because this is bad code lol
-        // Index 1 = initialization vector
-        // Index 2 = ciphertext
-        guard case let .sequence(topLevelValues) = asn1Decoded else {
-            return nil
-        }
-
-        guard case let .sequence(initializationVectorValues) = topLevelValues[1] else {
-            return nil
-        }
-
-        guard case let .octetString(initializationVector) = initializationVectorValues[1] else {
-            return nil
-        }
-
-        guard case let .octetString(ciphertext) = topLevelValues[2] else {
+        guard case let .sequence(topLevelValues) = asn1Decoded,
+              case let .sequence(initializationVectorValues) = topLevelValues[1],
+              case let .octetString(initializationVector) = initializationVectorValues[1],
+              case let .octetString(ciphertext) = topLevelValues[2] else {
             return nil
         }
 
