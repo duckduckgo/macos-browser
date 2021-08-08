@@ -49,13 +49,6 @@ enum DataImport {
         var canImportData: Bool {
             return ThirdPartyBrowser.browser(for: self)?.isInstalled ?? true
         }
-
-        var showSuccessScreen: Bool {
-            switch self {
-            case .csv: return true
-            default: return true
-            }
-        }
     }
 
     // Different data types (e.g. bookmarks) will be added later.
@@ -140,6 +133,7 @@ enum DataImportError: Error {
     case browserNeedsToBeClosed
     case needsLoginPrimaryPassword
     case cannotAccessSecureVault
+    case unknownError
 
 }
 

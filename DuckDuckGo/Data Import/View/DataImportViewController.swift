@@ -255,11 +255,7 @@ final class DataImportViewController: NSViewController {
                 if summary.isEmpty {
                     self.dismiss()
                 } else {
-                    if self.viewState.selectedImportSource.showSuccessScreen {
-                        self.viewState.interactionState = .completedImport(summary)
-                    } else {
-                        self.dismiss()
-                    }
+                    self.viewState.interactionState = .completedImport(summary)
                 }
 
                 self.fireImportLoginsPixelForSelectedImportSource()
@@ -284,6 +280,7 @@ final class DataImportViewController: NSViewController {
             let response = alert.runModal()
 
             if response == .alertFirstButtonReturn {
+                // Assume Firefox, as it's the only supported option that uses a password
                 let password = (alert.accessoryView as? NSSecureTextField)?.stringValue
                 (dataImporter as? FirefoxDataImporter)?.primaryPassword = password
 
@@ -342,7 +339,7 @@ extension NSPopUpButton {
 
         let validSources = DataImport.Source.allCases.filter(\.canImportData)
 
-        for (index, source) in validSources.enumerated() {
+        for source in validSources {
             // The CSV row is at the bottom of the picker, and requires a separator above it.
             if source == .csv {
                 let separator = NSMenuItem.separator()

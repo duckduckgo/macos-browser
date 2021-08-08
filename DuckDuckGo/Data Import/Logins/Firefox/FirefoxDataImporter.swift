@@ -32,16 +32,15 @@ final class FirefoxDataImporter: DataImporter {
         return [.logins]
     }
 
-    // swiftlint:disable cyclomatic_complexity
     func importData(types: [DataImport.DataType],
                     from profile: DataImport.BrowserProfile?,
                     completion: @escaping (Result<[DataImport.Summary], DataImportError>) -> Void) {
-        guard let defaultPath = defaultFirefoxProfilePath() else {
+        guard let firefoxProfileURL = profile?.profileURL ?? defaultFirefoxProfilePath() else {
             completion(.failure(.cannotReadFile))
             return
         }
 
-        let loginReader = FirefoxLoginReader(firefoxProfileURL: profile?.profileURL ?? defaultPath, primaryPassword: self.primaryPassword)
+        let loginReader = FirefoxLoginReader(firefoxProfileURL: firefoxProfileURL, primaryPassword: self.primaryPassword)
         let loginResult = loginReader.readLogins()
 
         switch loginResult {
@@ -53,42 +52,23 @@ final class FirefoxDataImporter: DataImporter {
                 completion(.failure(.cannotAccessSecureVault))
             }
         case .failure(let error):
-
-            switch error {
-            case .couldNotFindProfile:
-                let alert = NSAlert.failureAlert(message: "Could not find profile")
-                alert.runModal()
-            case .couldNotGetDecryptionKey:
-                let alert = NSAlert.failureAlert(message: "Could not get decryption key")
-                alert.runModal()
-            case .couldNotReadLoginsFile:
-                let alert = NSAlert.failureAlert(message: "Could not read logins.json")
-                alert.runModal()
-            case .decryptionFailed:
-                let alert = NSAlert.failureAlert(message: "Decryption failed")
-                alert.runModal()
-            case .databaseAccessFailed:
-                let alert = NSAlert.failureAlert(message: "Firefox database access failed")
-                alert.runModal()
-            default: break
-            }
-
             switch error {
             case .requiresPrimaryPassword:
                 completion(.failure(.needsLoginPrimaryPassword))
-            default:
+            case .databaseAccessFailed:
                 completion(.failure(.browserNeedsToBeClosed))
+            default:
+                completion(.failure(.unknownError))
             }
         }
     }
 
     private func defaultFirefoxProfilePath() -> URL? {
-        let profile = ThirdPartyBrowser.firefox.browserProfiles
-
         guard let potentialProfiles = try? FileManager.default.contentsOfDirectory(atPath: profilesDirectoryURL().path) else {
             return nil
         }
 
+        // This is the value used by Firefox in production releases. Use it by default, if no profile is selected.
         let profiles = potentialProfiles.filter { $0.hasSuffix(".default-release") }
 
         guard let selectedProfile = profiles.first else {

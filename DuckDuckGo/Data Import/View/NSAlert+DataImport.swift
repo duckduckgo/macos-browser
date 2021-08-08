@@ -36,11 +36,22 @@ extension NSAlert {
         return alert
     }
 
-    static func importFailedAlert(source: DataImport.Source) -> NSAlert {
+    static func browserNeedsToBeClosedAlert(source: DataImport.Source) -> NSAlert {
         let alert = NSAlert()
 
         alert.messageText = "Import Failed"
         alert.informativeText = "Please ensure that \(source.importSourceName) is not running before importing data"
+        alert.alertStyle = .warning
+        alert.addButton(withTitle: "Okay")
+
+        return alert
+    }
+
+    static func importFailedAlert(source: DataImport.Source) -> NSAlert {
+        let alert = NSAlert()
+
+        alert.messageText = "Import Failed"
+        alert.informativeText = "Failed to import data from \(source.importSourceName)"
         alert.alertStyle = .warning
         alert.addButton(withTitle: "Okay")
 
