@@ -22,6 +22,14 @@ import XCTest
 
 class ThirdPartyBrowserTests: XCTestCase {
 
-    
+    func testWhenCreatingThirdPartyBrowser_AndValidBrowserIsProvided_ThenThirdPartyBrowserInitializationSucceeds() {
+        XCTAssertNotNil(ThirdPartyBrowser.browser(for: .brave))
+        XCTAssertNotNil(ThirdPartyBrowser.browser(for: .chrome))
+        XCTAssertNotNil(ThirdPartyBrowser.browser(for: .edge))
+    }
+
+    func testWhenCreatingThirdPartyBrowser_AndValidBrowserIsNotProvided_ThenThirdPartyBrowserInitializationFails() {
+        XCTAssertNil(ThirdPartyBrowser.browser(for: .csv))
+    }
 
 }
