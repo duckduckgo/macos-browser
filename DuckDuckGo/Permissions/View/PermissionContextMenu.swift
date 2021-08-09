@@ -21,134 +21,172 @@ import Cocoa
 protocol PermissionContextMenuDelegate: AnyObject {
     func permissionContextMenu(_ menu: PermissionContextMenu, mutePermissions: [PermissionType])
     func permissionContextMenu(_ menu: PermissionContextMenu, unmutePermissions: [PermissionType])
-    func permissionContextMenu(_ menu: PermissionContextMenu, alwaysAllowPermissions: [PermissionType])
-    func permissionContextMenu(_ menu: PermissionContextMenu, alwaysDenyPermissions: [PermissionType])
-    func permissionContextMenu(_ menu: PermissionContextMenu, resetStoredPermissions: [PermissionType])
-    func permissionContextMenu(_ menu: PermissionContextMenu, reloadPageForPermissions: [PermissionType])
+    func permissionContextMenu(_ menu: PermissionContextMenu, alwaysAllowPermission: PermissionType)
+    func permissionContextMenu(_ menu: PermissionContextMenu, alwaysDenyPermission: PermissionType)
+    func permissionContextMenu(_ menu: PermissionContextMenu, resetStoredPermission: PermissionType)
+    func permissionContextMenuReloadPage(_ menu: PermissionContextMenu)
 }
 
 final class PermissionContextMenu: NSMenu {
 
     let domain: String
-    let permissions: [PermissionType]
+    let permissions: Permissions
     weak var actionDelegate: PermissionContextMenuDelegate?
 
     required init(coder: NSCoder) {
         fatalError("PermissionContextMenu: Bad initializer")
     }
 
-    init(permissions: [PermissionType], state: PermissionState, domain: String, delegate: PermissionContextMenuDelegate?) {
+    init(permissions: Permissions, domain: String, delegate: PermissionContextMenuDelegate?) {
         self.domain = domain.dropWWW()
         self.permissions = permissions
         self.actionDelegate = delegate
         super.init(title: "")
 
-        setupMenuItems(state: state)
+        setupMenuItems()
     }
 
-    // swiftlint:disable function_body_length
-    // swiftlint:disable cyclomatic_complexity
-    private func setupMenuItems(state: PermissionState) {
-        switch state {
-        case .active, .inactive:
-            if permissions.contains(.camera) && permissions.contains(.microphone),
-               WKWebView.canMuteCameraAndMicrophoneSeparately {
-                addItem(.mute([.camera], target: self))
-                addItem(.mute([.microphone], target: self))
-            } else {
-                addItem(.mute(permissions, target: self))
-            }
-            addItem(.separator())
+    private func setupMenuItems() {
+        let remainingPermission = setupCameraPermissionsMenuItems()
+        setupOtherPermissionMenuItems(for: remainingPermission)
+        addPersistenceItems()
+    }
 
-            for permission in permissions where permission.canBePersisted {
-                if PermissionManager.shared.permission(forDomain: domain, permissionType: permission) == nil {
-                    addItem(.alwaysAllow(permission, on: domain, target: self))
-                } else {
-                    addItem(.alwaysAsk(permission, on: domain, target: self))
-                }
+    private func setupCameraPermissionsMenuItems() -> Permissions {
+        var permissions = permissions
+        let permissionTypes = permissions.keys.sorted(by: { lhs, _ in lhs == .camera })
+
+        switch permissions.camera {
+        case .active, .inactive:
+            if ![.active, .inactive].contains(permissions.microphone) || WKWebView.canMuteCameraAndMicrophoneSeparately {
+                addItem(.mute([.camera], target: self))
+            } else {
+                addItem(.mute(permissionTypes, target: self))
+                permissions.microphone = nil
             }
+            permissions.camera = nil
 
         case .paused:
-            if permissions.contains(.camera) && permissions.contains(.microphone),
-               WKWebView.canMuteCameraAndMicrophoneSeparately {
+            if permissions.microphone != .paused || WKWebView.canMuteCameraAndMicrophoneSeparately {
                 addItem(.unmute([.camera], target: self))
-                addItem(.unmute([.microphone], target: self))
             } else {
-                addItem(.unmute(permissions, target: self))
+                addItem(.unmute(permissionTypes, target: self))
+                permissions.microphone = nil
             }
-            addItem(NSMenuItem.separator())
+            permissions.camera = nil
 
-            for permission in permissions where permission.canBePersisted {
+        default:
+            break
+        }
+
+        return permissions
+    }
+
+    private func setupOtherPermissionMenuItems(for permissions: Permissions) {
+        for (permission, state) in permissions.sorted(by: { lhs, _ in lhs.key == .camera }) {
+            switch state {
+            case .active, .inactive:
+                addItem(.mute([permission], target: self))
+            case .paused:
+                addItem(.unmute([permission], target: self))
+            case .denied:
+                addItem(.reload(target: self))
+            case .disabled(systemWide: let systemWide):
+                if numberOfItems > 0 {
+                    addItem(.separator())
+                }
+                addItem(.permissionDisabled(permission, systemWide: systemWide))
+                addItem(.openSystemPreferences(for: permission, target: self))
+
+            case .revoking:
+                // expected permission to deactivate access
+                return
+            case .requested(_):
+                // popover should be shown
+                return
+            }
+        }
+    }
+
+    func addPersistenceItems() {
+        if numberOfItems > 0 {
+            addItem(.separator())
+        }
+
+        for (permission, state) in permissions where permission.canBePersisted {
+            switch state {
+            case .active, .inactive, .paused:
                 if PermissionManager.shared.permission(forDomain: domain, permissionType: permission) == nil {
                     addItem(.alwaysAllow(permission, on: domain, target: self))
                 } else {
                     addItem(.alwaysAsk(permission, on: domain, target: self))
                 }
-            }
 
-        case .denied:
-            addItem(.reload(target: self))
-            addItem(NSMenuItem.separator())
-
-            for permission in permissions where permission.canBePersisted {
+            case .denied:
                 if PermissionManager.shared.permission(forDomain: domain, permissionType: permission) == nil {
                     addItem(.alwaysDeny(permission, on: domain, target: self))
                 } else {
                     addItem(.alwaysAsk(permission, on: domain, target: self))
                 }
-            }
 
-        case .disabled(systemWide: let systemWide):
-            guard let permission = permissions.first else {
-                assertionFailure("Permissions expected")
-                return
+            case .revoking, .requested, .disabled: break
             }
-            addItem(.permissionDisabled(permission, systemWide: systemWide))
-            addItem(.openSystemPreferences(target: self))
-
-        case .revoking:
-            // expected permission to deactivate access
-            return
-        case .requested(_):
-            // popover should be shown
-            return
         }
     }
-    // swiftlint:enable function_body_length
-    // swiftlint:enable cyclomatic_complexity
 
     @objc func mutePermission(_ sender: NSMenuItem) {
+        guard let permissions = sender.representedObject as? [PermissionType] else {
+            assertionFailure("Expected [PermissionType]")
+            return
+        }
         actionDelegate?.permissionContextMenu(self, mutePermissions: permissions)
     }
     @objc func unmutePermission(_ sender: NSMenuItem) {
-        print("unmutePermission:")
+        guard let permissions = sender.representedObject as? [PermissionType] else {
+            assertionFailure("Expected [PermissionType]")
+            return
+        }
         actionDelegate?.permissionContextMenu(self, unmutePermissions: permissions)
     }
     @objc func alwaysAllowPermission(_ sender: NSMenuItem) {
-        actionDelegate?.permissionContextMenu(self, alwaysAllowPermissions: permissions)
+        guard let permission = sender.representedObject as? PermissionType else {
+            assertionFailure("Expected PermissionType")
+            return
+        }
+        actionDelegate?.permissionContextMenu(self, alwaysAllowPermission: permission)
     }
     @objc func alwaysAskPermission(_ sender: NSMenuItem) {
-        actionDelegate?.permissionContextMenu(self, resetStoredPermissions: permissions)
+        guard let permission = sender.representedObject as? PermissionType else {
+            assertionFailure("Expected PermissionType")
+            return
+        }
+        actionDelegate?.permissionContextMenu(self, resetStoredPermission: permission)
     }
     @objc func alwaysDenyPermission(_ sender: NSMenuItem) {
-        actionDelegate?.permissionContextMenu(self, alwaysDenyPermissions: permissions)
+        guard let permission = sender.representedObject as? PermissionType else {
+            assertionFailure("Expected PermissionType")
+            return
+        }
+        actionDelegate?.permissionContextMenu(self, alwaysDenyPermission: permission)
     }
     @objc func reload(_ sender: NSMenuItem) {
-        actionDelegate?.permissionContextMenu(self, reloadPageForPermissions: permissions)
+        actionDelegate?.permissionContextMenuReloadPage(self)
     }
 
     @objc func openSystemPreferences(_ sender: NSMenuItem) {
+        guard let permission = sender.representedObject as? PermissionType else {
+            assertionFailure("Expected PermissionType")
+            return
+        }
+
         let deeplink: URL
-        switch permissions.first {
+        switch permission {
         case .camera:
             deeplink = URL(string: "x-apple.systempreferences:com.apple.preference.security?Privacy_Camera")!
         case .microphone:
             deeplink = URL(string: "x-apple.systempreferences:com.apple.preference.security?Privacy_Microphone")!
         case .geolocation:
             deeplink = URL(string: "x-apple.systempreferences:com.apple.preference.security?Privacy_LocationServices")!
-        case .none:
-            assertionFailure("Permissions expected")
-            return
         }
         NSWorkspace.shared.open(deeplink)
     }
@@ -165,6 +203,7 @@ private extension NSMenuItem {
         let item = NSMenuItem(title: title,
                               action: #selector(PermissionContextMenu.mutePermission),
                               keyEquivalent: "")
+        item.representedObject = permissions
         item.target = target
         return item
     }
@@ -177,6 +216,7 @@ private extension NSMenuItem {
         let item = NSMenuItem(title: title,
                               action: #selector(PermissionContextMenu.unmutePermission),
                               keyEquivalent: "")
+        item.representedObject = permissions
         item.target = target
         return item
     }
@@ -194,6 +234,7 @@ private extension NSMenuItem {
         let item = NSMenuItem(title: title,
                               action: #selector(PermissionContextMenu.alwaysAllowPermission),
                               keyEquivalent: "")
+        item.representedObject = permission
         item.target = target
         return item
     }
@@ -203,6 +244,7 @@ private extension NSMenuItem {
         let item = NSMenuItem(title: title,
                               action: #selector(PermissionContextMenu.alwaysAskPermission),
                               keyEquivalent: "")
+        item.representedObject = permission
         item.target = target
         return item
     }
@@ -212,6 +254,7 @@ private extension NSMenuItem {
         let item = NSMenuItem(title: title,
                               action: #selector(PermissionContextMenu.alwaysDenyPermission),
                               keyEquivalent: "")
+        item.representedObject = permission
         item.target = target
         return item
     }
@@ -229,10 +272,11 @@ private extension NSMenuItem {
         return NSMenuItem(title: title, action: nil, keyEquivalent: "")
     }
 
-    static func openSystemPreferences(target: PermissionContextMenu) -> NSMenuItem {
+    static func openSystemPreferences(for permission: PermissionType, target: PermissionContextMenu) -> NSMenuItem {
         let item = NSMenuItem(title: UserText.permissionOpenSystemPreferences,
                               action: #selector(PermissionContextMenu.openSystemPreferences),
                               keyEquivalent: "")
+        item.representedObject = permission
         item.target = target
         return item
     }

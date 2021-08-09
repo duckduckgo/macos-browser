@@ -268,11 +268,6 @@ final class TabBarViewItem: NSCollectionViewItem {
         }
     }
     private func updateUsedPermissions() {
-        guard !isSelected else {
-            permissionButton.isHidden = true
-            tabLoadingPermissionLeadingConstraint.isActive = false
-            return
-        }
         if usedPermissions.camera.isActive {
             permissionButton.image = .cameraActiveImage
         } else if usedPermissions.microphone.isActive {

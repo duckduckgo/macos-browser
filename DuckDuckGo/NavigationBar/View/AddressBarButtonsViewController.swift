@@ -176,7 +176,8 @@ final class AddressBarButtonsViewController: NSViewController {
 
     func openPermissionAuthorizationPopover(for query: PermissionAuthorizationQuery) {
         let button: NSButton
-        if query.permissions.contains(.camera) {
+        if query.permissions.contains(.camera)
+            || (query.permissions.contains(.microphone) && microphoneButton.isHidden && !cameraButton.isHidden) {
             button = cameraButton
         } else if query.permissions.contains(.microphone) {
             button = microphoneButton
@@ -247,7 +248,7 @@ final class AddressBarButtonsViewController: NSViewController {
 
     @IBAction func cameraButtonAction(_ sender: NSButton) {
         guard let selectedTabViewModel = tabCollectionViewModel.selectedTabViewModel,
-              let state = selectedTabViewModel.usedPermissions.camera
+              let state = selectedTabViewModel.usedPermissions.camera.formUnion(selectedTabViewModel.usedPermissions.microphone)
         else {
             os_log("%s: Selected tab view model is nil or no camera state", type: .error, className)
             return
@@ -257,11 +258,11 @@ final class AddressBarButtonsViewController: NSViewController {
             return
         }
 
-        let permissions: [PermissionType] = selectedTabViewModel.usedPermissions.microphone != nil
-            ? [.camera, .microphone]
-            : [.camera]
+        var permissions = Permissions()
+        permissions[.camera] = selectedTabViewModel.usedPermissions.camera
+        permissions[.microphone] = selectedTabViewModel.usedPermissions.microphone
+
         PermissionContextMenu(permissions: permissions,
-                              state: state,
                               domain: selectedTabViewModel.tab.url?.host ?? "",
                               delegate: self)
             .popUp(positioning: nil, at: NSPoint(x: 0, y: sender.bounds.height), in: sender)
@@ -279,8 +280,7 @@ final class AddressBarButtonsViewController: NSViewController {
             return
         }
 
-        PermissionContextMenu(permissions: [.microphone],
-                              state: state,
+        PermissionContextMenu(permissions: [.microphone: state],
                               domain: selectedTabViewModel.tab.url?.host ?? "",
                               delegate: self)
             .popUp(positioning: nil, at: NSPoint(x: 0, y: sender.bounds.height), in: sender)
@@ -298,8 +298,7 @@ final class AddressBarButtonsViewController: NSViewController {
             return
         }
 
-        PermissionContextMenu(permissions: [.geolocation],
-                              state: state,
+        PermissionContextMenu(permissions: [.geolocation: state],
                               domain: selectedTabViewModel.tab.url?.host ?? "",
                               delegate: self)
             .popUp(positioning: nil, at: NSPoint(x: 0, y: sender.bounds.height), in: sender)
@@ -355,7 +354,10 @@ final class AddressBarButtonsViewController: NSViewController {
 
         geolocationButton.buttonState = selectedTabViewModel.usedPermissions.geolocation
         cameraButton.buttonState = selectedTabViewModel.usedPermissions.camera
-        microphoneButton.buttonState = selectedTabViewModel.usedPermissions.microphone
+            .formUnion(selectedTabViewModel.usedPermissions.microphone)
+        microphoneButton.buttonState = selectedTabViewModel.usedPermissions.camera == nil
+            ? selectedTabViewModel.usedPermissions.microphone
+            : nil
 
         if let query = selectedTabViewModel.permissionAuthorizationQuery {
             if !permissionAuthorizationPopover.isShown {
@@ -436,22 +438,16 @@ extension AddressBarButtonsViewController: PermissionContextMenuDelegate {
     func permissionContextMenu(_ menu: PermissionContextMenu, unmutePermissions permissions: [PermissionType]) {
         tabCollectionViewModel.selectedTabViewModel?.tab.permissions.set(permissions, muted: false)
     }
-    func permissionContextMenu(_ menu: PermissionContextMenu, alwaysAllowPermissions permissions: [PermissionType]) {
-        for permission in permissions {
-            PermissionManager.shared.setPermission(true, forDomain: menu.domain, permissionType: permission)
-        }
+    func permissionContextMenu(_ menu: PermissionContextMenu, alwaysAllowPermission permission: PermissionType) {
+        PermissionManager.shared.setPermission(true, forDomain: menu.domain, permissionType: permission)
     }
-    func permissionContextMenu(_ menu: PermissionContextMenu, alwaysDenyPermissions permissions: [PermissionType]) {
-        for permission in permissions {
-            PermissionManager.shared.setPermission(false, forDomain: menu.domain, permissionType: permission)
-        }
+    func permissionContextMenu(_ menu: PermissionContextMenu, alwaysDenyPermission permission: PermissionType) {
+        PermissionManager.shared.setPermission(false, forDomain: menu.domain, permissionType: permission)
     }
-    func permissionContextMenu(_ menu: PermissionContextMenu, resetStoredPermissions permissions: [PermissionType]) {
-        for permission in permissions {
-            PermissionManager.shared.removePermission(forDomain: menu.domain, permissionType: permission)
-        }
+    func permissionContextMenu(_ menu: PermissionContextMenu, resetStoredPermission permission: PermissionType) {
+        PermissionManager.shared.removePermission(forDomain: menu.domain, permissionType: permission)
     }
-    func permissionContextMenu(_ menu: PermissionContextMenu, reloadPageForPermissions permissions: [PermissionType]) {
+    func permissionContextMenuReloadPage(_ menu: PermissionContextMenu) {
         tabCollectionViewModel.selectedTabViewModel?.tab.reload()
     }
 

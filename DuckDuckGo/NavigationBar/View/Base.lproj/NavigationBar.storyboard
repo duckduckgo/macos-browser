@@ -4,7 +4,6 @@
         <deployment identifier="macosx"/>
         <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="18122"/>
         <capability name="Named colors" minToolsVersion="9.0"/>
-        <capability name="System colors introduced in macOS 10.14" minToolsVersion="10.0"/>
         <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
     </dependencies>
     <scenes>
@@ -660,15 +659,10 @@
                                                     <userDefinedRuntimeAttribute type="color" keyPath="mouseDownColor">
                                                         <color key="value" name="ButtonMouseDownColor"/>
                                                     </userDefinedRuntimeAttribute>
-                                                    <userDefinedRuntimeAttribute type="color" keyPath="activeTintColor">
-                                                        <color key="value" name="controlAccentColor" catalog="System" colorSpace="catalog"/>
-                                                    </userDefinedRuntimeAttribute>
-                                                    <userDefinedRuntimeAttribute type="color" keyPath="disabledTintColor">
-                                                        <color key="value" name="systemRedColor" catalog="System" colorSpace="catalog"/>
-                                                    </userDefinedRuntimeAttribute>
-                                                    <userDefinedRuntimeAttribute type="color" keyPath="mutedTintColor">
-                                                        <color key="value" name="systemGrayColor" catalog="System" colorSpace="catalog"/>
-                                                    </userDefinedRuntimeAttribute>
+                                                    <userDefinedRuntimeAttribute type="image" keyPath="activeImage" value="Geolocation-Active"/>
+                                                    <userDefinedRuntimeAttribute type="image" keyPath="inactiveImage" value="Geolocation-Icon"/>
+                                                    <userDefinedRuntimeAttribute type="image" keyPath="disabledImage" value="Geolocation-Icon"/>
+                                                    <userDefinedRuntimeAttribute type="image" keyPath="mutedImage" value="Geolocation-Icon"/>
                                                 </userDefinedRuntimeAttributes>
                                             </button>
                                             <button verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="uao-nC-0co" userLabel="Microphone Button" customClass="PermissionButton" customModule="DuckDuckGo_Privacy_Browser" customModuleProvider="target">
@@ -688,15 +682,10 @@
                                                     <userDefinedRuntimeAttribute type="color" keyPath="mouseDownColor">
                                                         <color key="value" name="ButtonMouseDownColor"/>
                                                     </userDefinedRuntimeAttribute>
-                                                    <userDefinedRuntimeAttribute type="color" keyPath="activeTintColor">
-                                                        <color key="value" name="controlAccentColor" catalog="System" colorSpace="catalog"/>
-                                                    </userDefinedRuntimeAttribute>
-                                                    <userDefinedRuntimeAttribute type="color" keyPath="disabledTintColor">
-                                                        <color key="value" name="systemRedColor" catalog="System" colorSpace="catalog"/>
-                                                    </userDefinedRuntimeAttribute>
-                                                    <userDefinedRuntimeAttribute type="color" keyPath="mutedTintColor">
-                                                        <color key="value" name="systemGrayColor" catalog="System" colorSpace="catalog"/>
-                                                    </userDefinedRuntimeAttribute>
+                                                    <userDefinedRuntimeAttribute type="image" keyPath="activeImage" value="Microphone-Active"/>
+                                                    <userDefinedRuntimeAttribute type="image" keyPath="inactiveImage" value="Microphone-Icon"/>
+                                                    <userDefinedRuntimeAttribute type="image" keyPath="disabledImage" value="Microphone-Icon"/>
+                                                    <userDefinedRuntimeAttribute type="image" keyPath="mutedImage" value="Microphone-Icon"/>
                                                 </userDefinedRuntimeAttributes>
                                             </button>
                                             <button verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="C2L-f9-L3r" userLabel="Camera Button" customClass="PermissionButton" customModule="DuckDuckGo_Privacy_Browser" customModuleProvider="target">
@@ -705,7 +694,7 @@
                                                     <constraint firstAttribute="width" constant="32" id="4bE-1L-enO"/>
                                                     <constraint firstAttribute="height" constant="32" id="A7u-wU-pBb"/>
                                                 </constraints>
-                                                <buttonCell key="cell" type="square" bezelStyle="shadowlessSquare" image="NSTouchBarCommunicationVideoTemplate" imagePosition="only" alignment="center" imageScaling="proportionallyDown" inset="2" id="yfn-hT-2EA">
+                                                <buttonCell key="cell" type="square" bezelStyle="shadowlessSquare" image="Camera-Icon" imagePosition="only" alignment="center" imageScaling="proportionallyDown" inset="2" id="yfn-hT-2EA">
                                                     <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
                                                     <font key="font" metaFont="system"/>
                                                 </buttonCell>
@@ -716,15 +705,10 @@
                                                     <userDefinedRuntimeAttribute type="color" keyPath="mouseDownColor">
                                                         <color key="value" name="ButtonMouseDownColor"/>
                                                     </userDefinedRuntimeAttribute>
-                                                    <userDefinedRuntimeAttribute type="color" keyPath="activeTintColor">
-                                                        <color key="value" name="controlAccentColor" catalog="System" colorSpace="catalog"/>
-                                                    </userDefinedRuntimeAttribute>
-                                                    <userDefinedRuntimeAttribute type="color" keyPath="disabledTintColor">
-                                                        <color key="value" name="systemRedColor" catalog="System" colorSpace="catalog"/>
-                                                    </userDefinedRuntimeAttribute>
-                                                    <userDefinedRuntimeAttribute type="color" keyPath="mutedTintColor">
-                                                        <color key="value" name="systemGrayColor" catalog="System" colorSpace="catalog"/>
-                                                    </userDefinedRuntimeAttribute>
+                                                    <userDefinedRuntimeAttribute type="image" keyPath="activeImage" value="Camera-Active"/>
+                                                    <userDefinedRuntimeAttribute type="image" keyPath="inactiveImage" value="Camera-Icon"/>
+                                                    <userDefinedRuntimeAttribute type="image" keyPath="disabledImage" value="Camera-Tab-Blocked"/>
+                                                    <userDefinedRuntimeAttribute type="image" keyPath="mutedImage" value="Camera-Icon"/>
                                                 </userDefinedRuntimeAttributes>
                                             </button>
                                         </subviews>
@@ -789,13 +773,17 @@
         <image name="Bookmark" width="16" height="16"/>
         <image name="Bookmarks" width="16" height="16"/>
         <image name="BurnProof" width="16" height="16"/>
+        <image name="Camera-Active" width="16" height="12"/>
+        <image name="Camera-Icon" width="16" height="12"/>
+        <image name="Camera-Tab-Blocked" width="16" height="14"/>
         <image name="Clear" width="9" height="9"/>
         <image name="Feedback" width="16" height="16"/>
-        <image name="Geolocation-Icon" width="13" height="13"/>
         <image name="Forward" width="16" height="16"/>
+        <image name="Geolocation-Active" width="16" height="16"/>
+        <image name="Geolocation-Icon" width="16" height="16"/>
         <image name="HomeFavicon" width="16" height="16"/>
+        <image name="Microphone-Active" width="12" height="16"/>
         <image name="Microphone-Icon" width="12" height="16"/>
-        <image name="NSTouchBarCommunicationVideoTemplate" width="22" height="30"/>
         <image name="PasswordManagement" width="16" height="16"/>
         <image name="PrivacyEntryPoint" width="16" height="16"/>
         <image name="Refresh" width="16" height="16"/>

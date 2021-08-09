@@ -54,6 +54,29 @@ extension Optional where Wrapped == PermissionState {
         self == .paused
     }
 
+    func formUnion(_ other: PermissionState?) -> PermissionState? {
+        guard let lhs = self else { return other }
+        guard let rhs = other else { return lhs }
+
+        switch (lhs, rhs) {
+        case (.active, _), (_, .active):
+            return .active
+        case (.paused, _), (_, .paused):
+            return .paused
+        case (.inactive, _), (_, .inactive):
+            return .inactive
+        case (.requested(let query), _), (_, .requested(let query)):
+            return .requested(query)
+
+        case (.revoking, _), (_, .revoking):
+            return .revoking
+        case (.denied, _), (_, .denied):
+            return .denied
+        case (.disabled(let systemWide), _), (_, .disabled(let systemWide)):
+            return .disabled(systemWide: systemWide)
+        }
+    }
+
     mutating func authorizationQueried(_ query: PermissionAuthorizationQuery) {
         if case .some(.disabled) = self {
             // stay in disabled state if the App is disabled to use the permission
