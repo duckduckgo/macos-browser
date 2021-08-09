@@ -88,4 +88,15 @@ extension NSAlert {
         return alert
     }
 
+    static func burnButtonAlert() -> NSAlert {
+        let alert = NSAlert()
+        alert.messageText = UserText.burnAlertMessageText
+        alert.informativeText = UserText.burtAlertInformativeText
+        alert.alertStyle = .warning
+        alert.icon = NSImage(named: "BurnAlert")
+        alert.addButton(withTitle: UserText.burn)
+        alert.addButton(withTitle: UserText.cancel)
+        return alert
+    }
+
 }
