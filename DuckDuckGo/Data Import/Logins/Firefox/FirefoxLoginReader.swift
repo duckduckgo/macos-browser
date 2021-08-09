@@ -20,7 +20,6 @@ import Foundation
 import CommonCrypto
 import CryptoKit
 import GRDB
-import CryptoSwift
 
 final class FirefoxLoginReader {
 
@@ -157,8 +156,8 @@ final class FirefoxLoginReader {
         assert(keyLength == 32)
 
         let passwordData = globalSalt + (primaryPassword ?? "").data(using: .utf8)!
-        let hashDataArray: [UInt8] = SHA.from(data: passwordData)
-        guard let commonCryptoKey = Cryptography.decryptPBKDF2(password: .base64(Data(hashDataArray).base64EncodedString()),
+        let hashData = Insecure.SHA1.hash(data: passwordData).dataRepresentation
+        guard let commonCryptoKey = Cryptography.decryptPBKDF2(password: .base64(hashData.base64EncodedString()),
                                                                salt: entrySalt,
                                                                keyByteCount: keyLength,
                                                                rounds: iterationCount,
@@ -384,41 +383,6 @@ extension FirefoxLoginReader {
         }
 
         return data
-    }
-
-}
-
-struct SHA {
-
-    static func from(data: Data) -> [UInt8] {
-        var digest = [UInt8](repeating: 0, count: Int(CC_SHA1_DIGEST_LENGTH))
-        CC_SHA1(data.bytes, CC_LONG(data.count), &digest)
-
-        return digest
-    }
-
-    static func from(data: Data) -> Data {
-        let digest = Insecure.SHA1.hash(data: data)
-        return digest.dataRepresentation
-    }
-
-    static func hexFrom(data: Data) -> String {
-        let digest = Insecure.SHA1.hash(data: data).dataRepresentation
-        var digestHex = ""
-
-        for index in 0..<Int(CC_SHA1_DIGEST_LENGTH) {
-            digestHex += String(format: "%02x", digest[index])
-        }
-
-        return digestHex
-    }
-
-}
-
-extension Data {
-
-    func hexString() -> String {
-        return reduce("") {$0 + String(format: "%02x", $1)}
     }
 
 }
