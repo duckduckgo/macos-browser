@@ -15,6 +15,13 @@
 //  See the License for the specific language governing permissions and
 //  limitations under the License.
 //
+//
+//  RSAMessage.swift
+//  SwiftyCrypto
+//
+//  Created by Shuo Wang on 2018/1/16.
+//  Copyright © 2018年 Yufu. All rights reserved.
+//
 
 import Foundation
 
