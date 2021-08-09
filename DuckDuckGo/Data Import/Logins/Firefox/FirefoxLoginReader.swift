@@ -156,7 +156,8 @@ final class FirefoxLoginReader {
         assert(keyLength == 32)
 
         let passwordData = globalSalt + (primaryPassword ?? "").data(using: .utf8)!
-        let hashData = Insecure.SHA1.hash(data: passwordData).dataRepresentation
+        let hashData = SHA.from(data: passwordData)
+
         guard let commonCryptoKey = Cryptography.decryptPBKDF2(password: .base64(hashData.base64EncodedString()),
                                                                salt: entrySalt,
                                                                keyByteCount: keyLength,
@@ -383,6 +384,20 @@ extension FirefoxLoginReader {
         }
 
         return data
+    }
+
+}
+
+private struct SHA {
+
+    static func from(data: Data) -> Data {
+        var digest = [UInt8](repeating: 0, count: Int(CC_SHA1_DIGEST_LENGTH))
+
+        data.withUnsafeBytes {
+            _ = CC_SHA1($0.baseAddress, CC_LONG(data.count), &digest)
+        }
+
+        return Data(digest)
     }
 
 }

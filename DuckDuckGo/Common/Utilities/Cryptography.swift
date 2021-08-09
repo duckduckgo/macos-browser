@@ -85,9 +85,17 @@ struct Cryptography {
     }
 
     static func decryptAESCBC(data: Data, key: Data, iv: Data) -> Data? {
-        var outLength = Int(0)
+        return decrypt(with: CCAlgorithm(kCCAlgorithmAES128), data: data, key: key, iv: iv)
+    }
+
+    static func decrypt3DES(data: Data, key: Data, iv: Data) -> Data? {
+        return decrypt(with: CCAlgorithm(kCCAlgorithm3DES), data: data, key: key, iv: iv)
+    }
+
+    static func decrypt(with algorithm: CCAlgorithm, data: Data, key: Data, iv: Data) -> Data? {
+        var outLength: Int = 0
         var outBytes = [UInt8](repeating: 0, count: data.count)
-        var status: CCCryptorStatus = CCCryptorStatus(kCCSuccess)
+        var status = CCCryptorStatus(kCCSuccess)
 
         data.withUnsafeBytes { dataBytes in
             let dataRawBytes = dataBytes.bindMemory(to: UInt8.self).baseAddress
@@ -99,7 +107,7 @@ struct Cryptography {
                     let keyRawBytes = keyBytes.bindMemory(to: UInt8.self).baseAddress
 
                     status = CCCrypt(CCOperation(kCCDecrypt),
-                                     CCAlgorithm(kCCAlgorithmAES128),
+                                     algorithm,
                                      CCOptions(kCCOptionPKCS7Padding),
                                      keyRawBytes,
                                      key.count,
@@ -108,42 +116,6 @@ struct Cryptography {
                                      data.count,
                                      &outBytes,
                                      outBytes.count,
-                                     &outLength)
-                }
-            }
-        }
-
-        guard status == kCCSuccess else {
-            return nil
-        }
-
-        return Data(bytes: &outBytes, count: outLength)
-    }
-
-    static func decrypt3DES(data: Data, key: Data, iv: Data) -> Data? {
-        var outLength = Int(0)
-        var outBytes = [UInt8](repeating: 0, count: data.count + kCCBlockSize3DES)
-        var status: CCCryptorStatus = CCCryptorStatus(kCCSuccess)
-
-        data.withUnsafeBytes { dataBytes in
-            let dataRawBytes = dataBytes.bindMemory(to: UInt8.self).baseAddress
-
-            iv.withUnsafeBytes { ivBytes in
-                let ivRawBytes = ivBytes.bindMemory(to: UInt8.self).baseAddress
-
-                key.withUnsafeBytes { keyBytes in
-                    let keyRawBytes = keyBytes.bindMemory(to: UInt8.self).baseAddress
-
-                    status = CCCrypt(CCOperation(kCCDecrypt),
-                                     CCAlgorithm(kCCAlgorithm3DES),
-                                     CCOptions(kCCOptionPKCS7Padding),
-                                     keyRawBytes,
-                                     key.count,
-                                     ivRawBytes,
-                                     dataRawBytes,
-                                     data.count,
-                                     &outBytes,
-                                     outBytes.count + kCCBlockSize3DES,
                                      &outLength)
                 }
             }
