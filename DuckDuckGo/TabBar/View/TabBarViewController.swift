@@ -742,6 +742,23 @@ extension TabBarViewController: TabBarViewItemDelegate {
         tabCollectionViewModel.remove(at: indexPath.item)
     }
 
+    func tabBarViewItemTogglePermissionAction(_ tabBarViewItem: TabBarViewItem) {
+        guard let indexPath = collectionView.indexPath(for: tabBarViewItem),
+              let permissions = tabCollectionViewModel.tabViewModel(at: indexPath.item)?.tab.permissions
+        else {
+            os_log("TabBarViewController: Failed to get index path of tab bar view item or its permissions", type: .error)
+            return
+        }
+
+        if permissions.permissions.camera.isActive || permissions.permissions.microphone.isActive {
+            permissions.set([.camera, .microphone], muted: true)
+        } else if permissions.permissions.camera.isPaused || permissions.permissions.microphone.isPaused {
+            permissions.set([.camera, .microphone], muted: false)
+        } else {
+            assertionFailure("Unexpected Tab Permissions state")
+        }
+    }
+
     func tabBarViewItemCloseOtherAction(_ tabBarViewItem: TabBarViewItem) {
         guard let indexPath = collectionView.indexPath(for: tabBarViewItem) else {
             os_log("TabBarViewController: Failed to get index path of tab bar view item", type: .error)

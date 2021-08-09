@@ -25,6 +25,7 @@ protocol TabBarViewItemDelegate: AnyObject {
     func tabBarViewItem(_ tabBarViewItem: TabBarViewItem, isMouseOver: Bool)
 
     func tabBarViewItemCloseAction(_ tabBarViewItem: TabBarViewItem)
+    func tabBarViewItemTogglePermissionAction(_ tabBarViewItem: TabBarViewItem)
     func tabBarViewItemCloseOtherAction(_ tabBarViewItem: TabBarViewItem)
     func tabBarViewItemDuplicateAction(_ tabBarViewItem: TabBarViewItem)
     func tabBarViewItemBookmarkThisPageAction(_ tabBarViewItem: TabBarViewItem)
@@ -36,46 +37,12 @@ protocol TabBarViewItemDelegate: AnyObject {
 
 final class TabBarViewItem: NSCollectionViewItem {
 
-    enum Height: CGFloat {
-        case standard = 32
-    }
-
-    enum Width: CGFloat {
-        case minimum = 50
-        case minimumSelected = 120
-        case maximum = 240
-    }
-
-    enum WidthStage {
-        case full
-        case withoutCloseButton
-        case withoutTitle
-
-        init(width: CGFloat) {
-            switch width {
-            case 0..<61: self = .withoutTitle
-            case 61..<120: self = .withoutCloseButton
-            default: self = .full
-            }
-        }
-
-        var isTitleHidden: Bool { self == .withoutTitle }
-        var isCloseButtonHidden: Bool { self != .full }
-        var isFaviconCentered: Bool { !isTitleHidden }
-    }
-
     var widthStage: WidthStage {
         if isSelected || isDragged {
             return .full
         } else {
             return WidthStage(width: view.bounds.size.width)
         }
-    }
-
-    enum TextFieldMaskGradientSize: CGFloat {
-        case width = 6
-        case trailingSpace = 0
-        case trailingSpaceWithButton = 20
     }
 
     static let identifier = NSUserInterfaceItemIdentifier(rawValue: "TabBarViewItem")
@@ -127,6 +94,7 @@ final class TabBarViewItem: NSCollectionViewItem {
             faviconImageView.applyFaviconStyle()
         }
     }
+    @IBOutlet weak var permissionButton: NSButton!
 
     @IBOutlet weak var titleTextField: NSTextField!
     @IBOutlet weak var closeButton: MouseOverButton!
@@ -136,6 +104,8 @@ final class TabBarViewItem: NSCollectionViewItem {
     @IBOutlet weak var mouseClickView: MouseClickView!
     @IBOutlet weak var tabLoadingViewCenterConstraint: NSLayoutConstraint!
     @IBOutlet weak var tabLoadingViewLeadingConstraint: NSLayoutConstraint!
+    @IBOutlet var permissionCloseButtonTrailingConstraint: NSLayoutConstraint!
+    @IBOutlet var tabLoadingPermissionLeadingConstraint: NSLayoutConstraint!
 
     private let titleTextFieldMaskLayer = CAGradientLayer()
 
@@ -171,6 +141,7 @@ final class TabBarViewItem: NSCollectionViewItem {
                 isDragged = false
             }
             updateSubviews()
+            updateUsedPermissions()
             updateTitleTextFieldMask()
         }
     }
@@ -215,6 +186,10 @@ final class TabBarViewItem: NSCollectionViewItem {
         delegate?.tabBarViewItemCloseAction(self)
     }
 
+    @IBAction func permissionButtonAction(_ sender: NSButton) {
+        delegate?.tabBarViewItemTogglePermissionAction(self)
+    }
+
     @objc func closeOtherAction(_ sender: NSButton) {
         delegate?.tabBarViewItemCloseOtherAction(self)
     }
@@ -238,6 +213,8 @@ final class TabBarViewItem: NSCollectionViewItem {
             self?.currentURL = url
             self?.setupMenu()
         }.store(in: &cancellables)
+
+        tabViewModel.$usedPermissions.weakAssign(to: \.usedPermissions, on: self).store(in: &cancellables)
     }
 
     func clear() {
@@ -277,10 +254,40 @@ final class TabBarViewItem: NSCollectionViewItem {
 
         updateSeparatorView()
         closeButton.isHidden = !isSelected && !isDragged && widthStage.isCloseButtonHidden
+        permissionCloseButtonTrailingConstraint.isActive = !closeButton.isHidden
         titleTextField.isHidden = widthStage.isTitleHidden
 
         tabLoadingViewCenterConstraint.priority = widthStage.isTitleHidden && widthStage.isCloseButtonHidden ? .defaultHigh : .defaultLow
         tabLoadingViewLeadingConstraint.priority = widthStage.isTitleHidden && widthStage.isCloseButtonHidden ? .defaultLow : .defaultHigh
+    }
+
+    private var usedPermissions = Permissions() {
+        didSet {
+            updateUsedPermissions()
+            updateTitleTextFieldMask()
+        }
+    }
+    private func updateUsedPermissions() {
+        guard !isSelected else {
+            permissionButton.isHidden = true
+            tabLoadingPermissionLeadingConstraint.isActive = false
+            return
+        }
+        if usedPermissions.camera.isActive {
+            permissionButton.image = .cameraActiveImage
+        } else if usedPermissions.microphone.isActive {
+            permissionButton.image = .micActiveImage
+        } else if usedPermissions.camera.isPaused {
+            permissionButton.image = .cameraBlockedImage
+        } else if usedPermissions.microphone.isPaused {
+            permissionButton.image = .micBlockedImage
+        } else {
+            permissionButton.isHidden = true
+            tabLoadingPermissionLeadingConstraint.isActive = false
+            return
+        }
+        permissionButton.isHidden = false
+        tabLoadingPermissionLeadingConstraint.isActive = true
     }
 
     private func updateSeparatorView() {
@@ -297,10 +304,16 @@ final class TabBarViewItem: NSCollectionViewItem {
     }
 
     private func updateTitleTextFieldMask() {
-        let gradientPadding: CGFloat = closeButton.isHidden ?
-            TextFieldMaskGradientSize.trailingSpace.rawValue : TextFieldMaskGradientSize.trailingSpaceWithButton.rawValue
-        titleTextField.gradient(width: TextFieldMaskGradientSize.width.rawValue,
-                                trailingPadding: gradientPadding)
+        let gradientPadding: CGFloat
+        switch (closeButton.isHidden, permissionButton.isHidden) {
+        case (true, true):
+            gradientPadding = TextFieldMaskGradientSize.trailingSpace
+        case (false, true), (true, false):
+            gradientPadding = TextFieldMaskGradientSize.trailingSpaceWithButton
+        case (false, false):
+            gradientPadding = TextFieldMaskGradientSize.trailingSpaceWithPermissionAndButton
+        }
+        titleTextField.gradient(width: TextFieldMaskGradientSize.width, trailingPadding: gradientPadding)
     }
 
 }
@@ -334,4 +347,53 @@ extension TabBarViewItem: MouseClickViewDelegate {
         delegate?.tabBarViewItemCloseAction(self)
     }
 
+}
+
+extension TabBarViewItem {
+
+    enum Height: CGFloat {
+        case standard = 32
+    }
+
+    enum Width: CGFloat {
+        case minimum = 50
+        case minimumSelected = 120
+        case maximum = 240
+    }
+
+    enum WidthStage {
+        case full
+        case withoutCloseButton
+        case withoutTitle
+
+        init(width: CGFloat) {
+            switch width {
+            case 0..<61: self = .withoutTitle
+            case 61..<120: self = .withoutCloseButton
+            default: self = .full
+            }
+        }
+
+        var isTitleHidden: Bool { self == .withoutTitle }
+        var isCloseButtonHidden: Bool { self != .full }
+        var isFaviconCentered: Bool { !isTitleHidden }
+    }
+
+}
+
+private extension TabBarViewItem {
+    enum TextFieldMaskGradientSize {
+        static let width: CGFloat = 6
+        static let trailingSpace: CGFloat = 0
+        static let trailingSpaceWithButton: CGFloat = 20
+        static let trailingSpaceWithPermissionAndButton: CGFloat = 40
+    }
+}
+
+private extension NSImage {
+    static let cameraActiveImage = NSImage(named: "Camera-Tab-Active")
+    static let cameraBlockedImage = NSImage(named: "Camera-Tab-Blocked")
+
+    static let micActiveImage = NSImage(named: "Microphone-Active")
+    static let micBlockedImage = NSImage(named: "Microphone-Icon")
 }

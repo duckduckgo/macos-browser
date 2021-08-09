@@ -46,6 +46,14 @@ enum PermissionState: Equatable {
 
 extension Optional where Wrapped == PermissionState {
 
+    var isActive: Bool {
+        self == .active
+    }
+
+    var isPaused: Bool {
+        self == .paused
+    }
+
     mutating func authorizationQueried(_ query: PermissionAuthorizationQuery) {
         if case .some(.disabled) = self {
             // stay in disabled state if the App is disabled to use the permission
