@@ -10,6 +10,7 @@
 		026ADE1026C2FF97002518EE /* PrivacyConfigurationManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 026ADE0F26C2FF97002518EE /* PrivacyConfigurationManager.swift */; };
 		026ADE1226C2FFFE002518EE /* PrivacyConfiguration.swift in Sources */ = {isa = PBXBuildFile; fileRef = 026ADE1126C2FFFE002518EE /* PrivacyConfiguration.swift */; };
 		026ADE1426C3010C002518EE /* macos-config.json in Resources */ = {isa = PBXBuildFile; fileRef = 026ADE1326C3010C002518EE /* macos-config.json */; };
+		026ADE1626C30FA5002518EE /* PrivacyConfigurationManagerTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 026ADE1526C30FA5002518EE /* PrivacyConfigurationManagerTests.swift */; };
 		142879DA24CE1179005419BB /* SuggestionViewModelTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 142879D924CE1179005419BB /* SuggestionViewModelTests.swift */; };
 		142879DC24CE1185005419BB /* SuggestionContainerViewModelTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 142879DB24CE1185005419BB /* SuggestionContainerViewModelTests.swift */; };
 		1430DFF524D0580F00B8978C /* TabBarViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1430DFF424D0580F00B8978C /* TabBarViewController.swift */; };
@@ -462,6 +463,7 @@
 		026ADE0F26C2FF97002518EE /* PrivacyConfigurationManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PrivacyConfigurationManager.swift; sourceTree = "<group>"; };
 		026ADE1126C2FFFE002518EE /* PrivacyConfiguration.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = PrivacyConfiguration.swift; sourceTree = "<group>"; };
 		026ADE1326C3010C002518EE /* macos-config.json */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.json; path = "macos-config.json"; sourceTree = "<group>"; };
+		026ADE1526C30FA5002518EE /* PrivacyConfigurationManagerTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PrivacyConfigurationManagerTests.swift; sourceTree = "<group>"; };
 		142879D924CE1179005419BB /* SuggestionViewModelTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SuggestionViewModelTests.swift; sourceTree = "<group>"; };
 		142879DB24CE1185005419BB /* SuggestionContainerViewModelTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SuggestionContainerViewModelTests.swift; sourceTree = "<group>"; };
 		1430DFF424D0580F00B8978C /* TabBarViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TabBarViewController.swift; sourceTree = "<group>"; };
@@ -1289,6 +1291,7 @@
 			children = (
 				4B82E9B825B6A05800656FE7 /* DetectedTrackerTests.swift */,
 				4B82E9C025B6A1CD00656FE7 /* TrackerRadarManagerTests.swift */,
+				026ADE1526C30FA5002518EE /* PrivacyConfigurationManagerTests.swift */,
 			);
 			path = ContentBlocker;
 			sourceTree = "<group>";
@@ -2987,6 +2990,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				026ADE1626C30FA5002518EE /* PrivacyConfigurationManagerTests.swift in Sources */,
 				B67C6C472654C643006C872E /* FileManagerExtensionTests.swift in Sources */,
 				142879DA24CE1179005419BB /* SuggestionViewModelTests.swift in Sources */,
 				4B9292C12667103100AD2C21 /* BookmarkMigrationTests.swift in Sources */,

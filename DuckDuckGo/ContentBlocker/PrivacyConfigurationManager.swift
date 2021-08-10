@@ -24,7 +24,6 @@ final class PrivacyConfigurationManager {
 
     struct Constants {
         static let embeddedDataSetETag = "e6214cfd463faa4d9d00ab357539aa43"
-        static let embeddedDataSetSHA = "rIBc/qpKYsUxT6+oceMEnF/IUgBCz0tcWMOQWW/waac="
     }
 
     enum DataSet {
