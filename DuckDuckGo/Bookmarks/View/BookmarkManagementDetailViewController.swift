@@ -39,6 +39,7 @@ final class BookmarkManagementDetailViewController: NSViewController {
 
     @IBOutlet var tableView: NSTableView!
     @IBOutlet var colorView: ColorView!
+    @IBOutlet var contextMenu: NSMenu!
 
     weak var delegate: BookmarkManagementDetailViewControllerDelegate?
 

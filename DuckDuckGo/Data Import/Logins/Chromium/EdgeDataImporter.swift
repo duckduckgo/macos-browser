@@ -1,5 +1,5 @@
 //
-//  BrowserTabEmbeddable.swift
+//  EdgeDataImporter.swift
 //
 //  Copyright © 2021 DuckDuckGo. All rights reserved.
 //
@@ -18,14 +18,17 @@
 
 import Foundation
 
-protocol BrowserTabEmbeddable {
+final class EdgeDataImporter: ChromiumDataImporter {
 
-    var tabSwitcherButton: NSPopUpButton { get }
+    override var processName: String {
+        return "Microsoft Edge"
+    }
 
-}
+    init(loginImporter: LoginImporter) {
+        let applicationSupport = FileManager.default.urls(for: .applicationSupportDirectory, in: .userDomainMask).first!
+        let path = applicationSupport.appendingPathComponent("Microsoft Edge/Default/").absoluteString
 
-protocol BrowserTabSelectionDelegate: AnyObject {
-
-    func selectedTab(at index: Int)
+        super.init(applicationDataDirectoryPath: path, loginImporter: loginImporter)
+    }
 
 }
