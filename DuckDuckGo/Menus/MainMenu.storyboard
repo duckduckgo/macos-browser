@@ -401,7 +401,7 @@ CA
                                                     <menuItem title="Developer Tools" keyEquivalent="i" id="a5C-fO-7Ma">
                                                         <modifierMask key="keyEquivalentModifierMask" option="YES" command="YES"/>
                                                         <connections>
-                                                            <action selector="openDeveloperTools:" target="Ady-hI-5gd" id="eDk-E5-aph"/>
+                                                            <action selector="toggleDeveloperTools:" target="Ady-hI-5gd" id="eDk-E5-aph"/>
                                                         </connections>
                                                     </menuItem>
                                                     <menuItem title="JavaScript Console" keyEquivalent="c" id="7Mg-dc-AHl" userLabel="JavaScript Console">

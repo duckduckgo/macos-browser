@@ -1731,7 +1731,6 @@
 				AA7412BC24D2BEEE00D22FE0 /* MainWindow.swift */,
 				AA7412B424D1536B00D22FE0 /* MainWindowController.swift */,
 				AA585DAE2490E6E600E9A3E2 /* MainViewController.swift */,
-				85480F8925CDC360009424E3 /* MainMenu.storyboard */,
 			);
 			path = View;
 			sourceTree = "<group>";
@@ -1942,6 +1941,7 @@
 		AA97BF4425135CB60014931A /* Menus */ = {
 			isa = PBXGroup;
 			children = (
+				85480F8925CDC360009424E3 /* MainMenu.storyboard */,
 				AA4BBA3A25C58FA200C4FB0F /* MainMenu.swift */,
 				AA6EF9B425081B4C004754E6 /* MainMenuActions.swift */,
 				AA97BF4525135DD30014931A /* ApplicationDockMenu.swift */,

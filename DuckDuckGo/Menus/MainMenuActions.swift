@@ -462,8 +462,12 @@ extension MainViewController {
 
     // MARK: - Developer Tools
 
-    @IBAction func openDeveloperTools(_ sender: Any?) {
-        tabCollectionViewModel.selectedTabViewModel?.tab.webView.openDeveloperTools()
+    @IBAction func toggleDeveloperTools(_ sender: Any?) {
+        if tabCollectionViewModel.selectedTabViewModel?.tab.webView.isInspectorShown == true {
+            tabCollectionViewModel.selectedTabViewModel?.tab.webView.closeDeveloperTools()
+        } else {
+            tabCollectionViewModel.selectedTabViewModel?.tab.webView.openDeveloperTools()
+        }
     }
 
     @IBAction func openJavaScriptConsole(_ sender: Any?) {
@@ -539,8 +543,11 @@ extension MainViewController: NSMenuItemValidation {
             return tabCollectionViewModel.tabCollection.tabs.count > 1
 
         // Developer Tools
-        case #selector(MainViewController.openDeveloperTools(_:)),
-             #selector(MainViewController.openJavaScriptConsole(_:)),
+        case #selector(MainViewController.toggleDeveloperTools(_:)):
+            let isInspectorShown = tabCollectionViewModel.selectedTabViewModel?.tab.webView.isInspectorShown ?? false
+            menuItem.title = isInspectorShown ? UserText.closeDeveloperTools : UserText.openDeveloperTools
+            fallthrough
+        case #selector(MainViewController.openJavaScriptConsole(_:)),
              #selector(MainViewController.showPageSource(_:)),
              #selector(MainViewController.showPageResources(_:)):
             return tabCollectionViewModel.selectedTabViewModel?.canReload == true

@@ -121,18 +121,28 @@ final class WebView: WKWebView {
         return self.perform(NSSelectorFromString("_mainFrame"))?.takeUnretainedValue()
     }
 
-    private func inspectorPerform(_ selectorName: String, with object: Any? = nil) {
+    @discardableResult
+    private func inspectorPerform(_ selectorName: String, with object: Any? = nil) -> Unmanaged<AnyObject>? {
         guard self.responds(to: NSSelectorFromString("_inspector")),
               let inspector = self.value(forKey: "_inspector") as? NSObject,
               inspector.responds(to: NSSelectorFromString(selectorName)) else {
             assertionFailure("_WKInspector does not respond to \(selectorName)")
-            return
+            return nil
         }
-        inspector.perform(NSSelectorFromString(selectorName), with: object)
+        return inspector.perform(NSSelectorFromString(selectorName), with: object)
+    }
+
+    var isInspectorShown: Bool {
+        guard let result = inspectorPerform("isVisible") else { return false }
+        return result.toOpaque() == UnsafeMutableRawPointer(bitPattern: 0x1)
     }
 
     @nonobjc func openDeveloperTools() {
         inspectorPerform("show")
+    }
+
+    @nonobjc func closeDeveloperTools() {
+        inspectorPerform("close")
     }
 
     @nonobjc func openJavaScriptConsole() {
