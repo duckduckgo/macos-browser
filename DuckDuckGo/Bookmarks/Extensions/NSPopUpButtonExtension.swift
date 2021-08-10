@@ -27,7 +27,7 @@ extension NSPopUpButton {
             .eraseToAnyPublisher()
     }
 
-    func displayBrowserTabButtons(withSelectedTab tabType: Tab.TabContent.ContentType) {
+    func displayBrowserTabButtons(withSelectedTab tabType: Tab.TabContent) {
         removeAllItems()
 
         var selectedTabIndex: Int?

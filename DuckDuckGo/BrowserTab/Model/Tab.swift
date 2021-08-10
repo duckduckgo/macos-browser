@@ -38,43 +38,17 @@ protocol TabDelegate: FileDownloadManagerDelegate {
 final class Tab: NSObject {
 
     enum TabContent: Equatable {
-        enum ContentType: Int, CaseIterable {
-            case url = 0
-            case preferences = 1
-            case bookmarks = 2
-            case homepage = 3
-
-            var title: String? {
-                switch self {
-                case .url, .homepage: return nil
-                case .preferences: return UserText.tabPreferencesTitle
-                case .bookmarks: return UserText.tabBookmarksTitle
-                }
-            }
-        }
-
         case homepage
         case url(URL)
         case preferences
         case bookmarks
 
-        init?(type: ContentType, url: URL?) {
-            switch type {
-            case .homepage:
-                self = .homepage
-            case .url:
-                guard let url = url else { return nil }
-                self = .url(url)
-            case .bookmarks:
-                self = .bookmarks
-            case .preferences:
-                self = .preferences
-            }
-        }
-
-        static var displayableTabTypes: [ContentType] {
-            let cases = ContentType.allCases.filter { ![.url, .homepage].contains($0) }
-            return cases.sorted { first, second in
+        static var displayableTabTypes: [TabContent] {
+            return [TabContent.preferences, .bookmarks].sorted { first, second in
+                switch first {
+                case .homepage, .url, .preferences, .bookmarks: break
+                // !! Replace [TabContent.preferences, .bookmarks] above with new displayable Tab Types if added
+                }
                 guard let firstTitle = first.title, let secondTitle = second.title else {
                     return true // Arbitrary sort order, only non-standard tabs are displayable.
                 }
@@ -83,17 +57,12 @@ final class Tab: NSObject {
             }
         }
 
-        var type: ContentType {
-            switch self {
-            case .url: return .url
-            case .homepage: return .homepage
-            case .bookmarks: return .bookmarks
-            case .preferences: return .preferences
-            }
-        }
-
         var title: String? {
-            type.title
+            switch self {
+            case .url, .homepage: return nil
+            case .preferences: return UserText.tabPreferencesTitle
+            case .bookmarks: return UserText.tabBookmarksTitle
+            }
         }
 
         var url: URL? {
