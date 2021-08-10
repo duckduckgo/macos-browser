@@ -393,6 +393,38 @@ CA
                                                 <action selector="zoomOut:" target="Ady-hI-5gd" id="prL-67-8bi"/>
                                             </connections>
                                         </menuItem>
+                                        <menuItem isSeparatorItem="YES" id="4ph-XJ-dbR"/>
+                                        <menuItem title="Developer" id="lFB-BU-3vC">
+                                            <modifierMask key="keyEquivalentModifierMask"/>
+                                            <menu key="submenu" title="Developer" id="29C-HE-7N2">
+                                                <items>
+                                                    <menuItem title="Developer Tools" keyEquivalent="i" id="a5C-fO-7Ma">
+                                                        <modifierMask key="keyEquivalentModifierMask" option="YES" command="YES"/>
+                                                        <connections>
+                                                            <action selector="toggleDeveloperTools:" target="Ady-hI-5gd" id="eDk-E5-aph"/>
+                                                        </connections>
+                                                    </menuItem>
+                                                    <menuItem title="JavaScript Console" keyEquivalent="c" id="7Mg-dc-AHl" userLabel="JavaScript Console">
+                                                        <modifierMask key="keyEquivalentModifierMask" option="YES" command="YES"/>
+                                                        <connections>
+                                                            <action selector="openJavaScriptConsole:" target="Ady-hI-5gd" id="5dz-5p-cgV"/>
+                                                        </connections>
+                                                    </menuItem>
+                                                    <menuItem title="Show Page Source" keyEquivalent="u" id="fHM-BE-1Kw">
+                                                        <modifierMask key="keyEquivalentModifierMask" option="YES" command="YES"/>
+                                                        <connections>
+                                                            <action selector="showPageSource:" target="Ady-hI-5gd" id="YgB-ci-5ei"/>
+                                                        </connections>
+                                                    </menuItem>
+                                                    <menuItem title="Show Resources" keyEquivalent="a" id="fXn-Lp-oZ0">
+                                                        <modifierMask key="keyEquivalentModifierMask" option="YES" command="YES"/>
+                                                        <connections>
+                                                            <action selector="showPageResources:" target="Ady-hI-5gd" id="lAz-VD-kj7"/>
+                                                        </connections>
+                                                    </menuItem>
+                                                </items>
+                                            </menu>
+                                        </menuItem>
                                     </items>
                                 </menu>
                             </menuItem>
