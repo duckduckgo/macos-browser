@@ -54,8 +54,8 @@ extension Optional where Wrapped == PermissionState {
         self == .paused
     }
 
-    func formUnion(_ other: PermissionState?) -> PermissionState? {
-        guard let lhs = self else { return other }
+    func combined(with other: PermissionState?) -> PermissionState? {
+        guard let lhs = self else { return nil }
         guard let rhs = other else { return lhs }
 
         switch (lhs, rhs) {
@@ -109,7 +109,7 @@ extension Optional where Wrapped == PermissionState {
         case (.requested, .active), (.disabled, .active):
             self = .active
 
-        case (.revoking, .active):
+        case (.revoking, .active), (.revoking, .muted):
             // Probably Active Camera + Microphone -> Active Camera state change, stay in Revoking state
             break
         case (.denied, .active):
@@ -119,7 +119,7 @@ extension Optional where Wrapped == PermissionState {
         case (.none, .active), (.paused, .active), (.inactive, .active):
             self = .active
 
-        case (.disabled, .muted), (.denied, .muted), (.requested, .muted), (.revoking, .muted):
+        case (.disabled, .muted), (.denied, .muted), (.requested, .muted):
             assertionFailure("Unexpected change of system disabled Permission")
             fallthrough
         // Muted

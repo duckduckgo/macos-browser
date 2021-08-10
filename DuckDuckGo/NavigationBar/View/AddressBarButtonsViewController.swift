@@ -248,7 +248,7 @@ final class AddressBarButtonsViewController: NSViewController {
 
     @IBAction func cameraButtonAction(_ sender: NSButton) {
         guard let selectedTabViewModel = tabCollectionViewModel.selectedTabViewModel,
-              let state = selectedTabViewModel.usedPermissions.camera.formUnion(selectedTabViewModel.usedPermissions.microphone)
+              let state = selectedTabViewModel.usedPermissions.camera.combined(with: selectedTabViewModel.usedPermissions.microphone)
         else {
             os_log("%s: Selected tab view model is nil or no camera state", type: .error, className)
             return
@@ -354,7 +354,7 @@ final class AddressBarButtonsViewController: NSViewController {
 
         geolocationButton.buttonState = selectedTabViewModel.usedPermissions.geolocation
         cameraButton.buttonState = selectedTabViewModel.usedPermissions.camera
-            .formUnion(selectedTabViewModel.usedPermissions.microphone)
+            .combined(with: selectedTabViewModel.usedPermissions.microphone)
         microphoneButton.buttonState = selectedTabViewModel.usedPermissions.camera == nil
             ? selectedTabViewModel.usedPermissions.microphone
             : nil
