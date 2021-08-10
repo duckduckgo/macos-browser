@@ -30,6 +30,8 @@ final class TrackersAnimationView: NSView {
         return images
     }()
 
+    @Published private(set) var isAnimating = false
+
     func animate() {
         guard layer?.animation(forKey: Constants.animationKeyPath) == nil else { return }
         layer?.add(animation, forKey: Constants.animationKeyPath)
@@ -52,7 +54,20 @@ final class TrackersAnimationView: NSView {
         keyFrameAnimation.isRemovedOnCompletion = false
         keyFrameAnimation.beginTime = 0
         keyFrameAnimation.duration = 83/30
+        keyFrameAnimation.delegate = self
         return keyFrameAnimation
     }()
+
+}
+
+extension TrackersAnimationView: CAAnimationDelegate {
+
+    func animationDidStart(_ anim: CAAnimation) {
+        isAnimating = true
+    }
+
+    func animationDidStop(_ anim: CAAnimation, finished flag: Bool) {
+        isAnimating = false
+    }
 
 }

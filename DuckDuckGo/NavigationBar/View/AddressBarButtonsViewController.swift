@@ -65,6 +65,7 @@ final class AddressBarButtonsViewController: NSViewController {
     private var urlCancellable: AnyCancellable?
     private var trackerInfoCancellable: AnyCancellable?
     private var bookmarkListCancellable: AnyCancellable?
+    private var trackersAnimationViewStatusCancellable: AnyCancellable?
 
     required init?(coder: NSCoder) {
         fatalError("AddressBarButtonsViewController: Bad initializer")
@@ -83,6 +84,7 @@ final class AddressBarButtonsViewController: NSViewController {
         setupButtons()
         subscribeToSelectedTabViewModel()
         subscribeToBookmarkList()
+        subscribeToTrackersAnimationViewStatus()
 
         NotificationCenter.default.addObserver(self,
                                                selector: #selector(showUndoFireproofingPopover(_:)),
@@ -157,8 +159,16 @@ final class AddressBarButtonsViewController: NSViewController {
             imageButton.image = Self.homeFaviconImage
         }
 
-        // Fireproof button
-        if let url = selectedTabViewModel.tab.url, url.showFireproofStatus, !privacyEntryPointButton.isHidden {
+        updateFireproofedButton()
+    }
+
+    private func updateFireproofedButton() {
+        guard let selectedTabViewModel = tabCollectionViewModel.selectedTabViewModel else {
+            os_log("%s: Selected tab view model is nil", type: .error, className)
+            return
+        }
+
+        if let url = selectedTabViewModel.tab.url, url.showFireproofStatus, !privacyEntryPointButton.isHidden, !trackersAnimationView.isAnimating {
             fireproofedButtonDivider.isHidden = !FireproofDomains.shared.isFireproof(fireproofDomain: url.host ?? "")
             fireproofedButton.isHidden = !FireproofDomains.shared.isFireproof(fireproofDomain: url.host ?? "")
         } else {
@@ -277,6 +287,15 @@ final class AddressBarButtonsViewController: NSViewController {
                          of: self.fireproofedButton.superview!,
                          preferredEdge: .minY,
                          behavior: .applicationDefined)
+        }
+    }
+
+    func subscribeToTrackersAnimationViewStatus() {
+        trackersAnimationViewStatusCancellable = trackersAnimationView.$isAnimating
+            .dropFirst()
+            .receive(on: DispatchQueue.main)
+            .sink { [weak self] _ in
+            self?.updateFireproofedButton()
         }
     }
 
