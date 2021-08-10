@@ -92,7 +92,7 @@ final class ConfigurationManager {
                 configDownloader.refreshDataThenUpdate(for: [
                     .trackerRadar,
                     .surrogates,
-                    .temporaryUnprotectedSites
+                    .privacyConfiguration
                 ], self.updateTrackerBlockingDependencies),
 
                 configDownloader.refreshDataThenUpdate(for: [
@@ -154,6 +154,7 @@ final class ConfigurationManager {
     private func updateTrackerBlockingDependencies() throws {
 
         TrackerRadarManager.shared.reload()
+        PrivacyConfigurationManager.shared.reload()
         scriptSource.reload()
         ContentBlockerRulesManager.shared.compileRules { _ in
             self.trackerBlockerDataUpdatedSubject.send(())

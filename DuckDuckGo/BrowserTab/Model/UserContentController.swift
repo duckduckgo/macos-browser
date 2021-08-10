@@ -41,7 +41,9 @@ final class UserContentController: WKUserContentController {
             else { return }
 
             self.removeAllContentRuleLists()
-            self.add(rules)
+            if PrivacyConfigurationManager.shared.config.isEnabled(featureKey: .contentBlocking) {
+                self.add(rules)
+            }
         }
     }
 

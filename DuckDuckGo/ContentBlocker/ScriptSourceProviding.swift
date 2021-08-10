@@ -58,9 +58,10 @@ final class DefaultScriptSourceProvider: ScriptSourceProviding {
     }
 
     private func buildContentBlockerRulesSource() -> String {
-        let unprotectedDomains = configStorage.loadData(for: .temporaryUnprotectedSites)?.utf8String() ?? ""
+        let unprotectedDomains = PrivacyConfigurationManager.shared.config.tempUnprotectedDomains
+        let contentBlockingExceptions = PrivacyConfigurationManager.shared.config.exceptionsList(forFeature: .contentBlocking)
         return ContentBlockerRulesUserScript.loadJS("contentblockerrules", from: .main, withReplacements: [
-            "${unprotectedDomains}": unprotectedDomains
+            "${unprotectedDomains}": (unprotectedDomains + contentBlockingExceptions).joined(separator: "\n")
         ])
     }
 
@@ -69,10 +70,11 @@ final class DefaultScriptSourceProvider: ScriptSourceProviding {
         // Use sensible defaults in case the upstream data is unparsable
         let trackerData = TrackerRadarManager.shared.encodedTrackerData
         let surrogates = configStorage.loadData(for: .surrogates)?.utf8String() ?? ""
-        let unprotectedSites = configStorage.loadData(for: .temporaryUnprotectedSites)?.utf8String() ?? ""
+        let unprotectedSites = PrivacyConfigurationManager.shared.config.tempUnprotectedDomains
+        let contentBlockingExceptions = PrivacyConfigurationManager.shared.config.exceptionsList(forFeature: .contentBlocking)
 
         return ContentBlockerUserScript.loadJS("contentblocker", from: .main, withReplacements: [
-            "${unprotectedDomains}": unprotectedSites,
+            "${unprotectedDomains}": (unprotectedSites + contentBlockingExceptions).joined(separator: "\n"),
             "${trackerData}": trackerData,
             "${surrogates}": surrogates
         ])

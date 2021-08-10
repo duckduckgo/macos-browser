@@ -45,9 +45,10 @@ final class ContentBlockerRulesManager {
     }
 
     private func loadUnprotectedDomains() -> [String] {
-        guard let data = DefaultConfigurationStorage.shared.loadData(for: .temporaryUnprotectedSites),
-              let string = String(data: data, encoding: .utf8) else { return [] }
-        return string.components(separatedBy: .newlines).map { $0.trimmingWhitespaces() }.filter { !$0.isEmpty }
+        let tempUnprotected = PrivacyConfigurationManager.shared.config.tempUnprotectedDomains
+        let contentBlockingExceptions = PrivacyConfigurationManager.shared.config.exceptionsList(forFeature: .contentBlocking)
+        
+        return (tempUnprotected + contentBlockingExceptions).filter { !$0.isEmpty }
     }
 
     private func compileRules(with trackerData: TrackerData,

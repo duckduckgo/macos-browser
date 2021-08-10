@@ -1,0 +1,116 @@
+//
+//  PrivacyConfigurationManager.swift
+//
+//  Copyright © 2021 DuckDuckGo. All rights reserved.
+//
+//  Licensed under the Apache License, Version 2.0 (the "License");
+//  you may not use this file except in compliance with the License.
+//  You may obtain a copy of the License at
+//
+//  http://www.apache.org/licenses/LICENSE-2.0
+//
+//  Unless required by applicable law or agreed to in writing, software
+//  distributed under the License is distributed on an "AS IS" BASIS,
+//  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+//  See the License for the specific language governing permissions and
+//  limitations under the License.
+//
+
+import Foundation
+import TrackerRadarKit
+import Combine
+
+final class PrivacyConfigurationManager {
+
+    struct Constants {
+        static let embeddedDataSetETag = "e6214cfd463faa4d9d00ab357539aa43"
+        static let embeddedDataSetSHA = "rIBc/qpKYsUxT6+oceMEnF/IUgBCz0tcWMOQWW/waac="
+    }
+
+    enum DataSet {
+
+        case embedded
+        case embeddedFallback
+        case downloaded
+
+    }
+
+    static let shared = PrivacyConfigurationManager()
+
+    private(set) var config: PrivacyConfiguration
+    private(set) var encodedConfigData: String
+
+    private var configDataStore: ConfigurationStoring
+
+    init(configDataStore: ConfigurationStoring = DefaultConfigurationStorage.shared) {
+        self.configDataStore = configDataStore
+        (self.config, self.encodedConfigData, _) = Self.loadData()
+    }
+
+    private typealias LoadDataResult = (PrivacyConfiguration, String, DataSet)
+    private class func loadData() -> LoadDataResult {
+
+        var dataSet: DataSet
+        let configData: PrivacyConfiguration
+        var data: Data
+
+        if let loadedData = DefaultConfigurationStorage.shared.loadData(for: .privacyConfiguration) {
+            data = loadedData
+            dataSet = .downloaded
+        } else {
+            data = loadEmbeddedAsData()
+            dataSet = .embedded
+        }
+
+        do {
+            // This might fail if the downloaded data is corrupt or format has changed unexpectedly
+            configData = try JSONDecoder().decode(PrivacyConfiguration.self, from: data)
+        } catch {
+            // This should NEVER fail
+            data = loadEmbeddedAsData()
+            configData = (try? JSONDecoder().decode(PrivacyConfiguration.self, from: data))!
+            dataSet = .embeddedFallback
+
+            // TODO: fix pixel
+            Pixel.fire(.debug(event: .trackerDataParseFailed, error: error))
+        }
+
+        return (configData, data.utf8String()!, dataSet)
+    }
+
+    @discardableResult
+    public func reload() -> DataSet {
+        let (configData, encodedConfigData, dataSet) = Self.loadData()
+        if Thread.isMainThread {
+            self.config = configData
+            self.encodedConfigData = encodedConfigData
+        } else {
+            DispatchQueue.main.async {
+                self.config = configData
+                self.encodedConfigData = encodedConfigData
+            }
+        }
+
+        if dataSet != .downloaded {
+            // TODO: fix pixel
+            Pixel.fire(.debug(event: .trackerDataReloadFailed))
+        }
+
+        return dataSet
+    }
+
+    static var embeddedUrl: URL {
+        return Bundle.main.url(forResource: "macos-config", withExtension: "json")!
+    }
+
+    static func loadEmbeddedAsData() -> Data {
+        let json = try? Data(contentsOf: embeddedUrl)
+        return json!
+    }
+
+    static func loadEmbeddedAsString() -> String {
+        let json = try? String(contentsOf: embeddedUrl, encoding: .utf8)
+        return json!
+    }
+
+}

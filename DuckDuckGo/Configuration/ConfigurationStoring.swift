@@ -36,7 +36,7 @@ final class DefaultConfigurationStorage: ConfigurationStoring {
         .bloomFilterExcludedDomains: "smarterEncryptionExclusions.json",
         .bloomFilterSpec: "smarterEncryptionSpec.json",
         .surrogates: "surrogates.txt",
-        .temporaryUnprotectedSites: "temp-unprotected-sites.txt",
+        .privacyConfiguration: "macos-config.json",
         .trackerRadar: "tracker-radar.json"
     ]
 
@@ -56,9 +56,9 @@ final class DefaultConfigurationStorage: ConfigurationStoring {
 
     @UserDefaultsWrapper(key: .configStorageSurrogatesEtag, defaultValue: nil)
     private var surrogatesEtag: String?
-
-    @UserDefaultsWrapper(key: .configStorageTempUnprotectedSitesEtag, defaultValue: nil)
-    private var temporaryUnprotectedSitesEtag: String?
+    
+    @UserDefaultsWrapper(key: .configStoragePrivacyConfigurationEtag, defaultValue: nil)
+    private var privacyConfigruationEtag: String?
 
     private init() { }
 
@@ -76,11 +76,11 @@ final class DefaultConfigurationStorage: ConfigurationStoring {
         case .surrogates:
             return surrogatesEtag
 
-        case .temporaryUnprotectedSites:
-            return temporaryUnprotectedSitesEtag
-
         case .trackerRadar:
             return trackerRadarEtag
+            
+        case .privacyConfiguration:
+            return privacyConfigruationEtag
         }
     }
 
@@ -98,11 +98,11 @@ final class DefaultConfigurationStorage: ConfigurationStoring {
         case .surrogates:
             surrogatesEtag = etag
 
-        case .temporaryUnprotectedSites:
-            temporaryUnprotectedSitesEtag = etag
-
         case .trackerRadar:
             trackerRadarEtag = etag
+            
+        case .privacyConfiguration:
+            privacyConfigruationEtag = etag
         }
     }
 
@@ -126,8 +126,8 @@ final class DefaultConfigurationStorage: ConfigurationStoring {
         os_log("bloomFilterSpecEtag %{public}s", log: .config, type: .default, bloomFilterSpecEtag ?? "")
         os_log("bloomFilterExcludedDomainsEtag %{public}s", log: .config, type: .default, bloomFilterExcludedDomainsEtag ?? "")
         os_log("surrogatesEtag %{public}s", log: .config, type: .default, surrogatesEtag ?? "")
-        os_log("temporaryUnprotectedSitesEtag %{public}s", log: .config, type: .default, temporaryUnprotectedSitesEtag ?? "")
         os_log("trackerRadarEtag %{public}s", log: .config, type: .default, trackerRadarEtag ?? "")
+        os_log("privacyConfigurationEtag %{public}s", log: .config, type: .default, privacyConfigruationEtag ?? "")
     }
 
     func fileUrl(for config: ConfigurationLocation) -> URL {
