@@ -83,6 +83,50 @@ final class TabBarViewItem: NSCollectionViewItem {
 
     static let identifier = NSUserInterfaceItemIdentifier(rawValue: "TabBarViewItem")
 
+    private var eventMonitor: Any? {
+        didSet {
+            if let oldValue = oldValue {
+                NSEvent.removeMonitor(oldValue)
+            }
+        }
+    }
+
+    var tabBarViewItemMenu: NSMenu {
+        let menu = NSMenu()
+
+        let duplicateMenuItem = NSMenuItem(title: UserText.duplicateTab, action: #selector(duplicateAction(_:)), keyEquivalent: "")
+        menu.addItem(duplicateMenuItem)
+
+        menu.addItem(NSMenuItem.separator())
+
+        let bookmarkMenuItem = NSMenuItem(title: UserText.bookmarkThisPage, action: #selector(bookmarkThisPageAction(_:)), keyEquivalent: "")
+        menu.addItem(bookmarkMenuItem)
+
+        if let url = currentURL, url.canFireproof {
+            let menuItem: NSMenuItem
+
+            if FireproofDomains.shared.isFireproof(fireproofDomain: url.host ?? "") {
+                menuItem = NSMenuItem(title: UserText.removeFireproofing, action: #selector(removeFireproofingAction(_:)), keyEquivalent: "")
+            } else {
+                menuItem = NSMenuItem(title: UserText.fireproofSite, action: #selector(fireproofSiteAction(_:)), keyEquivalent: "")
+            }
+
+            menu.addItem(menuItem)
+            menu.addItem(NSMenuItem.separator())
+        }
+
+        let closeMenuItem = NSMenuItem(title: UserText.closeTab, action: #selector(closeButtonAction(_:)), keyEquivalent: "")
+        menu.addItem(closeMenuItem)
+
+        let closeOtherMenuItem = NSMenuItem(title: UserText.closeOtherTabs, action: #selector(closeOtherAction(_:)), keyEquivalent: "")
+        menu.addItem(closeOtherMenuItem)
+
+        let moveToNewWindowMenuItem = NSMenuItem(title: UserText.moveTabToNewWindow, action: #selector(moveToNewWindowAction(_:)), keyEquivalent: "")
+        menu.addItem(moveToNewWindowMenuItem)
+
+        return menu
+    }
+
     var isLeftToSelected: Bool = false {
         didSet {
             updateSeparatorView()
@@ -103,6 +147,7 @@ final class TabBarViewItem: NSCollectionViewItem {
     @IBOutlet weak var mouseClickView: MouseClickView!
     @IBOutlet weak var tabLoadingViewCenterConstraint: NSLayoutConstraint!
     @IBOutlet weak var tabLoadingViewLeadingConstraint: NSLayoutConstraint!
+    @IBOutlet var closeButtonTrailintgConstraint: NSLayoutConstraint!
 
     private let titleTextFieldMaskLayer = CAGradientLayer()
 
@@ -125,6 +170,17 @@ final class TabBarViewItem: NSCollectionViewItem {
 
         updateSubviews()
         updateTitleTextFieldMask()
+    }
+
+    override func viewWillDisappear() {
+        super.viewWillDisappear()
+        eventMonitor = nil
+    }
+
+    deinit {
+        if let eventMonitor = eventMonitor {
+            NSEvent.removeMonitor(eventMonitor)
+        }
     }
 
     override var isSelected: Bool {
@@ -246,6 +302,8 @@ final class TabBarViewItem: NSCollectionViewItem {
 
         tabLoadingViewCenterConstraint.priority = widthStage.isTitleHidden && widthStage.isCloseButtonHidden ? .defaultHigh : .defaultLow
         tabLoadingViewLeadingConstraint.priority = widthStage.isTitleHidden && widthStage.isCloseButtonHidden ? .defaultLow : .defaultHigh
+
+        closeButtonTrailintgConstraint.isActive = !widthStage.isCloseButtonHidden
     }
 
     private func updateSeparatorView() {
@@ -328,8 +386,27 @@ extension TabBarViewItem: NSMenuDelegate {
 
 extension TabBarViewItem: MouseOverViewDelegate {
 
+    private func modifierFlagsChanged(_ event: NSEvent?) {
+        guard widthStage.isCloseButtonHidden else { return }
+        let commandPressed = event?.modifierFlags.contains(.command) ?? false
+
+        self.closeButton.isHidden = !commandPressed
+        self.faviconImageView.isHidden = commandPressed
+    }
+
     func mouseOverView(_ mouseOverView: MouseOverView, isMouseOver: Bool) {
         delegate?.tabBarViewItem(self, isMouseOver: isMouseOver)
+
+        if isMouseOver {
+            self.modifierFlagsChanged(NSApp.currentEvent)
+            eventMonitor = NSEvent.addLocalMonitorForEvents(matching: .flagsChanged) { [weak self] event in
+                self?.modifierFlagsChanged(event)
+                return event
+            }
+        } else {
+            self.modifierFlagsChanged(nil)
+            eventMonitor = nil
+        }
     }
 
 }
