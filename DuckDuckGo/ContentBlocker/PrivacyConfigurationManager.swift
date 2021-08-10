@@ -70,8 +70,7 @@ final class PrivacyConfigurationManager {
             configData = (try? JSONDecoder().decode(PrivacyConfiguration.self, from: data))!
             dataSet = .embeddedFallback
 
-            // TODO: fix pixel
-            Pixel.fire(.debug(event: .trackerDataParseFailed, error: error))
+            Pixel.fire(.debug(event: .privacyConfigurationParseFailed, error: error))
         }
 
         return (configData, data.utf8String()!, dataSet)
@@ -91,8 +90,7 @@ final class PrivacyConfigurationManager {
         }
 
         if dataSet != .downloaded {
-            // TODO: fix pixel
-            Pixel.fire(.debug(event: .trackerDataReloadFailed))
+            Pixel.fire(.debug(event: .privacyConfigurationReloadFailed))
         }
 
         return dataSet

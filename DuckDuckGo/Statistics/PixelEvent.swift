@@ -85,6 +85,10 @@ extension Pixel {
             case trackerDataParseFailed = "tds_p"
             case trackerDataReloadFailed = "tds_r"
             case trackerDataCouldNotBeLoaded = "tds_l"
+            
+            case privacyConfigurationParseFailed = "pcf_p"
+            case privacyConfigurationReloadFailed = "pcf_r"
+            case privacyConfigurationCouldNotBeLoaded = "pcf_l"
 
             case fileStoreWriteFailed = "fswf"
             case fileMoveToDownloadsFailed = "df"
