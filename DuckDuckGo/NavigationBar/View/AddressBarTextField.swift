@@ -125,7 +125,7 @@ final class AddressBarTextField: NSTextField {
     }
 
     private func makeMeFirstResponderIfNeeded() {
-        let focusTab = tabCollectionViewModel.selectedTabViewModel?.tab.tabType.focusTabAddressBarWhenSelected ?? true
+        let focusTab = tabCollectionViewModel.selectedTabViewModel?.tab.content.focusTabAddressBarWhenSelected ?? true
 
         if focusTab, stringValue == "" {
             makeMeFirstResponder()
@@ -194,7 +194,7 @@ final class AddressBarTextField: NSTextField {
         }
         // keep current search mode
         if url.isDuckDuckGoSearch,
-           let oldURL = selectedTabViewModel.tab.url,
+           let oldURL = selectedTabViewModel.tab.content.url,
             oldURL.isDuckDuckGoSearch {
             if let ia = try? oldURL.getParameter(name: URL.DuckDuckGoParameters.ia.rawValue),
                let newURL = try? url.addParameter(name: URL.DuckDuckGoParameters.ia.rawValue, value: ia) {
@@ -206,7 +206,7 @@ final class AddressBarTextField: NSTextField {
             }
         }
 
-        if selectedTabViewModel.tab.url == url {
+        if selectedTabViewModel.tab.content.url == url {
             Pixel.fire(.refresh(source: .reloadURL))
             selectedTabViewModel.tab.reload()
         } else {
@@ -226,7 +226,7 @@ final class AddressBarTextField: NSTextField {
         }
 
         Pixel.fire(.navigation(kind: .init(url: url), source: suggestion != nil ? .suggestion : .addressBar))
-        let tab = Tab(url: url, shouldLoadInBackground: true)
+        let tab = Tab(content: .url(url), shouldLoadInBackground: true)
         tabCollectionViewModel.append(tab: tab, selected: selected)
     }
 

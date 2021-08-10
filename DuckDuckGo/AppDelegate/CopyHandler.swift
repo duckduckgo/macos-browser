@@ -43,7 +43,7 @@ final class CopyHandler: NSObject {
         }
 
         if let controller = NSApp.keyWindow?.contentViewController as? MainViewController,
-           let url = controller.tabCollectionViewModel.selectedTabViewModel?.tab.url {
+           let url = controller.tabCollectionViewModel.selectedTabViewModel?.tab.content.url {
             let targetCopy = url.isDuckDuckGoSearch ? url.searchQuery : url.absoluteString
             if editor.selectedText != targetCopy {
                 copyRange()

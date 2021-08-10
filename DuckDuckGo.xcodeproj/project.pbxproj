@@ -146,7 +146,7 @@
 		4B9292C22667103100AD2C21 /* BookmarkTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B9292B82667103000AD2C21 /* BookmarkTests.swift */; };
 		4B9292C32667103100AD2C21 /* PasteboardBookmarkTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B9292B92667103100AD2C21 /* PasteboardBookmarkTests.swift */; };
 		4B9292C52667104B00AD2C21 /* CoreDataTestUtilities.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B9292C42667104B00AD2C21 /* CoreDataTestUtilities.swift */; };
-		4B9292CE2667123700AD2C21 /* BrowserTabEmbeddable.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B9292C62667123700AD2C21 /* BrowserTabEmbeddable.swift */; };
+		4B9292CE2667123700AD2C21 /* BrowserTabSelectionDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B9292C62667123700AD2C21 /* BrowserTabSelectionDelegate.swift */; };
 		4B9292CF2667123700AD2C21 /* BookmarkManagementSidebarViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B9292C72667123700AD2C21 /* BookmarkManagementSidebarViewController.swift */; };
 		4B9292D02667123700AD2C21 /* BookmarkManagementSplitViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B9292C82667123700AD2C21 /* BookmarkManagementSplitViewController.swift */; };
 		4B9292D12667123700AD2C21 /* BookmarkTableRowView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B9292C92667123700AD2C21 /* BookmarkTableRowView.swift */; };
@@ -598,7 +598,7 @@
 		4B9292B82667103000AD2C21 /* BookmarkTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = BookmarkTests.swift; sourceTree = "<group>"; };
 		4B9292B92667103100AD2C21 /* PasteboardBookmarkTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = PasteboardBookmarkTests.swift; sourceTree = "<group>"; };
 		4B9292C42667104B00AD2C21 /* CoreDataTestUtilities.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CoreDataTestUtilities.swift; sourceTree = "<group>"; };
-		4B9292C62667123700AD2C21 /* BrowserTabEmbeddable.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = BrowserTabEmbeddable.swift; sourceTree = "<group>"; };
+		4B9292C62667123700AD2C21 /* BrowserTabSelectionDelegate.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = BrowserTabSelectionDelegate.swift; sourceTree = "<group>"; };
 		4B9292C72667123700AD2C21 /* BookmarkManagementSidebarViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = BookmarkManagementSidebarViewController.swift; sourceTree = "<group>"; };
 		4B9292C82667123700AD2C21 /* BookmarkManagementSplitViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = BookmarkManagementSplitViewController.swift; sourceTree = "<group>"; };
 		4B9292C92667123700AD2C21 /* BookmarkTableRowView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = BookmarkTableRowView.swift; sourceTree = "<group>"; };
@@ -2075,7 +2075,7 @@
 				4B9292C72667123700AD2C21 /* BookmarkManagementSidebarViewController.swift */,
 				4B9292C82667123700AD2C21 /* BookmarkManagementSplitViewController.swift */,
 				4B9292C92667123700AD2C21 /* BookmarkTableRowView.swift */,
-				4B9292C62667123700AD2C21 /* BrowserTabEmbeddable.swift */,
+				4B9292C62667123700AD2C21 /* BrowserTabSelectionDelegate.swift */,
 				4B92928726670D1600AD2C21 /* BookmarkOutlineViewCell.swift */,
 				4B92928826670D1600AD2C21 /* BookmarkOutlineViewCell.xib */,
 				4B92928526670D1600AD2C21 /* BookmarksOutlineView.swift */,
@@ -2803,7 +2803,7 @@
 				AA9E9A5625A3AE8400D1959D /* NSWindowExtension.swift in Sources */,
 				4B0511C9262CAA5A00F6079C /* RoundedSelectionRowView.swift in Sources */,
 				AAC5E4C725D6A6E8007F5990 /* BookmarkPopover.swift in Sources */,
-				4B9292CE2667123700AD2C21 /* BrowserTabEmbeddable.swift in Sources */,
+				4B9292CE2667123700AD2C21 /* BrowserTabSelectionDelegate.swift in Sources */,
 				4B9292A126670D2A00AD2C21 /* BookmarkTreeController.swift in Sources */,
 				4B9292D02667123700AD2C21 /* BookmarkManagementSplitViewController.swift in Sources */,
 				B6E61EE3263AC0C8004E11AB /* FileManagerExtension.swift in Sources */,

@@ -51,9 +51,9 @@ final class BookmarkManagementSplitViewController: NSSplitViewController {
         splitView.setValue(NSColor(named: "DividerColor"), forKey: "dividerColor")
         sidebarViewController.delegate = self
         detailViewController.delegate = self
-        tabSwitcherButton.displayBrowserTabButtons(withSelectedTab: .bookmarks)
+        sidebarViewController.tabSwitcherButton.displayBrowserTabButtons(withSelectedTab: .bookmarks)
 
-        selectedTabCancellable = tabSwitcherButton.selectionPublisher.sink { [weak self] index in
+        selectedTabCancellable = sidebarViewController.tabSwitcherButton.selectionPublisher.sink { [weak self] index in
             self?.delegate?.selectedTab(at: index)
         }
     }
@@ -73,14 +73,6 @@ extension BookmarkManagementSplitViewController: BookmarkManagementDetailViewCon
 
     func bookmarkManagementDetailViewControllerDidSelectFolder(_ folder: BookmarkFolder) {
         sidebarViewController.select(folder: folder)
-    }
-
-}
-
-extension BookmarkManagementSplitViewController: BrowserTabEmbeddable {
-
-    var tabSwitcherButton: NSPopUpButton {
-        return sidebarViewController.tabSwitcherButton
     }
 
 }
