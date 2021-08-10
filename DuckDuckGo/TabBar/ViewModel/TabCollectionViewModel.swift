@@ -241,6 +241,16 @@ final class TabCollectionViewModel: NSObject {
         delegate?.tabCollectionViewModelDidMultipleChanges(self)
     }
 
+    func removeTabs(after index: Int) {
+        tabCollection.removeTabs(after: index)
+
+        if !tabCollection.tabs.indices.contains(selectionIndex ?? -1) {
+            selectionIndex = tabCollection.tabs.indices.last
+        }
+        
+        delegate?.tabCollectionViewModelDidMultipleChanges(self)
+    }
+
     func removeAllTabsAndAppendNewTab() {
         tabCollection.removeAll(andAppend: Tab())
         select(at: 0)

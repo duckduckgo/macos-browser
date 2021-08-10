@@ -57,6 +57,10 @@ final class TabCollection: NSObject {
         tabs = tab.map { [$0] } ?? []
     }
 
+    func removeTabs(after index: Int) {
+        tabs.removeSubrange((index + 1)...)
+    }
+
     func moveTab(at index: Int, to newIndex: Int) {
         guard index >= 0, index < tabs.count, newIndex >= 0, newIndex < tabs.count else {
             os_log("TabCollection: Index out of bounds", type: .error)

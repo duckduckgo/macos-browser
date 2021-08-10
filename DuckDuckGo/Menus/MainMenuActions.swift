@@ -312,7 +312,13 @@ extension MainViewController {
 
         Pixel.fire(.navigation(kind: .bookmark(isFavorite: bookmark.isFavorite), source: .mainMenu))
 
-        selectedTabViewModel.tab.url = bookmark.url
+        if NSApplication.shared.isCommandPressed && NSApplication.shared.isShiftPressed {
+            WindowsManager.openNewWindow(with: bookmark.url)
+        } else if NSApplication.shared.isCommandPressed {
+            WindowControllersManager.shared.show(url: bookmark.url, newTab: true)
+        } else {
+            selectedTabViewModel.tab.url = bookmark.url
+        }
     }
 
     @IBAction func openAllInTabs(_ sender: Any?) {
@@ -354,7 +360,10 @@ extension MainViewController {
             return
         }
         let index = keyEquivalent - 1
-        if index >= 0 && index < tabCollectionViewModel.tabCollection.tabs.count {
+        if keyEquivalent == 9,
+           !tabCollectionViewModel.tabCollection.tabs.isEmpty {
+            tabCollectionViewModel.select(at: tabCollectionViewModel.tabCollection.tabs.count - 1)
+        } else if tabCollectionViewModel.tabCollection.tabs.indices.contains(index) {
             tabCollectionViewModel.select(at: index)
         }
     }
@@ -451,11 +460,34 @@ extension MainViewController {
         }
     }
 
+    // MARK: - Developer Tools
+
+    @IBAction func toggleDeveloperTools(_ sender: Any?) {
+        if tabCollectionViewModel.selectedTabViewModel?.tab.webView.isInspectorShown == true {
+            tabCollectionViewModel.selectedTabViewModel?.tab.webView.closeDeveloperTools()
+        } else {
+            tabCollectionViewModel.selectedTabViewModel?.tab.webView.openDeveloperTools()
+        }
+    }
+
+    @IBAction func openJavaScriptConsole(_ sender: Any?) {
+        tabCollectionViewModel.selectedTabViewModel?.tab.webView.openJavaScriptConsole()
+    }
+
+    @IBAction func showPageSource(_ sender: Any?) {
+        tabCollectionViewModel.selectedTabViewModel?.tab.webView.showPageSource()
+    }
+
+    @IBAction func showPageResources(_ sender: Any?) {
+        tabCollectionViewModel.selectedTabViewModel?.tab.webView.showPageSource()
+    }
+
 }
 
 extension MainViewController: NSMenuItemValidation {
     
     // swiftlint:disable cyclomatic_complexity
+    // swiftlint:disable function_body_length
     func validateMenuItem(_ menuItem: NSMenuItem) -> Bool {
         // Enable "Move to another Display" menu item (is there a better way?)
         for item in menuItem.menu!.items where item.action == Selector(("_moveToDisplay:")) {
@@ -510,10 +542,21 @@ extension MainViewController: NSMenuItemValidation {
              #selector(MainViewController.showPreviousTab(_:)):
             return tabCollectionViewModel.tabCollection.tabs.count > 1
 
+        // Developer Tools
+        case #selector(MainViewController.toggleDeveloperTools(_:)):
+            let isInspectorShown = tabCollectionViewModel.selectedTabViewModel?.tab.webView.isInspectorShown ?? false
+            menuItem.title = isInspectorShown ? UserText.closeDeveloperTools : UserText.openDeveloperTools
+            fallthrough
+        case #selector(MainViewController.openJavaScriptConsole(_:)),
+             #selector(MainViewController.showPageSource(_:)),
+             #selector(MainViewController.showPageResources(_:)):
+            return tabCollectionViewModel.selectedTabViewModel?.canReload == true
+
         default:
             return true
         }
     }
+    // swiftlint:enable function_body_length
     // swiftlint:enable cyclomatic_complexity
 
 }

@@ -21,7 +21,7 @@
                             <stackView distribution="fill" orientation="horizontal" alignment="top" spacing="4" horizontalStackHuggingPriority="249.99998474121094" verticalStackHuggingPriority="249.99998474121094" detachesHiddenViews="YES" translatesAutoresizingMaskIntoConstraints="NO" id="eEh-kf-smR">
                                 <rect key="frame" x="12" y="6" width="92" height="28"/>
                                 <subviews>
-                                    <button translatesAutoresizingMaskIntoConstraints="NO" id="kky-0N-Cfd" customClass="MouseOverButton" customModule="DuckDuckGo_Privacy_Browser" customModuleProvider="target">
+                                    <button translatesAutoresizingMaskIntoConstraints="NO" id="kky-0N-Cfd" customClass="LongPressButton" customModule="DuckDuckGo_Privacy_Browser" customModuleProvider="target">
                                         <rect key="frame" x="0.0" y="0.0" width="28" height="28"/>
                                         <constraints>
                                             <constraint firstAttribute="height" constant="28" id="0zh-Jn-l2h"/>
@@ -47,7 +47,7 @@
                                             <action selector="goBackAction:" target="o2v-eH-jTI" id="gEk-2Z-80d"/>
                                         </connections>
                                     </button>
-                                    <button translatesAutoresizingMaskIntoConstraints="NO" id="mdE-u0-Ei5" customClass="MouseOverButton" customModule="DuckDuckGo_Privacy_Browser" customModuleProvider="target">
+                                    <button translatesAutoresizingMaskIntoConstraints="NO" id="mdE-u0-Ei5" customClass="LongPressButton" customModule="DuckDuckGo_Privacy_Browser" customModuleProvider="target">
                                         <rect key="frame" x="32" y="0.0" width="28" height="28"/>
                                         <constraints>
                                             <constraint firstAttribute="height" constant="28" id="VXS-B2-jFA"/>

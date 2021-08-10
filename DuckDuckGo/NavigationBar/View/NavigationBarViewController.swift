@@ -69,6 +69,10 @@ final class NavigationBarViewController: NSViewController {
         subscribeToSelectedTabViewModel()
         listenToPasswordManagerNotifications()
 
+        optionsButton.sendAction(on: .leftMouseDown)
+        bookmarkListButton.sendAction(on: .leftMouseDown)
+        shareButton.sendAction(on: .leftMouseDown)
+
 #if !FEEDBACK
 
         removeFeedback()
@@ -116,36 +120,33 @@ final class NavigationBarViewController: NSViewController {
     }
 
     @IBAction func optionsButtonAction(_ sender: NSButton) {
-        if let event = NSApplication.shared.currentEvent {
-            let menu = OptionsButtonMenu(tabCollectionViewModel: tabCollectionViewModel)
-            menu.actionDelegate = self
+        let menu = OptionsButtonMenu(tabCollectionViewModel: tabCollectionViewModel)
+        menu.actionDelegate = self
+        menu.popUp(positioning: nil, at: NSPoint(x: 0, y: sender.bounds.height + 4), in: sender)
 
-            NSMenu.popUpContextMenu(menu, with: event, for: sender)
+        switch menu.result {
+        case .bookmarks:
+            Pixel.fire(.moreMenu(result: .bookmarksList))
+        case .logins:
+            Pixel.fire(.moreMenu(result: .logins))
+        case .emailProtection:
+            Pixel.fire(.moreMenu(result: .emailProtection))
+        case .feedback:
+            Pixel.fire(.moreMenu(result: .feedback))
+        case .fireproof:
+            Pixel.fire(.moreMenu(result: .fireproof))
+        case .moveTabToNewWindow:
+            Pixel.fire(.moreMenu(result: .moveTabToNewWindow))
+        case .preferences:
+            Pixel.fire(.moreMenu(result: .preferences))
+        case .none:
+            Pixel.fire(.moreMenu(result: .cancelled))
 
-            switch menu.result {
-            case .bookmarks:
-                Pixel.fire(.moreMenu(result: .bookmarksList))
-            case .logins:
-                Pixel.fire(.moreMenu(result: .logins))
-            case .emailProtection:
-                Pixel.fire(.moreMenu(result: .emailProtection))
-            case .feedback:
-                Pixel.fire(.moreMenu(result: .feedback))
-            case .fireproof:
-                Pixel.fire(.moreMenu(result: .fireproof))
-            case .moveTabToNewWindow:
-                Pixel.fire(.moreMenu(result: .moveTabToNewWindow))
-            case .preferences:
-                Pixel.fire(.moreMenu(result: .preferences))
-            case .none:
-                Pixel.fire(.moreMenu(result: .cancelled))
-
-            case .emailProtectionOff,
-                 .emailProtectionCreateAddress,
-                 .bookmarkThisPage,
-                 .favoriteThisPage:
-                break
-            }
+        case .emailProtectionOff,
+             .emailProtectionCreateAddress,
+             .bookmarkThisPage,
+             .favoriteThisPage:
+            break
         }
     }
 
