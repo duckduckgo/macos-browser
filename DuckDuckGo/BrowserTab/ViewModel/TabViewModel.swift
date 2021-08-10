@@ -81,7 +81,7 @@ final class TabViewModel {
     }
 
     private func subscribeToUrl() {
-        tab.$url.sink { [weak self] _ in
+        tab.$content.sink { [weak self] _ in
             self?.updateCanReload()
             self?.updateAddressBarStrings()
             self?.updateCanBeBookmarked()
@@ -111,11 +111,11 @@ final class TabViewModel {
     }
 
     private func updateCanReload() {
-        canReload = tab.url != nil
+        canReload = tab.content.url ?? .emptyPage != .emptyPage
     }
 
     private func updateCanBeBookmarked() {
-        canBeBookmarked = tab.url != nil
+        canBeBookmarked = tab.content.url ?? .emptyPage != .emptyPage
     }
 
     private func updateAddressBarStrings() {
@@ -126,7 +126,7 @@ final class TabViewModel {
             return
         }
 
-        guard let url = tab.url, let host = url.host else {
+        guard let url = tab.content.url, let host = url.host else {
             addressBarString = ""
             passiveAddressBarString = ""
             return
@@ -150,12 +150,12 @@ final class TabViewModel {
             return
         }
 
-        if tab.tabType == .preferences {
+        if tab.content == .preferences {
             title = UserText.tabPreferencesTitle
             return
         }
 
-        if tab.tabType == .bookmarks {
+        if tab.content == .bookmarks {
             title = UserText.tabBookmarksTitle
             return
         }
@@ -183,14 +183,14 @@ final class TabViewModel {
             return
         }
 
-        switch tab.tabType {
+        switch tab.content {
         case .preferences:
             favicon = Favicon.preferences
             return
         case .bookmarks:
             favicon = Favicon.bookmarks
             return
-        case .standard: break
+        case .url, .homepage: break
         }
 
         if let favicon = tab.favicon {

@@ -69,6 +69,10 @@ final class NavigationBarViewController: NSViewController {
         subscribeToSelectedTabViewModel()
         listenToPasswordManagerNotifications()
 
+        optionsButton.sendAction(on: .leftMouseDown)
+        bookmarkListButton.sendAction(on: .leftMouseDown)
+        shareButton.sendAction(on: .leftMouseDown)
+
 #if !FEEDBACK
 
         removeFeedback()
@@ -116,36 +120,33 @@ final class NavigationBarViewController: NSViewController {
     }
 
     @IBAction func optionsButtonAction(_ sender: NSButton) {
-        if let event = NSApplication.shared.currentEvent {
-            let menu = OptionsButtonMenu(tabCollectionViewModel: tabCollectionViewModel)
-            menu.actionDelegate = self
+        let menu = OptionsButtonMenu(tabCollectionViewModel: tabCollectionViewModel)
+        menu.actionDelegate = self
+        menu.popUp(positioning: nil, at: NSPoint(x: 0, y: sender.bounds.height + 4), in: sender)
 
-            NSMenu.popUpContextMenu(menu, with: event, for: sender)
+        switch menu.result {
+        case .bookmarks:
+            Pixel.fire(.moreMenu(result: .bookmarksList))
+        case .logins:
+            Pixel.fire(.moreMenu(result: .logins))
+        case .emailProtection:
+            Pixel.fire(.moreMenu(result: .emailProtection))
+        case .feedback:
+            Pixel.fire(.moreMenu(result: .feedback))
+        case .fireproof:
+            Pixel.fire(.moreMenu(result: .fireproof))
+        case .moveTabToNewWindow:
+            Pixel.fire(.moreMenu(result: .moveTabToNewWindow))
+        case .preferences:
+            Pixel.fire(.moreMenu(result: .preferences))
+        case .none:
+            Pixel.fire(.moreMenu(result: .cancelled))
 
-            switch menu.result {
-            case .bookmarks:
-                Pixel.fire(.moreMenu(result: .bookmarksList))
-            case .logins:
-                Pixel.fire(.moreMenu(result: .logins))
-            case .emailProtection:
-                Pixel.fire(.moreMenu(result: .emailProtection))
-            case .feedback:
-                Pixel.fire(.moreMenu(result: .feedback))
-            case .fireproof:
-                Pixel.fire(.moreMenu(result: .fireproof))
-            case .moveTabToNewWindow:
-                Pixel.fire(.moreMenu(result: .moveTabToNewWindow))
-            case .preferences:
-                Pixel.fire(.moreMenu(result: .preferences))
-            case .none:
-                Pixel.fire(.moreMenu(result: .cancelled))
-
-            case .emailProtectionOff,
-                 .emailProtectionCreateAddress,
-                 .bookmarkThisPage,
-                 .favoriteThisPage:
-                break
-            }
+        case .emailProtectionOff,
+             .emailProtectionCreateAddress,
+             .bookmarkThisPage,
+             .favoriteThisPage:
+            break
         }
     }
 
@@ -158,7 +159,7 @@ final class NavigationBarViewController: NSViewController {
     }
 
     @IBAction func shareButtonAction(_ sender: NSButton) {
-        guard let url = tabCollectionViewModel.selectedTabViewModel?.tab.url else { return }
+        guard let url = tabCollectionViewModel.selectedTabViewModel?.tab.content.url else { return }
         let sharing = NSSharingServicePicker(items: [url])
         sharing.delegate = self
         sharing.show(relativeTo: .zero, of: sender, preferredEdge: .minY)
@@ -222,7 +223,7 @@ final class NavigationBarViewController: NSViewController {
     }
 
     private func subscribeToTabUrl() {
-        urlCancellable = tabCollectionViewModel.selectedTabViewModel?.tab.$url
+        urlCancellable = tabCollectionViewModel.selectedTabViewModel?.tab.$content
             .receive(on: DispatchQueue.main)
             .sink(receiveValue: { [weak self] _ in
                 self?.updatePasswordManagementButton()
@@ -230,7 +231,7 @@ final class NavigationBarViewController: NSViewController {
     }
 
     private func updatePasswordManagementButton() {
-        let url = tabCollectionViewModel.selectedTabViewModel?.tab.url
+        let url = tabCollectionViewModel.selectedTabViewModel?.tab.content.url
 
         passwordManagementButton.image = NSImage(named: "PasswordManagement")
 
@@ -312,7 +313,7 @@ final class NavigationBarViewController: NSViewController {
         goForwardButton.isEnabled = selectedTabViewModel.canGoForward
         refreshButton.isEnabled = selectedTabViewModel.canReload
         shareButton.isEnabled = selectedTabViewModel.canReload
-        shareButton.isEnabled = selectedTabViewModel.tab.url != nil
+        shareButton.isEnabled = selectedTabViewModel.tab.content.url ?? .emptyPage != .emptyPage
     }
 
 }

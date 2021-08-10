@@ -380,3 +380,9 @@ fileprivate extension TabCollectionViewModel {
     }
 
 }
+
+extension Tab {
+    convenience init(parentTab: Tab) {
+        self.init(content: .url(.emptyPage), parentTab: parentTab)
+    }
+}

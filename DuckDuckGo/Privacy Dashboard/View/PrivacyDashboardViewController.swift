@@ -69,7 +69,7 @@ final class PrivacyDashboardViewController: NSViewController {
             assertionFailure("PrivacyDashboardViewController: tabViewModel not set")
             return
         }
-        guard let domain = tabViewModel?.tab.url?.host else {
+        guard let domain = tabViewModel?.tab.content.url?.host else {
             privacyDashboardScript.setPermissions(Permissions(), authorizationState: [:], domain: "", in: webView)
             return
         }
@@ -94,7 +94,7 @@ final class PrivacyDashboardViewController: NSViewController {
         tabViewModel?.tab.$trackerInfo
             .receive(on: DispatchQueue.main)
             .sink(receiveValue: { [weak self] trackerInfo in
-                guard let self = self, let trackerInfo = trackerInfo, let tabUrl = self.tabViewModel?.tab.url else { return }
+                guard let self = self, let trackerInfo = trackerInfo, let tabUrl = self.tabViewModel?.tab.content.url else { return }
                 self.privacyDashboardScript.setTrackerInfo(tabUrl, trackerInfo: trackerInfo, webView: self.webView)
             })
             .store(in: &cancellables)
@@ -123,7 +123,7 @@ extension PrivacyDashboardViewController: PrivacyDashboardUserScriptDelegate {
     }
 
     func userScript(_ userScript: PrivacyDashboardUserScript, didSetPermission permission: PermissionType, to state: PermissionAuthorizationState) {
-        guard let domain = tabViewModel?.tab.url?.host else {
+        guard let domain = tabViewModel?.tab.content.url?.host else {
             assertionFailure("PrivacyDashboardViewController: no domain available")
             return
         }

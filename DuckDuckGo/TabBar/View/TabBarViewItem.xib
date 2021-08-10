@@ -125,6 +125,7 @@
                 <constraint firstItem="XdB-Qn-iD9" firstAttribute="centerY" secondItem="Hz6-mo-xeY" secondAttribute="centerY" id="6wl-2B-Woa"/>
                 <constraint firstAttribute="trailing" secondItem="XdB-Qn-iD9" secondAttribute="trailing" priority="900" constant="8" id="BAO-r4-OkC"/>
                 <constraint firstItem="jlg-2n-tzm" firstAttribute="leading" secondItem="Hz6-mo-xeY" secondAttribute="leading" id="DOd-Y3-APh"/>
+                <constraint firstItem="vuD-rY-Vzl" firstAttribute="centerX" secondItem="A6g-eG-dOW" secondAttribute="centerX" priority="300" id="Eoq-S2-Ah7"/>
                 <constraint firstItem="jlg-2n-tzm" firstAttribute="top" secondItem="Hz6-mo-xeY" secondAttribute="top" id="IAM-jm-SbM"/>
                 <constraint firstItem="opQ-Od-dCO" firstAttribute="centerY" secondItem="Hz6-mo-xeY" secondAttribute="centerY" id="J32-aM-9m2"/>
                 <constraint firstAttribute="trailing" secondItem="DFD-8r-YGx" secondAttribute="trailing" constant="8" id="L7J-mr-jLh"/>
@@ -149,6 +150,7 @@
         <collectionViewItem id="4MN-w4-aCk" customClass="TabBarViewItem" customModule="DuckDuckGo_Privacy_Browser" customModuleProvider="target">
             <connections>
                 <outlet property="closeButton" destination="vuD-rY-Vzl" id="JGv-Ac-mRi"/>
+                <outlet property="closeButtonTrailintgConstraint" destination="web-9k-BYT" id="9Wt-xR-qep"/>
                 <outlet property="faviconImageView" destination="Kky-kZ-lU9" id="96Z-4T-ONB"/>
                 <outlet property="loadingView" destination="A6g-eG-dOW" id="ziS-fe-bqN"/>
                 <outlet property="mouseClickView" destination="890-3t-v5O" id="rcf-rO-cap"/>

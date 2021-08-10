@@ -1,5 +1,5 @@
 //
-//  BrowserTabEmbeddable.swift
+//  BrowserTabSelectionDelegate.swift
 //
 //  Copyright © 2021 DuckDuckGo. All rights reserved.
 //
@@ -17,12 +17,6 @@
 //
 
 import Foundation
-
-protocol BrowserTabEmbeddable {
-
-    var tabSwitcherButton: NSPopUpButton { get }
-
-}
 
 protocol BrowserTabSelectionDelegate: AnyObject {
 
