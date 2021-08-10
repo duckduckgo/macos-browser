@@ -137,17 +137,7 @@ final class SaveCredentialsViewController: NSViewController {
     }
 
     @IBAction func onTogglePasswordVisibility(sender: Any?) {
-
-        if hiddenPasswordField.isHidden {
-            hiddenPasswordField.stringValue = visiblePasswordField.stringValue
-            hiddenPasswordField.isHidden = false
-            visiblePasswordField.isHidden = true
-        } else {
-            visiblePasswordField.stringValue = hiddenPasswordField.stringValue
-            visiblePasswordField.isHidden = false
-            hiddenPasswordField.isHidden = true
-        }
-
+        updatePasswordFieldVisibility(visible: !hiddenPasswordField.isHidden)
     }
 
     override func viewDidLoad() {
@@ -156,9 +146,26 @@ final class SaveCredentialsViewController: NSViewController {
         saveButton.becomeFirstResponder()
     }
 
+    override func viewWillAppear() {
+        super.viewWillAppear()
+        updatePasswordFieldVisibility(visible: false)
+    }
+
     func loadFaviconForDomain(_ domain: String) {
         faviconImage.image = LocalFaviconService.shared.getCachedFavicon(for: domain, mustBeFromUserScript: false)
             ?? NSImage(named: NSImage.Name("Web"))
+    }
+
+    private func updatePasswordFieldVisibility(visible: Bool) {
+        if visible {
+            visiblePasswordField.stringValue = hiddenPasswordField.stringValue
+            visiblePasswordField.isHidden = false
+            hiddenPasswordField.isHidden = true
+        } else {
+            hiddenPasswordField.stringValue = visiblePasswordField.stringValue
+            hiddenPasswordField.isHidden = false
+            visiblePasswordField.isHidden = true
+        }
     }
 
 }

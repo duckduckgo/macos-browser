@@ -1,5 +1,5 @@
 //
-//  WKWebViewConfigurationExtensions.swift
+//  BraveDataImporter.swift
 //
 //  Copyright © 2021 DuckDuckGo. All rights reserved.
 //
@@ -16,19 +16,19 @@
 //  limitations under the License.
 //
 
-import WebKit
-import Combine
+import Foundation
 
-extension WKWebViewConfiguration {
+final class BraveDataImporter: ChromiumDataImporter {
 
-    func applyStandardConfiguration() {
-        allowsAirPlayForMediaPlayback = true
-        preferences.setValue(true, forKey: "fullScreenEnabled")
-        preferences.setValue(true, forKey: "allowsPictureInPictureMediaPlayback")
-        preferences.setValue(true, forKey: "developerExtrasEnabled")
-        preferences.setValue(false, forKey: "backspaceKeyNavigationEnabled")
-        preferences.javaScriptCanOpenWindowsAutomatically = false
-        self.userContentController = UserContentController()
-     }
+    override var processName: String {
+        return "Brave"
+    }
+
+    init(loginImporter: LoginImporter) {
+        let applicationSupport = FileManager.default.urls(for: .applicationSupportDirectory, in: .userDomainMask).first!
+        let path = applicationSupport.appendingPathComponent("BraveSoftware/Brave-Browser/Default/").absoluteString
+
+        super.init(applicationDataDirectoryPath: path, loginImporter: loginImporter)
+    }
 
 }

@@ -31,9 +31,11 @@ extension URLRequest {
         var request = URLRequest(url: url)
         request.setValue("gzip;q=1.0, compress;q=0.5",
                          forHTTPHeaderField: HeaderKey.acceptEncoding.rawValue)
-        // Rewrite with an user agent created specifically for the macOS desktop browser
-        // https://app.asana.com/0/0/1200259209069307/f
-        request.setValue("ddg_ios/7.54.0.0 (com.duckduckgo.mobile.ios; iOS 14.0)",
+
+        let appVersion = AppVersion.shared.versionNumber
+        let appId = AppVersion.shared.identifier
+        let systemVersion = ProcessInfo.processInfo.operatingSystemVersion
+        request.setValue("ddg_macos/\(appVersion) (\(appId); macOS \(systemVersion))",
                          forHTTPHeaderField: HeaderKey.userAgent.rawValue)
 
         let languages = Locale.preferredLanguages.prefix(6)
