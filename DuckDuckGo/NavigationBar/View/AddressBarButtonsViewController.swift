@@ -38,6 +38,7 @@ final class AddressBarButtonsViewController: NSViewController {
     private lazy var bookmarkPopover = BookmarkPopover()
 
     @IBOutlet weak var privacyEntryPointButton: PrivacyEntryPointAddressBarButton!
+    @IBOutlet weak var trackersAnimationView: TrackersAnimationView!
     @IBOutlet weak var bookmarkButton: AddressBarButton!
     @IBOutlet weak var imageButtonWrapper: NSView!
     @IBOutlet weak var imageButton: NSButton!
@@ -91,8 +92,6 @@ final class AddressBarButtonsViewController: NSViewController {
 
     @IBAction func bookmarkButtonAction(_ sender: Any) {
         openBookmarkPopover(setFavorite: false, accessPoint: .button)
-
-        privacyEntryPointButton.animate()
     }
 
     @IBAction func clearButtonAction(_ sender: Any) {
@@ -142,6 +141,7 @@ final class AddressBarButtonsViewController: NSViewController {
 
         // Privacy entry point button
         privacyEntryPointButton.isHidden = isSearchingMode || isTextFieldEditorFirstResponder || isDuckDuckGoUrl || isURLNil
+        trackersAnimationView.isHidden = privacyEntryPointButton.isHidden
         imageButtonWrapper.isHidden = !privacyEntryPointButton.isHidden
 
         clearButton.isHidden = !(isTextFieldEditorFirstResponder && !textFieldValue.isEmpty)
@@ -196,12 +196,12 @@ final class AddressBarButtonsViewController: NSViewController {
     private func subscribeToTrackerInfo() {
         trackerInfoCancellable?.cancel()
 
-        updatePrivacyEntryPointButton(trackerInfo: tabCollectionViewModel.selectedTabViewModel?.tab.trackerInfo, animated: false)
+        updatePrivacyViews(trackerInfo: tabCollectionViewModel.selectedTabViewModel?.tab.trackerInfo, animated: false)
         trackerInfoCancellable = tabCollectionViewModel.selectedTabViewModel?.tab.$trackerInfo
             .dropFirst()
             .receive(on: DispatchQueue.main)
             .sink { [weak self] trackerInfo in
-                self?.updatePrivacyEntryPointButton(trackerInfo: trackerInfo, animated: true)
+                self?.updatePrivacyViews(trackerInfo: trackerInfo, animated: true)
             }
     }
 
@@ -222,15 +222,17 @@ final class AddressBarButtonsViewController: NSViewController {
         }
     }
 
-    private func updatePrivacyEntryPointButton(trackerInfo: TrackerInfo?, animated: Bool) {
+    private func updatePrivacyViews(trackerInfo: TrackerInfo?, animated: Bool) {
         guard let trackerInfo = trackerInfo,
               !trackerInfo.trackersBlocked.isEmpty else {
             privacyEntryPointButton.reset()
+            trackersAnimationView.reset()
             return
         }
 
         if animated {
             privacyEntryPointButton.animate()
+            trackersAnimationView.animate()
         } else {
             privacyEntryPointButton.setFinal()
         }

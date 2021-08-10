@@ -1,5 +1,5 @@
 //
-//  PrivacyEntryPointAddressBarButton.swift
+//  TrackersAnimationView.swift
 //
 //  Copyright © 2021 DuckDuckGo. All rights reserved.
 //
@@ -18,12 +18,12 @@
 
 import Foundation
 
-final class PrivacyEntryPointAddressBarButton: AddressBarButton {
+final class TrackersAnimationView: NSView {
 
     static var images: [NSImage] = {
         var images = [NSImage]()
-        for i in 0...180 {
-            if let image = NSImage(named: "PrivacyIcon\(String(format: "%03d", i))") {
+        for i in 0...82 {
+            if let image = NSImage(named: "TrackersAnimation\(String(format: "%02d", i))") {
                 images.append(image)
             }
         }
@@ -36,12 +36,6 @@ final class PrivacyEntryPointAddressBarButton: AddressBarButton {
     }
 
     func reset() {
-        layer?.removeAnimation(forKey: Constants.animationKeyPath)
-        image = Self.images.first
-    }
-
-    func setFinal() {
-        image = Self.images.last
         layer?.removeAnimation(forKey: Constants.animationKeyPath)
     }
 
@@ -57,7 +51,7 @@ final class PrivacyEntryPointAddressBarButton: AddressBarButton {
         keyFrameAnimation.autoreverses = false
         keyFrameAnimation.isRemovedOnCompletion = false
         keyFrameAnimation.beginTime = 0
-        keyFrameAnimation.duration = 6
+        keyFrameAnimation.duration = 83/30
         return keyFrameAnimation
     }()
 
