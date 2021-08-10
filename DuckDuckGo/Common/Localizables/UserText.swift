@@ -31,6 +31,7 @@ struct UserText {
     static let duplicateTab = NSLocalizedString("duplicate.tab", value: "Duplicate Tab", comment: "Menu item. Duplicate as a verb")
     static let closeTab = NSLocalizedString("close.tab", value: "Close Tab", comment: "Menu item")
     static let closeOtherTabs = NSLocalizedString("close.other.tabs", value: "Close Other Tabs", comment: "Menu item")
+    static let closeTabsToTheRight = NSLocalizedString("close.tabs.to.the.right", value: "Close Tabs to the Right", comment: "Menu item")
     static let openInNewTab = NSLocalizedString("open.in.new.tab", value: "Open in New Tab", comment: "Menu item that opens the link in a new tab")
     static let openInNewWindow = NSLocalizedString("open.in.new.window", value: "Open in New Window", comment: "Menu item that opens the link in a new window")
 
@@ -43,7 +44,7 @@ struct UserText {
                                                       value: "Move Tab to New Window",
                                                       comment: "Context menu item")
 
-    static let addressBarSearchSuffix = NSLocalizedString("address.bar.search.suffix",
+    static let searchDuckDuckGoSuffix = NSLocalizedString("address.bar.search.suffix",
                                                           value: "Search DuckDuckGo",
                                                           comment: "Suffix of searched terms in address bar. Example: best watching machine . Search DuckDuckGo")
     static let addressBarVisitSuffix = NSLocalizedString("address.bar.visit.suffix",
@@ -70,6 +71,8 @@ struct UserText {
     static let searchWithDuckDuckGo = NSLocalizedString("search.with.DuckDuckGo", value: "Search with DuckDuckGo", comment: "Context menu item")
 
     static let findInPage = NSLocalizedString("find.in.page", value: "%1$d of %2$d", comment: "Find in page status (e.g. 1 of 99)")
+
+    static let moreMenuItem = NSLocalizedString("sharing.more", value: "More...", comment: "Sharing Menu -> More...")
 
     static let fireproofSite = NSLocalizedString("options.menu.fireproof-site", value: "Fireproof Site", comment: "Context menu item")
     static let removeFireproofing = NSLocalizedString("options.menu.remove-fireproofing", value: "Remove Fireproofing", comment: "Context menu item")

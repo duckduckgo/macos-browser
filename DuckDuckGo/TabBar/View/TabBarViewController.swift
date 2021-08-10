@@ -93,16 +93,6 @@ final class TabBarViewController: NSViewController {
         NotificationCenter.default.removeObserver(self)
     }
 
-    @IBAction func burnButtonAction(_ sender: NSButton) {
-        let response = NSAlert.burnButtonAlert.runModal()
-        if response == NSApplication.ModalResponse.alertFirstButtonReturn {
-            Pixel.fire(.burn())
-
-            WindowsManager.closeWindows(except: self.view.window)
-            playFireAnimation()
-        }
-    }
-
     @IBAction func addButtonAction(_ sender: NSButton) {
         tabCollectionViewModel.appendNewTab()
     }
@@ -761,6 +751,15 @@ extension TabBarViewController: TabBarViewItemDelegate {
         tabCollectionViewModel.removeAllTabs(except: indexPath.item)
     }
 
+    func tabBarViewItemCloseToTheRightAction(_ tabBarViewItem: TabBarViewItem) {
+        guard let indexPath = collectionView.indexPath(for: tabBarViewItem) else {
+            os_log("TabBarViewController: Failed to get index path of tab bar view item", type: .error)
+            return
+        }
+
+        tabCollectionViewModel.removeTabs(after: indexPath.item)
+    }
+
     func tabBarViewItemMoveToNewWindowAction(_ tabBarViewItem: TabBarViewItem) {
         guard let indexPath = collectionView.indexPath(for: tabBarViewItem) else {
             os_log("TabBarViewController: Failed to get index path of tab bar view item", type: .error)
@@ -776,16 +775,20 @@ extension TabBarViewController: TabBarViewItemDelegate {
             Pixel.fire(.fireproof(kind: .init(url: url), suggested: .manual))
             FireproofDomains.shared.addToAllowed(domain: host)
         }
-
-        tabBarViewItem.setupMenu()
     }
 
     func tabBarViewItemRemoveFireproofing(_ tabBarViewItem: TabBarViewItem) {
         if let host = tabCollectionViewModel.selectedTabViewModel?.tab.url?.host {
             FireproofDomains.shared.remove(domain: host)
         }
+    }
 
-        tabBarViewItem.setupMenu()
+    func otherTabBarViewItemsState(for tabBarViewItem: TabBarViewItem) -> (hasItemsToTheLeft: Bool, hasItemsToTheRight: Bool) {
+        guard let indexPath = collectionView.indexPath(for: tabBarViewItem) else {
+            os_log("TabBarViewController: Failed to get index path of tab bar view item", type: .error)
+            return (false, false)
+        }
+        return (hasItemsToTheLeft: indexPath.item > 0, hasItemsToTheRight: indexPath.item + 1 < tabCollectionViewModel.tabCollection.tabs.count)
     }
 
 }
@@ -826,19 +829,5 @@ extension TabBarViewController {
 
 }
 
-fileprivate extension NSAlert {
-
-    static var burnButtonAlert: NSAlert {
-        let alert = NSAlert()
-        alert.messageText = UserText.burnAlertMessageText
-        alert.informativeText = UserText.burtAlertInformativeText
-        alert.alertStyle = .warning
-        alert.icon = NSImage(named: "BurnAlert")
-        alert.addButton(withTitle: UserText.burn)
-        alert.addButton(withTitle: UserText.cancel)
-        return alert
-    }
-
-}
 // swiftlint:enable type_body_length
 // swiftlint:enable file_length

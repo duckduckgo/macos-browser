@@ -56,7 +56,7 @@ final class HomepageCollectionViewFlowLayout: NSCollectionViewFlowLayout {
             ? minimumInteritemSpacing
             : min((scrollView.frame.size.width - (CGFloat(columns) * itemWidth + insets.width * 2))
                   / CGFloat(columns - 1), minimumInteritemSpacing)
-        let contentWidth = CGFloat(columns) * itemWidth + CGFloat(columns - 1) * spacing
+        let contentWidth = CGFloat(actualColumns) * itemWidth + CGFloat(actualColumns - 1) * spacing
 
         let startX = (scrollView.frame.size.width - contentWidth) / 2
         let startY = max(insets.height,

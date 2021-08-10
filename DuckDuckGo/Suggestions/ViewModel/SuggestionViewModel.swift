@@ -69,7 +69,11 @@ final class SuggestionViewModel {
         case .website(url: let url):
             return url.toString(forUserInput: userStringValue)
         case .historyEntry(title: let title, url: let url, allowedInTopHits: _):
-            return title ?? url.toString(forUserInput: userStringValue)
+            if url.isDuckDuckGoSearch {
+                return url.searchQuery ?? url.toString(forUserInput: userStringValue)
+            } else {
+                return title ?? url.toString(forUserInput: userStringValue)
+            }
         case .bookmark(title: let title, url: _, isFavorite: _):
             return title
         case .unknown(value: let value):
@@ -83,8 +87,12 @@ final class SuggestionViewModel {
              .website(url: _),
              .unknown(value: _):
             return nil
-        case .historyEntry(title: let title, url: _, allowedInTopHits: _):
-            return title
+        case .historyEntry(title: let title, url: let url, allowedInTopHits: _):
+            if url.isDuckDuckGoSearch {
+                return url.searchQuery
+            } else {
+                return title
+            }
         case .bookmark(title: let title, url: _, isFavorite: _):
             return title
         }
@@ -120,10 +128,14 @@ final class SuggestionViewModel {
             return ""
         case .historyEntry(title: _, url: let url, allowedInTopHits: _),
              .bookmark(title: _, url: let url, isFavorite: _):
-            return " – " + url.toString(decodePunycode: true,
-                                        dropScheme: true,
-                                        needsWWW: false,
-                                        dropTrailingSlash: true)
+            if url.isDuckDuckGoSearch {
+                return " – \(UserText.searchDuckDuckGoSuffix)"
+            } else {
+                return " – " + url.toString(decodePunycode: true,
+                                              dropScheme: true,
+                                              needsWWW: false,
+                                              dropTrailingSlash: true)
+            }
         }
     }
 

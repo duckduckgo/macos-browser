@@ -1,5 +1,5 @@
 //
-//  WKWebViewConfigurationExtensions.swift
+//  NSImageExtensions.swift
 //
 //  Copyright © 2021 DuckDuckGo. All rights reserved.
 //
@@ -16,19 +16,23 @@
 //  limitations under the License.
 //
 
-import WebKit
-import Combine
+import Foundation
+import CoreGraphics
 
-extension WKWebViewConfiguration {
+extension NSImage {
 
-    func applyStandardConfiguration() {
-        allowsAirPlayForMediaPlayback = true
-        preferences.setValue(true, forKey: "fullScreenEnabled")
-        preferences.setValue(true, forKey: "allowsPictureInPictureMediaPlayback")
-        preferences.setValue(true, forKey: "developerExtrasEnabled")
-        preferences.setValue(false, forKey: "backspaceKeyNavigationEnabled")
-        preferences.javaScriptCanOpenWindowsAutomatically = false
-        self.userContentController = UserContentController()
-     }
+    func resized(to size: NSSize) -> NSImage? {
+        let image = NSImage(size: size)
+        let targetRect = NSRect(x: 0, y: 0, width: size.width, height: size.height)
+        let currentRect = NSRect(x: 0, y: 0, width: self.size.width, height: self.size.height)
+
+        image.lockFocus()
+        let graphicsContext = NSGraphicsContext.current
+        graphicsContext?.imageInterpolation = .high
+        self.draw(in: targetRect, from: currentRect, operation: .copy, fraction: 1)
+        image.unlockFocus()
+
+        return image
+    }
 
 }
