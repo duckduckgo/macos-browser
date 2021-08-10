@@ -89,7 +89,7 @@ final class Tab: NSObject {
          sessionStateData: Data? = nil,
          parentTab: Tab? = nil,
          shouldLoadInBackground: Bool = false,
-         canGoBackToClose: Bool = false) {
+         canBeClosedWithBack: Bool = false) {
 
         self.tabType = tabType
         self.faviconService = faviconService
@@ -99,7 +99,7 @@ final class Tab: NSObject {
         self.error = error
         self.favicon = favicon
         self.parentTab = parentTab
-        self.canGoBackToClose = canGoBackToClose
+        self._canBeClosedWithBack = canBeClosedWithBack
         self.sessionStateData = sessionStateData
 
         let configuration = webViewConfiguration ?? WKWebViewConfiguration()
@@ -145,7 +145,12 @@ final class Tab: NSObject {
     @PublishedAfter var error: Error?
 
     weak private(set) var parentTab: Tab?
-    var canGoBackToClose: Bool
+    private var _canBeClosedWithBack: Bool
+    var canBeClosedWithBack: Bool {
+        // Reset canBeClosedWithBack on any WebView navigation
+        _canBeClosedWithBack = _canBeClosedWithBack && parentTab != nil && !webView.canGoBack && !webView.canGoForward
+        return _canBeClosedWithBack
+    }
 
     weak var findInPage: FindInPageModel? {
         didSet {
@@ -224,14 +229,23 @@ final class Tab: NSObject {
         (url == nil || url == URL.emptyPage) && tabType == .bookmarks
     }
 
+    var canGoForward: Bool {
+        webView.canGoForward
+    }
+
     func goForward() {
+        guard self.canGoForward else { return }
         shouldStoreNextVisit = false
         webView.goForward()
     }
 
+    var canGoBack: Bool {
+        webView.canGoBack
+    }
+
     func goBack() {
-        guard self.webView.canGoBack else {
-            if self.parentTab != nil {
+        guard self.canGoBack else {
+            if canBeClosedWithBack {
                 delegate?.closeTab(self)
             }
             return
@@ -424,7 +438,6 @@ final class Tab: NSObject {
     private var shouldStoreNextVisit = true
 
     func addVisit(of url: URL) {
-        canGoBackToClose = false
         guard shouldStoreNextVisit else {
             shouldStoreNextVisit = true
             return

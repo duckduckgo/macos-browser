@@ -104,7 +104,7 @@ final class TabViewModel {
     }
 
     func updateCanGoBack() {
-        canGoBack = tab.webView.canGoBack || (tab.parentTab != nil && tab.canGoBackToClose)
+        canGoBack = tab.canGoBack || tab.canBeClosedWithBack
     }
 
     private func updateCanBeBookmarked() {

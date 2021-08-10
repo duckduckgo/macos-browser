@@ -60,6 +60,13 @@ struct UserText {
     static let burn = NSLocalizedString("burn", value: "Burn", comment: "Burn button")
 
     static let navigateBack = NSLocalizedString("navigate.back", value: "Back", comment: "Context menu item")
+    static let closeAndReturnToParentFormat = NSLocalizedString("close.tab.on.back.format",
+                                                                value: "Close and Return to “%@”",
+                                                                comment: "Close Child Tab on Back Button press and return Back to the Parent Tab titled “%@”")
+    static let closeAndReturnToParent = NSLocalizedString("close.tab.on.back",
+                                                          value: "Close and Return to Previous Tab",
+                                                          comment: "Close Child Tab on Back Button press and return Back to the Parent Tab without title")
+
     static let navigateForward = NSLocalizedString("navigate.forward", value: "Forward", comment: "Context menu item")
     static let reloadPage = NSLocalizedString("reload.page", value: "Reload Page", comment: "Context menu item")
 
