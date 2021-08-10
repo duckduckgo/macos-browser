@@ -169,4 +169,7 @@ struct UserText {
     static let initiateImport = NSLocalizedString("import.logins.initiate", value: "Import", comment: "Button text for importing data")
     static let doneImporting = NSLocalizedString("import.logins.done", value: "Done", comment: "Button text for finishing the data import")
 
+    static let openDeveloperTools = NSLocalizedString("main.menu.show.inspector", value: "Open Developer Tools", comment: "Show Web Inspector/Open Developer Tools")
+    static let closeDeveloperTools = NSLocalizedString("main.menu.close.inspector", value: "Close Developer Tools", comment: "Hide Web Inspector/Close Developer Tools")
+
 }
