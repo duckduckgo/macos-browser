@@ -52,7 +52,7 @@ final class CSVImportSummaryViewController: NSViewController {
         super.viewDidLoad()
 
         if case let .logins(successful, _, _) = summary {
-            successfulImportsLabel.stringValue = "New Logins: \(successful.count)"
+            successfulImportsLabel.stringValue = UserText.loginImportSuccessfulCSVImports(totalSuccessfulImports: successful.count)
         } else {
             successfulImportsLabel.isHidden = true
         }

@@ -228,4 +228,18 @@ struct UserText {
         return String(format: localized, source.importSourceName)
     }
 
+    static func loginImportSuccessfulCSVImports(totalSuccessfulImports: Int) -> String {
+        let localized = NSLocalizedString("import.logins.csv.successful-imports",
+                                          value: "New Logins: %@",
+                                          comment: "Status text indicating the number of successful CSV login imports")
+        return String(format: localized, String(totalSuccessfulImports))
+    }
+
+    static func loginImportSuccessfulBrowserImports(totalSuccessfulImports: Int) -> String {
+        let localized = NSLocalizedString("import.logins.browser.successful-imports",
+                                          value: "Passwords: %@",
+                                          comment: "Status text indicating the number of successful browser login imports")
+        return String(format: localized, String(totalSuccessfulImports))
+    }
+
 }

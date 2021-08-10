@@ -63,7 +63,7 @@ final class BrowserImportSummaryViewController: NSViewController {
             switch summary {
             case .logins(let successfulImports, _, _):
                 passwordSummaryRow.isHidden = false
-                passwordSummaryLabel.stringValue = "Passwords: \(successfulImports.count)"
+                passwordSummaryLabel.stringValue = UserText.loginImportSuccessfulBrowserImports(totalSuccessfulImports: successfulImports.count)
             }
         }
     }
