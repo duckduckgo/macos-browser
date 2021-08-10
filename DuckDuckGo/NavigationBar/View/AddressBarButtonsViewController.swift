@@ -240,7 +240,8 @@ final class AddressBarButtonsViewController: NSViewController {
             return
         }
 
-        if animated {
+        // Animate only when the first tracker is blocked
+        if trackerInfo.trackersBlocked.count == 1 && animated {
             privacyEntryPointButton.animate()
             trackersAnimationView.animate()
         } else {
