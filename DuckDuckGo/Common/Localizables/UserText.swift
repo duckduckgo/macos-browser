@@ -144,6 +144,7 @@ struct UserText {
 
     static let permissionMuteFormat = NSLocalizedString("permission.mute", value: "Pause %@", comment: "Temporarily pause input media device %@ access")
     static let permissionUnmuteFormat = NSLocalizedString("permission.unmute", value: "Resume %@", comment: "Resume input media device %@ access")
+    static let permissionRevokeFormat = NSLocalizedString("permission.revoke", value: "Stop %@ Access", comment: "Revoke input media device %@ access")
     static let permissionReloadToEnable = NSLocalizedString("permission.reloadPage", value: "Reload to Ask Again", comment: "Reload webpage to ask for input media device access permission again")
 
     static let permissionAlwaysAllowFormat = NSLocalizedString("permission.always.allow", value: "Always Allow on “%@“", comment: "Make input media device access permanently allowed for current domain")

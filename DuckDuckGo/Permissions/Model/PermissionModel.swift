@@ -193,6 +193,10 @@ final class PermissionModel {
     }
 
     func revoke(_ permission: PermissionType) {
+        if let domain = webView?.url?.host,
+           permissionManager.permission(forDomain: domain, permissionType: permission) == true {
+            permissionManager.removePermission(forDomain: domain, permissionType: permission)
+        }
         self.permissions[permission].revoke() // await deactivation
         webView?.revokePermissions([permission])
     }
