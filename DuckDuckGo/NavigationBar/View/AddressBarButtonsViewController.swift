@@ -198,6 +198,10 @@ final class AddressBarButtonsViewController: NSViewController {
 
     func openPrivacyDashboard() {
         guard let selectedTabViewModel = tabCollectionViewModel.selectedTabViewModel else { return }
+        guard !privacyDashboardPopover.isShown else {
+            privacyDashboardPopover.close()
+            return
+        }
         privacyDashboardPopover.viewController.tabViewModel = selectedTabViewModel
         privacyDashboardPopover.show(relativeTo: privacyEntryPointButton.bounds, of: privacyEntryPointButton, preferredEdge: .maxY)
 
