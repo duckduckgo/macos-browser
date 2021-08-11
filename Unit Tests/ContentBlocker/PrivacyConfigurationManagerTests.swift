@@ -36,5 +36,10 @@ class PrivacyConfigurationManagerTests: XCTestCase {
         PrivacyConfigurationManager.shared.reload()
         XCTAssertTrue(PrivacyConfigurationManager.shared.config.isEnabled(featureKey: .contentBlocking))
     }
+    
+    func testEmbeddedParsingDoesntCrash() {
+        let data = PrivacyConfigurationManager.loadEmbeddedAsData()
+        XCTAssertNotNil(try? JSONDecoder().decode(PrivacyConfiguration.self, from: data))
+    }
 
 }
