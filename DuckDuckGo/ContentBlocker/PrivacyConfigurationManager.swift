@@ -20,6 +20,14 @@ import Foundation
 import TrackerRadarKit
 import Combine
 
+protocol PrivacyConfigurationManagment {
+    
+    var tempUnprotectedDomains: [String] { get }
+    
+    func isEnabled(featureKey: PrivacyConfiguration.SupportedFeatures) -> Bool
+    func exceptionsList(forFeature featureKey: PrivacyConfiguration.SupportedFeatures) -> [String]
+}
+
 final class PrivacyConfigurationManager {
 
     struct Constants {
@@ -110,4 +118,20 @@ final class PrivacyConfigurationManager {
         return json!
     }
 
+}
+
+extension PrivacyConfigurationManager: PrivacyConfigurationManagment {
+    
+    var tempUnprotectedDomains: [String] {
+        return config.tempUnprotectedDomains
+    }
+    
+    func isEnabled(featureKey: PrivacyConfiguration.SupportedFeatures) -> Bool {
+        return config.isEnabled(featureKey: featureKey)
+    }
+    
+    func exceptionsList(forFeature featureKey: PrivacyConfiguration.SupportedFeatures) -> [String] {
+        return config.exceptionsList(forFeature: featureKey)
+    }
+    
 }
