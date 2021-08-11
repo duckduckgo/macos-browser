@@ -257,13 +257,36 @@ extension MainViewController {
        guard let locWindow = self.view.window,
           NSApplication.shared.keyWindow === locWindow else { return false }
 
-        if Int(event.keyCode) == kVK_Escape {
+        let flags = event.modifierFlags.intersection(.deviceIndependentFlagsMask)
+            .subtracting(.capsLock)
+
+        switch Int(event.keyCode) {
+        case kVK_Escape:
             findInPageViewController?.findInPageDone(self)
             checkForEndAddressBarEditing()
-            return true
-        }
+            return false
 
-        return false
+        // Handle critical Main Menu actions before WebView
+        case kVK_ANSI_1, kVK_ANSI_2, kVK_ANSI_3, kVK_ANSI_4, kVK_ANSI_5, kVK_ANSI_6,
+             kVK_ANSI_7, kVK_ANSI_8, kVK_ANSI_9,
+             kVK_ANSI_Keypad1, kVK_ANSI_Keypad2, kVK_ANSI_Keypad3, kVK_ANSI_Keypad4,
+             kVK_ANSI_Keypad5, kVK_ANSI_Keypad6, kVK_ANSI_Keypad7, kVK_ANSI_Keypad8,
+             kVK_ANSI_Keypad9:
+            guard flags == .command else { return false }
+            fallthrough
+        case kVK_Tab where [[.control], [.control, .shift]].contains(flags),
+             kVK_ANSI_N where flags == .command,
+             kVK_ANSI_W where flags.contains(.command),
+             kVK_ANSI_T where [[.command], [.command, .shift]].contains(flags),
+             kVK_ANSI_Q where flags == .command,
+             kVK_ANSI_R where flags == .command:
+            guard view.window?.firstResponder is WebView else { return false }
+            NSApp.menu?.performKeyEquivalent(with: event)
+            return true
+
+        default:
+            return false
+        }
     }
 
     func otherMouseUp(with event: NSEvent) -> NSEvent? {

@@ -67,7 +67,7 @@ final class TabCollectionViewModel: NSObject {
         subscribeToLastRemovedTab()
 
         if tabCollection.tabs.isEmpty {
-            appendNewTab()
+            appendNewTab(with: .homepage)
         }
         if self.selectionIndex != selectionIndex {
             self.selectionIndex = selectionIndex
@@ -133,8 +133,8 @@ final class TabCollectionViewModel: NSObject {
         }
     }
 
-    func appendNewTab(type: Tab.TabType = .standard) {
-        append(tab: Tab(tabType: type), selected: true)
+    func appendNewTab(with content: Tab.TabContent = .homepage) {
+        append(tab: Tab(content: content), selected: true)
     }
 
     func append(tab: Tab, selected: Bool = true) {
@@ -175,7 +175,7 @@ final class TabCollectionViewModel: NSObject {
     }
 
     func insertNewTab(at index: Int = 0) {
-        insert(tab: Tab(), at: index)
+        insert(tab: Tab(content: .homepage), at: index)
     }
 
     func insertChild(tab: Tab, selected: Bool) {
@@ -241,8 +241,18 @@ final class TabCollectionViewModel: NSObject {
         delegate?.tabCollectionViewModelDidMultipleChanges(self)
     }
 
+    func removeTabs(after index: Int) {
+        tabCollection.removeTabs(after: index)
+
+        if !tabCollection.tabs.indices.contains(selectionIndex ?? -1) {
+            selectionIndex = tabCollection.tabs.indices.last
+        }
+        
+        delegate?.tabCollectionViewModelDidMultipleChanges(self)
+    }
+
     func removeAllTabsAndAppendNewTab() {
-        tabCollection.removeAll(andAppend: Tab())
+        tabCollection.removeAll(andAppend: Tab(content: .homepage))
         select(at: 0)
 
         delegate?.tabCollectionViewModelDidMultipleChanges(self)
@@ -285,8 +295,7 @@ final class TabCollectionViewModel: NSObject {
         }
 
         let tab = tabCollection.tabs[index]
-        let tabCopy = Tab()
-        tabCopy.url = tab.url
+        let tabCopy = Tab(content: tab.content, sessionStateData: tab.sessionStateData)
         let newIndex = index + 1
 
         tabCollection.insert(tab: tabCopy, at: newIndex)

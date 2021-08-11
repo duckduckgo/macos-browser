@@ -51,11 +51,11 @@ final class WindowControllersManager {
 extension WindowControllersManager {
 
     func showBookmarksTab() {
-        showTab(type: .bookmarks)
+        showTab(with: .bookmarks)
     }
 
     func showPreferencesTab() {
-        showTab(type: .preferences)
+        showTab(with: .preferences)
     }
 
     /// Opens a bookmark in a tab, respecting the current modifier keys when deciding where to open the bookmark's URL.
@@ -82,12 +82,12 @@ extension WindowControllersManager {
                let firstTab = tabCollection.tabs.first,
                firstTab.isHomepageShown,
                !newTab {
-                firstTab.url = url
+                firstTab.content = .url(url)
             } else if let tab = tabCollectionViewModel.selectedTabViewModel?.tab, !newTab {
-                tab.url = url
+                tab.content = .url(url)
             } else {
-                let newTab = Tab()
-                newTab.url = url
+                let newTab = Tab(content: .url(url))
+                newTab.content = .url(url)
                 tabCollectionViewModel.append(tab: newTab)
             }
         }
@@ -120,7 +120,7 @@ extension WindowControllersManager {
         WindowsManager.openNewWindow(with: url)
     }
 
-    private func showTab(type: Tab.TabType) {
+    private func showTab(with content: Tab.TabContent) {
         guard let windowController = mainWindowControllers.first(where: {
             let isMain = $0.window?.isMainWindow ?? false
             let hasMainChildWindow = $0.window?.childWindows?.contains { $0.isMainWindow } ?? false
@@ -130,7 +130,7 @@ extension WindowControllersManager {
 
         let viewController = windowController.mainViewController
         let tabCollectionViewModel = viewController.tabCollectionViewModel
-        tabCollectionViewModel.appendNewTab(type: type)
+        tabCollectionViewModel.appendNewTab(with: content)
     }
 
 }

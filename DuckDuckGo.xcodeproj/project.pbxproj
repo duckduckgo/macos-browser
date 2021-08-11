@@ -152,7 +152,7 @@
 		4B9292C22667103100AD2C21 /* BookmarkTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B9292B82667103000AD2C21 /* BookmarkTests.swift */; };
 		4B9292C32667103100AD2C21 /* PasteboardBookmarkTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B9292B92667103100AD2C21 /* PasteboardBookmarkTests.swift */; };
 		4B9292C52667104B00AD2C21 /* CoreDataTestUtilities.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B9292C42667104B00AD2C21 /* CoreDataTestUtilities.swift */; };
-		4B9292CE2667123700AD2C21 /* BrowserTabEmbeddable.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B9292C62667123700AD2C21 /* BrowserTabEmbeddable.swift */; };
+		4B9292CE2667123700AD2C21 /* BrowserTabSelectionDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B9292C62667123700AD2C21 /* BrowserTabSelectionDelegate.swift */; };
 		4B9292CF2667123700AD2C21 /* BookmarkManagementSidebarViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B9292C72667123700AD2C21 /* BookmarkManagementSidebarViewController.swift */; };
 		4B9292D02667123700AD2C21 /* BookmarkManagementSplitViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B9292C82667123700AD2C21 /* BookmarkManagementSplitViewController.swift */; };
 		4B9292D12667123700AD2C21 /* BookmarkTableRowView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B9292C92667123700AD2C21 /* BookmarkTableRowView.swift */; };
@@ -189,7 +189,7 @@
 		85308E25267FC9F2001ABD76 /* NSAlertExtension.swift in Sources */ = {isa = PBXBuildFile; fileRef = 85308E24267FC9F2001ABD76 /* NSAlertExtension.swift */; };
 		85308E27267FCB22001ABD76 /* PasswordManagerSettings.swift in Sources */ = {isa = PBXBuildFile; fileRef = 85308E26267FCB22001ABD76 /* PasswordManagerSettings.swift */; };
 		8546DE6225C03056000CA5E1 /* UserAgentTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8546DE6125C03056000CA5E1 /* UserAgentTests.swift */; };
-		85480F8A25CDC360009424E3 /* Launch.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 85480F8925CDC360009424E3 /* Launch.storyboard */; };
+		85480F8A25CDC360009424E3 /* MainMenu.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 85480F8925CDC360009424E3 /* MainMenu.storyboard */; };
 		85480FBB25D181CB009424E3 /* ConfigurationDownloading.swift in Sources */ = {isa = PBXBuildFile; fileRef = 85480FBA25D181CB009424E3 /* ConfigurationDownloading.swift */; };
 		85480FCF25D1AA22009424E3 /* ConfigurationStoring.swift in Sources */ = {isa = PBXBuildFile; fileRef = 85480FCE25D1AA22009424E3 /* ConfigurationStoring.swift */; };
 		85625994269C8F9600EE44BC /* PasswordManager.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 85625993269C8F9600EE44BC /* PasswordManager.storyboard */; };
@@ -378,6 +378,7 @@
 		B63D466925BEB6C200874977 /* WKWebView+SessionState.swift in Sources */ = {isa = PBXBuildFile; fileRef = B63D466825BEB6C200874977 /* WKWebView+SessionState.swift */; };
 		B63D467125BFA6C100874977 /* DispatchQueueExtensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = B63D467025BFA6C100874977 /* DispatchQueueExtensions.swift */; };
 		B63D467A25BFC3E100874977 /* NSCoderExtensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = B63D467925BFC3E100874977 /* NSCoderExtensions.swift */; };
+		B641896226BBD0AB001FBC8B /* LongPressButton.swift in Sources */ = {isa = PBXBuildFile; fileRef = B641896126BBD0AB001FBC8B /* LongPressButton.swift */; };
 		B63ED0E526BB8FB900A9DAD1 /* SharingMenu.swift in Sources */ = {isa = PBXBuildFile; fileRef = B63ED0E426BB8FB900A9DAD1 /* SharingMenu.swift */; };
 		B65349AA265CF45000DCC645 /* DispatchQueueExtensionsTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = B65349A9265CF45000DCC645 /* DispatchQueueExtensionsTests.swift */; };
 		B65783E725F8AAFB00D8DB33 /* String+Punycode.swift in Sources */ = {isa = PBXBuildFile; fileRef = B65783E625F8AAFB00D8DB33 /* String+Punycode.swift */; };
@@ -613,7 +614,7 @@
 		4B9292B82667103000AD2C21 /* BookmarkTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = BookmarkTests.swift; sourceTree = "<group>"; };
 		4B9292B92667103100AD2C21 /* PasteboardBookmarkTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = PasteboardBookmarkTests.swift; sourceTree = "<group>"; };
 		4B9292C42667104B00AD2C21 /* CoreDataTestUtilities.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CoreDataTestUtilities.swift; sourceTree = "<group>"; };
-		4B9292C62667123700AD2C21 /* BrowserTabEmbeddable.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = BrowserTabEmbeddable.swift; sourceTree = "<group>"; };
+		4B9292C62667123700AD2C21 /* BrowserTabSelectionDelegate.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = BrowserTabSelectionDelegate.swift; sourceTree = "<group>"; };
 		4B9292C72667123700AD2C21 /* BookmarkManagementSidebarViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = BookmarkManagementSidebarViewController.swift; sourceTree = "<group>"; };
 		4B9292C82667123700AD2C21 /* BookmarkManagementSplitViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = BookmarkManagementSplitViewController.swift; sourceTree = "<group>"; };
 		4B9292C92667123700AD2C21 /* BookmarkTableRowView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = BookmarkTableRowView.swift; sourceTree = "<group>"; };
@@ -651,7 +652,7 @@
 		85308E24267FC9F2001ABD76 /* NSAlertExtension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NSAlertExtension.swift; sourceTree = "<group>"; };
 		85308E26267FCB22001ABD76 /* PasswordManagerSettings.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PasswordManagerSettings.swift; sourceTree = "<group>"; };
 		8546DE6125C03056000CA5E1 /* UserAgentTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UserAgentTests.swift; sourceTree = "<group>"; };
-		85480F8925CDC360009424E3 /* Launch.storyboard */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; path = Launch.storyboard; sourceTree = "<group>"; };
+		85480F8925CDC360009424E3 /* MainMenu.storyboard */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; path = MainMenu.storyboard; sourceTree = "<group>"; };
 		85480FBA25D181CB009424E3 /* ConfigurationDownloading.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ConfigurationDownloading.swift; sourceTree = "<group>"; };
 		85480FCE25D1AA22009424E3 /* ConfigurationStoring.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ConfigurationStoring.swift; sourceTree = "<group>"; };
 		8553FF51257523760029327F /* URLSuggestedFilenameTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = URLSuggestedFilenameTests.swift; sourceTree = "<group>"; };
@@ -847,6 +848,7 @@
 		B63D466825BEB6C200874977 /* WKWebView+SessionState.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "WKWebView+SessionState.swift"; sourceTree = "<group>"; };
 		B63D467025BFA6C100874977 /* DispatchQueueExtensions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DispatchQueueExtensions.swift; sourceTree = "<group>"; };
 		B63D467925BFC3E100874977 /* NSCoderExtensions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NSCoderExtensions.swift; sourceTree = "<group>"; };
+		B641896126BBD0AB001FBC8B /* LongPressButton.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LongPressButton.swift; sourceTree = "<group>"; };
 		B63ED0E426BB8FB900A9DAD1 /* SharingMenu.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SharingMenu.swift; sourceTree = "<group>"; };
 		B65349A9265CF45000DCC645 /* DispatchQueueExtensionsTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DispatchQueueExtensionsTests.swift; sourceTree = "<group>"; };
 		B65783E625F8AAFB00D8DB33 /* String+Punycode.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "String+Punycode.swift"; sourceTree = "<group>"; };
@@ -1801,7 +1803,6 @@
 				AA7412BC24D2BEEE00D22FE0 /* MainWindow.swift */,
 				AA7412B424D1536B00D22FE0 /* MainWindowController.swift */,
 				AA585DAE2490E6E600E9A3E2 /* MainViewController.swift */,
-				85480F8925CDC360009424E3 /* Launch.storyboard */,
 			);
 			path = View;
 			sourceTree = "<group>";
@@ -1885,6 +1886,7 @@
 				AA86490B24D3494C001BABEE /* GradientView.swift */,
 				AA4E633925E79C0A00134434 /* MouseClickView.swift */,
 				AAA8E8BE24EA8A0A0055E685 /* MouseOverButton.swift */,
+				B641896126BBD0AB001FBC8B /* LongPressButton.swift */,
 				AAA8E8C024EACA700055E685 /* MouseOverView.swift */,
 				4B65028925E6CBF40054432E /* NibLoadable.swift */,
 				B6E61ECF263A6F97004E11AB /* NSSavePanelExtension.swift */,
@@ -2012,6 +2014,7 @@
 		AA97BF4425135CB60014931A /* Menus */ = {
 			isa = PBXGroup;
 			children = (
+				85480F8925CDC360009424E3 /* MainMenu.storyboard */,
 				AA4BBA3A25C58FA200C4FB0F /* MainMenu.swift */,
 				AA6EF9B425081B4C004754E6 /* MainMenuActions.swift */,
 				AA97BF4525135DD30014931A /* ApplicationDockMenu.swift */,
@@ -2142,7 +2145,7 @@
 				4B9292C72667123700AD2C21 /* BookmarkManagementSidebarViewController.swift */,
 				4B9292C82667123700AD2C21 /* BookmarkManagementSplitViewController.swift */,
 				4B9292C92667123700AD2C21 /* BookmarkTableRowView.swift */,
-				4B9292C62667123700AD2C21 /* BrowserTabEmbeddable.swift */,
+				4B9292C62667123700AD2C21 /* BrowserTabSelectionDelegate.swift */,
 				4B92928726670D1600AD2C21 /* BookmarkOutlineViewCell.swift */,
 				4B92928826670D1600AD2C21 /* BookmarkOutlineViewCell.xib */,
 				4B92928526670D1600AD2C21 /* BookmarksOutlineView.swift */,
@@ -2654,7 +2657,7 @@
 				AAC5E4C925D6A6E8007F5990 /* Bookmarks.storyboard in Resources */,
 				4B65027525E5F2A70054432E /* DefaultBrowserPromptView.xib in Resources */,
 				AA7412B324D0B3AC00D22FE0 /* TabBarViewItem.xib in Resources */,
-				85480F8A25CDC360009424E3 /* Launch.storyboard in Resources */,
+				85480F8A25CDC360009424E3 /* MainMenu.storyboard in Resources */,
 				4B677435255DBEB800025BD8 /* httpsMobileV2FalsePositives.json in Resources */,
 				AAE71E3825F7869300D74437 /* HomepageCollectionViewItem.xib in Resources */,
 				4B723E1126B0006C00E14D75 /* DataImport.storyboard in Resources */,
@@ -2877,7 +2880,7 @@
 				AA9E9A5625A3AE8400D1959D /* NSWindowExtension.swift in Sources */,
 				4B0511C9262CAA5A00F6079C /* RoundedSelectionRowView.swift in Sources */,
 				AAC5E4C725D6A6E8007F5990 /* BookmarkPopover.swift in Sources */,
-				4B9292CE2667123700AD2C21 /* BrowserTabEmbeddable.swift in Sources */,
+				4B9292CE2667123700AD2C21 /* BrowserTabSelectionDelegate.swift in Sources */,
 				4B9292A126670D2A00AD2C21 /* BookmarkTreeController.swift in Sources */,
 				4B9292D02667123700AD2C21 /* BookmarkManagementSplitViewController.swift in Sources */,
 				B6E61EE3263AC0C8004E11AB /* FileManagerExtension.swift in Sources */,
@@ -2920,6 +2923,7 @@
 				4BA1A6B8258B081600F6F690 /* EncryptionKeyStoring.swift in Sources */,
 				B65783E725F8AAFB00D8DB33 /* String+Punycode.swift in Sources */,
 				B657841A25FA484B00D8DB33 /* NSException+Catch.m in Sources */,
+				B641896226BBD0AB001FBC8B /* LongPressButton.swift in Sources */,
 				B684592F25C93FBF00DC17B6 /* AppStateRestorationManager.swift in Sources */,
 				AAA892EA250A4CEF005B37B2 /* WindowControllersManager.swift in Sources */,
 				AAC5E4C825D6A6E8007F5990 /* BookmarkPopoverViewController.swift in Sources */,
@@ -3329,7 +3333,7 @@
 				CODE_SIGN_IDENTITY = "";
 				CODE_SIGN_STYLE = Manual;
 				COMBINE_HIDPI_IMAGES = YES;
-				CURRENT_PROJECT_VERSION = 0.11.0;
+				CURRENT_PROJECT_VERSION = 0.12.0;
 				DEVELOPMENT_TEAM = "";
 				ENABLE_HARDENED_RUNTIME = YES;
 				INFOPLIST_FILE = DuckDuckGo/Info.plist;
@@ -3337,7 +3341,7 @@
 					"$(inherited)",
 					"@executable_path/../Frameworks",
 				);
-				MARKETING_VERSION = 0.11.0;
+				MARKETING_VERSION = 0.12.0;
 				PRODUCT_BUNDLE_IDENTIFIER = com.duckduckgo.macos.browser.debug;
 				PRODUCT_MODULE_NAME = "$(TARGET_NAME:c99extidentifier)";
 				PRODUCT_NAME = DuckDuckGo;
@@ -3518,7 +3522,7 @@
 				CODE_SIGN_IDENTITY = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
 				COMBINE_HIDPI_IMAGES = YES;
-				CURRENT_PROJECT_VERSION = 0.11.0;
+				CURRENT_PROJECT_VERSION = 0.12.0;
 				DEVELOPMENT_TEAM = HKE973VLUW;
 				ENABLE_HARDENED_RUNTIME = YES;
 				INFOPLIST_FILE = DuckDuckGo/Info.plist;
@@ -3526,7 +3530,7 @@
 					"$(inherited)",
 					"@executable_path/../Frameworks",
 				);
-				MARKETING_VERSION = 0.11.0;
+				MARKETING_VERSION = 0.12.0;
 				PRODUCT_BUNDLE_IDENTIFIER = com.duckduckgo.macos.browser.debug;
 				PRODUCT_MODULE_NAME = "$(TARGET_NAME:c99extidentifier)";
 				PRODUCT_NAME = DuckDuckGo;
@@ -3546,7 +3550,7 @@
 				CODE_SIGN_IDENTITY = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
 				COMBINE_HIDPI_IMAGES = YES;
-				CURRENT_PROJECT_VERSION = 0.11.0;
+				CURRENT_PROJECT_VERSION = 0.12.0;
 				DEVELOPMENT_TEAM = HKE973VLUW;
 				ENABLE_HARDENED_RUNTIME = YES;
 				INFOPLIST_FILE = DuckDuckGo/Info.plist;
@@ -3554,7 +3558,7 @@
 					"$(inherited)",
 					"@executable_path/../Frameworks",
 				);
-				MARKETING_VERSION = 0.11.0;
+				MARKETING_VERSION = 0.12.0;
 				PRODUCT_BUNDLE_IDENTIFIER = com.duckduckgo.macos.browser;
 				PRODUCT_MODULE_NAME = "$(TARGET_NAME:c99extidentifier)";
 				PRODUCT_NAME = DuckDuckGo;

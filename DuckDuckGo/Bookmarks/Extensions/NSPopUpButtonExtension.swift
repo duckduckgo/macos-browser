@@ -27,12 +27,12 @@ extension NSPopUpButton {
             .eraseToAnyPublisher()
     }
 
-    func displayBrowserTabButtons(withSelectedTab tabType: Tab.TabType) {
+    func displayBrowserTabButtons(withSelectedTab tabType: Tab.TabContent) {
         removeAllItems()
 
         var selectedTabIndex: Int?
 
-        for (index, type) in Tab.TabType.displayableTabTypes.enumerated() {
+        for (index, type) in Tab.TabContent.displayableTabTypes.enumerated() {
             guard let tabTitle = type.title else {
                 assertionFailure("Attempted to display standard tab type in tab switcher")
                 return
@@ -48,7 +48,7 @@ extension NSPopUpButton {
         selectItem(at: selectedTabIndex ?? 0)
     }
 
-    func select(tabType: Tab.TabType) {
+    func select(tabType: Tab.TabContent) {
         guard let title = tabType.title else {
             return
         }
