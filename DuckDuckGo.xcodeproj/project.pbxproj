@@ -51,7 +51,6 @@
 		4B0511E7262CAB3700F6079C /* UserDefaultsWrapperUtilities.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B0511E6262CAB3700F6079C /* UserDefaultsWrapperUtilities.swift */; };
 		4B0511F0262CAEC900F6079C /* AppearancePreferencesTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B0511EF262CAEC900F6079C /* AppearancePreferencesTests.swift */; };
 		4B0511F8262CB20F00F6079C /* DownloadPreferencesTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B0511F7262CB20F00F6079C /* DownloadPreferencesTests.swift */; };
-		4B051207262CD24400F6079C /* NSImageViewExtension.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B0511FC262CD20D00F6079C /* NSImageViewExtension.swift */; };
 		4B11060525903E570039B979 /* CoreDataEncryptionTesting.xcdatamodeld in Sources */ = {isa = PBXBuildFile; fileRef = 4B11060325903E570039B979 /* CoreDataEncryptionTesting.xcdatamodeld */; };
 		4B11060A25903EAC0039B979 /* CoreDataEncryptionTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B11060925903EAC0039B979 /* CoreDataEncryptionTests.swift */; };
 		4B139AFD26B60BD800894F82 /* NSImageExtensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B139AFC26B60BD800894F82 /* NSImageExtensions.swift */; };
@@ -371,8 +370,8 @@
 		B63D466925BEB6C200874977 /* WKWebView+SessionState.swift in Sources */ = {isa = PBXBuildFile; fileRef = B63D466825BEB6C200874977 /* WKWebView+SessionState.swift */; };
 		B63D467125BFA6C100874977 /* DispatchQueueExtensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = B63D467025BFA6C100874977 /* DispatchQueueExtensions.swift */; };
 		B63D467A25BFC3E100874977 /* NSCoderExtensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = B63D467925BFC3E100874977 /* NSCoderExtensions.swift */; };
-		B641896226BBD0AB001FBC8B /* LongPressButton.swift in Sources */ = {isa = PBXBuildFile; fileRef = B641896126BBD0AB001FBC8B /* LongPressButton.swift */; };
 		B63ED0E526BB8FB900A9DAD1 /* SharingMenu.swift in Sources */ = {isa = PBXBuildFile; fileRef = B63ED0E426BB8FB900A9DAD1 /* SharingMenu.swift */; };
+		B641896226BBD0AB001FBC8B /* LongPressButton.swift in Sources */ = {isa = PBXBuildFile; fileRef = B641896126BBD0AB001FBC8B /* LongPressButton.swift */; };
 		B65349AA265CF45000DCC645 /* DispatchQueueExtensionsTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = B65349A9265CF45000DCC645 /* DispatchQueueExtensionsTests.swift */; };
 		B65783E725F8AAFB00D8DB33 /* String+Punycode.swift in Sources */ = {isa = PBXBuildFile; fileRef = B65783E625F8AAFB00D8DB33 /* String+Punycode.swift */; };
 		B65783EC25F8AB9300D8DB33 /* String+PunycodeTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = B65783EB25F8AB9200D8DB33 /* String+PunycodeTests.swift */; };
@@ -503,7 +502,6 @@
 		4B0511E6262CAB3700F6079C /* UserDefaultsWrapperUtilities.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UserDefaultsWrapperUtilities.swift; sourceTree = "<group>"; };
 		4B0511EF262CAEC900F6079C /* AppearancePreferencesTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppearancePreferencesTests.swift; sourceTree = "<group>"; };
 		4B0511F7262CB20F00F6079C /* DownloadPreferencesTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DownloadPreferencesTests.swift; sourceTree = "<group>"; };
-		4B0511FC262CD20D00F6079C /* NSImageViewExtension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NSImageViewExtension.swift; sourceTree = "<group>"; };
 		4B11060425903E570039B979 /* CoreDataEncryptionTesting.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = CoreDataEncryptionTesting.xcdatamodel; sourceTree = "<group>"; };
 		4B11060925903EAC0039B979 /* CoreDataEncryptionTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CoreDataEncryptionTests.swift; sourceTree = "<group>"; };
 		4B139AFC26B60BD800894F82 /* NSImageExtensions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NSImageExtensions.swift; sourceTree = "<group>"; };
@@ -834,8 +832,8 @@
 		B63D466825BEB6C200874977 /* WKWebView+SessionState.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "WKWebView+SessionState.swift"; sourceTree = "<group>"; };
 		B63D467025BFA6C100874977 /* DispatchQueueExtensions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DispatchQueueExtensions.swift; sourceTree = "<group>"; };
 		B63D467925BFC3E100874977 /* NSCoderExtensions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NSCoderExtensions.swift; sourceTree = "<group>"; };
-		B641896126BBD0AB001FBC8B /* LongPressButton.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LongPressButton.swift; sourceTree = "<group>"; };
 		B63ED0E426BB8FB900A9DAD1 /* SharingMenu.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SharingMenu.swift; sourceTree = "<group>"; };
+		B641896126BBD0AB001FBC8B /* LongPressButton.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LongPressButton.swift; sourceTree = "<group>"; };
 		B65349A9265CF45000DCC645 /* DispatchQueueExtensionsTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DispatchQueueExtensionsTests.swift; sourceTree = "<group>"; };
 		B65783E625F8AAFB00D8DB33 /* String+Punycode.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "String+Punycode.swift"; sourceTree = "<group>"; };
 		B65783EB25F8AB9200D8DB33 /* String+PunycodeTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "String+PunycodeTests.swift"; sourceTree = "<group>"; };
@@ -2195,7 +2193,6 @@
 				B657841825FA484B00D8DB33 /* NSException+Catch.h */,
 				B657841925FA484B00D8DB33 /* NSException+Catch.m */,
 				B657841E25FA497600D8DB33 /* NSException+Catch.swift */,
-				4B0511FC262CD20D00F6079C /* NSImageViewExtension.swift */,
 				AA6EF9B2250785D5004754E6 /* NSMenuExtension.swift */,
 				AA72D5FD25FFF94E00C77619 /* NSMenuItemExtension.swift */,
 				4B0511DF262CAA8600F6079C /* NSOpenPanelExtensions.swift */,
@@ -2928,7 +2925,6 @@
 				4B0511C7262CAA5A00F6079C /* PreferenceTableCellView.swift in Sources */,
 				4B9292D92667124B00AD2C21 /* BookmarkListTreeControllerDataSource.swift in Sources */,
 				14D9B8FB24F7E089000D4D13 /* AddressBarViewController.swift in Sources */,
-				4B051207262CD24400F6079C /* NSImageViewExtension.swift in Sources */,
 				AAC82C60258B6CB5009B6B42 /* TooltipWindowController.swift in Sources */,
 				AAC5E4E425D6BA9C007F5990 /* NSSizeExtension.swift in Sources */,
 				AAA8E8BF24EA8A0A0055E685 /* MouseOverButton.swift in Sources */,

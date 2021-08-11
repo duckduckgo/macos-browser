@@ -104,4 +104,11 @@ extension NSView {
         return locationInView
     }
 
+    // MARK: - Favicon
+
+    func applyFaviconStyle() {
+        wantsLayer = true
+        layer?.cornerRadius = 3.0
+    }
+
 }

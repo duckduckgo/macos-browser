@@ -184,6 +184,7 @@ final class AddressBarButtonsViewController: NSViewController {
         bookmarkButton.position = .right
         privacyEntryPointButton.position = .left
         privacyEntryPointButton.contentTintColor = .privacyEnabledColor
+        imageButton.applyFaviconStyle()
     }
 
     private func subscribeToSelectedTabViewModel() {
