@@ -348,6 +348,7 @@ extension Pixel.Event {
         case chrome = "source-chrome"
         case csv = "source-csv"
         case edge = "source-edge"
+        case firefox = "source-firefox"
     }
 
 }
