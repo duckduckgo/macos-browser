@@ -108,7 +108,9 @@ final class CSVImporter: DataImporter {
     }
 
     // This will change to return an array of DataImport.Summary objects, indicating the status of each import type that was requested.
-    func importData(types: [DataImport.DataType], completion: @escaping (Result<[DataImport.Summary], DataImportError>) -> Void) {
+    func importData(types: [DataImport.DataType],
+                    from profile: DataImport.BrowserProfile?,
+                    completion: @escaping (Result<[DataImport.Summary], DataImportError>) -> Void) {
         guard let fileContents = try? String(contentsOf: fileURL, encoding: .utf8) else {
             completion(.failure(.cannotReadFile))
             return

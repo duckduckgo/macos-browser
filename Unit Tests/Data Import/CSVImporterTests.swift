@@ -65,7 +65,7 @@ class CSVImporterTests: XCTestCase {
         let csvImporter = CSVImporter(fileURL: savedFileURL, loginImporter: mockLoginImporter)
 
         let expectation = expectation(description: #function)
-        csvImporter.importData(types: [.logins]) { result in
+        csvImporter.importData(types: [.logins], from: nil) { result in
             switch result {
             case .success(let summary):
                 let expectedSummary = DataImport.Summary.logins(successfulImports: ["username"], duplicateImports: [], failedImports: [])
@@ -87,7 +87,7 @@ class CSVImporterTests: XCTestCase {
         let csvImporter = CSVImporter(fileURL: savedFileURL, loginImporter: mockLoginImporter)
 
         let expectation = expectation(description: #function)
-        csvImporter.importData(types: [.logins]) { result in
+        csvImporter.importData(types: [.logins], from: nil) { result in
             switch result {
             case .success(let summary):
                 let expectedSummary = DataImport.Summary.logins(successfulImports: ["username"], duplicateImports: [], failedImports: [])

@@ -20,14 +20,29 @@ import Foundation
 
 extension NSAlert {
 
+    var stringValue: String? {
+        return (accessoryView as? NSTextField)?.stringValue
+    }
+
     static func closeRunningBrowserAlert(source: DataImport.Source) -> NSAlert {
         let alert = NSAlert()
 
-        alert.messageText = "Would you like to quit \(source.importSourceName) now?"
-        alert.informativeText = "You must quit \(source.importSourceName) before importing data."
+        alert.messageText = UserText.dataImportQuitBrowserTitle(source)
+        alert.informativeText = UserText.dataImportQuitBrowserBody(source)
         alert.alertStyle = .warning
-        alert.addButton(withTitle: "Quit \(source.importSourceName)")
-        alert.addButton(withTitle: "Cancel")
+        alert.addButton(withTitle: UserText.dataImportQuitBrowserButton(source))
+        alert.addButton(withTitle: UserText.dataImportAlertCancel)
+
+        return alert
+    }
+
+    static func browserNeedsToBeClosedAlert(source: DataImport.Source) -> NSAlert {
+        let alert = NSAlert()
+
+        alert.messageText = UserText.dataImportFailedTitle
+        alert.informativeText = UserText.dataImportBrowserMustBeClosed(source)
+        alert.alertStyle = .warning
+        alert.addButton(withTitle: UserText.dataImportAlertAccept)
 
         return alert
     }
@@ -35,10 +50,35 @@ extension NSAlert {
     static func importFailedAlert(source: DataImport.Source) -> NSAlert {
         let alert = NSAlert()
 
-        alert.messageText = "Import Failed"
-        alert.informativeText = "Please ensure that \(source.importSourceName) is not running before importing data"
+        alert.messageText = UserText.dataImportFailedTitle
+        alert.informativeText = UserText.dataImportGenericFailure(source)
         alert.alertStyle = .warning
-        alert.addButton(withTitle: "Okay")
+        alert.addButton(withTitle: UserText.dataImportAlertAccept)
+
+        return alert
+    }
+
+    static func passwordRequiredAlert(source: DataImport.Source) -> NSAlert {
+        let textField = NSSecureTextField(frame: NSRect(x: 0, y: 0, width: 280, height: 24))
+        let alert = NSAlert()
+
+        alert.messageText = UserText.dataImportRequiresPasswordTitle
+        alert.informativeText = UserText.dataImportRequiresPasswordBody(source)
+        alert.alertStyle = .warning
+        alert.accessoryView = textField
+        alert.addButton(withTitle: UserText.dataImportAlertImport)
+        alert.addButton(withTitle: UserText.dataImportAlertCancel)
+
+        return alert
+    }
+
+    static func failureAlert(message: String) -> NSAlert {
+        let alert = NSAlert()
+
+        alert.messageText = UserText.dataImportFailedTitle
+        alert.informativeText = message
+        alert.alertStyle = .warning
+        alert.addButton(withTitle: UserText.dataImportAlertAccept)
 
         return alert
     }

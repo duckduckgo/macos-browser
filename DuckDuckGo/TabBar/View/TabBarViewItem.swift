@@ -256,8 +256,8 @@ final class TabBarViewItem: NSCollectionViewItem {
             self?.faviconImageView.image = favicon
         }.store(in: &cancellables)
 
-        tabViewModel.tab.$url.sink { [weak self] url in
-            self?.currentURL = url
+        tabViewModel.tab.$content.sink { [weak self] content in
+            self?.currentURL = content.url
         }.store(in: &cancellables)
     }
 

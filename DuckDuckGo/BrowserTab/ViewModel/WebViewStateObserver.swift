@@ -81,7 +81,7 @@ final class WebViewStateObserver: NSObject {
         switch keyPath {
         case #keyPath(WKWebView.url):
             if let url = webView.url {
-                tabViewModel.tab.url = url
+                tabViewModel.tab.content = .url(url)
                 tabViewModel.tab.addVisit(of: url)
             }
             updateTitle() // The title might not change if webView doesn't think anything is different so update title here as well

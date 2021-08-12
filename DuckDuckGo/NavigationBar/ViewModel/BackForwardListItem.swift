@@ -27,7 +27,7 @@ enum BackForwardListItem {
         case .backForwardListItem(let item):
             return item.url
         case .goBackToCloseItem(parentTab: let tab):
-            return tab.url
+            return tab.content.url
         }
     }
 

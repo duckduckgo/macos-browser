@@ -1,5 +1,5 @@
 //
-//  BrowserTabEmbeddable.swift
+//  ThirdPartyBrowserTests.swift
 //
 //  Copyright © 2021 DuckDuckGo. All rights reserved.
 //
@@ -17,15 +17,19 @@
 //
 
 import Foundation
+import XCTest
+@testable import DuckDuckGo_Privacy_Browser
 
-protocol BrowserTabEmbeddable {
+class ThirdPartyBrowserTests: XCTestCase {
 
-    var tabSwitcherButton: NSPopUpButton { get }
+    func testWhenCreatingThirdPartyBrowser_AndValidBrowserIsProvided_ThenThirdPartyBrowserInitializationSucceeds() {
+        XCTAssertNotNil(ThirdPartyBrowser.browser(for: .brave))
+        XCTAssertNotNil(ThirdPartyBrowser.browser(for: .chrome))
+        XCTAssertNotNil(ThirdPartyBrowser.browser(for: .edge))
+    }
 
-}
-
-protocol BrowserTabSelectionDelegate: AnyObject {
-
-    func selectedTab(at index: Int)
+    func testWhenCreatingThirdPartyBrowser_AndValidBrowserIsNotProvided_ThenThirdPartyBrowserInitializationFails() {
+        XCTAssertNil(ThirdPartyBrowser.browser(for: .csv))
+    }
 
 }

@@ -105,7 +105,7 @@ final class AddressBarButtonsViewController: NSViewController {
             return
         }
 
-        if let host = selectedTabViewModel.tab.url?.host, FireproofDomains.shared.isFireproof(fireproofDomain: host) {
+        if let host = selectedTabViewModel.tab.content.url?.host, FireproofDomains.shared.isFireproof(fireproofDomain: host) {
             let viewController = FireproofInfoViewController.create(for: host)
             present(viewController, asPopoverRelativeTo: button.frame, of: button.superview!, preferredEdge: .minY, behavior: .transient)
         }
@@ -134,8 +134,8 @@ final class AddressBarButtonsViewController: NSViewController {
         }
 
         let isSearchingMode = mode != .browsing
-        let isURLNil = selectedTabViewModel.tab.url == nil
-        let isDuckDuckGoUrl = selectedTabViewModel.tab.url?.isDuckDuckGoSearch ?? false
+        let isURLNil = selectedTabViewModel.tab.content.url == nil
+        let isDuckDuckGoUrl = selectedTabViewModel.tab.content.url?.isDuckDuckGoSearch ?? false
 
         // Privacy entry point button
         privacyEntryPointButton.isHidden = isSearchingMode || isTextFieldEditorFirstResponder || isDuckDuckGoUrl || isURLNil
@@ -155,7 +155,7 @@ final class AddressBarButtonsViewController: NSViewController {
         }
 
         // Fireproof button
-        if let url = selectedTabViewModel.tab.url, url.showFireproofStatus, !privacyEntryPointButton.isHidden {
+        if let url = selectedTabViewModel.tab.content.url, url.showFireproofStatus, !privacyEntryPointButton.isHidden {
             fireproofedButtonDivider.isHidden = !FireproofDomains.shared.isFireproof(fireproofDomain: url.host ?? "")
             fireproofedButton.isHidden = !FireproofDomains.shared.isFireproof(fireproofDomain: url.host ?? "")
         } else {
@@ -184,7 +184,7 @@ final class AddressBarButtonsViewController: NSViewController {
             return
         }
 
-        urlCancellable = selectedTabViewModel.tab.$url.receive(on: DispatchQueue.main).sink { [weak self] _ in
+        urlCancellable = selectedTabViewModel.tab.$content.receive(on: DispatchQueue.main).sink { [weak self] _ in
             self?.updateBookmarkButtonImage()
         }
     }
@@ -196,7 +196,7 @@ final class AddressBarButtonsViewController: NSViewController {
     }
 
     private func updateBookmarkButtonImage(isUrlBookmarked: Bool = false) {
-        if let url = tabCollectionViewModel.selectedTabViewModel?.tab.url,
+        if let url = tabCollectionViewModel.selectedTabViewModel?.tab.content.url,
            isUrlBookmarked || bookmarkManager.isUrlBookmarked(url: url) {
             bookmarkButton.image = Self.bookmarkFilledImage
             bookmarkButton.contentTintColor = NSColor.bookmarkFilledTint
@@ -208,7 +208,7 @@ final class AddressBarButtonsViewController: NSViewController {
 
     private func bookmarkForCurrentUrl(setFavorite: Bool, accessPoint: Pixel.Event.AccessPoint) -> Bookmark? {
         guard let selectedTabViewModel = tabCollectionViewModel.selectedTabViewModel,
-              let url = selectedTabViewModel.tab.url else {
+              let url = selectedTabViewModel.tab.content.url else {
             assertionFailure("No URL for bookmarking")
             return nil
         }

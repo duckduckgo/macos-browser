@@ -70,9 +70,7 @@ extension AppDelegate {
         DefaultConfigurationStorage.shared.log()
         ConfigurationManager.shared.log()
 
-        let tab = Tab()
-        tab.url = URL.feedback
-
+        let tab = Tab(content: .url(.feedback))
         let tabCollectionViewModel = mainViewController.tabCollectionViewModel
         tabCollectionViewModel.append(tab: tab)
     }
@@ -85,26 +83,25 @@ extension AppDelegate {
             return
         }
 
-        let tab = Tab()
         guard let bookmark = menuItem.representedObject as? Bookmark else {
             assertionFailure("Unexpected type of menuItem.representedObject: \(type(of: menuItem.representedObject))")
             return
         }
         Pixel.fire(.navigation(kind: .bookmark(isFavorite: bookmark.isFavorite), source: .mainMenu))
 
-        tab.url = bookmark.url
+        let tab = Tab(content: .url(bookmark.url))
         WindowsManager.openNewWindow(with: tab)
     }
 
     @IBAction func showManageBookmarks(_ sender: Any?) {
-        let tabCollection = TabCollection(tabs: [Tab(tabType: .bookmarks)])
+        let tabCollection = TabCollection(tabs: [Tab(content: .bookmarks)])
         let tabCollectionViewModel = TabCollectionViewModel(tabCollection: tabCollection)
         Pixel.fire(.manageBookmarks(source: .mainMenu))
         WindowsManager.openNewWindow(with: tabCollectionViewModel)
     }
 
     @IBAction func openPreferences(_ sender: Any?) {
-        let tabCollection = TabCollection(tabs: [Tab(tabType: .preferences)])
+        let tabCollection = TabCollection(tabs: [Tab(content: .preferences)])
         let tabCollectionViewModel = TabCollectionViewModel(tabCollection: tabCollection)
         WindowsManager.openNewWindow(with: tabCollectionViewModel)
     }
@@ -177,13 +174,13 @@ extension MainViewController {
     // MARK: - Main Menu
 
     @IBAction func openPreferences(_ sender: Any?) {
-        tabCollectionViewModel.appendNewTab(type: .preferences)
+        tabCollectionViewModel.appendNewTab(with: .preferences)
     }
 
     // MARK: - File
 
     @IBAction func newTab(_ sender: Any?) {
-        tabCollectionViewModel.appendNewTab()
+        tabCollectionViewModel.appendNewTab(with: .homepage)
     }
 
     @IBAction func openLocation(_ sender: Any?) {
@@ -317,7 +314,7 @@ extension MainViewController {
         } else if NSApplication.shared.isCommandPressed {
             WindowControllersManager.shared.show(url: bookmark.url, newTab: true)
         } else {
-            selectedTabViewModel.tab.url = bookmark.url
+            selectedTabViewModel.tab.content = .url(bookmark.url)
         }
     }
 
@@ -331,12 +328,12 @@ extension MainViewController {
             return
         }
 
-        let tabs = models.compactMap { $0.entity as? Bookmark }.map { Tab(url: $0.url, shouldLoadInBackground: true) }
+        let tabs = models.compactMap { $0.entity as? Bookmark }.map { Tab(content: .url($0.url), shouldLoadInBackground: true) }
         tabCollectionViewModel.append(tabs: tabs)
     }
 
     @IBAction func showManageBookmarks(_ sender: Any?) {
-        tabCollectionViewModel.appendNewTab(type: .bookmarks)
+        tabCollectionViewModel.appendNewTab(with: .bookmarks)
         Pixel.fire(.manageBookmarks(source: .mainMenu))
     }
 
@@ -398,7 +395,7 @@ extension MainViewController {
 
     /// Declines handling findInPage action if there's no page loaded currently.
     override func responds(to aSelector: Selector!) -> Bool {
-        if aSelector == #selector(findInPage(_:)) && tabCollectionViewModel.selectedTabViewModel?.tab.url == nil {
+        if aSelector == #selector(findInPage(_:)) && tabCollectionViewModel.selectedTabViewModel?.tab.content.url == nil {
             return false
         }
 

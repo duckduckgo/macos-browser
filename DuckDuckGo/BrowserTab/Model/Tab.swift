@@ -37,19 +37,18 @@ protocol TabDelegate: FileDownloadManagerDelegate {
 // swiftlint:disable file_length
 final class Tab: NSObject {
 
-    enum TabType: Int, CaseIterable {
-        case standard = 0
-        case preferences = 1
-        case bookmarks = 2
+    enum TabContent: Equatable {
+        case homepage
+        case url(URL)
+        case preferences
+        case bookmarks
 
-        static func rawValue(_ type: Int?) -> TabType {
-            let tabType = type ?? TabType.standard.rawValue
-            return TabType(rawValue: tabType) ?? .standard
-        }
-
-        static var displayableTabTypes: [TabType] {
-            let cases = TabType.allCases.filter { $0 != .standard }
-            return cases.sorted { first, second in
+        static var displayableTabTypes: [TabContent] {
+            return [TabContent.preferences, .bookmarks].sorted { first, second in
+                switch first {
+                case .homepage, .url, .preferences, .bookmarks: break
+                // !! Replace [TabContent.preferences, .bookmarks] above with new displayable Tab Types if added
+                }
                 guard let firstTitle = first.title, let secondTitle = second.title else {
                     return true // Arbitrary sort order, only non-standard tabs are displayable.
                 }
@@ -60,15 +59,21 @@ final class Tab: NSObject {
 
         var title: String? {
             switch self {
-            case .standard: return nil
+            case .url, .homepage: return nil
             case .preferences: return UserText.tabPreferencesTitle
             case .bookmarks: return UserText.tabBookmarksTitle
             }
         }
 
+        var url: URL? {
+            guard case .url(let url) = self else { return nil }
+            return url
+        }
+
         var focusTabAddressBarWhenSelected: Bool {
             switch self {
-            case .standard: return true
+            case .homepage: return true
+            case .url: return true
             case .preferences: return false
             case .bookmarks: return false
             }
@@ -77,12 +82,11 @@ final class Tab: NSObject {
 
     weak var delegate: TabDelegate?
 
-    init(tabType: TabType = .standard,
+    init(content: TabContent,
          faviconService: FaviconService = LocalFaviconService.shared,
          webCacheManager: WebCacheManager = .shared,
          webViewConfiguration: WebViewConfiguration? = nil,
          historyCoordinating: HistoryCoordinating = HistoryCoordinator.shared,
-         url: URL? = nil,
          title: String? = nil,
          error: Error? = nil,
          favicon: NSImage? = nil,
@@ -91,10 +95,9 @@ final class Tab: NSObject {
          shouldLoadInBackground: Bool = false,
          canBeClosedWithBack: Bool = false) {
 
-        self.tabType = tabType
+        self.content = content
         self.faviconService = faviconService
         self.historyCoordinating = historyCoordinating
-        self.url = url
         self.title = title
         self.error = error
         self.favicon = favicon
@@ -113,7 +116,7 @@ final class Tab: NSObject {
 
         // cache session-restored favicon if present
         if let favicon = favicon,
-           let host = url?.host {
+           let host = content.url?.host {
             faviconService.cacheIfNeeded(favicon: favicon, for: host, isFromUserScript: false)
         }
     }
@@ -123,21 +126,20 @@ final class Tab: NSObject {
     }
 
     let webView: WebView
-    private(set) var tabType: TabType
     var userEnteredUrl = true
 
-    @PublishedAfter var url: URL? {
+    @PublishedAfter var content: TabContent {
         didSet {
-            if url != nil {
-                tabType = .standard
-            }
-
-            if oldValue?.host != url?.host {
-                fetchFavicon(nil, for: url?.host, isFromUserScript: false)
+            if oldValue.url?.host != content.url?.host {
+                fetchFavicon(nil, for: content.url?.host, isFromUserScript: false)
             }
 
             invalidateSessionStateData()
             reloadIfNeeded()
+
+            if let title = content.title {
+                self.title = title
+            }
         }
     }
 
@@ -160,14 +162,6 @@ final class Tab: NSObject {
 
     var sessionStateData: Data?
 
-    func set(tabType: TabType) {
-        self.tabType = tabType
-
-        if let title = tabType.title {
-            self.title = title
-        }
-    }
-
     func invalidateSessionStateData() {
         sessionStateData = nil
     }
@@ -183,7 +177,7 @@ final class Tab: NSObject {
     }
 
     func update(url: URL?, userEntered: Bool = true) {
-        self.url = url
+        self.content = .url(url ?? .emptyPage)
 
         // This function is called when the user has manually typed in a new address, which should reset the login detection flow.
         userEnteredUrl = userEntered
@@ -222,11 +216,11 @@ final class Tab: NSObject {
     private let instrumentation = TabInstrumentation()
 
     var isHomepageShown: Bool {
-        url == nil || url == URL.emptyPage
+        content == .homepage
     }
 
     var isBookmarksShown: Bool {
-        (url == nil || url == URL.emptyPage) && tabType == .bookmarks
+        content == .bookmarks
     }
 
     var canGoForward: Bool {
@@ -261,7 +255,7 @@ final class Tab: NSObject {
     }
 
     func openHomepage() {
-        url = nil
+        content = .homepage
     }
 
     func reload() {
@@ -271,7 +265,7 @@ final class Tab: NSObject {
         }
 
         if webView.url == nil,
-           let url = self.url {
+           let url = self.content.url {
             webView.load(url)
         } else {
             webView.reload()
@@ -280,7 +274,7 @@ final class Tab: NSObject {
 
     private func reloadIfNeeded(shouldLoadInBackground: Bool = false) {
         guard webView.superview != nil || shouldLoadInBackground,
-            webView.url != self.url
+              webView.url != self.content.url
         else { return }
 
         if let sessionStateData = self.sessionStateData {
@@ -291,7 +285,7 @@ final class Tab: NSObject {
                 os_log("Tab:setupWebView could not restore session state %s", "\(error)")
             }
         }
-        if let url = self.url {
+        if let url = self.content.url {
             webView.load(url)
         } else {
             webView.load(URL.emptyPage)
@@ -303,7 +297,7 @@ final class Tab: NSObject {
     }
 
     func requestFireproofToggle() {
-        guard let url = url,
+        guard let url = content.url,
               let host = url.host
         else { return }
 
@@ -474,12 +468,12 @@ extension Tab: ContextMenuDelegate {
 extension Tab: FaviconUserScriptDelegate {
 
     func faviconUserScript(_ faviconUserScript: FaviconUserScript, didFindFavicon faviconUrl: URL) {
-        guard let host = self.url?.host else {
+        guard let host = self.content.url?.host else {
             return
         }
 
         faviconService.fetchFavicon(faviconUrl, for: host, isFromUserScript: true) { (image, error) in
-            guard host == self.url?.host else {
+            guard host == self.content.url?.host else {
                 return
             }
             guard error == nil, let image = image else {

@@ -68,7 +68,7 @@ final class SharingMenu: NSMenu {
         }
         guard let tabViewModel = WindowControllersManager.shared.lastKeyMainWindowController?.mainViewController
                 .tabCollectionViewModel.selectedTabViewModel,
-              let url = tabViewModel.tab.url
+              let url = tabViewModel.tab.content.url
         else {
             return
         }
