@@ -76,7 +76,7 @@ final class AddressBarButtonsViewController: NSViewController {
         }
     }
 
-    @IBOutlet weak var permissionsButtons: NSView!
+    @IBOutlet weak var permissionButtons: NSView!
     @IBOutlet weak var cameraButton: PermissionButton! {
         didSet {
             cameraButton.isHidden = true
@@ -101,6 +101,7 @@ final class AddressBarButtonsViewController: NSViewController {
 
     private var tabCollectionViewModel: TabCollectionViewModel
     private var bookmarkManager: BookmarkManager = LocalBookmarkManager.shared
+    private var isTextFieldEditorFirstResponder = false
 
     private var selectedTabViewModelCancellable: AnyCancellable?
     private var urlCancellable: AnyCancellable?
@@ -195,7 +196,7 @@ final class AddressBarButtonsViewController: NSViewController {
             return
         }
         guard !button.isHidden,
-              !permissionsButtons.isHidden
+              !permissionButtons.isHidden
         else { return }
 
         permissionAuthorizationPopover.viewController.query = query
@@ -217,6 +218,8 @@ final class AddressBarButtonsViewController: NSViewController {
     func updateButtons(mode: AddressBarViewController.Mode,
                        isTextFieldEditorFirstResponder: Bool,
                        textFieldValue: AddressBarTextField.Value) {
+        self.isTextFieldEditorFirstResponder = isTextFieldEditorFirstResponder
+
         guard let selectedTabViewModel = tabCollectionViewModel.selectedTabViewModel else {
             os_log("%s: Selected tab view model is nil", type: .error, className)
             return
@@ -244,9 +247,7 @@ final class AddressBarButtonsViewController: NSViewController {
             imageButton.image = Self.homeFaviconImage
         }
 
-        permissionsButtons.isHidden = isTextFieldEditorFirstResponder
         updatePermissionButtons()
-
         updateFireproofedButton()
     }
 
@@ -381,6 +382,8 @@ final class AddressBarButtonsViewController: NSViewController {
     }
 
     private func updatePermissionButtons() {
+        permissionButtons.isHidden = isTextFieldEditorFirstResponder || trackersAnimationView.isAnimating
+
         guard let selectedTabViewModel = tabCollectionViewModel.selectedTabViewModel else {
             if _permissionAuthorizationPopover?.isShown == true {
                 permissionAuthorizationPopover.close()
