@@ -175,8 +175,11 @@ final class BrowserTabViewController: NSViewController {
         homepageView.isHidden = shown
     }
 
-    private func openNewTab(with url: URL?, parentTab: Tab?, selected: Bool = false) {
-        let tab = Tab(content: url != nil ? .url(url!) : .homepage, parentTab: parentTab, shouldLoadInBackground: true)
+    private func openNewTab(with url: URL?, parentTab: Tab?, selected: Bool = false, canBeClosedWithBack: Bool = false) {
+        let tab = Tab(content: url != nil ? .url(url!) : .homepage,
+                      parentTab: parentTab,
+                      shouldLoadInBackground: true,
+                      canBeClosedWithBack: canBeClosedWithBack)
 
         if parentTab != nil {
             tabCollectionViewModel.insertChild(tab: tab, selected: selected)
@@ -304,6 +307,7 @@ extension BrowserTabViewController: TabDelegate {
         guard let tabViewModel = tabViewModel else { return }
 
         tabViewModel.closeFindInPage()
+        tab.permissions.tabDidStartNavigation()
         if !tabViewModel.isLoading,
            tabViewModel.tab.webView.isLoading {
             tabViewModel.isLoading = true
@@ -311,7 +315,7 @@ extension BrowserTabViewController: TabDelegate {
     }
 
     func tab(_ tab: Tab, requestedNewTab url: URL?, selected: Bool) {
-        openNewTab(with: url, parentTab: tab, selected: selected)
+        openNewTab(with: url, parentTab: tab, selected: selected, canBeClosedWithBack: selected == true)
     }
 
     func closeTab(_ tab: Tab) {
@@ -470,12 +474,96 @@ extension BrowserTabViewController: WKUIDelegate {
                  windowFeatures: WKWindowFeatures) -> WKWebView? {
 
         // Returned web view must be created with the specified configuration.
-        let tab = Tab(content: .url(.emptyPage), webViewConfiguration: configuration, parentTab: tabViewModel?.tab)
+
+        let tab = Tab(content: .url(.emptyPage),
+                      webViewConfiguration: configuration,
+                      parentTab: tabViewModel?.tab,
+                      canBeClosedWithBack: true)
         tabCollectionViewModel.insertChild(tab: tab, selected: true)
         // WebKit loads the request in the returned web view.
         return tab.webView
     }
-    
+
+    @objc(_webView:checkUserMediaPermissionForURL:mainFrameURL:frameIdentifier:decisionHandler:)
+    func webView(_ webView: WKWebView,
+                 checkUserMediaPermissionFor url: URL,
+                 mainFrameURL: URL,
+                 frameIdentifier frame: UInt,
+                 decisionHandler: @escaping (String, Bool) -> Void) {
+        webView.tab?.permissions.checkUserMediaPermission(for: url, mainFrameURL: mainFrameURL, decisionHandler: decisionHandler)
+            ?? /* Tab deallocated: */ {
+                decisionHandler("", false)
+            }()
+    }
+
+    // https://github.com/WebKit/WebKit/blob/995f6b1595611c934e742a4f3a9af2e678bc6b8d/Source/WebKit/UIProcess/API/Cocoa/WKUIDelegate.h#L147
+    @objc(webView:requestMediaCapturePermissionForOrigin:initiatedByFrame:type:decisionHandler:)
+    @available(macOS 12, *)
+    func webView(_ webView: WKWebView,
+                 requestMediaCapturePermissionFor origin: WKSecurityOrigin,
+                 initiatedBy frame: WKFrameInfo,
+                 type: WKMediaCaptureType,
+                 decisionHandler: @escaping (WKPermissionDecision) -> Void) {
+        guard let permissions = [PermissionType](devices: type) else {
+            assertionFailure("Could not decode PermissionType")
+            decisionHandler(.deny)
+            return
+        }
+
+        webView.tab?.permissions.permissions(permissions, requestedForDomain: origin.host) { granted in
+            decisionHandler(granted ? .grant : .deny)
+        } ?? /* Tab deallocated: */ {
+            decisionHandler(.deny)
+        }()
+    }
+
+    // https://github.com/WebKit/WebKit/blob/9d7278159234e0bfa3d27909a19e695928f3b31e/Source/WebKit/UIProcess/API/Cocoa/WKUIDelegatePrivate.h#L126
+    @objc(_webView:requestUserMediaAuthorizationForDevices:url:mainFrameURL:decisionHandler:)
+    func webView(_ webView: WKWebView,
+                 requestUserMediaAuthorizationFor devices: _WKCaptureDevices,
+                 url: URL,
+                 mainFrameURL: URL,
+                 decisionHandler: @escaping (Bool) -> Void) {
+        guard let permissions = [PermissionType](devices: devices) else {
+            assertionFailure("Could not decode PermissionType")
+            decisionHandler(false)
+            return
+        }
+
+        webView.tab?.permissions.permissions(permissions, requestedForDomain: url.host, decisionHandler: decisionHandler)
+            ?? /* Tab deallocated: */ {
+                decisionHandler(false)
+            }()
+    }
+
+    @objc(_webView:mediaCaptureStateDidChange:)
+    func webView(_ webView: WKWebView, mediaCaptureStateDidChange state: _WKMediaCaptureStateDeprecated) {
+        webView.tab?.permissions.mediaCaptureStateDidChange()
+    }
+
+    // https://github.com/WebKit/WebKit/blob/9d7278159234e0bfa3d27909a19e695928f3b31e/Source/WebKit/UIProcess/API/Cocoa/WKUIDelegatePrivate.h#L131
+    @objc(_webView:requestGeolocationPermissionForFrame:decisionHandler:)
+    func webView(_ webView: WKWebView, requestGeolocationPermissionFor frame: WKFrameInfo, decisionHandler: @escaping (Bool) -> Void) {
+        webView.tab?.permissions.permissions([.geolocation], requestedForDomain: frame.request.url?.host, decisionHandler: decisionHandler)
+            ?? /* Tab deallocated: */ {
+                decisionHandler(false)
+            }()
+    }
+
+    // https://github.com/WebKit/WebKit/blob/9d7278159234e0bfa3d27909a19e695928f3b31e/Source/WebKit/UIProcess/API/Cocoa/WKUIDelegatePrivate.h#L132
+    @objc(_webView:requestGeolocationPermissionForOrigin:initiatedByFrame:decisionHandler:)
+    @available(macOS 12, *)
+    func webView(_ webView: WKWebView,
+                 requestGeolocationPermissionFor origin: WKSecurityOrigin,
+                 initiatedBy frame: WKFrameInfo,
+                 decisionHandler: @escaping (WKPermissionDecision) -> Void) {
+        webView.tab?.permissions.permissions([.geolocation], requestedForDomain: frame.request.url?.host) { granted in
+            decisionHandler(granted ? .grant : .deny)
+        } ?? /* Tab deallocated: */ {
+            decisionHandler(.deny)
+        }()
+    }
+
     func webView(_ webView: WKWebView,
                  runOpenPanelWith parameters: WKOpenPanelParameters,
                  initiatedByFrame frame: WKFrameInfo,
@@ -572,6 +660,19 @@ extension BrowserTabViewController: BrowserTabSelectionDelegate {
 
     func selectedTab(at index: Int) {
         show(displayableTabAtIndex: index)
+    }
+
+}
+
+private extension WKWebView {
+
+    var tab: Tab? {
+        guard let navigationDelegate = self.navigationDelegate else { return nil }
+        guard let tab = navigationDelegate as? Tab else {
+            assertionFailure("webView.navigationDelegate is not a Tab")
+            return nil
+        }
+        return tab
     }
 
 }

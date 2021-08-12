@@ -53,7 +53,7 @@ final class LongPressButton: MouseOverButton {
         menuTimer = timer
         RunLoop.current.add(timer, forMode: .eventTracking)
 
-        trackMouseEvents(withDelayedMenu: menu)
+        trackMouseEvents(withDelayedMenu: menu, previousEvent: event)
 
         menuTimer?.invalidate()
         menuTimer = nil
@@ -61,13 +61,21 @@ final class LongPressButton: MouseOverButton {
         self.isMouseDown = false
     }
 
-    private func trackMouseEvents(withDelayedMenu menu: NSMenu) {
+    private func trackMouseEvents(withDelayedMenu menu: NSMenu, previousEvent: NSEvent) {
         while let event = self.window?.nextEvent(matching: [.leftMouseDragged, .leftMouseUp]) {
             switch event.type {
             case .leftMouseDragged:
-                guard menuTimer != nil,
-                      self.isMouseLocationInsideBounds(event.locationInWindow)
-                else { return }
+                // ignore and return if menu was already shown
+                guard menuTimer != nil else { return }
+                // if on vertical mouse movement show menu instantly; ignore and return on X mouse-out
+                guard self.withMouseLocationInViewCoordinates(event.locationInWindow, convert: { locationInView in
+                    (self.bounds.minX...self.bounds.maxX).contains(locationInView.x)
+                }) == true else { return }
+                // should be a real mouse dragged event otherwise wait for next
+                guard Int(event.locationInWindow.x) != Int(previousEvent.locationInWindow.x),
+                      Int(event.locationInWindow.y) != Int(previousEvent.locationInWindow.y)
+                else { break }
+
                 self.displayMenu(menu)
                 return
 

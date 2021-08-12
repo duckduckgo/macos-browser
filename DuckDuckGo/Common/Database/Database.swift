@@ -94,9 +94,9 @@ extension NSManagedObjectContext {
     }
     
     func deleteAll<T: NSManagedObject>(matching request: NSFetchRequest<T>) {
-            if let result = try? fetch(request) {
-                deleteAll(entities: result)
-            }
+        if let result = try? fetch(request) {
+            deleteAll(entities: result)
+        }
     }
     
     func deleteAll(entityDescriptions: [NSEntityDescription] = []) {

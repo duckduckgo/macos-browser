@@ -10,3 +10,5 @@
 #import "_WKDownload.h"
 #import "WKProcessPool+Private.h"
 #import "WKNavigationAction+Private.h"
+
+#import "WKGeolocationProvider.h"

@@ -92,7 +92,8 @@ final class Tab: NSObject {
          favicon: NSImage? = nil,
          sessionStateData: Data? = nil,
          parentTab: Tab? = nil,
-         shouldLoadInBackground: Bool = false) {
+         shouldLoadInBackground: Bool = false,
+         canBeClosedWithBack: Bool = false) {
 
         self.content = content
         self.faviconService = faviconService
@@ -101,12 +102,14 @@ final class Tab: NSObject {
         self.error = error
         self.favicon = favicon
         self.parentTab = parentTab
+        self._canBeClosedWithBack = canBeClosedWithBack
         self.sessionStateData = sessionStateData
 
         let configuration = webViewConfiguration ?? WKWebViewConfiguration()
         configuration.applyStandardConfiguration()
 
         webView = WebView(frame: CGRect.zero, configuration: configuration)
+        permissions = PermissionModel(webView: webView)
 
         super.init()
 
@@ -146,8 +149,15 @@ final class Tab: NSObject {
 
     @PublishedAfter var title: String?
     @PublishedAfter var error: Error?
+    let permissions: PermissionModel
 
     weak private(set) var parentTab: Tab?
+    private var _canBeClosedWithBack: Bool
+    var canBeClosedWithBack: Bool {
+        // Reset canBeClosedWithBack on any WebView navigation
+        _canBeClosedWithBack = _canBeClosedWithBack && parentTab != nil && !webView.canGoBack && !webView.canGoForward
+        return _canBeClosedWithBack
+    }
 
     weak var findInPage: FindInPageModel? {
         didSet {
@@ -218,12 +228,28 @@ final class Tab: NSObject {
         content == .bookmarks
     }
 
+    var canGoForward: Bool {
+        webView.canGoForward
+    }
+
     func goForward() {
+        guard self.canGoForward else { return }
         shouldStoreNextVisit = false
         webView.goForward()
     }
 
+    var canGoBack: Bool {
+        webView.canGoBack
+    }
+
     func goBack() {
+        guard self.canGoBack else {
+            if canBeClosedWithBack {
+                delegate?.closeTab(self)
+            }
+            return
+        }
+
         shouldStoreNextVisit = false
         webView.goBack()
     }
@@ -388,7 +414,7 @@ final class Tab: NSObject {
             .weakAssign(to: \.userScripts, on: self)
     }
 
-    // MARK: Find in Page
+    // MARK: - Find in Page
 
     var findInPageCancellable: AnyCancellable?
     private func subscribeToFindInPageTextChange() {
@@ -425,15 +451,18 @@ final class Tab: NSObject {
     // MARK: - Dashboard Info
 
     @Published var trackerInfo: TrackerInfo?
+    @Published var serverTrust: ServerTrust?
 
     private func updateDashboardInfo(oldUrl: URL? = nil, url: URL?) {
         guard let url = url, let host = url.host else {
             trackerInfo = nil
+            serverTrust = nil
             return
         }
 
         if oldUrl?.host != host || oldUrl?.scheme != url.scheme {
             trackerInfo = TrackerInfo()
+            serverTrust = nil
         }
     }
 
@@ -558,6 +587,9 @@ extension Tab: WKNavigationDelegate {
             return
         }
         completionHandler(.performDefaultHandling, nil)
+        if let host = webView.url?.host, let serverTrust = challenge.protectionSpace.serverTrust {
+            self.serverTrust = ServerTrust(host: host, secTrust: serverTrust)
+        }
     }
 
     struct Constants {

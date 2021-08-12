@@ -21,22 +21,35 @@ import WebKit
 
 final class WKBackForwardListItemViewModel {
 
-    private let backForwardListItem: WKBackForwardListItem
+    private let backForwardListItem: BackForwardListItem
     private let faviconService: FaviconService
+    private let isCurrentItem: Bool
 
-    init(backForwardListItem: WKBackForwardListItem, faviconService: FaviconService) {
+    init(backForwardListItem: BackForwardListItem, faviconService: FaviconService, isCurrentItem: Bool) {
         self.backForwardListItem = backForwardListItem
         self.faviconService = faviconService
+        self.isCurrentItem = isCurrentItem
     }
 
     var title: String {
-        if backForwardListItem.url == URL.emptyPage {
-            return UserText.tabHomeTitle
-        }
+        switch backForwardListItem {
+        case .backForwardListItem(let item):
+            if item.url == URL.emptyPage {
+                return UserText.tabHomeTitle
+            }
 
-        return backForwardListItem.title ??
-            backForwardListItem.url.host ??
-            backForwardListItem.url.absoluteString
+            return item.title ??
+                item.url.host ??
+                item.url.absoluteString
+
+        case .goBackToCloseItem(parentTab: let tab):
+            if let title = tab.title,
+               !title.isEmpty {
+                return String(format: UserText.closeAndReturnToParentFormat, title)
+            } else {
+                return UserText.closeAndReturnToParent
+            }
+        }
     }
 
     var image: NSImage? {
@@ -44,12 +57,26 @@ final class WKBackForwardListItemViewModel {
             return NSImage(named: "HomeFavicon")
         }
 
-        if let host = backForwardListItem.url.host, let favicon = faviconService.getCachedFavicon(for: host, mustBeFromUserScript: false) {
+        if let host = backForwardListItem.url?.host, let favicon = faviconService.getCachedFavicon(for: host, mustBeFromUserScript: false) {
             favicon.size = NSSize.faviconSize
             return favicon
         }
 
         return NSImage(named: "DefaultFavicon")
+    }
+
+    var state: NSControl.StateValue {
+        if case .backForwardListItem = backForwardListItem {
+            return isCurrentItem ? .on : .off
+        }
+        return .off
+    }
+
+    var isGoBackToCloseItem: Bool {
+        if case .goBackToCloseItem = backForwardListItem {
+            return true
+        }
+        return false
     }
 
 }

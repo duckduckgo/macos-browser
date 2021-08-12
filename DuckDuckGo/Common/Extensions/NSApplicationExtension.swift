@@ -17,6 +17,7 @@
 //
 
 import Cocoa
+import Combine
 
 extension NSApplication {
 
@@ -39,6 +40,15 @@ extension NSApplication {
               case .keyDown = event.type
         else { return false }
         return event.keyCode == 36 || event.keyCode == 76
+    }
+
+    func isActivePublisher() -> AnyPublisher<Bool, Never> {
+        let activated = NotificationCenter.default
+            .publisher(for: NSApplication.didBecomeActiveNotification).map { _ in true }
+        let deactivated = NotificationCenter.default
+            .publisher(for: NSApplication.didResignActiveNotification).map { _ in false }
+
+        return activated.merge(with: deactivated).eraseToAnyPublisher()
     }
 
 }
