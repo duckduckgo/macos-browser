@@ -88,8 +88,6 @@ final class PrivacyDashboardViewController: NSViewController {
     }
 
     private func subscribeToTrackerInfo() {
-        #warning("Inject isProtectionOn to TrackerInfoViewModel based on protectionState")
-
         tabViewModel?.tab.$trackerInfo
             .receive(on: DispatchQueue.main)
             .sink(receiveValue: { [weak self] trackerInfo in
