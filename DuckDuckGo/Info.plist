@@ -39,6 +39,14 @@
 	<string>$(PRODUCT_BUNDLE_PACKAGE_TYPE)</string>
 	<key>CFBundleShortVersionString</key>
 	<string>$(MARKETING_VERSION)</string>
+	<key>NSCameraUsageDescription</key>
+	<string>Allows you to upload photographs and videos</string>
+	<key>NSLocationWhenInUseUsageDescription</key>
+	<string>Allows you to share your location</string>
+	<key>NSMicrophoneUsageDescription</key>
+	<string>Allows you to share recordings</string>
+	<key>NSLocationUsageDescription</key>
+	<string>Allows you to share your geolocation</string>
 	<key>CFBundleURLTypes</key>
 	<array>
 		<dict>

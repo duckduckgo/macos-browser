@@ -1,0 +1,71 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<document type="com.apple.InterfaceBuilder3.Cocoa.Storyboard.XIB" version="3.0" toolsVersion="18122" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none" useAutolayout="YES">
+    <dependencies>
+        <deployment identifier="macosx"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="18122"/>
+        <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
+    </dependencies>
+    <scenes>
+        <!--Permission Authorization View Controller-->
+        <scene sceneID="bgR-6y-2RZ">
+            <objects>
+                <viewController storyboardIdentifier="PermissionAuthorizationViewController" id="1ds-EH-Sa3" customClass="PermissionAuthorizationViewController" customModule="DuckDuckGo_Privacy_Browser" customModuleProvider="target" sceneMemberID="viewController">
+                    <view key="view" id="6Y6-ej-1GX">
+                        <rect key="frame" x="0.0" y="0.0" width="312" height="122"/>
+                        <autoresizingMask key="autoresizingMask"/>
+                        <subviews>
+                            <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="7nK-UI-YT3">
+                                <rect key="frame" x="14" y="64" width="284" height="32"/>
+                                <constraints>
+                                    <constraint firstAttribute="width" relation="lessThanOrEqual" constant="280" id="QYG-Ij-tMj"/>
+                                </constraints>
+                                <textFieldCell key="cell" title="website.com asks for permission to use your geolocation, allow?" id="z9s-AY-68S">
+                                    <font key="font" metaFont="systemBold"/>
+                                    <color key="textColor" name="labelColor" catalog="System" colorSpace="catalog"/>
+                                    <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
+                                </textFieldCell>
+                            </textField>
+                            <button verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="STv-Br-1F5">
+                                <rect key="frame" x="153" y="9" width="146" height="32"/>
+                                <buttonCell key="cell" type="push" title="Allow" bezelStyle="rounded" alignment="center" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="eOa-90-vwm">
+                                    <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
+                                    <font key="font" metaFont="system"/>
+                                </buttonCell>
+                                <connections>
+                                    <action selector="grantAction:" target="1ds-EH-Sa3" id="vZl-wW-qoF"/>
+                                </connections>
+                            </button>
+                            <button verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="nJj-cz-fYJ">
+                                <rect key="frame" x="9" y="9" width="146" height="32"/>
+                                <buttonCell key="cell" type="push" title="Deny" bezelStyle="rounded" alignment="center" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="tHA-lk-nXO">
+                                    <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
+                                    <font key="font" metaFont="system"/>
+                                </buttonCell>
+                                <connections>
+                                    <action selector="denyAction:" target="1ds-EH-Sa3" id="3f0-ZY-jHN"/>
+                                </connections>
+                            </button>
+                        </subviews>
+                        <constraints>
+                            <constraint firstItem="STv-Br-1F5" firstAttribute="width" secondItem="nJj-cz-fYJ" secondAttribute="width" id="5oP-rX-XmW"/>
+                            <constraint firstItem="nJj-cz-fYJ" firstAttribute="leading" secondItem="6Y6-ej-1GX" secondAttribute="leading" constant="16" id="OD8-zs-d8T"/>
+                            <constraint firstItem="7nK-UI-YT3" firstAttribute="top" secondItem="6Y6-ej-1GX" secondAttribute="top" constant="26" id="QSn-2H-Xo2"/>
+                            <constraint firstItem="STv-Br-1F5" firstAttribute="top" secondItem="7nK-UI-YT3" secondAttribute="bottom" constant="28" id="UZw-81-kcM"/>
+                            <constraint firstAttribute="trailing" secondItem="STv-Br-1F5" secondAttribute="trailing" constant="20" symbolic="YES" id="fYb-Vo-gC9"/>
+                            <constraint firstItem="7nK-UI-YT3" firstAttribute="leading" secondItem="6Y6-ej-1GX" secondAttribute="leading" constant="16" id="kAG-t8-mxX"/>
+                            <constraint firstItem="STv-Br-1F5" firstAttribute="leading" secondItem="nJj-cz-fYJ" secondAttribute="trailing" constant="12" symbolic="YES" id="mUt-ZG-eUB"/>
+                            <constraint firstAttribute="bottom" secondItem="nJj-cz-fYJ" secondAttribute="bottom" constant="16" id="nRi-XJ-2MT"/>
+                            <constraint firstAttribute="bottom" secondItem="STv-Br-1F5" secondAttribute="bottom" constant="16" id="nrt-Ld-8oq"/>
+                            <constraint firstAttribute="trailing" secondItem="7nK-UI-YT3" secondAttribute="trailing" constant="16" id="vPs-sd-8Ti"/>
+                        </constraints>
+                    </view>
+                    <connections>
+                        <outlet property="descriptionLabel" destination="7nK-UI-YT3" id="3j0-fM-dKc"/>
+                    </connections>
+                </viewController>
+                <customObject id="Pct-h6-WSE" userLabel="First Responder" customClass="NSResponder" sceneMemberID="firstResponder"/>
+            </objects>
+            <point key="canvasLocation" x="-588" y="-104"/>
+        </scene>
+    </scenes>
+</document>

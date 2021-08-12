@@ -65,6 +65,9 @@ final class TabViewModel {
     @Published private(set) var favicon: NSImage = Favicon.home
     @Published private(set) var findInPage: FindInPageModel = FindInPageModel()
 
+    @Published private(set) var usedPermissions = Permissions()
+    @Published private(set) var permissionAuthorizationQuery: PermissionAuthorizationQuery?
+
     init(tab: Tab) {
         self.tab = tab
 
@@ -74,6 +77,7 @@ final class TabViewModel {
         subscribeToTitle()
         subscribeToFavicon()
         subscribeToTabError()
+        subscribeToPermissions()
     }
 
     private func subscribeToUrl() {
@@ -97,6 +101,13 @@ final class TabViewModel {
             guard let self = self else { return }
             self.isErrorViewVisible = self.tab.error != nil
         } .store(in: &cancellables)
+    }
+
+    private func subscribeToPermissions() {
+        tab.permissions.$permissions.weakAssign(to: \.usedPermissions, on: self)
+            .store(in: &cancellables)
+        tab.permissions.$authorizationQuery.weakAssign(to: \.permissionAuthorizationQuery, on: self)
+            .store(in: &cancellables)
     }
 
     private func updateCanReload() {
