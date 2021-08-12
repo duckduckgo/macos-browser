@@ -17,13 +17,24 @@
 //
 
 import Foundation
+import Combine
 
 final class TrackersAnimationView: NSView {
 
-    static var images: [NSImage] = {
+    static var lightAnimationImages: [NSImage] = {
         var images = [NSImage]()
         for i in 0...82 {
-            if let image = NSImage(named: "TrackersAnimation\(String(format: "%02d", i))") {
+            if let image = NSImage(named: "TrackersAnimationLight\(String(format: "%02d", i))") {
+                images.append(image)
+            }
+        }
+        return images
+    }()
+
+    static var darkAnimationImages: [NSImage] = {
+        var images = [NSImage]()
+        for i in 0...82 {
+            if let image = NSImage(named: "TrackersAnimationDark\(String(format: "%02d", i))") {
                 images.append(image)
             }
         }
@@ -31,6 +42,15 @@ final class TrackersAnimationView: NSView {
     }()
 
     @Published private(set) var isAnimating = false
+
+    private var animationImages: [NSImage] = []
+    private var cancellables = Set<AnyCancellable>()
+
+    override func awakeFromNib() {
+        super.awakeFromNib()
+
+        subscribeToEffectiveAppearance()
+    }
 
     func animate() {
         guard layer?.animation(forKey: Constants.animationKeyPath) == nil else { return }
@@ -41,13 +61,21 @@ final class TrackersAnimationView: NSView {
         layer?.removeAnimation(forKey: Constants.animationKeyPath)
     }
 
+    private func subscribeToEffectiveAppearance() {
+        NSApp.publisher(for: \.effectiveAppearance)
+            .sink { [weak self] _ in
+                self?.updateAnimationImages()
+            }
+            .store(in: &cancellables)
+    }
+
     private enum Constants {
         static let animationKeyPath = "contents"
     }
 
     private lazy var animation: CAKeyframeAnimation = {
         let keyFrameAnimation = CAKeyframeAnimation(keyPath: Constants.animationKeyPath)
-        keyFrameAnimation.values = Self.images
+        keyFrameAnimation.values = animationImages
         keyFrameAnimation.calculationMode = .discrete
         keyFrameAnimation.fillMode = .forwards
         keyFrameAnimation.autoreverses = false
@@ -57,6 +85,17 @@ final class TrackersAnimationView: NSView {
         keyFrameAnimation.delegate = self
         return keyFrameAnimation
     }()
+
+    private func updateAnimationImages() {
+        animationImages.removeAll()
+
+        if NSApp.effectiveAppearance.name == NSAppearance.Name.aqua {
+            animationImages = Self.lightAnimationImages
+        } else {
+            animationImages = Self.darkAnimationImages
+        }
+        animation.values = animationImages
+    }
 
 }
 

@@ -601,7 +601,7 @@
                                             <constraint firstAttribute="width" constant="32" id="Hf1-nK-Kb4"/>
                                             <constraint firstAttribute="height" constant="32" id="NcD-Mf-Vae"/>
                                         </constraints>
-                                        <buttonCell key="cell" type="square" bezelStyle="shadowlessSquare" image="PrivacyIcon001" imagePosition="only" alignment="center" inset="2" id="ZJj-fb-53u">
+                                        <buttonCell key="cell" type="square" bezelStyle="shadowlessSquare" imagePosition="only" alignment="center" imageScaling="proportionallyDown" inset="2" id="ZJj-fb-53u">
                                             <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
                                             <font key="font" metaFont="system"/>
                                         </buttonCell>
@@ -698,7 +698,6 @@
         <image name="Forward" width="16" height="16"/>
         <image name="HomeFavicon" width="16" height="16"/>
         <image name="PasswordManagement" width="16" height="16"/>
-        <image name="PrivacyIcon001" width="32" height="32"/>
         <image name="Refresh" width="16" height="16"/>
         <image name="Settings" width="16" height="16"/>
         <image name="Share" width="16" height="16"/>

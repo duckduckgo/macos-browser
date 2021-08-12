@@ -66,6 +66,7 @@ final class AddressBarButtonsViewController: NSViewController {
     private var trackerInfoCancellable: AnyCancellable?
     private var bookmarkListCancellable: AnyCancellable?
     private var trackersAnimationViewStatusCancellable: AnyCancellable?
+    private var effectiveAppearanceCancellable: AnyCancellable?
 
     required init?(coder: NSCoder) {
         fatalError("AddressBarButtonsViewController: Bad initializer")
@@ -85,6 +86,7 @@ final class AddressBarButtonsViewController: NSViewController {
         subscribeToSelectedTabViewModel()
         subscribeToBookmarkList()
         subscribeToTrackersAnimationViewStatus()
+        subscribeToEffectiveAppearance()
 
         NotificationCenter.default.addObserver(self,
                                                selector: #selector(showUndoFireproofingPopover(_:)),
@@ -245,9 +247,11 @@ final class AddressBarButtonsViewController: NSViewController {
         }
 
         // Animate only when the first tracker is blocked
-        if trackerInfo.trackersBlocked.count == 1 && animated {
-            privacyEntryPointButton.animate()
-            trackersAnimationView.animate()
+        if animated {
+            if trackerInfo.trackersBlocked.count == 1 {
+                privacyEntryPointButton.animate()
+                trackersAnimationView.animate()
+            }
         } else {
             privacyEntryPointButton.setFinal()
         }
@@ -302,6 +306,17 @@ final class AddressBarButtonsViewController: NSViewController {
             .sink { [weak self] _ in
             self?.updateFireproofedButton()
         }
+    }
+
+    private func subscribeToEffectiveAppearance() {
+        effectiveAppearanceCancellable = NSApp.publisher(for: \.effectiveAppearance)
+            .receive(on: DispatchQueue.main)
+            .sink { [weak self] _ in
+                guard let trackerInfo = self?.tabCollectionViewModel.selectedTabViewModel?.tab.trackerInfo else {
+                    return
+                }
+                self?.updatePrivacyViews(trackerInfo: trackerInfo, animated: false)
+            }
     }
 
 }

@@ -17,18 +17,37 @@
 //
 
 import Foundation
+import Combine
 
 final class PrivacyEntryPointAddressBarButton: AddressBarButton {
 
-    static var images: [NSImage] = {
+    static var lightAnimationImages: [NSImage] = {
         var images = [NSImage]()
         for i in 0...180 {
-            if let image = NSImage(named: "PrivacyIcon\(String(format: "%03d", i))") {
+            if let image = NSImage(named: "PrivacyIconLight\(String(format: "%03d", i))") {
                 images.append(image)
             }
         }
         return images
     }()
+    static var darkAnimationImages: [NSImage] = {
+        var images = [NSImage]()
+        for i in 0...180 {
+            if let image = NSImage(named: "PrivacyIconDark\(String(format: "%03d", i))") {
+                images.append(image)
+            }
+        }
+        return images
+    }()
+
+    private var animationImages = [NSImage]()
+    private var cancellables = Set<AnyCancellable>()
+
+    override func awakeFromNib() {
+        super.awakeFromNib()
+
+        subscribeToEffectiveAppearance()
+    }
 
     func animate() {
         guard layer?.animation(forKey: Constants.animationKeyPath) == nil else { return }
@@ -37,12 +56,20 @@ final class PrivacyEntryPointAddressBarButton: AddressBarButton {
 
     func reset() {
         layer?.removeAnimation(forKey: Constants.animationKeyPath)
-        image = Self.images.first
+        image = animationImages.first
     }
 
     func setFinal() {
-        image = Self.images.last
+        image = animationImages.last
         layer?.removeAnimation(forKey: Constants.animationKeyPath)
+    }
+
+    private func subscribeToEffectiveAppearance() {
+        NSApp.publisher(for: \.effectiveAppearance)
+            .sink { [weak self] _ in
+                self?.updateAnimationImages()
+            }
+            .store(in: &cancellables)
     }
 
     private enum Constants {
@@ -51,7 +78,7 @@ final class PrivacyEntryPointAddressBarButton: AddressBarButton {
 
     private lazy var animation: CAKeyframeAnimation = {
         let keyFrameAnimation = CAKeyframeAnimation(keyPath: Constants.animationKeyPath)
-        keyFrameAnimation.values = Self.images
+        keyFrameAnimation.values = animationImages
         keyFrameAnimation.calculationMode = .discrete
         keyFrameAnimation.fillMode = .forwards
         keyFrameAnimation.autoreverses = false
@@ -60,5 +87,16 @@ final class PrivacyEntryPointAddressBarButton: AddressBarButton {
         keyFrameAnimation.duration = 6
         return keyFrameAnimation
     }()
+
+    private func updateAnimationImages() {
+        animationImages.removeAll()
+
+        if NSApp.effectiveAppearance.name == NSAppearance.Name.aqua {
+            animationImages = Self.lightAnimationImages
+        } else {
+            animationImages = Self.darkAnimationImages
+        }
+        animation.values = animationImages
+    }
 
 }
