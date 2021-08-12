@@ -70,19 +70,18 @@ final class PrivacyDashboardViewController: NSViewController {
             return
         }
         guard let domain = tabViewModel?.tab.content.url?.host else {
-            privacyDashboardScript.setPermissions(Permissions(), authorizationState: [:], domain: "", in: webView)
+            privacyDashboardScript.setPermissions(Permissions(), authorizationState: [], domain: "", in: webView)
             return
         }
 
-        var authState = [PermissionType: PermissionAuthorizationState]()
-        for permissionType in PermissionType.allCases {
+        let authState: PrivacyDashboardUserScript.AuthorizationState = PermissionType.allCases.compactMap { permissionType in
             guard let alwaysGrant = PermissionManager.shared.permission(forDomain: domain, permissionType: permissionType) else {
                 if usedPermissions[permissionType] != nil {
-                    authState[permissionType] = .ask
+                    return (permissionType, .ask)
                 }
-                continue
+                return nil
             }
-            authState[permissionType] = alwaysGrant ? .grant : .deny
+            return (permissionType, alwaysGrant ? .grant : .deny)
         }
 
         privacyDashboardScript.setPermissions(usedPermissions, authorizationState: authState, domain: domain, in: webView)

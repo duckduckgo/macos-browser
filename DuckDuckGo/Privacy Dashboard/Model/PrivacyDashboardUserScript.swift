@@ -109,17 +109,19 @@ final class PrivacyDashboardUserScript: NSObject, StaticUserScript {
         delegate?.userScript(self, setPermission: permission, paused: paused)
     }
 
+    typealias AuthorizationState = [(permission: PermissionType, state: PermissionAuthorizationState)]
     func setPermissions(_ usedPermissions: Permissions,
-                        authorizationState: [PermissionType: PermissionAuthorizationState],
+                        authorizationState: AuthorizationState,
                         domain: String,
                         in webView: WKWebView) {
 
-        let dict = authorizationState.reduce(into: [String: Any]()) {
-            $0[$1.key.rawValue] = [
-                "title": $1.key.localizedDescription,
-                "permission": $1.value.rawValue,
-                "used": usedPermissions[$1.key] != nil,
-                "paused": usedPermissions[$1.key] == .paused,
+        let allowedPermissions = authorizationState.map {
+            [
+                "key": $0.permission.rawValue,
+                "title": $0.permission.localizedDescription,
+                "permission": $0.state.rawValue,
+                "used": usedPermissions[$0.permission] != nil,
+                "paused": usedPermissions[$0.permission] == .paused,
                 "options": PermissionAuthorizationState.allCases.map {
                     [
                         "id": $0.rawValue,
@@ -128,7 +130,9 @@ final class PrivacyDashboardUserScript: NSObject, StaticUserScript {
                 }
             ]
         }
-        guard let allowedPermissionsJson = (try? JSONSerialization.data(withJSONObject: dict, options: []))?.utf8String() else {
+        guard let allowedPermissionsJson = (try? JSONSerialization.data(withJSONObject: allowedPermissions,
+                                                                        options: []))?.utf8String()
+        else {
             assertionFailure("PrivacyDashboardUserScript: could not serialize permissions object")
             return
         }
