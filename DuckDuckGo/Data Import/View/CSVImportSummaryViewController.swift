@@ -36,8 +36,6 @@ final class CSVImportSummaryViewController: NSViewController {
     @IBOutlet var importCompleteLabel: NSTextField!
 
     @IBOutlet var successfulImportsLabel: NSTextField!
-    @IBOutlet var duplicateImportsLabel: NSTextField!
-    @IBOutlet var failedImportsLabel: NSTextField!
 
     private let summary: DataImport.Summary?
 
@@ -53,14 +51,10 @@ final class CSVImportSummaryViewController: NSViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
 
-        if case let .logins(successful, duplicates, failed) = summary {
-            successfulImportsLabel.stringValue = "Successful Imports: \(successful.count)"
-            duplicateImportsLabel.stringValue = "Duplicate Imports: \(duplicates.count)"
-            failedImportsLabel.stringValue = "Failed Imports: \(failed.count)"
+        if case let .logins(successful, _, _) = summary {
+            successfulImportsLabel.stringValue = UserText.loginImportSuccessfulCSVImports(totalSuccessfulImports: successful.count)
         } else {
             successfulImportsLabel.isHidden = true
-            duplicateImportsLabel.isHidden = true
-            failedImportsLabel.isHidden = true
         }
     }
 

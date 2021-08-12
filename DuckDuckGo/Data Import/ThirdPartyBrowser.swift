@@ -23,6 +23,7 @@ struct ThirdPartyBrowser {
     static var brave: ThirdPartyBrowser { ThirdPartyBrowser(type: .brave) }
     static var chrome: ThirdPartyBrowser { ThirdPartyBrowser(type: .chrome) }
     static var edge: ThirdPartyBrowser { ThirdPartyBrowser(type: .edge) }
+    static var firefox: ThirdPartyBrowser { ThirdPartyBrowser(type: .firefox) }
 
     static func browser(for source: DataImport.Source) -> ThirdPartyBrowser? {
         switch source {
@@ -32,9 +33,18 @@ struct ThirdPartyBrowser {
             return Self.chrome
         case .edge:
             return Self.edge
+        case .firefox:
+            return Self.firefox
         case .csv:
             return nil
         }
+    }
+
+    enum BrowserType {
+        case brave
+        case chrome
+        case edge
+        case firefox
     }
 
     var isInstalled: Bool {
@@ -53,10 +63,15 @@ struct ThirdPartyBrowser {
         return NSWorkspace.shared.icon(forFile: applicationPath)
     }
 
-    private enum `Type` {
-        case brave
-        case chrome
-        case edge
+    var browserProfiles: DataImport.BrowserProfileList? {
+        guard let profilePath = profilesDirectory(),
+              let potentialProfileURLs = try? FileManager.default.contentsOfDirectory(at: profilePath,
+                                                                                    includingPropertiesForKeys: nil,
+                                                                                    options: [.skipsHiddenFiles]).filter(\.hasDirectoryPath) else {
+            return nil
+        }
+
+        return DataImport.BrowserProfileList(browser: self.type, profileURLs: potentialProfileURLs)
     }
 
     private var bundleID: String {
@@ -64,10 +79,11 @@ struct ThirdPartyBrowser {
         case .brave: return "com.brave.Browser"
         case .chrome: return "com.google.Chrome"
         case .edge: return "com.microsoft.edgemac"
+        case .firefox: return "org.mozilla.firefox"
         }
     }
 
-    private let type: Type
+    private let type: BrowserType
 
     @discardableResult
     func forceTerminate() -> Bool {
@@ -77,6 +93,20 @@ struct ThirdPartyBrowser {
 
     private func findRunningApplication() -> NSRunningApplication? {
         return NSRunningApplication.runningApplications(withBundleIdentifier: bundleID).first
+    }
+
+    // Returns the URL to the profiles for a given browser. This directory will contain a list of directories, each representing a profile.
+    private func profilesDirectory() -> URL? {
+        guard let applicationSupportURL = FileManager.default.urls(for: .applicationSupportDirectory, in: .userDomainMask).first else {
+            return nil
+        }
+
+        switch type {
+        case .brave: return applicationSupportURL.appendingPathComponent("BraveSoftware/Brave-Browser/")
+        case .chrome: return applicationSupportURL.appendingPathComponent("Google/Chrome/")
+        case .edge: return applicationSupportURL.appendingPathComponent("Microsoft Edge/")
+        case .firefox: return applicationSupportURL.appendingPathComponent("Firefox/Profiles/")
+        }
     }
 
 }

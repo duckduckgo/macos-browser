@@ -175,8 +175,11 @@ final class BrowserTabViewController: NSViewController {
         homepageView.isHidden = shown
     }
 
-    private func openNewTab(with url: URL?, parentTab: Tab?, selected: Bool = false) {
-        let tab = Tab(content: url != nil ? .url(url!) : .homepage, parentTab: parentTab, shouldLoadInBackground: true)
+    private func openNewTab(with url: URL?, parentTab: Tab?, selected: Bool = false, canBeClosedWithBack: Bool = false) {
+        let tab = Tab(content: url != nil ? .url(url!) : .homepage,
+                      parentTab: parentTab,
+                      shouldLoadInBackground: true,
+                      canBeClosedWithBack: canBeClosedWithBack)
 
         if parentTab != nil {
             tabCollectionViewModel.insertChild(tab: tab, selected: selected)
@@ -312,7 +315,7 @@ extension BrowserTabViewController: TabDelegate {
     }
 
     func tab(_ tab: Tab, requestedNewTab url: URL?, selected: Bool) {
-        openNewTab(with: url, parentTab: tab, selected: selected)
+        openNewTab(with: url, parentTab: tab, selected: selected, canBeClosedWithBack: selected == true)
     }
 
     func closeTab(_ tab: Tab) {
@@ -471,7 +474,11 @@ extension BrowserTabViewController: WKUIDelegate {
                  windowFeatures: WKWindowFeatures) -> WKWebView? {
 
         // Returned web view must be created with the specified configuration.
-        let tab = Tab(content: .url(.emptyPage), webViewConfiguration: configuration, parentTab: tabViewModel?.tab)
+
+        let tab = Tab(content: .url(.emptyPage),
+                      webViewConfiguration: configuration,
+                      parentTab: tabViewModel?.tab,
+                      canBeClosedWithBack: true)
         tabCollectionViewModel.insertChild(tab: tab, selected: true)
         // WebKit loads the request in the returned web view.
         return tab.webView

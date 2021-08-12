@@ -1,5 +1,5 @@
 //
-//  MockFileStore.swift
+//  BackForwardListItem.swift
 //
 //  Copyright © 2021 DuckDuckGo. All rights reserved.
 //
@@ -16,28 +16,19 @@
 //  limitations under the License.
 //
 
-import Foundation
-@testable import DuckDuckGo_Privacy_Browser
+import WebKit
 
-final class MockFileStore: FileStore {
+enum BackForwardListItem {
+    case backForwardListItem(WKBackForwardListItem)
+    case goBackToCloseItem(parentTab: Tab)
 
-    var persistedFiles: [URL: Data] = [:]
-
-    func persist(_ data: Data, url: URL) -> Bool {
-        persistedFiles[url] = data
-        return true
-    }
-
-    func loadData(at url: URL) -> Data? {
-        return persistedFiles[url]
-    }
-
-    func hasData(at url: URL) -> Bool {
-        return persistedFiles[url] != nil
-    }
-
-    func remove(fileAtURL url: URL) {
-        persistedFiles[url] = nil
+    var url: URL? {
+        switch self {
+        case .backForwardListItem(let item):
+            return item.url
+        case .goBackToCloseItem(parentTab: let tab):
+            return tab.content.url
+        }
     }
 
 }
