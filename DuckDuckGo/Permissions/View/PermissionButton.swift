@@ -35,7 +35,7 @@ final class PermissionButton: AddressBarButton {
         didSet {
             var isHidden = false
             switch buttonState {
-            case .none:
+            case .none, .reloading:
                 isHidden = true
             case .active:
                 self.image = activeImage ?? defaultImage

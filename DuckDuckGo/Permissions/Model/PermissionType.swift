@@ -25,7 +25,7 @@ enum PermissionType: String, CaseIterable {
 }
 
 extension PermissionType {
-    var canBePersisted: Bool {
+    var canPersistGrantedDecision: Bool {
         switch self {
         case .camera, .microphone:
             return true

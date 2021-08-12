@@ -81,17 +81,12 @@ final class PermissionModel {
 
     private func resetPermissions() {
         webView?.configuration.processPool.geolocationProvider?.reset()
-        webView?.revokePermissions([.camera, .microphone]) { [weak self] in
-            // Media usage deactivation will happen async after the tabDidStartNavigation() call
-            // which may cause updatePermissions() to set currently used permissions to `active` state
-            // and then switch to `inactive` state on media deactivation
-            // we want it to reset to `not used` instead after reload
-            self?.permissions.camera.resetIfInactive()
-            self?.permissions.microphone.resetIfInactive()
+        webView?.revokePermissions([.camera, .microphone])
+        for permission in PermissionType.allCases {
+            // await permission deactivation and transition to .none
+            permissions[permission].willReload()
         }
-        permissions = Permissions()
         authorizationQueries = []
-        updatePermissions()
     }
 
     private func updatePermissions() {
@@ -229,17 +224,11 @@ final class PermissionModel {
         AVCaptureDevice.restoreAuthorizationStatusForMediaType()
     }
 
-    func permissions(_ permissions: [PermissionType], requestedForDomain domain: String?, decisionHandler: @escaping (Bool) -> Void) {
-        guard let domain = domain, !domain.isEmpty, !permissions.isEmpty else {
-            assertionFailure("Unexpected permissions/domain")
-            decisionHandler(false)
-            return
-        }
-        var shouldGrant = true
+    private func shouldGrantPermission(for permissions: [PermissionType], requestedForDomain domain: String) -> Bool? {
         for permission in permissions {
             var grant: Bool?
-            if permission.canBePersisted,
-               let stored = permissionManager.permission(forDomain: domain, permissionType: permission) {
+            if let stored = permissionManager.permission(forDomain: domain, permissionType: permission),
+               permission.canPersistGrantedDecision || stored != true {
                 grant = stored
             } else if let state = self.permissions[permission] {
                 switch state {
@@ -247,7 +236,7 @@ final class PermissionModel {
                 case .denied, .revoking:
                     grant = false
                 // ask otherwise
-                case .disabled, .requested, .active, .inactive, .paused:
+                case .disabled, .requested, .active, .inactive, .paused, .reloading:
                     break
                 }
             }
@@ -256,21 +245,35 @@ final class PermissionModel {
                 if grant == false {
                     // deny if at least one permission denied permanently
                     // or during current page being displayed
-                    decisionHandler(false)
-                    return
-                }
-                // else if grant == true: allow if all permissions allowed permanently
+                    return false
+                } // else if grant == true: allow if all permissions allowed permanently
             } else {
                 // if at least one permission is not set: ask
-                shouldGrant = false
+                return nil
             }
         }
-        if shouldGrant {
-            decisionHandler(true)
+        return true
+    }
+
+    func permissions(_ permissions: [PermissionType], requestedForDomain domain: String?, decisionHandler: @escaping (Bool) -> Void) {
+        guard let domain = domain, !domain.isEmpty, !permissions.isEmpty else {
+            assertionFailure("Unexpected permissions/domain")
+            decisionHandler(false)
             return
         }
 
-        queryAuthorization(for: permissions, domain: domain, decisionHandler: decisionHandler)
+        let shouldGrant = shouldGrantPermission(for: permissions, requestedForDomain: domain)
+        switch shouldGrant {
+        case .none:
+            queryAuthorization(for: permissions, domain: domain, decisionHandler: decisionHandler)
+        case .some(true):
+            decisionHandler(true)
+        case .some(false):
+            decisionHandler(false)
+            for permission in permissions {
+                self.permissions[permission].denied()
+            }
+        }
     }
 
     func mediaCaptureStateDidChange() {

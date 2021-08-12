@@ -85,7 +85,11 @@ final class PermissionContextMenu: NSMenu {
     }
 
     private func setupOtherPermissionMenuItems(for permissions: Permissions) {
-        var hasReload = false
+        let permanentlyDeniedPermission = permissions.first(where: {
+            $0.value == .denied && PermissionManager.shared.permission(forDomain: domain, permissionType: $0.key) == false
+        })
+        // don't display Reload item for permanently denied Permissions
+        var shouldAddReload = permanentlyDeniedPermission == nil
         for (idx, (permission, state)) in permissions.sorted(by: { lhs, _ in lhs.key == .camera }).enumerated() {
             switch state {
             case .active:
@@ -96,9 +100,9 @@ final class PermissionContextMenu: NSMenu {
                 break
 
             case .denied:
-                guard !hasReload else { break }
+                guard shouldAddReload else { break }
                 addItem(.reload(target: self))
-                hasReload = true
+                shouldAddReload = false
 
             case .disabled(systemWide: let systemWide):
                 addSeparator(if: idx == 0 && numberOfItems > 0)
@@ -106,7 +110,7 @@ final class PermissionContextMenu: NSMenu {
                 addItem(.openSystemPreferences(for: permission, target: self))
                 addSeparator(if: idx + 1 < permissions.count)
 
-            case .revoking:
+            case .revoking, .reloading:
                 // expected permission to deactivate access
                 return
             case .requested(_):
@@ -128,9 +132,10 @@ final class PermissionContextMenu: NSMenu {
     private func addPersistenceItems() {
         addSeparator(if: numberOfItems > 0)
 
-        for (permission, state) in permissions where permission.canBePersisted {
+        for (permission, state) in permissions {
             switch state {
             case .active, .inactive, .paused:
+                guard permission.canPersistGrantedDecision else { continue }
                 if PermissionManager.shared.permission(forDomain: domain, permissionType: permission) == nil {
                     addItem(.alwaysAllow(permission, on: domain, target: self))
                 } else {
@@ -144,7 +149,7 @@ final class PermissionContextMenu: NSMenu {
                     addItem(.alwaysAsk(permission, on: domain, target: self))
                 }
 
-            case .revoking, .requested, .disabled: break
+            case .revoking, .requested, .disabled, .reloading: break
             }
         }
     }

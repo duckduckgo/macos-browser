@@ -64,7 +64,7 @@ final class PermissionManager: PermissionManagerProtocol {
     }
 
     func setPermission(_ allow: Bool, forDomain domain: String, permissionType: PermissionType) {
-        assert(permissionType.canBePersisted)
+        assert(permissionType.canPersistGrantedDecision || !allow)
         
         let storedPermission: StoredPermission
         let domain = domain.dropWWW()

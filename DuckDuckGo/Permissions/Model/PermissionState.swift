@@ -23,6 +23,7 @@ enum PermissionState: Equatable {
     case requested(PermissionAuthorizationQuery)
     case active
     case revoking
+    case reloading
     case denied
     case paused
     case inactive
@@ -34,6 +35,7 @@ enum PermissionState: Equatable {
         case .requested(let query1): if case .requested(let query2) = rhs, query1 === query2 { return true }
         case .active: if case .active = rhs { return true }
         case .revoking: if case .revoking = rhs { return true }
+        case .reloading: if case .reloading = rhs { return true }
         case .denied: if case .denied = rhs { return true }
         case .paused: if case .paused = rhs { return true }
         case .inactive: if case .inactive = rhs { return true }
@@ -70,6 +72,8 @@ extension Optional where Wrapped == PermissionState {
 
         case (.revoking, _), (_, .revoking):
             return .revoking
+        case (.reloading, _), (_, .reloading):
+            return .reloading
         case (.denied, _), (_, .denied):
             return .denied
         case (.disabled(let systemWide), _), (_, .disabled(let systemWide)):
@@ -109,7 +113,7 @@ extension Optional where Wrapped == PermissionState {
         case (.requested, .active), (.disabled, .active):
             self = .active
 
-        case (.revoking, .active), (.revoking, .muted):
+        case (.revoking, .active), (.revoking, .muted), (.reloading, .active), (.reloading, .muted):
             // Probably Active Camera + Microphone -> Active Camera state change, stay in Revoking state
             break
         case (.denied, .active):
@@ -133,6 +137,10 @@ extension Optional where Wrapped == PermissionState {
         // Permission revoked
         case (.revoking, .none):
             self = .denied
+
+        // Permission revoked on page reload
+        case (.reloading, .none):
+            self = .none
         }
     }
 
@@ -141,9 +149,13 @@ extension Optional where Wrapped == PermissionState {
         self = .revoking
     }
 
-    mutating func resetIfInactive() {
-        guard case .some(.inactive) = self else { return }
-        self = .none
+    mutating func willReload() {
+        switch self {
+        case .active, .paused:
+            self = .reloading
+        case .none, .disabled, .requested, .revoking, .reloading, .denied, .inactive:
+            self = .none
+        }
     }
 
 }

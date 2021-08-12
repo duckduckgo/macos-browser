@@ -115,18 +115,19 @@ final class PrivacyDashboardUserScript: NSObject, StaticUserScript {
                         domain: String,
                         in webView: WKWebView) {
 
-        let allowedPermissions = authorizationState.map {
+        let allowedPermissions = authorizationState.map { item in
             [
-                "key": $0.permission.rawValue,
-                "title": $0.permission.localizedDescription,
-                "permission": $0.state.rawValue,
-                "used": usedPermissions[$0.permission] != nil,
-                "paused": usedPermissions[$0.permission] == .paused,
-                "options": PermissionAuthorizationState.allCases.map {
-                    [
-                        "id": $0.rawValue,
-                        "title": String(format: $0.localizedFormat, domain)
-                    ]
+                "key": item.permission.rawValue,
+                "title": item.permission.localizedDescription,
+                "permission": item.state.rawValue,
+                "used": usedPermissions[item.permission] != nil,
+                "paused": usedPermissions[item.permission] == .paused,
+                "options": PermissionAuthorizationState.allCases.compactMap { decision in
+                    // don't show Permanently Allow if can't persist Granted Decision
+                    return decision != .grant || item.permission.canPersistGrantedDecision ? [
+                        "id": decision.rawValue,
+                        "title": String(format: decision.localizedFormat, domain)
+                    ] : nil
                 }
             ]
         }

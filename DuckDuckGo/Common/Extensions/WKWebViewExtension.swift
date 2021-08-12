@@ -149,29 +149,23 @@ extension WKWebView {
     }
 
     func revokePermissions(_ permissions: [PermissionType], completionHandler: (() -> Void)? = nil) {
-        let group = DispatchGroup()
         for permission in permissions {
             switch permission {
             case .camera:
                 if #available(macOS 12.0, *) {
-                    group.enter()
-                    self.setCameraCaptureState(.none, completionHandler: { group.leave() })
+                    self.setCameraCaptureState(.none, completionHandler: {})
                 } else {
                     self.stopMediaCapture()
                 }
             case .microphone:
                 if #available(macOS 12.0, *) {
-                    group.enter()
-                    self.setMicrophoneCaptureState(.none, completionHandler: { group.leave() })
+                    self.setMicrophoneCaptureState(.none, completionHandler: {})
                 } else {
                     self.stopMediaCapture()
                 }
             case .geolocation:
                 self.configuration.processPool.geolocationProvider?.revoke()
             }
-        }
-        group.notify(queue: .main) {
-            completionHandler?()
         }
     }
 
