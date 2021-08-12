@@ -92,7 +92,8 @@ final class Tab: NSObject {
          favicon: NSImage? = nil,
          sessionStateData: Data? = nil,
          parentTab: Tab? = nil,
-         shouldLoadInBackground: Bool = false) {
+         shouldLoadInBackground: Bool = false,
+         canBeClosedWithBack: Bool = false) {
 
         self.content = content
         self.faviconService = faviconService
@@ -101,6 +102,7 @@ final class Tab: NSObject {
         self.error = error
         self.favicon = favicon
         self.parentTab = parentTab
+        self._canBeClosedWithBack = canBeClosedWithBack
         self.sessionStateData = sessionStateData
 
         let configuration = webViewConfiguration ?? WKWebViewConfiguration()
@@ -145,6 +147,12 @@ final class Tab: NSObject {
     @PublishedAfter var error: Error?
 
     weak private(set) var parentTab: Tab?
+    private var _canBeClosedWithBack: Bool
+    var canBeClosedWithBack: Bool {
+        // Reset canBeClosedWithBack on any WebView navigation
+        _canBeClosedWithBack = _canBeClosedWithBack && parentTab != nil && !webView.canGoBack && !webView.canGoForward
+        return _canBeClosedWithBack
+    }
 
     weak var findInPage: FindInPageModel? {
         didSet {
@@ -215,12 +223,28 @@ final class Tab: NSObject {
         content == .bookmarks
     }
 
+    var canGoForward: Bool {
+        webView.canGoForward
+    }
+
     func goForward() {
+        guard self.canGoForward else { return }
         shouldStoreNextVisit = false
         webView.goForward()
     }
 
+    var canGoBack: Bool {
+        webView.canGoBack
+    }
+
     func goBack() {
+        guard self.canGoBack else {
+            if canBeClosedWithBack {
+                delegate?.closeTab(self)
+            }
+            return
+        }
+
         shouldStoreNextVisit = false
         webView.goBack()
     }
