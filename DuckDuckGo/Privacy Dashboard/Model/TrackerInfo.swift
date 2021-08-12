@@ -20,8 +20,6 @@ import Foundation
 
 struct TrackerInfo: Encodable {
 
-    private(set) var host: String
-
     private(set) var trackersDetected = Set<DetectedTracker>()
     private(set) var trackersBlocked = Set<DetectedTracker>()
     private(set) var installedSurrogates = Set<String>()

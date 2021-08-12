@@ -461,7 +461,7 @@ final class Tab: NSObject {
         }
 
         if oldUrl?.host != host || oldUrl?.scheme != url.scheme {
-            trackerInfo = TrackerInfo(host: host)
+            trackerInfo = TrackerInfo()
             serverTrust = nil
         }
     }
@@ -512,10 +512,7 @@ extension Tab: FaviconUserScriptDelegate {
 extension Tab: ContentBlockerUserScriptDelegate {
 
     func contentBlockerUserScriptShouldProcessTrackers(_ script: UserScript) -> Bool {
-        guard let trackerInfo = trackerInfo else {
-            return false
-        }
-        return trackerInfo.host == content.url?.host
+        return true
     }
 
     func contentBlockerUserScript(_ script: ContentBlockerUserScript,
