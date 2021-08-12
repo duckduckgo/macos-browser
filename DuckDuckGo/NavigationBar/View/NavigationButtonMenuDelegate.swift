@@ -50,23 +50,20 @@ extension NavigationButtonMenuDelegate: NSMenuDelegate {
 
     func menu(_ menu: NSMenu, update item: NSMenuItem, at index: Int, shouldCancel: Bool) -> Bool {
         let listItems = self.listItems
-        guard index < listItems.count else {
+        let listItem: BackForwardListItem
+        if listItems.count > 1,
+           let item = listItems[safe: index] {
+            listItem = .backForwardListItem(item)
+        } else if let parentTab = tabCollectionViewModel.selectedTabViewModel?.tab.parentTab {
+            listItem = .goBackToCloseItem(parentTab: parentTab)
+        } else {
             os_log("%s: Index out of bounds", type: .error, className)
             return true
         }
 
-        let listItem: BackForwardListItem
-        if listItems[index] === currentListItem,
-           listItems.count == 1,
-           let parentTab = tabCollectionViewModel.selectedTabViewModel?.tab.parentTab {
-            listItem = .goBackToCloseItem(parentTab: parentTab)
-        } else {
-            listItem = .backForwardListItem(listItems[index])
-        }
-
         let listItemViewModel = WKBackForwardListItemViewModel(backForwardListItem: listItem,
                                                                faviconService: LocalFaviconService.shared,
-                                                               isCurrentItem: listItems[index] === currentListItem)
+                                                               isCurrentItem: listItems[safe: index] === currentListItem)
 
         item.title = listItemViewModel.title
         item.image = listItemViewModel.image
@@ -114,7 +111,6 @@ extension NavigationButtonMenuDelegate: NSMenuDelegate {
         var list = buttonType == .back ? backForwardList.backList.reversed() : backForwardList.forwardList
 
         guard let currentItem = selectedTabViewModel.tab.webView.backForwardList.currentItem else {
-            os_log("%s: Current item is nil", type: .error, className)
             return list
         }
         list.insert(currentItem, at: 0)
