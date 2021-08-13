@@ -212,7 +212,7 @@ final class AddressBarTextField: NSTextField {
         } else {
             
             Pixel.fire(.navigation(kind: .init(url: url), source: suggestion != nil ? .suggestion : .addressBar))
-            selectedTabViewModel.tab.update(url: url)
+            selectedTabViewModel.tab.update(url: url, userEntered: true)
         }
 
         self.window?.makeFirstResponder(nil)
