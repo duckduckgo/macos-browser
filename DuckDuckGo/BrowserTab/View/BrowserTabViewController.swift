@@ -23,6 +23,7 @@ import Combine
 import SwiftUI
 import BrowserServicesKit
 
+// swiftlint:disable file_length
 final class BrowserTabViewController: NSViewController {
 
     @IBOutlet weak var errorView: NSView!
@@ -711,3 +712,5 @@ private extension WKWebView {
     }
 
 }
+
+// swiftlint:enable file_length
