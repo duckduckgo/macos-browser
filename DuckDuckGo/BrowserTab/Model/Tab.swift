@@ -219,7 +219,7 @@ final class Tab: NSObject {
 
     func saveWebContentAs(completionHandler: ((Result<URL, Error>) -> Void)? = nil) {
         webView.getMimeType { mimeType in
-            if case .html = mimeType.flatMap(UTType.init(mimeType:)) ?? .html {
+            if case .some(.html) = mimeType.flatMap(UTType.init(mimeType:)) {
                 self.delegate?.chooseDestination(suggestedFilename: self.webView.suggestedFilename,
                                                  directoryURL: DownloadPreferences().selectedDownloadLocation,
                                                  fileTypes: [.html, .webArchive, .pdf]) { url, fileType in
