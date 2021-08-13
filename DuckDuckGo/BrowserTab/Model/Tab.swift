@@ -612,6 +612,9 @@ extension Tab: WKNavigationDelegate {
             decisionHandler(.cancel)
             delegate?.tab(self, requestedNewTab: navigationAction.request.url, selected: NSApp.isShiftPressed)
             return
+        } else if isLinkActivated && NSApp.isOptionPressed && !NSApp.isCommandPressed {
+            decisionHandler(.download(navigationAction, using: webView))
+            return
         }
 
         guard let url = navigationAction.request.url, let urlScheme = url.scheme else {
