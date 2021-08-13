@@ -38,7 +38,7 @@ final class FireTests: XCTestCase {
         waitForExpectations(timeout: 5, handler: nil)
 
         XCTAssertEqual(tabCollectionViewModel.tabCollection.tabs.count, 1)
-        XCTAssert(tabCollectionViewModel.tabCollection.tabs.first?.isHomepageShown ?? false)
+        XCTAssertEqual(tabCollectionViewModel.tabCollection.tabs.first?.content, .homepage)
     }
 
     func testWhenBurnAll_ThenAllWebsiteDataAreRemovedAndHistoryIsCleanedAndLastRemovedTabCacheIsNil() {
