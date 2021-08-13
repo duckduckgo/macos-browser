@@ -84,6 +84,7 @@ private extension Tab.TabContent {
         case .homepage: return .homepage
         case .bookmarks: return .bookmarks
         case .preferences: return .preferences
+        case .none: return .homepage
         }
     }
 
