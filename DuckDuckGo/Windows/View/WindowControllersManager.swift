@@ -80,7 +80,7 @@ extension WindowControllersManager {
 
             if tabCollection.tabs.count == 1,
                let firstTab = tabCollection.tabs.first,
-               firstTab.isHomepageShown,
+               case .homepage = firstTab.content,
                !newTab {
                 firstTab.content = .url(url)
             } else if let tab = tabCollectionViewModel.selectedTabViewModel?.tab, !newTab {

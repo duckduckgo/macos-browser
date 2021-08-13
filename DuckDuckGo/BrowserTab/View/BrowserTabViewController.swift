@@ -212,7 +212,7 @@ final class BrowserTabViewController: NSViewController {
             self.addChild(preferencesViewController)
             view.addAndLayout(preferencesViewController.view)
 
-        case .url:
+        case .url, .auto:
             self.homepageView.removeFromSuperview()
             removeBookmarksPage()
             removePreferencesPage()
@@ -475,7 +475,7 @@ extension BrowserTabViewController: WKUIDelegate {
 
         // Returned web view must be created with the specified configuration.
 
-        let tab = Tab(content: .url(.emptyPage),
+        let tab = Tab(content: .auto(navigationAction.request.url),
                       webViewConfiguration: configuration,
                       parentTab: tabViewModel?.tab,
                       canBeClosedWithBack: true)

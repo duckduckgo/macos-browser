@@ -81,6 +81,7 @@ private extension Tab.TabContent {
     var type: ContentType {
         switch self {
         case .url: return .url
+        case .auto: return .homepage
         case .homepage: return .homepage
         case .bookmarks: return .bookmarks
         case .preferences: return .preferences

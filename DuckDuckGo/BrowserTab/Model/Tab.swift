@@ -39,6 +39,7 @@ final class Tab: NSObject {
 
     enum TabContent: Equatable {
         case homepage
+        case auto(URL?)
         case url(URL)
         case preferences
         case bookmarks
@@ -46,7 +47,7 @@ final class Tab: NSObject {
         static var displayableTabTypes: [TabContent] {
             return [TabContent.preferences, .bookmarks].sorted { first, second in
                 switch first {
-                case .homepage, .url, .preferences, .bookmarks: break
+                case .auto, .homepage, .url, .preferences, .bookmarks: break
                 // !! Replace [TabContent.preferences, .bookmarks] above with new displayable Tab Types if added
                 }
                 guard let firstTitle = first.title, let secondTitle = second.title else {
@@ -59,21 +60,28 @@ final class Tab: NSObject {
 
         var title: String? {
             switch self {
-            case .url, .homepage: return nil
+            case .auto, .url, .homepage: return nil
             case .preferences: return UserText.tabPreferencesTitle
             case .bookmarks: return UserText.tabBookmarksTitle
             }
         }
 
         var url: URL? {
-            guard case .url(let url) = self else { return nil }
-            return url
+            switch self {
+            case .url(let url):
+                return url
+            case .auto(let url):
+                return url
+            case .preferences, .bookmarks, .homepage:
+                return nil
+            }
         }
 
         var focusTabAddressBarWhenSelected: Bool {
             switch self {
             case .homepage: return true
             case .url: return true
+            case .auto: return false
             case .preferences: return false
             case .bookmarks: return false
             }
@@ -220,14 +228,6 @@ final class Tab: NSObject {
 
     private let instrumentation = TabInstrumentation()
 
-    var isHomepageShown: Bool {
-        content == .homepage
-    }
-
-    var isBookmarksShown: Bool {
-        content == .bookmarks
-    }
-
     var canGoForward: Bool {
         webView.canGoForward
     }
@@ -290,10 +290,11 @@ final class Tab: NSObject {
                 os_log("Tab:setupWebView could not restore session state %s", "\(error)")
             }
         }
-        if let url = self.content.url {
+        switch content {
+        case .url(let url):
             webView.load(url)
-        } else {
-            webView.load(URL.emptyPage)
+        case .auto, .homepage, .bookmarks, .preferences:
+            break
         }
     }
 
