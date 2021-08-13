@@ -70,13 +70,6 @@ final class Tab: NSObject {
             guard case .url(let url) = self else { return nil }
             return url
         }
-
-        var focusTabAddressBarWhenSelected: Bool {
-            switch self {
-            case .url: return true
-            case .preferences, .homepage, .bookmarks, .none: return false
-            }
-        }
     }
 
     weak var delegate: TabDelegate?
