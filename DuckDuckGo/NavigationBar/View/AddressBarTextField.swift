@@ -125,7 +125,7 @@ final class AddressBarTextField: NSTextField {
     }
 
     private func makeMeFirstResponderIfNeeded() {
-        let focusTab = tabCollectionViewModel.selectedTabViewModel?.tab.content.focusTabAddressBarWhenSelected ?? true
+        let focusTab = tabCollectionViewModel.selectedTabViewModel?.tab.content.shouldFocusAddressBarAfterSelection ?? true
 
         if focusTab, stringValue == "" {
             makeMeFirstResponder()
@@ -746,6 +746,17 @@ final class AddressBarTextFieldCell: NSTextFieldCell {
 
 fileprivate extension NSStoryboard {
     static let suggestion = NSStoryboard(name: "Suggestion", bundle: .main)
+}
+
+fileprivate extension Tab.TabContent {
+
+    var shouldFocusAddressBarAfterSelection: Bool {
+        switch self {
+        case .url, .homepage, .none: return true
+        case .preferences, .bookmarks: return false
+        }
+    }
+
 }
 
 // swiftlint:enable type_body_length

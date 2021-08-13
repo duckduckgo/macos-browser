@@ -42,11 +42,12 @@ final class Tab: NSObject {
         case url(URL)
         case preferences
         case bookmarks
+        case none
 
         static var displayableTabTypes: [TabContent] {
             return [TabContent.preferences, .bookmarks].sorted { first, second in
                 switch first {
-                case .homepage, .url, .preferences, .bookmarks: break
+                case .homepage, .url, .preferences, .bookmarks, .none: break
                 // !! Replace [TabContent.preferences, .bookmarks] above with new displayable Tab Types if added
                 }
                 guard let firstTitle = first.title, let secondTitle = second.title else {
@@ -59,7 +60,7 @@ final class Tab: NSObject {
 
         var title: String? {
             switch self {
-            case .url, .homepage: return nil
+            case .url, .homepage, .none: return nil
             case .preferences: return UserText.tabPreferencesTitle
             case .bookmarks: return UserText.tabBookmarksTitle
             }
@@ -68,15 +69,6 @@ final class Tab: NSObject {
         var url: URL? {
             guard case .url(let url) = self else { return nil }
             return url
-        }
-
-        var focusTabAddressBarWhenSelected: Bool {
-            switch self {
-            case .homepage: return true
-            case .url: return true
-            case .preferences: return false
-            case .bookmarks: return false
-            }
         }
     }
 
@@ -92,7 +84,8 @@ final class Tab: NSObject {
          favicon: NSImage? = nil,
          sessionStateData: Data? = nil,
          parentTab: Tab? = nil,
-         shouldLoadInBackground: Bool = false) {
+         shouldLoadInBackground: Bool = false,
+         canBeClosedWithBack: Bool = false) {
 
         self.content = content
         self.faviconService = faviconService
@@ -101,12 +94,14 @@ final class Tab: NSObject {
         self.error = error
         self.favicon = favicon
         self.parentTab = parentTab
+        self._canBeClosedWithBack = canBeClosedWithBack
         self.sessionStateData = sessionStateData
 
         let configuration = webViewConfiguration ?? WKWebViewConfiguration()
         configuration.applyStandardConfiguration()
 
         webView = WebView(frame: CGRect.zero, configuration: configuration)
+        permissions = PermissionModel(webView: webView)
 
         super.init()
 
@@ -117,6 +112,8 @@ final class Tab: NSObject {
            let host = content.url?.host {
             faviconService.cacheIfNeeded(favicon: favicon, for: host, isFromUserScript: false)
         }
+
+        updateDashboardInfo(url: content.url)
     }
 
     deinit {
@@ -133,6 +130,7 @@ final class Tab: NSObject {
             }
 
             invalidateSessionStateData()
+            updateDashboardInfo(oldUrl: oldValue.url, url: content.url)
             reloadIfNeeded()
 
             if let title = content.title {
@@ -143,8 +141,15 @@ final class Tab: NSObject {
 
     @PublishedAfter var title: String?
     @PublishedAfter var error: Error?
+    let permissions: PermissionModel
 
     weak private(set) var parentTab: Tab?
+    private var _canBeClosedWithBack: Bool
+    var canBeClosedWithBack: Bool {
+        // Reset canBeClosedWithBack on any WebView navigation
+        _canBeClosedWithBack = _canBeClosedWithBack && parentTab != nil && !webView.canGoBack && !webView.canGoForward
+        return _canBeClosedWithBack
+    }
 
     weak var findInPage: FindInPageModel? {
         didSet {
@@ -215,12 +220,28 @@ final class Tab: NSObject {
         content == .bookmarks
     }
 
+    var canGoForward: Bool {
+        webView.canGoForward
+    }
+
     func goForward() {
+        guard self.canGoForward else { return }
         shouldStoreNextVisit = false
         webView.goForward()
     }
 
+    var canGoBack: Bool {
+        webView.canGoBack
+    }
+
     func goBack() {
+        guard self.canGoBack else {
+            if canBeClosedWithBack {
+                delegate?.closeTab(self)
+            }
+            return
+        }
+
         shouldStoreNextVisit = false
         webView.goBack()
     }
@@ -385,7 +406,7 @@ final class Tab: NSObject {
             .weakAssign(to: \.userScripts, on: self)
     }
 
-    // MARK: Find in Page
+    // MARK: - Find in Page
 
     var findInPageCancellable: AnyCancellable?
     private func subscribeToFindInPageTextChange() {
@@ -417,6 +438,24 @@ final class Tab: NSObject {
 
     func updateVisitTitle(_ title: String, url: URL) {
         historyCoordinating.updateTitleIfNeeded(title: title, url: url)
+    }
+
+    // MARK: - Dashboard Info
+
+    @Published var trackerInfo: TrackerInfo?
+    @Published var serverTrust: ServerTrust?
+
+    private func updateDashboardInfo(oldUrl: URL? = nil, url: URL?) {
+        guard let url = url, let host = url.host else {
+            trackerInfo = nil
+            serverTrust = nil
+            return
+        }
+
+        if oldUrl?.host != host || oldUrl?.scheme != url.scheme {
+            trackerInfo = TrackerInfo()
+            serverTrust = nil
+        }
     }
 
 }
@@ -465,16 +504,19 @@ extension Tab: FaviconUserScriptDelegate {
 extension Tab: ContentBlockerUserScriptDelegate {
 
     func contentBlockerUserScriptShouldProcessTrackers(_ script: UserScript) -> Bool {
-        // Not used until site rating support is implemented.
         return true
     }
 
-    func contentBlockerUserScript(_ script: ContentBlockerUserScript, detectedTracker tracker: DetectedTracker, withSurrogate host: String) {
-        // Not used until site rating support is implemented.
+    func contentBlockerUserScript(_ script: ContentBlockerUserScript,
+                                  detectedTracker tracker: DetectedTracker,
+                                  withSurrogate host: String) {
+        trackerInfo?.add(installedSurrogateHost: host)
+
+        contentBlockerUserScript(script, detectedTracker: tracker)
     }
 
     func contentBlockerUserScript(_ script: UserScript, detectedTracker tracker: DetectedTracker) {
-        // Not used until site rating support is implemented.
+        trackerInfo?.add(detectedTracker: tracker)
     }
 
 }
@@ -537,6 +579,9 @@ extension Tab: WKNavigationDelegate {
             return
         }
         completionHandler(.performDefaultHandling, nil)
+        if let host = webView.url?.host, let serverTrust = challenge.protectionSpace.serverTrust {
+            self.serverTrust = ServerTrust(host: host, secTrust: serverTrust)
+        }
     }
 
     struct Constants {

@@ -36,8 +36,11 @@ internal class ChromiumDataImporter: DataImporter {
         return [.logins]
     }
 
-    func importData(types: [DataImport.DataType], completion: @escaping (Result<[DataImport.Summary], DataImportError>) -> Void) {
-        let loginReader = ChromiumLoginReader(chromiumDataDirectoryPath: applicationDataDirectoryPath, processName: processName)
+    func importData(types: [DataImport.DataType],
+                    from profile: DataImport.BrowserProfile?,
+                    completion: @escaping (Result<[DataImport.Summary], DataImportError>) -> Void) {
+        let loginReader = ChromiumLoginReader(chromiumDataDirectoryPath: profile?.profileURL.path ?? applicationDataDirectoryPath,
+                                              processName: processName)
         let loginResult = loginReader.readLogins()
 
         switch loginResult {

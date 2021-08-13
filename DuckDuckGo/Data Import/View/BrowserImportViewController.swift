@@ -31,16 +31,24 @@ final class BrowserImportViewController: NSViewController {
         static let identifier = "BrowserImportViewController"
     }
 
-    static func create(with browser: DataImport.Source) -> BrowserImportViewController {
+    static func create(with browser: DataImport.Source, profileList: DataImport.BrowserProfileList) -> BrowserImportViewController {
         let storyboard = NSStoryboard(name: Constants.storyboardName, bundle: nil)
 
         return storyboard.instantiateController(identifier: Constants.identifier) { (coder) -> BrowserImportViewController? in
-            return BrowserImportViewController(coder: coder, browser: browser)
+            return BrowserImportViewController(coder: coder, browser: browser, profileList: profileList)
         }
     }
 
+    @IBOutlet var importOptionsStackView: NSStackView!
+
+    @IBOutlet var profileSelectionLabel: NSTextField!
+    @IBOutlet var profileSelectionPopUpButton: NSPopUpButton!
+
     @IBOutlet var passwordsCheckbox: NSButton!
+    @IBOutlet var passwordDetailLabel: NSTextField!
+
     @IBOutlet var closeBrowserWarningLabel: NSTextField!
+    @IBOutlet var closeBrowserWarningViewHeightConstraint: NSLayoutConstraint!
     @IBOutlet var closeBrowserWarningView: ColorView! {
         didSet {
             closeBrowserWarningView.backgroundColor = NSColor.black.withAlphaComponent(0.05)
@@ -59,10 +67,22 @@ final class BrowserImportViewController: NSViewController {
         return options
     }
 
-    let browser: DataImport.Source
+    var selectedProfile: DataImport.BrowserProfile? {
+        guard let selectedProfile = profileSelectionPopUpButton.selectedItem else {
+            // If there is no selected item, there should only be one item in the list.
+            return profileList.validImportableProfiles.first
+        }
 
-    init?(coder: NSCoder, browser: DataImport.Source) {
+        return profileList.validImportableProfiles.first { $0.name == selectedProfile.title }
+    }
+
+    let browser: DataImport.Source
+    let profileList: DataImport.BrowserProfileList
+
+    init?(coder: NSCoder, browser: DataImport.Source, profileList: DataImport.BrowserProfileList) {
         self.browser = browser
+        self.profileList = profileList
+
         super.init(coder: coder)
     }
 
@@ -72,11 +92,65 @@ final class BrowserImportViewController: NSViewController {
 
     override func viewDidLoad() {
         super.viewDidLoad()
+
+        // Update the profile picker:
+
+        importOptionsStackView.setCustomSpacing(18, after: profileSelectionPopUpButton)
+
+        if profileList.showProfilePicker {
+            profileSelectionPopUpButton.displayBrowserProfiles(profiles: profileList.validImportableProfiles,
+                                                               defaultProfile: profileList.defaultProfile)
+        } else {
+            profileSelectionLabel.isHidden = true
+            profileSelectionPopUpButton.isHidden = true
+            profileSelectionPopUpButton.removeAllItems()
+        }
+
+        // Update the disclaimer label on the password import row:
+
+        switch browser {
+        case .brave, .chrome, .edge:
+            passwordDetailLabel.stringValue = UserText.chromiumPasswordImportDisclaimer
+        case .firefox:
+            passwordDetailLabel.stringValue = UserText.firefoxPasswordImportDisclaimer
+        default:
+            passwordDetailLabel.isHidden = true
+        }
+
+        // Toggle the browser warning bar:
+
         self.closeBrowserWarningLabel.stringValue = "You must close \(browser.importSourceName) before importing data."
+
+        let browserIsRunning = ThirdPartyBrowser.browser(for: browser)?.isRunning ?? false
+        if !browserIsRunning {
+            closeBrowserWarningViewHeightConstraint.constant = 0
+        }
     }
 
     @IBAction func selectedImportOptionsChanged(_ sender: NSButton) {
         delegate?.browserImportViewController(self, didChangeSelectedImportOptions: selectedImportOptions)
+    }
+
+}
+
+extension NSPopUpButton {
+
+    fileprivate func displayBrowserProfiles(profiles: [DataImport.BrowserProfile], defaultProfile: DataImport.BrowserProfile?) {
+        removeAllItems()
+
+        let validProfiles = profiles.filter { $0.hasLoginData }
+
+        var selectedSourceIndex: Int?
+
+        for (index, profile) in validProfiles.enumerated() {
+            addItem(withTitle: profile.name)
+
+            if profile.name == defaultProfile?.name {
+                selectedSourceIndex = index
+            }
+        }
+
+        selectItem(at: selectedSourceIndex ?? 0)
     }
 
 }

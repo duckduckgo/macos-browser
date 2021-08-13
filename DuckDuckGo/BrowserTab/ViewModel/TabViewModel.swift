@@ -36,8 +36,8 @@ final class TabViewModel {
     private var webViewStateObserver: WebViewStateObserver?
 
     @Published var canGoForward: Bool = false
-    @Published var canGoBack: Bool = false
-    @Published var canReload: Bool = false
+    @Published private(set) var canGoBack: Bool = false
+    @Published private(set) var canReload: Bool = false
     @Published var canBeBookmarked: Bool = false
     @Published var isLoading: Bool = false {
         willSet {
@@ -65,6 +65,9 @@ final class TabViewModel {
     @Published private(set) var favicon: NSImage = Favicon.home
     @Published private(set) var findInPage: FindInPageModel = FindInPageModel()
 
+    @Published private(set) var usedPermissions = Permissions()
+    @Published private(set) var permissionAuthorizationQuery: PermissionAuthorizationQuery?
+
     init(tab: Tab) {
         self.tab = tab
 
@@ -74,6 +77,7 @@ final class TabViewModel {
         subscribeToTitle()
         subscribeToFavicon()
         subscribeToTabError()
+        subscribeToPermissions()
     }
 
     private func subscribeToUrl() {
@@ -99,8 +103,19 @@ final class TabViewModel {
         } .store(in: &cancellables)
     }
 
+    private func subscribeToPermissions() {
+        tab.permissions.$permissions.weakAssign(to: \.usedPermissions, on: self)
+            .store(in: &cancellables)
+        tab.permissions.$authorizationQuery.weakAssign(to: \.permissionAuthorizationQuery, on: self)
+            .store(in: &cancellables)
+    }
+
     private func updateCanReload() {
         canReload = tab.content.url ?? .emptyPage != .emptyPage
+    }
+
+    func updateCanGoBack() {
+        canGoBack = tab.canGoBack || tab.canBeClosedWithBack
     }
 
     private func updateCanBeBookmarked() {
@@ -179,7 +194,7 @@ final class TabViewModel {
         case .bookmarks:
             favicon = Favicon.bookmarks
             return
-        case .url, .homepage: break
+        case .url, .homepage, .none: break
         }
 
         if let favicon = tab.favicon {

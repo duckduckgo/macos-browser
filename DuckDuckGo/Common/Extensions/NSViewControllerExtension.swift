@@ -59,8 +59,12 @@ extension NSViewController {
 
         if let sheetParent = window.sheetParent {
             sheetParent.endSheet(window, returnCode: .cancel)
+        } else if let presentingViewController = presentingViewController {
+            presentingViewController.dismiss(self)
+        } else if let popover = nextResponder as? NSPopover {
+            popover.close()
         } else {
-            presentingViewController?.dismiss(self)
+            assertionFailure("dismiss() called not properly")
         }
     }
 
