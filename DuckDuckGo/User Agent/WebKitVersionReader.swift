@@ -1,5 +1,5 @@
 //
-//  SafariVersionReader.swift
+//  WebKitVersionReader.swift
 //
 //  Copyright © 2021 DuckDuckGo. All rights reserved.
 //
@@ -18,22 +18,16 @@
 
 import Foundation
 
-#if OUT_OF_APPSTORE
-
-struct SafariVersionReader {
-
-    static let safariPlistPath = "/Applications/Safari.app/Contents/Info.plist"
+struct WebKitVersionReader {
 
     static func getVersion() -> String? {
-        guard let plist = NSDictionary(contentsOfFile: Self.safariPlistPath),
-              let versionNumber = plist.object(forKey: Bundle.Keys.versionNumber) as? String else {
-            assertionFailure("Reading the version of Safari failed")
+        guard let userAgent = WKWebView().value(forKey: "userAgent") as? String,
+              let regularExpression = try? NSRegularExpression(pattern: #"AppleWebKit[\/\s]([\d.]+)"#, options: []),
+              let match = regularExpression.firstMatch(in: userAgent, options: [], range: NSRange(location: 0, length: userAgent.utf8.count)) else {
             return nil
         }
 
-        return versionNumber
+        return userAgent[match.range(at: 1)]
     }
 
 }
-
-#endif

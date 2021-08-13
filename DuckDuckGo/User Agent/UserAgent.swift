@@ -20,16 +20,43 @@ import Foundation
 
 enum UserAgent {
 
-    static var safariVersion: String {
-        SafariVersionReader.getVersion()
-    }
+    // MARK: - Fallback versions
 
-    static let safari =
-        "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/\(safariVersion) Safari/605.1.15"
-    static let chrome = "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.101 Safari/537.36"
-    static let webViewDefault = ""
+    static let fallbackSafariVersion = "14.1.2"
+    static let fallbackWebKitVersion = "605.1.15"
+    static let fallbackWebViewDefault = "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/605.1.15 (KHTML, like Gecko)"
 
+    // MARK: - Loaded versions
+
+    static let safariVersion: String = {
+        guard let version = SafariVersionReader.getVersion() else {
+            assertionFailure("Couldn't get version of Safari")
+            return fallbackSafariVersion
+        }
+        return version
+    }()
+
+    static let webKitVersion: String = {
+        guard let version = WebKitVersionReader.getVersion() else {
+            assertionFailure("Couldn't get version of WebKit")
+            return fallbackWebKitVersion
+        }
+        return version
+    }()
+
+    // MARK: - User Agents
+
+    static let safari = "Mozilla/5.0 " +
+        "(Macintosh; Intel Mac OS X 10_15_7) " +
+        "AppleWebKit/\(webKitVersion) (KHTML, like Gecko) " +
+        "Version/\(safariVersion) " +
+        "Safari/\(webKitVersion)"
+    static let chrome = "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) " +
+        "AppleWebKit/537.36 (KHTML, like Gecko) " +
+        "Chrome/91.0.4472.101 " +
+        "Safari/537.36"
     static let `default` = UserAgent.safari
+    static let webViewDefault = ""
 
     static let domainUserAgents: KeyValuePairs<RegEx, String> = [
         // fix broken spreadsheets
