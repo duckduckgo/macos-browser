@@ -67,6 +67,10 @@ final class WebKitDownloadTask: NSObject, ProgressReporting {
     private var decideDestinationCompletionHandler: ((URL?) -> Void)?
     private var tempURL: URL?
 
+    var originalRequest: URLRequest? {
+        download.originalRequest
+    }
+
     init(download: WebKitDownload, promptForLocation: Bool, postflight: FileDownloadManager.PostflightAction?) {
         self.download = download
         self.progress = Progress(totalUnitCount: -1)

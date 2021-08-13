@@ -316,4 +316,49 @@ extension URL {
         try? self.resourceValues(forKeys: [.volumeURLKey]).volume
     }
 
+    func sanitizedForQuarantine() -> URL? {
+        guard !self.isFileURL,
+              !["data", "blob"].contains(self.scheme),
+              var components = URLComponents.init(url: self, resolvingAgainstBaseURL: false)
+        else {
+            return nil
+        }
+
+        components.user = nil
+        components.password = nil
+
+        return components.url
+    }
+
+    func setQuarantineAttributes(sourceURL: URL?, referrerURL: URL?) throws {
+        guard self.isFileURL,
+              FileManager.default.fileExists(atPath: self.path)
+        else {
+            throw CocoaError(CocoaError.Code.fileNoSuchFile)
+        }
+
+        let sourceURL = sourceURL?.sanitizedForQuarantine()
+        let referrerURL = referrerURL?.sanitizedForQuarantine()
+
+        if var quarantineProperties = try self.resourceValues(forKeys: [.quarantinePropertiesKey]).quarantineProperties {
+            quarantineProperties[kLSQuarantineAgentBundleIdentifierKey as String] = Bundle.main.bundleIdentifier
+            quarantineProperties[kLSQuarantineAgentNameKey as String] = Bundle.main.displayName
+
+            quarantineProperties[kLSQuarantineDataURLKey as String] = sourceURL
+            quarantineProperties[kLSQuarantineOriginURLKey as String] = referrerURL
+
+            if quarantineProperties[kLSQuarantineTypeKey as String] == nil {
+                quarantineProperties[kLSQuarantineTypeKey as String] = ["http", "https"].contains(sourceURL?.scheme)
+                    ? kLSQuarantineTypeWebDownload
+                    : kLSQuarantineTypeOtherDownload
+            }
+
+            var resourceValues = URLResourceValues()
+            resourceValues.quarantineProperties = quarantineProperties
+
+            try (self as NSURL).setResourceValue(quarantineProperties, forKey: .quarantinePropertiesKey)
+        }
+
+    }
+
 }
