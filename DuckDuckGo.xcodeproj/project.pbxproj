@@ -3924,8 +3924,8 @@
 			isa = XCRemoteSwiftPackageReference;
 			repositoryURL = "https://github.com/duckduckgo/BrowserServicesKit.git";
 			requirement = {
-				branch = "sam/autofill-version-3.2.2";
-				kind = branch;
+				kind = upToNextMajorVersion;
+				minimumVersion = 7.1.2;
 			};
 		};
 		85FF55C625F82E4F00E2AB99 /* XCRemoteSwiftPackageReference "lottie-ios" */ = {
