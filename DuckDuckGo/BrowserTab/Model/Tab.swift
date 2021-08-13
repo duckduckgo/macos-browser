@@ -42,11 +42,12 @@ final class Tab: NSObject {
         case url(URL)
         case preferences
         case bookmarks
+        case none
 
         static var displayableTabTypes: [TabContent] {
             return [TabContent.preferences, .bookmarks].sorted { first, second in
                 switch first {
-                case .homepage, .url, .preferences, .bookmarks: break
+                case .homepage, .url, .preferences, .bookmarks, .none: break
                 // !! Replace [TabContent.preferences, .bookmarks] above with new displayable Tab Types if added
                 }
                 guard let firstTitle = first.title, let secondTitle = second.title else {
@@ -59,7 +60,7 @@ final class Tab: NSObject {
 
         var title: String? {
             switch self {
-            case .url, .homepage: return nil
+            case .url, .homepage, .none: return nil
             case .preferences: return UserText.tabPreferencesTitle
             case .bookmarks: return UserText.tabBookmarksTitle
             }
@@ -68,15 +69,6 @@ final class Tab: NSObject {
         var url: URL? {
             guard case .url(let url) = self else { return nil }
             return url
-        }
-
-        var focusTabAddressBarWhenSelected: Bool {
-            switch self {
-            case .homepage: return true
-            case .url: return true
-            case .preferences: return false
-            case .bookmarks: return false
-            }
         }
     }
 
