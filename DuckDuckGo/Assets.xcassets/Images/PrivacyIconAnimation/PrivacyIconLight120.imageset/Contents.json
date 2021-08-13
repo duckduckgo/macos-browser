@@ -1,11 +1,11 @@
 {
   "images" : [
     {
+      "filename" : "PrivacyIconLight120.png",
       "idiom" : "universal",
       "scale" : "1x"
     },
     {
-      "filename" : "PrivacyIconLight120@2x.png",
       "idiom" : "universal",
       "scale" : "2x"
     },
