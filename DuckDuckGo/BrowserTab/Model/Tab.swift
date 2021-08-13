@@ -193,7 +193,7 @@ final class Tab: NSObject {
 
     func download(from url: URL, promptForLocation: Bool = true) {
         webView.startDownload(URLRequest(url: url, cachePolicy: .returnCacheDataElseLoad)) { download in
-            FileDownloadManager.shared.add(download, delegate: self.delegate, promptForLocation: promptForLocation, postflight: .reveal)
+            FileDownloadManager.shared.add(download, delegate: self.delegate, promptForLocation: promptForLocation, postflight: .none)
         }
     }
 
@@ -726,11 +726,11 @@ extension Tab: WKNavigationDelegate {
 // universal download event handlers for Legacy _WKDownload and modern WKDownload
 extension Tab: WKWebViewDownloadDelegate {
     func webView(_ webView: WKWebView, navigationAction: WKNavigationAction, didBecomeDownload download: WebKitDownload) {
-        FileDownloadManager.shared.add(download, delegate: self.delegate, promptForLocation: false, postflight: .reveal)
+        FileDownloadManager.shared.add(download, delegate: self.delegate, promptForLocation: false, postflight: .none)
     }
 
     func webView(_ webView: WKWebView, navigationResponse: WKNavigationResponse, didBecomeDownload download: WebKitDownload) {
-        FileDownloadManager.shared.add(download, delegate: self.delegate, promptForLocation: false, postflight: .reveal)
+        FileDownloadManager.shared.add(download, delegate: self.delegate, promptForLocation: false, postflight: .none)
     }
 }
 
