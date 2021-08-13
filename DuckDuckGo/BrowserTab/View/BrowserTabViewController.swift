@@ -468,6 +468,41 @@ extension BrowserTabViewController: MenuItemSelectors {
 
 extension BrowserTabViewController: WKUIDelegate {
 
+    @objc(_webView:saveDataToFile:suggestedFilename:mimeType:originatingURL:)
+    func webView(_ webView: WKWebView, saveDataToFile data: Data, suggestedFilename: String, mimeType: String, originatingURL: URL) {
+        func write(to url: URL) throws {
+            let progress = Progress(totalUnitCount: 1,
+                                    fileOperationKind: .downloading,
+                                    kind: .file,
+                                    isPausable: false,
+                                    isCancellable: false,
+                                    fileURL: url)
+            progress.publish()
+            defer {
+                progress.unpublish()
+            }
+
+            try data.write(to: url)
+            progress.completedUnitCount = progress.totalUnitCount
+        }
+
+        let prefs = DownloadPreferences()
+        if !prefs.alwaysRequestDownloadLocation,
+           let location = prefs.selectedDownloadLocation {
+            let url = location.appendingPathComponent(suggestedFilename)
+            try? write(to: url)
+
+            return
+        }
+
+        chooseDestination(suggestedFilename: suggestedFilename,
+                          directoryURL: prefs.selectedDownloadLocation,
+                          fileTypes: UTType(mimeType: mimeType).map { [$0] } ?? []) { url, _ in
+            guard let url = url else { return }
+            try? write(to: url)
+        }
+    }
+
     func webView(_ webView: WKWebView,
                  createWebViewWith configuration: WKWebViewConfiguration,
                  for navigationAction: WKNavigationAction,

@@ -20,6 +20,21 @@ import Foundation
 
 extension Progress {
 
+    convenience init(totalUnitCount: Int64,
+                     fileOperationKind: FileOperationKind,
+                     kind: ProgressKind,
+                     isPausable: Bool,
+                     isCancellable: Bool,
+                     fileURL: URL) {
+        self.init(totalUnitCount: totalUnitCount)
+
+        self.fileOperationKind = fileOperationKind
+        self.kind = kind
+        self.isPausable = isPausable
+        self.isCancellable = isCancellable
+        self.fileURL = fileURL
+    }
+
     var fileDownloadingSourceURL: URL? {
         get {
             self.userInfo[.fileDownloadingSourceURLKey] as? URL
