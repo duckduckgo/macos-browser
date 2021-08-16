@@ -134,7 +134,9 @@ final class PermissionModel {
                 query = completedQuery
                 granted = true
 
-                // granted handled through activation of a permission usage by the WebView
+                for permission in permissions {
+                    self?.permissions[permission].granted()
+                }
             }
 
             defer {

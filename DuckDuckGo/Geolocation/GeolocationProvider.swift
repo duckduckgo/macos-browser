@@ -39,6 +39,7 @@ protocol GeolocationProviderProtocol: AnyObject {
 final class GeolocationProvider: NSObject, GeolocationProviderProtocol {
     private let geolocationService: GeolocationServiceProtocol
     private var geolocationManager: WKGeolocationManager
+    private var geolocationProviderCallbacks: UnsafeRawPointer?
     private var locationCancellable: AnyCancellable?
     private var appIsActiveCancellable: AnyCancellable?
     private var highAccuracyCancellable: AnyCancellable?
@@ -108,7 +109,7 @@ final class GeolocationProvider: NSObject, GeolocationProviderProtocol {
         self.geolocationService = geolocationService
         super.init()
 
-        geolocationManager.setProvider(self)
+        geolocationProviderCallbacks = geolocationManager.setProvider(self)
         appIsActiveCancellable = appIsActivePublisher.weakAssign(to: \.isAppActive, on: self)
     }
 
@@ -117,6 +118,10 @@ final class GeolocationProvider: NSObject, GeolocationProviderProtocol {
         self.init(processPool: processPool,
                   geolocationService: geolocationService,
                   appIsActivePublisher: NSApp.isActivePublisher())
+    }
+
+    deinit {
+        geolocationProviderCallbacks?.deallocate()
     }
 
     func revoke() {
@@ -236,16 +241,17 @@ private struct WKGeolocationManager {
         self.geolocationManager = geolocationManager
     }
 
-    func setProvider(_ provider: AnyObject?) {
+    func setProvider(_ provider: GeolocationProvider?) -> UnsafeRawPointer {
         let clientInfo = provider.map { Unmanaged.passUnretained($0).toOpaque() }
-        var providerCallback = WKGeolocationProviderV1(base: .init(version: 1,
-                                                                   clientInfo: clientInfo),
-                                                       startUpdating: startUpdatingCallback,
-                                                       stopUpdating: stopUpdatingCallback,
-                                                       setEnableHighAccuracy: setEnableHighAccuracyCallback)
-        withUnsafePointer(to: &providerCallback.base) { base in
-            WKGeolocationManager.setProvider?(geolocationManager, base)
-        }
+        let providerCallbacks = UnsafeMutablePointer<WKGeolocationProviderV1>.allocate(capacity: 1)
+
+        providerCallbacks.initialize(to: WKGeolocationProviderV1(base: .init(version: 1, clientInfo: clientInfo),
+                                                                 startUpdating: startUpdatingCallback,
+                                                                 stopUpdating: stopUpdatingCallback,
+                                                                 setEnableHighAccuracy: setEnableHighAccuracyCallback))
+
+        WKGeolocationManager.setProvider?(geolocationManager, &providerCallbacks.pointee.base)
+        return UnsafeRawPointer(providerCallbacks)
     }
 
     func providerDidChangePosition(_ location: CLLocation) {
@@ -272,12 +278,12 @@ private let WKGeolocationPositionCreate_c: WKGeolocationPositionCreate_c_type? =
     dynamicSymbol(named: "WKGeolocationPositionCreate_c")
 
 private func createWKGeolocationPosition(_ location: CLLocation) -> UnsafeRawPointer? {
-    WKGeolocationPositionCreate_c?(/*timestamp:*/ location.timestamp.timeIntervalSince1970,
+    WKGeolocationPositionCreate_c?(/*timestamp:*/ location.timestamp.timeIntervalSinceReferenceDate,
                                    /*latitude:*/ location.coordinate.latitude,
                                    /*longitude:*/ location.coordinate.longitude,
                                    /*accuracy:*/ location.horizontalAccuracy,
-                                   /*providesAltitude:*/ location.verticalAccuracy >= 0.0,
-                                   /*altitude:*/ location.verticalAccuracy >= 0.0 ? location.altitude : 0.0,
+                                   /*providesAltitude:*/ false,
+                                   /*altitude:*/ 0.0,
                                    /*providesAltitudeAccuracy:*/ location.verticalAccuracy >= 0.0,
                                    /*altitudeAccuracy:*/ location.verticalAccuracy,
                                    /*providesHeading:*/ location.course >= 0.0,
