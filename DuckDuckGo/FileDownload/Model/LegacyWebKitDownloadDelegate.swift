@@ -110,4 +110,9 @@ private extension LegacyWebKitDownloadDelegate {
             ?? download.webView?.navigationDelegate?.webView?(download.webView!, didReceive: challenge, completionHandler: completionHandler)
     }
 
+    @objc(_download:didReceiveData:)
+    func _download(_ download: WebKitDownload, didReceiveData length: UInt64) {
+        download.downloadDelegate?.download?(download, didReceiveData: length)
+    }
+
 }

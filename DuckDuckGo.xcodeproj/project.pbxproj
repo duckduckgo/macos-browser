@@ -1532,6 +1532,7 @@
 				856C98DE257014BD00A22F1F /* FileDownloadManager.swift */,
 				B6A924D82664C72D001A28CA /* WebKitDownloadTask.swift */,
 				B6A924DD2664CA08001A28CA /* LegacyWebKitDownloadDelegate.swift */,
+				B6A924D32664BBB9001A28CA /* WKWebViewDownloadDelegate.swift */,
 				B6E61EE7263ACE16004E11AB /* UTType.swift */,
 			);
 			path = Model;
@@ -2528,7 +2529,6 @@
 			isa = PBXGroup;
 			children = (
 				B6F41030264D2B23003DA42C /* ProgressExtension.swift */,
-				B6A924D32664BBB9001A28CA /* WKWebViewDownloadDelegate.swift */,
 				B66E9DD12670EB2A00E53BB5 /* _WKDownload+WebKitDownload.swift */,
 				B66E9DD32670EB4A00E53BB5 /* WKDownload+WebKitDownload.swift */,
 				B61EF3EB266F91E700B4D78F /* WKWebView+Download.swift */,

@@ -21,76 +21,12 @@ import WebKit
 
 extension _WKDownload: WebKitDownload {
 
-    private static let downloadDelegateKey = UnsafeRawPointer(bitPattern: "_WKDownloadDelegateKey".hashValue)!
-    private static let subscriberRemoverKey = "subscriberRemoverKey"
-
-    private class WeakDownloadDelegateRef: NSObject {
-        weak var delegate: WebKitDownloadDelegate?
-        init(_ delegate: WebKitDownloadDelegate?) {
-            self.delegate = delegate
-        }
-    }
-
-    private class ProgressSubscriberRemover: NSObject {
-        let subscriber: Any
-
-        init(subscriber: Any) {
-            self.subscriber = subscriber
-        }
-
-        deinit {
-            Progress.removeSubscriber(subscriber)
-        }
-    }
-
     public var originalRequest: URLRequest? {
         request
     }
 
     public var webView: WKWebView? {
         originatingWebView
-    }
-
-    func getProgress(_ completionHandler: @escaping (Progress?) -> Void) {
-        guard self.responds(to: #selector(_WKDownload.publishProgress(at:))) else {
-            assertionFailure("_WKDownload does not respond to selector \"publishProgressAtURL:\"")
-            completionHandler(nil)
-            return
-        }
-
-        let tempURL = FileManager.default.temporaryDirectory.appendingPathComponent(.uniqueFilename())
-        FileManager.default.createFile(atPath: tempURL.path, contents: nil, attributes: nil)
-        defer {
-            try? FileManager.default.removeItem(at: tempURL)
-        }
-
-        var subscriber: Any?
-        // timeout Subscription after 1s
-        let timer = Timer.scheduledTimer(withTimeInterval: 1.0, repeats: false) { _ in
-            defer { subscriber = nil }
-            guard let subscriber = subscriber else { return }
-            Progress.removeSubscriber(subscriber)
-            completionHandler(nil)
-        }
-
-        subscriber = Progress.addSubscriber(forFileURL: tempURL) { [weak timer] progress in
-            defer {
-                subscriber = nil
-                timer?.invalidate()
-            }
-            guard let subscriber = subscriber else {
-                return nil
-            }
-            // keep Progress subscription active until returned Progress Proxy is deallocated
-            objc_setAssociatedObject(progress,
-                                     Self.subscriberRemoverKey,
-                                     ProgressSubscriberRemover(subscriber: subscriber),
-                                     .OBJC_ASSOCIATION_RETAIN)
-            completionHandler(progress)
-            return nil
-        }
-
-        self.publishProgress(at: tempURL)
     }
 
 }
