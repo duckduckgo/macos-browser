@@ -28,6 +28,9 @@ protocol TabDelegate: FileDownloadManagerDelegate {
     func tab(_ tab: Tab, willShowContextMenuAt position: NSPoint, image: URL?, link: URL?, selectedText: String?)
 	func tab(_ tab: Tab, requestedOpenExternalURL url: URL, forUserEnteredURL: Bool)
     func tab(_ tab: Tab, requestedSaveCredentials credentials: SecureVaultModels.WebsiteCredentials)
+    func tab(_ tab: Tab,
+             requestedBasicAuthenticationChallengeWith protectionSpace: URLProtectionSpace,
+             completionHandler: @escaping (URLSession.AuthChallengeDisposition, URLCredential?) -> Void)
 
     func tabPageDOMLoaded(_ tab: Tab)
     func closeTab(_ tab: Tab)
@@ -578,6 +581,12 @@ extension Tab: WKNavigationDelegate {
             completionHandler(.useCredential, URLCredential(user: "dax", password: "qu4ckqu4ck!", persistence: .none))
             return
         }
+        if challenge.protectionSpace.authenticationMethod == NSURLAuthenticationMethodHTTPBasic,
+           let delegate = delegate {
+            delegate.tab(self, requestedBasicAuthenticationChallengeWith: challenge.protectionSpace, completionHandler: completionHandler)
+            return
+        }
+
         completionHandler(.performDefaultHandling, nil)
         if let host = webView.url?.host, let serverTrust = challenge.protectionSpace.serverTrust {
             self.serverTrust = ServerTrust(host: host, secTrust: serverTrust)

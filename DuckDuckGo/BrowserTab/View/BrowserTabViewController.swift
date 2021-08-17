@@ -23,6 +23,7 @@ import Combine
 import SwiftUI
 import BrowserServicesKit
 
+// swiftlint:disable file_length
 final class BrowserTabViewController: NSViewController {
 
     @IBOutlet weak var errorView: NSView!
@@ -341,6 +342,29 @@ extension BrowserTabViewController: TabDelegate {
         contextMenuLink = link
         contextMenuExpected = true
         contextMenuSelectedText = selectedText
+    }
+
+    func tab(_ tab: Tab,
+             requestedBasicAuthenticationChallengeWith protectionSpace: URLProtectionSpace,
+             completionHandler: @escaping (URLSession.AuthChallengeDisposition, URLCredential?) -> Void) {
+        guard let window = view.window else {
+            completionHandler(.cancelAuthenticationChallenge, nil)
+            return
+        }
+
+        let alert = AuthenticationAlert(host: protectionSpace.host, isEncrypted: protectionSpace.receivesCredentialSecurely)
+        alert.beginSheetModal(for: window) { response in
+            guard case .OK = response,
+                  !alert.usernameTextField.stringValue.isEmpty,
+                  !alert.passwordTextField.stringValue.isEmpty else {
+                completionHandler(.cancelAuthenticationChallenge, nil)
+                return
+            }
+            completionHandler(.useCredential, URLCredential(user: alert.usernameTextField.stringValue,
+                                                            password: alert.passwordTextField.stringValue,
+                                                            persistence: .none))
+
+        }
     }
 
 }
@@ -682,3 +706,5 @@ private extension WKWebView {
     }
 
 }
+
+// swiftlint:enable file_length
