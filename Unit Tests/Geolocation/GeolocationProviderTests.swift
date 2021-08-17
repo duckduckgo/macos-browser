@@ -289,6 +289,7 @@ final class GeolocationProviderTests: XCTestCase {
         // swiftlint:enable identifier_name
 
         geolocationHandler = { [webView1=webView!] webView, body in
+            // swiftlint:disable empty_enum_arguments
             switch (webView, try Response(body)) {
             case (webView1, Response(location1.removingAltitude())):
                 e1_1.fulfill()
@@ -301,6 +302,7 @@ final class GeolocationProviderTests: XCTestCase {
             default:
                 XCTFail("Unexpected result")
             }
+            // swiftlint:enable empty_enum_arguments
         }
 
         webView.loadHTMLString(Self.watchPosition(), baseURL: .duckDuckGo)
@@ -412,6 +414,7 @@ final class GeolocationProviderTests: XCTestCase {
         // swiftlint:enable identifier_name
 
         geolocationHandler = { [webView1=webView!] webView, body in
+            // swiftlint:disable empty_enum_arguments
             switch (webView, try Response(body)) {
             case (webView1, Response(location1.removingAltitude())):
                 e1_1.fulfill()
@@ -424,6 +427,7 @@ final class GeolocationProviderTests: XCTestCase {
             default:
                 XCTFail("Unexpected result")
             }
+            // swiftlint:enable empty_enum_arguments
         }
 
         webView.loadHTMLString(Self.watchPosition(), baseURL: .duckDuckGo)
