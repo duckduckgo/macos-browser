@@ -353,9 +353,6 @@ extension URL {
                     : kLSQuarantineTypeOtherDownload
             }
 
-            var resourceValues = URLResourceValues()
-            resourceValues.quarantineProperties = quarantineProperties
-
             try (self as NSURL).setResourceValue(quarantineProperties, forKey: .quarantinePropertiesKey)
         }
 
