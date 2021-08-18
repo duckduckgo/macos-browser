@@ -144,10 +144,10 @@ struct UserText {
     static let permissionAuthorizationFormat = NSLocalizedString("permission.authorization.format",
                                       value: "Allow “%@“ to use your %@?",
                                       comment: "Displays the version and build numbers")
-    static let permissionMicrophone = NSLocalizedString("permission.microphone", value: "microphone", comment: "Microphone input media device name")
-    static let permissionCamera = NSLocalizedString("permission.camera", value: "camera", comment: "Camera input media device name")
+    static let permissionMicrophone = NSLocalizedString("permission.microphone", value: "Microphone", comment: "Microphone input media device name")
+    static let permissionCamera = NSLocalizedString("permission.camera", value: "Camera", comment: "Camera input media device name")
     static let permissionAndPermissionFormat = NSLocalizedString("permission.permissionAndPermission", value: "%@ and %@", comment: "%@(camera) and %@(microphone) input media devices name")
-    static let permissionGeolocation = NSLocalizedString("permission.geolocation", value: "geolocation", comment: "User's Geolocation permission access name")
+    static let permissionGeolocation = NSLocalizedString("permission.geolocation", value: "Geolocation", comment: "User's Geolocation permission access name")
 
     static let permissionMuteFormat = NSLocalizedString("permission.mute", value: "Pause %@", comment: "Temporarily pause input media device %@ access")
     static let permissionUnmuteFormat = NSLocalizedString("permission.unmute", value: "Resume %@", comment: "Resume input media device %@ access")

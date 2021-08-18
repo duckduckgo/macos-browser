@@ -127,7 +127,7 @@ final class GeolocationProviderTests: XCTestCase {
             geolocationServiceMock.currentLocationPublished = .success(coordinate)
         }
         geolocationHandler = { _, body in
-            try XCTAssertEqual(Response(body), Response(coordinate))
+            try XCTAssertEqual(Response(body), Response(coordinate.removingAltitude()))
             e2.fulfill()
         }
         geolocationServiceMock.onSubscriptionCancelled = {
@@ -163,7 +163,7 @@ final class GeolocationProviderTests: XCTestCase {
 
         let e = expectation(description: "location received")
         geolocationHandler = { _, body in
-            try XCTAssertEqual(Response(body), Response(coordinate))
+            try XCTAssertEqual(Response(body), Response(coordinate.removingAltitude()))
             e.fulfill()
         }
 
@@ -204,10 +204,10 @@ final class GeolocationProviderTests: XCTestCase {
         geolocationHandler = { [geolocationServiceMock, webView] _, body in
             if geolocationServiceMock.history == [.subscribed, .locationPublished] {
                 geolocationServiceMock.currentLocationPublished = .success(location2)
-                try XCTAssertEqual(Response(body), Response(location1))
+                try XCTAssertEqual(Response(body), Response(location1.removingAltitude()))
                 e1.fulfill()
             } else {
-                try XCTAssertEqual(Response(body), Response(location2))
+                try XCTAssertEqual(Response(body), Response(location2.removingAltitude()))
                 webView!.evaluateJavaScript("clearWatch()") { _, error in
                     XCTAssertNil(error)
                     e2.fulfill()
@@ -289,18 +289,20 @@ final class GeolocationProviderTests: XCTestCase {
         // swiftlint:enable identifier_name
 
         geolocationHandler = { [webView1=webView!] webView, body in
+            // swiftlint:disable empty_enum_arguments
             switch (webView, try Response(body)) {
-            case (webView1, Response(location1)):
+            case (webView1, Response(location1.removingAltitude())):
                 e1_1.fulfill()
-            case (webView2, Response(location1)):
+            case (webView2, Response(location1.removingAltitude())):
                 e1_2.fulfill()
-            case (webView1, Response(location2)):
+            case (webView1, Response(location2.removingAltitude())):
                 e2_1.fulfill()
-            case (webView2, Response(location2)):
+            case (webView2, Response(location2.removingAltitude())):
                 e2_2.fulfill()
             default:
                 XCTFail("Unexpected result")
             }
+            // swiftlint:enable empty_enum_arguments
         }
 
         webView.loadHTMLString(Self.watchPosition(), baseURL: .duckDuckGo)
@@ -412,18 +414,20 @@ final class GeolocationProviderTests: XCTestCase {
         // swiftlint:enable identifier_name
 
         geolocationHandler = { [webView1=webView!] webView, body in
+            // swiftlint:disable empty_enum_arguments
             switch (webView, try Response(body)) {
-            case (webView1, Response(location1)):
+            case (webView1, Response(location1.removingAltitude())):
                 e1_1.fulfill()
-            case (webView2, Response(location1)):
+            case (webView2, Response(location1.removingAltitude())):
                 e1_2.fulfill()
-            case (webView1, Response(location2)):
+            case (webView1, Response(location2.removingAltitude())):
                 e2_1.fulfill()
-            case (webView2, Response(location2)):
+            case (webView2, Response(location2.removingAltitude())):
                 XCTFail("webView2 Unexpectedly received location")
             default:
                 XCTFail("Unexpected result")
             }
+            // swiftlint:enable empty_enum_arguments
         }
 
         webView.loadHTMLString(Self.watchPosition(), baseURL: .duckDuckGo)
@@ -461,13 +465,13 @@ final class GeolocationProviderTests: XCTestCase {
         geolocationHandler = { [geolocationServiceMock] webView, body in
             XCTAssertFalse(webView.configuration.processPool.geolocationProvider!.isPaused)
             switch try Response(body) {
-            case Response(location1):
+            case Response(location1.removingAltitude()):
                 webView.configuration.processPool.geolocationProvider!.isPaused = true
                 geolocationServiceMock.currentLocationPublished = .success(location2)
                 DispatchQueue.main.asyncAfter(deadline: .now() + 0.05) {
                     webView.configuration.processPool.geolocationProvider!.isPaused = false
                 }
-            case Response(location2):
+            case Response(location2.removingAltitude()):
                 e.fulfill()
             default:
                 XCTFail("Unexpected result")
@@ -495,7 +499,7 @@ final class GeolocationProviderTests: XCTestCase {
         geolocationHandler = { webView, body in
             XCTAssertFalse(webView.configuration.processPool.geolocationProvider!.isPaused)
             switch try Response(body) {
-            case Response(location1):
+            case Response(location1.removingAltitude()):
                 webView.removeFromSuperview()
             default:
                 XCTFail("Unexpected result")
@@ -521,7 +525,7 @@ final class GeolocationProviderTests: XCTestCase {
         geolocationHandler = { webView, body in
             XCTAssertFalse(webView.configuration.processPool.geolocationProvider!.isPaused)
             switch try Response(body) {
-            case Response(location2):
+            case Response(location2.removingAltitude()):
                 e3.fulfill()
             default:
                 XCTFail("Unexpected result")
@@ -562,7 +566,7 @@ final class GeolocationProviderTests: XCTestCase {
 
         let e1 = expectation(description: "location received")
         geolocationHandler = { webView, body in
-            XCTAssertEqual(try Response(body), Response(location1))
+            XCTAssertEqual(try Response(body), Response(location1.removingAltitude()))
             webView.revokePermissions([.geolocation])
             e1.fulfill()
         }
@@ -638,7 +642,7 @@ final class GeolocationProviderTests: XCTestCase {
         let e2 = expectation(description: "received location")
         let e3 = expectation(description: "received cancel")
         geolocationHandler = { webView, body in
-            XCTAssertEqual(try Response(body), Response(location))
+            XCTAssertEqual(try Response(body), Response(location.removingAltitude()))
             e2.fulfill()
             webView.removeFromSuperview()
         }
@@ -707,7 +711,7 @@ extension GeolocationProviderTests {
             self.altitudeAccuracy = location.verticalAccuracy >= 0 ? location.verticalAccuracy : nil
             self.heading = location.course >= 0 ? location.course : nil
             self.speed = location.speed >= 0.0 ? location.speed : nil
-            self.timestamp = Int(location.timestamp.timeIntervalSince1970 * 1000)
+            self.timestamp = Int(location.timestamp.timeIntervalSinceReferenceDate * 1000)
         }
 
         init(_ object: Any) throws {
@@ -748,4 +752,22 @@ extension GeolocationProviderTests {
 
     }
 }
+extension CLLocation {
+    func removingAltitude() -> CLLocation {
+        if #available(macOS 10.15.4, *) {
+            return CLLocation(coordinate: coordinate,
+                              altitude: -1,
+                              horizontalAccuracy: horizontalAccuracy,
+                              verticalAccuracy: -1,
+                              course: course,
+                              courseAccuracy: courseAccuracy,
+                              speed: speed,
+                              speedAccuracy: speedAccuracy,
+                              timestamp: timestamp)
+        } else {
+            fatalError()
+        }
+    }
+}
+
 // swiftlint:enable file_length

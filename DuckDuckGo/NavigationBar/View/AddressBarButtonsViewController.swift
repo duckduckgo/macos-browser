@@ -491,7 +491,8 @@ final class AddressBarButtonsViewController: NSViewController {
             .dropFirst()
             .receive(on: DispatchQueue.main)
             .sink { [weak self] _ in
-            self?.updateFireproofedButton()
+                self?.updateFireproofedButton()
+                self?.updatePermissionButtons()
         }
     }
 

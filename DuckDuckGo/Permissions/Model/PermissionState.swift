@@ -97,6 +97,12 @@ extension Optional where Wrapped == PermissionState {
         self = .requested(pendingQuery)
     }
 
+    mutating func granted() {
+        guard case .some(.requested) = self else { return }
+        // becomes `active` after handling activation of a permission by the WebView
+        self = .inactive
+    }
+
     mutating func denied() {
         self = .denied
     }
