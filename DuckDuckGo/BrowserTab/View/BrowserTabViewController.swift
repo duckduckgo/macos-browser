@@ -356,8 +356,9 @@ extension BrowserTabViewController: TabDelegate {
         alert.beginSheetModal(for: window) { response in
             guard case .OK = response,
                   !alert.usernameTextField.stringValue.isEmpty,
-                  !alert.passwordTextField.stringValue.isEmpty else {
-                completionHandler(.cancelAuthenticationChallenge, nil)
+                  !alert.passwordTextField.stringValue.isEmpty
+            else {
+                completionHandler(.performDefaultHandling, nil)
                 return
             }
             completionHandler(.useCredential, URLCredential(user: alert.usernameTextField.stringValue,

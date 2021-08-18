@@ -31,14 +31,14 @@ final class AuthenticationAlert: NSAlert {
         stackView.spacing = 4.0
 
         usernameTextField = NSTextField(frame: NSRect(x: 0, y: 0, width: 200, height: 24))
-        usernameTextField.setAccessibilityLabel("Username")
+        usernameTextField.setAccessibilityLabel(UserText.authAlertUsernamePlaceholder)
         usernameTextField.placeholderString = UserText.authAlertUsernamePlaceholder
         usernameTextField.isAutomaticTextCompletionEnabled = false
 
         stackView.addView(usernameTextField, in: .top)
 
         passwordTextField = NSSecureTextField(frame: NSRect(x: 0, y: 0, width: 200, height: 56))
-        passwordTextField.setAccessibilityLabel("Password")
+        passwordTextField.setAccessibilityLabel(UserText.authAlertPasswordPlaceholder)
         passwordTextField.placeholderString = UserText.authAlertPasswordPlaceholder
         passwordTextField.isAutomaticTextCompletionEnabled = false
         stackView.addView(passwordTextField, in: .top)
