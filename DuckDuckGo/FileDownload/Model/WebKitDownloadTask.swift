@@ -215,6 +215,21 @@ extension WebKitDownloadTask: WebKitDownloadDelegate {
                                                       completionHandler: self.localFileURLCompletionHandler)
     }
 
+    func download(_ download: WebKitDownload,
+                  willPerformHTTPRedirection response: HTTPURLResponse,
+                  newRequest request: URLRequest,
+                  decisionHandler: @escaping (WebKitDownloadRedirectPolicy) -> Void) {
+        decisionHandler(.allow)
+    }
+
+    func download(_ download: WebKitDownload,
+                  didReceive challenge: URLAuthenticationChallenge,
+                  completionHandler: @escaping (URLSession.AuthChallengeDisposition, URLCredential?) -> Void) {
+        download.webView?.navigationDelegate?.webView?(download.webView!, didReceive: challenge, completionHandler: completionHandler) ?? {
+            completionHandler(.performDefaultHandling, nil)
+        }()
+    }
+
     func downloadDidFinish(_ download: WebKitDownload) {
         guard var destinationURL = destinationURL else {
             self.finish(with: .failure(.failedToMoveFileToDownloads))
