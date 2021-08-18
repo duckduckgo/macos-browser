@@ -374,6 +374,19 @@ extension BrowserTabViewController: FileDownloadManagerDelegate {
 
     func chooseDestination(suggestedFilename: String?, directoryURL: URL?, fileTypes: [UTType], callback: @escaping (URL?, UTType?) -> Void) {
         dispatchPrecondition(condition: .onQueue(.main))
+
+        var fileTypes = fileTypes
+        if fileTypes.isEmpty || (fileTypes.count == 1 && (fileTypes[0].fileExtension?.isEmpty ?? true)),
+           let fileExt = (suggestedFilename as NSString?)?.pathExtension,
+           let utType = UTType(fileExtension: fileExt) {
+            // When no file extension is set by default generate fileType from file extension
+            fileTypes.insert(utType, at: 0)
+        }
+        // allow user set any file extension
+        if !fileTypes.contains(where: { $0.fileExtension?.isEmpty ?? true }) {
+            fileTypes.append(.data)
+        }
+
         let savePanel = NSSavePanel.withFileTypeChooser(fileTypes: fileTypes, suggestedFilename: suggestedFilename, directoryURL: directoryURL)
 
         func completionHandler(_ result: NSApplication.ModalResponse) {
