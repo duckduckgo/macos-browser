@@ -687,15 +687,6 @@ extension Tab: WKNavigationDelegate {
     func webView(_ webView: WKWebView, didFailProvisionalNavigation navigation: WKNavigation!, withError error: Error) {
         if currentDownload != nil && (error as NSError).code == ErrorCodes.frameLoadInterrupted {
             currentDownload = nil
-
-            // Note this can result in tabs being left open, e.g. download button on this page:
-            // https://en.wikipedia.org/wiki/Guitar#/media/File:GuitareClassique5.png
-            // Safari closes new tabs that were opened and then create a download instantly.
-            if self.webView.backForwardList.currentItem == nil,
-               self.parentTab != nil {
-                delegate?.closeTab(self)
-            }
-
             return
         }
 
@@ -727,6 +718,17 @@ extension Tab: WKWebViewDownloadDelegate {
 
     func webView(_ webView: WKWebView, navigationResponse: WKNavigationResponse, didBecomeDownload download: WebKitDownload) {
         FileDownloadManager.shared.add(download, delegate: self.delegate, promptForLocation: false, postflight: .none)
+
+        // Note this can result in tabs being left open, e.g. download button on this page:
+        // https://en.wikipedia.org/wiki/Guitar#/media/File:GuitareClassique5.png
+        // Safari closes new tabs that were opened and then create a download instantly.
+        if self.webView.backForwardList.currentItem == nil,
+           self.parentTab != nil,
+           let delegate = delegate {
+            DispatchQueue.main.async {
+                delegate.closeTab(self)
+            }
+        }
     }
 }
 
