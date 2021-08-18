@@ -13,6 +13,9 @@ CC:
 1.
 1.
 
+**Testing checklist**:
+
+* [ ] Test with Release configuration
 
 ---
 ###### Internal references:
