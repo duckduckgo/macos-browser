@@ -391,6 +391,7 @@
 		B630794226731F5400DCEE41 /* WKDownloadMock.swift in Sources */ = {isa = PBXBuildFile; fileRef = B630794126731F5400DCEE41 /* WKDownloadMock.swift */; };
 		B633C86D25E797D800E4B352 /* UserScriptsManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = B633C86C25E797D800E4B352 /* UserScriptsManager.swift */; };
 		B637273B26CBC8AF00C8CB02 /* AuthenticationAlert.swift in Sources */ = {isa = PBXBuildFile; fileRef = B637273A26CBC8AF00C8CB02 /* AuthenticationAlert.swift */; };
+		B637273D26CCF0C200C8CB02 /* OptionalExtension.swift in Sources */ = {isa = PBXBuildFile; fileRef = B637273C26CCF0C200C8CB02 /* OptionalExtension.swift */; };
 		B63D466925BEB6C200874977 /* WKWebView+SessionState.swift in Sources */ = {isa = PBXBuildFile; fileRef = B63D466825BEB6C200874977 /* WKWebView+SessionState.swift */; };
 		B63D467125BFA6C100874977 /* DispatchQueueExtensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = B63D467025BFA6C100874977 /* DispatchQueueExtensions.swift */; };
 		B63D467A25BFC3E100874977 /* NSCoderExtensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = B63D467925BFC3E100874977 /* NSCoderExtensions.swift */; };
@@ -900,6 +901,7 @@
 		B630794F2673491500DCEE41 /* WebKitDownloadDelegate.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = WebKitDownloadDelegate.h; sourceTree = "<group>"; };
 		B633C86C25E797D800E4B352 /* UserScriptsManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UserScriptsManager.swift; sourceTree = "<group>"; };
 		B637273A26CBC8AF00C8CB02 /* AuthenticationAlert.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AuthenticationAlert.swift; sourceTree = "<group>"; };
+		B637273C26CCF0C200C8CB02 /* OptionalExtension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OptionalExtension.swift; sourceTree = "<group>"; };
 		B63B9C4A2670B24300C45B91 /* WKDownload.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = WKDownload.h; sourceTree = "<group>"; };
 		B63B9C502670B2B200C45B91 /* _WKDownload.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = _WKDownload.h; sourceTree = "<group>"; };
 		B63B9C542670B32000C45B91 /* WKProcessPool+Private.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "WKProcessPool+Private.h"; sourceTree = "<group>"; };
@@ -2394,6 +2396,7 @@
 				85625999269CA0A600EE44BC /* NSRectExtension.swift */,
 				858A798426A8BB5D00A75A42 /* NSTextViewExtension.swift */,
 				4B139AFC26B60BD800894F82 /* NSImageExtensions.swift */,
+				B637273C26CCF0C200C8CB02 /* OptionalExtension.swift */,
 			);
 			path = Extensions;
 			sourceTree = "<group>";
@@ -2975,6 +2978,7 @@
 				B684590825C9027900DC17B6 /* AppStateChangedPublisher.swift in Sources */,
 				4B92928F26670D1700AD2C21 /* BookmarkTableCellView.swift in Sources */,
 				4B9292CF2667123700AD2C21 /* BookmarkManagementSidebarViewController.swift in Sources */,
+				B637273D26CCF0C200C8CB02 /* OptionalExtension.swift in Sources */,
 				AA80EC54256BE3BC007083E7 /* UserText.swift in Sources */,
 				B61EF3EC266F91E700B4D78F /* WKWebView+Download.swift in Sources */,
 				4B0511C4262CAA5A00F6079C /* PreferencesSidebarViewController.swift in Sources */,

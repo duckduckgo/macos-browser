@@ -71,7 +71,11 @@ public struct UserDefaultsWrapper<T> {
             return defaultValue
         }
         set {
-            UserDefaults.standard.set(newValue, forKey: key.rawValue)
+            if (newValue as? OptionalProtocol)?.isNil == true {
+                UserDefaults.standard.removeObject(forKey: key.rawValue)
+            } else {
+                UserDefaults.standard.set(newValue, forKey: key.rawValue)
+            }
         }
     }
 
@@ -84,4 +88,5 @@ public struct UserDefaultsWrapper<T> {
     static func clear(_ key: Key) {
         UserDefaults.standard.removeObject(forKey: key.rawValue)
     }
+
 }
