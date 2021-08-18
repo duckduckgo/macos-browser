@@ -66,9 +66,7 @@ final class MainMenu: NSMenu {
     override func update() {
         super.update()
 
-        if #available(macOS 11, *) {
-            // no-op
-        } else {
+        if !WKWebView.canPrint {
             printMenuItem?.removeFromParent()
             printSeparatorItem?.removeFromParent()
         }

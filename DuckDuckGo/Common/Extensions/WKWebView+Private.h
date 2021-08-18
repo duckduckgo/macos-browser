@@ -92,6 +92,8 @@ typedef NS_ENUM(NSInteger, WKMediaCaptureState) {
 
 - (_WKMediaMutedState)_mediaMutedState;
 - (void)_setPageMuted:(_WKMediaMutedState)mutedState;
+
+- (NSPrintOperation *)_printOperationWithPrintInfo:(NSPrintInfo *)printInfo;
 @end
 
 NS_ASSUME_NONNULL_END

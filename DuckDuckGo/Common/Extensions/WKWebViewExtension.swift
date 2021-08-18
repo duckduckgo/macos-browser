@@ -186,4 +186,22 @@ extension WKWebView {
         }
     }
 
+    static var canPrint: Bool {
+        if #available(macOS 11.0, *) {
+            return true
+        } else {
+            return self.instancesRespond(to: #selector(WKWebView._printOperation(with:)))
+        }
+    }
+    
+    func printOperation() -> NSPrintOperation? {
+        if #available(macOS 11.0, *) {
+            return self.printOperation(with: .shared)
+        }
+
+        guard self.responds(to: #selector(WKWebView._printOperation(with:))) else { return nil }
+
+        return self._printOperation(with: .shared)
+    }
+
 }
