@@ -115,6 +115,32 @@ final private class WKDownloadDelegateWrapper: NSObject, WKDownloadDelegate {
         delegate?.download(download, decideDestinationUsing: response, suggestedFilename: suggestedFilename, completionHandler: completionHandler)
     }
 
+    func download(_ download: WKDownload,
+                  willPerformHTTPRedirection response: HTTPURLResponse,
+                  newRequest request: URLRequest,
+                  decisionHandler: @escaping (WKDownload.RedirectPolicy) -> Void) {
+        delegate?.download?(download, willPerformHTTPRedirection: response, newRequest: request) {
+            switch $0 {
+            case .cancel:
+                decisionHandler(.cancel)
+            case .allow:
+                decisionHandler(.allow)
+            @unknown default:
+                decisionHandler(.allow)
+            }
+        } ?? {
+            decisionHandler(.allow)
+        }()
+    }
+
+    func download(_ download: WKDownload,
+                  didReceive challenge: URLAuthenticationChallenge,
+                  completionHandler: @escaping (URLSession.AuthChallengeDisposition, URLCredential?) -> Void) {
+        delegate?.download?(download, didReceive: challenge, completionHandler: completionHandler) ?? {
+            completionHandler(.performDefaultHandling, nil)
+        }()
+    }
+
     func downloadDidFinish(_ download: WKDownload) {
         delegate?.downloadDidFinish?(download)
     }

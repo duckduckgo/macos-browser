@@ -23,6 +23,7 @@ import Combine
 import SwiftUI
 import BrowserServicesKit
 
+// swiftlint:disable file_length
 final class BrowserTabViewController: NSViewController {
 
     @IBOutlet weak var errorView: NSView!
@@ -212,7 +213,7 @@ final class BrowserTabViewController: NSViewController {
             self.addChild(preferencesViewController)
             view.addAndLayout(preferencesViewController.view)
 
-        case .url, .auto:
+        case .url:
             self.homepageView.removeFromSuperview()
             removeBookmarksPage()
             removePreferencesPage()
@@ -225,6 +226,12 @@ final class BrowserTabViewController: NSViewController {
             removePreferencesPage()
             self.webView?.removeFromSuperview()
             showHomepage()
+
+        case .none:
+            self.homepageView.removeFromSuperview()
+            removeBookmarksPage()
+            removePreferencesPage()
+            self.webView?.removeFromSuperview()
         }
     }
 
@@ -335,6 +342,30 @@ extension BrowserTabViewController: TabDelegate {
         contextMenuLink = link
         contextMenuExpected = true
         contextMenuSelectedText = selectedText
+    }
+
+    func tab(_ tab: Tab,
+             requestedBasicAuthenticationChallengeWith protectionSpace: URLProtectionSpace,
+             completionHandler: @escaping (URLSession.AuthChallengeDisposition, URLCredential?) -> Void) {
+        guard let window = view.window else {
+            completionHandler(.cancelAuthenticationChallenge, nil)
+            return
+        }
+
+        let alert = AuthenticationAlert(host: protectionSpace.host, isEncrypted: protectionSpace.receivesCredentialSecurely)
+        alert.beginSheetModal(for: window) { response in
+            guard case .OK = response,
+                  !alert.usernameTextField.stringValue.isEmpty,
+                  !alert.passwordTextField.stringValue.isEmpty
+            else {
+                completionHandler(.performDefaultHandling, nil)
+                return
+            }
+            completionHandler(.useCredential, URLCredential(user: alert.usernameTextField.stringValue,
+                                                            password: alert.passwordTextField.stringValue,
+                                                            persistence: .none))
+
+        }
     }
 
 }
@@ -468,6 +499,41 @@ extension BrowserTabViewController: MenuItemSelectors {
 
 extension BrowserTabViewController: WKUIDelegate {
 
+    @objc(_webView:saveDataToFile:suggestedFilename:mimeType:originatingURL:)
+    func webView(_ webView: WKWebView, saveDataToFile data: Data, suggestedFilename: String, mimeType: String, originatingURL: URL) {
+        func write(to url: URL) throws {
+            let progress = Progress(totalUnitCount: 1,
+                                    fileOperationKind: .downloading,
+                                    kind: .file,
+                                    isPausable: false,
+                                    isCancellable: false,
+                                    fileURL: url)
+            progress.publish()
+            defer {
+                progress.unpublish()
+            }
+
+            try data.write(to: url)
+            progress.completedUnitCount = progress.totalUnitCount
+        }
+
+        let prefs = DownloadPreferences()
+        if !prefs.alwaysRequestDownloadLocation,
+           let location = prefs.selectedDownloadLocation {
+            let url = location.appendingPathComponent(suggestedFilename)
+            try? write(to: url)
+
+            return
+        }
+
+        chooseDestination(suggestedFilename: suggestedFilename,
+                          directoryURL: prefs.selectedDownloadLocation,
+                          fileTypes: UTType(mimeType: mimeType).map { [$0] } ?? []) { url, _ in
+            guard let url = url else { return }
+            try? write(to: url)
+        }
+    }
+
     func webView(_ webView: WKWebView,
                  createWebViewWith configuration: WKWebViewConfiguration,
                  for navigationAction: WKNavigationAction,
@@ -475,7 +541,7 @@ extension BrowserTabViewController: WKUIDelegate {
 
         // Returned web view must be created with the specified configuration.
 
-        let tab = Tab(content: .auto(navigationAction.request.url),
+        let tab = Tab(content: .none,
                       webViewConfiguration: configuration,
                       parentTab: tabViewModel?.tab,
                       canBeClosedWithBack: true)
@@ -676,3 +742,5 @@ private extension WKWebView {
     }
 
 }
+
+// swiftlint:enable file_length

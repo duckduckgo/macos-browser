@@ -28,6 +28,9 @@ protocol TabDelegate: FileDownloadManagerDelegate {
     func tab(_ tab: Tab, willShowContextMenuAt position: NSPoint, image: URL?, link: URL?, selectedText: String?)
 	func tab(_ tab: Tab, requestedOpenExternalURL url: URL, forUserEnteredURL: Bool)
     func tab(_ tab: Tab, requestedSaveCredentials credentials: SecureVaultModels.WebsiteCredentials)
+    func tab(_ tab: Tab,
+             requestedBasicAuthenticationChallengeWith protectionSpace: URLProtectionSpace,
+             completionHandler: @escaping (URLSession.AuthChallengeDisposition, URLCredential?) -> Void)
 
     func tabPageDOMLoaded(_ tab: Tab)
     func closeTab(_ tab: Tab)
@@ -39,15 +42,15 @@ final class Tab: NSObject {
 
     enum TabContent: Equatable {
         case homepage
-        case auto(URL?)
         case url(URL)
         case preferences
         case bookmarks
+        case none
 
         static var displayableTabTypes: [TabContent] {
             return [TabContent.preferences, .bookmarks].sorted { first, second in
                 switch first {
-                case .auto, .homepage, .url, .preferences, .bookmarks: break
+                case .homepage, .url, .preferences, .bookmarks, .none: break
                 // !! Replace [TabContent.preferences, .bookmarks] above with new displayable Tab Types if added
                 }
                 guard let firstTitle = first.title, let secondTitle = second.title else {
@@ -60,31 +63,15 @@ final class Tab: NSObject {
 
         var title: String? {
             switch self {
-            case .auto, .url, .homepage: return nil
+            case .url, .homepage, .none: return nil
             case .preferences: return UserText.tabPreferencesTitle
             case .bookmarks: return UserText.tabBookmarksTitle
             }
         }
 
         var url: URL? {
-            switch self {
-            case .url(let url):
-                return url
-            case .auto(let url):
-                return url
-            case .preferences, .bookmarks, .homepage:
-                return nil
-            }
-        }
-
-        var focusTabAddressBarWhenSelected: Bool {
-            switch self {
-            case .homepage: return true
-            case .url: return true
-            case .auto: return false
-            case .preferences: return false
-            case .bookmarks: return false
-            }
+            guard case .url(let url) = self else { return nil }
+            return url
         }
     }
 
@@ -104,11 +91,6 @@ final class Tab: NSObject {
          canBeClosedWithBack: Bool = false) {
 
         self.content = content
-        if case .auto = content {
-            self.userEnteredUrl = false
-        } else {
-            self.userEnteredUrl = true
-        }
         self.faviconService = faviconService
         self.historyCoordinating = historyCoordinating
         self.title = title
@@ -142,7 +124,7 @@ final class Tab: NSObject {
     }
 
     let webView: WebView
-    private(set) var userEnteredUrl: Bool
+    var userEnteredUrl = true
 
     @PublishedAfter var content: TabContent {
         didSet {
@@ -150,9 +132,7 @@ final class Tab: NSObject {
                 fetchFavicon(nil, for: content.url?.host, isFromUserScript: false)
             }
 
-            if oldValue.url != content.url {
-                invalidateSessionStateData()
-            }
+            invalidateSessionStateData()
             updateDashboardInfo(oldUrl: oldValue.url, url: content.url)
             reloadIfNeeded()
 
@@ -196,13 +176,8 @@ final class Tab: NSObject {
         return self.sessionStateData
     }
 
-    func update(url: URL?, userEntered: Bool) {
-        if case .auto = self.content,
-           !userEntered {
-            self.content = .auto(url)
-        } else {
-            self.content = .url(url ?? .emptyPage)
-        }
+    func update(url: URL?, userEntered: Bool = true) {
+        self.content = .url(url ?? .emptyPage)
 
         // This function is called when the user has manually typed in a new address, which should reset the login detection flow.
         userEnteredUrl = userEntered
@@ -302,11 +277,10 @@ final class Tab: NSObject {
                 os_log("Tab:setupWebView could not restore session state %s", "\(error)")
             }
         }
-        switch content {
-        case .url(let url):
+        if let url = self.content.url {
             webView.load(url)
-        case .auto, .homepage, .bookmarks, .preferences:
-            break
+        } else {
+            webView.load(URL.emptyPage)
         }
     }
 
@@ -599,6 +573,12 @@ extension Tab: WKNavigationDelegate {
             completionHandler(.useCredential, URLCredential(user: "dax", password: "qu4ckqu4ck!", persistence: .none))
             return
         }
+        if challenge.protectionSpace.authenticationMethod == NSURLAuthenticationMethodHTTPBasic,
+           let delegate = delegate {
+            delegate.tab(self, requestedBasicAuthenticationChallengeWith: challenge.protectionSpace, completionHandler: completionHandler)
+            return
+        }
+
         completionHandler(.performDefaultHandling, nil)
         if let host = webView.url?.host, let serverTrust = challenge.protectionSpace.serverTrust {
             self.serverTrust = ServerTrust(host: host, secTrust: serverTrust)
@@ -693,9 +673,6 @@ extension Tab: WKNavigationDelegate {
     }
 
     func webView(_ webView: WKWebView, didFinish navigation: WKNavigation!) {
-        if case .auto(.some(let url)) = self.content {
-            self.content = .url(url)
-        }
         self.invalidateSessionStateData()
     }
 
@@ -714,7 +691,8 @@ extension Tab: WKNavigationDelegate {
             // Note this can result in tabs being left open, e.g. download button on this page:
             // https://en.wikipedia.org/wiki/Guitar#/media/File:GuitareClassique5.png
             // Safari closes new tabs that were opened and then create a download instantly.
-            if case .auto = self.content {
+            if self.webView.backForwardList.currentItem == nil,
+               self.parentTab != nil {
                 delegate?.closeTab(self)
             }
 

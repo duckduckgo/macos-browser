@@ -23,7 +23,7 @@ final class PrivacyEntryPointAddressBarButton: AddressBarButton {
 
     static var lightAnimationImages: [NSImage] = {
         var images = [NSImage]()
-        for i in 0...180 {
+        for i in 0...150 {
             if let image = NSImage(named: "PrivacyIconLight\(String(format: "%03d", i))") {
                 images.append(image)
             }
@@ -32,7 +32,7 @@ final class PrivacyEntryPointAddressBarButton: AddressBarButton {
     }()
     static var darkAnimationImages: [NSImage] = {
         var images = [NSImage]()
-        for i in 0...180 {
+        for i in 0...150 {
             if let image = NSImage(named: "PrivacyIconDark\(String(format: "%03d", i))") {
                 images.append(image)
             }
@@ -84,7 +84,7 @@ final class PrivacyEntryPointAddressBarButton: AddressBarButton {
         keyFrameAnimation.autoreverses = false
         keyFrameAnimation.isRemovedOnCompletion = false
         keyFrameAnimation.beginTime = 0
-        keyFrameAnimation.duration = 6
+        keyFrameAnimation.duration = Double(animationImages.count) / 30.0
         return keyFrameAnimation
     }()
 
