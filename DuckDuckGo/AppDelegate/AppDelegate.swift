@@ -38,7 +38,10 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
 
 #if OUT_OF_APPSTORE
 
+#if !BETA
     let updateController = UpdateController()
+#endif
+
     let crashReporter = CrashReporter()
 
 #endif
