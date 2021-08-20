@@ -188,13 +188,13 @@ final class Tab: NSObject {
 
     func download(from url: URL, promptForLocation: Bool = true) {
         webView.startDownload(URLRequest(url: url, cachePolicy: .returnCacheDataElseLoad)) { download in
-            FileDownloadManager.shared.add(download, delegate: self.delegate, promptForLocation: promptForLocation, postflight: .reveal)
+            FileDownloadManager.shared.add(download, delegate: self.delegate, promptForLocation: promptForLocation, postflight: .none)
         }
     }
 
     func saveWebContentAs(completionHandler: ((Result<URL, Error>) -> Void)? = nil) {
         webView.getMimeType { mimeType in
-            if case .html = mimeType.flatMap(UTType.init(mimeType:)) ?? .html {
+            if case .some(.html) = mimeType.flatMap(UTType.init(mimeType:)) {
                 self.delegate?.chooseDestination(suggestedFilename: self.webView.suggestedFilename,
                                                  directoryURL: DownloadPreferences().selectedDownloadLocation,
                                                  fileTypes: [.html, .webArchive, .pdf]) { url, fileType in
@@ -214,14 +214,6 @@ final class Tab: NSObject {
     }
 
     private let instrumentation = TabInstrumentation()
-
-    var isHomepageShown: Bool {
-        content == .homepage
-    }
-
-    var isBookmarksShown: Bool {
-        content == .bookmarks
-    }
 
     var canGoForward: Bool {
         webView.canGoForward
@@ -613,6 +605,9 @@ extension Tab: WKNavigationDelegate {
             decisionHandler(.cancel)
             delegate?.tab(self, requestedNewTab: navigationAction.request.url, selected: NSApp.isShiftPressed)
             return
+        } else if isLinkActivated && NSApp.isOptionPressed && !NSApp.isCommandPressed {
+            decisionHandler(.download(navigationAction, using: webView))
+            return
         }
 
         guard let url = navigationAction.request.url, let urlScheme = url.scheme else {
@@ -692,15 +687,6 @@ extension Tab: WKNavigationDelegate {
     func webView(_ webView: WKWebView, didFailProvisionalNavigation navigation: WKNavigation!, withError error: Error) {
         if currentDownload != nil && (error as NSError).code == ErrorCodes.frameLoadInterrupted {
             currentDownload = nil
-
-            // Note this can result in tabs being left open, e.g. download button on this page:
-            // https://en.wikipedia.org/wiki/Guitar#/media/File:GuitareClassique5.png
-            // Safari closes new tabs that were opened and then create a download instantly.
-            if self.webView.canGoBack == false,
-               self.parentTab != nil {
-                delegate?.closeTab(self)
-            }
-
             return
         }
 
@@ -727,11 +713,22 @@ extension Tab: WKNavigationDelegate {
 // universal download event handlers for Legacy _WKDownload and modern WKDownload
 extension Tab: WKWebViewDownloadDelegate {
     func webView(_ webView: WKWebView, navigationAction: WKNavigationAction, didBecomeDownload download: WebKitDownload) {
-        FileDownloadManager.shared.add(download, delegate: self.delegate, promptForLocation: false, postflight: .reveal)
+        FileDownloadManager.shared.add(download, delegate: self.delegate, promptForLocation: false, postflight: .none)
     }
 
     func webView(_ webView: WKWebView, navigationResponse: WKNavigationResponse, didBecomeDownload download: WebKitDownload) {
-        FileDownloadManager.shared.add(download, delegate: self.delegate, promptForLocation: false, postflight: .reveal)
+        FileDownloadManager.shared.add(download, delegate: self.delegate, promptForLocation: false, postflight: .none)
+
+        // Note this can result in tabs being left open, e.g. download button on this page:
+        // https://en.wikipedia.org/wiki/Guitar#/media/File:GuitareClassique5.png
+        // Safari closes new tabs that were opened and then create a download instantly.
+        if self.webView.backForwardList.currentItem == nil,
+           self.parentTab != nil,
+           let delegate = delegate {
+            DispatchQueue.main.async {
+                delegate.closeTab(self)
+            }
+        }
     }
 }
 

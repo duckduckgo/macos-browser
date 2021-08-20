@@ -78,7 +78,10 @@ extension NSSavePanel {
             self.allowedFileTypes = nil
             return
         }
-        Self.preferredFileType = fileType.mimeType
+        if fileType.fileExtension?.isEmpty == false,
+           let mimeType = fileType.mimeType {
+            Self.preferredFileType = mimeType
+        }
         self.allowedFileTypes = [fileType.rawValue as String]
     }
 

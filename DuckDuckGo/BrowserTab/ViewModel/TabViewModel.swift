@@ -154,25 +154,19 @@ final class TabViewModel {
             return
         }
 
-        if tab.content == .preferences {
+        switch tab.content {
+        case .preferences:
             title = UserText.tabPreferencesTitle
-            return
-        }
-
-        if tab.content == .bookmarks {
+        case .bookmarks:
             title = UserText.tabBookmarksTitle
-            return
-        }
-
-        if tab.isHomepageShown {
+        case .homepage:
             title = UserText.tabHomeTitle
-            return
-        }
-
-        if let title = tab.title {
-            self.title = title
-        } else {
-            title = addressBarString
+        case .url, .none:
+            if let title = tab.title {
+                self.title = title
+            } else {
+                title = addressBarString
+            }
         }
     }
 
@@ -182,19 +176,17 @@ final class TabViewModel {
             return
         }
 
-        if tab.isHomepageShown {
+        switch tab.content {
+        case .homepage:
             favicon = Favicon.home
             return
-        }
-
-        switch tab.content {
         case .preferences:
             favicon = Favicon.preferences
             return
         case .bookmarks:
             favicon = Favicon.bookmarks
             return
-        case .url, .homepage, .none: break
+        case .url, .none: break
         }
 
         if let favicon = tab.favicon {

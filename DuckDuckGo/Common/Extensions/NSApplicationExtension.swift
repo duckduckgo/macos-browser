@@ -35,6 +35,10 @@ extension NSApplication {
         currentEvent?.modifierFlags.contains(.shift) ?? false
     }
 
+    var isOptionPressed: Bool {
+        currentEvent?.modifierFlags.contains(.option) ?? false
+    }
+
     var isReturnOrEnterPressed: Bool {
         guard let event = currentEvent,
               case .keyDown = event.type
