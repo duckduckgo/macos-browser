@@ -383,7 +383,7 @@ extension BrowserTabViewController: FileDownloadManagerDelegate {
             fileTypes.insert(utType, at: 0)
         }
         // allow user set any file extension
-        if !fileTypes.contains(where: { $0.fileExtension?.isEmpty ?? true }) {
+        if fileTypes.count == 1 && !fileTypes.contains(where: { $0.fileExtension?.isEmpty ?? true }) {
             fileTypes.append(.data)
         }
 
