@@ -40,7 +40,7 @@ enum ConfigurationLocation: String, CaseIterable {
     case bloomFilterExcludedDomains = "https://staticcdn.duckduckgo.com/https/https-mobile-v2-false-positives.json"
     case surrogates = "https://duckduckgo.com/contentblocking.js?l=surrogates"
     case trackerRadar = "https://staticcdn.duckduckgo.com/trackerblocking/v2.1/tds.json"
-    case privacyConfiguration = "https://staticcdn.duckduckgo.com/trackerblocking/v1/macos-config.json"
+    case privacyConfiguration = "https://staticcdn.duckduckgo.com/trackerblocking/config/v1/macos-config.json"
 
 }
 
