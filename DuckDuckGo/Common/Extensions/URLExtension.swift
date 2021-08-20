@@ -290,7 +290,11 @@ extension URL {
 #if FEEDBACK
 
     static var feedback: URL {
+    #if BETA
+        return URL(string: "https://www.surveymonkey.com/r/WTBLLJR")!
+    #else
         return URL(string: "https://form.asana.com/?k=HzdxNoIgDZUBf4w0_cafIQ&d=137249556945")!
+    #endif
     }
 
 #endif
