@@ -3976,7 +3976,7 @@
 				MARKETING_VERSION = 0.14.1;
 				PRODUCT_BUNDLE_IDENTIFIER = com.duckduckgo.macos.browser;
 				PRODUCT_MODULE_NAME = "$(TARGET_NAME:c99extidentifier)";
-				PRODUCT_NAME = "DuckDuckGo Beta";
+				PRODUCT_NAME = "DuckDuckGo Non-Production";
 				SWIFT_ACTIVE_COMPILATION_CONDITIONS = "FEEDBACK OUT_OF_APPSTORE BETA";
 				SWIFT_OBJC_BRIDGING_HEADER = "$(SRCROOT)/DuckDuckGo/Bridging.h";
 				SWIFT_VERSION = 5.0;
