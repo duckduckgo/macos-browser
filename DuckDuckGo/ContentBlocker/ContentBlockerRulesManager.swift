@@ -31,7 +31,10 @@ final class ContentBlockerRulesManager {
         blockingRulesSubject.eraseToAnyPublisher()
     }
 
-    private init() {
+    let privacyConfiguration: PrivacyConfigurationManagment
+    
+    private init(privacyConfiguration: PrivacyConfigurationManagment = PrivacyConfigurationManager.shared) {
+        self.privacyConfiguration = privacyConfiguration
         compileRules()
     }
 
@@ -45,9 +48,10 @@ final class ContentBlockerRulesManager {
     }
 
     private func loadUnprotectedDomains() -> [String] {
-        guard let data = DefaultConfigurationStorage.shared.loadData(for: .temporaryUnprotectedSites),
-              let string = String(data: data, encoding: .utf8) else { return [] }
-        return string.components(separatedBy: .newlines).map { $0.trimmingWhitespaces() }.filter { !$0.isEmpty }
+        let tempUnprotected = privacyConfiguration.tempUnprotectedDomains
+        let contentBlockingExceptions = privacyConfiguration.exceptionsList(forFeature: .contentBlocking)
+        
+        return (tempUnprotected + contentBlockingExceptions).filter { !$0.isEmpty }
     }
 
     private func compileRules(with trackerData: TrackerData,

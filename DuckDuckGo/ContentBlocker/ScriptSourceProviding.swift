@@ -45,9 +45,12 @@ final class DefaultScriptSourceProvider: ScriptSourceProviding {
     }
 
     let configStorage: ConfigurationStoring
+    let privacyConfiguration: PrivacyConfigurationManagment
 
-    private init(configStorage: ConfigurationStoring = DefaultConfigurationStorage.shared) {
+    private init(configStorage: ConfigurationStoring = DefaultConfigurationStorage.shared,
+                 privacyConfiguration: PrivacyConfigurationManagment = PrivacyConfigurationManager.shared) {
         self.configStorage = configStorage
+        self.privacyConfiguration = privacyConfiguration
         reload()
     }
 
@@ -58,9 +61,10 @@ final class DefaultScriptSourceProvider: ScriptSourceProviding {
     }
 
     private func buildContentBlockerRulesSource() -> String {
-        let unprotectedDomains = configStorage.loadData(for: .temporaryUnprotectedSites)?.utf8String() ?? ""
+        let unprotectedDomains = privacyConfiguration.tempUnprotectedDomains
+        let contentBlockingExceptions = privacyConfiguration.exceptionsList(forFeature: .contentBlocking)
         return ContentBlockerRulesUserScript.loadJS("contentblockerrules", from: .main, withReplacements: [
-            "${unprotectedDomains}": unprotectedDomains
+            "${unprotectedDomains}": (unprotectedDomains + contentBlockingExceptions).joined(separator: "\n")
         ])
     }
 
@@ -69,10 +73,11 @@ final class DefaultScriptSourceProvider: ScriptSourceProviding {
         // Use sensible defaults in case the upstream data is unparsable
         let trackerData = TrackerRadarManager.shared.encodedTrackerData
         let surrogates = configStorage.loadData(for: .surrogates)?.utf8String() ?? ""
-        let unprotectedSites = configStorage.loadData(for: .temporaryUnprotectedSites)?.utf8String() ?? ""
+        let unprotectedSites = privacyConfiguration.tempUnprotectedDomains
+        let contentBlockingExceptions = privacyConfiguration.exceptionsList(forFeature: .contentBlocking)
 
         return ContentBlockerUserScript.loadJS("contentblocker", from: .main, withReplacements: [
-            "${unprotectedDomains}": unprotectedSites,
+            "${unprotectedDomains}": (unprotectedSites + contentBlockingExceptions).joined(separator: "\n"),
             "${trackerData}": trackerData,
             "${surrogates}": surrogates
         ])
