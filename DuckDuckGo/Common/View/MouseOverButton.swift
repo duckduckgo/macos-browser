@@ -73,7 +73,7 @@ internal class MouseOverButton: NSButton {
         }
     }
 
-    private var isMouseDown = false {
+    var isMouseDown = false {
         didSet {
             updateBackgroundColor()
         }

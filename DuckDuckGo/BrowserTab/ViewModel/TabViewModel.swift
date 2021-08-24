@@ -36,8 +36,8 @@ final class TabViewModel {
     private var webViewStateObserver: WebViewStateObserver?
 
     @Published var canGoForward: Bool = false
-    @Published var canGoBack: Bool = false
-    @Published var canReload: Bool = false
+    @Published private(set) var canGoBack: Bool = false
+    @Published private(set) var canReload: Bool = false
     @Published var canBeBookmarked: Bool = false
     @Published var isLoading: Bool = false {
         willSet {
@@ -65,6 +65,9 @@ final class TabViewModel {
     @Published private(set) var favicon: NSImage = Favicon.home
     @Published private(set) var findInPage: FindInPageModel = FindInPageModel()
 
+    @Published private(set) var usedPermissions = Permissions()
+    @Published private(set) var permissionAuthorizationQuery: PermissionAuthorizationQuery?
+
     init(tab: Tab) {
         self.tab = tab
 
@@ -74,10 +77,11 @@ final class TabViewModel {
         subscribeToTitle()
         subscribeToFavicon()
         subscribeToTabError()
+        subscribeToPermissions()
     }
 
     private func subscribeToUrl() {
-        tab.$url.sink { [weak self] _ in
+        tab.$content.sink { [weak self] _ in
             self?.updateCanReload()
             self?.updateAddressBarStrings()
             self?.updateCanBeBookmarked()
@@ -99,12 +103,23 @@ final class TabViewModel {
         } .store(in: &cancellables)
     }
 
+    private func subscribeToPermissions() {
+        tab.permissions.$permissions.weakAssign(to: \.usedPermissions, on: self)
+            .store(in: &cancellables)
+        tab.permissions.$authorizationQuery.weakAssign(to: \.permissionAuthorizationQuery, on: self)
+            .store(in: &cancellables)
+    }
+
     private func updateCanReload() {
-        canReload = tab.url != nil
+        canReload = tab.content.url ?? .emptyPage != .emptyPage
+    }
+
+    func updateCanGoBack() {
+        canGoBack = tab.canGoBack || tab.canBeClosedWithBack
     }
 
     private func updateCanBeBookmarked() {
-        canBeBookmarked = tab.url != nil
+        canBeBookmarked = tab.content.url ?? .emptyPage != .emptyPage
     }
 
     private func updateAddressBarStrings() {
@@ -115,7 +130,7 @@ final class TabViewModel {
             return
         }
 
-        guard let url = tab.url, let host = url.host else {
+        guard let url = tab.content.url, let host = url.host else {
             addressBarString = ""
             passiveAddressBarString = ""
             return
@@ -139,25 +154,19 @@ final class TabViewModel {
             return
         }
 
-        if tab.tabType == .preferences {
+        switch tab.content {
+        case .preferences:
             title = UserText.tabPreferencesTitle
-            return
-        }
-
-        if tab.tabType == .bookmarks {
+        case .bookmarks:
             title = UserText.tabBookmarksTitle
-            return
-        }
-
-        if tab.isHomepageShown {
+        case .homepage:
             title = UserText.tabHomeTitle
-            return
-        }
-
-        if let title = tab.title {
-            self.title = title
-        } else {
-            title = addressBarString
+        case .url, .none:
+            if let title = tab.title {
+                self.title = title
+            } else {
+                title = addressBarString
+            }
         }
     }
 
@@ -167,19 +176,17 @@ final class TabViewModel {
             return
         }
 
-        if tab.isHomepageShown {
+        switch tab.content {
+        case .homepage:
             favicon = Favicon.home
             return
-        }
-
-        switch tab.tabType {
         case .preferences:
             favicon = Favicon.preferences
             return
         case .bookmarks:
             favicon = Favicon.bookmarks
             return
-        case .standard: break
+        case .url, .none: break
         }
 
         if let favicon = tab.favicon {

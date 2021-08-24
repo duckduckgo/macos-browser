@@ -24,6 +24,7 @@ extension Pixel.Event {
         var description: String { rawValue }
 
         case initial = "initial"
+        case dailyFirst = "first-in-a-day"
         case regular = "app-launch"
         case openURL = "open-url"
         case openFile = "open-file"
@@ -35,7 +36,9 @@ extension Pixel.Event {
             switch launchRepetition {
             case .initial:
                 return .initial
-            case .dailyFirst, .repetitive:
+            case .dailyFirst:
+                return .dailyFirst
+            case .repetitive:
                 return .regular
             }
         }
@@ -344,7 +347,11 @@ extension Pixel.Event {
     enum DataImportSource: String, CustomStringConvertible {
         var description: String { rawValue }
 
+        case brave = "source-brave"
+        case chrome = "source-chrome"
         case csv = "source-csv"
+        case edge = "source-edge"
+        case firefox = "source-firefox"
     }
 
 }

@@ -23,41 +23,56 @@ final class Fire {
 
     let webCacheManager: WebCacheManager
     let historyCoordinating: HistoryCoordinating
+    let permissionManager: PermissionManagerProtocol
 
     @Published private(set) var isBurning = false
 
     init(cacheManager: WebCacheManager = .shared,
-         historyCoordinating: HistoryCoordinating = HistoryCoordinator.shared) {
+         historyCoordinating: HistoryCoordinating = HistoryCoordinator.shared,
+         permissionManager: PermissionManagerProtocol = PermissionManager.shared) {
         self.webCacheManager = cacheManager
         self.historyCoordinating = historyCoordinating
+        self.permissionManager = permissionManager
     }
 
-    func burnAll(tabCollectionViewModel: TabCollectionViewModel, completion: (() -> Void)? = nil) {
-        isBurning = true
-
-        tabCollectionViewModel.tabCollection.tabs.forEach { $0.stopLoading() }
-
+    private func burnAll(completion: (() -> Void)? = nil) {
         os_log("WebsiteDataStore began cookie deletion", log: .fire)
-        webCacheManager.clear { [weak self] in
+        webCacheManager.clear { [/* hold self while burning */ self] in
             os_log("WebsiteDataStore completed cookie deletion", log: .fire)
 
             os_log("HistoryCoordinating began history deletion", log: .fire)
-            self?.historyCoordinating.burnHistory(except: FireproofDomains.shared)
+            self.historyCoordinating.burnHistory(except: FireproofDomains.shared)
             os_log("HistoryCoordinating completed history deletion", log: .fire)
 
-            self?.isBurning = false
+            os_log("PermissionManager began permissions deletion", log: .fire)
+            self.permissionManager.burnPermissions(except: FireproofDomains.shared)
+            os_log("PermissionManager completed permissions deletion", log: .fire)
+
+            self.isBurning = false
 
             DispatchQueue.main.async {
-                if tabCollectionViewModel.tabCollection.tabs.count > 0 {
-                    tabCollectionViewModel.removeAllTabsAndAppendNewTab()
-                } else {
-                    tabCollectionViewModel.appendNewTab()
-                }
-
-                tabCollectionViewModel.tabCollection.cleanLastRemovedTab()
-
                 completion?()
             }
         }
     }
+
+    func burnAll(tabCollectionViewModel: TabCollectionViewModel?, completion: (() -> Void)? = nil) {
+        isBurning = true
+        
+        tabCollectionViewModel?.tabCollection.tabs.forEach { $0.stopLoading() }
+        burnAll {
+            defer {
+                completion?()
+            }
+            guard let tabCollectionViewModel = tabCollectionViewModel else { return }
+            if tabCollectionViewModel.tabCollection.tabs.count > 0 {
+                tabCollectionViewModel.removeAllTabsAndAppendNewTab()
+            } else {
+                tabCollectionViewModel.appendNewTab()
+            }
+
+            tabCollectionViewModel.tabCollection.cleanLastRemovedTab()
+        }
+    }
+
 }

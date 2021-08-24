@@ -67,6 +67,10 @@ final class WebKitDownloadTask: NSObject, ProgressReporting {
     private var decideDestinationCompletionHandler: ((URL?) -> Void)?
     private var tempURL: URL?
 
+    var originalRequest: URLRequest? {
+        download.originalRequest
+    }
+
     init(download: WebKitDownload, promptForLocation: Bool, postflight: FileDownloadManager.PostflightAction?) {
         self.download = download
         self.progress = Progress(totalUnitCount: -1)
@@ -213,6 +217,21 @@ extension WebKitDownloadTask: WebKitDownloadDelegate {
         delegate?.fileDownloadTaskNeedsDestinationURL(self,
                                                       suggestedFilename: suggestedFilename,
                                                       completionHandler: self.localFileURLCompletionHandler)
+    }
+
+    func download(_ download: WebKitDownload,
+                  willPerformHTTPRedirection response: HTTPURLResponse,
+                  newRequest request: URLRequest,
+                  decisionHandler: @escaping (WebKitDownloadRedirectPolicy) -> Void) {
+        decisionHandler(.allow)
+    }
+
+    func download(_ download: WebKitDownload,
+                  didReceive challenge: URLAuthenticationChallenge,
+                  completionHandler: @escaping (URLSession.AuthChallengeDisposition, URLCredential?) -> Void) {
+        download.webView?.navigationDelegate?.webView?(download.webView!, didReceive: challenge, completionHandler: completionHandler) ?? {
+            completionHandler(.performDefaultHandling, nil)
+        }()
     }
 
     func downloadDidFinish(_ download: WebKitDownload) {

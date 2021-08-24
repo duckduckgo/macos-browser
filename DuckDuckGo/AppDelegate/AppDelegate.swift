@@ -38,7 +38,10 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
 
 #if OUT_OF_APPSTORE
 
+#if !BETA
     let updateController = UpdateController()
+#endif
+
     let crashReporter = CrashReporter()
 
 #endif
@@ -46,6 +49,15 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
     var appUsageActivityMonitor: AppUsageActivityMonitor?
 
     func applicationWillFinishLaunching(_ notification: Notification) {
+#if BETA
+        if NSApp.buildDate < Date.monthAgo {
+            let message = "DuckDuckGo Beta has expired.\nPlease, delete the App and empty the Recycle Bin."
+            NSAlert(error: NSError(domain: "App Expired", code: -1, userInfo: [NSLocalizedDescriptionKey: message]))
+                .runModal()
+            NSApp.terminate(nil)
+        }
+#endif
+
         if !Self.isRunningTests {
             Pixel.setUp()
         }
@@ -97,7 +109,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
     }
 
     func applicationShouldTerminate(_ sender: NSApplication) -> NSApplication.TerminateReply {
-        stateRestorationManager.applicationWillTerminate()
+        stateRestorationManager?.applicationWillTerminate()
 
         return .terminateNow
     }

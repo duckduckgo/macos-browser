@@ -21,7 +21,7 @@ import Combine
 
 extension Tab {
     var stateChanged: AnyPublisher<Void, Never> {
-        $url.asVoid()
+        $content.asVoid()
             .merge(with: $favicon.asVoid())
             .eraseToAnyPublisher()
     }

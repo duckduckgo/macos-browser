@@ -143,6 +143,9 @@ extension FileDownloadManager: WebKitDownloadTaskDelegate {
         }
 
         if case .success(let url) = result {
+            try? url.setQuarantineAttributes(sourceURL: task.originalRequest?.url,
+                                             referrerURL: task.originalRequest?.mainDocumentURL)
+
             switch task.postflight {
             case .open:
                 self.workspace.open(url)

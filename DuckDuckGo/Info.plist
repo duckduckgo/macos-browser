@@ -62,10 +62,18 @@
 		<key>NSAllowsArbitraryLoads</key>
 		<true/>
 	</dict>
+	<key>NSCameraUsageDescription</key>
+	<string>Allows you to upload photographs and videos</string>
 	<key>NSHumanReadableCopyright</key>
 	<string>Copyright © 2021 DuckDuckGo. All rights reserved.</string>
+	<key>NSLocationUsageDescription</key>
+	<string>Allows you to share your geolocation</string>
+	<key>NSLocationWhenInUseUsageDescription</key>
+	<string>Allows you to share your location</string>
 	<key>NSMainStoryboardFile</key>
-	<string>Launch</string>
+	<string>MainMenu</string>
+	<key>NSMicrophoneUsageDescription</key>
+	<string>Allows you to share recordings</string>
 	<key>NSPrincipalClass</key>
 	<string>NSApplication</string>
 	<key>NSSupportsAutomaticTermination</key>

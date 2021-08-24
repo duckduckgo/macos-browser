@@ -62,4 +62,25 @@ final class URLExtensionTests: XCTestCase {
         }
     }
 
+    func test_sanitizedForQuarantine() {
+        let data: [(string: String, expected: String?)] = [
+            ("file:///local/file/name", nil),
+            ("http://example.com", "http://example.com"),
+            ("https://duckduckgo.com", "https://duckduckgo.com"),
+            ("data://asdfgb", nil),
+            ("localhost", "localhost"),
+            ("blob://afasdg", nil),
+            ("http://user:pass@duckduckgo.com", "http://duckduckgo.com"),
+            ("https://user:pass@duckduckgo.com", "https://duckduckgo.com"),
+            ("https://user:pass@releases.usercontent.com/asdfg?arg=AWS4-HMAC&Credential=AKIA",
+             "https://releases.usercontent.com/asdfg?arg=AWS4-HMAC&Credential=AKIA"),
+            ("ftp://user:pass@duckduckgo.com", "ftp://duckduckgo.com")
+        ]
+
+        for (string, expected) in data {
+            let url = URL(string: string)!.sanitizedForQuarantine()
+            XCTAssertEqual(url?.absoluteString, expected, string)
+        }
+    }
+
 }

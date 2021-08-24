@@ -38,20 +38,24 @@ final class FireTests: XCTestCase {
         waitForExpectations(timeout: 5, handler: nil)
 
         XCTAssertEqual(tabCollectionViewModel.tabCollection.tabs.count, 1)
-        XCTAssert(tabCollectionViewModel.tabCollection.tabs.first?.isHomepageShown ?? false)
+        XCTAssertEqual(tabCollectionViewModel.tabCollection.tabs.first?.content, .homepage)
     }
 
     func testWhenBurnAll_ThenAllWebsiteDataAreRemovedAndHistoryIsCleanedAndLastRemovedTabCacheIsNil() {
         let manager = WebCacheManagerMock()
         let historyCoordinator = HistoryCoordinatingMock()
+        let permissionManager = PermissionManagerMock()
 
-        let fire = Fire(cacheManager: manager, historyCoordinating: historyCoordinator)
+        let fire = Fire(cacheManager: manager,
+                        historyCoordinating: historyCoordinator,
+                        permissionManager: permissionManager)
         let tabCollectionViewModel = TabCollectionViewModel.aTabCollectionViewModel
 
         fire.burnAll(tabCollectionViewModel: tabCollectionViewModel)
 
         XCTAssert(manager.removeAllWebsiteDataCalled)
         XCTAssert(historyCoordinator.burnHistoryCalled)
+        XCTAssert(permissionManager.burnPermissionsCalled)
         XCTAssertNil(tabCollectionViewModel.tabCollection.lastRemovedTabCache)
     }
 

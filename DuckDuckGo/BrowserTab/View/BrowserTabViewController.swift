@@ -23,6 +23,7 @@ import Combine
 import SwiftUI
 import BrowserServicesKit
 
+// swiftlint:disable file_length
 final class BrowserTabViewController: NSViewController {
 
     @IBOutlet weak var errorView: NSView!
@@ -68,8 +69,8 @@ final class BrowserTabViewController: NSViewController {
     }
 
     private func subscribeToSelectedTabViewModel() {
-        selectedTabViewModelCancellable = tabCollectionViewModel.$selectedTabViewModel.receive(on: DispatchQueue.main).sink { [weak self] viewModel in
-            self?.updateInterface(url: viewModel?.tab.url)
+        selectedTabViewModelCancellable = tabCollectionViewModel.$selectedTabViewModel.receive(on: DispatchQueue.main).sink { [weak self] _ in
+            self?.updateInterface()
             self?.subscribeToIsErrorViewVisible()
         }
     }
@@ -79,18 +80,9 @@ final class BrowserTabViewController: NSViewController {
     /// 1. No URL is provided, so the webview should be hidden in favor of showing the default UI elements.
     /// 2. A URL is provided for the first time, so the webview should be added as a subview and the URL should be loaded.
     /// 3. A URL is provided after already adding the webview, so the webview should be reloaded.
-    private func updateInterface(url: URL?) {
+    private func updateInterface() {
         changeWebView()
-
-        if tabCollectionViewModel.selectedTabViewModel?.tab.tabType == .preferences {
-            show(tab: .preferences)
-        } else if tabCollectionViewModel.selectedTabViewModel?.tab.tabType == .bookmarks {
-            show(tab: .bookmarks)
-        } else if url != nil && url != URL.emptyPage {
-            show(tab: .standard)
-        } else {
-            showHomepage()
-        }
+        show(tabContent: tabCollectionViewModel.selectedTabViewModel?.tab.content)
     }
 
     private func showHomepage() {
@@ -149,8 +141,11 @@ final class BrowserTabViewController: NSViewController {
 
     func subscribeToUrl(of tabViewModel: TabViewModel) {
          urlCancellable?.cancel()
-         urlCancellable = tabViewModel.tab.$url.receive(on: DispatchQueue.main).sink { [weak self] url in
-            self?.updateInterface(url: url)
+         urlCancellable = tabViewModel.tab.$content
+            .removeDuplicates()
+            .receive(on: DispatchQueue.main)
+            .sink { [weak self] _ in
+                self?.updateInterface()
          }
     }
 
@@ -181,8 +176,11 @@ final class BrowserTabViewController: NSViewController {
         homepageView.isHidden = shown
     }
 
-    private func openNewTab(with url: URL?, parentTab: Tab?, selected: Bool = false) {
-        let tab = Tab(url: url, parentTab: parentTab, shouldLoadInBackground: true)
+    private func openNewTab(with url: URL?, parentTab: Tab?, selected: Bool = false, canBeClosedWithBack: Bool = false) {
+        let tab = Tab(content: url != nil ? .url(url!) : .homepage,
+                      parentTab: parentTab,
+                      shouldLoadInBackground: true,
+                      canBeClosedWithBack: canBeClosedWithBack)
 
         if parentTab != nil {
             tabCollectionViewModel.insertChild(tab: tab, selected: selected)
@@ -195,34 +193,45 @@ final class BrowserTabViewController: NSViewController {
 
     private func show(displayableTabAtIndex index: Int) {
         // The tab switcher only displays displayable tab types.
-        let tabType = Tab.TabType.displayableTabTypes[index]
-        show(tab: tabType)
+        tabCollectionViewModel.selectedTabViewModel?.tab.content = Tab.TabContent.displayableTabTypes[index]
+        updateInterface()
     }
 
-    private func show(tab type: Tab.TabType) {
-        tabCollectionViewModel.selectedTabViewModel?.tab.set(tabType: type)
-
-        self.homepageView.removeFromSuperview()
-        removePreferencesPage()
-        removeBookmarksPage()
-
-        switch type {
+    private func show(tabContent content: Tab.TabContent?) {
+        switch content ?? .homepage {
         case .bookmarks:
+            self.homepageView.removeFromSuperview()
+            removePreferencesPage()
             self.webView?.removeFromSuperview()
             self.addChild(bookmarksViewController)
             view.addAndLayout(bookmarksViewController.view)
-            bookmarksViewController.tabSwitcherButton.select(tabType: .bookmarks)
 
         case .preferences:
+            self.homepageView.removeFromSuperview()
+            removeBookmarksPage()
             self.webView?.removeFromSuperview()
             self.addChild(preferencesViewController)
             view.addAndLayout(preferencesViewController.view)
-            bookmarksViewController.tabSwitcherButton.select(tabType: .preferences)
 
-        case .standard:
+        case .url:
+            self.homepageView.removeFromSuperview()
+            removeBookmarksPage()
+            removePreferencesPage()
             if let webView = self.webView, webView.superview == nil {
                 addWebViewToViewHierarchy(webView)
             }
+
+        case .homepage:
+            removeBookmarksPage()
+            removePreferencesPage()
+            self.webView?.removeFromSuperview()
+            showHomepage()
+
+        case .none:
+            self.homepageView.removeFromSuperview()
+            removeBookmarksPage()
+            removePreferencesPage()
+            self.webView?.removeFromSuperview()
         }
     }
 
@@ -236,6 +245,7 @@ final class BrowserTabViewController: NSViewController {
     }()
 
     private func removePreferencesPage() {
+        guard preferencesViewController.parent != nil else { return }
         preferencesViewController.removeFromParent()
         preferencesViewController.view.removeFromSuperview()
     }
@@ -250,6 +260,7 @@ final class BrowserTabViewController: NSViewController {
     }()
 
     private func removeBookmarksPage() {
+        guard bookmarksViewController.parent != nil else { return }
         bookmarksViewController.removeFromParent()
         bookmarksViewController.view.removeFromSuperview()
     }
@@ -303,6 +314,7 @@ extension BrowserTabViewController: TabDelegate {
         guard let tabViewModel = tabViewModel else { return }
 
         tabViewModel.closeFindInPage()
+        tab.permissions.tabDidStartNavigation()
         if !tabViewModel.isLoading,
            tabViewModel.tab.webView.isLoading {
             tabViewModel.isLoading = true
@@ -310,7 +322,7 @@ extension BrowserTabViewController: TabDelegate {
     }
 
     func tab(_ tab: Tab, requestedNewTab url: URL?, selected: Bool) {
-        openNewTab(with: url, parentTab: tab, selected: selected)
+        openNewTab(with: url, parentTab: tab, selected: selected, canBeClosedWithBack: selected == true)
     }
 
     func closeTab(_ tab: Tab) {
@@ -332,12 +344,49 @@ extension BrowserTabViewController: TabDelegate {
         contextMenuSelectedText = selectedText
     }
 
+    func tab(_ tab: Tab,
+             requestedBasicAuthenticationChallengeWith protectionSpace: URLProtectionSpace,
+             completionHandler: @escaping (URLSession.AuthChallengeDisposition, URLCredential?) -> Void) {
+        guard let window = view.window else {
+            completionHandler(.cancelAuthenticationChallenge, nil)
+            return
+        }
+
+        let alert = AuthenticationAlert(host: protectionSpace.host, isEncrypted: protectionSpace.receivesCredentialSecurely)
+        alert.beginSheetModal(for: window) { response in
+            guard case .OK = response,
+                  !alert.usernameTextField.stringValue.isEmpty,
+                  !alert.passwordTextField.stringValue.isEmpty
+            else {
+                completionHandler(.performDefaultHandling, nil)
+                return
+            }
+            completionHandler(.useCredential, URLCredential(user: alert.usernameTextField.stringValue,
+                                                            password: alert.passwordTextField.stringValue,
+                                                            persistence: .none))
+
+        }
+    }
+
 }
 
 extension BrowserTabViewController: FileDownloadManagerDelegate {
 
     func chooseDestination(suggestedFilename: String?, directoryURL: URL?, fileTypes: [UTType], callback: @escaping (URL?, UTType?) -> Void) {
         dispatchPrecondition(condition: .onQueue(.main))
+
+        var fileTypes = fileTypes
+        if fileTypes.isEmpty || (fileTypes.count == 1 && (fileTypes[0].fileExtension?.isEmpty ?? true)),
+           let fileExt = (suggestedFilename as NSString?)?.pathExtension,
+           let utType = UTType(fileExtension: fileExt) {
+            // When no file extension is set by default generate fileType from file extension
+            fileTypes.insert(utType, at: 0)
+        }
+        // allow user set any file extension
+        if fileTypes.count == 1 && !fileTypes.contains(where: { $0.fileExtension?.isEmpty ?? true }) {
+            fileTypes.append(.data)
+        }
+
         let savePanel = NSSavePanel.withFileTypeChooser(fileTypes: fileTypes, suggestedFilename: suggestedFilename, directoryURL: directoryURL)
 
         func completionHandler(_ result: NSApplication.ModalResponse) {
@@ -463,18 +512,137 @@ extension BrowserTabViewController: MenuItemSelectors {
 
 extension BrowserTabViewController: WKUIDelegate {
 
+    @objc(_webView:saveDataToFile:suggestedFilename:mimeType:originatingURL:)
+    func webView(_ webView: WKWebView, saveDataToFile data: Data, suggestedFilename: String, mimeType: String, originatingURL: URL) {
+        func write(to url: URL) throws {
+            let progress = Progress(totalUnitCount: 1,
+                                    fileOperationKind: .downloading,
+                                    kind: .file,
+                                    isPausable: false,
+                                    isCancellable: false,
+                                    fileURL: url)
+            progress.publish()
+            defer {
+                progress.unpublish()
+            }
+
+            try data.write(to: url)
+            progress.completedUnitCount = progress.totalUnitCount
+        }
+
+        let prefs = DownloadPreferences()
+        if !prefs.alwaysRequestDownloadLocation,
+           let location = prefs.selectedDownloadLocation {
+            let url = location.appendingPathComponent(suggestedFilename)
+            try? write(to: url)
+
+            return
+        }
+
+        chooseDestination(suggestedFilename: suggestedFilename,
+                          directoryURL: prefs.selectedDownloadLocation,
+                          fileTypes: UTType(mimeType: mimeType).map { [$0] } ?? []) { url, _ in
+            guard let url = url else { return }
+            try? write(to: url)
+        }
+    }
+
     func webView(_ webView: WKWebView,
                  createWebViewWith configuration: WKWebViewConfiguration,
                  for navigationAction: WKNavigationAction,
                  windowFeatures: WKWindowFeatures) -> WKWebView? {
 
         // Returned web view must be created with the specified configuration.
-        let tab = Tab(webViewConfiguration: configuration, parentTab: tabViewModel?.tab)
+
+        let tab = Tab(content: .none,
+                      webViewConfiguration: configuration,
+                      parentTab: tabViewModel?.tab,
+                      canBeClosedWithBack: true)
         tabCollectionViewModel.insertChild(tab: tab, selected: true)
         // WebKit loads the request in the returned web view.
         return tab.webView
     }
-    
+
+    @objc(_webView:checkUserMediaPermissionForURL:mainFrameURL:frameIdentifier:decisionHandler:)
+    func webView(_ webView: WKWebView,
+                 checkUserMediaPermissionFor url: URL,
+                 mainFrameURL: URL,
+                 frameIdentifier frame: UInt,
+                 decisionHandler: @escaping (String, Bool) -> Void) {
+        webView.tab?.permissions.checkUserMediaPermission(for: url, mainFrameURL: mainFrameURL, decisionHandler: decisionHandler)
+            ?? /* Tab deallocated: */ {
+                decisionHandler("", false)
+            }()
+    }
+
+    // https://github.com/WebKit/WebKit/blob/995f6b1595611c934e742a4f3a9af2e678bc6b8d/Source/WebKit/UIProcess/API/Cocoa/WKUIDelegate.h#L147
+    @objc(webView:requestMediaCapturePermissionForOrigin:initiatedByFrame:type:decisionHandler:)
+    @available(macOS 12, *)
+    func webView(_ webView: WKWebView,
+                 requestMediaCapturePermissionFor origin: WKSecurityOrigin,
+                 initiatedBy frame: WKFrameInfo,
+                 type: WKMediaCaptureType,
+                 decisionHandler: @escaping (WKPermissionDecision) -> Void) {
+        guard let permissions = [PermissionType](devices: type) else {
+            assertionFailure("Could not decode PermissionType")
+            decisionHandler(.deny)
+            return
+        }
+
+        webView.tab?.permissions.permissions(permissions, requestedForDomain: origin.host) { granted in
+            decisionHandler(granted ? .grant : .deny)
+        } ?? /* Tab deallocated: */ {
+            decisionHandler(.deny)
+        }()
+    }
+
+    // https://github.com/WebKit/WebKit/blob/9d7278159234e0bfa3d27909a19e695928f3b31e/Source/WebKit/UIProcess/API/Cocoa/WKUIDelegatePrivate.h#L126
+    @objc(_webView:requestUserMediaAuthorizationForDevices:url:mainFrameURL:decisionHandler:)
+    func webView(_ webView: WKWebView,
+                 requestUserMediaAuthorizationFor devices: _WKCaptureDevices,
+                 url: URL,
+                 mainFrameURL: URL,
+                 decisionHandler: @escaping (Bool) -> Void) {
+        guard let permissions = [PermissionType](devices: devices) else {
+            assertionFailure("Could not decode PermissionType")
+            decisionHandler(false)
+            return
+        }
+
+        webView.tab?.permissions.permissions(permissions, requestedForDomain: url.host, decisionHandler: decisionHandler)
+            ?? /* Tab deallocated: */ {
+                decisionHandler(false)
+            }()
+    }
+
+    @objc(_webView:mediaCaptureStateDidChange:)
+    func webView(_ webView: WKWebView, mediaCaptureStateDidChange state: _WKMediaCaptureStateDeprecated) {
+        webView.tab?.permissions.mediaCaptureStateDidChange()
+    }
+
+    // https://github.com/WebKit/WebKit/blob/9d7278159234e0bfa3d27909a19e695928f3b31e/Source/WebKit/UIProcess/API/Cocoa/WKUIDelegatePrivate.h#L131
+    @objc(_webView:requestGeolocationPermissionForFrame:decisionHandler:)
+    func webView(_ webView: WKWebView, requestGeolocationPermissionFor frame: WKFrameInfo, decisionHandler: @escaping (Bool) -> Void) {
+        webView.tab?.permissions.permissions([.geolocation], requestedForDomain: frame.request.url?.host, decisionHandler: decisionHandler)
+            ?? /* Tab deallocated: */ {
+                decisionHandler(false)
+            }()
+    }
+
+    // https://github.com/WebKit/WebKit/blob/9d7278159234e0bfa3d27909a19e695928f3b31e/Source/WebKit/UIProcess/API/Cocoa/WKUIDelegatePrivate.h#L132
+    @objc(_webView:requestGeolocationPermissionForOrigin:initiatedByFrame:decisionHandler:)
+    @available(macOS 12, *)
+    func webView(_ webView: WKWebView,
+                 requestGeolocationPermissionFor origin: WKSecurityOrigin,
+                 initiatedBy frame: WKFrameInfo,
+                 decisionHandler: @escaping (WKPermissionDecision) -> Void) {
+        webView.tab?.permissions.permissions([.geolocation], requestedForDomain: frame.request.url?.host) { granted in
+            decisionHandler(granted ? .grant : .deny)
+        } ?? /* Tab deallocated: */ {
+            decisionHandler(.deny)
+        }()
+    }
+
     func webView(_ webView: WKWebView,
                  runOpenPanelWith parameters: WKOpenPanelParameters,
                  initiatedByFrame frame: WKFrameInfo,
@@ -574,3 +742,18 @@ extension BrowserTabViewController: BrowserTabSelectionDelegate {
     }
 
 }
+
+private extension WKWebView {
+
+    var tab: Tab? {
+        guard let navigationDelegate = self.navigationDelegate else { return nil }
+        guard let tab = navigationDelegate as? Tab else {
+            assertionFailure("webView.navigationDelegate is not a Tab")
+            return nil
+        }
+        return tab
+    }
+
+}
+
+// swiftlint:enable file_length

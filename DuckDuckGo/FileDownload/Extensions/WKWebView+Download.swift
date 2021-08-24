@@ -94,13 +94,12 @@ extension WKWebView {
             }
         }
 
-        let progress = Progress(totalUnitCount: 1)
-        progress.fileOperationKind = .downloading
-        progress.kind = .file
-        progress.isPausable = false
-        progress.isCancellable = false
-        progress.fileURL = url
-
+        let progress = Progress(totalUnitCount: 1,
+                                fileOperationKind: .downloading,
+                                kind: .file,
+                                isPausable: false,
+                                isCancellable: false,
+                                fileURL: url)
         progress.publish()
 
         create { (data, error) in

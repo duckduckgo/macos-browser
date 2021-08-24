@@ -26,8 +26,10 @@ extension WKWebViewConfiguration {
         preferences.setValue(true, forKey: "fullScreenEnabled")
         preferences.setValue(true, forKey: "allowsPictureInPictureMediaPlayback")
         preferences.setValue(true, forKey: "developerExtrasEnabled")
+        preferences.setValue(false, forKey: "backspaceKeyNavigationEnabled")
         preferences.javaScriptCanOpenWindowsAutomatically = false
         self.userContentController = UserContentController()
+        self.processPool.geolocationProvider = GeolocationProvider(processPool: self.processPool)
      }
 
 }

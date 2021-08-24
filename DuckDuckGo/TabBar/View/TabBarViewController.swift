@@ -93,18 +93,8 @@ final class TabBarViewController: NSViewController {
         NotificationCenter.default.removeObserver(self)
     }
 
-    @IBAction func burnButtonAction(_ sender: NSButton) {
-        let response = NSAlert.burnButtonAlert.runModal()
-        if response == NSApplication.ModalResponse.alertFirstButtonReturn {
-            Pixel.fire(.burn())
-
-            WindowsManager.closeWindows(except: self.view.window)
-            playFireAnimation()
-        }
-    }
-
     @IBAction func addButtonAction(_ sender: NSButton) {
-        tabCollectionViewModel.appendNewTab()
+        tabCollectionViewModel.appendNewTab(with: .homepage)
     }
 
     @IBAction func rightScrollButtonAction(_ sender: NSButton) {
@@ -607,7 +597,7 @@ extension TabBarViewController: NSCollectionViewDelegate {
 
     func collectionView(_ collectionView: NSCollectionView,
                         pasteboardWriterForItemAt indexPath: IndexPath) -> NSPasteboardWriting? {
-        if let url = tabCollectionViewModel.tabCollection.tabs[indexPath.item].url {
+        if let url = tabCollectionViewModel.tabCollection.tabs[indexPath.item].content.url {
             return url as NSURL
         } else {
             return URL.emptyPage as NSURL
@@ -732,7 +722,7 @@ extension TabBarViewController: TabBarViewItemDelegate {
     func tabBarViewItemBookmarkThisPageAction(_ tabBarViewItem: TabBarViewItem) {
         guard let indexPath = collectionView.indexPath(for: tabBarViewItem),
               let tabViewModel = tabCollectionViewModel.tabViewModel(at: indexPath.item),
-              let url = tabViewModel.tab.url else {
+              let url = tabViewModel.tab.content.url else {
             os_log("TabBarViewController: Failed to get index path of tab bar view item", type: .error)
             return
         }
@@ -752,6 +742,23 @@ extension TabBarViewController: TabBarViewItemDelegate {
         tabCollectionViewModel.remove(at: indexPath.item)
     }
 
+    func tabBarViewItemTogglePermissionAction(_ tabBarViewItem: TabBarViewItem) {
+        guard let indexPath = collectionView.indexPath(for: tabBarViewItem),
+              let permissions = tabCollectionViewModel.tabViewModel(at: indexPath.item)?.tab.permissions
+        else {
+            os_log("TabBarViewController: Failed to get index path of tab bar view item or its permissions", type: .error)
+            return
+        }
+
+        if permissions.permissions.camera.isActive || permissions.permissions.microphone.isActive {
+            permissions.set([.camera, .microphone], muted: true)
+        } else if permissions.permissions.camera.isPaused || permissions.permissions.microphone.isPaused {
+            permissions.set([.camera, .microphone], muted: false)
+        } else {
+            assertionFailure("Unexpected Tab Permissions state")
+        }
+    }
+
     func tabBarViewItemCloseOtherAction(_ tabBarViewItem: TabBarViewItem) {
         guard let indexPath = collectionView.indexPath(for: tabBarViewItem) else {
             os_log("TabBarViewController: Failed to get index path of tab bar view item", type: .error)
@@ -759,6 +766,15 @@ extension TabBarViewController: TabBarViewItemDelegate {
         }
 
         tabCollectionViewModel.removeAllTabs(except: indexPath.item)
+    }
+
+    func tabBarViewItemCloseToTheRightAction(_ tabBarViewItem: TabBarViewItem) {
+        guard let indexPath = collectionView.indexPath(for: tabBarViewItem) else {
+            os_log("TabBarViewController: Failed to get index path of tab bar view item", type: .error)
+            return
+        }
+
+        tabCollectionViewModel.removeTabs(after: indexPath.item)
     }
 
     func tabBarViewItemMoveToNewWindowAction(_ tabBarViewItem: TabBarViewItem) {
@@ -771,21 +787,25 @@ extension TabBarViewController: TabBarViewItemDelegate {
     }
 
     func tabBarViewItemFireproofSite(_ tabBarViewItem: TabBarViewItem) {
-        if let url = tabCollectionViewModel.selectedTabViewModel?.tab.url,
+        if let url = tabCollectionViewModel.selectedTabViewModel?.tab.content.url,
            let host = url.host {
             Pixel.fire(.fireproof(kind: .init(url: url), suggested: .manual))
             FireproofDomains.shared.addToAllowed(domain: host)
         }
-
-        tabBarViewItem.setupMenu()
     }
 
     func tabBarViewItemRemoveFireproofing(_ tabBarViewItem: TabBarViewItem) {
-        if let host = tabCollectionViewModel.selectedTabViewModel?.tab.url?.host {
+        if let host = tabCollectionViewModel.selectedTabViewModel?.tab.content.url?.host {
             FireproofDomains.shared.remove(domain: host)
         }
+    }
 
-        tabBarViewItem.setupMenu()
+    func otherTabBarViewItemsState(for tabBarViewItem: TabBarViewItem) -> (hasItemsToTheLeft: Bool, hasItemsToTheRight: Bool) {
+        guard let indexPath = collectionView.indexPath(for: tabBarViewItem) else {
+            os_log("TabBarViewController: Failed to get index path of tab bar view item", type: .error)
+            return (false, false)
+        }
+        return (hasItemsToTheLeft: indexPath.item > 0, hasItemsToTheRight: indexPath.item + 1 < tabCollectionViewModel.tabCollection.tabs.count)
     }
 
 }
@@ -826,19 +846,5 @@ extension TabBarViewController {
 
 }
 
-fileprivate extension NSAlert {
-
-    static var burnButtonAlert: NSAlert {
-        let alert = NSAlert()
-        alert.messageText = UserText.burnAlertMessageText
-        alert.informativeText = UserText.burtAlertInformativeText
-        alert.alertStyle = .warning
-        alert.icon = NSImage(named: "BurnAlert")
-        alert.addButton(withTitle: UserText.burn)
-        alert.addButton(withTitle: UserText.cancel)
-        return alert
-    }
-
-}
 // swiftlint:enable type_body_length
 // swiftlint:enable file_length
