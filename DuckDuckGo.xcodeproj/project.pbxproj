@@ -7,6 +7,10 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		026ADE1026C2FF97002518EE /* PrivacyConfigurationManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 026ADE0F26C2FF97002518EE /* PrivacyConfigurationManager.swift */; };
+		026ADE1226C2FFFE002518EE /* PrivacyConfiguration.swift in Sources */ = {isa = PBXBuildFile; fileRef = 026ADE1126C2FFFE002518EE /* PrivacyConfiguration.swift */; };
+		026ADE1426C3010C002518EE /* macos-config.json in Resources */ = {isa = PBXBuildFile; fileRef = 026ADE1326C3010C002518EE /* macos-config.json */; };
+		026ADE1626C30FA5002518EE /* PrivacyConfigurationManagerTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 026ADE1526C30FA5002518EE /* PrivacyConfigurationManagerTests.swift */; };
 		142879DA24CE1179005419BB /* SuggestionViewModelTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 142879D924CE1179005419BB /* SuggestionViewModelTests.swift */; };
 		142879DC24CE1185005419BB /* SuggestionContainerViewModelTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 142879DB24CE1185005419BB /* SuggestionContainerViewModelTests.swift */; };
 		1430DFF524D0580F00B8978C /* TabBarViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1430DFF424D0580F00B8978C /* TabBarViewController.swift */; };
@@ -511,6 +515,10 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
+		026ADE0F26C2FF97002518EE /* PrivacyConfigurationManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PrivacyConfigurationManager.swift; sourceTree = "<group>"; };
+		026ADE1126C2FFFE002518EE /* PrivacyConfiguration.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = PrivacyConfiguration.swift; sourceTree = "<group>"; };
+		026ADE1326C3010C002518EE /* macos-config.json */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.json; path = "macos-config.json"; sourceTree = "<group>"; };
+		026ADE1526C30FA5002518EE /* PrivacyConfigurationManagerTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PrivacyConfigurationManagerTests.swift; sourceTree = "<group>"; };
 		142879D924CE1179005419BB /* SuggestionViewModelTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SuggestionViewModelTests.swift; sourceTree = "<group>"; };
 		142879DB24CE1185005419BB /* SuggestionContainerViewModelTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SuggestionContainerViewModelTests.swift; sourceTree = "<group>"; };
 		1430DFF424D0580F00B8978C /* TabBarViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TabBarViewController.swift; sourceTree = "<group>"; };
@@ -1222,10 +1230,13 @@
 				4B6160DC25B152C5007DE5B2 /* ContentBlockerRulesUserScript.swift */,
 				4B6160E425B152FA007DE5B2 /* ContentBlockerUserScript.swift */,
 				4B6160D225B14E6E007DE5B2 /* TrackerRadarManager.swift */,
+				026ADE0F26C2FF97002518EE /* PrivacyConfigurationManager.swift */,
+				026ADE1126C2FFFE002518EE /* PrivacyConfiguration.swift */,
 				4B6160EC25B15417007DE5B2 /* DetectedTracker.swift */,
 				4B6160F125B15792007DE5B2 /* contentblockerrules.js */,
 				4B6160F625B157BB007DE5B2 /* contentblocker.js */,
 				4B6160D725B150E4007DE5B2 /* trackerData.json */,
+				026ADE1326C3010C002518EE /* macos-config.json */,
 				85AC3B0425D6B1D800C7D2AA /* ScriptSourceProviding.swift */,
 			);
 			path = ContentBlocker;
@@ -1416,6 +1427,7 @@
 			children = (
 				4B82E9B825B6A05800656FE7 /* DetectedTrackerTests.swift */,
 				4B82E9C025B6A1CD00656FE7 /* TrackerRadarManagerTests.swift */,
+				026ADE1526C30FA5002518EE /* PrivacyConfigurationManagerTests.swift */,
 			);
 			path = ContentBlocker;
 			sourceTree = "<group>";
@@ -2894,6 +2906,7 @@
 				AA80EC6D256C469C007083E7 /* NavigationBar.storyboard in Resources */,
 				4B0511C6262CAA5A00F6079C /* DefaultBrowserTableCellView.xib in Resources */,
 				4B677433255DBEB800025BD8 /* httpsMobileV2Bloom.bin in Resources */,
+				026ADE1426C3010C002518EE /* macos-config.json in Resources */,
 				4B677432255DBEB800025BD8 /* httpsMobileV2BloomSpec.json in Resources */,
 				AA2CB12D2587BB5600AA6FBE /* TabBarFooter.xib in Resources */,
 				4B6160D825B150E4007DE5B2 /* trackerData.json in Resources */,
@@ -3017,6 +3030,7 @@
 				AAD6D8882696DF6D002393B3 /* CrashReportPromptViewController.swift in Sources */,
 				4B6160FF25B15BB1007DE5B2 /* ContentBlockerRulesManager.swift in Sources */,
 				AA5C8F5E2590EEE800748EB7 /* NSPointExtension.swift in Sources */,
+				026ADE1026C2FF97002518EE /* PrivacyConfigurationManager.swift in Sources */,
 				AA6EF9AD25066F42004754E6 /* WindowsManager.swift in Sources */,
 				B68458CD25C7EB9000DC17B6 /* WKWebViewConfigurationExtensions.swift in Sources */,
 				AAC30A26268DFEE200D2D9CD /* CrashReporter.swift in Sources */,
@@ -3155,6 +3169,7 @@
 				AA6EF9B525081B4C004754E6 /* MainMenuActions.swift in Sources */,
 				B63D466925BEB6C200874977 /* WKWebView+SessionState.swift in Sources */,
 				4B723E1226B0006E00E14D75 /* DataImport.swift in Sources */,
+				026ADE1226C2FFFE002518EE /* PrivacyConfiguration.swift in Sources */,
 				B6A924D92664C72E001A28CA /* WebKitDownloadTask.swift in Sources */,
 				4B59023E26B35F3600489384 /* ChromiumLoginReader.swift in Sources */,
 				85D885B326A5A9DE0077C374 /* NSAlert+PasswordManager.swift in Sources */,
@@ -3326,6 +3341,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				026ADE1626C30FA5002518EE /* PrivacyConfigurationManagerTests.swift in Sources */,
 				B67C6C472654C643006C872E /* FileManagerExtensionTests.swift in Sources */,
 				142879DA24CE1179005419BB /* SuggestionViewModelTests.swift in Sources */,
 				4B9292C12667103100AD2C21 /* BookmarkMigrationTests.swift in Sources */,

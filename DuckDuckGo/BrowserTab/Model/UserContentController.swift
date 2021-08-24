@@ -21,8 +21,12 @@ import Combine
 
 final class UserContentController: WKUserContentController {
     private var blockingRulesUpdatedCancellable: AnyCancellable?
+    
+    let privacyConfiguration: PrivacyConfigurationManagment
 
-    public init(rulesPublisher: AnyPublisher<WKContentRuleList?, Never> = ContentBlockerRulesManager.shared.blockingRules) {
+    public init(rulesPublisher: AnyPublisher<WKContentRuleList?, Never> = ContentBlockerRulesManager.shared.blockingRules,
+                privacyConfiguration: PrivacyConfigurationManagment = PrivacyConfigurationManager.shared) {
+        self.privacyConfiguration = privacyConfiguration
         super.init()
 
         installContentBlockingRules(publisher: rulesPublisher)
@@ -41,7 +45,9 @@ final class UserContentController: WKUserContentController {
             else { return }
 
             self.removeAllContentRuleLists()
-            self.add(rules)
+            if self.privacyConfiguration.isEnabled(featureKey: .contentBlocking) {
+                self.add(rules)
+            }
         }
     }
 

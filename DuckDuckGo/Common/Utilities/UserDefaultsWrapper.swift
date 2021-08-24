@@ -29,7 +29,7 @@ public struct UserDefaultsWrapper<T> {
         case configStorageBloomFilterBinaryEtag = "config.storage.bloomfilter.binary.etag"
         case configStorageBloomFilterExclusionsEtag = "config.storage.bloomfilter.exclusions.etag"
         case configStorageSurrogatesEtag = "config.storage.surrogates.etag"
-        case configStorageTempUnprotectedSitesEtag = "config.storage.temporaryunprotectedsites.etag"
+        case configStoragePrivacyConfigurationEtag = "config.storage.privacyconfiguration.etag"
 
         case fireproofDomains = "com.duckduckgo.fireproofing.allowedDomains"
 
