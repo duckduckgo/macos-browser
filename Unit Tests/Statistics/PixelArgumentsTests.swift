@@ -238,9 +238,9 @@ class PixelArgumentsTests: XCTestCase {
         let rep2 = Pixel.Event.AppLaunch.autoInitialOrRegular(store: pixelDataStore, now: tomorrow2)
         let rep3 = Pixel.Event.AppLaunch.autoInitialOrRegular(store: pixelDataStore, now: afterTomorrow)
 
-        XCTAssertEqual(rep1, .regular)
+        XCTAssertEqual(rep1, .dailyFirst)
         XCTAssertEqual(rep2, .regular)
-        XCTAssertEqual(rep3, .regular)
+        XCTAssertEqual(rep3, .dailyFirst)
     }
 
     // MARK: Others
