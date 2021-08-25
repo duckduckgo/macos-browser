@@ -23,7 +23,8 @@ struct WebKitVersionProvider {
     static func getVersion() -> String? {
         guard let userAgent = WKWebView().value(forKey: "userAgent") as? String,
               let regularExpression = try? NSRegularExpression(pattern: #"AppleWebKit[\/\s]([\d.]+)"#, options: []),
-              let match = regularExpression.firstMatch(in: userAgent, options: [], range: NSRange(location: 0, length: userAgent.utf8.count)) else {
+              let match = regularExpression.firstMatch(in: userAgent, options: [], range: NSRange(location: 0, length: userAgent.utf8.count)),
+              match.numberOfRanges >= 1 else {
             return nil
         }
 
