@@ -298,21 +298,25 @@ private struct DatesView: View {
 
     var body: some View {
         VStack(alignment: .leading, spacing: 4) {
+            Spacer()
+
             HStack {
                 Text(UserText.pmLoginAdded)
                     .bold()
-                    .opacity(0.5)
+                    .opacity(0.6)
                 Text(model.createdDate)
-                    .opacity(0.5)
+                    .opacity(0.6)
             }
 
             HStack {
                 Text(UserText.pmLoginLastUpdated)
                     .bold()
-                    .opacity(0.5)
+                    .opacity(0.6)
                 Text(model.lastUpdatedDate)
-                    .opacity(0.5)
+                    .opacity(0.6)
             }
+
+            Spacer()
         }
     }
 

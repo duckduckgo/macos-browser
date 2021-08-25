@@ -27,14 +27,17 @@ struct PasswordManagementItemListView: View {
     var body: some View {
 
         ScrollView {
-            ForEach(model.displayedAccounts, id: \.id) { account in
-                ItemView(account: account, selected: model.selected?.id == account.id) {
-                    model.selectAccount(account)
+            VStack(alignment: .leading) {
+                Spacer(minLength: 10)
+
+                ForEach(model.displayedAccounts, id: \.id) { account in
+                    ItemView(account: account, selected: model.selected?.id == account.id) {
+                        model.selectAccount(account)
+                    }
+                    .padding(.horizontal, 10)
                 }
-                .padding(0)
             }
         }
-        .padding(10)
 
     }
 
@@ -56,17 +59,17 @@ private struct ItemView: View {
             HStack(spacing: 0) {
 
                 FaviconView(domain: account.domain)
-                    .padding(EdgeInsets(top: 0, leading: 6, bottom: 0, trailing: 0))
+                    .padding(.leading, 6)
 
                 VStack(alignment: .leading, spacing: 4) {
                     Text(displayName)
                         .foregroundColor(textColor)
                         .font(font)
                     Text(account.username)
-                        .foregroundColor(textColor.opacity(0.7))
+                        .foregroundColor(textColor.opacity(0.6))
                         .font(font)
                 }
-                .padding(EdgeInsets(top: 0, leading: 4, bottom: 0, trailing: 0))
+                .padding(.leading, 4)
             }
         })
         .frame(maxHeight: 48)
@@ -88,7 +91,7 @@ private struct CustomButtonStyle: ButtonStyle {
         let fillColor = configuration.isPressed ? Color.accentColor : bgColor
 
         configuration.label
-            .padding(4)
+            .padding(.vertical, 8)
             .frame(maxWidth: .infinity, alignment: .leading)
             .truncationMode(.tail)
             .background(RoundedRectangle(cornerRadius: 3, style: .continuous).fill(fillColor))
