@@ -48,7 +48,8 @@ private struct ItemView: View {
 
     var body: some View {
 
-        let selectedTextColor = Color(NSColor.selectedControlTextColor)
+        let textColor = selected ? Color(NSColor.selectedControlTextColor) : Color(NSColor.controlTextColor)
+        let font = Font.custom("SF Pro Text", size: 13)
         let displayName = ((account.title ?? "").isEmpty == true ? account.domain.dropWWW() : account.title) ?? ""
 
         Button(action: action, label: {
@@ -59,10 +60,11 @@ private struct ItemView: View {
 
                 VStack(alignment: .leading, spacing: 4) {
                     Text(displayName)
-                        .bold()
-                        .foregroundColor(selected ? selectedTextColor : nil)
+                        .foregroundColor(textColor)
+                        .font(font)
                     Text(account.username)
-                        .foregroundColor(selected ? selectedTextColor : nil)
+                        .foregroundColor(textColor.opacity(0.7))
+                        .font(font)
                 }
                 .padding(EdgeInsets(top: 0, leading: 4, bottom: 0, trailing: 0))
             }
