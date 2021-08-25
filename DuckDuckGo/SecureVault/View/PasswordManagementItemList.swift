@@ -25,14 +25,17 @@ struct PasswordManagementItemListView: View {
     @EnvironmentObject var model: PasswordManagementItemListModel
 
     var body: some View {
-        List(model.displayedAccounts, id: \.id) { account in
 
-            ItemView(account: account, selected: model.selected?.id == account.id) {
-                model.selectAccount(account)
+        ScrollView {
+            ForEach(model.displayedAccounts, id: \.id) { account in
+                ItemView(account: account, selected: model.selected?.id == account.id) {
+                    model.selectAccount(account)
+                }
+                .padding(0)
             }
-
         }
-        .listStyle(SidebarListStyle())
+        .padding(10)
+
     }
 
 }
@@ -49,21 +52,26 @@ private struct ItemView: View {
         let displayName = ((account.title ?? "").isEmpty == true ? account.domain.dropWWW() : account.title) ?? ""
 
         Button(action: action, label: {
-            HStack(spacing: 4) {
+            HStack(spacing: 0) {
+
                 FaviconView(domain: account.domain)
+                    .padding(EdgeInsets(top: 0, leading: 6, bottom: 0, trailing: 0))
 
                 VStack(alignment: .leading, spacing: 4) {
-                    Text(displayName).bold()
+                    Text(displayName)
+                        .bold()
                         .foregroundColor(selected ? selectedTextColor : nil)
                     Text(account.username)
                         .foregroundColor(selected ? selectedTextColor : nil)
                 }
+                .padding(EdgeInsets(top: 0, leading: 4, bottom: 0, trailing: 0))
             }
         })
+        .frame(maxHeight: 48)
         .buttonStyle(selected ?
                         CustomButtonStyle(bgColor: Color(NSColor.selectedControlColor)) :
                         // Almost clear, so that whole view is clickable
-                        CustomButtonStyle(bgColor: Color(NSColor.windowBackgroundColor.withAlphaComponent(0.01))))
+                        CustomButtonStyle(bgColor: Color(NSColor.windowBackgroundColor.withAlphaComponent(0.001))))
 
     }
 
@@ -80,6 +88,7 @@ private struct CustomButtonStyle: ButtonStyle {
         configuration.label
             .padding(4)
             .frame(maxWidth: .infinity, alignment: .leading)
+            .truncationMode(.tail)
             .background(RoundedRectangle(cornerRadius: 3, style: .continuous).fill(fillColor))
 
     }
