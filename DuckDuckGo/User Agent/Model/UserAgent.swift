@@ -37,7 +37,7 @@ enum UserAgent {
     }()
 
     static let webKitVersion: String = {
-        guard let version = WebKitVersionReader.getVersion() else {
+        guard let version = WebKitVersionProvider.getVersion() else {
             assertionFailure("Couldn't get version of WebKit")
             return fallbackWebKitVersion
         }

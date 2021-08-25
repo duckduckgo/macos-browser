@@ -1,5 +1,5 @@
 //
-//  WebKitVersionReader.swift
+//  WebKitVersionProvider.swift
 //
 //  Copyright © 2021 DuckDuckGo. All rights reserved.
 //
@@ -18,7 +18,7 @@
 
 import Foundation
 
-struct WebKitVersionReader {
+struct WebKitVersionProvider {
 
     static func getVersion() -> String? {
         guard let userAgent = WKWebView().value(forKey: "userAgent") as? String,
