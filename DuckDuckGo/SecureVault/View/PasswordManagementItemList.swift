@@ -52,7 +52,7 @@ private struct ItemView: View {
     var body: some View {
 
         let textColor = selected ? Color(NSColor.selectedControlTextColor) : Color(NSColor.controlTextColor)
-        let font = Font.custom("SF Pro Text", size: 13)
+        let font = Font.custom("SFProText-Regular", size: 13)
         let displayName = ((account.title ?? "").isEmpty == true ? account.domain.dropWWW() : account.title) ?? ""
 
         Button(action: action, label: {

@@ -189,7 +189,6 @@ final class NavigationBarViewController: NSViewController {
             return
         }
 
-        passwordManagementButton.isHidden = false
         passwordManagementPopover.show(relativeTo: passwordManagementButton.bounds.insetFromLineOfDeath(),
                                 of: passwordManagementButton,
                                 preferredEdge: .minY)
@@ -238,7 +237,6 @@ final class NavigationBarViewController: NSViewController {
         if passwordManagementPopover.viewController.isDirty {
             // Remember to reset this once the controller is not dirty
             passwordManagementButton.image = NSImage(named: "PasswordManagementDirty")
-            passwordManagementButton.isHidden = false
             return
         }
 
@@ -249,12 +247,9 @@ final class NavigationBarViewController: NSViewController {
 
         passwordManagementPopover.viewController.domain = nil
         guard let url = url, let domain = url.host else {
-            passwordManagementButton.isHidden = true
             return
         }
         passwordManagementPopover.viewController.domain = domain
-        let hide = (try? SecureVaultFactory.default.makeVault().accountsFor(domain: domain).isEmpty) ?? false
-        passwordManagementButton.isHidden = hide && !saveCredentialsPopover.isShown && !passwordManagementPopover.isShown
     }
 
     private func subscribeToCredentialsToSave() {

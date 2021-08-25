@@ -77,6 +77,7 @@ struct PasswordManagementItemView: View {
 
             }
             .padding(EdgeInsets(top: 10, leading: 0, bottom: 10, trailing: 10))
+
         }
 
     }
@@ -94,6 +95,7 @@ private struct Buttons: View {
                 Button(UserText.pmDelete) {
                     model.requestDelete()
                 }
+                .buttonStyle(StandardButtonStyle())
             }
 
             Spacer()
@@ -102,31 +104,27 @@ private struct Buttons: View {
                 Button(UserText.pmCancel) {
                     model.cancel()
                 }
-
-                if #available(macOS 11, *) {
-                    Button(UserText.pmSave) {
-                        model.save()
-                    }
-                    .keyboardShortcut(.defaultAction) // macOS 11+
-                    .disabled(!model.isDirty)
-                } else {
-                    Button(UserText.pmSave) {
-                        model.save()
-                    }
-                    .disabled(!model.isDirty)
+                .buttonStyle(StandardButtonStyle())
+                Button(UserText.pmSave) {
+                    model.save()
                 }
+                .disabled(!model.isDirty)
+                .buttonStyle(DefaultActionButtonStyle(enabled: model.isDirty))
 
             } else {
                 Button(UserText.pmDelete) {
                     model.requestDelete()
                 }
+                .buttonStyle(StandardButtonStyle())
 
                 Button(UserText.pmEdit) {
                     model.edit()
                 }
+                .buttonStyle(StandardButtonStyle())
+
             }
 
-        }.padding()
+        }
     }
 
 }
@@ -355,6 +353,46 @@ private struct HeaderView: View {
             }
 
         }
+
+    }
+
+}
+
+private struct StandardButtonStyle: ButtonStyle {
+
+    func makeBody(configuration: Self.Configuration) -> some View {
+
+        let backgroundColor = Color("PWMButtonBackground\(configuration.isPressed ? "-Pressed" : "")")
+        let labelColor = Color("PWMButtonLabel")
+
+        configuration.label
+            .font(.custom("SFProText-Regular", size: 13))
+            .padding(.vertical, 3.5)
+            .padding(.horizontal, 12)
+            .background(backgroundColor)
+            .foregroundColor(labelColor)
+            .cornerRadius(5)
+
+    }
+
+}
+
+private struct DefaultActionButtonStyle: ButtonStyle {
+
+    let enabled: Bool
+
+    func makeBody(configuration: Self.Configuration) -> some View {
+
+        let backgroundColor = configuration.isPressed ? Color(NSColor.controlAccentColor).opacity(0.5) : Color(NSColor.controlAccentColor)
+        let labelColor = enabled ? Color("PWMActionButtonLabel") : Color("PWMActionButtonLabel").opacity(0.5)
+
+        configuration.label
+            .font(.custom("SFProText-Regular", size: 13))
+            .padding(.vertical, 3.5)
+            .padding(.horizontal, 12)
+            .background(backgroundColor)
+            .foregroundColor(labelColor)
+            .cornerRadius(5)
 
     }
 
