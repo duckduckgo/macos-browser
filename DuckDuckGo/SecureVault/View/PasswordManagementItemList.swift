@@ -74,15 +74,15 @@ private struct ItemView: View {
         })
         .frame(maxHeight: 48)
         .buttonStyle(selected ?
-                        CustomButtonStyle(bgColor: Color(NSColor.selectedControlColor)) :
+                        PasswordManagerItemButtonStyle(bgColor: Color(NSColor.selectedControlColor)) :
                         // Almost clear, so that whole view is clickable
-                        CustomButtonStyle(bgColor: Color(NSColor.windowBackgroundColor.withAlphaComponent(0.001))))
+                        PasswordManagerItemButtonStyle(bgColor: Color(NSColor.windowBackgroundColor.withAlphaComponent(0.001))))
 
     }
 
 }
 
-private struct CustomButtonStyle: ButtonStyle {
+private struct PasswordManagerItemButtonStyle: ButtonStyle {
 
     let bgColor: Color
 
