@@ -1556,6 +1556,35 @@
 			path = Model;
 			sourceTree = "<group>";
 		};
+		8585B63526D6E5F600C1416F /* SwiftUI */ = {
+			isa = PBXGroup;
+			children = (
+				85CC1D76269FA1160062F04E /* FaviconView.swift */,
+			);
+			path = SwiftUI;
+			sourceTree = "<group>";
+		};
+		8585B63626D6E61500C1416F /* AppKit */ = {
+			isa = PBXGroup;
+			children = (
+				AA2E423324C8A2270048C0D5 /* ColorView.swift */,
+				14D9B90124F91316000D4D13 /* FocusRingView.swift */,
+				AA86490B24D3494C001BABEE /* GradientView.swift */,
+				AA4E633925E79C0A00134434 /* MouseClickView.swift */,
+				AAA8E8BE24EA8A0A0055E685 /* MouseOverButton.swift */,
+				B641896126BBD0AB001FBC8B /* LongPressButton.swift */,
+				AAA8E8C024EACA700055E685 /* MouseOverView.swift */,
+				4B65028925E6CBF40054432E /* NibLoadable.swift */,
+				B6E61ECF263A6F97004E11AB /* NSSavePanelExtension.swift */,
+				4B0511D7262CAA7000F6079C /* PaddedImageButton.swift */,
+				B6AAAC23260328950029438D /* ProgressView.swift */,
+				B6E61ED4263A6FC4004E11AB /* SavePanelAccessoryView.xib */,
+				B6D7A2ED25D2418B002B2AE1 /* ShadowView.swift */,
+				AA361A3524EBF0B500EEC649 /* WindowDraggingView.swift */,
+			);
+			path = AppKit;
+			sourceTree = "<group>";
+		};
 		85890634267B6CC500D23B0D /* SecureVault */ = {
 			isa = PBXGroup;
 			children = (
@@ -1992,21 +2021,8 @@
 		AA86491424D831C4001BABEE /* View */ = {
 			isa = PBXGroup;
 			children = (
-				AA2E423324C8A2270048C0D5 /* ColorView.swift */,
-				85CC1D76269FA1160062F04E /* FaviconView.swift */,
-				14D9B90124F91316000D4D13 /* FocusRingView.swift */,
-				AA86490B24D3494C001BABEE /* GradientView.swift */,
-				AA4E633925E79C0A00134434 /* MouseClickView.swift */,
-				AAA8E8BE24EA8A0A0055E685 /* MouseOverButton.swift */,
-				B641896126BBD0AB001FBC8B /* LongPressButton.swift */,
-				AAA8E8C024EACA700055E685 /* MouseOverView.swift */,
-				4B65028925E6CBF40054432E /* NibLoadable.swift */,
-				B6E61ECF263A6F97004E11AB /* NSSavePanelExtension.swift */,
-				4B0511D7262CAA7000F6079C /* PaddedImageButton.swift */,
-				B6AAAC23260328950029438D /* ProgressView.swift */,
-				B6E61ED4263A6FC4004E11AB /* SavePanelAccessoryView.xib */,
-				B6D7A2ED25D2418B002B2AE1 /* ShadowView.swift */,
-				AA361A3524EBF0B500EEC649 /* WindowDraggingView.swift */,
+				8585B63626D6E61500C1416F /* AppKit */,
+				8585B63526D6E5F600C1416F /* SwiftUI */,
 			);
 			path = View;
 			sourceTree = "<group>";
