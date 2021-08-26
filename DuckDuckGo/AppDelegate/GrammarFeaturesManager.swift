@@ -91,13 +91,3 @@ final class GrammarFeaturesManager {
     }
 
 }
-
-fileprivate extension WindowControllersManager {
-
-    var firstWebView: WebView? {
-        return mainWindowControllers
-            .compactMap { $0.mainViewController.tabCollectionViewModel.tabCollection.tabs.first?.webView }
-            .first
-    }
-
-}
