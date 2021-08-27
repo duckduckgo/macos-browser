@@ -1,5 +1,5 @@
 //
-//  BundleExtension.swift
+//  File.swift
 //
 //  Copyright © 2021 DuckDuckGo. All rights reserved.
 //
@@ -17,20 +17,15 @@
 //
 
 import Foundation
+import XCTest
+@testable import DuckDuckGo_Privacy_Browser
 
-extension Bundle {
+final class StringExtensionsTests: XCTestCase {
 
-    struct Keys {
-        static let name = kCFBundleNameKey as String
-        static let identifier = kCFBundleIdentifierKey as String
-        static let buildNumber = kCFBundleVersionKey as String
-        static let versionNumber = "CFBundleShortVersionString"
+    // MARK: - General
+
+    func testWhenNsRangeIsCalledWithoutParameter_ThenFullRangeIsReturened() {
+        XCTAssertEqual("".nsRange(), NSRange(location: 0, length: 0))
+        XCTAssertEqual("š".nsRange(), NSRange(location: 0, length: 1))
     }
-
-    var displayName: String {
-        object(forInfoDictionaryKey: "CFBundleDisplayName") as? String ??
-            object(forInfoDictionaryKey: "CFBundleName") as? String
-            ?? "DuckDuckGo"
-    }
-
 }

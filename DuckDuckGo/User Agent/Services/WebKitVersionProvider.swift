@@ -1,5 +1,5 @@
 //
-//  BundleExtension.swift
+//  WebKitVersionProvider.swift
 //
 //  Copyright © 2021 DuckDuckGo. All rights reserved.
 //
@@ -18,19 +18,17 @@
 
 import Foundation
 
-extension Bundle {
+struct WebKitVersionProvider {
 
-    struct Keys {
-        static let name = kCFBundleNameKey as String
-        static let identifier = kCFBundleIdentifierKey as String
-        static let buildNumber = kCFBundleVersionKey as String
-        static let versionNumber = "CFBundleShortVersionString"
-    }
+    static func getVersion() -> String? {
+        guard let userAgent = WKWebView().value(forKey: "userAgent") as? String,
+              let regularExpression = try? NSRegularExpression(pattern: #"AppleWebKit\s*\/\s*([\d.]+)"#, options: []),
+              let match = regularExpression.firstMatch(in: userAgent, options: [], range: userAgent.nsRange()),
+              match.numberOfRanges >= 1 else {
+            return nil
+        }
 
-    var displayName: String {
-        object(forInfoDictionaryKey: "CFBundleDisplayName") as? String ??
-            object(forInfoDictionaryKey: "CFBundleName") as? String
-            ?? "DuckDuckGo"
+        return userAgent[match.range(at: 1)]
     }
 
 }

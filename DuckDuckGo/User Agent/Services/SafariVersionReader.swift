@@ -1,5 +1,5 @@
 //
-//  BundleExtension.swift
+//  SafariVersionReader.swift
 //
 //  Copyright © 2021 DuckDuckGo. All rights reserved.
 //
@@ -18,19 +18,22 @@
 
 import Foundation
 
-extension Bundle {
+#if OUT_OF_APPSTORE
 
-    struct Keys {
-        static let name = kCFBundleNameKey as String
-        static let identifier = kCFBundleIdentifierKey as String
-        static let buildNumber = kCFBundleVersionKey as String
-        static let versionNumber = "CFBundleShortVersionString"
-    }
+struct SafariVersionReader {
 
-    var displayName: String {
-        object(forInfoDictionaryKey: "CFBundleDisplayName") as? String ??
-            object(forInfoDictionaryKey: "CFBundleName") as? String
-            ?? "DuckDuckGo"
+    static let safariPlistPath = "/Applications/Safari.app/Contents/Info.plist"
+
+    static func getVersion() -> String? {
+        guard let plist = NSDictionary(contentsOfFile: Self.safariPlistPath),
+              let versionNumber = plist.object(forKey: Bundle.Keys.versionNumber) as? String else {
+            assertionFailure("Reading the version of Safari failed")
+            return nil
+        }
+
+        return versionNumber
     }
 
 }
+
+#endif
