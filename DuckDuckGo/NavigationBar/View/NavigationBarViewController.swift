@@ -171,28 +171,33 @@ final class NavigationBarViewController: NSViewController {
         }
     }
 
-    func showBookmarkListPopover() {
-        if bookmarkListPopover.isShown {
-            bookmarkListPopover.close()
-            return
+    func closeTransientPopovers() -> Bool {
+        guard !saveCredentialsPopover.isShown else {
+            return false
         }
 
+        if bookmarkListPopover.isShown {
+            bookmarkListPopover.close()
+        }
+
+        if passwordManagementPopover.isShown {
+            passwordManagementPopover.close()
+        }
+
+        return true
+    }
+
+    func showBookmarkListPopover() {
+        guard closeTransientPopovers() else { return }
         bookmarkListPopover.show(relativeTo: bookmarkListButton.bounds.insetFromLineOfDeath(), of: bookmarkListButton, preferredEdge: .maxY)
         Pixel.fire(.bookmarksList(source: .button))
     }
 
     func showPasswordManagementPopover() {
-        guard !saveCredentialsPopover.isShown else { return }
-
-        if passwordManagementPopover.isShown {
-            passwordManagementPopover.close()
-            return
-        }
-
+        guard closeTransientPopovers() else { return }
         passwordManagementPopover.show(relativeTo: passwordManagementButton.bounds.insetFromLineOfDeath(),
                                 of: passwordManagementButton,
                                 preferredEdge: .minY)
-
         Pixel.fire(.manageLogins(source: .button))
     }
 
