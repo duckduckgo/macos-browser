@@ -34,7 +34,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
     private let keyStore = EncryptionKeyStore()
     private var fileStore: FileStore!
     private var stateRestorationManager: AppStateRestorationManager!
-    private var grammarCheckEnabler: GrammarCheckEnabler!
+    private var grammarFeaturesManager = GrammarFeaturesManager()
 
 #if OUT_OF_APPSTORE
 
@@ -92,8 +92,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
             WindowsManager.openNewWindow()
         }
 
-        grammarCheckEnabler = GrammarCheckEnabler(windowControllersManager: WindowControllersManager.shared)
-        grammarCheckEnabler.enableIfNeeded()
+        grammarFeaturesManager.manage()
 
         applyPreferredTheme()
 

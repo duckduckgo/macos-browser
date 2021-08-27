@@ -251,7 +251,7 @@
 		AA4BBA3B25C58FA200C4FB0F /* MainMenu.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA4BBA3A25C58FA200C4FB0F /* MainMenu.swift */; };
 		AA4D700725545EF800C3411E /* UrlEventListener.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA4D700625545EF800C3411E /* UrlEventListener.swift */; };
 		AA4E633A25E79C0A00134434 /* MouseClickView.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA4E633925E79C0A00134434 /* MouseClickView.swift */; };
-		AA4FF40C2624751A004E2377 /* GrammarCheckEnabler.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA4FF40B2624751A004E2377 /* GrammarCheckEnabler.swift */; };
+		AA4FF40C2624751A004E2377 /* GrammarFeaturesManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA4FF40B2624751A004E2377 /* GrammarFeaturesManager.swift */; };
 		AA512D1424D99D9800230283 /* FaviconService.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA512D1324D99D9800230283 /* FaviconService.swift */; };
 		AA585D82248FD31100E9A3E2 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA585D81248FD31100E9A3E2 /* AppDelegate.swift */; };
 		AA585D84248FD31100E9A3E2 /* BrowserTabViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA585D83248FD31100E9A3E2 /* BrowserTabViewController.swift */; };
@@ -760,7 +760,7 @@
 		AA4BBA3A25C58FA200C4FB0F /* MainMenu.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MainMenu.swift; sourceTree = "<group>"; };
 		AA4D700625545EF800C3411E /* UrlEventListener.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UrlEventListener.swift; sourceTree = "<group>"; };
 		AA4E633925E79C0A00134434 /* MouseClickView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MouseClickView.swift; sourceTree = "<group>"; };
-		AA4FF40B2624751A004E2377 /* GrammarCheckEnabler.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GrammarCheckEnabler.swift; sourceTree = "<group>"; };
+		AA4FF40B2624751A004E2377 /* GrammarFeaturesManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GrammarFeaturesManager.swift; sourceTree = "<group>"; };
 		AA512D1324D99D9800230283 /* FaviconService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FaviconService.swift; sourceTree = "<group>"; };
 		AA585D7E248FD31100E9A3E2 /* DuckDuckGo.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = DuckDuckGo.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		AA585D81248FD31100E9A3E2 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
@@ -1701,7 +1701,7 @@
 			children = (
 				AA585D81248FD31100E9A3E2 /* AppDelegate.swift */,
 				AA4D700625545EF800C3411E /* UrlEventListener.swift */,
-				AA4FF40B2624751A004E2377 /* GrammarCheckEnabler.swift */,
+				AA4FF40B2624751A004E2377 /* GrammarFeaturesManager.swift */,
 				AAD86E51267A0DFF005C11BE /* UpdateController.swift */,
 				858A798226A8B75F00A75A42 /* CopyHandler.swift */,
 				B637274226CE25EF00C8CB02 /* NSApplication+BuildTime.h */,
@@ -3116,7 +3116,7 @@
 				AABEE69A24A902A90043105B /* SuggestionContainerViewModel.swift in Sources */,
 				B657841F25FA497600D8DB33 /* NSException+Catch.swift in Sources */,
 				B63ED0E526BB8FB900A9DAD1 /* SharingMenu.swift in Sources */,
-				AA4FF40C2624751A004E2377 /* GrammarCheckEnabler.swift in Sources */,
+				AA4FF40C2624751A004E2377 /* GrammarFeaturesManager.swift in Sources */,
 				B6B3E0E12657EA7A0040E0A2 /* NSScreenExtension.swift in Sources */,
 				AA6820E425502F19005ED0D5 /* WebsiteDataStore.swift in Sources */,
 				B64C852A26942AC90048FEBE /* PermissionContextMenu.swift in Sources */,
