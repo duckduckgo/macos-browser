@@ -99,13 +99,11 @@ final class WebKitDownloadTask: NSObject, ProgressReporting {
 
     private func start() {
         self.progress.fileDownloadingSourceURL = download.originalRequest?.url
-        self.download.getProgress { [weak self] progress in
-            guard let self = self else { return }
-
-            progress?.publisher(for: \.totalUnitCount)
+        if let progress = (self.download as? ProgressReporting)?.progress {
+            progress.publisher(for: \.totalUnitCount)
                 .weakAssign(to: \.totalUnitCount, on: self.progress)
                 .store(in: &self.cancellables)
-            progress?.publisher(for: \.completedUnitCount)
+            progress.publisher(for: \.completedUnitCount)
                 .weakAssign(to: \.completedUnitCount, on: self.progress)
                 .store(in: &self.cancellables)
         }
@@ -212,6 +210,10 @@ extension WebKitDownloadTask: WebKitDownloadDelegate {
             }
             self.fileType = UTType(mimeType: mimeType)
         }
+        if let expectedContentLength = response?.expectedContentLength,
+           self.progress.totalUnitCount <= 0 {
+            self.progress.totalUnitCount = expectedContentLength
+        }
 
         self.decideDestinationCompletionHandler = completionHandler
         delegate?.fileDownloadTaskNeedsDestinationURL(self,
@@ -262,6 +264,10 @@ extension WebKitDownloadTask: WebKitDownloadDelegate {
             self.finish(with: .failure(.failedToCompleteDownloadTask(underlyingError: error,
                                                                      resumeData: resumeData)))
         }
+    }
+
+    func download(_ download: WebKitDownload, didReceiveData length: UInt64) {
+        self.progress.completedUnitCount += Int64(length)
     }
 
 }

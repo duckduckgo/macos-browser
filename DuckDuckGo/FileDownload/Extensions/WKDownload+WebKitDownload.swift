@@ -63,17 +63,6 @@ extension WebKitDownload {
         }
     }
 
-    func getProgress(_ completionHandler: @escaping (Progress?) -> Void) {
-        if let progressReporting = self as? ProgressReporting {
-            completionHandler(progressReporting.progress)
-        } else if let download = self as? _WKDownload {
-            download.getProgress(completionHandler)
-        } else {
-            assertionFailure("Unexpected Download class: \(self)")
-            completionHandler(nil)
-        }
-    }
-
     func cancel() {
         if #available(OSX 11.3, *),
            let download = self as? ObjCWKDownloadProtocol {
