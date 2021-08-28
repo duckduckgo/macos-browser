@@ -23,6 +23,7 @@ import os.log
 @NSApplicationMain
 final class AppDelegate: NSObject, NSApplicationDelegate {
 
+    let downloadsCoordinator = DownloadListCoordinator.shared
     let launchTimingPixel = TimedPixel(.launchTiming)
 
     static var isRunningTests: Bool {

@@ -427,6 +427,8 @@
 		B65783F525F8ACA400D8DB33 /* Punnycode in Frameworks */ = {isa = PBXBuildFile; productRef = B65783F425F8ACA400D8DB33 /* Punnycode */; };
 		B657841A25FA484B00D8DB33 /* NSException+Catch.m in Sources */ = {isa = PBXBuildFile; fileRef = B657841925FA484B00D8DB33 /* NSException+Catch.m */; };
 		B657841F25FA497600D8DB33 /* NSException+Catch.swift in Sources */ = {isa = PBXBuildFile; fileRef = B657841E25FA497600D8DB33 /* NSException+Catch.swift */; };
+		B65E6B9E26D9EC0800095F96 /* CircularProgressView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B65E6B9D26D9EC0800095F96 /* CircularProgressView.swift */; };
+		B65E6BA026D9F10600095F96 /* NSBezierPathExtension.swift in Sources */ = {isa = PBXBuildFile; fileRef = B65E6B9F26D9F10600095F96 /* NSBezierPathExtension.swift */; };
 		B66E9DD22670EB2A00E53BB5 /* _WKDownload+WebKitDownload.swift in Sources */ = {isa = PBXBuildFile; fileRef = B66E9DD12670EB2A00E53BB5 /* _WKDownload+WebKitDownload.swift */; };
 		B66E9DD42670EB4A00E53BB5 /* WKDownload+WebKitDownload.swift in Sources */ = {isa = PBXBuildFile; fileRef = B66E9DD32670EB4A00E53BB5 /* WKDownload+WebKitDownload.swift */; };
 		B67C6C3D2654B897006C872E /* WebViewExtensionTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = B67C6C3C2654B897006C872E /* WebViewExtensionTests.swift */; };
@@ -469,6 +471,12 @@
 		B6AAAC2D260330580029438D /* PublishedAfter.swift in Sources */ = {isa = PBXBuildFile; fileRef = B6AAAC2C260330580029438D /* PublishedAfter.swift */; };
 		B6AAAC3E26048F690029438D /* RandomAccessCollectionExtension.swift in Sources */ = {isa = PBXBuildFile; fileRef = B6AAAC3D26048F690029438D /* RandomAccessCollectionExtension.swift */; };
 		B6AE74342609AFCE005B9B1A /* ProgressEstimationTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = B6AE74332609AFCE005B9B1A /* ProgressEstimationTests.swift */; };
+		B6B1E87B26D381710062C350 /* DownloadListCoordinator.swift in Sources */ = {isa = PBXBuildFile; fileRef = B6B1E87A26D381710062C350 /* DownloadListCoordinator.swift */; };
+		B6B1E87E26D5DA0E0062C350 /* DownloadsPopover.swift in Sources */ = {isa = PBXBuildFile; fileRef = B6B1E87D26D5DA0E0062C350 /* DownloadsPopover.swift */; };
+		B6B1E88026D5DA9B0062C350 /* DownloadsViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = B6B1E87F26D5DA9B0062C350 /* DownloadsViewController.swift */; };
+		B6B1E88226D5DAC30062C350 /* Downloads.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = B6B1E88126D5DAC30062C350 /* Downloads.storyboard */; };
+		B6B1E88426D5EB570062C350 /* DownloadsCellView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B6B1E88326D5EB570062C350 /* DownloadsCellView.swift */; };
+		B6B1E88B26D774090062C350 /* LinkButton.swift in Sources */ = {isa = PBXBuildFile; fileRef = B6B1E88A26D774090062C350 /* LinkButton.swift */; };
 		B6B3E0962654DACD0040E0A2 /* UTTypeTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = B6B3E0952654DACD0040E0A2 /* UTTypeTests.swift */; };
 		B6B3E0E12657EA7A0040E0A2 /* NSScreenExtension.swift in Sources */ = {isa = PBXBuildFile; fileRef = B6B3E0DC2657E9CF0040E0A2 /* NSScreenExtension.swift */; };
 		B6CF78DE267B099C00CD4F13 /* WKNavigationActionExtension.swift in Sources */ = {isa = PBXBuildFile; fileRef = B6CF78DD267B099C00CD4F13 /* WKNavigationActionExtension.swift */; };
@@ -948,6 +956,8 @@
 		B657841825FA484B00D8DB33 /* NSException+Catch.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "NSException+Catch.h"; sourceTree = "<group>"; };
 		B657841925FA484B00D8DB33 /* NSException+Catch.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = "NSException+Catch.m"; sourceTree = "<group>"; };
 		B657841E25FA497600D8DB33 /* NSException+Catch.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "NSException+Catch.swift"; sourceTree = "<group>"; };
+		B65E6B9D26D9EC0800095F96 /* CircularProgressView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CircularProgressView.swift; sourceTree = "<group>"; };
+		B65E6B9F26D9F10600095F96 /* NSBezierPathExtension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NSBezierPathExtension.swift; sourceTree = "<group>"; };
 		B66E9DD12670EB2A00E53BB5 /* _WKDownload+WebKitDownload.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "_WKDownload+WebKitDownload.swift"; sourceTree = "<group>"; };
 		B66E9DD32670EB4A00E53BB5 /* WKDownload+WebKitDownload.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "WKDownload+WebKitDownload.swift"; sourceTree = "<group>"; };
 		B67C6C3C2654B897006C872E /* WebViewExtensionTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WebViewExtensionTests.swift; sourceTree = "<group>"; };
@@ -990,6 +1000,12 @@
 		B6AAAC2C260330580029438D /* PublishedAfter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PublishedAfter.swift; sourceTree = "<group>"; };
 		B6AAAC3D26048F690029438D /* RandomAccessCollectionExtension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RandomAccessCollectionExtension.swift; sourceTree = "<group>"; };
 		B6AE74332609AFCE005B9B1A /* ProgressEstimationTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProgressEstimationTests.swift; sourceTree = "<group>"; };
+		B6B1E87A26D381710062C350 /* DownloadListCoordinator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DownloadListCoordinator.swift; sourceTree = "<group>"; };
+		B6B1E87D26D5DA0E0062C350 /* DownloadsPopover.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DownloadsPopover.swift; sourceTree = "<group>"; };
+		B6B1E87F26D5DA9B0062C350 /* DownloadsViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DownloadsViewController.swift; sourceTree = "<group>"; };
+		B6B1E88126D5DAC30062C350 /* Downloads.storyboard */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; path = Downloads.storyboard; sourceTree = "<group>"; };
+		B6B1E88326D5EB570062C350 /* DownloadsCellView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DownloadsCellView.swift; sourceTree = "<group>"; };
+		B6B1E88A26D774090062C350 /* LinkButton.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LinkButton.swift; sourceTree = "<group>"; };
 		B6B3E0952654DACD0040E0A2 /* UTTypeTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UTTypeTests.swift; sourceTree = "<group>"; };
 		B6B3E0DC2657E9CF0040E0A2 /* NSScreenExtension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NSScreenExtension.swift; sourceTree = "<group>"; };
 		B6CF78DD267B099C00CD4F13 /* WKNavigationActionExtension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WKNavigationActionExtension.swift; sourceTree = "<group>"; };
@@ -1539,6 +1555,7 @@
 		8556A60C256C15C60092FA9D /* FileDownload */ = {
 			isa = PBXGroup;
 			children = (
+				B6B1E87C26D5DA020062C350 /* View */,
 				B61EF3EA266F91D700B4D78F /* Extensions */,
 				8556A615256C15E10092FA9D /* Model */,
 			);
@@ -1549,6 +1566,7 @@
 			isa = PBXGroup;
 			children = (
 				856C98DE257014BD00A22F1F /* FileDownloadManager.swift */,
+				B6B1E87A26D381710062C350 /* DownloadListCoordinator.swift */,
 				B6A924D82664C72D001A28CA /* WebKitDownloadTask.swift */,
 				B6A924DD2664CA08001A28CA /* LegacyWebKitDownloadDelegate.swift */,
 				B6E61EE7263ACE16004E11AB /* UTType.swift */,
@@ -1998,12 +2016,14 @@
 				AA86490B24D3494C001BABEE /* GradientView.swift */,
 				AA4E633925E79C0A00134434 /* MouseClickView.swift */,
 				AAA8E8BE24EA8A0A0055E685 /* MouseOverButton.swift */,
+				B6B1E88A26D774090062C350 /* LinkButton.swift */,
 				B641896126BBD0AB001FBC8B /* LongPressButton.swift */,
 				AAA8E8C024EACA700055E685 /* MouseOverView.swift */,
 				4B65028925E6CBF40054432E /* NibLoadable.swift */,
 				B6E61ECF263A6F97004E11AB /* NSSavePanelExtension.swift */,
 				4B0511D7262CAA7000F6079C /* PaddedImageButton.swift */,
 				B6AAAC23260328950029438D /* ProgressView.swift */,
+				B65E6B9D26D9EC0800095F96 /* CircularProgressView.swift */,
 				B6E61ED4263A6FC4004E11AB /* SavePanelAccessoryView.xib */,
 				B6D7A2ED25D2418B002B2AE1 /* ShadowView.swift */,
 				AA361A3524EBF0B500EEC649 /* WindowDraggingView.swift */,
@@ -2414,6 +2434,7 @@
 				858A798426A8BB5D00A75A42 /* NSTextViewExtension.swift */,
 				4B139AFC26B60BD800894F82 /* NSImageExtensions.swift */,
 				B637273C26CCF0C200C8CB02 /* OptionalExtension.swift */,
+				B65E6B9F26D9F10600095F96 /* NSBezierPathExtension.swift */,
 			);
 			path = Extensions;
 			sourceTree = "<group>";
@@ -2708,6 +2729,17 @@
 			path = Progress;
 			sourceTree = "<group>";
 		};
+		B6B1E87C26D5DA020062C350 /* View */ = {
+			isa = PBXGroup;
+			children = (
+				B6B1E87D26D5DA0E0062C350 /* DownloadsPopover.swift */,
+				B6B1E87F26D5DA9B0062C350 /* DownloadsViewController.swift */,
+				B6B1E88126D5DAC30062C350 /* Downloads.storyboard */,
+				B6B1E88326D5EB570062C350 /* DownloadsCellView.swift */,
+			);
+			path = View;
+			sourceTree = "<group>";
+		};
 		B6DA440F2616C0F200DD1EC2 /* Statistics */ = {
 			isa = PBXGroup;
 			children = (
@@ -2878,6 +2910,7 @@
 				4B0511CE262CAA5A00F6079C /* DownloadPreferencesTableCellView.xib in Resources */,
 				8511E18425F82B34002F516B /* 01_Fire_really_small.json in Resources */,
 				4B0511C3262CAA5A00F6079C /* Preferences.storyboard in Resources */,
+				B6B1E88226D5DAC30062C350 /* Downloads.storyboard in Resources */,
 				85A0117425AF2EDF00FA6A0C /* FindInPage.storyboard in Resources */,
 				AA80EC89256C49B8007083E7 /* Localizable.strings in Resources */,
 				AAE8B102258A41C000E81239 /* Tooltip.storyboard in Resources */,
@@ -3057,6 +3090,7 @@
 				4B723E0B26B0005B00E14D75 /* CSVImportViewController.swift in Sources */,
 				8589063C267BCDC000D23B0D /* SaveCredentialsViewController.swift in Sources */,
 				AABEE6A524AA0A7F0043105B /* SuggestionViewController.swift in Sources */,
+				B6B1E88026D5DA9B0062C350 /* DownloadsViewController.swift in Sources */,
 				85AC3AF725D5DBFD00C7D2AA /* DataExtension.swift in Sources */,
 				B6A924D42664BBBB001A28CA /* WKWebViewDownloadDelegate.swift in Sources */,
 				AA9B7C8526A199B60008D425 /* ServerTrustViewModel.swift in Sources */,
@@ -3082,6 +3116,7 @@
 				B6A9E499261474120067D1B9 /* TimedPixel.swift in Sources */,
 				B6AAAC24260328950029438D /* ProgressView.swift in Sources */,
 				856C98A6256EB59600A22F1F /* MenuItemSelectors.swift in Sources */,
+				B6B1E87E26D5DA0E0062C350 /* DownloadsPopover.swift in Sources */,
 				4B9292A026670D2A00AD2C21 /* SpacerNode.swift in Sources */,
 				B6E61EE8263ACE16004E11AB /* UTType.swift in Sources */,
 				AAFCB37F25E545D400859DD4 /* PublisherExtension.swift in Sources */,
@@ -3101,6 +3136,7 @@
 				4B92928C26670D1700AD2C21 /* OutlineSeparatorViewCell.swift in Sources */,
 				4B0511CD262CAA5A00F6079C /* DefaultBrowserTableCellView.swift in Sources */,
 				858A798526A8BB5D00A75A42 /* NSTextViewExtension.swift in Sources */,
+				B6B1E88426D5EB570062C350 /* DownloadsCellView.swift in Sources */,
 				4B723E0C26B0005D00E14D75 /* CSVImportSummaryViewController.swift in Sources */,
 				B6AAAC2D260330580029438D /* PublishedAfter.swift in Sources */,
 				85C6A29625CC1FFD00EEB5F1 /* UserDefaultsWrapper.swift in Sources */,
@@ -3118,14 +3154,17 @@
 				B63ED0E526BB8FB900A9DAD1 /* SharingMenu.swift in Sources */,
 				AA4FF40C2624751A004E2377 /* GrammarCheckEnabler.swift in Sources */,
 				B6B3E0E12657EA7A0040E0A2 /* NSScreenExtension.swift in Sources */,
+				B65E6BA026D9F10600095F96 /* NSBezierPathExtension.swift in Sources */,
 				AA6820E425502F19005ED0D5 /* WebsiteDataStore.swift in Sources */,
 				B64C852A26942AC90048FEBE /* PermissionContextMenu.swift in Sources */,
 				85D438B6256E7C9E00F3BAF8 /* ContextMenuUserScript.swift in Sources */,
+				B6B1E88B26D774090062C350 /* LinkButton.swift in Sources */,
 				B6DB3CF926A00E2D00D459B7 /* AVCaptureDevice+SwizzledAuthState.swift in Sources */,
 				4BA1A6BD258B082300F6F690 /* EncryptionKeyStore.swift in Sources */,
 				B6F41031264D2B23003DA42C /* ProgressExtension.swift in Sources */,
 				4B723E0F26B0006500E14D75 /* CSVParser.swift in Sources */,
 				B6DA44082616B30600DD1EC2 /* PixelDataModel.xcdatamodeld in Sources */,
+				B6B1E87B26D381710062C350 /* DownloadListCoordinator.swift in Sources */,
 				AAC5E4F125D6BF10007F5990 /* AddressBarButton.swift in Sources */,
 				AAE7527E263B05C600B973F8 /* HistoryEntry.swift in Sources */,
 				AAB8203C26B2DE0D00788AC3 /* SuggestionListCharacteristics.swift in Sources */,
@@ -3291,6 +3330,7 @@
 				85308E25267FC9F2001ABD76 /* NSAlertExtension.swift in Sources */,
 				4B59024826B3673600489384 /* ThirdPartyBrowser.swift in Sources */,
 				4B0511D8262CAA7000F6079C /* PaddedImageButton.swift in Sources */,
+				B65E6B9E26D9EC0800095F96 /* CircularProgressView.swift in Sources */,
 				AABEE69C24A902BB0043105B /* SuggestionContainer.swift in Sources */,
 				4B59024126B35F3600489384 /* BraveDataImporter.swift in Sources */,
 				B6A9E46B2614618A0067D1B9 /* OperatingSystemVersionExtension.swift in Sources */,

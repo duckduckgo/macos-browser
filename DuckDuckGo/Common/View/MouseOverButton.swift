@@ -30,6 +30,23 @@ internal class MouseOverButton: NSButton {
             updateBackgroundColor()
         }
     }
+
+    var normalTintColor: NSColor? {
+        didSet {
+            updateBackgroundColor()
+        }
+    }
+    @IBInspectable var mouseOverTintColor: NSColor? {
+        didSet {
+            updateBackgroundColor()
+        }
+    }
+    @IBInspectable var mouseDownTintColor: NSColor? {
+        didSet {
+            updateBackgroundColor()
+        }
+    }
+
     @IBInspectable var cornerRadius: CGFloat = 0 {
         didSet {
             updateCornerRadius()
@@ -45,6 +62,7 @@ internal class MouseOverButton: NSButton {
     override func awakeFromNib() {
         super.awakeFromNib()
 
+        normalTintColor = self.contentTintColor
         wantsLayer = true
         layerUsesCoreImageFilters = true
         addTrackingArea()
@@ -88,10 +106,13 @@ internal class MouseOverButton: NSButton {
         NSAppearance.withAppAppearance {
             if isMouseDown {
                 layer?.backgroundColor = mouseDownColor?.cgColor ?? NSColor.clear.cgColor
+                self.contentTintColor = self.mouseDownTintColor ?? self.normalTintColor
             } else if isMouseOver {
                 layer?.backgroundColor = mouseOverColor?.cgColor ?? NSColor.clear.cgColor
+                self.contentTintColor = self.mouseOverTintColor ?? self.normalTintColor
             } else {
                 layer?.backgroundColor = NSColor.clear.cgColor
+                self.contentTintColor = self.normalTintColor
             }
         }
     }

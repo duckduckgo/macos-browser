@@ -22,10 +22,14 @@ import Combine
 enum FileDownloadError: Error {
     case cancelled
 
-    case restartResumeNotSupported
-    case failedToCreateTemporaryDir
     case failedToMoveFileToDownloads
     case failedToCompleteDownloadTask(underlyingError: Error, resumeData: Data?)
+
+    var resumeData: Data? {
+        guard case .failedToCompleteDownloadTask(underlyingError: _, resumeData: let data) = self else { return nil }
+        return data
+    }
+
 }
 
 protocol WebKitDownloadTaskDelegate: AnyObject {
@@ -44,10 +48,11 @@ final class WebKitDownloadTask: NSObject, ProgressReporting {
     let shouldPromptForLocation: Bool
     /// Action that should be performed on file after it's downloaded
     var postflight: FileDownloadManager.PostflightAction?
+    @Published private(set) var suggestedFilename: String?
     /// Desired local destination file URL used to display download location
-    @PublishedAfter private(set) var destinationURL: URL?
+    @Published private(set) var destinationURL: URL?
     /// File Type used for File Icon generation
-    @PublishedAfter private(set) var fileType: UTType?
+    @Published private(set) var fileType: UTType?
 
     private lazy var future: Future<URL, FileDownloadError> = {
         dispatchPrecondition(condition: .onQueue(.main))
@@ -69,6 +74,9 @@ final class WebKitDownloadTask: NSObject, ProgressReporting {
 
     var originalRequest: URLRequest? {
         download.originalRequest
+    }
+    var originalWebView: WKWebView? {
+        download.webView
     }
 
     init(download: WebKitDownload, promptForLocation: Bool, postflight: FileDownloadManager.PostflightAction?) {
@@ -175,6 +183,9 @@ final class WebKitDownloadTask: NSObject, ProgressReporting {
         }
 
         if case .success(let url) = result {
+            if self.destinationURL != url {
+                self.destinationURL = url
+            }
             if progress.fileURL != url {
                 progress.fileURL = url
             }
@@ -213,6 +224,7 @@ extension WebKitDownloadTask: WebKitDownloadDelegate {
             self.fileType = UTType(mimeType: mimeType)
         }
 
+        self.suggestedFilename = suggestedFilename
         self.decideDestinationCompletionHandler = completionHandler
         delegate?.fileDownloadTaskNeedsDestinationURL(self,
                                                       suggestedFilename: suggestedFilename,

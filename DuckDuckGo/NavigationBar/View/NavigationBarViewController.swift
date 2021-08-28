@@ -31,6 +31,7 @@ final class NavigationBarViewController: NSViewController {
     @IBOutlet weak var bookmarkListButton: NSButton!
     @IBOutlet weak var shareButton: NSButton!
     @IBOutlet weak var passwordManagementButton: NSButton!
+    @IBOutlet weak var downloadsButton: NSButton!
 
     var addressBarViewController: AddressBarViewController?
 
@@ -44,6 +45,7 @@ final class NavigationBarViewController: NSViewController {
     private lazy var bookmarkListPopover = BookmarkListPopover()
     private lazy var saveCredentialsPopover: SaveCredentialsPopover = SaveCredentialsPopover()
     private lazy var passwordManagementPopover: PasswordManagementPopover = PasswordManagementPopover()
+    private lazy var downloadsPopover: DownloadsPopover = DownloadsPopover()
 
     private var urlCancellable: AnyCancellable?
     private var selectedTabViewModelCancellable: AnyCancellable?
@@ -72,6 +74,7 @@ final class NavigationBarViewController: NSViewController {
         optionsButton.sendAction(on: .leftMouseDown)
         bookmarkListButton.sendAction(on: .leftMouseDown)
         shareButton.sendAction(on: .leftMouseDown)
+        downloadsButton.sendAction(on: .leftMouseDown)
 
 #if !FEEDBACK
 
@@ -158,6 +161,10 @@ final class NavigationBarViewController: NSViewController {
         showPasswordManagementPopover()
     }
 
+    @IBAction func downloadsButtonAction(_ sender: NSButton) {
+        showDownloadsPopover()
+    }
+
     @IBAction func shareButtonAction(_ sender: NSButton) {
         guard let url = tabCollectionViewModel.selectedTabViewModel?.tab.content.url else { return }
         let sharing = NSSharingServicePicker(items: [url])
@@ -195,6 +202,17 @@ final class NavigationBarViewController: NSViewController {
                                 preferredEdge: .minY)
 
         Pixel.fire(.manageLogins(source: .button))
+    }
+
+    func showDownloadsPopover() {
+        if downloadsPopover.isShown {
+            downloadsPopover.close()
+            return
+        }
+
+        downloadsPopover.show(relativeTo: downloadsButton.bounds.insetFromLineOfDeath(), of: downloadsButton, preferredEdge: .minY)
+
+        Pixel.fire(.manageDownloads(source: .button))
     }
 
 #if !FEEDBACK

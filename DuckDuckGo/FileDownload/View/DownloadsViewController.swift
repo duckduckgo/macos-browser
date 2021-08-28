@@ -1,0 +1,206 @@
+//
+//  DownloadsViewController.swift
+//
+//  Copyright © 2021 DuckDuckGo. All rights reserved.
+//
+//  Licensed under the Apache License, Version 2.0 (the "License");
+//  you may not use this file except in compliance with the License.
+//  You may obtain a copy of the License at
+//
+//  http://www.apache.org/licenses/LICENSE-2.0
+//
+//  Unless required by applicable law or agreed to in writing, software
+//  distributed under the License is distributed on an "AS IS" BASIS,
+//  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+//  See the License for the specific language governing permissions and
+//  limitations under the License.
+//
+
+import Cocoa
+import Combine
+
+final class DownloadsViewController: NSViewController {
+
+    static func create() -> Self {
+        let storyboard = NSStoryboard(name: "Downloads", bundle: nil)
+        // swiftlint:disable force_cast
+        let controller = storyboard.instantiateInitialController() as! Self
+        controller.loadView()
+        // swiftlint:enable force_cast
+        return controller
+    }
+
+    @IBOutlet var contextMenu: NSMenu!
+    @IBOutlet var tableView: NSTableView!
+
+    var downloadsViewModel = DownloadListCoordinator.shared
+    var downloadsCancellable: AnyCancellable?
+
+    override func viewWillAppear() {
+        downloadsCancellable = downloadsViewModel.$downloads
+            .scan((old: [DownloadListItem](), new: [DownloadListItem]()), { ($0.new, $1) })
+            .dropFirst()
+            .sink { [weak self] value in
+                guard let self = self else { return }
+                let diff = value.new.difference(from: value.old) { $0.id == $1.id }
+                self.tableView.beginUpdates()
+                for change in diff {
+                    switch change {
+                    case .insert(offset: let offset, element: _, associatedWith: _):
+                        self.tableView.insertRows(at: IndexSet(integer: offset), withAnimation: .slideDown)
+                    case .remove(offset: let offset, element: _, associatedWith: _):
+                        self.tableView.removeRows(at: IndexSet(integer: offset), withAnimation: .slideUp)
+                    }
+                }
+                self.tableView.reloadData(forRowIndexes: IndexSet(integer: value.new.count), columnIndexes: IndexSet(integer: 0))
+                self.tableView.endUpdates()
+        }
+        tableView.reloadData()
+    }
+
+    override func viewWillDisappear() {
+        downloadsCancellable = nil
+    }
+
+    private func index(for sender: Any) -> Int? {
+        let row: Int
+        switch sender {
+        case let button as NSButton:
+            let converted = tableView.convert(button.bounds.origin, from: button)
+            row = tableView.row(at: converted)
+        case is NSMenuItem, is NSMenu:
+            row = tableView.clickedRow
+        default:
+            assertionFailure("Unexpected sender")
+            return nil
+        }
+        guard downloadsViewModel.downloads.indices.contains(row) else { return nil }
+        return row
+    }
+
+    // MARK: User Actions
+
+    @IBAction func openDownloadsFolderAction(_ sender: Any) {
+        guard let url = DownloadPreferences().selectedDownloadLocation
+                ?? FileManager.default.urls(for: .downloadsDirectory, in: .userDomainMask).first
+        else {
+            return
+        }
+        NSWorkspace.shared.selectFile(nil, inFileViewerRootedAtPath: url.path)
+    }
+
+    @IBAction func clearDownloadsAction(_ sender: Any) {
+        downloadsViewModel.cleanupInactiveDownloads()
+    }
+
+    @IBAction func openDownloadedFileAction(_ sender: Any) {
+        guard let index = index(for: sender),
+              let url = downloadsViewModel.downloads[index].localURL
+        else { return }
+        NSWorkspace.shared.open(url)
+    }
+
+    @IBAction func cancelDownloadAction(_ sender: Any) {
+        guard let index = index(for: sender) else { return }
+        downloadsViewModel.cancelDownload(at: index)
+    }
+
+    @IBAction func removeDownloadAction(_ sender: Any) {
+        guard let index = index(for: sender) else { return }
+        downloadsViewModel.removeDownload(at: index)
+    }
+
+    @IBAction func revealDownloadAction(_ sender: Any) {
+        guard let index = index(for: sender),
+              let url = downloadsViewModel.downloads[index].localURL
+        else { return }
+        NSWorkspace.shared.activateFileViewerSelecting([url])
+    }
+
+    @IBAction func restartDownloadAction(_ sender: Any) {
+        guard let index = index(for: sender) else { return }
+        downloadsViewModel.restartDownload(at: index)
+    }
+
+    @IBAction func copyDownloadLink(_ sender: Any) {
+
+    }
+
+}
+
+extension DownloadsViewController: NSMenuDelegate {
+
+    func menuNeedsUpdate(_ menu: NSMenu) {
+        guard let index = index(for: menu) else {
+            menu.cancelTracking()
+            return
+        }
+        let item = downloadsViewModel.downloads[index]
+
+        for menuItem in menu.items {
+            switch menuItem.action {
+            case #selector(openDownloadedFileAction(_:)),
+                 #selector(revealDownloadAction(_:)):
+                if case .complete(.some(let url)) = item.state,
+                   FileManager.default.fileExists(atPath: url.path) {
+                    menuItem.isHidden = false
+                } else {
+                    menuItem.isHidden = true
+                }
+
+            case #selector(copyDownloadLink(_:)):
+                menuItem.isHidden = false
+
+            case #selector(cancelDownloadAction(_:)):
+                menuItem.isHidden = item.state.progress == nil
+
+            case #selector(removeDownloadAction(_:)):
+                menuItem.isHidden = item.state.progress != nil
+
+            case #selector(clearDownloadsAction(_:)):
+                continue
+            default:
+                continue
+            }
+        }
+    }
+
+}
+
+extension DownloadsViewController: NSTableViewDataSource, NSTableViewDelegate {
+
+    func numberOfRows(in tableView: NSTableView) -> Int {
+        return downloadsViewModel.downloads.count + 1
+    }
+
+    func tableView(_ tableView: NSTableView, objectValueFor tableColumn: NSTableColumn?, row: Int) -> Any? {
+        return downloadsViewModel.downloads[safe: row]
+    }
+
+    func tableView(_ tableView: NSTableView, viewFor tableColumn: NSTableColumn?, row: Int) -> NSView? {
+        let identifier: NSUserInterfaceItemIdentifier
+        if downloadsViewModel.downloads.isEmpty {
+            identifier = .noDownloadsCell
+        } else if downloadsViewModel.downloads.indices.contains(row) {
+            identifier = .downloadCell
+        } else {
+            identifier = .openDownloadsCell
+        }
+        let cell = tableView.makeView(withIdentifier: identifier, owner: nil)
+        if identifier == .downloadCell {
+            cell?.menu = contextMenu
+        }
+        return cell
+    }
+
+    func tableView(_ tableView: NSTableView, shouldSelectRow row: Int) -> Bool {
+        return false
+    }
+
+}
+
+private extension NSUserInterfaceItemIdentifier {
+    static let downloadCell = NSUserInterfaceItemIdentifier(rawValue: "cell")
+    static let noDownloadsCell = NSUserInterfaceItemIdentifier(rawValue: "NoDownloads")
+    static let openDownloadsCell = NSUserInterfaceItemIdentifier(rawValue: "OpenDownloads")
+}
