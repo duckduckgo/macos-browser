@@ -66,6 +66,13 @@ final class BrowserTabViewController: NSViewController {
 
         subscribeToSelectedTabViewModel()
         subscribeToIsErrorViewVisible()
+
+        NotificationCenter.default.addObserver(self, selector: #selector(detect2FACode), name: Notification.Name("Add2FA"), object: nil)
+    }
+
+    @objc
+    private func detect2FACode() {
+        TwoFactorCodeDetector.detectTwoFactorCode(in: self.webView!)
     }
 
     private func subscribeToSelectedTabViewModel() {

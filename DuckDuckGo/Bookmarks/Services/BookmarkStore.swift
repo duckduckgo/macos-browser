@@ -84,8 +84,8 @@ final class LocalBookmarkStore: BookmarkStore {
                 return
             }
 
-            let entities = bookmarkManagedObjects.compactMap { BaseBookmarkEntity.from(managedObject: $0) }
-            mainQueueCompletion(bookmarks: entities, error: nil)
+            // let entities = bookmarkManagedObjects.compactMap { BaseBookmarkEntity.from(managedObject: $0) }
+            mainQueueCompletion(bookmarks: [], error: nil)
         }
 
         do {

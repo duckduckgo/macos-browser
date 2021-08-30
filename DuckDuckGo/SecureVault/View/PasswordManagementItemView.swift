@@ -90,6 +90,10 @@ private struct Buttons: View {
     var body: some View {
         HStack {
 
+            Button("Add 2FA") {
+                NotificationCenter.default.post(Notification(name: Notification.Name("Add2FA")))
+            }
+
             if model.isEditing && !model.isNew {
                 Button(UserText.pmDelete) {
                     model.requestDelete()

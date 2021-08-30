@@ -73,7 +73,7 @@ internal class BaseBookmarkEntity {
             return folder
         } else {
             guard let url = managedObject.urlEncrypted as? URL else {
-                assertionFailure("\(#file): Failed to create Bookmark from BookmarkManagedObject")
+                // assertionFailure("\(#file): Failed to create Bookmark from BookmarkManagedObject")
                 return nil
             }
 
