@@ -84,7 +84,7 @@ final class HomepageViewController: NSViewController {
         collectionView.register(nib, forItemWithIdentifier: HomepageCollectionViewItem.identifier)
 
         NotificationCenter.default.addObserver(self,
-                                               selector: #selector(displayDefaultBrowserPromptIfNeeded),
+                                               selector: #selector(displayDefaultBrowserPromptAfterDelayIfNeeded),
                                                name: NSApplication.didBecomeActiveNotification,
                                                object: nil)
 
@@ -114,9 +114,17 @@ final class HomepageViewController: NSViewController {
         self.view.addSubview(defaultBrowserPromptView)
     }
 
-    @objc
     private func displayDefaultBrowserPromptIfNeeded() {
         defaultBrowserPromptView.isHidden = DefaultBrowserPreferences.isDefault || defaultBrowserPromptDismissed
+    }
+
+    @objc
+    private func displayDefaultBrowserPromptAfterDelayIfNeeded() {
+        // The app checks whether it is the default after becoming active, in order to detect changes from the default browser prompt. However, if it
+        // checks for this immediately after returning from the prompt then the default browser has not yet changed, so a small delay has been added.
+        DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
+            self.displayDefaultBrowserPromptIfNeeded()
+        }
     }
 
     private func subscribeToBookmarkList() {
