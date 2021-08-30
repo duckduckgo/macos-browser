@@ -252,11 +252,14 @@ private struct PasswordView: View {
                         Image("Copy")
                     }.buttonStyle(PlainButtonStyle())
                 }
+
+                Spacer()
             }
+            .frame(maxWidth: .infinity)
+            .padding(.bottom, interItemSpacing)
             .onHover {
                 isHovering = $0
             }
-            .padding(.bottom, interItemSpacing)
 
         }
     }
