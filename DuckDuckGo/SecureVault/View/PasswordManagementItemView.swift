@@ -196,71 +196,75 @@ private struct PasswordView: View {
     @State var isPasswordVisible = false
 
     var body: some View {
-        Text(UserText.pmPassword)
-            .bold()
-            .padding(.bottom, itemSpacing)
+        VStack(alignment: .leading, spacing: 0) {
 
-        if model.isEditing || model.isNew {
+            Text(UserText.pmPassword)
+                .bold()
+                .padding(.bottom, itemSpacing)
 
-            HStack {
+            if model.isEditing || model.isNew {
 
-                if isPasswordVisible {
+                HStack {
 
-                    TextField("", text: $model.password)
-                        .textFieldStyle(RoundedBorderTextFieldStyle())
+                    if isPasswordVisible {
 
-                } else {
+                        TextField("", text: $model.password)
+                            .textFieldStyle(RoundedBorderTextFieldStyle())
 
-                    SecureField("", text: $model.password)
-                        .textFieldStyle(RoundedBorderTextFieldStyle())
+                    } else {
 
-                }
+                        SecureField("", text: $model.password)
+                            .textFieldStyle(RoundedBorderTextFieldStyle())
 
-                Button {
-                    isPasswordVisible = !isPasswordVisible
-                } label: {
-                    Image("SecureEyeToggle")
-                }
-                .buttonStyle(PlainButtonStyle())
-                .padding(.trailing, 10)
+                    }
 
-            }
-            .padding(.bottom, interItemSpacing)
-
-        } else {
-
-            HStack(alignment: .center, spacing: 6) {
-
-                if isPasswordVisible {
-                    Text(model.password)
-                } else {
-                    Text(model.password.isEmpty ? "" : "••••••••••••")
-                }
-
-                if isHovering || isPasswordVisible {
                     Button {
                         isPasswordVisible = !isPasswordVisible
                     } label: {
                         Image("SecureEyeToggle")
-                    }.buttonStyle(PlainButtonStyle())
+                    }
+                    .buttonStyle(PlainButtonStyle())
+                    .padding(.trailing, 10)
+
                 }
+                .padding(.bottom, interItemSpacing)
 
-                if isHovering {
-                    Button {
-                        model.copyPassword()
-                    } label: {
-                        Image("Copy")
-                    }.buttonStyle(PlainButtonStyle())
+            } else {
+
+                HStack(alignment: .center, spacing: 6) {
+
+                    if isPasswordVisible {
+                        Text(model.password)
+                    } else {
+                        Text(model.password.isEmpty ? "" : "••••••••••••")
+                    }
+
+                    if isHovering || isPasswordVisible {
+                        Button {
+                            isPasswordVisible = !isPasswordVisible
+                        } label: {
+                            Image("SecureEyeToggle")
+                        }.buttonStyle(PlainButtonStyle())
+                    }
+
+                    if isHovering {
+                        Button {
+                            model.copyPassword()
+                        } label: {
+                            Image("Copy")
+                        }.buttonStyle(PlainButtonStyle())
+                    }
+
+                    Spacer()
                 }
+                .frame(maxWidth: .infinity)
+                .padding(.bottom, interItemSpacing)
 
-                Spacer()
-            }
-            .frame(maxWidth: .infinity)
-            .padding(.bottom, interItemSpacing)
-            .onHover {
-                isHovering = $0
             }
 
+        }
+        .onHover {
+            isHovering = $0
         }
     }
 
