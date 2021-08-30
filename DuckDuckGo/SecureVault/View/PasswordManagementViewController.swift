@@ -166,8 +166,11 @@ final class PasswordManagementViewController: NSViewController {
 
         let view = NSHostingView(rootView: PasswordManagementItemView().environmentObject(itemModel))
         view.frame = itemContainer.bounds
+        view.wantsLayer = true
+        view.layer?.masksToBounds = false
         itemContainer.addSubview(view)
         itemContainer.wantsLayer = true
+        itemContainer.layer?.masksToBounds = false
     }
 
     private func doSaveCredentials(_ credentials: SecureVaultModels.WebsiteCredentials) {
