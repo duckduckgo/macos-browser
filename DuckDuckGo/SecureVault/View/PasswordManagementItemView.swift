@@ -154,36 +154,40 @@ private struct UsernameView: View {
     @State var isHovering = false
 
     var body: some View {
-        Text(UserText.pmUsername)
-            .bold()
-            .padding(.bottom, itemSpacing)
+        VStack(alignment: .leading, spacing: 0) {
 
-        if model.isEditing || model.isNew {
+            Text(UserText.pmUsername)
+                .bold()
+                .padding(.bottom, itemSpacing)
 
-            TextField("", text: $model.username)
-                .textFieldStyle(RoundedBorderTextFieldStyle())
-                .padding(.bottom, interItemSpacing)
+            if model.isEditing || model.isNew {
 
-        } else {
+                TextField("", text: $model.username)
+                    .textFieldStyle(RoundedBorderTextFieldStyle())
+                    .padding(.bottom, interItemSpacing)
 
-            HStack(spacing: 6) {
-                Text(model.username)
+            } else {
 
-                if isHovering {
-                    Button {
-                        model.copyUsername()
-                    } label: {
-                        Image("Copy")
-                    }.buttonStyle(PlainButtonStyle())
+                HStack(spacing: 6) {
+                    Text(model.username)
+
+                    if isHovering {
+                        Button {
+                            model.copyUsername()
+                        } label: {
+                            Image("Copy")
+                        }.buttonStyle(PlainButtonStyle())
+                    }
+
+                    Spacer()
                 }
+                .padding(.bottom, interItemSpacing)
             }
-            .onHover {
-                isHovering = $0
-            }
-            .padding(.bottom, interItemSpacing)
 
         }
-
+        .onHover {
+            isHovering = $0
+        }
     }
 
 }
@@ -257,7 +261,6 @@ private struct PasswordView: View {
 
                     Spacer()
                 }
-                .frame(maxWidth: .infinity)
                 .padding(.bottom, interItemSpacing)
 
             }
