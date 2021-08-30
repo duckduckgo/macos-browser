@@ -1804,7 +1804,6 @@
 				AA4D700525545EDE00C3411E /* AppDelegate */,
 				AAC5E4C025D6A6A9007F5990 /* Bookmarks */,
 				AA86491B24D837DE001BABEE /* BrowserTab */,
-				AA6820E825503A21005ED0D5 /* Burning */,
 				AA86491324D831B9001BABEE /* Common */,
 				85D33F1025C82E93002B91A6 /* Configuration */,
 				4B6160D125B14E5E007DE5B2 /* ContentBlocker */,
@@ -1815,6 +1814,7 @@
 				B65536902684409300085A79 /* Geolocation */,
 				8556A60C256C15C60092FA9D /* FileDownload */,
 				85A0115D25AF1C4700FA6A0C /* FindInPage */,
+				AA6820E825503A21005ED0D5 /* Fire */,
 				4B02197B25E05FAC00ED7DEA /* Fireproofing */,
 				AAE75275263B036300B973F8 /* History */,
 				AAE71DB225F66A0900D74437 /* Homepage */,
@@ -1939,14 +1939,14 @@
 			path = Services;
 			sourceTree = "<group>";
 		};
-		AA6820E825503A21005ED0D5 /* Burning */ = {
+		AA6820E825503A21005ED0D5 /* Fire */ = {
 			isa = PBXGroup;
 			children = (
 				AAFCB38325E546FF00859DD4 /* View */,
 				AA6820EF25503D93005ED0D5 /* ViewModel */,
 				AA6820E925503A49005ED0D5 /* Model */,
 			);
-			path = Burning;
+			path = Fire;
 			sourceTree = "<group>";
 		};
 		AA6820E925503A49005ED0D5 /* Model */ = {
