@@ -40,6 +40,11 @@ protocol TabDelegate: FileDownloadManagerDelegate {
 // swiftlint:disable file_length
 final class Tab: NSObject {
 
+    enum TabType {
+        case `default`
+        case burner
+    }
+
     enum TabContent: Equatable {
         case homepage
         case url(URL)
@@ -78,6 +83,7 @@ final class Tab: NSObject {
     weak var delegate: TabDelegate?
 
     init(content: TabContent,
+         tabType: TabType = .default,
          faviconService: FaviconService = LocalFaviconService.shared,
          webCacheManager: WebCacheManager = .shared,
          webViewConfiguration: WebViewConfiguration? = nil,
@@ -91,6 +97,7 @@ final class Tab: NSObject {
          canBeClosedWithBack: Bool = false) {
 
         self.content = content
+        self.tabType = tabType
         self.faviconService = faviconService
         self.historyCoordinating = historyCoordinating
         self.title = title
@@ -101,7 +108,11 @@ final class Tab: NSObject {
         self.sessionStateData = sessionStateData
 
         let configuration = webViewConfiguration ?? WKWebViewConfiguration()
-        configuration.applyStandardConfiguration()
+        if tabType == .burner {
+            configuration.applyBurnerConfiguration()
+        } else {
+            configuration.applyStandardConfiguration()
+        }
 
         webView = WebView(frame: CGRect.zero, configuration: configuration)
         permissions = PermissionModel(webView: webView)
@@ -141,6 +152,8 @@ final class Tab: NSObject {
             }
         }
     }
+
+    let tabType: TabType
 
     @PublishedAfter var title: String?
     @PublishedAfter var error: Error?
@@ -424,6 +437,8 @@ final class Tab: NSObject {
     private var shouldStoreNextVisit = true
 
     func addVisit(of url: URL) {
+        guard tabType != .burner else { return }
+
         guard shouldStoreNextVisit else {
             shouldStoreNextVisit = true
             return

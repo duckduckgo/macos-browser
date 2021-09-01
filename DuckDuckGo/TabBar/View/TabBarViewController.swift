@@ -38,7 +38,7 @@ final class TabBarViewController: NSViewController {
     @IBOutlet weak var leftScrollButton: MouseOverButton!
     @IBOutlet weak var rightShadowImageView: NSImageView!
     @IBOutlet weak var leftShadowImageView: NSImageView!
-    @IBOutlet weak var plusButton: MouseOverButton!
+    @IBOutlet weak var plusButton: LongPressButton!
     @IBOutlet weak var burnButton: BurnButton!
     @IBOutlet weak var draggingSpace: NSView!
     @IBOutlet weak var windowDraggingViewLeadingConstraint: NSLayoutConstraint!
@@ -70,6 +70,8 @@ final class TabBarViewController: NSViewController {
         subscribeToIsBurning()
 
         warmupFireAnimation()
+
+        plusButton.menu = createNewTabLongPressMenu()
     }
 
     override func viewWillAppear() {
@@ -97,6 +99,10 @@ final class TabBarViewController: NSViewController {
         tabCollectionViewModel.appendNewTab(with: .homepage)
     }
 
+    @IBAction func createBurnerTabAction(_ sender: NSButton) {
+        tabCollectionViewModel.appendNewTab(with: .homepage, tabType: .burner)
+    }
+
     @IBAction func rightScrollButtonAction(_ sender: NSButton) {
         collectionView.scrollToEnd()
     }
@@ -109,6 +115,13 @@ final class TabBarViewController: NSViewController {
         selectionIndexCancellable = tabCollectionViewModel.$selectionIndex.receive(on: DispatchQueue.main).sink { [weak self] _ in
             self?.reloadSelection()
         }
+    }
+
+    private func createNewTabLongPressMenu() -> NSMenu {
+        let menu = NSMenu()
+        menu.addItem(NSMenuItem(title: "New Tab", action: #selector(addButtonAction(_:)), target: self, keyEquivalent: ""))
+        menu.addItem(NSMenuItem(title: "New Burner Tab", action: #selector(createBurnerTabAction(_:)), target: self, keyEquivalent: ""))
+        return menu
     }
 
     private func subscribeToIsBurning() {
@@ -561,6 +574,7 @@ extension TabBarViewController: NSCollectionViewDataSource {
         if let footer = view as? TabBarFooter {
             footer.addButton?.target = self
             footer.addButton?.action = #selector(addButtonAction(_:))
+            footer.addButton?.menu = createNewTabLongPressMenu()
         }
         return view
     }
