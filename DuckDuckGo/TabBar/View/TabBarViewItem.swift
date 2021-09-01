@@ -127,6 +127,8 @@ final class TabBarViewItem: NSCollectionViewItem {
 
     weak var delegate: TabBarViewItemDelegate?
 
+    var isBurnerTab = false
+
     override func viewDidLoad() {
         super.viewDidLoad()
 
@@ -223,11 +225,18 @@ final class TabBarViewItem: NSCollectionViewItem {
         delegate?.tabBarViewItemMoveToNewWindowAction(self)
     }
 
+    @objc func convertToStandardTab(_ sender: NSMenuItem) {
+        delegate?.tabBarViewItemDuplicateAction(self)
+        delegate?.tabBarViewItemCloseAction(self)
+    }
+
     func subscribe(to tabViewModel: TabViewModel) {
         clearSubscriptions()
 
-        closeButton.image = tabViewModel.tab.tabType == .burner ? NSImage(named: "BurnClose") : NSImage(named: "Close")
-        burnIndicator.isHidden = tabViewModel.tab.tabType != .burner
+        isBurnerTab = tabViewModel.tab.tabStorageType == .burner
+
+        closeButton.image = tabViewModel.tab.tabStorageType == .burner ? NSImage(named: "BurnClose") : NSImage(named: "Close")
+        burnIndicator.isHidden = tabViewModel.tab.tabStorageType != .burner
 
         tabViewModel.$title.sink { [weak self] title in
             self?.titleTextField.stringValue = title
@@ -394,6 +403,11 @@ extension TabBarViewItem: NSMenuDelegate {
         let moveToNewWindowMenuItem = NSMenuItem(title: UserText.moveTabToNewWindow, action: #selector(moveToNewWindowAction(_:)), keyEquivalent: "")
         moveToNewWindowMenuItem.target = self
         menu.addItem(moveToNewWindowMenuItem)
+
+        if isBurnerTab {
+            menu.addItem(NSMenuItem(title: "Convert to standard tab", action: #selector(convertToStandardTab(_:)), target: self, keyEquivalent: ""))
+        }
+
     }
 
 }

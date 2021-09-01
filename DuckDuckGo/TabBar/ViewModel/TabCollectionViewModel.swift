@@ -133,8 +133,8 @@ final class TabCollectionViewModel: NSObject {
         }
     }
 
-    func appendNewTab(with content: Tab.TabContent = .homepage, tabType: Tab.TabType = .default) {
-        append(tab: Tab(content: content, tabType: tabType), selected: true)
+    func appendNewTab(with content: Tab.TabContent = .homepage, tabStorageType: Tab.TabStorageType = .default) {
+        append(tab: Tab(content: content, tabStorageType: tabStorageType), selected: true)
     }
 
     func append(tab: Tab, selected: Bool = true) {

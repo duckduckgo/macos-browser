@@ -100,7 +100,7 @@ final class TabBarViewController: NSViewController {
     }
 
     @IBAction func createBurnerTabAction(_ sender: NSButton) {
-        tabCollectionViewModel.appendNewTab(with: .homepage, tabType: .burner)
+        tabCollectionViewModel.appendNewTab(with: .homepage, tabStorageType: .burner)
     }
 
     @IBAction func rightScrollButtonAction(_ sender: NSButton) {
