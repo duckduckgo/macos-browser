@@ -21,6 +21,7 @@ import Cocoa
 @objc protocol LinkMenuItemSelectors {
 
     func openLinkInNewTab(_ sender: NSMenuItem)
+    func openLinkInBurnerTab(_ sender: NSMenuItem)
     func openLinkInNewWindow(_ sender: NSMenuItem)
     func downloadLinkedFileAs(_ sender: NSMenuItem)
     func copyLink(_ sender: NSMenuItem)

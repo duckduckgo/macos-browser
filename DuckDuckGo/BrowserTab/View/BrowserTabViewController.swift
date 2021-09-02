@@ -176,8 +176,9 @@ final class BrowserTabViewController: NSViewController {
         homepageView.isHidden = shown
     }
 
-    private func openNewTab(with url: URL?, parentTab: Tab?, selected: Bool = false, canBeClosedWithBack: Bool = false) {
+    private func openNewTab(with url: URL?, parentTab: Tab?, selected: Bool = false, canBeClosedWithBack: Bool = false, isBurner: Bool = false) {
         let tab = Tab(content: url != nil ? .url(url!) : .homepage,
+                      tabStorageType: isBurner ? .burner : .default,
                       parentTab: parentTab,
                       shouldLoadInBackground: true,
                       canBeClosedWithBack: canBeClosedWithBack)
@@ -447,6 +448,11 @@ extension BrowserTabViewController: LinkMenuItemSelectors {
     func openLinkInNewTab(_ sender: NSMenuItem) {
         guard let url = contextMenuLink else { return }
         openNewTab(with: url, parentTab: tabViewModel?.tab)
+    }
+
+    func openLinkInBurnerTab(_ sender: NSMenuItem) {
+        guard let url = contextMenuLink else { return }
+        openNewTab(with: url, parentTab: tabViewModel?.tab, isBurner: true)
     }
 
     func openLinkInNewWindow(_ sender: NSMenuItem) {
