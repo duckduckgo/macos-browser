@@ -27,6 +27,7 @@ extension UserText {
     static let pmLoginTitle = NSLocalizedString("pm.login.title", value: "Login Title", comment: "Label for login title edit field")
     static let pmUsername = NSLocalizedString("pm.username", value: "Username", comment: "Label for username edit field")
     static let pmPassword = NSLocalizedString("pm.password", value: "Password", comment: "Label for password edit field")
+    static let pmOneTimePassword = NSLocalizedString("pm.one-time-password", value: "One-Time Password", comment: "Label for one time password field")
     static let pmWebsite = NSLocalizedString("pm.website", value: "Website", comment: "Label for website edit field")
     static let pmLoginAdded = NSLocalizedString("pm.added", value: "Added", comment: "Label for login added data")
     static let pmLoginLastUpdated = NSLocalizedString("pm.last.updated", value: "Last Updated", comment: "Label for last updated edit field")

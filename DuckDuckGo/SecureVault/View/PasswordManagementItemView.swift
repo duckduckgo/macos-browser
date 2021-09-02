@@ -57,9 +57,28 @@ struct PasswordManagementItemView: View {
                         LoginTitleView()
                     }
 
+                    if model.twoFactorSecret == nil {
+                        Button(action: {
+                            model.presentTwoFactorSecretWindow()
+                        }) {
+                            Text("Configure Two-Factor Authentication")
+                                .font(.system(size: 14, weight: .semibold, design: .rounded))
+                                .padding([.top, .bottom], 10)
+                        }
+                        .frame(maxWidth: .infinity)
+                        .buttonStyle(PlainButtonStyle())
+                        .background(Color.accentColor)
+                        .cornerRadius(6)
+                        .padding([.bottom], 25)
+                    }
+
                     UsernameView()
 
                     PasswordView()
+
+                    if model.twoFactorSecret != nil {
+                        OneTimePasswordView()
+                    }
 
                     WebsiteView()
 
@@ -74,6 +93,13 @@ struct PasswordManagementItemView: View {
                 }
                 .frame(maxWidth: .infinity, maxHeight: .infinity)
                 .padding()
+                .onReceive(NotificationCenter.default.publisher(for: Notification.Name("Got2FA"))) { notification in
+                    guard let secret = notification.userInfo?["secret"] as? String else {
+                        return
+                    }
+
+                    model.save(twoFactorSecret: secret)
+                }
 
             }
             .padding(EdgeInsets(top: 10, leading: 0, bottom: 10, trailing: 10))
@@ -90,10 +116,6 @@ private struct Buttons: View {
     var body: some View {
         HStack {
 
-            Button("Add 2FA") {
-                NotificationCenter.default.post(Notification(name: Notification.Name("Add2FA")))
-            }
-
             if model.isEditing && !model.isNew {
                 Button(UserText.pmDelete) {
                     model.requestDelete()
@@ -103,6 +125,10 @@ private struct Buttons: View {
             Spacer()
 
             if model.isEditing || model.isNew {
+                Button("Remove 2FA") {
+                    model.requestTwoFactorSecretDeletion()
+                }
+
                 Button(UserText.pmCancel) {
                     model.cancel()
                 }
@@ -265,6 +291,85 @@ private struct PasswordView: View {
             .padding(.bottom, interItemSpacing)
 
         }
+    }
+
+}
+
+struct CircularProgressView: View {
+    @Binding var progress: Float
+
+    var body: some View {
+        ZStack {
+            Circle()
+                .stroke(lineWidth: 4.0)
+                .opacity(0.3)
+                .foregroundColor((1.0 - self.progress) > 0.3 ? Color.green : Color.red)
+
+            Circle()
+                .trim(from: 0.0, to: CGFloat(min(1.0 - self.progress, 1.0)))
+                .stroke(style: StrokeStyle(lineWidth: 4.0, lineCap: .round, lineJoin: .round))
+                .foregroundColor((1.0 - self.progress) > 0.3 ? Color.green : Color.red)
+                .rotationEffect(Angle(degrees: 270.0))
+                .animation(.linear)
+        }
+    }
+}
+
+private struct OneTimePasswordView: View {
+
+    @EnvironmentObject var model: PasswordManagementItemModel
+
+    @State var progressValue: Float = 0.5
+    @State var secondsRemaining: TimeInterval = OneTimePasswordTimer.shared.remainder
+    @State var isHovering = false
+
+    private let formatter: DateComponentsFormatter = {
+        let f = DateComponentsFormatter()
+        f.allowedUnits = [.second]
+        return f
+    }()
+
+    var body: some View {
+        Text(UserText.pmOneTimePassword)
+            .bold()
+            .padding(.bottom, itemSpacing)
+
+        HStack(spacing: 6) {
+            HStack {
+                CircularProgressView(progress: $progressValue)
+                    .frame(width: 15, height: 15, alignment: .leading)
+
+                Text(formatter.string(from: secondsRemaining)!).font(.system(.body, design: .monospaced))
+                    .fixedSize(horizontal: true, vertical: true)
+            }
+            .padding(6)
+            .background(Color.black.opacity(0.15))
+            .cornerRadius(16.0)
+
+            Text(TwoFactorCodeDetector.calculateSixDigitCode(secret: model.twoFactorSecret, date: Date())).font(.system(.body, design: .monospaced))
+
+            if isHovering {
+                Button {
+                    // TODO: Copy OTP
+                } label: {
+                    Image("Copy")
+                }.buttonStyle(PlainButtonStyle())
+            }
+        }
+        .onHover {
+            isHovering = $0
+        }
+        .onReceive(NotificationCenter.default.publisher(for: OneTimePasswordTimer.timerProgressedNotification)) { notification in
+            guard let remaining = notification.userInfo?[OneTimePasswordTimer.userInfoTimeRemainingKey] as? TimeInterval,
+                  let percentComplete = notification.userInfo?[OneTimePasswordTimer.userInfoProgressKey] as? Float else {
+                return
+            }
+
+            self.secondsRemaining = remaining
+            self.progressValue = percentComplete
+        }
+        .padding(.bottom, interItemSpacing)
+
     }
 
 }

@@ -188,6 +188,7 @@
 		4BB88B5B25B7BA50006F6B06 /* Instruments.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4BB88B5A25B7BA50006F6B06 /* Instruments.swift */; };
 		4BC6D94C26DD7A4E00FB6E8A /* TwoFactorCodeDetector.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4BC6D94B26DD7A4E00FB6E8A /* TwoFactorCodeDetector.swift */; };
 		4BC6D94F26DD89C300FB6E8A /* SwiftOTP in Frameworks */ = {isa = PBXBuildFile; productRef = 4BC6D94E26DD89C300FB6E8A /* SwiftOTP */; };
+		4BCB930C26E0289D00AF48D0 /* OneTimePasswordTimer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4BCB930B26E0289D00AF48D0 /* OneTimePasswordTimer.swift */; };
 		4BE0DF06267819A1006337B7 /* NSStoryboardExtension.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4BE0DF0426781961006337B7 /* NSStoryboardExtension.swift */; };
 		4BF4951826C08395000547B8 /* ThirdPartyBrowserTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4BF4951726C08395000547B8 /* ThirdPartyBrowserTests.swift */; };
 		8511E18425F82B34002F516B /* 01_Fire_really_small.json in Resources */ = {isa = PBXBuildFile; fileRef = 8511E18325F82B34002F516B /* 01_Fire_really_small.json */; };
@@ -571,6 +572,7 @@
 		4B0511E6262CAB3700F6079C /* UserDefaultsWrapperUtilities.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UserDefaultsWrapperUtilities.swift; sourceTree = "<group>"; };
 		4B0511EF262CAEC900F6079C /* AppearancePreferencesTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppearancePreferencesTests.swift; sourceTree = "<group>"; };
 		4B0511F7262CB20F00F6079C /* DownloadPreferencesTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DownloadPreferencesTests.swift; sourceTree = "<group>"; };
+		4B0F2CC026DF1A130047BE11 /* BrowserServicesKit */ = {isa = PBXFileReference; lastKnownFileType = folder; name = BrowserServicesKit; path = ../BrowserServicesKit; sourceTree = "<group>"; };
 		4B11060425903E570039B979 /* CoreDataEncryptionTesting.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = CoreDataEncryptionTesting.xcdatamodel; sourceTree = "<group>"; };
 		4B11060925903EAC0039B979 /* CoreDataEncryptionTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CoreDataEncryptionTests.swift; sourceTree = "<group>"; };
 		4B139AFC26B60BD800894F82 /* NSImageExtensions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NSImageExtensions.swift; sourceTree = "<group>"; };
@@ -706,6 +708,7 @@
 		4BB88B4F25B7BA2B006F6B06 /* TabInstrumentation.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TabInstrumentation.swift; sourceTree = "<group>"; };
 		4BB88B5A25B7BA50006F6B06 /* Instruments.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Instruments.swift; sourceTree = "<group>"; };
 		4BC6D94B26DD7A4E00FB6E8A /* TwoFactorCodeDetector.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TwoFactorCodeDetector.swift; sourceTree = "<group>"; };
+		4BCB930B26E0289D00AF48D0 /* OneTimePasswordTimer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OneTimePasswordTimer.swift; sourceTree = "<group>"; };
 		4BE0DF0426781961006337B7 /* NSStoryboardExtension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NSStoryboardExtension.swift; sourceTree = "<group>"; };
 		4BF4951726C08395000547B8 /* ThirdPartyBrowserTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ThirdPartyBrowserTests.swift; sourceTree = "<group>"; };
 		8511E18325F82B34002F516B /* 01_Fire_really_small.json */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.json; path = 01_Fire_really_small.json; sourceTree = "<group>"; };
@@ -1664,6 +1667,7 @@
 			children = (
 				85308E26267FCB22001ABD76 /* PasswordManagerSettings.swift */,
 				4BC6D94B26DD7A4E00FB6E8A /* TwoFactorCodeDetector.swift */,
+				4BCB930B26E0289D00AF48D0 /* OneTimePasswordTimer.swift */,
 			);
 			path = Services;
 			sourceTree = "<group>";
@@ -1783,6 +1787,7 @@
 			isa = PBXGroup;
 			children = (
 				AA68C3D62490F821001B8783 /* README.md */,
+				4B0F2CC026DF1A130047BE11 /* BrowserServicesKit */,
 				AA585D80248FD31100E9A3E2 /* DuckDuckGo */,
 				AA585D93248FD31400E9A3E2 /* Unit Tests */,
 				4B1AD89E25FC27E200261379 /* Integration Tests */,
@@ -3396,6 +3401,7 @@
 				AA8EDF2424923E980071C2E8 /* URLExtension.swift in Sources */,
 				4B67744B255DBF3A00025BD8 /* BloomFilter.cpp in Sources */,
 				4BE0DF06267819A1006337B7 /* NSStoryboardExtension.swift in Sources */,
+				4BCB930C26E0289D00AF48D0 /* OneTimePasswordTimer.swift in Sources */,
 				4B02198A25E05FAC00ED7DEA /* FireproofDomains.swift in Sources */,
 				4B677442255DBEEA00025BD8 /* Database.swift in Sources */,
 				4B92928B26670D1700AD2C21 /* BookmarksOutlineView.swift in Sources */,

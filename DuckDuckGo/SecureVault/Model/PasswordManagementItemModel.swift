@@ -65,6 +65,8 @@ final class PasswordManagementItemModel: ObservableObject {
     @Published var isEditing = false
     @Published var isNew = false
 
+    @Published var twoFactorSecret: String?
+
     var isDirty = false {
         didSet {
             self.onDirtyChanged(isDirty)
@@ -101,6 +103,22 @@ final class PasswordManagementItemModel: ObservableObject {
     func copyUsername() {
         NSPasteboard.general.clearContents()
         NSPasteboard.general.setString(username, forType: .string)
+    }
+
+    func presentTwoFactorSecretWindow() {
+        NotificationCenter.default.post(name: Notification.Name("Check2FA"), object: nil)
+    }
+
+    func save(twoFactorSecret: String) {
+        guard var credentials = credentials else { return }
+        credentials.account.twoFactorSecret = twoFactorSecret
+        onSaveRequested(credentials)
+    }
+
+    func requestTwoFactorSecretDeletion() {
+        guard var credentials = credentials else { return }
+        credentials.account.twoFactorSecret = nil
+        onSaveRequested(credentials)
     }
 
     func save() {
@@ -142,6 +160,7 @@ final class PasswordManagementItemModel: ObservableObject {
         username = credentials?.account.username ?? ""
         password = String(data: credentials?.password ?? Data(), encoding: .utf8) ?? ""
         domain = normalizedDomain(credentials?.account.domain ?? "")
+        twoFactorSecret = credentials?.account.twoFactorSecret
         isDirty = false
         isNew = credentials?.account.id == nil
 

@@ -100,6 +100,8 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
 
         appUsageActivityMonitor = AppUsageActivityMonitor(delegate: self)
 
+        OneTimePasswordTimer.shared.beginTimer()
+
 #if OUT_OF_APPSTORE
 
         crashReporter.checkForNewReports()

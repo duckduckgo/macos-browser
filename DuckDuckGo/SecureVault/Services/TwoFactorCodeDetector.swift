@@ -23,8 +23,8 @@ import SwiftOTP
 
 final class TwoFactorCodeDetector {
 
-    static func detectTwoFactorCode(in webView: WKWebView) {
-        let snapshot = webView.takeSnapshot(with: nil) { image, error in
+    static func detectTwoFactorCode(in webView: WKWebView, completion: @escaping (URL?) -> Void) {
+        webView.takeSnapshot(with: nil) { image, error in
             guard let imageData = image?.tiffRepresentation, let bitmap = NSBitmapImageRep(data: imageData) else {
                 print("Failed to get webview snapshot")
                 return
@@ -48,6 +48,8 @@ final class TwoFactorCodeDetector {
             let features = qrDetector?.features(in: image, options: options)
             let qrCodeFeature = features?.first as? CIQRCodeFeature
             if let messageURLString = qrCodeFeature?.messageString, let messageURL = URL(string: messageURLString) {
+                completion(messageURL)
+
                 let components = URLComponents(url: messageURL, resolvingAgainstBaseURL: false)
                 let secretQueryItem = components?.queryItems?.first { $0.name == "secret" }
                 let secret = secretQueryItem!.value!
@@ -56,9 +58,25 @@ final class TwoFactorCodeDetector {
                 let totp = TOTP(secret: base32Decoded, digits: 6, timeInterval: 30, algorithm: .sha1)!
                 let otpString = totp.generate(time: Date())
 
-                print(otpString)
+                print(otpString!)
+            } else {
+                completion(nil)
             }
         }
+    }
+
+    static func calculateSixDigitCode(secret: String?, date: Date = Date()) -> String {
+        guard let secret = secret, let secretURL = URL(string: secret) else {
+            return ""
+        }
+
+        let components = URLComponents(url: secretURL, resolvingAgainstBaseURL: false)
+        let secretQueryItem = components?.queryItems?.first { $0.name == "secret" }
+        let secretValue = secretQueryItem!.value!
+        let base32Decoded = base32DecodeToData(secretValue)!
+
+        let totp = TOTP(secret: base32Decoded, digits: 6, timeInterval: 30, algorithm: .sha1)!
+        return totp.generate(time: date)!
     }
 
 }
