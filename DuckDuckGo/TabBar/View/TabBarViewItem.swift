@@ -33,8 +33,11 @@ protocol TabBarViewItemDelegate: AnyObject {
     func tabBarViewItemMoveToNewWindowAction(_ tabBarViewItem: TabBarViewItem)
     func tabBarViewItemFireproofSite(_ tabBarViewItem: TabBarViewItem)
     func tabBarViewItemRemoveFireproofing(_ tabBarViewItem: TabBarViewItem)
+    func tabBarViewItemCloseBurnerTabs(_ tabBarViewItem: TabBarViewItem)
 
-    func otherTabBarViewItemsState(for tabBarViewItem: TabBarViewItem) -> (hasItemsToTheLeft: Bool, hasItemsToTheRight: Bool)
+    func otherTabBarViewItemsState(for tabBarViewItem: TabBarViewItem) -> (hasItemsToTheLeft: Bool,
+                                                                           hasItemsToTheRight: Bool,
+                                                                           hasBurnerTabs: Bool)
 
 }
 
@@ -230,6 +233,10 @@ final class TabBarViewItem: NSCollectionViewItem {
         delegate?.tabBarViewItemCloseAction(self)
     }
 
+    @objc func closeBurnerTabs(_ sender: NSMenuItem) {
+        delegate?.tabBarViewItemCloseBurnerTabs(self)
+    }
+
     func subscribe(to tabViewModel: TabViewModel) {
         clearSubscriptions()
 
@@ -384,7 +391,9 @@ extension TabBarViewItem: NSMenuDelegate {
         closeMenuItem.target = self
         menu.addItem(closeMenuItem)
 
-        let otherItemsState = delegate?.otherTabBarViewItemsState(for: self) ?? (hasItemsToTheLeft: true, hasItemsToTheRight: true)
+        let otherItemsState = delegate?.otherTabBarViewItemsState(for: self) ?? (hasItemsToTheLeft: true,
+                                                                                 hasItemsToTheRight: true,
+                                                                                 hasBurnerTabs: false)
 
         if otherItemsState.hasItemsToTheLeft || otherItemsState.hasItemsToTheRight {
             let closeOtherMenuItem = NSMenuItem(title: UserText.closeOtherTabs, action: #selector(closeOtherAction(_:)), keyEquivalent: "")
@@ -404,10 +413,17 @@ extension TabBarViewItem: NSMenuDelegate {
         moveToNewWindowMenuItem.target = self
         menu.addItem(moveToNewWindowMenuItem)
 
-        if isBurnerTab {
-            menu.addItem(NSMenuItem(title: "Convert to standard tab", action: #selector(convertToStandardTab(_:)), target: self, keyEquivalent: ""))
+        if isBurnerTab || otherItemsState.hasBurnerTabs {
+            menu.addItem(NSMenuItem.separator())
         }
 
+        if isBurnerTab {
+            menu.addItem(NSMenuItem(title: "Convert to Tab", action: #selector(convertToStandardTab(_:)), target: self, keyEquivalent: ""))
+        }
+
+        if otherItemsState.hasBurnerTabs {
+            menu.addItem(NSMenuItem(title: "Close all Burner Tabs", action: #selector(closeBurnerTabs(_:)), target: self, keyEquivalent: ""))
+        }
     }
 
 }

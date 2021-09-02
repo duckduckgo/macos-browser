@@ -311,6 +311,16 @@ final class TabCollectionViewModel: NSObject {
         delegate?.tabCollectionViewModel(self, didMoveTabAt: index, to: newIndex)
     }
 
+    func closeBurnerTabs() {
+        tabCollection.removeBurnerTabs()
+
+        if !tabCollection.tabs.indices.contains(selectionIndex ?? -1) {
+            selectionIndex = tabCollection.tabs.indices.last
+        }
+
+        delegate?.tabCollectionViewModelDidMultipleChanges(self)
+    }
+
     private func subscribeToTabs() {
         tabCollection.$tabs.sink { [weak self] newTabs in
             guard let self = self else { return }

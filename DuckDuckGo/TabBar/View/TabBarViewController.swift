@@ -814,12 +814,18 @@ extension TabBarViewController: TabBarViewItemDelegate {
         }
     }
 
-    func otherTabBarViewItemsState(for tabBarViewItem: TabBarViewItem) -> (hasItemsToTheLeft: Bool, hasItemsToTheRight: Bool) {
+    func tabBarViewItemCloseBurnerTabs(_ tabBarViewItem: TabBarViewItem) {
+        tabCollectionViewModel.closeBurnerTabs()
+    }
+
+    func otherTabBarViewItemsState(for tabBarViewItem: TabBarViewItem) -> (hasItemsToTheLeft: Bool, hasItemsToTheRight: Bool, hasBurnerTabs: Bool) {
         guard let indexPath = collectionView.indexPath(for: tabBarViewItem) else {
             os_log("TabBarViewController: Failed to get index path of tab bar view item", type: .error)
-            return (false, false)
+            return (false, false, false)
         }
-        return (hasItemsToTheLeft: indexPath.item > 0, hasItemsToTheRight: indexPath.item + 1 < tabCollectionViewModel.tabCollection.tabs.count)
+        return (hasItemsToTheLeft: indexPath.item > 0,
+                hasItemsToTheRight: indexPath.item + 1 < tabCollectionViewModel.tabCollection.tabs.count,
+                hasBurnerTabs: tabCollectionViewModel.tabCollection.tabs.first(where: { $0.tabStorageType == .burner }) != nil)
     }
 
 }
