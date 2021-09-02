@@ -189,6 +189,8 @@
 		4BC6D94C26DD7A4E00FB6E8A /* TwoFactorCodeDetector.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4BC6D94B26DD7A4E00FB6E8A /* TwoFactorCodeDetector.swift */; };
 		4BC6D94F26DD89C300FB6E8A /* SwiftOTP in Frameworks */ = {isa = PBXBuildFile; productRef = 4BC6D94E26DD89C300FB6E8A /* SwiftOTP */; };
 		4BCB930C26E0289D00AF48D0 /* OneTimePasswordTimer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4BCB930B26E0289D00AF48D0 /* OneTimePasswordTimer.swift */; };
+		4BCB930E26E0572B00AF48D0 /* TwoFactorCodeScannerWindow.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4BCB930D26E0572B00AF48D0 /* TwoFactorCodeScannerWindow.swift */; };
+		4BCB931226E058BA00AF48D0 /* SecureVault.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 4BCB931126E058BA00AF48D0 /* SecureVault.storyboard */; };
 		4BE0DF06267819A1006337B7 /* NSStoryboardExtension.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4BE0DF0426781961006337B7 /* NSStoryboardExtension.swift */; };
 		4BF4951826C08395000547B8 /* ThirdPartyBrowserTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4BF4951726C08395000547B8 /* ThirdPartyBrowserTests.swift */; };
 		8511E18425F82B34002F516B /* 01_Fire_really_small.json in Resources */ = {isa = PBXBuildFile; fileRef = 8511E18325F82B34002F516B /* 01_Fire_really_small.json */; };
@@ -709,6 +711,8 @@
 		4BB88B5A25B7BA50006F6B06 /* Instruments.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Instruments.swift; sourceTree = "<group>"; };
 		4BC6D94B26DD7A4E00FB6E8A /* TwoFactorCodeDetector.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TwoFactorCodeDetector.swift; sourceTree = "<group>"; };
 		4BCB930B26E0289D00AF48D0 /* OneTimePasswordTimer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OneTimePasswordTimer.swift; sourceTree = "<group>"; };
+		4BCB930D26E0572B00AF48D0 /* TwoFactorCodeScannerWindow.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TwoFactorCodeScannerWindow.swift; sourceTree = "<group>"; };
+		4BCB931126E058BA00AF48D0 /* SecureVault.storyboard */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; path = SecureVault.storyboard; sourceTree = "<group>"; };
 		4BE0DF0426781961006337B7 /* NSStoryboardExtension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NSStoryboardExtension.swift; sourceTree = "<group>"; };
 		4BF4951726C08395000547B8 /* ThirdPartyBrowserTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ThirdPartyBrowserTests.swift; sourceTree = "<group>"; };
 		8511E18325F82B34002F516B /* 01_Fire_really_small.json */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.json; path = 01_Fire_really_small.json; sourceTree = "<group>"; };
@@ -1658,6 +1662,8 @@
 				85625993269C8F9600EE44BC /* PasswordManager.storyboard */,
 				85890639267BCD8E00D23B0D /* SaveCredentialsPopover.swift */,
 				8589063B267BCDC000D23B0D /* SaveCredentialsViewController.swift */,
+				4BCB930D26E0572B00AF48D0 /* TwoFactorCodeScannerWindow.swift */,
+				4BCB931126E058BA00AF48D0 /* SecureVault.storyboard */,
 			);
 			path = View;
 			sourceTree = "<group>";
@@ -2950,6 +2956,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				4B02198C25E05FAC00ED7DEA /* Fireproofing.storyboard in Resources */,
+				4BCB931226E058BA00AF48D0 /* SecureVault.storyboard in Resources */,
 				AA80EC73256C46A2007083E7 /* Suggestion.storyboard in Resources */,
 				AA693E5E2696E5B90007BB78 /* CrashReports.storyboard in Resources */,
 				4B0511CE262CAA5A00F6079C /* DownloadPreferencesTableCellView.xib in Resources */,
@@ -3094,6 +3101,7 @@
 				4B92928F26670D1700AD2C21 /* BookmarkTableCellView.swift in Sources */,
 				4B9292CF2667123700AD2C21 /* BookmarkManagementSidebarViewController.swift in Sources */,
 				B637273D26CCF0C200C8CB02 /* OptionalExtension.swift in Sources */,
+				4BCB930E26E0572B00AF48D0 /* TwoFactorCodeScannerWindow.swift in Sources */,
 				AA80EC54256BE3BC007083E7 /* UserText.swift in Sources */,
 				B61EF3EC266F91E700B4D78F /* WKWebView+Download.swift in Sources */,
 				4BC6D94C26DD7A4E00FB6E8A /* TwoFactorCodeDetector.swift in Sources */,

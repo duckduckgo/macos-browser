@@ -106,7 +106,10 @@ final class PasswordManagementItemModel: ObservableObject {
     }
 
     func presentTwoFactorSecretWindow() {
-        NotificationCenter.default.post(name: Notification.Name("Check2FA"), object: nil)
+        let windowPresenter = TwoFactorCodeScannerWindow()
+        windowPresenter.showScanner()
+
+        // NotificationCenter.default.post(name: Notification.Name("Check2FA"), object: nil)
     }
 
     func save(twoFactorSecret: String) {

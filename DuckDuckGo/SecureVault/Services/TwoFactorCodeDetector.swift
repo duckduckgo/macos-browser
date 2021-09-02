@@ -25,28 +25,9 @@ final class TwoFactorCodeDetector {
 
     static func detectTwoFactorCode(in webView: WKWebView, completion: @escaping (URL?) -> Void) {
         webView.takeSnapshot(with: nil) { image, error in
-            guard let imageData = image?.tiffRepresentation, let bitmap = NSBitmapImageRep(data: imageData) else {
-                print("Failed to get webview snapshot")
-                return
-            }
-
-            let image = CIImage(bitmapImageRep: bitmap)!
-
-            var options: [String: Any]
-            let context = CIContext()
-
-            options = [CIDetectorAccuracy: CIDetectorAccuracyHigh]
-
-            let qrDetector = CIDetector(ofType: CIDetectorTypeQRCode, context: context, options: options)
-
-            if image.properties.keys.contains((kCGImagePropertyOrientation as String)) {
-                options = [CIDetectorImageOrientation: image.properties[(kCGImagePropertyOrientation as String)] ?? 1]
-            } else {
-                options = [CIDetectorImageOrientation: 1]
-            }
-
-            let features = qrDetector?.features(in: image, options: options)
+            let features = features(for: image)
             let qrCodeFeature = features?.first as? CIQRCodeFeature
+
             if let messageURLString = qrCodeFeature?.messageString, let messageURL = URL(string: messageURLString) {
                 completion(messageURL)
 
@@ -63,6 +44,39 @@ final class TwoFactorCodeDetector {
                 completion(nil)
             }
         }
+    }
+
+    static func secret(for image: NSImage?) -> URL? {
+        guard let features = features(for: image), let qrCodeFeature = features.first as? CIQRCodeFeature else {
+            return nil
+        }
+
+        if let messageURLString = qrCodeFeature.messageString, let messageURL = URL(string: messageURLString) {
+            return messageURL
+        }
+
+        return nil
+    }
+
+    static func features(for image: NSImage?) -> [CIFeature]? {
+        guard let imageData = image?.tiffRepresentation, let bitmap = NSBitmapImageRep(data: imageData) else {
+            return nil
+        }
+
+        let image = CIImage(bitmapImageRep: bitmap)!
+
+        var options: [String: Any] = [CIDetectorAccuracy: CIDetectorAccuracyHigh]
+        let context = CIContext()
+
+        let detector = CIDetector(ofType: CIDetectorTypeQRCode, context: context, options: options)
+
+        if image.properties.keys.contains((kCGImagePropertyOrientation as String)) {
+            options = [CIDetectorImageOrientation: image.properties[(kCGImagePropertyOrientation as String)] ?? 1]
+        } else {
+            options = [CIDetectorImageOrientation: 1]
+        }
+
+        return detector?.features(in: image, options: options)
     }
 
     static func calculateSixDigitCode(secret: String?, date: Date = Date()) -> String {

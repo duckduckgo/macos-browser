@@ -61,7 +61,7 @@ struct PasswordManagementItemView: View {
                         Button(action: {
                             model.presentTwoFactorSecretWindow()
                         }) {
-                            Text("Configure Two-Factor Authentication")
+                            Text("Scan Two-Factor QR Code 􀖂")
                                 .font(.system(size: 14, weight: .semibold, design: .rounded))
                                 .padding([.top, .bottom], 10)
                         }

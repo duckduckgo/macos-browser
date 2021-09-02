@@ -1,0 +1,115 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<document type="com.apple.InterfaceBuilder3.Cocoa.Storyboard.XIB" version="3.0" toolsVersion="18122" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none" useAutolayout="YES" initialViewController="EBj-lT-nve">
+    <dependencies>
+        <deployment identifier="macosx"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="18122"/>
+        <capability name="Named colors" minToolsVersion="9.0"/>
+        <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
+    </dependencies>
+    <scenes>
+        <!--Window Controller-->
+        <scene sceneID="SY8-gi-X4u">
+            <objects>
+                <windowController storyboardIdentifier="TwoFactorCodeScannerWindowController" showSeguePresentationStyle="single" id="EBj-lT-nve" sceneMemberID="viewController">
+                    <window key="window" title="Scan Two-Factor Code" allowsToolTipsWhenApplicationIsInactive="NO" autorecalculatesKeyViewLoop="NO" releasedWhenClosed="NO" visibleAtLaunch="NO" frameAutosaveName="" animationBehavior="default" id="QYW-Bw-uuL">
+                        <windowStyleMask key="styleMask" titled="YES" closable="YES" miniaturizable="YES" resizable="YES"/>
+                        <windowPositionMask key="initialPositionMask" leftStrut="YES" rightStrut="YES" topStrut="YES" bottomStrut="YES"/>
+                        <rect key="contentRect" x="268" y="330" width="480" height="270"/>
+                        <rect key="screenRect" x="0.0" y="0.0" width="1792" height="1095"/>
+                        <view key="contentView" id="enm-5C-iMQ">
+                            <rect key="frame" x="0.0" y="0.0" width="480" height="270"/>
+                            <autoresizingMask key="autoresizingMask"/>
+                        </view>
+                        <connections>
+                            <outlet property="delegate" destination="EBj-lT-nve" id="jTQ-SW-Hf2"/>
+                        </connections>
+                    </window>
+                    <connections>
+                        <segue destination="KSz-1C-nL7" kind="relationship" relationship="window.shadowedContentViewController" id="agW-ho-syK"/>
+                    </connections>
+                </windowController>
+                <customObject id="jlb-Z8-Hos" userLabel="First Responder" customClass="NSResponder" sceneMemberID="firstResponder"/>
+            </objects>
+            <point key="canvasLocation" x="-195" y="27"/>
+        </scene>
+        <!--Two Factor Code Scanner View Controller-->
+        <scene sceneID="9bo-m3-ST4">
+            <objects>
+                <viewController id="KSz-1C-nL7" customClass="TwoFactorCodeScannerViewController" customModule="DuckDuckGo_Privacy_Browser" customModuleProvider="target" sceneMemberID="viewController">
+                    <view key="view" id="nPk-IZ-Sfk">
+                        <rect key="frame" x="0.0" y="0.0" width="400" height="400"/>
+                        <autoresizingMask key="autoresizingMask"/>
+                        <subviews>
+                            <customView translatesAutoresizingMaskIntoConstraints="NO" id="udF-fF-L7w">
+                                <rect key="frame" x="65" y="84" width="270" height="268"/>
+                                <constraints>
+                                    <constraint firstAttribute="width" constant="270" id="Uhh-Ke-AMe"/>
+                                    <constraint firstAttribute="height" constant="268" id="sdd-Hj-q0q"/>
+                                </constraints>
+                            </customView>
+                            <customView translatesAutoresizingMaskIntoConstraints="NO" id="Hlf-C2-VDr" customClass="ColorView" customModule="DuckDuckGo_Privacy_Browser" customModuleProvider="target">
+                                <rect key="frame" x="0.0" y="0.0" width="400" height="400"/>
+                                <subviews>
+                                    <button verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="mHK-ci-R61">
+                                        <rect key="frame" x="175" y="10" width="50" height="61"/>
+                                        <constraints>
+                                            <constraint firstAttribute="height" constant="50" id="ecb-8W-EOQ"/>
+                                            <constraint firstAttribute="width" constant="50" id="lgG-UW-2Gb"/>
+                                        </constraints>
+                                        <buttonCell key="cell" type="bevel" bezelStyle="rounded" image="camera.fill" catalog="system" imagePosition="overlaps" alignment="center" imageScaling="proportionallyDown" inset="2" id="3Os-xA-mXW">
+                                            <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
+                                            <font key="font" metaFont="system" size="30"/>
+                                        </buttonCell>
+                                        <color key="contentTintColor" name="labelColor" catalog="System" colorSpace="catalog"/>
+                                        <connections>
+                                            <action selector="scanWindow:" target="KSz-1C-nL7" id="CJp-sk-x7J"/>
+                                        </connections>
+                                    </button>
+                                    <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="LM3-tZ-Coo">
+                                        <rect key="frame" x="27" y="41" width="347" height="358"/>
+                                        <textFieldCell key="cell" lineBreakMode="clipping" title="􀎹" id="SSq-8f-D9E">
+                                            <font key="font" size="300" name="SFProText-Ultralight"/>
+                                            <color key="textColor" red="1" green="1" blue="1" alpha="0.5" colorSpace="custom" customColorSpace="sRGB"/>
+                                            <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
+                                        </textFieldCell>
+                                    </textField>
+                                </subviews>
+                                <constraints>
+                                    <constraint firstAttribute="bottom" secondItem="mHK-ci-R61" secondAttribute="bottom" constant="15" id="5xe-J1-rJh"/>
+                                    <constraint firstItem="LM3-tZ-Coo" firstAttribute="centerY" secondItem="Hlf-C2-VDr" secondAttribute="centerY" constant="-20" id="IMx-ji-9sd"/>
+                                    <constraint firstItem="LM3-tZ-Coo" firstAttribute="centerX" secondItem="Hlf-C2-VDr" secondAttribute="centerX" id="XAf-0x-Rcr"/>
+                                    <constraint firstItem="mHK-ci-R61" firstAttribute="centerX" secondItem="Hlf-C2-VDr" secondAttribute="centerX" id="e6q-OG-Sbw"/>
+                                </constraints>
+                                <userDefinedRuntimeAttributes>
+                                    <userDefinedRuntimeAttribute type="color" keyPath="backgroundColor">
+                                        <color key="value" name="ClearColor"/>
+                                    </userDefinedRuntimeAttribute>
+                                </userDefinedRuntimeAttributes>
+                            </customView>
+                        </subviews>
+                        <constraints>
+                            <constraint firstAttribute="bottom" secondItem="Hlf-C2-VDr" secondAttribute="bottom" id="4rH-q0-fT0"/>
+                            <constraint firstItem="Hlf-C2-VDr" firstAttribute="leading" secondItem="nPk-IZ-Sfk" secondAttribute="leading" id="5HB-H3-TfE"/>
+                            <constraint firstItem="udF-fF-L7w" firstAttribute="centerY" secondItem="nPk-IZ-Sfk" secondAttribute="centerY" constant="-18" id="64t-tl-gVr"/>
+                            <constraint firstItem="udF-fF-L7w" firstAttribute="centerX" secondItem="nPk-IZ-Sfk" secondAttribute="centerX" id="dju-n5-O5L"/>
+                            <constraint firstAttribute="trailing" secondItem="Hlf-C2-VDr" secondAttribute="trailing" id="sBg-vG-Uw6"/>
+                            <constraint firstItem="Hlf-C2-VDr" firstAttribute="top" secondItem="nPk-IZ-Sfk" secondAttribute="top" id="zle-5B-WZb"/>
+                        </constraints>
+                    </view>
+                    <connections>
+                        <outlet property="maskView" destination="udF-fF-L7w" id="agM-WY-aVF"/>
+                        <outlet property="overlayView" destination="Hlf-C2-VDr" id="SEx-cw-Ld4"/>
+                    </connections>
+                </viewController>
+                <customObject id="EtT-jJ-enq" userLabel="First Responder" customClass="NSResponder" sceneMemberID="firstResponder"/>
+            </objects>
+            <point key="canvasLocation" x="427" y="18"/>
+        </scene>
+    </scenes>
+    <resources>
+        <image name="camera.fill" catalog="system" width="19" height="15"/>
+        <namedColor name="ClearColor">
+            <color red="1" green="1" blue="1" alpha="0.0" colorSpace="custom" customColorSpace="sRGB"/>
+        </namedColor>
+    </resources>
+</document>
