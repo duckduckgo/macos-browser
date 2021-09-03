@@ -36,8 +36,9 @@ final class WindowsManager {
     @discardableResult
     class func openNewWindow(with tabCollectionViewModel: TabCollectionViewModel? = nil,
                              droppingPoint: NSPoint? = nil,
-                             showWindow: Bool = true) -> NSWindow? {
-        let mainWindowController = makeNewWindow(tabCollectionViewModel: tabCollectionViewModel)
+                             showWindow: Bool = true,
+                             isBurner: Bool = false) -> NSWindow? {
+        let mainWindowController = makeNewWindow(tabCollectionViewModel: tabCollectionViewModel, isBurner: false)
 
         if let droppingPoint = droppingPoint {
             mainWindowController.window?.setFrameOrigin(droppingPoint: droppingPoint)
@@ -58,7 +59,7 @@ final class WindowsManager {
     }
 
     class func openNewWindow(with initialUrl: URL) {
-        let mainWindowController = makeNewWindow()
+        let mainWindowController = makeNewWindow(isBurner: false)
         mainWindowController.showWindow(self)
 
         let mainViewController = mainWindowController.mainViewController
@@ -70,17 +71,14 @@ final class WindowsManager {
         newTab.content = .url(initialUrl)
     }
 
-    private class func makeNewWindow(tabCollectionViewModel: TabCollectionViewModel? = nil) -> MainWindowController {
+    private class func makeNewWindow(tabCollectionViewModel: TabCollectionViewModel? = nil, isBurner: Bool) -> MainWindowController {
         let mainViewController: MainViewController
         do {
             mainViewController = try NSException.catch {
                 NSStoryboard(name: "Main", bundle: .main)
                     .instantiateController(identifier: .mainViewController) { coder -> MainViewController? in
-                        if let tabCollectionViewModel = tabCollectionViewModel {
-                            return MainViewController(coder: coder, tabCollectionViewModel: tabCollectionViewModel)
-                        } else {
-                            return MainViewController(coder: coder)
-                        }
+                        let model = tabCollectionViewModel ?? TabCollectionViewModel.makeWithDefaultTab(isBurner: isBurner)
+                        return MainViewController(coder: coder, tabCollectionViewModel: model)
                     }
             }
         } catch {

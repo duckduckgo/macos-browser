@@ -35,6 +35,11 @@ protocol TabCollectionViewModelDelegate: AnyObject {
 
 final class TabCollectionViewModel: NSObject {
 
+    static func makeWithDefaultTab(isBurner: Bool) -> TabCollectionViewModel {
+        let tab = Tab(content: .homepage, tabStorageType: isBurner ? .burner : .default)
+        return TabCollectionViewModel(tabCollection: TabCollection(tabs: [tab]))
+    }
+
     weak var delegate: TabCollectionViewModelDelegate?
 
     private(set) var tabCollection: TabCollection

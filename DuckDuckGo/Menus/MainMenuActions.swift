@@ -46,6 +46,10 @@ extension AppDelegate {
         WindowsManager.openNewWindow()
     }
 
+    @IBAction func newBurnerTab(_ sender: Any?) {
+        WindowsManager.openNewWindow(isBurner: true)
+    }
+
     @IBAction func openLocation(_ sender: Any?) {
         WindowsManager.openNewWindow()
     }
@@ -181,6 +185,10 @@ extension MainViewController {
 
     @IBAction func newTab(_ sender: Any?) {
         tabCollectionViewModel.appendNewTab(with: .homepage)
+    }
+
+    @IBAction func newBurnerTab(_ sender: Any?) {
+        tabCollectionViewModel.appendNewTab(with: .homepage, tabStorageType: .burner)
     }
 
     @IBAction func openLocation(_ sender: Any?) {

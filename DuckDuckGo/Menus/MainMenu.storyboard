@@ -84,6 +84,11 @@
                                                 <action selector="newTab:" target="Ady-hI-5gd" id="Gnb-ML-joG"/>
                                             </connections>
                                         </menuItem>
+                                        <menuItem title="New Burner Tab" keyEquivalent="T" id="ynd-51-l1j" userLabel="New Tab">
+                                            <connections>
+                                                <action selector="newBurnerTab:" target="Ady-hI-5gd" id="U9J-Ay-UIn"/>
+                                            </connections>
+                                        </menuItem>
                                         <menuItem title="Open Location..." keyEquivalent="l" id="xnU-dQ-JR1">
                                             <connections>
                                                 <action selector="openLocation:" target="Ady-hI-5gd" id="ggi-sX-Mec"/>
