@@ -40,6 +40,7 @@ import Cocoa
 @objc protocol MenuItemSelectors {
 
     func search(_ sender: NSMenuItem)
+    func searchInBurnerTab(_ sender: NSMenuItem)
 
 }
 

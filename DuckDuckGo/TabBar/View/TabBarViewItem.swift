@@ -29,6 +29,7 @@ protocol TabBarViewItemDelegate: AnyObject {
     func tabBarViewItemCloseOtherAction(_ tabBarViewItem: TabBarViewItem)
     func tabBarViewItemCloseToTheRightAction(_ tabBarViewItem: TabBarViewItem)
     func tabBarViewItemDuplicateAction(_ tabBarViewItem: TabBarViewItem)
+    func tabBarViewItemConvertToStandard(_ tabBarViewItem: TabBarViewItem)
     func tabBarViewItemBookmarkThisPageAction(_ tabBarViewItem: TabBarViewItem)
     func tabBarViewItemMoveToNewWindowAction(_ tabBarViewItem: TabBarViewItem)
     func tabBarViewItemFireproofSite(_ tabBarViewItem: TabBarViewItem)
@@ -229,8 +230,7 @@ final class TabBarViewItem: NSCollectionViewItem {
     }
 
     @objc func convertToStandardTab(_ sender: NSMenuItem) {
-        delegate?.tabBarViewItemDuplicateAction(self)
-        delegate?.tabBarViewItemCloseAction(self)
+        delegate?.tabBarViewItemConvertToStandard(self)
     }
 
     @objc func closeBurnerTabs(_ sender: NSMenuItem) {

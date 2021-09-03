@@ -176,7 +176,7 @@ final class BrowserTabViewController: NSViewController {
         homepageView.isHidden = shown
     }
 
-    private func openNewTab(with url: URL?, parentTab: Tab?, selected: Bool = false, canBeClosedWithBack: Bool = false, isBurner: Bool = false) {
+    private func openNewTab(with url: URL?, parentTab: Tab?, selected: Bool = false, canBeClosedWithBack: Bool = false, isBurner: Bool) {
         let tab = Tab(content: url != nil ? .url(url!) : .homepage,
                       tabStorageType: isBurner ? .burner : .default,
                       parentTab: parentTab,
@@ -322,8 +322,8 @@ extension BrowserTabViewController: TabDelegate {
         }
     }
 
-    func tab(_ tab: Tab, requestedNewTab url: URL?, selected: Bool) {
-        openNewTab(with: url, parentTab: tab, selected: selected, canBeClosedWithBack: selected == true)
+    func tab(_ tab: Tab, requestedNewTab url: URL?, selected: Bool, isBurner: Bool) {
+        openNewTab(with: url, parentTab: tab, selected: selected, canBeClosedWithBack: selected == true, isBurner: isBurner)
     }
 
     func closeTab(_ tab: Tab) {
@@ -447,7 +447,7 @@ extension BrowserTabViewController: LinkMenuItemSelectors {
 
     func openLinkInNewTab(_ sender: NSMenuItem) {
         guard let url = contextMenuLink else { return }
-        openNewTab(with: url, parentTab: tabViewModel?.tab)
+        openNewTab(with: url, parentTab: tabViewModel?.tab, isBurner: false)
     }
 
     func openLinkInBurnerTab(_ sender: NSMenuItem) {
@@ -482,7 +482,7 @@ extension BrowserTabViewController: ImageMenuItemSelectors {
 
     func openImageInNewTab(_ sender: NSMenuItem) {
         guard let url = contextMenuImage else { return }
-        openNewTab(with: url, parentTab: tabViewModel?.tab)
+        openNewTab(with: url, parentTab: tabViewModel?.tab, isBurner: tabViewModel?.tab.tabStorageType == .burner)
     }
 
     func openImageInNewWindow(_ sender: NSMenuItem) {
@@ -511,7 +511,13 @@ extension BrowserTabViewController: MenuItemSelectors {
     func search(_ sender: NSMenuItem) {
         let selectedText = contextMenuSelectedText ?? ""
         let url = URL.makeSearchUrl(from: selectedText)
-        openNewTab(with: url, parentTab: tabViewModel?.tab, selected: true)
+        openNewTab(with: url, parentTab: tabViewModel?.tab, selected: true, isBurner: false)
+    }
+
+    func searchInBurnerTab(_ sender: NSMenuItem) {
+        let selectedText = contextMenuSelectedText ?? ""
+        let url = URL.makeSearchUrl(from: selectedText)
+        openNewTab(with: url, parentTab: tabViewModel?.tab, selected: true, isBurner: true)
     }
 
 }

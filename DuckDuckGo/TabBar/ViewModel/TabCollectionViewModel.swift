@@ -295,7 +295,23 @@ final class TabCollectionViewModel: NSObject {
         }
 
         let tab = tabCollection.tabs[index]
-        let tabCopy = Tab(content: tab.content, sessionStateData: tab.sessionStateData)
+        let tabCopy = Tab(content: tab.content, tabStorageType: tab.tabStorageType, sessionStateData: tab.sessionStateData)
+        let newIndex = index + 1
+
+        tabCollection.insert(tab: tabCopy, at: newIndex)
+        select(at: newIndex)
+
+        delegate?.tabCollectionViewModelDidInsert(self, at: newIndex, selected: true)
+    }
+
+    func convertToStandardTab(at index: Int) {
+        guard index >= 0, index < tabCollection.tabs.count else {
+            os_log("TabCollectionViewModel: Index out of bounds", type: .error)
+            return
+        }
+
+        let tab = tabCollection.tabs[index]
+        let tabCopy = Tab(content: tab.content)
         let newIndex = index + 1
 
         tabCollection.insert(tab: tabCopy, at: newIndex)
