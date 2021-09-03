@@ -1,0 +1,116 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<document type="com.apple.InterfaceBuilder3.Cocoa.Storyboard.XIB" version="3.0" toolsVersion="18122" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none" useAutolayout="YES" initialViewController="bU7-R8-ocO">
+    <dependencies>
+        <deployment identifier="macosx"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="18122"/>
+        <capability name="Named colors" minToolsVersion="9.0"/>
+        <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
+    </dependencies>
+    <scenes>
+        <!--Fire View Controller-->
+        <scene sceneID="PEd-7d-5j0">
+            <objects>
+                <viewController id="bU7-R8-ocO" customClass="FireViewController" customModule="DuckDuckGo_Privacy_Browser" customModuleProvider="target" sceneMemberID="viewController">
+                    <view key="view" id="tOy-S4-hL0">
+                        <rect key="frame" x="0.0" y="0.0" width="450" height="300"/>
+                        <autoresizingMask key="autoresizingMask"/>
+                        <subviews>
+                            <customView translatesAutoresizingMaskIntoConstraints="NO" id="Yly-fF-tnL" userLabel="Background View" customClass="ColorView" customModule="DuckDuckGo_Privacy_Browser" customModuleProvider="target">
+                                <rect key="frame" x="0.0" y="0.0" width="450" height="220"/>
+                                <userDefinedRuntimeAttributes>
+                                    <userDefinedRuntimeAttribute type="color" keyPath="backgroundColor">
+                                        <color key="value" name="HomepageBackgroundColor"/>
+                                    </userDefinedRuntimeAttribute>
+                                </userDefinedRuntimeAttributes>
+                            </customView>
+                            <customView translatesAutoresizingMaskIntoConstraints="NO" id="0b7-lo-7YE" customClass="ColorView" customModule="DuckDuckGo_Privacy_Browser" customModuleProvider="target">
+                                <rect key="frame" x="0.0" y="0.0" width="450" height="300"/>
+                                <userDefinedRuntimeAttributes>
+                                    <userDefinedRuntimeAttribute type="color" keyPath="backgroundColor">
+                                        <color key="value" name="FireBackground"/>
+                                    </userDefinedRuntimeAttribute>
+                                </userDefinedRuntimeAttributes>
+                            </customView>
+                            <customView translatesAutoresizingMaskIntoConstraints="NO" id="Irb-Li-anx" customClass="AnimationView" customModule="Lottie" propertyAccessControl="all">
+                                <rect key="frame" x="0.0" y="0.0" width="450" height="300"/>
+                                <userDefinedRuntimeAttributes>
+                                    <userDefinedRuntimeAttribute type="string" keyPath="animationName" value="01_Fire_really_small"/>
+                                </userDefinedRuntimeAttributes>
+                            </customView>
+                            <customView translatesAutoresizingMaskIntoConstraints="NO" id="uFV-kr-0rY">
+                                <rect key="frame" x="75" y="50" width="300" height="200"/>
+                                <subviews>
+                                    <progressIndicator maxValue="100" doubleValue="50" style="bar" translatesAutoresizingMaskIntoConstraints="NO" id="ogp-oa-0j1">
+                                        <rect key="frame" x="45" y="77" width="210" height="20"/>
+                                        <constraints>
+                                            <constraint firstAttribute="height" constant="18" id="d5k-Q7-we7"/>
+                                            <constraint firstAttribute="width" constant="210" id="deu-Ho-QZK"/>
+                                        </constraints>
+                                    </progressIndicator>
+                                    <imageView horizontalHuggingPriority="251" verticalHuggingPriority="251" translatesAutoresizingMaskIntoConstraints="NO" id="5Iu-jp-smc">
+                                        <rect key="frame" x="126" y="116" width="48" height="48"/>
+                                        <constraints>
+                                            <constraint firstAttribute="width" constant="48" id="Su9-G0-Bst"/>
+                                            <constraint firstAttribute="height" constant="48" id="odT-nw-j1k"/>
+                                        </constraints>
+                                        <imageCell key="cell" refusesFirstResponder="YES" alignment="left" imageScaling="proportionallyDown" image="BurnAlert" id="JSo-Q5-FYr"/>
+                                    </imageView>
+                                    <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="1tt-F5-h1d">
+                                        <rect key="frame" x="83" y="59" width="135" height="14"/>
+                                        <textFieldCell key="cell" lineBreakMode="clipping" title="Deleting browsing data..." id="MnK-PN-hYp">
+                                            <font key="font" metaFont="system" size="11"/>
+                                            <color key="textColor" name="labelColor" catalog="System" colorSpace="catalog"/>
+                                            <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
+                                        </textFieldCell>
+                                    </textField>
+                                </subviews>
+                                <constraints>
+                                    <constraint firstItem="5Iu-jp-smc" firstAttribute="centerX" secondItem="uFV-kr-0rY" secondAttribute="centerX" id="5f5-i8-zcD"/>
+                                    <constraint firstItem="1tt-F5-h1d" firstAttribute="centerX" secondItem="uFV-kr-0rY" secondAttribute="centerX" id="AVa-oy-5Xi"/>
+                                    <constraint firstItem="5Iu-jp-smc" firstAttribute="centerY" secondItem="uFV-kr-0rY" secondAttribute="centerY" constant="-40" id="GcW-sq-yHn"/>
+                                    <constraint firstAttribute="height" constant="200" id="TXG-2y-V0d"/>
+                                    <constraint firstItem="ogp-oa-0j1" firstAttribute="centerX" secondItem="uFV-kr-0rY" secondAttribute="centerX" id="VaI-VM-zfn"/>
+                                    <constraint firstItem="1tt-F5-h1d" firstAttribute="top" secondItem="ogp-oa-0j1" secondAttribute="bottom" constant="5" id="Vvt-eq-y33"/>
+                                    <constraint firstAttribute="width" constant="300" id="aIf-Ga-vbP"/>
+                                    <constraint firstItem="ogp-oa-0j1" firstAttribute="centerY" secondItem="uFV-kr-0rY" secondAttribute="centerY" constant="13" id="rRa-dz-YVT"/>
+                                </constraints>
+                            </customView>
+                        </subviews>
+                        <constraints>
+                            <constraint firstAttribute="bottom" secondItem="Yly-fF-tnL" secondAttribute="bottom" id="8I3-A6-M9J"/>
+                            <constraint firstItem="Irb-Li-anx" firstAttribute="top" secondItem="tOy-S4-hL0" secondAttribute="top" id="B21-W6-jl6"/>
+                            <constraint firstAttribute="trailing" secondItem="Irb-Li-anx" secondAttribute="trailing" id="DRg-RM-bVO"/>
+                            <constraint firstItem="Irb-Li-anx" firstAttribute="leading" secondItem="tOy-S4-hL0" secondAttribute="leading" id="H3t-Ax-ZO9"/>
+                            <constraint firstItem="0b7-lo-7YE" firstAttribute="top" secondItem="tOy-S4-hL0" secondAttribute="top" id="Iht-PY-nUg"/>
+                            <constraint firstAttribute="bottom" secondItem="Irb-Li-anx" secondAttribute="bottom" id="LRY-yM-EOZ"/>
+                            <constraint firstItem="Yly-fF-tnL" firstAttribute="leading" secondItem="tOy-S4-hL0" secondAttribute="leading" id="MCc-zQ-Nzb"/>
+                            <constraint firstItem="0b7-lo-7YE" firstAttribute="leading" secondItem="tOy-S4-hL0" secondAttribute="leading" id="Soy-Jy-xFf"/>
+                            <constraint firstAttribute="bottom" secondItem="0b7-lo-7YE" secondAttribute="bottom" id="XZF-Be-nz4"/>
+                            <constraint firstItem="Yly-fF-tnL" firstAttribute="top" secondItem="tOy-S4-hL0" secondAttribute="top" constant="80" id="ZTQ-ck-sAr"/>
+                            <constraint firstItem="uFV-kr-0rY" firstAttribute="centerY" secondItem="tOy-S4-hL0" secondAttribute="centerY" id="aFg-Dk-hZE"/>
+                            <constraint firstItem="uFV-kr-0rY" firstAttribute="centerX" secondItem="tOy-S4-hL0" secondAttribute="centerX" id="hHN-Ge-Wm8"/>
+                            <constraint firstAttribute="trailing" secondItem="0b7-lo-7YE" secondAttribute="trailing" id="jbN-e4-w24"/>
+                            <constraint firstAttribute="trailing" secondItem="Yly-fF-tnL" secondAttribute="trailing" id="jfl-UO-KjX"/>
+                        </constraints>
+                    </view>
+                    <connections>
+                        <outlet property="fireAnimationView" destination="Irb-Li-anx" id="JfE-XU-lio"/>
+                        <outlet property="progressIndicator" destination="ogp-oa-0j1" id="JVl-ZY-KNv"/>
+                        <outlet property="progressIndicatorWrapper" destination="uFV-kr-0rY" id="RTJ-f8-iuU"/>
+                    </connections>
+                </viewController>
+                <customObject id="9uD-mB-xHs" userLabel="First Responder" customClass="NSResponder" sceneMemberID="firstResponder"/>
+            </objects>
+            <point key="canvasLocation" x="138" y="90"/>
+        </scene>
+    </scenes>
+    <resources>
+        <image name="BurnAlert" width="64" height="64"/>
+        <namedColor name="FireBackground">
+            <color red="1" green="1" blue="1" alpha="0.5" colorSpace="custom" customColorSpace="sRGB"/>
+        </namedColor>
+        <namedColor name="HomepageBackgroundColor">
+            <color red="0.97647058823529409" green="0.98039215686274506" blue="0.98039215686274506" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+        </namedColor>
+    </resources>
+</document>

@@ -26,6 +26,7 @@ final class Fire {
     let permissionManager: PermissionManagerProtocol
 
     @Published private(set) var isBurning = false
+    @Published private(set) var progress = 0.0
 
     init(cacheManager: WebCacheManager = .shared,
          historyCoordinating: HistoryCoordinating = HistoryCoordinator.shared,
@@ -35,43 +36,68 @@ final class Fire {
         self.permissionManager = permissionManager
     }
 
-    private func burnAll(completion: (() -> Void)? = nil) {
-        os_log("WebsiteDataStore began cookie deletion", log: .fire)
-        webCacheManager.clear { [/* hold self while burning */ self] in
-            os_log("WebsiteDataStore completed cookie deletion", log: .fire)
+    func burnAll(tabCollectionViewModel: TabCollectionViewModel?, completion: (() -> Void)? = nil) {
+        os_log("Fire started", log: .fire)
 
-            os_log("HistoryCoordinating began history deletion", log: .fire)
-            self.historyCoordinating.burnHistory(except: FireproofDomains.shared)
-            os_log("HistoryCoordinating completed history deletion", log: .fire)
+        isBurning = true
+        let group = DispatchGroup()
 
-            os_log("PermissionManager began permissions deletion", log: .fire)
-            self.permissionManager.burnPermissions(except: FireproofDomains.shared)
-            os_log("PermissionManager completed permissions deletion", log: .fire)
+        group.enter()
+        burnWebCache {
+            group.leave()
+        }
 
-            self.isBurning = false
+        burnHistory()
+        burnPermissions()
 
-            DispatchQueue.main.async {
-                completion?()
-            }
+        group.enter()
+        burnTabs(tabCollectionViewModel: tabCollectionViewModel) {
+            group.leave()
+        }
+
+        group.notify(queue: .main) { [weak self] in
+            self?.isBurning = false
+
+            os_log("Fire finished", log: .fire)
         }
     }
 
-    func burnAll(tabCollectionViewModel: TabCollectionViewModel?, completion: (() -> Void)? = nil) {
-        isBurning = true
-        
-        tabCollectionViewModel?.tabCollection.tabs.forEach { $0.stopLoading() }
-        burnAll {
-            defer {
-                completion?()
+    private func burnWebCache(completion: @escaping () -> Void) {
+        os_log("WebsiteDataStore began cookie deletion", log: .fire)
+        webCacheManager.clear(progress: { progress in
+            self.progress = progress
+        }, completion: {
+            os_log("WebsiteDataStore completed cookie deletion", log: .fire)
+
+            DispatchQueue.main.async {
+                completion()
             }
-            guard let tabCollectionViewModel = tabCollectionViewModel else { return }
-            if tabCollectionViewModel.tabCollection.tabs.count > 0 {
-                tabCollectionViewModel.removeAllTabsAndAppendNewTab()
-            } else {
-                tabCollectionViewModel.appendNewTab()
+        })
+    }
+
+    private func burnHistory() {
+        self.historyCoordinating.burnHistory(except: FireproofDomains.shared)
+    }
+
+    private func burnPermissions() {
+        self.permissionManager.burnPermissions(except: FireproofDomains.shared)
+    }
+
+    private func burnTabs(tabCollectionViewModel: TabCollectionViewModel?, completion: @escaping () -> Void) {
+        DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
+            os_log("WebsiteDataStore began tab deletion", log: .fire)
+            if let tabCollectionViewModel = tabCollectionViewModel {
+                if tabCollectionViewModel.tabCollection.tabs.count > 0 {
+                    tabCollectionViewModel.removeAllTabsAndAppendNewTab()
+                } else {
+                    tabCollectionViewModel.appendNewTab()
+                }
+                tabCollectionViewModel.tabCollection.cleanLastRemovedTab()
             }
 
-            tabCollectionViewModel.tabCollection.cleanLastRemovedTab()
+            os_log("WebsiteDataStore completed tab deletion", log: .fire)
+
+            completion()
         }
     }
 

@@ -151,20 +151,8 @@ extension AppDelegate {
     }
 
     @IBAction func burnButtonAction(_ sender: NSButton) {
-        let response = NSAlert.burnButtonAlert().runModal()
-        if response == NSApplication.ModalResponse.alertFirstButtonReturn {
-            Pixel.fire(.burn())
-
-            let windowController = WindowControllersManager.shared.lastKeyMainWindowController
-            WindowsManager.closeWindows(except: windowController?.window)
-            if let tabBarViewController = windowController?.mainViewController.tabBarViewController {
-                tabBarViewController.playFireAnimation()
-            } else {
-                Fire().burnAll(tabCollectionViewModel: nil) {
-                    WindowsManager.openNewWindow()
-                }
-            }
-        }
+        sender.state = .off
+        FireViewController.fireButtonAction()
     }
 
 }

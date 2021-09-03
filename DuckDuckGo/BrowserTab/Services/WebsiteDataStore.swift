@@ -47,6 +47,7 @@ internal class WebCacheManager {
 
     func clear(dataStore: WebsiteDataStore = WKWebsiteDataStore.default(),
                logins: FireproofDomains = FireproofDomains.shared,
+               progress: ((Double) -> Void)? = nil,
                completion: @escaping () -> Void) {
 
         let all = WKWebsiteDataStore.allWebsiteDataTypes()
@@ -62,21 +63,28 @@ internal class WebCacheManager {
                 }
 
                 let group = DispatchGroup()
-
                 cookieStore.getAllCookies { cookies in
                     let cookiesToRemove = cookies.filter { !logins.isFireproof(cookieDomain: $0.domain) && $0.domain != URL.cookieDomain }
+                    var finished = 0
 
                     for cookie in cookiesToRemove {
                         group.enter()
                         os_log("Deleting cookie for %s named %s", log: .fire, cookie.domain, cookie.name)
                         cookieStore.delete(cookie) {
                             group.leave()
+
+                            assert(Thread.isMainThread, "Completion outside of main thread")
+                            finished += 1
+                            let progressValue = (Double(finished) / Double(cookiesToRemove.count)) * 100
+                            DispatchQueue.main.async {
+                                progress?(progressValue)
+                            }
                         }
                     }
                 }
 
                 DispatchQueue.global(qos: .background).async {
-                    _ = group.wait(timeout: .now() + 5)
+                    group.wait()
                     DispatchQueue.main.async {
                         completion()
                     }

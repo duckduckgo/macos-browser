@@ -22,7 +22,7 @@ final class BurnButton: MouseOverButton {
 
     enum Constants {
         static let color = NSColor(named: "ButtonColor")
-        static let burningColor = NSColor.textColor
+
         static let backgroundColor = NSColor.clear
         static let burningBackgroundColor = NSColor(named: "BurnButtonColor")
 
@@ -36,11 +36,9 @@ final class BurnButton: MouseOverButton {
 
     private func updateColors() {
         if isBurning {
-            contentTintColor = Constants.burningColor
-            layer?.backgroundColor = Constants.burningBackgroundColor?.cgColor
+            layer?.backgroundColor = super.mouseDownColor?.cgColor
         } else {
-            contentTintColor = Constants.color
-            layer?.backgroundColor = Constants.backgroundColor.cgColor
+            layer?.backgroundColor = NSColor.clear.cgColor
         }
     }
 
