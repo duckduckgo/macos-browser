@@ -49,14 +49,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
     var appUsageActivityMonitor: AppUsageActivityMonitor?
 
     func applicationWillFinishLaunching(_ notification: Notification) {
-#if BETA
-        if NSApp.buildDate < Date.monthAgo {
-            let message = "DuckDuckGo Beta has expired.\nPlease, delete the App and empty the Recycle Bin."
-            NSAlert(error: NSError(domain: "App Expired", code: -1, userInfo: [NSLocalizedDescriptionKey: message]))
-                .runModal()
-            NSApp.terminate(nil)
-        }
-#endif
+        ExpirationChecker.check()
 
         if !Self.isRunningTests {
             Pixel.setUp()

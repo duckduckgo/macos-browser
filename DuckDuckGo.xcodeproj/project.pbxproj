@@ -448,6 +448,7 @@
 		B684592225C93BE000DC17B6 /* Publisher.asVoid.swift in Sources */ = {isa = PBXBuildFile; fileRef = B684592125C93BE000DC17B6 /* Publisher.asVoid.swift */; };
 		B684592725C93C0500DC17B6 /* Publishers.NestedObjectChanges.swift in Sources */ = {isa = PBXBuildFile; fileRef = B684592625C93C0500DC17B6 /* Publishers.NestedObjectChanges.swift */; };
 		B684592F25C93FBF00DC17B6 /* AppStateRestorationManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = B684592E25C93FBF00DC17B6 /* AppStateRestorationManager.swift */; };
+		B687260426E215C9008EE860 /* ExpirationChecker.swift in Sources */ = {isa = PBXBuildFile; fileRef = B687260326E215C9008EE860 /* ExpirationChecker.swift */; };
 		B689ECD526C247DB006FB0C5 /* BackForwardListItem.swift in Sources */ = {isa = PBXBuildFile; fileRef = B689ECD426C247DB006FB0C5 /* BackForwardListItem.swift */; };
 		B6A5A27125B9377300AA7ADA /* StatePersistenceService.swift in Sources */ = {isa = PBXBuildFile; fileRef = B6A5A27025B9377300AA7ADA /* StatePersistenceService.swift */; };
 		B6A5A27925B93FFF00AA7ADA /* StateRestorationManagerTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = B6A5A27825B93FFE00AA7ADA /* StateRestorationManagerTests.swift */; };
@@ -975,6 +976,7 @@
 		B684592125C93BE000DC17B6 /* Publisher.asVoid.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Publisher.asVoid.swift; sourceTree = "<group>"; };
 		B684592625C93C0500DC17B6 /* Publishers.NestedObjectChanges.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Publishers.NestedObjectChanges.swift; sourceTree = "<group>"; };
 		B684592E25C93FBF00DC17B6 /* AppStateRestorationManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppStateRestorationManager.swift; sourceTree = "<group>"; };
+		B687260326E215C9008EE860 /* ExpirationChecker.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ExpirationChecker.swift; sourceTree = "<group>"; };
 		B689ECD426C247DB006FB0C5 /* BackForwardListItem.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BackForwardListItem.swift; sourceTree = "<group>"; };
 		B6A5A27025B9377300AA7ADA /* StatePersistenceService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StatePersistenceService.swift; sourceTree = "<group>"; };
 		B6A5A27825B93FFE00AA7ADA /* StateRestorationManagerTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StateRestorationManagerTests.swift; sourceTree = "<group>"; };
@@ -1755,6 +1757,7 @@
 			isa = PBXGroup;
 			children = (
 				AA585D81248FD31100E9A3E2 /* AppDelegate.swift */,
+				B687260326E215C9008EE860 /* ExpirationChecker.swift */,
 				AA4D700625545EF800C3411E /* UrlEventListener.swift */,
 				AA4FF40B2624751A004E2377 /* GrammarFeaturesManager.swift */,
 				AAD86E51267A0DFF005C11BE /* UpdateController.swift */,
@@ -3294,6 +3297,7 @@
 				AAE7527A263B046100B973F8 /* History.xcdatamodeld in Sources */,
 				AAA8E8C124EACA700055E685 /* MouseOverView.swift in Sources */,
 				B64C853D26944B940048FEBE /* PermissionStore.swift in Sources */,
+				B687260426E215C9008EE860 /* ExpirationChecker.swift in Sources */,
 				AAE8B110258A456C00E81239 /* TooltipViewController.swift in Sources */,
 				85AC3B0525D6B1D800C7D2AA /* ScriptSourceProviding.swift in Sources */,
 				AA3F895324C18AD500628DDE /* SuggestionViewModel.swift in Sources */,
