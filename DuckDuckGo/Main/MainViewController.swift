@@ -27,6 +27,7 @@ final class MainViewController: NSViewController {
     @IBOutlet weak var navigationBarContainerView: NSView!
     @IBOutlet weak var webContainerView: NSView!
     @IBOutlet weak var findInPageContainerView: NSView!
+    @IBOutlet weak var separatorView: ColorView!
 
     private(set) var tabBarViewController: TabBarViewController!
     private(set) var navigationBarViewController: NavigationBarViewController!
@@ -59,6 +60,14 @@ final class MainViewController: NSViewController {
         listenToKeyDownEvents()
         subscribeToSelectedTabViewModel()
         findInPageContainerView.applyDropShadow()
+
+        // swiftlint:disable force_cast
+        if (NSApp.delegate as! AppDelegate).isInAppMode {
+            tabBarContainerView.removeFromSuperview()
+            navigationBarContainerView.removeFromSuperview()
+            separatorView.removeFromSuperview()
+        }
+        // swiftlint:enable force_cast
     }
     
     override func viewDidLayout() {

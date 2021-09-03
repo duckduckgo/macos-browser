@@ -33,8 +33,13 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
 
     private let keyStore = EncryptionKeyStore()
     private var fileStore: FileStore!
-    private var stateRestorationManager: AppStateRestorationManager!
+    private var stateRestorationManager: AppStateRestorationManager?
     private var grammarFeaturesManager = GrammarFeaturesManager()
+
+    private var argumentUrl: URL?
+    var isInAppMode: Bool {
+        return argumentUrl != nil
+    }
 
 #if OUT_OF_APPSTORE
 
@@ -58,6 +63,13 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         }
 #endif
 
+        for argument in CommandLine.arguments {
+            if argument.starts(with: "--app=") {
+                let urlString = argument.drop(prefix: "--app=")
+                argumentUrl = URL(string: urlString)
+            }
+        }
+
         if !Self.isRunningTests {
             Pixel.setUp()
         }
@@ -69,7 +81,10 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
             os_log("App Encryption Key could not be read: %s", "\(error)")
             fileStore = EncryptedFileStore()
         }
-        stateRestorationManager = AppStateRestorationManager(fileStore: fileStore)
+
+        if argumentUrl == nil {
+            stateRestorationManager = AppStateRestorationManager(fileStore: fileStore)
+        }
 
         urlEventListener.listen()
     }
@@ -86,7 +101,11 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
             Pixel.fire(.appLaunch(launch: .autoInitialOrRegular()))
         }
 
-        stateRestorationManager.applicationDidFinishLaunching()
+        stateRestorationManager?.applicationDidFinishLaunching()
+
+        if let argumentUrl = argumentUrl {
+            WindowsManager.openNewWindow(with: argumentUrl)
+        }
 
         if WindowsManager.windows.isEmpty {
             WindowsManager.openNewWindow()

@@ -58,42 +58,6 @@ final class TabBarViewItem: NSCollectionViewItem {
         }
     }
 
-    var tabBarViewItemMenu: NSMenu {
-        let menu = NSMenu()
-
-        let duplicateMenuItem = NSMenuItem(title: UserText.duplicateTab, action: #selector(duplicateAction(_:)), keyEquivalent: "")
-        menu.addItem(duplicateMenuItem)
-
-        menu.addItem(NSMenuItem.separator())
-
-        let bookmarkMenuItem = NSMenuItem(title: UserText.bookmarkThisPage, action: #selector(bookmarkThisPageAction(_:)), keyEquivalent: "")
-        menu.addItem(bookmarkMenuItem)
-
-        if let url = currentURL, url.canFireproof {
-            let menuItem: NSMenuItem
-
-            if FireproofDomains.shared.isFireproof(fireproofDomain: url.host ?? "") {
-                menuItem = NSMenuItem(title: UserText.removeFireproofing, action: #selector(removeFireproofingAction(_:)), keyEquivalent: "")
-            } else {
-                menuItem = NSMenuItem(title: UserText.fireproofSite, action: #selector(fireproofSiteAction(_:)), keyEquivalent: "")
-            }
-
-            menu.addItem(menuItem)
-            menu.addItem(NSMenuItem.separator())
-        }
-
-        let closeMenuItem = NSMenuItem(title: UserText.closeTab, action: #selector(closeButtonAction(_:)), keyEquivalent: "")
-        menu.addItem(closeMenuItem)
-
-        let closeOtherMenuItem = NSMenuItem(title: UserText.closeOtherTabs, action: #selector(closeOtherAction(_:)), keyEquivalent: "")
-        menu.addItem(closeOtherMenuItem)
-
-        let moveToNewWindowMenuItem = NSMenuItem(title: UserText.moveTabToNewWindow, action: #selector(moveToNewWindowAction(_:)), keyEquivalent: "")
-        menu.addItem(moveToNewWindowMenuItem)
-
-        return menu
-    }
-
     var isLeftToSelected: Bool = false {
         didSet {
             updateSeparatorView()
@@ -125,6 +89,8 @@ final class TabBarViewItem: NSCollectionViewItem {
     private var cancellables = Set<AnyCancellable>()
 
     weak var delegate: TabBarViewItemDelegate?
+
+    private let appCreator: AppCreatorProtocol = AppCreator.shared
 
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -183,6 +149,15 @@ final class TabBarViewItem: NSCollectionViewItem {
 
     @objc func bookmarkThisPageAction(_ sender: Any) {
         delegate?.tabBarViewItemBookmarkThisPageAction(self)
+    }
+
+    @objc func createApp(_ sender: NSMenuItem) {
+        guard let currentURL = currentURL else {
+            assertionFailure("Nah")
+            return
+        }
+
+        appCreator.createStandaloneApp(from: currentURL, name: titleTextField.stringValue)
     }
 
     private var lastKnownIndexPath: IndexPath?
@@ -388,6 +363,11 @@ extension TabBarViewItem: NSMenuDelegate {
         let moveToNewWindowMenuItem = NSMenuItem(title: UserText.moveTabToNewWindow, action: #selector(moveToNewWindowAction(_:)), keyEquivalent: "")
         moveToNewWindowMenuItem.target = self
         menu.addItem(moveToNewWindowMenuItem)
+
+        menu.addItem(NSMenuItem.separator())
+
+        let shortcutItem = NSMenuItem(title: "Create app", action: #selector(createApp(_:)), keyEquivalent: "")
+        menu.addItem(shortcutItem)
     }
 
 }

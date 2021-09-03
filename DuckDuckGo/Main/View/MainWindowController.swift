@@ -55,6 +55,12 @@ final class MainWindowController: NSWindowController {
         window?.toolbar = NSToolbar()
         window?.toolbar?.showsBaselineSeparator = true
 
+        // swiftlint:disable force_cast
+        guard !(NSApp.delegate as! AppDelegate).isInAppMode else {
+            return
+        }
+        // swiftlint:enable force_cast
+
         guard let tabBarViewController = mainViewController.tabBarViewController else {
             assertionFailure("MainWindowController: tabBarViewController is nil" )
             return
