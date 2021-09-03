@@ -452,7 +452,7 @@ extension BrowserTabViewController: LinkMenuItemSelectors {
 
     func openLinkInBurnerTab(_ sender: NSMenuItem) {
         guard let url = contextMenuLink else { return }
-        openNewTab(with: url, parentTab: tabViewModel?.tab, isBurner: true)
+        openNewTab(with: url, parentTab: tabViewModel?.tab, selected: true, isBurner: true)
     }
 
     func openLinkInNewWindow(_ sender: NSMenuItem) {
