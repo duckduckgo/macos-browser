@@ -186,6 +186,41 @@ extension WKWebView {
         }
     }
 
+    func getThemeColor(callback: @escaping (NSColor?) -> Void) {
+        if #available(macOS 12.0, *) {
+            callback(self.themeColor)
+            return
+        }
+        
+        let script = """
+            (function() {
+                var metaThemeColor = document.querySelector("meta[name=theme-color]");
+                if (metaThemeColor) {
+                    return metaThemeColor.content;
+                }
+                return null;
+            })()
+        """
+        self.evaluateJavaScript(script) { (result, _) in
+            guard let result = result as? String,
+               let color = NSColor(hex: result)
+            else {
+                callback(nil)
+                return
+            }
+            callback(color)
+        }
+    }
+
+    var pageBackgroundColor: NSColor? {
+        if #available(macOS 12.0, *) {
+            return self.pageExtendedBackgroundColor
+        } else if self.responds(to: #selector(getter: WKWebView._pageExtendedBackgroundColor)) {
+            return self._pageExtendedBackgroundColor
+        }
+        return nil
+    }
+
     static var canPrint: Bool {
         if #available(macOS 11.0, *) {
             return true

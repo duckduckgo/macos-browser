@@ -1,5 +1,5 @@
 //
-//  UpdateController.swift
+//  NotificationExtension.swift
 //
 //  Copyright © 2021 DuckDuckGo. All rights reserved.
 //
@@ -17,35 +17,10 @@
 //
 
 import Foundation
-import Sparkle
 
-#if OUT_OF_APPSTORE
+extension Notification.Name {
+    static let firstResponder = Notification.Name("firstResponder")
 
-final class UpdateController: NSObject {
-
-    private lazy var updater = SUUpdater()
-
-    override init() {
-        super.init()
-
-    }
-
-    func checkForUpdates(_ sender: Any!) {
-        updater.checkForUpdates(sender)
-    }
-
-    func configureUpdater() {
-    // The default configuration of Sparkle updates is in Info.plist
-        _=updater
-
-#if DEBUG
-
-        updater.automaticallyChecksForUpdates = false
-        updater.updateCheckInterval = 0
-
-#endif
-    }
-
+    static let openURL = Notification.Name(rawValue: "com.duckduckgo.appTab.openURL")
+    static let checkForUpdates = Notification.Name(rawValue: "com.duckduckgo.appTab.checkForUpdates")
 }
-
-#endif

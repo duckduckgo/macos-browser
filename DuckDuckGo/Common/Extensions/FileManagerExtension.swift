@@ -112,5 +112,47 @@ extension FileManager {
             return self.temporaryDirectory
         }
     }
-    
+
+    enum ExtendedAttributeError: Error {
+        case stringEncodingFailed
+    }
+
+    func extendedAttributeValue(forKey key: String, at url: URL) -> Data? {
+        guard let xattr = ((try? self.attributesOfItem(atPath: url.path))?[.extended] as? [String: Any]),
+              let data = xattr["com.duckduckgo.app-tab-url"] as? Data
+              else { return nil }
+        return data
+    }
+
+    func extendedAttributeValue(forKey key: String, at url: URL) -> String? {
+        guard let data: Data = extendedAttributeValue(forKey: key, at: url) else { return nil }
+        return String(data: data, encoding: .utf8)
+    }
+
+    func extendedAttributeValue(forKey key: String, at url: URL) -> URL? {
+        guard let string: String = extendedAttributeValue(forKey: key, at: url) else { return nil }
+        return URL.init(string: string)
+    }
+
+    func setExtendedAttributeValue(_ value: Data, forKey key: String, at url: URL) throws {
+        var attributes = (try? self.attributesOfItem(atPath: url.path)) ?? [:]
+        var extended = attributes[.extended] as? [String: Any] ?? [:]
+        extended[key] = value
+        attributes[.extended] = extended
+        try self.setAttributes(attributes, ofItemAtPath: url.path)
+    }
+
+    func setExtendedAttributeValue(_ value: String, forKey key: String, at url: URL) throws {
+        guard let data = value.data(using: .utf8) else { throw ExtendedAttributeError.stringEncodingFailed }
+        try setExtendedAttributeValue(data, forKey: key, at: url)
+    }
+
+    func setExtendedAttributeValue(_ value: URL, forKey key: String, at url: URL) throws {
+        try setExtendedAttributeValue(value.absoluteString, forKey: key, at: url)
+    }
+
+}
+
+extension FileAttributeKey {
+    static let extended = FileAttributeKey("NSFileExtendedAttributes")
 }

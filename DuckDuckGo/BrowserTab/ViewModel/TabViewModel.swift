@@ -63,6 +63,7 @@ final class TabViewModel {
     @PublishedAfter private(set) var passiveAddressBarString: String = ""
     @Published private(set) var title: String = UserText.tabHomeTitle
     @Published private(set) var favicon: NSImage = Favicon.home
+    @Published private(set) var themeColor: NSColor?
     @Published private(set) var findInPage: FindInPageModel = FindInPageModel()
 
     @Published private(set) var usedPermissions = Permissions()
@@ -94,6 +95,7 @@ final class TabViewModel {
 
     private func subscribeToFavicon() {
         tab.$favicon.receive(on: DispatchQueue.main).sink { [weak self] _ in self?.updateFavicon() } .store(in: &cancellables)
+        tab.$themeColor.weakAssign(to: \.themeColor, on: self).store(in: &cancellables)
     }
 
     private func subscribeToTabError() {

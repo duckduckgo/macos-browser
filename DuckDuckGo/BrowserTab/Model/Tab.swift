@@ -90,7 +90,8 @@ final class Tab: NSObject {
          shouldLoadInBackground: Bool = false,
          canBeClosedWithBack: Bool = false) {
 
-        self.content = content
+        // Web App locked to a URL
+        self.content = (content == .homepage && NSApp.appTabURL != nil) ? .url(NSApp.appTabURL!) : content
         self.faviconService = faviconService
         self.historyCoordinating = historyCoordinating
         self.title = title
@@ -337,6 +338,8 @@ final class Tab: NSObject {
 
     @Published var favicon: NSImage?
     let faviconService: FaviconService
+
+    @Published var themeColor: NSColor?
 
     private func fetchFavicon(_ faviconURL: URL?, for host: String?, isFromUserScript: Bool) {
         if favicon != nil {
@@ -674,6 +677,9 @@ extension Tab: WKNavigationDelegate {
 
     func webView(_ webView: WKWebView, didFinish navigation: WKNavigation!) {
         self.invalidateSessionStateData()
+        webView.getThemeColor { [weak self] color in
+            self?.themeColor = color
+        }
     }
 
     func webView(_ webView: WKWebView, didFail navigation: WKNavigation!, withError error: Error) {

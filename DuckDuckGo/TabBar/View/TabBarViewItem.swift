@@ -31,6 +31,7 @@ protocol TabBarViewItemDelegate: AnyObject {
     func tabBarViewItemDuplicateAction(_ tabBarViewItem: TabBarViewItem)
     func tabBarViewItemBookmarkThisPageAction(_ tabBarViewItem: TabBarViewItem)
     func tabBarViewItemMoveToNewWindowAction(_ tabBarViewItem: TabBarViewItem)
+    func makeAnAppAction(_ tabBarViewItem: TabBarViewItem)
     func tabBarViewItemFireproofSite(_ tabBarViewItem: TabBarViewItem)
     func tabBarViewItemRemoveFireproofing(_ tabBarViewItem: TabBarViewItem)
 
@@ -184,6 +185,10 @@ final class TabBarViewItem: NSCollectionViewItem {
         delegate?.tabBarViewItemMoveToNewWindowAction(self)
     }
 
+    @objc func makeAnAppAction(_ sender: NSMenuItem) {
+        delegate?.makeAnAppAction(self)
+    }
+
     func subscribe(to tabViewModel: TabViewModel) {
         clearSubscriptions()
 
@@ -220,7 +225,9 @@ final class TabBarViewItem: NSCollectionViewItem {
 
         view.wantsLayer = true
         view.layer?.cornerRadius = 7
-        view.layer?.maskedCorners = [.layerMinXMaxYCorner, .layerMaxXMaxYCorner]
+        if !NSApp.isAppTab {
+            view.layer?.maskedCorners = [.layerMinXMaxYCorner, .layerMaxXMaxYCorner]
+        }
         view.layer?.masksToBounds = true
     }
 
@@ -232,7 +239,7 @@ final class TabBarViewItem: NSCollectionViewItem {
 
     private func updateSubviews() {
         NSAppearance.withAppAppearance {
-            let backgroundColor = isSelected || isDragged ? NSColor.interfaceBackgroundColor : NSColor.clear
+            let backgroundColor = isSelected || isDragged ? NSColor.interfaceBackgroundColor : .tabBarBackgroundColor
             view.layer?.backgroundColor = backgroundColor.cgColor
             mouseOverView.mouseOverColor = isSelected || isDragged ? NSColor.clear : NSColor.tabMouseOverColor
         }
@@ -311,9 +318,11 @@ extension TabBarViewItem: NSMenuDelegate {
 
         menu.addItem(NSMenuItem.separator())
 
-        let bookmarkMenuItem = NSMenuItem(title: UserText.bookmarkThisPage, action: #selector(bookmarkThisPageAction(_:)), keyEquivalent: "")
-        bookmarkMenuItem.target = self
-        menu.addItem(bookmarkMenuItem)
+        if let url = currentURL, url != .emptyPage {
+            let bookmarkMenuItem = NSMenuItem(title: UserText.bookmarkThisPage, action: #selector(bookmarkThisPageAction(_:)), keyEquivalent: "")
+            bookmarkMenuItem.target = self
+            menu.addItem(bookmarkMenuItem)
+        }
 
         if let url = currentURL, url.canFireproof {
             let menuItem: NSMenuItem
@@ -352,6 +361,13 @@ extension TabBarViewItem: NSMenuDelegate {
         let moveToNewWindowMenuItem = NSMenuItem(title: UserText.moveTabToNewWindow, action: #selector(moveToNewWindowAction(_:)), keyEquivalent: "")
         moveToNewWindowMenuItem.target = self
         menu.addItem(moveToNewWindowMenuItem)
+
+        if !NSApp.isAppTab,
+           let url = currentURL, url != .emptyPage {
+            menu.addItem(NSMenuItem.separator())
+            let makeAnAppItem = NSMenuItem(title: "Make an App", action: #selector(makeAnAppAction(_:)), keyEquivalent: "")
+            menu.addItem(makeAnAppItem)
+        }
     }
 
 }

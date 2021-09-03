@@ -31,7 +31,18 @@ extension AppDelegate {
 #if OUT_OF_APPSTORE && !BETA
 
     @IBAction func checkForUpdates(_ sender: Any?) {
-        updateController.checkForUpdates(sender)
+        if NSApp.isAppTab {
+            if let browser = NSWorkspace.shared.runningBrowserInstance() {
+                DistributedNotificationCenter.default().postNotificationName(.checkForUpdates,
+                                                                             object: String(browser.processIdentifier),
+                                                                             userInfo: nil,
+                                                                             deliverImmediately: true)
+            } else if let appURL = NSWorkspace.shared.browserAppURL() {
+                NSWorkspace.shared.openApplication(at: appURL, with: ["--check-for-updates"], newInstance: true)
+            }
+        } else {
+            updateController.checkForUpdates(sender)
+        }
     }
 
 #endif

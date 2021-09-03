@@ -31,6 +31,8 @@ final class TabBarViewController: NSViewController {
         case buttonPadding = 4
     }
 
+    @IBOutlet weak var backgroundColorView: ColorView!
+
     @IBOutlet weak var collectionView: TabBarCollectionView!
     @IBOutlet weak var scrollView: TabBarScrollView!
     @IBOutlet weak var leadingStackViewLeadingConstraint: NSLayoutConstraint!
@@ -49,6 +51,7 @@ final class TabBarViewController: NSViewController {
 
     private var tabsCancellable: AnyCancellable?
     private var selectionIndexCancellable: AnyCancellable?
+    private var themeColorCancellable: AnyCancellable?
     private var cancellables = Set<AnyCancellable>()
 
     required init?(coder: NSCoder) {
@@ -69,7 +72,12 @@ final class TabBarViewController: NSViewController {
         subscribeToSelectionIndex()
         subscribeToIsBurning()
 
-        warmupFireAnimation()
+        if NSApp.isAppTab {
+            self.burnButton.isHidden = true
+            self.plusButton.isHidden = true
+        } else {
+            warmupFireAnimation()
+        }
     }
 
     override func viewWillAppear() {
@@ -108,6 +116,20 @@ final class TabBarViewController: NSViewController {
     private func subscribeToSelectionIndex() {
         selectionIndexCancellable = tabCollectionViewModel.$selectionIndex.receive(on: DispatchQueue.main).sink { [weak self] _ in
             self?.reloadSelection()
+            self?.subscribeToThemeColor()
+        }
+    }
+
+    private func subscribeToThemeColor() {
+        guard NSApp.isAppTab else { return }
+        guard let selectionIndex = tabCollectionViewModel.selectionIndex,
+              let tabViewModel = tabCollectionViewModel.tabViewModel(at: selectionIndex)
+        else {
+            os_log("TabBarViewController: Failed to get tab view model", type: .error)
+            return
+        }
+        themeColorCancellable = tabViewModel.$themeColor.sink { [weak self] themeColor in
+            self?.backgroundColorView.backgroundColor = themeColor ?? .tabBarBackgroundColor
         }
     }
 
@@ -174,7 +196,7 @@ final class TabBarViewController: NSViewController {
         } else {
             isAddButtonFloating = false
         }
-        plusButton.alphaValue = isAddButtonFloating ? 0.0 : 1.0
+        plusButton.alphaValue = isAddButtonFloating || NSApp.isAppTab ? 0.0 : 1.0
         plusButton.isEnabled = !isAddButtonFloating
     }
 
@@ -690,7 +712,7 @@ extension TabBarViewController: NSCollectionViewDelegate {
     func collectionView(_ collectionView: NSCollectionView,
                         layout collectionViewLayout: NSCollectionViewLayout,
                         referenceSizeForFooterInSection section: Int) -> NSSize {
-        let width = isAddButtonFloating ? HorizontalSpace.button.rawValue + HorizontalSpace.buttonPadding.rawValue : 0
+        let width = isAddButtonFloating && !NSApp.isAppTab ? HorizontalSpace.button.rawValue + HorizontalSpace.buttonPadding.rawValue : 0
         return NSSize(width: width, height: collectionView.frame.size.height)
     }
 
@@ -784,6 +806,37 @@ extension TabBarViewController: TabBarViewItemDelegate {
         }
 
         moveToNewWindow(indexPath: indexPath)
+    }
+
+    func makeAnAppAction(_ tabBarViewItem: TabBarViewItem) {
+        guard let indexPath = collectionView.indexPath(for: tabBarViewItem),
+              let tabViewModel = tabCollectionViewModel.tabViewModel(at: indexPath.item),
+              let url = tabViewModel.tab.content.url,
+              let window = self.view.window
+        else {
+            os_log("TabBarViewController: Failed to get index path of tab bar view item", type: .error)
+            return
+        }
+
+        let title = tabViewModel.tab.webView.suggestedFilename?.drop(suffix: ".html")
+            .trimmingCharacters(in: .punctuationCharacters.union(.whitespaces)) ?? ""
+
+        let alert = AppTabSettingsAlert(suggestedName: title, icon: tabViewModel.tab.favicon)
+        alert.beginSheetModal(for: window) { response in
+            guard case .OK = response,
+                  !alert.appNameTextField.stringValue.isEmpty
+            else { return }
+
+            AppTabMaker().makeAppTab(named: alert.appNameTextField.stringValue, for: url, icon: alert.icon) { error in
+                if let error = error {
+                    NSAlert(error: error).runModal()
+                } else {
+                    DispatchQueue.main.asyncAfter(deadline: .now() + 3.0) { [weak self] in
+                        self?.tabBarViewItemCloseAction(tabBarViewItem)
+                    }
+                }
+            }
+        }
     }
 
     func tabBarViewItemFireproofSite(_ tabBarViewItem: TabBarViewItem) {

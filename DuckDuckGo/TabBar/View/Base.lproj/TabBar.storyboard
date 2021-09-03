@@ -76,11 +76,11 @@
                             <scrollView wantsLayer="YES" borderType="none" horizontalLineScroll="10" horizontalPageScroll="10" verticalLineScroll="10" verticalPageScroll="10" hasVerticalScroller="NO" verticalScrollElasticity="none" translatesAutoresizingMaskIntoConstraints="NO" id="O0X-yp-zLn" customClass="TabBarScrollView" customModule="DuckDuckGo_Privacy_Browser" customModuleProvider="target">
                                 <rect key="frame" x="76" y="0.0" width="661" height="32"/>
                                 <clipView key="contentView" drawsBackground="NO" copiesOnScroll="NO" translatesAutoresizingMaskIntoConstraints="NO" id="zdf-RD-hTG">
-                                    <rect key="frame" x="0.0" y="0.0" width="661" height="17"/>
+                                    <rect key="frame" x="0.0" y="0.0" width="661" height="32"/>
                                     <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                     <subviews>
                                         <collectionView selectable="YES" allowsEmptySelection="NO" translatesAutoresizingMaskIntoConstraints="NO" id="OEu-5P-cRF" customClass="TabBarCollectionView" customModule="DuckDuckGo_Privacy_Browser" customModuleProvider="target">
-                                            <rect key="frame" x="0.0" y="0.0" width="661" height="17"/>
+                                            <rect key="frame" x="0.0" y="0.0" width="661" height="32"/>
                                             <autoresizingMask key="autoresizingMask" heightSizable="YES"/>
                                             <collectionViewFlowLayout key="collectionViewLayout" scrollDirection="horizontal" id="oAv-jh-KDw">
                                                 <size key="itemSize" width="120" height="32"/>
@@ -97,7 +97,7 @@
                                 </clipView>
                                 <edgeInsets key="contentInsets" left="0.0" right="0.0" top="0.0" bottom="0.0"/>
                                 <scroller key="horizontalScroller" wantsLayer="YES" verticalHuggingPriority="750" horizontal="YES" id="f6A-N1-Ed1">
-                                    <rect key="frame" x="0.0" y="17" width="661" height="15"/>
+                                    <rect key="frame" x="0.0" y="16" width="661" height="16"/>
                                     <autoresizingMask key="autoresizingMask"/>
                                 </scroller>
                                 <scroller key="verticalScroller" hidden="YES" wantsLayer="YES" verticalHuggingPriority="750" horizontal="NO" id="tXZ-5R-7cy">
@@ -255,6 +255,7 @@
                         </constraints>
                     </view>
                     <connections>
+                        <outlet property="backgroundColorView" destination="T1A-KU-P4c" id="hFD-V2-JhF"/>
                         <outlet property="burnButton" destination="XV4-Ze-5j7" id="ZCC-wX-7hC"/>
                         <outlet property="collectionView" destination="OEu-5P-cRF" id="b95-c4-JM0"/>
                         <outlet property="draggingSpace" destination="Ako-KX-AM9" id="yya-hb-te7"/>

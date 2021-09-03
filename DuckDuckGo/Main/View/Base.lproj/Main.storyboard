@@ -72,13 +72,13 @@
                             <constraint firstAttribute="trailing" secondItem="lYg-bX-QrJ" secondAttribute="trailing" id="HkZ-fV-qYb"/>
                             <constraint firstItem="lYg-bX-QrJ" firstAttribute="top" secondItem="m2S-Jp-Qdl" secondAttribute="top" id="PNG-fr-pcs"/>
                             <constraint firstItem="Jbn-9T-FNt" firstAttribute="centerX" secondItem="wFH-xq-50o" secondAttribute="centerX" id="PQa-4m-EpD"/>
-                            <constraint firstItem="SYo-8W-jl3" firstAttribute="top" secondItem="wFH-xq-50o" secondAttribute="bottom" id="SOg-lH-g5P"/>
                             <constraint firstItem="wFH-xq-50o" firstAttribute="leading" secondItem="m2S-Jp-Qdl" secondAttribute="leading" id="XQv-BZ-2ci"/>
                             <constraint firstItem="af1-Eb-VaG" firstAttribute="top" secondItem="wFH-xq-50o" secondAttribute="bottom" id="ajK-M4-7Qf"/>
                             <constraint firstItem="lYg-bX-QrJ" firstAttribute="leading" secondItem="m2S-Jp-Qdl" secondAttribute="leading" id="kVB-Sz-8Sv"/>
                             <constraint firstItem="af1-Eb-VaG" firstAttribute="leading" secondItem="m2S-Jp-Qdl" secondAttribute="leading" id="oLA-yb-nB8"/>
                             <constraint firstAttribute="bottom" secondItem="SYo-8W-jl3" secondAttribute="bottom" id="tLa-XX-e8i"/>
                             <constraint firstItem="SYo-8W-jl3" firstAttribute="leading" secondItem="m2S-Jp-Qdl" secondAttribute="leading" id="woj-yk-97j"/>
+                            <constraint firstItem="SYo-8W-jl3" firstAttribute="top" secondItem="lYg-bX-QrJ" secondAttribute="bottom" constant="40" id="x6q-Xj-OxS"/>
                             <constraint firstItem="Jbn-9T-FNt" firstAttribute="top" secondItem="wFH-xq-50o" secondAttribute="bottom" constant="-4" id="xdc-Pw-CDZ"/>
                             <constraint firstAttribute="trailing" secondItem="af1-Eb-VaG" secondAttribute="trailing" id="y1o-Rd-sxm"/>
                         </constraints>
@@ -86,8 +86,10 @@
                     <connections>
                         <outlet property="findInPageContainerView" destination="Jbn-9T-FNt" id="5Sl-UV-Fa9"/>
                         <outlet property="navigationBarContainerView" destination="wFH-xq-50o" id="hbq-xV-McI"/>
+                        <outlet property="separator" destination="af1-Eb-VaG" id="Bby-tM-4gw"/>
                         <outlet property="tabBarContainerView" destination="lYg-bX-QrJ" id="nor-E0-cFP"/>
                         <outlet property="webContainerView" destination="SYo-8W-jl3" id="DoZ-Ih-dHA"/>
+                        <outlet property="webContainerViewTopConstraint" destination="x6q-Xj-OxS" id="xAv-20-EmM"/>
                     </connections>
                 </viewController>
                 <customObject id="rPt-NT-nkU" userLabel="First Responder" customClass="NSResponder" sceneMemberID="firstResponder"/>

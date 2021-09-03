@@ -65,6 +65,8 @@ typedef NS_ENUM(NSInteger, WKMediaCaptureState) {
 
 @interface WKWebView (Private)
 
+@property (nonatomic, readonly) NSColor * _pageExtendedBackgroundColor;
+
 - (void)_restoreFromSessionStateData:(NSData *)data;
 - (NSData * _Nullable)_sessionStateData;
 
@@ -81,6 +83,9 @@ typedef NS_ENUM(NSInteger, WKMediaCaptureState) {
 
 @property (nonatomic, readonly) WKMediaCaptureState cameraCaptureState API_AVAILABLE(macos(12.0), ios(15.0));
 @property (nonatomic, readonly) WKMediaCaptureState microphoneCaptureState API_AVAILABLE(macos(12.0), ios(15.0));
+
+@property (nonatomic, readonly) NSColor * themeColor API_AVAILABLE(macos(12.0));
+@property (nonatomic, readonly) NSColor * pageExtendedBackgroundColor API_AVAILABLE(macos(12.0));
 
 #endif
 

@@ -35,4 +35,23 @@ extension NSImage {
         return image
     }
 
+    static let emptyAppIcon = NSImage(named: "icon_empty")!
+
+    func makeAppIcon() -> NSImage {
+        let icon = (NSImage.emptyAppIcon.copy() as? NSImage)!
+        icon.lockFocus()
+
+        self.draw(in: NSRect(x: icon.size.width * 0.046875,
+                             y: icon.size.height * 0.046875,
+                             width: icon.size.width * 0.90625,
+                             height: icon.size.height * 0.90625),
+                  from: NSRect(origin: .zero, size: self.size),
+                  operation: .sourceAtop,
+                  fraction: 1.0)
+
+        icon.unlockFocus()
+
+        return icon
+    }
+
 }

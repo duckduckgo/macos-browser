@@ -1,5 +1,5 @@
 //
-//  UpdateController.swift
+//  OpenURLNotificationMessage.swift
 //
 //  Copyright © 2021 DuckDuckGo. All rights reserved.
 //
@@ -17,35 +17,21 @@
 //
 
 import Foundation
-import Sparkle
 
-#if OUT_OF_APPSTORE
+struct OpenURLNotificationMessage: Codable {
+    
+    let pid: pid_t
+    let url: URL
 
-final class UpdateController: NSObject {
-
-    private lazy var updater = SUUpdater()
-
-    override init() {
-        super.init()
-
+    func toString() throws -> String {
+        try JSONEncoder().encode(self).base64EncodedString()
     }
 
-    func checkForUpdates(_ sender: Any!) {
-        updater.checkForUpdates(sender)
-    }
-
-    func configureUpdater() {
-    // The default configuration of Sparkle updates is in Info.plist
-        _=updater
-
-#if DEBUG
-
-        updater.automaticallyChecksForUpdates = false
-        updater.updateCheckInterval = 0
-
-#endif
+    static func fromString(_ string: String) throws -> OpenURLNotificationMessage {
+        guard let data = Data(base64Encoded: string) else {
+            throw DecodingError.dataCorrupted(DecodingError.Context(codingPath: [], debugDescription: ""))
+        }
+        return try JSONDecoder().decode(Self.self, from: data)
     }
 
 }
-
-#endif

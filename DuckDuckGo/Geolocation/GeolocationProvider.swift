@@ -191,14 +191,6 @@ final class GeolocationProvider: NSObject, GeolocationProviderProtocol {
 
 }
 
-private func dynamicSymbol<T>(named symbolName: String) -> T? {
-    guard let f = dlsym(/*RTLD_DEFAULT*/ UnsafeMutableRawPointer(bitPattern: -2), symbolName) else {
-        assertionFailure("\(symbolName) symbol not found")
-        return nil
-    }
-    return unsafeBitCast(f, to: T.self)
-}
-
 private extension WKProcessPool {
 
     // https://github.com/WebKit/WebKit/blob/8afe31a018b11741abdf9b4d5bb973d7c1d9ff05/Source/WebKit/UIProcess/API/C/WKContext.h#L171

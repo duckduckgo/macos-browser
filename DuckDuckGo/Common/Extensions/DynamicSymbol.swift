@@ -1,5 +1,5 @@
 //
-//  UpdateController.swift
+//  DynamicSymbol.swift
 //
 //  Copyright © 2021 DuckDuckGo. All rights reserved.
 //
@@ -17,35 +17,11 @@
 //
 
 import Foundation
-import Sparkle
 
-#if OUT_OF_APPSTORE
-
-final class UpdateController: NSObject {
-
-    private lazy var updater = SUUpdater()
-
-    override init() {
-        super.init()
-
+func dynamicSymbol<T>(named symbolName: String) -> T? {
+    guard let f = dlsym(/*RTLD_DEFAULT*/ UnsafeMutableRawPointer(bitPattern: -2), symbolName) else {
+        assertionFailure("\(symbolName) symbol not found")
+        return nil
     }
-
-    func checkForUpdates(_ sender: Any!) {
-        updater.checkForUpdates(sender)
-    }
-
-    func configureUpdater() {
-    // The default configuration of Sparkle updates is in Info.plist
-        _=updater
-
-#if DEBUG
-
-        updater.automaticallyChecksForUpdates = false
-        updater.updateCheckInterval = 0
-
-#endif
-    }
-
+    return unsafeBitCast(f, to: T.self)
 }
-
-#endif

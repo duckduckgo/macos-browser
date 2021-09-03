@@ -42,15 +42,19 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
 
 #if OUT_OF_APPSTORE
 
-#if !BETA
     let updateController = UpdateController()
-#endif
 
     let crashReporter = CrashReporter()
 
 #endif
 
     var appUsageActivityMonitor: AppUsageActivityMonitor?
+
+    // locked-to-URL app (App Tab/Web App mode)
+    fileprivate var appTabURL: URL?
+    fileprivate var isAppTab: Bool {
+        appTabURL != nil
+    }
 
     func applicationWillFinishLaunching(_ notification: Notification) {
 #if BETA
@@ -61,6 +65,15 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
             NSApp.terminate(nil)
         }
 #endif
+
+        // Load AppTab fixed URL from Bundle Extended Attributes (if set)
+        self.appTabURL = FileManager.default.extendedAttributeValue(forKey: AppTabMaker.appTabURLKey, at: Bundle.main.bundleURL)
+
+        if appTabURL != nil {
+            // If browser app is newer than this copy, update self
+            checkForMainBrowserUpdates()
+        }
+        checkLaunchArgs()
 
         if !Self.isRunningTests {
             Pixel.setUp()
@@ -73,9 +86,41 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
             os_log("App Encryption Key could not be read: %s", "\(error)")
             fileStore = EncryptedFileStore()
         }
-        stateRestorationManager = AppStateRestorationManager(fileStore: fileStore)
+
+        if !isAppTab {
+#if !BETA
+            updateController.configureUpdater()
+#endif
+            stateRestorationManager = AppStateRestorationManager(fileStore: fileStore)
+        }
 
         urlEventListener.listen()
+    }
+
+    private func checkLaunchArgs() {
+        let processInfo = ProcessInfo()
+        // Web App requests updating itself from current Bundle
+        if processInfo.arguments[safe: 1] == "--update-me",
+           let url = processInfo.arguments[safe: 2].map(URL.init(fileURLWithPath:)),
+           Bundle(url: url)?.bundleIdentifier == Bundle.main.bundleIdentifier,
+           let appTabURL: URL = FileManager.default.extendedAttributeValue(forKey: AppTabMaker.appTabURLKey,
+                                                                            at: url) {
+            let icon = NSWorkspace.shared.icon(forFile: url.path)
+
+            AppTabMaker().makeAppTab(at: url, for: appTabURL, icon: icon) { error in
+                if let error = error {
+                    NSAlert(error: error).runModal()
+                }
+                exit(0)
+            }
+            RunLoop.current.run(until: .distantFuture)
+
+        // Web App requests checking for updates
+        } else if processInfo.arguments[safe: 1] == "--check-for-updates" {
+            DispatchQueue.main.asyncAfter(deadline: .now() + 3) {
+                self.checkForUpdates(nil)
+            }
+        }
     }
 
     func applicationDidFinishLaunching(_ notification: Notification) {
@@ -90,10 +135,17 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
             Pixel.fire(.appLaunch(launch: .autoInitialOrRegular()))
         }
 
-        stateRestorationManager.applicationDidFinishLaunching()
+        if let url = appTabURL {
+            self.urlsToOpen = nil
+            self.appTabURL = url
 
-        if WindowsManager.windows.isEmpty {
-            WindowsManager.openNewWindow()
+            WindowsManager.openNewWindow(with: url)
+        } else {
+            stateRestorationManager.applicationDidFinishLaunching()
+
+            if WindowsManager.windows.isEmpty {
+                WindowsManager.openNewWindow()
+            }
         }
 
         grammarFeaturesManager.manage()
@@ -110,6 +162,16 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
 
 #endif
 
+        if isAppTab {
+            // Disable Bookmarks menu
+            NSApp.mainMenuTyped.bookmarksMenuItem?.isHidden = true
+            // Change Process Name to Bundle Name
+            try? ProcessInfo().setProcessName(Bundle.main.bundleURL.deletingPathExtension().lastPathComponent)
+
+        } else {
+            subscribeToDistributedNotifications()
+        }
+
         if let urlsToOpen = urlsToOpen {
             for url in urlsToOpen {
                 Self.handleURL(url)
@@ -117,6 +179,42 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         }
 
         didFinishLaunching = true
+    }
+
+    private var urlNotificationObserver: Any?
+    private var updateNotificationObserver: Any?
+
+    func subscribeToDistributedNotifications() {
+        let notificationCenter = DistributedNotificationCenter.default()
+        urlNotificationObserver = notificationCenter.addObserver(self,
+                                                                 selector: #selector(openURLNotification(_:)),
+                                                                 name: .openURL,
+                                                                 object: nil)
+        updateNotificationObserver = notificationCenter.addObserver(self,
+                                                                    selector: #selector(checkForUpdatesNotification(_:)),
+                                                                    name: .checkForUpdates,
+                                                                    object: nil)
+    }
+
+    @objc
+    func openURLNotification(_ notification: Notification) {
+        guard let string = notification.object as? String,
+              let obj = try? OpenURLNotificationMessage.fromString(string),
+              obj.pid == NSRunningApplication.current.processIdentifier
+        else { return }
+
+        Self.handleURL(obj.url)
+    }
+
+    @objc
+    func checkForUpdatesNotification(_ notification: Notification) {
+        guard let msg = notification.object as? String,
+              let pid = pid_t(msg),
+              pid == NSRunningApplication.current.processIdentifier
+        else { return }
+
+        NSApp.activate(ignoringOtherApps: true)
+        self.checkForUpdates(nil)
     }
 
     func applicationShouldTerminate(_ sender: NSApplication) -> NSApplication.TerminateReply {
@@ -169,6 +267,20 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         appearancePreferences.updateUserInterfaceStyle()
     }
 
+    // Web App checks if the Main Browser is newer than the Web App
+    private func checkForMainBrowserUpdates() {
+        guard let browserURL = NSWorkspace.shared.browserAppURL(),
+              (Bundle.main.bundleURL.appendingPathComponent("Contents/Info.plist").modificationDate ?? .distantPast)
+                < (browserURL.appendingPathComponent("Contents/Info.plist").modificationDate ?? .distantPast)
+        else { return }
+
+        // run update cycle
+        NSWorkspace.shared.openApplication(at: browserURL, with: ["--update-me", Bundle.main.bundleURL.path], newInstance: true) { _, _ in
+            exit(0)
+        }
+        RunLoop.current.run(until: .distantPast)
+    }
+
 }
 
 extension AppDelegate: AppUsageActivityMonitorDelegate {
@@ -182,4 +294,15 @@ extension AppDelegate: AppUsageActivityMonitorDelegate {
         Pixel.fire(.appActiveUsage(avgTabs: .init(avgTabs: avgTabCount)))
     }
 
+}
+
+extension NSApplication {
+
+    var isAppTab: Bool {
+        (delegate as? AppDelegate)!.isAppTab
+    }
+
+    var appTabURL: URL? {
+        (delegate as? AppDelegate)!.appTabURL
+    }
 }

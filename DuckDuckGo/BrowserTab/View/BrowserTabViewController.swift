@@ -552,6 +552,25 @@ extension BrowserTabViewController: WKUIDelegate {
                  for navigationAction: WKNavigationAction,
                  windowFeatures: WKWindowFeatures) -> WKWebView? {
 
+        // Open External URL in the Main Browser if we are the Web App
+        if NSApp.isAppTab,
+           let url = navigationAction.request.url,
+           navigationAction.request.httpMethod == "GET",
+           let secondLevelDomain = url.secondLevelDomain,
+           secondLevelDomain != self.tabViewModel?.tab.content.url?.secondLevelDomain {
+
+            if let browser = NSWorkspace.shared.runningBrowserInstance(),
+               let msg = try? OpenURLNotificationMessage(pid: browser.processIdentifier, url: url).toString() {
+                DistributedNotificationCenter.default().postNotificationName(.openURL, object: msg, deliverImmediately: true)
+                browser.activate(options: .activateIgnoringOtherApps)
+
+            } else if let appURL = NSWorkspace.shared.browserAppURL() {
+                NSWorkspace.shared.openApplication(at: appURL, with: [url.absoluteString], newInstance: true)
+            }
+
+            return nil
+        }
+
         // Returned web view must be created with the specified configuration.
 
         let tab = Tab(content: .none,

@@ -225,6 +225,12 @@ extension URL {
         return filename
     }
 
+    var secondLevelDomain: String? {
+        let hostComponents = self.host?.components(separatedBy: ".") ?? []
+        guard hostComponents.count >= 2 else { return nil }
+        return hostComponents[(hostComponents.count - 2)..<hostComponents.count].joined(separator: ".")
+    }
+
     // MARK: - Validity
 
     var isValid: Bool {
@@ -315,6 +321,10 @@ extension URL {
     }
 
     // MARK: - File URL
+
+    var modificationDate: Date? {
+        (try? self.resourceValues(forKeys: [.contentModificationDateKey]))?.contentModificationDate
+    }
 
     var volume: URL? {
         try? self.resourceValues(forKeys: [.volumeURLKey]).volume

@@ -88,7 +88,3 @@ final class MainWindow: NSWindow {
     }
 
 }
-
-extension Notification.Name {
-    static let firstResponder = Notification.Name("firstResponder")
-}
