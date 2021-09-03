@@ -86,7 +86,10 @@ final class TwoFactorCodeDetector {
 
         let components = URLComponents(url: secretURL, resolvingAgainstBaseURL: false)
         let secretQueryItem = components?.queryItems?.first { $0.name == "secret" }
-        let secretValue = secretQueryItem!.value!
+        guard let secretValue = secretQueryItem?.value else {
+            return ""
+        }
+
         let base32Decoded = base32DecodeToData(secretValue)!
 
         let totp = TOTP(secret: base32Decoded, digits: 6, timeInterval: 30, algorithm: .sha1)!

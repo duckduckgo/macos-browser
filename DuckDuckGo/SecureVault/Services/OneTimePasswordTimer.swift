@@ -28,6 +28,7 @@ final class OneTimePasswordTimer {
     static let shared = OneTimePasswordTimer()
 
     var remainder: TimeInterval = 0
+    var percentComplete: Float = 0
 
     private var timer: Timer?
 
@@ -43,9 +44,10 @@ final class OneTimePasswordTimer {
 
         let progress = delta.truncatingRemainder(dividingBy: period)
         let warning = ceil(period - progress)
-        let percentComplete = Float(progress / period)
+        let complete = Float(progress / period)
 
         remainder = TimeInterval(warning)
+        percentComplete = complete
 
         let userInfo: [Notification.Name: Any] = [
             OneTimePasswordTimer.userInfoTimeRemainingKey: remainder,

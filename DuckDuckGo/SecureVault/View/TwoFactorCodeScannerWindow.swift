@@ -78,7 +78,8 @@ final class TwoFactorCodeScannerViewController: NSViewController {
         // This isn't reliable in any way, only works for one window
         let windowIDs = NSApplication.shared.windows.map(\.windowNumber).filter { $0 != self.view.window!.windowNumber }
 
-        let imageRef = CGWindowListCreateImage(self.view.window!.frame,
+        // TODO: Figure out the correct frame for this call. self.view.window.frame isn't enough, `Son of Grab` Apple sample code will probably help
+        let imageRef = CGWindowListCreateImage(.zero,
                                                CGWindowListOption.optionIncludingWindow,
                                                CGWindowID(windowIDs.first!),
                                                [])

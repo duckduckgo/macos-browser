@@ -56,6 +56,12 @@ final class PasswordManagementItemModel: ObservableObject {
         }
     }
 
+    @Published var twoFactorSecret: String = "" {
+        didSet {
+            isDirty = true
+        }
+    }
+
     @Published var domain: String = "" {
         didSet {
             isDirty = true
@@ -64,8 +70,6 @@ final class PasswordManagementItemModel: ObservableObject {
 
     @Published var isEditing = false
     @Published var isNew = false
-
-    @Published var twoFactorSecret: String?
 
     var isDirty = false {
         didSet {
@@ -105,6 +109,13 @@ final class PasswordManagementItemModel: ObservableObject {
         NSPasteboard.general.setString(username, forType: .string)
     }
 
+    func copyOTP() {
+        let code = TwoFactorCodeDetector.calculateSixDigitCode(secret: twoFactorSecret, date: Date())
+
+        NSPasteboard.general.clearContents()
+        NSPasteboard.general.setString(code, forType: .string)
+    }
+
     func presentTwoFactorSecretWindow() {
         let windowPresenter = TwoFactorCodeScannerWindow()
         windowPresenter.showScanner()
@@ -129,6 +140,7 @@ final class PasswordManagementItemModel: ObservableObject {
         credentials.account.title = title
         credentials.account.username = username
         credentials.account.domain = normalizedDomain(domain)
+        credentials.account.twoFactorSecret = twoFactorSecret.isEmpty ? nil : twoFactorSecret
         credentials.password = password.data(using: .utf8)! // let it crash?
         onSaveRequested(credentials)
     }
@@ -163,7 +175,7 @@ final class PasswordManagementItemModel: ObservableObject {
         username = credentials?.account.username ?? ""
         password = String(data: credentials?.password ?? Data(), encoding: .utf8) ?? ""
         domain = normalizedDomain(credentials?.account.domain ?? "")
-        twoFactorSecret = credentials?.account.twoFactorSecret
+        twoFactorSecret = credentials?.account.twoFactorSecret ?? ""
         isDirty = false
         isNew = credentials?.account.id == nil
 

@@ -57,7 +57,7 @@ struct PasswordManagementItemView: View {
                         LoginTitleView()
                     }
 
-                    if model.twoFactorSecret == nil {
+                    if model.twoFactorSecret.isEmpty {
                         Button(action: {
                             model.presentTwoFactorSecretWindow()
                         }) {
@@ -76,8 +76,10 @@ struct PasswordManagementItemView: View {
 
                     PasswordView()
 
-                    if model.twoFactorSecret != nil {
+                    if !model.twoFactorSecret.isEmpty && !model.isEditing {
                         OneTimePasswordView()
+                    } else if model.isEditing {
+                        EditOneTimePasswordView()
                     }
 
                     WebsiteView()
@@ -301,16 +303,15 @@ struct CircularProgressView: View {
     var body: some View {
         ZStack {
             Circle()
-                .stroke(lineWidth: 4.0)
+                .stroke(lineWidth: 3.0)
                 .opacity(0.3)
-                .foregroundColor((1.0 - self.progress) > 0.3 ? Color.green : Color.red)
+                .foregroundColor(Color.gray)
 
             Circle()
                 .trim(from: 0.0, to: CGFloat(min(1.0 - self.progress, 1.0)))
-                .stroke(style: StrokeStyle(lineWidth: 4.0, lineCap: .round, lineJoin: .round))
-                .foregroundColor((1.0 - self.progress) > 0.3 ? Color.green : Color.red)
+                .stroke(style: StrokeStyle(lineWidth: 3.0, lineCap: .round, lineJoin: .round))
+                .foregroundColor((1.0 - self.progress) > 0.25 ? Color.green : Color.red)
                 .rotationEffect(Angle(degrees: 270.0))
-                .animation(.linear)
         }
     }
 }
@@ -319,7 +320,7 @@ private struct OneTimePasswordView: View {
 
     @EnvironmentObject var model: PasswordManagementItemModel
 
-    @State var progressValue: Float = 0.5
+    @State var progressValue: Float = OneTimePasswordTimer.shared.percentComplete
     @State var secondsRemaining: TimeInterval = OneTimePasswordTimer.shared.remainder
     @State var isHovering = false
 
@@ -335,26 +336,27 @@ private struct OneTimePasswordView: View {
             .padding(.bottom, itemSpacing)
 
         HStack(spacing: 6) {
+            // The OTP should be cached somewhere and only change when the timer resets
+            Text(TwoFactorCodeDetector.calculateSixDigitCode(secret: model.twoFactorSecret, date: Date())).font(.system(.body, design: .monospaced))
+
+            if isHovering {
+                Button {
+                    model.copyOTP()
+                } label: {
+                    Image("Copy")
+                }.buttonStyle(PlainButtonStyle())
+            }
+
+            Spacer()
+
             HStack {
                 CircularProgressView(progress: $progressValue)
-                    .frame(width: 15, height: 15, alignment: .leading)
+                    .frame(width: 12, height: 12, alignment: .leading)
 
                 Text(formatter.string(from: secondsRemaining)!).font(.system(.body, design: .monospaced))
                     .fixedSize(horizontal: true, vertical: true)
             }
             .padding(6)
-            .background(Color.black.opacity(0.15))
-            .cornerRadius(16.0)
-
-            Text(TwoFactorCodeDetector.calculateSixDigitCode(secret: model.twoFactorSecret, date: Date())).font(.system(.body, design: .monospaced))
-
-            if isHovering {
-                Button {
-                    // TODO: Copy OTP
-                } label: {
-                    Image("Copy")
-                }.buttonStyle(PlainButtonStyle())
-            }
         }
         .onHover {
             isHovering = $0
@@ -369,6 +371,24 @@ private struct OneTimePasswordView: View {
             self.progressValue = percentComplete
         }
         .padding(.bottom, interItemSpacing)
+
+    }
+
+}
+
+private struct EditOneTimePasswordView: View {
+
+    @EnvironmentObject var model: PasswordManagementItemModel
+
+    var body: some View {
+
+        Text(UserText.pmOneTimePassword)
+            .bold()
+            .padding(.bottom, itemSpacing)
+
+        TextField("", text: $model.twoFactorSecret)
+            .textFieldStyle(RoundedBorderTextFieldStyle())
+            .padding(.bottom, interItemSpacing)
 
     }
 
