@@ -23,7 +23,7 @@ import Combine
 final class FireViewController: NSViewController {
 
     static func fireButtonAction() {
-        let response = NSAlert.burnButtonAlert().runModal()
+        let response = NSAlert.fireButtonAlert().runModal()
         if response == NSApplication.ModalResponse.alertFirstButtonReturn {
             DispatchQueue.main.async {
                 let timedPixel = TimedPixel(.burn())

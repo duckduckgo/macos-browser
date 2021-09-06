@@ -90,7 +90,7 @@ final class MainWindowController: NSWindowController {
         mainViewController.tabCollectionViewModel.changesEnabled = !prevented
         mainViewController.tabCollectionViewModel.selectedTabViewModel?.tab.contentChangeEnabled = !prevented
 
-        mainViewController.tabBarViewController.burnButton.isEnabled = !prevented
+        mainViewController.tabBarViewController.fireButton.isEnabled = !prevented
         mainViewController.navigationBarViewController.controlsForUserPrevention.forEach { $0?.isEnabled = !prevented }
         NSApplication.shared.mainMenuTyped.menuItemsForUserPrevention.forEach { $0.isEnabled = !prevented }
 

@@ -189,7 +189,7 @@
                                             </userDefinedRuntimeAttribute>
                                         </userDefinedRuntimeAttributes>
                                         <connections>
-                                            <action selector="burnButtonAction:" target="7J5-0H-rHB" id="4O7-R9-MHU"/>
+                                            <action selector="fireButtonAction:" target="7J5-0H-rHB" id="4O7-R9-MHU"/>
                                         </connections>
                                     </button>
                                 </subviews>
@@ -255,9 +255,9 @@
                         </constraints>
                     </view>
                     <connections>
-                        <outlet property="burnButton" destination="XV4-Ze-5j7" id="ZCC-wX-7hC"/>
                         <outlet property="collectionView" destination="OEu-5P-cRF" id="b95-c4-JM0"/>
                         <outlet property="draggingSpace" destination="Ako-KX-AM9" id="yya-hb-te7"/>
+                        <outlet property="fireButton" destination="XV4-Ze-5j7" id="ZCC-wX-7hC"/>
                         <outlet property="leadingStackViewLeadingConstraint" destination="8CU-j8-UY3" id="qi2-Cw-RTu"/>
                         <outlet property="leftScrollButton" destination="7XG-Qm-Ksx" id="yre-8P-vb9"/>
                         <outlet property="leftShadowImageView" destination="zsA-or-9Xo" id="wVp-jj-2UD"/>

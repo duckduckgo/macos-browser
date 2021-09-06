@@ -39,7 +39,7 @@ final class TabBarViewController: NSViewController {
     @IBOutlet weak var rightShadowImageView: NSImageView!
     @IBOutlet weak var leftShadowImageView: NSImageView!
     @IBOutlet weak var plusButton: MouseOverButton!
-    @IBOutlet weak var burnButton: MouseOverButton!
+    @IBOutlet weak var fireButton: MouseOverButton!
     @IBOutlet weak var draggingSpace: NSView!
     @IBOutlet weak var windowDraggingViewLeadingConstraint: NSLayoutConstraint!
 

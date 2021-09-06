@@ -118,7 +118,7 @@ CA
 </string>
                                             <modifierMask key="keyEquivalentModifierMask" shift="YES" command="YES"/>
                                             <connections>
-                                                <action selector="burnButtonAction:" target="Ady-hI-5gd" id="vT7-U8-BVg"/>
+                                                <action selector="fireButtonAction:" target="Ady-hI-5gd" id="vT7-U8-BVg"/>
                                             </connections>
                                         </menuItem>
                                         <menuItem isSeparatorItem="YES" id="u7E-4A-OQP"/>

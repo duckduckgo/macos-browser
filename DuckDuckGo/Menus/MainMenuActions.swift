@@ -150,7 +150,7 @@ extension AppDelegate {
         }
     }
 
-    @IBAction func burnButtonAction(_ sender: NSButton) {
+    @IBAction func fireButtonAction(_ sender: NSButton) {
         FireViewController.fireButtonAction()
     }
 
