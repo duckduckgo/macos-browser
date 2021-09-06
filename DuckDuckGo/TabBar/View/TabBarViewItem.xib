@@ -169,7 +169,7 @@
         </customView>
         <collectionViewItem id="4MN-w4-aCk" customClass="TabBarViewItem" customModule="DuckDuckGo_Privacy_Browser" customModuleProvider="target">
             <connections>
-                <outlet property="burnIndicator" destination="KTM-gS-x2d" id="mhm-Dr-4GX"/>
+                <outlet property="burnerTabIndicator" destination="KTM-gS-x2d" id="Btu-m9-GPP"/>
                 <outlet property="closeButton" destination="vuD-rY-Vzl" id="JGv-Ac-mRi"/>
                 <outlet property="closeButtonTrailintgConstraint" destination="web-9k-BYT" id="9Wt-xR-qep"/>
                 <outlet property="faviconImageView" destination="Kky-kZ-lU9" id="96Z-4T-ONB"/>

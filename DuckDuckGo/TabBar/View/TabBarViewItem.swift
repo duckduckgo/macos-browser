@@ -128,7 +128,7 @@ final class TabBarViewItem: NSCollectionViewItem {
     @IBOutlet var permissionCloseButtonTrailingConstraint: NSLayoutConstraint!
     @IBOutlet var tabLoadingPermissionLeadingConstraint: NSLayoutConstraint!
     @IBOutlet var closeButtonTrailintgConstraint: NSLayoutConstraint!
-    @IBOutlet var burnIndicator: NSView!
+    @IBOutlet var burnerTabIndicator: ColorView!
 
     private let titleTextFieldMaskLayer = CAGradientLayer()
 
@@ -168,8 +168,7 @@ final class TabBarViewItem: NSCollectionViewItem {
 
     override var isSelected: Bool {
         didSet {
-            (burnIndicator as? ColorView)?.backgroundColor = isSelected ?
-                NSColor.burnerIndicatorSelectedColor : NSColor.burnerIndicatorUnselectedColor
+            burnerTabIndicator.backgroundColor = isSelected ? NSColor.burnerIndicatorSelectedColor : NSColor.burnerIndicatorUnselectedColor
             if isSelected {
                 isDragged = false
             }
@@ -249,7 +248,7 @@ final class TabBarViewItem: NSCollectionViewItem {
         isBurnerTab = tabViewModel.tab.tabStorageType == .burner
 
         closeButton.image = tabViewModel.tab.tabStorageType == .burner ? NSImage(named: "BurnClose") : NSImage(named: "Close")
-        burnIndicator.isHidden = tabViewModel.tab.tabStorageType != .burner
+        burnerTabIndicator.isHidden = tabViewModel.tab.tabStorageType != .burner
 
         tabViewModel.$title.sink { [weak self] title in
             self?.titleTextField.stringValue = title
