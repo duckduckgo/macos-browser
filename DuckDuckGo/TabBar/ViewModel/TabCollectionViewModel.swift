@@ -35,11 +35,6 @@ protocol TabCollectionViewModelDelegate: AnyObject {
 
 final class TabCollectionViewModel: NSObject {
 
-    static func makeWithDefaultTab(isBurner: Bool) -> TabCollectionViewModel {
-        let tab = Tab(content: .homepage, tabStorageType: isBurner ? .burner : .default)
-        return TabCollectionViewModel(tabCollection: TabCollection(tabs: [tab]))
-    }
-
     weak var delegate: TabCollectionViewModelDelegate?
 
     private(set) var tabCollection: TabCollection
@@ -309,37 +304,11 @@ final class TabCollectionViewModel: NSObject {
         delegate?.tabCollectionViewModelDidInsert(self, at: newIndex, selected: true)
     }
 
-    func convertToStandardTab(at index: Int) {
-        guard index >= 0, index < tabCollection.tabs.count else {
-            os_log("TabCollectionViewModel: Index out of bounds", type: .error)
-            return
-        }
-
-        let tab = tabCollection.tabs[index]
-        let tabCopy = Tab(content: tab.content)
-        let newIndex = index + 1
-
-        tabCollection.insert(tab: tabCopy, at: newIndex)
-        select(at: newIndex)
-
-        delegate?.tabCollectionViewModelDidInsert(self, at: newIndex, selected: true)
-    }
-
     func moveTab(at index: Int, to newIndex: Int) {
         tabCollection.moveTab(at: index, to: newIndex)
         select(at: newIndex)
 
         delegate?.tabCollectionViewModel(self, didMoveTabAt: index, to: newIndex)
-    }
-
-    func closeBurnerTabs() {
-        tabCollection.removeBurnerTabs()
-
-        if !tabCollection.tabs.indices.contains(selectionIndex ?? -1) {
-            selectionIndex = tabCollection.tabs.indices.last
-        }
-
-        delegate?.tabCollectionViewModelDidMultipleChanges(self)
     }
 
     private func subscribeToTabs() {
@@ -383,6 +352,42 @@ final class TabCollectionViewModel: NSObject {
 
     private func updateCanInsertLastRemovedTab() {
         canInsertLastRemovedTab = tabCollection.lastRemovedTabCache != nil
+    }
+
+}
+
+// MARK: Burner Tabs suport
+extension TabCollectionViewModel {
+
+    static func makeWithDefaultTab(isBurner: Bool) -> TabCollectionViewModel {
+        let tab = Tab(content: .homepage, tabStorageType: isBurner ? .burner : .default)
+        return TabCollectionViewModel(tabCollection: TabCollection(tabs: [tab]))
+    }
+
+    func closeBurnerTabs() {
+        tabCollection.removeBurnerTabs()
+
+        if !tabCollection.tabs.indices.contains(selectionIndex ?? -1) {
+            selectionIndex = tabCollection.tabs.indices.last
+        }
+
+        delegate?.tabCollectionViewModelDidMultipleChanges(self)
+    }
+
+    func convertToStandardTab(at index: Int) {
+        guard index >= 0, index < tabCollection.tabs.count else {
+            os_log("TabCollectionViewModel: Index out of bounds", type: .error)
+            return
+        }
+
+        let tab = tabCollection.tabs[index]
+        let tabCopy = Tab(content: tab.content)
+        let newIndex = index + 1
+
+        tabCollection.insert(tab: tabCopy, at: newIndex)
+        select(at: newIndex)
+
+        delegate?.tabCollectionViewModelDidInsert(self, at: newIndex, selected: true)
     }
 
 }

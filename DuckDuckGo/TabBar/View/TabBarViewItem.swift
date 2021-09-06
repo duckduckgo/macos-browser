@@ -20,6 +20,14 @@ import Cocoa
 import os.log
 import Combine
 
+struct OtherTabBarViewItemsState {
+
+    let hasItemsToTheLeft: Bool
+    let hasItemsToTheRight: Bool
+    let hasBurnerTabs: Bool
+
+}
+
 protocol TabBarViewItemDelegate: AnyObject {
 
     func tabBarViewItem(_ tabBarViewItem: TabBarViewItem, isMouseOver: Bool)
@@ -36,9 +44,7 @@ protocol TabBarViewItemDelegate: AnyObject {
     func tabBarViewItemRemoveFireproofing(_ tabBarViewItem: TabBarViewItem)
     func tabBarViewItemCloseBurnerTabs(_ tabBarViewItem: TabBarViewItem)
 
-    func otherTabBarViewItemsState(for tabBarViewItem: TabBarViewItem) -> (hasItemsToTheLeft: Bool,
-                                                                           hasItemsToTheRight: Bool,
-                                                                           hasBurnerTabs: Bool)
+    func otherTabBarViewItemsState(for tabBarViewItem: TabBarViewItem) -> OtherTabBarViewItemsState
 
 }
 
@@ -391,10 +397,20 @@ extension TabBarViewItem: NSMenuDelegate {
         closeMenuItem.target = self
         menu.addItem(closeMenuItem)
 
-        let otherItemsState = delegate?.otherTabBarViewItemsState(for: self) ?? (hasItemsToTheLeft: true,
-                                                                                 hasItemsToTheRight: true,
-                                                                                 hasBurnerTabs: false)
+        let otherItemsState = delegate?.otherTabBarViewItemsState(for: self) ?? .init(hasItemsToTheLeft: true,
+                                                                                      hasItemsToTheRight: true,
+                                                                                      hasBurnerTabs: false)
 
+        updateWithTabsToTheSides(menu, otherItemsState)
+
+        let moveToNewWindowMenuItem = NSMenuItem(title: UserText.moveTabToNewWindow, action: #selector(moveToNewWindowAction(_:)), keyEquivalent: "")
+        moveToNewWindowMenuItem.target = self
+        menu.addItem(moveToNewWindowMenuItem)
+
+        updateWithBurnerTabItems(menu, otherItemsState)
+    }
+
+    private func updateWithTabsToTheSides(_ menu: NSMenu, _ otherItemsState: OtherTabBarViewItemsState) {
         if otherItemsState.hasItemsToTheLeft || otherItemsState.hasItemsToTheRight {
             let closeOtherMenuItem = NSMenuItem(title: UserText.closeOtherTabs, action: #selector(closeOtherAction(_:)), keyEquivalent: "")
             closeOtherMenuItem.target = self
@@ -409,10 +425,9 @@ extension TabBarViewItem: NSMenuDelegate {
             menu.addItem(closeTabsToTheRightMenuItem)
         }
 
-        let moveToNewWindowMenuItem = NSMenuItem(title: UserText.moveTabToNewWindow, action: #selector(moveToNewWindowAction(_:)), keyEquivalent: "")
-        moveToNewWindowMenuItem.target = self
-        menu.addItem(moveToNewWindowMenuItem)
+    }
 
+    private func updateWithBurnerTabItems(_ menu: NSMenu, _ otherItemsState: OtherTabBarViewItemsState) {
         if isBurnerTab || otherItemsState.hasBurnerTabs {
             menu.addItem(NSMenuItem.separator())
         }

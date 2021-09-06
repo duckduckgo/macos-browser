@@ -119,8 +119,11 @@ final class TabBarViewController: NSViewController {
 
     private func createNewTabLongPressMenu() -> NSMenu {
         let menu = NSMenu()
-        menu.addItem(NSMenuItem(title: "New Tab", action: #selector(addButtonAction(_:)), target: self, keyEquivalent: ""))
-        menu.addItem(NSMenuItem(title: "New Burner Tab", action: #selector(createBurnerTabAction(_:)), target: self, keyEquivalent: ""))
+        menu.addItem(NSMenuItem(title: UserText.plusButtonNewTabMenuItem, action: #selector(addButtonAction(_:)), target: self, keyEquivalent: ""))
+        menu.addItem(NSMenuItem(title: UserText.plusButtonNewBurnerTabMenuItem,
+                                action: #selector(createBurnerTabAction(_:)),
+                                target: self,
+                                keyEquivalent: ""))
         return menu
     }
 
@@ -829,14 +832,14 @@ extension TabBarViewController: TabBarViewItemDelegate {
         tabCollectionViewModel.closeBurnerTabs()
     }
 
-    func otherTabBarViewItemsState(for tabBarViewItem: TabBarViewItem) -> (hasItemsToTheLeft: Bool, hasItemsToTheRight: Bool, hasBurnerTabs: Bool) {
+    func otherTabBarViewItemsState(for tabBarViewItem: TabBarViewItem) -> OtherTabBarViewItemsState {
         guard let indexPath = collectionView.indexPath(for: tabBarViewItem) else {
             os_log("TabBarViewController: Failed to get index path of tab bar view item", type: .error)
-            return (false, false, false)
+            return .init(hasItemsToTheLeft: false, hasItemsToTheRight: false, hasBurnerTabs: false)
         }
-        return (hasItemsToTheLeft: indexPath.item > 0,
-                hasItemsToTheRight: indexPath.item + 1 < tabCollectionViewModel.tabCollection.tabs.count,
-                hasBurnerTabs: tabCollectionViewModel.tabCollection.tabs.first(where: { $0.tabStorageType == .burner }) != nil)
+        return .init(hasItemsToTheLeft: indexPath.item > 0,
+                     hasItemsToTheRight: indexPath.item + 1 < tabCollectionViewModel.tabCollection.tabs.count,
+                     hasBurnerTabs: tabCollectionViewModel.tabCollection.tabs.first(where: { $0.tabStorageType == .burner }) != nil)
     }
 
 }
