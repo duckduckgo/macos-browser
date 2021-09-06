@@ -37,8 +37,8 @@ final class WindowsManager {
     class func openNewWindow(with tabCollectionViewModel: TabCollectionViewModel? = nil,
                              droppingPoint: NSPoint? = nil,
                              showWindow: Bool = true,
-                             isBurner: Bool = false) -> NSWindow? {
-        let mainWindowController = makeNewWindow(tabCollectionViewModel: tabCollectionViewModel, isBurner: false)
+                             withBurnerTab: Bool = false) -> NSWindow? {
+        let mainWindowController = makeNewWindow(tabCollectionViewModel: tabCollectionViewModel, withBurnerTab: withBurnerTab)
 
         if let droppingPoint = droppingPoint {
             mainWindowController.window?.setFrameOrigin(droppingPoint: droppingPoint)
@@ -59,7 +59,7 @@ final class WindowsManager {
     }
 
     class func openNewWindow(with initialUrl: URL) {
-        let mainWindowController = makeNewWindow(isBurner: false)
+        let mainWindowController = makeNewWindow()
         mainWindowController.showWindow(self)
 
         let mainViewController = mainWindowController.mainViewController
@@ -71,13 +71,13 @@ final class WindowsManager {
         newTab.content = .url(initialUrl)
     }
 
-    private class func makeNewWindow(tabCollectionViewModel: TabCollectionViewModel? = nil, isBurner: Bool) -> MainWindowController {
+    private class func makeNewWindow(tabCollectionViewModel: TabCollectionViewModel? = nil, withBurnerTab: Bool = false) -> MainWindowController {
         let mainViewController: MainViewController
         do {
             mainViewController = try NSException.catch {
                 NSStoryboard(name: "Main", bundle: .main)
                     .instantiateController(identifier: .mainViewController) { coder -> MainViewController? in
-                        let model = tabCollectionViewModel ?? TabCollectionViewModel.makeWithDefaultTab(isBurner: isBurner)
+                        let model = tabCollectionViewModel ?? TabCollectionViewModel.makeWithDefaultTab(isBurner: withBurnerTab)
                         return MainViewController(coder: coder, tabCollectionViewModel: model)
                     }
             }

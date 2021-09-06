@@ -47,7 +47,7 @@ extension AppDelegate {
     }
 
     @IBAction func newBurnerTab(_ sender: Any?) {
-        WindowsManager.openNewWindow(isBurner: true)
+        WindowsManager.openNewWindow(withBurnerTab: true)
     }
 
     @IBAction func openLocation(_ sender: Any?) {
