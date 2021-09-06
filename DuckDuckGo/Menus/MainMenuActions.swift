@@ -151,7 +151,6 @@ extension AppDelegate {
     }
 
     @IBAction func burnButtonAction(_ sender: NSButton) {
-        sender.state = .off
         FireViewController.fireButtonAction()
     }
 
@@ -302,7 +301,7 @@ extension MainViewController {
         } else if NSApplication.shared.isCommandPressed {
             WindowControllersManager.shared.show(url: bookmark.url, newTab: true)
         } else {
-            selectedTabViewModel.tab.content = .url(bookmark.url)
+            selectedTabViewModel.tab.setContent(.url(bookmark.url))
         }
     }
 

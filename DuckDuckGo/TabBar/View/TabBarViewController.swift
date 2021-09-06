@@ -39,7 +39,7 @@ final class TabBarViewController: NSViewController {
     @IBOutlet weak var rightShadowImageView: NSImageView!
     @IBOutlet weak var leftShadowImageView: NSImageView!
     @IBOutlet weak var plusButton: MouseOverButton!
-    @IBOutlet weak var burnButton: BurnButton!
+    @IBOutlet weak var burnButton: MouseOverButton!
     @IBOutlet weak var draggingSpace: NSView!
     @IBOutlet weak var windowDraggingViewLeadingConstraint: NSLayoutConstraint!
 
@@ -68,7 +68,6 @@ final class TabBarViewController: NSViewController {
         scrollView.updateScrollElasticity(with: tabMode)
         observeToScrollNotifications()
         subscribeToSelectionIndex()
-        subscribeToIsBurning()
     }
 
     override func viewWillAppear() {
@@ -108,14 +107,6 @@ final class TabBarViewController: NSViewController {
         selectionIndexCancellable = tabCollectionViewModel.$selectionIndex.receive(on: DispatchQueue.main).sink { [weak self] _ in
             self?.reloadSelection()
         }
-    }
-
-    private func subscribeToIsBurning() {
-        fireViewModel.fire.$isBurning
-            .dropFirst()
-            .receive(on: DispatchQueue.main)
-            .weakAssign(to: \.isBurning, on: burnButton)
-            .store(in: &cancellables)
     }
 
     private func reloadSelection() {

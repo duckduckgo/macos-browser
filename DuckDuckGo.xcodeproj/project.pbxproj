@@ -326,7 +326,6 @@
 		AAB549DF25DAB8F80058460B /* BookmarkViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = AAB549DE25DAB8F80058460B /* BookmarkViewModel.swift */; };
 		AAB7320726DD0C37002FACF9 /* Fire.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = AAB7320626DD0C37002FACF9 /* Fire.storyboard */; };
 		AAB7320926DD0CD9002FACF9 /* FireViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = AAB7320826DD0CD9002FACF9 /* FireViewController.swift */; };
-		AAB7320B26DE3154002FACF9 /* BurnButton.swift in Sources */ = {isa = PBXBuildFile; fileRef = AAB7320A26DE3154002FACF9 /* BurnButton.swift */; };
 		AAB8203C26B2DE0D00788AC3 /* SuggestionListCharacteristics.swift in Sources */ = {isa = PBXBuildFile; fileRef = AAB8203B26B2DE0D00788AC3 /* SuggestionListCharacteristics.swift */; };
 		AABAF59C260A7D130085060C /* FaviconServiceMock.swift in Sources */ = {isa = PBXBuildFile; fileRef = AABAF59B260A7D130085060C /* FaviconServiceMock.swift */; };
 		AABDEA0226BC80D600174FA6 /* PrivacyEntryPointAddressBarButton.swift in Sources */ = {isa = PBXBuildFile; fileRef = AABDEA0126BC80D600174FA6 /* PrivacyEntryPointAddressBarButton.swift */; };
@@ -848,7 +847,6 @@
 		AAB549DE25DAB8F80058460B /* BookmarkViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BookmarkViewModel.swift; sourceTree = "<group>"; };
 		AAB7320626DD0C37002FACF9 /* Fire.storyboard */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; path = Fire.storyboard; sourceTree = "<group>"; };
 		AAB7320826DD0CD9002FACF9 /* FireViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FireViewController.swift; sourceTree = "<group>"; };
-		AAB7320A26DE3154002FACF9 /* BurnButton.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = BurnButton.swift; sourceTree = "<group>"; };
 		AAB8203B26B2DE0D00788AC3 /* SuggestionListCharacteristics.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SuggestionListCharacteristics.swift; sourceTree = "<group>"; };
 		AABAF59B260A7D130085060C /* FaviconServiceMock.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FaviconServiceMock.swift; sourceTree = "<group>"; };
 		AABDEA0126BC80D600174FA6 /* PrivacyEntryPointAddressBarButton.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PrivacyEntryPointAddressBarButton.swift; sourceTree = "<group>"; };
@@ -2597,7 +2595,6 @@
 		AAFCB38325E546FF00859DD4 /* View */ = {
 			isa = PBXGroup;
 			children = (
-				AAB7320A26DE3154002FACF9 /* BurnButton.swift */,
 				AAB7320626DD0C37002FACF9 /* Fire.storyboard */,
 				AAB7320826DD0CD9002FACF9 /* FireViewController.swift */,
 			);
@@ -3237,7 +3234,6 @@
 				AA5C8F59258FE21F00748EB7 /* NSTextFieldExtension.swift in Sources */,
 				B65536AE2685E17200085A79 /* GeolocationService.swift in Sources */,
 				4B02198925E05FAC00ED7DEA /* FireproofingURLExtensions.swift in Sources */,
-				AAB7320B26DE3154002FACF9 /* BurnButton.swift in Sources */,
 				4BA1A6A5258B07DF00F6F690 /* EncryptedValueTransformer.swift in Sources */,
 				4B92929F26670D2A00AD2C21 /* PasteboardBookmark.swift in Sources */,
 				4B9292AC26670D3700AD2C21 /* Bookmark.xcdatamodeld in Sources */,

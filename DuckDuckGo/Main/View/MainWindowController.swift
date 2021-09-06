@@ -80,9 +80,27 @@ final class MainWindowController: NSWindowController {
     private func subscribeToShouldPreventUserInteraction() {
         shouldPreventUserInteractionCancellable = mainViewController.fireViewModel.shouldPreventUserInteraction
             .dropFirst()
-            .sink(receiveValue: { [weak self] isPlaying in
-                self?.moveTabBarView(toTitlebarView: !isPlaying)
+            .sink(receiveValue: { [weak self] shouldPreventUserInteraction in
+                self?.moveTabBarView(toTitlebarView: !shouldPreventUserInteraction)
+                self?.userInteraction(prevented: shouldPreventUserInteraction)
             })
+    }
+
+    private func userInteraction(prevented: Bool) {
+        mainViewController.tabCollectionViewModel.changesEnabled = !prevented
+        mainViewController.tabCollectionViewModel.selectedTabViewModel?.tab.contentChangeEnabled = !prevented
+
+        mainViewController.tabBarViewController.burnButton.isEnabled = !prevented
+        mainViewController.navigationBarViewController.controlsForUserPrevention.forEach { $0?.isEnabled = !prevented }
+        NSApplication.shared.mainMenuTyped.menuItemsForUserPrevention.forEach { $0.isEnabled = !prevented }
+
+        if prevented {
+            window?.styleMask.remove(.closable)
+            mainViewController.view.makeMeFirstResponder()
+        } else {
+            window?.styleMask.update(with: .closable)
+            mainViewController.navigationBarViewController.addressBarViewController?.addressBarTextField.makeMeFirstResponder()
+        }
     }
 
     private func moveTabBarView(toTitlebarView: Bool) {
@@ -156,6 +174,39 @@ extension MainWindowController: NSWindowDelegate {
         DispatchQueue.main.async {
             WindowControllersManager.shared.unregister(self)
         }
+    }
+}
+
+fileprivate extension MainMenu {
+
+    var menuItemsForUserPrevention: [NSMenuItem] {
+        return [
+            newWindowMenuItem,
+            newTabMenuItem,
+            openLocationMenuItem,
+            closeWindowMenuItem,
+            closeAllWindowsMenuItem,
+            closeTabMenuItem,
+            burnWebsiteDataMenuItem
+        ]
+    }
+
+}
+
+fileprivate extension NavigationBarViewController {
+
+    var controlsForUserPrevention: [NSControl?] {
+        return [goBackButton,
+                goForwardButton,
+                refreshButton,
+                feedbackButton,
+                optionsButton,
+                bookmarkListButton,
+                shareButton,
+                passwordManagementButton,
+                addressBarViewController?.addressBarTextField,
+                addressBarViewController?.passiveTextField
+        ]
     }
 
 }

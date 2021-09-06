@@ -67,7 +67,7 @@ final class WindowsManager {
             return
         }
 
-        newTab.content = .url(initialUrl)
+        newTab.setContent(.url(initialUrl))
     }
 
     private class func makeNewWindow(tabCollectionViewModel: TabCollectionViewModel? = nil) -> MainWindowController {

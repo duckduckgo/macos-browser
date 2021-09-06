@@ -193,7 +193,7 @@ final class BrowserTabViewController: NSViewController {
 
     private func show(displayableTabAtIndex index: Int) {
         // The tab switcher only displays displayable tab types.
-        tabCollectionViewModel.selectedTabViewModel?.tab.content = Tab.TabContent.displayableTabTypes[index]
+        tabCollectionViewModel.selectedTabViewModel?.tab.setContent(Tab.TabContent.displayableTabTypes[index])
         updateInterface()
     }
 

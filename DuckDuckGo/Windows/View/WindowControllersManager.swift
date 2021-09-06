@@ -82,12 +82,12 @@ extension WindowControllersManager {
                let firstTab = tabCollection.tabs.first,
                case .homepage = firstTab.content,
                !newTab {
-                firstTab.content = .url(url)
+                firstTab.setContent(.url(url))
             } else if let tab = tabCollectionViewModel.selectedTabViewModel?.tab, !newTab {
-                tab.content = .url(url)
+                tab.setContent(.url(url))
             } else {
                 let newTab = Tab(content: .url(url))
-                newTab.content = .url(url)
+                newTab.setContent(.url(url))
                 tabCollectionViewModel.append(tab: newTab)
             }
         }

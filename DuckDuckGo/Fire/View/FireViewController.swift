@@ -25,37 +25,36 @@ final class FireViewController: NSViewController {
     static func fireButtonAction() {
         let response = NSAlert.burnButtonAlert().runModal()
         if response == NSApplication.ModalResponse.alertFirstButtonReturn {
-            Pixel.fire(.burn())
+            DispatchQueue.main.async {
+                Pixel.fire(.burn())
 
-            let burningWindow: NSWindow
-            let waitForOpening: Bool
-            if let lastKeyWindow = WindowControllersManager.shared.lastKeyMainWindowController?.window,
-               lastKeyWindow.isVisible {
-                burningWindow = lastKeyWindow
-                waitForOpening = false
-            } else {
-                burningWindow = WindowsManager.openNewWindow()!
-                waitForOpening = true
-            }
+                let burningWindow: NSWindow
+                let waitForOpening: Bool
 
-            WindowsManager.closeWindows(except: burningWindow)
-
-            guard let mainViewController = burningWindow.contentViewController as? MainViewController,
-                  let fireViewController = mainViewController.fireViewController else {
-                assertionFailure("No burning window")
-
-                Fire().burnAll(tabCollectionViewModel: nil) {
-                    WindowsManager.openNewWindow()
+                if let lastKeyWindow = WindowControllersManager.shared.lastKeyMainWindowController?.window,
+                   lastKeyWindow.isVisible {
+                    burningWindow = lastKeyWindow
+                    waitForOpening = false
+                } else {
+                    burningWindow = WindowsManager.openNewWindow()!
+                    waitForOpening = true
                 }
-                return
-            }
 
-            if waitForOpening {
-                DispatchQueue.main.asyncAfter(deadline: .now() + 1/3) {
+                WindowsManager.closeWindows(except: burningWindow)
+
+                guard let mainViewController = burningWindow.contentViewController as? MainViewController,
+                      let fireViewController = mainViewController.fireViewController else {
+                    assertionFailure("No burning window")
+                    return
+                }
+
+                if waitForOpening {
+                    DispatchQueue.main.asyncAfter(deadline: .now() + 1/3) {
+                        fireViewController.fire()
+                    }
+                } else {
                     fireViewController.fire()
                 }
-            } else {
-                fireViewController.fire()
             }
         }
     }
@@ -63,6 +62,7 @@ final class FireViewController: NSViewController {
     private var fireViewModel: FireViewModel
     private let tabCollectionViewModel: TabCollectionViewModel
 
+    @IBOutlet weak var fakeFireButton: NSButton!
     @IBOutlet weak var fireAnimationView: AnimationView!
     @IBOutlet weak var progressIndicatorWrapper: NSView!
     @IBOutlet weak var progressIndicator: NSProgressIndicator!
@@ -104,6 +104,9 @@ final class FireViewController: NSViewController {
     }
 
     private func setupView() {
+        fakeFireButton.wantsLayer = true
+        fakeFireButton.layer?.backgroundColor = NSColor.buttonMouseDownColor.cgColor
+
         view.isHidden = true
     }
 

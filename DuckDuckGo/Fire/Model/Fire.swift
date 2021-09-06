@@ -88,9 +88,9 @@ final class Fire {
             os_log("WebsiteDataStore began tab deletion", log: .fire)
             if let tabCollectionViewModel = tabCollectionViewModel {
                 if tabCollectionViewModel.tabCollection.tabs.count > 0 {
-                    tabCollectionViewModel.removeAllTabsAndAppendNewTab()
+                    tabCollectionViewModel.removeAllTabsAndAppendNewTab(forceChange: true)
                 } else {
-                    tabCollectionViewModel.appendNewTab()
+                    tabCollectionViewModel.appendNewTab(forceChange: true)
                 }
                 tabCollectionViewModel.tabCollection.cleanLastRemovedTab()
             }
