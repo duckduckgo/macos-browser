@@ -33,6 +33,14 @@ final class WindowsManager {
         }
     }
 
+    class func closeAllBurnerTabs() {
+        NSApplication.shared.windows.forEach {
+            if let controller = $0.contentViewController as? MainViewController {
+                controller.tabCollectionViewModel.removeBurnerTabs()
+            }
+        }
+    }
+
     @discardableResult
     class func openNewWindow(with tabCollectionViewModel: TabCollectionViewModel? = nil,
                              droppingPoint: NSPoint? = nil,

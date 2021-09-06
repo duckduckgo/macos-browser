@@ -364,7 +364,7 @@ extension TabCollectionViewModel {
         return TabCollectionViewModel(tabCollection: TabCollection(tabs: [tab]))
     }
 
-    func closeBurnerTabs() {
+    func removeBurnerTabs() {
         tabCollection.removeBurnerTabs()
 
         if !tabCollection.tabs.indices.contains(selectionIndex ?? -1) {

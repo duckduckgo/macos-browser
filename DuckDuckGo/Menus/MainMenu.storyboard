@@ -106,6 +106,15 @@
                                                 <action selector="closeAllWindows:" target="Ady-hI-5gd" id="Mpf-Li-edD"/>
                                             </connections>
                                         </menuItem>
+                                        <menuItem title="Close All Burner Tabs" id="Ujb-fA-7Ww">
+                                            <string key="keyEquivalent" base64-UTF8="YES">
+CA
+</string>
+                                            <modifierMask key="keyEquivalentModifierMask" option="YES" command="YES"/>
+                                            <connections>
+                                                <action selector="closeAllBurnerTabs:" target="Ady-hI-5gd" id="8Og-OQ-HeA"/>
+                                            </connections>
+                                        </menuItem>
                                         <menuItem title="Close Tab" keyEquivalent="w" id="DVo-aG-piG">
                                             <connections>
                                                 <action selector="closeTab:" target="Ady-hI-5gd" id="zjx-YQ-d6C"/>

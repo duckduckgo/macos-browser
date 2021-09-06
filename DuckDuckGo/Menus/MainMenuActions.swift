@@ -58,6 +58,10 @@ extension AppDelegate {
         WindowsManager.closeWindows()
     }
 
+    @IBAction func closeAllBurnerTabs(_ sender: Any?) {
+        WindowsManager.closeAllBurnerTabs()
+    }
+
     // MARK: - Help
 
 #if FEEDBACK
@@ -573,9 +577,13 @@ extension AppDelegate: NSMenuItemValidation {
 
     func validateMenuItem(_ menuItem: NSMenuItem) -> Bool {
         switch menuItem.action {
-        // Close all windows
         case #selector(AppDelegate.closeAllWindows(_:)):
             return !WindowControllersManager.shared.mainWindowControllers.isEmpty
+
+        case #selector(AppDelegate.closeAllBurnerTabs(_:)):
+            return !WindowControllersManager.shared.mainWindowControllers.compactMap {
+                $0.mainViewController.tabCollectionViewModel.tabCollection.tabs.contains { $0.tabStorageType == .burner } ? $0 : nil
+            }.isEmpty
 
         default:
             return true

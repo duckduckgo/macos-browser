@@ -829,7 +829,7 @@ extension TabBarViewController: TabBarViewItemDelegate {
     }
 
     func tabBarViewItemCloseBurnerTabs(_ tabBarViewItem: TabBarViewItem) {
-        tabCollectionViewModel.closeBurnerTabs()
+        tabCollectionViewModel.removeBurnerTabs()
     }
 
     func otherTabBarViewItemsState(for tabBarViewItem: TabBarViewItem) -> OtherTabBarViewItemsState {
