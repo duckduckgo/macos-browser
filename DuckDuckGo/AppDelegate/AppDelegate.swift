@@ -36,6 +36,10 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
     private var stateRestorationManager: AppStateRestorationManager!
     private var grammarFeaturesManager = GrammarFeaturesManager()
 
+    private var urlsToOpen: [URL]?
+
+    private var didFinishLaunching = false
+
 #if OUT_OF_APPSTORE
 
 #if !BETA
@@ -105,6 +109,14 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         crashReporter.checkForNewReports()
 
 #endif
+
+        if let urlsToOpen = urlsToOpen {
+            for url in urlsToOpen {
+                Self.handleURL(url)
+            }
+        }
+
+        didFinishLaunching = true
     }
 
     func applicationShouldTerminate(_ sender: NSApplication) -> NSApplication.TerminateReply {
@@ -129,11 +141,20 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
     }
 
     func application(_ sender: NSApplication, openFiles files: [String]) {
-        for path in files {
-            guard FileManager.default.fileExists(atPath: path) else { continue }
-            let url = URL(fileURLWithPath: path)
-
-            Self.handleURL(url)
+        let urlsToOpen: [URL] = files.compactMap {
+            if let url = URL(string: $0),
+               ["http", "https"].contains(url.scheme) {
+                return url
+            } else if FileManager.default.fileExists(atPath: $0) {
+                let url = URL(fileURLWithPath: $0)
+                return url
+            }
+            return nil
+        }
+        if didFinishLaunching {
+            urlsToOpen.forEach(Self.handleURL)
+        } else {
+            self.urlsToOpen = urlsToOpen
         }
     }
 
