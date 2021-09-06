@@ -57,6 +57,7 @@ final class Fire {
 
         group.notify(queue: .main) { [weak self] in
             self?.isBurning = false
+            completion?()
 
             os_log("Fire finished", log: .fire)
         }
