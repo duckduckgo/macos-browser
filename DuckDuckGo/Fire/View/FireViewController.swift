@@ -26,8 +26,7 @@ final class FireViewController: NSViewController {
         let response = NSAlert.burnButtonAlert().runModal()
         if response == NSApplication.ModalResponse.alertFirstButtonReturn {
             DispatchQueue.main.async {
-                Pixel.fire(.burn())
-
+                let timedPixel = TimedPixel(.burn())
                 let burningWindow: NSWindow
                 let waitForOpening: Bool
 
@@ -50,10 +49,10 @@ final class FireViewController: NSViewController {
 
                 if waitForOpening {
                     DispatchQueue.main.asyncAfter(deadline: .now() + 1/3) {
-                        fireViewController.fire()
+                        fireViewController.fire { timedPixel.fire() }
                     }
                 } else {
-                    fireViewController.fire()
+                    fireViewController.fire { timedPixel.fire() }
                 }
             }
         }
@@ -114,7 +113,7 @@ final class FireViewController: NSViewController {
         fireAnimationView.contentMode = .scaleToFill
     }
 
-    private func fire() {
+    private func fire(completion: (() -> Void)? = nil) {
         progressIndicatorWrapper.isHidden = true
 
         fireViewModel.isAnimationPlaying = true
@@ -127,7 +126,7 @@ final class FireViewController: NSViewController {
             }
         }
 
-        self.fireViewModel.fire.burnAll(tabCollectionViewModel: self.tabCollectionViewModel)
+        self.fireViewModel.fire.burnAll(tabCollectionViewModel: self.tabCollectionViewModel, completion: completion)
     }
 
 }
