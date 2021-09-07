@@ -1,5 +1,5 @@
 //
-//  _WKDownload+WebKitDownload.swift
+//  WebKitVersionProvider.swift
 //
 //  Copyright © 2021 DuckDuckGo. All rights reserved.
 //
@@ -17,16 +17,18 @@
 //
 
 import Foundation
-import WebKit
 
-extension _WKDownload: WebKitDownload {
+struct WebKitVersionProvider {
 
-    public var originalRequest: URLRequest? {
-        request
-    }
+    static func getVersion() -> String? {
+        guard let userAgent = WKWebView().value(forKey: "userAgent") as? String,
+              let regularExpression = try? NSRegularExpression(pattern: #"AppleWebKit\s*\/\s*([\d.]+)"#, options: []),
+              let match = regularExpression.firstMatch(in: userAgent, options: [], range: userAgent.nsRange()),
+              match.numberOfRanges >= 1 else {
+            return nil
+        }
 
-    public var webView: WKWebView? {
-        originatingWebView
+        return userAgent[match.range(at: 1)]
     }
 
 }

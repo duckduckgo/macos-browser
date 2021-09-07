@@ -20,6 +20,13 @@ import Foundation
 
 extension Bundle {
 
+    struct Keys {
+        static let name = kCFBundleNameKey as String
+        static let identifier = kCFBundleIdentifierKey as String
+        static let buildNumber = kCFBundleVersionKey as String
+        static let versionNumber = "CFBundleShortVersionString"
+    }
+
     var displayName: String {
         object(forInfoDictionaryKey: "CFBundleDisplayName") as? String ??
             object(forInfoDictionaryKey: "CFBundleName") as? String

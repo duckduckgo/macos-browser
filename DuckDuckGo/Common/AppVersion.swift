@@ -21,13 +21,6 @@ import Foundation
 
 struct AppVersion {
 
-    struct Keys {
-        static let name = kCFBundleNameKey as String
-        static let identifier = kCFBundleIdentifierKey as String
-        static let buildNumber = kCFBundleVersionKey as String
-        static let versionNumber = "CFBundleShortVersionString"
-    }
-
     static let shared = AppVersion()
     
     private let bundle: Bundle
@@ -37,11 +30,11 @@ struct AppVersion {
     }
 
     var name: String {
-        return bundle.object(forInfoDictionaryKey: Keys.name) as? String ?? ""
+        return bundle.object(forInfoDictionaryKey: Bundle.Keys.name) as? String ?? ""
     }
 
     var identifier: String {
-        return bundle.object(forInfoDictionaryKey: Keys.identifier) as? String ?? ""
+        return bundle.object(forInfoDictionaryKey: Bundle.Keys.identifier) as? String ?? ""
     }
     
     var majorVersionNumber: String {
@@ -49,11 +42,11 @@ struct AppVersion {
     }
 
     var versionNumber: String {
-        return bundle.object(forInfoDictionaryKey: Keys.versionNumber) as? String ?? ""
+        return bundle.object(forInfoDictionaryKey: Bundle.Keys.versionNumber) as? String ?? ""
     }
 
     var buildNumber: String {
-        return bundle.object(forInfoDictionaryKey: Keys.buildNumber) as? String ?? ""
+        return bundle.object(forInfoDictionaryKey: Bundle.Keys.buildNumber) as? String ?? ""
     }
     
     var versionAndBuildNumber: String {

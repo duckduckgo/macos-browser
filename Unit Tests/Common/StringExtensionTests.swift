@@ -1,5 +1,5 @@
 //
-//  _WKDownload+WebKitDownload.swift
+//  StringExtensionsTests.swift
 //
 //  Copyright © 2021 DuckDuckGo. All rights reserved.
 //
@@ -17,16 +17,15 @@
 //
 
 import Foundation
-import WebKit
+import XCTest
+@testable import DuckDuckGo_Privacy_Browser
 
-extension _WKDownload: WebKitDownload {
+final class StringExtensionsTests: XCTestCase {
 
-    public var originalRequest: URLRequest? {
-        request
+    // MARK: - General
+
+    func testWhenNsRangeIsCalledWithoutParameter_ThenFullRangeIsReturened() {
+        XCTAssertEqual("".nsRange(), NSRange(location: 0, length: 0))
+        XCTAssertEqual("š".nsRange(), NSRange(location: 0, length: 1))
     }
-
-    public var webView: WKWebView? {
-        originatingWebView
-    }
-
 }

@@ -43,6 +43,7 @@ typedef NS_ENUM(NSInteger, WebKitDownloadRedirectPolicy) {
 @optional
 - (void)download:(id <WebKitDownload>)download willPerformHTTPRedirection:(NSHTTPURLResponse *)response newRequest:(NSURLRequest *)request decisionHandler:(void (^)(WebKitDownloadRedirectPolicy))decisionHandler;
 - (void)download:(id <WebKitDownload>)download didReceiveAuthenticationChallenge:(NSURLAuthenticationChallenge *)challenge completionHandler:(void (^)(NSURLSessionAuthChallengeDisposition, NSURLCredential * _Nullable))completionHandler;
+- (void)download:(id <WebKitDownload>)download didReceiveData:(uint64_t)length;
 - (void)downloadDidFinish:(id <WebKitDownload>)download;
 - (void)download:(id <WebKitDownload>)download didFailWithError:(NSError *)error resumeData:(NSData * _Nullable)resumeData;
 

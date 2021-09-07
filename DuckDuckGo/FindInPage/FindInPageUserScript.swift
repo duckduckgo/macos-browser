@@ -31,6 +31,12 @@ final class FindInPageUserScript: NSObject, StaticUserScript {
 
     func userContentController(_ userContentController: WKUserContentController, didReceive message: WKScriptMessage) {
         guard let dict = message.body as? [String: Any] else { return }
+
+        if let performancePixel = dict["performancePixel"] as? String {
+            Pixel.shared?.fire(pixelNamed: performancePixel)
+            return
+        }
+
         let currentResult = dict["currentResult"] as? Int
         let totalResults = dict["totalResults"] as? Int
         model?.update(currentSelection: currentResult, matchesFound: totalResults)

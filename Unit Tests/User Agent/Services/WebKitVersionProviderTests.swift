@@ -1,5 +1,5 @@
 //
-//  _WKDownload+WebKitDownload.swift
+//  WebKitVersionProviderTests.swift
 //
 //  Copyright © 2021 DuckDuckGo. All rights reserved.
 //
@@ -17,16 +17,14 @@
 //
 
 import Foundation
-import WebKit
 
-extension _WKDownload: WebKitDownload {
+import XCTest
+@testable import DuckDuckGo_Privacy_Browser
 
-    public var originalRequest: URLRequest? {
-        request
-    }
+final class WebKitVersionProviderTests: XCTestCase {
 
-    public var webView: WKWebView? {
-        originatingWebView
+    func testWhenGetVersionIsCalled_ThenNilIsNotReturned() {
+        XCTAssertNotNil(WebKitVersionProvider.getVersion())
     }
 
 }
