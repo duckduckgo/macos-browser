@@ -65,7 +65,7 @@ internal class WebCacheManager {
                 let group = DispatchGroup()
                 cookieStore.getAllCookies { cookies in
                     let cookiesToRemove = cookies.filter { !logins.isFireproof(cookieDomain: $0.domain) && $0.domain != URL.cookieDomain }
-                    assert(Thread.isMainThread, "Completion outside of main thread")
+                    dispatchPrecondition(condition: .onQueue(.main))
                     var finished = 0
 
                     for cookie in cookiesToRemove {
@@ -74,7 +74,7 @@ internal class WebCacheManager {
                         cookieStore.delete(cookie) {
                             group.leave()
 
-                            assert(Thread.isMainThread, "Completion outside of main thread")
+                            dispatchPrecondition(condition: .onQueue(.main))
                             finished += 1
                             let progressValue = (Double(finished) / Double(cookiesToRemove.count)) * 100
                             DispatchQueue.main.async {
