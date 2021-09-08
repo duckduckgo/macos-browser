@@ -62,6 +62,8 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         }
 #endif
 
+        Database.shared.loadStore()
+
         if !Self.isRunningTests {
             Pixel.setUp()
         }
@@ -80,8 +82,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
 
     func applicationDidFinishLaunching(_ notification: Notification) {
         guard !Self.isRunningTests else { return }
-        
-        Database.shared.loadStore()
+
         HTTPSUpgrade.shared.loadDataAsync()
         LocalBookmarkManager.shared.loadBookmarks()
         _=ConfigurationManager.shared
