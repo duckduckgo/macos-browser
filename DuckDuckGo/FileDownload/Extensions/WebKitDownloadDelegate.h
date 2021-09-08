@@ -20,15 +20,6 @@
 
 NS_ASSUME_NONNULL_BEGIN
 
-#ifndef __MAC_11_3
-
-typedef NS_ENUM(NSInteger, WKDownloadRedirectPolicy) {
-    WKDownloadRedirectPolicyCancel,
-    WKDownloadRedirectPolicyAllow,
-} NS_SWIFT_NAME(WKDownload.RedirectPolicy);
-
-#endif
-
 @protocol WebKitDownload;
 
 typedef NS_ENUM(NSInteger, WebKitDownloadRedirectPolicy) {

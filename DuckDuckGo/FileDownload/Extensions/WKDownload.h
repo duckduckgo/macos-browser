@@ -24,44 +24,10 @@ NS_ASSUME_NONNULL_BEGIN
 @protocol WebKitDownload <NSObject>
 @property (nonatomic, readonly, nullable) NSURLRequest *originalRequest;
 @property (nonatomic, readonly, weak) WKWebView *webView;
+@property (nonatomic, weak) id<WebKitDownloadDelegate> downloadDelegate;
+
+- (NSObject *)asNSObject;
+- (void)cancel;
 @end
-
-#ifndef __MAC_11_3
-// defining non-existing in pre-macOS 11.3 WKDownload; WKDownloadDelegate
-
-@class WKDownload;
-
-@protocol WKDownloadDelegate <NSObject>
-@required
-- (void)download:(WKDownload *)download decideDestinationUsingResponse:(NSURLResponse *)response suggestedFilename:(NSString *)suggestedFilename completionHandler:(void (^)(NSURL * _Nullable destination))completionHandler;
-
-@optional
-- (void)download:(WKDownload *)download willPerformHTTPRedirection:(NSHTTPURLResponse *)response newRequest:(NSURLRequest *)request decisionHandler:(void (^)(WKDownloadRedirectPolicy))decisionHandler;
-- (void)download:(WKDownload *)download didReceiveAuthenticationChallenge:(NSURLAuthenticationChallenge *)challenge completionHandler:(void (^)(NSURLSessionAuthChallengeDisposition, NSURLCredential * _Nullable))completionHandler;
-- (void)downloadDidFinish:(WKDownload *)download;
-- (void)download:(WKDownload *)download didFailWithError:(NSError *)error resumeData:(nullable NSData *)resumeData;
-@end
-
-#endif
-
-API_AVAILABLE(macosx(11.3))
-@protocol ObjCWKDownloadProtocol <NSObject>
-@property (nonatomic, weak) id <WKDownloadDelegate> delegate;
-- (void)cancel:(void(^ _Nullable)(NSData * _Nullable resumeData))completionHandler;
-@end
-
-#ifndef __MAC_11_3
-
-// https://github.com/WebKit/WebKit/blob/9a6f03d46238213231cf27641ed1a55e1949d074/Source/WebKit/UIProcess/API/Cocoa/WKDownload.h
-API_AVAILABLE(macosx(11.3))
-@interface WKDownload : NSObject<NSProgressReporting, WebKitDownload, ObjCWKDownloadProtocol>
-@property (nonatomic, readonly, nullable) NSURLRequest *originalRequest;
-@property (nonatomic, readonly, weak) WKWebView *webView;
-@property (nonatomic, weak) id <WKDownloadDelegate> delegate;
-
-- (void)cancel:(void(^ _Nullable)(NSData * _Nullable resumeData))completionHandler;
-@end
-
-#endif
 
 NS_ASSUME_NONNULL_END

@@ -20,6 +20,7 @@ import Foundation
 import WebKit
 
 extension _WKDownload: WebKitDownload {
+    private static let downloadDelegateKey = UnsafeRawPointer(bitPattern: "_WKDownloadDelegateKey".hashValue)!
 
     public var originalRequest: URLRequest? {
         request
@@ -27,6 +28,26 @@ extension _WKDownload: WebKitDownload {
 
     public var webView: WKWebView? {
         originatingWebView
+    }
+
+    public var downloadDelegate: WebKitDownloadDelegate? {
+        get {
+            return (objc_getAssociatedObject(self, Self.downloadDelegateKey) as? WeakDownloadDelegateRef)?.delegate
+        }
+        set {
+            objc_setAssociatedObject(self, Self.downloadDelegateKey, WeakDownloadDelegateRef(newValue), .OBJC_ASSOCIATION_RETAIN)
+        }
+    }
+
+    public func asNSObject() -> NSObject {
+        self as NSObject
+    }
+
+    final private class WeakDownloadDelegateRef: NSObject {
+        weak var delegate: WebKitDownloadDelegate?
+        init(_ delegate: WebKitDownloadDelegate?) {
+            self.delegate = delegate
+        }
     }
 
 }
