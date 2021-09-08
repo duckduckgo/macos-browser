@@ -355,7 +355,13 @@
                         <menuItem title="Copy Download Link" id="p9Q-4g-R6I">
                             <modifierMask key="keyEquivalentModifierMask"/>
                             <connections>
-                                <action selector="copyDownloadLink:" target="luO-ux-o3b" id="NVA-YX-IbL"/>
+                                <action selector="copyDownloadLinkAction:" target="luO-ux-o3b" id="7DR-xW-0FY"/>
+                            </connections>
+                        </menuItem>
+                        <menuItem title="Open Originating Website" id="ctA-Z1-mdh">
+                            <modifierMask key="keyEquivalentModifierMask"/>
+                            <connections>
+                                <action selector="openOriginatingWebsiteAction:" target="luO-ux-o3b" id="gVw-sj-qSZ"/>
                             </connections>
                         </menuItem>
                         <menuItem isSeparatorItem="YES" id="p77-2u-37g"/>

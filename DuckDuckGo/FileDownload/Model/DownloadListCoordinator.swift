@@ -18,113 +18,24 @@
 
 import Foundation
 import Combine
-
-final class DownloadListItem {
-
-    enum State {
-        case downloading(Progress)
-        case complete(URL?)
-        case failed(error: FileDownloadError, resumeData: Data?)
-
-        var progress: Progress? {
-            guard case .downloading(let progress) = self else { return nil }
-            return progress
-        }
-    }
-    let id: String = UUID().uuidString
-    
-    @Published var state: State
-    var added: Date
-    var updated: Date
-    @Published private(set) var localURL: URL?
-    @Published private(set) var filename: String
-    @Published private(set) var fileType: UTType?
-
-    weak var task: WebKitDownloadTask? {
-        didSet {
-            webView = task?.originalWebView
-            postflight = task?.postflight
-            if let task = task {
-                self.subscribe(to: task)
-            } else {
-                self.cancellables.removeAll()
-            }
-        }
-    }
-    weak var webView: WKWebView?
-    var postflight: FileDownloadManager.PostflightAction?
-
-    private var cancellables = Set<AnyCancellable>()
-
-    init(task: WebKitDownloadTask, added: Date) {
-        self.state = .downloading(task.progress)
-        self.added = added
-        self.updated = added
-        self.task = task
-        self.webView = task.originalWebView
-        self.postflight = task.postflight
-        self.filename = ""
-
-        self.subscribe(to: task)
-    }
-
-    convenience init(task: WebKitDownloadTask) {
-        self.init(task: task, added: Date())
-    }
-
-    init(localURL: URL, fileType: UTType?, added: Date = Date(), updated: Date = Date()) {
-        self.state = .complete(localURL)
-        self.localURL = localURL
-        self.filename = localURL.lastPathComponent
-        self.fileType = fileType
-        self.added = added
-        self.updated = updated
-    }
-
-    func createRequest() -> URLRequest {
-        fatalError()
-    }
-
-    private func subscribe(to task: WebKitDownloadTask) {
-        self.state = .downloading(task.progress)
-
-        task.output.sink { [weak self] completion in
-            guard let self = self else { return }
-            if case .failure(let error) = completion {
-                self.state = .failed(error: error, resumeData: error.resumeData)
-            } else {
-                self.state = .complete(self.localURL)
-            }
-            // TODO: inform Coordinator about state change
-            self.task = nil
-
-        } receiveValue: { [weak self] url in
-            self?.localURL = url
-        }.store(in: &cancellables)
-        task.$destinationURL.weakAssign(to: \.localURL, on: self).store(in: &cancellables)
-        task.$destinationURL.combineLatest(task.$suggestedFilename).map {
-            $0.0?.lastPathComponent ?? $0.1 ?? ""
-        }.weakAssign(to: \.filename, on: self).store(in: &cancellables)
-        task.$fileType.weakAssign(to: \.fileType, on: self).store(in: &cancellables)
-    }
-
-}
+import os.log
 
 final class DownloadListCoordinator {
     static let shared = DownloadListCoordinator()
 
-    private let store: Any?
+    private let store: DownloadListStoring
     private let downloadManager: FileDownloadManager
+    private let queue = DispatchQueue.init(label: "downloads.coordinator.queue")
 
     private var cancellable: AnyCancellable?
 
-    private var knownDownloadTasks: Set<WebKitDownloadTask> = []
-    private var isAddingDownload = false
-    @PublishedAfter private(set) var downloads: [DownloadListItem] = []
+    private var downloadTaskCancellables: [WebKitDownloadTask: Set<AnyCancellable>] = [:]
+    @PublishedAfter private(set) var downloads: [DownloadViewModel] = []
+    private var downloadEntries = [WebKitDownloadTask: DownloadListItem]()
 
     let progress = Progress()
 
-    init(store: Any? = nil, downloadManager: FileDownloadManager = .shared) {
+    init(store: DownloadListStoring = DownloadListStore(), downloadManager: FileDownloadManager = .shared) {
         self.store = store
         self.downloadManager = downloadManager
 
@@ -134,54 +45,154 @@ final class DownloadListCoordinator {
 
     private func load() {
         downloads = []
+        store.fetch(clearingItemsOlderThan: .monthAgo) { [weak self] result in
+            switch result {
+            case .success(let entries):
+                self?.downloads.append(contentsOf: entries.map(DownloadViewModel.init(entry:)))
+            case .failure(let error):
+                os_log("Cleaning and loading of downloads failed: %s", log: .history, type: .error, error.localizedDescription)
+            }
+        }
     }
 
     private func subscribeToDownloadManager() {
-        cancellable = downloadManager.$downloads.sink { [weak self] tasks in
-            guard let self = self,
-                  // restarted download will be reassigned to existing item
-                  !self.isAddingDownload
-            else { return }
+        cancellable = downloadManager.$downloads.receive(on: DispatchQueue.main)
+            .sink { [weak self] tasks in
+                guard let self = self else { return }
 
-            let added = tasks.subtracting(self.knownDownloadTasks)
-
-            self.knownDownloadTasks = tasks
-            self.addDownloadTasks(added)
+                let added = tasks.subtracting(self.downloadTaskCancellables.keys)
+                added.forEach(self.subscribeToDownloadTask)
+                added.forEach(self.subscribeToDownloadTaskCompletion)
         }
     }
 
-    func addDownloadTasks(_ tasks: Set<WebKitDownloadTask>) {
-        downloads.append(contentsOf: tasks.map(DownloadListItem.init(task:)))
+    private func updateDownloadHistoryEntryIfNeeded(for task: WebKitDownloadTask,
+                                                    model: DownloadViewModel? = nil,
+                                                    error: FileDownloadError? = nil) {
+        var updated = false
+        var entry: DownloadListItem! = self.downloadEntries[task]
+
+        if entry == nil {
+            var model: DownloadViewModel! = model
+            if model == nil {
+                model = DownloadViewModel(task: task)
+                self.downloads.insert(model, at: 0)
+            }
+            entry = DownloadListItem(model)
+            updated = true
+        }
+
+        if entry.fileType != task.fileType {
+            entry.fileType = task.fileType
+            updated = true
+        }
+        if entry.destinationURL != task.destinationURL {
+            entry.destinationURL = task.destinationURL
+            updated = true
+        }
+        if entry.tempURL != task.tempURL {
+            entry.tempURL = task.tempURL
+            updated = true
+        }
+        
+        if let error = error {
+            entry.error = error
+            updated = true
+        }
+
+        if updated {
+            self.downloadEntries[task] = entry
+            self.store.save(entry)
+        }
     }
+
+    private func subscribeToDownloadTask(_ task: WebKitDownloadTask) {
+        task.$destinationURL.asVoid()
+            .merge(with: task.$tempURL.asVoid())
+            .merge(with: task.$fileType.asVoid())
+            .merge(with: task.progress.publisher(for: \.fractionCompleted).asVoid())
+            .throttle(for: 0.3, scheduler: DispatchQueue.main, latest: true)
+            .sink { [weak self] _ in
+                self?.updateDownloadHistoryEntryIfNeeded(for: task)
+            }
+            .store(in: &self.downloadTaskCancellables[task, default: []])
+    }
+
+    private func subscribeToDownloadTaskCompletion(_ task: WebKitDownloadTask) {
+        // clear download cancellables (and the task as a Key) when download completes
+        task.output
+            .sink { [weak self] completion in
+                guard let self = self else { return }
+                if case .failure(let error) = completion {
+                    self.updateDownloadHistoryEntryIfNeeded(for: task, error: error)
+                }
+                self.downloadTaskCancellables[task] = nil
+                self.downloadEntries[task] = nil
+
+            } receiveValue: { [weak self] _ in
+                self?.updateDownloadHistoryEntryIfNeeded(for: task)
+            }
+            .store(in: &self.downloadTaskCancellables[task, default: []])
+    }
+
+    private func downloadRestartedCallback(for model: DownloadViewModel, webView: WKWebView) -> (WebKitDownload) -> Void {
+        return { download in
+            withExtendedLifetime(webView) {
+                let task = self.downloadManager.add(download,
+                                                    delegate: model,
+                                                    promptForLocation: true,
+                                                    postflight: model.postflight)
+                self.subscribeToDownloadTaskCompletion(task)
+                if let tempURL = model.tempURL, task.tempURL == nil {
+                    task.tempURL = tempURL
+                }
+                if let destinationURL = model.localURL, task.destinationURL == nil {
+                    task.destinationURL = destinationURL
+                }
+
+                model.task = task
+                let entry = DownloadListItem(model)
+                self.downloadEntries[task] = entry
+                self.store.save(entry)
+            }
+        }
+    }
+
+    // MARK: interface
 
     func restartDownload(at index: Int) {
         let model = downloads[index]
-        let request = model.createRequest()
 
-        defer {
-
-        }
         guard let webView = model.webView
-            ?? WindowControllersManager.shared.lastKeyMainWindowController?.mainViewController.browserTabViewController.tabViewModel?.tab.webView
+                ?? WindowControllersManager.shared.lastKeyMainWindowController?.mainViewController.browserTabViewController
+                .tabViewModel?.tab.webView
         else {
             assertionFailure("Restarting download without open windows is not supported")
             return
         }
 
-        // TODO: resumeDownload with resumeData
-        webView.startDownload(request) { download in
-            self.isAddingDownload = true
-            let task = self.downloadManager.add(download, delegate: model, promptForLocation: true, postflight: model.postflight)
-            self.isAddingDownload = false
-
-            withExtendedLifetime(webView) {
-                model.task = task
+        do {
+            guard let resumeData = model.error?.resumeData,
+                  let tempURL = model.tempURL,
+                  FileManager.default.fileExists(atPath: tempURL.path),
+                  model.localURL != nil
+            else {
+                struct ThrowableError: Error {}
+                throw ThrowableError()
             }
+            try webView.resumeDownload(from: resumeData,
+                                       to: tempURL,
+                                       completionHandler: self.downloadRestartedCallback(for: model, webView: webView))
+        } catch {
+            let request = model.createRequest()
+            webView.startDownload(request, completionHandler: self.downloadRestartedCallback(for: model,
+                                                                                             webView: webView))
         }
     }
 
     func cleanupInactiveDownloads() {
         downloads.removeAll { $0.task == nil }
+        store.clear()
     }
 
     func removeDownload(at index: Int) {
@@ -193,9 +204,13 @@ final class DownloadListCoordinator {
         downloads[index].task?.cancel()
     }
 
+    func sync() {
+        store.sync()
+    }
+
 }
 
-extension DownloadListItem: FileDownloadManagerDelegate {
+extension DownloadViewModel: FileDownloadManagerDelegate {
 
     func chooseDestination(suggestedFilename: String?, directoryURL: URL?, fileTypes: [UTType], callback: @escaping (URL?, UTType?) -> Void) {
         if let url = self.localURL {
@@ -217,6 +232,21 @@ extension DownloadListItem: FileDownloadManagerDelegate {
 
     func fileIconFlyAnimationOriginalRect(for downloadTask: WebKitDownloadTask) -> NSRect? {
         return nil
+    }
+
+}
+
+extension DownloadListItem {
+
+    init(_ item: DownloadViewModel) {
+        self.init(identifier: item.id,
+                  added: item.added,
+                  modified: item.modified,
+                  url: item.url,
+                  websiteURL: item.websiteURL,
+                  destinationURL: item.localURL,
+                  tempURL: item.tempURL,
+                  error: item.error)
     }
 
 }

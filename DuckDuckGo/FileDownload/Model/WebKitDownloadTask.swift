@@ -19,19 +19,6 @@
 import Foundation
 import Combine
 
-enum FileDownloadError: Error {
-    case cancelled
-
-    case failedToMoveFileToDownloads
-    case failedToCompleteDownloadTask(underlyingError: Error, resumeData: Data?)
-
-    var resumeData: Data? {
-        guard case .failedToCompleteDownloadTask(underlyingError: _, resumeData: let data) = self else { return nil }
-        return data
-    }
-
-}
-
 protocol WebKitDownloadTaskDelegate: AnyObject {
     func fileDownloadTaskNeedsDestinationURL(_ task: WebKitDownloadTask,
                                              suggestedFilename: String,
@@ -50,7 +37,7 @@ final class WebKitDownloadTask: NSObject, ProgressReporting {
     var postflight: FileDownloadManager.PostflightAction?
     @Published private(set) var suggestedFilename: String?
     /// Desired local destination file URL used to display download location
-    @Published private(set) var destinationURL: URL?
+    @Published var destinationURL: URL?
     /// File Type used for File Icon generation
     @Published private(set) var fileType: UTType?
 
@@ -70,7 +57,15 @@ final class WebKitDownloadTask: NSObject, ProgressReporting {
     private var cancellables = Set<AnyCancellable>()
 
     private var decideDestinationCompletionHandler: ((URL?) -> Void)?
-    private var tempURL: URL?
+
+    @Published var tempURL: URL? {
+        didSet {
+            guard let tempURL = tempURL else { return }
+
+            self.progress.fileURL = tempURL
+            self.progress.publishIfNotPublished()
+        }
+    }
 
     var originalRequest: URLRequest? {
         download.originalRequest
@@ -117,7 +112,7 @@ final class WebKitDownloadTask: NSObject, ProgressReporting {
         }
     }
 
-    func localFileURLCompletionHandler(localURL: URL?, fileType: UTType?) {
+    private func localFileURLCompletionHandler(localURL: URL?, fileType: UTType?) {
         dispatchPrecondition(condition: .onQueue(.main))
 
         do {
@@ -126,18 +121,14 @@ final class WebKitDownloadTask: NSObject, ProgressReporting {
             else { throw URLError(.cancelled) }
 
             let downloadURL = try self.downloadURL(for: localURL)
-
             self.tempURL = downloadURL
             self.destinationURL = localURL
-
-            self.progress.fileURL = downloadURL
-            self.progress.publishIfNotPublished()
 
             completionHandler(downloadURL)
 
         } catch {
             self.download.cancel()
-            self.finish(with: .failure(.cancelled))
+            self.finish(with: .failure(.failedToCompleteDownloadTask(underlyingError: URLError(.cancelled), resumeData: nil)))
             self.decideDestinationCompletionHandler?(nil)
         }
     }
@@ -191,6 +182,7 @@ final class WebKitDownloadTask: NSObject, ProgressReporting {
                 self.progress.totalUnitCount = 1
             }
             self.progress.completedUnitCount = self.progress.totalUnitCount
+            self.tempURL = nil
         }
 
         self.progress.unpublishIfNeeded()
@@ -270,12 +262,7 @@ extension WebKitDownloadTask: WebKitDownloadDelegate {
            let tempURL = tempURL {
             try? FileManager.default.removeItem(at: tempURL)
         }
-        if (error as? URLError)?.code == URLError.cancelled {
-            self.finish(with: .failure(.cancelled))
-        } else {
-            self.finish(with: .failure(.failedToCompleteDownloadTask(underlyingError: error,
-                                                                     resumeData: resumeData)))
-        }
+        self.finish(with: .failure(.failedToCompleteDownloadTask(underlyingError: error, resumeData: resumeData)))
     }
 
     func download(_ download: WebKitDownload, didReceiveData length: UInt64) {

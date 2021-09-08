@@ -23,7 +23,6 @@ import os.log
 @NSApplicationMain
 final class AppDelegate: NSObject, NSApplicationDelegate {
 
-    let downloadsCoordinator = DownloadListCoordinator.shared
     let launchTimingPixel = TimedPixel(.launchTiming)
 
     static var isRunningTests: Bool {
@@ -121,6 +120,13 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
     }
 
     func applicationShouldTerminate(_ sender: NSApplication) -> NSApplication.TerminateReply {
+        if let alert = NSAlert.activeDownloadsTerminationAlert() {
+            if alert.runModal() == .cancel {
+                return .terminateCancel
+            }
+            FileDownloadManager.shared.cancelAll(waitUntilDone: true)
+            DownloadListCoordinator.shared.sync()
+        }
         stateRestorationManager?.applicationWillTerminate()
 
         return .terminateNow

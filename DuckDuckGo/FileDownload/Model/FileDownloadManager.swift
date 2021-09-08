@@ -73,6 +73,28 @@ final class FileDownloadManager {
         return task
     }
 
+    func cancelAll(waitUntilDone: Bool) {
+        let dispatchGroup: DispatchGroup? = waitUntilDone ? DispatchGroup() : nil
+        var cancellables = Set<AnyCancellable>()
+        for task in downloads {
+            if waitUntilDone {
+                dispatchGroup?.enter()
+                task.output.sink { _ in
+                    dispatchGroup?.leave()
+                } receiveValue: { _ in }
+                .store(in: &cancellables)
+            }
+
+            task.cancel()
+        }
+
+        var finished = false
+        dispatchGroup?.notify(queue: .main) { finished = true }
+        while waitUntilDone && !finished {
+            RunLoop.main.run(until: Date.distantFuture)
+        }
+    }
+
 }
 
 extension FileDownloadManager: WebKitDownloadTaskDelegate {

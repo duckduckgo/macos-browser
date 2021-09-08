@@ -41,8 +41,8 @@ final class DownloadsCellView: NSTableCellView {
 
     override var objectValue: Any? {
         didSet {
-            assert(objectValue is DownloadListItem?)
-            guard let object = objectValue as? DownloadListItem else {
+            assert(objectValue is DownloadViewModel?)
+            guard let object = objectValue as? DownloadViewModel else {
                 unsubscribe()
                 return
             }
@@ -50,7 +50,7 @@ final class DownloadsCellView: NSTableCellView {
         }
     }
 
-    private func subscribe(to object: DownloadListItem) {
+    private func subscribe(to object: DownloadViewModel) {
         object.$fileType.combineLatest(object.$filename) { fileType, filename in
             var fileType = fileType ?? .data
             if fileType.fileExtension?.isEmpty ?? true {
@@ -74,7 +74,7 @@ final class DownloadsCellView: NSTableCellView {
             .store(in: &cancellables)
     }
 
-    private func updateState(_ state: DownloadListItem.State) {
+    private func updateState(_ state: DownloadViewModel.State) {
         switch state {
         case .downloading(let progress):
             subscribe(to: progress)
@@ -82,9 +82,26 @@ final class DownloadsCellView: NSTableCellView {
         case .complete(let url):
             updateCompletedFile(at: url)
 
-        case .failed(error: let error, resumeData: _):
+        case .failed(let error):
             updateDownloadFailed(with: .downloadFailed(error))
         }
+    }
+
+    private func updateDetails(with progress: Progress) {
+        var details = progress.localizedAdditionalDescription ?? ""
+        if details.isEmpty {
+            if progress.fractionCompleted == 0 {
+                details = UserText.downloadStarting
+            } else if progress.fractionCompleted == 1.0 {
+                details = UserText.downloadFinishing
+            } else {
+                assertionFailure("Unexpected empty description")
+                details = "Downloading…"
+            }
+        }
+
+        self.detailLabel.stringValue = details
+        self.detailLabel.toolTip = progress.localizedDescription
     }
 
     private func subscribe(to progress: Progress) {
@@ -92,15 +109,10 @@ final class DownloadsCellView: NSTableCellView {
         progressCancellable = progress.publisher(for: \.completedUnitCount)
             .throttle(for: 0.2, scheduler: DispatchQueue.main, latest: true)
             .sink { [weak self] _ in
-                guard let self = self else { return }
-
-                self.detailLabel.stringValue = progress.localizedAdditionalDescription
-                self.detailLabel.toolTip = progress.localizedDescription
+                self?.updateDetails(with: progress)
         }
 
-        self.detailLabel.stringValue = progress.localizedAdditionalDescription
-        self.detailLabel.toolTip = progress.localizedDescription
-
+        updateDetails(with: progress)
         self.cancelButton.isHidden = false
         self.restartButton.isHidden = true
         self.revealButton.isHidden = true
@@ -155,10 +167,10 @@ extension DownloadsCellView.DownloadError: LocalizedError {
             return ""
         case .fileRemoved:
             return UserText.downloadedFileRemoved
-        case .downloadFailed(.cancelled):
-            return UserText.downloadCanceled
         case .downloadFailed(.failedToMoveFileToDownloads):
             return UserText.downloadFailedToMoveFileToDownloads
+        case .downloadFailed(let error) where error.isCancelled:
+            return UserText.downloadCanceled
         case .downloadFailed(.failedToCompleteDownloadTask(underlyingError: _, resumeData: _)):
             return UserText.downloadFailed
         }
@@ -168,7 +180,7 @@ extension DownloadsCellView.DownloadError: LocalizedError {
         guard case .downloadFailed(.failedToCompleteDownloadTask(underlyingError: let error, resumeData: _)) = self else {
             return shortDescription
         }
-        return error.localizedDescription
+        return error?.localizedDescription
     }
 
 }

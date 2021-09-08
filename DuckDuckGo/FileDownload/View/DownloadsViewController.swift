@@ -38,7 +38,7 @@ final class DownloadsViewController: NSViewController {
 
     override func viewWillAppear() {
         downloadsCancellable = downloadsViewModel.$downloads
-            .scan((old: [DownloadListItem](), new: [DownloadListItem]()), { ($0.new, $1) })
+            .scan((old: [DownloadViewModel](), new: [DownloadViewModel]()), { ($0.new, $1) })
             .dropFirst()
             .sink { [weak self] value in
                 guard let self = self else { return }
@@ -122,7 +122,11 @@ final class DownloadsViewController: NSViewController {
         downloadsViewModel.restartDownload(at: index)
     }
 
-    @IBAction func copyDownloadLink(_ sender: Any) {
+    @IBAction func copyDownloadLinkAction(_ sender: Any) {
+
+    }
+
+    @IBAction func openOriginatingWebsiteAction(_ sender: Any) {
 
     }
 
@@ -148,9 +152,10 @@ extension DownloadsViewController: NSMenuDelegate {
                     menuItem.isHidden = true
                 }
 
-            case #selector(copyDownloadLink(_:)):
+            case #selector(copyDownloadLinkAction(_:)):
                 menuItem.isHidden = false
-
+            case #selector(openOriginatingWebsiteAction(_:)):
+                menuItem.isHidden = false
             case #selector(cancelDownloadAction(_:)):
                 menuItem.isHidden = item.state.progress == nil
 

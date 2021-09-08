@@ -21,6 +21,7 @@ import Combine
 import os.log
 import BrowserServicesKit
 
+// swiftlint:disable type_body_length
 final class NavigationBarViewController: NSViewController {
 
     @IBOutlet weak var goBackButton: NSButton!
@@ -335,6 +336,7 @@ final class NavigationBarViewController: NSViewController {
     }
 
 }
+// swiftlint:enable type_body_length
 
 extension NavigationBarViewController: NSSharingServicePickerDelegate {
 
