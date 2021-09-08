@@ -87,3 +87,18 @@ extension FileDownloadError: CustomNSError {
     }
 
 }
+
+extension FileDownloadError: Equatable {
+
+    static func == (lhs: FileDownloadError, rhs: FileDownloadError) -> Bool {
+        switch lhs {
+        case .failedToMoveFileToDownloads: if case .failedToMoveFileToDownloads = rhs { return true }
+        case .failedToCompleteDownloadTask(underlyingError: let error1, resumeData: let data1) :
+            if case .failedToCompleteDownloadTask(underlyingError: let error2, resumeData: let data2) = rhs {
+                return type(of: error1) == type(of: error2) && data1?.count == data2?.count
+            }
+        }
+        return false
+    }
+
+}

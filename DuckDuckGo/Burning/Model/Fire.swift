@@ -24,15 +24,18 @@ final class Fire {
     let webCacheManager: WebCacheManager
     let historyCoordinating: HistoryCoordinating
     let permissionManager: PermissionManagerProtocol
+    let downloadListCoordinator: DownloadListCoordinator
 
     @Published private(set) var isBurning = false
 
     init(cacheManager: WebCacheManager = .shared,
          historyCoordinating: HistoryCoordinating = HistoryCoordinator.shared,
-         permissionManager: PermissionManagerProtocol = PermissionManager.shared) {
+         permissionManager: PermissionManagerProtocol = PermissionManager.shared,
+         downloadListCoordinator: DownloadListCoordinator = DownloadListCoordinator.shared) {
         self.webCacheManager = cacheManager
         self.historyCoordinating = historyCoordinating
         self.permissionManager = permissionManager
+        self.downloadListCoordinator = downloadListCoordinator
     }
 
     private func burnAll(completion: (() -> Void)? = nil) {
@@ -47,6 +50,10 @@ final class Fire {
             os_log("PermissionManager began permissions deletion", log: .fire)
             self.permissionManager.burnPermissions(except: FireproofDomains.shared)
             os_log("PermissionManager completed permissions deletion", log: .fire)
+
+            os_log("DownloadListCoordinator began downloads deletion", log: .fire)
+            self.downloadListCoordinator.cleanupInactiveDownloads()
+            os_log("DownloadListCoordinator completed downloads deletion", log: .fire)
 
             self.isBurning = false
 

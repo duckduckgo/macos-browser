@@ -490,6 +490,8 @@
 		B6C0B23626E732000031CB7F /* DownloadListItem.swift in Sources */ = {isa = PBXBuildFile; fileRef = B6C0B23526E732000031CB7F /* DownloadListItem.swift */; };
 		B6C0B23926E742610031CB7F /* FileDownloadError.swift in Sources */ = {isa = PBXBuildFile; fileRef = B6C0B23826E742610031CB7F /* FileDownloadError.swift */; };
 		B6C0B23C26E87D900031CB7F /* NSAlert+ActiveDownloadsTermination.swift in Sources */ = {isa = PBXBuildFile; fileRef = B6C0B23B26E87D900031CB7F /* NSAlert+ActiveDownloadsTermination.swift */; };
+		B6C0B23E26E8BF1F0031CB7F /* DownloadListViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = B6C0B23D26E8BF1F0031CB7F /* DownloadListViewModel.swift */; };
+		B6C0B24026E8E7240031CB7F /* RunLoopExtension.swift in Sources */ = {isa = PBXBuildFile; fileRef = B6C0B23F26E8E7240031CB7F /* RunLoopExtension.swift */; };
 		B6CF78DE267B099C00CD4F13 /* WKNavigationActionExtension.swift in Sources */ = {isa = PBXBuildFile; fileRef = B6CF78DD267B099C00CD4F13 /* WKNavigationActionExtension.swift */; };
 		B6D7A2EE25D2418B002B2AE1 /* ShadowView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B6D7A2ED25D2418B002B2AE1 /* ShadowView.swift */; };
 		B6DA44022616B28300DD1EC2 /* PixelDataStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = B6DA44012616B28300DD1EC2 /* PixelDataStore.swift */; };
@@ -1031,6 +1033,8 @@
 		B6C0B23526E732000031CB7F /* DownloadListItem.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DownloadListItem.swift; sourceTree = "<group>"; };
 		B6C0B23826E742610031CB7F /* FileDownloadError.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FileDownloadError.swift; sourceTree = "<group>"; };
 		B6C0B23B26E87D900031CB7F /* NSAlert+ActiveDownloadsTermination.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "NSAlert+ActiveDownloadsTermination.swift"; sourceTree = "<group>"; };
+		B6C0B23D26E8BF1F0031CB7F /* DownloadListViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DownloadListViewModel.swift; sourceTree = "<group>"; };
+		B6C0B23F26E8E7240031CB7F /* RunLoopExtension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RunLoopExtension.swift; sourceTree = "<group>"; };
 		B6CF78DD267B099C00CD4F13 /* WKNavigationActionExtension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WKNavigationActionExtension.swift; sourceTree = "<group>"; };
 		B6CF78E2267B0A1900CD4F13 /* WKNavigationAction+Private.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "WKNavigationAction+Private.h"; sourceTree = "<group>"; };
 		B6D7A2ED25D2418B002B2AE1 /* ShadowView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ShadowView.swift; sourceTree = "<group>"; };
@@ -1590,10 +1594,10 @@
 			isa = PBXGroup;
 			children = (
 				856C98DE257014BD00A22F1F /* FileDownloadManager.swift */,
-				B6B1E87A26D381710062C350 /* DownloadListCoordinator.swift */,
-				B6C0B22D26E61CE70031CB7F /* DownloadViewModel.swift */,
 				B6C0B23526E732000031CB7F /* DownloadListItem.swift */,
 				B6A924D82664C72D001A28CA /* WebKitDownloadTask.swift */,
+				B6C0B22D26E61CE70031CB7F /* DownloadViewModel.swift */,
+				B6C0B23D26E8BF1F0031CB7F /* DownloadListViewModel.swift */,
 				B6C0B23826E742610031CB7F /* FileDownloadError.swift */,
 				B6A924DD2664CA08001A28CA /* LegacyWebKitDownloadDelegate.swift */,
 				B6A924D32664BBB9001A28CA /* WKWebViewDownloadDelegate.swift */,
@@ -2517,6 +2521,7 @@
 				4B139AFC26B60BD800894F82 /* NSImageExtensions.swift */,
 				B637273C26CCF0C200C8CB02 /* OptionalExtension.swift */,
 				B65E6B9F26D9F10600095F96 /* NSBezierPathExtension.swift */,
+				B6C0B23F26E8E7240031CB7F /* RunLoopExtension.swift */,
 			);
 			path = Extensions;
 			sourceTree = "<group>";
@@ -2827,6 +2832,7 @@
 			children = (
 				B6C0B23226E71BCD0031CB7F /* Downloads.xcdatamodeld */,
 				B6C0B22F26E61D630031CB7F /* DownloadListStore.swift */,
+				B6B1E87A26D381710062C350 /* DownloadListCoordinator.swift */,
 			);
 			path = Services;
 			sourceTree = "<group>";
@@ -3256,6 +3262,7 @@
 				B6DB3CF926A00E2D00D459B7 /* AVCaptureDevice+SwizzledAuthState.swift in Sources */,
 				4BA1A6BD258B082300F6F690 /* EncryptionKeyStore.swift in Sources */,
 				B6F41031264D2B23003DA42C /* ProgressExtension.swift in Sources */,
+				B6C0B24026E8E7240031CB7F /* RunLoopExtension.swift in Sources */,
 				4B723E0F26B0006500E14D75 /* CSVParser.swift in Sources */,
 				B6DA44082616B30600DD1EC2 /* PixelDataModel.xcdatamodeld in Sources */,
 				B6B1E87B26D381710062C350 /* DownloadListCoordinator.swift in Sources */,
@@ -3312,6 +3319,7 @@
 				85A0116925AF1D8900FA6A0C /* FindInPageViewController.swift in Sources */,
 				4BB6CE5F26B77ED000EC5860 /* Cryptography.swift in Sources */,
 				AA6FFB4424DC33320028F4D0 /* NSViewExtension.swift in Sources */,
+				B6C0B23E26E8BF1F0031CB7F /* DownloadListViewModel.swift in Sources */,
 				4B9292D52667123700AD2C21 /* BookmarkManagementDetailViewController.swift in Sources */,
 				4B723E1026B0006700E14D75 /* CSVImporter.swift in Sources */,
 				AA4BBA3B25C58FA200C4FB0F /* MainMenu.swift in Sources */,

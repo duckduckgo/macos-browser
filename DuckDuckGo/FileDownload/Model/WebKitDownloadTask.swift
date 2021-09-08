@@ -35,11 +35,25 @@ final class WebKitDownloadTask: NSObject, ProgressReporting {
     let shouldPromptForLocation: Bool
     /// Action that should be performed on file after it's downloaded
     var postflight: FileDownloadManager.PostflightAction?
-    @Published private(set) var suggestedFilename: String?
-    /// Desired local destination file URL used to display download location
-    @Published var destinationURL: URL?
-    /// File Type used for File Icon generation
-    @Published private(set) var fileType: UTType?
+
+    private(set) var suggestedFilename: String?
+    private(set) var suggestedFileType: UTType?
+
+    struct FileLocation: Equatable {
+        /// Desired local destination file URL used to display download location
+        var destinationURL: URL?
+        /// Temporary  (.duckload)  file URL; set to nil when download completes
+        var tempURL: URL?
+    }
+
+    @Published private(set) var location: FileLocation {
+        didSet {
+            guard let tempURL = location.tempURL else { return }
+
+            self.progress.fileURL = tempURL
+            self.progress.publishIfNotPublished()
+        }
+    }
 
     private lazy var future: Future<URL, FileDownloadError> = {
         dispatchPrecondition(condition: .onQueue(.main))
@@ -58,15 +72,6 @@ final class WebKitDownloadTask: NSObject, ProgressReporting {
 
     private var decideDestinationCompletionHandler: ((URL?) -> Void)?
 
-    @Published var tempURL: URL? {
-        didSet {
-            guard let tempURL = tempURL else { return }
-
-            self.progress.fileURL = tempURL
-            self.progress.publishIfNotPublished()
-        }
-    }
-
     var originalRequest: URLRequest? {
         download.originalRequest
     }
@@ -74,10 +79,16 @@ final class WebKitDownloadTask: NSObject, ProgressReporting {
         download.webView
     }
 
-    init(download: WebKitDownload, promptForLocation: Bool, postflight: FileDownloadManager.PostflightAction?) {
+    init(download: WebKitDownload,
+         promptForLocation: Bool,
+         destinationURL: URL?,
+         tempURL: URL?,
+         postflight: FileDownloadManager.PostflightAction?) {
+
         self.download = download
         self.progress = Progress(totalUnitCount: -1)
         self.shouldPromptForLocation = promptForLocation
+        self.location = .init(destinationURL: destinationURL, tempURL: tempURL)
         self.postflight = postflight
         super.init()
 
@@ -121,8 +132,7 @@ final class WebKitDownloadTask: NSObject, ProgressReporting {
             else { throw URLError(.cancelled) }
 
             let downloadURL = try self.downloadURL(for: localURL)
-            self.tempURL = downloadURL
-            self.destinationURL = localURL
+            self.location = .init(destinationURL: localURL, tempURL: downloadURL)
 
             completionHandler(downloadURL)
 
@@ -134,7 +144,7 @@ final class WebKitDownloadTask: NSObject, ProgressReporting {
     }
 
     private func downloadURL(for localURL: URL) throws -> URL {
-        var downloadURL = localURL.appendingPathExtension(Self.downloadExtension)
+        var downloadURL = self.location.tempURL ?? localURL.appendingPathExtension(Self.downloadExtension)
         let ext = localURL.pathExtension + (localURL.pathExtension.isEmpty ? "" : ".") + Self.downloadExtension
 
         // create temp file and move to Downloads folder with .duckload extension increasing index if needed
@@ -172,8 +182,9 @@ final class WebKitDownloadTask: NSObject, ProgressReporting {
         }
 
         if case .success(let url) = result {
-            if self.destinationURL != url {
-                self.destinationURL = url
+            let newLocation = FileLocation(destinationURL: url, tempURL: nil)
+            if self.location != newLocation {
+                self.location = newLocation
             }
             if progress.fileURL != url {
                 progress.fileURL = url
@@ -182,7 +193,6 @@ final class WebKitDownloadTask: NSObject, ProgressReporting {
                 self.progress.totalUnitCount = 1
             }
             self.progress.completedUnitCount = self.progress.totalUnitCount
-            self.tempURL = nil
         }
 
         self.progress.unpublishIfNeeded()
@@ -193,6 +203,7 @@ final class WebKitDownloadTask: NSObject, ProgressReporting {
     }
 
     deinit {
+        dispatchPrecondition(condition: .onQueue(.main))
         self.progress.unpublishIfNeeded()
         assert(fulfill == nil, "FileDownloadTask is deallocated without finish(with:) been called")
     }
@@ -206,12 +217,18 @@ extension WebKitDownloadTask: WebKitDownloadDelegate {
                   suggestedFilename: String,
                   completionHandler: @escaping (URL?) -> Void) {
 
+        guard let delegate = delegate else {
+            assertionFailure("WebKitDownloadTask: delegate is gone")
+            completionHandler(nil)
+            return
+        }
+
         if var mimeType = response?.mimeType {
             // drop ;charset=.. from "text/plain;charset=utf-8"
             if let charsetRange = mimeType.range(of: ";charset=") {
                 mimeType = String(mimeType[..<charsetRange.lowerBound])
             }
-            self.fileType = UTType(mimeType: mimeType)
+            self.suggestedFileType = UTType(mimeType: mimeType)
         }
         if let expectedContentLength = response?.expectedContentLength,
            self.progress.totalUnitCount <= 0 {
@@ -220,9 +237,14 @@ extension WebKitDownloadTask: WebKitDownloadDelegate {
 
         self.suggestedFilename = suggestedFilename
         self.decideDestinationCompletionHandler = completionHandler
-        delegate?.fileDownloadTaskNeedsDestinationURL(self,
-                                                      suggestedFilename: suggestedFilename,
-                                                      completionHandler: self.localFileURLCompletionHandler)
+
+        if let destinationURL = location.destinationURL {
+            self.localFileURLCompletionHandler(localURL: destinationURL, fileType: self.suggestedFileType)
+        } else {
+            delegate.fileDownloadTaskNeedsDestinationURL(self,
+                                                         suggestedFilename: suggestedFilename,
+                                                         completionHandler: self.localFileURLCompletionHandler)
+        }
     }
 
     func download(_ download: WebKitDownload,
@@ -241,12 +263,12 @@ extension WebKitDownloadTask: WebKitDownloadDelegate {
     }
 
     func downloadDidFinish(_ download: WebKitDownload) {
-        guard var destinationURL = destinationURL else {
+        guard var destinationURL = location.destinationURL else {
             self.finish(with: .failure(.failedToMoveFileToDownloads))
             return
         }
 
-        if let tempURL = tempURL, tempURL != destinationURL {
+        if let tempURL = location.tempURL, tempURL != destinationURL {
             do {
                 destinationURL = try FileManager.default.moveItem(at: tempURL, to: destinationURL, incrementingIndexIfExists: true)
             } catch {
@@ -259,7 +281,7 @@ extension WebKitDownloadTask: WebKitDownloadDelegate {
 
     func download(_ download: WebKitDownload, didFailWithError error: Error, resumeData: Data?) {
         if resumeData == nil,
-           let tempURL = tempURL {
+           let tempURL = location.tempURL {
             try? FileManager.default.removeItem(at: tempURL)
         }
         self.finish(with: .failure(.failedToCompleteDownloadTask(underlyingError: error, resumeData: resumeData)))

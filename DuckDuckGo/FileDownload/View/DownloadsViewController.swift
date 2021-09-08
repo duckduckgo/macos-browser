@@ -33,11 +33,12 @@ final class DownloadsViewController: NSViewController {
     @IBOutlet var contextMenu: NSMenu!
     @IBOutlet var tableView: NSTableView!
 
-    var downloadsViewModel = DownloadListCoordinator.shared
+    var viewModel = DownloadListViewModel()
     var downloadsCancellable: AnyCancellable?
 
     override func viewWillAppear() {
-        downloadsCancellable = downloadsViewModel.$downloads
+        downloadsCancellable = viewModel.$items
+            .throttle(for: 0.1, scheduler: DispatchQueue.main, latest: true)
             .scan((old: [DownloadViewModel](), new: [DownloadViewModel]()), { ($0.new, $1) })
             .dropFirst()
             .sink { [weak self] value in
@@ -74,7 +75,7 @@ final class DownloadsViewController: NSViewController {
             assertionFailure("Unexpected sender")
             return nil
         }
-        guard downloadsViewModel.downloads.indices.contains(row) else { return nil }
+        guard viewModel.items.indices.contains(row) else { return nil }
         return row
     }
 
@@ -90,44 +91,55 @@ final class DownloadsViewController: NSViewController {
     }
 
     @IBAction func clearDownloadsAction(_ sender: Any) {
-        downloadsViewModel.cleanupInactiveDownloads()
+        viewModel.cleanupInactiveDownloads()
     }
 
     @IBAction func openDownloadedFileAction(_ sender: Any) {
         guard let index = index(for: sender),
-              let url = downloadsViewModel.downloads[index].localURL
+              let url = viewModel.items[safe: index]?.localURL
         else { return }
         NSWorkspace.shared.open(url)
     }
 
     @IBAction func cancelDownloadAction(_ sender: Any) {
         guard let index = index(for: sender) else { return }
-        downloadsViewModel.cancelDownload(at: index)
+        viewModel.cancelDownload(at: index)
     }
 
     @IBAction func removeDownloadAction(_ sender: Any) {
         guard let index = index(for: sender) else { return }
-        downloadsViewModel.removeDownload(at: index)
+        viewModel.removeDownload(at: index)
     }
 
     @IBAction func revealDownloadAction(_ sender: Any) {
         guard let index = index(for: sender),
-              let url = downloadsViewModel.downloads[index].localURL
+              let url = viewModel.items[safe: index]?.localURL
         else { return }
         NSWorkspace.shared.activateFileViewerSelecting([url])
     }
 
     @IBAction func restartDownloadAction(_ sender: Any) {
         guard let index = index(for: sender) else { return }
-        downloadsViewModel.restartDownload(at: index)
+        viewModel.restartDownload(at: index)
     }
 
     @IBAction func copyDownloadLinkAction(_ sender: Any) {
+        guard let index = index(for: sender),
+              let url = viewModel.items[safe: index]?.url as NSURL?
+        else { return }
 
+        let pasteboard = NSPasteboard.general
+        pasteboard.declareTypes([.URL], owner: nil)
+        url.write(to: pasteboard)
+        pasteboard.setString(url.absoluteString ?? "", forType: .string)
     }
 
     @IBAction func openOriginatingWebsiteAction(_ sender: Any) {
+        guard let index = index(for: sender),
+              let url = viewModel.items[safe: index]?.websiteURL
+        else { return }
 
+        WindowControllersManager.shared.show(url: url, newTab: true)
     }
 
 }
@@ -135,12 +147,13 @@ final class DownloadsViewController: NSViewController {
 extension DownloadsViewController: NSMenuDelegate {
 
     func menuNeedsUpdate(_ menu: NSMenu) {
-        guard let index = index(for: menu) else {
+        guard let index = index(for: menu),
+              let item = viewModel.items[safe: index]
+        else {
             menu.cancelTracking()
             return
         }
-        let item = downloadsViewModel.downloads[index]
-
+// TODO: Add Restart Menu item
         for menuItem in menu.items {
             switch menuItem.action {
             case #selector(openDownloadedFileAction(_:)),
@@ -155,12 +168,12 @@ extension DownloadsViewController: NSMenuDelegate {
             case #selector(copyDownloadLinkAction(_:)):
                 menuItem.isHidden = false
             case #selector(openOriginatingWebsiteAction(_:)):
-                menuItem.isHidden = false
+                menuItem.isHidden = !(item.websiteURL != nil)
             case #selector(cancelDownloadAction(_:)):
-                menuItem.isHidden = item.state.progress == nil
+                menuItem.isHidden = !(item.state.progress != nil)
 
             case #selector(removeDownloadAction(_:)):
-                menuItem.isHidden = item.state.progress != nil
+                menuItem.isHidden = !(item.state.progress == nil)
 
             case #selector(clearDownloadsAction(_:)):
                 continue
@@ -175,18 +188,18 @@ extension DownloadsViewController: NSMenuDelegate {
 extension DownloadsViewController: NSTableViewDataSource, NSTableViewDelegate {
 
     func numberOfRows(in tableView: NSTableView) -> Int {
-        return downloadsViewModel.downloads.count + 1
+        return viewModel.items.count + 1
     }
 
     func tableView(_ tableView: NSTableView, objectValueFor tableColumn: NSTableColumn?, row: Int) -> Any? {
-        return downloadsViewModel.downloads[safe: row]
+        return viewModel.items[safe: row]
     }
 
     func tableView(_ tableView: NSTableView, viewFor tableColumn: NSTableColumn?, row: Int) -> NSView? {
         let identifier: NSUserInterfaceItemIdentifier
-        if downloadsViewModel.downloads.isEmpty {
+        if viewModel.items.isEmpty {
             identifier = .noDownloadsCell
-        } else if downloadsViewModel.downloads.indices.contains(row) {
+        } else if viewModel.items.indices.contains(row) {
             identifier = .downloadCell
         } else {
             identifier = .openDownloadsCell

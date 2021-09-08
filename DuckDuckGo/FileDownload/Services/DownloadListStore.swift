@@ -23,19 +23,27 @@ import Combine
 protocol DownloadListStoring {
 
     func fetch(clearingItemsOlderThan date: Date, completionHandler: @escaping (Result<[DownloadListItem], Error>) -> Void)
-    func save(_ entry: DownloadListItem, completionHandler: ((Result<DownloadManagedObject, Error>) -> Void)?)
+    func save(_ item: DownloadListItem, completionHandler: ((Result<DownloadManagedObject, Error>) -> Void)?)
+    func remove(_ item: DownloadListItem, completionHandler: ((Error?) -> Void)?)
     func clear(itemsOlderThan date: Date, completionHandler: ((Error?) -> Void)?)
     func sync()
 
 }
 
 extension DownloadListStoring {
+
     func clear() {
         clear(itemsOlderThan: .distantFuture, completionHandler: nil)
     }
+
+    func remove(_ item: DownloadListItem) {
+        remove(item, completionHandler: nil)
+    }
+
     func save(_ entry: DownloadListItem) {
         save(entry, completionHandler: nil)
     }
+
 }
 
 final class DownloadListStore: DownloadListStoring {
@@ -53,17 +61,10 @@ final class DownloadListStore: DownloadListStoring {
 
     private lazy var context = Database.shared.makeContext(concurrencyType: .privateQueueConcurrencyType, name: "Downloads")
 
-    func clear(itemsOlderThan date: Date, completionHandler: ((Error?) -> Void)?) {
-        func mainQueueCompletion(error: Error?) {
-            guard completionHandler != nil else { return }
-            DispatchQueue.main.async {
-                completionHandler?(error)
-            }
-        }
-
+    private func remove(itemsWithPredicate predicate: NSPredicate, completionHandler: ((Error?) -> Void)?) {
         context.perform { [context] in
             let deleteRequest = NSFetchRequest<NSFetchRequestResult>(entityName: DownloadManagedObject.className())
-            deleteRequest.predicate = NSPredicate(format: (\DownloadManagedObject.modified)._kvcKeyPathString! + " < %@", date as NSDate)
+            deleteRequest.predicate = predicate
             let batchDeleteRequest = NSBatchDeleteRequest(fetchRequest: deleteRequest)
             batchDeleteRequest.resultType = .resultTypeObjectIDs
 
@@ -72,29 +73,33 @@ final class DownloadListStore: DownloadListStoring {
                 let deletedObjects = result?.result as? [NSManagedObjectID] ?? []
                 let changes: [AnyHashable: Any] = [NSDeletedObjectsKey: deletedObjects]
                 NSManagedObjectContext.mergeChanges(fromRemoteContextSave: changes, into: [context])
-                mainQueueCompletion(error: nil)
+                completionHandler?(nil)
             } catch {
-                mainQueueCompletion(error: error)
+                completionHandler?(error)
             }
         }
     }
 
+    func clear(itemsOlderThan date: Date, completionHandler: ((Error?) -> Void)?) {
+        remove(itemsWithPredicate: NSPredicate(format: (\DownloadManagedObject.modified)._kvcKeyPathString! + " < %@", date as NSDate),
+               completionHandler: completionHandler)
+    }
+
+    func remove(_ item: DownloadListItem, completionHandler: ((Error?) -> Void)?) {
+        remove(itemsWithPredicate: NSPredicate(format: (\DownloadManagedObject.identifier)._kvcKeyPathString! + " == %@", item.identifier as CVarArg),
+               completionHandler: completionHandler)
+    }
+
     func fetch(completionHandler: @escaping (Result<[DownloadListItem], Error>) -> Void) {
-        func mainQueueCompletion(_ result: Result<[DownloadListItem], Error>) {
-            DispatchQueue.main.async {
-                completionHandler(result)
-            }
-        }
         context.perform { [context] in
             let fetchRequest = DownloadManagedObject.fetchRequest() as NSFetchRequest<DownloadManagedObject>
-            fetchRequest.sortDescriptors = [NSSortDescriptor(key: (\DownloadManagedObject.modified)._kvcKeyPathString, ascending: false)]
             fetchRequest.returnsObjectsAsFaults = false
             do {
                 let entries = try context.fetch(fetchRequest)
                     .compactMap(DownloadListItem.init(managedObject:))
-                mainQueueCompletion(.success(entries))
+                completionHandler(.success(entries))
             } catch {
-                mainQueueCompletion(.failure(error))
+                completionHandler(.failure(error))
             }
         }
     }
@@ -105,44 +110,38 @@ final class DownloadListStore: DownloadListStoring {
         }
     }
 
-    func save(_ entry: DownloadListItem, completionHandler: ((Result<DownloadManagedObject, Error>) -> Void)?) {
-        func mainQueueCompletion(_ result: Result<DownloadManagedObject, Error>) {
-            guard completionHandler != nil else { return }
-            DispatchQueue.main.async {
-                completionHandler?(result)
-            }
-        }
+    func save(_ item: DownloadListItem, completionHandler: ((Result<DownloadManagedObject, Error>) -> Void)?) {
         context.perform { [context] in
             // Check for existence
             let fetchRequest = DownloadManagedObject.fetchRequest() as NSFetchRequest<DownloadManagedObject>
             fetchRequest.predicate = NSPredicate(format: (\DownloadManagedObject.identifier)._kvcKeyPathString! + " == %@",
-                                                 entry.identifier as CVarArg)
+                                                 item.identifier as CVarArg)
             let fetchedObjects: [DownloadManagedObject]
             do {
                 fetchedObjects = try context.fetch(fetchRequest)
             } catch {
-                mainQueueCompletion(.failure(error))
+                completionHandler?(.failure(error))
                 return
             }
 
-            assert(fetchedObjects.count <= 1, "More than 1 downloads entry with the same identifier")
+            assert(fetchedObjects.count <= 1, "More than 1 downloads item with the same identifier")
 
             guard let managedObject = fetchedObjects.first
                     ?? NSEntityDescription.insertNewObject(forEntityName: DownloadManagedObject.className(),
                                                            into: context) as? DownloadManagedObject else {
                 assertionFailure("DownloadManagedObject insertion failed")
                 struct DownloadManagedObjectInsertionError: Error {}
-                mainQueueCompletion(.failure(DownloadManagedObjectInsertionError()))
+                completionHandler?(.failure(DownloadManagedObjectInsertionError()))
                 return
             }
 
-            managedObject.update(with: entry, afterInsertion: fetchedObjects.isEmpty)
+            managedObject.update(with: item, afterInsertion: fetchedObjects.isEmpty)
 
             do {
                 try context.save()
-                mainQueueCompletion(.success(managedObject))
+                completionHandler?(.success(managedObject))
             } catch {
-                mainQueueCompletion(.failure(error))
+                completionHandler?(.failure(error))
             }
         }
     }
@@ -161,7 +160,7 @@ extension DownloadListItem {
               let modified = managedObject.modified,
               let url = managedObject.urlEncrypted as? URL
         else {
-            assertionFailure("DownloadsHistoryEntry: Failed to init from ManagedObject")
+            assertionFailure("DownloadListItem: Failed to init from ManagedObject")
             return nil
         }
 
@@ -180,22 +179,22 @@ extension DownloadListItem {
 
 extension DownloadManagedObject {
 
-    func update(with entry: DownloadListItem, afterInsertion: Bool = false) {
+    func update(with item: DownloadListItem, afterInsertion: Bool = false) {
         if afterInsertion {
-            added = entry.added
-            identifier = entry.identifier
+            added = item.added
+            identifier = item.identifier
         }
 
-        assert(identifier == entry.identifier)
-        assert(identifier == entry.identifier)
+        assert(identifier == item.identifier)
+        assert(identifier == item.identifier)
 
-        urlEncrypted = entry.url as NSURL
-        websiteURLEncrypted = entry.websiteURL as NSURL?
-        modified = entry.modified
-        fileType = entry.fileType?.rawValue as String?
-        destinationURLEncrypted = entry.destinationURL as NSURL?
-        tempURLEncrypted = entry.tempURL as NSURL?
-        errorEncrypted = entry.error as NSError?
+        urlEncrypted = item.url as NSURL
+        websiteURLEncrypted = item.websiteURL as NSURL?
+        modified = item.modified
+        fileType = item.fileType?.rawValue as String?
+        destinationURLEncrypted = item.destinationURL as NSURL?
+        tempURLEncrypted = item.tempURL as NSURL?
+        errorEncrypted = item.error as NSError?
     }
 
 }

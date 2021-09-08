@@ -18,7 +18,7 @@
 
 import Foundation
 
-struct DownloadListItem {
+struct DownloadListItem: Equatable {
 
     let identifier: UUID
     let added: Date
@@ -26,6 +26,8 @@ struct DownloadListItem {
 
     let url: URL
     let websiteURL: URL?
+
+    var progress: Progress?
 
     var fileType: UTType? {
         didSet {

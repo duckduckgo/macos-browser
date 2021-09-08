@@ -20,12 +20,12 @@ import Cocoa
 
 extension NSAlert {
 
-    static func activeDownloadsTerminationAlert(downloadManager: FileDownloadManager = .shared) -> NSAlert? {
-        guard !downloadManager.downloads.isEmpty else { return nil }
+    static func activeDownloadsTerminationAlert(for downloads: Set<WebKitDownloadTask>) -> NSAlert {
+        assert(!downloads.isEmpty)
 
-        let activeDownload = downloadManager.downloads.first(where: { $0.destinationURL != nil })
-        let firstFileName = activeDownload?.destinationURL?.lastPathComponent ?? activeDownload?.suggestedFilename ?? ""
-        let andOthers = downloadManager.downloads.count > 1 ? UserText.downloadsActiveAlertMessageAndOthers : ""
+        let activeDownload = downloads.first(where: { $0.location.destinationURL != nil })
+        let firstFileName = activeDownload?.location.destinationURL?.lastPathComponent ?? activeDownload?.suggestedFilename ?? ""
+        let andOthers = downloads.count > 1 ? UserText.downloadsActiveAlertMessageAndOthers : ""
 
         let alert = NSAlert()
         alert.messageText = UserText.downloadsActiveAlertTitle

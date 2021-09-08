@@ -42,31 +42,28 @@ final class DownloadsCellView: NSTableCellView {
     override var objectValue: Any? {
         didSet {
             assert(objectValue is DownloadViewModel?)
-            guard let object = objectValue as? DownloadViewModel else {
+            guard let viewModel = objectValue as? DownloadViewModel else {
                 unsubscribe()
                 return
             }
-            subscribe(to: object)
+            subscribe(to: viewModel)
         }
     }
 
-    private func subscribe(to object: DownloadViewModel) {
-        object.$fileType.combineLatest(object.$filename) { fileType, filename in
-            var fileType = fileType ?? .data
-            if fileType.fileExtension?.isEmpty ?? true {
-                fileType = UTType(fileExtension: (filename as NSString).pathExtension) ?? .data
-            }
+    private func subscribe(to viewModel: DownloadViewModel) {
+        viewModel.$filename.map { filename in
+            let fileType = UTType(fileExtension: (filename as NSString).pathExtension) ?? .data
             return fileType.icon
         }
             .assign(to: \.image, on: imageView!)
             .store(in: &cancellables)
-        object.$filename.assign(to: \.stringValue, on: titleLabel!)
+        viewModel.$filename.assign(to: \.stringValue, on: titleLabel!)
             .store(in: &cancellables)
-        object.$state.sink { [weak self] state in
+        viewModel.$state.sink { [weak self] state in
             self?.updateState(state)
         }.store(in: &cancellables)
 
-        object.$state.map {
+        viewModel.$state.map {
             $0.progress?.publisher(for: \.fractionCompleted).map { .some($0) }.eraseToAnyPublisher() ?? Just(.none).eraseToAnyPublisher()
         }
             .switchToLatest()
