@@ -100,7 +100,6 @@ final class SafariBookmarksReader {
             return ImportedBookmarks.BookmarkOrFolder(name: title, type: "bookmark", urlString: url, children: nil)
         }
 
-        print("RETURNING NIL")
         return nil
     }
 
