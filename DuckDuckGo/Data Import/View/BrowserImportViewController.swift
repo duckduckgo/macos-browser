@@ -44,6 +44,7 @@ final class BrowserImportViewController: NSViewController {
     @IBOutlet var profileSelectionLabel: NSTextField!
     @IBOutlet var profileSelectionPopUpButton: NSPopUpButton!
 
+    @IBOutlet var bookmarksCheckbox: NSButton!
     @IBOutlet var passwordsCheckbox: NSButton!
     @IBOutlet var passwordDetailLabel: NSTextField!
 
@@ -60,7 +61,11 @@ final class BrowserImportViewController: NSViewController {
     var selectedImportOptions: [DataImport.DataType] {
         var options = [DataImport.DataType]()
 
-        if passwordsCheckbox.state == .on {
+        if bookmarksCheckbox.state == .on && !bookmarksCheckbox.isHidden {
+            options.append(.bookmarks)
+        }
+
+        if passwordsCheckbox.state == .on && !passwordsCheckbox.isHidden {
             options.append(.logins)
         }
 
@@ -113,8 +118,11 @@ final class BrowserImportViewController: NSViewController {
             passwordDetailLabel.stringValue = UserText.chromiumPasswordImportDisclaimer
         case .firefox:
             passwordDetailLabel.stringValue = UserText.firefoxPasswordImportDisclaimer
-        default:
+        case .safari:
+            passwordsCheckbox.isHidden = true
             passwordDetailLabel.isHidden = true
+        case .csv:
+            assertionFailure("Should not attempt to import a CSV file via \(#file)")
         }
 
         // Toggle the browser warning bar:

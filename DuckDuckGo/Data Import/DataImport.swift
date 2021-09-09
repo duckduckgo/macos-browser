@@ -25,6 +25,7 @@ enum DataImport {
         case chrome
         case edge
         case firefox
+        case safari
         case csv
 
         var importSourceName: String {
@@ -37,6 +38,8 @@ enum DataImport {
                 return "Edge"
             case .firefox:
                 return "Firefox"
+            case .safari:
+                return "Safari"
             case .csv:
                 return UserText.importLoginsCSV
             }
@@ -51,12 +54,13 @@ enum DataImport {
         }
     }
 
-    // Different data types (e.g. bookmarks) will be added later.
     enum DataType {
+        case bookmarks
         case logins
     }
 
     enum Summary: Equatable {
+        case bookmarks(successfulImportCount: Int)
         case logins(successfulImports: [String], duplicateImports: [String], failedImports: [String])
     }
 
@@ -81,6 +85,8 @@ enum DataImport {
                 self.profiles = sortedProfiles
             case .firefox:
                 self.profiles = profileURLs.map(BrowserProfile.init(profileURL:)).sorted()
+            case .safari:
+                self.profiles = profileURLs.map(BrowserProfile.init(profileURL:)).sorted()
             }
         }
 
@@ -94,6 +100,8 @@ enum DataImport {
                 return profiles.first { $0.name == "Default" } ?? profiles.first
             case .firefox:
                 return profiles.first { $0.name == "default-release" } ?? profiles.first
+            case .safari:
+                return nil
             }
         }
     }

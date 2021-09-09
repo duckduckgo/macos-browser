@@ -35,9 +35,11 @@ protocol BookmarkStore {
     func update(folder: BookmarkFolder)
     func add(objectsWithUUIDs: [UUID], to parent: BookmarkFolder?, completion: @escaping (Error?) -> Void)
     func update(objectsWithUUIDs uuids: [UUID], update: @escaping (BaseBookmarkEntity) -> Void, completion: @escaping (Error?) -> Void)
+    func importBookmarks(_ bookmarks: ImportedBookmarks) -> Int
 
 }
 
+// swiftlint:disable type_body_length
 final class LocalBookmarkStore: BookmarkStore {
 
     init() {}
@@ -65,33 +67,27 @@ final class LocalBookmarkStore: BookmarkStore {
             }
         }
 
-        let fetchRequest: NSFetchRequest<BookmarkManagedObject>
+        context.perform {
+            let fetchRequest: NSFetchRequest<BookmarkManagedObject>
 
-        switch type {
-        case .bookmarks:
-            fetchRequest = Bookmark.bookmarksFetchRequest()
-        case .topLevelEntities:
-            fetchRequest = Bookmark.topLevelEntitiesFetchRequest()
-        }
-
-        fetchRequest.sortDescriptors = [NSSortDescriptor(key: #keyPath(BookmarkManagedObject.dateAdded), ascending: false)]
-        fetchRequest.returnsObjectsAsFaults = false
-
-        let asyncRequest = NSAsynchronousFetchRequest(fetchRequest: fetchRequest) { result in
-            guard let bookmarkManagedObjects = result.finalResult else {
-                assertionFailure("LocalBookmarkStore: Async fetch failed")
-                mainQueueCompletion(bookmarks: nil, error: result.operationError)
-                return
+            switch type {
+            case .bookmarks:
+                fetchRequest = Bookmark.bookmarksFetchRequest()
+            case .topLevelEntities:
+                fetchRequest = Bookmark.topLevelEntitiesFetchRequest()
             }
 
-            let entities = bookmarkManagedObjects.compactMap { BaseBookmarkEntity.from(managedObject: $0) }
-            mainQueueCompletion(bookmarks: entities, error: nil)
-        }
+            fetchRequest.sortDescriptors = [NSSortDescriptor(key: #keyPath(BookmarkManagedObject.dateAdded), ascending: false)]
+            fetchRequest.returnsObjectsAsFaults = false
 
-        do {
-          try context.execute(asyncRequest)
-        } catch let error {
-          completion(nil, error)
+            do {
+                let results = try self.context.fetch(fetchRequest)
+                let entities = results.compactMap { BaseBookmarkEntity.from(managedObject: $0) }
+
+                mainQueueCompletion(bookmarks: entities, error: nil)
+            } catch let error {
+                completion(nil, error)
+            }
         }
     }
 
@@ -337,6 +333,80 @@ final class LocalBookmarkStore: BookmarkStore {
         }
     }
 
+    // MARK: - Import
+
+    func importBookmarks(_ bookmarks: ImportedBookmarks) -> Int {
+        var importCount = 0
+
+        context.performAndWait {
+            let bookmarkCountBeforeImport = (try? context.count(for: Bookmark.bookmarksFetchRequest())) ?? 0
+
+            let dateFormatter = DateFormatter()
+            dateFormatter.dateStyle = .medium
+            dateFormatter.timeStyle = .medium
+
+            let importRootFolder = createFolder(titled: "Imported Bookmarks (\(dateFormatter.string(from: Date())))", in: self.context)
+
+            let bookmarksBarFolder = createFolder(titled: "Bookmarks Bar", in: self.context)
+            bookmarksBarFolder.parentFolder = importRootFolder
+
+            if let bookmarksBar = bookmarks.topLevelFolders.bookmarkBar.children {
+                recursivelyCreateEntities(from: bookmarksBar, parent: bookmarksBarFolder, in: self.context)
+            }
+
+            let otherBookmarksFolder = createFolder(titled: "Other Bookmarks", in: self.context)
+            otherBookmarksFolder.parentFolder = importRootFolder
+
+            if let otherBookmarks = bookmarks.topLevelFolders.otherBookmarks.children {
+                recursivelyCreateEntities(from: otherBookmarks, parent: otherBookmarksFolder, in: self.context)
+            }
+
+            do {
+                try self.context.save()
+                let bookmarkCountAfterImport = try context.count(for: Bookmark.bookmarksFetchRequest())
+
+                importCount = bookmarkCountAfterImport - bookmarkCountBeforeImport
+            } catch {
+                // Only throw this assertion when running in debug and when unit tests are not running.
+                if !AppDelegate.isRunningTests {
+                    assertionFailure("LocalBookmarkStore: Saving of context failed")
+                }
+            }
+        }
+
+        return importCount
+    }
+
+    private func createFolder(titled title: String, in context: NSManagedObjectContext) -> BookmarkManagedObject {
+        let folder = BookmarkManagedObject(context: self.context)
+        folder.id = UUID()
+        folder.titleEncrypted = title as NSString
+        folder.isFolder = true
+        folder.dateAdded = NSDate.now
+
+        return folder
+    }
+
+    private func recursivelyCreateEntities(from bookmarks: [ImportedBookmarks.BookmarkOrFolder],
+                                           parent: BookmarkManagedObject?,
+                                           in context: NSManagedObjectContext) {
+        for bookmarkOrFolder in bookmarks {
+            let bookmarkManagedObject = BookmarkManagedObject(context: context)
+
+            bookmarkManagedObject.id = UUID()
+            bookmarkManagedObject.titleEncrypted = bookmarkOrFolder.name as NSString
+            bookmarkManagedObject.isFolder = bookmarkOrFolder.type == "folder"
+            bookmarkManagedObject.urlEncrypted = bookmarkOrFolder.url as NSURL?
+            bookmarkManagedObject.dateAdded = NSDate.now
+            bookmarkManagedObject.parentFolder = parent
+            bookmarkManagedObject.isFavorite = false
+
+            if let children = bookmarkOrFolder.children {
+                recursivelyCreateEntities(from: children, parent: bookmarkManagedObject, in: context)
+            }
+        }
+    }
+
 }
 
 fileprivate extension BookmarkManagedObject {
@@ -368,3 +438,4 @@ fileprivate extension BookmarkManagedObject {
     }
 
 }
+// swiftlint:enable type_body_length

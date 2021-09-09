@@ -69,6 +69,7 @@ extension Pixel {
 
         case importedLogins(repetition: Repetition = .init(key: "imported-logins"), source: DataImportSource)
         case exportedLogins(repetition: Repetition = .init(key: "exported-logins"))
+        case importedBookmarks(repetition: Repetition = .init(key: "imported-bookmarks"), source: DataImportSource)
 
         case debug(event: Debug, error: Error? = nil, countedBy: Pixel.Counter? = nil)
 
@@ -164,6 +165,9 @@ extension Pixel.Event {
 
         case .exportedLogins(repetition: let repetition):
             return "m_mac_exported-logins_\(repetition)"
+
+        case .importedBookmarks(repetition: let repetition, source: let source):
+            return "m_mac_imported-bookmarks_\(repetition)_\(source)"
 
         case .debug(event: let event, error: _, countedBy: _):
             return "m_mac_debug_\(event)"

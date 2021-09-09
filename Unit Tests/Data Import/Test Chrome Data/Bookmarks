@@ -1,0 +1,102 @@
+{
+   "checksum": "802283b8dd8e8a2b88069f89a9efa136",
+   "roots": {
+      "bookmark_bar": {
+         "children": [ {
+            "children": [  ],
+            "date_added": "13273183783627686",
+            "date_modified": "13273183783627687",
+            "guid": "3135643c-aacc-4b72-8e21-8de23ef5e0f5",
+            "id": "8",
+            "name": "Test Folder",
+            "type": "folder"
+         }, {
+            "date_added": "13273787267908194",
+            "guid": "d2ebfe02-39f0-4423-be5f-9d9c0c654f3f",
+            "id": "18",
+            "name": "DuckDuckGo",
+            "type": "url",
+            "url": "https://duckduckgo.com/"
+         } ],
+         "date_added": "13266254452854321",
+         "date_modified": "13273787267908194",
+         "guid": "00000000-0000-4000-a000-000000000002",
+         "id": "1",
+         "name": "Bookmarks Bar",
+         "type": "folder"
+      },
+      "other": {
+         "children": [ {
+            "children": [ {
+               "children": [ {
+                  "children": [ {
+                     "date_added": "13273183765341678",
+                     "guid": "bb49e254-b12d-411d-9592-1e302fbd482d",
+                     "id": "7",
+                     "name": "DuckDuckGo (Bottom Folder)",
+                     "type": "url",
+                     "url": "https://duckduckgo.com/"
+                  } ],
+                  "date_added": "13273787202895597",
+                  "date_modified": "13273787225035061",
+                  "guid": "d229e23b-cd85-4090-83ec-da035409dc15",
+                  "id": "14",
+                  "name": "Bottom Folder",
+                  "type": "folder"
+               }, {
+                  "date_added": "13273787234597638",
+                  "guid": "d062f9c8-77c7-44b2-92d1-dd0c6ad70e75",
+                  "id": "16",
+                  "name": "DuckDuckGo (Middle Folder)",
+                  "type": "url",
+                  "url": "https://duckduckgo.com/"
+               } ],
+               "date_added": "13273787193188040",
+               "date_modified": "13273787234597638",
+               "guid": "b1fa6493-eb59-4638-9416-5b2ed64604dc",
+               "id": "13",
+               "name": "Middle Folder",
+               "type": "folder"
+            }, {
+               "date_added": "13273787238916617",
+               "guid": "823a112d-f5c5-4ec6-bb22-5a1e840fba64",
+               "id": "17",
+               "name": "DuckDuckGo (Top Folder)",
+               "type": "url",
+               "url": "https://duckduckgo.com/"
+            } ],
+            "date_added": "13273183783628142",
+            "date_modified": "13273787238916617",
+            "guid": "b1010881-4457-4ae7-84fd-723d580f7573",
+            "id": "9",
+            "name": "Top Folder",
+            "type": "folder"
+         }, {
+            "children": [  ],
+            "date_added": "13273787217137440",
+            "date_modified": "13273787217137440",
+            "guid": "872a3780-55e6-4fae-9535-4b5a7c5135d9",
+            "id": "15",
+            "name": "Empty Folder",
+            "type": "folder"
+         } ],
+         "date_added": "13266254452854323",
+         "date_modified": "13273787217137542",
+         "guid": "00000000-0000-4000-a000-000000000003",
+         "id": "2",
+         "name": "Other Bookmarks",
+         "type": "folder"
+      },
+      "synced": {
+         "children": [  ],
+         "date_added": "13266254452854323",
+         "date_modified": "0",
+         "guid": "00000000-0000-4000-a000-000000000004",
+         "id": "3",
+         "name": "Mobile Bookmarks",
+         "type": "folder"
+      }
+   },
+   "sync_metadata": "CscBCqYBCIiBAhKfARKMAQgCEk4KBgoCYm0QARAzGhIJAEjjGGjGBQAhAEjjGGjGBQAiFAkgGuQlaMYFABABGSbO/MonM26OMhgKFggCEbdemCloxgUAGAAhAAAAAAAAAAASOAoGCgJiZBAAEDMaEgkASOMYaMYFACEASOMYaMYFADIYChYIAhG3XpgpaMYFABgAIQAAAAAAAAAAIABI38f+xqcvcN/H/sanLxIAIAEqGE10dlFSUXdLY3ZmN0JqejMwL1c5ZlE9PRKrAQgREqYBChxPT0Z2TWN3TDRsQVN6dk1GSkpTUVFabUVlWEU9EiQ4MjNhMTEyZC1mNWM1LTRlYzYtYmIyMi01YTFlODQwZmJhNjQYACADKAAw////////////ATiExKTVtS9Ag/Sk1bUvShxaTDlIT0hvdW1VNUVlSXI4anVoQWhUSTErOFU9Wh4iHGZiMS9tSXk5a3R6bmMrUlF6ZkZMWkdhbUE5UT1l4iVuWRKsAQgPEqcBChxMU1lpVEcvYlUrUmlDSml1RWc5MEFRSWFXQTg9EiQ4NzJhMzc4MC01NWU2LTRmYWUtOTUzNS00YjVhN2M1MTM1ZDkYACABKAAw////////////ATjxmaPVtS9A8Zmj1bUvShxzdktiMm0xYk1iZGVkSXBydVl0SURxcWhlREk9Wh8iHZwwNTRXVUNpanp2U3JRaXlKRTZueUMzbDkzc2c9ZQAAAAASqwEIDhKmAQocS0I5TXNYUFljREx0N2RkT2hlNVVtNHFYVlNJPRIkZDIyOWUyM2ItY2Q4NS00MDkwLTgzZWMtZGEwMzU0MDlkYzE1GAAgASgAMP///////////wE4z6qi1bUvQM+qotW1L0ocS2RUeDIzQTFjSU1ROEFJemhqT3p5L0l4THlvPVoeIhxvUzhBTHRvSUQ4cHBsYTZXdVcybUk1N3NQcVE9ZQAAAAASqwEIDRKmAQocYXAvZFd2YWVJN0lTN1VQdStJNXh2dllqWC9ZPRIkYjFmYTY0OTMtZWI1OS00NjM4LTk0MTYtNWIyZWQ2NDYwNGRjGAAgASgAMP///////////wE45N6h1bUvQOTeodW1L0ocT1dwRTk2TVFPNFlhU21qbHcxMExieU5tKzVRPVoeIhxVUEZBV0xXZWtJTFZnenYzalM5b1RDMnpwYm89ZQAAAAASrAEICBKnAQocK0JyT3I0Y0c1VTJmMlpsd1hxaGlveTUvY0dRPRIkMzEzNTY0M2MtYWFjYy00YjcyLThlMjEtOGRlMjNlZjVlMGY1GAAgAigAMP///////////wE4zMXEtbMvQIj0ptW1L0ocR1ZEMjJhRmpNZGxnRXlQSUtqNUhTTFZkZGg4PVofIh3cbGlaVzg5MHdZd013Q01BRm1YUlBDNUJ2WjlvPWUAAAAAEqsBCAcSpgEKHHJxWjgyT09vZjVaNGVadnc2OTMxSElwakdZdz0SJGJiNDllMjU0LWIxMmQtNDExZC05NTkyLTFlMzAyZmJkNDgyZBgAIAYoADD///////////8BON62w7WzL0DJ2KXVtS9KHDA2RUcrdHhlTGE4eFNoZTJWL0ZqNXpMTUlVRT1aHiIcKzM3TTAyUWVSSWNhVkdHdkp0elRUdzVVSFRNPWXiJW5ZEqwBCBISpwEKHHFFZ0ttbEd0a0p3cGZrZHBJdkFxNFVvUmVKZz0SJGQyZWJmZTAyLTM5ZjAtNDQyMy1iZTVmLTlkOWMwYzY1NGYzZhgAIAIoADD///////////8BOMSmptW1L0DEpqbVtS9KHFlOOUo0TTFzQ09EQ0I4bHZpNnFpcmJGempqRT1aHyId7lRXU001dUxOZ1VKU294eGxVTDR1KzFmMUpYWT1l4iVuWRKrAQgBEqYBChwvRUtMYVVVeU1kYktFazFCYTJVaW55RG5mN0k9Ek5aOkFEcXRBWnk4aUIvQ2RxQlpYaTBwUjIvNmpkQUhJd1BtUGg3ZEdRMTVyaGFZZFRRZ3dWTHV0Z2ZOTzlZME8xeDgvbEYzTDU1b3hBL0EYACAAKAAw4MmE1YTg8AI4AEAAShxVK0dHSXRaRURwWnNJU2xPVWFJVHVJTGRNbkk9WgBlAAAAABLDAQgCEr4BChx6RFZHcnJ0WkxkTSs0QlR5YmcrSENPcldneW89EmZaOkFEcXRBWng1K2h1OTZpQWJZcUdYYkdCL2lBOWUxVjhUZmwxVzJmRDBxNzRtdjZxZVIvTGZSRkwrMXZGQzV5VlpUeGszWWRIKzdVRy9PQldZZkdlTCsrcytrN2pOanJoRHJ3PT0YACAAKAAw4MmE1YTg8AI4AEAAShw1dXN5L2NwZnBpMUV0b0JIRGdYSXMwcWI0ckE9WgBlAAAAABKrAQgJEqYBChwyTjF0bktKMnNNMTU5TTBhZW91SU00MFFJT2M9EiRiMTAxMDg4MS00NDU3LTRhZTctODRmZC03MjNkNTgwZjc1NzMYACACKAAw////////////ATjMxcS1sy9A2/ug1bUvShwvNGQrcm1CVWF5YkR5SGNLMk1TbGpoV0tFWkU9Wh4iHDl5UHZhK1VUeFoxaVZUMTBUSkpueGxKb2RHaz1lAAAAABKrAQgQEqYBChw3djlFblROSnR6NHFJcjdBNnVIMXlpdExCb3M9EiRkMDYyZjljOC03N2M3LTQ0YjItOTJkMS1kZDBjNmFkNzBlNzUYACADKAAw////////////ATiloqTVtS9A3Kyl1bUvShxaTUoyWDNFdkE4QUtqUW02TERGNGpjUTJ2SWs9Wh4iHHJtbWhBUDBzb08zZytadmtQbm1LUmswMmp0Zz1l4iVuWRLDAQgDEr4BChx5NVdFMjd1STZ2WC9EZUlTSEp6bmpNcXVXV3M9EmZaOkFEcXRBWnlxYVFmeTdicUtLa3piZ1l5RjFaU1dQbEpLNHB6TVFHSDdINTJ3VEUxQ2NFZFE5Ri9jTE1xQWQ2NU5xTkJTMXZTOE5HcVladEhETFdhSllzYzd5MnpLaFFhVGFRPT0YACAAKAAw4MmE1YTg8AI4AEAAShw3OWwrTFJFVXBpYUV2REQrRzQzY3BYU3R3QmM9WgBlAAAAABKlARKiAQocL0t6bmcrTVorbUd6UUdDWnBkY01uL0pLb1hrPRIkYWE4NWM3ZjMtMzU5Mi00ZmI3LTgwMjctYjU2ZmJjYmYyYmQ0GAEgAygAMP///////////wE4ssD4u7MvQI3n+LuzL0ocdnNoazVGWTFYTkg4MWpZdmpiamZPc1dER0ZjPVofIh2cMTFlNkdYSXk3U1A2ZjR6N0IvRzJLRUhtOXdBPRKlAhKiAgocd1NRYWJrdHI4Q0QvLzdrdHE2czBtR2N4Wkw0PRKmAVo6QURxdEFaek5yOUZrN2dGNm9yQ24vVkM2OHN6REV4RXJsbkxVdloxRmFuaUlEVTI2clRZeUFYU3o0SCtGV0E2SWlWMXpGMVB5MXE2YlVSU3BFdldJZ1prQWtXT0VyYWtONW9iVUFSOWt5Nzl4WmRPT2NiZldEci9oRk44dVBGbGgrUlZlZWQzc0dKbWJLMERXekhyRUsvNW9YbmFVcGNhZklRPT0YASADKAIwn7SQr4LN8QI4+8/6xqcvQLjQ+sanL0ocbjBjQmU4eU9xSkpON3lJRk1keGhJWWlPeDdJPVoeIhxwWEJHbWtTVjJGY0NJZVJuekNJK1VIY2VhTHM9GAEgg8f+xqcvKAE=",
+   "version": 1
+}

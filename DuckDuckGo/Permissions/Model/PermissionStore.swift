@@ -48,7 +48,7 @@ final class LocalPermissionStore: PermissionStore {
                 return .none
             }
 #endif
-            _context = Database.shared.makeContext(concurrencyType: .privateQueueConcurrencyType, name: "Permissions")
+            _context = Database.shared.makeContext(concurrencyType: .mainQueueConcurrencyType, name: "Permissions")
         }
         return _context!
     }

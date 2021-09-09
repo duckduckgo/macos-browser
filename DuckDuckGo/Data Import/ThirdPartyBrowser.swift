@@ -24,6 +24,7 @@ struct ThirdPartyBrowser {
     static var chrome: ThirdPartyBrowser { ThirdPartyBrowser(type: .chrome) }
     static var edge: ThirdPartyBrowser { ThirdPartyBrowser(type: .edge) }
     static var firefox: ThirdPartyBrowser { ThirdPartyBrowser(type: .firefox) }
+    static var safari: ThirdPartyBrowser { ThirdPartyBrowser(type: .safari) }
 
     static func browser(for source: DataImport.Source) -> ThirdPartyBrowser? {
         switch source {
@@ -35,6 +36,8 @@ struct ThirdPartyBrowser {
             return Self.edge
         case .firefox:
             return Self.firefox
+        case .safari:
+            return Self.safari
         case .csv:
             return nil
         }
@@ -45,6 +48,7 @@ struct ThirdPartyBrowser {
         case chrome
         case edge
         case firefox
+        case safari
     }
 
     var isInstalled: Bool {
@@ -64,11 +68,18 @@ struct ThirdPartyBrowser {
     }
 
     var browserProfiles: DataImport.BrowserProfileList? {
-        guard let profilePath = profilesDirectory(),
-              let potentialProfileURLs = try? FileManager.default.contentsOfDirectory(at: profilePath,
-                                                                                    includingPropertiesForKeys: nil,
-                                                                                    options: [.skipsHiddenFiles]).filter(\.hasDirectoryPath) else {
-            return nil
+        let profilePath = profilesDirectory()
+
+        guard let potentialProfileURLs = try? FileManager.default.contentsOfDirectory(at: profilePath,
+                                                                                      includingPropertiesForKeys: nil,
+                                                                                      options: [.skipsHiddenFiles]).filter(\.hasDirectoryPath) else {
+            // Safari is an exception, as it may need permissions granted before being able to read the contents of the profile path. To be safe,
+            // return the profile anyway and check the file system permissions when preparing to import.
+            if type == .safari {
+                return DataImport.BrowserProfileList(browser: self.type, profileURLs: [profilePath])
+            } else {
+                return nil
+            }
         }
 
         return DataImport.BrowserProfileList(browser: self.type, profileURLs: potentialProfileURLs)
@@ -80,6 +91,7 @@ struct ThirdPartyBrowser {
         case .chrome: return "com.google.Chrome"
         case .edge: return "com.microsoft.edgemac"
         case .firefox: return "org.mozilla.firefox"
+        case .safari: return "com.apple.safari"
         }
     }
 
@@ -96,16 +108,17 @@ struct ThirdPartyBrowser {
     }
 
     // Returns the URL to the profiles for a given browser. This directory will contain a list of directories, each representing a profile.
-    private func profilesDirectory() -> URL? {
-        guard let applicationSupportURL = FileManager.default.urls(for: .applicationSupportDirectory, in: .userDomainMask).first else {
-            return nil
-        }
+    private func profilesDirectory() -> URL {
+        let applicationSupportURL = FileManager.default.urls(for: .applicationSupportDirectory, in: .userDomainMask)[0]
 
         switch type {
         case .brave: return applicationSupportURL.appendingPathComponent("BraveSoftware/Brave-Browser/")
         case .chrome: return applicationSupportURL.appendingPathComponent("Google/Chrome/")
         case .edge: return applicationSupportURL.appendingPathComponent("Microsoft Edge/")
         case .firefox: return applicationSupportURL.appendingPathComponent("Firefox/Profiles/")
+        case .safari:
+            let safariDataDirectory = FileManager.default.urls(for: .libraryDirectory, in: .userDomainMask)[0]
+            return safariDataDirectory.appendingPathComponent("Safari")
         }
     }
 

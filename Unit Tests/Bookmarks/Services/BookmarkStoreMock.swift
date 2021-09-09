@@ -82,4 +82,10 @@ final class BookmarkStoreMock: BookmarkStore {
         updateObjectsCalled = true
     }
 
+    var importBookmarksCalled = false
+    func importBookmarks(_ bookmarks: ImportedBookmarks) -> Int {
+        importBookmarksCalled = true
+        return 0
+    }
+
 }
