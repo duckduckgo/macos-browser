@@ -341,20 +341,16 @@ final class LocalBookmarkStore: BookmarkStore {
         context.performAndWait {
             let bookmarkCountBeforeImport = (try? context.count(for: Bookmark.bookmarksFetchRequest())) ?? 0
 
-            let dateFormatter = DateFormatter()
-            dateFormatter.dateStyle = .medium
-            dateFormatter.timeStyle = .medium
+            let importRootFolder = createFolder(titled: UserText.importedBookmarks(at: Date()), in: self.context)
 
-            let importRootFolder = createFolder(titled: "Imported Bookmarks (\(dateFormatter.string(from: Date())))", in: self.context)
-
-            let bookmarksBarFolder = createFolder(titled: "Bookmarks Bar", in: self.context)
+            let bookmarksBarFolder = createFolder(titled: UserText.bookmarkImportBookmarksBar, in: self.context)
             bookmarksBarFolder.parentFolder = importRootFolder
 
             if let bookmarksBar = bookmarks.topLevelFolders.bookmarkBar.children {
                 recursivelyCreateEntities(from: bookmarksBar, parent: bookmarksBarFolder, in: self.context)
             }
 
-            let otherBookmarksFolder = createFolder(titled: "Other Bookmarks", in: self.context)
+            let otherBookmarksFolder = createFolder(titled: UserText.bookmarkImportOtherBookmarks, in: self.context)
             otherBookmarksFolder.parentFolder = importRootFolder
 
             if let otherBookmarks = bookmarks.topLevelFolders.otherBookmarks.children {
