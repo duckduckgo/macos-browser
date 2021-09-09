@@ -39,13 +39,13 @@ final class TabBarViewController: NSViewController {
     @IBOutlet weak var rightShadowImageView: NSImageView!
     @IBOutlet weak var leftShadowImageView: NSImageView!
     @IBOutlet weak var plusButton: LongPressButton!
-    @IBOutlet weak var burnButton: BurnButton!
+    @IBOutlet weak var fireButton: MouseOverButton!
     @IBOutlet weak var draggingSpace: NSView!
     @IBOutlet weak var windowDraggingViewLeadingConstraint: NSLayoutConstraint!
 
     private let tabCollectionViewModel: TabCollectionViewModel
+    private let fireViewModel: FireViewModel
     private let bookmarkManager: BookmarkManager = LocalBookmarkManager.shared
-    lazy private var fireViewModel = FireViewModel()
 
     private var tabsCancellable: AnyCancellable?
     private var selectionIndexCancellable: AnyCancellable?
@@ -55,8 +55,9 @@ final class TabBarViewController: NSViewController {
         fatalError("TabBarViewController: Bad initializer")
     }
 
-    init?(coder: NSCoder, tabCollectionViewModel: TabCollectionViewModel) {
+    init?(coder: NSCoder, tabCollectionViewModel: TabCollectionViewModel, fireViewModel: FireViewModel) {
         self.tabCollectionViewModel = tabCollectionViewModel
+        self.fireViewModel = fireViewModel
 
         super.init(coder: coder)
     }
@@ -67,10 +68,6 @@ final class TabBarViewController: NSViewController {
         scrollView.updateScrollElasticity(with: tabMode)
         observeToScrollNotifications()
         subscribeToSelectionIndex()
-        subscribeToIsBurning()
-
-        warmupFireAnimation()
-
         plusButton.menu = createNewTabLongPressMenu()
     }
 
@@ -125,13 +122,6 @@ final class TabBarViewController: NSViewController {
                                 target: self,
                                 keyEquivalent: ""))
         return menu
-    }
-
-    private func subscribeToIsBurning() {
-        fireViewModel.fire.$isBurning
-            .receive(on: DispatchQueue.main)
-            .weakAssign(to: \.isBurning, on: burnButton)
-            .store(in: &cancellables)
     }
 
     private func reloadSelection() {
@@ -840,42 +830,6 @@ extension TabBarViewController: TabBarViewItemDelegate {
         return .init(hasItemsToTheLeft: indexPath.item > 0,
                      hasItemsToTheRight: indexPath.item + 1 < tabCollectionViewModel.tabCollection.tabs.count,
                      hasBurnerTabs: tabCollectionViewModel.tabCollection.tabs.first(where: { $0.tabStorageType == .burner }) != nil)
-    }
-
-}
-
-extension TabBarViewController {
-
-    static let fireAnimation: AnimationView = {
-        let view = AnimationView(name: "01_Fire_really_small")
-        view.forceDisplayUpdate()
-        return view
-    }()
-
-    func playFireAnimation() {
-
-        Self.fireAnimation.contentMode = .scaleToFill
-        Self.fireAnimation.frame = .init(x: 0,
-                                y: 0,
-                                width: view.window?.frame.width ?? 0,
-                                height: view.window?.frame.height ?? 0)
-
-        view.window?.contentView?.addSubview(Self.fireAnimation)
-        Self.fireAnimation.play { _ in
-            Self.fireAnimation.removeFromSuperview()
-        }
-
-        DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
-            self.fireViewModel.fire.burnAll(tabCollectionViewModel: self.tabCollectionViewModel)
-        }
-
-    }
-
-    func warmupFireAnimation() {
-        view.addSubview(Self.fireAnimation)
-        DispatchQueue.main.async {
-            Self.fireAnimation.removeFromSuperview()
-        }
     }
 
 }

@@ -137,7 +137,9 @@ final class Tab: NSObject {
     let webView: WebView
     var userEnteredUrl = true
 
-    @PublishedAfter var content: TabContent {
+    var contentChangeEnabled = true
+
+    @PublishedAfter private(set) var content: TabContent {
         didSet {
             if oldValue.url?.host != content.url?.host {
                 fetchFavicon(nil, for: content.url?.host, isFromUserScript: false)
@@ -151,6 +153,14 @@ final class Tab: NSObject {
                 self.title = title
             }
         }
+    }
+
+    func setContent(_ content: TabContent) {
+        guard contentChangeEnabled else {
+            return
+        }
+
+        self.content = content
     }
 
     let tabStorageType: TabStorageType

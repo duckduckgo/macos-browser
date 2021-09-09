@@ -64,9 +64,17 @@
                                     <segue destination="0cy-cn-sdp" kind="embed" destinationCreationSelector="createFindInPageViewControllerWithCoder:sender:segueIdentifier:" id="DxV-ID-C83"/>
                                 </connections>
                             </containerView>
+                            <containerView translatesAutoresizingMaskIntoConstraints="NO" id="UE1-Pg-JIe" userLabel="Fire Container View">
+                                <rect key="frame" x="0.0" y="0.0" width="1024" height="789"/>
+                                <connections>
+                                    <segue destination="cnP-Wp-dck" kind="embed" destinationCreationSelector="createFireViewControllerWithCoder:sender:segueIdentifier:" id="qCo-bx-oej"/>
+                                </connections>
+                            </containerView>
                         </subviews>
                         <constraints>
+                            <constraint firstItem="UE1-Pg-JIe" firstAttribute="top" secondItem="m2S-Jp-Qdl" secondAttribute="top" id="0gU-MO-6kc"/>
                             <constraint firstAttribute="trailing" secondItem="wFH-xq-50o" secondAttribute="trailing" id="4Cb-FA-sMo"/>
+                            <constraint firstAttribute="trailing" secondItem="UE1-Pg-JIe" secondAttribute="trailing" id="DIS-8Z-gS4"/>
                             <constraint firstAttribute="trailing" secondItem="SYo-8W-jl3" secondAttribute="trailing" id="EJ8-cX-El9"/>
                             <constraint firstItem="wFH-xq-50o" firstAttribute="top" secondItem="lYg-bX-QrJ" secondAttribute="bottom" id="EnL-Zp-RcI"/>
                             <constraint firstAttribute="trailing" secondItem="lYg-bX-QrJ" secondAttribute="trailing" id="HkZ-fV-qYb"/>
@@ -77,6 +85,8 @@
                             <constraint firstItem="af1-Eb-VaG" firstAttribute="top" secondItem="wFH-xq-50o" secondAttribute="bottom" id="ajK-M4-7Qf"/>
                             <constraint firstItem="lYg-bX-QrJ" firstAttribute="leading" secondItem="m2S-Jp-Qdl" secondAttribute="leading" id="kVB-Sz-8Sv"/>
                             <constraint firstItem="af1-Eb-VaG" firstAttribute="leading" secondItem="m2S-Jp-Qdl" secondAttribute="leading" id="oLA-yb-nB8"/>
+                            <constraint firstItem="UE1-Pg-JIe" firstAttribute="leading" secondItem="m2S-Jp-Qdl" secondAttribute="leading" id="qA7-89-XxQ"/>
+                            <constraint firstAttribute="bottom" secondItem="UE1-Pg-JIe" secondAttribute="bottom" id="qBJ-Ud-uhY"/>
                             <constraint firstAttribute="bottom" secondItem="SYo-8W-jl3" secondAttribute="bottom" id="tLa-XX-e8i"/>
                             <constraint firstItem="SYo-8W-jl3" firstAttribute="leading" secondItem="m2S-Jp-Qdl" secondAttribute="leading" id="woj-yk-97j"/>
                             <constraint firstItem="Jbn-9T-FNt" firstAttribute="top" secondItem="wFH-xq-50o" secondAttribute="bottom" constant="-4" id="xdc-Pw-CDZ"/>
@@ -118,13 +128,21 @@
             </objects>
             <point key="canvasLocation" x="860" y="1170"/>
         </scene>
+        <!--Fire-->
+        <scene sceneID="1LJ-1c-OxA">
+            <objects>
+                <controllerPlaceholder storyboardName="Fire" id="cnP-Wp-dck" sceneMemberID="viewController"/>
+                <customObject id="uyP-DE-lLX" userLabel="First Responder" customClass="NSResponder" sceneMemberID="firstResponder"/>
+            </objects>
+            <point key="canvasLocation" x="838" y="1228"/>
+        </scene>
         <!--BrowserTab-->
         <scene sceneID="O3n-py-FOu">
             <objects>
                 <customObject id="ECq-3v-dmj" userLabel="First Responder" customClass="NSResponder" sceneMemberID="firstResponder"/>
                 <controllerPlaceholder storyboardName="BrowserTab" id="wo6-dV-Q3Q" sceneMemberID="viewController"/>
             </objects>
-            <point key="canvasLocation" x="860" y="1224"/>
+            <point key="canvasLocation" x="862" y="1280"/>
         </scene>
     </scenes>
     <resources>

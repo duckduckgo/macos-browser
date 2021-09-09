@@ -88,7 +88,7 @@ extension NSAlert {
         return alert
     }
 
-    static func burnButtonAlert() -> NSAlert {
+    static func fireButtonAlert() -> NSAlert {
         let alert = NSAlert()
         alert.messageText = UserText.burnAlertMessageText
         alert.informativeText = UserText.burtAlertInformativeText

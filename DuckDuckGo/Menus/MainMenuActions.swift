@@ -158,21 +158,8 @@ extension AppDelegate {
         }
     }
 
-    @IBAction func burnButtonAction(_ sender: NSButton) {
-        let response = NSAlert.burnButtonAlert().runModal()
-        if response == NSApplication.ModalResponse.alertFirstButtonReturn {
-            Pixel.fire(.burn())
-
-            let windowController = WindowControllersManager.shared.lastKeyMainWindowController
-            WindowsManager.closeWindows(except: windowController?.window)
-            if let tabBarViewController = windowController?.mainViewController.tabBarViewController {
-                tabBarViewController.playFireAnimation()
-            } else {
-                Fire().burnAll(tabCollectionViewModel: nil) {
-                    WindowsManager.openNewWindow()
-                }
-            }
-        }
+    @IBAction func fireButtonAction(_ sender: NSButton) {
+        FireViewController.fireButtonAction()
     }
 
 }
@@ -326,7 +313,7 @@ extension MainViewController {
         } else if NSApplication.shared.isCommandPressed {
             WindowControllersManager.shared.show(url: bookmark.url, newTab: true)
         } else {
-            selectedTabViewModel.tab.content = .url(bookmark.url)
+            selectedTabViewModel.tab.setContent(.url(bookmark.url))
         }
     }
 

@@ -72,7 +72,7 @@
                             </menuItem>
                             <menuItem title="File" id="dMs-cI-mzQ">
                                 <modifierMask key="keyEquivalentModifierMask"/>
-                                <menu key="submenu" title="File" id="bib-Uj-vzu">
+                                <menu key="submenu" title="File" autoenablesItems="NO" id="bib-Uj-vzu">
                                     <items>
                                         <menuItem title="New Window" keyEquivalent="n" id="Was-JA-tGl">
                                             <connections>
@@ -132,7 +132,7 @@ CA
 </string>
                                             <modifierMask key="keyEquivalentModifierMask" shift="YES" command="YES"/>
                                             <connections>
-                                                <action selector="burnButtonAction:" target="Ady-hI-5gd" id="vT7-U8-BVg"/>
+                                                <action selector="fireButtonAction:" target="Ady-hI-5gd" id="vT7-U8-BVg"/>
                                             </connections>
                                         </menuItem>
                                         <menuItem isSeparatorItem="YES" id="u7E-4A-OQP"/>
@@ -674,10 +674,14 @@ CQ
                             <outlet property="backMenuItem" destination="VWV-vB-Mtc" id="Keo-4E-dRW"/>
                             <outlet property="bookmarkThisPageMenuItem" destination="Nkm-zy-JXD" id="HVV-JT-gvV"/>
                             <outlet property="bookmarksMenuItem" destination="xf8-PW-TOA" id="Pfa-kN-nIj"/>
+                            <outlet property="burnWebsiteDataMenuItem" destination="b1E-Hc-xhP" id="8br-vM-1Pj"/>
                             <outlet property="checkForUpdatesMenuItem" destination="RbH-ua-rrN" id="pdB-jS-fc3"/>
                             <outlet property="checkForUpdatesSeparatorItem" destination="gNj-hj-EIc" id="EH1-yf-r5I"/>
                             <outlet property="checkGrammarWithSpellingMenuItem" destination="mK6-2p-4JG" id="hA4-qY-11q"/>
                             <outlet property="checkSpellingWhileTypingMenuItem" destination="rbD-Rh-wIN" id="I0y-qO-6tE"/>
+                            <outlet property="closeAllWindowsMenuItem" destination="VeX-H4-NpP" id="NbQ-qo-OZe"/>
+                            <outlet property="closeTabMenuItem" destination="DVo-aG-piG" id="Hr0-hn-2p1"/>
+                            <outlet property="closeWindowMenuItem" destination="CzI-4o-2re" id="32H-X4-8Ub"/>
                             <outlet property="debugMenuItem" destination="ilv-5f-YpZ" id="4F7-9b-Mve"/>
                             <outlet property="favoriteThisPageMenuItem" destination="cHZ-Fb-aKU" id="uPM-LY-AmL"/>
                             <outlet property="favoritesMenuItem" destination="Y9I-ZC-gGg" id="zk1-XL-x3e"/>
@@ -685,6 +689,9 @@ CQ
                             <outlet property="helpMenuItem" destination="wpr-3q-Mcd" id="PSe-Hj-hck"/>
                             <outlet property="helpSeparatorMenuItem" destination="ESk-wA-tC4" id="XV6-OM-YLi"/>
                             <outlet property="homeMenuItem" destination="FPm-eZ-BQ8" id="Taj-EN-6R8"/>
+                            <outlet property="newTabMenuItem" destination="9qI-62-tsd" id="6SI-rG-P34"/>
+                            <outlet property="newWindowMenuItem" destination="Was-JA-tGl" id="uyQ-qR-DFk"/>
+                            <outlet property="openLocationMenuItem" destination="xnU-dQ-JR1" id="DYS-Dt-ydU"/>
                             <outlet property="printMenuItem" destination="uFk-FD-FTB" id="mOP-Xp-myS"/>
                             <outlet property="printSeparatorItem" destination="anH-0y-7dE" id="E6b-rl-clQ"/>
                             <outlet property="reloadMenuItem" destination="aKZ-VG-MOp" id="J3D-X3-Xg3"/>
