@@ -432,11 +432,11 @@ extension TabBarViewItem: NSMenuDelegate {
         }
 
         if isBurnerTab {
-            menu.addItem(NSMenuItem(title: "Convert to Tab", action: #selector(convertToStandardTab(_:)), target: self, keyEquivalent: ""))
+            menu.addItem(NSMenuItem(title: UserText.convertToTab, action: #selector(convertToStandardTab(_:)), target: self, keyEquivalent: ""))
         }
 
         if otherItemsState.hasBurnerTabs {
-            menu.addItem(NSMenuItem(title: "Close all Burner Tabs", action: #selector(closeBurnerTabs(_:)), target: self, keyEquivalent: ""))
+            menu.addItem(NSMenuItem(title: UserText.closeAllBurnerTabs, action: #selector(closeBurnerTabs(_:)), target: self, keyEquivalent: ""))
         }
     }
 

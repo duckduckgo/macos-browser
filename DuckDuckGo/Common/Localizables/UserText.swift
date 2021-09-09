@@ -34,6 +34,8 @@ struct UserText {
     static let closeTabsToTheRight = NSLocalizedString("close.tabs.to.the.right", value: "Close Tabs to the Right", comment: "Menu item")
     static let openInNewTab = NSLocalizedString("open.in.new.tab", value: "Open in New Tab", comment: "Menu item that opens the link in a new tab")
     static let openInNewWindow = NSLocalizedString("open.in.new.window", value: "Open in New Window", comment: "Menu item that opens the link in a new window")
+    static let convertToTab = NSLocalizedString("convert.to.tab", value: "Convert to Tab", comment: "Menu item")
+    static let closeAllBurnerTabs = NSLocalizedString("close.all.burner.tabs", value: "Close All Burner Tabs", comment: "Menu item")
 
     static let tabHomeTitle = NSLocalizedString("tab.home.title", value: "Home", comment: "Tab home title")
     static let tabPreferencesTitle = NSLocalizedString("tab.preferences.title", value: "Preferences", comment: "Tab preferences title")
