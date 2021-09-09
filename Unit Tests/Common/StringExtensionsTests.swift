@@ -22,9 +22,10 @@ import XCTest
 
 final class StringExtensionsTests: XCTestCase {
 
+    // MARK: - General
+
     func testWhenNsRangeIsCalledWithoutParameter_ThenFullRangeIsReturened() {
         XCTAssertEqual("".nsRange(), NSRange(location: 0, length: 0))
         XCTAssertEqual("š".nsRange(), NSRange(location: 0, length: 1))
     }
-
 }
