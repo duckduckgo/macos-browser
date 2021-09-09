@@ -62,10 +62,9 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         }
 #endif
 
-        Database.shared.loadStore()
-
         if !Self.isRunningTests {
             Pixel.setUp()
+            Database.shared.loadStore()
         }
 
         do {

@@ -28,7 +28,7 @@ final class Database {
     static let shared = Database()
 
     private let container: NSPersistentContainer
-    private var storeLoaded = false
+    private let storeLoadedCondition = RunLoop.ResumeCondition()
     
     var model: NSManagedObjectModel {
         return container.managedObjectModel
@@ -70,17 +70,13 @@ final class Database {
             context.perform {
                 migrationHandler(context)
 
-                DispatchQueue.main.async { [weak self] in
-                    self?.storeLoaded = true
-                }
+                self.storeLoadedCondition.resolve()
             }
         }
     }
     
     func makeContext(concurrencyType: NSManagedObjectContextConcurrencyType, name: String? = nil) -> NSManagedObjectContext {
-        while !storeLoaded {
-            RunLoop.current.run(mode: .default, before: Date() + 0.1)
-        }
+        RunLoop.current.run(until: storeLoadedCondition)
 
         let context = NSManagedObjectContext(concurrencyType: concurrencyType)
         context.persistentStoreCoordinator = container.persistentStoreCoordinator
