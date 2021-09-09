@@ -127,15 +127,4 @@ final class RunLoopExtensionTests: XCTestCase {
         waitForExpectations(timeout: 1)
     }
 
-    func testWhenResumeConditionResolvesBeforeRunningRunLoopThenWaitIsFinishedInstantly() {
-        let condition = RunLoop.ResumeCondition()
-        let e = expectation(description: "should execute")
-        RunLoop.current.perform {
-            e.fulfill()
-        }
-
-        RunLoop.current.run(until: condition)
-        waitForExpectations(timeout: 0)
-    }
-
 }
