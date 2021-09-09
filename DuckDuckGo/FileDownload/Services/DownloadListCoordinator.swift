@@ -25,13 +25,11 @@ final class DownloadListCoordinator {
 
     private let store: DownloadListStoring
     private let downloadManager: FileDownloadManager
-    private let queue = DispatchQueue(label: "downloads.coordinator.queue", qos: .userInitiated, attributes: .concurrent)
 
     private var items = [UUID: DownloadListItem]()
 
     private var downloadsCancellable: AnyCancellable?
-
-    private var downloadTaskCancellables = [UUID: Set<AnyCancellable>]()
+    private var downloadTaskCancellables = [WebKitDownloadTask: Set<AnyCancellable>]()
 
     enum UpdateKind {
         case added
@@ -50,20 +48,20 @@ final class DownloadListCoordinator {
     }
 
     private func load() {
-        store.fetch(clearingItemsOlderThan: .monthAgo) { [weak self] result in
-            self?.queue.async(flags: .barrier) { [weak self] in
-                guard let self = self else { return }
+        store.fetch(clearingItemsOlderThan: Date().addingTimeInterval(-3600 * 48)) { [weak self] result in
+            dispatchPrecondition(condition: .onQueue(.main))
 
-                switch result {
-                case .success(let items):
-                    for item in items {
-                        self.items[item.identifier] = item
-                        self.updatesSubject.send((.added, item))
-                    }
+            guard let self = self else { return }
 
-                case .failure(let error):
-                    os_log("Cleaning and loading of downloads failed: %s", log: .history, type: .error, error.localizedDescription)
+            switch result {
+            case .success(let items):
+                for item in items {
+                    self.items[item.identifier] = item
+                    self.updatesSubject.send((.added, item))
                 }
+
+            case .failure(let error):
+                os_log("Cleaning and loading of downloads failed: %s", log: .history, type: .error, error.localizedDescription)
             }
         }
     }
@@ -71,14 +69,14 @@ final class DownloadListCoordinator {
     private func subscribeToDownloadManager() {
         assert(downloadManager.downloads.isEmpty)
         downloadsCancellable = downloadManager.downloadsPublisher
-            .receive(on: self.queue, options: .init(flags: .barrier))
+            .receive(on: DispatchQueue.main)
             .sink { [weak self] task in
                 self?.subscribeToDownloadTask(task)
         }
     }
 
     private func subscribeToDownloadTask(_ task: WebKitDownloadTask, updating item: DownloadListItem? = nil) {
-        dispatchPrecondition(condition: .onQueue(queue))
+        dispatchPrecondition(condition: .onQueue(.main))
 
         if let identifier = item?.identifier {
             updateItem(withId: identifier) { item in
@@ -87,29 +85,30 @@ final class DownloadListCoordinator {
                 item?.progress = task.progress
             }
         }
-        guard !items.values.contains(where: { $0.progress === task.progress }) else { return }
+        // skip already known task: it's already subscribed
+        guard downloadTaskCancellables[task] == nil else { return }
         
         let item = item ?? DownloadListItem(task: task)
 
         task.$location
             // only add item to the dict when destination URL is set
             .filter { $0.destinationURL != nil }
-            .receive(on: self.queue, options: .init(flags: .barrier))
+            .receive(on: DispatchQueue.main)
             .sink { [weak self] location in
                 self?.addItemOrUpdateLocation(for: item, destinationURL: location.destinationURL, tempURL: location.tempURL)
             }
-            .store(in: &self.downloadTaskCancellables[item.identifier, default: []])
+            .store(in: &self.downloadTaskCancellables[task, default: []])
 
         task.output
-            .receive(on: self.queue, options: .init(flags: .barrier))
+            .receive(on: DispatchQueue.main)
             .sink { [weak self] completion in
-                self?.downloadTask(withId: item.identifier, completedWith: completion)
+                self?.downloadTask(task, withId: item.identifier, completedWith: completion)
             } receiveValue: { _ in }
-            .store(in: &self.downloadTaskCancellables[item.identifier, default: []])
+            .store(in: &self.downloadTaskCancellables[task, default: []])
     }
 
     private func addItemOrUpdateLocation(for initialItem: DownloadListItem, destinationURL: URL?, tempURL: URL?) {
-        dispatchPrecondition(condition: .onQueue(self.queue))
+        dispatchPrecondition(condition: .onQueue(.main))
 
         updateItem(withId: initialItem.identifier) { item in
             if item == nil { item = initialItem }
@@ -118,8 +117,8 @@ final class DownloadListCoordinator {
         }
     }
 
-    private func downloadTask(withId identifier: UUID, completedWith result: Subscribers.Completion<FileDownloadError>) {
-        dispatchPrecondition(condition: .onQueue(self.queue))
+    private func downloadTask(_ task: WebKitDownloadTask, withId identifier: UUID, completedWith result: Subscribers.Completion<FileDownloadError>) {
+        dispatchPrecondition(condition: .onQueue(.main))
 
         updateItem(withId: identifier) { item in
             if case .failure(let error) = result {
@@ -128,11 +127,11 @@ final class DownloadListCoordinator {
             item?.progress = nil
         }
 
-        self.downloadTaskCancellables[identifier] = nil
+        self.downloadTaskCancellables[task] = nil
     }
 
     private func updateItem(withId identifier: UUID, mutate: (inout DownloadListItem?) -> Void) {
-        dispatchPrecondition(condition: .onQueue(self.queue))
+        dispatchPrecondition(condition: .onQueue(.main))
 
         let original = self.items[identifier]
         var modified = original
@@ -167,10 +166,8 @@ final class DownloadListCoordinator {
                     location = .prompt
                 }
 
-                self.queue.sync(flags: .barrier) {
-                    let task = self.downloadManager.add(download, delegate: self, location: location, postflight: .none)
-                    self.subscribeToDownloadTask(task, updating: item)
-                }
+                let task = self.downloadManager.add(download, delegate: self, location: location, postflight: .none)
+                self.subscribeToDownloadTask(task, updating: item)
             }
         }
     }
@@ -178,12 +175,11 @@ final class DownloadListCoordinator {
     // MARK: interface
 
     func downloads<T: Comparable>(sortedBy keyPath: KeyPath<DownloadListItem, T>, ascending: Bool) -> [DownloadListItem] {
+        dispatchPrecondition(condition: .onQueue(.main))
         let comparator: (T, T) -> Bool = ascending ? (<) : (>)
-        return queue.sync {
-            items.values.sorted(by: {
-                comparator($0[keyPath: keyPath], $1[keyPath: keyPath])
-            })
-        }
+        return items.values.sorted(by: {
+            comparator($0[keyPath: keyPath], $1[keyPath: keyPath])
+        })
     }
 
     func updates() -> AnyPublisher<Update, Never> {
@@ -193,7 +189,7 @@ final class DownloadListCoordinator {
     func restart(downloadWithIdentifier identifier: UUID) {
         dispatchPrecondition(condition: .onQueue(.main))
 
-        guard let item = self.queue.sync(execute: { items[identifier] }),
+        guard let item = items[identifier],
               let webView = WindowControllersManager.shared.lastKeyMainWindowController?.mainViewController
                 .browserTabViewController.tabViewModel?.tab.webView
         else {
@@ -221,28 +217,27 @@ final class DownloadListCoordinator {
 
     func cleanupInactiveDownloads() {
         dispatchPrecondition(condition: .onQueue(.main))
-        self.queue.sync(flags: .barrier) {
-            for (id, item) in self.items where item.progress == nil {
-                self.items[id] = nil
-                self.updatesSubject.send((.removed, item))
-            }
+
+        for (id, item) in self.items where item.progress == nil {
+            self.items[id] = nil
+            self.updatesSubject.send((.removed, item))
         }
+
         store.clear()
     }
 
     func remove(downloadWithIdentifier identifier: UUID) {
         dispatchPrecondition(condition: .onQueue(.main))
-        self.queue.sync(flags: .barrier) {
-            updateItem(withId: identifier) { item in
-                item?.progress?.cancel()
-                item = nil
-            }
+
+        updateItem(withId: identifier) { item in
+            item?.progress?.cancel()
+            item = nil
         }
     }
 
     func cancel(downloadWithIdentifier identifier: UUID) {
         dispatchPrecondition(condition: .onQueue(.main))
-        guard let item = self.queue.sync(flags: .barrier, execute: { self.items[identifier] }) else {
+        guard let item = self.items[identifier] else {
             assertionFailure("Item with identifier \(identifier) not found")
             return
         }

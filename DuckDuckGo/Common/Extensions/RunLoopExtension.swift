@@ -20,27 +20,74 @@ import Foundation
 
 extension RunLoop {
 
-    func wait(for dispatchGroup: DispatchGroup) {
-        assert(self === RunLoop.main)
+    final class ResumeCondition {
 
-        let port = Port()
-        RunLoop.current.add(port, forMode: .default)
+        private let lock = NSLock()
+        private var receivePorts = [Port]()
 
-        var notified = false
-        dispatchGroup.notify(queue: .main) {
-            notified = true
+        private var _isResolved = false
+        var isResolved: Bool {
+            lock.lock()
+            defer { lock.unlock() }
+            return _isResolved
+        }
+
+        init() {
+        }
+
+        convenience init(dispatchGroup: DispatchGroup) {
+            self.init()
+            dispatchGroup.notify(queue: .main) {
+                self.resolve()
+            }
+        }
+
+        func addPort(to runLoop: RunLoop, forMode mode: RunLoop.Mode) -> Port? {
+            lock.lock()
+            defer { lock.unlock() }
+            guard !_isResolved else { return nil }
+
+            let port = Port()
+            receivePorts.append(port)
+            runLoop.add(port, forMode: mode)
+
+            return port
+        }
+
+        func resolve(mode: RunLoop.Mode = .default) {
+            lock.lock()
+
+            assert(!_isResolved)
+            _isResolved = true
+
+            let ports = receivePorts
+
+            lock.unlock()
 
             let sendPort = Port()
-            RunLoop.current.add(sendPort, forMode: .default)
-            sendPort.send(before: Date(), components: nil, from: port, reserved: 0)
-            RunLoop.current.remove(sendPort, forMode: .default)
+            RunLoop.current.add(sendPort, forMode: mode)
+
+            // Send Wake message from current RunLoop port to each running RunLoop
+            for receivePort in ports {
+                receivePort.send(before: Date(), components: nil, from: sendPort, reserved: 0)
+            }
+
+            RunLoop.current.remove(sendPort, forMode: mode)
         }
 
-        while !notified {
-            RunLoop.current.run(mode: .default, before: .distantFuture)
+    }
+
+    func run(mode: RunLoop.Mode = .default, until condition: ResumeCondition) {
+        // Add port to current RunLoop to receive Wake message
+        guard let port = condition.addPort(to: self, forMode: mode) else {
+            // already resolved
+            return
         }
 
-        RunLoop.current.remove(port, forMode: .default)
+        while !condition.isResolved {
+            self.run(mode: mode, before: .distantFuture)
+        }
+        self.remove(port, forMode: mode)
     }
 
 }

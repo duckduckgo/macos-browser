@@ -23,7 +23,7 @@ import Combine
 protocol DownloadListStoring {
 
     func fetch(clearingItemsOlderThan date: Date, completionHandler: @escaping (Result<[DownloadListItem], Error>) -> Void)
-    func save(_ item: DownloadListItem, completionHandler: ((Result<DownloadManagedObject, Error>) -> Void)?)
+    func save(_ item: DownloadListItem, completionHandler: ((Error?) -> Void)?)
     func remove(_ item: DownloadListItem, completionHandler: ((Error?) -> Void)?)
     func clear(itemsOlderThan date: Date, completionHandler: ((Error?) -> Void)?)
     func sync()
@@ -48,10 +48,25 @@ extension DownloadListStoring {
 
 final class DownloadListStore: DownloadListStoring {
 
-    init() {}
+    private var _context: NSManagedObjectContext??
+    private var context: NSManagedObjectContext? {
+        if case .none = _context {
+#if DEBUG
+            if AppDelegate.isRunningTests {
+                _context = .some(.none)
+                return .none
+            }
+#endif
+            _context = Database.shared.makeContext(concurrencyType: .privateQueueConcurrencyType, name: "Downloads")
+        }
+        return _context!
+    }
+
+    init() {
+    }
 
     init(context: NSManagedObjectContext) {
-        self.context = context
+        self._context = .some(context)
     }
 
     enum HistoryStoreError: Error {
@@ -59,9 +74,16 @@ final class DownloadListStore: DownloadListStoring {
         case savingFailed
     }
 
-    private lazy var context = Database.shared.makeContext(concurrencyType: .privateQueueConcurrencyType, name: "Downloads")
-
     private func remove(itemsWithPredicate predicate: NSPredicate, completionHandler: ((Error?) -> Void)?) {
+        guard let context = self.context else { return }
+
+        func mainQueueCompletion(_ error: Error?) {
+            guard completionHandler != nil else { return }
+            DispatchQueue.main.async {
+                completionHandler?(error)
+            }
+        }
+
         context.perform { [context] in
             let deleteRequest = NSFetchRequest<NSFetchRequestResult>(entityName: DownloadManagedObject.className())
             deleteRequest.predicate = predicate
@@ -73,9 +95,9 @@ final class DownloadListStore: DownloadListStoring {
                 let deletedObjects = result?.result as? [NSManagedObjectID] ?? []
                 let changes: [AnyHashable: Any] = [NSDeletedObjectsKey: deletedObjects]
                 NSManagedObjectContext.mergeChanges(fromRemoteContextSave: changes, into: [context])
-                completionHandler?(nil)
+                mainQueueCompletion(nil)
             } catch {
-                completionHandler?(error)
+                mainQueueCompletion(error)
             }
         }
     }
@@ -91,15 +113,23 @@ final class DownloadListStore: DownloadListStoring {
     }
 
     func fetch(completionHandler: @escaping (Result<[DownloadListItem], Error>) -> Void) {
+        guard let context = self.context else { return }
+
+        func mainQueueCompletion(_ result: Result<[DownloadListItem], Error>) {
+            DispatchQueue.main.async {
+                completionHandler(result)
+            }
+        }
+
         context.perform { [context] in
             let fetchRequest = DownloadManagedObject.fetchRequest() as NSFetchRequest<DownloadManagedObject>
             fetchRequest.returnsObjectsAsFaults = false
             do {
                 let entries = try context.fetch(fetchRequest)
                     .compactMap(DownloadListItem.init(managedObject:))
-                completionHandler(.success(entries))
+                mainQueueCompletion(.success(entries))
             } catch {
-                completionHandler(.failure(error))
+                mainQueueCompletion(.failure(error))
             }
         }
     }
@@ -110,7 +140,16 @@ final class DownloadListStore: DownloadListStoring {
         }
     }
 
-    func save(_ item: DownloadListItem, completionHandler: ((Result<DownloadManagedObject, Error>) -> Void)?) {
+    func save(_ item: DownloadListItem, completionHandler: ((Error?) -> Void)?) {
+        guard let context = self.context else { return }
+        
+        func mainQueueCompletion(_ error: Error?) {
+            guard completionHandler != nil else { return }
+            DispatchQueue.main.async {
+                completionHandler?(error)
+            }
+        }
+
         context.perform { [context] in
             // Check for existence
             let fetchRequest = DownloadManagedObject.fetchRequest() as NSFetchRequest<DownloadManagedObject>
@@ -120,7 +159,7 @@ final class DownloadListStore: DownloadListStoring {
             do {
                 fetchedObjects = try context.fetch(fetchRequest)
             } catch {
-                completionHandler?(.failure(error))
+                mainQueueCompletion(error)
                 return
             }
 
@@ -131,7 +170,7 @@ final class DownloadListStore: DownloadListStoring {
                                                            into: context) as? DownloadManagedObject else {
                 assertionFailure("DownloadManagedObject insertion failed")
                 struct DownloadManagedObjectInsertionError: Error {}
-                completionHandler?(.failure(DownloadManagedObjectInsertionError()))
+                mainQueueCompletion(DownloadManagedObjectInsertionError())
                 return
             }
 
@@ -139,15 +178,15 @@ final class DownloadListStore: DownloadListStoring {
 
             do {
                 try context.save()
-                completionHandler?(.success(managedObject))
+                mainQueueCompletion(nil)
             } catch {
-                completionHandler?(.failure(error))
+                mainQueueCompletion(error)
             }
         }
     }
 
     func sync() {
-        context.performAndWait {}
+        context?.performAndWait {}
     }
 
 }

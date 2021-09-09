@@ -103,7 +103,9 @@ final class FileDownloadManager {
 
             task.cancel()
         }
-        dispatchGroup.map(RunLoop.main.wait(for:))
+        if let dispatchGroup = dispatchGroup {
+            RunLoop.main.run(until: RunLoop.ResumeCondition(dispatchGroup: dispatchGroup))
+        }
     }
 
 }
