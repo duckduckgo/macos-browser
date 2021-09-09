@@ -25,14 +25,20 @@ struct PasswordManagementItemListView: View {
     @EnvironmentObject var model: PasswordManagementItemListModel
 
     var body: some View {
-        List(model.displayedAccounts, id: \.id) { account in
 
-            ItemView(account: account, selected: model.selected?.id == account.id) {
-                model.selectAccount(account)
+        ScrollView {
+            VStack(alignment: .leading) {
+                Spacer(minLength: 10)
+
+                ForEach(model.displayedAccounts, id: \.id) { account in
+                    ItemView(account: account, selected: model.selected?.id == account.id) {
+                        model.selectAccount(account)
+                    }
+                    .padding(.horizontal, 10)
+                }
             }
-
         }
-        .listStyle(SidebarListStyle())
+
     }
 
 }
@@ -45,31 +51,38 @@ private struct ItemView: View {
 
     var body: some View {
 
-        let selectedTextColor = Color(NSColor.selectedControlTextColor)
+        let textColor = selected ? Color(NSColor.selectedControlTextColor) : Color(NSColor.controlTextColor)
+        let font = Font.custom("SFProText-Regular", size: 13)
         let displayName = ((account.title ?? "").isEmpty == true ? account.domain.dropWWW() : account.title) ?? ""
 
         Button(action: action, label: {
-            HStack(spacing: 4) {
+            HStack(spacing: 0) {
+
                 FaviconView(domain: account.domain)
+                    .padding(.leading, 6)
 
                 VStack(alignment: .leading, spacing: 4) {
-                    Text(displayName).bold()
-                        .foregroundColor(selected ? selectedTextColor : nil)
+                    Text(displayName)
+                        .foregroundColor(textColor)
+                        .font(font)
                     Text(account.username)
-                        .foregroundColor(selected ? selectedTextColor : nil)
+                        .foregroundColor(textColor.opacity(0.6))
+                        .font(font)
                 }
+                .padding(.leading, 4)
             }
         })
+        .frame(maxHeight: 48)
         .buttonStyle(selected ?
-                        CustomButtonStyle(bgColor: Color(NSColor.selectedControlColor)) :
+                        PasswordManagerItemButtonStyle(bgColor: Color(NSColor.selectedControlColor)) :
                         // Almost clear, so that whole view is clickable
-                        CustomButtonStyle(bgColor: Color(NSColor.windowBackgroundColor.withAlphaComponent(0.01))))
+                        PasswordManagerItemButtonStyle(bgColor: Color(NSColor.windowBackgroundColor.withAlphaComponent(0.001))))
 
     }
 
 }
 
-private struct CustomButtonStyle: ButtonStyle {
+private struct PasswordManagerItemButtonStyle: ButtonStyle {
 
     let bgColor: Color
 
@@ -78,8 +91,9 @@ private struct CustomButtonStyle: ButtonStyle {
         let fillColor = configuration.isPressed ? Color.accentColor : bgColor
 
         configuration.label
-            .padding(4)
+            .padding(.vertical, 8)
             .frame(maxWidth: .infinity, alignment: .leading)
+            .truncationMode(.tail)
             .background(RoundedRectangle(cornerRadius: 3, style: .continuous).fill(fillColor))
 
     }

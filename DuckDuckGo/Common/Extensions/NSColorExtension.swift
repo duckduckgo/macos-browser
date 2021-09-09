@@ -113,4 +113,13 @@ extension NSColor {
     static var buttonMouseDownColor: NSColor {
         NSColor(named: "ButtonMouseDownColor")!
     }
+
+    static var burnerIndicatorSelectedColor: NSColor {
+        NSColor(named: "BurnerIndicatorSelectedColor")!
+    }
+
+    static var burnerIndicatorUnselectedColor: NSColor {
+        NSColor(named: "BurnerIndicatorUnselectedColor")!
+    }
+
 }
