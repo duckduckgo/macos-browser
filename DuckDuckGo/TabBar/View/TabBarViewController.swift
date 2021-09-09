@@ -38,7 +38,7 @@ final class TabBarViewController: NSViewController {
     @IBOutlet weak var leftScrollButton: MouseOverButton!
     @IBOutlet weak var rightShadowImageView: NSImageView!
     @IBOutlet weak var leftShadowImageView: NSImageView!
-    @IBOutlet weak var plusButton: MouseOverButton!
+    @IBOutlet weak var plusButton: LongPressButton!
     @IBOutlet weak var burnButton: BurnButton!
     @IBOutlet weak var draggingSpace: NSView!
     @IBOutlet weak var windowDraggingViewLeadingConstraint: NSLayoutConstraint!
@@ -70,6 +70,8 @@ final class TabBarViewController: NSViewController {
         subscribeToIsBurning()
 
         warmupFireAnimation()
+
+        plusButton.menu = createNewTabLongPressMenu()
     }
 
     override func viewWillAppear() {
@@ -97,6 +99,10 @@ final class TabBarViewController: NSViewController {
         tabCollectionViewModel.appendNewTab(with: .homepage)
     }
 
+    @IBAction func createBurnerTabAction(_ sender: NSButton) {
+        tabCollectionViewModel.appendNewTab(with: .homepage, tabStorageType: .burner)
+    }
+
     @IBAction func rightScrollButtonAction(_ sender: NSButton) {
         collectionView.scrollToEnd()
     }
@@ -109,6 +115,16 @@ final class TabBarViewController: NSViewController {
         selectionIndexCancellable = tabCollectionViewModel.$selectionIndex.receive(on: DispatchQueue.main).sink { [weak self] _ in
             self?.reloadSelection()
         }
+    }
+
+    private func createNewTabLongPressMenu() -> NSMenu {
+        let menu = NSMenu()
+        menu.addItem(NSMenuItem(title: UserText.plusButtonNewTabMenuItem, action: #selector(addButtonAction(_:)), target: self, keyEquivalent: ""))
+        menu.addItem(NSMenuItem(title: UserText.plusButtonNewBurnerTabMenuItem,
+                                action: #selector(createBurnerTabAction(_:)),
+                                target: self,
+                                keyEquivalent: ""))
+        return menu
     }
 
     private func subscribeToIsBurning() {
@@ -561,6 +577,7 @@ extension TabBarViewController: NSCollectionViewDataSource {
         if let footer = view as? TabBarFooter {
             footer.addButton?.target = self
             footer.addButton?.action = #selector(addButtonAction(_:))
+            footer.addButton?.menu = createNewTabLongPressMenu()
         }
         return view
     }
@@ -719,6 +736,17 @@ extension TabBarViewController: TabBarViewItemDelegate {
         tabCollectionViewModel.duplicateTab(at: indexPath.item)
     }
 
+    func tabBarViewItemConvertToStandard(_ tabBarViewItem: TabBarViewItem) {
+        guard let indexPath = collectionView.indexPath(for: tabBarViewItem) else {
+            os_log("TabBarViewController: Failed to get index path of tab bar view item", type: .error)
+            return
+        }
+
+        collectionView.clearSelection()
+        tabCollectionViewModel.convertToStandardTab(at: indexPath.item)
+        tabBarViewItemCloseAction(tabBarViewItem)
+    }
+
     func tabBarViewItemBookmarkThisPageAction(_ tabBarViewItem: TabBarViewItem) {
         guard let indexPath = collectionView.indexPath(for: tabBarViewItem),
               let tabViewModel = tabCollectionViewModel.tabViewModel(at: indexPath.item),
@@ -800,12 +828,18 @@ extension TabBarViewController: TabBarViewItemDelegate {
         }
     }
 
-    func otherTabBarViewItemsState(for tabBarViewItem: TabBarViewItem) -> (hasItemsToTheLeft: Bool, hasItemsToTheRight: Bool) {
+    func tabBarViewItemCloseBurnerTabs(_ tabBarViewItem: TabBarViewItem) {
+        tabCollectionViewModel.removeBurnerTabs()
+    }
+
+    func otherTabBarViewItemsState(for tabBarViewItem: TabBarViewItem) -> OtherTabBarViewItemsState {
         guard let indexPath = collectionView.indexPath(for: tabBarViewItem) else {
             os_log("TabBarViewController: Failed to get index path of tab bar view item", type: .error)
-            return (false, false)
+            return .init(hasItemsToTheLeft: false, hasItemsToTheRight: false, hasBurnerTabs: false)
         }
-        return (hasItemsToTheLeft: indexPath.item > 0, hasItemsToTheRight: indexPath.item + 1 < tabCollectionViewModel.tabCollection.tabs.count)
+        return .init(hasItemsToTheLeft: indexPath.item > 0,
+                     hasItemsToTheRight: indexPath.item + 1 < tabCollectionViewModel.tabCollection.tabs.count,
+                     hasBurnerTabs: tabCollectionViewModel.tabCollection.tabs.first(where: { $0.tabStorageType == .burner }) != nil)
     }
 
 }

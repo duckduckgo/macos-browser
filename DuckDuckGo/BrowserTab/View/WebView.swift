@@ -80,6 +80,16 @@ final class WebView: WKWebView {
 
         updateActionsAndTitles(menu.items)
 
+        menu.insertItemAfterItemWithIdentifier("WKMenuItemIdentifierSearchWeb",
+                                               title: UserText.searchWithBurnerTab,
+                                               target: uiDelegate,
+                                               selector: #selector(MenuItemSelectors.searchInBurnerTab(_:)))
+
+        menu.insertItemBeforeItemWithIdentifier("WKMenuItemIdentifierOpenLinkInNewWindow",
+                                                title: UserText.openLinkInBurnerTab,
+                                                target: uiDelegate,
+                                                selector: #selector(LinkMenuItemSelectors.openLinkInBurnerTab(_:)))
+
         menu.insertItemBeforeItemWithIdentifier("WKMenuItemIdentifierOpenImageInNewWindow",
                                                 title: UserText.openImageInNewTab,
                                                 target: uiDelegate,

@@ -133,8 +133,8 @@ final class TabCollectionViewModel: NSObject {
         }
     }
 
-    func appendNewTab(with content: Tab.TabContent = .homepage) {
-        append(tab: Tab(content: content), selected: true)
+    func appendNewTab(with content: Tab.TabContent = .homepage, tabStorageType: Tab.TabStorageType = .default) {
+        append(tab: Tab(content: content, tabStorageType: tabStorageType), selected: true)
     }
 
     func append(tab: Tab, selected: Bool = true) {
@@ -295,7 +295,7 @@ final class TabCollectionViewModel: NSObject {
         }
 
         let tab = tabCollection.tabs[index]
-        let tabCopy = Tab(content: tab.content, sessionStateData: tab.sessionStateData)
+        let tabCopy = Tab(content: tab.content, tabStorageType: tab.tabStorageType, sessionStateData: tab.sessionStateData)
         let newIndex = index + 1
 
         tabCollection.insert(tab: tabCopy, at: newIndex)
@@ -352,6 +352,42 @@ final class TabCollectionViewModel: NSObject {
 
     private func updateCanInsertLastRemovedTab() {
         canInsertLastRemovedTab = tabCollection.lastRemovedTabCache != nil
+    }
+
+}
+
+// MARK: Burner Tabs suport
+extension TabCollectionViewModel {
+
+    static func makeWithDefaultTab(isBurner: Bool) -> TabCollectionViewModel {
+        let tab = Tab(content: .homepage, tabStorageType: isBurner ? .burner : .default)
+        return TabCollectionViewModel(tabCollection: TabCollection(tabs: [tab]))
+    }
+
+    func removeBurnerTabs() {
+        tabCollection.removeBurnerTabs()
+
+        if !tabCollection.tabs.indices.contains(selectionIndex ?? -1) {
+            selectionIndex = tabCollection.tabs.indices.last
+        }
+
+        delegate?.tabCollectionViewModelDidMultipleChanges(self)
+    }
+
+    func convertToStandardTab(at index: Int) {
+        guard index >= 0, index < tabCollection.tabs.count else {
+            os_log("TabCollectionViewModel: Index out of bounds", type: .error)
+            return
+        }
+
+        let tab = tabCollection.tabs[index]
+        let tabCopy = Tab(content: tab.content)
+        let newIndex = index + 1
+
+        tabCollection.insert(tab: tabCopy, at: newIndex)
+        select(at: newIndex)
+
+        delegate?.tabCollectionViewModelDidInsert(self, at: newIndex, selected: true)
     }
 
 }

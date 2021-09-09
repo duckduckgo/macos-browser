@@ -32,4 +32,9 @@ extension WKWebViewConfiguration {
         self.processPool.geolocationProvider = GeolocationProvider(processPool: self.processPool)
      }
 
+    func applyBurnerConfiguration() {
+        applyStandardConfiguration()
+        websiteDataStore = WKWebsiteDataStore.nonPersistent()
+     }
+
 }
