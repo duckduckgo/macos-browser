@@ -574,28 +574,25 @@ Gw
             <objects>
                 <viewController storyboardIdentifier="RequestFilePermissionViewController" id="iZm-08-VGi" customClass="RequestFilePermissionViewController" customModule="DuckDuckGo_Privacy_Browser" customModuleProvider="target" sceneMemberID="viewController">
                     <view key="view" id="U4L-TI-4Tf">
-                        <rect key="frame" x="0.0" y="0.0" width="522" height="96"/>
+                        <rect key="frame" x="0.0" y="0.0" width="522" height="58"/>
                         <autoresizingMask key="autoresizingMask"/>
                         <subviews>
                             <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="w0f-jN-bHR">
-                                <rect key="frame" x="18" y="60" width="486" height="16"/>
+                                <rect key="frame" x="18" y="42" width="486" height="16"/>
                                 <constraints>
                                     <constraint firstAttribute="width" relation="lessThanOrEqual" constant="500" id="Fo0-Qg-iSF"/>
                                 </constraints>
-                                <textFieldCell key="cell" alignment="center" title="Description Label" id="YAw-q2-92i">
+                                <textFieldCell key="cell" alignment="left" title="Description Label" id="YAw-q2-92i">
                                     <font key="font" metaFont="system"/>
                                     <color key="textColor" name="labelColor" catalog="System" colorSpace="catalog"/>
                                     <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
                                 </textFieldCell>
                             </textField>
                             <button verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="E8r-SL-GMt">
-                                <rect key="frame" x="172" y="13" width="179" height="32"/>
+                                <rect key="frame" x="13" y="-5" width="179" height="32"/>
                                 <buttonCell key="cell" type="push" title="Select Bookmarks File..." bezelStyle="rounded" alignment="center" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="Tu7-Uq-DiB">
                                     <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
                                     <font key="font" metaFont="system"/>
-                                    <string key="keyEquivalent" base64-UTF8="YES">
-DQ
-</string>
                                 </buttonCell>
                                 <connections>
                                     <action selector="presentBookmarksOpenPanel" target="iZm-08-VGi" id="HCG-T5-knH"/>
@@ -603,11 +600,11 @@ DQ
                             </button>
                         </subviews>
                         <constraints>
-                            <constraint firstItem="E8r-SL-GMt" firstAttribute="centerX" secondItem="U4L-TI-4Tf" secondAttribute="centerX" id="7Ga-fb-Sbc"/>
                             <constraint firstItem="E8r-SL-GMt" firstAttribute="top" secondItem="w0f-jN-bHR" secondAttribute="bottom" constant="20" id="Gyk-we-u4t"/>
-                            <constraint firstItem="w0f-jN-bHR" firstAttribute="top" secondItem="U4L-TI-4Tf" secondAttribute="top" constant="20" id="Hxb-IO-jqO"/>
-                            <constraint firstAttribute="bottom" secondItem="E8r-SL-GMt" secondAttribute="bottom" constant="20" id="K7L-5y-2IB"/>
+                            <constraint firstItem="w0f-jN-bHR" firstAttribute="top" secondItem="U4L-TI-4Tf" secondAttribute="top" id="Hxb-IO-jqO"/>
+                            <constraint firstAttribute="bottom" secondItem="E8r-SL-GMt" secondAttribute="bottom" constant="2" id="K7L-5y-2IB"/>
                             <constraint firstItem="w0f-jN-bHR" firstAttribute="leading" secondItem="U4L-TI-4Tf" secondAttribute="leading" constant="20" id="NkU-Yh-Z9W"/>
+                            <constraint firstItem="E8r-SL-GMt" firstAttribute="leading" secondItem="U4L-TI-4Tf" secondAttribute="leading" constant="20" id="Xew-xH-vLg"/>
                             <constraint firstAttribute="trailing" secondItem="w0f-jN-bHR" secondAttribute="trailing" constant="20" id="ckF-dP-pVK"/>
                         </constraints>
                     </view>
@@ -618,7 +615,7 @@ DQ
                 </viewController>
                 <customObject id="5C3-rs-E3p" userLabel="First Responder" customClass="NSResponder" sceneMemberID="firstResponder"/>
             </objects>
-            <point key="canvasLocation" x="75" y="1009.5"/>
+            <point key="canvasLocation" x="75" y="928"/>
         </scene>
     </scenes>
     <resources>
