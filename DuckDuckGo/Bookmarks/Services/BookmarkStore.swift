@@ -339,25 +339,25 @@ final class LocalBookmarkStore: BookmarkStore {
         var importCount = 0
 
         context.performAndWait {
-            let bookmarkCountBeforeImport = (try? context.count(for: Bookmark.bookmarksFetchRequest())) ?? 0
-
-            let importRootFolder = createFolder(titled: UserText.importedBookmarks(at: Date()), in: self.context)
-
-            let bookmarksBarFolder = createFolder(titled: UserText.bookmarkImportBookmarksBar, in: self.context)
-            bookmarksBarFolder.parentFolder = importRootFolder
-
-            if let bookmarksBar = bookmarks.topLevelFolders.bookmarkBar.children {
-                recursivelyCreateEntities(from: bookmarksBar, parent: bookmarksBarFolder, in: self.context)
-            }
-
-            let otherBookmarksFolder = createFolder(titled: UserText.bookmarkImportOtherBookmarks, in: self.context)
-            otherBookmarksFolder.parentFolder = importRootFolder
-
-            if let otherBookmarks = bookmarks.topLevelFolders.otherBookmarks.children {
-                recursivelyCreateEntities(from: otherBookmarks, parent: otherBookmarksFolder, in: self.context)
-            }
-
             do {
+                let bookmarkCountBeforeImport = try context.count(for: Bookmark.bookmarksFetchRequest())
+
+                let importRootFolder = createFolder(titled: UserText.importedBookmarks(at: Date()), in: self.context)
+
+                let bookmarksBarFolder = createFolder(titled: UserText.bookmarkImportBookmarksBar, in: self.context)
+                bookmarksBarFolder.parentFolder = importRootFolder
+
+                if let bookmarksBar = bookmarks.topLevelFolders.bookmarkBar.children {
+                    recursivelyCreateEntities(from: bookmarksBar, parent: bookmarksBarFolder, in: self.context)
+                }
+
+                let otherBookmarksFolder = createFolder(titled: UserText.bookmarkImportOtherBookmarks, in: self.context)
+                otherBookmarksFolder.parentFolder = importRootFolder
+
+                if let otherBookmarks = bookmarks.topLevelFolders.otherBookmarks.children {
+                    recursivelyCreateEntities(from: otherBookmarks, parent: otherBookmarksFolder, in: self.context)
+                }
+
                 try self.context.save()
                 let bookmarkCountAfterImport = try context.count(for: Bookmark.bookmarksFetchRequest())
 
