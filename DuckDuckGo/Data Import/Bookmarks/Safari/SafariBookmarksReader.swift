@@ -17,6 +17,7 @@
 //
 
 import Foundation
+import os.log
 
 final class SafariBookmarksReader {
 
@@ -115,6 +116,7 @@ final class SafariBookmarksReader {
                                                                    options: [],
                                                                    format: &propertyListFormat) as? [String: AnyObject] ?? [:]
         } catch {
+            os_log("Failed to read Safari Bookmarks Plist at path: %s", log: .dataImportExport, type: .error, safariBookmarksFileURL.absoluteString)
             return nil
         }
 

@@ -19,6 +19,7 @@
 import Foundation
 import CoreData
 import Cocoa
+import os.log
 
 enum BookmarkStoreFetchPredicateType {
     case bookmarks
@@ -341,14 +342,12 @@ final class LocalBookmarkStore: BookmarkStore {
         context.performAndWait {
             do {
                 let bookmarkCountBeforeImport = try context.count(for: Bookmark.bookmarksFetchRequest())
+                os_log("Bookmarks count before import: %d", log: .dataImportExport, bookmarkCountBeforeImport)
 
                 let importRootFolder = createFolder(titled: UserText.importedBookmarks(at: Date()), in: self.context)
 
-                let bookmarksBarFolder = createFolder(titled: UserText.bookmarkImportBookmarksBar, in: self.context)
-                bookmarksBarFolder.parentFolder = importRootFolder
-
                 if let bookmarksBar = bookmarks.topLevelFolders.bookmarkBar.children {
-                    recursivelyCreateEntities(from: bookmarksBar, parent: bookmarksBarFolder, in: self.context)
+                    recursivelyCreateEntities(from: bookmarksBar, parent: importRootFolder, in: self.context)
                 }
 
                 let otherBookmarksFolder = createFolder(titled: UserText.bookmarkImportOtherBookmarks, in: self.context)
@@ -360,6 +359,7 @@ final class LocalBookmarkStore: BookmarkStore {
 
                 try self.context.save()
                 let bookmarkCountAfterImport = try context.count(for: Bookmark.bookmarksFetchRequest())
+                os_log("Bookmarks count after import: %d", log: .dataImportExport, bookmarkCountAfterImport)
 
                 importCount = bookmarkCountAfterImport - bookmarkCountBeforeImport
             } catch {
@@ -367,6 +367,8 @@ final class LocalBookmarkStore: BookmarkStore {
                 if !AppDelegate.isRunningTests {
                     assertionFailure("LocalBookmarkStore: Saving of context failed")
                 }
+
+                os_log("Failed to import bookmarks, with error: %s", log: .dataImportExport, type: .error, error.localizedDescription)
             }
         }
 

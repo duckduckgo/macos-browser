@@ -36,6 +36,10 @@ extension OSLog {
         Logging.historyLoggingEnabled ? Logging.historyLog : .disabled
     }
 
+    static var dataImportExport: OSLog {
+        Logging.dataImportExportLoggingEnabled ? Logging.dataImportExportLog : .disabled
+    }
+
 }
 
 struct Logging {
@@ -51,5 +55,8 @@ struct Logging {
 
     fileprivate static let historyLoggingEnabled = false
     fileprivate static let historyLog: OSLog = OSLog(subsystem: Bundle.main.bundleIdentifier ?? "DuckDuckGo", category: "History")
+
+    fileprivate static let dataImportExportLoggingEnabled = true
+    fileprivate static let dataImportExportLog: OSLog = OSLog(subsystem: Bundle.main.bundleIdentifier ?? "DuckDuckGo", category: "Data Import/Export")
 
 }
