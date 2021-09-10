@@ -150,7 +150,7 @@ final class StateRestorationManagerTests: XCTestCase {
 
 @objc(SavedStateMock)
 private class SavedStateMock: NSObject {
-    private enum NSCodingKeys {
+    private enum NSSecureCodingKeys {
         static let key1 = "key1"
         static let key2 = "key2"
     }
@@ -163,12 +163,12 @@ private class SavedStateMock: NSObject {
     }
 
     func encode(with coder: NSCoder) {
-        val1.map(coder.encode(forKey: NSCodingKeys.key1))
-        val2.map(coder.encode(forKey: NSCodingKeys.key2))
+        val1.map(coder.encode(forKey: NSSecureCodingKeys.key1))
+        val2.map(coder.encode(forKey: NSSecureCodingKeys.key2))
     }
 
     func restoreState(from coder: NSCoder) throws {
-        val1 = coder.decodeIfPresent(at: NSCodingKeys.key1)
-        val2 = coder.decodeIfPresent(at: NSCodingKeys.key2)
+        val1 = coder.decodeIfPresent(at: NSSecureCodingKeys.key1)
+        val2 = coder.decodeIfPresent(at: NSSecureCodingKeys.key2)
     }
 }
