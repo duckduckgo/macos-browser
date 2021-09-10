@@ -33,6 +33,8 @@ final class SafariBookmarksReader {
         static let urlStringKey = "URLString"
         static let uriDictionaryKey = "URIDictionary"
         static let uriDictionaryTitleKey = "title"
+        static let readingListKey = "com.apple.ReadingList"
+
         static let typeKey = "WebBookmarkType"
         static let listType = "WebBookmarkTypeList"
         static let leafType = "WebBookmarkTypeLeaf"
@@ -60,7 +62,7 @@ final class SafariBookmarksReader {
             ((entry[Constants.typeKey] as? String) == Constants.listType) &&
             (entry[Constants.bookmarkChildrenKey]) != nil {
 
-            guard let title = entry[Constants.titleKey] as? String else { continue }
+            guard let title = entry[Constants.titleKey] as? String, title != Constants.readingListKey else { continue }
 
             if title == Constants.bookmarksBar {
                 bookmarksBar = bookmarkOrFolder(from: entry)
