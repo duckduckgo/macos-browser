@@ -20,7 +20,7 @@ import Foundation
 import XCTest
 @testable import DuckDuckGo_Privacy_Browser
 
-final class StringExtensionsTests: XCTestCase {
+final class StringExtensionTests: XCTestCase {
 
     // MARK: - General
 
