@@ -567,6 +567,7 @@ extension BrowserTabViewController: WKUIDelegate {
         // Returned web view must be created with the specified configuration.
 
         let tab = Tab(content: .none,
+                      tabStorageType: tabViewModel?.tab.tabStorageType == .burner ? .burner : .default,
                       webViewConfiguration: configuration,
                       parentTab: tabViewModel?.tab,
                       canBeClosedWithBack: true)
