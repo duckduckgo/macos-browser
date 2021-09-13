@@ -75,39 +75,11 @@ final class PasswordManagementViewController: NSViewController {
         refetchWithText(isDirty ? "" : domain ?? "", clearWhenNoMatches: true)
     }
 
-    @IBAction func onNewClicked(_ sender: Any?) {
+    @IBAction func onNewClicked(_ sender: NSButton) {
+        let menu = createNewSecureVaultItemMenu()
+        let location = NSPoint(x: sender.frame.origin.x, y: sender.frame.origin.y - (sender.frame.height / 2))
 
-        guard let window = view.window else { return }
-
-        func createNew() {
-            listModel?.clearSelection()
-            itemModel?.createNew()
-        }
-
-        if isDirty {
-            let alert = NSAlert.passwordManagerSaveChangesToLogin()
-            alert.beginSheetModal(for: window) { response in
-
-                switch response {
-                case .alertFirstButtonReturn: // Save
-                    self.itemModel?.save()
-                    createNew()
-
-                case .alertSecondButtonReturn: // Discard
-                    self.itemModel?.cancel()
-                    createNew()
-
-                case .alertThirdButtonReturn: // Cancel
-                    break // just do nothing
-
-                default:
-                    fatalError("Unknown response \(response)")
-                }
-
-            }
-        } else {
-            createNew()
-        }
+        menu.popUp(positioning: nil, at: location, in: sender.superview)
     }
 
     private func subscribeToEditingState() {
@@ -268,6 +240,17 @@ final class PasswordManagementViewController: NSViewController {
         listContainer.addSubview(view)
     }
 
+    private func createNewSecureVaultItemMenu() -> NSMenu {
+        let menu = NSMenu()
+
+        menu.items = [
+            NSMenuItem(title: "Login", action: #selector(createNewLogin), keyEquivalent: ""),
+            NSMenuItem(title: "Note", action: #selector(createNewLogin), keyEquivalent: "")
+        ]
+
+        return menu
+    }
+
     private func updateFilter() {
         let text = searchField.stringValue.trimmingWhitespaces()
         listModel?.filter = text
@@ -279,6 +262,41 @@ final class PasswordManagementViewController: NSViewController {
             DispatchQueue.main.async {
                 completion(accounts)
             }
+        }
+    }
+
+    @objc
+    private func createNewLogin() {
+        guard let window = view.window else { return }
+
+        func createNew() {
+            listModel?.clearSelection()
+            itemModel?.createNew()
+        }
+
+        if isDirty {
+            let alert = NSAlert.passwordManagerSaveChangesToLogin()
+            alert.beginSheetModal(for: window) { response in
+
+                switch response {
+                case .alertFirstButtonReturn: // Save
+                    self.itemModel?.save()
+                    createNew()
+
+                case .alertSecondButtonReturn: // Discard
+                    self.itemModel?.cancel()
+                    createNew()
+
+                case .alertThirdButtonReturn: // Cancel
+                    break // just do nothing
+
+                default:
+                    fatalError("Unknown response \(response)")
+                }
+
+            }
+        } else {
+            createNew()
         }
     }
     
