@@ -19,12 +19,60 @@
 import Combine
 import BrowserServicesKit
 
+enum PasswordManagementItem {
+    case account(SecureVaultModels.WebsiteAccount)
+
+    var websiteAccount: SecureVaultModels.WebsiteAccount {
+        switch self {
+        case .account(let account):
+            return account
+        }
+    }
+
+    var id: Int64? {
+        switch self {
+        case .account(let account):
+            return account.id
+        }
+    }
+
+    var title: String? {
+        switch self {
+        case .account(let account):
+            return account.title
+        }
+    }
+
+    func item(matches filter: String) -> Bool {
+        switch self {
+        case .account(let account):
+            return account.domain.lowercased().contains(filter) ||
+                account.username.lowercased().contains(filter) ||
+                account.title?.lowercased().contains(filter) ?? false
+        }
+    }
+
+    var displayTitle: String {
+        switch self {
+        case .account(let account):
+            return ((account.title ?? "").isEmpty == true ? account.domain.dropWWW() : account.title) ?? ""
+        }
+    }
+
+    var displaySubtitle: String {
+        switch self {
+        case .account(let account):
+            return account.username
+        }
+    }
+}
+
 //// Using generic "item list" term as eventually this will be more than just accounts.
 ///
 /// Could maybe even abstract a bunch of this code to be more generic re-usable styled list for use elsewhere.
 final class PasswordManagementItemListModel: ObservableObject {
 
-    var accounts = [SecureVaultModels.WebsiteAccount]() {
+    var accounts = [PasswordManagementItem]() {
         didSet {
             refresh()
         }
@@ -36,16 +84,16 @@ final class PasswordManagementItemListModel: ObservableObject {
         }
     }
 
-    @Published private(set) var displayedAccounts = [SecureVaultModels.WebsiteAccount]()
-    @Published private(set) var selected: SecureVaultModels.WebsiteAccount?
+    @Published private(set) var displayedAccounts = [PasswordManagementItem]()
+    @Published private(set) var selected: PasswordManagementItem?
 
-    private var onItemSelected: (_ old: SecureVaultModels.WebsiteAccount?, _ new: SecureVaultModels.WebsiteAccount) -> Void
+    private var onItemSelected: (_ old: PasswordManagementItem?, _ new: PasswordManagementItem) -> Void
 
-    init(onItemSelected: @escaping (_ old: SecureVaultModels.WebsiteAccount?, _ new: SecureVaultModels.WebsiteAccount) -> Void) {
+    init(onItemSelected: @escaping (_ old: PasswordManagementItem?, _ new: PasswordManagementItem) -> Void) {
         self.onItemSelected = onItemSelected
     }
 
-    func selectAccount(_ account: SecureVaultModels.WebsiteAccount) {
+    func selectAccount(_ account: PasswordManagementItem) {
         let previous = selected
         selected = account
         onItemSelected(previous, account)
@@ -55,8 +103,9 @@ final class PasswordManagementItemListModel: ObservableObject {
         selected = displayedAccounts.first(where: { $0.id == id })
     }
 
-    func updateAccount(_ account: SecureVaultModels.WebsiteAccount) {
+    func updateAccount(_ account: PasswordManagementItem) {
         var accounts = displayedAccounts
+
         if let index = accounts.firstIndex(where: { $0.id == account.id }) {
             accounts[index] = account
             displayedAccounts = accounts
@@ -65,14 +114,12 @@ final class PasswordManagementItemListModel: ObservableObject {
 
     func refresh() {
         let filter = self.filter.lowercased()
+
         if filter.isEmpty {
             displayedAccounts = accounts
         } else {
             let filter = filter.lowercased()
-            displayedAccounts = accounts.filter { $0.domain.lowercased().contains(filter) ||
-                $0.username.lowercased().contains(filter) ||
-                $0.title?.lowercased().contains(filter) ?? false
-            }
+            displayedAccounts = accounts.filter { $0.item(matches: filter) }
         }
     }
 

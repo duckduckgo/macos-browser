@@ -45,7 +45,7 @@ struct PasswordManagementItemListView: View {
 
 private struct ItemView: View {
 
-    let account: SecureVaultModels.WebsiteAccount
+    let account: PasswordManagementItem
     let selected: Bool
     let action: () -> Void
 
@@ -53,19 +53,18 @@ private struct ItemView: View {
 
         let textColor = selected ? Color(NSColor.selectedControlTextColor) : Color(NSColor.controlTextColor)
         let font = Font.custom("SFProText-Regular", size: 13)
-        let displayName = ((account.title ?? "").isEmpty == true ? account.domain.dropWWW() : account.title) ?? ""
 
         Button(action: action, label: {
             HStack(spacing: 0) {
 
-                FaviconView(domain: account.domain)
+                FaviconView(domain: account.websiteAccount.domain)
                     .padding(.leading, 6)
 
                 VStack(alignment: .leading, spacing: 4) {
-                    Text(displayName)
+                    Text(account.displayTitle)
                         .foregroundColor(textColor)
                         .font(font)
-                    Text(account.username)
+                    Text(account.displaySubtitle)
                         .foregroundColor(textColor.opacity(0.6))
                         .font(font)
                 }

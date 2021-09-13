@@ -90,7 +90,7 @@ final class PasswordManagementViewController: NSViewController {
 
     private func refetchWithText(_ text: String, clearWhenNoMatches: Bool = false, completion: (() -> Void)? = nil) {
         fetchAccounts { [weak self] accounts in
-            self?.listModel?.accounts = accounts
+            self?.listModel?.accounts = accounts.map { PasswordManagementItem.account($0) }
             self?.searchField.stringValue = text
             self?.updateFilter()
 
@@ -118,10 +118,10 @@ final class PasswordManagementViewController: NSViewController {
 
     private func syncModelsOnCredentials(_ credentials: SecureVaultModels.WebsiteCredentials, select: Bool = false) {
         self.itemModel?.credentials = credentials
-        self.listModel?.updateAccount(credentials.account)
+        self.listModel?.updateAccount(PasswordManagementItem.account(credentials.account))
 
         if select {
-            self.listModel?.selectAccount(credentials.account)
+            self.listModel?.selectAccount(PasswordManagementItem.account(credentials.account))
         }
     }
 
