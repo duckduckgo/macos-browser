@@ -1,5 +1,5 @@
 //
-//  OptionsButtonMenu.swift
+//  MoreOptionsMenu.swift
 //
 //  Copyright © 2020 DuckDuckGo. All rights reserved.
 //
@@ -25,10 +25,11 @@ protocol OptionsButtonMenuDelegate: AnyObject {
 
     func optionsButtonMenuRequestedBookmarkPopover(_ menu: NSMenu)
     func optionsButtonMenuRequestedLoginsPopover(_ menu: NSMenu)
+    func optionsButtonMenuRequestedDownloadsPopover(_ menu: NSMenu)
 
 }
 
-final class OptionsButtonMenu: NSMenu {
+final class MoreOptionsMenu: NSMenu {
 
     weak var actionDelegate: OptionsButtonMenuDelegate?
 
@@ -50,12 +51,13 @@ final class OptionsButtonMenu: NSMenu {
         case bookmarks
         case logins
         case preferences
+        case downloads
     }
 
     fileprivate(set) var result: Result?
 
     required init(coder: NSCoder) {
-        fatalError("OptionsButtonMenu: Bad initializer")
+        fatalError("MoreOptionsMenu: Bad initializer")
     }
 
     init(tabCollectionViewModel: TabCollectionViewModel, emailManager: EmailManager = EmailManager()) {
@@ -135,6 +137,11 @@ final class OptionsButtonMenu: NSMenu {
         bookmarksMenuItem.image = NSImage(named: "Bookmarks")
         addItem(bookmarksMenuItem)
 
+        let downloadsMenuItem = NSMenuItem(title: UserText.downloads, action: #selector(openDownloads), keyEquivalent: "j")
+        downloadsMenuItem.target = self
+        downloadsMenuItem.image = NSImage(named: "Downloads")
+        addItem(downloadsMenuItem)
+
         let passwordManagementMenuItem = NSMenuItem(title: UserText.passwordManagement, action: #selector(openLogins), keyEquivalent: "")
         passwordManagementMenuItem.target = self
         passwordManagementMenuItem.image = NSImage(named: "PasswordManagement")
@@ -173,6 +180,10 @@ final class OptionsButtonMenu: NSMenu {
         actionDelegate?.optionsButtonMenuRequestedBookmarkPopover(self)
     }
 
+    @objc func openDownloads(_ sender: NSMenuItem) {
+        actionDelegate?.optionsButtonMenuRequestedDownloadsPopover(self)
+    }
+
     @objc func openLogins(_ sender: NSMenuItem) {
         actionDelegate?.optionsButtonMenuRequestedLoginsPopover(self)
     }
@@ -200,6 +211,8 @@ final class OptionsButtonMenu: NSMenu {
             self.result = .fireproof
         case #selector(openBookmarks(_:)):
             self.result = .bookmarks
+        case #selector(openDownloads(_:)):
+            self.result = .downloads
         case #selector(openPreferences(_:)):
             self.result = .preferences
         case #selector(openLogins(_:)):
@@ -272,20 +285,20 @@ final class EmailOptionsButtonSubMenu: NSMenu {
         }
         let tab = Tab(content: .url(url))
         tabCollectionViewModel.append(tab: tab)
-        (supermenu as? OptionsButtonMenu)?.result = .emailProtectionCreateAddress
+        (supermenu as? MoreOptionsMenu)?.result = .emailProtectionCreateAddress
     }
     
     @objc func turnOffEmailAction(_ sender: NSMenuItem) {
         emailManager.signOut()
 
-        (supermenu as? OptionsButtonMenu)?.result = .emailProtectionOff
+        (supermenu as? MoreOptionsMenu)?.result = .emailProtectionOff
     }
     
     @objc func turnOnEmailAction(_ sender: NSMenuItem) {
         let tab = Tab(content: .url(EmailUrls().emailLandingPage))
         tabCollectionViewModel.append(tab: tab)
 
-        (supermenu as? OptionsButtonMenu)?.result = .emailProtection
+        (supermenu as? MoreOptionsMenu)?.result = .emailProtection
     }
 
     @objc func emailDidSignInNotification(_ notification: Notification) {

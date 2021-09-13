@@ -25,19 +25,41 @@ final class DownloadsCellView: NSTableCellView {
         case urlNotSet
         case fileRemoved
         case downloadFailed(FileDownloadError)
+
+        var isCancelled: Bool {
+            guard case .downloadFailed(let error) = self, error.isCancelled else { return false }
+            return true
+        }
+
     }
 
     @IBOutlet var titleLabel: NSTextField!
     @IBOutlet var detailLabel: NSTextField!
     @IBOutlet var progressView: CircularProgressView!
-    @IBOutlet var cancelButton: NSButton!
-    @IBOutlet var revealButton: NSButton!
-    @IBOutlet var restartButton: NSButton!
+    @IBOutlet var cancelButton: MouseOverButton!
+    @IBOutlet var revealButton: MouseOverButton!
+    @IBOutlet var restartButton: MouseOverButton!
 
+    static let highlightedReloadImage = NSImage(named: "RestartDownloadHighlighted")!
+    static let normalReloadImage = NSImage(named: "RestartDownload")!
+
+    private var buttonOverCancellables = Set<AnyCancellable>()
     private var cancellables = Set<AnyCancellable>()
     private var progressCancellable: AnyCancellable?
 
     private static let byteFormatter = ByteCountFormatter()
+
+    override func awakeFromNib() {
+        cancelButton.$isMouseOver.sink { [weak self] isMouseOver in
+            self?.onButtonMouseOverChange?(isMouseOver)
+        }.store(in: &buttonOverCancellables)
+        revealButton.$isMouseOver.sink { [weak self] isMouseOver in
+            self?.onButtonMouseOverChange?(isMouseOver)
+        }.store(in: &buttonOverCancellables)
+        restartButton.$isMouseOver.sink { [weak self] isMouseOver in
+            self?.onButtonMouseOverChange?(isMouseOver)
+        }.store(in: &buttonOverCancellables)
+    }
 
     override var objectValue: Any? {
         didSet {
@@ -57,11 +79,11 @@ final class DownloadsCellView: NSTableCellView {
         }
             .assign(to: \.image, on: imageView!)
             .store(in: &cancellables)
-        viewModel.$filename.assign(to: \.stringValue, on: titleLabel!)
+        viewModel.$filename.combineLatest(viewModel.$state)
+            .sink { [weak self] filename, state in
+                self?.updateFilename(filename, state: state)
+            }
             .store(in: &cancellables)
-        viewModel.$state.sink { [weak self] state in
-            self?.updateState(state)
-        }.store(in: &cancellables)
 
         viewModel.$state.map {
             $0.progress?.publisher(for: \.fractionCompleted).map { .some($0) }.eraseToAnyPublisher() ?? Just(.none).eraseToAnyPublisher()
@@ -71,34 +93,58 @@ final class DownloadsCellView: NSTableCellView {
             .store(in: &cancellables)
     }
 
-    private func updateState(_ state: DownloadViewModel.State) {
+    private static let fileRemovedTitleAttributes: [NSAttributedString.Key: Any] = [.strikethroughStyle: 1,
+                                                                                    .foregroundColor: NSColor.disabledControlTextColor]
+
+    private func updateFilename(_ filename: String, state: DownloadViewModel.State) {
+        var attributes: [NSAttributedString.Key: Any]?
+
         switch state {
         case .downloading(let progress):
             subscribe(to: progress)
 
-        case .complete(let url):
-            updateCompletedFile(at: url)
+        case .complete(.some(let url)):
+            guard let fileSize = try? url.resourceValues(forKeys: [.fileSizeKey]).fileSize else {
+                updateDownloadFailed(with: .fileRemoved)
+                attributes = Self.fileRemovedTitleAttributes
+                break
+            }
+
+            updateCompletedFile(fileSize: fileSize)
+
+        case .complete(.none):
+            updateDownloadFailed(with: .urlNotSet)
 
         case .failed(let error):
             updateDownloadFailed(with: .downloadFailed(error))
         }
+
+        self.titleLabel.attributedStringValue = NSAttributedString(string: filename, attributes: attributes)
     }
 
+    private var onButtonMouseOverChange: ((Bool) -> Void)?
+
     private func updateDetails(with progress: Progress) {
-        var details = progress.localizedAdditionalDescription ?? ""
-        if details.isEmpty {
-            if progress.fractionCompleted == 0 {
-                details = UserText.downloadStarting
-            } else if progress.fractionCompleted == 1.0 {
-                details = UserText.downloadFinishing
-            } else {
-                assertionFailure("Unexpected empty description")
-                details = "Downloading…"
+        var details: String
+        if cancelButton.isMouseOver {
+            details = UserText.cancelDownloadToolTip
+        } else {
+            details = progress.localizedAdditionalDescription ?? ""
+            if details.isEmpty {
+                if progress.fractionCompleted == 0 {
+                    details = UserText.downloadStarting
+                } else if progress.fractionCompleted == 1.0 {
+                    details = UserText.downloadFinishing
+                } else {
+                    assertionFailure("Unexpected empty description")
+                    details = "Downloading…"
+                }
             }
+
+            self.detailLabel.toolTip = progress.localizedDescription
         }
 
         self.detailLabel.stringValue = details
-        self.detailLabel.toolTip = progress.localizedDescription
     }
 
     private func subscribe(to progress: Progress) {
@@ -109,39 +155,67 @@ final class DownloadsCellView: NSTableCellView {
                 self?.updateDetails(with: progress)
         }
 
-        updateDetails(with: progress)
         self.cancelButton.isHidden = false
         self.restartButton.isHidden = true
         self.revealButton.isHidden = true
+
+        self.imageView?.alphaValue = 1.0
+
+        onButtonMouseOverChange = { [weak self] _ in
+            self?.updateDetails(with: progress)
+        }
+        onButtonMouseOverChange!(cancelButton.isMouseOver)
     }
 
-    private func updateCompletedFile(at url: URL?) {
-        guard let fileSize = try? url?.resourceValues(forKeys: [.fileSizeKey]).fileSize else {
-            updateDownloadFailed(with: url == nil ? .urlNotSet : .fileRemoved)
-            return
-        }
-
+    private func updateCompletedFile(fileSize: Int) {
         progressCancellable = nil
         self.progressView.isHidden = true
-
-        self.detailLabel.stringValue = Self.byteFormatter.string(fromByteCount: Int64(fileSize))
-        self.detailLabel.toolTip = nil
 
         self.cancelButton.isHidden = true
         self.restartButton.isHidden = true
         self.revealButton.isHidden = false
+
+        self.imageView?.alphaValue = 1.0
+
+        onButtonMouseOverChange = { [weak self] isMouseOver in
+            if isMouseOver {
+                self?.detailLabel.stringValue = UserText.revealToolTip
+            } else {
+                self?.detailLabel.stringValue = Self.byteFormatter.string(fromByteCount: Int64(fileSize))
+            }
+            self?.detailLabel.toolTip = nil
+        }
+        onButtonMouseOverChange!(revealButton.isMouseOver)
     }
 
     private func updateDownloadFailed(with error: DownloadError) {
         progressCancellable = nil
         self.progressView.isHidden = true
 
-        self.detailLabel.stringValue = error.shortDescription
-        self.detailLabel.toolTip = error.localizedDescription
-
         self.cancelButton.isHidden = true
         self.restartButton.isHidden = false
         self.revealButton.isHidden = true
+
+        if case .fileRemoved = error {
+            self.imageView?.alphaValue = 0.3
+        } else {
+            self.imageView?.alphaValue = 1.0
+        }
+
+        onButtonMouseOverChange = { [weak self] isMouseOver in
+            if isMouseOver {
+                if case .fileRemoved = error {
+                    self?.detailLabel.stringValue = UserText.redownloadToolTip
+                } else {
+                    self?.detailLabel.stringValue = UserText.restartDownloadToolTip
+                }
+                self?.detailLabel.toolTip = nil
+            } else {
+                self?.detailLabel.stringValue = error.shortDescription
+                self?.detailLabel.toolTip = error.localizedDescription
+            }
+        }
+        onButtonMouseOverChange!(restartButton.isMouseOver)
     }
 
     private func unsubscribe() {

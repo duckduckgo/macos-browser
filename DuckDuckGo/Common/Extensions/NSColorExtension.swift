@@ -70,6 +70,10 @@ extension NSColor {
         NSColor(named: "TabMouseOverColor")!
     }
 
+    static var buttonMouseOverColor: NSColor {
+        NSColor(named: "ButtonMouseOverColor")!
+    }
+
     static var progressBarGradientDarkColor: NSColor {
         .controlAccentColor
     }

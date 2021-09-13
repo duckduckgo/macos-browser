@@ -32,6 +32,7 @@ final class DownloadsViewController: NSViewController {
 
     @IBOutlet var contextMenu: NSMenu!
     @IBOutlet var tableView: NSTableView!
+    @IBOutlet var tableViewHeightConstraint: NSLayoutConstraint?
 
     var viewModel = DownloadListViewModel()
     var downloadsCancellable: AnyCancellable?
@@ -55,8 +56,10 @@ final class DownloadsViewController: NSViewController {
                 }
                 self.tableView.reloadData(forRowIndexes: IndexSet(integer: value.new.count), columnIndexes: IndexSet(integer: 0))
                 self.tableView.endUpdates()
+                self.updateHeight()
         }
         tableView.reloadData()
+        updateHeight()
     }
 
     override func viewWillDisappear() {
@@ -69,7 +72,7 @@ final class DownloadsViewController: NSViewController {
         case let button as NSButton:
             let converted = tableView.convert(button.bounds.origin, from: button)
             row = tableView.row(at: converted)
-        case is NSMenuItem, is NSMenu:
+        case is NSMenuItem, is NSMenu, is NSTableView:
             row = tableView.clickedRow
         default:
             assertionFailure("Unexpected sender")
@@ -77,6 +80,13 @@ final class DownloadsViewController: NSViewController {
         }
         guard viewModel.items.indices.contains(row) else { return nil }
         return row
+    }
+
+    static private let maxNumberOfRows: CGFloat = 7.3
+    private func updateHeight() {
+        tableViewHeightConstraint?.constant = min(Self.maxNumberOfRows, CGFloat(tableView.numberOfRows)) * tableView.rowHeight
+            + (tableView.enclosingScrollView?.contentInsets.top ?? 0)
+            + (tableView.enclosingScrollView?.contentInsets.bottom ?? 0)
     }
 
     // MARK: User Actions
@@ -87,11 +97,13 @@ final class DownloadsViewController: NSViewController {
         else {
             return
         }
+        self.dismiss()
         NSWorkspace.shared.selectFile(nil, inFileViewerRootedAtPath: url.path)
     }
 
     @IBAction func clearDownloadsAction(_ sender: Any) {
         viewModel.cleanupInactiveDownloads()
+        self.dismiss()
     }
 
     @IBAction func openDownloadedFileAction(_ sender: Any) {
@@ -115,6 +127,7 @@ final class DownloadsViewController: NSViewController {
         guard let index = index(for: sender),
               let url = viewModel.items[safe: index]?.localURL
         else { return }
+        self.dismiss()
         NSWorkspace.shared.activateFileViewerSelecting([url])
     }
 
@@ -139,13 +152,23 @@ final class DownloadsViewController: NSViewController {
               let url = viewModel.items[safe: index]?.websiteURL
         else { return }
 
+        self.dismiss()
         WindowControllersManager.shared.show(url: url, newTab: true)
+    }
+
+    @IBAction func doubleClickAction(_ sender: Any) {
+        if index(for: sender) != nil {
+            revealDownloadAction(sender)
+        } else {
+            openDownloadsFolderAction(sender)
+        }
     }
 
 }
 
 extension DownloadsViewController: NSMenuDelegate {
 
+    // swiftlint:disable cyclomatic_complexity
     func menuNeedsUpdate(_ menu: NSMenu) {
         guard let index = index(for: menu),
               let item = viewModel.items[safe: index]
@@ -153,7 +176,7 @@ extension DownloadsViewController: NSMenuDelegate {
             menu.cancelTracking()
             return
         }
-// TODO: Add Restart Menu item
+
         for menuItem in menu.items {
             switch menuItem.action {
             case #selector(openDownloadedFileAction(_:)),
@@ -169,11 +192,13 @@ extension DownloadsViewController: NSMenuDelegate {
                 menuItem.isHidden = false
             case #selector(openOriginatingWebsiteAction(_:)):
                 menuItem.isHidden = !(item.websiteURL != nil)
+
             case #selector(cancelDownloadAction(_:)):
                 menuItem.isHidden = !(item.state.progress != nil)
-
             case #selector(removeDownloadAction(_:)):
                 menuItem.isHidden = !(item.state.progress == nil)
+            case #selector(restartDownloadAction(_:)):
+                menuItem.isHidden = !(item.state.error != nil)
 
             case #selector(clearDownloadsAction(_:)):
                 continue
@@ -182,6 +207,7 @@ extension DownloadsViewController: NSMenuDelegate {
             }
         }
     }
+    // swiftlint:enable cyclomatic_complexity
 
 }
 

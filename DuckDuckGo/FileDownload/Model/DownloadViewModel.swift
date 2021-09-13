@@ -43,6 +43,11 @@ final class DownloadViewModel {
             return progress
         }
 
+        var error: FileDownloadError? {
+            guard case .failed(let error) = self else { return nil }
+            return error
+        }
+
         init(item: DownloadListItem) {
             if let progress = item.progress {
                 self = .downloading(progress)

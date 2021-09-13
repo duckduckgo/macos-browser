@@ -30,6 +30,7 @@ final class DownloadListCoordinator {
 
     private var downloadsCancellable: AnyCancellable?
     private var downloadTaskCancellables = [WebKitDownloadTask: Set<AnyCancellable>]()
+    private var taskProgressCancellables = [WebKitDownloadTask: Set<AnyCancellable>]()
 
     enum UpdateKind {
         case added
@@ -38,6 +39,8 @@ final class DownloadListCoordinator {
     }
     typealias Update = (kind: UpdateKind, item: DownloadListItem)
     private let updatesSubject = PassthroughSubject<Update, Never>()
+
+    let progress = Progress()
 
     init(store: DownloadListStoring = DownloadListStore(), downloadManager: FileDownloadManager = .shared) {
         self.store = store
@@ -72,7 +75,7 @@ final class DownloadListCoordinator {
             .receive(on: DispatchQueue.main)
             .sink { [weak self] task in
                 self?.subscribeToDownloadTask(task)
-        }
+            }
     }
 
     private func subscribeToDownloadTask(_ task: WebKitDownloadTask, updating item: DownloadListItem? = nil) {
@@ -105,6 +108,8 @@ final class DownloadListCoordinator {
                 self?.downloadTask(task, withId: item.identifier, completedWith: completion)
             } receiveValue: { _ in }
             .store(in: &self.downloadTaskCancellables[task, default: []])
+
+        self.subscribeToProgress(of: task)
     }
 
     private func addItemOrUpdateLocation(for initialItem: DownloadListItem, destinationURL: URL?, tempURL: URL?) {
@@ -115,6 +120,31 @@ final class DownloadListCoordinator {
             item!.destinationURL = destinationURL
             item!.tempURL = tempURL
         }
+    }
+
+    private func subscribeToProgress(of task: WebKitDownloadTask) {
+        var lastKnownProgress = (total: Int64(0), completed: Int64(0))
+
+        task.progress.publisher(for: \.totalUnitCount)
+            .combineLatest(task.progress.publisher(for: \.completedUnitCount))
+            .throttle(for: 0.2, scheduler: DispatchQueue.main, latest: true)
+            .sink { [weak self] (total, completed) in
+                guard let self = self else { return }
+                self.progress.totalUnitCount += (total - lastKnownProgress.total)
+                self.progress.completedUnitCount += (completed - lastKnownProgress.completed)
+                lastKnownProgress = (total, completed)
+            }
+            .store(in: &self.taskProgressCancellables[task, default: []])
+
+        task.output.receive(on: DispatchQueue.main)
+            .sink { [weak self] _ in
+                guard let self = self else { return }
+                self.progress.completedUnitCount -= lastKnownProgress.completed
+                self.progress.totalUnitCount -= lastKnownProgress.total
+                self.taskProgressCancellables[task] = nil
+
+            } receiveValue: { _ in }
+            .store(in: &self.taskProgressCancellables[task, default: []])
     }
 
     private func downloadTask(_ task: WebKitDownloadTask, withId identifier: UUID, completedWith result: Subscribers.Completion<FileDownloadError>) {
@@ -173,6 +203,10 @@ final class DownloadListCoordinator {
     }
 
     // MARK: interface
+
+    var hasActiveDownloads: Bool {
+        !downloadTaskCancellables.isEmpty
+    }
 
     func downloads<T: Comparable>(sortedBy keyPath: KeyPath<DownloadListItem, T>, ascending: Bool) -> [DownloadListItem] {
         dispatchPrecondition(condition: .onQueue(.main))

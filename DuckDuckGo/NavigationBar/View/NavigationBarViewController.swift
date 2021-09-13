@@ -34,6 +34,17 @@ final class NavigationBarViewController: NSViewController {
     @IBOutlet weak var passwordManagementButton: NSButton!
     @IBOutlet weak var downloadsButton: NSButton!
 
+    lazy var downloadsProgressView: CircularProgressView = {
+        let bounds = downloadsButton.bounds
+        let width: CGFloat = 27.0
+        let frame = NSRect(x: (bounds.width - width) * 0.5 + 1, y: (bounds.height - width) * 0.5 - 1, width: width, height: width)
+        let progressView = CircularProgressView(frame: frame)
+        downloadsButton.addSubview(progressView)
+        return progressView
+    }()
+    private static let activeDownloadsImage = NSImage(named: "DownloadsActive")
+    private static let inactiveDownloadsImage = NSImage(named: "Downloads")
+
     var addressBarViewController: AddressBarViewController?
 
     private var tabCollectionViewModel: TabCollectionViewModel
@@ -46,13 +57,21 @@ final class NavigationBarViewController: NSViewController {
     private lazy var bookmarkListPopover = BookmarkListPopover()
     private lazy var saveCredentialsPopover: SaveCredentialsPopover = SaveCredentialsPopover()
     private lazy var passwordManagementPopover: PasswordManagementPopover = PasswordManagementPopover()
-    private lazy var downloadsPopover: DownloadsPopover = DownloadsPopover()
+    private lazy var downloadsPopover: DownloadsPopover = {
+        let downloadsPopover = DownloadsPopover()
+        downloadsPopover.delegate = self
+        return downloadsPopover
+    }()
+    var isDownloadsPopoverShown: Bool {
+        downloadsPopover.isShown
+    }
 
     private var urlCancellable: AnyCancellable?
     private var selectedTabViewModelCancellable: AnyCancellable?
     private var credentialsToSaveCancellable: AnyCancellable?
     private var passwordManagerNotificationCancellable: AnyCancellable?
     private var navigationButtonsCancellables = Set<AnyCancellable>()
+    private var downloadsCancellables = Set<AnyCancellable>()
 
     required init?(coder: NSCoder) {
         fatalError("NavigationBarViewController: Bad initializer")
@@ -71,6 +90,7 @@ final class NavigationBarViewController: NSViewController {
         setupNavigationButtonMenus()
         subscribeToSelectedTabViewModel()
         listenToPasswordManagerNotifications()
+        subscribeToDownloads()
 
         optionsButton.sendAction(on: .leftMouseDown)
         bookmarkListButton.sendAction(on: .leftMouseDown)
@@ -82,7 +102,11 @@ final class NavigationBarViewController: NSViewController {
         removeFeedback()
 
 #endif
+    }
 
+    override func viewWillAppear() {
+        downloadsButton.isHidden = true
+        updateDownloadsButton()
     }
 
     @IBSegueAction func createAddressBarViewController(_ coder: NSCoder) -> AddressBarViewController? {
@@ -124,7 +148,7 @@ final class NavigationBarViewController: NSViewController {
     }
 
     @IBAction func optionsButtonAction(_ sender: NSButton) {
-        let menu = OptionsButtonMenu(tabCollectionViewModel: tabCollectionViewModel)
+        let menu = MoreOptionsMenu(tabCollectionViewModel: tabCollectionViewModel)
         menu.actionDelegate = self
         menu.popUp(positioning: nil, at: NSPoint(x: 0, y: sender.bounds.height + 4), in: sender)
 
@@ -143,6 +167,8 @@ final class NavigationBarViewController: NSViewController {
             Pixel.fire(.moreMenu(result: .moveTabToNewWindow))
         case .preferences:
             Pixel.fire(.moreMenu(result: .preferences))
+        case .downloads:
+            Pixel.fire(.moreMenu(result: .downloads))
         case .none:
             Pixel.fire(.moreMenu(result: .cancelled))
 
@@ -163,7 +189,8 @@ final class NavigationBarViewController: NSViewController {
     }
 
     @IBAction func downloadsButtonAction(_ sender: NSButton) {
-        showDownloadsPopover()
+        toggleDownloadsPopover()
+        updateDownloadsButton()
     }
 
     @IBAction func shareButtonAction(_ sender: NSButton) {
@@ -205,13 +232,14 @@ final class NavigationBarViewController: NSViewController {
         Pixel.fire(.manageLogins(source: .button))
     }
 
-    func showDownloadsPopover() {
+    func toggleDownloadsPopover() {
         if downloadsPopover.isShown {
             downloadsPopover.close()
             return
         }
 
-        downloadsPopover.show(relativeTo: downloadsButton.bounds.insetFromLineOfDeath(), of: downloadsButton, preferredEdge: .minY)
+        downloadsButton.isHidden = false
+        downloadsPopover.show(relativeTo: downloadsButton.bounds.insetFromLineOfDeath(), of: downloadsButton, preferredEdge: .maxY)
 
         Pixel.fire(.manageDownloads(source: .button))
     }
@@ -249,6 +277,25 @@ final class NavigationBarViewController: NSViewController {
             })
     }
 
+    private func subscribeToDownloads() {
+        DownloadListCoordinator.shared.updates()
+            .throttle(for: 1.0, scheduler: DispatchQueue.main, latest: true)
+            .sink { [weak self] _ in
+                self?.updateDownloadsButton()
+            }
+            .store(in: &downloadsCancellables)
+        DownloadListCoordinator.shared.progress
+            .publisher(for: \.fractionCompleted)
+            .throttle(for: 0.2, scheduler: DispatchQueue.main, latest: true)
+            .map { _ in
+                let progress = DownloadListCoordinator.shared.progress
+                print("overall progress", progress.fractionCompleted)
+                return progress.fractionCompleted == 1.0 || progress.totalUnitCount == 0 ? nil : progress.fractionCompleted
+            }
+            .weakAssign(to: \.progress, on: downloadsProgressView)
+            .store(in: &downloadsCancellables)
+    }
+
     private func updatePasswordManagementButton() {
         let url = tabCollectionViewModel.selectedTabViewModel?.tab.content.url
 
@@ -274,6 +321,22 @@ final class NavigationBarViewController: NSViewController {
         passwordManagementPopover.viewController.domain = domain
         let hide = (try? SecureVaultFactory.default.makeVault().accountsFor(domain: domain).isEmpty) ?? false
         passwordManagementButton.isHidden = hide && !saveCredentialsPopover.isShown && !passwordManagementPopover.isShown
+    }
+
+    private func updateDownloadsButton(popoverDidClose: Bool = false) {
+        if downloadsPopover.isShown {
+            downloadsButton.isHidden = false
+            return
+        }
+
+        let hasActiveDownloads = DownloadListCoordinator.shared.hasActiveDownloads
+        if downloadsButton.isHidden && hasActiveDownloads && !popoverDidClose {
+            downloadsButton.isHidden = false
+        } else if !hasActiveDownloads && popoverDidClose {
+            downloadsButton.isHidden = true
+        }
+
+        downloadsButton.image = hasActiveDownloads ? Self.activeDownloadsImage : Self.inactiveDownloadsImage
     }
 
     private func subscribeToCredentialsToSave() {
@@ -372,6 +435,20 @@ extension NavigationBarViewController: OptionsButtonMenuDelegate {
 
     func optionsButtonMenuRequestedLoginsPopover(_ menu: NSMenu) {
         showPasswordManagementPopover()
+    }
+
+    func optionsButtonMenuRequestedDownloadsPopover(_ menu: NSMenu) {
+        toggleDownloadsPopover()
+    }
+
+}
+
+extension NavigationBarViewController: NSPopoverDelegate {
+
+    func popoverDidClose(_ notification: Notification) {
+        if notification.object as AnyObject? === downloadsPopover {
+            updateDownloadsButton(popoverDidClose: true)
+        }
     }
 
 }

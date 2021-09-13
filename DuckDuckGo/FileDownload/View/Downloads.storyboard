@@ -15,14 +15,6 @@
                         <rect key="frame" x="0.0" y="0.0" width="366" height="483"/>
                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                         <subviews>
-                            <box boxType="custom" borderType="none" cornerRadius="4" title="Box" translatesAutoresizingMaskIntoConstraints="NO" id="myC-Ma-Im1">
-                                <rect key="frame" x="0.0" y="0.0" width="366" height="483"/>
-                                <view key="contentView" id="RiE-we-Qh3">
-                                    <rect key="frame" x="0.0" y="0.0" width="366" height="483"/>
-                                    <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
-                                </view>
-                                <color key="fillColor" name="PopoverBackgroundColor"/>
-                            </box>
                             <customView translatesAutoresizingMaskIntoConstraints="NO" id="Bcr-Im-bcg">
                                 <rect key="frame" x="0.0" y="0.0" width="366" height="483"/>
                                 <subviews>
@@ -145,19 +137,19 @@
                                                                             <imageCell key="cell" refusesFirstResponder="YES" alignment="left" imageScaling="proportionallyDown" id="Iz7-Te-xl9"/>
                                                                         </imageView>
                                                                         <customView translatesAutoresizingMaskIntoConstraints="NO" id="BUB-Ea-xr5" customClass="CircularProgressView" customModule="DuckDuckGo_Privacy_Browser" customModuleProvider="target">
-                                                                            <rect key="frame" x="323" y="18" width="26" height="26"/>
+                                                                            <rect key="frame" x="324" y="18" width="27" height="27"/>
                                                                             <constraints>
-                                                                                <constraint firstAttribute="height" constant="26" id="eYj-jc-HTB"/>
-                                                                                <constraint firstAttribute="width" constant="26" id="vVc-1u-0F0"/>
+                                                                                <constraint firstAttribute="height" constant="27" id="eYj-jc-HTB"/>
+                                                                                <constraint firstAttribute="width" constant="27" id="vVc-1u-0F0"/>
                                                                             </constraints>
                                                                         </customView>
-                                                                        <button horizontalHuggingPriority="750" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="CEa-RP-JgA">
-                                                                            <rect key="frame" x="328" y="19" width="16" height="22"/>
+                                                                        <button horizontalHuggingPriority="750" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="CEa-RP-JgA" customClass="MouseOverButton" customModule="DuckDuckGo_Privacy_Browser" customModuleProvider="target">
+                                                                            <rect key="frame" x="328" y="22" width="16" height="16"/>
                                                                             <constraints>
                                                                                 <constraint firstAttribute="width" constant="16" id="AKX-kw-xvN"/>
                                                                                 <constraint firstAttribute="height" constant="16" id="HHP-yL-gQB"/>
                                                                             </constraints>
-                                                                            <buttonCell key="cell" type="square" bezelStyle="shadowlessSquare" image="NSStopProgressFreestandingTemplate" imagePosition="only" alignment="center" imageScaling="proportionallyDown" inset="2" id="kcy-Qa-BSO">
+                                                                            <buttonCell key="cell" type="square" bezelStyle="shadowlessSquare" image="CancelDownload" imagePosition="only" alignment="center" imageScaling="proportionallyDown" inset="2" id="kcy-Qa-BSO">
                                                                                 <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
                                                                                 <font key="font" metaFont="system"/>
                                                                             </buttonCell>
@@ -165,13 +157,13 @@
                                                                                 <action selector="cancelDownloadAction:" target="luO-ux-o3b" id="Cq9-Zq-NDo"/>
                                                                             </connections>
                                                                         </button>
-                                                                        <button horizontalHuggingPriority="750" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="Ejd-n2-PCA">
-                                                                            <rect key="frame" x="328" y="19" width="16" height="22"/>
+                                                                        <button horizontalHuggingPriority="750" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="Ejd-n2-PCA" customClass="MouseOverButton" customModule="DuckDuckGo_Privacy_Browser" customModuleProvider="target">
+                                                                            <rect key="frame" x="328" y="22" width="16" height="16"/>
                                                                             <constraints>
                                                                                 <constraint firstAttribute="width" constant="16" id="qKm-7W-LEz"/>
                                                                                 <constraint firstAttribute="height" constant="16" id="qsN-ta-Rgl"/>
                                                                             </constraints>
-                                                                            <buttonCell key="cell" type="square" bezelStyle="shadowlessSquare" image="NSRevealFreestandingTemplate" imagePosition="only" alignment="center" imageScaling="proportionallyDown" inset="2" id="8X3-Se-bda">
+                                                                            <buttonCell key="cell" type="square" bezelStyle="shadowlessSquare" image="RevealDownload" imagePosition="only" alignment="center" imageScaling="proportionallyDown" inset="2" id="8X3-Se-bda">
                                                                                 <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
                                                                                 <font key="font" metaFont="system"/>
                                                                             </buttonCell>
@@ -199,7 +191,7 @@
                                                                         <constraint firstItem="ziJ-5p-mOT" firstAttribute="leading" secondItem="w5d-I6-kEZ" secondAttribute="leading" id="0iP-dw-9x9"/>
                                                                         <constraint firstAttribute="trailing" secondItem="CEa-RP-JgA" secondAttribute="trailing" constant="21" id="1Ev-zW-tFt"/>
                                                                         <constraint firstItem="Ejd-n2-PCA" firstAttribute="centerX" secondItem="foT-7L-XqL" secondAttribute="centerX" id="5EG-iy-UAq"/>
-                                                                        <constraint firstItem="CEa-RP-JgA" firstAttribute="centerX" secondItem="BUB-Ea-xr5" secondAttribute="centerX" id="AUi-Ig-OGp"/>
+                                                                        <constraint firstItem="CEa-RP-JgA" firstAttribute="centerX" secondItem="BUB-Ea-xr5" secondAttribute="centerX" constant="-1" id="AUi-Ig-OGp"/>
                                                                         <constraint firstItem="w5d-I6-kEZ" firstAttribute="top" secondItem="0Hy-P1-z0d" secondAttribute="top" constant="12" id="EHy-1C-DMS"/>
                                                                         <constraint firstItem="CEa-RP-JgA" firstAttribute="centerY" secondItem="0Hy-P1-z0d" secondAttribute="centerY" id="PT1-2e-9ta"/>
                                                                         <constraint firstItem="Fue-CV-Ukm" firstAttribute="leading" secondItem="0Hy-P1-z0d" secondAttribute="leading" id="QBC-Js-e0p"/>
@@ -280,6 +272,7 @@
                                                         </tableColumn>
                                                     </tableColumns>
                                                     <connections>
+                                                        <action trigger="doubleAction" selector="doubleClickAction:" target="luO-ux-o3b" id="JjW-pA-gxL"/>
                                                         <outlet property="dataSource" destination="luO-ux-o3b" id="jKn-YV-l8R"/>
                                                         <outlet property="delegate" destination="luO-ux-o3b" id="ANr-09-OQ0"/>
                                                         <outlet property="menu" destination="SCZ-TM-duL" id="0my-wn-Pdd"/>
@@ -288,6 +281,9 @@
                                             </subviews>
                                             <nil key="backgroundColor"/>
                                         </clipView>
+                                        <constraints>
+                                            <constraint firstAttribute="height" constant="440" id="pa7-BQ-jMF"/>
+                                        </constraints>
                                         <edgeInsets key="contentInsets" left="0.0" right="0.0" top="0.0" bottom="0.0"/>
                                         <scroller key="horizontalScroller" hidden="YES" wantsLayer="YES" verticalHuggingPriority="750" horizontal="YES" id="N8F-en-0JK">
                                             <rect key="frame" x="-100" y="-100" width="184" height="16"/>
@@ -302,7 +298,6 @@
                                 <constraints>
                                     <constraint firstAttribute="width" constant="366" id="54p-oX-nFB"/>
                                     <constraint firstAttribute="trailing" secondItem="v01-Bs-7xy" secondAttribute="trailing" id="DfP-ji-bgO"/>
-                                    <constraint firstAttribute="height" constant="483" id="IwI-io-7w3"/>
                                     <constraint firstAttribute="bottom" secondItem="v01-Bs-7xy" secondAttribute="bottom" id="Kin-9D-Elb"/>
                                     <constraint firstItem="h7h-Ho-bYo" firstAttribute="leading" secondItem="Bcr-Im-bcg" secondAttribute="leading" constant="20" id="NbX-pY-e0i"/>
                                     <constraint firstItem="wlm-tA-4J8" firstAttribute="centerX" secondItem="Bcr-Im-bcg" secondAttribute="centerX" id="Qpp-H8-AEm"/>
@@ -322,18 +317,15 @@
                             <constraint firstItem="Bcr-Im-bcg" firstAttribute="top" secondItem="7fC-jy-ghc" secondAttribute="top" id="2xz-VQ-52H"/>
                             <constraint firstAttribute="trailing" secondItem="Bcr-Im-bcg" secondAttribute="trailing" id="9gQ-8e-KA0"/>
                             <constraint firstItem="Bcr-Im-bcg" firstAttribute="centerY" secondItem="7fC-jy-ghc" secondAttribute="centerY" id="H5a-rR-stb"/>
-                            <constraint firstItem="myC-Ma-Im1" firstAttribute="width" secondItem="7fC-jy-ghc" secondAttribute="width" id="Oph-pn-9BG"/>
-                            <constraint firstItem="myC-Ma-Im1" firstAttribute="centerY" secondItem="7fC-jy-ghc" secondAttribute="centerY" id="SJJ-UO-Edm"/>
                             <constraint firstAttribute="bottom" secondItem="Bcr-Im-bcg" secondAttribute="bottom" id="aNg-HQ-07t"/>
-                            <constraint firstItem="myC-Ma-Im1" firstAttribute="centerX" secondItem="7fC-jy-ghc" secondAttribute="centerX" id="aq9-Ox-CVF"/>
                             <constraint firstItem="Bcr-Im-bcg" firstAttribute="leading" secondItem="7fC-jy-ghc" secondAttribute="leading" id="pje-73-8HC"/>
-                            <constraint firstItem="myC-Ma-Im1" firstAttribute="height" secondItem="7fC-jy-ghc" secondAttribute="height" id="vxk-ZZ-gDq"/>
                             <constraint firstItem="Bcr-Im-bcg" firstAttribute="centerX" secondItem="7fC-jy-ghc" secondAttribute="centerX" id="wWU-OR-U92"/>
                         </constraints>
                     </view>
                     <connections>
                         <outlet property="contextMenu" destination="SCZ-TM-duL" id="Moa-bC-2Tb"/>
                         <outlet property="tableView" destination="zWp-mP-b3k" id="uqE-oO-u61"/>
+                        <outlet property="tableViewHeightConstraint" destination="pa7-BQ-jMF" id="i8E-WJ-esr"/>
                     </connections>
                 </viewController>
                 <customObject id="mPI-ye-bXg" userLabel="First Responder" customClass="NSResponder" sceneMemberID="firstResponder"/>
@@ -377,6 +369,12 @@
                                 <action selector="cancelDownloadAction:" target="luO-ux-o3b" id="EEu-ZY-i0W"/>
                             </connections>
                         </menuItem>
+                        <menuItem title="Restart" id="m1O-Mn-Tpq">
+                            <modifierMask key="keyEquivalentModifierMask"/>
+                            <connections>
+                                <action selector="restartDownloadAction:" target="luO-ux-o3b" id="97R-Tj-hOg"/>
+                            </connections>
+                        </menuItem>
                         <menuItem title="Clear All" id="u1l-bF-hk1">
                             <modifierMask key="keyEquivalentModifierMask"/>
                             <connections>
@@ -393,11 +391,11 @@
         </scene>
     </scenes>
     <resources>
+        <image name="CancelDownload" width="16" height="16"/>
         <image name="ClearDownloads" width="16" height="16"/>
-        <image name="NSRevealFreestandingTemplate" width="15" height="15"/>
-        <image name="NSStopProgressFreestandingTemplate" width="15" height="15"/>
         <image name="OpenDownloadsFolder" width="16" height="16"/>
         <image name="RestartDownload" width="16" height="16"/>
+        <image name="RevealDownload" width="16" height="16"/>
         <namedColor name="ButtonColor">
             <color red="0.28627450980392155" green="0.28627450980392155" blue="0.28627450980392155" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
         </namedColor>
@@ -409,9 +407,6 @@
         </namedColor>
         <namedColor name="ClearColor">
             <color red="1" green="1" blue="1" alpha="0.0" colorSpace="custom" customColorSpace="sRGB"/>
-        </namedColor>
-        <namedColor name="PopoverBackgroundColor">
-            <color red="0.94900000095367432" green="0.94099998474121094" blue="0.94099998474121094" alpha="0.89999997615814209" colorSpace="custom" customColorSpace="sRGB"/>
         </namedColor>
     </resources>
 </document>

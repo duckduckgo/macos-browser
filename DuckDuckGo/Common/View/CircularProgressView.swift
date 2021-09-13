@@ -21,26 +21,37 @@ import AppKit
 final class CircularProgressView: NSView {
 
     private let progressLayer = CAShapeLayer()
+    private var backgroundLayer = CAShapeLayer()
 
     @IBInspectable var lineWidth: CGFloat = 3.0 {
         didSet {
             progressLayer.lineWidth = lineWidth
         }
     }
-    @IBInspectable var fillColor: NSColor = .clear {
+    @IBInspectable var backgroundLineWidth: CGFloat = 2.0 {
         didSet {
-            progressLayer.fillColor = fillColor.cgColor
+            backgroundLayer.lineWidth = lineWidth
         }
     }
+
     @IBInspectable var strokeColor: NSColor = .controlAccentColor {
         didSet {
             progressLayer.strokeColor = strokeColor.cgColor
         }
     }
+    @IBInspectable var backgroundStrokeColor: NSColor = .buttonMouseOverColor {
+        didSet {
+            backgroundLayer.fillColor = backgroundStrokeColor.cgColor
+        }
+    }
+
+    var indeterminateProgressValue: CGFloat = 0.2
+    var animationDuration: TimeInterval = 0.5
+    var rotationDuration: TimeInterval = 1.5
 
     var progress: Double? = nil {
         didSet {
-            animateProgressLayer()
+            updateProgress()
         }
     }
 
@@ -60,47 +71,207 @@ final class CircularProgressView: NSView {
         self.wantsLayer = true
         self.layer!.backgroundColor = NSColor.clear.cgColor
 
-        progressLayer.autoresizingMask = [.layerHeightSizable, .layerWidthSizable]
-        progressLayer.path = self.progressLayerPath()
-        progressLayer.lineWidth = self.lineWidth
+        let radius = min(self.bounds.width, self.bounds.height) * 0.5 - max(lineWidth, backgroundLineWidth)
 
+        backgroundLayer.configureCircle(radius: radius, lineWidth: backgroundLineWidth)
+        backgroundLayer.strokeStart = 1.0
+        backgroundLayer.strokeEnd = 1.0
+        self.layer!.addSublayer(backgroundLayer)
+
+        progressLayer.configureCircle(radius: radius, lineWidth: lineWidth)
+        progressLayer.strokeStart = 1.0
+        progressLayer.strokeEnd = 1.0
         self.layer!.addSublayer(progressLayer)
+
         self.updateLayer()
     }
 
     override func updateLayer() {
-        progressLayer.frame = self.layer!.bounds
-        progressLayer.fillColor = self.fillColor.cgColor
-        progressLayer.strokeColor = self.strokeColor.cgColor
-    }
-
-    private func progressLayerPath() -> CGPath {
         let bounds = self.layer!.bounds
-        let radius = abs(min(bounds.width, bounds.height) * 0.5 - lineWidth)
-        let rect = NSRect(x: bounds.width * 0.5 - radius, y: bounds.height * 0.5 - radius, width: radius * 2, height: radius * 2)
-        let path = NSBezierPath(roundedRect: rect, xRadius: radius, yRadius: radius)
-        return path.cgPath
+        progressLayer.frame = CGRect(x: (bounds.width - progressLayer.bounds.width) * 0.5,
+                                     y: (bounds.height - progressLayer.bounds.height) * 0.5,
+                                     width: progressLayer.bounds.width,
+                                     height: progressLayer.bounds.height)
+        backgroundLayer.frame = CGRect(x: (bounds.width - backgroundLayer.bounds.width) * 0.5,
+                                       y: (bounds.height - backgroundLayer.bounds.height) * 0.5,
+                                       width: backgroundLayer.bounds.width,
+                                       height: backgroundLayer.bounds.height)
+        progressLayer.strokeColor = self.strokeColor.cgColor
+        backgroundLayer.strokeColor = self.backgroundStrokeColor.cgColor
     }
 
-    private func animateProgressLayer() {
-        progressLayer.removeAllAnimations()
-        guard let progress = self.progress else {
-            self.progressLayer.isHidden = true
+    private enum AnimationKeys {
+        static let strokeStart = "strokeStart"
+        static let strokeEnd = "strokeEnd"
+        static let rotation = "rotation"
+        static let stopRotation = "transform"
+    }
+
+    private func updateProgress() {
+        let isBackgroundAnimating = backgroundLayer.animation(forKey: AnimationKeys.strokeStart) != nil
+            || backgroundLayer.animation(forKey: AnimationKeys.strokeEnd) != nil
+        let isProgressShown = (backgroundLayer.strokeStart == 0.0 && backgroundLayer.strokeEnd != 0.0)
+
+        guard self.window != nil else {
+            backgroundLayer.strokeEnd = 1.0
+            backgroundLayer.strokeStart = (progress == nil) ? 1.0 : 0.0
+
+            progressLayer.strokeEnd = 1.0
+            progressLayer.strokeStart = (progress == nil)
+                ? 1.0
+                : (progress! > 0) ? (1.0 - CGFloat(progress!)) : self.indeterminateProgressValue
             return
         }
-        self.progressLayer.isHidden = false
+        guard !isBackgroundAnimating else {
+            // will call updateProgress on animation completion
+            return
+        }
+
+        switch (isProgressShown, (progress != nil)) {
+        case (false, true):
+            showProgressAnimated()
+        case (true, false):
+            hideProgressAnimated()
+        case (true, true):
+            updateProgressAnimated()
+        case (false, false):
+            return
+        }
+    }
+
+    private func showProgressAnimated() {
+        backgroundLayer.removeAllAnimations()
+        progressLayer.removeAllAnimations()
+
+        self.backgroundLayer.strokeEnd = 1.0
+        self.progressLayer.strokeStart = 1.0
+        self.progressLayer.strokeEnd = 1.0
 
         NSAnimationContext.runAnimationGroup { context in
-            context.duration = 0.2
+            context.duration = self.animationDuration
             context.allowsImplicitAnimation = true
-            context.timingFunction = CAMediaTimingFunction(name: .easeInEaseOut)
+            context.timingFunction = CAMediaTimingFunction(name: .easeIn)
+
+            let animation = CABasicAnimation(keyPath: (\CAShapeLayer.strokeStart)._kvcKeyPathString!)
+            self.backgroundLayer.strokeStart = 0.0
+            animation.fromValue = 1.0
+            animation.isRemovedOnCompletion = true
+            self.backgroundLayer.add(animation, forKey: AnimationKeys.strokeStart)
+
+        } completionHandler: { [weak self] in
+            self?.updateProgress()
+        }
+    }
+
+    private func startRotation() {
+        guard progressLayer.animation(forKey: AnimationKeys.rotation) == nil else { return }
+
+        let currentRotation = (progressLayer.presentation() ?? progressLayer).value(forKeyPath: "transform.rotation") as? CGFloat ?? 0.0
+        progressLayer.removeAnimation(forKey: AnimationKeys.stopRotation)
+
+        let rotation = CABasicAnimation(keyPath: "transform.rotation")
+        rotation.fromValue = currentRotation
+        rotation.toValue = currentRotation - CGFloat.pi * 2
+        rotation.duration = self.rotationDuration
+        rotation.repeatCount = .greatestFiniteMagnitude
+
+        self.progressLayer.add(rotation, forKey: AnimationKeys.rotation)
+    }
+
+    private func stopRotation() {
+        guard progressLayer.animation(forKey: AnimationKeys.rotation) != nil,
+              progressLayer.animation(forKey: AnimationKeys.stopRotation) == nil
+        else { return }
+
+        let currentRotation = progressLayer.presentation()?.value(forKeyPath: "transform.rotation") as? CGFloat ?? 0.0
+        self.progressLayer.removeAnimation(forKey: AnimationKeys.rotation)
+
+        let stopRotationAnimation = CABasicAnimation(keyPath: "transform.rotation")
+        stopRotationAnimation.fromValue = currentRotation
+        stopRotationAnimation.toValue = -CGFloat.pi * 2
+        stopRotationAnimation.isRemovedOnCompletion = true
+
+        self.progressLayer.add(stopRotationAnimation, forKey: AnimationKeys.stopRotation)
+    }
+
+    private func updateProgressAnimated() {
+        guard let progress = progress else {
+            assertionFailure("Unexpected flow")
+            return
+        }
+
+        NSAnimationContext.runAnimationGroup { context in
+            context.duration = self.animationDuration
+            context.allowsImplicitAnimation = true
+            context.timingFunction = CAMediaTimingFunction(name: .linear)
 
             let animation = CABasicAnimation(keyPath: "strokeStart")
-            let oldValue = self.progressLayer.strokeStart
-            self.progressLayer.strokeStart = (0...1.0).contains(progress) ? 1.0 - CGFloat(progress) : 1.0
-            animation.fromValue = oldValue
-            self.progressLayer.add(animation, forKey: "strokeStart")
+            let currentStrokeStart = (progressLayer.presentation() ?? progressLayer).value(forKey: "strokeStart") as? CGFloat ?? 0
+            self.progressLayer.removeAnimation(forKey: AnimationKeys.strokeStart)
+            let newStrokeStart = 1.0 - (progress >= 0.0
+                                            ? CGFloat(progress)
+                                            : max(self.indeterminateProgressValue, min(0.9, 1.0 - currentStrokeStart)))
+            self.progressLayer.strokeStart = newStrokeStart
+            animation.fromValue = currentStrokeStart
+            animation.isRemovedOnCompletion = true
+            self.progressLayer.add(animation, forKey: AnimationKeys.strokeStart)
+
+            self.stopRotation()
+
+        } completionHandler: { [weak self] in
+            guard let self = self, let progress = self.progress else { return }
+            self.progressLayer.setValue(0.0, forKeyPath: "transform.rotation")
+            if progress < 0.0 {
+                self.startRotation()
+            }
         }
+    }
+
+    private func hideProgressAnimated() {
+        NSAnimationContext.runAnimationGroup { context in
+            context.duration = self.animationDuration
+            context.allowsImplicitAnimation = true
+            context.timingFunction = CAMediaTimingFunction(name: .easeOut)
+
+            let backgroundAnimation = CABasicAnimation(keyPath: "strokeEnd")
+            self.backgroundLayer.strokeEnd = 0.0
+            backgroundAnimation.fromValue = 1.0
+            backgroundAnimation.isRemovedOnCompletion = true
+            self.backgroundLayer.add(backgroundAnimation, forKey: AnimationKeys.strokeEnd)
+
+            let progressEndAnimation = CABasicAnimation(keyPath: "strokeEnd")
+            self.progressLayer.strokeEnd = 0.0
+            progressEndAnimation.fromValue = 1.0
+            progressEndAnimation.isRemovedOnCompletion = true
+            self.progressLayer.add(progressEndAnimation, forKey: AnimationKeys.strokeEnd)
+
+            let progressAnimation = CABasicAnimation(keyPath: "strokeStart")
+            let currentStrokeStart = (progressLayer.presentation() ?? progressLayer).value(forKey: "strokeStart") as? CGFloat ?? 0
+            self.progressLayer.removeAnimation(forKey: AnimationKeys.strokeStart)
+            self.progressLayer.strokeStart = 0.0
+            progressAnimation.fromValue = currentStrokeStart
+            progressAnimation.isRemovedOnCompletion = true
+            self.progressLayer.add(progressAnimation, forKey: AnimationKeys.strokeStart)
+
+            self.stopRotation()
+
+        } completionHandler: { [weak self] in
+            self?.updateProgress()
+        }
+    }
+
+}
+
+private extension CAShapeLayer {
+
+    func configureCircle(radius: CGFloat, lineWidth: CGFloat) {
+        self.bounds = CGRect(x: 0, y: 0, width: (radius + lineWidth) * 2, height: (radius + lineWidth) * 2)
+
+        let rect = NSRect(x: lineWidth * 0.5, y: lineWidth * 0.5, width: radius * 2, height: radius * 2)
+        self.path = NSBezierPath(roundedRect: rect, xRadius: radius, yRadius: radius).cgPath
+
+        self.lineWidth = lineWidth
+        self.fillColor = NSColor.clear.cgColor
     }
 
 }

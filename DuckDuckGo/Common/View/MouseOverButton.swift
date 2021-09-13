@@ -85,7 +85,7 @@ internal class MouseOverButton: NSButton {
         isMouseDown = false
     }
 
-    private var isMouseOver = false {
+    @Published private(set) var isMouseOver = false {
         didSet {
             updateBackgroundColor()
         }
