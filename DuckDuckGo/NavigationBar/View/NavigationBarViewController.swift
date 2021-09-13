@@ -324,19 +324,20 @@ final class NavigationBarViewController: NSViewController {
     }
 
     private func updateDownloadsButton(popoverDidClose: Bool = false) {
+        let hasActiveDownloads = DownloadListCoordinator.shared.hasActiveDownloads
+
+        downloadsButton.image = hasActiveDownloads ? Self.activeDownloadsImage : Self.inactiveDownloadsImage
+
         if downloadsPopover.isShown {
             downloadsButton.isHidden = false
             return
         }
 
-        let hasActiveDownloads = DownloadListCoordinator.shared.hasActiveDownloads
         if downloadsButton.isHidden && hasActiveDownloads && !popoverDidClose {
             downloadsButton.isHidden = false
         } else if !hasActiveDownloads && popoverDidClose {
             downloadsButton.isHidden = true
         }
-
-        downloadsButton.image = hasActiveDownloads ? Self.activeDownloadsImage : Self.inactiveDownloadsImage
     }
 
     private func subscribeToCredentialsToSave() {
