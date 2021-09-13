@@ -22,7 +22,7 @@ import BrowserServicesKit
 extension EmailUrls {
 
     private struct Url {
-        static let emailLandingPage = "https://duckduckgo.com/email/login"
+        static let emailLandingPage = "https://duckduckgo.com/email/enable-autofill"
         static let emailGenerateTokenPage = "https://duckduckgo.com/email/new-address"
         static let emailAuthenticationHosts = ["quack.duckduckgo.com", "quackdev.duckduckgo.com"]
     }
