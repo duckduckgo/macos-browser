@@ -224,8 +224,8 @@ final class NavigationBarViewController: NSViewController {
 
         passwordManagementButton.isHidden = false
         passwordManagementPopover.show(relativeTo: passwordManagementButton.bounds.insetFromLineOfDeath(),
-                                of: passwordManagementButton,
-                                preferredEdge: .minY)
+                                       of: passwordManagementButton,
+                                       preferredEdge: .minY)
 
         Pixel.fire(.manageLogins(source: .button))
     }
