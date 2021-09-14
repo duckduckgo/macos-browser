@@ -114,4 +114,16 @@ extension NSColor {
     static let bookmarkRepresentingColor4 = NSColor(named: "BookmarkRepresentingColor4")!
     static let bookmarkRepresentingColor5 = NSColor(named: "BookmarkRepresentingColor5")!
 
+    static var buttonMouseDownColor: NSColor {
+        NSColor(named: "ButtonMouseDownColor")!
+    }
+
+    static var burnerIndicatorSelectedColor: NSColor {
+        NSColor(named: "BurnerIndicatorSelectedColor")!
+    }
+
+    static var burnerIndicatorUnselectedColor: NSColor {
+        NSColor(named: "BurnerIndicatorUnselectedColor")!
+    }
+
 }

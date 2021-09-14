@@ -204,29 +204,33 @@ final class NavigationBarViewController: NSViewController {
         }
     }
 
-    func showBookmarkListPopover() {
-        if bookmarkListPopover.isShown {
-            bookmarkListPopover.close()
-            return
+    func closeTransientPopovers() -> Bool {
+        guard !saveCredentialsPopover.isShown else {
+            return false
         }
 
+        if bookmarkListPopover.isShown {
+            bookmarkListPopover.close()
+        }
+
+        if passwordManagementPopover.isShown {
+            passwordManagementPopover.close()
+        }
+
+        return true
+    }
+
+    func showBookmarkListPopover() {
+        guard closeTransientPopovers() else { return }
         bookmarkListPopover.show(relativeTo: bookmarkListButton.bounds.insetFromLineOfDeath(), of: bookmarkListButton, preferredEdge: .maxY)
         Pixel.fire(.bookmarksList(source: .button))
     }
 
     func showPasswordManagementPopover() {
-        guard !saveCredentialsPopover.isShown else { return }
-
-        if passwordManagementPopover.isShown {
-            passwordManagementPopover.close()
-            return
-        }
-
-        passwordManagementButton.isHidden = false
+        guard closeTransientPopovers() else { return }
         passwordManagementPopover.show(relativeTo: passwordManagementButton.bounds.insetFromLineOfDeath(),
                                        of: passwordManagementButton,
                                        preferredEdge: .minY)
-
         Pixel.fire(.manageLogins(source: .button))
     }
 
@@ -301,7 +305,6 @@ final class NavigationBarViewController: NSViewController {
         if passwordManagementPopover.viewController.isDirty {
             // Remember to reset this once the controller is not dirty
             passwordManagementButton.image = NSImage(named: "PasswordManagementDirty")
-            passwordManagementButton.isHidden = false
             return
         }
 
@@ -312,12 +315,9 @@ final class NavigationBarViewController: NSViewController {
 
         passwordManagementPopover.viewController.domain = nil
         guard let url = url, let domain = url.host else {
-            passwordManagementButton.isHidden = true
             return
         }
         passwordManagementPopover.viewController.domain = domain
-        let hide = (try? SecureVaultFactory.default.makeVault().accountsFor(domain: domain).isEmpty) ?? false
-        passwordManagementButton.isHidden = hide && !saveCredentialsPopover.isShown && !passwordManagementPopover.isShown
     }
 
     private func updateDownloadsButton() {

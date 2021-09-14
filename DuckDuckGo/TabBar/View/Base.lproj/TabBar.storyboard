@@ -76,11 +76,11 @@
                             <scrollView wantsLayer="YES" borderType="none" horizontalLineScroll="10" horizontalPageScroll="10" verticalLineScroll="10" verticalPageScroll="10" hasVerticalScroller="NO" verticalScrollElasticity="none" translatesAutoresizingMaskIntoConstraints="NO" id="O0X-yp-zLn" customClass="TabBarScrollView" customModule="DuckDuckGo_Privacy_Browser" customModuleProvider="target">
                                 <rect key="frame" x="76" y="0.0" width="661" height="32"/>
                                 <clipView key="contentView" drawsBackground="NO" copiesOnScroll="NO" translatesAutoresizingMaskIntoConstraints="NO" id="zdf-RD-hTG">
-                                    <rect key="frame" x="0.0" y="0.0" width="661" height="17"/>
+                                    <rect key="frame" x="0.0" y="0.0" width="661" height="32"/>
                                     <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                     <subviews>
                                         <collectionView selectable="YES" allowsEmptySelection="NO" translatesAutoresizingMaskIntoConstraints="NO" id="OEu-5P-cRF" customClass="TabBarCollectionView" customModule="DuckDuckGo_Privacy_Browser" customModuleProvider="target">
-                                            <rect key="frame" x="0.0" y="0.0" width="661" height="17"/>
+                                            <rect key="frame" x="0.0" y="0.0" width="661" height="32"/>
                                             <autoresizingMask key="autoresizingMask" heightSizable="YES"/>
                                             <collectionViewFlowLayout key="collectionViewLayout" scrollDirection="horizontal" id="oAv-jh-KDw">
                                                 <size key="itemSize" width="120" height="32"/>
@@ -97,7 +97,7 @@
                                 </clipView>
                                 <edgeInsets key="contentInsets" left="0.0" right="0.0" top="0.0" bottom="0.0"/>
                                 <scroller key="horizontalScroller" wantsLayer="YES" verticalHuggingPriority="750" horizontal="YES" id="f6A-N1-Ed1">
-                                    <rect key="frame" x="0.0" y="17" width="661" height="15"/>
+                                    <rect key="frame" x="0.0" y="16" width="661" height="16"/>
                                     <autoresizingMask key="autoresizingMask"/>
                                 </scroller>
                                 <scroller key="verticalScroller" hidden="YES" wantsLayer="YES" verticalHuggingPriority="750" horizontal="NO" id="tXZ-5R-7cy">
@@ -133,7 +133,7 @@
                                             <action selector="rightScrollButtonAction:" target="uSf-9n-QMw" id="j7F-Ke-3i3"/>
                                         </connections>
                                     </button>
-                                    <button translatesAutoresizingMaskIntoConstraints="NO" id="qXs-b0-tWI" userLabel="Add Button" customClass="MouseOverButton" customModule="DuckDuckGo_Privacy_Browser" customModuleProvider="target">
+                                    <button translatesAutoresizingMaskIntoConstraints="NO" id="qXs-b0-tWI" userLabel="Add Button" customClass="LongPressButton" customModule="DuckDuckGo_Privacy_Browser" customModuleProvider="target">
                                         <rect key="frame" x="0.0" y="0.0" width="28" height="28"/>
                                         <constraints>
                                             <constraint firstAttribute="width" constant="28" id="Lmr-Cv-caT"/>
@@ -166,7 +166,7 @@
                                             <constraint firstAttribute="height" constant="28" id="zmV-VF-tQ1"/>
                                         </constraints>
                                     </customView>
-                                    <button translatesAutoresizingMaskIntoConstraints="NO" id="XV4-Ze-5j7" userLabel="Burn Button" customClass="BurnButton" customModule="DuckDuckGo_Privacy_Browser" customModuleProvider="target">
+                                    <button translatesAutoresizingMaskIntoConstraints="NO" id="XV4-Ze-5j7" userLabel="Burn Button" customClass="MouseOverButton" customModule="DuckDuckGo_Privacy_Browser" customModuleProvider="target">
                                         <rect key="frame" x="64" y="0.0" width="28" height="28"/>
                                         <constraints>
                                             <constraint firstAttribute="width" constant="28" id="9Ii-rC-Eca"/>
@@ -189,7 +189,7 @@
                                             </userDefinedRuntimeAttribute>
                                         </userDefinedRuntimeAttributes>
                                         <connections>
-                                            <action selector="burnButtonAction:" target="7J5-0H-rHB" id="4O7-R9-MHU"/>
+                                            <action selector="fireButtonAction:" target="7J5-0H-rHB" id="4O7-R9-MHU"/>
                                         </connections>
                                     </button>
                                 </subviews>
@@ -255,9 +255,9 @@
                         </constraints>
                     </view>
                     <connections>
-                        <outlet property="burnButton" destination="XV4-Ze-5j7" id="ZCC-wX-7hC"/>
                         <outlet property="collectionView" destination="OEu-5P-cRF" id="b95-c4-JM0"/>
                         <outlet property="draggingSpace" destination="Ako-KX-AM9" id="yya-hb-te7"/>
+                        <outlet property="fireButton" destination="XV4-Ze-5j7" id="ZCC-wX-7hC"/>
                         <outlet property="leadingStackViewLeadingConstraint" destination="8CU-j8-UY3" id="qi2-Cw-RTu"/>
                         <outlet property="leftScrollButton" destination="7XG-Qm-Ksx" id="yre-8P-vb9"/>
                         <outlet property="leftShadowImageView" destination="zsA-or-9Xo" id="wVp-jj-2UD"/>

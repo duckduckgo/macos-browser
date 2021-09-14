@@ -37,7 +37,10 @@ extension TabCollectionViewModel: NSSecureCoding {
     }
 
     func encode(with coder: NSCoder) {
-        selectionIndex.map(coder.encode(forKey: NSCodingKeys.selectionIndex))
+        if let index = selectionIndex {
+            let burners = tabCollection.tabs.filter { $0.tabStorageType != .burner }.count
+            coder.encode(min(0, index - burners))
+        }
         coder.encode(tabCollection, forKey: NSCodingKeys.tabCollection)
     }
 

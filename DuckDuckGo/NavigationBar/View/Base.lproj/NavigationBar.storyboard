@@ -150,8 +150,8 @@
                                             <action selector="openFeedback:" target="wkT-Td-n7D" id="1IP-IF-SD9"/>
                                         </connections>
                                     </button>
-                                    <button hidden="YES" translatesAutoresizingMaskIntoConstraints="NO" id="1nW-I1-nut" userLabel="Password Management Button" customClass="MouseOverButton" customModule="DuckDuckGo_Privacy_Browser" customModuleProvider="target">
-                                        <rect key="frame" x="0.0" y="0.0" width="28" height="28"/>
+                                    <button translatesAutoresizingMaskIntoConstraints="NO" id="1nW-I1-nut" userLabel="Password Management Button" customClass="MouseOverButton" customModule="DuckDuckGo_Privacy_Browser" customModuleProvider="target">
+                                        <rect key="frame" x="32" y="0.0" width="28" height="28"/>
                                         <constraints>
                                             <constraint firstAttribute="height" constant="28" id="7ig-jQ-Utf"/>
                                             <constraint firstAttribute="width" constant="28" id="T0W-BM-7GU"/>

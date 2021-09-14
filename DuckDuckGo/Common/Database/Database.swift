@@ -27,8 +27,8 @@ final class Database {
     
     static let shared = Database()
 
-    private let semaphore = DispatchSemaphore(value: 0)
     private let container: NSPersistentContainer
+    private let storeLoadedCondition = RunLoop.ResumeCondition()
     
     var model: NSManagedObjectModel {
         return container.managedObjectModel
@@ -70,17 +70,18 @@ final class Database {
             context.name = "Migration"
             context.perform {
                 migrationHandler(context)
-                self.semaphore.signal()
+
+                self.storeLoadedCondition.resolve()
             }
         }
     }
     
     func makeContext(concurrencyType: NSManagedObjectContextConcurrencyType, name: String? = nil) -> NSManagedObjectContext {
-        semaphore.wait()
+        RunLoop.current.run(until: storeLoadedCondition)
+
         let context = NSManagedObjectContext(concurrencyType: concurrencyType)
         context.persistentStoreCoordinator = container.persistentStoreCoordinator
         context.name = name
-        semaphore.signal()
         
         return context
     }

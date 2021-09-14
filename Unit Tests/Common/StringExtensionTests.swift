@@ -1,5 +1,5 @@
 //
-//  StringExtensionsTests.swift
+//  StringExtensionTests.swift
 //
 //  Copyright © 2021 DuckDuckGo. All rights reserved.
 //
@@ -20,7 +20,7 @@ import Foundation
 import XCTest
 @testable import DuckDuckGo_Privacy_Browser
 
-final class StringExtensionsTests: XCTestCase {
+final class StringExtensionTests: XCTestCase {
 
     // MARK: - General
 

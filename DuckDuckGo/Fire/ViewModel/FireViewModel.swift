@@ -17,10 +17,23 @@
 //
 
 import WebKit
+import Combine
 
 final class FireViewModel {
-
+    
     let fire: Fire
+
+    @Published var isAnimationPlaying = false
+
+    /// Publisher that emits true if burning animation or burning process is in progress
+    var shouldPreventUserInteraction: AnyPublisher<Bool, Never> {
+        Publishers
+            .CombineLatest($isAnimationPlaying, fire.$isBurning)
+            .map { (isAnimationPlaying, isBurning) -> (Bool) in
+                return isAnimationPlaying || isBurning
+            }
+            .eraseToAnyPublisher()
+    }
 
     init(fire: Fire) {
         self.fire = fire

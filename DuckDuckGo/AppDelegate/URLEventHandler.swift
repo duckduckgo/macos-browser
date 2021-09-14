@@ -1,5 +1,5 @@
 //
-//  UrlEventListener.swift
+//  URLEventHandler.swift
 //
 //  Copyright © 2020 DuckDuckGo. All rights reserved.
 //
@@ -19,15 +19,16 @@
 import Foundation
 import os.log
 
-final class UrlEventListener {
+final class URLEventHandler {
 
     private let handler: ((URL) -> Void)
 
-    init(handler: @escaping ((URL) -> Void)) {
+    private var didFinishLaunching = false
+    private var urlsToOpen = [URL]()
+    
+    init(handler: @escaping ((URL) -> Void) = openURL) {
         self.handler = handler
-    }
 
-    func listen() {
         NSAppleEventManager.shared().setEventHandler(
             self,
             andSelector: #selector(handleUrlEvent(event:reply:)),
@@ -36,7 +37,21 @@ final class UrlEventListener {
         )
     }
 
-    @objc func handleUrlEvent(event: NSAppleEventDescriptor, reply: NSAppleEventDescriptor) {
+    func applicationDidFinishLaunching() {
+        if !urlsToOpen.isEmpty {
+
+            for url in urlsToOpen {
+                self.handler(url)
+            }
+
+            Pixel.fire(.appLaunch(launch: urlsToOpen[0].isFileURL ? .openFile : .openURL))
+            self.urlsToOpen = []
+        }
+        
+        didFinishLaunching = true
+    }
+
+    @objc private func handleUrlEvent(event: NSAppleEventDescriptor, reply: NSAppleEventDescriptor) {
         guard let path = event.paramDescriptor(forKeyword: keyDirectObject)?.stringValue?.removingPercentEncoding else {
             os_log("UrlEventListener: unable to determine path", type: .error)
             Pixel.fire(.debug(event: .appOpenURLFailed,
@@ -51,7 +66,35 @@ final class UrlEventListener {
             return
         }
 
-        handler(url)
+        handleURLs([url])
+    }
+
+    func handleFiles(_ files: [String]) {
+        let urls: [URL] = files.compactMap {
+            if let url = URL(string: $0),
+               ["http", "https", "file"].contains(url.scheme) {
+                guard !url.isFileURL || FileManager.default.fileExists(atPath: url.path) else { return nil }
+                return url
+            } else if FileManager.default.fileExists(atPath: $0) {
+                let url = URL(fileURLWithPath: $0)
+                return url
+            }
+            return nil
+        }
+
+        handleURLs(urls)
+    }
+
+    private func handleURLs(_ urls: [URL]) {
+        if didFinishLaunching {
+            urls.forEach(self.handler)
+        } else {
+            self.urlsToOpen.append(contentsOf: urls)
+        }
+    }
+
+    private static func openURL(_ url: URL) {
+        WindowControllersManager.shared.show(url: url, newTab: true)
     }
 
 }

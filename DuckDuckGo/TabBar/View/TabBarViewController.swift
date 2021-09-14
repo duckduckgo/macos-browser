@@ -38,14 +38,14 @@ final class TabBarViewController: NSViewController {
     @IBOutlet weak var leftScrollButton: MouseOverButton!
     @IBOutlet weak var rightShadowImageView: NSImageView!
     @IBOutlet weak var leftShadowImageView: NSImageView!
-    @IBOutlet weak var plusButton: MouseOverButton!
-    @IBOutlet weak var burnButton: BurnButton!
+    @IBOutlet weak var plusButton: LongPressButton!
+    @IBOutlet weak var fireButton: MouseOverButton!
     @IBOutlet weak var draggingSpace: NSView!
     @IBOutlet weak var windowDraggingViewLeadingConstraint: NSLayoutConstraint!
 
     private let tabCollectionViewModel: TabCollectionViewModel
+    private let fireViewModel: FireViewModel
     private let bookmarkManager: BookmarkManager = LocalBookmarkManager.shared
-    lazy private var fireViewModel = FireViewModel()
 
     private var tabsCancellable: AnyCancellable?
     private var selectionIndexCancellable: AnyCancellable?
@@ -55,8 +55,9 @@ final class TabBarViewController: NSViewController {
         fatalError("TabBarViewController: Bad initializer")
     }
 
-    init?(coder: NSCoder, tabCollectionViewModel: TabCollectionViewModel) {
+    init?(coder: NSCoder, tabCollectionViewModel: TabCollectionViewModel, fireViewModel: FireViewModel) {
         self.tabCollectionViewModel = tabCollectionViewModel
+        self.fireViewModel = fireViewModel
 
         super.init(coder: coder)
     }
@@ -67,9 +68,7 @@ final class TabBarViewController: NSViewController {
         scrollView.updateScrollElasticity(with: tabMode)
         observeToScrollNotifications()
         subscribeToSelectionIndex()
-        subscribeToIsBurning()
-
-        warmupFireAnimation()
+        plusButton.menu = createNewTabLongPressMenu()
     }
 
     override func viewWillAppear() {
@@ -97,6 +96,10 @@ final class TabBarViewController: NSViewController {
         tabCollectionViewModel.appendNewTab(with: .homepage)
     }
 
+    @IBAction func createBurnerTabAction(_ sender: NSButton) {
+        tabCollectionViewModel.appendNewTab(with: .homepage, tabStorageType: .burner)
+    }
+
     @IBAction func rightScrollButtonAction(_ sender: NSButton) {
         collectionView.scrollToEnd()
     }
@@ -111,11 +114,14 @@ final class TabBarViewController: NSViewController {
         }
     }
 
-    private func subscribeToIsBurning() {
-        fireViewModel.fire.$isBurning
-            .receive(on: DispatchQueue.main)
-            .weakAssign(to: \.isBurning, on: burnButton)
-            .store(in: &cancellables)
+    private func createNewTabLongPressMenu() -> NSMenu {
+        let menu = NSMenu()
+        menu.addItem(NSMenuItem(title: UserText.plusButtonNewTabMenuItem, action: #selector(addButtonAction(_:)), target: self, keyEquivalent: ""))
+        menu.addItem(NSMenuItem(title: UserText.plusButtonNewBurnerTabMenuItem,
+                                action: #selector(createBurnerTabAction(_:)),
+                                target: self,
+                                keyEquivalent: ""))
+        return menu
     }
 
     private func reloadSelection() {
@@ -561,6 +567,7 @@ extension TabBarViewController: NSCollectionViewDataSource {
         if let footer = view as? TabBarFooter {
             footer.addButton?.target = self
             footer.addButton?.action = #selector(addButtonAction(_:))
+            footer.addButton?.menu = createNewTabLongPressMenu()
         }
         return view
     }
@@ -719,6 +726,17 @@ extension TabBarViewController: TabBarViewItemDelegate {
         tabCollectionViewModel.duplicateTab(at: indexPath.item)
     }
 
+    func tabBarViewItemConvertToStandard(_ tabBarViewItem: TabBarViewItem) {
+        guard let indexPath = collectionView.indexPath(for: tabBarViewItem) else {
+            os_log("TabBarViewController: Failed to get index path of tab bar view item", type: .error)
+            return
+        }
+
+        collectionView.clearSelection()
+        tabCollectionViewModel.convertToStandardTab(at: indexPath.item)
+        tabBarViewItemCloseAction(tabBarViewItem)
+    }
+
     func tabBarViewItemBookmarkThisPageAction(_ tabBarViewItem: TabBarViewItem) {
         guard let indexPath = collectionView.indexPath(for: tabBarViewItem),
               let tabViewModel = tabCollectionViewModel.tabViewModel(at: indexPath.item),
@@ -800,48 +818,18 @@ extension TabBarViewController: TabBarViewItemDelegate {
         }
     }
 
-    func otherTabBarViewItemsState(for tabBarViewItem: TabBarViewItem) -> (hasItemsToTheLeft: Bool, hasItemsToTheRight: Bool) {
+    func tabBarViewItemCloseBurnerTabs(_ tabBarViewItem: TabBarViewItem) {
+        tabCollectionViewModel.removeBurnerTabs()
+    }
+
+    func otherTabBarViewItemsState(for tabBarViewItem: TabBarViewItem) -> OtherTabBarViewItemsState {
         guard let indexPath = collectionView.indexPath(for: tabBarViewItem) else {
             os_log("TabBarViewController: Failed to get index path of tab bar view item", type: .error)
-            return (false, false)
+            return .init(hasItemsToTheLeft: false, hasItemsToTheRight: false, hasBurnerTabs: false)
         }
-        return (hasItemsToTheLeft: indexPath.item > 0, hasItemsToTheRight: indexPath.item + 1 < tabCollectionViewModel.tabCollection.tabs.count)
-    }
-
-}
-
-extension TabBarViewController {
-
-    static let fireAnimation: AnimationView = {
-        let view = AnimationView(name: "01_Fire_really_small")
-        view.forceDisplayUpdate()
-        return view
-    }()
-
-    func playFireAnimation() {
-
-        Self.fireAnimation.contentMode = .scaleToFill
-        Self.fireAnimation.frame = .init(x: 0,
-                                y: 0,
-                                width: view.window?.frame.width ?? 0,
-                                height: view.window?.frame.height ?? 0)
-
-        view.window?.contentView?.addSubview(Self.fireAnimation)
-        Self.fireAnimation.play { _ in
-            Self.fireAnimation.removeFromSuperview()
-        }
-
-        DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
-            self.fireViewModel.fire.burnAll(tabCollectionViewModel: self.tabCollectionViewModel)
-        }
-
-    }
-
-    func warmupFireAnimation() {
-        view.addSubview(Self.fireAnimation)
-        DispatchQueue.main.async {
-            Self.fireAnimation.removeFromSuperview()
-        }
+        return .init(hasItemsToTheLeft: indexPath.item > 0,
+                     hasItemsToTheRight: indexPath.item + 1 < tabCollectionViewModel.tabCollection.tabs.count,
+                     hasBurnerTabs: tabCollectionViewModel.tabCollection.tabs.first(where: { $0.tabStorageType == .burner }) != nil)
     }
 
 }

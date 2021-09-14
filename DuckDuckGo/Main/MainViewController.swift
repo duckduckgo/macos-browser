@@ -32,8 +32,10 @@ final class MainViewController: NSViewController {
     private(set) var navigationBarViewController: NavigationBarViewController!
     private(set) var browserTabViewController: BrowserTabViewController!
     private(set) var findInPageViewController: FindInPageViewController!
+    private(set) var fireViewController: FireViewController!
 
     let tabCollectionViewModel: TabCollectionViewModel
+    let fireViewModel = FireViewModel()
 
     private var selectedTabViewModelCancellable: AnyCancellable?
     private var navigationalCancellables = Set<AnyCancellable>()
@@ -84,7 +86,9 @@ final class MainViewController: NSViewController {
 
     @IBSegueAction
     func createTabBarViewController(coder: NSCoder, sender: Any?, segueIdentifier: String?) -> TabBarViewController? {
-        guard let tabBarViewController = TabBarViewController(coder: coder, tabCollectionViewModel: tabCollectionViewModel) else {
+        guard let tabBarViewController = TabBarViewController(coder: coder,
+                                                              tabCollectionViewModel: tabCollectionViewModel,
+                                                              fireViewModel: fireViewModel) else {
             fatalError("MainViewController: Failed to init TabBarViewController")
         }
 
@@ -119,6 +123,15 @@ final class MainViewController: NSViewController {
         findInPageViewController?.delegate = self
         self.findInPageViewController = findInPageViewController
         return findInPageViewController
+    }
+
+    @IBSegueAction
+    func createFireViewController(coder: NSCoder, sender: Any?, segueIdentifier: String?) -> FireViewController? {
+        let fireViewController = FireViewController(coder: coder,
+                                                    tabCollectionViewModel: tabCollectionViewModel,
+                                                    fireViewModel: fireViewModel)
+        self.fireViewController = fireViewController
+        return fireViewController
     }
 
     private func subscribeToSelectedTabViewModel() {

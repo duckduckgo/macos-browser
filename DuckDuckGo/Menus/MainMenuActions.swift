@@ -46,12 +46,20 @@ extension AppDelegate {
         WindowsManager.openNewWindow()
     }
 
+    @IBAction func newBurnerTab(_ sender: Any?) {
+        WindowsManager.openNewWindow(withBurnerTab: true)
+    }
+
     @IBAction func openLocation(_ sender: Any?) {
         WindowsManager.openNewWindow()
     }
 
     @IBAction func closeAllWindows(_ sender: Any?) {
         WindowsManager.closeWindows()
+    }
+
+    @IBAction func closeAllBurnerTabs(_ sender: Any?) {
+        WindowsManager.closeAllBurnerTabs()
     }
 
     // MARK: - Help
@@ -150,21 +158,8 @@ extension AppDelegate {
         }
     }
 
-    @IBAction func burnButtonAction(_ sender: NSButton) {
-        let response = NSAlert.burnButtonAlert().runModal()
-        if response == NSApplication.ModalResponse.alertFirstButtonReturn {
-            Pixel.fire(.burn())
-
-            let windowController = WindowControllersManager.shared.lastKeyMainWindowController
-            WindowsManager.closeWindows(except: windowController?.window)
-            if let tabBarViewController = windowController?.mainViewController.tabBarViewController {
-                tabBarViewController.playFireAnimation()
-            } else {
-                Fire().burnAll(tabCollectionViewModel: nil) {
-                    WindowsManager.openNewWindow()
-                }
-            }
-        }
+    @IBAction func fireButtonAction(_ sender: NSButton) {
+        FireViewController.fireButtonAction()
     }
 
 }
@@ -181,6 +176,10 @@ extension MainViewController {
 
     @IBAction func newTab(_ sender: Any?) {
         tabCollectionViewModel.appendNewTab(with: .homepage)
+    }
+
+    @IBAction func newBurnerTab(_ sender: Any?) {
+        tabCollectionViewModel.appendNewTab(with: .homepage, tabStorageType: .burner)
     }
 
     @IBAction func openLocation(_ sender: Any?) {
@@ -318,7 +317,7 @@ extension MainViewController {
         } else if NSApplication.shared.isCommandPressed {
             WindowControllersManager.shared.show(url: bookmark.url, newTab: true)
         } else {
-            selectedTabViewModel.tab.content = .url(bookmark.url)
+            selectedTabViewModel.tab.setContent(.url(bookmark.url))
         }
     }
 
@@ -575,9 +574,13 @@ extension AppDelegate: NSMenuItemValidation {
 
     func validateMenuItem(_ menuItem: NSMenuItem) -> Bool {
         switch menuItem.action {
-        // Close all windows
         case #selector(AppDelegate.closeAllWindows(_:)):
             return !WindowControllersManager.shared.mainWindowControllers.isEmpty
+
+        case #selector(AppDelegate.closeAllBurnerTabs(_:)):
+            return !WindowControllersManager.shared.mainWindowControllers.compactMap {
+                $0.mainViewController.tabCollectionViewModel.tabCollection.tabs.contains { $0.tabStorageType == .burner } ? $0 : nil
+            }.isEmpty
 
         default:
             return true

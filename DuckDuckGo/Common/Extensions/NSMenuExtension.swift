@@ -36,6 +36,17 @@ extension NSMenu {
         insertItem(newItem, at: index)
     }
 
+    func insertItemAfterItemWithIdentifier(_ id: String, title: String, target: AnyObject?, selector: Selector) {
+        guard let index = indexOfItem(withIdentifier: id) else { return }
+
+        let newItem = NSMenuItem()
+        newItem.title = title
+        newItem.action = selector
+        newItem.target = target
+
+        insertItem(newItem, at: index + 1)
+    }
+
     func insertSeparatorBeforeItemWithIdentifier(_ id: String) {
         guard let index = indexOfItem(withIdentifier: id) else { return }
         insertItem(.separator(), at: index)
