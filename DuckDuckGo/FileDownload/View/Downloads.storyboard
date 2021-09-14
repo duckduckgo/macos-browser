@@ -12,17 +12,17 @@
             <objects>
                 <viewController storyboardIdentifier="PasswordManagement" id="luO-ux-o3b" customClass="DownloadsViewController" customModule="DuckDuckGo_Privacy_Browser" customModuleProvider="target" sceneMemberID="viewController">
                     <view key="view" id="7fC-jy-ghc">
-                        <rect key="frame" x="0.0" y="0.0" width="366" height="483"/>
+                        <rect key="frame" x="0.0" y="0.0" width="366" height="484"/>
                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                         <subviews>
                             <customView translatesAutoresizingMaskIntoConstraints="NO" id="Bcr-Im-bcg">
-                                <rect key="frame" x="0.0" y="0.0" width="366" height="483"/>
+                                <rect key="frame" x="0.0" y="0.0" width="366" height="484"/>
                                 <subviews>
                                     <box verticalHuggingPriority="750" boxType="separator" translatesAutoresizingMaskIntoConstraints="NO" id="wlm-tA-4J8">
-                                        <rect key="frame" x="0.0" y="437" width="366" height="5"/>
+                                        <rect key="frame" x="1" y="438" width="364" height="5"/>
                                     </box>
                                     <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="h7h-Ho-bYo">
-                                        <rect key="frame" x="18" y="452" width="80" height="19"/>
+                                        <rect key="frame" x="10" y="453" width="80" height="19"/>
                                         <textFieldCell key="cell" lineBreakMode="clipping" title="Downloads" id="RlL-xR-1s1">
                                             <font key="font" textStyle="title3" name=".SFNS-Regular"/>
                                             <color key="textColor" name="labelColor" catalog="System" colorSpace="catalog"/>
@@ -30,10 +30,10 @@
                                         </textFieldCell>
                                     </textField>
                                     <button translatesAutoresizingMaskIntoConstraints="NO" id="aKx-1h-4hp" userLabel="Downloads Button" customClass="MouseOverButton" customModule="DuckDuckGo_Privacy_Browser" customModuleProvider="target">
-                                        <rect key="frame" x="284" y="448" width="28" height="28"/>
+                                        <rect key="frame" x="291" y="447" width="32" height="32"/>
                                         <constraints>
-                                            <constraint firstAttribute="width" constant="28" id="qmK-lZ-dXW"/>
-                                            <constraint firstAttribute="height" constant="28" id="x7g-Vs-qTK"/>
+                                            <constraint firstAttribute="width" constant="32" id="qmK-lZ-dXW"/>
+                                            <constraint firstAttribute="height" constant="32" id="x7g-Vs-qTK"/>
                                         </constraints>
                                         <buttonCell key="cell" type="square" bezelStyle="shadowlessSquare" image="OpenDownloadsFolder" imagePosition="only" alignment="center" imageScaling="proportionallyDown" inset="2" id="zPp-Ue-FE8">
                                             <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
@@ -50,16 +50,19 @@
                                             <userDefinedRuntimeAttribute type="number" keyPath="cornerRadius">
                                                 <real key="value" value="4"/>
                                             </userDefinedRuntimeAttribute>
+                                            <userDefinedRuntimeAttribute type="point" keyPath="contentInset">
+                                                <point key="value" x="2" y="2"/>
+                                            </userDefinedRuntimeAttribute>
                                         </userDefinedRuntimeAttributes>
                                         <connections>
                                             <action selector="openDownloadsFolderAction:" target="luO-ux-o3b" id="8Eo-z4-5r2"/>
                                         </connections>
                                     </button>
                                     <button translatesAutoresizingMaskIntoConstraints="NO" id="cev-k6-wFH" userLabel="Downloads Button" customClass="MouseOverButton" customModule="DuckDuckGo_Privacy_Browser" customModuleProvider="target">
-                                        <rect key="frame" x="320" y="448" width="28" height="28"/>
+                                        <rect key="frame" x="323" y="447" width="32" height="32"/>
                                         <constraints>
-                                            <constraint firstAttribute="width" constant="28" id="3WQ-PO-rHo"/>
-                                            <constraint firstAttribute="height" constant="28" id="mKF-nC-42R"/>
+                                            <constraint firstAttribute="width" constant="32" id="3WQ-PO-rHo"/>
+                                            <constraint firstAttribute="height" constant="32" id="mKF-nC-42R"/>
                                         </constraints>
                                         <buttonCell key="cell" type="square" bezelStyle="shadowlessSquare" image="ClearDownloads" imagePosition="only" alignment="center" imageScaling="proportionallyDown" inset="2" id="rtz-Fb-5yl">
                                             <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
@@ -75,6 +78,9 @@
                                             </userDefinedRuntimeAttribute>
                                             <userDefinedRuntimeAttribute type="number" keyPath="cornerRadius">
                                                 <real key="value" value="4"/>
+                                            </userDefinedRuntimeAttribute>
+                                            <userDefinedRuntimeAttribute type="point" keyPath="contentInset">
+                                                <point key="value" x="2" y="2"/>
                                             </userDefinedRuntimeAttribute>
                                         </userDefinedRuntimeAttributes>
                                         <connections>
@@ -109,8 +115,16 @@
                                                                     <rect key="frame" x="0.0" y="0.0" width="365" height="60"/>
                                                                     <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                                                     <subviews>
+                                                                        <imageView horizontalHuggingPriority="251" verticalHuggingPriority="251" translatesAutoresizingMaskIntoConstraints="NO" id="hpj-1Y-eDv">
+                                                                            <rect key="frame" x="7" y="14" width="32" height="32"/>
+                                                                            <constraints>
+                                                                                <constraint firstAttribute="width" constant="32" id="0po-LV-gLD"/>
+                                                                                <constraint firstAttribute="height" constant="32" id="OH2-MV-vxr"/>
+                                                                            </constraints>
+                                                                            <imageCell key="cell" refusesFirstResponder="YES" alignment="left" imageScaling="proportionallyDown" id="Iz7-Te-xl9"/>
+                                                                        </imageView>
                                                                         <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" horizontalCompressionResistancePriority="250" translatesAutoresizingMaskIntoConstraints="NO" id="w5d-I6-kEZ">
-                                                                            <rect key="frame" x="56" y="32" width="96" height="16"/>
+                                                                            <rect key="frame" x="43" y="32" width="96" height="16"/>
                                                                             <textFieldCell key="cell" lineBreakMode="truncatingMiddle" sendsActionOnEndEditing="YES" title="Table View Cell" id="7cy-zt-Zxl">
                                                                                 <font key="font" usesAppearanceFont="YES"/>
                                                                                 <color key="textColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
@@ -118,91 +132,127 @@
                                                                             </textFieldCell>
                                                                         </textField>
                                                                         <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" horizontalCompressionResistancePriority="250" translatesAutoresizingMaskIntoConstraints="NO" id="ziJ-5p-mOT">
-                                                                            <rect key="frame" x="56" y="13" width="96" height="16"/>
+                                                                            <rect key="frame" x="43" y="13" width="96" height="16"/>
                                                                             <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" title="Table View Cell" id="P5k-0F-CZE">
                                                                                 <font key="font" usesAppearanceFont="YES"/>
                                                                                 <color key="textColor" name="secondaryLabelColor" catalog="System" colorSpace="catalog"/>
                                                                                 <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
                                                                             </textFieldCell>
                                                                         </textField>
-                                                                        <box verticalHuggingPriority="750" boxType="separator" translatesAutoresizingMaskIntoConstraints="NO" id="Fue-CV-Ukm">
-                                                                            <rect key="frame" x="0.0" y="-2" width="365" height="5"/>
-                                                                        </box>
-                                                                        <imageView horizontalHuggingPriority="251" verticalHuggingPriority="251" translatesAutoresizingMaskIntoConstraints="NO" id="hpj-1Y-eDv">
-                                                                            <rect key="frame" x="18" y="14" width="32" height="32"/>
-                                                                            <constraints>
-                                                                                <constraint firstAttribute="width" constant="32" id="0po-LV-gLD"/>
-                                                                                <constraint firstAttribute="height" constant="32" id="OH2-MV-vxr"/>
-                                                                            </constraints>
-                                                                            <imageCell key="cell" refusesFirstResponder="YES" alignment="left" imageScaling="proportionallyDown" id="Iz7-Te-xl9"/>
-                                                                        </imageView>
-                                                                        <customView translatesAutoresizingMaskIntoConstraints="NO" id="BUB-Ea-xr5" customClass="CircularProgressView" customModule="DuckDuckGo_Privacy_Browser" customModuleProvider="target">
-                                                                            <rect key="frame" x="324" y="18" width="27" height="27"/>
-                                                                            <constraints>
-                                                                                <constraint firstAttribute="height" constant="27" id="eYj-jc-HTB"/>
-                                                                                <constraint firstAttribute="width" constant="27" id="vVc-1u-0F0"/>
-                                                                            </constraints>
-                                                                        </customView>
                                                                         <button horizontalHuggingPriority="750" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="CEa-RP-JgA" customClass="MouseOverButton" customModule="DuckDuckGo_Privacy_Browser" customModuleProvider="target">
-                                                                            <rect key="frame" x="328" y="22" width="16" height="16"/>
+                                                                            <rect key="frame" x="329" y="14" width="32" height="32"/>
                                                                             <constraints>
-                                                                                <constraint firstAttribute="width" constant="16" id="AKX-kw-xvN"/>
-                                                                                <constraint firstAttribute="height" constant="16" id="HHP-yL-gQB"/>
+                                                                                <constraint firstAttribute="width" constant="32" id="AKX-kw-xvN"/>
+                                                                                <constraint firstAttribute="height" constant="32" id="HHP-yL-gQB"/>
                                                                             </constraints>
                                                                             <buttonCell key="cell" type="square" bezelStyle="shadowlessSquare" image="CancelDownload" imagePosition="only" alignment="center" imageScaling="proportionallyDown" inset="2" id="kcy-Qa-BSO">
                                                                                 <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
                                                                                 <font key="font" metaFont="system"/>
                                                                             </buttonCell>
+                                                                            <userDefinedRuntimeAttributes>
+                                                                                <userDefinedRuntimeAttribute type="color" keyPath="mouseOverColor">
+                                                                                    <color key="value" name="ButtonMouseOverColor"/>
+                                                                                </userDefinedRuntimeAttribute>
+                                                                                <userDefinedRuntimeAttribute type="color" keyPath="mouseDownColor">
+                                                                                    <color key="value" name="ButtonMouseDownColor"/>
+                                                                                </userDefinedRuntimeAttribute>
+                                                                                <userDefinedRuntimeAttribute type="number" keyPath="cornerRadius">
+                                                                                    <real key="value" value="4"/>
+                                                                                </userDefinedRuntimeAttribute>
+                                                                                <userDefinedRuntimeAttribute type="point" keyPath="contentInset">
+                                                                                    <point key="value" x="2" y="2"/>
+                                                                                </userDefinedRuntimeAttribute>
+                                                                            </userDefinedRuntimeAttributes>
                                                                             <connections>
                                                                                 <action selector="cancelDownloadAction:" target="luO-ux-o3b" id="Cq9-Zq-NDo"/>
                                                                             </connections>
                                                                         </button>
                                                                         <button horizontalHuggingPriority="750" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="Ejd-n2-PCA" customClass="MouseOverButton" customModule="DuckDuckGo_Privacy_Browser" customModuleProvider="target">
-                                                                            <rect key="frame" x="328" y="22" width="16" height="16"/>
+                                                                            <rect key="frame" x="329" y="14" width="32" height="32"/>
                                                                             <constraints>
-                                                                                <constraint firstAttribute="width" constant="16" id="qKm-7W-LEz"/>
-                                                                                <constraint firstAttribute="height" constant="16" id="qsN-ta-Rgl"/>
+                                                                                <constraint firstAttribute="width" constant="32" id="qKm-7W-LEz"/>
+                                                                                <constraint firstAttribute="height" constant="32" id="qsN-ta-Rgl"/>
                                                                             </constraints>
                                                                             <buttonCell key="cell" type="square" bezelStyle="shadowlessSquare" image="RevealDownload" imagePosition="only" alignment="center" imageScaling="proportionallyDown" inset="2" id="8X3-Se-bda">
                                                                                 <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
                                                                                 <font key="font" metaFont="system"/>
                                                                             </buttonCell>
+                                                                            <userDefinedRuntimeAttributes>
+                                                                                <userDefinedRuntimeAttribute type="color" keyPath="mouseOverColor">
+                                                                                    <color key="value" name="ButtonMouseOverColor"/>
+                                                                                </userDefinedRuntimeAttribute>
+                                                                                <userDefinedRuntimeAttribute type="color" keyPath="mouseDownColor">
+                                                                                    <color key="value" name="ButtonMouseDownColor"/>
+                                                                                </userDefinedRuntimeAttribute>
+                                                                                <userDefinedRuntimeAttribute type="point" keyPath="contentInset">
+                                                                                    <point key="value" x="2" y="2"/>
+                                                                                </userDefinedRuntimeAttribute>
+                                                                                <userDefinedRuntimeAttribute type="number" keyPath="cornerRadius">
+                                                                                    <real key="value" value="4"/>
+                                                                                </userDefinedRuntimeAttribute>
+                                                                            </userDefinedRuntimeAttributes>
                                                                             <connections>
                                                                                 <action selector="revealDownloadAction:" target="luO-ux-o3b" id="8i5-el-ZyA"/>
                                                                             </connections>
                                                                         </button>
                                                                         <button horizontalHuggingPriority="750" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="foT-7L-XqL" customClass="MouseOverButton" customModule="DuckDuckGo_Privacy_Browser" customModuleProvider="target">
-                                                                            <rect key="frame" x="328" y="22" width="16" height="16"/>
+                                                                            <rect key="frame" x="329" y="14" width="32" height="32"/>
                                                                             <constraints>
-                                                                                <constraint firstAttribute="height" constant="16" id="ZVA-V5-l0y"/>
-                                                                                <constraint firstAttribute="width" constant="16" id="bXx-M6-jmk"/>
+                                                                                <constraint firstAttribute="height" constant="32" id="ZVA-V5-l0y"/>
+                                                                                <constraint firstAttribute="width" constant="32" id="bXx-M6-jmk"/>
                                                                             </constraints>
                                                                             <buttonCell key="cell" type="square" bezelStyle="shadowlessSquare" image="RestartDownload" imagePosition="only" alignment="center" imageScaling="proportionallyDown" inset="2" id="OH5-JL-AF7">
                                                                                 <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
                                                                                 <font key="font" metaFont="system"/>
                                                                             </buttonCell>
+                                                                            <userDefinedRuntimeAttributes>
+                                                                                <userDefinedRuntimeAttribute type="color" keyPath="mouseOverColor">
+                                                                                    <color key="value" name="ButtonMouseOverColor"/>
+                                                                                </userDefinedRuntimeAttribute>
+                                                                                <userDefinedRuntimeAttribute type="color" keyPath="mouseDownColor">
+                                                                                    <color key="value" name="ButtonMouseDownColor"/>
+                                                                                </userDefinedRuntimeAttribute>
+                                                                                <userDefinedRuntimeAttribute type="number" keyPath="cornerRadius">
+                                                                                    <real key="value" value="4"/>
+                                                                                </userDefinedRuntimeAttribute>
+                                                                                <userDefinedRuntimeAttribute type="point" keyPath="contentInset">
+                                                                                    <point key="value" x="2" y="2"/>
+                                                                                </userDefinedRuntimeAttribute>
+                                                                            </userDefinedRuntimeAttributes>
                                                                             <connections>
                                                                                 <action selector="restartDownloadAction:" target="luO-ux-o3b" id="g4e-M0-Abr"/>
                                                                             </connections>
                                                                         </button>
+                                                                        <customView translatesAutoresizingMaskIntoConstraints="NO" id="BUB-Ea-xr5" customClass="CircularProgressView" customModule="DuckDuckGo_Privacy_Browser" customModuleProvider="target">
+                                                                            <rect key="frame" x="332" y="17" width="27" height="27"/>
+                                                                            <constraints>
+                                                                                <constraint firstAttribute="height" constant="27" id="eYj-jc-HTB"/>
+                                                                                <constraint firstAttribute="width" constant="27" id="vVc-1u-0F0"/>
+                                                                            </constraints>
+                                                                        </customView>
+                                                                        <box verticalHuggingPriority="750" boxType="separator" translatesAutoresizingMaskIntoConstraints="NO" id="Fue-CV-Ukm">
+                                                                            <rect key="frame" x="0.0" y="-2" width="365" height="5"/>
+                                                                        </box>
                                                                     </subviews>
                                                                     <constraints>
                                                                         <constraint firstAttribute="bottom" secondItem="Fue-CV-Ukm" secondAttribute="bottom" id="0h7-2u-nBf"/>
                                                                         <constraint firstItem="ziJ-5p-mOT" firstAttribute="leading" secondItem="w5d-I6-kEZ" secondAttribute="leading" id="0iP-dw-9x9"/>
-                                                                        <constraint firstAttribute="trailing" secondItem="CEa-RP-JgA" secondAttribute="trailing" constant="21" id="1Ev-zW-tFt"/>
+                                                                        <constraint firstAttribute="trailing" secondItem="CEa-RP-JgA" secondAttribute="trailing" constant="4" id="1Ev-zW-tFt"/>
                                                                         <constraint firstItem="Ejd-n2-PCA" firstAttribute="centerX" secondItem="foT-7L-XqL" secondAttribute="centerX" id="5EG-iy-UAq"/>
-                                                                        <constraint firstItem="CEa-RP-JgA" firstAttribute="centerX" secondItem="BUB-Ea-xr5" secondAttribute="centerX" constant="-1" id="AUi-Ig-OGp"/>
+                                                                        <constraint firstItem="CEa-RP-JgA" firstAttribute="centerX" secondItem="BUB-Ea-xr5" secondAttribute="centerX" id="AUi-Ig-OGp"/>
                                                                         <constraint firstItem="w5d-I6-kEZ" firstAttribute="top" secondItem="0Hy-P1-z0d" secondAttribute="top" constant="12" id="EHy-1C-DMS"/>
                                                                         <constraint firstItem="CEa-RP-JgA" firstAttribute="centerY" secondItem="0Hy-P1-z0d" secondAttribute="centerY" id="PT1-2e-9ta"/>
                                                                         <constraint firstItem="Fue-CV-Ukm" firstAttribute="leading" secondItem="0Hy-P1-z0d" secondAttribute="leading" id="QBC-Js-e0p"/>
                                                                         <constraint firstItem="Fue-CV-Ukm" firstAttribute="top" secondItem="ziJ-5p-mOT" secondAttribute="bottom" constant="12" id="QwU-JU-idK"/>
                                                                         <constraint firstItem="hpj-1Y-eDv" firstAttribute="centerY" secondItem="0Hy-P1-z0d" secondAttribute="centerY" id="T7a-0E-ouJ"/>
+                                                                        <constraint firstItem="CEa-RP-JgA" firstAttribute="leading" relation="greaterThanOrEqual" secondItem="w5d-I6-kEZ" secondAttribute="trailing" constant="8" id="U1h-uy-ann"/>
                                                                         <constraint firstItem="Ejd-n2-PCA" firstAttribute="centerY" secondItem="foT-7L-XqL" secondAttribute="centerY" id="ZL1-MJ-Czx"/>
-                                                                        <constraint firstItem="CEa-RP-JgA" firstAttribute="centerY" secondItem="BUB-Ea-xr5" secondAttribute="centerY" constant="1" id="enG-OL-lav"/>
-                                                                        <constraint firstItem="w5d-I6-kEZ" firstAttribute="leading" secondItem="hpj-1Y-eDv" secondAttribute="trailing" constant="8" id="gSS-n9-QXX"/>
+                                                                        <constraint firstItem="CEa-RP-JgA" firstAttribute="centerY" secondItem="BUB-Ea-xr5" secondAttribute="centerY" id="enG-OL-lav"/>
+                                                                        <constraint firstItem="w5d-I6-kEZ" firstAttribute="leading" secondItem="hpj-1Y-eDv" secondAttribute="trailing" constant="6" id="gSS-n9-QXX"/>
                                                                         <constraint firstAttribute="trailing" secondItem="Fue-CV-Ukm" secondAttribute="trailing" id="oZ0-bh-Iaf"/>
+                                                                        <constraint firstItem="CEa-RP-JgA" firstAttribute="leading" relation="greaterThanOrEqual" secondItem="ziJ-5p-mOT" secondAttribute="trailing" constant="8" id="rp5-hJ-Ccg"/>
                                                                         <constraint firstItem="CEa-RP-JgA" firstAttribute="centerX" secondItem="Ejd-n2-PCA" secondAttribute="centerX" id="uRp-Pm-Vkf"/>
-                                                                        <constraint firstItem="hpj-1Y-eDv" firstAttribute="leading" secondItem="0Hy-P1-z0d" secondAttribute="leading" constant="18" id="vnq-0C-72q"/>
+                                                                        <constraint firstItem="hpj-1Y-eDv" firstAttribute="leading" secondItem="0Hy-P1-z0d" secondAttribute="leading" constant="7" id="vnq-0C-72q"/>
                                                                         <constraint firstItem="CEa-RP-JgA" firstAttribute="centerY" secondItem="Ejd-n2-PCA" secondAttribute="centerY" id="xeM-DX-IDw"/>
                                                                     </constraints>
                                                                     <connections>
@@ -299,15 +349,16 @@
                                     <constraint firstAttribute="width" constant="366" id="54p-oX-nFB"/>
                                     <constraint firstAttribute="trailing" secondItem="v01-Bs-7xy" secondAttribute="trailing" id="DfP-ji-bgO"/>
                                     <constraint firstAttribute="bottom" secondItem="v01-Bs-7xy" secondAttribute="bottom" id="Kin-9D-Elb"/>
-                                    <constraint firstItem="h7h-Ho-bYo" firstAttribute="leading" secondItem="Bcr-Im-bcg" secondAttribute="leading" constant="20" id="NbX-pY-e0i"/>
+                                    <constraint firstItem="h7h-Ho-bYo" firstAttribute="leading" secondItem="Bcr-Im-bcg" secondAttribute="leading" constant="12" id="NbX-pY-e0i"/>
                                     <constraint firstItem="wlm-tA-4J8" firstAttribute="centerX" secondItem="Bcr-Im-bcg" secondAttribute="centerX" id="Qpp-H8-AEm"/>
-                                    <constraint firstItem="cev-k6-wFH" firstAttribute="leading" secondItem="aKx-1h-4hp" secondAttribute="trailing" constant="8" id="QvA-Lh-kt7"/>
-                                    <constraint firstAttribute="trailing" secondItem="cev-k6-wFH" secondAttribute="trailing" constant="18" id="TTT-vT-pt8"/>
-                                    <constraint firstItem="wlm-tA-4J8" firstAttribute="width" secondItem="Bcr-Im-bcg" secondAttribute="width" id="VS1-TZ-mGu"/>
+                                    <constraint firstItem="cev-k6-wFH" firstAttribute="leading" secondItem="aKx-1h-4hp" secondAttribute="trailing" id="QvA-Lh-kt7"/>
+                                    <constraint firstAttribute="trailing" secondItem="cev-k6-wFH" secondAttribute="trailing" constant="11" id="TTT-vT-pt8"/>
+                                    <constraint firstItem="wlm-tA-4J8" firstAttribute="width" secondItem="Bcr-Im-bcg" secondAttribute="width" constant="-2" id="VS1-TZ-mGu"/>
+                                    <constraint firstItem="aKx-1h-4hp" firstAttribute="leading" relation="greaterThanOrEqual" secondItem="h7h-Ho-bYo" secondAttribute="trailing" constant="8" id="YCQ-I0-q5P"/>
                                     <constraint firstItem="aKx-1h-4hp" firstAttribute="centerY" secondItem="h7h-Ho-bYo" secondAttribute="centerY" id="fzW-iW-ujL"/>
-                                    <constraint firstItem="v01-Bs-7xy" firstAttribute="top" secondItem="Bcr-Im-bcg" secondAttribute="top" constant="43" id="kby-oc-5mP"/>
+                                    <constraint firstItem="v01-Bs-7xy" firstAttribute="top" secondItem="Bcr-Im-bcg" secondAttribute="top" constant="44" id="kby-oc-5mP"/>
                                     <constraint firstItem="v01-Bs-7xy" firstAttribute="leading" secondItem="Bcr-Im-bcg" secondAttribute="leading" id="lSf-gv-mXN"/>
-                                    <constraint firstItem="wlm-tA-4J8" firstAttribute="top" secondItem="Bcr-Im-bcg" secondAttribute="top" constant="43.5" id="lgq-m3-jvf"/>
+                                    <constraint firstItem="wlm-tA-4J8" firstAttribute="top" secondItem="Bcr-Im-bcg" secondAttribute="top" constant="43" id="lgq-m3-jvf"/>
                                     <constraint firstItem="h7h-Ho-bYo" firstAttribute="top" secondItem="Bcr-Im-bcg" secondAttribute="top" constant="12" id="q8X-iA-ppm"/>
                                     <constraint firstItem="cev-k6-wFH" firstAttribute="centerY" secondItem="aKx-1h-4hp" secondAttribute="centerY" id="wcX-HE-efy"/>
                                 </constraints>

@@ -42,16 +42,20 @@ final class DownloadListCoordinator {
 
     let progress = Progress()
 
-    init(store: DownloadListStoring = DownloadListStore(), downloadManager: FileDownloadManager = .shared) {
+    init(store: DownloadListStoring = DownloadListStore(),
+         downloadManager: FileDownloadManager = .shared,
+         clearItemsOlderThan clearDate: Date = .daysAgo(2)) {
+
         self.store = store
         self.downloadManager = downloadManager
 
-        load()
+        load(clearingItemsOlderThan: clearDate)
         subscribeToDownloadManager()
     }
 
-    private func load() {
-        store.fetch(clearingItemsOlderThan: Date().addingTimeInterval(-3600 * 48)) { [weak self] result in
+    private func load(clearingItemsOlderThan clearDate: Date) {
+        store.fetch(clearingItemsOlderThan: clearDate) { [weak self] result in
+            // WebKitDownloadTask should be used from the Main Thread (even in callbacks: see a notice below)
             dispatchPrecondition(condition: .onQueue(.main))
 
             guard let self = self else { return }
@@ -123,8 +127,9 @@ final class DownloadListCoordinator {
     }
 
     private func subscribeToProgress(of task: WebKitDownloadTask) {
-        var lastKnownProgress = (total: Int64(0), completed: Int64(0))
+        dispatchPrecondition(condition: .onQueue(.main))
 
+        var lastKnownProgress = (total: Int64(0), completed: Int64(0))
         task.progress.publisher(for: \.totalUnitCount)
             .combineLatest(task.progress.publisher(for: \.completedUnitCount))
             .throttle(for: 0.2, scheduler: DispatchQueue.main, latest: true)
@@ -176,17 +181,18 @@ final class DownloadListCoordinator {
         case (.none, .some(let item)):
             self.updatesSubject.send((.added, item))
             store.save(item)
-        case (.some(let item), .none):
-            self.updatesSubject.send((.removed, item))
-            store.remove(item)
         case (.some, .some(let item)):
             self.updatesSubject.send((.updated, item))
             store.save(item)
+        case (.some(let item), .none):
+            self.updatesSubject.send((.removed, item))
+            store.remove(item)
         }
     }
 
     private func downloadRestartedCallback(for item: DownloadListItem, webView: WKWebView) -> (WebKitDownload) -> Void {
         return { download in
+            // Important: WebKitDownloadTask (as well as WKWebView) should be deallocated on the Main Thread
             dispatchPrecondition(condition: .onQueue(.main))
             withExtendedLifetime(webView) {
                 let location: FileDownloadManager.DownloadLocationPreference
@@ -203,6 +209,10 @@ final class DownloadListCoordinator {
     }
 
     // MARK: interface
+
+    var hasDownloads: Bool {
+        !items.isEmpty
+    }
 
     var hasActiveDownloads: Bool {
         !downloadTaskCancellables.isEmpty
@@ -305,7 +315,7 @@ extension DownloadListCoordinator: FileDownloadManagerDelegate {
 
 }
 
-extension DownloadListItem {
+private extension DownloadListItem {
 
     init(task: WebKitDownloadTask) {
         let now = Date()

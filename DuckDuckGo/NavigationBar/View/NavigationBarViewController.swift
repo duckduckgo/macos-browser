@@ -32,12 +32,12 @@ final class NavigationBarViewController: NSViewController {
     @IBOutlet weak var bookmarkListButton: NSButton!
     @IBOutlet weak var shareButton: NSButton!
     @IBOutlet weak var passwordManagementButton: NSButton!
-    @IBOutlet weak var downloadsButton: NSButton!
+    @IBOutlet weak var downloadsButton: MouseOverButton!
 
     lazy var downloadsProgressView: CircularProgressView = {
         let bounds = downloadsButton.bounds
         let width: CGFloat = 27.0
-        let frame = NSRect(x: (bounds.width - width) * 0.5 + 1, y: (bounds.height - width) * 0.5 - 1, width: width, height: width)
+        let frame = NSRect(x: (bounds.width - width) * 0.5, y: (bounds.height - width) * 0.5, width: width, height: width)
         let progressView = CircularProgressView(frame: frame)
         downloadsButton.addSubview(progressView)
         return progressView
@@ -105,7 +105,6 @@ final class NavigationBarViewController: NSViewController {
     }
 
     override func viewWillAppear() {
-        downloadsButton.isHidden = true
         updateDownloadsButton()
     }
 
@@ -190,7 +189,6 @@ final class NavigationBarViewController: NSViewController {
 
     @IBAction func downloadsButtonAction(_ sender: NSButton) {
         toggleDownloadsPopover()
-        updateDownloadsButton()
     }
 
     @IBAction func shareButtonAction(_ sender: NSButton) {
@@ -289,7 +287,6 @@ final class NavigationBarViewController: NSViewController {
             .throttle(for: 0.2, scheduler: DispatchQueue.main, latest: true)
             .map { _ in
                 let progress = DownloadListCoordinator.shared.progress
-                print("overall progress", progress.fractionCompleted)
                 return progress.fractionCompleted == 1.0 || progress.totalUnitCount == 0 ? nil : progress.fractionCompleted
             }
             .weakAssign(to: \.progress, on: downloadsProgressView)
@@ -323,21 +320,13 @@ final class NavigationBarViewController: NSViewController {
         passwordManagementButton.isHidden = hide && !saveCredentialsPopover.isShown && !passwordManagementPopover.isShown
     }
 
-    private func updateDownloadsButton(popoverDidClose: Bool = false) {
+    private func updateDownloadsButton() {
+        let hasDownloads = DownloadListCoordinator.shared.hasDownloads
         let hasActiveDownloads = DownloadListCoordinator.shared.hasActiveDownloads
 
         downloadsButton.image = hasActiveDownloads ? Self.activeDownloadsImage : Self.inactiveDownloadsImage
-
-        if downloadsPopover.isShown {
-            downloadsButton.isHidden = false
-            return
-        }
-
-        if downloadsButton.isHidden && hasActiveDownloads && !popoverDidClose {
-            downloadsButton.isHidden = false
-        } else if !hasActiveDownloads && popoverDidClose {
-            downloadsButton.isHidden = true
-        }
+        downloadsButton.isHidden = !(hasDownloads || downloadsPopover.isShown)
+        downloadsButton.isMouseDown = downloadsPopover.isShown
     }
 
     private func subscribeToCredentialsToSave() {
@@ -448,7 +437,7 @@ extension NavigationBarViewController: NSPopoverDelegate {
 
     func popoverDidClose(_ notification: Notification) {
         if notification.object as AnyObject? === downloadsPopover {
-            updateDownloadsButton(popoverDidClose: true)
+            updateDownloadsButton()
         }
     }
 

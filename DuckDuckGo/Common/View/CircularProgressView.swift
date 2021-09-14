@@ -267,7 +267,7 @@ private extension CAShapeLayer {
     func configureCircle(radius: CGFloat, lineWidth: CGFloat) {
         self.bounds = CGRect(x: 0, y: 0, width: (radius + lineWidth) * 2, height: (radius + lineWidth) * 2)
 
-        let rect = NSRect(x: lineWidth * 0.5, y: lineWidth * 0.5, width: radius * 2, height: radius * 2)
+        let rect = NSRect(x: lineWidth, y: lineWidth, width: radius * 2, height: radius * 2)
         self.path = NSBezierPath(roundedRect: rect, xRadius: radius, yRadius: radius).cgPath
 
         self.lineWidth = lineWidth

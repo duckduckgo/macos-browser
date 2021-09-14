@@ -37,10 +37,10 @@ final class BurnButton: MouseOverButton {
     private func updateColors() {
         if isBurning {
             contentTintColor = Constants.burningColor
-            layer?.backgroundColor = Constants.burningBackgroundColor?.cgColor
+            backgroundLayer.backgroundColor = Constants.burningBackgroundColor?.cgColor
         } else {
             contentTintColor = Constants.color
-            layer?.backgroundColor = Constants.backgroundColor.cgColor
+            backgroundLayer.backgroundColor = Constants.backgroundColor.cgColor
         }
     }
 
