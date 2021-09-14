@@ -1,5 +1,5 @@
 //
-//  PasswordManagementItemModel.swift
+//  PasswordManagementLoginModel.swift
 //
 //  Copyright © 2021 DuckDuckGo. All rights reserved.
 //
@@ -19,7 +19,21 @@
 import Combine
 import BrowserServicesKit
 
-final class PasswordManagementItemModel: ObservableObject {
+protocol PasswordManagementItemModel: AnyObject {
+
+    func createNew()
+    func cancel()
+    func save()
+    func resetSecureVaultModel()
+    func setSecureVaultModel<Model>(_ modelObject: Model)
+
+    var isEditingPublisher: Published<Bool>.Publisher { get }
+
+}
+
+final class PasswordManagementLoginModel: ObservableObject, PasswordManagementItemModel {
+
+    typealias Model = SecureVaultModels.WebsiteCredentials
 
     static let dateFormatter: DateFormatter = {
         let dateFormatter = DateFormatter()
@@ -31,6 +45,22 @@ final class PasswordManagementItemModel: ObservableObject {
     var onDirtyChanged: (Bool) -> Void
     var onSaveRequested: (SecureVaultModels.WebsiteCredentials) -> Void
     var onDeleteRequested: (SecureVaultModels.WebsiteCredentials) -> Void
+
+    func setSecureVaultModel<Model>(_ modelObject: Model) {
+        guard let modelObject = modelObject as? SecureVaultModels.WebsiteCredentials else {
+            return
+        }
+
+        credentials = modelObject
+    }
+
+    func resetSecureVaultModel() {
+        credentials = nil
+    }
+
+    var isEditingPublisher: Published<Bool>.Publisher {
+        return $isEditing
+    }
 
     var credentials: SecureVaultModels.WebsiteCredentials? {
         didSet {

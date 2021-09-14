@@ -61,7 +61,7 @@ final class PasswordManagementViewController: NSViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         createListView()
-        createItemView()
+        createLoginItemView()
         subscribeToEditingState()
     }
 
@@ -69,7 +69,7 @@ final class PasswordManagementViewController: NSViewController {
         super.viewDidAppear()
 
         if !isDirty {
-            itemModel?.credentials = nil
+            itemModel?.resetSecureVaultModel()
         }
 
         refetchWithText(isDirty ? "" : domain ?? "", clearWhenNoMatches: true)
@@ -83,7 +83,7 @@ final class PasswordManagementViewController: NSViewController {
     }
 
     private func subscribeToEditingState() {
-        editingCancellable = itemModel?.$isEditing.sink(receiveValue: { [weak self] isEditing in
+        editingCancellable = itemModel?.isEditingPublisher.sink(receiveValue: { [weak self] isEditing in
             self?.divider.isHidden = isEditing
         })
     }
@@ -113,11 +113,11 @@ final class PasswordManagementViewController: NSViewController {
         self.listModel?.accounts = []
         self.listModel?.filter = ""
         self.listModel?.clearSelection()
-        self.itemModel?.credentials = nil
+        self.itemModel?.resetSecureVaultModel()
     }
 
     private func syncModelsOnCredentials(_ credentials: SecureVaultModels.WebsiteCredentials, select: Bool = false) {
-        self.itemModel?.credentials = credentials
+        self.itemModel?.setSecureVaultModel(credentials)
         self.listModel?.updateAccount(PasswordManagementItem.account(credentials.account))
 
         if select {
@@ -125,8 +125,8 @@ final class PasswordManagementViewController: NSViewController {
         }
     }
 
-    private func createItemView() {
-        let itemModel = PasswordManagementItemModel(onDirtyChanged: { [weak self] isDirty in
+    private func createLoginItemView() {
+        let itemModel = PasswordManagementLoginModel(onDirtyChanged: { [weak self] isDirty in
             self?.isDirty = isDirty
             self?.postChange()
         }, onSaveRequested: { [weak self] credentials in
@@ -134,9 +134,10 @@ final class PasswordManagementViewController: NSViewController {
         }, onDeleteRequested: { [weak self] in
             self?.promptToDelete($0)
         })
+
         self.itemModel = itemModel
 
-        let view = NSHostingView(rootView: PasswordManagementItemView().environmentObject(itemModel))
+        let view = NSHostingView(rootView: PasswordManagementLoginItemView().environmentObject(itemModel))
         view.frame = itemContainer.bounds
         view.wantsLayer = true
         view.layer?.masksToBounds = false
@@ -181,7 +182,7 @@ final class PasswordManagementViewController: NSViewController {
             switch response {
             case .alertFirstButtonReturn:
                 try? self.secureVault?.deleteWebsiteCredentialsFor(accountId: id)
-                self.itemModel?.credentials = nil
+                self.itemModel?.resetSecureVaultModel()
                 self.refetchWithText(self.searchField.stringValue)
                 self.postChange()
 

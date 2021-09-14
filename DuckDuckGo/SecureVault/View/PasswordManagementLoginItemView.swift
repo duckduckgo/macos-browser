@@ -1,5 +1,5 @@
 //
-//  PasswordManagementItemView.swift
+//  PasswordManagementLoginItemView.swift
 //
 //  Copyright © 2021 DuckDuckGo. All rights reserved.
 //
@@ -24,9 +24,9 @@ import BrowserServicesKit
 private let interItemSpacing: CGFloat = 23
 private let itemSpacing: CGFloat = 13
 
-struct PasswordManagementItemView: View {
+struct PasswordManagementLoginItemView: View {
 
-    @EnvironmentObject var model: PasswordManagementItemModel
+    @EnvironmentObject var model: PasswordManagementLoginModel
 
     var body: some View {
 
@@ -84,9 +84,11 @@ struct PasswordManagementItemView: View {
 
 }
 
+// MARK: - Generic Views
+
 private struct Buttons: View {
 
-    @EnvironmentObject var model: PasswordManagementItemModel
+    @EnvironmentObject var model: PasswordManagementLoginModel
 
     var body: some View {
         HStack {
@@ -129,9 +131,11 @@ private struct Buttons: View {
 
 }
 
+// MARK: - Login Views
+
 private struct LoginTitleView: View {
 
-    @EnvironmentObject var model: PasswordManagementItemModel
+    @EnvironmentObject var model: PasswordManagementLoginModel
 
     var body: some View {
 
@@ -149,7 +153,7 @@ private struct LoginTitleView: View {
 
 private struct UsernameView: View {
 
-    @EnvironmentObject var model: PasswordManagementItemModel
+    @EnvironmentObject var model: PasswordManagementLoginModel
 
     @State var isHovering = false
 
@@ -194,7 +198,7 @@ private struct UsernameView: View {
 
 private struct PasswordView: View {
 
-    @EnvironmentObject var model: PasswordManagementItemModel
+    @EnvironmentObject var model: PasswordManagementLoginModel
 
     @State var isHovering = false
     @State var isPasswordVisible = false
@@ -275,7 +279,7 @@ private struct PasswordView: View {
 
 private struct WebsiteView: View {
 
-    @EnvironmentObject var model: PasswordManagementItemModel
+    @EnvironmentObject var model: PasswordManagementLoginModel
 
     var body: some View {
 
@@ -302,7 +306,7 @@ private struct WebsiteView: View {
 
 private struct DatesView: View {
 
-    @EnvironmentObject var model: PasswordManagementItemModel
+    @EnvironmentObject var model: PasswordManagementLoginModel
 
     var body: some View {
         VStack(alignment: .leading, spacing: 4) {
@@ -332,7 +336,7 @@ private struct DatesView: View {
 
 private struct HeaderView: View {
 
-    @EnvironmentObject var model: PasswordManagementItemModel
+    @EnvironmentObject var model: PasswordManagementLoginModel
 
     var body: some View {
 

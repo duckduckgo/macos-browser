@@ -27,7 +27,7 @@ final class PasswordManagementItemModelTests: XCTestCase {
     var deletedCredentials: SecureVaultModels.WebsiteCredentials?
 
     func testWhenCredentialsAreSavedThenSaveIsRequested() {
-        let model = PasswordManagementItemModel(onDirtyChanged: onDirtyChanged,
+        let model = PasswordManagementLoginModel(onDirtyChanged: onDirtyChanged,
                                                 onSaveRequested: onSaveRequested,
                                                 onDeleteRequested: onDeleteRequested)
 
@@ -39,7 +39,7 @@ final class PasswordManagementItemModelTests: XCTestCase {
     }
 
     func testWhenCredentialsAreDeletedThenDeleteIsRequested() {
-        let model = PasswordManagementItemModel(onDirtyChanged: onDirtyChanged,
+        let model = PasswordManagementLoginModel(onDirtyChanged: onDirtyChanged,
                                                 onSaveRequested: onSaveRequested,
                                                 onDeleteRequested: onDeleteRequested)
 
@@ -51,7 +51,7 @@ final class PasswordManagementItemModelTests: XCTestCase {
     }
 
     func testWhenCredentialsHasNoIdThenModelStateIsNew() {
-        let model = PasswordManagementItemModel(onDirtyChanged: onDirtyChanged,
+        let model = PasswordManagementLoginModel(onDirtyChanged: onDirtyChanged,
                                                 onSaveRequested: onSaveRequested,
                                                 onDeleteRequested: onDeleteRequested)
 
@@ -65,7 +65,7 @@ final class PasswordManagementItemModelTests: XCTestCase {
     }
 
     func testWhenModelIsEditedThenStateIsUpdated() {
-        let model = PasswordManagementItemModel(onDirtyChanged: onDirtyChanged,
+        let model = PasswordManagementLoginModel(onDirtyChanged: onDirtyChanged,
                                                 onSaveRequested: onSaveRequested,
                                                 onDeleteRequested: onDeleteRequested)
 
