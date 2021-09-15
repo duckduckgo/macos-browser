@@ -75,7 +75,7 @@ final class FileDownloadManagerTests: XCTestCase {
         dm.add(download, delegate: nil, location: .auto, postflight: .none)
 
         struct TestError: Error {}
-        download.downloadDelegate?.download?(download, didFailWithError: TestError(), resumeData: nil)
+        download.downloadDelegate?.download(download, didFailWithError: TestError(), resumeData: nil)
 
         withExtendedLifetime(cancellable) {
             waitForExpectations(timeout: 0.3)
@@ -92,7 +92,7 @@ final class FileDownloadManagerTests: XCTestCase {
         let download = WKDownloadMock()
         dm.add(download, delegate: nil, location: .auto, postflight: .none)
 
-        download.downloadDelegate?.downloadDidFinish?(download)
+        download.downloadDelegate?.downloadDidFinish(download)
 
         withExtendedLifetime(cancellable) {
             waitForExpectations(timeout: 0.3)
@@ -274,7 +274,7 @@ final class FileDownloadManagerTests: XCTestCase {
             XCTAssertEqual(dest, url)
         }
 
-        download.downloadDelegate?.downloadDidFinish?(download)
+        download.downloadDelegate?.downloadDidFinish(download)
 
         withExtendedLifetime(cancellable) {
             waitForExpectations(timeout: 0.3)

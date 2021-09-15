@@ -53,7 +53,7 @@ extension WKDownload: WebKitDownload {
     func asNSObject() -> NSObject {
         self as NSObject
     }
-    
+
 }
 
 // Used for forwarding WKDownloadDelegate methods with WKDownload sender to WebKitDownloadDelegate methods

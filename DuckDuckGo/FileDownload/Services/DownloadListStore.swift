@@ -186,9 +186,11 @@ final class DownloadListStore: DownloadListStoring {
     }
 
     func sync() {
-        context?.performAndWait { [context] in
-            try? context?.save()
+        let condition = RunLoop.ResumeCondition()
+        context?.perform {
+            condition.resolve()
         }
+        RunLoop.current.run(until: condition)
     }
 
 }
@@ -227,7 +229,7 @@ extension DownloadManagedObject {
         }
 
         assert(identifier == item.identifier)
-        assert(identifier == item.identifier)
+        assert(added == item.added)
 
         urlEncrypted = item.url as NSURL
         websiteURLEncrypted = item.websiteURL as NSURL?
