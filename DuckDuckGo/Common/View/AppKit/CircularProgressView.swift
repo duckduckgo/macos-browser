@@ -107,12 +107,19 @@ final class CircularProgressView: NSView {
         static let stopRotation = "transform"
     }
 
+    override func viewWillMove(toWindow newWindow: NSWindow?) {
+        progress = nil
+    }
+
     private func updateProgress() {
         let isBackgroundAnimating = backgroundLayer.animation(forKey: AnimationKeys.strokeStart) != nil
             || backgroundLayer.animation(forKey: AnimationKeys.strokeEnd) != nil
         let isProgressShown = (backgroundLayer.strokeStart == 0.0 && backgroundLayer.strokeEnd != 0.0)
 
         guard self.window != nil else {
+            backgroundLayer.removeAllAnimations()
+            progressLayer.removeAllAnimations()
+
             backgroundLayer.strokeEnd = 1.0
             backgroundLayer.strokeStart = (progress == nil) ? 1.0 : 0.0
 
@@ -206,7 +213,7 @@ final class CircularProgressView: NSView {
             context.timingFunction = CAMediaTimingFunction(name: .linear)
 
             let animation = CABasicAnimation(keyPath: "strokeStart")
-            let currentStrokeStart = (progressLayer.presentation() ?? progressLayer).value(forKey: "strokeStart") as? CGFloat ?? 0
+            let currentStrokeStart = progressLayer.strokeStart
             self.progressLayer.removeAnimation(forKey: AnimationKeys.strokeStart)
             let newStrokeStart = 1.0 - (progress >= 0.0
                                             ? CGFloat(progress)

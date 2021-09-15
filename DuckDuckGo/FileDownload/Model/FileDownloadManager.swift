@@ -209,7 +209,7 @@ private extension FileDownloadManager.DownloadLocationPreference {
     }
 
     var tempURL: URL? {
-        guard case .preset(destinationURL: let url, tempURL: _) = self else { return nil }
+        guard case .preset(destinationURL: _, tempURL: let url) = self else { return nil }
         return url
     }
 

@@ -186,7 +186,9 @@ final class DownloadListStore: DownloadListStoring {
     }
 
     func sync() {
-        context?.performAndWait {}
+        context?.performAndWait { [context] in
+            try? context?.save()
+        }
     }
 
 }

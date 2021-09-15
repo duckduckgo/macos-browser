@@ -217,6 +217,10 @@ final class NavigationBarViewController: NSViewController {
             passwordManagementPopover.close()
         }
 
+        if downloadsPopover.isShown {
+            downloadsPopover.close()
+        }
+
         return true
     }
 
@@ -239,6 +243,7 @@ final class NavigationBarViewController: NSViewController {
             downloadsPopover.close()
             return
         }
+        guard closeTransientPopovers() else { return }
 
         downloadsButton.isHidden = false
         downloadsPopover.show(relativeTo: downloadsButton.bounds.insetFromLineOfDeath(), of: downloadsButton, preferredEdge: .maxY)
