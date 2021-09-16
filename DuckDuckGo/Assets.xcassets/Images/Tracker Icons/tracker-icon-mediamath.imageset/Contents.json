@@ -1,0 +1,12 @@
+{
+  "images" : [
+    {
+      "filename" : "tracker-icon-mediamath.svg",
+      "idiom" : "universal"
+    }
+  ],
+  "info" : {
+    "author" : "xcode",
+    "version" : 1
+  }
+}

@@ -45,6 +45,9 @@ final class TabViewModel {
                 loadingStartTime = CACurrentMediaTime()
             }
         }
+        didSet {
+            scheduleTrackerAnimationIfNeeded()
+        }
     }
     @Published var progress: Double = 0.0
     @Published var isErrorViewVisible: Bool = false {
@@ -78,6 +81,7 @@ final class TabViewModel {
         subscribeToFavicon()
         subscribeToTabError()
         subscribeToPermissions()
+        subscribeToTrackerInfo()
     }
 
     private func subscribeToUrl() {
@@ -107,6 +111,16 @@ final class TabViewModel {
         tab.permissions.$permissions.weakAssign(to: \.usedPermissions, on: self)
             .store(in: &cancellables)
         tab.permissions.$authorizationQuery.weakAssign(to: \.permissionAuthorizationQuery, on: self)
+            .store(in: &cancellables)
+    }
+
+    private func subscribeToTrackerInfo() {
+        tab.$trackerInfo
+            .sink { [weak self] trackerInfo in
+                if trackerInfo?.isEmpty ?? false {
+                    self?.scheduleTrackerAnimationAfterLoading = true
+                }
+            }
             .store(in: &cancellables)
     }
 
@@ -193,6 +207,28 @@ final class TabViewModel {
             self.favicon = favicon
         } else {
             favicon = Favicon.defaultFavicon
+        }
+    }
+
+    // MARK: - Privacy icon animation
+
+    let trackersAnimationTriggerPublisher = PassthroughSubject<Void, Never>()
+
+    private var scheduleTrackerAnimationAfterLoading = false
+    private var trackerAnimationTimer: Timer?
+
+    private func scheduleTrackerAnimationIfNeeded() {
+        if scheduleTrackerAnimationAfterLoading && !isLoading && trackerAnimationTimer == nil {
+            scheduleTrackerAnimationAfterLoading = false
+
+            trackerAnimationTimer = Timer.scheduledTimer(withTimeInterval: 2, repeats: false, block: { [weak self] _ in
+                self?.trackerAnimationTimer?.invalidate()
+                self?.trackerAnimationTimer = nil
+
+                if self?.tab.trackerInfo?.trackersBlocked.count ?? 0 > 0 {
+                    self?.trackersAnimationTriggerPublisher.send()
+                }
+            })
         }
     }
 

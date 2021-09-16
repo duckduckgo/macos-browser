@@ -1,0 +1,12 @@
+{
+  "images" : [
+    {
+      "filename" : "tracker-icon-comscore.svg",
+      "idiom" : "universal"
+    }
+  ],
+  "info" : {
+    "author" : "xcode",
+    "version" : 1
+  }
+}

@@ -1,0 +1,12 @@
+{
+  "images" : [
+    {
+      "filename" : "tracker-icon-cloudflare.svg",
+      "idiom" : "universal"
+    }
+  ],
+  "info" : {
+    "author" : "xcode",
+    "version" : 1
+  }
+}

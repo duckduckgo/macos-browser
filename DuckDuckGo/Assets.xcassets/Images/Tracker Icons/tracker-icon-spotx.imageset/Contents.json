@@ -1,0 +1,12 @@
+{
+  "images" : [
+    {
+      "filename" : "tracker-icon-spotx.svg",
+      "idiom" : "universal"
+    }
+  ],
+  "info" : {
+    "author" : "xcode",
+    "version" : 1
+  }
+}
