@@ -83,7 +83,7 @@ final class WebKitDownloadTask: NSObject, ProgressReporting {
          promptForLocation: Bool,
          destinationURL: URL?,
          tempURL: URL?,
-         postflight: FileDownloadManager.PostflightAction?) {
+         postflight: FileDownloadManager.PostflightAction? = .none) {
 
         self.download = download
         self.progress = Progress(totalUnitCount: -1)

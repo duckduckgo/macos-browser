@@ -20,6 +20,7 @@ import Foundation
 import XCTest
 @testable import DuckDuckGo_Privacy_Browser
 
+@available(macOS 11.3, *)
 final class FileDownloadManagerTests: XCTestCase {
 
     private let testGroupName = "test"
@@ -310,6 +311,7 @@ final class FileDownloadManagerTests: XCTestCase {
 
 }
 
+@available(macOS 11.3, *)
 extension FileDownloadManagerTests: FileDownloadManagerDelegate {
     func chooseDestination(suggestedFilename: String?, directoryURL: URL?, fileTypes: [UTType], callback: @escaping (URL?, UTType?) -> Void) {
         self.chooseDestination?(suggestedFilename, directoryURL, fileTypes, callback)

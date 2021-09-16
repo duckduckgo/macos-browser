@@ -31,24 +31,28 @@ struct DownloadListItem: Equatable {
 
     var fileType: UTType? {
         didSet {
+            guard fileType != oldValue else { return }
             modified = Date()
         }
     }
     
     var destinationURL: URL? {
         didSet {
+            guard destinationURL != oldValue else { return }
             modified = Date()
         }
     }
 
     var tempURL: URL? {
         didSet {
+            guard tempURL != oldValue else { return }
             modified = Date()
         }
     }
 
     var error: FileDownloadError? {
         didSet {
+            guard error != oldValue else { return }
             modified = Date()
         }
     }

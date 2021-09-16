@@ -20,7 +20,20 @@ import Cocoa
 import Combine
 import os
 
-final class FileDownloadManager {
+protocol FileDownloadManagerProtocol: AnyObject {
+    var downloads: Set<WebKitDownloadTask> { get }
+    var downloadsPublisher: AnyPublisher<WebKitDownloadTask, Never> { get }
+
+    @discardableResult
+    func add(_ download: WebKitDownload,
+             delegate: FileDownloadManagerDelegate?,
+             location: FileDownloadManager.DownloadLocationPreference,
+             postflight: FileDownloadManager.PostflightAction?) -> WebKitDownloadTask
+
+    func cancelAll(waitUntilDone: Bool)
+}
+
+final class FileDownloadManager: FileDownloadManagerProtocol {
 
     static let shared = FileDownloadManager()
     private let workspace: NSWorkspace
@@ -55,10 +68,27 @@ final class FileDownloadManager {
         case open
     }
 
-    enum DownloadLocationPreference {
+    enum DownloadLocationPreference: Equatable {
         case auto
         case prompt
         case preset(destinationURL: URL, tempURL: URL?)
+
+        var destinationURL: URL? {
+            guard case .preset(destinationURL: let url, tempURL: _) = self else { return nil }
+            return url
+        }
+
+        var tempURL: URL? {
+            guard case .preset(destinationURL: _, tempURL: let url) = self else { return nil }
+            return url
+        }
+
+        var promptForLocation: Bool {
+            switch self {
+            case .prompt: return true
+            case .preset, .auto: return false
+            }
+        }
     }
 
     @discardableResult
@@ -198,26 +228,5 @@ protocol FileDownloadManagerDelegate: AnyObject {
 
     func chooseDestination(suggestedFilename: String?, directoryURL: URL?, fileTypes: [UTType], callback: @escaping (URL?, UTType?) -> Void)
     func fileIconFlyAnimationOriginalRect(for downloadTask: WebKitDownloadTask) -> NSRect?
-
-}
-
-private extension FileDownloadManager.DownloadLocationPreference {
-
-    var destinationURL: URL? {
-        guard case .preset(destinationURL: let url, tempURL: _) = self else { return nil }
-        return url
-    }
-
-    var tempURL: URL? {
-        guard case .preset(destinationURL: _, tempURL: let url) = self else { return nil }
-        return url
-    }
-
-    var promptForLocation: Bool {
-        switch self {
-        case .prompt: return true
-        case .preset, .auto: return false
-        }
-    }
 
 }

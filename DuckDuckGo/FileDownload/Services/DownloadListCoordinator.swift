@@ -20,11 +20,25 @@ import Foundation
 import Combine
 import os.log
 
+private func getFirstAvailableWebView() -> WKWebView? {
+    let wcm = WindowControllersManager.shared
+    if wcm.lastKeyMainWindowController?.mainViewController.browserTabViewController == nil {
+        WindowsManager.openNewWindow()
+    }
+
+    guard let tab = wcm.lastKeyMainWindowController?.mainViewController.browserTabViewController.tabViewModel?.tab else {
+        assertionFailure("Expected to have an open window")
+        return nil
+    }
+    return tab.webView
+}
+
 final class DownloadListCoordinator {
     static let shared = DownloadListCoordinator()
 
     private let store: DownloadListStoring
-    private let downloadManager: FileDownloadManager
+    private let downloadManager: FileDownloadManagerProtocol
+    private let webViewProvider: () -> WKWebView?
 
     private var items = [UUID: DownloadListItem]()
 
@@ -43,11 +57,13 @@ final class DownloadListCoordinator {
     let progress = Progress()
 
     init(store: DownloadListStoring = DownloadListStore(),
-         downloadManager: FileDownloadManager = .shared,
-         clearItemsOlderThan clearDate: Date = .daysAgo(2)) {
+         downloadManager: FileDownloadManagerProtocol = FileDownloadManager.shared,
+         clearItemsOlderThan clearDate: Date = .daysAgo(2),
+         webViewProvider: @escaping () -> WKWebView? = getFirstAvailableWebView) {
 
         self.store = store
         self.downloadManager = downloadManager
+        self.webViewProvider = webViewProvider
 
         load(clearingItemsOlderThan: clearDate)
         subscribeToDownloadManager()
@@ -233,14 +249,7 @@ final class DownloadListCoordinator {
     func restart(downloadWithIdentifier identifier: UUID) {
         dispatchPrecondition(condition: .onQueue(.main))
 
-        guard let item = items[identifier],
-              let webView = WindowControllersManager.shared.lastKeyMainWindowController?.mainViewController
-                .browserTabViewController.tabViewModel?.tab.webView
-        else {
-            assertionFailure("Restarting download without open windows is not supported or download does not exist")
-            return
-        }
-
+        guard let item = items[identifier], let webView = self.webViewProvider() else { return }
         do {
             guard let resumeData = item.error?.resumeData,
                   let tempURL = item.tempURL,
@@ -298,11 +307,8 @@ extension DownloadListCoordinator: FileDownloadManagerDelegate {
 
     func chooseDestination(suggestedFilename: String?, directoryURL: URL?, fileTypes: [UTType], callback: @escaping (URL?, UTType?) -> Void) {
         // if download canceled/failed before the choice was made show a Save Panel
-        if WindowControllersManager.shared.lastKeyMainWindowController?.mainViewController.browserTabViewController == nil {
-            WindowsManager.openNewWindow()
-        }
-        guard let delegate = WindowControllersManager.shared.lastKeyMainWindowController?.mainViewController.browserTabViewController else {
-            assertionFailure("Expected to have an open window")
+        guard let delegate = webViewProvider()?.uiDelegate as? FileDownloadManagerDelegate else {
+            assertionFailure("Could not get FileDownloadManagerDelegate")
             callback(nil, nil)
             return
         }

@@ -1,5 +1,5 @@
 //
-//  WKDownloadMock.swift
+//  DownloadsWebViewMock.m
 //
 //  Copyright © 2021 DuckDuckGo. All rights reserved.
 //
@@ -16,21 +16,18 @@
 //  limitations under the License.
 //
 
-import Foundation
-@testable import DuckDuckGo_Privacy_Browser
+#import "DownloadsWebViewMock.h"
 
-final class WKDownloadMock: NSObject, WebKitDownload, ProgressReporting {
-    var originalRequest: URLRequest?
-    var webView: WKWebView?
-    var progress = Progress()
-    weak var downloadDelegate: WebKitDownloadDelegate?
+@implementation DownloadsWebViewMock
 
-    var cancelBlock: (() -> Void)?
-    func cancel() {
-        cancelBlock?()
-    }
-
-    func asNSObject() -> NSObject {
-        self
-    }
+- (void)startDownloadUsingRequest:(NSURLRequest *)request completionHandler:(void (^)(WKDownload * _Nonnull))completionHandler {
+    id download = self.startDownloadBlock(request);
+    completionHandler(download);
 }
+
+- (void)resumeDownloadFromResumeData:(NSData *)resumeData completionHandler:(void (^)(WKDownload * _Nonnull))completionHandler {
+    id download = self.resumeDownloadBlock(resumeData);
+    completionHandler(download);
+}
+
+@end
