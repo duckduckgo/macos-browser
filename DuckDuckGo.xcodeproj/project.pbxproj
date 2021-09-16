@@ -292,7 +292,7 @@
 		AA75A0AA26F34DFC0086B667 /* trackers.json in Resources */ = {isa = PBXBuildFile; fileRef = AA75A0A726F34DFC0086B667 /* trackers.json */; };
 		AA75A0AB26F34DFC0086B667 /* shield-dot.json in Resources */ = {isa = PBXBuildFile; fileRef = AA75A0A826F34DFC0086B667 /* shield-dot.json */; };
 		AA75A0AC26F34DFC0086B667 /* shield.json in Resources */ = {isa = PBXBuildFile; fileRef = AA75A0A926F34DFC0086B667 /* shield.json */; };
-		AA75A0AE26F3500C0086B667 /* TrackerInfoIconViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA75A0AD26F3500C0086B667 /* TrackerInfoIconViewModel.swift */; };
+		AA75A0AE26F3500C0086B667 /* PrivacyIconViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA75A0AD26F3500C0086B667 /* PrivacyIconViewModel.swift */; };
 		AA80EC54256BE3BC007083E7 /* UserText.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA80EC53256BE3BC007083E7 /* UserText.swift */; };
 		AA80EC67256C4691007083E7 /* BrowserTab.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = AA80EC69256C4691007083E7 /* BrowserTab.storyboard */; };
 		AA80EC6D256C469C007083E7 /* NavigationBar.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = AA80EC6F256C469C007083E7 /* NavigationBar.storyboard */; };
@@ -821,7 +821,7 @@
 		AA75A0A726F34DFC0086B667 /* trackers.json */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.json; path = trackers.json; sourceTree = "<group>"; };
 		AA75A0A826F34DFC0086B667 /* shield-dot.json */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.json; path = "shield-dot.json"; sourceTree = "<group>"; };
 		AA75A0A926F34DFC0086B667 /* shield.json */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.json; path = shield.json; sourceTree = "<group>"; };
-		AA75A0AD26F3500C0086B667 /* TrackerInfoIconViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TrackerInfoIconViewModel.swift; sourceTree = "<group>"; };
+		AA75A0AD26F3500C0086B667 /* PrivacyIconViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PrivacyIconViewModel.swift; sourceTree = "<group>"; };
 		AA7DE8E026A9BD000012B490 /* History 2.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = "History 2.xcdatamodel"; sourceTree = "<group>"; };
 		AA80EC53256BE3BC007083E7 /* UserText.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UserText.swift; sourceTree = "<group>"; };
 		AA80EC68256C4691007083E7 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/BrowserTab.storyboard; sourceTree = "<group>"; };
@@ -2284,7 +2284,7 @@
 			children = (
 				AAA0CC3B25337FAB0079BC96 /* WKBackForwardListItemViewModel.swift */,
 				B689ECD426C247DB006FB0C5 /* BackForwardListItem.swift */,
-				AA75A0AD26F3500C0086B667 /* TrackerInfoIconViewModel.swift */,
+				AA75A0AD26F3500C0086B667 /* PrivacyIconViewModel.swift */,
 			);
 			path = ViewModel;
 			sourceTree = "<group>";
@@ -3348,7 +3348,7 @@
 				AAE7527A263B046100B973F8 /* History.xcdatamodeld in Sources */,
 				AAA8E8C124EACA700055E685 /* MouseOverView.swift in Sources */,
 				B64C853D26944B940048FEBE /* PermissionStore.swift in Sources */,
-				AA75A0AE26F3500C0086B667 /* TrackerInfoIconViewModel.swift in Sources */,
+				AA75A0AE26F3500C0086B667 /* PrivacyIconViewModel.swift in Sources */,
 				B687260426E215C9008EE860 /* ExpirationChecker.swift in Sources */,
 				AAE8B110258A456C00E81239 /* TooltipViewController.swift in Sources */,
 				85AC3B0525D6B1D800C7D2AA /* ScriptSourceProviding.swift in Sources */,

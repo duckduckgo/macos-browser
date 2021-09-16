@@ -1,5 +1,5 @@
 //
-//  TrackerInfoIconViewModel.swift
+//  PrivacyIconViewModel.swift
 //
 //  Copyright © 2021 DuckDuckGo. All rights reserved.
 //
@@ -18,21 +18,9 @@
 
 import Foundation
 
-struct TrackerInfoIconViewModel {
+struct PrivacyIconViewModel {
 
     private static let maxNumberOfIcons = 4
-
-    static func trackerImages(from trackerInfo: TrackerInfo) -> [CGImage] {
-        let sortedEntities = sortedEntities(from: trackerInfo).prefix(maxNumberOfIcons)
-
-        return sortedEntities.map {
-            if let image = trackerImages[$0] {
-                return image
-            } else {
-                return blankImage
-            }
-        }
-    }
 
     static func sortedEntities(from trackerInfo: TrackerInfo) -> [String] {
         struct LightEntity: Hashable {
@@ -63,7 +51,23 @@ struct TrackerInfoIconViewModel {
             .map { $0.lowercasedName }
     }
 
+    static func trackerImages(from trackerInfo: TrackerInfo) -> [CGImage] {
+        let sortedEntities = sortedEntities(from: trackerInfo).prefix(maxNumberOfIcons)
+        var images: [CGImage] = sortedEntities.map {
+            if let image = trackerImages[$0] {
+                return image
+            } else {
+                return blankImage
+            }
+        }
+        if images.count == maxNumberOfIcons {
+            images[maxNumberOfIcons - 1] = lastImage
+        }
+        return images
+    }
+
     static let blankImage = NSImage(named: "tracker-icon-blank")!.cgImage(forProposedRect: nil, context: .current, hints: nil)!
+    static let lastImage = NSImage(named: "tracker-icon-last")!.cgImage(forProposedRect: nil, context: .current, hints: nil)!
 
     static let trackerImages: [String: CGImage] = {
         return [

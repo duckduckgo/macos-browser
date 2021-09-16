@@ -611,7 +611,7 @@ extension AddressBarButtonsViewController: AnimationImageProvider {
             return nil
         }
 
-        let images = TrackerInfoIconViewModel.trackerImages(from: trackerInfo)
+        let images = PrivacyIconViewModel.trackerImages(from: trackerInfo)
         switch asset.name {
         case "img_0.png": return images[safe: 0]
         case "img_1.png": return images[safe: 1]
