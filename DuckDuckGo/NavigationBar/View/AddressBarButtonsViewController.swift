@@ -494,14 +494,14 @@ final class AddressBarButtonsViewController: NSViewController {
         if !shieldAnimationView.isHidden || !shieldDotAnimationView.isHidden {
             trackerAnimationView.reloadImages()
             trackerAnimationView.play { [weak self] _ in
+                self?.updatePrivacyEntryPointButton()
                 self?.updateFireproofedButton()
                 self?.updatePermissionButtons()
-                self?.updatePrivacyEntryPointButton()
             }
 
+            updatePrivacyEntryPointButton()
             updateFireproofedButton()
             updatePermissionButtons()
-            updatePrivacyEntryPointButton()
         }
     }
 
