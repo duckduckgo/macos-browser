@@ -108,10 +108,9 @@ final class Tab: NSObject {
         self.sessionStateData = sessionStateData
 
         let configuration = webViewConfiguration ?? WKWebViewConfiguration()
-        if tabStorageType == .burner {
-            configuration.applyBurnerConfiguration()
-        } else {
-            configuration.applyStandardConfiguration()
+        configuration.applyStandardConfiguration()
+        if webViewConfiguration == nil && tabStorageType == .burner {
+            configuration.websiteDataStore = .nonPersistent()
         }
 
         webView = WebView(frame: CGRect.zero, configuration: configuration)
