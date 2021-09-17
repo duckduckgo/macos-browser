@@ -107,7 +107,7 @@ final class CircularProgressView: NSView {
         static let stopRotation = "transform"
     }
 
-    override func viewWillMove(toWindow newWindow: NSWindow?) {
+    override func prepareForReuse() {
         progress = nil
     }
 

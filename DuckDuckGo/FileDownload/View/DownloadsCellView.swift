@@ -89,8 +89,10 @@ final class DownloadsCellView: NSTableCellView {
             $0.progress?.publisher(for: \.fractionCompleted).map { .some($0) }.eraseToAnyPublisher() ?? Just(.none).eraseToAnyPublisher()
         }
             .switchToLatest()
+            .dropFirst()
             .assign(to: \.progress, on: progressView)
             .store(in: &cancellables)
+        progressView.progress = viewModel.state.progress?.fractionCompleted
     }
 
     private static let fileRemovedTitleAttributes: [NSAttributedString.Key: Any] = [.strikethroughStyle: 1,
@@ -120,6 +122,7 @@ final class DownloadsCellView: NSTableCellView {
         }
 
         self.titleLabel.attributedStringValue = NSAttributedString(string: filename, attributes: attributes)
+        self.titleLabel.toolTip = filename
     }
 
     private var onButtonMouseOverChange: ((Bool) -> Void)?

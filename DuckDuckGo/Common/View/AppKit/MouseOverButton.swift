@@ -92,6 +92,11 @@ internal class MouseOverButton: NSButton {
         addTrackingArea()
     }
 
+    override func viewWillMove(toWindow newWindow: NSWindow?) {
+        isMouseDown = false
+        isMouseOver = false
+    }
+
     override func mouseEntered(with event: NSEvent) {
         super.mouseEntered(with: event)
         isMouseOver = true
