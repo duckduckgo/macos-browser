@@ -337,7 +337,13 @@ final class AddressBarButtonsViewController: NSViewController {
 
     private func setupAnimationViews() {
         func makeAndLayoutAnimationView(name: String, setToLastFrame: Bool = false) -> AnimationView {
-            let animationView = AnimationView(name: name, bundle: Bundle.main, imageProvider: self)
+            let animationView: AnimationView
+            if AppDelegate.isRunningTests {
+                animationView = AnimationView()
+            } else {
+                // For unknown reason, this caused infinite execution of various unit tests.
+                animationView = AnimationView(name: name, bundle: Bundle.main, imageProvider: self)
+            }
             animationWrapperView.addAndLayout(animationView)
             if setToLastFrame { animationView.setToLastFrame() }
             return animationView
