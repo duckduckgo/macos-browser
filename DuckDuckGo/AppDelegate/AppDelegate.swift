@@ -72,6 +72,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         HTTPSUpgrade.shared.loadDataAsync()
         LocalBookmarkManager.shared.loadBookmarks()
         _=ConfigurationManager.shared
+        _=DownloadListCoordinator.shared
 
         if (notification.userInfo?[NSApplication.launchIsDefaultUserInfoKey] as? NSNumber)?.boolValue == true {
             Pixel.fire(.appLaunch(launch: .autoInitialOrRegular()))
@@ -98,6 +99,14 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
     }
 
     func applicationShouldTerminate(_ sender: NSApplication) -> NSApplication.TerminateReply {
+        if !FileDownloadManager.shared.downloads.isEmpty {
+            let alert = NSAlert.activeDownloadsTerminationAlert(for: FileDownloadManager.shared.downloads)
+            if alert.runModal() == .cancel {
+                return .terminateCancel
+            }
+            FileDownloadManager.shared.cancelAll(waitUntilDone: true)
+            DownloadListCoordinator.shared.sync()
+        }
         stateRestorationManager?.applicationWillTerminate()
 
         return .terminateNow

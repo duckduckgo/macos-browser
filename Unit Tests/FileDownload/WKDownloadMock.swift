@@ -23,5 +23,14 @@ final class WKDownloadMock: NSObject, WebKitDownload, ProgressReporting {
     var originalRequest: URLRequest?
     var webView: WKWebView?
     var progress = Progress()
+    weak var downloadDelegate: WebKitDownloadDelegate?
 
+    var cancelBlock: (() -> Void)?
+    func cancel() {
+        cancelBlock?()
+    }
+
+    func asNSObject() -> NSObject {
+        self
+    }
 }
