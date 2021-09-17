@@ -22,9 +22,9 @@ struct PrivacyIconViewModel {
 
     private static let maxNumberOfIcons = 4
 
-    static func sortedEntities(from trackerInfo: TrackerInfo) -> [String] {
+    static func sortedEntityLetters(from trackerInfo: TrackerInfo) -> [Character] {
         struct LightEntity: Hashable {
-            let lowercasedName: String
+            let name: String
             let prevalence: Double
         }
 
@@ -33,8 +33,8 @@ struct PrivacyIconViewModel {
             Set(trackerInfo.trackersBlocked
                     // Filter trackers without entity or entity name
                     .compactMap {
-                        if let entityName = $0.entity?.displayName?.lowercased(), entityName.count > 0 {
-                            return LightEntity(lowercasedName: entityName, prevalence: $0.entity?.prevalence ?? 0)
+                        if let entityName = $0.entity?.displayName {
+                            return LightEntity(name: entityName, prevalence: $0.entity?.prevalence ?? 0)
                         }
                         return nil
                     })
@@ -44,73 +44,63 @@ struct PrivacyIconViewModel {
             .sorted { l, r -> Bool in
                 return l.prevalence > r.prevalence
             }
+            // Get first character
+            .map {
+                guard $0.name.count > 0 else { return " " }
+                return $0.name.uppercased()[$0.name.startIndex]
+            }
             // Prioritise entities with images
             .sorted { _, r -> Bool in
-                return trackerImages[r.lowercasedName] == nil
+                return "AEIOU".contains(r)
             }
-            .map { $0.lowercasedName }
     }
 
     static func trackerImages(from trackerInfo: TrackerInfo) -> [CGImage] {
-        let sortedEntities = sortedEntities(from: trackerInfo).prefix(maxNumberOfIcons)
+        let sortedEntities = sortedEntityLetters(from: trackerInfo).prefix(maxNumberOfIcons)
         var images: [CGImage] = sortedEntities.map {
             if let image = trackerImages[$0] {
                 return image
             } else {
-                return blankImage
+                return blankTrackerImage
             }
         }
         if images.count == maxNumberOfIcons {
-            images[maxNumberOfIcons - 1] = lastImage
+            images[maxNumberOfIcons - 1] = shadowTrackerImage
         }
         return images
     }
 
-    static let blankImage = NSImage(named: "tracker-icon-blank")!.cgImage(forProposedRect: nil, context: .current, hints: nil)!
-    static let lastImage = NSImage(named: "tracker-icon-last")!.cgImage(forProposedRect: nil, context: .current, hints: nil)!
+    static let shadowTrackerImage = NSImage(named: "ShadowTracker")!.cgImage(forProposedRect: nil, context: .current, hints: nil)!
+    static let blankTrackerImage = NSImage(named: "BlankTracker")!.cgImage(forProposedRect: nil, context: .current, hints: nil)!
 
-    static let trackerImages: [String: CGImage] = {
+    static let trackerImages: [Character: CGImage] = {
         return [
-            "criteo": NSImage(named: "tracker-icon-criteo")!.cgImage(forProposedRect: nil, context: .current, hints: nil)!,
-            "newrelic": NSImage(named: "tracker-icon-newrelic")!.cgImage(forProposedRect: nil, context: .current, hints: nil)!,
-            "stackpath": NSImage(named: "tracker-icon-stackpath")!.cgImage(forProposedRect: nil, context: .current, hints: nil)!,
-            "adform": NSImage(named: "tracker-icon-adform")!.cgImage(forProposedRect: nil, context: .current, hints: nil)!,
-            "dataxu": NSImage(named: "tracker-icon-dataxu")!.cgImage(forProposedRect: nil, context: .current, hints: nil)!,
-            "nielsen": NSImage(named: "tracker-icon-nielsen")!.cgImage(forProposedRect: nil, context: .current, hints: nil)!,
-            "taboola": NSImage(named: "tracker-icon-taboola")!.cgImage(forProposedRect: nil, context: .current, hints: nil)!,
-            "adobe": NSImage(named: "tracker-icon-adobe")!.cgImage(forProposedRect: nil, context: .current, hints: nil)!,
-            "facebook": NSImage(named: "tracker-icon-facebook")!.cgImage(forProposedRect: nil, context: .current, hints: nil)!,
-            "openx": NSImage(named: "tracker-icon-openx")!.cgImage(forProposedRect: nil, context: .current, hints: nil)!,
-            "tapad": NSImage(named: "tracker-icon-tapad")!.cgImage(forProposedRect: nil, context: .current, hints: nil)!,
-            "amazon": NSImage(named: "tracker-icon-amazon")!.cgImage(forProposedRect: nil, context: .current, hints: nil)!,
-            "google": NSImage(named: "tracker-icon-google")!.cgImage(forProposedRect: nil, context: .current, hints: nil)!,
-            "oracle": NSImage(named: "tracker-icon-oracle")!.cgImage(forProposedRect: nil, context: .current, hints: nil)!,
-            "thetradedesk": NSImage(named: "tracker-icon-thetradedesk")!.cgImage(forProposedRect: nil, context: .current, hints: nil)!,
-            "amobee": NSImage(named: "tracker-icon-amobee")!.cgImage(forProposedRect: nil, context: .current, hints: nil)!,
-            "hotjar": NSImage(named: "tracker-icon-hotjar")!.cgImage(forProposedRect: nil, context: .current, hints: nil)!,
-            "pubmatic": NSImage(named: "tracker-icon-pubmatic")!.cgImage(forProposedRect: nil, context: .current, hints: nil)!,
-            "towerdata": NSImage(named: "tracker-icon-towerdata")!.cgImage(forProposedRect: nil, context: .current, hints: nil)!,
-            "appnexus": NSImage(named: "tracker-icon-appnexus")!.cgImage(forProposedRect: nil, context: .current, hints: nil)!,
-            "indexexchange": NSImage(named: "tracker-icon-indexexchange")!.cgImage(forProposedRect: nil, context: .current, hints: nil)!,
-            "qwantcast": NSImage(named: "tracker-icon-qwantcast")!.cgImage(forProposedRect: nil, context: .current, hints: nil)!,
-            "twitter": NSImage(named: "tracker-icon-twitter")!.cgImage(forProposedRect: nil, context: .current, hints: nil)!,
-            "iponweb": NSImage(named: "tracker-icon-iponweb")!.cgImage(forProposedRect: nil, context: .current, hints: nil)!,
-            "rubicon": NSImage(named: "tracker-icon-rubicon")!.cgImage(forProposedRect: nil, context: .current, hints: nil)!,
-            "centro": NSImage(named: "tracker-icon-centro")!.cgImage(forProposedRect: nil, context: .current, hints: nil)!,
-            "linkedin": NSImage(named: "tracker-icon-linkedin")!.cgImage(forProposedRect: nil, context: .current, hints: nil)!,
-            "salesforce": NSImage(named: "tracker-icon-salesforce")!.cgImage(forProposedRect: nil, context: .current, hints: nil)!,
-            "verizonmedia": NSImage(named: "tracker-icon-verizonmedia")!.cgImage(forProposedRect: nil, context: .current, hints: nil)!,
-            "cloudflare": NSImage(named: "tracker-icon-cloudflare")!.cgImage(forProposedRect: nil, context: .current, hints: nil)!,
-            "lotame": NSImage(named: "tracker-icon-lotame")!.cgImage(forProposedRect: nil, context: .current, hints: nil)!,
-            "shadowTracker": NSImage(named: "tracker-icon-shadowTracker")!.cgImage(forProposedRect: nil, context: .current, hints: nil)!,
-            "windows": NSImage(named: "tracker-icon-windows")!.cgImage(forProposedRect: nil, context: .current, hints: nil)!,
-            "comscore": NSImage(named: "tracker-icon-comscore")!.cgImage(forProposedRect: nil, context: .current, hints: nil)!,
-            "mediamath": NSImage(named: "tracker-icon-mediamath")!.cgImage(forProposedRect: nil, context: .current, hints: nil)!,
-            "smartadserver": NSImage(named: "tracker-icon-smartadserver")!.cgImage(forProposedRect: nil, context: .current, hints: nil)!,
-            "xaxis": NSImage(named: "tracker-icon-xaxis")!.cgImage(forProposedRect: nil, context: .current, hints: nil)!,
-            "conversant": NSImage(named: "tracker-icon-conversant")!.cgImage(forProposedRect: nil, context: .current, hints: nil)!,
-            "neustar": NSImage(named: "tracker-icon-neustar")!.cgImage(forProposedRect: nil, context: .current, hints: nil)!,
-            "spotx": NSImage(named: "tracker-icon-spotx")!.cgImage(forProposedRect: nil, context: .current, hints: nil)!
+            "A": NSImage(named: "A")!.cgImage(forProposedRect: nil, context: .current, hints: nil)!,
+            "B": NSImage(named: "B")!.cgImage(forProposedRect: nil, context: .current, hints: nil)!,
+            "C": NSImage(named: "C")!.cgImage(forProposedRect: nil, context: .current, hints: nil)!,
+            "D": NSImage(named: "D")!.cgImage(forProposedRect: nil, context: .current, hints: nil)!,
+            "E": NSImage(named: "E")!.cgImage(forProposedRect: nil, context: .current, hints: nil)!,
+            "F": NSImage(named: "F")!.cgImage(forProposedRect: nil, context: .current, hints: nil)!,
+            "G": NSImage(named: "G")!.cgImage(forProposedRect: nil, context: .current, hints: nil)!,
+            "H": NSImage(named: "H")!.cgImage(forProposedRect: nil, context: .current, hints: nil)!,
+            "I": NSImage(named: "I")!.cgImage(forProposedRect: nil, context: .current, hints: nil)!,
+            "J": NSImage(named: "J")!.cgImage(forProposedRect: nil, context: .current, hints: nil)!,
+            "K": NSImage(named: "K")!.cgImage(forProposedRect: nil, context: .current, hints: nil)!,
+            "L": NSImage(named: "L")!.cgImage(forProposedRect: nil, context: .current, hints: nil)!,
+            "M": NSImage(named: "M")!.cgImage(forProposedRect: nil, context: .current, hints: nil)!,
+            "N": NSImage(named: "N")!.cgImage(forProposedRect: nil, context: .current, hints: nil)!,
+            "O": NSImage(named: "O")!.cgImage(forProposedRect: nil, context: .current, hints: nil)!,
+            "P": NSImage(named: "P")!.cgImage(forProposedRect: nil, context: .current, hints: nil)!,
+            "Q": NSImage(named: "Q")!.cgImage(forProposedRect: nil, context: .current, hints: nil)!,
+            "R": NSImage(named: "R")!.cgImage(forProposedRect: nil, context: .current, hints: nil)!,
+            "S": NSImage(named: "S")!.cgImage(forProposedRect: nil, context: .current, hints: nil)!,
+            "T": NSImage(named: "T")!.cgImage(forProposedRect: nil, context: .current, hints: nil)!,
+            "U": NSImage(named: "U")!.cgImage(forProposedRect: nil, context: .current, hints: nil)!,
+            "V": NSImage(named: "V")!.cgImage(forProposedRect: nil, context: .current, hints: nil)!,
+            "W": NSImage(named: "W")!.cgImage(forProposedRect: nil, context: .current, hints: nil)!,
+            "X": NSImage(named: "X")!.cgImage(forProposedRect: nil, context: .current, hints: nil)!,
+            "Y": NSImage(named: "Y")!.cgImage(forProposedRect: nil, context: .current, hints: nil)!,
+            "Z": NSImage(named: "Z")!.cgImage(forProposedRect: nil, context: .current, hints: nil)!
         ]
     }()
 
