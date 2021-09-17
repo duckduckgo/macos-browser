@@ -49,7 +49,7 @@ final class CircularProgressView: NSView {
     var animationDuration: TimeInterval = 0.5
     var rotationDuration: TimeInterval = 1.5
 
-    var progress: Double? = nil {
+    var progress: Double? {
         didSet {
             updateProgress()
         }
