@@ -87,7 +87,8 @@ final class FireViewController: NSViewController {
         setupFireAnimation()
     }
 
-    override func viewDidAppear() {
+    override func viewWillAppear() {
+        self.view.superview?.isHidden = true
         subscribeToShouldPreventUserInteraction()
     }
 
