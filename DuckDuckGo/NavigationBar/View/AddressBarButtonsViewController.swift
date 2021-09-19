@@ -34,6 +34,8 @@ final class AddressBarButtonsViewController: NSViewController {
     static let webImage = NSImage(named: "Web")
     static let bookmarkImage = NSImage(named: "Bookmark")
     static let bookmarkFilledImage = NSImage(named: "BookmarkFilled")
+    static let shieldImage = NSImage(named: "Shield")
+    static let shieldDotImage = NSImage(named: "ShieldDot")
 
     weak var delegate: AddressBarButtonsViewControllerDelegate?
 
@@ -56,7 +58,7 @@ final class AddressBarButtonsViewController: NSViewController {
         return _privacyDashboardPopover!
     }
 
-    @IBOutlet weak var privacyEntryPointButton: PrivacyEntryPointAddressBarButton!
+    @IBOutlet weak var privacyEntryPointButton: AddressBarButton!
     @IBOutlet weak var bookmarkButton: AddressBarButton!
     @IBOutlet weak var imageButtonWrapper: NSView!
     @IBOutlet weak var imageButton: NSButton!
@@ -136,7 +138,7 @@ final class AddressBarButtonsViewController: NSViewController {
         setupButtons()
         subscribeToSelectedTabViewModel()
         subscribeToBookmarkList()
-//        subscribeToEffectiveAppearance()
+        subscribeToEffectiveAppearance()
         NotificationCenter.default.addObserver(self,
                                                selector: #selector(showUndoFireproofingPopover(_:)),
                                                name: FireproofDomains.Constants.newFireproofDomainNotification,
@@ -335,46 +337,56 @@ final class AddressBarButtonsViewController: NSViewController {
         imageButton.applyFaviconStyle()
     }
 
+    private var animationViewCache = [String: AnimationView]()
+    private func getAnimationView(for animationName: String) -> AnimationView {
+        if let animationView = animationViewCache[animationName] {
+            return animationView
+        }
+
+        let animation = Animation.named(animationName, animationCache: LottieAnimationCache.shared)
+        let animationView = AnimationView(animation: animation, imageProvider: self)
+        animationView.identifier = NSUserInterfaceItemIdentifier(rawValue: animationName)
+        animationViewCache[animationName] = animationView
+        return animationView
+    }
+
     private func setupAnimationViews() {
-        func makeAndLayoutAnimationView(name: String, setToLastFrame: Bool = false) -> AnimationView {
+        func addAndLayoutAnimationView(_ animationName: String) -> AnimationView {
+
             let animationView: AnimationView
             if AppDelegate.isRunningTests {
                 animationView = AnimationView()
             } else {
                 // For unknown reason, this caused infinite execution of various unit tests.
-                animationView = AnimationView(name: name, bundle: Bundle.main, imageProvider: self)
+                animationView = getAnimationView(for: animationName)
             }
             animationWrapperView.addAndLayout(animationView)
-            if setToLastFrame { animationView.setToLastFrame() }
+            animationView.isHidden = true
             return animationView
         }
 
-        trackerAnimationView = makeAndLayoutAnimationView(name: "trackers")
-        shieldAnimationView = makeAndLayoutAnimationView(name: "shield", setToLastFrame: true)
-        shieldDotAnimationView = makeAndLayoutAnimationView(name: "shield-dot", setToLastFrame: true)
-    }
+        let isAquaMode = NSApp.effectiveAppearance.name == NSAppearance.Name.aqua
 
-    private func resetAnimationViews() {
-        func resetAnimationView(_ animationView: AnimationView, setToLastFrame: Bool = false) {
-            if animationView.isAnimationPlaying {
-                animationView.stop()
-            }
-            if setToLastFrame {
-                // Well, ¯\_(ツ)_/¯
-                DispatchQueue.main.async {
-                    animationView.setToLastFrame()
-                }
-            }
+        if trackerAnimationView == nil {
+            trackerAnimationView = addAndLayoutAnimationView("trackers")
         }
 
-        resetAnimationView(shieldAnimationView, setToLastFrame: true)
-        resetAnimationView(shieldDotAnimationView, setToLastFrame: true)
-        resetAnimationView(trackerAnimationView)
+        let shieldAnimationName = isAquaMode ? "shield" : "dark-shield"
+        if shieldAnimationView?.identifier?.rawValue != shieldAnimationName {
+            shieldAnimationView?.removeFromSuperview()
+            shieldAnimationView = addAndLayoutAnimationView(shieldAnimationName)
+        }
+
+        let shieldDotAnimationName = isAquaMode ? "shield-dot" : "dark-shield-dot"
+        if shieldDotAnimationView?.identifier?.rawValue != shieldDotAnimationName {
+            shieldDotAnimationView?.removeFromSuperview()
+            shieldDotAnimationView = addAndLayoutAnimationView(shieldDotAnimationName)
+        }
     }
 
     private func subscribeToSelectedTabViewModel() {
         selectedTabViewModelCancellable = tabCollectionViewModel.$selectedTabViewModel.receive(on: DispatchQueue.main).sink { [weak self] _ in
-            self?.resetAnimationViews()
+            self?.stopAnimations()
             self?.subscribeToUrl()
             self?.subscribeToPermissions()
             self?.subscribeToTrackerAnimationTrigger()
@@ -483,32 +495,61 @@ final class AddressBarButtonsViewController: NSViewController {
             return
         }
 
-        switch (selectedTabViewModel.tab.content, privacyEntryPointButton.isHidden) {
-        case (.url(let url), false):
+        switch selectedTabViewModel.tab.content {
+        case .url(let url):
             let isNotSecure = url.scheme == "http"
-            shieldDotAnimationView.isHidden = !isNotSecure
-            shieldAnimationView.isHidden = isNotSecure
+            privacyEntryPointButton.image = isNotSecure ? Self.shieldDotImage : Self.shieldImage
         default:
-            shieldDotAnimationView.isHidden = true
-            shieldAnimationView.isHidden = true
+            break
         }
     }
 
     private func animateTrackers() {
-        if !shieldDotAnimationView.isHidden { shieldDotAnimationView.play() }
-        if !shieldAnimationView.isHidden { shieldAnimationView.play() }
-        if !shieldAnimationView.isHidden || !shieldDotAnimationView.isHidden {
-            trackerAnimationView.reloadImages()
-            trackerAnimationView.play { [weak self] _ in
-                self?.updatePrivacyEntryPointButton()
-                self?.updateFireproofedButton()
-                self?.updatePermissionButtons()
+        guard !privacyEntryPointButton.isHidden,
+              let selectedTabViewModel = tabCollectionViewModel.selectedTabViewModel else { return }
+
+        switch selectedTabViewModel.tab.content {
+        case .url(let url):
+            var animationView: AnimationView
+            if url.scheme == "http" {
+                animationView = shieldDotAnimationView
+            } else {
+                animationView = shieldAnimationView
             }
 
-            updatePrivacyEntryPointButton()
-            updateFireproofedButton()
-            updatePermissionButtons()
+            animationView.isHidden = false
+            animationView.play { _ in
+                animationView.isHidden = true
+            }
+        default:
+            return
         }
+
+        trackerAnimationView.isHidden = false
+        trackerAnimationView.reloadImages()
+        trackerAnimationView.play { [weak self] _ in
+            self?.trackerAnimationView.isHidden = true
+            self?.updatePrivacyEntryPointButton()
+            self?.updateFireproofedButton()
+            self?.updatePermissionButtons()
+        }
+
+        updatePrivacyEntryPointButton()
+        updateFireproofedButton()
+        updatePermissionButtons()
+    }
+
+    private func stopAnimations() {
+        func stopAnimation(_ animationView: AnimationView) {
+            if animationView.isAnimationPlaying || !animationView.isHidden {
+                animationView.isHidden = true
+                animationView.stop()
+            }
+        }
+
+        stopAnimation(trackerAnimationView)
+        stopAnimation(shieldAnimationView)
+        stopAnimation(shieldDotAnimationView)
     }
 
     private func bookmarkForCurrentUrl(setFavorite: Bool, accessPoint: Pixel.Event.AccessPoint) -> Bookmark? {
@@ -553,16 +594,15 @@ final class AddressBarButtonsViewController: NSViewController {
         }
     }
 
-//    private func subscribeToEffectiveAppearance() {
-//        effectiveAppearanceCancellable = NSApp.publisher(for: \.effectiveAppearance)
-//            .receive(on: DispatchQueue.main)
-//            .sink { [weak self] _ in
-//                guard let trackerInfo = self?.tabCollectionViewModel.selectedTabViewModel?.tab.trackerInfo else {
-//                    return
-//                }
-//                self?.updatePrivacyViews(trackerInfo: trackerInfo, animated: false)
-//            }
-//    }
+    private func subscribeToEffectiveAppearance() {
+        effectiveAppearanceCancellable = NSApp.publisher(for: \.effectiveAppearance)
+            .dropFirst()
+            .receive(on: DispatchQueue.main)
+            .sink { [weak self] _ in
+                self?.setupAnimationViews()
+                self?.updatePrivacyEntryPointIcon()
+            }
+    }
 
 }
 // swiftlint:enable type_body_length
@@ -624,16 +664,6 @@ extension AddressBarButtonsViewController: AnimationImageProvider {
         case "img_2.png": return images[safe: 2]
         case "img_3.png": return images[safe: 3]
         default: return nil
-        }
-    }
-
-}
-
-fileprivate extension AnimationView {
-
-    func setToLastFrame() {
-        if let endFrame = animation?.endFrame, currentFrame != endFrame {
-            currentFrame = endFrame
         }
     }
 

@@ -3,6 +3,16 @@
     {
       "filename" : "shadowTracker.svg",
       "idiom" : "universal"
+    },
+    {
+      "appearances" : [
+        {
+          "appearance" : "luminosity",
+          "value" : "dark"
+        }
+      ],
+      "filename" : "shadowTracker-1.svg",
+      "idiom" : "universal"
     }
   ],
   "info" : {

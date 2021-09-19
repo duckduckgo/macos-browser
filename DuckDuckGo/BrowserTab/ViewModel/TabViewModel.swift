@@ -45,9 +45,6 @@ final class TabViewModel {
                 loadingStartTime = CACurrentMediaTime()
             }
         }
-        didSet {
-            scheduleTrackerAnimationIfNeeded()
-        }
     }
     @Published var progress: Double = 0.0
     @Published var isErrorViewVisible: Bool = false {
@@ -118,7 +115,7 @@ final class TabViewModel {
         tab.$trackerInfo
             .sink { [weak self] trackerInfo in
                 if trackerInfo?.isEmpty ?? false {
-                    self?.scheduleTrackerAnimationAfterLoading = true
+                    self?.scheduleTrackerAnimationIfNeeded()
                 }
             }
             .store(in: &cancellables)
@@ -214,20 +211,19 @@ final class TabViewModel {
 
     let trackersAnimationTriggerPublisher = PassthroughSubject<Void, Never>()
 
-    private var scheduleTrackerAnimationAfterLoading = false
     private var trackerAnimationTimer: Timer?
 
     private func scheduleTrackerAnimationIfNeeded() {
-        if scheduleTrackerAnimationAfterLoading && !isLoading && trackerAnimationTimer == nil {
-            scheduleTrackerAnimationAfterLoading = false
+        if trackerAnimationTimer == nil {
+            trackerAnimationTimer = Timer.scheduledTimer(withTimeInterval: 3, repeats: true, block: { [weak self] _ in
+                guard let self = self, !self.isLoading else { return }
 
-            trackerAnimationTimer = Timer.scheduledTimer(withTimeInterval: 2, repeats: false, block: { [weak self] _ in
-                self?.trackerAnimationTimer?.invalidate()
-                self?.trackerAnimationTimer = nil
-
-                if self?.tab.trackerInfo?.trackersBlocked.count ?? 0 > 0 {
-                    self?.trackersAnimationTriggerPublisher.send()
+                if self.tab.trackerInfo?.trackersBlocked.count ?? 0 > 0 {
+                    self.trackersAnimationTriggerPublisher.send()
                 }
+
+                self.trackerAnimationTimer?.invalidate()
+                self.trackerAnimationTimer = nil
             })
         }
     }
