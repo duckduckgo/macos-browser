@@ -32,7 +32,7 @@ struct PasswordManagementItemListView: View {
 
                 ForEach(model.displayedAccounts, id: \.id) { account in
                     ItemView(account: account, selected: model.selected?.id == account.id) {
-                        model.selectAccount(account)
+                        model.select(item: account)
                     }
                     .padding(.horizontal, 10)
                 }
@@ -45,7 +45,7 @@ struct PasswordManagementItemListView: View {
 
 private struct ItemView: View {
 
-    let account: PasswordManagementItem
+    let account: SecureVaultItem
     let selected: Bool
     let action: () -> Void
 

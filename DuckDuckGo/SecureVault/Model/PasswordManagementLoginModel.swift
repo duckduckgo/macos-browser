@@ -24,7 +24,7 @@ protocol PasswordManagementItemModel: AnyObject {
     func createNew()
     func cancel()
     func save()
-    func resetSecureVaultModel()
+    func clearSecureVaultModel()
     func setSecureVaultModel<Model>(_ modelObject: Model)
 
     var isEditingPublisher: Published<Bool>.Publisher { get }
@@ -54,7 +54,7 @@ final class PasswordManagementLoginModel: ObservableObject, PasswordManagementIt
         credentials = modelObject
     }
 
-    func resetSecureVaultModel() {
+    func clearSecureVaultModel() {
         credentials = nil
     }
 

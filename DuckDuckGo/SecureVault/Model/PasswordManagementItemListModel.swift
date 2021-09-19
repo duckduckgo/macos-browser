@@ -19,7 +19,7 @@
 import Combine
 import BrowserServicesKit
 
-enum PasswordManagementItem {
+enum SecureVaultItem {
     case account(SecureVaultModels.WebsiteAccount)
 
     var websiteAccount: SecureVaultModels.WebsiteAccount {
@@ -72,7 +72,7 @@ enum PasswordManagementItem {
 /// Could maybe even abstract a bunch of this code to be more generic re-usable styled list for use elsewhere.
 final class PasswordManagementItemListModel: ObservableObject {
 
-    var accounts = [PasswordManagementItem]() {
+    var accounts = [SecureVaultItem]() {
         didSet {
             refresh()
         }
@@ -84,26 +84,26 @@ final class PasswordManagementItemListModel: ObservableObject {
         }
     }
 
-    @Published private(set) var displayedAccounts = [PasswordManagementItem]()
-    @Published private(set) var selected: PasswordManagementItem?
+    @Published private(set) var displayedAccounts = [SecureVaultItem]()
+    @Published private(set) var selected: SecureVaultItem?
 
-    private var onItemSelected: (_ old: PasswordManagementItem?, _ new: PasswordManagementItem) -> Void
+    private var onItemSelected: (_ old: SecureVaultItem?, _ new: SecureVaultItem) -> Void
 
-    init(onItemSelected: @escaping (_ old: PasswordManagementItem?, _ new: PasswordManagementItem) -> Void) {
+    init(onItemSelected: @escaping (_ old: SecureVaultItem?, _ new: SecureVaultItem) -> Void) {
         self.onItemSelected = onItemSelected
     }
 
-    func selectAccount(_ account: PasswordManagementItem) {
+    func select(item: SecureVaultItem) {
         let previous = selected
-        selected = account
-        onItemSelected(previous, account)
+        selected = item
+        onItemSelected(previous, item)
     }
 
-    func selectAccountWithId(_ id: Int64) {
+    func selectItem(with id: Int64) {
         selected = displayedAccounts.first(where: { $0.id == id })
     }
 
-    func updateAccount(_ account: PasswordManagementItem) {
+    func updateAccount(_ account: SecureVaultItem) {
         var accounts = displayedAccounts
 
         if let index = accounts.firstIndex(where: { $0.id == account.id }) {
@@ -126,7 +126,7 @@ final class PasswordManagementItemListModel: ObservableObject {
     func selectFirst() {
         selected = nil
         if let selected = displayedAccounts.first {
-            selectAccount(selected)
+            select(item: selected)
         }
     }
 

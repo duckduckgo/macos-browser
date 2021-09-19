@@ -52,7 +52,16 @@ final class PasswordManagementViewController: NSViewController {
     var isDirty = false
 
     var listModel: PasswordManagementItemListModel?
-    var itemModel: PasswordManagementItemModel?
+    var itemModel: PasswordManagementItemModel? {
+        didSet {
+            editingCancellable?.cancel()
+            editingCancellable = nil
+
+            editingCancellable = itemModel?.isEditingPublisher.sink(receiveValue: { [weak self] isEditing in
+                self?.divider.isHidden = isEditing
+            })
+        }
+    }
 
     var secureVault: SecureVault? {
         try? SecureVaultFactory.default.makeVault()
@@ -62,14 +71,13 @@ final class PasswordManagementViewController: NSViewController {
         super.viewDidLoad()
         createListView()
         createLoginItemView()
-        subscribeToEditingState()
     }
 
     override func viewDidAppear() {
         super.viewDidAppear()
 
         if !isDirty {
-            itemModel?.resetSecureVaultModel()
+            itemModel?.clearSecureVaultModel()
         }
 
         refetchWithText(isDirty ? "" : domain ?? "", clearWhenNoMatches: true)
@@ -82,15 +90,9 @@ final class PasswordManagementViewController: NSViewController {
         menu.popUp(positioning: nil, at: location, in: sender.superview)
     }
 
-    private func subscribeToEditingState() {
-        editingCancellable = itemModel?.isEditingPublisher.sink(receiveValue: { [weak self] isEditing in
-            self?.divider.isHidden = isEditing
-        })
-    }
-
     private func refetchWithText(_ text: String, clearWhenNoMatches: Bool = false, completion: (() -> Void)? = nil) {
-        fetchAccounts { [weak self] accounts in
-            self?.listModel?.accounts = accounts.map { PasswordManagementItem.account($0) }
+        fetchSecureVaultItems { [weak self] accounts in
+            self?.listModel?.accounts = accounts
             self?.searchField.stringValue = text
             self?.updateFilter()
 
@@ -113,15 +115,15 @@ final class PasswordManagementViewController: NSViewController {
         self.listModel?.accounts = []
         self.listModel?.filter = ""
         self.listModel?.clearSelection()
-        self.itemModel?.resetSecureVaultModel()
+        self.itemModel?.clearSecureVaultModel()
     }
 
     private func syncModelsOnCredentials(_ credentials: SecureVaultModels.WebsiteCredentials, select: Bool = false) {
         self.itemModel?.setSecureVaultModel(credentials)
-        self.listModel?.updateAccount(PasswordManagementItem.account(credentials.account))
+        self.listModel?.updateAccount(SecureVaultItem.account(credentials.account))
 
         if select {
-            self.listModel?.selectAccount(PasswordManagementItem.account(credentials.account))
+            self.listModel?.select(item: SecureVaultItem.account(credentials.account))
         }
     }
 
@@ -182,7 +184,7 @@ final class PasswordManagementViewController: NSViewController {
             switch response {
             case .alertFirstButtonReturn:
                 try? self.secureVault?.deleteWebsiteCredentialsFor(accountId: id)
-                self.itemModel?.resetSecureVaultModel()
+                self.itemModel?.clearSecureVaultModel()
                 self.refetchWithText(self.searchField.stringValue)
                 self.postChange()
 
@@ -201,6 +203,8 @@ final class PasswordManagementViewController: NSViewController {
         let listModel = PasswordManagementItemListModel { [weak self] previousValue, newValue in
             guard let id = newValue.id,
                   let window = self?.view.window else { return }
+
+            print("Got new value: \(newValue)")
 
             func loadCredentialsWithId() {
                 guard let credentials = try? self?.secureVault?.websiteCredentialsFor(accountId: id) else { return }
@@ -222,7 +226,7 @@ final class PasswordManagementViewController: NSViewController {
 
                     case .alertThirdButtonReturn: // Cancel
                         if let previousId = previousValue?.id {
-                            self?.listModel?.selectAccountWithId(previousId)
+                            self?.listModel?.selectItem(with : previousId)
                         }
 
                     default:
@@ -257,11 +261,15 @@ final class PasswordManagementViewController: NSViewController {
         listModel?.filter = text
     }
 
-    private func fetchAccounts(completion: @escaping ([SecureVaultModels.WebsiteAccount]) -> Void) {
+    private func fetchSecureVaultItems(completion: @escaping ([SecureVaultItem]) -> Void) {
         DispatchQueue.global(qos: .userInitiated).async {
             let accounts = (try? self.secureVault?.accounts()) ?? []
+            let notes = (try? self.secureVault?.notes()) ?? []
+
+            let items = accounts.map(SecureVaultItem.account)
+
             DispatchQueue.main.async {
-                completion(accounts)
+                completion(items)
             }
         }
     }
