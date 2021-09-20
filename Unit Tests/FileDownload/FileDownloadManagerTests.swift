@@ -20,7 +20,7 @@ import Foundation
 import XCTest
 @testable import DuckDuckGo_Privacy_Browser
 
-// swiftlint:disable type_body_length
+@available(macOS 11.3, *)
 final class FileDownloadManagerTests: XCTestCase {
 
     private let testGroupName = "test"
@@ -53,18 +53,13 @@ final class FileDownloadManagerTests: XCTestCase {
     }
 
     func testWhenDownloadIsAddedThenItsPublished() {
-        let e1 = expectation(description: "empty downloads populated")
-        let e2 = expectation(description: "FileDownloadTask populated")
-        let cancellable = dm.$downloads.sink { downloads in
-            if downloads.isEmpty {
-                e1.fulfill()
-            } else if downloads.count == 1 {
-                e2.fulfill()
-            }
+        let e = expectation(description: "empty downloads populated")
+        let cancellable = dm.downloadsPublisher.sink { _ in
+            e.fulfill()
         }
 
         let download = WKDownloadMock()
-        dm.add(download, delegate: nil, promptForLocation: false, postflight: .none)
+        dm.add(download, delegate: nil, location: .auto, postflight: .none)
 
         withExtendedLifetime(cancellable) {
             waitForExpectations(timeout: 0.3)
@@ -72,21 +67,16 @@ final class FileDownloadManagerTests: XCTestCase {
     }
 
     func testWhenDownloadFailsInstantlyThenItsRemoved() {
-        let e1 = expectation(description: "FileDownloadTask populated")
-        let e2 = expectation(description: "empty downloads populated")
-        let cancellable = dm.$downloads.dropFirst().sink { downloads in
-            if downloads.first != nil {
-                e1.fulfill()
-            } else {
-                e2.fulfill()
-            }
+        let e = expectation(description: "FileDownloadTask populated")
+        let cancellable = dm.downloadsPublisher.sink { _ in
+            e.fulfill()
         }
 
         let download = WKDownloadMock()
-        dm.add(download, delegate: nil, promptForLocation: false, postflight: .none)
+        dm.add(download, delegate: nil, location: .auto, postflight: .none)
 
         struct TestError: Error {}
-        download.downloadDelegate?.download?(download, didFailWithError: TestError(), resumeData: nil)
+        download.downloadDelegate?.download(download, didFailWithError: TestError(), resumeData: nil)
 
         withExtendedLifetime(cancellable) {
             waitForExpectations(timeout: 0.3)
@@ -95,20 +85,15 @@ final class FileDownloadManagerTests: XCTestCase {
     }
 
     func testWhenDownloadFinishesInstantlyThenItsRemoved() {
-        let e1 = expectation(description: "FileDownloadTask populated")
-        let e2 = expectation(description: "empty downloads populated")
-        let cancellable = dm.$downloads.dropFirst().sink { downloads in
-            if downloads.first != nil {
-                e1.fulfill()
-            } else {
-                e2.fulfill()
-            }
+        let e = expectation(description: "FileDownloadTask populated")
+        let cancellable = dm.downloadsPublisher.sink { _ in
+            e.fulfill()
         }
 
         let download = WKDownloadMock()
-        dm.add(download, delegate: nil, promptForLocation: false, postflight: .none)
+        dm.add(download, delegate: nil, location: .auto, postflight: .none)
 
-        download.downloadDelegate?.downloadDidFinish?(download)
+        download.downloadDelegate?.downloadDidFinish(download)
 
         withExtendedLifetime(cancellable) {
             waitForExpectations(timeout: 0.3)
@@ -133,7 +118,7 @@ final class FileDownloadManagerTests: XCTestCase {
         }
 
         let download = WKDownloadMock()
-        dm.add(download, delegate: self, promptForLocation: true, postflight: .none)
+        dm.add(download, delegate: self, location: .prompt, postflight: .none)
 
         let url = URL(string: "https://duckduckgo.com/somefile.html")!
         let response = URLResponse(url: url, mimeType: UTType.pdf.mimeType, expectedContentLength: 1, textEncodingName: "utf-8")
@@ -167,7 +152,7 @@ final class FileDownloadManagerTests: XCTestCase {
         }
 
         let download = WKDownloadMock()
-        dm.add(download, delegate: self, promptForLocation: false, postflight: .none)
+        dm.add(download, delegate: self, location: .auto, postflight: .none)
 
         let url = URL(string: "https://duckduckgo.com/somefile.html")!
         let response = URLResponse(url: url, mimeType: UTType.html.mimeType, expectedContentLength: 1, textEncodingName: "utf-8")
@@ -189,7 +174,7 @@ final class FileDownloadManagerTests: XCTestCase {
         XCTAssertTrue(fm.fileExists(atPath: localURL.path))
 
         let download = WKDownloadMock()
-        dm.add(download, delegate: self, promptForLocation: true, postflight: .none)
+        dm.add(download, delegate: self, location: .prompt, postflight: .none)
         self.chooseDestination = { _, _, _, callback in
             callback(localURL, nil)
         }
@@ -211,7 +196,7 @@ final class FileDownloadManagerTests: XCTestCase {
         prefs.selectedDownloadLocation = downloadsURL
 
         let download = WKDownloadMock()
-        dm.add(download, delegate: self, promptForLocation: false, postflight: .none)
+        dm.add(download, delegate: self, location: .auto, postflight: .none)
         self.chooseDestination = { _, _, _, _ in
             XCTFail("Unpected chooseDestination call")
         }
@@ -231,7 +216,7 @@ final class FileDownloadManagerTests: XCTestCase {
         prefs.selectedDownloadLocation = downloadsURL
 
         let download = WKDownloadMock()
-        dm.add(download, delegate: self, promptForLocation: false, postflight: .none)
+        dm.add(download, delegate: self, location: .auto, postflight: .none)
         self.chooseDestination = { _, _, _, _ in
             XCTFail("Unpected chooseDestination call")
         }
@@ -255,32 +240,20 @@ final class FileDownloadManagerTests: XCTestCase {
         }
 
         let download = WKDownloadMock()
-        dm.add(download, delegate: self, promptForLocation: false, postflight: .none)
+        dm.add(download, delegate: self, location: .auto, postflight: .none)
 
-        let e1 = expectation(description: "FileDownloadTask populated")
-        let e2 = expectation(description: "empty downloads populated")
-        let cancellable = dm.$downloads.sink { downloads in
-            if downloads.count == 1 {
-                e1.fulfill()
-            } else {
-                e2.fulfill()
-            }
-        }
-
-        let e3 = expectation(description: "WKDownload called")
+        let e = expectation(description: "WKDownload called")
         download.downloadDelegate?.download(download, decideDestinationUsing: nil, suggestedFilename: "") { url in
             XCTAssertNil(url)
-            e3.fulfill()
+            e.fulfill()
         }
 
-        withExtendedLifetime(cancellable) {
-            waitForExpectations(timeout: 0.3)
-        }
+        waitForExpectations(timeout: 0.3)
     }
 
     func performPostflightTest(at url: URL, with postflight: FileDownloadManager.PostflightAction?, completion: @escaping (Selector, [URL]) -> Void) {
         let download = WKDownloadMock()
-        let task = dm.add(download, delegate: self, promptForLocation: true, postflight: postflight)
+        let task = dm.add(download, delegate: self, location: .prompt, postflight: postflight)
         chooseDestination = { _, _, _, callback in
             callback(url, nil)
         }
@@ -302,7 +275,7 @@ final class FileDownloadManagerTests: XCTestCase {
             XCTAssertEqual(dest, url)
         }
 
-        download.downloadDelegate?.downloadDidFinish?(download)
+        download.downloadDelegate?.downloadDidFinish(download)
 
         withExtendedLifetime(cancellable) {
             waitForExpectations(timeout: 0.3)
@@ -337,8 +310,8 @@ final class FileDownloadManagerTests: XCTestCase {
     }
 
 }
-// swiftlint:enable type_body_length
 
+@available(macOS 11.3, *)
 extension FileDownloadManagerTests: FileDownloadManagerDelegate {
     func chooseDestination(suggestedFilename: String?, directoryURL: URL?, fileTypes: [UTType], callback: @escaping (URL?, UTType?) -> Void) {
         self.chooseDestination?(suggestedFilename, directoryURL, fileTypes, callback)

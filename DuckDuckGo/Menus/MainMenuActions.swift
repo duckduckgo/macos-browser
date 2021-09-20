@@ -242,6 +242,10 @@ extension MainViewController {
         selectedTabViewModel.tab.webView.magnification = 1.0
     }
 
+    @IBAction func toggleDownloads(_ sender: Any) {
+        navigationBarViewController.toggleDownloadsPopover()
+    }
+
     // MARK: - History
 
     @IBAction func back(_ sender: Any?) {
@@ -550,6 +554,12 @@ extension MainViewController: NSMenuItemValidation {
              #selector(MainViewController.showPageSource(_:)),
              #selector(MainViewController.showPageResources(_:)):
             return tabCollectionViewModel.selectedTabViewModel?.canReload == true
+
+        case #selector(MainViewController.toggleDownloads(_:)):
+            let isDownloadsPopoverShown = self.navigationBarViewController.isDownloadsPopoverShown
+            menuItem.title = isDownloadsPopoverShown ? UserText.closeDownloads : UserText.openDownloads
+
+            return true
 
         default:
             return true
