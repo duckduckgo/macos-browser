@@ -84,11 +84,10 @@ final class TabBarViewItem: NSCollectionViewItem {
     @IBOutlet weak var titleTextField: NSTextField!
     @IBOutlet weak var closeButton: MouseOverButton!
     @IBOutlet weak var rightSeparatorView: ColorView!
-    @IBOutlet weak var loadingView: TabLoadingView!
     @IBOutlet weak var mouseOverView: MouseOverView!
     @IBOutlet weak var mouseClickView: MouseClickView!
-    @IBOutlet weak var tabLoadingViewCenterConstraint: NSLayoutConstraint!
-    @IBOutlet weak var tabLoadingViewLeadingConstraint: NSLayoutConstraint!
+    @IBOutlet weak var faviconWrapperViewCenterConstraint: NSLayoutConstraint!
+    @IBOutlet weak var faviconWrapperViewLeadingConstraint: NSLayoutConstraint!
     @IBOutlet var permissionCloseButtonTrailingConstraint: NSLayoutConstraint!
     @IBOutlet var tabLoadingPermissionLeadingConstraint: NSLayoutConstraint!
     @IBOutlet var closeButtonTrailintgConstraint: NSLayoutConstraint!
@@ -269,8 +268,8 @@ final class TabBarViewItem: NSCollectionViewItem {
         permissionCloseButtonTrailingConstraint.isActive = !closeButton.isHidden
         titleTextField.isHidden = widthStage.isTitleHidden
 
-        tabLoadingViewCenterConstraint.priority = widthStage.isTitleHidden && widthStage.isCloseButtonHidden ? .defaultHigh : .defaultLow
-        tabLoadingViewLeadingConstraint.priority = widthStage.isTitleHidden && widthStage.isCloseButtonHidden ? .defaultLow : .defaultHigh
+        faviconWrapperViewCenterConstraint.priority = widthStage.isTitleHidden && widthStage.isCloseButtonHidden ? .defaultHigh : .defaultLow
+        faviconWrapperViewLeadingConstraint.priority = widthStage.isTitleHidden && widthStage.isCloseButtonHidden ? .defaultLow : .defaultHigh
 
         closeButtonTrailintgConstraint.isActive = !widthStage.isCloseButtonHidden
     }

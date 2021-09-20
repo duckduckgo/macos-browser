@@ -33,7 +33,7 @@
                         <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
                     </textFieldCell>
                 </textField>
-                <customView translatesAutoresizingMaskIntoConstraints="NO" id="A6g-eG-dOW" customClass="TabLoadingView" customModule="DuckDuckGo_Privacy_Browser" customModuleProvider="target">
+                <customView translatesAutoresizingMaskIntoConstraints="NO" id="A6g-eG-dOW">
                     <rect key="frame" x="8" y="5" width="24" height="24"/>
                     <subviews>
                         <imageView horizontalHuggingPriority="251" verticalHuggingPriority="251" translatesAutoresizingMaskIntoConstraints="NO" id="Kky-kZ-lU9" userLabel="Favicon Image View">
@@ -173,15 +173,14 @@
                 <outlet property="closeButton" destination="vuD-rY-Vzl" id="JGv-Ac-mRi"/>
                 <outlet property="closeButtonTrailintgConstraint" destination="web-9k-BYT" id="9Wt-xR-qep"/>
                 <outlet property="faviconImageView" destination="Kky-kZ-lU9" id="96Z-4T-ONB"/>
-                <outlet property="loadingView" destination="A6g-eG-dOW" id="ziS-fe-bqN"/>
+                <outlet property="faviconWrapperViewCenterConstraint" destination="PF1-mZ-U4m" id="5KT-Cu-bbm"/>
+                <outlet property="faviconWrapperViewLeadingConstraint" destination="TSx-41-S2A" id="342-tk-EzF"/>
                 <outlet property="mouseClickView" destination="890-3t-v5O" id="rcf-rO-cap"/>
                 <outlet property="mouseOverView" destination="jlg-2n-tzm" id="mX4-Hq-XHD"/>
                 <outlet property="permissionButton" destination="XdB-Qn-iD9" id="Cav-HW-zvK"/>
                 <outlet property="permissionCloseButtonTrailingConstraint" destination="lqC-R5-KOi" id="G6L-Zh-eBV"/>
                 <outlet property="rightSeparatorView" destination="opQ-Od-dCO" id="k6U-n5-y4S"/>
                 <outlet property="tabLoadingPermissionLeadingConstraint" destination="uNR-JN-6RT" id="r7F-38-4Nx"/>
-                <outlet property="tabLoadingViewCenterConstraint" destination="PF1-mZ-U4m" id="5KT-Cu-bbm"/>
-                <outlet property="tabLoadingViewLeadingConstraint" destination="TSx-41-S2A" id="342-tk-EzF"/>
                 <outlet property="titleTextField" destination="DFD-8r-YGx" id="6mj-b0-Oq3"/>
                 <outlet property="view" destination="Hz6-mo-xeY" id="DwG-v1-cn3"/>
             </connections>
