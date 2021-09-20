@@ -72,6 +72,10 @@
 		4B59024826B3673600489384 /* ThirdPartyBrowser.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B59024726B3673600489384 /* ThirdPartyBrowser.swift */; };
 		4B59024A26B38B0B00489384 /* Login Data in Resources */ = {isa = PBXBuildFile; fileRef = 4B59024926B38B0B00489384 /* Login Data */; };
 		4B59024C26B38BB800489384 /* ChromiumLoginReaderTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B59024B26B38BB800489384 /* ChromiumLoginReaderTests.swift */; };
+		4B5FA60D26F7E8BB0020F7D9 /* PasswordManagementItemModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B5FA60C26F7E8BB0020F7D9 /* PasswordManagementItemModel.swift */; };
+		4B5FA60F26F7E8D40020F7D9 /* PasswordManagementNoteModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B5FA60E26F7E8D40020F7D9 /* PasswordManagementNoteModel.swift */; };
+		4B5FA61126F7F4590020F7D9 /* PasswordManagementNoteItemView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B5FA61026F7F4590020F7D9 /* PasswordManagementNoteItemView.swift */; };
+		4B5FA61326F800820020F7D9 /* EditableTextView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B5FA61226F800820020F7D9 /* EditableTextView.swift */; };
 		4B5FF67826B602B100D42879 /* FirefoxDataImporter.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B5FF67726B602B100D42879 /* FirefoxDataImporter.swift */; };
 		4B6160D825B150E4007DE5B2 /* trackerData.json in Resources */ = {isa = PBXBuildFile; fileRef = 4B6160D725B150E4007DE5B2 /* trackerData.json */; };
 		4B6160DD25B152C5007DE5B2 /* ContentBlockerRulesUserScript.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B6160DC25B152C5007DE5B2 /* ContentBlockerRulesUserScript.swift */; };
@@ -589,6 +593,10 @@
 		4B59024726B3673600489384 /* ThirdPartyBrowser.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ThirdPartyBrowser.swift; sourceTree = "<group>"; };
 		4B59024926B38B0B00489384 /* Login Data */ = {isa = PBXFileReference; lastKnownFileType = file; path = "Login Data"; sourceTree = "<group>"; };
 		4B59024B26B38BB800489384 /* ChromiumLoginReaderTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChromiumLoginReaderTests.swift; sourceTree = "<group>"; };
+		4B5FA60C26F7E8BB0020F7D9 /* PasswordManagementItemModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PasswordManagementItemModel.swift; sourceTree = "<group>"; };
+		4B5FA60E26F7E8D40020F7D9 /* PasswordManagementNoteModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PasswordManagementNoteModel.swift; sourceTree = "<group>"; };
+		4B5FA61026F7F4590020F7D9 /* PasswordManagementNoteItemView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PasswordManagementNoteItemView.swift; sourceTree = "<group>"; };
+		4B5FA61226F800820020F7D9 /* EditableTextView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EditableTextView.swift; sourceTree = "<group>"; };
 		4B5FF67726B602B100D42879 /* FirefoxDataImporter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FirefoxDataImporter.swift; sourceTree = "<group>"; };
 		4B6160D225B14E6E007DE5B2 /* TrackerRadarManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TrackerRadarManager.swift; sourceTree = "<group>"; };
 		4B6160D725B150E4007DE5B2 /* trackerData.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; path = trackerData.json; sourceTree = "<group>"; };
@@ -1677,7 +1685,9 @@
 			isa = PBXGroup;
 			children = (
 				85CC1D7A26A05ECF0062F04E /* PasswordManagementItemListModel.swift */,
+				4B5FA60C26F7E8BB0020F7D9 /* PasswordManagementItemModel.swift */,
 				85CC1D7C26A05F250062F04E /* PasswordManagementLoginModel.swift */,
+				4B5FA60E26F7E8D40020F7D9 /* PasswordManagementNoteModel.swift */,
 			);
 			path = Model;
 			sourceTree = "<group>";
@@ -1687,11 +1697,13 @@
 			children = (
 				85CC1D72269EF1880062F04E /* PasswordManagementItemList.swift */,
 				85CC1D74269F6B420062F04E /* PasswordManagementLoginItemView.swift */,
+				4B5FA61026F7F4590020F7D9 /* PasswordManagementNoteItemView.swift */,
 				85625997269C9C5F00EE44BC /* PasswordManagementPopover.swift */,
 				85625995269C953C00EE44BC /* PasswordManagementViewController.swift */,
 				85625993269C8F9600EE44BC /* PasswordManager.storyboard */,
 				85890639267BCD8E00D23B0D /* SaveCredentialsPopover.swift */,
 				8589063B267BCDC000D23B0D /* SaveCredentialsViewController.swift */,
+				4B5FA61226F800820020F7D9 /* EditableTextView.swift */,
 			);
 			path = View;
 			sourceTree = "<group>";
@@ -3151,6 +3163,7 @@
 				85D885B026A590A90077C374 /* NSNotificationName+PasswordManager.swift in Sources */,
 				AAC30A28268E045400D2D9CD /* CrashReportReader.swift in Sources */,
 				4B6160DD25B152C5007DE5B2 /* ContentBlockerRulesUserScript.swift in Sources */,
+				4B5FA61126F7F4590020F7D9 /* PasswordManagementNoteItemView.swift in Sources */,
 				85AC3B3525DA82A600C7D2AA /* DataTaskProviding.swift in Sources */,
 				4BA1A6B3258B080A00F6F690 /* EncryptionKeyGeneration.swift in Sources */,
 				4B723E0B26B0005B00E14D75 /* CSVImportViewController.swift in Sources */,
@@ -3277,6 +3290,7 @@
 				4B59023E26B35F3600489384 /* ChromiumLoginReader.swift in Sources */,
 				85D885B326A5A9DE0077C374 /* NSAlert+PasswordManager.swift in Sources */,
 				85E11C2F25E7DC7E00974CAF /* ExternalURLHandler.swift in Sources */,
+				4B5FA60F26F7E8D40020F7D9 /* PasswordManagementNoteModel.swift in Sources */,
 				85308E27267FCB22001ABD76 /* PasswordManagerSettings.swift in Sources */,
 				85A0116925AF1D8900FA6A0C /* FindInPageViewController.swift in Sources */,
 				4BB6CE5F26B77ED000EC5860 /* Cryptography.swift in Sources */,
@@ -3347,6 +3361,7 @@
 				AA9E9A5E25A4867200D1959D /* TabDragAndDropManager.swift in Sources */,
 				B68458C025C7E9E000DC17B6 /* TabCollectionViewModel+NSSecureCoding.swift in Sources */,
 				AA8EDF2724923EC70071C2E8 /* StringExtension.swift in Sources */,
+				4B5FA60D26F7E8BB0020F7D9 /* PasswordManagementItemModel.swift in Sources */,
 				B68172A9269C487D006D1092 /* PrivacyDashboardUserScript.swift in Sources */,
 				858A797F26A79EAA00A75A42 /* UserText+PasswordManager.swift in Sources */,
 				8589063A267BCD8E00D23B0D /* SaveCredentialsPopover.swift in Sources */,
@@ -3418,6 +3433,7 @@
 				B64C84EB2692DD650048FEBE /* PermissionAuthorizationPopover.swift in Sources */,
 				AA6FFB4624DC3B5A0028F4D0 /* WebView.swift in Sources */,
 				B6CF78DE267B099C00CD4F13 /* WKNavigationActionExtension.swift in Sources */,
+				4B5FA61326F800820020F7D9 /* EditableTextView.swift in Sources */,
 				AA7412B224D0B3AC00D22FE0 /* TabBarViewItem.swift in Sources */,
 				856C98D52570116900A22F1F /* NSWindow+Toast.swift in Sources */,
 				4B5FF67826B602B100D42879 /* FirefoxDataImporter.swift in Sources */,

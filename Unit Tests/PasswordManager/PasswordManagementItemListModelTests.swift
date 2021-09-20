@@ -33,7 +33,7 @@ final class PasswordManagementItemListModelTests: XCTestCase {
         model.selectAccount(accounts[0])
         XCTAssertNotNil(model.selected)
 
-        model.selectItem(with : accounts[8].id!)
+        model.selectItem(with: accounts[8].id!)
         XCTAssertEqual(model.selected?.id, 8)
 
         model.clearSelection()

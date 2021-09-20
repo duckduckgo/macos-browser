@@ -91,8 +91,8 @@ final class PasswordManagementViewController: NSViewController {
     }
 
     private func refetchWithText(_ text: String, clearWhenNoMatches: Bool = false, completion: (() -> Void)? = nil) {
-        fetchSecureVaultItems { [weak self] accounts in
-            self?.listModel?.accounts = accounts
+        fetchSecureVaultItems { [weak self] items in
+            self?.listModel?.items = items
             self?.searchField.stringValue = text
             self?.updateFilter()
 
@@ -112,7 +112,7 @@ final class PasswordManagementViewController: NSViewController {
     }
 
     func clear() {
-        self.listModel?.accounts = []
+        self.listModel?.items = []
         self.listModel?.filter = ""
         self.listModel?.clearSelection()
         self.itemModel?.clearSecureVaultModel()
@@ -123,7 +123,16 @@ final class PasswordManagementViewController: NSViewController {
         self.listModel?.updateAccount(SecureVaultItem.account(credentials.account))
 
         if select {
-            self.listModel?.select(item: SecureVaultItem.account(credentials.account))
+            self.listModel?.selected(item: SecureVaultItem.account(credentials.account))
+        }
+    }
+
+    private func syncModelsOnNote(_ note: SecureVaultModels.Note, select: Bool = false) {
+        self.itemModel?.setSecureVaultModel(note)
+        self.listModel?.updateAccount(SecureVaultItem.note(note))
+
+        if select {
+            self.listModel?.selected(item: SecureVaultItem.note(note))
         }
     }
 
@@ -133,16 +142,41 @@ final class PasswordManagementViewController: NSViewController {
             self?.postChange()
         }, onSaveRequested: { [weak self] credentials in
             self?.doSaveCredentials(credentials)
-        }, onDeleteRequested: { [weak self] in
-            self?.promptToDelete($0)
+        }, onDeleteRequested: { [weak self] credentials in
+            self?.promptToDelete(credentials: credentials)
         })
 
         self.itemModel = itemModel
 
         let view = NSHostingView(rootView: PasswordManagementLoginItemView().environmentObject(itemModel))
+        replaceItemContainerChildView(with: view)
+    }
+
+    private func createNoteItemView() {
+        let itemModel = PasswordManagementNoteModel(onDirtyChanged: { [weak self] isDirty in
+            self?.isDirty = isDirty
+            self?.postChange()
+        }, onSaveRequested: { [weak self] note in
+            self?.doSaveNote(note)
+        }, onDeleteRequested: { [weak self] note in
+            print("Delete note \(note)")
+        })
+
+        self.itemModel = itemModel
+
+        let view = NSHostingView(rootView: PasswordManagementNoteItemView().environmentObject(itemModel))
+        replaceItemContainerChildView(with: view)
+    }
+
+    private func replaceItemContainerChildView(with view: NSView) {
+        itemContainer.subviews.forEach {
+            $0.removeFromSuperview()
+        }
+
         view.frame = itemContainer.bounds
         view.wantsLayer = true
         view.layer?.masksToBounds = false
+
         itemContainer.addSubview(view)
         itemContainer.wantsLayer = true
         itemContainer.layer?.masksToBounds = false
@@ -174,7 +208,32 @@ final class PasswordManagementViewController: NSViewController {
         }
     }
 
-    private func promptToDelete(_ credentials: SecureVaultModels.WebsiteCredentials) {
+    private func doSaveNote(_ note: SecureVaultModels.Note) {
+        let isNew = note.id == nil
+
+        do {
+            guard let id = try secureVault?.storeNote(note) else {
+                return
+            }
+
+            itemModel?.cancel()
+            if isNew {
+                refetchWithText(searchField.stringValue) { [weak self] in
+                    self?.syncModelsOnNote(note, select: true)
+                }
+            } else {
+                syncModelsOnNote(note)
+            }
+            postChange()
+
+        } catch {
+            if let window = view.window, case SecureVaultError.duplicateRecord = error {
+                NSAlert.passwordManagerDuplicateLogin().beginSheetModal(for: window)
+            }
+        }
+    }
+
+    private func promptToDelete(credentials: SecureVaultModels.WebsiteCredentials) {
         guard let window = self.view.window,
               let id = credentials.account.id else { return }
 
@@ -201,14 +260,20 @@ final class PasswordManagementViewController: NSViewController {
 
     private func createListView() {
         let listModel = PasswordManagementItemListModel { [weak self] previousValue, newValue in
-            guard let id = newValue.id,
+            guard let id = newValue.secureVaultID,
                   let window = self?.view.window else { return }
 
-            print("Got new value: \(newValue)")
-
-            func loadCredentialsWithId() {
-                guard let credentials = try? self?.secureVault?.websiteCredentialsFor(accountId: id) else { return }
-                self?.syncModelsOnCredentials(credentials)
+            func loadNewItemWithID() {
+                switch newValue {
+                case .account:
+                    guard let credentials = try? self?.secureVault?.websiteCredentialsFor(accountId: id) else { return }
+                    self?.createLoginItemView()
+                    self?.syncModelsOnCredentials(credentials)
+                case .note:
+                    guard let note = try? self?.secureVault?.noteFor(id: id) else { return }
+                    self?.createNoteItemView()
+                    self?.syncModelsOnNote(note)
+                }
             }
 
             if self?.isDirty == true {
@@ -218,15 +283,15 @@ final class PasswordManagementViewController: NSViewController {
                     switch response {
                     case .alertFirstButtonReturn: // Save
                         self?.itemModel?.save()
-                        loadCredentialsWithId()
+                        loadNewItemWithID()
 
                     case .alertSecondButtonReturn: // Discard
                         self?.itemModel?.cancel()
-                        loadCredentialsWithId()
+                        loadNewItemWithID()
 
                     case .alertThirdButtonReturn: // Cancel
-                        if let previousId = previousValue?.id {
-                            self?.listModel?.selectItem(with : previousId)
+                        if let previousValue = previousValue {
+                            self?.listModel?.select(item: previousValue)
                         }
 
                     default:
@@ -235,9 +300,10 @@ final class PasswordManagementViewController: NSViewController {
 
                 }
             } else {
-                loadCredentialsWithId()
+                loadNewItemWithID()
             }
         }
+
         self.listModel = listModel
 
         let view = NSHostingView(rootView: PasswordManagementItemListView().environmentObject(listModel))
@@ -250,7 +316,7 @@ final class PasswordManagementViewController: NSViewController {
 
         menu.items = [
             NSMenuItem(title: "Login", action: #selector(createNewLogin), keyEquivalent: ""),
-            NSMenuItem(title: "Note", action: #selector(createNewLogin), keyEquivalent: "")
+            NSMenuItem(title: "Note", action: #selector(createNewNote), keyEquivalent: "")
         ]
 
         return menu
@@ -266,7 +332,7 @@ final class PasswordManagementViewController: NSViewController {
             let accounts = (try? self.secureVault?.accounts()) ?? []
             let notes = (try? self.secureVault?.notes()) ?? []
 
-            let items = accounts.map(SecureVaultItem.account)
+            let items = accounts.map(SecureVaultItem.account) + notes.map(SecureVaultItem.note)
 
             DispatchQueue.main.async {
                 completion(items)
@@ -279,6 +345,45 @@ final class PasswordManagementViewController: NSViewController {
         guard let window = view.window else { return }
 
         func createNew() {
+            createLoginItemView()
+
+            listModel?.clearSelection()
+            itemModel?.createNew()
+        }
+
+        if isDirty {
+            let alert = NSAlert.passwordManagerSaveChangesToLogin()
+            alert.beginSheetModal(for: window) { response in
+
+                switch response {
+                case .alertFirstButtonReturn: // Save
+                    self.itemModel?.save()
+                    createNew()
+
+                case .alertSecondButtonReturn: // Discard
+                    self.itemModel?.cancel()
+                    createNew()
+
+                case .alertThirdButtonReturn: // Cancel
+                    break // just do nothing
+
+                default:
+                    fatalError("Unknown response \(response)")
+                }
+
+            }
+        } else {
+            createNew()
+        }
+    }
+
+    @objc
+    private func createNewNote() {
+        guard let window = view.window else { return }
+
+        func createNew() {
+            createNoteItemView()
+
             listModel?.clearSelection()
             itemModel?.createNew()
         }

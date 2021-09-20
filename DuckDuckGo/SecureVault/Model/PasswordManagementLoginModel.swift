@@ -19,18 +19,6 @@
 import Combine
 import BrowserServicesKit
 
-protocol PasswordManagementItemModel: AnyObject {
-
-    func createNew()
-    func cancel()
-    func save()
-    func clearSecureVaultModel()
-    func setSecureVaultModel<Model>(_ modelObject: Model)
-
-    var isEditingPublisher: Published<Bool>.Publisher { get }
-
-}
-
 final class PasswordManagementLoginModel: ObservableObject, PasswordManagementItemModel {
 
     typealias Model = SecureVaultModels.WebsiteCredentials
@@ -159,7 +147,6 @@ final class PasswordManagementLoginModel: ObservableObject, PasswordManagementIt
             credentials = nil
             isNew = false
         }
-
     }
 
     func createNew() {

@@ -19,20 +19,44 @@
 import Combine
 import BrowserServicesKit
 
-enum SecureVaultItem {
-    case account(SecureVaultModels.WebsiteAccount)
+enum SecureVaultItem: Equatable, Identifiable {
 
-    var websiteAccount: SecureVaultModels.WebsiteAccount {
+    case account(SecureVaultModels.WebsiteAccount)
+    case note(SecureVaultModels.Note)
+
+    var websiteAccount: SecureVaultModels.WebsiteAccount? {
         switch self {
         case .account(let account):
             return account
+        default:
+            return nil
         }
     }
 
-    var id: Int64? {
+    // Used as a unique identifier for SwiftUI
+    var id: String? {
+        switch self {
+        case .account(let account):
+            if let id = account.id {
+                return "account-\(id)"
+            } else {
+                return "account-unsaved"
+            }
+        case .note(let note):
+            if let id = note.id {
+                return "note-\(id)"
+            } else {
+                return "note-unsaved"
+            }
+        }
+    }
+
+    var secureVaultID: Int64? {
         switch self {
         case .account(let account):
             return account.id
+        case .note(let note):
+            return note.id
         }
     }
 
@@ -40,6 +64,8 @@ enum SecureVaultItem {
         switch self {
         case .account(let account):
             return account.title
+        case .note(let note):
+            return note.title
         }
     }
 
@@ -49,6 +75,8 @@ enum SecureVaultItem {
             return account.domain.lowercased().contains(filter) ||
                 account.username.lowercased().contains(filter) ||
                 account.title?.lowercased().contains(filter) ?? false
+        case .note(let note):
+            return note.title.localizedCaseInsensitiveContains(filter)
         }
     }
 
@@ -56,6 +84,8 @@ enum SecureVaultItem {
         switch self {
         case .account(let account):
             return ((account.title ?? "").isEmpty == true ? account.domain.dropWWW() : account.title) ?? ""
+        case .note(let note):
+            return note.title
         }
     }
 
@@ -63,8 +93,22 @@ enum SecureVaultItem {
         switch self {
         case .account(let account):
             return account.username
+        case .note(let note):
+            return note.text.truncated(length: 100)
         }
     }
+
+    static func == (lhs: SecureVaultItem, rhs: SecureVaultItem) -> Bool {
+        switch (lhs, rhs) {
+        case (.account(let account1), .account(let account2)):
+            return account1.id == account2.id
+        case (.note(let note1), .note(let note2)):
+            return note1.id == note2.id
+        default:
+            return false
+        }
+    }
+
 }
 
 //// Using generic "item list" term as eventually this will be more than just accounts.
@@ -72,8 +116,9 @@ enum SecureVaultItem {
 /// Could maybe even abstract a bunch of this code to be more generic re-usable styled list for use elsewhere.
 final class PasswordManagementItemListModel: ObservableObject {
 
-    var accounts = [SecureVaultItem]() {
+    var items = [SecureVaultItem]() {
         didSet {
+            print("Set items: \(items)")
             refresh()
         }
     }
@@ -93,40 +138,43 @@ final class PasswordManagementItemListModel: ObservableObject {
         self.onItemSelected = onItemSelected
     }
 
-    func select(item: SecureVaultItem) {
+    func selected(item: SecureVaultItem) {
+        print("SELECTED: \(item)")
         let previous = selected
         selected = item
         onItemSelected(previous, item)
     }
 
-    func selectItem(with id: Int64) {
-        selected = displayedAccounts.first(where: { $0.id == id })
+    func select(item: SecureVaultItem) {
+        selected = displayedAccounts.first(where: { $0 == item })
     }
 
     func updateAccount(_ account: SecureVaultItem) {
         var accounts = displayedAccounts
 
-        if let index = accounts.firstIndex(where: { $0.id == account.id }) {
-            accounts[index] = account
-            displayedAccounts = accounts
-        }
+        guard let index = accounts.firstIndex(where: {
+            $0 == account
+        }) else { return }
+
+        accounts[index] = account
+        displayedAccounts = accounts
     }
 
     func refresh() {
         let filter = self.filter.lowercased()
 
         if filter.isEmpty {
-            displayedAccounts = accounts
+            displayedAccounts = items
         } else {
             let filter = filter.lowercased()
-            displayedAccounts = accounts.filter { $0.item(matches: filter) }
+            displayedAccounts = items.filter { $0.item(matches: filter) }
         }
     }
 
     func selectFirst() {
         selected = nil
-        if let selected = displayedAccounts.first {
-            select(item: selected)
+        if let selectedAccount = displayedAccounts.first {
+            selected(item: selectedAccount)
         }
     }
 
