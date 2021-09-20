@@ -3,16 +3,6 @@
     {
       "filename" : "V.svg",
       "idiom" : "universal"
-    },
-    {
-      "appearances" : [
-        {
-          "appearance" : "luminosity",
-          "value" : "dark"
-        }
-      ],
-      "filename" : "V-1.svg",
-      "idiom" : "universal"
     }
   ],
   "info" : {

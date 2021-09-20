@@ -3,16 +3,6 @@
     {
       "filename" : "Y.svg",
       "idiom" : "universal"
-    },
-    {
-      "appearances" : [
-        {
-          "appearance" : "luminosity",
-          "value" : "dark"
-        }
-      ],
-      "filename" : "Y-1.svg",
-      "idiom" : "universal"
     }
   ],
   "info" : {

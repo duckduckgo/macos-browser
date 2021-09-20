@@ -3,16 +3,6 @@
     {
       "filename" : "Q.svg",
       "idiom" : "universal"
-    },
-    {
-      "appearances" : [
-        {
-          "appearance" : "luminosity",
-          "value" : "dark"
-        }
-      ],
-      "filename" : "Q-1.svg",
-      "idiom" : "universal"
     }
   ],
   "info" : {

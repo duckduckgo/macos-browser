@@ -22,7 +22,22 @@ struct PrivacyIconViewModel {
 
     private static let maxNumberOfIcons = 4
 
-    static func sortedEntityLetters(from trackerInfo: TrackerInfo) -> [Character] {
+    static func trackerImages(from trackerInfo: TrackerInfo) -> [CGImage] {
+        let sortedEntities = sortedEntityLetters(from: trackerInfo).prefix(maxNumberOfIcons)
+        var images: [CGImage] = sortedEntities.map {
+            if let image = trackerImages[$0] {
+                return image
+            } else {
+                return blankTrackerImage
+            }
+        }
+        if images.count == maxNumberOfIcons {
+            images[maxNumberOfIcons - 1] = shadowTrackerImage
+        }
+        return images
+    }
+
+    private static func sortedEntityLetters(from trackerInfo: TrackerInfo) -> [Character] {
         struct LightEntity: Hashable {
             let name: String
             let prevalence: Double
@@ -55,25 +70,39 @@ struct PrivacyIconViewModel {
             }
     }
 
-    static func trackerImages(from trackerInfo: TrackerInfo) -> [CGImage] {
-        let sortedEntities = sortedEntityLetters(from: trackerInfo).prefix(maxNumberOfIcons)
-        var images: [CGImage] = sortedEntities.map {
-            if let image = trackerImages[$0] {
-                return image
-            } else {
-                return blankTrackerImage
-            }
+    // MARK: - Images
+
+    static var shadowTrackerImage: CGImage {
+        if NSApp.effectiveAppearance.name == NSAppearance.Name.aqua {
+            return shadowTrackerImageAqua
+        } else {
+            return shadowTrackerImageDark
         }
-        if images.count == maxNumberOfIcons {
-            images[maxNumberOfIcons - 1] = shadowTrackerImage
-        }
-        return images
     }
 
-    static let shadowTrackerImage = NSImage(named: "ShadowTracker")!.cgImage(forProposedRect: nil, context: .current, hints: nil)!
-    static let blankTrackerImage = NSImage(named: "BlankTracker")!.cgImage(forProposedRect: nil, context: .current, hints: nil)!
+    private static let shadowTrackerImageAqua = NSImage(named: "ShadowTracker")!.cgImage(forProposedRect: nil, context: .current, hints: nil)!
+    private static let shadowTrackerImageDark = NSImage(named: "ShadowTrackerDark")!.cgImage(forProposedRect: nil, context: .current, hints: nil)!
 
-    static let trackerImages: [Character: CGImage] = {
+    static var blankTrackerImage: CGImage {
+        if NSApp.effectiveAppearance.name == NSAppearance.Name.aqua {
+            return blankTrackerImageAqua
+        } else {
+            return blankTrackerImageDark
+        }
+    }
+
+    static let blankTrackerImageAqua = NSImage(named: "BlankTracker")!.cgImage(forProposedRect: nil, context: .current, hints: nil)!
+    static let blankTrackerImageDark = NSImage(named: "BlankTrackerDark")!.cgImage(forProposedRect: nil, context: .current, hints: nil)!
+
+    static var trackerImages: [Character: CGImage] {
+        if NSApp.effectiveAppearance.name == NSAppearance.Name.aqua {
+            return trackerImagesAqua
+        } else {
+            return trackerImagesDark
+        }
+    }
+
+    private static let trackerImagesAqua: [Character: CGImage] = {
         return [
             "A": NSImage(named: "A")!.cgImage(forProposedRect: nil, context: .current, hints: nil)!,
             "B": NSImage(named: "B")!.cgImage(forProposedRect: nil, context: .current, hints: nil)!,
@@ -101,6 +130,37 @@ struct PrivacyIconViewModel {
             "X": NSImage(named: "X")!.cgImage(forProposedRect: nil, context: .current, hints: nil)!,
             "Y": NSImage(named: "Y")!.cgImage(forProposedRect: nil, context: .current, hints: nil)!,
             "Z": NSImage(named: "Z")!.cgImage(forProposedRect: nil, context: .current, hints: nil)!
+        ]
+    }()
+
+    private static let trackerImagesDark: [Character: CGImage] = {
+        return [
+            "A": NSImage(named: "ADark")!.cgImage(forProposedRect: nil, context: .current, hints: nil)!,
+            "B": NSImage(named: "BDark")!.cgImage(forProposedRect: nil, context: .current, hints: nil)!,
+            "C": NSImage(named: "CDark")!.cgImage(forProposedRect: nil, context: .current, hints: nil)!,
+            "D": NSImage(named: "DDark")!.cgImage(forProposedRect: nil, context: .current, hints: nil)!,
+            "E": NSImage(named: "EDark")!.cgImage(forProposedRect: nil, context: .current, hints: nil)!,
+            "F": NSImage(named: "FDark")!.cgImage(forProposedRect: nil, context: .current, hints: nil)!,
+            "G": NSImage(named: "GDark")!.cgImage(forProposedRect: nil, context: .current, hints: nil)!,
+            "H": NSImage(named: "HDark")!.cgImage(forProposedRect: nil, context: .current, hints: nil)!,
+            "I": NSImage(named: "IDark")!.cgImage(forProposedRect: nil, context: .current, hints: nil)!,
+            "J": NSImage(named: "JDark")!.cgImage(forProposedRect: nil, context: .current, hints: nil)!,
+            "K": NSImage(named: "KDark")!.cgImage(forProposedRect: nil, context: .current, hints: nil)!,
+            "L": NSImage(named: "LDark")!.cgImage(forProposedRect: nil, context: .current, hints: nil)!,
+            "M": NSImage(named: "MDark")!.cgImage(forProposedRect: nil, context: .current, hints: nil)!,
+            "N": NSImage(named: "NDark")!.cgImage(forProposedRect: nil, context: .current, hints: nil)!,
+            "O": NSImage(named: "ODark")!.cgImage(forProposedRect: nil, context: .current, hints: nil)!,
+            "P": NSImage(named: "PDark")!.cgImage(forProposedRect: nil, context: .current, hints: nil)!,
+            "Q": NSImage(named: "QDark")!.cgImage(forProposedRect: nil, context: .current, hints: nil)!,
+            "R": NSImage(named: "RDark")!.cgImage(forProposedRect: nil, context: .current, hints: nil)!,
+            "S": NSImage(named: "SDark")!.cgImage(forProposedRect: nil, context: .current, hints: nil)!,
+            "T": NSImage(named: "TDark")!.cgImage(forProposedRect: nil, context: .current, hints: nil)!,
+            "U": NSImage(named: "UDark")!.cgImage(forProposedRect: nil, context: .current, hints: nil)!,
+            "V": NSImage(named: "VDark")!.cgImage(forProposedRect: nil, context: .current, hints: nil)!,
+            "W": NSImage(named: "WDark")!.cgImage(forProposedRect: nil, context: .current, hints: nil)!,
+            "X": NSImage(named: "XDark")!.cgImage(forProposedRect: nil, context: .current, hints: nil)!,
+            "Y": NSImage(named: "YDark")!.cgImage(forProposedRect: nil, context: .current, hints: nil)!,
+            "Z": NSImage(named: "ZDark")!.cgImage(forProposedRect: nil, context: .current, hints: nil)!
         ]
     }()
 
