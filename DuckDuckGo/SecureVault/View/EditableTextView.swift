@@ -24,10 +24,10 @@ struct MacEditorTextView: NSViewRepresentable {
     @Binding var text: String
 
     var isEditable: Bool = true
-    var font: NSFont?    = .systemFont(ofSize: 14, weight: .regular)
+    var font: NSFont? = .systemFont(ofSize: 14, weight: .regular)
     var onEditingChanged: () -> Void       = {}
-    var onCommit        : () -> Void       = {}
-    var onTextChange    : (String) -> Void = { _ in }
+    var onCommit: () -> Void = {}
+    var onTextChange: (String) -> Void = { _ in }
 
     func makeCoordinator() -> Coordinator {
         Coordinator(self)

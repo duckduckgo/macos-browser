@@ -76,6 +76,7 @@
 		4B5FA60F26F7E8D40020F7D9 /* PasswordManagementNoteModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B5FA60E26F7E8D40020F7D9 /* PasswordManagementNoteModel.swift */; };
 		4B5FA61126F7F4590020F7D9 /* PasswordManagementNoteItemView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B5FA61026F7F4590020F7D9 /* PasswordManagementNoteItemView.swift */; };
 		4B5FA61326F800820020F7D9 /* EditableTextView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B5FA61226F800820020F7D9 /* EditableTextView.swift */; };
+		4B5FA61526F8EE440020F7D9 /* PasswordManagementIdentityModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B5FA61426F8EE440020F7D9 /* PasswordManagementIdentityModel.swift */; };
 		4B5FF67826B602B100D42879 /* FirefoxDataImporter.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B5FF67726B602B100D42879 /* FirefoxDataImporter.swift */; };
 		4B6160D825B150E4007DE5B2 /* trackerData.json in Resources */ = {isa = PBXBuildFile; fileRef = 4B6160D725B150E4007DE5B2 /* trackerData.json */; };
 		4B6160DD25B152C5007DE5B2 /* ContentBlockerRulesUserScript.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B6160DC25B152C5007DE5B2 /* ContentBlockerRulesUserScript.swift */; };
@@ -597,6 +598,7 @@
 		4B5FA60E26F7E8D40020F7D9 /* PasswordManagementNoteModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PasswordManagementNoteModel.swift; sourceTree = "<group>"; };
 		4B5FA61026F7F4590020F7D9 /* PasswordManagementNoteItemView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PasswordManagementNoteItemView.swift; sourceTree = "<group>"; };
 		4B5FA61226F800820020F7D9 /* EditableTextView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EditableTextView.swift; sourceTree = "<group>"; };
+		4B5FA61426F8EE440020F7D9 /* PasswordManagementIdentityModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PasswordManagementIdentityModel.swift; sourceTree = "<group>"; };
 		4B5FF67726B602B100D42879 /* FirefoxDataImporter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FirefoxDataImporter.swift; sourceTree = "<group>"; };
 		4B6160D225B14E6E007DE5B2 /* TrackerRadarManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TrackerRadarManager.swift; sourceTree = "<group>"; };
 		4B6160D725B150E4007DE5B2 /* trackerData.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; path = trackerData.json; sourceTree = "<group>"; };
@@ -1687,6 +1689,7 @@
 				85CC1D7A26A05ECF0062F04E /* PasswordManagementItemListModel.swift */,
 				4B5FA60C26F7E8BB0020F7D9 /* PasswordManagementItemModel.swift */,
 				85CC1D7C26A05F250062F04E /* PasswordManagementLoginModel.swift */,
+				4B5FA61426F8EE440020F7D9 /* PasswordManagementIdentityModel.swift */,
 				4B5FA60E26F7E8D40020F7D9 /* PasswordManagementNoteModel.swift */,
 			);
 			path = Model;
@@ -3356,6 +3359,7 @@
 				4B677431255DBEB800025BD8 /* BloomFilterWrapper.mm in Sources */,
 				4B0511C8262CAA5A00F6079C /* PreferencesListViewController.swift in Sources */,
 				B684592725C93C0500DC17B6 /* Publishers.NestedObjectChanges.swift in Sources */,
+				4B5FA61526F8EE440020F7D9 /* PasswordManagementIdentityModel.swift in Sources */,
 				85A011EA25B4D4CA00FA6A0C /* FindInPageUserScript.swift in Sources */,
 				AA9FF95B24A1EFC20039E328 /* TabViewModel.swift in Sources */,
 				AA9E9A5E25A4867200D1959D /* TabDragAndDropManager.swift in Sources */,

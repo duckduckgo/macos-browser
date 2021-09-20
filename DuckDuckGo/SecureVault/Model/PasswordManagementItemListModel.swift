@@ -118,7 +118,6 @@ final class PasswordManagementItemListModel: ObservableObject {
 
     var items = [SecureVaultItem]() {
         didSet {
-            print("Set items: \(items)")
             refresh()
         }
     }
@@ -139,13 +138,14 @@ final class PasswordManagementItemListModel: ObservableObject {
     }
 
     func selected(item: SecureVaultItem) {
-        print("SELECTED: \(item)")
+        print("Selected \(item)")
         let previous = selected
         selected = item
         onItemSelected(previous, item)
     }
 
     func select(item: SecureVaultItem) {
+        print("Select \(item)")
         selected = displayedAccounts.first(where: { $0 == item })
     }
 
@@ -156,6 +156,7 @@ final class PasswordManagementItemListModel: ObservableObject {
             $0 == account
         }) else { return }
 
+        print("Updating account at index \(index) \(account)")
         accounts[index] = account
         displayedAccounts = accounts
     }

@@ -31,7 +31,7 @@ struct PasswordManagementItemListView: View {
                 Spacer(minLength: 10)
 
                 ForEach(model.displayedAccounts, id: \.id) { account in
-                    ItemView(account: account, selected: model.selected?.id == account.id) {
+                    ItemView(item: account, selected: model.selected?.id == account.id) {
                         model.selected(item: account)
                     }
                     .padding(.horizontal, 10)
@@ -45,7 +45,7 @@ struct PasswordManagementItemListView: View {
 
 private struct ItemView: View {
 
-    let account: SecureVaultItem
+    let item: SecureVaultItem
     let selected: Bool
     let action: () -> Void
 
@@ -57,16 +57,21 @@ private struct ItemView: View {
         Button(action: action, label: {
             HStack(spacing: 0) {
 
-                if case let SecureVaultItem.account(account) = account {
+                switch item {
+                case .account(let account):
                     FaviconView(domain: account.domain)
+                        .padding(.leading, 6)
+                case .note:
+                    Image("Note")
+                        .frame(width: 32)
                         .padding(.leading, 6)
                 }
 
                 VStack(alignment: .leading, spacing: 4) {
-                    Text(account.displayTitle)
+                    Text(item.displayTitle)
                         .foregroundColor(textColor)
                         .font(font)
-                    Text(account.displaySubtitle)
+                    Text(item.displaySubtitle)
                         .foregroundColor(textColor.opacity(0.6))
                         .font(font)
                 }

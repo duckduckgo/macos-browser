@@ -30,6 +30,10 @@ final class PasswordManagementNoteModel: ObservableObject, PasswordManagementIte
         return dateFormatter
     } ()
 
+    var onDirtyChanged: (Bool) -> Void
+    var onSaveRequested: (SecureVaultModels.Note) -> Void
+    var onDeleteRequested: (SecureVaultModels.Note) -> Void
+
     var isEditingPublisher: Published<Bool>.Publisher {
         return $isEditing
     }
@@ -63,10 +67,6 @@ final class PasswordManagementNoteModel: ObservableObject, PasswordManagementIte
 
     var lastUpdatedDate: String = ""
     var createdDate: String = ""
-
-    var onDirtyChanged: (Bool) -> Void
-    var onSaveRequested: (SecureVaultModels.Note) -> Void
-    var onDeleteRequested: (SecureVaultModels.Note) -> Void
 
     init(onDirtyChanged: @escaping (Bool) -> Void,
          onSaveRequested: @escaping (SecureVaultModels.Note) -> Void,

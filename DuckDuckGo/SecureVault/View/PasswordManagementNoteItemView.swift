@@ -173,9 +173,9 @@ private struct HeaderView: View {
 
             if model.isNew {
 
-                Text("New Note")
+                TextField("", text: $model.title)
                     .font(.title)
-                    .padding(.trailing, 4)
+                    .textFieldStyle(RoundedBorderTextFieldStyle())
 
             } else {
 
