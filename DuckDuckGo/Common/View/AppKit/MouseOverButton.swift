@@ -148,14 +148,16 @@ internal class MouseOverButton: NSButton {
         }
 
         NSAppearance.withAppAppearance {
-            if isMouseDown {
-                NSAnimationContext.current.duration = 0.0
-                backgroundLayer.backgroundColor = mouseDownColor?.cgColor ?? NSColor.clear.cgColor
-            } else if isMouseOver {
-                NSAnimationContext.current.duration = 0.0
-                backgroundLayer.backgroundColor = mouseOverColor?.cgColor ?? NSColor.clear.cgColor
-            } else {
-                backgroundLayer.backgroundColor = NSColor.clear.cgColor
+            NSAnimationContext.runAnimationGroup { context in
+                if isMouseDown {
+                    context.duration = 0.0
+                    backgroundLayer.backgroundColor = mouseDownColor?.cgColor ?? NSColor.clear.cgColor
+                } else if isMouseOver {
+                    context.duration = 0.0
+                    backgroundLayer.backgroundColor = mouseOverColor?.cgColor ?? NSColor.clear.cgColor
+                } else {
+                    backgroundLayer.backgroundColor = NSColor.clear.cgColor
+                }
             }
         }
     }
