@@ -22,6 +22,7 @@ import BrowserServicesKit
 enum SecureVaultItem: Equatable, Identifiable {
 
     case account(SecureVaultModels.WebsiteAccount)
+    case identity(SecureVaultModels.Identity)
     case note(SecureVaultModels.Note)
 
     var websiteAccount: SecureVaultModels.WebsiteAccount? {
@@ -42,6 +43,12 @@ enum SecureVaultItem: Equatable, Identifiable {
             } else {
                 return "account-unsaved"
             }
+        case .identity(let identity):
+            if let id = identity.id {
+                return "identity-\(id)"
+            } else {
+                return "identity-unsaved"
+            }
         case .note(let note):
             if let id = note.id {
                 return "note-\(id)"
@@ -55,6 +62,8 @@ enum SecureVaultItem: Equatable, Identifiable {
         switch self {
         case .account(let account):
             return account.id
+        case .identity(let identity):
+            return identity.id
         case .note(let note):
             return note.id
         }
@@ -64,6 +73,8 @@ enum SecureVaultItem: Equatable, Identifiable {
         switch self {
         case .account(let account):
             return account.title
+        case .identity(let identity):
+            return identity.title
         case .note(let note):
             return note.title
         }
@@ -75,6 +86,8 @@ enum SecureVaultItem: Equatable, Identifiable {
             return account.domain.lowercased().contains(filter) ||
                 account.username.lowercased().contains(filter) ||
                 account.title?.lowercased().contains(filter) ?? false
+        case .identity(let identity):
+            return identity.title.localizedCaseInsensitiveContains(filter)
         case .note(let note):
             return note.title.localizedCaseInsensitiveContains(filter)
         }
@@ -84,6 +97,8 @@ enum SecureVaultItem: Equatable, Identifiable {
         switch self {
         case .account(let account):
             return ((account.title ?? "").isEmpty == true ? account.domain.dropWWW() : account.title) ?? ""
+        case .identity(let identity):
+            return identity.title
         case .note(let note):
             return note.title
         }
@@ -93,6 +108,15 @@ enum SecureVaultItem: Equatable, Identifiable {
         switch self {
         case .account(let account):
             return account.username
+        case .identity(let identity):
+            let formatter = PersonNameComponentsFormatter()
+
+            var nameComponents = PersonNameComponents()
+            nameComponents.givenName = identity.firstName
+            nameComponents.middleName = identity.middleName
+            nameComponents.familyName = identity.lastName
+
+            return formatter.string(from: nameComponents)
         case .note(let note):
             return note.text.truncated(length: 100)
         }
@@ -102,6 +126,8 @@ enum SecureVaultItem: Equatable, Identifiable {
         switch (lhs, rhs) {
         case (.account(let account1), .account(let account2)):
             return account1.id == account2.id
+        case (.identity(let identity1), .identity(let identity2)):
+            return identity1.id == identity2.id
         case (.note(let note1), .note(let note2)):
             return note1.id == note2.id
         default:
@@ -138,14 +164,12 @@ final class PasswordManagementItemListModel: ObservableObject {
     }
 
     func selected(item: SecureVaultItem) {
-        print("Selected \(item)")
         let previous = selected
         selected = item
         onItemSelected(previous, item)
     }
 
     func select(item: SecureVaultItem) {
-        print("Select \(item)")
         selected = displayedAccounts.first(where: { $0 == item })
     }
 
@@ -156,7 +180,6 @@ final class PasswordManagementItemListModel: ObservableObject {
             $0 == account
         }) else { return }
 
-        print("Updating account at index \(index) \(account)")
         accounts[index] = account
         displayedAccounts = accounts
     }

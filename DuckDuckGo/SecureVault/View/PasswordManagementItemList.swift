@@ -30,9 +30,9 @@ struct PasswordManagementItemListView: View {
             VStack(alignment: .leading) {
                 Spacer(minLength: 10)
 
-                ForEach(model.displayedAccounts, id: \.id) { account in
-                    ItemView(item: account, selected: model.selected?.id == account.id) {
-                        model.selected(item: account)
+                ForEach(model.displayedAccounts, id: \.id) { item in
+                    ItemView(item: item, selected: model.selected == item) {
+                        model.selected(item: item)
                     }
                     .padding(.horizontal, 10)
                 }
@@ -60,6 +60,10 @@ private struct ItemView: View {
                 switch item {
                 case .account(let account):
                     FaviconView(domain: account.domain)
+                        .padding(.leading, 6)
+                case .identity:
+                    Image("Identity")
+                        .frame(width: 32)
                         .padding(.leading, 6)
                 case .note:
                     Image("Note")
