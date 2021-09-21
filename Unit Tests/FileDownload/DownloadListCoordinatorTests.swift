@@ -426,7 +426,7 @@ final class DownloadListCoordinatorTests: XCTestCase {
             e.fulfill()
         }
         coordinator.cancel(downloadWithIdentifier: id)
-        waitForExpectations(timeout: 0)
+        waitForExpectations(timeout: 1)
     }
 
     func testSync() {
