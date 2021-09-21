@@ -25,10 +25,7 @@ class TabBarTests: XCTestCase {
         XCUIApplication().launch()
     }
 
-    override func tearDownWithError() throws {
-    }
-
-    func testOpeningTabs() throws {
+    func testWhenClickingAddTab_ThenTabsOpen() throws {
         let app = XCUIApplication()
         
         let tabbarviewitemElementsQuery = app.windows.collectionViews.otherElements.containing(.group, identifier: "TabBarViewItem")
