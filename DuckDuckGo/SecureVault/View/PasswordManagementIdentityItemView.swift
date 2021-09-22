@@ -60,8 +60,6 @@ struct PasswordManagementIdentityItemView: View {
                 .padding()
             }
 
-            // Spacer(minLength: 0)
-
         }
         .padding(EdgeInsets(top: 10, leading: 0, bottom: 10, trailing: 10))
 
@@ -87,16 +85,16 @@ private struct IdentificationView: View {
                     .padding(.bottom, 20)
             }
 
-            if !model.firstName.isEmpty || editMode {
-                FirstNameView()
+            EditableIdentityField(textFieldValue: $model.firstName, title: "First Name") {
+                print("Copied First Name")
             }
 
-            if !model.middleName.isEmpty || editMode {
-                MiddleNameView()
+            EditableIdentityField(textFieldValue: $model.middleName, title: "Middle Name") {
+                print("Copied Middle Name")
             }
 
-            if !model.lastName.isEmpty || editMode {
-                LastNameView()
+            EditableIdentityField(textFieldValue: $model.lastName, title: "Last Name") {
+                print("Copied Last Name")
             }
         }
 
@@ -108,60 +106,52 @@ private struct AddressView: View {
 
     @EnvironmentObject var model: PasswordManagementIdentityModel
 
-    @State private var selectedCountry = "Canada"
-
-    let countries: [String] = {
-        var countries: [String] = []
-
-        for code in NSLocale.isoCountryCodes as [String] {
-            let id = NSLocale.localeIdentifier(fromComponents: [NSLocale.Key.countryCode.rawValue: code])
-            let name = NSLocale(localeIdentifier: "en_UK").displayName(forKey: NSLocale.Key.identifier, value: id) ?? "Country not found for code: \(code)"
-            countries.append(name)
-        }
-
-        return countries.sorted()
-    }()
-
     var body: some View {
 
         VStack(alignment: .leading, spacing: 0) {
-            let editMode = model.isEditing || model.isNew
-
-            if !model.addressStreet.isEmpty || !model.addressCity.isEmpty || !model.addressProvince.isEmpty || !model.addressPostalCode.isEmpty || editMode {
+            if !model.addressStreet.isEmpty || !model.addressCity.isEmpty || !model.addressProvince.isEmpty || !model.addressPostalCode.isEmpty || model.isInEditMode {
                 Text("Address")
                     .bold()
                     .foregroundColor(.gray)
                     .padding(.bottom, 20)
             }
 
-            if !model.addressStreet.isEmpty || editMode {
-                AddressStreetView()
+            EditableIdentityField(textFieldValue: $model.addressStreet, title: "Street") {
+                print("Copied street")
             }
 
-            if !model.addressCity.isEmpty || editMode {
-                AddressCityView()
+            EditableIdentityField(textFieldValue: $model.addressCity, title: "City") {
+                print("Copied city")
             }
 
-            if !model.addressProvince.isEmpty || editMode {
-                AddressProvinceView()
+            EditableIdentityField(textFieldValue: $model.addressProvince, title: "Province") {
+                print("Copied province")
             }
 
-            if !model.addressPostalCode.isEmpty || editMode {
-                AddressPostalCodeView()
+            EditableIdentityField(textFieldValue: $model.addressPostalCode, title: "Postal Code") {
+                print("Copied postal code")
             }
 
-            if editMode {
+            if model.isInEditMode {
                 Text("Country")
                     .bold()
                     .padding(.bottom, 5)
 
-                Picker("", selection: $selectedCountry) {
-                    ForEach(countries, id: \.self) {
-                        Text($0)
+                Picker("", selection: $model.addressCountryCode) {
+                    ForEach(CountryList.countries, id: \.self) { country in
+                        Text(country.name)
+                            .tag(country.countryCode)
                     }
                 }
                 .labelsHidden()
                 .padding(.bottom, 5)
+            } else if !model.addressCountryCode.isEmpty {
+                Text("Country")
+                    .bold()
+                    .padding(.bottom, 5)
+
+                Text(CountryList.name(forCountryCode: model.addressCountryCode) ?? "")
+                    .padding(.bottom, interItemSpacing)
             }
         }
 
@@ -176,25 +166,23 @@ private struct ContactInfoView: View {
     var body: some View {
 
         VStack(alignment: .leading, spacing: 0) {
-            let editMode = model.isEditing || model.isNew
-
-            if !model.homePhone.isEmpty || !model.mobilePhone.isEmpty || !model.emailAddress.isEmpty || editMode {
+            if !model.homePhone.isEmpty || !model.mobilePhone.isEmpty || !model.emailAddress.isEmpty || model.isInEditMode {
                 Text("Contact Info")
                     .bold()
                     .foregroundColor(.gray)
                     .padding(.bottom, 20)
             }
 
-            if !model.homePhone.isEmpty || editMode {
-                HomePhoneView()
+            EditableIdentityField(textFieldValue: $model.homePhone, title: "Home Phone") {
+                print("Copied home phone")
             }
 
-            if !model.mobilePhone.isEmpty || editMode {
-                MobilePhoneView()
+            EditableIdentityField(textFieldValue: $model.mobilePhone, title: "Mobile Phone") {
+                print("Copied mobile phone")
             }
 
-            if !model.emailAddress.isEmpty || editMode {
-                EmailAddressView()
+            EditableIdentityField(textFieldValue: $model.emailAddress, title: "Email Address") {
+                print("Copied email address")
             }
         }
 
@@ -290,453 +278,55 @@ private struct Buttons: View {
 
 }
 
-// MARK: - Identity Views
-
-private struct FirstNameView: View {
+private struct EditableIdentityField: View {
 
     @EnvironmentObject var model: PasswordManagementIdentityModel
 
     @State var isHovering = false
+    @Binding var textFieldValue: String
+
+    let title: String
+    let copyButtonClosure: () -> Void
 
     var body: some View {
-        VStack(alignment: .leading, spacing: 0) {
+        // Only show fields if the model is either editing or has data to show
+        if model.isInEditMode || !textFieldValue.isEmpty {
 
-            Text("First Name")
-                .bold()
-                .padding(.bottom, 5)
+            VStack(alignment: .leading, spacing: 0) {
 
-            if model.isEditing || model.isNew {
+                Text(title)
+                    .bold()
+                    .padding(.bottom, 5)
 
-                TextField("", text: $model.firstName)
-                    .textFieldStyle(RoundedBorderTextFieldStyle())
-                    .padding(.bottom, interItemSpacing)
+                if model.isEditing || model.isNew {
 
-            } else {
+                    TextField("", text: $textFieldValue)
+                        .textFieldStyle(RoundedBorderTextFieldStyle())
+                        .padding(.bottom, interItemSpacing)
 
-                HStack(spacing: 6) {
-                    Text(model.firstName)
+                } else {
 
-                    if isHovering {
-                        Button {
-                            // model.copyFirstName()
-                        } label: {
-                            Image("Copy")
-                        }.buttonStyle(PlainButtonStyle())
+                    HStack(spacing: 6) {
+                        Text(textFieldValue)
+
+                        if isHovering {
+                            Button {
+                                copyButtonClosure()
+                            } label: {
+                                Image("Copy")
+                            }.buttonStyle(PlainButtonStyle())
+                        }
+
+                        Spacer()
                     }
-
-                    Spacer()
+                    .padding(.bottom, interItemSpacing)
                 }
-                .padding(.bottom, interItemSpacing)
+
+            }
+            .onHover {
+                isHovering = $0
             }
 
-        }
-        .onHover {
-            isHovering = $0
-        }
-    }
-
-}
-
-private struct MiddleNameView: View {
-
-    @EnvironmentObject var model: PasswordManagementIdentityModel
-
-    @State var isHovering = false
-
-    var body: some View {
-        VStack(alignment: .leading, spacing: 0) {
-
-            Text("Middle Name")
-                .bold()
-                .padding(.bottom, 5)
-
-            if model.isEditing || model.isNew {
-
-                TextField("", text: $model.middleName)
-                    .textFieldStyle(RoundedBorderTextFieldStyle())
-                    .padding(.bottom, interItemSpacing)
-
-            } else {
-
-                HStack(spacing: 6) {
-                    Text(model.middleName)
-
-                    if isHovering {
-                        Button {
-                            // model.copyFirstName()
-                        } label: {
-                            Image("Copy")
-                        }.buttonStyle(PlainButtonStyle())
-                    }
-
-                    Spacer()
-                }
-                .padding(.bottom, interItemSpacing)
-            }
-
-        }
-        .onHover {
-            isHovering = $0
-        }
-    }
-
-}
-
-private struct LastNameView: View {
-
-    @EnvironmentObject var model: PasswordManagementIdentityModel
-
-    @State var isHovering = false
-
-    var body: some View {
-        VStack(alignment: .leading, spacing: 0) {
-
-            Text("Last Name")
-                .bold()
-                .padding(.bottom, 5)
-
-            if model.isEditing || model.isNew {
-
-                TextField("", text: $model.lastName)
-                    .textFieldStyle(RoundedBorderTextFieldStyle())
-                    .padding(.bottom, interItemSpacing)
-
-            } else {
-
-                HStack(spacing: 6) {
-                    Text(model.lastName)
-
-                    if isHovering {
-                        Button {
-                            // model.copyFirstName()
-                        } label: {
-                            Image("Copy")
-                        }.buttonStyle(PlainButtonStyle())
-                    }
-
-                    Spacer()
-                }
-                .padding(.bottom, interItemSpacing)
-            }
-
-        }
-        .onHover {
-            isHovering = $0
-        }
-    }
-
-}
-
-private struct AddressStreetView: View {
-
-    @EnvironmentObject var model: PasswordManagementIdentityModel
-
-    @State var isHovering = false
-
-    var body: some View {
-        VStack(alignment: .leading, spacing: 0) {
-
-            Text("Street")
-                .bold()
-                .padding(.bottom, 5)
-
-            if model.isEditing || model.isNew {
-
-                TextField("", text: $model.addressStreet)
-                    .textFieldStyle(RoundedBorderTextFieldStyle())
-                    .padding(.bottom, interItemSpacing)
-
-            } else {
-
-                HStack(spacing: 6) {
-                    Text(model.addressStreet)
-
-                    if isHovering {
-                        Button {
-                            // model.copyFirstName()
-                        } label: {
-                            Image("Copy")
-                        }.buttonStyle(PlainButtonStyle())
-                    }
-
-                    Spacer()
-                }
-                .padding(.bottom, interItemSpacing)
-            }
-
-        }
-        .onHover {
-            isHovering = $0
-        }
-    }
-
-}
-
-private struct AddressCityView: View {
-
-    @EnvironmentObject var model: PasswordManagementIdentityModel
-
-    @State var isHovering = false
-
-    var body: some View {
-        VStack(alignment: .leading, spacing: 0) {
-
-            Text("City")
-                .bold()
-                .padding(.bottom, 5)
-
-            if model.isEditing || model.isNew {
-
-                TextField("", text: $model.addressCity)
-                    .textFieldStyle(RoundedBorderTextFieldStyle())
-                    .padding(.bottom, interItemSpacing)
-
-            } else {
-
-                HStack(spacing: 6) {
-                    Text(model.addressCity)
-
-                    if isHovering {
-                        Button {
-                            // model.copyFirstName()
-                        } label: {
-                            Image("Copy")
-                        }.buttonStyle(PlainButtonStyle())
-                    }
-
-                    Spacer()
-                }
-                .padding(.bottom, interItemSpacing)
-            }
-
-        }
-        .onHover {
-            isHovering = $0
-        }
-    }
-
-}
-
-private struct AddressProvinceView: View {
-
-    @EnvironmentObject var model: PasswordManagementIdentityModel
-
-    @State var isHovering = false
-
-    var body: some View {
-        VStack(alignment: .leading, spacing: 0) {
-
-            Text("State / Province")
-                .bold()
-                .padding(.bottom, 5)
-
-            if model.isEditing || model.isNew {
-
-                TextField("", text: $model.addressProvince)
-                    .textFieldStyle(RoundedBorderTextFieldStyle())
-                    .padding(.bottom, interItemSpacing)
-
-            } else {
-
-                HStack(spacing: 6) {
-                    Text(model.addressProvince)
-
-                    if isHovering {
-                        Button {
-                            // model.copyFirstName()
-                        } label: {
-                            Image("Copy")
-                        }.buttonStyle(PlainButtonStyle())
-                    }
-
-                    Spacer()
-                }
-                .padding(.bottom, interItemSpacing)
-            }
-
-        }
-        .onHover {
-            isHovering = $0
-        }
-    }
-
-}
-
-private struct AddressPostalCodeView: View {
-
-    @EnvironmentObject var model: PasswordManagementIdentityModel
-
-    @State var isHovering = false
-
-    var body: some View {
-        VStack(alignment: .leading, spacing: 0) {
-
-            Text("Postal Code")
-                .bold()
-                .padding(.bottom, 5)
-
-            if model.isEditing || model.isNew {
-
-                TextField("", text: $model.addressPostalCode)
-                    .textFieldStyle(RoundedBorderTextFieldStyle())
-                    .padding(.bottom, interItemSpacing)
-
-            } else {
-
-                HStack(spacing: 6) {
-                    Text(model.addressPostalCode)
-
-                    if isHovering {
-                        Button {
-                            // model.copyFirstName()
-                        } label: {
-                            Image("Copy")
-                        }.buttonStyle(PlainButtonStyle())
-                    }
-
-                    Spacer()
-                }
-                .padding(.bottom, interItemSpacing)
-            }
-
-        }
-        .onHover {
-            isHovering = $0
-        }
-    }
-
-}
-
-private struct HomePhoneView: View {
-
-    @EnvironmentObject var model: PasswordManagementIdentityModel
-
-    @State var isHovering = false
-
-    var body: some View {
-        VStack(alignment: .leading, spacing: 0) {
-
-            Text("Home Phone")
-                .bold()
-                .padding(.bottom, 5)
-
-            if model.isEditing || model.isNew {
-
-                TextField("", text: $model.homePhone)
-                    .textFieldStyle(RoundedBorderTextFieldStyle())
-                    .padding(.bottom, interItemSpacing)
-
-            } else {
-
-                HStack(spacing: 6) {
-                    Text(model.homePhone)
-
-                    if isHovering {
-                        Button {
-                            // model.copyFirstName()
-                        } label: {
-                            Image("Copy")
-                        }.buttonStyle(PlainButtonStyle())
-                    }
-
-                    Spacer()
-                }
-                .padding(.bottom, interItemSpacing)
-            }
-
-        }
-        .onHover {
-            isHovering = $0
-        }
-    }
-
-}
-
-private struct MobilePhoneView: View {
-
-    @EnvironmentObject var model: PasswordManagementIdentityModel
-
-    @State var isHovering = false
-
-    var body: some View {
-        VStack(alignment: .leading, spacing: 0) {
-
-            Text("Mobile Phone")
-                .bold()
-                .padding(.bottom, 5)
-
-            if model.isEditing || model.isNew {
-
-                TextField("", text: $model.mobilePhone)
-                    .textFieldStyle(RoundedBorderTextFieldStyle())
-                    .padding(.bottom, interItemSpacing)
-
-            } else {
-
-                HStack(spacing: 6) {
-                    Text(model.mobilePhone)
-
-                    if isHovering {
-                        Button {
-                            // model.copyFirstName()
-                        } label: {
-                            Image("Copy")
-                        }.buttonStyle(PlainButtonStyle())
-                    }
-
-                    Spacer()
-                }
-                .padding(.bottom, interItemSpacing)
-            }
-
-        }
-        .onHover {
-            isHovering = $0
-        }
-    }
-
-}
-
-private struct EmailAddressView: View {
-
-    @EnvironmentObject var model: PasswordManagementIdentityModel
-
-    @State var isHovering = false
-
-    var body: some View {
-        VStack(alignment: .leading, spacing: 0) {
-
-            Text("Email Address")
-                .bold()
-                .padding(.bottom, 5)
-
-            if model.isEditing || model.isNew {
-
-                TextField("", text: $model.emailAddress)
-                    .textFieldStyle(RoundedBorderTextFieldStyle())
-                    .padding(.bottom, interItemSpacing)
-
-            } else {
-
-                HStack(spacing: 6) {
-                    Text(model.emailAddress)
-
-                    if isHovering {
-                        Button {
-                            // model.copyFirstName()
-                        } label: {
-                            Image("Copy")
-                        }.buttonStyle(PlainButtonStyle())
-                    }
-
-                    Spacer()
-                }
-                .padding(.bottom, interItemSpacing)
-            }
-
-        }
-        .onHover {
-            isHovering = $0
         }
     }
 

@@ -36,26 +36,11 @@ enum SecureVaultItem: Equatable, Identifiable {
 
     // Used as a unique identifier for SwiftUI
     var id: String? {
-        switch self {
-        case .account(let account):
-            if let id = account.id {
-                return "account-\(id)"
-            } else {
-                return "account-unsaved"
-            }
-        case .identity(let identity):
-            if let id = identity.id {
-                return "identity-\(id)"
-            } else {
-                return "identity-unsaved"
-            }
-        case .note(let note):
-            if let id = note.id {
-                return "note-\(id)"
-            } else {
-                return "note-unsaved"
-            }
+        guard let caseName = Mirror(reflecting: self).children.first?.label, let id = self.secureVaultID else {
+            return nil
         }
+
+        return "\(caseName)-\(id)"
     }
 
     var secureVaultID: Int64? {
@@ -109,14 +94,12 @@ enum SecureVaultItem: Equatable, Identifiable {
         case .account(let account):
             return account.username
         case .identity(let identity):
-            let formatter = PersonNameComponentsFormatter()
-
             var nameComponents = PersonNameComponents()
             nameComponents.givenName = identity.firstName
             nameComponents.middleName = identity.middleName
             nameComponents.familyName = identity.lastName
 
-            return formatter.string(from: nameComponents)
+            return PasswordManagementItemListModel.personNameComponentsFormatter.string(from: nameComponents)
         case .note(let note):
             return note.text.truncated(length: 100)
         }
@@ -141,6 +124,13 @@ enum SecureVaultItem: Equatable, Identifiable {
 ///
 /// Could maybe even abstract a bunch of this code to be more generic re-usable styled list for use elsewhere.
 final class PasswordManagementItemListModel: ObservableObject {
+
+    static let personNameComponentsFormatter: PersonNameComponentsFormatter = {
+        let nameFormatter = PersonNameComponentsFormatter()
+        nameFormatter.style = .long
+
+        return nameFormatter
+    }()
 
     var items = [SecureVaultItem]() {
         didSet {

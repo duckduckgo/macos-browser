@@ -44,6 +44,10 @@ final class PasswordManagementIdentityModel: ObservableObject, PasswordManagemen
         }
     }
 
+    var isInEditMode: Bool {
+        return isEditing || isNew
+    }
+
     @Published var isEditing = false
     @Published var isNew = false
 
@@ -90,6 +94,12 @@ final class PasswordManagementIdentityModel: ObservableObject, PasswordManagemen
     }
 
     @Published var addressPostalCode: String = "" {
+        didSet {
+            isDirty = true
+        }
+    }
+
+    @Published var addressCountryCode: String = "" {
         didSet {
             isDirty = true
         }
@@ -157,6 +167,7 @@ final class PasswordManagementIdentityModel: ObservableObject, PasswordManagemen
         identity.addressCity = addressCity
         identity.addressProvince = addressProvince
         identity.addressPostalCode = addressPostalCode
+        identity.addressCountryCode = addressCountryCode
 
         identity.homePhone = homePhone
         identity.mobilePhone = mobilePhone
@@ -197,6 +208,7 @@ final class PasswordManagementIdentityModel: ObservableObject, PasswordManagemen
         addressCity = identity?.addressCity ?? ""
         addressProvince = identity?.addressProvince ?? ""
         addressPostalCode = identity?.addressPostalCode ?? ""
+        addressCountryCode = identity?.addressCountryCode ?? ""
 
         homePhone = identity?.homePhone ?? ""
         mobilePhone = identity?.mobilePhone ?? ""
