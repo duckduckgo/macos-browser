@@ -85,18 +85,18 @@ final class PasswordManagementViewController: NSViewController {
 
     @IBAction func onNewClicked(_ sender: NSButton) {
         let menu = createNewSecureVaultItemMenu()
-        let location = NSPoint(x: sender.frame.origin.x, y: sender.frame.origin.y - (sender.frame.height / 2))
+        let location = NSPoint(x: sender.frame.origin.x, y: sender.frame.origin.y - (sender.frame.height / 2) + 6)
 
         menu.popUp(positioning: nil, at: location, in: sender.superview)
     }
 
     private func refetchWithText(_ text: String, clearWhenNoMatches: Bool = false, completion: (() -> Void)? = nil) {
         fetchSecureVaultItems { [weak self] items in
-            self?.listModel?.items = items
+            self?.listModel?.update(items: items)
             self?.searchField.stringValue = text
             self?.updateFilter()
 
-            if clearWhenNoMatches && self?.listModel?.displayedAccounts.isEmpty == true {
+            if clearWhenNoMatches && self?.listModel?.displayedItems.isEmpty == true {
                 self?.searchField.stringValue = ""
                 self?.updateFilter()
             } else if self?.isDirty == false {
@@ -112,7 +112,7 @@ final class PasswordManagementViewController: NSViewController {
     }
 
     func clear() {
-        self.listModel?.items = []
+        self.listModel?.update(items: [])
         self.listModel?.filter = ""
         self.listModel?.clearSelection()
         self.itemModel?.clearSecureVaultModel()

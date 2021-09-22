@@ -19,7 +19,7 @@
 import Combine
 import BrowserServicesKit
 
-enum SecureVaultItem: Equatable, Identifiable {
+enum SecureVaultItem: Equatable, Identifiable, Comparable {
 
     case account(SecureVaultModels.WebsiteAccount)
     case identity(SecureVaultModels.Identity)
@@ -35,12 +35,8 @@ enum SecureVaultItem: Equatable, Identifiable {
     }
 
     // Used as a unique identifier for SwiftUI
-    var id: String? {
-        guard let caseName = Mirror(reflecting: self).children.first?.label, let id = self.secureVaultID else {
-            return nil
-        }
-
-        return "\(caseName)-\(id)"
+    var id: String {
+        return String(describing: self)
     }
 
     var secureVaultID: Int64? {
@@ -62,6 +58,17 @@ enum SecureVaultItem: Equatable, Identifiable {
             return identity.title
         case .note(let note):
             return note.title
+        }
+    }
+
+    var lastUpdated: Date {
+        switch self {
+        case .account(let account):
+            return account.lastUpdated
+        case .identity(let identity):
+            return identity.lastUpdated
+        case .note(let note):
+            return note.lastUpdated
         }
     }
 
@@ -118,6 +125,14 @@ enum SecureVaultItem: Equatable, Identifiable {
         }
     }
 
+    static func < (lhs: SecureVaultItem, rhs: SecureVaultItem) -> Bool {
+        if let lhsTitle = lhs.title, let rhsTitle = rhs.title {
+            return lhsTitle < rhsTitle
+        }
+
+        return lhs.lastUpdated < rhs.lastUpdated
+    }
+
 }
 
 //// Using generic "item list" term as eventually this will be more than just accounts.
@@ -125,18 +140,52 @@ enum SecureVaultItem: Equatable, Identifiable {
 /// Could maybe even abstract a bunch of this code to be more generic re-usable styled list for use elsewhere.
 final class PasswordManagementItemListModel: ObservableObject {
 
+    enum ListSection {
+        case accounts([SecureVaultItem])
+        case notes([SecureVaultItem])
+        case identities([SecureVaultItem])
+
+        var title: String {
+            switch self {
+            case .accounts:
+                return "Accounts"
+            case .notes:
+                return "Notes"
+            case .identities:
+                return "Identities"
+            }
+        }
+
+        var items: [SecureVaultItem] {
+            switch self {
+            case .accounts(let items):
+                return items
+            case .notes(let items):
+                return items
+            case .identities(let items):
+                return items
+            }
+        }
+
+        func withUpdatedItems(_ newItems: [SecureVaultItem]) -> ListSection {
+            switch self {
+            case .accounts:
+                return .accounts(newItems)
+            case .notes:
+                return .notes(newItems)
+            case .identities:
+                return .identities(newItems)
+            }
+        }
+
+    }
+
     static let personNameComponentsFormatter: PersonNameComponentsFormatter = {
         let nameFormatter = PersonNameComponentsFormatter()
-        nameFormatter.style = .long
+        nameFormatter.style = .medium
 
         return nameFormatter
     }()
-
-    var items = [SecureVaultItem]() {
-        didSet {
-            refresh()
-        }
-    }
 
     var filter: String = "" {
         didSet {
@@ -144,13 +193,23 @@ final class PasswordManagementItemListModel: ObservableObject {
         }
     }
 
-    @Published private(set) var displayedAccounts = [SecureVaultItem]()
+    private var items = [SecureVaultItem]() {
+        didSet {
+            refresh()
+        }
+    }
+
+    @Published private(set) var displayedItems = [ListSection]()
     @Published private(set) var selected: SecureVaultItem?
 
     private var onItemSelected: (_ old: SecureVaultItem?, _ new: SecureVaultItem) -> Void
 
     init(onItemSelected: @escaping (_ old: SecureVaultItem?, _ new: SecureVaultItem) -> Void) {
         self.onItemSelected = onItemSelected
+    }
+
+    func update(items: [SecureVaultItem]) {
+        self.items = items.sorted()
     }
 
     func selected(item: SecureVaultItem) {
@@ -160,40 +219,78 @@ final class PasswordManagementItemListModel: ObservableObject {
     }
 
     func select(item: SecureVaultItem) {
-        selected = displayedAccounts.first(where: { $0 == item })
+        for section in displayedItems {
+            if let first = section.items.first(where: { $0 == item }) {
+                selected = first
+            }
+        }
     }
 
-    func updateAccount(_ account: SecureVaultItem) {
-        var accounts = displayedAccounts
+    func updateAccount(_ item: SecureVaultItem) {
+        var sections = displayedItems
 
-        guard let index = accounts.firstIndex(where: {
-            $0 == account
+        guard let sectionIndex = sections.firstIndex(where: {
+            $0.items.contains(item)
         }) else { return }
 
-        accounts[index] = account
-        displayedAccounts = accounts
+        let updatedSection = displayedItems[sectionIndex]
+        var updatedSectionItems = updatedSection.items
+
+        guard let updatedItemIndex = updatedSectionItems.firstIndex(where: {
+            $0 == item
+        }) else { return }
+
+        updatedSectionItems[updatedItemIndex] = item
+        sections[sectionIndex] = updatedSection.withUpdatedItems(updatedSectionItems)
+
+        displayedItems = sections
     }
 
     func refresh() {
         let filter = self.filter.lowercased()
 
         if filter.isEmpty {
-            displayedAccounts = items
+            displayedItems = sortIntoSections(items)
         } else {
             let filter = filter.lowercased()
-            displayedAccounts = items.filter { $0.item(matches: filter) }
+            let filteredItems = items.filter { $0.item(matches: filter) }
+
+            displayedItems = sortIntoSections(filteredItems)
         }
     }
 
     func selectFirst() {
         selected = nil
-        if let selectedAccount = displayedAccounts.first {
-            selected(item: selectedAccount)
+        if let firstSection = displayedItems.first, let selectedItem = firstSection.items.first {
+            selected(item: selectedItem)
         }
     }
 
     func clearSelection() {
         selected = nil
+    }
+
+    private func sortIntoSections(_ items: [SecureVaultItem]) -> [ListSection] {
+        var accounts = [SecureVaultItem]()
+        var notes = [SecureVaultItem]()
+        var identities = [SecureVaultItem]()
+
+        for item in items {
+            switch item {
+            case .account:
+                accounts.append(item)
+            case .note:
+                notes.append(item)
+            case .identity:
+                identities.append(item)
+            }
+        }
+
+        return [
+            .accounts(accounts),
+            .identities(identities),
+            .notes(notes)
+        ]
     }
 
 }

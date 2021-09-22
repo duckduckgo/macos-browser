@@ -30,11 +30,17 @@ struct PasswordManagementItemListView: View {
             VStack(alignment: .leading) {
                 Spacer(minLength: 10)
 
-                ForEach(model.displayedAccounts, id: \.id) { item in
-                    ItemView(item: item, selected: model.selected == item) {
-                        model.selected(item: item)
+                ForEach(model.displayedItems, id: \.title) { section in
+
+                    Section(header: Text(section.title).padding(.leading, 20).padding(.top, 15)) {
+
+                        ForEach(section.items, id: \.id) { item in
+                            ItemView(item: item, selected: model.selected == item) {
+                                model.selected(item: item)
+                            }
+                            .padding(.horizontal, 10)
+                        }
                     }
-                    .padding(.horizontal, 10)
                 }
             }
         }
