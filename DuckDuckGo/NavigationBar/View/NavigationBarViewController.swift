@@ -252,6 +252,7 @@ final class NavigationBarViewController: NSViewController {
         guard closeTransientPopovers() else { return }
 
         downloadsButton.isHidden = false
+        setDownloadButtonHidingTimer()
         downloadsPopover.show(relativeTo: downloadsButton.bounds.insetFromLineOfDeath(), of: downloadsButton, preferredEdge: .maxY)
 
         if shouldFirePixel {
@@ -361,7 +362,7 @@ final class NavigationBarViewController: NSViewController {
         let hasActiveDownloads = DownloadListCoordinator.shared.hasActiveDownloads
 
         downloadsButton.image = hasActiveDownloads ? Self.activeDownloadsImage : Self.inactiveDownloadsImage
-        if hasActiveDownloads || downloadsPopover.isShown {
+        if hasActiveDownloads {
             downloadsButton.isHidden = false
         } else {
             setDownloadButtonHidingTimer()
