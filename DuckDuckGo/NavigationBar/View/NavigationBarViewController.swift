@@ -65,6 +65,7 @@ final class NavigationBarViewController: NSViewController {
     private lazy var downloadsPopover: DownloadsPopover = {
         let downloadsPopover = DownloadsPopover()
         downloadsPopover.delegate = self
+        (downloadsPopover.contentViewController as? DownloadsViewController)?.delegate = self
         return downloadsPopover
     }()
     var isDownloadsPopoverShown: Bool {
@@ -499,6 +500,14 @@ extension NavigationBarViewController: NSPopoverDelegate {
         if notification.object as AnyObject? === downloadsPopover {
             updateDownloadsButton()
         }
+    }
+
+}
+
+extension NavigationBarViewController: DownloadsViewControllerDelegate {
+
+    func clearDownloadsActionTriggered() {
+        downloadsButton.isHidden = true
     }
 
 }

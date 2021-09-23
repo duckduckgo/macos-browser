@@ -19,6 +19,12 @@
 import Cocoa
 import Combine
 
+protocol DownloadsViewControllerDelegate: AnyObject {
+
+    func clearDownloadsActionTriggered()
+
+}
+
 final class DownloadsViewController: NSViewController {
 
     static func create() -> Self {
@@ -33,6 +39,8 @@ final class DownloadsViewController: NSViewController {
     @IBOutlet var contextMenu: NSMenu!
     @IBOutlet var tableView: NSTableView!
     @IBOutlet var tableViewHeightConstraint: NSLayoutConstraint?
+
+    weak var delegate: DownloadsViewControllerDelegate?
 
     var viewModel = DownloadListViewModel()
     var downloadsCancellable: AnyCancellable?
@@ -106,6 +114,7 @@ final class DownloadsViewController: NSViewController {
     @IBAction func clearDownloadsAction(_ sender: Any) {
         viewModel.cleanupInactiveDownloads()
         self.dismiss()
+        delegate?.clearDownloadsActionTriggered()
     }
 
     @IBAction func openDownloadedFileAction(_ sender: Any) {
