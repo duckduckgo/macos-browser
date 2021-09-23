@@ -70,6 +70,12 @@ final class MoreOptionsMenu: NSMenu {
 
         addUtilityItems()
 
+        addItem(withTitle: UserText.emailOptionsMenuItem, action: nil, keyEquivalent: "")
+            .withImage(NSImage(named: "OptionsButtonMenuEmail"))
+            .withSubmenu(EmailOptionsButtonSubMenu(tabCollectionViewModel: tabCollectionViewModel, emailManager: emailManager))
+
+        addItem(NSMenuItem.separator())
+
         addPageItems()
 
         let preferencesItem = NSMenuItem(title: UserText.preferences, action: #selector(openPreferences(_:)), keyEquivalent: "")
@@ -170,10 +176,6 @@ final class MoreOptionsMenu: NSMenu {
             .targetting(self)
             .withImage(NSImage(named: "PasswordManagement"))
             .firingPixel(Pixel.Event.MoreResult.logins)
-
-        addItem(withTitle: UserText.emailOptionsMenuItem, action: nil, keyEquivalent: "")
-            .withImage(NSImage(named: "OptionsButtonMenuEmail"))
-            .withSubmenu(EmailOptionsButtonSubMenu(tabCollectionViewModel: tabCollectionViewModel, emailManager: emailManager))
 
         addItem(NSMenuItem.separator())
     }
