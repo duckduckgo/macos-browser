@@ -38,6 +38,8 @@ final class DownloadsViewController: NSViewController {
     var downloadsCancellable: AnyCancellable?
 
     override func viewWillAppear() {
+        viewModel.filterRemovedDownloads()
+
         downloadsCancellable = viewModel.$items
             .throttle(for: 0.1, scheduler: DispatchQueue.main, latest: true)
             .scan((old: [DownloadViewModel](), new: [DownloadViewModel]()), { ($0.new, $1) })
