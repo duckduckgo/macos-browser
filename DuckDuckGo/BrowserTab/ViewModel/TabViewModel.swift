@@ -78,6 +78,7 @@ final class TabViewModel {
         subscribeToFavicon()
         subscribeToTabError()
         subscribeToPermissions()
+        subscribeToTrackerInfo()
     }
 
     private func subscribeToUrl() {
@@ -107,6 +108,16 @@ final class TabViewModel {
         tab.permissions.$permissions.weakAssign(to: \.usedPermissions, on: self)
             .store(in: &cancellables)
         tab.permissions.$authorizationQuery.weakAssign(to: \.permissionAuthorizationQuery, on: self)
+            .store(in: &cancellables)
+    }
+
+    private func subscribeToTrackerInfo() {
+        tab.$trackerInfo
+            .sink { [weak self] trackerInfo in
+                if trackerInfo?.isEmpty ?? false {
+                    self?.scheduleTrackerAnimationIfNeeded()
+                }
+            }
             .store(in: &cancellables)
     }
 
@@ -193,6 +204,27 @@ final class TabViewModel {
             self.favicon = favicon
         } else {
             favicon = Favicon.defaultFavicon
+        }
+    }
+
+    // MARK: - Privacy icon animation
+
+    let trackersAnimationTriggerPublisher = PassthroughSubject<Void, Never>()
+
+    private var trackerAnimationTimer: Timer?
+
+    private func scheduleTrackerAnimationIfNeeded() {
+        if trackerAnimationTimer == nil {
+            trackerAnimationTimer = Timer.scheduledTimer(withTimeInterval: 3, repeats: true, block: { [weak self] _ in
+                guard let self = self, !self.isLoading else { return }
+
+                if self.tab.trackerInfo?.trackersBlocked.count ?? 0 > 0 {
+                    self.trackersAnimationTriggerPublisher.send()
+                }
+
+                self.trackerAnimationTimer?.invalidate()
+                self.trackerAnimationTimer = nil
+            })
         }
     }
 
