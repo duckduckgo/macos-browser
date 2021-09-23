@@ -32,8 +32,6 @@ final class ChromiumBookmarksReader {
     }
 
     func readBookmarks() -> Result<ImportedBookmarks, ChromiumBookmarksReader.ImportError> {
-        return .failure(.noBookmarksFileFound)
-        
         let fileURL = URL(fileURLWithPath: chromiumLoginDirectoryPath)
 
         guard let bookmarksFileData = try? Data(contentsOf: fileURL) else {
