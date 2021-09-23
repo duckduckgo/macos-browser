@@ -59,9 +59,6 @@ final class MainWindowController: NSWindowController {
         window?.toolbar = NSToolbar()
         window?.toolbar?.showsBaselineSeparator = true
 
-        let toolbarView = titlebarView?.subviews.first(where: { $0.className == "NSToolbarView" })
-        toolbarView?.frame.size.height = 40
-
         moveTabBarView(toTitlebarView: true)
     }
 

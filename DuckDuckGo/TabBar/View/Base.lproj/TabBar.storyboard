@@ -74,7 +74,7 @@
                                 </customSpacing>
                             </stackView>
                             <scrollView wantsLayer="YES" borderType="none" horizontalLineScroll="10" horizontalPageScroll="10" verticalLineScroll="10" verticalPageScroll="10" hasVerticalScroller="NO" verticalScrollElasticity="none" translatesAutoresizingMaskIntoConstraints="NO" id="O0X-yp-zLn" customClass="TabBarScrollView" customModule="DuckDuckGo_Privacy_Browser" customModuleProvider="target">
-                                <rect key="frame" x="76" y="1" width="661" height="34"/>
+                                <rect key="frame" x="76" y="-2" width="661" height="34"/>
                                 <clipView key="contentView" drawsBackground="NO" copiesOnScroll="NO" translatesAutoresizingMaskIntoConstraints="NO" id="zdf-RD-hTG">
                                     <rect key="frame" x="0.0" y="0.0" width="661" height="34"/>
                                     <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
@@ -231,7 +231,7 @@
                             <constraint firstAttribute="trailing" secondItem="8Av-Au-VBq" secondAttribute="trailing" id="04T-2h-lX4"/>
                             <constraint firstItem="efe-Pc-ueT" firstAttribute="leading" secondItem="O0X-yp-zLn" secondAttribute="leading" priority="250" id="5k3-uY-xby"/>
                             <constraint firstItem="kOb-4q-pAe" firstAttribute="leading" secondItem="JQD-ov-FCr" secondAttribute="leading" constant="76" id="8CU-j8-UY3"/>
-                            <constraint firstAttribute="bottom" secondItem="O0X-yp-zLn" secondAttribute="bottom" constant="1" id="9nu-uZ-CjI"/>
+                            <constraint firstAttribute="bottom" secondItem="O0X-yp-zLn" secondAttribute="bottom" constant="-2" id="9nu-uZ-CjI"/>
                             <constraint firstItem="u4N-Qc-LMf" firstAttribute="trailing" secondItem="O0X-yp-zLn" secondAttribute="trailing" id="Bd1-0P-xDt"/>
                             <constraint firstItem="zsA-or-9Xo" firstAttribute="top" secondItem="JQD-ov-FCr" secondAttribute="top" id="CKr-JO-cA6"/>
                             <constraint firstAttribute="bottom" secondItem="zsA-or-9Xo" secondAttribute="bottom" id="ErC-gw-bFR"/>

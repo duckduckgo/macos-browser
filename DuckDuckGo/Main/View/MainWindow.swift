@@ -44,6 +44,7 @@ final class MainWindow: NSWindow {
     }
 
     private func setupWindow() {
+        forceTitleBarHeight()
         allowsToolTipsWhenApplicationIsInactive = false
         autorecalculatesKeyViewLoop = false
         isReleasedWhenClosed = false
@@ -53,6 +54,14 @@ final class MainWindow: NSWindow {
         titlebarAppearsTransparent = true
         // the window will be draggable using custom drag areas defined by WindowDraggingView
         isMovable = false
+    }
+
+    private func forceTitleBarHeight() {
+        assert(titlebarAccessoryViewControllers.isEmpty, "Window already has NSTitlebarAccessoryViewControllers")
+        let controller = NSTitlebarAccessoryViewController()
+        // The toolbar does not change height so update the storyboard to offset the bottom constraint by 38 - the the height below (e.g. -2)
+        controller.view = NSView(frame: .init(x: 0, y: 0, width: 1, height: 40))
+        addTitlebarAccessoryViewController(controller)
     }
 
     // MARK: - First Responder Notification

@@ -12,14 +12,14 @@
             <objects>
                 <viewController id="o2v-eH-jTI" customClass="NavigationBarViewController" customModule="DuckDuckGo_Privacy_Browser" customModuleProvider="target" sceneMemberID="viewController">
                     <view key="view" id="hYV-nu-QIp" customClass="ColorView" customModule="DuckDuckGo_Privacy_Browser" customModuleProvider="target">
-                        <rect key="frame" x="0.0" y="0.0" width="803" height="52"/>
+                        <rect key="frame" x="0.0" y="0.0" width="803" height="48"/>
                         <autoresizingMask key="autoresizingMask"/>
                         <subviews>
                             <customView translatesAutoresizingMaskIntoConstraints="NO" id="EQw-GG-GMA" customClass="WindowDraggingView" customModule="DuckDuckGo_Privacy_Browser" customModuleProvider="target">
-                                <rect key="frame" x="0.0" y="0.0" width="803" height="52"/>
+                                <rect key="frame" x="0.0" y="0.0" width="803" height="48"/>
                             </customView>
                             <stackView distribution="fill" orientation="horizontal" alignment="top" spacing="4" horizontalStackHuggingPriority="249.99998474121094" verticalStackHuggingPriority="249.99998474121094" detachesHiddenViews="YES" translatesAutoresizingMaskIntoConstraints="NO" id="eEh-kf-smR">
-                                <rect key="frame" x="12" y="12" width="92" height="28"/>
+                                <rect key="frame" x="12" y="10" width="92" height="28"/>
                                 <subviews>
                                     <button translatesAutoresizingMaskIntoConstraints="NO" id="kky-0N-Cfd" customClass="LongPressButton" customModule="DuckDuckGo_Privacy_Browser" customModuleProvider="target">
                                         <rect key="frame" x="0.0" y="0.0" width="28" height="28"/>
@@ -112,7 +112,7 @@
                                 </customSpacing>
                             </stackView>
                             <containerView translatesAutoresizingMaskIntoConstraints="NO" id="Wba-nA-FYj">
-                                <rect key="frame" x="112" y="8" width="547" height="36"/>
+                                <rect key="frame" x="112" y="6" width="547" height="36"/>
                                 <constraints>
                                     <constraint firstAttribute="width" relation="greaterThanOrEqual" priority="301" constant="560" id="UmE-2a-hW4"/>
                                     <constraint firstAttribute="height" constant="36" id="fDM-4Y-Nvs"/>
@@ -122,7 +122,7 @@
                                 </connections>
                             </containerView>
                             <stackView distribution="fill" orientation="horizontal" alignment="top" spacing="4" horizontalStackHuggingPriority="249.99998474121094" verticalStackHuggingPriority="249.99998474121094" detachesHiddenViews="YES" translatesAutoresizingMaskIntoConstraints="NO" id="aWu-Jm-Oaz">
-                                <rect key="frame" x="667" y="12" width="124" height="28"/>
+                                <rect key="frame" x="667" y="10" width="124" height="28"/>
                                 <subviews>
                                     <button translatesAutoresizingMaskIntoConstraints="NO" id="1nW-I1-nut" userLabel="Password Management Button" customClass="MouseOverButton" customModule="DuckDuckGo_Privacy_Browser" customModuleProvider="target">
                                         <rect key="frame" x="0.0" y="0.0" width="28" height="28"/>
