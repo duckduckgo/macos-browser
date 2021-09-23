@@ -91,7 +91,7 @@ final class TabBarViewItem: NSCollectionViewItem {
     @IBOutlet weak var tabLoadingViewLeadingConstraint: NSLayoutConstraint!
     @IBOutlet var permissionCloseButtonTrailingConstraint: NSLayoutConstraint!
     @IBOutlet var tabLoadingPermissionLeadingConstraint: NSLayoutConstraint!
-    @IBOutlet var closeButtonTrailintgConstraint: NSLayoutConstraint!
+    @IBOutlet var closeButtonTrailingConstraint: NSLayoutConstraint!
     @IBOutlet var burnerTabIndicator: ColorView!
 
     private let titleTextFieldMaskLayer = CAGradientLayer()
@@ -102,6 +102,7 @@ final class TabBarViewItem: NSCollectionViewItem {
     weak var delegate: TabBarViewItemDelegate?
 
     var isBurnerTab = false
+    var isMouseOver = false
 
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -110,6 +111,7 @@ final class TabBarViewItem: NSCollectionViewItem {
         updateSubviews()
         setupMenu()
         updateTitleTextFieldMask()
+        closeButton.isHidden = true
     }
 
     override func viewDidLayout() {
@@ -265,14 +267,15 @@ final class TabBarViewItem: NSCollectionViewItem {
         }
 
         updateSeparatorView()
-        closeButton.isHidden = !isSelected && !isDragged && widthStage.isCloseButtonHidden
         permissionCloseButtonTrailingConstraint.isActive = !closeButton.isHidden
         titleTextField.isHidden = widthStage.isTitleHidden
 
-        tabLoadingViewCenterConstraint.priority = widthStage.isTitleHidden && widthStage.isCloseButtonHidden ? .defaultHigh : .defaultLow
-        tabLoadingViewLeadingConstraint.priority = widthStage.isTitleHidden && widthStage.isCloseButtonHidden ? .defaultLow : .defaultHigh
+        let showCloseButton = isSelected || isMouseOver
+        closeButton.isHidden = !showCloseButton
+        closeButtonTrailingConstraint.isActive = showCloseButton
 
-        closeButtonTrailintgConstraint.isActive = !widthStage.isCloseButtonHidden
+        tabLoadingViewCenterConstraint.priority = widthStage.isTitleHidden ? .defaultHigh : .defaultLow
+        tabLoadingViewLeadingConstraint.priority = widthStage.isTitleHidden ? .defaultLow : .defaultHigh
     }
 
     private var usedPermissions = Permissions() {
@@ -408,27 +411,10 @@ extension TabBarViewItem: NSMenuDelegate {
 
 extension TabBarViewItem: MouseOverViewDelegate {
 
-    private func modifierFlagsChanged(_ event: NSEvent?) {
-        guard widthStage.isCloseButtonHidden else { return }
-        let commandPressed = event?.modifierFlags.contains(.command) ?? false
-
-        self.closeButton.isHidden = !commandPressed
-        self.faviconImageView.isHidden = commandPressed
-    }
-
     func mouseOverView(_ mouseOverView: MouseOverView, isMouseOver: Bool) {
         delegate?.tabBarViewItem(self, isMouseOver: isMouseOver)
-
-        if isMouseOver {
-            self.modifierFlagsChanged(NSApp.currentEvent)
-            eventMonitor = NSEvent.addLocalMonitorForEvents(matching: .flagsChanged) { [weak self] event in
-                self?.modifierFlagsChanged(event)
-                return event
-            }
-        } else {
-            self.modifierFlagsChanged(nil)
-            eventMonitor = nil
-        }
+        self.isMouseOver = isMouseOver
+        view.needsLayout = true
     }
 
 }
@@ -470,19 +456,16 @@ extension TabBarViewItem {
 
     enum WidthStage {
         case full
-        case withoutCloseButton
         case withoutTitle
 
         init(width: CGFloat) {
             switch width {
             case 0..<61: self = .withoutTitle
-            case 61..<120: self = .withoutCloseButton
             default: self = .full
             }
         }
 
         var isTitleHidden: Bool { self == .withoutTitle }
-        var isCloseButtonHidden: Bool { self != .full }
         var isFaviconCentered: Bool { !isTitleHidden }
     }
 
