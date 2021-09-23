@@ -137,12 +137,32 @@ enum DataImport {
 
 enum DataImportError: Error {
 
+    case noFileFound
     case cannotReadFile
     case browserNeedsToBeClosed
     case needsLoginPrimaryPassword
     case cannotAccessSecureVault
-    case unknownError
+    case unknownError(Error)
 
+}
+
+extension DataImportError: LocalizedError {
+    public var errorDescription: String? {
+        switch self {
+        case .noFileFound:
+            return "Could not find file"
+        case .cannotReadFile:
+            return "Could not read file"
+        case .browserNeedsToBeClosed:
+            return "Browser needs to be closed"
+        case .needsLoginPrimaryPassword:
+            return "Failed to get primary password"
+        case .cannotAccessSecureVault:
+            return "Failed to read Secure Vault data"
+        case .unknownError(let error):
+            return error.localizedDescription
+        }
+    }
 }
 
 /// Represents an object able to import data from an outside source. The outside source may be capable of importing multiple types of data.

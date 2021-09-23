@@ -350,8 +350,6 @@ final class LocalBookmarkStore: BookmarkStore {
                 }
 
                 let bookmarkCountBeforeImport = try context.count(for: Bookmark.bookmarksFetchRequest())
-                os_log("Bookmarks count before import: %d", log: .dataImportExport, bookmarkCountBeforeImport)
-
                 let importRootFolder = createFolder(titled: UserText.importedBookmarks(at: Date()), in: self.context)
 
                 if let bookmarksBar = bookmarks.topLevelFolders.bookmarkBar.children {
@@ -373,7 +371,6 @@ final class LocalBookmarkStore: BookmarkStore {
 
                 try self.context.save()
                 let bookmarkCountAfterImport = try context.count(for: Bookmark.bookmarksFetchRequest())
-                os_log("Bookmarks count after import: %d", log: .dataImportExport, bookmarkCountAfterImport)
 
                 importCount = bookmarkCountAfterImport - bookmarkCountBeforeImport
             } catch {

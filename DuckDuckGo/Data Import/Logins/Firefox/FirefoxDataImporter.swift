@@ -64,7 +64,7 @@ final class FirefoxDataImporter: DataImporter {
                 case .databaseAccessFailed:
                     completion(.failure(.browserNeedsToBeClosed))
                 default:
-                    completion(.failure(.unknownError))
+                    completion(.failure(.unknownError(error)))
                 }
             }
         }

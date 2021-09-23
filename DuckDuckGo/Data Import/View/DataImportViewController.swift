@@ -312,7 +312,7 @@ final class DataImportViewController: NSViewController {
                 completeImport()
             }
         default:
-            let alert = NSAlert.importFailedAlert(source: viewState.selectedImportSource)
+            let alert = NSAlert.importFailedAlert(source: viewState.selectedImportSource, errorMessage: error.localizedDescription)
             alert.beginSheetModal(for: window, completionHandler: nil)
         }
     }

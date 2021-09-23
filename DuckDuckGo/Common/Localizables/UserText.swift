@@ -209,11 +209,12 @@ struct UserText {
     static let firefoxPasswordImportDisclaimer = NSLocalizedString("import.firefox.disclaimer", value: "DuckDuckGo will request your Primary Password if one has been set", comment: "Warning text for the Chromium password import option")
 
     static let dataImportFailedTitle = NSLocalizedString("import.data.import-failed.title", value: "Import Failed", comment: "Alert title when the data import fails")
-    static func dataImportFailedBody(_ source: DataImport.Source) -> String {
+
+    static func dataImportFailedBody(_ source: DataImport.Source, errorMessage: String) -> String {
         let localized = NSLocalizedString("import.data.import-failed.body",
-                                          value: "Failed to import data from %@",
+                                          value: "Failed to import data from %@.\n\nError message: %@",
                                           comment: "Alert body text when the data import fails")
-        return String(format: localized, source.importSourceName)
+        return String(format: localized, source.importSourceName, errorMessage)
     }
 
     static let dataImportAlertImport = NSLocalizedString("import.data.alert.import", value: "Import", comment: "Import button for data import alerts")
@@ -235,14 +236,6 @@ struct UserText {
                                           comment: "Alert body text when the data import fails due to the browser being open")
         return String(format: localized, source.importSourceName)
     }
-
-    static func dataImportGenericFailure(_ source: DataImport.Source) -> String {
-        let localized = NSLocalizedString("import.data.failure",
-                                          value: "Failed to import data from %@",
-                                          comment: "Generic alert body text when the data import fails")
-        return String(format: localized, source.importSourceName)
-    }
-
 
     static func dataImportQuitBrowserTitle(_ source: DataImport.Source) -> String {
         let localized = NSLocalizedString("import.data.quit-browser.title",

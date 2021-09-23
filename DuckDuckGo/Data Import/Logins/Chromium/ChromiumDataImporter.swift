@@ -76,8 +76,14 @@ internal class ChromiumDataImporter: DataImporter {
                     completion(.failure(.cannotAccessSecureVault))
                     return
                 }
-            case .failure:
-                completion(.failure(.browserNeedsToBeClosed))
+            case .failure(let error):
+                switch error {
+                case .noBookmarksFileFound:
+                    completion(.failure(.noFileFound))
+                case .bookmarksFileDecodingFailed:
+                    completion(.failure(.cannotReadFile))
+                }
+
                 return
             }
         }
