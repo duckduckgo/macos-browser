@@ -26,6 +26,7 @@ final class NavigationBarViewController: NSViewController {
 
     enum Constants {
         static let downloadsButtonAutoHidingInterval: TimeInterval = 5 * 60
+        static let downloadsPopoverAutoHidingInterval: TimeInterval = 10
     }
 
     @IBOutlet weak var goBackButton: NSButton!
@@ -242,7 +243,7 @@ final class NavigationBarViewController: NSViewController {
         Pixel.fire(.manageLogins(source: .button))
     }
 
-    func toggleDownloadsPopover() {
+    func toggleDownloadsPopover(shouldFirePixel: Bool = true) {
         if downloadsPopover.isShown {
             downloadsPopover.close()
             return
@@ -252,7 +253,29 @@ final class NavigationBarViewController: NSViewController {
         downloadsButton.isHidden = false
         downloadsPopover.show(relativeTo: downloadsButton.bounds.insetFromLineOfDeath(), of: downloadsButton, preferredEdge: .maxY)
 
-        Pixel.fire(.manageDownloads(source: .button))
+        if shouldFirePixel {
+            Pixel.fire(.manageDownloads(source: .button))
+        }
+    }
+
+    private var downloadsPopoverTimer: Timer?
+    private func showDownloadsPopoverAndAutoHide() {
+        let timerBlock: (Timer) -> Void = { [weak self] _ in
+            self?.downloadsPopoverTimer?.invalidate()
+            self?.downloadsPopoverTimer = nil
+
+            if self?.downloadsPopover.isShown ?? false {
+                self?.downloadsPopover.close()
+            }
+        }
+
+        if !self.downloadsPopover.isShown {
+            self.toggleDownloadsPopover()
+
+            downloadsPopoverTimer = Timer.scheduledTimer(withTimeInterval: Constants.downloadsPopoverAutoHidingInterval,
+                                                         repeats: false,
+                                                         block: timerBlock)
+        }
     }
 
 #if !FEEDBACK
@@ -289,11 +312,17 @@ final class NavigationBarViewController: NSViewController {
     }
 
     private func subscribeToDownloads() {
+        FileDownloadManager.shared.downloadsPublisher
+            .receive(on: DispatchQueue.main)
+            .sink { [weak self] _ in
+                guard let self = self else { return }
+                self.showDownloadsPopoverAndAutoHide()
+            }.store(in: &downloadsCancellables)
         DownloadListCoordinator.shared.updates
             .throttle(for: 1.0, scheduler: DispatchQueue.main, latest: true)
             .sink { [weak self] _ in
                 self?.updateDownloadsButton()
-                self?.setUpdateDownloadButtonTimer()
+                self?.setDownloadButtonTimer()
             }
             .store(in: &downloadsCancellables)
         DownloadListCoordinator.shared.progress
@@ -340,19 +369,19 @@ final class NavigationBarViewController: NSViewController {
         downloadsButton.isMouseDown = downloadsPopover.isShown
     }
 
-    private var updateDownloadsButtonTimer: Timer?
-    private func setUpdateDownloadButtonTimer() {
-        let block: (Timer) -> Void = { [weak self] _ in
-            self?.updateDownloadsButtonTimer?.invalidate()
-            self?.updateDownloadsButtonTimer = nil
+    private var downloadsButtonTimer: Timer?
+    private func setDownloadButtonTimer() {
+        let timerBlock: (Timer) -> Void = { [weak self] _ in
+            self?.downloadsButtonTimer?.invalidate()
+            self?.downloadsButtonTimer = nil
 
             self?.updateDownloadsButton()
         }
 
-        updateDownloadsButtonTimer?.invalidate()
-        updateDownloadsButtonTimer = Timer.scheduledTimer(withTimeInterval: Constants.downloadsButtonAutoHidingInterval,
+        downloadsButtonTimer?.invalidate()
+        downloadsButtonTimer = Timer.scheduledTimer(withTimeInterval: Constants.downloadsButtonAutoHidingInterval,
                                                           repeats: false,
-                                                          block: block)
+                                                          block: timerBlock)
     }
 
     private func subscribeToCredentialsToSave() {
