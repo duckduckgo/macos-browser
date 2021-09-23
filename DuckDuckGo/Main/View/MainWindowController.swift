@@ -59,6 +59,9 @@ final class MainWindowController: NSWindowController {
         window?.toolbar = NSToolbar()
         window?.toolbar?.showsBaselineSeparator = true
 
+        let toolbarView = titlebarView?.subviews.first(where: { $0.className == "NSToolbarView" })
+        toolbarView?.frame.size.height = 40
+
         moveTabBarView(toTitlebarView: true)
     }
 
@@ -123,7 +126,7 @@ final class MainWindowController: NSWindowController {
             .leading: .leading(),
             .trailing: .trailing(),
             .top: .top(),
-            .height: .const(38.0)
+            .height: .const(40.0)
         ])
         NSLayoutConstraint.activate(constraints)
     }

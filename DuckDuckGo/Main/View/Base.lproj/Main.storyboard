@@ -16,16 +16,16 @@
                         <autoresizingMask key="autoresizingMask"/>
                         <subviews>
                             <containerView translatesAutoresizingMaskIntoConstraints="NO" id="lYg-bX-QrJ">
-                                <rect key="frame" x="0.0" y="751" width="1024" height="38"/>
+                                <rect key="frame" x="0.0" y="749" width="1024" height="40"/>
                                 <constraints>
-                                    <constraint firstAttribute="height" constant="38" id="zAs-5I-a2u"/>
+                                    <constraint firstAttribute="height" constant="40" id="zAs-5I-a2u"/>
                                 </constraints>
                                 <connections>
                                     <segue destination="Nfk-V8-FAE" kind="embed" destinationCreationSelector="createTabBarViewControllerWithCoder:sender:segueIdentifier:" id="dL6-gI-9Hl"/>
                                 </connections>
                             </containerView>
                             <containerView translatesAutoresizingMaskIntoConstraints="NO" id="wFH-xq-50o">
-                                <rect key="frame" x="0.0" y="699" width="1024" height="52"/>
+                                <rect key="frame" x="0.0" y="697" width="1024" height="52"/>
                                 <constraints>
                                     <constraint firstAttribute="height" constant="52" id="vZS-tl-wOP"/>
                                 </constraints>
@@ -34,7 +34,7 @@
                                 </connections>
                             </containerView>
                             <containerView translatesAutoresizingMaskIntoConstraints="NO" id="SYo-8W-jl3">
-                                <rect key="frame" x="0.0" y="0.0" width="1024" height="699"/>
+                                <rect key="frame" x="0.0" y="0.0" width="1024" height="697"/>
                                 <constraints>
                                     <constraint firstAttribute="width" relation="greaterThanOrEqual" constant="512" id="FeK-TC-TkT"/>
                                     <constraint firstAttribute="height" relation="greaterThanOrEqual" constant="178" id="OOl-4a-Y8I"/>
@@ -44,7 +44,7 @@
                                 </connections>
                             </containerView>
                             <customView translatesAutoresizingMaskIntoConstraints="NO" id="af1-Eb-VaG" userLabel="Separator" customClass="ColorView" customModule="DuckDuckGo_Privacy_Browser" customModuleProvider="target">
-                                <rect key="frame" x="0.0" y="698" width="1024" height="1"/>
+                                <rect key="frame" x="0.0" y="696" width="1024" height="1"/>
                                 <constraints>
                                     <constraint firstAttribute="height" constant="1" id="hrt-pu-NuL"/>
                                 </constraints>
@@ -55,7 +55,7 @@
                                 </userDefinedRuntimeAttributes>
                             </customView>
                             <containerView hidden="YES" translatesAutoresizingMaskIntoConstraints="NO" id="Jbn-9T-FNt" userLabel="Find in Page Container View">
-                                <rect key="frame" x="312" y="663" width="400" height="40"/>
+                                <rect key="frame" x="312" y="661" width="400" height="40"/>
                                 <constraints>
                                     <constraint firstAttribute="height" constant="40" id="Hzq-Qn-wpU"/>
                                     <constraint firstAttribute="width" constant="400" id="Ndt-bt-exS"/>
