@@ -322,7 +322,6 @@ final class NavigationBarViewController: NSViewController {
             .throttle(for: 1.0, scheduler: DispatchQueue.main, latest: true)
             .sink { [weak self] _ in
                 self?.updateDownloadsButton()
-                self?.setDownloadButtonTimer()
             }
             .store(in: &downloadsCancellables)
         DownloadListCoordinator.shared.progress
@@ -361,25 +360,31 @@ final class NavigationBarViewController: NSViewController {
 
     private func updateDownloadsButton() {
         let hasActiveDownloads = DownloadListCoordinator.shared.hasActiveDownloads
-        let mostRecentModification = DownloadListCoordinator.shared.mostRecentModification ?? Date.distantPast
-        let withinAutohidingInterval = mostRecentModification > Date() - Constants.downloadsButtonAutoHidingInterval
 
         downloadsButton.image = hasActiveDownloads ? Self.activeDownloadsImage : Self.inactiveDownloadsImage
-        downloadsButton.isHidden = !(hasActiveDownloads || downloadsPopover.isShown || withinAutohidingInterval)
+        if hasActiveDownloads || downloadsPopover.isShown {
+            downloadsButton.isHidden = false
+        } else {
+            setDownloadButtonHidingTimer()
+        }
+        if !downloadsButton.isHidden { setDownloadButtonHidingTimer() }
         downloadsButton.isMouseDown = downloadsPopover.isShown
     }
 
-    private var downloadsButtonTimer: Timer?
-    private func setDownloadButtonTimer() {
-        let timerBlock: (Timer) -> Void = { [weak self] _ in
-            self?.downloadsButtonTimer?.invalidate()
-            self?.downloadsButtonTimer = nil
+    private var downloadsButtonHidingTimer: Timer?
+    private func setDownloadButtonHidingTimer() {
+        guard downloadsButtonHidingTimer == nil else { return }
 
-            self?.updateDownloadsButton()
+        let timerBlock: (Timer) -> Void = { [weak self] _ in
+            guard let self = self else { return }
+            self.downloadsButtonHidingTimer?.invalidate()
+            self.downloadsButtonHidingTimer = nil
+            if DownloadListCoordinator.shared.hasActiveDownloads || self.downloadsPopover.isShown { return }
+
+            self.downloadsButton.isHidden = true
         }
 
-        downloadsButtonTimer?.invalidate()
-        downloadsButtonTimer = Timer.scheduledTimer(withTimeInterval: Constants.downloadsButtonAutoHidingInterval,
+        downloadsButtonHidingTimer = Timer.scheduledTimer(withTimeInterval: Constants.downloadsButtonAutoHidingInterval,
                                                           repeats: false,
                                                           block: timerBlock)
     }
