@@ -37,8 +37,6 @@ final class MoreOptionsMenu: NSMenu {
     private let tabCollectionViewModel: TabCollectionViewModel
     private let emailManager: EmailManager
 
-    // fileprivate(set) var pixel: Pixel.Event.MoreResult?
-
     required init(coder: NSCoder) {
         fatalError("MoreOptionsMenu: Bad initializer")
     }
@@ -57,12 +55,9 @@ final class MoreOptionsMenu: NSMenu {
 
 #if FEEDBACK
 
-        let openFeedbackMenuItem = NSMenuItem(title: "Send Feedback",
-                                              action: #selector(AppDelegate.openFeedback(_:)),
-                                         keyEquivalent: "")
-        openFeedbackMenuItem.image = NSImage(named: "Feedback")
-        addItem(openFeedbackMenuItem)
-
+        addItem(withTitle: "Send Feedback", action: #selector(AppDelegate.openFeedback(_:)), keyEquivalent: "")
+            .withImage(NSImage(named: "Feedback"))
+            .firingPixel(.feedback)
         addItem(NSMenuItem.separator())
 
 #endif
