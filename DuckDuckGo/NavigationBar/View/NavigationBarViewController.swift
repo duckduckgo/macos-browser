@@ -151,16 +151,6 @@ final class NavigationBarViewController: NSViewController {
         let menu = MoreOptionsMenu(tabCollectionViewModel: tabCollectionViewModel)
         menu.actionDelegate = self
         menu.popUp(positioning: nil, at: NSPoint(x: 0, y: sender.bounds.height + 4), in: sender)
-
-        switch menu.pixel {
-        case .newTab, .newWindow, .bookmarksList,
-                .emailProtection, .emailProtectionCreateAddress, .emailProtectionOff,
-                .feedback, .fireproof, .preferences, .downloads, .findInPage, .print, .logins:
-            Pixel.fire(.moreMenu(result: menu.pixel!))
-
-        case .cancelled, .none:
-            Pixel.fire(.moreMenu(result: .cancelled))
-        }
     }
 
     @IBAction func bookmarksButtonAction(_ sender: NSButton) {
