@@ -313,15 +313,13 @@ final class NavigationBarViewController: NSViewController {
     }
 
     private func subscribeToDownloads() {
-        FileDownloadManager.shared.downloadsPublisher
-            .receive(on: DispatchQueue.main)
-            .sink { [weak self] _ in
-                guard let self = self else { return }
-                self.showDownloadsPopoverAndAutoHide()
-            }.store(in: &downloadsCancellables)
         DownloadListCoordinator.shared.updates
             .throttle(for: 1.0, scheduler: DispatchQueue.main, latest: true)
-            .sink { [weak self] _ in
+            .sink { [weak self] update in
+                let shouldShowPopover = update.kind == .updated && update.item.destinationURL != nil && update.item.tempURL == nil
+                if shouldShowPopover {
+                    self?.showDownloadsPopoverAndAutoHide()
+                }
                 self?.updateDownloadsButton()
             }
             .store(in: &downloadsCancellables)
