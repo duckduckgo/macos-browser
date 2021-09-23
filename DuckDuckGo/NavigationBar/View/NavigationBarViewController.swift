@@ -24,6 +24,10 @@ import BrowserServicesKit
 // swiftlint:disable type_body_length
 final class NavigationBarViewController: NSViewController {
 
+    enum Constants {
+        static let downloadsButtonAutoHidingInterval: TimeInterval = 5 * 60
+    }
+
     @IBOutlet weak var goBackButton: NSButton!
     @IBOutlet weak var goForwardButton: NSButton!
     @IBOutlet weak var refreshButton: NSButton!
@@ -285,10 +289,11 @@ final class NavigationBarViewController: NSViewController {
     }
 
     private func subscribeToDownloads() {
-        DownloadListCoordinator.shared.updates()
+        DownloadListCoordinator.shared.updates
             .throttle(for: 1.0, scheduler: DispatchQueue.main, latest: true)
             .sink { [weak self] _ in
                 self?.updateDownloadsButton()
+                self?.setUpdateDownloadButtonTimer()
             }
             .store(in: &downloadsCancellables)
         DownloadListCoordinator.shared.progress
@@ -326,12 +331,28 @@ final class NavigationBarViewController: NSViewController {
     }
 
     private func updateDownloadsButton() {
-        let hasDownloads = DownloadListCoordinator.shared.hasDownloads
         let hasActiveDownloads = DownloadListCoordinator.shared.hasActiveDownloads
+        let mostRecentModification = DownloadListCoordinator.shared.mostRecentModification ?? Date.distantPast
+        let withinAutohidingInterval = mostRecentModification > Date() - Constants.downloadsButtonAutoHidingInterval
 
         downloadsButton.image = hasActiveDownloads ? Self.activeDownloadsImage : Self.inactiveDownloadsImage
-        downloadsButton.isHidden = !(hasDownloads || downloadsPopover.isShown)
+        downloadsButton.isHidden = !(hasActiveDownloads || downloadsPopover.isShown || withinAutohidingInterval)
         downloadsButton.isMouseDown = downloadsPopover.isShown
+    }
+
+    private var updateDownloadsButtonTimer: Timer?
+    private func setUpdateDownloadButtonTimer() {
+        let block: (Timer) -> Void = { [weak self] _ in
+            self?.updateDownloadsButtonTimer?.invalidate()
+            self?.updateDownloadsButtonTimer = nil
+
+            self?.updateDownloadsButton()
+        }
+
+        updateDownloadsButtonTimer?.invalidate()
+        updateDownloadsButtonTimer = Timer.scheduledTimer(withTimeInterval: Constants.downloadsButtonAutoHidingInterval,
+                                                          repeats: false,
+                                                          block: block)
     }
 
     private func subscribeToCredentialsToSave() {

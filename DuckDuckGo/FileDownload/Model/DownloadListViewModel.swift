@@ -33,7 +33,7 @@ final class DownloadListViewModel {
         let items = coordinator.downloads(sortedBy: \.added, ascending: false).map(DownloadViewModel.init)
         self.items = items
         self.viewModels = items.reduce(into: [:]) { $0[$1.id] = $1 }
-        cancellable = coordinator.updates().receive(on: DispatchQueue.main).sink { [weak self] update in
+        cancellable = coordinator.updates.receive(on: DispatchQueue.main).sink { [weak self] update in
             self?.handleDownloadsUpdate(of: update.kind, item: update.item)
         }
     }

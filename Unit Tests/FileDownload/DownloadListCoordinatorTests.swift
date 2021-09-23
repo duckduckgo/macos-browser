@@ -68,7 +68,7 @@ final class DownloadListCoordinatorTests: XCTestCase {
 
         let e = expectation(description: "download added")
         var id: UUID!
-        let c = coordinator.updates().sink { _, item in
+        let c = coordinator.updates.sink { _, item in
             e.fulfill()
             id = item.identifier
         }
@@ -123,7 +123,7 @@ final class DownloadListCoordinatorTests: XCTestCase {
 
         let e1 = expectation(description: "item 1 added")
         let e2 = expectation(description: "item 2 added")
-        let c = coordinator.updates().sink { (kind, item) in
+        let c = coordinator.updates.sink { (kind, item) in
             XCTAssertEqual(kind, .added)
             switch item {
             case .testItem:
@@ -147,7 +147,7 @@ final class DownloadListCoordinatorTests: XCTestCase {
         let task = WebKitDownloadTask(download: WKDownloadMock(), promptForLocation: false, destinationURL: destURL, tempURL: tempURL)
 
         let e = expectation(description: "download added")
-        let c = coordinator.updates().sink { [coordinator] (kind, item) in
+        let c = coordinator.updates.sink { [coordinator] (kind, item) in
             XCTAssertEqual(kind, .added)
             XCTAssertEqual(item.destinationURL, self.destURL)
             XCTAssertEqual(item.tempURL, self.tempURL)
@@ -169,7 +169,7 @@ final class DownloadListCoordinatorTests: XCTestCase {
 
         let locationUpdated = expectation(description: "location updated")
         let taskCompleted = expectation(description: "location updated")
-        let c = coordinator.updates().sink { (kind, item) in
+        let c = coordinator.updates.sink { (kind, item) in
             XCTAssertEqual(kind, .updated)
             if item.progress != nil {
                 locationUpdated.fulfill()
@@ -187,7 +187,6 @@ final class DownloadListCoordinatorTests: XCTestCase {
         withExtendedLifetime(c) {
             waitForExpectations(timeout: 1)
         }
-        XCTAssertTrue(coordinator.hasDownloads)
         XCTAssertFalse(coordinator.hasActiveDownloads)
     }
 
@@ -195,7 +194,7 @@ final class DownloadListCoordinatorTests: XCTestCase {
         let (download, task, _) = setUpCoordinatorAndAddDownload()
 
         let taskCompleted = expectation(description: "location updated")
-        let c = coordinator.updates().sink { (kind, item) in
+        let c = coordinator.updates.sink { (kind, item) in
             XCTAssertEqual(kind, .updated)
             taskCompleted.fulfill()
 
@@ -211,7 +210,6 @@ final class DownloadListCoordinatorTests: XCTestCase {
         withExtendedLifetime(c) {
             waitForExpectations(timeout: 1)
         }
-        XCTAssertTrue(coordinator.hasDownloads)
         XCTAssertFalse(coordinator.hasActiveDownloads)
     }
 
@@ -249,7 +247,7 @@ final class DownloadListCoordinatorTests: XCTestCase {
         }
 
         let itemUpdated = expectation(description: "item updated")
-        let c = coordinator.updates().sink { (kind, item) in
+        let c = coordinator.updates.sink { (kind, item) in
             XCTAssertEqual(kind, .updated)
             itemUpdated.fulfill()
 
@@ -270,7 +268,7 @@ final class DownloadListCoordinatorTests: XCTestCase {
     func testWhenAddedDownloadRestartedWithResumeDataThenResumeIsCalled() {
         let (download, task, id) = setUpCoordinatorAndAddDownload()
         let taskFailed = expectation(description: "task failed")
-        let c1 = coordinator.updates().sink { _, _ in
+        let c1 = coordinator.updates.sink { _, _ in
             taskFailed.fulfill()
         }
         task.download(download, didFailWithError: TestError(), resumeData: .resumeData)
@@ -303,7 +301,7 @@ final class DownloadListCoordinatorTests: XCTestCase {
         }
 
         let itemUpdated = expectation(description: "item updated")
-        let c = coordinator.updates().sink { (kind, item) in
+        let c = coordinator.updates.sink { (kind, item) in
             XCTAssertEqual(kind, .updated)
             itemUpdated.fulfill()
 
@@ -356,7 +354,7 @@ final class DownloadListCoordinatorTests: XCTestCase {
         }
 
         let itemUpdated = expectation(description: "item updated")
-        let c = coordinator.updates().sink { (kind, item) in
+        let c = coordinator.updates.sink { (kind, item) in
             XCTAssertEqual(kind, .updated)
             itemUpdated.fulfill()
 
@@ -378,7 +376,7 @@ final class DownloadListCoordinatorTests: XCTestCase {
         let (download, _, id) = setUpCoordinatorAndAddDownload()
 
         let itemRemoved = expectation(description: "item removed")
-        let c = coordinator.updates().sink { (kind, item) in
+        let c = coordinator.updates.sink { (kind, item) in
             XCTAssertEqual(kind, .removed)
             itemRemoved.fulfill()
 
@@ -412,7 +410,6 @@ final class DownloadListCoordinatorTests: XCTestCase {
         coordinator.cleanupInactiveDownloads()
         
         waitForExpectations(timeout: 1)
-        XCTAssertTrue(coordinator.hasDownloads)
         XCTAssertTrue(coordinator.hasActiveDownloads)
         XCTAssertEqual(coordinator.downloads(sortedBy: \.modified, ascending: true).count, 1)
 
