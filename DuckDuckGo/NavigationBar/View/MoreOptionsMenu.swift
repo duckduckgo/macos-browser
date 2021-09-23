@@ -26,6 +26,7 @@ protocol OptionsButtonMenuDelegate: AnyObject {
     func optionsButtonMenuRequestedBookmarkPopover(_ menu: NSMenu)
     func optionsButtonMenuRequestedLoginsPopover(_ menu: NSMenu)
     func optionsButtonMenuRequestedDownloadsPopover(_ menu: NSMenu)
+    func optionsButtonMenuRequestedPrint(_ menu: NSMenu)
 
 }
 
@@ -36,25 +37,7 @@ final class MoreOptionsMenu: NSMenu {
     private let tabCollectionViewModel: TabCollectionViewModel
     private let emailManager: EmailManager
 
-    enum Result {
-        case moveTabToNewWindow
-        case feedback
-        case fireproof
-
-        case emailProtection
-        case emailProtectionOff
-        case emailProtectionCreateAddress
-
-        case bookmarkThisPage
-        case favoriteThisPage
-
-        case bookmarks
-        case logins
-        case preferences
-        case downloads
-    }
-
-    fileprivate(set) var result: Result?
+    fileprivate(set) var pixel: Pixel.Event.MoreResult?
 
     required init(coder: NSCoder) {
         fatalError("MoreOptionsMenu: Bad initializer")
@@ -71,18 +54,11 @@ final class MoreOptionsMenu: NSMenu {
     let zoomMenuItem = NSMenuItem(title: UserText.zoom, action: nil, keyEquivalent: "")
 
     override func update() {
-        self.result = nil
+        self.pixel = nil
         super.update()
     }
 
-    // swiftlint:disable function_body_length
     private func setupMenuItems() {
-        let moveTabMenuItem = NSMenuItem(title: UserText.moveTabToNewWindow,
-                                         action: #selector(moveTabToNewWindowAction(_:)),
-                                         keyEquivalent: "")
-        moveTabMenuItem.target = self
-        moveTabMenuItem.image = NSImage(named: "MoveTabToNewWindow")
-        addItem(moveTabMenuItem)
 
 #if FEEDBACK
 
@@ -92,79 +68,32 @@ final class MoreOptionsMenu: NSMenu {
         openFeedbackMenuItem.image = NSImage(named: "Feedback")
         addItem(openFeedbackMenuItem)
 
-#endif
-        
-        let emailItem = NSMenuItem(title: UserText.emailOptionsMenuItem,
-                                   action: nil,
-                                   keyEquivalent: "")
-        emailItem.image = NSImage(named: "OptionsButtonMenuEmail")
-        emailItem.submenu = EmailOptionsButtonSubMenu(tabCollectionViewModel: tabCollectionViewModel, emailManager: emailManager)
-        addItem(emailItem)
-    
         addItem(NSMenuItem.separator())
+
+#endif
+
+        addWindowItems()
 
         zoomMenuItem.submenu = ZoomSubMenu(tabCollectionViewModel: tabCollectionViewModel)
         addItem(zoomMenuItem)
-
         addItem(NSMenuItem.separator())
 
-        if let url = tabCollectionViewModel.selectedTabViewModel?.tab.content.url, url.canFireproof, let host = url.host {
-            if FireproofDomains.shared.isFireproof(fireproofDomain: host) {
+        addUtilityItems()
 
-                let removeFireproofingItem = NSMenuItem(title: UserText.removeFireproofing,
-                                                        action: #selector(toggleFireproofing(_:)),
-                                                        keyEquivalent: "")
-                removeFireproofingItem.target = self
-                removeFireproofingItem.image = NSImage(named: "BurnProof")
-                addItem(removeFireproofingItem)
-
-            } else {
-
-                let fireproofSiteItem = NSMenuItem(title: UserText.fireproofSite,
-                                                   action: #selector(toggleFireproofing(_:)),
-                                                   keyEquivalent: "")
-                fireproofSiteItem.target = self
-                fireproofSiteItem.image = NSImage(named: "BurnProof")
-                addItem(fireproofSiteItem)
-
-            }
-
-            addItem(NSMenuItem.separator())
-        }
-
-        let bookmarksMenuItem = NSMenuItem(title: UserText.bookmarks, action: #selector(openBookmarks), keyEquivalent: "")
-        bookmarksMenuItem.target = self
-        bookmarksMenuItem.image = NSImage(named: "Bookmarks")
-        addItem(bookmarksMenuItem)
-
-        let downloadsMenuItem = NSMenuItem(title: UserText.downloads, action: #selector(openDownloads), keyEquivalent: "j")
-        downloadsMenuItem.target = self
-        downloadsMenuItem.image = NSImage(named: "Downloads")
-        addItem(downloadsMenuItem)
-
-        let passwordManagementMenuItem = NSMenuItem(title: UserText.passwordManagement, action: #selector(openLogins), keyEquivalent: "")
-        passwordManagementMenuItem.target = self
-        passwordManagementMenuItem.image = NSImage(named: "PasswordManagement")
-        addItem(passwordManagementMenuItem)
-
-        addItem(NSMenuItem.separator())
+        addPageItems()
 
         let preferencesItem = NSMenuItem(title: UserText.preferences, action: #selector(openPreferences(_:)), keyEquivalent: "")
         preferencesItem.target = self
         preferencesItem.image = NSImage(named: "Preferences")
         addItem(preferencesItem)
     }
-    // swiftlint:enable function_body_length
 
-    @objc func moveTabToNewWindowAction(_ sender: NSMenuItem) {
-        guard let selectedTabViewModel = tabCollectionViewModel.selectedTabViewModel else {
-            os_log("MainViewController: No tab view model selected", type: .error)
-            return
-        }
+    @objc func newTab(_ sender: NSMenuItem) {
+        tabCollectionViewModel.appendNewTab()
+    }
 
-        let tab = selectedTabViewModel.tab
-        tabCollectionViewModel.removeSelected()
-        WindowsManager.openNewWindow(with: tab)
+    @objc func newWindow(_ sender: NSMenuItem) {
+        WindowsManager.openNewWindow()
     }
 
     @objc func toggleFireproofing(_ sender: NSMenuItem) {
@@ -192,6 +121,15 @@ final class MoreOptionsMenu: NSMenu {
         WindowControllersManager.shared.showPreferencesTab()
     }
 
+    @objc func findInPage(_ sender: NSMenuItem) {
+        tabCollectionViewModel.selectedTabViewModel?.findInPage.show()
+    }
+
+    @objc func doPrint(_ sender: NSMenuItem) {
+        actionDelegate?.optionsButtonMenuRequestedPrint(self)
+    }
+
+    // swiftlint:disable cyclomatic_complexity
     override func performActionForItem(at index: Int) {
         defer {
             super.performActionForItem(at: index)
@@ -203,25 +141,125 @@ final class MoreOptionsMenu: NSMenu {
         }
 
         switch item.action {
-        case #selector(moveTabToNewWindowAction(_:)):
-            self.result = .moveTabToNewWindow
         case #selector(AppDelegate.openFeedback(_:)):
-            self.result = .feedback
+            self.pixel = .feedback
         case #selector(toggleFireproofing(_:)):
-            self.result = .fireproof
+            self.pixel = .fireproof
         case #selector(openBookmarks(_:)):
-            self.result = .bookmarks
+            self.pixel = .bookmarksList
         case #selector(openDownloads(_:)):
-            self.result = .downloads
+            self.pixel = .downloads
         case #selector(openPreferences(_:)):
-            self.result = .preferences
+            self.pixel = .preferences
         case #selector(openLogins(_:)):
-            self.result = .logins
+            self.pixel = .logins
+        case #selector(findInPage(_:)):
+            self.pixel = .findInPage
+        case #selector(doPrint(_:)):
+            self.pixel = .print
+        case #selector(newTab(_:)):
+            self.pixel = .newTab
+        case #selector(newWindow(_:)):
+            self.pixel = .newWindow
         case .none:
             break
         default:
             assertionFailure("MainViewController: no case for selector \(item.action!)")
         }
+    }
+    // swiftlint:enable cyclomatic_complexity
+
+    private func addWindowItems() {
+
+        // New Tab
+        let newTabMenuItem = NSMenuItem(title: UserText.plusButtonNewTabMenuItem,
+                                         action: #selector(newTab(_:)),
+                                         keyEquivalent: "t")
+        newTabMenuItem.target = self
+        newTabMenuItem.image = NSImage(named: "Add")
+        addItem(newTabMenuItem)
+
+        // New Window
+        let newWindowItem = NSMenuItem(title: UserText.newWindowMenuItem,
+                                         action: #selector(newWindow(_:)),
+                                         keyEquivalent: "n")
+        newWindowItem.target = self
+        newWindowItem.image = NSImage(named: "NewWindow")
+        addItem(newWindowItem)
+
+        addItem(NSMenuItem.separator())
+
+    }
+
+    private func addUtilityItems() {
+        let bookmarksMenuItem = NSMenuItem(title: UserText.bookmarks, action: #selector(openBookmarks), keyEquivalent: "")
+        bookmarksMenuItem.target = self
+        bookmarksMenuItem.image = NSImage(named: "Bookmarks")
+        addItem(bookmarksMenuItem)
+
+        let downloadsMenuItem = NSMenuItem(title: UserText.downloads, action: #selector(openDownloads), keyEquivalent: "j")
+        downloadsMenuItem.target = self
+        downloadsMenuItem.image = NSImage(named: "Downloads")
+        addItem(downloadsMenuItem)
+
+        let passwordManagementMenuItem = NSMenuItem(title: UserText.passwordManagement, action: #selector(openLogins), keyEquivalent: "")
+        passwordManagementMenuItem.target = self
+        passwordManagementMenuItem.image = NSImage(named: "PasswordManagement")
+        addItem(passwordManagementMenuItem)
+
+        let emailItem = NSMenuItem(title: UserText.emailOptionsMenuItem,
+                                   action: nil,
+                                   keyEquivalent: "")
+        emailItem.image = NSImage(named: "OptionsButtonMenuEmail")
+        emailItem.submenu = EmailOptionsButtonSubMenu(tabCollectionViewModel: tabCollectionViewModel, emailManager: emailManager)
+        addItem(emailItem)
+
+        addItem(NSMenuItem.separator())
+    }
+
+    private func addPageItems() {
+        guard let url = tabCollectionViewModel.selectedTabViewModel?.tab.content.url else { return }
+
+        if url.canFireproof, let host = url.host {
+            if FireproofDomains.shared.isFireproof(fireproofDomain: host) {
+
+                let removeFireproofingItem = NSMenuItem(title: UserText.removeFireproofing,
+                                                        action: #selector(toggleFireproofing(_:)),
+                                                        keyEquivalent: "")
+                removeFireproofingItem.target = self
+                removeFireproofingItem.image = NSImage(named: "BurnProof")
+                addItem(removeFireproofingItem)
+
+            } else {
+
+                let fireproofSiteItem = NSMenuItem(title: UserText.fireproofSite,
+                                                   action: #selector(toggleFireproofing(_:)),
+                                                   keyEquivalent: "")
+                fireproofSiteItem.target = self
+                fireproofSiteItem.image = NSImage(named: "BurnProof")
+                addItem(fireproofSiteItem)
+
+            }
+        }
+
+        let findInPageMenuItem = NSMenuItem(title: UserText.findInPageMenuItem, action: #selector(findInPage(_:)), keyEquivalent: "f")
+        findInPageMenuItem.target = self
+        findInPageMenuItem.image = NSImage(named: "Find-Search")
+        addItem(findInPageMenuItem)
+
+        let shareMenuItem = NSMenuItem(title: UserText.shareMenuItem, action: nil, keyEquivalent: "")
+        shareMenuItem.target = self
+        shareMenuItem.image = NSImage(named: "Share")
+        addItem(shareMenuItem)
+        shareMenuItem.submenu = SharingMenu()
+
+        let printMenuItem = NSMenuItem(title: UserText.printMenuItem, action: #selector(doPrint(_:)), keyEquivalent: "")
+        printMenuItem.target = self
+        printMenuItem.image = NSImage(named: "Print")
+        addItem(printMenuItem)
+
+        addItem(NSMenuItem.separator())
+
     }
 
 }
@@ -285,20 +323,20 @@ final class EmailOptionsButtonSubMenu: NSMenu {
         }
         let tab = Tab(content: .url(url))
         tabCollectionViewModel.append(tab: tab)
-        (supermenu as? MoreOptionsMenu)?.result = .emailProtectionCreateAddress
+        (supermenu as? MoreOptionsMenu)?.pixel = .emailProtectionCreateAddress
     }
     
     @objc func turnOffEmailAction(_ sender: NSMenuItem) {
         emailManager.signOut()
 
-        (supermenu as? MoreOptionsMenu)?.result = .emailProtectionOff
+        (supermenu as? MoreOptionsMenu)?.pixel = .emailProtectionOff
     }
     
     @objc func turnOnEmailAction(_ sender: NSMenuItem) {
         let tab = Tab(content: .url(EmailUrls().emailLandingPage))
         tabCollectionViewModel.append(tab: tab)
 
-        (supermenu as? MoreOptionsMenu)?.result = .emailProtection
+        (supermenu as? MoreOptionsMenu)?.pixel = .emailProtection
     }
 
     @objc func emailDidSignInNotification(_ notification: Notification) {

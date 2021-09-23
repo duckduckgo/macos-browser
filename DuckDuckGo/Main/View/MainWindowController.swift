@@ -199,10 +199,8 @@ fileprivate extension NavigationBarViewController {
         return [goBackButton,
                 goForwardButton,
                 refreshButton,
-                feedbackButton,
                 optionsButton,
                 bookmarkListButton,
-                shareButton,
                 passwordManagementButton,
                 addressBarViewController?.addressBarTextField,
                 addressBarViewController?.passiveTextField

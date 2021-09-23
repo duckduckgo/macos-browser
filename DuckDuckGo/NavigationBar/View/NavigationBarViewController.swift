@@ -27,10 +27,8 @@ final class NavigationBarViewController: NSViewController {
     @IBOutlet weak var goBackButton: NSButton!
     @IBOutlet weak var goForwardButton: NSButton!
     @IBOutlet weak var refreshButton: NSButton!
-    @IBOutlet weak var feedbackButton: NSButton!
     @IBOutlet weak var optionsButton: NSButton!
     @IBOutlet weak var bookmarkListButton: NSButton!
-    @IBOutlet weak var shareButton: NSButton!
     @IBOutlet weak var passwordManagementButton: NSButton!
     @IBOutlet weak var downloadsButton: MouseOverButton!
 
@@ -54,13 +52,21 @@ final class NavigationBarViewController: NSViewController {
     private let goForwardButtonMenuDelegate: NavigationButtonMenuDelegate
     // swiftlint:enable weak_delegate
 
-    private lazy var bookmarkListPopover = BookmarkListPopover()
-    private lazy var saveCredentialsPopover: SaveCredentialsPopover = SaveCredentialsPopover()
+    private lazy var bookmarkListPopover: BookmarkListPopover = {
+        let popover = BookmarkListPopover()
+        popover.delegate = self
+        return popover
+    }()
+    private lazy var saveCredentialsPopover: SaveCredentialsPopover = {
+        let popover = SaveCredentialsPopover()
+        popover.delegate = self
+        return popover
+    }()
     private lazy var passwordManagementPopover: PasswordManagementPopover = PasswordManagementPopover()
     private lazy var downloadsPopover: DownloadsPopover = {
-        let downloadsPopover = DownloadsPopover()
-        downloadsPopover.delegate = self
-        return downloadsPopover
+        let popover = DownloadsPopover()
+        popover.delegate = self
+        return popover
     }()
     var isDownloadsPopoverShown: Bool {
         downloadsPopover.isShown
@@ -94,18 +100,13 @@ final class NavigationBarViewController: NSViewController {
 
         optionsButton.sendAction(on: .leftMouseDown)
         bookmarkListButton.sendAction(on: .leftMouseDown)
-        shareButton.sendAction(on: .leftMouseDown)
         downloadsButton.sendAction(on: .leftMouseDown)
-
-#if !FEEDBACK
-
-        removeFeedback()
-
-#endif
     }
 
     override func viewWillAppear() {
         updateDownloadsButton()
+        updatePasswordManagementButton()
+        updateBookmarksButton()
     }
 
     @IBSegueAction func createAddressBarViewController(_ coder: NSCoder) -> AddressBarViewController? {
@@ -151,31 +152,14 @@ final class NavigationBarViewController: NSViewController {
         menu.actionDelegate = self
         menu.popUp(positioning: nil, at: NSPoint(x: 0, y: sender.bounds.height + 4), in: sender)
 
-        switch menu.result {
-        case .bookmarks:
-            Pixel.fire(.moreMenu(result: .bookmarksList))
-        case .logins:
-            Pixel.fire(.moreMenu(result: .logins))
-        case .emailProtection:
-            Pixel.fire(.moreMenu(result: .emailProtection))
-        case .feedback:
-            Pixel.fire(.moreMenu(result: .feedback))
-        case .fireproof:
-            Pixel.fire(.moreMenu(result: .fireproof))
-        case .moveTabToNewWindow:
-            Pixel.fire(.moreMenu(result: .moveTabToNewWindow))
-        case .preferences:
-            Pixel.fire(.moreMenu(result: .preferences))
-        case .downloads:
-            Pixel.fire(.moreMenu(result: .downloads))
-        case .none:
-            Pixel.fire(.moreMenu(result: .cancelled))
+        switch menu.pixel {
+        case .newTab, .newWindow, .bookmarksList,
+                .emailProtection, .emailProtectionCreateAddress, .emailProtectionOff,
+                .feedback, .fireproof, .preferences, .downloads, .findInPage, .print, .logins:
+            Pixel.fire(.moreMenu(result: menu.pixel!))
 
-        case .emailProtectionOff,
-             .emailProtectionCreateAddress,
-             .bookmarkThisPage,
-             .favoriteThisPage:
-            break
+        case .cancelled, .none:
+            Pixel.fire(.moreMenu(result: .cancelled))
         }
     }
 
@@ -189,13 +173,6 @@ final class NavigationBarViewController: NSViewController {
 
     @IBAction func downloadsButtonAction(_ sender: NSButton) {
         toggleDownloadsPopover()
-    }
-
-    @IBAction func shareButtonAction(_ sender: NSButton) {
-        guard let url = tabCollectionViewModel.selectedTabViewModel?.tab.content.url else { return }
-        let sharing = NSSharingServicePicker(items: [url])
-        sharing.delegate = self
-        sharing.show(relativeTo: .zero, of: sender, preferredEdge: .minY)
     }
 
     func listenToPasswordManagerNotifications() {
@@ -226,12 +203,14 @@ final class NavigationBarViewController: NSViewController {
 
     func showBookmarkListPopover() {
         guard closeTransientPopovers() else { return }
+        bookmarkListButton.isHidden = false
         bookmarkListPopover.show(relativeTo: bookmarkListButton.bounds.insetFromLineOfDeath(), of: bookmarkListButton, preferredEdge: .maxY)
         Pixel.fire(.bookmarksList(source: .button))
     }
 
     func showPasswordManagementPopover() {
         guard closeTransientPopovers() else { return }
+        passwordManagementButton.isHidden = false
         passwordManagementPopover.show(relativeTo: passwordManagementButton.bounds.insetFromLineOfDeath(),
                                        of: passwordManagementButton,
                                        preferredEdge: .minY)
@@ -250,14 +229,6 @@ final class NavigationBarViewController: NSViewController {
 
         Pixel.fire(.manageDownloads(source: .button))
     }
-
-#if !FEEDBACK
-
-    private func removeFeedback() {
-        feedbackButton.removeFromSuperview()
-    }
-
-#endif
 
     private func setupNavigationButtonMenus() {
         let backButtonMenu = NSMenu()
@@ -303,26 +274,18 @@ final class NavigationBarViewController: NSViewController {
     }
 
     private func updatePasswordManagementButton() {
-        let url = tabCollectionViewModel.selectedTabViewModel?.tab.content.url
-
         passwordManagementButton.image = NSImage(named: "PasswordManagement")
 
+        if saveCredentialsPopover.isShown {
+            return
+        }
+
         if passwordManagementPopover.viewController.isDirty {
-            // Remember to reset this once the controller is not dirty
             passwordManagementButton.image = NSImage(named: "PasswordManagementDirty")
             return
         }
 
-        // We don't want to remove the button if the popever is showing
-        if passwordManagementPopover.isShown {
-            return
-        }
-
-        passwordManagementPopover.viewController.domain = nil
-        guard let url = url, let domain = url.host else {
-            return
-        }
-        passwordManagementPopover.viewController.domain = domain
+        passwordManagementButton.isHidden = !passwordManagementPopover.isShown
     }
 
     private func updateDownloadsButton() {
@@ -332,6 +295,10 @@ final class NavigationBarViewController: NSViewController {
         downloadsButton.image = hasActiveDownloads ? Self.activeDownloadsImage : Self.inactiveDownloadsImage
         downloadsButton.isHidden = !(hasDownloads || downloadsPopover.isShown)
         downloadsButton.isMouseDown = downloadsPopover.isShown
+    }
+
+    private func updateBookmarksButton() {
+        bookmarkListButton.isHidden = !bookmarkListPopover.isShown
     }
 
     private func subscribeToCredentialsToSave() {
@@ -389,38 +356,10 @@ final class NavigationBarViewController: NSViewController {
         goBackButton.isEnabled = selectedTabViewModel.canGoBack
         goForwardButton.isEnabled = selectedTabViewModel.canGoForward
         refreshButton.isEnabled = selectedTabViewModel.canReload
-        shareButton.isEnabled = selectedTabViewModel.canReload
-        shareButton.isEnabled = selectedTabViewModel.tab.content.url ?? .emptyPage != .emptyPage
     }
 
 }
 // swiftlint:enable type_body_length
-
-extension NavigationBarViewController: NSSharingServicePickerDelegate {
-
-    func sharingServicePicker(_ sharingServicePicker: NSSharingServicePicker,
-                              delegateFor sharingService: NSSharingService) -> NSSharingServiceDelegate? {
-        return self
-    }
-
-    func sharingServicePicker(_ sharingServicePicker: NSSharingServicePicker, didChoose service: NSSharingService?) {
-        if service == nil {
-            Pixel.fire(.sharingMenu(result: .cancelled))
-        }
-    }
-}
-
-extension NavigationBarViewController: NSSharingServiceDelegate {
-
-    func sharingService(_ sharingService: NSSharingService, didFailToShareItems items: [Any], error: Error) {
-        Pixel.fire(.sharingMenu(result: .failure))
-    }
-
-    func sharingService(_ sharingService: NSSharingService, didShareItems items: [Any]) {
-        Pixel.fire(.sharingMenu(result: .success))
-    }
-
-}
 
 extension NavigationBarViewController: OptionsButtonMenuDelegate {
 
@@ -436,6 +375,10 @@ extension NavigationBarViewController: OptionsButtonMenuDelegate {
         toggleDownloadsPopover()
     }
 
+    func optionsButtonMenuRequestedPrint(_ menu: NSMenu) {
+        WindowControllersManager.shared.lastKeyMainWindowController?.mainViewController.printWebView(self)
+    }
+
 }
 
 extension NavigationBarViewController: NSPopoverDelegate {
@@ -443,6 +386,10 @@ extension NavigationBarViewController: NSPopoverDelegate {
     func popoverDidClose(_ notification: Notification) {
         if notification.object as AnyObject? === downloadsPopover {
             updateDownloadsButton()
+        } else if notification.object as AnyObject? === bookmarkListPopover {
+            updateBookmarksButton()
+        } else if notification.object as AnyObject? === saveCredentialsPopover {
+            updatePasswordManagementButton()
         }
     }
 
