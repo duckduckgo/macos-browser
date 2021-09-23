@@ -96,6 +96,7 @@ final class NavigationBarViewController: NSViewController {
         setupNavigationButtonMenus()
         subscribeToSelectedTabViewModel()
         listenToPasswordManagerNotifications()
+        listenToFireproofNotifications()
         subscribeToDownloads()
 
         optionsButton.sendAction(on: .leftMouseDown)
@@ -168,6 +169,29 @@ final class NavigationBarViewController: NSViewController {
     func listenToPasswordManagerNotifications() {
         passwordManagerNotificationCancellable = NotificationCenter.default.publisher(for: .PasswordManagerChanged).sink { [weak self] _ in
             self?.updatePasswordManagementButton()
+        }
+    }
+
+    func listenToFireproofNotifications() {
+        NotificationCenter.default.addObserver(self,
+                                               selector: #selector(showFireproofingFeedback(_:)),
+                                               name: FireproofDomains.Constants.newFireproofDomainNotification,
+                                               object: nil)
+    }
+
+    @objc private func showFireproofingFeedback(_ sender: Notification) {
+        guard view.window?.isKeyWindow == true,
+            let domain = sender.userInfo?[FireproofDomains.Constants.newFireproofDomainKey] as? String else { return }
+
+        DispatchQueue.main.async {
+            let viewController = UndoFireproofingViewController.create(for: domain)
+            let frame = self.optionsButton.frame.insetFromLineOfDeath()
+
+            self.present(viewController,
+                         asPopoverRelativeTo: frame,
+                         of: self.optionsButton,
+                         preferredEdge: .maxY,
+                         behavior: .applicationDefined)
         }
     }
 

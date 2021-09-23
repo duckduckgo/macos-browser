@@ -542,7 +542,7 @@
                                 </constraints>
                             </customView>
                             <stackView distribution="equalSpacing" orientation="horizontal" alignment="centerY" spacing="0.0" horizontalStackHuggingPriority="249.99998474121094" verticalStackHuggingPriority="249.99998474121094" detachesHiddenViews="YES" translatesAutoresizingMaskIntoConstraints="NO" id="HEu-ro-RSA">
-                                <rect key="frame" x="1" y="0.0" width="161" height="32"/>
+                                <rect key="frame" x="1" y="0.0" width="128" height="32"/>
                                 <subviews>
                                     <customView translatesAutoresizingMaskIntoConstraints="NO" id="3Iv-YW-zn2">
                                         <rect key="frame" x="0.0" y="0.0" width="32" height="32"/>
@@ -592,36 +592,11 @@
                                             <action selector="privacyEntryPointButtonAction:" target="mcr-nj-GmC" id="YFW-MB-o9A"/>
                                         </connections>
                                     </button>
-                                    <box horizontalHuggingPriority="750" boxType="separator" translatesAutoresizingMaskIntoConstraints="NO" id="cFj-tR-zJp">
-                                        <rect key="frame" x="30" y="9" width="5" height="14"/>
-                                        <constraints>
-                                            <constraint firstAttribute="height" constant="14" id="4md-s2-T3R"/>
-                                        </constraints>
-                                    </box>
                                     <stackView distribution="fill" orientation="horizontal" alignment="top" spacing="0.0" horizontalStackHuggingPriority="249.99998474121094" verticalStackHuggingPriority="249.99998474121094" detachesHiddenViews="YES" translatesAutoresizingMaskIntoConstraints="NO" id="8UU-A8-1nD">
-                                        <rect key="frame" x="33" y="0.0" width="128" height="32"/>
+                                        <rect key="frame" x="32" y="0.0" width="96" height="32"/>
                                         <subviews>
-                                            <button verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="RL3-cF-l9C" userLabel="Fireproof Button" customClass="AddressBarButton" customModule="DuckDuckGo_Privacy_Browser" customModuleProvider="target">
-                                                <rect key="frame" x="0.0" y="0.0" width="32" height="32"/>
-                                                <constraints>
-                                                    <constraint firstAttribute="width" constant="32" id="8UX-0K-yzR"/>
-                                                    <constraint firstAttribute="height" constant="32" id="Dyz-dJ-VtI"/>
-                                                </constraints>
-                                                <buttonCell key="cell" type="square" bezelStyle="shadowlessSquare" image="BurnProof" imagePosition="only" alignment="center" imageScaling="proportionallyDown" inset="2" id="2fg-aM-2y9">
-                                                    <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
-                                                    <font key="font" metaFont="system"/>
-                                                </buttonCell>
-                                                <userDefinedRuntimeAttributes>
-                                                    <userDefinedRuntimeAttribute type="color" keyPath="mouseOverColor">
-                                                        <color key="value" name="ButtonMouseOverColor"/>
-                                                    </userDefinedRuntimeAttribute>
-                                                    <userDefinedRuntimeAttribute type="color" keyPath="mouseDownColor">
-                                                        <color key="value" name="ButtonMouseDownColor"/>
-                                                    </userDefinedRuntimeAttribute>
-                                                </userDefinedRuntimeAttributes>
-                                            </button>
                                             <button verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="CN6-fJ-o2J" userLabel="Geolocation Button" customClass="PermissionButton" customModule="DuckDuckGo_Privacy_Browser" customModuleProvider="target">
-                                                <rect key="frame" x="32" y="0.0" width="32" height="32"/>
+                                                <rect key="frame" x="0.0" y="0.0" width="32" height="32"/>
                                                 <constraints>
                                                     <constraint firstAttribute="width" constant="32" id="pIT-t1-8ER"/>
                                                     <constraint firstAttribute="height" constant="32" id="y9v-oG-C5i"/>
@@ -644,7 +619,7 @@
                                                 </userDefinedRuntimeAttributes>
                                             </button>
                                             <button verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="uao-nC-0co" userLabel="Microphone Button" customClass="PermissionButton" customModule="DuckDuckGo_Privacy_Browser" customModuleProvider="target">
-                                                <rect key="frame" x="64" y="0.0" width="32" height="32"/>
+                                                <rect key="frame" x="32" y="0.0" width="32" height="32"/>
                                                 <constraints>
                                                     <constraint firstAttribute="height" constant="32" id="0aM-UZ-dCe"/>
                                                     <constraint firstAttribute="width" constant="32" id="sbo-JD-GFp"/>
@@ -667,7 +642,7 @@
                                                 </userDefinedRuntimeAttributes>
                                             </button>
                                             <button verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="C2L-f9-L3r" userLabel="Camera Button" customClass="PermissionButton" customModule="DuckDuckGo_Privacy_Browser" customModuleProvider="target">
-                                                <rect key="frame" x="96" y="0.0" width="32" height="32"/>
+                                                <rect key="frame" x="64" y="0.0" width="32" height="32"/>
                                                 <constraints>
                                                     <constraint firstAttribute="width" constant="32" id="4bE-1L-enO"/>
                                                     <constraint firstAttribute="height" constant="32" id="A7u-wU-pBb"/>
@@ -694,10 +669,8 @@
                                             <integer value="1000"/>
                                             <integer value="1000"/>
                                             <integer value="1000"/>
-                                            <integer value="1000"/>
                                         </visibilityPriorities>
                                         <customSpacing>
-                                            <real value="3.4028234663852886e+38"/>
                                             <real value="3.4028234663852886e+38"/>
                                             <real value="3.4028234663852886e+38"/>
                                             <real value="3.4028234663852886e+38"/>
@@ -708,10 +681,8 @@
                                     <integer value="1000"/>
                                     <integer value="1000"/>
                                     <integer value="1000"/>
-                                    <integer value="1000"/>
                                 </visibilityPriorities>
                                 <customSpacing>
-                                    <real value="3.4028234663852886e+38"/>
                                     <real value="3.4028234663852886e+38"/>
                                     <real value="3.4028234663852886e+38"/>
                                     <real value="3.4028234663852886e+38"/>
@@ -733,8 +704,6 @@
                         <outlet property="bookmarkButton" destination="taC-vG-1fV" id="tbQ-qW-71o"/>
                         <outlet property="cameraButton" destination="C2L-f9-L3r" id="xua-H5-hAx"/>
                         <outlet property="clearButton" destination="kRc-0m-oqe" id="2sv-EP-8MW"/>
-                        <outlet property="fireproofedButton" destination="RL3-cF-l9C" id="YZ6-u8-g8e"/>
-                        <outlet property="fireproofedButtonDivider" destination="cFj-tR-zJp" id="iWt-5C-aj4"/>
                         <outlet property="geolocationButton" destination="CN6-fJ-o2J" id="FP7-Od-wu8"/>
                         <outlet property="imageButton" destination="psi-hX-Kh9" id="gEt-yl-q9m"/>
                         <outlet property="imageButtonWrapper" destination="3Iv-YW-zn2" id="rzK-lJ-auZ"/>
@@ -753,7 +722,6 @@
         <image name="Back" width="16" height="16"/>
         <image name="Bookmark" width="16" height="16"/>
         <image name="Bookmarks" width="16" height="16"/>
-        <image name="BurnProof" width="16" height="16"/>
         <image name="Camera-Active" width="16" height="12"/>
         <image name="Camera-Icon" width="16" height="12"/>
         <image name="Camera-Tab-Blocked" width="16" height="14"/>

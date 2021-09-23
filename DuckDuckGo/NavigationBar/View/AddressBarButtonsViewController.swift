@@ -62,20 +62,6 @@ final class AddressBarButtonsViewController: NSViewController {
     @IBOutlet weak var imageButton: NSButton!
     @IBOutlet weak var clearButton: NSButton!
 
-    @IBOutlet weak var fireproofedButtonDivider: NSBox! {
-        didSet {
-            fireproofedButtonDivider.isHidden = true
-        }
-    }
-
-    @IBOutlet weak var fireproofedButton: NSButton! {
-        didSet {
-            fireproofedButton.isHidden = true
-            fireproofedButton.target = self
-            fireproofedButton.action = #selector(fireproofedButtonAction)
-        }
-    }
-
     @IBOutlet weak var permissionButtons: NSView!
     @IBOutlet weak var cameraButton: PermissionButton! {
         didSet {
@@ -131,11 +117,6 @@ final class AddressBarButtonsViewController: NSViewController {
         subscribeToTrackersAnimationViewStatus()
         subscribeToEffectiveAppearance()
 
-        NotificationCenter.default.addObserver(self,
-                                               selector: #selector(showUndoFireproofingPopover(_:)),
-                                               name: FireproofDomains.Constants.newFireproofDomainNotification,
-                                               object: nil)
-
         cameraButton.sendAction(on: .leftMouseDown)
         microphoneButton.sendAction(on: .leftMouseDown)
         geolocationButton.sendAction(on: .leftMouseDown)
@@ -154,17 +135,6 @@ final class AddressBarButtonsViewController: NSViewController {
             permissionAuthorizationPopover.close()
         }
         openPrivacyDashboard()
-    }
-
-    @objc func fireproofedButtonAction(_ sender: Any) {
-        guard let selectedTabViewModel = tabCollectionViewModel.selectedTabViewModel, let button = sender as? NSButton else {
-            return
-        }
-
-        if let host = selectedTabViewModel.tab.content.url?.host, FireproofDomains.shared.isFireproof(fireproofDomain: host) {
-            let viewController = FireproofInfoViewController.create(for: host)
-            present(viewController, asPopoverRelativeTo: button.frame, of: button.superview!, preferredEdge: .minY, behavior: .transient)
-        }
     }
 
     func openBookmarkPopover(setFavorite: Bool, accessPoint: Pixel.Event.AccessPoint) {
@@ -248,25 +218,6 @@ final class AddressBarButtonsViewController: NSViewController {
         }
 
         updatePermissionButtons()
-        updateFireproofedButton()
-    }
-
-    private func updateFireproofedButton() {
-        guard let selectedTabViewModel = tabCollectionViewModel.selectedTabViewModel else {
-            os_log("%s: Selected tab view model is nil", type: .error, className)
-            return
-        }
-
-        if let url = selectedTabViewModel.tab.content.url,
-           url.showFireproofStatus,
-           !privacyEntryPointButton.isHidden,
-           !trackersAnimationView.isAnimating {
-            fireproofedButtonDivider.isHidden = !FireproofDomains.shared.isFireproof(fireproofDomain: url.host ?? "")
-            fireproofedButton.isHidden = !FireproofDomains.shared.isFireproof(fireproofDomain: url.host ?? "")
-        } else {
-            fireproofedButtonDivider.isHidden = true
-            fireproofedButton.isHidden = true
-        }
     }
 
     @IBAction func cameraButtonAction(_ sender: NSButton) {
@@ -470,28 +421,11 @@ final class AddressBarButtonsViewController: NSViewController {
         return bookmark
     }
 
-    @objc private func showUndoFireproofingPopover(_ sender: Notification) {
-        guard view.window?.isKeyWindow == true,
-            let domain = sender.userInfo?[FireproofDomains.Constants.newFireproofDomainKey] as? String else { return }
-
-        DispatchQueue.main.async {
-            let viewController = UndoFireproofingViewController.create(for: domain)
-            let frame = self.fireproofedButton.frame.insetFromLineOfDeath()
-
-            self.present(viewController,
-                         asPopoverRelativeTo: frame,
-                         of: self.fireproofedButton.superview!,
-                         preferredEdge: .minY,
-                         behavior: .applicationDefined)
-        }
-    }
-
     func subscribeToTrackersAnimationViewStatus() {
         trackersAnimationViewStatusCancellable = trackersAnimationView.$isAnimating
             .dropFirst()
             .receive(on: DispatchQueue.main)
             .sink { [weak self] _ in
-                self?.updateFireproofedButton()
                 self?.updatePermissionButtons()
         }
     }
