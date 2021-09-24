@@ -265,6 +265,8 @@ final class TabBarViewItem: NSCollectionViewItem {
             mouseOverView.mouseOverColor = isSelected || isDragged ? NSColor.clear : NSColor.tabMouseOverColor
         }
 
+        let showCloseButton = isMouseOver || isSelected
+        closeButton.isHidden = !showCloseButton
         updateSeparatorView()
         permissionCloseButtonTrailingConstraint.isActive = !closeButton.isHidden
         titleTextField.isHidden = widthStage.isTitleHidden
