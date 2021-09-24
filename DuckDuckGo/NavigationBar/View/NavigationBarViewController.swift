@@ -455,6 +455,8 @@ extension NavigationBarViewController: NSPopoverDelegate {
     func popoverDidClose(_ notification: Notification) {
         if notification.object as AnyObject? === downloadsPopover {
             updateDownloadsButton()
+            downloadsPopoverTimer?.invalidate()
+            downloadsPopoverTimer = nil
         } else if notification.object as AnyObject? === bookmarkListPopover {
             updateBookmarksButton()
         } else if notification.object as AnyObject? === saveCredentialsPopover {
