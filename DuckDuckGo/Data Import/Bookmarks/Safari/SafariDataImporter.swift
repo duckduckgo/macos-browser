@@ -32,7 +32,7 @@ internal class SafariDataImporter: DataImporter {
     static func requestBookmarksFilePermission() -> URL? {
         let openPanel = NSOpenPanel()
         openPanel.directoryURL = bookmarksFileURL
-        openPanel.message = "Select Safari Bookmarks.plist File"
+        openPanel.message = UserText.bookmarkImportSafariRequestPermissionButtonTitle
         openPanel.allowedFileTypes = ["plist"]
         openPanel.allowsOtherFileTypes = false
         openPanel.canChooseFiles = true
