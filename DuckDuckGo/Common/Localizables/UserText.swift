@@ -300,16 +300,6 @@ struct UserText {
 
     static let bookmarkImportBookmarksBar = NSLocalizedString("import.bookmarks.folder.bookmarks-bar", value: "Bookmarks Bar", comment: "Title text for Bookmarks Bar import folder")
     static let bookmarkImportOtherBookmarks = NSLocalizedString("import.bookmarks.folder.other-bookmarks", value: "Other Bookmarks", comment: "Title text for Other Bookmarks import folder")
-    static func importedBookmarks(at time: Date) -> String {
-        let dateFormatter = DateFormatter()
-        dateFormatter.dateStyle = .medium
-        dateFormatter.timeStyle = .medium
-
-        let localized = NSLocalizedString("import.bookmarks.folder.imported-bookmarks",
-                                          value: "Imported Bookmarks (%@)",
-                                          comment: "Title text for the Imported Bookmarks folder")
-        return String(format: localized, dateFormatter.string(from: time))
-    }
 
     static let openDeveloperTools = NSLocalizedString("main.menu.show.inspector", value: "Open Developer Tools", comment: "Show Web Inspector/Open Developer Tools")
     static let closeDeveloperTools = NSLocalizedString("main.menu.close.inspector", value: "Close Developer Tools", comment: "Hide Web Inspector/Close Developer Tools")

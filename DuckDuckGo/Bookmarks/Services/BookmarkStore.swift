@@ -352,11 +352,10 @@ final class LocalBookmarkStore: BookmarkStore {
                 }
 
                 let bookmarkCountBeforeImport = try context.count(for: Bookmark.bookmarksFetchRequest())
-                let importRootFolder = createFolder(titled: UserText.importedBookmarks(at: Date()), in: self.context)
 
                 if let bookmarksBar = bookmarks.topLevelFolders.bookmarkBar.children {
                     let result = recursivelyCreateEntities(from: bookmarksBar,
-                                                           parent: importRootFolder,
+                                                           parent: nil,
                                                            existingBookmarkURLs: bookmarkURLs,
                                                            in: self.context)
 
@@ -366,7 +365,6 @@ final class LocalBookmarkStore: BookmarkStore {
                 }
 
                 let otherBookmarksFolder = createFolder(titled: UserText.bookmarkImportOtherBookmarks, in: self.context)
-                otherBookmarksFolder.parentFolder = importRootFolder
 
                 if let otherBookmarks = bookmarks.topLevelFolders.otherBookmarks.children {
                     let result = recursivelyCreateEntities(from: otherBookmarks,
