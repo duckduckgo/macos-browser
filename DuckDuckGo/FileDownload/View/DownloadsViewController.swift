@@ -143,6 +143,14 @@ final class DownloadsViewController: NSViewController {
         NSWorkspace.shared.activateFileViewerSelecting([url])
     }
 
+    func openDownloadAction(_ sender: Any) {
+        guard let index = index(for: sender),
+              let url = viewModel.items[safe: index]?.localURL
+        else { return }
+        self.dismiss()
+        NSWorkspace.shared.open(url)
+    }
+
     @IBAction func restartDownloadAction(_ sender: Any) {
         guard let index = index(for: sender) else { return }
         viewModel.restartDownload(at: index)
@@ -170,7 +178,7 @@ final class DownloadsViewController: NSViewController {
 
     @IBAction func doubleClickAction(_ sender: Any) {
         if index(for: sender) != nil {
-            revealDownloadAction(sender)
+            openDownloadAction(sender)
         } else {
             openDownloadsFolderAction(sender)
         }
