@@ -38,6 +38,9 @@ final class BrowserImportSummaryViewController: NSViewController {
     @IBOutlet var bookmarkSummaryRow: NSView!
     @IBOutlet var bookmarkSummaryLabel: NSTextField!
 
+    @IBOutlet var bookmarkFailureRow: NSView!
+    @IBOutlet var bookmarkFailureLabel: NSTextField!
+
     @IBOutlet var passwordSummaryRow: NSView!
     @IBOutlet var passwordSummaryLabel: NSTextField!
 
@@ -64,9 +67,22 @@ final class BrowserImportSummaryViewController: NSViewController {
 
         for summary in summaries {
             switch summary {
-            case .bookmarks(let successfulImportCount):
-                bookmarkSummaryRow.isHidden = false
-                bookmarkSummaryLabel.stringValue = UserText.successfulBookmarkImports(successfulImportCount)
+            case .bookmarks(let successful, let duplicates, let failed):
+                if successful > 0 {
+                    bookmarkSummaryRow.isHidden = false
+                    bookmarkSummaryLabel.stringValue = UserText.successfulBookmarkImports(successful)
+                } else {
+                    bookmarkSummaryRow.isHidden = true
+                }
+
+                let failureTotal = duplicates + failed
+
+                if failureTotal > 0 {
+                    bookmarkFailureRow.isHidden = false
+                    bookmarkFailureLabel.stringValue = UserText.failedBookmarkImports(duplicates + failed)
+                } else {
+                    bookmarkFailureRow.isHidden = true
+                }
             case .logins(let successfulImports, _, _):
                 passwordSummaryRow.isHidden = false
                 passwordSummaryLabel.stringValue = UserText.loginImportSuccessfulBrowserImports(totalSuccessfulImports: successfulImports.count)

@@ -279,6 +279,13 @@ struct UserText {
         return String(format: localized, String(totalSuccessfulImports))
     }
 
+    static func failedBookmarkImports(_ totalFailedImports: Int) -> String {
+        let localized = NSLocalizedString("import.bookmarks.browser.failed-imports",
+                                          value: "Failed/Duplicate Bookmarks: %@",
+                                          comment: "Status text indicating the number of failed browser bookmark imports")
+        return String(format: localized, String(totalFailedImports))
+    }
+
     static let bookmarkImportSafariPermissionDescription = NSLocalizedString("import.bookmarks.safari.permission-description", value: "DuckDuckGo needs your permission to read the Safari bookmarks file. Select the Bookmarks.plist file to import bookmarks.", comment: "Description text for the Safari bookmark import permission screen")
     static let bookmarkImportSafariRequestPermissionButtonTitle = NSLocalizedString("import.bookmarks.safari.permission-button.title", value: "Select Bookmarks File...", comment: "Text for the Safari bookmark import permission button")
 

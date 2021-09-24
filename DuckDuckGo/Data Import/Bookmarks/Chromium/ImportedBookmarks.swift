@@ -35,6 +35,15 @@ struct ImportedBookmarks: Decodable {
             return nil
         }
 
+        var isFolder: Bool {
+            return type == "folder"
+        }
+
+        // There's no guarantee that imported bookmarks will have a URL, this is used to filter them out during import
+        var isInvalidBookmark: Bool {
+            return !isFolder && url == nil
+        }
+
         enum CodingKeys: String, CodingKey {
             case name
             case type

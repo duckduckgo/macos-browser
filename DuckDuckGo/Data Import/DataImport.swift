@@ -60,7 +60,7 @@ enum DataImport {
     }
 
     enum Summary: Equatable {
-        case bookmarks(successfulImportCount: Int)
+        case bookmarks(successfulImportCount: Int, duplicateImportCount: Int, failedImportCount: Int)
         case logins(successfulImports: [String], duplicateImports: [String], failedImports: [String])
     }
 

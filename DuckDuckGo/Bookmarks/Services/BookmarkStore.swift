@@ -36,7 +36,7 @@ protocol BookmarkStore {
     func update(folder: BookmarkFolder)
     func add(objectsWithUUIDs: [UUID], to parent: BookmarkFolder?, completion: @escaping (Error?) -> Void)
     func update(objectsWithUUIDs uuids: [UUID], update: @escaping (BaseBookmarkEntity) -> Void, completion: @escaping (Error?) -> Void)
-    func importBookmarks(_ bookmarks: ImportedBookmarks) -> Int
+    func importBookmarks(_ bookmarks: ImportedBookmarks) -> (successful: Int, duplicates: Int, failed: Int)
 
 }
 
@@ -336,8 +336,10 @@ final class LocalBookmarkStore: BookmarkStore {
 
     // MARK: - Import
 
-    func importBookmarks(_ bookmarks: ImportedBookmarks) -> Int {
+    func importBookmarks(_ bookmarks: ImportedBookmarks) -> (successful: Int, duplicates: Int, failed: Int) {
         var importCount = 0
+        var duplicateCount = 0
+        var failedCount = 0
 
         context.performAndWait {
             do {
@@ -353,20 +355,28 @@ final class LocalBookmarkStore: BookmarkStore {
                 let importRootFolder = createFolder(titled: UserText.importedBookmarks(at: Date()), in: self.context)
 
                 if let bookmarksBar = bookmarks.topLevelFolders.bookmarkBar.children {
-                    recursivelyCreateEntities(from: bookmarksBar,
-                                              parent: importRootFolder,
-                                              existingBookmarkURLs: bookmarkURLs,
-                                              in: self.context)
+                    let result = recursivelyCreateEntities(from: bookmarksBar,
+                                                           parent: importRootFolder,
+                                                           existingBookmarkURLs: bookmarkURLs,
+                                                           in: self.context)
+
+                    importCount += result.successful
+                    duplicateCount += result.duplicates
+                    failedCount += result.failed
                 }
 
                 let otherBookmarksFolder = createFolder(titled: UserText.bookmarkImportOtherBookmarks, in: self.context)
                 otherBookmarksFolder.parentFolder = importRootFolder
 
                 if let otherBookmarks = bookmarks.topLevelFolders.otherBookmarks.children {
-                    recursivelyCreateEntities(from: otherBookmarks,
+                    let result = recursivelyCreateEntities(from: otherBookmarks,
                                               parent: otherBookmarksFolder,
                                               existingBookmarkURLs: bookmarkURLs,
                                               in: self.context)
+
+                    importCount += result.successful
+                    duplicateCount += result.duplicates
+                    failedCount += result.failed
                 }
 
                 try self.context.save()
@@ -374,16 +384,16 @@ final class LocalBookmarkStore: BookmarkStore {
 
                 importCount = bookmarkCountAfterImport - bookmarkCountBeforeImport
             } catch {
+                os_log("Failed to import bookmarks, with error: %s", log: .dataImportExport, type: .error, error.localizedDescription)
+
                 // Only throw this assertion when running in debug and when unit tests are not running.
                 if !AppDelegate.isRunningTests {
                     assertionFailure("LocalBookmarkStore: Saving of context failed")
                 }
-
-                os_log("Failed to import bookmarks, with error: %s", log: .dataImportExport, type: .error, error.localizedDescription)
             }
         }
 
-        return importCount
+        return (successful: importCount, duplicates: duplicateCount, failed: failedCount)
     }
 
     private func createFolder(titled title: String, in context: NSManagedObjectContext) -> BookmarkManagedObject {
@@ -399,10 +409,21 @@ final class LocalBookmarkStore: BookmarkStore {
     private func recursivelyCreateEntities(from bookmarks: [ImportedBookmarks.BookmarkOrFolder],
                                            parent: BookmarkManagedObject?,
                                            existingBookmarkURLs: Set<URL>,
-                                           in context: NSManagedObjectContext) {
+                                           in context: NSManagedObjectContext) -> (successful: Int, duplicates: Int, failed: Int) {
+        var successful = 0
+        var duplicates = 0
+        var failed = 0
+
         for bookmarkOrFolder in bookmarks {
             if let bookmarkURL = bookmarkOrFolder.url, existingBookmarkURLs.contains(bookmarkURL) {
                 // Avoid creating bookmarks that already exist in the database.
+                duplicates += 1
+                continue
+            }
+
+            if bookmarkOrFolder.isInvalidBookmark {
+                // Skip importing bookmarks that don't have a valid URL
+                failed += 1
                 continue
             }
 
@@ -410,16 +431,25 @@ final class LocalBookmarkStore: BookmarkStore {
 
             bookmarkManagedObject.id = UUID()
             bookmarkManagedObject.titleEncrypted = bookmarkOrFolder.name as NSString
-            bookmarkManagedObject.isFolder = bookmarkOrFolder.type == "folder"
+            bookmarkManagedObject.isFolder = bookmarkOrFolder.isFolder
             bookmarkManagedObject.urlEncrypted = bookmarkOrFolder.url as NSURL?
             bookmarkManagedObject.dateAdded = NSDate.now
             bookmarkManagedObject.parentFolder = parent
             bookmarkManagedObject.isFavorite = false
 
             if let children = bookmarkOrFolder.children {
-                recursivelyCreateEntities(from: children, parent: bookmarkManagedObject, existingBookmarkURLs: existingBookmarkURLs, in: context)
+                let result = recursivelyCreateEntities(from: children,
+                                                       parent: bookmarkManagedObject,
+                                                       existingBookmarkURLs: existingBookmarkURLs,
+                                                       in: context)
+
+                successful += result.successful
+                duplicates += result.duplicates
+                failed += result.failed
             }
         }
+
+        return (successful, duplicates, failed)
     }
 
 }
