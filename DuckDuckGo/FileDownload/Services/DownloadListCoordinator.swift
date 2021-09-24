@@ -226,12 +226,14 @@ final class DownloadListCoordinator {
 
     // MARK: interface
 
-    var hasDownloads: Bool {
-        !items.isEmpty
-    }
-
     var hasActiveDownloads: Bool {
         !downloadTaskCancellables.isEmpty
+    }
+
+    var mostRecentModification: Date? {
+        return items.values.max { a, b in
+            a.modified < b.modified
+        }?.modified
     }
 
     func downloads<T: Comparable>(sortedBy keyPath: KeyPath<DownloadListItem, T>, ascending: Bool) -> [DownloadListItem] {
@@ -242,7 +244,7 @@ final class DownloadListCoordinator {
         })
     }
 
-    func updates() -> AnyPublisher<Update, Never> {
+    var updates: AnyPublisher<Update, Never> {
         return updatesSubject.eraseToAnyPublisher()
     }
 

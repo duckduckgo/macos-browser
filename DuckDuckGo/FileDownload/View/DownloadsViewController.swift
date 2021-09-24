@@ -19,6 +19,12 @@
 import Cocoa
 import Combine
 
+protocol DownloadsViewControllerDelegate: AnyObject {
+
+    func clearDownloadsActionTriggered()
+
+}
+
 final class DownloadsViewController: NSViewController {
 
     static func create() -> Self {
@@ -33,11 +39,16 @@ final class DownloadsViewController: NSViewController {
     @IBOutlet var contextMenu: NSMenu!
     @IBOutlet var tableView: NSTableView!
     @IBOutlet var tableViewHeightConstraint: NSLayoutConstraint?
+    private var cellIndexToUnselect: Int?
+
+    weak var delegate: DownloadsViewControllerDelegate?
 
     var viewModel = DownloadListViewModel()
     var downloadsCancellable: AnyCancellable?
 
     override func viewWillAppear() {
+        viewModel.filterRemovedDownloads()
+
         downloadsCancellable = viewModel.$items
             .throttle(for: 0.1, scheduler: DispatchQueue.main, latest: true)
             .scan((old: [DownloadViewModel](), new: [DownloadViewModel]()), { ($0.new, $1) })
@@ -104,6 +115,7 @@ final class DownloadsViewController: NSViewController {
     @IBAction func clearDownloadsAction(_ sender: Any) {
         viewModel.cleanupInactiveDownloads()
         self.dismiss()
+        delegate?.clearDownloadsActionTriggered()
     }
 
     @IBAction func openDownloadedFileAction(_ sender: Any) {
@@ -129,6 +141,14 @@ final class DownloadsViewController: NSViewController {
         else { return }
         self.dismiss()
         NSWorkspace.shared.activateFileViewerSelecting([url])
+    }
+
+    func openDownloadAction(_ sender: Any) {
+        guard let index = index(for: sender),
+              let url = viewModel.items[safe: index]?.localURL
+        else { return }
+        self.dismiss()
+        NSWorkspace.shared.open(url)
     }
 
     @IBAction func restartDownloadAction(_ sender: Any) {
@@ -158,7 +178,7 @@ final class DownloadsViewController: NSViewController {
 
     @IBAction func doubleClickAction(_ sender: Any) {
         if index(for: sender) != nil {
-            revealDownloadAction(sender)
+            openDownloadAction(sender)
         } else {
             openDownloadsFolderAction(sender)
         }
@@ -238,9 +258,28 @@ extension DownloadsViewController: NSTableViewDataSource, NSTableViewDelegate {
     }
 
     func tableView(_ tableView: NSTableView, shouldSelectRow row: Int) -> Bool {
-        return false
+        if viewModel.items.indices.contains(row) {
+            return true
+        } else {
+            return false
+        }
     }
 
+    func tableViewSelectionIsChanging(_ notification: Notification) {
+        func changeCellSelection(in row: Int?, selected: Bool) {
+            guard let row = row else { return }
+
+            if let rowView = tableView.rowView(atRow: row, makeIfNecessary: false) {
+                for subview in rowView.subviews where subview is DownloadsCellView {
+                    (subview as? DownloadsCellView)?.isSelected = selected
+                }
+            }
+        }
+
+        changeCellSelection(in: cellIndexToUnselect, selected: false)
+        changeCellSelection(in: tableView.selectedRow, selected: true)
+        cellIndexToUnselect = tableView.selectedRow
+    }
 }
 
 private extension NSUserInterfaceItemIdentifier {

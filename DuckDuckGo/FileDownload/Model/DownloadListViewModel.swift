@@ -33,7 +33,7 @@ final class DownloadListViewModel {
         let items = coordinator.downloads(sortedBy: \.added, ascending: false).map(DownloadViewModel.init)
         self.items = items
         self.viewModels = items.reduce(into: [:]) { $0[$1.id] = $1 }
-        cancellable = coordinator.updates().receive(on: DispatchQueue.main).sink { [weak self] update in
+        cancellable = coordinator.updates.receive(on: DispatchQueue.main).sink { [weak self] update in
             self?.handleDownloadsUpdate(of: update.kind, item: update.item)
         }
     }
@@ -49,7 +49,6 @@ final class DownloadListViewModel {
             self.viewModels[item.identifier]?.update(with: item)
         case .removed:
             guard let index = self.items.firstIndex(where: { $0.id == item.identifier }) else {
-                assertionFailure("DownloadListViewModel: Item with id \(item.identifier) not found")
                 return
             }
             self.viewModels[item.identifier] = nil
@@ -59,6 +58,17 @@ final class DownloadListViewModel {
 
     func cleanupInactiveDownloads() {
         coordinator.cleanupInactiveDownloads()
+    }
+
+    func filterRemovedDownloads() {
+        items = items.filter {
+            if let localUrl = $0.localURL {
+                let fileSize = try? localUrl.resourceValues(forKeys: [.fileSizeKey]).fileSize
+                return fileSize != nil
+            } else {
+                return true
+            }
+        }
     }
 
     func cancelDownload(at index: Int) {

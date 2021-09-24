@@ -97,7 +97,7 @@
                                                     <rect key="frame" x="0.0" y="0.0" width="366" height="440"/>
                                                     <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                                     <color key="backgroundColor" name="ClearColor"/>
-                                                    <color key="gridColor" name="gridColor" catalog="System" colorSpace="catalog"/>
+                                                    <color key="gridColor" name="ClearColor"/>
                                                     <tableColumns>
                                                         <tableColumn width="353" minWidth="40" maxWidth="1000" id="BU8-mD-jcA">
                                                             <tableHeaderCell key="headerCell" lineBreakMode="truncatingTail" borderStyle="border">
@@ -265,6 +265,7 @@
                                                                         <outlet property="progressView" destination="BUB-Ea-xr5" id="TGe-Up-R7s"/>
                                                                         <outlet property="restartButton" destination="foT-7L-XqL" id="bqc-H9-iee"/>
                                                                         <outlet property="revealButton" destination="Ejd-n2-PCA" id="14h-MQ-zFZ"/>
+                                                                        <outlet property="separator" destination="Fue-CV-Ukm" id="QsF-aI-dCo"/>
                                                                         <outlet property="textField" destination="w5d-I6-kEZ" id="2sR-pM-2jL"/>
                                                                         <outlet property="titleLabel" destination="w5d-I6-kEZ" id="SCM-u6-XnF"/>
                                                                     </connections>

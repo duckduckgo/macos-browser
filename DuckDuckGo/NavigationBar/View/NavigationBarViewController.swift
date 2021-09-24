@@ -24,6 +24,11 @@ import BrowserServicesKit
 // swiftlint:disable type_body_length
 final class NavigationBarViewController: NSViewController {
 
+    enum Constants {
+        static let downloadsButtonAutoHidingInterval: TimeInterval = 5 * 60
+        static let downloadsPopoverAutoHidingInterval: TimeInterval = 10
+    }
+
     @IBOutlet weak var goBackButton: NSButton!
     @IBOutlet weak var goForwardButton: NSButton!
     @IBOutlet weak var refreshButton: NSButton!
@@ -64,9 +69,10 @@ final class NavigationBarViewController: NSViewController {
     }()
     private lazy var passwordManagementPopover: PasswordManagementPopover = PasswordManagementPopover()
     private lazy var downloadsPopover: DownloadsPopover = {
-        let popover = DownloadsPopover()
-        popover.delegate = self
-        return popover
+        let downloadsPopover = DownloadsPopover()
+        downloadsPopover.delegate = self
+        (downloadsPopover.contentViewController as? DownloadsViewController)?.delegate = self
+        return downloadsPopover
     }()
     var isDownloadsPopoverShown: Bool {
         downloadsPopover.isShown
@@ -231,7 +237,7 @@ final class NavigationBarViewController: NSViewController {
         Pixel.fire(.manageLogins(source: .button))
     }
 
-    func toggleDownloadsPopover() {
+    func toggleDownloadsPopover(shouldFirePixel: Bool = true) {
         if downloadsPopover.isShown {
             downloadsPopover.close()
             return
@@ -239,9 +245,32 @@ final class NavigationBarViewController: NSViewController {
         guard closeTransientPopovers() else { return }
 
         downloadsButton.isHidden = false
+        setDownloadButtonHidingTimer()
         downloadsPopover.show(relativeTo: downloadsButton.bounds.insetFromLineOfDeath(), of: downloadsButton, preferredEdge: .maxY)
 
-        Pixel.fire(.manageDownloads(source: .button))
+        if shouldFirePixel {
+            Pixel.fire(.manageDownloads(source: .button))
+        }
+    }
+
+    private var downloadsPopoverTimer: Timer?
+    private func showDownloadsPopoverAndAutoHide() {
+        let timerBlock: (Timer) -> Void = { [weak self] _ in
+            self?.downloadsPopoverTimer?.invalidate()
+            self?.downloadsPopoverTimer = nil
+
+            if self?.downloadsPopover.isShown ?? false {
+                self?.downloadsPopover.close()
+            }
+        }
+
+        if !self.downloadsPopover.isShown {
+            self.toggleDownloadsPopover(shouldFirePixel: false)
+
+            downloadsPopoverTimer = Timer.scheduledTimer(withTimeInterval: Constants.downloadsPopoverAutoHidingInterval,
+                                                         repeats: false,
+                                                         block: timerBlock)
+        }
     }
 
     private func setupNavigationButtonMenus() {
@@ -270,9 +299,13 @@ final class NavigationBarViewController: NSViewController {
     }
 
     private func subscribeToDownloads() {
-        DownloadListCoordinator.shared.updates()
+        DownloadListCoordinator.shared.updates
             .throttle(for: 1.0, scheduler: DispatchQueue.main, latest: true)
-            .sink { [weak self] _ in
+            .sink { [weak self] update in
+                let shouldShowPopover = update.kind == .updated && update.item.destinationURL != nil && update.item.tempURL == nil
+                if shouldShowPopover {
+                    self?.showDownloadsPopoverAndAutoHide()
+                }
                 self?.updateDownloadsButton()
             }
             .store(in: &downloadsCancellables)
@@ -303,12 +336,34 @@ final class NavigationBarViewController: NSViewController {
     }
 
     private func updateDownloadsButton() {
-        let hasDownloads = DownloadListCoordinator.shared.hasDownloads
         let hasActiveDownloads = DownloadListCoordinator.shared.hasActiveDownloads
 
         downloadsButton.image = hasActiveDownloads ? Self.activeDownloadsImage : Self.inactiveDownloadsImage
-        downloadsButton.isHidden = !(hasDownloads || downloadsPopover.isShown)
+        if hasActiveDownloads {
+            downloadsButton.isHidden = false
+        } else {
+            setDownloadButtonHidingTimer()
+        }
+        if !downloadsButton.isHidden { setDownloadButtonHidingTimer() }
         downloadsButton.isMouseDown = downloadsPopover.isShown
+    }
+
+    private var downloadsButtonHidingTimer: Timer?
+    private func setDownloadButtonHidingTimer() {
+        guard downloadsButtonHidingTimer == nil else { return }
+
+        let timerBlock: (Timer) -> Void = { [weak self] _ in
+            guard let self = self else { return }
+            self.downloadsButtonHidingTimer?.invalidate()
+            self.downloadsButtonHidingTimer = nil
+            if DownloadListCoordinator.shared.hasActiveDownloads || self.downloadsPopover.isShown { return }
+
+            self.downloadsButton.isHidden = true
+        }
+
+        downloadsButtonHidingTimer = Timer.scheduledTimer(withTimeInterval: Constants.downloadsButtonAutoHidingInterval,
+                                                          repeats: false,
+                                                          block: timerBlock)
     }
 
     private func updateBookmarksButton() {
@@ -400,11 +455,21 @@ extension NavigationBarViewController: NSPopoverDelegate {
     func popoverDidClose(_ notification: Notification) {
         if notification.object as AnyObject? === downloadsPopover {
             updateDownloadsButton()
+            downloadsPopoverTimer?.invalidate()
+            downloadsPopoverTimer = nil
         } else if notification.object as AnyObject? === bookmarkListPopover {
             updateBookmarksButton()
         } else if notification.object as AnyObject? === saveCredentialsPopover {
             updatePasswordManagementButton()
         }
+    }
+
+}
+
+extension NavigationBarViewController: DownloadsViewControllerDelegate {
+
+    func clearDownloadsActionTriggered() {
+        downloadsButton.isHidden = true
     }
 
 }
