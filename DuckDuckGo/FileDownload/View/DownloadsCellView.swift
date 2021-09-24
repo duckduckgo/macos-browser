@@ -39,6 +39,7 @@ final class DownloadsCellView: NSTableCellView {
     @IBOutlet var cancelButton: MouseOverButton!
     @IBOutlet var revealButton: MouseOverButton!
     @IBOutlet var restartButton: MouseOverButton!
+    @IBOutlet var separator: NSBox!
 
     static let highlightedReloadImage = NSImage(named: "RestartDownloadHighlighted")!
     static let normalReloadImage = NSImage(named: "RestartDownload")!
@@ -48,6 +49,12 @@ final class DownloadsCellView: NSTableCellView {
     private var progressCancellable: AnyCancellable?
 
     private static let byteFormatter = ByteCountFormatter()
+
+    var isSelected: Bool = false {
+        didSet {
+            separator.isHidden = isSelected
+        }
+    }
 
     override func awakeFromNib() {
         cancelButton.$isMouseOver.sink { [weak self] isMouseOver in

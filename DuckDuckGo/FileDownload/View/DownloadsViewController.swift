@@ -39,6 +39,7 @@ final class DownloadsViewController: NSViewController {
     @IBOutlet var contextMenu: NSMenu!
     @IBOutlet var tableView: NSTableView!
     @IBOutlet var tableViewHeightConstraint: NSLayoutConstraint?
+    private var cellIndexToUnselect: Int?
 
     weak var delegate: DownloadsViewControllerDelegate?
 
@@ -249,9 +250,28 @@ extension DownloadsViewController: NSTableViewDataSource, NSTableViewDelegate {
     }
 
     func tableView(_ tableView: NSTableView, shouldSelectRow row: Int) -> Bool {
-        return false
+        if viewModel.items.indices.contains(row) {
+            return true
+        } else {
+            return false
+        }
     }
 
+    func tableViewSelectionIsChanging(_ notification: Notification) {
+        func changeCellSelection(in row: Int?, selected: Bool) {
+            guard let row = row else { return }
+
+            if let rowView = tableView.rowView(atRow: row, makeIfNecessary: false) {
+                for subview in rowView.subviews where subview is DownloadsCellView {
+                    (subview as? DownloadsCellView)?.isSelected = selected
+                }
+            }
+        }
+
+        changeCellSelection(in: cellIndexToUnselect, selected: false)
+        changeCellSelection(in: tableView.selectedRow, selected: true)
+        cellIndexToUnselect = tableView.selectedRow
+    }
 }
 
 private extension NSUserInterfaceItemIdentifier {
