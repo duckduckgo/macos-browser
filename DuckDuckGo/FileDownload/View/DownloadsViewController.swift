@@ -140,7 +140,7 @@ final class DownloadsViewController: NSViewController {
               let url = viewModel.items[safe: index]?.localURL
         else { return }
         self.dismiss()
-        NSWorkspace.shared.open(url)
+        NSWorkspace.shared.activateFileViewerSelecting([url])
     }
 
     @IBAction func restartDownloadAction(_ sender: Any) {
