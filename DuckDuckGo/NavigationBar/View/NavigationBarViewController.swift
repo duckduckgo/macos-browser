@@ -265,7 +265,7 @@ final class NavigationBarViewController: NSViewController {
         }
 
         if !self.downloadsPopover.isShown {
-            self.toggleDownloadsPopover()
+            self.toggleDownloadsPopover(shouldFirePixel: false)
 
             downloadsPopoverTimer = Timer.scheduledTimer(withTimeInterval: Constants.downloadsPopoverAutoHidingInterval,
                                                          repeats: false,
