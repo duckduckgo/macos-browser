@@ -277,8 +277,10 @@ extension DownloadsViewController: NSTableViewDataSource, NSTableViewDelegate {
         }
 
         changeCellSelection(in: cellIndexToUnselect, selected: false)
-        changeCellSelection(in: tableView.selectedRow, selected: true)
-        cellIndexToUnselect = tableView.selectedRow
+        if tableView.selectedRowIndexes.count > 0 {
+            changeCellSelection(in: tableView.selectedRow, selected: true)
+            cellIndexToUnselect = tableView.selectedRow
+        }
     }
 }
 

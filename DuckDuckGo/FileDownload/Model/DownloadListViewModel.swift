@@ -64,7 +64,7 @@ final class DownloadListViewModel {
         items = items.filter {
             if let localUrl = $0.localURL {
                 let fileSize = try? localUrl.resourceValues(forKeys: [.fileSizeKey]).fileSize
-                return fileSize != nil
+                return fileSize != nil || $0.isActive
             } else {
                 return true
             }
