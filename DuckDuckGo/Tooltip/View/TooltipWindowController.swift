@@ -139,7 +139,6 @@ extension TooltipWindowController.TimerInterval {
     init(from tabWidthStage: TabBarViewItem.WidthStage) {
         switch tabWidthStage {
         case .full: self = .long
-        case .withoutCloseButton: self = .middle
         case .withoutTitle: self = .short
         }
     }

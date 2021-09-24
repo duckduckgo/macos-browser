@@ -89,6 +89,10 @@ struct UserText {
     static let findInPage = NSLocalizedString("find.in.page", value: "%1$d of %2$d", comment: "Find in page status (e.g. 1 of 99)")
 
     static let moreMenuItem = NSLocalizedString("sharing.more", value: "More...", comment: "Sharing Menu -> More...")
+    static let findInPageMenuItem = NSLocalizedString("find.in.page.menu.item", value: "Find in Page", comment: "Menu item title")
+    static let shareMenuItem = NSLocalizedString("share.menu.item", value: "Share", comment: "Menu item title")
+    static let printMenuItem = NSLocalizedString("print.menu.item", value: "Print", comment: "Menu item title")
+    static let newWindowMenuItem = NSLocalizedString("new.window.menu.item", value: "New Window", comment: "Menu item title")
 
     static let fireproofSite = NSLocalizedString("options.menu.fireproof-site", value: "Fireproof Site", comment: "Context menu item")
     static let removeFireproofing = NSLocalizedString("options.menu.remove-fireproofing", value: "Remove Fireproofing", comment: "Context menu item")
@@ -110,7 +114,7 @@ struct UserText {
                                                                 value: "Fireproofing this site will keep you signed in after using the Fire Button.",
                                                                 comment: "Fireproof confirmation message")
 
-    static let passwordManagement = NSLocalizedString("passsword.management", value: "Logins", comment: "Used as title for password management user interface")
+    static let passwordManagement = NSLocalizedString("passsword.management", value: "Passwords and Logins", comment: "Used as title for password management user interface")
 
     static let bookmarks = NSLocalizedString("bookmarks", value: "Bookmarks", comment: "Button for bookmarks")
     static let bookmarksOpenInNewTabs = NSLocalizedString("bookmarks.open.in.new.tabs", value: "Open in New Tabs", comment: "Open all bookmarks in folder in new tabs")

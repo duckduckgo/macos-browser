@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<document type="com.apple.InterfaceBuilder3.Cocoa.XIB" version="3.0" toolsVersion="18122" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none" useAutolayout="YES" customObjectInstantitationMethod="direct">
+<document type="com.apple.InterfaceBuilder3.Cocoa.XIB" version="3.0" toolsVersion="19162" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none" useAutolayout="YES" customObjectInstantitationMethod="direct">
     <dependencies>
         <deployment identifier="macosx"/>
-        <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="18122"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="19162"/>
         <capability name="Named colors" minToolsVersion="9.0"/>
         <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
     </dependencies>
@@ -171,7 +171,7 @@
             <connections>
                 <outlet property="burnerTabIndicator" destination="KTM-gS-x2d" id="Btu-m9-GPP"/>
                 <outlet property="closeButton" destination="vuD-rY-Vzl" id="JGv-Ac-mRi"/>
-                <outlet property="closeButtonTrailintgConstraint" destination="web-9k-BYT" id="9Wt-xR-qep"/>
+                <outlet property="closeButtonTrailingConstraint" destination="web-9k-BYT" id="UkK-vj-qp9"/>
                 <outlet property="faviconImageView" destination="Kky-kZ-lU9" id="96Z-4T-ONB"/>
                 <outlet property="faviconWrapperViewCenterConstraint" destination="PF1-mZ-U4m" id="5KT-Cu-bbm"/>
                 <outlet property="faviconWrapperViewLeadingConstraint" destination="TSx-41-S2A" id="342-tk-EzF"/>
@@ -188,7 +188,7 @@
     </objects>
     <resources>
         <image name="Camera-Tab-Active" width="16" height="12"/>
-        <image name="Close" width="8" height="8"/>
+        <image name="Close" width="16" height="16"/>
         <namedColor name="ButtonColor">
             <color red="0.28627450980392155" green="0.28627450980392155" blue="0.28627450980392155" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
         </namedColor>
