@@ -33,11 +33,20 @@ final class WindowsManager {
         }
     }
 
+    class func closeAllBurnerTabs() {
+        NSApplication.shared.windows.forEach {
+            if let controller = $0.contentViewController as? MainViewController {
+                controller.tabCollectionViewModel.removeBurnerTabs()
+            }
+        }
+    }
+
     @discardableResult
     class func openNewWindow(with tabCollectionViewModel: TabCollectionViewModel? = nil,
                              droppingPoint: NSPoint? = nil,
-                             showWindow: Bool = true) -> NSWindow? {
-        let mainWindowController = makeNewWindow(tabCollectionViewModel: tabCollectionViewModel)
+                             showWindow: Bool = true,
+                             withBurnerTab: Bool = false) -> NSWindow? {
+        let mainWindowController = makeNewWindow(tabCollectionViewModel: tabCollectionViewModel, withBurnerTab: withBurnerTab)
 
         if let droppingPoint = droppingPoint {
             mainWindowController.window?.setFrameOrigin(droppingPoint: droppingPoint)
@@ -67,20 +76,17 @@ final class WindowsManager {
             return
         }
 
-        newTab.content = .url(initialUrl)
+        newTab.setContent(.url(initialUrl))
     }
 
-    private class func makeNewWindow(tabCollectionViewModel: TabCollectionViewModel? = nil) -> MainWindowController {
+    private class func makeNewWindow(tabCollectionViewModel: TabCollectionViewModel? = nil, withBurnerTab: Bool = false) -> MainWindowController {
         let mainViewController: MainViewController
         do {
             mainViewController = try NSException.catch {
                 NSStoryboard(name: "Main", bundle: .main)
                     .instantiateController(identifier: .mainViewController) { coder -> MainViewController? in
-                        if let tabCollectionViewModel = tabCollectionViewModel {
-                            return MainViewController(coder: coder, tabCollectionViewModel: tabCollectionViewModel)
-                        } else {
-                            return MainViewController(coder: coder)
-                        }
+                        let model = tabCollectionViewModel ?? TabCollectionViewModel.makeWithDefaultTab(isBurner: withBurnerTab)
+                        return MainViewController(coder: coder, tabCollectionViewModel: model)
                     }
             }
         } catch {

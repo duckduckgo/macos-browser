@@ -43,7 +43,7 @@ final class FindInPageUserScript: NSObject, StaticUserScript {
     }
 
     func find(text: String, inWebView webView: WKWebView) {
-        evaluate(js: "window.__firefox__.find('\(text)')", inWebView: webView)
+        evaluate(js: "window.__firefox__.find('\(text.replacingOccurrences(of: "'", with: "\\\'"))')", inWebView: webView)
     }
 
     func done(withWebView webView: WKWebView) {

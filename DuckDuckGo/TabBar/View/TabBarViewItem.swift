@@ -20,6 +20,14 @@ import Cocoa
 import os.log
 import Combine
 
+struct OtherTabBarViewItemsState {
+
+    let hasItemsToTheLeft: Bool
+    let hasItemsToTheRight: Bool
+    let hasBurnerTabs: Bool
+
+}
+
 protocol TabBarViewItemDelegate: AnyObject {
 
     func tabBarViewItem(_ tabBarViewItem: TabBarViewItem, isMouseOver: Bool)
@@ -29,12 +37,14 @@ protocol TabBarViewItemDelegate: AnyObject {
     func tabBarViewItemCloseOtherAction(_ tabBarViewItem: TabBarViewItem)
     func tabBarViewItemCloseToTheRightAction(_ tabBarViewItem: TabBarViewItem)
     func tabBarViewItemDuplicateAction(_ tabBarViewItem: TabBarViewItem)
+    func tabBarViewItemConvertToStandard(_ tabBarViewItem: TabBarViewItem)
     func tabBarViewItemBookmarkThisPageAction(_ tabBarViewItem: TabBarViewItem)
     func tabBarViewItemMoveToNewWindowAction(_ tabBarViewItem: TabBarViewItem)
     func tabBarViewItemFireproofSite(_ tabBarViewItem: TabBarViewItem)
     func tabBarViewItemRemoveFireproofing(_ tabBarViewItem: TabBarViewItem)
+    func tabBarViewItemCloseBurnerTabs(_ tabBarViewItem: TabBarViewItem)
 
-    func otherTabBarViewItemsState(for tabBarViewItem: TabBarViewItem) -> (hasItemsToTheLeft: Bool, hasItemsToTheRight: Bool)
+    func otherTabBarViewItemsState(for tabBarViewItem: TabBarViewItem) -> OtherTabBarViewItemsState
 
 }
 
@@ -58,42 +68,6 @@ final class TabBarViewItem: NSCollectionViewItem {
         }
     }
 
-    var tabBarViewItemMenu: NSMenu {
-        let menu = NSMenu()
-
-        let duplicateMenuItem = NSMenuItem(title: UserText.duplicateTab, action: #selector(duplicateAction(_:)), keyEquivalent: "")
-        menu.addItem(duplicateMenuItem)
-
-        menu.addItem(NSMenuItem.separator())
-
-        let bookmarkMenuItem = NSMenuItem(title: UserText.bookmarkThisPage, action: #selector(bookmarkThisPageAction(_:)), keyEquivalent: "")
-        menu.addItem(bookmarkMenuItem)
-
-        if let url = currentURL, url.canFireproof {
-            let menuItem: NSMenuItem
-
-            if FireproofDomains.shared.isFireproof(fireproofDomain: url.host ?? "") {
-                menuItem = NSMenuItem(title: UserText.removeFireproofing, action: #selector(removeFireproofingAction(_:)), keyEquivalent: "")
-            } else {
-                menuItem = NSMenuItem(title: UserText.fireproofSite, action: #selector(fireproofSiteAction(_:)), keyEquivalent: "")
-            }
-
-            menu.addItem(menuItem)
-            menu.addItem(NSMenuItem.separator())
-        }
-
-        let closeMenuItem = NSMenuItem(title: UserText.closeTab, action: #selector(closeButtonAction(_:)), keyEquivalent: "")
-        menu.addItem(closeMenuItem)
-
-        let closeOtherMenuItem = NSMenuItem(title: UserText.closeOtherTabs, action: #selector(closeOtherAction(_:)), keyEquivalent: "")
-        menu.addItem(closeOtherMenuItem)
-
-        let moveToNewWindowMenuItem = NSMenuItem(title: UserText.moveTabToNewWindow, action: #selector(moveToNewWindowAction(_:)), keyEquivalent: "")
-        menu.addItem(moveToNewWindowMenuItem)
-
-        return menu
-    }
-
     var isLeftToSelected: Bool = false {
         didSet {
             updateSeparatorView()
@@ -110,14 +84,14 @@ final class TabBarViewItem: NSCollectionViewItem {
     @IBOutlet weak var titleTextField: NSTextField!
     @IBOutlet weak var closeButton: MouseOverButton!
     @IBOutlet weak var rightSeparatorView: ColorView!
-    @IBOutlet weak var loadingView: TabLoadingView!
     @IBOutlet weak var mouseOverView: MouseOverView!
     @IBOutlet weak var mouseClickView: MouseClickView!
-    @IBOutlet weak var tabLoadingViewCenterConstraint: NSLayoutConstraint!
-    @IBOutlet weak var tabLoadingViewLeadingConstraint: NSLayoutConstraint!
+    @IBOutlet weak var faviconWrapperViewCenterConstraint: NSLayoutConstraint!
+    @IBOutlet weak var faviconWrapperViewLeadingConstraint: NSLayoutConstraint!
     @IBOutlet var permissionCloseButtonTrailingConstraint: NSLayoutConstraint!
     @IBOutlet var tabLoadingPermissionLeadingConstraint: NSLayoutConstraint!
     @IBOutlet var closeButtonTrailintgConstraint: NSLayoutConstraint!
+    @IBOutlet var burnerTabIndicator: ColorView!
 
     private let titleTextFieldMaskLayer = CAGradientLayer()
 
@@ -125,6 +99,8 @@ final class TabBarViewItem: NSCollectionViewItem {
     private var cancellables = Set<AnyCancellable>()
 
     weak var delegate: TabBarViewItemDelegate?
+
+    var isBurnerTab = false
 
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -155,6 +131,7 @@ final class TabBarViewItem: NSCollectionViewItem {
 
     override var isSelected: Bool {
         didSet {
+            burnerTabIndicator.backgroundColor = isSelected ? NSColor.burnerIndicatorSelectedColor : NSColor.burnerIndicatorUnselectedColor
             if isSelected {
                 isDragged = false
             }
@@ -220,8 +197,21 @@ final class TabBarViewItem: NSCollectionViewItem {
         delegate?.tabBarViewItemMoveToNewWindowAction(self)
     }
 
+    @objc func convertToStandardTab(_ sender: NSMenuItem) {
+        delegate?.tabBarViewItemConvertToStandard(self)
+    }
+
+    @objc func closeBurnerTabs(_ sender: NSMenuItem) {
+        delegate?.tabBarViewItemCloseBurnerTabs(self)
+    }
+
     func subscribe(to tabViewModel: TabViewModel) {
         clearSubscriptions()
+
+        isBurnerTab = tabViewModel.tab.tabStorageType == .burner
+
+        closeButton.image = tabViewModel.tab.tabStorageType == .burner ? NSImage(named: "BurnClose") : NSImage(named: "Close")
+        burnerTabIndicator.isHidden = tabViewModel.tab.tabStorageType != .burner
 
         tabViewModel.$title.sink { [weak self] title in
             self?.titleTextField.stringValue = title
@@ -278,8 +268,8 @@ final class TabBarViewItem: NSCollectionViewItem {
         permissionCloseButtonTrailingConstraint.isActive = !closeButton.isHidden
         titleTextField.isHidden = widthStage.isTitleHidden
 
-        tabLoadingViewCenterConstraint.priority = widthStage.isTitleHidden && widthStage.isCloseButtonHidden ? .defaultHigh : .defaultLow
-        tabLoadingViewLeadingConstraint.priority = widthStage.isTitleHidden && widthStage.isCloseButtonHidden ? .defaultLow : .defaultHigh
+        faviconWrapperViewCenterConstraint.priority = widthStage.isTitleHidden && widthStage.isCloseButtonHidden ? .defaultHigh : .defaultLow
+        faviconWrapperViewLeadingConstraint.priority = widthStage.isTitleHidden && widthStage.isCloseButtonHidden ? .defaultLow : .defaultHigh
 
         closeButtonTrailintgConstraint.isActive = !widthStage.isCloseButtonHidden
     }
@@ -369,8 +359,20 @@ extension TabBarViewItem: NSMenuDelegate {
         closeMenuItem.target = self
         menu.addItem(closeMenuItem)
 
-        let otherItemsState = delegate?.otherTabBarViewItemsState(for: self) ?? (hasItemsToTheLeft: true, hasItemsToTheRight: true)
+        let otherItemsState = delegate?.otherTabBarViewItemsState(for: self) ?? .init(hasItemsToTheLeft: true,
+                                                                                      hasItemsToTheRight: true,
+                                                                                      hasBurnerTabs: false)
 
+        updateWithTabsToTheSides(menu, otherItemsState)
+
+        let moveToNewWindowMenuItem = NSMenuItem(title: UserText.moveTabToNewWindow, action: #selector(moveToNewWindowAction(_:)), keyEquivalent: "")
+        moveToNewWindowMenuItem.target = self
+        menu.addItem(moveToNewWindowMenuItem)
+
+        updateWithBurnerTabItems(menu, otherItemsState)
+    }
+
+    private func updateWithTabsToTheSides(_ menu: NSMenu, _ otherItemsState: OtherTabBarViewItemsState) {
         if otherItemsState.hasItemsToTheLeft || otherItemsState.hasItemsToTheRight {
             let closeOtherMenuItem = NSMenuItem(title: UserText.closeOtherTabs, action: #selector(closeOtherAction(_:)), keyEquivalent: "")
             closeOtherMenuItem.target = self
@@ -385,9 +387,20 @@ extension TabBarViewItem: NSMenuDelegate {
             menu.addItem(closeTabsToTheRightMenuItem)
         }
 
-        let moveToNewWindowMenuItem = NSMenuItem(title: UserText.moveTabToNewWindow, action: #selector(moveToNewWindowAction(_:)), keyEquivalent: "")
-        moveToNewWindowMenuItem.target = self
-        menu.addItem(moveToNewWindowMenuItem)
+    }
+
+    private func updateWithBurnerTabItems(_ menu: NSMenu, _ otherItemsState: OtherTabBarViewItemsState) {
+        if isBurnerTab || otherItemsState.hasBurnerTabs {
+            menu.addItem(NSMenuItem.separator())
+        }
+
+        if isBurnerTab {
+            menu.addItem(NSMenuItem(title: UserText.convertToTab, action: #selector(convertToStandardTab(_:)), target: self, keyEquivalent: ""))
+        }
+
+        if otherItemsState.hasBurnerTabs {
+            menu.addItem(NSMenuItem(title: UserText.closeAllBurnerTabs, action: #selector(closeBurnerTabs(_:)), target: self, keyEquivalent: ""))
+        }
     }
 
 }

@@ -176,6 +176,32 @@
                                             <action selector="passwordManagementButtonAction:" target="o2v-eH-jTI" id="CkE-56-a4p"/>
                                         </connections>
                                     </button>
+                                    <button translatesAutoresizingMaskIntoConstraints="NO" id="G8p-di-fq4" userLabel="Downloads Button" customClass="MouseOverButton" customModule="DuckDuckGo_Privacy_Browser" customModuleProvider="target">
+                                        <rect key="frame" x="32" y="0.0" width="28" height="28"/>
+                                        <constraints>
+                                            <constraint firstAttribute="width" constant="28" id="e8q-LQ-wRv"/>
+                                            <constraint firstAttribute="height" constant="28" id="fxJ-mh-eCf"/>
+                                        </constraints>
+                                        <buttonCell key="cell" type="square" bezelStyle="shadowlessSquare" image="Downloads" imagePosition="only" alignment="center" imageScaling="proportionallyDown" inset="2" id="GwE-DM-8UC">
+                                            <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
+                                            <font key="font" metaFont="system"/>
+                                        </buttonCell>
+                                        <color key="contentTintColor" name="ButtonColor"/>
+                                        <userDefinedRuntimeAttributes>
+                                            <userDefinedRuntimeAttribute type="color" keyPath="mouseOverColor">
+                                                <color key="value" name="ButtonMouseOverColor"/>
+                                            </userDefinedRuntimeAttribute>
+                                            <userDefinedRuntimeAttribute type="color" keyPath="mouseDownColor">
+                                                <color key="value" name="ButtonMouseDownColor"/>
+                                            </userDefinedRuntimeAttribute>
+                                            <userDefinedRuntimeAttribute type="number" keyPath="cornerRadius">
+                                                <real key="value" value="4"/>
+                                            </userDefinedRuntimeAttribute>
+                                        </userDefinedRuntimeAttributes>
+                                        <connections>
+                                            <action selector="downloadsButtonAction:" target="o2v-eH-jTI" id="UIu-gq-V20"/>
+                                        </connections>
+                                    </button>
                                     <button translatesAutoresizingMaskIntoConstraints="NO" id="4sj-qN-UUY" userLabel="Bookmarks Button" customClass="MouseOverButton" customModule="DuckDuckGo_Privacy_Browser" customModuleProvider="target">
                                         <rect key="frame" x="64" y="0.0" width="28" height="28"/>
                                         <constraints>
@@ -261,8 +287,10 @@
                                     <integer value="1000"/>
                                     <integer value="1000"/>
                                     <integer value="1000"/>
+                                    <integer value="1000"/>
                                 </visibilityPriorities>
                                 <customSpacing>
+                                    <real value="3.4028234663852886e+38"/>
                                     <real value="3.4028234663852886e+38"/>
                                     <real value="3.4028234663852886e+38"/>
                                     <real value="3.4028234663852886e+38"/>
@@ -294,6 +322,7 @@
                     </view>
                     <connections>
                         <outlet property="bookmarkListButton" destination="4sj-qN-UUY" id="Fjs-KE-Lfp"/>
+                        <outlet property="downloadsButton" destination="G8p-di-fq4" id="oxD-pc-8hn"/>
                         <outlet property="feedbackButton" destination="DqX-mW-o7G" id="cwM-B1-ntW"/>
                         <outlet property="goBackButton" destination="kky-0N-Cfd" id="RA9-yE-URS"/>
                         <outlet property="goForwardButton" destination="mdE-u0-Ei5" id="7wT-nX-Avr"/>
@@ -511,6 +540,12 @@
                         <rect key="frame" x="0.0" y="0.0" width="578" height="32"/>
                         <autoresizingMask key="autoresizingMask"/>
                         <subviews>
+                            <customView translatesAutoresizingMaskIntoConstraints="NO" id="hdY-An-3W8">
+                                <rect key="frame" x="0.0" y="0.0" width="120" height="32"/>
+                                <constraints>
+                                    <constraint firstAttribute="width" constant="120" id="CQO-D3-iVT"/>
+                                </constraints>
+                            </customView>
                             <button translatesAutoresizingMaskIntoConstraints="NO" id="taC-vG-1fV" customClass="AddressBarButton" customModule="DuckDuckGo_Privacy_Browser" customModuleProvider="target">
                                 <rect key="frame" x="545" y="0.0" width="32" height="32"/>
                                 <constraints>
@@ -563,13 +598,6 @@
                                     <action selector="clearButtonAction:" target="mcr-nj-GmC" id="m9h-NY-Ujx"/>
                                 </connections>
                             </button>
-                            <customView translatesAutoresizingMaskIntoConstraints="NO" id="TWy-J2-Gym" customClass="TrackersAnimationView" customModule="DuckDuckGo_Privacy_Browser" customModuleProvider="target">
-                                <rect key="frame" x="5" y="1" width="88" height="30"/>
-                                <constraints>
-                                    <constraint firstAttribute="height" constant="30" id="MMm-sU-g83"/>
-                                    <constraint firstAttribute="width" constant="88" id="jgE-g5-qmO"/>
-                                </constraints>
-                            </customView>
                             <stackView distribution="equalSpacing" orientation="horizontal" alignment="centerY" spacing="0.0" horizontalStackHuggingPriority="249.99998474121094" verticalStackHuggingPriority="249.99998474121094" detachesHiddenViews="YES" translatesAutoresizingMaskIntoConstraints="NO" id="HEu-ro-RSA">
                                 <rect key="frame" x="1" y="0.0" width="161" height="32"/>
                                 <subviews>
@@ -595,7 +623,7 @@
                                             <constraint firstAttribute="height" constant="32" id="fQf-sl-KYI"/>
                                         </constraints>
                                     </customView>
-                                    <button hidden="YES" translatesAutoresizingMaskIntoConstraints="NO" id="nOW-iY-XmO" customClass="PrivacyEntryPointAddressBarButton" customModule="DuckDuckGo_Privacy_Browser" customModuleProvider="target">
+                                    <button hidden="YES" translatesAutoresizingMaskIntoConstraints="NO" id="nOW-iY-XmO" customClass="AddressBarButton" customModule="DuckDuckGo_Privacy_Browser" customModuleProvider="target">
                                         <rect key="frame" x="0.0" y="0.0" width="32" height="32"/>
                                         <constraints>
                                             <constraint firstAttribute="width" constant="32" id="Hf1-nK-Kb4"/>
@@ -749,16 +777,18 @@
                         </subviews>
                         <constraints>
                             <constraint firstAttribute="trailing" secondItem="taC-vG-1fV" secondAttribute="trailing" constant="1" id="26X-xU-JjT"/>
+                            <constraint firstAttribute="bottom" secondItem="hdY-An-3W8" secondAttribute="bottom" id="8H7-1T-rjX"/>
                             <constraint firstItem="HEu-ro-RSA" firstAttribute="centerY" secondItem="Bhg-sv-n5J" secondAttribute="centerY" id="BRs-q1-MOh"/>
-                            <constraint firstItem="TWy-J2-Gym" firstAttribute="leading" secondItem="Bhg-sv-n5J" secondAttribute="leading" constant="5" id="Ed1-Mt-XO7"/>
                             <constraint firstItem="HEu-ro-RSA" firstAttribute="leading" secondItem="Bhg-sv-n5J" secondAttribute="leading" constant="1" id="JJu-Ej-iFq"/>
-                            <constraint firstItem="TWy-J2-Gym" firstAttribute="centerY" secondItem="Bhg-sv-n5J" secondAttribute="centerY" id="MPX-Xd-TX0"/>
                             <constraint firstItem="kRc-0m-oqe" firstAttribute="centerY" secondItem="Bhg-sv-n5J" secondAttribute="centerY" id="T0S-fo-y1J"/>
+                            <constraint firstItem="hdY-An-3W8" firstAttribute="top" secondItem="Bhg-sv-n5J" secondAttribute="top" id="W1M-wR-jNQ"/>
                             <constraint firstAttribute="trailing" secondItem="kRc-0m-oqe" secondAttribute="trailing" constant="1" id="WeU-Fb-omO"/>
                             <constraint firstItem="taC-vG-1fV" firstAttribute="centerY" secondItem="Bhg-sv-n5J" secondAttribute="centerY" id="j0x-vX-dys"/>
+                            <constraint firstItem="hdY-An-3W8" firstAttribute="leading" secondItem="Bhg-sv-n5J" secondAttribute="leading" id="xv6-0t-7td"/>
                         </constraints>
                     </view>
                     <connections>
+                        <outlet property="animationWrapperView" destination="hdY-An-3W8" id="53o-2D-orG"/>
                         <outlet property="bookmarkButton" destination="taC-vG-1fV" id="tbQ-qW-71o"/>
                         <outlet property="cameraButton" destination="C2L-f9-L3r" id="xua-H5-hAx"/>
                         <outlet property="clearButton" destination="kRc-0m-oqe" id="2sv-EP-8MW"/>
@@ -770,7 +800,6 @@
                         <outlet property="microphoneButton" destination="uao-nC-0co" id="UHu-oA-rTl"/>
                         <outlet property="permissionButtons" destination="8UU-A8-1nD" id="gYJ-VW-MEG"/>
                         <outlet property="privacyEntryPointButton" destination="nOW-iY-XmO" id="r0A-EO-srN"/>
-                        <outlet property="trackersAnimationView" destination="TWy-J2-Gym" id="vbN-Mv-l4s"/>
                     </connections>
                 </viewController>
                 <customObject id="PAh-HG-vQt" userLabel="First Responder" customClass="NSResponder" sceneMemberID="firstResponder"/>
@@ -787,6 +816,7 @@
         <image name="Camera-Icon" width="16" height="12"/>
         <image name="Camera-Tab-Blocked" width="16" height="14"/>
         <image name="Clear" width="9" height="9"/>
+        <image name="Downloads" width="16" height="16"/>
         <image name="Feedback" width="16" height="16"/>
         <image name="Forward" width="16" height="16"/>
         <image name="Geolocation-Active" width="16" height="16"/>

@@ -36,4 +36,10 @@ struct TrackerInfo: Encodable {
         installedSurrogates.insert(installedSurrogateHost)
     }
 
+    var isEmpty: Bool {
+        return trackersDetected.count == 0 &&
+            trackersBlocked.count == 0 &&
+            installedSurrogates.count == 0
+    }
+
 }

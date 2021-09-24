@@ -29,16 +29,12 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         ProcessInfo.processInfo.environment["XCTestConfigurationFilePath"] != nil
     }
 
-    let urlEventListener = UrlEventListener(handler: AppDelegate.handleURL)
+    let urlEventHandler = URLEventHandler()
 
     private let keyStore = EncryptionKeyStore()
     private var fileStore: FileStore!
     private var stateRestorationManager: AppStateRestorationManager!
     private var grammarFeaturesManager = GrammarFeaturesManager()
-
-    private var urlsToOpen: [URL]?
-
-    private var didFinishLaunching = false
 
 #if OUT_OF_APPSTORE
 
@@ -53,17 +49,11 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
     var appUsageActivityMonitor: AppUsageActivityMonitor?
 
     func applicationWillFinishLaunching(_ notification: Notification) {
-#if BETA
-        if NSApp.buildDate < Date.monthAgo {
-            let message = "DuckDuckGo Beta has expired.\nPlease, delete the App and empty the Recycle Bin."
-            NSAlert(error: NSError(domain: "App Expired", code: -1, userInfo: [NSLocalizedDescriptionKey: message]))
-                .runModal()
-            NSApp.terminate(nil)
-        }
-#endif
+        ExpirationChecker.check()
 
         if !Self.isRunningTests {
             Pixel.setUp()
+            Database.shared.loadStore()
         }
 
         do {
@@ -74,17 +64,15 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
             fileStore = EncryptedFileStore()
         }
         stateRestorationManager = AppStateRestorationManager(fileStore: fileStore)
-
-        urlEventListener.listen()
     }
 
     func applicationDidFinishLaunching(_ notification: Notification) {
         guard !Self.isRunningTests else { return }
-        
-        Database.shared.loadStore()
+
         HTTPSUpgrade.shared.loadDataAsync()
         LocalBookmarkManager.shared.loadBookmarks()
         _=ConfigurationManager.shared
+        _=DownloadListCoordinator.shared
 
         if (notification.userInfo?[NSApplication.launchIsDefaultUserInfoKey] as? NSNumber)?.boolValue == true {
             Pixel.fire(.appLaunch(launch: .autoInitialOrRegular()))
@@ -105,21 +93,20 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         appUsageActivityMonitor = AppUsageActivityMonitor(delegate: self)
 
 #if OUT_OF_APPSTORE
-
         crashReporter.checkForNewReports()
-
 #endif
-
-        if let urlsToOpen = urlsToOpen {
-            for url in urlsToOpen {
-                Self.handleURL(url)
-            }
-        }
-
-        didFinishLaunching = true
+        urlEventHandler.applicationDidFinishLaunching()
     }
 
     func applicationShouldTerminate(_ sender: NSApplication) -> NSApplication.TerminateReply {
+        if !FileDownloadManager.shared.downloads.isEmpty {
+            let alert = NSAlert.activeDownloadsTerminationAlert(for: FileDownloadManager.shared.downloads)
+            if alert.runModal() == .cancel {
+                return .terminateCancel
+            }
+            FileDownloadManager.shared.cancelAll(waitUntilDone: true)
+            DownloadListCoordinator.shared.sync()
+        }
         stateRestorationManager?.applicationWillTerminate()
 
         return .terminateNow
@@ -141,27 +128,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
     }
 
     func application(_ sender: NSApplication, openFiles files: [String]) {
-        let urlsToOpen: [URL] = files.compactMap {
-            if let url = URL(string: $0),
-               ["http", "https"].contains(url.scheme) {
-                return url
-            } else if FileManager.default.fileExists(atPath: $0) {
-                let url = URL(fileURLWithPath: $0)
-                return url
-            }
-            return nil
-        }
-        if didFinishLaunching {
-            urlsToOpen.forEach(Self.handleURL)
-        } else {
-            self.urlsToOpen = urlsToOpen
-        }
-    }
-
-    static func handleURL(_ url: URL) {
-        Pixel.fire(.appLaunch(launch: url.isFileURL ? .openFile : .openURL))
-
-        WindowControllersManager.shared.show(url: url, newTab: true)
+        urlEventHandler.handleFiles(files)
     }
 
     private func applyPreferredTheme() {

@@ -19,7 +19,7 @@
 import Foundation
 
 extension TabCollectionViewModel: NSSecureCoding {
-    private enum NSCodingKeys {
+    private enum NSSecureCodingKeys {
         static let tabCollection = "tabs"
         static let selectionIndex = "idx"
     }
@@ -27,18 +27,21 @@ extension TabCollectionViewModel: NSSecureCoding {
     static var supportsSecureCoding: Bool { true }
 
     convenience init?(coder: NSCoder) {
-        guard let tabCollection = coder.decodeObject(of: TabCollection.self, forKey: NSCodingKeys.tabCollection),
+        guard let tabCollection = coder.decodeObject(of: TabCollection.self, forKey: NSSecureCodingKeys.tabCollection),
               !tabCollection.tabs.isEmpty
         else {
             return nil
         }
-        let selectionIndex = coder.decodeIfPresent(at: NSCodingKeys.selectionIndex) ?? 0
+        let selectionIndex = coder.decodeIfPresent(at: NSSecureCodingKeys.selectionIndex) ?? 0
         self.init(tabCollection: tabCollection, selectionIndex: selectionIndex)
     }
 
     func encode(with coder: NSCoder) {
-        selectionIndex.map(coder.encode(forKey: NSCodingKeys.selectionIndex))
-        coder.encode(tabCollection, forKey: NSCodingKeys.tabCollection)
+        if let index = selectionIndex {
+            let burners = tabCollection.tabs.filter { $0.tabStorageType != .burner }.count
+            coder.encode(min(0, index - burners))
+        }
+        coder.encode(tabCollection, forKey: NSSecureCodingKeys.tabCollection)
     }
 
 }

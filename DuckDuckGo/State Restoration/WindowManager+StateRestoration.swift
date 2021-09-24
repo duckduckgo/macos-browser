@@ -65,7 +65,7 @@ extension WindowControllersManager {
 
 @objc(WMState)
 final class WindowManagerStateRestoration: NSObject, NSSecureCoding {
-    private enum NSCodingKeys {
+    private enum NSSecureCodingKeys {
         static let controllers = "ctrls"
         static let keyWindowIndex = "key_idx"
     }
@@ -77,14 +77,14 @@ final class WindowManagerStateRestoration: NSObject, NSSecureCoding {
 
     init?(coder: NSCoder) {
         guard let restorationArray = coder.decodeObject(of: [NSArray.self, WindowRestorationItem.self],
-                                             forKey: NSCodingKeys.controllers) as? [WindowRestorationItem] else {
+                                             forKey: NSSecureCodingKeys.controllers) as? [WindowRestorationItem] else {
             os_log("WindowsManager:initWithCoder: could not decode Restoration Array: %s", type: .error,
                    String(describing: coder.error))
             return nil
         }
         self.windows = restorationArray
-        self.keyWindowIndex = coder.containsValue(forKey: NSCodingKeys.keyWindowIndex)
-            ? coder.decodeInteger(forKey: NSCodingKeys.keyWindowIndex)
+        self.keyWindowIndex = coder.containsValue(forKey: NSSecureCodingKeys.keyWindowIndex)
+            ? coder.decodeInteger(forKey: NSSecureCodingKeys.keyWindowIndex)
             : nil
 
         super.init()
@@ -102,14 +102,14 @@ final class WindowManagerStateRestoration: NSObject, NSSecureCoding {
         // Skip Private Windows coding
         // https://app.asana.com/0/1199230911884351/1200381133504358/f
 
-        coder.encode(windows as NSArray, forKey: NSCodingKeys.controllers)
-        keyWindowIndex.map(coder.encode(forKey: NSCodingKeys.keyWindowIndex))
+        coder.encode(windows as NSArray, forKey: NSSecureCodingKeys.controllers)
+        keyWindowIndex.map(coder.encode(forKey: NSSecureCodingKeys.keyWindowIndex))
     }
 }
 
 @objc(WR)
 final class WindowRestorationItem: NSObject, NSSecureCoding {
-    private enum NSCodingKeys {
+    private enum NSSecureCodingKeys {
         static let frame = "frame"
         static let model = "model"
 
@@ -126,16 +126,16 @@ final class WindowRestorationItem: NSObject, NSSecureCoding {
     static var supportsSecureCoding: Bool { true }
 
     required init?(coder: NSCoder) {
-        guard let model = coder.decodeObject(of: TabCollectionViewModel.self, forKey: NSCodingKeys.model) else {
+        guard let model = coder.decodeObject(of: TabCollectionViewModel.self, forKey: NSSecureCodingKeys.model) else {
             os_log("WindowRestoration:initWithCoder: could not decode model object: %s", type: .error, String(describing: coder.error))
             return nil
         }
         self.model = model
-        self.frame = coder.decodeRect(forKey: NSCodingKeys.frame)
+        self.frame = coder.decodeRect(forKey: NSSecureCodingKeys.frame)
     }
 
     func encode(with coder: NSCoder) {
-        coder.encode(frame, forKey: NSCodingKeys.frame)
-        coder.encode(model, forKey: NSCodingKeys.model)
+        coder.encode(frame, forKey: NSSecureCodingKeys.frame)
+        coder.encode(model, forKey: NSSecureCodingKeys.model)
     }
 }

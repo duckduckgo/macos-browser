@@ -24,7 +24,14 @@ final class MainMenu: NSMenu {
 
     @IBOutlet weak var checkForUpdatesMenuItem: NSMenuItem?
     @IBOutlet weak var checkForUpdatesSeparatorItem: NSMenuItem?
-    
+
+    @IBOutlet weak var newWindowMenuItem: NSMenuItem!
+    @IBOutlet weak var newTabMenuItem: NSMenuItem!
+    @IBOutlet weak var openLocationMenuItem: NSMenuItem!
+    @IBOutlet weak var closeWindowMenuItem: NSMenuItem!
+    @IBOutlet weak var closeAllWindowsMenuItem: NSMenuItem!
+    @IBOutlet weak var closeTabMenuItem: NSMenuItem!
+    @IBOutlet weak var burnWebsiteDataMenuItem: NSMenuItem!
     @IBOutlet weak var printSeparatorItem: NSMenuItem?
     @IBOutlet weak var printMenuItem: NSMenuItem?
     @IBOutlet weak var shareMenuItem: NSMenuItem!

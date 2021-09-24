@@ -71,12 +71,6 @@ typedef NS_ENUM(NSInteger, WKMediaCaptureState) {
 - (void)createWebArchiveDataWithCompletionHandler:(void (^)(NSData * _Nullable, NSError * _Nullable))completionHandler;
 - (void)createPDFWithConfiguration:(id _Nullable)pdfConfiguration completionHandler:(void (^)(NSData * _Nullable pdfDocumentData, NSError * _Nullable error))completionHandler;
 
-#ifndef __MAC_11_3
-- (void)startDownloadUsingRequest:(NSURLRequest *)request completionHandler:(void(^)(_WKDownload *))completionHandler;
-- (void)resumeDownloadFromResumeData:(NSData *)resumeData completionHandler:(void(^)(_WKDownload *))completionHandler;
-
-#endif
-
 #ifndef __MAC_12
 
 @property (nonatomic, readonly) WKMediaCaptureState cameraCaptureState API_AVAILABLE(macos(12.0), ios(15.0));

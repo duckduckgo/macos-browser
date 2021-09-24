@@ -82,36 +82,25 @@ extension WindowControllersManager {
                let firstTab = tabCollection.tabs.first,
                case .homepage = firstTab.content,
                !newTab {
-                firstTab.content = .url(url)
+                firstTab.setContent(.url(url))
             } else if let tab = tabCollectionViewModel.selectedTabViewModel?.tab, !newTab {
-                tab.content = .url(url)
+                tab.setContent(.url(url))
             } else {
                 let newTab = Tab(content: .url(url))
-                newTab.content = .url(url)
+                newTab.setContent(.url(url))
                 tabCollectionViewModel.append(tab: newTab)
             }
         }
 
         // If there is a main window, open the URL in it
-        if let windowController = mainWindowControllers.first(where: { $0.window?.isMainWindow ?? false }) {
-            show(url: url, in: windowController)
-            return
-        }
+        if let windowController = mainWindowControllers.first(where: { $0.window?.isMainWindow ?? false })
+            // If a last key window is available, open the URL in it
+            ?? lastKeyMainWindowController
+            // If there is any open window on the current screen, open the URL in it
+            ?? mainWindowControllers.first(where: { $0.window?.screen == NSScreen.main })
+            // If there is any window available, open the URL in it
+            ?? mainWindowControllers.first {
 
-        // If a last key window is available, open the URL in it
-        if let windowController = lastKeyMainWindowController {
-            show(url: url, in: windowController)
-            return
-        }
-
-        // If there is any open window on the current screen, open the URL in it
-        if let windowController = mainWindowControllers.first(where: { $0.window?.screen == NSScreen.main }) {
-            show(url: url, in: windowController)
-            return
-        }
-
-        // If there is any window available, open the URL in it
-        if let windowController = mainWindowControllers.first(where: { $0.window?.screen == NSScreen.main }) {
             show(url: url, in: windowController)
             return
         }
