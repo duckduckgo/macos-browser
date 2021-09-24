@@ -372,7 +372,9 @@ final class LocalBookmarkStore: BookmarkStore {
                     total += result
                 }
 
-                let otherBookmarksFolder = createFolder(titled: UserText.bookmarkImportOtherBookmarks, in: self.context)
+                let allFolders = try context.fetch(BookmarkFolder.bookmarkFoldersFetchRequest())
+                let existingOtherFolder = allFolders.first { ($0.titleEncrypted as? String) == "Other Bookmarks" }
+                let otherBookmarksFolder = existingOtherFolder ?? createFolder(titled: UserText.bookmarkImportOtherBookmarks, in: self.context)
 
                 if let otherBookmarks = bookmarks.topLevelFolders.otherBookmarks.children {
                     let result = recursivelyCreateEntities(from: otherBookmarks,

@@ -90,6 +90,12 @@ internal class BaseBookmarkEntity {
 
 final class BookmarkFolder: BaseBookmarkEntity {
 
+    static func bookmarkFoldersFetchRequest() -> NSFetchRequest<BookmarkManagedObject> {
+        let request = NSFetchRequest<BookmarkManagedObject>(entityName: "BookmarkManagedObject")
+        request.predicate = NSPredicate(format: "isFolder == YES")
+        return request
+    }
+
     let parentFolderUUID: UUID?
     let children: [BaseBookmarkEntity]
     let totalChildBookmarks: Int
