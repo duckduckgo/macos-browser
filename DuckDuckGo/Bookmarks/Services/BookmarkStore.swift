@@ -26,6 +26,18 @@ enum BookmarkStoreFetchPredicateType {
     case topLevelEntities
 }
 
+struct BookmarkImportResult: Equatable {
+    var successful: Int
+    var duplicates: Int
+    var failed: Int
+
+    static func += (left: inout BookmarkImportResult, right: BookmarkImportResult) {
+        left.successful += right.successful
+        left.duplicates += right.duplicates
+        left.failed += right.failed
+    }
+}
+
 protocol BookmarkStore {
 
     func loadAll(type: BookmarkStoreFetchPredicateType, completion: @escaping ([BaseBookmarkEntity]?, Error?) -> Void)
@@ -36,7 +48,7 @@ protocol BookmarkStore {
     func update(folder: BookmarkFolder)
     func add(objectsWithUUIDs: [UUID], to parent: BookmarkFolder?, completion: @escaping (Error?) -> Void)
     func update(objectsWithUUIDs uuids: [UUID], update: @escaping (BaseBookmarkEntity) -> Void, completion: @escaping (Error?) -> Void)
-    func importBookmarks(_ bookmarks: ImportedBookmarks) -> (successful: Int, duplicates: Int, failed: Int)
+    func importBookmarks(_ bookmarks: ImportedBookmarks) -> BookmarkImportResult
 
 }
 
@@ -336,10 +348,8 @@ final class LocalBookmarkStore: BookmarkStore {
 
     // MARK: - Import
 
-    func importBookmarks(_ bookmarks: ImportedBookmarks) -> (successful: Int, duplicates: Int, failed: Int) {
-        var importCount = 0
-        var duplicateCount = 0
-        var failedCount = 0
+    func importBookmarks(_ bookmarks: ImportedBookmarks) -> BookmarkImportResult {
+        var total = BookmarkImportResult(successful: 0, duplicates: 0, failed: 0)
 
         context.performAndWait {
             do {
@@ -359,9 +369,7 @@ final class LocalBookmarkStore: BookmarkStore {
                                                            existingBookmarkURLs: bookmarkURLs,
                                                            in: self.context)
 
-                    importCount += result.successful
-                    duplicateCount += result.duplicates
-                    failedCount += result.failed
+                    total += result
                 }
 
                 let otherBookmarksFolder = createFolder(titled: UserText.bookmarkImportOtherBookmarks, in: self.context)
@@ -372,15 +380,13 @@ final class LocalBookmarkStore: BookmarkStore {
                                               existingBookmarkURLs: bookmarkURLs,
                                               in: self.context)
 
-                    importCount += result.successful
-                    duplicateCount += result.duplicates
-                    failedCount += result.failed
+                    total += result
                 }
 
                 try self.context.save()
                 let bookmarkCountAfterImport = try context.count(for: Bookmark.bookmarksFetchRequest())
 
-                importCount = bookmarkCountAfterImport - bookmarkCountBeforeImport
+                total.successful = bookmarkCountAfterImport - bookmarkCountBeforeImport
             } catch {
                 os_log("Failed to import bookmarks, with error: %s", log: .dataImportExport, type: .error, error.localizedDescription)
 
@@ -391,7 +397,7 @@ final class LocalBookmarkStore: BookmarkStore {
             }
         }
 
-        return (successful: importCount, duplicates: duplicateCount, failed: failedCount)
+        return total
     }
 
     private func createFolder(titled title: String, in context: NSManagedObjectContext) -> BookmarkManagedObject {
@@ -407,21 +413,19 @@ final class LocalBookmarkStore: BookmarkStore {
     private func recursivelyCreateEntities(from bookmarks: [ImportedBookmarks.BookmarkOrFolder],
                                            parent: BookmarkManagedObject?,
                                            existingBookmarkURLs: Set<URL>,
-                                           in context: NSManagedObjectContext) -> (successful: Int, duplicates: Int, failed: Int) {
-        var successful = 0
-        var duplicates = 0
-        var failed = 0
+                                           in context: NSManagedObjectContext) -> BookmarkImportResult {
+        var total = BookmarkImportResult(successful: 0, duplicates: 0, failed: 0)
 
         for bookmarkOrFolder in bookmarks {
             if let bookmarkURL = bookmarkOrFolder.url, existingBookmarkURLs.contains(bookmarkURL) {
                 // Avoid creating bookmarks that already exist in the database.
-                duplicates += 1
+                total.duplicates += 1
                 continue
             }
 
             if bookmarkOrFolder.isInvalidBookmark {
                 // Skip importing bookmarks that don't have a valid URL
-                failed += 1
+                total.failed += 1
                 continue
             }
 
@@ -441,13 +445,11 @@ final class LocalBookmarkStore: BookmarkStore {
                                                        existingBookmarkURLs: existingBookmarkURLs,
                                                        in: context)
 
-                successful += result.successful
-                duplicates += result.duplicates
-                failed += result.failed
+                total += result
             }
         }
 
-        return (successful, duplicates, failed)
+        return total
     }
 
 }

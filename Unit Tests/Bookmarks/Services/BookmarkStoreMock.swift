@@ -83,9 +83,9 @@ final class BookmarkStoreMock: BookmarkStore {
     }
 
     var importBookmarksCalled = false
-    func importBookmarks(_ bookmarks: ImportedBookmarks) -> (successful: Int, duplicates: Int, failed: Int) {
+    func importBookmarks(_ bookmarks: ImportedBookmarks) -> BookmarkImportResult {
         importBookmarksCalled = true
-        return (0, 0, 0)
+        return BookmarkImportResult(successful: 0, duplicates: 0, failed: 0)
     }
 
 }

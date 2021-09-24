@@ -67,19 +67,19 @@ final class BrowserImportSummaryViewController: NSViewController {
 
         for summary in summaries {
             switch summary {
-            case .bookmarks(let successful, let duplicates, let failed):
-                if successful > 0 {
+            case .bookmarks(let result):
+                if result.successful > 0 {
                     bookmarkSummaryRow.isHidden = false
-                    bookmarkSummaryLabel.stringValue = UserText.successfulBookmarkImports(successful)
+                    bookmarkSummaryLabel.stringValue = UserText.successfulBookmarkImports(result.successful)
                 } else {
                     bookmarkSummaryRow.isHidden = true
                 }
 
-                let failureTotal = duplicates + failed
+                let failureTotal = result.duplicates + result.failed
 
                 if failureTotal > 0 {
                     bookmarkFailureRow.isHidden = false
-                    bookmarkFailureLabel.stringValue = UserText.failedBookmarkImports(duplicates + failed)
+                    bookmarkFailureLabel.stringValue = UserText.failedBookmarkImports(failureTotal)
                 } else {
                     bookmarkFailureRow.isHidden = true
                 }
