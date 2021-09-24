@@ -19,6 +19,7 @@
 import Cocoa
 import Combine
 import os.log
+import Lottie
 
 protocol AddressBarButtonsViewControllerDelegate: AnyObject {
 
@@ -33,6 +34,8 @@ final class AddressBarButtonsViewController: NSViewController {
     static let webImage = NSImage(named: "Web")
     static let bookmarkImage = NSImage(named: "Bookmark")
     static let bookmarkFilledImage = NSImage(named: "BookmarkFilled")
+    static let shieldImage = NSImage(named: "Shield")
+    static let shieldDotImage = NSImage(named: "ShieldDot")
 
     weak var delegate: AddressBarButtonsViewControllerDelegate?
 
@@ -55,12 +58,16 @@ final class AddressBarButtonsViewController: NSViewController {
         return _privacyDashboardPopover!
     }
 
-    @IBOutlet weak var privacyEntryPointButton: PrivacyEntryPointAddressBarButton!
-    @IBOutlet weak var trackersAnimationView: TrackersAnimationView!
+    @IBOutlet weak var privacyEntryPointButton: AddressBarButton!
     @IBOutlet weak var bookmarkButton: AddressBarButton!
     @IBOutlet weak var imageButtonWrapper: NSView!
     @IBOutlet weak var imageButton: NSButton!
     @IBOutlet weak var clearButton: NSButton!
+
+    @IBOutlet weak var animationWrapperView: NSView!
+    var trackerAnimationView: AnimationView!
+    var shieldAnimationView: AnimationView!
+    var shieldDotAnimationView: AnimationView!
 
     @IBOutlet weak var permissionButtons: NSView!
     @IBOutlet weak var cameraButton: PermissionButton! {
@@ -88,6 +95,7 @@ final class AddressBarButtonsViewController: NSViewController {
     private var tabCollectionViewModel: TabCollectionViewModel
     private var bookmarkManager: BookmarkManager = LocalBookmarkManager.shared
     private var isTextFieldEditorFirstResponder = false
+    private var isSearchingMode = false
 
     private var selectedTabViewModelCancellable: AnyCancellable?
     private var urlCancellable: AnyCancellable?
@@ -96,6 +104,7 @@ final class AddressBarButtonsViewController: NSViewController {
     private var trackersAnimationViewStatusCancellable: AnyCancellable?
     private var effectiveAppearanceCancellable: AnyCancellable?
     private var permissionsCancellables = Set<AnyCancellable>()
+    private var trackerAnimationTriggerCancellable: AnyCancellable?
 
     required init?(coder: NSCoder) {
         fatalError("AddressBarButtonsViewController: Bad initializer")
@@ -111,10 +120,10 @@ final class AddressBarButtonsViewController: NSViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
 
+        setupAnimationViews()
         setupButtons()
         subscribeToSelectedTabViewModel()
         subscribeToBookmarkList()
-        subscribeToTrackersAnimationViewStatus()
         subscribeToEffectiveAppearance()
 
         cameraButton.sendAction(on: .leftMouseDown)
@@ -195,14 +204,9 @@ final class AddressBarButtonsViewController: NSViewController {
             return
         }
 
-        let isSearchingMode = mode != .browsing
-        let isURLNil = selectedTabViewModel.tab.content.url == nil
-        let isDuckDuckGoUrl = selectedTabViewModel.tab.content.url?.isDuckDuckGoSearch ?? false
-
-        // Privacy entry point button
-        privacyEntryPointButton.isHidden = isSearchingMode || isTextFieldEditorFirstResponder || isDuckDuckGoUrl || isURLNil
-        trackersAnimationView.isHidden = privacyEntryPointButton.isHidden
-        imageButtonWrapper.isHidden = !privacyEntryPointButton.isHidden
+        isSearchingMode = mode != .browsing
+        updatePrivacyEntryPointButton()
+        updatePrivacyEntryPointIcon()
 
         clearButton.isHidden = !(isTextFieldEditorFirstResponder && !textFieldValue.isEmpty)
         bookmarkButton.isHidden = !clearButton.isHidden || textFieldValue.isEmpty
@@ -285,11 +289,59 @@ final class AddressBarButtonsViewController: NSViewController {
         imageButton.applyFaviconStyle()
     }
 
+    private var animationViewCache = [String: AnimationView]()
+    private func getAnimationView(for animationName: String) -> AnimationView {
+        if let animationView = animationViewCache[animationName] {
+            return animationView
+        }
+
+        let animation = Animation.named(animationName, animationCache: LottieAnimationCache.shared)
+        let animationView = AnimationView(animation: animation, imageProvider: self)
+        animationView.identifier = NSUserInterfaceItemIdentifier(rawValue: animationName)
+        animationViewCache[animationName] = animationView
+        return animationView
+    }
+
+    private func setupAnimationViews() {
+        func addAndLayoutAnimationView(_ animationName: String) -> AnimationView {
+
+            let animationView: AnimationView
+            if AppDelegate.isRunningTests {
+                animationView = AnimationView()
+            } else {
+                // For unknown reason, this caused infinite execution of various unit tests.
+                animationView = getAnimationView(for: animationName)
+            }
+            animationWrapperView.addAndLayout(animationView)
+            animationView.isHidden = true
+            return animationView
+        }
+
+        let isAquaMode = NSApp.effectiveAppearance.name == NSAppearance.Name.aqua
+
+        if trackerAnimationView == nil {
+            trackerAnimationView = addAndLayoutAnimationView("trackers")
+        }
+
+        let shieldAnimationName = isAquaMode ? "shield" : "dark-shield"
+        if shieldAnimationView?.identifier?.rawValue != shieldAnimationName {
+            shieldAnimationView?.removeFromSuperview()
+            shieldAnimationView = addAndLayoutAnimationView(shieldAnimationName)
+        }
+
+        let shieldDotAnimationName = isAquaMode ? "shield-dot" : "dark-shield-dot"
+        if shieldDotAnimationView?.identifier?.rawValue != shieldDotAnimationName {
+            shieldDotAnimationView?.removeFromSuperview()
+            shieldDotAnimationView = addAndLayoutAnimationView(shieldDotAnimationName)
+        }
+    }
+
     private func subscribeToSelectedTabViewModel() {
         selectedTabViewModelCancellable = tabCollectionViewModel.$selectedTabViewModel.receive(on: DispatchQueue.main).sink { [weak self] _ in
+            self?.stopAnimations()
             self?.subscribeToUrl()
-            self?.subscribeToTrackerInfo()
             self?.subscribeToPermissions()
+            self?.subscribeToTrackerAnimationTrigger()
         }
     }
 
@@ -306,18 +358,6 @@ final class AddressBarButtonsViewController: NSViewController {
         }
     }
 
-    private func subscribeToTrackerInfo() {
-        trackerInfoCancellable?.cancel()
-
-        updatePrivacyViews(trackerInfo: tabCollectionViewModel.selectedTabViewModel?.tab.trackerInfo, animated: false)
-        trackerInfoCancellable = tabCollectionViewModel.selectedTabViewModel?.tab.$trackerInfo
-            .dropFirst()
-            .receive(on: DispatchQueue.main)
-            .sink { [weak self] trackerInfo in
-                self?.updatePrivacyViews(trackerInfo: trackerInfo, animated: true)
-            }
-    }
-
     private func subscribeToPermissions() {
         permissionsCancellables = []
         guard let selectedTabViewModel = tabCollectionViewModel.selectedTabViewModel else {
@@ -332,8 +372,23 @@ final class AddressBarButtonsViewController: NSViewController {
         }.store(in: &permissionsCancellables)
     }
 
+    private func subscribeToTrackerAnimationTrigger() {
+        trackerAnimationTriggerCancellable?.cancel()
+
+        trackerAnimationTriggerCancellable = tabCollectionViewModel.selectedTabViewModel?.trackersAnimationTriggerPublisher
+            .sink { [weak self] _ in
+                self?.animateTrackers()
+        }
+    }
+
+    private func subscribeToBookmarkList() {
+        bookmarkListCancellable = bookmarkManager.listPublisher.receive(on: DispatchQueue.main).sink { [weak self] _ in
+            self?.updateBookmarkButtonImage()
+        }
+    }
+
     private func updatePermissionButtons() {
-        permissionButtons.isHidden = isTextFieldEditorFirstResponder || trackersAnimationView.isAnimating
+        permissionButtons.isHidden = isTextFieldEditorFirstResponder || trackerAnimationView.isAnimationPlaying
 
         guard let selectedTabViewModel = tabCollectionViewModel.selectedTabViewModel else {
             if _permissionAuthorizationPopover?.isShown == true {
@@ -359,12 +414,6 @@ final class AddressBarButtonsViewController: NSViewController {
 
     }
 
-    private func subscribeToBookmarkList() {
-        bookmarkListCancellable = bookmarkManager.listPublisher.receive(on: DispatchQueue.main).sink { [weak self] _ in
-            self?.updateBookmarkButtonImage()
-        }
-    }
-
     private func updateBookmarkButtonImage(isUrlBookmarked: Bool = false) {
         if let url = tabCollectionViewModel.selectedTabViewModel?.tab.content.url,
            isUrlBookmarked || bookmarkManager.isUrlBookmarked(url: url) {
@@ -376,23 +425,81 @@ final class AddressBarButtonsViewController: NSViewController {
         }
     }
 
-    private func updatePrivacyViews(trackerInfo: TrackerInfo?, animated: Bool) {
-        guard let trackerInfo = trackerInfo,
-              !trackerInfo.trackersBlocked.isEmpty else {
-            privacyEntryPointButton.reset()
-            trackersAnimationView.reset()
+    private func updatePrivacyEntryPointButton() {
+        guard let selectedTabViewModel = tabCollectionViewModel.selectedTabViewModel else {
             return
         }
 
-        // Animate only when the first tracker is blocked
-        if animated {
-            if trackerInfo.trackersBlocked.count == 1 {
-                privacyEntryPointButton.animate()
-                trackersAnimationView.animate()
-            }
-        } else {
-            privacyEntryPointButton.setFinal()
+        let isURLNil = selectedTabViewModel.tab.content.url == nil
+        let isDuckDuckGoUrl = selectedTabViewModel.tab.content.url?.isDuckDuckGoSearch ?? false
+
+        // Privacy entry point button
+        privacyEntryPointButton.isHidden = isSearchingMode ||
+            isTextFieldEditorFirstResponder ||
+            isDuckDuckGoUrl ||
+            isURLNil ||
+            trackerAnimationView.isAnimationPlaying
+        imageButtonWrapper.isHidden = !privacyEntryPointButton.isHidden || trackerAnimationView.isAnimationPlaying
+    }
+
+    private func updatePrivacyEntryPointIcon() {
+        guard let selectedTabViewModel = tabCollectionViewModel.selectedTabViewModel else {
+            return
         }
+
+        switch selectedTabViewModel.tab.content {
+        case .url(let url):
+            let isNotSecure = url.scheme == "http"
+            privacyEntryPointButton.image = isNotSecure ? Self.shieldDotImage : Self.shieldImage
+        default:
+            break
+        }
+    }
+
+    private func animateTrackers() {
+        guard !privacyEntryPointButton.isHidden,
+              let selectedTabViewModel = tabCollectionViewModel.selectedTabViewModel else { return }
+
+        switch selectedTabViewModel.tab.content {
+        case .url(let url):
+            var animationView: AnimationView
+            if url.scheme == "http" {
+                animationView = shieldDotAnimationView
+            } else {
+                animationView = shieldAnimationView
+            }
+
+            animationView.isHidden = false
+            animationView.play { _ in
+                animationView.isHidden = true
+            }
+        default:
+            return
+        }
+
+        trackerAnimationView.isHidden = false
+        trackerAnimationView.reloadImages()
+        trackerAnimationView.play { [weak self] _ in
+            self?.trackerAnimationView.isHidden = true
+            self?.updatePrivacyEntryPointButton()
+            self?.updatePermissionButtons()
+        }
+
+        updatePrivacyEntryPointButton()
+        updatePermissionButtons()
+    }
+
+    private func stopAnimations() {
+        func stopAnimation(_ animationView: AnimationView) {
+            if animationView.isAnimationPlaying || !animationView.isHidden {
+                animationView.isHidden = true
+                animationView.stop()
+            }
+        }
+
+        stopAnimation(trackerAnimationView)
+        stopAnimation(shieldAnimationView)
+        stopAnimation(shieldDotAnimationView)
     }
 
     private func bookmarkForCurrentUrl(setFavorite: Bool, accessPoint: Pixel.Event.AccessPoint) -> Bookmark? {
@@ -421,23 +528,13 @@ final class AddressBarButtonsViewController: NSViewController {
         return bookmark
     }
 
-    func subscribeToTrackersAnimationViewStatus() {
-        trackersAnimationViewStatusCancellable = trackersAnimationView.$isAnimating
+    private func subscribeToEffectiveAppearance() {
+        effectiveAppearanceCancellable = NSApp.publisher(for: \.effectiveAppearance)
             .dropFirst()
             .receive(on: DispatchQueue.main)
             .sink { [weak self] _ in
-                self?.updatePermissionButtons()
-        }
-    }
-
-    private func subscribeToEffectiveAppearance() {
-        effectiveAppearanceCancellable = NSApp.publisher(for: \.effectiveAppearance)
-            .receive(on: DispatchQueue.main)
-            .sink { [weak self] _ in
-                guard let trackerInfo = self?.tabCollectionViewModel.selectedTabViewModel?.tab.trackerInfo else {
-                    return
-                }
-                self?.updatePrivacyViews(trackerInfo: trackerInfo, animated: false)
+                self?.setupAnimationViews()
+                self?.updatePrivacyEntryPointIcon()
             }
     }
 
@@ -481,6 +578,26 @@ extension AddressBarButtonsViewController: NSPopoverDelegate {
 
         default:
             break
+        }
+    }
+
+}
+
+extension AddressBarButtonsViewController: AnimationImageProvider {
+
+    func imageForAsset(asset: ImageAsset) -> CGImage? {
+        guard let selectedTabViewModel = tabCollectionViewModel.selectedTabViewModel,
+              let trackerInfo = selectedTabViewModel.tab.trackerInfo else {
+            return nil
+        }
+
+        let images = PrivacyIconViewModel.trackerImages(from: trackerInfo)
+        switch asset.name {
+        case "img_0.png": return images[safe: 0]
+        case "img_1.png": return images[safe: 1]
+        case "img_2.png": return images[safe: 2]
+        case "img_3.png": return images[safe: 3]
+        default: return nil
         }
     }
 

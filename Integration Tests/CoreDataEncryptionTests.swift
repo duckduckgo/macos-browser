@@ -20,6 +20,8 @@ import Foundation
 
 import XCTest
 import CryptoKit
+import CoreData
+
 @testable import DuckDuckGo_Privacy_Browser
 
 class CoreDataEncryptionTests: XCTestCase {
@@ -40,7 +42,7 @@ class CoreDataEncryptionTests: XCTestCase {
     }
 
     func testSavingIncorrectValueTypes() {
-        let container = createInMemoryPersistentContainer()
+        let container = CoreData.encryptionContainer()
         let context = container.viewContext
 
         context.performAndWait {
