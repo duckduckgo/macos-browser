@@ -69,20 +69,6 @@ final class AddressBarButtonsViewController: NSViewController {
     var shieldAnimationView: AnimationView!
     var shieldDotAnimationView: AnimationView!
 
-    @IBOutlet weak var fireproofedButtonDivider: NSBox! {
-        didSet {
-            fireproofedButtonDivider.isHidden = true
-        }
-    }
-
-    @IBOutlet weak var fireproofedButton: NSButton! {
-        didSet {
-            fireproofedButton.isHidden = true
-            fireproofedButton.target = self
-            fireproofedButton.action = #selector(fireproofedButtonAction)
-        }
-    }
-
     @IBOutlet weak var permissionButtons: NSView!
     @IBOutlet weak var cameraButton: PermissionButton! {
         didSet {
@@ -139,10 +125,6 @@ final class AddressBarButtonsViewController: NSViewController {
         subscribeToSelectedTabViewModel()
         subscribeToBookmarkList()
         subscribeToEffectiveAppearance()
-        NotificationCenter.default.addObserver(self,
-                                               selector: #selector(showUndoFireproofingPopover(_:)),
-                                               name: FireproofDomains.Constants.newFireproofDomainNotification,
-                                               object: nil)
 
         cameraButton.sendAction(on: .leftMouseDown)
         microphoneButton.sendAction(on: .leftMouseDown)
@@ -162,17 +144,6 @@ final class AddressBarButtonsViewController: NSViewController {
             permissionAuthorizationPopover.close()
         }
         openPrivacyDashboard()
-    }
-
-    @objc func fireproofedButtonAction(_ sender: Any) {
-        guard let selectedTabViewModel = tabCollectionViewModel.selectedTabViewModel, let button = sender as? NSButton else {
-            return
-        }
-
-        if let host = selectedTabViewModel.tab.content.url?.host, FireproofDomains.shared.isFireproof(fireproofDomain: host) {
-            let viewController = FireproofInfoViewController.create(for: host)
-            present(viewController, asPopoverRelativeTo: button.frame, of: button.superview!, preferredEdge: .minY, behavior: .transient)
-        }
     }
 
     func openBookmarkPopover(setFavorite: Bool, accessPoint: Pixel.Event.AccessPoint) {
@@ -251,25 +222,6 @@ final class AddressBarButtonsViewController: NSViewController {
         }
 
         updatePermissionButtons()
-        updateFireproofedButton()
-    }
-
-    private func updateFireproofedButton() {
-        guard let selectedTabViewModel = tabCollectionViewModel.selectedTabViewModel else {
-            os_log("%s: Selected tab view model is nil", type: .error, className)
-            return
-        }
-
-        if let url = selectedTabViewModel.tab.content.url,
-           url.showFireproofStatus,
-           !privacyEntryPointButton.isHidden,
-           !trackerAnimationView.isAnimationPlaying {
-            fireproofedButtonDivider.isHidden = !FireproofDomains.shared.isFireproof(fireproofDomain: url.host ?? "")
-            fireproofedButton.isHidden = !FireproofDomains.shared.isFireproof(fireproofDomain: url.host ?? "")
-        } else {
-            fireproofedButtonDivider.isHidden = true
-            fireproofedButton.isHidden = true
-        }
     }
 
     @IBAction func cameraButtonAction(_ sender: NSButton) {
@@ -530,12 +482,10 @@ final class AddressBarButtonsViewController: NSViewController {
         trackerAnimationView.play { [weak self] _ in
             self?.trackerAnimationView.isHidden = true
             self?.updatePrivacyEntryPointButton()
-            self?.updateFireproofedButton()
             self?.updatePermissionButtons()
         }
 
         updatePrivacyEntryPointButton()
-        updateFireproofedButton()
         updatePermissionButtons()
     }
 
@@ -576,22 +526,6 @@ final class AddressBarButtonsViewController: NSViewController {
         Pixel.fire(.bookmark(isFavorite: setFavorite, fireproofed: .init(url: url), source: accessPoint))
 
         return bookmark
-    }
-
-    @objc private func showUndoFireproofingPopover(_ sender: Notification) {
-        guard view.window?.isKeyWindow == true,
-            let domain = sender.userInfo?[FireproofDomains.Constants.newFireproofDomainKey] as? String else { return }
-
-        DispatchQueue.main.async {
-            let viewController = UndoFireproofingViewController.create(for: domain)
-            let frame = self.fireproofedButton.frame.insetFromLineOfDeath()
-
-            self.present(viewController,
-                         asPopoverRelativeTo: frame,
-                         of: self.fireproofedButton.superview!,
-                         preferredEdge: .minY,
-                         behavior: .applicationDefined)
-        }
     }
 
     private func subscribeToEffectiveAppearance() {
