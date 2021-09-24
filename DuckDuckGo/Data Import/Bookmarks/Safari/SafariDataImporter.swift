@@ -49,14 +49,9 @@ internal class SafariDataImporter: DataImporter {
         return path.appendingPathComponent("Bookmarks.plist")
     }
 
-    private let applicationDataDirectoryPath: String
     private let bookmarkImporter: BookmarkImporter
 
     init(bookmarkImporter: BookmarkImporter) {
-        let applicationSupport = FileManager.default.urls(for: .libraryDirectory, in: .userDomainMask).first!
-        let path = applicationSupport.appendingPathComponent("Safari/").absoluteString
-
-        self.applicationDataDirectoryPath = path
         self.bookmarkImporter = bookmarkImporter
     }
 
