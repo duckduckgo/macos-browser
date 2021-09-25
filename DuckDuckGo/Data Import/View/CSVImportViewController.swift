@@ -37,8 +37,11 @@ final class CSVImportViewController: NSViewController {
     }
 
     @IBOutlet var descriptionLabel: NSTextField!
-    @IBOutlet var selectedFileLabel: NSTextField!
     @IBOutlet var selectFileButton: NSButton!
+
+    @IBOutlet var selectedFileContainer: NSView!
+    @IBOutlet var selectedFileLabel: NSTextField!
+    @IBOutlet var totalValidLoginsLabel: NSTextField!
 
     weak var delegate: CSVImportViewControllerDelegate?
 
@@ -68,13 +71,14 @@ final class CSVImportViewController: NSViewController {
 
         switch state {
         case .awaitingFileSelection:
-            selectedFileLabel.isHidden = true
+            selectedFileContainer.isHidden = true
             selectFileButton.title = UserText.importLoginsSelectCSVFile
         case .selectedValidFile(let fileURL):
             let totalLoginsToImport = CSVImporter.totalValidLogins(in: fileURL)
-            selectedFileLabel.stringValue = UserText.importingFile(at: fileURL.path, validLogins: totalLoginsToImport)
-            selectedFileLabel.isHidden = false
+            selectedFileContainer.isHidden = false
+            selectedFileLabel.stringValue = fileURL.path
             selectFileButton.title = UserText.importLoginsSelectAnotherFile
+            totalValidLoginsLabel.stringValue = UserText.importingFile(validLogins: totalLoginsToImport)
         case .selectedInvalidFile:
             selectedFileLabel.stringValue = UserText.importLoginsFailedToReadCSVFile
             selectedFileLabel.isHidden = false

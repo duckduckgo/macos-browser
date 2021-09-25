@@ -29,16 +29,19 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         ProcessInfo.processInfo.environment["XCTestConfigurationFilePath"] != nil
     }
 
-    let urlEventListener = UrlEventListener(handler: AppDelegate.handleURL)
+    let urlEventHandler = URLEventHandler()
 
     private let keyStore = EncryptionKeyStore()
     private var fileStore: FileStore!
     private var stateRestorationManager: AppStateRestorationManager!
-    private var grammarCheckEnabler: GrammarCheckEnabler!
+    private var grammarFeaturesManager = GrammarFeaturesManager()
 
 #if OUT_OF_APPSTORE
 
+#if !BETA
     let updateController = UpdateController()
+#endif
+
     let crashReporter = CrashReporter()
 
 #endif
@@ -46,8 +49,11 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
     var appUsageActivityMonitor: AppUsageActivityMonitor?
 
     func applicationWillFinishLaunching(_ notification: Notification) {
+        ExpirationChecker.check()
+
         if !Self.isRunningTests {
             Pixel.setUp()
+            Database.shared.loadStore()
         }
 
         do {
@@ -58,17 +64,15 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
             fileStore = EncryptedFileStore()
         }
         stateRestorationManager = AppStateRestorationManager(fileStore: fileStore)
-
-        urlEventListener.listen()
     }
 
     func applicationDidFinishLaunching(_ notification: Notification) {
         guard !Self.isRunningTests else { return }
-        
-        Database.shared.loadStore()
+
         HTTPSUpgrade.shared.loadDataAsync()
         LocalBookmarkManager.shared.loadBookmarks()
         _=ConfigurationManager.shared
+        _=DownloadListCoordinator.shared
 
         if (notification.userInfo?[NSApplication.launchIsDefaultUserInfoKey] as? NSNumber)?.boolValue == true {
             Pixel.fire(.appLaunch(launch: .autoInitialOrRegular()))
@@ -80,8 +84,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
             WindowsManager.openNewWindow()
         }
 
-        grammarCheckEnabler = GrammarCheckEnabler(windowControllersManager: WindowControllersManager.shared)
-        grammarCheckEnabler.enableIfNeeded()
+        grammarFeaturesManager.manage()
 
         applyPreferredTheme()
 
@@ -90,15 +93,21 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         appUsageActivityMonitor = AppUsageActivityMonitor(delegate: self)
 
 #if OUT_OF_APPSTORE
-
         crashReporter.checkForNewReports()
-
 #endif
-
+        urlEventHandler.applicationDidFinishLaunching()
     }
 
     func applicationShouldTerminate(_ sender: NSApplication) -> NSApplication.TerminateReply {
-        stateRestorationManager.applicationWillTerminate()
+        if !FileDownloadManager.shared.downloads.isEmpty {
+            let alert = NSAlert.activeDownloadsTerminationAlert(for: FileDownloadManager.shared.downloads)
+            if alert.runModal() == .cancel {
+                return .terminateCancel
+            }
+            FileDownloadManager.shared.cancelAll(waitUntilDone: true)
+            DownloadListCoordinator.shared.sync()
+        }
+        stateRestorationManager?.applicationWillTerminate()
 
         return .terminateNow
     }
@@ -119,18 +128,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
     }
 
     func application(_ sender: NSApplication, openFiles files: [String]) {
-        for path in files {
-            guard FileManager.default.fileExists(atPath: path) else { continue }
-            let url = URL(fileURLWithPath: path)
-
-            Self.handleURL(url)
-        }
-    }
-
-    static func handleURL(_ url: URL) {
-        Pixel.fire(.appLaunch(launch: url.isFileURL ? .openFile : .openURL))
-
-        WindowControllersManager.shared.show(url: url, newTab: true)
+        urlEventHandler.handleFiles(files)
     }
 
     private func applyPreferredTheme() {

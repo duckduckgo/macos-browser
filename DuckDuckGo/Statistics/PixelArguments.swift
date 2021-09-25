@@ -24,6 +24,7 @@ extension Pixel.Event {
         var description: String { rawValue }
 
         case initial = "initial"
+        case dailyFirst = "first-in-a-day"
         case regular = "app-launch"
         case openURL = "open-url"
         case openFile = "open-file"
@@ -35,7 +36,9 @@ extension Pixel.Event {
             switch launchRepetition {
             case .initial:
                 return .initial
-            case .dailyFirst, .repetitive:
+            case .dailyFirst:
+                return .dailyFirst
+            case .repetitive:
                 return .regular
             }
         }
@@ -279,6 +282,13 @@ extension Pixel.Event {
         case noFavorites = "no-favorites"
     }
 
+    enum HasHistoryEntry: String, CustomStringConvertible {
+        var description: String { rawValue }
+
+        case hasHistoryEntry = "has-history-entry"
+        case noHistoryEntry = "no-history-entry"
+    }
+
     enum SharingResult: String, CustomStringConvertible {
         var description: String { rawValue }
 
@@ -290,14 +300,20 @@ extension Pixel.Event {
     enum MoreResult: String, CustomStringConvertible {
         var description: String { rawValue }
 
+        case newTab = "new-tab"
         case cancelled = "cancelled"
-        case moveTabToNewWindow = "new-window"
+        case newWindow = "new-window"
         case feedback = "feedback"
         case bookmarksList = "bookmarks-list"
         case logins = "logins"
         case emailProtection = "email-protection"
+        case emailProtectionCreateAddress = "email-protection-create"
+        case emailProtectionOff = "email-protection-off"
         case fireproof = "fireproof"
         case preferences = "preferences"
+        case downloads = "downloads"
+        case findInPage = "find-in-page"
+        case print = "print"
     }
 
     enum RefreshAccessPoint: String, CustomStringConvertible {
@@ -337,7 +353,11 @@ extension Pixel.Event {
     enum DataImportSource: String, CustomStringConvertible {
         var description: String { rawValue }
 
+        case brave = "source-brave"
+        case chrome = "source-chrome"
         case csv = "source-csv"
+        case edge = "source-edge"
+        case firefox = "source-firefox"
     }
 
 }

@@ -35,6 +35,23 @@ extension WKWebView {
         }
     }
 
+    func resumeDownload(from resumeData: Data, to localURL: URL, completionHandler: @escaping (WebKitDownload) -> Void) throws {
+        try NSException.catch {
+            if #available(macOS 11.3, *) {
+                self.resumeDownload(fromResumeData: resumeData, completionHandler: completionHandler)
+            } else if configuration.processPool.responds(to:
+              #selector(WKProcessPool._resumeDownload(from:websiteDataStore:path:originatingWebView:))) {
+                let download = configuration.processPool._resumeDownload(from: resumeData,
+                                                                         websiteDataStore: self.configuration.websiteDataStore,
+                                                                         path: localURL.path,
+                                                                         originatingWebView: self)
+                completionHandler(download)
+            } else {
+                assertionFailure("WKProcessPool does not respond to _resumeDownloadFromData:websiteDataStore:path:originatingWebView:")
+            }
+        }
+    }
+
     var suggestedFilename: String? {
         guard let title = self.title?.replacingOccurrences(of: "[~#@*+%{}<>\\[\\]|\"\\_^\\/:\\\\]",
                                                            with: "_",
@@ -94,13 +111,12 @@ extension WKWebView {
             }
         }
 
-        let progress = Progress(totalUnitCount: 1)
-        progress.fileOperationKind = .downloading
-        progress.kind = .file
-        progress.isPausable = false
-        progress.isCancellable = false
-        progress.fileURL = url
-
+        let progress = Progress(totalUnitCount: 1,
+                                fileOperationKind: .downloading,
+                                kind: .file,
+                                isPausable: false,
+                                isCancellable: false,
+                                fileURL: url)
         progress.publish()
 
         create { (data, error) in

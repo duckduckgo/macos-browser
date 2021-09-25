@@ -19,6 +19,7 @@
 import Foundation
 import os.log
 import Combine
+import BrowserServicesKit
 
 typealias History = [HistoryEntry]
 
@@ -28,6 +29,9 @@ protocol HistoryCoordinating: AnyObject {
 
     func addVisit(of url: URL)
     func updateTitleIfNeeded(title: String, url: URL)
+    func markDownloadUrl(_ url: URL)
+    func markFailedToLoadUrl(_ url: URL)
+
     func burnHistory(except fireproofDomains: FireproofDomains)
 
 }
@@ -70,17 +74,20 @@ final class HistoryCoordinator: HistoryCoordinating {
     func addVisit(of url: URL) {
         queue.async(flags: .barrier) { [weak self] in
             guard var historyDictionary = self?.historyDictionary else {
-                os_log("Visit of %s ignored. On main thread: %s", log: .history, url.absoluteString, Thread.isMainThread ? "yes" : "no")
+                os_log("Visit of %s ignored", log: .history, url.absoluteString)
                 return
             }
 
             var entry = historyDictionary[url] ?? HistoryEntry(url: url)
             entry.addVisit()
+            entry.failedToLoad = false
 
             historyDictionary[url] = entry
             self?.historyDictionary = historyDictionary
             self?._history = self?.makeHistory(from: historyDictionary)
             self?.save(entry: entry)
+
+            self?.generateRootUrlIfNeeded(from: url)
         }
     }
 
@@ -101,6 +108,21 @@ final class HistoryCoordinator: HistoryCoordinating {
         }
     }
 
+    func markFailedToLoadUrl(_ url: URL) {
+        mark(url: url, keyPath: \HistoryEntry.failedToLoad, value: true)
+    }
+
+    func markDownloadUrl(_ url: URL) {
+        mark(url: url, keyPath: \HistoryEntry.isDownload, value: true)
+
+        queue.async(flags: .barrier) { [weak self] in
+            guard let historyDictionary = self?.historyDictionary else { return }
+            if !url.isRoot, let rootUrl = url.root, let rootEntry = historyDictionary[rootUrl], rootEntry.numberOfVisits == 0 {
+                self?.mark(url: rootUrl, keyPath: \HistoryEntry.isDownload, value: true)
+            }
+        }
+    }
+
     func burnHistory(except fireproofDomains: FireproofDomains) {
         queue.async(flags: .barrier) { [weak self] in
             guard let history = self?._history else { return }
@@ -116,7 +138,7 @@ final class HistoryCoordinator: HistoryCoordinating {
     }
 
     @objc private func cleanOldHistory() {
-        cleanAndReloadHistory(until: .weekAgo, except: [])
+        cleanAndReloadHistory(until: .monthAgo, except: [])
     }
 
     private func cleanAndReloadHistory(until date: Date,
@@ -130,7 +152,7 @@ final class HistoryCoordinator: HistoryCoordinating {
                 .sink(receiveCompletion: { completion in
                     switch completion {
                     case .finished:
-                        os_log("History cleaned and loaded successfully. On main thread: %s", log: .history, Thread.isMainThread ? "yes" : "no")
+                        os_log("History cleaned and loaded successfully", log: .history)
                     case .failure(let error):
                         os_log("Cleaning and loading of history failed: %s", log: .history, type: .error, error.localizedDescription)
                     }
@@ -167,17 +189,60 @@ final class HistoryCoordinator: HistoryCoordinating {
             .sink(receiveCompletion: { completion in
                 switch completion {
                 case .finished:
-                    os_log("Visit entry updated successfully. URL: %s, Title: %s, Number of visits: %d, On main thread: %s",
+                    os_log("Visit entry updated successfully. URL: %s, Title: %s, Number of visits: %d, failed to load: %s, is download: %s",
                            log: .history,
                            entry.url.absoluteString,
                            entry.title ?? "",
                            entry.numberOfVisits,
-                           Thread.isMainThread ? "yes" : "no")
+                           entry.failedToLoad ? "yes" : "no",
+                           entry.isDownload ? "yes" : "no")
                 case .failure(let error):
                     os_log("Saving of history entry failed: %s", log: .history, type: .error, error.localizedDescription)
                 }
             }, receiveValue: {})
             .store(in: &self.cancellables)
+    }
+
+    /// For the better user experience
+    /// When visiting a domain for the first time using a non-root URL, generating its root URL and adding into the history with the visit count 0
+    /// triggers the autocompletion of the root URL.
+    private func generateRootUrlIfNeeded(from url: URL) {
+        queue.async(flags: .barrier) { [weak self] in
+            guard var historyDictionary = self?.historyDictionary else {
+                os_log("Root URL of %s not saved. History not loaded yet", log: .history, url.absoluteString)
+                return
+            }
+
+            guard !url.isRoot, let rootUrl = url.root, historyDictionary[rootUrl] == nil else {
+                return
+            }
+
+            let entry = HistoryEntry(url: rootUrl)
+
+            historyDictionary[rootUrl] = entry
+            self?.historyDictionary = historyDictionary
+            self?._history = self?.makeHistory(from: historyDictionary)
+            self?.save(entry: entry)
+        }
+    }
+
+    /// Sets boolean value for the keyPath in HistroryEntry for the specified url
+    /// Does the same for the root URL if it has no visits
+    private func mark(url: URL, keyPath: WritableKeyPath<HistoryEntry, Bool>, value: Bool) {
+        queue.async(flags: .barrier) { [weak self] in
+            guard var historyDictionary = self?.historyDictionary, var entry = historyDictionary[url] else {
+                os_log("Marking of %s not saved. History not loaded yet or entry doesn't exist",
+                       log: .history, url.absoluteString)
+                return
+            }
+
+            entry[keyPath: keyPath] = value
+
+            historyDictionary[url] = entry
+            self?.historyDictionary = historyDictionary
+            self?._history = self?.makeHistory(from: historyDictionary)
+            self?.save(entry: entry)
+        }
     }
 
 }

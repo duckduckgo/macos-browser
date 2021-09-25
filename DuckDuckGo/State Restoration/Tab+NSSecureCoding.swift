@@ -21,7 +21,7 @@ import Foundation
 extension Tab: NSSecureCoding {
     // MARK: - Coding
 
-    private enum NSCodingKeys {
+    private enum NSSecureCodingKeys {
         static let url = "url"
         static let title = "title"
         static let sessionStateData = "ssdata"
@@ -32,21 +32,60 @@ extension Tab: NSSecureCoding {
     static var supportsSecureCoding: Bool { true }
 
     convenience init?(coder decoder: NSCoder) {
-        self.init(tabType: TabType.rawValue(decoder.decodeIfPresent(at: NSCodingKeys.tabType)),
-                  url: decoder.decodeIfPresent(at: NSCodingKeys.url),
-                  title: decoder.decodeIfPresent(at: NSCodingKeys.title),
-                  favicon: decoder.decodeIfPresent(at: NSCodingKeys.favicon),
-                  sessionStateData: decoder.decodeIfPresent(at: NSCodingKeys.sessionStateData))
+        guard let tabTypeRawValue = decoder.decodeIfPresent(at: NSSecureCodingKeys.tabType),
+              let tabType = TabContent.ContentType(rawValue: tabTypeRawValue),
+              let content = TabContent(type: tabType, url: decoder.decodeIfPresent(at: NSSecureCodingKeys.url))
+        else { return nil }
+
+        self.init(content: content,
+                  title: decoder.decodeIfPresent(at: NSSecureCodingKeys.title),
+                  favicon: decoder.decodeIfPresent(at: NSSecureCodingKeys.favicon),
+                  sessionStateData: decoder.decodeIfPresent(at: NSSecureCodingKeys.sessionStateData))
     }
 
     func encode(with coder: NSCoder) {
         guard webView.configuration.websiteDataStore.isPersistent == true else { return }
 
-        url.map(coder.encode(forKey: NSCodingKeys.url))
-        title.map(coder.encode(forKey: NSCodingKeys.title))
-        favicon.map(coder.encode(forKey: NSCodingKeys.favicon))
-        getActualSessionStateData().map(coder.encode(forKey: NSCodingKeys.sessionStateData))
-        coder.encode(tabType.rawValue, forKey: NSCodingKeys.tabType)
+        content.url.map(coder.encode(forKey: NSSecureCodingKeys.url))
+        title.map(coder.encode(forKey: NSSecureCodingKeys.title))
+        favicon.map(coder.encode(forKey: NSSecureCodingKeys.favicon))
+        getActualSessionStateData().map(coder.encode(forKey: NSSecureCodingKeys.sessionStateData))
+        coder.encode(content.type.rawValue, forKey: NSSecureCodingKeys.tabType)
+    }
+
+}
+
+private extension Tab.TabContent {
+
+    enum ContentType: Int, CaseIterable {
+        case url = 0
+        case preferences = 1
+        case bookmarks = 2
+        case homepage = 3
+    }
+
+    init?(type: ContentType, url: URL?) {
+        switch type {
+        case .homepage:
+            self = .homepage
+        case .url:
+            guard let url = url else { return nil }
+            self = .url(url)
+        case .bookmarks:
+            self = .bookmarks
+        case .preferences:
+            self = .preferences
+        }
+    }
+
+    var type: ContentType {
+        switch self {
+        case .url: return .url
+        case .homepage: return .homepage
+        case .bookmarks: return .bookmarks
+        case .preferences: return .preferences
+        case .none: return .homepage
+        }
     }
 
 }

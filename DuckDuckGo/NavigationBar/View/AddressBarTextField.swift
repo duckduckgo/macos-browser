@@ -81,10 +81,12 @@ final class AddressBarTextField: NSTextField {
         suggestionItemsCancellable = suggestionContainerViewModel.suggestionContainer.$suggestions
             .receive(on: DispatchQueue.main)
             .sink { [weak self] _ in
-            if self?.suggestionContainerViewModel.suggestionContainer.suggestions?.count ?? 0 > 0 {
-                self?.showSuggestionWindow()
+                guard let self = self else { return }
+                if self.suggestionContainerViewModel.suggestionContainer.suggestions?.count ?? 0 > 0 {
+                    self.showSuggestionWindow()
+                    Pixel.fire(.suggestionsDisplayed(self.suggestionsContainLocalItems()))
+                }
             }
-        }
     }
 
     private func subscribeToSelectedSuggestionViewModel() {
@@ -123,7 +125,7 @@ final class AddressBarTextField: NSTextField {
     }
 
     private func makeMeFirstResponderIfNeeded() {
-        let focusTab = tabCollectionViewModel.selectedTabViewModel?.tab.tabType.focusTabAddressBarWhenSelected ?? true
+        let focusTab = tabCollectionViewModel.selectedTabViewModel?.tab.content.shouldFocusAddressBarAfterSelection ?? true
 
         if focusTab, stringValue == "" {
             makeMeFirstResponder()
@@ -185,13 +187,26 @@ final class AddressBarTextField: NSTextField {
             return
         }
 
-        guard let url = makeUrl(suggestion: suggestion,
+        guard var url = makeUrl(suggestion: suggestion,
                                 stringValueWithoutSuffix: stringValueWithoutSuffix) else {
             os_log("%s: Making url from address bar string failed", type: .error, className)
             return
         }
+        // keep current search mode
+        if url.isDuckDuckGoSearch,
+           let oldURL = selectedTabViewModel.tab.content.url,
+            oldURL.isDuckDuckGoSearch {
+            if let ia = try? oldURL.getParameter(name: URL.DuckDuckGoParameters.ia.rawValue),
+               let newURL = try? url.addParameter(name: URL.DuckDuckGoParameters.ia.rawValue, value: ia) {
+                url = newURL
+            }
+            if let iax = try? oldURL.getParameter(name: URL.DuckDuckGoParameters.iax.rawValue),
+               let newURL = try? url.addParameter(name: URL.DuckDuckGoParameters.iax.rawValue, value: iax) {
+                url = newURL
+            }
+        }
 
-        if selectedTabViewModel.tab.url == url {
+        if selectedTabViewModel.tab.content.url == url {
             Pixel.fire(.refresh(source: .reloadURL))
             selectedTabViewModel.tab.reload()
         } else {
@@ -211,7 +226,7 @@ final class AddressBarTextField: NSTextField {
         }
 
         Pixel.fire(.navigation(kind: .init(url: url), source: suggestion != nil ? .suggestion : .addressBar))
-        let tab = Tab(url: url, shouldLoadInBackground: true)
+        let tab = Tab(content: .url(url), shouldLoadInBackground: true)
         tabCollectionViewModel.append(tab: tab, selected: selected)
     }
 
@@ -219,7 +234,7 @@ final class AddressBarTextField: NSTextField {
         let finalUrl: URL?
         switch suggestion {
         case .bookmark(title: _, url: let url, isFavorite: _),
-             .historyEntry(title: _, url: let url),
+             .historyEntry(title: _, url: let url, allowedInTopHits: _),
              .website(url: let url):
             finalUrl = url
         case .phrase(phrase: let phrase),
@@ -331,7 +346,7 @@ final class AddressBarTextField: NSTextField {
                 self = Suffix.visit(host: host)
 
             case .bookmark(title: _, url: let url, isFavorite: _),
-                 .historyEntry(title: _, url: let url):
+                 .historyEntry(title: _, url: let url, allowedInTopHits: _):
                 if let title = suggestionViewModel.title,
                    !title.isEmpty,
                    suggestionViewModel.autocompletionString != title {
@@ -363,20 +378,24 @@ final class AddressBarTextField: NSTextField {
             NSAttributedString(string: string, attributes: Self.suffixAttributes)
         }
 
-        static let searchSuffix = " – \(UserText.addressBarSearchSuffix)"
+        static let searchSuffix = " – \(UserText.searchDuckDuckGoSuffix)"
         static let visitSuffix = " – \(UserText.addressBarVisitSuffix)"
 
         var string: String {
             switch self {
             case .search:
-                return "\(Self.searchSuffix)"
+                return Self.searchSuffix
             case .visit(host: let host):
                 return "\(Self.visitSuffix) \(host)"
             case .url(let url):
-                return " – " + url.toString(decodePunycode: false,
-                                            dropScheme: true,
-                                            needsWWW: false,
-                                            dropTrailingSlash: false)
+                if url.isDuckDuckGoSearch {
+                    return Self.searchSuffix
+                } else {
+                    return " – " + url.toString(decodePunycode: false,
+                                                  dropScheme: true,
+                                                  needsWWW: false,
+                                                  dropTrailingSlash: false)
+                }
             case .title(let title):
                 return " – " + title
             }
@@ -445,22 +464,26 @@ final class AddressBarTextField: NSTextField {
         self.suggestionWindowController = windowController
     }
 
-    private func suggestionsContainBookmarkOrFavorite() -> (hasBookmark: Bool, hasFavorite: Bool) {
-        var result = (hasBookmark: false, hasFavorite: false)
+    private func suggestionsContainLocalItems() -> SuggestionListChacteristics {
+        var characteristics = SuggestionListChacteristics(hasBookmark: false, hasFavorite: false, hasHistoryEntry: false)
         for suggestion in self.suggestionContainerViewModel.suggestionContainer.suggestions ?? [] {
-            guard case .bookmark(title: _, url: _, isFavorite: let isFavorite) = suggestion else { continue }
-
-            if isFavorite {
-                result.hasFavorite = true
+            if case .bookmark(title: _, url: _, isFavorite: let isFavorite) = suggestion {
+                if isFavorite {
+                    characteristics.hasFavorite = true
+                } else {
+                    characteristics.hasBookmark = true
+                }
+            } else if case .historyEntry = suggestion {
+                characteristics.hasHistoryEntry = true
             } else {
-                result.hasBookmark = true
+                continue
             }
 
-            if result.hasFavorite && result.hasBookmark {
+            if characteristics.hasFavorite && characteristics.hasBookmark && characteristics.hasHistoryEntry {
                 break
             }
         }
-        return result
+        return characteristics
     }
 
     private func showSuggestionWindow() {
@@ -468,8 +491,6 @@ final class AddressBarTextField: NSTextField {
             os_log("AddressBarTextField: Window not available", type: .error)
             return
         }
-
-        Pixel.fire(.suggestionsDisplayed(suggestionsContainBookmarkOrFavorite()))
 
         guard !suggestionWindow.isVisible, window.firstResponder == currentEditor() else { return }
 
@@ -725,6 +746,17 @@ final class AddressBarTextFieldCell: NSTextFieldCell {
 
 fileprivate extension NSStoryboard {
     static let suggestion = NSStoryboard(name: "Suggestion", bundle: .main)
+}
+
+fileprivate extension Tab.TabContent {
+
+    var shouldFocusAddressBarAfterSelection: Bool {
+        switch self {
+        case .url, .homepage, .none: return true
+        case .preferences, .bookmarks: return false
+        }
+    }
+
 }
 
 // swiftlint:enable type_body_length

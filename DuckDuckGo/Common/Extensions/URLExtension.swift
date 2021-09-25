@@ -196,12 +196,16 @@ extension URL {
     }
 
     func toString(forUserInput input: String, decodePunycode: Bool = true) -> String {
-        self.toString(decodePunycode: decodePunycode,
-                      dropScheme: input.isEmpty
-                        || !input.hasOrIsPrefix(of: self.separatedScheme ?? ""),
-                      needsWWW: !input.drop(prefix: self.separatedScheme ?? "").isEmpty
-                        && input.drop(prefix: self.separatedScheme ?? "").hasOrIsPrefix(of: URL.HostPrefix.www.rawValue),
-                      dropTrailingSlash: false)
+        let hasInputScheme = input.hasOrIsPrefix(of: self.separatedScheme ?? "")
+        let hasInputWww = input.drop(prefix: self.separatedScheme ?? "").hasOrIsPrefix(of: URL.HostPrefix.www.rawValue)
+        let hasInputHost = (decodePunycode ? host?.idnaDecoded : host)?.hasOrIsPrefix(of: input) ?? false
+
+        return self.toString(decodePunycode: decodePunycode,
+                             dropScheme: input.isEmpty || !(hasInputScheme && !hasInputHost),
+                             needsWWW: !input.drop(prefix: self.separatedScheme ?? "").isEmpty
+                                && hasInputWww
+                                && !hasInputHost,
+                             dropTrailingSlash: !input.hasSuffix("/"))
     }
 
     /// Tries to use the file name part of the URL, if available, adjusting for content type, if available.
@@ -250,7 +254,7 @@ extension URL {
         return URL(string: "https://duckduckgo.com/about")!
     }
 
-    static var duckDuckGoEmail = URL(string: "https://quack.duckduckgo.com/email/dashboard")!
+    static var duckDuckGoEmail = URL(string: "https://duckduckgo.com/email-protection")!
 
     static var duckDuckGoMorePrivacyInfo = URL(string: "https://help.duckduckgo.com/duckduckgo-help-pages/privacy/atb/")!
 
@@ -270,6 +274,8 @@ extension URL {
 
     enum DuckDuckGoParameters: String {
         case search = "q"
+        case ia
+        case iax
     }
 
     // MARK: - Search
@@ -284,7 +290,11 @@ extension URL {
 #if FEEDBACK
 
     static var feedback: URL {
+    #if BETA
+        return URL(string: "https://www.surveymonkey.com/r/WTBLLJR")!
+    #else
         return URL(string: "https://form.asana.com/?k=HzdxNoIgDZUBf4w0_cafIQ&d=137249556945")!
+    #endif
     }
 
 #endif
@@ -308,6 +318,48 @@ extension URL {
 
     var volume: URL? {
         try? self.resourceValues(forKeys: [.volumeURLKey]).volume
+    }
+
+    func sanitizedForQuarantine() -> URL? {
+        guard !self.isFileURL,
+              !["data", "blob"].contains(self.scheme),
+              var components = URLComponents.init(url: self, resolvingAgainstBaseURL: false)
+        else {
+            return nil
+        }
+
+        components.user = nil
+        components.password = nil
+
+        return components.url
+    }
+
+    func setQuarantineAttributes(sourceURL: URL?, referrerURL: URL?) throws {
+        guard self.isFileURL,
+              FileManager.default.fileExists(atPath: self.path)
+        else {
+            throw CocoaError(CocoaError.Code.fileNoSuchFile)
+        }
+
+        let sourceURL = sourceURL?.sanitizedForQuarantine()
+        let referrerURL = referrerURL?.sanitizedForQuarantine()
+
+        if var quarantineProperties = try self.resourceValues(forKeys: [.quarantinePropertiesKey]).quarantineProperties {
+            quarantineProperties[kLSQuarantineAgentBundleIdentifierKey as String] = Bundle.main.bundleIdentifier
+            quarantineProperties[kLSQuarantineAgentNameKey as String] = Bundle.main.displayName
+
+            quarantineProperties[kLSQuarantineDataURLKey as String] = sourceURL
+            quarantineProperties[kLSQuarantineOriginURLKey as String] = referrerURL
+
+            if quarantineProperties[kLSQuarantineTypeKey as String] == nil {
+                quarantineProperties[kLSQuarantineTypeKey as String] = ["http", "https"].contains(sourceURL?.scheme)
+                    ? kLSQuarantineTypeWebDownload
+                    : kLSQuarantineTypeOtherDownload
+            }
+
+            try (self as NSURL).setResourceValue(quarantineProperties, forKey: .quarantinePropertiesKey)
+        }
+
     }
 
 }

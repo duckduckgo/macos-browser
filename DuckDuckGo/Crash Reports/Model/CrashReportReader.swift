@@ -22,7 +22,7 @@ import Foundation
 
 final class CrashReportReader {
 
-    static let displayName = Bundle.main.displayName!
+    static let displayName = Bundle.main.displayName
 
     func getCrashReports(since lastCheckDate: Date) -> [CrashReport] {
         let allPaths: [URL]
@@ -72,15 +72,6 @@ fileprivate extension FileManager {
     func fileCreationDate(url: URL) -> Date? {
         let fileAttributes: [FileAttributeKey: Any] = (try? self.attributesOfItem(atPath: url.path)) ?? [:]
         return fileAttributes[.creationDate] as? Date
-    }
-
-}
-
-fileprivate extension Bundle {
-
-    var displayName: String? {
-            return object(forInfoDictionaryKey: "CFBundleDisplayName") as? String ??
-                object(forInfoDictionaryKey: "CFBundleName") as? String
     }
 
 }

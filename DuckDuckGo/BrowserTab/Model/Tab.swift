@@ -24,10 +24,13 @@ import BrowserServicesKit
 
 protocol TabDelegate: FileDownloadManagerDelegate {
     func tabDidStartNavigation(_ tab: Tab)
-    func tab(_ tab: Tab, requestedNewTab url: URL?, selected: Bool)
+    func tab(_ tab: Tab, requestedNewTab url: URL?, selected: Bool, isBurner: Bool)
     func tab(_ tab: Tab, willShowContextMenuAt position: NSPoint, image: URL?, link: URL?, selectedText: String?)
 	func tab(_ tab: Tab, requestedOpenExternalURL url: URL, forUserEnteredURL: Bool)
     func tab(_ tab: Tab, requestedSaveCredentials credentials: SecureVaultModels.WebsiteCredentials)
+    func tab(_ tab: Tab,
+             requestedBasicAuthenticationChallengeWith protectionSpace: URLProtectionSpace,
+             completionHandler: @escaping (URLSession.AuthChallengeDisposition, URLCredential?) -> Void)
 
     func tabPageDOMLoaded(_ tab: Tab)
     func closeTab(_ tab: Tab)
@@ -37,19 +40,24 @@ protocol TabDelegate: FileDownloadManagerDelegate {
 // swiftlint:disable file_length
 final class Tab: NSObject {
 
-    enum TabType: Int, CaseIterable {
-        case standard = 0
-        case preferences = 1
-        case bookmarks = 2
+    enum TabStorageType {
+        case `default`
+        case burner
+    }
 
-        static func rawValue(_ type: Int?) -> TabType {
-            let tabType = type ?? TabType.standard.rawValue
-            return TabType(rawValue: tabType) ?? .standard
-        }
+    enum TabContent: Equatable {
+        case homepage
+        case url(URL)
+        case preferences
+        case bookmarks
+        case none
 
-        static var displayableTabTypes: [TabType] {
-            let cases = TabType.allCases.filter { $0 != .standard }
-            return cases.sorted { first, second in
+        static var displayableTabTypes: [TabContent] {
+            return [TabContent.preferences, .bookmarks].sorted { first, second in
+                switch first {
+                case .homepage, .url, .preferences, .bookmarks, .none: break
+                // !! Replace [TabContent.preferences, .bookmarks] above with new displayable Tab Types if added
+                }
                 guard let firstTitle = first.title, let secondTitle = second.title else {
                     return true // Arbitrary sort order, only non-standard tabs are displayable.
                 }
@@ -60,68 +68,65 @@ final class Tab: NSObject {
 
         var title: String? {
             switch self {
-            case .standard: return nil
+            case .url, .homepage, .none: return nil
             case .preferences: return UserText.tabPreferencesTitle
             case .bookmarks: return UserText.tabBookmarksTitle
             }
         }
 
-        var focusTabAddressBarWhenSelected: Bool {
-            switch self {
-            case .standard: return true
-            case .preferences: return false
-            case .bookmarks: return false
-            }
+        var url: URL? {
+            guard case .url(let url) = self else { return nil }
+            return url
         }
     }
 
     weak var delegate: TabDelegate?
 
-    init(tabType: TabType = .standard,
+    init(content: TabContent,
+         tabStorageType: TabStorageType = .default,
          faviconService: FaviconService = LocalFaviconService.shared,
          webCacheManager: WebCacheManager = .shared,
          webViewConfiguration: WebViewConfiguration? = nil,
          historyCoordinating: HistoryCoordinating = HistoryCoordinator.shared,
-         url: URL? = nil,
          title: String? = nil,
          error: Error? = nil,
          favicon: NSImage? = nil,
          sessionStateData: Data? = nil,
          parentTab: Tab? = nil,
-         shouldLoadInBackground: Bool = false) {
+         shouldLoadInBackground: Bool = false,
+         canBeClosedWithBack: Bool = false) {
 
-        self.tabType = tabType
+        self.content = content
+        self.tabStorageType = tabStorageType
         self.faviconService = faviconService
         self.historyCoordinating = historyCoordinating
-        self.url = url
         self.title = title
         self.error = error
         self.favicon = favicon
         self.parentTab = parentTab
+        self._canBeClosedWithBack = canBeClosedWithBack
         self.sessionStateData = sessionStateData
 
         let configuration = webViewConfiguration ?? WKWebViewConfiguration()
         configuration.applyStandardConfiguration()
+        if webViewConfiguration == nil && tabStorageType == .burner {
+            configuration.websiteDataStore = .nonPersistent()
+        }
 
         webView = WebView(frame: CGRect.zero, configuration: configuration)
+        permissions = PermissionModel(webView: webView)
 
         super.init()
-
-        self.loginDetectionService = LoginDetectionService(loginDiscardedHandler: { [weak self] in
-            self?.lastSeenCredentials = nil
-        }) { [weak self] _ in
-            guard let credentials = self?.lastSeenCredentials else { return }
-            self?.delegate?.tab(self!, requestedSaveCredentials: credentials)
-            self?.lastSeenCredentials = nil
-        }
 
         setupWebView(shouldLoadInBackground: shouldLoadInBackground)
 
         // cache session-restored favicon if present
         if let favicon = favicon,
-           let host = url?.host {
+           let host = content.url?.host {
             faviconService.cacheIfNeeded(favicon: favicon, for: host, isFromUserScript: false)
         }
+
+        updateDashboardInfo(url: content.url)
     }
 
     deinit {
@@ -129,29 +134,47 @@ final class Tab: NSObject {
     }
 
     let webView: WebView
-    private(set) var tabType: TabType
     var userEnteredUrl = true
-    var lastSeenCredentials: SecureVaultModels.WebsiteCredentials?
 
-    @PublishedAfter var url: URL? {
+    var contentChangeEnabled = true
+
+    @PublishedAfter private(set) var content: TabContent {
         didSet {
-            if url != nil {
-                tabType = .standard
-            }
-
-            if oldValue?.host != url?.host {
-                fetchFavicon(nil, for: url?.host, isFromUserScript: false)
+            if oldValue.url?.host != content.url?.host {
+                fetchFavicon(nil, for: content.url?.host, isFromUserScript: false)
             }
 
             invalidateSessionStateData()
+            updateDashboardInfo(oldUrl: oldValue.url, url: content.url)
             reloadIfNeeded()
+
+            if let title = content.title {
+                self.title = title
+            }
         }
     }
 
+    func setContent(_ content: TabContent) {
+        guard contentChangeEnabled else {
+            return
+        }
+
+        self.content = content
+    }
+
+    let tabStorageType: TabStorageType
+
     @PublishedAfter var title: String?
     @PublishedAfter var error: Error?
+    let permissions: PermissionModel
 
     weak private(set) var parentTab: Tab?
+    private var _canBeClosedWithBack: Bool
+    var canBeClosedWithBack: Bool {
+        // Reset canBeClosedWithBack on any WebView navigation
+        _canBeClosedWithBack = _canBeClosedWithBack && parentTab != nil && !webView.canGoBack && !webView.canGoForward
+        return _canBeClosedWithBack
+    }
 
     weak var findInPage: FindInPageModel? {
         didSet {
@@ -160,14 +183,6 @@ final class Tab: NSObject {
     }
 
     var sessionStateData: Data?
-
-    func set(tabType: TabType) {
-        self.tabType = tabType
-
-        if let title = tabType.title {
-            self.title = title
-        }
-    }
 
     func invalidateSessionStateData() {
         sessionStateData = nil
@@ -184,11 +199,10 @@ final class Tab: NSObject {
     }
 
     func update(url: URL?, userEntered: Bool = true) {
-        self.url = url
+        self.content = .url(url ?? .emptyPage)
 
         // This function is called when the user has manually typed in a new address, which should reset the login detection flow.
         userEnteredUrl = userEntered
-        loginDetectionService?.handle(navigationEvent: .userAction)
      }
 
     // Used to track if an error was caused by a download navigation.
@@ -196,13 +210,13 @@ final class Tab: NSObject {
 
     func download(from url: URL, promptForLocation: Bool = true) {
         webView.startDownload(URLRequest(url: url, cachePolicy: .returnCacheDataElseLoad)) { download in
-            FileDownloadManager.shared.add(download, delegate: self.delegate, promptForLocation: promptForLocation, postflight: .reveal)
+            FileDownloadManager.shared.add(download, delegate: self.delegate, location: promptForLocation ? .prompt : .auto, postflight: .none)
         }
     }
 
     func saveWebContentAs(completionHandler: ((Result<URL, Error>) -> Void)? = nil) {
         webView.getMimeType { mimeType in
-            if case .html = mimeType.flatMap(UTType.init(mimeType:)) ?? .html {
+            if case .some(.html) = mimeType.flatMap(UTType.init(mimeType:)) {
                 self.delegate?.chooseDestination(suggestedFilename: self.webView.suggestedFilename,
                                                  directoryURL: DownloadPreferences().selectedDownloadLocation,
                                                  fileTypes: [.html, .webArchive, .pdf]) { url, fileType in
@@ -221,37 +235,41 @@ final class Tab: NSObject {
         }
     }
 
-    private var loginDetectionService: LoginDetectionService?
     private let instrumentation = TabInstrumentation()
 
-    var isHomepageShown: Bool {
-        url == nil || url == URL.emptyPage
-    }
-
-    var isBookmarksShown: Bool {
-        (url == nil || url == URL.emptyPage) && tabType == .bookmarks
+    var canGoForward: Bool {
+        webView.canGoForward
     }
 
     func goForward() {
+        guard self.canGoForward else { return }
         shouldStoreNextVisit = false
         webView.goForward()
-        loginDetectionService?.handle(navigationEvent: .userAction)
+    }
+
+    var canGoBack: Bool {
+        webView.canGoBack
     }
 
     func goBack() {
+        guard self.canGoBack else {
+            if canBeClosedWithBack {
+                delegate?.closeTab(self)
+            }
+            return
+        }
+
         shouldStoreNextVisit = false
         webView.goBack()
-        loginDetectionService?.handle(navigationEvent: .userAction)
     }
 
     func go(to item: WKBackForwardListItem) {
         shouldStoreNextVisit = false
         webView.go(to: item)
-        loginDetectionService?.handle(navigationEvent: .userAction)
     }
 
     func openHomepage() {
-        url = nil
+        content = .homepage
     }
 
     func reload() {
@@ -261,17 +279,16 @@ final class Tab: NSObject {
         }
 
         if webView.url == nil,
-           let url = self.url {
+           let url = self.content.url {
             webView.load(url)
         } else {
             webView.reload()
         }
-        loginDetectionService?.handle(navigationEvent: .userAction)
     }
 
     private func reloadIfNeeded(shouldLoadInBackground: Bool = false) {
         guard webView.superview != nil || shouldLoadInBackground,
-            webView.url != self.url
+              webView.url != self.content.url
         else { return }
 
         if let sessionStateData = self.sessionStateData {
@@ -282,7 +299,7 @@ final class Tab: NSObject {
                 os_log("Tab:setupWebView could not restore session state %s", "\(error)")
             }
         }
-        if let url = self.url {
+        if let url = self.content.url {
             webView.load(url)
         } else {
             webView.load(URL.emptyPage)
@@ -294,7 +311,7 @@ final class Tab: NSObject {
     }
 
     func requestFireproofToggle() {
-        guard let url = url,
+        guard let url = content.url,
               let host = url.host
         else { return }
 
@@ -407,7 +424,7 @@ final class Tab: NSObject {
             .weakAssign(to: \.userScripts, on: self)
     }
 
-    // MARK: Find in Page
+    // MARK: - Find in Page
 
     var findInPageCancellable: AnyCancellable?
     private func subscribeToFindInPageTextChange() {
@@ -430,6 +447,8 @@ final class Tab: NSObject {
     private var shouldStoreNextVisit = true
 
     func addVisit(of url: URL) {
+        guard tabStorageType != .burner else { return }
+
         guard shouldStoreNextVisit else {
             shouldStoreNextVisit = true
             return
@@ -439,6 +458,24 @@ final class Tab: NSObject {
 
     func updateVisitTitle(_ title: String, url: URL) {
         historyCoordinating.updateTitleIfNeeded(title: title, url: url)
+    }
+
+    // MARK: - Dashboard Info
+
+    @Published var trackerInfo: TrackerInfo?
+    @Published var serverTrust: ServerTrust?
+
+    private func updateDashboardInfo(oldUrl: URL? = nil, url: URL?) {
+        guard let url = url, let host = url.host else {
+            trackerInfo = nil
+            serverTrust = nil
+            return
+        }
+
+        if oldUrl?.host != host || oldUrl?.scheme != url.scheme {
+            trackerInfo = TrackerInfo()
+            serverTrust = nil
+        }
     }
 
 }
@@ -478,12 +515,12 @@ extension Tab: ContextMenuDelegate {
 extension Tab: FaviconUserScriptDelegate {
 
     func faviconUserScript(_ faviconUserScript: FaviconUserScript, didFindFavicon faviconUrl: URL) {
-        guard let host = self.url?.host else {
+        guard let host = self.content.url?.host else {
             return
         }
 
         faviconService.fetchFavicon(faviconUrl, for: host, isFromUserScript: true) { (image, error) in
-            guard host == self.url?.host else {
+            guard host == self.content.url?.host else {
                 return
             }
             guard error == nil, let image = image else {
@@ -499,16 +536,19 @@ extension Tab: FaviconUserScriptDelegate {
 extension Tab: ContentBlockerUserScriptDelegate {
 
     func contentBlockerUserScriptShouldProcessTrackers(_ script: UserScript) -> Bool {
-        // Not used until site rating support is implemented.
         return true
     }
 
-    func contentBlockerUserScript(_ script: ContentBlockerUserScript, detectedTracker tracker: DetectedTracker, withSurrogate host: String) {
-        // Not used until site rating support is implemented.
+    func contentBlockerUserScript(_ script: ContentBlockerUserScript,
+                                  detectedTracker tracker: DetectedTracker,
+                                  withSurrogate host: String) {
+        trackerInfo?.add(installedSurrogateHost: host)
+
+        contentBlockerUserScript(script, detectedTracker: tracker)
     }
 
     func contentBlockerUserScript(_ script: UserScript, detectedTracker tracker: DetectedTracker) {
-        // Not used until site rating support is implemented.
+        trackerInfo?.add(detectedTracker: tracker)
     }
 
 }
@@ -551,9 +591,7 @@ extension Tab: EmailManagerRequestDelegate {
 extension Tab: SecureVaultManagerDelegate {
 
     func secureVaultManager(_: SecureVaultManager, promptUserToStoreCredentials credentials: SecureVaultModels.WebsiteCredentials) {
-        guard let url = webView.url else { return }
-        lastSeenCredentials = credentials
-        loginDetectionService?.handle(navigationEvent: .detectedLogin(url: url))
+        delegate?.tab(self, requestedSaveCredentials: credentials)
     }
 
 }
@@ -562,6 +600,7 @@ extension Tab: WKNavigationDelegate {
 
     struct ErrorCodes {
         static let frameLoadInterrupted = 102
+        static let internetConnectionOffline = -1009
     }
     
     func webView(_ webView: WKWebView,
@@ -571,7 +610,16 @@ extension Tab: WKNavigationDelegate {
             completionHandler(.useCredential, URLCredential(user: "dax", password: "qu4ckqu4ck!", persistence: .none))
             return
         }
+        if challenge.protectionSpace.authenticationMethod == NSURLAuthenticationMethodHTTPBasic,
+           let delegate = delegate {
+            delegate.tab(self, requestedBasicAuthenticationChallengeWith: challenge.protectionSpace, completionHandler: completionHandler)
+            return
+        }
+
         completionHandler(.performDefaultHandling, nil)
+        if let host = webView.url?.host, let serverTrust = challenge.protectionSpace.serverTrust {
+            self.serverTrust = ServerTrust(host: host, secTrust: serverTrust)
+        }
     }
 
     struct Constants {
@@ -592,7 +640,10 @@ extension Tab: WKNavigationDelegate {
         let isMiddleClicked = navigationAction.buttonNumber == Constants.webkitMiddleClick
         if isLinkActivated && NSApp.isCommandPressed || isMiddleClicked {
             decisionHandler(.cancel)
-            delegate?.tab(self, requestedNewTab: navigationAction.request.url, selected: NSApp.isShiftPressed)
+            delegate?.tab(self, requestedNewTab: navigationAction.request.url, selected: NSApp.isShiftPressed, isBurner: tabStorageType == .burner)
+            return
+        } else if isLinkActivated && NSApp.isOptionPressed && !NSApp.isCommandPressed {
+            decisionHandler(.download(navigationAction, using: webView))
             return
         }
 
@@ -656,15 +707,10 @@ extension Tab: WKNavigationDelegate {
         if error != nil { error = nil }
 
         self.invalidateSessionStateData()
-
-        if let url = webView.url {
-             loginDetectionService?.handle(navigationEvent: .pageBeganLoading(url: url))
-        }
     }
 
     func webView(_ webView: WKWebView, didFinish navigation: WKNavigation!) {
         self.invalidateSessionStateData()
-        loginDetectionService?.handle(navigationEvent: .pageFinishedLoading)
     }
 
     func webView(_ webView: WKWebView, didFail navigation: WKNavigation!, withError error: Error) {
@@ -678,24 +724,15 @@ extension Tab: WKNavigationDelegate {
     func webView(_ webView: WKWebView, didFailProvisionalNavigation navigation: WKNavigation!, withError error: Error) {
         if currentDownload != nil && (error as NSError).code == ErrorCodes.frameLoadInterrupted {
             currentDownload = nil
-
-            // Note this can result in tabs being left open, e.g. download button on this page:
-            // https://en.wikipedia.org/wiki/Guitar#/media/File:GuitareClassique5.png
-            // Safari closes new tabs that were opened and then create a download instantly.
-            if self.webView.canGoBack == false,
-               self.parentTab != nil {
-                delegate?.closeTab(self)
-            }
-
             return
         }
-        self.error = error
-    }
 
-    func webView(_ webView: WKWebView, didReceiveServerRedirectForProvisionalNavigation navigation: WKNavigation!) {
-         guard let url = webView.url else { return }
-         loginDetectionService?.handle(navigationEvent: .redirect(url: url))
-     }
+        self.error = error
+
+        if (error as NSError).code != ErrorCodes.internetConnectionOffline, let failingUrl = error.failingUrl {
+            historyCoordinating.markFailedToLoadUrl(failingUrl)
+        }
+    }
 
     @available(macOS 11.3, *)
     @objc(webView:navigationAction:didBecomeDownload:)
@@ -713,11 +750,22 @@ extension Tab: WKNavigationDelegate {
 // universal download event handlers for Legacy _WKDownload and modern WKDownload
 extension Tab: WKWebViewDownloadDelegate {
     func webView(_ webView: WKWebView, navigationAction: WKNavigationAction, didBecomeDownload download: WebKitDownload) {
-        FileDownloadManager.shared.add(download, delegate: self.delegate, promptForLocation: false, postflight: .reveal)
+        FileDownloadManager.shared.add(download, delegate: self.delegate, location: .auto, postflight: .none)
     }
 
     func webView(_ webView: WKWebView, navigationResponse: WKNavigationResponse, didBecomeDownload download: WebKitDownload) {
-        FileDownloadManager.shared.add(download, delegate: self.delegate, promptForLocation: false, postflight: .reveal)
+        FileDownloadManager.shared.add(download, delegate: self.delegate, location: .auto, postflight: .none)
+
+        // Note this can result in tabs being left open, e.g. download button on this page:
+        // https://en.wikipedia.org/wiki/Guitar#/media/File:GuitareClassique5.png
+        // Safari closes new tabs that were opened and then create a download instantly.
+        if self.webView.backForwardList.currentItem == nil,
+           self.parentTab != nil,
+           let delegate = delegate {
+            DispatchQueue.main.async {
+                delegate.closeTab(self)
+            }
+        }
     }
 }
 

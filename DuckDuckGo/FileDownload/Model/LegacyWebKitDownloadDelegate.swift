@@ -91,23 +91,28 @@ private extension LegacyWebKitDownloadDelegate {
     }
 
     @objc func _downloadDidFinish(_ download: WebKitDownload) {
-        download.downloadDelegate?.downloadDidFinish?(download)
+        download.downloadDelegate?.downloadDidFinish(download)
     }
 
     @objc func _downloadDidCancel(_ download: WebKitDownload) {
-        download.downloadDelegate?.download?(download, didFailWithError: URLError(.cancelled), resumeData: nil)
+        download.downloadDelegate?.download(download, didFailWithError: URLError(.cancelled), resumeData: nil)
     }
 
     @objc func _download(_ download: WebKitDownload, didFailWithError error: Error) {
-        download.downloadDelegate?.download?(download, didFailWithError: error, resumeData: nil)
+        download.downloadDelegate?.download(download, didFailWithError: error, resumeData: nil)
     }
 
     @objc(_download:didReceiveAuthenticationChallenge:completionHandler:)
     func _download(_ download: WebKitDownload,
                    didReceive challenge: URLAuthenticationChallenge,
                    completionHandler: @escaping (URLSession.AuthChallengeDisposition, URLCredential?) -> Void) {
-        download.downloadDelegate?.download?(download, didReceive: challenge, completionHandler: completionHandler)
+        download.downloadDelegate?.download(download, didReceive: challenge, completionHandler: completionHandler)
             ?? download.webView?.navigationDelegate?.webView?(download.webView!, didReceive: challenge, completionHandler: completionHandler)
+    }
+
+    @objc(_download:didReceiveData:)
+    func _download(_ download: WebKitDownload, didReceiveData length: UInt64) {
+        download.downloadDelegate?.download(download, didReceiveData: length)
     }
 
 }

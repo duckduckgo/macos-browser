@@ -21,12 +21,27 @@ import XCTest
 
 final class TabTests: XCTestCase {
 
+    func testWhenBurnerTabThenDataStoreIsNonPersistent() {
+        let burnerTab = Tab(content: .homepage, tabStorageType: .burner)
+        XCTAssertFalse(burnerTab.webView.configuration.websiteDataStore.isPersistent)
+
+        let burnerChildTab = Tab(content: .homepage, tabStorageType: .burner, webViewConfiguration: burnerTab.webView.configuration)
+        XCTAssertFalse(burnerChildTab.webView.configuration.websiteDataStore.isPersistent)
+
+        let defaultTab = Tab(content: .homepage, tabStorageType: .default)
+        XCTAssertTrue(defaultTab.webView.configuration.websiteDataStore.isPersistent)
+
+        let defaultChildTab = Tab(content: .homepage, tabStorageType: .default, webViewConfiguration: defaultTab.webView.configuration)
+        XCTAssertTrue(defaultChildTab.webView.configuration.websiteDataStore.isPersistent)
+
+    }
+
     func testWhenSettingURLThenTabTypeChangesToStandard() {
-        let tab = Tab(tabType: .preferences)
-        XCTAssertEqual(tab.tabType, .preferences)
+        let tab = Tab(content: .preferences)
+        XCTAssertEqual(tab.content, .preferences)
 
         tab.url = URL.duckDuckGo
-        XCTAssertEqual(tab.tabType, .standard)
+        XCTAssertEqual(tab.content, .url(.duckDuckGo))
     }
 
     // MARK: - Equality
@@ -47,4 +62,15 @@ final class TabTests: XCTestCase {
         XCTAssert(tab != tab2)
     }
     
+}
+
+extension Tab {
+    var url: URL? {
+        get {
+            content.url
+        }
+        set {
+            setContent(newValue.map(TabContent.url) ?? .homepage)
+        }
+    }
 }

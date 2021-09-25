@@ -29,6 +29,10 @@ final class MainWindowController: NSWindowController {
         // swiftlint:enable force_cast
     }
 
+    var titlebarView: NSView? {
+        return window?.standardWindowButton(.closeButton)?.superview
+    }
+
     init(mainViewController: MainViewController) {
         let window = MainWindow(frame: NSRect(x: 0, y: 0, width: 1024, height: 790))
         window.contentViewController = mainViewController
@@ -36,6 +40,9 @@ final class MainWindowController: NSWindowController {
         super.init(window: window)
 
         setupWindow()
+        setupToolbar()
+        subscribeToTrafficLightsAlpha()
+        subscribeToShouldPreventUserInteraction()
     }
 
     required init?(coder: NSCoder) {
@@ -45,41 +52,80 @@ final class MainWindowController: NSWindowController {
     private func setupWindow() {
         window?.delegate = self
         window?.setFrameAutosaveName(Self.windowFrameSaveName)
-
-        setupToolbar()
     }
 
-    var trafficLightsAlphaCancellable: AnyCancellable?
     private func setupToolbar() {
         // Empty toolbar ensures that window buttons are centered vertically
         window?.toolbar = NSToolbar()
         window?.toolbar?.showsBaselineSeparator = true
 
+        moveTabBarView(toTitlebarView: true)
+    }
+
+    private var trafficLightsAlphaCancellable: AnyCancellable?
+    private func subscribeToTrafficLightsAlpha() {
         guard let tabBarViewController = mainViewController.tabBarViewController else {
             assertionFailure("MainWindowController: tabBarViewController is nil" )
             return
         }
-
-        guard let titlebarView = window?.standardWindowButton(.closeButton)?.superview else { return }
-
-        tabBarViewController.view.removeFromSuperview()
-        titlebarView.addSubview(tabBarViewController.view)
-
-        tabBarViewController.view.frame = titlebarView.bounds
-        tabBarViewController.view.translatesAutoresizingMaskIntoConstraints = false
-        let constraints = tabBarViewController.view.addConstraints(to: titlebarView, [
-            .leading: .leading(),
-            .trailing: .trailing(),
-            .top: .top(),
-            .height: .const(38.0)
-        ])
-        NSLayoutConstraint.activate(constraints)
 
         // slide tabs to the left in full screen
         trafficLightsAlphaCancellable = window?.standardWindowButton(.closeButton)?
             .publisher(for: \.alphaValue)
             .map { alphaValue in TabBarViewController.HorizontalSpace.leadingStackViewPadding.rawValue * alphaValue }
             .weakAssign(to: \.constant, on: tabBarViewController.leadingStackViewLeadingConstraint)
+    }
+
+    private var shouldPreventUserInteractionCancellable: AnyCancellable?
+    private func subscribeToShouldPreventUserInteraction() {
+        shouldPreventUserInteractionCancellable = mainViewController.fireViewModel.shouldPreventUserInteraction
+            .dropFirst()
+            .sink(receiveValue: { [weak self] shouldPreventUserInteraction in
+                self?.moveTabBarView(toTitlebarView: !shouldPreventUserInteraction)
+                self?.userInteraction(prevented: shouldPreventUserInteraction)
+            })
+    }
+
+    private func userInteraction(prevented: Bool) {
+        mainViewController.tabCollectionViewModel.changesEnabled = !prevented
+        mainViewController.tabCollectionViewModel.selectedTabViewModel?.tab.contentChangeEnabled = !prevented
+
+        mainViewController.tabBarViewController.fireButton.isEnabled = !prevented
+        mainViewController.navigationBarViewController.controlsForUserPrevention.forEach { $0?.isEnabled = !prevented }
+        NSApplication.shared.mainMenuTyped.menuItemsForUserPrevention.forEach { $0.isEnabled = !prevented }
+
+        if prevented {
+            window?.styleMask.remove(.closable)
+            mainViewController.view.makeMeFirstResponder()
+        } else {
+            window?.styleMask.update(with: .closable)
+            mainViewController.navigationBarViewController.addressBarViewController?.addressBarTextField.makeMeFirstResponder()
+        }
+    }
+
+    private func moveTabBarView(toTitlebarView: Bool) {
+        guard let newParentView = toTitlebarView ? titlebarView : mainViewController.view,
+              let tabBarViewController = mainViewController.tabBarViewController else {
+            assertionFailure("Failed to move tab bar view")
+            return
+        }
+
+        tabBarViewController.view.removeFromSuperview()
+        if toTitlebarView {
+            newParentView.addSubview(tabBarViewController.view)
+        } else {
+            newParentView.addSubview(tabBarViewController.view, positioned: .below, relativeTo: mainViewController.fireViewController.view)
+        }
+
+        tabBarViewController.view.frame = newParentView.bounds
+        tabBarViewController.view.translatesAutoresizingMaskIntoConstraints = false
+        let constraints = tabBarViewController.view.addConstraints(to: newParentView, [
+            .leading: .leading(),
+            .trailing: .trailing(),
+            .top: .top(),
+            .height: .const(40.0)
+        ])
+        NSLayoutConstraint.activate(constraints)
     }
 
     override func showWindow(_ sender: Any?) {
@@ -128,6 +174,37 @@ extension MainWindowController: NSWindowDelegate {
         DispatchQueue.main.async {
             WindowControllersManager.shared.unregister(self)
         }
+    }
+}
+
+fileprivate extension MainMenu {
+
+    var menuItemsForUserPrevention: [NSMenuItem] {
+        return [
+            newWindowMenuItem,
+            newTabMenuItem,
+            openLocationMenuItem,
+            closeWindowMenuItem,
+            closeAllWindowsMenuItem,
+            closeTabMenuItem,
+            burnWebsiteDataMenuItem
+        ]
+    }
+
+}
+
+fileprivate extension NavigationBarViewController {
+
+    var controlsForUserPrevention: [NSControl?] {
+        return [goBackButton,
+                goForwardButton,
+                refreshButton,
+                optionsButton,
+                bookmarkListButton,
+                passwordManagementButton,
+                addressBarViewController?.addressBarTextField,
+                addressBarViewController?.passiveTextField
+        ]
     }
 
 }

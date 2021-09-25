@@ -18,7 +18,7 @@
 
 import Cocoa
 
-final class AddressBarButton: MouseOverButton {
+internal class AddressBarButton: MouseOverButton {
 
     override func awakeFromNib() {
         super.awakeFromNib()
@@ -36,13 +36,13 @@ final class AddressBarButton: MouseOverButton {
         didSet {
             switch position {
             case .left:
-                layer?.maskedCorners = [.layerMinXMaxYCorner, .layerMinXMinYCorner]
+                backgroundLayer.maskedCorners = [.layerMinXMaxYCorner, .layerMinXMinYCorner]
             case .center:
-                layer?.maskedCorners = []
+                backgroundLayer.maskedCorners = []
             case .right:
-                layer?.maskedCorners = [.layerMaxXMaxYCorner, .layerMaxXMinYCorner]
+                backgroundLayer.maskedCorners = [.layerMaxXMaxYCorner, .layerMaxXMinYCorner]
             }
-            layer?.masksToBounds = true
+            backgroundLayer.masksToBounds = true
         }
     }
 

@@ -70,6 +70,10 @@ extension NSColor {
         NSColor(named: "TabMouseOverColor")!
     }
 
+    static var buttonMouseOverColor: NSColor {
+        NSColor(named: "ButtonMouseOverColor")!
+    }
+
     static var progressBarGradientDarkColor: NSColor {
         .controlAccentColor
     }
@@ -109,5 +113,17 @@ extension NSColor {
     static let bookmarkRepresentingColor3 = NSColor(named: "BookmarkRepresentingColor3")!
     static let bookmarkRepresentingColor4 = NSColor(named: "BookmarkRepresentingColor4")!
     static let bookmarkRepresentingColor5 = NSColor(named: "BookmarkRepresentingColor5")!
+
+    static var buttonMouseDownColor: NSColor {
+        NSColor(named: "ButtonMouseDownColor")!
+    }
+
+    static var burnerIndicatorSelectedColor: NSColor {
+        NSColor(named: "BurnerIndicatorSelectedColor")!
+    }
+
+    static var burnerIndicatorUnselectedColor: NSColor {
+        NSColor(named: "BurnerIndicatorUnselectedColor")!
+    }
 
 }

@@ -21,8 +21,8 @@ import Foundation
 import SwiftUI
 import BrowserServicesKit
 
-private let interItemSpacing: CGFloat = 16
-private let itemSpacing: CGFloat = 10
+private let interItemSpacing: CGFloat = 23
+private let itemSpacing: CGFloat = 13
 
 struct PasswordManagementItemView: View {
 
@@ -77,6 +77,7 @@ struct PasswordManagementItemView: View {
 
             }
             .padding(EdgeInsets(top: 10, leading: 0, bottom: 10, trailing: 10))
+
         }
 
     }
@@ -94,6 +95,7 @@ private struct Buttons: View {
                 Button(UserText.pmDelete) {
                     model.requestDelete()
                 }
+                .buttonStyle(StandardButtonStyle())
             }
 
             Spacer()
@@ -102,31 +104,27 @@ private struct Buttons: View {
                 Button(UserText.pmCancel) {
                     model.cancel()
                 }
-
-                if #available(macOS 11, *) {
-                    Button(UserText.pmSave) {
-                        model.save()
-                    }
-                    .keyboardShortcut(.defaultAction) // macOS 11+
-                    .disabled(!model.isDirty)
-                } else {
-                    Button(UserText.pmSave) {
-                        model.save()
-                    }
-                    .disabled(!model.isDirty)
+                .buttonStyle(StandardButtonStyle())
+                Button(UserText.pmSave) {
+                    model.save()
                 }
+                .disabled(!model.isDirty)
+                .buttonStyle(DefaultActionButtonStyle(enabled: model.isDirty))
 
             } else {
                 Button(UserText.pmDelete) {
                     model.requestDelete()
                 }
+                .buttonStyle(StandardButtonStyle())
 
                 Button(UserText.pmEdit) {
                     model.edit()
                 }
+                .buttonStyle(StandardButtonStyle())
+
             }
 
-        }.padding()
+        }
     }
 
 }
@@ -156,36 +154,40 @@ private struct UsernameView: View {
     @State var isHovering = false
 
     var body: some View {
-        Text(UserText.pmUsername)
-            .bold()
-            .padding(.bottom, itemSpacing)
+        VStack(alignment: .leading, spacing: 0) {
 
-        if model.isEditing || model.isNew {
+            Text(UserText.pmUsername)
+                .bold()
+                .padding(.bottom, itemSpacing)
 
-            TextField("", text: $model.username)
-                .textFieldStyle(RoundedBorderTextFieldStyle())
-                .padding(.bottom, interItemSpacing)
+            if model.isEditing || model.isNew {
 
-        } else {
+                TextField("", text: $model.username)
+                    .textFieldStyle(RoundedBorderTextFieldStyle())
+                    .padding(.bottom, interItemSpacing)
 
-            HStack(spacing: 6) {
-                Text(model.username)
+            } else {
 
-                if isHovering {
-                    Button {
-                        model.copyUsername()
-                    } label: {
-                        Image("Copy")
-                    }.buttonStyle(PlainButtonStyle())
+                HStack(spacing: 6) {
+                    Text(model.username)
+
+                    if isHovering {
+                        Button {
+                            model.copyUsername()
+                        } label: {
+                            Image("Copy")
+                        }.buttonStyle(PlainButtonStyle())
+                    }
+
+                    Spacer()
                 }
+                .padding(.bottom, interItemSpacing)
             }
-            .onHover {
-                isHovering = $0
-            }
-            .padding(.bottom, interItemSpacing)
 
         }
-
+        .onHover {
+            isHovering = $0
+        }
     }
 
 }
@@ -198,68 +200,74 @@ private struct PasswordView: View {
     @State var isPasswordVisible = false
 
     var body: some View {
-        Text(UserText.pmPassword)
-            .bold()
-            .padding(.bottom, itemSpacing)
+        VStack(alignment: .leading, spacing: 0) {
 
-        if model.isEditing || model.isNew {
+            Text(UserText.pmPassword)
+                .bold()
+                .padding(.bottom, itemSpacing)
 
-            HStack {
+            if model.isEditing || model.isNew {
 
-                if isPasswordVisible {
+                HStack {
 
-                    TextField("", text: $model.password)
-                        .textFieldStyle(RoundedBorderTextFieldStyle())
+                    if isPasswordVisible {
 
-                } else {
+                        TextField("", text: $model.password)
+                            .textFieldStyle(RoundedBorderTextFieldStyle())
 
-                    SecureField("", text: $model.password)
-                        .textFieldStyle(RoundedBorderTextFieldStyle())
+                    } else {
 
-                }
+                        SecureField("", text: $model.password)
+                            .textFieldStyle(RoundedBorderTextFieldStyle())
 
-                Button {
-                    isPasswordVisible = !isPasswordVisible
-                } label: {
-                    Image("SecureEyeToggle")
-                }
-                .buttonStyle(PlainButtonStyle())
-                .padding(.trailing, 10)
+                    }
 
-            }
-            .padding(.bottom, interItemSpacing)
-
-        } else {
-
-            HStack(alignment: .center, spacing: 6) {
-
-                if isPasswordVisible {
-                    Text(model.password)
-                } else {
-                    Text(model.password.isEmpty ? "" : "••••••••••••")
-                }
-
-                if isHovering || isPasswordVisible {
                     Button {
                         isPasswordVisible = !isPasswordVisible
                     } label: {
                         Image("SecureEyeToggle")
-                    }.buttonStyle(PlainButtonStyle())
-                }
+                    }
+                    .buttonStyle(PlainButtonStyle())
+                    .padding(.trailing, 10)
 
-                if isHovering {
-                    Button {
-                        model.copyPassword()
-                    } label: {
-                        Image("Copy")
-                    }.buttonStyle(PlainButtonStyle())
                 }
-            }
-            .onHover {
-                isHovering = $0
-            }
-            .padding(.bottom, interItemSpacing)
+                .padding(.bottom, interItemSpacing)
 
+            } else {
+
+                HStack(alignment: .center, spacing: 6) {
+
+                    if isPasswordVisible {
+                        Text(model.password)
+                    } else {
+                        Text(model.password.isEmpty ? "" : "••••••••••••")
+                    }
+
+                    if isHovering || isPasswordVisible {
+                        Button {
+                            isPasswordVisible = !isPasswordVisible
+                        } label: {
+                            Image("SecureEyeToggle")
+                        }.buttonStyle(PlainButtonStyle())
+                    }
+
+                    if isHovering {
+                        Button {
+                            model.copyPassword()
+                        } label: {
+                            Image("Copy")
+                        }.buttonStyle(PlainButtonStyle())
+                    }
+
+                    Spacer()
+                }
+                .padding(.bottom, interItemSpacing)
+
+            }
+
+        }
+        .onHover {
+            isHovering = $0
         }
     }
 
@@ -298,21 +306,25 @@ private struct DatesView: View {
 
     var body: some View {
         VStack(alignment: .leading, spacing: 4) {
+            Spacer()
+
             HStack {
                 Text(UserText.pmLoginAdded)
                     .bold()
-                    .opacity(0.5)
+                    .opacity(0.6)
                 Text(model.createdDate)
-                    .opacity(0.5)
+                    .opacity(0.6)
             }
 
             HStack {
                 Text(UserText.pmLoginLastUpdated)
                     .bold()
-                    .opacity(0.5)
+                    .opacity(0.6)
                 Text(model.lastUpdatedDate)
-                    .opacity(0.5)
+                    .opacity(0.6)
             }
+
+            Spacer()
         }
     }
 

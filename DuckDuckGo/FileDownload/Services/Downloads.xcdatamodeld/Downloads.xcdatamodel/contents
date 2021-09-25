@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<model type="com.apple.IDECoreDataModeler.DataModel" documentVersion="1.0" lastSavedToolsVersion="18154" systemVersion="20G95" minimumToolsVersion="Automatic" sourceLanguage="Swift" userDefinedModelVersionIdentifier="">
+    <entity name="DownloadManagedObject" representedClassName="DownloadManagedObject" syncable="YES" codeGenerationType="class">
+        <attribute name="added" attributeType="Date" usesScalarValueType="NO"/>
+        <attribute name="destinationURLEncrypted" optional="YES" attributeType="Transformable" valueTransformerName="NSURLTransformer"/>
+        <attribute name="errorEncrypted" optional="YES" attributeType="Transformable" valueTransformerName="NSErrorTransformer"/>
+        <attribute name="fileType" optional="YES" attributeType="String"/>
+        <attribute name="identifier" attributeType="UUID" usesScalarValueType="NO"/>
+        <attribute name="modified" attributeType="Date" usesScalarValueType="NO"/>
+        <attribute name="tempURLEncrypted" optional="YES" attributeType="Transformable" valueTransformerName="NSURLTransformer"/>
+        <attribute name="urlEncrypted" attributeType="Transformable" valueTransformerName="NSURLTransformer"/>
+        <attribute name="websiteURLEncrypted" optional="YES" attributeType="Transformable" valueTransformerName="NSURLTransformer"/>
+    </entity>
+    <elements>
+        <element name="DownloadManagedObject" positionX="-63" positionY="-18" width="128" height="164"/>
+    </elements>
+</model>

@@ -19,10 +19,6 @@
 #import <WebKit/WebKit.h>
 
 @interface WKNavigationAction (Private)
-#ifndef __MAC_11_3
-@property (nonatomic, readonly) BOOL shouldPerformDownload API_AVAILABLE(macosx(11.3));
-#endif
-
 @property (nonatomic, readonly) BOOL _shouldPerformDownload;
 
 @end

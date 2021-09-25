@@ -38,14 +38,14 @@ final class TabBarViewController: NSViewController {
     @IBOutlet weak var leftScrollButton: MouseOverButton!
     @IBOutlet weak var rightShadowImageView: NSImageView!
     @IBOutlet weak var leftShadowImageView: NSImageView!
-    @IBOutlet weak var plusButton: MouseOverButton!
-    @IBOutlet weak var burnButton: BurnButton!
+    @IBOutlet weak var plusButton: LongPressButton!
+    @IBOutlet weak var fireButton: MouseOverButton!
     @IBOutlet weak var draggingSpace: NSView!
     @IBOutlet weak var windowDraggingViewLeadingConstraint: NSLayoutConstraint!
 
     private let tabCollectionViewModel: TabCollectionViewModel
+    private let fireViewModel: FireViewModel
     private let bookmarkManager: BookmarkManager = LocalBookmarkManager.shared
-    lazy private var fireViewModel = FireViewModel()
 
     private var tabsCancellable: AnyCancellable?
     private var selectionIndexCancellable: AnyCancellable?
@@ -55,8 +55,9 @@ final class TabBarViewController: NSViewController {
         fatalError("TabBarViewController: Bad initializer")
     }
 
-    init?(coder: NSCoder, tabCollectionViewModel: TabCollectionViewModel) {
+    init?(coder: NSCoder, tabCollectionViewModel: TabCollectionViewModel, fireViewModel: FireViewModel) {
         self.tabCollectionViewModel = tabCollectionViewModel
+        self.fireViewModel = fireViewModel
 
         super.init(coder: coder)
     }
@@ -67,9 +68,7 @@ final class TabBarViewController: NSViewController {
         scrollView.updateScrollElasticity(with: tabMode)
         observeToScrollNotifications()
         subscribeToSelectionIndex()
-        subscribeToIsBurning()
-
-        warmupFireAnimation()
+        plusButton.menu = createNewTabLongPressMenu()
     }
 
     override func viewWillAppear() {
@@ -93,18 +92,12 @@ final class TabBarViewController: NSViewController {
         NotificationCenter.default.removeObserver(self)
     }
 
-    @IBAction func burnButtonAction(_ sender: NSButton) {
-        let response = NSAlert.burnButtonAlert.runModal()
-        if response == NSApplication.ModalResponse.alertFirstButtonReturn {
-            Pixel.fire(.burn())
-
-            WindowsManager.closeWindows(except: self.view.window)
-            playFireAnimation()
-        }
+    @IBAction func addButtonAction(_ sender: NSButton) {
+        tabCollectionViewModel.appendNewTab(with: .homepage)
     }
 
-    @IBAction func addButtonAction(_ sender: NSButton) {
-        tabCollectionViewModel.appendNewTab()
+    @IBAction func createBurnerTabAction(_ sender: NSButton) {
+        tabCollectionViewModel.appendNewTab(with: .homepage, tabStorageType: .burner)
     }
 
     @IBAction func rightScrollButtonAction(_ sender: NSButton) {
@@ -121,11 +114,14 @@ final class TabBarViewController: NSViewController {
         }
     }
 
-    private func subscribeToIsBurning() {
-        fireViewModel.fire.$isBurning
-            .receive(on: DispatchQueue.main)
-            .weakAssign(to: \.isBurning, on: burnButton)
-            .store(in: &cancellables)
+    private func createNewTabLongPressMenu() -> NSMenu {
+        let menu = NSMenu()
+        menu.addItem(NSMenuItem(title: UserText.plusButtonNewTabMenuItem, action: #selector(addButtonAction(_:)), target: self, keyEquivalent: ""))
+        menu.addItem(NSMenuItem(title: UserText.plusButtonNewBurnerTabMenuItem,
+                                action: #selector(createBurnerTabAction(_:)),
+                                target: self,
+                                keyEquivalent: ""))
+        return menu
     }
 
     private func reloadSelection() {
@@ -571,6 +567,7 @@ extension TabBarViewController: NSCollectionViewDataSource {
         if let footer = view as? TabBarFooter {
             footer.addButton?.target = self
             footer.addButton?.action = #selector(addButtonAction(_:))
+            footer.addButton?.menu = createNewTabLongPressMenu()
         }
         return view
     }
@@ -607,7 +604,7 @@ extension TabBarViewController: NSCollectionViewDelegate {
 
     func collectionView(_ collectionView: NSCollectionView,
                         pasteboardWriterForItemAt indexPath: IndexPath) -> NSPasteboardWriting? {
-        if let url = tabCollectionViewModel.tabCollection.tabs[indexPath.item].url {
+        if let url = tabCollectionViewModel.tabCollection.tabs[indexPath.item].content.url {
             return url as NSURL
         } else {
             return URL.emptyPage as NSURL
@@ -729,10 +726,21 @@ extension TabBarViewController: TabBarViewItemDelegate {
         tabCollectionViewModel.duplicateTab(at: indexPath.item)
     }
 
+    func tabBarViewItemConvertToStandard(_ tabBarViewItem: TabBarViewItem) {
+        guard let indexPath = collectionView.indexPath(for: tabBarViewItem) else {
+            os_log("TabBarViewController: Failed to get index path of tab bar view item", type: .error)
+            return
+        }
+
+        collectionView.clearSelection()
+        tabCollectionViewModel.convertToStandardTab(at: indexPath.item)
+        tabBarViewItemCloseAction(tabBarViewItem)
+    }
+
     func tabBarViewItemBookmarkThisPageAction(_ tabBarViewItem: TabBarViewItem) {
         guard let indexPath = collectionView.indexPath(for: tabBarViewItem),
               let tabViewModel = tabCollectionViewModel.tabViewModel(at: indexPath.item),
-              let url = tabViewModel.tab.url else {
+              let url = tabViewModel.tab.content.url else {
             os_log("TabBarViewController: Failed to get index path of tab bar view item", type: .error)
             return
         }
@@ -752,6 +760,23 @@ extension TabBarViewController: TabBarViewItemDelegate {
         tabCollectionViewModel.remove(at: indexPath.item)
     }
 
+    func tabBarViewItemTogglePermissionAction(_ tabBarViewItem: TabBarViewItem) {
+        guard let indexPath = collectionView.indexPath(for: tabBarViewItem),
+              let permissions = tabCollectionViewModel.tabViewModel(at: indexPath.item)?.tab.permissions
+        else {
+            os_log("TabBarViewController: Failed to get index path of tab bar view item or its permissions", type: .error)
+            return
+        }
+
+        if permissions.permissions.camera.isActive || permissions.permissions.microphone.isActive {
+            permissions.set([.camera, .microphone], muted: true)
+        } else if permissions.permissions.camera.isPaused || permissions.permissions.microphone.isPaused {
+            permissions.set([.camera, .microphone], muted: false)
+        } else {
+            assertionFailure("Unexpected Tab Permissions state")
+        }
+    }
+
     func tabBarViewItemCloseOtherAction(_ tabBarViewItem: TabBarViewItem) {
         guard let indexPath = collectionView.indexPath(for: tabBarViewItem) else {
             os_log("TabBarViewController: Failed to get index path of tab bar view item", type: .error)
@@ -759,6 +784,15 @@ extension TabBarViewController: TabBarViewItemDelegate {
         }
 
         tabCollectionViewModel.removeAllTabs(except: indexPath.item)
+    }
+
+    func tabBarViewItemCloseToTheRightAction(_ tabBarViewItem: TabBarViewItem) {
+        guard let indexPath = collectionView.indexPath(for: tabBarViewItem) else {
+            os_log("TabBarViewController: Failed to get index path of tab bar view item", type: .error)
+            return
+        }
+
+        tabCollectionViewModel.removeTabs(after: indexPath.item)
     }
 
     func tabBarViewItemMoveToNewWindowAction(_ tabBarViewItem: TabBarViewItem) {
@@ -771,74 +805,34 @@ extension TabBarViewController: TabBarViewItemDelegate {
     }
 
     func tabBarViewItemFireproofSite(_ tabBarViewItem: TabBarViewItem) {
-        if let url = tabCollectionViewModel.selectedTabViewModel?.tab.url,
+        if let url = tabCollectionViewModel.selectedTabViewModel?.tab.content.url,
            let host = url.host {
             Pixel.fire(.fireproof(kind: .init(url: url), suggested: .manual))
             FireproofDomains.shared.addToAllowed(domain: host)
         }
-
-        tabBarViewItem.setupMenu()
     }
 
     func tabBarViewItemRemoveFireproofing(_ tabBarViewItem: TabBarViewItem) {
-        if let host = tabCollectionViewModel.selectedTabViewModel?.tab.url?.host {
+        if let host = tabCollectionViewModel.selectedTabViewModel?.tab.content.url?.host {
             FireproofDomains.shared.remove(domain: host)
         }
+    }
 
-        tabBarViewItem.setupMenu()
+    func tabBarViewItemCloseBurnerTabs(_ tabBarViewItem: TabBarViewItem) {
+        tabCollectionViewModel.removeBurnerTabs()
+    }
+
+    func otherTabBarViewItemsState(for tabBarViewItem: TabBarViewItem) -> OtherTabBarViewItemsState {
+        guard let indexPath = collectionView.indexPath(for: tabBarViewItem) else {
+            os_log("TabBarViewController: Failed to get index path of tab bar view item", type: .error)
+            return .init(hasItemsToTheLeft: false, hasItemsToTheRight: false, hasBurnerTabs: false)
+        }
+        return .init(hasItemsToTheLeft: indexPath.item > 0,
+                     hasItemsToTheRight: indexPath.item + 1 < tabCollectionViewModel.tabCollection.tabs.count,
+                     hasBurnerTabs: tabCollectionViewModel.tabCollection.tabs.first(where: { $0.tabStorageType == .burner }) != nil)
     }
 
 }
 
-extension TabBarViewController {
-
-    static let fireAnimation: AnimationView = {
-        let view = AnimationView(name: "01_Fire_really_small")
-        view.forceDisplayUpdate()
-        return view
-    }()
-
-    func playFireAnimation() {
-
-        Self.fireAnimation.contentMode = .scaleToFill
-        Self.fireAnimation.frame = .init(x: 0,
-                                y: 0,
-                                width: view.window?.frame.width ?? 0,
-                                height: view.window?.frame.height ?? 0)
-
-        view.window?.contentView?.addSubview(Self.fireAnimation)
-        Self.fireAnimation.play { _ in
-            Self.fireAnimation.removeFromSuperview()
-        }
-
-        DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
-            self.fireViewModel.fire.burnAll(tabCollectionViewModel: self.tabCollectionViewModel)
-        }
-
-    }
-
-    func warmupFireAnimation() {
-        view.addSubview(Self.fireAnimation)
-        DispatchQueue.main.async {
-            Self.fireAnimation.removeFromSuperview()
-        }
-    }
-
-}
-
-fileprivate extension NSAlert {
-
-    static var burnButtonAlert: NSAlert {
-        let alert = NSAlert()
-        alert.messageText = UserText.burnAlertMessageText
-        alert.informativeText = UserText.burtAlertInformativeText
-        alert.alertStyle = .warning
-        alert.icon = NSImage(named: "BurnAlert")
-        alert.addButton(withTitle: UserText.burn)
-        alert.addButton(withTitle: UserText.cancel)
-        return alert
-    }
-
-}
 // swiftlint:enable type_body_length
 // swiftlint:enable file_length

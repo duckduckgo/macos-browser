@@ -24,6 +24,14 @@ extension Date {
         return Calendar.current.date(byAdding: .weekOfMonth, value: -1, to: Date())!
     }
 
+    static var monthAgo: Date! {
+        return Calendar.current.date(byAdding: .month, value: -1, to: Date())!
+    }
+
+    static func daysAgo(_ days: Int) -> Date! {
+        return Calendar.current.date(byAdding: .day, value: -days, to: Date())!
+    }
+
     static var startOfDayTomorrow: Date {
         let tomorrow = Calendar.current.date(byAdding: .day, value: 1, to: Date())!
         return Calendar.current.startOfDay(for: tomorrow)

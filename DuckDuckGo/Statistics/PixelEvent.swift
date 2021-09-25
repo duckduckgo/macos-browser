@@ -40,6 +40,7 @@ extension Pixel {
         case manageBookmarks(repetition: Repetition = .init(key: "manage-bookmarks"), source: AccessPoint)
         case bookmarksList(repetition: Repetition = .init(key: "bookmarks-list"), source: AccessPoint)
         case manageLogins(repetition: Repetition = .init(key: "manage-logins"), source: AccessPoint)
+        case manageDownloads(repetition: Repetition = .init(key: "manage-downloads"), source: AccessPoint)
 
         case bookmark(fireproofed: IsBookmarkFireproofed, repetition: Repetition = .init(key: "bookmark"), source: AccessPoint)
         case favorite(fireproofed: IsBookmarkFireproofed, repetition: Repetition = .init(key: "favorite"), source: AccessPoint)
@@ -53,11 +54,12 @@ extension Pixel {
 
         case navigation(kind: NavigationKind, source: NavigationAccessPoint)
 
-        case suggestionsDisplayed(hasBookmark: HasBookmark, hasFavorite: HasFavorite)
+        case suggestionsDisplayed(hasBookmark: HasBookmark, hasFavorite: HasFavorite, hasHistoryEntry: HasHistoryEntry)
 
-        static func suggestionsDisplayed(_ arg: (hasBookmark: Bool, hasFavorite: Bool)) -> Event {
-            return .suggestionsDisplayed(hasBookmark: arg.hasBookmark ? .hasBookmark : .noBookmarks,
-                                         hasFavorite: arg.hasFavorite ? .hasFavorite : .noFavorites)
+        static func suggestionsDisplayed(_ characteristics: SuggestionListChacteristics) -> Event {
+            return .suggestionsDisplayed(hasBookmark: characteristics.hasBookmark ? .hasBookmark : .noBookmarks,
+                                         hasFavorite: characteristics.hasFavorite ? .hasFavorite : .noFavorites,
+                                         hasHistoryEntry: characteristics.hasHistoryEntry ? .hasHistoryEntry : .noHistoryEntry)
         }
 
         case sharingMenu(repetition: Repetition = .init(key: "sharing"), result: SharingResult)
@@ -84,6 +86,10 @@ extension Pixel {
             case trackerDataParseFailed = "tds_p"
             case trackerDataReloadFailed = "tds_r"
             case trackerDataCouldNotBeLoaded = "tds_l"
+            
+            case privacyConfigurationParseFailed = "pcf_p"
+            case privacyConfigurationReloadFailed = "pcf_r"
+            case privacyConfigurationCouldNotBeLoaded = "pcf_l"
 
             case fileStoreWriteFailed = "fswf"
             case fileMoveToDownloadsFailed = "df"
@@ -133,6 +139,9 @@ extension Pixel.Event {
         case .manageLogins(repetition: let repetition, source: let source):
             return "m_mac_manage-logins_\(repetition)_\(source)"
 
+        case .manageDownloads(repetition: let repetition, source: let source):
+            return "m_mac_manage-downloads_\(repetition)_\(source)"
+
         case .bookmark(fireproofed: let fireproofed, repetition: let repetition, source: let source):
             return "m_mac_bookmark_\(fireproofed)_\(repetition)_\(source)"
 
@@ -142,8 +151,8 @@ extension Pixel.Event {
         case .navigation(kind: let kind, source: let source):
             return "m_mac_navigation_\(kind)_\(source)"
 
-        case .suggestionsDisplayed(hasBookmark: let hasBookmark, hasFavorite: let hasFavorite):
-            return "m_mac_suggestions-displayed_\(hasBookmark)_\(hasFavorite)"
+        case .suggestionsDisplayed(hasBookmark: let hasBookmark, hasFavorite: let hasFavorite, hasHistoryEntry: let hasHistoryEntry):
+            return "m_mac_suggestions-displayed_\(hasBookmark)_\(hasFavorite)_\(hasHistoryEntry)"
 
         case .sharingMenu(repetition: let repetition, result: let result):
             return "m_mac_share_\(repetition)_\(result)"

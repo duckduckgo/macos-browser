@@ -20,14 +20,14 @@ import Foundation
 
 extension NSCoder {
 
-    func encode<T: NSObject>(forKey key: String) -> (T) -> Void where T: NSCoding {
+    func encode<T: NSObject>(forKey key: String) -> (T) -> Void where T: NSSecureCoding {
         return { object in
             self.encode(object, forKey: key)
         }
     }
 
     func encode<T: _ObjectiveCBridgeable>(forKey key: String) -> (T) -> Void
-        where T._ObjectiveCType: NSObject, T._ObjectiveCType: NSCoding {
+        where T._ObjectiveCType: NSObject, T._ObjectiveCType: NSSecureCoding {
 
         return { object in
             self.encode(object._bridgeToObjectiveC(), forKey: key)
@@ -45,13 +45,13 @@ extension NSCoder {
         return decodeInteger(forKey: key)
     }
 
-    func decodeIfPresent<T: NSObject>(at key: String) -> T? where T: NSCoding {
+    func decodeIfPresent<T: NSObject>(at key: String) -> T? where T: NSSecureCoding {
         guard containsValue(forKey: key) else { return nil }
         return decodeObject(of: T.self, forKey: key)
     }
 
     func decodeIfPresent<T: _ObjectiveCBridgeable>(at key: String) -> T?
-        where T._ObjectiveCType: NSObject, T._ObjectiveCType: NSCoding {
+        where T._ObjectiveCType: NSObject, T._ObjectiveCType: NSSecureCoding {
 
         guard containsValue(forKey: key),
             let obj = decodeObject(of: T._ObjectiveCType.self, forKey: key)

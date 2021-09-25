@@ -28,7 +28,7 @@ extension AppDelegate {
 
     // MARK: - DuckDuckGo
 
-#if OUT_OF_APPSTORE
+#if OUT_OF_APPSTORE && !BETA
 
     @IBAction func checkForUpdates(_ sender: Any?) {
         updateController.checkForUpdates(sender)
@@ -42,12 +42,24 @@ extension AppDelegate {
         WindowsManager.openNewWindow()
     }
 
+    @IBAction func newTab(_ sender: Any?) {
+        WindowsManager.openNewWindow()
+    }
+
+    @IBAction func newBurnerTab(_ sender: Any?) {
+        WindowsManager.openNewWindow(withBurnerTab: true)
+    }
+
     @IBAction func openLocation(_ sender: Any?) {
         WindowsManager.openNewWindow()
     }
 
     @IBAction func closeAllWindows(_ sender: Any?) {
         WindowsManager.closeWindows()
+    }
+
+    @IBAction func closeAllBurnerTabs(_ sender: Any?) {
+        WindowsManager.closeAllBurnerTabs()
     }
 
     // MARK: - Help
@@ -66,9 +78,7 @@ extension AppDelegate {
         DefaultConfigurationStorage.shared.log()
         ConfigurationManager.shared.log()
 
-        let tab = Tab()
-        tab.url = URL.feedback
-
+        let tab = Tab(content: .url(.feedback))
         let tabCollectionViewModel = mainViewController.tabCollectionViewModel
         tabCollectionViewModel.append(tab: tab)
     }
@@ -81,26 +91,25 @@ extension AppDelegate {
             return
         }
 
-        let tab = Tab()
         guard let bookmark = menuItem.representedObject as? Bookmark else {
             assertionFailure("Unexpected type of menuItem.representedObject: \(type(of: menuItem.representedObject))")
             return
         }
         Pixel.fire(.navigation(kind: .bookmark(isFavorite: bookmark.isFavorite), source: .mainMenu))
 
-        tab.url = bookmark.url
+        let tab = Tab(content: .url(bookmark.url))
         WindowsManager.openNewWindow(with: tab)
     }
 
     @IBAction func showManageBookmarks(_ sender: Any?) {
-        let tabCollection = TabCollection(tabs: [Tab(tabType: .bookmarks)])
+        let tabCollection = TabCollection(tabs: [Tab(content: .bookmarks)])
         let tabCollectionViewModel = TabCollectionViewModel(tabCollection: tabCollection)
         Pixel.fire(.manageBookmarks(source: .mainMenu))
         WindowsManager.openNewWindow(with: tabCollectionViewModel)
     }
 
     @IBAction func openPreferences(_ sender: Any?) {
-        let tabCollection = TabCollection(tabs: [Tab(tabType: .preferences)])
+        let tabCollection = TabCollection(tabs: [Tab(content: .preferences)])
         let tabCollectionViewModel = TabCollectionViewModel(tabCollection: tabCollection)
         WindowsManager.openNewWindow(with: tabCollectionViewModel)
     }
@@ -149,6 +158,10 @@ extension AppDelegate {
         }
     }
 
+    @IBAction func fireButtonAction(_ sender: NSButton) {
+        FireViewController.fireButtonAction()
+    }
+
 }
 
 extension MainViewController {
@@ -156,13 +169,17 @@ extension MainViewController {
     // MARK: - Main Menu
 
     @IBAction func openPreferences(_ sender: Any?) {
-        tabCollectionViewModel.appendNewTab(type: .preferences)
+        tabCollectionViewModel.appendNewTab(with: .preferences)
     }
 
     // MARK: - File
 
     @IBAction func newTab(_ sender: Any?) {
-        tabCollectionViewModel.appendNewTab()
+        tabCollectionViewModel.appendNewTab(with: .homepage)
+    }
+
+    @IBAction func newBurnerTab(_ sender: Any?) {
+        tabCollectionViewModel.appendNewTab(with: .homepage, tabStorageType: .burner)
     }
 
     @IBAction func openLocation(_ sender: Any?) {
@@ -223,6 +240,10 @@ extension MainViewController {
         }
 
         selectedTabViewModel.tab.webView.magnification = 1.0
+    }
+
+    @IBAction func toggleDownloads(_ sender: Any) {
+        navigationBarViewController.toggleDownloadsPopover()
     }
 
     // MARK: - History
@@ -291,7 +312,13 @@ extension MainViewController {
 
         Pixel.fire(.navigation(kind: .bookmark(isFavorite: bookmark.isFavorite), source: .mainMenu))
 
-        selectedTabViewModel.tab.url = bookmark.url
+        if NSApplication.shared.isCommandPressed && NSApplication.shared.isShiftPressed {
+            WindowsManager.openNewWindow(with: bookmark.url)
+        } else if NSApplication.shared.isCommandPressed {
+            WindowControllersManager.shared.show(url: bookmark.url, newTab: true)
+        } else {
+            selectedTabViewModel.tab.setContent(.url(bookmark.url))
+        }
     }
 
     @IBAction func openAllInTabs(_ sender: Any?) {
@@ -304,12 +331,12 @@ extension MainViewController {
             return
         }
 
-        let tabs = models.compactMap { $0.entity as? Bookmark }.map { Tab(url: $0.url, shouldLoadInBackground: true) }
+        let tabs = models.compactMap { $0.entity as? Bookmark }.map { Tab(content: .url($0.url), shouldLoadInBackground: true) }
         tabCollectionViewModel.append(tabs: tabs)
     }
 
     @IBAction func showManageBookmarks(_ sender: Any?) {
-        tabCollectionViewModel.appendNewTab(type: .bookmarks)
+        tabCollectionViewModel.appendNewTab(with: .bookmarks)
         Pixel.fire(.manageBookmarks(source: .mainMenu))
     }
 
@@ -333,7 +360,10 @@ extension MainViewController {
             return
         }
         let index = keyEquivalent - 1
-        if index >= 0 && index < tabCollectionViewModel.tabCollection.tabs.count {
+        if keyEquivalent == 9,
+           !tabCollectionViewModel.tabCollection.tabs.isEmpty {
+            tabCollectionViewModel.select(at: tabCollectionViewModel.tabCollection.tabs.count - 1)
+        } else if tabCollectionViewModel.tabCollection.tabs.indices.contains(index) {
             tabCollectionViewModel.select(at: index)
         }
     }
@@ -368,7 +398,7 @@ extension MainViewController {
 
     /// Declines handling findInPage action if there's no page loaded currently.
     override func responds(to aSelector: Selector!) -> Bool {
-        if aSelector == #selector(findInPage(_:)) && tabCollectionViewModel.selectedTabViewModel?.tab.url == nil {
+        if aSelector == #selector(findInPage(_:)) && tabCollectionViewModel.selectedTabViewModel?.tab.content.url == nil {
             return false
         }
 
@@ -382,12 +412,15 @@ extension MainViewController {
     // MARK: - Printing
 
     @IBAction func printWebView(_ sender: Any?) {
-        guard let webView = tabCollectionViewModel.selectedTabViewModel?.tab.webView else { return }
-        if #available(macOS 11.0, *) {
-            // This might throw an exception when running from Xcode, hit resume and it will continue.
-            // Release builds work fine.
-            webView.printOperation(with: NSPrintInfo.shared).run()
+        guard let webView = tabCollectionViewModel.selectedTabViewModel?.tab.webView,
+              let window = webView.window,
+              let printOperation = webView.printOperation()
+              else { return }
+        
+        if printOperation.view?.frame.isEmpty == true {
+            printOperation.view?.frame = webView.bounds
         }
+        printOperation.runModal(for: window, delegate: nil, didRun: nil, contextInfo: nil)
     }
 
     // MARK: - Saving
@@ -430,11 +463,34 @@ extension MainViewController {
         }
     }
 
+    // MARK: - Developer Tools
+
+    @IBAction func toggleDeveloperTools(_ sender: Any?) {
+        if tabCollectionViewModel.selectedTabViewModel?.tab.webView.isInspectorShown == true {
+            tabCollectionViewModel.selectedTabViewModel?.tab.webView.closeDeveloperTools()
+        } else {
+            tabCollectionViewModel.selectedTabViewModel?.tab.webView.openDeveloperTools()
+        }
+    }
+
+    @IBAction func openJavaScriptConsole(_ sender: Any?) {
+        tabCollectionViewModel.selectedTabViewModel?.tab.webView.openJavaScriptConsole()
+    }
+
+    @IBAction func showPageSource(_ sender: Any?) {
+        tabCollectionViewModel.selectedTabViewModel?.tab.webView.showPageSource()
+    }
+
+    @IBAction func showPageResources(_ sender: Any?) {
+        tabCollectionViewModel.selectedTabViewModel?.tab.webView.showPageSource()
+    }
+
 }
 
 extension MainViewController: NSMenuItemValidation {
     
     // swiftlint:disable cyclomatic_complexity
+    // swiftlint:disable function_body_length
     func validateMenuItem(_ menuItem: NSMenuItem) -> Bool {
         // Enable "Move to another Display" menu item (is there a better way?)
         for item in menuItem.menu!.items where item.action == Selector(("_moveToDisplay:")) {
@@ -489,10 +545,27 @@ extension MainViewController: NSMenuItemValidation {
              #selector(MainViewController.showPreviousTab(_:)):
             return tabCollectionViewModel.tabCollection.tabs.count > 1
 
+        // Developer Tools
+        case #selector(MainViewController.toggleDeveloperTools(_:)):
+            let isInspectorShown = tabCollectionViewModel.selectedTabViewModel?.tab.webView.isInspectorShown ?? false
+            menuItem.title = isInspectorShown ? UserText.closeDeveloperTools : UserText.openDeveloperTools
+            fallthrough
+        case #selector(MainViewController.openJavaScriptConsole(_:)),
+             #selector(MainViewController.showPageSource(_:)),
+             #selector(MainViewController.showPageResources(_:)):
+            return tabCollectionViewModel.selectedTabViewModel?.canReload == true
+
+        case #selector(MainViewController.toggleDownloads(_:)):
+            let isDownloadsPopoverShown = self.navigationBarViewController.isDownloadsPopoverShown
+            menuItem.title = isDownloadsPopoverShown ? UserText.closeDownloads : UserText.openDownloads
+
+            return true
+
         default:
             return true
         }
     }
+    // swiftlint:enable function_body_length
     // swiftlint:enable cyclomatic_complexity
 
 }
@@ -501,9 +574,13 @@ extension AppDelegate: NSMenuItemValidation {
 
     func validateMenuItem(_ menuItem: NSMenuItem) -> Bool {
         switch menuItem.action {
-        // Close all windows
         case #selector(AppDelegate.closeAllWindows(_:)):
             return !WindowControllersManager.shared.mainWindowControllers.isEmpty
+
+        case #selector(AppDelegate.closeAllBurnerTabs(_:)):
+            return !WindowControllersManager.shared.mainWindowControllers.compactMap {
+                $0.mainViewController.tabCollectionViewModel.tabCollection.tabs.contains { $0.tabStorageType == .burner } ? $0 : nil
+            }.isEmpty
 
         default:
             return true

@@ -33,11 +33,14 @@ protocol TabCollectionViewModelDelegate: AnyObject {
 
 }
 
+// swiftlint:disable type_body_length
 final class TabCollectionViewModel: NSObject {
 
     weak var delegate: TabCollectionViewModelDelegate?
 
     private(set) var tabCollection: TabCollection
+
+    var changesEnabled = true
 
     private var tabViewModels = [Tab: TabViewModel]()
     @Published private(set) var selectionIndex: Int? {
@@ -67,7 +70,7 @@ final class TabCollectionViewModel: NSObject {
         subscribeToLastRemovedTab()
 
         if tabCollection.tabs.isEmpty {
-            appendNewTab()
+            appendNewTab(with: .homepage)
         }
         if self.selectionIndex != selectionIndex {
             self.selectionIndex = selectionIndex
@@ -89,7 +92,10 @@ final class TabCollectionViewModel: NSObject {
         return tabViewModels[tab]
     }
 
-    @discardableResult func select(at index: Int) -> Bool {
+    // MARK: - Selection
+
+    @discardableResult func select(at index: Int, forceChange: Bool = false) -> Bool {
+        guard changesEnabled || forceChange else { return false }
         guard index >= 0, index < tabCollection.tabs.count else {
             os_log("TabCollectionViewModel: Index out of bounds", type: .error)
             selectionIndex = nil
@@ -102,6 +108,7 @@ final class TabCollectionViewModel: NSObject {
     }
 
     func selectNext() {
+        guard changesEnabled else { return }
         guard tabCollection.tabs.count > 0 else {
             os_log("TabCollectionViewModel: No tabs for selection", type: .error)
             return
@@ -118,6 +125,7 @@ final class TabCollectionViewModel: NSObject {
     }
 
     func selectPrevious() {
+        guard changesEnabled else { return }
         guard tabCollection.tabs.count > 0 else {
             os_log("TabCollectionViewModel: No tabs for selection", type: .error)
             return
@@ -133,15 +141,19 @@ final class TabCollectionViewModel: NSObject {
         }
     }
 
-    func appendNewTab(type: Tab.TabType = .standard) {
-        append(tab: Tab(tabType: type), selected: true)
+    // MARK: - Addition
+
+    func appendNewTab(with content: Tab.TabContent = .homepage, tabStorageType: Tab.TabStorageType = .default, forceChange: Bool = false) {
+        append(tab: Tab(content: content, tabStorageType: tabStorageType), selected: true)
     }
 
-    func append(tab: Tab, selected: Bool = true) {
+    func append(tab: Tab, selected: Bool = true, forceChange: Bool = false) {
+        guard changesEnabled || forceChange else { return }
+
         tabCollection.append(tab: tab)
 
         if selected {
-            select(at: tabCollection.tabs.count - 1)
+            select(at: tabCollection.tabs.count - 1, forceChange: forceChange)
             delegate?.tabCollectionViewModelDidAppend(self, selected: true)
         } else {
             delegate?.tabCollectionViewModelDidAppend(self, selected: false)
@@ -153,6 +165,8 @@ final class TabCollectionViewModel: NSObject {
     }
 
     func append(tabs: [Tab]) {
+        guard changesEnabled else { return }
+
         tabs.forEach {
             tabCollection.append(tab: $0)
         }
@@ -163,6 +177,8 @@ final class TabCollectionViewModel: NSObject {
     }
 
     func insert(tab: Tab, at index: Int = 0, selected: Bool = true) {
+        guard changesEnabled else { return }
+
         tabCollection.insert(tab: tab, at: index)
         if selected {
             select(at: index)
@@ -175,10 +191,11 @@ final class TabCollectionViewModel: NSObject {
     }
 
     func insertNewTab(at index: Int = 0) {
-        insert(tab: Tab(), at: index)
+        insert(tab: Tab(content: .homepage), at: index)
     }
 
     func insertChild(tab: Tab, selected: Bool) {
+        guard changesEnabled else { return }
         guard let parentTab = tab.parentTab,
               let parentTabIndex = tabCollection.tabs.firstIndex(where: { $0 === parentTab }) else {
             os_log("TabCollection: No tab selected", type: .error)
@@ -191,7 +208,11 @@ final class TabCollectionViewModel: NSObject {
         insert(tab: tab, at: newIndex, selected: selected)
     }
 
+    // MARK: - Removal
+
     func remove(at index: Int) {
+        guard changesEnabled else { return }
+
         let parentTab = tabCollection.tabs[safe: index]?.parentTab
         guard tabCollection.remove(at: index) else { return }
 
@@ -231,6 +252,8 @@ final class TabCollectionViewModel: NSObject {
     }
 
     func removeAllTabs(except exceptionIndex: Int? = nil) {
+        guard changesEnabled else { return }
+
         tabCollection.removeAll(andAppend: exceptionIndex.map { tabCollection.tabs[$0] })
 
         if exceptionIndex != nil {
@@ -241,14 +264,30 @@ final class TabCollectionViewModel: NSObject {
         delegate?.tabCollectionViewModelDidMultipleChanges(self)
     }
 
-    func removeAllTabsAndAppendNewTab() {
-        tabCollection.removeAll(andAppend: Tab())
-        select(at: 0)
+    func removeTabs(after index: Int) {
+        guard changesEnabled else { return }
+
+        tabCollection.removeTabs(after: index)
+
+        if !tabCollection.tabs.indices.contains(selectionIndex ?? -1) {
+            selectionIndex = tabCollection.tabs.indices.last
+        }
+        
+        delegate?.tabCollectionViewModelDidMultipleChanges(self)
+    }
+
+    func removeAllTabsAndAppendNewTab(forceChange: Bool = false) {
+        guard changesEnabled || forceChange else { return }
+
+        tabCollection.removeAll(andAppend: Tab(content: .homepage))
+        select(at: 0, forceChange: forceChange)
 
         delegate?.tabCollectionViewModelDidMultipleChanges(self)
     }
 
     func remove(ownerOf webView: WebView) {
+        guard changesEnabled else { return }
+
         let webViews = tabCollection.tabs.map { $0.webView }
         guard let index = webViews.firstIndex(of: webView) else {
             os_log("TabCollection: Failed to get index of the tab", type: .error)
@@ -259,6 +298,8 @@ final class TabCollectionViewModel: NSObject {
     }
 
     func removeSelected() {
+        guard changesEnabled else { return }
+
         guard let selectionIndex = selectionIndex else {
             os_log("TabCollectionViewModel: No tab selected", type: .error)
             return
@@ -267,7 +308,11 @@ final class TabCollectionViewModel: NSObject {
         self.remove(at: selectionIndex)
     }
 
+    // MARK: - Others
+
     func putBackLastRemovedTab() {
+        guard changesEnabled else { return }
+
         let lastRemovedTabIndex = tabCollection.lastRemovedTabCache?.index
         tabCollection.putBackLastRemovedTab()
 
@@ -279,14 +324,15 @@ final class TabCollectionViewModel: NSObject {
     }
 
     func duplicateTab(at index: Int) {
+        guard changesEnabled else { return }
+
         guard index >= 0, index < tabCollection.tabs.count else {
             os_log("TabCollectionViewModel: Index out of bounds", type: .error)
             return
         }
 
         let tab = tabCollection.tabs[index]
-        let tabCopy = Tab()
-        tabCopy.url = tab.url
+        let tabCopy = Tab(content: tab.content, tabStorageType: tab.tabStorageType, sessionStateData: tab.sessionStateData)
         let newIndex = index + 1
 
         tabCollection.insert(tab: tabCopy, at: newIndex)
@@ -296,6 +342,8 @@ final class TabCollectionViewModel: NSObject {
     }
 
     func moveTab(at index: Int, to newIndex: Int) {
+        guard changesEnabled else { return }
+
         tabCollection.moveTab(at: index, to: newIndex)
         select(at: newIndex)
 
@@ -343,6 +391,43 @@ final class TabCollectionViewModel: NSObject {
 
     private func updateCanInsertLastRemovedTab() {
         canInsertLastRemovedTab = tabCollection.lastRemovedTabCache != nil
+    }
+
+}
+// swiftlint:enable type_body_length
+
+// MARK: Burner Tabs suport
+extension TabCollectionViewModel {
+
+    static func makeWithDefaultTab(isBurner: Bool) -> TabCollectionViewModel {
+        let tab = Tab(content: .homepage, tabStorageType: isBurner ? .burner : .default)
+        return TabCollectionViewModel(tabCollection: TabCollection(tabs: [tab]))
+    }
+
+    func removeBurnerTabs() {
+        tabCollection.removeBurnerTabs()
+
+        if !tabCollection.tabs.indices.contains(selectionIndex ?? -1) {
+            selectionIndex = tabCollection.tabs.indices.last
+        }
+
+        delegate?.tabCollectionViewModelDidMultipleChanges(self)
+    }
+
+    func convertToStandardTab(at index: Int) {
+        guard index >= 0, index < tabCollection.tabs.count else {
+            os_log("TabCollectionViewModel: Index out of bounds", type: .error)
+            return
+        }
+
+        let tab = tabCollection.tabs[index]
+        let tabCopy = Tab(content: tab.content)
+        let newIndex = index + 1
+
+        tabCollection.insert(tab: tabCopy, at: newIndex)
+        select(at: newIndex)
+
+        delegate?.tabCollectionViewModelDidInsert(self, at: newIndex, selected: true)
     }
 
 }

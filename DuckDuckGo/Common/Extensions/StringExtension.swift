@@ -43,9 +43,13 @@ extension String {
         trimmingCharacters(in: .whitespacesAndNewlines)
     }
 
-    func nsRange(from range: Range<String.Index>) -> NSRange {
-        return NSRange(location: self[..<range.lowerBound].utf16.count,
-                       length: self[range].utf16.count)
+    func nsRange(from range: Range<String.Index>? = nil) -> NSRange {
+        if let range = range {
+            return NSRange(location: self[..<range.lowerBound].utf16.count,
+                           length: self[range].utf16.count)
+        } else {
+            return NSRange(location: 0, length: utf16.count)
+        }
     }
 
     func truncated(length: Int, trailing: String = "…") -> String {

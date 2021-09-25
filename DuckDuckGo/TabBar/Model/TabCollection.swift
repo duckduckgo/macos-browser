@@ -57,6 +57,14 @@ final class TabCollection: NSObject {
         tabs = tab.map { [$0] } ?? []
     }
 
+    func removeTabs(after index: Int) {
+        tabs.removeSubrange((index + 1)...)
+    }
+
+    func removeBurnerTabs() {
+        tabs = tabs.filter { $0.tabStorageType != .burner }
+    }
+
     func moveTab(at index: Int, to newIndex: Int) {
         guard index >= 0, index < tabs.count, newIndex >= 0, newIndex < tabs.count else {
             os_log("TabCollection: Index out of bounds", type: .error)
@@ -81,7 +89,7 @@ final class TabCollection: NSObject {
         }
 
         let tab = tabs[index]
-        lastRemovedTabCache = (tab.url, index)
+        lastRemovedTabCache = (tab.content.url, index)
     }
 
     func putBackLastRemovedTab() {
@@ -90,8 +98,7 @@ final class TabCollection: NSObject {
             return
         }
 
-        let tab = Tab()
-        tab.url = lastRemovedTabCache.url
+        let tab = Tab(content: lastRemovedTabCache.url.map(Tab.TabContent.url) ?? .homepage)
         insert(tab: tab, at: min(lastRemovedTabCache.index, tabs.count))
         self.lastRemovedTabCache = nil
     }

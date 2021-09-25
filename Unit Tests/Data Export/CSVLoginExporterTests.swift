@@ -24,7 +24,7 @@ import BrowserServicesKit
 class CSVLoginExporterTests: XCTestCase {
 
     func testWhenExportingLogins_ThenLoginsArePersistedToDisk() {
-        let mockFileStore = MockFileStore()
+        let mockFileStore = FileStoreMock()
         let vault = MockSecureVault()
 
         let credentials = websiteCredentials(identifiers: [1])

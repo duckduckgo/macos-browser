@@ -51,11 +51,11 @@ final class WindowControllersManager {
 extension WindowControllersManager {
 
     func showBookmarksTab() {
-        showTab(type: .bookmarks)
+        showTab(with: .bookmarks)
     }
 
     func showPreferencesTab() {
-        showTab(type: .preferences)
+        showTab(with: .preferences)
     }
 
     /// Opens a bookmark in a tab, respecting the current modifier keys when deciding where to open the bookmark's URL.
@@ -80,38 +80,27 @@ extension WindowControllersManager {
 
             if tabCollection.tabs.count == 1,
                let firstTab = tabCollection.tabs.first,
-               firstTab.isHomepageShown,
+               case .homepage = firstTab.content,
                !newTab {
-                firstTab.url = url
+                firstTab.setContent(.url(url))
             } else if let tab = tabCollectionViewModel.selectedTabViewModel?.tab, !newTab {
-                tab.url = url
+                tab.setContent(.url(url))
             } else {
-                let newTab = Tab()
-                newTab.url = url
+                let newTab = Tab(content: .url(url))
+                newTab.setContent(.url(url))
                 tabCollectionViewModel.append(tab: newTab)
             }
         }
 
         // If there is a main window, open the URL in it
-        if let windowController = mainWindowControllers.first(where: { $0.window?.isMainWindow ?? false }) {
-            show(url: url, in: windowController)
-            return
-        }
+        if let windowController = mainWindowControllers.first(where: { $0.window?.isMainWindow ?? false })
+            // If a last key window is available, open the URL in it
+            ?? lastKeyMainWindowController
+            // If there is any open window on the current screen, open the URL in it
+            ?? mainWindowControllers.first(where: { $0.window?.screen == NSScreen.main })
+            // If there is any window available, open the URL in it
+            ?? mainWindowControllers.first {
 
-        // If a last key window is available, open the URL in it
-        if let windowController = lastKeyMainWindowController {
-            show(url: url, in: windowController)
-            return
-        }
-
-        // If there is any open window on the current screen, open the URL in it
-        if let windowController = mainWindowControllers.first(where: { $0.window?.screen == NSScreen.main }) {
-            show(url: url, in: windowController)
-            return
-        }
-
-        // If there is any window available, open the URL in it
-        if let windowController = mainWindowControllers.first(where: { $0.window?.screen == NSScreen.main }) {
             show(url: url, in: windowController)
             return
         }
@@ -120,7 +109,7 @@ extension WindowControllersManager {
         WindowsManager.openNewWindow(with: url)
     }
 
-    private func showTab(type: Tab.TabType) {
+    private func showTab(with content: Tab.TabContent) {
         guard let windowController = mainWindowControllers.first(where: {
             let isMain = $0.window?.isMainWindow ?? false
             let hasMainChildWindow = $0.window?.childWindows?.contains { $0.isMainWindow } ?? false
@@ -130,7 +119,7 @@ extension WindowControllersManager {
 
         let viewController = windowController.mainViewController
         let tabCollectionViewModel = viewController.tabCollectionViewModel
-        tabCollectionViewModel.appendNewTab(type: type)
+        tabCollectionViewModel.appendNewTab(with: content)
     }
 
 }

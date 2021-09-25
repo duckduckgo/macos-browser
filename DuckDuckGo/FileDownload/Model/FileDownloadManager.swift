@@ -20,18 +20,39 @@ import Cocoa
 import Combine
 import os
 
-final class FileDownloadManager {
+protocol FileDownloadManagerProtocol: AnyObject {
+    var downloads: Set<WebKitDownloadTask> { get }
+    var downloadsPublisher: AnyPublisher<WebKitDownloadTask, Never> { get }
+
+    @discardableResult
+    func add(_ download: WebKitDownload,
+             delegate: FileDownloadManagerDelegate?,
+             location: FileDownloadManager.DownloadLocationPreference,
+             postflight: FileDownloadManager.PostflightAction?) -> WebKitDownloadTask
+
+    func cancelAll(waitUntilDone: Bool)
+}
+
+final class FileDownloadManager: FileDownloadManagerProtocol {
 
     static let shared = FileDownloadManager()
     private let workspace: NSWorkspace
     private let preferences: DownloadPreferences
+    private let historyCoordinating: HistoryCoordinating
 
-    init(workspace: NSWorkspace = .shared, preferences: DownloadPreferences = .init()) {
+    init(workspace: NSWorkspace = .shared,
+         preferences: DownloadPreferences = .init(),
+         historyCoordinating: HistoryCoordinating = HistoryCoordinator.shared) {
         self.workspace = workspace
         self.preferences = preferences
+        self.historyCoordinating = historyCoordinating
     }
 
-    @PublishedAfter private (set) var downloads = Set<WebKitDownloadTask>()
+    private (set) var downloads = Set<WebKitDownloadTask>()
+    private var downloadAddedSubject = PassthroughSubject<WebKitDownloadTask, Never>()
+    var downloadsPublisher: AnyPublisher<WebKitDownloadTask, Never> {
+        downloadAddedSubject.eraseToAnyPublisher()
+    }
 
     typealias FileNameChooserCallback = (/*suggestedFilename:*/ String?,
                                          /*directoryURL:*/      URL?,
@@ -47,23 +68,74 @@ final class FileDownloadManager {
         case open
     }
 
+    enum DownloadLocationPreference: Equatable {
+        case auto
+        case prompt
+        case preset(destinationURL: URL, tempURL: URL?)
+
+        var destinationURL: URL? {
+            guard case .preset(destinationURL: let url, tempURL: _) = self else { return nil }
+            return url
+        }
+
+        var tempURL: URL? {
+            guard case .preset(destinationURL: _, tempURL: let url) = self else { return nil }
+            return url
+        }
+
+        var promptForLocation: Bool {
+            switch self {
+            case .prompt: return true
+            case .preset, .auto: return false
+            }
+        }
+    }
+
     @discardableResult
     func add(_ download: WebKitDownload,
              delegate: FileDownloadManagerDelegate?,
-             promptForLocation: Bool,
+             location: DownloadLocationPreference,
              postflight: PostflightAction?) -> WebKitDownloadTask {
+        dispatchPrecondition(condition: .onQueue(.main))
 
         let task = WebKitDownloadTask(download: download,
-                                      promptForLocation: promptForLocation,
+                                      promptForLocation: location.promptForLocation,
+                                      destinationURL: location.destinationURL,
+                                      tempURL: location.tempURL,
                                       postflight: postflight)
 
         self.destinationChooserCallbacks[task] = delegate?.chooseDestination
         self.fileIconOriginalRectCallbacks[task] = delegate?.fileIconFlyAnimationOriginalRect
 
         downloads.insert(task)
+        downloadAddedSubject.send(task)
         task.start(delegate: self)
 
+        if let url = download.originalRequest?.url { historyCoordinating.markDownloadUrl(url) }
+        if let mainDocumentUrl = download.originalRequest?.mainDocumentURL { historyCoordinating.markDownloadUrl(mainDocumentUrl) }
+
         return task
+    }
+
+    func cancelAll(waitUntilDone: Bool) {
+        dispatchPrecondition(condition: .onQueue(.main))
+
+        let dispatchGroup: DispatchGroup? = waitUntilDone ? DispatchGroup() : nil
+        var cancellables = Set<AnyCancellable>()
+        for task in downloads {
+            if waitUntilDone {
+                dispatchGroup?.enter()
+                task.output.sink { _ in
+                    dispatchGroup?.leave()
+                } receiveValue: { _ in }
+                .store(in: &cancellables)
+            }
+
+            task.cancel()
+        }
+        if let dispatchGroup = dispatchGroup {
+            RunLoop.main.run(until: RunLoop.ResumeCondition(dispatchGroup: dispatchGroup))
+        }
     }
 
 }
@@ -89,7 +161,7 @@ extension FileDownloadManager: WebKitDownloadTaskDelegate {
         }
 
         let selectedDownloadLocation = preferences.selectedDownloadLocation
-        let fileType = task.fileType
+        let fileType = task.suggestedFileType
 
         guard task.shouldPromptForLocation || preferences.alwaysRequestDownloadLocation,
               let locationChooser = self.destinationChooserCallbacks[task]
@@ -136,6 +208,9 @@ extension FileDownloadManager: WebKitDownloadTaskDelegate {
         }
 
         if case .success(let url) = result {
+            try? url.setQuarantineAttributes(sourceURL: task.originalRequest?.url,
+                                             referrerURL: task.originalRequest?.mainDocumentURL)
+
             switch task.postflight {
             case .open:
                 self.workspace.open(url)

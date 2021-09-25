@@ -68,8 +68,12 @@ final class SuggestionViewModel {
             return phrase
         case .website(url: let url):
             return url.toString(forUserInput: userStringValue)
-        case .historyEntry(title: let title, url: let url):
-            return title ?? url.toString(forUserInput: userStringValue)
+        case .historyEntry(title: let title, url: let url, allowedInTopHits: _):
+            if url.isDuckDuckGoSearch {
+                return url.searchQuery ?? url.toString(forUserInput: userStringValue)
+            } else {
+                return title ?? url.toString(forUserInput: userStringValue)
+            }
         case .bookmark(title: let title, url: _, isFavorite: _):
             return title
         case .unknown(value: let value):
@@ -83,8 +87,12 @@ final class SuggestionViewModel {
              .website(url: _),
              .unknown(value: _):
             return nil
-        case .historyEntry(title: let title, url: _):
-            return title
+        case .historyEntry(title: let title, url: let url, allowedInTopHits: _):
+            if url.isDuckDuckGoSearch {
+                return url.searchQuery
+            } else {
+                return title
+            }
         case .bookmark(title: let title, url: _, isFavorite: _):
             return title
         }
@@ -92,7 +100,7 @@ final class SuggestionViewModel {
 
     var autocompletionString: String {
         switch suggestion {
-        case .historyEntry(title: _, url: let url),
+        case .historyEntry(title: _, url: let url, allowedInTopHits: _),
              .bookmark(title: _, url: let url, isFavorite: _):
 
             let userStringValue = self.userStringValue.lowercased()
@@ -118,12 +126,16 @@ final class SuggestionViewModel {
 
         case .phrase, .unknown, .website:
             return ""
-        case .historyEntry(title: _, url: let url),
+        case .historyEntry(title: _, url: let url, allowedInTopHits: _),
              .bookmark(title: _, url: let url, isFavorite: _):
-            return " – " + url.toString(decodePunycode: true,
-                                        dropScheme: true,
-                                        needsWWW: false,
-                                        dropTrailingSlash: false)
+            if url.isDuckDuckGoSearch {
+                return " – \(UserText.searchDuckDuckGoSuffix)"
+            } else {
+                return " – " + url.toString(decodePunycode: true,
+                                              dropScheme: true,
+                                              needsWWW: false,
+                                              dropTrailingSlash: true)
+            }
         }
     }
 
@@ -141,7 +153,7 @@ final class SuggestionViewModel {
             return Self.searchImage
         case .website(url: _):
             return Self.webImage
-        case .historyEntry(title: _, url: _):
+        case .historyEntry(title: _, url: _, allowedInTopHits: _):
             return Self.historyImage
         case .bookmark(title: _, url: _, isFavorite: false):
             return Self.bookmarkImage

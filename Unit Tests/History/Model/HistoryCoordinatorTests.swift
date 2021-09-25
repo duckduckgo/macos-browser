@@ -138,6 +138,67 @@ class HistoryCoordinatorTests: XCTestCase {
         XCTAssert(historyStoringMock.cleanAndReloadHistoryExteptions.first!.url.host!.hasPrefix(fireproofDomain))
     }
 
+    func testWhenDomainIsVisitedForTheFirstTimeUsingTheNonRootUrl_ThenItsRootUrlIsGenerated() {
+        let (historyStoringMock, historyCoordinator) = HistoryCoordinator.aHistoryCoordinator
+
+        let nonRootUrl = URL(string: "https://duckduckgo.com/privacy")!
+        historyCoordinator.addVisit(of: nonRootUrl)
+        Thread.sleep(forTimeInterval: 0.1)
+
+        XCTAssert(historyStoringMock.savedHistoryEntries[0].url == URL(string: "https://duckduckgo.com/privacy"))
+        XCTAssert(historyStoringMock.savedHistoryEntries[1].url == URL(string: "https://duckduckgo.com/"))
+
+        historyCoordinator.addVisit(of: nonRootUrl)
+        Thread.sleep(forTimeInterval: 0.1)
+
+        XCTAssert(historyStoringMock.savedHistoryEntries[2].url == URL(string: "https://duckduckgo.com/privacy"))
+        XCTAssertEqual(historyStoringMock.savedHistoryEntries.count, 3)
+    }
+
+    func testWhenUrlIsMarkedAsDownload_ThenIsDownloadFlagIsStored() {
+        let (historyStoringMock, historyCoordinator) = HistoryCoordinator.aHistoryCoordinator
+
+        let downloadUrl = URL(string: "https://duckduckgo.com/download")!
+        historyCoordinator.addVisit(of: downloadUrl)
+        Thread.sleep(forTimeInterval: 0.1)
+
+        historyCoordinator.markDownloadUrl(downloadUrl)
+        Thread.sleep(forTimeInterval: 0.1)
+
+        XCTAssertTrue(historyStoringMock.savedHistoryEntries.last?.isDownload ?? false)
+    }
+
+    func testWhenUrlIsMarkedAsFailedToLoad_ThenFailedToLoadFlagIsStored() {
+        let (historyStoringMock, historyCoordinator) = HistoryCoordinator.aHistoryCoordinator
+
+        let url = URL(string: "https://duckduckgo.com")!
+        historyCoordinator.addVisit(of: url)
+        Thread.sleep(forTimeInterval: 0.1)
+
+        historyCoordinator.markFailedToLoadUrl(url)
+        Thread.sleep(forTimeInterval: 0.1)
+
+        XCTAssertEqual(url, historyStoringMock.savedHistoryEntries.last?.url)
+        XCTAssert(historyStoringMock.savedHistoryEntries.last?.failedToLoad ?? false)
+    }
+
+    func testWhenUrlIsMarkedAsFailedToLoadAndItIsVisitedAgain_ThenFailedToLoadFlagIsSetToFalse() {
+        let (historyStoringMock, historyCoordinator) = HistoryCoordinator.aHistoryCoordinator
+
+        let url = URL(string: "https://duckduckgo.com")!
+        historyCoordinator.addVisit(of: url)
+        Thread.sleep(forTimeInterval: 0.1)
+
+        historyCoordinator.markFailedToLoadUrl(url)
+        Thread.sleep(forTimeInterval: 0.1)
+
+        historyCoordinator.addVisit(of: url)
+        Thread.sleep(forTimeInterval: 0.1)
+
+        XCTAssertEqual(url, historyStoringMock.savedHistoryEntries.last?.url)
+        XCTAssertFalse(historyStoringMock.savedHistoryEntries.last?.failedToLoad ?? true)
+    }
+
 }
 
 fileprivate extension HistoryCoordinator {

@@ -19,7 +19,7 @@
 import Foundation
 import CryptoKit
 
-final class EncryptedValueTransformer<T: NSCoding & NSObject>: ValueTransformer {
+final class EncryptedValueTransformer<T: NSSecureCoding & NSObject>: ValueTransformer {
 
     private let encryptionKey: SymmetricKey
 
@@ -36,8 +36,17 @@ final class EncryptedValueTransformer<T: NSCoding & NSObject>: ValueTransformer 
     }
 
     override func transformedValue(_ value: Any?) -> Any? {
-        guard let castValue = value as? T,
-              let archivedData = try? NSKeyedArchiver.archivedData(withRootObject: castValue, requiringSecureCoding: true) else { return nil }
+        guard let castValue = value as? T else {
+            assertionFailure("\(String(describing: value)) could not be converted to \(T.self)")
+            return nil
+        }
+        let archivedData: Data
+        do {
+            archivedData = try NSKeyedArchiver.archivedData(withRootObject: castValue, requiringSecureCoding: true)
+        } catch {
+            assertionFailure("Could not archive value \(castValue): \(error)")
+            return nil
+        }
 
         return try? DataEncryption.encrypt(data: archivedData, key: encryptionKey)
     }

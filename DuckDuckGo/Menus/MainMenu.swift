@@ -24,9 +24,17 @@ final class MainMenu: NSMenu {
 
     @IBOutlet weak var checkForUpdatesMenuItem: NSMenuItem?
     @IBOutlet weak var checkForUpdatesSeparatorItem: NSMenuItem?
-    
+
+    @IBOutlet weak var newWindowMenuItem: NSMenuItem!
+    @IBOutlet weak var newTabMenuItem: NSMenuItem!
+    @IBOutlet weak var openLocationMenuItem: NSMenuItem!
+    @IBOutlet weak var closeWindowMenuItem: NSMenuItem!
+    @IBOutlet weak var closeAllWindowsMenuItem: NSMenuItem!
+    @IBOutlet weak var closeTabMenuItem: NSMenuItem!
+    @IBOutlet weak var burnWebsiteDataMenuItem: NSMenuItem!
     @IBOutlet weak var printSeparatorItem: NSMenuItem?
     @IBOutlet weak var printMenuItem: NSMenuItem?
+    @IBOutlet weak var shareMenuItem: NSMenuItem!
 
     @IBOutlet weak var checkSpellingWhileTypingMenuItem: NSMenuItem?
     @IBOutlet weak var checkGrammarWithSpellingMenuItem: NSMenuItem?
@@ -54,6 +62,8 @@ final class MainMenu: NSMenu {
     @IBOutlet weak var zoomOutMenuItem: NSMenuItem?
     @IBOutlet weak var actualSizeMenuItem: NSMenuItem?
 
+    let sharingMenu = SharingMenu()
+
     required init(coder: NSCoder) {
         super.init(coder: coder)
 
@@ -63,12 +73,12 @@ final class MainMenu: NSMenu {
     override func update() {
         super.update()
 
-        if #available(macOS 11, *) {
-            // no-op
-        } else {
+        if !WKWebView.canPrint {
             printMenuItem?.removeFromParent()
             printSeparatorItem?.removeFromParent()
         }
+        sharingMenu.title = shareMenuItem.title
+        shareMenuItem.submenu = sharingMenu
 
 #if !OUT_OF_APPSTORE
 
@@ -79,7 +89,7 @@ final class MainMenu: NSMenu {
     }
 
     private func setup() {
-
+        self.delegate = self
 #if !FEEDBACK
 
         guard let helpMenuItemSubmenu = helpMenuItem?.submenu,
@@ -121,15 +131,19 @@ final class MainMenu: NSMenu {
             }
     }
 
+    // Nested recursing functions cause body length
+    // swiftlint:disable function_body_length
     func updateBookmarksMenu(favoriteViewModels: [BookmarkViewModel], topLevelBookmarkViewModels: [BookmarkViewModel]) {
 
-        func bookmarkMenuItems(from bookmarkViewModels: [BookmarkViewModel]) -> [NSMenuItem] {
+        func bookmarkMenuItems(from bookmarkViewModels: [BookmarkViewModel], topLevel: Bool = true) -> [NSMenuItem] {
             var menuItems = [NSMenuItem]()
 
-            let showOpenInTabsItem = bookmarkViewModels.compactMap { $0.entity as? Bookmark }.count > 1
-            if  showOpenInTabsItem {
-                menuItems.append(NSMenuItem(bookmarkViewModels: bookmarkViewModels))
-                menuItems.append(.separator())
+            if !topLevel {
+                let showOpenInTabsItem = bookmarkViewModels.compactMap { $0.entity as? Bookmark }.count > 1
+                if showOpenInTabsItem {
+                    menuItems.append(NSMenuItem(bookmarkViewModels: bookmarkViewModels))
+                    menuItems.append(.separator())
+                }
             }
 
             for viewModel in bookmarkViewModels {
@@ -138,7 +152,7 @@ final class MainMenu: NSMenu {
                 if let folder = viewModel.entity as? BookmarkFolder {
                     let subMenu = NSMenu(title: folder.title)
                     let childViewModels = folder.children.map(BookmarkViewModel.init)
-                    let childMenuItems = bookmarkMenuItems(from: childViewModels)
+                    let childMenuItems = bookmarkMenuItems(from: childViewModels, topLevel: false)
                     subMenu.items = childMenuItems
 
                     if !subMenu.items.isEmpty {
@@ -182,6 +196,20 @@ final class MainMenu: NSMenu {
         let cleanedFavoriteItems = favoritesMenu.items.dropLast(favoritesMenu.items.count - (favoriteThisPageSeparatorIndex + 1))
         let favoriteItems = favoriteMenuItems(from: favoriteViewModels)
         favoritesMenu.items = Array(cleanedFavoriteItems) + favoriteItems
+    }
+    // swiftlint:enable function_body_length
+
+}
+
+extension MainMenu: NSMenuDelegate {
+
+    func menuHasKeyEquivalent(_ menu: NSMenu,
+                              for event: NSEvent,
+                              target: AutoreleasingUnsafeMutablePointer<AnyObject?>,
+                              action: UnsafeMutablePointer<Selector?>) -> Bool {
+        sharingMenu.update()
+        shareMenuItem.submenu = sharingMenu
+        return false
     }
 
 }

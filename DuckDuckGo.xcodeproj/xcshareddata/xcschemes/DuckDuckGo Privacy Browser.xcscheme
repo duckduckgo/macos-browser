@@ -15,13 +15,13 @@
             <BuildableReference
                BuildableIdentifier = "primary"
                BlueprintIdentifier = "AA585D7D248FD31100E9A3E2"
-               BuildableName = "DuckDuckGo Privacy Browser.app"
+               BuildableName = "DuckDuckGo.app"
                BlueprintName = "DuckDuckGo Privacy Browser"
                ReferencedContainer = "container:DuckDuckGo.xcodeproj">
             </BuildableReference>
          </BuildActionEntry>
          <BuildActionEntry
-            buildForTesting = "NO"
+            buildForTesting = "YES"
             buildForRunning = "NO"
             buildForProfiling = "NO"
             buildForArchiving = "NO"
@@ -75,6 +75,34 @@
                </Test>
             </SkippedTests>
          </TestableReference>
+         <TestableReference
+            skipped = "NO">
+            <BuildableReference
+               BuildableIdentifier = "primary"
+               BlueprintIdentifier = "4B1AD89C25FC27E200261379"
+               BuildableName = "Integration Tests.xctest"
+               BlueprintName = "Integration Tests"
+               ReferencedContainer = "container:DuckDuckGo.xcodeproj">
+            </BuildableReference>
+            <SkippedTests>
+               <Test
+                  Identifier = "CoreDataEncryptionTests">
+               </Test>
+               <Test
+                  Identifier = "EncryptionKeyStoreTests">
+               </Test>
+            </SkippedTests>
+         </TestableReference>
+         <TestableReference
+            skipped = "NO">
+            <BuildableReference
+               BuildableIdentifier = "primary"
+               BlueprintIdentifier = "7B4CE8D926F02108009134B1"
+               BuildableName = "UI Tests.xctest"
+               BlueprintName = "UI Tests"
+               ReferencedContainer = "container:DuckDuckGo.xcodeproj">
+            </BuildableReference>
+         </TestableReference>
       </Testables>
    </TestAction>
    <LaunchAction
@@ -92,7 +120,7 @@
          <BuildableReference
             BuildableIdentifier = "primary"
             BlueprintIdentifier = "AA585D7D248FD31100E9A3E2"
-            BuildableName = "DuckDuckGo Privacy Browser.app"
+            BuildableName = "DuckDuckGo.app"
             BlueprintName = "DuckDuckGo Privacy Browser"
             ReferencedContainer = "container:DuckDuckGo.xcodeproj">
          </BuildableReference>
@@ -109,7 +137,7 @@
          <BuildableReference
             BuildableIdentifier = "primary"
             BlueprintIdentifier = "AA585D7D248FD31100E9A3E2"
-            BuildableName = "DuckDuckGo Privacy Browser.app"
+            BuildableName = "DuckDuckGo.app"
             BlueprintName = "DuckDuckGo Privacy Browser"
             ReferencedContainer = "container:DuckDuckGo.xcodeproj">
          </BuildableReference>
