@@ -565,13 +565,6 @@ extension BrowserTabViewController: WKUIDelegate {
         tabCollectionViewModel.remove(ownerOf: webView)
     }
 
-    // swiftlint:disable identifier_name
-    @objc func _webView(webView: WKWebView!, printFrame: WKFrameInfo) {
-        // Secret print delegate call: https://github.com/WebKit/WebKit/blob/main/Source/WebKit/UIProcess/API/Cocoa/WKUIDelegatePrivate.h#L110
-        print("Print call intercepted")
-    }
-    // swiftlint:enable enable_name
-
 }
 
 extension BrowserTabViewController: BrowserTabSelectionDelegate {

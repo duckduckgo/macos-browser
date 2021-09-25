@@ -32,9 +32,15 @@ public class PrintingUserScript: NSObject, UserScript {
 
     public var source: String = """
 (function() {
-    window.print = function() {
-        webkit.messageHandlers.printHandler.postMessage({});
-    };
+    document.addEventListener("click", function(e) {
+        e = e || window.event;
+
+        let onClickAttribute = e.target.getAttribute('onclick');
+
+        if (onClickAttribute.startsWith('javascript:') && onClickAttribute.includes('window.print()')) {
+            webkit.messageHandlers.printHandler.postMessage({});
+        }
+    });
 }) ();
 """
 
