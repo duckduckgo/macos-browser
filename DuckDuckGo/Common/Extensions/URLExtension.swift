@@ -239,6 +239,10 @@ extension URL {
         return URL.NavigationalScheme(rawValue: scheme) == nil
     }
 
+    var isDataURL: Bool {
+        return scheme == "data"
+    }
+
     // MARK: - DuckDuckGo
 
     static var duckDuckGo: URL {
