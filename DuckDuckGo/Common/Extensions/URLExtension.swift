@@ -264,7 +264,7 @@ extension URL {
 
     // swiftlint:disable unused_optional_binding
     var isDuckDuckGoSearch: Bool {
-        if isDuckDuckGo, let _ = try? getParameter(name: DuckDuckGoParameters.search.rawValue) {
+        if isDuckDuckGo, path.isEmpty || path == "/", let _ = try? getParameter(name: DuckDuckGoParameters.search.rawValue) {
             return true
         }
 
@@ -281,7 +281,7 @@ extension URL {
     // MARK: - Search
 
     var searchQuery: String? {
-        guard isDuckDuckGo else { return nil }
+        guard isDuckDuckGoSearch else { return nil }
         return try? getParameter(name: DuckDuckGoParameters.search.rawValue)
     }
 
