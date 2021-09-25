@@ -121,7 +121,8 @@ final class AddressBarTextField: NSTextField {
         }
 
         let addressBarString = selectedTabViewModel.addressBarString
-        value = Value(stringValue: addressBarString, userTyped: false)
+        let isSearch = selectedTabViewModel.tab.content.url?.isDuckDuckGoSearch ?? false
+        value = Value(stringValue: addressBarString, userTyped: false, isSearch: isSearch)
     }
 
     private func makeMeFirstResponderIfNeeded() {
@@ -142,7 +143,7 @@ final class AddressBarTextField: NSTextField {
         let originalStringValue = suggestionContainerViewModel.userStringValue
         guard let selectedSuggestionViewModel = suggestionContainerViewModel.selectedSuggestionViewModel else {
             if let originalStringValue = originalStringValue {
-                value = Value(stringValue: originalStringValue, userTyped: true)
+                value = Value(stringValue: originalStringValue, userTyped: true, isSearch: true)
             } else {
                 clearValue()
             }
@@ -253,8 +254,8 @@ final class AddressBarTextField: NSTextField {
         case url(urlString: String, url: URL, userTyped: Bool)
         case suggestion(_ suggestionViewModel: SuggestionViewModel)
 
-        init(stringValue: String, userTyped: Bool) {
-            if let url = stringValue.punycodedUrl, url.isValid {
+        init(stringValue: String, userTyped: Bool, isSearch: Bool) {
+            if !isSearch, let url = stringValue.punycodedUrl, url.isValid {
                 var stringValue = stringValue
                 // display punycoded url in readable form when editing
                 if !userTyped,
@@ -579,7 +580,7 @@ extension AddressBarTextField: NSTextFieldDelegate {
 
         } else {
             suggestionContainerViewModel.clearSelection()
-            self.value = Value(stringValue: stringValueWithoutSuffix, userTyped: true)
+            self.value = Value(stringValue: stringValueWithoutSuffix, userTyped: true, isSearch: true)
         }
 
         if stringValue.isEmpty {
