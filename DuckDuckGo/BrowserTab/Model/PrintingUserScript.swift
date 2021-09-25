@@ -32,10 +32,10 @@ public class PrintingUserScript: NSObject, UserScript {
 
     public var source: String = """
 (function() {
-    document.addEventListener("click", function(e) {
-        e = e || window.event;
+    document.addEventListener("click", function(event) {
+        event = event || window.event;
 
-        let onClickAttribute = e.target.getAttribute('onclick');
+        let onClickAttribute = event.target.getAttribute('onclick');
 
         if (onClickAttribute.startsWith('javascript:') && onClickAttribute.includes('window.print()')) {
             webkit.messageHandlers.printHandler.postMessage({});
