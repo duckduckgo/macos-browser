@@ -104,13 +104,18 @@ final class ChromiumLoginReader {
 
     // Step 3: Decrypt password values from the credential database.
     private func decrypt(passwordData: Data, with key: Data) -> String? {
-        let trimmedPasswordData = passwordData[3...]
-        let iv = String(repeating: " ", count: 16).data(using: .utf8)!
-
-        guard let decrypted = Cryptography.decryptAESCBC(data: trimmedPasswordData, key: key, iv: iv) else {
+        guard passwordData.count >= 4 else {
             return nil
         }
-        
+
+        let trimmedPasswordData = passwordData[3...]
+
+        guard let iv = String(repeating: " ", count: 16).data(using: .utf8),
+              let decrypted = Cryptography.decryptAESCBC(data: trimmedPasswordData, key: key, iv: iv),
+              passwordData.count >= 4 else {
+            return nil
+        }
+
         return String(data: decrypted, encoding: .utf8)
     }
 
