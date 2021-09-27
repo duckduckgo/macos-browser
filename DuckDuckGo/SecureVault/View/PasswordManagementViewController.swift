@@ -410,6 +410,7 @@ final class PasswordManagementViewController: NSViewController {
         let menu = NSMenu()
 
         menu.items = [
+            NSMenuItem(title: "Credit Card", action: #selector(createNewCreditCard), keyEquivalent: ""),
             NSMenuItem(title: "Login", action: #selector(createNewLogin), keyEquivalent: ""),
             NSMenuItem(title: "Identity", action: #selector(createNewIdentity), keyEquivalent: ""),
             NSMenuItem(title: "Note", action: #selector(createNewNote), keyEquivalent: "")
@@ -434,6 +435,43 @@ final class PasswordManagementViewController: NSViewController {
             DispatchQueue.main.async {
                 completion(items)
             }
+        }
+    }
+
+    @objc
+    private func createNewCreditCard() {
+        guard let window = view.window else { return }
+
+        func createNew() {
+            createCreditCardItemView()
+
+            listModel?.clearSelection()
+            itemModel?.createNew()
+        }
+
+        if isDirty {
+            let alert = NSAlert.passwordManagerSaveChangesToLogin()
+            alert.beginSheetModal(for: window) { response in
+
+                switch response {
+                case .alertFirstButtonReturn: // Save
+                    self.itemModel?.save()
+                    createNew()
+
+                case .alertSecondButtonReturn: // Discard
+                    self.itemModel?.cancel()
+                    createNew()
+
+                case .alertThirdButtonReturn: // Cancel
+                    break // just do nothing
+
+                default:
+                    fatalError("Unknown response \(response)")
+                }
+
+            }
+        } else {
+            createNew()
         }
     }
 

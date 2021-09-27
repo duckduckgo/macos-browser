@@ -19,7 +19,7 @@
 import Foundation
 import SwiftUI
 
-struct MacEditorTextView: NSViewRepresentable {
+struct EditableTextView: NSViewRepresentable {
 
     @Binding var text: String
 
@@ -50,13 +50,14 @@ struct MacEditorTextView: NSViewRepresentable {
 
 }
 
-extension MacEditorTextView {
+extension EditableTextView {
 
     final class Coordinator: NSObject, NSTextViewDelegate {
-        var parent: MacEditorTextView
+
+        var parent: EditableTextView
         var selectedRanges: [NSValue] = []
 
-        init(_ parent: MacEditorTextView) {
+        init(_ parent: EditableTextView) {
             self.parent = parent
         }
 
@@ -64,6 +65,7 @@ extension MacEditorTextView {
             guard let textView = notification.object as? NSTextView else {
                 return
             }
+
             self.parent.text = textView.string
             self.parent.onEditingChanged()
         }
@@ -72,6 +74,7 @@ extension MacEditorTextView {
             guard let textView = notification.object as? NSTextView else {
                 return
             }
+
             self.parent.text = textView.string
             self.selectedRanges = textView.selectedRanges
         }
@@ -80,9 +83,11 @@ extension MacEditorTextView {
             guard let textView = notification.object as? NSTextView else {
                 return
             }
+
             self.parent.text = textView.string
             self.parent.onCommit()
         }
+
     }
 
 }
@@ -106,18 +111,21 @@ final class CustomTextView: NSView {
             guard selectedRanges.count > 0 else {
                 return
             }
+
             textView.selectedRanges = selectedRanges
         }
     }
 
     private lazy var scrollView: NSScrollView = {
         let scrollView = NSScrollView()
+
         scrollView.drawsBackground = true
         scrollView.borderType = .noBorder
         scrollView.hasVerticalScroller = true
         scrollView.hasHorizontalRuler = false
         scrollView.autoresizingMask = [.width, .height]
         scrollView.translatesAutoresizingMaskIntoConstraints = false
+
         return scrollView
     }()
 
@@ -126,27 +134,26 @@ final class CustomTextView: NSView {
         let textStorage = NSTextStorage()
         let layoutManager = NSLayoutManager()
         textStorage.addLayoutManager(layoutManager)
+
         let textContainer = NSTextContainer(containerSize: scrollView.frame.size)
         textContainer.widthTracksTextView = true
-        textContainer.containerSize = NSSize(
-            width: contentSize.width,
-            height: CGFloat.greatestFiniteMagnitude
-        )
-
+        textContainer.containerSize = NSSize(width: contentSize.width, height: CGFloat.greatestFiniteMagnitude)
         layoutManager.addTextContainer(textContainer)
-        let textView                     = NSTextView(frame: .zero, textContainer: textContainer)
-        textView.autoresizingMask        = .width
-        textView.backgroundColor         = NSColor.textBackgroundColor
-        textView.delegate                = self.delegate
-        textView.drawsBackground         = true
-        textView.font                    = self.font
-        textView.isEditable              = self.isEditable
+
+        let textView = NSTextView(frame: .zero, textContainer: textContainer)
+        textView.autoresizingMask = .width
+        textView.backgroundColor = NSColor.tertiaryLabelColor
+        textView.delegate = self.delegate
+        textView.drawsBackground = true
+        textView.font = self.font
+        textView.isEditable = self.isEditable
         textView.isHorizontallyResizable = false
-        textView.isVerticallyResizable   = true
-        textView.maxSize                 = NSSize(width: CGFloat.greatestFiniteMagnitude, height: CGFloat.greatestFiniteMagnitude)
-        textView.minSize                 = NSSize(width: 0, height: contentSize.height)
-        textView.textColor               = NSColor.labelColor
-        textView.allowsUndo              = true
+        textView.isVerticallyResizable = true
+        textView.maxSize = NSSize(width: CGFloat.greatestFiniteMagnitude, height: CGFloat.greatestFiniteMagnitude)
+        textView.minSize = NSSize(width: 0, height: contentSize.height)
+        textView.textColor = NSColor.labelColor
+        textView.allowsUndo = true
+
         return textView
     }()
 
@@ -171,9 +178,11 @@ final class CustomTextView: NSView {
         setupScrollViewConstraints()
         setupTextView()
     }
+
     func setupScrollViewConstraints() {
         scrollView.translatesAutoresizingMaskIntoConstraints = false
         addSubview(scrollView)
+
         NSLayoutConstraint.activate([
             scrollView.topAnchor.constraint(equalTo: topAnchor),
             scrollView.trailingAnchor.constraint(equalTo: trailingAnchor),
@@ -181,6 +190,7 @@ final class CustomTextView: NSView {
             scrollView.leadingAnchor.constraint(equalTo: leadingAnchor)
         ])
     }
+
     func setupTextView() {
         scrollView.documentView = textView
     }

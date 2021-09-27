@@ -272,8 +272,8 @@ final class PasswordManagementItemListModel: ObservableObject {
 
     private func sortIntoSections(_ items: [SecureVaultItem]) -> [ListSection] {
         var accounts = [SecureVaultItem]()
-        var notes = [SecureVaultItem]()
         var identities = [SecureVaultItem]()
+        var notes = [SecureVaultItem]()
 
         for item in items {
             switch item {
@@ -286,11 +286,13 @@ final class PasswordManagementItemListModel: ObservableObject {
             }
         }
 
-        return [
-            .accounts(accounts),
-            .identities(identities),
-            .notes(notes)
-        ]
+        var sections = [ListSection]()
+
+        if !accounts.isEmpty { sections.append(.accounts(accounts)) }
+        if !identities.isEmpty { sections.append(.identities(identities)) }
+        if !notes.isEmpty { sections.append(.notes(notes)) }
+
+        return sections
     }
 
 }

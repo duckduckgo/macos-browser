@@ -141,7 +141,7 @@ private struct TextView: View {
 
             if model.isEditing || model.isNew {
 
-                MacEditorTextView(text: $model.text)
+                EditableTextView(text: $model.text)
                     .cornerRadius(6.0)
                     .padding(.bottom, interItemSpacing)
 
