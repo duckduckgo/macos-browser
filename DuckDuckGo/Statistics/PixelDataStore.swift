@@ -40,7 +40,7 @@ final class LocalPixelDataStore: PixelDataStore {
         self.context = context
     }
 
-    private lazy var context = Database.shared.makeContext(concurrencyType: .privateQueueConcurrencyType, name: "PixelData")
+    private lazy var context = Database.shared.makeContext(concurrencyType: .mainQueueConcurrencyType, name: "PixelData")
 
     private func loadAll() -> [String: NSNumber] {
         let fetchRequest = PixelData.fetchRequest() as NSFetchRequest<PixelData>

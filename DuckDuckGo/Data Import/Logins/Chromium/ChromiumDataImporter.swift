@@ -25,35 +25,70 @@ internal class ChromiumDataImporter: DataImporter {
     }
 
     private let applicationDataDirectoryPath: String
+    private let bookmarkImporter: BookmarkImporter
     private let loginImporter: LoginImporter
 
-    init(applicationDataDirectoryPath: String, loginImporter: LoginImporter) {
+    init(applicationDataDirectoryPath: String, loginImporter: LoginImporter, bookmarkImporter: BookmarkImporter) {
         self.applicationDataDirectoryPath = applicationDataDirectoryPath
         self.loginImporter = loginImporter
+        self.bookmarkImporter = bookmarkImporter
     }
 
     func importableTypes() -> [DataImport.DataType] {
-        return [.logins]
+        return [.logins, .bookmarks]
     }
 
     func importData(types: [DataImport.DataType],
                     from profile: DataImport.BrowserProfile?,
                     completion: @escaping (Result<[DataImport.Summary], DataImportError>) -> Void) {
-        let loginReader = ChromiumLoginReader(chromiumDataDirectoryPath: profile?.profileURL.path ?? applicationDataDirectoryPath,
-                                              processName: processName)
-        let loginResult = loginReader.readLogins()
+        var summaries = [DataImport.Summary]()
+        let dataDirectoryPath = profile?.profileURL.path ?? applicationDataDirectoryPath
 
-        switch loginResult {
-        case .success(let logins):
-            do {
-                let summary = try loginImporter.importLogins(logins)
-                completion(.success([summary]))
-            } catch {
-                completion(.failure(.cannotAccessSecureVault))
+        if types.contains(.logins) {
+            let loginReader = ChromiumLoginReader(chromiumDataDirectoryPath: dataDirectoryPath, processName: processName)
+            let loginResult = loginReader.readLogins()
+
+            switch loginResult {
+            case .success(let logins):
+                do {
+                    let summary = try loginImporter.importLogins(logins)
+                    summaries.append(summary)
+                } catch {
+                    completion(.failure(.cannotAccessSecureVault))
+                    return
+                }
+            case .failure:
+                completion(.failure(.browserNeedsToBeClosed))
+                return
             }
-        case .failure:
-            completion(.failure(.browserNeedsToBeClosed))
         }
+
+        if types.contains(.bookmarks) {
+            let bookmarkReader = ChromiumBookmarksReader(chromiumDataDirectoryPath: dataDirectoryPath)
+            let bookmarkResult = bookmarkReader.readBookmarks()
+
+            switch bookmarkResult {
+            case .success(let bookmarks):
+                do {
+                    let summary = try bookmarkImporter.importBookmarks(bookmarks)
+                    summaries.append(summary)
+                } catch {
+                    completion(.failure(.cannotAccessSecureVault))
+                    return
+                }
+            case .failure(let error):
+                switch error {
+                case .noBookmarksFileFound:
+                    completion(.failure(.noFileFound))
+                case .bookmarksFileDecodingFailed:
+                    completion(.failure(.cannotReadFile))
+                }
+
+                return
+            }
+        }
+
+        completion(.success(summaries))
     }
 
 }

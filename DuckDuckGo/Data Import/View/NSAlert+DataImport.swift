@@ -47,11 +47,11 @@ extension NSAlert {
         return alert
     }
 
-    static func importFailedAlert(source: DataImport.Source) -> NSAlert {
+    static func importFailedAlert(source: DataImport.Source, errorMessage: String) -> NSAlert {
         let alert = NSAlert()
 
         alert.messageText = UserText.dataImportFailedTitle
-        alert.informativeText = UserText.dataImportGenericFailure(source)
+        alert.informativeText = UserText.dataImportFailedBody(source, errorMessage: errorMessage)
         alert.alertStyle = .warning
         alert.addButton(withTitle: UserText.dataImportAlertAccept)
 

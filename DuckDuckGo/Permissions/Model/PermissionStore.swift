@@ -63,12 +63,24 @@ final class LocalPermissionStore: PermissionStore {
     func loadPermissions() throws -> [PermissionEntity] {
         guard let context = context else { return [] }
 
-        let fetchRequest = NSFetchRequest<PermissionManagedObject>(entityName: PermissionManagedObject.className())
+        var entities = [PermissionEntity]()
+        var coreDataError: Error?
 
-        fetchRequest.returnsObjectsAsFaults = false
+        context.performAndWait {
+            let fetchRequest = NSFetchRequest<PermissionManagedObject>(entityName: PermissionManagedObject.className())
+            fetchRequest.returnsObjectsAsFaults = false
 
-        let permissionManagedObjects = try context.fetch(fetchRequest)
-        let entities = permissionManagedObjects.compactMap(PermissionEntity.init(managedObject:))
+            do {
+                let permissionManagedObjects = try context.fetch(fetchRequest)
+                entities = permissionManagedObjects.compactMap(PermissionEntity.init(managedObject:))
+            } catch {
+                coreDataError = error
+            }
+        }
+
+        if let coreDataError = coreDataError {
+            throw coreDataError
+        }
 
         return entities
     }

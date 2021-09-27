@@ -90,7 +90,8 @@ extension Pixel.Event {
              .moreMenu,
              .refresh,
              .importedLogins,
-             .exportedLogins:
+             .exportedLogins,
+             .importedBookmarks:
 
             return nil
         }
