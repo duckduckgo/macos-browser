@@ -29,7 +29,7 @@ final class BrowserImportViewController: NSViewController {
     enum Constants {
         static let storyboardName = "DataImport"
         static let identifier = "BrowserImportViewController"
-        static let browserWarningBarHeight = 32.0
+        static let browserWarningBarHeight: CGFloat = 32.0
     }
 
     static func create(with browser: DataImport.Source, profileList: DataImport.BrowserProfileList) -> BrowserImportViewController {
