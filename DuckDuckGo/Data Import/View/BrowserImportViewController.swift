@@ -29,6 +29,7 @@ final class BrowserImportViewController: NSViewController {
     enum Constants {
         static let storyboardName = "DataImport"
         static let identifier = "BrowserImportViewController"
+        static let browserWarningBarHeight = 32.0
     }
 
     static func create(with browser: DataImport.Source, profileList: DataImport.BrowserProfileList) -> BrowserImportViewController {
@@ -98,6 +99,11 @@ final class BrowserImportViewController: NSViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
 
+        NotificationCenter.default.addObserver(self,
+                                               selector: #selector(hideOpenBrowserWarningIfNecessary),
+                                               name: NSApplication.didBecomeActiveNotification,
+                                               object: nil)
+
         // Update the profile picker:
 
         importOptionsStackView.setCustomSpacing(18, after: profileSelectionPopUpButton)
@@ -128,15 +134,21 @@ final class BrowserImportViewController: NSViewController {
         // Toggle the browser warning bar:
 
         self.closeBrowserWarningLabel.stringValue = "You must close \(browser.importSourceName) before importing data."
-
-        let browserIsRunning = ThirdPartyBrowser.browser(for: browser)?.isRunning ?? false
-        if !browserIsRunning {
-            closeBrowserWarningViewHeightConstraint.constant = 0
-        }
+        hideOpenBrowserWarningIfNecessary()
     }
 
     @IBAction func selectedImportOptionsChanged(_ sender: NSButton) {
         delegate?.browserImportViewController(self, didChangeSelectedImportOptions: selectedImportOptions)
+    }
+
+    @objc
+    private func hideOpenBrowserWarningIfNecessary() {
+        let browserIsRunning = ThirdPartyBrowser.browser(for: browser)?.isRunning ?? false
+        if browserIsRunning {
+            closeBrowserWarningViewHeightConstraint.constant = Constants.browserWarningBarHeight
+        } else {
+            closeBrowserWarningViewHeightConstraint.constant = 0
+        }
     }
 
 }
