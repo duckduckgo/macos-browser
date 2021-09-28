@@ -48,4 +48,10 @@ final class HistoryCoordinatingMock: HistoryCoordinating {
         markFailedToLoadUrlCalled = true
     }
 
+    var titleForUrlCalled = false
+    func title(for url: URL) -> String? {
+        titleForUrlCalled = true
+        return nil
+    }
+
 }
