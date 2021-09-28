@@ -41,7 +41,10 @@ extension TooltipViewController {
 
     func display(tabViewModel: TabViewModel) {
         titleTextField.stringValue = tabViewModel.title
-        if let url = tabViewModel.addressBarString.punycodedUrl,
+
+        // Search queries can match valid URL formats, so prevent creating a URL object from the address bar string if on a search page.
+        if !(tabViewModel.tab.content.url?.isDuckDuckGoSearch ?? false),
+           let url = tabViewModel.addressBarString.punycodedUrl,
            let punycodeDecoded = url.punycodeDecodedString {
             urlTextField.stringValue = punycodeDecoded
         } else {
