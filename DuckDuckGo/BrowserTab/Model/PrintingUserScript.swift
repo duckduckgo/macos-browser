@@ -37,7 +37,7 @@ public class PrintingUserScript: NSObject, UserScript {
 
         let onClickAttribute = event.target.getAttribute('onclick');
 
-        if (onClickAttribute.startsWith('javascript:') && onClickAttribute.includes('window.print()')) {
+        if (onClickAttribute.includes('window.print()')) {
             webkit.messageHandlers.printHandler.postMessage({});
         }
     });
