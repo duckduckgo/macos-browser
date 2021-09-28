@@ -27,7 +27,6 @@ final class WebCacheManagerMock: WebCacheManager {
 
     override func clear(dataStore: WebsiteDataStore = WKWebsiteDataStore.default(),
                         logins: FireproofDomains = FireproofDomains.shared,
-                        progress: ((Double) -> Void)? = nil,
                         completion: @escaping () -> Void) {
         removeAllWebsiteDataCalled = true
         completion()
