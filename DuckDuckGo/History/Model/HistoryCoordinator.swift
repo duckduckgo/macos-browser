@@ -31,6 +31,7 @@ protocol HistoryCoordinating: AnyObject {
     func updateTitleIfNeeded(title: String, url: URL)
     func markDownloadUrl(_ url: URL)
     func markFailedToLoadUrl(_ url: URL)
+    func title(for url: URL) -> String?
 
     func burnHistory(except fireproofDomains: FireproofDomains, completion: @escaping () -> Void)
 
@@ -120,6 +121,16 @@ final class HistoryCoordinator: HistoryCoordinating {
             if !url.isRoot, let rootUrl = url.root, let rootEntry = historyDictionary[rootUrl], rootEntry.numberOfVisits == 0 {
                 self?.mark(url: rootUrl, keyPath: \HistoryEntry.isDownload, value: true)
             }
+        }
+    }
+
+    func title(for url: URL) -> String? {
+        return queue.sync(flags: .barrier) { [weak self] in
+            guard let historyEntry = self?.historyDictionary?[url] else {
+                return nil
+            }
+
+            return historyEntry.title
         }
     }
 

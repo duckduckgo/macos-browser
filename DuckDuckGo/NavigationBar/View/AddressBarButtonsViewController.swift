@@ -39,7 +39,11 @@ final class AddressBarButtonsViewController: NSViewController {
 
     weak var delegate: AddressBarButtonsViewControllerDelegate?
 
-    private lazy var bookmarkPopover = BookmarkPopover()
+    private lazy var bookmarkPopover: BookmarkPopover = {
+        let popover = BookmarkPopover()
+        popover.delegate = self
+        return popover
+    }()
   
     private var _permissionAuthorizationPopover: PermissionAuthorizationPopover?
     private var permissionAuthorizationPopover: PermissionAuthorizationPopover {
@@ -96,6 +100,7 @@ final class AddressBarButtonsViewController: NSViewController {
     private var bookmarkManager: BookmarkManager = LocalBookmarkManager.shared
     private var isTextFieldEditorFirstResponder = false
     private var isSearchingMode = false
+    private var isMouseOver = false
 
     private var selectedTabViewModelCancellable: AnyCancellable?
     private var urlCancellable: AnyCancellable?
@@ -125,10 +130,45 @@ final class AddressBarButtonsViewController: NSViewController {
         subscribeToSelectedTabViewModel()
         subscribeToBookmarkList()
         subscribeToEffectiveAppearance()
+        updateBookmarkButtonVisibility()
 
         cameraButton.sendAction(on: .leftMouseDown)
         microphoneButton.sendAction(on: .leftMouseDown)
         geolocationButton.sendAction(on: .leftMouseDown)
+    }
+
+    var mouseEnterExitTrackingArea: NSTrackingArea?
+
+    override func viewDidLayout() {
+        super.viewDidLayout()
+        updateTrackingAreaForHover()
+    }
+
+    func updateTrackingAreaForHover() {
+        if let previous = mouseEnterExitTrackingArea {
+            view.removeTrackingArea(previous)
+        }
+        let trackingArea = NSTrackingArea(rect: view.frame, options: [.mouseEnteredAndExited, .mouseMoved, .activeAlways], owner: view, userInfo: nil)
+        view.addTrackingArea(trackingArea)
+        mouseEnterExitTrackingArea = trackingArea
+    }
+
+    override func mouseMoved(with event: NSEvent) {
+        super.mouseMoved(with: event)
+        isMouseOver = true
+        updateBookmarkButtonVisibility()
+    }
+
+    override func mouseEntered(with event: NSEvent) {
+        super.mouseEntered(with: event)
+        isMouseOver = true
+        updateBookmarkButtonVisibility()
+    }
+
+    override func mouseExited(with event: NSEvent) {
+        super.mouseExited(with: event)
+        isMouseOver = false
+        updateBookmarkButtonVisibility()
     }
 
     @IBAction func bookmarkButtonAction(_ sender: Any) {
@@ -146,6 +186,11 @@ final class AddressBarButtonsViewController: NSViewController {
         openPrivacyDashboard()
     }
 
+    private func updateBookmarkButtonVisibility() {
+        let showBookmarkButton = clearButton.isHidden && (isMouseOver || bookmarkPopover.isShown)
+        bookmarkButton.isHidden = !showBookmarkButton
+    }
+
     func openBookmarkPopover(setFavorite: Bool, accessPoint: Pixel.Event.AccessPoint) {
         guard let bookmark = bookmarkForCurrentUrl(setFavorite: setFavorite, accessPoint: accessPoint) else {
             assertionFailure("Failed to get a bookmark for the popover")
@@ -156,6 +201,7 @@ final class AddressBarButtonsViewController: NSViewController {
             bookmarkPopover.viewController.bookmark = bookmark
             bookmarkPopover.show(relativeTo: bookmarkButton.bounds, of: bookmarkButton, preferredEdge: .maxY)
         } else {
+            updateBookmarkButtonVisibility()
             bookmarkPopover.close()
         }
     }
@@ -209,7 +255,6 @@ final class AddressBarButtonsViewController: NSViewController {
         updatePrivacyEntryPointIcon()
 
         clearButton.isHidden = !(isTextFieldEditorFirstResponder && !textFieldValue.isEmpty)
-        bookmarkButton.isHidden = !clearButton.isHidden || textFieldValue.isEmpty
 
         // Image button
         switch mode {
@@ -418,8 +463,9 @@ final class AddressBarButtonsViewController: NSViewController {
         if let url = tabCollectionViewModel.selectedTabViewModel?.tab.content.url,
            isUrlBookmarked || bookmarkManager.isUrlBookmarked(url: url) {
             bookmarkButton.image = Self.bookmarkFilledImage
-            bookmarkButton.contentTintColor = NSColor.bookmarkFilledTint
+            bookmarkButton.mouseOverTintColor = NSColor.bookmarkFilledTint
         } else {
+            bookmarkButton.mouseOverTintColor = nil
             bookmarkButton.image = Self.bookmarkImage
             bookmarkButton.contentTintColor = nil
         }
@@ -573,6 +619,10 @@ extension AddressBarButtonsViewController: NSPopoverDelegate {
 
     func popoverDidClose(_ notification: Notification) {
         switch notification.object as? NSPopover {
+
+        case bookmarkPopover:
+            updateBookmarkButtonVisibility()
+
         case _privacyDashboardPopover:
             privacyEntryPointButton.state = .off
 

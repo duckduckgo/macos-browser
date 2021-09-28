@@ -334,10 +334,12 @@ extension AddressBarViewController {
                 !(self.view.hitTest(point) is NSButton)
             else { return event }
 
+            // bookmark button visibility is usually determined by hover state, but we def need to hide it right now
+            self.addressBarButtonsViewController?.bookmarkButton.isHidden = true
+
             // first activate app and window if needed, then make it first responder
             if self.view.window?.isMainWindow == true {
                 self.addressBarTextField.makeMeFirstResponder()
-
                 return nil
             } else {
                 DispatchQueue.main.async {

@@ -26,7 +26,7 @@ final class PasswordManagementPopover: NSPopover {
         super.init()
 
         self.animates = false
-        self.behavior = .semitransient
+        self.behavior = .transient
         self.delegate = self
 
         setupContentController()

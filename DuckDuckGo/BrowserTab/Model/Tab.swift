@@ -409,6 +409,7 @@ final class Tab: NSObject {
             userScripts.autofillScript.emailDelegate = emailManager
             userScripts.autofillScript.vaultDelegate = vaultManager
             userScripts.pageObserverScript.delegate = self
+            userScripts.printingUserScript.delegate = self
 
             attachFindInPage()
 
@@ -475,6 +476,22 @@ final class Tab: NSObject {
             trackerInfo = TrackerInfo()
             serverTrust = nil
         }
+    }
+
+}
+
+extension Tab: PrintingUserScriptDelegate {
+
+    func printingUserScriptDidRequestPrintController(_ script: PrintingUserScript) {
+        guard let window = webView.window,
+              let printOperation = webView.printOperation()
+              else { return }
+
+        if printOperation.view?.frame.isEmpty == true {
+            printOperation.view?.frame = webView.bounds
+        }
+
+        printOperation.runModal(for: window, delegate: nil, didRun: nil, contextInfo: nil)
     }
 
 }

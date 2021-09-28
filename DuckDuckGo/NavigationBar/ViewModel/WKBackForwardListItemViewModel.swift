@@ -23,11 +23,13 @@ final class WKBackForwardListItemViewModel {
 
     private let backForwardListItem: BackForwardListItem
     private let faviconService: FaviconService
+    private let historyCoordinating: HistoryCoordinating
     private let isCurrentItem: Bool
 
-    init(backForwardListItem: BackForwardListItem, faviconService: FaviconService, isCurrentItem: Bool) {
+    init(backForwardListItem: BackForwardListItem, faviconService: FaviconService, historyCoordinating: HistoryCoordinating, isCurrentItem: Bool) {
         self.backForwardListItem = backForwardListItem
         self.faviconService = faviconService
+        self.historyCoordinating = historyCoordinating
         self.isCurrentItem = isCurrentItem
     }
 
@@ -38,7 +40,13 @@ final class WKBackForwardListItemViewModel {
                 return UserText.tabHomeTitle
             }
 
-            return item.title ??
+            var title = item.title
+
+            if title == nil || (title?.isEmpty ?? false) {
+                title = historyCoordinating.title(for: item.url)
+            }
+
+            return title ??
                 item.url.host ??
                 item.url.absoluteString
 

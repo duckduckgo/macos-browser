@@ -22,7 +22,7 @@ import Punycode
 extension String {
 
     /// URL and URLComponents can't cope with emojis and international characters so this routine does some manual processing while trying to
-    ///  retain the input as much as possible.
+    /// retain the input as much as possible.
     var punycodedUrl: URL? {
         if let url = URL(string: self) {
             guard url.scheme != nil else {
