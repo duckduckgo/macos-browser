@@ -43,4 +43,9 @@ final class HomepageBackgroundView: NSView {
         collectionView.enclosingScrollView?.frame = frame
     }
 
+    override func updateLayer() {
+        super.updateLayer()
+        layer?.backgroundColor = backgroundColor?.cgColor
+    }
+
 }
