@@ -54,6 +54,7 @@ final class TabViewModel {
             updateFavicon()
         }
     }
+    var errorMessage: String?
 
     @Published var credentialsToSave: SecureVaultModels.WebsiteCredentials?
 
@@ -101,6 +102,7 @@ final class TabViewModel {
         tab.$error.receive(on: DispatchQueue.main).sink { [weak self] _ in
             guard let self = self else { return }
             self.isErrorViewVisible = self.tab.error != nil
+            self.errorMessage = self.tab.error?.localizedDescription
         } .store(in: &cancellables)
     }
 

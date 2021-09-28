@@ -151,7 +151,7 @@ final class BrowserTabViewController: NSViewController {
 
     private func subscribeToIsErrorViewVisible() {
         isErrorViewVisibleCancellable = tabViewModel?.$isErrorViewVisible.receive(on: DispatchQueue.main).sink { [weak self] _ in
-            self?.displayErrorView(self?.tabViewModel?.isErrorViewVisible ?? false)
+            self?.displayErrorView(self?.tabViewModel?.isErrorViewVisible ?? false, self?.tabViewModel?.errorMessage ?? "")
         }
     }
 
@@ -165,11 +165,16 @@ final class BrowserTabViewController: NSViewController {
         }
     }
 
-    private func displayErrorView(_ shown: Bool) {
+    private func displayErrorView(_ shown: Bool, _ message: String) {
         guard let webView = webView else {
             os_log("BrowserTabViewController: Web view is nil", type: .error)
             return
         }
+
+        // swiftlint:disable force_cast
+        let errorMessageLabel = errorView.subviews[1]
+        (errorMessageLabel as! NSTextField).stringValue = message
+        // swiftlint:enable force_cast
 
         errorView.isHidden = !shown
         webView.isHidden = shown

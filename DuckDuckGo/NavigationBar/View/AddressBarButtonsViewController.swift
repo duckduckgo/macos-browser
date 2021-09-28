@@ -484,7 +484,8 @@ final class AddressBarButtonsViewController: NSViewController {
             isTextFieldEditorFirstResponder ||
             isDuckDuckGoUrl ||
             isURLNil ||
-            trackerAnimationView.isAnimationPlaying
+            trackerAnimationView.isAnimationPlaying ||
+            selectedTabViewModel.isErrorViewVisible
         imageButtonWrapper.isHidden = !privacyEntryPointButton.isHidden || trackerAnimationView.isAnimationPlaying
     }
 
