@@ -148,9 +148,15 @@ final class AddressBarButtonsViewController: NSViewController {
         if let previous = mouseEnterExitTrackingArea {
             view.removeTrackingArea(previous)
         }
-        let trackingArea = NSTrackingArea(rect: view.frame, options: [.mouseEnteredAndExited, .activeAlways], owner: view, userInfo: nil)
+        let trackingArea = NSTrackingArea(rect: view.frame, options: [.mouseEnteredAndExited, .mouseMoved, .activeAlways], owner: view, userInfo: nil)
         view.addTrackingArea(trackingArea)
         mouseEnterExitTrackingArea = trackingArea
+    }
+
+    override func mouseMoved(with event: NSEvent) {
+        super.mouseMoved(with: event)
+        isMouseOver = true
+        updateBookmarkButtonVisibility()
     }
 
     override func mouseEntered(with event: NSEvent) {
