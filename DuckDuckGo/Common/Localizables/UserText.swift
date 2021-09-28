@@ -222,11 +222,12 @@ struct UserText {
     static let firefoxPasswordImportDisclaimer = NSLocalizedString("import.firefox.disclaimer", value: "DuckDuckGo will request your Primary Password if one has been set", comment: "Warning text for the Chromium password import option")
 
     static let dataImportFailedTitle = NSLocalizedString("import.data.import-failed.title", value: "Import Failed", comment: "Alert title when the data import fails")
-    static func dataImportFailedBody(_ source: DataImport.Source) -> String {
+
+    static func dataImportFailedBody(_ source: DataImport.Source, errorMessage: String) -> String {
         let localized = NSLocalizedString("import.data.import-failed.body",
-                                          value: "Failed to import data from %@",
+                                          value: "Failed to import data from %@.\n\nError message: %@",
                                           comment: "Alert body text when the data import fails")
-        return String(format: localized, source.importSourceName)
+        return String(format: localized, source.importSourceName, errorMessage)
     }
 
     static let dataImportAlertImport = NSLocalizedString("import.data.alert.import", value: "Import", comment: "Import button for data import alerts")
@@ -248,14 +249,6 @@ struct UserText {
                                           comment: "Alert body text when the data import fails due to the browser being open")
         return String(format: localized, source.importSourceName)
     }
-
-    static func dataImportGenericFailure(_ source: DataImport.Source) -> String {
-        let localized = NSLocalizedString("import.data.failure",
-                                          value: "Failed to import data from %@",
-                                          comment: "Generic alert body text when the data import fails")
-        return String(format: localized, source.importSourceName)
-    }
-
 
     static func dataImportQuitBrowserTitle(_ source: DataImport.Source) -> String {
         let localized = NSLocalizedString("import.data.quit-browser.title",
@@ -291,6 +284,26 @@ struct UserText {
                                           comment: "Status text indicating the number of successful browser login imports")
         return String(format: localized, String(totalSuccessfulImports))
     }
+
+    static func successfulBookmarkImports(_ totalSuccessfulImports: Int) -> String {
+        let localized = NSLocalizedString("import.bookmarks.browser.successful-imports",
+                                          value: "Bookmarks: %@",
+                                          comment: "Status text indicating the number of successful browser bookmark imports")
+        return String(format: localized, String(totalSuccessfulImports))
+    }
+
+    static func failedBookmarkImports(_ totalFailedImports: Int) -> String {
+        let localized = NSLocalizedString("import.bookmarks.browser.failed-imports",
+                                          value: "Failed/Duplicate Bookmarks: %@",
+                                          comment: "Status text indicating the number of failed browser bookmark imports")
+        return String(format: localized, String(totalFailedImports))
+    }
+
+    static let bookmarkImportSafariPermissionDescription = NSLocalizedString("import.bookmarks.safari.permission-description", value: "DuckDuckGo needs your permission to read the Safari bookmarks file. Select the Bookmarks.plist file to import bookmarks.", comment: "Description text for the Safari bookmark import permission screen")
+    static let bookmarkImportSafariRequestPermissionButtonTitle = NSLocalizedString("import.bookmarks.safari.permission-button.title", value: "Select Bookmarks File...", comment: "Text for the Safari bookmark import permission button")
+
+    static let bookmarkImportBookmarksBar = NSLocalizedString("import.bookmarks.folder.bookmarks-bar", value: "Bookmarks Bar", comment: "Title text for Bookmarks Bar import folder")
+    static let bookmarkImportOtherBookmarks = NSLocalizedString("import.bookmarks.folder.other-bookmarks", value: "Other Bookmarks", comment: "Title text for Other Bookmarks import folder")
 
     static let openDeveloperTools = NSLocalizedString("main.menu.show.inspector", value: "Open Developer Tools", comment: "Show Web Inspector/Open Developer Tools")
     static let closeDeveloperTools = NSLocalizedString("main.menu.close.inspector", value: "Close Developer Tools", comment: "Hide Web Inspector/Close Developer Tools")

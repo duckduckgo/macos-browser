@@ -73,13 +73,18 @@ final class DefaultScriptSourceProvider: ScriptSourceProviding {
         // Use sensible defaults in case the upstream data is unparsable
         let trackerData = TrackerRadarManager.shared.encodedTrackerData
         let surrogates = configStorage.loadData(for: .surrogates)?.utf8String() ?? ""
-        let unprotectedSites = privacyConfiguration.tempUnprotectedDomains
-        let contentBlockingExceptions = privacyConfiguration.exceptionsList(forFeature: .contentBlocking)
+
+        let remoteUnprotectedDomains = (privacyConfiguration.tempUnprotectedDomains.joined(separator: "\n"))
+            + "\n"
+            + (privacyConfiguration.exceptionsList(forFeature: .contentBlocking).joined(separator: "\n"))
 
         return ContentBlockerUserScript.loadJS("contentblocker", from: .main, withReplacements: [
-            "${unprotectedDomains}": (unprotectedSites + contentBlockingExceptions).joined(separator: "\n"),
+            "${isDebug}": isDebugBuild ? "true" : "false",
+            "${tempUnprotectedDomains}": remoteUnprotectedDomains,
+            "${userUnprotectedDomains}": "",
             "${trackerData}": trackerData,
-            "${surrogates}": surrogates
+            "${surrogates}": surrogates,
+            "${blockingEnabled}": privacyConfiguration.isEnabled(featureKey: .contentBlocking) ? "true" : "false"
         ])
     }
 

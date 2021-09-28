@@ -58,7 +58,7 @@ final class BookmarkOutlineViewCell: NSTableCellView {
         titleLabel.stringValue = folder.title
         countLabel.stringValue = ""
 
-        let totalChildBookmarks = folder.childBookmarks.count
+        let totalChildBookmarks = folder.totalChildBookmarks
         if totalChildBookmarks > 0 {
             countLabel.stringValue = "\(totalChildBookmarks)"
         } else {

@@ -29,6 +29,7 @@ final class BrowserImportViewController: NSViewController {
     enum Constants {
         static let storyboardName = "DataImport"
         static let identifier = "BrowserImportViewController"
+        static let browserWarningBarHeight: CGFloat = 32.0
     }
 
     static func create(with browser: DataImport.Source, profileList: DataImport.BrowserProfileList) -> BrowserImportViewController {
@@ -44,6 +45,7 @@ final class BrowserImportViewController: NSViewController {
     @IBOutlet var profileSelectionLabel: NSTextField!
     @IBOutlet var profileSelectionPopUpButton: NSPopUpButton!
 
+    @IBOutlet var bookmarksCheckbox: NSButton!
     @IBOutlet var passwordsCheckbox: NSButton!
     @IBOutlet var passwordDetailLabel: NSTextField!
 
@@ -60,7 +62,11 @@ final class BrowserImportViewController: NSViewController {
     var selectedImportOptions: [DataImport.DataType] {
         var options = [DataImport.DataType]()
 
-        if passwordsCheckbox.state == .on {
+        if bookmarksCheckbox.state == .on && !bookmarksCheckbox.isHidden {
+            options.append(.bookmarks)
+        }
+
+        if passwordsCheckbox.state == .on && !passwordsCheckbox.isHidden {
             options.append(.logins)
         }
 
@@ -93,6 +99,11 @@ final class BrowserImportViewController: NSViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
 
+        NotificationCenter.default.addObserver(self,
+                                               selector: #selector(hideOpenBrowserWarningIfNecessary),
+                                               name: NSApplication.didBecomeActiveNotification,
+                                               object: nil)
+
         // Update the profile picker:
 
         importOptionsStackView.setCustomSpacing(18, after: profileSelectionPopUpButton)
@@ -113,22 +124,31 @@ final class BrowserImportViewController: NSViewController {
             passwordDetailLabel.stringValue = UserText.chromiumPasswordImportDisclaimer
         case .firefox:
             passwordDetailLabel.stringValue = UserText.firefoxPasswordImportDisclaimer
-        default:
+        case .safari:
+            passwordsCheckbox.isHidden = true
             passwordDetailLabel.isHidden = true
+        case .csv:
+            assertionFailure("Should not attempt to import a CSV file via \(#file)")
         }
 
         // Toggle the browser warning bar:
 
         self.closeBrowserWarningLabel.stringValue = "You must close \(browser.importSourceName) before importing data."
-
-        let browserIsRunning = ThirdPartyBrowser.browser(for: browser)?.isRunning ?? false
-        if !browserIsRunning {
-            closeBrowserWarningViewHeightConstraint.constant = 0
-        }
+        hideOpenBrowserWarningIfNecessary()
     }
 
     @IBAction func selectedImportOptionsChanged(_ sender: NSButton) {
         delegate?.browserImportViewController(self, didChangeSelectedImportOptions: selectedImportOptions)
+    }
+
+    @objc
+    private func hideOpenBrowserWarningIfNecessary() {
+        let browserIsRunning = ThirdPartyBrowser.browser(for: browser)?.isRunning ?? false
+        if browserIsRunning {
+            closeBrowserWarningViewHeightConstraint.constant = Constants.browserWarningBarHeight
+        } else {
+            closeBrowserWarningViewHeightConstraint.constant = 0
+        }
     }
 
 }

@@ -24,11 +24,11 @@ final class ChromeDataImporter: ChromiumDataImporter {
         return "Chrome"
     }
 
-    init(loginImporter: LoginImporter) {
+    init(loginImporter: LoginImporter, bookmarkImporter: BookmarkImporter) {
         let applicationSupport = FileManager.default.urls(for: .applicationSupportDirectory, in: .userDomainMask).first!
         let path = applicationSupport.appendingPathComponent("Google/Chrome/Default/").absoluteString
 
-        super.init(applicationDataDirectoryPath: path, loginImporter: loginImporter)
+        super.init(applicationDataDirectoryPath: path, loginImporter: loginImporter, bookmarkImporter: bookmarkImporter)
     }
 
 }
