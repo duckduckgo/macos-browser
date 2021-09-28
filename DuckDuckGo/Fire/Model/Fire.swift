@@ -50,9 +50,13 @@ final class Fire {
             group.leave()
         }
 
-        burnHistory()
-        burnPermissions()
-        burnDownloads()
+        group.enter()
+        burnHistory { [weak self] in
+            self?.burnPermissions { [weak self] in
+                self?.burnDownloads()
+                group.leave()
+            }
+        }
 
         group.enter()
         burnTabs(tabCollectionViewModel: tabCollectionViewModel) {
@@ -80,12 +84,12 @@ final class Fire {
         })
     }
 
-    private func burnHistory() {
-        self.historyCoordinating.burnHistory(except: FireproofDomains.shared)
+    private func burnHistory(completion: @escaping () -> Void) {
+        self.historyCoordinating.burnHistory(except: FireproofDomains.shared, completion: completion)
     }
 
-    private func burnPermissions() {
-        self.permissionManager.burnPermissions(except: FireproofDomains.shared)
+    private func burnPermissions(completion: @escaping () -> Void) {
+        self.permissionManager.burnPermissions(except: FireproofDomains.shared, completion: completion)
     }
 
     private func burnDownloads() {
