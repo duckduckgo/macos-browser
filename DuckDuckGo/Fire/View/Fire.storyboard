@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<document type="com.apple.InterfaceBuilder3.Cocoa.Storyboard.XIB" version="3.0" toolsVersion="18122" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none" useAutolayout="YES" initialViewController="bU7-R8-ocO">
+<document type="com.apple.InterfaceBuilder3.Cocoa.Storyboard.XIB" version="3.0" toolsVersion="19162" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none" useAutolayout="YES" initialViewController="bU7-R8-ocO">
     <dependencies>
         <deployment identifier="macosx"/>
-        <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="18122"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="19162"/>
         <capability name="Named colors" minToolsVersion="9.0"/>
         <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
     </dependencies>
@@ -40,11 +40,11 @@
                             <customView translatesAutoresizingMaskIntoConstraints="NO" id="uFV-kr-0rY">
                                 <rect key="frame" x="75" y="50" width="300" height="200"/>
                                 <subviews>
-                                    <progressIndicator maxValue="100" doubleValue="50" style="bar" translatesAutoresizingMaskIntoConstraints="NO" id="ogp-oa-0j1">
+                                    <progressIndicator maxValue="100" indeterminate="YES" style="bar" translatesAutoresizingMaskIntoConstraints="NO" id="Nf3-CP-318">
                                         <rect key="frame" x="45" y="77" width="210" height="20"/>
                                         <constraints>
-                                            <constraint firstAttribute="height" constant="18" id="d5k-Q7-we7"/>
-                                            <constraint firstAttribute="width" constant="210" id="deu-Ho-QZK"/>
+                                            <constraint firstAttribute="width" constant="210" id="QdT-8E-2ak"/>
+                                            <constraint firstAttribute="height" constant="18" id="m9n-cp-6d4"/>
                                         </constraints>
                                     </progressIndicator>
                                     <imageView horizontalHuggingPriority="251" verticalHuggingPriority="251" translatesAutoresizingMaskIntoConstraints="NO" id="5Iu-jp-smc">
@@ -66,13 +66,13 @@
                                 </subviews>
                                 <constraints>
                                     <constraint firstItem="5Iu-jp-smc" firstAttribute="centerX" secondItem="uFV-kr-0rY" secondAttribute="centerX" id="5f5-i8-zcD"/>
+                                    <constraint firstItem="Nf3-CP-318" firstAttribute="centerY" secondItem="uFV-kr-0rY" secondAttribute="centerY" constant="13" id="81o-zp-hiJ"/>
                                     <constraint firstItem="1tt-F5-h1d" firstAttribute="centerX" secondItem="uFV-kr-0rY" secondAttribute="centerX" id="AVa-oy-5Xi"/>
                                     <constraint firstItem="5Iu-jp-smc" firstAttribute="centerY" secondItem="uFV-kr-0rY" secondAttribute="centerY" constant="-40" id="GcW-sq-yHn"/>
                                     <constraint firstAttribute="height" constant="200" id="TXG-2y-V0d"/>
-                                    <constraint firstItem="ogp-oa-0j1" firstAttribute="centerX" secondItem="uFV-kr-0rY" secondAttribute="centerX" id="VaI-VM-zfn"/>
-                                    <constraint firstItem="1tt-F5-h1d" firstAttribute="top" secondItem="ogp-oa-0j1" secondAttribute="bottom" constant="5" id="Vvt-eq-y33"/>
+                                    <constraint firstItem="Nf3-CP-318" firstAttribute="centerX" secondItem="uFV-kr-0rY" secondAttribute="centerX" id="WFP-q7-hWh"/>
                                     <constraint firstAttribute="width" constant="300" id="aIf-Ga-vbP"/>
-                                    <constraint firstItem="ogp-oa-0j1" firstAttribute="centerY" secondItem="uFV-kr-0rY" secondAttribute="centerY" constant="13" id="rRa-dz-YVT"/>
+                                    <constraint firstItem="1tt-F5-h1d" firstAttribute="centerY" secondItem="uFV-kr-0rY" secondAttribute="centerY" constant="34" id="tcx-i6-wMx"/>
                                 </constraints>
                             </customView>
                             <button translatesAutoresizingMaskIntoConstraints="NO" id="l2o-no-SFP" userLabel="Burn Button">
@@ -115,7 +115,7 @@
                     <connections>
                         <outlet property="fakeFireButton" destination="l2o-no-SFP" id="xqv-ch-iAF"/>
                         <outlet property="fireAnimationView" destination="Irb-Li-anx" id="JfE-XU-lio"/>
-                        <outlet property="progressIndicator" destination="ogp-oa-0j1" id="JVl-ZY-KNv"/>
+                        <outlet property="progressIndicator" destination="Nf3-CP-318" id="nq9-vZ-Fzk"/>
                         <outlet property="progressIndicatorWrapper" destination="uFV-kr-0rY" id="RTJ-f8-iuU"/>
                     </connections>
                 </viewController>

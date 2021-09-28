@@ -27,7 +27,6 @@ final class Fire {
     let downloadListCoordinator: DownloadListCoordinator
 
     @Published private(set) var isBurning = false
-    @Published private(set) var progress = 0.0
 
     init(cacheManager: WebCacheManager = .shared,
          historyCoordinating: HistoryCoordinating = HistoryCoordinator.shared,
@@ -73,15 +72,13 @@ final class Fire {
 
     private func burnWebCache(completion: @escaping () -> Void) {
         os_log("WebsiteDataStore began cookie deletion", log: .fire)
-        webCacheManager.clear(progress: { progress in
-            self.progress = progress
-        }, completion: {
+        webCacheManager.clear {
             os_log("WebsiteDataStore completed cookie deletion", log: .fire)
 
             DispatchQueue.main.async {
                 completion()
             }
-        })
+        }
     }
 
     private func burnHistory(completion: @escaping () -> Void) {

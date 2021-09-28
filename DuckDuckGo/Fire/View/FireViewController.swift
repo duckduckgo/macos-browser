@@ -82,14 +82,22 @@ final class FireViewController: NSViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
 
-        subscribeToProgress()
         setupView()
         setupFireAnimation()
     }
 
     override func viewWillAppear() {
+        super.viewWillAppear()
+
         self.view.superview?.isHidden = true
         subscribeToShouldPreventUserInteraction()
+        progressIndicator.startAnimation(self)
+    }
+
+    override func viewDidDisappear() {
+        super.viewDidDisappear()
+
+        progressIndicator.stopAnimation(self)
     }
 
     private var shouldPreventUserInteractioCancellable: AnyCancellable?
@@ -98,12 +106,6 @@ final class FireViewController: NSViewController {
             .sink { [weak self] shouldPreventUserInteraction in
                 self?.view.superview?.isHidden = !shouldPreventUserInteraction
             }
-    }
-
-    private var progressCancellable: AnyCancellable?
-    private func subscribeToProgress() {
-        progressCancellable = fireViewModel.fire.$progress
-            .weakAssign(to: \.doubleValue, on: progressIndicator)
     }
 
     private func setupView() {
