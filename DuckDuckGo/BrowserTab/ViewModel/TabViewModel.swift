@@ -141,7 +141,25 @@ final class TabViewModel {
             return
         }
 
-        guard let url = tab.content.url, let host = url.host else {
+        guard let url = tab.content.url else {
+            addressBarString = ""
+            passiveAddressBarString = ""
+            return
+        }
+
+        if url.isFileURL {
+            addressBarString = url.absoluteString
+            passiveAddressBarString = url.absoluteString
+            return
+        }
+
+        if url.isDataURL {
+            addressBarString = url.absoluteString
+            passiveAddressBarString = "data:"
+            return
+        }
+
+        guard let host = url.host else {
             addressBarString = ""
             passiveAddressBarString = ""
             return

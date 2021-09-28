@@ -23,15 +23,18 @@ final class FirefoxDataImporter: DataImporter {
     var primaryPassword: String?
 
     let loginImporter: LoginImporter
+    let bookmarkImporter: BookmarkImporter
 
-    init(loginImporter: LoginImporter) {
+    init(loginImporter: LoginImporter, bookmarkImporter: BookmarkImporter) {
         self.loginImporter = loginImporter
+        self.bookmarkImporter = bookmarkImporter
     }
 
     func importableTypes() -> [DataImport.DataType] {
-        return [.logins]
+        return [.logins, .bookmarks]
     }
 
+    // swiftlint:disable cyclomatic_complexity
     func importData(types: [DataImport.DataType],
                     from profile: DataImport.BrowserProfile?,
                     completion: @escaping (Result<[DataImport.Summary], DataImportError>) -> Void) {
@@ -40,28 +43,54 @@ final class FirefoxDataImporter: DataImporter {
             return
         }
 
-        let loginReader = FirefoxLoginReader(firefoxProfileURL: firefoxProfileURL, primaryPassword: self.primaryPassword)
-        let loginResult = loginReader.readLogins()
+        var summaries = [DataImport.Summary]()
 
-        switch loginResult {
-        case .success(let logins):
-            do {
-                let summary = try loginImporter.importLogins(logins)
-                completion(.success([summary]))
-            } catch {
-                completion(.failure(.cannotAccessSecureVault))
-            }
-        case .failure(let error):
-            switch error {
-            case .requiresPrimaryPassword:
-                completion(.failure(.needsLoginPrimaryPassword))
-            case .databaseAccessFailed:
-                completion(.failure(.browserNeedsToBeClosed))
-            default:
-                completion(.failure(.unknownError))
+        if types.contains(.logins) {
+            let loginReader = FirefoxLoginReader(firefoxProfileURL: firefoxProfileURL, primaryPassword: self.primaryPassword)
+            let loginResult = loginReader.readLogins()
+
+            switch loginResult {
+            case .success(let logins):
+                do {
+                    let summary = try loginImporter.importLogins(logins)
+                    summaries.append(summary)
+                } catch {
+                    completion(.failure(.cannotAccessSecureVault))
+                }
+            case .failure(let error):
+                switch error {
+                case .requiresPrimaryPassword:
+                    completion(.failure(.needsLoginPrimaryPassword))
+                case .databaseAccessFailed:
+                    completion(.failure(.browserNeedsToBeClosed))
+                default:
+                    completion(.failure(.unknownError(error)))
+                }
             }
         }
+
+        if types.contains(.bookmarks) {
+            let bookmarkReader = FirefoxBookmarksReader(firefoxDataDirectoryPath: firefoxProfileURL.absoluteString)
+            let bookmarkResult = bookmarkReader.readBookmarks()
+
+            switch bookmarkResult {
+            case .success(let bookmarks):
+                do {
+                    let summary = try bookmarkImporter.importBookmarks(bookmarks)
+                    summaries.append(summary)
+                } catch {
+                    completion(.failure(.cannotAccessSecureVault))
+                    return
+                }
+            case .failure:
+                completion(.failure(.browserNeedsToBeClosed))
+                return
+            }
+        }
+
+        completion(.success(summaries))
     }
+    // swiftlint:enable cyclomatic_complexity
 
     private func defaultFirefoxProfilePath() -> URL? {
         guard let potentialProfiles = try? FileManager.default.contentsOfDirectory(atPath: profilesDirectoryURL().path) else {
