@@ -28,6 +28,7 @@ protocol PasswordManagementDelegate: AnyObject {
 
 }
 
+// swiftlint:disable type_body_length
 final class PasswordManagementViewController: NSViewController {
 
     static func create() -> Self {
@@ -145,6 +146,15 @@ final class PasswordManagementViewController: NSViewController {
         }
     }
 
+    private func syncModelsOnCreditCard(_ card: SecureVaultModels.CreditCard, select: Bool = false) {
+        self.itemModel?.setSecureVaultModel(card)
+        self.listModel?.updateAccount(SecureVaultItem.card(card))
+
+        if select {
+            self.listModel?.selected(item: SecureVaultItem.card(card))
+        }
+    }
+
     private func createLoginItemView() {
         let itemModel = PasswordManagementLoginModel(onDirtyChanged: { [weak self] isDirty in
             self?.isDirty = isDirty
@@ -190,6 +200,22 @@ final class PasswordManagementViewController: NSViewController {
         self.itemModel = itemModel
 
         let view = NSHostingView(rootView: PasswordManagementNoteItemView().environmentObject(itemModel))
+        replaceItemContainerChildView(with: view)
+    }
+
+    private func createCreditCardItemView() {
+        let itemModel = PasswordManagementCreditCardModel(onDirtyChanged: { [weak self] isDirty in
+            self?.isDirty = isDirty
+            self?.postChange()
+        }, onSaveRequested: { [weak self] card in
+            self?.doSaveCreditCard(card)
+        }, onDeleteRequested: { [weak self] card in
+            self?.promptToDelete(card: card)
+        })
+
+        self.itemModel = itemModel
+
+        let view = NSHostingView(rootView: PasswordManagementCreditCardItemView().environmentObject(itemModel))
         replaceItemContainerChildView(with: view)
     }
 
@@ -277,6 +303,28 @@ final class PasswordManagementViewController: NSViewController {
         }
     }
 
+    private func doSaveCreditCard(_ card: SecureVaultModels.CreditCard) {
+        let isNew = card.id == nil
+
+        do {
+            guard let storedCardID = try secureVault?.storeCreditCard(card),
+                  let storedCard = try secureVault?.creditCardFor(id: storedCardID) else { return }
+
+            itemModel?.cancel()
+            if isNew {
+                refetchWithText(searchField.stringValue) { [weak self] in
+                    self?.syncModelsOnCreditCard(storedCard, select: true)
+                }
+            } else {
+                syncModelsOnCreditCard(storedCard)
+            }
+            postChange()
+
+        } catch {
+            // Which errors can occur when saving notes?
+        }
+    }
+
     private func promptToDelete(credentials: SecureVaultModels.WebsiteCredentials) {
         guard let window = self.view.window,
               let id = credentials.account.id else { return }
@@ -349,6 +397,10 @@ final class PasswordManagementViewController: NSViewController {
         }
     }
 
+    private func promptToDelete(card: SecureVaultModels.CreditCard) {
+        print("Deleting card")
+    }
+
     private func createListView() {
         let listModel = PasswordManagementItemListModel { [weak self] previousValue, newValue in
             guard let id = newValue.secureVaultID,
@@ -360,6 +412,10 @@ final class PasswordManagementViewController: NSViewController {
                     guard let credentials = try? self?.secureVault?.websiteCredentialsFor(accountId: id) else { return }
                     self?.createLoginItemView()
                     self?.syncModelsOnCredentials(credentials)
+                case .card:
+                    guard let card = try? self?.secureVault?.creditCardFor(id: id) else { return }
+                    self?.createCreditCardItemView()
+                    self?.syncModelsOnCreditCard(card)
                 case .identity:
                     guard let identity = try? self?.secureVault?.identityFor(id: id) else { return }
                     self?.createIdentityItemView()

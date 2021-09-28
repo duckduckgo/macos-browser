@@ -22,6 +22,7 @@ import BrowserServicesKit
 enum SecureVaultItem: Equatable, Identifiable, Comparable {
 
     case account(SecureVaultModels.WebsiteAccount)
+    case card(SecureVaultModels.CreditCard)
     case identity(SecureVaultModels.Identity)
     case note(SecureVaultModels.Note)
 
@@ -43,6 +44,8 @@ enum SecureVaultItem: Equatable, Identifiable, Comparable {
         switch self {
         case .account(let account):
             return account.id
+        case .card(let card):
+            return card.id
         case .identity(let identity):
             return identity.id
         case .note(let note):
@@ -54,6 +57,8 @@ enum SecureVaultItem: Equatable, Identifiable, Comparable {
         switch self {
         case .account(let account):
             return account.title
+        case .card(let card):
+            return card.title
         case .identity(let identity):
             return identity.title
         case .note(let note):
@@ -65,6 +70,8 @@ enum SecureVaultItem: Equatable, Identifiable, Comparable {
         switch self {
         case .account(let account):
             return account.lastUpdated
+        case .card(let card):
+            return card.lastUpdated
         case .identity(let identity):
             return identity.lastUpdated
         case .note(let note):
@@ -78,10 +85,13 @@ enum SecureVaultItem: Equatable, Identifiable, Comparable {
             return account.domain.lowercased().contains(filter) ||
                 account.username.lowercased().contains(filter) ||
                 account.title?.lowercased().contains(filter) ?? false
+        case .card(let card):
+            return card.title.localizedCaseInsensitiveContains(filter)
         case .identity(let identity):
             return identity.title.localizedCaseInsensitiveContains(filter)
         case .note(let note):
-            return note.title.localizedCaseInsensitiveContains(filter)
+            return note.title.localizedCaseInsensitiveContains(filter) ||
+                (note.associatedDomain?.localizedCaseInsensitiveContains(filter) ?? false)
         }
     }
 
@@ -89,6 +99,8 @@ enum SecureVaultItem: Equatable, Identifiable, Comparable {
         switch self {
         case .account(let account):
             return ((account.title ?? "").isEmpty == true ? account.domain.dropWWW() : account.title) ?? ""
+        case .card(let card):
+            return card.title
         case .identity(let identity):
             return identity.title
         case .note(let note):
@@ -100,6 +112,8 @@ enum SecureVaultItem: Equatable, Identifiable, Comparable {
         switch self {
         case .account(let account):
             return account.username
+        case .card(let card):
+            return "Credit Card"
         case .identity(let identity):
             var nameComponents = PersonNameComponents()
             nameComponents.givenName = identity.firstName
@@ -116,6 +130,8 @@ enum SecureVaultItem: Equatable, Identifiable, Comparable {
         switch (lhs, rhs) {
         case (.account(let account1), .account(let account2)):
             return account1.id == account2.id
+        case (.card(let card1), .card(let card2)):
+            return card1.id == card2.id
         case (.identity(let identity1), .identity(let identity2)):
             return identity1.id == identity2.id
         case (.note(let note1), .note(let note2)):
@@ -142,6 +158,7 @@ final class PasswordManagementItemListModel: ObservableObject {
 
     enum ListSection {
         case accounts([SecureVaultItem])
+        case cards([SecureVaultItem])
         case notes([SecureVaultItem])
         case identities([SecureVaultItem])
 
@@ -149,6 +166,8 @@ final class PasswordManagementItemListModel: ObservableObject {
             switch self {
             case .accounts:
                 return "Accounts"
+            case .cards:
+                return "Cards"
             case .notes:
                 return "Notes"
             case .identities:
@@ -159,6 +178,8 @@ final class PasswordManagementItemListModel: ObservableObject {
         var items: [SecureVaultItem] {
             switch self {
             case .accounts(let items):
+                return items
+            case .cards(let items):
                 return items
             case .notes(let items):
                 return items
@@ -171,6 +192,8 @@ final class PasswordManagementItemListModel: ObservableObject {
             switch self {
             case .accounts:
                 return .accounts(newItems)
+            case .cards:
+                return .cards(newItems)
             case .notes:
                 return .notes(newItems)
             case .identities:
@@ -272,6 +295,7 @@ final class PasswordManagementItemListModel: ObservableObject {
 
     private func sortIntoSections(_ items: [SecureVaultItem]) -> [ListSection] {
         var accounts = [SecureVaultItem]()
+        var cards = [SecureVaultItem]()
         var identities = [SecureVaultItem]()
         var notes = [SecureVaultItem]()
 
@@ -279,6 +303,8 @@ final class PasswordManagementItemListModel: ObservableObject {
             switch item {
             case .account:
                 accounts.append(item)
+            case .card:
+                cards.append(item)
             case .note:
                 notes.append(item)
             case .identity:
@@ -289,6 +315,7 @@ final class PasswordManagementItemListModel: ObservableObject {
         var sections = [ListSection]()
 
         if !accounts.isEmpty { sections.append(.accounts(accounts)) }
+        if !cards.isEmpty { sections.append(.cards(cards)) }
         if !identities.isEmpty { sections.append(.identities(identities)) }
         if !notes.isEmpty { sections.append(.notes(notes)) }
 

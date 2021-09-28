@@ -173,6 +173,8 @@
 		4B9292D72667124000AD2C21 /* NSPopUpButtonExtension.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B9292D62667124000AD2C21 /* NSPopUpButtonExtension.swift */; };
 		4B9292D92667124B00AD2C21 /* BookmarkListTreeControllerDataSource.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B9292D82667124B00AD2C21 /* BookmarkListTreeControllerDataSource.swift */; };
 		4B9292DB2667125D00AD2C21 /* ContextualMenu.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B9292DA2667125D00AD2C21 /* ContextualMenu.swift */; };
+		4B95A1792702B505003ECD6B /* PasswordManagementCreditCardItemView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B95A1782702B505003ECD6B /* PasswordManagementCreditCardItemView.swift */; };
+		4B95A17B2702B8CE003ECD6B /* PasswordManagementCreditCardModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B95A17A2702B8CE003ECD6B /* PasswordManagementCreditCardModel.swift */; };
 		4BA1A69B258B076900F6F690 /* FileStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4BA1A69A258B076900F6F690 /* FileStore.swift */; };
 		4BA1A6A0258B079600F6F690 /* DataEncryption.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4BA1A69F258B079600F6F690 /* DataEncryption.swift */; };
 		4BA1A6A5258B07DF00F6F690 /* EncryptedValueTransformer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4BA1A6A4258B07DF00F6F690 /* EncryptedValueTransformer.swift */; };
@@ -702,6 +704,8 @@
 		4B9292D62667124000AD2C21 /* NSPopUpButtonExtension.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = NSPopUpButtonExtension.swift; sourceTree = "<group>"; };
 		4B9292D82667124B00AD2C21 /* BookmarkListTreeControllerDataSource.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = BookmarkListTreeControllerDataSource.swift; sourceTree = "<group>"; };
 		4B9292DA2667125D00AD2C21 /* ContextualMenu.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ContextualMenu.swift; sourceTree = "<group>"; };
+		4B95A1782702B505003ECD6B /* PasswordManagementCreditCardItemView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PasswordManagementCreditCardItemView.swift; sourceTree = "<group>"; };
+		4B95A17A2702B8CE003ECD6B /* PasswordManagementCreditCardModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PasswordManagementCreditCardModel.swift; sourceTree = "<group>"; };
 		4BA1A69A258B076900F6F690 /* FileStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FileStore.swift; sourceTree = "<group>"; };
 		4BA1A69F258B079600F6F690 /* DataEncryption.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DataEncryption.swift; sourceTree = "<group>"; };
 		4BA1A6A4258B07DF00F6F690 /* EncryptedValueTransformer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EncryptedValueTransformer.swift; sourceTree = "<group>"; };
@@ -1695,6 +1699,7 @@
 				85CC1D7C26A05F250062F04E /* PasswordManagementLoginModel.swift */,
 				4B5FA61426F8EE440020F7D9 /* PasswordManagementIdentityModel.swift */,
 				4B5FA60E26F7E8D40020F7D9 /* PasswordManagementNoteModel.swift */,
+				4B95A17A2702B8CE003ECD6B /* PasswordManagementCreditCardModel.swift */,
 			);
 			path = Model;
 			sourceTree = "<group>";
@@ -1706,6 +1711,7 @@
 				85CC1D74269F6B420062F04E /* PasswordManagementLoginItemView.swift */,
 				4B5FA61626F967A50020F7D9 /* PasswordManagementIdentityItemView.swift */,
 				4B5FA61026F7F4590020F7D9 /* PasswordManagementNoteItemView.swift */,
+				4B95A1782702B505003ECD6B /* PasswordManagementCreditCardItemView.swift */,
 				85625997269C9C5F00EE44BC /* PasswordManagementPopover.swift */,
 				85625995269C953C00EE44BC /* PasswordManagementViewController.swift */,
 				85625993269C8F9600EE44BC /* PasswordManager.storyboard */,
@@ -3139,6 +3145,7 @@
 				B637273D26CCF0C200C8CB02 /* OptionalExtension.swift in Sources */,
 				AA80EC54256BE3BC007083E7 /* UserText.swift in Sources */,
 				B61EF3EC266F91E700B4D78F /* WKWebView+Download.swift in Sources */,
+				4B95A17B2702B8CE003ECD6B /* PasswordManagementCreditCardModel.swift in Sources */,
 				B637274426CE25EF00C8CB02 /* NSApplication+BuildTime.m in Sources */,
 				4B0511C4262CAA5A00F6079C /* PreferencesSidebarViewController.swift in Sources */,
 				B6E53888267C94A00010FEA9 /* HomepageCollectionViewFlowLayout.swift in Sources */,
@@ -3283,6 +3290,7 @@
 				B6106BAB26A7BF1D0013B453 /* PermissionType.swift in Sources */,
 				8585B63826D6E66C00C1416F /* ButtonStyles.swift in Sources */,
 				4B677450255DBFA300025BD8 /* HashExtension.swift in Sources */,
+				4B95A1792702B505003ECD6B /* PasswordManagementCreditCardItemView.swift in Sources */,
 				4B0511BD262CAA5A00F6079C /* PrivacySecurityPreferences.swift in Sources */,
 				AA9FF95F24A1FB690039E328 /* TabCollectionViewModel.swift in Sources */,
 				AAC5E4D125D6A709007F5990 /* BookmarkManager.swift in Sources */,

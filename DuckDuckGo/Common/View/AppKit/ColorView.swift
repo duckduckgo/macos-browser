@@ -45,7 +45,7 @@ final class ColorView: NSView {
         }
     }
 
-    @IBInspectable var borderColor: NSColor? = nil {
+    @IBInspectable var borderColor: NSColor? {
         didSet {
             layer!.borderColor = borderColor?.cgColor
         }
