@@ -38,7 +38,7 @@
                                 <rect key="frame" x="0.0" y="0.0" width="845" height="40"/>
                             </customView>
                             <stackView distribution="fillEqually" orientation="horizontal" alignment="top" spacing="0.0" horizontalStackHuggingPriority="249.99998474121094" verticalStackHuggingPriority="249.99998474121094" detachesHiddenViews="YES" translatesAutoresizingMaskIntoConstraints="NO" id="kOb-4q-pAe">
-                                <rect key="frame" x="76" y="2" width="0.0" height="0.0"/>
+                                <rect key="frame" x="76" y="18" width="0.0" height="0.0"/>
                                 <subviews>
                                     <button hidden="YES" translatesAutoresizingMaskIntoConstraints="NO" id="7XG-Qm-Ksx" userLabel="Left Scroll Button" customClass="MouseOverButton" customModule="DuckDuckGo_Privacy_Browser" customModuleProvider="target">
                                         <rect key="frame" x="0.0" y="-28" width="28" height="28"/>
@@ -74,7 +74,7 @@
                                 </customSpacing>
                             </stackView>
                             <scrollView wantsLayer="YES" borderType="none" horizontalLineScroll="10" horizontalPageScroll="10" verticalLineScroll="10" verticalPageScroll="10" hasVerticalScroller="NO" verticalScrollElasticity="none" translatesAutoresizingMaskIntoConstraints="NO" id="O0X-yp-zLn" customClass="TabBarScrollView" customModule="DuckDuckGo_Privacy_Browser" customModuleProvider="target">
-                                <rect key="frame" x="76" y="0.0" width="661" height="34"/>
+                                <rect key="frame" x="76" y="1" width="661" height="34"/>
                                 <clipView key="contentView" drawsBackground="NO" copiesOnScroll="NO" translatesAutoresizingMaskIntoConstraints="NO" id="zdf-RD-hTG">
                                     <rect key="frame" x="0.0" y="0.0" width="661" height="34"/>
                                     <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
@@ -109,7 +109,7 @@
                                 </scroller>
                             </scrollView>
                             <stackView distribution="fillEqually" orientation="horizontal" alignment="top" spacing="4" horizontalStackHuggingPriority="249.99998474121094" verticalStackHuggingPriority="249.99998474121094" detachesHiddenViews="YES" translatesAutoresizingMaskIntoConstraints="NO" id="dN1-y1-5Xe">
-                                <rect key="frame" x="741" y="2" width="92" height="28"/>
+                                <rect key="frame" x="741" y="4" width="92" height="28"/>
                                 <subviews>
                                     <button hidden="YES" translatesAutoresizingMaskIntoConstraints="NO" id="2da-G7-xcP" userLabel="Right Scroll Button" customClass="MouseOverButton" customModule="DuckDuckGo_Privacy_Browser" customModuleProvider="target">
                                         <rect key="frame" x="0.0" y="0.0" width="28" height="28"/>
@@ -231,25 +231,25 @@
                             <constraint firstAttribute="trailing" secondItem="8Av-Au-VBq" secondAttribute="trailing" id="04T-2h-lX4"/>
                             <constraint firstItem="efe-Pc-ueT" firstAttribute="leading" secondItem="O0X-yp-zLn" secondAttribute="leading" priority="250" id="5k3-uY-xby"/>
                             <constraint firstItem="kOb-4q-pAe" firstAttribute="leading" secondItem="JQD-ov-FCr" secondAttribute="leading" constant="76" id="8CU-j8-UY3"/>
-                            <constraint firstAttribute="bottom" secondItem="O0X-yp-zLn" secondAttribute="bottom" id="9nu-uZ-CjI"/>
+                            <constraint firstAttribute="bottom" secondItem="O0X-yp-zLn" secondAttribute="bottom" constant="1" id="9nu-uZ-CjI"/>
                             <constraint firstItem="u4N-Qc-LMf" firstAttribute="trailing" secondItem="O0X-yp-zLn" secondAttribute="trailing" id="Bd1-0P-xDt"/>
                             <constraint firstItem="zsA-or-9Xo" firstAttribute="top" secondItem="JQD-ov-FCr" secondAttribute="top" id="CKr-JO-cA6"/>
                             <constraint firstAttribute="bottom" secondItem="zsA-or-9Xo" secondAttribute="bottom" id="ErC-gw-bFR"/>
                             <constraint firstItem="efe-Pc-ueT" firstAttribute="trailing" secondItem="O0X-yp-zLn" secondAttribute="trailing" priority="250" constant="4" id="FJf-Su-MHu"/>
                             <constraint firstAttribute="bottom" secondItem="u4N-Qc-LMf" secondAttribute="bottom" id="Fc4-Wo-qz3"/>
+                            <constraint firstItem="kOb-4q-pAe" firstAttribute="centerY" secondItem="O0X-yp-zLn" secondAttribute="centerY" id="GDB-h4-lrc"/>
                             <constraint firstItem="efe-Pc-ueP" firstAttribute="top" secondItem="JQD-ov-FCr" secondAttribute="top" id="IfJ-U1-mpT"/>
+                            <constraint firstItem="dN1-y1-5Xe" firstAttribute="centerY" secondItem="O0X-yp-zLn" secondAttribute="centerY" id="M6c-OC-8Nn"/>
                             <constraint firstItem="O0X-yp-zLn" firstAttribute="leading" secondItem="kOb-4q-pAe" secondAttribute="trailing" id="MVf-BL-bYZ"/>
                             <constraint firstAttribute="bottom" secondItem="efe-Pc-ueT" secondAttribute="bottom" priority="750" id="Si3-u3-31S"/>
                             <constraint firstAttribute="trailing" secondItem="dN1-y1-5Xe" secondAttribute="trailing" constant="12" id="SiM-7u-jTo"/>
                             <constraint firstItem="efe-Pc-ueP" firstAttribute="leading" secondItem="JQD-ov-FCr" secondAttribute="leading" id="UBO-rv-mb4"/>
                             <constraint firstItem="8Av-Au-VBq" firstAttribute="top" secondItem="JQD-ov-FCr" secondAttribute="top" id="UNA-xd-vb7"/>
-                            <constraint firstAttribute="bottom" secondItem="dN1-y1-5Xe" secondAttribute="bottom" constant="2" id="aiC-Qo-Ct1"/>
                             <constraint firstItem="O0X-yp-zLn" firstAttribute="leading" secondItem="zsA-or-9Xo" secondAttribute="leading" id="bIL-4K-ggG"/>
                             <constraint firstItem="8Av-Au-VBq" firstAttribute="leading" secondItem="JQD-ov-FCr" secondAttribute="leading" id="djE-ZR-Zcb"/>
                             <constraint firstAttribute="trailing" secondItem="efe-Pc-ueP" secondAttribute="trailing" id="etm-VT-0k2"/>
                             <constraint firstItem="dN1-y1-5Xe" firstAttribute="leading" secondItem="efe-Pc-ueT" secondAttribute="trailing" id="hWs-AC-dwE"/>
                             <constraint firstAttribute="bottom" secondItem="efe-Pc-ueP" secondAttribute="bottom" id="iYT-Di-UlL"/>
-                            <constraint firstAttribute="bottom" secondItem="kOb-4q-pAe" secondAttribute="bottom" constant="2" id="jHt-Ik-IEK"/>
                             <constraint firstItem="efe-Pc-ueT" firstAttribute="top" secondItem="JQD-ov-FCr" secondAttribute="top" priority="750" id="kNA-2I-L0U"/>
                             <constraint firstAttribute="bottom" secondItem="8Av-Au-VBq" secondAttribute="bottom" id="pat-VC-dVb"/>
                             <constraint firstItem="u4N-Qc-LMf" firstAttribute="top" secondItem="JQD-ov-FCr" secondAttribute="top" id="zB8-BE-pJR"/>
