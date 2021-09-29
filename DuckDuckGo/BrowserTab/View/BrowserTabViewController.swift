@@ -35,7 +35,7 @@ final class BrowserTabViewController: NSViewController {
     private let tabCollectionViewModel: TabCollectionViewModel
     private var urlCancellable: AnyCancellable?
     private var selectedTabViewModelCancellable: AnyCancellable?
-    private var isErrorViewVisibleCancellable: AnyCancellable?
+    private var errorViewStateCancellable: AnyCancellable?
 
     private var contextMenuExpected = false
     private var contextMenuLink: URL?
@@ -65,13 +65,13 @@ final class BrowserTabViewController: NSViewController {
         super.viewDidLoad()
 
         subscribeToSelectedTabViewModel()
-        subscribeToIsErrorViewVisible()
+        subscribeToErrorViewState()
     }
 
     private func subscribeToSelectedTabViewModel() {
         selectedTabViewModelCancellable = tabCollectionViewModel.$selectedTabViewModel.receive(on: DispatchQueue.main).sink { [weak self] _ in
             self?.updateInterface()
-            self?.subscribeToIsErrorViewVisible()
+            self?.subscribeToErrorViewState()
         }
     }
 
@@ -149,9 +149,12 @@ final class BrowserTabViewController: NSViewController {
          }
     }
 
-    private func subscribeToIsErrorViewVisible() {
-        isErrorViewVisibleCancellable = tabViewModel?.$isErrorViewVisible.receive(on: DispatchQueue.main).sink { [weak self] _ in
-            self?.displayErrorView(self?.tabViewModel?.isErrorViewVisible ?? false, self?.tabViewModel?.errorMessage ?? "")
+    private func subscribeToErrorViewState() {
+        errorViewStateCancellable = tabViewModel?.$errorViewState.receive(on: DispatchQueue.main).sink { [weak self] _ in
+            self?.displayErrorView(
+                self?.tabViewModel?.errorViewState.isVisible ?? false,
+                message: self?.tabViewModel?.errorViewState.message ?? UserText.unknownErrorMessage
+            )
         }
     }
 
@@ -165,7 +168,7 @@ final class BrowserTabViewController: NSViewController {
         }
     }
 
-    private func displayErrorView(_ shown: Bool, _ message: String) {
+    private func displayErrorView(_ shown: Bool, message: String) {
         guard let webView = webView else {
             os_log("BrowserTabViewController: Web view is nil", type: .error)
             return

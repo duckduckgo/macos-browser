@@ -485,7 +485,7 @@ final class AddressBarButtonsViewController: NSViewController {
             isDuckDuckGoUrl ||
             isURLNil ||
             trackerAnimationView.isAnimationPlaying ||
-            selectedTabViewModel.isErrorViewVisible
+            selectedTabViewModel.errorViewState.isVisible
         imageButtonWrapper.isHidden = !privacyEntryPointButton.isHidden || trackerAnimationView.isAnimationPlaying
     }
 

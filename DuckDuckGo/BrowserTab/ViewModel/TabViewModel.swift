@@ -47,14 +47,18 @@ final class TabViewModel {
         }
     }
     @Published var progress: Double = 0.0
-    @Published var isErrorViewVisible: Bool = false {
+
+    struct ErrorViewState {
+        var isVisible: Bool = false
+        var message: String? = nil
+    }
+    @Published var errorViewState = ErrorViewState() {
         didSet {
             updateAddressBarStrings()
             updateTitle()
             updateFavicon()
         }
     }
-    var errorMessage: String?
 
     @Published var credentialsToSave: SecureVaultModels.WebsiteCredentials?
 
@@ -101,8 +105,8 @@ final class TabViewModel {
     private func subscribeToTabError() {
         tab.$error.receive(on: DispatchQueue.main).sink { [weak self] _ in
             guard let self = self else { return }
-            self.isErrorViewVisible = self.tab.error != nil
-            self.errorMessage = self.tab.error?.localizedDescription
+            self.errorViewState.isVisible = self.tab.error != nil
+            self.errorViewState.message = self.tab.error?.localizedDescription
         } .store(in: &cancellables)
     }
 
@@ -136,7 +140,7 @@ final class TabViewModel {
     }
 
     private func updateAddressBarStrings() {
-        guard !isErrorViewVisible else {
+        guard !errorViewState.isVisible else {
             let failingUrl = tab.error?.failingUrl
             addressBarString = failingUrl?.absoluteString ?? ""
             passiveAddressBarString = failingUrl?.host?.drop(prefix: URL.HostPrefix.www.separated()) ?? ""
@@ -180,7 +184,7 @@ final class TabViewModel {
     }
 
     private func updateTitle() {
-        guard !isErrorViewVisible else {
+        guard !errorViewState.isVisible else {
             title = UserText.tabErrorTitle
             return
         }
@@ -202,7 +206,7 @@ final class TabViewModel {
     }
 
     private func updateFavicon() {
-        guard !isErrorViewVisible else {
+        guard !errorViewState.isVisible else {
             favicon = Favicon.defaultFavicon
             return
         }
