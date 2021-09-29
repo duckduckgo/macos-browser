@@ -27,6 +27,26 @@ extension WKUserContentController {
             add(userScript, name: messageName)
         }
     }
+
+    func addHandlerPageContentWorld(_ userScript: UserScript) {
+        for messageName in userScript.messageNames {
+            if #available(macOS 11.0, *) {
+                add(userScript, contentWorld: .page, name: messageName)
+            } else {
+                add(userScript, name: messageName)
+            }
+        }
+    }
+
+    func removeHandlerPageContentWorld(_ userScript: UserScript) {
+        userScript.messageNames.forEach {
+            if #available(macOS 11.0, *) {
+                removeScriptMessageHandler(forName: $0, contentWorld: .page)
+            } else {
+                removeScriptMessageHandler(forName: $0)
+            }
+        }
+    }
     
     func addHandler(_ userScript: UserScript) {
         for messageName in userScript.messageNames {

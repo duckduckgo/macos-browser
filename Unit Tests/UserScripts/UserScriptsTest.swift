@@ -29,7 +29,7 @@ final class UserScriptsTests: XCTestCase {
 
         // swiftlint:disable force_cast
         let expected = Mirror(reflecting: userScripts).children.compactMap { $0.value as? UserScript } as! [NSObject]
-        let actual = Set(userScripts.userScripts as! [NSObject])
+        let actual = Set((userScripts.userScripts + userScripts.pageMutationScripts) as! [NSObject])
         // swiftlint:enable force_cast
 
         XCTAssertEqual(actual, Set(expected))
@@ -83,6 +83,7 @@ final class UserScriptsTests: XCTestCase {
 
         let scripts = Set(userScripts.scripts)
         let messageHandlersCount = userScripts.userScripts.reduce(0) { $0 + $1.messageNames.count }
+        let mutationScriptsCount = userScripts.pageMutationScripts.reduce(0) { $0 + $1.messageNames.count }
 
         let e = expectation(description: "Should receive message")
         let instrumentation = TabInstrumentationMock {
@@ -103,9 +104,10 @@ final class UserScriptsTests: XCTestCase {
                                                                           didReceive: message)
 
         let installedScripts = Set(userContentController.userScripts)
+        let count = messageHandlersCount + mutationScriptsCount
 
         XCTAssertEqual(scripts, installedScripts)
-        XCTAssertEqual(messageHandlersCount, userContentController.handlers.count + userContentController.handlersWithReply.count)
+        XCTAssertEqual(count, userContentController.handlers.count + userContentController.handlersWithReply.count)
         waitForExpectations(timeout: 0.3)
     }
 

@@ -43,6 +43,10 @@ final class UserScripts {
         scripts.append(autofillScript.makeWKUserScript())
     }
 
+    lazy var pageMutationScripts: [UserScript] = [
+        self.printingUserScript
+    ]
+
     lazy var userScripts: [UserScript] = [
         self.debugScript,
         self.faviconScript,
@@ -51,14 +55,13 @@ final class UserScripts {
         self.contentBlockerScript,
         self.contentBlockerRulesScript,
         self.pageObserverScript,
-        self.printingUserScript,
         self.hoverUserScript,
         self.gpcScript,
         self.navigatorCredentialsUserScript,
         self.autofillScript
     ]
 
-    lazy var scripts = userScripts.map { $0.makeWKUserScript() }
+    lazy var scripts = (pageMutationScripts + userScripts).map { $0.makeWKUserScript() }
 
 }
 
@@ -66,11 +69,13 @@ extension UserScripts {
 
     func install(into controller: WKUserContentController) {
         scripts.forEach(controller.addUserScript)
+        pageMutationScripts.forEach(controller.addHandlerPageContentWorld)
         userScripts.forEach(controller.addHandler)
     }
 
     func remove(from controller: WKUserContentController) {
         controller.removeAllUserScripts()
+        pageMutationScripts.forEach(controller.removeHandlerPageContentWorld)
         userScripts.forEach(controller.removeHandler)
     }
 

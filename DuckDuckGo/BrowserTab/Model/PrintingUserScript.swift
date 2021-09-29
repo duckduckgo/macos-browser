@@ -32,16 +32,23 @@ public class PrintingUserScript: NSObject, UserScript {
 
     public var source: String = """
 (function() {
-    document.addEventListener("click", function(event) {
-
-        let onClickAttribute = event.target.getAttribute('onclick');
-
-        if (onClickAttribute && onClickAttribute.includes('window.print()')) {
-            webkit.messageHandlers.printHandler.postMessage({});
-        }
-    });
+    window.print = function() {
+        webkit.messageHandlers.printHandler.postMessage({});
+    };
 }) ();
 """
+
+    private func makeWKUserScriptInPage(source: String, injectionTime: WKUserScriptInjectionTime, forMainFrameOnly: Bool) -> WKUserScript {
+        if #available(macOS 11.0, iOS 14.0, *) {
+            return WKUserScript(source: source, injectionTime: injectionTime, forMainFrameOnly: forMainFrameOnly, in: .page)
+        } else {
+            return WKUserScript(source: source, injectionTime: injectionTime, forMainFrameOnly: forMainFrameOnly)
+        }
+    }
+
+    public func makeWKUserScript() -> WKUserScript {
+        return makeWKUserScriptInPage(source: source, injectionTime: injectionTime, forMainFrameOnly: forMainFrameOnly)
+    }
 
     public var injectionTime: WKUserScriptInjectionTime = .atDocumentStart
     public var forMainFrameOnly: Bool = false
