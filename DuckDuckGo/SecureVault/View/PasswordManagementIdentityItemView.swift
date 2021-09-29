@@ -43,7 +43,7 @@ struct PasswordManagementIdentityItemView: View {
 
             }
 
-            ScrollView(.vertical, showsIndicators: /*@START_MENU_TOKEN@*/true/*@END_MENU_TOKEN@*/) {
+            ScrollView(.vertical) {
                 VStack(alignment: .leading, spacing: 10) {
 
                     HeaderView()

@@ -483,10 +483,14 @@ final class PasswordManagementViewController: NSViewController {
     private func fetchSecureVaultItems(completion: @escaping ([SecureVaultItem]) -> Void) {
         DispatchQueue.global(qos: .userInitiated).async {
             let accounts = (try? self.secureVault?.accounts()) ?? []
+            let cards = (try? self.secureVault?.creditCards()) ?? []
             let notes = (try? self.secureVault?.notes()) ?? []
             let identities = (try? self.secureVault?.identities()) ?? []
 
-            let items = accounts.map(SecureVaultItem.account) + notes.map(SecureVaultItem.note) + identities.map(SecureVaultItem.identity)
+            let items = accounts.map(SecureVaultItem.account) +
+                        cards.map(SecureVaultItem.card) +
+                        notes.map(SecureVaultItem.note) +
+                        identities.map(SecureVaultItem.identity)
 
             DispatchQueue.main.async {
                 completion(items)

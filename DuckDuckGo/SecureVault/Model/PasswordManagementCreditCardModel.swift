@@ -44,10 +44,50 @@ final class PasswordManagementCreditCardModel: ObservableObject, PasswordManagem
         }
     }
 
+    var isInEditMode: Bool {
+        return isEditing || isNew
+    }
+
     @Published var isEditing = false
     @Published var isNew = false
 
     @Published var title: String = "" {
+        didSet {
+            isDirty = true
+        }
+    }
+
+    @Published var cardNumber: String = "" {
+        didSet {
+            isDirty = true
+        }
+    }
+
+    @Published var cardSecurityCode: String = "" {
+        didSet {
+            isDirty = true
+        }
+    }
+
+    @Published var expirationMonth: Int? {
+        didSet {
+            isDirty = true
+        }
+    }
+
+    @Published var expirationYear: Int? {
+        didSet {
+            isDirty = true
+        }
+    }
+
+    @Published var countryCode: String = "" {
+        didSet {
+            isDirty = true
+        }
+    }
+
+    @Published var postalCode: String = "" {
         didSet {
             isDirty = true
         }
@@ -96,6 +136,12 @@ final class PasswordManagementCreditCardModel: ObservableObject, PasswordManagem
         guard var card = card else { return }
 
         card.title = title
+        card.cardNumber = cardNumber
+        card.cardSecurityCode = cardSecurityCode
+        card.expirationMonth = expirationMonth
+        card.expirationYear = expirationYear
+        card.countryCode = countryCode
+        card.postalCode = postalCode
 
         onSaveRequested(card)
     }
@@ -123,6 +169,12 @@ final class PasswordManagementCreditCardModel: ObservableObject, PasswordManagem
 
     private func populateViewModelFromCard() {
         title = card?.title ?? ""
+        cardNumber = card?.cardNumber ?? ""
+        cardSecurityCode = card?.cardSecurityCode ?? ""
+        expirationMonth = card?.expirationMonth
+        expirationYear = card?.expirationYear
+        countryCode = card?.countryCode ?? ""
+        postalCode = card?.postalCode ?? ""
 
         isDirty = false
 
