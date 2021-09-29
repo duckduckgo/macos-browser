@@ -265,7 +265,7 @@ final class TabBarViewItem: NSCollectionViewItem {
             mouseOverView.mouseOverColor = isSelected || isDragged ? NSColor.clear : NSColor.tabMouseOverColor
         }
 
-        let showCloseButton = isMouseOver || isSelected
+        let showCloseButton = (isMouseOver && !widthStage.isCloseButtonHidden) || isSelected
         closeButton.isHidden = !showCloseButton
         updateSeparatorView()
         permissionCloseButtonTrailingConstraint.isActive = !closeButton.isHidden
@@ -453,16 +453,19 @@ extension TabBarViewItem {
 
     enum WidthStage {
         case full
+        case withoutCloseButton
         case withoutTitle
 
         init(width: CGFloat) {
             switch width {
             case 0..<61: self = .withoutTitle
+            case 61..<120: self = .withoutCloseButton
             default: self = .full
             }
         }
 
         var isTitleHidden: Bool { self == .withoutTitle }
+        var isCloseButtonHidden: Bool { self != .full }
         var isFaviconCentered: Bool { !isTitleHidden }
     }
 
