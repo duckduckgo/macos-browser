@@ -28,6 +28,7 @@ final class BrowserTabViewController: NSViewController {
 
     @IBOutlet weak var errorView: NSView!
     @IBOutlet weak var homepageView: NSView!
+    @IBOutlet weak var errorMessageLabel: NSTextField!
     weak var webView: WebView?
 
     var tabViewModel: TabViewModel?
@@ -174,11 +175,7 @@ final class BrowserTabViewController: NSViewController {
             return
         }
 
-        // swiftlint:disable force_cast
-        let errorMessageLabel = errorView.subviews[1]
-        (errorMessageLabel as! NSTextField).stringValue = message
-        // swiftlint:enable force_cast
-
+        errorMessageLabel.stringValue = message
         errorView.isHidden = !shown
         webView.isHidden = shown
         homepageView.isHidden = shown

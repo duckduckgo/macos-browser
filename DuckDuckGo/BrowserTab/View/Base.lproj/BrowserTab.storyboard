@@ -71,6 +71,7 @@
                         </userDefinedRuntimeAttributes>
                     </view>
                     <connections>
+                        <outlet property="errorMessageLabel" destination="iH5-FT-P9e" id="xyD-i9-O2O"/>
                         <outlet property="errorView" destination="bol-qn-wuI" id="gbL-AN-fxw"/>
                         <outlet property="homepageView" destination="aUo-25-0iW" id="ScM-C9-V67"/>
                     </connections>
