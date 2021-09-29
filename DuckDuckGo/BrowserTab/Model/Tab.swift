@@ -24,7 +24,7 @@ import BrowserServicesKit
 
 protocol TabDelegate: FileDownloadManagerDelegate {
     func tabDidStartNavigation(_ tab: Tab)
-    func tab(_ tab: Tab, requestedNewTab url: URL?, selected: Bool, isBurner: Bool)
+    func tab(_ tab: Tab, requestedNewTab url: URL?, selected: Bool)
     func tab(_ tab: Tab, willShowContextMenuAt position: NSPoint, image: URL?, link: URL?, selectedText: String?)
 	func tab(_ tab: Tab, requestedOpenExternalURL url: URL, forUserEnteredURL: Bool)
     func tab(_ tab: Tab, requestedSaveCredentials credentials: SecureVaultModels.WebsiteCredentials)
@@ -39,11 +39,6 @@ protocol TabDelegate: FileDownloadManagerDelegate {
 // swiftlint:disable type_body_length
 // swiftlint:disable file_length
 final class Tab: NSObject {
-
-    enum TabStorageType {
-        case `default`
-        case burner
-    }
 
     enum TabContent: Equatable {
         case homepage
@@ -83,7 +78,6 @@ final class Tab: NSObject {
     weak var delegate: TabDelegate?
 
     init(content: TabContent,
-         tabStorageType: TabStorageType = .default,
          faviconService: FaviconService = LocalFaviconService.shared,
          webCacheManager: WebCacheManager = .shared,
          webViewConfiguration: WebViewConfiguration? = nil,
@@ -97,7 +91,6 @@ final class Tab: NSObject {
          canBeClosedWithBack: Bool = false) {
 
         self.content = content
-        self.tabStorageType = tabStorageType
         self.faviconService = faviconService
         self.historyCoordinating = historyCoordinating
         self.title = title
@@ -109,9 +102,6 @@ final class Tab: NSObject {
 
         let configuration = webViewConfiguration ?? WKWebViewConfiguration()
         configuration.applyStandardConfiguration()
-        if webViewConfiguration == nil && tabStorageType == .burner {
-            configuration.websiteDataStore = .nonPersistent()
-        }
 
         webView = WebView(frame: CGRect.zero, configuration: configuration)
         permissions = PermissionModel(webView: webView)
@@ -161,8 +151,6 @@ final class Tab: NSObject {
 
         self.content = content
     }
-
-    let tabStorageType: TabStorageType
 
     @PublishedAfter var title: String?
     @PublishedAfter var error: Error?
@@ -447,8 +435,6 @@ final class Tab: NSObject {
     private var shouldStoreNextVisit = true
 
     func addVisit(of url: URL) {
-        guard tabStorageType != .burner else { return }
-
         guard shouldStoreNextVisit else {
             shouldStoreNextVisit = true
             return
@@ -644,7 +630,7 @@ extension Tab: WKNavigationDelegate {
         let isMiddleClicked = navigationAction.buttonNumber == Constants.webkitMiddleClick
         if isLinkActivated && NSApp.isCommandPressed || isMiddleClicked {
             decisionHandler(.cancel)
-            delegate?.tab(self, requestedNewTab: navigationAction.request.url, selected: NSApp.isShiftPressed, isBurner: tabStorageType == .burner)
+            delegate?.tab(self, requestedNewTab: navigationAction.request.url, selected: NSApp.isShiftPressed)
             return
         } else if isLinkActivated && NSApp.isOptionPressed && !NSApp.isCommandPressed {
             decisionHandler(.download(navigationAction, using: webView))

@@ -33,20 +33,11 @@ final class WindowsManager {
         }
     }
 
-    class func closeAllBurnerTabs() {
-        NSApplication.shared.windows.forEach {
-            if let controller = $0.contentViewController as? MainViewController {
-                controller.tabCollectionViewModel.removeBurnerTabs()
-            }
-        }
-    }
-
     @discardableResult
     class func openNewWindow(with tabCollectionViewModel: TabCollectionViewModel? = nil,
                              droppingPoint: NSPoint? = nil,
-                             showWindow: Bool = true,
-                             withBurnerTab: Bool = false) -> NSWindow? {
-        let mainWindowController = makeNewWindow(tabCollectionViewModel: tabCollectionViewModel, withBurnerTab: withBurnerTab)
+                             showWindow: Bool = true) -> NSWindow? {
+        let mainWindowController = makeNewWindow(tabCollectionViewModel: tabCollectionViewModel)
 
         if let droppingPoint = droppingPoint {
             mainWindowController.window?.setFrameOrigin(droppingPoint: droppingPoint)
@@ -79,13 +70,13 @@ final class WindowsManager {
         newTab.setContent(.url(initialUrl))
     }
 
-    private class func makeNewWindow(tabCollectionViewModel: TabCollectionViewModel? = nil, withBurnerTab: Bool = false) -> MainWindowController {
+    private class func makeNewWindow(tabCollectionViewModel: TabCollectionViewModel? = nil) -> MainWindowController {
         let mainViewController: MainViewController
         do {
             mainViewController = try NSException.catch {
                 NSStoryboard(name: "Main", bundle: .main)
                     .instantiateController(identifier: .mainViewController) { coder -> MainViewController? in
-                        let model = tabCollectionViewModel ?? TabCollectionViewModel.makeWithDefaultTab(isBurner: withBurnerTab)
+                        let model = tabCollectionViewModel ?? TabCollectionViewModel()
                         return MainViewController(coder: coder, tabCollectionViewModel: model)
                     }
             }

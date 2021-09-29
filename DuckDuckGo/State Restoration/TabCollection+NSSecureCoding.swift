@@ -31,7 +31,7 @@ extension TabCollection: NSSecureCoding {
     }
 
     func encode(with coder: NSCoder) {
-        coder.encode(tabs.filter { $0.tabStorageType != .burner }, forKey: NSKeyedArchiveRootObjectKey)
+        coder.encode(tabs, forKey: NSKeyedArchiveRootObjectKey)
     }
 
 }
