@@ -130,10 +130,9 @@ class HistoryCoordinatorTests: XCTestCase {
 
         let fireproofDomains = FireproofDomains()
         fireproofDomains.addToAllowed(domain: fireproofDomain)
-
         historyCoordinator.burnHistory(except: fireproofDomains) {
-            XCTAssert(historyStoringMock.cleanAndReloadHistoryExteptions.count == 1)
-            XCTAssert(historyStoringMock.cleanAndReloadHistoryExteptions.first!.url.host!.hasPrefix(fireproofDomain))
+            XCTAssert(historyStoringMock.cleanAndReloadHistoryExceptions.count == 1)
+            XCTAssert(historyStoringMock.cleanAndReloadHistoryExceptions.first!.url.host!.hasPrefix(fireproofDomain))
         }
     }
 
