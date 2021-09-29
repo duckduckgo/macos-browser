@@ -44,6 +44,8 @@ struct UserText {
     static let tabBookmarksTitle = NSLocalizedString("tab.bookmarks.title", value: "Bookmarks", comment: "Tab bookmarks title")
     static let tabErrorTitle = NSLocalizedString("tab.error.title", value: "Oops!", comment: "Tab error title")
 
+    static let unknownErrorMessage = NSLocalizedString("error.unknown", value: "An unknown error has occurred", comment: "Error page subtitle")
+
     static let moveTabToNewWindow = NSLocalizedString("options.menu.move.tab.to.new.window",
                                                       value: "Move Tab to New Window",
                                                       comment: "Context menu item")
