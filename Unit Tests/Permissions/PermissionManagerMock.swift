@@ -42,9 +42,10 @@ final class PermissionManagerMock: PermissionManagerProtocol {
     }
 
     var burnPermissionsCalled = false
-    func burnPermissions(except fireproofDomains: FireproofDomains) {
+    func burnPermissions(except fireproofDomains: FireproofDomains, completion: @escaping () -> Void) {
         savedPermissions = savedPermissions.filter { fireproofDomains.isFireproof(fireproofDomain: $0.key) }
         burnPermissionsCalled = true
+        completion()
     }
 
 }

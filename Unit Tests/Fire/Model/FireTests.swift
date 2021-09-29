@@ -27,7 +27,13 @@ final class FireTests: XCTestCase {
     var cancellables = Set<AnyCancellable>()
 
     func testWhenBurnAllThenTabsAreClosedAndNewEmptyTabIsOpen() {
-        let fire = Fire()
+        let manager = WebCacheManagerMock()
+        let historyCoordinator = HistoryCoordinatingMock()
+        let permissionManager = PermissionManagerMock()
+
+        let fire = Fire(cacheManager: manager,
+                        historyCoordinating: historyCoordinator,
+                        permissionManager: permissionManager)
         let tabCollectionViewModel = TabCollectionViewModel.aTabCollectionViewModel
 
         let burningExpectation = expectation(description: "Burning")
@@ -60,7 +66,12 @@ final class FireTests: XCTestCase {
     }
 
     func testWhenBurnAllThenBurningFlagToggles() {
-        let fire = Fire()
+        let manager = WebCacheManagerMock()
+        let historyCoordinator = HistoryCoordinatingMock()
+        let permissionManager = PermissionManagerMock()
+        let fire = Fire(cacheManager: manager,
+                        historyCoordinating: historyCoordinator,
+                        permissionManager: permissionManager)
         let tabCollectionViewModel = TabCollectionViewModel.aTabCollectionViewModel
 
         let isBurningExpectation = expectation(description: "Burning")

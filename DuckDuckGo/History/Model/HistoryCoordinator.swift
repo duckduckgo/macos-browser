@@ -33,7 +33,7 @@ protocol HistoryCoordinating: AnyObject {
     func markFailedToLoadUrl(_ url: URL)
     func title(for url: URL) -> String?
 
-    func burnHistory(except fireproofDomains: FireproofDomains)
+    func burnHistory(except fireproofDomains: FireproofDomains, completion: @escaping () -> Void)
 
 }
 
@@ -134,7 +134,7 @@ final class HistoryCoordinator: HistoryCoordinating {
         }
     }
 
-    func burnHistory(except fireproofDomains: FireproofDomains) {
+    func burnHistory(except fireproofDomains: FireproofDomains, completion: @escaping () -> Void) {
         queue.async(flags: .barrier) { [weak self] in
             guard let history = self?._history else { return }
             let exceptions: [HistoryEntry] = history.compactMap({ historyEntry in
@@ -144,7 +144,11 @@ final class HistoryCoordinator: HistoryCoordinating {
                 return nil
             })
 
-            self?.cleanAndReloadHistory(until: .distantFuture, except: exceptions)
+            self?.cleanAndReloadHistory(until: .distantFuture, except: exceptions, completionHandler: { _ in
+                DispatchQueue.main.async {
+                    completion()
+                }
+            })
         }
     }
 
@@ -153,7 +157,8 @@ final class HistoryCoordinator: HistoryCoordinating {
     }
 
     private func cleanAndReloadHistory(until date: Date,
-                                       except exceptions: [HistoryEntry]) {
+                                       except exceptions: [HistoryEntry],
+                                       completionHandler: ((Error?) -> Void)? = nil) {
         queue.async(flags: .barrier) { [weak self] in
             guard let self = self else { return }
 
@@ -164,8 +169,10 @@ final class HistoryCoordinator: HistoryCoordinating {
                     switch completion {
                     case .finished:
                         os_log("History cleaned and loaded successfully", log: .history)
+                        completionHandler?(nil)
                     case .failure(let error):
                         os_log("Cleaning and loading of history failed: %s", log: .history, type: .error, error.localizedDescription)
+                        completionHandler?(error)
                     }
                 }, receiveValue: { [weak self] history in
                     self?.historyDictionary = self?.makeHistoryDictionary(from: history)

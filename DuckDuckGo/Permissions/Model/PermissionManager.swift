@@ -29,7 +29,7 @@ protocol PermissionManagerProtocol: AnyObject {
     func setPermission(_ permission: Bool, forDomain domain: String, permissionType: PermissionType)
     func removePermission(forDomain domain: String, permissionType: PermissionType)
 
-    func burnPermissions(except fireproofDomains: FireproofDomains)
+    func burnPermissions(except fireproofDomains: FireproofDomains, completion: @escaping () -> Void)
 
 }
 
@@ -99,7 +99,7 @@ final class PermissionManager: PermissionManagerProtocol {
         self.permissionSubject.send( (domain, permissionType, nil) )
     }
 
-    func burnPermissions(except fireproofDomains: FireproofDomains) {
+    func burnPermissions(except fireproofDomains: FireproofDomains, completion: @escaping () -> Void) {
         dispatchPrecondition(condition: .onQueue(.main))
 
         permissions = permissions.filter {
@@ -107,7 +107,9 @@ final class PermissionManager: PermissionManagerProtocol {
         }
         store.clear(except: permissions.values.reduce(into: [StoredPermission](), {
             $0.append(contentsOf: $1.values)
-        }))
+        }), completionHandler: { _ in 
+            completion()
+        })
     }
 
 }

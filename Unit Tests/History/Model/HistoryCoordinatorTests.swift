@@ -130,12 +130,10 @@ class HistoryCoordinatorTests: XCTestCase {
 
         let fireproofDomains = FireproofDomains()
         fireproofDomains.addToAllowed(domain: fireproofDomain)
-
-        historyCoordinator.burnHistory(except: fireproofDomains)
-        Thread.sleep(forTimeInterval: 0.1)
-
-        XCTAssert(historyStoringMock.cleanAndReloadHistoryExceptions.count == 1)
-        XCTAssert(historyStoringMock.cleanAndReloadHistoryExceptions.first!.url.host!.hasPrefix(fireproofDomain))
+        historyCoordinator.burnHistory(except: fireproofDomains) {
+            XCTAssert(historyStoringMock.cleanAndReloadHistoryExceptions.count == 1)
+            XCTAssert(historyStoringMock.cleanAndReloadHistoryExceptions.first!.url.host!.hasPrefix(fireproofDomain))
+        }
     }
 
     func testWhenDomainIsVisitedForTheFirstTimeUsingTheNonRootUrl_ThenItsRootUrlIsGenerated() {

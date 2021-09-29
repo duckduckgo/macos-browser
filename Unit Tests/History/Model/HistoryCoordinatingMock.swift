@@ -34,8 +34,9 @@ final class HistoryCoordinatingMock: HistoryCoordinating {
     }
 
     var burnHistoryCalled = false
-    func burnHistory(except fireproofDomains: FireproofDomains) {
+    func burnHistory(except fireproofDomains: FireproofDomains, completion: @escaping () -> Void) {
         burnHistoryCalled = true
+        completion()
     }
 
     var markDownloadUrlCalled = false

@@ -27,7 +27,6 @@ final class Fire {
     let downloadListCoordinator: DownloadListCoordinator
 
     @Published private(set) var isBurning = false
-    @Published private(set) var progress = 0.0
 
     init(cacheManager: WebCacheManager = .shared,
          historyCoordinating: HistoryCoordinating = HistoryCoordinator.shared,
@@ -50,9 +49,13 @@ final class Fire {
             group.leave()
         }
 
-        burnHistory()
-        burnPermissions()
-        burnDownloads()
+        group.enter()
+        burnHistory { [weak self] in
+            self?.burnPermissions { [weak self] in
+                self?.burnDownloads()
+                group.leave()
+            }
+        }
 
         group.enter()
         burnTabs(tabCollectionViewModel: tabCollectionViewModel) {
@@ -69,23 +72,21 @@ final class Fire {
 
     private func burnWebCache(completion: @escaping () -> Void) {
         os_log("WebsiteDataStore began cookie deletion", log: .fire)
-        webCacheManager.clear(progress: { progress in
-            self.progress = progress
-        }, completion: {
+        webCacheManager.clear {
             os_log("WebsiteDataStore completed cookie deletion", log: .fire)
 
             DispatchQueue.main.async {
                 completion()
             }
-        })
+        }
     }
 
-    private func burnHistory() {
-        self.historyCoordinating.burnHistory(except: FireproofDomains.shared)
+    private func burnHistory(completion: @escaping () -> Void) {
+        self.historyCoordinating.burnHistory(except: FireproofDomains.shared, completion: completion)
     }
 
-    private func burnPermissions() {
-        self.permissionManager.burnPermissions(except: FireproofDomains.shared)
+    private func burnPermissions(completion: @escaping () -> Void) {
+        self.permissionManager.burnPermissions(except: FireproofDomains.shared, completion: completion)
     }
 
     private func burnDownloads() {
