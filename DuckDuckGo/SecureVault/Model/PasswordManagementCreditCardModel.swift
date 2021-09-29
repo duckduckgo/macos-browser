@@ -25,8 +25,9 @@ final class PasswordManagementCreditCardModel: ObservableObject, PasswordManagem
 
     static let dateFormatter: DateFormatter = {
         let dateFormatter = DateFormatter()
-        dateFormatter.dateStyle = .medium
-        dateFormatter.timeStyle = .medium
+//        dateFormatter.dateStyle = .medium
+//        dateFormatter.timeStyle = .none
+        dateFormatter.dateFormat = "MMMM, yyyy"
         return dateFormatter
     } ()
 

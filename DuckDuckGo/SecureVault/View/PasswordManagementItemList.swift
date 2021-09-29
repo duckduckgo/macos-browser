@@ -68,8 +68,7 @@ private struct ItemView: View {
                     FaviconView(domain: account.domain)
                         .padding(.leading, 6)
                 case .card(let card):
-                    // TODO: Fix image
-                    Image("Identity")
+                    Image("Card")
                         .frame(width: 32)
                         .padding(.leading, 6)
                 case .identity:

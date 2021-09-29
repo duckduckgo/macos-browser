@@ -398,7 +398,27 @@ final class PasswordManagementViewController: NSViewController {
     }
 
     private func promptToDelete(card: SecureVaultModels.CreditCard) {
-        print("Deleting card")
+        guard let window = self.view.window,
+              let id = card.id else { return }
+
+        let alert = NSAlert.passwordManagerConfirmDeleteNote()
+        alert.beginSheetModal(for: window) { response in
+
+            switch response {
+            case .alertFirstButtonReturn:
+                try? self.secureVault?.deleteCreditCardFor(cardId: id)
+                self.itemModel?.clearSecureVaultModel()
+                self.refetchWithText(self.searchField.stringValue)
+                self.postChange()
+
+            case .alertSecondButtonReturn:
+                break // cancel, do nothing
+
+            default:
+                fatalError("Unknown response \(response)")
+            }
+
+        }
     }
 
     private func createListView() {

@@ -56,6 +56,44 @@ struct PasswordManagementCreditCardItemView: View {
                     print("Copied card security value")
                 }
 
+                // Expiration:
+
+                Text("Expiration Date")
+                    .bold()
+                    .padding(.bottom, 5)
+
+                if model.isInEditMode {
+                    HStack {
+
+                        Picker("", selection: $model.expirationMonth) {
+                            ForEach(Date.monthsWithIndex, id: \.self) { month in
+                                Text(month.name)
+                                    .tag(month.index as Int?)
+                            }
+                        }
+                        .labelsHidden()
+
+                        Picker("", selection: $model.expirationYear) {
+                            ForEach(Date.nextTenYears, id: \.self) { year in
+                                Text(String(year))
+                                    .tag(year as Int?)
+                            }
+                        }
+                        .labelsHidden()
+
+                    }
+                    .padding(.bottom, interItemSpacing)
+                } else if let month = model.expirationMonth, let year = model.expirationYear {
+                    let components = DateComponents(calendar: Calendar.current, year: year, month: month)
+
+                    if let date = components.date {
+                        Text(PasswordManagementCreditCardModel.dateFormatter.string(from: date))
+                            .padding(.bottom, interItemSpacing)
+                    }
+                }
+
+                // Country:
+
                 if model.isInEditMode {
                     Text("Country")
                         .bold()
@@ -68,7 +106,7 @@ struct PasswordManagementCreditCardItemView: View {
                         }
                     }
                     .labelsHidden()
-                    .padding(.bottom, 5)
+                    .padding(.bottom, interItemSpacing)
                 } else if !model.countryCode.isEmpty {
                     Text("Country")
                         .bold()
@@ -77,6 +115,8 @@ struct PasswordManagementCreditCardItemView: View {
                     Text(CountryList.name(forCountryCode: model.countryCode) ?? "")
                         .padding(.bottom, interItemSpacing)
                 }
+
+                // Postal Code:
 
                 EditableIdentityField(textFieldValue: $model.postalCode, title: "Postal Code") {
                     print("Copied postal code")
@@ -105,7 +145,7 @@ private struct HeaderView: View {
 
         HStack(alignment: .center, spacing: 0) {
 
-            Image("Note")
+            Image("Card")
                 .padding(.trailing, 10)
 
             if model.isNew {

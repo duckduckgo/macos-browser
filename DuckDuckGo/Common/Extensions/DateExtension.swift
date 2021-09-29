@@ -20,6 +20,11 @@ import Foundation
 
 extension Date {
 
+    struct IndexedMonth: Hashable {
+        let name: String
+        let index: Int
+    }
+
     static var weekAgo: Date! {
         return Calendar.current.date(byAdding: .weekOfMonth, value: -1, to: Date())!
     }
@@ -35,6 +40,30 @@ extension Date {
 
     static var startOfDayToday: Date {
         return Calendar.current.startOfDay(for: Date())
+    }
+
+    static var monthsWithIndex: [IndexedMonth] {
+        let months = Calendar.current.monthSymbols
+
+        return months.enumerated().map { index, month in
+            return IndexedMonth(name: month, index: index + 1)
+        }
+    }
+
+    static var nextTenYears: [Int] {
+        let offsetComponents = DateComponents(year: 1)
+
+        var years = [Int]()
+        var currentDate = Date()
+
+        for _ in 0...10 {
+            let currentYear = Calendar.current.component(.year, from: currentDate)
+            years.append(currentYear)
+
+            currentDate = Calendar.current.date(byAdding: offsetComponents, to: currentDate)!
+        }
+
+        return years
     }
 
     var daySinceReferenceDate: Int {
