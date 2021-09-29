@@ -25,8 +25,6 @@ final class PasswordManagementCreditCardModel: ObservableObject, PasswordManagem
 
     static let dateFormatter: DateFormatter = {
         let dateFormatter = DateFormatter()
-//        dateFormatter.dateStyle = .medium
-//        dateFormatter.timeStyle = .none
         dateFormatter.dateFormat = "MMMM, yyyy"
         return dateFormatter
     } ()
@@ -82,18 +80,6 @@ final class PasswordManagementCreditCardModel: ObservableObject, PasswordManagem
         }
     }
 
-    @Published var countryCode: String = "" {
-        didSet {
-            isDirty = true
-        }
-    }
-
-    @Published var postalCode: String = "" {
-        didSet {
-            isDirty = true
-        }
-    }
-
     var isDirty = false {
         didSet {
             self.onDirtyChanged(isDirty)
@@ -116,9 +102,7 @@ final class PasswordManagementCreditCardModel: ObservableObject, PasswordManagem
                      cardNumber: nil,
                      cardSecurityCode: nil,
                      expirationMonth: nil,
-                     expirationYear: nil,
-                     countryCode: nil,
-                     postalCode: nil)
+                     expirationYear: nil)
 
         isEditing = true
     }
@@ -141,8 +125,6 @@ final class PasswordManagementCreditCardModel: ObservableObject, PasswordManagem
         card.cardSecurityCode = cardSecurityCode
         card.expirationMonth = expirationMonth
         card.expirationYear = expirationYear
-        card.countryCode = countryCode
-        card.postalCode = postalCode
 
         onSaveRequested(card)
     }
@@ -174,8 +156,6 @@ final class PasswordManagementCreditCardModel: ObservableObject, PasswordManagem
         cardSecurityCode = card?.cardSecurityCode ?? ""
         expirationMonth = card?.expirationMonth
         expirationYear = card?.expirationYear
-        countryCode = card?.countryCode ?? ""
-        postalCode = card?.postalCode ?? ""
 
         isDirty = false
 

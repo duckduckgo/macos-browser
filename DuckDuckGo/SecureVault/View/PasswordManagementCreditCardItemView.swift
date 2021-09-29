@@ -92,36 +92,6 @@ struct PasswordManagementCreditCardItemView: View {
                     }
                 }
 
-                // Country:
-
-                if model.isInEditMode {
-                    Text("Country")
-                        .bold()
-                        .padding(.bottom, 5)
-
-                    Picker("", selection: $model.countryCode) {
-                        ForEach(CountryList.countries, id: \.self) { country in
-                            Text(country.name)
-                                .tag(country.countryCode)
-                        }
-                    }
-                    .labelsHidden()
-                    .padding(.bottom, interItemSpacing)
-                } else if !model.countryCode.isEmpty {
-                    Text("Country")
-                        .bold()
-                        .padding(.bottom, 5)
-
-                    Text(CountryList.name(forCountryCode: model.countryCode) ?? "")
-                        .padding(.bottom, interItemSpacing)
-                }
-
-                // Postal Code:
-
-                EditableIdentityField(textFieldValue: $model.postalCode, title: "Postal Code") {
-                    print("Copied postal code")
-                }
-
                 Spacer(minLength: 0)
 
                 Buttons()

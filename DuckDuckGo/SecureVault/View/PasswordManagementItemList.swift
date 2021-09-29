@@ -65,7 +65,7 @@ private struct ItemView: View {
 
                 switch item {
                 case .account(let account):
-                    FaviconView(domain: account.domain)
+                    LoginFaviconView(domain: account.domain)
                         .padding(.leading, 6)
                 case .card(let card):
                     Image("Card")
