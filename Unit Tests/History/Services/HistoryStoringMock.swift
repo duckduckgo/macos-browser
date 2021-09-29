@@ -27,11 +27,11 @@ final class HistoryStoringMock: HistoryStoring {
     }
 
     var cleanAndReloadHistoryCalled = false
-    var cleanAndReloadHistoryExteptions = [HistoryEntry]()
+    var cleanAndReloadHistoryExceptions = [HistoryEntry]()
     var cleanAndReloadHistoryResult: Result<History, Error>?
     func cleanAndReloadHistory(until date: Date, except exceptions: [HistoryEntry]) -> Future<History, Error> {
         cleanAndReloadHistoryCalled = true
-        cleanAndReloadHistoryExteptions = exceptions
+        cleanAndReloadHistoryExceptions = exceptions
         return Future { [weak self] promise in
             guard let cleanAndReloadHistoryResult = self?.cleanAndReloadHistoryResult else {
                 promise(.failure(HistoryStoringMockError.defaultError))
