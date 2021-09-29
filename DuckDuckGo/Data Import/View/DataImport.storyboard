@@ -14,29 +14,42 @@
                     <view key="view" translatesAutoresizingMaskIntoConstraints="NO" id="tOy-S4-hL0">
                         <rect key="frame" x="0.0" y="0.0" width="522" height="329"/>
                         <subviews>
-                            <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="0i7-MK-KZ1">
-                                <rect key="frame" x="18" y="294" width="136" height="15"/>
-                                <textFieldCell key="cell" lineBreakMode="clipping" title="Import Browser Data" id="Qne-Wm-qAI">
-                                    <font key="font" size="13" name="SFProText-Semibold"/>
-                                    <color key="textColor" name="labelColor" catalog="System" colorSpace="catalog"/>
-                                    <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
-                                </textFieldCell>
-                            </textField>
-                            <popUpButton verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="sh9-5v-T9e" userLabel="Import Source Picker">
-                                <rect key="frame" x="17" y="242" width="207" height="25"/>
-                                <constraints>
-                                    <constraint firstAttribute="width" priority="500" constant="200" id="gkZ-Iu-IBm"/>
-                                </constraints>
-                                <popUpButtonCell key="cell" type="push" title="CSV" bezelStyle="rounded" alignment="left" lineBreakMode="truncatingTail" state="on" borderStyle="borderAndBezel" imageScaling="proportionallyDown" inset="2" selectedItem="JdU-Ne-uLi" id="6q4-5Y-MHI" userLabel="CSV">
-                                    <behavior key="behavior" lightByBackground="YES" lightByGray="YES"/>
-                                    <font key="font" metaFont="menu"/>
-                                    <menu key="menu" id="6wh-Tc-88e">
-                                        <items>
-                                            <menuItem title="CSV" state="on" id="JdU-Ne-uLi" userLabel="CSV"/>
-                                        </items>
-                                    </menu>
-                                </popUpButtonCell>
-                            </popUpButton>
+                            <stackView distribution="fill" orientation="vertical" alignment="leading" spacing="18" horizontalStackHuggingPriority="249.99998474121094" verticalStackHuggingPriority="249.99998474121094" detachesHiddenViews="YES" translatesAutoresizingMaskIntoConstraints="NO" id="Uip-wv-e5R">
+                                <rect key="frame" x="20" y="256" width="200" height="53"/>
+                                <subviews>
+                                    <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="0i7-MK-KZ1">
+                                        <rect key="frame" x="-2" y="38" width="136" height="15"/>
+                                        <textFieldCell key="cell" lineBreakMode="clipping" title="Import Browser Data" id="Qne-Wm-qAI">
+                                            <font key="font" size="13" name="SFProText-Semibold"/>
+                                            <color key="textColor" name="labelColor" catalog="System" colorSpace="catalog"/>
+                                            <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
+                                        </textFieldCell>
+                                    </textField>
+                                    <popUpButton verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="sh9-5v-T9e" userLabel="Import Source Picker">
+                                        <rect key="frame" x="-3" y="-4" width="207" height="25"/>
+                                        <constraints>
+                                            <constraint firstAttribute="width" priority="500" constant="200" id="gkZ-Iu-IBm"/>
+                                        </constraints>
+                                        <popUpButtonCell key="cell" type="push" title="CSV" bezelStyle="rounded" alignment="left" lineBreakMode="truncatingTail" state="on" borderStyle="borderAndBezel" imageScaling="proportionallyDown" inset="2" selectedItem="JdU-Ne-uLi" id="6q4-5Y-MHI" userLabel="CSV">
+                                            <behavior key="behavior" lightByBackground="YES" lightByGray="YES"/>
+                                            <font key="font" metaFont="menu"/>
+                                            <menu key="menu" id="6wh-Tc-88e">
+                                                <items>
+                                                    <menuItem title="CSV" state="on" id="JdU-Ne-uLi" userLabel="CSV"/>
+                                                </items>
+                                            </menu>
+                                        </popUpButtonCell>
+                                    </popUpButton>
+                                </subviews>
+                                <visibilityPriorities>
+                                    <integer value="1000"/>
+                                    <integer value="1000"/>
+                                </visibilityPriorities>
+                                <customSpacing>
+                                    <real value="3.4028234663852886e+38"/>
+                                    <real value="3.4028234663852886e+38"/>
+                                </customSpacing>
+                            </stackView>
                             <button verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="p3M-G6-gOX">
                                 <rect key="frame" x="434" y="13" width="75" height="32"/>
                                 <buttonCell key="cell" type="push" title="Import" bezelStyle="rounded" alignment="center" enabled="NO" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="HD2-Mw-Fjl">
@@ -64,23 +77,20 @@ Gw
                                 </connections>
                             </button>
                             <customView translatesAutoresizingMaskIntoConstraints="NO" id="Bde-GS-Qx1">
-                                <rect key="frame" x="0.0" y="60" width="522" height="168"/>
+                                <rect key="frame" x="0.0" y="60" width="522" height="178"/>
                             </customView>
                         </subviews>
                         <constraints>
                             <constraint firstAttribute="trailing" secondItem="p3M-G6-gOX" secondAttribute="trailing" constant="20" symbolic="YES" id="2Pk-Jt-TVr"/>
                             <constraint firstItem="p3M-G6-gOX" firstAttribute="leading" secondItem="UkV-S4-sID" secondAttribute="trailing" constant="12" symbolic="YES" id="2q4-wX-FIX"/>
-                            <constraint firstItem="0i7-MK-KZ1" firstAttribute="top" secondItem="tOy-S4-hL0" secondAttribute="top" constant="20" symbolic="YES" id="Aep-ee-MBT"/>
                             <constraint firstAttribute="bottom" secondItem="UkV-S4-sID" secondAttribute="bottom" constant="20" symbolic="YES" id="Dcb-ww-ZTA"/>
-                            <constraint firstItem="Bde-GS-Qx1" firstAttribute="top" secondItem="sh9-5v-T9e" secondAttribute="bottom" constant="18" id="EEW-EO-4Iy"/>
                             <constraint firstItem="Bde-GS-Qx1" firstAttribute="leading" secondItem="tOy-S4-hL0" secondAttribute="leading" id="GQY-oe-i7P"/>
-                            <constraint firstAttribute="trailing" relation="greaterThanOrEqual" secondItem="0i7-MK-KZ1" secondAttribute="trailing" constant="20" symbolic="YES" id="Oab-xU-Wp2"/>
-                            <constraint firstItem="sh9-5v-T9e" firstAttribute="leading" secondItem="tOy-S4-hL0" secondAttribute="leading" constant="20" symbolic="YES" id="Spt-Wv-v3y"/>
+                            <constraint firstItem="Bde-GS-Qx1" firstAttribute="top" secondItem="Uip-wv-e5R" secondAttribute="bottom" constant="18" id="Q0u-xS-QGQ"/>
                             <constraint firstAttribute="bottom" secondItem="p3M-G6-gOX" secondAttribute="bottom" constant="20" symbolic="YES" id="d6F-cy-53u"/>
-                            <constraint firstItem="0i7-MK-KZ1" firstAttribute="leading" secondItem="tOy-S4-hL0" secondAttribute="leading" constant="20" symbolic="YES" id="g7P-bX-xpj"/>
+                            <constraint firstItem="Uip-wv-e5R" firstAttribute="top" secondItem="tOy-S4-hL0" secondAttribute="top" constant="20" symbolic="YES" id="lnT-bZ-UVf"/>
                             <constraint firstAttribute="trailing" secondItem="Bde-GS-Qx1" secondAttribute="trailing" id="mm5-fe-nTF"/>
+                            <constraint firstItem="Uip-wv-e5R" firstAttribute="leading" secondItem="tOy-S4-hL0" secondAttribute="leading" constant="20" symbolic="YES" id="nWz-Kd-2rP"/>
                             <constraint firstItem="p3M-G6-gOX" firstAttribute="top" secondItem="Bde-GS-Qx1" secondAttribute="bottom" constant="20" id="oji-iH-bCG"/>
-                            <constraint firstItem="sh9-5v-T9e" firstAttribute="top" secondItem="0i7-MK-KZ1" secondAttribute="bottom" constant="28" id="zOc-EF-N9F"/>
                         </constraints>
                     </view>
                     <connections>
@@ -92,7 +102,7 @@ Gw
                 </viewController>
                 <customObject id="9uD-mB-xHs" userLabel="First Responder" customClass="NSResponder" sceneMemberID="firstResponder"/>
             </objects>
-            <point key="canvasLocation" x="75" y="146"/>
+            <point key="canvasLocation" x="75" y="145.5"/>
         </scene>
         <!--CSV Import Summary View Controller-->
         <scene sceneID="lq1-B2-i1k">

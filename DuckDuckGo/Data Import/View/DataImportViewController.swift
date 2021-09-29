@@ -145,22 +145,27 @@ final class DataImportViewController: NSViewController {
     private func updateActionButton(with interactionState: InteractionState) {
         switch interactionState {
         case .unableToImport:
+            importSourcePopUpButton.isHidden = false
             importButton.title = UserText.initiateImport
             importButton.isEnabled = false
             cancelButton.isHidden = false
         case .ableToImport:
+            importSourcePopUpButton.isHidden = false
             importButton.title = UserText.initiateImport
             importButton.isEnabled = true
             cancelButton.isHidden = false
         case .permissionsRequired:
+            importSourcePopUpButton.isHidden = false
             importButton.title = UserText.initiateImport
             importButton.isEnabled = false
             cancelButton.isHidden = false
         case .completedImport:
+            importSourcePopUpButton.isHidden = true
             importButton.title = UserText.doneImporting
             importButton.isEnabled = true
             cancelButton.isHidden = true
         case .failedToImport:
+            importSourcePopUpButton.isHidden = false
             importButton.title = UserText.initiateImport
             importButton.isEnabled = true
             cancelButton.isHidden = false
