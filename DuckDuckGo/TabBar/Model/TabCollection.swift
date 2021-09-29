@@ -61,10 +61,6 @@ final class TabCollection: NSObject {
         tabs.removeSubrange((index + 1)...)
     }
 
-    func removeBurnerTabs() {
-        tabs = tabs.filter { $0.tabStorageType != .burner }
-    }
-
     func moveTab(at index: Int, to newIndex: Int) {
         guard index >= 0, index < tabs.count, newIndex >= 0, newIndex < tabs.count else {
             os_log("TabCollection: Index out of bounds", type: .error)
