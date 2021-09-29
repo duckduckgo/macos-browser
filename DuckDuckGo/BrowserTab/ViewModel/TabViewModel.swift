@@ -50,7 +50,7 @@ final class TabViewModel {
 
     struct ErrorViewState {
         var isVisible: Bool = false
-        var message: String? = nil
+        var message: String?
     }
     @Published var errorViewState = ErrorViewState() {
         didSet {
