@@ -169,6 +169,10 @@ final class PrivacyDashboardUserScript: NSObject, StaticUserScript {
         evaluate(js: "window.onChangeTrackerBlockingData(\(safeTabUrl), \(trackerBlockingDataJson))", in: webView)
     }
 
+    func setUpgradedHttps(_ upgradedHttps: Bool, webView: WKWebView) {
+        evaluate(js: "window.onChangeUpgradedHttps(\(upgradedHttps))", in: webView)
+    }
+
     func setServerTrust(_ serverTrustViewModel: ServerTrustViewModel, webView: WKWebView) {
         guard let certificateDataJson = try? JSONEncoder().encode(serverTrustViewModel).utf8String() else {
             assertionFailure("Can't encode serverTrustViewModel into JSON")
