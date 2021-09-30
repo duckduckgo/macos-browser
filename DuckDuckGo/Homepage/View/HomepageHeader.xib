@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<document type="com.apple.InterfaceBuilder3.Cocoa.XIB" version="3.0" toolsVersion="19162" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none" useAutolayout="YES" customObjectInstantitationMethod="direct">
+    <dependencies>
+        <deployment identifier="macosx"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="19162"/>
+        <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
+    </dependencies>
+    <objects>
+        <customObject id="-2" userLabel="File's Owner"/>
+        <customObject id="-1" userLabel="First Responder" customClass="FirstResponder"/>
+        <customObject id="-3" userLabel="Application" customClass="NSObject"/>
+        <customView id="sgY-8u-Li4">
+            <rect key="frame" x="0.0" y="0.0" width="567" height="154"/>
+            <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+            <subviews>
+                <imageView horizontalHuggingPriority="251" verticalHuggingPriority="251" translatesAutoresizingMaskIntoConstraints="NO" id="ZFe-Yi-fiG">
+                    <rect key="frame" x="220" y="70" width="128" height="64"/>
+                    <constraints>
+                        <constraint firstAttribute="height" constant="64" id="euN-MN-zEq"/>
+                    </constraints>
+                    <imageCell key="cell" refusesFirstResponder="YES" alignment="left" imageScaling="proportionallyDown" image="Logo" id="eoC-UH-q7t"/>
+                </imageView>
+                <textField focusRingType="none" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="4Rf-nj-2G2">
+                    <rect key="frame" x="12" y="19" width="543" height="22"/>
+                    <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" selectable="YES" editable="YES" sendsActionOnEndEditing="YES" borderStyle="bezel" focusRingType="none" bezelStyle="round" id="Kdn-px-yxu">
+                        <font key="font" metaFont="system"/>
+                        <color key="textColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
+                        <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
+                    </textFieldCell>
+                </textField>
+            </subviews>
+            <constraints>
+                <constraint firstItem="4Rf-nj-2G2" firstAttribute="width" secondItem="sgY-8u-Li4" secondAttribute="width" constant="-24" id="0xH-4K-pnK"/>
+                <constraint firstItem="4Rf-nj-2G2" firstAttribute="centerX" secondItem="sgY-8u-Li4" secondAttribute="centerX" id="2MH-zm-dhc"/>
+                <constraint firstItem="4Rf-nj-2G2" firstAttribute="top" secondItem="ZFe-Yi-fiG" secondAttribute="bottom" constant="29" id="NUJ-Mh-D1u"/>
+                <constraint firstItem="ZFe-Yi-fiG" firstAttribute="centerX" secondItem="sgY-8u-Li4" secondAttribute="centerX" id="itl-6p-Ogo"/>
+                <constraint firstItem="ZFe-Yi-fiG" firstAttribute="top" secondItem="sgY-8u-Li4" secondAttribute="top" constant="20" symbolic="YES" id="rgd-14-jeC"/>
+            </constraints>
+            <point key="canvasLocation" x="59.5" y="45"/>
+        </customView>
+    </objects>
+    <resources>
+        <image name="Logo" width="128" height="128"/>
+    </resources>
+</document>

@@ -43,6 +43,8 @@ final class HomepageViewController: NSViewController {
 
     enum Constants {
         static let maxNumberOfFavorites = 10
+        static let homepageHeaderIdentifier = NSUserInterfaceItemIdentifier("HomepageHeader")
+        static let homepageHeaderSize = NSSize(width: 1, height: 154)
     }
 
     private var defaultBrowserPromptView = DefaultBrowserPromptView.createFromNib()
@@ -78,10 +80,10 @@ final class HomepageViewController: NSViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
 
-        layoutDefaultBrowserPromptView()
-        (self.view as? HomepageBackgroundView)?.defaultBrowserPromptView = defaultBrowserPromptView
-        let nib = NSNib(nibNamed: "HomepageCollectionViewItem", bundle: nil)
-        collectionView.register(nib, forItemWithIdentifier: HomepageCollectionViewItem.identifier)
+        setupDefaultBrowserPrompt()
+
+        registerCollectionViewItemView()
+        registerCollectionViewHeader()
 
         NotificationCenter.default.addObserver(self,
                                                selector: #selector(displayDefaultBrowserPromptAfterDelayIfNeeded),
@@ -101,6 +103,22 @@ final class HomepageViewController: NSViewController {
         super.mouseDown(with: event)
 
         view.window?.makeFirstResponder(nil)
+    }
+
+    private func setupDefaultBrowserPrompt() {
+        layoutDefaultBrowserPromptView()
+        (self.view as? HomepageBackgroundView)?.defaultBrowserPromptView = defaultBrowserPromptView
+    }
+
+    private func registerCollectionViewItemView() {
+        let nib = NSNib(nibNamed: "HomepageCollectionViewItem", bundle: nil)
+        collectionView.register(nib, forItemWithIdentifier: HomepageCollectionViewItem.identifier)
+    }
+
+    private func registerCollectionViewHeader() {
+        let nib = NSNib(nibNamed: "HomepageHeader", bundle: nil)
+        collectionView.register(nib, forSupplementaryViewOfKind: NSCollectionView.elementKindSectionHeader,
+                                withIdentifier: Constants.homepageHeaderIdentifier)
     }
 
     func layoutDefaultBrowserPromptView() {
@@ -254,6 +272,13 @@ extension HomepageViewController: NSCollectionViewDataSource, NSCollectionViewDe
         tabCollectionViewModel.selectedTabViewModel?.tab.update(url: favorite.url, userEntered: true)
     }
 
+    func collectionView(_ collectionView: NSCollectionView,
+                        viewForSupplementaryElementOfKind kind: NSCollectionView.SupplementaryElementKind,
+                        at indexPath: IndexPath) -> NSView {
+        assert(kind == NSCollectionView.elementKindSectionHeader)
+        return collectionView.makeSupplementaryView(ofKind: kind, withIdentifier: Constants.homepageHeaderIdentifier, for: indexPath)
+    }
+
  }
 
  extension HomepageViewController: NSCollectionViewDelegateFlowLayout {
@@ -262,6 +287,12 @@ extension HomepageViewController: NSCollectionViewDataSource, NSCollectionViewDe
                          layout collectionViewLayout: NSCollectionViewLayout,
                          sizeForItemAt indexPath: IndexPath) -> NSSize {
         return NSSize(width: HomepageCollectionViewItem.Size.width, height: HomepageCollectionViewItem.Size.height)
+     }
+
+     func collectionView(_ collectionView: NSCollectionView,
+                         layout collectionViewLayout: NSCollectionViewLayout,
+                         referenceSizeForHeaderInSection section: Int) -> NSSize {
+         return Constants.homepageHeaderSize
      }
 
  }

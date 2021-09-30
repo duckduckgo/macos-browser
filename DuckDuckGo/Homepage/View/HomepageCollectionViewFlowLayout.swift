@@ -45,10 +45,14 @@ final class HomepageCollectionViewFlowLayout: NSCollectionViewFlowLayout {
 
     override func layoutAttributesForElements(in rect: NSRect) -> [NSCollectionViewLayoutAttributes] {
         let largestRect = NSRect(x: 0, y: 0, width: CGFloat.greatestFiniteMagnitude, height: CGFloat.greatestFiniteMagnitude)
-        let attributes = super.layoutAttributesForElements(in: largestRect).map { ($0.copy() as? NSCollectionViewLayoutAttributes)! }
-        guard !attributes.isEmpty,
-              let scrollView = collectionView?.enclosingScrollView
+        let allAttributes = super.layoutAttributesForElements(in: largestRect).map { ($0.copy() as? NSCollectionViewLayoutAttributes)! }
+        guard !allAttributes.isEmpty,
+              let scrollView = collectionView?.enclosingScrollView,
+              let headerAttribute = allAttributes.first(where: { $0.representedElementKind == NSCollectionView.elementKindSectionHeader })
         else { return [] }
+
+        let attributes = allAttributes.filter({ $0.representedElementKind != NSCollectionView.elementKindSectionHeader })
+        guard !attributes.isEmpty else { return [] }
 
         let itemWidth = attributes[0].frame.size.width
         let actualColumns = min(columns, attributes.count)
@@ -62,13 +66,20 @@ final class HomepageCollectionViewFlowLayout: NSCollectionViewFlowLayout {
         let startY = max(insets.height,
                         (scrollView.frame.size.height - contentHeight) / 2 + insets.height + verticalShift)
 
+        var headerMaxX = startX
         for (idx, attribute) in attributes.enumerated() {
             attribute.frame.origin.x = startX + (attribute.frame.height + spacing) * CGFloat(idx % columns)
             attribute.frame.origin.y = startY + (attribute.frame.height + minimumLineSpacing) * CGFloat(idx / columns)
+            headerMaxX = max(headerMaxX, attribute.frame.maxX)
         }
 
-        savedAttributes = attributes
-        return attributes
+        headerAttribute.frame.origin.x = startX
+        headerAttribute.frame.origin.y = 0
+        headerAttribute.frame.size.width = headerMaxX - startX
+        headerAttribute.frame.size.height = 160
+
+        savedAttributes = allAttributes
+        return allAttributes
     }
 
     override func shouldInvalidateLayout(forBoundsChange newBounds: NSRect) -> Bool {
