@@ -1,0 +1,12 @@
+{
+  "images" : [
+    {
+      "filename" : "TwitterDark.svg",
+      "idiom" : "universal"
+    }
+  ],
+  "info" : {
+    "author" : "xcode",
+    "version" : 1
+  }
+}

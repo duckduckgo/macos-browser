@@ -23,10 +23,12 @@ struct PrivacyIconViewModel {
     private static let maxNumberOfIcons = 4
 
     static func trackerImages(from trackerInfo: TrackerInfo) -> [CGImage] {
-        let sortedEntities = sortedEntityLetters(from: trackerInfo).prefix(maxNumberOfIcons)
+        let sortedEntities = sortedEntities(from: trackerInfo).prefix(maxNumberOfIcons)
         var images: [CGImage] = sortedEntities.map {
-            if let image = trackerImages[$0] {
-                return image
+            if let logo = logos[$0] {
+                return logo
+            } else if let letter = letters[$0[$0.startIndex].uppercased()] {
+                return letter
             } else {
                 return blankTrackerImage
             }
@@ -37,7 +39,7 @@ struct PrivacyIconViewModel {
         return images
     }
 
-    private static func sortedEntityLetters(from trackerInfo: TrackerInfo) -> [Character] {
+    private static func sortedEntities(from trackerInfo: TrackerInfo) -> [String] {
         struct LightEntity: Hashable {
             let name: String
             let prevalence: Double
@@ -48,7 +50,7 @@ struct PrivacyIconViewModel {
             Set(trackerInfo.trackersBlocked
                     // Filter trackers without entity or entity name
                     .compactMap {
-                        if let entityName = $0.entity?.displayName {
+                        if let entityName = $0.entity?.displayName, entityName.count > 0 {
                             return LightEntity(name: entityName, prevalence: $0.entity?.prevalence ?? 0)
                         }
                         return nil
@@ -61,12 +63,11 @@ struct PrivacyIconViewModel {
             }
             // Get first character
             .map {
-                guard $0.name.count > 0 else { return " " }
-                return $0.name.uppercased()[$0.name.startIndex]
+                return $0.name
             }
             // Prioritise entities with images
             .sorted { _, r -> Bool in
-                return "AEIOU".contains(r)
+                return "AEIOU".contains(r[r.startIndex])
             }
     }
 
@@ -94,15 +95,15 @@ struct PrivacyIconViewModel {
     static let blankTrackerImageAqua = NSImage(named: "BlankTracker")!.cgImage(forProposedRect: nil, context: .current, hints: nil)!
     static let blankTrackerImageDark = NSImage(named: "BlankTrackerDark")!.cgImage(forProposedRect: nil, context: .current, hints: nil)!
 
-    static var trackerImages: [Character: CGImage] {
+    static var letters: [String: CGImage] {
         if NSApp.effectiveAppearance.name == NSAppearance.Name.aqua {
-            return trackerImagesAqua
+            return lettersAqua
         } else {
-            return trackerImagesDark
+            return lettersDark
         }
     }
 
-    private static let trackerImagesAqua: [Character: CGImage] = {
+    private static let lettersAqua: [String: CGImage] = {
         return [
             "A": NSImage(named: "A")!.cgImage(forProposedRect: nil, context: .current, hints: nil)!,
             "B": NSImage(named: "B")!.cgImage(forProposedRect: nil, context: .current, hints: nil)!,
@@ -133,7 +134,7 @@ struct PrivacyIconViewModel {
         ]
     }()
 
-    private static let trackerImagesDark: [Character: CGImage] = {
+    private static let lettersDark: [String: CGImage] = {
         return [
             "A": NSImage(named: "ADark")!.cgImage(forProposedRect: nil, context: .current, hints: nil)!,
             "B": NSImage(named: "BDark")!.cgImage(forProposedRect: nil, context: .current, hints: nil)!,
@@ -161,6 +162,102 @@ struct PrivacyIconViewModel {
             "X": NSImage(named: "XDark")!.cgImage(forProposedRect: nil, context: .current, hints: nil)!,
             "Y": NSImage(named: "YDark")!.cgImage(forProposedRect: nil, context: .current, hints: nil)!,
             "Z": NSImage(named: "ZDark")!.cgImage(forProposedRect: nil, context: .current, hints: nil)!
+        ]
+    }()
+
+    static var logos: [String: CGImage] {
+        if NSApp.effectiveAppearance.name == NSAppearance.Name.aqua {
+            return logosAqua
+        } else {
+            return logosDark
+        }
+    }
+
+    private static let logosAqua: [String: CGImage] = {
+        return [
+            "Adform": NSImage(named: "Adform")!.cgImage(forProposedRect: nil, context: .current, hints: nil)!,
+            "Adobe": NSImage(named: "Adobe")!.cgImage(forProposedRect: nil, context: .current, hints: nil)!,
+            "Amazon": NSImage(named: "Amazon")!.cgImage(forProposedRect: nil, context: .current, hints: nil)!,
+            "Amobee": NSImage(named: "Amobee")!.cgImage(forProposedRect: nil, context: .current, hints: nil)!,
+            "Appnexus": NSImage(named: "Appnexus")!.cgImage(forProposedRect: nil, context: .current, hints: nil)!,
+            "Centro": NSImage(named: "Centro")!.cgImage(forProposedRect: nil, context: .current, hints: nil)!,
+            "Cloudflare": NSImage(named: "Cloudflare")!.cgImage(forProposedRect: nil, context: .current, hints: nil)!,
+            "Comscore": NSImage(named: "Comscore")!.cgImage(forProposedRect: nil, context: .current, hints: nil)!,
+            "Conversant": NSImage(named: "Conversant")!.cgImage(forProposedRect: nil, context: .current, hints: nil)!,
+            "Criteo": NSImage(named: "Criteo")!.cgImage(forProposedRect: nil, context: .current, hints: nil)!,
+            "Dataxu": NSImage(named: "Dataxu")!.cgImage(forProposedRect: nil, context: .current, hints: nil)!,
+            "Facebook": NSImage(named: "Facebook")!.cgImage(forProposedRect: nil, context: .current, hints: nil)!,
+            "Google": NSImage(named: "Google")!.cgImage(forProposedRect: nil, context: .current, hints: nil)!,
+            "Hotjar": NSImage(named: "Hotjar")!.cgImage(forProposedRect: nil, context: .current, hints: nil)!,
+            "Indexexchange": NSImage(named: "Indexexchange")!.cgImage(forProposedRect: nil, context: .current, hints: nil)!,
+            "IPONWEB": NSImage(named: "Iponweb")!.cgImage(forProposedRect: nil, context: .current, hints: nil)!,
+            "LinkedIn": NSImage(named: "LinkedIn")!.cgImage(forProposedRect: nil, context: .current, hints: nil)!,
+            "Lotame": NSImage(named: "Lotame")!.cgImage(forProposedRect: nil, context: .current, hints: nil)!,
+            "Mediamath": NSImage(named: "Mediamath")!.cgImage(forProposedRect: nil, context: .current, hints: nil)!,
+            "Neustar": NSImage(named: "Neustar")!.cgImage(forProposedRect: nil, context: .current, hints: nil)!,
+            "Newrelic": NSImage(named: "Newrelic")!.cgImage(forProposedRect: nil, context: .current, hints: nil)!,
+            "Nielsen": NSImage(named: "Nielsen")!.cgImage(forProposedRect: nil, context: .current, hints: nil)!,
+            "Openx": NSImage(named: "Openx")!.cgImage(forProposedRect: nil, context: .current, hints: nil)!,
+            "Oracle": NSImage(named: "Oracle")!.cgImage(forProposedRect: nil, context: .current, hints: nil)!,
+            "PubMatic": NSImage(named: "PubMatic")!.cgImage(forProposedRect: nil, context: .current, hints: nil)!,
+            "Qwantcast": NSImage(named: "Qwantcast")!.cgImage(forProposedRect: nil, context: .current, hints: nil)!,
+            "Rubicon": NSImage(named: "Rubicon")!.cgImage(forProposedRect: nil, context: .current, hints: nil)!,
+            "Salesforce": NSImage(named: "Salesforce")!.cgImage(forProposedRect: nil, context: .current, hints: nil)!,
+            "Smartadserver": NSImage(named: "Smartadserver")!.cgImage(forProposedRect: nil, context: .current, hints: nil)!,
+            "SpotX": NSImage(named: "SpotX")!.cgImage(forProposedRect: nil, context: .current, hints: nil)!,
+            "StackPath": NSImage(named: "StackPath")!.cgImage(forProposedRect: nil, context: .current, hints: nil)!,
+            "Taboola": NSImage(named: "Taboola")!.cgImage(forProposedRect: nil, context: .current, hints: nil)!,
+            "Tapad": NSImage(named: "Tapad")!.cgImage(forProposedRect: nil, context: .current, hints: nil)!,
+            "The Trade Desk": NSImage(named: "TheTradeDesk")!.cgImage(forProposedRect: nil, context: .current, hints: nil)!,
+            "TowerData": NSImage(named: "TowerData")!.cgImage(forProposedRect: nil, context: .current, hints: nil)!,
+            "Twitter": NSImage(named: "Twitter")!.cgImage(forProposedRect: nil, context: .current, hints: nil)!,
+            "Verizon Media": NSImage(named: "VerizonMedia")!.cgImage(forProposedRect: nil, context: .current, hints: nil)!,
+            "Windows": NSImage(named: "Windows")!.cgImage(forProposedRect: nil, context: .current, hints: nil)!,
+            "Xaxis": NSImage(named: "Xaxis")!.cgImage(forProposedRect: nil, context: .current, hints: nil)!
+        ]
+    }()
+
+    private static let logosDark: [String: CGImage] = {
+        return [
+            "Adform": NSImage(named: "AdformDark")!.cgImage(forProposedRect: nil, context: .current, hints: nil)!,
+            "Adobe": NSImage(named: "AdobeDark")!.cgImage(forProposedRect: nil, context: .current, hints: nil)!,
+            "Amazon": NSImage(named: "AmazonDark")!.cgImage(forProposedRect: nil, context: .current, hints: nil)!,
+            "Amobee": NSImage(named: "AmobeeDark")!.cgImage(forProposedRect: nil, context: .current, hints: nil)!,
+            "Appnexus": NSImage(named: "AppnexusDark")!.cgImage(forProposedRect: nil, context: .current, hints: nil)!,
+            "Centro": NSImage(named: "CentroDark")!.cgImage(forProposedRect: nil, context: .current, hints: nil)!,
+            "Cloudflare": NSImage(named: "CloudflareDark")!.cgImage(forProposedRect: nil, context: .current, hints: nil)!,
+            "Comscore": NSImage(named: "ComscoreDark")!.cgImage(forProposedRect: nil, context: .current, hints: nil)!,
+            "Conversant": NSImage(named: "ConversantDark")!.cgImage(forProposedRect: nil, context: .current, hints: nil)!,
+            "Criteo": NSImage(named: "CriteoDark")!.cgImage(forProposedRect: nil, context: .current, hints: nil)!,
+            "Dataxu": NSImage(named: "DataxuDark")!.cgImage(forProposedRect: nil, context: .current, hints: nil)!,
+            "Facebook": NSImage(named: "FacebookDark")!.cgImage(forProposedRect: nil, context: .current, hints: nil)!,
+            "Google": NSImage(named: "GoogleDark")!.cgImage(forProposedRect: nil, context: .current, hints: nil)!,
+            "Hotjar": NSImage(named: "HotjarDark")!.cgImage(forProposedRect: nil, context: .current, hints: nil)!,
+            "Indexexchange": NSImage(named: "IndexexchangeDark")!.cgImage(forProposedRect: nil, context: .current, hints: nil)!,
+            "IPONWEB": NSImage(named: "IponwebDark")!.cgImage(forProposedRect: nil, context: .current, hints: nil)!,
+            "LinkedIn": NSImage(named: "LinkedInDark")!.cgImage(forProposedRect: nil, context: .current, hints: nil)!,
+            "Lotame": NSImage(named: "LotameDark")!.cgImage(forProposedRect: nil, context: .current, hints: nil)!,
+            "Mediamath": NSImage(named: "MediamathDark")!.cgImage(forProposedRect: nil, context: .current, hints: nil)!,
+            "Neustar": NSImage(named: "NeustarDark")!.cgImage(forProposedRect: nil, context: .current, hints: nil)!,
+            "Newrelic": NSImage(named: "NewrelicDark")!.cgImage(forProposedRect: nil, context: .current, hints: nil)!,
+            "Nielsen": NSImage(named: "NielsenDark")!.cgImage(forProposedRect: nil, context: .current, hints: nil)!,
+            "Openx": NSImage(named: "OpenxDark")!.cgImage(forProposedRect: nil, context: .current, hints: nil)!,
+            "Oracle": NSImage(named: "OracleDark")!.cgImage(forProposedRect: nil, context: .current, hints: nil)!,
+            "PubMatic": NSImage(named: "PubMaticDark")!.cgImage(forProposedRect: nil, context: .current, hints: nil)!,
+            "Qwantcast": NSImage(named: "QwantcastDark")!.cgImage(forProposedRect: nil, context: .current, hints: nil)!,
+            "Rubicon": NSImage(named: "RubiconDark")!.cgImage(forProposedRect: nil, context: .current, hints: nil)!,
+            "Salesforce": NSImage(named: "SalesforceDark")!.cgImage(forProposedRect: nil, context: .current, hints: nil)!,
+            "Smartadserver": NSImage(named: "SmartadserverDark")!.cgImage(forProposedRect: nil, context: .current, hints: nil)!,
+            "SpotX": NSImage(named: "SpotXDark")!.cgImage(forProposedRect: nil, context: .current, hints: nil)!,
+            "StackPath": NSImage(named: "StackPathDark")!.cgImage(forProposedRect: nil, context: .current, hints: nil)!,
+            "Taboola": NSImage(named: "TaboolaDark")!.cgImage(forProposedRect: nil, context: .current, hints: nil)!,
+            "Tapad": NSImage(named: "TapadDark")!.cgImage(forProposedRect: nil, context: .current, hints: nil)!,
+            "The Trade Desk": NSImage(named: "TheTradeDeskDark")!.cgImage(forProposedRect: nil, context: .current, hints: nil)!,
+            "TowerData": NSImage(named: "TowerDataDark")!.cgImage(forProposedRect: nil, context: .current, hints: nil)!,
+            "Twitter": NSImage(named: "TwitterDark")!.cgImage(forProposedRect: nil, context: .current, hints: nil)!,
+            "Verizon Media": NSImage(named: "VerizonMediaDark")!.cgImage(forProposedRect: nil, context: .current, hints: nil)!,
+            "Windows": NSImage(named: "WindowsDark")!.cgImage(forProposedRect: nil, context: .current, hints: nil)!,
+            "Xaxis": NSImage(named: "XaxisDark")!.cgImage(forProposedRect: nil, context: .current, hints: nil)!
         ]
     }()
 
