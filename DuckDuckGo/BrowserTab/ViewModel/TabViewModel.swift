@@ -119,7 +119,7 @@ final class TabViewModel {
 
     private func subscribeToWebViewDidFinishNavigation() {
         tab.webViewDidFinishNavigationPublisher.sink { [weak self] _ in
-            self?.scheduleTrackerAnimation()
+            self?.sendAnimationTrigger()
         }.store(in: &cancellables)
     }
 
@@ -233,19 +233,10 @@ final class TabViewModel {
 
     private var trackerAnimationTimer: Timer?
 
-    private func scheduleTrackerAnimation() {
-        trackerAnimationTimer?.invalidate()
-        trackerAnimationTimer = nil
-        trackerAnimationTimer = Timer.scheduledTimer(withTimeInterval: 2, repeats: true, block: { [weak self] _ in
-            guard let self = self, !self.isLoading else { return }
-
-            if self.tab.trackerInfo?.trackersBlocked.count ?? 0 > 0 {
-                self.trackersAnimationTriggerPublisher.send()
-            }
-
-            self.trackerAnimationTimer?.invalidate()
-            self.trackerAnimationTimer = nil
-        })
+    private func sendAnimationTrigger() {
+        if self.tab.trackerInfo?.trackersBlocked.count ?? 0 > 0 {
+            self.trackersAnimationTriggerPublisher.send()
+        }
     }
 
 }
