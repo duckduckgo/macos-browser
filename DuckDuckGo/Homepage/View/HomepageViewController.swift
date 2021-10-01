@@ -44,7 +44,7 @@ final class HomepageViewController: NSViewController {
     enum Constants {
         static let maxNumberOfFavorites = 10
         static let homepageHeaderIdentifier = NSUserInterfaceItemIdentifier("HomepageHeader")
-        static let homepageHeaderSize = NSSize(width: 1, height: 154)
+        static let homepageHeaderSize = NSSize(width: 1, height: HomepageCollectionViewFlowLayout.headerHeight)
     }
 
     private var defaultBrowserPromptView = DefaultBrowserPromptView.createFromNib()

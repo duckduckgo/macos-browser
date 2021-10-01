@@ -20,6 +20,8 @@ import Cocoa
 
 final class HomepageCollectionViewFlowLayout: NSCollectionViewFlowLayout {
 
+    static let headerHeight: CGFloat = 160
+
     @IBInspectable var columns: Int = 1
     @IBInspectable var insets: CGSize = .zero
     @IBInspectable var verticalShift: CGFloat = 0
@@ -35,7 +37,7 @@ final class HomepageCollectionViewFlowLayout: NSCollectionViewFlowLayout {
             .collectionView?(collectionView, layout: self, sizeForItemAt: IndexPath(item: 0)).height
             ?? self.itemSize.height
 
-        return itemHeight * CGFloat(rows) + self.minimumLineSpacing * CGFloat(rows - 1) + insets.height * 2
+        return Self.headerHeight + itemHeight * CGFloat(rows) + self.minimumLineSpacing * CGFloat(rows - 1) + insets.height * 2
     }
 
     override var collectionViewContentSize: NSSize {
@@ -69,14 +71,14 @@ final class HomepageCollectionViewFlowLayout: NSCollectionViewFlowLayout {
         var headerMaxX = startX
         for (idx, attribute) in attributes.enumerated() {
             attribute.frame.origin.x = startX + (attribute.frame.height + spacing) * CGFloat(idx % columns)
-            attribute.frame.origin.y = startY + (attribute.frame.height + minimumLineSpacing) * CGFloat(idx / columns)
+            attribute.frame.origin.y = startY + Self.headerHeight + (attribute.frame.height + minimumLineSpacing) * CGFloat(idx / columns)
             headerMaxX = max(headerMaxX, attribute.frame.maxX)
         }
 
         headerAttribute.frame.origin.x = startX
-        headerAttribute.frame.origin.y = 0
+        headerAttribute.frame.origin.y = startY
         headerAttribute.frame.size.width = headerMaxX - startX
-        headerAttribute.frame.size.height = 160
+        headerAttribute.frame.size.height = Self.headerHeight
 
         savedAttributes = allAttributes
         return allAttributes
