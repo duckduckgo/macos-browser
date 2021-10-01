@@ -124,6 +124,8 @@ final class Tab: NSObject {
     }
 
     let webView: WebView
+    let webViewDidFinishNavigationPublisher = PassthroughSubject<Void, Never>()
+
     var userEnteredUrl = true
 
     var contentChangeEnabled = true
@@ -696,11 +698,12 @@ extension Tab: WKNavigationDelegate {
         // Unnecessary assignment triggers publishing
         if error != nil { error = nil }
 
-        self.invalidateSessionStateData()
+        invalidateSessionStateData()
     }
 
     func webView(_ webView: WKWebView, didFinish navigation: WKNavigation!) {
-        self.invalidateSessionStateData()
+        invalidateSessionStateData()
+        webViewDidFinishNavigationPublisher.send()
     }
 
     func webView(_ webView: WKWebView, didFail navigation: WKNavigation!, withError error: Error) {
@@ -708,7 +711,7 @@ extension Tab: WKNavigationDelegate {
         // https://app.asana.com/0/1199230911884351/1200381133504356/f
 //        hasError = true
 
-        self.invalidateSessionStateData()
+        invalidateSessionStateData()
     }
 
     func webView(_ webView: WKWebView, didFailProvisionalNavigation navigation: WKNavigation!, withError error: Error) {

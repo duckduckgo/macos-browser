@@ -61,6 +61,7 @@ final class AddressBarButtonsViewController: NSViewController {
         }
         return _privacyDashboardPopover!
     }
+    @IBOutlet weak var privacyDashboardPositioningView: NSView!
 
     @IBOutlet weak var privacyEntryPointButton: AddressBarButton!
     @IBOutlet weak var bookmarkButton: AddressBarButton!
@@ -235,7 +236,7 @@ final class AddressBarButtonsViewController: NSViewController {
             return
         }
         privacyDashboardPopover.viewController.tabViewModel = selectedTabViewModel
-        privacyDashboardPopover.show(relativeTo: privacyEntryPointButton.bounds, of: privacyEntryPointButton, preferredEdge: .maxY)
+        privacyDashboardPopover.show(relativeTo: privacyDashboardPositioningView.bounds, of: privacyDashboardPositioningView, preferredEdge: .maxY)
 
         privacyEntryPointButton.state = .on
     }
