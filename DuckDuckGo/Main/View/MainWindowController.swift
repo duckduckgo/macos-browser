@@ -21,7 +21,9 @@ import os.log
 import Combine
 
 final class MainWindowController: NSWindowController {
+
     private static let windowFrameSaveName = "MainWindow"
+    private var fireViewModel: FireViewModel
 
     var mainViewController: MainViewController {
         // swiftlint:disable force_cast
@@ -33,9 +35,10 @@ final class MainWindowController: NSWindowController {
         return window?.standardWindowButton(.closeButton)?.superview
     }
 
-    init(mainViewController: MainViewController) {
+    init(mainViewController: MainViewController, fireViewModel: FireViewModel = FireCoordinator.fireViewModel) {
         let window = MainWindow(frame: NSRect(x: 0, y: 0, width: 1024, height: 790))
         window.contentViewController = mainViewController
+        self.fireViewModel = fireViewModel
 
         super.init(window: window)
 
@@ -78,7 +81,7 @@ final class MainWindowController: NSWindowController {
 
     private var shouldPreventUserInteractionCancellable: AnyCancellable?
     private func subscribeToShouldPreventUserInteraction() {
-        shouldPreventUserInteractionCancellable = mainViewController.fireViewModel.shouldPreventUserInteraction
+        shouldPreventUserInteractionCancellable = fireViewModel.shouldPreventUserInteraction
             .dropFirst()
             .sink(receiveValue: { [weak self] shouldPreventUserInteraction in
                 self?.moveTabBarView(toTitlebarView: !shouldPreventUserInteraction)

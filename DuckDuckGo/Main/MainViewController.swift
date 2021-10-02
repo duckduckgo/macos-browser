@@ -35,7 +35,6 @@ final class MainViewController: NSViewController {
     private(set) var fireViewController: FireViewController!
 
     let tabCollectionViewModel: TabCollectionViewModel
-    let fireViewModel = FireViewModel()
 
     private var selectedTabViewModelCancellable: AnyCancellable?
     private var navigationalCancellables = Set<AnyCancellable>()
@@ -87,8 +86,7 @@ final class MainViewController: NSViewController {
     @IBSegueAction
     func createTabBarViewController(coder: NSCoder, sender: Any?, segueIdentifier: String?) -> TabBarViewController? {
         guard let tabBarViewController = TabBarViewController(coder: coder,
-                                                              tabCollectionViewModel: tabCollectionViewModel,
-                                                              fireViewModel: fireViewModel) else {
+                                                              tabCollectionViewModel: tabCollectionViewModel) else {
             fatalError("MainViewController: Failed to init TabBarViewController")
         }
 
@@ -128,8 +126,7 @@ final class MainViewController: NSViewController {
     @IBSegueAction
     func createFireViewController(coder: NSCoder, sender: Any?, segueIdentifier: String?) -> FireViewController? {
         let fireViewController = FireViewController(coder: coder,
-                                                    tabCollectionViewModel: tabCollectionViewModel,
-                                                    fireViewModel: fireViewModel)
+                                                    tabCollectionViewModel: tabCollectionViewModel)
         self.fireViewController = fireViewController
         return fireViewController
     }
