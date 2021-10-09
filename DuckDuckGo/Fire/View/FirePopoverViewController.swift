@@ -92,7 +92,7 @@ extension FirePopoverViewController: NSCollectionViewDataSource {
 
     func collectionView(_ collectionView: NSCollectionView, itemForRepresentedObjectAt indexPath: IndexPath) -> NSCollectionViewItem {
         let item = collectionView.makeItem(withIdentifier: Self.itemIdentifier, for: indexPath)
-        guard let _ = item as? FirePopoverCollectionViewItem else { return item }
+//        guard let _ = item as? FirePopoverCollectionViewItem else { return item }
 
         return item
     }

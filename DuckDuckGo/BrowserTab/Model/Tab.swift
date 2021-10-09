@@ -82,6 +82,7 @@ final class Tab: NSObject {
          webCacheManager: WebCacheManager = .shared,
          webViewConfiguration: WebViewConfiguration? = nil,
          historyCoordinating: HistoryCoordinating = HistoryCoordinator.shared,
+         visitedDomains: Set<String> = Set<String>(),
          title: String? = nil,
          error: Error? = nil,
          favicon: NSImage? = nil,
@@ -93,6 +94,7 @@ final class Tab: NSObject {
         self.content = content
         self.faviconService = faviconService
         self.historyCoordinating = historyCoordinating
+        self.visitedDomains = visitedDomains
         self.title = title
         self.error = error
         self.favicon = favicon
@@ -431,17 +433,25 @@ final class Tab: NSObject {
         subscribeToFindInPageTextChange()
     }
 
-    // MARK: - History
+    // MARK: - Global & Local History
 
     private var historyCoordinating: HistoryCoordinating
     private var shouldStoreNextVisit = true
+    private(set) var visitedDomains: Set<String>
 
     func addVisit(of url: URL) {
         guard shouldStoreNextVisit else {
             shouldStoreNextVisit = true
             return
         }
+
+        // Add to global history
         historyCoordinating.addVisit(of: url)
+
+        // Add to local history
+        if let host = url.host, !host.isEmpty {
+            visitedDomains.insert(host)
+        }
     }
 
     func updateVisitTitle(_ title: String, url: URL) {
