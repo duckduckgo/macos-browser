@@ -123,7 +123,7 @@ extension FirePopoverViewController: NSCollectionViewDelegate {
 
 }
 
-extension FirePopoverViewController : NSCollectionViewDelegateFlowLayout {
+extension FirePopoverViewController: NSCollectionViewDelegateFlowLayout {
 
     func collectionView(_ collectionView: NSCollectionView,
                         layout collectionViewLayout: NSCollectionViewLayout,
