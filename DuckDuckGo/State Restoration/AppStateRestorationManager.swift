@@ -31,7 +31,7 @@ final class AppStateRestorationManager {
     }
 
     func applicationDidFinishLaunching() {
-        if (AppDelegate.isRunningUITests) {
+        if AppDelegate.isRunningUITests {
             return
         }
         

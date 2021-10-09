@@ -87,7 +87,7 @@ class BookmarksTests: DDGUITestCase {
         app.windows.children(matching: .button).element(boundBy: 3).click()
         app.windows.popovers.buttons["Done"].click()
         
-        //move mouse off the address bar
+        // move mouse off the address bar
         app.windows.collectionViews.otherElements.children(matching: .group).element(boundBy: 1).forceHoverElement()
         
         // open the popover and delete the first bookmark
