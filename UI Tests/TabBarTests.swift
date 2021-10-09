@@ -18,12 +18,7 @@
 
 import XCTest
 
-class TabBarTests: XCTestCase {
-
-    override func setUpWithError() throws {
-        continueAfterFailure = false
-        XCUIApplication().launch()
-    }
+class TabBarTests: DDGUITestCase {
 
     func testWhenClickingAddTab_ThenTabsOpen() throws {
         let app = XCUIApplication()

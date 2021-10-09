@@ -53,7 +53,16 @@ final class Database {
             fatalError("Failed to register encryption value transformers")
         }
 
-        container = DDGPersistentContainer(name: name, managedObjectModel: model)
+        let newContainer = DDGPersistentContainer(name: name, managedObjectModel: model)
+        
+        // Use an in-memory store for UI tests
+        if AppDelegate.isRunningUITests {
+            let description = NSPersistentStoreDescription()
+            description.url = URL(fileURLWithPath: "/dev/null")
+            newContainer.persistentStoreDescriptions = [description]
+        }
+        
+        container = newContainer
     }
     
     func loadStore(migrationHandler: @escaping (NSManagedObjectContext) -> Void = { _ in }) {

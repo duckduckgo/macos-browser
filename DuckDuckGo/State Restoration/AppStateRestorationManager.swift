@@ -31,6 +31,10 @@ final class AppStateRestorationManager {
     }
 
     func applicationDidFinishLaunching() {
+        if (AppDelegate.isRunningUITests) {
+            return
+        }
+        
         do {
             try service.restoreState(using: WindowsManager.restoreState(from:))
         } catch CocoaError.fileReadNoSuchFile {

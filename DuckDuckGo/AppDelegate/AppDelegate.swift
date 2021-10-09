@@ -34,6 +34,10 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
     static var isRunningTests: Bool {
         ProcessInfo.processInfo.environment["XCTestConfigurationFilePath"] != nil
     }
+    
+    static var isRunningUITests: Bool {
+        ProcessInfo.processInfo.environment["isUITest"] != nil
+    }
 
     let urlEventHandler = URLEventHandler()
 
