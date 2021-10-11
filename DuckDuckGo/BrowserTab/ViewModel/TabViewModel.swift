@@ -83,7 +83,7 @@ final class TabViewModel {
         subscribeToFavicon()
         subscribeToTabError()
         subscribeToPermissions()
-        subscribeToTrackerInfo()
+        subscribeToWebViewDidFinishNavigation()
     }
 
     private func subscribeToUrl() {
@@ -117,14 +117,10 @@ final class TabViewModel {
             .store(in: &cancellables)
     }
 
-    private func subscribeToTrackerInfo() {
-        tab.$trackerInfo
-            .sink { [weak self] trackerInfo in
-                if trackerInfo?.isEmpty ?? false {
-                    self?.scheduleTrackerAnimationIfNeeded()
-                }
-            }
-            .store(in: &cancellables)
+    private func subscribeToWebViewDidFinishNavigation() {
+        tab.webViewDidFinishNavigationPublisher.sink { [weak self] _ in
+            self?.sendAnimationTrigger()
+        }.store(in: &cancellables)
     }
 
     private func updateCanReload() {
@@ -237,18 +233,9 @@ final class TabViewModel {
 
     private var trackerAnimationTimer: Timer?
 
-    private func scheduleTrackerAnimationIfNeeded() {
-        if trackerAnimationTimer == nil {
-            trackerAnimationTimer = Timer.scheduledTimer(withTimeInterval: 3, repeats: true, block: { [weak self] _ in
-                guard let self = self, !self.isLoading else { return }
-
-                if self.tab.trackerInfo?.trackersBlocked.count ?? 0 > 0 {
-                    self.trackersAnimationTriggerPublisher.send()
-                }
-
-                self.trackerAnimationTimer?.invalidate()
-                self.trackerAnimationTimer = nil
-            })
+    private func sendAnimationTrigger() {
+        if self.tab.trackerInfo?.trackersBlocked.count ?? 0 > 0 {
+            self.trackersAnimationTriggerPublisher.send()
         }
     }
 
