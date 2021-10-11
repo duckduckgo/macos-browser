@@ -75,6 +75,7 @@
             </constraints>
             <connections>
                 <outlet property="field" destination="3Vr-DR-fdD" id="ril-F9-XBH"/>
+                <outlet property="icon" destination="bS2-51-Skh" id="2vX-Pd-P0A"/>
                 <outlet property="searchContainer" destination="r0u-XH-URQ" id="i4T-Ie-thb"/>
             </connections>
             <point key="canvasLocation" x="59.5" y="79"/>

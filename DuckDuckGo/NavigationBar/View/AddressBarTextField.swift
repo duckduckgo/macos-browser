@@ -111,7 +111,6 @@ final class AddressBarTextField: NSTextField {
         }
         addressBarStringCancellable = selectedTabViewModel.$addressBarString.receive(on: DispatchQueue.main).sink { [weak self] _ in
             self?.updateValue()
-            self?.makeMeFirstResponderIfNeeded()
         }
     }
 
@@ -125,7 +124,7 @@ final class AddressBarTextField: NSTextField {
         value = Value(stringValue: addressBarString, userTyped: false, isSearch: isSearch)
     }
 
-    private func makeMeFirstResponderIfNeeded() {
+    func makeMeFirstResponderIfNeeded() {
         let focusTab = tabCollectionViewModel.selectedTabViewModel?.tab.content.shouldFocusAddressBarAfterSelection ?? true
 
         if focusTab, stringValue == "" {
