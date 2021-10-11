@@ -20,7 +20,7 @@ import Cocoa
 
 final class HomepageCollectionViewFlowLayout: NSCollectionViewFlowLayout {
 
-    static let headerHeight: CGFloat = 160
+    static let headerHeight: CGFloat = 222
 
     @IBInspectable var columns: Int = 1
     @IBInspectable var insets: CGSize = .zero

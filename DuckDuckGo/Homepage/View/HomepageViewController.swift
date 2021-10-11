@@ -276,7 +276,12 @@ extension HomepageViewController: NSCollectionViewDataSource, NSCollectionViewDe
                         viewForSupplementaryElementOfKind kind: NSCollectionView.SupplementaryElementKind,
                         at indexPath: IndexPath) -> NSView {
         assert(kind == NSCollectionView.elementKindSectionHeader)
-        return collectionView.makeSupplementaryView(ofKind: kind, withIdentifier: Constants.homepageHeaderIdentifier, for: indexPath)
+
+        let view = collectionView.makeSupplementaryView(ofKind: kind, withIdentifier: Constants.homepageHeaderIdentifier, for: indexPath)
+
+        (view as? HomepageHeaderView)?.tabViewCollectionModel = tabCollectionViewModel
+
+        return view
     }
 
  }

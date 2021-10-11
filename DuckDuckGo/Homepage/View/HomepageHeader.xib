@@ -9,37 +9,84 @@
         <customObject id="-2" userLabel="File's Owner"/>
         <customObject id="-1" userLabel="First Responder" customClass="FirstResponder"/>
         <customObject id="-3" userLabel="Application" customClass="NSObject"/>
-        <customView id="sgY-8u-Li4">
-            <rect key="frame" x="0.0" y="0.0" width="567" height="154"/>
+        <customView id="sgY-8u-Li4" customClass="HomepageHeaderView" customModule="DuckDuckGo_Privacy_Browser" customModuleProvider="target">
+            <rect key="frame" x="0.0" y="0.0" width="567" height="222"/>
             <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
             <subviews>
                 <imageView horizontalHuggingPriority="251" verticalHuggingPriority="251" translatesAutoresizingMaskIntoConstraints="NO" id="ZFe-Yi-fiG">
-                    <rect key="frame" x="220" y="70" width="128" height="64"/>
+                    <rect key="frame" x="244" y="122" width="80" height="80"/>
                     <constraints>
-                        <constraint firstAttribute="height" constant="64" id="euN-MN-zEq"/>
+                        <constraint firstAttribute="height" constant="80" id="euN-MN-zEq"/>
+                        <constraint firstAttribute="width" constant="80" id="pUF-Me-9jg"/>
                     </constraints>
                     <imageCell key="cell" refusesFirstResponder="YES" alignment="left" imageScaling="proportionallyDown" image="Logo" id="eoC-UH-q7t"/>
                 </imageView>
-                <textField focusRingType="none" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="4Rf-nj-2G2">
-                    <rect key="frame" x="12" y="19" width="543" height="22"/>
-                    <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" selectable="YES" editable="YES" sendsActionOnEndEditing="YES" borderStyle="bezel" focusRingType="none" bezelStyle="round" id="Kdn-px-yxu">
-                        <font key="font" metaFont="system"/>
-                        <color key="textColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
-                        <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
-                    </textFieldCell>
-                </textField>
+                <customView translatesAutoresizingMaskIntoConstraints="NO" id="r0u-XH-URQ" customClass="ColorView" customModule="DuckDuckGo_Privacy_Browser" customModuleProvider="target">
+                    <rect key="frame" x="8" y="40" width="551" height="42"/>
+                    <subviews>
+                        <imageView horizontalHuggingPriority="251" verticalHuggingPriority="251" translatesAutoresizingMaskIntoConstraints="NO" id="bS2-51-Skh">
+                            <rect key="frame" x="2" y="6" width="32" height="30"/>
+                            <constraints>
+                                <constraint firstAttribute="height" constant="30" id="1Qj-y0-A6r"/>
+                                <constraint firstAttribute="width" constant="32" id="bFf-Ci-vMW"/>
+                            </constraints>
+                            <imageCell key="cell" refusesFirstResponder="YES" alignment="left" imageScaling="proportionallyDown" image="Search" id="i82-cu-gTO"/>
+                        </imageView>
+                        <textField focusRingType="none" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="3Vr-DR-fdD" customClass="AddressBarTextField" customModule="DuckDuckGo_Privacy_Browser" customModuleProvider="target">
+                            <rect key="frame" x="33" y="13" width="502" height="16"/>
+                            <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" selectable="YES" editable="YES" sendsActionOnEndEditing="YES" focusRingType="none" placeholderString="Search DuckDuckGo" drawsBackground="YES" id="FTG-Jg-Wmc">
+                                <font key="font" usesAppearanceFont="YES"/>
+                                <color key="textColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
+                                <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
+                            </textFieldCell>
+                        </textField>
+                    </subviews>
+                    <constraints>
+                        <constraint firstItem="bS2-51-Skh" firstAttribute="centerY" secondItem="r0u-XH-URQ" secondAttribute="centerY" id="3wx-58-DJe"/>
+                        <constraint firstAttribute="trailing" secondItem="3Vr-DR-fdD" secondAttribute="trailing" constant="16" id="5Ks-87-BYk"/>
+                        <constraint firstItem="bS2-51-Skh" firstAttribute="leading" secondItem="r0u-XH-URQ" secondAttribute="leading" constant="2" id="Qn5-zP-yJE"/>
+                        <constraint firstItem="3Vr-DR-fdD" firstAttribute="leading" secondItem="r0u-XH-URQ" secondAttribute="leading" constant="33" id="fQ0-s1-Etq"/>
+                        <constraint firstItem="3Vr-DR-fdD" firstAttribute="centerY" secondItem="r0u-XH-URQ" secondAttribute="centerY" id="r2E-cF-sMD"/>
+                        <constraint firstAttribute="height" constant="42" id="tqw-6b-at9"/>
+                    </constraints>
+                    <userDefinedRuntimeAttributes>
+                        <userDefinedRuntimeAttribute type="color" keyPath="backgroundColor">
+                            <color key="value" name="AddressBarBackgroundColor"/>
+                        </userDefinedRuntimeAttribute>
+                        <userDefinedRuntimeAttribute type="number" keyPath="cornerRadius">
+                            <integer key="value" value="8"/>
+                        </userDefinedRuntimeAttribute>
+                        <userDefinedRuntimeAttribute type="color" keyPath="borderColor">
+                            <color key="value" name="AddressBarBorderColor"/>
+                        </userDefinedRuntimeAttribute>
+                        <userDefinedRuntimeAttribute type="number" keyPath="borderWidth">
+                            <real key="value" value="1"/>
+                        </userDefinedRuntimeAttribute>
+                    </userDefinedRuntimeAttributes>
+                </customView>
             </subviews>
             <constraints>
-                <constraint firstItem="4Rf-nj-2G2" firstAttribute="width" secondItem="sgY-8u-Li4" secondAttribute="width" constant="-24" id="0xH-4K-pnK"/>
-                <constraint firstItem="4Rf-nj-2G2" firstAttribute="centerX" secondItem="sgY-8u-Li4" secondAttribute="centerX" id="2MH-zm-dhc"/>
-                <constraint firstItem="4Rf-nj-2G2" firstAttribute="top" secondItem="ZFe-Yi-fiG" secondAttribute="bottom" constant="29" id="NUJ-Mh-D1u"/>
+                <constraint firstItem="r0u-XH-URQ" firstAttribute="centerX" secondItem="sgY-8u-Li4" secondAttribute="centerX" id="MBy-Uf-htp"/>
+                <constraint firstItem="r0u-XH-URQ" firstAttribute="width" secondItem="sgY-8u-Li4" secondAttribute="width" constant="-16" id="aBk-ci-gwV"/>
                 <constraint firstItem="ZFe-Yi-fiG" firstAttribute="centerX" secondItem="sgY-8u-Li4" secondAttribute="centerX" id="itl-6p-Ogo"/>
+                <constraint firstItem="r0u-XH-URQ" firstAttribute="top" secondItem="ZFe-Yi-fiG" secondAttribute="bottom" constant="40" id="jhv-Th-JTh"/>
                 <constraint firstItem="ZFe-Yi-fiG" firstAttribute="top" secondItem="sgY-8u-Li4" secondAttribute="top" constant="20" symbolic="YES" id="rgd-14-jeC"/>
             </constraints>
-            <point key="canvasLocation" x="59.5" y="45"/>
+            <connections>
+                <outlet property="field" destination="3Vr-DR-fdD" id="ril-F9-XBH"/>
+                <outlet property="searchContainer" destination="r0u-XH-URQ" id="i4T-Ie-thb"/>
+            </connections>
+            <point key="canvasLocation" x="59.5" y="79"/>
         </customView>
     </objects>
     <resources>
         <image name="Logo" width="128" height="128"/>
+        <image name="Search" width="14" height="14"/>
+        <namedColor name="AddressBarBackgroundColor">
+            <color red="1" green="1" blue="1" alpha="1" colorSpace="custom" customColorSpace="displayP3"/>
+        </namedColor>
+        <namedColor name="AddressBarBorderColor">
+            <color red="0.0" green="0.0" blue="0.0" alpha="0.20000000300000001" colorSpace="custom" customColorSpace="displayP3"/>
+        </namedColor>
     </resources>
 </document>
