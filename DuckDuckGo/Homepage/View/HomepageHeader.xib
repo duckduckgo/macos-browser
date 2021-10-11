@@ -3,6 +3,7 @@
     <dependencies>
         <deployment identifier="macosx"/>
         <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="19162"/>
+        <capability name="Named colors" minToolsVersion="9.0"/>
         <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
     </dependencies>
     <objects>
@@ -19,7 +20,7 @@
                         <constraint firstAttribute="height" constant="80" id="euN-MN-zEq"/>
                         <constraint firstAttribute="width" constant="80" id="pUF-Me-9jg"/>
                     </constraints>
-                    <imageCell key="cell" refusesFirstResponder="YES" alignment="left" imageScaling="proportionallyDown" image="Logo" id="eoC-UH-q7t"/>
+                    <imageCell key="cell" refusesFirstResponder="YES" alignment="left" imageScaling="proportionallyDown" image="HomepageLogo" id="eoC-UH-q7t"/>
                 </imageView>
                 <customView translatesAutoresizingMaskIntoConstraints="NO" id="r0u-XH-URQ" customClass="ColorView" customModule="DuckDuckGo_Privacy_Browser" customModuleProvider="target">
                     <rect key="frame" x="8" y="40" width="551" height="42"/>
@@ -80,13 +81,13 @@
         </customView>
     </objects>
     <resources>
-        <image name="Logo" width="128" height="128"/>
+        <image name="HomepageLogo" width="128" height="128"/>
         <image name="Search" width="14" height="14"/>
         <namedColor name="AddressBarBackgroundColor">
             <color red="1" green="1" blue="1" alpha="1" colorSpace="custom" customColorSpace="displayP3"/>
         </namedColor>
         <namedColor name="AddressBarBorderColor">
-            <color red="0.0" green="0.0" blue="0.0" alpha="0.20000000300000001" colorSpace="custom" customColorSpace="displayP3"/>
+            <color red="0.0" green="0.0" blue="0.0" alpha="0.20000000298023224" colorSpace="custom" customColorSpace="displayP3"/>
         </namedColor>
     </resources>
 </document>
