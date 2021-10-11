@@ -400,6 +400,7 @@ final class AddressBarButtonsViewController: NSViewController {
         }
 
         urlCancellable = selectedTabViewModel.tab.$content.receive(on: DispatchQueue.main).sink { [weak self] _ in
+            self?.stopAnimations()
             self?.updateBookmarkButtonImage()
         }
     }
