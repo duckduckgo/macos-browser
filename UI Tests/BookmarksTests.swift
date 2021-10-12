@@ -32,14 +32,14 @@ class BookmarksTests: DDGUITestCase {
         
         app.windows.staticTexts["addressBarInactiveText"].forceHoverElement()
                 
-        app.windows.children(matching: .button).element(boundBy: 3).click()
+        app.windows.children(matching: .button).element(boundBy: 3).forceClickElement()
         
-        app.windows.popovers.buttons["Done"].click()
-        app.windows.collectionViews.otherElements.children(matching: .group).element(boundBy: 1).children(matching: .button).element.click()
-        app.windows.children(matching: .button).element(boundBy: 4).click()
-        app.windows.menuItems["openBookmarks:"].click()
-        app.windows.popovers.outlines.staticTexts["DuckDuckGo — Privacy, simplified."].click()
-        app.windows.containing(.staticText, identifier: "Search or enter address").element.click()
+        app.windows.popovers.buttons["Done"].forceClickElement()
+        app.windows.collectionViews.otherElements.children(matching: .group).element(boundBy: 1).children(matching: .button).element.forceClickElement()
+        app.windows.children(matching: .button).element(boundBy: 4).forceClickElement()
+        app.windows.menuItems["openBookmarks:"].forceClickElement()
+        app.windows.popovers.outlines.staticTexts["DuckDuckGo — Privacy, simplified."].forceClickElement()
+        app.windows.containing(.staticText, identifier: "Search or enter address").element.forceClickElement()
         
         XCTAssertEqual(app.windows.textFields["Search or enter address"].firstMatch.value as? String, "https://duckduckgo.com/")
     }
@@ -50,17 +50,17 @@ class BookmarksTests: DDGUITestCase {
         let windowsQuery = app.windows
         windowsQuery.textFields["Search or enter address"].typeText("duckduckgo.com\n")
         
-        app.menuBars.menuBarItems["Bookmarks"].click()
+        app.menuBars.menuBarItems["Bookmarks"].forceClickElement()
         
-        app.menuBars.menuItems["Bookmark this page..."].click()
+        app.menuBars.menuItems["Bookmark this page..."].forceClickElement()
         
-        app.windows.collectionViews.otherElements.children(matching: .group).element(boundBy: 1).children(matching: .button).element.click()
+        app.windows.collectionViews.otherElements.children(matching: .group).element(boundBy: 1).children(matching: .button).element.forceClickElement()
         
-        windowsQuery.children(matching: .button).element(boundBy: 4).click()
-        windowsQuery.menuItems["openBookmarks:"].click()
-        windowsQuery.popovers.outlines.staticTexts["DuckDuckGo — Privacy, simplified."].click()
+        windowsQuery.children(matching: .button).element(boundBy: 4).forceClickElement()
+        windowsQuery.menuItems["openBookmarks:"].forceClickElement()
+        windowsQuery.popovers.outlines.staticTexts["DuckDuckGo — Privacy, simplified."].forceClickElement()
         
-        app.windows.containing(.staticText, identifier: "Search or enter address").element.click()
+        app.windows.containing(.staticText, identifier: "Search or enter address").element.forceClickElement()
         
         XCTAssertEqual(app.windows.textFields["Search or enter address"].firstMatch.value as? String, "https://duckduckgo.com/")
     }
@@ -73,48 +73,48 @@ class BookmarksTests: DDGUITestCase {
         windowsQuery.textFields["Search or enter address"].typeText("duckduckgo.com\n")
         
         app.windows.staticTexts["addressBarInactiveText"].forceHoverElement()
-        app.windows.children(matching: .button).element(boundBy: 3).click()
-        app.windows.popovers.buttons["Done"].click()
+        app.windows.children(matching: .button).element(boundBy: 3).forceClickElement()
+        app.windows.popovers.buttons["Done"].forceClickElement()
         
         // new tab
         let elementsQuery = app.windows.collectionViews.otherElements
-        elementsQuery.children(matching: .group).element(boundBy: 1).children(matching: .button).element.click()
+        elementsQuery.children(matching: .group).element(boundBy: 1).children(matching: .button).element.forceClickElement()
         
         // create the second bookmark
         windowsQuery.textFields["Search or enter address"].typeText("example.com\n")
         
         app.windows.staticTexts["addressBarInactiveText"].forceHoverElement()
-        app.windows.children(matching: .button).element(boundBy: 3).click()
-        app.windows.popovers.buttons["Done"].click()
+        app.windows.children(matching: .button).element(boundBy: 3).forceClickElement()
+        app.windows.popovers.buttons["Done"].forceClickElement()
         
         // move mouse off the address bar
         app.windows.collectionViews.otherElements.children(matching: .group).element(boundBy: 1).forceHoverElement()
         
         // open the popover and delete the first bookmark
         let button2 = windowsQuery.children(matching: .button).element(boundBy: 4)
-        button2.click()
+        button2.forceClickElement()
         
         let openbookmarksMenuItem = app.windows.menuItems["openBookmarks:"]
-        openbookmarksMenuItem.click()
+        openbookmarksMenuItem.forceClickElement()
         
         let popoversQuery = windowsQuery.popovers
         popoversQuery.outlines.staticTexts["DuckDuckGo — Privacy, simplified."].rightClick()
-        popoversQuery.menus.menuItems["deleteBookmark:"].click()
+        popoversQuery.menus.menuItems["deleteBookmark:"].forceClickElement()
         
         // new tab
-        elementsQuery.children(matching: .group).element(boundBy: 2).children(matching: .button).element.click()
+        elementsQuery.children(matching: .group).element(boundBy: 2).children(matching: .button).element.forceClickElement()
         
         // open the popup again
-        button2.click()
-        openbookmarksMenuItem.click()
+        button2.forceClickElement()
+        openbookmarksMenuItem.forceClickElement()
         
         // ensure that the first bookmark has been removed and the second bookmark remains
         XCTAssertFalse(app.windows.popovers.outlines.staticTexts["DuckDuckGo — Privacy, simplified."].exists)
         XCTAssertTrue(popoversQuery.outlines.staticTexts["Example Domain"].exists)
-        popoversQuery.outlines.staticTexts["Example Domain"].click()
+        popoversQuery.outlines.staticTexts["Example Domain"].forceClickElement()
         
         // make sure the second bookmark is clickable
-        app.windows.containing(.staticText, identifier: "addressBarInactiveText").element.click()
+        app.windows.containing(.staticText, identifier: "addressBarInactiveText").element.forceClickElement()
         XCTAssertEqual(app.windows.textFields["Search or enter address"].firstMatch.value as? String, "http://example.com/")
     }
 }
