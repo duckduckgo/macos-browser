@@ -131,6 +131,8 @@ final class BrowserImportViewController: NSViewController {
             assertionFailure("Should not attempt to import a CSV file via \(#file)")
         }
 
+        refreshCheckboxOptions()
+
         // Toggle the browser warning bar:
 
         self.closeBrowserWarningLabel.stringValue = "You must close \(browser.importSourceName) before importing data."
@@ -138,6 +140,7 @@ final class BrowserImportViewController: NSViewController {
     }
 
     @IBAction func selectedImportOptionsChanged(_ sender: NSButton) {
+        refreshCheckboxOptions()
         delegate?.browserImportViewController(self, didChangeSelectedImportOptions: selectedImportOptions)
     }
 
@@ -149,6 +152,10 @@ final class BrowserImportViewController: NSViewController {
         } else {
             closeBrowserWarningViewHeightConstraint.constant = 0
         }
+    }
+
+    private func refreshCheckboxOptions() {
+        passwordDetailLabel.isHidden = passwordsCheckbox.state == .off
     }
 
 }
