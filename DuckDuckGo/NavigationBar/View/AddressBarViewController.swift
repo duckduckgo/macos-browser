@@ -48,7 +48,7 @@ final class AddressBarViewController: NSViewController {
     private var selectedTabViewModelCancellable: AnyCancellable?
     private var addressBarTextFieldValueCancellable: AnyCancellable?
     private var passiveAddressBarStringCancellable: AnyCancellable?
-    private var isSuggestionsVisibleCancellable: AnyCancellable?
+    private var suggestionsVisibleCancellable: AnyCancellable?
     private var frameCancellable: AnyCancellable?
     private var addressBarStringCancellable: AnyCancellable?
 
@@ -205,13 +205,13 @@ final class AddressBarViewController: NSViewController {
 
     private func updateShadowView(firstResponder: Bool) {
         guard firstResponder else {
-            isSuggestionsVisibleCancellable = nil
+            suggestionsVisibleCancellable = nil
             frameCancellable = nil
             shadowView.removeFromSuperview()
             return
         }
 
-        isSuggestionsVisibleCancellable = addressBarTextField.isSuggestionWindowVisible.sink { [weak self] visible in
+        suggestionsVisibleCancellable = addressBarTextField.suggestionWindowVisible.sink { [weak self] visible in
             self?.shadowView.shadowSides = visible ? [.left, .top, .right] : .all
             self?.shadowView.shadowColor = visible ? .suggestionsShadowColor : .addressBarShadowColor
             self?.shadowView.shadowRadius = visible ? 8.0 : 4.0

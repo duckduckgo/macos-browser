@@ -3,7 +3,6 @@
     <dependencies>
         <deployment identifier="macosx"/>
         <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="19162"/>
-        <capability name="Named colors" minToolsVersion="9.0"/>
         <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
     </dependencies>
     <objects>
@@ -11,19 +10,48 @@
         <customObject id="-1" userLabel="First Responder" customClass="FirstResponder"/>
         <customObject id="-3" userLabel="Application" customClass="NSObject"/>
         <customView id="sgY-8u-Li4" customClass="HomepageHeaderView" customModule="DuckDuckGo_Privacy_Browser" customModuleProvider="target">
-            <rect key="frame" x="0.0" y="0.0" width="567" height="222"/>
+            <rect key="frame" x="0.0" y="0.0" width="491" height="222"/>
             <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
             <subviews>
                 <imageView horizontalHuggingPriority="251" verticalHuggingPriority="251" translatesAutoresizingMaskIntoConstraints="NO" id="ZFe-Yi-fiG">
-                    <rect key="frame" x="244" y="122" width="80" height="80"/>
+                    <rect key="frame" x="206" y="122" width="80" height="80"/>
                     <constraints>
                         <constraint firstAttribute="height" constant="80" id="euN-MN-zEq"/>
                         <constraint firstAttribute="width" constant="80" id="pUF-Me-9jg"/>
                     </constraints>
                     <imageCell key="cell" refusesFirstResponder="YES" alignment="left" imageScaling="proportionallyDown" image="HomepageLogo" id="eoC-UH-q7t"/>
                 </imageView>
-                <customView translatesAutoresizingMaskIntoConstraints="NO" id="r0u-XH-URQ" customClass="ColorView" customModule="DuckDuckGo_Privacy_Browser" customModuleProvider="target">
-                    <rect key="frame" x="8" y="40" width="551" height="42"/>
+                <customView hidden="YES" translatesAutoresizingMaskIntoConstraints="NO" id="9BZ-pG-ZEW" customClass="ShadowView" customModule="DuckDuckGo_Privacy_Browser" customModuleProvider="target">
+                    <rect key="frame" x="8" y="40" width="475" height="42"/>
+                    <constraints>
+                        <constraint firstAttribute="height" constant="42" id="l9h-X8-r7V"/>
+                    </constraints>
+                    <userDefinedRuntimeAttributes>
+                        <userDefinedRuntimeAttribute type="color" keyPath="shadowColor">
+                            <color key="value" name="AddressBarShadowColor"/>
+                        </userDefinedRuntimeAttribute>
+                        <userDefinedRuntimeAttribute type="size" keyPath="shadowOffset">
+                            <size key="value" width="0.0" height="-4"/>
+                        </userDefinedRuntimeAttribute>
+                        <userDefinedRuntimeAttribute type="number" keyPath="shadowRadius">
+                            <real key="value" value="4"/>
+                        </userDefinedRuntimeAttribute>
+                        <userDefinedRuntimeAttribute type="number" keyPath="cornerRadius">
+                            <integer key="value" value="8"/>
+                        </userDefinedRuntimeAttribute>
+                        <userDefinedRuntimeAttribute type="number" keyPath="shadowOpacity">
+                            <real key="value" value="1"/>
+                        </userDefinedRuntimeAttribute>
+                    </userDefinedRuntimeAttributes>
+                </customView>
+                <customView translatesAutoresizingMaskIntoConstraints="NO" id="xd9-q4-UZz">
+                    <rect key="frame" x="8" y="40" width="475" height="42"/>
+                    <constraints>
+                        <constraint firstAttribute="height" constant="42" id="JcP-N4-xCS"/>
+                    </constraints>
+                </customView>
+                <customView translatesAutoresizingMaskIntoConstraints="NO" id="r0u-XH-URQ" customClass="MouseClickView" customModule="DuckDuckGo_Privacy_Browser" customModuleProvider="target">
+                    <rect key="frame" x="8" y="40" width="475" height="42"/>
                     <subviews>
                         <imageView horizontalHuggingPriority="251" verticalHuggingPriority="251" translatesAutoresizingMaskIntoConstraints="NO" id="bS2-51-Skh">
                             <rect key="frame" x="2" y="6" width="32" height="30"/>
@@ -34,7 +62,7 @@
                             <imageCell key="cell" refusesFirstResponder="YES" alignment="left" imageScaling="proportionallyDown" image="Search" id="i82-cu-gTO"/>
                         </imageView>
                         <textField focusRingType="none" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="3Vr-DR-fdD" customClass="AddressBarTextField" customModule="DuckDuckGo_Privacy_Browser" customModuleProvider="target">
-                            <rect key="frame" x="33" y="13" width="502" height="16"/>
+                            <rect key="frame" x="33" y="13" width="426" height="16"/>
                             <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" selectable="YES" editable="YES" sendsActionOnEndEditing="YES" focusRingType="none" placeholderString="Search DuckDuckGo" drawsBackground="YES" id="FTG-Jg-Wmc">
                                 <font key="font" usesAppearanceFont="YES"/>
                                 <color key="textColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
@@ -43,52 +71,45 @@
                         </textField>
                     </subviews>
                     <constraints>
-                        <constraint firstItem="bS2-51-Skh" firstAttribute="centerY" secondItem="r0u-XH-URQ" secondAttribute="centerY" id="3wx-58-DJe"/>
-                        <constraint firstAttribute="trailing" secondItem="3Vr-DR-fdD" secondAttribute="trailing" constant="16" id="5Ks-87-BYk"/>
-                        <constraint firstItem="bS2-51-Skh" firstAttribute="leading" secondItem="r0u-XH-URQ" secondAttribute="leading" constant="2" id="Qn5-zP-yJE"/>
-                        <constraint firstItem="3Vr-DR-fdD" firstAttribute="leading" secondItem="r0u-XH-URQ" secondAttribute="leading" constant="33" id="fQ0-s1-Etq"/>
-                        <constraint firstItem="3Vr-DR-fdD" firstAttribute="centerY" secondItem="r0u-XH-URQ" secondAttribute="centerY" id="r2E-cF-sMD"/>
-                        <constraint firstAttribute="height" constant="42" id="tqw-6b-at9"/>
+                        <constraint firstAttribute="height" constant="42" id="3yF-SQ-rSA"/>
+                        <constraint firstItem="3Vr-DR-fdD" firstAttribute="leading" secondItem="bS2-51-Skh" secondAttribute="trailing" constant="-1" id="52i-yw-Ydh"/>
+                        <constraint firstAttribute="trailing" secondItem="3Vr-DR-fdD" secondAttribute="trailing" constant="16" id="LaC-0U-E3Y"/>
+                        <constraint firstItem="bS2-51-Skh" firstAttribute="centerY" secondItem="3Vr-DR-fdD" secondAttribute="centerY" id="T9L-OV-h4X"/>
+                        <constraint firstItem="bS2-51-Skh" firstAttribute="leading" secondItem="r0u-XH-URQ" secondAttribute="leading" constant="2" id="feT-nq-a5e"/>
+                        <constraint firstItem="3Vr-DR-fdD" firstAttribute="centerY" secondItem="r0u-XH-URQ" secondAttribute="centerY" id="vUG-Ap-zdd"/>
                     </constraints>
-                    <userDefinedRuntimeAttributes>
-                        <userDefinedRuntimeAttribute type="color" keyPath="backgroundColor">
-                            <color key="value" name="AddressBarBackgroundColor"/>
-                        </userDefinedRuntimeAttribute>
-                        <userDefinedRuntimeAttribute type="number" keyPath="cornerRadius">
-                            <integer key="value" value="8"/>
-                        </userDefinedRuntimeAttribute>
-                        <userDefinedRuntimeAttribute type="color" keyPath="borderColor">
-                            <color key="value" name="AddressBarBorderColor"/>
-                        </userDefinedRuntimeAttribute>
-                        <userDefinedRuntimeAttribute type="number" keyPath="borderWidth">
-                            <real key="value" value="1"/>
-                        </userDefinedRuntimeAttribute>
-                    </userDefinedRuntimeAttributes>
                 </customView>
             </subviews>
             <constraints>
-                <constraint firstItem="r0u-XH-URQ" firstAttribute="centerX" secondItem="sgY-8u-Li4" secondAttribute="centerX" id="MBy-Uf-htp"/>
-                <constraint firstItem="r0u-XH-URQ" firstAttribute="width" secondItem="sgY-8u-Li4" secondAttribute="width" constant="-16" id="aBk-ci-gwV"/>
-                <constraint firstItem="ZFe-Yi-fiG" firstAttribute="centerX" secondItem="sgY-8u-Li4" secondAttribute="centerX" id="itl-6p-Ogo"/>
-                <constraint firstItem="r0u-XH-URQ" firstAttribute="top" secondItem="ZFe-Yi-fiG" secondAttribute="bottom" constant="40" id="jhv-Th-JTh"/>
-                <constraint firstItem="ZFe-Yi-fiG" firstAttribute="top" secondItem="sgY-8u-Li4" secondAttribute="top" constant="20" symbolic="YES" id="rgd-14-jeC"/>
+                <constraint firstAttribute="trailing" secondItem="r0u-XH-URQ" secondAttribute="trailing" constant="8" id="BWd-az-JDX"/>
+                <constraint firstItem="ZFe-Yi-fiG" firstAttribute="centerX" secondItem="sgY-8u-Li4" secondAttribute="centerX" id="LlC-ek-imj"/>
+                <constraint firstItem="xd9-q4-UZz" firstAttribute="top" secondItem="r0u-XH-URQ" secondAttribute="top" id="TJL-lA-Vgo"/>
+                <constraint firstItem="xd9-q4-UZz" firstAttribute="leading" secondItem="sgY-8u-Li4" secondAttribute="leading" constant="8" id="Tr8-sM-O7o"/>
+                <constraint firstItem="ZFe-Yi-fiG" firstAttribute="top" secondItem="sgY-8u-Li4" secondAttribute="top" constant="20" symbolic="YES" id="bog-VG-Nqd"/>
+                <constraint firstItem="9BZ-pG-ZEW" firstAttribute="top" secondItem="r0u-XH-URQ" secondAttribute="top" id="dZi-BX-Vau"/>
+                <constraint firstItem="xd9-q4-UZz" firstAttribute="centerX" secondItem="r0u-XH-URQ" secondAttribute="centerX" id="e47-39-zCa"/>
+                <constraint firstAttribute="trailing" secondItem="xd9-q4-UZz" secondAttribute="trailing" constant="8" id="efC-hy-bMq"/>
+                <constraint firstAttribute="trailing" secondItem="9BZ-pG-ZEW" secondAttribute="trailing" constant="8" id="h5E-9l-Rlm"/>
+                <constraint firstItem="9BZ-pG-ZEW" firstAttribute="leading" secondItem="sgY-8u-Li4" secondAttribute="leading" constant="8" id="hQs-cT-U4g"/>
+                <constraint firstItem="r0u-XH-URQ" firstAttribute="top" secondItem="ZFe-Yi-fiG" secondAttribute="bottom" constant="40" id="jhX-jF-olu"/>
+                <constraint firstItem="r0u-XH-URQ" firstAttribute="leading" secondItem="sgY-8u-Li4" secondAttribute="leading" constant="8" id="zS0-UO-C49"/>
             </constraints>
             <connections>
+                <outlet property="backgroundHeight" destination="JcP-N4-xCS" id="u7w-uE-rFX"/>
+                <outlet property="backgroundView" destination="xd9-q4-UZz" id="WvC-NL-p9T"/>
+                <outlet property="container" destination="r0u-XH-URQ" id="JqF-AE-xD8"/>
                 <outlet property="field" destination="3Vr-DR-fdD" id="ril-F9-XBH"/>
                 <outlet property="icon" destination="bS2-51-Skh" id="2vX-Pd-P0A"/>
-                <outlet property="searchContainer" destination="r0u-XH-URQ" id="i4T-Ie-thb"/>
+                <outlet property="shadowView" destination="9BZ-pG-ZEW" id="dFa-za-NCZ"/>
             </connections>
-            <point key="canvasLocation" x="59.5" y="79"/>
+            <point key="canvasLocation" x="194.5" y="159"/>
         </customView>
     </objects>
     <resources>
-        <image name="HomepageLogo" width="128" height="128"/>
+        <image name="HomepageLogo" width="160" height="160"/>
         <image name="Search" width="14" height="14"/>
-        <namedColor name="AddressBarBackgroundColor">
-            <color red="1" green="1" blue="1" alpha="1" colorSpace="custom" customColorSpace="displayP3"/>
-        </namedColor>
-        <namedColor name="AddressBarBorderColor">
-            <color red="0.0" green="0.0" blue="0.0" alpha="0.20000000298023224" colorSpace="custom" customColorSpace="displayP3"/>
+        <namedColor name="AddressBarShadowColor">
+            <color red="0.0" green="0.0" blue="0.0" alpha="0.15000000599999999" colorSpace="custom" customColorSpace="displayP3"/>
         </namedColor>
     </resources>
 </document>

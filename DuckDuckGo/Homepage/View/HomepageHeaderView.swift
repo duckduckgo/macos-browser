@@ -40,6 +40,7 @@ final class HomepageHeaderView: NSView {
     private var mode: Mode = .idle {
         didSet {
             updateTextFieldIcon()
+            updateSearchView()
         }
     }
 
@@ -51,15 +52,35 @@ final class HomepageHeaderView: NSView {
 
     private let suggestionContainerViewModel = SuggestionContainerViewModel(suggestionContainer: SuggestionContainer())
 
+    @IBOutlet weak var backgroundView: NSView!
+    @IBOutlet weak var container: MouseClickView!
     @IBOutlet weak var field: AddressBarTextField!
+    @IBOutlet weak var shadowView: ShadowView!
     @IBOutlet weak var icon: NSImageView!
+    @IBOutlet weak var backgroundHeight: NSLayoutConstraint!
 
-    var fieldCancellable: AnyCancellable?
+    private var fieldCancellable: AnyCancellable?
+    private var suggestionsCancellable: AnyCancellable?
 
     override func awakeFromNib() {
         super.awakeFromNib()
-        print(#function)
+
+        wantsLayer = true
+        layer?.masksToBounds = false
+        
+        shadowView.shadowColor = .suggestionsShadowColor
+        shadowView.shadowRadius = 8.0
+
+        backgroundView.wantsLayer = true
+        backgroundView.layer?.cornerRadius = 8
+        backgroundView.layer?.backgroundColor = NSColor.addressBarBackgroundColor.cgColor
+        backgroundView.layer?.borderColor = NSColor.addressBarBorderColor.cgColor
+        backgroundView.layer?.borderWidth = 1
+
+        container.delegate = self
+
         field.suggestionContainerViewModel = suggestionContainerViewModel
+
         subscribeToField()
         updateTextFieldIcon()
     }
@@ -69,10 +90,20 @@ final class HomepageHeaderView: NSView {
             guard let self = self else { return }
             self.updateMode()
         }
+
+        suggestionsCancellable = field.suggestionWindowVisible.receive(on: DispatchQueue.main)
+            .sink { [weak self] _ in
+                self?.updateSearchView()
+            }
+
+        NotificationCenter.default.addObserver(self,
+                                               selector: #selector(textFieldFirstReponderNotification(_:)),
+                                               name: .firstResponder,
+                                               object: nil)
+
     }
 
     private func updateMode() {
-        print(#function, field.value)
         switch self.field.value {
         case .text(let text): self.mode = text.isEmpty ? .idle : .search
         case .url(urlString: _, url: _, userTyped: let userTyped): self.mode = userTyped ? .domain : .search
@@ -86,6 +117,51 @@ final class HomepageHeaderView: NSView {
 
     private func updateTextFieldIcon() {
         icon.image = Self.modeImages[mode, default: Self.homeSearchImage]
+    }
+
+    private func showSearchInactive() {
+        print(#function)
+        backgroundHeight.constant = 42
+        shadowView.isHidden = true
+    }
+
+    private func showSearchActive() {
+        print(#function)
+        backgroundHeight.constant = 42
+        shadowView.isHidden = false
+        shadowView.shadowSides = .all
+    }
+
+    private func showSearchHasResults() {
+        print(#function)
+        backgroundHeight.constant = 60
+        shadowView.isHidden = false
+        shadowView.shadowSides = [.left, .top, .right]
+    }
+
+    private func updateSearchView() {
+        if window?.firstResponder != field.currentEditor() {
+           showSearchInactive()
+        } else if field.isSuggestionWindowVisible {
+            showSearchHasResults()
+        } else {
+            showSearchActive()
+        }
+    }
+
+    @objc func textFieldFirstReponderNotification(_ notification: Notification) {
+        if mode != .idle {
+            self.mode = .idle
+        }
+        updateSearchView()
+    }
+
+}
+
+extension HomepageHeaderView: MouseClickViewDelegate {
+
+    func mouseClickView(_ mouseClickView: MouseClickView, mouseDownEvent: NSEvent) {
+        field.makeMeFirstResponderIfNeeded()
     }
 
 }
