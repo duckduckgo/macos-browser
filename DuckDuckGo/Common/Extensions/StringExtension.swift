@@ -57,7 +57,7 @@ extension String {
     }
 
     subscript (_ range: NSRange) -> Self {
-        .init(self[index(startIndex, offsetBy: range.lowerBound) ..< index(startIndex, offsetBy: range.upperBound)])
+        .init(self[utf16.index(startIndex, offsetBy: range.lowerBound) ..< utf16.index(startIndex, offsetBy: range.upperBound)])
     }
 
     // MARK: - Regular Expression
