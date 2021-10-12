@@ -54,7 +54,8 @@ class BookmarksTests: DDGUITestCase {
         
         app.menuBars.menuItems["Bookmark this page..."].forceClickElement()
         
-        app.windows.collectionViews.otherElements.children(matching: .group).element(boundBy: 1).children(matching: .button).element.forceClickElement()
+        app.windows.collectionViews.otherElements.children(matching: .group)
+            .element(boundBy: 1).children(matching: .button).element.forceClickElement()
         
         windowsQuery.children(matching: .button).element(boundBy: 4).forceClickElement()
         windowsQuery.menuItems["openBookmarks:"].forceClickElement()
