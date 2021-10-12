@@ -18,11 +18,45 @@
 
 import Cocoa
 
+protocol FirePopoverCollectionViewItemDelegate: AnyObject {
+
+    func firePopoverCollectionViewItemDidToggle(_ firePopoverCollectionViewItem: FirePopoverCollectionViewItem)
+
+}
+
 final class FirePopoverCollectionViewItem: NSCollectionViewItem {
 
-    override func viewDidLoad() {
-        super.viewDidLoad()
-        // Do view setup here.
+    static let identifier = NSUserInterfaceItemIdentifier(rawValue: "FirePopoverCollectionViewItem")
+
+    weak var delegate: FirePopoverCollectionViewItemDelegate?
+
+    @IBOutlet weak var domainTextField: NSTextField!
+    @IBOutlet weak var checkButton: NSButton!
+    @IBOutlet weak var faviconImageView: NSImageView! {
+       didSet {
+           faviconImageView.applyFaviconStyle()
+       }
+   }
+
+    func setItem(_ domainListItem: FireDomainList.Item, isFireproofed: Bool) {
+        domainTextField.stringValue = domainListItem.domain
+        faviconImageView.image = domainListItem.favicon
+        faviconImageView.isHidden = domainListItem.favicon == nil
+        checkButton.isHidden = isFireproofed
+    }
+
+    @IBAction func checkButtonAction(_ sender: Any) {
+        delegate?.firePopoverCollectionViewItemDidToggle(self)
+    }
+
+    override func mouseDown(with event: NSEvent) {
+        delegate?.firePopoverCollectionViewItemDidToggle(self)
+    }
+
+    override var isSelected: Bool {
+        didSet {
+            checkButton.state = isSelected ? .on : .off
+        }
     }
 
 }

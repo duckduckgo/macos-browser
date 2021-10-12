@@ -127,7 +127,7 @@
         <scene sceneID="H7D-pj-sTn">
             <objects>
                 <viewController storyboardIdentifier="FirePopoverViewController" id="DMI-mh-xLJ" customClass="FirePopoverViewController" customModule="DuckDuckGo_Privacy_Browser" customModuleProvider="target" sceneMemberID="viewController">
-                    <view key="view" misplaced="YES" id="dGd-Gc-P2e" customClass="ColorView" customModule="DuckDuckGo_Privacy_Browser" customModuleProvider="target">
+                    <view key="view" id="dGd-Gc-P2e" customClass="ColorView" customModule="DuckDuckGo_Privacy_Browser" customModuleProvider="target">
                         <rect key="frame" x="0.0" y="0.0" width="320" height="250"/>
                         <autoresizingMask key="autoresizingMask"/>
                         <subviews>
@@ -148,18 +148,21 @@
                                             <constraint firstAttribute="height" constant="30" id="AOr-Ku-GpD"/>
                                             <constraint firstAttribute="width" constant="127" id="f5G-AU-bU2"/>
                                         </constraints>
-                                        <popUpButtonCell key="cell" type="bevel" title="All Data" bezelStyle="regularSquare" alignment="center" lineBreakMode="truncatingTail" state="on" borderStyle="border" inset="2" selectedItem="36I-OU-7Bw" id="j8q-KC-blV">
+                                        <popUpButtonCell key="cell" type="bevel" title="All Data" bezelStyle="regularSquare" alignment="center" lineBreakMode="truncatingTail" state="on" borderStyle="border" tag="2" inset="2" selectedItem="36I-OU-7Bw" id="j8q-KC-blV">
                                             <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
-                                            <font key="font" metaFont="system"/>
+                                            <font key="font" metaFont="menu"/>
                                             <menu key="menu" id="oaR-se-uak">
                                                 <items>
                                                     <menuItem title="Current Tab" id="0e7-Td-3OA"/>
-                                                    <menuItem title="Current Window" id="15H-Hj-EPs"/>
+                                                    <menuItem title="Current Window" tag="1" id="15H-Hj-EPs"/>
                                                     <menuItem isSeparatorItem="YES" id="diM-Ta-dwx"/>
-                                                    <menuItem title="All Data" state="on" id="36I-OU-7Bw"/>
+                                                    <menuItem title="All Data" state="on" tag="2" id="36I-OU-7Bw"/>
                                                 </items>
                                             </menu>
                                         </popUpButtonCell>
+                                        <connections>
+                                            <action selector="optionsButtonAction:" target="DMI-mh-xLJ" id="4KY-AK-Ajq"/>
+                                        </connections>
                                     </popUpButton>
                                     <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="gVh-tG-Gue">
                                         <rect key="frame" x="85" y="33" width="36" height="16"/>
@@ -187,7 +190,7 @@
                                 </constraints>
                                 <buttonCell key="cell" type="square" title="Details" bezelStyle="shadowlessSquare" image="ExpandDown" imagePosition="trailing" alignment="center" inset="2" id="mkO-Cm-jWy">
                                     <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
-                                    <font key="font" metaFont="system" size="11"/>
+                                    <font key="font" metaFont="smallSystem"/>
                                 </buttonCell>
                                 <color key="contentTintColor" name="GreyTextColor"/>
                                 <connections>
@@ -221,7 +224,7 @@
                                                 <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                                 <buttonCell key="cell" type="square" title="Close all tabs and clear site data" bezelStyle="shadowlessSquare" image="ExpandDown" imagePosition="trailing" alignment="left" inset="2" id="5VP-Yt-jB8">
                                                     <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
-                                                    <font key="font" metaFont="system" size="11"/>
+                                                    <font key="font" metaFont="smallSystem"/>
                                                 </buttonCell>
                                                 <color key="contentTintColor" name="GreyTextColor"/>
                                                 <connections>
@@ -243,7 +246,7 @@
                                             <rect key="frame" x="0.0" y="0.0" width="320" height="221"/>
                                             <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                             <subviews>
-                                                <collectionView id="u7v-Gt-FjR">
+                                                <collectionView selectable="YES" allowsMultipleSelection="YES" id="u7v-Gt-FjR">
                                                     <rect key="frame" x="0.0" y="0.0" width="320" height="158"/>
                                                     <autoresizingMask key="autoresizingMask" widthSizable="YES"/>
                                                     <collectionViewFlowLayout key="collectionViewLayout" id="VZx-7u-HhL">
@@ -358,6 +361,7 @@ Gw
                         <outlet property="contentSizeConstraint" destination="hbg-4i-hjT" id="mC2-Ot-onY"/>
                         <outlet property="detailsWrapperView" destination="6vZ-d2-qnR" id="TKb-Ux-TIk"/>
                         <outlet property="openDetailsButton" destination="ACx-m8-z0K" id="cu4-zz-MhA"/>
+                        <outlet property="optionsButton" destination="ckJ-6G-38h" id="xSK-KE-yMk"/>
                     </connections>
                 </viewController>
                 <customObject id="fzV-LM-GvK" userLabel="First Responder" customClass="NSResponder" sceneMemberID="firstResponder"/>

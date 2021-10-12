@@ -1,5 +1,5 @@
 //
-//  FirePopoverCollectionViewHeader.swift
+//  FireClearingOption.swift
 //
 //  Copyright © 2021 DuckDuckGo. All rights reserved.
 //
@@ -16,12 +16,20 @@
 //  limitations under the License.
 //
 
-import Cocoa
+import Foundation
 
-final class FirePopoverCollectionViewHeader: NSView {
+enum FireClearingOption: CaseIterable {
 
-    static let identifier = NSUserInterfaceItemIdentifier(rawValue: "FirePopoverCollectionViewHeader")
+    case currentTab
+    case currentWindow
+    case allData
 
-    @IBOutlet weak var title: NSTextField!
+    var string: String {
+        switch self {
+        case .currentTab: return UserText.currentTab
+        case .currentWindow: return UserText.currentWindow
+        case .allData: return UserText.allData
+        }
+    }
 
 }

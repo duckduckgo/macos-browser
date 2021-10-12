@@ -17,12 +17,27 @@
 //
 
 import Cocoa
+import GRDB
 
 final class FirePopoverViewController: NSViewController {
 
-    let fireViewModel: FireViewModel
-    let tabCollectionViewModel: TabCollectionViewModel
+    private let fireViewModel: FireViewModel
+    private let tabCollectionViewModel: TabCollectionViewModel
+    private var clearingOption: FireClearingOption = .allData {
+        didSet {
+            updateCloseDetailsButton()
+            updateDomainList()
+        }
+    }
+    private var domainList: FireDomainList = FireDomainList.empty {
+        didSet {
+            collectionView.reloadData()
+            selectClearSection()
+        }
+    }
+    private let historyCoordinating: HistoryCoordinating
 
+    @IBOutlet weak var optionsButton: NSPopUpButton!
     @IBOutlet weak var openDetailsButton: NSButton!
     @IBOutlet weak var closeDetailsButton: NSButton!
     @IBOutlet weak var detailsWrapperView: NSView!
@@ -33,9 +48,12 @@ final class FirePopoverViewController: NSViewController {
         fatalError("FirePopoverViewController: Bad initializer")
     }
 
-    init?(coder: NSCoder, fireViewModel: FireViewModel, tabCollectionViewModel: TabCollectionViewModel) {
+    init?(coder: NSCoder, fireViewModel: FireViewModel,
+          tabCollectionViewModel: TabCollectionViewModel,
+          historyCoordinating: HistoryCoordinating = HistoryCoordinator.shared) {
         self.fireViewModel = fireViewModel
         self.tabCollectionViewModel = tabCollectionViewModel
+        self.historyCoordinating = historyCoordinating
 
         super.init(coder: coder)
     }
@@ -43,8 +61,27 @@ final class FirePopoverViewController: NSViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
 
+        let nib = NSNib(nibNamed: "FirePopoverCollectionViewItem", bundle: nil)
+        collectionView.register(nib, forItemWithIdentifier: FirePopoverCollectionViewItem.identifier)
         collectionView.delegate = self
         collectionView.dataSource = self
+        setupOptionsButton()
+        updateCloseDetailsButton()
+        updateDomainList()
+    }
+
+    private func setupOptionsButton() {
+        FireClearingOption.allCases.enumerated().forEach { (index, option) in
+            optionsButton.menu?.item(withTag: index)?.title = option.string
+        }
+    }
+
+    @IBAction func optionsButtonAction(_ sender: NSPopUpButton) {
+        guard let tag = sender.selectedItem?.tag else {
+            assertionFailure("No tag in the selected menu item")
+            return
+        }
+        clearingOption = FireClearingOption.allCases[tag]
     }
 
     @IBAction func openDetailsButtonAction(_ sender: Any) {
@@ -55,16 +92,24 @@ final class FirePopoverViewController: NSViewController {
         toggleDetails()
     }
 
+    private func updateCloseDetailsButton() {
+        switch clearingOption {
+        case .currentTab: closeDetailsButton.title = UserText.currentTabDescription
+        case .currentWindow: closeDetailsButton.title = UserText.currentWindowDescription
+        case .allData: closeDetailsButton.title = UserText.allDataDescription
+        }
+    }
+
     @IBAction func clearButtonAction(_ sender: Any) {
         let timedPixel = TimedPixel(.burn())
         fireViewModel.fire.burnAll(tabCollectionViewModel: tabCollectionViewModel) { timedPixel.fire() }
     }
 
     @IBAction func cancelButtonAction(_ sender: Any) {
-
+        dismiss()
     }
 
-    func toggleDetails() {
+    private func toggleDetails() {
         let showDetails = detailsWrapperView.isHidden
         openDetailsButton.isHidden = showDetails
         detailsWrapperView.isHidden = !showDetails
@@ -76,6 +121,27 @@ final class FirePopoverViewController: NSViewController {
         }
     }
 
+    private func updateDomainList() {
+        switch clearingOption {
+        case .currentTab:
+            guard let tab = tabCollectionViewModel.selectedTabViewModel?.tab else {
+                assertionFailure("selectedTabViewModel is nil")
+                return
+            }
+
+            domainList = FireDomainList(tab: tab)
+        case .currentWindow:
+            domainList =  FireDomainList(tabCollection: tabCollectionViewModel.tabCollection)
+        case .allData:
+            domainList = FireDomainList(historyCoordinating: historyCoordinating)
+        }
+    }
+
+    private func selectClearSection() {
+        let indexPaths = Set((0..<domainList.selectable.count).map { IndexPath(item: $0, section: 1) })
+        collectionView.selectItems(at: indexPaths, scrollPosition: [])
+    }
+
 }
 
 extension FirePopoverViewController: NSCollectionViewDataSource {
@@ -85,33 +151,33 @@ extension FirePopoverViewController: NSCollectionViewDataSource {
     }
 
     func collectionView(_ collectionView: NSCollectionView, numberOfItemsInSection section: Int) -> Int {
-        return 3
+        return section == 0 ? domainList.fireproofed.count : domainList.selectable.count
     }
-
-    static let itemIdentifier = NSUserInterfaceItemIdentifier(rawValue: "FirePopoverCollectionViewItem")
 
     func collectionView(_ collectionView: NSCollectionView, itemForRepresentedObjectAt indexPath: IndexPath) -> NSCollectionViewItem {
-        let item = collectionView.makeItem(withIdentifier: Self.itemIdentifier, for: indexPath)
-//        guard let _ = item as? FirePopoverCollectionViewItem else { return item }
+        let item = collectionView.makeItem(withIdentifier: FirePopoverCollectionViewItem.identifier, for: indexPath)
+        guard let firePopoverItem = item as? FirePopoverCollectionViewItem else { return item }
 
-        return item
+        firePopoverItem.delegate = self
+        let sectionList = (indexPath.section == 0 ? domainList.fireproofed : domainList.selectable)
+        let listItem = sectionList[indexPath.item]
+        firePopoverItem.setItem(listItem, isFireproofed: indexPath.section == 0)
+        return firePopoverItem
     }
-
-    static let headerIdentifier = NSUserInterfaceItemIdentifier(rawValue: "FirePopoverCollectionViewHeader")
 
     func collectionView(_ collectionView: NSCollectionView,
                         viewForSupplementaryElementOfKind kind: NSCollectionView.SupplementaryElementKind,
                         at indexPath: IndexPath) -> NSView {
         // swiftlint:disable force_cast
         let view = collectionView.makeSupplementaryView(ofKind: NSCollectionView.elementKindSectionHeader,
-                                                        withIdentifier: Self.headerIdentifier,
+                                                        withIdentifier: FirePopoverCollectionViewHeader.identifier,
                                                         for: indexPath) as! FirePopoverCollectionViewHeader
         // swiftlint:enable force_cast
 
         if indexPath.section == 0 {
-            view.title.stringValue = "Fireproof Sites"
+            view.title.stringValue = UserText.fireDialogFireproofSites
         } else {
-            view.title.stringValue = "Clear These Sites"
+            view.title.stringValue = UserText.fireDialogClearSites
         }
 
         return view
@@ -128,7 +194,30 @@ extension FirePopoverViewController: NSCollectionViewDelegateFlowLayout {
     func collectionView(_ collectionView: NSCollectionView,
                         layout collectionViewLayout: NSCollectionViewLayout,
                         referenceSizeForHeaderInSection section: Int) -> NSSize {
-        return NSSize(width: collectionView.bounds.width, height: 28)
+        let count: Int
+        switch section {
+        case 0: count = domainList.fireproofed.count
+        case 1: count = domainList.selectable.count
+        default: count = 0
+        }
+        return NSSize(width: collectionView.bounds.width, height: count == 0 ? 0 : 28)
+    }
+
+}
+
+extension FirePopoverViewController: FirePopoverCollectionViewItemDelegate {
+
+    func firePopoverCollectionViewItemDidToggle(_ firePopoverCollectionViewItem: FirePopoverCollectionViewItem) {
+        guard let indexPath = collectionView.indexPath(for: firePopoverCollectionViewItem) else {
+            assertionFailure("No index path for the \(firePopoverCollectionViewItem)")
+            return
+        }
+
+        if firePopoverCollectionViewItem.isSelected {
+            collectionView.deselectItems(at: [indexPath])
+        } else {
+            collectionView.selectItems(at: [indexPath], scrollPosition: [])
+        }
     }
 
 }
