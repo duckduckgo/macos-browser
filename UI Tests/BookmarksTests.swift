@@ -35,7 +35,8 @@ class BookmarksTests: DDGUITestCase {
         app.windows.children(matching: .button).element(boundBy: 3).forceClickElement()
         
         app.windows.popovers.buttons["Done"].forceClickElement()
-        app.windows.collectionViews.otherElements.children(matching: .group).element(boundBy: 1).children(matching: .button).element.forceClickElement()
+        app.windows.collectionViews.otherElements.children(matching: .group)
+            .element(boundBy: 1).children(matching: .button).element.forceClickElement()
         app.windows.children(matching: .button).element(boundBy: 4).forceClickElement()
         app.windows.menuItems["openBookmarks:"].forceClickElement()
         app.windows.popovers.outlines.staticTexts["DuckDuckGo — Privacy, simplified."].forceClickElement()
