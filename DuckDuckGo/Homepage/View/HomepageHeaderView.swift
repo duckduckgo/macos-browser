@@ -18,6 +18,7 @@
 
 import Foundation
 import Combine
+import WebKit
 
 final class HomepageHeaderView: NSView {
 
@@ -58,31 +59,78 @@ final class HomepageHeaderView: NSView {
     @IBOutlet weak var shadowView: ShadowView!
     @IBOutlet weak var icon: NSImageView!
     @IBOutlet weak var backgroundHeight: NSLayoutConstraint!
+    @IBOutlet weak var dax: WKWebView!
 
     private var fieldCancellable: AnyCancellable?
     private var suggestionsCancellable: AnyCancellable?
+    private var animationTimer: Timer?
 
     override func awakeFromNib() {
         super.awakeFromNib()
 
-        wantsLayer = true
-        layer?.masksToBounds = false
-        
-        shadowView.shadowColor = .suggestionsShadowColor
-        shadowView.shadowRadius = 8.0
+        initLogo()
+        initShadows()
+        initFieldBackground()
+        wireUpAddressBarFieldToModel()
+        subscribeToField()
+        updateTextFieldIcon()
+    }
 
+    @objc func textFieldFirstReponderNotification(_ notification: Notification) {
+        if mode != .idle {
+            self.mode = .idle
+        }
+        updateSearchView()
+    }
+
+    private func wireUpAddressBarFieldToModel() {
+        field.suggestionContainerViewModel = suggestionContainerViewModel
+    }
+
+    private func initFieldBackground() {
         backgroundView.wantsLayer = true
         backgroundView.layer?.cornerRadius = 8
         backgroundView.layer?.backgroundColor = NSColor.addressBarBackgroundColor.cgColor
         backgroundView.layer?.borderColor = NSColor.addressBarBorderColor.cgColor
         backgroundView.layer?.borderWidth = 1
-
         container.delegate = self
+    }
 
-        field.suggestionContainerViewModel = suggestionContainerViewModel
+    private func initShadows() {
+        wantsLayer = true
+        layer?.masksToBounds = false
+        shadowView.shadowColor = .suggestionsShadowColor
+        shadowView.shadowRadius = 8.0
+    }
 
-        subscribeToField()
-        updateTextFieldIcon()
+    private func initLogo() {
+        guard let daxLogo = Bundle.main.url(forResource: "Dax", withExtension: "svg") else { fatalError() }
+        dax.loadFileURL(daxLogo, allowingReadAccessTo: daxLogo)
+        dax.setValue(false, forKey: "drawsBackground")
+        dax.addGestureRecognizer(NSClickGestureRecognizer(target: self, action: #selector(onGesture(_:))))
+        startAnimation()
+    }
+
+    @objc func onGesture(_ gesture: NSGestureRecognizer) {
+        print(#function)
+        runAnimation()
+    }
+
+    private func startAnimation() {
+        animationTimer?.invalidate()
+        let delay: TimeInterval = Double.random(in: 30 ..< 120)
+        print(#function, delay)
+        animationTimer = Timer.scheduledTimer(withTimeInterval: delay, repeats: false, block: { [weak self] _ in
+            self?.runAnimation()
+        })
+    }
+
+    private func runAnimation() {
+        animationTimer?.invalidate()
+        let anim = ["Dax-Wink", "Dax-Bow-Tie", "Dax-EyeBrows", "Dax-Eyes"].randomElement()
+        guard let daxAnim = Bundle.main.url(forResource: anim, withExtension: "svg") else { fatalError() }
+        dax.loadFileURL(daxAnim, allowingReadAccessTo: daxAnim)
+        startAnimation()
     }
 
     private func subscribeToField() {
@@ -149,19 +197,31 @@ final class HomepageHeaderView: NSView {
         }
     }
 
-    @objc func textFieldFirstReponderNotification(_ notification: Notification) {
-        if mode != .idle {
-            self.mode = .idle
-        }
-        updateSearchView()
-    }
-
 }
 
 extension HomepageHeaderView: MouseClickViewDelegate {
 
     func mouseClickView(_ mouseClickView: MouseClickView, mouseDownEvent: NSEvent) {
         field.makeMeFirstResponderIfNeeded()
+    }
+
+}
+
+final class DaxWebView: WKWebView {
+
+    override init(frame: CGRect, configuration: WKWebViewConfiguration) {
+        let config = WKWebViewConfiguration()
+        config.websiteDataStore = .nonPersistent()
+        super.init(frame: frame, configuration: config)
+    }
+
+    required init?(coder: NSCoder) {
+        super.init(coder: coder)
+    }
+
+    override func willOpenMenu(_ menu: NSMenu, with event: NSEvent) {
+        print(#function)
+        menu.removeAllItems()
     }
 
 }

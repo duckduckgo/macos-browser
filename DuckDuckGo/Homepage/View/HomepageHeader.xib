@@ -3,6 +3,7 @@
     <dependencies>
         <deployment identifier="macosx"/>
         <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="19162"/>
+        <plugIn identifier="com.apple.WebKit2IBPlugin" version="19162"/>
         <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
     </dependencies>
     <objects>
@@ -13,7 +14,7 @@
             <rect key="frame" x="0.0" y="0.0" width="491" height="222"/>
             <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
             <subviews>
-                <imageView horizontalHuggingPriority="251" verticalHuggingPriority="251" translatesAutoresizingMaskIntoConstraints="NO" id="ZFe-Yi-fiG">
+                <imageView hidden="YES" horizontalHuggingPriority="251" verticalHuggingPriority="251" translatesAutoresizingMaskIntoConstraints="NO" id="ZFe-Yi-fiG">
                     <rect key="frame" x="206" y="122" width="80" height="80"/>
                     <constraints>
                         <constraint firstAttribute="height" constant="80" id="euN-MN-zEq"/>
@@ -79,6 +80,17 @@
                         <constraint firstItem="3Vr-DR-fdD" firstAttribute="centerY" secondItem="r0u-XH-URQ" secondAttribute="centerY" id="vUG-Ap-zdd"/>
                     </constraints>
                 </customView>
+                <wkWebView wantsLayer="YES" allowsLinkPreview="NO" translatesAutoresizingMaskIntoConstraints="NO" id="F0e-4u-oNv" customClass="DaxWebView" customModule="DuckDuckGo_Privacy_Browser" customModuleProvider="target">
+                    <rect key="frame" x="206" y="122" width="80" height="80"/>
+                    <constraints>
+                        <constraint firstAttribute="width" constant="80" id="DQs-Ia-k4Z"/>
+                        <constraint firstAttribute="height" constant="80" id="sor-Ms-jbM"/>
+                    </constraints>
+                    <wkWebViewConfiguration key="configuration" allowsAirPlayForMediaPlayback="NO" suppressesIncrementalRendering="YES">
+                        <audiovisualMediaTypes key="mediaTypesRequiringUserActionForPlayback" none="YES"/>
+                        <wkPreferences key="preferences" javaScriptCanOpenWindowsAutomatically="NO"/>
+                    </wkWebViewConfiguration>
+                </wkWebView>
             </subviews>
             <constraints>
                 <constraint firstAttribute="trailing" secondItem="r0u-XH-URQ" secondAttribute="trailing" constant="8" id="BWd-az-JDX"/>
@@ -88,16 +100,19 @@
                 <constraint firstItem="ZFe-Yi-fiG" firstAttribute="top" secondItem="sgY-8u-Li4" secondAttribute="top" constant="20" symbolic="YES" id="bog-VG-Nqd"/>
                 <constraint firstItem="9BZ-pG-ZEW" firstAttribute="top" secondItem="r0u-XH-URQ" secondAttribute="top" id="dZi-BX-Vau"/>
                 <constraint firstItem="xd9-q4-UZz" firstAttribute="centerX" secondItem="r0u-XH-URQ" secondAttribute="centerX" id="e47-39-zCa"/>
+                <constraint firstItem="F0e-4u-oNv" firstAttribute="centerX" secondItem="sgY-8u-Li4" secondAttribute="centerX" id="eeb-EC-jbO"/>
                 <constraint firstAttribute="trailing" secondItem="xd9-q4-UZz" secondAttribute="trailing" constant="8" id="efC-hy-bMq"/>
                 <constraint firstAttribute="trailing" secondItem="9BZ-pG-ZEW" secondAttribute="trailing" constant="8" id="h5E-9l-Rlm"/>
                 <constraint firstItem="9BZ-pG-ZEW" firstAttribute="leading" secondItem="sgY-8u-Li4" secondAttribute="leading" constant="8" id="hQs-cT-U4g"/>
                 <constraint firstItem="r0u-XH-URQ" firstAttribute="top" secondItem="ZFe-Yi-fiG" secondAttribute="bottom" constant="40" id="jhX-jF-olu"/>
+                <constraint firstItem="F0e-4u-oNv" firstAttribute="top" secondItem="sgY-8u-Li4" secondAttribute="top" constant="20" id="wlz-NE-1ou"/>
                 <constraint firstItem="r0u-XH-URQ" firstAttribute="leading" secondItem="sgY-8u-Li4" secondAttribute="leading" constant="8" id="zS0-UO-C49"/>
             </constraints>
             <connections>
                 <outlet property="backgroundHeight" destination="JcP-N4-xCS" id="u7w-uE-rFX"/>
                 <outlet property="backgroundView" destination="xd9-q4-UZz" id="WvC-NL-p9T"/>
                 <outlet property="container" destination="r0u-XH-URQ" id="JqF-AE-xD8"/>
+                <outlet property="dax" destination="F0e-4u-oNv" id="N4r-rx-2Gg"/>
                 <outlet property="field" destination="3Vr-DR-fdD" id="ril-F9-XBH"/>
                 <outlet property="icon" destination="bS2-51-Skh" id="2vX-Pd-P0A"/>
                 <outlet property="shadowView" destination="9BZ-pG-ZEW" id="dFa-za-NCZ"/>
