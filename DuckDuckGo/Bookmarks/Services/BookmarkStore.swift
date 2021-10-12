@@ -456,9 +456,9 @@ final class LocalBookmarkStore: BookmarkStore {
             if bookmarkManagedObject.isFolder, let folderChildren = bookmarkManagedObject.children {
                 let children = folderChildren.compactMap { $0 as? BookmarkManagedObject }
                 let containsBookmark = children.contains(where: { !$0.isFolder })
-                let containsEntityWithChildren = children.contains(where: { ($0.children?.count ?? 0) > 0 })
+                let containsPopulatedFolder = children.contains(where: { ($0.children?.count ?? 0) > 0 })
 
-                if !containsBookmark && !containsEntityWithChildren {
+                if !containsBookmark && !containsPopulatedFolder {
                     context.delete(bookmarkManagedObject)
                 }
             }

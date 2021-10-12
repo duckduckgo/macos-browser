@@ -291,7 +291,7 @@ struct UserText {
 
     static func duplicateBookmarkImports(_ totalFailedImports: Int) -> String {
         let localized = NSLocalizedString("import.bookmarks.browser.duplicate-imports",
-                                          value: "Duplicate Imports Skipped: %@",
+                                          value: "Duplicate Bookmarks Skipped: %@",
                                           comment: "Status text indicating the number of duplicate browser bookmark imports")
         return String(format: localized, String(totalFailedImports))
     }
