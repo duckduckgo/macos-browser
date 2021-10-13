@@ -79,7 +79,7 @@ internal class ChromiumDataImporter: DataImporter {
             case .failure(let error):
                 switch error {
                 case .noBookmarksFileFound:
-                    // If there is are no bookmarks, treat it as a successful import of zero bookmarks.
+                    // If there are no bookmarks, treat it as a successful import of zero bookmarks.
                     let result = BookmarkImportResult.init(successful: 0, duplicates: 0, failed: 0)
                     let summary = DataImport.Summary.bookmarks(result: result)
                     summaries.append(summary)
