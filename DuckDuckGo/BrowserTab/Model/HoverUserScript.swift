@@ -45,7 +45,7 @@ final class HoverUserScript: NSObject, UserScript {
     document.addEventListener("mouseover", function(event) {
         event = event || window.event;
         console.log(event.target)
-        var anchor = findAnchorParent(event.target)
+        var anchor = event.target.closest('a')
         let href = anchor ? anchor.href : null
         webkit.messageHandlers.hoverHandler.postMessage({ href: href });
     });
