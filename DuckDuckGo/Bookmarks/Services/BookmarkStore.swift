@@ -449,6 +449,19 @@ final class LocalBookmarkStore: BookmarkStore {
 
                 total += result
             }
+
+            // If a managed object is a folder, and it doesn't have any child bookmarks, it can be deleted. In the future, duplicate bookmarks will be
+            // allowed and folders won't have to be removed like this. This is done here as a separate step so that it's easy to delete later once
+            // duplicates are allowed.
+            if bookmarkManagedObject.isFolder, let folderChildren = bookmarkManagedObject.children {
+                let children = folderChildren.compactMap { $0 as? BookmarkManagedObject }
+                let containsBookmark = children.contains(where: { !$0.isFolder })
+                let containsPopulatedFolder = children.contains(where: { ($0.children?.count ?? 0) > 0 })
+
+                if !containsBookmark && !containsPopulatedFolder {
+                    context.delete(bookmarkManagedObject)
+                }
+            }
         }
 
         return total

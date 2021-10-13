@@ -38,6 +38,9 @@ final class BrowserImportSummaryViewController: NSViewController {
     @IBOutlet var bookmarkSummaryRow: NSView!
     @IBOutlet var bookmarkSummaryLabel: NSTextField!
 
+    @IBOutlet var bookmarkDuplicatesRow: NSView!
+    @IBOutlet var bookmarkDuplicatesLabel: NSTextField!
+
     @IBOutlet var bookmarkFailureRow: NSView!
     @IBOutlet var bookmarkFailureLabel: NSTextField!
 
@@ -68,18 +71,19 @@ final class BrowserImportSummaryViewController: NSViewController {
         for summary in summaries {
             switch summary {
             case .bookmarks(let result):
-                if result.successful > 0 {
-                    bookmarkSummaryRow.isHidden = false
-                    bookmarkSummaryLabel.stringValue = UserText.successfulBookmarkImports(result.successful)
+                bookmarkSummaryRow.isHidden = false
+                bookmarkSummaryLabel.stringValue = UserText.successfulBookmarkImports(result.successful)
+
+                if result.duplicates > 0 {
+                    bookmarkDuplicatesRow.isHidden = false
+                    bookmarkDuplicatesLabel.stringValue = UserText.duplicateBookmarkImports(result.duplicates)
                 } else {
-                    bookmarkSummaryRow.isHidden = true
+                    bookmarkDuplicatesRow.isHidden = true
                 }
 
-                let failureTotal = result.duplicates + result.failed
-
-                if failureTotal > 0 {
+                if result.failed > 0 {
                     bookmarkFailureRow.isHidden = false
-                    bookmarkFailureLabel.stringValue = UserText.failedBookmarkImports(failureTotal)
+                    bookmarkFailureLabel.stringValue = UserText.failedBookmarkImports(result.failed)
                 } else {
                     bookmarkFailureRow.isHidden = true
                 }
