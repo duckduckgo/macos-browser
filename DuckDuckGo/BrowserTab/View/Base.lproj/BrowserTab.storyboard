@@ -54,11 +54,11 @@
                                 </userDefinedRuntimeAttributes>
                             </customView>
                             <textField hidden="YES" horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="v5b-uq-Sj6">
-                                <rect key="frame" x="0.0" y="0.0" width="54" height="22"/>
-                                <textFieldCell key="cell" lineBreakMode="clipping" borderStyle="bezel" title="Label" bezelStyle="round" id="V9k-YC-WHR">
+                                <rect key="frame" x="0.0" y="0.0" width="41" height="21"/>
+                                <textFieldCell key="cell" lineBreakMode="clipping" borderStyle="bezel" title="Label" drawsBackground="YES" id="V9k-YC-WHR">
                                     <font key="font" metaFont="system"/>
                                     <color key="textColor" name="labelColor" catalog="System" colorSpace="catalog"/>
-                                    <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
+                                    <color key="backgroundColor" name="BrowserTabBackgroundColor"/>
                                 </textFieldCell>
                             </textField>
                         </subviews>
