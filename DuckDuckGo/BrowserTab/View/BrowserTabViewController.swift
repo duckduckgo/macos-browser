@@ -29,6 +29,7 @@ final class BrowserTabViewController: NSViewController {
     @IBOutlet weak var errorView: NSView!
     @IBOutlet weak var homepageView: NSView!
     @IBOutlet weak var errorMessageLabel: NSTextField!
+    @IBOutlet weak var hoverLabel: NSTextField!
     weak var webView: WebView?
 
     var tabViewModel: TabViewModel?
@@ -104,6 +105,8 @@ final class BrowserTabViewController: NSViewController {
         webView.frame = view.bounds
         webView.autoresizingMask = [.width, .height]
         view.addSubview(webView)
+        hoverLabel.removeFromSuperview()
+        view.addSubview(hoverLabel)
         setFirstResponderIfNeeded()
     }
 
@@ -371,6 +374,11 @@ extension BrowserTabViewController: TabDelegate {
                                                             persistence: .none))
 
         }
+    }
+
+    func tab(_ tab: Tab, didChangeHoverLink url: URL?) {
+        hoverLabel.isHidden = url == nil
+        hoverLabel.stringValue = url?.absoluteString ?? ""
     }
 
 }
