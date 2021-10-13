@@ -48,7 +48,7 @@ final class HoverUserScript: NSObject, UserScript {
         var anchor = event.target.closest('a')
         let href = anchor ? anchor.href : null
         webkit.messageHandlers.hoverHandler.postMessage({ href: href });
-    });
+    }, true);
 
 }) ();
 """
