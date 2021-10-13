@@ -54,12 +54,13 @@ final class HomepageHeaderView: NSView {
     private let suggestionContainerViewModel = SuggestionContainerViewModel(suggestionContainer: SuggestionContainer())
 
     @IBOutlet weak var backgroundView: NSView!
-    @IBOutlet weak var container: MouseClickView!
+    @IBOutlet weak var container: NSView!
     @IBOutlet weak var field: AddressBarTextField!
     @IBOutlet weak var shadowView: ShadowView!
     @IBOutlet weak var icon: NSImageView!
     @IBOutlet weak var backgroundHeight: NSLayoutConstraint!
     @IBOutlet weak var dax: WKWebView!
+    @IBOutlet weak var clearButton: NSView!
 
     private var fieldCancellable: AnyCancellable?
     private var suggestionsCancellable: AnyCancellable?
@@ -76,11 +77,20 @@ final class HomepageHeaderView: NSView {
         updateTextFieldIcon()
     }
 
+    override func updateLayer() {
+        super.updateLayer()
+        initFieldBackground()
+    }
+
     @objc func textFieldFirstReponderNotification(_ notification: Notification) {
         if mode != .idle {
             self.mode = .idle
         }
         updateSearchView()
+    }
+
+    @IBAction func clearText(_ sender: Any) {
+        field.clearValue()
     }
 
     private func wireUpAddressBarFieldToModel() {
@@ -93,7 +103,7 @@ final class HomepageHeaderView: NSView {
         backgroundView.layer?.backgroundColor = NSColor.addressBarBackgroundColor.cgColor
         backgroundView.layer?.borderColor = NSColor.addressBarBorderColor.cgColor
         backgroundView.layer?.borderWidth = 1
-        container.delegate = self
+        (container as? MouseClickView)?.delegate = self
     }
 
     private func initShadows() {
@@ -169,20 +179,23 @@ final class HomepageHeaderView: NSView {
 
     private func showSearchInactive() {
         print(#function)
-        backgroundHeight.constant = 42
+        backgroundHeight.constant = container.frame.height
         shadowView.isHidden = true
+        clearButton.isHidden = true
     }
 
     private func showSearchActive() {
         print(#function)
-        backgroundHeight.constant = 42
+        backgroundHeight.constant = container.frame.height
         shadowView.isHidden = false
         shadowView.shadowSides = .all
+        clearButton.isHidden = field.value.isEmpty
     }
 
     private func showSearchHasResults() {
         print(#function)
-        backgroundHeight.constant = 60
+        clearButton.isHidden = false
+        backgroundHeight.constant = container.frame.height + 10
         shadowView.isHidden = false
         shadowView.shadowSides = [.left, .top, .right]
     }
