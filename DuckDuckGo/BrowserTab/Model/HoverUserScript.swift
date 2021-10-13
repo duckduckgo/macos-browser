@@ -70,7 +70,6 @@ final class HoverUserScript: NSObject, UserScript {
             url = nil
         }
 
-        print(#function, lastURL, url)
         if url != lastURL {
             lastURL = url
             delegate?.hoverUserScript(self, didChange: url)

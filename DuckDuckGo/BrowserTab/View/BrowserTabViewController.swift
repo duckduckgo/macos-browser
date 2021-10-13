@@ -377,7 +377,6 @@ extension BrowserTabViewController: TabDelegate {
     }
 
     func tab(_ tab: Tab, didChangeHoverLink url: URL?) {
-        print(#function, url)
         hoverLabel.isHidden = url == nil
         hoverLabel.stringValue = url?.absoluteString ?? ""
     }
