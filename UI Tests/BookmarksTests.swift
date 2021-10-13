@@ -34,11 +34,11 @@ class BookmarksTests: DDGUITestCase {
                 
         app.windows.children(matching: .button).element(boundBy: 3).forceClickElement()
         
-        app.windows.popovers.buttons["Done"].forceClickElement()
+        app.windows.popovers.buttons["Done"].click()
         app.windows.collectionViews.otherElements.children(matching: .group)
             .element(boundBy: 1).children(matching: .button).element.forceClickElement()
         app.windows.children(matching: .button).element(boundBy: 4).forceClickElement()
-        app.windows.menuItems["openBookmarks:"].forceClickElement()
+        app.windows.menuItems["openBookmarks:"].click()
         app.windows.popovers.outlines.staticTexts["DuckDuckGo — Privacy, simplified."].forceClickElement()
         app.windows.containing(.staticText, identifier: "Search or enter address").element.forceClickElement()
         
@@ -51,15 +51,15 @@ class BookmarksTests: DDGUITestCase {
         let windowsQuery = app.windows
         windowsQuery.textFields["Search or enter address"].typeText("duckduckgo.com\n")
         
-        app.menuBars.menuBarItems["Bookmarks"].forceClickElement()
+        app.menuBars.menuBarItems["Bookmarks"].click()
         
-        app.menuBars.menuItems["Bookmark this page..."].forceClickElement()
+        app.menuBars.menuItems["Bookmark this page..."].click()
         
         app.windows.collectionViews.otherElements.children(matching: .group)
             .element(boundBy: 1).children(matching: .button).element.forceClickElement()
         
         windowsQuery.children(matching: .button).element(boundBy: 4).forceClickElement()
-        windowsQuery.menuItems["openBookmarks:"].forceClickElement()
+        windowsQuery.menuItems["openBookmarks:"].click()
         windowsQuery.popovers.outlines.staticTexts["DuckDuckGo — Privacy, simplified."].forceClickElement()
         
         app.windows.containing(.staticText, identifier: "Search or enter address").element.forceClickElement()
@@ -76,7 +76,7 @@ class BookmarksTests: DDGUITestCase {
         
         app.windows.staticTexts["addressBarInactiveText"].forceHoverElement()
         app.windows.children(matching: .button).element(boundBy: 3).forceClickElement()
-        app.windows.popovers.buttons["Done"].forceClickElement()
+        app.windows.popovers.buttons["Done"].click()
         
         // new tab
         let elementsQuery = app.windows.collectionViews.otherElements
@@ -87,7 +87,7 @@ class BookmarksTests: DDGUITestCase {
         
         app.windows.staticTexts["addressBarInactiveText"].forceHoverElement()
         app.windows.children(matching: .button).element(boundBy: 3).forceClickElement()
-        app.windows.popovers.buttons["Done"].forceClickElement()
+        app.windows.popovers.buttons["Done"].click()
         
         // move mouse off the address bar
         app.windows.collectionViews.otherElements.children(matching: .group).element(boundBy: 1).forceHoverElement()
@@ -97,18 +97,18 @@ class BookmarksTests: DDGUITestCase {
         button2.forceClickElement()
         
         let openbookmarksMenuItem = app.windows.menuItems["openBookmarks:"]
-        openbookmarksMenuItem.forceClickElement()
+        openbookmarksMenuItem.click()
         
         let popoversQuery = windowsQuery.popovers
         popoversQuery.outlines.staticTexts["DuckDuckGo — Privacy, simplified."].rightClick()
-        popoversQuery.menus.menuItems["deleteBookmark:"].forceClickElement()
+        popoversQuery.menus.menuItems["deleteBookmark:"].click()
         
         // new tab
         elementsQuery.children(matching: .group).element(boundBy: 2).children(matching: .button).element.forceClickElement()
         
         // open the popup again
         button2.forceClickElement()
-        openbookmarksMenuItem.forceClickElement()
+        openbookmarksMenuItem.click()
         
         // ensure that the first bookmark has been removed and the second bookmark remains
         XCTAssertFalse(app.windows.popovers.outlines.staticTexts["DuckDuckGo — Privacy, simplified."].exists)
