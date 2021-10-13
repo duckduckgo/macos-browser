@@ -122,14 +122,12 @@ final class HomepageHeaderView: NSView {
     }
 
     @objc func onGesture(_ gesture: NSGestureRecognizer) {
-        print(#function)
         runAnimation()
     }
 
     private func startAnimation() {
         animationTimer?.invalidate()
         let delay: TimeInterval = Double.random(in: 30 ..< 120)
-        print(#function, delay)
         animationTimer = Timer.scheduledTimer(withTimeInterval: delay, repeats: false, block: { [weak self] _ in
             self?.runAnimation()
         })
@@ -178,14 +176,12 @@ final class HomepageHeaderView: NSView {
     }
 
     private func showSearchInactive() {
-        print(#function)
         backgroundHeight.constant = container.frame.height
         shadowView.isHidden = true
         clearButton.isHidden = true
     }
 
     private func showSearchActive() {
-        print(#function)
         backgroundHeight.constant = container.frame.height
         shadowView.isHidden = false
         shadowView.shadowSides = .all
@@ -193,7 +189,6 @@ final class HomepageHeaderView: NSView {
     }
 
     private func showSearchHasResults() {
-        print(#function)
         clearButton.isHidden = false
         backgroundHeight.constant = container.frame.height + 10
         shadowView.isHidden = false
@@ -233,7 +228,6 @@ final class DaxWebView: WKWebView {
     }
 
     override func willOpenMenu(_ menu: NSMenu, with event: NSEvent) {
-        print(#function)
         menu.removeAllItems()
     }
 
