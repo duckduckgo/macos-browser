@@ -38,10 +38,10 @@ final class FirePopoverCollectionViewItem: NSCollectionViewItem {
        }
    }
 
-    func setItem(_ domainListItem: FireDomainList.Item, isFireproofed: Bool) {
-        domainTextField.stringValue = domainListItem.domain
-        faviconImageView.image = domainListItem.favicon
-        faviconImageView.isHidden = domainListItem.favicon == nil
+    func setItem(_ item: FirePopoverViewModel.Item, isFireproofed: Bool) {
+        domainTextField.stringValue = item.domain
+        faviconImageView.image = item.favicon
+        faviconImageView.isHidden = item.favicon == nil
         checkButton.isHidden = isFireproofed
     }
 

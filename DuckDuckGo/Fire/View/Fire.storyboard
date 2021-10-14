@@ -358,7 +358,7 @@ Gw
                     <connections>
                         <outlet property="closeDetailsButton" destination="cgG-hF-FAP" id="PDY-tj-zma"/>
                         <outlet property="collectionView" destination="u7v-Gt-FjR" id="zeu-lV-usx"/>
-                        <outlet property="contentSizeConstraint" destination="hbg-4i-hjT" id="mC2-Ot-onY"/>
+                        <outlet property="contentHeightConstraint" destination="hbg-4i-hjT" id="mC2-Ot-onY"/>
                         <outlet property="detailsWrapperView" destination="6vZ-d2-qnR" id="TKb-Ux-TIk"/>
                         <outlet property="openDetailsButton" destination="ACx-m8-z0K" id="cu4-zz-MhA"/>
                         <outlet property="optionsButton" destination="ckJ-6G-38h" id="xSK-KE-yMk"/>
@@ -366,7 +366,7 @@ Gw
                 </viewController>
                 <customObject id="fzV-LM-GvK" userLabel="First Responder" customClass="NSResponder" sceneMemberID="firstResponder"/>
             </objects>
-            <point key="canvasLocation" x="203" y="-272"/>
+            <point key="canvasLocation" x="566" y="65"/>
         </scene>
     </scenes>
     <resources>

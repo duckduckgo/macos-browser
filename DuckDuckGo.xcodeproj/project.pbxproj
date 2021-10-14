@@ -258,7 +258,7 @@
 		AA0877B826D5160D00B05660 /* SafariVersionReaderTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA0877B726D5160D00B05660 /* SafariVersionReaderTests.swift */; };
 		AA0877BA26D5161D00B05660 /* WebKitVersionProviderTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA0877B926D5161D00B05660 /* WebKitVersionProviderTests.swift */; };
 		AA0F3DB7261A566C0077F2D9 /* SuggestionLoadingMock.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA0F3DB6261A566C0077F2D9 /* SuggestionLoadingMock.swift */; };
-		AA13DCB4271480B0006D48D3 /* FireDomainList.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA13DCB3271480B0006D48D3 /* FireDomainList.swift */; };
+		AA13DCB4271480B0006D48D3 /* FirePopoverViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA13DCB3271480B0006D48D3 /* FirePopoverViewModel.swift */; };
 		AA2CB12D2587BB5600AA6FBE /* TabBarFooter.xib in Resources */ = {isa = PBXBuildFile; fileRef = AA2CB12C2587BB5600AA6FBE /* TabBarFooter.xib */; };
 		AA2CB1352587C29500AA6FBE /* TabBarFooter.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA2CB1342587C29500AA6FBE /* TabBarFooter.swift */; };
 		AA3F895324C18AD500628DDE /* SuggestionViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA3F895224C18AD500628DDE /* SuggestionViewModel.swift */; };
@@ -378,7 +378,6 @@
 		AAE246F42709EF3B00BEEAEE /* FirePopoverCollectionViewItem.xib in Resources */ = {isa = PBXBuildFile; fileRef = AAE246F22709EF3B00BEEAEE /* FirePopoverCollectionViewItem.xib */; };
 		AAE246F6270A3D3000BEEAEE /* FirePopoverCollectionViewHeader.xib in Resources */ = {isa = PBXBuildFile; fileRef = AAE246F5270A3D3000BEEAEE /* FirePopoverCollectionViewHeader.xib */; };
 		AAE246F8270A406200BEEAEE /* FirePopoverCollectionViewHeader.swift in Sources */ = {isa = PBXBuildFile; fileRef = AAE246F7270A406200BEEAEE /* FirePopoverCollectionViewHeader.swift */; };
-		AAE246FA27122C7500BEEAEE /* FireClearingOption.swift in Sources */ = {isa = PBXBuildFile; fileRef = AAE246F927122C7500BEEAEE /* FireClearingOption.swift */; };
 		AAE39D1B24F44885008EF28B /* TabCollectionViewModelDelegateMock.swift in Sources */ = {isa = PBXBuildFile; fileRef = AAE39D1A24F44885008EF28B /* TabCollectionViewModelDelegateMock.swift */; };
 		AAE71E2C25F781EA00D74437 /* Homepage.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = AAE71E2B25F781EA00D74437 /* Homepage.storyboard */; };
 		AAE71E3125F7855400D74437 /* HomepageViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = AAE71E3025F7855400D74437 /* HomepageViewController.swift */; };
@@ -837,7 +836,7 @@
 		AA0877B726D5160D00B05660 /* SafariVersionReaderTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SafariVersionReaderTests.swift; sourceTree = "<group>"; };
 		AA0877B926D5161D00B05660 /* WebKitVersionProviderTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WebKitVersionProviderTests.swift; sourceTree = "<group>"; };
 		AA0F3DB6261A566C0077F2D9 /* SuggestionLoadingMock.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SuggestionLoadingMock.swift; sourceTree = "<group>"; };
-		AA13DCB3271480B0006D48D3 /* FireDomainList.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FireDomainList.swift; sourceTree = "<group>"; };
+		AA13DCB3271480B0006D48D3 /* FirePopoverViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FirePopoverViewModel.swift; sourceTree = "<group>"; };
 		AA2CB12C2587BB5600AA6FBE /* TabBarFooter.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = TabBarFooter.xib; sourceTree = "<group>"; };
 		AA2CB1342587C29500AA6FBE /* TabBarFooter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TabBarFooter.swift; sourceTree = "<group>"; };
 		AA3F895224C18AD500628DDE /* SuggestionViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SuggestionViewModel.swift; sourceTree = "<group>"; };
@@ -966,7 +965,6 @@
 		AAE246F22709EF3B00BEEAEE /* FirePopoverCollectionViewItem.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = FirePopoverCollectionViewItem.xib; sourceTree = "<group>"; };
 		AAE246F5270A3D3000BEEAEE /* FirePopoverCollectionViewHeader.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = FirePopoverCollectionViewHeader.xib; sourceTree = "<group>"; };
 		AAE246F7270A406200BEEAEE /* FirePopoverCollectionViewHeader.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FirePopoverCollectionViewHeader.swift; sourceTree = "<group>"; };
-		AAE246F927122C7500BEEAEE /* FireClearingOption.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FireClearingOption.swift; sourceTree = "<group>"; };
 		AAE39D1A24F44885008EF28B /* TabCollectionViewModelDelegateMock.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TabCollectionViewModelDelegateMock.swift; sourceTree = "<group>"; };
 		AAE71E2B25F781EA00D74437 /* Homepage.storyboard */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; path = Homepage.storyboard; sourceTree = "<group>"; };
 		AAE71E3025F7855400D74437 /* HomepageViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HomepageViewController.swift; sourceTree = "<group>"; };
@@ -2198,8 +2196,6 @@
 			children = (
 				8511E18325F82B34002F516B /* 01_Fire_really_small.json */,
 				AA6820EA25503D6A005ED0D5 /* Fire.swift */,
-				AAE246F927122C7500BEEAEE /* FireClearingOption.swift */,
-				AA13DCB3271480B0006D48D3 /* FireDomainList.swift */,
 			);
 			path = Model;
 			sourceTree = "<group>";
@@ -2208,6 +2204,7 @@
 			isa = PBXGroup;
 			children = (
 				AA6820F025503DA9005ED0D5 /* FireViewModel.swift */,
+				AA13DCB3271480B0006D48D3 /* FirePopoverViewModel.swift */,
 			);
 			path = ViewModel;
 			sourceTree = "<group>";
@@ -2859,13 +2856,13 @@
 			children = (
 				AAB7320626DD0C37002FACF9 /* Fire.storyboard */,
 				AAEEC6A827088ADB008445F7 /* FireCoordinator.swift */,
+				AAB7320826DD0CD9002FACF9 /* FireViewController.swift */,
 				AAE99B8827088A19008B6BD9 /* FirePopover.swift */,
 				AA6AD95A2704B6DB00159F8A /* FirePopoverViewController.swift */,
 				AAE246F7270A406200BEEAEE /* FirePopoverCollectionViewHeader.swift */,
 				AAE246F5270A3D3000BEEAEE /* FirePopoverCollectionViewHeader.xib */,
 				AAE246F12709EF3B00BEEAEE /* FirePopoverCollectionViewItem.swift */,
 				AAE246F22709EF3B00BEEAEE /* FirePopoverCollectionViewItem.xib */,
-				AAB7320826DD0CD9002FACF9 /* FireViewController.swift */,
 			);
 			path = View;
 			sourceTree = "<group>";
@@ -3455,7 +3452,6 @@
 				4B9292D72667124000AD2C21 /* NSPopUpButtonExtension.swift in Sources */,
 				4B677437255DBEB800025BD8 /* HTTPSUpgrade.swift in Sources */,
 				85D33F1225C82EB3002B91A6 /* ConfigurationManager.swift in Sources */,
-				AAE246FA27122C7500BEEAEE /* FireClearingOption.swift in Sources */,
 				B6A9E48426146AAB0067D1B9 /* PixelParameters.swift in Sources */,
 				B633C86D25E797D800E4B352 /* UserScriptsManager.swift in Sources */,
 				4B0511BF262CAA5A00F6079C /* PreferenceSections.swift in Sources */,
@@ -3739,7 +3735,7 @@
 				85AC3AEF25D5CE9800C7D2AA /* UserScripts.swift in Sources */,
 				4B677439255DBEB800025BD8 /* HTTPSUpgradeStore.swift in Sources */,
 				AAB549DF25DAB8F80058460B /* BookmarkViewModel.swift in Sources */,
-				AA13DCB4271480B0006D48D3 /* FireDomainList.swift in Sources */,
+				AA13DCB4271480B0006D48D3 /* FirePopoverViewModel.swift in Sources */,
 				F41D174125CB131900472416 /* NSColorExtension.swift in Sources */,
 				4B02198D25E05FAC00ED7DEA /* UndoFireproofingViewController.swift in Sources */,
 				AAE71E3725F7869300D74437 /* HomepageCollectionViewItem.swift in Sources */,

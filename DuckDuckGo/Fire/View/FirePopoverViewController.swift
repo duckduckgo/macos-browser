@@ -17,32 +17,30 @@
 //
 
 import Cocoa
-import GRDB
+import Combine
 
 final class FirePopoverViewController: NSViewController {
 
+    struct Constants {
+        static let maximumContentHeight: CGFloat = 263
+        static let minimumContentHeight: CGFloat = 42
+        static let headerHeight: CGFloat = 28
+    }
+
     private let fireViewModel: FireViewModel
     private let tabCollectionViewModel: TabCollectionViewModel
-    private var clearingOption: FireClearingOption = .allData {
-        didSet {
-            updateCloseDetailsButton()
-            updateDomainList()
-        }
-    }
-    private var domainList: FireDomainList = FireDomainList.empty {
-        didSet {
-            collectionView.reloadData()
-            selectClearSection()
-        }
-    }
+    private var firePopoverViewModel: FirePopoverViewModel
     private let historyCoordinating: HistoryCoordinating
 
     @IBOutlet weak var optionsButton: NSPopUpButton!
     @IBOutlet weak var openDetailsButton: NSButton!
     @IBOutlet weak var closeDetailsButton: NSButton!
     @IBOutlet weak var detailsWrapperView: NSView!
-    @IBOutlet weak var contentSizeConstraint: NSLayoutConstraint!
+    @IBOutlet weak var contentHeightConstraint: NSLayoutConstraint!
     @IBOutlet weak var collectionView: NSCollectionView!
+
+    private var viewModelCancellable: AnyCancellable?
+    private var selectedCancellable: AnyCancellable?
 
     required init?(coder: NSCoder) {
         fatalError("FirePopoverViewController: Bad initializer")
@@ -50,10 +48,17 @@ final class FirePopoverViewController: NSViewController {
 
     init?(coder: NSCoder, fireViewModel: FireViewModel,
           tabCollectionViewModel: TabCollectionViewModel,
-          historyCoordinating: HistoryCoordinating = HistoryCoordinator.shared) {
+          historyCoordinating: HistoryCoordinating = HistoryCoordinator.shared,
+          fireproofDomains: FireproofDomains = FireproofDomains.shared,
+          faviconService: FaviconService = LocalFaviconService.shared) {
         self.fireViewModel = fireViewModel
         self.tabCollectionViewModel = tabCollectionViewModel
         self.historyCoordinating = historyCoordinating
+        self.firePopoverViewModel = FirePopoverViewModel(fireViewModel: fireViewModel,
+                                                         tabCollectionViewModel: tabCollectionViewModel,
+                                                         historyCoordinating: historyCoordinating,
+                                                         fireproofDomains: fireproofDomains,
+                                                         faviconService: faviconService)
 
         super.init(coder: coder)
     }
@@ -66,14 +71,10 @@ final class FirePopoverViewController: NSViewController {
         collectionView.delegate = self
         collectionView.dataSource = self
         setupOptionsButton()
-        updateCloseDetailsButton()
-        updateDomainList()
-    }
+        updateCloseDetailsButton(for: .allData)
 
-    private func setupOptionsButton() {
-        FireClearingOption.allCases.enumerated().forEach { (index, option) in
-            optionsButton.menu?.item(withTag: index)?.title = option.string
-        }
+        subscribeToViewModel()
+        subscribeToSelected()
     }
 
     @IBAction func optionsButtonAction(_ sender: NSPopUpButton) {
@@ -81,7 +82,10 @@ final class FirePopoverViewController: NSViewController {
             assertionFailure("No tag in the selected menu item")
             return
         }
-        clearingOption = FireClearingOption.allCases[tag]
+        let clearingOption = FirePopoverViewModel.ClearingOption.allCases[tag]
+        firePopoverViewModel.updateItems(for: clearingOption)
+        updateCloseDetailsButton(for: clearingOption)
+        firePopoverViewModel.updateItems(for: clearingOption)
     }
 
     @IBAction func openDetailsButtonAction(_ sender: Any) {
@@ -92,7 +96,7 @@ final class FirePopoverViewController: NSViewController {
         toggleDetails()
     }
 
-    private func updateCloseDetailsButton() {
+    private func updateCloseDetailsButton(for clearingOption: FirePopoverViewModel.ClearingOption) {
         switch clearingOption {
         case .currentTab: closeDetailsButton.title = UserText.currentTabDescription
         case .currentWindow: closeDetailsButton.title = UserText.currentWindowDescription
@@ -101,12 +105,32 @@ final class FirePopoverViewController: NSViewController {
     }
 
     @IBAction func clearButtonAction(_ sender: Any) {
-        let timedPixel = TimedPixel(.burn())
-        fireViewModel.fire.burnAll(tabCollectionViewModel: tabCollectionViewModel) { timedPixel.fire() }
+        dismiss()
+        firePopoverViewModel.burn()
     }
 
     @IBAction func cancelButtonAction(_ sender: Any) {
         dismiss()
+    }
+
+    private func subscribeToViewModel() {
+        viewModelCancellable = Publishers.Zip(
+            firePopoverViewModel.$fireproofed,
+            firePopoverViewModel.$selectable
+        ).receive(on: DispatchQueue.main)
+            .sink { [weak self] _ in
+                self?.collectionView.reloadData()
+                self?.adjustContentHeight()
+            }
+    }
+
+    private func subscribeToSelected() {
+        selectedCancellable = firePopoverViewModel.$selected
+            .receive(on: DispatchQueue.main)
+            .sink { [weak self] selected in
+                let selectionIndexPaths = Set(selected.map {IndexPath(item: $0, section: 1)})
+                self?.collectionView.selectionIndexPaths = selectionIndexPaths
+            }
     }
 
     private func toggleDetails() {
@@ -114,32 +138,33 @@ final class FirePopoverViewController: NSViewController {
         openDetailsButton.isHidden = showDetails
         detailsWrapperView.isHidden = !showDetails
 
+        adjustContentHeight()
+    }
+
+    private func adjustContentHeight() {
         NSAnimationContext.runAnimationGroup { [weak self] context in
             context.duration = 1/3
             context.timingFunction = CAMediaTimingFunction(name: .easeInEaseOut)
-            self?.contentSizeConstraint.animator().constant = showDetails ? 263 : 42
+            self?.contentHeightConstraint.animator().constant = contentHeight()
         }
     }
 
-    private func updateDomainList() {
-        switch clearingOption {
-        case .currentTab:
-            guard let tab = tabCollectionViewModel.selectedTabViewModel?.tab else {
-                assertionFailure("selectedTabViewModel is nil")
-                return
+    private func contentHeight() -> CGFloat {
+        if detailsWrapperView.isHidden {
+            return Constants.minimumContentHeight
+        } else {
+            if let contentHeight = collectionView.collectionViewLayout?.collectionViewContentSize.height {
+                return min(Constants.maximumContentHeight, contentHeight + 50)
+            } else {
+                return Constants.maximumContentHeight
             }
-
-            domainList = FireDomainList(tab: tab)
-        case .currentWindow:
-            domainList =  FireDomainList(tabCollection: tabCollectionViewModel.tabCollection)
-        case .allData:
-            domainList = FireDomainList(historyCoordinating: historyCoordinating)
         }
     }
 
-    private func selectClearSection() {
-        let indexPaths = Set((0..<domainList.selectable.count).map { IndexPath(item: $0, section: 1) })
-        collectionView.selectItems(at: indexPaths, scrollPosition: [])
+    private func setupOptionsButton() {
+        FirePopoverViewModel.ClearingOption.allCases.enumerated().forEach { (index, option) in
+            optionsButton.menu?.item(withTag: index)?.title = option.string
+        }
     }
 
 }
@@ -151,7 +176,7 @@ extension FirePopoverViewController: NSCollectionViewDataSource {
     }
 
     func collectionView(_ collectionView: NSCollectionView, numberOfItemsInSection section: Int) -> Int {
-        return section == 0 ? domainList.fireproofed.count : domainList.selectable.count
+        return section == 0 ? firePopoverViewModel.fireproofed.count : firePopoverViewModel.selectable.count
     }
 
     func collectionView(_ collectionView: NSCollectionView, itemForRepresentedObjectAt indexPath: IndexPath) -> NSCollectionViewItem {
@@ -159,7 +184,7 @@ extension FirePopoverViewController: NSCollectionViewDataSource {
         guard let firePopoverItem = item as? FirePopoverCollectionViewItem else { return item }
 
         firePopoverItem.delegate = self
-        let sectionList = (indexPath.section == 0 ? domainList.fireproofed : domainList.selectable)
+        let sectionList = (indexPath.section == 0 ? firePopoverViewModel.fireproofed : firePopoverViewModel.selectable)
         let listItem = sectionList[indexPath.item]
         firePopoverItem.setItem(listItem, isFireproofed: indexPath.section == 0)
         return firePopoverItem
@@ -196,11 +221,11 @@ extension FirePopoverViewController: NSCollectionViewDelegateFlowLayout {
                         referenceSizeForHeaderInSection section: Int) -> NSSize {
         let count: Int
         switch section {
-        case 0: count = domainList.fireproofed.count
-        case 1: count = domainList.selectable.count
+        case 0: count = firePopoverViewModel.fireproofed.count
+        case 1: count = firePopoverViewModel.selectable.count
         default: count = 0
         }
-        return NSSize(width: collectionView.bounds.width, height: count == 0 ? 0 : 28)
+        return NSSize(width: collectionView.bounds.width, height: count == 0 ? 0 : Constants.headerHeight)
     }
 
 }
@@ -214,9 +239,9 @@ extension FirePopoverViewController: FirePopoverCollectionViewItemDelegate {
         }
 
         if firePopoverCollectionViewItem.isSelected {
-            collectionView.deselectItems(at: [indexPath])
+            firePopoverViewModel.deselect(index: indexPath.item)
         } else {
-            collectionView.selectItems(at: [indexPath], scrollPosition: [])
+            firePopoverViewModel.select(index: indexPath.item)
         }
     }
 
