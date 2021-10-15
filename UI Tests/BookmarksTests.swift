@@ -31,7 +31,7 @@ class BookmarksTests: DDGUITestCase {
         app.windows.textFields["Search or enter address"].typeText("duckduckgo.com\n")
         
         app.windows.staticTexts["addressBarInactiveText"].forceHoverElement()
-                
+        sleep(2);
         app.windows.children(matching: .button).element(boundBy: 3).forceClickElement()
         
         app.windows.popovers.buttons["Done"].click()
@@ -59,6 +59,7 @@ class BookmarksTests: DDGUITestCase {
             .element(boundBy: 1).children(matching: .button).element.forceClickElement()
         
         windowsQuery.children(matching: .button).element(boundBy: 4).forceClickElement()
+        sleep(2);
         windowsQuery.menuItems["openBookmarks:"].click()
         windowsQuery.popovers.outlines.staticTexts["DuckDuckGo — Privacy, simplified."].forceClickElement()
         
@@ -75,6 +76,7 @@ class BookmarksTests: DDGUITestCase {
         windowsQuery.textFields["Search or enter address"].typeText("duckduckgo.com\n")
         
         app.windows.staticTexts["addressBarInactiveText"].forceHoverElement()
+        sleep(2);
         app.windows.children(matching: .button).element(boundBy: 3).forceClickElement()
         app.windows.popovers.buttons["Done"].click()
         
@@ -86,12 +88,13 @@ class BookmarksTests: DDGUITestCase {
         windowsQuery.textFields["Search or enter address"].typeText("example.com\n")
         
         app.windows.staticTexts["addressBarInactiveText"].forceHoverElement()
+        sleep(2);
         app.windows.children(matching: .button).element(boundBy: 3).forceClickElement()
         app.windows.popovers.buttons["Done"].click()
         
         // move mouse off the address bar
         app.windows.collectionViews.otherElements.children(matching: .group).element(boundBy: 1).forceHoverElement()
-        
+        sleep(2);
         // open the popover and delete the first bookmark
         let button2 = windowsQuery.children(matching: .button).element(boundBy: 4)
         button2.forceClickElement()
