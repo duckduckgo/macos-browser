@@ -365,8 +365,10 @@ final class AddressBarButtonsViewController: NSViewController {
 
         let isAquaMode = NSApp.effectiveAppearance.name == NSAppearance.Name.aqua
 
-        if trackerAnimationView == nil {
-            trackerAnimationView = addAndLayoutAnimationView("trackers")
+        let trackerAnimationName = isAquaMode ? "trackers" : "dark-trackers"
+        if trackerAnimationView?.identifier?.rawValue != trackerAnimationName {
+            trackerAnimationView?.removeFromSuperview()
+            trackerAnimationView = addAndLayoutAnimationView(trackerAnimationName)
         }
 
         let shieldAnimationName = isAquaMode ? "shield" : "dark-shield"
