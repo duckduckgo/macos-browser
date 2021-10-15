@@ -125,8 +125,13 @@ final class Tab: NSObject {
         userScripts?.remove(from: webView.configuration.userContentController)
     }
 
-    let webView: WebView
+    // MARK: - Event Publishers
+
     let webViewDidFinishNavigationPublisher = PassthroughSubject<Void, Never>()
+
+    // MARK: - Properties
+
+    let webView: WebView
 
     var userEnteredUrl = true
 
