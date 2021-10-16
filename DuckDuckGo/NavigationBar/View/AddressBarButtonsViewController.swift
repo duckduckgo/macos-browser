@@ -488,13 +488,17 @@ final class AddressBarButtonsViewController: NSViewController {
             isTextFieldEditorFirstResponder ||
             isDuckDuckGoUrl ||
             isURLNil ||
-            trackerAnimationView.isAnimationPlaying ||
             selectedTabViewModel.errorViewState.isVisible
         imageButtonWrapper.isHidden = !privacyEntryPointButton.isHidden || trackerAnimationView.isAnimationPlaying
     }
 
     private func updatePrivacyEntryPointIcon() {
         guard let selectedTabViewModel = tabCollectionViewModel.selectedTabViewModel else {
+            return
+        }
+
+        guard !trackerAnimationView.isAnimationPlaying else {
+            privacyEntryPointButton.image = nil
             return
         }
 
@@ -532,11 +536,11 @@ final class AddressBarButtonsViewController: NSViewController {
         trackerAnimationView.reloadImages()
         trackerAnimationView.play { [weak self] _ in
             self?.trackerAnimationView.isHidden = true
-            self?.updatePrivacyEntryPointButton()
+            self?.updatePrivacyEntryPointIcon()
             self?.updatePermissionButtons()
         }
 
-        updatePrivacyEntryPointButton()
+        updatePrivacyEntryPointIcon()
         updatePermissionButtons()
     }
 
