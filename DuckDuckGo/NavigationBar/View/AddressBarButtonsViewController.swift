@@ -365,8 +365,10 @@ final class AddressBarButtonsViewController: NSViewController {
 
         let isAquaMode = NSApp.effectiveAppearance.name == NSAppearance.Name.aqua
 
-        if trackerAnimationView == nil {
-            trackerAnimationView = addAndLayoutAnimationView("trackers")
+        let trackerAnimationName = isAquaMode ? "trackers" : "dark-trackers"
+        if trackerAnimationView?.identifier?.rawValue != trackerAnimationName {
+            trackerAnimationView?.removeFromSuperview()
+            trackerAnimationView = addAndLayoutAnimationView(trackerAnimationName)
         }
 
         let shieldAnimationName = isAquaMode ? "shield" : "dark-shield"
@@ -486,13 +488,17 @@ final class AddressBarButtonsViewController: NSViewController {
             isTextFieldEditorFirstResponder ||
             isDuckDuckGoUrl ||
             isURLNil ||
-            trackerAnimationView.isAnimationPlaying ||
             selectedTabViewModel.errorViewState.isVisible
         imageButtonWrapper.isHidden = !privacyEntryPointButton.isHidden || trackerAnimationView.isAnimationPlaying
     }
 
     private func updatePrivacyEntryPointIcon() {
         guard let selectedTabViewModel = tabCollectionViewModel.selectedTabViewModel else {
+            return
+        }
+
+        guard !trackerAnimationView.isAnimationPlaying else {
+            privacyEntryPointButton.image = nil
             return
         }
 
@@ -530,11 +536,11 @@ final class AddressBarButtonsViewController: NSViewController {
         trackerAnimationView.reloadImages()
         trackerAnimationView.play { [weak self] _ in
             self?.trackerAnimationView.isHidden = true
-            self?.updatePrivacyEntryPointButton()
+            self?.updatePrivacyEntryPointIcon()
             self?.updatePermissionButtons()
         }
 
-        updatePrivacyEntryPointButton()
+        updatePrivacyEntryPointIcon()
         updatePermissionButtons()
     }
 
