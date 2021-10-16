@@ -68,7 +68,7 @@ class BookmarksTests: DDGUITestCase {
         XCTAssertEqual(app.windows.textFields["Search or enter address"].firstMatch.value as? String, "https://duckduckgo.com/")
     }
     
-    func testWhenDeletingBookmarkFromPopup_ThenBookmarkRemoved() throws {
+    func testWhenDeletingBookmarkFromPopover_ThenBookmarkRemoved() throws {
         let app = XCUIApplication()
         let windowsQuery = app.windows
         
@@ -121,5 +121,110 @@ class BookmarksTests: DDGUITestCase {
         // make sure the second bookmark is clickable
         app.windows.containing(.staticText, identifier: "addressBarInactiveText").element.forceClickElement()
         XCTAssertEqual(app.windows.textFields["Search or enter address"].firstMatch.value as? String, "http://example.com/")
+    }
+    
+    func testAddingFavoriteFromPopover_ThenBookmarkFavorited () {
+        let app = XCUIApplication()
+        
+        // make a bookmark
+        app.windows.textFields["Search or enter address"].typeText("duckduckgo.com\n")
+
+        app.windows.staticTexts["addressBarInactiveText"].forceHoverElement()
+
+        app.windows.children(matching: .button).element(boundBy: 3).click()
+        app.windows.popovers.buttons["Done"].click()
+        
+        // move mouse off the address bar
+        app.windows.collectionViews.otherElements.children(matching: .group).element(boundBy: 1).forceHoverElement()
+        
+        // open the popup
+        app.windows.children(matching: .button).element(boundBy: 4).click()
+        app.windows.menuItems["openBookmarks:"].click()
+        let popoversQuery = app.windows.popovers
+        
+        // favorite the bookmark
+        popoversQuery.outlines.staticTexts["DuckDuckGo — Privacy, simplified."].rightClick()
+        popoversQuery.menus.menuItems["toggleBookmarkAsFavorite:"].click()
+        
+        // try clicking on the disclosure triangle for favorites
+        popoversQuery.outlines.disclosureTriangles["NSOutlineViewDisclosureButtonKey"].click()
+        
+        // make sure the context menu title is updated
+        popoversQuery.outlines.children(matching: .outlineRow).element(boundBy: 1).staticTexts["DuckDuckGo — Privacy, simplified."].rightClick()
+        XCTAssertEqual(popoversQuery.menus.menuItems["toggleBookmarkAsFavorite:"].title, "Remove from Favorites")
+    }
+    
+    func testCreatingFolderAndMovingBookmarkInPopover_ThenBookmarkMoved () {
+        let app = XCUIApplication()
+        app.windows.textFields["Search or enter address"].typeText("duckduckgo.com\n")
+
+        // create a folder
+        let button = app.windows.children(matching: .button).element(boundBy: 4)
+        button.click()
+        let openbookmarksMenuItem = app.windows.menuItems["openBookmarks:"]
+        openbookmarksMenuItem.click()
+        app.windows.popovers.children(matching: .button).element(boundBy: 1).click()
+        app.dialogs["Untitled"].children(matching: .textField).element.typeText("Test Folder\n")
+
+        // create a bookmark
+        app.windows.staticTexts["addressBarInactiveText"].forceHoverElement()
+
+        app.windows.children(matching: .button).element(boundBy: 3).click()
+        app.windows.popovers.buttons["Done"].click()
+        
+        // move mouse off the address bar
+        app.windows.collectionViews.otherElements.children(matching: .group).element(boundBy: 1).forceHoverElement()
+        
+        // open the bookmarks popup
+        app.windows.children(matching: .button).element(boundBy: 4).click()
+        openbookmarksMenuItem.click()
+        
+        let popoversQuery = app.windows.popovers
+        let duckduckgoPrivacySimplifiedStaticText = popoversQuery.outlines.staticTexts["DuckDuckGo — Privacy, simplified."]
+        let folderText = popoversQuery.outlines.staticTexts["Test Folder"]
+        
+        // drag the bookmark into the folder
+        duckduckgoPrivacySimplifiedStaticText.press(forDuration: 1, thenDragTo: folderText)
+        
+        let duckduckgoPrivacySimplifiedWebView = app.windows.webViews["DuckDuckGo — Privacy, simplified."]
+        duckduckgoPrivacySimplifiedWebView.click()
+        
+        button.click()
+        openbookmarksMenuItem.click()
+        
+        // bookmark shouldn't be visible
+        XCTAssertFalse(duckduckgoPrivacySimplifiedStaticText.isHittable)
+        popoversQuery.outlines.disclosureTriangles["NSOutlineViewDisclosureButtonKey"].click()
+        // open the folder and verify that the bookmark is visible now
+        XCTAssertTrue(duckduckgoPrivacySimplifiedStaticText.isHittable)
+        duckduckgoPrivacySimplifiedStaticText.click()
+    }
+    
+    func testRenamingFolderInPopover_thenFolderRenamed() {
+        
+        let app = XCUIApplication()
+        let windowsQuery = app.windows
+        let button = windowsQuery.children(matching: .button).element(boundBy: 4)
+        button.click()
+        
+        let openbookmarksMenuItem = windowsQuery.menuItems["openBookmarks:"]
+        openbookmarksMenuItem.click()
+        
+        let popoversQuery = windowsQuery.popovers
+        popoversQuery.children(matching: .button).element(boundBy: 1).click()
+        
+        let textField = app.dialogs["Untitled"].children(matching: .textField).element
+        textField.typeText("Original folder name\n")
+        button.click()
+        openbookmarksMenuItem.click()
+        XCTAssertNotNil(popoversQuery.staticTexts["Original folder name"].firstMatch)
+        
+        popoversQuery.outlines.staticTexts["Original folder name"].rightClick()
+        popoversQuery.menus.menuItems["renameFolder:"].click()
+        textField.typeText("New folder name\n")
+        button.click()
+        openbookmarksMenuItem.click()
+        XCTAssertFalse(popoversQuery.staticTexts["Original folder name"].exists)
+        XCTAssertTrue(popoversQuery.staticTexts["New folder name"].exists)
     }
 }
