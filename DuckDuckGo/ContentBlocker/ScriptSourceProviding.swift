@@ -79,12 +79,12 @@ final class DefaultScriptSourceProvider: ScriptSourceProviding {
             + (privacyConfiguration.exceptionsList(forFeature: .contentBlocking).joined(separator: "\n"))
 
         return ContentBlockerUserScript.loadJS("contentblocker", from: .main, withReplacements: [
-            "${isDebug}": isDebugBuild ? "true" : "false",
-            "${tempUnprotectedDomains}": remoteUnprotectedDomains,
-            "${userUnprotectedDomains}": "",
-            "${trackerData}": trackerData,
-            "${surrogates}": surrogates,
-            "${blockingEnabled}": privacyConfiguration.isEnabled(featureKey: .contentBlocking) ? "true" : "false"
+            "IS_DEBUG": isDebugBuild ? "true" : "false",
+            "TEMP_UNPROTECTED_DOMAINS": remoteUnprotectedDomains,
+            "USER_UNPROTECTED_DOMAINS": "",
+            "TRACKER_DATA": trackerData,
+            "SURROGATES": surrogates,
+            "BLOCKING_ENABLED": privacyConfiguration.isEnabled(featureKey: .contentBlocking) ? "true" : "false"
         ])
     }
 
