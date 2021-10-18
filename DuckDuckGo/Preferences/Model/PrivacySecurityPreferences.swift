@@ -22,7 +22,9 @@ struct PrivacySecurityPreferences {
 
     @UserDefaultsWrapper(key: .loginDetectionEnabled, defaultValue: true)
     public var loginDetectionEnabled: Bool
-
+    
+    @UserDefaultsWrapper(key: .gpcEnabled, defaultValue: true)
+    public var gpcEnabled: Bool
 }
 
 extension PrivacySecurityPreferences: PreferenceSection {

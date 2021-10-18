@@ -22,6 +22,7 @@ protocol PrivacySecurityPreferencesTableCellViewDelegate: AnyObject {
 
     func privacySecurityPreferencesTableCellViewRequestedFireproofManagementModal(_ cell: PrivacySecurityPreferencesTableCellView)
     func privacySecurityPreferencesTableCellView(_ cell: PrivacySecurityPreferencesTableCellView, setLoginDetectionEnabled: Bool)
+    func privacySecurtyPreferencesTableCellView( _ cell: PrivacySecurityPreferencesTableCellView, setGPCEnabled: Bool)
 
 }
 
@@ -34,11 +35,13 @@ final class PrivacySecurityPreferencesTableCellView: NSTableCellView {
     }
 
     @IBOutlet var loginDetectionCheckbox: NSButton!
+    @IBOutlet var gpcCheckbox: NSButton!
 
     weak var delegate: PrivacySecurityPreferencesTableCellViewDelegate?
 
-    func update(loginDetectionEnabled: Bool) {
+    func update(loginDetectionEnabled: Bool, gpcEnabled: Bool) {
         loginDetectionCheckbox.state = loginDetectionEnabled ? .on : .off
+        gpcCheckbox.state = gpcEnabled ? .on : .off
     }
 
     @IBAction func manageFireproofWebsitesButtonClicked(_ sender: NSButton) {
@@ -48,6 +51,11 @@ final class PrivacySecurityPreferencesTableCellView: NSTableCellView {
     @IBAction func toggledLoginDetectionCheckbox(_ sender: NSButton) {
         let loginDetectionEnabled = loginDetectionCheckbox.state == .on
         delegate?.privacySecurityPreferencesTableCellView(self, setLoginDetectionEnabled: loginDetectionEnabled)
+    }
+    
+    @IBAction func toggledGPCCheckbox(_ sender: NSButton) {
+        let gpcEnabled = gpcCheckbox.state == .on
+        delegate?.privacySecurtyPreferencesTableCellView(self, setGPCEnabled: gpcEnabled)
     }
 
 }

@@ -79,6 +79,7 @@ final class MoreOptionsMenu: NSMenu {
         addPageItems()
 
         let preferencesItem = NSMenuItem(title: UserText.preferences, action: #selector(openPreferences(_:)), keyEquivalent: "")
+            .firingPixel(Pixel.Event.MoreResult.preferences)
         preferencesItem.target = self
         preferencesItem.image = NSImage(named: "Preferences")
         addItem(preferencesItem)
