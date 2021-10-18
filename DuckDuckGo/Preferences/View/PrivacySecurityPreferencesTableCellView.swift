@@ -73,7 +73,7 @@ final class PrivacySecurityPreferencesTableCellView: NSTableCellView {
         ])
         gpcDisclaimer.linkTextAttributes = [
             NSAttributedString.Key.font: NSFont.systemFont(ofSize: NSFont.systemFontSize),
-            NSAttributedString.Key.foregroundColor: NSColor(named: "BookmarkFilledTint")!
+            NSAttributedString.Key.foregroundColor: NSColor(named: "LinkBlueColor")!
         ]
         let newStr = NSMutableAttributedString(attributedString: gpcDisclaimer.attributedString())
         newStr.append(attrString)
