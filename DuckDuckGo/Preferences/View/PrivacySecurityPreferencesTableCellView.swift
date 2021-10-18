@@ -67,7 +67,7 @@ final class PrivacySecurityPreferencesTableCellView: NSTableCellView {
     }
     
     func appendLearnMore() {
-        let attrString = NSAttributedString(string: "Learn More", attributes: [
+        let attrString = NSAttributedString(string: UserText.gpcLearnMore, attributes: [
             NSAttributedString.Key.link: URL.gpcLearnMore,
             NSAttributedString.Key.font: NSFont.systemFont(ofSize: NSFont.systemFontSize)
         ])
