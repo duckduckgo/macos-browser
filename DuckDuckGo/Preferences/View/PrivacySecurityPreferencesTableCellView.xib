@@ -9,8 +9,8 @@
         <customObject id="-2" userLabel="File's Owner"/>
         <customObject id="-1" userLabel="First Responder" customClass="FirstResponder"/>
         <customObject id="-3" userLabel="Application" customClass="NSObject"/>
-        <tableCellView id="ZOv-mQ-BdW" customClass="PrivacySecurityPreferencesTableCellView" customModule="DuckDuckGo_Privacy_Browser" customModuleProvider="target">
-            <rect key="frame" x="0.0" y="0.0" width="480" height="371"/>
+        <tableCellView misplaced="YES" id="ZOv-mQ-BdW" customClass="PrivacySecurityPreferencesTableCellView" customModule="DuckDuckGo_Privacy_Browser" customModuleProvider="target">
+            <rect key="frame" x="0.0" y="0.0" width="480" height="399"/>
             <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
             <subviews>
                 <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="UTK-kg-11g">
@@ -92,8 +92,7 @@
                 <constraint firstAttribute="trailing" secondItem="ciy-dP-z15" secondAttribute="trailing" constant="17" id="AZF-5e-QDt"/>
                 <constraint firstItem="1Hn-nJ-bFt" firstAttribute="leading" secondItem="ZOv-mQ-BdW" secondAttribute="leading" constant="3" id="F45-Xp-jFH"/>
                 <constraint firstItem="4U5-6s-Y6q" firstAttribute="top" secondItem="UTK-kg-11g" secondAttribute="bottom" constant="20" id="G13-tL-MJQ"/>
-                <constraint firstItem="UTK-kg-11g" firstAttribute="top" secondItem="ZOv-mQ-BdW" secondAttribute="top" constant="8" id="GDG-5B-bg4"/>
-                <constraint firstItem="UTK-kg-11g" firstAttribute="top" secondItem="ZOv-mQ-BdW" secondAttribute="top" constant="8" id="HhP-Hl-KL3"/>
+                <constraint firstItem="UTK-kg-11g" firstAttribute="top" secondItem="ZOv-mQ-BdW" secondAttribute="top" constant="36" id="HhP-Hl-KL3"/>
                 <constraint firstItem="UTK-kg-11g" firstAttribute="leading" secondItem="3Oj-RS-EIB" secondAttribute="leading" id="NDv-h8-7Yl"/>
                 <constraint firstItem="1Hn-nJ-bFt" firstAttribute="top" secondItem="Fd2-fn-gaX" secondAttribute="bottom" constant="12" id="Qpx-ee-2UM"/>
                 <constraint firstItem="Fd2-fn-gaX" firstAttribute="leading" secondItem="ZOv-mQ-BdW" secondAttribute="leading" constant="3" id="Ucq-ST-8rU"/>
