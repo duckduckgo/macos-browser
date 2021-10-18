@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<document type="com.apple.InterfaceBuilder3.Cocoa.Storyboard.XIB" version="3.0" toolsVersion="18122" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none" useAutolayout="YES">
+<document type="com.apple.InterfaceBuilder3.Cocoa.Storyboard.XIB" version="3.0" toolsVersion="19162" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none" useAutolayout="YES">
     <dependencies>
         <deployment identifier="macosx"/>
-        <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="18122"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="19162"/>
         <capability name="Named colors" minToolsVersion="9.0"/>
         <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
     </dependencies>
@@ -66,7 +66,7 @@
                                                     <imageCell key="cell" refusesFirstResponder="YES" alignment="left" imageScaling="proportionallyDown" image="Logo" id="V3u-lP-o54"/>
                                                 </imageView>
                                                 <button verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="ExO-AA-imf">
-                                                    <rect key="frame" x="8" y="192" width="184" height="15"/>
+                                                    <rect key="frame" x="8" y="191" width="184" height="16"/>
                                                     <buttonCell key="cell" type="bevel" title="More at duckduckgo.com/about" bezelStyle="rounded" alignment="center" imageScaling="proportionallyDown" inset="2" id="YrD-Nw-OMB">
                                                         <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
                                                         <font key="font" metaFont="cellTitle"/>
@@ -77,7 +77,7 @@
                                                     </connections>
                                                 </button>
                                                 <button verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="J62-E9-DAv">
-                                                    <rect key="frame" x="411" y="183" width="128" height="32"/>
+                                                    <rect key="frame" x="411" y="182" width="128" height="32"/>
                                                     <buttonCell key="cell" type="push" title="Send Feedback" bezelStyle="rounded" alignment="center" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="Cql-dh-brF">
                                                         <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
                                                         <font key="font" metaFont="system"/>
@@ -337,11 +337,11 @@
                             <scrollView borderType="none" autohidesScrollers="YES" horizontalLineScroll="24" horizontalPageScroll="10" verticalLineScroll="24" verticalPageScroll="10" usesPredominantAxisScrolling="NO" translatesAutoresizingMaskIntoConstraints="NO" id="v7G-m4-y9G">
                                 <rect key="frame" x="42" y="0.0" width="429" height="306"/>
                                 <clipView key="contentView" drawsBackground="NO" id="Sca-lN-1gh">
-                                    <rect key="frame" x="0.0" y="0.0" width="429" height="306"/>
+                                    <rect key="frame" x="0.0" y="0.0" width="429" height="291"/>
                                     <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                     <subviews>
                                         <tableView verticalHuggingPriority="750" allowsExpansionToolTips="YES" columnAutoresizingStyle="lastColumnOnly" columnReordering="NO" columnSelection="YES" columnResizing="NO" multipleSelection="NO" autosaveColumns="NO" rowHeight="24" usesAutomaticRowHeights="YES" viewBased="YES" id="Hzk-42-jjV">
-                                            <rect key="frame" x="0.0" y="0.0" width="533" height="306"/>
+                                            <rect key="frame" x="0.0" y="0.0" width="533" height="291"/>
                                             <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                             <size key="intercellSpacing" width="17" height="0.0"/>
                                             <color key="backgroundColor" name="ClearColor"/>
@@ -369,7 +369,7 @@
                                     <color key="backgroundColor" name="ClearColor"/>
                                 </clipView>
                                 <scroller key="horizontalScroller" wantsLayer="YES" verticalHuggingPriority="750" horizontal="YES" id="cBz-er-7F4">
-                                    <rect key="frame" x="0.0" y="290" width="429" height="16"/>
+                                    <rect key="frame" x="0.0" y="291" width="429" height="15"/>
                                     <autoresizingMask key="autoresizingMask"/>
                                 </scroller>
                                 <scroller key="verticalScroller" hidden="YES" wantsLayer="YES" verticalHuggingPriority="750" horizontal="NO" id="Fbd-Kx-iHN">
@@ -406,7 +406,7 @@
                         <autoresizingMask key="autoresizingMask"/>
                         <subviews>
                             <button verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="DEQ-Uh-Y7p">
-                                <rect key="frame" x="13" y="13" width="83" height="32"/>
+                                <rect key="frame" x="13" y="13" width="84" height="32"/>
                                 <buttonCell key="cell" type="push" title="Remove" bezelStyle="rounded" alignment="center" enabled="NO" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="0Dz-eI-5jh">
                                     <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
                                     <font key="font" metaFont="system"/>
@@ -416,7 +416,7 @@
                                 </connections>
                             </button>
                             <button verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="KAc-ZW-ZAV">
-                                <rect key="frame" x="94" y="13" width="101" height="32"/>
+                                <rect key="frame" x="95" y="13" width="102" height="32"/>
                                 <buttonCell key="cell" type="push" title="Remove All" bezelStyle="rounded" alignment="center" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="atA-bI-IOY">
                                     <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
                                     <font key="font" metaFont="system"/>
@@ -573,7 +573,7 @@ DQ
     <resources>
         <image name="HomeFavicon" width="16" height="16"/>
         <image name="Logo" width="128" height="128"/>
-        <image name="Web" width="15" height="15"/>
+        <image name="Web" width="16" height="16"/>
         <namedColor name="BlueButtonBorderColor">
             <color red="0.22699999809265137" green="0.40999999642372131" blue="0.93699997663497925" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
         </namedColor>

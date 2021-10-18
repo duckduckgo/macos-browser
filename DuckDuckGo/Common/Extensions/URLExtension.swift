@@ -257,6 +257,10 @@ extension URL {
     static var aboutDuckDuckGo: URL {
         return URL(string: "https://duckduckgo.com/about")!
     }
+    
+    static var gpcLearnMore: URL {
+        return URL(string: "https://help.duckduckgo.com/duckduckgo-help-pages/privacy/gpc/")!
+    }
 
     static var duckDuckGoEmail = URL(string: "https://duckduckgo.com/email-protection")!
 

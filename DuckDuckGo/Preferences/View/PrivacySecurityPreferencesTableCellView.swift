@@ -17,6 +17,7 @@
 //
 
 import Foundation
+import AppKit
 
 protocol PrivacySecurityPreferencesTableCellViewDelegate: AnyObject {
 
@@ -36,9 +37,16 @@ final class PrivacySecurityPreferencesTableCellView: NSTableCellView {
 
     @IBOutlet var loginDetectionCheckbox: NSButton!
     @IBOutlet var gpcCheckbox: NSButton!
+    
+    @IBOutlet var gpcDisclaimer: NSTextView!
 
     weak var delegate: PrivacySecurityPreferencesTableCellViewDelegate?
-
+    
+    override func viewDidMoveToSuperview() {
+        super.viewDidMoveToSuperview()
+        appendLearnMore()
+    }
+    
     func update(loginDetectionEnabled: Bool, gpcEnabled: Bool) {
         loginDetectionCheckbox.state = loginDetectionEnabled ? .on : .off
         gpcCheckbox.state = gpcEnabled ? .on : .off
@@ -57,5 +65,30 @@ final class PrivacySecurityPreferencesTableCellView: NSTableCellView {
         let gpcEnabled = gpcCheckbox.state == .on
         delegate?.privacySecurtyPreferencesTableCellView(self, setGPCEnabled: gpcEnabled)
     }
+    
+    func appendLearnMore() {
+        let attrString = NSAttributedString(string: "Learn More", attributes: [
+            NSAttributedString.Key.link: URL.gpcLearnMore,
+            NSAttributedString.Key.font: NSFont.systemFont(ofSize: NSFont.systemFontSize)
+        ])
+        gpcDisclaimer.linkTextAttributes = [
+            NSAttributedString.Key.font: NSFont.systemFont(ofSize: NSFont.systemFontSize),
+            NSAttributedString.Key.foregroundColor: NSColor(named: "BookmarkFilledTint")!
+        ]
+        let newStr = NSMutableAttributedString(attributedString: gpcDisclaimer.attributedString())
+        newStr.append(attrString)
+        gpcDisclaimer.textStorage?.setAttributedString(newStr)
+    }
+}
 
+extension PrivacySecurityPreferencesTableCellView: NSTextViewDelegate {
+    func textView(_ textView: NSTextView, clickedOnLink link: Any, at charIndex: Int) -> Bool {
+        if let link = link as? URL {
+            WindowControllersManager.shared.show(url: link, newTab: true)
+        } else if let link = link as? String,
+            let url = URL(string: link) {
+            WindowControllersManager.shared.show(url: url, newTab: true)
+        }
+        return true
+    }
 }
