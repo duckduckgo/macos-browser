@@ -136,6 +136,10 @@ extension PrivacyDashboardViewController: PrivacyDashboardUserScriptDelegate {
         tabViewModel?.tab.permissions.set(permission, muted: paused)
     }
 
+    func userScript(_ userScript: PrivacyDashboardUserScript, setHeight height: Int) {
+        self.preferredContentSize = CGSize(width: self.view.frame.width, height: CGFloat(height))
+    }
+
 }
 
 extension PrivacyDashboardViewController: WKNavigationDelegate {

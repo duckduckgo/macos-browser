@@ -25,6 +25,7 @@ protocol PrivacyDashboardUserScriptDelegate: AnyObject {
     func userScript(_ userScript: PrivacyDashboardUserScript, didChangeProtectionStateTo protectionState: Bool)
     func userScript(_ userScript: PrivacyDashboardUserScript, didSetPermission permission: PermissionType, to state: PermissionAuthorizationState)
     func userScript(_ userScript: PrivacyDashboardUserScript, setPermission permission: PermissionType, paused: Bool)
+    func userScript(_ userScript: PrivacyDashboardUserScript, setHeight height: Int)
 
 }
 
@@ -35,6 +36,7 @@ final class PrivacyDashboardUserScript: NSObject, StaticUserScript {
         case privacyDashboardFirePixel
         case privacyDashboardSetPermission
         case privacyDashboardSetPermissionPaused
+        case privacyDashboardSetHeight
     }
 
     static var injectionTime: WKUserScriptInjectionTime { .atDocumentStart }
@@ -64,6 +66,9 @@ final class PrivacyDashboardUserScript: NSObject, StaticUserScript {
 
         case .privacyDashboardSetPermissionPaused:
             handleSetPermissionPaused(message: message)
+
+        case .privacyDashboardSetHeight:
+            handleSetHeight(message: message)
         }
     }
 
@@ -107,6 +112,15 @@ final class PrivacyDashboardUserScript: NSObject, StaticUserScript {
         }
 
         delegate?.userScript(self, setPermission: permission, paused: paused)
+    }
+
+    private func handleSetHeight(message: WKScriptMessage) {
+        guard let height = message.body as? Int else {
+            assertionFailure("privacyDashboardSetHeght: expected height Int")
+            return
+        }
+
+        delegate?.userScript(self, setHeight: height)
     }
 
     typealias AuthorizationState = [(permission: PermissionType, state: PermissionAuthorizationState)]
