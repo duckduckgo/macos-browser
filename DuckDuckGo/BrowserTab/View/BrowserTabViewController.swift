@@ -30,6 +30,7 @@ final class BrowserTabViewController: NSViewController {
     @IBOutlet weak var homepageView: NSView!
     @IBOutlet weak var errorMessageLabel: NSTextField!
     @IBOutlet weak var hoverLabel: NSTextField!
+    @IBOutlet weak var hoverLabelContainer: NSView!
     weak var webView: WebView?
 
     var tabViewModel: TabViewModel?
@@ -43,6 +44,8 @@ final class BrowserTabViewController: NSViewController {
     private var contextMenuLink: URL?
     private var contextMenuImage: URL?
     private var contextMenuSelectedText: String?
+
+    private var hoverLabelWorkItem: DispatchWorkItem?
 
     required init?(coder: NSCoder) {
         fatalError("BrowserTabViewController: Bad initializer")
@@ -66,6 +69,7 @@ final class BrowserTabViewController: NSViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
 
+        hoverLabelContainer.alphaValue = 0
         subscribeToSelectedTabViewModel()
         subscribeToErrorViewState()
     }
@@ -105,8 +109,11 @@ final class BrowserTabViewController: NSViewController {
         webView.frame = view.bounds
         webView.autoresizingMask = [.width, .height]
         view.addSubview(webView)
-        hoverLabel.removeFromSuperview()
-        view.addSubview(hoverLabel)
+
+        // Make sure this is on top
+        hoverLabelContainer.removeFromSuperview()
+        view.addSubview(hoverLabelContainer)
+
         setFirstResponderIfNeeded()
     }
 
@@ -377,8 +384,21 @@ extension BrowserTabViewController: TabDelegate {
     }
 
     func tab(_ tab: Tab, didChangeHoverLink url: URL?) {
-        hoverLabel.isHidden = url == nil
-        hoverLabel.stringValue = url?.absoluteString ?? ""
+
+        hoverLabelWorkItem?.cancel()
+        if url == nil {
+            hoverLabelContainer.animator().alphaValue = 0
+        } else {
+            // Wait shortly before showing it to make sure we don't flash loads of URLs
+            let item = DispatchWorkItem { [weak self] in
+                self?.hoverLabelContainer.animator().alphaValue = 1
+                self?.hoverLabelContainer.isHidden = false
+                self?.hoverLabel.stringValue = url?.absoluteString ?? ""
+            }
+            DispatchQueue.main.asyncAfter(deadline: .now() + 0.3, execute: item)
+            hoverLabelWorkItem = item
+        }
+
     }
 
 }
