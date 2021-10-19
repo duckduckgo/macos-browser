@@ -19,7 +19,7 @@
 import XCTest
 import Cocoa
 
-class BookmarksTests: DDGUITestCase {
+class BookmarkPopupTests: DDGUITestCase {
 
     func testWhenAddingBookmarkFromSearchbar_ThenBookmarkAppearsInPopover() throws {
         /*
