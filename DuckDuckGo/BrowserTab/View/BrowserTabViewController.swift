@@ -388,8 +388,9 @@ extension BrowserTabViewController: TabDelegate {
         hoverLabelWorkItem?.cancel()
         if url == nil {
             hoverLabelContainer.animator().alphaValue = 0
+        } else if hoverLabelContainer.alphaValue >= 1 {
+            hoverLabel.stringValue = url?.absoluteString ?? ""
         } else {
-            // Wait shortly before showing it to make sure we don't flash loads of URLs
             let item = DispatchWorkItem { [weak self] in
                 self?.hoverLabelContainer.animator().alphaValue = 1
                 self?.hoverLabelContainer.isHidden = false
