@@ -8,6 +8,7 @@ Run `git submodule update --init --recursive`
 
 ## Schemes
 
-`DuckDuckGo Browser` is the Primary Scheme. Use it for development, testing and Internal Releases.
-Use `DuckDuckGo PR test RELEASE with TSan` for testing a build in RELEASE mode before approving a Pull Request.
-Use `DuckDuckGo Release External Beta` scheme for building External Beta Testing RELEASE builds .
+`DuckDuckGo Privacy Browser` is the primary scheme. Use it for development, testing and internal releases.
+Use `External Beta Release` scheme for building external releases.
+Use `Product Review Release` scheme for exporting builds for a review.
+Use `Pull Request Testing with TSan` for testing a build in Release configuration before approving a pull request.
