@@ -54,11 +54,11 @@
                                 </userDefinedRuntimeAttributes>
                             </customView>
                             <customView translatesAutoresizingMaskIntoConstraints="NO" id="TI8-MI-JdM" customClass="ColorView" customModule="DuckDuckGo_Privacy_Browser" customModuleProvider="target">
-                                <rect key="frame" x="-2" y="-4" width="49" height="27"/>
+                                <rect key="frame" x="-2" y="-4" width="139" height="31"/>
                                 <subviews>
                                     <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="v5b-uq-Sj6">
-                                        <rect key="frame" x="10" y="8" width="35" height="15"/>
-                                        <textFieldCell key="cell" lineBreakMode="clipping" title="Label" id="V9k-YC-WHR">
+                                        <rect key="frame" x="10" y="10" width="123" height="15"/>
+                                        <textFieldCell key="cell" lineBreakMode="clipping" title="https://example.com/" id="V9k-YC-WHR">
                                             <font key="font" metaFont="system" size="12"/>
                                             <color key="textColor" name="labelColor" catalog="System" colorSpace="catalog"/>
                                             <color key="backgroundColor" name="BrowserTabBackgroundColor"/>
@@ -66,10 +66,10 @@
                                     </textField>
                                 </subviews>
                                 <constraints>
-                                    <constraint firstAttribute="bottom" secondItem="v5b-uq-Sj6" secondAttribute="bottom" constant="8" id="Ip3-f6-k2w"/>
+                                    <constraint firstAttribute="bottom" secondItem="v5b-uq-Sj6" secondAttribute="bottom" constant="10" id="Ip3-f6-k2w"/>
                                     <constraint firstItem="v5b-uq-Sj6" firstAttribute="leading" secondItem="TI8-MI-JdM" secondAttribute="leading" constant="12" id="QWu-RY-2dY"/>
-                                    <constraint firstAttribute="trailing" secondItem="v5b-uq-Sj6" secondAttribute="trailing" constant="6" id="jsE-7Z-bXi"/>
-                                    <constraint firstItem="v5b-uq-Sj6" firstAttribute="top" secondItem="TI8-MI-JdM" secondAttribute="top" constant="4" id="xfZ-nB-DNj"/>
+                                    <constraint firstAttribute="trailing" secondItem="v5b-uq-Sj6" secondAttribute="trailing" constant="8" id="jsE-7Z-bXi"/>
+                                    <constraint firstItem="v5b-uq-Sj6" firstAttribute="top" secondItem="TI8-MI-JdM" secondAttribute="top" constant="6" id="xfZ-nB-DNj"/>
                                 </constraints>
                                 <userDefinedRuntimeAttributes>
                                     <userDefinedRuntimeAttribute type="color" keyPath="backgroundColor">
