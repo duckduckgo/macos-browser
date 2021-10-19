@@ -638,6 +638,10 @@ extension Tab: WKNavigationDelegate {
         static let webkitMiddleClick = 4
     }
 
+    private func isNewTargetBlankRequest(navigationAction: WKNavigationAction) -> Bool {
+        return navigationAction.navigationType == .linkActivated && navigationAction.targetFrame == nil
+    }
+
     func webView(_ webView: WKWebView,
                  decidePolicyFor navigationAction: WKNavigationAction,
                  decisionHandler: @escaping (WKNavigationActionPolicy) -> Void) {
@@ -663,6 +667,12 @@ extension Tab: WKNavigationDelegate {
 
         guard let url = navigationAction.request.url, let urlScheme = url.scheme else {
             decisionHandler(.allow)
+            return
+        }
+
+        if isNewTargetBlankRequest(navigationAction: navigationAction) {
+            delegate?.tab(self, requestedNewTab: navigationAction.request.url, selected: true)
+            decisionHandler(.cancel)
             return
         }
 
