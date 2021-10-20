@@ -384,22 +384,30 @@ extension BrowserTabViewController: TabDelegate {
     }
 
     func tab(_ tab: Tab, didChangeHoverLink url: URL?) {
-
+        // cancel previous animation, if any
         hoverLabelWorkItem?.cancel()
-        if url == nil {
-            hoverLabelContainer.animator().alphaValue = 0
-        } else if hoverLabelContainer.alphaValue >= 1 {
-            hoverLabel.stringValue = url?.absoluteString ?? ""
-        } else {
-            let item = DispatchWorkItem { [weak self] in
-                self?.hoverLabelContainer.animator().alphaValue = 1
-                self?.hoverLabelContainer.isHidden = false
-                self?.hoverLabel.stringValue = url?.absoluteString ?? ""
+
+        // schedule an animation if needed
+        var animationItem: DispatchWorkItem?
+        if url == nil && hoverLabelContainer.alphaValue > 0 {
+            // schedule a fade out
+            animationItem = DispatchWorkItem { [weak self] in
+                self?.hoverLabelContainer.animator().alphaValue = 0
             }
-            DispatchQueue.main.asyncAfter(deadline: .now() + 0.5, execute: item)
-            hoverLabelWorkItem = item
+        } else if hoverLabelContainer.alphaValue < 1 {
+            // schedule a fade in
+            animationItem = DispatchWorkItem { [weak self] in
+                self?.hoverLabel.stringValue = url?.absoluteString ?? ""
+                self?.hoverLabelContainer.animator().alphaValue = 1
+            }
+        } else {
+            hoverLabel.stringValue = url?.absoluteString ?? ""
         }
 
+        if let item = animationItem {
+            hoverLabelWorkItem = item
+            DispatchQueue.main.asyncAfter(deadline: .now() + 0.5, execute: item)
+        }
     }
 
 }
