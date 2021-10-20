@@ -44,11 +44,7 @@ final class PrivacyConfigurationManager {
 
     static let shared = PrivacyConfigurationManager()
 
-    private(set) var config: PrivacyConfiguration {
-        didSet {
-            print("Config Set")
-        }
-    }
+    private(set) var config: PrivacyConfiguration
     private(set) var encodedConfigData: String
 
     private var configDataStore: ConfigurationStoring
@@ -126,6 +122,10 @@ final class PrivacyConfigurationManager {
 
 extension PrivacyConfigurationManager: PrivacyConfigurationManagment {
     
+    enum ConfigurationSettingsKeys: String {
+        case gpcHeaderEnabled = "gpcHeaderEnabledSites"
+    }
+    
     var tempUnprotectedDomains: [String] {
         return config.tempUnprotectedDomains
     }
@@ -138,4 +138,10 @@ extension PrivacyConfigurationManager: PrivacyConfigurationManagment {
         return config.exceptionsList(forFeature: featureKey)
     }
     
+    func gpcHeadersEnabled() -> [String] {
+        guard let enabledSites = config.features[PrivacyConfiguration.SupportedFeatures.gpc.rawValue]?
+                .settings?[ConfigurationSettingsKeys.gpcHeaderEnabled.rawValue] as? [String] else { return [] }
+        
+        return enabledSites
+    }
 }

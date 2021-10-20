@@ -9,6 +9,7 @@
 /* Begin PBXBuildFile section */
 		0230C09F271F53000018F728 /* GPCUserScript.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0230C09E271F53000018F728 /* GPCUserScript.swift */; };
 		0230C0A1271F53670018F728 /* gpc.js in Resources */ = {isa = PBXBuildFile; fileRef = 0230C0A0271F53670018F728 /* gpc.js */; };
+		0230C0A3272080090018F728 /* KeyedCodingExtension.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0230C0A2272080090018F728 /* KeyedCodingExtension.swift */; };
 		026ADE1026C2FF97002518EE /* PrivacyConfigurationManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 026ADE0F26C2FF97002518EE /* PrivacyConfigurationManager.swift */; };
 		026ADE1226C2FFFE002518EE /* PrivacyConfiguration.swift in Sources */ = {isa = PBXBuildFile; fileRef = 026ADE1126C2FFFE002518EE /* PrivacyConfiguration.swift */; };
 		026ADE1426C3010C002518EE /* macos-config.json in Resources */ = {isa = PBXBuildFile; fileRef = 026ADE1326C3010C002518EE /* macos-config.json */; };
@@ -581,6 +582,7 @@
 /* Begin PBXFileReference section */
 		0230C09E271F53000018F728 /* GPCUserScript.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GPCUserScript.swift; sourceTree = "<group>"; };
 		0230C0A0271F53670018F728 /* gpc.js */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.javascript; path = gpc.js; sourceTree = "<group>"; };
+		0230C0A2272080090018F728 /* KeyedCodingExtension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = KeyedCodingExtension.swift; sourceTree = "<group>"; };
 		026ADE0F26C2FF97002518EE /* PrivacyConfigurationManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PrivacyConfigurationManager.swift; sourceTree = "<group>"; };
 		026ADE1126C2FFFE002518EE /* PrivacyConfiguration.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = PrivacyConfiguration.swift; sourceTree = "<group>"; };
 		026ADE1326C3010C002518EE /* macos-config.json */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.json; path = "macos-config.json"; sourceTree = "<group>"; };
@@ -2735,6 +2737,7 @@
 				B637273C26CCF0C200C8CB02 /* OptionalExtension.swift */,
 				B65E6B9F26D9F10600095F96 /* NSBezierPathExtension.swift */,
 				B6C0B24326E9CB080031CB7F /* RunLoopExtension.swift */,
+				0230C0A2272080090018F728 /* KeyedCodingExtension.swift */,
 			);
 			path = Extensions;
 			sourceTree = "<group>";
@@ -3411,6 +3414,7 @@
 				B6A9E45A261460350067D1B9 /* ApiRequestError.swift in Sources */,
 				AADCBF3A26F7C2CE00EF67A8 /* LottieAnimationCache.swift in Sources */,
 				4B723E0E26B0006300E14D75 /* LoginImport.swift in Sources */,
+				0230C0A3272080090018F728 /* KeyedCodingExtension.swift in Sources */,
 				B6C0B23026E61D630031CB7F /* DownloadListStore.swift in Sources */,
 				85799C1825DEBB3F0007EC87 /* Logging.swift in Sources */,
 				AAC30A2E268F1EE300D2D9CD /* CrashReportPromptPresenter.swift in Sources */,

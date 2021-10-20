@@ -379,12 +379,7 @@ extension URL {
     
     static func isGPCEnabled(url: URL,
                              config: PrivacyConfigurationManager = PrivacyConfigurationManager.shared) -> Bool {
-        let enabledSites = [
-            "http://global-privacy-control.glitch.me",
-            "https://privacy-test-pages.glitch.me",
-            "https://washingtonpost.com",
-            "https://nytimes.com"
-        ]
+        let enabledSites = config.gpcHeadersEnabled()
         
         for gpcURL in enabledSites {
             if let host = URL(string: gpcURL)?.host,
