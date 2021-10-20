@@ -79,14 +79,15 @@ extension EditableTextView {
             self.selectedRanges = textView.selectedRanges
         }
 
-        func textDidEndEditing(_ notification: Notification) {
-            guard let textView = notification.object as? NSTextView else {
-                return
-            }
-
-            self.parent.text = textView.string
-            self.parent.onCommit()
-        }
+        // Commented out as this event comes after the note view model refreshes its note and sets isDirty to false. Might not need this anyway?
+//        func textDidEndEditing(_ notification: Notification) {
+//            guard let textView = notification.object as? NSTextView else {
+//                return
+//            }
+//
+//            self.parent.text = textView.string
+//            self.parent.onCommit()
+//        }
 
     }
 
