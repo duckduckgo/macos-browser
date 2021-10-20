@@ -396,7 +396,7 @@ extension BrowserTabViewController: TabDelegate {
                 self?.hoverLabelContainer.isHidden = false
                 self?.hoverLabel.stringValue = url?.absoluteString ?? ""
             }
-            DispatchQueue.main.asyncAfter(deadline: .now() + 0.3, execute: item)
+            DispatchQueue.main.asyncAfter(deadline: .now() + 0.5, execute: item)
             hoverLabelWorkItem = item
         }
 
