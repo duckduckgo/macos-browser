@@ -401,7 +401,7 @@ final class PasswordManagementViewController: NSViewController {
         guard let window = self.view.window,
               let id = card.id else { return }
 
-        let alert = NSAlert.passwordManagerConfirmDeleteNote()
+        let alert = NSAlert.passwordManagerConfirmDeleteCard()
         alert.beginSheetModal(for: window) { response in
 
             switch response {
