@@ -177,13 +177,14 @@ final class HomepageHeaderView: NSView {
 
     private func showSearchInactive() {
         backgroundHeight.constant = container.frame.height
-        shadowView.isHidden = true
+        shadowView.shadowOpacity = 0.3
+        shadowView.shadowSides = .all
         clearButton.isHidden = true
     }
 
     private func showSearchActive() {
         backgroundHeight.constant = container.frame.height
-        shadowView.isHidden = false
+        shadowView.shadowOpacity = 1
         shadowView.shadowSides = .all
         clearButton.isHidden = field.value.isEmpty
     }
@@ -191,7 +192,7 @@ final class HomepageHeaderView: NSView {
     private func showSearchHasResults() {
         clearButton.isHidden = false
         backgroundHeight.constant = container.frame.height + 10
-        shadowView.isHidden = false
+        shadowView.shadowOpacity = 1
         shadowView.shadowSides = [.left, .top, .right]
     }
 
