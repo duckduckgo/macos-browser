@@ -69,7 +69,6 @@ final class HomepageHeaderView: NSView {
     override func awakeFromNib() {
         super.awakeFromNib()
 
-        initLogo()
         initShadows()
         initFieldBackground()
         wireUpAddressBarFieldToModel()
@@ -111,34 +110,6 @@ final class HomepageHeaderView: NSView {
         layer?.masksToBounds = false
         shadowView.shadowColor = .suggestionsShadowColor
         shadowView.shadowRadius = 8.0
-    }
-
-    private func initLogo() {
-        guard let daxLogo = Bundle.main.url(forResource: "Dax", withExtension: "svg") else { fatalError() }
-        dax.loadFileURL(daxLogo, allowingReadAccessTo: daxLogo)
-        dax.setValue(false, forKey: "drawsBackground")
-        dax.addGestureRecognizer(NSClickGestureRecognizer(target: self, action: #selector(onGesture(_:))))
-        startAnimation()
-    }
-
-    @objc func onGesture(_ gesture: NSGestureRecognizer) {
-        runAnimation()
-    }
-
-    private func startAnimation() {
-        animationTimer?.invalidate()
-        let delay: TimeInterval = Double.random(in: 30 ..< 120)
-        animationTimer = Timer.scheduledTimer(withTimeInterval: delay, repeats: false, block: { [weak self] _ in
-            self?.runAnimation()
-        })
-    }
-
-    private func runAnimation() {
-        animationTimer?.invalidate()
-        let anim = ["Dax-Wink", "Dax-Bow-Tie", "Dax-EyeBrows", "Dax-Eyes"].randomElement()
-        guard let daxAnim = Bundle.main.url(forResource: anim, withExtension: "svg") else { fatalError() }
-        dax.loadFileURL(daxAnim, allowingReadAccessTo: daxAnim)
-        startAnimation()
     }
 
     private func subscribeToField() {

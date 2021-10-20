@@ -22,7 +22,6 @@ final class HomepageCollectionViewFlowLayout: NSCollectionViewFlowLayout {
 
     struct Constants {
         static let headerHeight: CGFloat = 222
-        static let verticalShift = headerHeight / -2
         static let columns: Int = 5
         static let insets: CGSize = .zero
     }
@@ -68,7 +67,7 @@ final class HomepageCollectionViewFlowLayout: NSCollectionViewFlowLayout {
 
         let startX = (scrollView.frame.size.width - contentWidth) / 2
         let startY = max(Constants.insets.height,
-                         (scrollView.frame.size.height - contentHeight) / 2 + Constants.insets.height + Constants.verticalShift)
+                         (scrollView.frame.size.height / 2) - Constants.headerHeight)
 
         var headerMaxX = startX
         for (idx, attribute) in attributes.enumerated() {
@@ -77,6 +76,8 @@ final class HomepageCollectionViewFlowLayout: NSCollectionViewFlowLayout {
                                         * CGFloat(idx / Constants.columns)
             headerMaxX = max(headerMaxX, attribute.frame.maxX)
         }
+
+        print(#function, startY)
 
         headerAttribute.frame.origin.x = startX
         headerAttribute.frame.origin.y = startY
