@@ -31,6 +31,7 @@ struct LoginFaviconView: View {
                 .resizable()
                 .aspectRatio(contentMode: .fit)
                 .frame(width: 32)
+                .cornerRadius(4.0)
         }
 
     }
