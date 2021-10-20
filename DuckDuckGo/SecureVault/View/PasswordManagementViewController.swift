@@ -421,6 +421,7 @@ final class PasswordManagementViewController: NSViewController {
         }
     }
 
+    // swiftlint:disable function_body_length
     private func createListView() {
         let listModel = PasswordManagementItemListModel { [weak self] previousValue, newValue in
             guard let id = newValue.secureVaultID,
@@ -481,6 +482,7 @@ final class PasswordManagementViewController: NSViewController {
         view.frame = listContainer.bounds
         listContainer.addSubview(view)
     }
+    // swiftlint:enable function_body_length
 
     private func createNewSecureVaultItemMenu() -> NSMenu {
         let menu = NSMenu()

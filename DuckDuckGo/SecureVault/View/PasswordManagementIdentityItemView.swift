@@ -109,7 +109,11 @@ private struct AddressView: View {
     var body: some View {
 
         VStack(alignment: .leading, spacing: 0) {
-            if !model.addressStreet.isEmpty || !model.addressCity.isEmpty || !model.addressProvince.isEmpty || !model.addressPostalCode.isEmpty || model.isInEditMode {
+            if !model.addressStreet.isEmpty ||
+                !model.addressCity.isEmpty ||
+                !model.addressProvince.isEmpty ||
+                !model.addressPostalCode.isEmpty ||
+                model.isInEditMode {
                 Text("Address")
                     .bold()
                     .foregroundColor(.gray)
