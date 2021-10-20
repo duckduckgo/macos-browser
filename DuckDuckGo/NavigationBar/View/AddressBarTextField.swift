@@ -121,7 +121,8 @@ final class AddressBarTextField: NSTextField {
         }
 
         let addressBarString = selectedTabViewModel.addressBarString
-        value = Value(stringValue: addressBarString, userTyped: false)
+        let isSearch = selectedTabViewModel.tab.content.url?.isDuckDuckGoSearch ?? false
+        value = Value(stringValue: addressBarString, userTyped: false, isSearch: isSearch)
     }
 
     private func makeMeFirstResponderIfNeeded() {
@@ -253,8 +254,11 @@ final class AddressBarTextField: NSTextField {
         case url(urlString: String, url: URL, userTyped: Bool)
         case suggestion(_ suggestionViewModel: SuggestionViewModel)
 
-        init(stringValue: String, userTyped: Bool) {
-            if let url = stringValue.punycodedUrl, url.isValid {
+        init(stringValue: String, userTyped: Bool, isSearch: Bool = false) {
+            if isSearch {
+                // When searching, the string value will be the URL query
+                self = .text(stringValue)
+            } else if let url = stringValue.punycodedUrl, url.isValid {
                 var stringValue = stringValue
                 // display punycoded url in readable form when editing
                 if !userTyped,

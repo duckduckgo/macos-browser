@@ -202,7 +202,7 @@ final class PermissionManagerTests: XCTestCase {
         let fireproofDomains = FireproofDomains()
         fireproofDomains.addToAllowed(domain: PermissionEntity.entity1.domain)
 
-        manager.burnPermissions(except: fireproofDomains)
+        manager.burnPermissions(except: fireproofDomains) {}
 
         XCTAssertEqual(store.history, [.load, .clear(exceptions: [PermissionEntity.entity1.permission])])
         XCTAssertEqual(manager.permission(forDomain: PermissionEntity.entity1.domain,

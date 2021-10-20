@@ -267,6 +267,68 @@ final class LocalBookmarkStoreTests: XCTestCase {
         waitForExpectations(timeout: 3, handler: nil)
     }
 
-    // func testWhenAdding
+    func testWhenBookmarksAreImported_AndNoDuplicatesExist_ThenBookmarksAreImported() {
+        let container = CoreData.bookmarkContainer()
+        let context = container.viewContext
+        let bookmarkStore = LocalBookmarkStore(context: context)
+
+        let bookmark = ImportedBookmarks.BookmarkOrFolder(name: "DuckDuckGo", type: "bookmark", urlString: "https://duckduckgo.com", children: nil)
+        let bookmarkBar = ImportedBookmarks.BookmarkOrFolder(name: "Bookmark Bar", type: "folder", urlString: nil, children: [bookmark])
+        let otherBookmarks = ImportedBookmarks.BookmarkOrFolder(name: "Other Bookmarks", type: "folder", urlString: nil, children: [])
+
+        let topLevelFolders = ImportedBookmarks.TopLevelFolders(bookmarkBar: bookmarkBar, otherBookmarks: otherBookmarks)
+        let importedBookmarks = ImportedBookmarks(topLevelFolders: topLevelFolders)
+
+        let result = bookmarkStore.importBookmarks(importedBookmarks)
+
+        XCTAssertEqual(result.successful, 1)
+        XCTAssertEqual(result.duplicates, 0)
+        XCTAssertEqual(result.failed, 0)
+
+        let loadingExpectation = self.expectation(description: "Loading")
+
+        bookmarkStore.loadAll(type: .bookmarks) { bookmarks, error in
+            XCTAssertNotNil(bookmarks)
+            XCTAssertNil(error)
+            XCTAssert(bookmarks?.count == 1)
+
+            loadingExpectation.fulfill()
+        }
+
+        waitForExpectations(timeout: 3, handler: nil)
+    }
+
+    func testWhenBookmarksAreImported_AndDuplicatesExist_ThenNoBookmarksAreImported() {
+        let container = CoreData.bookmarkContainer()
+        let context = container.viewContext
+        let bookmarkStore = LocalBookmarkStore(context: context)
+
+        let bookmark = ImportedBookmarks.BookmarkOrFolder(name: "DuckDuckGo", type: "bookmark", urlString: "https://duckduckgo.com", children: nil)
+        let bookmarkBar = ImportedBookmarks.BookmarkOrFolder(name: "Bookmark Bar", type: "folder", urlString: nil, children: [bookmark])
+        let otherBookmarks = ImportedBookmarks.BookmarkOrFolder(name: "Other Bookmarks", type: "folder", urlString: nil, children: [])
+
+        let topLevelFolders = ImportedBookmarks.TopLevelFolders(bookmarkBar: bookmarkBar, otherBookmarks: otherBookmarks)
+        let importedBookmarks = ImportedBookmarks(topLevelFolders: topLevelFolders)
+
+        // Import bookmarks once, and then again to test duplicates
+        _ = bookmarkStore.importBookmarks(importedBookmarks)
+        let result = bookmarkStore.importBookmarks(importedBookmarks)
+
+        XCTAssertEqual(result.successful, 0)
+        XCTAssertEqual(result.duplicates, 1)
+        XCTAssertEqual(result.failed, 0)
+
+        let loadingExpectation = self.expectation(description: "Loading")
+
+        bookmarkStore.loadAll(type: .bookmarks) { bookmarks, error in
+            XCTAssertNotNil(bookmarks)
+            XCTAssertNil(error)
+            XCTAssert(bookmarks?.count == 1)
+
+            loadingExpectation.fulfill()
+        }
+
+        waitForExpectations(timeout: 3, handler: nil)
+    }
 
 }

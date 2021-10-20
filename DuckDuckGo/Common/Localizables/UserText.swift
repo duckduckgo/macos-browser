@@ -27,6 +27,8 @@ struct UserText {
     static let save = NSLocalizedString("save", value: "Save", comment: "Save button")
     static let edit = NSLocalizedString("edit", value: "Edit", comment: "Edit button")
     static let remove = NSLocalizedString("remove", value: "Remove", comment: "Remove button")
+    static let quit = NSLocalizedString("quit", value: "Quit", comment: "Quit button")
+    static let dontQuit = NSLocalizedString("dont.quit", value: "Don’t Quit", comment: "Don’t Quit button")
 
     static let duplicateTab = NSLocalizedString("duplicate.tab", value: "Duplicate Tab", comment: "Menu item. Duplicate as a verb")
     static let closeTab = NSLocalizedString("close.tab", value: "Close Tab", comment: "Menu item")
@@ -34,13 +36,13 @@ struct UserText {
     static let closeTabsToTheRight = NSLocalizedString("close.tabs.to.the.right", value: "Close Tabs to the Right", comment: "Menu item")
     static let openInNewTab = NSLocalizedString("open.in.new.tab", value: "Open in New Tab", comment: "Menu item that opens the link in a new tab")
     static let openInNewWindow = NSLocalizedString("open.in.new.window", value: "Open in New Window", comment: "Menu item that opens the link in a new window")
-    static let convertToTab = NSLocalizedString("convert.to.tab", value: "Convert to Tab", comment: "Menu item")
-    static let closeAllBurnerTabs = NSLocalizedString("close.all.burner.tabs", value: "Close All Burner Tabs", comment: "Menu item")
 
     static let tabHomeTitle = NSLocalizedString("tab.home.title", value: "Home", comment: "Tab home title")
     static let tabPreferencesTitle = NSLocalizedString("tab.preferences.title", value: "Preferences", comment: "Tab preferences title")
     static let tabBookmarksTitle = NSLocalizedString("tab.bookmarks.title", value: "Bookmarks", comment: "Tab bookmarks title")
     static let tabErrorTitle = NSLocalizedString("tab.error.title", value: "Oops!", comment: "Tab error title")
+
+    static let unknownErrorMessage = NSLocalizedString("error.unknown", value: "An unknown error has occurred", comment: "Error page subtitle")
 
     static let moveTabToNewWindow = NSLocalizedString("options.menu.move.tab.to.new.window",
                                                       value: "Move Tab to New Window",
@@ -56,7 +58,7 @@ struct UserText {
     static let burnAlertMessageText = NSLocalizedString("burn.alert.message.text",
                                                         value: "Are you sure you want to burn everything?",
                                                         comment: "")
-    static let burtAlertInformativeText = NSLocalizedString("burn.alert.informative.text",
+    static let burnAlertInformativeText = NSLocalizedString("burn.alert.informative.text",
                                                             value: "This will close all tabs and clear website data.",
                                                             comment: "")
     static let burn = NSLocalizedString("burn", value: "Burn", comment: "Burn button")
@@ -73,20 +75,21 @@ struct UserText {
     static let reloadPage = NSLocalizedString("reload.page", value: "Reload Page", comment: "Context menu item")
 
     static let openLinkInNewTab = NSLocalizedString("open.link.in.new.tab", value: "Open Link in New Tab", comment: "Context menu item")
-    static let openLinkInBurnerTab = NSLocalizedString("open.link.in.burner.tab", value: "Open Link in Burner Tab", comment: "Context menu item")
     static let openImageInNewTab = NSLocalizedString("open.image.in.new.tab", value: "Open Image in New Tab", comment: "Context menu item")
     static let copyImageAddress = NSLocalizedString("copy.image.address", value: "Copy Image Address", comment: "Context menu item")
     static let saveImageAs = NSLocalizedString("save.image.as", value: "Save Image As...", comment: "Context menu item")
     static let downloadLinkedFileAs = NSLocalizedString("save.image.as", value: "Download Linked File As...", comment: "Context menu item")
     static let searchWithDuckDuckGo = NSLocalizedString("search.with.DuckDuckGo", value: "Search with DuckDuckGo", comment: "Context menu item")
-    static let searchWithBurnerTab = NSLocalizedString("search.with.burnerTab", value: "Search with Burner Tab", comment: "Context menu item")
 
     static let plusButtonNewTabMenuItem = NSLocalizedString("menu.item.new.tab", value: "New Tab", comment: "Context menu item")
-    static let plusButtonNewBurnerTabMenuItem = NSLocalizedString("menu.item.new.burner.tab", value: "New Burner Tab", comment: "Context menu item")
 
     static let findInPage = NSLocalizedString("find.in.page", value: "%1$d of %2$d", comment: "Find in page status (e.g. 1 of 99)")
 
     static let moreMenuItem = NSLocalizedString("sharing.more", value: "More...", comment: "Sharing Menu -> More...")
+    static let findInPageMenuItem = NSLocalizedString("find.in.page.menu.item", value: "Find in Page", comment: "Menu item title")
+    static let shareMenuItem = NSLocalizedString("share.menu.item", value: "Share", comment: "Menu item title")
+    static let printMenuItem = NSLocalizedString("print.menu.item", value: "Print", comment: "Menu item title")
+    static let newWindowMenuItem = NSLocalizedString("new.window.menu.item", value: "New Window", comment: "Menu item title")
 
     static let fireproofSite = NSLocalizedString("options.menu.fireproof-site", value: "Fireproof Site", comment: "Context menu item")
     static let removeFireproofing = NSLocalizedString("options.menu.remove-fireproofing", value: "Remove Fireproofing", comment: "Context menu item")
@@ -108,7 +111,7 @@ struct UserText {
                                                                 value: "Fireproofing this site will keep you signed in after using the Fire Button.",
                                                                 comment: "Fireproof confirmation message")
 
-    static let passwordManagement = NSLocalizedString("passsword.management", value: "Logins", comment: "Used as title for password management user interface")
+    static let passwordManagement = NSLocalizedString("passsword.management", value: "Passwords and Logins", comment: "Used as title for password management user interface")
 
     static let bookmarks = NSLocalizedString("bookmarks", value: "Bookmarks", comment: "Button for bookmarks")
     static let bookmarksOpenInNewTabs = NSLocalizedString("bookmarks.open.in.new.tabs", value: "Open in New Tabs", comment: "Open all bookmarks in folder in new tabs")
@@ -212,15 +215,16 @@ struct UserText {
     static let initiateImport = NSLocalizedString("import.data.initiate", value: "Import", comment: "Button text for importing data")
     static let doneImporting = NSLocalizedString("import.data.done", value: "Done", comment: "Button text for finishing the data import")
 
-    static let chromiumPasswordImportDisclaimer = NSLocalizedString("import.chromium.disclaimer", value: "DuckDuckGo will need to access your keychain information", comment: "Warning text for the Chromium password import option")
-    static let firefoxPasswordImportDisclaimer = NSLocalizedString("import.firefox.disclaimer", value: "DuckDuckGo will request your Primary Password if one has been set", comment: "Warning text for the Chromium password import option")
+    static let chromiumPasswordImportDisclaimer = NSLocalizedString("import.chromium.disclaimer", value: "Your Keychain password is temporarily needed to import passwords.", comment: "Warning text for the Chromium password import option")
+    static let firefoxPasswordImportDisclaimer = NSLocalizedString("import.firefox.disclaimer", value: "Your Primary Password is temporarily needed to import passwords.", comment: "Warning text for the Chromium password import option")
 
     static let dataImportFailedTitle = NSLocalizedString("import.data.import-failed.title", value: "Import Failed", comment: "Alert title when the data import fails")
-    static func dataImportFailedBody(_ source: DataImport.Source) -> String {
+
+    static func dataImportFailedBody(_ source: DataImport.Source, errorMessage: String) -> String {
         let localized = NSLocalizedString("import.data.import-failed.body",
-                                          value: "Failed to import data from %@",
+                                          value: "Failed to import data from %@.\n\nError message: %@",
                                           comment: "Alert body text when the data import fails")
-        return String(format: localized, source.importSourceName)
+        return String(format: localized, source.importSourceName, errorMessage)
     }
 
     static let dataImportAlertImport = NSLocalizedString("import.data.alert.import", value: "Import", comment: "Import button for data import alerts")
@@ -242,14 +246,6 @@ struct UserText {
                                           comment: "Alert body text when the data import fails due to the browser being open")
         return String(format: localized, source.importSourceName)
     }
-
-    static func dataImportGenericFailure(_ source: DataImport.Source) -> String {
-        let localized = NSLocalizedString("import.data.failure",
-                                          value: "Failed to import data from %@",
-                                          comment: "Generic alert body text when the data import fails")
-        return String(format: localized, source.importSourceName)
-    }
-
 
     static func dataImportQuitBrowserTitle(_ source: DataImport.Source) -> String {
         let localized = NSLocalizedString("import.data.quit-browser.title",
@@ -286,6 +282,33 @@ struct UserText {
         return String(format: localized, String(totalSuccessfulImports))
     }
 
+    static func successfulBookmarkImports(_ totalSuccessfulImports: Int) -> String {
+        let localized = NSLocalizedString("import.bookmarks.browser.successful-imports",
+                                          value: "Bookmarks: %@",
+                                          comment: "Status text indicating the number of successful browser bookmark imports")
+        return String(format: localized, String(totalSuccessfulImports))
+    }
+
+    static func duplicateBookmarkImports(_ totalFailedImports: Int) -> String {
+        let localized = NSLocalizedString("import.bookmarks.browser.duplicate-imports",
+                                          value: "Duplicate Bookmarks Skipped: %@",
+                                          comment: "Status text indicating the number of duplicate browser bookmark imports")
+        return String(format: localized, String(totalFailedImports))
+    }
+
+    static func failedBookmarkImports(_ totalFailedImports: Int) -> String {
+        let localized = NSLocalizedString("import.bookmarks.browser.failed-imports",
+                                          value: "Failed Imports: %@",
+                                          comment: "Status text indicating the number of failed browser bookmark imports")
+        return String(format: localized, String(totalFailedImports))
+    }
+
+    static let bookmarkImportSafariPermissionDescription = NSLocalizedString("import.bookmarks.safari.permission-description", value: "DuckDuckGo needs your permission to read the Safari bookmarks file. Select the Bookmarks.plist file to import bookmarks.", comment: "Description text for the Safari bookmark import permission screen")
+    static let bookmarkImportSafariRequestPermissionButtonTitle = NSLocalizedString("import.bookmarks.safari.permission-button.title", value: "Select Bookmarks File...", comment: "Text for the Safari bookmark import permission button")
+
+    static let bookmarkImportBookmarksBar = NSLocalizedString("import.bookmarks.folder.bookmarks-bar", value: "Bookmarks Bar", comment: "Title text for Bookmarks Bar import folder")
+    static let bookmarkImportOtherBookmarks = NSLocalizedString("import.bookmarks.folder.other-bookmarks", value: "Other Bookmarks", comment: "Title text for Other Bookmarks import folder")
+
     static let openDeveloperTools = NSLocalizedString("main.menu.show.inspector", value: "Open Developer Tools", comment: "Show Web Inspector/Open Developer Tools")
     static let closeDeveloperTools = NSLocalizedString("main.menu.close.inspector", value: "Close Developer Tools", comment: "Hide Web Inspector/Close Developer Tools")
 
@@ -296,5 +319,23 @@ struct UserText {
     static let authAlertPasswordPlaceholder = NSLocalizedString("auth.alert.password.placeholder", value: "Password", comment: "Authentication Password field placeholder")
     static let authAlertLogInButtonTitle = NSLocalizedString("auth.alert.login.button", value: "Sign In", comment: "Authentication Alert Sign In Button")
 
+    static let openDownloads = NSLocalizedString("main.menu.show.downloads", value: "Show Downloads", comment: "Show Downloads Popover")
+    static let closeDownloads = NSLocalizedString("main.menu.close.downloads", value: "Hide Downloads", comment: "Hide Downloads Popover")
+
+    static let downloadedFileRemoved = NSLocalizedString("downloads.error.removed", value: "Removed", comment: "Short error description when downloaded file removed from Downloads folder")
+    static let downloadStarting = NSLocalizedString("download.starting", value: "Starting download…", comment: "Download being initiated information text")
+    static let downloadFinishing = NSLocalizedString("download.finishing", value: "Finishing download…", comment: "Download being finished information text")
+    static let downloadCanceled = NSLocalizedString("downloads.error.canceled", value: "Canceled", comment: "Short error description when downloaded file download was canceled")
+    static let downloadFailedToMoveFileToDownloads = NSLocalizedString("downloads.error.move.failed", value: "Could not move file to Downloads", comment: "Short error description when could not move downloaded file to the Downloads folder")
+    static let downloadFailed = NSLocalizedString("downloads.error.other", value: "Error", comment: "Short error description when Download failed")
+
+    static let cancelDownloadToolTip = NSLocalizedString("downloads.tooltip.cancel", value: "Cancel Download", comment: "Mouse-over tooltip for Cancel Download button")
+    static let restartDownloadToolTip = NSLocalizedString("downloads.tooltip.restart", value: "Restart Download", comment: "Mouse-over tooltip for Restart Download button")
+    static let redownloadToolTip = NSLocalizedString("downloads.tooltip.redownload", value: "Download Again", comment: "Mouse-over tooltip for Download [deleted file] Again button")
+    static let revealToolTip = NSLocalizedString("downloads.tooltip.reveal", value: "Show in Finder", comment: "Mouse-over tooltip for Show in Finder button")
+
+    static let downloadsActiveAlertTitle = NSLocalizedString("downloads.active.alert.title", value: "A download is in progress.", comment: "Alert title when trying to quit application while files are being downloaded")
+    static let downloadsActiveAlertMessageFormat = NSLocalizedString("downloads.active.alert.message.format", value: "Are you sure you want to quit? DuckDuckGo Privacy Browser is currently downloading “%@”%@. If you quit now DuckDuckGo Privacy Browser won’t finish downloading this file.", comment: "Alert text format when trying to quit application while file “filename”[, and others] are being downloaded")
+    static let downloadsActiveAlertMessageAndOthers = NSLocalizedString("downloads.active.alert.message.and.others", value: ", and other files", comment: "Alert text format element for “, and other files”")
 
 }

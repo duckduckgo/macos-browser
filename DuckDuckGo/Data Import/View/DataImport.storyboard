@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<document type="com.apple.InterfaceBuilder3.Cocoa.Storyboard.XIB" version="3.0" toolsVersion="18122" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none" useAutolayout="YES">
+<document type="com.apple.InterfaceBuilder3.Cocoa.Storyboard.XIB" version="3.0" toolsVersion="19162" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none" useAutolayout="YES">
     <dependencies>
         <deployment identifier="macosx"/>
-        <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="18122"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="19162"/>
         <capability name="Named colors" minToolsVersion="9.0"/>
         <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
     </dependencies>
@@ -14,29 +14,42 @@
                     <view key="view" translatesAutoresizingMaskIntoConstraints="NO" id="tOy-S4-hL0">
                         <rect key="frame" x="0.0" y="0.0" width="522" height="329"/>
                         <subviews>
-                            <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="0i7-MK-KZ1">
-                                <rect key="frame" x="18" y="294" width="136" height="15"/>
-                                <textFieldCell key="cell" lineBreakMode="clipping" title="Import Browser Data" id="Qne-Wm-qAI">
-                                    <font key="font" size="13" name="SFProText-Semibold"/>
-                                    <color key="textColor" name="labelColor" catalog="System" colorSpace="catalog"/>
-                                    <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
-                                </textFieldCell>
-                            </textField>
-                            <popUpButton verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="sh9-5v-T9e" userLabel="Import Source Picker">
-                                <rect key="frame" x="17" y="242" width="207" height="25"/>
-                                <constraints>
-                                    <constraint firstAttribute="width" priority="500" constant="200" id="gkZ-Iu-IBm"/>
-                                </constraints>
-                                <popUpButtonCell key="cell" type="push" title="CSV" bezelStyle="rounded" alignment="left" lineBreakMode="truncatingTail" state="on" borderStyle="borderAndBezel" imageScaling="proportionallyDown" inset="2" selectedItem="JdU-Ne-uLi" id="6q4-5Y-MHI" userLabel="CSV">
-                                    <behavior key="behavior" lightByBackground="YES" lightByGray="YES"/>
-                                    <font key="font" metaFont="menu"/>
-                                    <menu key="menu" id="6wh-Tc-88e">
-                                        <items>
-                                            <menuItem title="CSV" state="on" id="JdU-Ne-uLi" userLabel="CSV"/>
-                                        </items>
-                                    </menu>
-                                </popUpButtonCell>
-                            </popUpButton>
+                            <stackView distribution="fill" orientation="vertical" alignment="leading" spacing="18" horizontalStackHuggingPriority="249.99998474121094" verticalStackHuggingPriority="249.99998474121094" detachesHiddenViews="YES" translatesAutoresizingMaskIntoConstraints="NO" id="Uip-wv-e5R">
+                                <rect key="frame" x="20" y="256" width="200" height="53"/>
+                                <subviews>
+                                    <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="0i7-MK-KZ1">
+                                        <rect key="frame" x="-2" y="38" width="136" height="15"/>
+                                        <textFieldCell key="cell" lineBreakMode="clipping" title="Import Browser Data" id="Qne-Wm-qAI">
+                                            <font key="font" size="13" name="SFProText-Semibold"/>
+                                            <color key="textColor" name="labelColor" catalog="System" colorSpace="catalog"/>
+                                            <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
+                                        </textFieldCell>
+                                    </textField>
+                                    <popUpButton verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="sh9-5v-T9e" userLabel="Import Source Picker">
+                                        <rect key="frame" x="-3" y="-4" width="207" height="25"/>
+                                        <constraints>
+                                            <constraint firstAttribute="width" priority="500" constant="200" id="gkZ-Iu-IBm"/>
+                                        </constraints>
+                                        <popUpButtonCell key="cell" type="push" title="CSV" bezelStyle="rounded" alignment="left" lineBreakMode="truncatingTail" state="on" borderStyle="borderAndBezel" imageScaling="proportionallyDown" inset="2" selectedItem="JdU-Ne-uLi" id="6q4-5Y-MHI" userLabel="CSV">
+                                            <behavior key="behavior" lightByBackground="YES" lightByGray="YES"/>
+                                            <font key="font" metaFont="menu"/>
+                                            <menu key="menu" id="6wh-Tc-88e">
+                                                <items>
+                                                    <menuItem title="CSV" state="on" id="JdU-Ne-uLi" userLabel="CSV"/>
+                                                </items>
+                                            </menu>
+                                        </popUpButtonCell>
+                                    </popUpButton>
+                                </subviews>
+                                <visibilityPriorities>
+                                    <integer value="1000"/>
+                                    <integer value="1000"/>
+                                </visibilityPriorities>
+                                <customSpacing>
+                                    <real value="3.4028234663852886e+38"/>
+                                    <real value="3.4028234663852886e+38"/>
+                                </customSpacing>
+                            </stackView>
                             <button verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="p3M-G6-gOX">
                                 <rect key="frame" x="434" y="13" width="75" height="32"/>
                                 <buttonCell key="cell" type="push" title="Import" bezelStyle="rounded" alignment="center" enabled="NO" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="HD2-Mw-Fjl">
@@ -64,23 +77,20 @@ Gw
                                 </connections>
                             </button>
                             <customView translatesAutoresizingMaskIntoConstraints="NO" id="Bde-GS-Qx1">
-                                <rect key="frame" x="0.0" y="60" width="522" height="168"/>
+                                <rect key="frame" x="0.0" y="60" width="522" height="178"/>
                             </customView>
                         </subviews>
                         <constraints>
                             <constraint firstAttribute="trailing" secondItem="p3M-G6-gOX" secondAttribute="trailing" constant="20" symbolic="YES" id="2Pk-Jt-TVr"/>
                             <constraint firstItem="p3M-G6-gOX" firstAttribute="leading" secondItem="UkV-S4-sID" secondAttribute="trailing" constant="12" symbolic="YES" id="2q4-wX-FIX"/>
-                            <constraint firstItem="0i7-MK-KZ1" firstAttribute="top" secondItem="tOy-S4-hL0" secondAttribute="top" constant="20" symbolic="YES" id="Aep-ee-MBT"/>
                             <constraint firstAttribute="bottom" secondItem="UkV-S4-sID" secondAttribute="bottom" constant="20" symbolic="YES" id="Dcb-ww-ZTA"/>
-                            <constraint firstItem="Bde-GS-Qx1" firstAttribute="top" secondItem="sh9-5v-T9e" secondAttribute="bottom" constant="18" id="EEW-EO-4Iy"/>
                             <constraint firstItem="Bde-GS-Qx1" firstAttribute="leading" secondItem="tOy-S4-hL0" secondAttribute="leading" id="GQY-oe-i7P"/>
-                            <constraint firstAttribute="trailing" relation="greaterThanOrEqual" secondItem="0i7-MK-KZ1" secondAttribute="trailing" constant="20" symbolic="YES" id="Oab-xU-Wp2"/>
-                            <constraint firstItem="sh9-5v-T9e" firstAttribute="leading" secondItem="tOy-S4-hL0" secondAttribute="leading" constant="20" symbolic="YES" id="Spt-Wv-v3y"/>
+                            <constraint firstItem="Bde-GS-Qx1" firstAttribute="top" secondItem="Uip-wv-e5R" secondAttribute="bottom" constant="18" id="Q0u-xS-QGQ"/>
                             <constraint firstAttribute="bottom" secondItem="p3M-G6-gOX" secondAttribute="bottom" constant="20" symbolic="YES" id="d6F-cy-53u"/>
-                            <constraint firstItem="0i7-MK-KZ1" firstAttribute="leading" secondItem="tOy-S4-hL0" secondAttribute="leading" constant="20" symbolic="YES" id="g7P-bX-xpj"/>
+                            <constraint firstItem="Uip-wv-e5R" firstAttribute="top" secondItem="tOy-S4-hL0" secondAttribute="top" constant="20" symbolic="YES" id="lnT-bZ-UVf"/>
                             <constraint firstAttribute="trailing" secondItem="Bde-GS-Qx1" secondAttribute="trailing" id="mm5-fe-nTF"/>
+                            <constraint firstItem="Uip-wv-e5R" firstAttribute="leading" secondItem="tOy-S4-hL0" secondAttribute="leading" constant="20" symbolic="YES" id="nWz-Kd-2rP"/>
                             <constraint firstItem="p3M-G6-gOX" firstAttribute="top" secondItem="Bde-GS-Qx1" secondAttribute="bottom" constant="20" id="oji-iH-bCG"/>
-                            <constraint firstItem="sh9-5v-T9e" firstAttribute="top" secondItem="0i7-MK-KZ1" secondAttribute="bottom" constant="28" id="zOc-EF-N9F"/>
                         </constraints>
                     </view>
                     <connections>
@@ -92,7 +102,7 @@ Gw
                 </viewController>
                 <customObject id="9uD-mB-xHs" userLabel="First Responder" customClass="NSResponder" sceneMemberID="firstResponder"/>
             </objects>
-            <point key="canvasLocation" x="75" y="146"/>
+            <point key="canvasLocation" x="75" y="145.5"/>
         </scene>
         <!--CSV Import Summary View Controller-->
         <scene sceneID="lq1-B2-i1k">
@@ -188,11 +198,11 @@ Gw
             <objects>
                 <viewController storyboardIdentifier="BrowserImportSummaryViewController" id="XjS-hv-All" customClass="BrowserImportSummaryViewController" customModule="DuckDuckGo_Privacy_Browser" customModuleProvider="target" sceneMemberID="viewController">
                     <view key="view" id="ux1-hA-I34">
-                        <rect key="frame" x="0.0" y="0.0" width="509" height="42"/>
+                        <rect key="frame" x="0.0" y="0.0" width="509" height="114"/>
                         <autoresizingMask key="autoresizingMask"/>
                         <subviews>
                             <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="pLM-zg-r5i">
-                                <rect key="frame" x="18" y="26" width="473" height="16"/>
+                                <rect key="frame" x="18" y="98" width="473" height="16"/>
                                 <textFieldCell key="cell" lineBreakMode="clipping" title="Import Complete:" id="fnj-an-rLQ">
                                     <font key="font" usesAppearanceFont="YES"/>
                                     <color key="textColor" name="labelColor" catalog="System" colorSpace="catalog"/>
@@ -200,8 +210,98 @@ Gw
                                 </textFieldCell>
                             </textField>
                             <stackView distribution="fillEqually" orientation="vertical" alignment="leading" horizontalStackHuggingPriority="249.99998474121094" verticalStackHuggingPriority="249.99998474121094" detachesHiddenViews="YES" translatesAutoresizingMaskIntoConstraints="NO" id="QDv-FK-S6H">
-                                <rect key="frame" x="20" y="0.0" width="469" height="16"/>
+                                <rect key="frame" x="20" y="0.0" width="469" height="88"/>
                                 <subviews>
+                                    <customView translatesAutoresizingMaskIntoConstraints="NO" id="EI8-cC-sJU" userLabel="Bookmarks Row">
+                                        <rect key="frame" x="0.0" y="72" width="469" height="16"/>
+                                        <subviews>
+                                            <imageView horizontalHuggingPriority="251" verticalHuggingPriority="251" translatesAutoresizingMaskIntoConstraints="NO" id="D8R-6v-Qkq" userLabel="Checkmark">
+                                                <rect key="frame" x="0.0" y="0.0" width="16" height="16"/>
+                                                <constraints>
+                                                    <constraint firstAttribute="width" constant="16" id="FBg-iI-FWI"/>
+                                                    <constraint firstAttribute="height" constant="16" id="Qeg-Zm-1DW"/>
+                                                </constraints>
+                                                <imageCell key="cell" refusesFirstResponder="YES" alignment="left" imageScaling="proportionallyDown" image="SuccessCheckmark" id="pGT-Zf-xge"/>
+                                            </imageView>
+                                            <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="7CX-U7-HBt">
+                                                <rect key="frame" x="22" y="0.0" width="449" height="16"/>
+                                                <textFieldCell key="cell" lineBreakMode="clipping" title="Bookmarks:" id="oUm-aK-rjB">
+                                                    <font key="font" metaFont="system"/>
+                                                    <color key="textColor" name="labelColor" catalog="System" colorSpace="catalog"/>
+                                                    <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
+                                                </textFieldCell>
+                                            </textField>
+                                        </subviews>
+                                        <constraints>
+                                            <constraint firstAttribute="bottom" secondItem="D8R-6v-Qkq" secondAttribute="bottom" id="K1F-Op-Kvk"/>
+                                            <constraint firstItem="7CX-U7-HBt" firstAttribute="top" secondItem="EI8-cC-sJU" secondAttribute="top" id="Mm7-O5-iZo"/>
+                                            <constraint firstItem="D8R-6v-Qkq" firstAttribute="top" secondItem="EI8-cC-sJU" secondAttribute="top" id="bPA-wY-RqQ"/>
+                                            <constraint firstAttribute="trailing" secondItem="7CX-U7-HBt" secondAttribute="trailing" id="bXn-d5-z5I"/>
+                                            <constraint firstAttribute="bottom" secondItem="7CX-U7-HBt" secondAttribute="bottom" id="cPC-WO-zSV"/>
+                                            <constraint firstItem="D8R-6v-Qkq" firstAttribute="leading" secondItem="EI8-cC-sJU" secondAttribute="leading" id="t8r-NL-Inh"/>
+                                            <constraint firstItem="7CX-U7-HBt" firstAttribute="leading" secondItem="D8R-6v-Qkq" secondAttribute="trailing" constant="8" symbolic="YES" id="tUj-1B-aIy"/>
+                                        </constraints>
+                                    </customView>
+                                    <customView translatesAutoresizingMaskIntoConstraints="NO" id="5kb-ea-sNd" userLabel="Duplicate Bookmarks Row">
+                                        <rect key="frame" x="0.0" y="48" width="469" height="16"/>
+                                        <subviews>
+                                            <imageView horizontalHuggingPriority="251" verticalHuggingPriority="251" translatesAutoresizingMaskIntoConstraints="NO" id="bFG-nJ-vRu" userLabel="Checkmark">
+                                                <rect key="frame" x="0.0" y="0.0" width="16" height="16"/>
+                                                <constraints>
+                                                    <constraint firstAttribute="width" constant="16" id="JGh-uX-9tc"/>
+                                                    <constraint firstAttribute="height" constant="16" id="bre-Nn-9Js"/>
+                                                </constraints>
+                                                <imageCell key="cell" refusesFirstResponder="YES" alignment="left" imageScaling="proportionallyDown" image="Error" id="4m3-Qd-nkg"/>
+                                            </imageView>
+                                            <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="DFV-JF-JSR">
+                                                <rect key="frame" x="22" y="0.0" width="449" height="16"/>
+                                                <textFieldCell key="cell" lineBreakMode="clipping" title="Duplicate Bookmarks:" id="GWR-I0-Uyv">
+                                                    <font key="font" metaFont="system"/>
+                                                    <color key="textColor" name="labelColor" catalog="System" colorSpace="catalog"/>
+                                                    <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
+                                                </textFieldCell>
+                                            </textField>
+                                        </subviews>
+                                        <constraints>
+                                            <constraint firstAttribute="bottom" secondItem="bFG-nJ-vRu" secondAttribute="bottom" id="8I3-Pr-xUp"/>
+                                            <constraint firstItem="bFG-nJ-vRu" firstAttribute="leading" secondItem="5kb-ea-sNd" secondAttribute="leading" id="J2S-7t-KSU"/>
+                                            <constraint firstItem="bFG-nJ-vRu" firstAttribute="top" secondItem="5kb-ea-sNd" secondAttribute="top" id="Q3Z-pC-0ZN"/>
+                                            <constraint firstItem="DFV-JF-JSR" firstAttribute="top" secondItem="5kb-ea-sNd" secondAttribute="top" id="SsG-nP-l7r"/>
+                                            <constraint firstAttribute="bottom" secondItem="DFV-JF-JSR" secondAttribute="bottom" id="Tnn-D4-uFq"/>
+                                            <constraint firstItem="DFV-JF-JSR" firstAttribute="leading" secondItem="bFG-nJ-vRu" secondAttribute="trailing" constant="8" symbolic="YES" id="d83-fg-MU2"/>
+                                            <constraint firstAttribute="trailing" secondItem="DFV-JF-JSR" secondAttribute="trailing" id="qi4-bG-6Db"/>
+                                        </constraints>
+                                    </customView>
+                                    <customView translatesAutoresizingMaskIntoConstraints="NO" id="fh4-V9-bq2" userLabel="Failed Bookmarks Row">
+                                        <rect key="frame" x="0.0" y="24" width="469" height="16"/>
+                                        <subviews>
+                                            <imageView horizontalHuggingPriority="251" verticalHuggingPriority="251" translatesAutoresizingMaskIntoConstraints="NO" id="9Ca-In-O4J" userLabel="Checkmark">
+                                                <rect key="frame" x="0.0" y="0.0" width="16" height="16"/>
+                                                <constraints>
+                                                    <constraint firstAttribute="height" constant="16" id="4TH-ph-EyV"/>
+                                                    <constraint firstAttribute="width" constant="16" id="QBc-Eb-wgS"/>
+                                                </constraints>
+                                                <imageCell key="cell" refusesFirstResponder="YES" alignment="left" imageScaling="proportionallyDown" image="Error" id="Yw4-sD-yEn"/>
+                                            </imageView>
+                                            <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="CFt-8G-txl">
+                                                <rect key="frame" x="22" y="0.0" width="449" height="16"/>
+                                                <textFieldCell key="cell" lineBreakMode="clipping" title="Failed Bookmarks:" id="gNe-J2-8zd">
+                                                    <font key="font" metaFont="system"/>
+                                                    <color key="textColor" name="labelColor" catalog="System" colorSpace="catalog"/>
+                                                    <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
+                                                </textFieldCell>
+                                            </textField>
+                                        </subviews>
+                                        <constraints>
+                                            <constraint firstItem="CFt-8G-txl" firstAttribute="leading" secondItem="9Ca-In-O4J" secondAttribute="trailing" constant="8" symbolic="YES" id="Cpy-Fg-9PK"/>
+                                            <constraint firstItem="CFt-8G-txl" firstAttribute="top" secondItem="fh4-V9-bq2" secondAttribute="top" id="Wk7-QG-9cV"/>
+                                            <constraint firstAttribute="bottom" secondItem="CFt-8G-txl" secondAttribute="bottom" id="b7C-8Y-hFW"/>
+                                            <constraint firstItem="9Ca-In-O4J" firstAttribute="top" secondItem="fh4-V9-bq2" secondAttribute="top" id="gn4-iy-KfY"/>
+                                            <constraint firstAttribute="bottom" secondItem="9Ca-In-O4J" secondAttribute="bottom" id="tA0-2V-5La"/>
+                                            <constraint firstAttribute="trailing" secondItem="CFt-8G-txl" secondAttribute="trailing" id="xCf-dh-aP2"/>
+                                            <constraint firstItem="9Ca-In-O4J" firstAttribute="leading" secondItem="fh4-V9-bq2" secondAttribute="leading" id="yES-8H-ugR"/>
+                                        </constraints>
+                                    </customView>
                                     <customView translatesAutoresizingMaskIntoConstraints="NO" id="Wd7-d2-7lv" userLabel="Passwords Row">
                                         <rect key="frame" x="0.0" y="0.0" width="469" height="16"/>
                                         <subviews>
@@ -239,8 +339,14 @@ Gw
                                 </constraints>
                                 <visibilityPriorities>
                                     <integer value="1000"/>
+                                    <integer value="1000"/>
+                                    <integer value="1000"/>
+                                    <integer value="1000"/>
                                 </visibilityPriorities>
                                 <customSpacing>
+                                    <real value="3.4028234663852886e+38"/>
+                                    <real value="3.4028234663852886e+38"/>
+                                    <real value="3.4028234663852886e+38"/>
                                     <real value="3.4028234663852886e+38"/>
                                 </customSpacing>
                             </stackView>
@@ -256,6 +362,12 @@ Gw
                         </constraints>
                     </view>
                     <connections>
+                        <outlet property="bookmarkDuplicatesLabel" destination="DFV-JF-JSR" id="PHV-Bv-8ut"/>
+                        <outlet property="bookmarkDuplicatesRow" destination="5kb-ea-sNd" id="ch4-0Z-Gna"/>
+                        <outlet property="bookmarkFailureLabel" destination="CFt-8G-txl" id="tU8-uZ-SPn"/>
+                        <outlet property="bookmarkFailureRow" destination="fh4-V9-bq2" id="aNl-xc-7pS"/>
+                        <outlet property="bookmarkSummaryLabel" destination="7CX-U7-HBt" id="w6y-Jb-Mhw"/>
+                        <outlet property="bookmarkSummaryRow" destination="EI8-cC-sJU" id="Ndo-kn-jNo"/>
                         <outlet property="passwordSummaryLabel" destination="MKa-AL-0wK" id="1OS-WG-uW7"/>
                         <outlet property="passwordSummaryRow" destination="Wd7-d2-7lv" id="RQ5-sc-EH4"/>
                         <outlet property="summaryRowsStackView" destination="QDv-FK-S6H" id="4tz-i9-mrO"/>
@@ -270,14 +382,14 @@ Gw
             <objects>
                 <viewController storyboardIdentifier="BrowserImportViewController" id="NYV-k5-Kxh" customClass="BrowserImportViewController" customModule="DuckDuckGo_Privacy_Browser" customModuleProvider="target" sceneMemberID="viewController">
                     <view key="view" id="jY2-NF-ftb">
-                        <rect key="frame" x="0.0" y="0.0" width="522" height="164"/>
+                        <rect key="frame" x="0.0" y="0.0" width="522" height="184"/>
                         <autoresizingMask key="autoresizingMask"/>
                         <subviews>
                             <stackView distribution="fill" orientation="vertical" alignment="leading" horizontalStackHuggingPriority="249.99998474121094" verticalStackHuggingPriority="249.99998474121094" detachesHiddenViews="YES" translatesAutoresizingMaskIntoConstraints="NO" id="ubR-la-MhZ">
-                                <rect key="frame" x="20" y="53" width="482" height="111"/>
+                                <rect key="frame" x="20" y="53" width="482" height="131"/>
                                 <subviews>
                                     <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="nz5-5G-Zws">
-                                        <rect key="frame" x="-2" y="95" width="89" height="16"/>
+                                        <rect key="frame" x="-2" y="115" width="89" height="16"/>
                                         <textFieldCell key="cell" lineBreakMode="clipping" title="Select Profile:" id="FRc-rN-qNZ">
                                             <font key="font" metaFont="system"/>
                                             <color key="textColor" name="labelColor" catalog="System" colorSpace="catalog"/>
@@ -285,7 +397,7 @@ Gw
                                         </textFieldCell>
                                     </textField>
                                     <popUpButton verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="YeL-CL-i2K">
-                                        <rect key="frame" x="-3" y="63" width="131" height="25"/>
+                                        <rect key="frame" x="-3" y="83" width="131" height="25"/>
                                         <popUpButtonCell key="cell" type="push" title="Browser Profile" bezelStyle="rounded" alignment="left" lineBreakMode="truncatingTail" state="on" borderStyle="borderAndBezel" imageScaling="proportionallyDown" inset="2" selectedItem="1g6-Jy-ahO" id="5eM-qQ-JZd">
                                             <behavior key="behavior" lightByBackground="YES" lightByGray="YES"/>
                                             <font key="font" metaFont="menu"/>
@@ -297,7 +409,7 @@ Gw
                                         </popUpButtonCell>
                                     </popUpButton>
                                     <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="cub-aJ-1ti">
-                                        <rect key="frame" x="-2" y="43" width="137" height="16"/>
+                                        <rect key="frame" x="-2" y="63" width="137" height="16"/>
                                         <textFieldCell key="cell" lineBreakMode="clipping" title="Select Data to Import:" id="Wce-nN-umc">
                                             <font key="font" usesAppearanceFont="YES"/>
                                             <color key="textColor" name="labelColor" catalog="System" colorSpace="catalog"/>
@@ -305,8 +417,18 @@ Gw
                                         </textFieldCell>
                                     </textField>
                                     <stackView distribution="fill" orientation="vertical" alignment="leading" spacing="4" horizontalStackHuggingPriority="249.99998474121094" verticalStackHuggingPriority="249.99998474121094" detachesHiddenViews="YES" translatesAutoresizingMaskIntoConstraints="NO" id="4W0-UP-EJ0" userLabel="Passwords Stack View">
-                                        <rect key="frame" x="0.0" y="0.0" width="354" height="35"/>
+                                        <rect key="frame" x="0.0" y="0.0" width="354" height="55"/>
                                         <subviews>
+                                            <button verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="w0g-Sf-AVj">
+                                                <rect key="frame" x="-2" y="38" width="94" height="18"/>
+                                                <buttonCell key="cell" type="check" title="Bookmarks" bezelStyle="regularSquare" imagePosition="left" state="on" inset="2" id="7dW-N0-mQW">
+                                                    <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
+                                                    <font key="font" metaFont="system"/>
+                                                </buttonCell>
+                                                <connections>
+                                                    <action selector="selectedImportOptionsChanged:" target="NYV-k5-Kxh" id="im1-Ix-Dme"/>
+                                                </connections>
+                                            </button>
                                             <button verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="GGX-yw-24n">
                                                 <rect key="frame" x="-2" y="18" width="91" height="18"/>
                                                 <buttonCell key="cell" type="check" title="Passwords" bezelStyle="regularSquare" imagePosition="left" state="on" inset="2" id="dM3-0G-bfD">
@@ -332,8 +454,10 @@ Gw
                                         <visibilityPriorities>
                                             <integer value="1000"/>
                                             <integer value="1000"/>
+                                            <integer value="1000"/>
                                         </visibilityPriorities>
                                         <customSpacing>
+                                            <real value="3.4028234663852886e+38"/>
                                             <real value="3.4028234663852886e+38"/>
                                             <real value="3.4028234663852886e+38"/>
                                         </customSpacing>
@@ -407,6 +531,7 @@ Gw
                         </constraints>
                     </view>
                     <connections>
+                        <outlet property="bookmarksCheckbox" destination="w0g-Sf-AVj" id="YdR-rV-R3z"/>
                         <outlet property="closeBrowserWarningLabel" destination="Lgq-ti-uAf" id="4UB-FQ-sWL"/>
                         <outlet property="closeBrowserWarningView" destination="1FX-Lc-Hmx" id="kwx-hK-hHy"/>
                         <outlet property="closeBrowserWarningViewHeightConstraint" destination="DBn-CK-Rzs" id="biF-aA-vwH"/>
@@ -522,8 +647,57 @@ Gw
             </objects>
             <point key="canvasLocation" x="75" y="739"/>
         </scene>
+        <!--Request File Permission View Controller-->
+        <scene sceneID="nXf-mC-09w">
+            <objects>
+                <viewController storyboardIdentifier="RequestFilePermissionViewController" id="iZm-08-VGi" customClass="RequestFilePermissionViewController" customModule="DuckDuckGo_Privacy_Browser" customModuleProvider="target" sceneMemberID="viewController">
+                    <view key="view" id="U4L-TI-4Tf">
+                        <rect key="frame" x="0.0" y="0.0" width="522" height="58"/>
+                        <autoresizingMask key="autoresizingMask"/>
+                        <subviews>
+                            <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="w0f-jN-bHR">
+                                <rect key="frame" x="18" y="42" width="486" height="16"/>
+                                <constraints>
+                                    <constraint firstAttribute="width" relation="lessThanOrEqual" constant="500" id="Fo0-Qg-iSF"/>
+                                </constraints>
+                                <textFieldCell key="cell" alignment="left" title="Description Label" id="YAw-q2-92i">
+                                    <font key="font" metaFont="system"/>
+                                    <color key="textColor" name="labelColor" catalog="System" colorSpace="catalog"/>
+                                    <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
+                                </textFieldCell>
+                            </textField>
+                            <button verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="E8r-SL-GMt">
+                                <rect key="frame" x="13" y="-5" width="179" height="32"/>
+                                <buttonCell key="cell" type="push" title="Select Bookmarks File..." bezelStyle="rounded" alignment="center" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="Tu7-Uq-DiB">
+                                    <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
+                                    <font key="font" metaFont="system"/>
+                                </buttonCell>
+                                <connections>
+                                    <action selector="presentBookmarksOpenPanel" target="iZm-08-VGi" id="HCG-T5-knH"/>
+                                </connections>
+                            </button>
+                        </subviews>
+                        <constraints>
+                            <constraint firstItem="E8r-SL-GMt" firstAttribute="top" secondItem="w0f-jN-bHR" secondAttribute="bottom" constant="20" id="Gyk-we-u4t"/>
+                            <constraint firstItem="w0f-jN-bHR" firstAttribute="top" secondItem="U4L-TI-4Tf" secondAttribute="top" id="Hxb-IO-jqO"/>
+                            <constraint firstAttribute="bottom" secondItem="E8r-SL-GMt" secondAttribute="bottom" constant="2" id="K7L-5y-2IB"/>
+                            <constraint firstItem="w0f-jN-bHR" firstAttribute="leading" secondItem="U4L-TI-4Tf" secondAttribute="leading" constant="20" id="NkU-Yh-Z9W"/>
+                            <constraint firstItem="E8r-SL-GMt" firstAttribute="leading" secondItem="U4L-TI-4Tf" secondAttribute="leading" constant="20" id="Xew-xH-vLg"/>
+                            <constraint firstAttribute="trailing" secondItem="w0f-jN-bHR" secondAttribute="trailing" constant="20" id="ckF-dP-pVK"/>
+                        </constraints>
+                    </view>
+                    <connections>
+                        <outlet property="descriptionLabel" destination="w0f-jN-bHR" id="aLt-Oz-g5x"/>
+                        <outlet property="requestPermissionButton" destination="E8r-SL-GMt" id="g4S-Y6-op6"/>
+                    </connections>
+                </viewController>
+                <customObject id="5C3-rs-E3p" userLabel="First Responder" customClass="NSResponder" sceneMemberID="firstResponder"/>
+            </objects>
+            <point key="canvasLocation" x="75" y="928"/>
+        </scene>
     </scenes>
     <resources>
+        <image name="Error" width="16" height="16"/>
         <image name="SuccessCheckmark" width="16" height="16"/>
         <image name="WarningTriangle" width="16" height="15"/>
         <namedColor name="ClearColor">

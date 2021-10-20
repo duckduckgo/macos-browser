@@ -90,9 +90,15 @@ internal class BaseBookmarkEntity {
 
 final class BookmarkFolder: BaseBookmarkEntity {
 
-    var parentFolderUUID: UUID?
+    static func bookmarkFoldersFetchRequest() -> NSFetchRequest<BookmarkManagedObject> {
+        let request = NSFetchRequest<BookmarkManagedObject>(entityName: "BookmarkManagedObject")
+        request.predicate = NSPredicate(format: "isFolder == YES")
+        return request
+    }
 
-    private(set) var children: [BaseBookmarkEntity] = []
+    let parentFolderUUID: UUID?
+    let children: [BaseBookmarkEntity]
+    let totalChildBookmarks: Int
 
     var childBookmarks: [Bookmark] {
         return children.compactMap { $0 as? Bookmark }
@@ -106,10 +112,16 @@ final class BookmarkFolder: BaseBookmarkEntity {
          title: String,
          parentFolderUUID: UUID? = nil,
          children: [BaseBookmarkEntity] = []) {
-        super.init(id: id, title: title, isFolder: true)
-
         self.parentFolderUUID = parentFolderUUID
         self.children = children
+
+        let childFolders = children.compactMap({ $0 as? BookmarkFolder })
+        let childBookmarks = children.compactMap({ $0 as? Bookmark })
+        let subfolderBookmarksCount = childFolders.reduce(0) { total, folder in return total + folder.totalChildBookmarks }
+
+        self.totalChildBookmarks = childBookmarks.count + subfolderBookmarksCount
+
+        super.init(id: id, title: title, isFolder: true)
     }
 }
 

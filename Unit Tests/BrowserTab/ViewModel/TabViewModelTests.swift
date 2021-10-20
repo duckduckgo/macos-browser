@@ -83,6 +83,38 @@ final class TabViewModelTests: XCTestCase {
         waitForExpectations(timeout: 1, handler: nil)
     }
 
+    func testWhenURLIsFileURLThenAddressBarIsFilePath() {
+        let tabViewModel = TabViewModel.aTabViewModel
+
+        let urlString = "file:///Users/Dax/file.txt"
+        tabViewModel.tab.url = URL.makeURL(from: urlString)
+
+        let addressBarStringExpectation = expectation(description: "Address bar string")
+
+        tabViewModel.$addressBarString.debounce(for: 0.1, scheduler: RunLoop.main).sink { _ in
+            XCTAssertEqual(tabViewModel.addressBarString, urlString)
+            XCTAssertEqual(tabViewModel.passiveAddressBarString, urlString)
+            addressBarStringExpectation.fulfill()
+        } .store(in: &cancellables)
+        waitForExpectations(timeout: 1, handler: nil)
+    }
+
+    func testWhenURLIsDataURLThenAddressBarIsDataURL() {
+        let tabViewModel = TabViewModel.aTabViewModel
+
+        let urlString = "data:,Hello%2C%20World%21"
+        tabViewModel.tab.url = URL.makeURL(from: urlString)
+
+        let addressBarStringExpectation = expectation(description: "Address bar string")
+
+        tabViewModel.$addressBarString.debounce(for: 0.1, scheduler: RunLoop.main).sink { _ in
+            XCTAssertEqual(tabViewModel.addressBarString, urlString)
+            XCTAssertEqual(tabViewModel.passiveAddressBarString, "data:")
+            addressBarStringExpectation.fulfill()
+        } .store(in: &cancellables)
+        waitForExpectations(timeout: 1, handler: nil)
+    }
+
     // MARK: - Title
 
     func testWhenURLIsNilThenTitleIsHome() {

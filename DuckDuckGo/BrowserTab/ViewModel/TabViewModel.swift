@@ -47,7 +47,12 @@ final class TabViewModel {
         }
     }
     @Published var progress: Double = 0.0
-    @Published var isErrorViewVisible: Bool = false {
+
+    struct ErrorViewState {
+        var isVisible: Bool = false
+        var message: String?
+    }
+    @Published var errorViewState = ErrorViewState() {
         didSet {
             updateAddressBarStrings()
             updateTitle()
@@ -78,6 +83,7 @@ final class TabViewModel {
         subscribeToFavicon()
         subscribeToTabError()
         subscribeToPermissions()
+        subscribeToWebViewDidFinishNavigation()
     }
 
     private func subscribeToUrl() {
@@ -99,7 +105,8 @@ final class TabViewModel {
     private func subscribeToTabError() {
         tab.$error.receive(on: DispatchQueue.main).sink { [weak self] _ in
             guard let self = self else { return }
-            self.isErrorViewVisible = self.tab.error != nil
+            self.errorViewState.isVisible = self.tab.error != nil
+            self.errorViewState.message = self.tab.error?.localizedDescription
         } .store(in: &cancellables)
     }
 
@@ -108,6 +115,12 @@ final class TabViewModel {
             .store(in: &cancellables)
         tab.permissions.$authorizationQuery.weakAssign(to: \.permissionAuthorizationQuery, on: self)
             .store(in: &cancellables)
+    }
+
+    private func subscribeToWebViewDidFinishNavigation() {
+        tab.webViewDidFinishNavigationPublisher.sink { [weak self] _ in
+            self?.sendAnimationTrigger()
+        }.store(in: &cancellables)
     }
 
     private func updateCanReload() {
@@ -123,14 +136,32 @@ final class TabViewModel {
     }
 
     private func updateAddressBarStrings() {
-        guard !isErrorViewVisible else {
+        guard !errorViewState.isVisible else {
             let failingUrl = tab.error?.failingUrl
             addressBarString = failingUrl?.absoluteString ?? ""
             passiveAddressBarString = failingUrl?.host?.drop(prefix: URL.HostPrefix.www.separated()) ?? ""
             return
         }
 
-        guard let url = tab.content.url, let host = url.host else {
+        guard let url = tab.content.url else {
+            addressBarString = ""
+            passiveAddressBarString = ""
+            return
+        }
+
+        if url.isFileURL {
+            addressBarString = url.absoluteString
+            passiveAddressBarString = url.absoluteString
+            return
+        }
+
+        if url.isDataURL {
+            addressBarString = url.absoluteString
+            passiveAddressBarString = "data:"
+            return
+        }
+
+        guard let host = url.host else {
             addressBarString = ""
             passiveAddressBarString = ""
             return
@@ -149,7 +180,7 @@ final class TabViewModel {
     }
 
     private func updateTitle() {
-        guard !isErrorViewVisible else {
+        guard !errorViewState.isVisible else {
             title = UserText.tabErrorTitle
             return
         }
@@ -171,7 +202,7 @@ final class TabViewModel {
     }
 
     private func updateFavicon() {
-        guard !isErrorViewVisible else {
+        guard !errorViewState.isVisible else {
             favicon = Favicon.defaultFavicon
             return
         }
@@ -193,6 +224,18 @@ final class TabViewModel {
             self.favicon = favicon
         } else {
             favicon = Favicon.defaultFavicon
+        }
+    }
+
+    // MARK: - Privacy icon animation
+
+    let trackersAnimationTriggerPublisher = PassthroughSubject<Void, Never>()
+
+    private var trackerAnimationTimer: Timer?
+
+    private func sendAnimationTrigger() {
+        if self.tab.trackerInfo?.trackersBlocked.count ?? 0 > 0 {
+            self.trackersAnimationTriggerPublisher.send()
         }
     }
 

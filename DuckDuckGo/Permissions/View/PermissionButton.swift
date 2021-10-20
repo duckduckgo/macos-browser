@@ -39,19 +39,19 @@ final class PermissionButton: AddressBarButton {
                 isHidden = true
             case .active:
                 self.image = activeImage ?? defaultImage
-                self.contentTintColor = activeTintColor
+                self.normalTintColor = activeTintColor
             case .paused:
                 self.image = mutedImage ?? defaultImage
-                self.contentTintColor = mutedTintColor
+                self.normalTintColor = mutedTintColor
             case .disabled, .denied, .revoking:
                 self.image = disabledImage ?? defaultImage
-                self.contentTintColor = disabledTintColor
+                self.normalTintColor = disabledTintColor
             case .requested:
                 self.image = defaultImage
-                self.contentTintColor = defaultTint
+                self.normalTintColor = defaultTint
             case .inactive:
                 self.image = inactiveImage ?? defaultImage
-                self.contentTintColor = inactiveTintColor ?? defaultTint
+                self.normalTintColor = inactiveTintColor ?? defaultTint
             }
             self.isHidden = isHidden
         }

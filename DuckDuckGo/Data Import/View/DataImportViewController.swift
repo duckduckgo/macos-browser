@@ -20,6 +20,7 @@ import AppKit
 import BrowserServicesKit
 import Combine
 
+// swiftlint:disable type_body_length
 final class DataImportViewController: NSViewController {
 
     enum Constants {
@@ -29,6 +30,7 @@ final class DataImportViewController: NSViewController {
 
     enum InteractionState {
         case unableToImport
+        case permissionsRequired([DataImport.DataType])
         case ableToImport
         case failedToImport
         case completedImport([DataImport.Summary])
@@ -48,23 +50,27 @@ final class DataImportViewController: NSViewController {
         didSet {
             renderCurrentViewState()
 
+            let bookmarkImporter = CoreDataBookmarkImporter(bookmarkManager: LocalBookmarkManager.shared)
+
             switch viewState.selectedImportSource {
             case .brave:
                 let secureVault = try? SecureVaultFactory.default.makeVault()
                 let secureVaultImporter = SecureVaultLoginImporter(secureVault: secureVault!)
-                self.dataImporter = BraveDataImporter(loginImporter: secureVaultImporter)
+                self.dataImporter = BraveDataImporter(loginImporter: secureVaultImporter, bookmarkImporter: bookmarkImporter)
             case .chrome:
                 let secureVault = try? SecureVaultFactory.default.makeVault()
                 let secureVaultImporter = SecureVaultLoginImporter(secureVault: secureVault!)
-                self.dataImporter = ChromeDataImporter(loginImporter: secureVaultImporter)
+                self.dataImporter = ChromeDataImporter(loginImporter: secureVaultImporter, bookmarkImporter: bookmarkImporter)
             case .edge:
                 let secureVault = try? SecureVaultFactory.default.makeVault()
                 let secureVaultImporter = SecureVaultLoginImporter(secureVault: secureVault!)
-                self.dataImporter = EdgeDataImporter(loginImporter: secureVaultImporter)
+                self.dataImporter = EdgeDataImporter(loginImporter: secureVaultImporter, bookmarkImporter: bookmarkImporter)
             case .firefox:
                 let secureVault = try? SecureVaultFactory.default.makeVault()
                 let secureVaultImporter = SecureVaultLoginImporter(secureVault: secureVault!)
-                self.dataImporter = FirefoxDataImporter(loginImporter: secureVaultImporter)
+                self.dataImporter = FirefoxDataImporter(loginImporter: secureVaultImporter, bookmarkImporter: bookmarkImporter)
+            case .safari:
+                self.dataImporter = SafariDataImporter(bookmarkImporter: bookmarkImporter)
             case .csv:
                 if !(self.dataImporter is CSVImporter) {
                     self.dataImporter = nil
@@ -102,8 +108,9 @@ final class DataImportViewController: NSViewController {
 
         let secureVault = try? SecureVaultFactory.default.makeVault()
         let secureVaultImporter = SecureVaultLoginImporter(secureVault: secureVault!)
+        let bookmarkImporter = CoreDataBookmarkImporter(bookmarkManager: LocalBookmarkManager.shared)
 
-        self.dataImporter = ChromeDataImporter(loginImporter: secureVaultImporter)
+        self.dataImporter = ChromeDataImporter(loginImporter: secureVaultImporter, bookmarkImporter: bookmarkImporter)
         importSourcePopUpButton.displayImportSources()
         renderCurrentViewState()
 
@@ -117,7 +124,12 @@ final class DataImportViewController: NSViewController {
             if source == .csv {
                 self.viewState = ViewState(selectedImportSource: source, interactionState: .unableToImport)
             } else {
-                self.viewState = ViewState(selectedImportSource: source, interactionState: .ableToImport)
+                if source == .safari {
+                    let state: InteractionState = SafariDataImporter.canReadBookmarksFile() ? .ableToImport : .permissionsRequired([.bookmarks])
+                    self.viewState = ViewState(selectedImportSource: source, interactionState: state)
+                } else {
+                    self.viewState = ViewState(selectedImportSource: source, interactionState: .ableToImport)
+                }
             }
         }
     }
@@ -133,18 +145,27 @@ final class DataImportViewController: NSViewController {
     private func updateActionButton(with interactionState: InteractionState) {
         switch interactionState {
         case .unableToImport:
+            importSourcePopUpButton.isHidden = false
             importButton.title = UserText.initiateImport
             importButton.isEnabled = false
             cancelButton.isHidden = false
         case .ableToImport:
+            importSourcePopUpButton.isHidden = false
             importButton.title = UserText.initiateImport
             importButton.isEnabled = true
             cancelButton.isHidden = false
+        case .permissionsRequired:
+            importSourcePopUpButton.isHidden = false
+            importButton.title = UserText.initiateImport
+            importButton.isEnabled = false
+            cancelButton.isHidden = false
         case .completedImport:
+            importSourcePopUpButton.isHidden = true
             importButton.title = UserText.doneImporting
             importButton.isEnabled = true
             cancelButton.isHidden = true
         case .failedToImport:
+            importSourcePopUpButton.isHidden = false
             importButton.title = UserText.initiateImport
             importButton.isEnabled = true
             cancelButton.isHidden = false
@@ -153,9 +174,13 @@ final class DataImportViewController: NSViewController {
 
     private func newChildViewController(for importSource: DataImport.Source, interactionState: InteractionState) -> NSViewController? {
         switch importSource {
-        case .brave, .chrome, .edge, .firefox:
+        case .brave, .chrome, .edge, .firefox, .safari:
             if case let .completedImport(summaryArray) = interactionState {
                 return BrowserImportSummaryViewController.create(importSummaries: summaryArray)
+            } else if case let .permissionsRequired(types) = interactionState {
+                let filePermissionViewController =  RequestFilePermissionViewController.create(importSource: importSource, permissionsRequired: types)
+                filePermissionViewController.delegate = self
+                return filePermissionViewController
             } else {
                 return createBrowserImportViewController(for: importSource)
             }
@@ -246,10 +271,11 @@ final class DataImportViewController: NSViewController {
             return
         }
 
-        let profile = (self.currentChildViewController as? BrowserImportViewController)?.selectedProfile
+        let browserViewController = self.currentChildViewController as? BrowserImportViewController
+        let importTypes = browserViewController?.selectedImportOptions ?? importer.importableTypes()
+        let profile = browserViewController?.selectedProfile
 
-        // When we support multiple types of data, this will change to check which ones were selected. For now, import everything.
-        importer.importData(types: importer.importableTypes(), from: profile) { result in
+        importer.importData(types: importTypes, from: profile) { result in
             switch result {
             case .success(let summary):
                 if summary.isEmpty {
@@ -258,7 +284,11 @@ final class DataImportViewController: NSViewController {
                     self.viewState.interactionState = .completedImport(summary)
                 }
 
-                self.fireImportLoginsPixelForSelectedImportSource()
+                if importTypes.contains(.logins) {
+                    self.fireImportLoginsPixelForSelectedImportSource()
+                } else if importTypes.contains(.bookmarks) {
+                    self.fireImportBookmarksPixelForSelectedImportSource()
+                }
             case .failure(let error):
                 switch error {
                 case .needsLoginPrimaryPassword:
@@ -287,7 +317,7 @@ final class DataImportViewController: NSViewController {
                 completeImport()
             }
         default:
-            let alert = NSAlert.importFailedAlert(source: viewState.selectedImportSource)
+            let alert = NSAlert.importFailedAlert(source: viewState.selectedImportSource, errorMessage: error.localizedDescription)
             alert.beginSheetModal(for: window, completionHandler: nil)
         }
     }
@@ -299,10 +329,23 @@ final class DataImportViewController: NSViewController {
         case .csv: Pixel.fire(.importedLogins(source: .csv))
         case .edge: Pixel.fire(.importedLogins(source: .edge))
         case .firefox: Pixel.fire(.importedLogins(source: .firefox))
+        case .safari: assertionFailure("Attempted to fire Safari login import pixel") // Safari cannot import logins
+        }
+    }
+
+    private func fireImportBookmarksPixelForSelectedImportSource() {
+        switch self.viewState.selectedImportSource {
+        case .brave: Pixel.fire(.importedBookmarks(source: .brave))
+        case .chrome: Pixel.fire(.importedBookmarks(source: .chrome))
+        case .csv: assertionFailure("Attempted to fire CSV bookmark import pixel")
+        case .edge: Pixel.fire(.importedBookmarks(source: .edge))
+        case .firefox: Pixel.fire(.importedBookmarks(source: .firefox))
+        case .safari: Pixel.fire(.importedBookmarks(source: .safari))
         }
     }
 
 }
+// swiftlint:enable type_body_length
 
 extension DataImportViewController: CSVImportViewControllerDelegate {
 
@@ -328,6 +371,14 @@ extension DataImportViewController: BrowserImportViewControllerDelegate {
 
     func browserImportViewController(_ viewController: BrowserImportViewController, didChangeSelectedImportOptions options: [DataImport.DataType]) {
         self.viewState.interactionState = options.isEmpty ? .unableToImport : .ableToImport
+    }
+
+}
+
+extension DataImportViewController: RequestFilePermissionViewControllerDelegate {
+
+    func requestFilePermissionViewControllerDidReceivePermission(_ viewController: RequestFilePermissionViewController) {
+        self.viewState.interactionState = .ableToImport
     }
 
 }

@@ -70,6 +70,10 @@ extension NSColor {
         NSColor(named: "TabMouseOverColor")!
     }
 
+    static var buttonMouseOverColor: NSColor {
+        NSColor(named: "ButtonMouseOverColor")!
+    }
+
     static var progressBarGradientDarkColor: NSColor {
         .controlAccentColor
     }
@@ -112,14 +116,6 @@ extension NSColor {
 
     static var buttonMouseDownColor: NSColor {
         NSColor(named: "ButtonMouseDownColor")!
-    }
-
-    static var burnerIndicatorSelectedColor: NSColor {
-        NSColor(named: "BurnerIndicatorSelectedColor")!
-    }
-
-    static var burnerIndicatorUnselectedColor: NSColor {
-        NSColor(named: "BurnerIndicatorUnselectedColor")!
     }
 
 }

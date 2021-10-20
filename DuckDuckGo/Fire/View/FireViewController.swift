@@ -82,31 +82,35 @@ final class FireViewController: NSViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
 
-        subscribeToProgress()
-        subscribeToShouldPreventUserInteraction()
         setupView()
         setupFireAnimation()
+    }
+
+    override func viewWillAppear() {
+        super.viewWillAppear()
+
+        self.view.superview?.isHidden = true
+        subscribeToShouldPreventUserInteraction()
+        progressIndicator.startAnimation(self)
+    }
+
+    override func viewDidDisappear() {
+        super.viewDidDisappear()
+
+        progressIndicator.stopAnimation(self)
     }
 
     private var shouldPreventUserInteractioCancellable: AnyCancellable?
     private func subscribeToShouldPreventUserInteraction() {
         shouldPreventUserInteractioCancellable = fireViewModel.shouldPreventUserInteraction
             .sink { [weak self] shouldPreventUserInteraction in
-                self?.view.isHidden = !shouldPreventUserInteraction
+                self?.view.superview?.isHidden = !shouldPreventUserInteraction
             }
-    }
-
-    private var progressCancellable: AnyCancellable?
-    private func subscribeToProgress() {
-        progressCancellable = fireViewModel.fire.$progress
-            .weakAssign(to: \.doubleValue, on: progressIndicator)
     }
 
     private func setupView() {
         fakeFireButton.wantsLayer = true
         fakeFireButton.layer?.backgroundColor = NSColor.buttonMouseDownColor.cgColor
-
-        view.isHidden = true
     }
 
     private func setupFireAnimation() {

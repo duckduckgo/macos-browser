@@ -46,20 +46,12 @@ extension AppDelegate {
         WindowsManager.openNewWindow()
     }
 
-    @IBAction func newBurnerTab(_ sender: Any?) {
-        WindowsManager.openNewWindow(withBurnerTab: true)
-    }
-
     @IBAction func openLocation(_ sender: Any?) {
         WindowsManager.openNewWindow()
     }
 
     @IBAction func closeAllWindows(_ sender: Any?) {
         WindowsManager.closeWindows()
-    }
-
-    @IBAction func closeAllBurnerTabs(_ sender: Any?) {
-        WindowsManager.closeAllBurnerTabs()
     }
 
     // MARK: - Help
@@ -178,10 +170,6 @@ extension MainViewController {
         tabCollectionViewModel.appendNewTab(with: .homepage)
     }
 
-    @IBAction func newBurnerTab(_ sender: Any?) {
-        tabCollectionViewModel.appendNewTab(with: .homepage, tabStorageType: .burner)
-    }
-
     @IBAction func openLocation(_ sender: Any?) {
         guard let addressBarTextField = navigationBarViewController?.addressBarViewController?.addressBarTextField else {
             os_log("MainViewController: Cannot reference address bar text field", type: .error)
@@ -240,6 +228,10 @@ extension MainViewController {
         }
 
         selectedTabViewModel.tab.webView.magnification = 1.0
+    }
+
+    @IBAction func toggleDownloads(_ sender: Any) {
+        navigationBarViewController.toggleDownloadsPopover()
     }
 
     // MARK: - History
@@ -551,6 +543,12 @@ extension MainViewController: NSMenuItemValidation {
              #selector(MainViewController.showPageResources(_:)):
             return tabCollectionViewModel.selectedTabViewModel?.canReload == true
 
+        case #selector(MainViewController.toggleDownloads(_:)):
+            let isDownloadsPopoverShown = self.navigationBarViewController.isDownloadsPopoverShown
+            menuItem.title = isDownloadsPopoverShown ? UserText.closeDownloads : UserText.openDownloads
+
+            return true
+
         default:
             return true
         }
@@ -566,11 +564,6 @@ extension AppDelegate: NSMenuItemValidation {
         switch menuItem.action {
         case #selector(AppDelegate.closeAllWindows(_:)):
             return !WindowControllersManager.shared.mainWindowControllers.isEmpty
-
-        case #selector(AppDelegate.closeAllBurnerTabs(_:)):
-            return !WindowControllersManager.shared.mainWindowControllers.compactMap {
-                $0.mainViewController.tabCollectionViewModel.tabCollection.tabs.contains { $0.tabStorageType == .burner } ? $0 : nil
-            }.isEmpty
 
         default:
             return true

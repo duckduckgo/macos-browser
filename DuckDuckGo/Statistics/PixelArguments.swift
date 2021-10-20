@@ -300,14 +300,20 @@ extension Pixel.Event {
     enum MoreResult: String, CustomStringConvertible {
         var description: String { rawValue }
 
+        case newTab = "new-tab"
         case cancelled = "cancelled"
-        case moveTabToNewWindow = "new-window"
+        case newWindow = "new-window"
         case feedback = "feedback"
         case bookmarksList = "bookmarks-list"
         case logins = "logins"
         case emailProtection = "email-protection"
+        case emailProtectionCreateAddress = "email-protection-create"
+        case emailProtectionOff = "email-protection-off"
         case fireproof = "fireproof"
         case preferences = "preferences"
+        case downloads = "downloads"
+        case findInPage = "find-in-page"
+        case print = "print"
     }
 
     enum RefreshAccessPoint: String, CustomStringConvertible {
@@ -352,6 +358,7 @@ extension Pixel.Event {
         case csv = "source-csv"
         case edge = "source-edge"
         case firefox = "source-firefox"
+        case safari = "source-safari"
     }
 
 }

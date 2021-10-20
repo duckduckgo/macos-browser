@@ -28,6 +28,8 @@ final class UserScripts {
     let contentBlockerScript = ContentBlockerUserScript()
     let contentBlockerRulesScript = ContentBlockerRulesUserScript()
     let autofillScript = AutofillUserScript()
+    let printingUserScript = PrintingUserScript()
+    let hoverUserScript = HoverUserScript()
     let debugScript = DebugUserScript()
 
     init() {
@@ -47,6 +49,8 @@ final class UserScripts {
         self.contentBlockerScript,
         self.contentBlockerRulesScript,
         self.pageObserverScript,
+        self.printingUserScript,
+        self.hoverUserScript,
         self.autofillScript
     ]
 

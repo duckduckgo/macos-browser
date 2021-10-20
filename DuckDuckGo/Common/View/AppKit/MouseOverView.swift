@@ -76,7 +76,10 @@ final class MouseOverView: NSView {
                 layer?.backgroundColor = mouseOverColor.cgColor
             }
         } else {
-            layer?.backgroundColor = NSColor.clear.cgColor
+            NSAnimationContext.runAnimationGroup { context in
+                context.allowsImplicitAnimation = true
+                layer?.backgroundColor = NSColor.clear.cgColor
+            }
         }
     }
 

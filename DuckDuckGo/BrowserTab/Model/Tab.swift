@@ -24,13 +24,15 @@ import BrowserServicesKit
 
 protocol TabDelegate: FileDownloadManagerDelegate {
     func tabDidStartNavigation(_ tab: Tab)
-    func tab(_ tab: Tab, requestedNewTab url: URL?, selected: Bool, isBurner: Bool)
+    func tab(_ tab: Tab, requestedNewTab url: URL?, selected: Bool)
     func tab(_ tab: Tab, willShowContextMenuAt position: NSPoint, image: URL?, link: URL?, selectedText: String?)
 	func tab(_ tab: Tab, requestedOpenExternalURL url: URL, forUserEnteredURL: Bool)
     func tab(_ tab: Tab, requestedSaveCredentials credentials: SecureVaultModels.WebsiteCredentials)
     func tab(_ tab: Tab,
              requestedBasicAuthenticationChallengeWith protectionSpace: URLProtectionSpace,
              completionHandler: @escaping (URLSession.AuthChallengeDisposition, URLCredential?) -> Void)
+
+    func tab(_ tab: Tab, didChangeHoverLink url: URL?)
 
     func tabPageDOMLoaded(_ tab: Tab)
     func closeTab(_ tab: Tab)
@@ -39,11 +41,6 @@ protocol TabDelegate: FileDownloadManagerDelegate {
 // swiftlint:disable type_body_length
 // swiftlint:disable file_length
 final class Tab: NSObject {
-
-    enum TabStorageType {
-        case `default`
-        case burner
-    }
 
     enum TabContent: Equatable {
         case homepage
@@ -83,7 +80,6 @@ final class Tab: NSObject {
     weak var delegate: TabDelegate?
 
     init(content: TabContent,
-         tabStorageType: TabStorageType = .default,
          faviconService: FaviconService = LocalFaviconService.shared,
          webCacheManager: WebCacheManager = .shared,
          webViewConfiguration: WebViewConfiguration? = nil,
@@ -97,7 +93,6 @@ final class Tab: NSObject {
          canBeClosedWithBack: Bool = false) {
 
         self.content = content
-        self.tabStorageType = tabStorageType
         self.faviconService = faviconService
         self.historyCoordinating = historyCoordinating
         self.title = title
@@ -108,11 +103,7 @@ final class Tab: NSObject {
         self.sessionStateData = sessionStateData
 
         let configuration = webViewConfiguration ?? WKWebViewConfiguration()
-        if tabStorageType == .burner {
-            configuration.applyBurnerConfiguration()
-        } else {
-            configuration.applyStandardConfiguration()
-        }
+        configuration.applyStandardConfiguration()
 
         webView = WebView(frame: CGRect.zero, configuration: configuration)
         permissions = PermissionModel(webView: webView)
@@ -134,7 +125,14 @@ final class Tab: NSObject {
         userScripts?.remove(from: webView.configuration.userContentController)
     }
 
+    // MARK: - Event Publishers
+
+    let webViewDidFinishNavigationPublisher = PassthroughSubject<Void, Never>()
+
+    // MARK: - Properties
+
     let webView: WebView
+
     var userEnteredUrl = true
 
     var contentChangeEnabled = true
@@ -162,8 +160,6 @@ final class Tab: NSObject {
 
         self.content = content
     }
-
-    let tabStorageType: TabStorageType
 
     @PublishedAfter var title: String?
     @PublishedAfter var error: Error?
@@ -211,7 +207,7 @@ final class Tab: NSObject {
 
     func download(from url: URL, promptForLocation: Bool = true) {
         webView.startDownload(URLRequest(url: url, cachePolicy: .returnCacheDataElseLoad)) { download in
-            FileDownloadManager.shared.add(download, delegate: self.delegate, promptForLocation: promptForLocation, postflight: .none)
+            FileDownloadManager.shared.add(download, delegate: self.delegate, location: promptForLocation ? .prompt : .auto, postflight: .none)
         }
     }
 
@@ -410,6 +406,8 @@ final class Tab: NSObject {
             userScripts.autofillScript.emailDelegate = emailManager
             userScripts.autofillScript.vaultDelegate = vaultManager
             userScripts.pageObserverScript.delegate = self
+            userScripts.printingUserScript.delegate = self
+            userScripts.hoverUserScript.delegate = self
 
             attachFindInPage()
 
@@ -447,8 +445,6 @@ final class Tab: NSObject {
     private var shouldStoreNextVisit = true
 
     func addVisit(of url: URL) {
-        guard tabStorageType != .burner else { return }
-
         guard shouldStoreNextVisit else {
             shouldStoreNextVisit = true
             return
@@ -464,6 +460,7 @@ final class Tab: NSObject {
 
     @Published var trackerInfo: TrackerInfo?
     @Published var serverTrust: ServerTrust?
+    @Published var connectionUpgradedTo: URL?
 
     private func updateDashboardInfo(oldUrl: URL? = nil, url: URL?) {
         guard let url = url, let host = url.host else {
@@ -476,6 +473,33 @@ final class Tab: NSObject {
             trackerInfo = TrackerInfo()
             serverTrust = nil
         }
+    }
+
+    private func resetConnectionUpgradedTo(navigationAction: WKNavigationAction) {
+        let isOnUpgradedPage = navigationAction.request.url == connectionUpgradedTo
+        if !navigationAction.isTargetingMainFrame || isOnUpgradedPage { return }
+        connectionUpgradedTo = nil
+    }
+
+    private func setConnectionUpgradedTo(_ upgradedUrl: URL, navigationAction: WKNavigationAction) {
+        if !navigationAction.isTargetingMainFrame { return }
+        connectionUpgradedTo = upgradedUrl
+    }
+
+}
+
+extension Tab: PrintingUserScriptDelegate {
+
+    func printingUserScriptDidRequestPrintController(_ script: PrintingUserScript) {
+        guard let window = webView.window,
+              let printOperation = webView.printOperation()
+              else { return }
+
+        if printOperation.view?.frame.isEmpty == true {
+            printOperation.view?.frame = webView.bounds
+        }
+
+        printOperation.runModal(for: window, delegate: nil, didRun: nil, contextInfo: nil)
     }
 
 }
@@ -624,11 +648,13 @@ extension Tab: WKNavigationDelegate {
             currentDownload = nil
         }
 
+        self.resetConnectionUpgradedTo(navigationAction: navigationAction)
+
         let isLinkActivated = navigationAction.navigationType == .linkActivated
         let isMiddleClicked = navigationAction.buttonNumber == Constants.webkitMiddleClick
         if isLinkActivated && NSApp.isCommandPressed || isMiddleClicked {
             decisionHandler(.cancel)
-            delegate?.tab(self, requestedNewTab: navigationAction.request.url, selected: NSApp.isShiftPressed, isBurner: tabStorageType == .burner)
+            delegate?.tab(self, requestedNewTab: navigationAction.request.url, selected: NSApp.isShiftPressed)
             return
         } else if isLinkActivated && NSApp.isOptionPressed && !NSApp.isCommandPressed {
             decisionHandler(.download(navigationAction, using: webView))
@@ -662,6 +688,7 @@ extension Tab: WKNavigationDelegate {
         HTTPSUpgrade.shared.isUpgradeable(url: url) { [weak self] isUpgradable in
             if isUpgradable, let upgradedUrl = url.toHttps() {
                 self?.webView.load(upgradedUrl)
+                self?.setConnectionUpgradedTo(upgradedUrl, navigationAction: navigationAction)
                 decisionHandler(.cancel)
                 return
             }
@@ -694,11 +721,12 @@ extension Tab: WKNavigationDelegate {
         // Unnecessary assignment triggers publishing
         if error != nil { error = nil }
 
-        self.invalidateSessionStateData()
+        invalidateSessionStateData()
     }
 
     func webView(_ webView: WKWebView, didFinish navigation: WKNavigation!) {
-        self.invalidateSessionStateData()
+        invalidateSessionStateData()
+        webViewDidFinishNavigationPublisher.send()
     }
 
     func webView(_ webView: WKWebView, didFail navigation: WKNavigation!, withError error: Error) {
@@ -706,7 +734,7 @@ extension Tab: WKNavigationDelegate {
         // https://app.asana.com/0/1199230911884351/1200381133504356/f
 //        hasError = true
 
-        self.invalidateSessionStateData()
+        invalidateSessionStateData()
     }
 
     func webView(_ webView: WKWebView, didFailProvisionalNavigation navigation: WKNavigation!, withError error: Error) {
@@ -738,11 +766,11 @@ extension Tab: WKNavigationDelegate {
 // universal download event handlers for Legacy _WKDownload and modern WKDownload
 extension Tab: WKWebViewDownloadDelegate {
     func webView(_ webView: WKWebView, navigationAction: WKNavigationAction, didBecomeDownload download: WebKitDownload) {
-        FileDownloadManager.shared.add(download, delegate: self.delegate, promptForLocation: false, postflight: .none)
+        FileDownloadManager.shared.add(download, delegate: self.delegate, location: .auto, postflight: .none)
     }
 
     func webView(_ webView: WKWebView, navigationResponse: WKNavigationResponse, didBecomeDownload download: WebKitDownload) {
-        FileDownloadManager.shared.add(download, delegate: self.delegate, promptForLocation: false, postflight: .none)
+        FileDownloadManager.shared.add(download, delegate: self.delegate, location: .auto, postflight: .none)
 
         // Note this can result in tabs being left open, e.g. download button on this page:
         // https://en.wikipedia.org/wiki/Guitar#/media/File:GuitareClassique5.png
@@ -780,6 +808,14 @@ fileprivate extension WKNavigationResponse {
         let contentDisposition = (response as? HTTPURLResponse)?.allHeaderFields["Content-Disposition"] as? String
         return contentDisposition?.hasPrefix("attachment") ?? false
     }
+}
+
+extension Tab: HoverUserScriptDelegate {
+
+    func hoverUserScript(_ script: HoverUserScript, didChange url: URL?) {
+        delegate?.tab(self, didChangeHoverLink: url)
+    }
+
 }
 
 // swiftlint:enable type_body_length

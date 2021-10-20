@@ -62,6 +62,9 @@ enum UserAgent {
         // fix broken spreadsheets
         regex("https://docs\\.google\\.com/spreadsheets/.*"): UserAgent.chrome,
 
+        // use safari when serving up PDFs from duckduckgo directly
+        regex("https://duckduckgo\\.com/.*\\.pdf"): UserAgent.safari,
+
         // use default WKWebView user agent for duckduckgo domain to remove CTA
         regex("https://duckduckgo\\.com/.*"): UserAgent.webViewDefault
     ]

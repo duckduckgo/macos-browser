@@ -130,12 +130,10 @@ class HistoryCoordinatorTests: XCTestCase {
 
         let fireproofDomains = FireproofDomains()
         fireproofDomains.addToAllowed(domain: fireproofDomain)
-
-        historyCoordinator.burnHistory(except: fireproofDomains)
-        Thread.sleep(forTimeInterval: 0.1)
-
-        XCTAssert(historyStoringMock.cleanAndReloadHistoryExteptions.count == 1)
-        XCTAssert(historyStoringMock.cleanAndReloadHistoryExteptions.first!.url.host!.hasPrefix(fireproofDomain))
+        historyCoordinator.burnHistory(except: fireproofDomains) {
+            XCTAssert(historyStoringMock.cleanAndReloadHistoryExceptions.count == 1)
+            XCTAssert(historyStoringMock.cleanAndReloadHistoryExceptions.first!.url.host!.hasPrefix(fireproofDomain))
+        }
     }
 
     func testWhenDomainIsVisitedForTheFirstTimeUsingTheNonRootUrl_ThenItsRootUrlIsGenerated() {
@@ -197,6 +195,37 @@ class HistoryCoordinatorTests: XCTestCase {
 
         XCTAssertEqual(url, historyStoringMock.savedHistoryEntries.last?.url)
         XCTAssertFalse(historyStoringMock.savedHistoryEntries.last?.failedToLoad ?? true)
+    }
+
+    func testWhenUrlHasNoTitle_ThenFetchingTitleReturnsNil() {
+        let (_, historyCoordinator) = HistoryCoordinator.aHistoryCoordinator
+
+        let url = URL.duckDuckGo
+        historyCoordinator.addVisit(of: url)
+        Thread.sleep(forTimeInterval: 0.1)
+
+        let title = historyCoordinator.title(for: url)
+        Thread.sleep(forTimeInterval: 0.1)
+
+        XCTAssertNil(title)
+    }
+
+    func testWhenUrlHasTitle_ThenTitleIsReturned() {
+        let (_, historyCoordinator) = HistoryCoordinator.aHistoryCoordinator
+
+        let url = URL.duckDuckGo
+        let title = "DuckDuckGo"
+
+        historyCoordinator.addVisit(of: url)
+        Thread.sleep(forTimeInterval: 0.1)
+
+        historyCoordinator.updateTitleIfNeeded(title: title, url: url)
+        Thread.sleep(forTimeInterval: 0.1)
+
+        let fetchedTitle = historyCoordinator.title(for: url)
+        Thread.sleep(forTimeInterval: 0.1)
+
+        XCTAssertEqual(title, fetchedTitle)
     }
 
 }

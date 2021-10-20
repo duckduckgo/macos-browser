@@ -123,7 +123,7 @@ final class MainWindowController: NSWindowController {
             .leading: .leading(),
             .trailing: .trailing(),
             .top: .top(),
-            .height: .const(38.0)
+            .height: .const(40.0)
         ])
         NSLayoutConstraint.activate(constraints)
     }
@@ -199,10 +199,8 @@ fileprivate extension NavigationBarViewController {
         return [goBackButton,
                 goForwardButton,
                 refreshButton,
-                feedbackButton,
                 optionsButton,
                 bookmarkListButton,
-                shareButton,
                 passwordManagementButton,
                 addressBarViewController?.addressBarTextField,
                 addressBarViewController?.passiveTextField

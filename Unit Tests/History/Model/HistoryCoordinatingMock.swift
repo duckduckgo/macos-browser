@@ -34,8 +34,9 @@ final class HistoryCoordinatingMock: HistoryCoordinating {
     }
 
     var burnHistoryCalled = false
-    func burnHistory(except fireproofDomains: FireproofDomains) {
+    func burnHistory(except fireproofDomains: FireproofDomains, completion: @escaping () -> Void) {
         burnHistoryCalled = true
+        completion()
     }
 
     var markDownloadUrlCalled = false
@@ -46,6 +47,12 @@ final class HistoryCoordinatingMock: HistoryCoordinating {
     var markFailedToLoadUrlCalled = false
     func markFailedToLoadUrl(_ url: URL) {
         markFailedToLoadUrlCalled = true
+    }
+
+    var titleForUrlCalled = false
+    func title(for url: URL) -> String? {
+        titleForUrlCalled = true
+        return nil
     }
 
 }

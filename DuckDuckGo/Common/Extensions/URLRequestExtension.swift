@@ -24,6 +24,7 @@ extension URLRequest {
         case acceptEncoding = "Accept-Encoding"
         case acceptLanguage = "Accept-Language"
         case userAgent = "User-Agent"
+        case referer = "Referer"
     }
 
     // Note: Change the user agent to macOS version before the release

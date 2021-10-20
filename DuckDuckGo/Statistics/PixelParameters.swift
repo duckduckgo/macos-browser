@@ -82,6 +82,7 @@ extension Pixel.Event {
              .manageBookmarks,
              .bookmarksList,
              .manageLogins,
+             .manageDownloads,
              .favorite,
              .navigation,
              .suggestionsDisplayed,
@@ -89,7 +90,8 @@ extension Pixel.Event {
              .moreMenu,
              .refresh,
              .importedLogins,
-             .exportedLogins:
+             .exportedLogins,
+             .importedBookmarks:
 
             return nil
         }

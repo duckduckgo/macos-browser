@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<document type="com.apple.InterfaceBuilder3.Cocoa.Storyboard.XIB" version="3.0" toolsVersion="18122" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none" useAutolayout="YES">
+<document type="com.apple.InterfaceBuilder3.Cocoa.Storyboard.XIB" version="3.0" toolsVersion="19162" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none" useAutolayout="YES">
     <dependencies>
         <deployment identifier="macosx"/>
-        <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="18122"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="19162"/>
     </dependencies>
     <scenes>
         <!--Application-->
@@ -84,11 +84,6 @@
                                                 <action selector="newTab:" target="Ady-hI-5gd" id="Gnb-ML-joG"/>
                                             </connections>
                                         </menuItem>
-                                        <menuItem title="New Burner Tab" keyEquivalent="T" id="ynd-51-l1j" userLabel="New Tab">
-                                            <connections>
-                                                <action selector="newBurnerTab:" target="Ady-hI-5gd" id="U9J-Ay-UIn"/>
-                                            </connections>
-                                        </menuItem>
                                         <menuItem title="Open Location..." keyEquivalent="l" id="xnU-dQ-JR1">
                                             <connections>
                                                 <action selector="openLocation:" target="Ady-hI-5gd" id="ggi-sX-Mec"/>
@@ -104,15 +99,6 @@
                                             <modifierMask key="keyEquivalentModifierMask" option="YES" command="YES"/>
                                             <connections>
                                                 <action selector="closeAllWindows:" target="Ady-hI-5gd" id="Mpf-Li-edD"/>
-                                            </connections>
-                                        </menuItem>
-                                        <menuItem title="Close All Burner Tabs" id="Ujb-fA-7Ww">
-                                            <string key="keyEquivalent" base64-UTF8="YES">
-CA
-</string>
-                                            <modifierMask key="keyEquivalentModifierMask" option="YES" command="YES"/>
-                                            <connections>
-                                                <action selector="closeAllBurnerTabs:" target="Ady-hI-5gd" id="8Og-OQ-HeA"/>
                                             </connections>
                                         </menuItem>
                                         <menuItem title="Close Tab" keyEquivalent="w" id="DVo-aG-piG">
@@ -385,6 +371,12 @@ CA
                                             </connections>
                                         </menuItem>
                                         <menuItem isSeparatorItem="YES" id="hB3-LF-h0Y"/>
+                                        <menuItem title="Open Downloads" keyEquivalent="j" id="qWL-J6-S8r">
+                                            <connections>
+                                                <action selector="toggleDownloads:" target="Ady-hI-5gd" id="UAV-kU-Drp"/>
+                                            </connections>
+                                        </menuItem>
+                                        <menuItem isSeparatorItem="YES" id="Ucx-oU-4kc"/>
                                         <menuItem title="Enter Full Screen" keyEquivalent="f" id="4J7-dP-txa">
                                             <modifierMask key="keyEquivalentModifierMask" control="YES" command="YES"/>
                                             <connections>
@@ -486,6 +478,13 @@ CA
                                             </connections>
                                         </menuItem>
                                         <menuItem isSeparatorItem="YES" id="aPG-H0-BrG"/>
+                                        <menuItem title="Import Bookmarks..." id="tNX-Bv-yM3" userLabel="Import Bookmarks...">
+                                            <modifierMask key="keyEquivalentModifierMask"/>
+                                            <connections>
+                                                <action selector="openImportBrowserDataWindow:" target="Ady-hI-5gd" id="NdE-Lt-CL5"/>
+                                            </connections>
+                                        </menuItem>
+                                        <menuItem isSeparatorItem="YES" id="xsn-Ak-LSd"/>
                                         <menuItem title="Favorites" image="Favorite" id="Y9I-ZC-gGg">
                                             <modifierMask key="keyEquivalentModifierMask"/>
                                             <menu key="submenu" id="Nxf-cs-uVD">

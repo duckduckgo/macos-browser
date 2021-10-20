@@ -1,0 +1,102 @@
+{
+   "checksum": "802283b8dd8e8a2b88069f89a9efa136",
+   "roots": {
+      "bookmark_bar": {
+         "children": [ {
+            "children": [  ],
+            "date_added": "13273183783627686",
+            "date_modified": "13273183783627687",
+            "guid": "3135643c-aacc-4b72-8e21-8de23ef5e0f5",
+            "id": "8",
+            "name": "Test Folder",
+            "type": "folder"
+         }, {
+            "date_added": "13273787267908194",
+            "guid": "d2ebfe02-39f0-4423-be5f-9d9c0c654f3f",
+            "id": "18",
+            "name": "DuckDuckGo",
+            "type": "url",
+            "url": "https://duckduckgo.com/"
+         } ],
+         "date_added": "13266254452854321",
+         "date_modified": "13273787267908194",
+         "guid": "00000000-0000-4000-a000-000000000002",
+         "id": "1",
+         "name": "Bookmarks Bar",
+         "type": "folder"
+      },
+      "other": {
+         "children": [ {
+            "children": [ {
+               "children": [ {
+                  "children": [ {
+                     "date_added": "13273183765341678",
+                     "guid": "bb49e254-b12d-411d-9592-1e302fbd482d",
+                     "id": "7",
+                     "name": "DuckDuckGo (Bottom Folder)",
+                     "type": "url",
+                     "url": "https://duckduckgo.com/"
+                  } ],
+                  "date_added": "13273787202895597",
+                  "date_modified": "13273787225035061",
+                  "guid": "d229e23b-cd85-4090-83ec-da035409dc15",
+                  "id": "14",
+                  "name": "Bottom Folder",
+                  "type": "folder"
+               }, {
+                  "date_added": "13273787234597638",
+                  "guid": "d062f9c8-77c7-44b2-92d1-dd0c6ad70e75",
+                  "id": "16",
+                  "name": "DuckDuckGo (Middle Folder)",
+                  "type": "url",
+                  "url": "https://duckduckgo.com/"
+               } ],
+               "date_added": "13273787193188040",
+               "date_modified": "13273787234597638",
+               "guid": "b1fa6493-eb59-4638-9416-5b2ed64604dc",
+               "id": "13",
+               "name": "Middle Folder",
+               "type": "folder"
+            }, {
+               "date_added": "13273787238916617",
+               "guid": "823a112d-f5c5-4ec6-bb22-5a1e840fba64",
+               "id": "17",
+               "name": "DuckDuckGo (Top Folder)",
+               "type": "url",
+               "url": "https://duckduckgo.com/"
+            } ],
+            "date_added": "13273183783628142",
+            "date_modified": "13273787238916617",
+            "guid": "b1010881-4457-4ae7-84fd-723d580f7573",
+            "id": "9",
+            "name": "Top Folder",
+            "type": "folder"
+         }, {
+            "children": [  ],
+            "date_added": "13273787217137440",
+            "date_modified": "13273787217137440",
+            "guid": "872a3780-55e6-4fae-9535-4b5a7c5135d9",
+            "id": "15",
+            "name": "Empty Folder",
+            "type": "folder"
+         } ],
+         "date_added": "13266254452854323",
+         "date_modified": "13273787217137542",
+         "guid": "00000000-0000-4000-a000-000000000003",
+         "id": "2",
+         "name": "Other Bookmarks",
+         "type": "folder"
+      },
+      "synced": {
+         "children": [  ],
+         "date_added": "13266254452854323",
+         "date_modified": "0",
+         "guid": "00000000-0000-4000-a000-000000000004",
+         "id": "3",
+         "name": "Mobile Bookmarks",
+         "type": "folder"
+      }
+   },
+   "sync_metadata": "<metadata>",
+   "version": 1
+}
