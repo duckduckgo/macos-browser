@@ -44,7 +44,11 @@ final class PrivacyConfigurationManager {
 
     static let shared = PrivacyConfigurationManager()
 
-    private(set) var config: PrivacyConfiguration
+    private(set) var config: PrivacyConfiguration {
+        didSet {
+            print("Config Set")
+        }
+    }
     private(set) var encodedConfigData: String
 
     private var configDataStore: ConfigurationStoring

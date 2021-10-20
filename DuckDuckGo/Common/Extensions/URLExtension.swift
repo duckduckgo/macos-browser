@@ -224,6 +224,11 @@ extension URL {
 
         return filename
     }
+    
+    public func isPart(ofDomain domain: String) -> Bool {
+        guard let host = host else { return false }
+        return host == domain || host.hasSuffix(".\(domain)")
+    }
 
     // MARK: - Validity
 
@@ -368,6 +373,38 @@ extension URL {
             try (self as NSURL).setResourceValue(quarantineProperties, forKey: .quarantinePropertiesKey)
         }
 
+    }
+    
+    // MARK: - GPC
+    
+    static func isGPCEnabled(url: URL,
+                             config: PrivacyConfigurationManager = PrivacyConfigurationManager.shared) -> Bool {
+        let enabledSites = [
+            "http://global-privacy-control.glitch.me",
+            "https://privacy-test-pages.glitch.me",
+            "https://washingtonpost.com",
+            "https://nytimes.com"
+        ]
+        
+        for gpcURL in enabledSites {
+            if let host = URL(string: gpcURL)?.host,
+               url.isPart(ofDomain: host) {
+                
+                // Check if url is on exception list
+                // Since headers are only enabled for a small numbers of sites
+                // perfrom this check here for efficency
+                let exceptions = config.tempUnprotectedDomains + config.exceptionsList(forFeature: .gpc)
+                for exception in exceptions {
+                    if url.isPart(ofDomain: exception) {
+                        return false
+                    }
+                }
+                
+                return true
+            }
+        }
+        
+        return false
     }
 
 }

@@ -581,7 +581,7 @@ DQ
             <color red="0.97647058823529409" green="0.98039215686274506" blue="0.98039215686274506" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
         </namedColor>
         <namedColor name="LinkBlueColor">
-            <color red="0.22352941176470587" green="0.41176470588235292" blue="0.93725490196078431" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+            <color red="0.22400000691413879" green="0.41200000047683716" blue="0.93699997663497925" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
         </namedColor>
     </resources>
 </document>

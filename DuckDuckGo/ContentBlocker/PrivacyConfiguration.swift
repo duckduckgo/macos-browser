@@ -28,6 +28,7 @@ public struct PrivacyConfiguration: Codable {
     
     public enum SupportedFeatures: String {
         case contentBlocking
+        case gpc
     }
     
     public init(features: [String: PrivacyFeature], unprotectedTemporary: [ExceptionEntry]) {

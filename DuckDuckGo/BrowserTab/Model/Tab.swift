@@ -624,6 +624,34 @@ extension Tab: WKNavigationDelegate {
 
     struct Constants {
         static let webkitMiddleClick = 4
+        static let secGPCHeader = "Sec-GPC"
+    }
+    
+    private func requestForGPC(basedOn incomingRequest: URLRequest) -> URLRequest? {
+        /*
+         For now, the GPC header is only applied to sites known to be honoring GPC (nytimes.com, washingtonpost.com),
+         while the DOM signal is available to all websites.
+         This is done to avoid an issue with back navigation when adding the header (e.g. with 't.co').
+         */
+        guard let url = incomingRequest.url, URL.isGPCEnabled(url: url) else { return nil }
+        
+        var request = incomingRequest
+        // Add Do Not sell header if needed
+        let settings = PrivacySecurityPreferences()
+        if settings.gpcEnabled && PrivacyConfigurationManager.shared.isEnabled(featureKey: .gpc) {
+            if let headers = request.allHTTPHeaderFields,
+               headers.firstIndex(where: { $0.key == Constants.secGPCHeader }) == nil {
+                request.addValue("1", forHTTPHeaderField: Constants.secGPCHeader)
+                return request
+            }
+        } else {
+            // Check if GPC header is still there and remove it
+            if let headers = request.allHTTPHeaderFields, headers.firstIndex(where: { $0.key == Constants.secGPCHeader }) != nil {
+                request.setValue(nil, forHTTPHeaderField: Constants.secGPCHeader)
+                return request
+            }
+        }
+        return nil
     }
 
     func webView(_ webView: WKWebView,
@@ -631,6 +659,13 @@ extension Tab: WKNavigationDelegate {
                  decisionHandler: @escaping (WKNavigationActionPolicy) -> Void) {
 
         webView.customUserAgent = UserAgent.for(navigationAction.request.url)
+                                                
+        if navigationAction.isTargetingMainFrame, navigationAction.navigationType != .backForward,
+            let request = requestForGPC(basedOn: navigationAction.request) {
+            decisionHandler(.cancel)
+            webView.load(request)
+            return
+        }
 
         if navigationAction.isTargetingMainFrame {
             currentDownload = nil
