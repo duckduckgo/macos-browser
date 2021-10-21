@@ -460,6 +460,7 @@ final class Tab: NSObject {
 
     @Published var trackerInfo: TrackerInfo?
     @Published var serverTrust: ServerTrust?
+    @Published var connectionUpgradedTo: URL?
 
     private func updateDashboardInfo(oldUrl: URL? = nil, url: URL?) {
         guard let url = url, let host = url.host else {
@@ -472,6 +473,17 @@ final class Tab: NSObject {
             trackerInfo = TrackerInfo()
             serverTrust = nil
         }
+    }
+
+    private func resetConnectionUpgradedTo(navigationAction: WKNavigationAction) {
+        let isOnUpgradedPage = navigationAction.request.url == connectionUpgradedTo
+        if !navigationAction.isTargetingMainFrame || isOnUpgradedPage { return }
+        connectionUpgradedTo = nil
+    }
+
+    private func setConnectionUpgradedTo(_ upgradedUrl: URL, navigationAction: WKNavigationAction) {
+        if !navigationAction.isTargetingMainFrame { return }
+        connectionUpgradedTo = upgradedUrl
     }
 
 }
@@ -643,6 +655,8 @@ extension Tab: WKNavigationDelegate {
             currentDownload = nil
         }
 
+        self.resetConnectionUpgradedTo(navigationAction: navigationAction)
+
         let isLinkActivated = navigationAction.navigationType == .linkActivated
         let isMiddleClicked = navigationAction.buttonNumber == Constants.webkitMiddleClick
         if isLinkActivated && NSApp.isCommandPressed || isMiddleClicked {
@@ -681,6 +695,7 @@ extension Tab: WKNavigationDelegate {
         HTTPSUpgrade.shared.isUpgradeable(url: url) { [weak self] isUpgradable in
             if isUpgradable, let upgradedUrl = url.toHttps() {
                 self?.webView.load(upgradedUrl)
+                self?.setConnectionUpgradedTo(upgradedUrl, navigationAction: navigationAction)
                 decisionHandler(.cancel)
                 return
             }

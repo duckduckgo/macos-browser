@@ -48,8 +48,9 @@ final class AddressBarViewController: NSViewController {
     private var selectedTabViewModelCancellable: AnyCancellable?
     private var addressBarTextFieldValueCancellable: AnyCancellable?
     private var passiveAddressBarStringCancellable: AnyCancellable?
-    private var isSuggestionsVisibleCancellable: AnyCancellable?
+    private var suggestionsVisibleCancellable: AnyCancellable?
     private var frameCancellable: AnyCancellable?
+    private var addressBarStringCancellable: AnyCancellable?
 
     private var progressCancellable: AnyCancellable?
     private var loadingCancellable: AnyCancellable?
@@ -103,6 +104,7 @@ final class AddressBarViewController: NSViewController {
         super.viewDidLayout()
 
         addressBarTextField.viewDidLayout()
+        addressBarTextField.makeMeFirstResponderIfNeeded()
     }
 
     @IBSegueAction func createAddressBarButtonsViewController(_ coder: NSCoder) -> AddressBarButtonsViewController? {
@@ -119,8 +121,17 @@ final class AddressBarViewController: NSViewController {
         selectedTabViewModelCancellable = tabCollectionViewModel.$selectedTabViewModel.receive(on: DispatchQueue.main).sink { [weak self] _ in
             self?.subscribeToPassiveAddressBarString()
             self?.subscribeToProgressEvents()
+            self?.subscribeToAddressBarString()
             // don't resign first responder on tab switching
             self?.clickPoint = nil
+        }
+    }
+
+    private func subscribeToAddressBarString() {
+        addressBarStringCancellable?.cancel()
+        guard let model = tabCollectionViewModel.selectedTabViewModel else { return }
+        addressBarStringCancellable = model.$addressBarString.receive(on: DispatchQueue.main).sink { [weak self] _ in
+            self?.addressBarTextField.makeMeFirstResponderIfNeeded()
         }
     }
 
@@ -194,13 +205,13 @@ final class AddressBarViewController: NSViewController {
 
     private func updateShadowView(firstResponder: Bool) {
         guard firstResponder else {
-            isSuggestionsVisibleCancellable = nil
+            suggestionsVisibleCancellable = nil
             frameCancellable = nil
             shadowView.removeFromSuperview()
             return
         }
 
-        isSuggestionsVisibleCancellable = addressBarTextField.isSuggestionWindowVisible.sink { [weak self] visible in
+        suggestionsVisibleCancellable = addressBarTextField.suggestionWindowVisible.sink { [weak self] visible in
             self?.shadowView.shadowSides = visible ? [.left, .top, .right] : .all
             self?.shadowView.shadowColor = visible ? .suggestionsShadowColor : .addressBarShadowColor
             self?.shadowView.shadowRadius = visible ? 8.0 : 4.0
