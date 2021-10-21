@@ -389,13 +389,16 @@ extension BrowserTabViewController: TabDelegate {
 
         // schedule an animation if needed
         var animationItem: DispatchWorkItem?
+        var delay: Double = 0
         if url == nil && hoverLabelContainer.alphaValue > 0 {
             // schedule a fade out
+            delay = 0.1
             animationItem = DispatchWorkItem { [weak self] in
                 self?.hoverLabelContainer.animator().alphaValue = 0
             }
         } else if hoverLabelContainer.alphaValue < 1 {
             // schedule a fade in
+            delay = 0.5
             animationItem = DispatchWorkItem { [weak self] in
                 self?.hoverLabel.stringValue = url?.absoluteString ?? ""
                 self?.hoverLabelContainer.animator().alphaValue = 1
@@ -406,7 +409,7 @@ extension BrowserTabViewController: TabDelegate {
 
         if let item = animationItem {
             hoverLabelWorkItem = item
-            DispatchQueue.main.asyncAfter(deadline: .now() + 0.5, execute: item)
+            DispatchQueue.main.asyncAfter(deadline: .now() + delay, execute: item)
         }
     }
 
