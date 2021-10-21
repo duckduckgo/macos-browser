@@ -33,7 +33,8 @@ protocol HistoryCoordinating: AnyObject {
     func markFailedToLoadUrl(_ url: URL)
     func title(for url: URL) -> String?
 
-    func burnHistory(except fireproofDomains: FireproofDomains, completion: @escaping () -> Void)
+    func burn(except fireproofDomains: FireproofDomains, completion: @escaping () -> Void)
+    func burnDomains(_ domains: Set<String>, completion: @escaping () -> Void)
 
 }
 
@@ -134,17 +135,33 @@ final class HistoryCoordinator: HistoryCoordinating {
         }
     }
 
-    func burnHistory(except fireproofDomains: FireproofDomains, completion: @escaping () -> Void) {
+    func burn(except fireproofDomains: FireproofDomains, completion: @escaping () -> Void) {
         queue.async(flags: .barrier) { [weak self] in
             guard let history = self?._history else { return }
-            let exceptions: [HistoryEntry] = history.compactMap({ historyEntry in
-                if fireproofDomains.isURLFireproof(url: historyEntry.url) {
-                    return historyEntry
-                }
-                return nil
-            })
+            let entries: [HistoryEntry] = history.filter { historyEntry in
+                return !fireproofDomains.isURLFireproof(url: historyEntry.url)
+            }
 
-            self?.cleanAndReloadHistory(until: .distantFuture, except: exceptions, completionHandler: { _ in
+            self?.removeEntries(entries, completionHandler: { _ in
+                DispatchQueue.main.async {
+                    completion()
+                }
+            })
+        }
+    }
+
+    func burnDomains(_ domains: Set<String>, completion: @escaping () -> Void) {
+        queue.async(flags: .barrier) { [weak self] in
+            guard let history = self?._history else { return }
+            let entries: [HistoryEntry] = history.filter { historyEntry in
+                guard let host = historyEntry.url.host else {
+                    return false
+                }
+
+                return host.isSubdomain(of: domains)
+            }
+
+            self?.removeEntries(entries, completionHandler: { _ in
                 DispatchQueue.main.async {
                     completion()
                 }
@@ -153,25 +170,51 @@ final class HistoryCoordinator: HistoryCoordinating {
     }
 
     @objc private func cleanOldHistory() {
-        cleanAndReloadHistory(until: .monthAgo, except: [])
+        clean(until: .monthAgo)
     }
 
-    private func cleanAndReloadHistory(until date: Date,
-                                       except exceptions: [HistoryEntry],
-                                       completionHandler: ((Error?) -> Void)? = nil) {
+    private func clean(until date: Date,
+                       completionHandler: ((Error?) -> Void)? = nil) {
         queue.async(flags: .barrier) { [weak self] in
             guard let self = self else { return }
 
             self.cancellables = Set<AnyCancellable>()
-            self.historyStoring.cleanAndReloadHistory(until: date, except: exceptions)
+            self.historyStoring.cleanOld(until: date)
                 .receive(on: self.queue, options: .init(flags: .barrier))
                 .sink(receiveCompletion: { completion in
                     switch completion {
                     case .finished:
-                        os_log("History cleaned and loaded successfully", log: .history)
+                        os_log("History cleaned successfully", log: .history)
                         completionHandler?(nil)
                     case .failure(let error):
-                        os_log("Cleaning and loading of history failed: %s", log: .history, type: .error, error.localizedDescription)
+                        assertionFailure("Cleaning of history failed")
+                        os_log("Cleaning of history failed: %s", log: .history, type: .error, error.localizedDescription)
+                        completionHandler?(error)
+                    }
+                }, receiveValue: { [weak self] history in
+                    self?.historyDictionary = self?.makeHistoryDictionary(from: history)
+                    self?._history = history
+                })
+                .store(in: &self.cancellables)
+        }
+    }
+
+    private func removeEntries(_ entries: [HistoryEntry],
+                               completionHandler: ((Error?) -> Void)? = nil) {
+        queue.async(flags: .barrier) { [weak self] in
+            guard let self = self else { return }
+
+            self.cancellables = Set<AnyCancellable>()
+            self.historyStoring.removeEntries(entries)
+                .receive(on: self.queue, options: .init(flags: .barrier))
+                .sink(receiveCompletion: { completion in
+                    switch completion {
+                    case .finished:
+                        os_log("Entries removed successfully", log: .history)
+                        completionHandler?(nil)
+                    case .failure(let error):
+                        assertionFailure("Removal failed")
+                        os_log("Removal failed: %s", log: .history, type: .error, error.localizedDescription)
                         completionHandler?(error)
                     }
                 }, receiveValue: { [weak self] history in

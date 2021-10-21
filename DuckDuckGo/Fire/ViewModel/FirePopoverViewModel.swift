@@ -53,8 +53,14 @@ final class FirePopoverViewModel {
         self.historyCoordinating = historyCoordinating
         self.fireproofDomains = fireproofDomains
         self.faviconService = faviconService
-
+        self.clearingOption = initialClearingOption
         updateItems(for: initialClearingOption)
+    }
+
+    var clearingOption = ClearingOption.allData {
+        didSet {
+            updateItems(for: clearingOption)
+        }
     }
 
     private let fireViewModel: FireViewModel
@@ -69,7 +75,7 @@ final class FirePopoverViewModel {
 
     // MARK: - Options
 
-    func updateItems(for clearingOption: ClearingOption) {
+    private func updateItems(for clearingOption: ClearingOption) {
 
         func visitedDomains(basedOn clearingOption: ClearingOption) -> Set<String> {
             switch clearingOption {
@@ -111,10 +117,17 @@ final class FirePopoverViewModel {
             .map { Item(domain: $0, favicon: faviconService.getCachedFavicon(for: $0, mustBeFromUserScript: false)) }
             .sorted { $0.domain < $1.domain }
         selectAll()
-
     }
 
     // MARK: - Selection
+
+    private var areAllSelected: Bool {
+        Set(0..<selectable.count) == selected
+    }
+
+    private func selectAll() {
+        self.selected = Set(0..<selectable.count)
+    }
 
     func select(index: Int) {
         guard index < selectable.count, index >= 0 else {
@@ -132,15 +145,25 @@ final class FirePopoverViewModel {
         selected.remove(index)
     }
 
-    private func selectAll() {
-        self.selected = Set(0..<selectable.count)
-    }
-
     // MARK: - Burning
 
     func burn() {
         let timedPixel = TimedPixel(.burn())
-        fireViewModel.fire.burnAll(tabCollectionViewModel: tabCollectionViewModel) { timedPixel.fire() }
+        if clearingOption == .allData && areAllSelected {
+            // Burn everything
+            fireViewModel.fire.burnAll(tabCollectionViewModel: tabCollectionViewModel) { timedPixel.fire() }
+        } else {
+            // Burn selected domains
+            let selectedDomains = Set<String>(selected.compactMap {
+                guard let selectedDomain = selectable[safe: $0]?.domain else {
+                    assertionFailure("Wrong index")
+                    return nil
+                }
+                return selectedDomain
+            })
+
+            fireViewModel.fire.burnDomains(selectedDomains) { timedPixel.fire() }
+        }
     }
 
 }

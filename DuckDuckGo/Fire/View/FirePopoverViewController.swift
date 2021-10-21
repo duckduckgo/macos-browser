@@ -83,9 +83,8 @@ final class FirePopoverViewController: NSViewController {
             return
         }
         let clearingOption = FirePopoverViewModel.ClearingOption.allCases[tag]
-        firePopoverViewModel.updateItems(for: clearingOption)
+        firePopoverViewModel.clearingOption = clearingOption
         updateCloseDetailsButton(for: clearingOption)
-        firePopoverViewModel.updateItems(for: clearingOption)
     }
 
     @IBAction func openDetailsButtonAction(_ sender: Any) {

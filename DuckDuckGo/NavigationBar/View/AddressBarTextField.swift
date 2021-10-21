@@ -125,7 +125,7 @@ final class AddressBarTextField: NSTextField {
         value = Value(stringValue: addressBarString, userTyped: false, isSearch: isSearch)
     }
 
-    private func makeMeFirstResponderIfNeeded() {
+    func makeMeFirstResponderIfNeeded() {
         let focusTab = tabCollectionViewModel.selectedTabViewModel?.tab.content.shouldFocusAddressBarAfterSelection ?? true
 
         if focusTab, stringValue == "" {

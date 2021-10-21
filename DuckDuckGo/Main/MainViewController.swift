@@ -66,6 +66,13 @@ final class MainViewController: NSViewController {
         findInPageContainerView.applyDropShadow()
     }
 
+    func windowDidBecomeMain() {
+        updateBackMenuItem()
+        updateForwardMenuItem()
+        updateReloadMenuItem()
+        updateStopMenuItem()
+    }
+
     override func encodeRestorableState(with coder: NSCoder) {
         fatalError("Default AppKit State Restoration should not be used")
     }
@@ -181,9 +188,8 @@ final class MainViewController: NSViewController {
     }
 
     private func updateBackMenuItem() {
-        guard self.view.window?.isMainWindow == true,
-            let selectedTabViewModel = tabCollectionViewModel.selectedTabViewModel
-        else {
+        guard self.view.window?.isMainWindow == true else { return }
+        guard let selectedTabViewModel = tabCollectionViewModel.selectedTabViewModel else {
             os_log("MainViewController: No tab view model selected", type: .error)
             return
         }
@@ -196,9 +202,8 @@ final class MainViewController: NSViewController {
     }
 
     private func updateForwardMenuItem() {
-        guard self.view.window?.isMainWindow == true,
-            let selectedTabViewModel = tabCollectionViewModel.selectedTabViewModel
-        else {
+        guard self.view.window?.isMainWindow == true else { return }
+        guard let selectedTabViewModel = tabCollectionViewModel.selectedTabViewModel else {
             os_log("MainViewController: No tab view model selected", type: .error)
             return
         }
@@ -211,9 +216,8 @@ final class MainViewController: NSViewController {
     }
 
     private func updateReloadMenuItem() {
-        guard self.view.window?.isMainWindow == true,
-            let selectedTabViewModel = tabCollectionViewModel.selectedTabViewModel
-        else {
+        guard self.view.window?.isMainWindow == true else { return }
+        guard let selectedTabViewModel = tabCollectionViewModel.selectedTabViewModel else {
             os_log("MainViewController: No tab view model selected", type: .error)
             return
         }
@@ -226,9 +230,8 @@ final class MainViewController: NSViewController {
     }
 
     private func updateStopMenuItem() {
-        guard self.view.window?.isMainWindow == true,
-            let selectedTabViewModel = tabCollectionViewModel.selectedTabViewModel
-        else {
+        guard self.view.window?.isMainWindow == true else { return }
+        guard let selectedTabViewModel = tabCollectionViewModel.selectedTabViewModel else {
             os_log("MainViewController: No tab view model selected", type: .error)
             return
         }

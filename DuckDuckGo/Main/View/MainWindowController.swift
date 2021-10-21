@@ -102,7 +102,7 @@ final class MainWindowController: NSWindowController {
             mainViewController.view.makeMeFirstResponder()
         } else {
             window?.styleMask.update(with: .closable)
-            mainViewController.navigationBarViewController.addressBarViewController?.addressBarTextField.makeMeFirstResponder()
+            mainViewController.navigationBarViewController.addressBarViewController?.addressBarTextField.makeMeFirstResponderIfNeeded()
         }
     }
 
@@ -155,6 +155,8 @@ extension MainWindowController: NSWindowDelegate {
     }
 
     func windowDidBecomeKey(_ notification: Notification) {
+        mainViewController.windowDidBecomeMain()
+        mainViewController.navigationBarViewController.windowDidBecomeMain()
         WindowControllersManager.shared.lastKeyMainWindowController = self
     }
 

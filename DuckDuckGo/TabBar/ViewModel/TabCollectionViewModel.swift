@@ -221,7 +221,7 @@ final class TabCollectionViewModel: NSObject {
             delegate?.tabCollectionViewModel(self, didRemoveTabAt: index, andSelectTabAt: nil)
             return
         }
-        
+
         guard let selectionIndex = selectionIndex else {
             os_log("TabCollection: No tab selected", type: .error)
             return
@@ -276,12 +276,37 @@ final class TabCollectionViewModel: NSObject {
         delegate?.tabCollectionViewModelDidMultipleChanges(self)
     }
 
-    func removeAllTabsAndAppendNewTab(forceChange: Bool = false) {
+    func removeAllTabsAndAppendNew(forceChange: Bool = false) {
         guard changesEnabled || forceChange else { return }
 
         tabCollection.removeAll(andAppend: Tab(content: .homepage))
         select(at: 0, forceChange: forceChange)
 
+        delegate?.tabCollectionViewModelDidMultipleChanges(self)
+    }
+
+    func removeTabsAndAppendNew(at indexSet: Set<Int>, forceChange: Bool = false) {
+        guard !indexSet.isEmpty, changesEnabled || forceChange else { return }
+        guard let selectionIndex = selectionIndex else {
+            os_log("TabCollection: No tab selected", type: .error)
+            return
+        }
+
+        tabCollection.removeTabs(at: indexSet)
+        if tabCollection.tabs.isEmpty {
+            tabCollection.append(tab: Tab(content: .homepage))
+            select(at: 0, forceChange: forceChange)
+        } else {
+            let selectionDiff = indexSet.reduce(0) { result, index in
+                if index < selectionIndex {
+                    return result + 1
+                } else {
+                    return result
+                }
+            }
+
+            select(at: max(min(selectionIndex - selectionDiff, tabCollection.tabs.count - 1), 0), forceChange: forceChange)
+        }
         delegate?.tabCollectionViewModelDidMultipleChanges(self)
     }
 
@@ -348,6 +373,23 @@ final class TabCollectionViewModel: NSObject {
         select(at: newIndex)
 
         delegate?.tabCollectionViewModel(self, didMoveTabAt: index, to: newIndex)
+    }
+
+    func replaceTab(at index: Int, with tab: Tab, forceChange: Bool = false) {
+        guard changesEnabled || forceChange else { return }
+
+        guard index >= 0, index < tabCollection.tabs.count else {
+            os_log("TabCollectionViewModel: Index out of bounds", type: .error)
+            return
+        }
+
+        tabCollection.replaceTab(at: index, with: tab)
+
+        guard let selectionIndex = selectionIndex else {
+            os_log("TabCollectionViewModel: No tab selected", type: .error)
+            return
+        }
+        select(at: selectionIndex, forceChange: forceChange)
     }
 
     private func subscribeToTabs() {

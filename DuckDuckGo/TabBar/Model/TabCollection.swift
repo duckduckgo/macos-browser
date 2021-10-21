@@ -61,6 +61,17 @@ final class TabCollection: NSObject {
         tabs.removeSubrange((index + 1)...)
     }
 
+    func removeTabs(at indexSet: Set<Int>) {
+        guard !indexSet.contains(where: { index in
+            index < 0 && index >= tabs.count
+        }) else {
+            os_log("TabCollection: Index out of bounds", type: .error)
+            return
+        }
+
+        tabs.remove(atOffsets: IndexSet(indexSet))
+    }
+
     func moveTab(at index: Int, to newIndex: Int) {
         guard index >= 0, index < tabs.count, newIndex >= 0, newIndex < tabs.count else {
             os_log("TabCollection: Index out of bounds", type: .error)
@@ -76,6 +87,15 @@ final class TabCollection: NSObject {
         var tabs = self.tabs
         tabs.insert(tabs.remove(at: index), at: newIndex)
         self.tabs = tabs
+    }
+
+    func replaceTab(at index: Int, with tab: Tab) {
+        guard index >= 0, index < tabs.count else {
+            os_log("TabCollection: Index out of bounds", type: .error)
+            return
+        }
+
+        tabs[index] = tab
     }
 
     private func saveLastRemovedTab(at index: Int) {

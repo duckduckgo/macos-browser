@@ -108,6 +108,18 @@ extension String {
         return parts.dropFirst().joined(separator: ".")
     }
 
+    func isSubdomain(of domain: String) -> Bool {
+        return domain == self
+        || ".\(domain)" == self
+        || (self.hasPrefix(".") && domain.hasSuffix(self))
+    }
+
+    func isSubdomain(of domains: Set<String>) -> Bool {
+        return domains.contains { domain in
+            isSubdomain(of: domain)
+        }
+    }
+
     func dropWWW() -> String {
         self.drop(prefix: URL.HostPrefix.www.separated())
     }

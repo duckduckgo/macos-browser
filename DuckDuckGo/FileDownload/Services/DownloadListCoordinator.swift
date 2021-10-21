@@ -281,6 +281,10 @@ final class DownloadListCoordinator {
         store.clear()
     }
 
+    func cleanupInactiveDownloads(for domains: Set<String>) {
+        //TODO
+    }
+
     func remove(downloadWithIdentifier identifier: UUID) {
         dispatchPrecondition(condition: .onQueue(.main))
 
