@@ -111,7 +111,6 @@ final class BrowserTabViewController: NSViewController {
         view.addSubview(webView)
 
         // Make sure this is on top
-        hoverLabelContainer.removeFromSuperview()
         view.addSubview(hoverLabelContainer)
 
         setFirstResponderIfNeeded()
