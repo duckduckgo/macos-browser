@@ -480,14 +480,15 @@ final class AddressBarButtonsViewController: NSViewController {
             return
         }
 
-        let isURLNil = selectedTabViewModel.tab.content.url == nil
+        let urlScheme = selectedTabViewModel.tab.content.url?.scheme
+        let isHypertextUrl = urlScheme == "http" || urlScheme == "https"
         let isDuckDuckGoUrl = selectedTabViewModel.tab.content.url?.isDuckDuckGoSearch ?? false
 
         // Privacy entry point button
         privacyEntryPointButton.isHidden = isSearchingMode ||
             isTextFieldEditorFirstResponder ||
             isDuckDuckGoUrl ||
-            isURLNil ||
+            !isHypertextUrl ||
             selectedTabViewModel.errorViewState.isVisible
         imageButtonWrapper.isHidden = !privacyEntryPointButton.isHidden || trackerAnimationView.isAnimationPlaying
     }
