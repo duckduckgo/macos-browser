@@ -21,28 +21,10 @@ import Combine
 
 final class HomepageViewController: NSViewController {
 
-    // Temporary placeholders that are displayed when user has no favorites
-    // Should be removed when the search element of the homepage is implemented
-    static let favoritePlaceholders: [Bookmark] = [
-        Bookmark(id: UUID(),
-                 url: URL.duckDuckGo,
-                 title: "Search",
-                 favicon: NSImage(named: "HomepageSearch"),
-                 isFavorite: true),
-        Bookmark(id: UUID(),
-                 url: URL.duckDuckGoEmail,
-                 title: "Email",
-                 favicon: NSImage(named: "HomepageEmail"),
-                 isFavorite: true),
-        Bookmark(id: UUID(),
-                 url: URL(string: "https://spreadprivacy.com/")!,
-                 title: "Spread Privacy",
-                 favicon: NSImage(named: "HomepageSpreadPrivacy"),
-                 isFavorite: true)
-    ]
-
     enum Constants {
         static let maxNumberOfFavorites = 10
+        static let homepageHeaderIdentifier = NSUserInterfaceItemIdentifier("HomepageHeader")
+        static let homepageHeaderSize = NSSize(width: 1, height: HomepageCollectionViewFlowLayout.Constants.headerHeight)
     }
 
     private var defaultBrowserPromptView = DefaultBrowserPromptView.createFromNib()
@@ -55,12 +37,9 @@ final class HomepageViewController: NSViewController {
     private var bookmarkManager: BookmarkManager
     private var topFavorites: [Bookmark]? {
         didSet {
-            areFavoritesPlaceholders = topFavorites == Self.favoritePlaceholders
-
             collectionView.reloadData()
         }
     }
-    private var areFavoritesPlaceholders = false
 
     private var bookmarkListCancellable: AnyCancellable?
 
@@ -78,10 +57,10 @@ final class HomepageViewController: NSViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
 
-        layoutDefaultBrowserPromptView()
-        (self.view as? HomepageBackgroundView)?.defaultBrowserPromptView = defaultBrowserPromptView
-        let nib = NSNib(nibNamed: "HomepageCollectionViewItem", bundle: nil)
-        collectionView.register(nib, forItemWithIdentifier: HomepageCollectionViewItem.identifier)
+        setupDefaultBrowserPrompt()
+
+        registerCollectionViewItemView()
+        registerCollectionViewHeader()
 
         NotificationCenter.default.addObserver(self,
                                                selector: #selector(displayDefaultBrowserPromptAfterDelayIfNeeded),
@@ -101,6 +80,22 @@ final class HomepageViewController: NSViewController {
         super.mouseDown(with: event)
 
         view.window?.makeFirstResponder(nil)
+    }
+
+    private func setupDefaultBrowserPrompt() {
+        layoutDefaultBrowserPromptView()
+        (self.view as? HomepageBackgroundView)?.defaultBrowserPromptView = defaultBrowserPromptView
+    }
+
+    private func registerCollectionViewItemView() {
+        let nib = NSNib(nibNamed: "HomepageCollectionViewItem", bundle: nil)
+        collectionView.register(nib, forItemWithIdentifier: HomepageCollectionViewItem.identifier)
+    }
+
+    private func registerCollectionViewHeader() {
+        let nib = NSNib(nibNamed: "HomepageHeader", bundle: nil)
+        collectionView.register(nib, forSupplementaryViewOfKind: NSCollectionView.elementKindSectionHeader,
+                                withIdentifier: Constants.homepageHeaderIdentifier)
     }
 
     func layoutDefaultBrowserPromptView() {
@@ -139,14 +134,7 @@ final class HomepageViewController: NSViewController {
         guard let favorites = bookmarkList?.bookmarks().filter({ $0.isFavorite }) else {
             return
         }
-
-        if favorites.isEmpty {
-            topFavorites = Self.favoritePlaceholders
-        } else {
-            topFavorites = Array(favorites
-                                    .prefix(Constants.maxNumberOfFavorites)
-                                    .reversed())
-        }
+        topFavorites = Array(favorites.prefix(Constants.maxNumberOfFavorites).reversed())
     }
 
     // MARK: - Add/Edit Favorite Popover
@@ -226,7 +214,7 @@ extension HomepageViewController: NSCollectionViewDataSource, NSCollectionViewDe
             return item
         }
 
-        item.set(bookmarkViewModel: BookmarkViewModel(entity: topFavorites[indexPath.item]), isPlaceholder: areFavoritesPlaceholders)
+        item.set(bookmarkViewModel: BookmarkViewModel(entity: topFavorites[indexPath.item]))
         item.delegate = self
         return item
     }
@@ -254,6 +242,18 @@ extension HomepageViewController: NSCollectionViewDataSource, NSCollectionViewDe
         tabCollectionViewModel.selectedTabViewModel?.tab.update(url: favorite.url, userEntered: true)
     }
 
+    func collectionView(_ collectionView: NSCollectionView,
+                        viewForSupplementaryElementOfKind kind: NSCollectionView.SupplementaryElementKind,
+                        at indexPath: IndexPath) -> NSView {
+        assert(kind == NSCollectionView.elementKindSectionHeader)
+
+        let view = collectionView.makeSupplementaryView(ofKind: kind, withIdentifier: Constants.homepageHeaderIdentifier, for: indexPath)
+
+        (view as? HomepageHeaderView)?.tabViewCollectionModel = tabCollectionViewModel
+
+        return view
+    }
+
  }
 
  extension HomepageViewController: NSCollectionViewDelegateFlowLayout {
@@ -262,6 +262,12 @@ extension HomepageViewController: NSCollectionViewDataSource, NSCollectionViewDe
                          layout collectionViewLayout: NSCollectionViewLayout,
                          sizeForItemAt indexPath: IndexPath) -> NSSize {
         return NSSize(width: HomepageCollectionViewItem.Size.width, height: HomepageCollectionViewItem.Size.height)
+     }
+
+     func collectionView(_ collectionView: NSCollectionView,
+                         layout collectionViewLayout: NSCollectionViewLayout,
+                         referenceSizeForHeaderInSection section: Int) -> NSSize {
+         return Constants.homepageHeaderSize
      }
 
  }
