@@ -19,7 +19,6 @@
 		14D9B8FB24F7E089000D4D13 /* AddressBarViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 14D9B8F924F7E089000D4D13 /* AddressBarViewController.swift */; };
 		336D5B18262D8D3C0052E0C9 /* findinpage.js in Resources */ = {isa = PBXBuildFile; fileRef = 336D5AEF262D8D3C0052E0C9 /* findinpage.js */; };
 		339A6B5826A044BA00E3DAE8 /* duckduckgo-privacy-dashboard in Resources */ = {isa = PBXBuildFile; fileRef = 339A6B5726A044BA00E3DAE8 /* duckduckgo-privacy-dashboard */; };
-		4B02198825E05FAC00ED7DEA /* login-detection.js in Resources */ = {isa = PBXBuildFile; fileRef = 4B02197D25E05FAC00ED7DEA /* login-detection.js */; };
 		4B02198925E05FAC00ED7DEA /* FireproofingURLExtensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B02197F25E05FAC00ED7DEA /* FireproofingURLExtensions.swift */; };
 		4B02198A25E05FAC00ED7DEA /* FireproofDomains.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B02198125E05FAC00ED7DEA /* FireproofDomains.swift */; };
 		4B02198B25E05FAC00ED7DEA /* FireproofInfoViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B02198325E05FAC00ED7DEA /* FireproofInfoViewController.swift */; };
@@ -596,7 +595,6 @@
 		14D9B8F924F7E089000D4D13 /* AddressBarViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AddressBarViewController.swift; sourceTree = "<group>"; };
 		336D5AEF262D8D3C0052E0C9 /* findinpage.js */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.javascript; path = findinpage.js; sourceTree = "<group>"; };
 		339A6B5726A044BA00E3DAE8 /* duckduckgo-privacy-dashboard */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; name = "duckduckgo-privacy-dashboard"; path = "Submodules/duckduckgo-privacy-dashboard"; sourceTree = SOURCE_ROOT; };
-		4B02197D25E05FAC00ED7DEA /* login-detection.js */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.javascript; path = "login-detection.js"; sourceTree = "<group>"; };
 		4B02197F25E05FAC00ED7DEA /* FireproofingURLExtensions.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = FireproofingURLExtensions.swift; sourceTree = "<group>"; };
 		4B02198125E05FAC00ED7DEA /* FireproofDomains.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = FireproofDomains.swift; sourceTree = "<group>"; };
 		4B02198325E05FAC00ED7DEA /* FireproofInfoViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = FireproofInfoViewController.swift; sourceTree = "<group>"; };
@@ -1219,20 +1217,11 @@
 		4B02197B25E05FAC00ED7DEA /* Fireproofing */ = {
 			isa = PBXGroup;
 			children = (
-				4B02197C25E05FAC00ED7DEA /* Resources */,
 				4B02197E25E05FAC00ED7DEA /* Extensions */,
 				4B02198025E05FAC00ED7DEA /* Model */,
 				4B02198225E05FAC00ED7DEA /* View */,
 			);
 			path = Fireproofing;
-			sourceTree = "<group>";
-		};
-		4B02197C25E05FAC00ED7DEA /* Resources */ = {
-			isa = PBXGroup;
-			children = (
-				4B02197D25E05FAC00ED7DEA /* login-detection.js */,
-			);
-			path = Resources;
 			sourceTree = "<group>";
 		};
 		4B02197E25E05FAC00ED7DEA /* Extensions */ = {
@@ -3287,7 +3276,6 @@
 				AAE71E3825F7869300D74437 /* HomepageCollectionViewItem.xib in Resources */,
 				4B723E1126B0006C00E14D75 /* DataImport.storyboard in Resources */,
 				4B92929026670D1700AD2C21 /* BookmarkTableCellView.xib in Resources */,
-				4B02198825E05FAC00ED7DEA /* login-detection.js in Resources */,
 				339A6B5826A044BA00E3DAE8 /* duckduckgo-privacy-dashboard in Resources */,
 				4B92928E26670D1700AD2C21 /* BookmarkOutlineViewCell.xib in Resources */,
 				858C78FC2705EB5F009B2B44 /* HomepageHeader.xib in Resources */,
