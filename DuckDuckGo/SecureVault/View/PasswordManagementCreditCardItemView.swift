@@ -62,9 +62,11 @@ struct PasswordManagementCreditCardItemView: View {
 
                 // Expiration:
 
-                Text("Expiration Date")
-                    .bold()
-                    .padding(.bottom, 5)
+                if model.expirationMonth != nil || model.expirationYear != nil || model.isInEditMode {
+                    Text("Expiration Date")
+                        .bold()
+                        .padding(.bottom, 5)
+                }
 
                 if model.isInEditMode {
                     HStack {
