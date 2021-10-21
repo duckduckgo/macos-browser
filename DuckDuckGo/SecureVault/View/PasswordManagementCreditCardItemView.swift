@@ -52,6 +52,10 @@ struct PasswordManagementCreditCardItemView: View {
                     print("Copied card number")
                 }
 
+                EditableIdentityField(textFieldValue: $model.cardholderName, title: "Cardholder Name") {
+                    print("Copied card security value")
+                }
+
                 EditableIdentityField(textFieldValue: $model.cardSecurityCode, title: "CVV") {
                     print("Copied card security value")
                 }

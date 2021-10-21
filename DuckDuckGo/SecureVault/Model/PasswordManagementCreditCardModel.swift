@@ -62,6 +62,12 @@ final class PasswordManagementCreditCardModel: ObservableObject, PasswordManagem
         }
     }
 
+    @Published var cardholderName: String = "" {
+        didSet {
+            isDirty = true
+        }
+    }
+
     @Published var cardSecurityCode: String = "" {
         didSet {
             isDirty = true
@@ -100,6 +106,7 @@ final class PasswordManagementCreditCardModel: ObservableObject, PasswordManagem
     func createNew() {
         card = .init(title: "",
                      cardNumber: nil,
+                     cardholderName: nil,
                      cardSecurityCode: nil,
                      expirationMonth: nil,
                      expirationYear: nil)
@@ -122,6 +129,7 @@ final class PasswordManagementCreditCardModel: ObservableObject, PasswordManagem
 
         card.title = title
         card.cardNumber = cardNumber
+        card.cardholderName = cardholderName
         card.cardSecurityCode = cardSecurityCode
         card.expirationMonth = expirationMonth
         card.expirationYear = expirationYear
@@ -153,6 +161,7 @@ final class PasswordManagementCreditCardModel: ObservableObject, PasswordManagem
     private func populateViewModelFromCard() {
         title = card?.title ?? ""
         cardNumber = card?.cardNumber ?? ""
+        cardholderName = card?.cardholderName ?? ""
         cardSecurityCode = card?.cardSecurityCode ?? ""
         expirationMonth = card?.expirationMonth
         expirationYear = card?.expirationYear
