@@ -32,6 +32,10 @@ extension NSColor {
         NSColor(named: "AddressBarBackgroundColor")!
     }
 
+    static var addressBarBorderColor: NSColor {
+        NSColor(named: "AddressBarBorderColor")!
+    }
+
     static var addressBarShadowColor: NSColor {
         NSColor(named: "AddressBarShadowColor")!
     }

@@ -20,9 +20,12 @@ import Cocoa
 
 final class HomepageCollectionViewFlowLayout: NSCollectionViewFlowLayout {
 
-    @IBInspectable var columns: Int = 1
-    @IBInspectable var insets: CGSize = .zero
-    @IBInspectable var verticalShift: CGFloat = 0
+    struct Constants {
+        static let headerHeight: CGFloat = 222
+        static let columns: Int = 5
+        static let insets: CGSize = .zero
+    }
+
     private var savedAttributes: [NSCollectionViewLayoutAttributes]?
 
     private var contentHeight: CGFloat {
@@ -30,12 +33,12 @@ final class HomepageCollectionViewFlowLayout: NSCollectionViewFlowLayout {
         let count = collectionView.numberOfItems(inSection: 0)
         guard count > 0 else { return 0 }
 
-        let rows = count / columns + (count % columns > 0 ? 1 : 0)
+        let rows = count / Constants.columns + (count % Constants.columns > 0 ? 1 : 0)
         let itemHeight = (collectionView.delegate as? NSCollectionViewDelegateFlowLayout)?
             .collectionView?(collectionView, layout: self, sizeForItemAt: IndexPath(item: 0)).height
             ?? self.itemSize.height
 
-        return itemHeight * CGFloat(rows) + self.minimumLineSpacing * CGFloat(rows - 1) + insets.height * 2
+        return Constants.headerHeight + itemHeight * CGFloat(rows) + self.minimumLineSpacing * CGFloat(rows - 1) + Constants.insets.height * 2
     }
 
     override var collectionViewContentSize: NSSize {
@@ -45,30 +48,44 @@ final class HomepageCollectionViewFlowLayout: NSCollectionViewFlowLayout {
 
     override func layoutAttributesForElements(in rect: NSRect) -> [NSCollectionViewLayoutAttributes] {
         let largestRect = NSRect(x: 0, y: 0, width: CGFloat.greatestFiniteMagnitude, height: CGFloat.greatestFiniteMagnitude)
-        let attributes = super.layoutAttributesForElements(in: largestRect).map { ($0.copy() as? NSCollectionViewLayoutAttributes)! }
-        guard !attributes.isEmpty,
-              let scrollView = collectionView?.enclosingScrollView
+        let allAttributes = super.layoutAttributesForElements(in: largestRect).map { ($0.copy() as? NSCollectionViewLayoutAttributes)! }
+        guard !allAttributes.isEmpty,
+              let scrollView = collectionView?.enclosingScrollView,
+              let headerAttribute = allAttributes.first(where: { $0.representedElementKind == NSCollectionView.elementKindSectionHeader })
         else { return [] }
 
+        let attributes = allAttributes.filter({ $0.representedElementKind != NSCollectionView.elementKindSectionHeader })
+        guard !attributes.isEmpty else { return [] }
+
         let itemWidth = attributes[0].frame.size.width
-        let actualColumns = min(columns, attributes.count)
-        let spacing = actualColumns < columns
+        let actualColumns = min(Constants.columns, attributes.count)
+        let spacing = actualColumns < Constants.columns
             ? minimumInteritemSpacing
-            : min((scrollView.frame.size.width - (CGFloat(columns) * itemWidth + insets.width * 2))
-                  / CGFloat(columns - 1), minimumInteritemSpacing)
-        let contentWidth = CGFloat(actualColumns) * itemWidth + CGFloat(actualColumns - 1) * spacing
+        : min((scrollView.frame.size.width - (CGFloat(Constants.columns) * itemWidth + Constants.insets.width * 2))
+              / CGFloat(Constants.columns - 1), minimumInteritemSpacing)
+        let contentWidth = min(collectionViewContentSize.width, CGFloat(Constants.columns) * itemWidth + CGFloat(Constants.columns - 1) * spacing)
 
         let startX = (scrollView.frame.size.width - contentWidth) / 2
-        let startY = max(insets.height,
-                        (scrollView.frame.size.height - contentHeight) / 2 + insets.height + verticalShift)
+        let startY = max(Constants.insets.height,
+                         (scrollView.frame.size.height / 2) - Constants.headerHeight)
 
+        var headerMaxX = startX
         for (idx, attribute) in attributes.enumerated() {
-            attribute.frame.origin.x = startX + (attribute.frame.height + spacing) * CGFloat(idx % columns)
-            attribute.frame.origin.y = startY + (attribute.frame.height + minimumLineSpacing) * CGFloat(idx / columns)
+            attribute.frame.origin.x = startX + (attribute.frame.height + spacing) * CGFloat(idx % Constants.columns)
+            attribute.frame.origin.y = startY + Constants.headerHeight + (attribute.frame.height + minimumLineSpacing)
+                                        * CGFloat(idx / Constants.columns)
+            headerMaxX = max(headerMaxX, attribute.frame.maxX)
         }
 
-        savedAttributes = attributes
-        return attributes
+        print(#function, startY)
+
+        headerAttribute.frame.origin.x = startX
+        headerAttribute.frame.origin.y = startY
+        headerAttribute.frame.size.width = contentWidth
+        headerAttribute.frame.size.height = Constants.headerHeight
+
+        savedAttributes = allAttributes
+        return allAttributes
     }
 
     override func shouldInvalidateLayout(forBoundsChange newBounds: NSRect) -> Bool {
