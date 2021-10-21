@@ -383,6 +383,10 @@ extension BrowserTabViewController: TabDelegate {
     }
 
     func tab(_ tab: Tab, didChangeHoverLink url: URL?) {
+        scheduleHoverLabelUpdatesForUrl(url)
+    }
+
+    private func scheduleHoverLabelUpdatesForUrl(_ url: URL?) {
         // cancel previous animation, if any
         hoverLabelWorkItem?.cancel()
 
