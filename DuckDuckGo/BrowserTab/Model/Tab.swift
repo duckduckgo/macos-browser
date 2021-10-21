@@ -32,6 +32,8 @@ protocol TabDelegate: FileDownloadManagerDelegate {
              requestedBasicAuthenticationChallengeWith protectionSpace: URLProtectionSpace,
              completionHandler: @escaping (URLSession.AuthChallengeDisposition, URLCredential?) -> Void)
 
+    func tab(_ tab: Tab, didChangeHoverLink url: URL?)
+
     func tabPageDOMLoaded(_ tab: Tab)
     func closeTab(_ tab: Tab)
 }
@@ -125,8 +127,13 @@ final class Tab: NSObject {
         userScripts?.remove(from: webView.configuration.userContentController)
     }
 
-    let webView: WebView
+    // MARK: - Event Publishers
+
     let webViewDidFinishNavigationPublisher = PassthroughSubject<Void, Never>()
+
+    // MARK: - Properties
+
+    let webView: WebView
 
     var userEnteredUrl = true
 
@@ -402,6 +409,7 @@ final class Tab: NSObject {
             userScripts.autofillScript.vaultDelegate = vaultManager
             userScripts.pageObserverScript.delegate = self
             userScripts.printingUserScript.delegate = self
+            userScripts.hoverUserScript.delegate = self
 
             attachFindInPage()
 
@@ -795,6 +803,14 @@ fileprivate extension WKNavigationResponse {
         let contentDisposition = (response as? HTTPURLResponse)?.allHeaderFields["Content-Disposition"] as? String
         return contentDisposition?.hasPrefix("attachment") ?? false
     }
+}
+
+extension Tab: HoverUserScriptDelegate {
+
+    func hoverUserScript(_ script: HoverUserScript, didChange url: URL?) {
+        delegate?.tab(self, didChangeHoverLink: url)
+    }
+
 }
 
 // swiftlint:enable type_body_length

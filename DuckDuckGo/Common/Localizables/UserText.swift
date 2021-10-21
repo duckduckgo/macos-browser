@@ -223,8 +223,8 @@ struct UserText {
     static let initiateImport = NSLocalizedString("import.data.initiate", value: "Import", comment: "Button text for importing data")
     static let doneImporting = NSLocalizedString("import.data.done", value: "Done", comment: "Button text for finishing the data import")
 
-    static let chromiumPasswordImportDisclaimer = NSLocalizedString("import.chromium.disclaimer", value: "DuckDuckGo will need to access your keychain information", comment: "Warning text for the Chromium password import option")
-    static let firefoxPasswordImportDisclaimer = NSLocalizedString("import.firefox.disclaimer", value: "DuckDuckGo will request your Primary Password if one has been set", comment: "Warning text for the Chromium password import option")
+    static let chromiumPasswordImportDisclaimer = NSLocalizedString("import.chromium.disclaimer", value: "Your Keychain password is temporarily needed to import passwords.", comment: "Warning text for the Chromium password import option")
+    static let firefoxPasswordImportDisclaimer = NSLocalizedString("import.firefox.disclaimer", value: "Your Primary Password is temporarily needed to import passwords.", comment: "Warning text for the Chromium password import option")
 
     static let dataImportFailedTitle = NSLocalizedString("import.data.import-failed.title", value: "Import Failed", comment: "Alert title when the data import fails")
 
@@ -297,9 +297,16 @@ struct UserText {
         return String(format: localized, String(totalSuccessfulImports))
     }
 
+    static func duplicateBookmarkImports(_ totalFailedImports: Int) -> String {
+        let localized = NSLocalizedString("import.bookmarks.browser.duplicate-imports",
+                                          value: "Duplicate Bookmarks Skipped: %@",
+                                          comment: "Status text indicating the number of duplicate browser bookmark imports")
+        return String(format: localized, String(totalFailedImports))
+    }
+
     static func failedBookmarkImports(_ totalFailedImports: Int) -> String {
         let localized = NSLocalizedString("import.bookmarks.browser.failed-imports",
-                                          value: "Failed/Duplicate Bookmarks: %@",
+                                          value: "Failed Imports: %@",
                                           comment: "Status text indicating the number of failed browser bookmark imports")
         return String(format: localized, String(totalFailedImports))
     }
