@@ -30,41 +30,53 @@ struct PasswordManagementIdentityItemView: View {
 
     var body: some View {
 
-        let editMode = model.isEditing || model.isNew
+        if model.identity != nil {
 
-        ZStack(alignment: .top) {
-            Spacer()
+            let editMode = model.isEditing || model.isNew
 
-            if editMode {
+            ZStack(alignment: .top) {
+                Spacer()
 
-                RoundedRectangle(cornerRadius: 8)
-                    .foregroundColor(Color(NSColor.editingPanelColor))
-                    .shadow(radius: 6)
+                if editMode {
 
-            }
-
-            ScrollView(.vertical) {
-                VStack(alignment: .leading, spacing: 10) {
-
-                    HeaderView()
-                        .padding(.bottom, editMode ? 20 : 30)
-
-                    IdentificationView()
-
-                    AddressView()
-
-                    ContactInfoView()
+                    RoundedRectangle(cornerRadius: 8)
+                        .foregroundColor(Color(NSColor.editingPanelColor))
+                        .shadow(radius: 6)
 
                 }
-                .frame(maxWidth: .infinity, maxHeight: .infinity)
+
+                VStack {
+
+                    ScrollView(.vertical) {
+                        VStack(alignment: .leading, spacing: 10) {
+
+                            HeaderView()
+                                .padding(.bottom, editMode ? 20 : 30)
+
+                            IdentificationView()
+
+                            AddressView()
+
+                            ContactInfoView()
+
+                        }
+                        .frame(maxWidth: .infinity, maxHeight: .infinity)
+                        .padding()
+                    }
+
+                    Spacer(minLength: 0)
+
+                    Buttons()
+                        .padding(.top, 10)
+
+                }
                 .padding()
+
             }
+            .padding(EdgeInsets(top: 10, leading: 0, bottom: 10, trailing: 10))
 
         }
-        .padding(EdgeInsets(top: 10, leading: 0, bottom: 10, trailing: 10))
 
-        Buttons()
-            .padding(EdgeInsets(top: 0, leading: 0, bottom: 26, trailing: 26))
     }
 
 }
@@ -179,26 +191,21 @@ private struct HeaderView: View {
             Image("Identity")
                 .padding(.trailing, 10)
 
-            if model.isNew {
+            if model.isNew || model.isEditing {
 
                 TextField("", text: $model.title)
                     .font(.title)
-                    .textFieldStyle(RoundedBorderTextFieldStyle())
+                    .textFieldStyle(PlainTextFieldStyle())
+                    .padding(4)
+                    .overlay(
+                        RoundedRectangle(cornerRadius: 5)
+                            .stroke(Color.accentColor, lineWidth: 2)
+                    )
 
             } else {
 
-                if model.isEditing {
-
-                    TextField("", text: $model.title)
-                        .font(.title)
-                        .textFieldStyle(RoundedBorderTextFieldStyle())
-
-                } else {
-
-                    Text(model.title)
-                        .font(.title)
-
-                }
+                Text(model.title)
+                    .font(.title)
 
             }
 

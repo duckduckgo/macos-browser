@@ -29,38 +29,42 @@ struct PasswordManagementNoteItemView: View {
     @EnvironmentObject var model: PasswordManagementNoteModel
 
     var body: some View {
-
-        let editMode = model.isEditing || model.isNew
-
-        ZStack(alignment: .top) {
-            Spacer()
-
-            if editMode {
-
-                RoundedRectangle(cornerRadius: 8)
-                    .foregroundColor(Color(NSColor.editingPanelColor))
-                    .shadow(radius: 6)
-
+        
+        if model.note != nil {
+            
+            let editMode = model.isEditing || model.isNew
+            
+            ZStack(alignment: .top) {
+                Spacer()
+                
+                if editMode {
+                    
+                    RoundedRectangle(cornerRadius: 8)
+                        .foregroundColor(Color(NSColor.editingPanelColor))
+                        .shadow(radius: 6)
+                    
+                }
+                
+                VStack(alignment: .leading, spacing: 0) {
+                    
+                    HeaderView()
+                        .padding(.bottom, editMode ? 20 : 30)
+                    
+                    TextView()
+                    
+                    Spacer(minLength: 0)
+                    
+                    Buttons()
+                    
+                }
+                .frame(maxWidth: .infinity, maxHeight: .infinity)
+                .padding()
+                
             }
-
-            VStack(alignment: .leading, spacing: 0) {
-
-                HeaderView()
-                    .padding(.bottom, editMode ? 20 : 30)
-
-                TextView()
-
-                Spacer(minLength: 0)
-
-                Buttons()
-
-            }
-            .frame(maxWidth: .infinity, maxHeight: .infinity)
-            .padding()
-
+            .padding(EdgeInsets(top: 10, leading: 0, bottom: 10, trailing: 10))
+            
         }
-        .padding(EdgeInsets(top: 10, leading: 0, bottom: 10, trailing: 10))
-
+        
     }
 
 }
