@@ -240,14 +240,14 @@
                                             <constraint firstAttribute="height" constant="42" id="tKr-oa-xct"/>
                                         </constraints>
                                     </customView>
-                                    <scrollView wantsLayer="YES" borderType="none" autohidesScrollers="YES" horizontalLineScroll="10" horizontalPageScroll="10" verticalLineScroll="10" verticalPageScroll="10" usesPredominantAxisScrolling="NO" translatesAutoresizingMaskIntoConstraints="NO" id="XmN-jm-YAB">
-                                        <rect key="frame" x="0.0" y="0.0" width="320" height="221"/>
+                                    <scrollView wantsLayer="YES" borderType="none" autohidesScrollers="YES" horizontalLineScroll="10" horizontalPageScroll="10" verticalLineScroll="10" verticalPageScroll="10" hasHorizontalScroller="NO" usesPredominantAxisScrolling="NO" translatesAutoresizingMaskIntoConstraints="NO" id="XmN-jm-YAB">
+                                        <rect key="frame" x="0.0" y="32" width="320" height="189"/>
                                         <clipView key="contentView" id="TlT-bV-Znt">
-                                            <rect key="frame" x="0.0" y="0.0" width="320" height="221"/>
+                                            <rect key="frame" x="0.0" y="0.0" width="320" height="189"/>
                                             <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                             <subviews>
                                                 <collectionView selectable="YES" allowsMultipleSelection="YES" id="u7v-Gt-FjR">
-                                                    <rect key="frame" x="0.0" y="0.0" width="320" height="158"/>
+                                                    <rect key="frame" x="0.0" y="0.0" width="320" height="189"/>
                                                     <autoresizingMask key="autoresizingMask" widthSizable="YES"/>
                                                     <collectionViewFlowLayout key="collectionViewLayout" id="VZx-7u-HhL">
                                                         <size key="itemSize" width="318" height="24"/>
@@ -258,30 +258,69 @@
                                             <color key="backgroundColor" name="InterfaceBackgroundColor"/>
                                         </clipView>
                                         <scroller key="horizontalScroller" hidden="YES" wantsLayer="YES" verticalHuggingPriority="750" horizontal="YES" id="hPt-lI-OLT">
-                                            <rect key="frame" x="1" y="144" width="233" height="15"/>
+                                            <rect key="frame" x="-100" y="-100" width="233" height="15"/>
                                             <autoresizingMask key="autoresizingMask"/>
                                         </scroller>
-                                        <scroller key="verticalScroller" hidden="YES" wantsLayer="YES" verticalHuggingPriority="750" doubleValue="1" horizontal="NO" id="PP2-Z5-4Jn">
-                                            <rect key="frame" x="234" y="1" width="15" height="143"/>
+                                        <scroller key="verticalScroller" hidden="YES" wantsLayer="YES" verticalHuggingPriority="750" horizontal="NO" id="PP2-Z5-4Jn">
+                                            <rect key="frame" x="304" y="0.0" width="16" height="185"/>
                                             <autoresizingMask key="autoresizingMask"/>
                                         </scroller>
                                     </scrollView>
+                                    <customView translatesAutoresizingMaskIntoConstraints="NO" id="r7f-Ig-GcB">
+                                        <rect key="frame" x="0.0" y="0.0" width="320" height="32"/>
+                                        <subviews>
+                                            <customView translatesAutoresizingMaskIntoConstraints="NO" id="R2h-Oh-HRn" customClass="ColorView" customModule="DuckDuckGo_Privacy_Browser" customModuleProvider="target">
+                                                <rect key="frame" x="0.0" y="0.0" width="320" height="32"/>
+                                                <userDefinedRuntimeAttributes>
+                                                    <userDefinedRuntimeAttribute type="color" keyPath="backgroundColor">
+                                                        <color key="value" red="0.98039215690000003" green="0.98039215690000003" blue="0.98039215690000003" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+                                                    </userDefinedRuntimeAttribute>
+                                                </userDefinedRuntimeAttributes>
+                                            </customView>
+                                            <box verticalHuggingPriority="750" fixedFrame="YES" boxType="separator" translatesAutoresizingMaskIntoConstraints="NO" id="55B-tN-GCl">
+                                                <rect key="frame" x="0.0" y="29" width="320" height="5"/>
+                                                <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+                                            </box>
+                                            <box verticalHuggingPriority="750" fixedFrame="YES" boxType="separator" translatesAutoresizingMaskIntoConstraints="NO" id="rMv-28-G5x">
+                                                <rect key="frame" x="0.0" y="-12" width="320" height="5"/>
+                                                <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+                                            </box>
+                                            <button fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="Bir-wk-iOW">
+                                                <rect key="frame" x="20" y="0.0" width="280" height="32"/>
+                                                <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+                                                <buttonCell key="cell" type="square" title="   Also clears these sites in other open tabs" bezelStyle="shadowlessSquare" image="WarningTriangle" imagePosition="leading" alignment="left" inset="2" id="6NW-yL-FoB">
+                                                    <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
+                                                    <font key="font" metaFont="smallSystem"/>
+                                                </buttonCell>
+                                                <color key="contentTintColor" name="GreyTextColor"/>
+                                                <connections>
+                                                    <action selector="closeDetailsButtonAction:" target="DMI-mh-xLJ" id="mLs-dU-owR"/>
+                                                </connections>
+                                            </button>
+                                        </subviews>
+                                        <constraints>
+                                            <constraint firstAttribute="height" constant="32" id="h9e-lu-Vxm"/>
+                                            <constraint firstItem="R2h-Oh-HRn" firstAttribute="leading" secondItem="r7f-Ig-GcB" secondAttribute="leading" id="lUJ-br-5nG"/>
+                                            <constraint firstItem="R2h-Oh-HRn" firstAttribute="top" secondItem="r7f-Ig-GcB" secondAttribute="top" id="nOB-Rm-zOy"/>
+                                            <constraint firstAttribute="trailing" secondItem="R2h-Oh-HRn" secondAttribute="trailing" id="tm1-hf-0JX"/>
+                                            <constraint firstAttribute="bottom" secondItem="R2h-Oh-HRn" secondAttribute="bottom" id="uVV-mf-WiT"/>
+                                        </constraints>
+                                    </customView>
                                 </subviews>
                                 <constraints>
-                                    <constraint firstAttribute="bottom" secondItem="XmN-jm-YAB" secondAttribute="bottom" id="5iE-36-U0y"/>
                                     <constraint firstItem="553-P8-fEM" firstAttribute="leading" secondItem="6vZ-d2-qnR" secondAttribute="leading" id="8gV-9l-4mF"/>
                                     <constraint firstItem="XmN-jm-YAB" firstAttribute="top" secondItem="553-P8-fEM" secondAttribute="bottom" id="8i6-2b-wAQ"/>
+                                    <constraint firstItem="r7f-Ig-GcB" firstAttribute="leading" secondItem="6vZ-d2-qnR" secondAttribute="leading" id="Ftm-7H-wzh"/>
                                     <constraint firstItem="553-P8-fEM" firstAttribute="top" secondItem="6vZ-d2-qnR" secondAttribute="top" id="Kkv-Ph-bzf"/>
                                     <constraint firstAttribute="trailing" secondItem="553-P8-fEM" secondAttribute="trailing" id="LI2-w5-bja"/>
                                     <constraint firstAttribute="trailing" secondItem="XmN-jm-YAB" secondAttribute="trailing" id="N6O-9R-Xd6"/>
+                                    <constraint firstItem="r7f-Ig-GcB" firstAttribute="top" secondItem="XmN-jm-YAB" secondAttribute="bottom" id="aU3-o4-gEz"/>
+                                    <constraint firstAttribute="bottom" secondItem="r7f-Ig-GcB" secondAttribute="bottom" id="cHm-Wn-HOf"/>
+                                    <constraint firstAttribute="trailing" secondItem="r7f-Ig-GcB" secondAttribute="trailing" id="gUL-0S-TPQ"/>
                                     <constraint firstItem="XmN-jm-YAB" firstAttribute="leading" secondItem="6vZ-d2-qnR" secondAttribute="leading" id="kYV-Im-5du"/>
                                     <constraint firstAttribute="height" constant="263" id="sJt-dl-rlH"/>
                                 </constraints>
                             </customView>
-                            <box verticalHuggingPriority="750" fixedFrame="YES" boxType="separator" translatesAutoresizingMaskIntoConstraints="NO" id="dqq-R5-UUp">
-                                <rect key="frame" x="0.0" y="-163" width="320" height="5"/>
-                                <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
-                            </box>
                             <customView translatesAutoresizingMaskIntoConstraints="NO" id="nId-He-RIU" userLabel="Main Buttons Wrapper View">
                                 <rect key="frame" x="0.0" y="0.0" width="320" height="60"/>
                                 <subviews>
@@ -293,6 +332,9 @@
                                             </userDefinedRuntimeAttribute>
                                         </userDefinedRuntimeAttributes>
                                     </customView>
+                                    <box verticalHuggingPriority="750" boxType="separator" translatesAutoresizingMaskIntoConstraints="NO" id="dqq-R5-UUp">
+                                        <rect key="frame" x="0.0" y="57" width="320" height="5"/>
+                                    </box>
                                     <button verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="Sam-GO-uzw">
                                         <rect key="frame" x="158" y="10" width="148" height="40"/>
                                         <buttonCell key="cell" type="push" title="Clear" bezelStyle="rounded" alignment="center" controlSize="large" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="tCs-Mx-t1s">
@@ -324,13 +366,16 @@ Gw
                                     <constraint firstItem="wam-tC-iBG" firstAttribute="leading" secondItem="nId-He-RIU" secondAttribute="leading" constant="20" symbolic="YES" id="AuD-PM-TDS"/>
                                     <constraint firstAttribute="trailing" secondItem="fSV-XR-8Dh" secondAttribute="trailing" id="FKa-ym-q6d"/>
                                     <constraint firstItem="fSV-XR-8Dh" firstAttribute="top" secondItem="nId-He-RIU" secondAttribute="top" id="NE5-jE-jH4"/>
+                                    <constraint firstItem="dqq-R5-UUp" firstAttribute="top" secondItem="nId-He-RIU" secondAttribute="top" id="PGZ-Bu-97k"/>
                                     <constraint firstAttribute="bottom" secondItem="fSV-XR-8Dh" secondAttribute="bottom" id="TBV-Rc-0cG"/>
                                     <constraint firstItem="fSV-XR-8Dh" firstAttribute="leading" secondItem="nId-He-RIU" secondAttribute="leading" id="TbY-vY-ucm"/>
                                     <constraint firstItem="wam-tC-iBG" firstAttribute="centerY" secondItem="nId-He-RIU" secondAttribute="centerY" id="UII-xg-UW9"/>
+                                    <constraint firstAttribute="trailing" secondItem="dqq-R5-UUp" secondAttribute="trailing" id="XjP-XU-XCQ"/>
                                     <constraint firstItem="Sam-GO-uzw" firstAttribute="centerY" secondItem="nId-He-RIU" secondAttribute="centerY" id="eOp-LI-mk2"/>
                                     <constraint firstItem="Sam-GO-uzw" firstAttribute="width" secondItem="wam-tC-iBG" secondAttribute="width" id="f6X-EJ-v6s"/>
                                     <constraint firstAttribute="trailing" secondItem="Sam-GO-uzw" secondAttribute="trailing" constant="20" symbolic="YES" id="jSP-YU-j67"/>
                                     <constraint firstItem="Sam-GO-uzw" firstAttribute="leading" secondItem="wam-tC-iBG" secondAttribute="trailing" constant="8" id="mPK-5a-aZP"/>
+                                    <constraint firstItem="dqq-R5-UUp" firstAttribute="leading" secondItem="nId-He-RIU" secondAttribute="leading" id="mW9-Ra-VSw"/>
                                     <constraint firstAttribute="height" constant="60" id="onw-qY-te8"/>
                                 </constraints>
                             </customView>
@@ -369,12 +414,15 @@ Gw
                     </view>
                     <connections>
                         <outlet property="closeDetailsButton" destination="cgG-hF-FAP" id="PDY-tj-zma"/>
+                        <outlet property="closeWrapperView" destination="553-P8-fEM" id="vUO-wA-3ME"/>
                         <outlet property="collectionView" destination="u7v-Gt-FjR" id="zeu-lV-usx"/>
                         <outlet property="contentHeightConstraint" destination="hbg-4i-hjT" id="mC2-Ot-onY"/>
                         <outlet property="detailsWrapperView" destination="6vZ-d2-qnR" id="TKb-Ux-TIk"/>
+                        <outlet property="detailsWrapperViewHeightContraint" destination="sJt-dl-rlH" id="7pa-Kc-9xB"/>
                         <outlet property="infoContainerView" destination="WCe-Mc-jz7" id="bYw-KY-Zy8"/>
                         <outlet property="openDetailsButton" destination="ACx-m8-z0K" id="cu4-zz-MhA"/>
                         <outlet property="optionsButton" destination="ckJ-6G-38h" id="xSK-KE-yMk"/>
+                        <outlet property="warningWrapperView" destination="r7f-Ig-GcB" id="cSU-Xr-Bin"/>
                     </connections>
                 </viewController>
                 <customObject id="fzV-LM-GvK" userLabel="First Responder" customClass="NSResponder" sceneMemberID="firstResponder"/>
@@ -463,6 +511,7 @@ DQ
         <image name="BurnAlert" width="64" height="64"/>
         <image name="ExpandDown" width="9" height="5"/>
         <image name="FireHeader" width="128" height="64"/>
+        <image name="WarningTriangle" width="16" height="15"/>
         <namedColor name="ButtonColor">
             <color red="0.28627450980392155" green="0.28627450980392155" blue="0.28627450980392155" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
         </namedColor>

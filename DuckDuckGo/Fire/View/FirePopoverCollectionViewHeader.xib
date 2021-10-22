@@ -15,7 +15,7 @@
             <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
             <subviews>
                 <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="YiR-5k-KYr">
-                    <rect key="frame" x="6" y="7" width="188" height="14"/>
+                    <rect key="frame" x="14" y="3" width="180" height="14"/>
                     <textFieldCell key="cell" lineBreakMode="clipping" title="Fireproof Sites" id="BXG-ly-W3v">
                         <font key="font" metaFont="smallSystem"/>
                         <color key="textColor" red="0.40000000000000002" green="0.40000000000000002" blue="0.40000000000000002" alpha="0.84999999999999998" colorSpace="custom" customColorSpace="sRGB"/>
@@ -24,8 +24,8 @@
                 </textField>
             </subviews>
             <constraints>
-                <constraint firstItem="YiR-5k-KYr" firstAttribute="centerY" secondItem="c22-O7-iKe" secondAttribute="centerY" id="BkU-az-bMv"/>
-                <constraint firstItem="YiR-5k-KYr" firstAttribute="leading" secondItem="c22-O7-iKe" secondAttribute="leading" constant="8" id="Jo4-FE-sHa"/>
+                <constraint firstItem="YiR-5k-KYr" firstAttribute="centerY" secondItem="c22-O7-iKe" secondAttribute="centerY" constant="4" id="BkU-az-bMv"/>
+                <constraint firstItem="YiR-5k-KYr" firstAttribute="leading" secondItem="c22-O7-iKe" secondAttribute="leading" constant="16" id="Jo4-FE-sHa"/>
                 <constraint firstAttribute="trailing" secondItem="YiR-5k-KYr" secondAttribute="trailing" constant="8" id="uCf-pa-hQ0"/>
             </constraints>
             <viewLayoutGuide key="safeArea" id="lxB-wC-ttc"/>

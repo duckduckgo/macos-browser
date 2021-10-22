@@ -47,15 +47,13 @@ struct Logging {
     fileprivate static let configLoggingEnabled = false
     fileprivate static let configLog: OSLog = OSLog(subsystem: Bundle.main.bundleIdentifier ?? "DuckDuckGo", category: "Configuration Downloading")
 
-    //TODO put back
-    fileprivate static let fireLoggingEnabled = true
+    fileprivate static let fireLoggingEnabled = false
     fileprivate static let fireLog: OSLog = OSLog(subsystem: Bundle.main.bundleIdentifier ?? "DuckDuckGo", category: "Fire")
 
     fileprivate static let passwordManagerEnabled = false
     fileprivate static let passwordManagerLog: OSLog = OSLog(subsystem: Bundle.main.bundleIdentifier ?? "DuckDuckGo", category: "Password Manager")
 
-    //TODO put back
-    fileprivate static let historyLoggingEnabled = true
+    fileprivate static let historyLoggingEnabled = false
     fileprivate static let historyLog: OSLog = OSLog(subsystem: Bundle.main.bundleIdentifier ?? "DuckDuckGo", category: "History")
 
     fileprivate static let dataImportExportLoggingEnabled = false

@@ -22,9 +22,10 @@ import Combine
 final class FirePopoverViewController: NSViewController {
 
     struct Constants {
-        static let maximumContentHeight: CGFloat = 263
+        static let maximumContentHeight: CGFloat = 42 + 230 + 32
         static let minimumContentHeight: CGFloat = 42
         static let headerHeight: CGFloat = 28
+        static let footerHeight: CGFloat = 8
     }
 
     private let fireViewModel: FireViewModel
@@ -40,7 +41,10 @@ final class FirePopoverViewController: NSViewController {
     @IBOutlet weak var closeDetailsButton: NSButton!
     @IBOutlet weak var detailsWrapperView: NSView!
     @IBOutlet weak var contentHeightConstraint: NSLayoutConstraint!
+    @IBOutlet weak var detailsWrapperViewHeightContraint: NSLayoutConstraint!
+    @IBOutlet weak var closeWrapperView: NSView!
     @IBOutlet weak var collectionView: NSCollectionView!
+    @IBOutlet weak var warningWrapperView: NSView!
     @IBOutlet weak var infoContainerView: NSView!
 
     private var viewModelCancellable: AnyCancellable?
@@ -90,6 +94,7 @@ final class FirePopoverViewController: NSViewController {
         let clearingOption = FirePopoverViewModel.ClearingOption.allCases[tag]
         firePopoverViewModel.clearingOption = clearingOption
         updateCloseDetailsButton(for: clearingOption)
+        updateWarningWrapperView(for: clearingOption)
     }
 
     @IBAction func openDetailsButtonAction(_ sender: Any) {
@@ -106,6 +111,10 @@ final class FirePopoverViewController: NSViewController {
         case .currentWindow: closeDetailsButton.title = UserText.currentWindowDescription
         case .allData: closeDetailsButton.title = UserText.allDataDescription
         }
+    }
+
+    private func updateWarningWrapperView(for clearingOption: FirePopoverViewModel.ClearingOption) {
+//        warningWrapperView.isHidden = clearingOption == .allData || firePopoverViewModel.selectable.isEmpty
     }
 
     @IBAction func clearButtonAction(_ sender: Any) {
@@ -149,7 +158,11 @@ final class FirePopoverViewController: NSViewController {
         NSAnimationContext.runAnimationGroup { [weak self] context in
             context.duration = 1/3
             context.timingFunction = CAMediaTimingFunction(name: .easeInEaseOut)
-            self?.contentHeightConstraint.animator().constant = contentHeight()
+            let contentHeight = contentHeight()
+            self?.contentHeightConstraint.animator().constant = contentHeight
+            if contentHeight != Constants.minimumContentHeight {
+                self?.detailsWrapperViewHeightContraint.animator().constant = contentHeight
+            }
         }
     }
 
@@ -158,7 +171,8 @@ final class FirePopoverViewController: NSViewController {
             return Constants.minimumContentHeight
         } else {
             if let contentHeight = collectionView.collectionViewLayout?.collectionViewContentSize.height {
-                return min(Constants.maximumContentHeight, contentHeight + 50)
+                let height = contentHeight + closeWrapperView.frame.height + warningWrapperView.frame.height
+                return min(Constants.maximumContentHeight, height)
             } else {
                 return Constants.maximumContentHeight
             }
@@ -239,6 +253,16 @@ extension FirePopoverViewController: NSCollectionViewDelegateFlowLayout {
         default: count = 0
         }
         return NSSize(width: collectionView.bounds.width, height: count == 0 ? 0 : Constants.headerHeight)
+    }
+
+    func collectionView(_ collectionView: NSCollectionView, layout collectionViewLayout: NSCollectionViewLayout, referenceSizeForFooterInSection section: Int) -> NSSize {
+        let count: Int
+        switch section {
+        case 0: count = firePopoverViewModel.fireproofed.count
+        case 1: count = firePopoverViewModel.selectable.count
+        default: count = 0
+        }
+        return NSSize(width: collectionView.bounds.width, height: count == 0 ? 0 : Constants.footerHeight)
     }
 
 }

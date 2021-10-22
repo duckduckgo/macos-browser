@@ -108,9 +108,8 @@ extension String {
         return parts.dropFirst().joined(separator: ".")
     }
 
-    //TODO
     func isSubdomain(of domain: String) -> Bool {
-        return self.hasSuffix(domain)
+        return self == domain || self.hasSuffix(".\(domain)")
     }
 
     func isSubdomain(of domains: Set<String>) -> Bool {
