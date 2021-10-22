@@ -41,7 +41,6 @@ final class HomepageCollectionViewItem: NSCollectionViewItem {
     }
 
     weak var delegate: HomepageCollectionViewItemDelegate?
-    var isPlaceholder: Bool = false
 
     @IBOutlet weak var wideBorderView: ColorView!
     @IBOutlet weak var narrowBorderView: ColorView!
@@ -59,8 +58,7 @@ final class HomepageCollectionViewItem: NSCollectionViewItem {
         state = .normal
     }
 
-    func set(bookmarkViewModel: BookmarkViewModel, isPlaceholder: Bool = false) {
-        self.isPlaceholder = isPlaceholder
+    func set(bookmarkViewModel: BookmarkViewModel) {
 
         if let bookmark = bookmarkViewModel.entity as? Bookmark {
             if let favicon = bookmark.favicon {
@@ -164,18 +162,16 @@ final class HomepageCollectionViewItem: NSCollectionViewItem {
                                 target: self,
                                 keyEquivalent: ""))
 
-        if !isPlaceholder {
-            menu.addItem(NSMenuItem.separator())
+        menu.addItem(NSMenuItem.separator())
 
-            menu.addItem(NSMenuItem(title: UserText.edit,
-                                action: #selector(edit(_:)),
-                                target: self,
-                                keyEquivalent: ""))
-            menu.addItem(NSMenuItem(title: UserText.remove,
-                                action: #selector(remove(_:)),
-                                target: self,
-                                keyEquivalent: ""))
-        }
+        menu.addItem(NSMenuItem(title: UserText.edit,
+                            action: #selector(edit(_:)),
+                            target: self,
+                            keyEquivalent: ""))
+        menu.addItem(NSMenuItem(title: UserText.remove,
+                            action: #selector(remove(_:)),
+                            target: self,
+                            keyEquivalent: ""))
 
         menu.delegate = self
         view.menu = menu
