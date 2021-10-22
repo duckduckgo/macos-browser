@@ -111,14 +111,8 @@ final class PasswordManagementLoginModel: ObservableObject, PasswordManagementIt
         self.onDeleteRequested = onDeleteRequested
     }
 
-    func copyPassword() {
-        NSPasteboard.general.clearContents()
-        NSPasteboard.general.setString(password, forType: .string)
-    }
-
-    func copyUsername() {
-        NSPasteboard.general.clearContents()
-        NSPasteboard.general.setString(username, forType: .string)
+    func copy(_ value: String) {
+        NSPasteboard.copy(value)
     }
 
     func save() {

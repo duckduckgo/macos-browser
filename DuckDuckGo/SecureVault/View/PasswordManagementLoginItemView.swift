@@ -53,8 +53,6 @@ struct PasswordManagementLoginItemView: View {
                     if model.isEditing || model.isNew {
                         Divider()
                             .padding(.bottom, 10)
-
-                        LoginTitleView()
                     }
 
                     UsernameView()
@@ -133,24 +131,6 @@ private struct Buttons: View {
 
 // MARK: - Login Views
 
-private struct LoginTitleView: View {
-
-    @EnvironmentObject var model: PasswordManagementLoginModel
-
-    var body: some View {
-
-        Text(UserText.pmLoginTitle)
-            .bold()
-            .padding(.bottom, itemSpacing)
-
-        TextField("", text: $model.title)
-            .textFieldStyle(RoundedBorderTextFieldStyle())
-            .padding(.bottom, interItemSpacing)
-
-    }
-
-}
-
 private struct UsernameView: View {
 
     @EnvironmentObject var model: PasswordManagementLoginModel
@@ -177,7 +157,7 @@ private struct UsernameView: View {
 
                     if isHovering {
                         Button {
-                            model.copyUsername()
+                            model.copy(model.username)
                         } label: {
                             Image("Copy")
                         }.buttonStyle(PlainButtonStyle())
@@ -257,7 +237,7 @@ private struct PasswordView: View {
 
                     if isHovering {
                         Button {
-                            model.copyPassword()
+                            model.copy(model.password)
                         } label: {
                             Image("Copy")
                         }.buttonStyle(PlainButtonStyle())
@@ -345,21 +325,18 @@ private struct HeaderView: View {
             LoginFaviconView(domain: model.domain)
                 .padding(.trailing, 10)
 
-            if model.isNew {
+            if model.isNew || model.isEditing {
 
-                Text(UserText.pmNewLogin)
+                TextField("", text: $model.title)
                     .font(.title)
-                    .padding(.trailing, 4)
+                    .textFieldStyle(PlainTextFieldStyle())
+                    .padding(4)
+                    .overlay(
+                        RoundedRectangle(cornerRadius: 5)
+                            .stroke(Color.accentColor, lineWidth: 2)
+                    )
 
             } else {
-
-                if model.isEditing {
-
-                    Text(UserText.pmEdit)
-                        .font(.title)
-                        .padding(.trailing, 4)
-
-                }
 
                 Text(model.title.isEmpty ? model.domain.dropWWW() : model.title)
                     .font(.title)

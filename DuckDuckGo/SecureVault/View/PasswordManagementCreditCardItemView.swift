@@ -48,17 +48,9 @@ struct PasswordManagementCreditCardItemView: View {
                 HeaderView()
                     .padding(.bottom, editMode ? 20 : 30)
 
-                EditableIdentityField(textFieldValue: $model.cardNumber, title: "Card Number") {
-                    print("Copied card number")
-                }
-
-                EditableIdentityField(textFieldValue: $model.cardholderName, title: "Cardholder Name") {
-                    print("Copied card security value")
-                }
-
-                EditableIdentityField(textFieldValue: $model.cardSecurityCode, title: "CVV") {
-                    print("Copied card security value")
-                }
+                EditableIdentityField(textFieldValue: $model.cardNumber, title: "Card Number")
+                EditableIdentityField(textFieldValue: $model.cardholderName, title: "Cardholder Name")
+                EditableIdentityField(textFieldValue: $model.cardSecurityCode, title: "CVV")
 
                 // Expiration:
 
@@ -124,26 +116,21 @@ private struct HeaderView: View {
             Image("Card")
                 .padding(.trailing, 10)
 
-            if model.isNew {
+            if model.isNew || model.isEditing {
 
                 TextField("", text: $model.title)
                     .font(.title)
-                    .textFieldStyle(RoundedBorderTextFieldStyle())
+                    .textFieldStyle(PlainTextFieldStyle())
+                    .padding(4)
+                    .overlay(
+                        RoundedRectangle(cornerRadius: 5)
+                            .stroke(Color.accentColor, lineWidth: 2)
+                    )
 
             } else {
 
-                if model.isEditing {
-
-                    TextField("", text: $model.title)
-                        .font(.title)
-                        .textFieldStyle(RoundedBorderTextFieldStyle())
-
-                } else {
-
-                    Text(model.title)
-                        .font(.title)
-
-                }
+                Text(model.title)
+                    .font(.title)
 
             }
 
@@ -208,7 +195,6 @@ private struct EditableIdentityField: View {
     @Binding var textFieldValue: String
 
     let title: String
-    let copyButtonClosure: () -> Void
 
     var body: some View {
 
@@ -233,7 +219,7 @@ private struct EditableIdentityField: View {
 
                         if isHovering {
                             Button {
-                                copyButtonClosure()
+                                model.copy(textFieldValue)
                             } label: {
                                 Image("Copy")
                             }.buttonStyle(PlainButtonStyle())

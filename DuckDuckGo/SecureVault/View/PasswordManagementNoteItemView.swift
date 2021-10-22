@@ -171,26 +171,21 @@ private struct HeaderView: View {
             Image("Note")
                 .padding(.trailing, 10)
 
-            if model.isNew {
+            if model.isNew || model.isEditing {
 
                 TextField("", text: $model.title)
                     .font(.title)
-                    .textFieldStyle(RoundedBorderTextFieldStyle())
+                    .textFieldStyle(PlainTextFieldStyle())
+                    .padding(4)
+                    .overlay(
+                        RoundedRectangle(cornerRadius: 5)
+                            .stroke(Color.accentColor, lineWidth: 2)
+                    )
 
             } else {
 
-                if model.isEditing {
-
-                    TextField("", text: $model.title)
-                        .font(.title)
-                        .textFieldStyle(RoundedBorderTextFieldStyle())
-
-                } else {
-
-                    Text(model.title)
-                        .font(.title)
-
-                }
+                Text(model.title)
+                    .font(.title)
 
             }
 

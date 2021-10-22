@@ -140,6 +140,10 @@ final class PasswordManagementIdentityModel: ObservableObject, PasswordManagemen
         self.onDeleteRequested = onDeleteRequested
     }
 
+    func copy(_ value: String) {
+        NSPasteboard.copy(value)
+    }
+
     func createNew() {
         identity = SecureVaultModels.Identity()
         isEditing = true

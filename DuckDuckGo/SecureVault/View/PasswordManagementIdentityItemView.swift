@@ -85,17 +85,9 @@ private struct IdentificationView: View {
                     .padding(.bottom, 20)
             }
 
-            EditableIdentityField(textFieldValue: $model.firstName, title: "First Name") {
-                print("Copied First Name")
-            }
-
-            EditableIdentityField(textFieldValue: $model.middleName, title: "Middle Name") {
-                print("Copied Middle Name")
-            }
-
-            EditableIdentityField(textFieldValue: $model.lastName, title: "Last Name") {
-                print("Copied Last Name")
-            }
+            EditableIdentityField(textFieldValue: $model.firstName, title: "First Name")
+            EditableIdentityField(textFieldValue: $model.middleName, title: "Middle Name")
+            EditableIdentityField(textFieldValue: $model.lastName, title: "Last Name")
         }
 
     }
@@ -120,21 +112,10 @@ private struct AddressView: View {
                     .padding(.bottom, 20)
             }
 
-            EditableIdentityField(textFieldValue: $model.addressStreet, title: "Street") {
-                print("Copied street")
-            }
-
-            EditableIdentityField(textFieldValue: $model.addressCity, title: "City") {
-                print("Copied city")
-            }
-
-            EditableIdentityField(textFieldValue: $model.addressProvince, title: "Province") {
-                print("Copied province")
-            }
-
-            EditableIdentityField(textFieldValue: $model.addressPostalCode, title: "Postal Code") {
-                print("Copied postal code")
-            }
+            EditableIdentityField(textFieldValue: $model.addressStreet, title: "Street")
+            EditableIdentityField(textFieldValue: $model.addressCity, title: "City")
+            EditableIdentityField(textFieldValue: $model.addressProvince, title: "Province")
+            EditableIdentityField(textFieldValue: $model.addressPostalCode, title: "Postal Code")
 
             if model.isInEditMode {
                 Text("Country")
@@ -177,17 +158,9 @@ private struct ContactInfoView: View {
                     .padding(.bottom, 20)
             }
 
-            EditableIdentityField(textFieldValue: $model.homePhone, title: "Home Phone") {
-                print("Copied home phone")
-            }
-
-            EditableIdentityField(textFieldValue: $model.mobilePhone, title: "Mobile Phone") {
-                print("Copied mobile phone")
-            }
-
-            EditableIdentityField(textFieldValue: $model.emailAddress, title: "Email Address") {
-                print("Copied email address")
-            }
+            EditableIdentityField(textFieldValue: $model.homePhone, title: "Home Phone")
+            EditableIdentityField(textFieldValue: $model.mobilePhone, title: "Mobile Phone")
+            EditableIdentityField(textFieldValue: $model.emailAddress, title: "Email Address")
         }
 
     }
@@ -290,7 +263,6 @@ private struct EditableIdentityField: View {
     @Binding var textFieldValue: String
 
     let title: String
-    let copyButtonClosure: () -> Void
 
     var body: some View {
         // Only show fields if the model is either editing or has data to show
@@ -315,7 +287,7 @@ private struct EditableIdentityField: View {
 
                         if isHovering {
                             Button {
-                                copyButtonClosure()
+                                model.copy(textFieldValue)
                             } label: {
                                 Image("Copy")
                             }.buttonStyle(PlainButtonStyle())

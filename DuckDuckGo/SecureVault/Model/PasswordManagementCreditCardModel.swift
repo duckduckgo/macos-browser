@@ -103,9 +103,13 @@ final class PasswordManagementCreditCardModel: ObservableObject, PasswordManagem
         self.onDeleteRequested = onDeleteRequested
     }
 
+    func copy(_ value: String) {
+        NSPasteboard.copy(value)
+    }
+
     func createNew() {
         card = .init(title: "",
-                     cardNumber: nil,
+                     cardNumber: "",
                      cardholderName: nil,
                      cardSecurityCode: nil,
                      expirationMonth: nil,
