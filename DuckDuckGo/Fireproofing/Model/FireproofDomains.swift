@@ -72,7 +72,7 @@ internal class FireproofDomains {
     }
 
     func isFireproof(fireproofDomain domain: String) -> Bool {
-        return fireproofDomains.contains(domain)
+        return fireproofDomains.contains(where: { $0.hasSuffix(domain) || $0.dropWWW().hasSuffix(domain) })
     }
 
     func isURLFireproof(url: URL) -> Bool {

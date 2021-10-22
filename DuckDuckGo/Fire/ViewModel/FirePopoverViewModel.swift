@@ -101,7 +101,11 @@ final class FirePopoverViewModel {
             }
         }
 
-        let visitedDomains = visitedDomains(basedOn: clearingOption)
+        func dropWWW(domains: Set<String>) -> Set<String> {
+            return Set(domains.map { $0.dropWWW() })
+        }
+
+        let visitedDomains = dropWWW(domains: visitedDomains(basedOn: clearingOption))
 
         let fireproofed = visitedDomains
             .filter { domain in

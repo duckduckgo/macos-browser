@@ -32,12 +32,16 @@ final class FirePopoverViewController: NSViewController {
     private var firePopoverViewModel: FirePopoverViewModel
     private let historyCoordinating: HistoryCoordinating
 
+    @UserDefaultsWrapper(key: .fireInfoPresentedOnce, defaultValue: false)
+    var infoPresentedOnce: Bool
+
     @IBOutlet weak var optionsButton: NSPopUpButton!
     @IBOutlet weak var openDetailsButton: NSButton!
     @IBOutlet weak var closeDetailsButton: NSButton!
     @IBOutlet weak var detailsWrapperView: NSView!
     @IBOutlet weak var contentHeightConstraint: NSLayoutConstraint!
     @IBOutlet weak var collectionView: NSCollectionView!
+    @IBOutlet weak var infoContainerView: NSView!
 
     private var viewModelCancellable: AnyCancellable?
     private var selectedCancellable: AnyCancellable?
@@ -72,6 +76,7 @@ final class FirePopoverViewController: NSViewController {
         collectionView.dataSource = self
         setupOptionsButton()
         updateCloseDetailsButton(for: .allData)
+        removeInfoContainerViewIfNeeded()
 
         subscribeToViewModel()
         subscribeToSelected()
@@ -163,6 +168,15 @@ final class FirePopoverViewController: NSViewController {
     private func setupOptionsButton() {
         FirePopoverViewModel.ClearingOption.allCases.enumerated().forEach { (index, option) in
             optionsButton.menu?.item(withTag: index)?.title = option.string
+        }
+    }
+
+    private func removeInfoContainerViewIfNeeded() {
+        if infoPresentedOnce {
+            infoContainerView?.removeFromSuperview()
+            infoContainerView = nil
+        } else {
+            infoPresentedOnce = true
         }
     }
 
