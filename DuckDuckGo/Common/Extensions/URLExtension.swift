@@ -381,9 +381,8 @@ extension URL {
                              config: PrivacyConfigurationManager = PrivacyConfigurationManager.shared) -> Bool {
         let enabledSites = config.gpcHeadersEnabled()
         
-        for gpcURL in enabledSites {
-            if let host = URL(string: gpcURL)?.host,
-               url.isPart(ofDomain: host) {
+        for gpcHost in enabledSites {
+            if url.isPart(ofDomain: gpcHost) {
                 
                 // Check if url is on exception list
                 // Since headers are only enabled for a small numbers of sites
