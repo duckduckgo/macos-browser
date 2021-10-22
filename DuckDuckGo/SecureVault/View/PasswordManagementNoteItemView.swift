@@ -120,7 +120,7 @@ private struct NoteTitleView: View {
 
     var body: some View {
 
-        Text("Note")
+        Text(UserText.pmNote)
             .bold()
             .padding(.bottom, itemSpacing)
 

@@ -79,15 +79,15 @@ private struct IdentificationView: View {
             let editMode = model.isEditing || model.isNew
 
             if !model.firstName.isEmpty || !model.middleName.isEmpty || !model.lastName.isEmpty || editMode {
-                Text("Identification")
+                Text(UserText.pmIdentification)
                     .bold()
                     .foregroundColor(.gray)
                     .padding(.bottom, 20)
             }
 
-            EditableIdentityField(textFieldValue: $model.firstName, title: "First Name")
-            EditableIdentityField(textFieldValue: $model.middleName, title: "Middle Name")
-            EditableIdentityField(textFieldValue: $model.lastName, title: "Last Name")
+            EditableIdentityField(textFieldValue: $model.firstName, title: UserText.pmFirstName)
+            EditableIdentityField(textFieldValue: $model.middleName, title: UserText.pmMiddleName)
+            EditableIdentityField(textFieldValue: $model.lastName, title: UserText.pmLastName)
         }
 
     }
@@ -112,10 +112,10 @@ private struct AddressView: View {
                     .padding(.bottom, 20)
             }
 
-            EditableIdentityField(textFieldValue: $model.addressStreet, title: "Street")
-            EditableIdentityField(textFieldValue: $model.addressCity, title: "City")
-            EditableIdentityField(textFieldValue: $model.addressProvince, title: "Province")
-            EditableIdentityField(textFieldValue: $model.addressPostalCode, title: "Postal Code")
+            EditableIdentityField(textFieldValue: $model.addressStreet, title: UserText.pmAddressStreet)
+            EditableIdentityField(textFieldValue: $model.addressCity, title: UserText.pmAddressCity)
+            EditableIdentityField(textFieldValue: $model.addressProvince, title: UserText.pmAddressProvince)
+            EditableIdentityField(textFieldValue: $model.addressPostalCode, title: UserText.pmAddressPostalCode)
 
             if model.isInEditMode {
                 Text("Country")
@@ -158,9 +158,8 @@ private struct ContactInfoView: View {
                     .padding(.bottom, 20)
             }
 
-            EditableIdentityField(textFieldValue: $model.homePhone, title: "Home Phone")
-            EditableIdentityField(textFieldValue: $model.mobilePhone, title: "Mobile Phone")
-            EditableIdentityField(textFieldValue: $model.emailAddress, title: "Email Address")
+            EditableIdentityField(textFieldValue: $model.homePhone, title: UserText.pmPhoneNumber)
+            EditableIdentityField(textFieldValue: $model.emailAddress, title: UserText.pmEmailAddress)
         }
 
     }

@@ -48,14 +48,14 @@ struct PasswordManagementCreditCardItemView: View {
                 HeaderView()
                     .padding(.bottom, editMode ? 20 : 30)
 
-                EditableIdentityField(textFieldValue: $model.cardNumber, title: "Card Number")
-                EditableIdentityField(textFieldValue: $model.cardholderName, title: "Cardholder Name")
-                EditableIdentityField(textFieldValue: $model.cardSecurityCode, title: "CVV")
+                EditableIdentityField(textFieldValue: $model.cardNumber, title: UserText.pmCardNumber)
+                EditableIdentityField(textFieldValue: $model.cardholderName, title: UserText.pmCardholderName)
+                EditableIdentityField(textFieldValue: $model.cardSecurityCode, title: UserText.pmCardVerificationValue)
 
                 // Expiration:
 
                 if model.expirationMonth != nil || model.expirationYear != nil || model.isInEditMode {
-                    Text("Expiration Date")
+                    Text(UserText.pmCardExpiration)
                         .bold()
                         .padding(.bottom, 5)
                 }
