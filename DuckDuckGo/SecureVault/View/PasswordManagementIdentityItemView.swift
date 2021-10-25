@@ -161,6 +161,7 @@ private struct AddressView: View {
                 !model.addressCity.isEmpty ||
                 !model.addressProvince.isEmpty ||
                 !model.addressPostalCode.isEmpty ||
+                !model.addressCountryCode.isEmpty ||
                 model.isInEditMode {
                 Text("Address")
                     .bold()
