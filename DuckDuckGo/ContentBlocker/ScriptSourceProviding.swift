@@ -64,7 +64,7 @@ final class DefaultScriptSourceProvider: ScriptSourceProviding {
         let unprotectedDomains = privacyConfiguration.tempUnprotectedDomains
         let contentBlockingExceptions = privacyConfiguration.exceptionsList(forFeature: .contentBlocking)
         return ContentBlockerRulesUserScript.loadJS("contentblockerrules", from: .main, withReplacements: [
-            "${unprotectedDomains}": (unprotectedDomains + contentBlockingExceptions).joined(separator: "\n")
+            "TEMP_UNPROTECTED_DOMAINS": (unprotectedDomains + contentBlockingExceptions).joined(separator: "\n")
         ])
     }
 
