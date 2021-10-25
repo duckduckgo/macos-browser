@@ -6,7 +6,7 @@
         "repositoryURL": "https://github.com/duckduckgo/BrowserServicesKit.git",
         "state": {
           "branch": "sam/secure-vault-data-types-additions",
-          "revision": "a7fe4f7692c8e4fb50ace3c4cf073bb6266cac5b",
+          "revision": "2398491478f34f94f48732c920456261ef95d1d9",
           "version": null
         }
       },
@@ -15,8 +15,8 @@
         "repositoryURL": "https://github.com/duckduckgo/GRDB.swift.git",
         "state": {
           "branch": null,
-          "revision": "9efe5a515acff8b73f69a31a65fc2bce2a823219",
-          "version": "1.1.0"
+          "revision": "995e7b639e4e5194fdff30778dbe080220bdb810",
+          "version": "1.0.0"
         }
       },
       {
