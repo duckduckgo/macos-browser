@@ -50,16 +50,16 @@ final class ContentBlockerRulesManager {
     private func loadUnprotectedDomains() -> [String] {
         let tempUnprotected = privacyConfiguration.tempUnprotectedDomains
         let contentBlockingExceptions = privacyConfiguration.exceptionsList(forFeature: .contentBlocking)
-        
-        return (tempUnprotected + contentBlockingExceptions).filter { !$0.isEmpty }
+
+        let protectionStore = DomainsProtectionUserDefaultsStore()
+        let userDisabledProtection = protectionStore.unprotectedDomains
+
+        return (tempUnprotected + contentBlockingExceptions + userDisabledProtection).filter { !$0.isEmpty }
     }
 
     private func compileRules(with trackerData: TrackerData,
                               andTemporaryUnprotectedDomains tempUnprotectedDomains: [String],
                               completion: ((WKContentRuleList?) -> Void)?) {
-
-        // When a user turns off protection for a site, it needs to be passed to the exceptions here
-        // https://app.asana.com/0/1177771139624306/1183561025576937/f
 
         let rules = ContentBlockerRulesBuilder(trackerData: trackerData).buildRules(withExceptions: [],
                                                                                     andTemporaryUnprotectedDomains: tempUnprotectedDomains)
