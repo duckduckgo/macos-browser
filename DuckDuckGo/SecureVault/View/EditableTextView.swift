@@ -79,16 +79,6 @@ extension EditableTextView {
             self.selectedRanges = textView.selectedRanges
         }
 
-        // Commented out as this event comes after the note view model refreshes its note and sets isDirty to false. Might not need this anyway?
-//        func textDidEndEditing(_ notification: Notification) {
-//            guard let textView = notification.object as? NSTextView else {
-//                return
-//            }
-//
-//            self.parent.text = textView.string
-//            self.parent.onCommit()
-//        }
-
     }
 
 }
@@ -143,7 +133,7 @@ final class CustomTextView: NSView {
 
         let textView = NSTextView(frame: .zero, textContainer: textContainer)
         textView.autoresizingMask = .width
-        textView.backgroundColor = NSColor.tertiaryLabelColor
+        textView.backgroundColor = NSColor(named: "PWMEditingControlColor")!
         textView.delegate = self.delegate
         textView.drawsBackground = true
         textView.font = self.font

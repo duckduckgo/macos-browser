@@ -26,7 +26,7 @@ final class PasswordManagementIdentityModel: ObservableObject, PasswordManagemen
     static let dateFormatter: DateFormatter = {
         let dateFormatter = DateFormatter()
         dateFormatter.dateStyle = .medium
-        dateFormatter.timeStyle = .medium
+        dateFormatter.timeStyle = .none
         return dateFormatter
     } ()
 
@@ -70,6 +70,24 @@ final class PasswordManagementIdentityModel: ObservableObject, PasswordManagemen
     }
 
     @Published var lastName: String = "" {
+        didSet {
+            isDirty = true
+        }
+    }
+
+    @Published var birthdayDay: Int? {
+        didSet {
+            isDirty = true
+        }
+    }
+
+    @Published var birthdayMonth: Int? {
+        didSet {
+            isDirty = true
+        }
+    }
+
+    @Published var birthdayYear: Int? {
         didSet {
             isDirty = true
         }
@@ -166,6 +184,9 @@ final class PasswordManagementIdentityModel: ObservableObject, PasswordManagemen
         identity.firstName = firstName
         identity.middleName = middleName
         identity.lastName = lastName
+        identity.birthdayDay = birthdayDay
+        identity.birthdayMonth = birthdayMonth
+        identity.birthdayYear = birthdayYear
 
         identity.addressStreet = addressStreet
         identity.addressCity = addressCity
@@ -207,6 +228,10 @@ final class PasswordManagementIdentityModel: ObservableObject, PasswordManagemen
         firstName = identity?.firstName ?? ""
         middleName = identity?.middleName ?? ""
         lastName = identity?.lastName ?? ""
+
+        birthdayDay = identity?.birthdayDay
+        birthdayMonth = identity?.birthdayMonth
+        birthdayYear = identity?.birthdayYear
 
         addressStreet = identity?.addressStreet ?? ""
         addressCity = identity?.addressCity ?? ""

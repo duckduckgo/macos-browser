@@ -67,10 +67,9 @@ struct PasswordManagementIdentityItemView: View {
                     Spacer(minLength: 0)
 
                     Buttons()
-                        .padding(.top, 10)
+                        .padding()
 
                 }
-                .padding()
 
             }
             .padding(EdgeInsets(top: 10, leading: 0, bottom: 10, trailing: 10))
@@ -100,6 +99,51 @@ private struct IdentificationView: View {
             EditableIdentityField(textFieldValue: $model.firstName, title: UserText.pmFirstName)
             EditableIdentityField(textFieldValue: $model.middleName, title: UserText.pmMiddleName)
             EditableIdentityField(textFieldValue: $model.lastName, title: UserText.pmLastName)
+
+            if model.isInEditMode {
+                Text("Birthday")
+                    .bold()
+                    .padding(.bottom, 5)
+
+                HStack {
+
+                    Picker("", selection: $model.birthdayDay) {
+                        ForEach(Date.daysInMonth, id: \.self) { year in
+                            Text(String(year))
+                                .tag(year as Int?)
+                        }
+                    }
+
+                    Picker("", selection: $model.birthdayMonth) {
+                        ForEach(Date.monthsWithIndex, id: \.self) { month in
+                            Text(month.name)
+                                .tag(month.index as Int?)
+                        }
+                    }
+                    .labelsHidden()
+
+                    Picker("", selection: $model.birthdayYear) {
+                        ForEach(Date.lastHundredYears, id: \.self) { year in
+                            Text(String(year))
+                                .tag(year as Int?)
+                        }
+                    }
+                    .labelsHidden()
+
+                }
+                .padding(.bottom, interItemSpacing)
+            } else if let day = model.birthdayDay, let month = model.birthdayMonth, let year = model.birthdayYear {
+                Text("Birthday")
+                    .bold()
+                    .padding(.bottom, 5)
+
+                let components = DateComponents(calendar: Calendar.current, year: year, month: month, day: day)
+
+                if let date = components.date {
+                    Text(PasswordManagementIdentityModel.dateFormatter.string(from: date))
+                        .padding(.bottom, interItemSpacing)
+                }
+            }
         }
 
     }

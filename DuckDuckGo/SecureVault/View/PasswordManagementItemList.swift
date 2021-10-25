@@ -32,7 +32,7 @@ struct PasswordManagementItemListView: View {
 
                 ForEach(model.displayedItems, id: \.title) { section in
 
-                    Section(header: Text(section.title).padding(.leading, 20).padding(.top, 15)) {
+                    Section(header: Text(section.title).padding(.leading, 18).padding(.top, 15)) {
 
                         ForEach(section.items, id: \.id) { item in
                             ItemView(item: item, selected: model.selected == item) {

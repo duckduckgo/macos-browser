@@ -146,7 +146,10 @@ private struct TextView: View {
             if model.isEditing || model.isNew {
 
                 EditableTextView(text: $model.text)
-                    .cornerRadius(6.0)
+                    .overlay(
+                        RoundedRectangle(cornerRadius: 4.0)
+                        .stroke(Color.init(NSColor.tertiaryLabelColor), lineWidth: 1)
+                    )
                     .padding(.bottom, interItemSpacing)
 
             } else {

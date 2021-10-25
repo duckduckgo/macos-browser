@@ -54,6 +54,10 @@ extension Date {
         }
     }
 
+    static var daysInMonth: [Int] {
+        return Array(1...31)
+    }
+
     static var nextTenYears: [Int] {
         let offsetComponents = DateComponents(year: 1)
 
@@ -61,6 +65,22 @@ extension Date {
         var currentDate = Date()
 
         for _ in 0...10 {
+            let currentYear = Calendar.current.component(.year, from: currentDate)
+            years.append(currentYear)
+
+            currentDate = Calendar.current.date(byAdding: offsetComponents, to: currentDate)!
+        }
+
+        return years
+    }
+
+    static var lastHundredYears: [Int] {
+        let offsetComponents = DateComponents(year: -1)
+
+        var years = [Int]()
+        var currentDate = Date()
+
+        for _ in 0...100 {
             let currentYear = Calendar.current.component(.year, from: currentDate)
             years.append(currentYear)
 
