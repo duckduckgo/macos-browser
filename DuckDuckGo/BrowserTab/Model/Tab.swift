@@ -629,7 +629,7 @@ extension Tab: WKNavigationDelegate {
         }
 
         completionHandler(.performDefaultHandling, nil)
-        if let host = webView.url?.host, let serverTrust = challenge.protectionSpace.serverTrust {
+        if let host = webView.url?.host, let serverTrust = challenge.protectionSpace.serverTrust, host == challenge.protectionSpace.host {
             self.serverTrust = ServerTrust(host: host, secTrust: serverTrust)
         }
     }
