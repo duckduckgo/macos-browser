@@ -172,7 +172,7 @@ final class PrivacyDashboardUserScript: NSObject, StaticUserScript {
     func setProtectionStatus(_ isProtected: Bool, webView: WKWebView) {
         evaluate(js: "window.onChangeProtectionStatus(\(isProtected))", in: webView)
     }
-    
+
     func setUpgradedHttps(_ upgradedHttps: Bool, webView: WKWebView) {
         evaluate(js: "window.onChangeUpgradedHttps(\(upgradedHttps))", in: webView)
     }

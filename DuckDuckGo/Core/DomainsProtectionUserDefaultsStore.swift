@@ -22,11 +22,7 @@ import Foundation
 public class DomainsProtectionUserDefaultsStore: DomainsProtectionStore {
 
     private struct Keys {
-        static let unprotectedDomains = "com.duckduckgo.contentblocker.whitelist"
-    }
-
-    public init() {
-        //
+        static let unprotectedDomains = "com.duckduckgo.contentblocker.unprotectedDomains"
     }
 
     private var userDefaults: UserDefaults? {

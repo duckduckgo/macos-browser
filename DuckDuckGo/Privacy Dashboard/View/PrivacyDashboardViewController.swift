@@ -119,7 +119,7 @@ final class PrivacyDashboardViewController: NSViewController {
         let isProtected = !protectionStore.unprotectedDomains.contains(domain)
         self.privacyDashboardScript.setProtectionStatus(isProtected, webView: self.webView)
     }
-    
+
     private func sendPendingUpdates() {
         guard let domain = tabViewModel?.tab.content.url?.host else {
             assertionFailure("PrivacyDashboardViewController: no domain available")

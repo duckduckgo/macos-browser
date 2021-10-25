@@ -41,27 +41,30 @@ final class ContentBlockerRulesManager {
     func compileRules(completion: ((WKContentRuleList?) -> Void)? = nil) {
         let trackerData = TrackerRadarManager.shared.trackerData
         let unprotectedDomains = loadUnprotectedDomains()
+        let protectionStore = DomainsProtectionUserDefaultsStore()
+        let userDisabledProtection = protectionStore.unprotectedDomains
 
         DispatchQueue.global(qos: .background).async {
-            self.compileRules(with: trackerData, andTemporaryUnprotectedDomains: unprotectedDomains, completion: completion)
+            self.compileRules(with: trackerData,
+                              withExceptions: Array(userDisabledProtection),
+                              andTemporaryUnprotectedDomains: unprotectedDomains,
+                              completion: completion)
         }
     }
 
     private func loadUnprotectedDomains() -> [String] {
         let tempUnprotected = privacyConfiguration.tempUnprotectedDomains
         let contentBlockingExceptions = privacyConfiguration.exceptionsList(forFeature: .contentBlocking)
-
-        let protectionStore = DomainsProtectionUserDefaultsStore()
-        let userDisabledProtection = protectionStore.unprotectedDomains
-
-        return (tempUnprotected + contentBlockingExceptions + userDisabledProtection).filter { !$0.isEmpty }
+        
+        return (tempUnprotected + contentBlockingExceptions).filter { !$0.isEmpty }
     }
 
     private func compileRules(with trackerData: TrackerData,
+                              withExceptions exceptions: [String],
                               andTemporaryUnprotectedDomains tempUnprotectedDomains: [String],
                               completion: ((WKContentRuleList?) -> Void)?) {
 
-        let rules = ContentBlockerRulesBuilder(trackerData: trackerData).buildRules(withExceptions: [],
+        let rules = ContentBlockerRulesBuilder(trackerData: trackerData).buildRules(withExceptions: exceptions,
                                                                                     andTemporaryUnprotectedDomains: tempUnprotectedDomains)
         guard let store = WKContentRuleListStore.default() else {
             assert(false, "Failed to access the default WKContentRuleListStore for rules compiliation checking")
