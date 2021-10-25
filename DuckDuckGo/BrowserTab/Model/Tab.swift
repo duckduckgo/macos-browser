@@ -686,7 +686,7 @@ extension Tab: WKNavigationDelegate {
         }
 
         HTTPSUpgrade.shared.isUpgradeable(url: url) { [weak self] isUpgradable in
-            if isUpgradable, let upgradedUrl = url.toHttps() {
+            if isUpgradable && navigationAction.isTargetingMainFrame, let upgradedUrl = url.toHttps() {
                 self?.webView.load(upgradedUrl)
                 self?.setConnectionUpgradedTo(upgradedUrl, navigationAction: navigationAction)
                 decisionHandler(.cancel)
