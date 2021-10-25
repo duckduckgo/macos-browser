@@ -74,13 +74,13 @@
                                 </customSpacing>
                             </stackView>
                             <scrollView wantsLayer="YES" borderType="none" horizontalLineScroll="10" horizontalPageScroll="10" verticalLineScroll="10" verticalPageScroll="10" hasVerticalScroller="NO" verticalScrollElasticity="none" translatesAutoresizingMaskIntoConstraints="NO" id="O0X-yp-zLn" customClass="TabBarScrollView" customModule="DuckDuckGo_Privacy_Browser" customModuleProvider="target">
-                                <rect key="frame" x="76" y="1" width="661" height="34"/>
+                                <rect key="frame" x="76" y="1" width="625" height="34"/>
                                 <clipView key="contentView" drawsBackground="NO" copiesOnScroll="NO" translatesAutoresizingMaskIntoConstraints="NO" id="zdf-RD-hTG">
-                                    <rect key="frame" x="0.0" y="0.0" width="661" height="34"/>
+                                    <rect key="frame" x="0.0" y="0.0" width="625" height="34"/>
                                     <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                     <subviews>
                                         <collectionView selectable="YES" allowsEmptySelection="NO" translatesAutoresizingMaskIntoConstraints="NO" id="OEu-5P-cRF" customClass="TabBarCollectionView" customModule="DuckDuckGo_Privacy_Browser" customModuleProvider="target">
-                                            <rect key="frame" x="0.0" y="0.0" width="661" height="34"/>
+                                            <rect key="frame" x="0.0" y="0.0" width="625" height="34"/>
                                             <autoresizingMask key="autoresizingMask" heightSizable="YES"/>
                                             <collectionViewFlowLayout key="collectionViewLayout" scrollDirection="horizontal" id="oAv-jh-KDw">
                                                 <size key="itemSize" width="120" height="32"/>
@@ -100,7 +100,7 @@
                                 </constraints>
                                 <edgeInsets key="contentInsets" left="0.0" right="0.0" top="0.0" bottom="0.0"/>
                                 <scroller key="horizontalScroller" wantsLayer="YES" verticalHuggingPriority="750" horizontal="YES" id="f6A-N1-Ed1">
-                                    <rect key="frame" x="0.0" y="18" width="661" height="16"/>
+                                    <rect key="frame" x="0.0" y="18" width="625" height="16"/>
                                     <autoresizingMask key="autoresizingMask"/>
                                 </scroller>
                                 <scroller key="verticalScroller" hidden="YES" wantsLayer="YES" verticalHuggingPriority="750" horizontal="NO" id="tXZ-5R-7cy">
@@ -108,11 +108,11 @@
                                     <autoresizingMask key="autoresizingMask"/>
                                 </scroller>
                             </scrollView>
-                            <stackView distribution="fillEqually" orientation="horizontal" alignment="top" spacing="4" horizontalStackHuggingPriority="249.99998474121094" verticalStackHuggingPriority="249.99998474121094" detachesHiddenViews="YES" translatesAutoresizingMaskIntoConstraints="NO" id="dN1-y1-5Xe">
-                                <rect key="frame" x="741" y="4" width="92" height="28"/>
+                            <stackView distribution="fillEqually" orientation="horizontal" alignment="centerY" spacing="4" horizontalStackHuggingPriority="249.99998474121094" verticalStackHuggingPriority="249.99998474121094" detachesHiddenViews="YES" translatesAutoresizingMaskIntoConstraints="NO" id="dN1-y1-5Xe">
+                                <rect key="frame" x="705" y="-2" width="128" height="40"/>
                                 <subviews>
                                     <button hidden="YES" translatesAutoresizingMaskIntoConstraints="NO" id="2da-G7-xcP" userLabel="Right Scroll Button" customClass="MouseOverButton" customModule="DuckDuckGo_Privacy_Browser" customModuleProvider="target">
-                                        <rect key="frame" x="0.0" y="0.0" width="28" height="28"/>
+                                        <rect key="frame" x="0.0" y="12" width="28" height="28"/>
                                         <constraints>
                                             <constraint firstAttribute="width" constant="28" id="avH-Y7-ipU"/>
                                             <constraint firstAttribute="height" constant="28" id="loq-Q2-JPM"/>
@@ -137,7 +137,7 @@
                                         </connections>
                                     </button>
                                     <button translatesAutoresizingMaskIntoConstraints="NO" id="qXs-b0-tWI" userLabel="Add Button" customClass="LongPressButton" customModule="DuckDuckGo_Privacy_Browser" customModuleProvider="target">
-                                        <rect key="frame" x="0.0" y="0.0" width="28" height="28"/>
+                                        <rect key="frame" x="0.0" y="6" width="28" height="28"/>
                                         <constraints>
                                             <constraint firstAttribute="width" constant="28" id="Lmr-Cv-caT"/>
                                             <constraint firstAttribute="height" constant="28" id="dy2-Qu-QxL"/>
@@ -163,14 +163,26 @@
                                         </connections>
                                     </button>
                                     <customView translatesAutoresizingMaskIntoConstraints="NO" id="Ako-KX-AM9" userLabel="Dragging Space">
-                                        <rect key="frame" x="32" y="0.0" width="28" height="28"/>
+                                        <rect key="frame" x="32" y="0.0" width="64" height="40"/>
+                                        <subviews>
+                                            <imageView horizontalHuggingPriority="251" verticalHuggingPriority="251" translatesAutoresizingMaskIntoConstraints="NO" id="GYW-Sf-jDU">
+                                                <rect key="frame" x="9" y="12" width="46" height="16"/>
+                                                <constraints>
+                                                    <constraint firstAttribute="width" constant="46" id="65K-Fe-JxF"/>
+                                                    <constraint firstAttribute="height" constant="16" id="gGJ-rj-cHl"/>
+                                                </constraints>
+                                                <imageCell key="cell" refusesFirstResponder="YES" alignment="left" imageScaling="proportionallyDown" image="BetaLabel" id="L4S-ox-4XH"/>
+                                            </imageView>
+                                        </subviews>
                                         <constraints>
-                                            <constraint firstAttribute="width" constant="28" id="9ye-ja-rYh"/>
-                                            <constraint firstAttribute="height" constant="28" id="zmV-VF-tQ1"/>
+                                            <constraint firstAttribute="width" constant="64" id="9ye-ja-rYh"/>
+                                            <constraint firstItem="GYW-Sf-jDU" firstAttribute="centerX" secondItem="Ako-KX-AM9" secondAttribute="centerX" id="Cd2-SA-9tB"/>
+                                            <constraint firstItem="GYW-Sf-jDU" firstAttribute="centerY" secondItem="Ako-KX-AM9" secondAttribute="centerY" id="Z2u-TA-yUd"/>
+                                            <constraint firstAttribute="height" constant="40" id="zmV-VF-tQ1"/>
                                         </constraints>
                                     </customView>
                                     <button translatesAutoresizingMaskIntoConstraints="NO" id="XV4-Ze-5j7" userLabel="Burn Button" customClass="MouseOverButton" customModule="DuckDuckGo_Privacy_Browser" customModuleProvider="target">
-                                        <rect key="frame" x="64" y="0.0" width="28" height="28"/>
+                                        <rect key="frame" x="100" y="6" width="28" height="28"/>
                                         <constraints>
                                             <constraint firstAttribute="width" constant="28" id="9Ii-rC-Eca"/>
                                             <constraint firstAttribute="height" constant="28" id="Dea-ni-6y6"/>
@@ -210,7 +222,7 @@
                                 </customSpacing>
                             </stackView>
                             <imageView hidden="YES" horizontalHuggingPriority="251" verticalHuggingPriority="251" translatesAutoresizingMaskIntoConstraints="NO" id="u4N-Qc-LMf" userLabel="Right Shadow Image">
-                                <rect key="frame" x="732" y="0.0" width="5" height="40"/>
+                                <rect key="frame" x="696" y="0.0" width="5" height="40"/>
                                 <constraints>
                                     <constraint firstAttribute="width" constant="5" id="tqI-pU-ZWB"/>
                                 </constraints>
@@ -224,7 +236,7 @@
                                 <imageCell key="cell" refusesFirstResponder="YES" alignment="left" imageScaling="axesIndependently" image="TabBarShadowLeft" id="crE-9i-66r"/>
                             </imageView>
                             <customView translatesAutoresizingMaskIntoConstraints="NO" id="efe-Pc-ueT" userLabel="Window Dragging View" customClass="WindowDraggingView" customModule="DuckDuckGo_Privacy_Browser" customModuleProvider="target">
-                                <rect key="frame" x="76" y="0.0" width="665" height="40"/>
+                                <rect key="frame" x="76" y="0.0" width="629" height="40"/>
                             </customView>
                         </subviews>
                         <constraints>
@@ -277,6 +289,7 @@
     <resources>
         <image name="Add" width="16" height="16"/>
         <image name="Back" width="16" height="16"/>
+        <image name="BetaLabel" width="46" height="16"/>
         <image name="Burn" width="16" height="16"/>
         <image name="Forward" width="16" height="16"/>
         <image name="TabBarShadowLeft" width="5" height="34"/>
