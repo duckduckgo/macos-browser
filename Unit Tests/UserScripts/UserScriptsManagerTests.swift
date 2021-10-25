@@ -35,6 +35,7 @@ final class UserScriptsManagerTests: XCTestCase {
 
         var contentBlockerRulesSource: String { fatalError() }
         var contentBlockerSource: String { fatalError() }
+        var credentialsSource: String { fatalError() }
     }
 
     func testWhenUserScriptsManagerInitializedUserScriptsAreLoadedAndStored() {

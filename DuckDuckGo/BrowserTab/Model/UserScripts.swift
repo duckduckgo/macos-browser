@@ -30,6 +30,7 @@ final class UserScripts {
     let autofillScript = AutofillUserScript()
     let printingUserScript = PrintingUserScript()
     let hoverUserScript = HoverUserScript()
+    let credentialsUserScript = CredentialsUserScript()
     let debugScript = DebugUserScript()
 
     init() {
@@ -51,6 +52,7 @@ final class UserScripts {
         self.pageObserverScript,
         self.printingUserScript,
         self.hoverUserScript,
+        self.credentialsUserScript,
         self.autofillScript
     ]
 

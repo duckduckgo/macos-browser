@@ -24,6 +24,7 @@ protocol ScriptSourceProviding {
     func reload()
     var contentBlockerRulesSource: String { get }
     var contentBlockerSource: String { get }
+    var credentialsSource: String { get }
 
     var sourceUpdatedPublisher: AnyPublisher<Void, Never> { get }
 
@@ -37,6 +38,8 @@ final class DefaultScriptSourceProvider: ScriptSourceProviding {
     private(set) var contentBlockerRulesSource: String = ""
     @Published
     private(set) var contentBlockerSource: String = ""
+    @Published
+    private(set) var credentialsSource: String = ""
 
     private let sourceUpdatedSubject = PassthroughSubject<Void, Never>()
 
@@ -57,6 +60,7 @@ final class DefaultScriptSourceProvider: ScriptSourceProviding {
     func reload() {
         contentBlockerRulesSource = buildContentBlockerRulesSource()
         contentBlockerSource = buildContentBlockerSource()
+        credentialsSource = buildCredentialsSource()
         sourceUpdatedSubject.send( () )
     }
 
@@ -85,6 +89,15 @@ final class DefaultScriptSourceProvider: ScriptSourceProviding {
             "TRACKER_DATA": trackerData,
             "SURROGATES": surrogates,
             "BLOCKING_ENABLED": privacyConfiguration.isEnabled(featureKey: .contentBlocking) ? "true" : "false"
+        ])
+    }
+
+    private func buildCredentialsSource() -> String {
+        let unprotectedDomains = privacyConfiguration.tempUnprotectedDomains
+        let contentBlockingExceptions = privacyConfiguration.exceptionsList(forFeature: .credentials)
+        return CredentialsUserScript.loadJS("credentials", from: .main, withReplacements: [
+            "CREDENTIALS_ENABLED": privacyConfiguration.isEnabled(featureKey: .credentials) ? "true" : "false",
+            "CREDENTIALS_EXCEPTIONS": (unprotectedDomains + contentBlockingExceptions).joined(separator: "\n")
         ])
     }
 
