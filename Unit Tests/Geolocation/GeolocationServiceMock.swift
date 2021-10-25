@@ -78,7 +78,7 @@ final class GeolocationServiceMock: GeolocationServiceProtocol {
         }
     }
     var locationServicesEnabled: () -> Bool {
-        { self.locationServicesEnabledValue }
+        self.locationServicesEnabledValue
     }
 
     private func didReceiveSubscription(_ s: Subscription) {
