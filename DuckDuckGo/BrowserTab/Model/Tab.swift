@@ -645,7 +645,7 @@ extension Tab: WKNavigationDelegate {
         webView.customUserAgent = UserAgent.for(navigationAction.request.url)
                                                 
         if navigationAction.isTargetingMainFrame, navigationAction.navigationType != .backForward,
-           let request = GPCRequestFactory.requestForGPC(basedOn: navigationAction.request) {
+           let request = GPCRequestFactory.shared.requestForGPC(basedOn: navigationAction.request) {
             decisionHandler(.cancel)
             webView.load(request)
             return

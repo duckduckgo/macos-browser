@@ -20,13 +20,25 @@ import Foundation
 
 final class GPCRequestFactory {
     
+    static let shared = GPCRequestFactory()
+    
     struct Constants {
         static let secGPCHeader = "Sec-GPC"
     }
     
-    static func requestForGPC(basedOn incomingRequest: URLRequest,
-                              settings: PrivacySecurityPreferences = PrivacySecurityPreferences(),
-                              config: PrivacyConfigurationManager = PrivacyConfigurationManager.shared) -> URLRequest? {
+    var gpcEnabled = true
+    
+    init() {
+        reloadGPCSetting()
+    }
+    
+    func reloadGPCSetting() {
+        let prefs = PrivacySecurityPreferences()
+        gpcEnabled = prefs.gpcEnabled
+    }
+    
+    func requestForGPC(basedOn incomingRequest: URLRequest,
+                       config: PrivacyConfigurationManager = PrivacyConfigurationManager.shared) -> URLRequest? {
         /*
          For now, the GPC header is only applied to sites known to be honoring GPC (nytimes.com, washingtonpost.com),
          while the DOM signal is available to all websites.
@@ -36,11 +48,9 @@ final class GPCRequestFactory {
         
         var request = incomingRequest
         // Add GPC header if needed
-        if config.isEnabled(featureKey: .gpc) {
+        if config.isEnabled(featureKey: .gpc) && gpcEnabled {
             if let headers = request.allHTTPHeaderFields,
                headers.firstIndex(where: { $0.key == Constants.secGPCHeader }) == nil {
-                guard settings.gpcEnabled else { return nil }
-                
                 request.addValue("1", forHTTPHeaderField: Constants.secGPCHeader)
                 return request
             }

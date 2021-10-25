@@ -27,6 +27,7 @@ struct PrivacySecurityPreferences {
     public var gpcEnabled: Bool {
         didSet {
             DefaultScriptSourceProvider.shared.reload()
+            GPCRequestFactory.shared.reloadGPCSetting()
         }
     }
 }
