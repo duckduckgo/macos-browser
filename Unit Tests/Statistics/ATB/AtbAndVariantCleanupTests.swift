@@ -23,30 +23,26 @@ import XCTest
 
 class AtbAndVariantCleanupTests: XCTestCase {
 
-//    struct Constants {
-//
-//        static let atb = "atb"
-//        static let variant = "variant"
-//
-//    }
-//
-//    let mockStorage = MockStatisticsStore()
-//    let mockVariantManager = MockVariantManager()
-//
-//    override func setUp() {
-//        super.setUp()
-//    }
-//
-//    func testWhenAtbHasVariantThenAtbStoredWithVariantRemoved() {
-//
-//        mockStorage.atb = "\(Constants.atb)\(Constants.variant)"
-//        mockStorage.variant = Constants.variant
-//
-//        AtbAndVariantCleanup.cleanup(statisticsStorage: mockStorage, variantManager: mockVariantManager)
-//
-//        XCTAssertEqual(Constants.atb, mockStorage.atb)
-//
-//    }
+    struct Constants {
+
+        static let atb = "atb"
+        static let variant = "variant"
+
+    }
+
+    let mockStorage = MockStatisticsStore()
+    let mockVariantManager = MockVariantManager()
+
+    func testWhenAtbHasVariantThenAtbStoredWithVariantRemoved() {
+
+        mockStorage.atb = "\(Constants.atb)\(Constants.variant)"
+        mockStorage.variant = Constants.variant
+
+        AtbAndVariantCleanup.cleanup(statisticsStorage: mockStorage, variantManager: mockVariantManager)
+
+        XCTAssertEqual(Constants.atb, mockStorage.atb)
+
+    }
 //
 //    func testWhenVariantIsNotInCurrentExperimentThenVariantRemovedFromStorage() {
 //
