@@ -33,9 +33,9 @@ final class HistoryCoordinatingMock: HistoryCoordinating {
         updateTitleIfNeededCalled = true
     }
 
-    var burnHistoryCalled = false
-    func burnHistory(except fireproofDomains: FireproofDomains, completion: @escaping () -> Void) {
-        burnHistoryCalled = true
+    var burnCalled = false
+    func burn(except fireproofDomains: FireproofDomains, completion: @escaping () -> Void) {
+        burnCalled = true
         completion()
     }
 
