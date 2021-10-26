@@ -77,8 +77,6 @@ final class HomepageCollectionViewFlowLayout: NSCollectionViewFlowLayout {
             headerMaxX = max(headerMaxX, attribute.frame.maxX)
         }
 
-        print(#function, startY)
-
         headerAttribute.frame.origin.x = startX
         headerAttribute.frame.origin.y = startY
         headerAttribute.frame.size.width = contentWidth

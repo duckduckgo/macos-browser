@@ -19,7 +19,6 @@
 		14D9B8FB24F7E089000D4D13 /* AddressBarViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 14D9B8F924F7E089000D4D13 /* AddressBarViewController.swift */; };
 		336D5B18262D8D3C0052E0C9 /* findinpage.js in Resources */ = {isa = PBXBuildFile; fileRef = 336D5AEF262D8D3C0052E0C9 /* findinpage.js */; };
 		339A6B5826A044BA00E3DAE8 /* duckduckgo-privacy-dashboard in Resources */ = {isa = PBXBuildFile; fileRef = 339A6B5726A044BA00E3DAE8 /* duckduckgo-privacy-dashboard */; };
-		4B02198825E05FAC00ED7DEA /* login-detection.js in Resources */ = {isa = PBXBuildFile; fileRef = 4B02197D25E05FAC00ED7DEA /* login-detection.js */; };
 		4B02198925E05FAC00ED7DEA /* FireproofingURLExtensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B02197F25E05FAC00ED7DEA /* FireproofingURLExtensions.swift */; };
 		4B02198A25E05FAC00ED7DEA /* FireproofDomains.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B02198125E05FAC00ED7DEA /* FireproofDomains.swift */; };
 		4B02198B25E05FAC00ED7DEA /* FireproofInfoViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B02198325E05FAC00ED7DEA /* FireproofInfoViewController.swift */; };
@@ -261,11 +260,6 @@
 		85CC1D7D26A05F250062F04E /* PasswordManagementItemModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 85CC1D7C26A05F250062F04E /* PasswordManagementItemModel.swift */; };
 		85D33F1225C82EB3002B91A6 /* ConfigurationManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 85D33F1125C82EB3002B91A6 /* ConfigurationManager.swift */; };
 		85D438B6256E7C9E00F3BAF8 /* ContextMenuUserScript.swift in Sources */ = {isa = PBXBuildFile; fileRef = 85D438B5256E7C9E00F3BAF8 /* ContextMenuUserScript.swift */; };
-		85D6F82427163D9500051734 /* Dax-Wink.svg in Resources */ = {isa = PBXBuildFile; fileRef = 85D6F82327163D9500051734 /* Dax-Wink.svg */; };
-		85D6F826271648CB00051734 /* Dax.svg in Resources */ = {isa = PBXBuildFile; fileRef = 85D6F825271648CB00051734 /* Dax.svg */; };
-		85D6F82827164E3B00051734 /* Dax-Bow-Tie.svg in Resources */ = {isa = PBXBuildFile; fileRef = 85D6F82727164E3A00051734 /* Dax-Bow-Tie.svg */; };
-		85D6F82B271656C500051734 /* Dax-EyeBrows.svg in Resources */ = {isa = PBXBuildFile; fileRef = 85D6F829271656C500051734 /* Dax-EyeBrows.svg */; };
-		85D6F82C271656C500051734 /* Dax-Eyes.svg in Resources */ = {isa = PBXBuildFile; fileRef = 85D6F82A271656C500051734 /* Dax-Eyes.svg */; };
 		85D885B026A590A90077C374 /* NSNotificationName+PasswordManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 85D885AF26A590A90077C374 /* NSNotificationName+PasswordManager.swift */; };
 		85D885B326A5A9DE0077C374 /* NSAlert+PasswordManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 85D885B226A5A9DE0077C374 /* NSAlert+PasswordManager.swift */; };
 		85E11C2F25E7DC7E00974CAF /* ExternalURLHandler.swift in Sources */ = {isa = PBXBuildFile; fileRef = 85E11C2E25E7DC7E00974CAF /* ExternalURLHandler.swift */; };
@@ -607,7 +601,6 @@
 		14D9B8F924F7E089000D4D13 /* AddressBarViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AddressBarViewController.swift; sourceTree = "<group>"; };
 		336D5AEF262D8D3C0052E0C9 /* findinpage.js */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.javascript; path = findinpage.js; sourceTree = "<group>"; };
 		339A6B5726A044BA00E3DAE8 /* duckduckgo-privacy-dashboard */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; name = "duckduckgo-privacy-dashboard"; path = "Submodules/duckduckgo-privacy-dashboard"; sourceTree = SOURCE_ROOT; };
-		4B02197D25E05FAC00ED7DEA /* login-detection.js */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.javascript; path = "login-detection.js"; sourceTree = "<group>"; };
 		4B02197F25E05FAC00ED7DEA /* FireproofingURLExtensions.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = FireproofingURLExtensions.swift; sourceTree = "<group>"; };
 		4B02198125E05FAC00ED7DEA /* FireproofDomains.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = FireproofDomains.swift; sourceTree = "<group>"; };
 		4B02198325E05FAC00ED7DEA /* FireproofInfoViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = FireproofInfoViewController.swift; sourceTree = "<group>"; };
@@ -854,11 +847,6 @@
 		85CC1D7C26A05F250062F04E /* PasswordManagementItemModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PasswordManagementItemModel.swift; sourceTree = "<group>"; };
 		85D33F1125C82EB3002B91A6 /* ConfigurationManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ConfigurationManager.swift; sourceTree = "<group>"; };
 		85D438B5256E7C9E00F3BAF8 /* ContextMenuUserScript.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContextMenuUserScript.swift; sourceTree = "<group>"; };
-		85D6F82327163D9500051734 /* Dax-Wink.svg */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = "Dax-Wink.svg"; sourceTree = "<group>"; };
-		85D6F825271648CB00051734 /* Dax.svg */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = Dax.svg; sourceTree = "<group>"; };
-		85D6F82727164E3A00051734 /* Dax-Bow-Tie.svg */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = "Dax-Bow-Tie.svg"; sourceTree = "<group>"; };
-		85D6F829271656C500051734 /* Dax-EyeBrows.svg */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = "Dax-EyeBrows.svg"; sourceTree = "<group>"; };
-		85D6F82A271656C500051734 /* Dax-Eyes.svg */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = "Dax-Eyes.svg"; sourceTree = "<group>"; };
 		85D885AF26A590A90077C374 /* NSNotificationName+PasswordManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "NSNotificationName+PasswordManager.swift"; sourceTree = "<group>"; };
 		85D885B226A5A9DE0077C374 /* NSAlert+PasswordManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "NSAlert+PasswordManager.swift"; sourceTree = "<group>"; };
 		85E11C2E25E7DC7E00974CAF /* ExternalURLHandler.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ExternalURLHandler.swift; sourceTree = "<group>"; };
@@ -1241,20 +1229,11 @@
 		4B02197B25E05FAC00ED7DEA /* Fireproofing */ = {
 			isa = PBXGroup;
 			children = (
-				4B02197C25E05FAC00ED7DEA /* Resources */,
 				4B02197E25E05FAC00ED7DEA /* Extensions */,
 				4B02198025E05FAC00ED7DEA /* Model */,
 				4B02198225E05FAC00ED7DEA /* View */,
 			);
 			path = Fireproofing;
-			sourceTree = "<group>";
-		};
-		4B02197C25E05FAC00ED7DEA /* Resources */ = {
-			isa = PBXGroup;
-			children = (
-				4B02197D25E05FAC00ED7DEA /* login-detection.js */,
-			);
-			path = Resources;
 			sourceTree = "<group>";
 		};
 		4B02197E25E05FAC00ED7DEA /* Extensions */ = {
@@ -2793,11 +2772,6 @@
 			children = (
 				AA72D5E225FE977F00C77619 /* AddEditFavoriteViewController.swift */,
 				AA72D5EF25FEA49900C77619 /* AddEditFavoriteWindow.swift */,
-				85D6F82727164E3A00051734 /* Dax-Bow-Tie.svg */,
-				85D6F829271656C500051734 /* Dax-EyeBrows.svg */,
-				85D6F82A271656C500051734 /* Dax-Eyes.svg */,
-				85D6F82327163D9500051734 /* Dax-Wink.svg */,
-				85D6F825271648CB00051734 /* Dax.svg */,
 				4B65027925E5F2B10054432E /* DefaultBrowserPromptView.swift */,
 				4B65027425E5F2A70054432E /* DefaultBrowserPromptView.xib */,
 				AAE71E2B25F781EA00D74437 /* Homepage.storyboard */,
@@ -3302,13 +3276,11 @@
 				85A0117425AF2EDF00FA6A0C /* FindInPage.storyboard in Resources */,
 				AA80EC89256C49B8007083E7 /* Localizable.strings in Resources */,
 				AAE8B102258A41C000E81239 /* Tooltip.storyboard in Resources */,
-				85D6F82C271656C500051734 /* Dax-Eyes.svg in Resources */,
 				AA68C3D72490F821001B8783 /* README.md in Resources */,
 				AA585D86248FD31400E9A3E2 /* Assets.xcassets in Resources */,
 				AA585D89248FD31400E9A3E2 /* Main.storyboard in Resources */,
 				4B6160F225B15792007DE5B2 /* contentblockerrules.js in Resources */,
 				AA80EC79256C46AA007083E7 /* TabBar.storyboard in Resources */,
-				85D6F82B271656C500051734 /* Dax-EyeBrows.svg in Resources */,
 				AAC5E4C925D6A6E8007F5990 /* Bookmarks.storyboard in Resources */,
 				B6FA893D269C423100588ECD /* PrivacyDashboard.storyboard in Resources */,
 				B693955626F04BEC0015B914 /* SavePanelAccessoryView.xib in Resources */,
@@ -3320,7 +3292,6 @@
 				AAE71E3825F7869300D74437 /* HomepageCollectionViewItem.xib in Resources */,
 				4B723E1126B0006C00E14D75 /* DataImport.storyboard in Resources */,
 				4B92929026670D1700AD2C21 /* BookmarkTableCellView.xib in Resources */,
-				4B02198825E05FAC00ED7DEA /* login-detection.js in Resources */,
 				339A6B5826A044BA00E3DAE8 /* duckduckgo-privacy-dashboard in Resources */,
 				4B92928E26670D1700AD2C21 /* BookmarkOutlineViewCell.xib in Resources */,
 				858C78FC2705EB5F009B2B44 /* HomepageHeader.xib in Resources */,
@@ -3338,14 +3309,11 @@
 				4B677432255DBEB800025BD8 /* httpsMobileV2BloomSpec.json in Resources */,
 				AA28C11E271AFD3600F33FF1 /* shield-dot.json in Resources */,
 				AA2CB12D2587BB5600AA6FBE /* TabBarFooter.xib in Resources */,
-				85D6F826271648CB00051734 /* Dax.svg in Resources */,
-				85D6F82827164E3B00051734 /* Dax-Bow-Tie.svg in Resources */,
 				4B6160D825B150E4007DE5B2 /* trackerData.json in Resources */,
 				AA80EC67256C4691007083E7 /* BrowserTab.storyboard in Resources */,
 				4B0511C1262CAA5A00F6079C /* PrivacySecurityPreferencesTableCellView.xib in Resources */,
 				AA28C11F271AFD3600F33FF1 /* dark-trackers.json in Resources */,
 				4B0511D0262CAA5A00F6079C /* AppearancePreferencesTableCellView.xib in Resources */,
-				85D6F82427163D9500051734 /* Dax-Wink.svg in Resources */,
 				4B6160F725B157BB007DE5B2 /* contentblocker.js in Resources */,
 				336D5B18262D8D3C0052E0C9 /* findinpage.js in Resources */,
 			);
@@ -4137,7 +4105,7 @@
 				CODE_SIGN_IDENTITY = "";
 				CODE_SIGN_STYLE = Manual;
 				COMBINE_HIDPI_IMAGES = YES;
-				CURRENT_PROJECT_VERSION = 0.16.3;
+				CURRENT_PROJECT_VERSION = 0.16.4;
 				DEVELOPMENT_TEAM = "";
 				ENABLE_HARDENED_RUNTIME = YES;
 				INFOPLIST_FILE = DuckDuckGo/Info.plist;
@@ -4145,7 +4113,7 @@
 					"$(inherited)",
 					"@executable_path/../Frameworks",
 				);
-				MARKETING_VERSION = 0.16.3;
+				MARKETING_VERSION = 0.16.4;
 				PRODUCT_BUNDLE_IDENTIFIER = com.duckduckgo.macos.browser.debug;
 				PRODUCT_MODULE_NAME = "$(TARGET_NAME:c99extidentifier)";
 				PRODUCT_NAME = DuckDuckGo;
@@ -4409,7 +4377,7 @@
 				CODE_SIGN_IDENTITY = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
 				COMBINE_HIDPI_IMAGES = YES;
-				CURRENT_PROJECT_VERSION = 0.16.3;
+				CURRENT_PROJECT_VERSION = 0.16.4;
 				DEVELOPMENT_TEAM = HKE973VLUW;
 				ENABLE_HARDENED_RUNTIME = YES;
 				INFOPLIST_FILE = DuckDuckGo/Info.plist;
@@ -4417,7 +4385,7 @@
 					"$(inherited)",
 					"@executable_path/../Frameworks",
 				);
-				MARKETING_VERSION = 0.16.3;
+				MARKETING_VERSION = 0.16.4;
 				PRODUCT_BUNDLE_IDENTIFIER = com.duckduckgo.macos.browser.debug;
 				PRODUCT_MODULE_NAME = "$(TARGET_NAME:c99extidentifier)";
 				PRODUCT_NAME = DuckDuckGo;
@@ -4437,7 +4405,7 @@
 				CODE_SIGN_IDENTITY = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
 				COMBINE_HIDPI_IMAGES = YES;
-				CURRENT_PROJECT_VERSION = 0.16.3;
+				CURRENT_PROJECT_VERSION = 0.16.4;
 				DEVELOPMENT_TEAM = HKE973VLUW;
 				ENABLE_HARDENED_RUNTIME = YES;
 				INFOPLIST_FILE = DuckDuckGo/Info.plist;
@@ -4445,7 +4413,7 @@
 					"$(inherited)",
 					"@executable_path/../Frameworks",
 				);
-				MARKETING_VERSION = 0.16.3;
+				MARKETING_VERSION = 0.16.4;
 				PRODUCT_BUNDLE_IDENTIFIER = com.duckduckgo.macos.browser;
 				PRODUCT_MODULE_NAME = "$(TARGET_NAME:c99extidentifier)";
 				PRODUCT_NAME = DuckDuckGo;
@@ -4569,7 +4537,7 @@
 				CODE_SIGN_IDENTITY = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
 				COMBINE_HIDPI_IMAGES = YES;
-				CURRENT_PROJECT_VERSION = 0.16.3;
+				CURRENT_PROJECT_VERSION = 0.16.4;
 				DEVELOPMENT_TEAM = HKE973VLUW;
 				ENABLE_HARDENED_RUNTIME = YES;
 				INFOPLIST_FILE = DuckDuckGo/Info.plist;
@@ -4577,7 +4545,7 @@
 					"$(inherited)",
 					"@executable_path/../Frameworks",
 				);
-				MARKETING_VERSION = 0.16.3;
+				MARKETING_VERSION = 0.16.4;
 				PRODUCT_BUNDLE_IDENTIFIER = com.duckduckgo.macos.browser.review;
 				PRODUCT_MODULE_NAME = "$(TARGET_NAME:c99extidentifier)";
 				PRODUCT_NAME = "DuckDuckGo Review";
@@ -4717,7 +4685,7 @@
 				CODE_SIGN_IDENTITY = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
 				COMBINE_HIDPI_IMAGES = YES;
-				CURRENT_PROJECT_VERSION = 0.16.3;
+				CURRENT_PROJECT_VERSION = 0.16.4;
 				DEVELOPMENT_TEAM = HKE973VLUW;
 				ENABLE_HARDENED_RUNTIME = YES;
 				GCC_PREPROCESSOR_DEFINITIONS = "BETA=1";
@@ -4726,7 +4694,7 @@
 					"$(inherited)",
 					"@executable_path/../Frameworks",
 				);
-				MARKETING_VERSION = 0.16.3;
+				MARKETING_VERSION = 0.16.4;
 				PRODUCT_BUNDLE_IDENTIFIER = com.duckduckgo.macos.browser;
 				PRODUCT_MODULE_NAME = "$(TARGET_NAME:c99extidentifier)";
 				PRODUCT_NAME = "DuckDuckGo Non-Production";
