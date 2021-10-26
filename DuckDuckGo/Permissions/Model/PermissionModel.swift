@@ -20,6 +20,7 @@ import Foundation
 import Combine
 import WebKit
 import AVFoundation
+import CoreLocation
 
 final class PermissionModel {
 
