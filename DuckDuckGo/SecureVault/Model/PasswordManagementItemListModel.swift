@@ -213,6 +213,7 @@ final class PasswordManagementItemListModel: ObservableObject {
     var filter: String = "" {
         didSet {
             refresh()
+            selectFirst()
         }
     }
 
