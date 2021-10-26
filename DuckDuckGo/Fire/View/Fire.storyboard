@@ -143,12 +143,12 @@
                                         <imageCell key="cell" refusesFirstResponder="YES" alignment="left" imageScaling="proportionallyDown" image="FireHeader" id="Dql-dm-pHB"/>
                                     </imageView>
                                     <popUpButton translatesAutoresizingMaskIntoConstraints="NO" id="ckJ-6G-38h">
-                                        <rect key="frame" x="110" y="23" width="131" height="35"/>
+                                        <rect key="frame" x="115" y="23" width="131" height="35"/>
                                         <constraints>
                                             <constraint firstAttribute="height" constant="30" id="AOr-Ku-GpD"/>
                                             <constraint firstAttribute="width" constant="127" id="f5G-AU-bU2"/>
                                         </constraints>
-                                        <popUpButtonCell key="cell" type="bevel" title="All Data" bezelStyle="regularSquare" alignment="center" lineBreakMode="truncatingTail" enabled="NO" state="on" borderStyle="border" tag="2" inset="2" selectedItem="36I-OU-7Bw" id="j8q-KC-blV">
+                                        <popUpButtonCell key="cell" type="bevel" title="All Data" bezelStyle="regularSquare" alignment="left" lineBreakMode="truncatingTail" enabled="NO" state="on" borderStyle="border" tag="2" inset="2" selectedItem="36I-OU-7Bw" id="j8q-KC-blV">
                                             <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
                                             <font key="font" metaFont="menu"/>
                                             <menu key="menu" id="oaR-se-uak">
@@ -165,7 +165,7 @@
                                         </connections>
                                     </popUpButton>
                                     <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="gVh-tG-Gue">
-                                        <rect key="frame" x="70" y="33" width="36" height="16"/>
+                                        <rect key="frame" x="75" y="33" width="36" height="16"/>
                                         <textFieldCell key="cell" lineBreakMode="clipping" title="Clear" id="98U-sP-UUR">
                                             <font key="font" metaFont="system"/>
                                             <color key="textColor" name="labelColor" catalog="System" colorSpace="catalog"/>
@@ -179,7 +179,7 @@
                                     <constraint firstAttribute="height" constant="148" id="KFj-xA-het"/>
                                     <constraint firstItem="acV-lE-jVh" firstAttribute="top" secondItem="3Jn-h4-fXL" secondAttribute="top" constant="20" id="TNw-m8-oz1"/>
                                     <constraint firstItem="gVh-tG-Gue" firstAttribute="top" secondItem="acV-lE-jVh" secondAttribute="bottom" constant="15" id="dzE-fi-9Qb"/>
-                                    <constraint firstItem="ckJ-6G-38h" firstAttribute="centerX" secondItem="3Jn-h4-fXL" secondAttribute="centerX" constant="15" id="eVG-pj-q6k"/>
+                                    <constraint firstItem="ckJ-6G-38h" firstAttribute="centerX" secondItem="3Jn-h4-fXL" secondAttribute="centerX" constant="20" id="eVG-pj-q6k"/>
                                     <constraint firstItem="acV-lE-jVh" firstAttribute="centerX" secondItem="3Jn-h4-fXL" secondAttribute="centerX" id="jdZ-Ii-nMi"/>
                                 </constraints>
                             </customView>
@@ -379,7 +379,7 @@ Gw
                                     <constraint firstAttribute="height" constant="60" id="onw-qY-te8"/>
                                 </constraints>
                             </customView>
-                            <containerView translatesAutoresizingMaskIntoConstraints="NO" id="WCe-Mc-jz7">
+                            <containerView translatesAutoresizingMaskIntoConstraints="NO" id="WCe-Mc-jz7" propertyAccessControl="all">
                                 <rect key="frame" x="0.0" y="0.0" width="320" height="250"/>
                                 <connections>
                                     <segue destination="hqb-gn-5gp" kind="embed" id="Icn-nq-7B7"/>
