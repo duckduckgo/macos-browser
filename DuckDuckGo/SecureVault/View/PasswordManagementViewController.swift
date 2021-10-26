@@ -219,10 +219,14 @@ final class PasswordManagementViewController: NSViewController {
         replaceItemContainerChildView(with: view)
     }
 
-    private func replaceItemContainerChildView(with view: NSView) {
+    private func clearSelectedItem() {
         itemContainer.subviews.forEach {
             $0.removeFromSuperview()
         }
+    }
+
+    private func replaceItemContainerChildView(with view: NSView) {
+        clearSelectedItem()
 
         view.frame = itemContainer.bounds
         view.wantsLayer = true
@@ -321,7 +325,7 @@ final class PasswordManagementViewController: NSViewController {
             postChange()
 
         } catch {
-            // Which errors can occur when saving notes?
+            // Which errors can occur when saving cards?
         }
     }
 
@@ -424,8 +428,14 @@ final class PasswordManagementViewController: NSViewController {
     // swiftlint:disable function_body_length
     private func createListView() {
         let listModel = PasswordManagementItemListModel { [weak self] previousValue, newValue in
-            guard let id = newValue.secureVaultID,
-                  let window = self?.view.window else { return }
+            guard let newValue = newValue,
+                  let id = newValue.secureVaultID,
+                  let window = self?.view.window else {
+                      self?.itemModel = nil
+                      self?.clearSelectedItem()
+
+                      return
+                  }
 
             func loadNewItemWithID() {
                 switch newValue {

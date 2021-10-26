@@ -226,9 +226,9 @@ final class PasswordManagementItemListModel: ObservableObject {
     @Published private(set) var displayedItems = [ListSection]()
     @Published private(set) var selected: SecureVaultItem?
 
-    private var onItemSelected: (_ old: SecureVaultItem?, _ new: SecureVaultItem) -> Void
+    private var onItemSelected: (_ old: SecureVaultItem?, _ new: SecureVaultItem?) -> Void
 
-    init(onItemSelected: @escaping (_ old: SecureVaultItem?, _ new: SecureVaultItem) -> Void) {
+    init(onItemSelected: @escaping (_ old: SecureVaultItem?, _ new: SecureVaultItem?) -> Void) {
         self.onItemSelected = onItemSelected
     }
 
@@ -236,7 +236,7 @@ final class PasswordManagementItemListModel: ObservableObject {
         self.items = items.sorted()
     }
 
-    func selected(item: SecureVaultItem) {
+    func selected(item: SecureVaultItem?) {
         let previous = selected
         selected = item
         onItemSelected(previous, item)
@@ -285,8 +285,11 @@ final class PasswordManagementItemListModel: ObservableObject {
 
     func selectFirst() {
         selected = nil
+
         if let firstSection = displayedItems.first, let selectedItem = firstSection.items.first {
             selected(item: selectedItem)
+        } else {
+            selected(item: nil)
         }
     }
 
