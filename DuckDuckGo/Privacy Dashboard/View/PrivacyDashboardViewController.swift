@@ -161,6 +161,7 @@ extension PrivacyDashboardViewController: PrivacyDashboardUserScriptDelegate {
         self.sendPendingUpdates()
 
         ContentBlockerRulesManager.shared.compileRules { _ in
+            DefaultScriptSourceProvider.shared.reload()
             self.pendingUpdates.remove(domain)
             self.sendPendingUpdates()
         }
