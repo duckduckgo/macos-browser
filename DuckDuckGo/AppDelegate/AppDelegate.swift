@@ -58,7 +58,12 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         ExpirationChecker.check()
 
         if !Self.isRunningTests {
+#if DEBUG
+            Pixel.setUp(dryRun: true)
+#else
             Pixel.setUp()
+#endif
+
             Database.shared.loadStore()
         }
 

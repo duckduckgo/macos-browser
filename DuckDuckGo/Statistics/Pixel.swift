@@ -24,12 +24,18 @@ final class Pixel {
 
     static private(set) var shared: Pixel?
 
-    static func setUp() {
-        shared = Pixel()
+    static func setUp(dryRun: Bool = false) {
+        shared = Pixel(dryRun: dryRun)
     }
 
     static func tearDown() {
         shared = nil
+    }
+
+    private var dryRun: Bool
+
+    init(dryRun: Bool) {
+        self.dryRun = dryRun
     }
 
     func fire(pixelNamed pixelName: String,
@@ -38,7 +44,7 @@ final class Pixel {
               onComplete: @escaping (Error?) -> Void = {_ in }) {
 
         var newParams = params ?? [:]
-        newParams[Parameters.appVersion] = AppVersion.shared.versionAndBuildNumber
+        newParams[Parameters.appVersion] = AppVersion.shared.versionNumber
         #if DEBUG
             newParams[Parameters.test] = Values.test
         #endif
@@ -49,10 +55,15 @@ final class Pixel {
         var headers = headers
         headers[APIHeaders.Name.moreInfo] = "See " + URL.duckDuckGoMorePrivacyInfo.absoluteString
 
+        guard !dryRun else {
+            os_log(.debug, log: .pixel, "Pixel: %@", pixelName)
+
+            onComplete(nil)
+            return
+        }
+
         let url = URL.pixelUrl(forPixelNamed: pixelName)
-
         APIRequest.request(url: url, parameters: newParams, headers: headers, callBackOnMainThread: true) { (_, error) in
-
             onComplete(error)
         }
     }
