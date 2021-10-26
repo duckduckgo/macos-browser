@@ -165,7 +165,7 @@ final class PasswordManagementItemListModel: ObservableObject {
         var title: String {
             switch self {
             case .accounts:
-                return "Accounts"
+                return "Logins"
             case .cards:
                 return "Cards"
             case .notes:
