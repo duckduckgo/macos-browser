@@ -23,64 +23,54 @@ import XCTest
 
 class AtbAndVariantCleanupTests: XCTestCase {
 
-    struct Constants {
-
-        static let atb = "atb"
-        static let variant = "variant"
-
-    }
-
-    let mockStorage = MockStatisticsStore()
-    let mockVariantManager = MockVariantManager()
-
-    override func setUp() {
-        super.setUp()
-    }
-
-    func testWhenAtbHasVariantThenAtbStoredWithVariantRemoved() {
-
-        mockStorage.atb = "\(Constants.atb)\(Constants.variant)"
-        mockStorage.variant = Constants.variant
-
-        AtbAndVariantCleanup.cleanup(statisticsStorage: mockStorage, variantManager: mockVariantManager)
-
-        XCTAssertEqual(Constants.atb, mockStorage.atb)
-
-    }
-
-    func testWhenVariantIsNotInCurrentExperimentThenVariantRemovedFromStorage() {
-
-        mockStorage.atb = "\(Constants.atb)\(Constants.variant)"
-        mockStorage.variant = Constants.variant
-
-        AtbAndVariantCleanup.cleanup(statisticsStorage: mockStorage, variantManager: mockVariantManager)
-
-        XCTAssertNil(mockStorage.variant)
-
-    }
-
-    func testWhenVariantIsInCurrentExperimentThenVariantIsNotRemovedFromStorage() {
-
-        let variant = Variant(name: Constants.variant, weight: 100, isIncluded: Variant.When.always, features: [])
-        let mockVariantManager = MockVariantManager(currentVariant: variant)
-
-        mockStorage.atb = "\(Constants.atb)\(Constants.variant)"
-        mockStorage.variant = Constants.variant
-
-        AtbAndVariantCleanup.cleanup(statisticsStorage: mockStorage, variantManager: mockVariantManager)
-
-        XCTAssertEqual(Constants.variant, mockStorage.variant)
-
-    }
+//    struct Constants {
+//
+//        static let atb = "atb"
+//        static let variant = "variant"
+//
+//    }
+//
+//    let mockStorage = MockStatisticsStore()
+//    let mockVariantManager = MockVariantManager()
+//
+//    override func setUp() {
+//        super.setUp()
+//    }
+//
+//    func testWhenAtbHasVariantThenAtbStoredWithVariantRemoved() {
+//
+//        mockStorage.atb = "\(Constants.atb)\(Constants.variant)"
+//        mockStorage.variant = Constants.variant
+//
+//        AtbAndVariantCleanup.cleanup(statisticsStorage: mockStorage, variantManager: mockVariantManager)
+//
+//        XCTAssertEqual(Constants.atb, mockStorage.atb)
+//
+//    }
+//
+//    func testWhenVariantIsNotInCurrentExperimentThenVariantRemovedFromStorage() {
+//
+//        mockStorage.atb = "\(Constants.atb)\(Constants.variant)"
+//        mockStorage.variant = Constants.variant
+//
+//        AtbAndVariantCleanup.cleanup(statisticsStorage: mockStorage, variantManager: mockVariantManager)
+//
+//        XCTAssertNil(mockStorage.variant)
+//
+//    }
+//
+//    func testWhenVariantIsInCurrentExperimentThenVariantIsNotRemovedFromStorage() {
+//
+//        let variant = Variant(name: Constants.variant, weight: 100, isIncluded: Variant.When.always, features: [])
+//        let mockVariantManager = MockVariantManager(currentVariant: variant)
+//
+//        mockStorage.atb = "\(Constants.atb)\(Constants.variant)"
+//        mockStorage.variant = Constants.variant
+//
+//        AtbAndVariantCleanup.cleanup(statisticsStorage: mockStorage, variantManager: mockVariantManager)
+//
+//        XCTAssertEqual(Constants.variant, mockStorage.variant)
+//
+//    }
     
-}
-
-extension UserDefaults {
-
-    static func clearStandard() {
-        if let bundleID = Bundle.main.bundleIdentifier {
-            UserDefaults.standard.removePersistentDomain(forName: bundleID)
-        }
-    }
-
 }
