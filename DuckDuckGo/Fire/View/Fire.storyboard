@@ -131,6 +131,12 @@
                         <rect key="frame" x="0.0" y="0.0" width="320" height="250"/>
                         <autoresizingMask key="autoresizingMask"/>
                         <subviews>
+                            <containerView translatesAutoresizingMaskIntoConstraints="NO" id="WCe-Mc-jz7" propertyAccessControl="all">
+                                <rect key="frame" x="0.0" y="0.0" width="320" height="250"/>
+                                <connections>
+                                    <segue destination="hqb-gn-5gp" kind="embed" id="Icn-nq-7B7"/>
+                                </connections>
+                            </containerView>
                             <customView translatesAutoresizingMaskIntoConstraints="NO" id="3Jn-h4-fXL" userLabel="Header Wrapper View">
                                 <rect key="frame" x="0.0" y="102" width="320" height="148"/>
                                 <subviews>
@@ -222,7 +228,7 @@
                                             <button fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="cgG-hF-FAP">
                                                 <rect key="frame" x="20" y="0.0" width="280" height="42"/>
                                                 <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
-                                                <buttonCell key="cell" type="square" title="Close all tabs and clear site data" bezelStyle="shadowlessSquare" image="ExpandDown" imagePosition="trailing" alignment="left" inset="2" id="5VP-Yt-jB8">
+                                                <buttonCell key="cell" type="square" title="Close all tabs and clear site data" bezelStyle="shadowlessSquare" image="CondenseUp" imagePosition="trailing" alignment="left" inset="2" id="5VP-Yt-jB8">
                                                     <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
                                                     <font key="font" metaFont="smallSystem"/>
                                                 </buttonCell>
@@ -379,12 +385,6 @@ Gw
                                     <constraint firstAttribute="height" constant="60" id="onw-qY-te8"/>
                                 </constraints>
                             </customView>
-                            <containerView translatesAutoresizingMaskIntoConstraints="NO" id="WCe-Mc-jz7" propertyAccessControl="all">
-                                <rect key="frame" x="0.0" y="0.0" width="320" height="250"/>
-                                <connections>
-                                    <segue destination="hqb-gn-5gp" kind="embed" id="Icn-nq-7B7"/>
-                                </connections>
-                            </containerView>
                         </subviews>
                         <constraints>
                             <constraint firstAttribute="trailing" secondItem="ACx-m8-z0K" secondAttribute="trailing" constant="20" symbolic="YES" id="3dH-oe-VKH"/>
@@ -509,6 +509,7 @@ DQ
     <resources>
         <image name="Burn" width="16" height="16"/>
         <image name="BurnAlert" width="64" height="64"/>
+        <image name="CondenseUp" width="9" height="5"/>
         <image name="ExpandDown" width="9" height="5"/>
         <image name="FireHeader" width="128" height="64"/>
         <image name="WarningTriangle" width="16" height="15"/>
