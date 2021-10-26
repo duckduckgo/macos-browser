@@ -125,7 +125,7 @@ final class FirePopoverViewModel {
 
     // MARK: - Selection
 
-    private var areAllSelected: Bool {
+    var areAllSelected: Bool {
         Set(0..<selectable.count) == selected
     }
 

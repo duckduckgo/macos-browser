@@ -44,6 +44,7 @@ final class FirePopoverViewController: NSViewController {
     @IBOutlet weak var detailsWrapperViewHeightContraint: NSLayoutConstraint!
     @IBOutlet weak var closeWrapperView: NSView!
     @IBOutlet weak var collectionView: NSCollectionView!
+    @IBOutlet weak var collectionViewBottomConstraint: NSLayoutConstraint!
     @IBOutlet weak var warningWrapperView: NSView!
     @IBOutlet weak var infoContainerView: NSView!
 
@@ -79,7 +80,8 @@ final class FirePopoverViewController: NSViewController {
         collectionView.delegate = self
         collectionView.dataSource = self
         setupOptionsButton()
-        updateCloseDetailsButton(for: .allData)
+        updateCloseDetailsButton()
+        updateWarningWrapperView()
         removeInfoContainerViewIfNeeded()
         if infoContainerView == nil {
             optionsButton.isEnabled = true
@@ -96,8 +98,8 @@ final class FirePopoverViewController: NSViewController {
         }
         let clearingOption = FirePopoverViewModel.ClearingOption.allCases[tag]
         firePopoverViewModel.clearingOption = clearingOption
-        updateCloseDetailsButton(for: clearingOption)
-        updateWarningWrapperView(for: clearingOption)
+        updateCloseDetailsButton()
+        updateWarningWrapperView()
     }
 
     @IBAction func openDetailsButtonAction(_ sender: Any) {
@@ -108,17 +110,22 @@ final class FirePopoverViewController: NSViewController {
         toggleDetails()
     }
 
-    private func updateCloseDetailsButton(for clearingOption: FirePopoverViewModel.ClearingOption) {
-        switch clearingOption {
+    private func updateCloseDetailsButton() {
+        guard firePopoverViewModel.areAllSelected else {
+            closeDetailsButton.title = "     \(UserText.selectedDomainsDescription)"
+            return
+        }
+
+        switch firePopoverViewModel.clearingOption {
         case .currentTab: closeDetailsButton.title = "     \(UserText.currentTabDescription)"
         case .currentWindow: closeDetailsButton.title = "     \(UserText.currentWindowDescription)"
         case .allData: closeDetailsButton.title = "     \(UserText.allDataDescription)"
         }
     }
 
-    private func updateWarningWrapperView(for clearingOption: FirePopoverViewModel.ClearingOption) {
-        // To do:
-//        warningWrapperView.isHidden = clearingOption == .allData || firePopoverViewModel.selectable.isEmpty
+    private func updateWarningWrapperView() {
+        warningWrapperView.isHidden = firePopoverViewModel.clearingOption == .allData || firePopoverViewModel.selectable.isEmpty
+        collectionViewBottomConstraint.constant = warningWrapperView.isHidden ? 0 : 32
     }
 
     @IBAction func clearButtonAction(_ sender: Any) {
@@ -147,6 +154,7 @@ final class FirePopoverViewController: NSViewController {
             .sink { [weak self] selected in
                 let selectionIndexPaths = Set(selected.map {IndexPath(item: $0, section: 1)})
                 self?.collectionView.selectionIndexPaths = selectionIndexPaths
+                self?.updateCloseDetailsButton()
             }
     }
 

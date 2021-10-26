@@ -266,13 +266,13 @@
                                         </constraints>
                                     </customView>
                                     <scrollView wantsLayer="YES" borderType="none" autohidesScrollers="YES" horizontalLineScroll="10" horizontalPageScroll="10" verticalLineScroll="10" verticalPageScroll="10" hasHorizontalScroller="NO" usesPredominantAxisScrolling="NO" translatesAutoresizingMaskIntoConstraints="NO" id="XmN-jm-YAB">
-                                        <rect key="frame" x="0.0" y="32" width="320" height="189"/>
+                                        <rect key="frame" x="0.0" y="0.0" width="320" height="221"/>
                                         <clipView key="contentView" id="TlT-bV-Znt">
-                                            <rect key="frame" x="0.0" y="0.0" width="320" height="189"/>
+                                            <rect key="frame" x="0.0" y="0.0" width="320" height="221"/>
                                             <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                             <subviews>
                                                 <collectionView selectable="YES" allowsMultipleSelection="YES" id="u7v-Gt-FjR">
-                                                    <rect key="frame" x="0.0" y="0.0" width="320" height="189"/>
+                                                    <rect key="frame" x="0.0" y="0.0" width="320" height="221"/>
                                                     <autoresizingMask key="autoresizingMask" widthSizable="YES"/>
                                                     <collectionViewFlowLayout key="collectionViewLayout" id="VZx-7u-HhL">
                                                         <size key="itemSize" width="318" height="24"/>
@@ -291,59 +291,56 @@
                                             <autoresizingMask key="autoresizingMask"/>
                                         </scroller>
                                     </scrollView>
-                                    <customView translatesAutoresizingMaskIntoConstraints="NO" id="r7f-Ig-GcB">
-                                        <rect key="frame" x="0.0" y="0.0" width="320" height="32"/>
-                                        <subviews>
-                                            <customView translatesAutoresizingMaskIntoConstraints="NO" id="R2h-Oh-HRn" customClass="ColorView" customModule="DuckDuckGo_Privacy_Browser" customModuleProvider="target">
-                                                <rect key="frame" x="0.0" y="0.0" width="320" height="32"/>
-                                                <userDefinedRuntimeAttributes>
-                                                    <userDefinedRuntimeAttribute type="color" keyPath="backgroundColor">
-                                                        <color key="value" red="0.98039215690000003" green="0.98039215690000003" blue="0.98039215690000003" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
-                                                    </userDefinedRuntimeAttribute>
-                                                </userDefinedRuntimeAttributes>
-                                            </customView>
-                                            <box verticalHuggingPriority="750" fixedFrame="YES" boxType="separator" translatesAutoresizingMaskIntoConstraints="NO" id="55B-tN-GCl">
-                                                <rect key="frame" x="0.0" y="29" width="320" height="5"/>
-                                                <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
-                                            </box>
-                                            <box verticalHuggingPriority="750" fixedFrame="YES" boxType="separator" translatesAutoresizingMaskIntoConstraints="NO" id="rMv-28-G5x">
-                                                <rect key="frame" x="0.0" y="-12" width="320" height="5"/>
-                                                <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
-                                            </box>
-                                            <button fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="Bir-wk-iOW">
-                                                <rect key="frame" x="20" y="0.0" width="280" height="32"/>
-                                                <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
-                                                <buttonCell key="cell" type="square" title="   Also clears these sites in other open tabs" bezelStyle="shadowlessSquare" image="WarningTriangle" imagePosition="leading" alignment="left" inset="2" id="6NW-yL-FoB">
-                                                    <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
-                                                    <font key="font" metaFont="smallSystem"/>
-                                                </buttonCell>
-                                                <color key="contentTintColor" name="GreyTextColor"/>
-                                                <connections>
-                                                    <action selector="closeDetailsButtonAction:" target="DMI-mh-xLJ" id="mLs-dU-owR"/>
-                                                </connections>
-                                            </button>
-                                        </subviews>
-                                        <constraints>
-                                            <constraint firstAttribute="height" constant="32" id="h9e-lu-Vxm"/>
-                                            <constraint firstItem="R2h-Oh-HRn" firstAttribute="leading" secondItem="r7f-Ig-GcB" secondAttribute="leading" id="lUJ-br-5nG"/>
-                                            <constraint firstItem="R2h-Oh-HRn" firstAttribute="top" secondItem="r7f-Ig-GcB" secondAttribute="top" id="nOB-Rm-zOy"/>
-                                            <constraint firstAttribute="trailing" secondItem="R2h-Oh-HRn" secondAttribute="trailing" id="tm1-hf-0JX"/>
-                                            <constraint firstAttribute="bottom" secondItem="R2h-Oh-HRn" secondAttribute="bottom" id="uVV-mf-WiT"/>
-                                        </constraints>
-                                    </customView>
                                 </subviews>
                                 <constraints>
                                     <constraint firstItem="553-P8-fEM" firstAttribute="leading" secondItem="6vZ-d2-qnR" secondAttribute="leading" id="8gV-9l-4mF"/>
                                     <constraint firstItem="XmN-jm-YAB" firstAttribute="top" secondItem="553-P8-fEM" secondAttribute="bottom" id="8i6-2b-wAQ"/>
-                                    <constraint firstItem="r7f-Ig-GcB" firstAttribute="leading" secondItem="6vZ-d2-qnR" secondAttribute="leading" id="Ftm-7H-wzh"/>
                                     <constraint firstItem="553-P8-fEM" firstAttribute="top" secondItem="6vZ-d2-qnR" secondAttribute="top" id="Kkv-Ph-bzf"/>
                                     <constraint firstAttribute="trailing" secondItem="553-P8-fEM" secondAttribute="trailing" id="LI2-w5-bja"/>
                                     <constraint firstAttribute="trailing" secondItem="XmN-jm-YAB" secondAttribute="trailing" id="N6O-9R-Xd6"/>
-                                    <constraint firstItem="r7f-Ig-GcB" firstAttribute="top" secondItem="XmN-jm-YAB" secondAttribute="bottom" id="aU3-o4-gEz"/>
-                                    <constraint firstAttribute="bottom" secondItem="r7f-Ig-GcB" secondAttribute="bottom" id="cHm-Wn-HOf"/>
-                                    <constraint firstAttribute="trailing" secondItem="r7f-Ig-GcB" secondAttribute="trailing" id="gUL-0S-TPQ"/>
+                                    <constraint firstAttribute="bottom" secondItem="XmN-jm-YAB" secondAttribute="bottom" id="anE-16-8X8"/>
                                     <constraint firstItem="XmN-jm-YAB" firstAttribute="leading" secondItem="6vZ-d2-qnR" secondAttribute="leading" id="kYV-Im-5du"/>
                                     <constraint firstAttribute="height" constant="263" id="sJt-dl-rlH"/>
+                                </constraints>
+                            </customView>
+                            <customView translatesAutoresizingMaskIntoConstraints="NO" id="r7f-Ig-GcB">
+                                <rect key="frame" x="0.0" y="60" width="320" height="32"/>
+                                <subviews>
+                                    <customView translatesAutoresizingMaskIntoConstraints="NO" id="R2h-Oh-HRn" customClass="ColorView" customModule="DuckDuckGo_Privacy_Browser" customModuleProvider="target">
+                                        <rect key="frame" x="0.0" y="0.0" width="320" height="32"/>
+                                        <userDefinedRuntimeAttributes>
+                                            <userDefinedRuntimeAttribute type="color" keyPath="backgroundColor">
+                                                <color key="value" red="0.98039215690000003" green="0.98039215690000003" blue="0.98039215690000003" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+                                            </userDefinedRuntimeAttribute>
+                                        </userDefinedRuntimeAttributes>
+                                    </customView>
+                                    <box verticalHuggingPriority="750" fixedFrame="YES" boxType="separator" translatesAutoresizingMaskIntoConstraints="NO" id="55B-tN-GCl">
+                                        <rect key="frame" x="0.0" y="29" width="320" height="5"/>
+                                        <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+                                    </box>
+                                    <box verticalHuggingPriority="750" fixedFrame="YES" boxType="separator" translatesAutoresizingMaskIntoConstraints="NO" id="rMv-28-G5x">
+                                        <rect key="frame" x="0.0" y="-12" width="320" height="5"/>
+                                        <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+                                    </box>
+                                    <button fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="Bir-wk-iOW">
+                                        <rect key="frame" x="20" y="0.0" width="280" height="32"/>
+                                        <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+                                        <buttonCell key="cell" type="square" title="   Also clears these sites in other open tabs" bezelStyle="shadowlessSquare" image="WarningTriangle" imagePosition="leading" alignment="left" inset="2" id="6NW-yL-FoB">
+                                            <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
+                                            <font key="font" metaFont="smallSystem"/>
+                                        </buttonCell>
+                                        <color key="contentTintColor" name="GreyTextColor"/>
+                                        <connections>
+                                            <action selector="closeDetailsButtonAction:" target="DMI-mh-xLJ" id="mLs-dU-owR"/>
+                                        </connections>
+                                    </button>
+                                </subviews>
+                                <constraints>
+                                    <constraint firstAttribute="height" constant="32" id="h9e-lu-Vxm"/>
+                                    <constraint firstItem="R2h-Oh-HRn" firstAttribute="leading" secondItem="r7f-Ig-GcB" secondAttribute="leading" id="lUJ-br-5nG"/>
+                                    <constraint firstItem="R2h-Oh-HRn" firstAttribute="top" secondItem="r7f-Ig-GcB" secondAttribute="top" id="nOB-Rm-zOy"/>
+                                    <constraint firstAttribute="trailing" secondItem="R2h-Oh-HRn" secondAttribute="trailing" id="tm1-hf-0JX"/>
+                                    <constraint firstAttribute="bottom" secondItem="R2h-Oh-HRn" secondAttribute="bottom" id="uVV-mf-WiT"/>
                                 </constraints>
                             </customView>
                             <customView translatesAutoresizingMaskIntoConstraints="NO" id="nId-He-RIU" userLabel="Main Buttons Wrapper View">
@@ -416,9 +413,12 @@ Gw
                             <constraint firstItem="6vZ-d2-qnR" firstAttribute="top" secondItem="3Jn-h4-fXL" secondAttribute="bottom" id="SiT-y0-otC"/>
                             <constraint firstAttribute="trailing" secondItem="nId-He-RIU" secondAttribute="trailing" id="UP0-3m-4QV"/>
                             <constraint firstItem="3Jn-h4-fXL" firstAttribute="leading" secondItem="dGd-Gc-P2e" secondAttribute="leading" id="ZK2-xe-fKM"/>
+                            <constraint firstItem="r7f-Ig-GcB" firstAttribute="leading" secondItem="dGd-Gc-P2e" secondAttribute="leading" id="ZOG-ov-blY"/>
                             <constraint firstItem="3Jn-h4-fXL" firstAttribute="top" secondItem="dGd-Gc-P2e" secondAttribute="top" id="bUr-Qo-pGT"/>
                             <constraint firstItem="ACx-m8-z0K" firstAttribute="top" secondItem="3Jn-h4-fXL" secondAttribute="bottom" id="ds2-Vf-W5U"/>
+                            <constraint firstItem="nId-He-RIU" firstAttribute="top" secondItem="r7f-Ig-GcB" secondAttribute="bottom" id="f1V-n7-jhp"/>
                             <constraint firstItem="nId-He-RIU" firstAttribute="top" secondItem="3Jn-h4-fXL" secondAttribute="bottom" constant="42" id="hbg-4i-hjT"/>
+                            <constraint firstAttribute="trailing" secondItem="r7f-Ig-GcB" secondAttribute="trailing" id="kNz-fP-3Iv"/>
                             <constraint firstAttribute="trailing" secondItem="3Jn-h4-fXL" secondAttribute="trailing" id="nnI-mg-tvm"/>
                             <constraint firstAttribute="bottom" secondItem="nId-He-RIU" secondAttribute="bottom" id="oF4-VF-B5Y"/>
                             <constraint firstItem="WCe-Mc-jz7" firstAttribute="leading" secondItem="dGd-Gc-P2e" secondAttribute="leading" id="sDE-XV-36n"/>
@@ -434,6 +434,7 @@ Gw
                         <outlet property="closeDetailsButton" destination="cgG-hF-FAP" id="PDY-tj-zma"/>
                         <outlet property="closeWrapperView" destination="553-P8-fEM" id="vUO-wA-3ME"/>
                         <outlet property="collectionView" destination="u7v-Gt-FjR" id="zeu-lV-usx"/>
+                        <outlet property="collectionViewBottomConstraint" destination="anE-16-8X8" id="Yt9-1O-5Hq"/>
                         <outlet property="contentHeightConstraint" destination="hbg-4i-hjT" id="mC2-Ot-onY"/>
                         <outlet property="detailsWrapperView" destination="6vZ-d2-qnR" id="TKb-Ux-TIk"/>
                         <outlet property="detailsWrapperViewHeightContraint" destination="sJt-dl-rlH" id="7pa-Kc-9xB"/>
