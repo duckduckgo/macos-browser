@@ -54,19 +54,19 @@ class AtbAndVariantCleanupTests: XCTestCase {
         XCTAssertNil(mockStorage.variant)
 
     }
-//
-//    func testWhenVariantIsInCurrentExperimentThenVariantIsNotRemovedFromStorage() {
-//
-//        let variant = Variant(name: Constants.variant, weight: 100, isIncluded: Variant.When.always, features: [])
-//        let mockVariantManager = MockVariantManager(currentVariant: variant)
-//
-//        mockStorage.atb = "\(Constants.atb)\(Constants.variant)"
-//        mockStorage.variant = Constants.variant
-//
-//        AtbAndVariantCleanup.cleanup(statisticsStorage: mockStorage, variantManager: mockVariantManager)
-//
-//        XCTAssertEqual(Constants.variant, mockStorage.variant)
-//
-//    }
+
+    func testWhenVariantIsInCurrentExperimentThenVariantIsNotRemovedFromStorage() {
+
+        let variant = Variant(name: Constants.variant, weight: 100, isIncluded: Variant.When.always, features: [])
+        let mockVariantManager = MockVariantManager(currentVariant: variant)
+
+        mockStorage.atb = "\(Constants.atb)\(Constants.variant)"
+        mockStorage.variant = Constants.variant
+
+        AtbAndVariantCleanup.cleanup(statisticsStorage: mockStorage, variantManager: mockVariantManager)
+
+        XCTAssertEqual(Constants.variant, mockStorage.variant)
+
+    }
     
 }
