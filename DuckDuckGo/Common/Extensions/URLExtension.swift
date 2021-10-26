@@ -72,6 +72,8 @@ extension URL {
         return URL(string: "about:blank")!
     }
 
+    // MARK: Pixel
+
     static let pixelBase = ProcessInfo.processInfo.environment["PIXEL_BASE_URL", default: "https://improving.duckduckgo.com"]
 
     static func pixelUrl(forPixelNamed pixelName: String) -> URL {
@@ -82,6 +84,41 @@ extension URL {
         return url
     }
 
+    // MARK: ATB
+
+    static var devMode: String {
+    #if DEBUG
+        return "?test=1"
+    #else
+        return ""
+    #endif
+    }
+
+    static let atb = "\(Self.duckDuckGo)/atb.js\(devMode)"
+    static let exti = "\(Self.duckDuckGo)/exti/\(devMode)"
+
+    static var initialAtb: URL {
+        return URL(string: Self.atb)!
+    }
+
+    static func searchAtb(atbWithVariant: String, setAtb: String) -> URL? {
+        return try? URL(string: Self.atb)!
+            .addParameter(name: DuckDuckGoParameters.ATB.atb, value: atbWithVariant)
+            .addParameter(name: DuckDuckGoParameters.ATB.setAtb, value: setAtb)
+    }
+
+    static func appRetentionAtb(atbWithVariant: String, setAtb: String) -> URL? {
+        return try? URL(string: Self.atb)!
+            .addParameter(name: DuckDuckGoParameters.ATB.activityType, value: DuckDuckGoParameters.ATB.appUsageValue)
+            .addParameter(name: DuckDuckGoParameters.ATB.atb, value: atbWithVariant)
+            .addParameter(name: DuckDuckGoParameters.ATB.setAtb, value: setAtb)
+    }
+
+    static func exti(forAtb atb: String) -> URL? {
+        let extiUrl = URL(string: Self.exti)!
+        return try? extiUrl.addParameter(name: DuckDuckGoParameters.ATB.atb, value: atb)
+    }
+    
     // MARK: - Parameters
 
     enum ParameterError: Error {
@@ -280,6 +317,14 @@ extension URL {
         case search = "q"
         case ia
         case iax
+
+        enum ATB {
+            static let atb = "atb"
+            static let setAtb = "set_atb"
+            static let activityType = "at"
+
+            static let appUsageValue = "app_use"
+        }
     }
 
     // MARK: - Search

@@ -46,6 +46,14 @@ public struct UserDefaultsWrapper<T> {
         case passwordManagerDoNotPromptDomains = "com.duckduckgo.passwordmanager.do-not-prompt-domains"
 
         case lastCrashReportCheckDate = "last.crash.report.check.date"
+
+        // ATB
+        case installDate = "statistics.installdate.key"
+        case atb = "statistics.atb.key"
+        case searchRetentionAtb = "statistics.retentionatb.key"
+        case appRetentionAtb = "statistics.appretentionatb.key"
+        case variant = "statistics.variant.key"
+
     }
 
     private let key: Key

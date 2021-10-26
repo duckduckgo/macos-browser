@@ -80,6 +80,11 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         _=ConfigurationManager.shared
         _=DownloadListCoordinator.shared
 
+        AtbAndVariantCleanup.cleanup()
+        DefaultVariantManager().assignVariantIfNeeded { _ in
+            // MARK: perform first time launch logic here
+        }
+
         if (notification.userInfo?[NSApplication.launchIsDefaultUserInfoKey] as? NSNumber)?.boolValue == true {
             Pixel.fire(.appLaunch(launch: .autoInitialOrRegular()))
         }
