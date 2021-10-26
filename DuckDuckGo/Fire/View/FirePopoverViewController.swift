@@ -255,7 +255,9 @@ extension FirePopoverViewController: NSCollectionViewDelegateFlowLayout {
         return NSSize(width: collectionView.bounds.width, height: count == 0 ? 0 : Constants.headerHeight)
     }
 
-    func collectionView(_ collectionView: NSCollectionView, layout collectionViewLayout: NSCollectionViewLayout, referenceSizeForFooterInSection section: Int) -> NSSize {
+    func collectionView(_ collectionView: NSCollectionView,
+                        layout collectionViewLayout: NSCollectionViewLayout,
+                        referenceSizeForFooterInSection section: Int) -> NSSize {
         let count: Int
         switch section {
         case 0: count = firePopoverViewModel.fireproofed.count

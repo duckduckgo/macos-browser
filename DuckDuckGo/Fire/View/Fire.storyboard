@@ -476,7 +476,7 @@ DQ
                                     <constraint firstAttribute="width" constant="280" id="LLa-XW-6PH"/>
                                 </constraints>
                                 <textFieldCell key="cell" alignment="center" title="Leave No Trace" id="DXW-XN-dYa">
-                                    <font key="font" metaFont="system" size="15"/>
+                                    <font key="font" metaFont="systemSemibold" size="15"/>
                                     <color key="textColor" name="GreyTextColor"/>
                                     <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
                                 </textFieldCell>
