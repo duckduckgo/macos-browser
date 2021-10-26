@@ -43,20 +43,17 @@
         domainParts.shift()
     }
     if (!gpcEnabled) {
-        console.log('disabled')
         return;
     }
     
     const scriptContent = `
         if (navigator.globalPrivacyControl === undefined) {
-            console.log('defining')
             Object.defineProperty(Navigator.prototype, 'globalPrivacyControl', {
                 get: () => true,
                 configurable: true,
                 enumerable: true
             });
         } else {
-            console.log('Setting')
             try {
                 navigator.globalPrivacyControl = true;
             } catch (e) {
