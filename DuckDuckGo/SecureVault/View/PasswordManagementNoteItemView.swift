@@ -182,12 +182,6 @@ private struct HeaderView: View {
 
                 TextField("", text: $model.title)
                     .font(.title)
-                    .textFieldStyle(PlainTextFieldStyle())
-                    .padding(4)
-                    .overlay(
-                        RoundedRectangle(cornerRadius: 5)
-                            .stroke(Color.accentColor, lineWidth: 2)
-                    )
 
             } else {
 
