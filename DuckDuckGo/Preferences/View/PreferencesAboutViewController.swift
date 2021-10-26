@@ -58,6 +58,10 @@ final class PreferencesAboutViewController: NSViewController {
         openURLInNewTab(URL.aboutDuckDuckGo)
     }
 
+    @IBAction func openPrivacyPolicy(_ sender: NSButton) {
+        openURLInNewTab(URL.privacyPolicy)
+    }
+
     private func openURLInNewTab(_ url: URL) {
         guard let windowController = WindowControllersManager.shared.lastKeyMainWindowController,
               windowController.window?.isKeyWindow == true else {
