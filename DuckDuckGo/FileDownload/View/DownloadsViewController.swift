@@ -51,11 +51,12 @@ final class DownloadsViewController: NSViewController {
 
         downloadsCancellable = viewModel.$items
             .throttle(for: 0.1, scheduler: DispatchQueue.main, latest: true)
-            .scan((old: [DownloadViewModel](), new: [DownloadViewModel]()), { ($0.new, $1) })
-            .dropFirst()
+            .scan((old: [DownloadViewModel](), new: viewModel.items), { ($0.new, $1) })
             .sink { [weak self] value in
                 guard let self = self else { return }
                 let diff = value.new.difference(from: value.old) { $0.id == $1.id }
+                guard !diff.isEmpty else { return }
+                
                 self.tableView.beginUpdates()
                 for change in diff {
                     switch change {

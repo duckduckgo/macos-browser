@@ -40,10 +40,14 @@ final class AddressBarTextField: NSTextField {
         }
     }
 
-    var isSuggestionWindowVisible: AnyPublisher<Bool, Never> {
+    var suggestionWindowVisible: AnyPublisher<Bool, Never> {
         self.publisher(for: \.suggestionWindowController?.window?.isVisible)
             .map { $0 ?? false }
             .eraseToAnyPublisher()
+    }
+
+    var isSuggestionWindowVisible: Bool {
+        suggestionWindowController?.window?.isVisible == true
     }
 
     private var suggestionItemsCancellable: AnyCancellable?
@@ -111,7 +115,6 @@ final class AddressBarTextField: NSTextField {
         }
         addressBarStringCancellable = selectedTabViewModel.$addressBarString.receive(on: DispatchQueue.main).sink { [weak self] _ in
             self?.updateValue()
-            self?.makeMeFirstResponderIfNeeded()
         }
     }
 

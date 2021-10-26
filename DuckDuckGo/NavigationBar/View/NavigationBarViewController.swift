@@ -246,7 +246,9 @@ final class NavigationBarViewController: NSViewController {
             downloadsPopover.close()
             return
         }
-        guard closeTransientPopovers() else { return }
+        guard closeTransientPopovers(),
+              downloadsButton.window != nil
+        else { return }
 
         downloadsButton.isHidden = false
         setDownloadButtonHidingTimer()
@@ -306,11 +308,17 @@ final class NavigationBarViewController: NSViewController {
         DownloadListCoordinator.shared.updates
             .throttle(for: 1.0, scheduler: DispatchQueue.main, latest: true)
             .sink { [weak self] update in
-                let shouldShowPopover = update.kind == .updated && update.item.destinationURL != nil && update.item.tempURL == nil
+                guard let self = self else { return }
+
+                let shouldShowPopover = update.kind == .updated
+                    && update.item.destinationURL != nil
+                    && update.item.tempURL == nil
+                    && WindowControllersManager.shared.lastKeyMainWindowController?.window === self.downloadsButton.window
+
                 if shouldShowPopover {
-                    self?.showDownloadsPopoverAndAutoHide()
+                    self.showDownloadsPopoverAndAutoHide()
                 }
-                self?.updateDownloadsButton()
+                self.updateDownloadsButton()
             }
             .store(in: &downloadsCancellables)
         DownloadListCoordinator.shared.progress

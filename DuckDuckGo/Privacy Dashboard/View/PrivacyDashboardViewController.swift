@@ -87,6 +87,17 @@ final class PrivacyDashboardViewController: NSViewController {
         privacyDashboardScript.setPermissions(usedPermissions, authorizationState: authState, domain: domain, in: webView)
     }
 
+    private func subscribeToConnectionUpgradedTo() {
+        tabViewModel?.tab.$connectionUpgradedTo
+            .receive(on: DispatchQueue.main)
+            .sink(receiveValue: { [weak self] connectionUpgradedTo in
+                guard let self = self else { return }
+                let upgradedHttps = connectionUpgradedTo != nil
+                self.privacyDashboardScript.setUpgradedHttps(upgradedHttps, webView: self.webView)
+            })
+            .store(in: &cancellables)
+    }
+
     private func subscribeToTrackerInfo() {
         tabViewModel?.tab.$trackerInfo
             .receive(on: DispatchQueue.main)
@@ -136,6 +147,10 @@ extension PrivacyDashboardViewController: PrivacyDashboardUserScriptDelegate {
         tabViewModel?.tab.permissions.set(permission, muted: paused)
     }
 
+    func userScript(_ userScript: PrivacyDashboardUserScript, setHeight height: Int) {
+        self.preferredContentSize = CGSize(width: self.view.frame.width, height: CGFloat(height))
+    }
+
 }
 
 extension PrivacyDashboardViewController: WKNavigationDelegate {
@@ -143,6 +158,7 @@ extension PrivacyDashboardViewController: WKNavigationDelegate {
     func webView(_ webView: WKWebView, didFinish navigation: WKNavigation!) {
         subscribeToPermissions()
         subscribeToTrackerInfo()
+        subscribeToConnectionUpgradedTo()
         subscribeToServerTrust()
     }
 
