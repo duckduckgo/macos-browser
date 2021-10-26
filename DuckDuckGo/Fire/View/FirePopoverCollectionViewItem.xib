@@ -40,7 +40,7 @@
                                 <constraint firstAttribute="width" constant="16" id="RPh-kM-6nW"/>
                                 <constraint firstAttribute="height" constant="16" id="yMz-yr-SBE"/>
                             </constraints>
-                            <imageCell key="cell" refusesFirstResponder="YES" alignment="left" imageScaling="proportionallyDown" image="Appearance" id="q2b-Rf-Eil"/>
+                            <imageCell key="cell" refusesFirstResponder="YES" alignment="left" imageScaling="proportionallyDown" image="Web" id="q2b-Rf-Eil"/>
                         </imageView>
                         <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="p6Z-nn-uzt">
                             <rect key="frame" x="44" y="4" width="207" height="16"/>
@@ -81,6 +81,6 @@
         </collectionViewItem>
     </objects>
     <resources>
-        <image name="Appearance" width="16" height="16"/>
+        <image name="Web" width="16" height="16"/>
     </resources>
 </document>
