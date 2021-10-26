@@ -114,7 +114,7 @@ final class PermissionManager: PermissionManagerProtocol {
     }
 
     func burnPermissions(of domains: [String], completion: @escaping () -> Void) {
-        //TODO
+        // To do:
         completion()
     }
 

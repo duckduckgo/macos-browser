@@ -282,7 +282,7 @@ final class DownloadListCoordinator {
     }
 
     func cleanupInactiveDownloads(for domains: Set<String>) {
-        //TODO
+        // To do:
     }
 
     func remove(downloadWithIdentifier identifier: UUID) {

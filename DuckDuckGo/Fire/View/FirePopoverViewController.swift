@@ -117,7 +117,7 @@ final class FirePopoverViewController: NSViewController {
     }
 
     private func updateWarningWrapperView(for clearingOption: FirePopoverViewModel.ClearingOption) {
-        //TODO
+        // To do:
 //        warningWrapperView.isHidden = clearingOption == .allData || firePopoverViewModel.selectable.isEmpty
     }
 
