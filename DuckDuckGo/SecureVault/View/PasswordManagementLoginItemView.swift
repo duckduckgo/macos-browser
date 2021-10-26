@@ -327,7 +327,7 @@ private struct HeaderView: View {
 
             if model.isNew || model.isEditing {
 
-                TextField("", text: $model.title)
+                TextField(model.domain.dropWWW(), text: $model.title)
                     .font(.title)
                     .textFieldStyle(PlainTextFieldStyle())
                     .padding(4)
