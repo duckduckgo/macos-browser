@@ -81,6 +81,9 @@ final class FirePopoverViewController: NSViewController {
         setupOptionsButton()
         updateCloseDetailsButton(for: .allData)
         removeInfoContainerViewIfNeeded()
+        if infoContainerView == nil {
+            optionsButton.isEnabled = true
+        }
 
         subscribeToViewModel()
         subscribeToSelected()
@@ -114,6 +117,7 @@ final class FirePopoverViewController: NSViewController {
     }
 
     private func updateWarningWrapperView(for clearingOption: FirePopoverViewModel.ClearingOption) {
+        //TODO
 //        warningWrapperView.isHidden = clearingOption == .allData || firePopoverViewModel.selectable.isEmpty
     }
 
