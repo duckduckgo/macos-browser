@@ -110,9 +110,9 @@ final class FirePopoverViewController: NSViewController {
 
     private func updateCloseDetailsButton(for clearingOption: FirePopoverViewModel.ClearingOption) {
         switch clearingOption {
-        case .currentTab: closeDetailsButton.title = UserText.currentTabDescription
-        case .currentWindow: closeDetailsButton.title = UserText.currentWindowDescription
-        case .allData: closeDetailsButton.title = UserText.allDataDescription
+        case .currentTab: closeDetailsButton.title = "     \(UserText.currentTabDescription)"
+        case .currentWindow: closeDetailsButton.title = "     \(UserText.currentWindowDescription)"
+        case .allData: closeDetailsButton.title = "     \(UserText.allDataDescription)"
         }
     }
 

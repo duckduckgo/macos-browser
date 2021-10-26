@@ -189,8 +189,8 @@
                                     <constraint firstItem="acV-lE-jVh" firstAttribute="centerX" secondItem="3Jn-h4-fXL" secondAttribute="centerX" id="jdZ-Ii-nMi"/>
                                 </constraints>
                             </customView>
-                            <button translatesAutoresizingMaskIntoConstraints="NO" id="ACx-m8-z0K">
-                                <rect key="frame" x="20" y="60" width="280" height="42"/>
+                            <button translatesAutoresizingMaskIntoConstraints="NO" id="ACx-m8-z0K" customClass="MouseOverButton" customModule="DuckDuckGo_Privacy_Browser" customModuleProvider="target">
+                                <rect key="frame" x="0.0" y="60" width="320" height="42"/>
                                 <constraints>
                                     <constraint firstAttribute="height" constant="42" id="lCs-Fg-DUS"/>
                                 </constraints>
@@ -199,6 +199,14 @@
                                     <font key="font" metaFont="smallSystem"/>
                                 </buttonCell>
                                 <color key="contentTintColor" name="GreyTextColor"/>
+                                <userDefinedRuntimeAttributes>
+                                    <userDefinedRuntimeAttribute type="color" keyPath="mouseOverColor">
+                                        <color key="value" name="ButtonMouseOverColorLight"/>
+                                    </userDefinedRuntimeAttribute>
+                                    <userDefinedRuntimeAttribute type="color" keyPath="mouseDownColor">
+                                        <color key="value" name="ButtonMouseDownColorLight"/>
+                                    </userDefinedRuntimeAttribute>
+                                </userDefinedRuntimeAttributes>
                                 <connections>
                                     <action selector="openDetailsButtonAction:" target="DMI-mh-xLJ" id="AXs-B1-jCk"/>
                                 </connections>
@@ -225,24 +233,35 @@
                                                 <rect key="frame" x="0.0" y="-2" width="320" height="5"/>
                                                 <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                             </box>
-                                            <button fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="cgG-hF-FAP">
-                                                <rect key="frame" x="20" y="0.0" width="280" height="42"/>
-                                                <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
-                                                <buttonCell key="cell" type="square" title="Close all tabs and clear site data" bezelStyle="shadowlessSquare" image="CondenseUp" imagePosition="trailing" alignment="left" inset="2" id="5VP-Yt-jB8">
+                                            <button translatesAutoresizingMaskIntoConstraints="NO" id="cgG-hF-FAP" customClass="MouseOverButton" customModule="DuckDuckGo_Privacy_Browser" customModuleProvider="target">
+                                                <rect key="frame" x="0.0" y="0.0" width="320" height="42"/>
+                                                <buttonCell key="cell" type="square" title="     Close all tabs and clear site data" bezelStyle="shadowlessSquare" image="CondenseUp" imagePosition="trailing" alignment="left" inset="2" id="5VP-Yt-jB8">
                                                     <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
                                                     <font key="font" metaFont="smallSystem"/>
                                                 </buttonCell>
                                                 <color key="contentTintColor" name="GreyTextColor"/>
+                                                <userDefinedRuntimeAttributes>
+                                                    <userDefinedRuntimeAttribute type="color" keyPath="mouseOverColor">
+                                                        <color key="value" name="ButtonMouseOverColorLight"/>
+                                                    </userDefinedRuntimeAttribute>
+                                                    <userDefinedRuntimeAttribute type="color" keyPath="mouseDownColor">
+                                                        <color key="value" name="ButtonMouseDownColorLight"/>
+                                                    </userDefinedRuntimeAttribute>
+                                                </userDefinedRuntimeAttributes>
                                                 <connections>
                                                     <action selector="closeDetailsButtonAction:" target="DMI-mh-xLJ" id="Uk9-rU-fB7"/>
                                                 </connections>
                                             </button>
                                         </subviews>
                                         <constraints>
+                                            <constraint firstItem="cgG-hF-FAP" firstAttribute="top" secondItem="553-P8-fEM" secondAttribute="top" id="6TI-A7-P2Y"/>
                                             <constraint firstItem="41J-2u-8fZ" firstAttribute="top" secondItem="553-P8-fEM" secondAttribute="top" id="HwF-am-94m"/>
                                             <constraint firstAttribute="trailing" secondItem="41J-2u-8fZ" secondAttribute="trailing" id="IZr-Z5-H9m"/>
+                                            <constraint firstAttribute="bottom" secondItem="cgG-hF-FAP" secondAttribute="bottom" id="YqW-aQ-re9"/>
+                                            <constraint firstItem="cgG-hF-FAP" firstAttribute="leading" secondItem="553-P8-fEM" secondAttribute="leading" id="bly-Eb-EeK"/>
                                             <constraint firstItem="41J-2u-8fZ" firstAttribute="leading" secondItem="553-P8-fEM" secondAttribute="leading" id="c4x-27-uiA"/>
                                             <constraint firstAttribute="bottom" secondItem="41J-2u-8fZ" secondAttribute="bottom" id="fZu-cZ-7bS"/>
+                                            <constraint firstAttribute="trailing" secondItem="cgG-hF-FAP" secondAttribute="trailing" id="syR-Xd-ulV"/>
                                             <constraint firstAttribute="height" constant="42" id="tKr-oa-xct"/>
                                         </constraints>
                                     </customView>
@@ -387,13 +406,12 @@ Gw
                             </customView>
                         </subviews>
                         <constraints>
-                            <constraint firstAttribute="trailing" secondItem="ACx-m8-z0K" secondAttribute="trailing" constant="20" symbolic="YES" id="3dH-oe-VKH"/>
+                            <constraint firstAttribute="trailing" secondItem="ACx-m8-z0K" secondAttribute="trailing" id="3dH-oe-VKH"/>
                             <constraint firstItem="6vZ-d2-qnR" firstAttribute="leading" secondItem="dGd-Gc-P2e" secondAttribute="leading" id="Anc-Gh-sNK"/>
-                            <constraint firstItem="ACx-m8-z0K" firstAttribute="leading" secondItem="dGd-Gc-P2e" secondAttribute="leading" constant="20" symbolic="YES" id="FH3-vT-iON"/>
+                            <constraint firstItem="ACx-m8-z0K" firstAttribute="leading" secondItem="dGd-Gc-P2e" secondAttribute="leading" id="FH3-vT-iON"/>
                             <constraint firstItem="WCe-Mc-jz7" firstAttribute="top" secondItem="dGd-Gc-P2e" secondAttribute="top" id="IcR-sy-EB5"/>
                             <constraint firstAttribute="trailing" secondItem="6vZ-d2-qnR" secondAttribute="trailing" id="Kyw-38-ua5"/>
                             <constraint firstAttribute="bottom" secondItem="WCe-Mc-jz7" secondAttribute="bottom" id="NAx-fl-1Ni"/>
-                            <constraint firstItem="ACx-m8-z0K" firstAttribute="centerX" secondItem="dGd-Gc-P2e" secondAttribute="centerX" id="NE6-6a-dV3"/>
                             <constraint firstItem="nId-He-RIU" firstAttribute="leading" secondItem="dGd-Gc-P2e" secondAttribute="leading" id="R5q-Fw-y3V"/>
                             <constraint firstItem="6vZ-d2-qnR" firstAttribute="top" secondItem="3Jn-h4-fXL" secondAttribute="bottom" id="SiT-y0-otC"/>
                             <constraint firstAttribute="trailing" secondItem="nId-He-RIU" secondAttribute="trailing" id="UP0-3m-4QV"/>
@@ -515,6 +533,12 @@ DQ
         <image name="WarningTriangle" width="16" height="15"/>
         <namedColor name="ButtonColor">
             <color red="0.28627450980392155" green="0.28627450980392155" blue="0.28627450980392155" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+        </namedColor>
+        <namedColor name="ButtonMouseDownColorLight">
+            <color red="0.0" green="0.0" blue="0.0" alpha="0.10000000000000001" colorSpace="custom" customColorSpace="sRGB"/>
+        </namedColor>
+        <namedColor name="ButtonMouseOverColorLight">
+            <color red="0.0" green="0.0" blue="0.0" alpha="0.050000000000000003" colorSpace="custom" customColorSpace="sRGB"/>
         </namedColor>
         <namedColor name="FireBackground">
             <color red="1" green="1" blue="1" alpha="0.5" colorSpace="custom" customColorSpace="sRGB"/>
