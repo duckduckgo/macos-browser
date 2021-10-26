@@ -176,6 +176,110 @@ class StatisticsLoaderTests: XCTestCase {
         waitForExpectations(timeout: 1, handler: nil)
     }
 
+    func testWhenSearchRefreshCompletesThenLastAppRetentionRequestDateNotUpdated() {
+        mockStatisticsStore.atb = "atb"
+        mockStatisticsStore.appRetentionAtb = "retentionAtb"
+        mockStatisticsStore.searchRetentionAtb = "retentionAtb"
+        loadSuccessfulAtbStub()
+        XCTAssertFalse(self.mockStatisticsStore.isAppRetentionFiredToday)
+
+        let expect = expectation(description: "Search retention atb does not update lastAppRetentionRequestDate")
+        testee.refreshSearchRetentionAtb {
+            XCTAssertNil(self.mockStatisticsStore.lastAppRetentionRequestDate)
+            XCTAssertFalse(self.mockStatisticsStore.isAppRetentionFiredToday)
+            expect.fulfill()
+        }
+
+        waitForExpectations(timeout: 1, handler: nil)
+    }
+
+    func testWhenAppRefreshCompletesThenLastAppRetentionRequestDateUpdated() {
+        mockStatisticsStore.atb = "atb"
+        mockStatisticsStore.appRetentionAtb = "retentionAtb"
+        mockStatisticsStore.searchRetentionAtb = "retentionAtb"
+        loadSuccessfulAtbStub()
+        XCTAssertFalse(self.mockStatisticsStore.isAppRetentionFiredToday)
+
+        let expect = expectation(description: "App retention atb updates lastAppRetentionRequestDate")
+        testee.refreshAppRetentionAtb {
+            XCTAssertNotNil(self.mockStatisticsStore.lastAppRetentionRequestDate)
+            XCTAssertTrue(self.mockStatisticsStore.isAppRetentionFiredToday)
+            expect.fulfill()
+        }
+
+        waitForExpectations(timeout: 1, handler: nil)
+    }
+
+    func testWhenAppRefreshFailsThenLastAppRetentionRequestDateNotUpdated() {
+        mockStatisticsStore.atb = "atb"
+        mockStatisticsStore.appRetentionAtb = "retentionAtb"
+        mockStatisticsStore.searchRetentionAtb = "retentionAtb"
+        loadUnsuccessfulAtbStub()
+        XCTAssertFalse(self.mockStatisticsStore.isAppRetentionFiredToday)
+
+        let expect = expectation(description: "Unsuccessful App retention atb does not update lastAppRetentionRequestDate")
+        testee.refreshAppRetentionAtb {
+            XCTAssertNil(self.mockStatisticsStore.lastAppRetentionRequestDate)
+            XCTAssertFalse(self.mockStatisticsStore.isAppRetentionFiredToday)
+            expect.fulfill()
+        }
+
+        waitForExpectations(timeout: 1, handler: nil)
+    }
+
+    func testWhenRefreshRetentionAtbIsPerformedForSearchThenSearchRetentionAtbRequested() {
+        mockStatisticsStore.appRetentionAtb = "appRetentionAtb"
+        mockStatisticsStore.searchRetentionAtb = "searchRetentionAtb"
+        loadSuccessfulUpdateAtbStub()
+
+        let expect = expectation(description: "Search retention ATB requested")
+        testee.refreshRetentionAtb(isSearch: true) {
+            XCTAssertEqual(self.mockStatisticsStore.atb, "v20-1")
+            XCTAssertEqual(self.mockStatisticsStore.appRetentionAtb, "appRetentionAtb")
+            XCTAssertEqual(self.mockStatisticsStore.searchRetentionAtb, "v77-5")
+            expect.fulfill()
+        }
+
+        waitForExpectations(timeout: 1, handler: nil)
+    }
+
+    func testWhenRefreshRetentionAtbIsPerformedForNavigationThenAppRetentionAtbRequested() {
+        mockStatisticsStore.atb = "atb"
+        mockStatisticsStore.appRetentionAtb = "appRetentionAtb"
+        mockStatisticsStore.searchRetentionAtb = "searchRetentionAtb"
+        loadSuccessfulUpdateAtbStub()
+
+        let expect = expectation(description: "App retention ATB requested")
+        testee.refreshRetentionAtb(isSearch: false) {
+            XCTAssertEqual(self.mockStatisticsStore.atb, "v20-1")
+            XCTAssertEqual(self.mockStatisticsStore.appRetentionAtb, "v77-5")
+            XCTAssertEqual(self.mockStatisticsStore.searchRetentionAtb, "searchRetentionAtb")
+            XCTAssertTrue(self.mockStatisticsStore.isAppRetentionFiredToday)
+            expect.fulfill()
+        }
+
+        waitForExpectations(timeout: 1, handler: nil)
+    }
+
+    func testWhenRefreshRetentionAtbIsPerformedTwiceADayThenAppRetentionAtbNotRequested() {
+        mockStatisticsStore.atb = "atb"
+        mockStatisticsStore.appRetentionAtb = "appRetentionAtb"
+        mockStatisticsStore.searchRetentionAtb = "searchRetentionAtb"
+        mockStatisticsStore.lastAppRetentionRequestDate = Date()
+        loadSuccessfulUpdateAtbStub()
+
+        let expect = expectation(description: "App retention ATB not requested")
+        testee.refreshRetentionAtb(isSearch: false) {
+            XCTAssertEqual(self.mockStatisticsStore.atb, "atb")
+            XCTAssertEqual(self.mockStatisticsStore.appRetentionAtb, "appRetentionAtb")
+            XCTAssertEqual(self.mockStatisticsStore.searchRetentionAtb, "searchRetentionAtb")
+            XCTAssertTrue(self.mockStatisticsStore.isAppRetentionFiredToday)
+            expect.fulfill()
+        }
+
+        waitForExpectations(timeout: 1, handler: nil)
+    }
+
     func loadSuccessfulAtbStub() {
         stub(condition: isHost(URL.initialAtb.host!)) { _ in
             let path = OHPathForFile("atb.json", type(of: self))!

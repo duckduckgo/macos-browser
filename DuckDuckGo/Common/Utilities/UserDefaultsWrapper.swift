@@ -53,6 +53,7 @@ public struct UserDefaultsWrapper<T> {
         case searchRetentionAtb = "statistics.retentionatb.key"
         case appRetentionAtb = "statistics.appretentionatb.key"
         case variant = "statistics.variant.key"
+        case lastAppRetentionRequestDate = "statistics.appretentionatb.last.request.key"
 
     }
 

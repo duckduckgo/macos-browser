@@ -27,9 +27,6 @@ final class MockStatisticsStore: StatisticsStore {
     var searchRetentionAtb: String?
     var appRetentionAtb: String?
 
-    var hasInstallStatistics: Bool {
-        return atb != nil
-    }
-
     var variant: String?
+    var lastAppRetentionRequestDate: Date?
 }

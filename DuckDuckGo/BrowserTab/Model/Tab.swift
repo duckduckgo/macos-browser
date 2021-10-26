@@ -692,6 +692,7 @@ extension Tab: WKNavigationDelegate {
                 decisionHandler(.cancel)
                 return
             }
+            StatisticsLoader.shared.refreshRetentionAtb(isSearch: url.isDuckDuckGoSearch)
 
             decisionHandler(.allow)
         }

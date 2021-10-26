@@ -43,4 +43,7 @@ final class StatisticsUserDefaults: StatisticsStore {
     @UserDefaultsWrapper(key: .variant, defaultValue: nil)
     var variant: String?
 
+    @UserDefaultsWrapper(key: .lastAppRetentionRequestDate, defaultValue: nil)
+    var lastAppRetentionRequestDate: Date?
+
 }

@@ -33,6 +33,20 @@ final class StatisticsLoader {
         self.statisticsStore = statisticsStore
     }
 
+    func refreshRetentionAtb(isSearch: Bool, completion: @escaping Completion = {}) {
+        load {
+            dispatchPrecondition(condition: .onQueue(.main))
+
+            if isSearch {
+                self.refreshSearchRetentionAtb(completion: completion)
+            } else if !self.statisticsStore.isAppRetentionFiredToday {
+                self.refreshAppRetentionAtb(completion: completion)
+            } else {
+                completion()
+            }
+        }
+    }
+
     func load(completion: @escaping Completion = {}) {
         if statisticsStore.hasInstallStatistics {
             completion()
@@ -43,16 +57,18 @@ final class StatisticsLoader {
     
     private func requestInstallStatistics(completion: @escaping Completion = {}) {
         APIRequest.request(url: URL.initialAtb) { response, error in
-            if let error = error {
-                os_log("Initial atb request failed with error %s", type: .error, error.localizedDescription)
-                completion()
-                return
-            }
-            
-            if let data = response?.data, let atb  = try? self.parser.convert(fromJsonData: data) {
-                self.requestExti(atb: atb, completion: completion)
-            } else {
-                completion()
+            DispatchQueue.main.async {
+                if let error = error {
+                    os_log("Initial atb request failed with error %s", type: .error, error.localizedDescription)
+                    completion()
+                    return
+                }
+
+                if let data = response?.data, let atb  = try? self.parser.convert(fromJsonData: data) {
+                    self.requestExti(atb: atb, completion: completion)
+                } else {
+                    completion()
+                }
             }
         }
     }
@@ -62,14 +78,16 @@ final class StatisticsLoader {
         guard let url = URL.exti(forAtb: installAtb) else { return }
 
         APIRequest.request(url: url) { _, error in
-            if let error = error {
-                os_log("Exti request failed with error %s", type: .error, error.localizedDescription)
+            DispatchQueue.main.async {
+                if let error = error {
+                    os_log("Exti request failed with error %s", type: .error, error.localizedDescription)
+                    completion()
+                    return
+                }
+                self.statisticsStore.installDate = Date()
+                self.statisticsStore.atb = atb.version
                 completion()
-                return
             }
-            self.statisticsStore.installDate = Date()
-            self.statisticsStore.atb = atb.version
-            completion()
         }
     }
     
@@ -83,16 +101,18 @@ final class StatisticsLoader {
         }
 
         APIRequest.request(url: url) { response, error in
-            if let error = error {
-                os_log("Search atb request failed with error %s", type: .error, error.localizedDescription)
+            DispatchQueue.main.async {
+                if let error = error {
+                    os_log("Search atb request failed with error %s", type: .error, error.localizedDescription)
+                    completion()
+                    return
+                }
+                if let data = response?.data, let atb  = try? self.parser.convert(fromJsonData: data) {
+                    self.statisticsStore.searchRetentionAtb = atb.version
+                    self.storeUpdateVersionIfPresent(atb)
+                }
                 completion()
-                return
             }
-            if let data = response?.data, let atb  = try? self.parser.convert(fromJsonData: data) {
-                self.statisticsStore.searchRetentionAtb = atb.version
-                self.storeUpdateVersionIfPresent(atb)
-            }
-            completion()
         }
     }
     
@@ -106,16 +126,19 @@ final class StatisticsLoader {
         }
 
         APIRequest.request(url: url) { response, error in
-            if let error = error {
-                os_log("App atb request failed with error %s", type: .error, error.localizedDescription)
+            DispatchQueue.main.async {
+                if let error = error {
+                    os_log("App atb request failed with error %s", type: .error, error.localizedDescription)
+                    completion()
+                    return
+                }
+                if let data = response?.data, let atb  = try? self.parser.convert(fromJsonData: data) {
+                    self.statisticsStore.appRetentionAtb = atb.version
+                    self.statisticsStore.lastAppRetentionRequestDate = Date()
+                    self.storeUpdateVersionIfPresent(atb)
+                }
                 completion()
-                return
             }
-            if let data = response?.data, let atb  = try? self.parser.convert(fromJsonData: data) {
-                self.statisticsStore.appRetentionAtb = atb.version
-                self.storeUpdateVersionIfPresent(atb)
-            }
-            completion()
         }
     }
 
@@ -124,4 +147,5 @@ final class StatisticsLoader {
             statisticsStore.atb = updateVersion
         }
     }
+
 }
