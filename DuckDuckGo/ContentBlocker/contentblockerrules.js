@@ -35,6 +35,12 @@
         domainParts.shift()
     }
 
+    if (!unprotectedDomain && topLevelUrl.host != null) {
+        unprotectedDomain = `
+          USER_UNPROTECTED_DOMAINS
+          `.split('\n').filter(domain => domain.trim() === topLevelUrl.host).length > 0
+    }
+
     // private
     function getTopLevelURL () {
         try {

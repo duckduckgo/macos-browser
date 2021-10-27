@@ -89,6 +89,7 @@ final class TabBarViewController: NSViewController {
 
     deinit {
         NotificationCenter.default.removeObserver(self)
+        tabCollectionViewModel.removeAllTabs()
     }
 
     @IBAction func addButtonAction(_ sender: NSButton) {

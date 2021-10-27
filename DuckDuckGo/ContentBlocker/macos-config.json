@@ -9,24 +9,56 @@
             "state": "enabled",
             "exceptions": [
                 {
+                    "domain": "www.nhl.com",
+                    "reason": "Video content missing"
+                },
+                {
+                    "domain": "pnc.com",
+                    "reason": "Login issues"
+                },
+                {
+                    "domain": "www.corsair.com",
+                    "reason": "Missing content"
+                },
+                {
+                    "domain": "www.eurogamer.net",
+                    "reason": "Hard adwall"
+                },
+                {
+                    "domain": "53.com",
+                    "reason": "Broken sign in"
+                },
+                {
+                    "domain": "www.costco.com",
+                    "reason": "Broken sign in"
+                },
+                {
                     "domain": "www.livenewsnow.com",
                     "reason": "Adblocker wall"
-                },
-                {
-                    "domain": "weather.com",
-                    "reason": "Broken videos"
-                },
-                {
-                    "domain": "www.cbsnews.com",
-                    "reason": "Broken videos"
                 },
                 {
                     "domain": "rp5.ru",
                     "reason": "Adblocker wall"
                 },
                 {
-                    "domain": "chase.com",
-                    "reason": "Login"
+                    "domain": "easyjet.com",
+                    "reason": "Broken site content"
+                },
+                {
+                    "domain": "id.me",
+                    "reason": "Broken logins"
+                },
+                {
+                    "domain": "stubhub.com",
+                    "reason": "Missing site content"
+                },
+                {
+                    "domain": "riteaid.com",
+                    "reason": "Missing site content"
+                },
+                {
+                    "domain": "video.ibm.com",
+                    "reason": "Broken videos"
                 }
             ]
         },
@@ -39,16 +71,7 @@
         },
         "trackingCookies3p": {
             "state": "enabled",
-            "exceptions": [
-                {
-                    "domain": "hangouts.google.com",
-                    "reason": "site breakage"
-                },
-                {
-                    "domain": "docs.google.com",
-                    "reason": "site breakage"
-                }
-            ],
+            "exceptions": [],
             "settings": {
                 "excludedCookieDomains": [
                     {
@@ -150,6 +173,10 @@
                     {
                         "domain": "docs.google.com",
                         "reason": "site breakage"
+                    },
+                    {
+                        "domain": "btsport-utils-prod.akamaized.net",
+                        "reason": "broken videos"
                     }
                 ]
             }
@@ -172,112 +199,16 @@
             "state": "enabled",
             "exceptions": [
                 {
-                    "domain": "www.delta.com",
-                    "reason": "site breakage"
+                    "domain": "krunker.io",
+                    "reason": "Broken game init"
                 },
                 {
-                    "domain": "www.johnlewis.com",
-                    "reason": "site breakage"
-                },
-                {
-                    "domain": "warzone.com",
-                    "reason": "site breakage"
-                },
-                {
-                    "domain": "skribbl.io",
-                    "reason": "site breakage"
+                    "domain": "usaa.com",
+                    "reason": "Broken login"
                 },
                 {
                     "domain": "kroger.com",
-                    "reason": "site breakage"
-                },
-                {
-                    "domain": "bakersplus.com",
-                    "reason": "site breakage"
-                },
-                {
-                    "domain": "citymarket.com",
-                    "reason": "site breakage"
-                },
-                {
-                    "domain": "dillons.com",
-                    "reason": "site breakage"
-                },
-                {
-                    "domain": "food4less.com",
-                    "reason": "site breakage"
-                },
-                {
-                    "domain": "foodsco.net",
-                    "reason": "site breakage"
-                },
-                {
-                    "domain": "fredmeyer.com",
-                    "reason": "site breakage"
-                },
-                {
-                    "domain": "frysfood.com",
-                    "reason": "site breakage"
-                },
-                {
-                    "domain": "gerbes.com",
-                    "reason": "site breakage"
-                },
-                {
-                    "domain": "jaycfoods.com",
-                    "reason": "site breakage"
-                },
-                {
-                    "domain": "kingsoopers.com",
-                    "reason": "site breakage"
-                },
-                {
-                    "domain": "marianos.com",
-                    "reason": "site breakage"
-                },
-                {
-                    "domain": "metromarket.net",
-                    "reason": "site breakage"
-                },
-                {
-                    "domain": "pay-less.com",
-                    "reason": "site breakage"
-                },
-                {
-                    "domain": "picknsave.com",
-                    "reason": "site breakage"
-                },
-                {
-                    "domain": "qfc.com",
-                    "reason": "site breakage"
-                },
-                {
-                    "domain": "ralphs.com",
-                    "reason": "site breakage"
-                },
-                {
-                    "domain": "smithsfoodanddrug.com",
-                    "reason": "site breakage"
-                },
-                {
-                    "domain": "pnc.com",
-                    "reason": "site breakage"
-                },
-                {
-                    "domain": "www.coolmathgames.com",
-                    "reason": "site breakage"
-                },
-                {
-                    "domain": "textfree.us",
-                    "reason": "site breakage"
-                },
-                {
-                    "domain": "www.academy.com",
-                    "reason": "site breakage"
-                },
-                {
-                    "domain": "edd.ca.gov",
-                    "reason": "login issues"
+                    "reason": "Broken login"
                 }
             ]
         },
@@ -285,10 +216,12 @@
             "state": "disabled",
             "exceptions": [
                 {
-                    "domain": "youtube.com"
+                    "domain": "youtube.com",
+                    "reason": "site breakage"
                 },
                 {
-                    "domain": "meet.google.com"
+                    "domain": "meet.google.com",
+                    "reason": "site breakage"
                 }
             ]
         },
@@ -312,10 +245,12 @@
             "state": "enabled",
             "exceptions": [
                 {
-                    "domain": "play.geforcenow.com"
+                    "domain": "play.geforcenow.com",
+                    "reason": "site breakage"
                 },
                 {
-                    "domain": "stadia.google.com"
+                    "domain": "stadia.google.com",
+                    "reason": "site breakage"
                 }
             ]
         },
@@ -325,7 +260,15 @@
         },
         "gpc": {
             "state": "enabled",
-            "exceptions": []
+            "exceptions": [],
+            "settings": {
+                "gpcHeaderEnabledSites": [
+                    "http://global-privacy-control.glitch.me",
+                    "https://washingtonpost.com",
+                    "https://nytimes.com",
+                    "https://privacy-test-pages.glitch.me"
+                ]
+            }
         },
         "userAgentRotation": {
             "state": "disabled",
@@ -377,28 +320,8 @@
             ]
         }
     },
-    "version": 1628605398407,
+    "version": 1634748171373,
     "unprotectedTemporary": [
-        {
-            "domain": "inlandbank.com",
-            "reason": "site breakage"
-        },
-        {
-            "domain": "bank.barclays.co.uk",
-            "reason": "site breakage"
-        },
-        {
-            "domain": "capitalone.ca",
-            "reason": "site breakage"
-        },
-        {
-            "domain": "capitalone.com",
-            "reason": "site breakage"
-        },
-        {
-            "domain": "nbarizona.com",
-            "reason": "site breakage"
-        },
         {
             "domain": "sberbank.ru",
             "reason": "site breakage"
@@ -433,10 +356,6 @@
         },
         {
             "domain": "tiaa.org",
-            "reason": "site breakage"
-        },
-        {
-            "domain": "53.com",
             "reason": "site breakage"
         },
         {

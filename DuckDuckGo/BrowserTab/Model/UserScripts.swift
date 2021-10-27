@@ -31,6 +31,7 @@ final class UserScripts {
     let printingUserScript = PrintingUserScript()
     let hoverUserScript = HoverUserScript()
     let debugScript = DebugUserScript()
+    let gpcScript = GPCUserScript()
 
     init() {
     }
@@ -51,6 +52,7 @@ final class UserScripts {
         self.pageObserverScript,
         self.printingUserScript,
         self.hoverUserScript,
+        self.gpcScript,
         self.autofillScript
     ]
 

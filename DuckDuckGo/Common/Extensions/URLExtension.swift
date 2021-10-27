@@ -261,6 +261,11 @@ extension URL {
 
         return filename
     }
+    
+    public func isPart(ofDomain domain: String) -> Bool {
+        guard let host = host else { return false }
+        return host == domain || host.hasSuffix(".\(domain)")
+    }
 
     // MARK: - Validity
 
@@ -293,6 +298,14 @@ extension URL {
 
     static var aboutDuckDuckGo: URL {
         return URL(string: "https://duckduckgo.com/about")!
+    }
+    
+    static var gpcLearnMore: URL {
+        return URL(string: "https://help.duckduckgo.com/duckduckgo-help-pages/privacy/gpc/")!
+    }
+
+    static var privacyPolicy: URL {
+        return URL(string: "https://duckduckgo.com/privacy")!
     }
 
     static var duckDuckGoEmail = URL(string: "https://duckduckgo.com/email-protection")!
@@ -409,6 +422,32 @@ extension URL {
             try (self as NSURL).setResourceValue(quarantineProperties, forKey: .quarantinePropertiesKey)
         }
 
+    }
+    
+    // MARK: - GPC
+    
+    static func isGPCEnabled(url: URL,
+                             config: PrivacyConfigurationManager = PrivacyConfigurationManager.shared) -> Bool {
+        let enabledSites = config.gpcHeadersEnabled()
+        
+        for gpcHost in enabledSites {
+            if url.isPart(ofDomain: gpcHost) {
+                
+                // Check if url is on exception list
+                // Since headers are only enabled for a small numbers of sites
+                // perfrom this check here for efficency
+                let exceptions = config.tempUnprotectedDomains + config.exceptionsList(forFeature: .gpc)
+                for exception in exceptions {
+                    if url.isPart(ofDomain: exception) {
+                        return false
+                    }
+                }
+                
+                return true
+            }
+        }
+        
+        return false
     }
 
 }

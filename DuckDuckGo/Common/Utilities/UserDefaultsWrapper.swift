@@ -39,6 +39,7 @@ public struct UserDefaultsWrapper<T> {
         case grammarCheckEnabledOnce = "grammar.check.enabled.once"
 
         case loginDetectionEnabled = "fireproofing.login-detection-enabled"
+        case gpcEnabled = "preferences.gpc-enabled"
         case alwaysRequestDownloadLocationKey = "preferences.download-location.always-request"
 
         case saveAsPreferredFileType = "saveAs.selected.filetype"

@@ -57,7 +57,7 @@
                                                         <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
                                                     </textFieldCell>
                                                 </textField>
-                                                <imageView horizontalHuggingPriority="251" verticalHuggingPriority="251" translatesAutoresizingMaskIntoConstraints="NO" id="V02-0X-JE4">
+                                                <imageView horizontalHuggingPriority="251" verticalHuggingPriority="251" horizontalCompressionResistancePriority="1000" verticalCompressionResistancePriority="1000" translatesAutoresizingMaskIntoConstraints="NO" id="V02-0X-JE4">
                                                     <rect key="frame" x="8" y="215" width="128" height="128"/>
                                                     <constraints>
                                                         <constraint firstAttribute="width" constant="128" id="XmM-dp-Whc"/>
@@ -66,18 +66,18 @@
                                                     <imageCell key="cell" refusesFirstResponder="YES" alignment="left" imageScaling="proportionallyDown" image="Logo" id="V3u-lP-o54"/>
                                                 </imageView>
                                                 <button verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="ExO-AA-imf">
-                                                    <rect key="frame" x="8" y="192" width="184" height="15"/>
+                                                    <rect key="frame" x="8" y="191" width="184" height="16"/>
                                                     <buttonCell key="cell" type="bevel" title="More at duckduckgo.com/about" bezelStyle="rounded" alignment="center" imageScaling="proportionallyDown" inset="2" id="YrD-Nw-OMB">
                                                         <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
                                                         <font key="font" metaFont="cellTitle"/>
                                                     </buttonCell>
-                                                    <color key="contentTintColor" name="BlueButtonBorderColor"/>
+                                                    <color key="contentTintColor" name="LinkBlueColor"/>
                                                     <connections>
                                                         <action selector="openMoreInfoTab:" target="oLP-M7-uq4" id="1Jp-XU-wBI"/>
                                                     </connections>
                                                 </button>
                                                 <button verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="J62-E9-DAv">
-                                                    <rect key="frame" x="411" y="183" width="128" height="32"/>
+                                                    <rect key="frame" x="411" y="182" width="128" height="32"/>
                                                     <buttonCell key="cell" type="push" title="Send Feedback" bezelStyle="rounded" alignment="center" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="Cql-dh-brF">
                                                         <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
                                                         <font key="font" metaFont="system"/>
@@ -132,6 +132,17 @@
                                                         </constraints>
                                                     </view>
                                                 </box>
+                                                <button verticalHuggingPriority="1000" verticalCompressionResistancePriority="1000" translatesAutoresizingMaskIntoConstraints="NO" id="sxa-k3-7xD">
+                                                    <rect key="frame" x="8" y="163" width="83" height="15"/>
+                                                    <buttonCell key="cell" type="bevel" title="Privacy Policy" bezelStyle="rounded" alignment="center" imageScaling="proportionallyDown" inset="2" id="HYF-08-nWX">
+                                                        <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
+                                                        <font key="font" metaFont="cellTitle"/>
+                                                    </buttonCell>
+                                                    <color key="contentTintColor" name="LinkBlueColor"/>
+                                                    <connections>
+                                                        <action selector="openPrivacyPolicy:" target="oLP-M7-uq4" id="lbs-XZ-ToB"/>
+                                                    </connections>
+                                                </button>
                                             </subviews>
                                             <constraints>
                                                 <constraint firstItem="wvW-vQ-gKy" firstAttribute="centerY" secondItem="V02-0X-JE4" secondAttribute="centerY" id="4Sq-E1-e4w"/>
@@ -141,9 +152,11 @@
                                                 <constraint firstItem="ExO-AA-imf" firstAttribute="top" secondItem="V02-0X-JE4" secondAttribute="bottom" constant="8" symbolic="YES" id="Jys-2v-gOT"/>
                                                 <constraint firstAttribute="trailing" secondItem="J62-E9-DAv" secondAttribute="trailing" constant="8" id="clC-rs-Umo"/>
                                                 <constraint firstItem="wvW-vQ-gKy" firstAttribute="leading" secondItem="V02-0X-JE4" secondAttribute="trailing" constant="8" id="dvc-NQ-KwM"/>
+                                                <constraint firstItem="sxa-k3-7xD" firstAttribute="top" secondItem="ExO-AA-imf" secondAttribute="bottom" constant="14" id="ea7-iA-T4K"/>
                                                 <constraint firstItem="J62-E9-DAv" firstAttribute="centerY" secondItem="ExO-AA-imf" secondAttribute="centerY" id="lju-sp-pai"/>
                                                 <constraint firstItem="cMA-Ms-5FE" firstAttribute="top" secondItem="Tak-Ve-Prm" secondAttribute="top" constant="8" id="o4a-Xp-hbg"/>
                                                 <constraint firstItem="cMA-Ms-5FE" firstAttribute="leading" secondItem="Tak-Ve-Prm" secondAttribute="leading" constant="8" id="oT1-4c-MLw"/>
+                                                <constraint firstItem="sxa-k3-7xD" firstAttribute="leading" secondItem="Tak-Ve-Prm" secondAttribute="leading" constant="8" id="sew-nl-I9O"/>
                                                 <constraint firstItem="J62-E9-DAv" firstAttribute="leading" relation="greaterThanOrEqual" secondItem="ExO-AA-imf" secondAttribute="trailing" constant="8" symbolic="YES" id="vHG-MB-a2k"/>
                                             </constraints>
                                         </view>
@@ -337,11 +350,11 @@
                             <scrollView borderType="none" autohidesScrollers="YES" horizontalLineScroll="24" horizontalPageScroll="10" verticalLineScroll="24" verticalPageScroll="10" usesPredominantAxisScrolling="NO" translatesAutoresizingMaskIntoConstraints="NO" id="v7G-m4-y9G">
                                 <rect key="frame" x="42" y="0.0" width="429" height="306"/>
                                 <clipView key="contentView" drawsBackground="NO" id="Sca-lN-1gh">
-                                    <rect key="frame" x="0.0" y="0.0" width="429" height="306"/>
+                                    <rect key="frame" x="0.0" y="0.0" width="429" height="291"/>
                                     <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                     <subviews>
                                         <tableView verticalHuggingPriority="750" allowsExpansionToolTips="YES" columnAutoresizingStyle="lastColumnOnly" columnReordering="NO" columnSelection="YES" columnResizing="NO" multipleSelection="NO" autosaveColumns="NO" rowHeight="24" usesAutomaticRowHeights="YES" viewBased="YES" id="Hzk-42-jjV">
-                                            <rect key="frame" x="0.0" y="0.0" width="533" height="306"/>
+                                            <rect key="frame" x="0.0" y="0.0" width="533" height="291"/>
                                             <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                             <size key="intercellSpacing" width="17" height="0.0"/>
                                             <color key="backgroundColor" name="ClearColor"/>
@@ -369,7 +382,7 @@
                                     <color key="backgroundColor" name="ClearColor"/>
                                 </clipView>
                                 <scroller key="horizontalScroller" wantsLayer="YES" verticalHuggingPriority="750" horizontal="YES" id="cBz-er-7F4">
-                                    <rect key="frame" x="0.0" y="290" width="429" height="16"/>
+                                    <rect key="frame" x="0.0" y="291" width="429" height="15"/>
                                     <autoresizingMask key="autoresizingMask"/>
                                 </scroller>
                                 <scroller key="verticalScroller" hidden="YES" wantsLayer="YES" verticalHuggingPriority="750" horizontal="NO" id="Fbd-Kx-iHN">
@@ -406,7 +419,7 @@
                         <autoresizingMask key="autoresizingMask"/>
                         <subviews>
                             <button verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="DEQ-Uh-Y7p">
-                                <rect key="frame" x="13" y="13" width="83" height="32"/>
+                                <rect key="frame" x="13" y="13" width="84" height="32"/>
                                 <buttonCell key="cell" type="push" title="Remove" bezelStyle="rounded" alignment="center" enabled="NO" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="0Dz-eI-5jh">
                                     <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
                                     <font key="font" metaFont="system"/>
@@ -416,7 +429,7 @@
                                 </connections>
                             </button>
                             <button verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="KAc-ZW-ZAV">
-                                <rect key="frame" x="94" y="13" width="101" height="32"/>
+                                <rect key="frame" x="95" y="13" width="102" height="32"/>
                                 <buttonCell key="cell" type="push" title="Remove All" bezelStyle="rounded" alignment="center" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="atA-bI-IOY">
                                     <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
                                     <font key="font" metaFont="system"/>
@@ -574,14 +587,14 @@ DQ
         <image name="HomeFavicon" width="16" height="16"/>
         <image name="Logo" width="128" height="128"/>
         <image name="Web" width="16" height="16"/>
-        <namedColor name="BlueButtonBorderColor">
-            <color red="0.22699999809265137" green="0.40999999642372131" blue="0.93699997663497925" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
-        </namedColor>
         <namedColor name="ClearColor">
             <color red="1" green="1" blue="1" alpha="0.0" colorSpace="custom" customColorSpace="sRGB"/>
         </namedColor>
         <namedColor name="HomepageBackgroundColor">
             <color red="0.97647058823529409" green="0.98039215686274506" blue="0.98039215686274506" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+        </namedColor>
+        <namedColor name="LinkBlueColor">
+            <color red="0.22400000691413879" green="0.41200000047683716" blue="0.93699997663497925" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
         </namedColor>
     </resources>
 </document>
