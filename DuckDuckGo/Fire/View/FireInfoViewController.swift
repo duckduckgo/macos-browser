@@ -20,7 +20,14 @@ import Cocoa
 
 final class FireInfoViewController: NSViewController {
 
+    @UserDefaultsWrapper(key: .fireInfoPresentedOnce, defaultValue: false)
+    var infoPresentedOnce: Bool
+
+    override func mouseDown(with event: NSEvent) {}
+
     @IBAction func gotItAction(_ sender: Any) {
+        infoPresentedOnce = true
+
         NSAnimationContext.runAnimationGroup { [weak self] context in
             context.duration = 1/3
             context.timingFunction = CAMediaTimingFunction(name: .easeOut)

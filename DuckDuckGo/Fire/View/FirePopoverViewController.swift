@@ -84,9 +84,6 @@ final class FirePopoverViewController: NSViewController {
         updateCloseDetailsButton()
         updateWarningWrapperView()
         removeInfoContainerViewIfNeeded()
-        if infoContainerView == nil {
-            optionsButton.isEnabled = true
-        }
 
         subscribeToViewModel()
         subscribeToSelected()
@@ -211,8 +208,6 @@ final class FirePopoverViewController: NSViewController {
         if infoPresentedOnce {
             infoContainerView?.removeFromSuperview()
             infoContainerView = nil
-        } else {
-            infoPresentedOnce = true
         }
     }
 
