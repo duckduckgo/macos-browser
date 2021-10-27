@@ -245,7 +245,7 @@ final class PasswordManagementItemListModel: ObservableObject {
     func select(item: SecureVaultItem) {
         for section in displayedItems {
             if let first = section.items.first(where: { $0 == item }) {
-                selected = first
+                selected(item: first)
             }
         }
     }

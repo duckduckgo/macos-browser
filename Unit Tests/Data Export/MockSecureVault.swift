@@ -23,6 +23,9 @@ final class MockSecureVault: SecureVault {
 
     var storedAccounts: [SecureVaultModels.WebsiteAccount] = []
     var storedCredentials: [Int64: SecureVaultModels.WebsiteCredentials] = [:]
+    var storedNotes: [SecureVaultModels.Note] = []
+    var storedIdentities: [SecureVaultModels.Identity] = []
+    var storedCards: [SecureVaultModels.CreditCard] = []
 
     func authWith(password: Data) throws -> SecureVault {
         return self
@@ -51,6 +54,57 @@ final class MockSecureVault: SecureVault {
 
     func deleteWebsiteCredentialsFor(accountId: Int64) throws {
         storedCredentials[accountId] = nil
+    }
+
+    func notes() throws -> [SecureVaultModels.Note] {
+        return storedNotes
+    }
+
+    func noteFor(id: Int64) throws -> SecureVaultModels.Note? {
+        return storedNotes.first { $0.id == id }
+    }
+
+    func storeNote(_ note: SecureVaultModels.Note) throws -> Int64 {
+        storedNotes.append(note)
+        return note.id!
+    }
+
+    func deleteNoteFor(noteId: Int64) throws {
+        storedNotes = storedNotes.filter { $0.id != noteId }
+    }
+
+    func identities() throws -> [SecureVaultModels.Identity] {
+        return storedIdentities
+    }
+
+    func identityFor(id: Int64) throws -> SecureVaultModels.Identity? {
+        return storedIdentities.first { $0.id == id }
+    }
+
+    func storeIdentity(_ identity: SecureVaultModels.Identity) throws -> Int64 {
+        storedIdentities.append(identity)
+        return identity.id!
+    }
+
+    func deleteIdentityFor(identityId: Int64) throws {
+        storedIdentities = storedIdentities.filter { $0.id != identityId }
+    }
+
+    func creditCards() throws -> [SecureVaultModels.CreditCard] {
+        return storedCards
+    }
+
+    func creditCardFor(id: Int64) throws -> SecureVaultModels.CreditCard? {
+        return storedCards.first { $0.id == id }
+    }
+
+    func storeCreditCard(_ card: SecureVaultModels.CreditCard) throws -> Int64 {
+        storedCards.append(card)
+        return card.id!
+    }
+
+    func deleteCreditCardFor(cardId: Int64) throws {
+        storedCards = storedCards.filter { $0.id != cardId }
     }
 
 }
