@@ -131,12 +131,6 @@
                         <rect key="frame" x="0.0" y="0.0" width="320" height="250"/>
                         <autoresizingMask key="autoresizingMask"/>
                         <subviews>
-                            <containerView translatesAutoresizingMaskIntoConstraints="NO" id="WCe-Mc-jz7" propertyAccessControl="all">
-                                <rect key="frame" x="0.0" y="0.0" width="320" height="250"/>
-                                <connections>
-                                    <segue destination="hqb-gn-5gp" kind="embed" id="Icn-nq-7B7"/>
-                                </connections>
-                            </containerView>
                             <customView translatesAutoresizingMaskIntoConstraints="NO" id="3Jn-h4-fXL" userLabel="Header Wrapper View">
                                 <rect key="frame" x="0.0" y="102" width="320" height="148"/>
                                 <subviews>
@@ -401,6 +395,12 @@ Gw
                                     <constraint firstAttribute="height" constant="60" id="onw-qY-te8"/>
                                 </constraints>
                             </customView>
+                            <containerView translatesAutoresizingMaskIntoConstraints="NO" id="WCe-Mc-jz7" propertyAccessControl="all">
+                                <rect key="frame" x="0.0" y="0.0" width="320" height="250"/>
+                                <connections>
+                                    <segue destination="hqb-gn-5gp" kind="embed" id="Icn-nq-7B7"/>
+                                </connections>
+                            </containerView>
                         </subviews>
                         <constraints>
                             <constraint firstAttribute="trailing" secondItem="ACx-m8-z0K" secondAttribute="trailing" id="3dH-oe-VKH"/>
