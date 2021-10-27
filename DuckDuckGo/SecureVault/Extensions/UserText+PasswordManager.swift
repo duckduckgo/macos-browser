@@ -29,7 +29,6 @@ extension UserText {
     static let pmCancel = NSLocalizedString("pm.cancel", value: "Cancel", comment: "Cancel button")
     static let pmSave = NSLocalizedString("pm.save", value: "Save", comment: "Save button")
     static let pmEdit = NSLocalizedString("pm.edit", value: "Edit", comment: "Edit button")
-
     static let pmUsername = NSLocalizedString("pm.username", value: "Username", comment: "Label for username edit field")
     static let pmPassword = NSLocalizedString("pm.password", value: "Password", comment: "Label for password edit field")
     static let pmWebsite = NSLocalizedString("pm.website", value: "Website", comment: "Label for website edit field")

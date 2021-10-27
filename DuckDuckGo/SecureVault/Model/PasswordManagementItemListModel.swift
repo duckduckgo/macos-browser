@@ -164,40 +164,28 @@ final class PasswordManagementItemListModel: ObservableObject {
 
         var title: String {
             switch self {
-            case .accounts:
-                return "Logins"
-            case .cards:
-                return "Cards"
-            case .notes:
-                return "Notes"
-            case .identities:
-                return "Identities"
+            case .accounts: return "Logins"
+            case .cards: return "Cards"
+            case .notes: return "Notes"
+            case .identities: return "Identities"
             }
         }
 
         var items: [SecureVaultItem] {
             switch self {
-            case .accounts(let items):
-                return items
-            case .cards(let items):
-                return items
-            case .notes(let items):
-                return items
-            case .identities(let items):
-                return items
+            case .accounts(let items): return items
+            case .cards(let items): return items
+            case .notes(let items): return items
+            case .identities(let items): return items
             }
         }
 
         func withUpdatedItems(_ newItems: [SecureVaultItem]) -> ListSection {
             switch self {
-            case .accounts:
-                return .accounts(newItems)
-            case .cards:
-                return .cards(newItems)
-            case .notes:
-                return .notes(newItems)
-            case .identities:
-                return .identities(newItems)
+            case .accounts: return .accounts(newItems)
+            case .cards: return .cards(newItems)
+            case .notes: return .notes(newItems)
+            case .identities: return .identities(newItems)
             }
         }
 
@@ -250,7 +238,7 @@ final class PasswordManagementItemListModel: ObservableObject {
         }
     }
 
-    func updateAccount(_ item: SecureVaultItem) {
+    func update(item: SecureVaultItem) {
         var sections = displayedItems
 
         guard let sectionIndex = sections.firstIndex(where: {

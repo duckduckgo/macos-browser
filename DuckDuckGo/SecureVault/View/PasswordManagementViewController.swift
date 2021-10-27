@@ -121,7 +121,7 @@ final class PasswordManagementViewController: NSViewController {
 
     private func syncModelsOnCredentials(_ credentials: SecureVaultModels.WebsiteCredentials, select: Bool = false) {
         self.itemModel?.setSecureVaultModel(credentials)
-        self.listModel?.updateAccount(SecureVaultItem.account(credentials.account))
+        self.listModel?.update(item: SecureVaultItem.account(credentials.account))
 
         if select {
             self.listModel?.selected(item: SecureVaultItem.account(credentials.account))
@@ -130,7 +130,7 @@ final class PasswordManagementViewController: NSViewController {
 
     private func syncModelsOnIdentity(_ identity: SecureVaultModels.Identity, select: Bool = false) {
         self.itemModel?.setSecureVaultModel(identity)
-        self.listModel?.updateAccount(SecureVaultItem.identity(identity))
+        self.listModel?.update(item: SecureVaultItem.identity(identity))
 
         if select {
             self.listModel?.selected(item: SecureVaultItem.identity(identity))
@@ -139,7 +139,7 @@ final class PasswordManagementViewController: NSViewController {
 
     private func syncModelsOnNote(_ note: SecureVaultModels.Note, select: Bool = false) {
         self.itemModel?.setSecureVaultModel(note)
-        self.listModel?.updateAccount(SecureVaultItem.note(note))
+        self.listModel?.update(item: SecureVaultItem.note(note))
 
         if select {
             self.listModel?.selected(item: SecureVaultItem.note(note))
@@ -148,7 +148,7 @@ final class PasswordManagementViewController: NSViewController {
 
     private func syncModelsOnCreditCard(_ card: SecureVaultModels.CreditCard, select: Bool = false) {
         self.itemModel?.setSecureVaultModel(card)
-        self.listModel?.updateAccount(SecureVaultItem.card(card))
+        self.listModel?.update(item: SecureVaultItem.card(card))
 
         if select {
             self.listModel?.selected(item: SecureVaultItem.card(card))
