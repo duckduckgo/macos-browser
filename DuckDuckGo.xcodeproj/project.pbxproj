@@ -207,7 +207,6 @@
 		4BB99D1326FE1A94001E4761 /* places.sqlite in Resources */ = {isa = PBXBuildFile; fileRef = 4BB99D1226FE1A94001E4761 /* places.sqlite */; };
 		4BE0DF06267819A1006337B7 /* NSStoryboardExtension.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4BE0DF0426781961006337B7 /* NSStoryboardExtension.swift */; };
 		4BE65474271FCD40008D1D63 /* PasswordManagementIdentityItemView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4BE6546E271FCD40008D1D63 /* PasswordManagementIdentityItemView.swift */; };
-		4BE65475271FCD40008D1D63 /* EditableTextField.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4BE6546F271FCD40008D1D63 /* EditableTextField.swift */; };
 		4BE65476271FCD41008D1D63 /* PasswordManagementCreditCardItemView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4BE65470271FCD40008D1D63 /* PasswordManagementCreditCardItemView.swift */; };
 		4BE65477271FCD41008D1D63 /* PasswordManagementLoginItemView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4BE65471271FCD40008D1D63 /* PasswordManagementLoginItemView.swift */; };
 		4BE65478271FCD41008D1D63 /* PasswordManagementNoteItemView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4BE65472271FCD40008D1D63 /* PasswordManagementNoteItemView.swift */; };
@@ -801,7 +800,6 @@
 		4BB99D1226FE1A94001E4761 /* places.sqlite */ = {isa = PBXFileReference; lastKnownFileType = file; path = places.sqlite; sourceTree = "<group>"; };
 		4BE0DF0426781961006337B7 /* NSStoryboardExtension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NSStoryboardExtension.swift; sourceTree = "<group>"; };
 		4BE6546E271FCD40008D1D63 /* PasswordManagementIdentityItemView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = PasswordManagementIdentityItemView.swift; sourceTree = "<group>"; };
-		4BE6546F271FCD40008D1D63 /* EditableTextField.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = EditableTextField.swift; sourceTree = "<group>"; };
 		4BE65470271FCD40008D1D63 /* PasswordManagementCreditCardItemView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = PasswordManagementCreditCardItemView.swift; sourceTree = "<group>"; };
 		4BE65471271FCD40008D1D63 /* PasswordManagementLoginItemView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = PasswordManagementLoginItemView.swift; sourceTree = "<group>"; };
 		4BE65472271FCD40008D1D63 /* PasswordManagementNoteItemView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = PasswordManagementNoteItemView.swift; sourceTree = "<group>"; };
@@ -1923,7 +1921,6 @@
 			isa = PBXGroup;
 			children = (
 				85CC1D72269EF1880062F04E /* PasswordManagementItemList.swift */,
-				4BE6546F271FCD40008D1D63 /* EditableTextField.swift */,
 				4BE65473271FCD40008D1D63 /* EditableTextView.swift */,
 				4BE65470271FCD40008D1D63 /* PasswordManagementCreditCardItemView.swift */,
 				4BE6546E271FCD40008D1D63 /* PasswordManagementIdentityItemView.swift */,
@@ -3645,7 +3642,6 @@
 				B6106BAB26A7BF1D0013B453 /* PermissionType.swift in Sources */,
 				8585B63826D6E66C00C1416F /* ButtonStyles.swift in Sources */,
 				4B677450255DBFA300025BD8 /* HashExtension.swift in Sources */,
-				4BE65475271FCD40008D1D63 /* EditableTextField.swift in Sources */,
 				4B0511BD262CAA5A00F6079C /* PrivacySecurityPreferences.swift in Sources */,
 				AA9FF95F24A1FB690039E328 /* TabCollectionViewModel.swift in Sources */,
 				AAC5E4D125D6A709007F5990 /* BookmarkManager.swift in Sources */,
