@@ -81,7 +81,7 @@ final class Tab: NSObject {
 
     init(content: TabContent,
          faviconService: FaviconService = LocalFaviconService.shared,
-         webCacheManager: WebCacheManager = .shared,
+         webCacheManager: WebCacheManager = WebCacheManager.shared,
          webViewConfiguration: WebViewConfiguration? = nil,
          historyCoordinating: HistoryCoordinating = HistoryCoordinator.shared,
          visitedDomains: Set<String> = Set<String>(),

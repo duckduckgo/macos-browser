@@ -29,7 +29,7 @@ final class Fire {
 
     @Published private(set) var isBurning = false
 
-    init(cacheManager: WebCacheManager = .shared,
+    init(cacheManager: WebCacheManager = WebCacheManager.shared,
          historyCoordinating: HistoryCoordinating = HistoryCoordinator.shared,
          permissionManager: PermissionManagerProtocol = PermissionManager.shared,
          downloadListCoordinator: DownloadListCoordinator = DownloadListCoordinator.shared,
