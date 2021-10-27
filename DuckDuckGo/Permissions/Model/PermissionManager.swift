@@ -30,7 +30,7 @@ protocol PermissionManagerProtocol: AnyObject {
     func removePermission(forDomain domain: String, permissionType: PermissionType)
 
     func burnPermissions(except fireproofDomains: FireproofDomains, completion: @escaping () -> Void)
-    func burnPermissions(of domains: [String], completion: @escaping () -> Void)
+    func burnPermissions(of domains: Set<String>, completion: @escaping () -> Void)
 
 }
 
@@ -113,9 +113,19 @@ final class PermissionManager: PermissionManagerProtocol {
         })
     }
 
-    func burnPermissions(of domains: [String], completion: @escaping () -> Void) {
-        // To do:
-        completion()
+    func burnPermissions(of domains: Set<String>, completion: @escaping () -> Void) {
+        dispatchPrecondition(condition: .onQueue(.main))
+
+        permissions = permissions.filter { permission in
+            !domains.contains(where: { domain in
+                permission.key.isSubdomain(of: domain)
+            })
+        }
+        store.clear(except: permissions.values.reduce(into: [StoredPermission](), {
+            $0.append(contentsOf: $1.values)
+        }), completionHandler: { _ in
+            completion()
+        })
     }
 
 }

@@ -136,7 +136,7 @@ final class Fire {
     }
 
     private func burnPermissions(of domains: Set<String>, completion: @escaping () -> Void) {
-        self.permissionManager.burnPermissions(except: FireproofDomains.shared, completion: completion)
+        self.permissionManager.burnPermissions(of: domains, completion: completion)
     }
 
     // MARK: - Downloads
