@@ -28,6 +28,7 @@ final class StatisticsLoader {
     
     private let statisticsStore: StatisticsStore
     private let parser = AtbParser()
+    private var isAppRetentionRequestInProgress = false
     
     init(statisticsStore: StatisticsStore = StatisticsUserDefaults()) {
         self.statisticsStore = statisticsStore
@@ -56,6 +57,8 @@ final class StatisticsLoader {
     }
     
     private func requestInstallStatistics(completion: @escaping Completion = {}) {
+        dispatchPrecondition(condition: .onQueue(.main))
+
         APIRequest.request(url: URL.initialAtb) { response, error in
             DispatchQueue.main.async {
                 if let error = error {
@@ -74,6 +77,8 @@ final class StatisticsLoader {
     }
     
     private func requestExti(atb: Atb, completion: @escaping Completion = {}) {
+        dispatchPrecondition(condition: .onQueue(.main))
+
         let installAtb = atb.version + (statisticsStore.variant ?? "")
         guard let url = URL.exti(forAtb: installAtb) else { return }
 
@@ -92,8 +97,10 @@ final class StatisticsLoader {
     }
     
     func refreshSearchRetentionAtb(completion: @escaping Completion = {}) {
+        dispatchPrecondition(condition: .onQueue(.main))
+
         guard let atbWithVariant = statisticsStore.atbWithVariant,
-              let searchRetentionAtb = statisticsStore.searchRetentionAtb,
+              let searchRetentionAtb = statisticsStore.searchRetentionAtb ?? statisticsStore.atb,
               let url = URL.searchAtb(atbWithVariant: atbWithVariant, setAtb: searchRetentionAtb)
         else {
             requestInstallStatistics(completion: completion)
@@ -117,16 +124,22 @@ final class StatisticsLoader {
     }
     
     func refreshAppRetentionAtb(completion: @escaping Completion = {}) {
-        guard let atbWithVariant = statisticsStore.atbWithVariant,
-              let appRetentionAtb = statisticsStore.appRetentionAtb,
+        dispatchPrecondition(condition: .onQueue(.main))
+
+        guard !isAppRetentionRequestInProgress,
+              let atbWithVariant = statisticsStore.atbWithVariant,
+              let appRetentionAtb = statisticsStore.appRetentionAtb ?? statisticsStore.atb,
               let url = URL.appRetentionAtb(atbWithVariant: atbWithVariant, setAtb: appRetentionAtb)
         else {
             requestInstallStatistics(completion: completion)
             return
         }
 
+        isAppRetentionRequestInProgress = true
         APIRequest.request(url: url) { response, error in
             DispatchQueue.main.async {
+                self.isAppRetentionRequestInProgress = false
+
                 if let error = error {
                     os_log("App atb request failed with error %s", type: .error, error.localizedDescription)
                     completion()
@@ -143,6 +156,8 @@ final class StatisticsLoader {
     }
 
     func storeUpdateVersionIfPresent(_ atb: Atb) {
+        dispatchPrecondition(condition: .onQueue(.main))
+        
         if let updateVersion = atb.updateVersion {
             statisticsStore.atb = updateVersion
         }
