@@ -42,8 +42,6 @@ final class Fire {
     }
 
     func burnDomains(_ domains: Set<String>, completion: (() -> Void)? = nil) {
-        // To do: assert wheter one of the domain isn't fireproofed
-
         os_log("Fire started", log: .fire)
 
         isBurning = true

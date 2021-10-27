@@ -282,7 +282,19 @@ final class DownloadListCoordinator {
     }
 
     func cleanupInactiveDownloads(for domains: Set<String>) {
-        // To do:
+        for (id, item) in self.items where item.progress == nil {
+            if domains.contains(where: { domain in
+                if item.websiteURL?.host?.isSubdomain(of: domain) ?? false ||
+                    item.url.host?.isSubdomain(of: domain) ?? false {
+                    return true
+                }
+                return false
+            }) {
+                self.items[id] = nil
+                self.updatesSubject.send((.removed, item))
+                store.remove(item)
+            }
+        }
     }
 
     func remove(downloadWithIdentifier identifier: UUID) {
