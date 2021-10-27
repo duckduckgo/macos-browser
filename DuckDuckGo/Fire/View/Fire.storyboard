@@ -431,6 +431,7 @@ Gw
                         </userDefinedRuntimeAttributes>
                     </view>
                     <connections>
+                        <outlet property="clearButton" destination="Sam-GO-uzw" id="zbv-kv-WkC"/>
                         <outlet property="closeDetailsButton" destination="cgG-hF-FAP" id="PDY-tj-zma"/>
                         <outlet property="closeWrapperView" destination="553-P8-fEM" id="vUO-wA-3ME"/>
                         <outlet property="collectionView" destination="u7v-Gt-FjR" id="zeu-lV-usx"/>
@@ -536,10 +537,10 @@ DQ
             <color red="0.28627450980392155" green="0.28627450980392155" blue="0.28627450980392155" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
         </namedColor>
         <namedColor name="ButtonMouseDownColorLight">
-            <color red="0.0" green="0.0" blue="0.0" alpha="0.10000000000000001" colorSpace="custom" customColorSpace="sRGB"/>
+            <color red="0.0" green="0.0" blue="0.0" alpha="0.10000000149011612" colorSpace="custom" customColorSpace="sRGB"/>
         </namedColor>
         <namedColor name="ButtonMouseOverColorLight">
-            <color red="0.0" green="0.0" blue="0.0" alpha="0.050000000000000003" colorSpace="custom" customColorSpace="sRGB"/>
+            <color red="0.0" green="0.0" blue="0.0" alpha="0.05000000074505806" colorSpace="custom" customColorSpace="sRGB"/>
         </namedColor>
         <namedColor name="FireBackground">
             <color red="1" green="1" blue="1" alpha="0.5" colorSpace="custom" customColorSpace="sRGB"/>

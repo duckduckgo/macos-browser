@@ -47,6 +47,7 @@ final class FirePopoverViewController: NSViewController {
     @IBOutlet weak var collectionViewBottomConstraint: NSLayoutConstraint!
     @IBOutlet weak var warningWrapperView: NSView!
     @IBOutlet weak var infoContainerView: NSView!
+    @IBOutlet weak var clearButton: NSButton!
 
     private var viewModelCancellable: AnyCancellable?
     private var selectedCancellable: AnyCancellable?
@@ -124,7 +125,9 @@ final class FirePopoverViewController: NSViewController {
     }
 
     private func updateWarningWrapperView() {
-        warningWrapperView.isHidden = firePopoverViewModel.clearingOption == .allData || firePopoverViewModel.selectable.isEmpty
+        warningWrapperView.isHidden = firePopoverViewModel.clearingOption == .allData ||
+        firePopoverViewModel.selectable.isEmpty || detailsWrapperView.isHidden
+
         collectionViewBottomConstraint.constant = warningWrapperView.isHidden ? 0 : 32
     }
 
@@ -155,6 +158,7 @@ final class FirePopoverViewController: NSViewController {
                 let selectionIndexPaths = Set(selected.map {IndexPath(item: $0, section: 1)})
                 self?.collectionView.selectionIndexPaths = selectionIndexPaths
                 self?.updateCloseDetailsButton()
+                self?.updateClearButton()
             }
     }
 
@@ -164,6 +168,7 @@ final class FirePopoverViewController: NSViewController {
         detailsWrapperView.isHidden = !showDetails
 
         adjustContentHeight()
+        updateWarningWrapperView()
     }
 
     private func adjustContentHeight() {
@@ -204,6 +209,10 @@ final class FirePopoverViewController: NSViewController {
         } else {
             infoPresentedOnce = true
         }
+    }
+
+    private func updateClearButton() {
+        clearButton.isEnabled = !firePopoverViewModel.selected.isEmpty
     }
 
 }
