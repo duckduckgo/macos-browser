@@ -67,8 +67,10 @@ final class DefaultScriptSourceProvider: ScriptSourceProviding {
     private func buildContentBlockerRulesSource() -> String {
         let unprotectedDomains = privacyConfiguration.tempUnprotectedDomains
         let contentBlockingExceptions = privacyConfiguration.exceptionsList(forFeature: .contentBlocking)
+        let protectionStore = DomainsProtectionUserDefaultsStore()
         return ContentBlockerRulesUserScript.loadJS("contentblockerrules", from: .main, withReplacements: [
-            "${unprotectedDomains}": (unprotectedDomains + contentBlockingExceptions).joined(separator: "\n")
+            "TEMP_UNPROTECTED_DOMAINS": (unprotectedDomains + contentBlockingExceptions).joined(separator: "\n"),
+            "USER_UNPROTECTED_DOMAINS": protectionStore.unprotectedDomains.joined(separator: "\n")
         ])
     }
 
@@ -82,10 +84,13 @@ final class DefaultScriptSourceProvider: ScriptSourceProviding {
             + "\n"
             + (privacyConfiguration.exceptionsList(forFeature: .contentBlocking).joined(separator: "\n"))
 
+        let protectionStore = DomainsProtectionUserDefaultsStore()
+        let localUnprotectedDomains = protectionStore.unprotectedDomains.joined(separator: "\n")
+
         return ContentBlockerUserScript.loadJS("contentblocker", from: .main, withReplacements: [
             "IS_DEBUG": isDebugBuild ? "true" : "false",
             "TEMP_UNPROTECTED_DOMAINS": remoteUnprotectedDomains,
-            "USER_UNPROTECTED_DOMAINS": "",
+            "USER_UNPROTECTED_DOMAINS": localUnprotectedDomains,
             "TRACKER_DATA": trackerData,
             "SURROGATES": surrogates,
             "BLOCKING_ENABLED": privacyConfiguration.isEnabled(featureKey: .contentBlocking) ? "true" : "false"

@@ -57,7 +57,7 @@
                                                         <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
                                                     </textFieldCell>
                                                 </textField>
-                                                <imageView horizontalHuggingPriority="251" verticalHuggingPriority="251" translatesAutoresizingMaskIntoConstraints="NO" id="V02-0X-JE4">
+                                                <imageView horizontalHuggingPriority="251" verticalHuggingPriority="251" horizontalCompressionResistancePriority="1000" verticalCompressionResistancePriority="1000" translatesAutoresizingMaskIntoConstraints="NO" id="V02-0X-JE4">
                                                     <rect key="frame" x="8" y="215" width="128" height="128"/>
                                                     <constraints>
                                                         <constraint firstAttribute="width" constant="128" id="XmM-dp-Whc"/>
@@ -132,6 +132,17 @@
                                                         </constraints>
                                                     </view>
                                                 </box>
+                                                <button verticalHuggingPriority="1000" verticalCompressionResistancePriority="1000" translatesAutoresizingMaskIntoConstraints="NO" id="sxa-k3-7xD">
+                                                    <rect key="frame" x="8" y="163" width="83" height="15"/>
+                                                    <buttonCell key="cell" type="bevel" title="Privacy Policy" bezelStyle="rounded" alignment="center" imageScaling="proportionallyDown" inset="2" id="HYF-08-nWX">
+                                                        <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
+                                                        <font key="font" metaFont="cellTitle"/>
+                                                    </buttonCell>
+                                                    <color key="contentTintColor" name="LinkBlueColor"/>
+                                                    <connections>
+                                                        <action selector="openPrivacyPolicy:" target="oLP-M7-uq4" id="lbs-XZ-ToB"/>
+                                                    </connections>
+                                                </button>
                                             </subviews>
                                             <constraints>
                                                 <constraint firstItem="wvW-vQ-gKy" firstAttribute="centerY" secondItem="V02-0X-JE4" secondAttribute="centerY" id="4Sq-E1-e4w"/>
@@ -141,9 +152,11 @@
                                                 <constraint firstItem="ExO-AA-imf" firstAttribute="top" secondItem="V02-0X-JE4" secondAttribute="bottom" constant="8" symbolic="YES" id="Jys-2v-gOT"/>
                                                 <constraint firstAttribute="trailing" secondItem="J62-E9-DAv" secondAttribute="trailing" constant="8" id="clC-rs-Umo"/>
                                                 <constraint firstItem="wvW-vQ-gKy" firstAttribute="leading" secondItem="V02-0X-JE4" secondAttribute="trailing" constant="8" id="dvc-NQ-KwM"/>
+                                                <constraint firstItem="sxa-k3-7xD" firstAttribute="top" secondItem="ExO-AA-imf" secondAttribute="bottom" constant="14" id="ea7-iA-T4K"/>
                                                 <constraint firstItem="J62-E9-DAv" firstAttribute="centerY" secondItem="ExO-AA-imf" secondAttribute="centerY" id="lju-sp-pai"/>
                                                 <constraint firstItem="cMA-Ms-5FE" firstAttribute="top" secondItem="Tak-Ve-Prm" secondAttribute="top" constant="8" id="o4a-Xp-hbg"/>
                                                 <constraint firstItem="cMA-Ms-5FE" firstAttribute="leading" secondItem="Tak-Ve-Prm" secondAttribute="leading" constant="8" id="oT1-4c-MLw"/>
+                                                <constraint firstItem="sxa-k3-7xD" firstAttribute="leading" secondItem="Tak-Ve-Prm" secondAttribute="leading" constant="8" id="sew-nl-I9O"/>
                                                 <constraint firstItem="J62-E9-DAv" firstAttribute="leading" relation="greaterThanOrEqual" secondItem="ExO-AA-imf" secondAttribute="trailing" constant="8" symbolic="YES" id="vHG-MB-a2k"/>
                                             </constraints>
                                         </view>
