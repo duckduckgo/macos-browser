@@ -146,8 +146,13 @@ final class FirePopoverViewController: NSViewController {
             firePopoverViewModel.$selectable
         ).receive(on: DispatchQueue.main)
             .sink { [weak self] _ in
-                self?.collectionView.reloadData()
-                self?.adjustContentHeight()
+                guard let self = self else { return }
+                self.collectionView.reloadData()
+                self.adjustContentHeight()
+                if self.firePopoverViewModel.selectable.isEmpty && !self.detailsWrapperView.isHidden {
+                    self.toggleDetails()
+                }
+                self.updateOpenDetailsButton()
             }
     }
 
@@ -213,6 +218,11 @@ final class FirePopoverViewController: NSViewController {
 
     private func updateClearButton() {
         clearButton.isEnabled = !firePopoverViewModel.selected.isEmpty
+    }
+
+    private func updateOpenDetailsButton() {
+        openDetailsButton.title = firePopoverViewModel.selectable.isEmpty ? UserText.fireDialogNothingToBurn : UserText.fireDialogDetails
+        openDetailsButton.isEnabled = !firePopoverViewModel.selectable.isEmpty
     }
 
 }

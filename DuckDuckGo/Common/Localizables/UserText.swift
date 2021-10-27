@@ -100,6 +100,8 @@ struct UserText {
     static let currentTabDescription = NSLocalizedString("fire.current-tab.description", value: "Close current tab and clear related site data", comment: "Description of the 'Current Tab' configuration option for the fire button")
     static let currentWindowDescription = NSLocalizedString("fire.current-window.description", value: "Clear current window and related site data", comment: "Description of the 'Current Window' configuration option for the fire button")
     static let selectedDomainsDescription = NSLocalizedString("fire.selected-domains.description", value: "Clear selected domains and related site data", comment: "Description of the 'Current Window' configuration option for the fire button")
+    static let fireDialogNothingToBurn = NSLocalizedString("fire.dialog.nothing-to-burn", value: "Nothing to burn", comment: "Information label to inform there is no domain for burning")
+    static let fireDialogDetails = NSLocalizedString("fire.dialog.details", value: "Details", comment: "Button to show more details")
     static let fireproofSite = NSLocalizedString("options.menu.fireproof-site", value: "Fireproof Site", comment: "Context menu item")
     static let removeFireproofing = NSLocalizedString("options.menu.remove-fireproofing", value: "Remove Fireproofing", comment: "Context menu item")
     static let fireproof = NSLocalizedString("fireproof", value: "Fireproof", comment: "Fireproof button")
