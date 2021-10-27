@@ -1,5 +1,5 @@
 //
-//  PrivacySecurityPreferences.swift
+//  ArrayExtension.swift
 //
 //  Copyright © 2021 DuckDuckGo. All rights reserved.
 //
@@ -18,28 +18,12 @@
 
 import Foundation
 
-struct PrivacySecurityPreferences {
+extension Array {
 
-    @UserDefaultsWrapper(key: .loginDetectionEnabled, defaultValue: true)
-    public var loginDetectionEnabled: Bool
-    
-    @UserDefaultsWrapper(key: .gpcEnabled, defaultValue: true)
-    public var gpcEnabled: Bool {
-        didSet {
-            DefaultScriptSourceProvider.shared.reload()
-            GPCRequestFactory.shared.reloadGPCSetting()
+    func chunked(into size: Int) -> [[Element]] {
+        return stride(from: 0, to: count, by: size).map {
+            Array(self[$0 ..< Swift.min($0 + size, count)])
         }
-    }
-}
-
-extension PrivacySecurityPreferences: PreferenceSection {
-    
-    var displayName: String {
-        return UserText.privacyAndSecurity
-    }
-
-    var preferenceIcon: NSImage {
-        return NSImage(named: "Privacy")!
     }
 
 }

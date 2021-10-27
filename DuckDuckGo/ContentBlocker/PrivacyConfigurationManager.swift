@@ -122,6 +122,10 @@ final class PrivacyConfigurationManager {
 
 extension PrivacyConfigurationManager: PrivacyConfigurationManagment {
     
+    enum ConfigurationSettingsKeys: String {
+        case gpcHeaderEnabled = "gpcHeaderEnabledSites"
+    }
+    
     var tempUnprotectedDomains: [String] {
         return config.tempUnprotectedDomains
     }
@@ -134,4 +138,10 @@ extension PrivacyConfigurationManager: PrivacyConfigurationManagment {
         return config.exceptionsList(forFeature: featureKey)
     }
     
+    func gpcHeadersEnabled() -> [String] {
+        guard let enabledSites = config.features[PrivacyConfiguration.SupportedFeatures.gpc.rawValue]?
+                .settings?[ConfigurationSettingsKeys.gpcHeaderEnabled.rawValue] as? [String] else { return [] }
+        
+        return enabledSites
+    }
 }

@@ -26,19 +26,33 @@ final class HistoryStoringMock: HistoryStoring {
         case defaultError
     }
 
-    var cleanAndReloadHistoryCalled = false
-    var cleanAndReloadHistoryExceptions = [HistoryEntry]()
-    var cleanAndReloadHistoryResult: Result<History, Error>?
-    func cleanAndReloadHistory(until date: Date, except exceptions: [HistoryEntry]) -> Future<History, Error> {
-        cleanAndReloadHistoryCalled = true
-        cleanAndReloadHistoryExceptions = exceptions
+    var cleanOldCalled = false
+    var cleanOldResult: Result<History, Error>?
+    func cleanOld(until date: Date) -> Future<History, Error> {
+        cleanOldCalled = true
         return Future { [weak self] promise in
-            guard let cleanAndReloadHistoryResult = self?.cleanAndReloadHistoryResult else {
+            guard let cleanOldResult = self?.cleanOldResult else {
                 promise(.failure(HistoryStoringMockError.defaultError))
                 return
             }
 
-            promise(cleanAndReloadHistoryResult)
+            promise(cleanOldResult)
+        }
+    }
+
+    var removeEntriesCalled = false
+    var removeEntriesArray = [HistoryEntry]()
+    var removeEntriesResult: Result<History, Error>?
+    func removeEntries(_ entries: [HistoryEntry]) -> Future<History, Error> {
+        removeEntriesCalled = true
+        removeEntriesArray = entries
+        return Future { [weak self] promise in
+            guard let removeEntriesResult = self?.removeEntriesResult else {
+                promise(.failure(HistoryStoringMockError.defaultError))
+                return
+            }
+
+            promise(removeEntriesResult)
         }
     }
 
