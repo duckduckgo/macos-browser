@@ -40,6 +40,7 @@ final class StatisticsLoader {
 
             if isSearch {
                 self.refreshSearchRetentionAtb(completion: completion)
+                Pixel.fire(.serp)
             } else if !self.statisticsStore.isAppRetentionFiredToday {
                 self.refreshAppRetentionAtb(completion: completion)
             } else {

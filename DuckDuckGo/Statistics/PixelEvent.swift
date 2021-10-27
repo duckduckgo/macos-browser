@@ -53,6 +53,8 @@ extension Pixel {
         }
 
         case navigation(kind: NavigationKind, source: NavigationAccessPoint)
+        
+        case serp
 
         case suggestionsDisplayed(hasBookmark: HasBookmark, hasFavorite: HasFavorite, hasHistoryEntry: HasHistoryEntry)
 
@@ -154,6 +156,9 @@ extension Pixel.Event {
 
         case .navigation(kind: let kind, source: let source):
             return "m_mac_navigation_\(kind)_\(source)"
+            
+        case .serp:
+            return "m_mac_navigation_search"
 
         case .suggestionsDisplayed(hasBookmark: let hasBookmark, hasFavorite: let hasFavorite, hasHistoryEntry: let hasHistoryEntry):
             return "m_mac_suggestions-displayed_\(hasBookmark)_\(hasFavorite)_\(hasHistoryEntry)"
