@@ -25,7 +25,7 @@ final class PrivacyDashboardViewController: NSViewController {
     @IBOutlet var webView: WKWebView!
     private let privacyDashboardScript = PrivacyDashboardUserScript()
     private var cancellables = Set<AnyCancellable>()
-    private var pendingUpdates = Set<String>()
+    @Published var pendingUpdates = Set<String>()
 
     weak var tabViewModel: TabViewModel?
     var serverTrustViewModel: ServerTrustViewModel?
@@ -43,6 +43,10 @@ final class PrivacyDashboardViewController: NSViewController {
 
     override func viewWillDisappear() {
         cancellables.removeAll()
+    }
+
+    public func isPendingUpdates() -> Bool {
+        return !pendingUpdates.isEmpty
     }
 
     private func initWebView() {
@@ -153,6 +157,7 @@ extension PrivacyDashboardViewController: PrivacyDashboardUserScriptDelegate {
             return
         }
 
+        let activeTab = self.tabViewModel?.tab
         let protectionStore = DomainsProtectionUserDefaultsStore()
         let operation = isProtected ? protectionStore.enableProtection : protectionStore.disableProtection
         operation(domain)
@@ -164,6 +169,7 @@ extension PrivacyDashboardViewController: PrivacyDashboardUserScriptDelegate {
             DefaultScriptSourceProvider.shared.reload()
             self.pendingUpdates.remove(domain)
             self.sendPendingUpdates()
+            activeTab?.reload()
         }
     }
 
