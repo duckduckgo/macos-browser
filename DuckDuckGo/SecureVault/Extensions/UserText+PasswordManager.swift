@@ -20,6 +20,11 @@ import Foundation
 
 extension UserText {
 
+    static let pmNewCard = NSLocalizedString("pm.new.card", value: "Credit Card", comment: "Label for new card title")
+    static let pmNewLogin = NSLocalizedString("pm.new.login", value: "Login", comment: "Label for new login title")
+    static let pmNewIdentity = NSLocalizedString("pm.new.identity", value: "Identity", comment: "Label for new identity title")
+    static let pmNewNote = NSLocalizedString("pm.new.note", value: "Note", comment: "Label for new note title")
+
     static let pmDelete = NSLocalizedString("pm.delete", value: "Delete", comment: "Delete button")
     static let pmCancel = NSLocalizedString("pm.cancel", value: "Cancel", comment: "Cancel button")
     static let pmSave = NSLocalizedString("pm.save", value: "Save", comment: "Save button")
@@ -30,7 +35,6 @@ extension UserText {
     static let pmWebsite = NSLocalizedString("pm.website", value: "Website", comment: "Label for website edit field")
     static let pmLoginAdded = NSLocalizedString("pm.added", value: "Added", comment: "Label for login added data")
     static let pmLoginLastUpdated = NSLocalizedString("pm.last.updated", value: "Last Updated", comment: "Label for last updated edit field")
-    static let pmNewLogin = NSLocalizedString("pm.new.login", value: "New Login", comment: "Label for new login title")
 
     static let pmCardNumber = NSLocalizedString("pm.card.number", value: "Card Number", comment: "Label for card number title")
     static let pmCardholderName = NSLocalizedString("pm.card.cardholder-name", value: "Cardholder Name", comment: "Label for cardholder name title")

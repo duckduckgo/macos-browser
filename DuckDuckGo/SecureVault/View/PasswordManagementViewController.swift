@@ -497,12 +497,20 @@ final class PasswordManagementViewController: NSViewController {
     private func createNewSecureVaultItemMenu() -> NSMenu {
         let menu = NSMenu()
 
+#if DEBUG
         menu.items = [
-            NSMenuItem(title: "Credit Card", action: #selector(createNewCreditCard), keyEquivalent: ""),
-            NSMenuItem(title: "Login", action: #selector(createNewLogin), keyEquivalent: ""),
-            NSMenuItem(title: "Identity", action: #selector(createNewIdentity), keyEquivalent: ""),
-            NSMenuItem(title: "Note", action: #selector(createNewNote), keyEquivalent: "")
+            NSMenuItem(title: UserText.pmNewCard, action: #selector(createNewCreditCard), keyEquivalent: ""),
+            NSMenuItem(title: UserText.pmNewLogin, action: #selector(createNewLogin), keyEquivalent: ""),
+            NSMenuItem(title: UserText.pmNewIdentity, action: #selector(createNewIdentity), keyEquivalent: ""),
+            NSMenuItem(title: UserText.pmNewNote, action: #selector(createNewNote), keyEquivalent: "")
         ]
+#else
+        menu.items = [
+            NSMenuItem(title: UserText.pmNewCard, action: #selector(createNewCreditCard), keyEquivalent: ""),
+            NSMenuItem(title: UserText.pmNewLogin, action: #selector(createNewLogin), keyEquivalent: ""),
+            NSMenuItem(title: UserText.pmNewNote, action: #selector(createNewNote), keyEquivalent: "")
+        ]
+#endif
 
         return menu
     }
