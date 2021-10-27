@@ -117,9 +117,7 @@ final class PermissionManager: PermissionManagerProtocol {
         dispatchPrecondition(condition: .onQueue(.main))
 
         permissions = permissions.filter { permission in
-            !domains.contains(where: { domain in
-                permission.key.isSubdomain(of: domain)
-            })
+            !permission.key.isSubdomain(of: domains)
         }
         store.clear(except: permissions.values.reduce(into: [StoredPermission](), {
             $0.append(contentsOf: $1.values)

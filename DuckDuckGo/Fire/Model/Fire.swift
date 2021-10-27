@@ -210,7 +210,7 @@ fileprivate extension TabCollectionViewModel {
 
         // Clean last removed tab if needed
         if let lastRemovedTabHost = tabCollection.lastRemovedTabCache?.url?.host,
-           domains.contains(where: { lastRemovedTabHost.isSubdomain(of: $0) }) {
+           lastRemovedTabHost.isSubdomain(of: domains) {
             tabCollection.cleanLastRemovedTab()
         }
     }

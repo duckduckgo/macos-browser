@@ -76,9 +76,7 @@ internal class WebCacheManager {
                     if let domains = domains {
                         // If domains are specified, clear just their cookies
                         cookies = cookies.filter { cookie in
-                            domains.contains { domain in
-                                cookie.domain.isSubdomain(of: domain)
-                            }
+                            cookie.domain.isSubdomain(of: domains)
                         }
                     }
                     // Don't clear fireproof domains

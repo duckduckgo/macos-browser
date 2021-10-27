@@ -283,13 +283,8 @@ final class DownloadListCoordinator {
 
     func cleanupInactiveDownloads(for domains: Set<String>) {
         for (id, item) in self.items where item.progress == nil {
-            if domains.contains(where: { domain in
-                if item.websiteURL?.host?.isSubdomain(of: domain) ?? false ||
-                    item.url.host?.isSubdomain(of: domain) ?? false {
-                    return true
-                }
-                return false
-            }) {
+            if item.websiteURL?.host?.isSubdomain(of: domains) ?? false ||
+                item.url.host?.isSubdomain(of: domains) ?? false {
                 self.items[id] = nil
                 self.updatesSubject.send((.removed, item))
                 store.remove(item)
