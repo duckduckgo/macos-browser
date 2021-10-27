@@ -637,6 +637,14 @@ extension Tab: WKNavigationDelegate {
     struct Constants {
         static let webkitMiddleClick = 4
     }
+    
+    func checkSerp(_ navigationAction: WKNavigationAction) {
+        if (navigationAction.request.url?.isDuckDuckGoSearch) ?? false
+            && navigationAction.navigationType != .backForward
+            && navigationAction.navigationType != .reload {
+            Pixel.fire(.serp)
+        }
+    }
 
     func webView(_ webView: WKWebView,
                  decidePolicyFor navigationAction: WKNavigationAction,
@@ -650,6 +658,8 @@ extension Tab: WKNavigationDelegate {
             webView.load(request)
             return
         }
+        
+        checkSerp(navigationAction)
 
         if navigationAction.isTargetingMainFrame {
             currentDownload = nil
