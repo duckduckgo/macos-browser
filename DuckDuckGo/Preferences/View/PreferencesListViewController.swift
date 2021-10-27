@@ -149,7 +149,9 @@ extension PreferencesListViewController: NSTableViewDataSource, NSTableViewDeleg
             let cell: PrivacySecurityPreferencesTableCellView? = createCell(identifier: PrivacySecurityPreferencesTableCellView.identifier,
                                                                             tableView: tableView)
             cell?.delegate = self
-            cell?.update(loginDetectionEnabled: PrivacySecurityPreferences().loginDetectionEnabled)
+            let preferences = PrivacySecurityPreferences()
+            cell?.update(loginDetectionEnabled: preferences.loginDetectionEnabled,
+                         gpcEnabled: preferences.gpcEnabled)
             return cell
         case .downloads:
             let cell: DownloadPreferencesTableCellView? = createCell(identifier: DownloadPreferencesTableCellView.identifier, tableView: tableView)
@@ -197,7 +199,7 @@ extension PreferencesListViewController: DownloadPreferencesTableCellViewDelegat
 }
 
 extension PreferencesListViewController: PrivacySecurityPreferencesTableCellViewDelegate {
-
+    
     func privacySecurityPreferencesTableCellViewRequestedFireproofManagementModal(_ cell: PrivacySecurityPreferencesTableCellView) {
         let viewController = FireproofDomainsViewController.create()
         beginSheet(viewController)
@@ -206,6 +208,11 @@ extension PreferencesListViewController: PrivacySecurityPreferencesTableCellView
     func privacySecurityPreferencesTableCellView(_ cell: PrivacySecurityPreferencesTableCellView, setLoginDetectionEnabled enabled: Bool) {
         var preferences = PrivacySecurityPreferences()
         preferences.loginDetectionEnabled = enabled
+    }
+    
+    func privacySecurtyPreferencesTableCellView(_ cell: PrivacySecurityPreferencesTableCellView, setGPCEnabled enabled: Bool) {
+        var preferences = PrivacySecurityPreferences()
+        preferences.gpcEnabled = enabled
     }
 
 }

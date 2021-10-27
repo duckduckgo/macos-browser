@@ -24,6 +24,7 @@ protocol ScriptSourceProviding {
     func reload()
     var contentBlockerRulesSource: String { get }
     var contentBlockerSource: String { get }
+    var gpcSource: String { get }
 
     var sourceUpdatedPublisher: AnyPublisher<Void, Never> { get }
 
@@ -37,6 +38,8 @@ final class DefaultScriptSourceProvider: ScriptSourceProviding {
     private(set) var contentBlockerRulesSource: String = ""
     @Published
     private(set) var contentBlockerSource: String = ""
+    @Published
+    private(set) var gpcSource: String = ""
 
     private let sourceUpdatedSubject = PassthroughSubject<Void, Never>()
 
@@ -57,6 +60,7 @@ final class DefaultScriptSourceProvider: ScriptSourceProviding {
     func reload() {
         contentBlockerRulesSource = buildContentBlockerRulesSource()
         contentBlockerSource = buildContentBlockerSource()
+        gpcSource = buildGPCSource()
         sourceUpdatedSubject.send( () )
     }
 
@@ -90,6 +94,16 @@ final class DefaultScriptSourceProvider: ScriptSourceProviding {
             "TRACKER_DATA": trackerData,
             "SURROGATES": surrogates,
             "BLOCKING_ENABLED": privacyConfiguration.isEnabled(featureKey: .contentBlocking) ? "true" : "false"
+        ])
+    }
+    
+    private func buildGPCSource() -> String {
+        let exceptions = privacyConfiguration.tempUnprotectedDomains +
+                            privacyConfiguration.exceptionsList(forFeature: .gpc)
+        let privSettings = PrivacySecurityPreferences()
+        return GPCUserScript.loadJS("gpc", from: .main, withReplacements: [
+            "${gpcEnabled}": privacyConfiguration.isEnabled(featureKey: .gpc) && privSettings.gpcEnabled ? "true" : "false",
+            "${gpcExceptions}": exceptions.joined(separator: "\n")
         ])
     }
 

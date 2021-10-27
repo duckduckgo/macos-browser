@@ -643,6 +643,13 @@ extension Tab: WKNavigationDelegate {
                  decisionHandler: @escaping (WKNavigationActionPolicy) -> Void) {
 
         webView.customUserAgent = UserAgent.for(navigationAction.request.url)
+                                                
+        if navigationAction.isTargetingMainFrame, navigationAction.navigationType != .backForward,
+           let request = GPCRequestFactory.shared.requestForGPC(basedOn: navigationAction.request) {
+            decisionHandler(.cancel)
+            webView.load(request)
+            return
+        }
 
         if navigationAction.isTargetingMainFrame {
             currentDownload = nil
