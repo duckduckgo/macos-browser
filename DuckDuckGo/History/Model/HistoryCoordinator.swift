@@ -187,7 +187,6 @@ final class HistoryCoordinator: HistoryCoordinating {
                         os_log("History cleaned successfully", log: .history)
                         completionHandler?(nil)
                     case .failure(let error):
-                        assertionFailure("Cleaning of history failed")
                         os_log("Cleaning of history failed: %s", log: .history, type: .error, error.localizedDescription)
                         completionHandler?(error)
                     }

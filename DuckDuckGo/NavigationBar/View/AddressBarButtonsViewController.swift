@@ -244,6 +244,9 @@ final class AddressBarButtonsViewController: NSViewController {
     func updateButtons(mode: AddressBarViewController.Mode,
                        isTextFieldEditorFirstResponder: Bool,
                        textFieldValue: AddressBarTextField.Value) {
+        stopAnimationsAfterFocus(oldIsTextFieldEditorFirstResponder: self.isTextFieldEditorFirstResponder,
+                                 newIsTextFieldEditorFirstResponder: isTextFieldEditorFirstResponder)
+
         self.isTextFieldEditorFirstResponder = isTextFieldEditorFirstResponder
 
         guard let selectedTabViewModel = tabCollectionViewModel.selectedTabViewModel else {
@@ -556,6 +559,12 @@ final class AddressBarButtonsViewController: NSViewController {
         stopAnimation(trackerAnimationView)
         stopAnimation(shieldAnimationView)
         stopAnimation(shieldDotAnimationView)
+    }
+
+    private func stopAnimationsAfterFocus(oldIsTextFieldEditorFirstResponder: Bool, newIsTextFieldEditorFirstResponder: Bool) {
+        if !oldIsTextFieldEditorFirstResponder && newIsTextFieldEditorFirstResponder {
+            stopAnimations()
+        }
     }
 
     private func bookmarkForCurrentUrl(setFavorite: Bool, accessPoint: Pixel.Event.AccessPoint) -> Bookmark? {

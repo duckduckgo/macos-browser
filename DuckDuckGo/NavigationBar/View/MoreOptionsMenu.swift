@@ -56,8 +56,9 @@ final class MoreOptionsMenu: NSMenu {
 #if FEEDBACK
 
         addItem(withTitle: "Send Feedback", action: #selector(AppDelegate.openFeedback(_:)), keyEquivalent: "")
-            .withImage(NSImage(named: "Feedback"))
+            .withImage(NSImage(named: "BetaLabel"))
             .firingPixel(.feedback)
+
         addItem(NSMenuItem.separator())
 
 #endif

@@ -85,7 +85,7 @@ final class HistoryStore: HistoryStoring {
 
     private func remove(_ identifiers: [UUID], context: NSManagedObjectContext) -> Result<Void, Error> {
         // To avoid long predicate, execute multiple times
-        let chunkedIdentifiers = identifiers.chunked(into: 20)
+        let chunkedIdentifiers = identifiers.chunked(into: 100)
 
         for identifiers in chunkedIdentifiers {
             let deleteRequest = NSFetchRequest<NSFetchRequestResult>(entityName: HistoryEntryManagedObject.className())
