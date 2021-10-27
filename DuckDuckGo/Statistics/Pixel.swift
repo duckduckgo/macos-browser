@@ -56,7 +56,7 @@ final class Pixel {
         headers[APIHeaders.Name.moreInfo] = "See " + URL.duckDuckGoMorePrivacyInfo.absoluteString
 
         guard !dryRun else {
-            os_log(.debug, log: .pixel, "Pixel: %@", pixelName)
+            os_log(.debug, log: .pixel, "%@", pixelName.replacingOccurrences(of: "_", with: "."))
 
             onComplete(nil)
             return
