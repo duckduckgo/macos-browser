@@ -329,6 +329,8 @@ final class NavigationBarViewController: NSViewController {
     }
 
     private func updatePasswordManagementButton() {
+        let url = tabCollectionViewModel.selectedTabViewModel?.tab.content.url
+
         passwordManagementButton.image = NSImage(named: "PasswordManagement")
 
         if saveCredentialsPopover.isShown {
@@ -341,6 +343,12 @@ final class NavigationBarViewController: NSViewController {
         }
 
         passwordManagementButton.isHidden = !passwordManagementPopover.isShown
+
+        passwordManagementPopover.viewController.domain = nil
+        guard let url = url, let domain = url.host else {
+            return
+        }
+        passwordManagementPopover.viewController.domain = domain
     }
 
     private func updateDownloadsButton() {
