@@ -82,7 +82,7 @@ final class Fire {
     }
 
     private func burnHistory(completion: @escaping () -> Void) {
-        self.historyCoordinating.burnHistory(except: FireproofDomains.shared, completion: completion)
+        self.historyCoordinating.burn(except: FireproofDomains.shared, completion: completion)
     }
 
     private func burnPermissions(completion: @escaping () -> Void) {

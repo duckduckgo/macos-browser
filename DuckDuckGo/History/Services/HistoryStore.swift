@@ -23,7 +23,8 @@ import os.log
 
 protocol HistoryStoring {
 
-    func cleanAndReloadHistory(until date: Date, except exceptions: [HistoryEntry]) -> Future<History, Error>
+    func cleanOld(until date: Date) -> Future<History, Error>
+    func removeEntries(_ entries: [HistoryEntry]) -> Future<History, Error>
     func save(entry: HistoryEntry) -> Future<Void, Error>
 
 }
@@ -43,7 +44,7 @@ final class HistoryStore: HistoryStoring {
 
     private lazy var context = Database.shared.makeContext(concurrencyType: .privateQueueConcurrencyType, name: "History")
 
-    func cleanAndReloadHistory(until date: Date, except exceptions: [HistoryEntry]) -> Future<History, Error> {
+    func removeEntries(_ entries: [HistoryEntry]) -> Future<History, Error> {
         return Future { [weak self] promise in
             self?.context.perform {
                 guard let self = self else {
@@ -51,38 +52,90 @@ final class HistoryStore: HistoryStoring {
                     return
                 }
 
-                // Clean using batch delete request
-                let deleteRequest = NSFetchRequest<NSFetchRequestResult>(entityName: HistoryEntryManagedObject.className())
-                var predicates = exceptions.map({ NSPredicate(format: "identifier != %@", argumentArray: [$0.identifier]) })
-                predicates.append(NSPredicate(format: "lastVisit < %@", date as NSDate))
-                deleteRequest.predicate = NSCompoundPredicate(type: .and, subpredicates: predicates)
-                let batchDeleteRequest = NSBatchDeleteRequest(fetchRequest: deleteRequest)
-                batchDeleteRequest.resultType = .resultTypeObjectIDs
-
-                do {
-                    let result = try self.context.execute(batchDeleteRequest) as? NSBatchDeleteResult
-                    let deletedObjects = result?.result as? [NSManagedObjectID] ?? []
-                    let changes: [AnyHashable: Any] = [ NSDeletedObjectsKey: deletedObjects ]
-                    NSManagedObjectContext.mergeChanges(fromRemoteContextSave: changes, into: [self.context])
-                    os_log("%d items cleaned from history", log: .history, deletedObjects.count)
-                } catch {
+                let identifiers = entries.map { $0.identifier }
+                switch self.remove(identifiers, context: self.context) {
+                case .failure(let error):
                     promise(.failure(error))
-                    return
-                }
-
-                // Fetch
-                let fetchRequest = HistoryEntryManagedObject.fetchRequest() as NSFetchRequest<HistoryEntryManagedObject>
-                fetchRequest.returnsObjectsAsFaults = false
-                do {
-                    let historyEntries = try self.context.fetch(fetchRequest)
-                    os_log("%d items loaded from history", log: .history, historyEntries.count)
-                    let history = History(historyEntries: historyEntries)
-                    promise(.success(history))
-                } catch {
-                    promise(.failure(error))
-                    return
+                case .success:
+                    let reloadResult = self.reload(self.context)
+                    promise(reloadResult)
                 }
             }
+        }
+    }
+
+    func cleanOld(until date: Date) -> Future<History, Error> {
+        return Future { [weak self] promise in
+            self?.context.perform {
+                guard let self = self else {
+                    promise(.failure(HistoryStoreError.storeDeallocated))
+                    return
+                }
+
+                switch self.clean(self.context, until: date) {
+                case .failure(let error):
+                    promise(.failure(error))
+                case .success:
+                    let reloadResult = self.reload(self.context)
+                    promise(reloadResult)
+                }
+            }
+        }
+    }
+
+    private func remove(_ identifiers: [UUID], context: NSManagedObjectContext) -> Result<Void, Error> {
+        // To avoid long predicate, execute multiple times
+        let chunkedIdentifiers = identifiers.chunked(into: 100)
+
+        for identifiers in chunkedIdentifiers {
+            let deleteRequest = NSFetchRequest<NSFetchRequestResult>(entityName: HistoryEntryManagedObject.className())
+            let predicates = identifiers.map({ NSPredicate(format: "identifier == %@", argumentArray: [$0]) })
+            deleteRequest.predicate = NSCompoundPredicate(type: .or, subpredicates: predicates)
+            let batchDeleteRequest = NSBatchDeleteRequest(fetchRequest: deleteRequest)
+            batchDeleteRequest.resultType = .resultTypeObjectIDs
+            do {
+                let result = try self.context.execute(batchDeleteRequest) as? NSBatchDeleteResult
+                let deletedObjects = result?.result as? [NSManagedObjectID] ?? []
+                let changes: [AnyHashable: Any] = [ NSDeletedObjectsKey: deletedObjects ]
+                NSManagedObjectContext.mergeChanges(fromRemoteContextSave: changes, into: [context])
+                os_log("%d items cleaned from history", log: .history, deletedObjects.count)
+            } catch {
+                return .failure(error)
+            }
+        }
+
+        return .success(())
+    }
+
+    private func reload(_ context: NSManagedObjectContext) -> Result<History, Error> {
+        let fetchRequest = HistoryEntryManagedObject.fetchRequest() as NSFetchRequest<HistoryEntryManagedObject>
+        fetchRequest.returnsObjectsAsFaults = false
+        do {
+            let historyEntries = try context.fetch(fetchRequest)
+            os_log("%d items loaded from history", log: .history, historyEntries.count)
+            let history = History(historyEntries: historyEntries)
+            return .success(history)
+        } catch {
+            return .failure(error)
+        }
+    }
+
+    private func clean(_ context: NSManagedObjectContext, until date: Date) -> Result<Void, Error> {
+        // Clean using batch delete request
+        let deleteRequest = NSFetchRequest<NSFetchRequestResult>(entityName: HistoryEntryManagedObject.className())
+        deleteRequest.predicate = NSPredicate(format: "lastVisit < %@", date as NSDate)
+        let batchDeleteRequest = NSBatchDeleteRequest(fetchRequest: deleteRequest)
+        batchDeleteRequest.resultType = .resultTypeObjectIDs
+
+        do {
+            let result = try context.execute(batchDeleteRequest) as? NSBatchDeleteResult
+            let deletedObjects = result?.result as? [NSManagedObjectID] ?? []
+            let changes: [AnyHashable: Any] = [ NSDeletedObjectsKey: deletedObjects ]
+            NSManagedObjectContext.mergeChanges(fromRemoteContextSave: changes, into: [context])
+            os_log("%d items cleaned from history", log: .history, deletedObjects.count)
+            return .success(())
+        } catch {
+            return .failure(error)
         }
     }
 

@@ -53,7 +53,7 @@ final class HistoryStoreTests: XCTestCase {
         save(entry: historyEntry, historyStore: historyStore, expectation: secondSavingExpectation)
 
         let loadingExpectation = self.expectation(description: "Loading")
-        historyStore.cleanAndReloadHistory(until: Date(timeIntervalSince1970: 0), except: [])
+        historyStore.cleanOld(until: Date(timeIntervalSince1970: 0))
             .receive(on: DispatchQueue.main)
             .sink { completion in
                 switch completion {
@@ -71,7 +71,7 @@ final class HistoryStoreTests: XCTestCase {
         waitForExpectations(timeout: 1, handler: nil)
     }
 
-    func testWhenCleanAndReloadHistoryIsCalled_ThenOlderEntriesThanDateAreCleaned() {
+    func testWhenCleanOldIsCalled_ThenOlderEntriesThanDateAreCleaned() {
         let container = NSPersistentContainer.createInMemoryPersistentContainer(modelName: "History", bundle: Bundle(for: type(of: self)))
         let context = container.viewContext
         let historyStore = HistoryStore(context: context)
@@ -94,7 +94,7 @@ final class HistoryStoreTests: XCTestCase {
         save(entry: newHistoryEntry, historyStore: historyStore, expectation: secondSavingExpectation)
 
         let loadingExpectation = self.expectation(description: "Loading")
-        historyStore.cleanAndReloadHistory(until: Date(timeIntervalSince1970: 1), except: [])
+        historyStore.cleanOld(until: Date(timeIntervalSince1970: 1))
             .receive(on: DispatchQueue.main)
             .sink { completion in
                 switch completion {
@@ -112,12 +112,13 @@ final class HistoryStoreTests: XCTestCase {
         waitForExpectations(timeout: 1, handler: nil)
     }
 
-    func testWhenCleanAndReloadHistoryIsCalledWithExceptions_ThenExceptionsMustNotBeCleaned() {
+    func testWhenRemoveEntriesIsCalled_ThenEntriesMustBeCleaned() {
         let container = NSPersistentContainer.createInMemoryPersistentContainer(modelName: "History", bundle: Bundle(for: type(of: self)))
         let context = container.viewContext
         let historyStore = HistoryStore(context: context)
 
-        let historyEntry = HistoryEntry(identifier: UUID(),
+        let notToRemoveIdentifier = UUID()
+        let historyEntry = HistoryEntry(identifier: notToRemoveIdentifier,
                                       url: URL.duckDuckGo,
                                       title: nil,
                                       numberOfVisits: 1,
@@ -125,17 +126,16 @@ final class HistoryStoreTests: XCTestCase {
         let firstSavingExpectation = self.expectation(description: "Saving")
         save(entry: historyEntry, historyStore: historyStore, expectation: firstSavingExpectation)
 
-        let exceptionHistoryEntryIdentifier = UUID()
-        let exceptionHistoryEntry = HistoryEntry(identifier: exceptionHistoryEntryIdentifier,
+        let toRemoveHistoryEntry = HistoryEntry(identifier: UUID(),
                                            url: URL(string: "wikipedia.org")!,
                                            title: nil,
                                            numberOfVisits: 1,
                                            lastVisit: Date())
         let secondSavingExpectation = self.expectation(description: "Saving")
-        save(entry: exceptionHistoryEntry, historyStore: historyStore, expectation: secondSavingExpectation)
+        save(entry: toRemoveHistoryEntry, historyStore: historyStore, expectation: secondSavingExpectation)
 
         let loadingExpectation = self.expectation(description: "Loading")
-        historyStore.cleanAndReloadHistory(until: Date(), except: [exceptionHistoryEntry])
+        historyStore.removeEntries([toRemoveHistoryEntry])
             .receive(on: DispatchQueue.main)
             .sink { completion in
                 switch completion {
@@ -146,7 +146,7 @@ final class HistoryStoreTests: XCTestCase {
                 }
             } receiveValue: { history in
                 XCTAssertEqual(history.count, 1)
-                XCTAssertEqual(history.first!.identifier, exceptionHistoryEntryIdentifier)
+                XCTAssertEqual(history.first!.identifier, notToRemoveIdentifier)
             }
             .store(in: &cancellables)
 
