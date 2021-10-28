@@ -31,7 +31,7 @@ extension UserText {
     static let pmEdit = NSLocalizedString("pm.edit", value: "Edit", comment: "Edit button")
     static let pmUsername = NSLocalizedString("pm.username", value: "Username", comment: "Label for username edit field")
     static let pmPassword = NSLocalizedString("pm.password", value: "Password", comment: "Label for password edit field")
-    static let pmWebsite = NSLocalizedString("pm.website", value: "Website", comment: "Label for website edit field")
+    static let pmWebsite = NSLocalizedString("pm.website", value: "Website URL", comment: "Label for website edit field")
     static let pmLoginAdded = NSLocalizedString("pm.added", value: "Added", comment: "Label for login added data")
     static let pmLoginLastUpdated = NSLocalizedString("pm.last.updated", value: "Last Updated", comment: "Label for last updated edit field")
 
@@ -47,7 +47,7 @@ extension UserText {
 
     static let pmAddressStreet = NSLocalizedString("pm.address.street", value: "Street", comment: "Label for street title")
     static let pmAddressCity = NSLocalizedString("pm.address.city", value: "City", comment: "Label for city title")
-    static let pmAddressProvince = NSLocalizedString("pm.address.province", value: "Province", comment: "Label for province title")
+    static let pmAddressProvince = NSLocalizedString("pm.address.state-province", value: "State/Province", comment: "Label for state/province title")
     static let pmAddressPostalCode = NSLocalizedString("pm.address.postal-code", value: "Postal Code", comment: "Label for postal code title")
     static let pmPhoneNumber = NSLocalizedString("pm.phone-number", value: "Phone Number", comment: "Label for phone number title")
     static let pmEmailAddress = NSLocalizedString("pm.email-address", value: "Email Address", comment: "Label for email address title")
