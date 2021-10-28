@@ -165,7 +165,7 @@ final class NavigationBarViewController: NSViewController {
     }
 
     @IBAction func passwordManagementButtonAction(_ sender: NSButton) {
-        showPasswordManagementPopover()
+        showPasswordManagementPopover(sender: sender)
     }
 
     @IBAction func downloadsButtonAction(_ sender: NSButton) {
@@ -228,13 +228,13 @@ final class NavigationBarViewController: NSViewController {
         Pixel.fire(.bookmarksList(source: .button))
     }
 
-    func showPasswordManagementPopover() {
+    func showPasswordManagementPopover(sender: Any) {
         guard closeTransientPopovers() else { return }
         passwordManagementButton.isHidden = false
         passwordManagementPopover.show(relativeTo: passwordManagementButton.bounds.insetFromLineOfDeath(),
                                        of: passwordManagementButton,
                                        preferredEdge: .minY)
-        Pixel.fire(.manageLogins(source: .button))
+        Pixel.fire(.manageLogins(source: sender is NSButton ? .button : (sender is MainMenu ? .mainMenu : .moreMenu)))
     }
 
     func toggleDownloadsPopover(shouldFirePixel: Bool = true) {
@@ -445,7 +445,7 @@ extension NavigationBarViewController: OptionsButtonMenuDelegate {
     }
 
     func optionsButtonMenuRequestedLoginsPopover(_ menu: NSMenu) {
-        showPasswordManagementPopover()
+        showPasswordManagementPopover(sender: menu)
     }
 
     func optionsButtonMenuRequestedDownloadsPopover(_ menu: NSMenu) {

@@ -85,13 +85,16 @@ extension Pixel.Event {
              .manageDownloads,
              .favorite,
              .navigation,
+             .serp,
              .suggestionsDisplayed,
              .sharingMenu,
              .moreMenu,
              .refresh,
              .importedLogins,
              .exportedLogins,
-             .importedBookmarks:
+             .importedBookmarks,
+             .formAutofilled,
+             .autofillItemSaved:
 
             return nil
         }

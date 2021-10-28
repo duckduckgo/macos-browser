@@ -257,6 +257,14 @@ extension Pixel.Event {
 
     }
 
+    enum FormAutofillKind: String, CustomStringConvertible {
+        var description: String { rawValue }
+
+        case password
+        case card
+        case identity
+    }
+
     enum NavigationAccessPoint: String, CustomStringConvertible {
         var description: String { rawValue }
 

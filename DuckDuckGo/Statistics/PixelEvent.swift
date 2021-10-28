@@ -53,6 +53,8 @@ extension Pixel {
         }
 
         case navigation(kind: NavigationKind, source: NavigationAccessPoint)
+        
+        case serp
 
         case suggestionsDisplayed(hasBookmark: HasBookmark, hasFavorite: HasFavorite, hasHistoryEntry: HasHistoryEntry)
 
@@ -71,6 +73,9 @@ extension Pixel {
         case importedLogins(repetition: Repetition = .init(key: "imported-logins"), source: DataImportSource)
         case exportedLogins(repetition: Repetition = .init(key: "exported-logins"))
         case importedBookmarks(repetition: Repetition = .init(key: "imported-bookmarks"), source: DataImportSource)
+
+        case formAutofilled(kind: FormAutofillKind)
+        case autofillItemSaved(kind: FormAutofillKind)
 
         case debug(event: Debug, error: Error? = nil, countedBy: Pixel.Counter? = nil)
 
@@ -151,6 +156,9 @@ extension Pixel.Event {
 
         case .navigation(kind: let kind, source: let source):
             return "m_mac_navigation_\(kind)_\(source)"
+            
+        case .serp:
+            return "m_mac_navigation_search"
 
         case .suggestionsDisplayed(hasBookmark: let hasBookmark, hasFavorite: let hasFavorite, hasHistoryEntry: let hasHistoryEntry):
             return "m_mac_suggestions-displayed_\(hasBookmark)_\(hasFavorite)_\(hasHistoryEntry)"
@@ -172,6 +180,12 @@ extension Pixel.Event {
 
         case .importedBookmarks(repetition: let repetition, source: let source):
             return "m_mac_imported-bookmarks_\(repetition)_\(source)"
+
+        case .formAutofilled(kind: let kind):
+            return "m_mac_autofill_\(kind)"
+
+        case .autofillItemSaved(kind: let kind):
+            return "m_mac_save_\(kind)"
 
         case .debug(event: let event, error: _, countedBy: _):
             return "m_mac_debug_\(event)"
