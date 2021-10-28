@@ -51,7 +51,15 @@ final class MainMenu: NSMenu {
     @IBOutlet weak var favoritesMenuItem: NSMenuItem?
     @IBOutlet weak var favoriteThisPageMenuItem: NSMenuItem?
 
-    @IBOutlet weak var debugMenuItem: NSMenuItem?
+    @IBOutlet weak var debugMenuItem: NSMenuItem? {
+        didSet {
+#if !DEBUG
+            if let item = debugMenuItem {
+                removeItem(item)
+            }
+#endif
+        }
+    }
 
     @IBOutlet weak var helpMenuItem: NSMenuItem?
     @IBOutlet weak var helpSeparatorMenuItem: NSMenuItem?
@@ -101,14 +109,6 @@ final class MainMenu: NSMenu {
 
         helpMenuItemSubmenu.removeItem(helpSeparatorMenuItem)
         helpMenuItemSubmenu.removeItem(sendFeedbackMenuItem)
-
-#endif
-
-#if !DEBUG
-
-        if let item = debugMenuItem {
-            removeItem(item)
-        }
 
 #endif
 
