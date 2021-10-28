@@ -204,7 +204,7 @@ fileprivate extension TabCollectionViewModel {
     // Burns data related to domains from the collection of tabs
     func burn(domains: Set<String>) {
         // Go one by one and execute the fire action
-        var toRemove = Set<Int>()
+        var toRemove = IndexSet()
         for (index, tab) in tabCollection.tabs.enumerated() {
             switch tab.fireAction(for: domains) {
             case .none: continue

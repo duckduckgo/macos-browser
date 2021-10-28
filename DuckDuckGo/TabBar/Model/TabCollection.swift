@@ -61,7 +61,7 @@ final class TabCollection: NSObject {
         tabs.removeSubrange((index + 1)...)
     }
 
-    func removeTabs(at indexSet: Set<Int>) {
+    func removeTabs(at indexSet: IndexSet) {
         guard !indexSet.contains(where: { index in
             index < 0 && index >= tabs.count
         }) else {
@@ -69,7 +69,7 @@ final class TabCollection: NSObject {
             return
         }
 
-        tabs.remove(atOffsets: IndexSet(indexSet))
+        tabs.remove(atOffsets: indexSet)
     }
 
     func moveTab(at index: Int, to newIndex: Int) {

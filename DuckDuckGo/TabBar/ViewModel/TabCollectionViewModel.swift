@@ -285,7 +285,7 @@ final class TabCollectionViewModel: NSObject {
         delegate?.tabCollectionViewModelDidMultipleChanges(self)
     }
 
-    func removeTabsAndAppendNew(at indexSet: Set<Int>, forceChange: Bool = false) {
+    func removeTabsAndAppendNew(at indexSet: IndexSet, forceChange: Bool = false) {
         guard !indexSet.isEmpty, changesEnabled || forceChange else { return }
         guard let selectionIndex = selectionIndex else {
             os_log("TabCollection: No tab selected", type: .error)
