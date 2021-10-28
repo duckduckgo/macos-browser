@@ -270,12 +270,7 @@
 		AA0877BA26D5161D00B05660 /* WebKitVersionProviderTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA0877B926D5161D00B05660 /* WebKitVersionProviderTests.swift */; };
 		AA0F3DB7261A566C0077F2D9 /* SuggestionLoadingMock.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA0F3DB6261A566C0077F2D9 /* SuggestionLoadingMock.swift */; };
 		AA13DCB4271480B0006D48D3 /* FirePopoverViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA13DCB3271480B0006D48D3 /* FirePopoverViewModel.swift */; };
-		AA28C11B271AFD3600F33FF1 /* dark-shield-dot.json in Resources */ = {isa = PBXBuildFile; fileRef = AA28C115271AFD3500F33FF1 /* dark-shield-dot.json */; };
-		AA28C11C271AFD3600F33FF1 /* dark-shield.json in Resources */ = {isa = PBXBuildFile; fileRef = AA28C116271AFD3500F33FF1 /* dark-shield.json */; };
-		AA28C11D271AFD3600F33FF1 /* trackers.json in Resources */ = {isa = PBXBuildFile; fileRef = AA28C117271AFD3600F33FF1 /* trackers.json */; };
-		AA28C11E271AFD3600F33FF1 /* shield-dot.json in Resources */ = {isa = PBXBuildFile; fileRef = AA28C118271AFD3600F33FF1 /* shield-dot.json */; };
-		AA28C11F271AFD3600F33FF1 /* dark-trackers.json in Resources */ = {isa = PBXBuildFile; fileRef = AA28C119271AFD3600F33FF1 /* dark-trackers.json */; };
-		AA28C120271AFD3600F33FF1 /* shield.json in Resources */ = {isa = PBXBuildFile; fileRef = AA28C11A271AFD3600F33FF1 /* shield.json */; };
+		AA21BDF2272B001900A12034 /* dark-trackers.json in Resources */ = {isa = PBXBuildFile; fileRef = AA8AF575272AC614006A09F8 /* dark-trackers.json */; };
 		AA2CB12D2587BB5600AA6FBE /* TabBarFooter.xib in Resources */ = {isa = PBXBuildFile; fileRef = AA2CB12C2587BB5600AA6FBE /* TabBarFooter.xib */; };
 		AA2CB1352587C29500AA6FBE /* TabBarFooter.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA2CB1342587C29500AA6FBE /* TabBarFooter.swift */; };
 		AA3F895324C18AD500628DDE /* SuggestionViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA3F895224C18AD500628DDE /* SuggestionViewModel.swift */; };
@@ -331,7 +326,6 @@
 		AA8AF570272AC601006A09F8 /* trackers.json in Resources */ = {isa = PBXBuildFile; fileRef = AA8AF56F272AC601006A09F8 /* trackers.json */; };
 		AA8AF572272AC608006A09F8 /* shield.json in Resources */ = {isa = PBXBuildFile; fileRef = AA8AF571272AC608006A09F8 /* shield.json */; };
 		AA8AF574272AC60D006A09F8 /* shield-dot.json in Resources */ = {isa = PBXBuildFile; fileRef = AA8AF573272AC60D006A09F8 /* shield-dot.json */; };
-		AA8AF576272AC614006A09F8 /* dark-trackers.json in Resources */ = {isa = PBXBuildFile; fileRef = AA8AF575272AC614006A09F8 /* dark-trackers.json */; };
 		AA8AF578272AC61B006A09F8 /* dark-shield.json in Resources */ = {isa = PBXBuildFile; fileRef = AA8AF577272AC61A006A09F8 /* dark-shield.json */; };
 		AA8AF57A272AC620006A09F8 /* dark-shield-dot.json in Resources */ = {isa = PBXBuildFile; fileRef = AA8AF579272AC620006A09F8 /* dark-shield-dot.json */; };
 		AA8EDF2424923E980071C2E8 /* URLExtension.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA8EDF2324923E980071C2E8 /* URLExtension.swift */; };
@@ -885,12 +879,6 @@
 		AA0877B926D5161D00B05660 /* WebKitVersionProviderTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WebKitVersionProviderTests.swift; sourceTree = "<group>"; };
 		AA0F3DB6261A566C0077F2D9 /* SuggestionLoadingMock.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SuggestionLoadingMock.swift; sourceTree = "<group>"; };
 		AA13DCB3271480B0006D48D3 /* FirePopoverViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FirePopoverViewModel.swift; sourceTree = "<group>"; };
-		AA28C115271AFD3500F33FF1 /* dark-shield-dot.json */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.json; path = "dark-shield-dot.json"; sourceTree = "<group>"; };
-		AA28C116271AFD3500F33FF1 /* dark-shield.json */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.json; path = "dark-shield.json"; sourceTree = "<group>"; };
-		AA28C117271AFD3600F33FF1 /* trackers.json */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.json; path = trackers.json; sourceTree = "<group>"; };
-		AA28C118271AFD3600F33FF1 /* shield-dot.json */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.json; path = "shield-dot.json"; sourceTree = "<group>"; };
-		AA28C119271AFD3600F33FF1 /* dark-trackers.json */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.json; path = "dark-trackers.json"; sourceTree = "<group>"; };
-		AA28C11A271AFD3600F33FF1 /* shield.json */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.json; path = shield.json; sourceTree = "<group>"; };
 		AA2CB12C2587BB5600AA6FBE /* TabBarFooter.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = TabBarFooter.xib; sourceTree = "<group>"; };
 		AA2CB1342587C29500AA6FBE /* TabBarFooter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TabBarFooter.swift; sourceTree = "<group>"; };
 		AA3F895224C18AD500628DDE /* SuggestionViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SuggestionViewModel.swift; sourceTree = "<group>"; };
@@ -926,7 +914,6 @@
 		AA68C3D62490F821001B8783 /* README.md */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; path = README.md; sourceTree = "<group>"; };
 		AA693E5D2696E5B90007BB78 /* CrashReports.storyboard */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; path = CrashReports.storyboard; sourceTree = "<group>"; };
 		AA6AD95A2704B6DB00159F8A /* FirePopoverViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FirePopoverViewController.swift; sourceTree = "<group>"; };
-		AA6AD95C27050A5100159F8A /* FireCoordinator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FireCoordinator.swift; sourceTree = "<group>"; };
 		AA6EF9AC25066F42004754E6 /* WindowsManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WindowsManager.swift; sourceTree = "<group>"; };
 		AA6EF9B2250785D5004754E6 /* NSMenuExtension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NSMenuExtension.swift; sourceTree = "<group>"; };
 		AA6EF9B425081B4C004754E6 /* MainMenuActions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MainMenuActions.swift; sourceTree = "<group>"; };
@@ -3005,7 +2992,6 @@
 		B633C89425E85C5700E4B352 /* Recovered References */ = {
 			isa = PBXGroup;
 			children = (
-				AA6AD95C27050A5100159F8A /* FireCoordinator.swift */,
 			);
 			name = "Recovered References";
 			sourceTree = "<group>";
@@ -3394,6 +3380,7 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				AA21BDF2272B001900A12034 /* dark-trackers.json in Resources */,
 				4B02198C25E05FAC00ED7DEA /* Fireproofing.storyboard in Resources */,
 				AA80EC73256C46A2007083E7 /* Suggestion.storyboard in Resources */,
 				AA693E5E2696E5B90007BB78 /* CrashReports.storyboard in Resources */,
@@ -3445,7 +3432,6 @@
 				4B0511C1262CAA5A00F6079C /* PrivacySecurityPreferencesTableCellView.xib in Resources */,
 				AA8AF572272AC608006A09F8 /* shield.json in Resources */,
 				7B860DE427274E54006D8957 /* navigatorCredentials.js in Resources */,
-				AA28C11F271AFD3600F33FF1 /* dark-trackers.json in Resources */,
 				4B0511D0262CAA5A00F6079C /* AppearancePreferencesTableCellView.xib in Resources */,
 				4B6160F725B157BB007DE5B2 /* contentblocker.js in Resources */,
 				336D5B18262D8D3C0052E0C9 /* findinpage.js in Resources */,
@@ -3607,7 +3593,6 @@
 				AAC30A28268E045400D2D9CD /* CrashReportReader.swift in Sources */,
 				4B6160DD25B152C5007DE5B2 /* ContentBlockerRulesUserScript.swift in Sources */,
 				85AC3B3525DA82A600C7D2AA /* DataTaskProviding.swift in Sources */,
-				AA61C0D42727F82000E6B681 /* ArrayExtension.swift in Sources */,
 				4B2E7D6326FF9D6500D2DB17 /* PrintingUserScript.swift in Sources */,
 				0230C0A52721F3750018F728 /* GPCRequestFactory.swift in Sources */,
 				4BA1A6B3258B080A00F6F690 /* EncryptionKeyGeneration.swift in Sources */,
