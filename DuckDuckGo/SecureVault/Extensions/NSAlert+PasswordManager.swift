@@ -22,7 +22,7 @@ extension NSAlert {
 
     static func passwordManagerConfirmDeleteLogin() -> NSAlert {
         let alert = NSAlert()
-        alert.messageText = "Are you sure you want to delete this login?"
+        alert.messageText = "Are you sure you want to delete this Login?"
         alert.informativeText = "You cannot revert this action."
         alert.alertStyle = .warning
         alert.addButton(withTitle: "Delete")
