@@ -38,7 +38,7 @@ final class FireCoordinator {
         }
 
         guard let mainViewController = burningWindow.contentViewController as? MainViewController else {
-            assertionFailure("Burning window or it's content view controller are nil")
+            assertionFailure("Burning window or its content view controller is nil")
             return
         }
 
