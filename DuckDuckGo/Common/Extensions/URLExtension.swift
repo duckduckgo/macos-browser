@@ -94,21 +94,21 @@ extension URL {
     #endif
     }
 
-    static let atb = "\(Self.duckDuckGo)/atb.js\(devMode)"
-    static let exti = "\(Self.duckDuckGo)/exti/\(devMode)"
+    static let atb = "\(Self.duckDuckGo)atb.js\(devMode)"
+    static let exti = "\(Self.duckDuckGo)exti/\(devMode)"
 
     static var initialAtb: URL {
         return URL(string: Self.atb)!
     }
 
     static func searchAtb(atbWithVariant: String, setAtb: String) -> URL? {
-        return try? URL(string: Self.atb)!
+        return try? Self.initialAtb
             .addParameter(name: DuckDuckGoParameters.ATB.atb, value: atbWithVariant)
             .addParameter(name: DuckDuckGoParameters.ATB.setAtb, value: setAtb)
     }
 
     static func appRetentionAtb(atbWithVariant: String, setAtb: String) -> URL? {
-        return try? URL(string: Self.atb)!
+        return try? Self.initialAtb
             .addParameter(name: DuckDuckGoParameters.ATB.activityType, value: DuckDuckGoParameters.ATB.appUsageValue)
             .addParameter(name: DuckDuckGoParameters.ATB.atb, value: atbWithVariant)
             .addParameter(name: DuckDuckGoParameters.ATB.setAtb, value: setAtb)

@@ -4924,8 +4924,8 @@
 			isa = XCRemoteSwiftPackageReference;
 			repositoryURL = "https://github.com/duckduckgo/BrowserServicesKit.git";
 			requirement = {
-				kind = revision;
-				revision = 96947a149ed9c606d1f1d5765361b54609e4cfa0;
+				branch = "release/friends-and-family";
+				kind = branch;
 			};
 		};
 		85FF55C625F82E4F00E2AB99 /* XCRemoteSwiftPackageReference "lottie-ios" */ = {
