@@ -54,7 +54,7 @@
                     <rect key="frame" x="1" y="215" width="464" height="48"/>
                     <textFieldCell key="cell" selectable="YES" id="VcP-EL-hod">
                         <font key="font" metaFont="system"/>
-                        <string key="title">Websites rely on cookies to keep you signed in. When you Fireproof a site, cookies won't be erased and you'll stay signed in, even after using the Fire Button. We still block third-party trackers found on Fireproof websites.</string>
+                        <string key="title">Websites rely on cookies to keep you signed in. When you Fireproof a site, cookies won’t be erased and you'll stay signed in, even after using the Fire Button. We still block third-party trackers found on Fireproof websites.</string>
                         <color key="textColor" name="labelColor" catalog="System" colorSpace="catalog"/>
                         <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
                     </textFieldCell>
