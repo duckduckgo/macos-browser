@@ -60,4 +60,19 @@ final class FireproofDomainsTests: XCTestCase {
         XCTAssertTrue(logins.fireproofDomains.isEmpty)
     }
 
+    func testWhenAddingDuplicateDomainsThenSubsequentDomainsAreIgnored() {
+        let domain = "example.com"
+        let logins = FireproofDomains()
+        logins.addToAllowed(domain: domain)
+        XCTAssertTrue(logins.isFireproof(fireproofDomain: domain))
+
+        logins.addToAllowed(domain: domain)
+        XCTAssertTrue(logins.isFireproof(fireproofDomain: domain))
+        XCTAssertEqual(logins.fireproofDomains, [domain])
+
+        logins.remove(domain: domain)
+        XCTAssertFalse(logins.isFireproof(fireproofDomain: domain))
+        XCTAssertEqual(logins.fireproofDomains, [])
+    }
+
 }
