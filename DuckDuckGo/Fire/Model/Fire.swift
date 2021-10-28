@@ -62,9 +62,9 @@ final class Fire {
         })
 
         group.enter()
-        burnHistory(of: burningDomains, completion: { [weak self] in
-            self?.burnPermissions(of: burningDomains, completion: { [weak self] in
-                self?.burnDownloads(of: burningDomains)
+        burnHistory(of: burningDomains, completion: {
+            self.burnPermissions(of: burningDomains, completion: {
+                self.burnDownloads(of: burningDomains)
                 group.leave()
             })
         })
@@ -74,8 +74,8 @@ final class Fire {
             group.leave()
         })
 
-        group.notify(queue: .main) { [weak self] in
-            self?.isBurning = false
+        group.notify(queue: .main) {
+            self.isBurning = false
             completion?()
 
             os_log("Fire finished", log: .fire)
@@ -94,9 +94,9 @@ final class Fire {
         }
 
         group.enter()
-        burnHistory { [weak self] in
-            self?.burnPermissions { [weak self] in
-                self?.burnDownloads()
+        burnHistory {
+            self.burnPermissions {
+                self.burnDownloads()
                 group.leave()
             }
         }
@@ -106,8 +106,8 @@ final class Fire {
             group.leave()
         }
 
-        group.notify(queue: .main) { [weak self] in
-            self?.isBurning = false
+        group.notify(queue: .main) {
+            self.isBurning = false
             completion?()
 
             os_log("Fire finished", log: .fire)
