@@ -149,7 +149,9 @@ final class PasswordManagementLoginModel: ObservableObject, PasswordManagementIt
     }
 
     private func populateViewModelFromCredentials() {
-        title =  credentials?.account.title ?? ""
+        let titleString = credentials?.account.title ?? ""
+        title =  titleString.isEmpty ? normalizedDomain(credentials?.account.domain ?? "") : titleString
+
         username = credentials?.account.username ?? ""
         password = String(data: credentials?.password ?? Data(), encoding: .utf8) ?? ""
         domain = normalizedDomain(credentials?.account.domain ?? "")
