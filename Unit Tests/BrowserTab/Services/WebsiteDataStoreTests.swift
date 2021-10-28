@@ -47,7 +47,7 @@ final class WebCacheManagerTests: XCTestCase {
         webCacheManager.clear {
             expect.fulfill()
         }
-        wait(for: [expect], timeout: 5.0)
+        wait(for: [expect], timeout: 15.0)
 
         XCTAssertEqual(cookieStore.cookies.count, 2)
         XCTAssertEqual(cookieStore.cookies[0].domain, ".twitter.com")
@@ -77,7 +77,7 @@ final class WebCacheManagerTests: XCTestCase {
         webCacheManager.clear {
             expect.fulfill()
         }
-        wait(for: [expect], timeout: 5.0)
+        wait(for: [expect], timeout: 30.0)
 
         XCTAssertEqual(cookieStore.cookies.count, 1)
         XCTAssertEqual(cookieStore.cookies[0].domain, ".example.com")
@@ -104,7 +104,7 @@ final class WebCacheManagerTests: XCTestCase {
         webCacheManager.clear {
             expect.fulfill()
         }
-        wait(for: [expect], timeout: 5.0)
+        wait(for: [expect], timeout: 30.0)
 
         XCTAssertEqual(cookieStore.cookies.count, 1)
         XCTAssertEqual(cookieStore.cookies[0].domain, "duckduckgo.com")
@@ -132,7 +132,7 @@ final class WebCacheManagerTests: XCTestCase {
         webCacheManager.clear {
             expect.fulfill()
         }
-        wait(for: [expect], timeout: 5.0)
+        wait(for: [expect], timeout: 30.0)
 
         XCTAssertEqual(cookieStore.cookies.count, 1)
         XCTAssertEqual(cookieStore.cookies[0].domain, "www.example.com")

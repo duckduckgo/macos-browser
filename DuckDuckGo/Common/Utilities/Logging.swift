@@ -40,6 +40,10 @@ extension OSLog {
         Logging.dataImportExportLoggingEnabled ? Logging.dataImportExportLog : .disabled
     }
 
+    static var pixel: OSLog {
+        Logging.pixelLoggingEnabled ? Logging.pixelLog : .disabled
+    }
+
 }
 
 struct Logging {
@@ -58,5 +62,8 @@ struct Logging {
 
     fileprivate static let dataImportExportLoggingEnabled = false
     fileprivate static let dataImportExportLog: OSLog = OSLog(subsystem: Bundle.main.bundleIdentifier ?? "DuckDuckGo", category: "Data Import/Export")
+
+    fileprivate static let pixelLoggingEnabled = false
+    fileprivate static let pixelLog: OSLog = OSLog(subsystem: Bundle.main.bundleIdentifier ?? "DuckDuckGo", category: "Pixel")
 
 }

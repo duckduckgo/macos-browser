@@ -58,7 +58,12 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         ExpirationChecker.check()
 
         if !Self.isRunningTests {
+#if DEBUG
+            Pixel.setUp(dryRun: true)
+#else
             Pixel.setUp()
+#endif
+
             Database.shared.loadStore()
         }
 
@@ -79,6 +84,11 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         LocalBookmarkManager.shared.loadBookmarks()
         _=ConfigurationManager.shared
         _=DownloadListCoordinator.shared
+
+        AtbAndVariantCleanup.cleanup()
+        DefaultVariantManager().assignVariantIfNeeded { _ in
+            // MARK: perform first time launch logic here
+        }
 
         if (notification.userInfo?[NSApplication.launchIsDefaultUserInfoKey] as? NSNumber)?.boolValue == true {
             Pixel.fire(.appLaunch(launch: .autoInitialOrRegular()))

@@ -121,6 +121,8 @@ struct UserText {
     static let fireproofConfirmationMessage = NSLocalizedString("fireproof.confirmation.message",
                                                                 value: "Fireproofing this site will keep you signed in after using the Fire Button.",
                                                                 comment: "Fireproof confirmation message")
+    
+    static let gpcLearnMore = NSLocalizedString("gpc.learnmore.link", value: "Learn More", comment: "Learn More link")
 
     static let passwordManagement = NSLocalizedString("passsword.management", value: "Passwords and Logins", comment: "Used as title for password management user interface")
 

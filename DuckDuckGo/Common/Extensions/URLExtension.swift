@@ -72,6 +72,8 @@ extension URL {
         return URL(string: "about:blank")!
     }
 
+    // MARK: Pixel
+
     static let pixelBase = ProcessInfo.processInfo.environment["PIXEL_BASE_URL", default: "https://improving.duckduckgo.com"]
 
     static func pixelUrl(forPixelNamed pixelName: String) -> URL {
@@ -82,6 +84,41 @@ extension URL {
         return url
     }
 
+    // MARK: ATB
+
+    static var devMode: String {
+    #if DEBUG
+        return "?test=1"
+    #else
+        return ""
+    #endif
+    }
+
+    static let atb = "\(Self.duckDuckGo)atb.js\(devMode)"
+    static let exti = "\(Self.duckDuckGo)exti/\(devMode)"
+
+    static var initialAtb: URL {
+        return URL(string: Self.atb)!
+    }
+
+    static func searchAtb(atbWithVariant: String, setAtb: String) -> URL? {
+        return try? Self.initialAtb
+            .addParameter(name: DuckDuckGoParameters.ATB.atb, value: atbWithVariant)
+            .addParameter(name: DuckDuckGoParameters.ATB.setAtb, value: setAtb)
+    }
+
+    static func appRetentionAtb(atbWithVariant: String, setAtb: String) -> URL? {
+        return try? Self.initialAtb
+            .addParameter(name: DuckDuckGoParameters.ATB.activityType, value: DuckDuckGoParameters.ATB.appUsageValue)
+            .addParameter(name: DuckDuckGoParameters.ATB.atb, value: atbWithVariant)
+            .addParameter(name: DuckDuckGoParameters.ATB.setAtb, value: setAtb)
+    }
+
+    static func exti(forAtb atb: String) -> URL? {
+        let extiUrl = URL(string: Self.exti)!
+        return try? extiUrl.addParameter(name: DuckDuckGoParameters.ATB.atb, value: atb)
+    }
+    
     // MARK: - Parameters
 
     enum ParameterError: Error {
@@ -224,6 +261,11 @@ extension URL {
 
         return filename
     }
+    
+    public func isPart(ofDomain domain: String) -> Bool {
+        guard let host = host else { return false }
+        return host == domain || host.hasSuffix(".\(domain)")
+    }
 
     // MARK: - Validity
 
@@ -257,6 +299,10 @@ extension URL {
     static var aboutDuckDuckGo: URL {
         return URL(string: "https://duckduckgo.com/about")!
     }
+    
+    static var gpcLearnMore: URL {
+        return URL(string: "https://help.duckduckgo.com/duckduckgo-help-pages/privacy/gpc/")!
+    }
 
     static var privacyPolicy: URL {
         return URL(string: "https://duckduckgo.com/privacy")!
@@ -284,6 +330,14 @@ extension URL {
         case search = "q"
         case ia
         case iax
+
+        enum ATB {
+            static let atb = "atb"
+            static let setAtb = "set_atb"
+            static let activityType = "at"
+
+            static let appUsageValue = "app_use"
+        }
     }
 
     // MARK: - Search
@@ -368,6 +422,32 @@ extension URL {
             try (self as NSURL).setResourceValue(quarantineProperties, forKey: .quarantinePropertiesKey)
         }
 
+    }
+    
+    // MARK: - GPC
+    
+    static func isGPCEnabled(url: URL,
+                             config: PrivacyConfigurationManager = PrivacyConfigurationManager.shared) -> Bool {
+        let enabledSites = config.gpcHeadersEnabled()
+        
+        for gpcHost in enabledSites {
+            if url.isPart(ofDomain: gpcHost) {
+                
+                // Check if url is on exception list
+                // Since headers are only enabled for a small numbers of sites
+                // perfrom this check here for efficency
+                let exceptions = config.tempUnprotectedDomains + config.exceptionsList(forFeature: .gpc)
+                for exception in exceptions {
+                    if url.isPart(ofDomain: exception) {
+                        return false
+                    }
+                }
+                
+                return true
+            }
+        }
+        
+        return false
     }
 
 }

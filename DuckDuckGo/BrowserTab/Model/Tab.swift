@@ -616,6 +616,20 @@ extension Tab: SecureVaultManagerDelegate {
         delegate?.tab(self, requestedSaveCredentials: credentials)
     }
 
+    func secureVaultManager(_: SecureVaultManager, didAutofill type: AutofillType, withObjectId objectId: Int64) {
+        Pixel.fire(.formAutofilled(kind: type.formAutofillKind))
+    } 
+
+}
+
+extension AutofillType {
+    var formAutofillKind: Pixel.Event.FormAutofillKind {
+        switch self {
+        case .password: return .password
+        case .card: return .card
+        case .identity: return .identity
+        }
+    }
 }
 
 extension Tab: WKNavigationDelegate {
@@ -653,6 +667,13 @@ extension Tab: WKNavigationDelegate {
                  decisionHandler: @escaping (WKNavigationActionPolicy) -> Void) {
 
         webView.customUserAgent = UserAgent.for(navigationAction.request.url)
+                                                
+        if navigationAction.isTargetingMainFrame, navigationAction.navigationType != .backForward,
+           let request = GPCRequestFactory.shared.requestForGPC(basedOn: navigationAction.request) {
+            decisionHandler(.cancel)
+            webView.load(request)
+            return
+        }
 
         if navigationAction.isTargetingMainFrame {
             currentDownload = nil
@@ -702,6 +723,7 @@ extension Tab: WKNavigationDelegate {
                 decisionHandler(.cancel)
                 return
             }
+            StatisticsLoader.shared.refreshRetentionAtb(isSearch: url.isDuckDuckGoSearch)
 
             decisionHandler(.allow)
         }
