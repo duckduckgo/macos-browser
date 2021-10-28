@@ -33,8 +33,8 @@
                     </connections>
                 </button>
                 <button verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="3Oj-RS-EIB">
-                    <rect key="frame" x="-3" y="176" width="212" height="32"/>
-                    <buttonCell key="cell" type="push" title="Manage Fireproof Websites…" bezelStyle="rounded" alignment="center" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="0HE-gw-PLQ">
+                    <rect key="frame" x="-3" y="176" width="185" height="32"/>
+                    <buttonCell key="cell" type="push" title="Manage Fireproof Sites…" bezelStyle="rounded" alignment="center" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="0HE-gw-PLQ">
                         <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
                         <font key="font" metaFont="system"/>
                     </buttonCell>
@@ -43,8 +43,8 @@
                     </connections>
                 </button>
                 <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="4U5-6s-Y6q">
-                    <rect key="frame" x="1" y="303" width="72" height="19"/>
-                    <textFieldCell key="cell" lineBreakMode="clipping" title="Fireproof" id="UhZ-7t-gWn">
+                    <rect key="frame" x="1" y="303" width="113" height="19"/>
+                    <textFieldCell key="cell" lineBreakMode="clipping" title="Fireproof Sites" id="UhZ-7t-gWn">
                         <font key="font" metaFont="systemMedium" size="16"/>
                         <color key="textColor" name="labelColor" catalog="System" colorSpace="catalog"/>
                         <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
@@ -54,7 +54,7 @@
                     <rect key="frame" x="1" y="215" width="464" height="48"/>
                     <textFieldCell key="cell" selectable="YES" id="VcP-EL-hod">
                         <font key="font" metaFont="system"/>
-                        <string key="title">Websites rely on cookies to keep you signed in. When you Fireproof a site, cookies won't be erased and you'll stay signed in, even after using the Fire Button.</string>
+                        <string key="title">Websites rely on cookies to keep you signed in. When you Fireproof a site, cookies won't be erased and you'll stay signed in, even after using the Fire Button. We still block third-party trackers found on Fireproof websites.</string>
                         <color key="textColor" name="labelColor" catalog="System" colorSpace="catalog"/>
                         <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
                     </textFieldCell>
@@ -111,11 +111,11 @@
                     <constraints>
                         <constraint firstAttribute="height" relation="greaterThanOrEqual" constant="60" id="QEb-Jg-v8U"/>
                     </constraints>
-                    <scroller key="horizontalScroller" hidden="YES" verticalHuggingPriority="750" horizontal="YES" id="3cd-Cl-dGw">
+                    <scroller key="horizontalScroller" hidden="YES" wantsLayer="YES" verticalHuggingPriority="750" horizontal="YES" id="3cd-Cl-dGw">
                         <rect key="frame" x="-100" y="-100" width="225" height="15"/>
                         <autoresizingMask key="autoresizingMask"/>
                     </scroller>
-                    <scroller key="verticalScroller" hidden="YES" verticalHuggingPriority="750" horizontal="NO" id="2rh-IS-YSH">
+                    <scroller key="verticalScroller" hidden="YES" wantsLayer="YES" verticalHuggingPriority="750" horizontal="NO" id="2rh-IS-YSH">
                         <rect key="frame" x="-100" y="-100" width="15" height="135"/>
                         <autoresizingMask key="autoresizingMask"/>
                     </scroller>
