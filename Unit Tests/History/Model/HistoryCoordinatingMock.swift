@@ -39,6 +39,12 @@ final class HistoryCoordinatingMock: HistoryCoordinating {
         completion()
     }
 
+    var burnDomainsCalled = false
+    func burnDomains(_ domains: Set<String>, completion: @escaping () -> Void) {
+        burnDomainsCalled = true
+        completion()
+    }
+
     var markDownloadUrlCalled = false
     func markDownloadUrl(_ url: URL) {
         markDownloadUrlCalled = true

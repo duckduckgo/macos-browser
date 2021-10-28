@@ -22,44 +22,14 @@ import Combine
 
 final class FireViewController: NSViewController {
 
-    static func fireButtonAction() {
-        let response = NSAlert.fireButtonAlert().runModal()
-        if response == NSApplication.ModalResponse.alertFirstButtonReturn {
-            DispatchQueue.main.async {
-                let timedPixel = TimedPixel(.burn())
-                let burningWindow: NSWindow
-                let waitForOpening: Bool
-
-                if let lastKeyWindow = WindowControllersManager.shared.lastKeyMainWindowController?.window,
-                   lastKeyWindow.isVisible {
-                    burningWindow = lastKeyWindow
-                    waitForOpening = false
-                } else {
-                    burningWindow = WindowsManager.openNewWindow()!
-                    waitForOpening = true
-                }
-
-                WindowsManager.closeWindows(except: burningWindow)
-
-                guard let mainViewController = burningWindow.contentViewController as? MainViewController,
-                      let fireViewController = mainViewController.fireViewController else {
-                    assertionFailure("No burning window")
-                    return
-                }
-
-                if waitForOpening {
-                    DispatchQueue.main.asyncAfter(deadline: .now() + 1/3) {
-                        fireViewController.fire { timedPixel.fire() }
-                    }
-                } else {
-                    fireViewController.fire { timedPixel.fire() }
-                }
-            }
-        }
-    }
-
     private var fireViewModel: FireViewModel
     private let tabCollectionViewModel: TabCollectionViewModel
+    private var cancellables = Set<AnyCancellable>()
+
+    private lazy var fireDialogViewController: FirePopoverViewController = {
+        let storyboard = NSStoryboard(name: "Fire", bundle: nil)
+        return storyboard.instantiateController(identifier: "FirePopoverViewController")
+    }()
 
     @IBOutlet weak var fakeFireButton: NSButton!
     @IBOutlet weak var fireAnimationView: AnimationView!
@@ -72,7 +42,7 @@ final class FireViewController: NSViewController {
 
     init?(coder: NSCoder,
           tabCollectionViewModel: TabCollectionViewModel,
-          fireViewModel: FireViewModel) {
+          fireViewModel: FireViewModel = FireCoordinator.fireViewModel) {
         self.tabCollectionViewModel = tabCollectionViewModel
         self.fireViewModel = fireViewModel
 
@@ -84,6 +54,7 @@ final class FireViewController: NSViewController {
 
         setupView()
         setupFireAnimation()
+        subscribeToIsBurning()
     }
 
     override func viewWillAppear() {
@@ -117,7 +88,21 @@ final class FireViewController: NSViewController {
         fireAnimationView.contentMode = .scaleToFill
     }
 
-    private func fire(completion: (() -> Void)? = nil) {
+    private func subscribeToIsBurning() {
+        fireViewModel.fire.$isBurning
+            .sink(receiveValue: { [weak self] isBurning in
+                if isBurning {
+                    self?.animateFire()
+                }
+            })
+            .store(in: &cancellables)
+    }
+
+    func showDialog() {
+        presentAsModalWindow(fireDialogViewController)
+    }
+
+    func animateFire() {
         progressIndicatorWrapper.isHidden = true
 
         fireViewModel.isAnimationPlaying = true
@@ -129,8 +114,6 @@ final class FireViewController: NSViewController {
                 self.progressIndicatorWrapper.isHidden = false
             }
         }
-
-        self.fireViewModel.fire.burnAll(tabCollectionViewModel: self.tabCollectionViewModel, completion: completion)
     }
 
 }

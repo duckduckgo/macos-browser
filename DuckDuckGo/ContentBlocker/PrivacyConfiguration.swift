@@ -29,6 +29,7 @@ public struct PrivacyConfiguration: Decodable {
     public enum SupportedFeatures: String {
         case contentBlocking
         case gpc
+        case navigatorCredentials
     }
     
     public init(features: [String: PrivacyFeature], unprotectedTemporary: [ExceptionEntry]) {

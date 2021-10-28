@@ -95,6 +95,7 @@ final class SaveCredentialsViewController: NSViewController {
             os_log("%s:%: failed to store credentials %s", type: .error, className, #function, error.localizedDescription)
         }
 
+        Pixel.fire(.autofillItemSaved(kind: .password))
         if self.fireproofCheck.state == .on {
             Pixel.fire(.fireproof(kind: .pwm, suggested: .pwm))
             FireproofDomains.shared.addToAllowed(domain: account.domain)
