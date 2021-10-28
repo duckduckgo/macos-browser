@@ -66,7 +66,7 @@
                                                     <imageCell key="cell" refusesFirstResponder="YES" alignment="left" imageScaling="proportionallyDown" image="Logo" id="V3u-lP-o54"/>
                                                 </imageView>
                                                 <button verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="ExO-AA-imf">
-                                                    <rect key="frame" x="8" y="191" width="184" height="16"/>
+                                                    <rect key="frame" x="8" y="192" width="184" height="15"/>
                                                     <buttonCell key="cell" type="bevel" title="More at duckduckgo.com/about" bezelStyle="rounded" alignment="center" imageScaling="proportionallyDown" inset="2" id="YrD-Nw-OMB">
                                                         <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
                                                         <font key="font" metaFont="cellTitle"/>
@@ -77,7 +77,7 @@
                                                     </connections>
                                                 </button>
                                                 <button verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="J62-E9-DAv">
-                                                    <rect key="frame" x="411" y="182" width="128" height="32"/>
+                                                    <rect key="frame" x="411" y="183" width="128" height="32"/>
                                                     <buttonCell key="cell" type="push" title="Send Feedback" bezelStyle="rounded" alignment="center" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="Cql-dh-brF">
                                                         <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
                                                         <font key="font" metaFont="system"/>
@@ -87,9 +87,9 @@
                                                     </connections>
                                                 </button>
                                                 <box boxType="custom" borderType="none" cornerRadius="4" title="Box" translatesAutoresizingMaskIntoConstraints="NO" id="wvW-vQ-gKy" userLabel="Label Container Box">
-                                                    <rect key="frame" x="144" y="243" width="123" height="73"/>
+                                                    <rect key="frame" x="144" y="243" width="128" height="73"/>
                                                     <view key="contentView" id="KuZ-fg-lbE">
-                                                        <rect key="frame" x="0.0" y="0.0" width="123" height="73"/>
+                                                        <rect key="frame" x="0.0" y="0.0" width="128" height="73"/>
                                                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                                         <subviews>
                                                             <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="MLy-bw-KnV">
@@ -101,8 +101,8 @@
                                                                 </textFieldCell>
                                                             </textField>
                                                             <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="a4U-ca-W15">
-                                                                <rect key="frame" x="-2" y="24" width="127" height="17"/>
-                                                                <textFieldCell key="cell" lineBreakMode="clipping" title="Privacy, simplified" id="br6-PH-ezd">
+                                                                <rect key="frame" x="-2" y="24" width="132" height="17"/>
+                                                                <textFieldCell key="cell" lineBreakMode="clipping" title="Privacy, simplified." id="br6-PH-ezd">
                                                                     <font key="font" metaFont="systemSemibold" size="14"/>
                                                                     <color key="textColor" name="labelColor" catalog="System" colorSpace="catalog"/>
                                                                     <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
@@ -350,11 +350,11 @@
                             <scrollView borderType="none" autohidesScrollers="YES" horizontalLineScroll="24" horizontalPageScroll="10" verticalLineScroll="24" verticalPageScroll="10" usesPredominantAxisScrolling="NO" translatesAutoresizingMaskIntoConstraints="NO" id="v7G-m4-y9G">
                                 <rect key="frame" x="42" y="0.0" width="429" height="306"/>
                                 <clipView key="contentView" drawsBackground="NO" id="Sca-lN-1gh">
-                                    <rect key="frame" x="0.0" y="0.0" width="429" height="291"/>
+                                    <rect key="frame" x="0.0" y="0.0" width="429" height="306"/>
                                     <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                     <subviews>
                                         <tableView verticalHuggingPriority="750" allowsExpansionToolTips="YES" columnAutoresizingStyle="lastColumnOnly" columnReordering="NO" columnSelection="YES" columnResizing="NO" multipleSelection="NO" autosaveColumns="NO" rowHeight="24" usesAutomaticRowHeights="YES" viewBased="YES" id="Hzk-42-jjV">
-                                            <rect key="frame" x="0.0" y="0.0" width="533" height="291"/>
+                                            <rect key="frame" x="0.0" y="0.0" width="533" height="306"/>
                                             <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                             <size key="intercellSpacing" width="17" height="0.0"/>
                                             <color key="backgroundColor" name="ClearColor"/>
@@ -382,7 +382,7 @@
                                     <color key="backgroundColor" name="ClearColor"/>
                                 </clipView>
                                 <scroller key="horizontalScroller" wantsLayer="YES" verticalHuggingPriority="750" horizontal="YES" id="cBz-er-7F4">
-                                    <rect key="frame" x="0.0" y="291" width="429" height="15"/>
+                                    <rect key="frame" x="0.0" y="290" width="429" height="16"/>
                                     <autoresizingMask key="autoresizingMask"/>
                                 </scroller>
                                 <scroller key="verticalScroller" hidden="YES" wantsLayer="YES" verticalHuggingPriority="750" horizontal="NO" id="Fbd-Kx-iHN">
@@ -419,7 +419,7 @@
                         <autoresizingMask key="autoresizingMask"/>
                         <subviews>
                             <button verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="DEQ-Uh-Y7p">
-                                <rect key="frame" x="13" y="13" width="84" height="32"/>
+                                <rect key="frame" x="13" y="13" width="83" height="32"/>
                                 <buttonCell key="cell" type="push" title="Remove" bezelStyle="rounded" alignment="center" enabled="NO" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="0Dz-eI-5jh">
                                     <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
                                     <font key="font" metaFont="system"/>
@@ -429,7 +429,7 @@
                                 </connections>
                             </button>
                             <button verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="KAc-ZW-ZAV">
-                                <rect key="frame" x="95" y="13" width="102" height="32"/>
+                                <rect key="frame" x="94" y="13" width="101" height="32"/>
                                 <buttonCell key="cell" type="push" title="Remove All" bezelStyle="rounded" alignment="center" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="atA-bI-IOY">
                                     <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
                                     <font key="font" metaFont="system"/>
