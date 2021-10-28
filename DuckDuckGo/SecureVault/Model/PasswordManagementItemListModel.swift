@@ -201,7 +201,11 @@ final class PasswordManagementItemListModel: ObservableObject {
     var filter: String = "" {
         didSet {
             refresh()
-            selectFirst()
+
+            // Only select the first item if the filter has actually changed
+            if oldValue != filter {
+                selectFirst()
+            }
         }
     }
 
