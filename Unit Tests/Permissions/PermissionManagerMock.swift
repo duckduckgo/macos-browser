@@ -48,4 +48,10 @@ final class PermissionManagerMock: PermissionManagerProtocol {
         completion()
     }
 
+    var burnPermissionsOfDomainsCalled = false
+    func burnPermissions(of domains: Set<String>, completion: @escaping () -> Void) {
+        burnPermissionsOfDomainsCalled = true
+        completion()
+    }
+
 }

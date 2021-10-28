@@ -28,6 +28,7 @@ extension WKWebViewConfiguration {
         preferences.setValue(true, forKey: "developerExtrasEnabled")
         preferences.setValue(false, forKey: "backspaceKeyNavigationEnabled")
         preferences.javaScriptCanOpenWindowsAutomatically = false
+        preferences.isFraudulentWebsiteWarningEnabled = false
         self.userContentController = UserContentController()
         self.processPool.geolocationProvider = GeolocationProvider(processPool: self.processPool)
      }

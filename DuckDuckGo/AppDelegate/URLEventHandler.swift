@@ -51,7 +51,7 @@ final class URLEventHandler {
         didFinishLaunching = true
     }
 
-    @objc private func handleUrlEvent(event: NSAppleEventDescriptor, reply: NSAppleEventDescriptor) {
+    @objc func handleUrlEvent(event: NSAppleEventDescriptor, reply: NSAppleEventDescriptor) {
         guard let stringValue = event.paramDescriptor(forKeyword: keyDirectObject)?.stringValue else {
             os_log("UrlEventListener: unable to determine path", type: .error)
             Pixel.fire(.debug(event: .appOpenURLFailed,

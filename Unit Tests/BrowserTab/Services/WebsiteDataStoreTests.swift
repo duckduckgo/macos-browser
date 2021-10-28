@@ -43,7 +43,8 @@ final class WebCacheManagerTests: XCTestCase {
         ]
 
         let expect = expectation(description: #function)
-        WebCacheManager.shared.clear(dataStore: dataStore, logins: logins) {
+        let webCacheManager = WebCacheManager(fireproofDomains: logins, websiteDataStore: dataStore)
+        webCacheManager.clear {
             expect.fulfill()
         }
         wait(for: [expect], timeout: 15.0)
@@ -72,7 +73,8 @@ final class WebCacheManagerTests: XCTestCase {
         ]
 
         let expect = expectation(description: #function)
-        WebCacheManager.shared.clear(dataStore: dataStore, logins: logins) {
+        let webCacheManager = WebCacheManager(fireproofDomains: logins, websiteDataStore: dataStore)
+        webCacheManager.clear {
             expect.fulfill()
         }
         wait(for: [expect], timeout: 30.0)
@@ -98,7 +100,8 @@ final class WebCacheManagerTests: XCTestCase {
         ]
 
         let expect = expectation(description: #function)
-        WebCacheManager.shared.clear(dataStore: dataStore, logins: logins) {
+        let webCacheManager = WebCacheManager(fireproofDomains: logins, websiteDataStore: dataStore)
+        webCacheManager.clear {
             expect.fulfill()
         }
         wait(for: [expect], timeout: 30.0)
@@ -125,7 +128,8 @@ final class WebCacheManagerTests: XCTestCase {
         ]
 
         let expect = expectation(description: #function)
-        WebCacheManager.shared.clear(dataStore: dataStore, logins: logins) {
+        let webCacheManager = WebCacheManager(fireproofDomains: logins, websiteDataStore: dataStore)
+        webCacheManager.clear {
             expect.fulfill()
         }
         wait(for: [expect], timeout: 30.0)
@@ -140,7 +144,8 @@ final class WebCacheManagerTests: XCTestCase {
         let logins = MockPreservedLogins(domains: [])
 
         let expect = expectation(description: #function)
-        WebCacheManager.shared.clear(dataStore: dataStore, logins: logins) {
+        let webCacheManager = WebCacheManager(fireproofDomains: logins, websiteDataStore: dataStore)
+        webCacheManager.clear {
             expect.fulfill()
         }
         wait(for: [expect], timeout: 5.0)
