@@ -378,11 +378,6 @@ final class TabCollectionViewModel: NSObject {
     func replaceTab(at index: Int, with tab: Tab, forceChange: Bool = false) {
         guard changesEnabled || forceChange else { return }
 
-        guard index >= 0, index < tabCollection.tabs.count else {
-            os_log("TabCollectionViewModel: Index out of bounds", type: .error)
-            return
-        }
-
         tabCollection.replaceTab(at: index, with: tab)
 
         guard let selectionIndex = selectionIndex else {
