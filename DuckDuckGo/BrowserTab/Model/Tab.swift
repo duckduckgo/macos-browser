@@ -280,6 +280,7 @@ final class Tab: NSObject {
             webView.load(url)
         } else {
             webView.reload()
+            updateDashboardInfo(url: content.url)
         }
     }
 
