@@ -47,21 +47,30 @@ final class Fire {
         isBurning = true
         let group = DispatchGroup()
 
+        // Add www prefixes
+        let wwwDomains = Set(domains.map { domain -> String in
+            if !domain.hasPrefix("www.") {
+                return "www.\(domain)"
+            }
+            return domain
+        })
+        let burningDomains = domains.union(wwwDomains)
+
         group.enter()
-        burnWebCache(domains: domains, completion: {
+        burnWebCache(domains: burningDomains, completion: {
             group.leave()
         })
 
         group.enter()
-        burnHistory(of: domains, completion: { [weak self] in
-            self?.burnPermissions(of: domains, completion: { [weak self] in
-                self?.burnDownloads(of: domains)
+        burnHistory(of: burningDomains, completion: { [weak self] in
+            self?.burnPermissions(of: burningDomains, completion: { [weak self] in
+                self?.burnDownloads(of: burningDomains)
                 group.leave()
             })
         })
 
         group.enter()
-        burnTabs(relatedTo: domains, completion: {
+        burnTabs(relatedTo: burningDomains, completion: {
             group.leave()
         })
 
@@ -210,7 +219,7 @@ fileprivate extension TabCollectionViewModel {
 
         // Clean last removed tab if needed
         if let lastRemovedTabHost = tabCollection.lastRemovedTabCache?.url?.host,
-           lastRemovedTabHost.isSubdomain(of: domains) {
+           domains.contains(lastRemovedTabHost) {
             tabCollection.cleanLastRemovedTab()
         }
     }
@@ -233,13 +242,13 @@ fileprivate extension Tab {
     // Returns true if the tab should be closed because it remained empty after burning
     func fireAction(for domains: Set<String>) -> FireAction {
         // If currently visited website belongs to one of domains, burn
-        if let host = content.url?.host, host.isSubdomain(of: domains) {
+        if let host = content.url?.host, domains.contains(host) {
             return .burn
         }
 
         // If tab visited one of domains in past, replace (to clean internal data)
         if visitedDomains.contains(where: { visitedDomain in
-            visitedDomain.isSubdomain(of: domains)
+            domains.contains(visitedDomain)
         }) {
             return .replace
         }

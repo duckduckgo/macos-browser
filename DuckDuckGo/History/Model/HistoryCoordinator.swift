@@ -158,7 +158,7 @@ final class HistoryCoordinator: HistoryCoordinating {
                     return false
                 }
 
-                return host.isSubdomain(of: domains)
+                return domains.contains(host)
             }
 
             self?.removeEntries(entries, completionHandler: { _ in
