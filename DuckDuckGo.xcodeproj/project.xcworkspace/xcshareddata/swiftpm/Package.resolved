@@ -5,8 +5,8 @@
         "package": "BrowserServicesKit",
         "repositoryURL": "https://github.com/duckduckgo/BrowserServicesKit.git",
         "state": {
-          "branch": "sam/secure-vault-data-types-additions",
-          "revision": "83eff13ceb7a85753d5f328b8f59b9a942b1d8b5",
+          "branch": "release/friends-and-family",
+          "revision": "65b012ca808d534f2d46a368bff83a7ec1de3b92",
           "version": null
         }
       },

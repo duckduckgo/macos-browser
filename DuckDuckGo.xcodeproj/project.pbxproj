@@ -941,7 +941,6 @@
 		AA68C3D62490F821001B8783 /* README.md */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; path = README.md; sourceTree = "<group>"; };
 		AA693E5D2696E5B90007BB78 /* CrashReports.storyboard */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; path = CrashReports.storyboard; sourceTree = "<group>"; };
 		AA6AD95A2704B6DB00159F8A /* FirePopoverViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FirePopoverViewController.swift; sourceTree = "<group>"; };
-		AA6AD95C27050A5100159F8A /* FireCoordinator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FireCoordinator.swift; sourceTree = "<group>"; };
 		AA6EF9AC25066F42004754E6 /* WindowsManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WindowsManager.swift; sourceTree = "<group>"; };
 		AA6EF9B2250785D5004754E6 /* NSMenuExtension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NSMenuExtension.swift; sourceTree = "<group>"; };
 		AA6EF9B425081B4C004754E6 /* MainMenuActions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MainMenuActions.swift; sourceTree = "<group>"; };
@@ -3617,7 +3616,6 @@
 				AAC30A28268E045400D2D9CD /* CrashReportReader.swift in Sources */,
 				4B6160DD25B152C5007DE5B2 /* ContentBlockerRulesUserScript.swift in Sources */,
 				85AC3B3525DA82A600C7D2AA /* DataTaskProviding.swift in Sources */,
-				AA61C0D42727F82000E6B681 /* ArrayExtension.swift in Sources */,
 				4B2E7D6326FF9D6500D2DB17 /* PrintingUserScript.swift in Sources */,
 				0230C0A52721F3750018F728 /* GPCRequestFactory.swift in Sources */,
 				4BA1A6B3258B080A00F6F690 /* EncryptionKeyGeneration.swift in Sources */,
@@ -5002,7 +5000,7 @@
 			isa = XCRemoteSwiftPackageReference;
 			repositoryURL = "https://github.com/duckduckgo/BrowserServicesKit.git";
 			requirement = {
-				branch = "sam/secure-vault-data-types-additions";
+				branch = "release/friends-and-family";
 				kind = branch;
 			};
 		};
