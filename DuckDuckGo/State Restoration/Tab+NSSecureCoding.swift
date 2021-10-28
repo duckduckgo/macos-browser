@@ -27,6 +27,7 @@ extension Tab: NSSecureCoding {
         static let sessionStateData = "ssdata"
         static let favicon = "icon"
         static let tabType = "tabType"
+        static let visitedDomains = "visitedDomains"
     }
 
     static var supportsSecureCoding: Bool { true }
@@ -37,7 +38,10 @@ extension Tab: NSSecureCoding {
               let content = TabContent(type: tabType, url: decoder.decodeIfPresent(at: NSSecureCodingKeys.url))
         else { return nil }
 
+        let visitedDomains = decoder.decodeObject(of: [NSArray.self, NSString.self], forKey: NSSecureCodingKeys.visitedDomains) as? [String] ?? []
+
         self.init(content: content,
+                  visitedDomains: Set(visitedDomains),
                   title: decoder.decodeIfPresent(at: NSSecureCodingKeys.title),
                   favicon: decoder.decodeIfPresent(at: NSSecureCodingKeys.favicon),
                   sessionStateData: decoder.decodeIfPresent(at: NSSecureCodingKeys.sessionStateData))
@@ -47,6 +51,7 @@ extension Tab: NSSecureCoding {
         guard webView.configuration.websiteDataStore.isPersistent == true else { return }
 
         content.url.map(coder.encode(forKey: NSSecureCodingKeys.url))
+        coder.encode(Array(visitedDomains), forKey: NSSecureCodingKeys.visitedDomains)
         title.map(coder.encode(forKey: NSSecureCodingKeys.title))
         favicon.map(coder.encode(forKey: NSSecureCodingKeys.favicon))
         getActualSessionStateData().map(coder.encode(forKey: NSSecureCodingKeys.sessionStateData))

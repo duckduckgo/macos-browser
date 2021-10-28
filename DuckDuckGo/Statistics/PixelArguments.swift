@@ -179,7 +179,7 @@ extension Pixel.Event {
         case fireproofed = "fireproofed"
         case nonFireproofed = "non-fireproofed"
 
-        init(url: URL?, fireproofDomains: FireproofDomains = .shared) {
+        init(url: URL?, fireproofDomains: FireproofDomains = FireproofDomains.shared) {
             if let host = url?.host,
                fireproofDomains.isFireproof(fireproofDomain: host) {
                 self = .fireproofed

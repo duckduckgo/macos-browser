@@ -5,6 +5,10 @@
             "state": "enabled",
             "exceptions": []
         },
+        "navigatorCredentials": {
+            "state": "enabled",
+            "exceptions": []
+        },
         "contentBlocking": {
             "state": "enabled",
             "exceptions": [

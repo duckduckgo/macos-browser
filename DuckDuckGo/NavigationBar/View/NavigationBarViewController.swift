@@ -116,6 +116,10 @@ final class NavigationBarViewController: NSViewController {
         updateBookmarksButton()
     }
 
+    func windowDidBecomeMain() {
+        updateNavigationButtons()
+    }
+
     @IBSegueAction func createAddressBarViewController(_ coder: NSCoder) -> AddressBarViewController? {
         guard let addressBarViewController = AddressBarViewController(coder: coder,
                                                                       tabCollectionViewModel: tabCollectionViewModel) else {

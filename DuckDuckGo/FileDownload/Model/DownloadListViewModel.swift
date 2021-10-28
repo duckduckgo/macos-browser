@@ -27,7 +27,7 @@ final class DownloadListViewModel {
 
     @Published private(set) var items: [DownloadViewModel]
 
-    init(coordinator: DownloadListCoordinator = .shared) {
+    init(coordinator: DownloadListCoordinator = DownloadListCoordinator.shared) {
         self.coordinator = coordinator
 
         let items = coordinator.downloads(sortedBy: \.added, ascending: false).map(DownloadViewModel.init)

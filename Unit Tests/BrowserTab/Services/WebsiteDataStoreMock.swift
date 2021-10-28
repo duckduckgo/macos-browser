@@ -23,12 +23,10 @@ import XCTest
 
 final class WebCacheManagerMock: WebCacheManager {
 
-    var removeAllWebsiteDataCalled = false
-
-    override func clear(dataStore: WebsiteDataStore = WKWebsiteDataStore.default(),
-                        logins: FireproofDomains = FireproofDomains.shared,
+    var clearCalled = false
+    override func clear(domains: Set<String>? = nil,
                         completion: @escaping () -> Void) {
-        removeAllWebsiteDataCalled = true
+        clearCalled = true
         completion()
     }
 
