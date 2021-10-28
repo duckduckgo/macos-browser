@@ -34,6 +34,7 @@ protocol HistoryCoordinating: AnyObject {
     func title(for url: URL) -> String?
 
     func burn(except fireproofDomains: FireproofDomains, completion: @escaping () -> Void)
+    func burnDomains(_ domains: Set<String>, completion: @escaping () -> Void)
 
 }
 
@@ -139,6 +140,25 @@ final class HistoryCoordinator: HistoryCoordinating {
             guard let history = self?._history else { return }
             let entries: [HistoryEntry] = history.filter { historyEntry in
                 return !fireproofDomains.isURLFireproof(url: historyEntry.url)
+            }
+
+            self?.removeEntries(entries, completionHandler: { _ in
+                DispatchQueue.main.async {
+                    completion()
+                }
+            })
+        }
+    }
+
+    func burnDomains(_ domains: Set<String>, completion: @escaping () -> Void) {
+        queue.async(flags: .barrier) { [weak self] in
+            guard let history = self?._history else { return }
+            let entries: [HistoryEntry] = history.filter { historyEntry in
+                guard let host = historyEntry.url.host else {
+                    return false
+                }
+
+                return domains.contains(host)
             }
 
             self?.removeEntries(entries, completionHandler: { _ in

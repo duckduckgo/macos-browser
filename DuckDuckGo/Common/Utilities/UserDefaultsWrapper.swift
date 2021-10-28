@@ -48,6 +48,8 @@ public struct UserDefaultsWrapper<T> {
 
         case lastCrashReportCheckDate = "last.crash.report.check.date"
 
+        case fireInfoPresentedOnce = "fire.info.presented.once"
+
         // ATB
         case installDate = "statistics.installdate.key"
         case atb = "statistics.atb.key"
