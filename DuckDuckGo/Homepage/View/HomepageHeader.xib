@@ -89,7 +89,7 @@
                         </imageView>
                         <textField focusRingType="none" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="3Vr-DR-fdD" customClass="AddressBarTextField" customModule="DuckDuckGo_Privacy_Browser" customModuleProvider="target">
                             <rect key="frame" x="31" y="12" width="404" height="16"/>
-                            <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" selectable="YES" editable="YES" sendsActionOnEndEditing="YES" focusRingType="none" placeholderString="Search DuckDuckGo" id="FTG-Jg-Wmc">
+                            <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" selectable="YES" editable="YES" sendsActionOnEndEditing="YES" focusRingType="none" placeholderString="Search DuckDuckGo or enter address" id="FTG-Jg-Wmc">
                                 <font key="font" usesAppearanceFont="YES"/>
                                 <color key="textColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
                                 <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
