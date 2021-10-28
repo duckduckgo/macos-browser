@@ -94,6 +94,9 @@
                                 <color key="textColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
                                 <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
                             </textFieldCell>
+                            <userDefinedRuntimeAttributes>
+                                <userDefinedRuntimeAttribute type="boolean" keyPath="isHomepageAddressBar" value="YES"/>
+                            </userDefinedRuntimeAttributes>
                         </textField>
                         <button translatesAutoresizingMaskIntoConstraints="NO" id="GuE-Dc-cYk" customClass="MouseOverButton" customModule="DuckDuckGo_Privacy_Browser" customModuleProvider="target">
                             <rect key="frame" x="433" y="6" width="32" height="28"/>

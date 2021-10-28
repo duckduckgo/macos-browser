@@ -76,7 +76,7 @@ final class TabViewModelTests: XCTestCase {
 
         let addressBarStringExpectation = expectation(description: "Address bar string")
 
-        tabViewModel.$addressBarString.debounce(for: 0.1, scheduler: RunLoop.main).sink { _ in
+        tabViewModel.$addressBarString.debounce(for: 0.5, scheduler: RunLoop.main).sink { _ in
             XCTAssertEqual(tabViewModel.addressBarString, urlString)
             addressBarStringExpectation.fulfill()
         } .store(in: &cancellables)

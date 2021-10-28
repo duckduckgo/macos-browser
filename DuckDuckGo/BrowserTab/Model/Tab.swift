@@ -608,7 +608,7 @@ extension Tab: SecureVaultManagerDelegate {
 
     func secureVaultManager(_: SecureVaultManager, didAutofill type: AutofillType, withObjectId objectId: Int64) {
         Pixel.fire(.formAutofilled(kind: type.formAutofillKind))
-    }
+    } 
 
 }
 
@@ -713,6 +713,7 @@ extension Tab: WKNavigationDelegate {
                 decisionHandler(.cancel)
                 return
             }
+            StatisticsLoader.shared.refreshRetentionAtb(isSearch: url.isDuckDuckGoSearch)
 
             decisionHandler(.allow)
         }
