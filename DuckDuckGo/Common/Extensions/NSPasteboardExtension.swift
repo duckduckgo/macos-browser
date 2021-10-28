@@ -1,5 +1,5 @@
 //
-//  PasswordManagementItemModel.swift
+//  NSPasteboardExtension.swift
 //
 //  Copyright © 2021 DuckDuckGo. All rights reserved.
 //
@@ -18,14 +18,11 @@
 
 import Foundation
 
-protocol PasswordManagementItemModel: AnyObject {
+extension NSPasteboard {
 
-    func createNew()
-    func cancel()
-    func save()
-    func clearSecureVaultModel()
-    func setSecureVaultModel<Model>(_ modelObject: Model)
-
-    var isEditingPublisher: Published<Bool>.Publisher { get }
+    static func copy(_ string: String) {
+        NSPasteboard.general.clearContents()
+        NSPasteboard.general.setString(string, forType: .string)
+    }
 
 }

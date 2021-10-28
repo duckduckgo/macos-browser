@@ -124,7 +124,7 @@ struct UserText {
     
     static let gpcLearnMore = NSLocalizedString("gpc.learnmore.link", value: "Learn More", comment: "Learn More link")
 
-    static let passwordManagement = NSLocalizedString("passsword.management", value: "Passwords and Logins", comment: "Used as title for password management user interface")
+    static let passwordManagement = NSLocalizedString("passsword.management", value: "Logins+", comment: "Used as title for password management user interface")
 
     static let bookmarks = NSLocalizedString("bookmarks", value: "Bookmarks", comment: "Button for bookmarks")
     static let bookmarksOpenInNewTabs = NSLocalizedString("bookmarks.open.in.new.tabs", value: "Open in New Tabs", comment: "Open all bookmarks in folder in new tabs")

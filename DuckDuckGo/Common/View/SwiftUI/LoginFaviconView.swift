@@ -1,5 +1,5 @@
 //
-//  FaviconView.swift
+//  LoginFaviconView.swift
 //
 //  Copyright © 2021 DuckDuckGo. All rights reserved.
 //
@@ -18,19 +18,20 @@
 
 import SwiftUI
 
-struct FaviconView: View {
+struct LoginFaviconView: View {
 
     let domain: String
 
     var body: some View {
 
-        let favicon = LocalFaviconService.shared.getCachedFavicon(for: domain, mustBeFromUserScript: false) ?? NSImage(named: "WebLarge")
+        let favicon = LocalFaviconService.shared.getCachedFavicon(for: domain, mustBeFromUserScript: false) ?? NSImage(named: "Login")
 
         if let image = favicon {
             Image(nsImage: image)
                 .resizable()
                 .aspectRatio(contentMode: .fit)
                 .frame(width: 32)
+                .cornerRadius(4.0)
         }
 
     }

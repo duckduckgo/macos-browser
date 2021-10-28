@@ -49,4 +49,34 @@ extension NSAlert {
         return alert
     }
 
+    static func passwordManagerConfirmDeleteCard() -> NSAlert {
+        let alert = NSAlert()
+        alert.messageText = "Are you sure you want to delete this card?"
+        alert.informativeText = "You cannot revert this action."
+        alert.alertStyle = .warning
+        alert.addButton(withTitle: "Delete")
+        alert.addButton(withTitle: "Cancel")
+        return alert
+    }
+
+    static func passwordManagerConfirmDeleteIdentity() -> NSAlert {
+        let alert = NSAlert()
+        alert.messageText = "Are you sure you want to delete this identity?"
+        alert.informativeText = "You cannot revert this action."
+        alert.alertStyle = .warning
+        alert.addButton(withTitle: "Delete")
+        alert.addButton(withTitle: "Cancel")
+        return alert
+    }
+
+    static func passwordManagerConfirmDeleteNote() -> NSAlert {
+        let alert = NSAlert()
+        alert.messageText = "Are you sure you want to delete this note?"
+        alert.informativeText = "You cannot revert this action."
+        alert.alertStyle = .warning
+        alert.addButton(withTitle: "Delete")
+        alert.addButton(withTitle: "Cancel")
+        return alert
+    }
+
 }
