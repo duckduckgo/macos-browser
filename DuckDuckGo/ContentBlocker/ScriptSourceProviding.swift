@@ -25,6 +25,7 @@ protocol ScriptSourceProviding {
     var contentBlockerRulesSource: String { get }
     var contentBlockerSource: String { get }
     var gpcSource: String { get }
+    var navigatorCredentialsSource: String { get }
 
     var sourceUpdatedPublisher: AnyPublisher<Void, Never> { get }
 
@@ -40,6 +41,7 @@ final class DefaultScriptSourceProvider: ScriptSourceProviding {
     private(set) var contentBlockerSource: String = ""
     @Published
     private(set) var gpcSource: String = ""
+    private(set) var navigatorCredentialsSource: String = ""
 
     private let sourceUpdatedSubject = PassthroughSubject<Void, Never>()
 
@@ -61,6 +63,7 @@ final class DefaultScriptSourceProvider: ScriptSourceProviding {
         contentBlockerRulesSource = buildContentBlockerRulesSource()
         contentBlockerSource = buildContentBlockerSource()
         gpcSource = buildGPCSource()
+        navigatorCredentialsSource = buildNavigatorCredentialsSource()
         sourceUpdatedSubject.send( () )
     }
 
@@ -104,6 +107,18 @@ final class DefaultScriptSourceProvider: ScriptSourceProviding {
         return GPCUserScript.loadJS("gpc", from: .main, withReplacements: [
             "${gpcEnabled}": privacyConfiguration.isEnabled(featureKey: .gpc) && privSettings.gpcEnabled ? "true" : "false",
             "${gpcExceptions}": exceptions.joined(separator: "\n")
+        ])
+    }
+
+    private func buildNavigatorCredentialsSource() -> String {
+        let unprotectedDomains = privacyConfiguration.tempUnprotectedDomains
+        let contentBlockingExceptions = privacyConfiguration.exceptionsList(forFeature: .navigatorCredentials)
+        if !privacyConfiguration.isEnabled(featureKey: .navigatorCredentials) {
+            return ""
+        }
+        return NavigatorCredentialsUserScript.loadJS("navigatorCredentials", from: .main, withReplacements: [
+             "USER_UNPROTECTED_DOMAINS": "",
+             "CREDENTIALS_EXCEPTIONS": (unprotectedDomains + contentBlockingExceptions).joined(separator: "\n")
         ])
     }
 
