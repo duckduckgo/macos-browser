@@ -188,7 +188,7 @@
                                 <constraints>
                                     <constraint firstAttribute="height" constant="42" id="lCs-Fg-DUS"/>
                                 </constraints>
-                                <buttonCell key="cell" type="square" title="Details" bezelStyle="shadowlessSquare" image="ExpandDown" imagePosition="trailing" alignment="center" inset="2" id="mkO-Cm-jWy">
+                                <buttonCell key="cell" type="square" title="Details" bezelStyle="shadowlessSquare" image="ExpandDownPadding" imagePosition="trailing" alignment="center" inset="2" id="mkO-Cm-jWy">
                                     <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
                                     <font key="font" metaFont="smallSystem"/>
                                 </buttonCell>
@@ -229,7 +229,7 @@
                                             </box>
                                             <button translatesAutoresizingMaskIntoConstraints="NO" id="cgG-hF-FAP" customClass="MouseOverButton" customModule="DuckDuckGo_Privacy_Browser" customModuleProvider="target">
                                                 <rect key="frame" x="0.0" y="0.0" width="320" height="42"/>
-                                                <buttonCell key="cell" type="square" title="     Close all tabs and clear site data" bezelStyle="shadowlessSquare" image="CondenseUp" imagePosition="trailing" alignment="left" inset="2" id="5VP-Yt-jB8">
+                                                <buttonCell key="cell" type="square" title="     Close all tabs and clear site data" bezelStyle="shadowlessSquare" image="CondenseUpPadding" imagePosition="trailing" alignment="left" inset="2" id="5VP-Yt-jB8">
                                                     <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
                                                     <font key="font" metaFont="smallSystem"/>
                                                 </buttonCell>
@@ -529,8 +529,8 @@ DQ
     <resources>
         <image name="Burn" width="16" height="16"/>
         <image name="BurnAlert" width="64" height="64"/>
-        <image name="CondenseUp" width="9" height="5"/>
-        <image name="ExpandDown" width="9" height="5"/>
+        <image name="CondenseUpPadding" width="32" height="16"/>
+        <image name="ExpandDownPadding" width="32" height="16"/>
         <image name="FireHeader" width="128" height="64"/>
         <image name="WarningTriangle" width="16" height="15"/>
         <namedColor name="ButtonColor">
