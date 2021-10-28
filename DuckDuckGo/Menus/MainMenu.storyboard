@@ -199,7 +199,7 @@ CA
                                             <modifierMask key="keyEquivalentModifierMask"/>
                                             <menu key="submenu" title="Find" id="1b7-l0-nxx">
                                                 <items>
-                                                    <menuItem title="Find…" tag="1" keyEquivalent="f" id="Xz5-n4-O0W">
+                                                    <menuItem title="Find in Page…" tag="1" keyEquivalent="f" id="Xz5-n4-O0W">
                                                         <connections>
                                                             <action selector="findInPage:" target="Ady-hI-5gd" id="XOi-sW-sOR"/>
                                                         </connections>
