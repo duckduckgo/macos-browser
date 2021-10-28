@@ -91,7 +91,8 @@ extension Pixel.Event {
              .refresh,
              .importedLogins,
              .exportedLogins,
-             .importedBookmarks:
+             .importedBookmarks,
+             .formAutofilled:
 
             return nil
         }

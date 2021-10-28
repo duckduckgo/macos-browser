@@ -606,6 +606,20 @@ extension Tab: SecureVaultManagerDelegate {
         delegate?.tab(self, requestedSaveCredentials: credentials)
     }
 
+    func secureVaultManager(_: SecureVaultManager, didAutofill type: AutofillType, withObjectId objectId: Int64) {
+        Pixel.fire(.formAutofilled(kind: type.formAutofillKind))
+    }
+
+}
+
+extension AutofillType {
+    var formAutofillKind: Pixel.Event.FormAutofillKind {
+        switch self {
+        case .password: return .password
+        case .card: return .card
+        case .identity: return .identity
+        }
+    }
 }
 
 extension Tab: WKNavigationDelegate {
