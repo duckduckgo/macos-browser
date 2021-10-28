@@ -44,7 +44,15 @@ final class PasswordManagementNoteModel: ObservableObject, PasswordManagementIte
         }
     }
 
-    @Published var isEditing = false
+    @Published var isEditing = false {
+        didSet {
+            // Experimental change suggested by the design team to mark an item as dirty as soon as it enters the editing state.
+            if isEditing {
+                isDirty = true
+            }
+        }
+    }
+
     @Published var isNew = false
 
     @Published var title: String = "" {
