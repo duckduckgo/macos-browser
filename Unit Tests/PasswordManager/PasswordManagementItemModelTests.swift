@@ -61,7 +61,7 @@ final class PasswordManagementItemModelTests: XCTestCase {
         XCTAssertEqual(model.username, "")
         XCTAssertTrue(model.isEditing)
         XCTAssertTrue(model.isNew)
-        XCTAssertFalse(model.isDirty)
+        XCTAssertTrue(model.isDirty)
     }
 
     func testWhenModelIsEditedThenStateIsUpdated() {
