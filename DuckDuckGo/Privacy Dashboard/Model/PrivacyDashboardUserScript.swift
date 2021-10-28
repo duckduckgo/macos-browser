@@ -19,6 +19,7 @@
 import WebKit
 import os
 import BrowserServicesKit
+import TrackerRadarKit
 
 protocol PrivacyDashboardUserScriptDelegate: AnyObject {
 
@@ -175,6 +176,17 @@ final class PrivacyDashboardUserScript: NSObject, StaticUserScript {
 
     func setUpgradedHttps(_ upgradedHttps: Bool, webView: WKWebView) {
         evaluate(js: "window.onChangeUpgradedHttps(\(upgradedHttps))", in: webView)
+    }
+
+    func setParentEntity(_ parentEntity: Entity?, webView: WKWebView) {
+        if parentEntity == nil { return }
+
+        guard let parentEntityJson = try? JSONEncoder().encode(parentEntity).utf8String() else {
+            assertionFailure("Can't encode parentEntity into JSON")
+            return
+        }
+
+        evaluate(js: "window.onChangeParentEntity(\(parentEntityJson))", in: webView)
     }
 
     func setServerTrust(_ serverTrustViewModel: ServerTrustViewModel, webView: WKWebView) {

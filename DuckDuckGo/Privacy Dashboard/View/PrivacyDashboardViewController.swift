@@ -133,6 +133,16 @@ final class PrivacyDashboardViewController: NSViewController {
         self.privacyDashboardScript.setPendingUpdates(self.pendingUpdates, domain: domain, webView: self.webView)
     }
 
+    private func sendParentEntity() {
+        guard let domain = tabViewModel?.tab.content.url?.host else {
+            assertionFailure("PrivacyDashboardViewController: no domain available")
+            return
+        }
+
+        let pageEntity = TrackerRadarManager.shared.findEntity(forHost: domain)
+        self.privacyDashboardScript.setParentEntity(pageEntity, webView: self.webView)
+    }
+
     private func subscribeToServerTrust() {
         tabViewModel?.tab.$serverTrust
             .receive(on: DispatchQueue.global(qos: .userInitiated))
@@ -205,6 +215,7 @@ extension PrivacyDashboardViewController: WKNavigationDelegate {
         subscribeToServerTrust()
         sendProtectionStatus()
         sendPendingUpdates()
+        sendParentEntity()
     }
 
 }
