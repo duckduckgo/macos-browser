@@ -521,8 +521,8 @@
                                 </scroller>
                             </scrollView>
                             <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="aur-0h-QzR">
-                                <rect key="frame" x="18" y="271" width="122" height="16"/>
-                                <textFieldCell key="cell" lineBreakMode="clipping" title="Fireproof Websites" id="s7t-C5-auR">
+                                <rect key="frame" x="18" y="271" width="95" height="16"/>
+                                <textFieldCell key="cell" lineBreakMode="clipping" title="Fireproof Sites" id="s7t-C5-auR">
                                     <font key="font" metaFont="systemMedium" size="13"/>
                                     <color key="textColor" name="labelColor" catalog="System" colorSpace="catalog"/>
                                     <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
