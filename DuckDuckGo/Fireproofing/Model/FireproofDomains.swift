@@ -46,6 +46,10 @@ internal class FireproofDomains {
     }
 
     func addToAllowed(domain: String) {
+        guard !isFireproof(fireproofDomain: domain) else {
+            return
+        }
+
         fireproofDomains += [domain]
 
         NotificationCenter.default.post(name: Constants.newFireproofDomainNotification, object: self, userInfo: [
