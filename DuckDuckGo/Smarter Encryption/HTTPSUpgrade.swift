@@ -32,6 +32,7 @@ final class HTTPSUpgrade {
     
     init(store: HTTPSUpgradeStore = HTTPSUpgradePersistence()) {
         self.store = store
+        reload()
     }
     
     func reload() {
