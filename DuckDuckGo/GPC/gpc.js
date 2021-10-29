@@ -28,13 +28,19 @@
         }
     }
     
-    var gpcEnabled = ${gpcEnabled}
+    var gpcEnabled = GPC_ENABLED
     
     let topLevelUrl = getTopLevelURL()
     var domainParts = topLevelUrl && topLevelUrl.host ? topLevelUrl.host.split(".") : [];
+    
+    const userExcluded = `USER_UNPROTECTED_DOMAINS`.split("\n").filter(domain => domain.trim() == topLevelUrl.host).length > 0;
+    if (userExcluded) {
+        return;
+    }
+    
     while (domainParts && domainParts.length > 1 && gpcEnabled) {
         let partialDomain = domainParts.join(".")
-        const gpcExcluded = `${gpcExceptions}`.split("\n").filter(domain => domain.trim() == partialDomain).length > 0;
+        const gpcExcluded = `GPC_EXCEPTIONS`.split("\n").filter(domain => domain.trim() == partialDomain).length > 0;
         console.log(partialDomain, gpcExcluded)
         if (gpcExcluded) {
             gpcEnabled = false;
