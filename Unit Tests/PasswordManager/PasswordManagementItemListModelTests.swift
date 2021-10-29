@@ -22,64 +22,92 @@ import BrowserServicesKit
 
 final class PasswordManagementItemListModelTests: XCTestCase {
 
-    var oldSelection: SecureVaultModels.WebsiteAccount?
-    var newSelection: SecureVaultModels.WebsiteAccount?
+    var oldSelection: SecureVaultItem?
+    var newSelection: SecureVaultItem?
 
-    func testWhenAccountIsSelctedThenModelReflectsThat() {
+    func testWhenAccountIsSelectedThenModelReflectsThat() {
         let accounts = (0 ..< 10).map { makeAccount(id: $0, domain: "domain\($0)") }
         let model = PasswordManagementItemListModel(onItemSelected: onItemSelected)
 
-        model.accounts = accounts
-        model.selectAccount(accounts[0])
+        model.update(items: accounts)
+        model.select(item: accounts[0])
         XCTAssertNotNil(model.selected)
 
-        model.selectAccountWithId(accounts[8].id!)
-        XCTAssertEqual(model.selected?.id, 8)
+        model.select(item: accounts[8])
+        XCTAssertEqual(model.selected?.id, String(describing: accounts[8]))
 
         model.clearSelection()
         XCTAssertNil(model.selected)
 
         model.selectFirst()
-        XCTAssertEqual(model.selected?.id, 0)
+        XCTAssertEqual(model.selected?.id, String(describing: accounts[0]))
         
     }
 
     func testWhenFilterAppliedThenDisplayedAccountsOnlyContainFilteredMatches() {
 
-        let accounts = (0 ..< 10).map { makeAccount(id: $0, domain: "domain\($0)") }
+        let createdAccounts = (0 ..< 10).map { makeAccount(id: $0, domain: "domain\($0)") }
         let model = PasswordManagementItemListModel(onItemSelected: onItemSelected)
 
-        model.accounts = accounts
+        model.update(items: createdAccounts)
         model.filter = "domain5"
 
-        XCTAssertEqual(model.displayedAccounts.count, 1)
-        XCTAssertEqual(model.displayedAccounts[0].domain, "domain5")
+        XCTAssertEqual(model.displayedItems.count, 1)
+
+        let filteredAccounts = accounts(from: model.displayedItems)
+        XCTAssertEqual(filteredAccounts[0].domain, "domain5")
 
         model.filter = ""
-        XCTAssertEqual(model.displayedAccounts.count, 10)
-        XCTAssertEqual(model.displayedAccounts[0].domain, "domain0")
-        XCTAssertEqual(model.displayedAccounts[9].domain, "domain9")
+
+        let unfilteredAccounts = accounts(from: model.displayedItems)
+        XCTAssertEqual(unfilteredAccounts.count, 10)
+        XCTAssertEqual(unfilteredAccounts[0].domain, "domain0")
+        XCTAssertEqual(unfilteredAccounts[9].domain, "domain9")
     }
 
     func testWhenAccountIsSelectedThenCallbackReceivesOldAndNewVersion() {
         let model = PasswordManagementItemListModel(onItemSelected: onItemSelected)
         let account = makeAccount(id: 1)
-        model.selectAccount(account)
+
+        model.update(items: [account])
+        model.select(item: account)
 
         XCTAssertNil(oldSelection)
         XCTAssertNotNil(newSelection)
     }
 
-    func makeAccount(id: Int64, title: String? = nil, username: String = "username", domain: String = "domain") -> SecureVaultModels.WebsiteAccount {
-        return SecureVaultModels.WebsiteAccount(id: id,
+    func makeAccount(id: Int64, title: String? = nil, username: String = "username", domain: String = "domain") -> SecureVaultItem {
+        let account = SecureVaultModels.WebsiteAccount(id: id,
                                                 title: title,
                                                 username: username,
                                                 domain: domain)
+        return .account(account)
     }
 
-    func onItemSelected(old: SecureVaultModels.WebsiteAccount?, new: SecureVaultModels.WebsiteAccount) {
+    func onItemSelected(old: SecureVaultItem?, new: SecureVaultItem?) {
         oldSelection = old
         newSelection = new
+    }
+
+    private func accounts(from sections: [PasswordManagementItemListModel.ListSection]) -> [SecureVaultModels.WebsiteAccount] {
+        var accounts = [SecureVaultModels.WebsiteAccount]()
+
+        for section in sections {
+            switch section {
+            case .accounts(let items):
+                let accountsFromItems: [SecureVaultModels.WebsiteAccount] = items.compactMap {
+                    switch $0 {
+                    case .account(let account): return account
+                    default: return nil
+                    }
+                }
+
+                accounts.append(contentsOf: accountsFromItems)
+            default: break
+            }
+        }
+
+        return accounts
     }
 
 }
