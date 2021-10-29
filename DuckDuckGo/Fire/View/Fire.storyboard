@@ -57,7 +57,7 @@
                                     </imageView>
                                     <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="1tt-F5-h1d">
                                         <rect key="frame" x="82" y="59" width="135" height="14"/>
-                                        <textFieldCell key="cell" lineBreakMode="clipping" title="Deleting browsing data..." id="MnK-PN-hYp">
+                                        <textFieldCell key="cell" lineBreakMode="clipping" title="Deleting browsing data…" id="MnK-PN-hYp">
                                             <font key="font" metaFont="smallSystem"/>
                                             <color key="textColor" name="labelColor" catalog="System" colorSpace="catalog"/>
                                             <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
