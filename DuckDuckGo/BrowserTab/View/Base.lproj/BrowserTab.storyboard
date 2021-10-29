@@ -26,7 +26,7 @@
                                 <subviews>
                                     <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="RNn-86-Wkx">
                                         <rect key="frame" x="140" y="253" width="232" height="17"/>
-                                        <textFieldCell key="cell" lineBreakMode="clipping" title="DuckDuckGo can't load this page." id="W60-yd-bv3">
+                                        <textFieldCell key="cell" lineBreakMode="clipping" title="DuckDuckGo can’t load this page." id="W60-yd-bv3">
                                             <font key="font" metaFont="systemSemibold" size="14"/>
                                             <color key="textColor" name="labelColor" catalog="System" colorSpace="catalog"/>
                                             <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
