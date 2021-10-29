@@ -566,7 +566,7 @@ Gw
                                     </textField>
                                     <button horizontalHuggingPriority="1000" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="A1C-Th-KJZ">
                                         <rect key="frame" x="-7" y="87" width="138" height="32"/>
-                                        <buttonCell key="cell" type="push" title="Select CSV File..." bezelStyle="rounded" alignment="center" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="L8K-VD-A0V">
+                                        <buttonCell key="cell" type="push" title="Select CSV File…" bezelStyle="rounded" alignment="center" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="L8K-VD-A0V">
                                             <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
                                             <font key="font" metaFont="system"/>
                                         </buttonCell>
@@ -668,7 +668,7 @@ Gw
                             </textField>
                             <button verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="E8r-SL-GMt">
                                 <rect key="frame" x="13" y="-5" width="179" height="32"/>
-                                <buttonCell key="cell" type="push" title="Select Bookmarks File..." bezelStyle="rounded" alignment="center" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="Tu7-Uq-DiB">
+                                <buttonCell key="cell" type="push" title="Select Bookmarks File…" bezelStyle="rounded" alignment="center" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="Tu7-Uq-DiB">
                                     <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
                                     <font key="font" metaFont="system"/>
                                 </buttonCell>

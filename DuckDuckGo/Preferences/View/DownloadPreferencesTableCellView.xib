@@ -38,7 +38,7 @@
                 </pathControl>
                 <button verticalHuggingPriority="750" horizontalCompressionResistancePriority="1000" translatesAutoresizingMaskIntoConstraints="NO" id="pt9-Dk-ki9">
                     <rect key="frame" x="219" y="38" width="92" height="32"/>
-                    <buttonCell key="cell" type="push" title="Change..." bezelStyle="rounded" alignment="center" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="NKP-DN-lrL">
+                    <buttonCell key="cell" type="push" title="Change…" bezelStyle="rounded" alignment="center" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="NKP-DN-lrL">
                         <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
                         <font key="font" metaFont="system"/>
                     </buttonCell>
