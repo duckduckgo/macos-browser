@@ -80,6 +80,8 @@ final class Fire {
         burnTabs(relatedTo: burningDomains, completion: {
             group.leave()
         })
+        
+        burnAutoconsentCache()
 
         group.notify(queue: .main) {
             self.isBurning = false
@@ -115,6 +117,8 @@ final class Fire {
         burnWindows(exceptOwnerOf: tabCollectionViewModel) {
             group.leave()
         }
+        
+        burnAutoconsentCache()
 
         group.notify(queue: .main) {
             self.isBurning = false
@@ -218,6 +222,13 @@ final class Fire {
             }
 
             completion()
+        }
+    }
+    
+    // MARK: - Autoconsent visit cache
+    private func burnAutoconsentCache() {
+        if #available(macOS 11, *) {
+            AutoconsentUserScript.background.sitesNotifiedCache.removeAll()
         }
     }
 
