@@ -351,7 +351,7 @@ final class AddressBarButtonsViewController: NSViewController {
         }
 
         let animation = Animation.named(animationName, animationCache: LottieAnimationCache.shared)
-        let animationView = AnimationView(animation: animation, imageProvider: self)
+        let animationView = AnimationView(animation: animation, imageProvider: tabCollectionViewModel)
         animationView.identifier = NSUserInterfaceItemIdentifier(rawValue: animationName)
         animationViewCache[animationName] = animationView
         return animationView
@@ -679,10 +679,10 @@ extension AddressBarButtonsViewController: NSPopoverDelegate {
 
 }
 
-extension AddressBarButtonsViewController: AnimationImageProvider {
+extension TabCollectionViewModel: AnimationImageProvider {
 
     func imageForAsset(asset: ImageAsset) -> CGImage? {
-        guard let selectedTabViewModel = tabCollectionViewModel.selectedTabViewModel,
+        guard let selectedTabViewModel = self.selectedTabViewModel,
               let trackerInfo = selectedTabViewModel.tab.trackerInfo else {
             return nil
         }
