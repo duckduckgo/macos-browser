@@ -16,145 +16,16 @@
 //  limitations under the License.
 //
 
-import Combine
-import BrowserServicesKit
+import Foundation
 
-final class PasswordManagementItemModel: ObservableObject {
+protocol PasswordManagementItemModel: AnyObject {
 
-    static let dateFormatter: DateFormatter = {
-        let dateFormatter = DateFormatter()
-        dateFormatter.dateStyle = .medium
-        dateFormatter.timeStyle = .medium
-        return dateFormatter
-    } ()
+    func createNew()
+    func cancel()
+    func save()
+    func clearSecureVaultModel()
+    func setSecureVaultModel<Model>(_ modelObject: Model)
 
-    var onDirtyChanged: (Bool) -> Void
-    var onSaveRequested: (SecureVaultModels.WebsiteCredentials) -> Void
-    var onDeleteRequested: (SecureVaultModels.WebsiteCredentials) -> Void
+    var isEditingPublisher: Published<Bool>.Publisher { get }
 
-    var credentials: SecureVaultModels.WebsiteCredentials? {
-        didSet {
-            populateViewModelFromCredentials()
-        }
-    }
-
-    @Published var title: String = "" {
-        didSet {
-            isDirty = true
-        }
-    }
-
-    @Published var username: String = "" {
-        didSet {
-            isDirty = true
-        }
-    }
-
-    @Published var password: String = "" {
-        didSet {
-            isDirty = true
-        }
-    }
-
-    @Published var domain: String = "" {
-        didSet {
-            isDirty = true
-        }
-    }
-
-    @Published var isEditing = false
-    @Published var isNew = false
-
-    var isDirty = false {
-        didSet {
-            self.onDirtyChanged(isDirty)
-        }
-    }
-
-    func normalizedDomain(_ domain: String) -> String {
-        let trimmed = domain.trimmingWhitespaces()
-        if !trimmed.starts(with: "https://") && !trimmed.starts(with: "http://") && trimmed.contains("://") {
-            // Contains some other protocol, so don't mess with it
-            return domain
-        }
-
-        let noSchemeOrWWW = domain.drop(prefix: "https://").drop(prefix: "http://").dropWWW()
-        return URLComponents(string: "https://\(noSchemeOrWWW)")?.host ?? ""
-    }
-
-    var lastUpdatedDate: String = ""
-    var createdDate: String = ""
-
-    init(onDirtyChanged: @escaping (Bool) -> Void,
-         onSaveRequested: @escaping (SecureVaultModels.WebsiteCredentials) -> Void,
-         onDeleteRequested: @escaping (SecureVaultModels.WebsiteCredentials) -> Void) {
-        self.onDirtyChanged = onDirtyChanged
-        self.onSaveRequested = onSaveRequested
-        self.onDeleteRequested = onDeleteRequested
-    }
-
-    func copyPassword() {
-        NSPasteboard.general.clearContents()
-        NSPasteboard.general.setString(password, forType: .string)
-    }
-
-    func copyUsername() {
-        NSPasteboard.general.clearContents()
-        NSPasteboard.general.setString(username, forType: .string)
-    }
-
-    func save() {
-        guard var credentials = credentials else { return }
-        credentials.account.title = title
-        credentials.account.username = username
-        credentials.account.domain = normalizedDomain(domain)
-        credentials.password = password.data(using: .utf8)! // let it crash?
-        onSaveRequested(credentials)
-    }
-
-    func requestDelete() {
-        guard let credentials = credentials else { return }
-        onDeleteRequested(credentials)
-    }
-
-    func edit() {
-        isEditing = true
-    }
-
-    func cancel() {
-        populateViewModelFromCredentials()
-        isEditing = false
-
-        if isNew {
-            credentials = nil
-            isNew = false
-        }
-
-    }
-
-    func createNew() {
-        credentials = .init(account: .init(username: "", domain: ""), password: Data())
-        isEditing = true
-    }
-
-    private func populateViewModelFromCredentials() {
-        title =  credentials?.account.title ?? ""
-        username = credentials?.account.username ?? ""
-        password = String(data: credentials?.password ?? Data(), encoding: .utf8) ?? ""
-        domain = normalizedDomain(credentials?.account.domain ?? "")
-        isDirty = false
-        isNew = credentials?.account.id == nil
-
-        if let date = credentials?.account.created {
-            createdDate = Self.dateFormatter.string(from: date)
-        } else {
-            createdDate = ""
-        }
-
-        if let date = credentials?.account.lastUpdated {
-            lastUpdatedDate = Self.dateFormatter.string(from: date)
-        } else {
-            lastUpdatedDate = ""
-        }
-    }
 }

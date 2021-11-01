@@ -1,7 +1,8 @@
 //
-//  FaviconView.swift
+//  AtbParser.swift
+//  DuckDuckGo
 //
-//  Copyright © 2021 DuckDuckGo. All rights reserved.
+//  Copyright © 2017 DuckDuckGo. All rights reserved.
 //
 //  Licensed under the Apache License, Version 2.0 (the "License");
 //  you may not use this file except in compliance with the License.
@@ -16,23 +17,11 @@
 //  limitations under the License.
 //
 
-import SwiftUI
+import Foundation
 
-struct FaviconView: View {
-
-    let domain: String
-
-    var body: some View {
-
-        let favicon = LocalFaviconService.shared.getCachedFavicon(for: domain, mustBeFromUserScript: false) ?? NSImage(named: "WebLarge")
-
-        if let image = favicon {
-            Image(nsImage: image)
-                .resizable()
-                .aspectRatio(contentMode: .fit)
-                .frame(width: 32)
-        }
-
+public struct AtbParser {
+    func convert(fromJsonData data: Data) throws -> Atb {
+        let decoder = JSONDecoder()
+        return try decoder.decode(Atb.self, from: data)
     }
-
 }

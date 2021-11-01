@@ -1,5 +1,5 @@
 //
-//  PasswordManagementItemView.swift
+//  PasswordManagementLoginItemView.swift
 //
 //  Copyright © 2021 DuckDuckGo. All rights reserved.
 //
@@ -24,9 +24,9 @@ import BrowserServicesKit
 private let interItemSpacing: CGFloat = 23
 private let itemSpacing: CGFloat = 13
 
-struct PasswordManagementItemView: View {
+struct PasswordManagementLoginItemView: View {
 
-    @EnvironmentObject var model: PasswordManagementItemModel
+    @EnvironmentObject var model: PasswordManagementLoginModel
 
     var body: some View {
 
@@ -53,8 +53,6 @@ struct PasswordManagementItemView: View {
                     if model.isEditing || model.isNew {
                         Divider()
                             .padding(.bottom, 10)
-
-                        LoginTitleView()
                     }
 
                     UsernameView()
@@ -84,9 +82,11 @@ struct PasswordManagementItemView: View {
 
 }
 
+// MARK: - Generic Views
+
 private struct Buttons: View {
 
-    @EnvironmentObject var model: PasswordManagementItemModel
+    @EnvironmentObject var model: PasswordManagementLoginModel
 
     var body: some View {
         HStack {
@@ -129,27 +129,11 @@ private struct Buttons: View {
 
 }
 
-private struct LoginTitleView: View {
-
-    @EnvironmentObject var model: PasswordManagementItemModel
-
-    var body: some View {
-
-        Text(UserText.pmLoginTitle)
-            .bold()
-            .padding(.bottom, itemSpacing)
-
-        TextField("", text: $model.title)
-            .textFieldStyle(RoundedBorderTextFieldStyle())
-            .padding(.bottom, interItemSpacing)
-
-    }
-
-}
+// MARK: - Login Views
 
 private struct UsernameView: View {
 
-    @EnvironmentObject var model: PasswordManagementItemModel
+    @EnvironmentObject var model: PasswordManagementLoginModel
 
     @State var isHovering = false
 
@@ -173,7 +157,7 @@ private struct UsernameView: View {
 
                     if isHovering {
                         Button {
-                            model.copyUsername()
+                            model.copy(model.username)
                         } label: {
                             Image("Copy")
                         }.buttonStyle(PlainButtonStyle())
@@ -194,7 +178,7 @@ private struct UsernameView: View {
 
 private struct PasswordView: View {
 
-    @EnvironmentObject var model: PasswordManagementItemModel
+    @EnvironmentObject var model: PasswordManagementLoginModel
 
     @State var isHovering = false
     @State var isPasswordVisible = false
@@ -253,7 +237,7 @@ private struct PasswordView: View {
 
                     if isHovering {
                         Button {
-                            model.copyPassword()
+                            model.copy(model.password)
                         } label: {
                             Image("Copy")
                         }.buttonStyle(PlainButtonStyle())
@@ -275,7 +259,7 @@ private struct PasswordView: View {
 
 private struct WebsiteView: View {
 
-    @EnvironmentObject var model: PasswordManagementItemModel
+    @EnvironmentObject var model: PasswordManagementLoginModel
 
     var body: some View {
 
@@ -302,7 +286,7 @@ private struct WebsiteView: View {
 
 private struct DatesView: View {
 
-    @EnvironmentObject var model: PasswordManagementItemModel
+    @EnvironmentObject var model: PasswordManagementLoginModel
 
     var body: some View {
         VStack(alignment: .leading, spacing: 4) {
@@ -332,30 +316,21 @@ private struct DatesView: View {
 
 private struct HeaderView: View {
 
-    @EnvironmentObject var model: PasswordManagementItemModel
+    @EnvironmentObject var model: PasswordManagementLoginModel
 
     var body: some View {
 
         HStack(alignment: .center, spacing: 0) {
 
-            FaviconView(domain: model.domain)
+            LoginFaviconView(domain: model.domain)
                 .padding(.trailing, 10)
 
-            if model.isNew {
+            if model.isNew || model.isEditing {
 
-                Text(UserText.pmNewLogin)
+                TextField(model.domain.dropWWW(), text: $model.title)
                     .font(.title)
-                    .padding(.trailing, 4)
 
             } else {
-
-                if model.isEditing {
-
-                    Text(UserText.pmEdit)
-                        .font(.title)
-                        .padding(.trailing, 4)
-
-                }
 
                 Text(model.title.isEmpty ? model.domain.dropWWW() : model.title)
                     .font(.title)

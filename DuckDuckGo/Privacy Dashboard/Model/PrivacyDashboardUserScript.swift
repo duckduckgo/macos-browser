@@ -19,6 +19,7 @@
 import WebKit
 import os
 import BrowserServicesKit
+import TrackerRadarKit
 
 protocol PrivacyDashboardUserScriptDelegate: AnyObject {
 
@@ -73,12 +74,12 @@ final class PrivacyDashboardUserScript: NSObject, StaticUserScript {
     }
 
     private func handleSetProtection(message: WKScriptMessage) {
-        guard let protectionIsActive = message.body as? Bool else {
+        guard let isProtected = message.body as? Bool else {
             assertionFailure("privacyDashboardSetProtection: expected Bool")
             return
         }
 
-        delegate?.userScript(self, didChangeProtectionStateTo: protectionIsActive)
+        delegate?.userScript(self, didChangeProtectionStateTo: isProtected)
     }
 
     private func handleFirePixel(message: WKScriptMessage) {
@@ -169,8 +170,23 @@ final class PrivacyDashboardUserScript: NSObject, StaticUserScript {
         evaluate(js: "window.onChangeTrackerBlockingData(\(safeTabUrl), \(trackerBlockingDataJson))", in: webView)
     }
 
+    func setProtectionStatus(_ isProtected: Bool, webView: WKWebView) {
+        evaluate(js: "window.onChangeProtectionStatus(\(isProtected))", in: webView)
+    }
+
     func setUpgradedHttps(_ upgradedHttps: Bool, webView: WKWebView) {
         evaluate(js: "window.onChangeUpgradedHttps(\(upgradedHttps))", in: webView)
+    }
+
+    func setParentEntity(_ parentEntity: Entity?, webView: WKWebView) {
+        if parentEntity == nil { return }
+
+        guard let parentEntityJson = try? JSONEncoder().encode(parentEntity).utf8String() else {
+            assertionFailure("Can't encode parentEntity into JSON")
+            return
+        }
+
+        evaluate(js: "window.onChangeParentEntity(\(parentEntityJson))", in: webView)
     }
 
     func setServerTrust(_ serverTrustViewModel: ServerTrustViewModel, webView: WKWebView) {
@@ -180,6 +196,11 @@ final class PrivacyDashboardUserScript: NSObject, StaticUserScript {
         }
 
         evaluate(js: "window.onChangeCertificateData(\(certificateDataJson))", in: webView)
+    }
+
+    func setPendingUpdates(_ pendingUpdates: Set<String>, domain: String, webView: WKWebView) {
+        let isPendingUpdates = pendingUpdates.contains(domain)
+        evaluate(js: "window.onIsPendingUpdates(\(isPendingUpdates))", in: webView)
     }
 
     private func evaluate(js: String, in webView: WKWebView) {

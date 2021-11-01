@@ -50,6 +50,8 @@ final class AddressBarTextField: NSTextField {
         suggestionWindowController?.window?.isVisible == true
     }
 
+    @IBInspectable var isHomepageAddressBar: Bool = false
+
     private var suggestionItemsCancellable: AnyCancellable?
     private var selectedSuggestionViewModelCancellable: AnyCancellable?
     private var selectedTabViewModelCancellable: AnyCancellable?
@@ -215,7 +217,7 @@ final class AddressBarTextField: NSTextField {
             selectedTabViewModel.tab.reload()
         } else {
             
-            Pixel.fire(.navigation(kind: .init(url: url), source: suggestion != nil ? .suggestion : .addressBar))
+            Pixel.fire(.navigation(kind: .init(url: url), source: isHomepageAddressBar ? .newTab : (suggestion != nil ? .suggestion : .addressBar)))
             selectedTabViewModel.tab.update(url: url)
         }
 
@@ -229,7 +231,7 @@ final class AddressBarTextField: NSTextField {
             return
         }
 
-        Pixel.fire(.navigation(kind: .init(url: url), source: suggestion != nil ? .suggestion : .addressBar))
+        Pixel.fire(.navigation(kind: .init(url: url), source: isHomepageAddressBar ? .newTab : (suggestion != nil ? .suggestion : .addressBar)))
         let tab = Tab(content: .url(url), shouldLoadInBackground: true)
         tabCollectionViewModel.append(tab: tab, selected: selected)
     }

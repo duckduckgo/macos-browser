@@ -25,6 +25,7 @@ final class PrivacyDashboardViewController: NSViewController {
     @IBOutlet var webView: WKWebView!
     private let privacyDashboardScript = PrivacyDashboardUserScript()
     private var cancellables = Set<AnyCancellable>()
+    @Published var pendingUpdates = Set<String>()
 
     weak var tabViewModel: TabViewModel?
     var serverTrustViewModel: ServerTrustViewModel?
@@ -42,6 +43,10 @@ final class PrivacyDashboardViewController: NSViewController {
 
     override func viewWillDisappear() {
         cancellables.removeAll()
+    }
+
+    public func isPendingUpdates() -> Bool {
+        return !pendingUpdates.isEmpty
     }
 
     private func initWebView() {
@@ -108,6 +113,36 @@ final class PrivacyDashboardViewController: NSViewController {
             .store(in: &cancellables)
     }
 
+    private func sendProtectionStatus() {
+        guard let domain = tabViewModel?.tab.content.url?.host else {
+            assertionFailure("PrivacyDashboardViewController: no domain available")
+            return
+        }
+
+        let protectionStore = DomainsProtectionUserDefaultsStore()
+        let isProtected = !protectionStore.unprotectedDomains.contains(domain)
+        self.privacyDashboardScript.setProtectionStatus(isProtected, webView: self.webView)
+    }
+
+    private func sendPendingUpdates() {
+        guard let domain = tabViewModel?.tab.content.url?.host else {
+            assertionFailure("PrivacyDashboardViewController: no domain available")
+            return
+        }
+
+        self.privacyDashboardScript.setPendingUpdates(self.pendingUpdates, domain: domain, webView: self.webView)
+    }
+
+    private func sendParentEntity() {
+        guard let domain = tabViewModel?.tab.content.url?.host else {
+            assertionFailure("PrivacyDashboardViewController: no domain available")
+            return
+        }
+
+        let pageEntity = TrackerRadarManager.shared.findEntity(forHost: domain)
+        self.privacyDashboardScript.setParentEntity(pageEntity, webView: self.webView)
+    }
+
     private func subscribeToServerTrust() {
         tabViewModel?.tab.$serverTrust
             .receive(on: DispatchQueue.global(qos: .userInitiated))
@@ -126,8 +161,26 @@ final class PrivacyDashboardViewController: NSViewController {
 
 extension PrivacyDashboardViewController: PrivacyDashboardUserScriptDelegate {
 
-    func userScript(_ userScript: PrivacyDashboardUserScript, didChangeProtectionStateTo protectionState: Bool) {
-        print("didChangeProtectionState", protectionState)
+    func userScript(_ userScript: PrivacyDashboardUserScript, didChangeProtectionStateTo isProtected: Bool) {
+        guard let domain = tabViewModel?.tab.content.url?.host else {
+            assertionFailure("PrivacyDashboardViewController: no domain available")
+            return
+        }
+
+        let activeTab = self.tabViewModel?.tab
+        let protectionStore = DomainsProtectionUserDefaultsStore()
+        let operation = isProtected ? protectionStore.enableProtection : protectionStore.disableProtection
+        operation(domain)
+
+        pendingUpdates.insert(domain)
+        self.sendPendingUpdates()
+
+        ContentBlockerRulesManager.shared.compileRules { _ in
+            DefaultScriptSourceProvider.shared.reload()
+            self.pendingUpdates.remove(domain)
+            self.sendPendingUpdates()
+            activeTab?.reload()
+        }
     }
 
     func userScript(_ userScript: PrivacyDashboardUserScript, didSetPermission permission: PermissionType, to state: PermissionAuthorizationState) {
@@ -160,6 +213,9 @@ extension PrivacyDashboardViewController: WKNavigationDelegate {
         subscribeToTrackerInfo()
         subscribeToConnectionUpgradedTo()
         subscribeToServerTrust()
+        sendProtectionStatus()
+        sendPendingUpdates()
+        sendParentEntity()
     }
 
 }

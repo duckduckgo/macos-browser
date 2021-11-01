@@ -51,7 +51,7 @@
                                 </customSpacing>
                             </stackView>
                             <button verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="p3M-G6-gOX">
-                                <rect key="frame" x="434" y="13" width="75" height="32"/>
+                                <rect key="frame" x="435" y="13" width="74" height="32"/>
                                 <buttonCell key="cell" type="push" title="Import" bezelStyle="rounded" alignment="center" enabled="NO" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="HD2-Mw-Fjl">
                                     <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
                                     <font key="font" metaFont="system"/>
@@ -64,7 +64,7 @@ DQ
                                 </connections>
                             </button>
                             <button verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="UkV-S4-sID">
-                                <rect key="frame" x="360" y="13" width="76" height="32"/>
+                                <rect key="frame" x="361" y="13" width="76" height="32"/>
                                 <buttonCell key="cell" type="push" title="Cancel" bezelStyle="rounded" alignment="center" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="XaU-cZ-jqv">
                                     <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
                                     <font key="font" metaFont="system"/>
@@ -409,8 +409,8 @@ Gw
                                         </popUpButtonCell>
                                     </popUpButton>
                                     <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="cub-aJ-1ti">
-                                        <rect key="frame" x="-2" y="63" width="137" height="16"/>
-                                        <textFieldCell key="cell" lineBreakMode="clipping" title="Select Data to Import:" id="Wce-nN-umc">
+                                        <rect key="frame" x="-2" y="63" width="136" height="16"/>
+                                        <textFieldCell key="cell" lineBreakMode="clipping" title="Select data to import:" id="Wce-nN-umc">
                                             <font key="font" usesAppearanceFont="YES"/>
                                             <color key="textColor" name="labelColor" catalog="System" colorSpace="catalog"/>
                                             <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
@@ -566,7 +566,7 @@ Gw
                                     </textField>
                                     <button horizontalHuggingPriority="1000" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="A1C-Th-KJZ">
                                         <rect key="frame" x="-7" y="87" width="138" height="32"/>
-                                        <buttonCell key="cell" type="push" title="Select CSV File..." bezelStyle="rounded" alignment="center" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="L8K-VD-A0V">
+                                        <buttonCell key="cell" type="push" title="Select CSV File…" bezelStyle="rounded" alignment="center" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="L8K-VD-A0V">
                                             <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
                                             <font key="font" metaFont="system"/>
                                         </buttonCell>
@@ -668,7 +668,7 @@ Gw
                             </textField>
                             <button verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="E8r-SL-GMt">
                                 <rect key="frame" x="13" y="-5" width="179" height="32"/>
-                                <buttonCell key="cell" type="push" title="Select Bookmarks File..." bezelStyle="rounded" alignment="center" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="Tu7-Uq-DiB">
+                                <buttonCell key="cell" type="push" title="Select Bookmarks File…" bezelStyle="rounded" alignment="center" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="Tu7-Uq-DiB">
                                     <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
                                     <font key="font" metaFont="system"/>
                                 </buttonCell>

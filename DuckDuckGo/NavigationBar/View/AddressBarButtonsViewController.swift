@@ -107,6 +107,7 @@ final class AddressBarButtonsViewController: NSViewController {
     private var urlCancellable: AnyCancellable?
     private var trackerInfoCancellable: AnyCancellable?
     private var bookmarkListCancellable: AnyCancellable?
+    private var privacyDashboadPendingUpdatesCancellable: AnyCancellable?
     private var trackersAnimationViewStatusCancellable: AnyCancellable?
     private var effectiveAppearanceCancellable: AnyCancellable?
     private var permissionsCancellables = Set<AnyCancellable>()
@@ -130,6 +131,7 @@ final class AddressBarButtonsViewController: NSViewController {
         setupButtons()
         subscribeToSelectedTabViewModel()
         subscribeToBookmarkList()
+        subscribePrivacyDashboardPendingUpdates()
         subscribeToEffectiveAppearance()
         updateBookmarkButtonVisibility()
 
@@ -231,6 +233,10 @@ final class AddressBarButtonsViewController: NSViewController {
 
     func openPrivacyDashboard() {
         guard let selectedTabViewModel = tabCollectionViewModel.selectedTabViewModel else { return }
+
+        // Prevent popover from being closed with Privacy Entry Point Button, while pending updates
+        if privacyDashboardPopover.viewController.isPendingUpdates() { return }
+
         guard !privacyDashboardPopover.isShown else {
             privacyDashboardPopover.close()
             return
@@ -244,6 +250,9 @@ final class AddressBarButtonsViewController: NSViewController {
     func updateButtons(mode: AddressBarViewController.Mode,
                        isTextFieldEditorFirstResponder: Bool,
                        textFieldValue: AddressBarTextField.Value) {
+        stopAnimationsAfterFocus(oldIsTextFieldEditorFirstResponder: self.isTextFieldEditorFirstResponder,
+                                 newIsTextFieldEditorFirstResponder: isTextFieldEditorFirstResponder)
+
         self.isTextFieldEditorFirstResponder = isTextFieldEditorFirstResponder
 
         guard let selectedTabViewModel = tabCollectionViewModel.selectedTabViewModel else {
@@ -342,7 +351,7 @@ final class AddressBarButtonsViewController: NSViewController {
         }
 
         let animation = Animation.named(animationName, animationCache: LottieAnimationCache.shared)
-        let animationView = AnimationView(animation: animation, imageProvider: self)
+        let animationView = AnimationView(animation: animation, imageProvider: tabCollectionViewModel)
         animationView.identifier = NSUserInterfaceItemIdentifier(rawValue: animationName)
         animationViewCache[animationName] = animationView
         return animationView
@@ -433,6 +442,27 @@ final class AddressBarButtonsViewController: NSViewController {
     private func subscribeToBookmarkList() {
         bookmarkListCancellable = bookmarkManager.listPublisher.receive(on: DispatchQueue.main).sink { [weak self] _ in
             self?.updateBookmarkButtonImage()
+        }
+    }
+
+    private func subscribePrivacyDashboardPendingUpdates() {
+        privacyDashboadPendingUpdatesCancellable?.cancel()
+
+        privacyDashboadPendingUpdatesCancellable = privacyDashboardPopover.viewController
+            .$pendingUpdates.receive(on: DispatchQueue.main).sink { [weak self] _ in
+            let isPendingUpdate = self?.privacyDashboardPopover.viewController.isPendingUpdates() ?? false
+
+            // Prevent popover from being closed when clicking away, while pending updates
+            if isPendingUpdate {
+                self?.privacyDashboardPopover.behavior = .applicationDefined
+            } else {
+                self?.privacyDashboardPopover.close()
+#if DEBUG
+                self?.privacyDashboardPopover.behavior = .semitransient
+#else
+                self?.privacyDashboardPopover.behavior = .transient
+#endif
+            }
         }
     }
 
@@ -558,6 +588,12 @@ final class AddressBarButtonsViewController: NSViewController {
         stopAnimation(shieldDotAnimationView)
     }
 
+    private func stopAnimationsAfterFocus(oldIsTextFieldEditorFirstResponder: Bool, newIsTextFieldEditorFirstResponder: Bool) {
+        if !oldIsTextFieldEditorFirstResponder && newIsTextFieldEditorFirstResponder {
+            stopAnimations()
+        }
+    }
+
     private func bookmarkForCurrentUrl(setFavorite: Bool, accessPoint: Pixel.Event.AccessPoint) -> Bookmark? {
         guard let selectedTabViewModel = tabCollectionViewModel.selectedTabViewModel,
               let url = selectedTabViewModel.tab.content.url else {
@@ -643,10 +679,10 @@ extension AddressBarButtonsViewController: NSPopoverDelegate {
 
 }
 
-extension AddressBarButtonsViewController: AnimationImageProvider {
+extension TabCollectionViewModel: AnimationImageProvider {
 
     func imageForAsset(asset: ImageAsset) -> CGImage? {
-        guard let selectedTabViewModel = tabCollectionViewModel.selectedTabViewModel,
+        guard let selectedTabViewModel = self.selectedTabViewModel,
               let trackerInfo = selectedTabViewModel.tab.trackerInfo else {
             return nil
         }

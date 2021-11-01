@@ -40,7 +40,7 @@ final class FileDownloadManager: FileDownloadManagerProtocol {
     private let preferences: DownloadPreferences
     private let historyCoordinating: HistoryCoordinating
 
-    init(workspace: NSWorkspace = .shared,
+    init(workspace: NSWorkspace = NSWorkspace.shared,
          preferences: DownloadPreferences = .init(),
          historyCoordinating: HistoryCoordinating = HistoryCoordinator.shared) {
         self.workspace = workspace

@@ -28,6 +28,7 @@ protocol PasswordManagementDelegate: AnyObject {
 
 }
 
+// swiftlint:disable type_body_length
 final class PasswordManagementViewController: NSViewController {
 
     static func create() -> Self {
@@ -52,7 +53,16 @@ final class PasswordManagementViewController: NSViewController {
     var isDirty = false
 
     var listModel: PasswordManagementItemListModel?
-    var itemModel: PasswordManagementItemModel?
+    var itemModel: PasswordManagementItemModel? {
+        didSet {
+            editingCancellable?.cancel()
+            editingCancellable = nil
+
+            editingCancellable = itemModel?.isEditingPublisher.sink(receiveValue: { [weak self] isEditing in
+                self?.divider.isHidden = isEditing
+            })
+        }
+    }
 
     var secureVault: SecureVault? {
         try? SecureVaultFactory.default.makeVault()
@@ -61,68 +71,33 @@ final class PasswordManagementViewController: NSViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         createListView()
-        createItemView()
-        subscribeToEditingState()
+        createLoginItemView()
     }
 
     override func viewDidAppear() {
         super.viewDidAppear()
 
         if !isDirty {
-            itemModel?.credentials = nil
+            itemModel?.clearSecureVaultModel()
         }
 
         refetchWithText(isDirty ? "" : domain ?? "", clearWhenNoMatches: true)
     }
 
-    @IBAction func onNewClicked(_ sender: Any?) {
+    @IBAction func onNewClicked(_ sender: NSButton) {
+        let menu = createNewSecureVaultItemMenu()
+        let location = NSPoint(x: sender.frame.origin.x, y: sender.frame.origin.y - (sender.frame.height / 2) + 6)
 
-        guard let window = view.window else { return }
-
-        func createNew() {
-            listModel?.clearSelection()
-            itemModel?.createNew()
-        }
-
-        if isDirty {
-            let alert = NSAlert.passwordManagerSaveChangesToLogin()
-            alert.beginSheetModal(for: window) { response in
-
-                switch response {
-                case .alertFirstButtonReturn: // Save
-                    self.itemModel?.save()
-                    createNew()
-
-                case .alertSecondButtonReturn: // Discard
-                    self.itemModel?.cancel()
-                    createNew()
-
-                case .alertThirdButtonReturn: // Cancel
-                    break // just do nothing
-
-                default:
-                    fatalError("Unknown response \(response)")
-                }
-
-            }
-        } else {
-            createNew()
-        }
-    }
-
-    private func subscribeToEditingState() {
-        editingCancellable = itemModel?.$isEditing.sink(receiveValue: { [weak self] isEditing in
-            self?.divider.isHidden = isEditing
-        })
+        menu.popUp(positioning: nil, at: location, in: sender.superview)
     }
 
     private func refetchWithText(_ text: String, clearWhenNoMatches: Bool = false, completion: (() -> Void)? = nil) {
-        fetchAccounts { [weak self] accounts in
-            self?.listModel?.accounts = accounts
+        fetchSecureVaultItems { [weak self] items in
+            self?.listModel?.update(items: items)
             self?.searchField.stringValue = text
             self?.updateFilter()
 
-            if clearWhenNoMatches && self?.listModel?.displayedAccounts.isEmpty == true {
+            if clearWhenNoMatches && self?.listModel?.displayedItems.isEmpty == true {
                 self?.searchField.stringValue = ""
                 self?.updateFilter()
             } else if self?.isDirty == false {
@@ -138,36 +113,125 @@ final class PasswordManagementViewController: NSViewController {
     }
 
     func clear() {
-        self.listModel?.accounts = []
+        self.listModel?.update(items: [])
         self.listModel?.filter = ""
         self.listModel?.clearSelection()
-        self.itemModel?.credentials = nil
+        self.itemModel?.clearSecureVaultModel()
     }
 
     private func syncModelsOnCredentials(_ credentials: SecureVaultModels.WebsiteCredentials, select: Bool = false) {
-        self.itemModel?.credentials = credentials
-        self.listModel?.updateAccount(credentials.account)
+        self.itemModel?.setSecureVaultModel(credentials)
+        self.listModel?.update(item: SecureVaultItem.account(credentials.account))
 
         if select {
-            self.listModel?.selectAccount(credentials.account)
+            self.listModel?.selected(item: SecureVaultItem.account(credentials.account))
         }
     }
 
-    private func createItemView() {
-        let itemModel = PasswordManagementItemModel(onDirtyChanged: { [weak self] isDirty in
+    private func syncModelsOnIdentity(_ identity: SecureVaultModels.Identity, select: Bool = false) {
+        self.itemModel?.setSecureVaultModel(identity)
+        self.listModel?.update(item: SecureVaultItem.identity(identity))
+
+        if select {
+            self.listModel?.selected(item: SecureVaultItem.identity(identity))
+        }
+    }
+
+    private func syncModelsOnNote(_ note: SecureVaultModels.Note, select: Bool = false) {
+        self.itemModel?.setSecureVaultModel(note)
+        self.listModel?.update(item: SecureVaultItem.note(note))
+
+        if select {
+            self.listModel?.selected(item: SecureVaultItem.note(note))
+        }
+    }
+
+    private func syncModelsOnCreditCard(_ card: SecureVaultModels.CreditCard, select: Bool = false) {
+        self.itemModel?.setSecureVaultModel(card)
+        self.listModel?.update(item: SecureVaultItem.card(card))
+
+        if select {
+            self.listModel?.selected(item: SecureVaultItem.card(card))
+        }
+    }
+
+    private func createLoginItemView() {
+        let itemModel = PasswordManagementLoginModel(onDirtyChanged: { [weak self] isDirty in
             self?.isDirty = isDirty
             self?.postChange()
         }, onSaveRequested: { [weak self] credentials in
             self?.doSaveCredentials(credentials)
-        }, onDeleteRequested: { [weak self] in
-            self?.promptToDelete($0)
+        }, onDeleteRequested: { [weak self] credentials in
+            self?.promptToDelete(credentials: credentials)
         })
+
         self.itemModel = itemModel
 
-        let view = NSHostingView(rootView: PasswordManagementItemView().environmentObject(itemModel))
+        let view = NSHostingView(rootView: PasswordManagementLoginItemView().environmentObject(itemModel))
+        replaceItemContainerChildView(with: view)
+    }
+
+    private func createIdentityItemView() {
+        let itemModel = PasswordManagementIdentityModel(onDirtyChanged: { [weak self] isDirty in
+            self?.isDirty = isDirty
+            self?.postChange()
+        }, onSaveRequested: { [weak self] note in
+            self?.doSaveIdentity(note)
+        }, onDeleteRequested: { [weak self] identity in
+            self?.promptToDelete(identity: identity)
+        })
+
+        self.itemModel = itemModel
+
+        let view = NSHostingView(rootView: PasswordManagementIdentityItemView().environmentObject(itemModel))
+        replaceItemContainerChildView(with: view)
+    }
+
+    private func createNoteItemView() {
+        let itemModel = PasswordManagementNoteModel(onDirtyChanged: { [weak self] isDirty in
+            self?.isDirty = isDirty
+            self?.postChange()
+        }, onSaveRequested: { [weak self] note in
+            self?.doSaveNote(note)
+        }, onDeleteRequested: { [weak self] note in
+            self?.promptToDelete(note: note)
+        })
+
+        self.itemModel = itemModel
+
+        let view = NSHostingView(rootView: PasswordManagementNoteItemView().environmentObject(itemModel))
+        replaceItemContainerChildView(with: view)
+    }
+
+    private func createCreditCardItemView() {
+        let itemModel = PasswordManagementCreditCardModel(onDirtyChanged: { [weak self] isDirty in
+            self?.isDirty = isDirty
+            self?.postChange()
+        }, onSaveRequested: { [weak self] card in
+            self?.doSaveCreditCard(card)
+        }, onDeleteRequested: { [weak self] card in
+            self?.promptToDelete(card: card)
+        })
+
+        self.itemModel = itemModel
+
+        let view = NSHostingView(rootView: PasswordManagementCreditCardItemView().environmentObject(itemModel))
+        replaceItemContainerChildView(with: view)
+    }
+
+    private func clearSelectedItem() {
+        itemContainer.subviews.forEach {
+            $0.removeFromSuperview()
+        }
+    }
+
+    private func replaceItemContainerChildView(with view: NSView) {
+        clearSelectedItem()
+
         view.frame = itemContainer.bounds
         view.wantsLayer = true
         view.layer?.masksToBounds = false
+
         itemContainer.addSubview(view)
         itemContainer.wantsLayer = true
         itemContainer.layer?.masksToBounds = false
@@ -199,7 +263,73 @@ final class PasswordManagementViewController: NSViewController {
         }
     }
 
-    private func promptToDelete(_ credentials: SecureVaultModels.WebsiteCredentials) {
+    private func doSaveIdentity(_ identity: SecureVaultModels.Identity) {
+        let isNew = identity.id == nil
+
+        do {
+            guard let storedIdentityID = try secureVault?.storeIdentity(identity),
+                  let storedIdentity = try secureVault?.identityFor(id: storedIdentityID) else { return }
+
+            itemModel?.cancel()
+            if isNew {
+                refetchWithText(searchField.stringValue) { [weak self] in
+                    self?.syncModelsOnIdentity(storedIdentity, select: true)
+                }
+            } else {
+                syncModelsOnIdentity(storedIdentity)
+            }
+            postChange()
+
+        } catch {
+            // Which errors can occur when saving identities?
+        }
+    }
+
+    private func doSaveNote(_ note: SecureVaultModels.Note) {
+        let isNew = note.id == nil
+
+        do {
+            guard let storedNoteID = try secureVault?.storeNote(note),
+                  let storedNote = try secureVault?.noteFor(id: storedNoteID) else { return }
+
+            itemModel?.cancel()
+            if isNew {
+                refetchWithText(searchField.stringValue) { [weak self] in
+                    self?.syncModelsOnNote(storedNote, select: true)
+                }
+            } else {
+                syncModelsOnNote(storedNote)
+            }
+            postChange()
+
+        } catch {
+            // Which errors can occur when saving notes?
+        }
+    }
+
+    private func doSaveCreditCard(_ card: SecureVaultModels.CreditCard) {
+        let isNew = card.id == nil
+
+        do {
+            guard let storedCardID = try secureVault?.storeCreditCard(card),
+                  let storedCard = try secureVault?.creditCardFor(id: storedCardID) else { return }
+
+            itemModel?.cancel()
+            if isNew {
+                refetchWithText(searchField.stringValue) { [weak self] in
+                    self?.syncModelsOnCreditCard(storedCard, select: true)
+                }
+            } else {
+                syncModelsOnCreditCard(storedCard)
+            }
+            postChange()
+
+        } catch {
+            // Which errors can occur when saving cards?
+        }
+    }
+
+    private func promptToDelete(credentials: SecureVaultModels.WebsiteCredentials) {
         guard let window = self.view.window,
               let id = credentials.account.id else { return }
 
@@ -209,7 +339,7 @@ final class PasswordManagementViewController: NSViewController {
             switch response {
             case .alertFirstButtonReturn:
                 try? self.secureVault?.deleteWebsiteCredentialsFor(accountId: id)
-                self.itemModel?.credentials = nil
+                self.itemModel?.clearSecureVaultModel()
                 self.refetchWithText(self.searchField.stringValue)
                 self.postChange()
 
@@ -221,17 +351,111 @@ final class PasswordManagementViewController: NSViewController {
             }
 
         }
-
     }
 
+    private func promptToDelete(identity: SecureVaultModels.Identity) {
+        guard let window = self.view.window,
+              let id = identity.id else { return }
+
+        let alert = NSAlert.passwordManagerConfirmDeleteIdentity()
+        alert.beginSheetModal(for: window) { response in
+
+            switch response {
+            case .alertFirstButtonReturn:
+                try? self.secureVault?.deleteIdentityFor(identityId: id)
+                self.itemModel?.clearSecureVaultModel()
+                self.refetchWithText(self.searchField.stringValue)
+                self.postChange()
+
+            case .alertSecondButtonReturn:
+                break // cancel, do nothing
+
+            default:
+                fatalError("Unknown response \(response)")
+            }
+
+        }
+    }
+
+    private func promptToDelete(note: SecureVaultModels.Note) {
+        guard let window = self.view.window,
+              let id = note.id else { return }
+
+        let alert = NSAlert.passwordManagerConfirmDeleteNote()
+        alert.beginSheetModal(for: window) { response in
+
+            switch response {
+            case .alertFirstButtonReturn:
+                try? self.secureVault?.deleteNoteFor(noteId: id)
+                self.itemModel?.clearSecureVaultModel()
+                self.refetchWithText(self.searchField.stringValue)
+                self.postChange()
+
+            case .alertSecondButtonReturn:
+                break // cancel, do nothing
+
+            default:
+                fatalError("Unknown response \(response)")
+            }
+
+        }
+    }
+
+    private func promptToDelete(card: SecureVaultModels.CreditCard) {
+        guard let window = self.view.window,
+              let id = card.id else { return }
+
+        let alert = NSAlert.passwordManagerConfirmDeleteCard()
+        alert.beginSheetModal(for: window) { response in
+
+            switch response {
+            case .alertFirstButtonReturn:
+                try? self.secureVault?.deleteCreditCardFor(cardId: id)
+                self.itemModel?.clearSecureVaultModel()
+                self.refetchWithText(self.searchField.stringValue)
+                self.postChange()
+
+            case .alertSecondButtonReturn:
+                break // cancel, do nothing
+
+            default:
+                fatalError("Unknown response \(response)")
+            }
+
+        }
+    }
+
+    // swiftlint:disable function_body_length
     private func createListView() {
         let listModel = PasswordManagementItemListModel { [weak self] previousValue, newValue in
-            guard let id = newValue.id,
-                  let window = self?.view.window else { return }
+            guard let newValue = newValue,
+                  let id = newValue.secureVaultID,
+                  let window = self?.view.window else {
+                      self?.itemModel = nil
+                      self?.clearSelectedItem()
 
-            func loadCredentialsWithId() {
-                guard let credentials = try? self?.secureVault?.websiteCredentialsFor(accountId: id) else { return }
-                self?.syncModelsOnCredentials(credentials)
+                      return
+                  }
+
+            func loadNewItemWithID() {
+                switch newValue {
+                case .account:
+                    guard let credentials = try? self?.secureVault?.websiteCredentialsFor(accountId: id) else { return }
+                    self?.createLoginItemView()
+                    self?.syncModelsOnCredentials(credentials)
+                case .card:
+                    guard let card = try? self?.secureVault?.creditCardFor(id: id) else { return }
+                    self?.createCreditCardItemView()
+                    self?.syncModelsOnCreditCard(card)
+                case .identity:
+                    guard let identity = try? self?.secureVault?.identityFor(id: id) else { return }
+                    self?.createIdentityItemView()
+                    self?.syncModelsOnIdentity(identity)
+                case .note:
+                    guard let note = try? self?.secureVault?.noteFor(id: id) else { return }
+                    self?.createNoteItemView()
+                    self?.syncModelsOnNote(note)
+                }
             }
 
             if self?.isDirty == true {
@@ -241,15 +465,15 @@ final class PasswordManagementViewController: NSViewController {
                     switch response {
                     case .alertFirstButtonReturn: // Save
                         self?.itemModel?.save()
-                        loadCredentialsWithId()
+                        loadNewItemWithID()
 
                     case .alertSecondButtonReturn: // Discard
                         self?.itemModel?.cancel()
-                        loadCredentialsWithId()
+                        loadNewItemWithID()
 
                     case .alertThirdButtonReturn: // Cancel
-                        if let previousId = previousValue?.id {
-                            self?.listModel?.selectAccountWithId(previousId)
+                        if let previousValue = previousValue {
+                            self?.listModel?.select(item: previousValue)
                         }
 
                     default:
@@ -258,14 +482,37 @@ final class PasswordManagementViewController: NSViewController {
 
                 }
             } else {
-                loadCredentialsWithId()
+                loadNewItemWithID()
             }
         }
+
         self.listModel = listModel
 
         let view = NSHostingView(rootView: PasswordManagementItemListView().environmentObject(listModel))
         view.frame = listContainer.bounds
         listContainer.addSubview(view)
+    }
+    // swiftlint:enable function_body_length
+
+    private func createNewSecureVaultItemMenu() -> NSMenu {
+        let menu = NSMenu()
+
+#if DEBUG
+        menu.items = [
+            NSMenuItem(title: UserText.pmNewCard, action: #selector(createNewCreditCard), keyEquivalent: ""),
+            NSMenuItem(title: UserText.pmNewLogin, action: #selector(createNewLogin), keyEquivalent: ""),
+            NSMenuItem(title: UserText.pmNewIdentity, action: #selector(createNewIdentity), keyEquivalent: ""),
+            NSMenuItem(title: UserText.pmNewNote, action: #selector(createNewNote), keyEquivalent: "")
+        ]
+#else
+        menu.items = [
+            NSMenuItem(title: UserText.pmNewCard, action: #selector(createNewCreditCard), keyEquivalent: ""),
+            NSMenuItem(title: UserText.pmNewLogin, action: #selector(createNewLogin), keyEquivalent: ""),
+            NSMenuItem(title: UserText.pmNewNote, action: #selector(createNewNote), keyEquivalent: "")
+        ]
+#endif
+
+        return menu
     }
 
     private func updateFilter() {
@@ -273,12 +520,169 @@ final class PasswordManagementViewController: NSViewController {
         listModel?.filter = text
     }
 
-    private func fetchAccounts(completion: @escaping ([SecureVaultModels.WebsiteAccount]) -> Void) {
+    private func fetchSecureVaultItems(completion: @escaping ([SecureVaultItem]) -> Void) {
         DispatchQueue.global(qos: .userInitiated).async {
             let accounts = (try? self.secureVault?.accounts()) ?? []
+            let cards = (try? self.secureVault?.creditCards()) ?? []
+            let notes = (try? self.secureVault?.notes()) ?? []
+            let identities = (try? self.secureVault?.identities()) ?? []
+
+            let items = accounts.map(SecureVaultItem.account) +
+                        cards.map(SecureVaultItem.card) +
+                        notes.map(SecureVaultItem.note) +
+                        identities.map(SecureVaultItem.identity)
+
             DispatchQueue.main.async {
-                completion(accounts)
+                completion(items)
             }
+        }
+    }
+
+    @objc
+    private func createNewCreditCard() {
+        guard let window = view.window else { return }
+
+        func createNew() {
+            createCreditCardItemView()
+
+            listModel?.clearSelection()
+            itemModel?.createNew()
+        }
+
+        if isDirty {
+            let alert = NSAlert.passwordManagerSaveChangesToLogin()
+            alert.beginSheetModal(for: window) { response in
+
+                switch response {
+                case .alertFirstButtonReturn: // Save
+                    self.itemModel?.save()
+                    createNew()
+
+                case .alertSecondButtonReturn: // Discard
+                    self.itemModel?.cancel()
+                    createNew()
+
+                case .alertThirdButtonReturn: // Cancel
+                    break // just do nothing
+
+                default:
+                    fatalError("Unknown response \(response)")
+                }
+
+            }
+        } else {
+            createNew()
+        }
+    }
+
+    @objc
+    private func createNewLogin() {
+        guard let window = view.window else { return }
+
+        func createNew() {
+            createLoginItemView()
+
+            listModel?.clearSelection()
+            itemModel?.createNew()
+        }
+
+        if isDirty {
+            let alert = NSAlert.passwordManagerSaveChangesToLogin()
+            alert.beginSheetModal(for: window) { response in
+
+                switch response {
+                case .alertFirstButtonReturn: // Save
+                    self.itemModel?.save()
+                    createNew()
+
+                case .alertSecondButtonReturn: // Discard
+                    self.itemModel?.cancel()
+                    createNew()
+
+                case .alertThirdButtonReturn: // Cancel
+                    break // just do nothing
+
+                default:
+                    fatalError("Unknown response \(response)")
+                }
+
+            }
+        } else {
+            createNew()
+        }
+    }
+
+    @objc
+    private func createNewIdentity() {
+        guard let window = view.window else { return }
+
+        func createNew() {
+            createIdentityItemView()
+
+            listModel?.clearSelection()
+            itemModel?.createNew()
+        }
+
+        if isDirty {
+            let alert = NSAlert.passwordManagerSaveChangesToLogin()
+            alert.beginSheetModal(for: window) { response in
+
+                switch response {
+                case .alertFirstButtonReturn: // Save
+                    self.itemModel?.save()
+                    createNew()
+
+                case .alertSecondButtonReturn: // Discard
+                    self.itemModel?.cancel()
+                    createNew()
+
+                case .alertThirdButtonReturn: // Cancel
+                    break // just do nothing
+
+                default:
+                    fatalError("Unknown response \(response)")
+                }
+
+            }
+        } else {
+            createNew()
+        }
+    }
+
+    @objc
+    private func createNewNote() {
+        guard let window = view.window else { return }
+
+        func createNew() {
+            createNoteItemView()
+
+            listModel?.clearSelection()
+            itemModel?.createNew()
+        }
+
+        if isDirty {
+            let alert = NSAlert.passwordManagerSaveChangesToLogin()
+            alert.beginSheetModal(for: window) { response in
+
+                switch response {
+                case .alertFirstButtonReturn: // Save
+                    self.itemModel?.save()
+                    createNew()
+
+                case .alertSecondButtonReturn: // Discard
+                    self.itemModel?.cancel()
+                    createNew()
+
+                case .alertThirdButtonReturn: // Cancel
+                    break // just do nothing
+
+                default:
+                    fatalError("Unknown response \(response)")
+                }
+
+            }
+        } else {
+            createNew()
         }
     }
     

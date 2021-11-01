@@ -22,7 +22,7 @@ extension NSAlert {
 
     static func passwordManagerConfirmDeleteLogin() -> NSAlert {
         let alert = NSAlert()
-        alert.messageText = "Are you sure you want to delete this login?"
+        alert.messageText = "Are you sure you want to delete this Login?"
         alert.informativeText = "You cannot revert this action."
         alert.alertStyle = .warning
         alert.addButton(withTitle: "Delete")
@@ -46,6 +46,36 @@ extension NSAlert {
         alert.informativeText = "You already have a login for this username and website."
         alert.alertStyle = .warning
         alert.addButton(withTitle: "OK")
+        return alert
+    }
+
+    static func passwordManagerConfirmDeleteCard() -> NSAlert {
+        let alert = NSAlert()
+        alert.messageText = "Are you sure you want to delete this card?"
+        alert.informativeText = "You cannot revert this action."
+        alert.alertStyle = .warning
+        alert.addButton(withTitle: "Delete")
+        alert.addButton(withTitle: "Cancel")
+        return alert
+    }
+
+    static func passwordManagerConfirmDeleteIdentity() -> NSAlert {
+        let alert = NSAlert()
+        alert.messageText = "Are you sure you want to delete this identity?"
+        alert.informativeText = "You cannot revert this action."
+        alert.alertStyle = .warning
+        alert.addButton(withTitle: "Delete")
+        alert.addButton(withTitle: "Cancel")
+        return alert
+    }
+
+    static func passwordManagerConfirmDeleteNote() -> NSAlert {
+        let alert = NSAlert()
+        alert.messageText = "Are you sure you want to delete this note?"
+        alert.informativeText = "You cannot revert this action."
+        alert.alertStyle = .warning
+        alert.addButton(withTitle: "Delete")
+        alert.addButton(withTitle: "Cancel")
         return alert
     }
 

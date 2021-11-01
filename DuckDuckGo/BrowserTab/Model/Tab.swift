@@ -81,9 +81,10 @@ final class Tab: NSObject {
 
     init(content: TabContent,
          faviconService: FaviconService = LocalFaviconService.shared,
-         webCacheManager: WebCacheManager = .shared,
+         webCacheManager: WebCacheManager = WebCacheManager.shared,
          webViewConfiguration: WebViewConfiguration? = nil,
          historyCoordinating: HistoryCoordinating = HistoryCoordinator.shared,
+         visitedDomains: Set<String> = Set<String>(),
          title: String? = nil,
          error: Error? = nil,
          favicon: NSImage? = nil,
@@ -95,6 +96,7 @@ final class Tab: NSObject {
         self.content = content
         self.faviconService = faviconService
         self.historyCoordinating = historyCoordinating
+        self.visitedDomains = visitedDomains
         self.title = title
         self.error = error
         self.favicon = favicon
@@ -280,6 +282,7 @@ final class Tab: NSObject {
             webView.load(url)
         } else {
             webView.reload()
+            updateDashboardInfo(url: content.url)
         }
     }
 
@@ -439,17 +442,25 @@ final class Tab: NSObject {
         subscribeToFindInPageTextChange()
     }
 
-    // MARK: - History
+    // MARK: - Global & Local History
 
     private var historyCoordinating: HistoryCoordinating
     private var shouldStoreNextVisit = true
+    private(set) var visitedDomains: Set<String>
 
     func addVisit(of url: URL) {
         guard shouldStoreNextVisit else {
             shouldStoreNextVisit = true
             return
         }
+
+        // Add to global history
         historyCoordinating.addVisit(of: url)
+
+        // Add to local history
+        if let host = url.host, !host.isEmpty {
+            visitedDomains.insert(host)
+        }
     }
 
     func updateVisitTitle(_ title: String, url: URL) {
@@ -606,6 +617,20 @@ extension Tab: SecureVaultManagerDelegate {
         delegate?.tab(self, requestedSaveCredentials: credentials)
     }
 
+    func secureVaultManager(_: SecureVaultManager, didAutofill type: AutofillType, withObjectId objectId: Int64) {
+        Pixel.fire(.formAutofilled(kind: type.formAutofillKind))
+    } 
+
+}
+
+extension AutofillType {
+    var formAutofillKind: Pixel.Event.FormAutofillKind {
+        switch self {
+        case .password: return .password
+        case .card: return .card
+        case .identity: return .identity
+        }
+    }
 }
 
 extension Tab: WKNavigationDelegate {
@@ -629,7 +654,7 @@ extension Tab: WKNavigationDelegate {
         }
 
         completionHandler(.performDefaultHandling, nil)
-        if let host = webView.url?.host, let serverTrust = challenge.protectionSpace.serverTrust {
+        if let host = webView.url?.host, let serverTrust = challenge.protectionSpace.serverTrust, host == challenge.protectionSpace.host {
             self.serverTrust = ServerTrust(host: host, secTrust: serverTrust)
         }
     }
@@ -643,6 +668,13 @@ extension Tab: WKNavigationDelegate {
                  decisionHandler: @escaping (WKNavigationActionPolicy) -> Void) {
 
         webView.customUserAgent = UserAgent.for(navigationAction.request.url)
+                                                
+        if navigationAction.isTargetingMainFrame, navigationAction.navigationType != .backForward,
+           let request = GPCRequestFactory.shared.requestForGPC(basedOn: navigationAction.request) {
+            decisionHandler(.cancel)
+            webView.load(request)
+            return
+        }
 
         if navigationAction.isTargetingMainFrame {
             currentDownload = nil
@@ -686,12 +718,13 @@ extension Tab: WKNavigationDelegate {
         }
 
         HTTPSUpgrade.shared.isUpgradeable(url: url) { [weak self] isUpgradable in
-            if isUpgradable, let upgradedUrl = url.toHttps() {
+            if isUpgradable && navigationAction.isTargetingMainFrame, let upgradedUrl = url.toHttps() {
                 self?.webView.load(upgradedUrl)
                 self?.setConnectionUpgradedTo(upgradedUrl, navigationAction: navigationAction)
                 decisionHandler(.cancel)
                 return
             }
+            StatisticsLoader.shared.refreshRetentionAtb(isSearch: url.isDuckDuckGoSearch)
 
             decisionHandler(.allow)
         }

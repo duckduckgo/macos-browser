@@ -89,11 +89,14 @@
                         </imageView>
                         <textField focusRingType="none" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="3Vr-DR-fdD" customClass="AddressBarTextField" customModule="DuckDuckGo_Privacy_Browser" customModuleProvider="target">
                             <rect key="frame" x="31" y="12" width="404" height="16"/>
-                            <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" selectable="YES" editable="YES" sendsActionOnEndEditing="YES" focusRingType="none" placeholderString="Search DuckDuckGo" id="FTG-Jg-Wmc">
+                            <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" selectable="YES" editable="YES" sendsActionOnEndEditing="YES" focusRingType="none" placeholderString="Search or enter address" id="FTG-Jg-Wmc">
                                 <font key="font" usesAppearanceFont="YES"/>
                                 <color key="textColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
                                 <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
                             </textFieldCell>
+                            <userDefinedRuntimeAttributes>
+                                <userDefinedRuntimeAttribute type="boolean" keyPath="isHomepageAddressBar" value="YES"/>
+                            </userDefinedRuntimeAttributes>
                         </textField>
                         <button translatesAutoresizingMaskIntoConstraints="NO" id="GuE-Dc-cYk" customClass="MouseOverButton" customModule="DuckDuckGo_Privacy_Browser" customModuleProvider="target">
                             <rect key="frame" x="433" y="6" width="32" height="28"/>
@@ -128,6 +131,7 @@
                         <constraint firstItem="ziH-o6-MGN" firstAttribute="leading" secondItem="r0u-XH-URQ" secondAttribute="leading" constant="1" id="Cju-tR-Jyc"/>
                         <constraint firstItem="GuE-Dc-cYk" firstAttribute="centerY" secondItem="3Vr-DR-fdD" secondAttribute="centerY" id="DT6-ch-P8V"/>
                         <constraint firstAttribute="trailing" secondItem="GuE-Dc-cYk" secondAttribute="trailing" constant="10" id="F4a-Dx-qlR"/>
+                        <constraint firstAttribute="width" relation="lessThanOrEqual" constant="550" id="H18-6d-SBy"/>
                         <constraint firstItem="ziH-o6-MGN" firstAttribute="top" secondItem="r0u-XH-URQ" secondAttribute="top" constant="1" id="JkK-Rg-T5V"/>
                         <constraint firstAttribute="trailing" secondItem="3Vr-DR-fdD" secondAttribute="trailing" constant="42" id="LaC-0U-E3Y"/>
                         <constraint firstItem="bS2-51-Skh" firstAttribute="centerY" secondItem="3Vr-DR-fdD" secondAttribute="centerY" id="T9L-OV-h4X"/>
@@ -138,20 +142,22 @@
                 </customView>
             </subviews>
             <constraints>
-                <constraint firstAttribute="trailing" secondItem="r0u-XH-URQ" secondAttribute="trailing" constant="8" id="BWd-az-JDX"/>
+                <constraint firstItem="9BZ-pG-ZEW" firstAttribute="leading" secondItem="r0u-XH-URQ" secondAttribute="leading" id="0m2-R0-ReL"/>
+                <constraint firstItem="r0u-XH-URQ" firstAttribute="leading" secondItem="sgY-8u-Li4" secondAttribute="leading" priority="250" constant="8" id="3oN-VA-Z76"/>
                 <constraint firstItem="ziH-o6-MGN" firstAttribute="height" secondItem="xd9-q4-UZz" secondAttribute="height" multiplier="0.95" id="IN2-ex-oHb"/>
                 <constraint firstItem="ZFe-Yi-fiG" firstAttribute="centerX" secondItem="sgY-8u-Li4" secondAttribute="centerX" id="LlC-ek-imj"/>
+                <constraint firstItem="9BZ-pG-ZEW" firstAttribute="width" secondItem="r0u-XH-URQ" secondAttribute="width" id="Mlq-mM-tQc"/>
+                <constraint firstItem="9BZ-pG-ZEW" firstAttribute="trailing" secondItem="r0u-XH-URQ" secondAttribute="trailing" id="Pah-rG-GHv"/>
+                <constraint firstItem="xd9-q4-UZz" firstAttribute="width" secondItem="r0u-XH-URQ" secondAttribute="width" id="R9K-l8-jgZ"/>
                 <constraint firstItem="xd9-q4-UZz" firstAttribute="top" secondItem="r0u-XH-URQ" secondAttribute="top" id="TJL-lA-Vgo"/>
-                <constraint firstItem="xd9-q4-UZz" firstAttribute="leading" secondItem="sgY-8u-Li4" secondAttribute="leading" constant="8" id="Tr8-sM-O7o"/>
+                <constraint firstItem="xd9-q4-UZz" firstAttribute="trailing" secondItem="r0u-XH-URQ" secondAttribute="trailing" id="ZNd-Ag-IcI"/>
+                <constraint firstAttribute="trailing" secondItem="r0u-XH-URQ" secondAttribute="trailing" priority="250" constant="8" id="a9k-gf-kRZ"/>
                 <constraint firstItem="9BZ-pG-ZEW" firstAttribute="height" secondItem="r0u-XH-URQ" secondAttribute="height" id="aSe-Gs-Rn9"/>
                 <constraint firstItem="ZFe-Yi-fiG" firstAttribute="top" secondItem="sgY-8u-Li4" secondAttribute="top" constant="20" symbolic="YES" id="bog-VG-Nqd"/>
                 <constraint firstItem="9BZ-pG-ZEW" firstAttribute="top" secondItem="r0u-XH-URQ" secondAttribute="top" id="dZi-BX-Vau"/>
-                <constraint firstItem="xd9-q4-UZz" firstAttribute="centerX" secondItem="r0u-XH-URQ" secondAttribute="centerX" id="e47-39-zCa"/>
-                <constraint firstAttribute="trailing" secondItem="xd9-q4-UZz" secondAttribute="trailing" constant="8" id="efC-hy-bMq"/>
-                <constraint firstAttribute="trailing" secondItem="9BZ-pG-ZEW" secondAttribute="trailing" constant="8" id="h5E-9l-Rlm"/>
-                <constraint firstItem="9BZ-pG-ZEW" firstAttribute="leading" secondItem="sgY-8u-Li4" secondAttribute="leading" constant="8" id="hQs-cT-U4g"/>
                 <constraint firstItem="r0u-XH-URQ" firstAttribute="top" secondItem="ZFe-Yi-fiG" secondAttribute="bottom" constant="40" id="jhX-jF-olu"/>
-                <constraint firstItem="r0u-XH-URQ" firstAttribute="leading" secondItem="sgY-8u-Li4" secondAttribute="leading" constant="8" id="zS0-UO-C49"/>
+                <constraint firstItem="xd9-q4-UZz" firstAttribute="leading" secondItem="r0u-XH-URQ" secondAttribute="leading" id="l1R-XK-zo9"/>
+                <constraint firstItem="r0u-XH-URQ" firstAttribute="centerX" secondItem="sgY-8u-Li4" secondAttribute="centerX" id="q7C-bg-fOd"/>
             </constraints>
             <connections>
                 <outlet property="backgroundHeight" destination="HKL-uV-eF3" id="Qaf-DX-a9f"/>
@@ -167,7 +173,7 @@
     </objects>
     <resources>
         <image name="Clear" width="9" height="9"/>
-        <image name="HomepageLogo" width="160" height="160"/>
+        <image name="HomepageLogo" width="192" height="192"/>
         <image name="Search" width="14" height="14"/>
         <namedColor name="AddressBarBackgroundColor">
             <color red="1" green="1" blue="1" alpha="1" colorSpace="custom" customColorSpace="displayP3"/>

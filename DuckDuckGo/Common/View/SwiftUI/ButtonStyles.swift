@@ -44,14 +44,15 @@ struct DefaultActionButtonStyle: ButtonStyle {
 
     func makeBody(configuration: Self.Configuration) -> some View {
 
-        let backgroundColor = configuration.isPressed ? Color(NSColor.controlAccentColor).opacity(0.5) : Color(NSColor.controlAccentColor)
-        let labelColor = enabled ? Color("PWMActionButtonLabel") : Color("PWMActionButtonLabel").opacity(0.5)
+        let enabledBackgroundColor = configuration.isPressed ? Color(NSColor.controlAccentColor).opacity(0.5) : Color(NSColor.controlAccentColor)
+        let disabledBackgroundColor = Color.gray.opacity(0.1)
+        let labelColor = enabled ? Color("PWMActionButtonLabel") : Color.primary.opacity(0.3)
 
         configuration.label
             .font(.custom("SFProText-Regular", size: 13))
             .padding(.vertical, 3.5)
             .padding(.horizontal, 12)
-            .background(backgroundColor)
+            .background(enabled ? enabledBackgroundColor : disabledBackgroundColor)
             .foregroundColor(labelColor)
             .cornerRadius(5)
 

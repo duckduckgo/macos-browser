@@ -56,8 +56,9 @@ final class MoreOptionsMenu: NSMenu {
 #if FEEDBACK
 
         addItem(withTitle: "Send Feedback", action: #selector(AppDelegate.openFeedback(_:)), keyEquivalent: "")
-            .withImage(NSImage(named: "Feedback"))
+            .withImage(NSImage(named: "BetaLabel"))
             .firingPixel(.feedback)
+
         addItem(NSMenuItem.separator())
 
 #endif
@@ -79,8 +80,9 @@ final class MoreOptionsMenu: NSMenu {
         addPageItems()
 
         let preferencesItem = NSMenuItem(title: UserText.preferences, action: #selector(openPreferences(_:)), keyEquivalent: "")
-        preferencesItem.target = self
-        preferencesItem.image = NSImage(named: "Preferences")
+            .targetting(self)
+            .withImage(NSImage(named: "Preferences"))
+            .firingPixel(Pixel.Event.MoreResult.preferences)
         addItem(preferencesItem)
     }
 

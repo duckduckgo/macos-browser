@@ -59,8 +59,8 @@ final class FireTests: XCTestCase {
 
         fire.burnAll(tabCollectionViewModel: tabCollectionViewModel)
 
-        XCTAssert(manager.removeAllWebsiteDataCalled)
-        XCTAssert(historyCoordinator.burnHistoryCalled)
+        XCTAssert(manager.clearCalled)
+        XCTAssert(historyCoordinator.burnCalled)
         XCTAssert(permissionManager.burnPermissionsCalled)
         XCTAssertNil(tabCollectionViewModel.tabCollection.lastRemovedTabCache)
     }

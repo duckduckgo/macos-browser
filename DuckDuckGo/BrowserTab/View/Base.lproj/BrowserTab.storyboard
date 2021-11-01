@@ -26,7 +26,7 @@
                                 <subviews>
                                     <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="RNn-86-Wkx">
                                         <rect key="frame" x="140" y="253" width="232" height="17"/>
-                                        <textFieldCell key="cell" lineBreakMode="clipping" title="DuckDuckGo can't load this page." id="W60-yd-bv3">
+                                        <textFieldCell key="cell" lineBreakMode="clipping" title="DuckDuckGo can’t load this page." id="W60-yd-bv3">
                                             <font key="font" metaFont="systemSemibold" size="14"/>
                                             <color key="textColor" name="labelColor" catalog="System" colorSpace="catalog"/>
                                             <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
@@ -59,7 +59,7 @@
                                     <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="v5b-uq-Sj6">
                                         <rect key="frame" x="10" y="10" width="123" height="15"/>
                                         <textFieldCell key="cell" lineBreakMode="clipping" title="https://example.com/" id="V9k-YC-WHR">
-                                            <font key="font" metaFont="system" size="12"/>
+                                            <font key="font" metaFont="cellTitle"/>
                                             <color key="textColor" name="labelColor" catalog="System" colorSpace="catalog"/>
                                             <color key="backgroundColor" name="BrowserTabBackgroundColor"/>
                                         </textFieldCell>
@@ -81,7 +81,6 @@
                                     <userDefinedRuntimeAttribute type="number" keyPath="borderWidth">
                                         <real key="value" value="0.0"/>
                                     </userDefinedRuntimeAttribute>
-                                    <userDefinedRuntimeAttribute type="boolean" keyPath="showShadow" value="YES"/>
                                 </userDefinedRuntimeAttributes>
                             </customView>
                         </subviews>

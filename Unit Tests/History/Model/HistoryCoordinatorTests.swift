@@ -24,12 +24,12 @@ class HistoryCoordinatorTests: XCTestCase {
     func testWhenHistoryCoordinatorIsInitialized_ThenHistoryIsCleanedAndLoadedFromTheStore() {
         let (historyStoringMock, _) = HistoryCoordinator.aHistoryCoordinator
 
-        XCTAssert(historyStoringMock.cleanAndReloadHistoryCalled)
+        XCTAssert(historyStoringMock.cleanOldCalled)
     }
 
     func testWhenAddVisitIsCalledBeforeHistoryIsLoadedFromStorage_ThenVisitIsIgnored() {
         let historyStoringMock = HistoryStoringMock()
-        historyStoringMock.cleanAndReloadHistoryResult = nil
+        historyStoringMock.cleanOldResult = nil
         let historyCoordinator = HistoryCoordinator(historyStoring: historyStoringMock)
 
         let url = URL.duckDuckGo
@@ -130,9 +130,8 @@ class HistoryCoordinatorTests: XCTestCase {
 
         let fireproofDomains = FireproofDomains()
         fireproofDomains.addToAllowed(domain: fireproofDomain)
-        historyCoordinator.burnHistory(except: fireproofDomains) {
-            XCTAssert(historyStoringMock.cleanAndReloadHistoryExceptions.count == 1)
-            XCTAssert(historyStoringMock.cleanAndReloadHistoryExceptions.first!.url.host!.hasPrefix(fireproofDomain))
+        historyCoordinator.burn(except: fireproofDomains) {
+            XCTAssert(historyStoringMock.removeEntriesArray.count == 3)
         }
     }
 
@@ -234,7 +233,8 @@ fileprivate extension HistoryCoordinator {
 
     static var aHistoryCoordinator: (HistoryStoringMock, HistoryCoordinator) {
         let historyStoringMock = HistoryStoringMock()
-        historyStoringMock.cleanAndReloadHistoryResult = .success(History())
+        historyStoringMock.cleanOldResult = .success(History())
+        historyStoringMock.removeEntriesResult = .success(History())
         let historyCoordinator = HistoryCoordinator(historyStoring: historyStoringMock)
         Thread.sleep(forTimeInterval: 0.1)
 
