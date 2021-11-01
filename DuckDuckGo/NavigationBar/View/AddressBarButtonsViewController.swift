@@ -28,6 +28,7 @@ protocol AddressBarButtonsViewControllerDelegate: AnyObject {
 }
 
 // swiftlint:disable type_body_length
+// swiftlint:disable file_length
 final class AddressBarButtonsViewController: NSViewController {
 
     static let homeFaviconImage = NSImage(named: "HomeFavicon")
@@ -105,6 +106,7 @@ final class AddressBarButtonsViewController: NSViewController {
 
     private var selectedTabViewModelCancellable: AnyCancellable?
     private var urlCancellable: AnyCancellable?
+    private var isLoadingCancellable: AnyCancellable?
     private var trackerInfoCancellable: AnyCancellable?
     private var bookmarkListCancellable: AnyCancellable?
     private var privacyDashboadPendingUpdatesCancellable: AnyCancellable?
@@ -397,6 +399,7 @@ final class AddressBarButtonsViewController: NSViewController {
         selectedTabViewModelCancellable = tabCollectionViewModel.$selectedTabViewModel.receive(on: DispatchQueue.main).sink { [weak self] _ in
             self?.stopAnimations()
             self?.subscribeToUrl()
+            self?.subscribeToIsLoading()
             self?.subscribeToPermissions()
             self?.subscribeToTrackerAnimationTrigger()
         }
@@ -413,6 +416,16 @@ final class AddressBarButtonsViewController: NSViewController {
         urlCancellable = selectedTabViewModel.tab.$content.receive(on: DispatchQueue.main).sink { [weak self] _ in
             self?.stopAnimations()
             self?.updateBookmarkButtonImage()
+        }
+    }
+
+    private func subscribeToIsLoading() {
+        isLoadingCancellable?.cancel()
+
+        guard let selectedTabViewModel = tabCollectionViewModel.selectedTabViewModel else { return }
+
+        isLoadingCancellable = selectedTabViewModel.$isLoading.receive(on: DispatchQueue.main).sink { [weak self] _ in
+            self?.updatePrivacyEntryPointButton()
         }
     }
 
@@ -519,6 +532,7 @@ final class AddressBarButtonsViewController: NSViewController {
             isTextFieldEditorFirstResponder ||
             isDuckDuckGoUrl ||
             !isHypertextUrl ||
+            selectedTabViewModel.isLoading ||
             selectedTabViewModel.errorViewState.isVisible
         imageButtonWrapper.isHidden = !privacyEntryPointButton.isHidden || trackerAnimationView.isAnimationPlaying
     }
@@ -528,7 +542,7 @@ final class AddressBarButtonsViewController: NSViewController {
             return
         }
 
-        guard !trackerAnimationView.isAnimationPlaying else {
+        guard !trackerAnimationView.isAnimationPlaying || selectedTabViewModel.isLoading else {
             privacyEntryPointButton.image = nil
             return
         }
@@ -698,3 +712,6 @@ extension TabCollectionViewModel: AnimationImageProvider {
     }
 
 }
+
+// swiftlint:enable type_body_length
+// swiftlint:enable file_length
