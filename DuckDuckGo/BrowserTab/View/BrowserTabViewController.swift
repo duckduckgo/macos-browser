@@ -123,6 +123,7 @@ final class BrowserTabViewController: NSViewController {
         webView.autoresizingMask = [.width, .height]
 
         let container = NSView(frame: view.bounds)
+        container.autoresizingMask = [.width, .height]
         view.addSubview(container)
         container.addSubview(webView)
         self.webViewContainer = container
