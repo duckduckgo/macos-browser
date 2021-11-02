@@ -31,7 +31,8 @@ final class BrowserTabViewController: NSViewController {
     @IBOutlet weak var errorMessageLabel: NSTextField!
     @IBOutlet weak var hoverLabel: NSTextField!
     @IBOutlet weak var hoverLabelContainer: NSView!
-    weak var webView: WebView?
+    private weak var webView: WebView?
+    private weak var webViewContainer: NSView?
 
     var tabViewModel: TabViewModel?
 
@@ -92,11 +93,23 @@ final class BrowserTabViewController: NSViewController {
     }
 
     private func showHomepage() {
-        self.webView?.removeFromSuperview()
+        removeWebViewFromHierarchy()
         removePreferencesPage()
         removeBookmarksPage()
 
         view.addAndLayout(homepageView)
+    }
+
+    private func removeWebViewFromHierarchy(webView: WebView? = nil,
+                                            container: NSView? = nil) {
+        guard let webView = webView ?? self.webView,
+              let container = container ?? self.webViewContainer
+        else { return }
+
+        // close fullscreenWindowController when closing tab in FullScreen mode
+        webView.fullscreenWindowController?.close()
+        webView.removeFromSuperview()
+        container.removeFromSuperview()
     }
 
     private func addWebViewToViewHierarchy(_ webView: WebView) {
@@ -108,7 +121,11 @@ final class BrowserTabViewController: NSViewController {
 
         webView.frame = view.bounds
         webView.autoresizingMask = [.width, .height]
-        view.addSubview(webView)
+
+        let container = NSView(frame: view.bounds)
+        view.addSubview(container)
+        container.addSubview(webView)
+        self.webViewContainer = container
 
         // Make sure this is on top
         view.addSubview(hoverLabelContainer)
@@ -128,25 +145,20 @@ final class BrowserTabViewController: NSViewController {
             addWebViewToViewHierarchy(newWebView)
         }
 
-        func removeOldWebView(_ oldWebView: WebView?) {
-            if let oldWebView = oldWebView, view.subviews.contains(oldWebView) {
-                oldWebView.removeFromSuperview()
-            }
-        }
-
         guard let tabViewModel = tabCollectionViewModel.selectedTabViewModel else {
             self.tabViewModel = nil
-            removeOldWebView(webView)
+            removeWebViewFromHierarchy()
             return
         }
 
         guard self.tabViewModel !== tabViewModel else { return }
 
         let oldWebView = webView
+        let webViewContainer = webViewContainer
         displayWebView(of: tabViewModel)
         subscribeToUrl(of: tabViewModel)
         self.tabViewModel = tabViewModel
-        removeOldWebView(oldWebView)
+        removeWebViewFromHierarchy(webView: oldWebView, container: webViewContainer)
     }
 
     func subscribeToUrl(of tabViewModel: TabViewModel) {
@@ -216,14 +228,14 @@ final class BrowserTabViewController: NSViewController {
         case .bookmarks:
             self.homepageView.removeFromSuperview()
             removePreferencesPage()
-            self.webView?.removeFromSuperview()
+            removeWebViewFromHierarchy()
             self.addChild(bookmarksViewController)
             view.addAndLayout(bookmarksViewController.view)
 
         case .preferences:
             self.homepageView.removeFromSuperview()
             removeBookmarksPage()
-            self.webView?.removeFromSuperview()
+            removeWebViewFromHierarchy()
             self.addChild(preferencesViewController)
             view.addAndLayout(preferencesViewController.view)
 
@@ -238,14 +250,14 @@ final class BrowserTabViewController: NSViewController {
         case .homepage:
             removeBookmarksPage()
             removePreferencesPage()
-            self.webView?.removeFromSuperview()
+            removeWebViewFromHierarchy()
             showHomepage()
 
         case .none:
             self.homepageView.removeFromSuperview()
             removeBookmarksPage()
             removePreferencesPage()
-            self.webView?.removeFromSuperview()
+            removeWebViewFromHierarchy()
         }
     }
 
@@ -341,7 +353,6 @@ extension BrowserTabViewController: TabDelegate {
 
     func closeTab(_ tab: Tab) {
         guard let index = tabCollectionViewModel.tabCollection.tabs.firstIndex(of: tab) else {
-
             return
         }
         tabCollectionViewModel.remove(at: index)
