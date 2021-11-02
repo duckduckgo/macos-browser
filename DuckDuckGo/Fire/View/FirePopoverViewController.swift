@@ -33,9 +33,6 @@ final class FirePopoverViewController: NSViewController {
     private var firePopoverViewModel: FirePopoverViewModel
     private let historyCoordinating: HistoryCoordinating
 
-    @UserDefaultsWrapper(key: .fireInfoPresentedOnce, defaultValue: false)
-    var infoPresentedOnce: Bool
-
     @IBOutlet weak var optionsButton: NSPopUpButton!
     @IBOutlet weak var openDetailsButton: NSButton!
     @IBOutlet weak var closeDetailsButton: NSButton!
@@ -46,7 +43,6 @@ final class FirePopoverViewController: NSViewController {
     @IBOutlet weak var collectionView: NSCollectionView!
     @IBOutlet weak var collectionViewBottomConstraint: NSLayoutConstraint!
     @IBOutlet weak var warningWrapperView: NSView!
-    @IBOutlet weak var infoContainerView: NSView!
     @IBOutlet weak var clearButton: NSButton!
 
     private var viewModelCancellable: AnyCancellable?
@@ -56,7 +52,8 @@ final class FirePopoverViewController: NSViewController {
         fatalError("FirePopoverViewController: Bad initializer")
     }
 
-    init?(coder: NSCoder, fireViewModel: FireViewModel,
+    init?(coder: NSCoder,
+          fireViewModel: FireViewModel,
           tabCollectionViewModel: TabCollectionViewModel,
           historyCoordinating: HistoryCoordinating = HistoryCoordinator.shared,
           fireproofDomains: FireproofDomains = FireproofDomains.shared,
@@ -83,7 +80,6 @@ final class FirePopoverViewController: NSViewController {
         setupOptionsButton()
         updateCloseDetailsButton()
         updateWarningWrapperView()
-        removeInfoContainerViewIfNeeded()
 
         subscribeToViewModel()
         subscribeToSelected()
@@ -201,13 +197,6 @@ final class FirePopoverViewController: NSViewController {
     private func setupOptionsButton() {
         FirePopoverViewModel.ClearingOption.allCases.enumerated().forEach { (index, option) in
             optionsButton.menu?.item(withTag: index)?.title = option.string
-        }
-    }
-
-    private func removeInfoContainerViewIfNeeded() {
-        if infoPresentedOnce {
-            infoContainerView?.removeFromSuperview()
-            infoContainerView = nil
         }
     }
 

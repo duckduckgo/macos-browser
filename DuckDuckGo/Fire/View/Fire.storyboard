@@ -395,20 +395,12 @@ Gw
                                     <constraint firstAttribute="height" constant="60" id="onw-qY-te8"/>
                                 </constraints>
                             </customView>
-                            <containerView translatesAutoresizingMaskIntoConstraints="NO" id="WCe-Mc-jz7" propertyAccessControl="all">
-                                <rect key="frame" x="0.0" y="0.0" width="320" height="250"/>
-                                <connections>
-                                    <segue destination="hqb-gn-5gp" kind="embed" id="Icn-nq-7B7"/>
-                                </connections>
-                            </containerView>
                         </subviews>
                         <constraints>
                             <constraint firstAttribute="trailing" secondItem="ACx-m8-z0K" secondAttribute="trailing" id="3dH-oe-VKH"/>
                             <constraint firstItem="6vZ-d2-qnR" firstAttribute="leading" secondItem="dGd-Gc-P2e" secondAttribute="leading" id="Anc-Gh-sNK"/>
                             <constraint firstItem="ACx-m8-z0K" firstAttribute="leading" secondItem="dGd-Gc-P2e" secondAttribute="leading" id="FH3-vT-iON"/>
-                            <constraint firstItem="WCe-Mc-jz7" firstAttribute="top" secondItem="dGd-Gc-P2e" secondAttribute="top" id="IcR-sy-EB5"/>
                             <constraint firstAttribute="trailing" secondItem="6vZ-d2-qnR" secondAttribute="trailing" id="Kyw-38-ua5"/>
-                            <constraint firstAttribute="bottom" secondItem="WCe-Mc-jz7" secondAttribute="bottom" id="NAx-fl-1Ni"/>
                             <constraint firstItem="nId-He-RIU" firstAttribute="leading" secondItem="dGd-Gc-P2e" secondAttribute="leading" id="R5q-Fw-y3V"/>
                             <constraint firstItem="6vZ-d2-qnR" firstAttribute="top" secondItem="3Jn-h4-fXL" secondAttribute="bottom" id="SiT-y0-otC"/>
                             <constraint firstAttribute="trailing" secondItem="nId-He-RIU" secondAttribute="trailing" id="UP0-3m-4QV"/>
@@ -421,8 +413,6 @@ Gw
                             <constraint firstAttribute="trailing" secondItem="r7f-Ig-GcB" secondAttribute="trailing" id="kNz-fP-3Iv"/>
                             <constraint firstAttribute="trailing" secondItem="3Jn-h4-fXL" secondAttribute="trailing" id="nnI-mg-tvm"/>
                             <constraint firstAttribute="bottom" secondItem="nId-He-RIU" secondAttribute="bottom" id="oF4-VF-B5Y"/>
-                            <constraint firstItem="WCe-Mc-jz7" firstAttribute="leading" secondItem="dGd-Gc-P2e" secondAttribute="leading" id="sDE-XV-36n"/>
-                            <constraint firstAttribute="trailing" secondItem="WCe-Mc-jz7" secondAttribute="trailing" id="wcD-et-vyX"/>
                         </constraints>
                         <userDefinedRuntimeAttributes>
                             <userDefinedRuntimeAttribute type="color" keyPath="backgroundColor">
@@ -439,7 +429,6 @@ Gw
                         <outlet property="contentHeightConstraint" destination="hbg-4i-hjT" id="mC2-Ot-onY"/>
                         <outlet property="detailsWrapperView" destination="6vZ-d2-qnR" id="TKb-Ux-TIk"/>
                         <outlet property="detailsWrapperViewHeightContraint" destination="sJt-dl-rlH" id="7pa-Kc-9xB"/>
-                        <outlet property="infoContainerView" destination="WCe-Mc-jz7" id="bYw-KY-Zy8"/>
                         <outlet property="openDetailsButton" destination="ACx-m8-z0K" id="cu4-zz-MhA"/>
                         <outlet property="optionsButton" destination="ckJ-6G-38h" id="xSK-KE-yMk"/>
                         <outlet property="warningWrapperView" destination="r7f-Ig-GcB" id="cSU-Xr-Bin"/>
@@ -447,7 +436,48 @@ Gw
                 </viewController>
                 <customObject id="fzV-LM-GvK" userLabel="First Responder" customClass="NSResponder" sceneMemberID="firstResponder"/>
             </objects>
-            <point key="canvasLocation" x="623" y="65"/>
+            <point key="canvasLocation" x="1054" y="512"/>
+        </scene>
+        <!--Fire Popover Wrapper View Controller-->
+        <scene sceneID="lY9-rI-KGe">
+            <objects>
+                <viewController storyboardIdentifier="FirePopoverWrapperViewController" id="tVa-jC-2sf" customClass="FirePopoverWrapperViewController" customModule="DuckDuckGo_Privacy_Browser" customModuleProvider="target" sceneMemberID="viewController">
+                    <view key="view" id="MAm-om-86j">
+                        <rect key="frame" x="0.0" y="0.0" width="320" height="250"/>
+                        <autoresizingMask key="autoresizingMask"/>
+                        <subviews>
+                            <containerView hidden="YES" translatesAutoresizingMaskIntoConstraints="NO" id="hQC-gC-rhn">
+                                <rect key="frame" x="0.0" y="0.0" width="320" height="250"/>
+                                <connections>
+                                    <segue destination="hqb-gn-5gp" kind="embed" destinationCreationSelector="createFireInfoViewController:" id="Kqq-oK-w9X"/>
+                                </connections>
+                            </containerView>
+                            <containerView hidden="YES" translatesAutoresizingMaskIntoConstraints="NO" id="hnY-hP-VSW">
+                                <rect key="frame" x="0.0" y="0.0" width="320" height="250"/>
+                                <connections>
+                                    <segue destination="DMI-mh-xLJ" kind="embed" destinationCreationSelector="createFirePopoverViewController:" id="dT4-mE-M8b"/>
+                                </connections>
+                            </containerView>
+                        </subviews>
+                        <constraints>
+                            <constraint firstItem="hnY-hP-VSW" firstAttribute="top" secondItem="MAm-om-86j" secondAttribute="top" id="FDF-kU-dRg"/>
+                            <constraint firstAttribute="trailing" secondItem="hQC-gC-rhn" secondAttribute="trailing" id="GFS-lO-blz"/>
+                            <constraint firstAttribute="bottom" secondItem="hnY-hP-VSW" secondAttribute="bottom" id="Ggc-TY-taI"/>
+                            <constraint firstItem="hQC-gC-rhn" firstAttribute="leading" secondItem="MAm-om-86j" secondAttribute="leading" id="ecJ-eB-ecJ"/>
+                            <constraint firstItem="hnY-hP-VSW" firstAttribute="leading" secondItem="MAm-om-86j" secondAttribute="leading" id="rKw-cI-Yjc"/>
+                            <constraint firstAttribute="trailing" secondItem="hnY-hP-VSW" secondAttribute="trailing" id="xP9-RL-Lto"/>
+                            <constraint firstItem="hQC-gC-rhn" firstAttribute="top" secondItem="MAm-om-86j" secondAttribute="top" id="ydM-w5-XgO"/>
+                            <constraint firstAttribute="bottom" secondItem="hQC-gC-rhn" secondAttribute="bottom" id="zlJ-hk-T67"/>
+                        </constraints>
+                    </view>
+                    <connections>
+                        <outlet property="infoView" destination="hQC-gC-rhn" id="b3R-6w-u6p"/>
+                        <outlet property="popoverView" destination="hnY-hP-VSW" id="iDv-6v-A2a"/>
+                    </connections>
+                </viewController>
+                <customObject id="ShS-nn-GCs" userLabel="First Responder" customClass="NSResponder" sceneMemberID="firstResponder"/>
+            </objects>
+            <point key="canvasLocation" x="839" y="65"/>
         </scene>
         <!--Fire Info View Controller-->
         <scene sceneID="lUp-2i-9rp">
@@ -523,7 +553,7 @@ DQ
                     </view>
                 </viewController>
             </objects>
-            <point key="canvasLocation" x="623" y="435"/>
+            <point key="canvasLocation" x="622" y="512"/>
         </scene>
     </scenes>
     <resources>
