@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<document type="com.apple.InterfaceBuilder3.Cocoa.Storyboard.XIB" version="3.0" toolsVersion="19162" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none" useAutolayout="YES" initialViewController="bU7-R8-ocO">
+<document type="com.apple.InterfaceBuilder3.Cocoa.Storyboard.XIB" version="3.0" toolsVersion="19455" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none" useAutolayout="YES" initialViewController="bU7-R8-ocO">
     <dependencies>
         <deployment identifier="macosx"/>
-        <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="19162"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="19455"/>
         <capability name="Named colors" minToolsVersion="9.0"/>
         <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
     </dependencies>
@@ -56,7 +56,7 @@
                                         <imageCell key="cell" refusesFirstResponder="YES" alignment="left" imageScaling="proportionallyDown" image="BurnAlert" id="JSo-Q5-FYr"/>
                                     </imageView>
                                     <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="1tt-F5-h1d">
-                                        <rect key="frame" x="82" y="59" width="135" height="14"/>
+                                        <rect key="frame" x="83" y="59" width="134" height="14"/>
                                         <textFieldCell key="cell" lineBreakMode="clipping" title="Deleting browsing data…" id="MnK-PN-hYp">
                                             <font key="font" metaFont="smallSystem"/>
                                             <color key="textColor" name="labelColor" catalog="System" colorSpace="catalog"/>
@@ -143,7 +143,7 @@
                                         <imageCell key="cell" refusesFirstResponder="YES" alignment="left" imageScaling="proportionallyDown" image="FireHeader" id="Dql-dm-pHB"/>
                                     </imageView>
                                     <popUpButton translatesAutoresizingMaskIntoConstraints="NO" id="ckJ-6G-38h">
-                                        <rect key="frame" x="115" y="23" width="131" height="35"/>
+                                        <rect key="frame" x="114" y="22" width="133" height="37"/>
                                         <constraints>
                                             <constraint firstAttribute="height" constant="30" id="AOr-Ku-GpD"/>
                                             <constraint firstAttribute="width" constant="127" id="f5G-AU-bU2"/>
@@ -215,7 +215,7 @@
                                                 <rect key="frame" x="0.0" y="0.0" width="320" height="42"/>
                                                 <userDefinedRuntimeAttributes>
                                                     <userDefinedRuntimeAttribute type="color" keyPath="backgroundColor">
-                                                        <color key="value" name="FirePopoverSecondaryBackground"/>
+                                                        <color key="value" name="FirePopoverPanelBackground"/>
                                                     </userDefinedRuntimeAttribute>
                                                 </userDefinedRuntimeAttributes>
                                             </customView>
@@ -271,7 +271,7 @@
                                                     <collectionViewFlowLayout key="collectionViewLayout" id="VZx-7u-HhL">
                                                         <size key="itemSize" width="318" height="24"/>
                                                     </collectionViewFlowLayout>
-                                                    <color key="primaryBackgroundColor" name="InterfaceBackgroundColor"/>
+                                                    <color key="primaryBackgroundColor" name="FirePopoverListBackground"/>
                                                 </collectionView>
                                             </subviews>
                                             <color key="backgroundColor" name="InterfaceBackgroundColor"/>
@@ -304,7 +304,7 @@
                                         <rect key="frame" x="0.0" y="0.0" width="320" height="32"/>
                                         <userDefinedRuntimeAttributes>
                                             <userDefinedRuntimeAttribute type="color" keyPath="backgroundColor">
-                                                <color key="value" name="FirePopoverSecondaryBackground"/>
+                                                <color key="value" name="FirePopoverPanelBackground"/>
                                             </userDefinedRuntimeAttribute>
                                         </userDefinedRuntimeAttributes>
                                     </customView>
@@ -545,8 +545,11 @@ DQ
         <namedColor name="FireBackground">
             <color red="1" green="1" blue="1" alpha="0.5" colorSpace="custom" customColorSpace="sRGB"/>
         </namedColor>
-        <namedColor name="FirePopoverSecondaryBackground">
-            <color red="0.98039215686274506" green="0.98039215686274506" blue="0.98039215686274506" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+        <namedColor name="FirePopoverListBackground">
+            <color red="1" green="1" blue="1" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+        </namedColor>
+        <namedColor name="FirePopoverPanelBackground">
+            <color red="0.98000001907348633" green="0.98000001907348633" blue="0.98000001907348633" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
         </namedColor>
         <namedColor name="GreyTextColor">
             <color red="0.20000000000000001" green="0.20000000000000001" blue="0.20000000000000001" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
