@@ -68,6 +68,15 @@
             </BuildableReference>
             <SkippedTests>
                <Test
+                  Identifier = "DownloadListCoordinatorTests/testWhenAddedDownloadRestartedWithResumeDataThenResumeIsCalled()">
+               </Test>
+               <Test
+                  Identifier = "DownloadListCoordinatorTests/testWhenDownloadRestartedWithoutResumeDataThenDownloadIsStarted()">
+               </Test>
+               <Test
+                  Identifier = "DownloadListCoordinatorTests/testWhenPreloadedDownloadRestartedWithResumeDataThenResumeIsCalled()">
+               </Test>
+               <Test
                   Identifier = "EncryptionKeyStoreTests">
                </Test>
                <Test
