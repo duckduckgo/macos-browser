@@ -26,6 +26,7 @@ protocol FaviconService {
     func fetchFavicon(_ faviconUrl: URL?, for host: String, isFromUserScript: Bool, completion: @escaping (NSImage?, Error?) -> Void)
     func getCachedFavicon(for host: String, mustBeFromUserScript: Bool) -> NSImage?
     func cacheIfNeeded(favicon: NSImage, for host: String, isFromUserScript: Bool)
+    func invalidateCache()
 
 }
 
@@ -134,7 +135,7 @@ final class LocalFaviconService: FaviconService {
         invalidateCache()
     }
     
-    private func invalidateCache() {
+    func invalidateCache() {
         cache = [String: CacheEntry]()
     }
 

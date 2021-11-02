@@ -34,4 +34,7 @@ final class FaviconServiceMock: FaviconService {
     func cacheIfNeeded(favicon: NSImage, for host: String, isFromUserScript: Bool) {
     }
 
+    func invalidateCache() {
+    }
+
 }

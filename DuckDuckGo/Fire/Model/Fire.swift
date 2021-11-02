@@ -26,6 +26,7 @@ final class Fire {
     let permissionManager: PermissionManagerProtocol
     let downloadListCoordinator: DownloadListCoordinator
     let windowControllerManager: WindowControllersManager
+    let faviconService: FaviconService
 
     @Published private(set) var isBurning = false
 
@@ -33,12 +34,14 @@ final class Fire {
          historyCoordinating: HistoryCoordinating = HistoryCoordinator.shared,
          permissionManager: PermissionManagerProtocol = PermissionManager.shared,
          downloadListCoordinator: DownloadListCoordinator = DownloadListCoordinator.shared,
-         windowControllerManager: WindowControllersManager = WindowControllersManager.shared) {
+         windowControllerManager: WindowControllersManager = WindowControllersManager.shared,
+         faviconService: FaviconService = LocalFaviconService.shared) {
         self.webCacheManager = cacheManager
         self.historyCoordinating = historyCoordinating
         self.permissionManager = permissionManager
         self.downloadListCoordinator = downloadListCoordinator
         self.windowControllerManager = windowControllerManager
+        self.faviconService = faviconService
     }
 
     func burnDomains(_ domains: Set<String>, completion: (() -> Void)? = nil) {
@@ -74,6 +77,11 @@ final class Fire {
             group.leave()
         })
 
+        group.enter()
+        burnFavicons {
+            group.leave()
+        }
+
         group.notify(queue: .main) {
             self.isBurning = false
             completion?()
@@ -106,12 +114,23 @@ final class Fire {
             group.leave()
         }
 
+        group.enter()
+        burnFavicons {
+            group.leave()
+        }
+
         group.notify(queue: .main) {
             self.isBurning = false
             completion?()
 
             os_log("Fire finished", log: .fire)
         }
+    }
+
+    // MARK: - Favicons
+    private func burnFavicons(completion: @escaping () -> Void) {
+        faviconService.invalidateCache()
+        completion()
     }
 
     // MARK: - Web cache
