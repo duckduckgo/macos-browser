@@ -260,7 +260,7 @@ final class DownloadListCoordinatorTests: XCTestCase {
         coordinator.restart(downloadWithIdentifier: DownloadListItem.testFailedItem.identifier)
 
         withExtendedLifetime(c) {
-            waitForExpectations(timeout: 1)
+            waitForExpectations(timeout: 5)
         }
         XCTAssertEqual(coordinator.downloads(sortedBy: \.modified, ascending: true).count, 1)
     }
@@ -314,7 +314,7 @@ final class DownloadListCoordinatorTests: XCTestCase {
         coordinator.restart(downloadWithIdentifier: id)
 
         withExtendedLifetime(c) {
-            waitForExpectations(timeout: 1)
+            waitForExpectations(timeout: 5)
         }
         XCTAssertEqual(coordinator.downloads(sortedBy: \.modified, ascending: true).count, 1)
     }
@@ -367,7 +367,7 @@ final class DownloadListCoordinatorTests: XCTestCase {
         coordinator.restart(downloadWithIdentifier: DownloadListItem.testFailedItem.identifier)
 
         withExtendedLifetime(c) {
-            waitForExpectations(timeout: 1)
+            waitForExpectations(timeout: 5)
         }
         XCTAssertEqual(coordinator.downloads(sortedBy: \.modified, ascending: true).count, 1)
     }
