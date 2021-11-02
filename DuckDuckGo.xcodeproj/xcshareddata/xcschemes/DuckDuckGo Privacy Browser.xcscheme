@@ -71,6 +71,24 @@
                   Identifier = "EncryptionKeyStoreTests">
                </Test>
                <Test
+                  Identifier = "PermissionModelTests/testWhenCameraAndMicAreRevokedThenStopMediaCaptureIsCalled()">
+               </Test>
+               <Test
+                  Identifier = "PermissionModelTests/testWhenCameraAndMicPermissionIsGrantedThenItIsProvidedToDecisionHandler()">
+               </Test>
+               <Test
+                  Identifier = "PermissionModelTests/testWhenCameraIsRevokedThenStopMediaCaptureIsCalled()">
+               </Test>
+               <Test
+                  Identifier = "PermissionModelTests/testWhenDeniedPermissionIsStoredThenActivePermissionIsRevoked()">
+               </Test>
+               <Test
+                  Identifier = "PermissionModelTests/testWhenMicrophoneIsMutedThenSetMediaCaptureMutedIsCalled()">
+               </Test>
+               <Test
+                  Identifier = "PermissionModelTests/testWhenMicrophoneIsRevokedThenStopMediaCaptureIsCalled()">
+               </Test>
+               <Test
                   Identifier = "PixelTests/testWhenErrorPixelIsFiredThenParametersAdded()">
                </Test>
             </SkippedTests>
@@ -92,16 +110,6 @@
                   Identifier = "EncryptionKeyStoreTests">
                </Test>
             </SkippedTests>
-         </TestableReference>
-         <TestableReference
-            skipped = "NO">
-            <BuildableReference
-               BuildableIdentifier = "primary"
-               BlueprintIdentifier = "7B4CE8D926F02108009134B1"
-               BuildableName = "UI Tests.xctest"
-               BlueprintName = "UI Tests"
-               ReferencedContainer = "container:DuckDuckGo.xcodeproj">
-            </BuildableReference>
          </TestableReference>
       </Testables>
    </TestAction>
