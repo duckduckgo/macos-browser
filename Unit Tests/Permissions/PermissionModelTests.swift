@@ -146,7 +146,7 @@ final class PermissionModelTests: XCTestCase {
 
         self.webView(webView,
                      requestMediaCapturePermissionFor: securityOrigin,
-                     initiatedBy: frameInfo,
+                     initiatedByFrame: frameInfo,
                      type: .microphone) { _ in }
 
         withExtendedLifetime(c) {
@@ -868,7 +868,7 @@ extension PermissionModelTests: WebViewPermissionsDelegate {
     @available(macOS 12, *)
     func webView(_ webView: WKWebView,
                  requestMediaCapturePermissionFor origin: WKSecurityOrigin,
-                 initiatedBy frame: WKFrameInfo,
+                 initiatedByFrame frame: WKFrameInfo,
                  type: WKMediaCaptureType,
                  decisionHandler: @escaping (WKPermissionDecision) -> Void) {
         guard let permissions = [PermissionType](devices: type) else {
