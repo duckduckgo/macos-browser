@@ -19,6 +19,7 @@
 import Foundation
 import XCTest
 import Combine
+import CoreLocation
 @testable import DuckDuckGo_Privacy_Browser
 
 final class GeolocationServiceTests: XCTestCase {

@@ -16,21 +16,21 @@
     while (domainParts.length > 1 && !unprotectedDomain) {
         const partialDomain = domainParts.join('.')
         unprotectedDomain = `
-        CREDENTIALS_EXCEPTIONS
+        $CREDENTIALS_EXCEPTIONS$
         `.split('\n').filter(domain => domain.trim() === partialDomain).length > 0
         domainParts.shift()
     }
 
     if (!unprotectedDomain && topLevelUrl.host != null) {
         unprotectedDomain = `
-          USER_UNPROTECTED_DOMAINS
+          $USER_UNPROTECTED_DOMAINS$
           `.split('\n').filter(domain => domain.trim() === topLevelUrl.host).length > 0
     }
 
     if (!unprotectedDomain) {
-        init();
+        init()
     }
-    function init() {
+    function init () {
         const script = document.createElement('script')
         script.textContent = `(() => {
             const value = {

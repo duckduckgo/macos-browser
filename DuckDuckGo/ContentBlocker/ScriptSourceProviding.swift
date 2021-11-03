@@ -72,8 +72,8 @@ final class DefaultScriptSourceProvider: ScriptSourceProviding {
         let contentBlockingExceptions = privacyConfiguration.exceptionsList(forFeature: .contentBlocking)
         let protectionStore = DomainsProtectionUserDefaultsStore()
         return ContentBlockerRulesUserScript.loadJS("contentblockerrules", from: .main, withReplacements: [
-            "TEMP_UNPROTECTED_DOMAINS": (unprotectedDomains + contentBlockingExceptions).joined(separator: "\n"),
-            "USER_UNPROTECTED_DOMAINS": protectionStore.unprotectedDomains.joined(separator: "\n")
+            "$TEMP_UNPROTECTED_DOMAINS$": (unprotectedDomains + contentBlockingExceptions).joined(separator: "\n"),
+            "$USER_UNPROTECTED_DOMAINS$": protectionStore.unprotectedDomains.joined(separator: "\n")
         ])
     }
 
@@ -91,12 +91,12 @@ final class DefaultScriptSourceProvider: ScriptSourceProviding {
         let localUnprotectedDomains = protectionStore.unprotectedDomains.joined(separator: "\n")
 
         return ContentBlockerUserScript.loadJS("contentblocker", from: .main, withReplacements: [
-            "IS_DEBUG": isDebugBuild ? "true" : "false",
-            "TEMP_UNPROTECTED_DOMAINS": remoteUnprotectedDomains,
-            "USER_UNPROTECTED_DOMAINS": localUnprotectedDomains,
-            "TRACKER_DATA": trackerData,
-            "SURROGATES": surrogates,
-            "BLOCKING_ENABLED": privacyConfiguration.isEnabled(featureKey: .contentBlocking) ? "true" : "false"
+            "$IS_DEBUG$": isDebugBuild ? "true" : "false",
+            "$TEMP_UNPROTECTED_DOMAINS$": remoteUnprotectedDomains,
+            "$USER_UNPROTECTED_DOMAINS$": localUnprotectedDomains,
+            "$TRACKER_DATA$": trackerData,
+            "$SURROGATES$": surrogates,
+            "$BLOCKING_ENABLED$": privacyConfiguration.isEnabled(featureKey: .contentBlocking) ? "true" : "false"
         ])
     }
     
@@ -108,9 +108,9 @@ final class DefaultScriptSourceProvider: ScriptSourceProviding {
         let localUnprotectedDomains = protectionStore.unprotectedDomains.joined(separator: "\n")
         
         return GPCUserScript.loadJS("gpc", from: .main, withReplacements: [
-            "GPC_ENABLED": privacyConfiguration.isEnabled(featureKey: .gpc) && privSettings.gpcEnabled ? "true" : "false",
-            "GPC_EXCEPTIONS": exceptions.joined(separator: "\n"),
-            "USER_UNPROTECTED_DOMAINS": localUnprotectedDomains
+            "$GPC_ENABLED$": privacyConfiguration.isEnabled(featureKey: .gpc) && privSettings.gpcEnabled ? "true" : "false",
+            "$GPC_EXCEPTIONS$": exceptions.joined(separator: "\n"),
+            "$USER_UNPROTECTED_DOMAINS$": localUnprotectedDomains
         ])
     }
 
@@ -121,8 +121,8 @@ final class DefaultScriptSourceProvider: ScriptSourceProviding {
             return ""
         }
         return NavigatorCredentialsUserScript.loadJS("navigatorCredentials", from: .main, withReplacements: [
-             "USER_UNPROTECTED_DOMAINS": "",
-             "CREDENTIALS_EXCEPTIONS": (unprotectedDomains + contentBlockingExceptions).joined(separator: "\n")
+             "$USER_UNPROTECTED_DOMAINS$": "",
+             "$CREDENTIALS_EXCEPTIONS$": (unprotectedDomains + contentBlockingExceptions).joined(separator: "\n")
         ])
     }
 
