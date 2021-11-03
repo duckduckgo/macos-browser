@@ -187,14 +187,13 @@ final class AddressBarTextField: NSTextField {
         currentEditor()?.selectAll(self)
     }
 
-    private func updateTabUrl(suggestion: Suggestion?) {
+    private func updateTabUrlWithUrl(_ providedUrl: URL?, suggestion: Suggestion?) {
         guard let selectedTabViewModel = tabCollectionViewModel.selectedTabViewModel else {
             os_log("%s: Selected tab view model is nil", type: .error, className)
             return
         }
 
-        guard var url = makeUrl(suggestion: suggestion,
-                                stringValueWithoutSuffix: stringValueWithoutSuffix) else {
+        guard var url = providedUrl else {
             os_log("%s: Making url from address bar string failed", type: .error, className)
             return
         }
@@ -216,7 +215,7 @@ final class AddressBarTextField: NSTextField {
             Pixel.fire(.refresh(source: .reloadURL))
             selectedTabViewModel.tab.reload()
         } else {
-            
+
             Pixel.fire(.navigation(kind: .init(url: url), source: isHomepageAddressBar ? .newTab : (suggestion != nil ? .suggestion : .addressBar)))
             selectedTabViewModel.tab.update(url: url)
         }
@@ -224,9 +223,16 @@ final class AddressBarTextField: NSTextField {
         self.window?.makeFirstResponder(nil)
     }
 
-    private func openNewTab(selected: Bool, suggestion: Suggestion?) {
-        guard let url = makeUrl(suggestion: suggestion,
-                                stringValueWithoutSuffix: stringValueWithoutSuffix) else {
+    private func updateTabUrl(suggestion: Suggestion?) {
+        makeUrl(suggestion: suggestion,
+                stringValueWithoutSuffix: stringValueWithoutSuffix,
+                completion: { [weak self] url in
+                    self?.updateTabUrlWithUrl(url, suggestion: suggestion)
+                })
+    }
+
+    private func openNewTabWithUrl(_ providedUrl: URL?, selected: Bool, suggestion: Suggestion?) {
+        guard let url = providedUrl else {
             os_log("%s: Making url from address bar string failed", type: .error, className)
             return
         }
@@ -236,7 +242,15 @@ final class AddressBarTextField: NSTextField {
         tabCollectionViewModel.append(tab: tab, selected: selected)
     }
 
-    private func makeUrl(suggestion: Suggestion?, stringValueWithoutSuffix: String) -> URL? {
+    private func openNewTab(selected: Bool, suggestion: Suggestion?) {
+        makeUrl(suggestion: suggestion,
+                stringValueWithoutSuffix: stringValueWithoutSuffix,
+                completion: { [weak self] url in
+                    self?.openNewTabWithUrl(url, selected: selected, suggestion: suggestion)
+                })
+    }
+
+    private func makeUrl(suggestion: Suggestion?, stringValueWithoutSuffix: String, completion: @escaping (URL?) -> Void) {
         let finalUrl: URL?
         switch suggestion {
         case .bookmark(title: _, url: let url, isFavorite: _),
@@ -249,7 +263,22 @@ final class AddressBarTextField: NSTextField {
         case .none:
             finalUrl = URL.makeURL(from: stringValueWithoutSuffix)
         }
-        return finalUrl
+
+        guard let url = finalUrl else {
+            completion(finalUrl)
+            return
+        }
+
+        HTTPSUpgrade.shared.isUpgradeable(url: url) { [weak self] isUpgradable in
+            if isUpgradable {
+                let upgradedUrl = url.toHttps()
+                let tab = self?.tabCollectionViewModel.selectedTabViewModel?.tab
+                tab?.setMainFrameConnectionUpgradedTo(upgradedUrl)
+                completion(upgradedUrl)
+            } else {
+                completion(url)
+            }
+        }
     }
 
     // MARK: - Value
