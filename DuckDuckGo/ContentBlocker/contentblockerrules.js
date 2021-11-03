@@ -29,7 +29,7 @@
         const partialDomain = domainParts.join('.')
 
         unprotectedDomain = `
-        TEMP_UNPROTECTED_DOMAINS
+        $TEMP_UNPROTECTED_DOMAINS$
         `.split('\n').filter(domain => domain.trim() === partialDomain).length > 0
 
         domainParts.shift()
@@ -37,7 +37,7 @@
 
     if (!unprotectedDomain && topLevelUrl.host != null) {
         unprotectedDomain = `
-          USER_UNPROTECTED_DOMAINS
+          $USER_UNPROTECTED_DOMAINS$
           `.split('\n').filter(domain => domain.trim() === topLevelUrl.host).length > 0
     }
 

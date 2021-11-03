@@ -22,7 +22,7 @@
         let log = () => {}
         let signpostEvent = () => {}
 
-        if (IS_DEBUG) {
+        if ($IS_DEBUG$) {
             signpostEvent = function signpostEvent (data) {
                 try {
                     webkit.messageHandlers.signpostMessage.postMessage(data)
@@ -430,15 +430,15 @@
 
     // surrogates
     const surrogates = `
-    SURROGATES
+    $SURROGATES$
     `
     // surrogates
 
     // tracker data set
-    const trackerData = TRACKER_DATA
+    const trackerData = $TRACKER_DATA$
     // tracker data set
 
-    const blockingEnabled = BLOCKING_ENABLED
+    const blockingEnabled = $BLOCKING_ENABLED$
 
     // overrides
     Trackers.prototype.findTrackerOwner = function (domain) {
@@ -481,7 +481,7 @@
         const partialDomain = domainParts.join('.')
 
         unprotectedDomain = `
-          TEMP_UNPROTECTED_DOMAINS
+          $TEMP_UNPROTECTED_DOMAINS$
           `.split('\n').filter(domain => domain.trim() === partialDomain).length > 0
 
         domainParts.shift()
@@ -489,7 +489,7 @@
 
     if (!unprotectedDomain && topLevelUrl.host != null) {
         unprotectedDomain = `
-          USER_UNPROTECTED_DOMAINS
+          $USER_UNPROTECTED_DOMAINS$
           `.split('\n').filter(domain => domain.trim() === topLevelUrl.host).length > 0
     }
 
