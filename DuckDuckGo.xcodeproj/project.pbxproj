@@ -577,7 +577,6 @@
 		B6C0B23E26E8BF1F0031CB7F /* DownloadListViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = B6C0B23D26E8BF1F0031CB7F /* DownloadListViewModel.swift */; };
 		B6C0B24426E9CB080031CB7F /* RunLoopExtension.swift in Sources */ = {isa = PBXBuildFile; fileRef = B6C0B24326E9CB080031CB7F /* RunLoopExtension.swift */; };
 		B6C0B24626E9CB190031CB7F /* RunLoopExtensionTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = B6C0B24526E9CB190031CB7F /* RunLoopExtensionTests.swift */; };
-		B6CF288427325DB1003CFAFD /* WKWebView+Download.m in Sources */ = {isa = PBXBuildFile; fileRef = B6CF288327325AE9003CFAFD /* WKWebView+Download.m */; };
 		B6CF78DE267B099C00CD4F13 /* WKNavigationActionExtension.swift in Sources */ = {isa = PBXBuildFile; fileRef = B6CF78DD267B099C00CD4F13 /* WKNavigationActionExtension.swift */; };
 		B6DA44022616B28300DD1EC2 /* PixelDataStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = B6DA44012616B28300DD1EC2 /* PixelDataStore.swift */; };
 		B6DA44082616B30600DD1EC2 /* PixelDataModel.xcdatamodeld in Sources */ = {isa = PBXBuildFile; fileRef = B6DA44062616B30600DD1EC2 /* PixelDataModel.xcdatamodeld */; };
@@ -1211,8 +1210,6 @@
 		B6C0B23D26E8BF1F0031CB7F /* DownloadListViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DownloadListViewModel.swift; sourceTree = "<group>"; };
 		B6C0B24326E9CB080031CB7F /* RunLoopExtension.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = RunLoopExtension.swift; sourceTree = "<group>"; };
 		B6C0B24526E9CB190031CB7F /* RunLoopExtensionTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = RunLoopExtensionTests.swift; sourceTree = "<group>"; };
-		B6CF288227325AE9003CFAFD /* WKWebView+Download.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "WKWebView+Download.h"; sourceTree = "<group>"; };
-		B6CF288327325AE9003CFAFD /* WKWebView+Download.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = "WKWebView+Download.m"; sourceTree = "<group>"; };
 		B6CF78DD267B099C00CD4F13 /* WKNavigationActionExtension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WKNavigationActionExtension.swift; sourceTree = "<group>"; };
 		B6CF78E2267B0A1900CD4F13 /* WKNavigationAction+Private.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "WKNavigationAction+Private.h"; sourceTree = "<group>"; };
 		B6DA44012616B28300DD1EC2 /* PixelDataStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PixelDataStore.swift; sourceTree = "<group>"; };
@@ -3008,8 +3005,6 @@
 				B66E9DD32670EB4A00E53BB5 /* WKDownload+WebKitDownload.swift */,
 				B61EF3EB266F91E700B4D78F /* WKWebView+Download.swift */,
 				B61EF3F0266F922200B4D78F /* WKProcessPool+DownloadDelegate.swift */,
-				B6CF288227325AE9003CFAFD /* WKWebView+Download.h */,
-				B6CF288327325AE9003CFAFD /* WKWebView+Download.m */,
 				B63B9C502670B2B200C45B91 /* _WKDownload.h */,
 				B63B9C542670B32000C45B91 /* WKProcessPool+Private.h */,
 				B6CF78E2267B0A1900CD4F13 /* WKNavigationAction+Private.h */,
@@ -3919,7 +3914,6 @@
 				AABEE69C24A902BB0043105B /* SuggestionContainer.swift in Sources */,
 				4B59024126B35F3600489384 /* BraveDataImporter.swift in Sources */,
 				B6A9E46B2614618A0067D1B9 /* OperatingSystemVersionExtension.swift in Sources */,
-				B6CF288427325DB1003CFAFD /* WKWebView+Download.m in Sources */,
 				85AC3AEF25D5CE9800C7D2AA /* UserScripts.swift in Sources */,
 				4B677439255DBEB800025BD8 /* HTTPSUpgradeStore.swift in Sources */,
 				AAB549DF25DAB8F80058460B /* BookmarkViewModel.swift in Sources */,

@@ -788,15 +788,15 @@ extension Tab: WKNavigationDelegate {
         }
     }
 
+    @available(macOS 12, *)
     @objc(webView:navigationAction:didBecomeDownload:)
-    // IMPORTANT: Don‘t fix this warning until Xcode 12 support is dropped in 2022
-    func webView(_ webView: WKWebView, navigationAction: WKNavigationAction, didBecome download: WebKitDownload) {
+    func webView(_ webView: WKWebView, navigationAction: WKNavigationAction, didBecome download: WKDownload) {
         self.webView(webView, navigationAction: navigationAction, didBecomeDownload: download)
     }
 
+    @available(macOS 12, *)
     @objc(webView:navigationResponse:didBecomeDownload:)
-    // IMPORTANT: Don‘t fix this warning until Xcode 12 support is dropped in 2022
-    func webView(_ webView: WKWebView, navigationResponse: WKNavigationResponse, didBecome download: WebKitDownload) {
+    func webView(_ webView: WKWebView, navigationResponse: WKNavigationResponse, didBecome download: WKDownload) {
         self.webView(webView, navigationResponse: navigationResponse, didBecomeDownload: download)
     }
 
