@@ -200,8 +200,21 @@ extension PrivacyDashboardViewController: PrivacyDashboardUserScriptDelegate {
         tabViewModel?.tab.permissions.set(permission, muted: paused)
     }
 
-    func userScript(_ userScript: PrivacyDashboardUserScript, setHeight height: Int) {
-        self.preferredContentSize = CGSize(width: self.view.frame.width, height: CGFloat(height))
+    func userScript(_ userScript: PrivacyDashboardUserScript, setHeight newHeight: Int) {
+        let width = self.view.frame.width
+        let height = CGFloat(newHeight)
+
+        guard let windowFrame = tabViewModel?.tab.webView.window?.frame else {
+            self.preferredContentSize = CGSize(width: width, height: height)
+            return
+        }
+
+        // The position of bottom left corner of the browser window + the height of the browser window
+        // gives us the distance to the bottom of the screen. If we keep the height of the popover less
+        // than that, then it won't shift about relative to the triggering button.
+        let availableSpace = windowFrame.origin.y + windowFrame.size.height
+        let bufferHeight = 150.0
+        self.preferredContentSize = CGSize(width: width, height: min(height, availableSpace - bufferHeight))
     }
 
 }
