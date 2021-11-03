@@ -42,7 +42,11 @@ final class FirePopoverWrapperViewController: NSViewController {
         super.init(coder: coder)
     }
     @IBSegueAction func createFirePopoverViewController(_ coder: NSCoder) -> FirePopoverViewController? {
-        return FirePopoverViewController(coder: coder, fireViewModel: fireViewModel, tabCollectionViewModel: tabCollectionViewModel)
+        let firePopoverViewController = FirePopoverViewController(coder: coder,
+                                                                  fireViewModel: fireViewModel,
+                                                                  tabCollectionViewModel: tabCollectionViewModel)
+        firePopoverViewController?.delegate = self
+        return firePopoverViewController
     }
 
     @IBSegueAction func createFireInfoViewController(_ coder: NSCoder) -> FireInfoViewController? {
@@ -70,6 +74,18 @@ extension FirePopoverWrapperViewController: FireInfoViewControllerDelegate {
     func fireInfoViewControllerDidConfirm(_ fireInfoViewController: FireInfoViewController) {
         infoPresentedOnce = true
         hideInfoContainerViewIfNeeded()
+    }
+
+}
+
+extension FirePopoverWrapperViewController: FirePopoverViewControllerDelegate {
+
+    func firePopoverViewControllerDidClear(_ firePopoverViewController: FirePopoverViewController) {
+        dismiss()
+    }
+
+    func firePopoverViewControllerDidCancel(_ firePopoverViewController: FirePopoverViewController) {
+        dismiss()
     }
 
 }

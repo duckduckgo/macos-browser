@@ -19,6 +19,13 @@
 import Cocoa
 import Combine
 
+protocol FirePopoverViewControllerDelegate: AnyObject {
+
+    func firePopoverViewControllerDidClear(_ firePopoverViewController: FirePopoverViewController)
+    func firePopoverViewControllerDidCancel(_ firePopoverViewController: FirePopoverViewController)
+
+}
+
 final class FirePopoverViewController: NSViewController {
 
     struct Constants {
@@ -27,6 +34,8 @@ final class FirePopoverViewController: NSViewController {
         static let headerHeight: CGFloat = 28
         static let footerHeight: CGFloat = 8
     }
+
+    weak var delegate: FirePopoverViewControllerDelegate?
 
     private let fireViewModel: FireViewModel
     private let tabCollectionViewModel: TabCollectionViewModel
@@ -125,12 +134,13 @@ final class FirePopoverViewController: NSViewController {
     }
 
     @IBAction func clearButtonAction(_ sender: Any) {
-        dismiss()
+        delegate?.firePopoverViewControllerDidClear(self)
         firePopoverViewModel.burn()
+
     }
 
     @IBAction func cancelButtonAction(_ sender: Any) {
-        dismiss()
+        delegate?.firePopoverViewControllerDidCancel(self)
     }
 
     private func subscribeToViewModel() {
