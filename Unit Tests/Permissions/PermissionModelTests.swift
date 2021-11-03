@@ -54,36 +54,30 @@ final class PermissionModelTests: XCTestCase {
     }
 
     func testWhenCameraIsActivatedThenCameraPermissionChangesToActive() {
-        webView.mediaCaptureState = .activeCamera
-        XCTAssertEqual(model.permissions, [.camera: .active])
-    }
-
-    func testWhenCameraIsActivatedThenCameraPermissionChangesToActive_macOS12() {
-        guard #available(macOS 12, *) else { return }
-        webView.cameraCaptureState = .active
+        if #available(macOS 12, *) {
+            webView.cameraCaptureState = .active
+        } else {
+            webView.mediaCaptureState = .activeCamera
+        }
         XCTAssertEqual(model.permissions, [.camera: .active])
     }
 
     func testWhenMicIsActivatedThenMicPermissionChangesToActive() {
-        webView.mediaCaptureState = .activeMicrophone
-        XCTAssertEqual(model.permissions, [.microphone: .active])
-    }
-
-    func testWhenMicIsActivatedThenMicPermissionChangesToActive_macOS12() {
-        guard #available(macOS 12, *) else { return }
-        webView.microphoneCaptureState = .active
+        if #available(macOS 12, *) {
+            webView.microphoneCaptureState = .active
+        } else {
+            webView.mediaCaptureState = .activeMicrophone
+        }
         XCTAssertEqual(model.permissions, [.microphone: .active])
     }
     
     func testWhenCameraAndMicIsActivatedThenCameraAndMicPermissionChangesToActive() {
-        webView.mediaCaptureState = [.activeCamera, .activeMicrophone]
-        XCTAssertEqual(model.permissions, [.microphone: .active,
-                                           .camera: .active])
-    }
-    func testWhenCameraAndMicIsActivatedThenCameraAndMicPermissionChangesToActive_macOS12() {
-        guard #available(macOS 12, *) else { return }
-        webView.cameraCaptureState = .active
-        webView.microphoneCaptureState = .active
+        if #available(macOS 12, *) {
+            webView.cameraCaptureState = .active
+            webView.microphoneCaptureState = .active
+        } else {
+            webView.mediaCaptureState = [.activeCamera, .activeMicrophone]
+        }
         XCTAssertEqual(model.permissions, [.microphone: .active,
                                            .camera: .active])
     }
@@ -96,8 +90,15 @@ final class PermissionModelTests: XCTestCase {
     }
 
     func testWhenPermissionIsDeactivatedThenStateChangesToInactive() {
-        webView.mediaCaptureState = [.activeCamera, .activeMicrophone]
-        webView.mediaCaptureState = []
+        if #available(macOS 12, *) {
+            webView.cameraCaptureState = .active
+            webView.microphoneCaptureState = .active
+            webView.cameraCaptureState = .none
+            webView.microphoneCaptureState = .none
+        } else {
+            webView.mediaCaptureState = [.activeCamera, .activeMicrophone]
+            webView.mediaCaptureState = []
+        }
 
         XCTAssertEqual(model.permissions, [.microphone: .inactive,
                                            .camera: .inactive])
@@ -146,7 +147,7 @@ final class PermissionModelTests: XCTestCase {
 
         self.webView(webView,
                      requestMediaCapturePermissionFor: securityOrigin,
-                     initiatedBy: frameInfo,
+                     initiatedByFrame: frameInfo,
                      type: .microphone) { _ in }
 
         withExtendedLifetime(c) {
@@ -868,7 +869,7 @@ extension PermissionModelTests: WebViewPermissionsDelegate {
     @available(macOS 12, *)
     func webView(_ webView: WKWebView,
                  requestMediaCapturePermissionFor origin: WKSecurityOrigin,
-                 initiatedBy frame: WKFrameInfo,
+                 initiatedByFrame frame: WKFrameInfo,
                  type: WKMediaCaptureType,
                  decisionHandler: @escaping (WKPermissionDecision) -> Void) {
         guard let permissions = [PermissionType](devices: type) else {

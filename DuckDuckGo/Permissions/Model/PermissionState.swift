@@ -17,6 +17,7 @@
 //
 
 import Foundation
+import WebKit
 
 enum PermissionState: Equatable {
     case disabled(systemWide: Bool)
