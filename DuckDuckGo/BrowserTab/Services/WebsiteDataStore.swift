@@ -36,6 +36,7 @@ protocol WebsiteDataStore {
     func fetchDataRecords(ofTypes dataTypes: Set<String>, completionHandler: @escaping ([WKWebsiteDataRecord]) -> Void)
 
     func removeData(ofTypes dataTypes: Set<String>, for dataRecords: [WKWebsiteDataRecord], completionHandler: @escaping () -> Void)
+    func removeData(ofTypes dataTypes: Set<String>, modifiedSince date: Date, completionHandler: @escaping () -> Void)
 
 }
 
@@ -52,11 +53,47 @@ internal class WebCacheManager {
         self.websiteDataStore = websiteDataStore
     }
 
+    func clear(completion: @escaping () -> Void) {
+
+        var types = WKWebsiteDataStore.allWebsiteDataTypes()
+        types.remove(WKWebsiteDataTypeCookies)
+
+        websiteDataStore.removeData(ofTypes: types, modifiedSince: Date.distantPast) {
+            guard let cookieStore = self.websiteDataStore.cookieStore else {
+                completion()
+                return
+            }
+
+            cookieStore.getAllCookies { cookies in
+                let group = DispatchGroup()
+                // Don't clear fireproof domains
+                let cookiesToRemove = cookies.filter { cookie in
+                    !self.fireproofDomains.isFireproof(cookieDomain: cookie.domain) && cookie.domain != URL.cookieDomain
+                }
+
+                for cookie in cookiesToRemove {
+                    group.enter()
+                    os_log("Deleting cookie for %s named %s", log: .fire, cookie.domain, cookie.name)
+                    cookieStore.delete(cookie) {
+                        group.leave()
+                    }
+                }
+
+                DispatchQueue.global(qos: .userInitiated).async {
+                    group.wait()
+                    DispatchQueue.main.async {
+                        completion()
+                    }
+                }
+            }
+        }
+    }
+
     func clear(domains: Set<String>? = nil,
                completion: @escaping () -> Void) {
 
         let all = WKWebsiteDataStore.allWebsiteDataTypes()
-        let allExceptCookies = all.filter { $0 != "WKWebsiteDataTypeCookies" }
+        let allExceptCookies = all.filter { $0 != WKWebsiteDataTypeCookies }
 
         websiteDataStore.fetchDataRecords(ofTypes: all) { [weak self] records in
 
@@ -69,9 +106,9 @@ internal class WebCacheManager {
                     return
                 }
 
-                let group = DispatchGroup()
-                group.enter()
                 cookieStore.getAllCookies { cookies in
+                    let group = DispatchGroup()
+
                     var cookies = cookies
                     if let domains = domains {
                         // If domains are specified, clear just their cookies
@@ -96,13 +133,11 @@ internal class WebCacheManager {
                         }
                     }
 
-                    group.leave()
-                }
-
-                DispatchQueue.global(qos: .background).async {
-                    group.wait()
-                    DispatchQueue.main.async {
-                        completion()
+                    DispatchQueue.global(qos: .userInitiated).async {
+                        group.wait()
+                        DispatchQueue.main.async {
+                            completion()
+                        }
                     }
                 }
             }

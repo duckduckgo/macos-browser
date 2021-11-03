@@ -116,6 +116,18 @@ final class Fire {
 
     // MARK: - Web cache
 
+    private func burnWebCache(completion: @escaping () -> Void) {
+        os_log("WebsiteDataStore began cookie deletion", log: .fire)
+
+        webCacheManager.clear {
+            os_log("WebsiteDataStore completed cookie deletion", log: .fire)
+
+            DispatchQueue.main.async {
+                completion()
+            }
+        }
+    }
+
     private func burnWebCache(domains: Set<String>? = nil, completion: @escaping () -> Void) {
         os_log("WebsiteDataStore began cookie deletion", log: .fire)
 
