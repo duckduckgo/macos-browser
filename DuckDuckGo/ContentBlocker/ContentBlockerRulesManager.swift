@@ -44,7 +44,7 @@ final class ContentBlockerRulesManager {
         let protectionStore = DomainsProtectionUserDefaultsStore()
         let userDisabledProtection = protectionStore.unprotectedDomains
 
-        DispatchQueue.global(qos: .background).async {
+        DispatchQueue.global(qos: .userInitiated).async {
             self.compileRules(with: trackerData,
                               withExceptions: Array(userDisabledProtection),
                               andTemporaryUnprotectedDomains: unprotectedDomains,
