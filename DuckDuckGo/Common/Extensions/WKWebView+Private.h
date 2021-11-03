@@ -37,11 +37,29 @@ typedef NS_OPTIONS(NSUInteger, _WKMediaMutedState) {
 
 #ifndef __MAC_12
 
+typedef NS_ENUM(NSInteger, WKMediaCaptureType) {
+    WKMediaCaptureTypeCamera,
+    WKMediaCaptureTypeMicrophone,
+    WKMediaCaptureTypeCameraAndMicrophone,
+} API_AVAILABLE(macosx(11.3));
+
+typedef NS_ENUM(NSInteger, WKPermissionDecision) {
+    WKPermissionDecisionPrompt,
+    WKPermissionDecisionGrant,
+    WKPermissionDecisionDeny,
+} API_AVAILABLE(macosx(11.3));
+
 typedef NS_OPTIONS(NSUInteger, _WKCaptureDevices) {
     _WKCaptureDeviceMicrophone = 1 << 0,
     _WKCaptureDeviceCamera = 1 << 1,
     _WKCaptureDeviceDisplay = 1 << 2,
 } API_AVAILABLE(macosx(10.3));
+
+typedef NS_ENUM(NSInteger, WKMediaCaptureState) {
+    WKMediaCaptureStateNone,
+    WKMediaCaptureStateActive,
+    WKMediaCaptureStateMuted,
+} API_AVAILABLE(macos(12.0), ios(15.0));;
 
 #endif
 

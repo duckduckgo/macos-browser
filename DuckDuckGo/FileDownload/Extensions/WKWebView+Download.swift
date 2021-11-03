@@ -22,8 +22,9 @@ extension WKWebView {
 
     func startDownload(_ request: URLRequest, completionHandler: @escaping (WebKitDownload) -> Void) {
         if #available(macOS 12, *) {
-            self.startDownload(using: request) { completionHandler($0) }
-
+            self.startDownload(using: request, completionHandler: completionHandler)
+        } else if #available(macOS 11.3, *) {
+            self.macos_11_3_startDownload(request) { completionHandler(($0 as? WebKitDownload)!) }
         } else if configuration.processPool.responds(to: #selector(WKProcessPool._downloadURLRequest(_:websiteDataStore:originatingWebView:))) {
             configuration.processPool.setDownloadDelegateIfNeeded(using: LegacyWebKitDownloadDelegate.init)
             let download = configuration.processPool._downloadURLRequest(request,
@@ -39,6 +40,8 @@ extension WKWebView {
         try NSException.catch {
             if #available(macOS 12, *) {
                 self.resumeDownload(fromResumeData: resumeData, completionHandler: completionHandler)
+            } else if #available(macOS 11.3, *) {
+                self.macos_11_3_resumeDownload(resumeData) { completionHandler(($0 as? WebKitDownload)!) }
             } else if configuration.processPool.responds(to:
               #selector(WKProcessPool._resumeDownload(from:websiteDataStore:path:originatingWebView:))) {
                 let download = configuration.processPool._resumeDownload(from: resumeData,

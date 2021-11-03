@@ -17,7 +17,7 @@
 //
 
 import Foundation
-import WebKit
+import Cocoa
 
 extension NSAlert {
 
