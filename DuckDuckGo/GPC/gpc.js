@@ -35,7 +35,7 @@
 
     const userExcluded = `
             $USER_UNPROTECTED_DOMAINS$
-    `.split("\n").filter(domain => domain.trim() === topLevelUrl.host).length > 0
+    `.split('\n').filter(domain => domain.trim() === topLevelUrl.host).length > 0
     if (userExcluded) {
         return
     }
