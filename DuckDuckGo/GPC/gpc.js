@@ -40,7 +40,9 @@
         
     while (domainParts.length > 1 && gpcEnabled) {
         const partialDomain = domainParts.join('.')
-        const gpcExcluded = '$GPC_EXCEPTIONS$'.split('\n').filter(domain => domain.trim() === partialDomain).length > 0
+        const gpcExcluded = `
+            $GPC_EXCEPTIONS$
+        `.split('\n').filter(domain => domain.trim() === partialDomain).length > 0
         console.log(partialDomain, gpcExcluded)
         if (gpcExcluded) {
             gpcEnabled = false
