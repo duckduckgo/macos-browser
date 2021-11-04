@@ -30,6 +30,7 @@ public struct PrivacyConfiguration: Decodable {
         case contentBlocking
         case gpc
         case navigatorCredentials
+        case https
     }
     
     public init(features: [String: PrivacyFeature], unprotectedTemporary: [ExceptionEntry]) {
