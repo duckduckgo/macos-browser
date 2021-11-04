@@ -32,12 +32,14 @@
 
     const topLevelUrl = getTopLevelURL()
     const domainParts = topLevelUrl && topLevelUrl.host ? topLevelUrl.host.split('.') : []
-        
-    const userExcluded = `$USER_UNPROTECTED_DOMAINS$`.split("\n").filter(domain => domain.trim() == topLevelUrl.host).length > 0
+
+    const userExcluded = `
+            $USER_UNPROTECTED_DOMAINS$
+    `.split("\n").filter(domain => domain.trim() === topLevelUrl.host).length > 0
     if (userExcluded) {
-        return;
+        return
     }
-        
+
     while (domainParts.length > 1 && gpcEnabled) {
         const partialDomain = domainParts.join('.')
         const gpcExcluded = `
