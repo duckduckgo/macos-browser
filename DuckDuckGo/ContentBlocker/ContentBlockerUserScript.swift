@@ -72,4 +72,16 @@ final class ContentBlockerUserScript: NSObject, UserScript {
         return DetectedTracker(url: urlString, knownTracker: knownTracker, entity: entity, blocked: blocked)
     }
 
+    private func makeWKUserScriptInPage(source: String, injectionTime: WKUserScriptInjectionTime, forMainFrameOnly: Bool) -> WKUserScript {
+        if #available(macOS 11.0, iOS 14.0, *) {
+            return WKUserScript(source: source, injectionTime: injectionTime, forMainFrameOnly: forMainFrameOnly, in: .page)
+        } else {
+            return WKUserScript(source: source, injectionTime: injectionTime, forMainFrameOnly: forMainFrameOnly)
+        }
+    }
+
+    public func makeWKUserScript() -> WKUserScript {
+        return makeWKUserScriptInPage(source: source, injectionTime: injectionTime, forMainFrameOnly: forMainFrameOnly)
+    }
+
 }

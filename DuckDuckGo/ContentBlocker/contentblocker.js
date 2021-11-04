@@ -94,92 +94,6 @@
     }
     // util.js
 
-    // Base64
-    /**
-*
-*  Base64 encode / decode
-*  http://www.webtoolkit.info/
-*
-**/
-    const Base64 = {
-
-        // private property
-        _keyStr: 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/=',
-
-        // public method for encoding
-        encode: function (input) {
-            let output = ''
-            let chr1, chr2, chr3, enc1, enc2, enc3, enc4
-            let i = 0
-
-            input = Base64._utf8_encode(input)
-
-            while (i < input.length) {
-                chr1 = input.charCodeAt(i++)
-                chr2 = input.charCodeAt(i++)
-                chr3 = input.charCodeAt(i++)
-
-                enc1 = chr1 >> 2
-                enc2 = ((chr1 & 3) << 4) | (chr2 >> 4)
-                enc3 = ((chr2 & 15) << 2) | (chr3 >> 6)
-                enc4 = chr3 & 63
-
-                if (isNaN(chr2)) {
-                    enc3 = enc4 = 64
-                } else if (isNaN(chr3)) {
-                    enc4 = 64
-                }
-
-                output = output +
-        this._keyStr.charAt(enc1) + this._keyStr.charAt(enc2) +
-        this._keyStr.charAt(enc3) + this._keyStr.charAt(enc4)
-            }
-
-            return output
-        },
-
-        // private method for UTF-8 encoding
-        _utf8_encode: function (string) {
-            string = string.replace(/\r\n/g, '\n')
-            let utftext = ''
-
-            for (let n = 0; n < string.length; n++) {
-                const c = string.charCodeAt(n)
-
-                if (c < 128) {
-                    utftext += String.fromCharCode(c)
-                } else if ((c > 127) && (c < 2048)) {
-                    utftext += String.fromCharCode((c >> 6) | 192)
-                    utftext += String.fromCharCode((c & 63) | 128)
-                } else {
-                    utftext += String.fromCharCode((c >> 12) | 224)
-                    utftext += String.fromCharCode(((c >> 6) & 63) | 128)
-                    utftext += String.fromCharCode((c & 63) | 128)
-                }
-            }
-
-            return utftext
-        }
-
-    }
-    // Base64
-
-    // Buffer
-    class Buffer {
-        static from (string, type) {
-            return new Buffer(string)
-        }
-
-        constructor (string) {
-            this.string = string
-        }
-
-        toString (type) {
-            return Base64.encode(this.string)
-        }
-    }
-    // Buffer
-
     // trackers.js - https://raw.githubusercontent.com/duckduckgo/privacy-grade/298ddcbdd9d55808233643d90639578cd063a439/src/classes/trackers.js
     class Trackers {
         constructor (ops) {
@@ -221,7 +135,6 @@
         }
 
         processSurrogateList (text) {
-            const b64dataheader = 'data:application/javascript;base64,'
             const surrogateList = {}
             const splitSurrogateList = text.trim().split('\n\n')
 
@@ -236,8 +149,7 @@
 
                 // take identifier from first line
                 const pattern = firstLine.split(' ')[0].split('/')[1]
-                const b64surrogate = Buffer.from(lines.join('\n').toString(), 'binary').toString('base64')
-                surrogateList[pattern] = b64dataheader + b64surrogate
+                surrogateList[pattern] = lines.join('\n').toString()
             })
             return surrogateList
         }
@@ -508,14 +420,9 @@
 
     // private
     function loadSurrogate (surrogatePattern) {
-        const s = document.createElement('script')
-        s.type = 'application/javascript'
-        s.async = true
-        s.src = trackers.surrogateList[surrogatePattern]
-        const scripts = document.getElementsByTagName('script')
-        if (scripts && scripts.length > 0) {
-            scripts[0].parentNode.insertBefore(s, scripts[0])
-        }
+        // Yes this is a PoC
+        // eslint-disable-next-line no-eval
+        eval(trackers.surrogateList[surrogatePattern])
     }
 
     // public
