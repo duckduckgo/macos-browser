@@ -27,6 +27,7 @@ protocol AddressBarButtonsViewControllerDelegate: AnyObject {
 
 }
 
+// swiftlint:disable file_length
 // swiftlint:disable type_body_length
 // swiftlint:disable file_length
 final class AddressBarButtonsViewController: NSViewController {
@@ -113,6 +114,7 @@ final class AddressBarButtonsViewController: NSViewController {
     private var effectiveAppearanceCancellable: AnyCancellable?
     private var permissionsCancellables = Set<AnyCancellable>()
     private var trackerAnimationTriggerCancellable: AnyCancellable?
+    private var updatePrivacyEntryPointDebounced: Debounce?
 
     required init?(coder: NSCoder) {
         fatalError("AddressBarButtonsViewController: Bad initializer")
@@ -123,6 +125,10 @@ final class AddressBarButtonsViewController: NSViewController {
         self.tabCollectionViewModel = tabCollectionViewModel
 
         super.init(coder: coder)
+
+        self.updatePrivacyEntryPointDebounced = Debounce(delay: 0.2, callback: { [weak self] in
+            self?.updatePrivacyEntryPoint()
+        })
     }
 
     override func viewDidLoad() {
@@ -262,8 +268,7 @@ final class AddressBarButtonsViewController: NSViewController {
         }
 
         isSearchingMode = mode != .browsing
-        updatePrivacyEntryPointButton()
-        updatePrivacyEntryPointIcon()
+        self.updatePrivacyEntryPointDebounced?.call()
 
         clearButton.isHidden = !(isTextFieldEditorFirstResponder && !textFieldValue.isEmpty)
 
@@ -504,6 +509,11 @@ final class AddressBarButtonsViewController: NSViewController {
             bookmarkButton.image = Self.bookmarkImage
             bookmarkButton.contentTintColor = nil
         }
+    }
+
+    private func updatePrivacyEntryPoint() {
+        self.updatePrivacyEntryPointButton()
+        self.updatePrivacyEntryPointIcon()
     }
 
     private func updatePrivacyEntryPointButton() {
