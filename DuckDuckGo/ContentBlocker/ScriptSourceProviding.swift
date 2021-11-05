@@ -82,6 +82,14 @@ final class DefaultScriptSourceProvider: ScriptSourceProviding {
         // Use sensible defaults in case the upstream data is unparsable
         let trackerData = TrackerRadarManager.shared.encodedTrackerData
         let surrogates = configStorage.loadData(for: .surrogates)?.utf8String() ?? ""
+        var surrogateScripts = surrogates.components(separatedBy: "\n\n")
+        surrogateScripts.removeFirst()
+        let surrogatesOut = surrogateScripts.map { (surrogate) -> String in
+            var split = surrogate.split(separator: "\n")
+            let instructionsRow = split.removeFirst()
+            let pattern = instructionsRow.split(separator: " ")[0].split(separator: "/")[1]
+            return "surrogates['" + pattern + "'] = function () {" + split.joined(separator: "\n") + "}"
+        }
 
         let remoteUnprotectedDomains = (privacyConfiguration.tempUnprotectedDomains.joined(separator: "\n"))
             + "\n"
@@ -95,7 +103,7 @@ final class DefaultScriptSourceProvider: ScriptSourceProviding {
             "$TEMP_UNPROTECTED_DOMAINS$": remoteUnprotectedDomains,
             "$USER_UNPROTECTED_DOMAINS$": localUnprotectedDomains,
             "$TRACKER_DATA$": trackerData,
-            "$SURROGATES$": surrogates,
+            "$SURROGATES$": surrogatesOut.joined(separator: "\n"),
             "$BLOCKING_ENABLED$": privacyConfiguration.isEnabled(featureKey: .contentBlocking) ? "true" : "false"
         ])
     }
