@@ -40,6 +40,7 @@ final class ContentBlockerUserScript: NSObject, UserScript {
 
     var injectionTime: WKUserScriptInjectionTime { .atDocumentStart }
     var forMainFrameOnly: Bool { false }
+    var requiresRunInPageContentWorld: Bool { true }
     var messageNames: [String] { ["trackerDetectedMessage"] }
     let source: String
 
@@ -70,18 +71,6 @@ final class ContentBlockerUserScript: NSObject, UserScript {
         let knownTracker = TrackerRadarManager.shared.findTracker(forUrl: urlString)
         let entity = TrackerRadarManager.shared.findEntity(byName: knownTracker?.owner?.name ?? "")
         return DetectedTracker(url: urlString, knownTracker: knownTracker, entity: entity, blocked: blocked)
-    }
-
-    private func makeWKUserScriptInPage(source: String, injectionTime: WKUserScriptInjectionTime, forMainFrameOnly: Bool) -> WKUserScript {
-        if #available(macOS 11.0, iOS 14.0, *) {
-            return WKUserScript(source: source, injectionTime: injectionTime, forMainFrameOnly: forMainFrameOnly, in: .page)
-        } else {
-            return WKUserScript(source: source, injectionTime: injectionTime, forMainFrameOnly: forMainFrameOnly)
-        }
-    }
-
-    public func makeWKUserScript() -> WKUserScript {
-        return makeWKUserScriptInPage(source: source, injectionTime: injectionTime, forMainFrameOnly: forMainFrameOnly)
     }
 
 }

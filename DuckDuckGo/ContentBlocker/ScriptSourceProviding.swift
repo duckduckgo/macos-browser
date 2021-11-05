@@ -84,11 +84,14 @@ final class DefaultScriptSourceProvider: ScriptSourceProviding {
         let surrogates = configStorage.loadData(for: .surrogates)?.utf8String() ?? ""
         var surrogateScripts = surrogates.components(separatedBy: "\n\n")
         surrogateScripts.removeFirst()
+
+        // Construct a JavaScript object for function lookup
         let surrogatesOut = surrogateScripts.map { (surrogate) -> String in
-            var split = surrogate.split(separator: "\n")
-            let instructionsRow = split.removeFirst()
+            var codeLines = surrogate.split(separator: "\n")
+            let instructionsRow = codeLines.removeFirst()
             let pattern = instructionsRow.split(separator: " ")[0].split(separator: "/")[1]
-            return "surrogates['" + pattern + "'] = function () {" + split.joined(separator: "\n") + "}"
+            let stringifiedFunction = codeLines.joined(separator: "\n")
+            return "surrogates['\(pattern)'] = function () {\(stringifiedFunction)}"
         }
 
         let remoteUnprotectedDomains = (privacyConfiguration.tempUnprotectedDomains.joined(separator: "\n"))
