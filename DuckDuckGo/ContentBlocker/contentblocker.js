@@ -108,7 +108,7 @@
                     this.trackerList = this.processTrackerList(list.data.trackers)
                     this.domains = list.data.domains
                 } else if (list.name === 'surrogates') {
-                    this.surrogateList = this.processSurrogateList(list.data)
+                    this.surrogateList = list.data
                 }
             })
         }
@@ -132,26 +132,6 @@
                 })
             }
             return processed
-        }
-
-        processSurrogateList (text) {
-            const surrogateList = {}
-            const splitSurrogateList = text.trim().split('\n\n')
-
-            splitSurrogateList.forEach(sur => {
-                // remove comment lines
-                const lines = sur.split('\n').filter((line) => {
-                    return !(/^#.*/).test(line)
-                })
-
-                // remove first line, store it
-                const firstLine = lines.shift()
-
-                // take identifier from first line
-                const pattern = firstLine.split(' ')[0].split('/')[1]
-                surrogateList[pattern] = lines.join('\n').toString()
-            })
-            return surrogateList
         }
 
         getTrackerData (urlToCheck, siteUrl, request, ops) {
@@ -182,10 +162,10 @@
                 return null
             }
 
-            // finds a matching rule by iterating over the rules in tracker.data and sets redirectUrl.
+            // finds a matching rule by iterating over the rules in tracker.data
             const matchedRule = this.findRule(tracker, requestData)
 
-            const redirectUrl = (matchedRule && matchedRule.surrogate) ? this.surrogateList[matchedRule.surrogate] : false
+            const redirectUrl = Boolean(matchedRule && matchedRule.surrogate)
 
             // sets tracker.exception by looking at tracker.rule exceptions (if any)
             const matchedRuleException = matchedRule ? this.matchesRuleDefinition(matchedRule, 'exceptions', requestData) : false
@@ -341,9 +321,12 @@
     // trackers.js
 
     // surrogates
-    const surrogates = `
-    $SURROGATES$
-    `
+    const surrogates = {}
+    try {
+        // eslint-disable-next-line no-unused-expressions
+        $SURROGATES$
+    } catch (e) {
+    }
     // surrogates
 
     // tracker data set
@@ -420,9 +403,7 @@
 
     // private
     function loadSurrogate (surrogatePattern) {
-        // Yes this is a PoC
-        // eslint-disable-next-line no-eval
-        eval(trackers.surrogateList[surrogatePattern])
+        trackers.surrogateList[surrogatePattern]()
     }
 
     // public
