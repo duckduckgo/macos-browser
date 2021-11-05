@@ -18,23 +18,20 @@
 
 import Cocoa
 
+protocol FireInfoViewControllerDelegate: AnyObject {
+
+    func fireInfoViewControllerDidConfirm(_ fireInfoViewController: FireInfoViewController)
+
+}
+
 final class FireInfoViewController: NSViewController {
 
-    @UserDefaultsWrapper(key: .fireInfoPresentedOnce, defaultValue: false)
-    var infoPresentedOnce: Bool
+    weak var delegate: FireInfoViewControllerDelegate?
 
     override func mouseDown(with event: NSEvent) {}
 
     @IBAction func gotItAction(_ sender: Any) {
-        infoPresentedOnce = true
-
-        NSAnimationContext.runAnimationGroup { [weak self] context in
-            context.duration = 1/3
-            context.timingFunction = CAMediaTimingFunction(name: .easeOut)
-            self?.view.animator().alphaValue = 0
-        } completionHandler: { [weak self] in
-            self?.view.removeFromSuperview()
-        }
+        delegate?.fireInfoViewControllerDidConfirm(self)
     }
 
 }
