@@ -30,6 +30,7 @@ final class FaviconUserScript: NSObject, StaticUserScript {
 
     static var injectionTime: WKUserScriptInjectionTime { .atDocumentEnd }
     static var forMainFrameOnly: Bool { true }
+    static var requiresRunInPageContentWorld: Bool { false }
     static var script: WKUserScript = FaviconUserScript.makeWKUserScript()
     var messageNames: [String] { ["faviconFound"] }
 

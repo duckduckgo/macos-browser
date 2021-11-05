@@ -33,5 +33,6 @@ public final class NavigatorCredentialsUserScript: NSObject, UserScript {
 
     public let injectionTime: WKUserScriptInjectionTime = .atDocumentStart
     public let forMainFrameOnly: Bool = false
+    public let requiresRunInPageContentWorld: Bool = false
 
 }

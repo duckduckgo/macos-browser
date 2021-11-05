@@ -33,6 +33,8 @@ final class PageObserverUserScript: NSObject, StaticUserScript {
 
     static var forMainFrameOnly: Bool { false }
 
+    static var requiresRunInPageContentWorld: Bool { false }
+
     static let source = """
 
         // assuming we're inserted at document end, we can message up to the native layer immediately

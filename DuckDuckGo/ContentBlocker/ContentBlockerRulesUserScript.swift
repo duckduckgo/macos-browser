@@ -29,6 +29,7 @@ final class ContentBlockerRulesUserScript: NSObject, UserScript {
     }
 
     var injectionTime: WKUserScriptInjectionTime { .atDocumentStart }
+    var requiresRunInPageContentWorld: Bool { false }
     var forMainFrameOnly: Bool { false }
     var messageNames: [String] { ["processRule"] }
     let source: String

@@ -23,6 +23,7 @@ final class FindInPageUserScript: NSObject, StaticUserScript {
 
     static var injectionTime: WKUserScriptInjectionTime { .atDocumentEnd }
     static var forMainFrameOnly: Bool { false }
+    static var requiresRunInPageContentWorld: Bool { false }
     static var source: String = FindInPageUserScript.loadJS("findinpage", from: .main)
     static var script: WKUserScript = FindInPageUserScript.makeWKUserScript()
     var messageNames: [String] { ["findInPageHandler"] }

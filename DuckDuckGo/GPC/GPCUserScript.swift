@@ -23,6 +23,7 @@ import BrowserServicesKit
 final class GPCUserScript: NSObject, UserScript {
     var injectionTime: WKUserScriptInjectionTime { .atDocumentStart }
     var forMainFrameOnly: Bool { false }
+    var requiresRunInPageContentWorld: Bool { false }
     var messageNames: [String] { [] }
     let source: String
 

@@ -33,6 +33,7 @@ final class ContextMenuUserScript: NSObject, StaticUserScript {
 
     static var injectionTime: WKUserScriptInjectionTime { .atDocumentStart }
     static var forMainFrameOnly: Bool { true }
+    static var requiresRunInPageContentWorld: Bool { false }
     static var script: WKUserScript = ContextMenuUserScript.makeWKUserScript()
     var messageNames: [String] { ["contextMenu"] }
 
