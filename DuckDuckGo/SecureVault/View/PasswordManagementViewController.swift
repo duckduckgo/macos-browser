@@ -28,7 +28,7 @@ protocol PasswordManagementDelegate: AnyObject {
 
 }
 
-// swiftlint:disable type_body_length
+// swiftlint:disable type_body_length file_length
 final class PasswordManagementViewController: NSViewController {
 
     static func create() -> Self {
@@ -68,10 +68,17 @@ final class PasswordManagementViewController: NSViewController {
         try? SecureVaultFactory.default.makeVault()
     }
 
+    private var keyDownMonitor: Any?
+
     override func viewDidLoad() {
         super.viewDidLoad()
         createListView()
         createLoginItemView()
+
+        self.keyDownMonitor = NSEvent.addLocalMonitorForEvents(matching: .keyDown) { [weak self] event in
+            guard let self = self else { return nil }
+            return self.handleKey(event: event) ? nil : event
+        }
     }
 
     override func viewDidAppear() {
@@ -89,6 +96,22 @@ final class PasswordManagementViewController: NSViewController {
         let location = NSPoint(x: sender.frame.origin.x, y: sender.frame.origin.y - (sender.frame.height / 2) + 6)
 
         menu.popUp(positioning: nil, at: location, in: sender.superview)
+    }
+
+    private func handleKey(event: NSEvent) -> Bool {
+        let upArrowKey = 126
+        let downArrowKey = 125
+        let character = Int(event.keyCode)
+
+        switch character {
+        case upArrowKey:
+            print("Up")
+            return true
+        case downArrowKey:
+            print("Down")
+            return true
+        default: return false
+        }
     }
 
     private func refetchWithText(_ text: String, clearWhenNoMatches: Bool = false, completion: (() -> Void)? = nil) {
@@ -695,3 +718,4 @@ extension PasswordManagementViewController: NSTextFieldDelegate {
     }
 
 }
+// swiftlint:enable file_length

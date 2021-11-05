@@ -285,6 +285,38 @@ final class PasswordManagementItemListModel: ObservableObject {
         }
     }
 
+    func selectPrevious() {
+        guard let selected = selected else {
+            selectFirst()
+            return
+        }
+
+        // Find the section with the current item:
+
+        guard let currentSection = displayedItems.first(where: { section in
+            section.items.contains(selected)
+        }) else {
+            return
+        }
+
+        // Find the index of the current item within its section:
+
+        guard let indexInSection = currentSection.items.firstIndex(of: selected) else {
+            return
+        }
+    }
+
+    func selectNext() {
+        guard let selected = selected else {
+            selectFirst()
+            return
+        }
+
+        let currentSection = displayedItems.first(where: { section in
+            section.items.contains(selected)
+        })
+    }
+
     func clearSelection() {
         selected = nil
     }
