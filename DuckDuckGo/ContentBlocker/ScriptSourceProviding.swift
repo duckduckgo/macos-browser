@@ -104,9 +104,13 @@ final class DefaultScriptSourceProvider: ScriptSourceProviding {
         let exceptions = privacyConfiguration.tempUnprotectedDomains +
                             privacyConfiguration.exceptionsList(forFeature: .gpc)
         let privSettings = PrivacySecurityPreferences()
+        let protectionStore = DomainsProtectionUserDefaultsStore()
+        let localUnprotectedDomains = protectionStore.unprotectedDomains.joined(separator: "\n")
+        
         return GPCUserScript.loadJS("gpc", from: .main, withReplacements: [
             "$GPC_ENABLED$": privacyConfiguration.isEnabled(featureKey: .gpc) && privSettings.gpcEnabled ? "true" : "false",
-            "$GPC_EXCEPTIONS$": exceptions.joined(separator: "\n")
+            "$GPC_EXCEPTIONS$": exceptions.joined(separator: "\n"),
+            "$USER_UNPROTECTED_DOMAINS$": localUnprotectedDomains
         ])
     }
 

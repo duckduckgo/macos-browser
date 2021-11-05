@@ -437,6 +437,10 @@ extension URL {
                 // Since headers are only enabled for a small numbers of sites
                 // perfrom this check here for efficency
                 let exceptions = config.tempUnprotectedDomains + config.exceptionsList(forFeature: .gpc)
+                let protectionStore = DomainsProtectionUserDefaultsStore()
+                if protectionStore.unprotectedDomains.contains(url.host ?? "") {
+                    return false
+                }
                 for exception in exceptions {
                     if url.isPart(ofDomain: exception) {
                         return false
