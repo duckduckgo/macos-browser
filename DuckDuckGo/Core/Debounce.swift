@@ -20,18 +20,26 @@ public class Debounce {
 
     private let delay: TimeInterval
     private var timer: Timer?
-    private var callback: () -> Void
+    private var callback: (_: Any?) -> Void
 
-    init(delay: TimeInterval, callback: @escaping () -> Void) {
+    init(delay: TimeInterval, callback: @escaping (_: Any?) -> Void) {
         self.delay = delay
         self.callback = callback
+    }
+
+    public func call(_ value: Any?) {
+        timer?.invalidate()
+        timer = Timer.scheduledTimer(withTimeInterval: delay, repeats: false, block: { [weak self] timer in
+            guard timer.isValid else { return }
+            self?.callback(value)
+        })
     }
 
     public func call() {
         timer?.invalidate()
         timer = Timer.scheduledTimer(withTimeInterval: delay, repeats: false, block: { [weak self] timer in
             guard timer.isValid else { return }
-            self?.callback()
+            self?.callback(nil)
         })
     }
 }
