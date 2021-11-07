@@ -29,9 +29,9 @@ public class Debounce {
 
     public func call() {
         timer?.invalidate()
-        timer = Timer.scheduledTimer(withTimeInterval: delay, repeats: false, block: { (timer) in
+        timer = Timer.scheduledTimer(withTimeInterval: delay, repeats: false, block: { [weak self] timer in
             guard timer.isValid else { return }
-            self.callback()
+            self?.callback()
         })
     }
 }
