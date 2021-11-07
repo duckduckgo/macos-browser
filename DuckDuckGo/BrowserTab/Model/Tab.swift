@@ -497,6 +497,11 @@ final class Tab: NSObject {
         connectionUpgradedTo = upgradedUrl
     }
 
+    public func setMainFrameConnectionUpgradedTo(_ upgradedUrl: URL?) {
+        if upgradedUrl == nil { return }
+        connectionUpgradedTo = upgradedUrl
+    }
+
 }
 
 extension Tab: PrintingUserScriptDelegate {
