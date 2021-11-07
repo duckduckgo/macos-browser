@@ -226,9 +226,16 @@ final class AddressBarTextField: NSTextField {
     private func updateTabUrl(suggestion: Suggestion?) {
         makeUrl(suggestion: suggestion,
                 stringValueWithoutSuffix: stringValueWithoutSuffix,
-                completion: { [weak self] url in
+                completion: { [weak self] url, isUpgraded in
+                    if isUpgraded { self?.updateTabUpgradedToUrl(url) }
                     self?.updateTabUrlWithUrl(url, suggestion: suggestion)
                 })
+    }
+
+    private func updateTabUpgradedToUrl(_ url: URL?) {
+        if url == nil { return }
+        let tab = tabCollectionViewModel.selectedTabViewModel?.tab
+        tab?.setMainFrameConnectionUpgradedTo(url)
     }
 
     private func openNewTabWithUrl(_ providedUrl: URL?, selected: Bool, suggestion: Suggestion?) {
@@ -245,12 +252,13 @@ final class AddressBarTextField: NSTextField {
     private func openNewTab(selected: Bool, suggestion: Suggestion?) {
         makeUrl(suggestion: suggestion,
                 stringValueWithoutSuffix: stringValueWithoutSuffix,
-                completion: { [weak self] url in
+                completion: { [weak self] url, isUpgraded in
+                    if isUpgraded { self?.updateTabUpgradedToUrl(url) }
                     self?.openNewTabWithUrl(url, selected: selected, suggestion: suggestion)
                 })
     }
 
-    private func makeUrl(suggestion: Suggestion?, stringValueWithoutSuffix: String, completion: @escaping (URL?) -> Void) {
+    private func makeUrl(suggestion: Suggestion?, stringValueWithoutSuffix: String, completion: @escaping (URL?, Bool) -> Void) {
         let finalUrl: URL?
         switch suggestion {
         case .bookmark(title: _, url: let url, isFavorite: _),
@@ -265,19 +273,12 @@ final class AddressBarTextField: NSTextField {
         }
 
         guard let url = finalUrl else {
-            completion(finalUrl)
+            completion(finalUrl, false)
             return
         }
 
-        HTTPSUpgrade.shared.isUpgradeable(url: url) { [weak self] isUpgradable in
-            if isUpgradable {
-                let upgradedUrl = url.toHttps()
-                let tab = self?.tabCollectionViewModel.selectedTabViewModel?.tab
-                tab?.setMainFrameConnectionUpgradedTo(upgradedUrl)
-                completion(upgradedUrl)
-            } else {
-                completion(url)
-            }
+        HTTPSUpgrade.shared.isUpgradeable(url: url) { isUpgradable in
+            completion(isUpgradable ? url.toHttps() : url, isUpgradable)
         }
     }
 
