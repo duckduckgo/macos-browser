@@ -79,11 +79,8 @@ internal class WebCacheManager {
                     }
                 }
 
-                DispatchQueue.global(qos: .userInitiated).async {
-                    group.wait()
-                    DispatchQueue.main.async {
-                        completion()
-                    }
+                group.notify(queue: .main) {
+                    completion()
                 }
             }
         }
@@ -133,11 +130,8 @@ internal class WebCacheManager {
                         }
                     }
 
-                    DispatchQueue.global(qos: .userInitiated).async {
-                        group.wait()
-                        DispatchQueue.main.async {
-                            completion()
-                        }
+                    group.notify(queue: .main) {
+                        completion()
                     }
                 }
             }
