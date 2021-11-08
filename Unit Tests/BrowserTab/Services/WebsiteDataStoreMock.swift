@@ -30,6 +30,11 @@ final class WebCacheManagerMock: WebCacheManager {
         completion()
     }
 
+    override func clear(completion: @escaping () -> Void) {
+        clearCalled = true
+        completion()
+    }
+
 }
 
 extension HTTPCookie {
