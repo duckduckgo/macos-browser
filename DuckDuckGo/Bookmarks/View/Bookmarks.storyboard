@@ -102,7 +102,7 @@
                                 <rect key="frame" x="21" y="456" width="219" height="24"/>
                                 <popUpButtonCell key="cell" type="bevel" title="Bookmarks" bezelStyle="rounded" alignment="left" controlSize="large" lineBreakMode="truncatingTail" state="on" imageScaling="proportionallyDown" inset="2" selectedItem="Pxw-Jh-Zh0" id="Hfh-Gh-9qt">
                                     <behavior key="behavior" lightByBackground="YES" lightByGray="YES"/>
-                                    <font key="font" size="20" name="SFProDisplay-Semibold"/>
+                                    <font key="font" metaFont="system" size="20"/>
                                     <menu key="menu" id="VEx-gs-amO">
                                         <items>
                                             <menuItem title="Bookmarks" state="on" id="Pxw-Jh-Zh0"/>
@@ -616,9 +616,9 @@ Gw
                                 <color key="fillColor" name="PopoverBackgroundColor"/>
                             </box>
                             <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="TJx-89-ls4">
-                                <rect key="frame" x="13" y="457" width="89" height="20"/>
+                                <rect key="frame" x="13" y="457" width="90" height="20"/>
                                 <textFieldCell key="cell" lineBreakMode="clipping" title="Bookmarks" id="HqW-8W-PJu">
-                                    <font key="font" size="17" name="SFProDisplay-Semibold"/>
+                                    <font key="font" metaFont="system" size="17"/>
                                     <color key="textColor" name="labelColor" catalog="System" colorSpace="catalog"/>
                                     <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
                                 </textFieldCell>
