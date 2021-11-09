@@ -37,7 +37,15 @@ final class GeolocationService: NSObject, GeolocationServiceProtocol {
     private let locationManager: CLLocationManager
 
     @PublishedAfter private var currentLocationPublished: Result<CLLocation, Error>?
-    @PublishedAfter private(set) var authorizationStatus: CLAuthorizationStatus
+    @PublishedAfter private(set) var authorizationStatus: CLAuthorizationStatus {
+        didSet {
+            if case .notDetermined = oldValue,
+               [.denied, .restricted].contains(authorizationStatus) {
+                currentLocationPublished = .failure(CLError(.denied))
+            }
+        }
+    }
+
     private var locationPublisherEventsHandler: AnyPublisher<Result<CLLocation, Error>?, Never>!
     private var highAccuracyEventsHandler: AnyPublisher<Void, Never>!
 
@@ -137,7 +145,9 @@ extension GeolocationService: CLLocationManagerDelegate {
     }
 
     func locationManager(_ manager: CLLocationManager, didFailWithError error: Error) {
-        guard geolocationSubscriptionCounter > 0 else { return }
+        guard geolocationSubscriptionCounter > 0,
+              authorizationStatus != .notDetermined
+        else { return }
         currentLocationPublished = .failure(error)
     }
 
