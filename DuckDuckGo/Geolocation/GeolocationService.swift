@@ -145,9 +145,11 @@ extension GeolocationService: CLLocationManagerDelegate {
     }
 
     func locationManager(_ manager: CLLocationManager, didFailWithError error: Error) {
-        guard geolocationSubscriptionCounter > 0,
-              authorizationStatus != .notDetermined
-        else { return }
+        guard geolocationSubscriptionCounter > 0, authorizationStatus != .notDetermined else { return }
+        if case .success = currentLocationPublished,
+           error as? CLError == CLError(.locationUnknown) {
+            return
+        }
         currentLocationPublished = .failure(error)
     }
 
