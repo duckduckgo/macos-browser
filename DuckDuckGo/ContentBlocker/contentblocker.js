@@ -407,7 +407,7 @@
     }
 
     // public
-    function shouldBlock (trackerUrl, type) {
+    function shouldBlock (trackerUrl, type, element) {
         seenUrls.add(trackerUrl)
         const startTime = performance.now()
 
@@ -437,9 +437,17 @@
         // Tracker blocking is dealt with by content rules
         // Only handle surrogates here
         if (blocked && isSurrogate) {
+            // Remove error handlers on the original element
+            if (element && element.onerror) {
+                element.onerror = () => {}
+            }
             if (!loadedSurrogates[result.matchedRule.surrogate]) {
                 loadSurrogate(result.matchedRule.surrogate)
                 loadedSurrogates[result.matchedRule.surrogate] = true
+                // Trigger a load event on the original element
+                if (element && element.onload) {
+                    element.onload(new Event('load'))
+                }
             }
 
             const pageUrl = window.location.href
@@ -470,7 +478,7 @@
 
     function processPage () {
         [...document.scripts].filter(hasNotSeen).forEach((el) => {
-            if (shouldBlock(el.src, 'SCRIPT')) {
+            if (shouldBlock(el.src, 'SCRIPT', el)) {
                 duckduckgoDebugMessaging.log('blocking load')
             }
         });
@@ -478,7 +486,7 @@
             // If the image's natural width is zero, then it has not loaded so we
             // can assume that it may have been blocked.
             if (el.naturalWidth === 0) {
-                if (shouldBlock(el.src, 'IMG')) {
+                if (shouldBlock(el.src, 'IMG', el)) {
                     duckduckgoDebugMessaging.log('blocking load')
                 }
             }
@@ -489,7 +497,7 @@
             }
         });
         [...document.querySelectorAll('iframe')].filter(hasNotSeen).forEach((el) => {
-            if (shouldBlock(el.src, 'IFRAME')) {
+            if (shouldBlock(el.src, 'IFRAME', el)) {
                 duckduckgoDebugMessaging.log('blocking load')
             }
         })
