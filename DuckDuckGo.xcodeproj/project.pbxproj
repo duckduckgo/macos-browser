@@ -205,6 +205,8 @@
 		4BB99D1026FE1A84001E4761 /* FirefoxBookmarksReaderTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4BB99D0D26FE1A83001E4761 /* FirefoxBookmarksReaderTests.swift */; };
 		4BB99D1126FE1A84001E4761 /* SafariBookmarksReaderTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4BB99D0E26FE1A84001E4761 /* SafariBookmarksReaderTests.swift */; };
 		4BB99D1326FE1A94001E4761 /* places.sqlite in Resources */ = {isa = PBXBuildFile; fileRef = 4BB99D1226FE1A94001E4761 /* places.sqlite */; };
+		4BD66A52273B1C4F003E4A9B /* CrashReportTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4BD66A51273B1C4F003E4A9B /* CrashReportTests.swift */; };
+		4BD66A55273B1C66003E4A9B /* DuckDuckGo-ExampleCrash.ips in Resources */ = {isa = PBXBuildFile; fileRef = 4BD66A54273B1C66003E4A9B /* DuckDuckGo-ExampleCrash.ips */; };
 		4BE0DF06267819A1006337B7 /* NSStoryboardExtension.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4BE0DF0426781961006337B7 /* NSStoryboardExtension.swift */; };
 		4BE65474271FCD40008D1D63 /* PasswordManagementIdentityItemView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4BE6546E271FCD40008D1D63 /* PasswordManagementIdentityItemView.swift */; };
 		4BE65476271FCD41008D1D63 /* PasswordManagementCreditCardItemView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4BE65470271FCD40008D1D63 /* PasswordManagementCreditCardItemView.swift */; };
@@ -827,6 +829,8 @@
 		4BB99D0D26FE1A83001E4761 /* FirefoxBookmarksReaderTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = FirefoxBookmarksReaderTests.swift; sourceTree = "<group>"; };
 		4BB99D0E26FE1A84001E4761 /* SafariBookmarksReaderTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SafariBookmarksReaderTests.swift; sourceTree = "<group>"; };
 		4BB99D1226FE1A94001E4761 /* places.sqlite */ = {isa = PBXFileReference; lastKnownFileType = file; path = places.sqlite; sourceTree = "<group>"; };
+		4BD66A51273B1C4F003E4A9B /* CrashReportTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CrashReportTests.swift; sourceTree = "<group>"; };
+		4BD66A54273B1C66003E4A9B /* DuckDuckGo-ExampleCrash.ips */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = "DuckDuckGo-ExampleCrash.ips"; sourceTree = "<group>"; };
 		4BE0DF0426781961006337B7 /* NSStoryboardExtension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NSStoryboardExtension.swift; sourceTree = "<group>"; };
 		4BE6546E271FCD40008D1D63 /* PasswordManagementIdentityItemView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = PasswordManagementIdentityItemView.swift; sourceTree = "<group>"; };
 		4BE65470271FCD40008D1D63 /* PasswordManagementCreditCardItemView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = PasswordManagementCreditCardItemView.swift; sourceTree = "<group>"; };
@@ -1805,6 +1809,23 @@
 			path = "Test Safari Data";
 			sourceTree = "<group>";
 		};
+		4BD66A50273B18D5003E4A9B /* Crash Reports */ = {
+			isa = PBXGroup;
+			children = (
+				4BD66A51273B1C4F003E4A9B /* CrashReportTests.swift */,
+				4BD66A53273B1C53003E4A9B /* Example Crash Reports */,
+			);
+			path = "Crash Reports";
+			sourceTree = "<group>";
+		};
+		4BD66A53273B1C53003E4A9B /* Example Crash Reports */ = {
+			isa = PBXGroup;
+			children = (
+				4BD66A54273B1C66003E4A9B /* DuckDuckGo-ExampleCrash.ips */,
+			);
+			path = "Example Crash Reports";
+			sourceTree = "<group>";
+		};
 		7B4CE8DB26F02108009134B1 /* UI Tests */ = {
 			isa = PBXGroup;
 			children = (
@@ -2198,6 +2219,7 @@
 				85F69B3A25EDE7F800978E59 /* Common */,
 				85AC3B1525D9BBFA00C7D2AA /* Configuration */,
 				4B82E9B725B6A04B00656FE7 /* ContentBlocker */,
+				4BD66A50273B18D5003E4A9B /* Crash Reports */,
 				4B723DFE26B0003E00E14D75 /* Data Import */,
 				4B723E0226B0003E00E14D75 /* Data Export */,
 				8553FF50257523630029327F /* FileDownload */,
@@ -3477,6 +3499,7 @@
 				4B8AC94126B49BEE00879451 /* key4.db in Resources */,
 				B67C6C422654BF49006C872E /* DuckDuckGo-Symbol.jpg in Resources */,
 				B69B50552726CD8100758A2B /* invalid.json in Resources */,
+				4BD66A55273B1C66003E4A9B /* DuckDuckGo-ExampleCrash.ips in Resources */,
 				4B8AC94026B49BEE00879451 /* logins.json in Resources */,
 				4B59024A26B38B0B00489384 /* Login Data in Resources */,
 				4BB46EA226B8954500222970 /* logins-encrypted.json in Resources */,
@@ -4078,6 +4101,7 @@
 				AAEC74B22642C57200C2EFBC /* HistoryCoordinatingMock.swift in Sources */,
 				AAEC74B62642CC6A00C2EFBC /* HistoryStoringMock.swift in Sources */,
 				AA652CB125DD825B009059CC /* LocalBookmarkStoreTests.swift in Sources */,
+				4BD66A52273B1C4F003E4A9B /* CrashReportTests.swift in Sources */,
 				B630794226731F5400DCEE41 /* WKDownloadMock.swift in Sources */,
 				B6C0B24626E9CB190031CB7F /* RunLoopExtensionTests.swift in Sources */,
 				B693956326F1C2A40015B914 /* FileDownloadManagerMock.swift in Sources */,

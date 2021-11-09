@@ -20,7 +20,19 @@ import Foundation
 
 #if OUT_OF_APPSTORE
 
-struct CrashReport {
+protocol CrashReport {
+    
+    static var fileExtension: String { get }
+
+    var url: URL { get }
+    var content: String? { get }
+    var contentData: Data? { get }
+
+}
+
+struct LegacyCrashReport: CrashReport {
+
+    static let fileExtension = "crash"
 
     static let headerItemsToFilter = [
         "Anonymous UUID:",
@@ -33,14 +45,47 @@ struct CrashReport {
         try? String(contentsOf: url)
             .components(separatedBy: "\n")
             .filter({ line in
-                for headerItemToFilder in Self.headerItemsToFilter {
-                    if line.hasPrefix(headerItemToFilder) { return false }
+                for headerItemToFilter in Self.headerItemsToFilter {
+                    if line.hasPrefix(headerItemToFilter) { return false }
                 }
                 return true
             })
             .joined(separator: "\n")
     }
 
+    var contentData: Data? {
+        content?.data(using: .utf8)
+    }
+
+}
+
+struct JSONCrashReport: CrashReport {
+    
+    static let fileExtension = "ips"
+
+    static let headerItemsToFilter = [
+        "sleepWakeUUID"
+    ]
+
+    let url: URL
+    
+    var content: String? {
+        guard var fileContents = try? String(contentsOf: url) else {
+            return nil
+        }
+        
+        for itemToFilter in Self.headerItemsToFilter {
+            let patternToReplace = "\"\(itemToFilter)\"\\s*:\\s*\".*\""
+            let redactedKeyValuePair = "\"\(itemToFilter)\":\"<removed>\""
+            
+            fileContents = fileContents.replacingOccurrences(of: patternToReplace,
+                                                             with: redactedKeyValuePair,
+                                                             options: .regularExpression)
+        }
+        
+        return fileContents
+    }
+    
     var contentData: Data? {
         content?.data(using: .utf8)
     }
