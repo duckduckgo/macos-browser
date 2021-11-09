@@ -68,34 +68,7 @@
             </BuildableReference>
             <SkippedTests>
                <Test
-                  Identifier = "DownloadListCoordinatorTests/testWhenAddedDownloadRestartedWithResumeDataThenResumeIsCalled()">
-               </Test>
-               <Test
-                  Identifier = "DownloadListCoordinatorTests/testWhenDownloadRestartedWithoutResumeDataThenDownloadIsStarted()">
-               </Test>
-               <Test
-                  Identifier = "DownloadListCoordinatorTests/testWhenPreloadedDownloadRestartedWithResumeDataThenResumeIsCalled()">
-               </Test>
-               <Test
                   Identifier = "EncryptionKeyStoreTests">
-               </Test>
-               <Test
-                  Identifier = "PermissionModelTests/testWhenCameraAndMicAreRevokedThenStopMediaCaptureIsCalled()">
-               </Test>
-               <Test
-                  Identifier = "PermissionModelTests/testWhenCameraAndMicPermissionIsGrantedThenItIsProvidedToDecisionHandler()">
-               </Test>
-               <Test
-                  Identifier = "PermissionModelTests/testWhenCameraIsRevokedThenStopMediaCaptureIsCalled()">
-               </Test>
-               <Test
-                  Identifier = "PermissionModelTests/testWhenDeniedPermissionIsStoredThenActivePermissionIsRevoked()">
-               </Test>
-               <Test
-                  Identifier = "PermissionModelTests/testWhenMicrophoneIsMutedThenSetMediaCaptureMutedIsCalled()">
-               </Test>
-               <Test
-                  Identifier = "PermissionModelTests/testWhenMicrophoneIsRevokedThenStopMediaCaptureIsCalled()">
                </Test>
                <Test
                   Identifier = "PixelTests/testWhenErrorPixelIsFiredThenParametersAdded()">
