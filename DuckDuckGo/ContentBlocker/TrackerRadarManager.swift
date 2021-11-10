@@ -125,7 +125,7 @@ final class TrackerRadarManager {
     }
 
     func isHostMajorTrackingNetwork(_ host: String) -> Bool {
-        let majorTrackerThresholdPrevalence = 7.0
+        let majorTrackerThresholdPrevalence = 25.0
         let parentEntity = findEntity(forHost: host)
         return (parentEntity?.prevalence ?? 0.0) >= majorTrackerThresholdPrevalence
     }
