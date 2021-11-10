@@ -164,13 +164,17 @@ struct UserText {
     static let openExternalURLMessageUnknownApp = NSLocalizedString("open.external.url.message.unknown.app", value: "Do you want to view this content in another app?", comment: "Open URL in another app dialog message for unknown app")
     static let failedToOpenExternally = NSLocalizedString("open.externally.failed", value: "The app required to open that link can’t be found", comment: "’Link’ is link on a website")
 
-    static let permissionAuthorizationFormat = NSLocalizedString("permission.authorization.format",
-                                      value: "Allow “%@“ to use your %@?",
-                                      comment: "Displays the version and build numbers")
+    static let devicePermissionAuthorizationFormat = NSLocalizedString("permission.authorization.format",
+                                                                       value: "Allow “%@“ to use your %@?",
+                                                                       comment: "Popover asking for domain %@ to use camera/mic/location (%@)")
+    static let popupWindowsPermissionAuthorizationFormat = NSLocalizedString("permission.authorization.popups",
+                                                                             value: "Allow “%@“ to open PopUp Window?",
+                                                                             comment: "Popover asking for domain %@ to open Popup Window")
     static let permissionMicrophone = NSLocalizedString("permission.microphone", value: "Microphone", comment: "Microphone input media device name")
     static let permissionCamera = NSLocalizedString("permission.camera", value: "Camera", comment: "Camera input media device name")
-    static let permissionAndPermissionFormat = NSLocalizedString("permission.permissionAndPermission", value: "%@ and %@", comment: "%@(camera) and %@(microphone) input media devices name")
+    static let permissionCameraAndMicrophone = NSLocalizedString("permission.cameraAndmicrophone", value: "use your Camera and Microphone", comment: "camera and microphone input media devices name")
     static let permissionGeolocation = NSLocalizedString("permission.geolocation", value: "Geolocation", comment: "User's Geolocation permission access name")
+    static let permissionPopups = NSLocalizedString("permission.popups", value: "PopUp Windows", comment: "Open Pop Up Windows permission access name")
 
     static let permissionMuteFormat = NSLocalizedString("permission.mute", value: "Pause %@", comment: "Temporarily pause input media device %@ access")
     static let permissionUnmuteFormat = NSLocalizedString("permission.unmute", value: "Resume %@", comment: "Resume input media device %@ access")

@@ -110,6 +110,8 @@ final class PermissionModel {
                 } else {
                     permissions.geolocation.update(with: webView.geolocationState)
                 }
+            case .popups:
+                continue
             }
         }
     }

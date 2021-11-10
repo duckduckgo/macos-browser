@@ -108,6 +108,10 @@ extension Optional where Wrapped == PermissionState {
         self = .denied
     }
 
+    mutating func popupOpened() {
+        self = .inactive
+    }
+
     mutating func update(with captureState: WKWebView.CaptureState) {
         switch (self, captureState) {
         // same state

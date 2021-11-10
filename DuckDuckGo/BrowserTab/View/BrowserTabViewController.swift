@@ -605,13 +605,37 @@ extension BrowserTabViewController: WKUIDelegate {
                  for navigationAction: WKNavigationAction,
                  windowFeatures: WKWindowFeatures) -> WKWebView? {
 
-        // Returned web view must be created with the specified configuration.
+        var shouldOpenPopUp = navigationAction.isUserInitiated
+        if !shouldOpenPopUp {
+            let host = navigationAction.sourceFrame.request.url?.host
+            webView.tab?.permissions.permissions([.popups],
+                                                 requestedForDomain: host) { granted in
+                switch (granted, shouldOpenPopUp) {
+                case (true, false):
+                    // callback called synchronously - will return webView for the request
+                    shouldOpenPopUp = true
+                case (true, true):
+                    // called asynchronously
+                    guard let url = navigationAction.request.url else { return }
+                    WindowsManager.openNewWindow(with: url)
+                case (false, _):
+                    return
+                }
+            }
+        }
+        guard shouldOpenPopUp else {
+            shouldOpenPopUp = true // if granted asynchronously
+            return nil
+        }
 
+        // Returned web view must be created with the specified configuration.
         let tab = Tab(content: .none,
                       webViewConfiguration: configuration,
                       parentTab: tabViewModel?.tab,
                       canBeClosedWithBack: true)
-        tabCollectionViewModel.insertChild(tab: tab, selected: true)
+        WindowsManager.openNewWindow(with: tab)
+        webView.tab?.permissions.permissions.popups.popupOpened()
+
         // WebKit loads the request in the returned web view.
         return tab.webView
     }

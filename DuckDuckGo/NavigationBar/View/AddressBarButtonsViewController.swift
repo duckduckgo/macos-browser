@@ -97,6 +97,13 @@ final class AddressBarButtonsViewController: NSViewController {
             geolocationButton.action = #selector(geolocationButtonAction(_:))
         }
     }
+    @IBOutlet weak var popupsButton: PermissionButton! {
+        didSet {
+            popupsButton.isHidden = true
+            popupsButton.target = self
+            popupsButton.action = #selector(popupsButtonAction(_:))
+        }
+    }
 
     private var tabCollectionViewModel: TabCollectionViewModel
     private var bookmarkManager: BookmarkManager = LocalBookmarkManager.shared
@@ -151,6 +158,7 @@ final class AddressBarButtonsViewController: NSViewController {
         cameraButton.sendAction(on: .leftMouseDown)
         microphoneButton.sendAction(on: .leftMouseDown)
         geolocationButton.sendAction(on: .leftMouseDown)
+        popupsButton.sendAction(on: .leftMouseDown)
     }
 
     var mouseEnterExitTrackingArea: NSTrackingArea?
@@ -231,6 +239,8 @@ final class AddressBarButtonsViewController: NSViewController {
             button = microphoneButton
         } else if query.permissions.contains(.geolocation) {
             button = geolocationButton
+        } else if query.permissions.contains(.popups) {
+            button = popupsButton
         } else {
             assertionFailure("Unexpected permissions")
             query.handleDecision(grant: false)
@@ -333,6 +343,24 @@ final class AddressBarButtonsViewController: NSViewController {
         }
 
         PermissionContextMenu(permissions: [.geolocation: state],
+                              domain: selectedTabViewModel.tab.content.url?.host ?? "",
+                              delegate: self)
+            .popUp(positioning: nil, at: NSPoint(x: 0, y: sender.bounds.height), in: sender)
+    }
+
+    @IBAction func popupsButtonAction(_ sender: NSButton) {
+        guard let selectedTabViewModel = tabCollectionViewModel.selectedTabViewModel,
+              let state = selectedTabViewModel.usedPermissions.popups
+        else {
+            os_log("%s: Selected tab view model is nil or no geolocation state", type: .error, className)
+            return
+        }
+        if case .requested(let query) = state {
+            openPermissionAuthorizationPopover(for: query)
+            return
+        }
+
+        PermissionContextMenu(permissions: [.popups: state],
                               domain: selectedTabViewModel.tab.content.url?.host ?? "",
                               delegate: self)
             .popUp(positioning: nil, at: NSPoint(x: 0, y: sender.bounds.height), in: sender)
@@ -483,6 +511,7 @@ final class AddressBarButtonsViewController: NSViewController {
         microphoneButton.buttonState = selectedTabViewModel.usedPermissions.camera == nil
             ? selectedTabViewModel.usedPermissions.microphone
             : nil
+        popupsButton.buttonState = selectedTabViewModel.usedPermissions.popups
 
         if let query = selectedTabViewModel.permissionAuthorizationQuery {
             if !permissionAuthorizationPopover.isShown {

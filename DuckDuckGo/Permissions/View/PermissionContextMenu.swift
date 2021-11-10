@@ -221,6 +221,9 @@ final class PermissionContextMenu: NSMenu {
             deeplink = URL(string: "x-apple.systempreferences:com.apple.preference.security?Privacy_Microphone")!
         case .geolocation:
             deeplink = URL(string: "x-apple.systempreferences:com.apple.preference.security?Privacy_LocationServices")!
+        case .popups:
+            assertionFailure("No settings available for Popups")
+            return
         }
         NSWorkspace.shared.open(deeplink)
     }
@@ -230,10 +233,7 @@ final class PermissionContextMenu: NSMenu {
 private extension NSMenuItem {
 
     static func mute(_ permissions: [PermissionType], target: PermissionContextMenu) -> NSMenuItem {
-        let localizedPermissions = permissions.map(\.localizedDescription).reduce("") {
-            $0.isEmpty ? $1 : String(format: UserText.permissionAndPermissionFormat, $0, $1)
-        }
-        let title = String(format: UserText.permissionMuteFormat, localizedPermissions)
+        let title = String(format: UserText.permissionMuteFormat, permissions.localizedDescription)
         let item = NSMenuItem(title: title,
                               action: #selector(PermissionContextMenu.mutePermissions),
                               keyEquivalent: "")
@@ -243,10 +243,7 @@ private extension NSMenuItem {
     }
 
     static func unmute(_ permissions: [PermissionType], target: PermissionContextMenu) -> NSMenuItem {
-        let localizedPermissions = permissions.map(\.localizedDescription).reduce("") {
-            $0.isEmpty ? $1 : String(format: UserText.permissionAndPermissionFormat, $0, $1)
-        }
-        let title = String(format: UserText.permissionUnmuteFormat, localizedPermissions)
+        let title = String(format: UserText.permissionUnmuteFormat, permissions.localizedDescription)
         let item = NSMenuItem(title: title,
                               action: #selector(PermissionContextMenu.unmutePermissions),
                               keyEquivalent: "")
@@ -256,10 +253,7 @@ private extension NSMenuItem {
     }
 
     static func revoke(_ permissions: [PermissionType], target: PermissionContextMenu) -> NSMenuItem {
-        let localizedPermissions = permissions.map(\.localizedDescription).reduce("") {
-            $0.isEmpty ? $1 : String(format: UserText.permissionAndPermissionFormat, $0, $1)
-        }
-        let title = String(format: UserText.permissionRevokeFormat, localizedPermissions)
+        let title = String(format: UserText.permissionRevokeFormat, permissions.localizedDescription)
         let item = NSMenuItem(title: title,
                               action: #selector(PermissionContextMenu.revokePermissions),
                               keyEquivalent: "")

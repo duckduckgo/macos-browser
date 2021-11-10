@@ -23,6 +23,7 @@ enum PermissionType: String, CaseIterable {
     case camera
     case microphone
     case geolocation
+    case popups
 }
 
 extension PermissionType {
@@ -32,6 +33,8 @@ extension PermissionType {
             return true
         case .geolocation:
             return false
+        case .popups:
+            return true
         }
     }
 }
