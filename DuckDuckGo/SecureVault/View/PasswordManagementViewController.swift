@@ -343,11 +343,8 @@ final class PasswordManagementViewController: NSViewController {
                 self.refetchWithText(self.searchField.stringValue)
                 self.postChange()
 
-            case .alertSecondButtonReturn:
-                break // cancel, do nothing
-
             default:
-                fatalError("Unknown response \(response)")
+                break // cancel, do nothing
             }
 
         }
@@ -367,11 +364,8 @@ final class PasswordManagementViewController: NSViewController {
                 self.refetchWithText(self.searchField.stringValue)
                 self.postChange()
 
-            case .alertSecondButtonReturn:
-                break // cancel, do nothing
-
             default:
-                fatalError("Unknown response \(response)")
+                break // cancel, do nothing
             }
 
         }
@@ -391,11 +385,8 @@ final class PasswordManagementViewController: NSViewController {
                 self.refetchWithText(self.searchField.stringValue)
                 self.postChange()
 
-            case .alertSecondButtonReturn:
-                break // cancel, do nothing
-
             default:
-                fatalError("Unknown response \(response)")
+                break // cancel, do nothing
             }
 
         }
@@ -415,11 +406,8 @@ final class PasswordManagementViewController: NSViewController {
                 self.refetchWithText(self.searchField.stringValue)
                 self.postChange()
 
-            case .alertSecondButtonReturn:
-                break // cancel, do nothing
-
             default:
-                fatalError("Unknown response \(response)")
+                break // cancel, do nothing
             }
 
         }
@@ -471,13 +459,10 @@ final class PasswordManagementViewController: NSViewController {
                         self?.itemModel?.cancel()
                         loadNewItemWithID()
 
-                    case .alertThirdButtonReturn: // Cancel
+                    default: // Cancel
                         if let previousValue = previousValue {
-                            self?.listModel?.select(item: previousValue)
+                            self?.listModel?.select(item: previousValue, notify: false)
                         }
-
-                    default:
-                        fatalError("Unknown response \(response)")
                     }
 
                 }
@@ -562,11 +547,8 @@ final class PasswordManagementViewController: NSViewController {
                     self.itemModel?.cancel()
                     createNew()
 
-                case .alertThirdButtonReturn: // Cancel
+                default: // Cancel
                     break // just do nothing
-
-                default:
-                    fatalError("Unknown response \(response)")
                 }
 
             }
@@ -599,11 +581,8 @@ final class PasswordManagementViewController: NSViewController {
                     self.itemModel?.cancel()
                     createNew()
 
-                case .alertThirdButtonReturn: // Cancel
+                default: // Cancel
                     break // just do nothing
-
-                default:
-                    fatalError("Unknown response \(response)")
                 }
 
             }
@@ -636,11 +615,8 @@ final class PasswordManagementViewController: NSViewController {
                     self.itemModel?.cancel()
                     createNew()
 
-                case .alertThirdButtonReturn: // Cancel
+                default: // Cancel
                     break // just do nothing
-
-                default:
-                    fatalError("Unknown response \(response)")
                 }
 
             }
@@ -673,11 +649,8 @@ final class PasswordManagementViewController: NSViewController {
                     self.itemModel?.cancel()
                     createNew()
 
-                case .alertThirdButtonReturn: // Cancel
+                default: // Cancel
                     break // just do nothing
-
-                default:
-                    fatalError("Unknown response \(response)")
                 }
 
             }
@@ -685,7 +658,7 @@ final class PasswordManagementViewController: NSViewController {
             createNew()
         }
     }
-    
+
 }
 
 extension PasswordManagementViewController: NSTextFieldDelegate {
