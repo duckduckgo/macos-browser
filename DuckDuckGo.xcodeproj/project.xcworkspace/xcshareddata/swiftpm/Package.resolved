@@ -6,7 +6,7 @@
         "repositoryURL": "https://github.com/duckduckgo/BrowserServicesKit.git",
         "state": {
           "branch": "release/friends-and-family",
-          "revision": "65b012ca808d534f2d46a368bff83a7ec1de3b92",
+          "revision": "6fd3f7d652b318a1b4986f50222d3af27edbca15",
           "version": null
         }
       },
@@ -56,12 +56,21 @@
         }
       },
       {
+        "package": "swift-argument-parser",
+        "repositoryURL": "https://github.com/apple/swift-argument-parser",
+        "state": {
+          "branch": null,
+          "revision": "6b2aa2748a7881eebb9f84fb10c01293e15b52ca",
+          "version": "0.5.0"
+        }
+      },
+      {
         "package": "TrackerRadarKit",
         "repositoryURL": "https://github.com/duckduckgo/TrackerRadarKit.git",
         "state": {
           "branch": null,
-          "revision": "a11e97e591273845519b6b06ddbb6ba88eab2195",
-          "version": "1.0.2"
+          "revision": "5f4caf35b8418700a48c64c7c61eb43308c8dacc",
+          "version": "1.0.3"
         }
       }
     ]
