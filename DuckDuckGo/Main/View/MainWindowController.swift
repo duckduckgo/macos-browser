@@ -160,6 +160,10 @@ extension MainWindowController: NSWindowDelegate {
         WindowControllersManager.shared.lastKeyMainWindowController = self
     }
 
+    func windowDidResignKey(_ notification: Notification) {
+        mainViewController.windowDidResignKey()
+    }
+
     func windowWillEnterFullScreen(_ notification: Notification) {
         mainViewController.tabBarViewController.draggingSpace.isHidden = true
     }
