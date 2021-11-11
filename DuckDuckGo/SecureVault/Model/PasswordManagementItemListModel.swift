@@ -228,16 +228,18 @@ final class PasswordManagementItemListModel: ObservableObject {
         self.items = items.sorted()
     }
 
-    func selected(item: SecureVaultItem?) {
+    func selected(item: SecureVaultItem?, notify: Bool = true) {
         let previous = selected
         selected = item
-        onItemSelected(previous, item)
+        if notify {
+            onItemSelected(previous, item)
+        }
     }
 
-    func select(item: SecureVaultItem) {
+    func select(item: SecureVaultItem, notify: Bool = true) {
         for section in displayedItems {
             if let first = section.items.first(where: { $0 == item }) {
-                selected(item: first)
+                selected(item: first, notify: notify)
             }
         }
     }
