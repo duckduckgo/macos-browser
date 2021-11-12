@@ -28,23 +28,27 @@ extension Tab: NSSecureCoding {
         static let favicon = "icon"
         static let tabType = "tabType"
         static let visitedDomains = "visitedDomains"
+        static let invalidatedBackForwardListItems = "inv_fli"
     }
 
     static var supportsSecureCoding: Bool { true }
 
     convenience init?(coder decoder: NSCoder) {
-        guard let tabTypeRawValue = decoder.decodeIfPresent(at: NSSecureCodingKeys.tabType),
+        guard let tabTypeRawValue: Int = decoder.decodeIfPresent(at: NSSecureCodingKeys.tabType),
               let tabType = TabContent.ContentType(rawValue: tabTypeRawValue),
               let content = TabContent(type: tabType, url: decoder.decodeIfPresent(at: NSSecureCodingKeys.url))
         else { return nil }
 
         let visitedDomains = decoder.decodeObject(of: [NSArray.self, NSString.self], forKey: NSSecureCodingKeys.visitedDomains) as? [String] ?? []
+        let invalidatedBackForwardListItems = decoder.decodeObject(of: [NSArray.self, InvalidatedBackForwardListItem.self],
+                                                                   forKey: NSSecureCodingKeys.invalidatedBackForwardListItems) as? [InvalidatedBackForwardListItem]
 
         self.init(content: content,
                   visitedDomains: Set(visitedDomains),
                   title: decoder.decodeIfPresent(at: NSSecureCodingKeys.title),
                   favicon: decoder.decodeIfPresent(at: NSSecureCodingKeys.favicon),
-                  sessionStateData: decoder.decodeIfPresent(at: NSSecureCodingKeys.sessionStateData))
+                  sessionStateData: decoder.decodeIfPresent(at: NSSecureCodingKeys.sessionStateData),
+                  invalidatedBackForwardListItems: invalidatedBackForwardListItems)
     }
 
     func encode(with coder: NSCoder) {
@@ -56,6 +60,8 @@ extension Tab: NSSecureCoding {
         favicon.map(coder.encode(forKey: NSSecureCodingKeys.favicon))
         getActualSessionStateData().map(coder.encode(forKey: NSSecureCodingKeys.sessionStateData))
         coder.encode(content.type.rawValue, forKey: NSSecureCodingKeys.tabType)
+        coder.encode(webView.invalidatedBackForwardListItems ?? self.invalidatedBackForwardListItems,
+                     forKey: NSSecureCodingKeys.invalidatedBackForwardListItems)
     }
 
 }

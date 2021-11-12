@@ -89,6 +89,7 @@ final class Tab: NSObject {
          error: Error? = nil,
          favicon: NSImage? = nil,
          sessionStateData: Data? = nil,
+         invalidatedBackForwardListItems: [InvalidatedBackForwardListItem]? = nil,
          parentTab: Tab? = nil,
          shouldLoadInBackground: Bool = false,
          canBeClosedWithBack: Bool = false) {
@@ -103,6 +104,7 @@ final class Tab: NSObject {
         self.parentTab = parentTab
         self._canBeClosedWithBack = canBeClosedWithBack
         self.sessionStateData = sessionStateData
+        self.invalidatedBackForwardListItems = invalidatedBackForwardListItems
 
         let configuration = webViewConfiguration ?? WKWebViewConfiguration()
         configuration.applyStandardConfiguration()
@@ -182,6 +184,7 @@ final class Tab: NSObject {
     }
 
     var sessionStateData: Data?
+    var invalidatedBackForwardListItems: [InvalidatedBackForwardListItem]?
 
     func invalidateSessionStateData() {
         sessionStateData = nil
@@ -235,6 +238,8 @@ final class Tab: NSObject {
     }
 
     private let instrumentation = TabInstrumentation()
+
+    private weak var currentNavigationBackForwardListItem: WKBackForwardListItem?
 
     var canGoForward: Bool {
         webView.canGoForward
@@ -294,10 +299,12 @@ final class Tab: NSObject {
         if let sessionStateData = self.sessionStateData {
             do {
                 try webView.restoreSessionState(from: sessionStateData)
+                invalidatedBackForwardListItems.map(webView.invalidate)
                 return
             } catch {
                 os_log("Tab:setupWebView could not restore session state %s", "\(error)")
             }
+            self.invalidatedBackForwardListItems = nil
         }
         if let url = self.content.url {
             webView.load(url)
@@ -668,6 +675,7 @@ extension Tab: WKNavigationDelegate {
         static let webkitMiddleClick = 4
     }
 
+    // swiftlint:disable:next function_body_length
     func webView(_ webView: WKWebView,
                  decidePolicyFor navigationAction: WKNavigationAction,
                  decisionHandler: @escaping (WKNavigationActionPolicy) -> Void) {
@@ -723,9 +731,19 @@ extension Tab: WKNavigationDelegate {
         }
 
         HTTPSUpgrade.shared.isUpgradeable(url: url) { [weak self] isUpgradable in
-            if isUpgradable && navigationAction.isTargetingMainFrame, let upgradedUrl = url.toHttps() {
-                self?.webView.load(upgradedUrl)
-                self?.setConnectionUpgradedTo(upgradedUrl, navigationAction: navigationAction)
+            if let self = self,
+               isUpgradable && navigationAction.isTargetingMainFrame,
+                let upgradedUrl = url.toHttps() {
+
+                if let originalBackForwardListItem = self.currentNavigationBackForwardListItem,
+                   let currentBackForwardListItem = self.webView.backForwardList.currentItem,
+                    originalBackForwardListItem !== currentBackForwardListItem {
+                    // Cancelled&Upgraded URL leaves wrong backForwardList record
+                    // https://app.asana.com/0/inbox/1199237043628108/1201280322539473/1201353436736961
+                    self.webView.invalidate(currentBackForwardListItem)
+                }
+                self.webView.load(upgradedUrl)
+                self.setConnectionUpgradedTo(upgradedUrl, navigationAction: navigationAction)
                 decisionHandler(.cancel)
                 return
             }
@@ -754,6 +772,8 @@ extension Tab: WKNavigationDelegate {
     }
 
     func webView(_ webView: WKWebView, didStartProvisionalNavigation navigation: WKNavigation!) {
+        self.currentNavigationBackForwardListItem = webView.backForwardList.currentItem
+
         delegate?.tabDidStartNavigation(self)
 
         // Unnecessary assignment triggers publishing
