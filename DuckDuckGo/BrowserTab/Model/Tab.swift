@@ -198,7 +198,7 @@ final class Tab: NSObject {
     }
 
     func update(url: URL?, userEntered: Bool = true) {
-        self.content = .url(url ?? .emptyPage)
+        self.content = url == .homePage ? .homepage : .url(url ?? .blankPage)
 
         // This function is called when the user has manually typed in a new address, which should reset the login detection flow.
         userEnteredUrl = userEntered
@@ -287,8 +287,19 @@ final class Tab: NSObject {
     }
 
     private func reloadIfNeeded(shouldLoadInBackground: Bool = false) {
+        let url: URL
+        switch self.content {
+        case .url(let value):
+            url = value
+        case .homepage:
+            url = .homePage
+        default:
+            url = .blankPage
+        }
         guard webView.superview != nil || shouldLoadInBackground,
-              webView.url != self.content.url
+              webView.url != url
+                // Initial Home Page shouldn't show Back Button
+                && webView.url != self.content.url
         else { return }
 
         if let sessionStateData = self.sessionStateData {
@@ -299,11 +310,7 @@ final class Tab: NSObject {
                 os_log("Tab:setupWebView could not restore session state %s", "\(error)")
             }
         }
-        if let url = self.content.url {
-            webView.load(url)
-        } else {
-            webView.load(URL.emptyPage)
-        }
+        webView.load(url)
     }
 
     func stopLoading() {

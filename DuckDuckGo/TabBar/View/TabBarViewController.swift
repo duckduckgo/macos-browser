@@ -588,7 +588,7 @@ extension TabBarViewController: NSCollectionViewDelegate {
         if let url = tabCollectionViewModel.tabCollection.tabs[indexPath.item].content.url {
             return url as NSURL
         } else {
-            return URL.emptyPage as NSURL
+            return URL.blankPage as NSURL
         }
     }
 

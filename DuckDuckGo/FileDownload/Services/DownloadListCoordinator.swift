@@ -341,7 +341,7 @@ private extension DownloadListItem {
         self.init(identifier: UUID(),
                   added: now,
                   modified: now,
-                  url: task.originalRequest?.url ?? .emptyPage,
+                  url: task.originalRequest?.url ?? .blankPage,
                   websiteURL: task.originalRequest?.mainDocumentURL,
                   progress: task.progress,
                   destinationURL: nil,
