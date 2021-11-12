@@ -41,7 +41,8 @@ extension Tab: NSSecureCoding {
 
         let visitedDomains = decoder.decodeObject(of: [NSArray.self, NSString.self], forKey: NSSecureCodingKeys.visitedDomains) as? [String] ?? []
         let invalidatedBackForwardListItems = decoder.decodeObject(of: [NSArray.self, InvalidatedBackForwardListItem.self],
-                                                                   forKey: NSSecureCodingKeys.invalidatedBackForwardListItems) as? [InvalidatedBackForwardListItem]
+                                                                   forKey: NSSecureCodingKeys.invalidatedBackForwardListItems)
+            as? [InvalidatedBackForwardListItem]
 
         self.init(content: content,
                   visitedDomains: Set(visitedDomains),
