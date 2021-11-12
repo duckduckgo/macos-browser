@@ -55,8 +55,7 @@ internal class WebCacheManager {
 
     func clear(completion: @escaping () -> Void) {
 
-        var types = WKWebsiteDataStore.allWebsiteDataTypes()
-        types.remove(WKWebsiteDataTypeCookies)
+        let types = WKWebsiteDataStore.allWebsiteDataTypesExceptCookies
 
         websiteDataStore.removeData(ofTypes: types, modifiedSince: Date.distantPast) {
             guard let cookieStore = self.websiteDataStore.cookieStore else {
@@ -90,7 +89,7 @@ internal class WebCacheManager {
                completion: @escaping () -> Void) {
 
         let all = WKWebsiteDataStore.allWebsiteDataTypes()
-        let allExceptCookies = all.filter { $0 != WKWebsiteDataTypeCookies }
+        let allExceptCookies = WKWebsiteDataStore.allWebsiteDataTypesExceptCookies
 
         websiteDataStore.fetchDataRecords(ofTypes: all) { [weak self] records in
 
