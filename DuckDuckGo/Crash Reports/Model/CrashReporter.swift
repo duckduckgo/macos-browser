@@ -33,13 +33,13 @@ final class CrashReporter {
 
     func checkForNewReports() {
 
-#if !DEBUG
-
-        guard let lastCheckDate = lastCheckDate else {
-            // Initial run
-            self.lastCheckDate = Date()
-            return
-        }
+//        guard let lastCheckDate = lastCheckDate else {
+//            // Initial run
+//            self.lastCheckDate = Date()
+//            return
+//        }
+        
+        let lastCheckDate = Date.distantPast
 
         let crashReports = reader.getCrashReports(since: lastCheckDate)
         self.lastCheckDate = Date()
@@ -49,12 +49,10 @@ final class CrashReporter {
             return
         }
 
-        Pixel.fire(.crash)
+        // Pixel.fire(.crash)
 
         latestCrashReport = latest
         promptPresenter.showPrompt(self, for: latest)
-
-#endif
 
     }
 

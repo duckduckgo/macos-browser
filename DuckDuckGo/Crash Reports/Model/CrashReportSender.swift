@@ -22,7 +22,7 @@ import Foundation
 
 final class CrashReportSender {
 
-    static let reportServiceUrl = URL(string: "https://duckduckgo.com/crash.js")!
+    static let reportServiceUrl = URL(string: "https://use-devtesting10.duckduckgo.com/crash.js")!
 
     func send(_ crashReport: CrashReport) {
         guard let contentData = crashReport.contentData else {
@@ -34,7 +34,13 @@ final class CrashReportSender {
         request.setValue("ddg_mac", forHTTPHeaderField: "User-Agent")
         request.httpMethod = "POST"
         request.httpBody = contentData
+        request.httpShouldHandleCookies = true
+        
+        // Visit the report service URL in a webpage and monitor the request, pull out the Duo cookie and paste it here in order for crashes to send.
+        request.setValue("", forHTTPHeaderField: "Cookie")
 
+        print("SENDING CRASH: \(request)")
+        
         URLSession.shared.dataTask(with: request) { (_, _, error) in
             if error != nil {
                 assertionFailure("CrashReportSender: Failed to send the crash reprot")
