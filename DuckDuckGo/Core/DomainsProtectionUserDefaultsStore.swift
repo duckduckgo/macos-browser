@@ -43,6 +43,10 @@ public class DomainsProtectionUserDefaultsStore: DomainsProtectionStore {
         }
     }
 
+    public func isHostUnprotected(forDomain domain: String) -> Bool {
+        return unprotectedDomains.contains(domain)
+    }
+
     public func disableProtection(forDomain domain: String) {
         var domains = unprotectedDomains
         domains.insert(domain)

@@ -520,6 +520,7 @@
 
     // public
     function shouldBlock (trackerUrl, type) {
+        seenUrls.add(trackerUrl)
         const startTime = performance.now()
 
         if (!blockingEnabled) {
@@ -574,13 +575,18 @@
         return false
     }
 
+    const seenUrls = new Set()
+    function hasNotSeen (url) {
+        return !seenUrls.has(url)
+    }
+
     function processPage () {
-        [].slice.apply(document.scripts).forEach(function (el) {
+        [...document.scripts].filter(hasNotSeen).forEach((el) => {
             if (shouldBlock(el.src, 'SCRIPT')) {
                 duckduckgoDebugMessaging.log('blocking load')
             }
         });
-        [].slice.apply(document.images).forEach(function (el) {
+        [...document.images].filter(hasNotSeen).forEach((el) => {
             // If the image's natural width is zero, then it has not loaded so we
             // can assume that it may have been blocked.
             if (el.naturalWidth === 0) {
@@ -589,24 +595,33 @@
                 }
             }
         });
-        [].slice.apply(document.querySelectorAll('link')).forEach(function (el) {
+        [...document.querySelectorAll('link')].filter(hasNotSeen).forEach((el) => {
             if (shouldBlock(el.href, 'LINK')) {
                 duckduckgoDebugMessaging.log('blocking load')
             }
         });
-        [].slice.apply(document.querySelectorAll('iframe')).forEach(function (el) {
+        [...document.querySelectorAll('iframe')].filter(hasNotSeen).forEach((el) => {
             if (shouldBlock(el.src, 'IFRAME')) {
                 duckduckgoDebugMessaging.log('blocking load')
             }
         })
-        scheduleProcessPage()
     }
 
-    let interval = 1
-    function scheduleProcessPage () {
-        interval *= 2
-        setTimeout(processPage, interval * 1000)
+    function debounce (func, wait) {
+        let timeout
+        return function () {
+            clearTimeout(timeout)
+            timeout = setTimeout(() => {
+                func.apply(this, arguments)
+            }, wait)
+        }
     }
+
+    const observer = new MutationObserver(debounce((mutations, o) => {
+        processPage()
+    }, 100))
+    const rootElement = document.body || document.documentElement
+    observer.observe(rootElement, { childList: true, subtree: true });
 
     // Init
     (function () {

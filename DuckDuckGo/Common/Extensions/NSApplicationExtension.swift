@@ -52,7 +52,9 @@ extension NSApplication {
         let deactivated = NotificationCenter.default
             .publisher(for: NSApplication.didResignActiveNotification).map { _ in false }
 
-        return activated.merge(with: deactivated).eraseToAnyPublisher()
+        return Just(self.isActive)
+            .merge(with: activated.merge(with: deactivated))
+            .eraseToAnyPublisher()
     }
 
 }

@@ -28,6 +28,7 @@ protocol AddressBarButtonsViewControllerDelegate: AnyObject {
 }
 
 // swiftlint:disable type_body_length
+// swiftlint:disable file_length
 final class AddressBarButtonsViewController: NSViewController {
 
     static let homeFaviconImage = NSImage(named: "HomeFavicon")
@@ -535,8 +536,14 @@ final class AddressBarButtonsViewController: NSViewController {
 
         switch selectedTabViewModel.tab.content {
         case .url(let url):
+            guard let host = url.host else { break }
+
             let isNotSecure = url.scheme == "http"
-            privacyEntryPointButton.image = isNotSecure ? Self.shieldDotImage : Self.shieldImage
+            let isMajorTrackingNetwork = TrackerRadarManager.shared.isHostMajorTrackingNetwork(host)
+            let protectionStore = DomainsProtectionUserDefaultsStore()
+            let isUnprotected = protectionStore.isHostUnprotected(forDomain: host)
+
+            privacyEntryPointButton.image = isNotSecure || isMajorTrackingNetwork || isUnprotected ? Self.shieldDotImage : Self.shieldImage
         default:
             break
         }
@@ -698,3 +705,6 @@ extension TabCollectionViewModel: AnimationImageProvider {
     }
 
 }
+
+// swiftlint:enable type_body_length
+// swiftlint:enable file_length

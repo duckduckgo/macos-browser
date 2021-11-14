@@ -24,13 +24,14 @@ import CoreLocation
 
 final class GeolocationServiceTests: XCTestCase {
     var locationManagerMock: CLLocationManagerMock!
-    var service: GeolocationService!
+    lazy var service: GeolocationService = {
+        GeolocationService(locationManager: locationManagerMock)
+    }()
 
     override func setUp() {
         CLLocationManagerMock.authStatus = .notDetermined
         CLLocationManagerMock.systemLocationServicesEnabled = false
         locationManagerMock = CLLocationManagerMock()
-        service = GeolocationService(locationManager: locationManagerMock)
     }
 
     func testWhenGeolocationServiceInitThenNoLocationIsSet() {
@@ -73,7 +74,7 @@ final class GeolocationServiceTests: XCTestCase {
         var e3: XCTestExpectation!
         let c = service.authorizationStatusPublisher.sink { [service] status in
             XCTAssertEqual(status, .notDetermined)
-            switch service!.locationServicesEnabled() {
+            switch service.locationServicesEnabled() {
             case false:
                 if e3 == nil {
                     e1.fulfill()
@@ -105,6 +106,7 @@ final class GeolocationServiceTests: XCTestCase {
         var e2: XCTestExpectation!
         var e3: XCTestExpectation!
         var e4: XCTestExpectation!
+        CLLocationManagerMock.authStatus = .authorized
         let c = service.locationPublisher.sink { result in
             switch result {
             case .none:
@@ -142,6 +144,7 @@ final class GeolocationServiceTests: XCTestCase {
         let enil1 = expectation(description: "expect nil 1")
         let eloc1 = expectation(description: "expect loc 1")
         let eerr1 = expectation(description: "expect err 1")
+        CLLocationManagerMock.authStatus = .authorized
         let c1 = service.locationPublisher.sink { result in
             switch result {
             case .none:

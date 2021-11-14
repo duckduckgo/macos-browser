@@ -35,15 +35,11 @@ typedef NS_OPTIONS(NSUInteger, _WKMediaMutedState) {
     _WKMediaScreenCaptureMuted = 1 << 2,
 };
 
-#ifndef __MAC_12
-
 typedef NS_OPTIONS(NSUInteger, _WKCaptureDevices) {
     _WKCaptureDeviceMicrophone = 1 << 0,
     _WKCaptureDeviceCamera = 1 << 1,
     _WKCaptureDeviceDisplay = 1 << 2,
 } API_AVAILABLE(macosx(10.3));
-
-#endif
 
 @interface WKWebView (Private)
 
@@ -52,13 +48,6 @@ typedef NS_OPTIONS(NSUInteger, _WKCaptureDevices) {
 
 - (void)createWebArchiveDataWithCompletionHandler:(void (^)(NSData * _Nullable, NSError * _Nullable))completionHandler;
 - (void)createPDFWithConfiguration:(id _Nullable)pdfConfiguration completionHandler:(void (^)(NSData * _Nullable pdfDocumentData, NSError * _Nullable error))completionHandler;
-
-#ifndef __MAC_12
-
-@property (nonatomic, readonly) WKMediaCaptureState cameraCaptureState API_AVAILABLE(macos(12.0), ios(15.0));
-@property (nonatomic, readonly) WKMediaCaptureState microphoneCaptureState API_AVAILABLE(macos(12.0), ios(15.0));
-
-#endif
 
 @property (nonatomic, readonly) _WKMediaCaptureStateDeprecated _mediaCaptureState;
 

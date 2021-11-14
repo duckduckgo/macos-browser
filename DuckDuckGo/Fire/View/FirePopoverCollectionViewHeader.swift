@@ -24,4 +24,6 @@ final class FirePopoverCollectionViewHeader: NSView {
 
     @IBOutlet weak var title: NSTextField!
 
+    override func mouseDown(with event: NSEvent) {}
+
 }
