@@ -157,6 +157,7 @@ private struct TextView: View {
                 HStack {
                     if #available(macOS 12, *) {
                         Text(model.text)
+                            .foregroundColor(Color.primary)
                             .textSelection(.enabled)
                     } else {
                         Text(model.text)
