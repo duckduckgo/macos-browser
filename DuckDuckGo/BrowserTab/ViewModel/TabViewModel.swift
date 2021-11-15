@@ -124,7 +124,7 @@ final class TabViewModel {
     }
 
     private func updateCanReload() {
-        canReload = tab.content.url ?? .emptyPage != .emptyPage
+        canReload = tab.content.url ?? .blankPage != .blankPage
     }
 
     func updateCanGoBack() {
@@ -132,7 +132,7 @@ final class TabViewModel {
     }
 
     private func updateCanBeBookmarked() {
-        canBeBookmarked = tab.content.url ?? .emptyPage != .emptyPage
+        canBeBookmarked = tab.content.url ?? .blankPage != .blankPage
     }
 
     private func updateAddressBarStrings() {
@@ -170,7 +170,7 @@ final class TabViewModel {
         if let searchQuery = url.searchQuery {
             addressBarString = searchQuery
             passiveAddressBarString = searchQuery
-        } else if url == URL.emptyPage {
+        } else if [.blankPage, .homePage].contains(url) {
             addressBarString = ""
             passiveAddressBarString = ""
         } else {
