@@ -31,9 +31,12 @@ enum APIRequest {
         queue.maxConcurrentOperationCount = 1
         return queue
     }()
+
+    private static let defaultCallbackSession = URLSession(configuration: .default, delegate: nil, delegateQueue: defaultCallbackQueue)
+    private static let defaultCallbackEphemeralSession = URLSession(configuration: .ephemeral, delegate: nil, delegateQueue: defaultCallbackQueue)
     
-    private static let defaultSession = URLSession(configuration: .default, delegate: nil, delegateQueue: defaultCallbackQueue)
     private static let mainThreadCallbackSession = URLSession(configuration: .default, delegate: nil, delegateQueue: OperationQueue.main)
+    private static let mainThreadCallbackEphemeralSession = URLSession(configuration: .ephemeral, delegate: nil, delegateQueue: OperationQueue.main)
     
     struct Response {
         
@@ -61,12 +64,12 @@ enum APIRequest {
                         parameters: [String: String]? = nil,
                         headers: HTTPHeaders = APIHeaders().defaultHeaders,
                         timeoutInterval: TimeInterval = 60.0,
+                        useEphemeralURLSession: Bool = false,
                         callBackOnMainThread: Bool = false,
                         completion: @escaping APIRequestCompletion) -> URLSessionDataTask {
         
         let urlRequest = urlRequestFor(url: url, method: method, parameters: parameters, headers: headers, timeoutInterval: timeoutInterval)
-        
-        let session = callBackOnMainThread ? mainThreadCallbackSession : defaultSession
+        let session = session(useMainThreadCallbackQueue: callBackOnMainThread, ephemeral: useEphemeralURLSession)
 
         let task = session.dataTask(with: urlRequest) { (data, response, error) in
             
@@ -99,6 +102,14 @@ enum APIRequest {
         urlRequest.httpMethod = method.rawValue
         urlRequest.timeoutInterval = timeoutInterval
         return urlRequest
+    }
+    
+    private static func session(useMainThreadCallbackQueue: Bool, ephemeral: Bool) -> URLSession {
+        if useMainThreadCallbackQueue {
+            return ephemeral ? mainThreadCallbackEphemeralSession : mainThreadCallbackSession
+        } else {
+            return ephemeral ? defaultCallbackEphemeralSession : defaultCallbackSession
+        }
     }
 }
 
