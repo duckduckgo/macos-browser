@@ -28,7 +28,7 @@ protocol PasswordManagementDelegate: AnyObject {
 
 }
 
-// swiftlint:disable type_body_length file_length
+// swiftlint:disable type_body_length
 final class PasswordManagementViewController: NSViewController {
 
     static func create() -> Self {
@@ -691,4 +691,3 @@ extension PasswordManagementViewController: NSTextFieldDelegate {
     }
 
 }
-// swiftlint:enable file_length

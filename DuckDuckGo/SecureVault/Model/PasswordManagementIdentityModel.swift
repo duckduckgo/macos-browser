@@ -106,6 +106,12 @@ final class PasswordManagementIdentityModel: ObservableObject, PasswordManagemen
             isDirty = true
         }
     }
+    
+    @Published var addressStreet2: String = "" {
+        didSet {
+            isDirty = true
+        }
+    }
 
     @Published var addressCity: String = "" {
         didSet {
@@ -197,6 +203,7 @@ final class PasswordManagementIdentityModel: ObservableObject, PasswordManagemen
         identity.birthdayYear = birthdayYear
 
         identity.addressStreet = addressStreet
+        identity.addressStreet2 = addressStreet2
         identity.addressCity = addressCity
         identity.addressProvince = addressProvince
         identity.addressPostalCode = addressPostalCode
@@ -242,6 +249,7 @@ final class PasswordManagementIdentityModel: ObservableObject, PasswordManagemen
         birthdayYear = identity?.birthdayYear
 
         addressStreet = identity?.addressStreet ?? ""
+        addressStreet2 = identity?.addressStreet2 ?? ""
         addressCity = identity?.addressCity ?? ""
         addressProvince = identity?.addressProvince ?? ""
         addressPostalCode = identity?.addressPostalCode ?? ""
