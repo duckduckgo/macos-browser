@@ -27,6 +27,13 @@ public protocol PrintingUserScriptDelegate: AnyObject {
 }
 
 public class PrintingUserScript: NSObject, UserScript {
+    static public var requiresRunInPageContentWorld: Bool {
+        return true
+    }
+
+    public var requiresRunInPageContentWorld: Bool {
+        return true
+    }
 
     public weak var delegate: PrintingUserScriptDelegate?
 
@@ -37,18 +44,6 @@ public class PrintingUserScript: NSObject, UserScript {
     };
 }) ();
 """
-
-    private func makeWKUserScriptInPage(source: String, injectionTime: WKUserScriptInjectionTime, forMainFrameOnly: Bool) -> WKUserScript {
-        if #available(macOS 11.0, iOS 14.0, *) {
-            return WKUserScript(source: source, injectionTime: injectionTime, forMainFrameOnly: forMainFrameOnly, in: .page)
-        } else {
-            return WKUserScript(source: source, injectionTime: injectionTime, forMainFrameOnly: forMainFrameOnly)
-        }
-    }
-
-    public func makeWKUserScript() -> WKUserScript {
-        return makeWKUserScriptInPage(source: source, injectionTime: injectionTime, forMainFrameOnly: forMainFrameOnly)
-    }
 
     public var injectionTime: WKUserScriptInjectionTime = .atDocumentStart
     public var forMainFrameOnly: Bool = false
