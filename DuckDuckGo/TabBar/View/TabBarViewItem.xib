@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<document type="com.apple.InterfaceBuilder3.Cocoa.XIB" version="3.0" toolsVersion="19162" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none" useAutolayout="YES" customObjectInstantitationMethod="direct">
+<document type="com.apple.InterfaceBuilder3.Cocoa.XIB" version="3.0" toolsVersion="19455" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none" useAutolayout="YES" customObjectInstantitationMethod="direct">
     <dependencies>
         <deployment identifier="macosx"/>
-        <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="19162"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="19455"/>
         <capability name="Named colors" minToolsVersion="9.0"/>
         <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
     </dependencies>
@@ -122,6 +122,7 @@
             </subviews>
             <constraints>
                 <constraint firstAttribute="trailing" secondItem="jlg-2n-tzm" secondAttribute="trailing" id="0eL-gX-odc"/>
+                <constraint firstItem="DFD-8r-YGx" firstAttribute="leading" secondItem="Hz6-mo-xeY" secondAttribute="leading" constant="32" id="4P8-mH-XGb"/>
                 <constraint firstItem="XdB-Qn-iD9" firstAttribute="centerY" secondItem="Hz6-mo-xeY" secondAttribute="centerY" id="6wl-2B-Woa"/>
                 <constraint firstAttribute="trailing" secondItem="XdB-Qn-iD9" secondAttribute="trailing" priority="900" constant="8" id="BAO-r4-OkC"/>
                 <constraint firstItem="jlg-2n-tzm" firstAttribute="leading" secondItem="Hz6-mo-xeY" secondAttribute="leading" id="DOd-Y3-APh"/>
@@ -143,7 +144,6 @@
                 <constraint firstItem="XdB-Qn-iD9" firstAttribute="leading" relation="greaterThanOrEqual" secondItem="A6g-eG-dOW" secondAttribute="trailing" constant="4" id="uNR-JN-6RT"/>
                 <constraint firstAttribute="bottom" secondItem="jlg-2n-tzm" secondAttribute="bottom" id="vcb-oV-uSI"/>
                 <constraint firstAttribute="trailing" secondItem="vuD-rY-Vzl" secondAttribute="trailing" constant="9" id="web-9k-BYT"/>
-                <constraint firstItem="DFD-8r-YGx" firstAttribute="leading" secondItem="Hz6-mo-xeY" secondAttribute="leading" constant="32" id="wsl-bP-pgm"/>
             </constraints>
             <point key="canvasLocation" x="-61" y="120.5"/>
         </customView>
@@ -152,6 +152,7 @@
                 <outlet property="closeButton" destination="vuD-rY-Vzl" id="JGv-Ac-mRi"/>
                 <outlet property="closeButtonTrailingConstraint" destination="web-9k-BYT" id="UkK-vj-qp9"/>
                 <outlet property="faviconImageView" destination="Kky-kZ-lU9" id="96Z-4T-ONB"/>
+                <outlet property="faviconWrapperView" destination="A6g-eG-dOW" id="5ol-jq-QwE"/>
                 <outlet property="faviconWrapperViewCenterConstraint" destination="PF1-mZ-U4m" id="5KT-Cu-bbm"/>
                 <outlet property="faviconWrapperViewLeadingConstraint" destination="TSx-41-S2A" id="342-tk-EzF"/>
                 <outlet property="mouseClickView" destination="890-3t-v5O" id="rcf-rO-cap"/>
@@ -161,6 +162,7 @@
                 <outlet property="rightSeparatorView" destination="opQ-Od-dCO" id="k6U-n5-y4S"/>
                 <outlet property="tabLoadingPermissionLeadingConstraint" destination="uNR-JN-6RT" id="r7F-38-4Nx"/>
                 <outlet property="titleTextField" destination="DFD-8r-YGx" id="6mj-b0-Oq3"/>
+                <outlet property="titleTextFieldLeadingConstraint" destination="4P8-mH-XGb" id="mKz-Wl-mQJ"/>
                 <outlet property="view" destination="Hz6-mo-xeY" id="DwG-v1-cn3"/>
             </connections>
         </collectionViewItem>
