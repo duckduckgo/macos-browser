@@ -17,6 +17,7 @@
 //
 
 import Foundation
+import WebKit
 
 enum PermissionType: String, CaseIterable {
     case camera
@@ -37,7 +38,7 @@ extension PermissionType {
 
 extension Array where Element == PermissionType {
 
-    @available(OSX 11.3, *)
+    @available(OSX 12, *)
     init?(devices: WKMediaCaptureType) {
         switch devices {
         case .camera:

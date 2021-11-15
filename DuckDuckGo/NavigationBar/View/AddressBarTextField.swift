@@ -40,11 +40,17 @@ final class AddressBarTextField: NSTextField {
         }
     }
 
-    var isSuggestionWindowVisible: AnyPublisher<Bool, Never> {
+    var suggestionWindowVisible: AnyPublisher<Bool, Never> {
         self.publisher(for: \.suggestionWindowController?.window?.isVisible)
             .map { $0 ?? false }
             .eraseToAnyPublisher()
     }
+
+    var isSuggestionWindowVisible: Bool {
+        suggestionWindowController?.window?.isVisible == true
+    }
+
+    @IBInspectable var isHomepageAddressBar: Bool = false
 
     private var suggestionItemsCancellable: AnyCancellable?
     private var selectedSuggestionViewModelCancellable: AnyCancellable?
@@ -111,7 +117,6 @@ final class AddressBarTextField: NSTextField {
         }
         addressBarStringCancellable = selectedTabViewModel.$addressBarString.receive(on: DispatchQueue.main).sink { [weak self] _ in
             self?.updateValue()
-            self?.makeMeFirstResponderIfNeeded()
         }
     }
 
@@ -125,7 +130,7 @@ final class AddressBarTextField: NSTextField {
         value = Value(stringValue: addressBarString, userTyped: false, isSearch: isSearch)
     }
 
-    private func makeMeFirstResponderIfNeeded() {
+    func makeMeFirstResponderIfNeeded() {
         let focusTab = tabCollectionViewModel.selectedTabViewModel?.tab.content.shouldFocusAddressBarAfterSelection ?? true
 
         if focusTab, stringValue == "" {
@@ -182,14 +187,13 @@ final class AddressBarTextField: NSTextField {
         currentEditor()?.selectAll(self)
     }
 
-    private func updateTabUrl(suggestion: Suggestion?) {
+    private func updateTabUrlWithUrl(_ providedUrl: URL?, suggestion: Suggestion?) {
         guard let selectedTabViewModel = tabCollectionViewModel.selectedTabViewModel else {
             os_log("%s: Selected tab view model is nil", type: .error, className)
             return
         }
 
-        guard var url = makeUrl(suggestion: suggestion,
-                                stringValueWithoutSuffix: stringValueWithoutSuffix) else {
+        guard var url = providedUrl else {
             os_log("%s: Making url from address bar string failed", type: .error, className)
             return
         }
@@ -211,27 +215,50 @@ final class AddressBarTextField: NSTextField {
             Pixel.fire(.refresh(source: .reloadURL))
             selectedTabViewModel.tab.reload()
         } else {
-            
-            Pixel.fire(.navigation(kind: .init(url: url), source: suggestion != nil ? .suggestion : .addressBar))
+
+            Pixel.fire(.navigation(kind: .init(url: url), source: isHomepageAddressBar ? .newTab : (suggestion != nil ? .suggestion : .addressBar)))
             selectedTabViewModel.tab.update(url: url)
         }
 
         self.window?.makeFirstResponder(nil)
     }
 
-    private func openNewTab(selected: Bool, suggestion: Suggestion?) {
-        guard let url = makeUrl(suggestion: suggestion,
-                                stringValueWithoutSuffix: stringValueWithoutSuffix) else {
+    private func updateTabUrl(suggestion: Suggestion?) {
+        makeUrl(suggestion: suggestion,
+                stringValueWithoutSuffix: stringValueWithoutSuffix,
+                completion: { [weak self] url, isUpgraded in
+                    if isUpgraded { self?.updateTabUpgradedToUrl(url) }
+                    self?.updateTabUrlWithUrl(url, suggestion: suggestion)
+                })
+    }
+
+    private func updateTabUpgradedToUrl(_ url: URL?) {
+        if url == nil { return }
+        let tab = tabCollectionViewModel.selectedTabViewModel?.tab
+        tab?.setMainFrameConnectionUpgradedTo(url)
+    }
+
+    private func openNewTabWithUrl(_ providedUrl: URL?, selected: Bool, suggestion: Suggestion?) {
+        guard let url = providedUrl else {
             os_log("%s: Making url from address bar string failed", type: .error, className)
             return
         }
 
-        Pixel.fire(.navigation(kind: .init(url: url), source: suggestion != nil ? .suggestion : .addressBar))
+        Pixel.fire(.navigation(kind: .init(url: url), source: isHomepageAddressBar ? .newTab : (suggestion != nil ? .suggestion : .addressBar)))
         let tab = Tab(content: .url(url), shouldLoadInBackground: true)
         tabCollectionViewModel.append(tab: tab, selected: selected)
     }
 
-    private func makeUrl(suggestion: Suggestion?, stringValueWithoutSuffix: String) -> URL? {
+    private func openNewTab(selected: Bool, suggestion: Suggestion?) {
+        makeUrl(suggestion: suggestion,
+                stringValueWithoutSuffix: stringValueWithoutSuffix,
+                completion: { [weak self] url, isUpgraded in
+                    if isUpgraded { self?.updateTabUpgradedToUrl(url) }
+                    self?.openNewTabWithUrl(url, selected: selected, suggestion: suggestion)
+                })
+    }
+
+    private func makeUrl(suggestion: Suggestion?, stringValueWithoutSuffix: String, completion: @escaping (URL?, Bool) -> Void) {
         let finalUrl: URL?
         switch suggestion {
         case .bookmark(title: _, url: let url, isFavorite: _),
@@ -244,7 +271,15 @@ final class AddressBarTextField: NSTextField {
         case .none:
             finalUrl = URL.makeURL(from: stringValueWithoutSuffix)
         }
-        return finalUrl
+
+        guard let url = finalUrl else {
+            completion(finalUrl, false)
+            return
+        }
+
+        HTTPSUpgrade.shared.isUpgradeable(url: url) { isUpgradable in
+            completion(isUpgradable ? url.toHttps() : url, isUpgradable)
+        }
     }
 
     // MARK: - Value

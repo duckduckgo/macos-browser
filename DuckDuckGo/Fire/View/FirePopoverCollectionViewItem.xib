@@ -1,0 +1,86 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<document type="com.apple.InterfaceBuilder3.Cocoa.XIB" version="3.0" toolsVersion="19162" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none" useAutolayout="YES" customObjectInstantitationMethod="direct">
+    <dependencies>
+        <deployment identifier="macosx"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="19162"/>
+        <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
+    </dependencies>
+    <objects>
+        <customObject id="-2" userLabel="File's Owner">
+            <connections>
+                <outlet property="view" destination="Hz6-mo-xeY" id="0bl-1N-x8E"/>
+            </connections>
+        </customObject>
+        <customObject id="-1" userLabel="First Responder" customClass="FirstResponder"/>
+        <customObject id="-3" userLabel="Application" customClass="NSObject"/>
+        <customView id="Hz6-mo-xeY">
+            <rect key="frame" x="0.0" y="0.0" width="265" height="24"/>
+            <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+            <subviews>
+                <stackView distribution="fill" orientation="horizontal" alignment="centerY" horizontalStackHuggingPriority="249.99998474121094" verticalStackHuggingPriority="249.99998474121094" detachesHiddenViews="YES" translatesAutoresizingMaskIntoConstraints="NO" id="jlM-kU-ddU">
+                    <rect key="frame" x="16" y="0.0" width="249" height="24"/>
+                    <subviews>
+                        <button verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="X8J-Aj-0ZV">
+                            <rect key="frame" x="-2" y="3" width="18" height="18"/>
+                            <constraints>
+                                <constraint firstAttribute="height" constant="14" id="HC1-u3-Aru"/>
+                                <constraint firstAttribute="width" constant="14" id="SCP-dg-MvG"/>
+                            </constraints>
+                            <buttonCell key="cell" type="check" bezelStyle="regularSquare" imagePosition="left" inset="2" id="sWG-wi-C6G">
+                                <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
+                                <font key="font" metaFont="system"/>
+                            </buttonCell>
+                            <connections>
+                                <action selector="checkButtonAction:" target="4Bn-0D-Hjp" id="siF-8h-z7b"/>
+                            </connections>
+                        </button>
+                        <imageView horizontalHuggingPriority="251" verticalHuggingPriority="251" translatesAutoresizingMaskIntoConstraints="NO" id="7mH-u3-zX1">
+                            <rect key="frame" x="22" y="4" width="16" height="16"/>
+                            <constraints>
+                                <constraint firstAttribute="width" constant="16" id="RPh-kM-6nW"/>
+                                <constraint firstAttribute="height" constant="16" id="yMz-yr-SBE"/>
+                            </constraints>
+                            <imageCell key="cell" refusesFirstResponder="YES" alignment="left" imageScaling="proportionallyDown" image="Web" id="q2b-Rf-Eil"/>
+                        </imageView>
+                        <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="p6Z-nn-uzt">
+                            <rect key="frame" x="44" y="4" width="207" height="16"/>
+                            <textFieldCell key="cell" lineBreakMode="clipping" title="Label" id="3dP-mx-q8D">
+                                <font key="font" metaFont="system"/>
+                                <color key="textColor" name="labelColor" catalog="System" colorSpace="catalog"/>
+                                <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
+                            </textFieldCell>
+                        </textField>
+                    </subviews>
+                    <visibilityPriorities>
+                        <integer value="1000"/>
+                        <integer value="1000"/>
+                        <integer value="1000"/>
+                    </visibilityPriorities>
+                    <customSpacing>
+                        <real value="3.4028234663852886e+38"/>
+                        <real value="3.4028234663852886e+38"/>
+                        <real value="3.4028234663852886e+38"/>
+                    </customSpacing>
+                </stackView>
+            </subviews>
+            <constraints>
+                <constraint firstAttribute="trailing" secondItem="jlM-kU-ddU" secondAttribute="trailing" id="0XP-Lb-9sF"/>
+                <constraint firstItem="jlM-kU-ddU" firstAttribute="leading" secondItem="Hz6-mo-xeY" secondAttribute="leading" constant="16" id="71C-vl-Bng"/>
+                <constraint firstItem="jlM-kU-ddU" firstAttribute="top" secondItem="Hz6-mo-xeY" secondAttribute="top" id="I6A-HC-lI9"/>
+                <constraint firstAttribute="bottom" secondItem="jlM-kU-ddU" secondAttribute="bottom" id="OVv-Qx-3Xz"/>
+            </constraints>
+            <point key="canvasLocation" x="-101.5" y="22"/>
+        </customView>
+        <collectionViewItem id="4Bn-0D-Hjp" customClass="FirePopoverCollectionViewItem" customModule="DuckDuckGo_Privacy_Browser" customModuleProvider="target">
+            <connections>
+                <outlet property="checkButton" destination="X8J-Aj-0ZV" id="iWO-wc-EW4"/>
+                <outlet property="domainTextField" destination="p6Z-nn-uzt" id="odN-eO-glZ"/>
+                <outlet property="faviconImageView" destination="7mH-u3-zX1" id="9f6-79-DQW"/>
+                <outlet property="view" destination="Hz6-mo-xeY" id="uYZ-H5-5dk"/>
+            </connections>
+        </collectionViewItem>
+    </objects>
+    <resources>
+        <image name="Web" width="16" height="16"/>
+    </resources>
+</document>

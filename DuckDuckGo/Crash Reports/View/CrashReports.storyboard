@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<document type="com.apple.InterfaceBuilder3.Cocoa.Storyboard.XIB" version="3.0" toolsVersion="18122" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none" useAutolayout="YES">
+<document type="com.apple.InterfaceBuilder3.Cocoa.Storyboard.XIB" version="3.0" toolsVersion="19162" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none" useAutolayout="YES">
     <dependencies>
         <deployment identifier="macosx"/>
-        <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="18122"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="19162"/>
         <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
     </dependencies>
     <scenes>
@@ -44,8 +44,9 @@
                                 <constraints>
                                     <constraint firstAttribute="width" constant="510" id="axz-QQ-mY7"/>
                                 </constraints>
-                                <textFieldCell key="cell" title="Click &quot;Send to DuckDuckGo&quot; to submit report to DuckDuckGo. No personal infomation is sent with this report." id="FNu-TK-DVM">
+                                <textFieldCell key="cell" id="FNu-TK-DVM">
                                     <font key="font" metaFont="smallSystem"/>
+                                    <string key="title">Click "Send to DuckDuckGo" to submit report to DuckDuckGo. Crash reports help DuckDuckGo diagnose issues and improve our products. No personal information is sent with this report.</string>
                                     <color key="textColor" name="labelColor" catalog="System" colorSpace="catalog"/>
                                     <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
                                 </textFieldCell>
@@ -61,15 +62,15 @@
                             <scrollView borderType="none" horizontalLineScroll="10" horizontalPageScroll="10" verticalLineScroll="10" verticalPageScroll="10" hasHorizontalScroller="NO" translatesAutoresizingMaskIntoConstraints="NO" id="BCE-ZT-Gcn">
                                 <rect key="frame" x="20" y="50" width="510" height="261"/>
                                 <clipView key="contentView" drawsBackground="NO" id="7d5-pg-ric">
-                                    <rect key="frame" x="0.0" y="0.0" width="495" height="261"/>
+                                    <rect key="frame" x="0.0" y="0.0" width="510" height="261"/>
                                     <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                     <subviews>
                                         <textView editable="NO" importsGraphics="NO" richText="NO" verticallyResizable="YES" fieldEditor="YES" usesRuler="YES" smartInsertDelete="YES" id="kX4-zd-AAp">
-                                            <rect key="frame" x="0.0" y="0.0" width="495" height="261"/>
+                                            <rect key="frame" x="0.0" y="0.0" width="510" height="261"/>
                                             <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                             <color key="textColor" name="secondaryLabelColor" catalog="System" colorSpace="catalog"/>
                                             <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
-                                            <size key="minSize" width="495" height="261"/>
+                                            <size key="minSize" width="510" height="261"/>
                                             <size key="maxSize" width="562" height="10000000"/>
                                             <color key="insertionPointColor" name="textColor" catalog="System" colorSpace="catalog"/>
                                         </textView>
@@ -78,12 +79,12 @@
                                 <constraints>
                                     <constraint firstAttribute="height" constant="261" id="aY8-ps-wVW"/>
                                 </constraints>
-                                <scroller key="horizontalScroller" hidden="YES" verticalHuggingPriority="750" horizontal="YES" id="xTu-AP-Svq">
+                                <scroller key="horizontalScroller" hidden="YES" wantsLayer="YES" verticalHuggingPriority="750" horizontal="YES" id="xTu-AP-Svq">
                                     <rect key="frame" x="-100" y="-100" width="225" height="15"/>
                                     <autoresizingMask key="autoresizingMask"/>
                                 </scroller>
-                                <scroller key="verticalScroller" verticalHuggingPriority="750" horizontal="NO" id="w5p-4h-eAs">
-                                    <rect key="frame" x="495" y="0.0" width="15" height="261"/>
+                                <scroller key="verticalScroller" wantsLayer="YES" verticalHuggingPriority="750" horizontal="NO" id="w5p-4h-eAs">
+                                    <rect key="frame" x="494" y="0.0" width="16" height="261"/>
                                     <autoresizingMask key="autoresizingMask"/>
                                 </scroller>
                             </scrollView>
@@ -102,7 +103,7 @@ DQ
                             </button>
                             <button verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="CAq-Gi-cda">
                                 <rect key="frame" x="273" y="13" width="102" height="32"/>
-                                <buttonCell key="cell" type="push" title="Don't Send" bezelStyle="rounded" alignment="center" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="BUX-UX-TAr">
+                                <buttonCell key="cell" type="push" title="Don’t Send" bezelStyle="rounded" alignment="center" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="BUX-UX-TAr">
                                     <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
                                     <font key="font" metaFont="system"/>
                                 </buttonCell>

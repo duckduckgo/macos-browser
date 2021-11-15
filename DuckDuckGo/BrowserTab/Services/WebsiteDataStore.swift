@@ -36,6 +36,7 @@ protocol WebsiteDataStore {
     func fetchDataRecords(ofTypes dataTypes: Set<String>, completionHandler: @escaping ([WKWebsiteDataRecord]) -> Void)
 
     func removeData(ofTypes dataTypes: Set<String>, for dataRecords: [WKWebsiteDataRecord], completionHandler: @escaping () -> Void)
+    func removeData(ofTypes dataTypes: Set<String>, modifiedSince date: Date, completionHandler: @escaping () -> Void)
 
 }
 
@@ -43,27 +44,84 @@ internal class WebCacheManager {
 
     static var shared = WebCacheManager()
 
-    init() { }
+    private let fireproofDomains: FireproofDomains
+    private let websiteDataStore: WebsiteDataStore
 
-    func clear(dataStore: WebsiteDataStore = WKWebsiteDataStore.default(),
-               logins: FireproofDomains = FireproofDomains.shared,
+    init(fireproofDomains: FireproofDomains = FireproofDomains.shared,
+         websiteDataStore: WebsiteDataStore = WKWebsiteDataStore.default()) {
+        self.fireproofDomains = fireproofDomains
+        self.websiteDataStore = websiteDataStore
+    }
+
+    func clear(completion: @escaping () -> Void) {
+
+        var types = WKWebsiteDataStore.allWebsiteDataTypes()
+        types.remove(WKWebsiteDataTypeCookies)
+
+        websiteDataStore.removeData(ofTypes: types, modifiedSince: Date.distantPast) {
+            guard let cookieStore = self.websiteDataStore.cookieStore else {
+                completion()
+                return
+            }
+
+            cookieStore.getAllCookies { cookies in
+                let group = DispatchGroup()
+                // Don't clear fireproof domains
+                let cookiesToRemove = cookies.filter { cookie in
+                    !self.fireproofDomains.isFireproof(cookieDomain: cookie.domain) && cookie.domain != URL.cookieDomain
+                }
+
+                for cookie in cookiesToRemove {
+                    group.enter()
+                    os_log("Deleting cookie for %s named %s", log: .fire, cookie.domain, cookie.name)
+                    cookieStore.delete(cookie) {
+                        group.leave()
+                    }
+                }
+
+                group.notify(queue: .main) {
+                    completion()
+                }
+            }
+        }
+    }
+
+    func clear(domains: Set<String>? = nil,
                completion: @escaping () -> Void) {
 
         let all = WKWebsiteDataStore.allWebsiteDataTypes()
-        let allExceptCookies = all.filter { $0 != "WKWebsiteDataTypeCookies" }
+        let allExceptCookies = all.filter { $0 != WKWebsiteDataTypeCookies }
 
-        dataStore.fetchDataRecords(ofTypes: all) { records in
+        websiteDataStore.fetchDataRecords(ofTypes: all) { [weak self] records in
 
             // Remove all data except cookies for all domains, and then filter cookies to preserve those allowed by Fireproofing.
-            dataStore.removeData(ofTypes: allExceptCookies, for: records) {
-                guard let cookieStore = dataStore.cookieStore else {
+            self?.websiteDataStore.removeData(ofTypes: allExceptCookies, for: records) { [weak self] in
+                guard let self = self else { return }
+
+                guard let cookieStore = self.websiteDataStore.cookieStore else {
                     completion()
                     return
                 }
 
-                let group = DispatchGroup()
                 cookieStore.getAllCookies { cookies in
-                    let cookiesToRemove = cookies.filter { !logins.isFireproof(cookieDomain: $0.domain) && $0.domain != URL.cookieDomain }
+                    let group = DispatchGroup()
+
+                    var cookies = cookies
+                    if let domains = domains {
+                        // If domains are specified, clear just their cookies
+                        cookies = cookies.filter { cookie in
+                            domains.contains {
+                                $0 == cookie.domain
+                                || ".\($0)" == cookie.domain
+                                || (cookie.domain.hasPrefix(".") && $0.hasSuffix(cookie.domain))
+                            }
+                        }
+                    }
+                    // Don't clear fireproof domains
+                    let cookiesToRemove = cookies.filter { cookie in
+                        !self.fireproofDomains.isFireproof(cookieDomain: cookie.domain) && cookie.domain != URL.cookieDomain
+                    }
+
                     for cookie in cookiesToRemove {
                         group.enter()
                         os_log("Deleting cookie for %s named %s", log: .fire, cookie.domain, cookie.name)
@@ -71,11 +129,8 @@ internal class WebCacheManager {
                             group.leave()
                         }
                     }
-                }
 
-                DispatchQueue.global(qos: .background).async {
-                    group.wait()
-                    DispatchQueue.main.async {
+                    group.notify(queue: .main) {
                         completion()
                     }
                 }

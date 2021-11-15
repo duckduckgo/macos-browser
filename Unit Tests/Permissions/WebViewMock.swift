@@ -29,12 +29,12 @@ import WebKit
                  decisionHandler: @escaping (String, Bool) -> Void)
 
     @objc(webView:requestMediaCapturePermissionForOrigin:initiatedByFrame:type:decisionHandler:)
-    @available(macOS 12, *)
-    func webView(_ webView: WKWebView,
-                 requestMediaCapturePermissionFor origin: WKSecurityOrigin,
-                 initiatedBy frame: WKFrameInfo,
-                 type: WKMediaCaptureType,
-                 decisionHandler: @escaping (WKPermissionDecision) -> Void)
+    @available(macOS 12.0, *)
+    optional func webView(_ webView: WKWebView,
+                          requestMediaCapturePermissionFor origin: WKSecurityOrigin,
+                          initiatedByFrame frame: WKFrameInfo,
+                          type: WKMediaCaptureType,
+                          decisionHandler: @escaping (WKPermissionDecision) -> Void)
 
     @objc(_webView:requestUserMediaAuthorizationForDevices:url:mainFrameURL:decisionHandler:)
     func webView(_ webView: WKWebView,
@@ -120,7 +120,7 @@ final class WebViewMock: WKWebView {
 
     var setCameraCaptureStateHandler: ((Bool?) -> Void)?
     @available(macOS 12.0, *)
-    override func setCameraCaptureState(_ state: WKMediaCaptureState, completionHandler: @escaping () -> Void) {
+    override func setCameraCaptureState(_ state: WKMediaCaptureState, completionHandler: (() -> Void)?) {
         cameraCaptureState = state
         switch state {
         case .none: setCameraCaptureStateHandler?(.none)
@@ -132,7 +132,7 @@ final class WebViewMock: WKWebView {
 
     var setMicCaptureStateHandler: ((Bool?) -> Void)?
     @available(macOS 12.0, *)
-    override func setMicrophoneCaptureState(_ state: WKMediaCaptureState, completionHandler: @escaping () -> Void) {
+    override func setMicrophoneCaptureState(_ state: WKMediaCaptureState, completionHandler: (() -> Void)?) {
         microphoneCaptureState = state
         switch state {
         case .none: setMicCaptureStateHandler?(.none)

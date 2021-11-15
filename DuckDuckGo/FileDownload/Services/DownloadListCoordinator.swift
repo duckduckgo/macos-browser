@@ -281,6 +281,17 @@ final class DownloadListCoordinator {
         store.clear()
     }
 
+    func cleanupInactiveDownloads(for domains: Set<String>) {
+        for (id, item) in self.items where item.progress == nil {
+            if domains.contains(item.websiteURL?.host ?? "") ||
+                domains.contains(item.url.host ?? "") {
+                self.items[id] = nil
+                self.updatesSubject.send((.removed, item))
+                store.remove(item)
+            }
+        }
+    }
+
     func remove(downloadWithIdentifier identifier: UUID) {
         dispatchPrecondition(condition: .onQueue(.main))
 
@@ -330,7 +341,7 @@ private extension DownloadListItem {
         self.init(identifier: UUID(),
                   added: now,
                   modified: now,
-                  url: task.originalRequest?.url ?? .emptyPage,
+                  url: task.originalRequest?.url ?? .blankPage,
                   websiteURL: task.originalRequest?.mainDocumentURL,
                   progress: task.progress,
                   destinationURL: nil,

@@ -22,7 +22,14 @@ struct PrivacySecurityPreferences {
 
     @UserDefaultsWrapper(key: .loginDetectionEnabled, defaultValue: true)
     public var loginDetectionEnabled: Bool
-
+    
+    @UserDefaultsWrapper(key: .gpcEnabled, defaultValue: true)
+    public var gpcEnabled: Bool {
+        didSet {
+            DefaultScriptSourceProvider.shared.reload()
+            GPCRequestFactory.shared.reloadGPCSetting()
+        }
+    }
 }
 
 extension PrivacySecurityPreferences: PreferenceSection {

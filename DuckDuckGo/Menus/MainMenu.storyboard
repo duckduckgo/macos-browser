@@ -112,7 +112,7 @@
                                             </connections>
                                         </menuItem>
                                         <menuItem isSeparatorItem="YES" id="lUm-8h-5el"/>
-                                        <menuItem title="Burn Website Data..." id="b1E-Hc-xhP">
+                                        <menuItem title="Clear Browsing Data..." id="b1E-Hc-xhP">
                                             <string key="keyEquivalent" base64-UTF8="YES">
 CA
 </string>
@@ -199,7 +199,7 @@ CA
                                             <modifierMask key="keyEquivalentModifierMask"/>
                                             <menu key="submenu" title="Find" id="1b7-l0-nxx">
                                                 <items>
-                                                    <menuItem title="Find…" tag="1" keyEquivalent="f" id="Xz5-n4-O0W">
+                                                    <menuItem title="Find in Page…" tag="1" keyEquivalent="f" id="Xz5-n4-O0W">
                                                         <connections>
                                                             <action selector="findInPage:" target="Ady-hI-5gd" id="XOi-sW-sOR"/>
                                                         </connections>
@@ -466,7 +466,7 @@ CA
                                 <modifierMask key="keyEquivalentModifierMask"/>
                                 <menu key="submenu" title="Bookmarks" id="AGQ-XC-31O">
                                     <items>
-                                        <menuItem title="Bookmark this page..." enabled="NO" keyEquivalent="d" id="Nkm-zy-JXD">
+                                        <menuItem title="Bookmark This Page..." enabled="NO" keyEquivalent="d" id="Nkm-zy-JXD">
                                             <connections>
                                                 <action selector="bookmarkThisPage:" target="Ady-hI-5gd" id="Mah-44-bE1"/>
                                             </connections>

@@ -30,6 +30,7 @@ final class BrowserTabViewController: NSViewController {
     @IBOutlet weak var homepageView: NSView!
     @IBOutlet weak var errorMessageLabel: NSTextField!
     @IBOutlet weak var hoverLabel: NSTextField!
+    @IBOutlet weak var hoverLabelContainer: NSView!
     weak var webView: WebView?
 
     var tabViewModel: TabViewModel?
@@ -43,6 +44,8 @@ final class BrowserTabViewController: NSViewController {
     private var contextMenuLink: URL?
     private var contextMenuImage: URL?
     private var contextMenuSelectedText: String?
+
+    private var hoverLabelWorkItem: DispatchWorkItem?
 
     required init?(coder: NSCoder) {
         fatalError("BrowserTabViewController: Bad initializer")
@@ -66,6 +69,7 @@ final class BrowserTabViewController: NSViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
 
+        hoverLabelContainer.alphaValue = 0
         subscribeToSelectedTabViewModel()
         subscribeToErrorViewState()
     }
@@ -84,6 +88,7 @@ final class BrowserTabViewController: NSViewController {
     /// 3. A URL is provided after already adding the webview, so the webview should be reloaded.
     private func updateInterface() {
         changeWebView()
+        scheduleHoverLabelUpdatesForUrl(nil)
         show(tabContent: tabCollectionViewModel.selectedTabViewModel?.tab.content)
     }
 
@@ -105,8 +110,10 @@ final class BrowserTabViewController: NSViewController {
         webView.frame = view.bounds
         webView.autoresizingMask = [.width, .height]
         view.addSubview(webView)
-        hoverLabel.removeFromSuperview()
-        view.addSubview(hoverLabel)
+
+        // Make sure this is on top
+        view.addSubview(hoverLabelContainer)
+
         setFirstResponderIfNeeded()
     }
 
@@ -377,8 +384,41 @@ extension BrowserTabViewController: TabDelegate {
     }
 
     func tab(_ tab: Tab, didChangeHoverLink url: URL?) {
-        hoverLabel.isHidden = url == nil
-        hoverLabel.stringValue = url?.absoluteString ?? ""
+        scheduleHoverLabelUpdatesForUrl(url)
+    }
+
+    func windowDidResignKey() {
+        scheduleHoverLabelUpdatesForUrl(nil)
+    }
+
+    private func scheduleHoverLabelUpdatesForUrl(_ url: URL?) {
+        // cancel previous animation, if any
+        hoverLabelWorkItem?.cancel()
+
+        // schedule an animation if needed
+        var animationItem: DispatchWorkItem?
+        var delay: Double = 0
+        if url == nil && hoverLabelContainer.alphaValue > 0 {
+            // schedule a fade out
+            delay = 0.1
+            animationItem = DispatchWorkItem { [weak self] in
+                self?.hoverLabelContainer.animator().alphaValue = 0
+            }
+        } else if url != nil && hoverLabelContainer.alphaValue < 1 {
+            // schedule a fade in
+            delay = 0.5
+            animationItem = DispatchWorkItem { [weak self] in
+                self?.hoverLabel.stringValue = url?.absoluteString ?? ""
+                self?.hoverLabelContainer.animator().alphaValue = 1
+            }
+        } else {
+            hoverLabel.stringValue = url?.absoluteString ?? ""
+        }
+
+        if let item = animationItem {
+            hoverLabelWorkItem = item
+            DispatchQueue.main.asyncAfter(deadline: .now() + delay, execute: item)
+        }
     }
 
 }
@@ -593,7 +633,7 @@ extension BrowserTabViewController: WKUIDelegate {
     @available(macOS 12, *)
     func webView(_ webView: WKWebView,
                  requestMediaCapturePermissionFor origin: WKSecurityOrigin,
-                 initiatedBy frame: WKFrameInfo,
+                 initiatedByFrame frame: WKFrameInfo,
                  type: WKMediaCaptureType,
                  decisionHandler: @escaping (WKPermissionDecision) -> Void) {
         guard let permissions = [PermissionType](devices: type) else {

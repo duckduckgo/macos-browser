@@ -44,7 +44,6 @@ final class TabBarViewController: NSViewController {
     @IBOutlet weak var windowDraggingViewLeadingConstraint: NSLayoutConstraint!
 
     private let tabCollectionViewModel: TabCollectionViewModel
-    private let fireViewModel: FireViewModel
     private let bookmarkManager: BookmarkManager = LocalBookmarkManager.shared
 
     private var tabsCancellable: AnyCancellable?
@@ -55,9 +54,8 @@ final class TabBarViewController: NSViewController {
         fatalError("TabBarViewController: Bad initializer")
     }
 
-    init?(coder: NSCoder, tabCollectionViewModel: TabCollectionViewModel, fireViewModel: FireViewModel) {
+    init?(coder: NSCoder, tabCollectionViewModel: TabCollectionViewModel) {
         self.tabCollectionViewModel = tabCollectionViewModel
-        self.fireViewModel = fireViewModel
 
         super.init(coder: coder)
     }
@@ -590,7 +588,7 @@ extension TabBarViewController: NSCollectionViewDelegate {
         if let url = tabCollectionViewModel.tabCollection.tabs[indexPath.item].content.url {
             return url as NSURL
         } else {
-            return URL.emptyPage as NSURL
+            return URL.blankPage as NSURL
         }
     }
 

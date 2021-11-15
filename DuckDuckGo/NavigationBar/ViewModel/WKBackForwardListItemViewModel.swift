@@ -36,7 +36,7 @@ final class WKBackForwardListItemViewModel {
     var title: String {
         switch backForwardListItem {
         case .backForwardListItem(let item):
-            if item.url == URL.emptyPage {
+            if item.url == .homePage {
                 return UserText.tabHomeTitle
             }
 
@@ -61,7 +61,7 @@ final class WKBackForwardListItemViewModel {
     }
 
     var image: NSImage? {
-        if backForwardListItem.url == URL.emptyPage {
+        if backForwardListItem.url == .homePage {
             return NSImage(named: "HomeFavicon")
         }
 

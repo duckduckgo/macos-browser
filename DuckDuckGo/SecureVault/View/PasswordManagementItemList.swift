@@ -30,12 +30,21 @@ struct PasswordManagementItemListView: View {
             VStack(alignment: .leading) {
                 Spacer(minLength: 10)
 
-                ForEach(model.displayedAccounts, id: \.id) { account in
-                    ItemView(account: account, selected: model.selected?.id == account.id) {
-                        model.selectAccount(account)
+                ForEach(model.displayedItems, id: \.title) { section in
+
+                    Section(header: Text(section.title).padding(.leading, 18).padding(.top, 10)) {
+
+                        ForEach(section.items, id: \.id) { item in
+                            ItemView(item: item, selected: model.selected == item) {
+                                model.selected(item: item)
+                            }
+                            .padding(.horizontal, 10)
+                        }
                     }
-                    .padding(.horizontal, 10)
+
                 }
+
+                Spacer(minLength: 10)
             }
         }
 
@@ -45,39 +54,52 @@ struct PasswordManagementItemListView: View {
 
 private struct ItemView: View {
 
-    let account: SecureVaultModels.WebsiteAccount
+    let item: SecureVaultItem
     let selected: Bool
     let action: () -> Void
 
     var body: some View {
 
-        let textColor = selected ? Color(NSColor.selectedControlTextColor) : Color(NSColor.controlTextColor)
+        let textColor = selected ? .white : Color(NSColor.controlTextColor)
         let font = Font.custom("SFProText-Regular", size: 13)
-        let displayName = ((account.title ?? "").isEmpty == true ? account.domain.dropWWW() : account.title) ?? ""
 
         Button(action: action, label: {
             HStack(spacing: 0) {
 
-                FaviconView(domain: account.domain)
-                    .padding(.leading, 6)
+                switch item {
+                case .account(let account):
+                    LoginFaviconView(domain: account.domain)
+                        .padding(.leading, 6)
+                case .card:
+                    Image("Card")
+                        .frame(width: 32)
+                        .padding(.leading, 6)
+                case .identity:
+                    Image("Identity")
+                        .frame(width: 32)
+                        .padding(.leading, 6)
+                case .note:
+                    Image("Note")
+                        .frame(width: 32)
+                        .padding(.leading, 6)
+                }
 
                 VStack(alignment: .leading, spacing: 4) {
-                    Text(displayName)
+                    Text(item.displayTitle)
                         .foregroundColor(textColor)
                         .font(font)
-                    Text(account.username)
-                        .foregroundColor(textColor.opacity(0.6))
+                    Text(item.displaySubtitle)
+                        .foregroundColor(textColor.opacity(0.8))
                         .font(font)
                 }
                 .padding(.leading, 4)
             }
         })
-        .frame(maxHeight: 48)
-        .buttonStyle(selected ?
-                        PasswordManagerItemButtonStyle(bgColor: Color(NSColor.selectedControlColor)) :
-                        // Almost clear, so that whole view is clickable
-                        PasswordManagerItemButtonStyle(bgColor: Color(NSColor.windowBackgroundColor.withAlphaComponent(0.001))))
-
+            .frame(maxHeight: 48)
+            .buttonStyle(selected ?
+                         PasswordManagerItemButtonStyle(bgColor: Color.accentColor) :
+                            // Almost clear, so that whole view is clickable
+                         PasswordManagerItemButtonStyle(bgColor: Color(NSColor.windowBackgroundColor.withAlphaComponent(0.001))))
     }
 
 }
@@ -88,7 +110,7 @@ private struct PasswordManagerItemButtonStyle: ButtonStyle {
 
     func makeBody(configuration: Self.Configuration) -> some View {
 
-        let fillColor = configuration.isPressed ? Color.accentColor : bgColor
+        let fillColor = configuration.isPressed ? Color.accentColor.opacity(0.6) : bgColor
 
         configuration.label
             .padding(.vertical, 8)

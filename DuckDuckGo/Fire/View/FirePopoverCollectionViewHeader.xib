@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<document type="com.apple.InterfaceBuilder3.Cocoa.XIB" version="3.0" toolsVersion="19455" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none" useAutolayout="YES" customObjectInstantitationMethod="direct">
+    <dependencies>
+        <deployment identifier="macosx"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="19455"/>
+        <capability name="NSView safe area layout guides" minToolsVersion="12.0"/>
+        <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
+    </dependencies>
+    <objects>
+        <customObject id="-2" userLabel="File's Owner"/>
+        <customObject id="-1" userLabel="First Responder" customClass="FirstResponder"/>
+        <customObject id="-3" userLabel="Application" customClass="NSObject"/>
+        <customView identifier="FirePopoverCollectionViewHeader" id="c22-O7-iKe" customClass="FirePopoverCollectionViewHeader" customModule="DuckDuckGo_Privacy_Browser" customModuleProvider="target">
+            <rect key="frame" x="0.0" y="0.0" width="200" height="28"/>
+            <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+            <subviews>
+                <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="YiR-5k-KYr">
+                    <rect key="frame" x="14" y="3" width="180" height="14"/>
+                    <textFieldCell key="cell" lineBreakMode="clipping" title="Fireproof Sites" id="BXG-ly-W3v">
+                        <font key="font" metaFont="smallSystem"/>
+                        <color key="textColor" red="0.40000000000000002" green="0.40000000000000002" blue="0.40000000000000002" alpha="0.84999999999999998" colorSpace="custom" customColorSpace="sRGB"/>
+                        <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
+                    </textFieldCell>
+                </textField>
+            </subviews>
+            <constraints>
+                <constraint firstItem="YiR-5k-KYr" firstAttribute="centerY" secondItem="c22-O7-iKe" secondAttribute="centerY" constant="4" id="BkU-az-bMv"/>
+                <constraint firstItem="YiR-5k-KYr" firstAttribute="leading" secondItem="c22-O7-iKe" secondAttribute="leading" constant="16" id="Jo4-FE-sHa"/>
+                <constraint firstAttribute="trailing" secondItem="YiR-5k-KYr" secondAttribute="trailing" constant="8" id="uCf-pa-hQ0"/>
+            </constraints>
+            <viewLayoutGuide key="safeArea" id="lxB-wC-ttc"/>
+            <viewLayoutGuide key="layoutMargins" id="iZ8-VW-3zy"/>
+            <connections>
+                <outlet property="title" destination="YiR-5k-KYr" id="Wiq-p7-Dgl"/>
+            </connections>
+            <point key="canvasLocation" x="-11" y="146"/>
+        </customView>
+    </objects>
+</document>

@@ -328,22 +328,22 @@ fileprivate extension HTTPURLResponse {
     static let ifNoneMatchHeader = "If-None-Match"
     static let etagValue = "test-etag"
 
-    static let success = HTTPURLResponse(url: URL.emptyPage,
+    static let success = HTTPURLResponse(url: URL.blankPage,
                                          statusCode: 200,
                                          httpVersion: nil,
                                          headerFields: [HTTPURLResponse.etagHeader: HTTPURLResponse.etagValue])!
 
-    static let notModified = HTTPURLResponse(url: URL.emptyPage,
+    static let notModified = HTTPURLResponse(url: URL.blankPage,
                                              statusCode: 304,
                                              httpVersion: nil,
                                              headerFields: [HTTPURLResponse.etagHeader: HTTPURLResponse.etagValue])!
 
-    static let internalServerError = HTTPURLResponse(url: URL.emptyPage,
+    static let internalServerError = HTTPURLResponse(url: URL.blankPage,
                                                      statusCode: 500,
                                                      httpVersion: nil,
                                                      headerFields: [:])!
 
-    static let successNoEtag = HTTPURLResponse(url: URL.emptyPage,
+    static let successNoEtag = HTTPURLResponse(url: URL.blankPage,
                                                statusCode: 200,
                                                httpVersion: nil,
                                                headerFields: [:])!

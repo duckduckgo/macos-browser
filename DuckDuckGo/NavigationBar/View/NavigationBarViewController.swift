@@ -116,6 +116,10 @@ final class NavigationBarViewController: NSViewController {
         updateBookmarksButton()
     }
 
+    func windowDidBecomeMain() {
+        updateNavigationButtons()
+    }
+
     @IBSegueAction func createAddressBarViewController(_ coder: NSCoder) -> AddressBarViewController? {
         guard let addressBarViewController = AddressBarViewController(coder: coder,
                                                                       tabCollectionViewModel: tabCollectionViewModel) else {
@@ -165,7 +169,7 @@ final class NavigationBarViewController: NSViewController {
     }
 
     @IBAction func passwordManagementButtonAction(_ sender: NSButton) {
-        showPasswordManagementPopover()
+        showPasswordManagementPopover(sender: sender)
     }
 
     @IBAction func downloadsButtonAction(_ sender: NSButton) {
@@ -228,13 +232,13 @@ final class NavigationBarViewController: NSViewController {
         Pixel.fire(.bookmarksList(source: .button))
     }
 
-    func showPasswordManagementPopover() {
+    func showPasswordManagementPopover(sender: Any) {
         guard closeTransientPopovers() else { return }
         passwordManagementButton.isHidden = false
         passwordManagementPopover.show(relativeTo: passwordManagementButton.bounds.insetFromLineOfDeath(),
                                        of: passwordManagementButton,
                                        preferredEdge: .minY)
-        Pixel.fire(.manageLogins(source: .button))
+        Pixel.fire(.manageLogins(source: sender is NSButton ? .button : (sender is MainMenu ? .mainMenu : .moreMenu)))
     }
 
     func toggleDownloadsPopover(shouldFirePixel: Bool = true) {
@@ -242,7 +246,9 @@ final class NavigationBarViewController: NSViewController {
             downloadsPopover.close()
             return
         }
-        guard closeTransientPopovers() else { return }
+        guard closeTransientPopovers(),
+              downloadsButton.window != nil
+        else { return }
 
         downloadsButton.isHidden = false
         setDownloadButtonHidingTimer()
@@ -302,11 +308,17 @@ final class NavigationBarViewController: NSViewController {
         DownloadListCoordinator.shared.updates
             .throttle(for: 1.0, scheduler: DispatchQueue.main, latest: true)
             .sink { [weak self] update in
-                let shouldShowPopover = update.kind == .updated && update.item.destinationURL != nil && update.item.tempURL == nil
+                guard let self = self else { return }
+
+                let shouldShowPopover = update.kind == .updated
+                    && update.item.destinationURL != nil
+                    && update.item.tempURL == nil
+                    && WindowControllersManager.shared.lastKeyMainWindowController?.window === self.downloadsButton.window
+
                 if shouldShowPopover {
-                    self?.showDownloadsPopoverAndAutoHide()
+                    self.showDownloadsPopoverAndAutoHide()
                 }
-                self?.updateDownloadsButton()
+                self.updateDownloadsButton()
             }
             .store(in: &downloadsCancellables)
         DownloadListCoordinator.shared.progress
@@ -321,6 +333,8 @@ final class NavigationBarViewController: NSViewController {
     }
 
     private func updatePasswordManagementButton() {
+        let url = tabCollectionViewModel.selectedTabViewModel?.tab.content.url
+
         passwordManagementButton.image = NSImage(named: "PasswordManagement")
 
         if saveCredentialsPopover.isShown {
@@ -333,6 +347,12 @@ final class NavigationBarViewController: NSViewController {
         }
 
         passwordManagementButton.isHidden = !passwordManagementPopover.isShown
+
+        passwordManagementPopover.viewController.domain = nil
+        guard let url = url, let domain = url.host else {
+            return
+        }
+        passwordManagementPopover.viewController.domain = domain
     }
 
     private func updateDownloadsButton() {
@@ -437,7 +457,7 @@ extension NavigationBarViewController: OptionsButtonMenuDelegate {
     }
 
     func optionsButtonMenuRequestedLoginsPopover(_ menu: NSMenu) {
-        showPasswordManagementPopover()
+        showPasswordManagementPopover(sender: menu)
     }
 
     func optionsButtonMenuRequestedDownloadsPopover(_ menu: NSMenu) {

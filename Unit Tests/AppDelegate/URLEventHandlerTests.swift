@@ -32,7 +32,7 @@ final class URLEventHandlerTests: XCTestCase {
     }
 
     private func assertUrlHandled(_ urlString: String) {
-        var handlerCalled: XCTestExpectation!
+        let handlerCalled = expectation(description: "handler called")
         let listener = URLEventHandler { url in
             XCTAssertEqual(url.absoluteString, urlString)
             handlerCalled.fulfill()
@@ -45,18 +45,10 @@ final class URLEventHandlerTests: XCTestCase {
                                            returnID: 0,
                                            transactionID: 0)
         event.setParam(.init(string: urlString), forKeyword: keyDirectObject)
-        NSWorkspace.shared.open([URL(string: urlString)!],
-                                withAppBundleIdentifier: Bundle.main.bundleIdentifier,
-                                options: .default,
-                                additionalEventParamDescriptor: event,
-                                launchIdentifiers: nil)
-
-        handlerCalled = expectation(description: "handler called")
         listener.applicationDidFinishLaunching()
-        
-        withExtendedLifetime(listener) {
-            waitForExpectations(timeout: 1.0, handler: nil)
-        }
+        listener.handleUrlEvent(event: event, reply: NSAppleEventDescriptor())
+
+        wait(for: [handlerCalled], timeout: 1)
     }
 
     func testWhenFilePassedOnLaunchThenFileOpenedAfterAppDidFinishLaunching() {

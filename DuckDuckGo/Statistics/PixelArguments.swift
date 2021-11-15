@@ -179,7 +179,7 @@ extension Pixel.Event {
         case fireproofed = "fireproofed"
         case nonFireproofed = "non-fireproofed"
 
-        init(url: URL?, fireproofDomains: FireproofDomains = .shared) {
+        init(url: URL?, fireproofDomains: FireproofDomains = FireproofDomains.shared) {
             if let host = url?.host,
                fireproofDomains.isFireproof(fireproofDomain: host) {
                 self = .fireproofed
@@ -255,6 +255,14 @@ extension Pixel.Event {
             self = .bookmark(isFavorite: bookmark.isFavorite)
         }
 
+    }
+
+    enum FormAutofillKind: String, CustomStringConvertible {
+        var description: String { rawValue }
+
+        case password
+        case card
+        case identity
     }
 
     enum NavigationAccessPoint: String, CustomStringConvertible {

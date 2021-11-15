@@ -55,7 +55,7 @@ final class APIHeaders {
 
     var userAgent: String {
         let osVersion = ProcessInfo.processInfo.operatingSystemVersion
-        return "ddg_mac/\(appVersion.versionAndBuildNumber) (\(appVersion.identifier); macOS \(osVersion))"
+        return "ddg_mac/\(appVersion.versionNumber) (\(appVersion.identifier); macOS \(osVersion))"
     }
 
     func defaultHeaders(with etag: String?) -> HTTPHeaders {

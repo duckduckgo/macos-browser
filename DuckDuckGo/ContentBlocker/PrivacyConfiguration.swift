@@ -19,7 +19,7 @@
 
 import Foundation
 
-public struct PrivacyConfiguration: Codable {
+public struct PrivacyConfiguration: Decodable {
     public typealias FeatureName = String
     public typealias UnprotectedList = [ExceptionEntry]
     
@@ -28,6 +28,9 @@ public struct PrivacyConfiguration: Codable {
     
     public enum SupportedFeatures: String {
         case contentBlocking
+        case gpc
+        case navigatorCredentials
+        case https
     }
     
     public init(features: [String: PrivacyFeature], unprotectedTemporary: [ExceptionEntry]) {
@@ -57,22 +60,32 @@ public struct PrivacyConfiguration: Codable {
     }
 }
 
-public struct PrivacyFeature: Codable {
+public struct PrivacyFeature: Decodable {
     public typealias FeatureState = String
     public typealias ExceptionList = [ExceptionEntry]
-    public typealias FeatureSettings = [String: String]
+    public typealias FeatureSettings = [String: Any]?
     
     public let state: FeatureState
     public let exceptions: ExceptionList
+    public let settings: FeatureSettings
     
-    public init(state: String, exceptions: [ExceptionEntry]) {
+    public init(state: String, exceptions: [ExceptionEntry], settings: FeatureSettings) {
         self.state = state
         self.exceptions = exceptions
+        self.settings = settings
+    }
+    
+    public init(from decoder: Decoder) throws {
+        let container = try decoder.container(keyedBy: CodingKeys.self)
+        self.state = try container.decode(String.self, forKey: .state)
+        self.exceptions = try container.decode(ExceptionList.self, forKey: .exceptions)
+        self.settings = try container.decodeIfPresent([String: Any].self, forKey: .settings)
     }
     
     enum CodingKeys: String, CodingKey {
         case state
         case exceptions
+        case settings
     }
 }
 

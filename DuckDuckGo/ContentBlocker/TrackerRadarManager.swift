@@ -124,6 +124,12 @@ final class TrackerRadarManager {
         return nil
     }
 
+    func isHostMajorTrackingNetwork(_ host: String) -> Bool {
+        let majorTrackerThresholdPrevalence = 25.0
+        let parentEntity = findEntity(forHost: host)
+        return (parentEntity?.prevalence ?? 0.0) >= majorTrackerThresholdPrevalence
+    }
+
     private func variations(of host: String) -> [String] {
         var parts = host.components(separatedBy: ".")
         var domains = [String]()

@@ -46,6 +46,10 @@ internal class FireproofDomains {
     }
 
     func addToAllowed(domain: String) {
+        guard !isFireproof(fireproofDomain: domain) else {
+            return
+        }
+
         fireproofDomains += [domain]
 
         NotificationCenter.default.post(name: Constants.newFireproofDomainNotification, object: self, userInfo: [
@@ -72,7 +76,7 @@ internal class FireproofDomains {
     }
 
     func isFireproof(fireproofDomain domain: String) -> Bool {
-        return fireproofDomains.contains(domain)
+        return fireproofDomains.contains(where: { $0.hasSuffix(domain) || $0.dropWWW().hasSuffix(domain) })
     }
 
     func isURLFireproof(url: URL) -> Bool {

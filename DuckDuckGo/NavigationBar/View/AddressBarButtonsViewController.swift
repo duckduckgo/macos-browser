@@ -28,6 +28,7 @@ protocol AddressBarButtonsViewControllerDelegate: AnyObject {
 }
 
 // swiftlint:disable type_body_length
+// swiftlint:disable file_length
 final class AddressBarButtonsViewController: NSViewController {
 
     static let homeFaviconImage = NSImage(named: "HomeFavicon")
@@ -107,10 +108,13 @@ final class AddressBarButtonsViewController: NSViewController {
     private var urlCancellable: AnyCancellable?
     private var trackerInfoCancellable: AnyCancellable?
     private var bookmarkListCancellable: AnyCancellable?
+    private var privacyDashboadPendingUpdatesCancellable: AnyCancellable?
     private var trackersAnimationViewStatusCancellable: AnyCancellable?
     private var effectiveAppearanceCancellable: AnyCancellable?
     private var permissionsCancellables = Set<AnyCancellable>()
     private var trackerAnimationTriggerCancellable: AnyCancellable?
+    private var updatePrivacyEntryPointDebounced: Debounce?
+    private var updateImageButtonDebounced: Debounce?
 
     required init?(coder: NSCoder) {
         fatalError("AddressBarButtonsViewController: Bad initializer")
@@ -121,6 +125,16 @@ final class AddressBarButtonsViewController: NSViewController {
         self.tabCollectionViewModel = tabCollectionViewModel
 
         super.init(coder: coder)
+
+        self.updatePrivacyEntryPointDebounced = Debounce(delay: 0.2, callback: { [weak self] _ in
+            self?.updatePrivacyEntryPoint()
+        })
+
+        self.updateImageButtonDebounced = Debounce(delay: 0.2, callback: { [weak self] mode in
+            // swiftlint:disable force_cast
+            self?.updateImageButton(mode as! AddressBarViewController.Mode)
+            // swiftlint:enable force_cast
+        })
     }
 
     override func viewDidLoad() {
@@ -130,6 +144,7 @@ final class AddressBarButtonsViewController: NSViewController {
         setupButtons()
         subscribeToSelectedTabViewModel()
         subscribeToBookmarkList()
+        subscribePrivacyDashboardPendingUpdates()
         subscribeToEffectiveAppearance()
         updateBookmarkButtonVisibility()
 
@@ -231,6 +246,10 @@ final class AddressBarButtonsViewController: NSViewController {
 
     func openPrivacyDashboard() {
         guard let selectedTabViewModel = tabCollectionViewModel.selectedTabViewModel else { return }
+
+        // Prevent popover from being closed with Privacy Entry Point Button, while pending updates
+        if privacyDashboardPopover.viewController.isPendingUpdates() { return }
+
         guard !privacyDashboardPopover.isShown else {
             privacyDashboardPopover.close()
             return
@@ -244,29 +263,20 @@ final class AddressBarButtonsViewController: NSViewController {
     func updateButtons(mode: AddressBarViewController.Mode,
                        isTextFieldEditorFirstResponder: Bool,
                        textFieldValue: AddressBarTextField.Value) {
+        stopAnimationsAfterFocus(oldIsTextFieldEditorFirstResponder: self.isTextFieldEditorFirstResponder,
+                                 newIsTextFieldEditorFirstResponder: isTextFieldEditorFirstResponder)
+
         self.isTextFieldEditorFirstResponder = isTextFieldEditorFirstResponder
 
-        guard let selectedTabViewModel = tabCollectionViewModel.selectedTabViewModel else {
+        if tabCollectionViewModel.selectedTabViewModel == nil {
             os_log("%s: Selected tab view model is nil", type: .error, className)
             return
         }
 
         isSearchingMode = mode != .browsing
-        updatePrivacyEntryPointButton()
-        updatePrivacyEntryPointIcon()
-
         clearButton.isHidden = !(isTextFieldEditorFirstResponder && !textFieldValue.isEmpty)
-
-        // Image button
-        switch mode {
-        case .browsing:
-            imageButton.image = selectedTabViewModel.favicon
-        case .searching(withUrl: true):
-            imageButton.image = Self.webImage
-        case .searching(withUrl: false):
-            imageButton.image = Self.homeFaviconImage
-        }
-
+        self.updatePrivacyEntryPointDebounced?.call()
+        self.updateImageButtonDebounced?.call(mode)
         updatePermissionButtons()
     }
 
@@ -342,7 +352,7 @@ final class AddressBarButtonsViewController: NSViewController {
         }
 
         let animation = Animation.named(animationName, animationCache: LottieAnimationCache.shared)
-        let animationView = AnimationView(animation: animation, imageProvider: self)
+        let animationView = AnimationView(animation: animation, imageProvider: tabCollectionViewModel)
         animationView.identifier = NSUserInterfaceItemIdentifier(rawValue: animationName)
         animationViewCache[animationName] = animationView
         return animationView
@@ -436,6 +446,27 @@ final class AddressBarButtonsViewController: NSViewController {
         }
     }
 
+    private func subscribePrivacyDashboardPendingUpdates() {
+        privacyDashboadPendingUpdatesCancellable?.cancel()
+
+        privacyDashboadPendingUpdatesCancellable = privacyDashboardPopover.viewController
+            .$pendingUpdates.receive(on: DispatchQueue.main).sink { [weak self] _ in
+            let isPendingUpdate = self?.privacyDashboardPopover.viewController.isPendingUpdates() ?? false
+
+            // Prevent popover from being closed when clicking away, while pending updates
+            if isPendingUpdate {
+                self?.privacyDashboardPopover.behavior = .applicationDefined
+            } else {
+                self?.privacyDashboardPopover.close()
+#if DEBUG
+                self?.privacyDashboardPopover.behavior = .semitransient
+#else
+                self?.privacyDashboardPopover.behavior = .transient
+#endif
+            }
+        }
+    }
+
     private func updatePermissionButtons() {
         permissionButtons.isHidden = isTextFieldEditorFirstResponder || trackerAnimationView.isAnimationPlaying
 
@@ -475,19 +506,39 @@ final class AddressBarButtonsViewController: NSViewController {
         }
     }
 
+    private func updateImageButton(_ mode: AddressBarViewController.Mode) {
+        guard let selectedTabViewModel = tabCollectionViewModel.selectedTabViewModel else { return }
+
+        // Image button
+        switch mode {
+        case .browsing:
+            imageButton.image = selectedTabViewModel.favicon
+        case .searching(withUrl: true):
+            imageButton.image = Self.webImage
+        case .searching(withUrl: false):
+            imageButton.image = Self.homeFaviconImage
+        }
+    }
+
+    private func updatePrivacyEntryPoint() {
+        self.updatePrivacyEntryPointButton()
+        self.updatePrivacyEntryPointIcon()
+    }
+
     private func updatePrivacyEntryPointButton() {
         guard let selectedTabViewModel = tabCollectionViewModel.selectedTabViewModel else {
             return
         }
 
-        let isURLNil = selectedTabViewModel.tab.content.url == nil
+        let urlScheme = selectedTabViewModel.tab.content.url?.scheme
+        let isHypertextUrl = urlScheme == "http" || urlScheme == "https"
         let isDuckDuckGoUrl = selectedTabViewModel.tab.content.url?.isDuckDuckGoSearch ?? false
 
         // Privacy entry point button
         privacyEntryPointButton.isHidden = isSearchingMode ||
             isTextFieldEditorFirstResponder ||
             isDuckDuckGoUrl ||
-            isURLNil ||
+            !isHypertextUrl ||
             selectedTabViewModel.errorViewState.isVisible
         imageButtonWrapper.isHidden = !privacyEntryPointButton.isHidden || trackerAnimationView.isAnimationPlaying
     }
@@ -504,8 +555,14 @@ final class AddressBarButtonsViewController: NSViewController {
 
         switch selectedTabViewModel.tab.content {
         case .url(let url):
+            guard let host = url.host else { break }
+
             let isNotSecure = url.scheme == "http"
-            privacyEntryPointButton.image = isNotSecure ? Self.shieldDotImage : Self.shieldImage
+            let isMajorTrackingNetwork = TrackerRadarManager.shared.isHostMajorTrackingNetwork(host)
+            let protectionStore = DomainsProtectionUserDefaultsStore()
+            let isUnprotected = protectionStore.isHostUnprotected(forDomain: host)
+
+            privacyEntryPointButton.image = isNotSecure || isMajorTrackingNetwork || isUnprotected ? Self.shieldDotImage : Self.shieldImage
         default:
             break
         }
@@ -555,6 +612,12 @@ final class AddressBarButtonsViewController: NSViewController {
         stopAnimation(trackerAnimationView)
         stopAnimation(shieldAnimationView)
         stopAnimation(shieldDotAnimationView)
+    }
+
+    private func stopAnimationsAfterFocus(oldIsTextFieldEditorFirstResponder: Bool, newIsTextFieldEditorFirstResponder: Bool) {
+        if !oldIsTextFieldEditorFirstResponder && newIsTextFieldEditorFirstResponder {
+            stopAnimations()
+        }
     }
 
     private func bookmarkForCurrentUrl(setFavorite: Bool, accessPoint: Pixel.Event.AccessPoint) -> Bookmark? {
@@ -642,10 +705,10 @@ extension AddressBarButtonsViewController: NSPopoverDelegate {
 
 }
 
-extension AddressBarButtonsViewController: AnimationImageProvider {
+extension TabCollectionViewModel: AnimationImageProvider {
 
     func imageForAsset(asset: ImageAsset) -> CGImage? {
-        guard let selectedTabViewModel = tabCollectionViewModel.selectedTabViewModel,
+        guard let selectedTabViewModel = self.selectedTabViewModel,
               let trackerInfo = selectedTabViewModel.tab.trackerInfo else {
             return nil
         }
@@ -661,3 +724,6 @@ extension AddressBarButtonsViewController: AnimationImageProvider {
     }
 
 }
+
+// swiftlint:enable type_body_length
+// swiftlint:enable file_length

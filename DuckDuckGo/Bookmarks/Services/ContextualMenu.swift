@@ -117,7 +117,7 @@ struct ContextualMenu {
     }
 
     static func editBookmarkMenuItem(bookmark: Bookmark) -> NSMenuItem {
-        let title = NSLocalizedString("Edit...", comment: "Command")
+        let title = NSLocalizedString("Edit…", comment: "Command")
         return menuItem(title, #selector(BookmarkMenuItemSelectors.editBookmark(_:)), bookmark)
     }
 
