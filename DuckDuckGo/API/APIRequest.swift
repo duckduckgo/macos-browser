@@ -64,7 +64,7 @@ enum APIRequest {
                         parameters: [String: String]? = nil,
                         headers: HTTPHeaders = APIHeaders().defaultHeaders,
                         timeoutInterval: TimeInterval = 60.0,
-                        useEphemeralURLSession: Bool = false,
+                        useEphemeralURLSession: Bool = true, // URL requests must opt into using shared storage
                         callBackOnMainThread: Bool = false,
                         completion: @escaping APIRequestCompletion) -> URLSessionDataTask {
         
