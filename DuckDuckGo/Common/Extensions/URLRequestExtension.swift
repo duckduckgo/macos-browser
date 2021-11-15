@@ -28,7 +28,7 @@ extension URLRequest {
     }
 
     // Note: Change the user agent to macOS version before the release
-    static func defaultRequest(with url: URL) -> URLRequest {
+    static func defaultRequest(with url: URL, useDuckDuckGoUserAgent: Bool = true) -> URLRequest {
         var request = URLRequest(url: url)
         request.setValue("gzip;q=1.0, compress;q=0.5",
                          forHTTPHeaderField: HeaderKey.acceptEncoding.rawValue)
@@ -36,8 +36,16 @@ extension URLRequest {
         let appVersion = AppVersion.shared.versionNumber
         let appId = AppVersion.shared.identifier
         let systemVersion = ProcessInfo.processInfo.operatingSystemVersion
-        request.setValue("ddg_macos/\(appVersion) (\(appId); macOS \(systemVersion))",
-                         forHTTPHeaderField: HeaderKey.userAgent.rawValue)
+        
+        let userAgent: String
+
+        if useDuckDuckGoUserAgent {
+            userAgent = "ddg_macos/\(appVersion) (\(appId); macOS \(systemVersion))"
+        } else {
+            userAgent = UserAgent.fallbackWebViewDefault
+        }
+        
+        request.setValue(userAgent, forHTTPHeaderField: HeaderKey.userAgent.rawValue)
 
         let languages = Locale.preferredLanguages.prefix(6)
         let acceptLanguage = languages.enumerated().map { index, language in
