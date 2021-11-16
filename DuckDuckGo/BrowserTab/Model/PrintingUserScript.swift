@@ -27,10 +27,6 @@ public protocol PrintingUserScriptDelegate: AnyObject {
 }
 
 public class PrintingUserScript: NSObject, UserScript {
-    static public var requiresRunInPageContentWorld: Bool {
-        return true
-    }
-
     public var requiresRunInPageContentWorld: Bool {
         return true
     }

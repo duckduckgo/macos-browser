@@ -27,34 +27,15 @@ extension WKUserContentController {
             add(userScript, name: messageName)
         }
     }
-
-    func addHandlerPageContentWorld(_ userScript: UserScript) {
-        for messageName in userScript.messageNames {
-            if #available(macOS 11.0, *) {
-                add(userScript, contentWorld: .page, name: messageName)
-            } else {
-                add(userScript, name: messageName)
-            }
-        }
-    }
-
-    func removeHandlerPageContentWorld(_ userScript: UserScript) {
-        userScript.messageNames.forEach {
-            if #available(macOS 11.0, *) {
-                removeScriptMessageHandler(forName: $0, contentWorld: .page)
-            } else {
-                removeScriptMessageHandler(forName: $0)
-            }
-        }
-    }
     
     func addHandler(_ userScript: UserScript) {
         for messageName in userScript.messageNames {
             if #available(macOS 11.0, *) {
+                let contentWorld: WKContentWorld = userScript.getContentWorld()
                 if let handlerWithReply = userScript as? WKScriptMessageHandlerWithReply {
-                    addScriptMessageHandler(handlerWithReply, contentWorld: .defaultClient, name: messageName)
+                    addScriptMessageHandler(handlerWithReply, contentWorld: contentWorld, name: messageName)
                 } else {
-                    add(userScript, contentWorld: .defaultClient, name: messageName)
+                    add(userScript, contentWorld: contentWorld, name: messageName)
                 }
             } else {
                 add(userScript, name: messageName)
@@ -65,7 +46,8 @@ extension WKUserContentController {
     func removeHandler(_ userScript: UserScript) {
         userScript.messageNames.forEach {
             if #available(macOS 11.0, *) {
-                removeScriptMessageHandler(forName: $0, contentWorld: .defaultClient)
+                let contentWorld: WKContentWorld = userScript.getContentWorld()
+                removeScriptMessageHandler(forName: $0, contentWorld: contentWorld)
             } else {
                 removeScriptMessageHandler(forName: $0)
             }
