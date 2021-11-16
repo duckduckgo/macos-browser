@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<document type="com.apple.InterfaceBuilder3.Cocoa.Storyboard.XIB" version="3.0" toolsVersion="19162" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none" useAutolayout="YES">
+<document type="com.apple.InterfaceBuilder3.Cocoa.Storyboard.XIB" version="3.0" toolsVersion="19455" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none" useAutolayout="YES">
     <dependencies>
         <deployment identifier="macosx"/>
-        <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="19162"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="19455"/>
     </dependencies>
     <scenes>
         <!--Application-->
@@ -534,6 +534,12 @@ GQ
                                                 <action selector="showPreviousTab:" target="Ady-hI-5gd" id="sdG-QM-RLb"/>
                                             </connections>
                                         </menuItem>
+                                        <menuItem title="Show Previous Tab (Hidden)" hidden="YES" keyEquivalent="" allowsKeyEquivalentWhenHidden="YES" id="GuX-M1-3LQ">
+                                            <modifierMask key="keyEquivalentModifierMask" option="YES" command="YES"/>
+                                            <connections>
+                                                <action selector="showPreviousTab:" target="Ady-hI-5gd" id="NKT-sZ-qox"/>
+                                            </connections>
+                                        </menuItem>
                                         <menuItem title="Show Next Tab" id="ell-8c-IYS">
                                             <string key="keyEquivalent" base64-UTF8="YES">
 CQ
@@ -547,6 +553,12 @@ CQ
                                             <modifierMask key="keyEquivalentModifierMask" shift="YES" command="YES"/>
                                             <connections>
                                                 <action selector="showNextTab:" target="Ady-hI-5gd" id="wOR-ar-KT6"/>
+                                            </connections>
+                                        </menuItem>
+                                        <menuItem title="Show Next Tab (Hidden)" hidden="YES" keyEquivalent="" allowsKeyEquivalentWhenHidden="YES" id="bCk-E5-pHd">
+                                            <modifierMask key="keyEquivalentModifierMask" option="YES" command="YES"/>
+                                            <connections>
+                                                <action selector="showNextTab:" target="Ady-hI-5gd" id="DB1-dn-3YS"/>
                                             </connections>
                                         </menuItem>
                                         <menuItem title="Show First Tab (Hidden)" hidden="YES" keyEquivalent="1" allowsKeyEquivalentWhenHidden="YES" id="jjn-9W-TQZ">
