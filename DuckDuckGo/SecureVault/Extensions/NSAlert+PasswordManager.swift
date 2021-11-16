@@ -23,7 +23,7 @@ extension NSAlert {
     static func passwordManagerConfirmDeleteLogin() -> NSAlert {
         let alert = NSAlert()
         alert.messageText = "Are you sure you want to delete this Login?"
-        alert.informativeText = "You cannot revert this action."
+        alert.informativeText = "This action cannot be undone."
         alert.alertStyle = .warning
         alert.addButton(withTitle: "Delete")
         alert.addButton(withTitle: "Cancel")
@@ -52,7 +52,7 @@ extension NSAlert {
     static func passwordManagerConfirmDeleteCard() -> NSAlert {
         let alert = NSAlert()
         alert.messageText = "Are you sure you want to delete this card?"
-        alert.informativeText = "You cannot revert this action."
+        alert.informativeText = "This action cannot be undone."
         alert.alertStyle = .warning
         alert.addButton(withTitle: "Delete")
         alert.addButton(withTitle: "Cancel")
@@ -62,7 +62,7 @@ extension NSAlert {
     static func passwordManagerConfirmDeleteIdentity() -> NSAlert {
         let alert = NSAlert()
         alert.messageText = "Are you sure you want to delete this identity?"
-        alert.informativeText = "You cannot revert this action."
+        alert.informativeText = "This action cannot be undone."
         alert.alertStyle = .warning
         alert.addButton(withTitle: "Delete")
         alert.addButton(withTitle: "Cancel")
@@ -72,7 +72,7 @@ extension NSAlert {
     static func passwordManagerConfirmDeleteNote() -> NSAlert {
         let alert = NSAlert()
         alert.messageText = "Are you sure you want to delete this note?"
-        alert.informativeText = "You cannot revert this action."
+        alert.informativeText = "This action cannot be undone."
         alert.alertStyle = .warning
         alert.addButton(withTitle: "Delete")
         alert.addButton(withTitle: "Cancel")
