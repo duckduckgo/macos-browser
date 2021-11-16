@@ -1,6 +1,15 @@
 {
     "readme": "https://github.com/duckduckgo/privacy-configuration",
     "features": {
+        "webCompat": {
+            "state": "enabled",
+            "settings": {
+                "loadScripts": {
+                    "example.com": "ga.js",
+                }
+            },
+            "exceptions": []
+        },
         "https": {
             "state": "enabled",
             "exceptions": []

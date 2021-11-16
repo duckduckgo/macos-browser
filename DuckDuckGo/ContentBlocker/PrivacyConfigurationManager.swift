@@ -26,6 +26,7 @@ protocol PrivacyConfigurationManagment {
     
     func isEnabled(featureKey: PrivacyConfiguration.SupportedFeatures) -> Bool
     func exceptionsList(forFeature featureKey: PrivacyConfiguration.SupportedFeatures) -> [String]
+    func webCompatLookup() -> [String: String]
 }
 
 final class PrivacyConfigurationManager {
@@ -60,14 +61,15 @@ final class PrivacyConfigurationManager {
         var dataSet: DataSet
         let configData: PrivacyConfiguration
         var data: Data
-
+/*
         if let loadedData = DefaultConfigurationStorage.shared.loadData(for: .privacyConfiguration) {
             data = loadedData
             dataSet = .downloaded
         } else {
+ */
             data = loadEmbeddedAsData()
             dataSet = .embedded
-        }
+   //     }
 
         do {
             // This might fail if the downloaded data is corrupt or format has changed unexpectedly
@@ -124,6 +126,7 @@ extension PrivacyConfigurationManager: PrivacyConfigurationManagment {
     
     enum ConfigurationSettingsKeys: String {
         case gpcHeaderEnabled = "gpcHeaderEnabledSites"
+        case webCompatScripts = "loadScripts"
     }
     
     var tempUnprotectedDomains: [String] {
@@ -143,5 +146,12 @@ extension PrivacyConfigurationManager: PrivacyConfigurationManagment {
                 .settings?[ConfigurationSettingsKeys.gpcHeaderEnabled.rawValue] as? [String] else { return [] }
         
         return enabledSites
+    }
+    
+    func webCompatLookup() -> [String: String] {
+        guard let webCompatScripts = config.features[PrivacyConfiguration.SupportedFeatures.webCompat.rawValue]?
+                .settings?[ConfigurationSettingsKeys.webCompatScripts.rawValue] as? [String: String] else { return [:] }
+        
+        return webCompatScripts
     }
 }

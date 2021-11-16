@@ -31,6 +31,7 @@ public struct PrivacyConfiguration: Decodable {
         case gpc
         case navigatorCredentials
         case https
+        case webCompat
     }
     
     public init(features: [String: PrivacyFeature], unprotectedTemporary: [ExceptionEntry]) {

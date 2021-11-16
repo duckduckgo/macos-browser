@@ -101,8 +101,12 @@ final class DefaultScriptSourceProvider: ScriptSourceProviding {
         let protectionStore = DomainsProtectionUserDefaultsStore()
         let localUnprotectedDomains = protectionStore.unprotectedDomains.joined(separator: "\n")
 
+        // TODO escape correctly here.
+        let webcompatData = privacyConfiguration.webCompatLookup().map { "'\($0.0)': '\($0.1)'" }.joined(separator: ",")
+        
         return ContentBlockerUserScript.loadJS("contentblocker", from: .main, withReplacements: [
             "$IS_DEBUG$": isDebugBuild ? "true" : "false",
+            "$WEBCOMPAT_DATA$": "{\(webcompatData)}",
             "$TEMP_UNPROTECTED_DOMAINS$": remoteUnprotectedDomains,
             "$USER_UNPROTECTED_DOMAINS$": localUnprotectedDomains,
             "$TRACKER_DATA$": trackerData,

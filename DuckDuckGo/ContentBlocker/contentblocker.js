@@ -334,6 +334,8 @@
     // tracker data set
 
     const blockingEnabled = $BLOCKING_ENABLED$
+    
+    const webCompatData = $WEBCOMPAT_DATA$
 
     // overrides
     Trackers.prototype.findTrackerOwner = function (domain) {
@@ -367,6 +369,11 @@
     ])
 
     const topLevelUrl = getTopLevelURL()
+    
+    if (topLevelUrl.hostname in webCompatData) {
+        let scriptName = webCompatData[topLevelUrl.hostname]
+        surrogates[scriptName]()
+    }
 
     let unprotectedDomain = false
     const domainParts = topLevelUrl && topLevelUrl.host ? topLevelUrl.host.split('.') : []
