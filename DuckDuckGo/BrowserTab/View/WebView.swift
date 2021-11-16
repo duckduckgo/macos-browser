@@ -75,62 +75,15 @@ final class WebView: WKWebView {
 
     // MARK: - Back/Forward Navigation
 
-    private var realBackForwardList: WKBackForwardList {
-        super.backForwardList
-    }
-
-    private(set) lazy var filteredBackForwardList: FilteredBackForwardList = {
-        FilteredBackForwardList(backForwardList: realBackForwardList)
-    }()
-
-    override var backForwardList: WKBackForwardList {
-        filteredBackForwardList
-    }
+    var frozenCanGoBack: Bool?
+    var frozenCanGoForward: Bool?
 
     override var canGoBack: Bool {
-        backForwardList.backItem != nil
+        frozenCanGoBack ?? super.canGoBack
     }
 
     override var canGoForward: Bool {
-        backForwardList.forwardItem != nil
-    }
-
-    @discardableResult
-    override func goBack() -> WKNavigation? {
-        guard let backItem = backForwardList.backItem else { return nil }
-        return super.go(to: backItem)
-    }
-
-    @discardableResult
-    override func goForward() -> WKNavigation? {
-        guard let forwardItem = backForwardList.forwardItem else { return nil }
-        return super.go(to: forwardItem)
-    }
-
-    var invalidatedBackForwardListItems: [InvalidatedBackForwardListItem]? {
-        let invalidatedBackForwardListItems = filteredBackForwardList.invalidatedBackForwardListItems
-        guard !invalidatedBackForwardListItems.isEmpty else { return nil }
-
-        let allList = realBackForwardList.backList + (realBackForwardList.currentItem.map { [$0] } ?? []) + realBackForwardList.forwardList
-        return invalidatedBackForwardListItems.compactMap {
-            guard let idx = allList.firstIndex(of: $0) else { return nil }
-            return InvalidatedBackForwardListItem(backForwardListItem: $0, index: idx)
-        }
-    }
-
-    func invalidate(_ backForwardListItem: WKBackForwardListItem) {
-        filteredBackForwardList.invalidateBackForwardListItem(backForwardListItem)
-    }
-
-    func invalidate(_ items: [InvalidatedBackForwardListItem]) {
-        let allList = realBackForwardList.backList + (realBackForwardList.currentItem.map { [$0] } ?? []) + realBackForwardList.forwardList
-        for invalidatedItem in items {
-            guard let item = allList[safe: invalidatedItem.index],
-                  item.title ?? "" == invalidatedItem.title ?? "",
-                  item.url == invalidatedItem.url
-             else { continue }
-            invalidate(item)
-        }
+        frozenCanGoForward ?? super.canGoForward
     }
 
     // MARK: - Menu

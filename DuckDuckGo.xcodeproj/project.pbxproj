@@ -498,8 +498,6 @@
 		B684592725C93C0500DC17B6 /* Publishers.NestedObjectChanges.swift in Sources */ = {isa = PBXBuildFile; fileRef = B684592625C93C0500DC17B6 /* Publishers.NestedObjectChanges.swift */; };
 		B684592F25C93FBF00DC17B6 /* AppStateRestorationManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = B684592E25C93FBF00DC17B6 /* AppStateRestorationManager.swift */; };
 		B687260426E215C9008EE860 /* ExpirationChecker.swift in Sources */ = {isa = PBXBuildFile; fileRef = B687260326E215C9008EE860 /* ExpirationChecker.swift */; };
-		B688B4D6273E1D450087BEAF /* FilteredBackForwardList.m in Sources */ = {isa = PBXBuildFile; fileRef = B688B4D5273E1D450087BEAF /* FilteredBackForwardList.m */; };
-		B688B4D8273E2F850087BEAF /* InvalidatedBackForwardListItem.swift in Sources */ = {isa = PBXBuildFile; fileRef = B688B4D7273E2F850087BEAF /* InvalidatedBackForwardListItem.swift */; };
 		B689ECD526C247DB006FB0C5 /* BackForwardListItem.swift in Sources */ = {isa = PBXBuildFile; fileRef = B689ECD426C247DB006FB0C5 /* BackForwardListItem.swift */; };
 		B693954A26F04BEB0015B914 /* NibLoadable.swift in Sources */ = {isa = PBXBuildFile; fileRef = B693953C26F04BE70015B914 /* NibLoadable.swift */; };
 		B693954B26F04BEB0015B914 /* MouseOverView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B693953D26F04BE70015B914 /* MouseOverView.swift */; };
@@ -1131,9 +1129,6 @@
 		B684592625C93C0500DC17B6 /* Publishers.NestedObjectChanges.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Publishers.NestedObjectChanges.swift; sourceTree = "<group>"; };
 		B684592E25C93FBF00DC17B6 /* AppStateRestorationManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppStateRestorationManager.swift; sourceTree = "<group>"; };
 		B687260326E215C9008EE860 /* ExpirationChecker.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ExpirationChecker.swift; sourceTree = "<group>"; };
-		B688B4D4273E1D450087BEAF /* FilteredBackForwardList.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = FilteredBackForwardList.h; sourceTree = "<group>"; };
-		B688B4D5273E1D450087BEAF /* FilteredBackForwardList.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = FilteredBackForwardList.m; sourceTree = "<group>"; };
-		B688B4D7273E2F850087BEAF /* InvalidatedBackForwardListItem.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InvalidatedBackForwardListItem.swift; sourceTree = "<group>"; };
 		B689ECD426C247DB006FB0C5 /* BackForwardListItem.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BackForwardListItem.swift; sourceTree = "<group>"; };
 		B693953C26F04BE70015B914 /* NibLoadable.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = NibLoadable.swift; sourceTree = "<group>"; };
 		B693953D26F04BE70015B914 /* MouseOverView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MouseOverView.swift; sourceTree = "<group>"; };
@@ -2487,9 +2482,6 @@
 				B633C86C25E797D800E4B352 /* UserScriptsManager.swift */,
 				AAF7D3852567CED500998667 /* WebViewConfiguration.swift */,
 				B61F015425EDD5A700ABB5A3 /* UserContentController.swift */,
-				B688B4D4273E1D450087BEAF /* FilteredBackForwardList.h */,
-				B688B4D5273E1D450087BEAF /* FilteredBackForwardList.m */,
-				B688B4D7273E2F850087BEAF /* InvalidatedBackForwardListItem.swift */,
 			);
 			path = Model;
 			sourceTree = "<group>";
@@ -3840,7 +3832,6 @@
 				4B9292AB26670D3700AD2C21 /* BookmarkMigrationPolicy.swift in Sources */,
 				AA92126F25ACCB1100600CD4 /* ErrorExtension.swift in Sources */,
 				B6A9E47026146A250067D1B9 /* DateExtension.swift in Sources */,
-				B688B4D8273E2F850087BEAF /* InvalidatedBackForwardListItem.swift in Sources */,
 				AAE7527A263B046100B973F8 /* History.xcdatamodeld in Sources */,
 				B64C853D26944B940048FEBE /* PermissionStore.swift in Sources */,
 				AA75A0AE26F3500C0086B667 /* PrivacyIconViewModel.swift in Sources */,
@@ -3901,7 +3892,6 @@
 				4B6160E525B152FA007DE5B2 /* ContentBlockerUserScript.swift in Sources */,
 				B66E9DD42670EB4A00E53BB5 /* WKDownload+WebKitDownload.swift in Sources */,
 				B69B503F2726A12500758A2B /* StatisticsUserDefaults.swift in Sources */,
-				B688B4D6273E1D450087BEAF /* FilteredBackForwardList.m in Sources */,
 				B689ECD526C247DB006FB0C5 /* BackForwardListItem.swift in Sources */,
 				B69B50572727D16900758A2B /* AtbAndVariantCleanup.swift in Sources */,
 				B693954A26F04BEB0015B914 /* NibLoadable.swift in Sources */,
