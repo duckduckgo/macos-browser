@@ -146,6 +146,10 @@ final class Tab: NSObject {
     var userEnteredUrl = true
 
     var contentChangeEnabled = true
+    
+    var FBblocked = true
+    
+    var FBblockingRules: WKContentRuleList? = nil
 
     @Published private(set) var content: TabContent {
         didSet {
@@ -295,6 +299,14 @@ final class Tab: NSObject {
             webView.reload()
         }
     }
+    
+    private func clickToLoadBlockFB() {
+        guard !self.FBblocked else {
+            return
+        }
+        self.FBblocked = true
+        self.webView.configuration.userContentController.add(self.FBblockingRules!)
+    }
 
     private func reloadIfNeeded(shouldLoadInBackground: Bool = false) {
         let url: URL
@@ -433,6 +445,7 @@ final class Tab: NSObject {
             userScripts.contextMenuScript.delegate = self
             userScripts.surrogatesScript.delegate = self
             userScripts.contentBlockerRulesScript.delegate = self
+            userScripts.clickToLoadScript.delegate = self
             userScripts.autofillScript.emailDelegate = emailManager
             userScripts.autofillScript.vaultDelegate = vaultManager
             userScripts.pageObserverScript.delegate = self
@@ -611,8 +624,37 @@ extension Tab: ContentBlockerRulesUserScriptDelegate {
     }
 }
 
-extension Tab: SurrogatesUserScriptDelegate {
+extension Tab: ClickToLoadUserScriptDelegate {
 
+    func clickToLoadUserScriptAllowFB(_ script: UserScript, replyHandler: @escaping (Bool) -> Void) -> Void {
+        guard self.FBblocked else {
+            replyHandler(true)
+            return
+        }
+        guard let store = WKContentRuleListStore.default() else {
+            assert(false, "Failed to access the default WKContentRuleListStore")
+            replyHandler(false)
+            return
+        }
+        store.lookUpContentRuleList(forIdentifier: "fb") { [weak self] ruleList, error in
+            guard let self = self else {
+                assert(false, "self is gone")
+                replyHandler(false)
+                return
+            }
+            self.FBblockingRules = ruleList!
+
+            if let error = error {
+                os_log("Failed to access FB rules %{public}s", type: .error, error.localizedDescription)
+            }
+            self.FBblocked = false
+            self.webView.configuration.userContentController.remove(ruleList!)
+            replyHandler(true)
+        }
+    }
+}
+
+extension Tab: SurrogatesUserScriptDelegate {
     func surrogatesUserScriptShouldProcessTrackers(_ script: SurrogatesUserScript) -> Bool {
         return true
     }
@@ -798,6 +840,7 @@ extension Tab: WKNavigationDelegate {
     }
 
     func webView(_ webView: WKWebView, didStartProvisionalNavigation navigation: WKNavigation!) {
+        self.clickToLoadBlockFB()
         delegate?.tabDidStartNavigation(self)
 
         // Unnecessary assignment triggers publishing

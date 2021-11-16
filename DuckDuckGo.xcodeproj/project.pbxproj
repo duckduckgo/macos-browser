@@ -592,6 +592,12 @@
 		B6FA893D269C423100588ECD /* PrivacyDashboard.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = B6FA893C269C423100588ECD /* PrivacyDashboard.storyboard */; };
 		B6FA893F269C424500588ECD /* PrivacyDashboardViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = B6FA893E269C424500588ECD /* PrivacyDashboardViewController.swift */; };
 		B6FA8941269C425400588ECD /* PrivacyDashboardPopover.swift in Sources */ = {isa = PBXBuildFile; fileRef = B6FA8940269C425400588ECD /* PrivacyDashboardPopover.swift */; };
+		EA0BA3A9272217E6002A0B6C /* ClickToLoadUserScript.swift in Sources */ = {isa = PBXBuildFile; fileRef = EA0BA3A8272217E6002A0B6C /* ClickToLoadUserScript.swift */; };
+		EA18D1CA272F0DC8006DC101 /* social_images in Resources */ = {isa = PBXBuildFile; fileRef = EA18D1C9272F0DC8006DC101 /* social_images */; };
+		EA4617F0273A28A700F110A2 /* fb-tds.json in Resources */ = {isa = PBXBuildFile; fileRef = EA4617EF273A28A700F110A2 /* fb-tds.json */; };
+		EA477680272A21B700419EDA /* clickToLoadConfig.json in Resources */ = {isa = PBXBuildFile; fileRef = EA47767F272A21B700419EDA /* clickToLoadConfig.json */; };
+		EAC80DE0271F6C0100BBF02D /* fb-sdk.js in Resources */ = {isa = PBXBuildFile; fileRef = EAC80DDF271F6C0100BBF02D /* fb-sdk.js */; };
+		EAFAD6CA2728BD1200F9DF00 /* clickToLoad.js in Resources */ = {isa = PBXBuildFile; fileRef = EAFAD6C92728BD1200F9DF00 /* clickToLoad.js */; };
 		F41D174125CB131900472416 /* NSColorExtension.swift in Sources */ = {isa = PBXBuildFile; fileRef = F41D174025CB131900472416 /* NSColorExtension.swift */; };
 		F44C130225C2DA0400426E3E /* NSAppearanceExtension.swift in Sources */ = {isa = PBXBuildFile; fileRef = F44C130125C2DA0400426E3E /* NSAppearanceExtension.swift */; };
 /* End PBXBuildFile section */
@@ -1220,6 +1226,12 @@
 		B6FA893C269C423100588ECD /* PrivacyDashboard.storyboard */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; path = PrivacyDashboard.storyboard; sourceTree = "<group>"; };
 		B6FA893E269C424500588ECD /* PrivacyDashboardViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PrivacyDashboardViewController.swift; sourceTree = "<group>"; };
 		B6FA8940269C425400588ECD /* PrivacyDashboardPopover.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PrivacyDashboardPopover.swift; sourceTree = "<group>"; };
+		EA0BA3A8272217E6002A0B6C /* ClickToLoadUserScript.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ClickToLoadUserScript.swift; sourceTree = "<group>"; };
+		EA18D1C9272F0DC8006DC101 /* social_images */ = {isa = PBXFileReference; lastKnownFileType = folder; path = social_images; sourceTree = "<group>"; };
+		EA4617EF273A28A700F110A2 /* fb-tds.json */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.json; path = "fb-tds.json"; sourceTree = "<group>"; };
+		EA47767F272A21B700419EDA /* clickToLoadConfig.json */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.json; path = clickToLoadConfig.json; sourceTree = "<group>"; };
+		EAC80DDF271F6C0100BBF02D /* fb-sdk.js */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.javascript; path = "fb-sdk.js"; sourceTree = "<group>"; };
+		EAFAD6C92728BD1200F9DF00 /* clickToLoad.js */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.javascript; path = clickToLoad.js; sourceTree = "<group>"; };
 		F41D174025CB131900472416 /* NSColorExtension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NSColorExtension.swift; sourceTree = "<group>"; };
 		F44C130125C2DA0400426E3E /* NSAppearanceExtension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NSAppearanceExtension.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
@@ -1445,6 +1457,12 @@
 				85AC3B0425D6B1D800C7D2AA /* ScriptSourceProviding.swift */,
 				9826B09F2747DF3D0092F683 /* ContentBlocking.swift */,
 				9826B0A12747DFEB0092F683 /* AppPrivacyConfigurationDataProvider.swift */,
+				EA18D1C9272F0DC8006DC101 /* social_images */,
+				EA0BA3A8272217E6002A0B6C /* ClickToLoadUserScript.swift */,
+				EAFAD6C92728BD1200F9DF00 /* clickToLoad.js */,
+				EA47767F272A21B700419EDA /* clickToLoadConfig.json */,
+				EA4617EF273A28A700F110A2 /* fb-tds.json */,
+				EAC80DDF271F6C0100BBF02D /* fb-sdk.js */,
 			);
 			path = ContentBlocker;
 			sourceTree = "<group>";
@@ -3383,10 +3401,12 @@
 				4B0511CE262CAA5A00F6079C /* DownloadPreferencesTableCellView.xib in Resources */,
 				8511E18425F82B34002F516B /* 01_Fire_really_small.json in Resources */,
 				4B0511C3262CAA5A00F6079C /* Preferences.storyboard in Resources */,
+				EA477680272A21B700419EDA /* clickToLoadConfig.json in Resources */,
 				B6B1E88226D5DAC30062C350 /* Downloads.storyboard in Resources */,
 				AA3439712754D4E900B241FA /* dark-shield.json in Resources */,
 				85A0117425AF2EDF00FA6A0C /* FindInPage.storyboard in Resources */,
 				AA80EC89256C49B8007083E7 /* Localizable.strings in Resources */,
+				EA4617F0273A28A700F110A2 /* fb-tds.json in Resources */,
 				AAE8B102258A41C000E81239 /* Tooltip.storyboard in Resources */,
 				AA68C3D72490F821001B8783 /* README.md in Resources */,
 				AA585D86248FD31400E9A3E2 /* Assets.xcassets in Resources */,
@@ -3415,7 +3435,9 @@
 				AA34397D2754D55100B241FA /* dark-trackers-3.json in Resources */,
 				AA3439782754D55100B241FA /* dark-trackers-2.json in Resources */,
 				AAB7320726DD0C37002FACF9 /* Fire.storyboard in Resources */,
+				EA18D1CA272F0DC8006DC101 /* social_images in Resources */,
 				AA80EC8F256C49BC007083E7 /* Localizable.stringsdict in Resources */,
+				EAC80DE0271F6C0100BBF02D /* fb-sdk.js in Resources */,
 				AAE71E2C25F781EA00D74437 /* Homepage.storyboard in Resources */,
 				85625994269C8F9600EE44BC /* PasswordManager.storyboard in Resources */,
 				AA80EC6D256C469C007083E7 /* NavigationBar.storyboard in Resources */,
@@ -3433,6 +3455,7 @@
 				7B860DE427274E54006D8957 /* navigatorCredentials.js in Resources */,
 				AA34397A2754D55100B241FA /* trackers-2.json in Resources */,
 				4B0511D0262CAA5A00F6079C /* AppearancePreferencesTableCellView.xib in Resources */,
+				EAFAD6CA2728BD1200F9DF00 /* clickToLoad.js in Resources */,
 				336D5B18262D8D3C0052E0C9 /* findinpage.js in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -3779,6 +3802,7 @@
 				B65783E725F8AAFB00D8DB33 /* String+Punycode.swift in Sources */,
 				B657841A25FA484B00D8DB33 /* NSException+Catch.m in Sources */,
 				B684592F25C93FBF00DC17B6 /* AppStateRestorationManager.swift in Sources */,
+				EA0BA3A9272217E6002A0B6C /* ClickToLoadUserScript.swift in Sources */,
 				AAA892EA250A4CEF005B37B2 /* WindowControllersManager.swift in Sources */,
 				AAC5E4C825D6A6E8007F5990 /* BookmarkPopoverViewController.swift in Sources */,
 				85CC1D7B26A05ECF0062F04E /* PasswordManagementItemListModel.swift in Sources */,

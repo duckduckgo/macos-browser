@@ -43,6 +43,7 @@ enum ConfigurationLocation: String, CaseIterable {
     case surrogates = "https://duckduckgo.com/contentblocking.js?l=surrogates"
     case trackerRadar = "https://staticcdn.duckduckgo.com/trackerblocking/v2.1/tds.json"
     case privacyConfiguration = "https://staticcdn.duckduckgo.com/trackerblocking/config/v1/macos-config.json"
+    case FBConfig = "" //"https://staticcdn.duckduckgo.com/useragents/social_ctp_configuration.json"
 
 }
 

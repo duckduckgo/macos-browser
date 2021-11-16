@@ -30,7 +30,8 @@ public struct UserDefaultsWrapper<T> {
         case configStorageBloomFilterExclusionsEtag = "config.storage.bloomfilter.exclusions.etag"
         case configStorageSurrogatesEtag = "config.storage.surrogates.etag"
         case configStoragePrivacyConfigurationEtag = "config.storage.privacyconfiguration.etag"
-
+        case configFBConfigEtag = "config.storage.fbconfig.etag"
+        
         case fireproofDomains = "com.duckduckgo.fireproofing.allowedDomains"
 
         case defaultBrowserDismissed = "browser.default.dismissed"

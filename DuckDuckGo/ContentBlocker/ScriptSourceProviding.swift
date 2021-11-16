@@ -27,6 +27,7 @@ protocol ScriptSourceProviding {
     var surrogatesConfig: SurrogatesUserScriptConfig? { get }
     var gpcSource: String { get }
     var navigatorCredentialsSource: String { get }
+    var clickToLoadSource: String { get }
 
     var sourceUpdatedPublisher: AnyPublisher<ContentBlockerRulesIdentifier.Difference?, Never> { get }
 
@@ -40,6 +41,7 @@ final class DefaultScriptSourceProvider: ScriptSourceProviding {
     private(set) var surrogatesConfig: SurrogatesUserScriptConfig?
     private(set) var gpcSource: String = ""
     private(set) var navigatorCredentialsSource: String = ""
+    private(set) var clickToLoadSource: String = ""
 
     private let sourceUpdatedSubject = PassthroughSubject<ContentBlockerRulesIdentifier.Difference?, Never>()
     var sourceUpdatedPublisher: AnyPublisher<ContentBlockerRulesIdentifier.Difference?, Never> {
@@ -79,6 +81,7 @@ final class DefaultScriptSourceProvider: ScriptSourceProviding {
         surrogatesConfig = buildSurrogatesConfig()
         gpcSource = buildGPCSource()
         navigatorCredentialsSource = buildNavigatorCredentialsSource()
+        clickToLoadSource = buildClickToLoadSource()
         sourceUpdatedSubject.send( knownChanges )
     }
 
@@ -131,5 +134,29 @@ final class DefaultScriptSourceProvider: ScriptSourceProviding {
              "$CREDENTIALS_EXCEPTIONS$": (unprotectedDomains + contentBlockingExceptions).joined(separator: "\n")
         ])
     }
+    
+    private func loadTextFile(_ fileName: String, _ fileExt: String) -> String {
+        let sdkUrl = Bundle.main.url(
+            forResource: fileName,
+            withExtension: fileExt
+        )
+        var data = ""
+        do {
+            data = try String(contentsOf: sdkUrl!)
+        } catch let error as NSError {
+            print(error.debugDescription)
+        }
+        
+        return data
+    }
 
+    private func buildClickToLoadSource() -> String {
+        // For now bundle FB SDK and associated config, as they diverged from the extension
+        let fbSDK = loadTextFile("fb-sdk", "js")
+        let config = loadTextFile("clickToLoadConfig", "json")
+        return ContentBlockerRulesUserScript.loadJS("clickToLoad", from: .main, withReplacements: [
+            "${fb-sdk.js}": fbSDK,
+            "${clickToLoadConfig.json}": config
+        ])
+    }
 }

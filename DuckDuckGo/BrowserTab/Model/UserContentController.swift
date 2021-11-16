@@ -45,7 +45,8 @@ final class UserContentController: WKUserContentController {
                   let newRules = newRules
             else { return }
 
-            self.removeAllContentRuleLists()
+            // self.removeAllContentRuleLists()
+            self.remove(newRules.rules.rulesList) // LDA TODO temporarily, don't remove all rules
             if self.privacyConfigurationManager.privacyConfig.isEnabled(featureKey: .contentBlocking) {
                 self.add(newRules.rules.rulesList)
             }
