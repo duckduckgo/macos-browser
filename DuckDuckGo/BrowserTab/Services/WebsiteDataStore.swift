@@ -57,6 +57,8 @@ internal class WebCacheManager {
 
         let types = WKWebsiteDataStore.allWebsiteDataTypesExceptCookies
 
+        removeResourceLoadStatisticsDatabase()
+
         websiteDataStore.removeData(ofTypes: types, modifiedSince: Date.distantPast) {
             guard let cookieStore = self.websiteDataStore.cookieStore else {
                 completion()
@@ -90,6 +92,8 @@ internal class WebCacheManager {
 
         let all = WKWebsiteDataStore.allWebsiteDataTypes()
         let allExceptCookies = WKWebsiteDataStore.allWebsiteDataTypesExceptCookies
+
+        removeResourceLoadStatisticsDatabase()
 
         websiteDataStore.fetchDataRecords(ofTypes: all) { [weak self] records in
 
@@ -134,6 +138,24 @@ internal class WebCacheManager {
                     }
                 }
             }
+        }
+    }
+    
+    // WKWebView doesn't provide a way to remove the observations database, which contains domains that have been
+    // visited by the user. This database is removed directly as a part of the Fire button process.
+    private func removeResourceLoadStatisticsDatabase() {
+        guard let bundleID = Bundle.main.bundleIdentifier,
+              var libraryURL = FileManager.default.urls(for: .libraryDirectory, in: .userDomainMask).first else {
+            return
+        }
+
+        libraryURL.appendPathComponent("WebKit/\(bundleID)/WebsiteData/ResourceLoadStatistics")
+        
+        let contentsOfDirectory = (try? FileManager.default.contentsOfDirectory(at: libraryURL, includingPropertiesForKeys: [.nameKey])) ?? []
+        let fileNames = contentsOfDirectory.compactMap { $0.suggestedFilename }
+        
+        for fileName in fileNames where fileName.contains("observations.db") {
+            FileManager.default.remove(fileAtURL: libraryURL.appendingPathComponent(fileName))
         }
     }
 
