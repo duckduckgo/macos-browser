@@ -508,21 +508,38 @@ final class Tab: NSObject {
         if upgradedUrl == nil { return }
         connectionUpgradedTo = upgradedUrl
     }
+    
+    // MARK: - Printing
+    
+    // To avoid webpages invoking the printHandler and overwhelming the browser, this property keeps track of the active
+    // print operation and ignores incoming printHandler messages if one exists.
+    fileprivate var activePrintOperation: NSPrintOperation?
 
 }
 
 extension Tab: PrintingUserScriptDelegate {
 
     func printingUserScriptDidRequestPrintController(_ script: PrintingUserScript) {
+        guard activePrintOperation == nil else { return }
+        
         guard let window = webView.window,
               let printOperation = webView.printOperation()
               else { return }
+        
+        self.activePrintOperation = printOperation
 
         if printOperation.view?.frame.isEmpty == true {
             printOperation.view?.frame = webView.bounds
         }
 
-        printOperation.runModal(for: window, delegate: nil, didRun: nil, contextInfo: nil)
+        let selector = #selector(printOperationDidRun(printOperation: success: contextInfo:))
+        printOperation.runModal(for: window, delegate: self, didRun: selector, contextInfo: nil)
+    }
+    
+    @objc func printOperationDidRun(printOperation: NSPrintOperation,
+                                    success: Bool,
+                                    contextInfo: UnsafeMutableRawPointer?) {
+        activePrintOperation = nil
     }
 
 }
