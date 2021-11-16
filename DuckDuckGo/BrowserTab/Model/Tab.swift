@@ -687,6 +687,7 @@ extension Tab: WKNavigationDelegate {
             if navigationAction.navigationType == .backForward,
                self.webView.frozenCanGoForward != nil {
 
+                // Auto-cancel simulated Back action when upgrading to HTTPS from Client Redirect
                 self.webView.frozenCanGoForward = nil
                 self.webView.frozenCanGoBack = nil
                 decisionHandler(.cancel)
