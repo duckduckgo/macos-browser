@@ -54,7 +54,7 @@ final class FireproofDomainsViewController: NSViewController {
 
     fileprivate func reloadData() {
         allFireproofDomains = FireproofDomains.shared.fireproofDomains.sorted { (lhs, rhs) -> Bool in
-            return lhs.dropWWW() < rhs.dropWWW()
+            return lhs < rhs
         }
 
         tableView.reloadData()

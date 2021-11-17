@@ -17,6 +17,8 @@
 //
 
 import Foundation
+import CoreData
+import os.log
 
 internal class FireproofDomains {
 
@@ -28,10 +30,37 @@ internal class FireproofDomains {
 
     static let shared = FireproofDomains()
 
-    @UserDefaultsWrapper(key: .fireproofDomains, defaultValue: [])
-    private(set) var fireproofDomains: [String] {
+    private let store: FireproofDomainsStore
+
+    @UserDefaultsWrapper(key: .fireproofDomains, defaultValue: nil)
+    private var legacyUserDefaultsFireproofDomains: [String]?
+
+    private lazy var fireproofDomainsToIds: [String: NSManagedObjectID] = loadFireproofDomains() {
         didSet {
             NotificationCenter.default.post(name: Constants.allowedDomainsChangedNotification, object: self)
+        }
+    }
+    var fireproofDomains: [String] {
+        return Array(fireproofDomainsToIds.keys)
+    }
+
+    init(store: FireproofDomainsStore = LocalFireproofDomainsStore()) {
+        self.store = store
+    }
+
+    private func loadFireproofDomains() -> [String: NSManagedObjectID] {
+        do {
+            if let fireproofDomains = legacyUserDefaultsFireproofDomains?.map({ $0.dropWWW() }),
+                !fireproofDomains.isEmpty,
+                let migratedDomains = try? store.add(fireproofDomains: Array(Set(fireproofDomains))) {
+                self.legacyUserDefaultsFireproofDomains = nil
+                return migratedDomains
+            }
+
+            return try store.loadFireproofDomains()
+        } catch {
+            os_log("FireproofDomainsStore: Failed to load Fireproof Domains", type: .error)
+            return [:]
         }
     }
 
@@ -50,33 +79,47 @@ internal class FireproofDomains {
             return
         }
 
-        fireproofDomains += [domain]
+        let domainWithoutWWW = domain.dropWWW()
+        do {
+            fireproofDomainsToIds[domainWithoutWWW] = try store.add(fireproofDomain: domainWithoutWWW)
+        } catch {
+            assertionFailure("could not add fireproof domain \(domain): \(error)")
+            return
+        }
 
         NotificationCenter.default.post(name: Constants.newFireproofDomainNotification, object: self, userInfo: [
-            Constants.newFireproofDomainKey: domain
+            Constants.newFireproofDomainKey: domainWithoutWWW
         ])
     }
 
     public func isFireproof(cookieDomain: String) -> Bool {
-        fireproofDomains.contains {
-            $0 == cookieDomain
-                || ".\($0)" == cookieDomain
-                || (cookieDomain.hasPrefix(".") && $0.hasSuffix(cookieDomain))
-        }
+        return fireproofDomainsToIds[cookieDomain] != nil
+            || fireproofDomainsToIds[cookieDomain.drop(prefix: ".")] != nil
+            || (cookieDomain.hasPrefix(".") && fireproofDomainsToIds.contains(where: { key, _ in
+                    key.hasSuffix(cookieDomain)
+                }))
     }
 
     func remove(domain: String) {
-        fireproofDomains.removeAll {
-            $0 == domain || $0 == "www.\(domain)"
+        let domainWithoutWWW = domain.dropWWW()
+        guard let id = fireproofDomainsToIds[domainWithoutWWW] else {
+            assertionFailure("fireproof domain \(domain) not found")
+            return
         }
+        fireproofDomainsToIds[domainWithoutWWW] = nil
+        store.remove(objectWithId: id)
     }
 
     func clearAll() {
-        fireproofDomains = []
+        fireproofDomainsToIds = [:]
+        store.clear()
     }
 
     func isFireproof(fireproofDomain domain: String) -> Bool {
-        return fireproofDomains.contains(where: { $0.hasSuffix(domain) || $0.dropWWW().hasSuffix(domain) })
+        let domainWithoutWWW = domain.dropWWW()
+        let dotPrefixedDomain = "." + domainWithoutWWW
+        return fireproofDomainsToIds[domainWithoutWWW] != nil
+            || fireproofDomainsToIds.contains(where: { key, _ in key.hasSuffix(dotPrefixedDomain) })
     }
 
     func isURLFireproof(url: URL) -> Bool {
