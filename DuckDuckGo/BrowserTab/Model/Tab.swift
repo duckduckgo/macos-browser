@@ -687,7 +687,7 @@ extension Tab: WKNavigationDelegate {
             if navigationAction.navigationType == .backForward,
                self.webView.frozenCanGoForward != nil {
 
-                // Auto-cancel simulated Back action when upgrading to HTTPS from Client Redirect
+                // Auto-cancel simulated Back action when upgrading to HTTPS or GPC from Client Redirect
                 self.webView.frozenCanGoForward = nil
                 self.webView.frozenCanGoBack = nil
                 decisionHandler(.cancel)
@@ -695,6 +695,7 @@ extension Tab: WKNavigationDelegate {
 
             } else if navigationAction.navigationType != .backForward,
                let request = GPCRequestFactory.shared.requestForGPC(basedOn: navigationAction.request) {
+                self.invalidateBackItemIfNeeded(for: navigationAction)
                 decisionHandler(.cancel)
                 webView.load(request)
                 return
@@ -750,14 +751,7 @@ extension Tab: WKNavigationDelegate {
                isUpgradable && navigationAction.isTargetingMainFrame,
                 let upgradedUrl = url.toHttps() {
 
-                if url == self.clientRedirectedDuringNavigationURL {
-                    // Cancelled & Upgraded Client Redirect URL leaves wrong backForwardList record
-                    // https://app.asana.com/0/inbox/1199237043628108/1201280322539473/1201353436736961
-                    self.webView.goBack()
-                    self.webView.frozenCanGoBack = self.webView.canGoBack
-                    self.webView.frozenCanGoForward = false
-                }
-
+                self.invalidateBackItemIfNeeded(for: navigationAction)
                 self.webView.load(upgradedUrl)
                 self.setConnectionUpgradedTo(upgradedUrl, navigationAction: navigationAction)
                 decisionHandler(.cancel)
@@ -770,6 +764,18 @@ extension Tab: WKNavigationDelegate {
     }
     // swiftlint:enable cyclomatic_complexity
     // swiftlint:enable function_body_length
+
+    private func invalidateBackItemIfNeeded(for navigationAction: WKNavigationAction) {
+        guard let url = navigationAction.request.url,
+              url == self.clientRedirectedDuringNavigationURL
+        else { return }
+
+        // Cancelled & Upgraded Client Redirect URL leaves wrong backForwardList record
+        // https://app.asana.com/0/inbox/1199237043628108/1201280322539473/1201353436736961
+        self.webView.goBack()
+        self.webView.frozenCanGoBack = self.webView.canGoBack
+        self.webView.frozenCanGoForward = false
+    }
 
     func webView(_ webView: WKWebView,
                  decidePolicyFor navigationResponse: WKNavigationResponse,
@@ -843,7 +849,7 @@ extension Tab: WKNavigationDelegate {
     }
 
     @objc(_webView:willPerformClientRedirectToURL:delay:)
-    func webView(_ webView: WebView, willPerformClientRedirectToURL url: URL, delay: TimeInterval) {
+    func webView(_ webView: WKWebView, willPerformClientRedirectToURL url: URL, delay: TimeInterval) {
         if case .committed = self.mainFrameLoadState {
             self.clientRedirectedDuringNavigationURL = url
         }
