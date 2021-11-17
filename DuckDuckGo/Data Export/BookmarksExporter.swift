@@ -1,5 +1,5 @@
 //
-//  LoginExport.swift
+//  BookmarksExporter.swift
 //
 //  Copyright © 2021 DuckDuckGo. All rights reserved.
 //
@@ -18,8 +18,12 @@
 
 import Foundation
 
-protocol LoginExporter {
+struct BookmarksExporter {
 
-    func exportVaultLogins(to: URL) throws
+    let bookmarkManager: BookmarkManager
+
+    func exportBookmarksTo(url: URL) throws {
+
+    }
 
 }

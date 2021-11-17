@@ -122,13 +122,11 @@ extension AppDelegate {
               let window = windowController.window else { return }
 
         let savePanel = NSSavePanel()
-        savePanel.nameFieldStringValue = "DuckDuckGo Logins"
+        savePanel.nameFieldStringValue = UserText.exportLoginsFileName
         savePanel.allowedFileTypes = ["csv"]
 
         savePanel.beginSheetModal(for: window) { response in
-            guard response == .OK, let selectedURL = savePanel.url else {
-                return
-            }
+            guard response == .OK, let selectedURL = savePanel.url else { return }
 
             let vault = try? SecureVaultFactory.default.makeVault()
             let exporter = CSVLoginExporter(secureVault: vault!)
@@ -136,13 +134,30 @@ extension AppDelegate {
                 try exporter.exportVaultLogins(to: selectedURL)
                 Pixel.fire(.exportedLogins())
             } catch {
-                // @samsymons Move this into an extension in the followup login import PR:
-                let alert = NSAlert()
-                alert.messageText = "Failed to Export Logins"
-                alert.informativeText = "Please check that no file exists at the location you selected."
-                alert.alertStyle = .warning
-                alert.addButton(withTitle: "OK")
-                alert.beginSheetModal(for: window, completionHandler: nil)
+                NSAlert.exportLoginsFailed()
+                    .beginSheetModal(for: window, completionHandler: nil)
+            }
+        }
+    }
+
+    @IBAction func openExportBookmarks(_ sender: Any?) {
+        guard let windowController = WindowControllersManager.shared.lastKeyMainWindowController,
+              let window = windowController.window else { return }
+
+        let savePanel = NSSavePanel()
+        savePanel.nameFieldStringValue = UserText.exportBookmarksFileName
+        savePanel.allowedFileTypes = ["html"]
+
+        savePanel.beginSheetModal(for: window) { response in
+            guard response == .OK, let selectedURL = savePanel.url else { return }
+
+            let exporter = BookmarksExporter(bookmarkManager: LocalBookmarkManager.shared)
+            do {
+                try exporter.exportBookmarksTo(url: selectedURL)
+                Pixel.fire(.exportedBookmarks())
+            } catch {
+                NSAlert.exportBookmarksFailed()
+                    .beginSheetModal(for: window, completionHandler: nil)
             }
         }
     }
