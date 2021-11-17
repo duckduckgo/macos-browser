@@ -142,7 +142,8 @@ extension AppDelegate {
 
     @IBAction func openExportBookmarks(_ sender: Any?) {
         guard let windowController = WindowControllersManager.shared.lastKeyMainWindowController,
-              let window = windowController.window else { return }
+              let window = windowController.window,
+              let list = LocalBookmarkManager.shared.list else { return }
 
         let savePanel = NSSavePanel()
         savePanel.nameFieldStringValue = UserText.exportBookmarksFileName
@@ -151,7 +152,7 @@ extension AppDelegate {
         savePanel.beginSheetModal(for: window) { response in
             guard response == .OK, let selectedURL = savePanel.url else { return }
 
-            let exporter = BookmarksExporter(bookmarkManager: LocalBookmarkManager.shared)
+            let exporter = BookmarksExporter(list: list)
             do {
                 try exporter.exportBookmarksTo(url: selectedURL)
                 Pixel.fire(.exportedBookmarks())

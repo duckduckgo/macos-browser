@@ -20,9 +20,23 @@ import Foundation
 
 struct BookmarksExporter {
 
-    let bookmarkManager: BookmarkManager
+    let list: BookmarkList
 
     func exportBookmarksTo(url: URL) throws {
+        let content = Template.header + Template.footer
+        try content.write(to: url, atomically: true, encoding: .utf8)
+    }
+
+}
+
+// MARK: Exported Bookmarks Template
+
+extension BookmarksExporter {
+
+    struct Template {
+
+        static let header = "HEADER"
+        static let footer = "FOOTER"
 
     }
 
