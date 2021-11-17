@@ -704,8 +704,8 @@ extension Tab: WKNavigationDelegate {
 
         if navigationAction.isTargetingMainFrame {
             currentDownload = nil
-            if navigationAction.request.url != clientRedirectedDuringNavigationURL {
-                clientRedirectedDuringNavigationURL = nil
+            if navigationAction.request.url != self.clientRedirectedDuringNavigationURL {
+                self.clientRedirectedDuringNavigationURL = nil
             }
         }
 
@@ -845,7 +845,13 @@ extension Tab: WKNavigationDelegate {
     @objc(_webView:didStartProvisionalLoadWithRequest:inFrame:)
     func webView(_ webView: WKWebView, didStartProvisionalLoadWithRequest request: URLRequest, inFrame frame: WKFrameInfo) {
         guard frame.isMainFrame else { return }
-        mainFrameLoadState = .provisional
+        self.mainFrameLoadState = .provisional
+    }
+
+    @objc(_webView:didCommitLoadWithRequest:inFrame:)
+    func webView(_ webView: WKWebView, didCommitLoadWithRequest request: URLRequest, inFrame frame: WKFrameInfo) {
+        guard frame.isMainFrame else { return }
+        self.mainFrameLoadState = .committed
     }
 
     @objc(_webView:willPerformClientRedirectToURL:delay:)
@@ -853,12 +859,6 @@ extension Tab: WKNavigationDelegate {
         if case .committed = self.mainFrameLoadState {
             self.clientRedirectedDuringNavigationURL = url
         }
-    }
-
-    @objc(_webView:didCommitLoadWithRequest:inFrame:)
-    func webView(_ webView: WKWebView, didCommitLoadWithRequest request: URLRequest, inFrame frame: WKFrameInfo) {
-        guard frame.isMainFrame else { return }
-        mainFrameLoadState = .committed
     }
 
     @objc(_webView:didFinishLoadWithRequest:inFrame:)
