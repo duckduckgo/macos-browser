@@ -199,7 +199,7 @@ final class PermissionManagerTests: XCTestCase {
     func testWhenPermissionsBurnedThenTheyAreCleared() {
         store.permissions = [.entity1, .entity2]
 
-        let fireproofDomains = FireproofDomains()
+        let fireproofDomains = FireproofDomains(store: FireproofDomainsStoreMock())
         fireproofDomains.addToAllowed(domain: PermissionEntity.entity1.domain)
 
         manager.burnPermissions(except: fireproofDomains) {}

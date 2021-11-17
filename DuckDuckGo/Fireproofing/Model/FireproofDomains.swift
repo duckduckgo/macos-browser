@@ -35,7 +35,7 @@ internal class FireproofDomains {
     @UserDefaultsWrapper(key: .fireproofDomains, defaultValue: nil)
     private var legacyUserDefaultsFireproofDomains: [String]?
 
-    private lazy var fireproofDomainsToIds: [String: NSManagedObjectID] = loadFireproofDomains() {
+    private(set) lazy var fireproofDomainsToIds: [String: NSManagedObjectID] = loadFireproofDomains() {
         didSet {
             NotificationCenter.default.post(name: Constants.allowedDomainsChangedNotification, object: self)
         }
@@ -92,6 +92,7 @@ internal class FireproofDomains {
     }
 
     public func isFireproof(cookieDomain: String) -> Bool {
+        let cookieDomain = cookieDomain.dropWWW()
         return fireproofDomainsToIds[cookieDomain] != nil
             || fireproofDomainsToIds[cookieDomain.drop(prefix: ".")] != nil
             || (cookieDomain.hasPrefix(".") && fireproofDomainsToIds.contains(where: { key, _ in
