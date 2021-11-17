@@ -122,7 +122,7 @@ extension AppDelegate {
               let window = windowController.window else { return }
 
         let savePanel = NSSavePanel()
-        savePanel.nameFieldStringValue = UserText.exportLoginsFileName
+        savePanel.nameFieldStringValue = "DuckDuckGo \(UserText.exportLoginsFileNameSuffix)"
         savePanel.allowedFileTypes = ["csv"]
 
         savePanel.beginSheetModal(for: window) { response in
@@ -146,7 +146,7 @@ extension AppDelegate {
               let list = LocalBookmarkManager.shared.list else { return }
 
         let savePanel = NSSavePanel()
-        savePanel.nameFieldStringValue = UserText.exportBookmarksFileName
+        savePanel.nameFieldStringValue = "DuckDuckGo \(UserText.exportBookmarksFileNameSuffix)"
         savePanel.allowedFileTypes = ["html"]
 
         savePanel.beginSheetModal(for: window) { response in

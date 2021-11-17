@@ -356,7 +356,7 @@ struct UserText {
     static let exportBookmarksFailedMessage = NSLocalizedString("export.bookmarks.failed.message", value: "Failed to Export Bookmarks", comment: "Alert title when exporting login data fails")
     static let exportBookmarksFailedInformative = NSLocalizedString("export.bookmarks.failed.informative", value: "Please check that no file exists at the location you selected.", comment: "Alert message when exporting bookmarks fails")
 
-    static let exportLoginsFileName = NSLocalizedString("export.logins.file.name", value: "DuckDuckGo Logins", comment: "The suggested file name for exporting logins")
-    static let exportBookmarksFileName = NSLocalizedString("export.bookmarks.file.name", value: "DuckDuckGo Bookmarks", comment: "The suggested file for exporting bookmarks")
+    static let exportLoginsFileNameSuffix = NSLocalizedString("export.logins.file.name.suffix", value: "Logins", comment: "The last part of the suggested file name for exporting logins")
+    static let exportBookmarksFileNameSuffix = NSLocalizedString("export.bookmarks.file.name.suffix", value: "Bookmarks", comment: "The last part of the suggested file for exporting bookmarks")
     
 }

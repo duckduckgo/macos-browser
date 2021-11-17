@@ -22,7 +22,43 @@ import XCTest
 
 class BookmarksExporterTests: XCTestCase {
 
+    struct TestData {
+        static let exampleUrl = URL(string: "https://example.com")!
+        static let exampleTitle = "Example"
+
+        static let otherUrl = URL(string: "https://other.com")!
+        static let otherTitle = "Other"
+    }
+
     let tmpFile: URL = FileManager.default.temporaryDirectory.appendingPathComponent(UUID().uuidString + ".html", isDirectory: false)
+
+    func test_WhenMultipleBookmarksAtTopLevel_ThenFileContainsAllBookmarksAtTopLevel() throws {
+        let exporter = BookmarksExporter(list: BookmarkList(entities: [], topLevelEntities: [
+            Bookmark.init(id: UUID(), url: TestData.exampleUrl, title: TestData.exampleTitle, isFavorite: false),
+            Bookmark.init(id: UUID(), url: TestData.otherUrl, title: TestData.otherTitle, isFavorite: false)
+        ]))
+
+        try exporter.exportBookmarksTo(url: tmpFile)
+        assertExportedFileEquals([
+            BookmarksExporter.Template.header,
+            BookmarksExporter.Template.bookmark(title: TestData.exampleTitle, url: TestData.exampleUrl),
+            BookmarksExporter.Template.bookmark(title: TestData.otherTitle, url: TestData.otherUrl),
+            BookmarksExporter.Template.footer
+        ].joined())
+    }
+
+    func test_WhenBookmarkAtTopLevel_ThenFileContainsBookmarkAtTopLevel() throws {
+        let exporter = BookmarksExporter(list: BookmarkList(entities: [], topLevelEntities: [
+            Bookmark.init(id: UUID(), url: TestData.exampleUrl, title: TestData.exampleTitle, isFavorite: false)
+        ]))
+
+        try exporter.exportBookmarksTo(url: tmpFile)
+        assertExportedFileEquals([
+            BookmarksExporter.Template.header,
+            BookmarksExporter.Template.bookmark(title: TestData.exampleTitle, url: TestData.exampleUrl),
+            BookmarksExporter.Template.footer
+        ].joined())
+    }
 
     func test_WhenNoBookmarks_ThenFileContainsOnlyHeaderAndFooter() throws {
         let exporter = BookmarksExporter(list: BookmarkList(entities: [], topLevelEntities: []))
@@ -34,6 +70,7 @@ class BookmarksExporterTests: XCTestCase {
     }
 
     private func assertExportedFileEquals(_ expected: String) {
+        print(tmpFile.absoluteString)
         let actual = try? String(contentsOf: tmpFile)
         XCTAssertEqual(expected, actual)
     }

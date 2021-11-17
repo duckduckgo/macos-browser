@@ -23,8 +23,18 @@ struct BookmarksExporter {
     let list: BookmarkList
 
     func exportBookmarksTo(url: URL) throws {
-        let content = Template.header + Template.footer
-        try content.write(to: url, atomically: true, encoding: .utf8)
+        var content = [Template.header]
+
+        for entity in list.topLevelEntities {
+
+            if let bookmark = entity as? Bookmark {
+                content.append(Template.bookmark(title: bookmark.title, url: bookmark.url))
+            }
+
+        }
+
+        content.append(Template.footer)
+        try content.joined().write(to: url, atomically: true, encoding: .utf8)
     }
 
 }
@@ -35,8 +45,23 @@ extension BookmarksExporter {
 
     struct Template {
 
-        static let header = "HEADER"
-        static let footer = "FOOTER"
+        static var header = """
+        <!DOCTYPE NETSCAPE-Bookmark-file-1>
+            <HTML xmlns:duckduckgo="https://duckduckgo.com/bookmarks">
+            <META HTTP-EQUIV="Content-Type" CONTENT="text/html; charset=UTF-8">
+            <Title>\(UserText.exportBookmarksFileNameSuffix)</Title>
+            <H1>\(UserText.exportBookmarksFileNameSuffix)</H1>
+        """
+
+        static let footer = """
+        </HTML>
+        """
+
+        static func bookmark(title: String, url: URL) -> String {
+            return """
+            <DT><A HREF="\(url.absoluteString)">\(title)</A>
+            """
+        }
 
     }
 
