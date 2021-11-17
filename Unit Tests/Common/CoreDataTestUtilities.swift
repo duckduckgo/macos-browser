@@ -30,6 +30,10 @@ final class CoreData {
         return createInMemoryPersistentContainer(modelName: "Permissions", bundle: Bundle(for: AppDelegate.self))
     }
 
+    static func fireproofingContainer() -> NSPersistentContainer {
+        return createInMemoryPersistentContainer(modelName: "FireproofDomains", bundle: Bundle(for: AppDelegate.self))
+    }
+
     static func downloadsContainer() -> NSPersistentContainer {
         return createInMemoryPersistentContainer(modelName: "Downloads", bundle: Bundle(for: AppDelegate.self))
     }

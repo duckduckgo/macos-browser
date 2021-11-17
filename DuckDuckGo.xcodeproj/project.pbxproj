@@ -566,6 +566,8 @@
 		B6B3E0962654DACD0040E0A2 /* UTTypeTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = B6B3E0952654DACD0040E0A2 /* UTTypeTests.swift */; };
 		B6B3E0E12657EA7A0040E0A2 /* NSScreenExtension.swift in Sources */ = {isa = PBXBuildFile; fileRef = B6B3E0DC2657E9CF0040E0A2 /* NSScreenExtension.swift */; };
 		B6BBF17427475B15004F850E /* PopupBlockedPopover.swift in Sources */ = {isa = PBXBuildFile; fileRef = B6BBF17327475B15004F850E /* PopupBlockedPopover.swift */; };
+		B6BBF1702744CDE1004F850E /* FireproofDomainsStoreTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = B6BBF16F2744CDE1004F850E /* FireproofDomainsStoreTests.swift */; };
+		B6BBF1722744CE36004F850E /* FireproofDomainsStoreMock.swift in Sources */ = {isa = PBXBuildFile; fileRef = B6BBF1712744CE36004F850E /* FireproofDomainsStoreMock.swift */; };
 		B6C0B22E26E61CE70031CB7F /* DownloadViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = B6C0B22D26E61CE70031CB7F /* DownloadViewModel.swift */; };
 		B6C0B23026E61D630031CB7F /* DownloadListStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = B6C0B22F26E61D630031CB7F /* DownloadListStore.swift */; };
 		B6C0B23426E71BCD0031CB7F /* Downloads.xcdatamodeld in Sources */ = {isa = PBXBuildFile; fileRef = B6C0B23226E71BCD0031CB7F /* Downloads.xcdatamodeld */; };
@@ -1197,6 +1199,8 @@
 		B6B3E0952654DACD0040E0A2 /* UTTypeTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UTTypeTests.swift; sourceTree = "<group>"; };
 		B6B3E0DC2657E9CF0040E0A2 /* NSScreenExtension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NSScreenExtension.swift; sourceTree = "<group>"; };
 		B6BBF17327475B15004F850E /* PopupBlockedPopover.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PopupBlockedPopover.swift; sourceTree = "<group>"; };
+		B6BBF16F2744CDE1004F850E /* FireproofDomainsStoreTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FireproofDomainsStoreTests.swift; sourceTree = "<group>"; };
+		B6BBF1712744CE36004F850E /* FireproofDomainsStoreMock.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FireproofDomainsStoreMock.swift; sourceTree = "<group>"; };
 		B6C0B22D26E61CE70031CB7F /* DownloadViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DownloadViewModel.swift; sourceTree = "<group>"; };
 		B6C0B22F26E61D630031CB7F /* DownloadListStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DownloadListStore.swift; sourceTree = "<group>"; };
 		B6C0B23326E71BCD0031CB7F /* Downloads.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = Downloads.xcdatamodel; sourceTree = "<group>"; };
@@ -1346,6 +1350,8 @@
 			children = (
 				4B02199925E063DE00ED7DEA /* FireproofDomainsTests.swift */,
 				4B02199A25E063DE00ED7DEA /* FireproofingURLExtensionsTests.swift */,
+				B6BBF16F2744CDE1004F850E /* FireproofDomainsStoreTests.swift */,
+				B6BBF1712744CE36004F850E /* FireproofDomainsStoreMock.swift */,
 			);
 			path = Fireproofing;
 			sourceTree = "<group>";
@@ -3971,6 +3977,7 @@
 				B65349AA265CF45000DCC645 /* DispatchQueueExtensionsTests.swift in Sources */,
 				858A798A26A9B35E00A75A42 /* PasswordManagementItemModelTests.swift in Sources */,
 				B6DA441E2616C84600DD1EC2 /* PixelStoreMock.swift in Sources */,
+				B6BBF1702744CDE1004F850E /* FireproofDomainsStoreTests.swift in Sources */,
 				4B9292BF2667103100AD2C21 /* TreeControllerTests.swift in Sources */,
 				B693956926F352DB0015B914 /* DownloadsWebViewMock.m in Sources */,
 				4B11060525903E570039B979 /* CoreDataEncryptionTesting.xcdatamodeld in Sources */,
@@ -4014,6 +4021,7 @@
 				AA63745424C9BF9A00AB2AC4 /* SuggestionContainerTests.swift in Sources */,
 				AAC9C01524CAFBCE00AD1325 /* TabTests.swift in Sources */,
 				B69B504C2726CA2900758A2B /* MockVariantManager.swift in Sources */,
+				B6BBF1722744CE36004F850E /* FireproofDomainsStoreMock.swift in Sources */,
 				4BA1A6D9258C0CB300F6F690 /* DataEncryptionTests.swift in Sources */,
 				858C1BED26974E6600E6C014 /* PasswordManagerSettingsTests.swift in Sources */,
 				B6A5A27E25B9403E00AA7ADA /* FileStoreMock.swift in Sources */,

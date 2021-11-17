@@ -152,20 +152,20 @@ final class LocalFireproofDomainsStore: FireproofDomainsStore {
         context.performAndWait { [context] in
             let entityName = FireproofDomainManagedObject.className()
 
-            var added = [String: NSManagedObjectID]()
+            var added = [String: NSManagedObject]()
             for domain in domains {
                 guard let managedObject = NSEntityDescription
                     .insertNewObject(forEntityName: entityName, into: context) as? FireproofDomainManagedObject
                 else { continue }
 
                 managedObject.domainEncrypted = domain as NSString
-                added[domain] = managedObject.objectID
+                added[domain] = managedObject
             }
             guard !added.isEmpty else { return }
 
             do {
                 try context.save()
-                result = .success(added)
+                result = .success(added.mapValues({ $0.objectID }))
             } catch {
                 result = .failure(error)
             }

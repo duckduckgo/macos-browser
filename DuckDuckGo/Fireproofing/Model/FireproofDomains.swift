@@ -68,10 +68,9 @@ internal class FireproofDomains {
         if isFireproof(fireproofDomain: domain) {
             remove(domain: domain)
             return false
-        } else {
-            addToAllowed(domain: domain)
-            return true
         }
+        addToAllowed(domain: domain)
+        return true
     }
 
     func addToAllowed(domain: String) {

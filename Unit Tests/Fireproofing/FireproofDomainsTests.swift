@@ -20,38 +20,94 @@ import XCTest
 @testable import DuckDuckGo_Privacy_Browser
 
 final class FireproofDomainsTests: XCTestCase {
+    let store = FireproofDomainsStoreMock()
+    lazy var logins: FireproofDomains = FireproofDomains(store: store)
 
     override func setUp() {
         UserDefaultsWrapper<Any>.clearAll()
     }
 
     func testWhenFireproofDomainsContainsFireproofedDomainThenReturnsTrue() {
-        let logins = FireproofDomains()
         XCTAssertFalse(logins.isFireproof(fireproofDomain: "example.com"))
         logins.addToAllowed(domain: "example.com")
-        XCTAssertTrue(logins.isFireproof(fireproofDomain: "example.com"))
+        XCTAssertTrue(logins.isFireproof(fireproofDomain: "www.example.com"))
+    }
+
+    func testWhenFireproofDomainsContainsFireproofedDomainThenIsURLFireproofReturnsTrue() {
+        XCTAssertFalse(logins.isFireproof(fireproofDomain: "example.com"))
+        logins.addToAllowed(domain: "example.com")
+        XCTAssertTrue(logins.isURLFireproof(url: URL(string: "http://www.example.com/example")!))
+    }
+
+    func testWhenFireproofDomainsDoesNotContainDomainThenIsURLFireproofReturnsFalse() {
+        XCTAssertFalse(logins.isFireproof(fireproofDomain: "thisisexample.com"))
+        logins.addToAllowed(domain: "thisisexample.com")
+        XCTAssertFalse(logins.isURLFireproof(url: URL(string: "http://www.example.com/example")!))
+    }
+
+    func testWhenFireproofDomainsContainsCookieDomainThenIsCookieDomainFireproofReturnsTrue() {
+        logins.addToAllowed(domain: "www.example.com")
+        XCTAssertTrue(logins.isFireproof(cookieDomain: "example.com"))
+    }
+
+    func testWhenFireproofDomainsContainsCookieDomainThenDotPrefixedIsCookieDomainFireproofReturnsTrue() {
+        logins.addToAllowed(domain: "www.example.com")
+        XCTAssertTrue(logins.isFireproof(cookieDomain: ".example.com"))
+    }
+
+    func testWhenFireproofDomainsContainsCookieSubdomainThenDotPrefixedIsCookieDomainFireproofReturnsTrue() {
+        logins.addToAllowed(domain: "www.sub.example.com")
+        XCTAssertTrue(logins.isFireproof(cookieDomain: ".example.com"))
+    }
+
+    func testWhenFireproofDomainsDoesNotContainCookieDomainThenIsCookieDomainFireproofReturnsFalse() {
+        logins.addToAllowed(domain: "thisisexample.com")
+        XCTAssertFalse(logins.isFireproof(cookieDomain: "example.com"))
     }
 
     func testWhenNewThenFireproofDomainsIsEmpty() {
-        let logins = FireproofDomains()
         XCTAssertTrue(logins.fireproofDomains.isEmpty)
     }
 
+    func testWhenFireproofedDomainsInUserDefaultsThenMigrationIsPerformed() {
+        var udw = UserDefaultsWrapper<[String]?>(key: .fireproofDomains, defaultValue: nil)
+        udw.wrappedValue = ["example.com", "www.secondexample.com"]
+        XCTAssertEqual(logins.fireproofDomains.sorted(), ["example.com", "secondexample.com"])
+        XCTAssertNil(udw.wrappedValue)
+    }
+
+    func testWhenFireproofedDomainsInStoreThenTheyAreLoaded() {
+        var udw = UserDefaultsWrapper<[String]?>(key: .fireproofDomains, defaultValue: nil)
+        udw.wrappedValue = []
+        store.domains = ["example.com": .init(), "secondexample.com": .init()]
+        XCTAssertEqual(logins.fireproofDomains.sorted(), ["example.com", "secondexample.com"])
+        XCTAssertEqual(udw.wrappedValue, [])
+    }
+
     func testWhenRemovingDomainThenOtherDomainsAreNotRemoved() {
-        let logins = FireproofDomains()
         logins.addToAllowed(domain: "example.com")
-        logins.addToAllowed(domain: "secondexample.com")
+        logins.addToAllowed(domain: "www.secondexample.com")
         XCTAssertTrue(logins.isFireproof(fireproofDomain: "example.com"))
         XCTAssertTrue(logins.isFireproof(fireproofDomain: "secondexample.com"))
 
         logins.remove(domain: "secondexample.com")
-        XCTAssertTrue(logins.isFireproof(fireproofDomain: "example.com"))
+        XCTAssertTrue(logins.isFireproof(fireproofDomain: "www.example.com"))
         XCTAssertFalse(logins.isFireproof(fireproofDomain: "secondexample.com"))
         XCTAssertFalse(logins.fireproofDomains.isEmpty)
     }
 
+    func testWhenTogglingFireproofDomainThenItIsRemoved() {
+        logins.addToAllowed(domain: "www.example.com")
+        XCTAssertFalse(logins.toggle(domain: "example.com"))
+        XCTAssertFalse(logins.isFireproof(fireproofDomain: "example.com"))
+    }
+
+    func testWhenTogglingNotFireproofedDomainThenItIsAdded() {
+        XCTAssertTrue(logins.toggle(domain: "www.example.com"))
+        XCTAssertTrue(logins.isFireproof(fireproofDomain: "www.example.com"))
+    }
+
     func testWhenClearAllIsCalledThenAllDomainsAreRemoved() {
-        let logins = FireproofDomains()
         logins.addToAllowed(domain: "example.com")
         XCTAssertTrue(logins.isFireproof(fireproofDomain: "example.com"))
 
@@ -62,7 +118,6 @@ final class FireproofDomainsTests: XCTestCase {
 
     func testWhenAddingDuplicateDomainsThenSubsequentDomainsAreIgnored() {
         let domain = "example.com"
-        let logins = FireproofDomains()
         logins.addToAllowed(domain: domain)
         XCTAssertTrue(logins.isFireproof(fireproofDomain: domain))
 
