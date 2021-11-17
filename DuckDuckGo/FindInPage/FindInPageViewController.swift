@@ -51,14 +51,6 @@ final class FindInPageViewController: NSViewController {
         updateFieldStates()
     }
 
-    @IBAction func findInPageNext(_ sender: Any?) {
-        delegate?.findInPageNext(self)
-    }
-
-    @IBAction func findInPagePrevious(_ sender: Any?) {
-        delegate?.findInPagePrevious(self)
-    }
-
     @IBAction func findInPageDone(_ sender: Any?) {
         delegate?.findInPageDone(self)
     }
@@ -73,10 +65,10 @@ final class FindInPageViewController: NSViewController {
         modifiers.remove(.capsLock)
         switch modifiers {
         case .shift:
-            findInPagePrevious(self)
+            delegate?.findInPagePrevious(self)
             return true
         case []:
-            findInPageNext(self)
+            delegate?.findInPageNext(self)
             return true
         default:
             return false

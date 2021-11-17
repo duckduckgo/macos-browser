@@ -384,6 +384,14 @@ extension MainViewController {
         tabCollectionViewModel.selectedTabViewModel?.startFindInPage()
     }
 
+    @IBAction func findInPageNext(_ sender: Any?) {
+        self.tabCollectionViewModel.selectedTabViewModel?.findInPageNext()
+    }
+
+    @IBAction func findInPagePrevious(_ sender: Any?) {
+        self.tabCollectionViewModel.selectedTabViewModel?.findInPagePrevious()
+    }
+
     /// Declines handling findInPage action if there's no page loaded currently.
     override func responds(to aSelector: Selector!) -> Bool {
         if aSelector == #selector(findInPage(_:)) && tabCollectionViewModel.selectedTabViewModel?.tab.content.url == nil {
