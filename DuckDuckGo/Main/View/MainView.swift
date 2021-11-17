@@ -23,6 +23,10 @@ final class MainView: NSView {
 
     // PDF Plugin context menu
     override func willOpenMenu(_ menu: NSMenu, with event: NSEvent) {
+        setupSearchContextMenuItem(menu: menu)
+    }
+
+    private func setupSearchContextMenuItem(menu: NSMenu) {
         // Intercept [_NSServiceEntry invokeWithPasteboard:] to catch selected PDF text "Search with %@" menu item
         PDFSearchTextMenuItemHandler.swizzleInvokeWithPasteboardOnce()
 
@@ -38,6 +42,7 @@ final class MainView: NSView {
             guard !item.isSeparatorItem else { break }
             if item.title.contains(providerDisplayName) {
                 item.title = item.title.replacingOccurrences(of: providerDisplayName, with: "DuckDuckGo")
+                break
             }
         }
     }

@@ -2325,6 +2325,7 @@
 				AA7412B424D1536B00D22FE0 /* MainWindowController.swift */,
 				AA585DAE2490E6E600E9A3E2 /* MainViewController.swift */,
 				B688B4D9273E6D3B0087BEAF /* MainView.swift */,
+				B688B4DE27420D290087BEAF /* PDFSearchTextMenuItemHandler.swift */,
 			);
 			path = View;
 			sourceTree = "<group>";
@@ -2849,7 +2850,6 @@
 				B65E6B9F26D9F10600095F96 /* NSBezierPathExtension.swift */,
 				B6C0B24326E9CB080031CB7F /* RunLoopExtension.swift */,
 				0230C0A2272080090018F728 /* KeyedCodingExtension.swift */,
-				B688B4DE27420D290087BEAF /* PDFSearchTextMenuItemHandler.swift */,
 			);
 			path = Extensions;
 			sourceTree = "<group>";
