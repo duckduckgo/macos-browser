@@ -117,12 +117,9 @@ extension AppDelegate {
         windowController.mainViewController.beginSheet(viewController)
     }
 
-    @IBAction func openExportBrowserDataWindow(_ sender: Any?) {
+    @IBAction func openExportLogins(_ sender: Any?) {
         guard let windowController = WindowControllersManager.shared.lastKeyMainWindowController,
-              let window = windowController.window else {
-
-            return
-        }
+              let window = windowController.window else { return }
 
         let savePanel = NSSavePanel()
         savePanel.nameFieldStringValue = "DuckDuckGo Logins"

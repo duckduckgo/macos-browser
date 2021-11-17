@@ -128,11 +128,24 @@ CA
                                                 <action selector="openImportBrowserDataWindow:" target="Ady-hI-5gd" id="UU7-vO-0ol"/>
                                             </connections>
                                         </menuItem>
-                                        <menuItem title="Export Browser Data..." id="raM-fX-nRg">
+                                        <menuItem title="Export" id="sSo-Jf-Tfd">
                                             <modifierMask key="keyEquivalentModifierMask"/>
-                                            <connections>
-                                                <action selector="openExportBrowserDataWindow:" target="Ady-hI-5gd" id="KJ1-rb-kec"/>
-                                            </connections>
+                                            <menu key="submenu" title="Export" id="SGe-jt-1so">
+                                                <items>
+                                                    <menuItem title="Logins..." id="raM-fX-nRg">
+                                                        <modifierMask key="keyEquivalentModifierMask"/>
+                                                        <connections>
+                                                            <action selector="openExportLogins:" target="Ady-hI-5gd" id="MLl-kw-Su4"/>
+                                                        </connections>
+                                                    </menuItem>
+                                                    <menuItem title="Bookmarks...." id="S6f-01-1ln">
+                                                        <modifierMask key="keyEquivalentModifierMask"/>
+                                                        <connections>
+                                                            <action selector="openExportBookmarks:" target="Ady-hI-5gd" id="mZd-DH-xgA"/>
+                                                        </connections>
+                                                    </menuItem>
+                                                </items>
+                                            </menu>
                                         </menuItem>
                                         <menuItem isSeparatorItem="YES" id="wqo-x3-9Zn"/>
                                         <menuItem title="Share" id="kUE-Qf-cwa">
