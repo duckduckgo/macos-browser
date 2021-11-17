@@ -48,7 +48,7 @@ final class FireproofDomainsStoreMock: FireproofDomainsStore {
         return .init()
     }
 
-    func add(fireproofDomains: [String]) throws -> [String : NSManagedObjectID] {
+    func add(fireproofDomains: [String]) throws -> [String: NSManagedObjectID] {
         history.append(.add(domains: fireproofDomains))
         if let error = error {
             throw error
