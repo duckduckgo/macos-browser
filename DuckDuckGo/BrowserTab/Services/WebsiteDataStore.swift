@@ -153,7 +153,7 @@ internal class WebCacheManager {
         libraryURL.appendPathComponent("WebKit/\(bundleID)/WebsiteData/ResourceLoadStatistics")
         
         let contentsOfDirectory = (try? FileManager.default.contentsOfDirectory(at: libraryURL, includingPropertiesForKeys: [.nameKey])) ?? []
-        let fileNames = contentsOfDirectory.compactMap { $0.suggestedFilename }
+        let fileNames = contentsOfDirectory.compactMap(\.suggestedFilename)
         
         guard fileNames.contains("observations.db") else {
             return
