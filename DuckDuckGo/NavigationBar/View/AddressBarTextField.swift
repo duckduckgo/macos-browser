@@ -115,8 +115,12 @@ final class AddressBarTextField: NSTextField {
             clearValue()
             return
         }
-        addressBarStringCancellable = selectedTabViewModel.$addressBarString.receive(on: DispatchQueue.main).sink { [weak self] _ in
+        addressBarStringCancellable = selectedTabViewModel.$addressBarString.dropFirst().receive(on: DispatchQueue.main).sink { [weak self] _ in
             self?.updateValue()
+        }
+
+        DispatchQueue.main.async {
+            self.restoreValueIfPossible()
         }
     }
 
@@ -130,10 +134,54 @@ final class AddressBarTextField: NSTextField {
         value = Value(stringValue: addressBarString, userTyped: false, isSearch: isSearch)
     }
 
+    private func saveValue() {
+        guard let selectedTabViewModel = tabCollectionViewModel.selectedTabViewModel else {
+            return
+        }
+
+        if isHomepageAddressBar {
+            selectedTabViewModel.lastHomepageTextFieldValue = value
+        } else {
+            selectedTabViewModel.lastAddressBarTextFieldValue = value
+        }
+    }
+
+    private func restoreValueIfPossible() {
+        guard let selectedTabViewModel = tabCollectionViewModel.selectedTabViewModel else {
+            return
+        }
+
+        let lastAddressBarTextFieldValue: AddressBarTextField.Value?
+        if isHomepageAddressBar {
+            lastAddressBarTextFieldValue = selectedTabViewModel.lastHomepageTextFieldValue
+        } else {
+            lastAddressBarTextFieldValue = selectedTabViewModel.lastAddressBarTextFieldValue
+        }
+
+        switch lastAddressBarTextFieldValue {
+        case .text:
+            self.value = lastAddressBarTextFieldValue ?? Value(stringValue: "", userTyped: true)
+        case .suggestion(let suggestionViewModel):
+            let suggestion = suggestionViewModel.suggestion
+            switch suggestion {
+            case .website, .bookmark, .historyEntry:
+                self.value = Value(stringValue: suggestionViewModel.autocompletionString, userTyped: true)
+            case .phrase(phrase: let phase):
+                self.value = Value.text(phase)
+            default:
+                updateValue()
+            }
+        case .url(urlString: let urlString, url: _, userTyped: true):
+            self.value = Value(stringValue: urlString, userTyped: true)
+        default:
+            updateValue()
+        }
+    }
+
     func makeMeFirstResponderIfNeeded() {
         let focusTab = tabCollectionViewModel.selectedTabViewModel?.tab.content.shouldFocusAddressBarAfterSelection ?? true
 
-        if focusTab, stringValue == "" {
+        if focusTab, value.isEmpty || value.isText {
             makeMeFirstResponder()
         }
     }
@@ -290,10 +338,7 @@ final class AddressBarTextField: NSTextField {
         case suggestion(_ suggestionViewModel: SuggestionViewModel)
 
         init(stringValue: String, userTyped: Bool, isSearch: Bool = false) {
-            if isSearch {
-                // When searching, the string value will be the URL query
-                self = .text(stringValue)
-            } else if let url = stringValue.punycodedUrl, url.isValid {
+            if let url = stringValue.punycodedUrl, url.isValid {
                 var stringValue = stringValue
                 // display punycoded url in readable form when editing
                 if !userTyped,
@@ -334,10 +379,19 @@ final class AddressBarTextField: NSTextField {
                 return suggestion.string.isEmpty
             }
         }
+
+        var isText: Bool {
+            if case .text = self {
+                return true
+            }
+            return false
+        }
     }
 
     @Published private(set) var value: Value = .text("") {
         didSet {
+            saveValue()
+
             suffix = Suffix(value: value)
 
             if let suffix = suffix {
@@ -595,7 +649,6 @@ extension AddressBarTextField: NSTextFieldDelegate {
     func controlTextDidEndEditing(_ obj: Notification) {
         suggestionContainerViewModel.clearUserStringValue()
         hideSuggestionWindow()
-        updateValue()
     }
 
     func controlTextDidChange(_ obj: Notification) {

@@ -66,6 +66,9 @@ final class TabViewModel {
 
     @Published private(set) var addressBarString: String = ""
     @PublishedAfter private(set) var passiveAddressBarString: String = ""
+    var lastAddressBarTextFieldValue: AddressBarTextField.Value?
+    var lastHomepageTextFieldValue: AddressBarTextField.Value?
+
     @Published private(set) var title: String = UserText.tabHomeTitle
     @Published private(set) var favicon: NSImage = Favicon.home
     @Published private(set) var findInPage: FindInPageModel = FindInPageModel()
@@ -167,10 +170,7 @@ final class TabViewModel {
             return
         }
 
-        if let searchQuery = url.searchQuery {
-            addressBarString = searchQuery
-            passiveAddressBarString = searchQuery
-        } else if [.blankPage, .homePage].contains(url) {
+        if [.blankPage, .homePage].contains(url) {
             addressBarString = ""
             passiveAddressBarString = ""
         } else {

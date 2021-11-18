@@ -100,8 +100,21 @@ final class AddressBarButtonsViewController: NSViewController {
 
     private var tabCollectionViewModel: TabCollectionViewModel
     private var bookmarkManager: BookmarkManager = LocalBookmarkManager.shared
-    private var isTextFieldEditorFirstResponder = false
-    private var isSearchingMode = false
+    var controllerMode: AddressBarViewController.Mode? {
+        didSet {
+            updateButtons()
+        }
+    }
+    var isTextFieldEditorFirstResponder = false {
+        didSet {
+            updateButtons()
+        }
+    }
+    var textFieldValue: AddressBarTextField.Value? {
+        didSet {
+            updateButtons()
+        }
+    }
     private var isMouseOver = false
 
     private var selectedTabViewModelCancellable: AnyCancellable?
@@ -113,8 +126,6 @@ final class AddressBarButtonsViewController: NSViewController {
     private var effectiveAppearanceCancellable: AnyCancellable?
     private var permissionsCancellables = Set<AnyCancellable>()
     private var trackerAnimationTriggerCancellable: AnyCancellable?
-    private var updatePrivacyEntryPointDebounced: Debounce?
-    private var updateImageButtonDebounced: Debounce?
 
     required init?(coder: NSCoder) {
         fatalError("AddressBarButtonsViewController: Bad initializer")
@@ -125,16 +136,6 @@ final class AddressBarButtonsViewController: NSViewController {
         self.tabCollectionViewModel = tabCollectionViewModel
 
         super.init(coder: coder)
-
-        self.updatePrivacyEntryPointDebounced = Debounce(delay: 0.2, callback: { [weak self] _ in
-            self?.updatePrivacyEntryPoint()
-        })
-
-        self.updateImageButtonDebounced = Debounce(delay: 0.2, callback: { [weak self] mode in
-            // swiftlint:disable force_cast
-            self?.updateImageButton(mode as! AddressBarViewController.Mode)
-            // swiftlint:enable force_cast
-        })
     }
 
     override func viewDidLoad() {
@@ -260,23 +261,18 @@ final class AddressBarButtonsViewController: NSViewController {
         privacyEntryPointButton.state = .on
     }
 
-    func updateButtons(mode: AddressBarViewController.Mode,
-                       isTextFieldEditorFirstResponder: Bool,
-                       textFieldValue: AddressBarTextField.Value) {
-        stopAnimationsAfterFocus(oldIsTextFieldEditorFirstResponder: self.isTextFieldEditorFirstResponder,
-                                 newIsTextFieldEditorFirstResponder: isTextFieldEditorFirstResponder)
-
-        self.isTextFieldEditorFirstResponder = isTextFieldEditorFirstResponder
+    func updateButtons() {
+        stopAnimationsAfterFocus()
 
         if tabCollectionViewModel.selectedTabViewModel == nil {
             os_log("%s: Selected tab view model is nil", type: .error, className)
             return
         }
 
-        isSearchingMode = mode != .browsing
-        clearButton.isHidden = !(isTextFieldEditorFirstResponder && !textFieldValue.isEmpty)
-        self.updatePrivacyEntryPointDebounced?.call()
-        self.updateImageButtonDebounced?.call(mode)
+        clearButton.isHidden = !(isTextFieldEditorFirstResponder && !(textFieldValue?.isEmpty ?? true))
+
+        updatePrivacyEntryPoint()
+        updateImageButton()
         updatePermissionButtons()
     }
 
@@ -506,17 +502,19 @@ final class AddressBarButtonsViewController: NSViewController {
         }
     }
 
-    private func updateImageButton(_ mode: AddressBarViewController.Mode) {
+    private func updateImageButton() {
         guard let selectedTabViewModel = tabCollectionViewModel.selectedTabViewModel else { return }
 
         // Image button
-        switch mode {
+        switch controllerMode {
         case .browsing:
             imageButton.image = selectedTabViewModel.favicon
         case .searching(withUrl: true):
             imageButton.image = Self.webImage
         case .searching(withUrl: false):
             imageButton.image = Self.homeFaviconImage
+        default:
+            imageButton.image = nil
         }
     }
 
@@ -533,13 +531,17 @@ final class AddressBarButtonsViewController: NSViewController {
         let urlScheme = selectedTabViewModel.tab.content.url?.scheme
         let isHypertextUrl = urlScheme == "http" || urlScheme == "https"
         let isDuckDuckGoUrl = selectedTabViewModel.tab.content.url?.isDuckDuckGoSearch ?? false
+        let isSearchingMode = controllerMode != .browsing
+        let isTextFieldValueText = textFieldValue?.isText ?? false
 
         // Privacy entry point button
         privacyEntryPointButton.isHidden = isSearchingMode ||
             isTextFieldEditorFirstResponder ||
             isDuckDuckGoUrl ||
             !isHypertextUrl ||
-            selectedTabViewModel.errorViewState.isVisible
+            selectedTabViewModel.errorViewState.isVisible ||
+            isTextFieldValueText
+
         imageButtonWrapper.isHidden = !privacyEntryPointButton.isHidden || trackerAnimationView.isAnimationPlaying
     }
 
@@ -557,7 +559,7 @@ final class AddressBarButtonsViewController: NSViewController {
         case .url(let url):
             guard let host = url.host else { break }
 
-            let isNotSecure = url.scheme == "http"
+            let isNotSecure = url.scheme == URL.NavigationalScheme.http.rawValue
             let isMajorTrackingNetwork = TrackerRadarManager.shared.isHostMajorTrackingNetwork(host)
             let protectionStore = DomainsProtectionUserDefaultsStore()
             let isUnprotected = protectionStore.isHostUnprotected(forDomain: host)
@@ -614,8 +616,8 @@ final class AddressBarButtonsViewController: NSViewController {
         stopAnimation(shieldDotAnimationView)
     }
 
-    private func stopAnimationsAfterFocus(oldIsTextFieldEditorFirstResponder: Bool, newIsTextFieldEditorFirstResponder: Bool) {
-        if !oldIsTextFieldEditorFirstResponder && newIsTextFieldEditorFirstResponder {
+    private func stopAnimationsAfterFocus() {
+        if isTextFieldEditorFirstResponder {
             stopAnimations()
         }
     }

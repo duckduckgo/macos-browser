@@ -41,7 +41,14 @@ final class AddressBarViewController: NSViewController {
     
     private var mode: Mode = .searching(withUrl: false) {
         didSet {
-            updateButtons()
+            addressBarButtonsViewController?.controllerMode = mode
+        }
+    }
+
+    private var isFirstResponder = false {
+        didSet {
+            updateView()
+            self.addressBarButtonsViewController?.isTextFieldEditorFirstResponder = isFirstResponder
         }
     }
 
@@ -72,7 +79,7 @@ final class AddressBarViewController: NSViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
 
-        updateView(firstResponder: false)
+        updateView()
         addressBarTextField.tabCollectionViewModel = tabCollectionViewModel
         addressBarTextField.suggestionContainerViewModel = suggestionContainerViewModel
         subscribeToSelectedTabViewModel()
@@ -187,20 +194,22 @@ final class AddressBarViewController: NSViewController {
     }
 
     private func subscribeToAddressBarTextFieldValue() {
-        addressBarTextFieldValueCancellable = addressBarTextField.$value.receive(on: DispatchQueue.main).sink { [weak self] _ in
+        addressBarTextFieldValueCancellable = addressBarTextField.$value.receive(on: DispatchQueue.main).sink { [weak self] value in
             guard let self = self else { return }
             self.updateMode()
-            self.updateButtons()
+            self.addressBarButtonsViewController?.textFieldValue = value
+            self.updateView()
         }
     }
 
-    private func updateView(firstResponder: Bool) {
-        addressBarTextField.alphaValue = firstResponder ? 1 : 0
-        passiveTextField.alphaValue = firstResponder ? 0 : 1
+    private func updateView() {
+        let isPassiveTextFieldHidden = isFirstResponder || mode != .browsing
+        addressBarTextField.alphaValue = isPassiveTextFieldHidden ? 1 : 0
+        passiveTextField.alphaValue = isPassiveTextFieldHidden ? 0 : 1
 
-        updateShadowView(firstResponder: firstResponder)
-        inactiveBackgroundView.alphaValue = firstResponder ? 0 : 1
-        activeBackgroundView.alphaValue = firstResponder ? 1 : 0
+        updateShadowView(firstResponder: isFirstResponder)
+        inactiveBackgroundView.alphaValue = isFirstResponder ? 0 : 1
+        activeBackgroundView.alphaValue = isFirstResponder ? 1 : 0
     }
 
     private func updateShadowView(firstResponder: Bool) {
@@ -247,32 +256,18 @@ final class AddressBarViewController: NSViewController {
 
     @objc private func refreshAddressBarAppearance(_ sender: Any) {
         self.updateMode()
-        self.updateButtons()
     }
 
-    private func updateButtons() {
-        let isTextFieldEditorFirstResponder = view.window?.firstResponder === addressBarTextField.currentEditor()
-
-        self.addressBarButtonsViewController?.updateButtons(mode: mode,
-                                                            isTextFieldEditorFirstResponder: isTextFieldEditorFirstResponder,
-                                                            textFieldValue: addressBarTextField.value)
-    }
-    
 }
 
 extension AddressBarViewController {
 
     @objc func textFieldFirstReponderNotification(_ notification: Notification) {
         if view.window?.firstResponder == addressBarTextField.currentEditor() {
-            updateView(firstResponder: true)
+            isFirstResponder = true
         } else {
-            if mode != .browsing {
-                self.mode = .browsing
-            }
-            updateView(firstResponder: false)
+            isFirstResponder = false
         }
-
-        updateButtons()
     }
     
 }
