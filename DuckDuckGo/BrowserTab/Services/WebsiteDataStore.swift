@@ -17,6 +17,7 @@
 //
 
 import WebKit
+import GRDB
 import os
 
 public protocol HTTPCookieStore {
@@ -57,8 +58,6 @@ internal class WebCacheManager {
 
         let types = WKWebsiteDataStore.allWebsiteDataTypesExceptCookies
 
-        removeResourceLoadStatisticsDatabase()
-
         websiteDataStore.removeData(ofTypes: types, modifiedSince: Date.distantPast) {
             guard let cookieStore = self.websiteDataStore.cookieStore else {
                 completion()
@@ -79,6 +78,8 @@ internal class WebCacheManager {
                         group.leave()
                     }
                 }
+                
+                self.removeResourceLoadStatisticsDatabase()
 
                 group.notify(queue: .main) {
                     completion()
@@ -92,8 +93,6 @@ internal class WebCacheManager {
 
         let all = WKWebsiteDataStore.allWebsiteDataTypes()
         let allExceptCookies = WKWebsiteDataStore.allWebsiteDataTypesExceptCookies
-
-        removeResourceLoadStatisticsDatabase()
 
         websiteDataStore.fetchDataRecords(ofTypes: all) { [weak self] records in
 
@@ -132,6 +131,8 @@ internal class WebCacheManager {
                             group.leave()
                         }
                     }
+                    
+                    self.removeResourceLoadStatisticsDatabase()
 
                     group.notify(queue: .main) {
                         completion()
@@ -154,8 +155,25 @@ internal class WebCacheManager {
         let contentsOfDirectory = (try? FileManager.default.contentsOfDirectory(at: libraryURL, includingPropertiesForKeys: [.nameKey])) ?? []
         let fileNames = contentsOfDirectory.compactMap { $0.suggestedFilename }
         
-        for fileName in fileNames where fileName.contains("observations.db") {
-            FileManager.default.remove(fileAtURL: libraryURL.appendingPathComponent(fileName))
+        guard fileNames.contains("observations.db") else {
+            return
+        }
+
+        // We've confirmed that the observations.db exists, now it can be cleaned out. We can't delete it entirely, as
+        // WebKit won't recreate it until next app launch.
+        
+        let databasePath = libraryURL.appendingPathComponent("observations.db")
+
+        guard let pool = try? DatabasePool(path: databasePath.absoluteString) else {
+            return
+        }
+        
+        try? pool.write { database in
+            let tables = try String.fetchAll(database, sql: "SELECT name FROM sqlite_master WHERE type='table';")
+            
+            for table in tables {
+                try database.execute(sql: "DELETE FROM \(table);")
+            }
         }
     }
 
