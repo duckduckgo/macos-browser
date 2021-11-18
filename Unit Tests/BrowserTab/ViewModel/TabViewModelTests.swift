@@ -52,22 +52,6 @@ final class TabViewModelTests: XCTestCase {
         XCTAssertEqual(tabViewModel.addressBarString, "")
     }
 
-    func testWhenURLIsSearchThenAddressBarStringIsTheQuery() {
-        let tabViewModel = TabViewModel.aTabViewModel
-
-        let query = "query"
-        let searchUrl = URL.makeSearchUrl(from: query)
-        tabViewModel.tab.url = searchUrl
-
-        let addressBarStringExpectation = expectation(description: "Address bar string")
-
-        tabViewModel.$addressBarString.debounce(for: 0.1, scheduler: RunLoop.main).sink { addressBarString in
-            XCTAssertEqual(addressBarString, query)
-            addressBarStringExpectation.fulfill()
-        } .store(in: &cancellables)
-        waitForExpectations(timeout: 1, handler: nil)
-    }
-
     func testWhenURLIsSetThenAddressBarIsUpdated() {
         let tabViewModel = TabViewModel.aTabViewModel
 
