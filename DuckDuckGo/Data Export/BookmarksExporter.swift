@@ -24,22 +24,25 @@ struct BookmarksExporter {
 
     func exportBookmarksTo(url: URL) throws {
         var content = [Template.header]
-        content.append(contentsOf: export(list.topLevelEntities))
+        content.append(contentsOf: export(list.topLevelEntities, level: 1))
         content.append(Template.footer)
         try content.joined().write(to: url, atomically: true, encoding: .utf8)
     }
 
-    func export(_ entities: [BaseBookmarkEntity]) -> [String] {
+    func export(_ entities: [BaseBookmarkEntity], level: Int) -> [String] {
         var content = [String]()
         for entity in entities {
             if let bookmark = entity as? Bookmark {
-                content.append(Template.bookmark(title: bookmark.title.escapedForHTML, url: bookmark.url, isFavorite: bookmark.isFavorite))
+                content.append(Template.bookmark(level: level,
+                                                 title: bookmark.title.escapedForHTML,
+                                                 url: bookmark.url,
+                                                 isFavorite: bookmark.isFavorite))
             }
 
             if let folder = entity as? BookmarkFolder {
-                content.append(Template.openFolder(named: folder.title))
-                content.append(contentsOf: export(folder.children))
-                content.append(Template.closeFolder)
+                content.append(Template.openFolder(level: level, named: folder.title))
+                content.append(contentsOf: export(folder.children, level: level + 1))
+                content.append(Template.closeFolder(level: level))
             }
         }
         return content
@@ -53,35 +56,43 @@ extension BookmarksExporter {
 
     struct Template {
 
-        static var header = """
+        static var header =
+        """
         <!DOCTYPE NETSCAPE-Bookmark-file-1>
             <HTML xmlns:duckduckgo="https://duckduckgo.com/bookmarks">
             <META HTTP-EQUIV="Content-Type" CONTENT="text/html; charset=UTF-8">
             <Title>\(UserText.exportBookmarksFileNameSuffix)</Title>
             <H1>\(UserText.exportBookmarksFileNameSuffix)</H1>
+
         """
 
-        static let footer = """
+        static let footer =
+        """
         </HTML>
         """
 
-        static func bookmark(title: String, url: URL, isFavorite: Bool = false) -> String {
+        static func bookmark(level: Int, title: String, url: URL, isFavorite: Bool = false) -> String {
             """
-            <DT><A HREF="\(url.absoluteString)"\(isFavorite ? " duckduckgo:favorite=\"true\"" : "")>\(title)</A>
+            \(String.indent(by: level))<DT><A HREF="\(url.absoluteString)"\(isFavorite ? " duckduckgo:favorite=\"true\"" : "")>\(title)</A>
+
             """
         }
 
-        static func openFolder(named name: String) -> String {
+        static func openFolder(level: Int, named name: String) -> String {
             """
-            <DT><H3 FOLDED>\(name)</H3>
-            <DL><p>
+            \(String.indent(by: level))<DT><H3 FOLDED>\(name)</H3>
+            \(String.indent(by: level))<DL><p>
+
             """
         }
 
         // This "open paragraph" to close the folder is part of the format 🙄
-        static var closeFolder = """
-            </DL><p>
-        """
+        static func closeFolder(level: Int) -> String {
+            """
+            \(String(repeating: "\t", count: level))</DL><p>
+
+            """
+        }
 
     }
 
@@ -93,6 +104,10 @@ fileprivate extension String {
         self.replacingOccurrences(of: "&", with: "&amp;")
             .replacingOccurrences(of: "<", with: "&lt;")
             .replacingOccurrences(of: ">", with: "&gt;")
+    }
+
+    static func indent(by level: Int) -> String {
+        return String(repeating: "\t", count: level)
     }
 
 }
