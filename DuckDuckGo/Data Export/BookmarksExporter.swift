@@ -24,17 +24,25 @@ struct BookmarksExporter {
 
     func exportBookmarksTo(url: URL) throws {
         var content = [Template.header]
-
-        for entity in list.topLevelEntities {
-
-            if let bookmark = entity as? Bookmark {
-                content.append(Template.bookmark(title: bookmark.title, url: bookmark.url))
-            }
-
-        }
-
+        content.append(contentsOf: export(list.topLevelEntities))
         content.append(Template.footer)
         try content.joined().write(to: url, atomically: true, encoding: .utf8)
+    }
+
+    func export(_ entities: [BaseBookmarkEntity]) -> [String] {
+        var content = [String]()
+        for entity in entities {
+            if let bookmark = entity as? Bookmark {
+                content.append(Template.bookmark(title: bookmark.title.escapedForHTML, url: bookmark.url, isFavorite: bookmark.isFavorite))
+            }
+
+            if let folder = entity as? BookmarkFolder {
+                content.append(Template.openFolder(named: folder.title))
+                content.append(contentsOf: export(folder.children))
+                content.append(Template.closeFolder)
+            }
+        }
+        return content
     }
 
 }
@@ -57,12 +65,34 @@ extension BookmarksExporter {
         </HTML>
         """
 
-        static func bookmark(title: String, url: URL) -> String {
-            return """
-            <DT><A HREF="\(url.absoluteString)">\(title)</A>
+        static func bookmark(title: String, url: URL, isFavorite: Bool = false) -> String {
+            """
+            <DT><A HREF="\(url.absoluteString)"\(isFavorite ? " duckduckgo:favorite=\"true\"" : "")>\(title)</A>
             """
         }
 
+        static func openFolder(named name: String) -> String {
+            """
+            <DT><H3 FOLDED>\(name)</H3>
+            <DL><p>
+            """
+        }
+
+        // This "open paragraph" to close the folder is part of the format 🙄
+        static var closeFolder = """
+            </DL><p>
+        """
+
+    }
+
+}
+
+fileprivate extension String {
+
+    var escapedForHTML: String {
+        self.replacingOccurrences(of: "&", with: "&amp;")
+            .replacingOccurrences(of: "<", with: "&lt;")
+            .replacingOccurrences(of: ">", with: "&gt;")
     }
 
 }
