@@ -169,10 +169,10 @@ internal class WebCacheManager {
         }
         
         try? pool.write { database in
-            let tables = try String.fetchAll(database, sql: "SELECT name FROM sqlite_master WHERE type='table';")
+            let tables = try String.fetchAll(database, sql: "SELECT name FROM sqlite_master WHERE type='table'")
             
             for table in tables {
-                try database.execute(sql: "DELETE FROM \(table);")
+                try database.execute(sql: "DELETE FROM \(table)")
             }
         }
     }
