@@ -191,7 +191,7 @@ final class WebCacheManagerTests: XCTestCase {
 
         let domains: [String]
 
-        override var fireproofDomainsToIds: [String : NSManagedObjectID] {
+        override var fireproofDomainsToIds: [String: NSManagedObjectID] {
             return domains.reduce(into: [:]) { $0[$1] = .init() }
         }
 
