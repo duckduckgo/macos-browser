@@ -783,6 +783,10 @@ extension Tab: WKNavigationDelegate {
             }
             StatisticsLoader.shared.refreshRetentionAtb(isSearch: url.isDuckDuckGoSearch)
 
+            if [.initial, .dailyFirst].contains(Pixel.Event.Repetition(key: "app_usage")) {
+                Pixel.fire(.appUsage)
+            }
+
             decisionHandler(.allow)
         }
     }
