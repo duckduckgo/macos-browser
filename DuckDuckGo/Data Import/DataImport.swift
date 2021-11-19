@@ -65,14 +65,14 @@ enum DataImport {
     }
 
     struct BrowserProfileList {
-        let browser: ThirdPartyBrowser.BrowserType
+        let browser: ThirdPartyBrowser
         let profiles: [BrowserProfile]
 
         var validImportableProfiles: [BrowserProfile] {
             return profiles.filter(\.hasLoginData)
         }
 
-        init(browser: ThirdPartyBrowser.BrowserType, profileURLs: [URL]) {
+        init(browser: ThirdPartyBrowser, profileURLs: [URL]) {
             self.browser = browser
 
             switch browser {

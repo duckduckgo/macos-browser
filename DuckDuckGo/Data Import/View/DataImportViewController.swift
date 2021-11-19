@@ -39,6 +39,14 @@ final class DataImportViewController: NSViewController {
     private struct ViewState {
         var selectedImportSource: DataImport.Source
         var interactionState: InteractionState
+        
+        static func defaultState() -> ViewState {
+            if let firstInstalledBrowser = ThirdPartyBrowser.installedBrowsers.first {
+                return ViewState(selectedImportSource: firstInstalledBrowser.importSource, interactionState: .ableToImport)
+            } else {
+                return ViewState(selectedImportSource: .csv, interactionState: .ableToImport)
+            }
+        }
     }
 
     static func create() -> DataImportViewController {
@@ -46,7 +54,7 @@ final class DataImportViewController: NSViewController {
         return storyboard.instantiateController(identifier: Constants.identifier)
     }
 
-    private var viewState: ViewState = ViewState(selectedImportSource: .brave, interactionState: .ableToImport) {
+    private var viewState: ViewState = .defaultState() {
         didSet {
             renderCurrentViewState()
 
