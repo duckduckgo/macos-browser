@@ -121,6 +121,7 @@
 		4B723E1526B000A400E14D75 /* LoginExport.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B723DFB26B0002B00E14D75 /* LoginExport.swift */; };
 		4B723E1926B000DC00E14D75 /* TemporaryFileCreator.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B723E1726B000DC00E14D75 /* TemporaryFileCreator.swift */; };
 		4B78A86B26BB3ADD0071BB16 /* BrowserImportSummaryViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B78A86A26BB3ADD0071BB16 /* BrowserImportSummaryViewController.swift */; };
+		4B7A60A1273E0BE400BBDFEB /* WKWebsiteDataStoreExtension.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B7A60A0273E0BE400BBDFEB /* WKWebsiteDataStoreExtension.swift */; };
 		4B82E9B325B69E3E00656FE7 /* TrackerRadarKit in Frameworks */ = {isa = PBXBuildFile; productRef = 4B82E9B225B69E3E00656FE7 /* TrackerRadarKit */; };
 		4B82E9B925B6A05800656FE7 /* DetectedTrackerTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B82E9B825B6A05800656FE7 /* DetectedTrackerTests.swift */; };
 		4B82E9C125B6A1CD00656FE7 /* TrackerRadarManagerTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B82E9C025B6A1CD00656FE7 /* TrackerRadarManagerTests.swift */; };
@@ -745,6 +746,7 @@
 		4B723E0426B0003E00E14D75 /* CSVLoginExporterTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CSVLoginExporterTests.swift; sourceTree = "<group>"; };
 		4B723E1726B000DC00E14D75 /* TemporaryFileCreator.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = TemporaryFileCreator.swift; sourceTree = "<group>"; };
 		4B78A86A26BB3ADD0071BB16 /* BrowserImportSummaryViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BrowserImportSummaryViewController.swift; sourceTree = "<group>"; };
+		4B7A60A0273E0BE400BBDFEB /* WKWebsiteDataStoreExtension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WKWebsiteDataStoreExtension.swift; sourceTree = "<group>"; };
 		4B82E9B825B6A05800656FE7 /* DetectedTrackerTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DetectedTrackerTests.swift; sourceTree = "<group>"; };
 		4B82E9C025B6A1CD00656FE7 /* TrackerRadarManagerTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TrackerRadarManagerTests.swift; sourceTree = "<group>"; };
 		4B8AC93226B3B06300879451 /* EdgeDataImporter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EdgeDataImporter.swift; sourceTree = "<group>"; };
@@ -2853,6 +2855,7 @@
 				B65E6B9F26D9F10600095F96 /* NSBezierPathExtension.swift */,
 				B6C0B24326E9CB080031CB7F /* RunLoopExtension.swift */,
 				0230C0A2272080090018F728 /* KeyedCodingExtension.swift */,
+				4B7A60A0273E0BE400BBDFEB /* WKWebsiteDataStoreExtension.swift */,
 			);
 			path = Extensions;
 			sourceTree = "<group>";
@@ -3593,6 +3596,7 @@
 				AA80EC54256BE3BC007083E7 /* UserText.swift in Sources */,
 				B61EF3EC266F91E700B4D78F /* WKWebView+Download.swift in Sources */,
 				B637274426CE25EF00C8CB02 /* NSApplication+BuildTime.m in Sources */,
+				4B7A60A1273E0BE400BBDFEB /* WKWebsiteDataStoreExtension.swift in Sources */,
 				B693955326F04BEC0015B914 /* WindowDraggingView.swift in Sources */,
 				4B0511C4262CAA5A00F6079C /* PreferencesSidebarViewController.swift in Sources */,
 				B6E53888267C94A00010FEA9 /* HomepageCollectionViewFlowLayout.swift in Sources */,

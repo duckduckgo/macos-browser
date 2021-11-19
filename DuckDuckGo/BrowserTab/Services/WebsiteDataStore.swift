@@ -17,6 +17,7 @@
 //
 
 import WebKit
+import GRDB
 import os
 
 public protocol HTTPCookieStore {
@@ -55,8 +56,7 @@ internal class WebCacheManager {
 
     func clear(completion: @escaping () -> Void) {
 
-        var types = WKWebsiteDataStore.allWebsiteDataTypes()
-        types.remove(WKWebsiteDataTypeCookies)
+        let types = WKWebsiteDataStore.allWebsiteDataTypesExceptCookies
 
         websiteDataStore.removeData(ofTypes: types, modifiedSince: Date.distantPast) {
             guard let cookieStore = self.websiteDataStore.cookieStore else {
@@ -78,6 +78,8 @@ internal class WebCacheManager {
                         group.leave()
                     }
                 }
+                
+                self.removeResourceLoadStatisticsDatabase()
 
                 group.notify(queue: .main) {
                     completion()
@@ -90,7 +92,7 @@ internal class WebCacheManager {
                completion: @escaping () -> Void) {
 
         let all = WKWebsiteDataStore.allWebsiteDataTypes()
-        let allExceptCookies = all.filter { $0 != WKWebsiteDataTypeCookies }
+        let allExceptCookies = WKWebsiteDataStore.allWebsiteDataTypesExceptCookies
 
         websiteDataStore.fetchDataRecords(ofTypes: all) { [weak self] records in
 
@@ -129,11 +131,48 @@ internal class WebCacheManager {
                             group.leave()
                         }
                     }
+                    
+                    self.removeResourceLoadStatisticsDatabase()
 
                     group.notify(queue: .main) {
                         completion()
                     }
                 }
+            }
+        }
+    }
+    
+    // WKWebView doesn't provide a way to remove the observations database, which contains domains that have been
+    // visited by the user. This database is removed directly as a part of the Fire button process.
+    private func removeResourceLoadStatisticsDatabase() {
+        guard let bundleID = Bundle.main.bundleIdentifier,
+              var libraryURL = FileManager.default.urls(for: .libraryDirectory, in: .userDomainMask).first else {
+            return
+        }
+
+        libraryURL.appendPathComponent("WebKit/\(bundleID)/WebsiteData/ResourceLoadStatistics")
+        
+        let contentsOfDirectory = (try? FileManager.default.contentsOfDirectory(at: libraryURL, includingPropertiesForKeys: [.nameKey])) ?? []
+        let fileNames = contentsOfDirectory.compactMap(\.suggestedFilename)
+        
+        guard fileNames.contains("observations.db") else {
+            return
+        }
+
+        // We've confirmed that the observations.db exists, now it can be cleaned out. We can't delete it entirely, as
+        // WebKit won't recreate it until next app launch.
+        
+        let databasePath = libraryURL.appendingPathComponent("observations.db")
+
+        guard let pool = try? DatabasePool(path: databasePath.absoluteString) else {
+            return
+        }
+        
+        try? pool.write { database in
+            let tables = try String.fetchAll(database, sql: "SELECT name FROM sqlite_master WHERE type='table'")
+            
+            for table in tables {
+                try database.execute(sql: "DELETE FROM \(table)")
             }
         }
     }
