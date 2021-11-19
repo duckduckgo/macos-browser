@@ -75,6 +75,14 @@ final class Tab: NSObject {
             guard case .url(let url) = self else { return nil }
             return url
         }
+
+        var isUrl: Bool {
+            if case .url = self {
+                return true
+            } else {
+                return false
+            }
+        }
     }
 
     weak var delegate: TabDelegate?
@@ -141,10 +149,7 @@ final class Tab: NSObject {
 
     @PublishedAfter private(set) var content: TabContent {
         didSet {
-            if oldValue.url?.host != content.url?.host {
-                fetchFavicon(nil, for: content.url?.host, isFromUserScript: false)
-            }
-
+            handleFavicon(oldContent: oldValue)
             invalidateSessionStateData()
             updateDashboardInfo(oldUrl: oldValue.url, url: content.url)
             reloadIfNeeded()
@@ -366,6 +371,15 @@ final class Tab: NSObject {
 
     @Published var favicon: NSImage?
     let faviconService: FaviconService
+
+    private func handleFavicon(oldContent: TabContent) {
+        if !content.isUrl {
+            favicon = nil
+        }
+        if oldContent.url?.host != content.url?.host {
+            fetchFavicon(nil, for: content.url?.host, isFromUserScript: false)
+        }
+    }
 
     private func fetchFavicon(_ faviconURL: URL?, for host: String?, isFromUserScript: Bool) {
         if favicon != nil {

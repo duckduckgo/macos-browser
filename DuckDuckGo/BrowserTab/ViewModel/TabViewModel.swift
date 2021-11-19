@@ -90,6 +90,7 @@ final class TabViewModel {
             self?.updateCanReload()
             self?.updateAddressBarStrings()
             self?.updateCanBeBookmarked()
+            self?.updateFavicon()
         } .store(in: &cancellables)
     }
 
