@@ -21,6 +21,7 @@ import WebKit
 import os.log
 import TrackerRadarKit
 import Combine
+import BrowserServicesKit
 
 final class ContentBlockerRulesManager {
 
@@ -31,10 +32,10 @@ final class ContentBlockerRulesManager {
         blockingRulesSubject.eraseToAnyPublisher()
     }
 
-    let privacyConfiguration: PrivacyConfigurationManagment
+    let privacyConfigurationManager: PrivacyConfigurationManager
     
-    private init(privacyConfiguration: PrivacyConfigurationManagment = PrivacyConfigurationManager.shared) {
-        self.privacyConfiguration = privacyConfiguration
+    private init(privacyConfigurationManager: PrivacyConfigurationManager = ContentBlocking.privacyConfigurationManager) {
+        self.privacyConfigurationManager = privacyConfigurationManager
         compileRules()
     }
 
@@ -53,6 +54,7 @@ final class ContentBlockerRulesManager {
     }
 
     private func loadUnprotectedDomains() -> [String] {
+        let privacyConfiguration = privacyConfigurationManager.privacyConfig
         let tempUnprotected = privacyConfiguration.tempUnprotectedDomains
         let contentBlockingExceptions = privacyConfiguration.exceptionsList(forFeature: .contentBlocking)
         

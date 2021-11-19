@@ -18,6 +18,7 @@
 
 import Foundation
 import Combine
+import BrowserServicesKit
 
 protocol ScriptSourceProviding {
 
@@ -50,12 +51,12 @@ final class DefaultScriptSourceProvider: ScriptSourceProviding {
     }
 
     let configStorage: ConfigurationStoring
-    let privacyConfiguration: PrivacyConfigurationManagment
+    let privacyConfigurationManager: PrivacyConfigurationManager
 
     private init(configStorage: ConfigurationStoring = DefaultConfigurationStorage.shared,
-                 privacyConfiguration: PrivacyConfigurationManagment = PrivacyConfigurationManager.shared) {
+                 privacyConfigurationManager: PrivacyConfigurationManager = ContentBlocking.privacyConfigurationManager) {
         self.configStorage = configStorage
-        self.privacyConfiguration = privacyConfiguration
+        self.privacyConfigurationManager = privacyConfigurationManager
         reload()
     }
 
@@ -68,6 +69,7 @@ final class DefaultScriptSourceProvider: ScriptSourceProviding {
     }
 
     private func buildContentBlockerRulesSource() -> String {
+        let privacyConfiguration = privacyConfigurationManager.privacyConfig
         let unprotectedDomains = privacyConfiguration.tempUnprotectedDomains
         let contentBlockingExceptions = privacyConfiguration.exceptionsList(forFeature: .contentBlocking)
         let protectionStore = DomainsProtectionUserDefaultsStore()
@@ -78,6 +80,7 @@ final class DefaultScriptSourceProvider: ScriptSourceProviding {
     }
 
     private func buildContentBlockerSource() -> String {
+        let privacyConfiguration = privacyConfigurationManager.privacyConfig
 
         // Use sensible defaults in case the upstream data is unparsable
         let trackerData = TrackerRadarManager.shared.encodedTrackerData
@@ -101,6 +104,7 @@ final class DefaultScriptSourceProvider: ScriptSourceProviding {
     }
     
     private func buildGPCSource() -> String {
+        let privacyConfiguration = privacyConfigurationManager.privacyConfig
         let exceptions = privacyConfiguration.tempUnprotectedDomains +
                             privacyConfiguration.exceptionsList(forFeature: .gpc)
         let privSettings = PrivacySecurityPreferences()
@@ -115,6 +119,7 @@ final class DefaultScriptSourceProvider: ScriptSourceProviding {
     }
 
     private func buildNavigatorCredentialsSource() -> String {
+        let privacyConfiguration = privacyConfigurationManager.privacyConfig
         let unprotectedDomains = privacyConfiguration.tempUnprotectedDomains
         let contentBlockingExceptions = privacyConfiguration.exceptionsList(forFeature: .navigatorCredentials)
         if !privacyConfiguration.isEnabled(featureKey: .navigatorCredentials) {

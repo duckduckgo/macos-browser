@@ -154,7 +154,11 @@ final class ConfigurationManager {
     private func updateTrackerBlockingDependencies() throws {
 
         TrackerRadarManager.shared.reload()
-        PrivacyConfigurationManager.shared.reload()
+
+        let configEtag = DefaultConfigurationStorage.shared.loadEtag(for: .privacyConfiguration)
+        let configData = DefaultConfigurationStorage.shared.loadData(for: .privacyConfiguration)
+        ContentBlocking.privacyConfigurationManager.reload(etag: configEtag, data: configData)
+        
         scriptSource.reload()
         ContentBlockerRulesManager.shared.compileRules { _ in
             self.trackerBlockerDataUpdatedSubject.send(())

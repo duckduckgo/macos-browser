@@ -17,6 +17,7 @@
 //
 
 import Foundation
+import BrowserServicesKit
 
 final class GPCRequestFactory {
     
@@ -38,7 +39,7 @@ final class GPCRequestFactory {
     }
     
     func requestForGPC(basedOn incomingRequest: URLRequest,
-                       config: PrivacyConfigurationManager = PrivacyConfigurationManager.shared) -> URLRequest? {
+                       config: PrivacyConfiguration = ContentBlocking.privacyConfigurationManager.privacyConfig) -> URLRequest? {
         /*
          For now, the GPC header is only applied to sites known to be honoring GPC (nytimes.com, washingtonpost.com),
          while the DOM signal is available to all websites.

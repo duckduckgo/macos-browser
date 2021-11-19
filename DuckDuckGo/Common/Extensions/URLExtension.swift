@@ -18,6 +18,7 @@
 
 import Foundation
 import os.log
+import BrowserServicesKit
 
 extension URL {
 
@@ -429,10 +430,19 @@ extension URL {
     }
     
     // MARK: - GPC
+
+    static func gpcHeadersEnabled(config: PrivacyConfiguration) -> [String] {
+        return []
+        // FIXME - setings
+//        guard let enabledSites = config.features[PrivacyFeature.gpc.rawValue]?
+//                .settings?["gpcHeaderEnabledSites"] as? [String] else { return [] }
+//
+//        return enabledSites
+    }
     
     static func isGPCEnabled(url: URL,
-                             config: PrivacyConfigurationManager = PrivacyConfigurationManager.shared) -> Bool {
-        let enabledSites = config.gpcHeadersEnabled()
+                             config: PrivacyConfiguration = ContentBlocking.privacyConfigurationManager.privacyConfig) -> Bool {
+        let enabledSites = gpcHeadersEnabled(config: config)
         
         for gpcHost in enabledSites {
             if url.isPart(ofDomain: gpcHost) {

@@ -18,6 +18,7 @@
 
 import Foundation
 import os.log
+import BrowserServicesKit
 
 final class HTTPSUpgrade {
 
@@ -41,7 +42,7 @@ final class HTTPSUpgrade {
     }
 
     func isUpgradeable(url: URL, completion: @escaping UpgradeCheckCompletion,
-                       config: PrivacyConfigurationManagment = PrivacyConfigurationManager.shared) {
+                       config: PrivacyConfiguration = ContentBlocking.privacyConfigurationManager.privacyConfig) {
         
         guard url.scheme == URL.NavigationalScheme.http.rawValue else {
             completion(false)
@@ -58,7 +59,7 @@ final class HTTPSUpgrade {
             return
         }
         
-        if config.isEnabled(featureKey: .https) {
+        if config.isEnabled(featureKey: .httpsUpgrade) {
             // Check exception lists before upgrading
             if config.tempUnprotectedDomains.contains(host) {
                 completion(false)
@@ -68,7 +69,7 @@ final class HTTPSUpgrade {
                 completion(false)
                 return
             }
-            if config.exceptionsList(forFeature: .https).contains(host) {
+            if config.exceptionsList(forFeature: .httpsUpgrade).contains(host) {
                 completion(false)
                 return
             }

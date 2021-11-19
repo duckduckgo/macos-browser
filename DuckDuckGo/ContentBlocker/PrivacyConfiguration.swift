@@ -19,11 +19,11 @@
 
 import Foundation
 
-public struct PrivacyConfiguration: Decodable {
+public struct OldPrivacyConfiguration: Decodable {
     public typealias FeatureName = String
-    public typealias UnprotectedList = [ExceptionEntry]
+    public typealias UnprotectedList = [OldExceptionEntry]
     
-    public let features: [FeatureName: PrivacyFeature]
+    public let features: [FeatureName: OldPrivacyFeature]
     public let unprotectedTemporary: UnprotectedList
     
     public enum SupportedFeatures: String {
@@ -33,7 +33,7 @@ public struct PrivacyConfiguration: Decodable {
         case https
     }
     
-    public init(features: [String: PrivacyFeature], unprotectedTemporary: [ExceptionEntry]) {
+    public init(features: [String: OldPrivacyFeature], unprotectedTemporary: [OldExceptionEntry]) {
         self.features = features
         self.unprotectedTemporary = unprotectedTemporary
     }
@@ -60,16 +60,16 @@ public struct PrivacyConfiguration: Decodable {
     }
 }
 
-public struct PrivacyFeature: Decodable {
+public struct OldPrivacyFeature: Decodable {
     public typealias FeatureState = String
-    public typealias ExceptionList = [ExceptionEntry]
+    public typealias ExceptionList = [OldExceptionEntry]
     public typealias FeatureSettings = [String: Any]?
     
     public let state: FeatureState
     public let exceptions: ExceptionList
     public let settings: FeatureSettings
     
-    public init(state: String, exceptions: [ExceptionEntry], settings: FeatureSettings) {
+    public init(state: String, exceptions: [OldExceptionEntry], settings: FeatureSettings) {
         self.state = state
         self.exceptions = exceptions
         self.settings = settings
@@ -89,7 +89,7 @@ public struct PrivacyFeature: Decodable {
     }
 }
 
-public struct ExceptionEntry: Codable {
+public struct OldExceptionEntry: Codable {
     public typealias ExcludedDomain = String
     public typealias ExclusionReason = String
     

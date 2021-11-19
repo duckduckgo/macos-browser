@@ -24,11 +24,11 @@ protocol PrivacyConfigurationManagment {
     
     var tempUnprotectedDomains: [String] { get }
     
-    func isEnabled(featureKey: PrivacyConfiguration.SupportedFeatures) -> Bool
-    func exceptionsList(forFeature featureKey: PrivacyConfiguration.SupportedFeatures) -> [String]
+    func isEnabled(featureKey: OldPrivacyConfiguration.SupportedFeatures) -> Bool
+    func exceptionsList(forFeature featureKey: OldPrivacyConfiguration.SupportedFeatures) -> [String]
 }
 
-final class PrivacyConfigurationManager {
+final class OldPrivacyConfigurationManager {
 
     struct Constants {
         static let embeddedDataSetETag = "e6214cfd463faa4d9d00ab357539aa43"
@@ -42,9 +42,9 @@ final class PrivacyConfigurationManager {
 
     }
 
-    static let shared = PrivacyConfigurationManager()
+//    static let shared = PrivacyConfigurationManager()
 
-    private(set) var config: PrivacyConfiguration
+    private(set) var config: OldPrivacyConfiguration
     private(set) var encodedConfigData: String
 
     private var configDataStore: ConfigurationStoring
@@ -54,11 +54,11 @@ final class PrivacyConfigurationManager {
         (self.config, self.encodedConfigData, _) = Self.loadData()
     }
 
-    private typealias LoadDataResult = (PrivacyConfiguration, String, DataSet)
+    private typealias LoadDataResult = (OldPrivacyConfiguration, String, DataSet)
     private class func loadData() -> LoadDataResult {
 
         var dataSet: DataSet
-        let configData: PrivacyConfiguration
+        let configData: OldPrivacyConfiguration
         var data: Data
 
         if let loadedData = DefaultConfigurationStorage.shared.loadData(for: .privacyConfiguration) {
@@ -71,11 +71,11 @@ final class PrivacyConfigurationManager {
 
         do {
             // This might fail if the downloaded data is corrupt or format has changed unexpectedly
-            configData = try JSONDecoder().decode(PrivacyConfiguration.self, from: data)
+            configData = try JSONDecoder().decode(OldPrivacyConfiguration.self, from: data)
         } catch {
             // This should NEVER fail
             data = loadEmbeddedAsData()
-            configData = (try? JSONDecoder().decode(PrivacyConfiguration.self, from: data))!
+            configData = (try? JSONDecoder().decode(OldPrivacyConfiguration.self, from: data))!
             dataSet = .embeddedFallback
 
             Pixel.fire(.debug(event: .privacyConfigurationParseFailed, error: error))
@@ -120,7 +120,7 @@ final class PrivacyConfigurationManager {
 
 }
 
-extension PrivacyConfigurationManager: PrivacyConfigurationManagment {
+extension OldPrivacyConfigurationManager: PrivacyConfigurationManagment {
     
     enum ConfigurationSettingsKeys: String {
         case gpcHeaderEnabled = "gpcHeaderEnabledSites"
@@ -130,16 +130,16 @@ extension PrivacyConfigurationManager: PrivacyConfigurationManagment {
         return config.tempUnprotectedDomains
     }
     
-    func isEnabled(featureKey: PrivacyConfiguration.SupportedFeatures) -> Bool {
+    func isEnabled(featureKey: OldPrivacyConfiguration.SupportedFeatures) -> Bool {
         return config.isEnabled(featureKey: featureKey)
     }
     
-    func exceptionsList(forFeature featureKey: PrivacyConfiguration.SupportedFeatures) -> [String] {
+    func exceptionsList(forFeature featureKey: OldPrivacyConfiguration.SupportedFeatures) -> [String] {
         return config.exceptionsList(forFeature: featureKey)
     }
     
     func gpcHeadersEnabled() -> [String] {
-        guard let enabledSites = config.features[PrivacyConfiguration.SupportedFeatures.gpc.rawValue]?
+        guard let enabledSites = config.features[OldPrivacyConfiguration.SupportedFeatures.gpc.rawValue]?
                 .settings?[ConfigurationSettingsKeys.gpcHeaderEnabled.rawValue] as? [String] else { return [] }
         
         return enabledSites

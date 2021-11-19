@@ -18,19 +18,19 @@
 
 import WebKit
 import Combine
+import BrowserServicesKit
 
 final class UserContentController: WKUserContentController {
     private var blockingRulesUpdatedCancellable: AnyCancellable?
     
-    let privacyConfiguration: PrivacyConfigurationManagment
+    let privacyConfigurationManager: PrivacyConfigurationManager
 
-    public init(rulesPublisher: AnyPublisher<WKContentRuleList?, Never> = ContentBlockerRulesManager.shared.blockingRules,
-                privacyConfiguration: PrivacyConfigurationManagment = PrivacyConfigurationManager.shared) {
-        self.privacyConfiguration = privacyConfiguration
-        super.init()
+    public init(rulesPublisher: AnyPublisher<WKContentRuleList?, Never> = ContentBlockerRulesManager.shared.blockingRules, privacyConfigurationManager: PrivacyConfigurationManager = ContentBlocking.privacyConfigurationManager) {
+    self.privacyConfigurationManager = privacyConfigurationManager
+    super.init()
 
-        installContentBlockingRules(publisher: rulesPublisher)
-    }
+    installContentBlockingRules(publisher: rulesPublisher)
+}
 
     required init?(coder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
@@ -45,7 +45,7 @@ final class UserContentController: WKUserContentController {
             else { return }
 
             self.removeAllContentRuleLists()
-            if self.privacyConfiguration.isEnabled(featureKey: .contentBlocking) {
+            if self.privacyConfigurationManager.privacyConfig.isEnabled(featureKey: .contentBlocking) {
                 self.add(rules)
             }
         }
