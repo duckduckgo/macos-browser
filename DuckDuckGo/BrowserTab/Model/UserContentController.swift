@@ -25,28 +25,29 @@ final class UserContentController: WKUserContentController {
     
     let privacyConfigurationManager: PrivacyConfigurationManager
 
-    public init(rulesPublisher: AnyPublisher<WKContentRuleList?, Never> = ContentBlockerRulesManager.shared.blockingRules, privacyConfigurationManager: PrivacyConfigurationManager = ContentBlocking.privacyConfigurationManager) {
-    self.privacyConfigurationManager = privacyConfigurationManager
-    super.init()
+    public init(rulesPublisher: ContentBlockingUpdating.NewRulesPublisher = ContentBlocking.contentBlockingUpdating.contentBlockingRules,
+                privacyConfigurationManager: PrivacyConfigurationManager = ContentBlocking.privacyConfigurationManager) {
+        self.privacyConfigurationManager = privacyConfigurationManager
+        super.init()
 
-    installContentBlockingRules(publisher: rulesPublisher)
-}
+        installContentBlockingRules(publisher: rulesPublisher)
+    }
 
     required init?(coder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
     }
 
-    func installContentBlockingRules(publisher: AnyPublisher<WKContentRuleList?, Never>) {
-        blockingRulesUpdatedCancellable = publisher.receive(on: RunLoop.main).sink { [weak self] rules in
+    func installContentBlockingRules(publisher: ContentBlockingUpdating.NewRulesPublisher) {
+        blockingRulesUpdatedCancellable = publisher.receive(on: RunLoop.main).sink { [weak self] newRules in
             dispatchPrecondition(condition: .onQueue(.main))
 
             guard let self = self,
-                  let rules = rules
+                  let newRules = newRules
             else { return }
 
             self.removeAllContentRuleLists()
             if self.privacyConfigurationManager.privacyConfig.isEnabled(featureKey: .contentBlocking) {
-                self.add(rules)
+                self.add(newRules.rules.rulesList)
             }
         }
     }

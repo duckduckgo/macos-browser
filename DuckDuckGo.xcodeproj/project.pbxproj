@@ -84,7 +84,6 @@
 		4B6160ED25B15417007DE5B2 /* DetectedTracker.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B6160EC25B15417007DE5B2 /* DetectedTracker.swift */; };
 		4B6160F225B15792007DE5B2 /* contentblockerrules.js in Resources */ = {isa = PBXBuildFile; fileRef = 4B6160F125B15792007DE5B2 /* contentblockerrules.js */; };
 		4B6160F725B157BB007DE5B2 /* contentblocker.js in Resources */ = {isa = PBXBuildFile; fileRef = 4B6160F625B157BB007DE5B2 /* contentblocker.js */; };
-		4B6160FF25B15BB1007DE5B2 /* ContentBlockerRulesManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B6160FE25B15BB1007DE5B2 /* ContentBlockerRulesManager.swift */; };
 		4B65027525E5F2A70054432E /* DefaultBrowserPromptView.xib in Resources */ = {isa = PBXBuildFile; fileRef = 4B65027425E5F2A70054432E /* DefaultBrowserPromptView.xib */; };
 		4B65027A25E5F2B10054432E /* DefaultBrowserPromptView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B65027925E5F2B10054432E /* DefaultBrowserPromptView.swift */; };
 		4B65143E263924B5005B46EB /* EmailUrlExtensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B65143D263924B5005B46EB /* EmailUrlExtensions.swift */; };
@@ -706,7 +705,6 @@
 		4B6160EC25B15417007DE5B2 /* DetectedTracker.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DetectedTracker.swift; sourceTree = "<group>"; };
 		4B6160F125B15792007DE5B2 /* contentblockerrules.js */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.javascript; path = contentblockerrules.js; sourceTree = "<group>"; };
 		4B6160F625B157BB007DE5B2 /* contentblocker.js */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.javascript; path = contentblocker.js; sourceTree = "<group>"; };
-		4B6160FE25B15BB1007DE5B2 /* ContentBlockerRulesManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentBlockerRulesManager.swift; sourceTree = "<group>"; };
 		4B65027425E5F2A70054432E /* DefaultBrowserPromptView.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = DefaultBrowserPromptView.xib; sourceTree = "<group>"; };
 		4B65027925E5F2B10054432E /* DefaultBrowserPromptView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DefaultBrowserPromptView.swift; sourceTree = "<group>"; };
 		4B65143D263924B5005B46EB /* EmailUrlExtensions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EmailUrlExtensions.swift; sourceTree = "<group>"; };
@@ -1469,7 +1467,6 @@
 		4B6160D125B14E5E007DE5B2 /* ContentBlocker */ = {
 			isa = PBXGroup;
 			children = (
-				4B6160FE25B15BB1007DE5B2 /* ContentBlockerRulesManager.swift */,
 				4B6160DC25B152C5007DE5B2 /* ContentBlockerRulesUserScript.swift */,
 				4B6160E425B152FA007DE5B2 /* ContentBlockerUserScript.swift */,
 				4B6160D225B14E6E007DE5B2 /* TrackerRadarManager.swift */,
@@ -3609,7 +3606,6 @@
 				33B7B244273441D6001E10F4 /* Debounce.swift in Sources */,
 				AA7412BD24D2BEEE00D22FE0 /* MainWindow.swift in Sources */,
 				AAD6D8882696DF6D002393B3 /* CrashReportPromptViewController.swift in Sources */,
-				4B6160FF25B15BB1007DE5B2 /* ContentBlockerRulesManager.swift in Sources */,
 				B693955126F04BEB0015B914 /* GradientView.swift in Sources */,
 				85778E3527142C3000F091CA /* HomepageHeaderView.swift in Sources */,
 				AA5C8F5E2590EEE800748EB7 /* NSPointExtension.swift in Sources */,

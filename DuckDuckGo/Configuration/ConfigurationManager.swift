@@ -160,9 +160,12 @@ final class ConfigurationManager {
         ContentBlocking.privacyConfigurationManager.reload(etag: configEtag, data: configData)
         
         scriptSource.reload()
-        ContentBlockerRulesManager.shared.compileRules { _ in
-            self.trackerBlockerDataUpdatedSubject.send(())
-        }
+
+        ContentBlocking.contentBlockingManager.recompile()
+
+//        ContentBlockerRulesManager.shared.compileRules { _ in FIXME
+//            self.trackerBlockerDataUpdatedSubject.send(())
+//        }
 
     }
 
