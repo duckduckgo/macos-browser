@@ -75,6 +75,14 @@ final class Tab: NSObject {
             guard case .url(let url) = self else { return nil }
             return url
         }
+
+        var isUrl: Bool {
+            if case .url = self {
+                return true
+            } else {
+                return false
+            }
+        }
     }
 
     weak var delegate: TabDelegate?
@@ -141,10 +149,7 @@ final class Tab: NSObject {
 
     @PublishedAfter private(set) var content: TabContent {
         didSet {
-            if oldValue.url?.host != content.url?.host {
-                fetchFavicon(nil, for: content.url?.host, isFromUserScript: false)
-            }
-
+            handleFavicon(oldContent: oldValue)
             invalidateSessionStateData()
             updateDashboardInfo(oldUrl: oldValue.url, url: content.url)
             reloadIfNeeded()
@@ -198,7 +203,7 @@ final class Tab: NSObject {
     }
 
     func update(url: URL?, userEntered: Bool = true) {
-        self.content = .url(url ?? .emptyPage)
+        self.content = url == .homePage ? .homepage : .url(url ?? .blankPage)
 
         // This function is called when the user has manually typed in a new address, which should reset the login detection flow.
         userEnteredUrl = userEntered
@@ -235,6 +240,13 @@ final class Tab: NSObject {
     }
 
     private let instrumentation = TabInstrumentation()
+    private enum FrameLoadState {
+        case provisional
+        case committed
+        case finished
+    }
+    private var mainFrameLoadState: FrameLoadState = .finished
+    private var clientRedirectedDuringNavigationURL: URL?
 
     var canGoForward: Bool {
         webView.canGoForward
@@ -287,8 +299,19 @@ final class Tab: NSObject {
     }
 
     private func reloadIfNeeded(shouldLoadInBackground: Bool = false) {
+        let url: URL
+        switch self.content {
+        case .url(let value):
+            url = value
+        case .homepage:
+            url = .homePage
+        default:
+            url = .blankPage
+        }
         guard webView.superview != nil || shouldLoadInBackground,
-              webView.url != self.content.url
+              webView.url != url
+                // Initial Home Page shouldn't show Back Button
+                && webView.url != self.content.url
         else { return }
 
         if let sessionStateData = self.sessionStateData {
@@ -299,11 +322,7 @@ final class Tab: NSObject {
                 os_log("Tab:setupWebView could not restore session state %s", "\(error)")
             }
         }
-        if let url = self.content.url {
-            webView.load(url)
-        } else {
-            webView.load(URL.emptyPage)
-        }
+        webView.load(url)
     }
 
     func stopLoading() {
@@ -359,6 +378,15 @@ final class Tab: NSObject {
 
     @Published var favicon: NSImage?
     let faviconService: FaviconService
+
+    private func handleFavicon(oldContent: TabContent) {
+        if !content.isUrl {
+            favicon = nil
+        }
+        if oldContent.url?.host != content.url?.host {
+            fetchFavicon(nil, for: content.url?.host, isFromUserScript: false)
+        }
+    }
 
     private func fetchFavicon(_ faviconURL: URL?, for host: String?, isFromUserScript: Bool) {
         if favicon != nil {
@@ -501,21 +529,38 @@ final class Tab: NSObject {
         if upgradedUrl == nil { return }
         connectionUpgradedTo = upgradedUrl
     }
+    
+    // MARK: - Printing
+    
+    // To avoid webpages invoking the printHandler and overwhelming the browser, this property keeps track of the active
+    // print operation and ignores incoming printHandler messages if one exists.
+    fileprivate var activePrintOperation: NSPrintOperation?
 
 }
 
 extension Tab: PrintingUserScriptDelegate {
 
     func printingUserScriptDidRequestPrintController(_ script: PrintingUserScript) {
+        guard activePrintOperation == nil else { return }
+        
         guard let window = webView.window,
               let printOperation = webView.printOperation()
               else { return }
+        
+        self.activePrintOperation = printOperation
 
         if printOperation.view?.frame.isEmpty == true {
             printOperation.view?.frame = webView.bounds
         }
 
-        printOperation.runModal(for: window, delegate: nil, didRun: nil, contextInfo: nil)
+        let selector = #selector(printOperationDidRun(printOperation: success: contextInfo:))
+        printOperation.runModal(for: window, delegate: self, didRun: selector, contextInfo: nil)
+    }
+    
+    @objc func printOperationDidRun(printOperation: NSPrintOperation,
+                                    success: Bool,
+                                    contextInfo: UnsafeMutableRawPointer?) {
+        activePrintOperation = nil
     }
 
 }
@@ -668,21 +713,38 @@ extension Tab: WKNavigationDelegate {
         static let webkitMiddleClick = 4
     }
 
+    // swiftlint:disable cyclomatic_complexity
+    // swiftlint:disable function_body_length
     func webView(_ webView: WKWebView,
                  decidePolicyFor navigationAction: WKNavigationAction,
                  decisionHandler: @escaping (WKNavigationActionPolicy) -> Void) {
 
         webView.customUserAgent = UserAgent.for(navigationAction.request.url)
-                                                
-        if navigationAction.isTargetingMainFrame, navigationAction.navigationType != .backForward,
-           let request = GPCRequestFactory.shared.requestForGPC(basedOn: navigationAction.request) {
-            decisionHandler(.cancel)
-            webView.load(request)
-            return
+
+        if navigationAction.isTargetingMainFrame {
+            if navigationAction.navigationType == .backForward,
+               self.webView.frozenCanGoForward != nil {
+
+                // Auto-cancel simulated Back action when upgrading to HTTPS or GPC from Client Redirect
+                self.webView.frozenCanGoForward = nil
+                self.webView.frozenCanGoBack = nil
+                decisionHandler(.cancel)
+                return
+
+            } else if navigationAction.navigationType != .backForward,
+               let request = GPCRequestFactory.shared.requestForGPC(basedOn: navigationAction.request) {
+                self.invalidateBackItemIfNeeded(for: navigationAction)
+                decisionHandler(.cancel)
+                webView.load(request)
+                return
+            }
         }
 
         if navigationAction.isTargetingMainFrame {
             currentDownload = nil
+            if navigationAction.request.url != self.clientRedirectedDuringNavigationURL {
+                self.clientRedirectedDuringNavigationURL = nil
+            }
         }
 
         self.resetConnectionUpgradedTo(navigationAction: navigationAction)
@@ -723,9 +785,13 @@ extension Tab: WKNavigationDelegate {
         }
 
         HTTPSUpgrade.shared.isUpgradeable(url: url) { [weak self] isUpgradable in
-            if isUpgradable && navigationAction.isTargetingMainFrame, let upgradedUrl = url.toHttps() {
-                self?.webView.load(upgradedUrl)
-                self?.setConnectionUpgradedTo(upgradedUrl, navigationAction: navigationAction)
+            if let self = self,
+               isUpgradable && navigationAction.isTargetingMainFrame,
+                let upgradedUrl = url.toHttps() {
+
+                self.invalidateBackItemIfNeeded(for: navigationAction)
+                self.webView.load(upgradedUrl)
+                self.setConnectionUpgradedTo(upgradedUrl, navigationAction: navigationAction)
                 decisionHandler(.cancel)
                 return
             }
@@ -733,6 +799,20 @@ extension Tab: WKNavigationDelegate {
 
             decisionHandler(.allow)
         }
+    }
+    // swiftlint:enable cyclomatic_complexity
+    // swiftlint:enable function_body_length
+
+    private func invalidateBackItemIfNeeded(for navigationAction: WKNavigationAction) {
+        guard let url = navigationAction.request.url,
+              url == self.clientRedirectedDuringNavigationURL
+        else { return }
+
+        // Cancelled & Upgraded Client Redirect URL leaves wrong backForwardList record
+        // https://app.asana.com/0/inbox/1199237043628108/1201280322539473/1201353436736961
+        self.webView.goBack()
+        self.webView.frozenCanGoBack = self.webView.canGoBack
+        self.webView.frozenCanGoForward = false
     }
 
     func webView(_ webView: WKWebView,
@@ -798,6 +878,37 @@ extension Tab: WKNavigationDelegate {
     @objc(webView:navigationResponse:didBecomeDownload:)
     func webView(_ webView: WKWebView, navigationResponse: WKNavigationResponse, didBecome download: WKDownload) {
         self.webView(webView, navigationResponse: navigationResponse, didBecomeDownload: download)
+    }
+
+    @objc(_webView:didStartProvisionalLoadWithRequest:inFrame:)
+    func webView(_ webView: WKWebView, didStartProvisionalLoadWithRequest request: URLRequest, inFrame frame: WKFrameInfo) {
+        guard frame.isMainFrame else { return }
+        self.mainFrameLoadState = .provisional
+    }
+
+    @objc(_webView:didCommitLoadWithRequest:inFrame:)
+    func webView(_ webView: WKWebView, didCommitLoadWithRequest request: URLRequest, inFrame frame: WKFrameInfo) {
+        guard frame.isMainFrame else { return }
+        self.mainFrameLoadState = .committed
+    }
+
+    @objc(_webView:willPerformClientRedirectToURL:delay:)
+    func webView(_ webView: WKWebView, willPerformClientRedirectToURL url: URL, delay: TimeInterval) {
+        if case .committed = self.mainFrameLoadState {
+            self.clientRedirectedDuringNavigationURL = url
+        }
+    }
+
+    @objc(_webView:didFinishLoadWithRequest:inFrame:)
+    func webView(_ webView: WKWebView, didFinishLoadWithRequest request: URLRequest, inFrame frame: WKFrameInfo) {
+        guard frame.isMainFrame else { return }
+        self.mainFrameLoadState = .finished
+    }
+
+    @objc(_webView:didFinishLoadWithRequest:inFrame:withError:)
+    func webView(_ webView: WKWebView, didFailLoadWithRequest request: URLRequest, inFrame frame: WKFrameInfo, withError error: Error) {
+        guard frame.isMainFrame else { return }
+        self.mainFrameLoadState = .finished
     }
 
 }

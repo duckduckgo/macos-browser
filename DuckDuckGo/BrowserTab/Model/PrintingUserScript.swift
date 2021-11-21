@@ -27,20 +27,17 @@ public protocol PrintingUserScriptDelegate: AnyObject {
 }
 
 public class PrintingUserScript: NSObject, UserScript {
+    public var requiresRunInPageContentWorld: Bool {
+        return true
+    }
 
     public weak var delegate: PrintingUserScriptDelegate?
 
     public var source: String = """
 (function() {
-    document.addEventListener("click", function(event) {
-        event = event || window.event;
-
-        let onClickAttribute = event.target.getAttribute('onclick');
-
-        if (onClickAttribute.includes('window.print()')) {
-            webkit.messageHandlers.printHandler.postMessage({});
-        }
-    });
+    window.print = function() {
+        webkit.messageHandlers.printHandler.postMessage({});
+    };
 }) ();
 """
 

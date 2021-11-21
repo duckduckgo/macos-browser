@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<document type="com.apple.InterfaceBuilder3.Cocoa.Storyboard.XIB" version="3.0" toolsVersion="19162" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none" useAutolayout="YES">
+<document type="com.apple.InterfaceBuilder3.Cocoa.Storyboard.XIB" version="3.0" toolsVersion="19455" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none" useAutolayout="YES">
     <dependencies>
         <deployment identifier="macosx"/>
-        <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="19162"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="19455"/>
     </dependencies>
     <scenes>
         <!--Application-->
@@ -128,11 +128,24 @@ CA
                                                 <action selector="openImportBrowserDataWindow:" target="Ady-hI-5gd" id="UU7-vO-0ol"/>
                                             </connections>
                                         </menuItem>
-                                        <menuItem title="Export Browser Data..." id="raM-fX-nRg">
+                                        <menuItem title="Export" id="sSo-Jf-Tfd">
                                             <modifierMask key="keyEquivalentModifierMask"/>
-                                            <connections>
-                                                <action selector="openExportBrowserDataWindow:" target="Ady-hI-5gd" id="KJ1-rb-kec"/>
-                                            </connections>
+                                            <menu key="submenu" title="Export" id="SGe-jt-1so">
+                                                <items>
+                                                    <menuItem title="Logins..." id="raM-fX-nRg">
+                                                        <modifierMask key="keyEquivalentModifierMask"/>
+                                                        <connections>
+                                                            <action selector="openExportLogins:" target="Ady-hI-5gd" id="MLl-kw-Su4"/>
+                                                        </connections>
+                                                    </menuItem>
+                                                    <menuItem title="Bookmarks...." id="S6f-01-1ln">
+                                                        <modifierMask key="keyEquivalentModifierMask"/>
+                                                        <connections>
+                                                            <action selector="openExportBookmarks:" target="Ady-hI-5gd" id="mZd-DH-xgA"/>
+                                                        </connections>
+                                                    </menuItem>
+                                                </items>
+                                            </menu>
                                         </menuItem>
                                         <menuItem isSeparatorItem="YES" id="wqo-x3-9Zn"/>
                                         <menuItem title="Share" id="kUE-Qf-cwa">
@@ -534,6 +547,12 @@ GQ
                                                 <action selector="showPreviousTab:" target="Ady-hI-5gd" id="sdG-QM-RLb"/>
                                             </connections>
                                         </menuItem>
+                                        <menuItem title="Show Previous Tab (Hidden)" hidden="YES" keyEquivalent="" allowsKeyEquivalentWhenHidden="YES" id="GuX-M1-3LQ">
+                                            <modifierMask key="keyEquivalentModifierMask" option="YES" command="YES"/>
+                                            <connections>
+                                                <action selector="showPreviousTab:" target="Ady-hI-5gd" id="NKT-sZ-qox"/>
+                                            </connections>
+                                        </menuItem>
                                         <menuItem title="Show Next Tab" id="ell-8c-IYS">
                                             <string key="keyEquivalent" base64-UTF8="YES">
 CQ
@@ -547,6 +566,12 @@ CQ
                                             <modifierMask key="keyEquivalentModifierMask" shift="YES" command="YES"/>
                                             <connections>
                                                 <action selector="showNextTab:" target="Ady-hI-5gd" id="wOR-ar-KT6"/>
+                                            </connections>
+                                        </menuItem>
+                                        <menuItem title="Show Next Tab (Hidden)" hidden="YES" keyEquivalent="" allowsKeyEquivalentWhenHidden="YES" id="bCk-E5-pHd">
+                                            <modifierMask key="keyEquivalentModifierMask" option="YES" command="YES"/>
+                                            <connections>
+                                                <action selector="showNextTab:" target="Ady-hI-5gd" id="DB1-dn-3YS"/>
                                             </connections>
                                         </menuItem>
                                         <menuItem title="Show First Tab (Hidden)" hidden="YES" keyEquivalent="1" allowsKeyEquivalentWhenHidden="YES" id="jjn-9W-TQZ">

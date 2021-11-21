@@ -153,10 +153,26 @@ final class TabViewModelTests: XCTestCase {
 
     // MARK: - Favicon
 
-    func testWhenURLIsNilThenFaviconIsHomeFavicon() {
-        let tabViewModel = TabViewModel.aTabViewModel
+    func testWhenContentIsNoneThenFaviconIsNil() {
+        let tab = Tab(content: .none)
+        let tabViewModel = TabViewModel(tab: tab)
 
-        XCTAssertEqual(tabViewModel.favicon, TabViewModel.Favicon.home)
+        XCTAssertEqual(tabViewModel.favicon, nil)
+    }
+
+    func testWhenContentIsHomeThenFaviconIsHome() {
+        let tabViewModel = TabViewModel.aTabViewModel
+        tabViewModel.tab.setContent(.homepage)
+
+        let faviconExpectation = expectation(description: "Favicon")
+
+        tabViewModel.$favicon.debounce(for: 0.1, scheduler: RunLoop.main).sink { favicon in
+            XCTAssertNotNil(favicon)
+            if favicon == TabViewModel.Favicon.home {
+                faviconExpectation.fulfill()
+            }
+        } .store(in: &cancellables)
+        waitForExpectations(timeout: 5, handler: nil)
     }
 
     func testWhenTabDownloadedFaviconThenFaviconIsNotNil() {
@@ -165,10 +181,10 @@ final class TabViewModelTests: XCTestCase {
 
         let faviconExpectation = expectation(description: "Favicon")
 
-        tabViewModel.$favicon.debounce(for: 0.3, scheduler: RunLoop.main).sink { favicon in
+        tabViewModel.$favicon.debounce(for: 1, scheduler: RunLoop.main).sink { favicon in
             XCTAssertNotNil(favicon)
             XCTAssertNotEqual(favicon, TabViewModel.Favicon.home)
-            if favicon != TabViewModel.Favicon.defaultFavicon {
+            if favicon != nil {
                 faviconExpectation.fulfill()
             }
         } .store(in: &cancellables)

@@ -191,7 +191,7 @@ final class GeolocationProvider: NSObject, GeolocationProviderProtocol {
 
 }
 
-private func dynamicSymbol<T>(named symbolName: String) -> T? {
+func dynamicSymbol<T>(named symbolName: String) -> T? {
     guard let f = dlsym(/*RTLD_DEFAULT*/ UnsafeMutableRawPointer(bitPattern: -2), symbolName) else {
         assertionFailure("\(symbolName) symbol not found")
         return nil

@@ -398,30 +398,34 @@ extension TabBarViewController: TabCollectionViewModelDelegate {
         let shouldScroll = collectionView.isAtEndScrollPosition
             && (!self.view.isMouseLocationInsideBounds() || removedIndex == self.collectionView.numberOfItems(inSection: 0) - 1)
         let visiRect = collectionView.enclosingScrollView!.contentView.documentVisibleRect
-        collectionView.animator().performBatchUpdates {
-            let tabWidth = currentTabWidth(removedIndex: removedIndex)
-            if shouldScroll {
-                collectionView.animator().scroll(CGPoint(x: scrollView.contentView.bounds.origin.x - tabWidth, y: 0))
-            }
+        NSAnimationContext.runAnimationGroup { context in
+            context.duration = 0.15
 
-            if collectionView.selectionIndexPaths != selectionIndexPathSet {
-                collectionView.clearSelection()
-                collectionView.animator().selectItems(at: selectionIndexPathSet, scrollPosition: .centeredHorizontally)
-            }
-            collectionView.animator().deleteItems(at: removedIndexPathSet)
-        } completionHandler: { [weak self] _ in
-            guard let self = self else { return }
+            collectionView.animator().performBatchUpdates {
+                let tabWidth = currentTabWidth(removedIndex: removedIndex)
+                if shouldScroll {
+                    collectionView.animator().scroll(CGPoint(x: scrollView.contentView.bounds.origin.x - tabWidth, y: 0))
+                }
 
-            self.frozenLayout = self.view.isMouseLocationInsideBounds()
-            if !self.frozenLayout {
-                self.updateLayout()
-            }
-            self.updateEmptyTabArea()
-            self.enableScrollButtons()
-            self.hideTooltip()
+                if collectionView.selectionIndexPaths != selectionIndexPathSet {
+                    collectionView.clearSelection()
+                    collectionView.animator().selectItems(at: selectionIndexPathSet, scrollPosition: .centeredHorizontally)
+                }
+                collectionView.animator().deleteItems(at: removedIndexPathSet)
+            } completionHandler: { [weak self] _ in
+                guard let self = self else { return }
 
-            if !shouldScroll {
-                self.collectionView.enclosingScrollView!.contentView.scroll(to: visiRect.origin)
+                self.frozenLayout = self.view.isMouseLocationInsideBounds()
+                if !self.frozenLayout {
+                    self.updateLayout()
+                }
+                self.updateEmptyTabArea()
+                self.enableScrollButtons()
+                self.hideTooltip()
+
+                if !shouldScroll {
+                    self.collectionView.enclosingScrollView!.contentView.scroll(to: visiRect.origin)
+                }
             }
         }
     }
@@ -588,7 +592,7 @@ extension TabBarViewController: NSCollectionViewDelegate {
         if let url = tabCollectionViewModel.tabCollection.tabs[indexPath.item].content.url {
             return url as NSURL
         } else {
-            return URL.emptyPage as NSURL
+            return URL.blankPage as NSURL
         }
     }
 

@@ -68,8 +68,12 @@ extension URL {
         return url
     }
 
-    static var emptyPage: URL {
+    static var blankPage: URL {
         return URL(string: "about:blank")!
+    }
+
+    static var homePage: URL {
+        return URL(string: "about:home")!
     }
 
     // MARK: Pixel
