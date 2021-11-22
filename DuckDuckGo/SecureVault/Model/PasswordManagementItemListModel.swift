@@ -91,6 +91,7 @@ enum SecureVaultItem: Equatable, Identifiable, Comparable {
             return identity.title.localizedCaseInsensitiveContains(filter)
         case .note(let note):
             return note.title.localizedCaseInsensitiveContains(filter) ||
+                note.text.localizedCaseInsensitiveContains(filter) ||
                 (note.associatedDomain?.localizedCaseInsensitiveContains(filter) ?? false)
         }
     }
