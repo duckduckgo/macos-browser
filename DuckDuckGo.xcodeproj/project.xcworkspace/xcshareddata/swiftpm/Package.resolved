@@ -5,8 +5,8 @@
         "package": "BrowserServicesKit",
         "repositoryURL": "https://github.com/duckduckgo/BrowserServicesKit.git",
         "state": {
-          "branch": "release/friends-and-family",
-          "revision": "6fd3f7d652b318a1b4986f50222d3af27edbca15",
+          "branch": "sam/autofill-identity-additions",
+          "revision": "8836c676a1a9d834e0f1a0fbd16eef808ac083be",
           "version": null
         }
       },
