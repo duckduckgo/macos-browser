@@ -39,30 +39,6 @@
      * FB SDK loads -> SDK calls window.fbAsyncInit -> Our function calls window.FB.init (maybe) ->
      * our function calls original fbAsyncInit (if it existed)
      */
-    function enableFacebookSDK_new () {
-        console.log('enableFacebookSDK')
-        if (!fbIsEnabled) {
-//            window.FB = undefined
-
-//            const fbScript = document.createElement('script')
-//            fbScript.setAttribute('crossorigin', 'anonymous')
-//            fbScript.setAttribute('async', '')
-//            fbScript.setAttribute('defer', '')
-//            fbScript.src = originalFBURL
-//            fbScript.onload = function () {
-                for (const node of parseCalls) {
-                    window.FB.XFBML.parse.apply(window.FB.XFBML, node)
-                }
-//            }
-//            document.head.appendChild(fbScript)
-            fbIsEnabled = true
-        } else {
-            if (initData) {
-                window.FB.init(initData)
-            }
-        }
-    }
-     
     function enableFacebookSDK () {
         if (!fbIsEnabled) {
          window.FB = undefined
