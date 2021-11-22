@@ -795,7 +795,6 @@ extension Tab: WKNavigationDelegate {
                 decisionHandler(.cancel)
                 return
             }
-            StatisticsLoader.shared.refreshRetentionAtb(isSearch: url.isDuckDuckGoSearch)
 
             decisionHandler(.allow)
         }
@@ -903,6 +902,12 @@ extension Tab: WKNavigationDelegate {
     func webView(_ webView: WKWebView, didFinishLoadWithRequest request: URLRequest, inFrame frame: WKFrameInfo) {
         guard frame.isMainFrame else { return }
         self.mainFrameLoadState = .finished
+
+        StatisticsLoader.shared.refreshRetentionAtb(isSearch: request.url?.isDuckDuckGoSearch == true)
+
+        if [.initial, .dailyFirst].contains(Pixel.Event.Repetition(key: "app_usage")) {
+            Pixel.fire(.appUsage)
+        }
     }
 
     @objc(_webView:didFinishLoadWithRequest:inFrame:withError:)
