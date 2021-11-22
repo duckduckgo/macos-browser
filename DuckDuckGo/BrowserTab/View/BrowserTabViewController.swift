@@ -607,9 +607,8 @@ extension BrowserTabViewController: WKUIDelegate {
 
         var shouldOpenPopUp = navigationAction.isUserInitiated
         if !shouldOpenPopUp {
-            let host = navigationAction.sourceFrame.request.url?.host
-            webView.tab?.permissions.permissions([.popups],
-                                                 requestedForDomain: host) { granted in
+            let url = navigationAction.sourceFrame.request.url
+            webView.tab?.permissions.permissions([.popups], requestedFor: url) { granted in
                 switch (granted, shouldOpenPopUp) {
                 case (true, false):
                     // callback called synchronously - will return webView for the request
@@ -666,7 +665,7 @@ extension BrowserTabViewController: WKUIDelegate {
             return
         }
 
-        webView.tab?.permissions.permissions(permissions, requestedForDomain: origin.host) { granted in
+        webView.tab?.permissions.permissions(permissions, requestedFor: URL(origin)) { granted in
             decisionHandler(granted ? .grant : .deny)
         } ?? /* Tab deallocated: */ {
             decisionHandler(.deny)
