@@ -193,6 +193,8 @@ struct UserText {
     static let permissionGeolocationServicesDisabled = NSLocalizedString("permission.disabled.system", value: "System Geolocation Services are disabled", comment: "Geolocation Services are disabled in System Preferences")
     static let permissionOpenSystemPreferences = NSLocalizedString("permission.open.preferences", value: "Open System Preferences", comment: "Open System Preferences (to re-enable permission for the App)")
 
+    static let permissionPopupTitleFormat = NSLocalizedString("permission.popup.title.format", value: "Popup (%@)", comment: "Website requested permission to open a Popup with %@ URL")
+
     static let privacyDashboardPermissionAsk = NSLocalizedString("dashboard.permission.ask", value: "Ask", comment: "Privacy Dashboard: Website should always Ask for permission for input media device access")
     static let privacyDashboardPermissionAlwaysAllow = NSLocalizedString("dashboard.permission.allow", value: "Allow Always", comment: "Privacy Dashboard: Website can always access input media device")
     static let privacyDashboardPermissionAlwaysDeny = NSLocalizedString("dashboard.permission.deny", value: "Deny Always", comment: "Privacy Dashboard: Website can never access input media device")

@@ -686,7 +686,7 @@ extension BrowserTabViewController: WKUIDelegate {
             return
         }
 
-        webView.tab?.permissions.permissions(permissions, requestedForDomain: url.host, decisionHandler: decisionHandler)
+        webView.tab?.permissions.permissions(permissions, requestedFor: url, decisionHandler: decisionHandler)
             ?? /* Tab deallocated: */ {
                 decisionHandler(false)
             }()
@@ -700,7 +700,7 @@ extension BrowserTabViewController: WKUIDelegate {
     // https://github.com/WebKit/WebKit/blob/9d7278159234e0bfa3d27909a19e695928f3b31e/Source/WebKit/UIProcess/API/Cocoa/WKUIDelegatePrivate.h#L131
     @objc(_webView:requestGeolocationPermissionForFrame:decisionHandler:)
     func webView(_ webView: WKWebView, requestGeolocationPermissionFor frame: WKFrameInfo, decisionHandler: @escaping (Bool) -> Void) {
-        webView.tab?.permissions.permissions([.geolocation], requestedForDomain: frame.request.url?.host, decisionHandler: decisionHandler)
+        webView.tab?.permissions.permissions([.geolocation], requestedFor: frame.request.url, decisionHandler: decisionHandler)
             ?? /* Tab deallocated: */ {
                 decisionHandler(false)
             }()
@@ -713,7 +713,7 @@ extension BrowserTabViewController: WKUIDelegate {
                  requestGeolocationPermissionFor origin: WKSecurityOrigin,
                  initiatedBy frame: WKFrameInfo,
                  decisionHandler: @escaping (WKPermissionDecision) -> Void) {
-        webView.tab?.permissions.permissions([.geolocation], requestedForDomain: frame.request.url?.host) { granted in
+        webView.tab?.permissions.permissions([.geolocation], requestedFor: frame.request.url) { granted in
             decisionHandler(granted ? .grant : .deny)
         } ?? /* Tab deallocated: */ {
             decisionHandler(.deny)

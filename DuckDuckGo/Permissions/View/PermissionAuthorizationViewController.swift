@@ -85,3 +85,9 @@ final class PermissionAuthorizationViewController: NSViewController {
     }
 
 }
+
+extension PermissionAuthorizationQuery {
+    var domain: String {
+        return url.host ?? ""
+    }
+}

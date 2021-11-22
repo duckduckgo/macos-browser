@@ -23,6 +23,7 @@ protocol PermissionContextMenuDelegate: AnyObject {
     func permissionContextMenu(_ menu: PermissionContextMenu, mutePermissions: [PermissionType])
     func permissionContextMenu(_ menu: PermissionContextMenu, unmutePermissions: [PermissionType])
     func permissionContextMenu(_ menu: PermissionContextMenu, revokePermissions: [PermissionType])
+    func permissionContextMenu(_ menu: PermissionContextMenu, allowPermission: PermissionType)
     func permissionContextMenu(_ menu: PermissionContextMenu, alwaysAllowPermission: PermissionType)
     func permissionContextMenu(_ menu: PermissionContextMenu, alwaysDenyPermission: PermissionType)
     func permissionContextMenu(_ menu: PermissionContextMenu, resetStoredPermission: PermissionType)
@@ -114,9 +115,14 @@ final class PermissionContextMenu: NSMenu {
             case .revoking, .reloading:
                 // expected permission to deactivate access
                 return
-            case .requested:
-                // popover should be shown
-                return
+            case .requested(let query):
+                // otherwise Permission Popover should be shown
+                guard case .popups = permission else { return }
+
+                addItem(.popupPermissionRequested(url: query.url))
+                addItem(.openPopup(permission: permission, target: self))
+                addItem(.separator())
+                addItem(.alwaysAllow(permission, on: domain, target: self))
             }
         }
     }
@@ -205,6 +211,14 @@ final class PermissionContextMenu: NSMenu {
     }
     @objc func reload(_ sender: NSMenuItem) {
         actionDelegate?.permissionContextMenuReloadPage(self)
+    }
+
+    @objc func openPopup(_ sender: NSMenuItem) {
+        guard let permission = sender.representedObject as? PermissionType else {
+            assertionFailure("Expected PermissionType")
+            return
+        }
+        actionDelegate?.permissionContextMenu(self, allowPermission: permission)
     }
 
     @objc func openSystemPreferences(_ sender: NSMenuItem) {
@@ -317,6 +331,24 @@ private extension NSMenuItem {
         let item = NSMenuItem(title: UserText.permissionOpenSystemPreferences,
                               action: #selector(PermissionContextMenu.openSystemPreferences),
                               keyEquivalent: "")
+        item.representedObject = permission
+        item.target = target
+        return item
+    }
+
+    static func popupPermissionRequested(url: URL) -> NSMenuItem {
+        let title = String(format: UserText.permissionPopupTitleFormat, url.absoluteString)
+        let attributedTitle = NSMutableAttributedString(string: title)
+        attributedTitle.setAttributes([.font: NSFont.systemFont(ofSize: 11.0)], range: title.nsRange())
+
+        let menuItem = NSMenuItem(title: "", action: nil, keyEquivalent: "")
+        menuItem.attributedTitle = attributedTitle
+
+        return menuItem
+    }
+
+    static func openPopup(permission: PermissionType, target: PermissionContextMenu) -> NSMenuItem {
+        let item = NSMenuItem(title: UserText.open, action: #selector(PermissionContextMenu.openPopup), keyEquivalent: "")
         item.representedObject = permission
         item.target = target
         return item

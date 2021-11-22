@@ -17,6 +17,7 @@
 //
 
 import Foundation
+import WebKit
 import os.log
 
 extension URL {
@@ -74,6 +75,16 @@ extension URL {
 
     static var homePage: URL {
         return URL(string: "about:home")!
+    }
+
+    init?(_ securityOrigin: WKSecurityOrigin) {
+        let port: String
+        if securityOrigin.port != NavigationalScheme(rawValue: securityOrigin.protocol)?.port {
+            port = ":\(securityOrigin.port)"
+        } else {
+            port = ""
+        }
+        self.init(string: securityOrigin.protocol + "://" + securityOrigin.host + port)
     }
 
     // MARK: Pixel
@@ -173,6 +184,13 @@ extension URL {
 
         func separated() -> String {
             self.rawValue + Self.separator
+        }
+
+        var port: Int {
+            switch self {
+            case .http: return 80
+            case .https: return 443
+            }
         }
     }
 

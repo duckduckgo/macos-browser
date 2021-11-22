@@ -572,6 +572,7 @@
 		B6B1E88B26D774090062C350 /* LinkButton.swift in Sources */ = {isa = PBXBuildFile; fileRef = B6B1E88A26D774090062C350 /* LinkButton.swift */; };
 		B6B3E0962654DACD0040E0A2 /* UTTypeTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = B6B3E0952654DACD0040E0A2 /* UTTypeTests.swift */; };
 		B6B3E0E12657EA7A0040E0A2 /* NSScreenExtension.swift in Sources */ = {isa = PBXBuildFile; fileRef = B6B3E0DC2657E9CF0040E0A2 /* NSScreenExtension.swift */; };
+		B6BBF17427475B15004F850E /* PopupBlockedPopover.swift in Sources */ = {isa = PBXBuildFile; fileRef = B6BBF17327475B15004F850E /* PopupBlockedPopover.swift */; };
 		B6C0B22E26E61CE70031CB7F /* DownloadViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = B6C0B22D26E61CE70031CB7F /* DownloadViewModel.swift */; };
 		B6C0B23026E61D630031CB7F /* DownloadListStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = B6C0B22F26E61D630031CB7F /* DownloadListStore.swift */; };
 		B6C0B23426E71BCD0031CB7F /* Downloads.xcdatamodeld in Sources */ = {isa = PBXBuildFile; fileRef = B6C0B23226E71BCD0031CB7F /* Downloads.xcdatamodeld */; };
@@ -1209,6 +1210,7 @@
 		B6B1E88A26D774090062C350 /* LinkButton.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LinkButton.swift; sourceTree = "<group>"; };
 		B6B3E0952654DACD0040E0A2 /* UTTypeTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UTTypeTests.swift; sourceTree = "<group>"; };
 		B6B3E0DC2657E9CF0040E0A2 /* NSScreenExtension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NSScreenExtension.swift; sourceTree = "<group>"; };
+		B6BBF17327475B15004F850E /* PopupBlockedPopover.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PopupBlockedPopover.swift; sourceTree = "<group>"; };
 		B6C0B22D26E61CE70031CB7F /* DownloadViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DownloadViewModel.swift; sourceTree = "<group>"; };
 		B6C0B22F26E61D630031CB7F /* DownloadListStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DownloadListStore.swift; sourceTree = "<group>"; };
 		B6C0B23326E71BCD0031CB7F /* Downloads.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = Downloads.xcdatamodel; sourceTree = "<group>"; };
@@ -3032,6 +3034,7 @@
 				B64C84DD2692D7400048FEBE /* PermissionAuthorization.storyboard */,
 				B64C84E22692DC9F0048FEBE /* PermissionAuthorizationViewController.swift */,
 				B64C84EA2692DD650048FEBE /* PermissionAuthorizationPopover.swift */,
+				B6BBF17327475B15004F850E /* PopupBlockedPopover.swift */,
 				B64C852926942AC90048FEBE /* PermissionContextMenu.swift */,
 				B64C85412694590B0048FEBE /* PermissionButton.swift */,
 			);
@@ -3861,6 +3864,7 @@
 				B693954E26F04BEB0015B914 /* ProgressView.swift in Sources */,
 				B69B503C2726A12500758A2B /* StatisticsStore.swift in Sources */,
 				B693955426F04BEC0015B914 /* ColorView.swift in Sources */,
+				B6BBF17427475B15004F850E /* PopupBlockedPopover.swift in Sources */,
 				8589063A267BCD8E00D23B0D /* SaveCredentialsPopover.swift in Sources */,
 				AA72D5E325FE977F00C77619 /* AddEditFavoriteViewController.swift in Sources */,
 				B6C0B22E26E61CE70031CB7F /* DownloadViewModel.swift in Sources */,
