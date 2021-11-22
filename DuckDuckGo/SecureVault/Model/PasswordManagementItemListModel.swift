@@ -248,6 +248,10 @@ final class PasswordManagementItemListModel: ObservableObject {
     }
 
     func update(item: SecureVaultItem) {
+        if let index = items.firstIndex(of: item) {
+            items[index] = item
+        }
+
         var sections = displayedItems
 
         guard let sectionIndex = sections.firstIndex(where: {
