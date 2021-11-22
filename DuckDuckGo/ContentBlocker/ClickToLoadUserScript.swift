@@ -48,59 +48,32 @@ final class ClickToLoadUserScript: NSObject, UserScript, WKScriptMessageHandlerW
                                replyHandler: @escaping (Any?, String?) -> Void) {
         if message.name == "enableFacebook" {
             guard let delegate = delegate else { return }
-            delegate.clickToLoadUserScriptAllowFB(self) { (result) -> Void in
+            delegate.clickToLoadUserScriptAllowFB(self) { (_) -> Void in
                 guard let isLogin = message.body as? Bool else {
                     replyHandler(nil, nil)
                     return
                 }
 
-                replyHandler(true, nil)
+                replyHandler(isLogin, nil)
             }
 
             return
         }
-        
-        let pathPrefix = "social_images/"
-        var fileName: String = ""
-        var fileExt: String = ""
+
+        var image: String
 
         guard let arg = message.body as? String else {
             replyHandler(nil, nil)
             return
         }
-        if message.name == "getLoadingImage" {
-            switch arg {
-            case "light": fileName = "loading_light"
-            case "dark" : fileName = "loading_dark"
-            default: replyHandler(nil, "Missing loading image namek")
-                return
-            }
-            fileExt = "svg"
-        } else if message.name == "getImage" {
-            let fileArgs = arg.split(separator: ".")
-            fileName = String(fileArgs[0])
-            fileExt = String(fileArgs[1])
-        } else if message.name == "getLogo" {
-            fileName = "dax"
-            fileExt = "png"
+        if message.name == "getImage" {
+            image = ClickToLoadModel.getImage[arg]!
         } else {
             print("Uknown message type")
             replyHandler(nil, nil)
             return
         }
 
-        let filePath = pathPrefix + fileName
-
-        let imgURL = Bundle.main.url(
-            forResource: filePath,
-            withExtension: fileExt
-        )
-        if imgURL == nil {
-            replyHandler(nil, "Image not found")
-            return
-        }
-        let base64String = try? Data(contentsOf: imgURL!).base64EncodedString()
-        let image = "data:image/" + (fileExt == "svg" ? "svg+xml" : fileExt) + ";base64," + base64String!
         replyHandler(image, nil)
     }
     
@@ -108,4 +81,3 @@ final class ClickToLoadUserScript: NSObject, UserScript, WKScriptMessageHandlerW
         print("SHOULDN'T BE HERE!")
     }
 }
-
