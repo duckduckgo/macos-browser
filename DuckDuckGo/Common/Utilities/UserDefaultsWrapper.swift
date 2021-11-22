@@ -32,6 +32,7 @@ public struct UserDefaultsWrapper<T> {
         case configStoragePrivacyConfigurationEtag = "config.storage.privacyconfiguration.etag"
 
         case fireproofDomains = "com.duckduckgo.fireproofing.allowedDomains"
+        case unprotectedDomains = "com.duckduckgo.contentblocker.unprotectedDomains"
 
         case defaultBrowserDismissed = "browser.default.dismissed"
 

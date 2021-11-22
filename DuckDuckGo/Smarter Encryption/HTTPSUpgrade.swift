@@ -50,7 +50,7 @@ final class HTTPSUpgrade {
             completion(false)
             return
         }
-        
+
         guard config.isFeature(.httpsUpgrade, enabledForDomain: host) else {
             completion(false)
             return
