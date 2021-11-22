@@ -5,8 +5,8 @@
         "package": "BrowserServicesKit",
         "repositoryURL": "https://github.com/duckduckgo/BrowserServicesKit.git",
         "state": {
-          "branch": "sam/autofill-identity-additions",
-          "revision": "55c9355a9c2a6966b3f031f8160bdf1fc53c9c1f",
+          "branch": "release/friends-and-family",
+          "revision": "aeb2dc2fc19c75dcca1b0727a2b078742ebac280",
           "version": null
         }
       },
@@ -51,8 +51,8 @@
         "repositoryURL": "https://github.com/sparkle-project/Sparkle.git",
         "state": {
           "branch": null,
-          "revision": "c0933a516b420806e9216e71bd13ba76c54f0de6",
-          "version": "1.26.0"
+          "revision": "7918c1c8fc68baa37917eeaa67286b077ad5e393",
+          "version": "1.27.1"
         }
       },
       {

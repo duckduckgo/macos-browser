@@ -5004,7 +5004,7 @@
 			isa = XCRemoteSwiftPackageReference;
 			repositoryURL = "https://github.com/duckduckgo/BrowserServicesKit.git";
 			requirement = {
-				branch = "sam/autofill-identity-additions";
+				branch = "release/friends-and-family";
 				kind = branch;
 			};
 		};
