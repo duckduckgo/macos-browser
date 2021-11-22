@@ -54,5 +54,6 @@ extension UserText {
     static let pmEmailAddress = NSLocalizedString("pm.email-address", value: "Email Address", comment: "Label for email address title")
 
     static let pmNote = NSLocalizedString("pm.note", value: "Note", comment: "Label for note title")
+    static let pmEmptyNote = NSLocalizedString("pm.note.empty", value: "Empty note", comment: "Label for empty note title")
 
 }
