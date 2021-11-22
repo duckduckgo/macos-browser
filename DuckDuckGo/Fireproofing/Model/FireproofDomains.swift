@@ -95,9 +95,14 @@ internal class FireproofDomains {
         let cookieDomain = cookieDomain.dropWWW()
         return fireproofDomainsToIds[cookieDomain] != nil
             || fireproofDomainsToIds[cookieDomain.drop(prefix: ".")] != nil
+            // ".name.com" would match if "mail.name.com" is fireproofed
             || (cookieDomain.hasPrefix(".") && fireproofDomainsToIds.contains(where: { key, _ in
                     key.hasSuffix(cookieDomain)
                 }))
+    }
+
+    func asyncTest() async {
+
     }
 
     func remove(domain: String) {
@@ -119,6 +124,7 @@ internal class FireproofDomains {
         let domainWithoutWWW = domain.dropWWW()
         let dotPrefixedDomain = "." + domainWithoutWWW
         return fireproofDomainsToIds[domainWithoutWWW] != nil
+            // ".name.com" would match if "mail.name.com" is fireproofed
             || fireproofDomainsToIds.contains(where: { key, _ in key.hasSuffix(dotPrefixedDomain) })
     }
 
