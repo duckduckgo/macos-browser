@@ -17,6 +17,7 @@
 //
 
 import Combine
+import BrowserServicesKit
 
 protocol ConfigurationDownloading {
 
@@ -138,7 +139,7 @@ final class DefaultConfigurationDownloader: ConfigurationDownloading {
 
     func embeddedEtag(for config: ConfigurationLocation) -> String? {
         switch config {
-        case .trackerRadar: return TrackerRadarManager.Constants.embeddedDataSetETag
+        case .trackerRadar: return TrackerDataManager.Constants.embeddedDataSetETag
         default: return nil
         }
     }

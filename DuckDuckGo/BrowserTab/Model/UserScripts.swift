@@ -18,6 +18,20 @@
 
 import Foundation
 import BrowserServicesKit
+import TrackerRadarKit
+
+public class DefaultUserScriptConfigSource: ContentBlockerUserScriptConfigSource {
+
+    public var privacyConfig: PrivacyConfiguration {
+        return ContentBlocking.privacyConfigurationManager.privacyConfig
+    }
+
+    public var trackerData: TrackerData? {
+        return ContentBlocking.contentBlockingManager.currentRules?.trackerData
+    }
+
+    public init() {}
+}
 
 final class UserScripts {
 
@@ -26,7 +40,7 @@ final class UserScripts {
     let contextMenuScript = ContextMenuUserScript()
     let findInPageScript = FindInPageUserScript()
     let contentBlockerScript = ContentBlockerUserScript()
-    let contentBlockerRulesScript = ContentBlockerRulesUserScript()
+    let contentBlockerRulesScript = ContentBlockerRulesUserScript(configurationSource: DefaultUserScriptConfigSource())
     let autofillScript = AutofillUserScript()
     let printingUserScript = PrintingUserScript()
     let hoverUserScript = HoverUserScript()

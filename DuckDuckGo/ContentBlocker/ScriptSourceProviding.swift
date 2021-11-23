@@ -83,7 +83,7 @@ final class DefaultScriptSourceProvider: ScriptSourceProviding {
         let privacyConfiguration = privacyConfigurationManager.privacyConfig
 
         // Use sensible defaults in case the upstream data is unparsable
-        let trackerData = TrackerRadarManager.shared.encodedTrackerData
+        let trackerData = ContentBlocking.contentBlockingManager.currentRules?.encodedTrackerData ?? "" //FIXME
         let surrogates = configStorage.loadData(for: .surrogates)?.utf8String() ?? ""
 
         let remoteUnprotectedDomains = (privacyConfiguration.tempUnprotectedDomains.joined(separator: "\n"))

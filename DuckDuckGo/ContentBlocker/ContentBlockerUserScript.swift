@@ -67,9 +67,9 @@ final class ContentBlockerUserScript: NSObject, UserScript {
     }
 
     private func trackerFromUrl(_ urlString: String, _ blocked: Bool) -> DetectedTracker {
-        let knownTracker = TrackerRadarManager.shared.findTracker(forUrl: urlString)
-        let entity = TrackerRadarManager.shared.findEntity(byName: knownTracker?.owner?.name ?? "")
-        return DetectedTracker(url: urlString, knownTracker: knownTracker, entity: entity, blocked: blocked)
+        let knownTracker = ContentBlocking.trackerDataManager.trackerData.findTracker(forUrl: urlString)
+        let entity = ContentBlocking.trackerDataManager.trackerData.findEntity(byName: knownTracker?.owner?.name ?? "")
+        return DetectedTracker(url: urlString, knownTracker: knownTracker, entity: entity, blocked: blocked, pageUrl: "") // TODO - pageURL
     }
 
 }

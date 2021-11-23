@@ -153,7 +153,7 @@ final class ConfigurationManager {
 
     private func updateTrackerBlockingDependencies() throws {
 
-        TrackerRadarManager.shared.reload()
+//        TrackerRadarManager.shared.reload() FIXME
 
         let configEtag = DefaultConfigurationStorage.shared.loadEtag(for: .privacyConfiguration)
         let configData = DefaultConfigurationStorage.shared.loadData(for: .privacyConfiguration)

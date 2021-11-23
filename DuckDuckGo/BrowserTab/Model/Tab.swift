@@ -592,6 +592,17 @@ extension Tab: FaviconUserScriptDelegate {
 
 }
 
+extension Tab: ContentBlockerRulesUserScriptDelegate {
+
+    func contentBlockerRulesUserScriptShouldProcessTrackers(_ script: ContentBlockerRulesUserScript) -> Bool {
+        return true
+    }
+
+    func contentBlockerRulesUserScript(_ script: ContentBlockerRulesUserScript, detectedTracker tracker: DetectedTracker) {
+        trackerInfo?.add(detectedTracker: tracker)
+    }
+}
+
 extension Tab: ContentBlockerUserScriptDelegate {
 
     func contentBlockerUserScriptShouldProcessTrackers(_ script: UserScript) -> Bool {

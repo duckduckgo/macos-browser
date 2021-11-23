@@ -19,6 +19,7 @@
 import Cocoa
 import WebKit
 import Combine
+import BrowserServicesKit
 
 final class PrivacyDashboardViewController: NSViewController {
 
@@ -139,7 +140,7 @@ final class PrivacyDashboardViewController: NSViewController {
             return
         }
 
-        let pageEntity = TrackerRadarManager.shared.findEntity(forHost: domain)
+        let pageEntity = ContentBlocking.trackerDataManager.trackerData.findEntity(forHost: domain)
         self.privacyDashboardScript.setParentEntity(pageEntity, webView: self.webView)
     }
 
