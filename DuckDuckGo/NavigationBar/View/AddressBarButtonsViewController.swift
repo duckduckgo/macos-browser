@@ -562,9 +562,9 @@ final class AddressBarButtonsViewController: NSViewController {
             let majorTrackerThresholdPrevalence = 25.0
             let parentEntity = ContentBlocking.trackerDataManager.trackerData.findEntity(forHost: host)
             let isMajorTrackingNetwork = (parentEntity?.prevalence ?? 0.0) >= majorTrackerThresholdPrevalence
-            
-            let protectionStore = DomainsProtectionUserDefaultsStore() // FIXME
-            let isUnprotected = protectionStore.isHostUnprotected(forDomain: host)
+
+            let configuration = ContentBlocking.privacyConfigurationManager.privacyConfig
+            let isUnprotected = configuration.isUserUnprotected(domain: host)
 
             privacyEntryPointButton.image = isNotSecure || isMajorTrackingNetwork || isUnprotected ? Self.shieldDotImage : Self.shieldImage
         default:

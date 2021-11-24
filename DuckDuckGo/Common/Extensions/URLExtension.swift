@@ -432,12 +432,13 @@ extension URL {
     // MARK: - GPC
 
     static func gpcHeadersEnabled(config: PrivacyConfiguration) -> [String] {
-        return []
-        // FIXME - setings
-//        guard let enabledSites = config.features[PrivacyFeature.gpc.rawValue]?
-//                .settings?["gpcHeaderEnabledSites"] as? [String] else { return [] }
-//
-//        return enabledSites
+        let settings = config.settings(for: .gpc)
+
+        guard let enabledSites = settings["gpcHeaderEnabledSites"] as? [String] else {
+            return []
+        }
+
+        return enabledSites
     }
     
     static func isGPCEnabled(url: URL,

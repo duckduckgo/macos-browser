@@ -148,8 +148,8 @@ final class PrivacyDashboardViewController: NSViewController {
             return
         }
 
-        let protectionStore = DomainsProtectionUserDefaultsStore()
-        let isProtected = !protectionStore.unprotectedDomains.contains(domain)
+        let configuration = ContentBlocking.privacyConfigurationManager.privacyConfig
+        let isProtected = !configuration.isUserUnprotected(domain: domain)
         self.privacyDashboardScript.setProtectionStatus(isProtected, webView: self.webView)
     }
 
@@ -196,9 +196,12 @@ extension PrivacyDashboardViewController: PrivacyDashboardUserScriptDelegate {
             return
         }
 
-        let protectionStore = DomainsProtectionUserDefaultsStore()
-        let operation = isProtected ? protectionStore.enableProtection : protectionStore.disableProtection
-        operation(domain)
+        let configuration = ContentBlocking.privacyConfigurationManager.privacyConfig
+        if isProtected {
+            configuration.userEnabledProtection(forDomain: domain)
+        } else {
+            configuration.userDisabledProtection(forDomain: domain)
+        }
 
         let completionToken = ContentBlocking.contentBlockingManager.scheduleCompilation()
         pendingUpdates[completionToken] = domain
