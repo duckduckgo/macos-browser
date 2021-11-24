@@ -765,29 +765,10 @@
       *  Messaging to surrogates & extension
       *********************************************************/
      function enableSocialTracker (entity, isLogin) {
-//         const message = {
-//             entity: entity,
-//             isLogin: isLogin
-//         }
-//         sendMessage('enableSocialTracker', message)
          console.log('enableSocialTracker, isLogin=', isLogin)
          window.webkit.messageHandlers.enableFacebook.postMessage(isLogin).then((enable) => {
              console.log('enableSocialTracker PM callback', enable)
-             window.dispatchEvent(new CustomEvent('LoadFacebookSDK')) 
-//             var scripts = document.getElementsByTagName("script")
-//             if(enable && scripts && scripts.length > 0) {
-//                 window.dispatchEvent(new CustomEvent('RemoveFacebookSurrogate')) // Race condition vs SDK load?  We should win here but..
-//
-//                 var s2 = document.createElement("script")
-//                 s2.type = "application/javascript"
-//                 s2.async = true
-//                 s2.src = "https://connect.facebook.net/en_US/sdk.js?XFBML=false"
-//                 s2.addEventListener('load', () => { window.dispatchEvent(new CustomEvent('LoadFacebookSDK')) }, false);
-//
-//                 console.log('FBenable s.src', s2.src)
-//                 scripts[0].parentNode.insertBefore(s2, scripts[0])
-//
-//             }
+             window.dispatchEvent(new CustomEvent('LoadFacebookSDK'))
          })
         .catch((e) => console.log('messageHandler exception', e))
      }
@@ -807,31 +788,18 @@
 //     })
 
      // Fetch reusable assets
-//     sendMessage('getLoadingImage', 'light',
-//         function (response) {
-//             loadingImages.lightMode = response
-//         })
      window.webkit.messageHandlers.getImage.postMessage('loading_light.svg').then((response) => {
          console.log('Postmessage icon', response)
          loadingImages.lightMode = response
      })
     .catch((e) => console.log('messageHandler exception', e))
 
-
-//     sendMessage('getLoadingImage', 'dark',
-//         function (response) {
-//             loadingImages.darkMode = response
-//         })
      window.webkit.messageHandlers.getImage.postMessage('loading_dark.svg').then((response) => {
          console.log('Postmessage icon', response)
          loadingImages.darkMode = response
      })
     .catch((e) => console.log('messageHandler exception', e))
 
-//     sendMessage('getLogo', '',
-//         function (response) {
-//             logoImg = response
-//         })
      window.webkit.messageHandlers.getImage.postMessage('dax.png').then((response) => {
          console.log('Postmessage icon', response)
          logoImg = response
