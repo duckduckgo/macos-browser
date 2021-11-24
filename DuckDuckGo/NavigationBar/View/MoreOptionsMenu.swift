@@ -46,6 +46,8 @@ final class MoreOptionsMenu: NSMenu {
         self.emailManager = emailManager
         super.init(title: "")
 
+        self.emailManager.requestDelegate = self
+
         setupMenuItems()
     }
 
@@ -263,12 +265,17 @@ final class EmailOptionsButtonSubMenu: NSMenu {
     }
     
     @objc func createAddressAction(_ sender: NSMenuItem) {
-        guard let url = emailManager.generateTokenPageURL else {
-            assertionFailure("Could not get token page URL, token not available")
-            return
+        assert(emailManager.requestDelegate != nil, "No requestDelegate on emailManager")
+
+        emailManager.getAliasIfNeededAndConsume { [weak self] alias, error in
+            guard let alias = alias, let address = self?.emailManager.emailAddressFor(alias) else {
+                assertionFailure(error?.localizedDescription ?? "Unexpected email error")
+                return
+            }
+            NSPasteboard.general.clearContents()
+            NSPasteboard.general.setString(address, forType: .string)
+            NotificationCenter.default.post(name: NSNotification.Name.privateEmailCopiedToClipboard, object: nil)
         }
-        let tab = Tab(content: .url(url))
-        tabCollectionViewModel.append(tab: tab)
         Pixel.fire(.moreMenu(result: .emailProtectionCreateAddress))
     }
     
@@ -349,5 +356,40 @@ extension NSMenuItem {
         self.submenu = submenu
         return self
     }
+
+}
+
+extension MoreOptionsMenu: EmailManagerRequestDelegate {
+
+    // swiftlint:disable function_parameter_count
+    func emailManager(_ emailManager: EmailManager,
+                      requested url: URL,
+                      method: String,
+                      headers: [String: String],
+                      parameters: [String: String]?,
+                      httpBody: Data?,
+                      timeoutInterval: TimeInterval,
+                      completion: @escaping (Data?, Error?) -> Void) {
+        let currentQueue = OperationQueue.current
+
+        let finalURL: URL
+
+        if let parameters = parameters {
+            finalURL = (try? url.addParameters(parameters)) ?? url
+        } else {
+            finalURL = url
+        }
+
+        var request = URLRequest(url: finalURL, timeoutInterval: timeoutInterval)
+        request.allHTTPHeaderFields = headers
+        request.httpMethod = method
+        request.httpBody = httpBody
+        URLSession.shared.dataTask(with: request) { (data, _, error) in
+            currentQueue?.addOperation {
+                completion(data, error)
+            }
+        }.resume()
+    }
+    // swiftlint:enable function_parameter_count
 
 }
