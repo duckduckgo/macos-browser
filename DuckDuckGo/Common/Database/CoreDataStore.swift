@@ -43,6 +43,10 @@ extension DataStore {
             update(managedObject)(object)
         }).first?.id ?? { throw CoreDataStoreError.objectNotFound }()
     }
+    func add<T, ManagedObject: NSManagedObject>(_ object: T, using update: (ManagedObject, T) -> Void) throws -> NSManagedObjectID {
+        try add([object], using: update).first?.id ?? { throw CoreDataStoreError.objectNotFound }()
+    }
+
     func remove(objectWithId id: NSManagedObjectID) {
         remove(objectWithId: id, completionHandler: nil)
     }
@@ -115,16 +119,17 @@ final class CoreDataStore: DataStore {
 
         guard let context = context else { return [] }
 
-        var added = [(Seq.Element, NSManagedObject)]()
-        added.reserveCapacity(objects.underestimatedCount)
+        var result: Result<[(Seq.Element, NSManagedObjectID)], Error> = .success([])
 
-        var error: Error?
         context.performAndWait { [context] in
             let entityName = ManagedObject.className()
+// TODO: new context for mutation
+            var added = [(Seq.Element, NSManagedObject)]()
+            added.reserveCapacity(objects.underestimatedCount)
 
             for object in objects {
                 guard let managedObject = NSEntityDescription.insertNewObject(forEntityName: entityName, into: context) as? ManagedObject else {
-                    error = CoreDataStoreError.invalidManagedObject
+                    result = .failure(CoreDataStoreError.invalidManagedObject)
                     return
                 }
 
@@ -134,14 +139,12 @@ final class CoreDataStore: DataStore {
 
             do {
                 try context.save()
-            } catch let e {
-                error = e
+                result = .success(added.map { ($0, $1.objectID) })
+            } catch {
+                result = .failure(error)
             }
         }
-        if let error = error {
-            throw error
-        }
-        return added.map { ($0, $1.objectID) }
+        return try result.get()
     }
 
     func remove<ManagedObject: NSManagedObject>(objectsOfType _: ManagedObject.Type,

@@ -20,6 +20,38 @@ import Foundation
 @testable import DuckDuckGo_Privacy_Browser
 
 final class FireproofDomainsStoreMock: FireproofDomainsStore {
+
+    final class FakeDataStore: DataStore {
+        func clear<ManagedObject>(objectsOfType _: ManagedObject.Type,
+                                  completionHandler: ((Error?) -> Void)?) where ManagedObject: NSManagedObject {
+            fatalError()
+        }
+
+        func remove(objectWithId id: NSManagedObjectID, completionHandler: ((Error?) -> Void)?) {
+            fatalError()
+        }
+
+        func remove<ManagedObject>(objectsOfType _: ManagedObject.Type,
+                                   withPredicate predicate: NSPredicate,
+                                   completionHandler: ((Error?) -> Void)?) where ManagedObject: NSManagedObject {
+            fatalError()
+        }
+
+        func add<Seq, ManagedObject>(_ objects: Seq,
+                                     using update: (ManagedObject, Seq.Element) -> Void) throws
+            -> [(element: Seq.Element, id: NSManagedObjectID)] where Seq: Sequence, ManagedObject: NSManagedObject {
+            fatalError()
+        }
+
+        func load<Result, ManagedObject>(into initialResult: Result,
+                                         _ update: (inout Result, ManagedObject) throws -> Void) throws
+            -> Result where ManagedObject: NSManagedObject {
+            fatalError()
+        }
+
+        init() {}
+    }
+
     var domains = [String: NSManagedObjectID]()
     var error: Error?
 
@@ -32,37 +64,59 @@ final class FireproofDomainsStoreMock: FireproofDomainsStore {
 
     var history = [CallHistoryItem]()
 
-    func loadFireproofDomains() throws -> [String: NSManagedObjectID] {
+    init() {
+        super.init(store: FakeDataStore()) { fatalError() }
+            update: { _, _ in fatalError() }
+            combine: { _, _ in fatalError() }
+
+    }
+
+    override func load() throws -> FireproofDomainsContainer {
         history.append(.load)
         if let error = error {
             throw error
         }
-        return domains
+
+        var result = FireproofDomainsContainer()
+        for (domain, id) in domains {
+            try result.add(domain: domain, withId: id)
+        }
+        return result
     }
 
-    func add(fireproofDomain: String) throws -> NSManagedObjectID {
+    override func add(_ fireproofDomain: String) throws -> NSManagedObjectID {
         history.append(.add(domains: [fireproofDomain]))
         if let error = error {
             throw error
         }
-        return .init()
+        domains[fireproofDomain] = .init()
+        return domains[fireproofDomain]!
     }
 
-    func add(fireproofDomains: [String]) throws -> [String: NSManagedObjectID] {
-        history.append(.add(domains: fireproofDomains))
+    override func add<Seq: Sequence>(_ fireproofDomains: Seq) throws
+        -> [(element: String, id: NSManagedObjectID)] where Seq.Element == String {
+
+        history.append(.add(domains: Array(fireproofDomains)))
         if let error = error {
             throw error
         }
-        return fireproofDomains.reduce(into: [:]) { $0[$1] = .init() }
+        var result = [(element: String, id: NSManagedObjectID)]()
+        for domain in fireproofDomains {
+            result.append( (domain, .init()) )
+            domains[domain] = result.last!.id
+        }
+        return result
     }
 
-    func remove(objectWithId id: NSManagedObjectID, completionHandler: ((Error?) -> Void)?) {
+    override func remove(objectWithId id: NSManagedObjectID, completionHandler: ((Error?) -> Void)? = nil) {
         history.append(.remove(id))
+        domains[domains.first(where: { $0.value == id })!.key] = nil
         completionHandler?(nil)
     }
 
-    func clear(completionHandler: ((Error?) -> Void)?) {
+    override func clear(completionHandler: ((Error?) -> Void)? = nil) {
         history.append(.clear)
+        domains = [:]
         completionHandler?(nil)
     }
 

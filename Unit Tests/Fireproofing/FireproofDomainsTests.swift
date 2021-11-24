@@ -76,6 +76,15 @@ final class FireproofDomainsTests: XCTestCase {
         XCTAssertNil(udw.wrappedValue)
     }
 
+    func testWhenInitWithErrorThenFireproofDomainsWorkCorrectly() {
+        struct TestError: Error {}
+        store.error = TestError()
+        XCTAssertTrue(logins.fireproofDomains.isEmpty)
+        store.error = nil
+        logins.addToAllowed(domain: "example.com")
+        XCTAssertEqual(logins.fireproofDomains, ["example.com"])
+    }
+
     func testWhenFireproofedDomainsInStoreThenTheyAreLoaded() {
         var udw = UserDefaultsWrapper<[String]?>(key: .fireproofDomains, defaultValue: nil)
         udw.wrappedValue = []
