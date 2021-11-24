@@ -228,6 +228,7 @@
 		85378D9C274E61B8007C5CBF /* MessageViews.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 85378D9B274E61B8007C5CBF /* MessageViews.storyboard */; };
 		85378D9E274E664C007C5CBF /* PopoverMessageViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 85378D9D274E664C007C5CBF /* PopoverMessageViewController.swift */; };
 		85378DA0274E6F42007C5CBF /* NSNotificationName+EmailManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 85378D9F274E6F42007C5CBF /* NSNotificationName+EmailManager.swift */; };
+		85378DA2274E7F25007C5CBF /* EmailManagerRequestDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 85378DA1274E7F25007C5CBF /* EmailManagerRequestDelegate.swift */; };
 		8546DE6225C03056000CA5E1 /* UserAgentTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8546DE6125C03056000CA5E1 /* UserAgentTests.swift */; };
 		85480F8A25CDC360009424E3 /* MainMenu.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 85480F8925CDC360009424E3 /* MainMenu.storyboard */; };
 		85480FBB25D181CB009424E3 /* ConfigurationDownloading.swift in Sources */ = {isa = PBXBuildFile; fileRef = 85480FBA25D181CB009424E3 /* ConfigurationDownloading.swift */; };
@@ -857,6 +858,7 @@
 		85378D9B274E61B8007C5CBF /* MessageViews.storyboard */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; path = MessageViews.storyboard; sourceTree = "<group>"; };
 		85378D9D274E664C007C5CBF /* PopoverMessageViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PopoverMessageViewController.swift; sourceTree = "<group>"; };
 		85378D9F274E6F42007C5CBF /* NSNotificationName+EmailManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "NSNotificationName+EmailManager.swift"; sourceTree = "<group>"; };
+		85378DA1274E7F25007C5CBF /* EmailManagerRequestDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EmailManagerRequestDelegate.swift; sourceTree = "<group>"; };
 		8546DE6125C03056000CA5E1 /* UserAgentTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UserAgentTests.swift; sourceTree = "<group>"; };
 		85480F8925CDC360009424E3 /* MainMenu.storyboard */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; path = MainMenu.storyboard; sourceTree = "<group>"; };
 		85480FBA25D181CB009424E3 /* ConfigurationDownloading.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ConfigurationDownloading.swift; sourceTree = "<group>"; };
@@ -1493,6 +1495,7 @@
 			children = (
 				4B65143D263924B5005B46EB /* EmailUrlExtensions.swift */,
 				85378D9F274E6F42007C5CBF /* NSNotificationName+EmailManager.swift */,
+				85378DA1274E7F25007C5CBF /* EmailManagerRequestDelegate.swift */,
 			);
 			path = Email;
 			sourceTree = "<group>";
@@ -3870,6 +3873,7 @@
 				AA9E9A5E25A4867200D1959D /* TabDragAndDropManager.swift in Sources */,
 				B68458C025C7E9E000DC17B6 /* TabCollectionViewModel+NSSecureCoding.swift in Sources */,
 				AA8EDF2724923EC70071C2E8 /* StringExtension.swift in Sources */,
+				85378DA2274E7F25007C5CBF /* EmailManagerRequestDelegate.swift in Sources */,
 				B68172A9269C487D006D1092 /* PrivacyDashboardUserScript.swift in Sources */,
 				858A797F26A79EAA00A75A42 /* UserText+PasswordManager.swift in Sources */,
 				0230C09F271F53000018F728 /* GPCUserScript.swift in Sources */,
