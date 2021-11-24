@@ -29,16 +29,8 @@ final class HTTPSUpgrade {
     private let store: HTTPSUpgradeStore
     private var bloomFilter: BloomFilterWrapper?
     
-    private var userUnprotected: Set<String> = []
-    
     init(store: HTTPSUpgradeStore = HTTPSUpgradePersistence()) {
         self.store = store
-        reload()
-    }
-    
-    func reload() {
-        let protectionStore = DomainsProtectionUserDefaultsStore()
-        userUnprotected = protectionStore.unprotectedDomains
     }
 
     func isUpgradeable(url: URL, completion: @escaping UpgradeCheckCompletion,
@@ -59,21 +51,7 @@ final class HTTPSUpgrade {
             return
         }
         
-        if config.isEnabled(featureKey: .httpsUpgrade) {
-            // Check exception lists before upgrading
-            if config.tempUnprotectedDomains.contains(host) {
-                completion(false)
-                return
-            }
-            if userUnprotected.contains(host) {
-                completion(false)
-                return
-            }
-            if config.exceptionsList(forFeature: .httpsUpgrade).contains(host) {
-                completion(false)
-                return
-            }
-        } else {
+        guard config.isFeature(.httpsUpgrade, enabledForDomain: host) else {
             completion(false)
             return
         }

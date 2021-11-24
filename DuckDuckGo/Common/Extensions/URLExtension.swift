@@ -446,22 +446,10 @@ extension URL {
         
         for gpcHost in enabledSites {
             if url.isPart(ofDomain: gpcHost) {
-                
                 // Check if url is on exception list
                 // Since headers are only enabled for a small numbers of sites
                 // perfrom this check here for efficency
-                let exceptions = config.tempUnprotectedDomains + config.exceptionsList(forFeature: .gpc)
-                let protectionStore = DomainsProtectionUserDefaultsStore()
-                if protectionStore.unprotectedDomains.contains(url.host ?? "") {
-                    return false
-                }
-                for exception in exceptions {
-                    if url.isPart(ofDomain: exception) {
-                        return false
-                    }
-                }
-                
-                return true
+                return config.isFeature(.gpc, enabledForDomain: url.host)
             }
         }
         

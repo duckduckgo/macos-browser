@@ -62,7 +62,6 @@ final class PrivacyDashboardViewController: NSViewController {
             }
 
             DefaultScriptSourceProvider.shared.reload() // FIXME - better event handling
-            HTTPSUpgrade.shared.reload()
         }
     }
 
