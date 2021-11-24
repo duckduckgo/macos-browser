@@ -21,37 +21,6 @@ import Foundation
 
 final class FireproofDomainsStoreMock: FireproofDomainsStore {
 
-    final class FakeDataStore: DataStore {
-        func clear<ManagedObject>(objectsOfType _: ManagedObject.Type,
-                                  completionHandler: ((Error?) -> Void)?) where ManagedObject: NSManagedObject {
-            fatalError()
-        }
-
-        func remove(objectWithId id: NSManagedObjectID, completionHandler: ((Error?) -> Void)?) {
-            fatalError()
-        }
-
-        func remove<ManagedObject>(objectsOfType _: ManagedObject.Type,
-                                   withPredicate predicate: NSPredicate,
-                                   completionHandler: ((Error?) -> Void)?) where ManagedObject: NSManagedObject {
-            fatalError()
-        }
-
-        func add<Seq, ManagedObject>(_ objects: Seq,
-                                     using update: (ManagedObject, Seq.Element) -> Void) throws
-            -> [(element: Seq.Element, id: NSManagedObjectID)] where Seq: Sequence, ManagedObject: NSManagedObject {
-            fatalError()
-        }
-
-        func load<Result, ManagedObject>(into initialResult: Result,
-                                         _ update: (inout Result, ManagedObject) throws -> Void) throws
-            -> Result where ManagedObject: NSManagedObject {
-            fatalError()
-        }
-
-        init() {}
-    }
-
     var domains = [String: NSManagedObjectID]()
     var error: Error?
 
@@ -65,42 +34,34 @@ final class FireproofDomainsStoreMock: FireproofDomainsStore {
     var history = [CallHistoryItem]()
 
     init() {
-        super.init(store: FakeDataStore()) { fatalError() }
-            update: { _, _ in fatalError() }
-            combine: { _, _ in fatalError() }
-
+        super.init(context: nil, tableName: "")
     }
 
-    override func load() throws -> FireproofDomainsContainer {
+    override func load<Result>(objectsWithPredicate predicate: NSPredicate? = nil,
+                               sortDescriptors: [NSSortDescriptor]? = nil,
+                               into initialResult: Result,
+                               _ accumulate: (inout Result, IDValueTuple) throws -> Void) throws -> Result {
+
         history.append(.load)
         if let error = error {
             throw error
         }
 
-        var result = FireproofDomainsContainer()
+        var result = initialResult
         for (domain, id) in domains {
-            try result.add(domain: domain, withId: id)
+            try accumulate(&result, (id, domain))
         }
         return result
     }
 
-    override func add(_ fireproofDomain: String) throws -> NSManagedObjectID {
-        history.append(.add(domains: [fireproofDomain]))
-        if let error = error {
-            throw error
-        }
-        domains[fireproofDomain] = .init()
-        return domains[fireproofDomain]!
-    }
-
-    override func add<Seq: Sequence>(_ fireproofDomains: Seq) throws
-        -> [(element: String, id: NSManagedObjectID)] where Seq.Element == String {
+    override func add<S>(_ fireproofDomains: S) throws
+        -> [(value: Value, id: NSManagedObjectID)] where S: Sequence, String == S.Element {
 
         history.append(.add(domains: Array(fireproofDomains)))
         if let error = error {
             throw error
         }
-        var result = [(element: String, id: NSManagedObjectID)]()
+        var result = [(value: String, id: NSManagedObjectID)]()
         for domain in fireproofDomains {
             result.append( (domain, .init()) )
             domains[domain] = result.last!.id

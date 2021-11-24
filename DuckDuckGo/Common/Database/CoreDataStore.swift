@@ -19,51 +19,40 @@
 import Foundation
 import CoreData
 
-protocol DataStore: AnyObject {
+protocol ValueRepresentableManagedObject: NSManagedObject {
+    associatedtype ValueType
 
-    func load<Result, ManagedObject: NSManagedObject>(into initialResult: Result,
-                                                      _ update: (inout Result, ManagedObject) throws -> Void) throws -> Result
-
-    func add<Seq: Sequence, ManagedObject: NSManagedObject>(_ objects: Seq,
-                                                            using update: (ManagedObject, Seq.Element) -> Void) throws
-        -> [(element: Seq.Element, id: NSManagedObjectID)]
-
-    func remove<ManagedObject: NSManagedObject>(objectsOfType _: ManagedObject.Type,
-                                                withPredicate predicate: NSPredicate,
-                                                completionHandler: ((Error?) -> Void)?)
-    func remove(objectWithId id: NSManagedObjectID, completionHandler: ((Error?) -> Void)?)
-
-    func clear<ManagedObject: NSManagedObject>(objectsOfType _: ManagedObject.Type, completionHandler: ((Error?) -> Void)?)
-
+    func valueRepresentation() -> ValueType?
+    func update(with value: ValueType) throws
 }
 
-extension DataStore {
-    func add<T, ManagedObject: NSManagedObject>(_ object: T, using update: (ManagedObject) -> (T) -> Void) throws -> NSManagedObjectID {
-        try add([object], using: { (managedObject: ManagedObject, object: T) in
-            update(managedObject)(object)
-        }).first?.id ?? { throw CoreDataStoreError.objectNotFound }()
-    }
-    func add<T, ManagedObject: NSManagedObject>(_ object: T, using update: (ManagedObject, T) -> Void) throws -> NSManagedObjectID {
-        try add([object], using: update).first?.id ?? { throw CoreDataStoreError.objectNotFound }()
+enum CoreDataStoreError: Error {
+    case objectNotFound
+    case multipleObjectsFound
+    case invalidManagedObject
+}
+
+extension CoreDataStore {
+
+    func add(_ value: Value) throws -> NSManagedObjectID {
+        try add([value]).first?.id ?? { throw CoreDataStoreError.objectNotFound }()
     }
 
     func remove(objectWithId id: NSManagedObjectID) {
         remove(objectWithId: id, completionHandler: nil)
     }
-    func remove<ManagedObject: NSManagedObject>(objectsOfType type: ManagedObject.Type, withPredicate predicate: NSPredicate) {
-        remove(objectsOfType: type, withPredicate: predicate, completionHandler: nil)
+
+    func remove(objectsWithPredicate predicate: NSPredicate) {
+        remove(objectsWithPredicate: predicate, completionHandler: nil)
     }
-    func clear<ManagedObject: NSManagedObject>(objectsOfType type: ManagedObject.Type) {
-        clear(objectsOfType: type, completionHandler: nil)
+
+    func clear() {
+        clear(completionHandler: nil)
     }
+
 }
 
-enum CoreDataStoreError: Error {
-    case objectNotFound
-    case invalidManagedObject
-}
-
-final class CoreDataStore: DataStore {
+internal class CoreDataStore<ManagedObject: ValueRepresentableManagedObject> {
 
     private let tableName: String
     private var _context: NSManagedObjectContext??
@@ -88,8 +77,13 @@ final class CoreDataStore: DataStore {
         self.tableName = tableName
     }
 
-    func load<Result, ManagedObject: NSManagedObject>(into initialResult: Result,
-                                                      _ update: (inout Result, ManagedObject) throws -> Void) throws -> Result {
+    typealias Value = ManagedObject.ValueType
+    typealias IDValueTuple = (id: NSManagedObjectID, value: Value)
+
+    func load<Result>(objectsWithPredicate predicate: NSPredicate? = nil,
+                      sortDescriptors: [NSSortDescriptor]? = nil,
+                      into initialResult: Result,
+                      _ accumulate: (inout Result, IDValueTuple) throws -> Void) throws -> Result {
 
         var result = initialResult
         var coreDataError: Error?
@@ -97,10 +91,15 @@ final class CoreDataStore: DataStore {
         guard let context = context else { return result }
         context.performAndWait {
             let fetchRequest = NSFetchRequest<ManagedObject>(entityName: ManagedObject.className())
+            fetchRequest.predicate = predicate
+            fetchRequest.sortDescriptors = sortDescriptors
             fetchRequest.returnsObjectsAsFaults = false
 
             do {
-                result = try context.fetch(fetchRequest).reduce(into: result, update)
+                result = try context.fetch(fetchRequest).reduce(into: result) { result, managedObject in
+                    guard let value = managedObject.valueRepresentation() else { return }
+                    try accumulate(&result, (managedObject.objectID, value))
+                }
             } catch {
                 coreDataError = error
             }
@@ -113,31 +112,29 @@ final class CoreDataStore: DataStore {
         return result
     }
 
-    func add<Seq: Sequence, ManagedObject: NSManagedObject>(_ objects: Seq,
-                                                            using update: (ManagedObject, Seq.Element) -> Void) throws
-        -> [(element: Seq.Element, id: NSManagedObjectID)] {
-
+    func add<S: Sequence>(_ values: S) throws -> [(value: Value, id: NSManagedObjectID)] where S.Element == Value {
         guard let context = context else { return [] }
 
-        var result: Result<[(Seq.Element, NSManagedObjectID)], Error> = .success([])
+        var result: Result<[(Value, NSManagedObjectID)], Error> = .success([])
 
         context.performAndWait { [context] in
             let entityName = ManagedObject.className()
-// TODO: new context for mutation
-            var added = [(Seq.Element, NSManagedObject)]()
-            added.reserveCapacity(objects.underestimatedCount)
-
-            for object in objects {
-                guard let managedObject = NSEntityDescription.insertNewObject(forEntityName: entityName, into: context) as? ManagedObject else {
-                    result = .failure(CoreDataStoreError.invalidManagedObject)
-                    return
-                }
-
-                update(managedObject, object)
-                added.append((object, managedObject))
-            }
+            var added = [(Value, NSManagedObject)]()
+            added.reserveCapacity(values.underestimatedCount)
 
             do {
+                for value in values {
+                    guard let managedObject = NSEntityDescription
+                            .insertNewObject(forEntityName: entityName, into: context) as? ManagedObject
+                    else {
+                        result = .failure(CoreDataStoreError.invalidManagedObject)
+                        return
+                    }
+
+                    try managedObject.update(with: value)
+                    added.append((value, managedObject))
+                }
+
                 try context.save()
                 result = .success(added.map { ($0, $1.objectID) })
             } catch {
@@ -147,9 +144,65 @@ final class CoreDataStore: DataStore {
         return try result.get()
     }
 
-    func remove<ManagedObject: NSManagedObject>(objectsOfType _: ManagedObject.Type,
-                                                withPredicate predicate: NSPredicate,
-                                                completionHandler: ((Error?) -> Void)?) {
+    func update(objectWithPredicate predicate: NSPredicate, with value: Value, completionHandler: ((Error?) -> Void)?) {
+        guard let context = context else { return }
+
+        func mainQueueCompletion(_ error: Error?) {
+            guard completionHandler != nil else { return }
+            DispatchQueue.main.async {
+                completionHandler?(error)
+            }
+        }
+
+        context.perform { [context] in
+            do {
+                let fetchRequest = NSFetchRequest<NSFetchRequestResult>(entityName: ManagedObject.className())
+                fetchRequest.predicate = predicate
+
+                let fetchResults = try context.fetch(fetchRequest)
+                guard fetchResults.count <= 1 else { throw CoreDataStoreError.multipleObjectsFound }
+                guard let managedObject = fetchResults.first as? ManagedObject else {
+                    throw CoreDataStoreError.objectNotFound
+                }
+
+                try managedObject.update(with: value)
+                try context.save()
+
+                mainQueueCompletion(nil)
+            } catch {
+                mainQueueCompletion(error)
+            }
+        }
+    }
+
+    func update(objectWithId id: NSManagedObjectID, with value: Value, completionHandler: ((Error?) -> Void)?) {
+        guard let context = context else { return }
+
+        func mainQueueCompletion(_ error: Error?) {
+            guard completionHandler != nil else { return }
+            DispatchQueue.main.async {
+                completionHandler?(error)
+            }
+        }
+
+        context.perform { [context] in
+            do {
+                guard let managedObject = try? context.existingObject(with: id) as? ManagedObject else {
+                    assertionFailure("CoreDataStore: Failed to get Managed Object from the context")
+                    throw CoreDataStoreError.objectNotFound
+                }
+
+                try managedObject.update(with: value)
+                try context.save()
+
+                mainQueueCompletion(nil)
+            } catch {
+                mainQueueCompletion(error)
+            }
+        }
+    }
+
+    func remove(objectsWithPredicate predicate: NSPredicate, completionHandler: ((Error?) -> Void)?) {
         guard let context = self.context else { return }
 
         func mainQueueCompletion(_ error: Error?) {
@@ -187,15 +240,14 @@ final class CoreDataStore: DataStore {
         }
 
         context.perform { [context] in
-            guard let managedObject = try? context.existingObject(with: id) else {
-                assertionFailure("CoreDataStore: Failed to get Managed Object from the context")
-                mainQueueCompletion(error: CoreDataStoreError.objectNotFound)
-                return
-            }
-
-            context.delete(managedObject)
-
             do {
+                guard let managedObject = try? context.existingObject(with: id) else {
+                    assertionFailure("CoreDataStore: Failed to get Managed Object from the context")
+                    throw CoreDataStoreError.objectNotFound
+                }
+
+                context.delete(managedObject)
+
                 try context.save()
                 mainQueueCompletion(error: nil)
             } catch {
@@ -205,7 +257,7 @@ final class CoreDataStore: DataStore {
         }
     }
 
-    func clear<ManagedObject: NSManagedObject>(objectsOfType _: ManagedObject.Type, completionHandler: ((Error?) -> Void)?) {
+    func clear(completionHandler: ((Error?) -> Void)?) {
         guard let context = context else { return }
         func mainQueueCompletion(error: Error?) {
             guard completionHandler != nil else { return }

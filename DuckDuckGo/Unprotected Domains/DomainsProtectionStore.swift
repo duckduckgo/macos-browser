@@ -20,16 +20,18 @@ import Foundation
 import CoreData
 import os.log
 
-protocol DomainsProtectionStore: AnyObject {
+protocol UnprotectedDomains: AnyObject {
     func isHostUnprotected(_ domain: String) -> Bool
     func disableProtection(forDomain domain: String)
     func enableProtection(forDomain domain: String)
 }
 
-final class LocalDomainsProtectionStore: DomainsProtectionStore {
+typealias UnprotectedDomainsStore = CoreDataStore<UnprotectedDomainManagedObject>
+final class LocalUnprotectedDomains: UnprotectedDomains {
 
-    static let shared = LocalDomainsProtectionStore()
-    private let store: DataStore
+    static let shared = LocalUnprotectedDomains()
+
+    private let store: UnprotectedDomainsStore
 
     @UserDefaultsWrapper(key: .unprotectedDomains, defaultValue: nil)
     private var legacyUserDefaultsUnprotectedDomainsData: Data?
@@ -40,7 +42,7 @@ final class LocalDomainsProtectionStore: DomainsProtectionStore {
         Array(unprotectedDomainsToIds.keys)
     }
 
-    init(store: DataStore = CoreDataStore(tableName: "UnprotectedDomains")) {
+    init(store: UnprotectedDomainsStore = UnprotectedDomainsStore(tableName: "UnprotectedDomains")) {
         self.store = store
     }
 
@@ -48,14 +50,14 @@ final class LocalDomainsProtectionStore: DomainsProtectionStore {
         dispatchPrecondition(condition: .onQueue(.main))
         do {
             if let data = legacyUserDefaultsUnprotectedDomainsData,
-               let domains = try? NSKeyedUnarchiver.unarchivedObject(ofClass: NSSet.self, from: data) as? Set<String>,
+               var domains = try? NSKeyedUnarchiver.unarchivedObject(ofClass: NSSet.self, from: data) as? Set<String>,
                !domains.isEmpty {
 
+                domains = Set(domains.map { $0.dropWWW() })
                 var result = [String: NSManagedObjectID]()
                 do {
-                    let added = try store.add(domains) { (object: UnprotectedDomainManagedObject, domain) in
-                        object.update(withDomain: domain.dropWWW())
-                    }
+
+                    let added = try store.add(domains)
                     for (domain, id) in added {
                         result[domain.dropWWW()] = id
                     }
@@ -66,10 +68,7 @@ final class LocalDomainsProtectionStore: DomainsProtectionStore {
                 return result
             }
 
-            return try store.load(into: [:]) { (result, object: UnprotectedDomainManagedObject) in
-                guard let domain = object.domainEncrypted as? String else { return }
-                result[domain] = object.objectID
-            }
+            return try store.load(into: [:]) { $0[$1.value] = $1.id }
         } catch {
             os_log("UnprotectedDomainStore: Failed to load Unprotected Domains", type: .error)
             return [:]
@@ -85,7 +84,7 @@ final class LocalDomainsProtectionStore: DomainsProtectionStore {
         dispatchPrecondition(condition: .onQueue(.main))
         let domainWithoutWWW = domain.dropWWW()
         do {
-            let id = try store.add(domainWithoutWWW, using: UnprotectedDomainManagedObject.update)
+            let id = try store.add(domainWithoutWWW)
             unprotectedDomainsToIds[domainWithoutWWW] = id
         } catch {
             assertionFailure("could not add unprotected domain \(domain): \(error)")
@@ -104,8 +103,14 @@ final class LocalDomainsProtectionStore: DomainsProtectionStore {
 
 }
 
-extension UnprotectedDomainManagedObject {
-    func update(withDomain domain: String) {
+extension UnprotectedDomainManagedObject: ValueRepresentableManagedObject {
+
+    func valueRepresentation() -> String? {
+        self.domainEncrypted as? String
+    }
+
+    func update(with domain: String) {
         self.domainEncrypted = domain as NSString
     }
+
 }

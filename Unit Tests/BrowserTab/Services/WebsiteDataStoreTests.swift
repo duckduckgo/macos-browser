@@ -189,14 +189,12 @@ final class WebCacheManagerTests: XCTestCase {
 
     class MockPreservedLogins: FireproofDomains {
 
-        let domains: [String]
-
-        override var fireproofDomainsToIds: [String: NSManagedObjectID] {
-            return domains.reduce(into: [:]) { $0[$1] = .init() }
-        }
-
         init(domains: [String]) {
-            self.domains = domains
+            super.init(store: FireproofDomainsStoreMock())
+
+            for domain in domains {
+                super.addToAllowed(domain: domain)
+            }
         }
 
     }

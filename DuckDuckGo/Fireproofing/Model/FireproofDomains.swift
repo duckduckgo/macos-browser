@@ -44,7 +44,7 @@ internal class FireproofDomains {
         container.domains
     }
 
-    init(store: FireproofDomainsStore = LocalFireproofDomainsStore()) {
+    init(store: FireproofDomainsStore = FireproofDomainsStore(tableName: "FireproofDomains")) {
         self.store = store
     }
 

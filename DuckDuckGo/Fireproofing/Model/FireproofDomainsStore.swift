@@ -19,22 +19,25 @@
 import Foundation
 import CoreData
 
-typealias FireproofDomainsStore = ConcreteDataStore<FireproofDomainManagedObject, FireproofDomainsContainer, String>
-final class LocalFireproofDomainsStore: FireproofDomainsStore {
+typealias FireproofDomainsStore = CoreDataStore<FireproofDomainManagedObject>
+extension FireproofDomainsStore {
 
-    init(store: DataStore = CoreDataStore(tableName: "FireproofDomains")) {
-        super.init(store: store, initContainer: FireproofDomainsContainer.init) { object, domain in
-            object.update(withDomain: domain)
-        } combine: { container, object in
-            guard let domain = object.domainEncrypted as? String else { return }
-            try container.add(domain: domain, withId: object.objectID)
+    func load() throws -> FireproofDomainsContainer {
+        try load(into: FireproofDomainsContainer()) {
+            try $0.add(domain: $1.value, withId: $1.id)
         }
     }
 
 }
 
-extension FireproofDomainManagedObject {
-    func update(withDomain domain: String) {
+extension FireproofDomainManagedObject: ValueRepresentableManagedObject {
+
+    func update(with domain: String) {
         self.domainEncrypted = domain as NSString
     }
+
+    func valueRepresentation() -> String? {
+        self.domainEncrypted as? String
+    }
+
 }
