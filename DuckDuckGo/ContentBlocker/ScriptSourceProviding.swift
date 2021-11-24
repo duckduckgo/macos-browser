@@ -23,7 +23,7 @@ import BrowserServicesKit
 protocol ScriptSourceProviding {
 
     func reload()
-    var contentBlockerRulesSource: String { get }
+//    var contentBlockerRulesSource: String { get }
     var contentBlockerSource: String { get }
     var gpcSource: String { get }
     var navigatorCredentialsSource: String { get }
@@ -36,8 +36,8 @@ final class DefaultScriptSourceProvider: ScriptSourceProviding {
 
     static var shared: ScriptSourceProviding = DefaultScriptSourceProvider()
 
-    @Published
-    private(set) var contentBlockerRulesSource: String = ""
+//    @Published
+//    private(set) var contentBlockerRulesSource: String = ""
     @Published
     private(set) var contentBlockerSource: String = ""
     @Published
@@ -61,23 +61,23 @@ final class DefaultScriptSourceProvider: ScriptSourceProviding {
     }
 
     func reload() {
-        contentBlockerRulesSource = buildContentBlockerRulesSource()
+//        contentBlockerRulesSource = buildContentBlockerRulesSource()
         contentBlockerSource = buildContentBlockerSource()
         gpcSource = buildGPCSource()
         navigatorCredentialsSource = buildNavigatorCredentialsSource()
         sourceUpdatedSubject.send( () )
     }
 
-    private func buildContentBlockerRulesSource() -> String {
-        let privacyConfiguration = privacyConfigurationManager.privacyConfig
-        let unprotectedDomains = privacyConfiguration.tempUnprotectedDomains
-        let contentBlockingExceptions = privacyConfiguration.exceptionsList(forFeature: .contentBlocking)
-        let protectionStore = DomainsProtectionUserDefaultsStore()
-        return ContentBlockerRulesUserScript.loadJS("contentblockerrules", from: .main, withReplacements: [
-            "$TEMP_UNPROTECTED_DOMAINS$": (unprotectedDomains + contentBlockingExceptions).joined(separator: "\n"),
-            "$USER_UNPROTECTED_DOMAINS$": protectionStore.unprotectedDomains.joined(separator: "\n")
-        ])
-    }
+//    private func buildContentBlockerRulesSource() -> String {
+//        let privacyConfiguration = privacyConfigurationManager.privacyConfig
+//        let unprotectedDomains = privacyConfiguration.tempUnprotectedDomains
+//        let contentBlockingExceptions = privacyConfiguration.exceptionsList(forFeature: .contentBlocking)
+//        let protectionStore = DomainsProtectionUserDefaultsStore()
+//        return ContentBlockerRulesUserScript.loadJS("contentblockerrules", from: .main, withReplacements: [
+//            "$TEMP_UNPROTECTED_DOMAINS$": (unprotectedDomains + contentBlockingExceptions).joined(separator: "\n"),
+//            "$USER_UNPROTECTED_DOMAINS$": protectionStore.unprotectedDomains.joined(separator: "\n")
+//        ])
+//    }
 
     private func buildContentBlockerSource() -> String {
         let privacyConfiguration = privacyConfigurationManager.privacyConfig

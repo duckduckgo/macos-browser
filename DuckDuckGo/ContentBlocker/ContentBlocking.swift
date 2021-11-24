@@ -22,7 +22,8 @@ import Combine
 
 final class ContentBlockingUpdating: ContentBlockerRulesUpdating {
     typealias NewRulesInfo = (rules: ContentBlockerRulesManager.CurrentRules,
-                              changes: ContentBlockerRulesIdentifier.Difference)
+                              changes: ContentBlockerRulesIdentifier.Difference,
+                              completionTokens: Set<ContentBlockerRulesManager.CompletionToken>)
     typealias NewRulesPublisher = AnyPublisher<NewRulesInfo?, Never>
 
     private let contentBlockingRulesSubject = CurrentValueSubject<NewRulesInfo?, Never>(nil)
@@ -31,8 +32,11 @@ final class ContentBlockingUpdating: ContentBlockerRulesUpdating {
         contentBlockingRulesSubject.eraseToAnyPublisher()
     }
 
-    func rulesManager(_ manager: ContentBlockerRulesManager, didUpdateRules rules: ContentBlockerRulesManager.CurrentRules, changes: ContentBlockerRulesIdentifier.Difference) {
-        contentBlockingRulesSubject.send((rules: rules, changes: changes))
+    func rulesManager(_ manager: ContentBlockerRulesManager,
+                      didUpdateRules rules: ContentBlockerRulesManager.CurrentRules,
+                      changes: ContentBlockerRulesIdentifier.Difference,
+                      completionTokens: [ContentBlockerRulesManager.CompletionToken]) {
+        contentBlockingRulesSubject.send((rules: rules, changes: changes, completionTokens: Set(completionTokens)))
     }
 
 }
@@ -46,7 +50,9 @@ final class ContentBlocking {
 
     static let trackerDataManager = TrackerDataManager()
 
-    static let contentBlockingManager = ContentBlockerRulesManager(source: DefaultContentBlockerRulesSource(trackerDataManager: trackerDataManager,
-                                                                                                            privacyConfigManager: privacyConfigurationManager),
+    private static let contentBlockingSource = DefaultContentBlockerRulesSource(trackerDataManager: trackerDataManager,
+                                                                                privacyConfigManager: privacyConfigurationManager)
+
+    static let contentBlockingManager = ContentBlockerRulesManager(source: contentBlockingSource,
                                                                    updateListener: contentBlockingUpdating)
 }

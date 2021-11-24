@@ -49,7 +49,6 @@ final class ConfigurationManager {
     @UserDefaultsWrapper(key: .configLastUpdated, defaultValue: .distantPast)
     var lastUpdateTime: Date
 
-    private var trackerBlockerDataUpdatedSubject = PassthroughSubject<Void, Never>()
     private var timerCancellable: AnyCancellable?
     private var refreshCancellable: AnyCancellable?
     private var lastRefreshCheckTime: Date = Date()
@@ -72,10 +71,6 @@ final class ConfigurationManager {
                 self.lastRefreshCheckTime = Date()
                 self.refreshIfNeeded()
             })
-    }
-
-    public func trackerBlockerDataUpdatedPublisher() -> AnyPublisher<Void, Never> {
-        return trackerBlockerDataUpdatedSubject.share().eraseToAnyPublisher()
     }
 
     func log() {
@@ -153,7 +148,9 @@ final class ConfigurationManager {
 
     private func updateTrackerBlockingDependencies() throws {
 
-//        TrackerRadarManager.shared.reload() FIXME
+        let tdsEtag = DefaultConfigurationStorage.shared.loadEtag(for: .trackerRadar)
+        let tdsData = DefaultConfigurationStorage.shared.loadData(for: .trackerRadar)
+        ContentBlocking.trackerDataManager.reload(etag: tdsEtag, data: tdsData)
 
         let configEtag = DefaultConfigurationStorage.shared.loadEtag(for: .privacyConfiguration)
         let configData = DefaultConfigurationStorage.shared.loadData(for: .privacyConfiguration)
@@ -161,12 +158,7 @@ final class ConfigurationManager {
         
         scriptSource.reload()
 
-        ContentBlocking.contentBlockingManager.recompile()
-
-//        ContentBlockerRulesManager.shared.compileRules { _ in FIXME
-//            self.trackerBlockerDataUpdatedSubject.send(())
-//        }
-
+        ContentBlocking.contentBlockingManager.scheduleCompilation()
     }
 
     private func updateBloomFilter() throws {

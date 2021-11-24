@@ -26,15 +26,44 @@ final class PrivacyDashboardViewController: NSViewController {
     @IBOutlet var webView: WKWebView!
     private let privacyDashboardScript = PrivacyDashboardUserScript()
     private var cancellables = Set<AnyCancellable>()
-    @Published var pendingUpdates = Set<String>()
+    @Published var pendingUpdates = [String: String]()
 
     weak var tabViewModel: TabViewModel?
     var serverTrustViewModel: ServerTrustViewModel?
+
+    private var contentBlockinRulesUpdatedCancellable: AnyCancellable?
 
     override func viewDidLoad() {
         privacyDashboardScript.delegate = self
         initWebView()
         webView.configuration.userContentController.addHandlerNoContentWorld(privacyDashboardScript)
+
+        prepareContentBlockingCancellable(publisher: ContentBlocking.contentBlockingUpdating.contentBlockingRules)
+    }
+
+    private func prepareContentBlockingCancellable(publisher: ContentBlockingUpdating.NewRulesPublisher) {
+        contentBlockinRulesUpdatedCancellable = publisher.receive(on: RunLoop.main).sink { [weak self] newRules in
+            dispatchPrecondition(condition: .onQueue(.main))
+
+            guard let self = self, let newRules = newRules, !self.pendingUpdates.isEmpty else { return }
+
+            var didUpdate = false
+            for token in newRules.completionTokens {
+                if self.pendingUpdates.removeValue(forKey: token) != nil {
+                    didUpdate = true
+                }
+            }
+
+            if didUpdate {
+                self.sendPendingUpdates()
+
+                let activeTab = self.tabViewModel?.tab
+                activeTab?.reload()
+            }
+
+            DefaultScriptSourceProvider.shared.reload() // FIXME - better event handling
+            HTTPSUpgrade.shared.reload()
+        }
     }
 
     override func viewWillAppear() {
@@ -131,7 +160,7 @@ final class PrivacyDashboardViewController: NSViewController {
             return
         }
 
-        self.privacyDashboardScript.setPendingUpdates(self.pendingUpdates, domain: domain, webView: self.webView)
+        self.privacyDashboardScript.setIsPendingUpdates(pendingUpdates.values.contains(domain), webView: self.webView)
     }
 
     private func sendParentEntity() {
@@ -168,23 +197,13 @@ extension PrivacyDashboardViewController: PrivacyDashboardUserScriptDelegate {
             return
         }
 
-        let activeTab = self.tabViewModel?.tab
         let protectionStore = DomainsProtectionUserDefaultsStore()
         let operation = isProtected ? protectionStore.enableProtection : protectionStore.disableProtection
         operation(domain)
 
-        pendingUpdates.insert(domain)
-        self.sendPendingUpdates()
-
-        ContentBlocking.contentBlockingManager.recompile()
-        // FIXME
-//        ContentBlockerRulesManager.shared.compileRules { _ in
-//            DefaultScriptSourceProvider.shared.reload()
-//            HTTPSUpgrade.shared.reload()
-//            self.pendingUpdates.remove(domain)
-//            self.sendPendingUpdates()
-//            activeTab?.reload()
-//        }
+        let completionToken = ContentBlocking.contentBlockingManager.scheduleCompilation()
+        pendingUpdates[completionToken] = domain
+        sendPendingUpdates()
     }
 
     func userScript(_ userScript: PrivacyDashboardUserScript, didSetPermission permission: PermissionType, to state: PermissionAuthorizationState) {
