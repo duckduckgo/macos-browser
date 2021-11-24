@@ -1,7 +1,7 @@
  (function clickToLoad () {
-     function sendMessage (messageType, options, callback) {
+//     function sendMessage (messageType, options, callback) {
 //         TODO chrome.runtime.sendMessage({ messageType, options }, callback)
-     }
+//     }
      let appID
      const loadingImages = {
          darkMode: '',
@@ -294,7 +294,7 @@
              margin: auto;
              display: flex;
              flex-direction: column;
-             
+
              font-family: DuckDuckGoPrivacyEssentials;
              line-height: 1;
          `,
@@ -447,8 +447,11 @@
              cursor: pointer;
              text-decoration: none;
          `,
-         fbContainer: `
+         wrapperDiv: `
              display: inline-block;
+             border: 0;
+             padding: 0;
+             margin: 0;
          `
      }
 
@@ -556,6 +559,8 @@
 
          /*
           * Creates an iFrame for this facebook content.
+          *
+          * @returns {Element}
           */
          createFBIFrame () {
              const frame = document.createElement('iframe')
@@ -595,7 +600,7 @@
              return this.fadeElement(element, 10, true)
          }
 
-         clickFunction (originalElement, replacementElement, shouldFade = true) {
+         clickFunction (originalElement, replacementElement) {
              let clicked = false
              const handleClick = function handleClick (e) {
                  // Ensure that the click is created by a user event & prevent double clicks from adding more animations
@@ -612,12 +617,12 @@
                      // notify surrogate to enable SDK and replace original element.
                      if (this.clickAction.type === 'allowFull') {
                          parent.replaceChild(originalElement, replacementElement)
-//                         window.dispatchEvent(new CustomEvent(`Load${this.entity}SDK`))
+                         window.dispatchEvent(new CustomEvent(`Load${this.entity}SDK`))
                          return
                      }
                      // Create a container for the new FB element
                      const fbContainer = document.createElement('div')
-                     fbContainer.style.cssText = styles.fbContainer
+                     fbContainer.style.cssText = styles.wrapperDiv
                      const fadeIn = document.createElement('div')
                      fadeIn.style.cssText = 'display: none; opacity: 0;'
 
@@ -662,8 +667,7 @@
                      fbElement.addEventListener('load', () => {
                          this.fadeOutElement(replacementElement)
                              .then(v => {
-                                 fbContainer.removeChild(replacementElement)
-                                 fadeIn.style.cssText = 'opacity: 0;'
+                                 fbContainer.replaceWith(fbElement)
                                  this.fadeInElement(fadeIn).then(v => {
                                      fbElement.focus() // focus on new element for screen readers
                                  })
@@ -701,11 +705,9 @@
      }
 
      /**
-      * Creates a safe element to replace the original tracking element.
+      * Creates a safe element and replaces the original tracking element with it.
       * @param {Object} widgetData - a single entry from elementData
       * @param {Element} originalElement - the element on the page we are replacing
-      *
-      * @returns {Element} a new element that can be inserted on the page in place of the original.
       */
      function createReplacementWidget (entity, widgetData, originalElement) {
          // Construct the widget based on data in the original element
@@ -731,18 +733,18 @@
              window.webkit.messageHandlers.getImage.postMessage(widgetData.replaceSettings.icon).then((icon) => {
                  const button = makeButton(widgetData.replaceSettings.buttonText, widget.getMode())
                  const textButton = makeTextButton(widgetData.replaceSettings.buttonText, widget.getMode())
-                 const el = createContentBlock(
-                     widget,
-                     button,
-                     textButton,
-                     icon)
-                 button.addEventListener('click', widget.clickFunction(originalElement, el))
-                 textButton.addEventListener('click', widget.clickFunction(originalElement, el))
-                 parent.replaceChild(el, originalElement)
+                 const { contentBlock, shadowRoot } = createContentBlock(
+                     widget, button, textButton, icon
+                 )
+                 button.addEventListener('click', widget.clickFunction(originalElement, contentBlock))
+                 textButton.addEventListener('click', widget.clickFunction(originalElement, contentBlock))
+                 parent.replaceChild(contentBlock, originalElement)
+
                  // Show an unblock link if parent element forces small height
                  // which may hide video.
-                 if ((!!el.offsetHeight && el.offsetHeight <= 200) || (!!el.parentNode && el.parentNode.offsetHeight <= 200)) {
-                     const textButton = el.querySelector(`#${titleID + 'TextButton'}`)
+                 if ((!!contentBlock.offsetHeight && contentBlock.offsetHeight <= 200) ||
+                     (!!contentBlock.parentNode && contentBlock.parentNode.offsetHeight <= 200)) {
+                     const textButton = shadowRoot.querySelector(`#${titleID + 'TextButton'}`)
                      textButton.style.cssText += 'display: block'
                  }
              })
@@ -843,6 +845,7 @@
          linkElement.style.cssText = styles.generalLink + styles[mode].linkFont
          linkElement.ariaLabel = 'Read about this privacy protection'
          linkElement.href = 'https://help.duckduckgo.com/duckduckgo-help-pages/privacy/embedded-content-protection/'
+         linkElement.target = '_blank'
          linkElement.textContent = 'Learn More'
          return linkElement
      }
@@ -1019,7 +1022,6 @@
              modalContainer.appendChild(modal)
              document.body.insertBefore(modalContainer, document.body.childNodes[0])
          })
-         .catch((e) => console.log('messageHandler exception', e))
      }
 
      function createTitleRow (message, textButton) {
@@ -1055,12 +1057,25 @@
 
      // Create the content block to replace other divs/iframes with
      function createContentBlock (widget, button, textButton, img) {
-         const wrapper = document.createElement('div')
-         wrapper.style.cssText = 'display: inline-block;'
+         const contentBlock = document.createElement('div')
+         contentBlock.style.cssText = styles.wrapperDiv
+
+         // Put our custom font-faces inside the wrapper element, since
+         // @font-face does not work inside a shadowRoot.
+         // See https://github.com/mdn/interactive-examples/issues/887.
+         const fontFaceStyleElement = document.createElement('style')
+         fontFaceStyleElement.textContent = styles.fontStyle
+         contentBlock.appendChild(fontFaceStyleElement)
+
+         // Put everyting else inside the shadowRoot of the wrapper element to
+         // reduce the chances of the website's stylesheets messing up the
+         // placeholder's appearance.
+         const shadowRoot = contentBlock.attachShadow({ mode: 'closed' })
+
          // Style element includes our font & overwrites page styles
          const styleElement = document.createElement('style')
          const wrapperClass = 'DuckDuckGoSocialContainer'
-         styleElement.textContent = styles.fontStyle + `
+         styleElement.textContent = `
              .${wrapperClass} a {
                  ${styles[widget.getMode()].linkFont}
                  font-weight: bold;
@@ -1070,13 +1085,13 @@
                  font-weight: bold;
              }
          `
-         wrapper.appendChild(styleElement)
+         shadowRoot.appendChild(styleElement)
 
          // Create overall grid structure
          const element = document.createElement('div')
          element.style.cssText = styles.block + styles[widget.getMode()].background + styles[widget.getMode()].textFont
          element.className = wrapperClass
-         wrapper.appendChild(element)
+         shadowRoot.appendChild(element)
 
          // grid of three rows
          const titleRow = document.createElement('div')
@@ -1122,7 +1137,6 @@
          buttonRow.appendChild(button)
          contentRow.appendChild(buttonRow)
 
-         return wrapper
+         return { contentBlock, shadowRoot }
      }
  })()
-
