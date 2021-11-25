@@ -191,8 +191,21 @@ final class BrowserTabViewController: NSViewController {
         homepageView.isHidden = shown
     }
 
-    private func openNewTab(with url: URL?, parentTab: Tab?, selected: Bool = false, canBeClosedWithBack: Bool = false) {
-        let tab = Tab(content: url != nil ? .url(url!) : .homepage,
+    func openNewTab(with content: Tab.TabContent, parentTab: Tab? = nil, selected: Bool = false, canBeClosedWithBack: Bool = false) {
+        // shouldn't open New Tabs in PopUp window
+        guard view.window?.isPopUpWindow == false else {
+            // Prefer Tab's Parent
+            if let parentTab = tabCollectionViewModel.selectedTabViewModel?.tab.parentTab, parentTab.delegate !== self {
+                parentTab.delegate?.tab(parentTab, requestedNewTabWith: content, selected: true)
+                parentTab.webView.window?.makeKeyAndOrderFront(nil)
+            // Act as default URL Handler if no Parent
+            } else {
+                WindowControllersManager.shared.showTab(with: content)
+            }
+            return
+        }
+
+        let tab = Tab(content: content,
                       parentTab: parentTab,
                       shouldLoadInBackground: true,
                       canBeClosedWithBack: canBeClosedWithBack)
@@ -336,8 +349,8 @@ extension BrowserTabViewController: TabDelegate {
         }
     }
 
-    func tab(_ tab: Tab, requestedNewTab url: URL?, selected: Bool) {
-        openNewTab(with: url, parentTab: tab, selected: selected, canBeClosedWithBack: selected == true)
+    func tab(_ tab: Tab, requestedNewTabWith content: Tab.TabContent, selected: Bool) {
+        openNewTab(with: content, parentTab: tab, selected: selected, canBeClosedWithBack: selected == true)
     }
 
     func closeTab(_ tab: Tab) {
@@ -499,7 +512,7 @@ extension BrowserTabViewController: LinkMenuItemSelectors {
 
     func openLinkInNewTab(_ sender: NSMenuItem) {
         guard let url = contextMenuLink else { return }
-        openNewTab(with: url, parentTab: tabViewModel?.tab)
+        openNewTab(with: .url(url), parentTab: tabViewModel?.tab)
     }
 
     func openLinkInNewWindow(_ sender: NSMenuItem) {
@@ -529,7 +542,7 @@ extension BrowserTabViewController: ImageMenuItemSelectors {
 
     func openImageInNewTab(_ sender: NSMenuItem) {
         guard let url = contextMenuImage else { return }
-        openNewTab(with: url, parentTab: tabViewModel?.tab)
+        openNewTab(with: .url(url), parentTab: tabViewModel?.tab)
     }
 
     func openImageInNewWindow(_ sender: NSMenuItem) {
@@ -557,8 +570,8 @@ extension BrowserTabViewController: MenuItemSelectors {
 
     func search(_ sender: NSMenuItem) {
         let selectedText = contextMenuSelectedText ?? ""
-        let url = URL.makeSearchUrl(from: selectedText)
-        openNewTab(with: url, parentTab: tabViewModel?.tab, selected: true)
+        guard let url = URL.makeSearchUrl(from: selectedText) else { return }
+        openNewTab(with: .url(url), parentTab: tabViewModel?.tab, selected: true)
     }
 
 }
@@ -605,10 +618,21 @@ extension BrowserTabViewController: WKUIDelegate {
                  for navigationAction: WKNavigationAction,
                  windowFeatures: WKWindowFeatures) -> WKWebView? {
 
+        func makeTab(parentTab: Tab, content: Tab.TabContent) -> Tab {
+            // Returned web view must be created with the specified configuration.
+            return Tab(content: content,
+                       webViewConfiguration: configuration,
+                       parentTab: parentTab,
+                       canBeClosedWithBack: true)
+        }
+        guard let parentTab = webView.tab else { return nil }
+
         var shouldOpenPopUp = navigationAction.isUserInitiated
         if !shouldOpenPopUp {
             let url = navigationAction.sourceFrame.request.url
-            webView.tab?.permissions.permissions([.popups], requestedFor: url) { granted in
+            parentTab.permissions.permissions([.popups], requestedFor: url) { [weak parentTab] granted in
+                guard let parentTab = parentTab else { return }
+
                 switch (granted, shouldOpenPopUp) {
                 case (true, false):
                     // callback called synchronously - will return webView for the request
@@ -616,7 +640,11 @@ extension BrowserTabViewController: WKUIDelegate {
                 case (true, true):
                     // called asynchronously
                     guard let url = navigationAction.request.url else { return }
-                    WindowsManager.openNewWindow(with: url)
+                    let tab = makeTab(parentTab: parentTab, content: .url(url))
+                    WindowsManager.openPopUpWindow(with: tab)
+
+                    parentTab.permissions.permissions.popups.popupOpened()
+
                 case (false, _):
                     return
                 }
@@ -627,13 +655,9 @@ extension BrowserTabViewController: WKUIDelegate {
             return nil
         }
 
-        // Returned web view must be created with the specified configuration.
-        let tab = Tab(content: .none,
-                      webViewConfiguration: configuration,
-                      parentTab: tabViewModel?.tab,
-                      canBeClosedWithBack: true)
-        WindowsManager.openNewWindow(with: tab)
-        webView.tab?.permissions.permissions.popups.popupOpened()
+        let tab = makeTab(parentTab: parentTab, content: .none)
+        WindowsManager.openPopUpWindow(with: tab)
+        parentTab.permissions.permissions.popups.popupOpened()
 
         // WebKit loads the request in the returned web view.
         return tab.webView

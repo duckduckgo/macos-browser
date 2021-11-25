@@ -36,8 +36,9 @@ final class WindowsManager {
     @discardableResult
     class func openNewWindow(with tabCollectionViewModel: TabCollectionViewModel? = nil,
                              droppingPoint: NSPoint? = nil,
-                             showWindow: Bool = true) -> NSWindow? {
-        let mainWindowController = makeNewWindow(tabCollectionViewModel: tabCollectionViewModel)
+                             showWindow: Bool = true,
+                             popUp: Bool = false) -> NSWindow? {
+        let mainWindowController = makeNewWindow(tabCollectionViewModel: tabCollectionViewModel, popUp: popUp)
 
         if let droppingPoint = droppingPoint {
             mainWindowController.window?.setFrameOrigin(droppingPoint: droppingPoint)
@@ -51,10 +52,10 @@ final class WindowsManager {
         return mainWindowController.window
     }
 
-    class func openNewWindow(with tab: Tab, droppingPoint: NSPoint? = nil) {
+    class func openNewWindow(with tab: Tab, droppingPoint: NSPoint? = nil, popUp: Bool = false) {
         let tabCollection = TabCollection()
         tabCollection.append(tab: tab)
-        openNewWindow(with: TabCollectionViewModel(tabCollection: tabCollection), droppingPoint: droppingPoint)
+        openNewWindow(with: TabCollectionViewModel(tabCollection: tabCollection), droppingPoint: droppingPoint, popUp: popUp)
     }
 
     class func openNewWindow(with initialUrl: URL) {
@@ -70,7 +71,17 @@ final class WindowsManager {
         newTab.setContent(.url(initialUrl))
     }
 
-    private class func makeNewWindow(tabCollectionViewModel: TabCollectionViewModel? = nil) -> MainWindowController {
+    class func openPopUpWindow(with tab: Tab) {
+        if let mainWindowController = WindowControllersManager.shared.lastKeyMainWindowController,
+           mainWindowController.window?.styleMask.contains(.fullScreen) == true,
+           mainWindowController.window?.isPopUpWindow == false {
+            mainWindowController.mainViewController.tabCollectionViewModel.insertChild(tab: tab, selected: true)
+        } else {
+            self.openNewWindow(with: tab, popUp: true)
+        }
+    }
+
+    private class func makeNewWindow(tabCollectionViewModel: TabCollectionViewModel? = nil, popUp: Bool = false) -> MainWindowController {
         let mainViewController: MainViewController
         do {
             mainViewController = try NSException.catch {
@@ -88,7 +99,7 @@ final class WindowsManager {
 #endif
         }
 
-        return MainWindowController(mainViewController: mainViewController)
+        return MainWindowController(mainViewController: mainViewController, popUp: popUp)
     }
 
 }

@@ -503,6 +503,7 @@
 		B688B4DA273E6D3B0087BEAF /* MainView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B688B4D9273E6D3B0087BEAF /* MainView.swift */; };
 		B688B4DF27420D290087BEAF /* PDFSearchTextMenuItemHandler.swift in Sources */ = {isa = PBXBuildFile; fileRef = B688B4DE27420D290087BEAF /* PDFSearchTextMenuItemHandler.swift */; };
 		B689ECD526C247DB006FB0C5 /* BackForwardListItem.swift in Sources */ = {isa = PBXBuildFile; fileRef = B689ECD426C247DB006FB0C5 /* BackForwardListItem.swift */; };
+		B68C92C1274E3EF4002AC6B0 /* PopUpWindow.swift in Sources */ = {isa = PBXBuildFile; fileRef = B68C92C0274E3EF4002AC6B0 /* PopUpWindow.swift */; };
 		B693954A26F04BEB0015B914 /* NibLoadable.swift in Sources */ = {isa = PBXBuildFile; fileRef = B693953C26F04BE70015B914 /* NibLoadable.swift */; };
 		B693954B26F04BEB0015B914 /* MouseOverView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B693953D26F04BE70015B914 /* MouseOverView.swift */; };
 		B693954C26F04BEB0015B914 /* FocusRingView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B693953E26F04BE70015B914 /* FocusRingView.swift */; };
@@ -924,7 +925,7 @@
 		AA585D8B248FD31400E9A3E2 /* DuckDuckGo.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = DuckDuckGo.entitlements; sourceTree = "<group>"; };
 		AA585D90248FD31400E9A3E2 /* Unit Tests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = "Unit Tests.xctest"; sourceTree = BUILT_PRODUCTS_DIR; };
 		AA585D96248FD31400E9A3E2 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
-		AA585DAE2490E6E600E9A3E2 /* MainViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = MainViewController.swift; path = ../MainViewController.swift; sourceTree = "<group>"; };
+		AA585DAE2490E6E600E9A3E2 /* MainViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MainViewController.swift; sourceTree = "<group>"; };
 		AA5C8F58258FE21F00748EB7 /* NSTextFieldExtension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NSTextFieldExtension.swift; sourceTree = "<group>"; };
 		AA5C8F5D2590EEE800748EB7 /* NSPointExtension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NSPointExtension.swift; sourceTree = "<group>"; };
 		AA5C8F622591021700748EB7 /* NSApplicationExtension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NSApplicationExtension.swift; sourceTree = "<group>"; };
@@ -1139,6 +1140,7 @@
 		B688B4D9273E6D3B0087BEAF /* MainView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MainView.swift; sourceTree = "<group>"; };
 		B688B4DE27420D290087BEAF /* PDFSearchTextMenuItemHandler.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PDFSearchTextMenuItemHandler.swift; sourceTree = "<group>"; };
 		B689ECD426C247DB006FB0C5 /* BackForwardListItem.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BackForwardListItem.swift; sourceTree = "<group>"; };
+		B68C92C0274E3EF4002AC6B0 /* PopUpWindow.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PopUpWindow.swift; sourceTree = "<group>"; };
 		B693953C26F04BE70015B914 /* NibLoadable.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = NibLoadable.swift; sourceTree = "<group>"; };
 		B693953D26F04BE70015B914 /* MouseOverView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MouseOverView.swift; sourceTree = "<group>"; };
 		B693953E26F04BE70015B914 /* FocusRingView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = FocusRingView.swift; sourceTree = "<group>"; };
@@ -2317,6 +2319,7 @@
 				AA585DAE2490E6E600E9A3E2 /* MainViewController.swift */,
 				B688B4D9273E6D3B0087BEAF /* MainView.swift */,
 				B688B4DE27420D290087BEAF /* PDFSearchTextMenuItemHandler.swift */,
+				B68C92C0274E3EF4002AC6B0 /* PopUpWindow.swift */,
 			);
 			path = View;
 			sourceTree = "<group>";
@@ -3666,6 +3669,7 @@
 				B6E61EE8263ACE16004E11AB /* UTType.swift in Sources */,
 				4BE6547F271FCD4D008D1D63 /* PasswordManagementCreditCardModel.swift in Sources */,
 				AAFCB37F25E545D400859DD4 /* PublisherExtension.swift in Sources */,
+				B68C92C1274E3EF4002AC6B0 /* PopUpWindow.swift in Sources */,
 				B684592225C93BE000DC17B6 /* Publisher.asVoid.swift in Sources */,
 				AAA0CC33252F181A0079BC96 /* NavigationButtonMenuDelegate.swift in Sources */,
 				AAC30A2A268E239100D2D9CD /* CrashReport.swift in Sources */,

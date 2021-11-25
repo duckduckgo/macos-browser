@@ -92,6 +92,7 @@ final class WindowManagerStateRestoration: NSObject, NSSecureCoding {
 
     init(windowControllersManager: WindowControllersManager) {
         self.windows = windowControllersManager.mainWindowControllers
+            .filter { $0.window?.isPopUpWindow == false }
             .map(WindowRestorationItem.init(windowController:))
         self.keyWindowIndex = windowControllersManager.lastKeyMainWindowController.flatMap {
             windowControllersManager.mainWindowControllers.firstIndex(of: $0)
@@ -99,9 +100,6 @@ final class WindowManagerStateRestoration: NSObject, NSSecureCoding {
     }
 
     func encode(with coder: NSCoder) {
-        // Skip Private Windows coding
-        // https://app.asana.com/0/1199230911884351/1200381133504358/f
-
         coder.encode(windows as NSArray, forKey: NSSecureCodingKeys.controllers)
         keyWindowIndex.map(coder.encode(forKey: NSSecureCodingKeys.keyWindowIndex))
     }

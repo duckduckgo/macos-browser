@@ -37,6 +37,10 @@ final class NavigationBarViewController: NSViewController {
     @IBOutlet weak var passwordManagementButton: NSButton!
     @IBOutlet weak var downloadsButton: MouseOverButton!
 
+    @IBOutlet var addressBarLeftToNavButtonsConstraint: NSLayoutConstraint!
+    @IBOutlet var addressBarLeftToSuperviewConstraint: NSLayoutConstraint!
+    @IBOutlet var addressBarProportionalWidthConstraint: NSLayoutConstraint!
+
     lazy var downloadsProgressView: CircularProgressView = {
         let bounds = downloadsButton.bounds
         let width: CGFloat = 27.0
@@ -114,6 +118,20 @@ final class NavigationBarViewController: NSViewController {
         updateDownloadsButton()
         updatePasswordManagementButton()
         updateBookmarksButton()
+
+        if view.window?.isPopUpWindow == true {
+            goBackButton.isHidden = true
+            goForwardButton.isHidden = true
+            refreshButton.isHidden = true
+            optionsButton.isHidden = true
+            addressBarLeftToSuperviewConstraint.isActive = true
+            addressBarLeftToNavButtonsConstraint.isActive = false
+            addressBarProportionalWidthConstraint.isActive = false
+        } else {
+            addressBarLeftToSuperviewConstraint.isActive = false
+            addressBarLeftToNavButtonsConstraint.isActive = true
+            addressBarProportionalWidthConstraint.isActive = true
+        }
     }
 
     func windowDidBecomeMain() {

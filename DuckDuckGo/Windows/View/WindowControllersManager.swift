@@ -69,9 +69,9 @@ extension WindowControllersManager {
         }
     }
     
-    func show(url: URL, newTab: Bool = false) {
+    func show(url: URL?, newTab: Bool = false) {
 
-        func show(url: URL, in windowController: MainWindowController) {
+        func show(url: URL?, in windowController: MainWindowController) {
             let viewController = windowController.mainViewController
             windowController.window?.makeKeyAndOrderFront(self)
 
@@ -82,44 +82,49 @@ extension WindowControllersManager {
                let firstTab = tabCollection.tabs.first,
                case .homepage = firstTab.content,
                !newTab {
-                firstTab.setContent(.url(url))
+                firstTab.setContent(url.map { .url($0) } ?? .homepage)
             } else if let tab = tabCollectionViewModel.selectedTabViewModel?.tab, !newTab {
-                tab.setContent(.url(url))
+                tab.setContent(url.map { .url($0) } ?? .homepage)
             } else {
-                let newTab = Tab(content: .url(url))
-                newTab.setContent(.url(url))
+                let newTab = Tab(content: url.map { .url($0) } ?? .homepage)
+                newTab.setContent(url.map { .url($0) } ?? .homepage)
                 tabCollectionViewModel.append(tab: newTab)
             }
         }
 
         // If there is a main window, open the URL in it
-        if let windowController = mainWindowControllers.first(where: { $0.window?.isMainWindow ?? false })
+        if let windowController = mainWindowControllers.first(where: { $0.window?.isMainWindow == true && $0.window?.isPopUpWindow == false })
             // If a last key window is available, open the URL in it
             ?? lastKeyMainWindowController
             // If there is any open window on the current screen, open the URL in it
-            ?? mainWindowControllers.first(where: { $0.window?.screen == NSScreen.main })
+            ?? mainWindowControllers.first(where: { $0.window?.screen == NSScreen.main && $0.window?.isPopUpWindow == false })
             // If there is any window available, open the URL in it
-            ?? mainWindowControllers.first {
+            ?? { mainWindowControllers.first?.window?.isPopUpWindow == false ? mainWindowControllers.first : nil }() {
 
             show(url: url, in: windowController)
             return
         }
 
         // Open a new window
-        WindowsManager.openNewWindow(with: url)
+        if let url = url {
+            WindowsManager.openNewWindow(with: url)
+        } else {
+            WindowsManager.openNewWindow()
+        }
     }
 
-    private func showTab(with content: Tab.TabContent) {
+    func showTab(with content: Tab.TabContent) {
         guard let windowController = mainWindowControllers.first(where: {
             let isMain = $0.window?.isMainWindow ?? false
             let hasMainChildWindow = $0.window?.childWindows?.contains { $0.isMainWindow } ?? false
 
-            return isMain || hasMainChildWindow
+            return $0.window?.isPopUpWindow == false && (isMain || hasMainChildWindow)
         }) else { return }
 
         let viewController = windowController.mainViewController
         let tabCollectionViewModel = viewController.tabCollectionViewModel
         tabCollectionViewModel.appendNewTab(with: content)
+        windowController.window?.orderFront(nil)
     }
 
 }

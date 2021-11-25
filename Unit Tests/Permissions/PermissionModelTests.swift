@@ -920,7 +920,7 @@ extension PermissionModelTests: WebViewPermissionsDelegate {
             fatalError()
         }
 
-        self.model.permissions(permissions, requestedForDomain: origin.host) { granted in
+        self.model.permissions(permissions, requestedFor: URL(origin)) { granted in
             decisionHandler(granted ? .grant : .deny)
         }
     }
@@ -935,7 +935,7 @@ extension PermissionModelTests: WebViewPermissionsDelegate {
             fatalError()
         }
 
-        self.model.permissions(permissions, requestedForDomain: url.host, decisionHandler: decisionHandler)
+        self.model.permissions(permissions, requestedFor: url, decisionHandler: decisionHandler)
     }
 
     @objc(_webView:mediaCaptureStateDidChange:)
@@ -945,7 +945,7 @@ extension PermissionModelTests: WebViewPermissionsDelegate {
 
     @objc(_webView:requestGeolocationPermissionForFrame:decisionHandler:)
     func webView(_ webView: WKWebView, requestGeolocationPermissionFor frame: WKFrameInfo, decisionHandler: @escaping (Bool) -> Void) {
-        self.model.permissions([.geolocation], requestedForDomain: frame.request.url?.host, decisionHandler: decisionHandler)
+        self.model.permissions([.geolocation], requestedFor: frame.request.url, decisionHandler: decisionHandler)
     }
 
     @objc(_webView:requestGeolocationPermissionForOrigin:initiatedByFrame:decisionHandler:)
@@ -954,7 +954,7 @@ extension PermissionModelTests: WebViewPermissionsDelegate {
                  requestGeolocationPermissionFor origin: WKSecurityOrigin,
                  initiatedBy frame: WKFrameInfo,
                  decisionHandler: @escaping (WKPermissionDecision) -> Void) {
-        self.model.permissions([.geolocation], requestedForDomain: frame.request.url?.host) { granted in
+        self.model.permissions([.geolocation], requestedFor: frame.request.url) { granted in
             decisionHandler(granted ? .grant : .deny)
         }
     }

@@ -174,7 +174,7 @@ struct UserText {
     static let permissionCamera = NSLocalizedString("permission.camera", value: "Camera", comment: "Camera input media device name")
     static let permissionCameraAndMicrophone = NSLocalizedString("permission.cameraAndmicrophone", value: "use your Camera and Microphone", comment: "camera and microphone input media devices name")
     static let permissionGeolocation = NSLocalizedString("permission.geolocation", value: "Geolocation", comment: "User's Geolocation permission access name")
-    static let permissionPopups = NSLocalizedString("permission.popups", value: "PopUp Windows", comment: "Open Pop Up Windows permission access name")
+    static let permissionPopups = NSLocalizedString("permission.popups", value: "Pop-ups", comment: "Open Pop Up Windows permission access name")
 
     static let permissionMuteFormat = NSLocalizedString("permission.mute", value: "Pause %@", comment: "Temporarily pause input media device %@ access")
     static let permissionUnmuteFormat = NSLocalizedString("permission.unmute", value: "Resume %@", comment: "Resume input media device %@ access")
@@ -198,6 +198,8 @@ struct UserText {
     static let privacyDashboardPermissionAsk = NSLocalizedString("dashboard.permission.ask", value: "Ask", comment: "Privacy Dashboard: Website should always Ask for permission for input media device access")
     static let privacyDashboardPermissionAlwaysAllow = NSLocalizedString("dashboard.permission.allow", value: "Allow Always", comment: "Privacy Dashboard: Website can always access input media device")
     static let privacyDashboardPermissionAlwaysDeny = NSLocalizedString("dashboard.permission.deny", value: "Deny Always", comment: "Privacy Dashboard: Website can never access input media device")
+
+    static let privacyDashboardPopupsAlwaysAsk = NSLocalizedString("dashboard.popups.ask", value: "Notify", comment: "Make PopUp Windows always asked from user for current domain")
 
     static let preferences = NSLocalizedString("preferences", value: "Preferences", comment: "Menu item for opening preferences")
 

@@ -173,7 +173,9 @@ final class AddressBarButtonsViewController: NSViewController {
 
     override func viewDidLayout() {
         super.viewDidLayout()
-        updateTrackingAreaForHover()
+        if view.window?.isPopUpWindow == false {
+            updateTrackingAreaForHover()
+        }
     }
 
     func updateTrackingAreaForHover() {
@@ -376,8 +378,18 @@ final class AddressBarButtonsViewController: NSViewController {
     }
 
     private func setupButtons() {
-        bookmarkButton.position = .right
-        privacyEntryPointButton.position = .left
+        if view.window?.isPopUpWindow == true {
+            privacyEntryPointButton.position = .free
+            cameraButton.position = .free
+            geolocationButton.position = .free
+            popupsButton.position = .free
+            microphoneButton.position = .free
+            bookmarkButton.isHidden = true
+        } else {
+            bookmarkButton.position = .right
+            privacyEntryPointButton.position = .left
+        }
+
         privacyEntryPointButton.contentTintColor = .privacyEnabledColor
         imageButton.applyFaviconStyle()
     }

@@ -32,8 +32,9 @@ final class AddressBarTextField: NSTextField {
         }
     }
 
-    var suggestionContainerViewModel: SuggestionContainerViewModel! {
+    var suggestionContainerViewModel: SuggestionContainerViewModel? {
         didSet {
+            guard suggestionContainerViewModel != nil else { return }
             initSuggestionWindow()
             subscribeToSuggestionItems()
             subscribeToSelectedSuggestionViewModel()
@@ -76,19 +77,19 @@ final class AddressBarTextField: NSTextField {
 
     func clearValue() {
         value = .text("")
-        suggestionContainerViewModel.clearSelection()
-        suggestionContainerViewModel.clearUserStringValue()
+        suggestionContainerViewModel?.clearSelection()
+        suggestionContainerViewModel?.clearUserStringValue()
         hideSuggestionWindow()
     }
 
     private var isHandlingUserAppendingText = false
 
     private func subscribeToSuggestionItems() {
-        suggestionItemsCancellable = suggestionContainerViewModel.suggestionContainer.$suggestions
+        suggestionItemsCancellable = suggestionContainerViewModel?.suggestionContainer.$suggestions
             .receive(on: DispatchQueue.main)
             .sink { [weak self] _ in
                 guard let self = self else { return }
-                if self.suggestionContainerViewModel.suggestionContainer.suggestions?.count ?? 0 > 0 {
+                if self.suggestionContainerViewModel?.suggestionContainer.suggestions?.count ?? 0 > 0 {
                     self.showSuggestionWindow()
                     Pixel.fire(.suggestionsDisplayed(self.suggestionsContainLocalItems()))
                 }
@@ -97,7 +98,7 @@ final class AddressBarTextField: NSTextField {
 
     private func subscribeToSelectedSuggestionViewModel() {
         selectedSuggestionViewModelCancellable =
-            suggestionContainerViewModel.$selectedSuggestionViewModel.receive(on: DispatchQueue.main).sink { [weak self] _ in
+            suggestionContainerViewModel?.$selectedSuggestionViewModel.receive(on: DispatchQueue.main).sink { [weak self] _ in
                 self?.displaySelectedSuggestionViewModel()
         }
     }
@@ -145,8 +146,8 @@ final class AddressBarTextField: NSTextField {
         }
         guard suggestionWindow.isVisible else { return }
 
-        let originalStringValue = suggestionContainerViewModel.userStringValue
-        guard let selectedSuggestionViewModel = suggestionContainerViewModel.selectedSuggestionViewModel else {
+        let originalStringValue = suggestionContainerViewModel?.userStringValue
+        guard let selectedSuggestionViewModel = suggestionContainerViewModel?.selectedSuggestionViewModel else {
             if let originalStringValue = originalStringValue {
                 value = Value(stringValue: originalStringValue, userTyped: true)
             } else {
@@ -168,9 +169,9 @@ final class AddressBarTextField: NSTextField {
     }
 
     private func addressBarEnterPressed() {
-        suggestionContainerViewModel.clearUserStringValue()
+        suggestionContainerViewModel?.clearUserStringValue()
 
-        let suggestion = suggestionContainerViewModel.selectedSuggestionViewModel?.suggestion
+        let suggestion = suggestionContainerViewModel?.selectedSuggestionViewModel?.suggestion
         if NSApp.isCommandPressed {
             openNewTab(selected: NSApp.isShiftPressed, suggestion: suggestion)
         } else {
@@ -489,7 +490,7 @@ final class AddressBarTextField: NSTextField {
     private lazy var suggestionViewController: SuggestionViewController = {
         NSStoryboard.suggestion.instantiateController(identifier: "SuggestionViewController") { coder in
             let suggestionViewController = SuggestionViewController(coder: coder,
-                                                                    suggestionContainerViewModel: self.suggestionContainerViewModel)
+                                                                    suggestionContainerViewModel: self.suggestionContainerViewModel!)
             suggestionViewController?.delegate = self
             return suggestionViewController
         }
@@ -505,7 +506,7 @@ final class AddressBarTextField: NSTextField {
 
     private func suggestionsContainLocalItems() -> SuggestionListChacteristics {
         var characteristics = SuggestionListChacteristics(hasBookmark: false, hasFavorite: false, hasHistoryEntry: false)
-        for suggestion in self.suggestionContainerViewModel.suggestionContainer.suggestions ?? [] {
+        for suggestion in self.suggestionContainerViewModel?.suggestionContainer.suggestions ?? [] {
             if case .bookmark(title: _, url: _, isFavorite: let isFavorite) = suggestion {
                 if isFavorite {
                     characteristics.hasFavorite = true
@@ -544,7 +545,6 @@ final class AddressBarTextField: NSTextField {
 
     private func hideSuggestionWindow() {
         guard let window = window, let suggestionWindow = suggestionWindowController?.window else {
-            os_log("AddressBarTextField: Window not available", type: .error)
             return
         }
 
@@ -557,7 +557,6 @@ final class AddressBarTextField: NSTextField {
 
     private func layoutSuggestionWindow() {
         guard let window = window, let suggestionWindow = suggestionWindowController?.window else {
-            os_log("AddressBarTextField: Window not available", type: .error)
             return
         }
         guard let superview = superview else {
@@ -593,7 +592,7 @@ extension Notification.Name {
 extension AddressBarTextField: NSTextFieldDelegate {
 
     func controlTextDidEndEditing(_ obj: Notification) {
-        suggestionContainerViewModel.clearUserStringValue()
+        suggestionContainerViewModel?.clearUserStringValue()
         hideSuggestionWindow()
         updateValue()
     }
@@ -617,15 +616,15 @@ extension AddressBarTextField: NSTextFieldDelegate {
             self.selectToTheEnd(from: stringValueWithoutSuffix.count)
 
         } else {
-            suggestionContainerViewModel.clearSelection()
+            suggestionContainerViewModel?.clearSelection()
             self.value = Value(stringValue: stringValueWithoutSuffix, userTyped: true)
         }
 
         if stringValue.isEmpty {
-            suggestionContainerViewModel.clearUserStringValue()
+            suggestionContainerViewModel?.clearUserStringValue()
             hideSuggestionWindow()
         } else {
-            suggestionContainerViewModel.setUserStringValue(stringValueWithoutSuffix,
+            suggestionContainerViewModel?.setUserStringValue(stringValueWithoutSuffix,
                                                             userAppendedStringToTheEnd: isHandlingUserAppendingText)
         }
 
@@ -634,7 +633,7 @@ extension AddressBarTextField: NSTextFieldDelegate {
     }
 
     func textView(_ textView: NSTextView, userTypedString typedString: String, at range: NSRange) {
-        let userTypedLength = suggestionContainerViewModel.userStringValue?.utf16.count ?? 0
+        let userTypedLength = suggestionContainerViewModel?.userStringValue?.utf16.count ?? 0
         let currentValueLength = self.stringValueWithoutSuffix.utf16.count
         let selectedSuggestionRange = NSRange(location: userTypedLength, length: currentValueLength - userTypedLength)
         assert(selectedSuggestionRange.upperBound <= currentValueLength)
@@ -671,9 +670,9 @@ extension AddressBarTextField: NSTextFieldDelegate {
         if suggestionWindowController?.window?.isVisible ?? false {
             switch commandSelector {
             case #selector(NSResponder.moveDown(_:)):
-                suggestionContainerViewModel.selectNextIfPossible(); return true
+                suggestionContainerViewModel?.selectNextIfPossible(); return true
             case #selector(NSResponder.moveUp(_:)):
-                suggestionContainerViewModel.selectPreviousIfPossible(); return true
+                suggestionContainerViewModel?.selectPreviousIfPossible(); return true
             case #selector(NSResponder.deleteBackward(_:)),
                 #selector(NSResponder.deleteForward(_:)),
                 #selector(NSResponder.deleteToMark(_:)),
@@ -683,7 +682,7 @@ extension AddressBarTextField: NSTextFieldDelegate {
                 #selector(NSResponder.deleteToEndOfParagraph(_:)),
                 #selector(NSResponder.deleteToBeginningOfLine(_:)),
                 #selector(NSResponder.deleteBackwardByDecomposingPreviousCharacter(_:)):
-                suggestionContainerViewModel.clearSelection(); return false
+                suggestionContainerViewModel?.clearSelection(); return false
             default:
                 return false
             }
@@ -697,7 +696,7 @@ extension AddressBarTextField: NSTextFieldDelegate {
 extension AddressBarTextField: SuggestionViewControllerDelegate {
 
     func suggestionViewControllerDidConfirmSelection(_ suggestionViewController: SuggestionViewController) {
-        let suggestion = suggestionContainerViewModel.selectedSuggestionViewModel?.suggestion
+        let suggestion = suggestionContainerViewModel?.selectedSuggestionViewModel?.suggestion
         if NSApp.isCommandPressed {
             openNewTab(selected: NSApp.isShiftPressed, suggestion: suggestion)
             return
