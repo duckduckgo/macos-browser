@@ -201,6 +201,8 @@ final class AddressBarViewController: NSViewController {
         updateShadowView(firstResponder: firstResponder)
         inactiveBackgroundView.alphaValue = firstResponder ? 0 : 1
         activeBackgroundView.alphaValue = firstResponder ? 1 : 0
+        
+        activeBackgroundView.layer?.borderColor = NSColor.controlAccentColor.withAlphaComponent(0.6).cgColor
     }
 
     private func updateShadowView(firstResponder: Bool) {
@@ -212,10 +214,10 @@ final class AddressBarViewController: NSViewController {
         }
 
         suggestionsVisibleCancellable = addressBarTextField.suggestionWindowVisible.sink { [weak self] visible in
-            self?.shadowView.shadowSides = visible ? [.left, .top, .right] : .all
-            self?.shadowView.shadowColor = visible ? .suggestionsShadowColor : .addressBarShadowColor
-            self?.shadowView.shadowRadius = visible ? 8.0 : 4.0
-
+            self?.shadowView.shadowSides = visible ? [.left, .top, .right] : []
+            self?.shadowView.shadowColor = visible ? .suggestionsShadowColor : .clear
+            self?.shadowView.shadowRadius = visible ? 8.0 : 0.0
+            
             self?.activeBackgroundView.isHidden = visible
             self?.activeBackgroundViewWithSuggestions.isHidden = !visible
         }
