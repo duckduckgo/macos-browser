@@ -19,7 +19,8 @@
 import Foundation
 
 final class PermissionAuthorizationQuery {
-    let url: URL
+    let url: URL?
+    let domain: String
     let permissions: [PermissionType]
     var wasShownOnce: Bool = false
 
@@ -30,7 +31,8 @@ final class PermissionAuthorizationQuery {
     }
     private var decisionHandler: ((Decision) -> Void)?
 
-    init(url: URL, permissions: [PermissionType], decisionHandler: @escaping (Decision) -> Void) {
+    init(domain: String, url: URL?, permissions: [PermissionType], decisionHandler: @escaping (Decision) -> Void) {
+        self.domain = domain
         self.url = url
         self.permissions = permissions
         self.decisionHandler = decisionHandler

@@ -77,14 +77,14 @@ extension URL {
         return URL(string: "about:home")!
     }
 
-    init?(_ securityOrigin: WKSecurityOrigin) {
-        let port: String
-        if securityOrigin.port != NavigationalScheme(rawValue: securityOrigin.protocol)?.port {
-            port = ":\(securityOrigin.port)"
-        } else {
-            port = ""
+    var domain: String? {
+        if let host = host {
+            return host
         }
-        self.init(string: securityOrigin.protocol + "://" + securityOrigin.host + port)
+        if self.scheme == NavigationalScheme.file.rawValue {
+            return .localhost
+        }
+        return nil
     }
 
     // MARK: Pixel
@@ -181,6 +181,7 @@ extension URL {
 
         case http
         case https
+        case file
 
         func separated() -> String {
             self.rawValue + Self.separator
@@ -190,6 +191,7 @@ extension URL {
             switch self {
             case .http: return 80
             case .https: return 443
+            case .file: return 0
             }
         }
     }

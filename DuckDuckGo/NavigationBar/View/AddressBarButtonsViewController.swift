@@ -321,7 +321,7 @@ final class AddressBarButtonsViewController: NSViewController {
         permissions[.camera] = selectedTabViewModel.usedPermissions.camera
         permissions[.microphone] = selectedTabViewModel.usedPermissions.microphone
 
-        PermissionContextMenu(permissions: permissions,
+        PermissionContextMenu(permissions: permissions.map { ($0, $1) },
                               domain: selectedTabViewModel.tab.content.url?.host ?? "",
                               delegate: self)
             .popUp(positioning: nil, at: NSPoint(x: 0, y: sender.bounds.height), in: sender)
@@ -339,8 +339,8 @@ final class AddressBarButtonsViewController: NSViewController {
             return
         }
 
-        PermissionContextMenu(permissions: [.microphone: state],
-                              domain: selectedTabViewModel.tab.content.url?.host ?? "",
+        PermissionContextMenu(permissions: [(.microphone, state)],
+                              domain: selectedTabViewModel.tab.content.url?.domain ?? "",
                               delegate: self)
             .popUp(positioning: nil, at: NSPoint(x: 0, y: sender.bounds.height), in: sender)
     }
@@ -357,8 +357,8 @@ final class AddressBarButtonsViewController: NSViewController {
             return
         }
 
-        PermissionContextMenu(permissions: [.geolocation: state],
-                              domain: selectedTabViewModel.tab.content.url?.host ?? "",
+        PermissionContextMenu(permissions: [(.geolocation, state)],
+                              domain: selectedTabViewModel.tab.content.url?.domain ?? "",
                               delegate: self)
             .popUp(positioning: nil, at: NSPoint(x: 0, y: sender.bounds.height), in: sender)
     }
@@ -371,8 +371,17 @@ final class AddressBarButtonsViewController: NSViewController {
             return
         }
 
-        PermissionContextMenu(permissions: [.popups: state],
-                              domain: selectedTabViewModel.tab.content.url?.host ?? "",
+        let permissions: [(PermissionType, PermissionState)]
+        if case .requested = state {
+            permissions = selectedTabViewModel.tab.permissions.authorizationQueries.reduce(into: .init()) {
+                guard $1.permissions.contains(.popups) else { return }
+                $0.append( (.popups, .requested($1)) )
+            }
+        } else {
+            permissions = [(.popups, state)]
+        }
+        PermissionContextMenu(permissions: permissions,
+                              domain: selectedTabViewModel.tab.content.url?.domain ?? "",
                               delegate: self)
             .popUp(positioning: nil, at: NSPoint(x: 0, y: sender.bounds.height), in: sender)
     }
@@ -729,8 +738,8 @@ extension AddressBarButtonsViewController: PermissionContextMenuDelegate {
             tabCollectionViewModel.selectedTabViewModel?.tab.permissions.revoke(permission)
         }
     }
-    func permissionContextMenu(_ menu: PermissionContextMenu, allowPermission permission: PermissionType) {
-        tabCollectionViewModel.selectedTabViewModel?.tab.permissions.allow(permission)
+    func permissionContextMenu(_ menu: PermissionContextMenu, allowPermissionQuery query: PermissionAuthorizationQuery) {
+        tabCollectionViewModel.selectedTabViewModel?.tab.permissions.allow(query)
     }
     func permissionContextMenu(_ menu: PermissionContextMenu, alwaysAllowPermission permission: PermissionType) {
         PermissionManager.shared.setPermission(true, forDomain: menu.domain, permissionType: permission)

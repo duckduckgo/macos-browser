@@ -626,11 +626,17 @@ extension BrowserTabViewController: WKUIDelegate {
                        canBeClosedWithBack: true)
         }
         guard let parentTab = webView.tab else { return nil }
+        func nextQuery(parentTab: Tab) -> PermissionAuthorizationQuery? {
+            parentTab.permissions.authorizationQueries.first(where: { $0.permissions.contains(.popups) })
+        }
 
         var shouldOpenPopUp = navigationAction.isUserInitiated
         if !shouldOpenPopUp {
-            let url = navigationAction.sourceFrame.request.url
-            parentTab.permissions.permissions([.popups], requestedFor: url) { [weak parentTab] granted in
+            let url = navigationAction.request.url
+            parentTab.permissions.permissions([.popups],
+                                              requestedForDomain: navigationAction.sourceFrame.request.url?.domain,
+                                              url: url) { [weak parentTab] granted in
+
                 guard let parentTab = parentTab else { return }
 
                 switch (granted, shouldOpenPopUp) {
@@ -643,7 +649,7 @@ extension BrowserTabViewController: WKUIDelegate {
                     let tab = makeTab(parentTab: parentTab, content: .url(url))
                     WindowsManager.openPopUpWindow(with: tab)
 
-                    parentTab.permissions.permissions.popups.popupOpened()
+                    parentTab.permissions.permissions.popups.popupOpened(nextQuery: nextQuery(parentTab: parentTab))
 
                 case (false, _):
                     return
@@ -657,7 +663,7 @@ extension BrowserTabViewController: WKUIDelegate {
 
         let tab = makeTab(parentTab: parentTab, content: .none)
         WindowsManager.openPopUpWindow(with: tab)
-        parentTab.permissions.permissions.popups.popupOpened()
+        parentTab.permissions.permissions.popups.popupOpened(nextQuery: nextQuery(parentTab: parentTab))
 
         // WebKit loads the request in the returned web view.
         return tab.webView
@@ -689,7 +695,7 @@ extension BrowserTabViewController: WKUIDelegate {
             return
         }
 
-        webView.tab?.permissions.permissions(permissions, requestedFor: URL(origin)) { granted in
+        webView.tab?.permissions.permissions(permissions, requestedForDomain: origin.host) { granted in
             decisionHandler(granted ? .grant : .deny)
         } ?? /* Tab deallocated: */ {
             decisionHandler(.deny)
@@ -709,7 +715,7 @@ extension BrowserTabViewController: WKUIDelegate {
             return
         }
 
-        webView.tab?.permissions.permissions(permissions, requestedFor: url, decisionHandler: decisionHandler)
+        webView.tab?.permissions.permissions(permissions, requestedForDomain: url.host, decisionHandler: decisionHandler)
             ?? /* Tab deallocated: */ {
                 decisionHandler(false)
             }()
@@ -723,7 +729,7 @@ extension BrowserTabViewController: WKUIDelegate {
     // https://github.com/WebKit/WebKit/blob/9d7278159234e0bfa3d27909a19e695928f3b31e/Source/WebKit/UIProcess/API/Cocoa/WKUIDelegatePrivate.h#L131
     @objc(_webView:requestGeolocationPermissionForFrame:decisionHandler:)
     func webView(_ webView: WKWebView, requestGeolocationPermissionFor frame: WKFrameInfo, decisionHandler: @escaping (Bool) -> Void) {
-        webView.tab?.permissions.permissions([.geolocation], requestedFor: frame.request.url, decisionHandler: decisionHandler)
+        webView.tab?.permissions.permissions([.geolocation], requestedForDomain: frame.request.url?.host, decisionHandler: decisionHandler)
             ?? /* Tab deallocated: */ {
                 decisionHandler(false)
             }()
@@ -736,7 +742,7 @@ extension BrowserTabViewController: WKUIDelegate {
                  requestGeolocationPermissionFor origin: WKSecurityOrigin,
                  initiatedBy frame: WKFrameInfo,
                  decisionHandler: @escaping (WKPermissionDecision) -> Void) {
-        webView.tab?.permissions.permissions([.geolocation], requestedFor: frame.request.url) { granted in
+        webView.tab?.permissions.permissions([.geolocation], requestedForDomain: frame.request.url?.host) { granted in
             decisionHandler(granted ? .grant : .deny)
         } ?? /* Tab deallocated: */ {
             decisionHandler(.deny)

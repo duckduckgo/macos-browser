@@ -22,12 +22,13 @@ import WebKit
 import AVFoundation
 import CoreLocation
 
+// swiftlint:disable:next type_body_length
 final class PermissionModel {
 
     @PublishedAfter var permissions = Permissions()
     @PublishedAfter var authorizationQuery: PermissionAuthorizationQuery?
 
-    private var authorizationQueries = [PermissionAuthorizationQuery]() {
+    private(set) var authorizationQueries = [PermissionAuthorizationQuery]() {
         didSet {
             authorizationQuery = authorizationQueries.first
         }
@@ -116,8 +117,11 @@ final class PermissionModel {
         }
     }
 
-    private func queryAuthorization(for permissions: [PermissionType], url: URL, decisionHandler: @escaping (Bool) -> Void) {
-        let query = PermissionAuthorizationQuery(url: url, permissions: permissions) { [weak self] decision in
+    private func queryAuthorization(for permissions: [PermissionType],
+                                    domain: String,
+                                    url: URL?,
+                                    decisionHandler: @escaping (Bool) -> Void) {
+        let query = PermissionAuthorizationQuery(domain: domain, url: url, permissions: permissions) { [weak self] decision in
             let query: PermissionAuthorizationQuery?
             let granted: Bool
             switch decision {
@@ -172,7 +176,7 @@ final class PermissionModel {
                                    to decision: Bool?) {
 
         // If Always Deny for the current host: revoke the permission
-        guard webView?.url?.host?.dropWWW() == domain,
+        guard webView?.url?.domain?.dropWWW() == domain,
            decision == false,
            self.permissions[permissionType] != nil
         else {
@@ -192,8 +196,8 @@ final class PermissionModel {
         webView?.setPermissions([permission], muted: muted)
     }
 
-    func allow(_ permission: PermissionType) {
-        guard case .requested(let query) = self.permissions[permission] else {
+    func allow(_ query: PermissionAuthorizationQuery) {
+        guard self.authorizationQueries.contains(where: { $0 === query }) else {
             assertionFailure("unexpected Permission state")
             return
         }
@@ -201,7 +205,7 @@ final class PermissionModel {
     }
 
     func revoke(_ permission: PermissionType) {
-        if let domain = webView?.url?.host,
+        if let domain = webView?.url?.domain,
            permissionManager.permission(forDomain: domain, permissionType: permission) == true {
             permissionManager.removePermission(forDomain: domain, permissionType: permission)
         }
@@ -268,9 +272,11 @@ final class PermissionModel {
         return true
     }
 
-    func permissions(_ permissions: [PermissionType], requestedFor url: URL?, decisionHandler: @escaping (Bool) -> Void) {
-        guard let url = url,
-              let domain = url.host,
+    func permissions(_ permissions: [PermissionType],
+                     requestedForDomain domain: String?,
+                     url: URL? = nil,
+                     decisionHandler: @escaping (Bool) -> Void) {
+        guard let domain = domain,
               !domain.isEmpty,
               !permissions.isEmpty
         else {
@@ -282,7 +288,7 @@ final class PermissionModel {
         let shouldGrant = shouldGrantPermission(for: permissions, requestedForDomain: domain)
         switch shouldGrant {
         case .none:
-            queryAuthorization(for: permissions, url: url, decisionHandler: decisionHandler)
+            queryAuthorization(for: permissions, domain: domain, url: url, decisionHandler: decisionHandler)
         case .some(true):
             decisionHandler(true)
         case .some(false):
