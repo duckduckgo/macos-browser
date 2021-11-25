@@ -1,5 +1,5 @@
 //
-//  UndoFireproofingViewController.swift
+//  PopoverMessageViewController.swift
 //
 //  Copyright © 2021 DuckDuckGo. All rights reserved.
 //
@@ -18,34 +18,34 @@
 
 import AppKit
 
-final class UndoFireproofingViewController: NSViewController {
+final class PopoverMessageViewController: NSViewController {
 
     enum Constants {
-        static let storyboardName = "Fireproofing"
-        static let identifier = "UndoFireproofingViewController"
+        static let storyboardName = "MessageViews"
+        static let identifier = "PopoverMessageView"
         static let autoDismissDuration: TimeInterval = 2.5
     }
 
-    static func create(for domain: String) -> UndoFireproofingViewController {
+    static func createWithMessage(_ message: String) -> PopoverMessageViewController {
         let storyboard = NSStoryboard(name: Constants.storyboardName, bundle: nil)
 
         return storyboard.instantiateController(identifier: Constants.identifier) { coder in
-            return UndoFireproofingViewController(coder: coder, domain: domain.dropWWW())
+            return PopoverMessageViewController(coder: coder, message: message)
         }
     }
 
     @IBOutlet weak var titleLabel: NSTextField!
 
     private var timer: Timer?
-    private var domain: String
+    private var message: String
 
-    init?(coder: NSCoder, domain: String) {
-        self.domain = domain
+    init?(coder: NSCoder, message: String) {
+        self.message = message
         super.init(coder: coder)
     }
 
     required init?(coder: NSCoder) {
-        fatalError("You must create this view controller with a domain.")
+        fatalError("You must create this view controller with a message.")
     }
 
     deinit {
@@ -54,7 +54,7 @@ final class UndoFireproofingViewController: NSViewController {
 
     override func viewDidLoad() {
         super.viewDidLoad()
-        self.titleLabel.stringValue = UserText.domainIsFireproof(domain: domain)
+        self.titleLabel.stringValue = message
 
         if let mouseOverView = self.view as? MouseOverView {
             mouseOverView.delegate = self
@@ -64,6 +64,15 @@ final class UndoFireproofingViewController: NSViewController {
     override func viewDidAppear() {
         super.viewDidAppear()
         scheduleAutoDismissTimer()
+    }
+
+    func show(onParent parent: NSViewController, relativeTo view: NSView) {
+        let frame = view.frame.insetFromLineOfDeath()
+        parent.present(self,
+                     asPopoverRelativeTo: frame,
+                     of: view,
+                     preferredEdge: .maxY,
+                     behavior: .applicationDefined)
     }
 
     private func cancelAutoDismissTimer() {
@@ -81,7 +90,7 @@ final class UndoFireproofingViewController: NSViewController {
 
 }
 
-extension UndoFireproofingViewController: MouseOverViewDelegate {
+extension PopoverMessageViewController: MouseOverViewDelegate {
 
     func mouseOverView(_ mouseOverView: MouseOverView, isMouseOver: Bool) {
         if isMouseOver {

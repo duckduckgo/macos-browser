@@ -616,40 +616,7 @@ extension Tab: ContentBlockerUserScriptDelegate {
 
 }
 
-extension Tab: EmailManagerRequestDelegate {
-
-    // swiftlint:disable function_parameter_count
-    func emailManager(_ emailManager: EmailManager,
-                      requested url: URL,
-                      method: String,
-                      headers: [String: String],
-                      parameters: [String: String]?,
-                      httpBody: Data?,
-                      timeoutInterval: TimeInterval,
-                      completion: @escaping (Data?, Error?) -> Void) {
-        let currentQueue = OperationQueue.current
-
-        let finalURL: URL
-
-        if let parameters = parameters {
-            finalURL = (try? url.addParameters(parameters)) ?? url
-        } else {
-            finalURL = url
-        }
-
-        var request = URLRequest(url: finalURL, timeoutInterval: timeoutInterval)
-        request.allHTTPHeaderFields = headers
-        request.httpMethod = method
-        request.httpBody = httpBody
-        URLSession.shared.dataTask(with: request) { (data, _, error) in
-            currentQueue?.addOperation {
-                completion(data, error)
-            }
-        }.resume()
-    }
-    // swiftlint:enable function_parameter_count
-    
-}
+extension Tab: EmailManagerRequestDelegate { }
 
 extension Tab: SecureVaultManagerDelegate {
 

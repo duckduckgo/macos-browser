@@ -1,5 +1,5 @@
 //
-//  EmailUrlExtensions.swift
+//  NSNotificationName+EmailManager.swift
 //
 //  Copyright © 2021 DuckDuckGo. All rights reserved.
 //
@@ -19,21 +19,8 @@
 import Foundation
 import BrowserServicesKit
 
-extension EmailUrls {
+extension NSNotification.Name {
 
-    private struct Url {
-        static let emailLandingPage = "https://duckduckgo.com/email/enable-autofill"
-        static let emailGenerateTokenPage = "https://duckduckgo.com/email/new-address"
-        static let emailAuthenticationHosts = ["quack.duckduckgo.com", "quackdev.duckduckgo.com"]
-    }
-
-    var emailLandingPage: URL {
-        return URL(string: Url.emailLandingPage)!
-    }
-
-    func shouldAuthenticateWithEmailCredentials(url: URL) -> Bool {
-        guard let host = url.host else { return false }
-        return Url.emailAuthenticationHosts.contains(host)
-    }
+    static let privateEmailCopiedToClipboard = NSNotification.Name("privateEmailCopiedToClipboard")
 
 }

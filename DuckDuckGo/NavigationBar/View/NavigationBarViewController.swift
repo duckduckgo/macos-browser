@@ -102,7 +102,7 @@ final class NavigationBarViewController: NSViewController {
         setupNavigationButtonMenus()
         subscribeToSelectedTabViewModel()
         listenToPasswordManagerNotifications()
-        listenToFireproofNotifications()
+        listenToMessageNotifications()
         subscribeToDownloads()
 
         optionsButton.sendAction(on: .leftMouseDown)
@@ -182,11 +182,26 @@ final class NavigationBarViewController: NSViewController {
         }
     }
 
-    func listenToFireproofNotifications() {
+    func listenToMessageNotifications() {
         NotificationCenter.default.addObserver(self,
                                                selector: #selector(showFireproofingFeedback(_:)),
                                                name: FireproofDomains.Constants.newFireproofDomainNotification,
                                                object: nil)
+
+        NotificationCenter.default.addObserver(self,
+                                               selector: #selector(showPrivateEmailCopiedToClipboard(_:)),
+                                               name: Notification.Name.privateEmailCopiedToClipboard,
+                                               object: nil)
+    }
+
+    @objc private func showPrivateEmailCopiedToClipboard(_ sender: Notification) {
+        guard view.window?.isKeyWindow == true else { return }
+
+        DispatchQueue.main.async {
+            let viewController = PopoverMessageViewController.createWithMessage(UserText.privateEmailCopiedToClipboard)
+            viewController.show(onParent: self, relativeTo: self.optionsButton)
+        }
+
     }
 
     @objc private func showFireproofingFeedback(_ sender: Notification) {
@@ -194,14 +209,8 @@ final class NavigationBarViewController: NSViewController {
             let domain = sender.userInfo?[FireproofDomains.Constants.newFireproofDomainKey] as? String else { return }
 
         DispatchQueue.main.async {
-            let viewController = UndoFireproofingViewController.create(for: domain)
-            let frame = self.optionsButton.frame.insetFromLineOfDeath()
-
-            self.present(viewController,
-                         asPopoverRelativeTo: frame,
-                         of: self.optionsButton,
-                         preferredEdge: .maxY,
-                         behavior: .applicationDefined)
+            let viewController = PopoverMessageViewController.createWithMessage(UserText.domainIsFireproof(domain: domain))
+            viewController.show(onParent: self, relativeTo: self.optionsButton)
         }
     }
 
