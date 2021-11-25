@@ -83,6 +83,16 @@ final class AddressBarViewController: NSViewController {
                                                selector: #selector(refreshAddressBarAppearance(_:)),
                                                name: FireproofDomains.Constants.allowedDomainsChangedNotification,
                                                object: nil)
+        
+        NotificationCenter.default.addObserver(self,
+                                               selector: #selector(refreshAddressBarAppearance(_:)),
+                                               name: NSWindow.didBecomeKeyNotification,
+                                               object: nil)
+        
+        NotificationCenter.default.addObserver(self,
+                                               selector: #selector(refreshAddressBarAppearance(_:)),
+                                               name: NSWindow.didResignKeyNotification,
+                                               object: nil)
     }
 
     override func viewWillAppear() {
@@ -250,6 +260,20 @@ final class AddressBarViewController: NSViewController {
     @objc private func refreshAddressBarAppearance(_ sender: Any) {
         self.updateMode()
         self.updateButtons()
+        
+        guard let window = view.window else { return }
+        
+        NSAppearance.withAppAppearance {
+            if window.isKeyWindow {
+                activeBackgroundView.layer?.borderWidth = 2.0
+                activeBackgroundView.layer?.borderColor = NSColor.controlAccentColor.withAlphaComponent(0.6).cgColor
+                activeBackgroundView.layer?.backgroundColor = NSColor.addressBarBackgroundColor.cgColor
+            } else {
+                activeBackgroundView.layer?.borderWidth = 0
+                activeBackgroundView.layer?.borderColor = nil
+                activeBackgroundView.layer?.backgroundColor = NSColor.inactiveSearchBarBackground.cgColor
+            }
+        }
     }
 
     private func updateButtons() {
