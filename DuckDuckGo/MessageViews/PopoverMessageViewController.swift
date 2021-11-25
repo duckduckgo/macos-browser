@@ -67,9 +67,9 @@ final class PopoverMessageViewController: NSViewController {
     }
 
     func show(onParent parent: NSViewController, relativeTo view: NSView) {
-        let frame = view.frame.insetFromLineOfDeath()
+        let rect = view.bounds.insetFromLineOfDeath()
         parent.present(self,
-                     asPopoverRelativeTo: frame,
+                     asPopoverRelativeTo: rect,
                      of: view,
                      preferredEdge: .maxY,
                      behavior: .applicationDefined)
