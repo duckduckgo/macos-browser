@@ -218,6 +218,10 @@ final class BrowserTabViewController: NSViewController {
             self.homepageView.removeFromSuperview()
             removePreferencesPage()
             self.webView?.removeFromSuperview()
+            guard bookmarksViewController.parent == nil else {
+                return
+            }
+            
             self.addChild(bookmarksViewController)
             view.addAndLayout(bookmarksViewController.view)
 
@@ -225,6 +229,10 @@ final class BrowserTabViewController: NSViewController {
             self.homepageView.removeFromSuperview()
             removeBookmarksPage()
             self.webView?.removeFromSuperview()
+            guard preferencesViewController.parent == nil else {
+                return
+            }
+
             self.addChild(preferencesViewController)
             view.addAndLayout(preferencesViewController.view)
 
