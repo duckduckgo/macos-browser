@@ -87,6 +87,11 @@ final class BrowserTabViewController: NSViewController {
     /// 2. A URL is provided for the first time, so the webview should be added as a subview and the URL should be loaded.
     /// 3. A URL is provided after already adding the webview, so the webview should be reloaded.
     private func updateInterface() {
+        if tabCollectionViewModel.tabCollection.tabs.isEmpty {
+            view.window?.close()
+            return
+        }
+
         changeWebView()
         scheduleHoverLabelUpdatesForUrl(nil)
         show(tabContent: tabCollectionViewModel.selectedTabViewModel?.tab.content)

@@ -186,14 +186,6 @@ extension URL {
         func separated() -> String {
             self.rawValue + Self.separator
         }
-
-        var port: Int {
-            switch self {
-            case .http: return 80
-            case .https: return 443
-            case .file: return 0
-            }
-        }
     }
 
     enum HostPrefix: String {
