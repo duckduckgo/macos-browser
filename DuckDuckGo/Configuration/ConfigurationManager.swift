@@ -53,14 +53,10 @@ final class ConfigurationManager {
     private var refreshCancellable: AnyCancellable?
     private var lastRefreshCheckTime: Date = Date()
 
-    private let scriptSource: ScriptSourceProviding
     private let configDownloader: ConfigurationDownloading
 
     /// Use the shared instance if subscribing to events.  Only use the constructor for testing.
-    init(scriptSource: ScriptSourceProviding = DefaultScriptSourceProvider.shared,
-         configDownloader: ConfigurationDownloading = DefaultConfigurationDownloader(deliveryQueue: ConfigurationManager.queue)) {
-
-        self.scriptSource = scriptSource
+    init(configDownloader: ConfigurationDownloading = DefaultConfigurationDownloader(deliveryQueue: ConfigurationManager.queue)) {
         self.configDownloader = configDownloader
 
         os_log("Starting configuration refresh timer", log: .config, type: .debug)
@@ -155,8 +151,6 @@ final class ConfigurationManager {
         let configEtag = DefaultConfigurationStorage.shared.loadEtag(for: .privacyConfiguration)
         let configData = DefaultConfigurationStorage.shared.loadData(for: .privacyConfiguration)
         ContentBlocking.privacyConfigurationManager.reload(etag: configEtag, data: configData)
-        
-        scriptSource.reload()
 
         ContentBlocking.contentBlockingManager.scheduleCompilation()
     }

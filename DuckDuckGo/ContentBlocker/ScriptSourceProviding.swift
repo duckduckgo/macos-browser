@@ -22,13 +22,13 @@ import BrowserServicesKit
 
 protocol ScriptSourceProviding {
 
-    func reload()
-//    var contentBlockerRulesSource: String { get }
-//    var contentBlockerSource: String { get }
+    func reload(knownChanges: ContentBlockerRulesIdentifier.Difference?)
+    var contentBlockerRulesConfig: ContentBlockerUserScriptConfig? { get }
+    var surrogatesConfig: SurrogatesUserScriptConfig? { get }
     var gpcSource: String { get }
     var navigatorCredentialsSource: String { get }
 
-    var sourceUpdatedPublisher: AnyPublisher<Void, Never> { get }
+    var sourceUpdatedPublisher: AnyPublisher<ContentBlockerRulesIdentifier.Difference?, Never> { get }
 
 }
 
@@ -36,36 +36,65 @@ final class DefaultScriptSourceProvider: ScriptSourceProviding {
 
     static var shared: ScriptSourceProviding = DefaultScriptSourceProvider()
 
-//    @Published
-//    private(set) var contentBlockerRulesSource: String = ""
-//    @Published
-//    private(set) var contentBlockerSource: String = ""
-    @Published
+    private(set) var contentBlockerRulesConfig: ContentBlockerUserScriptConfig?
+    private(set) var surrogatesConfig: SurrogatesUserScriptConfig?
     private(set) var gpcSource: String = ""
     private(set) var navigatorCredentialsSource: String = ""
 
-    private let sourceUpdatedSubject = PassthroughSubject<Void, Never>()
-
-    var sourceUpdatedPublisher: AnyPublisher<Void, Never> {
+    private let sourceUpdatedSubject = PassthroughSubject<ContentBlockerRulesIdentifier.Difference?, Never>()
+    var sourceUpdatedPublisher: AnyPublisher<ContentBlockerRulesIdentifier.Difference?, Never> {
         sourceUpdatedSubject.eraseToAnyPublisher()
     }
 
     let configStorage: ConfigurationStoring
     let privacyConfigurationManager: PrivacyConfigurationManager
+    let contentBlockingManager: ContentBlockerRulesManager
+
+    var contentBlockingRulesUpdatedCancellable: AnyCancellable!
 
     private init(configStorage: ConfigurationStoring = DefaultConfigurationStorage.shared,
-                 privacyConfigurationManager: PrivacyConfigurationManager = ContentBlocking.privacyConfigurationManager) {
+                 privacyConfigurationManager: PrivacyConfigurationManager = ContentBlocking.privacyConfigurationManager,
+                 contentBlockingManager: ContentBlockerRulesManager = ContentBlocking.contentBlockingManager,
+                 contentBlockingUpdating: ContentBlockingUpdating = ContentBlocking.contentBlockingUpdating) {
         self.configStorage = configStorage
         self.privacyConfigurationManager = privacyConfigurationManager
-        reload()
+        self.contentBlockingManager = contentBlockingManager
+
+        attachListeners(contentBlockingUpdating: contentBlockingUpdating)
+
+        reload(knownChanges: nil)
     }
 
-    func reload() {
-//        contentBlockerRulesSource = buildContentBlockerRulesSource() // FIXME
-//        contentBlockerSource = buildContentBlockerSource()
+    private func attachListeners(contentBlockingUpdating: ContentBlockingUpdating) {
+        let cancellable = contentBlockingUpdating.contentBlockingRules.receive(on: RunLoop.main).sink(receiveValue: { [weak self] newRulesInfo in
+            guard let self = self, let newRulesInfo = newRulesInfo else { return }
+
+            self.reload(knownChanges: newRulesInfo.changes)
+        })
+        contentBlockingRulesUpdatedCancellable = cancellable
+    }
+
+    func reload(knownChanges: ContentBlockerRulesIdentifier.Difference?) {
+        contentBlockerRulesConfig = buildContentBlockerRulesConfig()
+        surrogatesConfig = buildSurrogatesConfig()
         gpcSource = buildGPCSource()
         navigatorCredentialsSource = buildNavigatorCredentialsSource()
-        sourceUpdatedSubject.send( () )
+        sourceUpdatedSubject.send( knownChanges )
+    }
+
+    private func buildContentBlockerRulesConfig() -> ContentBlockerUserScriptConfig {
+        return DefaultContentBlockerUserScriptConfig(privacyConfiguration: privacyConfigurationManager.privacyConfig,
+                                                     trackerData: contentBlockingManager.currentRules?.trackerData)
+    }
+
+    private func buildSurrogatesConfig() -> SurrogatesUserScriptConfig {
+        let surrogates = configStorage.loadData(for: .surrogates)?.utf8String() ?? ""
+        let rules = contentBlockingManager.currentRules
+        return DefaultSurrogatesUserScriptConfig(privacyConfig: privacyConfigurationManager.privacyConfig,
+                                                 surrogates: surrogates,
+                                                 trackerData: rules?.trackerData,
+                                                 encodedSurrogateTrackerData: rules?.encodedTrackerData,
+                                                 isDebugBuild: isDebugBuild)
     }
     
     private func buildGPCSource() -> String {

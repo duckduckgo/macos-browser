@@ -84,6 +84,7 @@ final class Tab: NSObject {
          webCacheManager: WebCacheManager = WebCacheManager.shared,
          webViewConfiguration: WebViewConfiguration? = nil,
          historyCoordinating: HistoryCoordinating = HistoryCoordinator.shared,
+         scriptsSource: ScriptSourceProviding = DefaultScriptSourceProvider.shared,
          visitedDomains: Set<String> = Set<String>(),
          title: String? = nil,
          error: Error? = nil,
@@ -96,6 +97,7 @@ final class Tab: NSObject {
         self.content = content
         self.faviconService = faviconService
         self.historyCoordinating = historyCoordinating
+        self.scriptsSource = scriptsSource
         self.visitedDomains = visitedDomains
         self.title = title
         self.error = error
@@ -342,7 +344,7 @@ final class Tab: NSObject {
         webView.allowsBackForwardNavigationGestures = true
         webView.allowsMagnification = true
 
-        subscribeToUserScripts()
+        subscribeToUserScriptChanges()
         subscribeToOpenExternalUrlEvents()
 
         superviewObserver = webView.observe(\.superview, options: .old) { [weak self] _, change in
@@ -393,7 +395,10 @@ final class Tab: NSObject {
     }
 
     // MARK: - User Scripts
-    
+
+    let scriptsSource: ScriptSourceProviding
+    private var userScriptsUpdatedCancellable: AnyCancellable?
+
     lazy var emailManager: EmailManager = {
         let emailManager = EmailManager()
         emailManager.requestDelegate = self
@@ -405,8 +410,6 @@ final class Tab: NSObject {
         manager.delegate = self
         return manager
     }()
-
-    private var userScriptsUpdatedCancellable: AnyCancellable?
 
     private var userScripts: UserScripts! {
         willSet {
@@ -432,11 +435,16 @@ final class Tab: NSObject {
         }
     }
 
-    private func subscribeToUserScripts() {
-        userScriptsUpdatedCancellable = UserScriptsManager.shared
-            .$userScripts
-            .map(UserScripts.init(copy:))
-            .weakAssign(to: \.userScripts, on: self)
+    private func subscribeToUserScriptChanges() {
+        userScriptsUpdatedCancellable = scriptsSource.sourceUpdatedPublisher.receive(on: RunLoop.main).sink { [weak self] knownChanges in
+            guard let self = self else { return }
+
+            self.userScripts = UserScripts(with: self.scriptsSource)
+
+            if knownChanges?.contains(.unprotectedSites) ?? false {
+                self.reload()
+            }
+        }
     }
 
     // MARK: - Find in Page

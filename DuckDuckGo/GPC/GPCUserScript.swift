@@ -26,7 +26,7 @@ final class GPCUserScript: NSObject, UserScript {
     var messageNames: [String] { [] }
     let source: String
 
-    init(scriptSource: ScriptSourceProviding = DefaultScriptSourceProvider.shared) {
+    init(scriptSource: ScriptSourceProviding) {
         source = scriptSource.gpcSource
     }
 

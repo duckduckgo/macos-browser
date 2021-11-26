@@ -26,44 +26,37 @@ final class UserScripts {
     let faviconScript = FaviconUserScript()
     let contextMenuScript = ContextMenuUserScript()
     let findInPageScript = FindInPageUserScript()
-
-    // swiftlint:disable line_length
-
-    let surrogatesScript = SurrogatesUserScript(configurationSource: DefaultSurrogatesUserScriptConfigSource(privacyConfig: ContentBlocking.privacyConfigurationManager.privacyConfig,
-                                                                                                             surrogates: DefaultConfigurationStorage.shared.loadData(for: .surrogates)?.utf8String() ?? "", trackerData: ContentBlocking.contentBlockingManager.currentRules?.trackerData, encodedSurrogateTrackerData: ContentBlocking.contentBlockingManager.currentRules?.encodedTrackerData, isDebugBuild: isDebugBuild) )
-
-    let contentBlockerRulesScript = ContentBlockerRulesUserScript(configurationSource: ContentBlockerUserScriptConfigSource(privacyConfiguration: ContentBlocking.privacyConfigurationManager.privacyConfig,
-                                                                                                                            trackerData: ContentBlocking.contentBlockingManager.currentRules?.trackerData))
-    // swiftlint:enable line_length
-    let autofillScript = AutofillUserScript()
     let printingUserScript = PrintingUserScript()
     let hoverUserScript = HoverUserScript()
-    let navigatorCredentialsUserScript = NavigatorCredentialsUserScript()
     let debugScript = DebugUserScript()
-    let gpcScript = GPCUserScript()
+    let autofillScript = AutofillUserScript()
 
-    init() {
-    }
+    let contentBlockerRulesScript: ContentBlockerRulesUserScript
+    let surrogatesScript: SurrogatesUserScript
+    let navigatorCredentialsUserScript: NavigatorCredentialsUserScript
+    let gpcScript: GPCUserScript
 
-    init(copy other: UserScripts) {
-        scripts = other.scripts
-        scripts.removeLast()
-        scripts.append(autofillScript.makeWKUserScript())
+    init(with sourceProvider: ScriptSourceProviding) {
+
+        contentBlockerRulesScript = ContentBlockerRulesUserScript(configuration: sourceProvider.contentBlockerRulesConfig!)
+        surrogatesScript = SurrogatesUserScript(configuration: sourceProvider.surrogatesConfig!)
+        navigatorCredentialsUserScript = NavigatorCredentialsUserScript(scriptSource: sourceProvider)
+        gpcScript = GPCUserScript(scriptSource: sourceProvider)
     }
 
     lazy var userScripts: [UserScript] = [
-        self.debugScript,
-        self.faviconScript,
-        self.contextMenuScript,
-        self.findInPageScript,
-        self.surrogatesScript,
-        self.contentBlockerRulesScript,
-        self.pageObserverScript,
-        self.printingUserScript,
-        self.hoverUserScript,
-        self.gpcScript,
-        self.navigatorCredentialsUserScript,
-        self.autofillScript
+        debugScript,
+        faviconScript,
+        contextMenuScript,
+        findInPageScript,
+        surrogatesScript,
+        contentBlockerRulesScript,
+        pageObserverScript,
+        printingUserScript,
+        hoverUserScript,
+        gpcScript,
+        navigatorCredentialsUserScript,
+        autofillScript
     ]
 
     lazy var scripts = userScripts.map { $0.makeWKUserScript() }

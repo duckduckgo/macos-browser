@@ -54,11 +54,10 @@ final class PrivacyDashboardViewController: NSViewController {
                 }
             }
 
-            DefaultScriptSourceProvider.shared.reload() // This needs to be refactored to guarantee Scripts consistency
-
             if didUpdate {
                 self.sendPendingUpdates()
 
+                // This should be removed, as event is processed in the Tab (to follow up)
                 let activeTab = self.tabViewModel?.tab
                 activeTab?.reload()
             }
