@@ -418,7 +418,7 @@ final class Tab: NSObject {
             userScripts.debugScript.instrumentation = instrumentation
             userScripts.faviconScript.delegate = self
             userScripts.contextMenuScript.delegate = self
-            userScripts.contentBlockerScript.delegate = self
+            userScripts.surrogatesScript.delegate = self
             userScripts.contentBlockerRulesScript.delegate = self
             userScripts.autofillScript.emailDelegate = emailManager
             userScripts.autofillScript.vaultDelegate = vaultManager
@@ -603,24 +603,17 @@ extension Tab: ContentBlockerRulesUserScriptDelegate {
     }
 }
 
-extension Tab: ContentBlockerUserScriptDelegate {
+extension Tab: SurrogatesUserScriptDelegate {
 
-    func contentBlockerUserScriptShouldProcessTrackers(_ script: UserScript) -> Bool {
+    func surrogatesUserScriptShouldProcessTrackers(_ script: SurrogatesUserScript) -> Bool {
         return true
     }
 
-    func contentBlockerUserScript(_ script: ContentBlockerUserScript,
-                                  detectedTracker tracker: DetectedTracker,
-                                  withSurrogate host: String) {
+    func surrogatesUserScript(_ script: SurrogatesUserScript, detectedTracker tracker: DetectedTracker, withSurrogate host: String) {
         trackerInfo?.add(installedSurrogateHost: host)
 
-        contentBlockerUserScript(script, detectedTracker: tracker)
-    }
-
-    func contentBlockerUserScript(_ script: UserScript, detectedTracker tracker: DetectedTracker) {
         trackerInfo?.add(detectedTracker: tracker)
     }
-
 }
 
 extension Tab: EmailManagerRequestDelegate {

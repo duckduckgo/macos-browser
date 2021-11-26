@@ -20,27 +20,21 @@ import Foundation
 import BrowserServicesKit
 import TrackerRadarKit
 
-public class DefaultUserScriptConfigSource: ContentBlockerUserScriptConfigSource {
-
-    public var privacyConfig: PrivacyConfiguration {
-        return ContentBlocking.privacyConfigurationManager.privacyConfig
-    }
-
-    public var trackerData: TrackerData? {
-        return ContentBlocking.contentBlockingManager.currentRules?.trackerData
-    }
-
-    public init() {}
-}
-
 final class UserScripts {
 
     let pageObserverScript = PageObserverUserScript()
     let faviconScript = FaviconUserScript()
     let contextMenuScript = ContextMenuUserScript()
     let findInPageScript = FindInPageUserScript()
-    let contentBlockerScript = ContentBlockerUserScript()
-    let contentBlockerRulesScript = ContentBlockerRulesUserScript(configurationSource: DefaultUserScriptConfigSource())
+
+    // swiftlint:disable line_length
+
+    let surrogatesScript = SurrogatesUserScript(configurationSource: DefaultSurrogatesUserScriptConfigSource(privacyConfig: ContentBlocking.privacyConfigurationManager.privacyConfig,
+                                                                                                             surrogates: DefaultConfigurationStorage.shared.loadData(for: .surrogates)?.utf8String() ?? "", trackerData: ContentBlocking.contentBlockingManager.currentRules?.trackerData, encodedSurrogateTrackerData: ContentBlocking.contentBlockingManager.currentRules?.encodedTrackerData, isDebugBuild: isDebugBuild) )
+
+    let contentBlockerRulesScript = ContentBlockerRulesUserScript(configurationSource: ContentBlockerUserScriptConfigSource(privacyConfiguration: ContentBlocking.privacyConfigurationManager.privacyConfig,
+                                                                                                                            trackerData: ContentBlocking.contentBlockingManager.currentRules?.trackerData))
+    // swiftlint:enable line_length
     let autofillScript = AutofillUserScript()
     let printingUserScript = PrintingUserScript()
     let hoverUserScript = HoverUserScript()
@@ -62,7 +56,7 @@ final class UserScripts {
         self.faviconScript,
         self.contextMenuScript,
         self.findInPageScript,
-        self.contentBlockerScript,
+        self.surrogatesScript,
         self.contentBlockerRulesScript,
         self.pageObserverScript,
         self.printingUserScript,

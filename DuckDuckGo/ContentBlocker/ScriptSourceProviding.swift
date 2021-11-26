@@ -24,7 +24,7 @@ protocol ScriptSourceProviding {
 
     func reload()
 //    var contentBlockerRulesSource: String { get }
-    var contentBlockerSource: String { get }
+//    var contentBlockerSource: String { get }
     var gpcSource: String { get }
     var navigatorCredentialsSource: String { get }
 
@@ -38,8 +38,8 @@ final class DefaultScriptSourceProvider: ScriptSourceProviding {
 
 //    @Published
 //    private(set) var contentBlockerRulesSource: String = ""
-    @Published
-    private(set) var contentBlockerSource: String = ""
+//    @Published
+//    private(set) var contentBlockerSource: String = ""
     @Published
     private(set) var gpcSource: String = ""
     private(set) var navigatorCredentialsSource: String = ""
@@ -61,46 +61,11 @@ final class DefaultScriptSourceProvider: ScriptSourceProviding {
     }
 
     func reload() {
-//        contentBlockerRulesSource = buildContentBlockerRulesSource()
-        contentBlockerSource = buildContentBlockerSource()
+//        contentBlockerRulesSource = buildContentBlockerRulesSource() // FIXME
+//        contentBlockerSource = buildContentBlockerSource()
         gpcSource = buildGPCSource()
         navigatorCredentialsSource = buildNavigatorCredentialsSource()
         sourceUpdatedSubject.send( () )
-    }
-
-//    private func buildContentBlockerRulesSource() -> String {
-//        let privacyConfiguration = privacyConfigurationManager.privacyConfig
-//        let unprotectedDomains = privacyConfiguration.tempUnprotectedDomains
-//        let contentBlockingExceptions = privacyConfiguration.exceptionsList(forFeature: .contentBlocking)
-//        let protectionStore = DomainsProtectionUserDefaultsStore()
-//        return ContentBlockerRulesUserScript.loadJS("contentblockerrules", from: .main, withReplacements: [
-//            "$TEMP_UNPROTECTED_DOMAINS$": (unprotectedDomains + contentBlockingExceptions).joined(separator: "\n"),
-//            "$USER_UNPROTECTED_DOMAINS$": protectionStore.unprotectedDomains.joined(separator: "\n")
-//        ])
-//    }
-
-    private func buildContentBlockerSource() -> String {
-        let privacyConfiguration = privacyConfigurationManager.privacyConfig
-
-        // Use sensible defaults in case the upstream data is unparsable
-        let trackerData = ContentBlocking.contentBlockingManager.currentRules?.encodedTrackerData ?? "" // FIXME
-        let surrogates = configStorage.loadData(for: .surrogates)?.utf8String() ?? ""
-
-        let remoteUnprotectedDomains = (privacyConfiguration.tempUnprotectedDomains.joined(separator: "\n"))
-            + "\n"
-            + (privacyConfiguration.exceptionsList(forFeature: .contentBlocking).joined(separator: "\n"))
-
-        let protectionStore = DomainsProtectionUserDefaultsStore()
-        let localUnprotectedDomains = protectionStore.unprotectedDomains.joined(separator: "\n")
-
-        return ContentBlockerUserScript.loadJS("contentblocker", from: .main, withReplacements: [
-            "$IS_DEBUG$": isDebugBuild ? "true" : "false",
-            "$TEMP_UNPROTECTED_DOMAINS$": remoteUnprotectedDomains,
-            "$USER_UNPROTECTED_DOMAINS$": localUnprotectedDomains,
-            "$TRACKER_DATA$": trackerData,
-            "$SURROGATES$": surrogates,
-            "$BLOCKING_ENABLED$": privacyConfiguration.isEnabled(featureKey: .contentBlocking) ? "true" : "false"
-        ])
     }
     
     private func buildGPCSource() -> String {

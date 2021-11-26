@@ -76,9 +76,6 @@
 		4B59024A26B38B0B00489384 /* Login Data in Resources */ = {isa = PBXBuildFile; fileRef = 4B59024926B38B0B00489384 /* Login Data */; };
 		4B59024C26B38BB800489384 /* ChromiumLoginReaderTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B59024B26B38BB800489384 /* ChromiumLoginReaderTests.swift */; };
 		4B5FF67826B602B100D42879 /* FirefoxDataImporter.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B5FF67726B602B100D42879 /* FirefoxDataImporter.swift */; };
-		4B6160D825B150E4007DE5B2 /* trackerData.json in Resources */ = {isa = PBXBuildFile; fileRef = 4B6160D725B150E4007DE5B2 /* trackerData.json */; };
-		4B6160E525B152FA007DE5B2 /* ContentBlockerUserScript.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B6160E425B152FA007DE5B2 /* ContentBlockerUserScript.swift */; };
-		4B6160F725B157BB007DE5B2 /* contentblocker.js in Resources */ = {isa = PBXBuildFile; fileRef = 4B6160F625B157BB007DE5B2 /* contentblocker.js */; };
 		4B65027525E5F2A70054432E /* DefaultBrowserPromptView.xib in Resources */ = {isa = PBXBuildFile; fileRef = 4B65027425E5F2A70054432E /* DefaultBrowserPromptView.xib */; };
 		4B65027A25E5F2B10054432E /* DefaultBrowserPromptView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B65027925E5F2B10054432E /* DefaultBrowserPromptView.swift */; };
 		4B65143E263924B5005B46EB /* EmailUrlExtensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B65143D263924B5005B46EB /* EmailUrlExtensions.swift */; };
@@ -690,9 +687,6 @@
 		4B59024926B38B0B00489384 /* Login Data */ = {isa = PBXFileReference; lastKnownFileType = file; path = "Login Data"; sourceTree = "<group>"; };
 		4B59024B26B38BB800489384 /* ChromiumLoginReaderTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChromiumLoginReaderTests.swift; sourceTree = "<group>"; };
 		4B5FF67726B602B100D42879 /* FirefoxDataImporter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FirefoxDataImporter.swift; sourceTree = "<group>"; };
-		4B6160D725B150E4007DE5B2 /* trackerData.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; path = trackerData.json; sourceTree = "<group>"; };
-		4B6160E425B152FA007DE5B2 /* ContentBlockerUserScript.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentBlockerUserScript.swift; sourceTree = "<group>"; };
-		4B6160F625B157BB007DE5B2 /* contentblocker.js */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.javascript; path = contentblocker.js; sourceTree = "<group>"; };
 		4B65027425E5F2A70054432E /* DefaultBrowserPromptView.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = DefaultBrowserPromptView.xib; sourceTree = "<group>"; };
 		4B65027925E5F2B10054432E /* DefaultBrowserPromptView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DefaultBrowserPromptView.swift; sourceTree = "<group>"; };
 		4B65143D263924B5005B46EB /* EmailUrlExtensions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EmailUrlExtensions.swift; sourceTree = "<group>"; };
@@ -1455,9 +1449,6 @@
 		4B6160D125B14E5E007DE5B2 /* ContentBlocker */ = {
 			isa = PBXGroup;
 			children = (
-				4B6160E425B152FA007DE5B2 /* ContentBlockerUserScript.swift */,
-				4B6160F625B157BB007DE5B2 /* contentblocker.js */,
-				4B6160D725B150E4007DE5B2 /* trackerData.json */,
 				026ADE1326C3010C002518EE /* macos-config.json */,
 				85AC3B0425D6B1D800C7D2AA /* ScriptSourceProviding.swift */,
 				9826B09F2747DF3D0092F683 /* ContentBlocking.swift */,
@@ -3443,14 +3434,12 @@
 				4B677432255DBEB800025BD8 /* httpsMobileV2BloomSpec.json in Resources */,
 				AA2CB12D2587BB5600AA6FBE /* TabBarFooter.xib in Resources */,
 				AA8AF574272AC60D006A09F8 /* shield-dot.json in Resources */,
-				4B6160D825B150E4007DE5B2 /* trackerData.json in Resources */,
 				AA80EC67256C4691007083E7 /* BrowserTab.storyboard in Resources */,
 				AAE246F42709EF3B00BEEAEE /* FirePopoverCollectionViewItem.xib in Resources */,
 				4B0511C1262CAA5A00F6079C /* PrivacySecurityPreferencesTableCellView.xib in Resources */,
 				AA8AF572272AC608006A09F8 /* shield.json in Resources */,
 				7B860DE427274E54006D8957 /* navigatorCredentials.js in Resources */,
 				4B0511D0262CAA5A00F6079C /* AppearancePreferencesTableCellView.xib in Resources */,
-				4B6160F725B157BB007DE5B2 /* contentblocker.js in Resources */,
 				336D5B18262D8D3C0052E0C9 /* findinpage.js in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -3881,7 +3870,6 @@
 				4B677436255DBEB800025BD8 /* HTTPSExcludedDomains.swift in Sources */,
 				AAC5E4D225D6A709007F5990 /* BookmarkList.swift in Sources */,
 				4B9292D12667123700AD2C21 /* BookmarkTableRowView.swift in Sources */,
-				4B6160E525B152FA007DE5B2 /* ContentBlockerUserScript.swift in Sources */,
 				B66E9DD42670EB4A00E53BB5 /* WKDownload+WebKitDownload.swift in Sources */,
 				B69B503F2726A12500758A2B /* StatisticsUserDefaults.swift in Sources */,
 				B689ECD526C247DB006FB0C5 /* BackForwardListItem.swift in Sources */,
