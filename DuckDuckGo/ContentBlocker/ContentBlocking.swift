@@ -19,6 +19,7 @@
 import Foundation
 import BrowserServicesKit
 import Combine
+import os.log
 
 final class ContentBlockingUpdating: ContentBlockerRulesUpdating {
     typealias NewRulesInfo = (rules: ContentBlockerRulesManager.CurrentRules,
@@ -54,5 +55,6 @@ final class ContentBlocking {
                                                                                 privacyConfigManager: privacyConfigurationManager)
 
     static let contentBlockingManager = ContentBlockerRulesManager(source: contentBlockingSource,
-                                                                   updateListener: contentBlockingUpdating)
+                                                                   updateListener: contentBlockingUpdating,
+                                                                   logger: OSLog.contentBlocking)
 }
