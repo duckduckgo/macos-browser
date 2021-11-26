@@ -127,8 +127,6 @@ final class Tab: NSObject {
            let host = content.url?.host {
             faviconService.cacheIfNeeded(favicon: favicon, for: host, isFromUserScript: false)
         }
-
-        updateDashboardInfo(url: content.url)
     }
 
     deinit {
@@ -151,7 +149,6 @@ final class Tab: NSObject {
         didSet {
             handleFavicon(oldContent: oldValue)
             invalidateSessionStateData()
-            updateDashboardInfo(oldUrl: oldValue.url, url: content.url)
             reloadIfNeeded()
 
             if let title = content.title {
@@ -294,7 +291,6 @@ final class Tab: NSObject {
             webView.load(url)
         } else {
             webView.reload()
-            updateDashboardInfo(url: content.url)
         }
     }
 
@@ -501,15 +497,9 @@ final class Tab: NSObject {
     @Published var serverTrust: ServerTrust?
     @Published var connectionUpgradedTo: URL?
 
-    private func updateDashboardInfo(oldUrl: URL? = nil, url: URL?) {
-        guard let url = url, let host = url.host else {
-            trackerInfo = nil
-            serverTrust = nil
-            return
-        }
-
-        if oldUrl?.host != host || oldUrl?.scheme != url.scheme {
-            trackerInfo = TrackerInfo()
+    public func resetDashboardInfo(_ url: URL?) {
+        trackerInfo = TrackerInfo()
+        if self.serverTrust?.host != url?.host {
             serverTrust = nil
         }
     }
@@ -626,40 +616,7 @@ extension Tab: ContentBlockerUserScriptDelegate {
 
 }
 
-extension Tab: EmailManagerRequestDelegate {
-
-    // swiftlint:disable function_parameter_count
-    func emailManager(_ emailManager: EmailManager,
-                      requested url: URL,
-                      method: String,
-                      headers: [String: String],
-                      parameters: [String: String]?,
-                      httpBody: Data?,
-                      timeoutInterval: TimeInterval,
-                      completion: @escaping (Data?, Error?) -> Void) {
-        let currentQueue = OperationQueue.current
-
-        let finalURL: URL
-
-        if let parameters = parameters {
-            finalURL = (try? url.addParameters(parameters)) ?? url
-        } else {
-            finalURL = url
-        }
-
-        var request = URLRequest(url: finalURL, timeoutInterval: timeoutInterval)
-        request.allHTTPHeaderFields = headers
-        request.httpMethod = method
-        request.httpBody = httpBody
-        URLSession.shared.dataTask(with: request) { (data, _, error) in
-            currentQueue?.addOperation {
-                completion(data, error)
-            }
-        }.resume()
-    }
-    // swiftlint:enable function_parameter_count
-    
-}
+extension Tab: EmailManagerRequestDelegate { }
 
 extension Tab: SecureVaultManagerDelegate {
 

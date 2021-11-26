@@ -90,6 +90,10 @@ final class StatisticsLoader {
                     completion()
                     return
                 }
+
+                assert(self.statisticsStore.atb == nil)
+                assert(self.statisticsStore.installDate == nil)
+
                 self.statisticsStore.installDate = Date()
                 self.statisticsStore.atb = atb.version
                 completion()
