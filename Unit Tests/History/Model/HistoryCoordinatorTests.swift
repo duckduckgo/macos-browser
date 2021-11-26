@@ -129,7 +129,7 @@ class HistoryCoordinatorTests: XCTestCase {
         XCTAssert(historyCoordinator.history!.count == 4)
 
         let fireproofDomains = FireproofDomains(store: FireproofDomainsStoreMock())
-        fireproofDomains.addToAllowed(domain: fireproofDomain)
+        fireproofDomains.add(domain: fireproofDomain)
         historyCoordinator.burn(except: fireproofDomains) {
             XCTAssert(historyStoringMock.removeEntriesArray.count == 3)
         }

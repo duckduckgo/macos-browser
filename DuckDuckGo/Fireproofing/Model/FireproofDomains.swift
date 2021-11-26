@@ -80,11 +80,11 @@ internal class FireproofDomains {
             remove(domain: domain)
             return false
         }
-        addToAllowed(domain: domain)
+        add(domain: domain)
         return true
     }
 
-    func addToAllowed(domain: String) {
+    func add(domain: String) {
         dispatchPrecondition(condition: .onQueue(.main))
         guard !isFireproof(fireproofDomain: domain) else {
             // submodains also?

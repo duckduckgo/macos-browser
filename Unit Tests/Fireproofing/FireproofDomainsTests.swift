@@ -29,39 +29,39 @@ final class FireproofDomainsTests: XCTestCase {
 
     func testWhenFireproofDomainsContainsFireproofedDomainThenReturnsTrue() {
         XCTAssertFalse(logins.isFireproof(fireproofDomain: "example.com"))
-        logins.addToAllowed(domain: "example.com")
+        logins.add(domain: "example.com")
         XCTAssertTrue(logins.isFireproof(fireproofDomain: "www.example.com"))
     }
 
     func testWhenFireproofDomainsContainsFireproofedDomainThenIsURLFireproofReturnsTrue() {
         XCTAssertFalse(logins.isFireproof(fireproofDomain: "example.com"))
-        logins.addToAllowed(domain: "example.com")
+        logins.add(domain: "example.com")
         XCTAssertTrue(logins.isURLFireproof(url: URL(string: "http://www.example.com/example")!))
     }
 
     func testWhenFireproofDomainsDoesNotContainDomainThenIsURLFireproofReturnsFalse() {
         XCTAssertFalse(logins.isFireproof(fireproofDomain: "thisisexample.com"))
-        logins.addToAllowed(domain: "thisisexample.com")
+        logins.add(domain: "thisisexample.com")
         XCTAssertFalse(logins.isURLFireproof(url: URL(string: "http://www.example.com/example")!))
     }
 
     func testWhenFireproofDomainsContainsCookieDomainThenIsCookieDomainFireproofReturnsTrue() {
-        logins.addToAllowed(domain: "www.example.com")
+        logins.add(domain: "www.example.com")
         XCTAssertTrue(logins.isFireproof(cookieDomain: "example.com"))
     }
 
     func testWhenFireproofDomainsContainsCookieDomainThenDotPrefixedIsCookieDomainFireproofReturnsTrue() {
-        logins.addToAllowed(domain: "www.example.com")
+        logins.add(domain: "www.example.com")
         XCTAssertTrue(logins.isFireproof(cookieDomain: ".example.com"))
     }
 
     func testWhenFireproofDomainsContainsCookieSubdomainThenDotPrefixedIsCookieDomainFireproofReturnsTrue() {
-        logins.addToAllowed(domain: "www.sub.example.com")
+        logins.add(domain: "www.sub.example.com")
         XCTAssertTrue(logins.isFireproof(cookieDomain: ".example.com"))
     }
 
     func testWhenFireproofDomainsDoesNotContainCookieDomainThenIsCookieDomainFireproofReturnsFalse() {
-        logins.addToAllowed(domain: "thisisexample.com")
+        logins.add(domain: "thisisexample.com")
         XCTAssertFalse(logins.isFireproof(cookieDomain: "example.com"))
     }
 
@@ -81,7 +81,7 @@ final class FireproofDomainsTests: XCTestCase {
         store.error = TestError()
         XCTAssertTrue(logins.fireproofDomains.isEmpty)
         store.error = nil
-        logins.addToAllowed(domain: "example.com")
+        logins.add(domain: "example.com")
         XCTAssertEqual(logins.fireproofDomains, ["example.com"])
     }
 
@@ -94,8 +94,8 @@ final class FireproofDomainsTests: XCTestCase {
     }
 
     func testWhenRemovingDomainThenOtherDomainsAreNotRemoved() {
-        logins.addToAllowed(domain: "example.com")
-        logins.addToAllowed(domain: "www.secondexample.com")
+        logins.add(domain: "example.com")
+        logins.add(domain: "www.secondexample.com")
         XCTAssertTrue(logins.isFireproof(fireproofDomain: "example.com"))
         XCTAssertTrue(logins.isFireproof(fireproofDomain: "secondexample.com"))
 
@@ -106,7 +106,7 @@ final class FireproofDomainsTests: XCTestCase {
     }
 
     func testWhenTogglingFireproofDomainThenItIsRemoved() {
-        logins.addToAllowed(domain: "www.example.com")
+        logins.add(domain: "www.example.com")
         XCTAssertFalse(logins.toggle(domain: "example.com"))
         XCTAssertFalse(logins.isFireproof(fireproofDomain: "example.com"))
     }
@@ -117,7 +117,7 @@ final class FireproofDomainsTests: XCTestCase {
     }
 
     func testWhenClearAllIsCalledThenAllDomainsAreRemoved() {
-        logins.addToAllowed(domain: "example.com")
+        logins.add(domain: "example.com")
         XCTAssertTrue(logins.isFireproof(fireproofDomain: "example.com"))
 
         logins.clearAll()
@@ -127,10 +127,10 @@ final class FireproofDomainsTests: XCTestCase {
 
     func testWhenAddingDuplicateDomainsThenSubsequentDomainsAreIgnored() {
         let domain = "example.com"
-        logins.addToAllowed(domain: domain)
+        logins.add(domain: domain)
         XCTAssertTrue(logins.isFireproof(fireproofDomain: domain))
 
-        logins.addToAllowed(domain: domain)
+        logins.add(domain: domain)
         XCTAssertTrue(logins.isFireproof(fireproofDomain: domain))
         XCTAssertEqual(logins.fireproofDomains, [domain])
 

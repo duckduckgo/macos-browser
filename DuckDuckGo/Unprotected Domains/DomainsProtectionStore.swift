@@ -56,12 +56,7 @@ final class LocalUnprotectedDomains: UnprotectedDomains {
                 domains = Set(domains.map { $0.dropWWW() })
                 var result = [String: NSManagedObjectID]()
                 do {
-
-                    let added = try store.add(domains)
-                    for (domain, id) in added {
-                        result[domain.dropWWW()] = id
-                    }
-
+                    result = try store.add(domains).reduce(into: [:]) { $0[$1.value] = $1.id }
                     self.legacyUserDefaultsUnprotectedDomainsData = nil
                 } catch {}
 

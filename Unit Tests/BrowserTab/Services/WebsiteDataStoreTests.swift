@@ -193,7 +193,7 @@ final class WebCacheManagerTests: XCTestCase {
             super.init(store: FireproofDomainsStoreMock())
 
             for domain in domains {
-                super.addToAllowed(domain: domain)
+                super.add(domain: domain)
             }
         }
 
