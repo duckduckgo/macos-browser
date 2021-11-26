@@ -1,0 +1,56 @@
+//
+//  DomainMatchingReportTests.swift
+//  DuckDuckGo
+//
+//  Copyright © 2021 DuckDuckGo. All rights reserved.
+//
+//  Licensed under the Apache License, Version 2.0 (the "License");
+//  you may not use this file except in compliance with the License.
+//  You may obtain a copy of the License at
+//
+//  http://www.apache.org/licenses/LICENSE-2.0
+//
+//  Unless required by applicable law or agreed to in writing, software
+//  distributed under the License is distributed on an "AS IS" BASIS,
+//  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+//  See the License for the specific language governing permissions and
+//  limitations under the License.
+//
+
+import XCTest
+import BrowserServicesKit
+@testable import TrackerRadarKit
+import Foundation
+import os.log
+
+class DomainMatchingReportTests: XCTestCase {
+    private var data = JsonTestDataLoader()
+
+    func testRegularDomainMatchingRules() throws {
+        let trackerJSON = data.fromJsonFile("resources/tracker_radar_reference.json")
+        let testJSON = data.fromJsonFile("resources/domain_matching_tests.json")
+
+        let trackerData = try JSONDecoder().decode(TrackerData.self, from: trackerJSON)
+        
+        let refTests = try JSONDecoder().decode(RefTests.self, from: testJSON)
+        let tests = refTests.domainTests.tests
+        
+        let resolver = TrackerResolver(tds: trackerData, unprotectedSites: [], tempList: [])
+
+        for test in tests {            
+            let tracker = resolver.trackerFromUrl(test.requestURL,
+                                                  pageUrlString: test.siteURL,
+                                                  resourceType: test.requestType,
+                                                  potentiallyBlocked: true)
+            
+            if test.expectAction == "block" {
+                XCTAssertNotNil(tracker)
+                XCTAssert(tracker?.blocked ?? false)
+            } else if test.expectAction == "ignore" {
+                XCTAssertFalse(tracker?.blocked ?? false)
+            } else {
+                XCTAssert(tracker?.blocked ?? true)
+            }
+        }
+    }
+}

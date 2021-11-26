@@ -1,0 +1,65 @@
+{
+    "trackers": {
+        "allowlist-tracker-1.com": {
+            "domain": "allowlist-tracker-1.com",
+            "owner": {
+                "name": "Test Site for Tracker Blocking",
+                "displayName": "allowlist-tracker-1.com",
+                "privacyPolicy": "",
+                "url": "http://allowlist-tracker-1.com"
+            },
+            "prevalence": 0.1,
+            "fingerprinting": 3,
+            "cookies": 0.1,
+            "categories": [],
+            "default": "block"
+        },
+        "allowlist-tracker-2.com": {
+            "domain": "allowlist-tracker-2.com",
+            "owner": {
+                "name": "Test Site for Tracker Blocking",
+                "displayName": "allowlist-tracker-2.com",
+                "privacyPolicy": "",
+                "url": "http://allowlist-tracker-2.com"
+            },
+            "prevalence": 0.1,
+            "fingerprinting": 3,
+            "cookies": 0.1,
+            "categories": [],
+            "default": "block"
+        },
+        "allowlist-tracker-3.com": {
+            "domain": "allowlist-tracker-3.com",
+            "owner": {
+                "name": "Test Site for Tracker Blocking",
+                "displayName": "allowlist-tracker-3.com",
+                "privacyPolicy": "",
+                "url": "http://allowlist-tracker-3.com"
+            },
+            "prevalence": 0.1,
+            "fingerprinting": 3,
+            "cookies": 0.1,
+            "categories": [],
+            "default": "block"
+        }
+    },
+    "entities": {
+        "Test Site for Tracker Blocking": {
+            "domains": [
+                "allowlist-tracker-1.com",
+                "allowlist-tracker-2.com",
+                "allowlist-tracker-3.com"
+            ],
+            "prevalence": 0.1,
+            "displayName": "Test Site for Tracker Blocking"
+        }
+    },
+    "cnames": {
+        "bad.cnames.test": "allowlist-tracker-1.com"
+    },
+    "domains": {
+        "allowlist-tracker-1.com": "Test Site for Tracker Blocking",
+        "allowlist-tracker-2.com": "Test Site for Tracker Blocking",
+        "allowlist-tracker-3.com": "Test Site for Tracker Blocking"
+    }
+}
