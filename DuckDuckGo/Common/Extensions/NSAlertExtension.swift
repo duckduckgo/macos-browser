@@ -100,4 +100,22 @@ extension NSAlert {
         return alert
     }
 
+    static func exportLoginsFailed() -> NSAlert {
+        let alert = NSAlert()
+        alert.messageText = UserText.exportLoginsFailedMessage
+        alert.informativeText = UserText.exportLoginsFailedInformative
+        alert.alertStyle = .warning
+        alert.addButton(withTitle: UserText.ok)
+        return alert
+    }
+
+    static func exportBookmarksFailed() -> NSAlert {
+        let alert = NSAlert()
+        alert.messageText = UserText.exportBookmarksFailedMessage
+        alert.informativeText = UserText.exportBookmarksFailedInformative
+        alert.alertStyle = .warning
+        alert.addButton(withTitle: UserText.ok)
+        return alert
+    }
+
 }

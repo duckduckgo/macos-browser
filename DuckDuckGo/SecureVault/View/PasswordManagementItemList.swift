@@ -110,13 +110,11 @@ private struct PasswordManagerItemButtonStyle: ButtonStyle {
 
     func makeBody(configuration: Self.Configuration) -> some View {
 
-        let fillColor = configuration.isPressed ? Color.accentColor.opacity(0.6) : bgColor
-
         configuration.label
             .padding(.vertical, 8)
             .frame(maxWidth: .infinity, alignment: .leading)
             .truncationMode(.tail)
-            .background(RoundedRectangle(cornerRadius: 3, style: .continuous).fill(fillColor))
+            .background(RoundedRectangle(cornerRadius: 3, style: .continuous).fill(bgColor))
 
     }
 }
