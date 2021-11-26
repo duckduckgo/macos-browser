@@ -715,7 +715,6 @@ extension BrowserTabViewController: WKUIDelegate {
                  mainFrameURL: URL,
                  decisionHandler: @escaping (Bool) -> Void) {
         guard let permissions = [PermissionType](devices: devices) else {
-            assertionFailure("Could not decode PermissionType")
             decisionHandler(false)
             return
         }
