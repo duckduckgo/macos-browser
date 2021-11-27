@@ -446,7 +446,7 @@ final class Tab: NSObject {
     }
 
     private func subscribeToUserScriptChanges() {
-        userScriptsUpdatedCancellable = scriptsSource.sourceUpdatedPublisher.receive(on: RunLoop.main).sink { [weak self] knownChanges in
+        userScriptsUpdatedCancellable = scriptsSource.sourceUpdatedPublisher.receive(on: RunLoop.main).sink { [weak self] _ in
             guard let self = self, self.delegate != nil else { return }
 
             self.userScripts = UserScripts(with: self.scriptsSource)
