@@ -19,7 +19,7 @@
 import Foundation
 import BrowserServicesKit
 
-final class AppPrivacyConfigurationDataProvider: PrivacyConfigurationDataProvider {
+final class AppPrivacyConfigurationDataProvider: PrivacyConfigurationEmbeddedDataProvider {
 
     public struct Constants {
         public static let embeddedConfigETag = "083fe0926381273459e458bcca3e7c9a"

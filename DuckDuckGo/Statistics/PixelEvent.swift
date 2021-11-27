@@ -18,6 +18,7 @@
 
 import Foundation
 
+// swiftlint:disable identifier_name
 extension Pixel {
 
     enum Event {
@@ -105,11 +106,17 @@ extension Pixel {
             case suggestionsFetchFailed = "sgf"
             case appOpenURLFailed = "url"
             case appStateRestorationFailed = "srf"
+
+            case contentBlockingTDSCompilationFailed = "content_blocking_compilation_error_fetched_tds"
+            case contentBlockingTempListCompilationFailed = "content_blocking_compilation_error_temp_list"
+            case contentBlockingAllowListCompilationFailed = "content_blocking_compilation_error_allow_list"
+            case contentBlockingUnpSitesCompilationFailed = "content_blocking_compilation_error_unprotected_list"
+            case contentBlockingFallbackCompilationFailed = "content_blocking_compilation_error_fallback_tds"
         }
 
     }
-
 }
+// swiftlint:enable identifier_name
 
 extension Pixel.Event {
 

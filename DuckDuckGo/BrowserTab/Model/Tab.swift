@@ -447,13 +447,9 @@ final class Tab: NSObject {
 
     private func subscribeToUserScriptChanges() {
         userScriptsUpdatedCancellable = scriptsSource.sourceUpdatedPublisher.receive(on: RunLoop.main).sink { [weak self] knownChanges in
-            guard let self = self else { return }
+            guard let self = self, self.delegate != nil else { return }
 
             self.userScripts = UserScripts(with: self.scriptsSource)
-
-            if knownChanges?.contains(.unprotectedSites) ?? false {
-                self.reload()
-            }
         }
     }
 

@@ -200,8 +200,7 @@ class ContentBlockerRulesManagerLoadingTests: ContentBlockerRulesManagerTests {
 
         let cbrm = ContentBlockerRulesManager(source: mockSource,
                                               updateListener: rulesUpdateListener,
-                                              logger: .disabled,
-                                              skipInitialSetup: false)
+                                              logger: .disabled)
 
         wait(for: [exp], timeout: 15.0)
         
@@ -228,8 +227,7 @@ class ContentBlockerRulesManagerLoadingTests: ContentBlockerRulesManagerTests {
 
         let cbrm = ContentBlockerRulesManager(source: mockSource,
                                               updateListener: rulesUpdateListener,
-                                              logger: .disabled,
-                                              skipInitialSetup: false)
+                                              logger: .disabled)
 
         wait(for: [exp], timeout: 15.0)
         
@@ -259,8 +257,7 @@ class ContentBlockerRulesManagerLoadingTests: ContentBlockerRulesManagerTests {
 
         let cbrm = ContentBlockerRulesManager(source: mockSource,
                                               updateListener: rulesUpdateListener,
-                                              logger: .disabled,
-                                              skipInitialSetup: false)
+                                              logger: .disabled)
 
         wait(for: [exp], timeout: 15.0)
         
@@ -290,9 +287,7 @@ class ContentBlockerRulesManagerLoadingTests: ContentBlockerRulesManagerTests {
         }
 
         let cbrm = ContentBlockerRulesManager(source: mockSource,
-                                              updateListener: rulesUpdateListener,
-                                              logger: .disabled,
-                                              skipInitialSetup: false)
+                                              updateListener: rulesUpdateListener)
 
         wait(for: [exp], timeout: 15.0)
         
@@ -326,9 +321,7 @@ class ContentBlockerRulesManagerLoadingTests: ContentBlockerRulesManagerTests {
         }
 
         let cbrm = ContentBlockerRulesManager(source: mockSource,
-                                              updateListener: rulesUpdateListener,
-                                              logger: .disabled,
-                                              skipInitialSetup: false)
+                                              updateListener: rulesUpdateListener)
 
         wait(for: [exp], timeout: 15.0)
         
@@ -366,9 +359,7 @@ class ContentBlockerRulesManagerLoadingTests: ContentBlockerRulesManagerTests {
         }
 
         let cbrm = ContentBlockerRulesManager(source: mockSource,
-                                              updateListener: rulesUpdateListener,
-                                              logger: .disabled,
-                                              skipInitialSetup: false)
+                                              updateListener: rulesUpdateListener)
 
         wait(for: [exp], timeout: 15.0)
         
@@ -405,9 +396,7 @@ class ContentBlockerRulesManagerLoadingTests: ContentBlockerRulesManagerTests {
         }
 
         let cbrm = ContentBlockerRulesManager(source: mockSource,
-                                              updateListener: rulesUpdateListener,
-                                              logger: .disabled,
-                                              skipInitialSetup: false)
+                                              updateListener: rulesUpdateListener)
 
         wait(for: [exp], timeout: 15.0)
 
@@ -445,9 +434,7 @@ class ContentBlockerRulesManagerLoadingTests: ContentBlockerRulesManagerTests {
         }
 
         let cbrm = ContentBlockerRulesManager(source: mockSource,
-                                              updateListener: rulesUpdateListener,
-                                              logger: .disabled,
-                                              skipInitialSetup: false)
+                                              updateListener: rulesUpdateListener)
 
         wait(for: [exp], timeout: 15.0)
 
@@ -489,9 +476,7 @@ class ContentBlockerRulesManagerLoadingTests: ContentBlockerRulesManagerTests {
         }
 
         let cbrm = ContentBlockerRulesManager(source: mockSource,
-                                              updateListener: rulesUpdateListener,
-                                              logger: .disabled,
-                                              skipInitialSetup: false)
+                                              updateListener: rulesUpdateListener)
 
         wait(for: [exp], timeout: 15.0)
         
@@ -541,9 +526,7 @@ class ContentBlockerRulesManagerUpdatingTests: ContentBlockerRulesManagerTests {
         }
 
         let cbrm = ContentBlockerRulesManager(source: mockSource,
-                                              updateListener: rulesUpdateListener,
-                                              logger: .disabled,
-                                              skipInitialSetup: false)
+                                              updateListener: rulesUpdateListener)
         
         wait(for: [initialLoading], timeout: 15.0)
 
@@ -598,9 +581,7 @@ class ContentBlockerRulesManagerUpdatingTests: ContentBlockerRulesManagerTests {
         }
 
         let cbrm = ContentBlockerRulesManager(source: mockSource,
-                                              updateListener: rulesUpdateListener,
-                                              logger: .disabled,
-                                              skipInitialSetup: false)
+                                              updateListener: rulesUpdateListener)
         
         wait(for: [initialLoading], timeout: 15.0)
 
@@ -656,9 +637,7 @@ class ContentBlockerRulesManagerUpdatingTests: ContentBlockerRulesManagerTests {
         }
 
         let cbrm = ContentBlockerRulesManager(source: mockSource,
-                                              updateListener: rulesUpdateListener,
-                                              logger: .disabled,
-                                              skipInitialSetup: false)
+                                              updateListener: rulesUpdateListener)
 
         wait(for: [initialLoading], timeout: 15.0)
 
@@ -715,9 +694,7 @@ class ContentBlockerRulesManagerUpdatingTests: ContentBlockerRulesManagerTests {
         }
 
         let cbrm = ContentBlockerRulesManager(source: mockSource,
-                                              updateListener: rulesUpdateListener,
-                                              logger: .disabled,
-                                              skipInitialSetup: false)
+                                              updateListener: rulesUpdateListener)
         
         wait(for: [initialLoading], timeout: 15.0)
 
@@ -773,9 +750,7 @@ class ContentBlockerRulesManagerUpdatingTests: ContentBlockerRulesManagerTests {
         }
 
         let cbrm = ContentBlockerRulesManager(source: mockSource,
-                                              updateListener: rulesUpdateListener,
-                                              logger: .disabled,
-                                              skipInitialSetup: false)
+                                              updateListener: rulesUpdateListener)
 
         wait(for: [initialLoading], timeout: 15.0)
 

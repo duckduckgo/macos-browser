@@ -43,10 +43,6 @@ class ContentBlockerReferenceTests: XCTestCase {
                                        schemeHandler: TestSchemeHandler,
                                        completion: @escaping (WKWebView) -> Void) {
 
-//        let mockSource = MockContentBlockerRulesSource(trackerData: nil,
-//                                                       embeddedTrackerData: (trackerData, UUID().uuidString) )
-//        _ = ContentBlockerRulesManager.test_prepareRegularInstance(source: mockSource, skipInitialSetup: false)
-
         WebKitTestHelper.prepareContentBlockingRules(trackerData: trackerData,
                                                      exceptions: [],
                                                      tempUnprotected: [],

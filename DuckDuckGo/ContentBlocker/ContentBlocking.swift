@@ -21,6 +21,69 @@ import BrowserServicesKit
 import Combine
 import os.log
 
+// swiftlint:disable line_length
+final class ContentBlocking {
+
+    static let privacyConfigurationManager = PrivacyConfigurationManager(fetchedETag: DefaultConfigurationStorage.shared.loadEtag(for: .privacyConfiguration),
+                                                                         fetchedData: DefaultConfigurationStorage.shared.loadData(for: .privacyConfiguration),
+                                                                         embeddedDataProvider: AppPrivacyConfigurationDataProvider(),
+                                                                         localProtection: DomainsProtectionUserDefaultsStore(),
+                                                                         errorReporting: debugEvents)
+
+    static let contentBlockingUpdating = ContentBlockingUpdating()
+
+    static let trackerDataManager = TrackerDataManager(etag: DefaultConfigurationStorage.shared.loadEtag(for: .trackerRadar),
+                                                       data: DefaultConfigurationStorage.shared.loadData(for: .trackerRadar),
+                                                       errorReporting: debugEvents)
+
+    static let contentBlockingManager = ContentBlockerRulesManager(source: contentBlockingSource,
+                                                                   updateListener: contentBlockingUpdating,
+                                                                   logger: OSLog.contentBlocking)
+
+    private static let contentBlockingSource = DefaultContentBlockerRulesSource(trackerDataManager: trackerDataManager,
+                                                                                privacyConfigManager: privacyConfigurationManager)
+
+    private static let debugEvents = EventMapping<ContentBlockerDebugEvents> { event, error, parameters in
+        let domainEvent: Pixel.Event.Debug
+        switch event {
+        case .trackerDataParseFailed:
+            domainEvent = .trackerDataParseFailed
+
+        case .trackerDataReloadFailed:
+            domainEvent = .trackerDataReloadFailed
+
+        case .trackerDataCouldNotBeLoaded:
+            domainEvent = .trackerDataCouldNotBeLoaded
+
+        case .privacyConfigurationReloadFailed:
+            domainEvent = .privacyConfigurationReloadFailed
+
+        case .privacyConfigurationParseFailed:
+            domainEvent = .privacyConfigurationParseFailed
+
+        case .privacyConfigurationCouldNotBeLoaded:
+            domainEvent = .privacyConfigurationCouldNotBeLoaded
+
+        case .contentBlockingTDSCompilationFailed:
+            domainEvent = .contentBlockingTDSCompilationFailed
+
+        case .contentBlockingTempListCompilationFailed:
+            domainEvent = .contentBlockingTempListCompilationFailed
+
+        case .contentBlockingAllowListCompilationFailed:
+            domainEvent = .contentBlockingAllowListCompilationFailed
+
+        case .contentBlockingUnpSitesCompilationFailed:
+            domainEvent = .contentBlockingUnpSitesCompilationFailed
+
+        case .contentBlockingFallbackCompilationFailed:
+            domainEvent = .contentBlockingFallbackCompilationFailed
+        }
+
+        Pixel.fire(.debug(event: domainEvent, error: error), withAdditionalParameters: parameters)
+    }
+}
+
 final class ContentBlockingUpdating: ContentBlockerRulesUpdating {
     typealias NewRulesInfo = (rules: ContentBlockerRulesManager.CurrentRules,
                               changes: ContentBlockerRulesIdentifier.Difference,
@@ -42,19 +105,4 @@ final class ContentBlockingUpdating: ContentBlockerRulesUpdating {
 
 }
 
-final class ContentBlocking {
-
-    static let privacyConfigurationManager = PrivacyConfigurationManager(dataProvider: AppPrivacyConfigurationDataProvider(),
-                                                                         localProtection: DomainsProtectionUserDefaultsStore())
-
-    static let contentBlockingUpdating = ContentBlockingUpdating()
-
-    static let trackerDataManager = TrackerDataManager()
-
-    private static let contentBlockingSource = DefaultContentBlockerRulesSource(trackerDataManager: trackerDataManager,
-                                                                                privacyConfigManager: privacyConfigurationManager)
-
-    static let contentBlockingManager = ContentBlockerRulesManager(source: contentBlockingSource,
-                                                                   updateListener: contentBlockingUpdating,
-                                                                   logger: OSLog.contentBlocking)
-}
+// swiftlint:enable line_length

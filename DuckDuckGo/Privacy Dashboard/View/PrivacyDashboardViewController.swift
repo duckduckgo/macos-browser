@@ -242,4 +242,8 @@ extension PrivacyDashboardViewController: WKNavigationDelegate {
         sendParentEntity()
     }
 
+    func webView(_ webView: WKWebView, didFail navigation: WKNavigation!, withError error: Error) {
+        print(error)
+    }
+
 }
