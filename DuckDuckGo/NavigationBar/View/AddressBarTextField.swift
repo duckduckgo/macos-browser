@@ -245,16 +245,14 @@ final class AddressBarTextField: NSTextField {
         currentEditor()?.selectAll(self)
     }
 
-    private func updateTabUrlWithUrl(_ providedUrl: URL?, suggestion: Suggestion?) {
+    private func updateTabUrlWithUrl(_ providedUrl: URL, suggestion: Suggestion?) {
         guard let selectedTabViewModel = tabCollectionViewModel.selectedTabViewModel else {
             os_log("%s: Selected tab view model is nil", type: .error, className)
             return
         }
 
-        guard var url = providedUrl else {
-            os_log("%s: Making url from address bar string failed", type: .error, className)
-            return
-        }
+        var url = providedUrl
+
         // keep current search mode
         if url.isDuckDuckGoSearch,
            let oldURL = selectedTabViewModel.tab.content.url,
@@ -285,9 +283,11 @@ final class AddressBarTextField: NSTextField {
         makeUrl(suggestion: suggestion,
                 stringValueWithoutSuffix: stringValueWithoutSuffix,
                 completion: { [weak self] url, isUpgraded in
-                    if isUpgraded { self?.updateTabUpgradedToUrl(url) }
-                    self?.updateTabUrlWithUrl(url, suggestion: suggestion)
-                })
+            guard let url = url else { return }
+
+            if isUpgraded { self?.updateTabUpgradedToUrl(url) }
+            self?.updateTabUrlWithUrl(url, suggestion: suggestion)
+        })
     }
 
     private func updateTabUpgradedToUrl(_ url: URL?) {
