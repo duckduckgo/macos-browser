@@ -35,11 +35,15 @@ final class AddressBarViewController: NSViewController {
     private let suggestionContainerViewModel = SuggestionContainerViewModel(suggestionContainer: SuggestionContainer())
 
     enum Mode: Equatable {
-        case searching(withUrl: Bool)
+        case editing(isUrl: Bool)
         case browsing
+
+        var isEditing: Bool {
+            return self != .browsing
+        }
     }
     
-    private var mode: Mode = .searching(withUrl: false) {
+    private var mode: Mode = .editing(isUrl: false) {
         didSet {
             addressBarButtonsViewController?.controllerMode = mode
         }
@@ -112,6 +116,24 @@ final class AddressBarViewController: NSViewController {
 
         addressBarTextField.viewDidLayout()
         addressBarTextField.makeMeFirstResponderIfNeeded()
+    }
+
+    func escapeKeyDown() -> Bool {
+        guard isFirstResponder else { return false }
+
+        guard !mode.isEditing else {
+            addressBarTextField.escapeKeyDown()
+            return true
+        }
+
+        // If the webview doesn't have content it doesn't handle becoming the first responder properly
+        if tabCollectionViewModel.selectedTabViewModel?.tab.webView.url != nil {
+            tabCollectionViewModel.selectedTabViewModel?.tab.webView.makeMeFirstResponder()
+        } else {
+            view.superview?.becomeFirstResponder()
+        }
+
+        return true
     }
 
     @IBSegueAction func createAddressBarButtonsViewController(_ coder: NSCoder) -> AddressBarButtonsViewController? {
@@ -203,7 +225,7 @@ final class AddressBarViewController: NSViewController {
     }
 
     private func updateView() {
-        let isPassiveTextFieldHidden = isFirstResponder || mode != .browsing
+        let isPassiveTextFieldHidden = isFirstResponder || mode.isEditing
         addressBarTextField.alphaValue = isPassiveTextFieldHidden ? 1 : 0
         passiveTextField.alphaValue = isPassiveTextFieldHidden ? 0 : 1
 
@@ -244,12 +266,12 @@ final class AddressBarViewController: NSViewController {
 
     private func updateMode() {
         switch self.addressBarTextField.value {
-        case .text: self.mode = .searching(withUrl: false)
-        case .url(urlString: _, url: _, userTyped: let userTyped): self.mode = userTyped ? .searching(withUrl: true) : .browsing
+        case .text: self.mode = .editing(isUrl: false)
+        case .url(urlString: _, url: _, userTyped: let userTyped): self.mode = userTyped ? .editing(isUrl: true) : .browsing
         case .suggestion(let suggestionViewModel):
             switch suggestionViewModel.suggestion {
-            case .phrase, .unknown: self.mode = .searching(withUrl: false)
-            case .website, .bookmark, .historyEntry: self.mode = .searching(withUrl: true)
+            case .phrase, .unknown: self.mode = .editing(isUrl: false)
+            case .website, .bookmark, .historyEntry: self.mode = .editing(isUrl: true)
             }
         }
     }

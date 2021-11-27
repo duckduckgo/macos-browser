@@ -509,9 +509,9 @@ final class AddressBarButtonsViewController: NSViewController {
         switch controllerMode {
         case .browsing:
             imageButton.image = selectedTabViewModel.favicon
-        case .searching(withUrl: true):
+        case .editing(isUrl: true):
             imageButton.image = Self.webImage
-        case .searching(withUrl: false):
+        case .editing(isUrl: false):
             imageButton.image = Self.homeFaviconImage
         default:
             imageButton.image = nil
@@ -531,11 +531,11 @@ final class AddressBarButtonsViewController: NSViewController {
         let urlScheme = selectedTabViewModel.tab.content.url?.scheme
         let isHypertextUrl = urlScheme == "http" || urlScheme == "https"
         let isDuckDuckGoUrl = selectedTabViewModel.tab.content.url?.isDuckDuckGoSearch ?? false
-        let isSearchingMode = controllerMode != .browsing
+        let isEditingMode = controllerMode?.isEditing ?? false
         let isTextFieldValueText = textFieldValue?.isText ?? false
 
         // Privacy entry point button
-        privacyEntryPointButton.isHidden = isSearchingMode ||
+        privacyEntryPointButton.isHidden = isEditingMode ||
             isTextFieldEditorFirstResponder ||
             isDuckDuckGoUrl ||
             !isHypertextUrl ||

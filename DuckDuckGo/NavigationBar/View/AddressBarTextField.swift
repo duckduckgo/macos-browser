@@ -178,6 +178,16 @@ final class AddressBarTextField: NSTextField {
         }
     }
 
+    func escapeKeyDown() {
+        if suggestionWindowController?.window?.isVisible ?? false {
+            hideSuggestionWindow()
+            return
+        }
+
+        clearValue()
+        updateValue()
+    }
+
     func makeMeFirstResponderIfNeeded() {
         let focusTab = tabCollectionViewModel.selectedTabViewModel?.tab.content.shouldFocusAddressBarAfterSelection ?? true
 
