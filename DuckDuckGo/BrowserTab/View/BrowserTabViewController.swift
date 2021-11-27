@@ -49,7 +49,6 @@ final class BrowserTabViewController: NSViewController {
 
     private var transientTabContentViewController: NSViewController?
 
-    private var clickPoint: NSPoint?
     private var mouseDownMonitor: Any?
     private var mouseUpMonitor: Any?
     private var cancellables = Set<AnyCancellable>()
@@ -75,6 +74,9 @@ final class BrowserTabViewController: NSViewController {
         // Private API to hide the popover arrow
         contentOverlayPopover.setValue(true, forKeyPath: "shouldHideAnchor")
         //contentOverlayPopover.setValue(CGSize.zero, forKeyPath: "anchorSize")
+        
+        contentOverlayPopover.zoomFactor = self.webView?.magnification
+        contentOverlayPopover.webView = self.webView
         
         return contentOverlayPopover
     }
@@ -104,7 +106,6 @@ final class BrowserTabViewController: NSViewController {
         hoverLabelContainer.alphaValue = 0
         subscribeToSelectedTabViewModel()
         subscribeToErrorViewState()
-        addMouseMonitors()
     }
 
     private func subscribeToSelectedTabViewModel() {
@@ -173,6 +174,7 @@ final class BrowserTabViewController: NSViewController {
 
         guard self.tabViewModel !== tabViewModel else { return }
 
+        tabViewModel.tab.userScripts.autofillScript.topView = self
         let oldWebView = webView
         displayWebView(of: tabViewModel)
         subscribeToUrl(of: tabViewModel)
@@ -532,83 +534,6 @@ extension BrowserTabViewController: FileDownloadManagerDelegate {
     func tab(_ tab: Tab, requestedSaveCredentials credentials: SecureVaultModels.WebsiteCredentials) {
         guard PasswordManagerSettings().canPromptOnDomain(credentials.account.domain) else { return }
         tabViewModel?.credentialsToSave = credentials
-    }
-
-}
-
-// TODO copied from address bar, can it be shared?!
-extension BrowserTabViewController {
-
-    func registerForMouseEnteredAndExitedEvents() {
-        guard let webView = self.webView else { return }
-        let trackingArea = NSTrackingArea(rect: webView.bounds,
-                                          options: [.activeAlways, .mouseEnteredAndExited, .mouseMoved],
-                                          owner: self,
-                                          userInfo: nil)
-        self.view.addTrackingArea(trackingArea)
-    }
-
-    override func mouseEntered(with event: NSEvent) {
-        NSCursor.iBeam.set()
-        super.mouseEntered(with: event)
-    }
-
-    override func mouseMoved(with event: NSEvent) {
-        guard event.window === self.view.window else { return }
-
-        let point = self.view.convert(event.locationInWindow, from: nil)
-        let view = self.view.hitTest(point)
-
-        if view is NSButton {
-            NSCursor.arrow.set()
-        } else {
-            NSCursor.iBeam.set()
-        }
-
-        super.mouseMoved(with: event)
-    }
-
-    override func mouseExited(with event: NSEvent) {
-        NSCursor.arrow.set()
-        super.mouseExited(with: event)
-    }
-
-    func addMouseMonitors() {
-        guard mouseDownMonitor == nil, mouseUpMonitor == nil else { return }
-
-        self.mouseDownMonitor = NSEvent.addLocalMonitorForEvents(matching: .leftMouseDown) { [weak self] event in
-            self?.mouseDown(with: event)
-        }
-        self.mouseUpMonitor = NSEvent.addLocalMonitorForEvents(matching: .leftMouseUp) { [weak self] event in
-            self?.mouseUp(with: event)
-        }
-    }
-
-    func removeMouseMonitors() {
-        if let monitor = mouseDownMonitor {
-            NSEvent.removeMonitor(monitor)
-        }
-        if let monitor = mouseUpMonitor {
-            NSEvent.removeMonitor(monitor)
-        }
-        self.mouseUpMonitor = nil
-        self.mouseDownMonitor = nil
-    }
-
-    func mouseDown(with event: NSEvent) -> NSEvent? {
-        self.clickPoint = nil
-        guard event.window === self.view.window else { return event }
-        self.clickPoint = event.locationInWindow
-
-        tabViewModel?.tab.clickPoint = self.clickPoint
-        // TODO make a more elegant way to send over the reference
-        tabViewModel?.tab.userScripts.autofillScript.topView = self
-        tabViewModel?.tab.userScripts.autofillScript.clickPoint = self.clickPoint
-        return event
-    }
-
-    func mouseUp(with event: NSEvent) -> NSEvent? {
-        return event
     }
 
 }

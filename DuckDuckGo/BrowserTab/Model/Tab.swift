@@ -429,8 +429,6 @@ final class Tab: NSObject {
         return manager
     }()
 
-    private var userScriptsUpdatedCancellable: AnyCancellable?
-
     // TODO make private again
     public var userScripts: UserScripts! {
         willSet {
@@ -446,7 +444,6 @@ final class Tab: NSObject {
             userScripts.contentBlockerRulesScript.delegate = self
             // TODO verify this changes on tab change
             userScripts.autofillScript.topView = nil
-            userScripts.autofillScript.delegate = self
             userScripts.autofillScript.emailDelegate = emailManager
             userScripts.autofillScript.vaultDelegate = vaultManager
             userScripts.pageObserverScript.delegate = self
@@ -571,13 +568,6 @@ extension Tab: PrintingUserScriptDelegate {
         activePrintOperation = nil
     }
 
-}
-
-// TODO
-extension Tab: AutofillUserScriptDelegate {
-    func clickTriggered(_ script: AutofillUserScript) {
-        script.clickPoint = self.clickPoint
-    }
 }
 
 extension Tab: PageObserverUserScriptDelegate {
