@@ -159,8 +159,12 @@ final class AddressBarTextField: NSTextField {
         }
 
         switch lastAddressBarTextFieldValue {
-        case .text:
-            self.value = lastAddressBarTextFieldValue ?? Value(stringValue: "", userTyped: true)
+        case .text(let text):
+            if !text.isEmpty {
+                self.value = lastAddressBarTextFieldValue ?? Value(stringValue: "", userTyped: true)
+            } else {
+                updateValue()
+            }
         case .suggestion(let suggestionViewModel):
             let suggestion = suggestionViewModel.suggestion
             switch suggestion {
