@@ -2,6 +2,15 @@
   "object": {
     "pins": [
       {
+        "package": "BrowserServicesKit",
+        "repositoryURL": "https://github.com/duckduckgo/BrowserServicesKit.git",
+        "state": {
+          "branch": "bartek/content-blocking",
+          "revision": "09cc7283a27b9acac42140f15e4a3aaca5ed8d43",
+          "version": null
+        }
+      },
+      {
         "package": "GRDB",
         "repositoryURL": "https://github.com/duckduckgo/GRDB.swift.git",
         "state": {
@@ -53,6 +62,15 @@
           "branch": null,
           "revision": "6b2aa2748a7881eebb9f84fb10c01293e15b52ca",
           "version": "0.5.0"
+        }
+      },
+      {
+        "package": "TrackerRadarKit",
+        "repositoryURL": "https://github.com/duckduckgo/TrackerRadarKit.git",
+        "state": {
+          "branch": null,
+          "revision": "5f4caf35b8418700a48c64c7c61eb43308c8dacc",
+          "version": "1.0.3"
         }
       }
     ]

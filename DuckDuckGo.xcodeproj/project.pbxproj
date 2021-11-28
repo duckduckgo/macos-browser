@@ -879,7 +879,6 @@
 		85E11C3625E7F1E100974CAF /* ExternalURLHandlerTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ExternalURLHandlerTests.swift; sourceTree = "<group>"; };
 		85F1B0C825EF9759004792B6 /* URLEventHandlerTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = URLEventHandlerTests.swift; sourceTree = "<group>"; };
 		85F69B3B25EDE81F00978E59 /* URLExtensionTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = URLExtensionTests.swift; sourceTree = "<group>"; };
-		9826B09E2747B6D60092F683 /* BrowserServicesKit */ = {isa = PBXFileReference; lastKnownFileType = folder; name = BrowserServicesKit; path = ../BrowserServicesKit; sourceTree = "<group>"; };
 		9826B09F2747DF3D0092F683 /* ContentBlocking.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentBlocking.swift; sourceTree = "<group>"; };
 		9826B0A12747DFEB0092F683 /* AppPrivacyConfigurationDataProvider.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppPrivacyConfigurationDataProvider.swift; sourceTree = "<group>"; };
 		98EB5D0F27516A4800681FE6 /* AppPrivacyConfigurationTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppPrivacyConfigurationTests.swift; sourceTree = "<group>"; };
@@ -2089,7 +2088,6 @@
 			isa = PBXGroup;
 			children = (
 				AA68C3D62490F821001B8783 /* README.md */,
-				9826B09E2747B6D60092F683 /* BrowserServicesKit */,
 				AA585D80248FD31100E9A3E2 /* DuckDuckGo */,
 				AA585D93248FD31400E9A3E2 /* Unit Tests */,
 				4B1AD89E25FC27E200261379 /* Integration Tests */,
@@ -4966,7 +4964,7 @@
 			isa = XCRemoteSwiftPackageReference;
 			repositoryURL = "https://github.com/duckduckgo/BrowserServicesKit.git";
 			requirement = {
-				branch = "release/friends-and-family";
+				branch = "bartek/content-blocking";
 				kind = branch;
 			};
 		};
