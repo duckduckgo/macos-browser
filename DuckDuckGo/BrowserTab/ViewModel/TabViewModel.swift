@@ -89,7 +89,7 @@ final class TabViewModel {
     }
 
     private func subscribeToUrl() {
-        tab.$content.sink { [weak self] _ in
+        tab.$content.receive(on: DispatchQueue.main).sink { [weak self] _ in
             self?.updateCanReload()
             self?.updateAddressBarStrings()
             self?.updateCanBeBookmarked()
@@ -98,7 +98,7 @@ final class TabViewModel {
     }
 
     private func subscribeToTitle() {
-        tab.$title.sink { [weak self] _ in self?.updateTitle() } .store(in: &cancellables)
+        tab.$title.receive(on: DispatchQueue.main).sink { [weak self] _ in self?.updateTitle() } .store(in: &cancellables)
     }
 
     private func subscribeToFavicon() {
