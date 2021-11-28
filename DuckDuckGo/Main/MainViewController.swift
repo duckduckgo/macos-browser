@@ -147,6 +147,7 @@ final class MainViewController: NSViewController {
             self?.navigationalCancellables = []
             self?.subscribeToCanGoBackForward()
             self?.subscribeToFindInPage()
+            self?.adjustFirstResponder()
         }
     }
 
@@ -184,11 +185,7 @@ final class MainViewController: NSViewController {
         findInPageViewController?.model = model
         if model.visible {
             findInPageViewController?.makeMeFirstResponder()
-        } else if !(tabCollectionViewModel.selectedTabViewModel?.addressBarString.isEmpty ?? false) {
-            // If there's an address bar string, this isn't a new tab, so make the webview the first responder
-            tabCollectionViewModel.selectedTabViewModel?.tab.webView.makeMeFirstResponder()
         }
-        
     }
 
     private func updateBackMenuItem() {
@@ -247,9 +244,27 @@ final class MainViewController: NSViewController {
         stopMenuItem.isEnabled = selectedTabViewModel.isLoading
     }
 
+    // MARK: - First responder
+
+    func adjustFirstResponder() {
+        guard let selectedTabViewModel = tabCollectionViewModel.selectedTabViewModel else {
+            os_log("MainViewController: No tab view model selected", type: .error)
+            return
+        }
+
+        switch selectedTabViewModel.tab.content {
+        case .homepage, .none: navigationBarViewController.addressBarViewController?.addressBarTextField.makeMeFirstResponder()
+        case .url:
+            browserTabViewController.webView?.makeMeFirstResponder()
+        case .preferences: browserTabViewController.preferencesViewController.view.makeMeFirstResponder()
+        case .bookmarks: browserTabViewController.bookmarksViewController.view.makeMeFirstResponder()
+        }
+
+    }
+
 }
 
-// MARK: - Escape key
+// MARK: - Mouse & Keyboard Events
 
 // This needs to be handled here or else there will be a "beep" even if handled in a different view controller. This now
 //  matches Safari behaviour.

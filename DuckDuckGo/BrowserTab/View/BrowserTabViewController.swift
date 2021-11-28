@@ -113,8 +113,6 @@ final class BrowserTabViewController: NSViewController {
 
         // Make sure this is on top
         view.addSubview(hoverLabelContainer)
-
-        setFirstResponderIfNeeded()
     }
 
     private func changeWebView() {
@@ -252,7 +250,7 @@ final class BrowserTabViewController: NSViewController {
 
     // MARK: - Preferences
 
-    private lazy var preferencesViewController: PreferencesSplitViewController = {
+    private(set) lazy var preferencesViewController: PreferencesSplitViewController = {
         let viewController = PreferencesSplitViewController.create()
         viewController.delegate = self
 
@@ -267,7 +265,7 @@ final class BrowserTabViewController: NSViewController {
 
     // MARK: - Bookmarks
 
-    private lazy var bookmarksViewController: BookmarkManagementSplitViewController = {
+    private(set) lazy var bookmarksViewController: BookmarkManagementSplitViewController = {
         let viewController = BookmarkManagementSplitViewController.create()
         viewController.delegate = self
 

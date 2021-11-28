@@ -57,11 +57,9 @@ final class AddressBarViewController: NSViewController {
     }
 
     private var selectedTabViewModelCancellable: AnyCancellable?
-    private var addressBarTextFieldValueCancellable: AnyCancellable?
     private var passiveAddressBarStringCancellable: AnyCancellable?
     private var suggestionsVisibleCancellable: AnyCancellable?
     private var frameCancellable: AnyCancellable?
-    private var addressBarStringCancellable: AnyCancellable?
 
     private var progressCancellable: AnyCancellable?
     private var loadingCancellable: AnyCancellable?
@@ -84,10 +82,10 @@ final class AddressBarViewController: NSViewController {
         super.viewDidLoad()
 
         updateView()
+        addressBarTextField.addressBarTextFieldDelegate = self
         addressBarTextField.tabCollectionViewModel = tabCollectionViewModel
         addressBarTextField.suggestionContainerViewModel = suggestionContainerViewModel
         subscribeToSelectedTabViewModel()
-        subscribeToAddressBarTextFieldValue()
         registerForMouseEnteredAndExitedEvents()
 
         NotificationCenter.default.addObserver(self,
@@ -115,7 +113,6 @@ final class AddressBarViewController: NSViewController {
         super.viewDidLayout()
 
         addressBarTextField.viewDidLayout()
-        addressBarTextField.makeMeFirstResponderIfNeeded()
     }
 
     func escapeKeyDown() -> Bool {
@@ -150,17 +147,8 @@ final class AddressBarViewController: NSViewController {
         selectedTabViewModelCancellable = tabCollectionViewModel.$selectedTabViewModel.receive(on: DispatchQueue.main).sink { [weak self] _ in
             self?.subscribeToPassiveAddressBarString()
             self?.subscribeToProgressEvents()
-            self?.subscribeToAddressBarString()
             // don't resign first responder on tab switching
             self?.clickPoint = nil
-        }
-    }
-
-    private func subscribeToAddressBarString() {
-        addressBarStringCancellable?.cancel()
-        guard let model = tabCollectionViewModel.selectedTabViewModel else { return }
-        addressBarStringCancellable = model.$addressBarString.receive(on: DispatchQueue.main).sink { [weak self] _ in
-            self?.addressBarTextField.makeMeFirstResponderIfNeeded()
         }
     }
 
@@ -215,15 +203,6 @@ final class AddressBarViewController: NSViewController {
         }
     }
 
-    private func subscribeToAddressBarTextFieldValue() {
-        addressBarTextFieldValueCancellable = addressBarTextField.$value.receive(on: DispatchQueue.main).sink { [weak self] value in
-            guard let self = self else { return }
-            self.updateMode()
-            self.addressBarButtonsViewController?.textFieldValue = value
-            self.updateView()
-        }
-    }
-
     private func updateView() {
         let isPassiveTextFieldHidden = isFirstResponder || mode.isEditing
         addressBarTextField.alphaValue = isPassiveTextFieldHidden ? 1 : 0
@@ -264,8 +243,8 @@ final class AddressBarViewController: NSViewController {
         shadowView.frame = frame
     }
 
-    private func updateMode() {
-        switch self.addressBarTextField.value {
+    private func updateMode(value: AddressBarTextField.Value? = nil) {
+        switch value ?? self.addressBarTextField.value {
         case .text: self.mode = .editing(isUrl: false)
         case .url(urlString: _, url: _, userTyped: let userTyped): self.mode = userTyped ? .editing(isUrl: true) : .browsing
         case .suggestion(let suggestionViewModel):
@@ -399,6 +378,16 @@ extension AddressBarViewController: AddressBarButtonsViewControllerDelegate {
 
     func addressBarButtonsViewControllerClearButtonClicked(_ addressBarButtonsViewController: AddressBarButtonsViewController) {
         addressBarTextField.clearValue()
+    }
+
+}
+
+extension AddressBarViewController: AddressBarTextFieldDelegate {
+
+    func adressBarTextField(_ addressBarTextField: AddressBarTextField, didChangeValue value: AddressBarTextField.Value) {
+        updateMode(value: value)
+        addressBarButtonsViewController?.textFieldValue = value
+        updateView()
     }
 
 }

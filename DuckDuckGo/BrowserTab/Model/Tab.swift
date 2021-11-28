@@ -139,7 +139,7 @@ final class Tab: NSObject {
 
     var contentChangeEnabled = true
 
-    @PublishedAfter private(set) var content: TabContent {
+    @Published private(set) var content: TabContent {
         didSet {
             if oldValue.url?.host != content.url?.host {
                 fetchFavicon(nil, for: content.url?.host, isFromUserScript: false)
@@ -163,8 +163,8 @@ final class Tab: NSObject {
         self.content = content
     }
 
-    @PublishedAfter var title: String?
-    @PublishedAfter var error: Error?
+    @Published var title: String?
+    @Published var error: Error?
     let permissions: PermissionModel
 
     weak private(set) var parentTab: Tab?

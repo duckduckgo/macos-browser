@@ -102,7 +102,7 @@ final class MainWindowController: NSWindowController {
             mainViewController.view.makeMeFirstResponder()
         } else {
             window?.styleMask.update(with: .closable)
-            mainViewController.navigationBarViewController.addressBarViewController?.addressBarTextField.makeMeFirstResponderIfNeeded()
+            mainViewController.adjustFirstResponder()
         }
     }
 

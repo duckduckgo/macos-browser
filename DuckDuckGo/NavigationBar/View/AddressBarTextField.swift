@@ -24,7 +24,15 @@ import BrowserServicesKit
 // swiftlint:disable file_length
 // swiftlint:disable type_body_length
 
+protocol AddressBarTextFieldDelegate: AnyObject {
+
+    func adressBarTextField(_ addressBarTextField: AddressBarTextField, didChangeValue value: AddressBarTextField.Value)
+
+}
+
 final class AddressBarTextField: NSTextField {
+
+    weak var addressBarTextFieldDelegate: AddressBarTextFieldDelegate?
 
     var tabCollectionViewModel: TabCollectionViewModel! {
         didSet {
@@ -104,6 +112,7 @@ final class AddressBarTextField: NSTextField {
 
     private func subscribeToSelectedTabViewModel() {
         selectedTabViewModelCancellable = tabCollectionViewModel.$selectedTabViewModel.receive(on: DispatchQueue.main).sink { [weak self] _ in
+            self?.restoreValueIfPossible()
             self?.subscribeToAddressBarString()
         }
     }
@@ -117,10 +126,6 @@ final class AddressBarTextField: NSTextField {
         }
         addressBarStringCancellable = selectedTabViewModel.$addressBarString.dropFirst().receive(on: DispatchQueue.main).sink { [weak self] _ in
             self?.updateValue()
-        }
-
-        DispatchQueue.main.async {
-            self.restoreValueIfPossible()
         }
     }
 
@@ -147,6 +152,11 @@ final class AddressBarTextField: NSTextField {
     }
 
     private func restoreValueIfPossible() {
+        func restoreValue(_ value: AddressBarTextField.Value) {
+            self.value = value
+            currentEditor()?.selectAll(self)
+        }
+
         guard let selectedTabViewModel = tabCollectionViewModel.selectedTabViewModel else {
             return
         }
@@ -161,7 +171,7 @@ final class AddressBarTextField: NSTextField {
         switch lastAddressBarTextFieldValue {
         case .text(let text):
             if !text.isEmpty {
-                self.value = lastAddressBarTextFieldValue ?? Value(stringValue: "", userTyped: true)
+                restoreValue(lastAddressBarTextFieldValue ?? Value(stringValue: "", userTyped: true))
             } else {
                 updateValue()
             }
@@ -169,14 +179,14 @@ final class AddressBarTextField: NSTextField {
             let suggestion = suggestionViewModel.suggestion
             switch suggestion {
             case .website, .bookmark, .historyEntry:
-                self.value = Value(stringValue: suggestionViewModel.autocompletionString, userTyped: true)
+                restoreValue(Value(stringValue: suggestionViewModel.autocompletionString, userTyped: true))
             case .phrase(phrase: let phase):
-                self.value = Value.text(phase)
+                restoreValue(Value.text(phase))
             default:
                 updateValue()
             }
         case .url(urlString: let urlString, url: _, userTyped: true):
-            self.value = Value(stringValue: urlString, userTyped: true)
+            restoreValue(Value(stringValue: urlString, userTyped: true))
         default:
             updateValue()
         }
@@ -190,14 +200,6 @@ final class AddressBarTextField: NSTextField {
 
         clearValue()
         updateValue()
-    }
-
-    func makeMeFirstResponderIfNeeded() {
-        let focusTab = tabCollectionViewModel.selectedTabViewModel?.tab.content.shouldFocusAddressBarAfterSelection ?? true
-
-        if focusTab, value.isEmpty || value.isText {
-            makeMeFirstResponder()
-        }
     }
 
     private func displaySelectedSuggestionViewModel() {
@@ -415,6 +417,8 @@ final class AddressBarTextField: NSTextField {
             } else {
                 self.stringValue = value.string
             }
+
+            addressBarTextFieldDelegate?.adressBarTextField(self, didChangeValue: value)
         }
     }
 
@@ -852,17 +856,6 @@ final class AddressBarTextFieldCell: NSTextFieldCell {
 
 fileprivate extension NSStoryboard {
     static let suggestion = NSStoryboard(name: "Suggestion", bundle: .main)
-}
-
-fileprivate extension Tab.TabContent {
-
-    var shouldFocusAddressBarAfterSelection: Bool {
-        switch self {
-        case .url, .homepage, .none: return true
-        case .preferences, .bookmarks: return false
-        }
-    }
-
 }
 
 // swiftlint:enable type_body_length

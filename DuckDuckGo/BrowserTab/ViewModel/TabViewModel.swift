@@ -65,7 +65,7 @@ final class TabViewModel {
     var loadingStartTime: CFTimeInterval?
 
     @Published private(set) var addressBarString: String = ""
-    @PublishedAfter private(set) var passiveAddressBarString: String = ""
+    @Published private(set) var passiveAddressBarString: String = ""
     var lastAddressBarTextFieldValue: AddressBarTextField.Value?
     var lastHomepageTextFieldValue: AddressBarTextField.Value?
 
