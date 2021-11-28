@@ -70,8 +70,10 @@ extension Pixel.Event {
 
             return params
 
+        // Don't use default to force new items to be thought about
         case .appLaunch,
              .launchTiming,
+             .appUsage,
              .appActiveUsage,
              .browserMadeDefault,
              .burn,
@@ -93,6 +95,7 @@ extension Pixel.Event {
              .importedLogins,
              .exportedLogins,
              .importedBookmarks,
+             .exportedBookmarks,
              .formAutofilled,
              .autofillItemSaved:
 

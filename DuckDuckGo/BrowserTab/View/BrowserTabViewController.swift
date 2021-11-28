@@ -216,6 +216,10 @@ final class BrowserTabViewController: NSViewController {
             self.homepageView.removeFromSuperview()
             removePreferencesPage()
             self.webView?.removeFromSuperview()
+            guard bookmarksViewController.parent == nil else {
+                return
+            }
+            
             self.addChild(bookmarksViewController)
             view.addAndLayout(bookmarksViewController.view)
 
@@ -223,6 +227,10 @@ final class BrowserTabViewController: NSViewController {
             self.homepageView.removeFromSuperview()
             removeBookmarksPage()
             self.webView?.removeFromSuperview()
+            guard preferencesViewController.parent == nil else {
+                return
+            }
+
             self.addChild(preferencesViewController)
             view.addAndLayout(preferencesViewController.view)
 
@@ -327,6 +335,7 @@ extension BrowserTabViewController: TabDelegate {
         guard let tabViewModel = tabViewModel else { return }
 
         tabViewModel.closeFindInPage()
+        tabViewModel.tab.resetDashboardInfo(tabViewModel.tab.webView.url)
         tab.permissions.tabDidStartNavigation()
         if !tabViewModel.isLoading,
            tabViewModel.tab.webView.isLoading {

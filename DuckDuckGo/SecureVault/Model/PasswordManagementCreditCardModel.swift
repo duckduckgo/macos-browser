@@ -140,7 +140,7 @@ final class PasswordManagementCreditCardModel: ObservableObject, PasswordManagem
         guard var card = card else { return }
 
         card.title = title
-        card.cardNumber = cardNumber
+        card.cardNumberData = cardNumber.data(using: .utf8)!
         card.cardholderName = cardholderName
         card.cardSecurityCode = cardSecurityCode
         card.expirationMonth = expirationMonth

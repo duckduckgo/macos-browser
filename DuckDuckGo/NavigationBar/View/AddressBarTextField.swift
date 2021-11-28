@@ -729,28 +729,38 @@ extension AddressBarTextField: NSTextFieldDelegate {
             return false
         }
 
-        guard suggestionWindowController?.window?.isVisible == true else {
-            return false
+        // Collision of suffix and forward deleting
+        if [#selector(NSResponder.deleteForward(_:)), #selector(NSResponder.deleteWordForward(_:))].contains(commandSelector) {
+            if let currentEditor = currentEditor(),
+               currentEditor.selectedRange.location == value.string.utf16.count,
+               currentEditor.selectedRange.length == 0 {
+                // Don't do delete when cursor is in the end
+                return true
+            }
         }
 
-        switch commandSelector {
-        case #selector(NSResponder.moveDown(_:)):
-            suggestionContainerViewModel.selectNextIfPossible(); return true
-        case #selector(NSResponder.moveUp(_:)):
-            suggestionContainerViewModel.selectPreviousIfPossible(); return true
-        case #selector(NSResponder.deleteBackward(_:)),
-             #selector(NSResponder.deleteForward(_:)),
-             #selector(NSResponder.deleteToMark(_:)),
-             #selector(NSResponder.deleteWordForward(_:)),
-             #selector(NSResponder.deleteWordBackward(_:)),
-             #selector(NSResponder.deleteToEndOfLine(_:)),
-             #selector(NSResponder.deleteToEndOfParagraph(_:)),
-             #selector(NSResponder.deleteToBeginningOfLine(_:)),
-             #selector(NSResponder.deleteBackwardByDecomposingPreviousCharacter(_:)):
-            suggestionContainerViewModel.clearSelection(); return false
-        default:
-            return false
+        if suggestionWindowController?.window?.isVisible ?? false {
+            switch commandSelector {
+            case #selector(NSResponder.moveDown(_:)):
+                suggestionContainerViewModel.selectNextIfPossible(); return true
+            case #selector(NSResponder.moveUp(_:)):
+                suggestionContainerViewModel.selectPreviousIfPossible(); return true
+            case #selector(NSResponder.deleteBackward(_:)),
+                #selector(NSResponder.deleteForward(_:)),
+                #selector(NSResponder.deleteToMark(_:)),
+                #selector(NSResponder.deleteWordForward(_:)),
+                #selector(NSResponder.deleteWordBackward(_:)),
+                #selector(NSResponder.deleteToEndOfLine(_:)),
+                #selector(NSResponder.deleteToEndOfParagraph(_:)),
+                #selector(NSResponder.deleteToBeginningOfLine(_:)),
+                #selector(NSResponder.deleteBackwardByDecomposingPreviousCharacter(_:)):
+                suggestionContainerViewModel.clearSelection(); return false
+            default:
+                return false
+            }
         }
+
+        return false
     }
 
 }

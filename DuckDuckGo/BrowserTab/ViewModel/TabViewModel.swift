@@ -27,7 +27,6 @@ final class TabViewModel {
         static let home = NSImage(named: "HomeFavicon")!
         static let preferences = NSImage(named: "Preferences")!
         static let bookmarks = NSImage(named: "Bookmarks")!
-        static let defaultFavicon = NSImage()
     }
 
     private(set) var tab: Tab
@@ -70,7 +69,7 @@ final class TabViewModel {
     var lastHomepageTextFieldValue: AddressBarTextField.Value?
 
     @Published private(set) var title: String = UserText.tabHomeTitle
-    @Published private(set) var favicon: NSImage = Favicon.home
+    @Published private(set) var favicon: NSImage?
     @Published private(set) var findInPage: FindInPageModel = FindInPageModel()
 
     @Published private(set) var usedPermissions = Permissions()
@@ -94,6 +93,7 @@ final class TabViewModel {
             self?.updateCanReload()
             self?.updateAddressBarStrings()
             self?.updateCanBeBookmarked()
+            self?.updateFavicon()
         } .store(in: &cancellables)
     }
 
@@ -203,7 +203,7 @@ final class TabViewModel {
 
     private func updateFavicon() {
         guard !errorViewState.isVisible else {
-            favicon = Favicon.defaultFavicon
+            favicon = nil
             return
         }
 
@@ -223,7 +223,7 @@ final class TabViewModel {
         if let favicon = tab.favicon {
             self.favicon = favicon
         } else {
-            favicon = Favicon.defaultFavicon
+            favicon = nil
         }
     }
 

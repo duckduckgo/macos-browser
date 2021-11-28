@@ -24,6 +24,7 @@ extension Pixel {
         case appLaunch(isDefault: IsDefaultBrowser = .init(), launch: AppLaunch)
         case launchTiming
 
+        case appUsage
         case appActiveUsage(isDefault: IsDefaultBrowser = .init(), avgTabs: AverageTabsCount)
 
         case browserMadeDefault
@@ -73,6 +74,7 @@ extension Pixel {
         case importedLogins(repetition: Repetition = .init(key: "imported-logins"), source: DataImportSource)
         case exportedLogins(repetition: Repetition = .init(key: "exported-logins"))
         case importedBookmarks(repetition: Repetition = .init(key: "imported-bookmarks"), source: DataImportSource)
+        case exportedBookmarks(repetition: Repetition = .init(key: "exported-bookmarks"))
 
         case formAutofilled(kind: FormAutofillKind)
         case autofillItemSaved(kind: FormAutofillKind)
@@ -117,6 +119,9 @@ extension Pixel.Event {
             return "ml_mac_app-launch_\(isDefault)_\(launch)"
         case .launchTiming:
             return "ml_mac_launch-timing"
+
+        case .appUsage:
+            return "m_mac_usage"
 
         case .appActiveUsage(isDefault: let isDefault, avgTabs: let avgTabs):
             return "m_mac_active-usage_\(isDefault)_\(avgTabs)"
@@ -180,6 +185,9 @@ extension Pixel.Event {
 
         case .importedBookmarks(repetition: let repetition, source: let source):
             return "m_mac_imported-bookmarks_\(repetition)_\(source)"
+
+        case .exportedBookmarks(repetition: let repetition):
+            return "m_mac_exported-bookmarks_\(repetition)"
 
         case .formAutofilled(kind: let kind):
             return "m_mac_autofill_\(kind)"

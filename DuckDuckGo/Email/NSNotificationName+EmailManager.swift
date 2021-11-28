@@ -1,5 +1,5 @@
 //
-//  LoginExport.swift
+//  NSNotificationName+EmailManager.swift
 //
 //  Copyright © 2021 DuckDuckGo. All rights reserved.
 //
@@ -17,9 +17,10 @@
 //
 
 import Foundation
+import BrowserServicesKit
 
-protocol LoginExporter {
+extension NSNotification.Name {
 
-    func exportVaultLogins(to: URL) throws
+    static let privateEmailCopiedToClipboard = NSNotification.Name("privateEmailCopiedToClipboard")
 
 }

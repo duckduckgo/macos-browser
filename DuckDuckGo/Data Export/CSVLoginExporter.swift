@@ -19,7 +19,7 @@
 import Foundation
 import BrowserServicesKit
 
-final class CSVLoginExporter: LoginExporter {
+final class CSVLoginExporter {
 
     enum CSVLoginExportError: Error {
         case failedToEncodeLogins

@@ -92,6 +92,16 @@ final class AddressBarViewController: NSViewController {
                                                selector: #selector(refreshAddressBarAppearance(_:)),
                                                name: FireproofDomains.Constants.allowedDomainsChangedNotification,
                                                object: nil)
+        
+        NotificationCenter.default.addObserver(self,
+                                               selector: #selector(refreshAddressBarAppearance(_:)),
+                                               name: NSWindow.didBecomeKeyNotification,
+                                               object: nil)
+        
+        NotificationCenter.default.addObserver(self,
+                                               selector: #selector(refreshAddressBarAppearance(_:)),
+                                               name: NSWindow.didResignKeyNotification,
+                                               object: nil)
     }
 
     override func viewWillAppear() {
@@ -211,6 +221,8 @@ final class AddressBarViewController: NSViewController {
         updateShadowView(firstResponder: isFirstResponder)
         inactiveBackgroundView.alphaValue = isFirstResponder ? 0 : 1
         activeBackgroundView.alphaValue = isFirstResponder ? 1 : 0
+        
+        activeBackgroundView.layer?.borderColor = NSColor.controlAccentColor.withAlphaComponent(0.6).cgColor
     }
 
     private func updateShadowView(firstResponder: Bool) {
@@ -222,10 +234,10 @@ final class AddressBarViewController: NSViewController {
         }
 
         suggestionsVisibleCancellable = addressBarTextField.suggestionWindowVisible.sink { [weak self] visible in
-            self?.shadowView.shadowSides = visible ? [.left, .top, .right] : .all
-            self?.shadowView.shadowColor = visible ? .suggestionsShadowColor : .addressBarShadowColor
-            self?.shadowView.shadowRadius = visible ? 8.0 : 4.0
-
+            self?.shadowView.shadowSides = visible ? [.left, .top, .right] : []
+            self?.shadowView.shadowColor = visible ? .suggestionsShadowColor : .clear
+            self?.shadowView.shadowRadius = visible ? 8.0 : 0.0
+            
             self?.activeBackgroundView.isHidden = visible
             self?.activeBackgroundViewWithSuggestions.isHidden = !visible
         }
@@ -257,6 +269,21 @@ final class AddressBarViewController: NSViewController {
 
     @objc private func refreshAddressBarAppearance(_ sender: Any) {
         self.updateMode()
+        self.addressBarButtonsViewController?.updateButtons()
+
+        guard let window = view.window else { return }
+
+        NSAppearance.withAppAppearance {
+            if window.isKeyWindow {
+                activeBackgroundView.layer?.borderWidth = 2.0
+                activeBackgroundView.layer?.borderColor = NSColor.controlAccentColor.withAlphaComponent(0.6).cgColor
+                activeBackgroundView.layer?.backgroundColor = NSColor.addressBarBackgroundColor.cgColor
+            } else {
+                activeBackgroundView.layer?.borderWidth = 0
+                activeBackgroundView.layer?.borderColor = nil
+                activeBackgroundView.layer?.backgroundColor = NSColor.inactiveSearchBarBackground.cgColor
+            }
+        }
     }
 
 }

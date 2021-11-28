@@ -91,6 +91,7 @@ enum SecureVaultItem: Equatable, Identifiable, Comparable {
             return identity.title.localizedCaseInsensitiveContains(filter)
         case .note(let note):
             return note.title.localizedCaseInsensitiveContains(filter) ||
+                note.text.localizedCaseInsensitiveContains(filter) ||
                 (note.associatedDomain?.localizedCaseInsensitiveContains(filter) ?? false)
         }
     }
@@ -104,7 +105,8 @@ enum SecureVaultItem: Equatable, Identifiable, Comparable {
         case .identity(let identity):
             return identity.title
         case .note(let note):
-            return note.title
+            let title = note.displayTitle
+            return title ?? UserText.pmEmptyNote
         }
     }
 
@@ -122,7 +124,8 @@ enum SecureVaultItem: Equatable, Identifiable, Comparable {
 
             return PasswordManagementItemListModel.personNameComponentsFormatter.string(from: nameComponents)
         case .note(let note):
-            return note.text.truncated(length: 100)
+            let subtitle = note.displaySubtitle
+            return subtitle
         }
     }
 
@@ -245,6 +248,10 @@ final class PasswordManagementItemListModel: ObservableObject {
     }
 
     func update(item: SecureVaultItem) {
+        if let index = items.firstIndex(of: item) {
+            items[index] = item
+        }
+
         var sections = displayedItems
 
         guard let sectionIndex = sections.firstIndex(where: {
