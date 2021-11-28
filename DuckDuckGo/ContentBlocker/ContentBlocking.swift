@@ -43,7 +43,7 @@ final class ContentBlocking {
     private static let contentBlockingSource = DefaultContentBlockerRulesSource(trackerDataManager: trackerDataManager,
                                                                                 privacyConfigManager: privacyConfigurationManager)
 
-    private static let debugEvents = EventMapping<ContentBlockerDebugEvents> { event, error, parameters in
+    private static let debugEvents = EventMapping<ContentBlockerDebugEvents> { event, error, parameters, onComplete in
         let domainEvent: Pixel.Event.Debug
         switch event {
         case .trackerDataParseFailed:
@@ -80,7 +80,7 @@ final class ContentBlocking {
             domainEvent = .contentBlockingFallbackCompilationFailed
         }
 
-        Pixel.fire(.debug(event: domainEvent, error: error), withAdditionalParameters: parameters)
+        Pixel.fire(.debug(event: domainEvent, error: error), withAdditionalParameters: parameters, onComplete: onComplete)
     }
 }
 
