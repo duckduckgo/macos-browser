@@ -57,7 +57,6 @@ final class PrivacyDashboardViewController: NSViewController {
             if didUpdate {
                 self.sendPendingUpdates()
 
-                // This should be removed, as event is processed in the Tab (to follow up)
                 let activeTab = self.tabViewModel?.tab
                 activeTab?.reload()
             }
