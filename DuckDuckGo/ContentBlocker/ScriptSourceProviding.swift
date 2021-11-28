@@ -88,6 +88,14 @@ final class DefaultScriptSourceProvider: ScriptSourceProviding {
     }
 
     private func buildSurrogatesConfig() -> SurrogatesUserScriptConfig {
+
+        let isDebugBuild: Bool
+        #if DEBUG
+        isDebugBuild = true
+        #else
+        isDebugBuild = false
+        #endif
+
         let surrogates = configStorage.loadData(for: .surrogates)?.utf8String() ?? ""
         let rules = contentBlockingManager.currentRules
         return DefaultSurrogatesUserScriptConfig(privacyConfig: privacyConfigurationManager.privacyConfig,
