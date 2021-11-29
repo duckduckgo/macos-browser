@@ -76,11 +76,11 @@
                             <constraint firstAttribute="trailing" secondItem="wFH-xq-50o" secondAttribute="trailing" id="4Cb-FA-sMo"/>
                             <constraint firstAttribute="trailing" secondItem="UE1-Pg-JIe" secondAttribute="trailing" id="DIS-8Z-gS4"/>
                             <constraint firstAttribute="trailing" secondItem="SYo-8W-jl3" secondAttribute="trailing" id="EJ8-cX-El9"/>
-                            <constraint firstItem="wFH-xq-50o" firstAttribute="top" secondItem="lYg-bX-QrJ" secondAttribute="bottom" id="EnL-Zp-RcI"/>
                             <constraint firstAttribute="trailing" secondItem="lYg-bX-QrJ" secondAttribute="trailing" id="HkZ-fV-qYb"/>
                             <constraint firstItem="lYg-bX-QrJ" firstAttribute="top" secondItem="m2S-Jp-Qdl" secondAttribute="top" id="PNG-fr-pcs"/>
                             <constraint firstItem="Jbn-9T-FNt" firstAttribute="centerX" secondItem="wFH-xq-50o" secondAttribute="centerX" id="PQa-4m-EpD"/>
                             <constraint firstItem="SYo-8W-jl3" firstAttribute="top" secondItem="wFH-xq-50o" secondAttribute="bottom" id="SOg-lH-g5P"/>
+                            <constraint firstItem="wFH-xq-50o" firstAttribute="top" secondItem="m2S-Jp-Qdl" secondAttribute="top" constant="38" id="TRm-AX-VcL"/>
                             <constraint firstItem="wFH-xq-50o" firstAttribute="leading" secondItem="m2S-Jp-Qdl" secondAttribute="leading" id="XQv-BZ-2ci"/>
                             <constraint firstItem="af1-Eb-VaG" firstAttribute="top" secondItem="wFH-xq-50o" secondAttribute="bottom" id="ajK-M4-7Qf"/>
                             <constraint firstItem="lYg-bX-QrJ" firstAttribute="leading" secondItem="m2S-Jp-Qdl" secondAttribute="leading" id="kVB-Sz-8Sv"/>
@@ -96,6 +96,8 @@
                     <connections>
                         <outlet property="findInPageContainerView" destination="Jbn-9T-FNt" id="5Sl-UV-Fa9"/>
                         <outlet property="navigationBarContainerView" destination="wFH-xq-50o" id="hbq-xV-McI"/>
+                        <outlet property="navigationBarTopConstraint" destination="TRm-AX-VcL" id="cCS-Fd-hJd"/>
+                        <outlet property="addressBarHeightConstraint" destination="vZS-tl-wOP" id="cCS-Fd-zJd"/>
                         <outlet property="tabBarContainerView" destination="lYg-bX-QrJ" id="nor-E0-cFP"/>
                         <outlet property="webContainerView" destination="SYo-8W-jl3" id="DoZ-Ih-dHA"/>
                     </connections>

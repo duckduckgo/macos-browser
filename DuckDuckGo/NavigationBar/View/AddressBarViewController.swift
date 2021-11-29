@@ -74,33 +74,43 @@ final class AddressBarViewController: NSViewController {
 
         updateView(firstResponder: false)
         addressBarTextField.tabCollectionViewModel = tabCollectionViewModel
-        addressBarTextField.suggestionContainerViewModel = suggestionContainerViewModel
         subscribeToSelectedTabViewModel()
         subscribeToAddressBarTextFieldValue()
-        registerForMouseEnteredAndExitedEvents()
 
-        NotificationCenter.default.addObserver(self,
-                                               selector: #selector(refreshAddressBarAppearance(_:)),
-                                               name: FireproofDomains.Constants.allowedDomainsChangedNotification,
-                                               object: nil)
-        
-        NotificationCenter.default.addObserver(self,
-                                               selector: #selector(refreshAddressBarAppearance(_:)),
-                                               name: NSWindow.didBecomeKeyNotification,
-                                               object: nil)
-        
-        NotificationCenter.default.addObserver(self,
-                                               selector: #selector(refreshAddressBarAppearance(_:)),
-                                               name: NSWindow.didResignKeyNotification,
-                                               object: nil)
     }
 
     override func viewWillAppear() {
-        NotificationCenter.default.addObserver(self,
-                                               selector: #selector(textFieldFirstReponderNotification(_:)),
-                                               name: .firstResponder,
-                                               object: nil)
-        addMouseMonitors()
+        if view.window?.isPopUpWindow == true {
+            addressBarTextField.isHidden = true
+            inactiveBackgroundView.isHidden = true
+            activeBackgroundViewWithSuggestions.isHidden = true
+            activeBackgroundView.isHidden = true
+            shadowView.isHidden = true
+        } else {
+            addressBarTextField.suggestionContainerViewModel = suggestionContainerViewModel
+
+            registerForMouseEnteredAndExitedEvents()
+
+            NotificationCenter.default.addObserver(self,
+                                                   selector: #selector(refreshAddressBarAppearance(_:)),
+                                                   name: FireproofDomains.Constants.allowedDomainsChangedNotification,
+                                                   object: nil)
+
+            NotificationCenter.default.addObserver(self,
+                                                   selector: #selector(refreshAddressBarAppearance(_:)),
+                                                   name: NSWindow.didBecomeKeyNotification,
+                                                   object: nil)
+
+            NotificationCenter.default.addObserver(self,
+                                                   selector: #selector(refreshAddressBarAppearance(_:)),
+                                                   name: NSWindow.didResignKeyNotification,
+                                                   object: nil)
+            NotificationCenter.default.addObserver(self,
+                                                   selector: #selector(textFieldFirstReponderNotification(_:)),
+                                                   name: .firstResponder,
+                                                   object: nil)
+            addMouseMonitors()
+        }
     }
 
     // swiftlint:disable notification_center_detachment
@@ -216,7 +226,9 @@ final class AddressBarViewController: NSViewController {
     }
 
     private func updateShadowView(firstResponder: Bool) {
-        guard firstResponder else {
+        guard firstResponder,
+            view.window?.isPopUpWindow == false
+        else {
             suggestionsVisibleCancellable = nil
             frameCancellable = nil
             shadowView.removeFromSuperview()

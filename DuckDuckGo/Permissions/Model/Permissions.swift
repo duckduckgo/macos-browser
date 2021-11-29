@@ -49,4 +49,13 @@ extension Dictionary where Key == PermissionType, Value == PermissionState {
         }
     }
 
+    var popups: PermissionState? {
+        get {
+            self[.popups]
+        }
+        set {
+            self[.popups] = newValue
+        }
+    }
+
 }

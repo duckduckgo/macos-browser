@@ -170,6 +170,7 @@ extension URL {
 
         case http
         case https
+        case file
 
         func separated() -> String {
             self.rawValue + Self.separator

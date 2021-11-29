@@ -27,6 +27,8 @@ final class MainViewController: NSViewController {
     @IBOutlet weak var navigationBarContainerView: NSView!
     @IBOutlet weak var webContainerView: NSView!
     @IBOutlet weak var findInPageContainerView: NSView!
+    @IBOutlet var navigationBarTopConstraint: NSLayoutConstraint!
+    @IBOutlet var addressBarHeightConstraint: NSLayoutConstraint!
 
     private(set) var tabBarViewController: TabBarViewController!
     private(set) var navigationBarViewController: NavigationBarViewController!
@@ -60,6 +62,16 @@ final class MainViewController: NSViewController {
         listenToKeyDownEvents()
         subscribeToSelectedTabViewModel()
         findInPageContainerView.applyDropShadow()
+
+    }
+
+    override func viewWillAppear() {
+        if view.window?.isPopUpWindow == true {
+            tabBarViewController.view.isHidden = true
+            tabBarContainerView.isHidden = true
+            navigationBarTopConstraint.constant = 0.0
+            addressBarHeightConstraint.constant = tabBarContainerView.frame.height
+        }
     }
     
     override func viewDidLayout() {
