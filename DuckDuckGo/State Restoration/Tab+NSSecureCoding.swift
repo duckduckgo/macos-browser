@@ -33,7 +33,7 @@ extension Tab: NSSecureCoding {
     static var supportsSecureCoding: Bool { true }
 
     convenience init?(coder decoder: NSCoder) {
-        guard let tabTypeRawValue = decoder.decodeIfPresent(at: NSSecureCodingKeys.tabType),
+        guard let tabTypeRawValue: Int = decoder.decodeIfPresent(at: NSSecureCodingKeys.tabType),
               let tabType = TabContent.ContentType(rawValue: tabTypeRawValue),
               let content = TabContent(type: tabType, url: decoder.decodeIfPresent(at: NSSecureCodingKeys.url))
         else { return nil }

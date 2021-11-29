@@ -88,6 +88,7 @@ final class BrowserTabViewController: NSViewController {
     /// 3. A URL is provided after already adding the webview, so the webview should be reloaded.
     private func updateInterface() {
         changeWebView()
+        scheduleHoverLabelUpdatesForUrl(nil)
         show(tabContent: tabCollectionViewModel.selectedTabViewModel?.tab.content)
     }
 
@@ -217,6 +218,10 @@ final class BrowserTabViewController: NSViewController {
             self.homepageView.removeFromSuperview()
             removePreferencesPage()
             self.webView?.removeFromSuperview()
+            guard bookmarksViewController.parent == nil else {
+                return
+            }
+            
             self.addChild(bookmarksViewController)
             view.addAndLayout(bookmarksViewController.view)
 
@@ -224,6 +229,10 @@ final class BrowserTabViewController: NSViewController {
             self.homepageView.removeFromSuperview()
             removeBookmarksPage()
             self.webView?.removeFromSuperview()
+            guard preferencesViewController.parent == nil else {
+                return
+            }
+
             self.addChild(preferencesViewController)
             view.addAndLayout(preferencesViewController.view)
 
@@ -328,6 +337,7 @@ extension BrowserTabViewController: TabDelegate {
         guard let tabViewModel = tabViewModel else { return }
 
         tabViewModel.closeFindInPage()
+        tabViewModel.tab.resetDashboardInfo(tabViewModel.tab.webView.url)
         tab.permissions.tabDidStartNavigation()
         if !tabViewModel.isLoading,
            tabViewModel.tab.webView.isLoading {
@@ -386,6 +396,10 @@ extension BrowserTabViewController: TabDelegate {
         scheduleHoverLabelUpdatesForUrl(url)
     }
 
+    func windowDidResignKey() {
+        scheduleHoverLabelUpdatesForUrl(nil)
+    }
+
     private func scheduleHoverLabelUpdatesForUrl(_ url: URL?) {
         // cancel previous animation, if any
         hoverLabelWorkItem?.cancel()
@@ -399,7 +413,7 @@ extension BrowserTabViewController: TabDelegate {
             animationItem = DispatchWorkItem { [weak self] in
                 self?.hoverLabelContainer.animator().alphaValue = 0
             }
-        } else if hoverLabelContainer.alphaValue < 1 {
+        } else if url != nil && hoverLabelContainer.alphaValue < 1 {
             // schedule a fade in
             delay = 0.5
             animationItem = DispatchWorkItem { [weak self] in

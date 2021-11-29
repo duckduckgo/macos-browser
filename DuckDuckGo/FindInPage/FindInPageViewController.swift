@@ -73,10 +73,10 @@ final class FindInPageViewController: NSViewController {
         modifiers.remove(.capsLock)
         switch modifiers {
         case .shift:
-            findInPagePrevious(self)
+            delegate?.findInPagePrevious(self)
             return true
         case []:
-            findInPageNext(self)
+            delegate?.findInPageNext(self)
             return true
         default:
             return false

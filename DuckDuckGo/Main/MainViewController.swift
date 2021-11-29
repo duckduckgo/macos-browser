@@ -73,6 +73,10 @@ final class MainViewController: NSViewController {
         updateStopMenuItem()
     }
 
+    func windowDidResignKey() {
+        browserTabViewController.windowDidResignKey()
+    }
+
     override func encodeRestorableState(with coder: NSCoder) {
         fatalError("Default AppKit State Restoration should not be used")
     }

@@ -47,6 +47,11 @@ protocol TabBarViewItemDelegate: AnyObject {
 
 final class TabBarViewItem: NSCollectionViewItem {
 
+    enum Constants {
+        static let textFieldPadding: CGFloat = 32
+        static let textFieldPaddingNoFavicon: CGFloat = 12
+    }
+
     var widthStage: WidthStage {
         if isSelected || isDragged {
             return .full
@@ -79,10 +84,12 @@ final class TabBarViewItem: NSCollectionViewItem {
     @IBOutlet weak var permissionButton: NSButton!
 
     @IBOutlet weak var titleTextField: NSTextField!
+    @IBOutlet weak var titleTextFieldLeadingConstraint: NSLayoutConstraint!
     @IBOutlet weak var closeButton: MouseOverButton!
     @IBOutlet weak var rightSeparatorView: ColorView!
     @IBOutlet weak var mouseOverView: MouseOverView!
     @IBOutlet weak var mouseClickView: MouseClickView!
+    @IBOutlet weak var faviconWrapperView: NSView!
     @IBOutlet weak var faviconWrapperViewCenterConstraint: NSLayoutConstraint!
     @IBOutlet weak var faviconWrapperViewLeadingConstraint: NSLayoutConstraint!
     @IBOutlet var permissionCloseButtonTrailingConstraint: NSLayoutConstraint!
@@ -201,7 +208,7 @@ final class TabBarViewItem: NSCollectionViewItem {
         }.store(in: &cancellables)
 
         tabViewModel.$favicon.sink { [weak self] favicon in
-            self?.faviconImageView.image = favicon
+            self?.updateFavicon(favicon)
         }.store(in: &cancellables)
 
         tabViewModel.tab.$content.sink { [weak self] content in
@@ -249,11 +256,11 @@ final class TabBarViewItem: NSCollectionViewItem {
         let showCloseButton = (isMouseOver && !widthStage.isCloseButtonHidden) || isSelected
         closeButton.isHidden = !showCloseButton
         updateSeparatorView()
-        permissionCloseButtonTrailingConstraint.isActive = !closeButton.isHidden
-        titleTextField.isHidden = widthStage.isTitleHidden
+        permissionCloseButtonTrailingConstraint.isActive = !closeButton.isHidden 
+        titleTextField.isHidden = widthStage.isTitleHidden && faviconImageView.image != nil
 
-        faviconWrapperViewCenterConstraint.priority = widthStage.isTitleHidden ? .defaultHigh : .defaultLow
-        faviconWrapperViewLeadingConstraint.priority = widthStage.isTitleHidden ? .defaultLow : .defaultHigh
+        faviconWrapperViewCenterConstraint.priority = titleTextField.isHidden ? .defaultHigh : .defaultLow
+        faviconWrapperViewLeadingConstraint.priority = titleTextField.isHidden ? .defaultLow : .defaultHigh
     }
 
     private var usedPermissions = Permissions() {
@@ -304,6 +311,12 @@ final class TabBarViewItem: NSCollectionViewItem {
             gradientPadding = TextFieldMaskGradientSize.trailingSpaceWithPermissionAndButton
         }
         titleTextField.gradient(width: TextFieldMaskGradientSize.width, trailingPadding: gradientPadding)
+    }
+
+    private func updateFavicon(_ favicon: NSImage?) {
+        faviconWrapperView.isHidden = favicon == nil
+        titleTextFieldLeadingConstraint.constant = faviconWrapperView.isHidden ? Constants.textFieldPaddingNoFavicon : Constants.textFieldPadding 
+        faviconImageView.image = favicon
     }
 
 }

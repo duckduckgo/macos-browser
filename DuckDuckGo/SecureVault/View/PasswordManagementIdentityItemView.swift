@@ -169,7 +169,8 @@ private struct AddressView: View {
                     .padding(.bottom, 20)
             }
 
-            EditableIdentityField(textFieldValue: $model.addressStreet, title: UserText.pmAddressStreet)
+            EditableIdentityField(textFieldValue: $model.addressStreet, title: UserText.pmAddress1)
+            EditableIdentityField(textFieldValue: $model.addressStreet2, title: UserText.pmAddress2)
             EditableIdentityField(textFieldValue: $model.addressCity, title: UserText.pmAddressCity)
             EditableIdentityField(textFieldValue: $model.addressProvince, title: UserText.pmAddressProvince)
             EditableIdentityField(textFieldValue: $model.addressPostalCode, title: UserText.pmAddressPostalCode)
