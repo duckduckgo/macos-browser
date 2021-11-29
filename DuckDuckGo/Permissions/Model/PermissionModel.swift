@@ -176,7 +176,7 @@ final class PermissionModel {
                                    to decision: Bool?) {
 
         // If Always Deny for the current host: revoke the permission
-        guard webView?.url?.domain?.dropWWW() == domain,
+        guard webView?.url?.host?.dropWWW() == domain,
            decision == false,
            self.permissions[permissionType] != nil
         else {
@@ -205,7 +205,7 @@ final class PermissionModel {
     }
 
     func revoke(_ permission: PermissionType) {
-        if let domain = webView?.url?.domain,
+        if let domain = webView?.url?.host,
            permissionManager.permission(forDomain: domain, permissionType: permission) == true {
             permissionManager.removePermission(forDomain: domain, permissionType: permission)
         }

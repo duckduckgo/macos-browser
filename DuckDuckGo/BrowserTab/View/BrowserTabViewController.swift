@@ -639,7 +639,7 @@ extension BrowserTabViewController: WKUIDelegate {
         if !shouldOpenPopUp {
             let url = navigationAction.request.url
             parentTab.permissions.permissions([.popups],
-                                              requestedForDomain: navigationAction.sourceFrame.request.url?.domain,
+                                              requestedForDomain: navigationAction.sourceFrame.request.url?.host,
                                               url: url) { [weak parentTab] granted in
 
                 guard let parentTab = parentTab else { return }

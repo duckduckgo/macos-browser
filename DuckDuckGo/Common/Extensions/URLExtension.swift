@@ -17,7 +17,6 @@
 //
 
 import Foundation
-import WebKit
 import os.log
 
 extension URL {
@@ -75,16 +74,6 @@ extension URL {
 
     static var homePage: URL {
         return URL(string: "about:home")!
-    }
-
-    var domain: String? {
-        if let host = host {
-            return host
-        }
-        if self.scheme == NavigationalScheme.file.rawValue {
-            return .localhost
-        }
-        return nil
     }
 
     // MARK: Pixel

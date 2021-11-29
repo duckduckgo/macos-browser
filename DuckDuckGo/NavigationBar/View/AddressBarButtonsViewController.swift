@@ -340,7 +340,7 @@ final class AddressBarButtonsViewController: NSViewController {
         }
 
         PermissionContextMenu(permissions: [(.microphone, state)],
-                              domain: selectedTabViewModel.tab.content.url?.domain ?? "",
+                              domain: selectedTabViewModel.tab.content.url?.host ?? "",
                               delegate: self)
             .popUp(positioning: nil, at: NSPoint(x: 0, y: sender.bounds.height), in: sender)
     }
@@ -358,7 +358,7 @@ final class AddressBarButtonsViewController: NSViewController {
         }
 
         PermissionContextMenu(permissions: [(.geolocation, state)],
-                              domain: selectedTabViewModel.tab.content.url?.domain ?? "",
+                              domain: selectedTabViewModel.tab.content.url?.host ?? "",
                               delegate: self)
             .popUp(positioning: nil, at: NSPoint(x: 0, y: sender.bounds.height), in: sender)
     }
@@ -381,7 +381,7 @@ final class AddressBarButtonsViewController: NSViewController {
             permissions = [(.popups, state)]
         }
         PermissionContextMenu(permissions: permissions,
-                              domain: selectedTabViewModel.tab.content.url?.domain ?? "",
+                              domain: selectedTabViewModel.tab.content.url?.host ?? "",
                               delegate: self)
             .popUp(positioning: nil, at: NSPoint(x: 0, y: sender.bounds.height), in: sender)
     }
