@@ -79,7 +79,9 @@ final class AddressBarButtonsViewController: NSViewController {
     @IBOutlet weak var clearButton: NSButton!
 
     @IBOutlet weak var animationWrapperView: NSView!
-    var trackerAnimationView: AnimationView!
+    var trackerAnimationView1: AnimationView!
+    var trackerAnimationView2: AnimationView!
+    var trackerAnimationView3: AnimationView!
     var shieldAnimationView: AnimationView!
     var shieldDotAnimationView: AnimationView!
 
@@ -408,46 +410,44 @@ final class AddressBarButtonsViewController: NSViewController {
         }
 
         let animation = Animation.named(animationName, animationCache: LottieAnimationCache.shared)
-        let animationView = AnimationView(animation: animation, imageProvider: tabCollectionViewModel)
+        let animationView = AnimationView(animation: animation, imageProvider: self)
         animationView.identifier = NSUserInterfaceItemIdentifier(rawValue: animationName)
         animationViewCache[animationName] = animationView
         return animationView
     }
 
     private func setupAnimationViews() {
-        func addAndLayoutAnimationView(_ animationName: String) -> AnimationView {
+        func addAndLayoutAnimationViewIfNeeded(animationView: AnimationView?, animationName: String) -> AnimationView {
+            if let animationView = animationView, animationView.identifier?.rawValue == animationName {
+                return animationView
+            }
 
-            let animationView: AnimationView
+            animationView?.removeFromSuperview()
+
+            let newAnimationView: AnimationView
             if AppDelegate.isRunningTests {
-                animationView = AnimationView()
+                newAnimationView = AnimationView()
             } else {
                 // For unknown reason, this caused infinite execution of various unit tests.
-                animationView = getAnimationView(for: animationName)
+                newAnimationView = getAnimationView(for: animationName)
             }
-            animationWrapperView.addAndLayout(animationView)
-            animationView.isHidden = true
-            return animationView
+            animationWrapperView.addAndLayout(newAnimationView)
+            newAnimationView.isHidden = true
+            return newAnimationView
         }
 
         let isAquaMode = NSApp.effectiveAppearance.name == NSAppearance.Name.aqua
 
-        let trackerAnimationName = isAquaMode ? "trackers" : "dark-trackers"
-        if trackerAnimationView?.identifier?.rawValue != trackerAnimationName {
-            trackerAnimationView?.removeFromSuperview()
-            trackerAnimationView = addAndLayoutAnimationView(trackerAnimationName)
-        }
-
-        let shieldAnimationName = isAquaMode ? "shield" : "dark-shield"
-        if shieldAnimationView?.identifier?.rawValue != shieldAnimationName {
-            shieldAnimationView?.removeFromSuperview()
-            shieldAnimationView = addAndLayoutAnimationView(shieldAnimationName)
-        }
-
-        let shieldDotAnimationName = isAquaMode ? "shield-dot" : "dark-shield-dot"
-        if shieldDotAnimationView?.identifier?.rawValue != shieldDotAnimationName {
-            shieldDotAnimationView?.removeFromSuperview()
-            shieldDotAnimationView = addAndLayoutAnimationView(shieldDotAnimationName)
-        }
+        trackerAnimationView1 = addAndLayoutAnimationViewIfNeeded(animationView: trackerAnimationView1,
+                                                                  animationName: isAquaMode ? "trackers-1" : "dark-trackers-1")
+        trackerAnimationView2 = addAndLayoutAnimationViewIfNeeded(animationView: trackerAnimationView2,
+                                                                  animationName: isAquaMode ? "trackers-2" : "dark-trackers-2")
+        trackerAnimationView3 = addAndLayoutAnimationViewIfNeeded(animationView: trackerAnimationView3,
+                                                                  animationName: isAquaMode ? "trackers-3" : "dark-trackers-3")
+        shieldAnimationView = addAndLayoutAnimationViewIfNeeded(animationView: shieldAnimationView,
+                                                                animationName: isAquaMode ? "shield" : "dark-shield")
+        shieldDotAnimationView = addAndLayoutAnimationViewIfNeeded(animationView: shieldDotAnimationView,
+                                                                   animationName: isAquaMode ? "shield-dot" : "dark-shield-dot")
     }
 
     private func subscribeToSelectedTabViewModel() {
@@ -524,7 +524,7 @@ final class AddressBarButtonsViewController: NSViewController {
     }
 
     private func updatePermissionButtons() {
-        permissionButtons.isHidden = isTextFieldEditorFirstResponder || trackerAnimationView.isAnimationPlaying
+        permissionButtons.isHidden = isTextFieldEditorFirstResponder || isAnyTrackerAnimationPlaying
         defer {
             showOrHidePermissionPopoverIfNeeded()
         }
@@ -609,8 +609,7 @@ final class AddressBarButtonsViewController: NSViewController {
             !isHypertextUrl ||
             selectedTabViewModel.errorViewState.isVisible ||
             isTextFieldValueText
-
-        imageButtonWrapper.isHidden = !privacyEntryPointButton.isHidden || trackerAnimationView.isAnimationPlaying
+        imageButtonWrapper.isHidden = !privacyEntryPointButton.isHidden || isAnyTrackerAnimationPlaying
     }
 
     private func updatePrivacyEntryPointIcon() {
@@ -618,7 +617,7 @@ final class AddressBarButtonsViewController: NSViewController {
             return
         }
 
-        guard !trackerAnimationView.isAnimationPlaying else {
+        guard !isAnyTrackerAnimationPlaying else {
             privacyEntryPointButton.image = nil
             return
         }
@@ -637,6 +636,10 @@ final class AddressBarButtonsViewController: NSViewController {
             break
         }
     }
+
+    // MARK: Tracker Animation
+
+    var lastTrackerImages = [CGImage]()
 
     private func animateTrackers() {
         guard !privacyEntryPointButton.isHidden,
@@ -659,12 +662,23 @@ final class AddressBarButtonsViewController: NSViewController {
             return
         }
 
-        trackerAnimationView.isHidden = false
-        trackerAnimationView.reloadImages()
-        trackerAnimationView.play { [weak self] _ in
-            self?.trackerAnimationView.isHidden = true
-            self?.updatePrivacyEntryPointIcon()
-            self?.updatePermissionButtons()
+        if let trackerInfo = selectedTabViewModel.tab.trackerInfo {
+            lastTrackerImages = PrivacyIconViewModel.trackerImages(from: trackerInfo)
+
+            let trackerAnimationView: AnimationView?
+            switch lastTrackerImages.count {
+            case 0: trackerAnimationView = nil
+            case 1: trackerAnimationView = trackerAnimationView1
+            case 2: trackerAnimationView = trackerAnimationView2
+            default: trackerAnimationView = trackerAnimationView3
+            }
+            trackerAnimationView?.isHidden = false
+            trackerAnimationView?.reloadImages()
+            trackerAnimationView?.play { [weak self] _ in
+                trackerAnimationView?.isHidden = true
+                self?.updatePrivacyEntryPointIcon()
+                self?.updatePermissionButtons()
+            }
         }
 
         updatePrivacyEntryPointIcon()
@@ -679,9 +693,17 @@ final class AddressBarButtonsViewController: NSViewController {
             }
         }
 
-        stopAnimation(trackerAnimationView)
+        stopAnimation(trackerAnimationView1)
+        stopAnimation(trackerAnimationView2)
+        stopAnimation(trackerAnimationView3)
         stopAnimation(shieldAnimationView)
         stopAnimation(shieldDotAnimationView)
+    }
+
+    private var isAnyTrackerAnimationPlaying: Bool {
+        trackerAnimationView1.isAnimationPlaying ||
+        trackerAnimationView2.isAnimationPlaying ||
+        trackerAnimationView3.isAnimationPlaying
     }
 
     private func stopAnimationsAfterFocus() {
@@ -778,20 +800,14 @@ extension AddressBarButtonsViewController: NSPopoverDelegate {
 
 }
 
-extension TabCollectionViewModel: AnimationImageProvider {
+extension AddressBarButtonsViewController: AnimationImageProvider {
 
     func imageForAsset(asset: ImageAsset) -> CGImage? {
-        guard let selectedTabViewModel = self.selectedTabViewModel,
-              let trackerInfo = selectedTabViewModel.tab.trackerInfo else {
-            return nil
-        }
-
-        let images = PrivacyIconViewModel.trackerImages(from: trackerInfo)
         switch asset.name {
-        case "img_0.png": return images[safe: 0]
-        case "img_1.png": return images[safe: 1]
-        case "img_2.png": return images[safe: 2]
-        case "img_3.png": return images[safe: 3]
+        case "img_0.png": return lastTrackerImages[safe: 0]
+        case "img_1.png": return lastTrackerImages[safe: 1]
+        case "img_2.png": return lastTrackerImages[safe: 2]
+        case "img_3.png": return lastTrackerImages[safe: 3]
         default: return nil
         }
     }
