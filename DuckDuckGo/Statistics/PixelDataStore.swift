@@ -27,12 +27,17 @@ protocol PixelDataStore {
     func value(forKey key: String) -> Int?
     func set(_ value: Int, forKey: String)
 
+    func value(forKey key: String) -> String?
+    func set(_ value: String, forKey: String)
+
+    func removeValue(forKey key: String)
+    
 }
 
 final class LocalPixelDataStore: PixelDataStore {
     static let shared = LocalPixelDataStore()
 
-    private lazy var cache: [String: NSNumber] = loadAll()
+    private lazy var cache: [String: NSObject] = loadAll()
 
     private init() {}
 
@@ -41,71 +46,100 @@ final class LocalPixelDataStore: PixelDataStore {
     }
 
     private lazy var context = Database.shared.makeContext(concurrencyType: .mainQueueConcurrencyType, name: "PixelData")
-
-    private func loadAll() -> [String: NSNumber] {
+    private func loadAll() -> [String: NSObject] {
         let fetchRequest = PixelData.fetchRequest() as NSFetchRequest<PixelData>
-        var dict = [String: NSNumber]()
+        var dict = [String: NSObject]()
         do {
             let result = try context.fetch(fetchRequest)
             for item in result {
-                guard let key = item.key else {
-                    assertionFailure("LocalPixelDataStore: Key should not be nil")
+                guard let record = item.valueRepresentation() else {
+                    assertionFailure("LocalPixelDataStore: Key should not load PixelDataRecord")
                     continue
                 }
-                guard let value = item.valueEncrypted as? NSNumber else {
-                    assertionFailure("LocalPixelDataStore: Could not decrypt value")
-                    continue
-                }
-                dict[key] = value
+
+                dict[record.key] = record.value
             }
         } catch {
-            assertionFailure("LocalPixelDataStore: loadAll failed \(error)")
         }
         return dict
     }
 
-    func value(forKey key: String) -> Int? {
-        return cache[key]?.intValue
+    private func predicate(forKey key: String) -> NSPredicate {
+        return NSPredicate(format: "key = %@", key)
     }
 
-    func value(forKey key: String) -> Double? {
-        return cache[key]?.doubleValue
-    }
-
-    private func set(_ value: NSNumber, forKey key: String) {
-        cache[key] = value
+    private func update(record: PixelDataRecord) {
+        cache[record.key] = record.value
+        let predicate = self.predicate(forKey: record.key)
 
         context.perform { [context] in
             do {
-                let fetchRequest = PixelData.fetchRequest() as NSFetchRequest<PixelData>
-                fetchRequest.predicate = NSPredicate(format: "key = %@", key)
-                if let pixelData = try context.fetch(fetchRequest).first {
-                    pixelData.valueEncrypted = value
-                } else {
-                    let mobj = NSEntityDescription.insertNewObject(forEntityName: PixelData.className(),
-                                                                   into: self.context)
-                    guard let pixelData = mobj as? PixelData else {
-                        assertionFailure("LocalPixelDataStore: Failed to init PixelData")
-                        return
+                let fetchRequest = NSFetchRequest<NSFetchRequestResult>(entityName: PixelData.className())
+                fetchRequest.predicate = predicate
+
+                let fetchResults = try context.fetch(fetchRequest)
+                let managedObject: PixelData = try {
+                    if let managedObject = fetchResults.first as? PixelData {
+                        return managedObject
+                    } else if let managedObject = NSEntityDescription.insertNewObject(forEntityName: PixelData.className(),
+                                                                                      into: context) as? PixelData {
+                        return managedObject
                     }
+                    struct ObjectNotFoundError: Error {}
+                    throw ObjectNotFoundError()
+                }()
 
-                    pixelData.key = key
-                    pixelData.valueEncrypted = value
-                }
+                try managedObject.update(with: record)
+                try context.save()
 
-                try self.context.save()
             } catch {
-                assertionFailure("LocalPixelDataStore: Saving of context failed")
+                assertionFailure("LocalPixelDataStore: Could not update record with \(error)")
             }
         }
     }
 
-    func set(_ value: Int, forKey key: String) {
-        self.set(NSNumber(value: value), forKey: key)
+    func value(forKey key: String) -> Double? {
+        return (cache[key] as? NSNumber)?.doubleValue
+    }
+
+    func value(forKey key: String) -> Int? {
+        return (cache[key] as? NSNumber)?.intValue
+    }
+
+    func value(forKey key: String) -> String? {
+        return cache[key] as? String
     }
 
     func set(_ value: Double, forKey key: String) {
-        self.set(NSNumber(value: value), forKey: key)
+        update(record: PixelDataRecord(key: key, value: NSNumber(value: value)))
+    }
+
+    func set(_ value: Int, forKey key: String) {
+        update(record: PixelDataRecord(key: key, value: NSNumber(value: value)))
+    }
+
+    func set(_ value: String, forKey key: String) {
+        update(record: PixelDataRecord(key: key, value: value as NSString))
+    }
+
+    func removeValue(forKey key: String) {
+        let predicate = self.predicate(forKey: key)
+
+        context.perform { [context] in
+            let deleteRequest = NSFetchRequest<NSFetchRequestResult>(entityName: PixelData.className())
+            deleteRequest.predicate = predicate
+            let batchDeleteRequest = NSBatchDeleteRequest(fetchRequest: deleteRequest)
+            batchDeleteRequest.resultType = .resultTypeObjectIDs
+
+            do {
+                let result = try context.execute(batchDeleteRequest) as? NSBatchDeleteResult
+                let deletedObjects = result?.result as? [NSManagedObjectID] ?? []
+                let changes: [AnyHashable: Any] = [NSDeletedObjectsKey: deletedObjects]
+                NSManagedObjectContext.mergeChanges(fromRemoteContextSave: changes, into: [context])
+            } catch {
+                assertionFailure("LocalPixelDataStore: Could not remove record with \(error)")
+            }
+        }
     }
 
 }

@@ -41,11 +41,16 @@ final class EncryptedValueTransformer<T: NSSecureCoding & NSObject>: ValueTransf
             return nil
         }
         let archivedData: Data
-        do {
-            archivedData = try NSKeyedArchiver.archivedData(withRootObject: castValue, requiringSecureCoding: true)
-        } catch {
-            assertionFailure("Could not archive value \(castValue): \(error)")
-            return nil
+        // if T is Data
+        if let data = castValue as? Data {
+            archivedData = data
+        } else {
+            do {
+                archivedData = try NSKeyedArchiver.archivedData(withRootObject: castValue, requiringSecureCoding: true)
+            } catch {
+                assertionFailure("Could not archive value \(castValue): \(error)")
+                return nil
+            }
         }
 
         return try? DataEncryption.encrypt(data: archivedData, key: encryptionKey)
@@ -54,6 +59,11 @@ final class EncryptedValueTransformer<T: NSSecureCoding & NSObject>: ValueTransf
     override func reverseTransformedValue(_ value: Any?) -> Any? {
         guard let data = value as? Data,
               let decryptedData = try? DataEncryption.decrypt(data: data, key: encryptionKey) else { return nil }
+
+        // if T is Data
+        if let data = decryptedData as? T {
+            return data
+        }
 
         return try? NSKeyedUnarchiver.unarchivedObject(ofClass: T.self, from: decryptedData as Data)
     }
