@@ -676,7 +676,11 @@ extension BrowserTabViewController: WKUIDelegate {
         }
 
         let tab = makeTab(parentTab: parentTab, content: .none)
-        WindowsManager.openPopUpWindow(with: tab)
+        if windowFeatures.toolbarsVisibility?.boolValue == true {
+            tabCollectionViewModel.insertChild(tab: tab, selected: true)
+        } else {
+            WindowsManager.openPopUpWindow(with: tab)
+        }
         parentTab.permissions.permissions.popups.popupOpened(nextQuery: nextQuery(parentTab: parentTab))
 
         // WebKit loads the request in the returned web view.
