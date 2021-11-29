@@ -141,7 +141,7 @@ final class PrivacyDashboardUserScript: NSObject, StaticUserScript {
                     // don't show Permanently Allow if can't persist Granted Decision
                     return decision != .grant || item.permission.canPersistGrantedDecision ? [
                         "id": decision.rawValue,
-                        "title": String(format: decision.localizedFormat, domain)
+                        "title": String(format: decision.localizedFormat(for: item.permission), domain)
                     ] : nil
                 }
             ]
@@ -210,14 +210,16 @@ final class PrivacyDashboardUserScript: NSObject, StaticUserScript {
 }
 
 extension PermissionAuthorizationState {
-    var localizedFormat: String {
-        switch self {
-        case .ask:
-            return UserText.permissionAlwaysAskFormat
-        case .grant:
-            return UserText.permissionAlwaysAllowFormat
-        case .deny:
-            return UserText.permissionAlwaysDenyFormat
+    func localizedFormat(for permission: PermissionType) -> String {
+        switch (permission, self) {
+        case (.popups, .ask):
+            return UserText.privacyDashboardPopupsAlwaysAsk
+        case (_, .ask):
+            return UserText.privacyDashboardPermissionAsk
+        case (_, .grant):
+            return UserText.privacyDashboardPermissionAlwaysAllow
+        case (_, .deny):
+            return UserText.privacyDashboardPermissionAlwaysDeny
         }
     }
 }

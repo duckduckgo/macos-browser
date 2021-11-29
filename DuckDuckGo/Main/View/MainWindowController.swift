@@ -35,8 +35,9 @@ final class MainWindowController: NSWindowController {
         return window?.standardWindowButton(.closeButton)?.superview
     }
 
-    init(mainViewController: MainViewController, fireViewModel: FireViewModel = FireCoordinator.fireViewModel) {
-        let window = MainWindow(frame: NSRect(x: 0, y: 0, width: 1024, height: 790))
+    init(mainViewController: MainViewController, popUp: Bool, fireViewModel: FireViewModel = FireCoordinator.fireViewModel) {
+        let makeWindow: (NSRect) -> NSWindow = popUp ? PopUpWindow.init(frame:) : MainWindow.init(frame:)
+        let window = makeWindow(NSRect(x: 0, y: 0, width: 1024, height: 790))
         window.contentViewController = mainViewController
         self.fireViewModel = fireViewModel
 
@@ -157,7 +158,9 @@ extension MainWindowController: NSWindowDelegate {
     func windowDidBecomeKey(_ notification: Notification) {
         mainViewController.windowDidBecomeMain()
         mainViewController.navigationBarViewController.windowDidBecomeMain()
-        WindowControllersManager.shared.lastKeyMainWindowController = self
+        if (notification.object as? NSWindow)?.isPopUpWindow == false {
+            WindowControllersManager.shared.lastKeyMainWindowController = self
+        }
     }
 
     func windowDidResignKey(_ notification: Notification) {

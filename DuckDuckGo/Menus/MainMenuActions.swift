@@ -59,8 +59,7 @@ extension AppDelegate {
 #if FEEDBACK
 
     @IBAction func openFeedback(_ sender: Any?) {
-        guard let windowController = WindowControllersManager.shared.lastKeyMainWindowController,
-              windowController.window?.isKeyWindow == true else {
+        guard let windowController = WindowControllersManager.shared.lastKeyMainWindowController else {
             WindowsManager.openNewWindow(with: URL.feedback)
             return
         }
@@ -73,6 +72,7 @@ extension AppDelegate {
         let tab = Tab(content: .url(.feedback))
         let tabCollectionViewModel = mainViewController.tabCollectionViewModel
         tabCollectionViewModel.append(tab: tab)
+        windowController.window?.makeKeyAndOrderFront(nil)
     }
 
 #endif
@@ -174,13 +174,13 @@ extension MainViewController {
     // MARK: - Main Menu
 
     @IBAction func openPreferences(_ sender: Any?) {
-        tabCollectionViewModel.appendNewTab(with: .preferences)
+        browserTabViewController.openNewTab(with: .preferences, selected: true)
     }
 
     // MARK: - File
 
     @IBAction func newTab(_ sender: Any?) {
-        tabCollectionViewModel.appendNewTab(with: .homepage)
+        browserTabViewController.openNewTab(with: .homepage, selected: true)
     }
 
     @IBAction func openLocation(_ sender: Any?) {
@@ -244,7 +244,20 @@ extension MainViewController {
     }
 
     @IBAction func toggleDownloads(_ sender: Any) {
-        navigationBarViewController.toggleDownloadsPopover()
+        var navigationBarViewController = self.navigationBarViewController
+        if view.window?.isPopUpWindow == true {
+            if let vc = WindowControllersManager.shared.lastKeyMainWindowController?.mainViewController.navigationBarViewController {
+                navigationBarViewController = vc
+            } else {
+                WindowsManager.openNewWindow(with: Tab(content: .homepage))
+                guard let wc = WindowControllersManager.shared.mainWindowControllers.first(where: { $0.window?.isPopUpWindow == false }) else {
+                    return
+                }
+                navigationBarViewController = wc.mainViewController.navigationBarViewController
+            }
+            navigationBarViewController?.view.window?.makeKeyAndOrderFront(nil)
+        }
+        navigationBarViewController?.toggleDownloadsPopover()
     }
 
     // MARK: - History
@@ -268,6 +281,10 @@ extension MainViewController {
     }
 
     @IBAction func home(_ sender: Any?) {
+        guard view.window?.isPopUpWindow == false else {
+            browserTabViewController.openNewTab(with: .homepage, selected: true)
+            return
+        }
         guard let selectedTabViewModel = tabCollectionViewModel.selectedTabViewModel else {
             os_log("MainViewController: No tab view model selected", type: .error)
             return
@@ -296,7 +313,7 @@ extension MainViewController {
             .openBookmarkPopover(setFavorite: true, accessPoint: .init(sender: sender, default: .moreMenu))
     }
     
-    @IBAction func navigateToBookmark(_ sender: Any?) {
+    @IBAction func openBookmark(_ sender: Any?) {
         guard let menuItem = sender as? NSMenuItem else {
             os_log("MainViewController: Casting to menu item failed", type: .error)
             return
@@ -315,7 +332,7 @@ extension MainViewController {
 
         if NSApplication.shared.isCommandPressed && NSApplication.shared.isShiftPressed {
             WindowsManager.openNewWindow(with: bookmark.url)
-        } else if NSApplication.shared.isCommandPressed {
+        } else if NSApplication.shared.isCommandPressed || self.view.window?.isPopUpWindow == true {
             WindowControllersManager.shared.show(url: bookmark.url, newTab: true)
         } else {
             selectedTabViewModel.tab.setContent(.url(bookmark.url))
@@ -337,7 +354,7 @@ extension MainViewController {
     }
 
     @IBAction func showManageBookmarks(_ sender: Any?) {
-        tabCollectionViewModel.appendNewTab(with: .bookmarks)
+        browserTabViewController.openNewTab(with: .bookmarks, selected: true)
         Pixel.fire(.manageBookmarks(source: .mainMenu))
     }
 
@@ -381,7 +398,8 @@ extension MainViewController {
     }
 
     @IBAction func mergeAllWindows(_ sender: Any?) {
-        let otherWindowControllers = WindowControllersManager.shared.mainWindowControllers.filter { $0.window != view.window }
+        guard let mainWindowController = WindowControllersManager.shared.lastKeyMainWindowController else { return }
+        let otherWindowControllers = WindowControllersManager.shared.mainWindowControllers.filter { $0 !== mainWindowController }
         let otherMainViewControllers = otherWindowControllers.compactMap { $0.mainViewController }
         let otherTabCollectionViewModels = otherMainViewControllers.map { $0.tabCollectionViewModel }
         let otherTabs = otherTabCollectionViewModels.flatMap { $0.tabCollection.tabs }
@@ -531,7 +549,7 @@ extension MainViewController: NSMenuItemValidation {
         case #selector(MainViewController.bookmarkThisPage(_:)),
              #selector(MainViewController.favoriteThisPage(_:)):
             return tabCollectionViewModel.selectedTabViewModel?.canBeBookmarked == true
-        case #selector(MainViewController.navigateToBookmark(_:)),
+        case #selector(MainViewController.openBookmark(_:)),
              #selector(MainViewController.showManageBookmarks(_:)):
             return true
 

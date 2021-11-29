@@ -45,6 +45,11 @@ enum PermissionState: Equatable {
     }
     // swiftlint:enable cyclomatic_complexity
 
+    var isRequested: Bool {
+        if case .requested = self { return true }
+        return false
+    }
+    
 }
 
 extension Optional where Wrapped == PermissionState {
@@ -83,11 +88,14 @@ extension Optional where Wrapped == PermissionState {
     }
 
     mutating func authorizationQueried(_ query: PermissionAuthorizationQuery) {
-        if case .some(.disabled) = self {
+        switch self {
+        case .disabled, .requested:
             // stay in disabled state if the App is disabled to use the permission
+            // stay in requested state for already queried permission
             return
+        default:
+            self = .requested(query)
         }
-        self = .requested(query)
     }
 
     mutating func systemAuthorizationDenied(systemWide: Bool) {
@@ -106,6 +114,10 @@ extension Optional where Wrapped == PermissionState {
 
     mutating func denied() {
         self = .denied
+    }
+
+    mutating func popupOpened(nextQuery: PermissionAuthorizationQuery?) {
+        self = nextQuery != nil ? .requested(nextQuery!) : .inactive
     }
 
     mutating func update(with captureState: WKWebView.CaptureState) {

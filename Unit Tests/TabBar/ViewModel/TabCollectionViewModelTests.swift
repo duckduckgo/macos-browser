@@ -147,16 +147,6 @@ final class TabCollectionViewModelTests: XCTestCase {
 
     // MARK: - Insert
 
-    func testInsertTab() {
-        let tabCollectionViewModel = TabCollectionViewModel.aTabCollectionViewModel()
-
-        let originalFirstTabViewModel = tabCollectionViewModel.tabViewModel(at: 0)
-        tabCollectionViewModel.insertNewTab(at: 0)
-
-        XCTAssert(originalFirstTabViewModel !== tabCollectionViewModel.tabViewModel(at: 0))
-        XCTAssert(tabCollectionViewModel.tabCollection.tabs.count == 2)
-    }
-
     func testWhenInsertChildAndParentIsNil_ThenNoChildIsInserted() {
         let tabCollectionViewModel = TabCollectionViewModel.aTabCollectionViewModel()
 
