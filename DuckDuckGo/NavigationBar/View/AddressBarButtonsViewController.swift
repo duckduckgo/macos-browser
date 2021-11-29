@@ -222,7 +222,9 @@ final class AddressBarButtonsViewController: NSViewController {
     }
 
     private func updateBookmarkButtonVisibility() {
-        let showBookmarkButton = clearButton.isHidden && (isMouseOver || bookmarkPopover.isShown)
+        let hasEmptyAddressBar = tabCollectionViewModel.selectedTabViewModel?.addressBarString.isEmpty ?? true
+        let showBookmarkButton = clearButton.isHidden && !hasEmptyAddressBar && (isMouseOver || bookmarkPopover.isShown)
+
         bookmarkButton.isHidden = !showBookmarkButton
     }
 

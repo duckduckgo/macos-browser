@@ -51,6 +51,14 @@ final class FindInPageViewController: NSViewController {
         updateFieldStates()
     }
 
+    @IBAction func findInPageNext(_ sender: Any?) {
+        delegate?.findInPageNext(self)
+    }
+
+    @IBAction func findInPagePrevious(_ sender: Any?) {
+        delegate?.findInPagePrevious(self)
+    }
+
     @IBAction func findInPageDone(_ sender: Any?) {
         delegate?.findInPageDone(self)
     }

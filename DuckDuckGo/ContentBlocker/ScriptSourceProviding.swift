@@ -89,9 +89,16 @@ final class DefaultScriptSourceProvider: ScriptSourceProviding {
 
         let protectionStore = DomainsProtectionUserDefaultsStore()
         let localUnprotectedDomains = protectionStore.unprotectedDomains.joined(separator: "\n")
-
+        let isDebugBuild: String
+        
+        #if DEBUG
+        isDebugBuild = "true"
+        #else
+        isDebugBuild = "false"
+        #endif
+        
         return ContentBlockerUserScript.loadJS("contentblocker", from: .main, withReplacements: [
-            "$IS_DEBUG$": isDebugBuild ? "true" : "false",
+            "$IS_DEBUG$": isDebugBuild,
             "$TEMP_UNPROTECTED_DOMAINS$": remoteUnprotectedDomains,
             "$USER_UNPROTECTED_DOMAINS$": localUnprotectedDomains,
             "$TRACKER_DATA$": trackerData,
