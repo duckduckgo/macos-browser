@@ -145,7 +145,7 @@ final class Tab: NSObject {
 
     var contentChangeEnabled = true
 
-    @PublishedAfter private(set) var content: TabContent {
+    @Published private(set) var content: TabContent {
         didSet {
             handleFavicon(oldContent: oldValue)
             invalidateSessionStateData()
@@ -165,8 +165,8 @@ final class Tab: NSObject {
         self.content = content
     }
 
-    @PublishedAfter var title: String?
-    @PublishedAfter var error: Error?
+    @Published var title: String?
+    @Published var error: Error?
     let permissions: PermissionModel
 
     weak private(set) var parentTab: Tab?
