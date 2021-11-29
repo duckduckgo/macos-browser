@@ -75,9 +75,10 @@ final class BrowserTabViewController: NSViewController {
     }
 
     private func subscribeToSelectedTabViewModel() {
-        selectedTabViewModelCancellable = tabCollectionViewModel.$selectedTabViewModel.receive(on: DispatchQueue.main).sink { [weak self] _ in
-            self?.updateInterface()
-            self?.subscribeToErrorViewState()
+        selectedTabViewModelCancellable = tabCollectionViewModel.$selectedTabViewModel
+            .sink { [weak self] selectedTabViewModel in
+                self?.updateInterface(tabViewModel: selectedTabViewModel)
+                self?.subscribeToErrorViewState()
         }
     }
 
@@ -86,15 +87,15 @@ final class BrowserTabViewController: NSViewController {
     /// 1. No URL is provided, so the webview should be hidden in favor of showing the default UI elements.
     /// 2. A URL is provided for the first time, so the webview should be added as a subview and the URL should be loaded.
     /// 3. A URL is provided after already adding the webview, so the webview should be reloaded.
-    private func updateInterface() {
+    private func updateInterface(tabViewModel: TabViewModel?) {
         if tabCollectionViewModel.tabCollection.tabs.isEmpty {
             view.window?.close()
             return
         }
 
-        changeWebView()
+        changeWebView(tabViewModel: tabViewModel)
         scheduleHoverLabelUpdatesForUrl(nil)
-        show(tabContent: tabCollectionViewModel.selectedTabViewModel?.tab.content)
+        show(tabContent: tabViewModel?.tab.content)
     }
 
     private func showHomepage() {
@@ -120,7 +121,7 @@ final class BrowserTabViewController: NSViewController {
         view.addSubview(hoverLabelContainer)
     }
 
-    private func changeWebView() {
+    private func changeWebView(tabViewModel: TabViewModel?) {
 
         func displayWebView(of tabViewModel: TabViewModel) {
             tabViewModel.tab.delegate = self
@@ -138,7 +139,7 @@ final class BrowserTabViewController: NSViewController {
             }
         }
 
-        guard let tabViewModel = tabCollectionViewModel.selectedTabViewModel else {
+        guard let tabViewModel = tabViewModel else {
             self.tabViewModel = nil
             removeOldWebView(webView)
             return
@@ -159,7 +160,7 @@ final class BrowserTabViewController: NSViewController {
             .removeDuplicates()
             .receive(on: DispatchQueue.main)
             .sink { [weak self] _ in
-                self?.updateInterface()
+                self?.updateInterface(tabViewModel: tabViewModel)
          }
     }
 
@@ -225,7 +226,7 @@ final class BrowserTabViewController: NSViewController {
     private func show(displayableTabAtIndex index: Int) {
         // The tab switcher only displays displayable tab types.
         tabCollectionViewModel.selectedTabViewModel?.tab.setContent(Tab.TabContent.displayableTabTypes[index])
-        updateInterface()
+        updateInterface(tabViewModel: tabCollectionViewModel.selectedTabViewModel)
     }
 
     private func show(tabContent content: Tab.TabContent?) {
