@@ -75,19 +75,11 @@ final class EncryptedValueTransformer<T: NSSecureCoding & NSObject>: ValueTransf
         return NSValueTransformerName("\(className)Transformer")
     }
 
-    static func registerTransformer() throws {
-        #if CI
-            // Don't register transformers when running on the CI, they'll fail to read the Keychain due to the build machines not being provisioned.
-            return
-        #else
-            let generator = EncryptionKeyGenerator()
-            let keyStore = EncryptionKeyStore(generator: generator)
-            let key = try keyStore.readKey()
-            let transformer = EncryptedValueTransformer<T>(encryptionKey: key)
+    static func registerTransformer(keyStore: EncryptionKeyStoring) throws {
+        let key = try keyStore.readKey()
+        let transformer = EncryptedValueTransformer<T>(encryptionKey: key)
 
-            ValueTransformer.setValueTransformer(transformer, forName: transformerName)
-        #endif
-
+        ValueTransformer.setValueTransformer(transformer, forName: transformerName)
     }
 
 }
