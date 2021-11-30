@@ -165,11 +165,14 @@ final class TabViewModelTests: XCTestCase {
         tabViewModel.tab.setContent(.homepage)
 
         let faviconExpectation = expectation(description: "Favicon")
+        var fulfilled = false
 
         tabViewModel.$favicon.debounce(for: 0.1, scheduler: RunLoop.main).sink { favicon in
             XCTAssertNotNil(favicon)
-            if favicon == TabViewModel.Favicon.home {
+            if favicon == TabViewModel.Favicon.home,
+                !fulfilled {
                 faviconExpectation.fulfill()
+                fulfilled = true
             }
         } .store(in: &cancellables)
         waitForExpectations(timeout: 5, handler: nil)
