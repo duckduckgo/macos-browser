@@ -55,7 +55,8 @@ extension PixelData {
             self.key = record.key
         }
 
-        self.valueEncrypted = record.value
+        let data = try NSKeyedArchiver.archivedData(withRootObject: record.value, requiringSecureCoding: true)
+        self.valueEncrypted = data as NSData
     }
 
 }
