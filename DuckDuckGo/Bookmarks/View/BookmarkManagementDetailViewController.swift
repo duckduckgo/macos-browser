@@ -86,7 +86,6 @@ final class BookmarkManagementDetailViewController: NSViewController {
         tableView.registerForDraggedTypes([BookmarkPasteboardWriter.bookmarkUTIInternalType,
                                            FolderPasteboardWriter.folderUTIInternalType])
 
-        configureTableHighlight()
         reloadData()
     }
 
@@ -101,10 +100,6 @@ final class BookmarkManagementDetailViewController: NSViewController {
         updateEditingState(forRowAt: -1)
     }
 
-    func configureTableHighlight() {
-        tableView.selectionHighlightStyle = .none
-    }
-
     fileprivate func reloadData() {
         guard editingBookmarkIndex == nil else {
             // If the table view is editing, the reload will be deferred until after the cell animation has completed.
@@ -114,7 +109,8 @@ final class BookmarkManagementDetailViewController: NSViewController {
         self.tableView.reloadData()
     }
 
-    @IBAction func handleClick(_ sender: NSTableView) {
+    private func performClickAction(_ sender: NSTableView, doubleClick: Bool) {
+
         let index = sender.clickedRow
 
         guard index != -1, let entity = fetchEntity(at: index) else {
@@ -130,26 +126,39 @@ final class BookmarkManagementDetailViewController: NSViewController {
 
         // 1. Command: Open in Background Tab
         // 2. Command + Shift: Open in New Window
-        // 3. Default: Open in Current Tab
+        // 3. Select or launch
 
         editingBookmarkIndex = nil
 
         if let bookmark = entity as? Bookmark {
+            var launched = false
             if NSApplication.shared.isCommandPressed && NSApplication.shared.isShiftPressed {
                 WindowsManager.openNewWindow(with: bookmark.url)
+                launched = true
             } else if NSApplication.shared.isCommandPressed {
                 WindowControllersManager.shared.show(url: bookmark.url, newTab: true)
-            } else {
-                WindowControllersManager.shared.show(url: bookmark.url)
-                tableView.deselectAll(nil)
+                launched = true
+            } else if doubleClick {
+                WindowControllersManager.shared.show(url: bookmark.url, newTab: true)
+                launched = true
             }
 
-            Pixel.fire(.navigation(kind: .bookmark(isFavorite: bookmark.isFavorite), source: .managementInterface))
-        } else if let folder = entity as? BookmarkFolder {
+            if launched {
+                Pixel.fire(.navigation(kind: .bookmark(isFavorite: bookmark.isFavorite), source: .managementInterface))
+            }
+
+        } else if let folder = entity as? BookmarkFolder, doubleClick {
             delegate?.bookmarkManagementDetailViewControllerDidSelectFolder(folder)
-        } else {
-            assertionFailure("\(#file): Failed to cast selected object to Folder or Bookmark")
         }
+
+    }
+
+    @IBAction func handleDoubleClick(_ sender: NSTableView) {
+        performClickAction(sender, doubleClick: true)
+    }
+
+    @IBAction func handleClick(_ sender: NSTableView) {
+        performClickAction(sender, doubleClick: false)
     }
 
     @IBAction func presentAddBookmarkModal(_ sender: Any) {
