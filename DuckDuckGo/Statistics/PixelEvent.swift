@@ -79,7 +79,7 @@ extension Pixel {
         case formAutofilled(kind: FormAutofillKind)
         case autofillItemSaved(kind: FormAutofillKind)
 
-        case debug(event: Debug, error: Error? = nil, countedBy: Pixel.Counter? = nil)
+        case debug(event: Debug, error: Error? = nil)
 
         enum Debug: String, CustomStringConvertible {
             var description: String { rawValue }
@@ -195,7 +195,7 @@ extension Pixel.Event {
         case .autofillItemSaved(kind: let kind):
             return "m_mac_save_\(kind)"
 
-        case .debug(event: let event, error: _, countedBy: _):
+        case .debug(event: let event, error: _):
             return "m_mac_debug_\(event)"
         }
     }

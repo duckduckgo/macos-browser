@@ -111,7 +111,7 @@ final class ConfigurationManager {
 
                 if case .failure(let error) = completion {
                     os_log("Failed to complete configuration update %s", log: .config, type: .error, error.localizedDescription)
-                    Pixel.fire(.debug(event: .configurationFetchError, error: error, countedBy: .counter))
+                    Pixel.fire(.debug(event: .configurationFetchError, error: error))
 
                     tryAgainSoon()
                 } else {
