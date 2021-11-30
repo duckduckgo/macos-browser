@@ -38,8 +38,9 @@ final class PixelStoreTests: XCTestCase {
 
         self.tempURL = fm.temporaryDirectory
 
-        try? EncryptedValueTransformer<NSNumber>.registerTransformer(keyStore: EncryptionKeyStoreMock())
-        try? EncryptedValueTransformer<NSData>.registerTransformer(keyStore: EncryptionKeyStoreMock())
+        let keyStore = EncryptionKeyStoreMock()
+        try? EncryptedValueTransformer<NSNumber>.registerTransformer(keyStore: keyStore)
+        try? EncryptedValueTransformer<NSData>.registerTransformer(keyStore: keyStore)
     }
 
     override func tearDown() {
