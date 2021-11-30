@@ -20,6 +20,12 @@ import Foundation
 
 final class RoundedSelectionRowView: NSTableRowView {
 
+    var highlight = false {
+        didSet {
+            needsDisplay = true
+        }
+    }
+
     var insets = NSEdgeInsets()
 
     override func drawDraggingDestinationFeedback(in dirtyRect: NSRect) {
@@ -36,6 +42,21 @@ final class RoundedSelectionRowView: NSTableRowView {
     }
 
     override func drawSelection(in dirtyRect: NSRect) {
+        var selectionRect = self.bounds
+
+        selectionRect.origin.x += insets.left
+        selectionRect.origin.y += insets.top
+        selectionRect.size.width -= (insets.left + insets.right)
+        selectionRect.size.height -= (insets.top + insets.bottom)
+
+        let path = NSBezierPath(roundedRect: selectionRect, xRadius: 6, yRadius: 6)
+        NSColor.rowHoverColor.setFill()
+        path.fill()
+    }
+
+    override func drawBackground(in: NSRect) {
+        guard highlight else { return }
+
         var selectionRect = self.bounds
 
         selectionRect.origin.x += insets.left
