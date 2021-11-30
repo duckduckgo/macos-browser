@@ -27,28 +27,32 @@ final class PixelStoreMock: PixelDataStore {
         return (data[key] as? NSNumber)?.intValue
     }
 
-    func set(_ value: Int, forKey key: String) {
+    func set(_ value: Int, forKey key: String, completionHandler: ((Error?) -> Void)?) {
         data[key] = NSNumber(value: value)
+        completionHandler?(nil)
     }
 
     func value(forKey key: String) -> Double? {
         return (data[key] as? NSNumber)?.doubleValue
     }
 
-    func set(_ value: Double, forKey key: String) {
+    func set(_ value: Double, forKey key: String, completionHandler: ((Error?) -> Void)?) {
         data[key] = NSNumber(value: value)
+        completionHandler?(nil)
     }
 
     func value(forKey key: String) -> String? {
         return data[key] as? String
     }
 
-    func set(_ value: String, forKey key: String) {
+    func set(_ value: String, forKey key: String, completionHandler: ((Error?) -> Void)?) {
         data[key] = value
+        completionHandler?(nil)
     }
 
-    func removeValue(forKey key: String) {
+    func removeValue(forKey key: String, completionHandler: ((Error?) -> Void)?) {
         data[key] = nil
+        completionHandler?(nil)
     }
 
 }

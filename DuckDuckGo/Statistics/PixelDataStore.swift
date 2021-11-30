@@ -22,30 +22,63 @@ import CoreData
 protocol PixelDataStore {
 
     func value(forKey key: String) -> Double?
-    func set(_ value: Double, forKey: String)
+    func set(_ value: Double, forKey: String, completionHandler: ((Error?) -> Void)?)
 
     func value(forKey key: String) -> Int?
-    func set(_ value: Int, forKey: String)
+    func set(_ value: Int, forKey: String, completionHandler: ((Error?) -> Void)?)
 
     func value(forKey key: String) -> String?
-    func set(_ value: String, forKey: String)
+    func set(_ value: String, forKey: String, completionHandler: ((Error?) -> Void)?)
 
-    func removeValue(forKey key: String)
+    func removeValue(forKey key: String, completionHandler: ((Error?) -> Void)?)
     
 }
-
-final class LocalPixelDataStore: PixelDataStore {
-    static let shared = LocalPixelDataStore()
-
-    private lazy var cache: [String: NSObject] = loadAll()
-
-    private init() {}
-
-    init(context: NSManagedObjectContext) {
-        self.context = context
+extension PixelDataStore {
+    func set(_ value: Double, forKey key: String) {
+        set(value, forKey: key, completionHandler: nil)
     }
 
-    private lazy var context = Database.shared.makeContext(concurrencyType: .mainQueueConcurrencyType, name: "PixelData")
+    func set(_ value: Int, forKey key: String) {
+        set(value, forKey: key, completionHandler: nil)
+    }
+
+    func set(_ value: String, forKey key: String) {
+        set(value, forKey: key, completionHandler: nil)
+    }
+
+    func removeValue(forKey key: String) {
+        removeValue(forKey: key, completionHandler: nil)
+    }
+}
+
+extension PixelData {
+    fileprivate static let sharedPixelDataStore = LocalPixelDataStore<PixelData>()
+}
+private extension LocalPixelDataStore where T == PixelData {
+    convenience init() {
+        self.init(context: Database.shared.makeContext(concurrencyType: .mainQueueConcurrencyType, name: "PixelData"),
+                  updateModel: PixelData.update,
+                  entityName: PixelData.className())
+    }
+}
+enum PixelDataStoreError: Error {
+    case objectNotFound
+}
+
+final class LocalPixelDataStore<T: NSManagedObject>: PixelDataStore {
+    static var shared: LocalPixelDataStore<PixelData> { PixelData.sharedPixelDataStore }
+
+    private let context: NSManagedObjectContext
+    private let entityName: String
+    private(set) lazy var cache: [String: NSObject] = loadAll()
+    private let updateModel: (T) -> (PixelDataRecord) throws -> Void
+
+    init(context: NSManagedObjectContext, updateModel: @escaping (T) -> (PixelDataRecord) throws -> Void, entityName: String = T.className()) {
+        self.updateModel = updateModel
+        self.context = context
+        self.entityName = entityName
+    }
+
     private func loadAll() -> [String: NSObject] {
         let fetchRequest = PixelData.fetchRequest() as NSFetchRequest<PixelData>
         var dict = [String: NSObject]()
@@ -53,7 +86,7 @@ final class LocalPixelDataStore: PixelDataStore {
             let result = try context.fetch(fetchRequest)
             for item in result {
                 guard let record = item.valueRepresentation() else {
-                    assertionFailure("LocalPixelDataStore: Key should not load PixelDataRecord")
+                    assertionFailure("LocalPixelDataStore: could not load PixelDataRecord")
                     continue
                 }
 
@@ -68,32 +101,39 @@ final class LocalPixelDataStore: PixelDataStore {
         return NSPredicate(format: "key = %@", key)
     }
 
-    private func update(record: PixelDataRecord) {
+    private func update(record: PixelDataRecord, completionHandler: ((Error?) -> Void)?) {
         cache[record.key] = record.value
         let predicate = self.predicate(forKey: record.key)
 
-        context.perform { [context] in
+        func mainQueueCompletion(_ error: Error?) {
+            guard completionHandler != nil else { return }
+            DispatchQueue.main.async {
+                completionHandler?(error)
+            }
+        }
+
+        context.perform { [context, updateModel, entityName] in
             do {
-                let fetchRequest = NSFetchRequest<NSFetchRequestResult>(entityName: PixelData.className())
+                let fetchRequest = NSFetchRequest<NSFetchRequestResult>(entityName: entityName)
                 fetchRequest.predicate = predicate
 
                 let fetchResults = try context.fetch(fetchRequest)
-                let managedObject: PixelData = try {
-                    if let managedObject = fetchResults.first as? PixelData {
+                let managedObject: T = try {
+                    if let managedObject = fetchResults.first as? T {
                         return managedObject
-                    } else if let managedObject = NSEntityDescription.insertNewObject(forEntityName: PixelData.className(),
-                                                                                      into: context) as? PixelData {
+                    } else if let managedObject = NSEntityDescription.insertNewObject(forEntityName: entityName, into: context) as? T {
                         return managedObject
                     }
-                    struct ObjectNotFoundError: Error {}
-                    throw ObjectNotFoundError()
+                    assertionFailure("Could not insert new object of type \(entityName)")
+                    throw PixelDataStoreError.objectNotFound
                 }()
 
-                try managedObject.update(with: record)
+                try updateModel(managedObject)(record)
                 try context.save()
+                mainQueueCompletion(nil)
 
             } catch {
-                assertionFailure("LocalPixelDataStore: Could not update record with \(error)")
+                mainQueueCompletion(error)
             }
         }
     }
@@ -110,23 +150,30 @@ final class LocalPixelDataStore: PixelDataStore {
         return cache[key] as? String
     }
 
-    func set(_ value: Double, forKey key: String) {
-        update(record: PixelDataRecord(key: key, value: NSNumber(value: value)))
+    func set(_ value: Double, forKey key: String, completionHandler: ((Error?) -> Void)?) {
+        update(record: PixelDataRecord(key: key, value: NSNumber(value: value)), completionHandler: completionHandler)
     }
 
-    func set(_ value: Int, forKey key: String) {
-        update(record: PixelDataRecord(key: key, value: NSNumber(value: value)))
+    func set(_ value: Int, forKey key: String, completionHandler: ((Error?) -> Void)?) {
+        update(record: PixelDataRecord(key: key, value: NSNumber(value: value)), completionHandler: completionHandler)
     }
 
-    func set(_ value: String, forKey key: String) {
-        update(record: PixelDataRecord(key: key, value: value as NSString))
+    func set(_ value: String, forKey key: String, completionHandler: ((Error?) -> Void)?) {
+        update(record: PixelDataRecord(key: key, value: value as NSString), completionHandler: completionHandler)
     }
 
-    func removeValue(forKey key: String) {
+    func removeValue(forKey key: String, completionHandler: ((Error?) -> Void)?) {
         let predicate = self.predicate(forKey: key)
 
-        context.perform { [context] in
-            let deleteRequest = NSFetchRequest<NSFetchRequestResult>(entityName: PixelData.className())
+        func mainQueueCompletion(_ error: Error?) {
+            guard completionHandler != nil else { return }
+            DispatchQueue.main.async {
+                completionHandler?(error)
+            }
+        }
+
+        context.perform { [context, entityName] in
+            let deleteRequest = NSFetchRequest<NSFetchRequestResult>(entityName: entityName)
             deleteRequest.predicate = predicate
             let batchDeleteRequest = NSBatchDeleteRequest(fetchRequest: deleteRequest)
             batchDeleteRequest.resultType = .resultTypeObjectIDs
@@ -136,8 +183,10 @@ final class LocalPixelDataStore: PixelDataStore {
                 let deletedObjects = result?.result as? [NSManagedObjectID] ?? []
                 let changes: [AnyHashable: Any] = [NSDeletedObjectsKey: deletedObjects]
                 NSManagedObjectContext.mergeChanges(fromRemoteContextSave: changes, into: [context])
+
+                mainQueueCompletion(nil)
             } catch {
-                assertionFailure("LocalPixelDataStore: Could not remove record with \(error)")
+                mainQueueCompletion(error)
             }
         }
     }
