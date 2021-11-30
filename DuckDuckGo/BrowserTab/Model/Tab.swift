@@ -24,7 +24,7 @@ import BrowserServicesKit
 
 protocol TabDelegate: FileDownloadManagerDelegate {
     func tabDidStartNavigation(_ tab: Tab)
-    func tab(_ tab: Tab, requestedNewTab url: URL?, selected: Bool)
+    func tab(_ tab: Tab, requestedNewTabWith content: Tab.TabContent, selected: Bool)
     func tab(_ tab: Tab, willShowContextMenuAt position: NSPoint, image: URL?, link: URL?, selectedText: String?)
 	func tab(_ tab: Tab, requestedOpenExternalURL url: URL, forUserEnteredURL: Bool)
     func tab(_ tab: Tab, requestedSaveCredentials credentials: SecureVaultModels.WebsiteCredentials)
@@ -147,7 +147,7 @@ final class Tab: NSObject {
 
     var contentChangeEnabled = true
 
-    @PublishedAfter private(set) var content: TabContent {
+    @Published private(set) var content: TabContent {
         didSet {
             handleFavicon(oldContent: oldValue)
             invalidateSessionStateData()
@@ -167,8 +167,8 @@ final class Tab: NSObject {
         self.content = content
     }
 
-    @PublishedAfter var title: String?
-    @PublishedAfter var error: Error?
+    @Published var title: String?
+    @Published var error: Error?
     let permissions: PermissionModel
 
     weak private(set) var parentTab: Tab?
@@ -718,7 +718,7 @@ extension Tab: WKNavigationDelegate {
         let isMiddleClicked = navigationAction.buttonNumber == Constants.webkitMiddleClick
         if isLinkActivated && NSApp.isCommandPressed || isMiddleClicked {
             decisionHandler(.cancel)
-            delegate?.tab(self, requestedNewTab: navigationAction.request.url, selected: NSApp.isShiftPressed)
+            delegate?.tab(self, requestedNewTabWith: navigationAction.request.url.map { .url($0) } ?? .none, selected: NSApp.isShiftPressed)
             return
         } else if isLinkActivated && NSApp.isOptionPressed && !NSApp.isCommandPressed {
             decisionHandler(.download(navigationAction, using: webView))

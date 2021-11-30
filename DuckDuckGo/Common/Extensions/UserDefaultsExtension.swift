@@ -19,7 +19,9 @@
 import Foundation
 
 extension UserDefaults {
+
     public func bool(forKey key: String, defaultValue: Bool) -> Bool {
         return object(forKey: key) as? Bool ?? defaultValue
     }
+
 }

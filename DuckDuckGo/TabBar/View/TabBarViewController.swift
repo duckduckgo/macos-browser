@@ -22,7 +22,6 @@ import Combine
 import Lottie
 
 // swiftlint:disable file_length
-// swiftlint:disable type_body_length
 final class TabBarViewController: NSViewController {
 
     enum HorizontalSpace: CGFloat {
@@ -125,17 +124,6 @@ final class TabBarViewController: NSViewController {
             collectionView.animator().selectItems(at: [newSelectionIndexPath], scrollPosition: .centeredHorizontally)
         } else {
             collectionView.selectItems(at: [newSelectionIndexPath], scrollPosition: .centeredHorizontally)
-        }
-    }
-
-    private func closeWindowIfNeeded() {
-        if tabCollectionViewModel.tabCollection.tabs.isEmpty {
-            // when in fullscreen self.view.window will return NSToolbarFullScreenWindow instead of MainWindow
-            guard let window = parent?.view.window else {
-                os_log("AddressBarTextField: Window not available", type: .error)
-                return
-            }
-            window.close()
         }
     }
 
@@ -387,7 +375,6 @@ extension TabBarViewController: TabCollectionViewModelDelegate {
         let removedIndexPathSet = Set(arrayLiteral: IndexPath(item: removedIndex))
         guard let selectionIndex = selectionIndex else {
             collectionView.animator().deleteItems(at: removedIndexPathSet)
-            closeWindowIfNeeded()
             return
         }
         let selectionIndexPathSet = Set(arrayLiteral: IndexPath(item: selectionIndex))
@@ -451,8 +438,6 @@ extension TabBarViewController: TabCollectionViewModelDelegate {
     }
 
     func tabCollectionViewModelDidMultipleChanges(_ tabCollectionViewModel: TabCollectionViewModel) {
-        closeWindowIfNeeded()
-
         collectionView.reloadData()
         reloadSelection()
 
@@ -804,4 +789,3 @@ extension TabBarViewController: TabBarViewItemDelegate {
 }
 
 // swiftlint:enable type_body_length
-// swiftlint:enable file_length

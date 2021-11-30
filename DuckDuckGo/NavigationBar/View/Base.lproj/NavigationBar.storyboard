@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<document type="com.apple.InterfaceBuilder3.Cocoa.Storyboard.XIB" version="3.0" toolsVersion="19455" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none" useAutolayout="YES" initialViewController="o2v-eH-jTI">
+<document type="com.apple.InterfaceBuilder3.Cocoa.Storyboard.XIB" version="3.0" toolsVersion="19528" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none" useAutolayout="YES" initialViewController="o2v-eH-jTI">
     <dependencies>
         <deployment identifier="macosx"/>
-        <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="19455"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="19528"/>
         <capability name="Named colors" minToolsVersion="9.0"/>
         <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
     </dependencies>
@@ -246,14 +246,16 @@
                         <constraints>
                             <constraint firstItem="aWu-Jm-Oaz" firstAttribute="leading" relation="greaterThanOrEqual" secondItem="Wba-nA-FYj" secondAttribute="trailing" constant="8" id="1AC-G2-aTL"/>
                             <constraint firstAttribute="bottom" secondItem="EQw-GG-GMA" secondAttribute="bottom" id="4ye-CO-dDp"/>
+                            <constraint firstItem="eEh-kf-smR" firstAttribute="leading" secondItem="hYV-nu-QIp" secondAttribute="leading" constant="12" id="MQ7-vv-adb"/>
                             <constraint firstItem="Wba-nA-FYj" firstAttribute="centerX" secondItem="hYV-nu-QIp" secondAttribute="centerX" priority="300" constant="8" id="Ofg-Pb-s0m"/>
                             <constraint firstAttribute="trailing" secondItem="aWu-Jm-Oaz" secondAttribute="trailing" constant="12" id="UeG-qO-bD2"/>
-                            <constraint firstItem="Wba-nA-FYj" firstAttribute="leading" relation="greaterThanOrEqual" secondItem="eEh-kf-smR" secondAttribute="trailing" constant="8" id="W83-wu-cjA"/>
+                            <constraint firstItem="Wba-nA-FYj" firstAttribute="leading" relation="greaterThanOrEqual" secondItem="eEh-kf-smR" secondAttribute="trailing" priority="999" constant="8" id="W83-wu-cjA"/>
                             <constraint firstItem="EQw-GG-GMA" firstAttribute="top" secondItem="hYV-nu-QIp" secondAttribute="top" id="ctd-w7-EMF"/>
                             <constraint firstItem="EQw-GG-GMA" firstAttribute="leading" secondItem="hYV-nu-QIp" secondAttribute="leading" id="hpe-5Y-XTJ"/>
                             <constraint firstItem="aWu-Jm-Oaz" firstAttribute="centerY" secondItem="hYV-nu-QIp" secondAttribute="centerY" id="oRj-YP-56Z"/>
                             <constraint firstAttribute="trailing" secondItem="EQw-GG-GMA" secondAttribute="trailing" id="oYK-XH-0iN"/>
                             <constraint firstItem="eEh-kf-smR" firstAttribute="centerY" secondItem="hYV-nu-QIp" secondAttribute="centerY" id="p4d-Um-snf"/>
+                            <constraint firstItem="Wba-nA-FYj" firstAttribute="leading" secondItem="hYV-nu-QIp" secondAttribute="leading" constant="84" id="t38-xG-cxS"/>
                             <constraint firstItem="Wba-nA-FYj" firstAttribute="centerY" secondItem="hYV-nu-QIp" secondAttribute="centerY" id="uOr-Zw-zxM"/>
                             <constraint firstItem="eEh-kf-smR" firstAttribute="leading" secondItem="hYV-nu-QIp" secondAttribute="leading" constant="12" id="yWl-jM-JYI"/>
                             <constraint firstItem="Wba-nA-FYj" firstAttribute="width" secondItem="hYV-nu-QIp" secondAttribute="width" multiplier="0.6" priority="300" id="yyv-y0-Is1"/>
@@ -265,6 +267,9 @@
                         </userDefinedRuntimeAttributes>
                     </view>
                     <connections>
+                        <outlet property="addressBarLeftToNavButtonsConstraint" destination="W83-wu-cjA" id="cCS-Fa-hJd"/>
+                        <outlet property="addressBarLeftToSuperviewConstraint" destination="t38-xG-cxS" id="cCS-Fb-hJd"/>
+                        <outlet property="addressBarProportionalWidthConstraint" destination="yyv-y0-Is1" id="cCS-Fc-hJd"/>
                         <outlet property="bookmarkListButton" destination="4sj-qN-UUY" id="Fjs-KE-Lfp"/>
                         <outlet property="downloadsButton" destination="G8p-di-fq4" id="oxD-pc-8hn"/>
                         <outlet property="goBackButton" destination="kky-0N-Cfd" id="RA9-yE-URS"/>
@@ -282,15 +287,15 @@
         <scene sceneID="gzs-lg-gqU">
             <objects>
                 <viewController id="H4f-bE-T92" customClass="AddressBarViewController" customModule="DuckDuckGo_Privacy_Browser" customModuleProvider="target" sceneMemberID="viewController">
-                    <view key="view" wantsLayer="YES" id="wj6-L2-5rJ">
-                        <rect key="frame" x="0.0" y="0.0" width="600" height="36"/>
+                    <view key="view" wantsLayer="YES" misplaced="YES" id="wj6-L2-5rJ">
+                        <rect key="frame" x="0.0" y="0.0" width="726" height="36"/>
                         <autoresizingMask key="autoresizingMask"/>
                         <subviews>
                             <customView translatesAutoresizingMaskIntoConstraints="NO" id="ENV-0H-Fcc" userLabel="Inactive Background View with Progress" customClass="ColorView" customModule="DuckDuckGo_Privacy_Browser" customModuleProvider="target">
-                                <rect key="frame" x="5" y="3" width="590" height="30"/>
+                                <rect key="frame" x="5" y="3" width="716" height="30"/>
                                 <subviews>
                                     <customView translatesAutoresizingMaskIntoConstraints="NO" id="4x6-Xn-fNv" customClass="ProgressView" customModule="DuckDuckGo_Privacy_Browser" customModuleProvider="target">
-                                        <rect key="frame" x="0.0" y="0.0" width="590" height="2"/>
+                                        <rect key="frame" x="0.0" y="0.0" width="716" height="2"/>
                                         <constraints>
                                             <constraint firstAttribute="height" constant="2" id="phH-XL-CIq"/>
                                         </constraints>
@@ -329,10 +334,10 @@
                                 </userDefinedRuntimeAttributes>
                             </customView>
                             <customView translatesAutoresizingMaskIntoConstraints="NO" id="Ij9-fc-CLI" customClass="ColorView" customModule="DuckDuckGo_Privacy_Browser" customModuleProvider="target">
-                                <rect key="frame" x="0.0" y="-24" width="600" height="60"/>
+                                <rect key="frame" x="0.0" y="-24" width="726" height="60"/>
                                 <subviews>
                                     <customView translatesAutoresizingMaskIntoConstraints="NO" id="INL-zs-eEh" userLabel="Inner Border View" customClass="ColorView" customModule="DuckDuckGo_Privacy_Browser" customModuleProvider="target">
-                                        <rect key="frame" x="1" y="1" width="598" height="58"/>
+                                        <rect key="frame" x="1" y="1" width="724" height="58"/>
                                         <userDefinedRuntimeAttributes>
                                             <userDefinedRuntimeAttribute type="color" keyPath="borderColor">
                                                 <color key="value" name="AddressBarInnerBorderColor"/>
@@ -369,15 +374,15 @@
                                 </userDefinedRuntimeAttributes>
                             </customView>
                             <textField horizontalHuggingPriority="750" verticalHuggingPriority="750" horizontalCompressionResistancePriority="250" translatesAutoresizingMaskIntoConstraints="NO" id="le0-Hn-ZAC">
-                                <rect key="frame" x="223" y="10" width="154" height="16"/>
-                                <textFieldCell key="cell" lineBreakMode="truncatingTail" refusesFirstResponder="YES" alignment="center" placeholderString="Search or enter address" usesSingleLineMode="YES" id="rpt-TE-48N">
+                                <rect key="frame" x="359" y="10" width="8" height="16"/>
+                                <textFieldCell key="cell" lineBreakMode="truncatingTail" refusesFirstResponder="YES" alignment="center" usesSingleLineMode="YES" id="rpt-TE-48N">
                                     <font key="font" metaFont="system"/>
                                     <color key="textColor" name="labelColor" catalog="System" colorSpace="catalog"/>
                                     <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
                                 </textFieldCell>
                             </textField>
                             <textField focusRingType="none" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="zaX-wZ-E3D" customClass="AddressBarTextField" customModule="DuckDuckGo_Privacy_Browser" customModuleProvider="target">
-                                <rect key="frame" x="35" y="10" width="522" height="16"/>
+                                <rect key="frame" x="35" y="10" width="648" height="16"/>
                                 <textFieldCell key="cell" lineBreakMode="truncatingTail" selectable="YES" editable="YES" sendsActionOnEndEditing="YES" focusRingType="none" tag="5" placeholderString="Search or enter address" usesSingleLineMode="YES" id="1ah-Qg-8lr" customClass="AddressBarTextFieldCell" customModule="DuckDuckGo_Privacy_Browser" customModuleProvider="target">
                                     <font key="font" metaFont="system"/>
                                     <color key="textColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
@@ -385,7 +390,7 @@
                                 </textFieldCell>
                             </textField>
                             <containerView translatesAutoresizingMaskIntoConstraints="NO" id="bOl-8Z-hTh">
-                                <rect key="frame" x="4" y="3" width="592" height="30"/>
+                                <rect key="frame" x="4" y="3" width="718" height="30"/>
                                 <connections>
                                     <segue destination="mcr-nj-GmC" kind="embed" destinationCreationSelector="createAddressBarButtonsViewController:" id="zZO-zH-MBi"/>
                                 </connections>
@@ -527,7 +532,7 @@
                                 </connections>
                             </button>
                             <stackView distribution="equalSpacing" orientation="horizontal" alignment="centerY" spacing="0.0" horizontalStackHuggingPriority="249.99998474121094" verticalStackHuggingPriority="249.99998474121094" detachesHiddenViews="YES" translatesAutoresizingMaskIntoConstraints="NO" id="HEu-ro-RSA">
-                                <rect key="frame" x="1" y="0.0" width="128" height="32"/>
+                                <rect key="frame" x="1" y="0.0" width="160" height="32"/>
                                 <subviews>
                                     <customView translatesAutoresizingMaskIntoConstraints="NO" id="3Iv-YW-zn2">
                                         <rect key="frame" x="0.0" y="0.0" width="32" height="32"/>
@@ -578,7 +583,7 @@
                                         </connections>
                                     </button>
                                     <stackView distribution="fill" orientation="horizontal" alignment="top" spacing="0.0" horizontalStackHuggingPriority="249.99998474121094" verticalStackHuggingPriority="249.99998474121094" detachesHiddenViews="YES" translatesAutoresizingMaskIntoConstraints="NO" id="8UU-A8-1nD">
-                                        <rect key="frame" x="32" y="0.0" width="96" height="32"/>
+                                        <rect key="frame" x="32" y="0.0" width="128" height="32"/>
                                         <subviews>
                                             <button verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="CN6-fJ-o2J" userLabel="Geolocation Button" customClass="PermissionButton" customModule="DuckDuckGo_Privacy_Browser" customModuleProvider="target">
                                                 <rect key="frame" x="0.0" y="0.0" width="32" height="32"/>
@@ -649,13 +654,34 @@
                                                     <userDefinedRuntimeAttribute type="image" keyPath="mutedImage" value="Camera-Icon"/>
                                                 </userDefinedRuntimeAttributes>
                                             </button>
+                                            <button verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="qqY-h9-UQ7" userLabel="Popups Button" customClass="PermissionButton" customModule="DuckDuckGo_Privacy_Browser" customModuleProvider="target">
+                                                <rect key="frame" x="96" y="0.0" width="32" height="32"/>
+                                                <constraints>
+                                                    <constraint firstAttribute="height" constant="32" id="Lys-Hh-cYc"/>
+                                                    <constraint firstAttribute="width" constant="32" id="Psq-lr-DYc"/>
+                                                </constraints>
+                                                <buttonCell key="cell" type="square" bezelStyle="shadowlessSquare" image="PopupBlocked" imagePosition="only" alignment="center" imageScaling="proportionallyDown" inset="2" id="2Eq-5P-3Ne">
+                                                    <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
+                                                    <font key="font" metaFont="system"/>
+                                                </buttonCell>
+                                                <userDefinedRuntimeAttributes>
+                                                    <userDefinedRuntimeAttribute type="color" keyPath="mouseOverColor">
+                                                        <color key="value" name="ButtonMouseOverColor"/>
+                                                    </userDefinedRuntimeAttribute>
+                                                    <userDefinedRuntimeAttribute type="color" keyPath="mouseDownColor">
+                                                        <color key="value" name="ButtonMouseDownColor"/>
+                                                    </userDefinedRuntimeAttribute>
+                                                </userDefinedRuntimeAttributes>
+                                            </button>
                                         </subviews>
                                         <visibilityPriorities>
                                             <integer value="1000"/>
                                             <integer value="1000"/>
                                             <integer value="1000"/>
+                                            <integer value="1000"/>
                                         </visibilityPriorities>
                                         <customSpacing>
+                                            <real value="3.4028234663852886e+38"/>
                                             <real value="3.4028234663852886e+38"/>
                                             <real value="3.4028234663852886e+38"/>
                                             <real value="3.4028234663852886e+38"/>
@@ -697,6 +723,7 @@
                         <outlet property="imageButtonWrapper" destination="3Iv-YW-zn2" id="rzK-lJ-auZ"/>
                         <outlet property="microphoneButton" destination="uao-nC-0co" id="UHu-oA-rTl"/>
                         <outlet property="permissionButtons" destination="8UU-A8-1nD" id="gYJ-VW-MEG"/>
+                        <outlet property="popupsButton" destination="qqY-h9-UQ7" id="1QY-I6-oNC"/>
                         <outlet property="privacyDashboardPositioningView" destination="lYD-6T-NGB" id="y2g-pX-zea"/>
                         <outlet property="privacyEntryPointButton" destination="nOW-iY-XmO" id="r0A-EO-srN"/>
                     </connections>
@@ -722,6 +749,7 @@
         <image name="Microphone-Active" width="12" height="16"/>
         <image name="Microphone-Icon" width="12" height="16"/>
         <image name="PasswordManagement" width="16" height="16"/>
+        <image name="PopupBlocked" width="16" height="16"/>
         <image name="Refresh" width="16" height="16"/>
         <image name="Settings" width="16" height="16"/>
         <namedColor name="AddressBarBackgroundColor">

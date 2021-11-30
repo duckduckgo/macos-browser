@@ -31,6 +31,7 @@ final class FireCoordinator {
         if let lastKeyWindow = WindowControllersManager.shared.lastKeyMainWindowController?.window,
            lastKeyWindow.isVisible {
             burningWindow = lastKeyWindow
+            burningWindow.makeKeyAndOrderFront(nil)
             waitForOpening = false
         } else {
             burningWindow = WindowsManager.openNewWindow()!

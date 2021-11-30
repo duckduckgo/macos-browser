@@ -182,7 +182,7 @@ final class HomepageHeaderView: NSView {
 extension HomepageHeaderView: MouseClickViewDelegate {
 
     func mouseClickView(_ mouseClickView: MouseClickView, mouseDownEvent: NSEvent) {
-        field.makeMeFirstResponderIfNeeded()
+        field.makeMeFirstResponder()
     }
 
 }

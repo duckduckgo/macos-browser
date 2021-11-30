@@ -23,6 +23,7 @@ protocol PermissionContextMenuDelegate: AnyObject {
     func permissionContextMenu(_ menu: PermissionContextMenu, mutePermissions: [PermissionType])
     func permissionContextMenu(_ menu: PermissionContextMenu, unmutePermissions: [PermissionType])
     func permissionContextMenu(_ menu: PermissionContextMenu, revokePermissions: [PermissionType])
+    func permissionContextMenu(_ menu: PermissionContextMenu, allowPermissionQuery: PermissionAuthorizationQuery)
     func permissionContextMenu(_ menu: PermissionContextMenu, alwaysAllowPermission: PermissionType)
     func permissionContextMenu(_ menu: PermissionContextMenu, alwaysDenyPermission: PermissionType)
     func permissionContextMenu(_ menu: PermissionContextMenu, resetStoredPermission: PermissionType)
@@ -32,14 +33,16 @@ protocol PermissionContextMenuDelegate: AnyObject {
 final class PermissionContextMenu: NSMenu {
 
     let domain: String
-    let permissions: Permissions
+    let permissions: [(key: PermissionType, value: PermissionState)]
     weak var actionDelegate: PermissionContextMenuDelegate?
 
     required init(coder: NSCoder) {
         fatalError("PermissionContextMenu: Bad initializer")
     }
 
-    init(permissions: Permissions, domain: String, delegate: PermissionContextMenuDelegate?) {
+    init(permissions: [(key: PermissionType, value: PermissionState)],
+         domain: String,
+         delegate: PermissionContextMenuDelegate?) {
         self.domain = domain.dropWWW()
         self.permissions = permissions
         self.actionDelegate = delegate
@@ -49,13 +52,16 @@ final class PermissionContextMenu: NSMenu {
     }
 
     private func setupMenuItems() {
-        let remainingPermission = setupCameraPermissionsMenuItems()
+        let remainingPermission = setupCameraPermissionsMenuItems(permissions.reduce(into: Permissions()) {
+            $0[$1.key] = $1.value
+        })
         setupOtherPermissionMenuItems(for: remainingPermission)
         addRevokeItems()
         addPersistenceItems()
+        setupPopupsPermissionsMenuItems()
     }
 
-    private func setupCameraPermissionsMenuItems() -> Permissions {
+    private func setupCameraPermissionsMenuItems(_ permissions: Permissions) -> Permissions {
         var permissions = permissions
         let permissionTypes = permissions.keys.sorted(by: { lhs, _ in lhs == .camera })
 
@@ -115,19 +121,44 @@ final class PermissionContextMenu: NSMenu {
                 // expected permission to deactivate access
                 return
             case .requested:
-                // popover should be shown
                 return
             }
         }
     }
 
+    private func setupPopupsPermissionsMenuItems() {
+        var popupsItemsAdded = false
+        for (permission, state) in permissions {
+            guard case (.popups, .requested(let query)) = (permission, state) else { continue }
+
+            if !popupsItemsAdded {
+                addItem(.popupPermissionRequested(domain: domain))
+
+                popupsItemsAdded = true
+            }
+
+            addItem(.openPopup(query: query, permission: permission, target: self))
+        }
+        guard popupsItemsAdded else { return }
+
+        addItem(.separator())
+
+        if PermissionManager.shared.permission(forDomain: domain, permissionType: .popups) == nil {
+            addItem(.alwaysAllow(.popups, on: domain, target: self))
+        } else {
+            addItem(.alwaysAsk(.popups, on: domain, target: self))
+        }
+    }
+
     private func addRevokeItems() {
+        guard permissions.contains(where: {
+            [.active, .inactive, .paused].contains($0.value) && $0.key != .popups
+        }) else { return }
+
         addSeparator(if: numberOfItems > 0)
 
-        if permissions.values.contains(where: { [.active, .inactive, .paused].contains($0) }) {
-            let permissionTypes = permissions.keys.sorted(by: { lhs, _ in lhs == .camera })
-            addItem(.revoke(permissionTypes, target: self))
-        }
+        let permissionTypes = permissions.map(\.key).sorted(by: { lhs, _ in lhs == .camera })
+        addItem(.revoke(permissionTypes, target: self))
     }
 
     private func addPersistenceItems() {
@@ -207,6 +238,14 @@ final class PermissionContextMenu: NSMenu {
         actionDelegate?.permissionContextMenuReloadPage(self)
     }
 
+    @objc func openPopup(_ sender: NSMenuItem) {
+        guard let query = sender.representedObject as? PermissionAuthorizationQuery else {
+            assertionFailure("Expected PermissionAuthorizationQuery")
+            return
+        }
+        actionDelegate?.permissionContextMenu(self, allowPermissionQuery: query)
+    }
+
     @objc func openSystemPreferences(_ sender: NSMenuItem) {
         guard let permission = sender.representedObject as? PermissionType else {
             assertionFailure("Expected PermissionType")
@@ -221,6 +260,9 @@ final class PermissionContextMenu: NSMenu {
             deeplink = URL(string: "x-apple.systempreferences:com.apple.preference.security?Privacy_Microphone")!
         case .geolocation:
             deeplink = URL(string: "x-apple.systempreferences:com.apple.preference.security?Privacy_LocationServices")!
+        case .popups:
+            assertionFailure("No settings available for Popups")
+            return
         }
         NSWorkspace.shared.open(deeplink)
     }
@@ -230,10 +272,7 @@ final class PermissionContextMenu: NSMenu {
 private extension NSMenuItem {
 
     static func mute(_ permissions: [PermissionType], target: PermissionContextMenu) -> NSMenuItem {
-        let localizedPermissions = permissions.map(\.localizedDescription).reduce("") {
-            $0.isEmpty ? $1 : String(format: UserText.permissionAndPermissionFormat, $0, $1)
-        }
-        let title = String(format: UserText.permissionMuteFormat, localizedPermissions)
+        let title = String(format: UserText.permissionMuteFormat, permissions.localizedDescription)
         let item = NSMenuItem(title: title,
                               action: #selector(PermissionContextMenu.mutePermissions),
                               keyEquivalent: "")
@@ -243,10 +282,7 @@ private extension NSMenuItem {
     }
 
     static func unmute(_ permissions: [PermissionType], target: PermissionContextMenu) -> NSMenuItem {
-        let localizedPermissions = permissions.map(\.localizedDescription).reduce("") {
-            $0.isEmpty ? $1 : String(format: UserText.permissionAndPermissionFormat, $0, $1)
-        }
-        let title = String(format: UserText.permissionUnmuteFormat, localizedPermissions)
+        let title = String(format: UserText.permissionUnmuteFormat, permissions.localizedDescription)
         let item = NSMenuItem(title: title,
                               action: #selector(PermissionContextMenu.unmutePermissions),
                               keyEquivalent: "")
@@ -256,10 +292,7 @@ private extension NSMenuItem {
     }
 
     static func revoke(_ permissions: [PermissionType], target: PermissionContextMenu) -> NSMenuItem {
-        let localizedPermissions = permissions.map(\.localizedDescription).reduce("") {
-            $0.isEmpty ? $1 : String(format: UserText.permissionAndPermissionFormat, $0, $1)
-        }
-        let title = String(format: UserText.permissionRevokeFormat, localizedPermissions)
+        let title = String(format: UserText.permissionRevokeFormat, permissions.localizedDescription)
         let item = NSMenuItem(title: title,
                               action: #selector(PermissionContextMenu.revokePermissions),
                               keyEquivalent: "")
@@ -324,6 +357,28 @@ private extension NSMenuItem {
                               action: #selector(PermissionContextMenu.openSystemPreferences),
                               keyEquivalent: "")
         item.representedObject = permission
+        item.target = target
+        return item
+    }
+
+    static func popupPermissionRequested(domain: String?) -> NSMenuItem {
+        let title = String(format: UserText.permissionPopupTitleFormat, domain ?? "“”")
+        let attributedTitle = NSMutableAttributedString(string: title)
+        attributedTitle.setAttributes([.font: NSFont.systemFont(ofSize: 11.0)], range: title.nsRange())
+
+        let menuItem = NSMenuItem(title: "", action: nil, keyEquivalent: "")
+        menuItem.attributedTitle = attributedTitle
+
+        return menuItem
+    }
+
+    static func openPopup(query: PermissionAuthorizationQuery,
+                          permission: PermissionType,
+                          target: PermissionContextMenu) -> NSMenuItem {
+
+        let title = String(format: UserText.permissionPopupOpenFormat, query.url?.absoluteString ?? "“”")
+        let item = NSMenuItem(title: title, action: #selector(PermissionContextMenu.openPopup), keyEquivalent: "")
+        item.representedObject = query
         item.target = target
         return item
     }

@@ -144,6 +144,8 @@ extension WKWebView {
                 }
             case .geolocation:
                 self.configuration.processPool.geolocationProvider?.isPaused = muted
+            case .popups:
+                assertionFailure("Popups don't support pausing")
             }
         }
     }
@@ -165,6 +167,8 @@ extension WKWebView {
                 }
             case .geolocation:
                 self.configuration.processPool.geolocationProvider?.revoke()
+            case .popups:
+                continue
             }
         }
     }

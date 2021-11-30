@@ -23,6 +23,7 @@ enum PermissionType: String, CaseIterable {
     case camera
     case microphone
     case geolocation
+    case popups
 }
 
 extension PermissionType {
@@ -32,6 +33,8 @@ extension PermissionType {
             return true
         case .geolocation:
             return false
+        case .popups:
+            return true
         }
     }
 }
@@ -61,7 +64,8 @@ extension Array where Element == PermissionType {
             result.append(.microphone)
         }
         if devices.contains(.display) {
-            assertionFailure("Unexpected permission")
+            // https://app.asana.com/0/1177771139624306/1201416749093968
+            // result.append(.display)
         }
         guard !result.isEmpty else { return nil }
         self = result

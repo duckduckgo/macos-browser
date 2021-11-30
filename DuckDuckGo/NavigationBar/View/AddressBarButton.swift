@@ -30,6 +30,7 @@ internal class AddressBarButton: MouseOverButton {
         case left
         case center
         case right
+        case free
     }
 
     var position: Position = .center {
@@ -41,6 +42,11 @@ internal class AddressBarButton: MouseOverButton {
                 backgroundLayer.maskedCorners = []
             case .right:
                 backgroundLayer.maskedCorners = [.layerMaxXMaxYCorner, .layerMaxXMinYCorner]
+            case .free:
+                backgroundLayer.maskedCorners = [.layerMaxXMaxYCorner,
+                                                 .layerMaxXMinYCorner,
+                                                 .layerMinXMaxYCorner,
+                                                 .layerMinXMinYCorner]
             }
             backgroundLayer.masksToBounds = true
         }

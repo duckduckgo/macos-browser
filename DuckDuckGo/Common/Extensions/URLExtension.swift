@@ -39,6 +39,11 @@ extension URL {
 
     static func makeSearchUrl(from searchQuery: String) -> URL? {
         let trimmedQuery = searchQuery.trimmingCharacters(in: .whitespacesAndNewlines)
+
+        guard !trimmedQuery.isEmpty else {
+            return nil
+        }
+
         do {
             var searchUrl = Self.duckDuckGo
             searchUrl = try searchUrl.addParameter(name: DuckDuckGoParameters.search.rawValue, value: trimmedQuery)
@@ -171,6 +176,7 @@ extension URL {
 
         case http
         case https
+        case file
 
         func separated() -> String {
             self.rawValue + Self.separator
@@ -280,6 +286,8 @@ extension URL {
         if URL.NavigationalScheme(rawValue: scheme) != nil,
            let host = host, host.isValidHost,
            user == nil { return true }
+
+        if scheme == URL.NavigationalScheme.file.rawValue { return true }
 
         // This effectively allows external URLs to be entered by the user.
         // Without this check single word entries get treated like domains.

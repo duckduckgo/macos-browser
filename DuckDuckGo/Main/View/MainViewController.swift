@@ -27,6 +27,8 @@ final class MainViewController: NSViewController {
     @IBOutlet weak var navigationBarContainerView: NSView!
     @IBOutlet weak var webContainerView: NSView!
     @IBOutlet weak var findInPageContainerView: NSView!
+    @IBOutlet var navigationBarTopConstraint: NSLayoutConstraint!
+    @IBOutlet var addressBarHeightConstraint: NSLayoutConstraint!
 
     private(set) var tabBarViewController: TabBarViewController!
     private(set) var navigationBarViewController: NavigationBarViewController!
@@ -60,6 +62,16 @@ final class MainViewController: NSViewController {
         listenToKeyDownEvents()
         subscribeToSelectedTabViewModel()
         findInPageContainerView.applyDropShadow()
+
+    }
+
+    override func viewWillAppear() {
+        if view.window?.isPopUpWindow == true {
+            tabBarViewController.view.isHidden = true
+            tabBarContainerView.isHidden = true
+            navigationBarTopConstraint.constant = 0.0
+            addressBarHeightConstraint.constant = tabBarContainerView.frame.height
+        }
     }
     
     override func viewDidLayout() {
@@ -147,6 +159,7 @@ final class MainViewController: NSViewController {
             self?.navigationalCancellables = []
             self?.subscribeToCanGoBackForward()
             self?.subscribeToFindInPage()
+            self?.adjustFirstResponder()
         }
     }
 
@@ -184,11 +197,7 @@ final class MainViewController: NSViewController {
         findInPageViewController?.model = model
         if model.visible {
             findInPageViewController?.makeMeFirstResponder()
-        } else if !(tabCollectionViewModel.selectedTabViewModel?.addressBarString.isEmpty ?? false) {
-            // If there's an address bar string, this isn't a new tab, so make the webview the first responder
-            tabCollectionViewModel.selectedTabViewModel?.tab.webView.makeMeFirstResponder()
         }
-        
     }
 
     private func updateBackMenuItem() {
@@ -247,9 +256,27 @@ final class MainViewController: NSViewController {
         stopMenuItem.isEnabled = selectedTabViewModel.isLoading
     }
 
+    // MARK: - First responder
+
+    func adjustFirstResponder() {
+        guard let selectedTabViewModel = tabCollectionViewModel.selectedTabViewModel else {
+            os_log("MainViewController: No tab view model selected", type: .error)
+            return
+        }
+
+        switch selectedTabViewModel.tab.content {
+        case .homepage, .none: navigationBarViewController.addressBarViewController?.addressBarTextField.makeMeFirstResponder()
+        case .url:
+            browserTabViewController.webView?.makeMeFirstResponder()
+        case .preferences: browserTabViewController.preferencesViewController.view.makeMeFirstResponder()
+        case .bookmarks: browserTabViewController.bookmarksViewController.view.makeMeFirstResponder()
+        }
+
+    }
+
 }
 
-// MARK: - Escape key
+// MARK: - Mouse & Keyboard Events
 
 // This needs to be handled here or else there will be a "beep" even if handled in a different view controller. This now
 //  matches Safari behaviour.
@@ -280,8 +307,7 @@ extension MainViewController {
         switch Int(event.keyCode) {
         case kVK_Escape:
             findInPageViewController?.findInPageDone(self)
-            checkForEndAddressBarEditing()
-            return false
+            return navigationBarViewController.addressBarViewController?.escapeKeyDown() ?? false
 
         // Handle critical Main Menu actions before WebView
         case kVK_ANSI_1, kVK_ANSI_2, kVK_ANSI_3, kVK_ANSI_4, kVK_ANSI_5, kVK_ANSI_6,
@@ -323,18 +349,6 @@ extension MainViewController {
 
         return event
 
-    }
-
-    private func checkForEndAddressBarEditing() {
-        let addressBarTextField = navigationBarViewController?.addressBarViewController?.addressBarTextField
-        guard view.window?.firstResponder == addressBarTextField?.currentEditor() else { return }
-
-        // If the webview doesn't have content it doesn't handle becoming the first responder properly
-        if tabCollectionViewModel.selectedTabViewModel?.tab.webView.url != nil {
-            tabCollectionViewModel.selectedTabViewModel?.tab.webView.makeMeFirstResponder()
-        } else {
-            navigationBarContainerView.makeMeFirstResponder()
-        }
     }
 
 }
