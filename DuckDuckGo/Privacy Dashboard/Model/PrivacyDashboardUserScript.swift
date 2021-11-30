@@ -198,8 +198,7 @@ final class PrivacyDashboardUserScript: NSObject, StaticUserScript {
         evaluate(js: "window.onChangeCertificateData(\(certificateDataJson))", in: webView)
     }
 
-    func setPendingUpdates(_ pendingUpdates: Set<String>, domain: String, webView: WKWebView) {
-        let isPendingUpdates = pendingUpdates.contains(domain)
+    func setIsPendingUpdates(_ isPendingUpdates: Bool, webView: WKWebView) {
         evaluate(js: "window.onIsPendingUpdates(\(isPendingUpdates))", in: webView)
     }
 

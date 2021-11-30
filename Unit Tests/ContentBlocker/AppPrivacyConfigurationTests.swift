@@ -1,5 +1,5 @@
 //
-//  UserScriptsManager.swift
+//  AppPrivacyConfigurationTests.swift
 //
 //  Copyright © 2021 DuckDuckGo. All rights reserved.
 //
@@ -16,21 +16,20 @@
 //  limitations under the License.
 //
 
-import Foundation
-import Combine
+import XCTest
+import TrackerRadarKit
+import BrowserServicesKit
+@testable import DuckDuckGo_Privacy_Browser
 
-final class UserScriptsManager {
-    static let shared = UserScriptsManager()
+class AppPrivacyConfigurationTests: XCTestCase {
 
-    @Published
-    private(set) var userScripts = UserScripts()
-    private var sourceUpdatedCancellable: AnyCancellable!
+    func testWhenEmbeddedDataIsUpdatedThenUpdateSHAAndEtag() {
 
-    init(scriptSource: ScriptSourceProviding = DefaultScriptSourceProvider.shared) {
-        sourceUpdatedCancellable = scriptSource.sourceUpdatedPublisher
-            .receive(on: DispatchQueue.main)
-            .map(UserScripts.init)
-            .weakAssign(to: \.userScripts, on: self)
+        let data = AppPrivacyConfigurationDataProvider.loadEmbeddedAsData()
+
+        XCTAssertEqual(data.sha256,
+                       AppPrivacyConfigurationDataProvider.Constants.embeddedConfigurationSHA,
+                       "Error: please update SHA and ETag when changing embedded config")
     }
 
 }

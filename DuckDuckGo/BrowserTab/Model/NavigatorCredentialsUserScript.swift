@@ -22,7 +22,7 @@ import WebKit
 public final class NavigatorCredentialsUserScript: NSObject, UserScript {
     public let messageNames: [String] = []
 
-    init(scriptSource: ScriptSourceProviding = DefaultScriptSourceProvider.shared) {
+    init(scriptSource: ScriptSourceProviding) {
         source = scriptSource.navigatorCredentialsSource
     }
 

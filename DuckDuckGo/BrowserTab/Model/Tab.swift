@@ -92,6 +92,7 @@ final class Tab: NSObject {
          webCacheManager: WebCacheManager = WebCacheManager.shared,
          webViewConfiguration: WebViewConfiguration? = nil,
          historyCoordinating: HistoryCoordinating = HistoryCoordinator.shared,
+         scriptsSource: ScriptSourceProviding = DefaultScriptSourceProvider.shared,
          visitedDomains: Set<String> = Set<String>(),
          title: String? = nil,
          error: Error? = nil,
@@ -104,6 +105,7 @@ final class Tab: NSObject {
         self.content = content
         self.faviconService = faviconService
         self.historyCoordinating = historyCoordinating
+        self.scriptsSource = scriptsSource
         self.visitedDomains = visitedDomains
         self.title = title
         self.error = error
@@ -343,7 +345,7 @@ final class Tab: NSObject {
         webView.allowsBackForwardNavigationGestures = true
         webView.allowsMagnification = true
 
-        subscribeToUserScripts()
+        subscribeToUserScriptChanges()
         subscribeToOpenExternalUrlEvents()
 
         superviewObserver = webView.observe(\.superview, options: .old) { [weak self] _, change in
@@ -403,7 +405,10 @@ final class Tab: NSObject {
     }
 
     // MARK: - User Scripts
-    
+
+    let scriptsSource: ScriptSourceProviding
+    private var userScriptsUpdatedCancellable: AnyCancellable?
+
     lazy var emailManager: EmailManager = {
         let emailManager = EmailManager()
         emailManager.requestDelegate = self
@@ -416,8 +421,6 @@ final class Tab: NSObject {
         return manager
     }()
 
-    private var userScriptsUpdatedCancellable: AnyCancellable?
-
     private var userScripts: UserScripts! {
         willSet {
             if let userScripts = userScripts {
@@ -428,7 +431,7 @@ final class Tab: NSObject {
             userScripts.debugScript.instrumentation = instrumentation
             userScripts.faviconScript.delegate = self
             userScripts.contextMenuScript.delegate = self
-            userScripts.contentBlockerScript.delegate = self
+            userScripts.surrogatesScript.delegate = self
             userScripts.contentBlockerRulesScript.delegate = self
             userScripts.autofillScript.emailDelegate = emailManager
             userScripts.autofillScript.vaultDelegate = vaultManager
@@ -442,11 +445,12 @@ final class Tab: NSObject {
         }
     }
 
-    private func subscribeToUserScripts() {
-        userScriptsUpdatedCancellable = UserScriptsManager.shared
-            .$userScripts
-            .map(UserScripts.init(copy:))
-            .weakAssign(to: \.userScripts, on: self)
+    private func subscribeToUserScriptChanges() {
+        userScriptsUpdatedCancellable = scriptsSource.sourceUpdatedPublisher.receive(on: RunLoop.main).sink { [weak self] _ in
+            guard let self = self, self.delegate != nil else { return }
+
+            self.userScripts = UserScripts(with: self.scriptsSource)
+        }
     }
 
     // MARK: - Find in Page
@@ -596,24 +600,28 @@ extension Tab: FaviconUserScriptDelegate {
 
 }
 
-extension Tab: ContentBlockerUserScriptDelegate {
+extension Tab: ContentBlockerRulesUserScriptDelegate {
 
-    func contentBlockerUserScriptShouldProcessTrackers(_ script: UserScript) -> Bool {
+    func contentBlockerRulesUserScriptShouldProcessTrackers(_ script: ContentBlockerRulesUserScript) -> Bool {
         return true
     }
 
-    func contentBlockerUserScript(_ script: ContentBlockerUserScript,
-                                  detectedTracker tracker: DetectedTracker,
-                                  withSurrogate host: String) {
-        trackerInfo?.add(installedSurrogateHost: host)
-
-        contentBlockerUserScript(script, detectedTracker: tracker)
-    }
-
-    func contentBlockerUserScript(_ script: UserScript, detectedTracker tracker: DetectedTracker) {
+    func contentBlockerRulesUserScript(_ script: ContentBlockerRulesUserScript, detectedTracker tracker: DetectedTracker) {
         trackerInfo?.add(detectedTracker: tracker)
     }
+}
 
+extension Tab: SurrogatesUserScriptDelegate {
+
+    func surrogatesUserScriptShouldProcessTrackers(_ script: SurrogatesUserScript) -> Bool {
+        return true
+    }
+
+    func surrogatesUserScript(_ script: SurrogatesUserScript, detectedTracker tracker: DetectedTracker, withSurrogate host: String) {
+        trackerInfo?.add(installedSurrogateHost: host)
+
+        trackerInfo?.add(detectedTracker: tracker)
+    }
 }
 
 extension Tab: EmailManagerRequestDelegate { }
