@@ -105,7 +105,6 @@ final class BookmarkManagementDetailViewController: NSViewController {
             // If the table view is editing, the reload will be deferred until after the cell animation has completed.
             return
         }
-
         self.tableView.reloadData()
     }
 
@@ -148,6 +147,7 @@ final class BookmarkManagementDetailViewController: NSViewController {
             }
 
         } else if let folder = entity as? BookmarkFolder, doubleClick {
+            clearSelections()
             delegate?.bookmarkManagementDetailViewControllerDidSelectFolder(folder)
         }
 
@@ -299,7 +299,7 @@ extension BookmarkManagementDetailViewController: NSTableViewDelegate, NSTableVi
             } else {
                 assertionFailure("Failed to cast bookmark")
             }
-
+            cell.isSelected = tableView.selectedRowIndexes.contains(row)
             return cell
         }
 
@@ -411,6 +411,25 @@ extension BookmarkManagementDetailViewController: NSTableViewDelegate, NSTableVi
         return tableView.selectedRowIndexes.compactMap { (index) -> AnyObject? in
             return fetchEntity(at: index) as AnyObject
         }
+    }
+
+    fileprivate func clearSelections() {
+        guard totalRows() > 0 else { return }
+        for index in 0 ..< totalRows() {
+            let row = self.tableView.view(atColumn: 0, row: index, makeIfNecessary: false) as? BookmarkTableCellView
+            row?.isSelected = false
+        }
+    }
+        
+    func tableViewSelectionDidChange(_ notification: Notification) {
+
+        clearSelections()
+
+        tableView.selectedRowIndexes.forEach {
+            let row = self.tableView.view(atColumn: 0, row: $0, makeIfNecessary: false) as? BookmarkTableCellView
+            row?.isSelected = true
+        }
+
     }
 
 }

@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<document type="com.apple.InterfaceBuilder3.Cocoa.XIB" version="3.0" toolsVersion="18122" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none" useAutolayout="YES" customObjectInstantitationMethod="direct">
+<document type="com.apple.InterfaceBuilder3.Cocoa.XIB" version="3.0" toolsVersion="19455" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none" useAutolayout="YES" customObjectInstantitationMethod="direct">
     <dependencies>
         <deployment identifier="macosx"/>
-        <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="18122"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="19455"/>
         <capability name="Named colors" minToolsVersion="9.0"/>
         <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
     </dependencies>
@@ -67,6 +67,7 @@
                                     <constraint firstAttribute="height" constant="32" id="e5J-97-uFp"/>
                                 </constraints>
                                 <imageCell key="cell" refusesFirstResponder="YES" alignment="left" imageScaling="proportionallyDown" image="Forward" id="vnu-27-HAX"/>
+                                <color key="contentTintColor" name="controlColor" catalog="System" colorSpace="catalog"/>
                             </imageView>
                             <textField focusRingType="none" horizontalHuggingPriority="251" verticalHuggingPriority="1000" translatesAutoresizingMaskIntoConstraints="NO" id="hcL-4L-Bbl">
                                 <rect key="frame" x="30" y="32" width="410" height="16"/>
@@ -142,9 +143,9 @@
     </objects>
     <resources>
         <image name="FavoriteFilledBorder" width="16" height="16"/>
-        <image name="Forward" width="7" height="13"/>
-        <image name="Settings" width="12" height="3"/>
-        <image name="Web" width="15" height="15"/>
+        <image name="Forward" width="16" height="16"/>
+        <image name="Settings" width="16" height="16"/>
+        <image name="Web" width="16" height="16"/>
         <namedColor name="ButtonColor">
             <color red="0.28627450980392155" green="0.28627450980392155" blue="0.28627450980392155" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
         </namedColor>
