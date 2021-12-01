@@ -65,7 +65,8 @@ final class BookmarksOutlineView: NSOutlineView {
         let point = convert(event.locationInWindow, to: nil)
         let row = row(at: point)
         guard row >= 0, let rowView = rowView(atRow: row, makeIfNecessary: false) as? RoundedSelectionRowView else { return }
-        rowView.highlight = true
+        let item = item(atRow: row) as? BookmarkNode
+        rowView.highlight = !(item?.representedObject is SpacerNode)
         lastRow = rowView
     }
 }
