@@ -40,6 +40,13 @@ final class BookmarkTableRowView: NSTableRowView {
         }
     }
 
+    override func drawSelection(in dirtyRect: NSRect) {
+        guard !editing else { return }
+        let path = NSBezierPath(roundedRect: bounds, xRadius: 6, yRadius: 6)
+        NSColor.controlAccentColor.withAlphaComponent(0.5).setFill()
+        path.fill()
+    }
+
     override func updateTrackingAreas() {
         super.updateTrackingAreas()
         ensureTrackingArea()

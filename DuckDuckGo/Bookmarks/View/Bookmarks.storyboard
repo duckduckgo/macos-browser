@@ -79,6 +79,9 @@
                                                     <tableColumnResizingMask key="resizingMask" resizeWithTable="YES" userResizable="YES"/>
                                                 </tableColumn>
                                             </tableColumns>
+                                            <connections>
+                                                <action trigger="doubleAction" selector="onDoubleClick:" target="cOb-MX-4XZ" id="tXZ-3l-9pc"/>
+                                            </connections>
                                         </outlineView>
                                     </subviews>
                                     <color key="backgroundColor" name="ClearColor"/>
