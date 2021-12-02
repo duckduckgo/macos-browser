@@ -69,7 +69,7 @@
                                 <imageCell key="cell" refusesFirstResponder="YES" alignment="left" imageScaling="proportionallyDown" image="Forward" id="vnu-27-HAX"/>
                                 <color key="contentTintColor" name="controlColor" catalog="System" colorSpace="catalog"/>
                             </imageView>
-                            <textField focusRingType="none" horizontalHuggingPriority="251" verticalHuggingPriority="1000" translatesAutoresizingMaskIntoConstraints="NO" id="hcL-4L-Bbl">
+                            <textField focusRingType="none" horizontalHuggingPriority="251" verticalHuggingPriority="1000" horizontalCompressionResistancePriority="250" translatesAutoresizingMaskIntoConstraints="NO" id="hcL-4L-Bbl">
                                 <rect key="frame" x="30" y="32" width="410" height="16"/>
                                 <textFieldCell key="cell" lineBreakMode="clipping" focusRingType="none" title="URL" drawsBackground="YES" id="2Os-Cj-KWy">
                                     <font key="font" metaFont="system"/>
