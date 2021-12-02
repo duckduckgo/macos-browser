@@ -20,6 +20,8 @@ import Foundation
 
 final class BookmarkTableRowView: NSTableRowView {
 
+    var editing = false
+
     var hasPrevious = false {
         didSet {
             needsDisplay = true
