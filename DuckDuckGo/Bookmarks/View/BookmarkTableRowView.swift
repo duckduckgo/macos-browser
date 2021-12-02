@@ -20,7 +20,18 @@ import Foundation
 
 final class BookmarkTableRowView: NSTableRowView {
 
-    var editing = false
+    var hasPrevious = false {
+        didSet {
+            needsDisplay = true
+        }
+    }
+
+    var hasNext = false {
+        didSet {
+            needsDisplay = true
+        }
+    }
+
     var mouseInside: Bool = false {
         didSet {
             needsDisplay = true
@@ -43,7 +54,19 @@ final class BookmarkTableRowView: NSTableRowView {
     override func drawSelection(in dirtyRect: NSRect) {
         guard !editing else { return }
 
-        let path = NSBezierPath(roundedRect: dirtyRect, forCorners: NSBezierPath.Corners.allCases, cornerRadius: 6)
+        var roundedCorners = [NSBezierPath.Corners]()
+
+        if !hasPrevious {
+            roundedCorners.append(.topLeft)
+            roundedCorners.append(.topRight)
+        }
+
+        if !hasNext {
+            roundedCorners.append(.bottomLeft)
+            roundedCorners.append(.bottomRight)
+        }
+
+        let path = NSBezierPath(roundedRect: dirtyRect, forCorners: roundedCorners, cornerRadius: 6)
         NSColor.controlAccentColor.withAlphaComponent(0.5).setFill()
         path.fill()
     }

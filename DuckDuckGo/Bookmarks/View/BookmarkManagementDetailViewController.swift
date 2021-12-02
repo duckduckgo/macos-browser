@@ -425,9 +425,15 @@ extension BookmarkManagementDetailViewController: NSTableViewDelegate, NSTableVi
 
         clearSelections()
 
-        tableView.selectedRowIndexes.forEach {
-            let row = self.tableView.view(atColumn: 0, row: $0, makeIfNecessary: false) as? BookmarkTableCellView
-            row?.isSelected = true
+        let indexes = tableView.selectedRowIndexes
+
+        indexes.forEach {
+            let row = self.tableView.rowView(atRow: $0, makeIfNecessary: false) as? BookmarkTableRowView
+            row?.hasPrevious = indexes.contains($0 - 1)
+            row?.hasNext = indexes.contains($0 + 1)
+
+            let cell = self.tableView.view(atColumn: 0, row: $0, makeIfNecessary: false) as? BookmarkTableCellView
+            cell?.isSelected = true
         }
 
     }
