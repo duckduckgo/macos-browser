@@ -69,7 +69,7 @@ final class BookmarkTableRowView: NSTableRowView {
         }
 
         let path = NSBezierPath(roundedRect: dirtyRect, forCorners: roundedCorners, cornerRadius: 6)
-        NSColor.controlAccentColor.withAlphaComponent(0.5).setFill()
+        NSColor.selectedContentBackgroundColor.setFill()
         path.fill()
     }
 
