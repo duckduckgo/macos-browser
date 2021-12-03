@@ -4988,7 +4988,7 @@
 			isa = XCRemoteSwiftPackageReference;
 			repositoryURL = "https://github.com/duckduckgo/BrowserServicesKit.git";
 			requirement = {
-				branch = "release/friends-and-family";
+				branch = 63fe79d6aa23a251895552b01fde6f47d084100a;
 				kind = branch;
 			};
 		};
