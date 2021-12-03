@@ -188,6 +188,8 @@
 		4BB99D1026FE1A84001E4761 /* FirefoxBookmarksReaderTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4BB99D0D26FE1A83001E4761 /* FirefoxBookmarksReaderTests.swift */; };
 		4BB99D1126FE1A84001E4761 /* SafariBookmarksReaderTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4BB99D0E26FE1A84001E4761 /* SafariBookmarksReaderTests.swift */; };
 		4BB99D1326FE1A94001E4761 /* places.sqlite in Resources */ = {isa = PBXBuildFile; fileRef = 4BB99D1226FE1A94001E4761 /* places.sqlite */; };
+		4BC68A702759AE490029A586 /* Waitlist.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 4BC68A6F2759AE490029A586 /* Waitlist.storyboard */; };
+		4BC68A722759B2140029A586 /* Waitlist.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4BC68A712759B2140029A586 /* Waitlist.swift */; };
 		4BE0DF06267819A1006337B7 /* NSStoryboardExtension.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4BE0DF0426781961006337B7 /* NSStoryboardExtension.swift */; };
 		4BE65474271FCD40008D1D63 /* PasswordManagementIdentityItemView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4BE6546E271FCD40008D1D63 /* PasswordManagementIdentityItemView.swift */; };
 		4BE65476271FCD41008D1D63 /* PasswordManagementCreditCardItemView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4BE65470271FCD40008D1D63 /* PasswordManagementCreditCardItemView.swift */; };
@@ -805,6 +807,8 @@
 		4BB99D0D26FE1A83001E4761 /* FirefoxBookmarksReaderTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = FirefoxBookmarksReaderTests.swift; sourceTree = "<group>"; };
 		4BB99D0E26FE1A84001E4761 /* SafariBookmarksReaderTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SafariBookmarksReaderTests.swift; sourceTree = "<group>"; };
 		4BB99D1226FE1A94001E4761 /* places.sqlite */ = {isa = PBXFileReference; lastKnownFileType = file; path = places.sqlite; sourceTree = "<group>"; };
+		4BC68A6F2759AE490029A586 /* Waitlist.storyboard */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; path = Waitlist.storyboard; sourceTree = "<group>"; };
+		4BC68A712759B2140029A586 /* Waitlist.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Waitlist.swift; sourceTree = "<group>"; };
 		4BE0DF0426781961006337B7 /* NSStoryboardExtension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NSStoryboardExtension.swift; sourceTree = "<group>"; };
 		4BE6546E271FCD40008D1D63 /* PasswordManagementIdentityItemView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = PasswordManagementIdentityItemView.swift; sourceTree = "<group>"; };
 		4BE65470271FCD40008D1D63 /* PasswordManagementCreditCardItemView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = PasswordManagementCreditCardItemView.swift; sourceTree = "<group>"; };
@@ -1762,6 +1766,15 @@
 			path = "Test Safari Data";
 			sourceTree = "<group>";
 		};
+		4BC68A6C2759ADC20029A586 /* Waitlist */ = {
+			isa = PBXGroup;
+			children = (
+				4BC68A6F2759AE490029A586 /* Waitlist.storyboard */,
+				4BC68A712759B2140029A586 /* Waitlist.swift */,
+			);
+			path = Waitlist;
+			sourceTree = "<group>";
+		};
 		7B4CE8DB26F02108009134B1 /* UI Tests */ = {
 			isa = PBXGroup;
 			children = (
@@ -2109,6 +2122,7 @@
 		AA585D80248FD31100E9A3E2 /* DuckDuckGo */ = {
 			isa = PBXGroup;
 			children = (
+				4BC68A6C2759ADC20029A586 /* Waitlist */,
 				B6A9E47526146A440067D1B9 /* API */,
 				AA4D700525545EDE00C3411E /* AppDelegate */,
 				AAC5E4C025D6A6A9007F5990 /* Bookmarks */,
@@ -3412,6 +3426,7 @@
 				4B92928E26670D1700AD2C21 /* BookmarkOutlineViewCell.xib in Resources */,
 				858C78FC2705EB5F009B2B44 /* HomepageHeader.xib in Resources */,
 				B64C84DE2692D7400048FEBE /* PermissionAuthorization.storyboard in Resources */,
+				4BC68A702759AE490029A586 /* Waitlist.storyboard in Resources */,
 				AA34397D2754D55100B241FA /* dark-trackers-3.json in Resources */,
 				AA3439782754D55100B241FA /* dark-trackers-2.json in Resources */,
 				AAB7320726DD0C37002FACF9 /* Fire.storyboard in Resources */,
@@ -3888,6 +3903,7 @@
 				B6A9E46B2614618A0067D1B9 /* OperatingSystemVersionExtension.swift in Sources */,
 				85AC3AEF25D5CE9800C7D2AA /* UserScripts.swift in Sources */,
 				4B677439255DBEB800025BD8 /* HTTPSUpgradeStore.swift in Sources */,
+				4BC68A722759B2140029A586 /* Waitlist.swift in Sources */,
 				AAB549DF25DAB8F80058460B /* BookmarkViewModel.swift in Sources */,
 				AA13DCB4271480B0006D48D3 /* FirePopoverViewModel.swift in Sources */,
 				F41D174125CB131900472416 /* NSColorExtension.swift in Sources */,
