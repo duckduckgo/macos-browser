@@ -106,6 +106,11 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         crashReporter.checkForNewReports()
 #endif
         urlEventHandler.applicationDidFinishLaunching()
+        
+        // swiftlint:disable force_cast
+        let windowController = Waitlist.createWindowController()
+        NSApplication.shared.runModal(for: windowController.window!)
+        // swiftlint:enable force_cast
     }
 
     func applicationShouldTerminate(_ sender: NSApplication) -> NSApplication.TerminateReply {
