@@ -133,7 +133,7 @@ final class BookmarkTableCellView: NSTableCellView, NibLoadable {
 
     override var backgroundStyle: NSView.BackgroundStyle {
         didSet {
-            faviconImageView.contentTintColor = .black
+            faviconImageView.contentTintColor = isSelected ? .white : .black
             updateTitleLabelValue()
         }
     }

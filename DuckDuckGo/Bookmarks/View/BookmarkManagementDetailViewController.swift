@@ -147,7 +147,7 @@ final class BookmarkManagementDetailViewController: NSViewController {
             }
 
         } else if let folder = entity as? BookmarkFolder, doubleClick {
-            clearSelections()
+            resetSelections()
             delegate?.bookmarkManagementDetailViewControllerDidSelectFolder(folder)
         }
 
@@ -275,6 +275,8 @@ extension BookmarkManagementDetailViewController: NSTableViewDelegate, NSTableVi
 
     func tableView(_ tableView: NSTableView, rowViewForRow row: Int) -> NSTableRowView? {
         let rowView = BookmarkTableRowView()
+        rowView.onSelectionChanged = onSelectionChanged
+
         let entity = fetchEntity(at: row)
 
         if let uuid = editingBookmarkIndex?.uuid, uuid == entity?.id {
@@ -413,29 +415,32 @@ extension BookmarkManagementDetailViewController: NSTableViewDelegate, NSTableVi
         }
     }
 
-    fileprivate func clearSelections() {
+    /// Updates the next/previous selection state of each row, and clears the selection flag.
+    fileprivate func resetSelections() {
         guard totalRows() > 0 else { return }
+
+        let indexes = tableView.selectedRowIndexes
         for index in 0 ..< totalRows() {
-            let row = self.tableView.view(atColumn: 0, row: index, makeIfNecessary: false) as? BookmarkTableCellView
-            row?.isSelected = false
+            let row = self.tableView.rowView(atRow: index, makeIfNecessary: false) as? BookmarkTableRowView
+            row?.hasPrevious = indexes.contains(index - 1)
+            row?.hasNext = indexes.contains(index + 1)
+
+            let cell = self.tableView.view(atColumn: 0, row: index, makeIfNecessary: false) as? BookmarkTableCellView
+            cell?.isSelected = false
         }
     }
         
     func tableViewSelectionDidChange(_ notification: Notification) {
+        onSelectionChanged()
+    }
 
-        clearSelections()
-
+    func onSelectionChanged() {
+        resetSelections()
         let indexes = tableView.selectedRowIndexes
-
         indexes.forEach {
-            let row = self.tableView.rowView(atRow: $0, makeIfNecessary: false) as? BookmarkTableRowView
-            row?.hasPrevious = indexes.contains($0 - 1)
-            row?.hasNext = indexes.contains($0 + 1)
-
             let cell = self.tableView.view(atColumn: 0, row: $0, makeIfNecessary: false) as? BookmarkTableCellView
             cell?.isSelected = true
         }
-
     }
 
 }

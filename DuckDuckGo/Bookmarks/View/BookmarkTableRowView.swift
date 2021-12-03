@@ -20,6 +20,8 @@ import Foundation
 
 final class BookmarkTableRowView: NSTableRowView {
 
+    var onSelectionChanged: (() -> Void)?
+
     var editing = false
 
     var hasPrevious = false {
@@ -37,6 +39,14 @@ final class BookmarkTableRowView: NSTableRowView {
     var mouseInside: Bool = false {
         didSet {
             needsDisplay = true
+        }
+    }
+
+    override var isSelected: Bool {
+        didSet {
+            if mouseInside {
+                onSelectionChanged?()
+            }
         }
     }
 
