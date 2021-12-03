@@ -125,7 +125,7 @@ final class BookmarkManagementDetailViewController: NSViewController {
 
         // 1. Command: Open in Background Tab
         // 2. Command + Shift: Open in New Window
-        // 3. Select or launch
+        // 3. Double click to launch
 
         editingBookmarkIndex = nil
 
