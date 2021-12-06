@@ -122,31 +122,20 @@ final class BookmarkManagementDetailViewController: NSViewController {
         if row?.editing ?? false {
             return
         }
-
-        // 1. Command: Open in Background Tab
-        // 2. Command + Shift: Open in New Window
-        // 3. Double click to launch
-
         editingBookmarkIndex = nil
 
+        guard doubleClick else { return }
+
         if let bookmark = entity as? Bookmark {
-            var launched = false
             if NSApplication.shared.isCommandPressed && NSApplication.shared.isShiftPressed {
                 WindowsManager.openNewWindow(with: bookmark.url)
-                launched = true
             } else if NSApplication.shared.isCommandPressed {
                 WindowControllersManager.shared.show(url: bookmark.url, newTab: true)
-                launched = true
-            } else if doubleClick {
+            } else {
                 WindowControllersManager.shared.show(url: bookmark.url, newTab: true)
-                launched = true
             }
-
-            if launched {
-                Pixel.fire(.navigation(kind: .bookmark(isFavorite: bookmark.isFavorite), source: .managementInterface))
-            }
-
-        } else if let folder = entity as? BookmarkFolder, doubleClick {
+            Pixel.fire(.navigation(kind: .bookmark(isFavorite: bookmark.isFavorite), source: .managementInterface))
+        } else if let folder = entity as? BookmarkFolder {
             resetSelections()
             delegate?.bookmarkManagementDetailViewControllerDidSelectFolder(folder)
         }
