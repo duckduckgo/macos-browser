@@ -597,6 +597,7 @@
 		EA4617F0273A28A700F110A2 /* fb-tds.json in Resources */ = {isa = PBXBuildFile; fileRef = EA4617EF273A28A700F110A2 /* fb-tds.json */; };
 		EA477680272A21B700419EDA /* clickToLoadConfig.json in Resources */ = {isa = PBXBuildFile; fileRef = EA47767F272A21B700419EDA /* clickToLoadConfig.json */; };
 		EAC80DE0271F6C0100BBF02D /* fb-sdk.js in Resources */ = {isa = PBXBuildFile; fileRef = EAC80DDF271F6C0100BBF02D /* fb-sdk.js */; };
+		EAE42800275D47FA00DAC26B /* ClickToLoadModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = EAE427FF275D47FA00DAC26B /* ClickToLoadModel.swift */; };
 		EAFAD6CA2728BD1200F9DF00 /* clickToLoad.js in Resources */ = {isa = PBXBuildFile; fileRef = EAFAD6C92728BD1200F9DF00 /* clickToLoad.js */; };
 		F41D174125CB131900472416 /* NSColorExtension.swift in Sources */ = {isa = PBXBuildFile; fileRef = F41D174025CB131900472416 /* NSColorExtension.swift */; };
 		F44C130225C2DA0400426E3E /* NSAppearanceExtension.swift in Sources */ = {isa = PBXBuildFile; fileRef = F44C130125C2DA0400426E3E /* NSAppearanceExtension.swift */; };
@@ -1231,6 +1232,7 @@
 		EA4617EF273A28A700F110A2 /* fb-tds.json */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.json; path = "fb-tds.json"; sourceTree = "<group>"; };
 		EA47767F272A21B700419EDA /* clickToLoadConfig.json */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.json; path = clickToLoadConfig.json; sourceTree = "<group>"; };
 		EAC80DDF271F6C0100BBF02D /* fb-sdk.js */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.javascript; path = "fb-sdk.js"; sourceTree = "<group>"; };
+		EAE427FF275D47FA00DAC26B /* ClickToLoadModel.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ClickToLoadModel.swift; sourceTree = "<group>"; };
 		EAFAD6C92728BD1200F9DF00 /* clickToLoad.js */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.javascript; path = clickToLoad.js; sourceTree = "<group>"; };
 		F41D174025CB131900472416 /* NSColorExtension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NSColorExtension.swift; sourceTree = "<group>"; };
 		F44C130125C2DA0400426E3E /* NSAppearanceExtension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NSAppearanceExtension.swift; sourceTree = "<group>"; };
@@ -1454,6 +1456,7 @@
 			isa = PBXGroup;
 			children = (
 				026ADE1326C3010C002518EE /* macos-config.json */,
+				EAE427FF275D47FA00DAC26B /* ClickToLoadModel.swift */,
 				85AC3B0425D6B1D800C7D2AA /* ScriptSourceProviding.swift */,
 				9826B09F2747DF3D0092F683 /* ContentBlocking.swift */,
 				9826B0A12747DFEB0092F683 /* AppPrivacyConfigurationDataProvider.swift */,
@@ -3569,6 +3572,7 @@
 				B6A9E45A261460350067D1B9 /* ApiRequestError.swift in Sources */,
 				AADCBF3A26F7C2CE00EF67A8 /* LottieAnimationCache.swift in Sources */,
 				4B723E0E26B0006300E14D75 /* LoginImport.swift in Sources */,
+				EAE42800275D47FA00DAC26B /* ClickToLoadModel.swift in Sources */,
 				0230C0A3272080090018F728 /* KeyedCodingExtension.swift in Sources */,
 				B6C0B23026E61D630031CB7F /* DownloadListStore.swift in Sources */,
 				85799C1825DEBB3F0007EC87 /* Logging.swift in Sources */,
@@ -4282,7 +4286,7 @@
 					"@executable_path/../Frameworks",
 				);
 				MARKETING_VERSION = 0.17.7;
-				PRODUCT_BUNDLE_IDENTIFIER = com.duckduckgo.macos.browser.debug;
+				PRODUCT_BUNDLE_IDENTIFIER = com.ladamski.macos.browser.debug;
 				PRODUCT_MODULE_NAME = "$(TARGET_NAME:c99extidentifier)";
 				PRODUCT_NAME = DuckDuckGo;
 				PROVISIONING_PROFILE_SPECIFIER = "";
@@ -4546,7 +4550,7 @@
 				CODE_SIGN_STYLE = Automatic;
 				COMBINE_HIDPI_IMAGES = YES;
 				CURRENT_PROJECT_VERSION = 0.17.7;
-				DEVELOPMENT_TEAM = HKE973VLUW;
+				DEVELOPMENT_TEAM = 5Y2AZDZ3DM;
 				ENABLE_HARDENED_RUNTIME = YES;
 				INFOPLIST_FILE = DuckDuckGo/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = (
@@ -4554,7 +4558,7 @@
 					"@executable_path/../Frameworks",
 				);
 				MARKETING_VERSION = 0.17.7;
-				PRODUCT_BUNDLE_IDENTIFIER = com.duckduckgo.macos.browser.debug;
+				PRODUCT_BUNDLE_IDENTIFIER = com.ladamski.macos.browser.debug;
 				PRODUCT_MODULE_NAME = "$(TARGET_NAME:c99extidentifier)";
 				PRODUCT_NAME = DuckDuckGo;
 				SWIFT_ACTIVE_COMPILATION_CONDITIONS = "FEEDBACK OUT_OF_APPSTORE $(inherited)";
@@ -4574,7 +4578,7 @@
 				CODE_SIGN_STYLE = Automatic;
 				COMBINE_HIDPI_IMAGES = YES;
 				CURRENT_PROJECT_VERSION = 0.17.7;
-				DEVELOPMENT_TEAM = HKE973VLUW;
+				DEVELOPMENT_TEAM = 5Y2AZDZ3DM;
 				ENABLE_HARDENED_RUNTIME = YES;
 				INFOPLIST_FILE = DuckDuckGo/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = (
@@ -4582,7 +4586,7 @@
 					"@executable_path/../Frameworks",
 				);
 				MARKETING_VERSION = 0.17.7;
-				PRODUCT_BUNDLE_IDENTIFIER = com.duckduckgo.macos.browser;
+				PRODUCT_BUNDLE_IDENTIFIER = com.ladamski.macos.browser;
 				PRODUCT_MODULE_NAME = "$(TARGET_NAME:c99extidentifier)";
 				PRODUCT_NAME = DuckDuckGo;
 				SWIFT_ACTIVE_COMPILATION_CONDITIONS = "FEEDBACK OUT_OF_APPSTORE";
@@ -4706,7 +4710,7 @@
 				CODE_SIGN_STYLE = Automatic;
 				COMBINE_HIDPI_IMAGES = YES;
 				CURRENT_PROJECT_VERSION = 0.17.7;
-				DEVELOPMENT_TEAM = HKE973VLUW;
+				DEVELOPMENT_TEAM = 5Y2AZDZ3DM;
 				ENABLE_HARDENED_RUNTIME = YES;
 				INFOPLIST_FILE = DuckDuckGo/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = (
@@ -4714,7 +4718,7 @@
 					"@executable_path/../Frameworks",
 				);
 				MARKETING_VERSION = 0.17.7;
-				PRODUCT_BUNDLE_IDENTIFIER = com.duckduckgo.macos.browser.review;
+				PRODUCT_BUNDLE_IDENTIFIER = com.ladamski.macos.browser.review;
 				PRODUCT_MODULE_NAME = "$(TARGET_NAME:c99extidentifier)";
 				PRODUCT_NAME = "DuckDuckGo Review";
 				SWIFT_ACTIVE_COMPILATION_CONDITIONS = "FEEDBACK OUT_OF_APPSTORE";
@@ -4854,7 +4858,7 @@
 				CODE_SIGN_STYLE = Automatic;
 				COMBINE_HIDPI_IMAGES = YES;
 				CURRENT_PROJECT_VERSION = 0.17.7;
-				DEVELOPMENT_TEAM = HKE973VLUW;
+				DEVELOPMENT_TEAM = 5Y2AZDZ3DM;
 				ENABLE_HARDENED_RUNTIME = YES;
 				GCC_PREPROCESSOR_DEFINITIONS = "BETA=1";
 				INFOPLIST_FILE = DuckDuckGo/Info.plist;
@@ -4863,7 +4867,7 @@
 					"@executable_path/../Frameworks",
 				);
 				MARKETING_VERSION = 0.17.7;
-				PRODUCT_BUNDLE_IDENTIFIER = com.duckduckgo.macos.browser;
+				PRODUCT_BUNDLE_IDENTIFIER = com.ladamski.macos.browser;
 				PRODUCT_MODULE_NAME = "$(TARGET_NAME:c99extidentifier)";
 				PRODUCT_NAME = "DuckDuckGo Non-Production";
 				SWIFT_ACTIVE_COMPILATION_CONDITIONS = "FEEDBACK OUT_OF_APPSTORE BETA";
