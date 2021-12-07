@@ -22,7 +22,7 @@ import Foundation
 
 final class CrashReportSender {
 
-    static let reportServiceUrl = URL(string: "https://use-devtesting10.duckduckgo.com/crash.js")!
+    static let reportServiceUrl = URL(string: "https://duckduckgo.com/crash.js")!
 
     func send(_ crashReport: CrashReport) {
         guard let contentData = crashReport.contentData else {
