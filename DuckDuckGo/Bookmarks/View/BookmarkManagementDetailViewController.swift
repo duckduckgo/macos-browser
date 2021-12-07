@@ -111,7 +111,7 @@ final class BookmarkManagementDetailViewController: NSViewController {
     @IBAction func handleDoubleClick(_ sender: NSTableView) {
         let index = sender.clickedRow
 
-        guard index != -1, let entity = fetchEntity(at: index) else {
+        guard index != -1, editingBookmarkIndex?.index != index, let entity = fetchEntity(at: index) else {
             return
         }
 
@@ -160,14 +160,17 @@ final class BookmarkManagementDetailViewController: NSViewController {
     }
 
     private func updateEditingState(forRowAt index: Int) {
+        print(#function, index, editingBookmarkIndex?.index ?? "<none>")
         guard index != -1 else {
             endEditing()
             return
         }
 
-        if editingBookmarkIndex?.index != index {
+        if editingBookmarkIndex?.index == nil || editingBookmarkIndex?.index != index {
             endEditing()
-        } else if let entity = fetchEntity(at: index) {
+        }
+
+        if let entity = fetchEntity(at: index) {
             editingBookmarkIndex = EditedBookmarkMetadata(uuid: entity.id, index: index)
             animateEditingState(forRowAt: index, editing: true)
         } else {
