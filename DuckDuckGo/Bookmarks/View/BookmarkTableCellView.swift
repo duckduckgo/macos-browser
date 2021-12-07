@@ -300,7 +300,7 @@ final class BookmarkTableCellView: NSTableCellView, NibLoadable {
         let titleAttributes = [NSAttributedString.Key.foregroundColor: color]
         let titleString = NSMutableAttributedString(string: primaryTitleLabelValue, attributes: titleAttributes)
 
-        let urlColor = isSelected ? NSColor.secondaryLabelColor : NSColor.tertiaryLabelColor
+        let urlColor = isSelected ? NSColor.white.withAlphaComponent(0.6) : NSColor.tertiaryLabelColor
 
         let urlAttributes = [NSAttributedString.Key.foregroundColor: urlColor]
         let urlString = NSAttributedString(string: " – \(tertiaryValue)", attributes: urlAttributes)
