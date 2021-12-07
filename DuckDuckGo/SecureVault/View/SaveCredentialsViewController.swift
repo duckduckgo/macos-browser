@@ -153,7 +153,7 @@ final class SaveCredentialsViewController: NSViewController {
     }
 
     func loadFaviconForDomain(_ domain: String) {
-        faviconImage.image = LocalFaviconService.shared.getCachedFavicon(for: domain, mustBeFromUserScript: false)
+        faviconImage.image = FaviconManager.shared.getCachedFavicon(for: domain, mustBeFromUserScript: false)
             ?? NSImage(named: NSImage.Name("Web"))
     }
 

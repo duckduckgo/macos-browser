@@ -24,7 +24,7 @@ struct LoginFaviconView: View {
 
     var body: some View {
 
-        let favicon = LocalFaviconService.shared.getCachedFavicon(for: domain, mustBeFromUserScript: false) ?? NSImage(named: "Login")
+        let favicon = FaviconManager.shared.getCachedFavicon(for: domain, mustBeFromUserScript: false) ?? NSImage(named: "Login")
 
         if let image = favicon {
             Image(nsImage: image)

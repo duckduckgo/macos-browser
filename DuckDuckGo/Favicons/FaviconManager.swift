@@ -1,5 +1,5 @@
 //
-//  FaviconService.swift
+//  FaviconManager.swift
 //
 //  Copyright © 2020 DuckDuckGo. All rights reserved.
 //
@@ -19,7 +19,7 @@
 import Cocoa
 import Combine
 
-protocol FaviconService {
+protocol FaviconManagement {
 
     var cachedFaviconsPublisher: PassthroughSubject<(host: String, favicon: NSImage), Never> { get }
 
@@ -29,9 +29,9 @@ protocol FaviconService {
 
 }
 
-final class LocalFaviconService: FaviconService {
+final class FaviconManager: FaviconManagement {
 
-    static let shared = LocalFaviconService()
+    static let shared = FaviconManager()
 
     var cachedFaviconsPublisher = PassthroughSubject<(host: String, favicon: NSImage), Never>()
 
@@ -49,9 +49,9 @@ final class LocalFaviconService: FaviconService {
     }
     
     private var cache = [String: CacheEntry]()
-    private let queue = DispatchQueue(label: "LocalFaviconService queue", attributes: .concurrent)
+    private let queue = DispatchQueue(label: "FaviconManager queue", attributes: .concurrent)
 
-    enum LocalFaviconServiceError: Error {
+    enum FaviconManagerError: Error {
         case urlConstructionFailed
         case imageInitFailed
     }
@@ -89,7 +89,7 @@ final class LocalFaviconService: FaviconService {
             }
 
             guard let url = faviconUrl ?? URL(string: "\(URL.NavigationalScheme.https.separated())\(host)/\(FaviconName.favicon)") else {
-                mainQueueCompletion(nil, LocalFaviconServiceError.urlConstructionFailed)
+                mainQueueCompletion(nil, FaviconManagerError.urlConstructionFailed)
                 return
             }
 
@@ -97,7 +97,7 @@ final class LocalFaviconService: FaviconService {
                 if let newHost = host.dropSubdomain(), faviconUrl == nil {
                     self.fetchFavicon(nil, for: newHost, isFromUserScript: isFromUserScript, completion: completion)
                 } else {
-                    mainQueueCompletion(nil, LocalFaviconServiceError.imageInitFailed)
+                    mainQueueCompletion(nil, FaviconManagerError.imageInitFailed)
                 }
                 return
             }

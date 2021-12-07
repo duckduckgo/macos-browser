@@ -1,5 +1,5 @@
 //
-//  FaviconServiceMock.swift
+//  FaviconManagerMock.swift
 //
 //  Copyright © 2021 DuckDuckGo. All rights reserved.
 //
@@ -20,7 +20,7 @@ import XCTest
 import Combine
 @testable import DuckDuckGo_Privacy_Browser
 
-final class FaviconServiceMock: FaviconService {
+final class FaviconManagerMock: FaviconManagement {
 
     var cachedFaviconsPublisher = PassthroughSubject<(host: String, favicon: NSImage), Never>()
 

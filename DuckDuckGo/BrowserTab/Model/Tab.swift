@@ -88,7 +88,7 @@ final class Tab: NSObject {
     weak var delegate: TabDelegate?
 
     init(content: TabContent,
-         faviconService: FaviconService = LocalFaviconService.shared,
+         faviconManagement: FaviconManagement = FaviconManager.shared,
          webCacheManager: WebCacheManager = WebCacheManager.shared,
          webViewConfiguration: WebViewConfiguration? = nil,
          historyCoordinating: HistoryCoordinating = HistoryCoordinator.shared,
@@ -103,7 +103,7 @@ final class Tab: NSObject {
          canBeClosedWithBack: Bool = false) {
 
         self.content = content
-        self.faviconService = faviconService
+        self.faviconManagement = faviconManagement
         self.historyCoordinating = historyCoordinating
         self.scriptsSource = scriptsSource
         self.visitedDomains = visitedDomains
@@ -127,7 +127,7 @@ final class Tab: NSObject {
         // cache session-restored favicon if present
         if let favicon = favicon,
            let host = content.url?.host {
-            faviconService.cacheIfNeeded(favicon: favicon, for: host, isFromUserScript: false)
+            faviconManagement.cacheIfNeeded(favicon: favicon, for: host, isFromUserScript: false)
         }
     }
 
@@ -375,7 +375,7 @@ final class Tab: NSObject {
     // MARK: - Favicon
 
     @Published var favicon: NSImage?
-    let faviconService: FaviconService
+    let faviconManagement: FaviconManagement
 
     private func handleFavicon(oldContent: TabContent) {
         if !content.isUrl {
@@ -395,7 +395,7 @@ final class Tab: NSObject {
             return
         }
 
-        faviconService.fetchFavicon(faviconURL, for: host, isFromUserScript: isFromUserScript) { (image, error) in
+        faviconManagement.fetchFavicon(faviconURL, for: host, isFromUserScript: isFromUserScript) { (image, error) in
             guard error == nil, let image = image else {
                 return
             }
@@ -586,7 +586,7 @@ extension Tab: FaviconUserScriptDelegate {
             return
         }
 
-        faviconService.fetchFavicon(faviconUrl, for: host, isFromUserScript: true) { (image, error) in
+        faviconManagement.fetchFavicon(faviconUrl, for: host, isFromUserScript: true) { (image, error) in
             guard host == self.content.url?.host else {
                 return
             }

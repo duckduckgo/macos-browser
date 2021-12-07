@@ -16,7 +16,7 @@
 //  limitations under the License.
 //
 
-import Foundation
+import Cocoa
 import BrowserServicesKit
 
 final class FirePopoverViewModel {
@@ -46,13 +46,13 @@ final class FirePopoverViewModel {
          tabCollectionViewModel: TabCollectionViewModel,
          historyCoordinating: HistoryCoordinating,
          fireproofDomains: FireproofDomains,
-         faviconService: FaviconService,
+         faviconManagement: FaviconManagement,
          initialClearingOption: ClearingOption = .allData) {
         self.fireViewModel = fireViewModel
         self.tabCollectionViewModel = tabCollectionViewModel
         self.historyCoordinating = historyCoordinating
         self.fireproofDomains = fireproofDomains
-        self.faviconService = faviconService
+        self.faviconManagement = faviconManagement
         self.clearingOption = initialClearingOption
         updateItems(for: initialClearingOption)
     }
@@ -67,7 +67,7 @@ final class FirePopoverViewModel {
     private let tabCollectionViewModel: TabCollectionViewModel
     private let historyCoordinating: HistoryCoordinating
     private let fireproofDomains: FireproofDomains
-    private let faviconService: FaviconService
+    private let faviconManagement: FaviconManagement
 
     @Published private(set) var fireproofed: [Item] = []
     @Published private(set) var selectable: [Item] = []
@@ -115,10 +115,10 @@ final class FirePopoverViewModel {
             .subtracting(fireproofed)
 
         self.fireproofed = fireproofed
-            .map { Item(domain: $0, favicon: faviconService.getCachedFavicon(for: $0, mustBeFromUserScript: false)) }
+            .map { Item(domain: $0, favicon: faviconManagement.getCachedFavicon(for: $0, mustBeFromUserScript: false)) }
             .sorted { $0.domain < $1.domain }
         self.selectable = selectable
-            .map { Item(domain: $0, favicon: faviconService.getCachedFavicon(for: $0, mustBeFromUserScript: false)) }
+            .map { Item(domain: $0, favicon: faviconManagement.getCachedFavicon(for: $0, mustBeFromUserScript: false)) }
             .sorted { $0.domain < $1.domain }
         selectAll()
     }

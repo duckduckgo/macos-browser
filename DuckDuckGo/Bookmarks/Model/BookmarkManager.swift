@@ -49,9 +49,9 @@ final class LocalBookmarkManager: BookmarkManager {
         subscribeToCachedFavicons()
     }
 
-    init(bookmarkStore: BookmarkStore, faviconService: FaviconService) {
+    init(bookmarkStore: BookmarkStore, faviconManagement: FaviconManagement) {
         self.bookmarkStore = bookmarkStore
-        self.faviconService = faviconService
+        self.faviconManagement = faviconManagement
 
         subscribeToCachedFavicons()
     }
@@ -60,7 +60,7 @@ final class LocalBookmarkManager: BookmarkManager {
     var listPublisher: Published<BookmarkList?>.Publisher { $list }
 
     private lazy var bookmarkStore: BookmarkStore = LocalBookmarkStore()
-    private lazy var faviconService: FaviconService = LocalFaviconService.shared
+    private lazy var faviconManagement: FaviconManagement = FaviconManager.shared
 
     // MARK: - Bookmarks
 
@@ -204,7 +204,7 @@ final class LocalBookmarkManager: BookmarkManager {
     private var faviconCancellable: AnyCancellable?
 
     private func subscribeToCachedFavicons() {
-        faviconCancellable = faviconService.cachedFaviconsPublisher
+        faviconCancellable = faviconManagement.cachedFaviconsPublisher
             .sink(receiveValue: { [weak self] (host, favicon) in
                 self?.update(favicon: favicon, for: host)
             })
@@ -226,7 +226,7 @@ final class LocalBookmarkManager: BookmarkManager {
 
     private func favicon(for host: String?) -> NSImage? {
         if let host = host {
-            return faviconService.getCachedFavicon(for: host, mustBeFromUserScript: false)
+            return faviconManagement.getCachedFavicon(for: host, mustBeFromUserScript: false)
         }
 
         return nil

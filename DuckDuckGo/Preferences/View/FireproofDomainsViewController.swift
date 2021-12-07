@@ -97,7 +97,7 @@ extension FireproofDomainsViewController: NSTableViewDataSource, NSTableViewDele
         if let cell = tableView.makeView(withIdentifier: Constants.cellIdentifier, owner: nil) as? NSTableCellView {
             let domain = fireproofDomains[row]
             cell.textField?.stringValue = domain.dropWWW()
-            cell.imageView?.image = LocalFaviconService.shared.getCachedFavicon(for: domain, mustBeFromUserScript: false)
+            cell.imageView?.image = FaviconManager.shared.getCachedFavicon(for: domain, mustBeFromUserScript: false)
             cell.imageView?.applyFaviconStyle()
 
             return cell

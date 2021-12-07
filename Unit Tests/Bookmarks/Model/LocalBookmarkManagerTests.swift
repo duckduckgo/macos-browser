@@ -29,8 +29,8 @@ final class LocalBookmarkManagerTests: XCTestCase {
 
     func testWhenBookmarksAreNotLoadedYet_ThenManagerIgnoresBookmarkingRequests() {
         let bookmarkStoreMock = BookmarkStoreMock()
-        let faviconServiceMock = FaviconServiceMock()
-        let bookmarkManager = LocalBookmarkManager(bookmarkStore: bookmarkStoreMock, faviconService: faviconServiceMock)
+        let faviconManagerMock = FaviconManagerMock()
+        let bookmarkManager = LocalBookmarkManager(bookmarkStore: bookmarkStoreMock, faviconManagement: faviconManagerMock)
 
         XCTAssertNil(bookmarkManager.makeBookmark(for: URL.duckDuckGo, title: "Test", isFavorite: false))
         XCTAssertNil(bookmarkManager.updateUrl(of: Bookmark.aBookmark, to: URL.duckDuckGoAutocomplete))
@@ -38,8 +38,8 @@ final class LocalBookmarkManagerTests: XCTestCase {
 
     func testWhenBookmarksAreLoaded_ThenTheManagerHoldsAllLoadedBookmarks() {
         let bookmarkStoreMock = BookmarkStoreMock()
-        let faviconServiceMock = FaviconServiceMock()
-        let bookmarkManager = LocalBookmarkManager(bookmarkStore: bookmarkStoreMock, faviconService: faviconServiceMock)
+        let faviconManagerMock = FaviconManagerMock()
+        let bookmarkManager = LocalBookmarkManager(bookmarkStore: bookmarkStoreMock, faviconManagement: faviconManagerMock)
 
         bookmarkStoreMock.bookmarks = [Bookmark.aBookmark]
         bookmarkManager.loadBookmarks()
@@ -52,8 +52,8 @@ final class LocalBookmarkManagerTests: XCTestCase {
 
     func testWhenLoadFails_ThenTheManagerHoldsBookmarksAreNil() {
         let bookmarkStoreMock = BookmarkStoreMock()
-        let faviconServiceMock = FaviconServiceMock()
-        let bookmarkManager = LocalBookmarkManager(bookmarkStore: bookmarkStoreMock, faviconService: faviconServiceMock)
+        let faviconManagerMock = FaviconManagerMock()
+        let bookmarkManager = LocalBookmarkManager(bookmarkStore: bookmarkStoreMock, faviconManagement: faviconManagerMock)
 
         bookmarkStoreMock.bookmarks = nil
         bookmarkStoreMock.loadError = BookmarkManagerError.somethingReallyBad
@@ -160,14 +160,14 @@ final class LocalBookmarkManagerTests: XCTestCase {
 
     func testWhenNewFaviconIsCached_ThenManagerUpdatesItAlsoInStore() {
         let bookmarkStoreMock = BookmarkStoreMock()
-        let faviconServiceMock = FaviconServiceMock()
-        let bookmarkManager = LocalBookmarkManager(bookmarkStore: bookmarkStoreMock, faviconService: faviconServiceMock)
+        let faviconManagerMock = FaviconManagerMock()
+        let bookmarkManager = LocalBookmarkManager(bookmarkStore: bookmarkStoreMock, faviconManagement: faviconManagerMock)
 
         bookmarkStoreMock.bookmarks = [Bookmark.aBookmark]
         bookmarkManager.loadBookmarks()
 
         let newFavicon = NSImage(named: "HomeFavicon")!
-        faviconServiceMock.cachedFaviconsPublisher.send((URL.duckDuckGo.host!, newFavicon))
+        faviconManagerMock.cachedFaviconsPublisher.send((URL.duckDuckGo.host!, newFavicon))
 
         XCTAssert(bookmarkStoreMock.updateBookmarkCalled)
         XCTAssert(bookmarkManager.getBookmark(for: URL.duckDuckGo)?.favicon == newFavicon)
@@ -179,8 +179,8 @@ fileprivate extension LocalBookmarkManager {
 
     static var aManager: (LocalBookmarkManager, BookmarkStoreMock) {
         let bookmarkStoreMock = BookmarkStoreMock()
-        let faviconServiceMock = FaviconServiceMock()
-        let bookmarkManager = LocalBookmarkManager(bookmarkStore: bookmarkStoreMock, faviconService: faviconServiceMock)
+        let faviconManagerMock = FaviconManagerMock()
+        let bookmarkManager = LocalBookmarkManager(bookmarkStore: bookmarkStoreMock, faviconManagement: faviconManagerMock)
 
         bookmarkStoreMock.bookmarks = []
         bookmarkManager.loadBookmarks()

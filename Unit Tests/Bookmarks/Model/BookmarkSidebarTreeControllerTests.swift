@@ -46,8 +46,8 @@ class BookmarkSidebarTreeControllerTests: XCTestCase {
 
     func testWhenBookmarkStoreHasNoTopLevelFolders_ThenTheDefaultBookmarksNodeHasNoChildren() {
         let bookmarkStoreMock = BookmarkStoreMock()
-        let faviconServiceMock = FaviconServiceMock()
-        let bookmarkManager = LocalBookmarkManager(bookmarkStore: bookmarkStoreMock, faviconService: faviconServiceMock)
+        let faviconManagerMock = FaviconManagerMock()
+        let bookmarkManager = LocalBookmarkManager(bookmarkStore: bookmarkStoreMock, faviconManagement: faviconManagerMock)
 
         bookmarkStoreMock.bookmarks = [Bookmark.mock]
         bookmarkManager.loadBookmarks()
@@ -64,8 +64,8 @@ class BookmarkSidebarTreeControllerTests: XCTestCase {
 
     func testWhenBookmarkStoreHasTopLevelFolders_ThenTheDefaultBookmarksNodeHasThemAsChildren() {
         let bookmarkStoreMock = BookmarkStoreMock()
-        let faviconServiceMock = FaviconServiceMock()
-        let bookmarkManager = LocalBookmarkManager(bookmarkStore: bookmarkStoreMock, faviconService: faviconServiceMock)
+        let faviconManagerMock = FaviconManagerMock()
+        let bookmarkManager = LocalBookmarkManager(bookmarkStore: bookmarkStoreMock, faviconManagement: faviconManagerMock)
         let topLevelFolder = BookmarkFolder.mock
 
         bookmarkStoreMock.bookmarks = [topLevelFolder]
@@ -85,8 +85,8 @@ class BookmarkSidebarTreeControllerTests: XCTestCase {
 
     func testWhenBookmarkStoreHasNestedFolders_ThenTheTreeContainsNestedNodes() {
         let bookmarkStoreMock = BookmarkStoreMock()
-        let faviconServiceMock = FaviconServiceMock()
-        let bookmarkManager = LocalBookmarkManager(bookmarkStore: bookmarkStoreMock, faviconService: faviconServiceMock)
+        let faviconManagerMock = FaviconManagerMock()
+        let bookmarkManager = LocalBookmarkManager(bookmarkStore: bookmarkStoreMock, faviconManagement: faviconManagerMock)
 
         let childFolder = BookmarkFolder(id: UUID(), title: "Child")
         let rootFolder = BookmarkFolder(id: UUID(), title: "Root", children: [childFolder])
