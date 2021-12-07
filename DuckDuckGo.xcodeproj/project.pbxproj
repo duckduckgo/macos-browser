@@ -2076,7 +2076,6 @@
 		AA512D1224D99D4900230283 /* Services */ = {
 			isa = PBXGroup;
 			children = (
-				AA512D1324D99D9800230283 /* FaviconService.swift */,
 				AA6820E325502F19005ED0D5 /* WebsiteDataStore.swift */,
 			);
 			path = Services;
@@ -2120,12 +2119,13 @@
 				4B723DEA26B0002B00E14D75 /* Data Import */,
 				4B723DF826B0002B00E14D75 /* Data Export */,
 				4B65143C26392483005B46EB /* Email */,
-				B65536902684409300085A79 /* Geolocation */,
-				0230C09D271F52D50018F728 /* GPC */,
+				AA5FA695275F823900DCE9C9 /* Favicons */,
 				8556A60C256C15C60092FA9D /* FileDownload */,
 				85A0115D25AF1C4700FA6A0C /* FindInPage */,
 				AA6820E825503A21005ED0D5 /* Fire */,
 				4B02197B25E05FAC00ED7DEA /* Fireproofing */,
+				B65536902684409300085A79 /* Geolocation */,
+				0230C09D271F52D50018F728 /* GPC */,
 				AAE75275263B036300B973F8 /* History */,
 				AAE71DB225F66A0900D74437 /* Homepage */,
 				AA585DB02490E6FA00E9A3E2 /* Main */,
@@ -2194,6 +2194,14 @@
 				AA68C3D824911D56001B8783 /* View */,
 			);
 			path = Main;
+			sourceTree = "<group>";
+		};
+		AA5FA695275F823900DCE9C9 /* Favicons */ = {
+			isa = PBXGroup;
+			children = (
+				AA512D1324D99D9800230283 /* FaviconService.swift */,
+			);
+			path = Favicons;
 			sourceTree = "<group>";
 		};
 		AA63744E24C9BB4A00AB2AC4 /* Suggestions */ = {
