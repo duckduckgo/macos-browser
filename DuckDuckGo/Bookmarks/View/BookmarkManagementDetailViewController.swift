@@ -132,7 +132,6 @@ final class BookmarkManagementDetailViewController: NSViewController {
 
     @IBAction func handleClick(_ sender: NSTableView) {
         let index = sender.clickedRow
-        print(#function, index)
 
         if index != editingBookmarkIndex?.index {
             endEditing()
@@ -152,7 +151,6 @@ final class BookmarkManagementDetailViewController: NSViewController {
     }
 
     private func endEditing() {
-        print(#function, editingBookmarkIndex?.index as Any)
         if let editingIndex = editingBookmarkIndex?.index {
             animateEditingState(forRowAt: editingIndex, editing: false)
         }
@@ -160,7 +158,6 @@ final class BookmarkManagementDetailViewController: NSViewController {
     }
 
     private func updateEditingState(forRowAt index: Int) {
-        print(#function, index, editingBookmarkIndex?.index ?? "<none>")
         guard index != -1 else {
             endEditing()
             return
@@ -179,7 +176,6 @@ final class BookmarkManagementDetailViewController: NSViewController {
     }
 
     private func animateEditingState(forRowAt index: Int, editing: Bool, completion: (() -> Void)? = nil) {
-        print(#function, index, editing)
         if let cell = tableView.view(atColumn: 0, row: index, makeIfNecessary: false) as? BookmarkTableCellView,
            let row = tableView.rowView(atRow: index, makeIfNecessary: false) as? BookmarkTableRowView {
 
