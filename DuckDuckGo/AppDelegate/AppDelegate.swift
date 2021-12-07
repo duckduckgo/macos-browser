@@ -107,10 +107,17 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
 #endif
         urlEventHandler.applicationDidFinishLaunching()
         
-        // swiftlint:disable force_cast
+        // WAITLIST:
+
         let windowController = Waitlist.createWindowController()
-        NSApplication.shared.runModal(for: windowController.window!)
+        let response = NSApplication.shared.runModal(for: windowController.window!)
         // swiftlint:enable force_cast
+     
+        if response == .abort {
+            exit(1)
+        }
+
+        print("Response: \(response)")
     }
 
     func applicationShouldTerminate(_ sender: NSApplication) -> NSApplication.TerminateReply {

@@ -9,14 +9,14 @@
         <!--Window Controller-->
         <scene sceneID="m31-DN-CVg">
             <objects>
-                <windowController storyboardIdentifier="WaitlistWindowController" id="lYq-z5-Oer" sceneMemberID="viewController">
-                    <window key="window" title="Window" allowsToolTipsWhenApplicationIsInactive="NO" autorecalculatesKeyViewLoop="NO" releasedWhenClosed="NO" visibleAtLaunch="NO" frameAutosaveName="" animationBehavior="default" id="OJl-Wj-u1K">
+                <windowController storyboardIdentifier="WaitlistWindowController" id="lYq-z5-Oer" customClass="WaitlistWindowController" customModule="DuckDuckGo_Privacy_Browser" customModuleProvider="target" sceneMemberID="viewController">
+                    <window key="window" title="Desktop Browser Waitlist" allowsToolTipsWhenApplicationIsInactive="NO" autorecalculatesKeyViewLoop="NO" releasedWhenClosed="NO" visibleAtLaunch="NO" frameAutosaveName="" animationBehavior="default" id="OJl-Wj-u1K">
                         <windowStyleMask key="styleMask" titled="YES" closable="YES" miniaturizable="YES" resizable="YES"/>
                         <windowPositionMask key="initialPositionMask" leftStrut="YES" rightStrut="YES" topStrut="YES" bottomStrut="YES"/>
-                        <rect key="contentRect" x="255" y="323" width="480" height="270"/>
+                        <rect key="contentRect" x="95" y="323" width="700" height="400"/>
                         <rect key="screenRect" x="0.0" y="0.0" width="1728" height="1079"/>
                         <view key="contentView" id="eox-7T-vB3">
-                            <rect key="frame" x="0.0" y="0.0" width="480" height="270"/>
+                            <rect key="frame" x="0.0" y="0.0" width="700" height="400"/>
                             <autoresizingMask key="autoresizingMask"/>
                         </view>
                         <connections>
@@ -29,39 +29,90 @@
                 </windowController>
                 <customObject id="8pJ-cq-vb9" userLabel="First Responder" customClass="NSResponder" sceneMemberID="firstResponder"/>
             </objects>
-            <point key="canvasLocation" x="-382" y="-341"/>
+            <point key="canvasLocation" x="-462" y="-274.5"/>
         </scene>
-        <!--View Controller-->
+        <!--Waitlist Lock Screen View Controller-->
         <scene sceneID="WHd-gN-94v">
             <objects>
-                <viewController storyboardIdentifier="WaitlistUnlockViewController" id="F9Q-mg-aJG" sceneMemberID="viewController">
+                <viewController storyboardIdentifier="WaitlistUnlockViewController" id="F9Q-mg-aJG" customClass="WaitlistLockScreenViewController" customModule="DuckDuckGo_Privacy_Browser" customModuleProvider="target" sceneMemberID="viewController">
                     <view key="view" id="Tm0-Dx-fKo">
-                        <rect key="frame" x="0.0" y="0.0" width="538" height="270"/>
+                        <rect key="frame" x="0.0" y="0.0" width="752" height="400"/>
                         <autoresizingMask key="autoresizingMask"/>
                         <subviews>
-                            <textField verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="QkQ-Su-Se9">
-                                <rect key="frame" x="180" y="76" width="96" height="21"/>
-                                <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
-                                <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" selectable="YES" editable="YES" sendsActionOnEndEditing="YES" borderStyle="bezel" placeholderString="Invite Code" drawsBackground="YES" id="3u7-ac-bVZ">
-                                    <font key="font" usesAppearanceFont="YES"/>
-                                    <color key="textColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
+                            <stackView distribution="fill" orientation="vertical" alignment="centerX" horizontalStackHuggingPriority="249.99998474121094" verticalStackHuggingPriority="249.99998474121094" detachesHiddenViews="YES" translatesAutoresizingMaskIntoConstraints="NO" id="1Dc-Sl-H3o">
+                                <rect key="frame" x="226" y="80" width="300" height="68"/>
+                                <subviews>
+                                    <textField focusRingType="none" verticalHuggingPriority="750" horizontalCompressionResistancePriority="1000" translatesAutoresizingMaskIntoConstraints="NO" id="QkQ-Su-Se9">
+                                        <rect key="frame" x="54" y="28" width="193" height="40"/>
+                                        <constraints>
+                                            <constraint firstAttribute="height" constant="40" id="RQe-1b-cQk"/>
+                                        </constraints>
+                                        <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" selectable="YES" editable="YES" sendsActionOnEndEditing="YES" borderStyle="bezel" focusRingType="none" alignment="center" placeholderString="Invite Code" bezelStyle="round" id="3u7-ac-bVZ">
+                                            <font key="font" usesAppearanceFont="YES"/>
+                                            <color key="textColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
+                                            <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
+                                        </textFieldCell>
+                                    </textField>
+                                    <button horizontalHuggingPriority="249" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="hVh-EB-iQR">
+                                        <rect key="frame" x="47" y="-7" width="207" height="32"/>
+                                        <buttonCell key="cell" type="push" title="Unlock" bezelStyle="rounded" alignment="center" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="OD9-vE-QIc">
+                                            <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
+                                            <font key="font" metaFont="system"/>
+                                        </buttonCell>
+                                        <connections>
+                                            <action selector="unlock:" target="F9Q-mg-aJG" id="rV4-ho-Bba"/>
+                                        </connections>
+                                    </button>
+                                </subviews>
+                                <constraints>
+                                    <constraint firstItem="hVh-EB-iQR" firstAttribute="width" secondItem="QkQ-Su-Se9" secondAttribute="width" id="nMl-Kn-w76"/>
+                                    <constraint firstAttribute="width" constant="300" id="r5m-In-a26"/>
+                                </constraints>
+                                <visibilityPriorities>
+                                    <integer value="1000"/>
+                                    <integer value="1000"/>
+                                </visibilityPriorities>
+                                <customSpacing>
+                                    <real value="3.4028234663852886e+38"/>
+                                    <real value="3.4028234663852886e+38"/>
+                                </customSpacing>
+                            </stackView>
+                            <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="OtQ-lg-ny6">
+                                <rect key="frame" x="243" y="264" width="266" height="24"/>
+                                <textFieldCell key="cell" lineBreakMode="clipping" title="DuckDuckGo Privacy Browser" id="ecb-cd-Gzd">
+                                    <font key="font" size="20" name="ProximaNova-Regular"/>
+                                    <color key="textColor" name="labelColor" catalog="System" colorSpace="catalog"/>
                                     <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
                                 </textFieldCell>
                             </textField>
-                            <button verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="hVh-EB-iQR">
-                                <rect key="frame" x="290" y="70" width="77" height="32"/>
-                                <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
-                                <buttonCell key="cell" type="push" title="Unlock" bezelStyle="rounded" alignment="center" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="OD9-vE-QIc">
-                                    <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
-                                    <font key="font" metaFont="system"/>
-                                </buttonCell>
-                            </button>
+                            <imageView horizontalHuggingPriority="251" verticalHuggingPriority="251" translatesAutoresizingMaskIntoConstraints="NO" id="geE-7q-xYb">
+                                <rect key="frame" x="351" y="304" width="50" height="48"/>
+                                <constraints>
+                                    <constraint firstAttribute="width" constant="50" id="fX6-VY-K07"/>
+                                    <constraint firstAttribute="height" constant="48" id="m5s-eQ-VIx"/>
+                                </constraints>
+                                <imageCell key="cell" refusesFirstResponder="YES" alignment="left" imageScaling="proportionallyDown" image="HomepageLogo" id="i4p-iE-ZkA"/>
+                            </imageView>
                         </subviews>
+                        <constraints>
+                            <constraint firstItem="OtQ-lg-ny6" firstAttribute="centerX" secondItem="Tm0-Dx-fKo" secondAttribute="centerX" id="0as-6M-igR"/>
+                            <constraint firstItem="1Dc-Sl-H3o" firstAttribute="centerX" secondItem="Tm0-Dx-fKo" secondAttribute="centerX" id="0kq-0M-gJD"/>
+                            <constraint firstItem="OtQ-lg-ny6" firstAttribute="top" secondItem="geE-7q-xYb" secondAttribute="bottom" constant="16" id="asf-xF-I09"/>
+                            <constraint firstItem="geE-7q-xYb" firstAttribute="centerX" secondItem="Tm0-Dx-fKo" secondAttribute="centerX" id="bEj-SH-qVT"/>
+                            <constraint firstAttribute="bottom" secondItem="1Dc-Sl-H3o" secondAttribute="bottom" constant="80" id="ixg-n6-8aG"/>
+                            <constraint firstItem="geE-7q-xYb" firstAttribute="top" secondItem="Tm0-Dx-fKo" secondAttribute="top" constant="48" id="qcc-jB-32V"/>
+                        </constraints>
                     </view>
+                    <connections>
+                        <outlet property="inviteCodeTextField" destination="QkQ-Su-Se9" id="ESU-eP-zxm"/>
+                    </connections>
                 </viewController>
                 <customObject id="5Eb-Bl-4zD" userLabel="First Responder" customClass="NSResponder" sceneMemberID="firstResponder"/>
             </objects>
-            <point key="canvasLocation" x="229" y="-341"/>
+            <point key="canvasLocation" x="339" y="-283"/>
         </scene>
     </scenes>
+    <resources>
+        <image name="HomepageLogo" width="192" height="192"/>
+    </resources>
 </document>
