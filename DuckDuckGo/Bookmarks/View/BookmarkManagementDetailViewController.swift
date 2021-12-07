@@ -108,23 +108,12 @@ final class BookmarkManagementDetailViewController: NSViewController {
         self.tableView.reloadData()
     }
 
-    private func performClickAction(_ sender: NSTableView, doubleClick: Bool) {
-
+    @IBAction func handleDoubleClick(_ sender: NSTableView) {
         let index = sender.clickedRow
 
         guard index != -1, let entity = fetchEntity(at: index) else {
-            updateEditingState(forRowAt: index)
             return
         }
-
-        let row = sender.view(atColumn: 0, row: index, makeIfNecessary: false) as? BookmarkTableCellView
-
-        if row?.editing ?? false {
-            return
-        }
-        editingBookmarkIndex = nil
-
-        guard doubleClick else { return }
 
         if let bookmark = entity as? Bookmark {
             if NSApplication.shared.isCommandPressed && NSApplication.shared.isShiftPressed {
@@ -139,15 +128,15 @@ final class BookmarkManagementDetailViewController: NSViewController {
             resetSelections()
             delegate?.bookmarkManagementDetailViewControllerDidSelectFolder(folder)
         }
-
-    }
-
-    @IBAction func handleDoubleClick(_ sender: NSTableView) {
-        performClickAction(sender, doubleClick: true)
     }
 
     @IBAction func handleClick(_ sender: NSTableView) {
-        performClickAction(sender, doubleClick: false)
+        let index = sender.clickedRow
+        print(#function, index)
+
+        if index != editingBookmarkIndex?.index {
+            endEditing()
+        }
     }
 
     @IBAction func presentAddBookmarkModal(_ sender: Any) {
@@ -162,27 +151,22 @@ final class BookmarkManagementDetailViewController: NSViewController {
         beginSheet(addFolderViewController)
     }
 
+    private func endEditing() {
+        print(#function, editingBookmarkIndex?.index as Any)
+        if let editingIndex = editingBookmarkIndex?.index {
+            animateEditingState(forRowAt: editingIndex, editing: false)
+        }
+        self.editingBookmarkIndex = nil
+    }
+
     private func updateEditingState(forRowAt index: Int) {
         guard index != -1 else {
-            if let expandedIndex = self.editingBookmarkIndex?.index {
-                animateEditingState(forRowAt: expandedIndex, editing: false) {
-                    self.editingBookmarkIndex = nil
-                }
-            }
-
+            endEditing()
             return
         }
 
-        // Cancel the current editing state, if one exists.
-        if let expandedIndex = self.editingBookmarkIndex?.index {
-            animateEditingState(forRowAt: expandedIndex, editing: false)
-            self.editingBookmarkIndex = nil
-        }
-
-        // If the current expanded row matches the one that has just been double clicked, we're going to deselect it.
-        if editingBookmarkIndex?.index == index {
-            editingBookmarkIndex = nil
-            animateEditingState(forRowAt: index, editing: false)
+        if editingBookmarkIndex?.index != index {
+            endEditing()
         } else if let entity = fetchEntity(at: index) {
             editingBookmarkIndex = EditedBookmarkMetadata(uuid: entity.id, index: index)
             animateEditingState(forRowAt: index, editing: true)
@@ -192,6 +176,7 @@ final class BookmarkManagementDetailViewController: NSViewController {
     }
 
     private func animateEditingState(forRowAt index: Int, editing: Bool, completion: (() -> Void)? = nil) {
+        print(#function, index, editing)
         if let cell = tableView.view(atColumn: 0, row: index, makeIfNecessary: false) as? BookmarkTableCellView,
            let row = tableView.rowView(atRow: index, makeIfNecessary: false) as? BookmarkTableRowView {
 

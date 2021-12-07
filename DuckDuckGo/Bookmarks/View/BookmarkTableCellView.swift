@@ -104,7 +104,7 @@ final class BookmarkTableCellView: NSTableCellView, NibLoadable {
 
     var isSelected = false {
         didSet {
-            titleLabel.textColor = isSelected ? .white : NSColor.controlTextColor
+            titleLabel.textColor = isSelected && !editing ? .white : NSColor.controlTextColor
             faviconImageView.contentTintColor = isSelected ? .white : .black
             accessoryImageView.contentTintColor = isSelected ? .white : nil
             updateTitleLabelValue()
@@ -295,12 +295,14 @@ final class BookmarkTableCellView: NSTableCellView, NibLoadable {
 
     private func buildTitleAttributedString(tertiaryValue: String) -> NSAttributedString {
 
-        let color = isSelected ? NSColor.white : NSColor.labelColor
+        let color = isSelected && !editing ? NSColor.white : NSColor.labelColor
 
         let titleAttributes = [NSAttributedString.Key.foregroundColor: color]
         let titleString = NSMutableAttributedString(string: primaryTitleLabelValue, attributes: titleAttributes)
 
-        let urlAttributes = [NSAttributedString.Key.foregroundColor: NSColor.tertiaryLabelColor]
+        let urlColor = isSelected ? NSColor.secondaryLabelColor : NSColor.tertiaryLabelColor
+
+        let urlAttributes = [NSAttributedString.Key.foregroundColor: urlColor]
         let urlString = NSAttributedString(string: " – \(tertiaryValue)", attributes: urlAttributes)
 
         titleString.append(urlString)
