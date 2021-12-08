@@ -22,57 +22,106 @@ import XCTest
 
 final class CoreDataStoreTests: XCTestCase {
 
-    let container = CoreData.fireproofingContainer()
-    lazy var store = FireproofDomainsStore(context: container.viewContext, tableName: "FireproofDomains")
+    let container = CoreData.coreDataStoreTestsContainer()
+    typealias Store = CoreDataStore<TestManagedObject>
+    lazy var store = Store(context: container.viewContext, tableName: "TestDataModel")
 
-    private func load(into result: inout [String: NSManagedObjectID],
-                      idValue: FireproofDomainsStore.IDValueTuple) throws {
+    private func load(into result: inout [CoreDataTestStruct: NSManagedObjectID],
+                      idValue: Store.IDValueTuple) throws {
         result[idValue.value] = idValue.id
     }
 
-    func testWhenFireproofingIsAddedThenItMustBeLoadedFromStore() throws {
-        let storedId = try store.add("duckduckgo.com")
+    func testWhenObjectIsAddedThenItMustBeLoadedFromStore() throws {
+        let storedId = try store.add(.init(domain: "duckduckgo.com"))
 
         let fireproofed = try store.load(into: .init(), self.load)
-        XCTAssertEqual(fireproofed, ["duckduckgo.com": storedId])
+        XCTAssertEqual(fireproofed, [.init(domain: "duckduckgo.com"): storedId])
     }
 
-    func testWhenFireproofingIsRemovedThenItShouldntBeLoadedFromStore() throws {
-        let storedId1 = try store.add("duckduckgo.com")
-        let storedId2 = try store.add("otherdomain.com")
+    func testWhenObjectIsRemovedThenItShouldntBeLoadedFromStore() throws {
+        let storedId1 = try store.add(.init(domain: "duckduckgo.com"))
+        let storedId2 = try store.add(.init(domain: "otherdomain.com"))
 
         let e = expectation(description: "object removed")
-        store.remove(objectWithId: storedId2) { [store] _ in
+        store.remove(objectWithId: storedId2) { [store] error in
+            XCTAssertNil(error)
             let fireproofed = try? store.load(into: .init(), self.load)
-            XCTAssertEqual(fireproofed, ["duckduckgo.com": storedId1])
+            XCTAssertEqual(fireproofed, [.init(domain: "duckduckgo.com"): storedId1])
             e.fulfill()
         }
         waitForExpectations(timeout: 1)
     }
 
-    func testWhenFireproofingIsUpdatedThenIstLoadedWithNewValue() throws {
-        let storedId1 = try store.add("duckduckgo.com")
-        let storedId2 = try store.add("otherdomain.com")
+    func testWhenObjectIsRemovedWithPredicateThenItShouldntBeLoadedFromStore() throws {
+        let storedId1 = try store.add(.init(domain: "duckduckgo.com", testAttribute: "a"))
+        _=try store.add(.init(domain: "otherdomain.com", testAttribute: "b"))
 
         let e = expectation(description: "object removed")
-        store.remove(objectWithId: storedId2) { [store] _ in
-            // swiftlint:disable:next force_try
-            let storedId3 = try! store.add("thirddomain.com")
+        store.remove(objectsWithPredicate: NSPredicate(format: #keyPath(TestManagedObject.testAttribute) + " == %@", "b")) { [store] error in
+            XCTAssertNil(error)
+            let fireproofed = try? store.load(into: .init(), self.load)
+            XCTAssertEqual(fireproofed, [.init(domain: "duckduckgo.com", testAttribute: "a"): storedId1])
+            e.fulfill()
+        }
+        waitForExpectations(timeout: 1)
+    }
+
+    func testWhenObjectIsUpdatedThenIstLoadedWithNewValue() throws {
+        let storedId1 = try store.add(.init(domain: "duckduckgo.com"))
+        let storedId2 = try store.add(.init(domain: "otherdomain.com"))
+
+        let e = expectation(description: "object removed")
+        store.update(objectWithId: storedId1, with: .init(domain: "www.duckduckgo.com", testAttribute: "a")) { [store] error in
+            XCTAssertNil(error)
 
             let fireproofed = try? store.load(into: .init(), self.load)
-            XCTAssertEqual(fireproofed, ["duckduckgo.com": storedId1,
-                                         "thirddomain.com": storedId3])
+            XCTAssertEqual(fireproofed, [.init(domain: "www.duckduckgo.com", testAttribute: "a"): storedId1,
+                                         .init(domain: "otherdomain.com"): storedId2])
             e.fulfill()
         }
 
         waitForExpectations(timeout: 1)
     }
 
-    func testWhenFireproofingsAreClearedThenOnlyExceptionsRemain() throws {
-        _=try store.add("duckduckgo.com")
-        _=try store.add("otherdomain.com")
-        _=try store.add("wikipedia.org")
-        _=try store.add("fireproofing.site")
+    func testWhenObjectIsUpdatedWithPredicateThenIstLoadedWithNewValue() throws {
+        let storedId1 = try store.add(.init(domain: "duckduckgo.com", testAttribute: "a"))
+        let storedId2 = try store.add(.init(domain: "otherdomain.com", testAttribute: "b"))
+
+        let e = expectation(description: "object removed")
+        store.update(objectWithPredicate: NSPredicate(format: #keyPath(TestManagedObject.testAttribute) + " == %@", "a"),
+                     with: .init(domain: "www.duckduckgo.com", testAttribute: "a")) { [store] error in
+            XCTAssertNil(error)
+
+            let fireproofed = try? store.load(into: .init(), self.load)
+            XCTAssertEqual(fireproofed, [.init(domain: "www.duckduckgo.com", testAttribute: "a"): storedId1,
+                                         .init(domain: "otherdomain.com", testAttribute: "b"): storedId2])
+            e.fulfill()
+        }
+
+        waitForExpectations(timeout: 1)
+    }
+
+    func testWhenUpdateWithPredicateFailsThenErrorIsReturned() throws {
+        let storedId1 = try store.add(.init(domain: "duckduckgo.com", testAttribute: "a"))
+        let storedId2 = try store.add(.init(domain: "otherdomain.com", testAttribute: "b"))
+
+        let e = expectation(description: "object removed")
+        store.update(objectWithPredicate: NSPredicate(format: #keyPath(TestManagedObject.testAttribute) + " == %@", "c"),
+                     with: .init(domain: "www.duckduckgo.com", testAttribute: "c")) { [store] error in
+            XCTAssertEqual(error as? CoreDataStoreError, CoreDataStoreError.objectNotFound)
+            let fireproofed = try? store.load(into: .init(), self.load)
+            XCTAssertEqual(fireproofed, [.init(domain: "duckduckgo.com", testAttribute: "a"): storedId1,
+                                         .init(domain: "otherdomain.com", testAttribute: "b"): storedId2])
+            e.fulfill()
+        }
+        waitForExpectations(timeout: 1)
+    }
+
+    func testWhenObjectsAreClearedThenOnlyExceptionsRemain() throws {
+        _=try store.add(.init(domain: "duckduckgo.com"))
+        _=try store.add(.init(domain: "otherdomain.com"))
+        _=try store.add(.init(domain: "wikipedia.org"))
+        _=try store.add(.init(domain: "fireproofing.site"))
 
         let e = expectation(description: "store cleared")
         store.clear { [store] error in
@@ -85,6 +134,24 @@ final class CoreDataStoreTests: XCTestCase {
             e.fulfill()
         }
         waitForExpectations(timeout: 1)
+    }
+
+}
+
+public struct CoreDataTestStruct: Hashable {
+    var domain: String
+    var testAttribute: String?
+}
+extension TestManagedObject: ValueRepresentableManagedObject {
+
+    public func update(with val: CoreDataTestStruct) {
+        self.domainEncrypted = val.domain as NSString
+        self.testAttribute = val.testAttribute
+    }
+
+    public func valueRepresentation() -> CoreDataTestStruct? {
+        guard let domain = self.domainEncrypted as? String else { return nil }
+        return CoreDataTestStruct(domain: domain, testAttribute: self.testAttribute)
     }
 
 }

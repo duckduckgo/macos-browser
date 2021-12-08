@@ -26,7 +26,7 @@ protocol ValueRepresentableManagedObject: NSManagedObject {
     func update(with value: ValueType) throws
 }
 
-enum CoreDataStoreError: Error {
+enum CoreDataStoreError: Error, Equatable {
     case objectNotFound
     case multipleObjectsFound
     case invalidManagedObject

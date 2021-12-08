@@ -34,6 +34,10 @@ final class CoreData {
         return createInMemoryPersistentContainer(modelName: "FireproofDomains", bundle: Bundle(for: AppDelegate.self))
     }
 
+    static func coreDataStoreTestsContainer() -> NSPersistentContainer {
+        return createInMemoryPersistentContainer(modelName: "TestDataModel", bundle: Bundle(for: Self.self))
+    }
+
     static func downloadsContainer() -> NSPersistentContainer {
         return createInMemoryPersistentContainer(modelName: "Downloads", bundle: Bundle(for: AppDelegate.self))
     }
