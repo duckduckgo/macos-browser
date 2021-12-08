@@ -5,8 +5,8 @@
         "package": "BrowserServicesKit",
         "repositoryURL": "https://github.com/duckduckgo/BrowserServicesKit.git",
         "state": {
-          "branch": "ema/add-identities-autofill",
-          "revision": "1ba9de9d4d8eaa95259c0bf8ffe9f3a0238b44b5",
+          "branch": null,
+          "revision": "b5af13ae334171d1d232b5cda6885e8c854a7afd",
           "version": null
         }
       },

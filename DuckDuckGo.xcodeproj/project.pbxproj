@@ -4972,8 +4972,8 @@
 			isa = XCRemoteSwiftPackageReference;
 			repositoryURL = "https://github.com/duckduckgo/BrowserServicesKit.git";
 			requirement = {
-				branch = "ema/add-identities-autofill";
-				kind = branch;
+				kind = revision;
+				revision = b5af13ae334171d1d232b5cda6885e8c854a7afd;
 			};
 		};
 		85FF55C625F82E4F00E2AB99 /* XCRemoteSwiftPackageReference "lottie-ios" */ = {
