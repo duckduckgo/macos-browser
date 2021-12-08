@@ -24,7 +24,15 @@ import BrowserServicesKit
 // swiftlint:disable file_length
 // swiftlint:disable type_body_length
 
+protocol AddressBarTextFieldDelegate: AnyObject {
+
+    func adressBarTextField(_ addressBarTextField: AddressBarTextField, didChangeValue value: AddressBarTextField.Value)
+
+}
+
 final class AddressBarTextField: NSTextField {
+
+    weak var addressBarTextFieldDelegate: AddressBarTextFieldDelegate?
 
     var tabCollectionViewModel: TabCollectionViewModel! {
         didSet {
@@ -105,6 +113,7 @@ final class AddressBarTextField: NSTextField {
 
     private func subscribeToSelectedTabViewModel() {
         selectedTabViewModelCancellable = tabCollectionViewModel.$selectedTabViewModel.receive(on: DispatchQueue.main).sink { [weak self] _ in
+            self?.restoreValueIfPossible()
             self?.subscribeToAddressBarString()
         }
     }
@@ -116,7 +125,7 @@ final class AddressBarTextField: NSTextField {
             clearValue()
             return
         }
-        addressBarStringCancellable = selectedTabViewModel.$addressBarString.receive(on: DispatchQueue.main).sink { [weak self] _ in
+        addressBarStringCancellable = selectedTabViewModel.$addressBarString.dropFirst().receive(on: DispatchQueue.main).sink { [weak self] _ in
             self?.updateValue()
         }
     }
@@ -131,12 +140,67 @@ final class AddressBarTextField: NSTextField {
         value = Value(stringValue: addressBarString, userTyped: false, isSearch: isSearch)
     }
 
-    func makeMeFirstResponderIfNeeded() {
-        let focusTab = tabCollectionViewModel.selectedTabViewModel?.tab.content.shouldFocusAddressBarAfterSelection ?? true
-
-        if focusTab, stringValue == "" {
-            makeMeFirstResponder()
+    private func saveValue() {
+        guard let selectedTabViewModel = tabCollectionViewModel.selectedTabViewModel else {
+            return
         }
+
+        if isHomepageAddressBar {
+            selectedTabViewModel.lastHomepageTextFieldValue = value
+        } else {
+            selectedTabViewModel.lastAddressBarTextFieldValue = value
+        }
+    }
+
+    private func restoreValueIfPossible() {
+        func restoreValue(_ value: AddressBarTextField.Value) {
+            self.value = value
+            currentEditor()?.selectAll(self)
+        }
+
+        guard let selectedTabViewModel = tabCollectionViewModel.selectedTabViewModel else {
+            return
+        }
+
+        let lastAddressBarTextFieldValue: AddressBarTextField.Value?
+        if isHomepageAddressBar {
+            lastAddressBarTextFieldValue = selectedTabViewModel.lastHomepageTextFieldValue
+        } else {
+            lastAddressBarTextFieldValue = selectedTabViewModel.lastAddressBarTextFieldValue
+        }
+
+        switch lastAddressBarTextFieldValue {
+        case .text(let text):
+            if !text.isEmpty {
+                restoreValue(lastAddressBarTextFieldValue ?? Value(stringValue: "", userTyped: true))
+            } else {
+                updateValue()
+            }
+        case .suggestion(let suggestionViewModel):
+            let suggestion = suggestionViewModel.suggestion
+            switch suggestion {
+            case .website, .bookmark, .historyEntry:
+                restoreValue(Value(stringValue: suggestionViewModel.autocompletionString, userTyped: true))
+            case .phrase(phrase: let phase):
+                restoreValue(Value.text(phase))
+            default:
+                updateValue()
+            }
+        case .url(urlString: let urlString, url: _, userTyped: true):
+            restoreValue(Value(stringValue: urlString, userTyped: true))
+        default:
+            updateValue()
+        }
+    }
+
+    func escapeKeyDown() {
+        if suggestionWindowController?.window?.isVisible ?? false {
+            hideSuggestionWindow()
+            return
+        }
+
+        clearValue()
+        updateValue()
     }
 
     private func displaySelectedSuggestionViewModel() {
@@ -188,16 +252,14 @@ final class AddressBarTextField: NSTextField {
         currentEditor()?.selectAll(self)
     }
 
-    private func updateTabUrlWithUrl(_ providedUrl: URL?, suggestion: Suggestion?) {
+    private func updateTabUrlWithUrl(_ providedUrl: URL, suggestion: Suggestion?) {
         guard let selectedTabViewModel = tabCollectionViewModel.selectedTabViewModel else {
             os_log("%s: Selected tab view model is nil", type: .error, className)
             return
         }
 
-        guard var url = providedUrl else {
-            os_log("%s: Making url from address bar string failed", type: .error, className)
-            return
-        }
+        var url = providedUrl
+
         // keep current search mode
         if url.isDuckDuckGoSearch,
            let oldURL = selectedTabViewModel.tab.content.url,
@@ -228,9 +290,11 @@ final class AddressBarTextField: NSTextField {
         makeUrl(suggestion: suggestion,
                 stringValueWithoutSuffix: stringValueWithoutSuffix,
                 completion: { [weak self] url, isUpgraded in
-                    if isUpgraded { self?.updateTabUpgradedToUrl(url) }
-                    self?.updateTabUrlWithUrl(url, suggestion: suggestion)
-                })
+            guard let url = url else { return }
+
+            if isUpgraded { self?.updateTabUpgradedToUrl(url) }
+            self?.updateTabUrlWithUrl(url, suggestion: suggestion)
+        })
     }
 
     private func updateTabUpgradedToUrl(_ url: URL?) {
@@ -291,10 +355,7 @@ final class AddressBarTextField: NSTextField {
         case suggestion(_ suggestionViewModel: SuggestionViewModel)
 
         init(stringValue: String, userTyped: Bool, isSearch: Bool = false) {
-            if isSearch {
-                // When searching, the string value will be the URL query
-                self = .text(stringValue)
-            } else if let url = stringValue.punycodedUrl, url.isValid {
+            if let url = stringValue.punycodedUrl, url.isValid {
                 var stringValue = stringValue
                 // display punycoded url in readable form when editing
                 if !userTyped,
@@ -335,10 +396,19 @@ final class AddressBarTextField: NSTextField {
                 return suggestion.string.isEmpty
             }
         }
+
+        var isText: Bool {
+            if case .text = self {
+                return true
+            }
+            return false
+        }
     }
 
     @Published private(set) var value: Value = .text("") {
         didSet {
+            saveValue()
+
             suffix = Suffix(value: value)
 
             if let suffix = suffix {
@@ -348,6 +418,8 @@ final class AddressBarTextField: NSTextField {
             } else {
                 self.stringValue = value.string
             }
+
+            addressBarTextFieldDelegate?.adressBarTextField(self, didChangeValue: value)
         }
     }
 
@@ -594,7 +666,6 @@ extension AddressBarTextField: NSTextFieldDelegate {
     func controlTextDidEndEditing(_ obj: Notification) {
         suggestionContainerViewModel?.clearUserStringValue()
         hideSuggestionWindow()
-        updateValue()
     }
 
     func controlTextDidChange(_ obj: Notification) {
@@ -794,17 +865,6 @@ final class AddressBarTextFieldCell: NSTextFieldCell {
 
 fileprivate extension NSStoryboard {
     static let suggestion = NSStoryboard(name: "Suggestion", bundle: .main)
-}
-
-fileprivate extension Tab.TabContent {
-
-    var shouldFocusAddressBarAfterSelection: Bool {
-        switch self {
-        case .url, .homepage, .none: return true
-        case .preferences, .bookmarks: return false
-        }
-    }
-
 }
 
 // swiftlint:enable type_body_length

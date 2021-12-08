@@ -64,7 +64,10 @@ final class TabViewModel {
     var loadingStartTime: CFTimeInterval?
 
     @Published private(set) var addressBarString: String = ""
-    @PublishedAfter private(set) var passiveAddressBarString: String = ""
+    @Published private(set) var passiveAddressBarString: String = ""
+    var lastAddressBarTextFieldValue: AddressBarTextField.Value?
+    var lastHomepageTextFieldValue: AddressBarTextField.Value?
+
     @Published private(set) var title: String = UserText.tabHomeTitle
     @Published private(set) var favicon: NSImage?
     @Published private(set) var findInPage: FindInPageModel = FindInPageModel()
@@ -86,7 +89,7 @@ final class TabViewModel {
     }
 
     private func subscribeToUrl() {
-        tab.$content.sink { [weak self] _ in
+        tab.$content.receive(on: DispatchQueue.main).sink { [weak self] _ in
             self?.updateCanReload()
             self?.updateAddressBarStrings()
             self?.updateCanBeBookmarked()
@@ -95,7 +98,7 @@ final class TabViewModel {
     }
 
     private func subscribeToTitle() {
-        tab.$title.sink { [weak self] _ in self?.updateTitle() } .store(in: &cancellables)
+        tab.$title.receive(on: DispatchQueue.main).sink { [weak self] _ in self?.updateTitle() } .store(in: &cancellables)
     }
 
     private func subscribeToFavicon() {
@@ -167,10 +170,7 @@ final class TabViewModel {
             return
         }
 
-        if let searchQuery = url.searchQuery {
-            addressBarString = searchQuery
-            passiveAddressBarString = searchQuery
-        } else if [.blankPage, .homePage].contains(url) {
+        if [.blankPage, .homePage].contains(url) {
             addressBarString = ""
             passiveAddressBarString = ""
         } else {

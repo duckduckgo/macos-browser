@@ -120,7 +120,7 @@ final class PermissionContextMenu: NSMenu {
             case .revoking, .reloading:
                 // expected permission to deactivate access
                 return
-            case .requested(_):
+            case .requested:
                 return
             }
         }
