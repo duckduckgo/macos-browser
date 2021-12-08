@@ -175,15 +175,19 @@ final class PermissionModel {
                                    forDomain domain: String,
                                    to decision: Bool?) {
 
-        // If Always Deny for the current host: revoke the permission
-        guard webView?.url?.host?.dropWWW() == domain,
-           decision == false,
-           self.permissions[permissionType] != nil
-        else {
-            return
-        }
+        // If Always Allow/Deny for the current host: Grant/Revoke the permission
+        guard webView?.url?.host?.dropWWW() == domain else { return }
 
-        self.revoke(permissionType)
+        switch (decision, self.permissions[permissionType]) {
+        case (false, .some):
+            self.revoke(permissionType)
+            fallthrough
+        case (true, .requested):
+            while let query = self.authorizationQueries.first(where: { $0.permissions == [permissionType] }) {
+                query.handleDecision(grant: decision!)
+            }
+        default: break
+        }
     }
 
     // MARK: Pausing/Revoking
@@ -245,7 +249,7 @@ final class PermissionModel {
         for permission in permissions {
             var grant: Bool?
             if let stored = permissionManager.permission(forDomain: domain, permissionType: permission),
-               permission.canPersistGrantedDecision || stored != true {
+               (permission.canPersistGrantedDecision || stored == false) && (permission.canPersistDeniedDecision || stored == true) {
                 grant = stored
             } else if let state = self.permissions[permission] {
                 switch state {

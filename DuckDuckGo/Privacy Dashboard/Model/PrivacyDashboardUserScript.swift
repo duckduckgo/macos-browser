@@ -137,12 +137,19 @@ final class PrivacyDashboardUserScript: NSObject, StaticUserScript {
                 "permission": item.state.rawValue,
                 "used": usedPermissions[item.permission] != nil,
                 "paused": usedPermissions[item.permission] == .paused,
-                "options": PermissionAuthorizationState.allCases.compactMap { decision in
+                "options": PermissionAuthorizationState.allCases.compactMap { decision -> [String: String]? in
                     // don't show Permanently Allow if can't persist Granted Decision
-                    return decision != .grant || item.permission.canPersistGrantedDecision ? [
+                    switch decision {
+                    case .grant:
+                        guard item.permission.canPersistGrantedDecision else { return nil }
+                    case .deny:
+                        guard item.permission.canPersistDeniedDecision else { return nil }
+                    case .ask: break
+                    }
+                    return [
                         "id": decision.rawValue,
                         "title": String(format: decision.localizedFormat(for: item.permission), domain)
-                    ] : nil
+                    ]
                 }
             ]
         }

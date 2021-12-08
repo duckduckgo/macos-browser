@@ -167,8 +167,8 @@ final class PermissionContextMenu: NSMenu {
         for (permission, state) in permissions {
             switch state {
             case .active, .inactive, .paused:
-                guard permission.canPersistGrantedDecision else { continue }
                 if PermissionManager.shared.permission(forDomain: domain, permissionType: permission) == nil {
+                    guard permission.canPersistGrantedDecision else { continue }
                     addItem(.alwaysAllow(permission, on: domain, target: self))
                 } else {
                     addItem(.alwaysAsk(permission, on: domain, target: self))
@@ -176,6 +176,7 @@ final class PermissionContextMenu: NSMenu {
 
             case .denied:
                 if PermissionManager.shared.permission(forDomain: domain, permissionType: permission) == nil {
+                    guard permission.canPersistDeniedDecision else { continue }
                     addItem(.alwaysDeny(permission, on: domain, target: self))
                 } else {
                     addItem(.alwaysAsk(permission, on: domain, target: self))
@@ -310,7 +311,13 @@ private extension NSMenuItem {
     }
 
     static func alwaysAllow(_ permission: PermissionType, on domain: String, target: PermissionContextMenu) -> NSMenuItem {
-        let title = String(format: UserText.permissionAlwaysAllowDeviceFormat, permission.localizedDescription, domain)
+        let title: String
+        if case .popups = permission {
+            title = String(format: UserText.permissionAlwaysAllowPopupsFormat, domain)
+        } else {
+            title = String(format: UserText.permissionAlwaysAllowDeviceFormat, permission.localizedDescription, domain)
+        }
+
         let item = NSMenuItem(title: title,
                               action: #selector(PermissionContextMenu.alwaysAllowPermission),
                               keyEquivalent: "")

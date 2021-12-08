@@ -643,6 +643,7 @@ extension BrowserTabViewController: WKUIDelegate {
             parentTab.permissions.authorizationQueries.first(where: { $0.permissions.contains(.popups) })
         }
 
+        let contentSize = NSSize(width: windowFeatures.width?.intValue ?? 1024, height: windowFeatures.height?.intValue ?? 752)
         var shouldOpenPopUp = navigationAction.isUserInitiated
         if !shouldOpenPopUp {
             let url = navigationAction.request.url
@@ -660,7 +661,7 @@ extension BrowserTabViewController: WKUIDelegate {
                     // called asynchronously
                     guard let url = navigationAction.request.url else { return }
                     let tab = makeTab(parentTab: parentTab, content: .url(url))
-                    WindowsManager.openPopUpWindow(with: tab)
+                    WindowsManager.openPopUpWindow(with: tab, contentSize: contentSize)
 
                     parentTab.permissions.permissions.popups.popupOpened(nextQuery: nextQuery(parentTab: parentTab))
 
@@ -678,7 +679,7 @@ extension BrowserTabViewController: WKUIDelegate {
         if windowFeatures.toolbarsVisibility?.boolValue == true {
             tabCollectionViewModel.insertChild(tab: tab, selected: true)
         } else {
-            WindowsManager.openPopUpWindow(with: tab)
+            WindowsManager.openPopUpWindow(with: tab, contentSize: contentSize)
         }
         parentTab.permissions.permissions.popups.popupOpened(nextQuery: nextQuery(parentTab: parentTab))
 
