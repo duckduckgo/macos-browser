@@ -55,24 +55,34 @@ extension CoreDataStore {
 internal class CoreDataStore<ManagedObject: ValueRepresentableManagedObject> {
 
     private let tableName: String
-    private var _context: NSManagedObjectContext??
+    private var _readContext: NSManagedObjectContext??
 
-    private var context: NSManagedObjectContext? {
-        if case .none = _context {
+    private var readContext: NSManagedObjectContext? {
+        if case .none = _readContext {
 #if DEBUG
             if AppDelegate.isRunningTests {
-                _context = .some(.none)
+                _readContext = .some(.none)
                 return .none
             }
 #endif
-            _context = Database.shared.makeContext(concurrencyType: .privateQueueConcurrencyType, name: tableName)
+            _readContext = Database.shared.makeContext(concurrencyType: .privateQueueConcurrencyType, name: tableName)
         }
-        return _context!
+        return _readContext!
+    }
+
+    private func writeContext() -> NSManagedObjectContext? {
+        guard let context = readContext else { return nil }
+
+        let newContext = NSManagedObjectContext(concurrencyType: .privateQueueConcurrencyType)
+        newContext.persistentStoreCoordinator = context.persistentStoreCoordinator
+        newContext.name = context.name
+
+        return newContext
     }
 
     init(context: NSManagedObjectContext? = nil, tableName: String) {
         if let context = context {
-            self._context = .some(context)
+            self._readContext = .some(context)
         }
         self.tableName = tableName
     }
@@ -88,7 +98,7 @@ internal class CoreDataStore<ManagedObject: ValueRepresentableManagedObject> {
         var result = initialResult
         var coreDataError: Error?
 
-        guard let context = context else { return result }
+        guard let context = readContext else { return result }
         context.performAndWait {
             let fetchRequest = NSFetchRequest<ManagedObject>(entityName: ManagedObject.className())
             fetchRequest.predicate = predicate
@@ -113,7 +123,7 @@ internal class CoreDataStore<ManagedObject: ValueRepresentableManagedObject> {
     }
 
     func add<S: Sequence>(_ values: S) throws -> [(value: Value, id: NSManagedObjectID)] where S.Element == Value {
-        guard let context = context else { return [] }
+        guard let context = writeContext() else { return [] }
 
         var result: Result<[(Value, NSManagedObjectID)], Error> = .success([])
 
@@ -145,7 +155,7 @@ internal class CoreDataStore<ManagedObject: ValueRepresentableManagedObject> {
     }
 
     func update(objectWithPredicate predicate: NSPredicate, with value: Value, completionHandler: ((Error?) -> Void)?) {
-        guard let context = context else { return }
+        guard let context = writeContext() else { return }
 
         func mainQueueCompletion(_ error: Error?) {
             guard completionHandler != nil else { return }
@@ -176,7 +186,7 @@ internal class CoreDataStore<ManagedObject: ValueRepresentableManagedObject> {
     }
 
     func update(objectWithId id: NSManagedObjectID, with value: Value, completionHandler: ((Error?) -> Void)?) {
-        guard let context = context else { return }
+        guard let context = writeContext() else { return }
 
         func mainQueueCompletion(_ error: Error?) {
             guard completionHandler != nil else { return }
@@ -203,7 +213,7 @@ internal class CoreDataStore<ManagedObject: ValueRepresentableManagedObject> {
     }
 
     func remove(objectsWithPredicate predicate: NSPredicate, completionHandler: ((Error?) -> Void)?) {
-        guard let context = self.context else { return }
+        guard let context = self.writeContext() else { return }
 
         func mainQueueCompletion(_ error: Error?) {
             guard completionHandler != nil else { return }
@@ -231,7 +241,7 @@ internal class CoreDataStore<ManagedObject: ValueRepresentableManagedObject> {
     }
 
     func remove(objectWithId id: NSManagedObjectID, completionHandler: ((Error?) -> Void)?) {
-        guard let context = context else { return }
+        guard let context = writeContext() else { return }
         func mainQueueCompletion(error: Error?) {
             guard completionHandler != nil else { return }
             DispatchQueue.main.async {
@@ -258,7 +268,7 @@ internal class CoreDataStore<ManagedObject: ValueRepresentableManagedObject> {
     }
 
     func clear(completionHandler: ((Error?) -> Void)?) {
-        guard let context = context else { return }
+        guard let context = writeContext() else { return }
         func mainQueueCompletion(error: Error?) {
             guard completionHandler != nil else { return }
             DispatchQueue.main.async {
